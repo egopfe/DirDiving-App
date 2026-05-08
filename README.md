@@ -1,202 +1,273 @@
-# DIR DIVING — watchOS Dive App
-# Copyright Federico Lombardo di Monte Iato 2026
-## Contenuto
-Questo pacchetto contiene il codice SwiftUI/watchOS di DIR DIVING con:
-- profondità attuale, media e massima
-- temperatura acqua
-- TTV
+# DIR DIVING - watchOS Dive App
+
+Copyright Federico Lombardo di Monte Iato 2026
+
+DIR DIVING is a SwiftUI watchOS application for Apple Watch Ultra-class devices. It focuses on essential in-water dive information, ascent-rate awareness, compass navigation, local dive logging, GPS entry/exit metadata, and CSV export for Subsurface.
+
+> Status note: the app is prepared for Apple water submersion APIs, but the depth/submersion entitlement is still pending. Until the entitlement is granted and the app is signed with it, `CMWaterSubmersionManager` may report entitlement-related errors and will not deliver production depth data.
+
+## Features
+
+- Current, average, and maximum depth
+- Water temperature
 - RunTime
-- cronometro manuale Start / Stop / Reset
-- log locale ultime 40 immersioni
-- profilo grafico immersione
-- export CSV per Subsurface
-- schermata bussola integrata
-- set bearing contestuale nella schermata bussola
-- scala dinamica velocità di risalita verde/giallo/rosso
-- vibrazione e warning lampeggiante rosso quando la velocità di risalita supera il limite
+- TTV-style live value
+- Manual stopwatch with Start, Stop, and Reset controls
+- Local log of the latest 40 dives
+- Dive profile chart
+- CSV export compatible with Subsurface workflows
+- Integrated compass screen
+- Contextual `SET BEARING` / `CLEAR BEARING` compass action
+- Dynamic ascent-rate gauge with green, yellow, and red zones
+- Red blinking warning and haptic feedback when ascent rate exceeds the current depth-band limit
+- GPS entry and exit points captured with a best-effort surface fix
+- Custom image screen for bundled reference images, checklists, or static procedures
 
-## Navigazione e comandi
-Lo standard implementato è:
-- **Bussola = schermata**, non funzione da avviare.
-- **Digital Crown = navigazione** tra le schermate dell'app.
-- **Tasto/azione contestuale nella schermata bussola = SET BEARING / CLEAR BEARING**.
-- Nessuna shortcut complessa dedicata alla bussola.
+## Project Structure
 
-Le schermate principali sono:
-1. Live immersione
-2. Bussola
-3. Log immersioni
+```text
+App/        watchOS app entry point and Info.plist
+Config/     entitlements file
+Models/     dive sessions, samples, GPS points, ascent status
+Services/   dive, GPS, compass, haptics, export, image loading, App Intents
+Utils/      formatting helpers
+Views/      SwiftUI screens and components
+Resources/  asset catalogs and bundled user resources
+```
 
-## Bussola
-La schermata bussola usa `CoreLocation` e `CLHeading` per mostrare:
-- heading corrente in gradi
-- punto cardinale
-- accuratezza heading, quando disponibile
-- bearing bloccato
-- deviazione dal bearing impostato
+The project is configured with XcodeGen through `project.yml`.
 
-Il pulsante contestuale funziona così:
-- `SET BEARING`: salva la direzione corrente come bearing
-- `CLEAR BEARING`: cancella il bearing salvato
+## Main Navigation
 
-Per usare la bussola è presente in `Info.plist` la chiave:
-- `NSLocationWhenInUseUsageDescription`
+DIR DIVING uses a vertical page-based `TabView`, designed for Apple Watch navigation with the Digital Crown.
 
-## Velocità massima di risalita
-La scala cambia automaticamente in base alla profondità corrente:
-- 40–30 m: limite 10 m/min
-- 30–20 m: limite 5 m/min
-- 20–6 m: limite 3 m/min
-- 6–0 m: limite 1 m/min
+Main screens:
 
-La velocità reale viene calcolata confrontando i campioni di profondità successivi. Se la profondità diminuisce, DIR DIVING calcola la risalita in m/min.
+1. Live dive screen
+2. Compass screen
+3. User images screen
+4. Dive log screen
 
-## Warning e vibrazione
-Quando la velocità attuale supera il limite della fascia corrente:
-- la scala lampeggia in rosso
-- il bordo del pannello lampeggia
-- Apple Watch vibra con feedback `.failure`
-- la vibrazione viene limitata a un massimo di una ogni 2 secondi per evitare feedback continuo
+The compass is implemented as a full screen, not as a modal feature that must be launched. Bearing actions are contextual to the compass screen.
 
-Nel mockup non compare un banner inferiore fisso: il warning resta nella UI della scala e nel feedback aptico.
+## Live Dive Screen
 
-## Pulsanti cronometro
-I pulsanti sul display comandano solo il cronometro manuale:
-- START avvia il cronometro
-- STOP mette in pausa
-- RESET riporta a 00:00
+The live screen shows:
 
-Il RunTime di immersione resta automatico e viene gestito dalla sessione immersione.
+- Current depth
+- Maximum depth
+- Average depth
+- Water temperature, when available
+- RunTime
+- TTV value
+- Manual stopwatch value
+- Ascent-rate gauge
+- Warning state when ascent rate is over limit
 
-## Tasto laterale / Action Button
-Apple non espone API pubbliche per intercettare liberamente il long-press fisico del tasto laterale o dell'Action Button dentro una app watchOS. Per questo nel progetto restano inclusi due App Intent semplici:
-- `ToggleStopwatchIntent`: avvia/ferma il cronometro, assegnabile all'Action Button
-- `ResetStopwatchIntent`: reset del cronometro, richiamabile come intent dedicato
+RunTime is controlled automatically by the dive session. The manual stopwatch is independent and can be started, stopped, or reset by the user.
 
-Quindi la pressione singola dell'Action Button può essere usata per Start/Stop cronometro. Il reset con pressione di 2 secondi non è implementabile in modo affidabile con API pubbliche Apple; il reset resta disponibile dal tasto display e dall'intent dedicato.
+## Ascent-Rate Limits
 
-Per la bussola non sono stati aggiunti shortcut complessi: il bearing si imposta dalla schermata bussola con il tasto contestuale.
+The ascent-rate limit changes according to current depth:
 
-## Export Subsurface
-Sì: la documentazione e il codice includono l'export per Subsurface.
+| Depth band | Limit |
+| --- | ---: |
+| 40-30 m | 10 m/min |
+| 30-20 m | 5 m/min |
+| 20-6 m | 3 m/min |
+| 6-0 m | 1 m/min |
+| Outside configured bands | 10 m/min |
 
-Procedura:
-1. Apri il log immersioni su DIR DIVING.
-2. Seleziona una immersione.
-3. Premi `Genera CSV Subsurface`.
-4. Premi `Condividi CSV` e invia il file a iPhone, Mac, Files, AirDrop o email.
-5. In Subsurface apri: `File > Import > Import log files > CSV`.
-6. Mappa le colonne:
-   - `time_sec` = tempo in secondi
-   - `depth_m` = profondità in metri
-   - `temperature_c` = temperatura acqua in °C
-7. Subsurface ricostruirà il profilo grafico dell'immersione.
+The fallback limit of `10 m/min` outside the configured bands is intentional.
 
+The app computes ascent rate by comparing consecutive depth samples. When depth decreases, DIR DIVING converts the difference into meters per minute.
 
-## GPS automatico inizio/fine immersione
+## Warning and Haptics
 
-DIR DIVING registra automaticamente il punto GPS di inizio e fine immersione, anche se l'utente non preme nessun comando manuale.
+When ascent rate exceeds the active limit:
 
-### Punto GPS di inizio immersione
-Quando Apple Watch entra in modalità immersione / submersione:
+- The ascent gauge enters the red zone
+- The live depth warning state blinks in red
+- Apple Watch plays `.failure` haptic feedback
+- Haptic feedback is throttled to at most one warning every 2 seconds
 
-1. DIR DIVING salva subito l'ultimo punto GPS valido già disponibile.
-2. Avvia una richiesta `best effort` di posizione aggiornata.
-3. Se entro pochi secondi arriva un fix migliore, aggiorna il punto di inizio.
-4. Se il fix non arriva, resta salvato l'ultimo punto registrabile disponibile prima dell'immersione.
+The warning is intentionally kept inside the main live UI instead of using a separate fixed bottom banner.
 
-Questo comportamento è pensato perché il GPS sott'acqua non è affidabile: il punto di inizio deve essere preso in superficie o immediatamente prima della discesa.
+## Compass
 
-### Punto GPS di fine immersione
-Quando Apple Watch esce dalla modalità immersione perché torna fuori dall'acqua:
+The compass screen uses `CoreLocation` and `CLHeading` to show:
 
-1. DIR DIVING salva subito l'ultimo punto GPS disponibile.
-2. Prova per alcuni secondi ad acquisire un nuovo fix di superficie.
-3. Se arriva un fix migliore, lo usa come punto fine.
-4. Se non arriva, mantiene l'ultimo punto valido già registrato.
+- Current heading in degrees
+- Cardinal direction
+- Saved bearing
+- Bearing clear action
 
-### Visualizzazione e uso
-- Nel dettaglio immersione vengono mostrate coordinate e accuratezza stimata.
-- Il dato GPS va considerato come posizione di superficie/entry-exit, non come tracking subacqueo continuo.
-- L'app mantiene il GPS aggiornato mentre è attiva per avere sempre un ultimo punto registrabile pronto da salvare.
+Actions:
 
-Permesso richiesto in `Info.plist`:
+- `SET BEARING` stores the current heading as the active bearing
+- `CLEAR` removes the active bearing
+
+Required permission in `Info.plist`:
 
 ```xml
 <key>NSLocationWhenInUseUsageDescription</key>
-<string>DIR DIVING usa la posizione per la bussola e per registrare il punto GPS di inizio e fine immersione quando disponibile in superficie.</string>
+<string>DIR DIVING uses location to save GPS entry and exit points.</string>
 ```
 
-### Subsurface e coordinate GPS
+## Manual Stopwatch and App Intents
 
-L'export CSV Subsurface resta disponibile dal dettaglio immersione. Il file contiene:
+The on-screen stopwatch controls are:
 
-- campioni `time_sec`, `depth_m`, `temperature_c`
-- righe commentate con `start_lat`, `start_lon`, `end_lat`, `end_lon` quando disponibili
+- `START`: starts the manual stopwatch
+- `STOP`: pauses the manual stopwatch
+- `RESET`: returns the stopwatch to `00:00`
 
-In Subsurface importa il CSV da **File > Import > Import log files > CSV** e mappa le colonne tempo/profondità/temperatura. Le coordinate sono incluse come metadati DIR DIVING nel CSV; se la procedura CSV di Subsurface non le usa automaticamente, restano comunque disponibili nel file esportato e nel dettaglio immersione dell'app.
+The project also includes two App Intents:
 
-## Revisione compatibilità API — 27/04/2026
+- `ToggleStopwatchIntent`: starts or stops the manual stopwatch
+- `ResetStopwatchIntent`: resets the manual stopwatch
 
-Ho riallineato il codice alle firme pubbliche Apple più recenti per la parte submersione:
+These intents are intended for Action Button or shortcut-style workflows where watchOS exposes them. Apple does not provide a public API for arbitrary long-press handling of the physical side button or Action Button inside a watchOS app, so the reset action remains available through the UI and through the dedicated intent.
 
-- disponibilità verificata con `CMWaterSubmersionManager.waterSubmersionAvailable`;
-- delegate aggiornato con metodi `manager(_:didUpdate:)` per `CMWaterSubmersionEvent`, `CMWaterSubmersionMeasurement` e `CMWaterTemperature`;
-- gestione errori con `manager(_:errorOccurred:)`;
-- metodi delegate marcati `nonisolated` per evitare errori di actor isolation con Swift moderno;
-- app icon set espanso con le dimensioni watchOS principali oltre alla marketing icon da 1024 px.
+## Automatic GPS Entry and Exit Points
 
-### Apple Watch Ultra 5
-Al momento della revisione non risulta un modello Apple Watch Ultra 5 ufficialmente documentato da Apple. La compatibilità dichiarabile è quindi: **Apple Watch Ultra e modelli successivi che espongono `CMWaterSubmersionManager` e il sensore di profondità/temperatura acqua**. Se un futuro Apple Watch Ultra 5 manterrà le stesse API pubbliche, il progetto è strutturalmente compatibile; andrà comunque ricompilato e validato con l'SDK Apple disponibile al momento.
+DIR DIVING records surface GPS metadata for the beginning and end of a dive.
 
-### Nota compilazione
-Non posso eseguire `xcodebuild` watchOS in questo ambiente perché non è disponibile Xcode/macOS. Il progetto è stato ricontrollato staticamente e preparato per generazione tramite XcodeGen su Mac.
+### Entry Point
 
-## Immagini caricate da PC/Mac e visualizzazione sull'orologio
+When the watch enters submersion mode:
 
-È stata aggiunta una schermata **Schermi** dentro DIR DIVING, navigabile con la Digital Crown insieme a Live, Bussola e Log.
+1. The app immediately stores the latest available GPS point.
+2. It starts a best-effort GPS capture window.
+3. If a better fix arrives within the capture window, the entry point is updated.
+4. If no better fix arrives, the app keeps the latest available point.
 
-### Cosa fa
-La schermata permette di visualizzare immagini personalizzate già preparate nelle dimensioni dello schermo dell'Apple Watch. È utile per:
-- checklist grafiche;
-- promemoria di immersione;
-- tabelle personali;
-- schermate statiche o procedure da consultare sott'acqua/in superficie.
+This design reflects the fact that GPS is not reliable underwater. Entry position should be captured at the surface or immediately before descent.
 
-### Come caricare le immagini dal PC/Mac
-watchOS non consente a una app standalone di leggere direttamente file dal filesystem di un PC. Per questo la soluzione implementata è tramite risorse incluse nel progetto:
+### Exit Point
 
-1. Prepara le immagini sul PC/Mac in formato `PNG`, `JPG`, `JPEG` o `HEIC`.
-2. Usa dimensioni pari o proporzionate allo schermo del tuo Apple Watch.
-3. Copia i file dentro:
+When the watch leaves submersion mode:
+
+1. The app immediately stores the latest available GPS point.
+2. It starts a best-effort surface GPS capture window.
+3. If a better fix arrives, the exit point is saved with the dive log.
+4. If no better fix arrives, the app keeps the latest available point.
+
+The dive log is finalized after the exit best-effort capture completes, so the exported session contains the best available exit point.
+
+### Display and Use
+
+- Entry and exit coordinates are shown in the dive detail screen when available.
+- GPS data represents surface entry/exit metadata, not underwater tracking.
+- The app keeps location updates active while needed so a recent point is available.
+
+## Dive Log
+
+Dive sessions are stored locally in the app documents directory as JSON. The log keeps the latest 40 sessions and sorts them by start date.
+
+Each saved session includes:
+
+- Start and end date
+- Duration
+- Maximum depth
+- Average depth
+- Average, minimum, and maximum water temperature when available
+- TTV value
+- Entry and exit GPS points when available
+- Full depth/temperature sample list
+
+## Subsurface CSV Export
+
+The dive detail screen can generate and share a CSV file for Subsurface-style import workflows.
+
+Workflow:
+
+1. Open the dive log.
+2. Select a dive.
+3. Tap `Generate Subsurface CSV`.
+4. Tap the share button and send the CSV to iPhone, Mac, Files, AirDrop, or email.
+5. In Subsurface, open `File > Import > Import log files > CSV`.
+6. Map the columns:
+   - `time_seconds` = elapsed time in seconds
+   - `depth_m` = depth in meters
+   - `temperature_c` = water temperature in degrees Celsius
+
+The CSV also includes entry and exit latitude/longitude columns when available.
+
+## User Images
+
+DIR DIVING includes a `Screens` view for bundled static images. This is useful for:
+
+- Dive checklists
+- Personal procedures
+- Reference tables
+- Static reminders
+- High-contrast underwater-readable notes
+
+### Adding Images
+
+watchOS standalone apps cannot directly read arbitrary files from a PC or Mac filesystem. DIR DIVING therefore loads images that are bundled with the app.
+
+To add images:
+
+1. Prepare `PNG`, `JPG`, `JPEG`, or `HEIC` images.
+2. Use dimensions matching, or proportional to, the target Apple Watch screen.
+3. Copy the images into:
 
 ```text
-DIRDiving/Resources/UserImages/
+Resources/UserImages/
 ```
 
-4. Se usi XcodeGen, rigenera il progetto:
+4. Regenerate the Xcode project if using XcodeGen:
 
 ```bash
 xcodegen generate
 ```
 
-5. Apri Xcode, compila e installa l'app sull'Apple Watch.
-6. Apri DIR DIVING e vai alla schermata **Schermi**.
-7. Seleziona l'immagine e visualizzala a pieno schermo.
+5. Build and install the app on Apple Watch.
+6. Open DIR DIVING and navigate to the `Screens` view.
 
-### Dimensioni consigliate
-Per immagini pensate per lo schermo completo, prepara file già ottimizzati per il modello di Apple Watch target. In generale:
-- formato verticale;
-- sfondo scuro;
-- testi grandi;
-- alto contrasto;
-- evitare dettagli piccoli, perché in immersione sono poco leggibili.
+### Recommended Image Style
 
-### Aggiornamento immagini
-Per aggiungere o sostituire immagini:
-1. aggiungi/rimuovi i file nella cartella `Resources/UserImages`;
-2. ricompila l'app;
-3. reinstalla/sincronizza su Apple Watch.
+- Portrait orientation
+- Dark background
+- Large text
+- High contrast
+- Minimal fine detail
 
-### Estensione futura
-Se in futuro vuoi caricare immagini senza ricompilare l'app, serve una companion app iPhone o una funzione di sincronizzazione via `WatchConnectivity`. La struttura `UserImageStore` è già predisposta per leggere anche immagini presenti nella cartella Documents dell'app, quindi può essere estesa in seguito per ricevere file trasferiti da iPhone.
+For future file transfer without recompiling the app, the project could be extended with an iPhone companion app and `WatchConnectivity`.
+
+## Apple Water Submersion API Compatibility
+
+The dive engine uses:
+
+- `CMWaterSubmersionManager.waterSubmersionAvailable`
+- `CMWaterSubmersionManagerDelegate`
+- `CMWaterSubmersionEvent`
+- `CMWaterSubmersionMeasurement`
+- `CMWaterTemperature`
+- `manager(_:errorOccurred:)`
+
+Delegate methods are marked `nonisolated` and bridge back to the main actor for Swift concurrency compatibility.
+
+## Build Notes
+
+This repository is intended to be generated and built on macOS with Xcode and XcodeGen.
+
+```bash
+xcodegen generate
+```
+
+Then open the generated Xcode project and build the watchOS target.
+
+This environment cannot run a full watchOS `xcodebuild` validation because Xcode and the Apple watchOS SDK are not available here. Final validation should be performed on macOS with the target Apple Watch hardware or simulator configuration.
+
+## Entitlement Status
+
+The entitlements file currently exists at:
+
+```text
+Config/DIRDiving.entitlements
+```
+
+The Apple water depth/submersion entitlement is intentionally not filled in yet because approval is pending. After Apple grants the entitlement, update this file and rebuild with the correct signing profile.
