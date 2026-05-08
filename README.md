@@ -92,28 +92,6 @@ Procedura:
    - `temperature_c` = temperatura acqua in °C
 7. Subsurface ricostruirà il profilo grafico dell'immersione.
 
-## Come generare il progetto Xcode
-Il pacchetto include `project.yml` per XcodeGen.
-
-Su Mac:
-```bash
-brew install xcodegen
-cd DIRDiving_Final
-xcodegen generate
-open DIRDiving.xcodeproj
-```
-
-Poi in Xcode:
-1. Seleziona il target DIR DIVING.
-2. Imposta il tuo Team Apple Developer.
-3. Cambia `PRODUCT_BUNDLE_IDENTIFIER`, se necessario.
-4. Aggiungi l'entitlement corretto in Signing & Capabilities:
-   - shallow depth per test limitati
-   - full submerged depth and pressure se Apple lo approva per immersioni complete
-5. Compila su Apple Watch Ultra fisico. Il simulatore non fornisce dati reali di profondità o bussola affidabili.
-
-## Nota importante sugli entitlement
-Per attività scuba / profondità fino a 40 m serve richiedere ad Apple il full `Submerged Depth and Pressure` entitlement. Il pacchetto include sia il template shallow sia full, ma non lo forza nel progetto per evitare errori di signing se il tuo account non è ancora abilitato.
 
 ## GPS automatico inizio/fine immersione
 
