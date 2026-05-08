@@ -9,7 +9,7 @@ final class HapticService {
 
     func warnIfNeeded() {
         let now = Date()
-        if let lastWarningDate, now.timeIntervalSince(lastWarningDate) < 4 { return }
+        if let lastWarningDate, now.timeIntervalSince(lastWarningDate) < 2 { return }
         lastWarningDate = now
         WKInterfaceDevice.current().play(.failure)
     }

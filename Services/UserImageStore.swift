@@ -15,8 +15,8 @@ final class UserImageStore: ObservableObject {
         imageNames = names.sorted()
     }
 
-    func image(for fileName: String) -> UIImage? {
-        guard let url = Bundle.main.url(forResource: fileName, withExtension: nil, subdirectory: "UserImages") else { return nil }
-        return UIImage(contentsOfFile: url.path)
+    func imageResourceName(for fileName: String) -> String? {
+        guard Bundle.main.url(forResource: fileName, withExtension: nil, subdirectory: "UserImages") != nil else { return nil }
+        return "UserImages/\(fileName)"
     }
 }

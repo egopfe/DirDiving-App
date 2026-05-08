@@ -3,6 +3,8 @@ import CoreMotion
 
 @MainActor
 final class DiveManager: NSObject, ObservableObject {
+    static private(set) weak var shared: DiveManager?
+
     @Published var currentDepthMeters: Double = 0
     @Published var averageDepthMeters: Double = 0
     @Published var maxDepthMeters: Double = 0
@@ -32,6 +34,7 @@ final class DiveManager: NSObject, ObservableObject {
         self.logStore = logStore
         self.gpsManager = gpsManager
         super.init()
+        Self.shared = self
         configureSubmersion()
     }
 
@@ -64,6 +67,9 @@ final class DiveManager: NSObject, ObservableObject {
         isDiveActive = true
         sessionStart = Date()
         entryGPS = gpsManager.currentBestPoint()
+        gpsManager.captureBestEffortPoint(for: 6) { [weak self] point in
+            self?.entryGPS = point
+        }
         samples = []
         previousDepthSample = nil
         currentDepthMeters = 0
@@ -89,6 +95,18 @@ final class DiveManager: NSObject, ObservableObject {
         runtimeTimer = nil
         stopBlinking()
         let end = Date()
+        let finishedSamples = samples
+        let finishedEntryGPS = entryGPS
+        sessionStart = nil
+        samples = []
+        previousDepthSample = nil
+        gpsManager.captureBestEffortPoint(for: 6) { [weak self] point in
+            self?.exitGPS = point
+            self?.finalizeDive(start: start, end: end, entryGPS: finishedEntryGPS, exitGPS: point, samples: finishedSamples)
+        }
+    }
+
+    private func finalizeDive(start: Date, end: Date, entryGPS: GPSPoint?, exitGPS: GPSPoint?, samples: [DiveSample]) {
         let depths = samples.map(\.depthMeters)
         let temps = samples.compactMap(\.temperatureCelsius)
         let avgDepth = depths.isEmpty ? 0 : depths.reduce(0, +) / Double(depths.count)
@@ -97,9 +115,6 @@ final class DiveManager: NSObject, ObservableObject {
         let duration = end.timeIntervalSince(start)
         let session = DiveSession(startDate: start, endDate: end, durationSeconds: duration, maxDepthMeters: maxDepth, avgDepthMeters: avgDepth, avgWaterTemperatureCelsius: avgTemp, minWaterTemperatureCelsius: temps.min(), maxWaterTemperatureCelsius: temps.max(), ttv: avgDepth + (duration / 60.0), entryGPS: entryGPS, exitGPS: exitGPS, samples: samples)
         logStore.add(session)
-        sessionStart = nil
-        samples = []
-        previousDepthSample = nil
     }
 
     private func addSample(depthMeters: Double, temperatureCelsius: Double?) {
