@@ -27,6 +27,26 @@ DIR DIVING is a SwiftUI watchOS application for Apple Watch Ultra-class devices.
 
 Experimental branch documentation is available in [`Docs/EXPERIMENTAL_FEATURES.md`](Docs/EXPERIMENTAL_FEATURES.md).
 
+## Visual Design Standard
+
+DIR DIVING uses an Apple Watch Ultra-style dive computer interface as its product visual baseline.
+
+Future screens and feature work should preserve this look and feel:
+
+- Full black watch-first canvas for maximum underwater contrast
+- Large white depth and time values with monospaced-style numeric readability
+- Blue labels for water, depth, and technical measurement context
+- Green, yellow, orange, and red used only as functional state colors
+- Thin rounded borders around operational panels and action controls
+- Compact vertical spacing suited to Apple Watch Ultra displays
+- No generic dashboard cards, decorative gradients, or marketing-style layouts inside the watch UI
+
+The current live UI preview is stored at:
+
+```text
+Docs/CurrentCodeLiveViewPreview.png
+```
+
 ## Project Structure
 
 ```text
