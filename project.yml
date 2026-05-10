@@ -26,6 +26,7 @@ targets:
     dependencies:
       - sdk: CoreMotion.framework
       - sdk: CoreLocation.framework
+      - sdk: CoreBluetooth.framework
       - sdk: WatchKit.framework
       - sdk: Charts.framework
       - sdk: AppIntents.framework

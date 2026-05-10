@@ -22,6 +22,7 @@ DIR DIVING is a SwiftUI watchOS application for Apple Watch Ultra-class devices.
 - User-configurable ascent-rate limits by depth band
 - Red blinking warning and haptic feedback when ascent rate exceeds the current depth-band limit
 - GPS entry and exit points captured with a best-effort surface fix
+- Experimental Buddy Assist screen for preset buddy messages over a future BLE pairing path
 - Custom image screen for bundled reference images, checklists, or static procedures
 
 ## Project Structure
@@ -47,8 +48,9 @@ Main screens:
 1. Live dive screen
 2. Compass screen
 3. Ascent-rate settings screen
-4. User images screen
-5. Dive log screen
+4. Buddy Assist screen
+5. User images screen
+6. Dive log screen
 
 The compass is implemented as a full screen, not as a modal feature that must be launched. Bearing actions are contextual to the compass screen.
 
@@ -187,6 +189,32 @@ Each saved session includes:
 - TTV value
 - Entry and exit GPS points when available
 - Full depth/temperature sample list
+
+## Buddy Assist
+
+The experimental `BUDDY` screen is designed for quick preset messages between divers:
+
+- `OK`
+- `RISALI`
+- `HO UN PROBLEMA`
+- `DOVE SEI?`
+- `TORNA INDIETRO`
+- `LOW GAS`
+
+The intended concept is:
+
+```text
+Apple Watch <-> BLE <-> Apple Watch
+```
+
+Current implementation status:
+
+- Adds the watchOS UI for pairing and sending preset messages.
+- Adds a `BuddyAssistService` with CoreBluetooth central-side scaffolding.
+- Defines a custom BLE service UUID and message characteristic UUID.
+- Adds the required Bluetooth privacy usage string to `Info.plist`.
+
+Important limitation: Apple documents that watchOS apps cannot advertise BLE peripheral services with `CBPeripheralManager`. A true direct Watch-to-Watch BLE pairing architecture is therefore not currently reliable as a production-only Apple Watch implementation. A production path may require a companion device, an external BLE relay, or a revised architecture validated on Apple hardware.
 
 ## Subsurface CSV Export
 

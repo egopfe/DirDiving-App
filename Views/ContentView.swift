@@ -6,6 +6,7 @@ struct ContentView: View {
             DiveLiveView()
             CompassView()
             AscentRateSettingsView()
+            BuddyAssistView()
             UserImagesView()
             DiveLogListView()
         }
