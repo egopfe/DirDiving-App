@@ -2,6 +2,7 @@ import SwiftUI
 
 struct BuddyAssistView: View {
     @EnvironmentObject private var buddyAssist: BuddyAssistService
+    @EnvironmentObject private var compass: CompassManager
 
     private let columns = [
         GridItem(.flexible(), spacing: 6),
@@ -13,7 +14,9 @@ struct BuddyAssistView: View {
             VStack(spacing: 8) {
                 header
                 warning
+                buddyLink
                 proximity
+                compassBlock
 
                 LazyVGrid(columns: columns, spacing: 6) {
                     ForEach(BuddyAssistMessage.allCases) { message in
@@ -48,6 +51,19 @@ struct BuddyAssistView: View {
             .padding(8)
         }
         .navigationTitle("BUDDY")
+        .onAppear {
+            compass.start()
+            buddyAssist.updateCompassContext(headingDegrees: compass.headingDegrees, bearingDegrees: compass.bearingDegrees)
+        }
+        .onDisappear {
+            compass.stop()
+        }
+        .onReceive(compass.$headingDegrees) { heading in
+            buddyAssist.updateCompassContext(headingDegrees: heading, bearingDegrees: compass.bearingDegrees)
+        }
+        .onReceive(compass.$bearingDegrees) { bearing in
+            buddyAssist.updateCompassContext(headingDegrees: compass.headingDegrees, bearingDegrees: bearing)
+        }
     }
 
     private var header: some View {
@@ -69,6 +85,18 @@ struct BuddyAssistView: View {
             .fixedSize(horizontal: false, vertical: true)
     }
 
+    private var buddyLink: some View {
+        HStack {
+            Text("Buddy Link")
+                .font(.caption.bold())
+                .foregroundStyle(.white)
+            Spacer()
+            Text(buddyAssist.buddyLinkStatus)
+                .font(.caption.monospacedDigit().bold())
+                .foregroundStyle(buddyAssist.isBuddyOnline ? .green : .red)
+        }
+    }
+
     private var proximity: some View {
         HStack(spacing: 8) {
             Circle()
@@ -88,6 +116,37 @@ struct BuddyAssistView: View {
         .padding(.vertical, 4)
     }
 
+    private var compassBlock: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("BUSSOLA")
+                .font(.caption.bold())
+                .foregroundStyle(.cyan)
+            compassRow("Ultima direzione", degrees: buddyAssist.lastKnownDirectionDegrees)
+            compassRow("Bearing condiviso", degrees: buddyAssist.sharedBearingDegrees)
+            compassRow("Heading", degrees: compass.headingDegrees)
+            HStack {
+                Text("Direzione plausibile")
+                Spacer()
+                Text(directionText(buddyAssist.plausibleDirectionDegrees))
+                    .foregroundStyle(.yellow)
+                    .monospacedDigit()
+            }
+            .font(.caption2.bold())
+        }
+        .padding(.vertical, 4)
+    }
+
+    private func compassRow(_ title: String, degrees: Double?) -> some View {
+        HStack {
+            Text(title)
+            Spacer()
+            Text(directionText(degrees))
+                .monospacedDigit()
+        }
+        .font(.caption2)
+        .foregroundStyle(.secondary)
+    }
+
     private var proximityColor: Color {
         switch buddyAssist.proximityState {
         case .near: return .green
@@ -101,5 +160,10 @@ struct BuddyAssistView: View {
             return "PING 15s RSSI \(lastRSSI)"
         }
         return "PING 15s --"
+    }
+
+    private func directionText(_ degrees: Double?) -> String {
+        guard let degrees else { return "--" }
+        return "\(Int(degrees.rounded()))°"
     }
 }

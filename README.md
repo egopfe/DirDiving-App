@@ -216,6 +216,11 @@ Current implementation status:
   - green when RSSI suggests the buddy is near;
   - yellow when RSSI suggests the buddy is around the distant / mid-range zone;
   - red when no buddy link is available.
+- Adds Buddy Link status with `ONLINE` / `LOST`.
+- Adds haptic patterns for proximity changes:
+  - slow pulse when the buddy is distant;
+  - rapid double pulse when the buddy is near.
+- Adds a compass block with last known direction, shared bearing, current heading, and an estimated `Direzione plausibile`.
 - Reads buddy RSSI every 15 seconds while connected.
 - Adds a `BuddyAssistService` with CoreBluetooth central-side scaffolding.
 - Defines a custom BLE service UUID and message characteristic UUID.

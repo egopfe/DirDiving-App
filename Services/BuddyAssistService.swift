@@ -25,6 +25,9 @@ final class BuddyAssistService: NSObject, ObservableObject {
     @Published private(set) var proximityState: ProximityState = .disconnected
     @Published private(set) var lastRSSI: Int?
     @Published private(set) var lastPingDate: Date?
+    @Published private(set) var lastKnownDirectionDegrees: Double?
+    @Published private(set) var sharedBearingDegrees: Double?
+    @Published private(set) var plausibleDirectionDegrees: Double?
     @Published private(set) var lastErrorMessage: String?
     @Published private(set) var events: [BuddyAssistEvent] = []
 
@@ -34,6 +37,8 @@ final class BuddyAssistService: NSObject, ObservableObject {
     private var pingTimer: Timer?
 
     var canSend: Bool { state == .connected && messageCharacteristic != nil }
+    var isBuddyOnline: Bool { state == .connected }
+    var buddyLinkStatus: String { isBuddyOnline ? "ONLINE" : "LOST" }
 
     var limitationText: String {
         "Direct Watch-to-Watch BLE pairing is experimental. watchOS apps cannot advertise BLE peripheral services, so a reliable production path may need a companion device or external BLE relay."
@@ -75,6 +80,14 @@ final class BuddyAssistService: NSObject, ObservableObject {
 
         connectedPeripheral.writeValue(data, for: messageCharacteristic, type: .withResponse)
         append(message, direction: .sent)
+    }
+
+    func updateCompassContext(headingDegrees: Double, bearingDegrees: Double?) {
+        lastKnownDirectionDegrees = headingDegrees
+        if let bearingDegrees {
+            sharedBearingDegrees = bearingDegrees
+        }
+        plausibleDirectionDegrees = sharedBearingDegrees ?? lastKnownDirectionDegrees
     }
 
     private func startScanningIfReady(_ centralManager: CBCentralManager) {
@@ -129,10 +142,10 @@ final class BuddyAssistService: NSObject, ObservableObject {
         lastRSSI = rssi
         if rssi >= -70 {
             proximityState = .near
-        } else if rssi >= -90 {
-            proximityState = .distant
+            HapticService.shared.buddyNearPulseIfNeeded()
         } else {
-            proximityState = .disconnected
+            proximityState = .distant
+            HapticService.shared.buddyDistantPulseIfNeeded()
         }
     }
 }
