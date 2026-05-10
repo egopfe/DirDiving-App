@@ -7,6 +7,7 @@ final class HapticService {
     private var lastWarningDate: Date?
     private var lastBuddyNearDate: Date?
     private var lastBuddyDistantDate: Date?
+    private var lastBuddyMessageDate: Date?
     private init() {}
 
     func warnIfNeeded() {
@@ -32,5 +33,12 @@ final class HapticService {
         if let lastBuddyDistantDate, now.timeIntervalSince(lastBuddyDistantDate) < 5 { return }
         lastBuddyDistantDate = now
         WKInterfaceDevice.current().play(.directionDown)
+    }
+
+    func buddyMessageReceived(isCritical: Bool) {
+        let now = Date()
+        if let lastBuddyMessageDate, now.timeIntervalSince(lastBuddyMessageDate) < 1 { return }
+        lastBuddyMessageDate = now
+        WKInterfaceDevice.current().play(isCritical ? .failure : .notification)
     }
 }

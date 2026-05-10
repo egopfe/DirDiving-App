@@ -55,6 +55,7 @@ Current implementation:
 - `BuddyAssistService`: CoreBluetooth central-side scaffold.
 - `BuddyAssistMessage`: preset message model.
 - `OpenBuddyAssistIntent`: App Intent intended for Action Button / shortcut-style access when watchOS exposes it.
+- Received-message banner with direct `ANSWER` flow.
 
 ## Buddy Link UI
 
@@ -87,6 +88,8 @@ The experimental haptic behavior is:
 
 - Buddy near: rapid double pulse.
 - Buddy distant: slow pulse.
+- Buddy message received: notification haptic for normal messages.
+- Critical buddy message received: failure haptic for `HO UN PROBLEMA` and `LOW GAS`.
 
 Implementation lives in `HapticService`:
 
@@ -94,6 +97,32 @@ Implementation lives in `HapticService`:
 - `buddyDistantPulseIfNeeded()`
 
 These haptics are throttled to avoid continuous vibration.
+
+## Received Messages and Answer Flow
+
+When a buddy message is received, the UI promotes it into a large visible banner:
+
+- Header: `MESSAGGIO BUDDY`
+- Main text: received preset message
+- Critical styling for:
+  - `HO UN PROBLEMA`
+  - `LOW GAS`
+
+The banner includes:
+
+- `ANSWER`: switches the message grid into reply mode.
+- `OK`: dismisses the active received message.
+
+The reply mode uses the same preset message set:
+
+- `OK`
+- `RISALI`
+- `HO UN PROBLEMA`
+- `DOVE SEI?`
+- `TORNA INDIETRO`
+- `LOW GAS`
+
+After sending an answer, the active received-message banner is cleared.
 
 ## Buddy Compass Block
 

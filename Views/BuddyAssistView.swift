@@ -3,6 +3,7 @@ import SwiftUI
 struct BuddyAssistView: View {
     @EnvironmentObject private var buddyAssist: BuddyAssistService
     @EnvironmentObject private var compass: CompassManager
+    @State private var isAnswering = false
 
     private let columns = [
         GridItem(.flexible(), spacing: 6),
@@ -17,17 +18,9 @@ struct BuddyAssistView: View {
                 buddyLink
                 proximity
                 compassBlock
+                receivedBanner
 
-                LazyVGrid(columns: columns, spacing: 6) {
-                    ForEach(BuddyAssistMessage.allCases) { message in
-                        Button(message.title) {
-                            buddyAssist.send(message)
-                        }
-                        .font(.caption2.bold())
-                        .buttonStyle(.bordered)
-                        .disabled(!buddyAssist.canSend)
-                    }
-                }
+                messageGrid(title: isAnswering ? "ANSWER" : "SEND")
 
                 HStack(spacing: 6) {
                     Button("PAIR") { buddyAssist.startPairing() }
@@ -63,6 +56,35 @@ struct BuddyAssistView: View {
         }
         .onReceive(compass.$bearingDegrees) { bearing in
             buddyAssist.updateCompassContext(headingDegrees: compass.headingDegrees, bearingDegrees: bearing)
+        }
+    }
+
+    @ViewBuilder
+    private var receivedBanner: some View {
+        if let event = buddyAssist.activeReceivedMessage {
+            VStack(spacing: 6) {
+                Text("MESSAGGIO BUDDY")
+                    .font(.caption2.bold())
+                    .foregroundStyle(.white)
+                Text(event.message.title)
+                    .font(.headline.bold())
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+                HStack(spacing: 6) {
+                    Button("ANSWER") {
+                        isAnswering = true
+                    }
+                    Button("OK") {
+                        isAnswering = false
+                        buddyAssist.clearActiveReceivedMessage()
+                    }
+                }
+                .font(.caption2.bold())
+            }
+            .padding(8)
+            .frame(maxWidth: .infinity)
+            .background(event.message.isCritical ? .red.opacity(0.65) : .green.opacity(0.45))
+            .clipShape(RoundedRectangle(cornerRadius: 8))
         }
     }
 
@@ -134,6 +156,28 @@ struct BuddyAssistView: View {
             .font(.caption2.bold())
         }
         .padding(.vertical, 4)
+    }
+
+    private func messageGrid(title: String) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(title)
+                .font(.caption2.bold())
+                .foregroundStyle(isAnswering ? .yellow : .cyan)
+            LazyVGrid(columns: columns, spacing: 6) {
+                ForEach(BuddyAssistMessage.allCases) { message in
+                    Button(message.title) {
+                        buddyAssist.send(message)
+                        if isAnswering {
+                            isAnswering = false
+                            buddyAssist.clearActiveReceivedMessage()
+                        }
+                    }
+                    .font(.caption2.bold())
+                    .buttonStyle(.bordered)
+                    .disabled(!buddyAssist.canSend)
+                }
+            }
+        }
     }
 
     private func compassRow(_ title: String, degrees: Double?) -> some View {

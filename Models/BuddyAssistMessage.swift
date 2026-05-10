@@ -22,6 +22,13 @@ enum BuddyAssistMessage: String, CaseIterable, Codable, Identifiable {
     }
 
     var payload: String { title }
+
+    var isCritical: Bool {
+        switch self {
+        case .problem, .lowGas: return true
+        case .ok, .ascend, .whereAreYou, .turnBack: return false
+        }
+    }
 }
 
 struct BuddyAssistEvent: Identifiable, Hashable {

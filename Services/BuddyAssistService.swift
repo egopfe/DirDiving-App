@@ -29,6 +29,7 @@ final class BuddyAssistService: NSObject, ObservableObject {
     @Published private(set) var sharedBearingDegrees: Double?
     @Published private(set) var plausibleDirectionDegrees: Double?
     @Published private(set) var lastErrorMessage: String?
+    @Published private(set) var activeReceivedMessage: BuddyAssistEvent?
     @Published private(set) var events: [BuddyAssistEvent] = []
 
     private var centralManager: CBCentralManager?
@@ -90,6 +91,10 @@ final class BuddyAssistService: NSObject, ObservableObject {
         plausibleDirectionDegrees = sharedBearingDegrees ?? lastKnownDirectionDegrees
     }
 
+    func clearActiveReceivedMessage() {
+        activeReceivedMessage = nil
+    }
+
     private func startScanningIfReady(_ centralManager: CBCentralManager) {
         switch centralManager.state {
         case .poweredOn:
@@ -109,8 +114,13 @@ final class BuddyAssistService: NSObject, ObservableObject {
     }
 
     private func append(_ message: BuddyAssistMessage, direction: BuddyAssistEvent.Direction) {
-        events.insert(BuddyAssistEvent(message: message, direction: direction, timestamp: Date()), at: 0)
+        let event = BuddyAssistEvent(message: message, direction: direction, timestamp: Date())
+        events.insert(event, at: 0)
         events = Array(events.prefix(8))
+        if direction == .received {
+            activeReceivedMessage = event
+            HapticService.shared.buddyMessageReceived(isCritical: message.isCritical)
+        }
     }
 
     private func startPinging() {
