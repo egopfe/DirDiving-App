@@ -25,6 +25,8 @@ DIR DIVING is a SwiftUI watchOS application for Apple Watch Ultra-class devices.
 - Experimental Buddy Assist screen for preset buddy messages over a future BLE pairing path
 - Custom image screen for bundled reference images, checklists, or static procedures
 
+Experimental branch documentation is available in [`Docs/EXPERIMENTAL_FEATURES.md`](Docs/EXPERIMENTAL_FEATURES.md).
+
 ## Project Structure
 
 ```text
