@@ -9,12 +9,14 @@ struct DIRDivingApp: App {
     @StateObject private var imageStore: UserImageStore
     @StateObject private var ascentSettings: AscentRateSettingsStore
     @StateObject private var buddyAssist: BuddyAssistService
+    @StateObject private var navigationStore: AppNavigationStore
 
     init() {
         let logStore = DiveLogStore()
         let gpsManager = GPSManager()
         let ascentSettings = AscentRateSettingsStore()
         let buddyAssist = BuddyAssistService()
+        let navigationStore = AppNavigationStore()
         _logStore = StateObject(wrappedValue: logStore)
         _gpsManager = StateObject(wrappedValue: gpsManager)
         _compassManager = StateObject(wrappedValue: CompassManager())
@@ -22,6 +24,7 @@ struct DIRDivingApp: App {
         _imageStore = StateObject(wrappedValue: UserImageStore())
         _ascentSettings = StateObject(wrappedValue: ascentSettings)
         _buddyAssist = StateObject(wrappedValue: buddyAssist)
+        _navigationStore = StateObject(wrappedValue: navigationStore)
     }
 
     var body: some Scene {
@@ -34,6 +37,7 @@ struct DIRDivingApp: App {
                 .environmentObject(imageStore)
                 .environmentObject(ascentSettings)
                 .environmentObject(buddyAssist)
+                .environmentObject(navigationStore)
         }
     }
 }

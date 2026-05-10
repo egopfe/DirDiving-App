@@ -12,16 +12,26 @@ final class BuddyAssistService: NSObject, ObservableObject {
         case unsupported = "LIMITED"
     }
 
+    enum ProximityState: String {
+        case near = "NEAR"
+        case distant = "DISTANT"
+        case disconnected = "NO LINK"
+    }
+
     static let serviceUUID = CBUUID(string: "A1C4D7B0-8C4A-4D74-9C0F-0C38D87D1A01")
     static let messageCharacteristicUUID = CBUUID(string: "E02B806D-3B9C-49A4-A8EF-6A96CB2D56E1")
 
     @Published private(set) var state: ConnectionState = .idle
+    @Published private(set) var proximityState: ProximityState = .disconnected
+    @Published private(set) var lastRSSI: Int?
+    @Published private(set) var lastPingDate: Date?
     @Published private(set) var lastErrorMessage: String?
     @Published private(set) var events: [BuddyAssistEvent] = []
 
     private var centralManager: CBCentralManager?
     private var connectedPeripheral: CBPeripheral?
     private var messageCharacteristic: CBCharacteristic?
+    private var pingTimer: Timer?
 
     var canSend: Bool { state == .connected && messageCharacteristic != nil }
 
@@ -45,6 +55,9 @@ final class BuddyAssistService: NSObject, ObservableObject {
         }
         connectedPeripheral = nil
         messageCharacteristic = nil
+        stopPinging()
+        proximityState = .disconnected
+        lastRSSI = nil
         state = .idle
     }
 
@@ -86,6 +99,42 @@ final class BuddyAssistService: NSObject, ObservableObject {
         events.insert(BuddyAssistEvent(message: message, direction: direction, timestamp: Date()), at: 0)
         events = Array(events.prefix(8))
     }
+
+    private func startPinging() {
+        stopPinging()
+        pingBuddy()
+        pingTimer = Timer.scheduledTimer(withTimeInterval: 15, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.pingBuddy()
+            }
+        }
+    }
+
+    private func stopPinging() {
+        pingTimer?.invalidate()
+        pingTimer = nil
+    }
+
+    private func pingBuddy() {
+        guard let connectedPeripheral, state == .connected else {
+            proximityState = .disconnected
+            return
+        }
+
+        lastPingDate = Date()
+        connectedPeripheral.readRSSI()
+    }
+
+    private func updateProximity(rssi: Int) {
+        lastRSSI = rssi
+        if rssi >= -70 {
+            proximityState = .near
+        } else if rssi >= -90 {
+            proximityState = .distant
+        } else {
+            proximityState = .disconnected
+        }
+    }
 }
 
 extension BuddyAssistService: CBCentralManagerDelegate {
@@ -97,6 +146,7 @@ extension BuddyAssistService: CBCentralManagerDelegate {
 
     nonisolated func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi RSSI: NSNumber) {
         Task { @MainActor in
+            updateProximity(rssi: RSSI.intValue)
             connectedPeripheral = peripheral
             connectedPeripheral?.delegate = self
             central.stopScan()
@@ -107,6 +157,8 @@ extension BuddyAssistService: CBCentralManagerDelegate {
     nonisolated func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         Task { @MainActor in
             state = .connected
+            proximityState = .distant
+            startPinging()
             peripheral.discoverServices([Self.serviceUUID])
         }
     }
@@ -123,6 +175,8 @@ extension BuddyAssistService: CBCentralManagerDelegate {
         Task { @MainActor in
             connectedPeripheral = nil
             messageCharacteristic = nil
+            stopPinging()
+            proximityState = .disconnected
             state = .idle
             lastErrorMessage = error?.localizedDescription
         }
@@ -167,6 +221,18 @@ extension BuddyAssistService: CBPeripheralDelegate {
                   let message = BuddyAssistMessage.allCases.first(where: { $0.payload == payload }) else { return }
 
             append(message, direction: .received)
+        }
+    }
+
+    nonisolated func peripheral(_ peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: Error?) {
+        Task { @MainActor in
+            if let error {
+                lastErrorMessage = error.localizedDescription
+                proximityState = .disconnected
+                return
+            }
+
+            updateProximity(rssi: RSSI.intValue)
         }
     }
 }

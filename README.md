@@ -210,6 +210,13 @@ Apple Watch <-> BLE <-> Apple Watch
 Current implementation status:
 
 - Adds the watchOS UI for pairing and sending preset messages.
+- Adds an `OpenBuddyAssistIntent` so the Buddy Assist page can be opened from an Action Button or shortcut-style workflow when watchOS exposes it.
+- Shows the mandatory safety warning: `Indicazione di prossimità sperimentale non affidabile per sicurezza immersione.`
+- Shows an experimental proximity dot:
+  - green when RSSI suggests the buddy is near;
+  - yellow when RSSI suggests the buddy is around the distant / mid-range zone;
+  - red when no buddy link is available.
+- Reads buddy RSSI every 15 seconds while connected.
 - Adds a `BuddyAssistService` with CoreBluetooth central-side scaffolding.
 - Defines a custom BLE service UUID and message characteristic UUID.
 - Adds the required Bluetooth privacy usage string to `Info.plist`.
