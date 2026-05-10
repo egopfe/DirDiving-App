@@ -19,6 +19,7 @@ DIR DIVING is a SwiftUI watchOS application for Apple Watch Ultra-class devices.
 - Integrated compass screen
 - Contextual `SET BEARING` / `CLEAR BEARING` compass action
 - Dynamic ascent-rate gauge with green, yellow, and red zones
+- User-configurable ascent-rate limits by depth band
 - Red blinking warning and haptic feedback when ascent rate exceeds the current depth-band limit
 - GPS entry and exit points captured with a best-effort surface fix
 - Custom image screen for bundled reference images, checklists, or static procedures
@@ -45,8 +46,9 @@ Main screens:
 
 1. Live dive screen
 2. Compass screen
-3. User images screen
-4. Dive log screen
+3. Ascent-rate settings screen
+4. User images screen
+5. Dive log screen
 
 The compass is implemented as a full screen, not as a modal feature that must be launched. Bearing actions are contextual to the compass screen.
 
@@ -68,7 +70,7 @@ RunTime is controlled automatically by the dive session. The manual stopwatch is
 
 ## Ascent-Rate Limits
 
-The ascent-rate limit changes according to current depth:
+The ascent-rate limit changes according to current depth. The default profile is:
 
 | Depth band | Limit |
 | --- | ---: |
@@ -79,6 +81,16 @@ The ascent-rate limit changes according to current depth:
 | Outside configured bands | 10 m/min |
 
 The fallback limit of `10 m/min` outside the configured bands is intentional.
+
+The `ASC SET` screen lets the diver customize each limit directly on Apple Watch:
+
+- `40-30 m`
+- `30-20 m`
+- `20-6 m`
+- `6-0 m`
+- `Other`
+
+Values are stored locally with `UserDefaults`, persist across app launches, and can be restored with `RESET STD`.
 
 The app computes ascent rate by comparing consecutive depth samples. When depth decreases, DIR DIVING converts the difference into meters per minute.
 

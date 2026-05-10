@@ -5,6 +5,7 @@ struct ContentView: View {
         TabView {
             DiveLiveView()
             CompassView()
+            AscentRateSettingsView()
             UserImagesView()
             DiveLogListView()
         }

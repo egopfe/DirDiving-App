@@ -24,7 +24,11 @@ struct AscentStatus: Codable, Hashable {
     }
 
     static func make(rate: Double, depth: Double) -> AscentStatus {
-        let limit = Self.limit(for: depth)
+        make(rate: rate, depth: depth, limits: .standard)
+    }
+
+    static func make(rate: Double, depth: Double, limits: AscentRateLimits) -> AscentStatus {
+        let limit = limits.limit(for: depth)
         let safeRate = max(0, rate)
         let zone: AscentZone = safeRate <= limit * 0.70 ? .green : (safeRate <= limit ? .yellow : .red)
         return AscentStatus(currentRateMetersPerMinute: safeRate, limitMetersPerMinute: limit, zone: zone)

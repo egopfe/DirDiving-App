@@ -7,15 +7,18 @@ struct DIRDivingApp: App {
     @StateObject private var compassManager: CompassManager
     @StateObject private var diveManager: DiveManager
     @StateObject private var imageStore: UserImageStore
+    @StateObject private var ascentSettings: AscentRateSettingsStore
 
     init() {
         let logStore = DiveLogStore()
         let gpsManager = GPSManager()
+        let ascentSettings = AscentRateSettingsStore()
         _logStore = StateObject(wrappedValue: logStore)
         _gpsManager = StateObject(wrappedValue: gpsManager)
         _compassManager = StateObject(wrappedValue: CompassManager())
-        _diveManager = StateObject(wrappedValue: DiveManager(logStore: logStore, gpsManager: gpsManager))
+        _diveManager = StateObject(wrappedValue: DiveManager(logStore: logStore, gpsManager: gpsManager, ascentSettings: ascentSettings))
         _imageStore = StateObject(wrappedValue: UserImageStore())
+        _ascentSettings = StateObject(wrappedValue: ascentSettings)
     }
 
     var body: some Scene {
@@ -26,6 +29,7 @@ struct DIRDivingApp: App {
                 .environmentObject(compassManager)
                 .environmentObject(diveManager)
                 .environmentObject(imageStore)
+                .environmentObject(ascentSettings)
         }
     }
 }
