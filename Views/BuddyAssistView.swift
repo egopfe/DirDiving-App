@@ -100,7 +100,7 @@ struct BuddyAssistView: View {
     }
 
     private var warning: some View {
-        Text("Indicazione di prossimità sperimentale non affidabile per sicurezza immersione.")
+        Text("Indicazione di prossimit\u{00E0} sperimentale non affidabile per sicurezza immersione.")
             .font(.caption2)
             .foregroundStyle(.yellow)
             .multilineTextAlignment(.center)
@@ -208,6 +208,6 @@ struct BuddyAssistView: View {
 
     private func directionText(_ degrees: Double?) -> String {
         guard let degrees else { return "--" }
-        return "\(Int(degrees.rounded()))°"
+        return "\(Int(degrees.rounded()))\u{00B0}"
     }
 }
