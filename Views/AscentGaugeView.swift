@@ -5,7 +5,7 @@ struct AscentGaugeView: View {
 
     var body: some View {
         VStack(alignment: .trailing, spacing: 5) {
-            Text("VELOCITÀ\nRISALITA")
+            Text("VELOCIT\u{00C0}\nRISALITA")
                 .font(.caption2.bold())
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.leading)
