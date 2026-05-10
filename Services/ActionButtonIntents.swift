@@ -23,3 +23,16 @@ struct ResetStopwatchIntent: AppIntent {
         return .result()
     }
 }
+
+struct OpenBuddyAssistIntent: AppIntent {
+    static var title: LocalizedStringResource = "Open DIR DIVING Buddy Assist"
+    static var description = IntentDescription("Open the DIR DIVING Buddy Assist screen.")
+    static var openAppWhenRun = true
+
+    func perform() async throws -> some IntentResult {
+        await MainActor.run {
+            AppNavigationStore.shared?.openBuddyAssist()
+        }
+        return .result()
+    }
+}

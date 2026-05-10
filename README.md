@@ -19,9 +19,13 @@ DIR DIVING is a SwiftUI watchOS application for Apple Watch Ultra-class devices.
 - Integrated compass screen
 - Contextual `SET BEARING` / `CLEAR BEARING` compass action
 - Dynamic ascent-rate gauge with green, yellow, and red zones
+- User-configurable ascent-rate limits by depth band
 - Red blinking warning and haptic feedback when ascent rate exceeds the current depth-band limit
 - GPS entry and exit points captured with a best-effort surface fix
+- Experimental Buddy Assist screen for preset buddy messages over a future BLE pairing path
 - Custom image screen for bundled reference images, checklists, or static procedures
+
+Experimental branch documentation is available in [`Docs/EXPERIMENTAL_FEATURES.md`](Docs/EXPERIMENTAL_FEATURES.md).
 
 ## Visual Design Standard
 
@@ -73,8 +77,10 @@ Main screens:
 
 1. Live dive screen
 2. Compass screen
-3. User images screen
-4. Dive log screen
+3. Ascent-rate settings screen
+4. Buddy Assist screen
+5. User images screen
+6. Dive log screen
 
 The compass is implemented as a full screen, not as a modal feature that must be launched. Bearing actions are contextual to the compass screen.
 
@@ -96,7 +102,7 @@ RunTime is controlled automatically by the dive session. The manual stopwatch is
 
 ## Ascent-Rate Limits
 
-The ascent-rate limit changes according to current depth:
+The ascent-rate limit changes according to current depth. The default profile is:
 
 | Depth band | Limit |
 | --- | ---: |
@@ -107,6 +113,16 @@ The ascent-rate limit changes according to current depth:
 | Outside configured bands | 10 m/min |
 
 The fallback limit of `10 m/min` outside the configured bands is intentional.
+
+The `ASC SET` screen lets the diver customize each limit directly on Apple Watch:
+
+- `40-30 m`
+- `30-20 m`
+- `20-6 m`
+- `6-0 m`
+- `Other`
+
+Values are stored locally with `UserDefaults`, persist across app launches, and can be restored with `RESET STD`.
 
 The app computes ascent rate by comparing consecutive depth samples. When depth decreases, DIR DIVING converts the difference into meters per minute.
 
@@ -203,6 +219,44 @@ Each saved session includes:
 - TTV value
 - Entry and exit GPS points when available
 - Full depth/temperature sample list
+
+## Buddy Assist
+
+The experimental `BUDDY` screen is designed for quick preset messages between divers:
+
+- `OK`
+- `RISALI`
+- `HO UN PROBLEMA`
+- `DOVE SEI?`
+- `TORNA INDIETRO`
+- `LOW GAS`
+
+The intended concept is:
+
+```text
+Apple Watch <-> BLE <-> Apple Watch
+```
+
+Current implementation status:
+
+- Adds the watchOS UI for pairing and sending preset messages.
+- Adds an `OpenBuddyAssistIntent` so the Buddy Assist page can be opened from an Action Button or shortcut-style workflow when watchOS exposes it.
+- Shows the mandatory safety warning: `Indicazione di prossimità sperimentale non affidabile per sicurezza immersione.`
+- Shows an experimental proximity dot:
+  - green when RSSI suggests the buddy is near;
+  - yellow when RSSI suggests the buddy is around the distant / mid-range zone;
+  - red when no buddy link is available.
+- Adds Buddy Link status with `ONLINE` / `LOST`.
+- Adds haptic patterns for proximity changes:
+  - slow pulse when the buddy is distant;
+  - rapid double pulse when the buddy is near.
+- Adds a compass block with last known direction, shared bearing, current heading, and an estimated `Direzione plausibile`.
+- Reads buddy RSSI every 15 seconds while connected.
+- Adds a `BuddyAssistService` with CoreBluetooth central-side scaffolding.
+- Defines a custom BLE service UUID and message characteristic UUID.
+- Adds the required Bluetooth privacy usage string to `Info.plist`.
+
+Important limitation: Apple documents that watchOS apps cannot advertise BLE peripheral services with `CBPeripheralManager`. A true direct Watch-to-Watch BLE pairing architecture is therefore not currently reliable as a production-only Apple Watch implementation. A production path may require a companion device, an external BLE relay, or a revised architecture validated on Apple hardware.
 
 ## Subsurface CSV Export
 

@@ -21,21 +21,34 @@ final class DiveManager: NSObject, ObservableObject {
 
     private let logStore: DiveLogStore
     private let gpsManager: GPSManager
+    private let ascentSettings: AscentRateSettingsStore
     private var submersionManager: CMWaterSubmersionManager?
     private var runtimeTimer: Timer?
     private var stopwatchTimer: Timer?
     private var blinkTimer: Timer?
+    private var settingsCancellable: AnyCancellable?
     private var sessionStart: Date?
     private var samples: [DiveSample] = []
     private var entryGPS: GPSPoint?
     private var exitGPS: GPSPoint?
     private var previousDepthSample: DiveSample?
 
-    init(logStore: DiveLogStore, gpsManager: GPSManager) {
+    init(logStore: DiveLogStore, gpsManager: GPSManager, ascentSettings: AscentRateSettingsStore) {
         self.logStore = logStore
         self.gpsManager = gpsManager
+        self.ascentSettings = ascentSettings
         super.init()
         Self.shared = self
+        settingsCancellable = ascentSettings.$limits.sink { [weak self] limits in
+            Task { @MainActor in
+                guard let self else { return }
+                self.ascentStatus = AscentStatus.make(
+                    rate: self.ascentStatus.currentRateMetersPerMinute,
+                    depth: self.currentDepthMeters,
+                    limits: limits
+                )
+            }
+        }
         configureSubmersion()
     }
 
@@ -134,14 +147,14 @@ final class DiveManager: NSObject, ObservableObject {
 
     private func updateAscentRate(with sample: DiveSample) {
         guard let previous = previousDepthSample else {
-            ascentStatus = AscentStatus.make(rate: 0, depth: sample.depthMeters)
+            ascentStatus = AscentStatus.make(rate: 0, depth: sample.depthMeters, limits: ascentSettings.limits)
             return
         }
         let deltaTime = sample.timestamp.timeIntervalSince(previous.timestamp)
         guard deltaTime > 0 else { return }
         let deltaDepth = previous.depthMeters - sample.depthMeters
         let rate = max(0, (deltaDepth / deltaTime) * 60.0)
-        ascentStatus = AscentStatus.make(rate: rate, depth: sample.depthMeters)
+        ascentStatus = AscentStatus.make(rate: rate, depth: sample.depthMeters, limits: ascentSettings.limits)
         if ascentStatus.isOverLimit {
             HapticService.shared.warnIfNeeded()
             startBlinking()

@@ -5,9 +5,11 @@
     <key>CFBundleDisplayName</key>
     <string>DIR DIVING</string>
     <key>NSMotionUsageDescription</key>
-    <string>DIR DIVING usa i sensori di movimento e profondità per registrare profilo di immersione e velocità di risalita.</string>
+    <string>DIR DIVING usa i sensori di movimento e profondit&#224; per registrare profilo di immersione e velocit&#224; di risalita.</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>DIR DIVING usa la posizione per salvare il punto GPS di inizio e fine immersione.</string>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>DIR DIVING uses Bluetooth for experimental buddy assist preset messages.</string>
     <key>WKSupportsAutomaticDepthLaunch</key>
     <true/>
     <key>WKBackgroundModes</key>

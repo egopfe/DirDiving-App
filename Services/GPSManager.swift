@@ -21,7 +21,7 @@ final class GPSManager: NSObject, ObservableObject {
     func stop() { locationManager.stopUpdatingLocation() }
     func currentBestPoint() -> GPSPoint? { lastPoint }
 
-    func captureBestEffortPoint(for seconds: TimeInterval, completion: @MainActor @escaping (GPSPoint?) -> Void) {
+    func captureBestEffortPoint(for seconds: TimeInterval, completion: @escaping @MainActor (GPSPoint?) -> Void) {
         requestAuthorization()
         locationManager.startUpdatingLocation()
 
@@ -75,7 +75,7 @@ private final class BestEffortCapture {
     var bestPoint: GPSPoint?
     let completion: @MainActor (GPSPoint?) -> Void
 
-    init(deadline: Date, bestPoint: GPSPoint?, completion: @MainActor @escaping (GPSPoint?) -> Void) {
+    init(deadline: Date, bestPoint: GPSPoint?, completion: @escaping @MainActor (GPSPoint?) -> Void) {
         self.deadline = deadline
         self.bestPoint = bestPoint
         self.completion = completion
