@@ -29,19 +29,27 @@ Experimental branch documentation is available in [`Docs/EXPERIMENTAL_FEATURES.m
 
 ## Visual Design Standard
 
-DIR DIVING uses an Apple Watch Ultra-style dive computer interface as its product visual baseline.
+DIR DIVING uses the supplied Apple Watch Ultra dive-computer screenshot as its product visual baseline.
 
 Future screens and feature work should preserve this look and feel:
 
-- Full black watch-first canvas for maximum underwater contrast
-- Large white depth and time values with monospaced-style numeric readability
-- Blue labels for water, depth, and technical measurement context
-- Green, yellow, orange, and red used only as functional state colors
+- Apple Watch Ultra titanium case framing with a dark underwater bubbles background in presentation material
+- Full black watch-first screen canvas for maximum underwater contrast
+- Oversized white current-depth value, with the blue `m` unit aligned on the baseline
+- Blue labels for water, temperature, depth, and technical measurement context
+- Green immersion state, TTV panel, and safe action styling
+- Yellow stopwatch panel, orange/yellow ascent caution zones, and red stop/danger states
 - Thin rounded borders around operational panels and action controls
-- Compact vertical spacing suited to Apple Watch Ultra displays
+- Compact vertical spacing matching the supplied reference screenshot
 - No generic dashboard cards, decorative gradients, or marketing-style layouts inside the watch UI
 
-The current live UI preview is stored at:
+The visual reference image is stored at:
+
+```text
+Docs/ReferenceLookAndFeel.jpg
+```
+
+The current code preview is stored at:
 
 ```text
 Docs/CurrentCodeLiveViewPreview.png

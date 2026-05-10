@@ -31,7 +31,7 @@ struct DiveLiveView: View {
 
     private var topBar: some View {
         HStack {
-            Text("🐙")
+            Text("\u{1F419}")
                 .font(.title3)
                 .foregroundStyle(.blue)
             Spacer()
@@ -103,7 +103,7 @@ struct DiveLiveView: View {
                         .font(.system(size: 30, weight: .bold, design: .rounded))
                         .foregroundStyle(.blue)
                 }
-                Text("PROFONDITÀ ATTUALE")
+                Text("PROFONDIT\u{00C0} ATTUALE")
                     .font(.caption.bold())
                     .foregroundStyle(.blue)
             }
@@ -203,8 +203,8 @@ struct DiveLiveView: View {
     }
 
     private var temperatureText: String {
-        guard let temp = dive.currentTemperatureCelsius else { return "--.- °C" }
-        return "\(Formatters.one(temp)) °C"
+        guard let temp = dive.currentTemperatureCelsius else { return "--.- \u{00B0}C" }
+        return "\(Formatters.one(temp)) \u{00B0}C"
     }
 
     private var runtimeMinutes: String {
