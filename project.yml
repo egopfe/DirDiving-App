@@ -2,8 +2,21 @@ name: DIRDiving
 options:
   bundleIdPrefix: com.egopfe
   deploymentTarget:
+    iOS: "17.0"
     watchOS: "10.0"
 targets:
+  DIRDiving iOS:
+    type: application
+    platform: iOS
+    sources:
+      - iOSApp
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios
+        DEVELOPMENT_TEAM: C6FKKPB6A9
+        CODE_SIGN_STYLE: Automatic
+        INFOPLIST_FILE: iOSApp/Info.plist
+        PRODUCT_NAME: DIR DIVING
   DIRDiving Watch App:
     type: application
     platform: watchOS

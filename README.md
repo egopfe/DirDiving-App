@@ -72,11 +72,36 @@ The current code preview is stored at:
 Docs/LiveDiveImmersionPremiumPreview.png
 ```
 
+## iOS Companion Branch
+
+The `main-iOS` branch contains the first iPhone companion interface for DIR DIVING.
+
+It adds an XcodeGen iOS target:
+
+```text
+DIRDiving iOS
+```
+
+The iPhone app lives in:
+
+```text
+iOSApp/
+```
+
+This target is intentionally separate from the watchOS target. It provides an iPhone companion dashboard with the same premium visual standard: black canvas, blue technical labels, green/yellow/red operational states, octopus mark, live dive summary, Apple Watch sync status, Buddy Link entry point, and dive log/export panels.
+
+The Apple Watch app remains in:
+
+```text
+DIRDiving Watch App
+```
+
 ## Project Structure
 
 ```text
 App/        watchOS app entry point and Info.plist
 Config/     entitlements file
+iOSApp/     iPhone companion app entry point and SwiftUI interface
 Models/     dive sessions, samples, GPS points, ascent status
 Services/   dive, GPS, compass, haptics, export, image loading, App Intents
 Utils/      formatting helpers
