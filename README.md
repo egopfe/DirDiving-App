@@ -41,11 +41,13 @@ Future screens and feature work should preserve this look and feel:
 - Yellow stopwatch panel, orange/yellow ascent caution zones, and red stop/danger states
 - Thin rounded borders around operational panels and action controls
 - Compact vertical spacing matching the supplied reference screenshot
+- SwiftUI-drawn octopus logo at the top left of the live screen, matching the supplied reference instead of relying on emoji rendering
+- Dedicated depth and ascent-gauge columns on the live screen so values, labels, and the colored ascent bar never overlap
 - No generic dashboard cards, decorative gradients, or marketing-style layouts inside the watch UI
 
 This premium visual system is now applied across the watch UI, not only the live dive screen:
 
-- `DiveLiveView`: primary dive computer screen with depth, TTV, RunTime, ascent gauge, stopwatch, and controls
+- `DiveLiveView`: primary dive computer screen with octopus logo, depth, TTV, RunTime, separated ascent gauge, stopwatch, and controls
 - `CompassView`: black full-screen compass surface with large heading, bearing panel, and bordered controls
 - `AscentRateSettingsView`: custom ascent-limit controls with color-coded depth bands
 - `BuddyAssistView`: pre-dive pairing, Buddy Link, proximity, message, and compass panels using the same black technical visual language
@@ -67,7 +69,7 @@ Docs/ReferenceLookAndFeel.jpg
 The current code preview is stored at:
 
 ```text
-Docs/CurrentCodeLiveViewPreview.png
+Docs/LiveDiveImmersionPremiumPreview.png
 ```
 
 ## Project Structure
