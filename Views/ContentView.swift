@@ -11,8 +11,6 @@ struct ContentView: View {
                 .tag(AppPage.compass)
             AscentRateSettingsView()
                 .tag(AppPage.ascentSettings)
-            BuddyAssistView()
-                .tag(AppPage.buddyAssist)
             UserImagesView()
                 .tag(AppPage.userImages)
             DiveLogListView()

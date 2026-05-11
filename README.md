@@ -22,10 +22,9 @@ DIR DIVING is a SwiftUI watchOS application for Apple Watch Ultra-class devices.
 - User-configurable ascent-rate limits by depth band
 - Red blinking warning and haptic feedback when ascent rate exceeds the current depth-band limit
 - GPS entry and exit points captured with a best-effort surface fix
-- Experimental Buddy Assist screen for pre-dive buddy identification and preset messages over a future BLE pairing path
 - Custom image screen for bundled reference images, checklists, or static procedures
 
-Experimental branch documentation is available in [`Docs/EXPERIMENTAL_FEATURES.md`](Docs/EXPERIMENTAL_FEATURES.md).
+Experimental Buddy Assist / BLE work is intentionally kept out of `main` and lives only on the `codex/experimental-features` branch.
 
 ## Visual Design Standard
 
@@ -50,7 +49,6 @@ This premium visual system is now applied across the watch UI, not only the live
 - `DiveLiveView`: primary dive computer screen with octopus logo, depth, TTV, RunTime, separated ascent gauge, stopwatch, and controls
 - `CompassView`: black full-screen compass surface with large heading, bearing panel, and bordered controls
 - `AscentRateSettingsView`: custom ascent-limit controls with color-coded depth bands
-- `BuddyAssistView`: pre-dive pairing, Buddy Link, proximity, message, and compass panels using the same black technical visual language
 - `DiveLogListView` and `DiveDetailView`: log, detail, chart, GPS, and CSV export screens using the same metric panels and command buttons
 - `UserImagesView`: bundled image selector with the same black canvas and bordered action controls
 
@@ -95,9 +93,8 @@ Main screens:
 1. Live dive screen
 2. Compass screen
 3. Ascent-rate settings screen
-4. Buddy Assist screen
-5. User images screen
-6. Dive log screen
+4. User images screen
+5. Dive log screen
 
 The compass is implemented as a full screen, not as a modal feature that must be launched. Bearing actions are contextual to the compass screen.
 
@@ -236,51 +233,6 @@ Each saved session includes:
 - TTV value
 - Entry and exit GPS points when available
 - Full depth/temperature sample list
-
-## Buddy Assist
-
-The experimental `BUDDY` screen is designed for quick preset messages between divers:
-
-- `OK`
-- `RISALI`
-- `HO UN PROBLEMA`
-- `DOVE SEI?`
-- `TORNA INDIETRO`
-- `LOW GAS`
-
-The intended concept is:
-
-```text
-Apple Watch <-> BLE <-> Apple Watch
-```
-
-Current implementation status:
-
-- Adds the watchOS UI for pre-dive pairing, buddy identification, and sending preset messages.
-- Stores the paired buddy identity locally after a successful connection.
-- Blocks pairing while `DiveManager.isDiveActive` is true.
-- Cancels an active pairing scan if a dive starts before pairing completes.
-- Adds an `OpenBuddyAssistIntent` so the Buddy Assist page can be opened from an Action Button or shortcut-style workflow when watchOS exposes it.
-- Shows the mandatory safety warning: `Indicazione di prossimità sperimentale non affidabile per sicurezza immersione.`
-- Shows the mandatory pairing warning: `Pairing solo prima dell'immersione. Non effettuare pairing in immersione.`
-- Shows an experimental proximity dot:
-  - green when RSSI suggests the buddy is near;
-  - yellow when RSSI suggests the buddy is around the distant / mid-range zone;
-  - red when no buddy link is available.
-- Adds Buddy Link status with `ONLINE` / `LOST`.
-- Adds haptic patterns for proximity changes:
-  - slow pulse when the buddy is distant;
-  - rapid double pulse when the buddy is near.
-- Adds a compass block with last known direction, shared bearing, current heading, and an estimated `Direzione plausibile`.
-- Reads buddy RSSI every 15 seconds while connected.
-- Adds a `BuddyAssistService` with CoreBluetooth central-side scaffolding.
-- Defines a custom BLE service UUID and message characteristic UUID.
-- Adds the required Bluetooth privacy usage string to `Info.plist`.
-- Uses the shared premium visual system from `DiveUIComponents.swift`, with black canvas, thin status borders, large readable values, and blue/green/yellow/red functional colors.
-
-Operational rule: Buddy pairing must be completed before entering the water. DIR DIVING intentionally disables pairing while a dive is active and cancels any in-progress pairing scan when a dive starts, because pairing underwater is not a safe or reliable setup workflow.
-
-Important limitation: Apple documents that watchOS apps cannot advertise BLE peripheral services with `CBPeripheralManager`. A true direct Watch-to-Watch BLE pairing architecture is therefore not currently reliable as a production-only Apple Watch implementation. A production path may require a companion device, an external BLE relay, or a revised architecture validated on Apple hardware.
 
 ## Subsurface CSV Export
 
