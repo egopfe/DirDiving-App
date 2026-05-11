@@ -31,21 +31,46 @@ final class BuddyAssistService: NSObject, ObservableObject {
     @Published private(set) var lastErrorMessage: String?
     @Published private(set) var activeReceivedMessage: BuddyAssistEvent?
     @Published private(set) var events: [BuddyAssistEvent] = []
+    @Published private(set) var pairedBuddyIdentifier: String?
+    @Published private(set) var pairedBuddyName: String?
 
     private var centralManager: CBCentralManager?
     private var connectedPeripheral: CBPeripheral?
     private var messageCharacteristic: CBCharacteristic?
     private var pingTimer: Timer?
+    private let defaults: UserDefaults
+    private let pairedBuddyIdentifierKey = "dirdiving_paired_buddy_identifier"
+    private let pairedBuddyNameKey = "dirdiving_paired_buddy_name"
 
     var canSend: Bool { state == .connected && messageCharacteristic != nil }
     var isBuddyOnline: Bool { state == .connected }
     var buddyLinkStatus: String { isBuddyOnline ? "ONLINE" : "LOST" }
+    var isPaired: Bool { pairedBuddyIdentifier != nil }
+    var pairingStatusText: String { isPaired ? "PAIRED" : "NOT PAIRED" }
+    var pairedBuddyDisplayName: String { pairedBuddyName ?? "DIRDIVING WATCH" }
 
     var limitationText: String {
         "Direct Watch-to-Watch BLE pairing is experimental. watchOS apps cannot advertise BLE peripheral services, so a reliable production path may need a companion device or external BLE relay."
     }
 
-    func startPairing() {
+    var preDivePairingDisclaimer: String {
+        "Buddy pairing must be completed before entering the water. Pairing is disabled while a dive is active."
+    }
+
+    override init() {
+        defaults = .standard
+        pairedBuddyIdentifier = defaults.string(forKey: pairedBuddyIdentifierKey)
+        pairedBuddyName = defaults.string(forKey: pairedBuddyNameKey)
+        super.init()
+    }
+
+    func startPairing(isDiveActive: Bool) {
+        guard !isDiveActive else {
+            lastErrorMessage = preDivePairingDisclaimer
+            state = .idle
+            return
+        }
+
         if centralManager == nil {
             centralManager = CBCentralManager(delegate: self, queue: nil)
         }
@@ -65,6 +90,21 @@ final class BuddyAssistService: NSObject, ObservableObject {
         proximityState = .disconnected
         lastRSSI = nil
         state = .idle
+    }
+
+    func cancelPairingForActiveDive() {
+        guard state == .scanning else { return }
+        centralManager?.stopScan()
+        lastErrorMessage = preDivePairingDisclaimer
+        state = .idle
+    }
+
+    func forgetBuddy() {
+        stopPairing()
+        pairedBuddyIdentifier = nil
+        pairedBuddyName = nil
+        defaults.removeObject(forKey: pairedBuddyIdentifierKey)
+        defaults.removeObject(forKey: pairedBuddyNameKey)
     }
 
     func send(_ message: BuddyAssistMessage) {
@@ -123,6 +163,13 @@ final class BuddyAssistService: NSObject, ObservableObject {
         }
     }
 
+    private func persistPairedBuddy(from peripheral: CBPeripheral) {
+        pairedBuddyIdentifier = peripheral.identifier.uuidString
+        pairedBuddyName = peripheral.name ?? "DIRDIVING WATCH"
+        defaults.set(peripheral.identifier.uuidString, forKey: pairedBuddyIdentifierKey)
+        defaults.set(pairedBuddyName ?? "DIRDIVING WATCH", forKey: pairedBuddyNameKey)
+    }
+
     private func startPinging() {
         stopPinging()
         pingBuddy()
@@ -179,6 +226,7 @@ extension BuddyAssistService: CBCentralManagerDelegate {
 
     nonisolated func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         Task { @MainActor in
+            persistPairedBuddy(from: peripheral)
             state = .connected
             proximityState = .distant
             startPinging()
