@@ -5,7 +5,7 @@ struct ContentView: View {
         TabView {
             LogbookView().tabItem { Label("Logbook", systemImage: "list.bullet.rectangle") }
             AnalysisView().tabItem { Label("Analisi", systemImage: "chart.line.uptrend.xyaxis") }
-            PlannerView().tabItem { Label("Planner", systemImage: "point.topleft.down.curvedto.point.bottomright.up") }
+            PlannerView().tabItem { Label("Planner", systemImage: "chart.line.uptrend.xyaxis") }
             EquipmentView().tabItem { Label("Attrezzatura", systemImage: "shippingbox") }
             MoreView().tabItem { Label("Altro", systemImage: "ellipsis") }
         }

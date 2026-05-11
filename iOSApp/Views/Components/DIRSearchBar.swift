@@ -7,7 +7,9 @@ struct DIRSearchBar: View {
             Image(systemName: "magnifyingglass").foregroundStyle(DIRTheme.muted)
             TextField("Cerca immersioni", text: $text).foregroundStyle(.white)
         }
-        .padding(12)
-        .background(RoundedRectangle(cornerRadius: 14).fill(DIRTheme.surface2.opacity(0.90)))
+        .font(.callout)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface2.opacity(0.78)))
     }
 }

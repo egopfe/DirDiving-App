@@ -3,33 +3,46 @@ import Charts
 
 struct AnalysisView: View {
     @EnvironmentObject private var logStore: DiveLogStore
+
     var body: some View {
         NavigationStack {
             ZStack {
                 DIRBackground()
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 18) {
-                        DIRSectionHeader(title: "Analisi", subtitle: "Statistiche aggregate")
-                        DIRCard("Overview", icon: "chart.bar.xaxis") {
-                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Analisi")
+                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                        DIRCard("ANALISI AVANZATE", icon: "chart.line.uptrend.xyaxis") {
+                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 0) {
                                 DIRMetricTile(title: "Immersioni", value: "\(logStore.sessions.count)", color: DIRTheme.cyan)
                                 DIRMetricTile(title: "Max assoluta", value: Formatters.one(logStore.sessions.map(\.maxDepthMeters).max() ?? 0), unit: "m", color: DIRTheme.yellow)
-                                DIRMetricTile(title: "Runtime totale", value: Formatters.zero(logStore.sessions.map(\.durationSeconds).reduce(0,+)/60), unit: "min")
-                                DIRMetricTile(title: "Temp media", value: Formatters.one(avgTemp), unit: "°C")
+                                DIRMetricTile(title: "Runtime totale", value: Formatters.zero(logStore.sessions.map(\.durationSeconds).reduce(0, +) / 60), unit: "min")
+                                DIRMetricTile(title: "Temp media", value: Formatters.one(avgTemp), unit: "C")
                             }
                         }
-                        DIRCard("Profondità massima per immersione", icon: "chart.xyaxis.line") {
+                        DIRCard("PROFONDITA MASSIMA PER IMMERSIONE", icon: "chart.xyaxis.line") {
                             Chart(logStore.sessions) { session in
-                                BarMark(x: .value("Data", session.startDate, unit: .day), y: .value("Max", session.maxDepthMeters)).foregroundStyle(DIRTheme.cyan)
-                            }.frame(height: 260)
+                                BarMark(
+                                    x: .value("Data", session.startDate, unit: .day),
+                                    y: .value("Max", session.maxDepthMeters)
+                                )
+                                .foregroundStyle(DIRTheme.cyan)
+                            }
+                            .chartXAxis { AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) } }
+                            .chartYAxis { AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) } }
+                            .frame(height: 240)
                         }
-                    }.padding()
+                    }
+                    .padding(16)
                 }
-            }.navigationTitle("Analisi").navigationBarTitleDisplayMode(.inline)
+            }
+            .toolbar(.hidden, for: .navigationBar)
         }
     }
+
     private var avgTemp: Double {
         let values = logStore.sessions.compactMap(\.avgWaterTemperatureCelsius)
-        return values.isEmpty ? 0 : values.reduce(0,+)/Double(values.count)
+        return values.isEmpty ? 0 : values.reduce(0, +) / Double(values.count)
     }
 }

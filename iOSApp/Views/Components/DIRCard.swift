@@ -25,8 +25,8 @@ struct DIRCard<Content: View>: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
-                .fill(DIRTheme.surface.opacity(0.94))
-                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.cyan.opacity(0.18), lineWidth: 1))
+                .fill(DIRTheme.surface.opacity(0.86))
+                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.hairline, lineWidth: 1))
         )
     }
 }

@@ -88,7 +88,7 @@ The iPhone app lives in:
 iOSApp/
 ```
 
-This target is intentionally separate from the watchOS target. It provides an iPhone companion experience with the same premium visual standard: black canvas, blue technical labels, green/yellow/red operational states, logbook, dive analysis, dive planner, equipment screen, Apple Watch sync status, and Subsurface CSV export.
+This target is intentionally separate from the watchOS target. It provides an iPhone companion experience aligned to the supplied iOS companion mockup: black technical canvas, cyan controls, compact card rows, photographic-style dive thumbnails, logbook, tabbed dive detail, dive analysis, full planner, plan result screen, equipment screen, Apple Watch sync status, and Subsurface CSV export.
 
 The iOS-specific build and validation notes live in:
 

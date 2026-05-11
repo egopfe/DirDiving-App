@@ -2,33 +2,45 @@ import SwiftUI
 
 struct MoreView: View {
     @EnvironmentObject private var watchSync: WatchSyncService
+
     var body: some View {
         NavigationStack {
             ZStack {
                 DIRBackground()
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 18) {
-                        DIRSectionHeader(title: "Altro", subtitle: "Sync, backup, export e informazioni")
-                        DIRCard("Sync Watch", icon: "applewatch") {
-                            row("Supportato", watchSync.isSupported ? "Sì" : "No")
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("Altro")
+                            .font(.system(size: 28, weight: .bold, design: .rounded))
+                            .foregroundStyle(.white)
+                        DIRCard("SYNC WATCH", icon: "applewatch") {
+                            row("Supportato", watchSync.isSupported ? "Si" : "No")
                             row("Stato", String(describing: watchSync.activationState))
                             row("Ultimo evento", watchSync.lastMessage)
                         }
-                        DIRCard("Backup Cloud", icon: "icloud") {
+                        DIRCard("BACKUP CLOUD", icon: "icloud") {
                             row("iCloud Sync", "Predisposto")
                             row("Backup automatico", "Da abilitare")
                         }
-                        DIRCard("Info", icon: "info.circle") {
-                            row("Versione", "1.0")
+                        DIRCard("EXPORT", icon: "square.and.arrow.up") {
+                            row("Subsurface", "CSV")
                             row("Bundle", "com.egopfe.dirdiving.ios")
                         }
-                        DIRWarningBox(text: "DIR DIVING è un supporto informativo per logbook, analisi e pianificazione preliminare.")
-                    }.padding()
+                        DIRWarningBox(text: "DIR DIVING e un supporto informativo per logbook, analisi e pianificazione preliminare.")
+                    }
+                    .padding(16)
                 }
-            }.navigationTitle("Altro").navigationBarTitleDisplayMode(.inline)
+            }
+            .toolbar(.hidden, for: .navigationBar)
         }
     }
+
     private func row(_ title: String, _ value: String) -> some View {
-        HStack { Text(title).foregroundStyle(DIRTheme.muted); Spacer(); Text(value).foregroundStyle(.white) }
+        HStack {
+            Text(title).foregroundStyle(DIRTheme.muted)
+            Spacer()
+            Text(value).foregroundStyle(.white)
+        }
+        .font(.callout)
+        .padding(.vertical, 4)
     }
 }

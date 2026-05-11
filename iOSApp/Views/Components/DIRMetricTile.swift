@@ -8,19 +8,18 @@ struct DIRMetricTile: View {
     var icon: String?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .center, spacing: 7) {
             HStack {
                 if let icon { Image(systemName: icon).font(.caption).foregroundStyle(color) }
-                Text(title.uppercased()).font(.caption2).foregroundStyle(DIRTheme.muted)
-                Spacer()
+                Text(title).font(.caption2).foregroundStyle(DIRTheme.muted)
             }
             HStack(alignment: .firstTextBaseline, spacing: 4) {
-                Text(value).font(.system(size: 26, weight: .bold, design: .rounded)).foregroundStyle(color)
+                Text(value).font(.system(size: 22, weight: .semibold, design: .rounded)).monospacedDigit().foregroundStyle(color)
                 if let unit { Text(unit).font(.caption).foregroundStyle(DIRTheme.muted) }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(14)
-        .background(RoundedRectangle(cornerRadius: 18).fill(DIRTheme.surface2.opacity(0.90)))
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .background(RoundedRectangle(cornerRadius: 0).fill(Color.clear))
     }
 }

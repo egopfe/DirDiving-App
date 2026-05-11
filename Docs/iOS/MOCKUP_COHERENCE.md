@@ -1,6 +1,6 @@
-# Mockup coherence checklist
+# iOS Companion Mockup Coherence
 
-The code maps to the premium iOS mockup as follows:
+The `main-iOS` code maps to the supplied premium iOS companion mockup as follows.
 
 ## Logbook
 
@@ -8,7 +8,8 @@ Implemented:
 - dark technical UI;
 - cyan accent;
 - search bar;
-- dive cards;
+- compact dive rows with day, month, time, thumbnail, site, max depth, runtime, gas and chevron;
+- yellow `BUDDY` badge;
 - max depth, runtime and gas label.
 
 Files:
@@ -20,7 +21,7 @@ Files:
 
 Implemented:
 - header card;
-- internal segmented tabs: Riepilogo / Grafici / Dettagli;
+- internal underline tabs: RIEPILOGO / GRAFICI / DETTAGLI;
 - metric grid;
 - depth chart using Charts;
 - GPS block;
@@ -34,10 +35,12 @@ File:
 
 Implemented:
 - planner modes: Semplice / Avanzato / Tecnico;
-- planned depth/time/temperature;
+- planned depth/time/temperature with cyan plus/minus steppers;
 - bottom gas + deco gas 1 + deco gas 2;
 - MOD/PPO2;
+- cyan `Calcola Piano` call to action;
 - TTR, deco stop count, OTU and CNS;
+- dedicated `Piano Immersione` result screen;
 - ascent/decompression table;
 - Buhlmann ZHL-16C simplified curve.
 
@@ -62,7 +65,7 @@ File:
 
 ## Differences from visual mockup
 
-- Real underwater thumbnail photos are represented by symbolic gradient cards.
+- Real underwater thumbnail photos are represented by generated, photographic-style SwiftUI thumbnails until final media assets are supplied.
 - Buhlmann/deco calculations are simplified planning-assistant logic, not a certified decompression engine.
 - iCloud backup is represented as prepared/future status.
 - CSV export is implemented; `.ssrf` export is not implemented yet.

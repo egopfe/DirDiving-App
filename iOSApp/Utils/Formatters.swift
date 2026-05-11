@@ -1,6 +1,26 @@
 import Foundation
 
 enum Formatters {
+    private static let clockFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter
+    }()
+
+    private static let detailFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d MMM yyyy - HH:mm"
+        return formatter
+    }()
+
+    static func clock(_ date: Date) -> String {
+        clockFormatter.string(from: date)
+    }
+
+    static func detailTitle(_ date: Date) -> String {
+        detailFormatter.string(from: date)
+    }
+
     static func time(_ interval: TimeInterval) -> String {
         let total = Int(interval)
         let m = (total % 3600) / 60

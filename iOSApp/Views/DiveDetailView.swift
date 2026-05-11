@@ -2,93 +2,231 @@ import SwiftUI
 import Charts
 
 enum DiveDetailTab: String, CaseIterable, Identifiable {
-    case summary = "Riepilogo"
-    case charts = "Grafici"
-    case details = "Dettagli"
+    case summary = "RIEPILOGO"
+    case charts = "GRAFICI"
+    case details = "DETTAGLI"
     var id: String { rawValue }
 }
+
 struct DiveDetailView: View {
     let session: DiveSession
     @State private var tab: DiveDetailTab = .summary
     @State private var csvURL: URL?
+
     var body: some View {
         ZStack {
             DIRBackground()
-            ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 16) {
+                    segmentedTabs
                     header
-                    Picker("Tab", selection: $tab) {
-                        ForEach(DiveDetailTab.allCases) { Text($0.rawValue).tag($0) }
-                    }.pickerStyle(.segmented)
                     switch tab {
-                    case .summary: summary
-                    case .charts: charts
-                    case .details: details
+                    case .summary:
+                        metricGrid
+                        depthChart
+                        gasBlock
+                    case .charts:
+                        depthChart
+                        gasBlock
+                    case .details:
+                        details
                     }
                     exportBlock
-                }.padding()
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 18)
             }
-        }.navigationTitle(session.startDate.formatted(date: .abbreviated, time: .shortened)).navigationBarTitleDisplayMode(.inline)
+        }
+        .navigationTitle(Formatters.detailTitle(session.startDate))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Image(systemName: "ellipsis")
+                    .foregroundStyle(DIRTheme.cyan)
+            }
+        }
     }
+
+    private var segmentedTabs: some View {
+        HStack(spacing: 0) {
+            ForEach(DiveDetailTab.allCases) { item in
+                Button {
+                    tab = item
+                } label: {
+                    VStack(spacing: 10) {
+                        Text(item.rawValue)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(tab == item ? DIRTheme.cyan : .white.opacity(0.72))
+                        Rectangle()
+                            .fill(tab == item ? DIRTheme.cyan : .clear)
+                            .frame(height: 2)
+                    }
+                }
+                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(.top, 10)
+    }
+
     private var header: some View {
-        DIRCard {
-            HStack(spacing: 14) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 16).fill(LinearGradient(colors: [DIRTheme.cyan.opacity(0.55), DIRTheme.surface2], startPoint: .topLeading, endPoint: .bottomTrailing))
-                    Image(systemName: "water.waves").font(.largeTitle).foregroundStyle(.white)
-                }.frame(width: 88, height: 88)
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(session.siteName ?? "Immersione").font(.title3.bold()).foregroundStyle(.white)
-                    Text(session.gasLabel.rawValue).font(.caption.bold()).foregroundStyle(DIRTheme.yellow)
-                    if let buddy = session.buddy { Text("Buddy: \(buddy)").font(.caption).foregroundStyle(DIRTheme.muted) }
+        HStack(spacing: 14) {
+            DiveThumbnail(index: 0)
+                .frame(width: 86, height: 86)
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 6) {
+                    Text(session.siteName ?? "Immersione")
+                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                    Text("BUDDY")
+                        .font(.system(size: 8, weight: .bold, design: .rounded))
+                        .foregroundStyle(DIRTheme.yellow)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 1)
+                        .overlay(RoundedRectangle(cornerRadius: 3).stroke(DIRTheme.yellow, lineWidth: 1))
                 }
-                Spacer()
+                Label(session.gasLabel.rawValue, systemImage: "circle")
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.78))
+                HStack(spacing: 16) {
+                    Label("Acqua Salata", systemImage: "drop")
+                    Label("\(Formatters.one(session.avgWaterTemperatureCelsius ?? 0)) C", systemImage: "thermometer")
+                }
+                .font(.caption)
+                .foregroundStyle(.white.opacity(0.78))
             }
+            Spacer()
         }
     }
-    private var summary: some View {
-        VStack(spacing: 14) {
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+
+    private var metricGrid: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 0) {
                 DIRMetricTile(title: "Tempo", value: Formatters.time(session.durationSeconds), unit: "min")
-                DIRMetricTile(title: "Max", value: Formatters.one(session.maxDepthMeters), unit: "m", color: DIRTheme.cyan)
-                DIRMetricTile(title: "Media", value: Formatters.one(session.avgDepthMeters), unit: "m")
-                DIRMetricTile(title: "TTR", value: Formatters.one(session.ttv), unit: "min", color: DIRTheme.yellow)
-                DIRMetricTile(title: "SAC", value: Formatters.one(session.sacLitersMinute ?? 0), unit: "l/min")
-                DIRMetricTile(title: "Temp", value: Formatters.one(session.avgWaterTemperatureCelsius ?? 0), unit: "°C")
+                Divider().overlay(DIRTheme.hairline)
+                DIRMetricTile(title: "Max Profondita", value: Formatters.one(session.maxDepthMeters), unit: "m")
+                Divider().overlay(DIRTheme.hairline)
+                DIRMetricTile(title: "Prof. Media", value: Formatters.one(session.avgDepthMeters), unit: "m")
             }
-            DIRCard("Gas utilizzato", icon: "gauge.with.dots.needle.67percent") {
-                HStack {
-                    VStack(alignment: .leading) { Text("Inizio").foregroundStyle(DIRTheme.muted); Text("200 bar").font(.title3.bold()) }
-                    Spacer(); Image(systemName: "arrow.right").foregroundStyle(DIRTheme.muted); Spacer()
-                    VStack(alignment: .leading) { Text("Fine").foregroundStyle(DIRTheme.muted); Text("50 bar").font(.title3.bold()) }
-                    Spacer()
-                    VStack(alignment: .leading) { Text("Consumo").foregroundStyle(DIRTheme.yellow); Text("150 bar").font(.title3.bold()).foregroundStyle(DIRTheme.yellow) }
+            Divider().overlay(DIRTheme.hairline)
+            HStack(spacing: 0) {
+                DIRMetricTile(title: "TTR", value: Formatters.zero(session.ttv), unit: "min")
+                Divider().overlay(DIRTheme.hairline)
+                DIRMetricTile(title: "SAC", value: Formatters.one(session.sacLitersMinute ?? 0), unit: "l/min")
+                Divider().overlay(DIRTheme.hairline)
+                DIRMetricTile(title: "Temperatura", value: Formatters.one(session.avgWaterTemperatureCelsius ?? 0), unit: "C")
+            }
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(DIRTheme.surface.opacity(0.72))
+                .overlay(RoundedRectangle(cornerRadius: 10).stroke(DIRTheme.hairline, lineWidth: 1))
+        )
+    }
+
+    private var depthChart: some View {
+        DIRCard("PROFONDITA", icon: nil) {
+            Chart(session.samples) { sample in
+                LineMark(
+                    x: .value("Tempo", sample.timestamp),
+                    y: .value("Profondita", sample.depthMeters)
+                )
+                .foregroundStyle(DIRTheme.cyan)
+                .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
+            }
+            .chartYScale(domain: [(session.maxDepthMeters + 8), 0])
+            .chartXAxis {
+                AxisMarks(values: .automatic(desiredCount: 4)) {
+                    AxisGridLine().foregroundStyle(DIRTheme.faint)
+                    AxisValueLabel().foregroundStyle(DIRTheme.muted)
                 }
             }
+            .chartYAxis {
+                AxisMarks(position: .leading) {
+                    AxisGridLine().foregroundStyle(DIRTheme.faint)
+                    AxisValueLabel().foregroundStyle(DIRTheme.muted)
+                }
+            }
+            .frame(height: 220)
         }
     }
-    private var charts: some View {
-        DIRCard("Profondità", icon: "chart.xyaxis.line") {
-            Chart(session.samples) { sample in
-                LineMark(x: .value("Tempo", sample.timestamp), y: .value("Profondità", sample.depthMeters)).foregroundStyle(DIRTheme.cyan).lineStyle(StrokeStyle(lineWidth: 3))
-            }.chartYScale(domain: [(session.maxDepthMeters + 2), 0]).frame(height: 280)
+
+    private var gasBlock: some View {
+        DIRCard("GAS UTILIZZATO", icon: nil) {
+            HStack {
+                gasMetric("Inizio", "200", "bar", color: .white)
+                Spacer()
+                Image(systemName: "arrow.right").foregroundStyle(DIRTheme.muted)
+                Spacer()
+                gasMetric("Fine", "50", "bar", color: .white)
+                Spacer()
+                gasMetric("Consumo", "150", "bar", color: DIRTheme.yellow)
+            }
         }
     }
+
+    private func gasMetric(_ title: String, _ value: String, _ unit: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(title == "Consumo" ? DIRTheme.yellow : DIRTheme.muted)
+            HStack(alignment: .lastTextBaseline, spacing: 3) {
+                Text(value)
+                    .font(.title3.weight(.semibold))
+                    .monospacedDigit()
+                    .foregroundStyle(color)
+                Text(unit)
+                    .font(.caption)
+                    .foregroundStyle(DIRTheme.muted)
+            }
+        }
+    }
+
     private var details: some View {
         VStack(spacing: 14) {
             DIRCard("GPS", icon: "location.fill") {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Start: \(session.entryGPS?.coordinateText ?? "n/d")")
                     Text("End: \(session.exitGPS?.coordinateText ?? "n/d")")
-                }.font(.callout.monospacedDigit())
+                }
+                .font(.callout.monospacedDigit())
+                .foregroundStyle(.white)
             }
-            DIRCard("Note", icon: "note.text") { Text(session.notes ?? "Nessuna nota").foregroundStyle(DIRTheme.muted) }
+            DIRCard("Note", icon: "note.text") {
+                Text(session.notes ?? "Nessuna nota")
+                    .foregroundStyle(DIRTheme.muted)
+            }
         }
     }
+
     private var exportBlock: some View {
-        DIRCard("Export", icon: "square.and.arrow.up") {
-            Button("Genera CSV Subsurface") { csvURL = SubsurfaceExportService.writeCSV(for: session) }.buttonStyle(.borderedProminent).tint(DIRTheme.cyan)
-            if let csvURL { ShareLink(item: csvURL) { Label("Condividi CSV", systemImage: "doc") }.foregroundStyle(DIRTheme.yellow) }
+        HStack {
+            Button {
+                csvURL = SubsurfaceExportService.writeCSV(for: session)
+            } label: {
+                Image(systemName: "square.and.arrow.up")
+                    .font(.title3)
+                    .foregroundStyle(DIRTheme.cyan)
+            }
+            Spacer()
+            if let csvURL {
+                ShareLink(item: csvURL) {
+                    Text("Condividi CSV")
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(DIRTheme.cyan)
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 10)
+                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan, lineWidth: 1))
+                }
+            } else {
+                Text("Modifica")
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(DIRTheme.cyan)
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 10)
+                    .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan, lineWidth: 1))
+            }
         }
+        .padding(.top, 4)
     }
 }
