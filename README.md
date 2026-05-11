@@ -22,7 +22,7 @@ DIR DIVING is a SwiftUI watchOS application for Apple Watch Ultra-class devices.
 - User-configurable ascent-rate limits by depth band
 - Red blinking warning and haptic feedback when ascent rate exceeds the current depth-band limit
 - GPS entry and exit points captured with a best-effort surface fix
-- Experimental Buddy Assist screen for preset buddy messages over a future BLE pairing path
+- Experimental Buddy Assist screen for pre-dive buddy identification and preset messages over a future BLE pairing path
 - Custom image screen for bundled reference images, checklists, or static procedures
 
 Experimental branch documentation is available in [`Docs/EXPERIMENTAL_FEATURES.md`](Docs/EXPERIMENTAL_FEATURES.md).
@@ -239,9 +239,13 @@ Apple Watch <-> BLE <-> Apple Watch
 
 Current implementation status:
 
-- Adds the watchOS UI for pairing and sending preset messages.
+- Adds the watchOS UI for pre-dive pairing, buddy identification, and sending preset messages.
+- Stores the paired buddy identity locally after a successful connection.
+- Blocks pairing while `DiveManager.isDiveActive` is true.
+- Cancels an active pairing scan if a dive starts before pairing completes.
 - Adds an `OpenBuddyAssistIntent` so the Buddy Assist page can be opened from an Action Button or shortcut-style workflow when watchOS exposes it.
 - Shows the mandatory safety warning: `Indicazione di prossimità sperimentale non affidabile per sicurezza immersione.`
+- Shows the mandatory pairing warning: `Pairing solo prima dell'immersione. Non effettuare pairing in immersione.`
 - Shows an experimental proximity dot:
   - green when RSSI suggests the buddy is near;
   - yellow when RSSI suggests the buddy is around the distant / mid-range zone;
@@ -255,6 +259,8 @@ Current implementation status:
 - Adds a `BuddyAssistService` with CoreBluetooth central-side scaffolding.
 - Defines a custom BLE service UUID and message characteristic UUID.
 - Adds the required Bluetooth privacy usage string to `Info.plist`.
+
+Operational rule: Buddy pairing must be completed before entering the water. DIR DIVING intentionally disables pairing while a dive is active and cancels any in-progress pairing scan when a dive starts, because pairing underwater is not a safe or reliable setup workflow.
 
 Important limitation: Apple documents that watchOS apps cannot advertise BLE peripheral services with `CBPeripheralManager`. A true direct Watch-to-Watch BLE pairing architecture is therefore not currently reliable as a production-only Apple Watch implementation. A production path may require a companion device, an external BLE relay, or a revised architecture validated on Apple hardware.
 

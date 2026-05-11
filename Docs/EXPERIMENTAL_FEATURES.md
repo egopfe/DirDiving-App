@@ -9,6 +9,7 @@ The experimental branch currently contains:
 - User-configurable ascent-rate limits.
 - Buddy Assist preset messaging UI.
 - Buddy Link proximity indication.
+- Pre-dive Buddy pairing and local buddy identification.
 - Experimental BLE/CoreBluetooth scaffolding.
 - Buddy direction UI based on heading, shared bearing, and last known direction.
 
@@ -32,7 +33,7 @@ The live dive engine uses the configured values through `AscentRateLimits` when 
 
 ## Buddy Assist
 
-Buddy Assist is an experimental communication-oriented screen for predefined diver-to-diver messages.
+Buddy Assist is an experimental communication-oriented screen for pre-dive buddy identification and predefined diver-to-diver messages.
 
 Preset messages:
 
@@ -56,6 +57,22 @@ Current implementation:
 - `BuddyAssistMessage`: preset message model.
 - `OpenBuddyAssistIntent`: App Intent intended for Action Button / shortcut-style access when watchOS exposes it.
 - Received-message banner with direct `ANSWER` flow.
+- Pre-dive pairing status with `PAIRED` / `NOT PAIRED`.
+- Locally persisted paired buddy identity from the connected peripheral.
+- Pairing lockout while `DiveManager.isDiveActive` is true.
+- Automatic cancellation of an in-progress pairing scan if a dive starts before pairing completes.
+
+### Pre-Dive Pairing Rule
+
+Buddy pairing must be completed before entering the water.
+
+DIR DIVING intentionally blocks pairing during an active dive and cancels any in-progress pairing scan if a dive starts before pairing completes. Pairing is a setup workflow, not an underwater operational workflow, because BLE discovery, authorization prompts, RSSI, and connection establishment are not reliable safety actions during immersion.
+
+Mandatory UI disclaimer:
+
+```text
+Pairing solo prima dell'immersione. Non effettuare pairing in immersione.
+```
 
 ## Buddy Link UI
 

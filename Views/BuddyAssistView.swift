@@ -3,6 +3,7 @@ import SwiftUI
 struct BuddyAssistView: View {
     @EnvironmentObject private var buddyAssist: BuddyAssistService
     @EnvironmentObject private var compass: CompassManager
+    @EnvironmentObject private var dive: DiveManager
     @State private var isAnswering = false
 
     private let columns = [
@@ -15,6 +16,7 @@ struct BuddyAssistView: View {
             VStack(spacing: 8) {
                 header
                 warning
+                pairingPanel
                 buddyLink
                 proximity
                 compassBlock
@@ -23,8 +25,10 @@ struct BuddyAssistView: View {
                 messageGrid(title: isAnswering ? "ANSWER" : "SEND")
 
                 HStack(spacing: 6) {
-                    Button("PAIR") { buddyAssist.startPairing() }
+                    Button("PAIR") { buddyAssist.startPairing(isDiveActive: dive.isDiveActive) }
+                        .disabled(dive.isDiveActive)
                     Button("STOP") { buddyAssist.stopPairing() }
+                    Button("UNPAIR") { buddyAssist.forgetBuddy() }
                 }
                 .font(.caption2)
 
@@ -56,6 +60,11 @@ struct BuddyAssistView: View {
         }
         .onReceive(compass.$bearingDegrees) { bearing in
             buddyAssist.updateCompassContext(headingDegrees: compass.headingDegrees, bearingDegrees: bearing)
+        }
+        .onReceive(dive.$isDiveActive) { isDiveActive in
+            if isDiveActive {
+                buddyAssist.cancelPairingForActiveDive()
+            }
         }
     }
 
@@ -100,11 +109,52 @@ struct BuddyAssistView: View {
     }
 
     private var warning: some View {
-        Text("Indicazione di prossimit\u{00E0} sperimentale non affidabile per sicurezza immersione.")
-            .font(.caption2)
-            .foregroundStyle(.yellow)
-            .multilineTextAlignment(.center)
-            .fixedSize(horizontal: false, vertical: true)
+        VStack(spacing: 4) {
+            Text("Indicazione di prossimit\u{00E0} sperimentale non affidabile per sicurezza immersione.")
+            Text("Pairing solo prima dell'immersione. Non effettuare pairing in immersione.")
+        }
+        .font(.caption2)
+        .foregroundStyle(.yellow)
+        .multilineTextAlignment(.center)
+        .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var pairingPanel: some View {
+        VStack(spacing: 5) {
+            HStack {
+                Text("PAIRING PRE-DIVE")
+                    .font(.caption.bold())
+                    .foregroundStyle(.green)
+                Spacer()
+                Text(buddyAssist.pairingStatusText)
+                    .font(.caption2.monospacedDigit().bold())
+                    .foregroundStyle(buddyAssist.isPaired ? .green : .red)
+            }
+
+            HStack {
+                Text("Buddy")
+                    .font(.caption2)
+                    .foregroundStyle(.white.opacity(0.78))
+                Spacer()
+                Text(buddyAssist.isPaired ? buddyAssist.pairedBuddyDisplayName : "--")
+                    .font(.caption2.monospacedDigit())
+                    .foregroundStyle(.blue)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
+
+            if dive.isDiveActive {
+                Text("PAIRING BLOCCATO: IMMERSIONE ATTIVA")
+                    .font(.caption2.bold())
+                    .foregroundStyle(.red)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .padding(8)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(dive.isDiveActive ? .red : .green, lineWidth: 1)
+        )
     }
 
     private var buddyLink: some View {
