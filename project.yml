@@ -15,8 +15,13 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios
         DEVELOPMENT_TEAM: C6FKKPB6A9
         CODE_SIGN_STYLE: Automatic
-        INFOPLIST_FILE: iOSApp/Info.plist
+        INFOPLIST_FILE: iOSApp/App/Info.plist
         PRODUCT_NAME: DIR DIVING
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    dependencies:
+      - sdk: Charts.framework
+      - sdk: WatchConnectivity.framework
+      - sdk: CoreLocation.framework
   DIRDiving Watch App:
     type: application
     platform: watchOS

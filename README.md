@@ -88,7 +88,13 @@ The iPhone app lives in:
 iOSApp/
 ```
 
-This target is intentionally separate from the watchOS target. It provides an iPhone companion dashboard with the same premium visual standard: black canvas, blue technical labels, green/yellow/red operational states, octopus mark, live dive summary, Apple Watch sync status, Buddy Link entry point, and dive log/export panels.
+This target is intentionally separate from the watchOS target. It provides an iPhone companion experience with the same premium visual standard: black canvas, blue technical labels, green/yellow/red operational states, logbook, dive analysis, dive planner, equipment screen, Apple Watch sync status, and Subsurface CSV export.
+
+The iOS-specific build and validation notes live in:
+
+```text
+Docs/iOS/
+```
 
 The Apple Watch app remains in:
 
@@ -101,7 +107,7 @@ DIRDiving Watch App
 ```text
 App/        watchOS app entry point and Info.plist
 Config/     entitlements file
-iOSApp/     iPhone companion app entry point and SwiftUI interface
+iOSApp/     iPhone companion app target, models, services, design system, assets, and SwiftUI interface
 Models/     dive sessions, samples, GPS points, ascent status
 Services/   dive, GPS, compass, haptics, export, image loading, App Intents
 Utils/      formatting helpers
