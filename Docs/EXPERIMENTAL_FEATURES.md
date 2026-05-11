@@ -24,6 +24,14 @@ The experimental branch uses the same premium visual language as the supplied Ap
 - Blue labels for technical context.
 - Green, yellow, orange, and red used as functional state colors.
 - Custom bordered command controls instead of generic watchOS bordered buttons.
+- A drawn octopus mark at the live screen top left, matching the supplied reference without depending on emoji glyphs.
+- Explicit live-screen layout regions for the large depth value and the right-side ascent gauge, preventing text and gauge overlap.
+
+The live dive screen reference preview generated from the current code is:
+
+```text
+Docs/LiveDiveImmersionPremiumPreview.png
+```
 
 The shared styling helpers live in:
 
