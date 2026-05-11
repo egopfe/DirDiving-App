@@ -43,6 +43,21 @@ Future screens and feature work should preserve this look and feel:
 - Compact vertical spacing matching the supplied reference screenshot
 - No generic dashboard cards, decorative gradients, or marketing-style layouts inside the watch UI
 
+This premium visual system is now applied across the watch UI, not only the live dive screen:
+
+- `DiveLiveView`: primary dive computer screen with depth, TTV, RunTime, ascent gauge, stopwatch, and controls
+- `CompassView`: black full-screen compass surface with large heading, bearing panel, and bordered controls
+- `AscentRateSettingsView`: custom ascent-limit controls with color-coded depth bands
+- `BuddyAssistView`: pre-dive pairing, Buddy Link, proximity, message, and compass panels using the same black technical visual language
+- `DiveLogListView` and `DiveDetailView`: log, detail, chart, GPS, and CSV export screens using the same metric panels and command buttons
+- `UserImagesView`: bundled image selector with the same black canvas and bordered action controls
+
+Implementation helpers live in:
+
+```text
+Views/DiveUIComponents.swift
+```
+
 The visual reference image is stored at:
 
 ```text
@@ -259,6 +274,9 @@ Current implementation status:
 - Adds a `BuddyAssistService` with CoreBluetooth central-side scaffolding.
 - Defines a custom BLE service UUID and message characteristic UUID.
 - Adds the required Bluetooth privacy usage string to `Info.plist`.
+- Uses the shared premium visual system from `DiveUIComponents.swift`, with black canvas, thin status borders, large readable values, and blue/green/yellow/red functional colors.
+
+Operational rule: Buddy pairing must be completed before entering the water. DIR DIVING intentionally disables pairing while a dive is active and cancels any in-progress pairing scan when a dive starts, because pairing underwater is not a safe or reliable setup workflow.
 
 Operational rule: Buddy pairing must be completed before entering the water. DIR DIVING intentionally disables pairing while a dive is active and cancels any in-progress pairing scan when a dive starts, because pairing underwater is not a safe or reliable setup workflow.
 

@@ -12,6 +12,34 @@ The experimental branch currently contains:
 - Pre-dive Buddy pairing and local buddy identification.
 - Experimental BLE/CoreBluetooth scaffolding.
 - Buddy direction UI based on heading, shared bearing, and last known direction.
+- Premium Apple Watch Ultra-style UI alignment for shared and experimental screens.
+
+## Premium UI Alignment
+
+The experimental branch uses the same premium visual language as the supplied Apple Watch Ultra dive-computer reference:
+
+- Black full-screen watch canvas.
+- Thin rounded technical panels instead of standard list rows.
+- Large readable numeric values with monospaced digits.
+- Blue labels for technical context.
+- Green, yellow, orange, and red used as functional state colors.
+- Custom bordered command controls instead of generic watchOS bordered buttons.
+
+The shared styling helpers live in:
+
+```text
+Views/DiveUIComponents.swift
+```
+
+Screens using this system include:
+
+- `DiveLiveView`
+- `CompassView`
+- `AscentRateSettingsView`
+- `BuddyAssistView`
+- `DiveLogListView`
+- `DiveDetailView`
+- `UserImagesView`
 
 ## User-Configurable Ascent-Rate Limits
 
@@ -61,6 +89,7 @@ Current implementation:
 - Locally persisted paired buddy identity from the connected peripheral.
 - Pairing lockout while `DiveManager.isDiveActive` is true.
 - Automatic cancellation of an in-progress pairing scan if a dive starts before pairing completes.
+- Premium Buddy UI panels for pairing, Buddy Link, proximity, compass, received messages, answer flow, and command buttons.
 
 ### Pre-Dive Pairing Rule
 
