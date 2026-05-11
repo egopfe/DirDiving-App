@@ -278,8 +278,6 @@ Current implementation status:
 
 Operational rule: Buddy pairing must be completed before entering the water. DIR DIVING intentionally disables pairing while a dive is active and cancels any in-progress pairing scan when a dive starts, because pairing underwater is not a safe or reliable setup workflow.
 
-Operational rule: Buddy pairing must be completed before entering the water. DIR DIVING intentionally disables pairing while a dive is active and cancels any in-progress pairing scan when a dive starts, because pairing underwater is not a safe or reliable setup workflow.
-
 Important limitation: Apple documents that watchOS apps cannot advertise BLE peripheral services with `CBPeripheralManager`. A true direct Watch-to-Watch BLE pairing architecture is therefore not currently reliable as a production-only Apple Watch implementation. A production path may require a companion device, an external BLE relay, or a revised architecture validated on Apple hardware.
 
 ## Subsurface CSV Export
