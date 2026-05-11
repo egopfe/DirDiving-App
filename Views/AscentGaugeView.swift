@@ -4,60 +4,69 @@ struct AscentGaugeView: View {
     let status: AscentStatus
 
     var body: some View {
-        VStack(alignment: .trailing, spacing: 5) {
+        VStack(alignment: .leading, spacing: 4) {
             Text("VELOCIT\u{00C0}\nRISALITA")
                 .font(.caption2.bold())
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.leading)
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .lineLimit(2)
 
-            HStack(alignment: .center, spacing: 5) {
-                VStack(alignment: .trailing) {
-                    scaleLabel("3.0", .red)
-                    Spacer()
-                    scaleLabel("2.3", .orange)
-                    Spacer()
-                    scaleLabel("1.5", .yellow)
-                    Spacer()
-                    scaleLabel("0.8", .green)
-                    Spacer()
-                    scaleLabel("0.0", .green)
-                }
-                .frame(width: 28)
+            HStack(alignment: .center, spacing: 4) {
+                scaleLabels
+                    .frame(width: 26)
 
-                GeometryReader { geometry in
-                    ZStack(alignment: .bottom) {
-                        VStack(spacing: 0) {
-                            Rectangle().fill(.red)
-                            Rectangle().fill(.orange)
-                            Rectangle().fill(.yellow)
-                            Rectangle().fill(.green)
-                        }
-                        .clipShape(Rectangle())
-
-                        VStack(spacing: geometry.size.height / 5.0 - 1) {
-                            ForEach(0..<6, id: \.self) { _ in
-                                Rectangle()
-                                    .fill(.white)
-                                    .frame(width: 28, height: 1)
-                            }
-                        }
-                        .frame(maxHeight: .infinity)
-
-                        Triangle()
-                            .fill(.white)
-                            .frame(width: 14, height: 16)
-                            .rotationEffect(.degrees(180))
-                            .offset(x: 26, y: pointerOffset(in: geometry.size.height))
-                    }
-                }
-                .frame(width: 30)
+                gaugeBar
+                    .frame(width: 28, height: 112)
             }
 
             Text("m/min")
                 .font(.caption2)
                 .foregroundStyle(.white)
-                .frame(maxWidth: .infinity, alignment: .center)
+                .frame(width: 58, alignment: .trailing)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var scaleLabels: some View {
+        VStack(alignment: .trailing, spacing: 0) {
+            scaleLabel("3.0", DiveUI.red)
+            Spacer()
+            scaleLabel("2.3", DiveUI.orange)
+            Spacer()
+            scaleLabel("1.5", DiveUI.yellow)
+            Spacer()
+            scaleLabel("0.8", DiveUI.green)
+            Spacer()
+            scaleLabel("0.0", DiveUI.green)
+        }
+    }
+
+    private var gaugeBar: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .bottom) {
+                VStack(spacing: 0) {
+                    Rectangle().fill(DiveUI.red)
+                    Rectangle().fill(DiveUI.orange)
+                    Rectangle().fill(DiveUI.yellow)
+                    Rectangle().fill(DiveUI.green)
+                }
+                .clipShape(Rectangle())
+
+                VStack(spacing: geometry.size.height / 5.0 - 1) {
+                    ForEach(0..<6, id: \.self) { _ in
+                        Rectangle()
+                            .fill(.white)
+                            .frame(width: 34, height: 1)
+                    }
+                }
+                .frame(maxHeight: .infinity)
+
+                Triangle()
+                    .fill(.white)
+                    .frame(width: 14, height: 16)
+                    .rotationEffect(.degrees(180))
+                    .offset(x: 23, y: pointerOffset(in: geometry.size.height))
+            }
         }
     }
 
@@ -66,6 +75,8 @@ struct AscentGaugeView: View {
             .font(.caption2.bold())
             .monospacedDigit()
             .foregroundStyle(color)
+            .lineLimit(1)
+            .minimumScaleFactor(0.75)
     }
 
     private func pointerOffset(in height: CGFloat) -> CGFloat {

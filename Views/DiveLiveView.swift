@@ -7,79 +7,89 @@ struct DiveLiveView: View {
         ZStack {
             Color.black.ignoresSafeArea()
 
-            VStack(spacing: 9) {
-                topBar
-                immersionStatus
-                ttvRuntimePanel
-                depthAndAscent
-                depthSummary
-                stopwatchPanel
-                controls
+            GeometryReader { geometry in
+                let contentWidth = geometry.size.width - 20
+                let gaugeWidth = min(92, contentWidth * 0.25)
+                let leftWidth = contentWidth - gaugeWidth - 8
 
-                if let error = dive.lastErrorMessage {
-                    Text(error)
-                        .font(.caption2)
-                        .foregroundStyle(.yellow)
-                        .multilineTextAlignment(.center)
-                        .lineLimit(2)
+                VStack(spacing: 8) {
+                    topBar
+                    immersionStatus
+                    ttvRuntimePanel
+                    depthSection(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
+                    stopwatchPanel
+                    controls
+
+                    if let error = dive.lastErrorMessage {
+                        Text(error)
+                            .font(.caption2)
+                            .foregroundStyle(DiveUI.yellow)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                    }
                 }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
+                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
         }
     }
 
     private var topBar: some View {
-        HStack {
-            Text("\u{1F419}")
-                .font(.title3)
-                .foregroundStyle(.blue)
+        HStack(alignment: .center) {
+            OctopusLogo()
+                .frame(width: 34, height: 30, alignment: .leading)
+
             Spacer()
+
             HStack(spacing: 5) {
                 Image(systemName: "drop.fill")
+                    .font(.headline)
                 Text(temperatureText)
+                    .font(.headline.monospacedDigit().bold())
             }
-            .font(.headline.monospacedDigit())
-            .foregroundStyle(.blue)
+            .foregroundStyle(DiveUI.blue)
         }
     }
 
     private var immersionStatus: some View {
         HStack(spacing: 8) {
             Image(systemName: "water.waves")
+                .font(.title3)
             Text(dive.isDiveActive ? "IN IMMERSIONE" : "PRONTO")
                 .font(.headline.bold())
         }
-        .foregroundStyle(.green)
+        .foregroundStyle(DiveUI.green)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.leading, 18)
+        .padding(.leading, 46)
     }
 
     private var ttvRuntimePanel: some View {
         HStack(spacing: 0) {
-            dashboardValue(title: "TTV", value: Formatters.one(dive.ttv), suffix: "")
+            dashboardValue(title: "TTV", value: Formatters.one(dive.ttv), suffix: "", color: DiveUI.green)
             Rectangle()
                 .fill(.white.opacity(0.35))
-                .frame(width: 1, height: 52)
-            dashboardValue(title: "RunTime", value: runtimeMinutes, suffix: "min")
+                .frame(width: 1, height: 48)
+            dashboardValue(title: "RunTime", value: runtimeMinutes, suffix: "min", color: .white)
         }
         .padding(.vertical, 8)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(.green, lineWidth: 1.2)
+                .stroke(DiveUI.green, lineWidth: 1.4)
         )
     }
 
-    private func dashboardValue(title: String, value: String, suffix: String) -> some View {
+    private func dashboardValue(title: String, value: String, suffix: String, color: Color) -> some View {
         VStack(spacing: 2) {
             Text(title)
                 .font(.caption)
                 .foregroundStyle(.white)
             HStack(alignment: .lastTextBaseline, spacing: 4) {
                 Text(value)
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .font(.system(size: 31, weight: .bold, design: .rounded))
+                    .minimumScaleFactor(0.72)
                     .monospacedDigit()
-                    .foregroundStyle(title == "TTV" ? .green : .white)
+                    .foregroundStyle(color)
                 if !suffix.isEmpty {
                     Text(suffix)
                         .font(.caption)
@@ -90,27 +100,43 @@ struct DiveLiveView: View {
         .frame(maxWidth: .infinity)
     }
 
-    private var depthAndAscent: some View {
-        HStack(alignment: .center, spacing: 8) {
-            VStack(spacing: 0) {
-                HStack(alignment: .lastTextBaseline, spacing: 4) {
-                    Text(Formatters.one(dive.currentDepthMeters))
-                        .font(.system(size: 76, weight: .bold, design: .rounded))
-                        .minimumScaleFactor(0.55)
-                        .monospacedDigit()
-                        .foregroundStyle(dive.redWarningBlink ? .red : .white)
-                    Text("m")
-                        .font(.system(size: 30, weight: .bold, design: .rounded))
-                        .foregroundStyle(.blue)
-                }
-                Text("PROFONDIT\u{00C0} ATTUALE")
-                    .font(.caption.bold())
-                    .foregroundStyle(.blue)
+    private func depthSection(leftWidth: CGFloat, gaugeWidth: CGFloat) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            VStack(spacing: 9) {
+                depthReadout
+                depthSummary
             }
-            .frame(maxWidth: .infinity)
+            .frame(width: leftWidth)
 
             AscentGaugeView(status: dive.ascentStatus)
-                .frame(width: 94, height: 168)
+                .frame(width: gaugeWidth, height: 176)
+                .padding(.top, 4)
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var depthReadout: some View {
+        VStack(spacing: 0) {
+            HStack(alignment: .lastTextBaseline, spacing: 4) {
+                Text(Formatters.one(dive.currentDepthMeters))
+                    .font(.system(size: 88, weight: .bold, design: .rounded))
+                    .minimumScaleFactor(0.5)
+                    .lineLimit(1)
+                    .monospacedDigit()
+                    .foregroundStyle(dive.redWarningBlink ? DiveUI.red : .white)
+                    .layoutPriority(1)
+                Text("m")
+                    .font(.system(size: 34, weight: .bold, design: .rounded))
+                    .foregroundStyle(DiveUI.blue)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Text("PROFONDIT\u{00C0} ATTUALE")
+                .font(.caption.bold())
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+                .foregroundStyle(DiveUI.blue)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
@@ -122,18 +148,21 @@ struct DiveLiveView: View {
     }
 
     private func depthCard(title: String, value: Double) -> some View {
-        VStack(spacing: 3) {
+        VStack(spacing: 2) {
             Text(title)
                 .font(.caption2)
                 .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.65)
             HStack(alignment: .lastTextBaseline, spacing: 3) {
                 Text(Formatters.one(value))
                     .font(.system(size: 25, weight: .regular, design: .rounded))
+                    .minimumScaleFactor(0.7)
                     .monospacedDigit()
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(DiveUI.blue)
                 Text("m")
                     .font(.caption)
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(DiveUI.blue)
             }
         }
         .frame(maxWidth: .infinity)
@@ -151,26 +180,27 @@ struct DiveLiveView: View {
             VStack(spacing: 0) {
                 Text(Formatters.time(dive.stopwatchTime))
                     .font(.system(size: 36, weight: .bold, design: .rounded))
+                    .minimumScaleFactor(0.75)
                     .monospacedDigit()
                 Text("CRONOMETRO")
                     .font(.caption2.bold())
             }
         }
-        .foregroundStyle(.yellow)
+        .foregroundStyle(DiveUI.yellow)
         .frame(maxWidth: .infinity)
         .padding(.vertical, 7)
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .stroke(.yellow, lineWidth: 1)
+                .stroke(DiveUI.yellow, lineWidth: 1.2)
         )
     }
 
     private var controls: some View {
         HStack(spacing: 8) {
-            controlButton("START", systemImage: "play.fill", color: .green) {
+            controlButton("START", systemImage: "play.fill", color: DiveUI.green) {
                 dive.startStopwatch()
             }
-            controlButton("STOP", systemImage: "stop.fill", color: .red) {
+            controlButton("STOP", systemImage: "stop.fill", color: DiveUI.red) {
                 dive.stopStopwatch()
             }
             controlButton("RESET", systemImage: "arrow.clockwise", color: .white.opacity(0.78)) {
@@ -184,6 +214,8 @@ struct DiveLiveView: View {
             HStack(spacing: 5) {
                 Text(title)
                     .font(.caption.bold())
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
                 Image(systemName: systemImage)
                     .font(.caption.bold())
             }
@@ -209,5 +241,51 @@ struct DiveLiveView: View {
 
     private var runtimeMinutes: String {
         String(Int(dive.runtime / 60.0))
+    }
+}
+
+private struct OctopusLogo: View {
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(DiveUI.blue.opacity(0.18))
+                .frame(width: 19, height: 19)
+                .offset(y: -4)
+            Circle()
+                .stroke(DiveUI.blue, lineWidth: 2)
+                .frame(width: 19, height: 19)
+                .offset(y: -4)
+            HStack(spacing: 5) {
+                Circle().fill(DiveUI.blue).frame(width: 3, height: 3)
+                Circle().fill(DiveUI.blue).frame(width: 3, height: 3)
+            }
+            .offset(y: -5)
+            OctopusTentacles()
+                .stroke(DiveUI.blue, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+                .frame(width: 29, height: 17)
+                .offset(y: 8)
+        }
+        .frame(width: 34, height: 30)
+    }
+}
+
+private struct OctopusTentacles: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let top = rect.minY + 2
+        let bottom = rect.maxY - 2
+        let centers: [CGFloat] = [0.12, 0.3, 0.5, 0.7, 0.88]
+
+        for center in centers {
+            let x = rect.minX + rect.width * center
+            path.move(to: CGPoint(x: x, y: top))
+            path.addCurve(
+                to: CGPoint(x: x + (center < 0.5 ? -3 : center > 0.5 ? 3 : 0), y: bottom),
+                control1: CGPoint(x: x - 5, y: top + 4),
+                control2: CGPoint(x: x + 5, y: bottom - 4)
+            )
+        }
+
+        return path
     }
 }
