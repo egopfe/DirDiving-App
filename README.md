@@ -2,11 +2,13 @@
 
 Copyright Federico Lombardo di Monte Iato 2026
 
-This branch contains the iPhone companion interface for DIR DIVING. It is intentionally focused on the iOS app and does not include the Apple Watch dive-computer target or experimental Buddy Assist BLE features.
+This branch contains the iPhone companion interface for DIR DIVING. It is intentionally focused on the iOS app and does not include the Apple Watch dive-computer target.
 
 ## Branch Scope
 
-`main-iOS` contains:
+`main-iOS` contains the stable iOS companion app. The experimental iOS companion branch is `codex/ios-experimental-features`.
+
+The stable iOS app contains:
 
 - iPhone logbook.
 - Dive detail screen with summary metrics and depth profile.
@@ -19,7 +21,7 @@ This branch contains the iPhone companion interface for DIR DIVING. It is intent
 - Subsurface CSV export support, including entry and exit GPS columns when available.
 - iOS companion visual system aligned to the supplied dark cyan mockup.
 
-Buddy Assist, Buddy Link, BLE pairing, and secure Buddy message authentication live only on the `codex/experimental-features` branch.
+Buddy Assist, Buddy Link, BLE pairing, and secure Buddy message authentication runtime code live only on the Apple Watch `codex/experimental-features` branch. iOS companion experiments that mirror or support those concepts live on `codex/ios-experimental-features`.
 
 ## Visual Design Standard
 
@@ -31,7 +33,7 @@ The iOS companion uses the supplied iPhone companion mockup as its product basel
 - Dense logbook rows for fast scanning.
 - Tab-based iPhone navigation.
 - Technical planner surfaces instead of marketing-style pages.
-- No Buddy/BLE screens in this branch.
+- No Apple Watch runtime target in this branch.
 
 ## Project Structure
 
@@ -118,4 +120,10 @@ iOS-specific notes live in:
 Docs/iOS/
 ```
 
-The watchOS production app is maintained on `main`. Experimental Buddy/BLE work is maintained on `codex/experimental-features`.
+Experimental iOS companion notes live in:
+
+```text
+Docs/iOS/EXPERIMENTAL_FEATURES.md
+```
+
+The watchOS production app is maintained on `main`. Experimental Apple Watch Buddy/BLE work is maintained on `codex/experimental-features`. Experimental iOS companion work is maintained on `codex/ios-experimental-features`.
