@@ -40,6 +40,11 @@ struct MoreView: View {
                             row("Subsurface", "CSV")
                             row("Bundle", "com.egopfe.dirdiving.ios")
                         }
+                        DIRCard("EXPERIMENTAL", icon: "testtube.2") {
+                            row("Branch iOS", "codex/ios-experimental-features")
+                            row("Watch source", "codex/experimental-features")
+                            row("Buddy runtime", "Solo Apple Watch")
+                        }
                         DIRWarningBox(text: "DIR DIVING e un supporto informativo per logbook, analisi e pianificazione preliminare.")
                     }
                     .padding(16)
