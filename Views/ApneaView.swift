@@ -24,7 +24,7 @@ struct ApneaView: View {
 
     private var topBar: some View {
         HStack {
-            Text("🐙").font(.title3)
+            DiveOctopusLogo()
             Spacer()
             Label("APNEA", systemImage: "lungs")
                 .font(.caption.bold())

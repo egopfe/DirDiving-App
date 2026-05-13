@@ -27,8 +27,7 @@ struct ModeSelectionView: View {
     private var header: some View {
         VStack(spacing: 6) {
             HStack {
-                Text("🐙")
-                    .font(.title2)
+                DiveOctopusLogo()
                 Spacer()
                 Text("PRE-DIVE")
                     .font(.caption.bold())

@@ -32,7 +32,7 @@ struct SnorkelingView: View {
 
     private var topBar: some View {
         HStack {
-            Text("🐙").font(.title3)
+            DiveOctopusLogo()
             Spacer()
             Label("SNORKELING", systemImage: "figure.pool.swim")
                 .font(.caption.bold())
