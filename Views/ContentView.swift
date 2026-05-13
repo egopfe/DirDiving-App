@@ -5,8 +5,14 @@ struct ContentView: View {
 
     var body: some View {
         TabView(selection: $navigation.selectedPage) {
+            ModeSelectionView()
+                .tag(AppPage.modeSelection)
             DiveLiveView()
                 .tag(AppPage.live)
+            SnorkelingView()
+                .tag(AppPage.snorkeling)
+            ApneaView()
+                .tag(AppPage.apnea)
             CompassView()
                 .tag(AppPage.compass)
             AscentRateSettingsView()
