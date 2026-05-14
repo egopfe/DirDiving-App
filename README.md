@@ -14,6 +14,7 @@ DIR DIVING is a SwiftUI watchOS application for Apple Watch Ultra-class devices.
 - TTV-style live value
 - Manual stopwatch with Start, Stop, and Reset controls
 - Local log of the latest 40 dives
+- Local persistence with iCloud Key-Value Store mirroring for dive logs and ascent-rate settings
 - Dive profile chart
 - CSV export compatible with Subsurface workflows
 - Integrated compass screen
@@ -83,6 +84,24 @@ Resources/  asset catalogs and bundled user resources
 ```
 
 The project is configured with XcodeGen through `project.yml`.
+
+## iCloud Persistence
+
+The watchOS app persists user data locally and mirrors supported data to iCloud Key-Value Store when the app is signed with the iCloud capability.
+
+Persisted data:
+
+- Latest dive log sessions.
+- User-configurable ascent-rate limits.
+
+Implementation:
+
+- `Services/CloudSyncStore.swift`
+- `Services/DiveLogStore.swift`
+- `Services/AscentRateSettingsStore.swift`
+- `Config/DIRDiving.entitlements`
+
+Runtime note: iCloud sync requires the Apple Developer iCloud capability and the configured iCloud container to be enabled for the app identifier. Without the entitlement/capability at signing time, data is still saved locally.
 
 ## Main Navigation
 

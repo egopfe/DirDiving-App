@@ -9,10 +9,13 @@ final class AscentRateSettingsStore: ObservableObject {
 
     private let defaults: UserDefaults
     private let key = "dirdiving_ascent_rate_limits"
+    private let cloudSync = CloudSyncStore()
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        if let data = defaults.data(forKey: key),
+        if let cloudLimits = cloudSync.load(AscentRateLimits.self, forKey: key) {
+            limits = cloudLimits
+        } else if let data = defaults.data(forKey: key),
            let decoded = try? JSONDecoder().decode(AscentRateLimits.self, from: data) {
             limits = decoded
         } else {
@@ -27,5 +30,6 @@ final class AscentRateSettingsStore: ObservableObject {
     private func save() {
         guard let data = try? JSONEncoder().encode(limits) else { return }
         defaults.set(data, forKey: key)
+        cloudSync.save(limits, forKey: key)
     }
 }
