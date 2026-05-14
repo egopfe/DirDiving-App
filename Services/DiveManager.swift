@@ -110,13 +110,13 @@ final class DiveManager: NSObject, ObservableObject {
         stopBlinking()
         let end = Date()
         let finishedSamples = samples
-        let finishedEntryGPS = entryGPS
         sessionStart = nil
         samples = []
         previousDepthSample = nil
         gpsManager.captureBestEffortPoint(for: 6) { [weak self] point in
-            self?.exitGPS = point
-            self?.finalizeDive(start: start, end: end, entryGPS: finishedEntryGPS, exitGPS: point, samples: finishedSamples)
+            guard let self else { return }
+            self.exitGPS = point
+            self.finalizeDive(start: start, end: end, entryGPS: self.entryGPS, exitGPS: point, samples: finishedSamples)
         }
     }
 
