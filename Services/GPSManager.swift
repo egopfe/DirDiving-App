@@ -25,6 +25,11 @@ final class GPSManager: NSObject, ObservableObject {
         requestAuthorization()
         locationManager.startUpdatingLocation()
 
+        if let superseded = bestEffortCapture {
+            bestEffortCapture = nil
+            superseded.completion(superseded.bestPoint)
+        }
+
         let capture = BestEffortCapture(deadline: Date().addingTimeInterval(seconds), bestPoint: lastPoint, completion: completion)
         bestEffortCapture = capture
 
