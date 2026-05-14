@@ -2,6 +2,8 @@ import SwiftUI
 
 struct MoreView: View {
     @EnvironmentObject private var watchSync: WatchSyncService
+    @EnvironmentObject private var cloudSync: CloudSyncStore
+    @EnvironmentObject private var logStore: DiveLogStore
 
     var body: some View {
         NavigationStack {
@@ -18,8 +20,21 @@ struct MoreView: View {
                             row("Ultimo evento", watchSync.lastMessage)
                         }
                         DIRCard("BACKUP CLOUD", icon: "icloud") {
-                            row("iCloud Sync", "Predisposto")
-                            row("Backup automatico", "Da abilitare")
+                            row("iCloud Sync", cloudSync.isICloudAvailable ? "Attivo" : "Non disponibile")
+                            row("Backup automatico", "Log e planner")
+                            row("Ultimo evento", cloudSync.lastSyncStatus)
+                            Button {
+                                logStore.synchronizeCloud()
+                                cloudSync.synchronize()
+                            } label: {
+                                Label("Sincronizza ora", systemImage: "icloud.and.arrow.up")
+                                    .font(.callout.weight(.semibold))
+                                    .foregroundStyle(DIRTheme.cyan)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                                    .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
+                            }
+                            .buttonStyle(.plain)
                         }
                         DIRCard("EXPORT", icon: "square.and.arrow.up") {
                             row("Subsurface", "CSV")

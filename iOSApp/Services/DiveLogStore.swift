@@ -3,16 +3,44 @@ import Combine
 
 @MainActor
 final class DiveLogStore: ObservableObject {
-    @Published private(set) var sessions: [DiveSession] = []
+    @Published private(set) var sessions: [DiveSession] = [] {
+        didSet { saveIfReady() }
+    }
 
-    init() {
-        insertDemoDives()
+    private let cloudSync: CloudSyncStore?
+    private let key = "dirdiving_ios_dive_sessions"
+    private var isReady = false
+
+    init(cloudSync: CloudSyncStore? = nil) {
+        self.cloudSync = cloudSync
+        if let saved = cloudSync?.load([DiveSession].self, forKey: key), !saved.isEmpty {
+            sessions = saved.sorted { $0.startDate > $1.startDate }
+        } else {
+            insertDemoDives()
+        }
+        isReady = true
+        saveIfReady()
+    }
+
+    func add(_ session: DiveSession) {
+        sessions.insert(session, at: 0)
+        sessions = sessions.sorted { $0.startDate > $1.startDate }
     }
 
     func delete(at offsets: IndexSet) {
         for index in offsets.sorted(by: >) {
             sessions.remove(at: index)
         }
+    }
+
+    func synchronizeCloud() {
+        saveIfReady()
+        cloudSync?.synchronize()
+    }
+
+    private func saveIfReady() {
+        guard isReady else { return }
+        cloudSync?.save(sessions, forKey: key)
     }
 
     private func insertDemoDives() {

@@ -15,6 +15,7 @@ This branch contains the iPhone companion interface for DIR DIVING. It is intent
 - Gas, MOD, decompression, and plan result screens.
 - Equipment screen.
 - Apple Watch sync status scaffold through WatchConnectivity.
+- Local persistence with iCloud Key-Value Store mirroring for logbook sessions and planner inputs.
 - Subsurface CSV export support.
 - iOS companion visual system aligned to the supplied dark cyan mockup.
 
@@ -39,6 +40,7 @@ iOSApp/App/          iOS app entry point and Info.plist
 iOSApp/DesignSystem/ shared iOS colors, backgrounds, and card styling
 iOSApp/Models/       iOS dive, gas, and planner models
 iOSApp/Services/     log store, planner, WatchConnectivity, CSV export
+iOSApp/Config/       iCloud entitlement configuration
 iOSApp/Utils/        formatting helpers
 iOSApp/Views/        SwiftUI iPhone screens and components
 iOSApp/Resources/    asset catalogs and app icon
@@ -66,6 +68,24 @@ Frameworks:
 - `Charts.framework`
 - `WatchConnectivity.framework`
 - `CoreLocation.framework`
+
+## iCloud Persistence
+
+The iOS companion persists user data locally and mirrors supported data to iCloud Key-Value Store when the app is signed with the iCloud capability.
+
+Persisted data:
+
+- iOS logbook sessions.
+- Planner mode and gas-planning input.
+
+Implementation:
+
+- `iOSApp/Services/CloudSyncStore.swift`
+- `iOSApp/Services/DiveLogStore.swift`
+- `iOSApp/Services/PlannerStore.swift`
+- `iOSApp/Config/DIRDivingiOS.entitlements`
+
+Runtime note: iCloud sync requires the Apple Developer iCloud capability and the configured iCloud container to be enabled for the app identifier. Without the entitlement/capability at signing time, data is still saved locally and the UI reports iCloud as unavailable.
 
 ## Build Notes
 

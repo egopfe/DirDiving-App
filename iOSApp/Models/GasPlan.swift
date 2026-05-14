@@ -6,7 +6,7 @@ enum PressureUnit: String, CaseIterable, Identifiable, Codable {
     var id: String { rawValue }
 }
 
-enum PlannerMode: String, CaseIterable, Identifiable {
+enum PlannerMode: String, CaseIterable, Identifiable, Codable {
     case simple = "Semplice"
     case advanced = "Avanzato"
     case technical = "Tecnico"
