@@ -21,7 +21,7 @@ struct MoreView: View {
                         }
                         DIRCard("BACKUP CLOUD", icon: "icloud") {
                             row("iCloud Sync", cloudSync.isICloudAvailable ? "Attivo" : "Non disponibile")
-                            row("Backup automatico", "Log e planner")
+                            row("Backup automatico", "Log, planner, Buddy Lab, Explore")
                             row("Ultimo evento", cloudSync.lastSyncStatus)
                             Button {
                                 logStore.synchronizeCloud()

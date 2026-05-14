@@ -1,14 +1,14 @@
 import Foundation
 import SwiftUI
 
-enum BuddyLinkState: String, CaseIterable, Identifiable {
+enum BuddyLinkState: String, CaseIterable, Identifiable, Codable {
     case online = "ONLINE"
     case lost = "LOST"
 
     var id: String { rawValue }
 }
 
-enum BuddySignalState: String, CaseIterable, Identifiable {
+enum BuddySignalState: String, CaseIterable, Identifiable, Codable {
     case near = "VICINO"
     case distant = "DISTANTE"
     case lost = "NO LINK"
@@ -24,7 +24,7 @@ enum BuddySignalState: String, CaseIterable, Identifiable {
     }
 }
 
-enum BuddyTrustedPairingState: String, CaseIterable, Identifiable {
+enum BuddyTrustedPairingState: String, CaseIterable, Identifiable, Codable {
     case notPaired = "NOT PAIRED"
     case verify = "VERIFY"
     case trusted = "TRUSTED"
@@ -41,7 +41,7 @@ enum BuddyTrustedPairingState: String, CaseIterable, Identifiable {
     }
 }
 
-enum BuddyPresetMessage: String, CaseIterable, Identifiable {
+enum BuddyPresetMessage: String, CaseIterable, Identifiable, Codable {
     case ok = "OK"
     case ascend = "RISALI"
     case problem = "HO UN PROBLEMA"
@@ -53,7 +53,7 @@ enum BuddyPresetMessage: String, CaseIterable, Identifiable {
     var isCritical: Bool { self == .problem || self == .lowGas }
 }
 
-struct BuddyExperimentalStatus: Hashable {
+struct BuddyExperimentalStatus: Hashable, Codable {
     var pairingState: BuddyTrustedPairingState
     var linkState: BuddyLinkState
     var signalState: BuddySignalState
