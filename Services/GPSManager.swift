@@ -25,6 +25,9 @@ final class GPSManager: NSObject, ObservableObject {
         requestAuthorization()
         locationManager.startUpdatingLocation()
 
+        // Complete any in-flight capture before replacing it so callers are never stranded.
+        finishBestEffortCapture()
+
         let capture = BestEffortCapture(deadline: Date().addingTimeInterval(seconds), bestPoint: lastPoint, completion: completion)
         bestEffortCapture = capture
 
