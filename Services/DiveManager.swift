@@ -82,8 +82,10 @@ final class DiveManager: NSObject, ObservableObject {
         isDiveActive = true
         sessionStart = Date()
         entryGPS = gpsManager.currentBestPoint()
+        let capturedAtStart = entryGPS
         gpsManager.captureBestEffortPoint(for: 6) { [weak self] point in
-            self?.entryGPS = point
+            guard let self, self.isDiveActive, !self.isFinalizingDive else { return }
+            self.entryGPS = point ?? capturedAtStart
         }
         samples = []
         previousDepthSample = nil

@@ -74,7 +74,7 @@ struct DiveLogListView: View {
             .buttonStyle(.plain)
 
             DiveCommandButton("DEL", systemImage: "trash", color: DiveUI.red) {
-                log.delete(at: IndexSet(integer: index))
+                log.delete(id: session.id)
             }
             .frame(width: 72)
         }
