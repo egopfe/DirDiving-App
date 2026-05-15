@@ -6,10 +6,10 @@ struct DiveLogListView: View {
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            DiveScreenBackground()
 
             ScrollView {
-                VStack(spacing: 8) {
+                VStack(spacing: 10) {
                     header
                     if let loadError = log.loadErrorMessage {
                         DivePanel(stroke: DiveUI.red) {
@@ -34,21 +34,22 @@ struct DiveLogListView: View {
                         }
                     }
                 }
-                .padding(.horizontal, 10)
+                .padding(.horizontal, DiveUI.screenPadding)
                 .padding(.vertical, 8)
             }
         }
     }
 
     private var header: some View {
-        HStack {
-            Text("DIVE LOG")
-                .font(.headline.bold())
-                .foregroundStyle(DiveUI.blue)
-            Spacer()
-            Text("\(log.sessions.count)")
-                .font(.headline.monospacedDigit().bold())
-                .foregroundStyle(DiveUI.green)
+        VStack(spacing: 6) {
+            DiveScreenHeader("DIVE LOG", subtitle: "SYNCED SESSIONS", accent: DiveUI.blue, systemImage: "list.bullet.rectangle")
+            HStack {
+                Text("SESSIONI")
+                    .font(.system(size: 10, weight: .black, design: .rounded))
+                    .foregroundStyle(DiveUI.secondaryText)
+                Spacer()
+                DiveStatusPill("\(log.sessions.count)", color: DiveUI.green)
+            }
         }
     }
 

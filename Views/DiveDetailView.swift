@@ -7,29 +7,27 @@ struct DiveDetailView: View {
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            DiveScreenBackground()
 
             ScrollView {
-                VStack(spacing: 8) {
+                VStack(spacing: 10) {
                     header
                     summaryGrid
                     gpsPanel
                     chartPanel
                     exportPanel
                 }
-                .padding(.horizontal, 10)
+                .padding(.horizontal, DiveUI.screenPadding)
                 .padding(.vertical, 8)
             }
         }
     }
 
     private var header: some View {
-        VStack(spacing: 2) {
-            Text("IMMERSIONE")
-                .font(.headline.bold())
-                .foregroundStyle(DiveUI.blue)
+        VStack(spacing: 5) {
+            DiveScreenHeader("IMMERSIONE", subtitle: "DIVE DETAIL", accent: DiveUI.blue, systemImage: "waveform.path.ecg")
             Text(session.startDate.formatted(date: .abbreviated, time: .shortened))
-                .font(.caption2)
+                .font(.system(size: 10, weight: .semibold, design: .rounded))
                 .foregroundStyle(DiveUI.secondaryText)
         }
         .frame(maxWidth: .infinity)
