@@ -3,23 +3,33 @@ import Combine
 
 @MainActor
 final class DiveLogStore: ObservableObject {
+    static let includeDemoLogbookKey = "dirdiving_ios_include_demo_logbook"
+
     @Published private(set) var sessions: [DiveSession] = [] {
         didSet { saveIfReady() }
     }
 
+    @Published var includeDemoLogbook: Bool {
+        didSet {
+            guard isReady, includeDemoLogbook != oldValue else { return }
+            UserDefaults.standard.set(includeDemoLogbook, forKey: Self.includeDemoLogbookKey)
+            applyDemoLogbookPreference()
+        }
+    }
+
     private let cloudSync: CloudSyncStore?
     private let key = "dirdiving_ios_dive_sessions"
-    private let includeDemoKey = "dirdiving_ios_include_demo_logbook"
     private var isReady = false
 
     init(cloudSync: CloudSyncStore? = nil) {
         self.cloudSync = cloudSync
+        includeDemoLogbook = UserDefaults.standard.bool(forKey: Self.includeDemoLogbookKey)
         let localSessions = loadLocalSessions()
         let cloudSessions = cloudSync?.load([DiveSession].self, forKey: key)
         sessions = mergedSessions(local: localSessions, cloud: cloudSessions)
             .sorted { $0.startDate > $1.startDate }
 
-        if sessions.isEmpty, UserDefaults.standard.bool(forKey: includeDemoKey) {
+        if includeDemoLogbook, sessions.filter({ !$0.isDemoDive }).isEmpty {
             insertDemoDives()
         }
 
@@ -70,6 +80,15 @@ final class DiveLogStore: ObservableObject {
         cloudSync?.save(sessions, forKey: key)
     }
 
+    private func applyDemoLogbookPreference() {
+        if includeDemoLogbook {
+            guard sessions.filter({ !$0.isDemoDive }).isEmpty else { return }
+            insertDemoDives()
+        } else {
+            sessions.removeAll { $0.isDemoDive }
+        }
+    }
+
     private func insertDemoDives() {
         let names = ["Secca di Mezzo", "Punta Margherita", "Relitto dell'Elba", "Scoglio del Corallo", "Grotta Azzurra"]
         let days = [24, 21, 18, 14, 10]
@@ -117,7 +136,7 @@ final class DiveLogStore: ObservableObject {
                 samples: samples,
                 siteName: name,
                 buddy: idx == 0 ? "Buddy" : nil,
-                notes: "Demo dive",
+                notes: DiveSession.demoNotesLabel,
                 gasLabel: gases[idx],
                 sacLitersMinute: 18.2 + Double(idx)
             )
