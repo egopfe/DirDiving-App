@@ -1,6 +1,7 @@
 name: DIRDiving
 options:
   bundleIdPrefix: com.egopfe
+  xcodeVersion: "15.4"
   deploymentTarget:
     watchOS: "10.0"
     iOS: "17.0"
