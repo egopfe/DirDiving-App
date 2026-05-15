@@ -1,5 +1,18 @@
 import AppIntents
 
+struct OpenBuddyAssistIntent: AppIntent {
+    static var title: LocalizedStringResource = "Open Buddy Assist"
+    static var description = IntentDescription("Opens the Buddy Assist screen for pre-dive pairing and preset messages.")
+    static var openAppWhenRun = true
+
+    func perform() async throws -> some IntentResult {
+        await MainActor.run {
+            AppNavigationStore.shared?.openBuddyAssist()
+        }
+        return .result()
+    }
+}
+
 struct ToggleStopwatchIntent: AppIntent {
     static var title: LocalizedStringResource = "Toggle DIR DIVING Stopwatch"
     static var description = IntentDescription("Start or stop the DIR DIVING manual stopwatch.")
@@ -21,5 +34,25 @@ struct ResetStopwatchIntent: AppIntent {
             DiveManager.shared?.resetStopwatch()
         }
         return .result()
+    }
+}
+
+struct DIRDivingAppShortcuts: AppShortcutsProvider {
+    static var appShortcuts: [AppShortcut] {
+        AppShortcut(
+            intent: OpenBuddyAssistIntent(),
+            phrases: [
+                "Open Buddy Assist in \(.applicationName)",
+                "Buddy Assist in \(.applicationName)"
+            ],
+            shortTitle: "Buddy Assist",
+            systemImageName: "person.2.wave.2"
+        )
+        AppShortcut(
+            intent: ToggleStopwatchIntent(),
+            phrases: ["Toggle stopwatch in \(.applicationName)"],
+            shortTitle: "Stopwatch",
+            systemImageName: "stopwatch"
+        )
     }
 }

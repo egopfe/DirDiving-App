@@ -28,6 +28,9 @@ struct SnorkelingView: View {
         }
         .background(Color.black)
         .onAppear { gps.start() }
+        .onReceive(gps.$lastSpeedMetersPerSecond) { speed in
+            exploration.updateSnorkelingProgress(speedMetersPerSecond: speed)
+        }
     }
 
     private var topBar: some View {

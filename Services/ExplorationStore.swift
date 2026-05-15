@@ -15,6 +15,10 @@ final class ExplorationStore: ObservableObject {
     @Published var apneaCount: Int = 4
     @Published var apneaWarning: String?
     @Published var snorkelingWarning: String?
+    @Published private(set) var snorkelingDistanceMeters: Double = 0
+    private var snorkelingStartedAt: Date?
+    private var snorkelingLastSampleAt: Date?
+    private var snorkelingLastSpeedMetersPerSecond: Double = 0
     private let cloudSync = CloudSyncStore()
     private let cloudKey = "dirdiving_watch_exploration_state"
     private var isReady = false
@@ -27,10 +31,28 @@ final class ExplorationStore: ObservableObject {
     ]
 
     var activeWaypoint: SnorkelingWaypoint { waypoints[min(activeWaypointIndex, waypoints.count - 1)] }
-    var runtimeSeconds: TimeInterval { snorkelingState == .active || snorkelingState == .navigation || snorkelingState == .returnMode ? 1740 : 0 }
-    var distanceMeters: Double { snorkelingState == .idle ? 0 : 742 }
-    var averageSpeedKnots: Double { snorkelingState == .idle ? 0 : 1.4 }
-    var entryDistanceMeters: Double { snorkelingState == .returnMode ? 318 : 142 }
+    var runtimeSeconds: TimeInterval {
+        guard let snorkelingStartedAt,
+              snorkelingState == .active || snorkelingState == .navigation || snorkelingState == .returnMode else {
+            return 0
+        }
+        return Date().timeIntervalSince(snorkelingStartedAt)
+    }
+
+    var distanceMeters: Double {
+        snorkelingState == .idle || snorkelingState == .ended ? 0 : snorkelingDistanceMeters
+    }
+
+    var averageSpeedKnots: Double {
+        let runtime = runtimeSeconds
+        guard runtime > 0 else { return 0 }
+        return (distanceMeters / runtime) * 1.94384
+    }
+
+    var entryDistanceMeters: Double {
+        guard snorkelingState == .returnMode || snorkelingState == .navigation else { return 0 }
+        return max(0, snorkelingDistanceMeters * 0.42)
+    }
     var gpsStatus: String { snorkelingState == .active ? "SURFACE GPS" : "LAST FIX" }
 
     init() {
@@ -47,6 +69,7 @@ final class ExplorationStore: ObservableObject {
             apneaCount = state.apneaCount
             apneaWarning = state.apneaWarning
             snorkelingWarning = state.snorkelingWarning
+            snorkelingDistanceMeters = state.snorkelingDistanceMeters ?? 0
         }
         isReady = true
         saveIfReady()
@@ -60,7 +83,25 @@ final class ExplorationStore: ObservableObject {
     func startSnorkeling() {
         snorkelingState = .active
         snorkelingWarning = nil
+        snorkelingStartedAt = Date()
+        snorkelingLastSampleAt = snorkelingStartedAt
+        snorkelingDistanceMeters = 0
+        snorkelingLastSpeedMetersPerSecond = 0
         saveIfReady()
+    }
+
+    func updateSnorkelingProgress(speedMetersPerSecond: Double) {
+        guard snorkelingState == .active || snorkelingState == .navigation || snorkelingState == .returnMode else { return }
+        let now = Date()
+        if snorkelingStartedAt == nil {
+            snorkelingStartedAt = now
+            snorkelingLastSampleAt = now
+        }
+        let delta = max(0, now.timeIntervalSince(snorkelingLastSampleAt ?? now))
+        let speed = max(0, speedMetersPerSecond)
+        snorkelingDistanceMeters += ((snorkelingLastSpeedMetersPerSecond + speed) / 2) * delta
+        snorkelingLastSpeedMetersPerSecond = speed
+        snorkelingLastSampleAt = now
     }
 
     func startNavigation() {
@@ -76,6 +117,9 @@ final class ExplorationStore: ObservableObject {
 
     func endSnorkeling() {
         snorkelingState = .ended
+        snorkelingStartedAt = nil
+        snorkelingLastSampleAt = nil
+        snorkelingLastSpeedMetersPerSecond = 0
         saveIfReady()
     }
 
@@ -160,7 +204,8 @@ final class ExplorationStore: ObservableObject {
                 recoverySeconds: recoverySeconds,
                 apneaCount: apneaCount,
                 apneaWarning: apneaWarning,
-                snorkelingWarning: snorkelingWarning
+                snorkelingWarning: snorkelingWarning,
+                snorkelingDistanceMeters: snorkelingDistanceMeters
             ),
             forKey: cloudKey
         )
@@ -180,4 +225,5 @@ private struct ExplorationState: Codable {
     var apneaCount: Int
     var apneaWarning: String?
     var snorkelingWarning: String?
+    var snorkelingDistanceMeters: Double?
 }

@@ -10,6 +10,7 @@ struct DIRDivingApp: App {
     @StateObject private var ascentSettings: AscentRateSettingsStore
     @StateObject private var navigationStore: AppNavigationStore
     @StateObject private var explorationStore: ExplorationStore
+    @StateObject private var buddyAssist: BuddyAssistService
     @StateObject private var watchSync: WatchSyncService
 
     init() {
@@ -25,6 +26,7 @@ struct DIRDivingApp: App {
         _ascentSettings = StateObject(wrappedValue: ascentSettings)
         _navigationStore = StateObject(wrappedValue: navigationStore)
         _explorationStore = StateObject(wrappedValue: ExplorationStore())
+        _buddyAssist = StateObject(wrappedValue: BuddyAssistService())
         _watchSync = StateObject(wrappedValue: WatchSyncService.shared)
     }
 
@@ -39,6 +41,7 @@ struct DIRDivingApp: App {
                 .environmentObject(ascentSettings)
                 .environmentObject(navigationStore)
                 .environmentObject(explorationStore)
+                .environmentObject(buddyAssist)
                 .environmentObject(watchSync)
         }
     }

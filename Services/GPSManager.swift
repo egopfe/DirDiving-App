@@ -5,8 +5,10 @@ import CoreLocation
 @MainActor
 final class GPSManager: NSObject, ObservableObject {
     @Published private(set) var lastPoint: GPSPoint?
+    @Published private(set) var lastSpeedMetersPerSecond: Double = 0
     @Published private(set) var authorizationStatus: CLAuthorizationStatus = .notDetermined
     private let locationManager = CLLocationManager()
+    private var previousSpeedSample: (point: GPSPoint, date: Date)?
     private var bestEffortCapture: BestEffortCapture?
 
     override init() {
@@ -57,6 +59,20 @@ extension GPSManager: CLLocationManagerDelegate {
         guard let location = locations.last else { return }
         Task { @MainActor in
             let point = GPSPoint(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude, horizontalAccuracy: location.horizontalAccuracy, timestamp: location.timestamp)
+            if let previous = previousSpeedSample {
+                let delta = location.timestamp.timeIntervalSince(previous.date)
+                if delta > 0.25 {
+                    let previousLocation = CLLocation(
+                        latitude: previous.point.latitude,
+                        longitude: previous.point.longitude
+                    )
+                    lastSpeedMetersPerSecond = max(0, location.distance(from: previousLocation) / delta)
+                    previousSpeedSample = (point, location.timestamp)
+                }
+            } else {
+                previousSpeedSample = (point, location.timestamp)
+                lastSpeedMetersPerSecond = 0
+            }
             lastPoint = point
             if let capture = bestEffortCapture {
                 if let current = capture.bestPoint {

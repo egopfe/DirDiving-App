@@ -15,10 +15,6 @@ struct BuddyAssistView: View {
         ZStack {
             Color.black.ignoresSafeArea()
 
-            if !ExperimentalFeatures.buddyAssistEnabled {
-                disabledOverlay
-            }
-
             ScrollView {
                 VStack(spacing: 8) {
                     header
@@ -337,20 +333,6 @@ struct BuddyAssistView: View {
         return "PING 15s --"
     }
 
-    private var disabledOverlay: some View {
-        DivePanel(stroke: DiveUI.red) {
-            VStack(spacing: 4) {
-                Text("BUDDY ASSIST DISABILITATO")
-                    .font(.caption.bold())
-                    .foregroundStyle(DiveUI.red)
-                Text("Funzione sperimentale non attiva in produzione.")
-                    .font(.caption2)
-                    .foregroundStyle(DiveUI.secondaryText)
-                    .multilineTextAlignment(.center)
-            }
-        }
-        .padding(24)
-    }
 
     private func directionText(_ degrees: Double?) -> String {
         guard let degrees else { return "--" }

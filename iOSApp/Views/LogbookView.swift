@@ -21,10 +21,24 @@ struct LogbookView: View {
                             .foregroundStyle(DIRTheme.cyan)
                             .padding(.top, 8)
                         ForEach(Array(filtered.enumerated()), id: \.element.id) { index, session in
-                            NavigationLink { DiveDetailView(session: session) } label: {
-                                DiveLogCard(session: session, index: index)
+                            HStack(spacing: 8) {
+                                NavigationLink { DiveDetailView(session: session) } label: {
+                                    DiveLogCard(session: session, index: index)
+                                }
+                                .buttonStyle(.plain)
+
+                                if !session.isDemoDive {
+                                    Button(role: .destructive) {
+                                        logStore.delete(id: session.id)
+                                    } label: {
+                                        Image(systemName: "trash")
+                                            .font(.body.weight(.semibold))
+                                            .foregroundStyle(DIRTheme.red)
+                                            .frame(width: 36, height: 36)
+                                    }
+                                    .buttonStyle(.plain)
+                                }
                             }
-                            .buttonStyle(.plain)
                         }
                     }
                     .padding(.horizontal, 16)

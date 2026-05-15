@@ -15,10 +15,15 @@ final class CloudSyncStore: ObservableObject {
             forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
             object: cloudStore,
             queue: .main
-        ) { [weak self] _ in
+        ) { [weak self] notification in
             Task { @MainActor in
                 self?.isICloudAvailable = FileManager.default.ubiquityIdentityToken != nil
                 self?.lastSyncStatus = "Aggiornamento ricevuto da iCloud"
+                NotificationCenter.default.post(
+                    name: .cloudSyncDidChangeExternally,
+                    object: self,
+                    userInfo: notification.userInfo
+                )
             }
         }
         synchronize()

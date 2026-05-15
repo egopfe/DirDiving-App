@@ -8,6 +8,8 @@
     <string>DIR DIVING usa i sensori di movimento e profondit&#224; per registrare profilo di immersione e velocit&#224; di risalita.</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>DIR DIVING usa la posizione per salvare il punto GPS di inizio e fine immersione.</string>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>DIR DIVING usa il Bluetooth per il collegamento sperimentale Buddy Assist tra watch.</string>
     <key>WKSupportsAutomaticDepthLaunch</key>
     <true/>
     <key>WKBackgroundModes</key>

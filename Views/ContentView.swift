@@ -21,6 +21,8 @@ struct ContentView: View {
                 .tag(AppPage.userImages)
             DiveLogListView()
                 .tag(AppPage.diveLog)
+            BuddyAssistView()
+                .tag(AppPage.buddyAssist)
         }
         .tabViewStyle(.verticalPage)
     }

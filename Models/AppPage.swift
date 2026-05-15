@@ -9,4 +9,5 @@ enum AppPage: Hashable {
     case ascentSettings
     case userImages
     case diveLog
+    case buddyAssist
 }
