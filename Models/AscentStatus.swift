@@ -15,7 +15,7 @@ struct AscentStatus: Codable, Hashable {
 
     static func limit(for depthMeters: Double) -> Double {
         switch depthMeters {
-        case 30..<40: return 10
+        case 30...40: return 10
         case 20..<30: return 5
         case 6..<20: return 3
         case 0..<6: return 1

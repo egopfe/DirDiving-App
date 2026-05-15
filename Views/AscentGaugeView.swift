@@ -28,16 +28,19 @@ struct AscentGaugeView: View {
     }
 
     private var scaleLabels: some View {
-        VStack(alignment: .trailing, spacing: 0) {
-            scaleLabel("3.0", DiveUI.red)
-            Spacer()
-            scaleLabel("2.3", DiveUI.orange)
-            Spacer()
-            scaleLabel("1.5", DiveUI.yellow)
-            Spacer()
-            scaleLabel("0.8", DiveUI.green)
-            Spacer()
-            scaleLabel("0.0", DiveUI.green)
+        let limit = max(status.limitMetersPerMinute, 0.5)
+        let ticks: [(Double, Color)] = [
+            (limit, DiveUI.red),
+            (limit * 0.75, DiveUI.orange),
+            (limit * 0.5, DiveUI.yellow),
+            (limit * 0.25, DiveUI.green),
+            (0, DiveUI.green)
+        ]
+        return VStack(alignment: .trailing, spacing: 0) {
+            ForEach(Array(ticks.enumerated()), id: \.offset) { index, tick in
+                if index > 0 { Spacer() }
+                scaleLabel(Formatters.one(tick.0), tick.1)
+            }
         }
     }
 

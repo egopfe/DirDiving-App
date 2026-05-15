@@ -32,6 +32,7 @@ final class DiveManager: NSObject, ObservableObject {
     private var entryGPS: GPSPoint?
     private var exitGPS: GPSPoint?
     private var previousDepthSample: DiveSample?
+    private var isFinalizingDive = false
 
     init(logStore: DiveLogStore, gpsManager: GPSManager, ascentSettings: AscentRateSettingsStore) {
         self.logStore = logStore
@@ -102,9 +103,11 @@ final class DiveManager: NSObject, ObservableObject {
     }
 
     private func endDiveIfNeeded() {
-        guard isDiveActive, let start = sessionStart else { return }
+        guard isDiveActive, let start = sessionStart, !isFinalizingDive else { return }
+        let capturedEntryGPS = entryGPS
         exitGPS = gpsManager.currentBestPoint()
         isDiveActive = false
+        isFinalizingDive = true
         runtimeTimer?.invalidate()
         runtimeTimer = nil
         stopBlinking()
@@ -113,10 +116,12 @@ final class DiveManager: NSObject, ObservableObject {
         sessionStart = nil
         samples = []
         previousDepthSample = nil
+        entryGPS = nil
         gpsManager.captureBestEffortPoint(for: 6) { [weak self] point in
             guard let self else { return }
+            self.isFinalizingDive = false
             self.exitGPS = point
-            self.finalizeDive(start: start, end: end, entryGPS: self.entryGPS, exitGPS: point, samples: finishedSamples)
+            self.finalizeDive(start: start, end: end, entryGPS: capturedEntryGPS, exitGPS: point, samples: finishedSamples)
         }
     }
 
@@ -132,7 +137,7 @@ final class DiveManager: NSObject, ObservableObject {
     }
 
     private func addSample(depthMeters: Double, temperatureCelsius: Double?) {
-        beginDiveIfNeeded()
+        guard isDiveActive else { return }
         let sample = DiveSample(depthMeters: max(0, depthMeters), temperatureCelsius: temperatureCelsius)
         currentDepthMeters = sample.depthMeters
         currentTemperatureCelsius = temperatureCelsius
@@ -150,8 +155,7 @@ final class DiveManager: NSObject, ObservableObject {
             ascentStatus = AscentStatus.make(rate: 0, depth: sample.depthMeters, limits: ascentSettings.limits)
             return
         }
-        let deltaTime = sample.timestamp.timeIntervalSince(previous.timestamp)
-        guard deltaTime > 0 else { return }
+        let deltaTime = max(sample.timestamp.timeIntervalSince(previous.timestamp), 0.001)
         let deltaDepth = previous.depthMeters - sample.depthMeters
         let rate = max(0, (deltaDepth / deltaTime) * 60.0)
         ascentStatus = AscentStatus.make(rate: rate, depth: sample.depthMeters, limits: ascentSettings.limits)
