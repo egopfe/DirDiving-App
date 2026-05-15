@@ -7,7 +7,11 @@ enum SubsurfaceExportService {
         for sample in session.samples {
             let seconds = Int(sample.timestamp.timeIntervalSince(first))
             let temp = sample.temperatureCelsius.map { String(format: "%.1f", $0) } ?? ""
-            rows.append("\(seconds),\(String(format: "%.2f", sample.depthMeters)),\(temp),,,,")
+            let entryLat = session.entryGPS.map { String(format: "%.6f", $0.latitude) } ?? ""
+            let entryLon = session.entryGPS.map { String(format: "%.6f", $0.longitude) } ?? ""
+            let exitLat = session.exitGPS.map { String(format: "%.6f", $0.latitude) } ?? ""
+            let exitLon = session.exitGPS.map { String(format: "%.6f", $0.longitude) } ?? ""
+            rows.append("\(seconds),\(String(format: "%.2f", sample.depthMeters)),\(temp),\(entryLat),\(entryLon),\(exitLat),\(exitLon)")
         }
         return rows.joined(separator: "\n")
     }

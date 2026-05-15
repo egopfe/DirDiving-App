@@ -69,9 +69,9 @@ struct PlannerView: View {
 
     private var gasCards: some View {
         VStack(spacing: 12) {
-            GasMixCard(title: "Gas di Fondo", mix: store.input.bottomGas, accent: DIRTheme.green, showsHelium: true)
-            GasMixCard(title: "Gas di Decompressione 1", mix: store.input.decoGas1, accent: DIRTheme.yellow, showsHelium: false)
-            GasMixCard(title: "Gas di Decompressione 2", mix: store.input.decoGas2, accent: DIRTheme.cyan, showsHelium: false)
+            GasMixCard(title: "Gas di Fondo", mix: $store.input.bottomGas, accent: DIRTheme.green, showsHelium: true)
+            GasMixCard(title: "Gas di Decompressione 1", mix: $store.input.decoGas1, accent: DIRTheme.yellow, showsHelium: false)
+            GasMixCard(title: "Gas di Decompressione 2", mix: $store.input.decoGas2, accent: DIRTheme.cyan, showsHelium: false)
         }
     }
 
@@ -125,7 +125,7 @@ struct PlannerView: View {
 
 struct GasMixCard: View {
     let title: String
-    let mix: GasMix
+    @Binding var mix: GasMix
     let accent: Color
     let showsHelium: Bool
 
@@ -137,15 +137,15 @@ struct GasMixCard: View {
                         .font(.callout.weight(.semibold))
                         .foregroundStyle(.white)
                     Spacer()
-                    Image(systemName: "xmark")
+                    Image(systemName: "slider.horizontal.3")
                         .font(.caption.weight(.bold))
                         .foregroundStyle(accent)
                 }
                 HStack {
                     gasMetric("Miscela", mix.label, alignLeading: true)
-                    gasMetric("O2", "\(Int(mix.oxygen * 100))%")
+                    gasAdjuster("O2", value: mix.oxygen, suffix: "%", step: 0.01) { setOxygen($0) }
                     if showsHelium {
-                        gasMetric("He", "\(Int(mix.helium * 100))%")
+                        gasAdjuster("He", value: mix.helium, suffix: "%", step: 0.01) { setHelium($0) }
                     }
                     gasMetric("MOD", "\(Formatters.one(mix.modMeters)) m")
                 }
@@ -155,12 +155,7 @@ struct GasMixCard: View {
                         .font(.caption)
                         .foregroundStyle(DIRTheme.muted)
                     Spacer()
-                    Text(Formatters.one(mix.maxPPO2))
-                        .font(.callout.monospacedDigit())
-                        .foregroundStyle(.white)
-                    Image(systemName: "chevron.right")
-                        .font(.caption)
-                        .foregroundStyle(DIRTheme.muted)
+                    gasStepper(value: mix.maxPPO2, step: 0.05) { mix.maxPPO2 = min(max($0, 1.0), 1.6) }
                 }
             }
         }
@@ -182,6 +177,60 @@ struct GasMixCard: View {
                 .foregroundStyle(.white)
         }
         .frame(maxWidth: .infinity, alignment: alignLeading ? .leading : .trailing)
+    }
+
+    private func gasAdjuster(_ title: String, value: Double, suffix: String, step: Double, update: @escaping (Double) -> Void) -> some View {
+        VStack(alignment: .trailing, spacing: 5) {
+            Text(title)
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+            HStack(spacing: 3) {
+                Button { update(value - step) } label: {
+                    Image(systemName: "minus")
+                        .font(.caption2.weight(.bold))
+                        .frame(width: 18, height: 18)
+                }
+                Text("\(Int(value * 100))\(suffix)")
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.white)
+                    .frame(width: 42)
+                Button { update(value + step) } label: {
+                    Image(systemName: "plus")
+                        .font(.caption2.weight(.bold))
+                        .frame(width: 18, height: 18)
+                }
+            }
+            .foregroundStyle(DIRTheme.cyan)
+        }
+        .frame(maxWidth: .infinity, alignment: .trailing)
+    }
+
+    private func gasStepper(value: Double, step: Double, update: @escaping (Double) -> Void) -> some View {
+        HStack(spacing: 5) {
+            Button { update(value - step) } label: {
+                Image(systemName: "minus")
+                    .frame(width: 24, height: 22)
+            }
+            Text(Formatters.one(value))
+                .font(.callout.monospacedDigit())
+                .foregroundStyle(.white)
+                .frame(width: 42)
+            Button { update(value + step) } label: {
+                Image(systemName: "plus")
+                    .frame(width: 24, height: 22)
+            }
+        }
+        .foregroundStyle(DIRTheme.cyan)
+    }
+
+    private func setOxygen(_ value: Double) {
+        let capped = min(max(value, 0.10), 1.0 - mix.helium)
+        mix.oxygen = capped
+    }
+
+    private func setHelium(_ value: Double) {
+        let capped = min(max(value, 0), 1.0 - mix.oxygen)
+        mix.helium = capped
     }
 }
 

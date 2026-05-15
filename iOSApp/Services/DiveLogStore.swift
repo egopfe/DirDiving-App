@@ -13,7 +13,7 @@ final class DiveLogStore: ObservableObject {
 
     init(cloudSync: CloudSyncStore? = nil) {
         self.cloudSync = cloudSync
-        if let saved = cloudSync?.load([DiveSession].self, forKey: key), !saved.isEmpty {
+        if let saved = cloudSync?.load([DiveSession].self, forKey: key) {
             sessions = saved.sorted { $0.startDate > $1.startDate }
         } else {
             insertDemoDives()
@@ -23,6 +23,7 @@ final class DiveLogStore: ObservableObject {
     }
 
     func add(_ session: DiveSession) {
+        sessions.removeAll { $0.id == session.id }
         sessions.insert(session, at: 0)
         sessions = sessions.sorted { $0.startDate > $1.startDate }
     }
