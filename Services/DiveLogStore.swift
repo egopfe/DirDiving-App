@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import SwiftUI
 
 @MainActor
@@ -24,20 +24,41 @@ final class DiveLogStore: ObservableObject {
     }
 
     private func load() {
-        if let cloudSessions = cloudSync.load([DiveSession].self, forKey: cloudKey) {
-            sessions = cloudSessions.sorted { $0.startDate > $1.startDate }
+        let localSessions = loadLocalSessions()
+        let cloudSessions = cloudSync.load([DiveSession].self, forKey: cloudKey)
+        sessions = mergeSessions(local: localSessions, cloud: cloudSessions)
+            .sorted { $0.startDate > $1.startDate }
+        if !sessions.isEmpty {
             save()
-            return
         }
+    }
 
+    private func loadLocalSessions() -> [DiveSession] {
         let url = fileURL()
-        guard FileManager.default.fileExists(atPath: url.path) else { return }
+        guard FileManager.default.fileExists(atPath: url.path) else { return [] }
         do {
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = .iso8601
-            sessions = try decoder.decode([DiveSession].self, from: Data(contentsOf: url)).sorted { $0.startDate > $1.startDate }
-            cloudSync.save(sessions, forKey: cloudKey)
-        } catch { sessions = [] }
+            return try decoder.decode([DiveSession].self, from: Data(contentsOf: url))
+        } catch {
+            return []
+        }
+    }
+
+    private func mergeSessions(local: [DiveSession], cloud: [DiveSession]?) -> [DiveSession] {
+        var byID: [UUID: DiveSession] = [:]
+        for session in local {
+            byID[session.id] = session
+        }
+        guard let cloud else { return Array(byID.values) }
+        for session in cloud {
+            if let existing = byID[session.id] {
+                byID[session.id] = existing.endDate >= session.endDate ? existing : session
+            } else {
+                byID[session.id] = session
+            }
+        }
+        return Array(byID.values)
     }
 
     private func save() {

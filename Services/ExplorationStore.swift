@@ -119,13 +119,22 @@ final class ExplorationStore: ObservableObject {
     }
 
     func surfaceFromApnea(maxDepthMeters: Double) {
+        let plannedRecovery = max(currentApneaSeconds * 2, currentApneaSeconds * 1.8)
+        apneaDives.insert(
+            ApneaDiveRecord(
+                durationSeconds: currentApneaSeconds,
+                maxDepthMeters: maxDepthMeters,
+                recoverySeconds: plannedRecovery
+            ),
+            at: 0
+        )
+        recoverySeconds = plannedRecovery
         apneaState = .surface
-        let recovery = max(recoverySeconds, currentApneaSeconds * 1.8)
-        apneaDives.insert(ApneaDiveRecord(durationSeconds: currentApneaSeconds, maxDepthMeters: maxDepthMeters, recoverySeconds: recovery), at: 0)
-        recoverySeconds = 0
-        if recovery < currentApneaSeconds * 2 {
+        if plannedRecovery < currentApneaSeconds * 2 {
             apneaWarning = "RECOVERY INSUFFICIENTE"
             apneaState = .warning
+        } else {
+            apneaWarning = nil
         }
         saveIfReady()
     }

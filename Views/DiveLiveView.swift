@@ -70,7 +70,7 @@ struct DiveLiveView: View {
             Rectangle()
                 .fill(.white.opacity(0.35))
                 .frame(width: 1, height: 48)
-            dashboardValue(title: "RunTime", value: runtimeMinutes, suffix: "min", color: .white)
+            dashboardValue(title: "RunTime", value: runtimeMinutes, suffix: "", color: .white)
         }
         .padding(.vertical, 8)
         .background(
@@ -240,6 +240,6 @@ struct DiveLiveView: View {
     }
 
     private var runtimeMinutes: String {
-        String(Int(dive.runtime / 60.0))
+        Formatters.time(dive.runtime)
     }
 }

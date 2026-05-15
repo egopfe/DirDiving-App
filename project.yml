@@ -3,6 +3,7 @@ options:
   bundleIdPrefix: com.egopfe
   deploymentTarget:
     watchOS: "10.0"
+    iOS: "17.0"
 targets:
   DIRDiving Watch App:
     type: application
@@ -32,3 +33,21 @@ targets:
       - sdk: WatchKit.framework
       - sdk: Charts.framework
       - sdk: AppIntents.framework
+  DIRDiving iOS:
+    type: application
+    platform: iOS
+    sources:
+      - iOSApp
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios
+        DEVELOPMENT_TEAM: C6FKKPB6A9
+        CODE_SIGN_STYLE: Automatic
+        INFOPLIST_FILE: iOSApp/App/Info.plist
+        CODE_SIGN_ENTITLEMENTS: iOSApp/Config/DIRDivingiOS.entitlements
+        PRODUCT_NAME: DIR DIVING
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    dependencies:
+      - sdk: Charts.framework
+      - sdk: WatchConnectivity.framework
+      - sdk: CoreLocation.framework

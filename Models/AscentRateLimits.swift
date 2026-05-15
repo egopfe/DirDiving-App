@@ -17,7 +17,7 @@ struct AscentRateLimits: Codable, Hashable {
 
     func limit(for depthMeters: Double) -> Double {
         switch depthMeters {
-        case 30..<40: return deepMetersPerMinute
+        case 30...40: return deepMetersPerMinute
         case 20..<30: return midMetersPerMinute
         case 6..<20: return shallowMetersPerMinute
         case 0..<6: return surfaceMetersPerMinute

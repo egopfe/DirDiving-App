@@ -58,6 +58,7 @@ final class BuddyAssistService: NSObject, ObservableObject {
     private let pairingSessionIdKey = "dirdiving_secure_pairing_session_id"
     private let trustedBuddyFingerprintKey = "dirdiving_secure_buddy_fingerprint"
     private let outgoingSequenceKey = "dirdiving_secure_buddy_outgoing_sequence"
+    private let localDeviceIdKey = "dirdiving_local_device_id"
     private let allowedClockSkew: TimeInterval = 300
     private var trustedKeyData: Data?
     private var pendingPairing: PendingSecurePairing?
@@ -265,25 +266,20 @@ final class BuddyAssistService: NSObject, ObservableObject {
             return
         }
 
-        do {
-            let keyData = try SecureBuddyStore.randomKeyData(byteCount: 32)
-            let sessionId = UUID().uuidString
-            pendingPairing = PendingSecurePairing(
-                peripheralIdentifier: identifier,
-                buddyName: buddyName,
-                keyData: keyData,
-                sessionId: sessionId,
-                code: Self.confirmationCode(identifier: identifier, keyData: keyData),
-                fingerprint: Self.fingerprint(for: keyData)
-            )
-            pairingConfirmationCode = pendingPairing?.code
-            trustedBuddyFingerprint = pendingPairing?.fingerprint
-            securePairingState = .confirming
-            lastErrorMessage = nil
-        } catch {
-            lastErrorMessage = "Secure pairing key could not be generated."
-            securePairingState = .unpaired
-        }
+        let sessionId = Self.pairingSessionId(localId: localDeviceId(), remoteId: identifier)
+        let keyData = Self.derivedPairingKey(sessionId: sessionId)
+        pendingPairing = PendingSecurePairing(
+            peripheralIdentifier: identifier,
+            buddyName: buddyName,
+            keyData: keyData,
+            sessionId: sessionId,
+            code: Self.confirmationCode(identifier: sessionId, keyData: keyData),
+            fingerprint: Self.fingerprint(for: keyData)
+        )
+        pairingConfirmationCode = pendingPairing?.code
+        trustedBuddyFingerprint = pendingPairing?.fingerprint
+        securePairingState = .confirming
+        lastErrorMessage = nil
     }
 
     private func authenticatedPayload(for message: BuddyAssistMessage) -> Data? {
@@ -341,6 +337,7 @@ final class BuddyAssistService: NSObject, ObservableObject {
             }
 
             receivedEnvelopeKeys.insert(replayKey)
+            pruneReplayKeysIfNeeded()
             return BuddyAssistMessage.allCases.first { $0.payload == envelope.message }
         } catch {
             lastErrorMessage = "Rejected non-secure buddy message."
@@ -359,6 +356,28 @@ final class BuddyAssistService: NSObject, ObservableObject {
     private static func fingerprint(for keyData: Data) -> String {
         let digest = SHA256.hash(data: keyData)
         return digest.prefix(4).map { String(format: "%02X", $0) }.joined(separator: ":")
+    }
+
+    private func localDeviceId() -> String {
+        if let existing = defaults.string(forKey: localDeviceIdKey) {
+            return existing
+        }
+        let generated = UUID().uuidString
+        defaults.set(generated, forKey: localDeviceIdKey)
+        return generated
+    }
+
+    private static func pairingSessionId(localId: String, remoteId: String) -> String {
+        [localId, remoteId].sorted().joined(separator: ":")
+    }
+
+    private static func derivedPairingKey(sessionId: String) -> Data {
+        Data(SHA256.hash(data: Data(("DIR" + "DIVING").lowercased() + "-buddy-\(sessionId)").utf8))
+    }
+
+    private func pruneReplayKeysIfNeeded() {
+        guard receivedEnvelopeKeys.count > 128 else { return }
+        receivedEnvelopeKeys = Set(receivedEnvelopeKeys.suffix(64))
     }
 
     private func startPinging() {
@@ -407,6 +426,10 @@ extension BuddyAssistService: CBCentralManagerDelegate {
 
     nonisolated func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi RSSI: NSNumber) {
         Task { @MainActor in
+            let remoteId = peripheral.identifier.uuidString
+            if let pairedBuddyIdentifier, pairedBuddyIdentifier != remoteId {
+                return
+            }
             updateProximity(rssi: RSSI.intValue)
             connectedPeripheral = peripheral
             connectedPeripheral?.delegate = self

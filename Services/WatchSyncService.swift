@@ -39,12 +39,14 @@ final class WatchSyncService: NSObject, ObservableObject {
                 WCSession.default.sendMessage(payload, replyHandler: nil) { [weak self] error in
                     Task { @MainActor in
                         self?.lastSyncStatus = "Sync diretto non riuscito: \(error.localizedDescription)"
+                        WCSession.default.transferUserInfo(payload)
                     }
                 }
+                lastSyncStatus = "Immersione inviata al companion"
+            } else {
+                WCSession.default.transferUserInfo(payload)
+                lastSyncStatus = "Immersione in coda per il companion"
             }
-
-            WCSession.default.transferUserInfo(payload)
-            lastSyncStatus = "Immersione inviata al companion"
         } catch {
             lastSyncStatus = "Errore codifica sync: \(error.localizedDescription)"
         }
