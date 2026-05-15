@@ -5,42 +5,59 @@ struct CompassView: View {
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            DiveScreenBackground()
 
-            VStack(spacing: 10) {
+            VStack(spacing: 11) {
                 header
                 headingPanel
                 bearingPanel
                 controls
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
+            .padding(.horizontal, DiveUI.screenPadding)
+            .padding(.vertical, 9)
         }
         .onAppear { compass.start() }
         .onDisappear { compass.stop() }
+        .animation(.easeInOut(duration: 0.24), value: compass.headingDegrees)
+        .animation(.easeInOut(duration: 0.24), value: compass.bearingDegrees ?? -1)
     }
 
     private var header: some View {
-        HStack {
-            Text("BUSSOLA")
-                .font(.headline.bold())
-                .foregroundStyle(DiveUI.blue)
-            Spacer()
-            Text(compass.cardinal)
-                .font(.headline.bold())
-                .foregroundStyle(DiveUI.yellow)
-        }
+        DiveScreenHeader(
+            "BUSSOLA",
+            subtitle: "HEADING REFERENCE",
+            accent: DiveUI.blue,
+            systemImage: "safari"
+        )
     }
 
     private var headingPanel: some View {
         DivePanel(stroke: DiveUI.green) {
-            VStack(spacing: 0) {
-                Text("\(Int(compass.headingDegrees.rounded()))")
-                    .font(.system(size: 72, weight: .bold, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(.white)
+            VStack(spacing: 8) {
+                DiveBearingRing(
+                    headingDegrees: compass.headingDegrees,
+                    bearingDelta: bearingDelta,
+                    accent: DiveUI.green,
+                    size: 138
+                )
+
+                HStack(alignment: .lastTextBaseline, spacing: 6) {
+                    Text("\(Int(compass.headingDegrees.rounded()))")
+                        .font(.system(size: 44, weight: .black, design: .rounded))
+                        .minimumScaleFactor(0.72)
+                        .lineLimit(1)
+                        .monospacedDigit()
+                        .foregroundStyle(.white)
+                    Text("\u{00B0}")
+                        .font(.title2.bold())
+                        .foregroundStyle(DiveUI.blue)
+                    Text(compass.cardinal)
+                        .font(.system(size: 18, weight: .black, design: .rounded))
+                        .foregroundStyle(DiveUI.yellow)
+                }
+
                 Text("HEADING")
-                    .font(.caption.bold())
+                    .font(.system(size: 10, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.blue)
             }
         }
@@ -48,20 +65,32 @@ struct CompassView: View {
 
     private var bearingPanel: some View {
         DivePanel(stroke: compass.bearingDegrees == nil ? DiveUI.subtleStroke : DiveUI.yellow) {
-            HStack {
-                VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 10) {
+                ZStack {
+                    Circle()
+                        .fill((compass.bearingDegrees == nil ? DiveUI.subtleStroke : DiveUI.yellow).opacity(0.13))
+                    Circle()
+                        .stroke((compass.bearingDegrees == nil ? DiveUI.subtleStroke : DiveUI.yellow).opacity(0.75), lineWidth: 1)
+                    Image(systemName: "location.north.line.fill")
+                        .font(.title2.bold())
+                        .foregroundStyle(compass.bearingDegrees == nil ? DiveUI.secondaryText : DiveUI.yellow)
+                        .rotationEffect(.degrees(bearingDelta ?? 0))
+                }
+                .frame(width: 48, height: 48)
+
+                VStack(alignment: .leading, spacing: 2) {
                     Text("BEARING")
-                        .font(.caption.bold())
+                        .font(.system(size: 10, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
                     Text(bearingText)
-                        .font(.system(size: 30, weight: .bold, design: .rounded))
+                        .font(.system(size: 31, weight: .black, design: .rounded))
                         .monospacedDigit()
                         .foregroundStyle(compass.bearingDegrees == nil ? DiveUI.secondaryText : DiveUI.yellow)
                 }
-                Spacer()
-                Image(systemName: "location.north.line.fill")
-                    .font(.title)
-                    .foregroundStyle(DiveUI.blue)
+
+                Spacer(minLength: 0)
+
+                DiveStatusPill(compass.bearingDegrees == nil ? "FREE" : "LOCK", color: compass.bearingDegrees == nil ? DiveUI.secondaryText : DiveUI.yellow)
             }
         }
     }
@@ -77,9 +106,16 @@ struct CompassView: View {
         }
     }
 
+    private var bearingDelta: Double? {
+        guard let bearing = compass.bearingDegrees else { return nil }
+        let delta = bearing - compass.headingDegrees
+        if delta > 180 { return delta - 360 }
+        if delta < -180 { return delta + 360 }
+        return delta
+    }
+
     private var bearingText: String {
         guard let bearing = compass.bearingDegrees else { return "---" }
-        return "\(Int(bearing.rounded()))"
+        return "\(Int(bearing.rounded()))\u{00B0}"
     }
 }
-

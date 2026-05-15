@@ -6,7 +6,7 @@ struct UserImagesView: View {
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            DiveScreenBackground()
 
             if let selectedName, let resourceName = imageStore.imageResourceName(for: selectedName) {
                 imageDetail(name: selectedName, resourceName: resourceName)
@@ -20,14 +20,15 @@ struct UserImagesView: View {
     private var imageList: some View {
         ScrollView {
             VStack(spacing: 8) {
-                HStack {
-                    Text("SCHERMI")
-                        .font(.headline.bold())
-                        .foregroundStyle(DiveUI.blue)
-                    Spacer()
-                    Text("\(imageStore.imageNames.count)")
-                        .font(.headline.monospacedDigit().bold())
-                        .foregroundStyle(DiveUI.green)
+                VStack(spacing: 6) {
+                    DiveScreenHeader("SCHERMI", subtitle: "REFERENCE VISUALS", accent: DiveUI.blue, systemImage: "photo")
+                    HStack {
+                        Text("IMMAGINI")
+                            .font(.system(size: 10, weight: .black, design: .rounded))
+                            .foregroundStyle(DiveUI.secondaryText)
+                        Spacer()
+                        DiveStatusPill("\(imageStore.imageNames.count)", color: DiveUI.green)
+                    }
                 }
 
                 if imageStore.imageNames.isEmpty {
@@ -44,7 +45,7 @@ struct UserImagesView: View {
                     }
                 }
             }
-            .padding(.horizontal, 10)
+            .padding(.horizontal, DiveUI.screenPadding)
             .padding(.vertical, 8)
         }
     }

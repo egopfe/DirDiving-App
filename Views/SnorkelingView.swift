@@ -14,19 +14,22 @@ struct SnorkelingView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 8) {
-                topBar
-                runtimePanel
-                navigationPanel
-                markerPanel
-                safetyPanel
-                controls
+        ZStack {
+            DiveScreenBackground()
+
+            ScrollView {
+                VStack(spacing: 10) {
+                    topBar
+                    runtimePanel
+                    navigationPanel
+                    markerPanel
+                    safetyPanel
+                    controls
+                }
+                .padding(.horizontal, DiveUI.screenPadding)
+                .padding(.vertical, 10)
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 10)
         }
-        .background(Color.black)
         .onAppear {
             compass.start()
             gps.start()
@@ -44,56 +47,85 @@ struct SnorkelingView: View {
     }
 
     private var topBar: some View {
-        HStack {
-            DiveOctopusLogo()
-            Spacer()
-            Label("SNORKELING", systemImage: "figure.pool.swim")
-                .font(.caption.bold())
-                .foregroundStyle(DiveUI.green)
-            Spacer()
-            Text(exploration.snorkelingState.rawValue)
-                .font(.caption2.bold())
-                .foregroundStyle(exploration.snorkelingState == .returnMode ? DiveUI.yellow : DiveUI.green)
-        }
+        DiveScreenHeader(
+            "SNORKELING",
+            subtitle: exploration.snorkelingState.rawValue.uppercased(),
+            accent: exploration.snorkelingState == .returnMode ? DiveUI.yellow : DiveUI.green,
+            systemImage: "figure.pool.swim"
+        )
     }
 
     private var runtimePanel: some View {
         DivePanel(stroke: DiveUI.green) {
-            HStack {
-                DiveMetric("RUN", value: Formatters.time(exploration.runtimeSeconds), color: DiveUI.green)
-                Divider().background(DiveUI.subtleStroke)
-                DiveMetric("DIST", value: String(format: "%.0f", exploration.distanceMeters), unit: "m", color: DiveUI.blue)
-                Divider().background(DiveUI.subtleStroke)
-                DiveMetric("AVG", value: String(format: "%.1f", exploration.averageSpeedKnots), unit: "kt", color: DiveUI.yellow)
+            VStack(spacing: 8) {
+                HStack(alignment: .lastTextBaseline, spacing: 6) {
+                    Text(Formatters.time(exploration.runtimeSeconds))
+                        .font(.system(size: 42, weight: .black, design: .rounded))
+                        .minimumScaleFactor(0.68)
+                        .lineLimit(1)
+                        .monospacedDigit()
+                        .foregroundStyle(DiveUI.green)
+                    Text("RUN")
+                        .font(.system(size: 11, weight: .black, design: .rounded))
+                        .foregroundStyle(DiveUI.secondaryText)
+                    Spacer(minLength: 0)
+                }
+
+                HStack(spacing: 0) {
+                    DiveMetric("DIST", value: String(format: "%.0f", exploration.distanceMeters), unit: "m", color: DiveUI.blue, valueSize: 26)
+                    Rectangle().fill(DiveUI.hairline).frame(width: 1, height: 34)
+                    DiveMetric("AVG", value: String(format: "%.1f", exploration.averageSpeedKnots), unit: "kt", color: DiveUI.yellow, valueSize: 26)
+                    Rectangle().fill(DiveUI.hairline).frame(width: 1, height: 34)
+                    DiveMetric("GPS", value: exploration.gpsStatus, color: .white, valueSize: 15)
+                }
             }
         }
     }
 
     private var navigationPanel: some View {
         DivePanel(stroke: DiveUI.blue) {
-            VStack(spacing: 8) {
-                Image(systemName: "location.north.fill")
-                    .font(.system(size: 54, weight: .black))
-                    .foregroundStyle(DiveUI.blue)
-                    .rotationEffect(.degrees(bearingDelta))
-                Text(exploration.activeWaypoint.name.uppercased())
-                    .font(.headline.bold())
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-                HStack {
-                    DiveMetric("HEAD", value: String(format: "%.0f", compass.headingDegrees), unit: "°", color: .white)
-                    DiveMetric("TARGET", value: String(format: "%.0f", exploration.liveTargetBearing), unit: "°", color: DiveUI.green)
-                    DiveMetric("DELTA", value: String(format: "%+.0f", bearingDelta), unit: "°", color: abs(bearingDelta) < 12 ? DiveUI.green : DiveUI.yellow)
+            HStack(spacing: 10) {
+                DiveBearingRing(
+                    headingDegrees: compass.headingDegrees,
+                    bearingDelta: bearingDelta,
+                    accent: abs(bearingDelta) < 12 ? DiveUI.green : DiveUI.blue,
+                    size: 108
+                )
+
+                VStack(alignment: .leading, spacing: 7) {
+                    Text(exploration.activeWaypoint.name.uppercased())
+                        .font(.system(size: 16, weight: .black, design: .rounded))
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.68)
+
+                    HStack(spacing: 5) {
+                        DiveStatusPill("\(Int(exploration.liveTargetDistanceMeters)) m", color: DiveUI.blue, systemImage: "point.topleft.down.curvedto.point.bottomright.up")
+                        DiveStatusPill(abs(bearingDelta) < 12 ? "ON LINE" : "TURN", color: abs(bearingDelta) < 12 ? DiveUI.green : DiveUI.yellow)
+                    }
+
+                    VStack(spacing: 4) {
+                        navRow("HEAD", "\(Int(compass.headingDegrees.rounded()))\u{00B0}", .white)
+                        navRow("TARGET", "\(Int(exploration.liveTargetBearing.rounded()))\u{00B0}", DiveUI.green)
+                        navRow("DELTA", String(format: "%+.0f\u{00B0}", bearingDelta), abs(bearingDelta) < 12 ? DiveUI.green : DiveUI.yellow)
+                    }
                 }
-                HStack {
-                    Label(exploration.gpsStatus, systemImage: "location")
-                    Spacer()
-                    Text("\(Int(exploration.liveTargetDistanceMeters)) m")
-                }
-                .font(.caption2.bold())
-                .foregroundStyle(DiveUI.secondaryText)
+
+                Spacer(minLength: 0)
             }
+        }
+    }
+
+    private func navRow(_ title: String, _ value: String, _ color: Color) -> some View {
+        HStack(spacing: 6) {
+            Text(title)
+                .font(.system(size: 9, weight: .bold, design: .rounded))
+                .foregroundStyle(DiveUI.secondaryText)
+            Spacer(minLength: 0)
+            Text(value)
+                .font(.system(size: 13, weight: .bold, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(color)
         }
     }
 
@@ -101,13 +133,11 @@ struct SnorkelingView: View {
         DivePanel(stroke: DiveUI.yellow) {
             VStack(spacing: 8) {
                 HStack {
-                    Text("GPS MARKER")
-                        .font(.caption.bold())
+                    Label("GPS MARKER", systemImage: "mappin.and.ellipse")
+                        .font(.system(size: 11, weight: .black, design: .rounded))
                         .foregroundStyle(DiveUI.yellow)
                     Spacer()
-                    Text("\(exploration.markers.count)")
-                        .font(.caption.bold())
-                        .foregroundStyle(.white)
+                    DiveStatusPill("\(exploration.markers.count)", color: .white)
                 }
                 Picker("Marker", selection: $exploration.currentMarkerCategory) {
                     ForEach(GPSMarkerCategory.allCases) { category in
@@ -115,7 +145,7 @@ struct SnorkelingView: View {
                     }
                 }
                 .labelsHidden()
-                DiveCommandButton("SAVE", systemImage: "mappin.and.ellipse", color: DiveUI.yellow) {
+                DiveCommandButton("SAVE MARKER", systemImage: "mappin.and.ellipse", color: DiveUI.yellow) {
                     exploration.saveMarker(
                         gpsPoint: gps.currentBestPoint(),
                         depthMeters: dive.currentDepthMeters,
@@ -127,20 +157,32 @@ struct SnorkelingView: View {
     }
 
     private var safetyPanel: some View {
-        DivePanel(stroke: exploration.entryDistanceMeters > 300 ? DiveUI.red : DiveUI.green) {
-            HStack {
+        let color = exploration.entryDistanceMeters > 300 ? DiveUI.red : DiveUI.green
+
+        return DivePanel(stroke: color) {
+            HStack(spacing: 10) {
+                ZStack {
+                    Circle()
+                        .fill(color.opacity(0.14))
+                    Circle()
+                        .stroke(color.opacity(0.78), lineWidth: 1)
+                    Image(systemName: "arrow.uturn.backward")
+                        .font(.title3.bold())
+                        .foregroundStyle(DiveUI.yellow)
+                }
+                .frame(width: 46, height: 46)
+
                 VStack(alignment: .leading, spacing: 2) {
                     Text("RETURN TO ENTRY")
-                        .font(.caption2.bold())
+                        .font(.system(size: 10, weight: .black, design: .rounded))
                         .foregroundStyle(DiveUI.secondaryText)
                     Text("\(Int(exploration.entryDistanceMeters)) m")
-                        .font(.title3.bold())
-                        .foregroundStyle(exploration.entryDistanceMeters > 300 ? DiveUI.red : DiveUI.green)
+                        .font(.system(size: 26, weight: .black, design: .rounded))
+                        .monospacedDigit()
+                        .foregroundStyle(color)
                 }
-                Spacer()
-                Image(systemName: "arrow.uturn.backward.circle.fill")
-                    .font(.title2)
-                    .foregroundStyle(DiveUI.yellow)
+
+                Spacer(minLength: 0)
             }
         }
     }

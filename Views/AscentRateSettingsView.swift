@@ -5,10 +5,10 @@ struct AscentRateSettingsView: View {
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            DiveScreenBackground()
 
             ScrollView {
-                VStack(spacing: 8) {
+                VStack(spacing: 10) {
                     header
                     limitControl("40-30 m", value: $settings.limits.deepMetersPerMinute, accent: DiveUI.red)
                     limitControl("30-20 m", value: $settings.limits.midMetersPerMinute, accent: DiveUI.orange)
@@ -20,22 +20,19 @@ struct AscentRateSettingsView: View {
                         settings.resetToStandard()
                     }
                 }
-                .padding(.horizontal, 10)
+                .padding(.horizontal, DiveUI.screenPadding)
                 .padding(.vertical, 8)
             }
         }
     }
 
     private var header: some View {
-        VStack(spacing: 3) {
-            Text("VELOCIT\u{00C0} RISALITA")
-                .font(.headline.bold())
-                .foregroundStyle(DiveUI.green)
-            Text("LIMITI PERSONALIZZATI")
-                .font(.caption2.bold())
-                .foregroundStyle(DiveUI.blue)
-        }
-        .frame(maxWidth: .infinity)
+        DiveScreenHeader(
+            "VELOCITA RISALITA",
+            subtitle: "LIMITI PERSONALIZZATI",
+            accent: DiveUI.green,
+            systemImage: "gauge"
+        )
     }
 
     private func limitControl(_ title: String, value: Binding<Double>, accent: Color) -> some View {
@@ -43,11 +40,11 @@ struct AscentRateSettingsView: View {
             HStack(spacing: 8) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.caption.bold())
+                        .font(.system(size: 11, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
                     HStack(alignment: .lastTextBaseline, spacing: 3) {
                         Text(Formatters.one(value.wrappedValue))
-                            .font(.system(size: 30, weight: .bold, design: .rounded))
+                            .font(.system(size: 32, weight: .black, design: .rounded))
                             .monospacedDigit()
                             .foregroundStyle(accent)
                         Text("m/min")

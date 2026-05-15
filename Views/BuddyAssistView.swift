@@ -13,10 +13,10 @@ struct BuddyAssistView: View {
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            DiveScreenBackground()
 
             ScrollView {
-                VStack(spacing: 8) {
+                VStack(spacing: 10) {
                     header
                     warning
                     pairingPanel
@@ -28,7 +28,7 @@ struct BuddyAssistView: View {
                     lastEvent
                     errorMessage
                 }
-                .padding(.horizontal, 10)
+                .padding(.horizontal, DiveUI.screenPadding)
                 .padding(.vertical, 8)
             }
         }
@@ -53,20 +53,17 @@ struct BuddyAssistView: View {
     }
 
     private var header: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("BUDDY ASSIST")
-                    .font(.headline.bold())
-                    .foregroundStyle(DiveUI.blue)
-                Text(buddyAssist.state.rawValue)
-                    .font(.caption2.monospacedDigit().bold())
-                    .foregroundStyle(buddyAssist.canSend ? DiveUI.green : DiveUI.yellow)
+        VStack(spacing: 6) {
+            DiveScreenHeader("BUDDY ASSIST", subtitle: buddyAssist.state.rawValue, accent: DiveUI.blue, systemImage: "dot.radiowaves.left.and.right")
+            HStack {
+                DiveStatusPill(buddyAssist.canSend ? "ONLINE" : "STANDBY", color: buddyAssist.canSend ? DiveUI.green : DiveUI.yellow)
+                Spacer()
+                Circle()
+                    .fill(proximityColor)
+                    .frame(width: 18, height: 18)
+                    .overlay(Circle().stroke(.white.opacity(0.7), lineWidth: 1))
+                    .shadow(color: proximityColor.opacity(0.55), radius: 5, x: 0, y: 0)
             }
-            Spacer()
-            Circle()
-                .fill(proximityColor)
-                .frame(width: 18, height: 18)
-                .overlay(Circle().stroke(.white.opacity(0.7), lineWidth: 1))
         }
     }
 
