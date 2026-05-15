@@ -23,6 +23,7 @@ DIR DIVING is a SwiftUI watchOS application for Apple Watch Ultra-class devices.
 - User-configurable ascent-rate limits by depth band
 - Red blinking warning and haptic feedback when ascent rate exceeds the current depth-band limit
 - GPS entry and exit points captured with a best-effort surface fix
+- Automatic WatchConnectivity transfer of saved dive logs to the iOS companion
 - Custom image screen for bundled reference images, checklists, or static procedures
 
 Experimental Buddy Assist / BLE work is intentionally kept out of `main` and lives only on the `codex/experimental-features` branch.
@@ -312,7 +313,7 @@ xcodegen generate
 - High contrast
 - Minimal fine detail
 
-For future file transfer without recompiling the app, the project could be extended with an iPhone companion app and `WatchConnectivity`.
+Saved dives are also transferred to the iOS companion through `WatchConnectivity` when the paired iPhone app is installed and reachable. The watch uses direct messages when possible and queued `transferUserInfo` delivery as a fallback.
 
 ## Apple Water Submersion API Compatibility
 
