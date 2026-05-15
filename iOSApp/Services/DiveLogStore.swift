@@ -9,15 +9,20 @@ final class DiveLogStore: ObservableObject {
 
     private let cloudSync: CloudSyncStore?
     private let key = "dirdiving_ios_dive_sessions"
+    private let includeDemoKey = "dirdiving_ios_include_demo_logbook"
     private var isReady = false
 
     init(cloudSync: CloudSyncStore? = nil) {
         self.cloudSync = cloudSync
-        if let saved = cloudSync?.load([DiveSession].self, forKey: key) {
-            sessions = saved.sorted { $0.startDate > $1.startDate }
-        } else {
+        let localSessions = loadLocalSessions()
+        let cloudSessions = cloudSync?.load([DiveSession].self, forKey: key)
+        sessions = mergedSessions(local: localSessions, cloud: cloudSessions)
+            .sorted { $0.startDate > $1.startDate }
+
+        if sessions.isEmpty, UserDefaults.standard.bool(forKey: includeDemoKey) {
             insertDemoDives()
         }
+
         isReady = true
         saveIfReady()
     }
@@ -37,6 +42,27 @@ final class DiveLogStore: ObservableObject {
     func synchronizeCloud() {
         saveIfReady()
         cloudSync?.synchronize()
+    }
+
+    private func loadLocalSessions() -> [DiveSession] {
+        cloudSync?.load([DiveSession].self, forKey: key) ?? []
+    }
+
+    private func mergedSessions(local: [DiveSession], cloud: [DiveSession]?) -> [DiveSession] {
+        var byID: [UUID: DiveSession] = [:]
+        for session in local {
+            byID[session.id] = session
+        }
+        if let cloud {
+            for session in cloud {
+                if let existing = byID[session.id] {
+                    byID[session.id] = existing.endDate >= session.endDate ? existing : session
+                } else {
+                    byID[session.id] = session
+                }
+            }
+        }
+        return Array(byID.values)
     }
 
     private func saveIfReady() {

@@ -2,8 +2,37 @@ name: DIRDiving
 options:
   bundleIdPrefix: com.egopfe
   deploymentTarget:
+    watchOS: "10.0"
     iOS: "17.0"
 targets:
+  DIRDiving Watch App:
+    type: application
+    platform: watchOS
+    sources:
+      - App
+      - Models
+      - Services
+      - Views
+      - Utils
+      - Resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving
+        DEVELOPMENT_TEAM: C6FKKPB6A9
+        CODE_SIGN_STYLE: Automatic
+        INFOPLIST_FILE: App/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Config/DIRDiving.entitlements
+        PRODUCT_NAME: DIR DIVING
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    dependencies:
+      - sdk: CoreMotion.framework
+      - sdk: CoreLocation.framework
+      - sdk: CoreBluetooth.framework
+      - sdk: Security.framework
+      - sdk: WatchConnectivity.framework
+      - sdk: WatchKit.framework
+      - sdk: Charts.framework
+      - sdk: AppIntents.framework
   DIRDiving iOS:
     type: application
     platform: iOS
