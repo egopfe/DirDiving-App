@@ -1,0 +1,49 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+      - main-iOS
+      - codex/experimental-features
+      - codex/ios-experimental-features
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build watchOS target
+        run: |
+          if grep -q "DIRDiving Watch App" project.yml; then
+            xcodebuild build \
+              -project DIRDiving.xcodeproj \
+              -scheme "DIRDiving Watch App" \
+              -destination "generic/platform=watchOS Simulator" \
+              CODE_SIGNING_ALLOWED=NO \
+              CODE_SIGNING_REQUIRED=NO
+          else
+            echo "Skipping watch build: no watch target in project.yml"
+          fi
+
+      - name: Build iOS target
+        run: |
+          if grep -q "DIRDiving iOS" project.yml; then
+            xcodebuild build \
+              -project DIRDiving.xcodeproj \
+              -scheme "DIRDiving iOS" \
+              -destination "generic/platform=iOS Simulator" \
+              CODE_SIGNING_ALLOWED=NO \
+              CODE_SIGNING_REQUIRED=NO
+          else
+            echo "Skipping iOS build: no iOS target in project.yml"
+          fi

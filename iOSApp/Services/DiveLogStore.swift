@@ -35,6 +35,23 @@ final class DiveLogStore: ObservableObject {
 
         isReady = true
         saveIfReady()
+
+        NotificationCenter.default.addObserver(
+            forName: .cloudSyncDidChangeExternally,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in self?.reloadFromCloud() }
+        }
+    }
+
+    func reloadFromCloud() {
+        guard isReady else { return }
+        let localSessions = loadLocalSessions()
+        let cloudSessions = cloudSync?.load([DiveSession].self, forKey: key)
+        sessions = mergedSessions(local: localSessions, cloud: cloudSessions)
+            .sorted { $0.startDate > $1.startDate }
+        applyDemoLogbookPreference()
     }
 
     func add(_ session: DiveSession) {
@@ -70,7 +87,7 @@ final class DiveLogStore: ObservableObject {
         if let cloud {
             for session in cloud {
                 if let existing = byID[session.id] {
-                    byID[session.id] = existing.endDate >= session.endDate ? existing : session
+                    byID[session.id] = DiveSessionMerge.preferred(existing, session)
                 } else {
                     byID[session.id] = session
                 }
