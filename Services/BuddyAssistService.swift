@@ -29,6 +29,7 @@ final class BuddyAssistService: NSObject, ObservableObject {
     }
 
     static let serviceUUID = CBUUID(string: "A1C4D7B0-8C4A-4D74-9C0F-0C38D87D1A01")
+    static let pairingCharacteristicUUID = CBUUID(string: "F3A91C2E-8B4D-4F6A-9E1C-7D2B5A8E4C90")
     static let messageCharacteristicUUID = CBUUID(string: "E02B806D-3B9C-49A4-A8EF-6A96CB2D56E1")
 
     @Published private(set) var state: ConnectionState = .idle
@@ -52,6 +53,10 @@ final class BuddyAssistService: NSObject, ObservableObject {
     private var candidatePeripheral: CBPeripheral?
     private var connectedPeripheral: CBPeripheral?
     private var messageCharacteristic: CBCharacteristic?
+    private var pairingCharacteristic: CBCharacteristic?
+    private var handshakePrivateKey: P256.KeyAgreement.PrivateKey?
+    private var handshakeBuddyName: String?
+    private let peripheralRelay = BuddyAssistPeripheralService()
     private var pingTimer: Timer?
     private let defaults: UserDefaults
     private let secureStore = SecureBuddyStore()
@@ -85,7 +90,7 @@ final class BuddyAssistService: NSObject, ObservableObject {
         case .trusted:
             return "Authenticated link ready"
         case .confirming:
-            return "Verify the same code on both watches"
+            return "Verify ECDH pairing code on both watches"
         case .scanning:
             return "Searching for a DIR DIVING buddy"
         case .blocked:
@@ -115,6 +120,7 @@ final class BuddyAssistService: NSObject, ObservableObject {
             trustedKeyData = secureStore.loadBuddyKey(for: pairedBuddyIdentifier)
         }
         super.init()
+        peripheralRelay.delegate = self
         securePairingState = trustedKeyData == nil ? .unpaired : .trusted
     }
 
@@ -137,6 +143,7 @@ final class BuddyAssistService: NSObject, ObservableObject {
         }
 
         guard let centralManager else { return }
+        peripheralRelay.start()
         startScanningIfReady(centralManager)
     }
 
@@ -155,6 +162,7 @@ final class BuddyAssistService: NSObject, ObservableObject {
     }
 
     func stopPairing() {
+        peripheralRelay.stop()
         centralManager?.stopScan()
         if let connectedPeripheral {
             centralManager?.cancelPeripheralConnection(connectedPeripheral)
@@ -192,6 +200,8 @@ final class BuddyAssistService: NSObject, ObservableObject {
         pairingSessionId = nil
         trustedBuddyFingerprint = nil
         trustedKeyData = nil
+        handshakePrivateKey = nil
+        handshakeBuddyName = nil
         outgoingSequence = 0
         securePairingState = .unpaired
         defaults.removeObject(forKey: pairedBuddyIdentifierKey)
@@ -301,19 +311,8 @@ final class BuddyAssistService: NSObject, ObservableObject {
             return
         }
 
-        let sessionId = Self.pairingSessionId(localId: localDeviceId(), remoteId: identifier)
-        let keyData = Self.derivedPairingKey(sessionId: sessionId)
-        pendingPairing = PendingSecurePairing(
-            peripheralIdentifier: identifier,
-            buddyName: buddyName,
-            keyData: keyData,
-            sessionId: sessionId,
-            code: Self.confirmationCode(identifier: sessionId, keyData: keyData),
-            fingerprint: Self.fingerprint(for: keyData)
-        )
-        pairingConfirmationCode = pendingPairing?.code
-        trustedBuddyFingerprint = pendingPairing?.fingerprint
-        securePairingState = .confirming
+        handshakeBuddyName = buddyName
+        securePairingState = .scanning
         lastErrorMessage = nil
     }
 
@@ -381,19 +380,6 @@ final class BuddyAssistService: NSObject, ObservableObject {
         }
     }
 
-    private static func confirmationCode(identifier: String, keyData: Data) -> String {
-        var material = Data(identifier.utf8)
-        material.append(keyData)
-        let digest = SHA256.hash(data: material)
-        let value = digest.prefix(4).reduce(UInt32(0)) { ($0 << 8) | UInt32($1) } % 1_000_000
-        return String(format: "%03d-%03d", value / 1000, value % 1000)
-    }
-
-    private static func fingerprint(for keyData: Data) -> String {
-        let digest = SHA256.hash(data: keyData)
-        return digest.prefix(4).map { String(format: "%02X", $0) }.joined(separator: ":")
-    }
-
     private func localDeviceId() -> String {
         if let existing = defaults.string(forKey: localDeviceIdKey) {
             return existing
@@ -403,12 +389,125 @@ final class BuddyAssistService: NSObject, ObservableObject {
         return generated
     }
 
-    private static func pairingSessionId(localId: String, remoteId: String) -> String {
-        [localId, remoteId].sorted().joined(separator: ":")
+    private func beginCentralHandshake(with peripheral: CBPeripheral) {
+        guard !isTrusted, pendingPairing == nil, let pairingCharacteristic else { return }
+
+        let remotePeripheralId = peripheral.identifier.uuidString
+        if handshakePrivateKey == nil {
+            handshakePrivateKey = BuddyPairingKeyAgreement.makeEphemeralKeyPair()
+        }
+
+        if BuddyPairingKeyAgreement.shouldSendOffer(localDeviceId: localDeviceId(), remoteDeviceId: remotePeripheralId) {
+            sendCentralHandshake(
+                peripheral: peripheral,
+                characteristic: pairingCharacteristic,
+                phase: .offer
+            )
+        }
+
+        if pairingCharacteristic.properties.contains(.notify) || pairingCharacteristic.properties.contains(.indicate) {
+            peripheral.setNotifyValue(true, for: pairingCharacteristic)
+        }
     }
 
-    private static func derivedPairingKey(sessionId: String) -> Data {
-        Data(SHA256.hash(data: Data(("DIR" + "DIVING").lowercased() + "-buddy-\(sessionId)").utf8))
+    private func sendCentralHandshake(
+        peripheral: CBPeripheral,
+        characteristic: CBCharacteristic,
+        phase: BuddyPairingHandshake.Phase
+    ) {
+        guard let privateKey = handshakePrivateKey else { return }
+        let handshake = BuddyPairingHandshake(
+            deviceId: localDeviceId(),
+            publicKey: privateKey.publicKey.x963Representation,
+            phase: phase
+        )
+        guard let data = try? JSONEncoder().encode(handshake) else { return }
+        peripheral.writeValue(data, for: characteristic, type: .withResponse)
+    }
+
+    private func handlePairingHandshake(
+        _ data: Data,
+        peripheral: CBPeripheral?,
+        remotePeripheralId overridePeripheralId: String? = nil
+    ) {
+        guard pendingPairing == nil else { return }
+        guard let handshake = try? JSONDecoder().decode(BuddyPairingHandshake.self, from: data),
+              handshake.version == BuddyPairingHandshake.protocolVersion,
+              handshake.publicKey.count == 65 else {
+            lastErrorMessage = "Invalid buddy pairing handshake."
+            return
+        }
+
+        if handshakePrivateKey == nil {
+            handshakePrivateKey = BuddyPairingKeyAgreement.makeEphemeralKeyPair()
+        }
+
+        guard let privateKey = handshakePrivateKey else { return }
+
+        switch handshake.phase {
+        case .offer:
+            let response = BuddyPairingHandshake(
+                deviceId: localDeviceId(),
+                publicKey: privateKey.publicKey.x963Representation,
+                phase: .response
+            )
+            if let encoded = try? JSONEncoder().encode(response) {
+                peripheralRelay.sendHandshake(encoded)
+                if let peripheral, let pairingCharacteristic {
+                    peripheral.writeValue(encoded, for: pairingCharacteristic, type: .withResponse)
+                }
+            }
+            finalizePairingHandshake(
+                remoteDeviceId: handshake.deviceId,
+                remotePeripheralId: overridePeripheralId ?? peripheral?.identifier.uuidString ?? handshake.deviceId,
+                buddyName: handshakeBuddyName ?? peripheral?.name ?? "DIRDIVING WATCH",
+                privateKey: privateKey,
+                peerPublicKey: handshake.publicKey
+            )
+        case .response:
+            finalizePairingHandshake(
+                remoteDeviceId: handshake.deviceId,
+                remotePeripheralId: overridePeripheralId ?? peripheral?.identifier.uuidString ?? handshake.deviceId,
+                buddyName: handshakeBuddyName ?? peripheral?.name ?? "DIRDIVING WATCH",
+                privateKey: privateKey,
+                peerPublicKey: handshake.publicKey
+            )
+        }
+    }
+
+    private func finalizePairingHandshake(
+        remoteDeviceId: String,
+        remotePeripheralId: String,
+        buddyName: String,
+        privateKey: P256.KeyAgreement.PrivateKey,
+        peerPublicKey: Data
+    ) {
+        let sessionId = BuddyPairingKeyAgreement.pairingSessionId(
+            localId: localDeviceId(),
+            remoteId: remoteDeviceId
+        )
+
+        do {
+            let keyData = try BuddyPairingKeyAgreement.deriveSessionKey(
+                privateKey: privateKey,
+                peerPublicKeyData: peerPublicKey,
+                sessionId: sessionId
+            )
+            pendingPairing = PendingSecurePairing(
+                peripheralIdentifier: remotePeripheralId,
+                buddyName: buddyName,
+                keyData: keyData,
+                sessionId: sessionId,
+                code: BuddyPairingKeyAgreement.confirmationCode(sessionId: sessionId, keyData: keyData),
+                fingerprint: BuddyPairingKeyAgreement.fingerprint(for: keyData)
+            )
+            pairingConfirmationCode = pendingPairing?.code
+            trustedBuddyFingerprint = pendingPairing?.fingerprint
+            securePairingState = .confirming
+            lastErrorMessage = nil
+        } catch {
+            lastErrorMessage = "Buddy key exchange failed."
+        }
     }
 
     private func pruneReplayKeysIfNeeded() {
@@ -531,7 +630,12 @@ extension BuddyAssistService: CBPeripheralDelegate {
 
             peripheral.services?
                 .filter { $0.uuid == Self.serviceUUID }
-                .forEach { peripheral.discoverCharacteristics([Self.messageCharacteristicUUID], for: $0) }
+                .forEach {
+                    peripheral.discoverCharacteristics(
+                        [Self.pairingCharacteristicUUID, Self.messageCharacteristicUUID],
+                        for: $0
+                    )
+                }
         }
     }
 
@@ -542,7 +646,11 @@ extension BuddyAssistService: CBPeripheralDelegate {
                 return
             }
 
+            pairingCharacteristic = service.characteristics?.first { $0.uuid == Self.pairingCharacteristicUUID }
             messageCharacteristic = service.characteristics?.first { $0.uuid == Self.messageCharacteristicUUID }
+            if pairingCharacteristic != nil {
+                beginCentralHandshake(with: peripheral)
+            }
             if let messageCharacteristic,
                messageCharacteristic.properties.contains(.notify) || messageCharacteristic.properties.contains(.indicate) {
                 peripheral.setNotifyValue(true, for: messageCharacteristic)
@@ -552,9 +660,14 @@ extension BuddyAssistService: CBPeripheralDelegate {
 
     nonisolated func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         Task { @MainActor in
-            guard error == nil,
-                  characteristic.uuid == Self.messageCharacteristicUUID,
-                  let value = characteristic.value,
+            guard error == nil, let value = characteristic.value else { return }
+
+            if characteristic.uuid == Self.pairingCharacteristicUUID {
+                handlePairingHandshake(value, peripheral: peripheral)
+                return
+            }
+
+            guard characteristic.uuid == Self.messageCharacteristicUUID,
                   let message = authenticatedMessage(from: value) else { return }
 
             append(message, direction: .received)
@@ -609,6 +722,21 @@ private struct SecureBuddyEnvelope: Codable {
 
     private var canonicalString: String {
         "\(sessionId)|\(sequence)|\(timestamp)|\(message)"
+    }
+}
+
+extension BuddyAssistService: BuddyAssistPeripheralDelegate {
+    func peripheralServiceDidBecomeReady(_ service: BuddyAssistPeripheralService) {
+        _ = service
+    }
+
+    func peripheralService(_ service: BuddyAssistPeripheralService, didReceiveHandshake data: Data, from central: CBCentral) {
+        _ = service
+        handlePairingHandshake(
+            data,
+            peripheral: connectedPeripheral,
+            remotePeripheralId: central.identifier.uuidString
+        )
     }
 }
 
