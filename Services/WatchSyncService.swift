@@ -30,10 +30,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         guard WCSession.isSupported() else { return }
 
         do {
-            let encoder = JSONEncoder()
-            encoder.dateEncodingStrategy = .iso8601
-            let data = try encoder.encode(session)
-            let payload: [String: Any] = [sessionPayloadKey: data]
+            let payload = try WatchDiveSyncCodec.makePayload(session: session)
 
             if WCSession.default.isReachable {
                 WCSession.default.sendMessage(payload, replyHandler: nil) { [weak self] error in

@@ -18,6 +18,12 @@ final class DiveLogStore: ObservableObject {
         WatchSyncService.shared.transfer(session)
     }
 
+    func delete(id: UUID) {
+        guard let index = sessions.firstIndex(where: { $0.id == id }) else { return }
+        sessions.remove(at: index)
+        save()
+    }
+
     func delete(at offsets: IndexSet) {
         sessions.remove(atOffsets: offsets)
         save()
@@ -66,7 +72,8 @@ final class DiveLogStore: ObservableObject {
             let encoder = JSONEncoder()
             encoder.dateEncodingStrategy = .iso8601
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-            try encoder.encode(sessions).write(to: fileURL(), options: .atomic)
+            let data = try encoder.encode(sessions)
+            try data.write(to: fileURL(), options: [.atomic, .completeFileProtection])
             cloudSync.save(sessions, forKey: cloudKey)
         } catch { print("Save error: \(error.localizedDescription)") }
     }

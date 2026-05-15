@@ -43,6 +43,10 @@ final class DiveLogStore: ObservableObject {
         sessions = sessions.sorted { $0.startDate > $1.startDate }
     }
 
+    func delete(id: UUID) {
+        sessions.removeAll { $0.id == id }
+    }
+
     func delete(at offsets: IndexSet) {
         for index in offsets.sorted(by: >) {
             sessions.remove(at: index)
@@ -98,6 +102,7 @@ final class DiveLogStore: ObservableObject {
         let gases: [DiveGasLabel] = [.trimix, .oc, .trimix, .nitrox, .oc]
 
         sessions = names.enumerated().map { idx, name in
+            let demoID = DemoDiveCatalog.sessionIDs[idx]
             let start = Calendar.current.date(
                 from: DateComponents(year: 2024, month: 5, day: days[idx], hour: times[idx].0, minute: times[idx].1)
             ) ?? Date()
@@ -123,7 +128,7 @@ final class DiveLogStore: ObservableObject {
             }
             let avg = samples.map(\.depthMeters).reduce(0, +) / Double(samples.count)
             return DiveSession(
-                id: UUID(),
+                id: demoID,
                 startDate: start,
                 endDate: start.addingTimeInterval(duration),
                 durationSeconds: duration,
@@ -138,7 +143,8 @@ final class DiveLogStore: ObservableObject {
                 buddy: idx == 0 ? "Buddy" : nil,
                 notes: DiveSession.demoNotesLabel,
                 gasLabel: gases[idx],
-                sacLitersMinute: 18.2 + Double(idx)
+                sacLitersMinute: 18.2 + Double(idx),
+                isDemo: true
             )
         }
     }

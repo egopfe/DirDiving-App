@@ -46,8 +46,10 @@ final class BuddyAssistService: NSObject, ObservableObject {
     @Published private(set) var securePairingState: SecurePairingState = .unpaired
     @Published private(set) var pairingConfirmationCode: String?
     @Published private(set) var trustedBuddyFingerprint: String?
+    @Published private(set) var discoveredBuddyName: String?
 
     private var centralManager: CBCentralManager?
+    private var candidatePeripheral: CBPeripheral?
     private var connectedPeripheral: CBPeripheral?
     private var messageCharacteristic: CBCharacteristic?
     private var pingTimer: Timer?
@@ -58,6 +60,7 @@ final class BuddyAssistService: NSObject, ObservableObject {
     private let pairingSessionIdKey = "dirdiving_secure_pairing_session_id"
     private let trustedBuddyFingerprintKey = "dirdiving_secure_buddy_fingerprint"
     private let outgoingSequenceKey = "dirdiving_secure_buddy_outgoing_sequence"
+    private let replayEnvelopeKeysKey = "dirdiving_secure_buddy_replay_keys"
     private let localDeviceIdKey = "dirdiving_local_device_id"
     private let allowedClockSkew: TimeInterval = 300
     private var trustedKeyData: Data?
@@ -66,7 +69,10 @@ final class BuddyAssistService: NSObject, ObservableObject {
     private var outgoingSequence: Int = 0
     private var receivedEnvelopeKeys: Set<String> = []
 
-    var canSend: Bool { state == .connected && messageCharacteristic != nil && isTrusted }
+    var canSend: Bool {
+        ExperimentalFeatures.buddyAssistEnabled && state == .connected && messageCharacteristic != nil && isTrusted
+    }
+    var hasDiscoveredBuddy: Bool { candidatePeripheral != nil }
     var isBuddyOnline: Bool { state == .connected }
     var buddyLinkStatus: String { isBuddyOnline ? "ONLINE" : "LOST" }
     var isPaired: Bool { pairedBuddyIdentifier != nil }
@@ -104,6 +110,7 @@ final class BuddyAssistService: NSObject, ObservableObject {
         pairingSessionId = defaults.string(forKey: pairingSessionIdKey)
         trustedBuddyFingerprint = defaults.string(forKey: trustedBuddyFingerprintKey)
         outgoingSequence = defaults.integer(forKey: outgoingSequenceKey)
+        receivedEnvelopeKeys = Set(defaults.stringArray(forKey: replayEnvelopeKeysKey) ?? [])
         if let pairedBuddyIdentifier {
             trustedKeyData = secureStore.loadBuddyKey(for: pairedBuddyIdentifier)
         }
@@ -112,6 +119,12 @@ final class BuddyAssistService: NSObject, ObservableObject {
     }
 
     func startPairing(isDiveActive: Bool) {
+        guard ExperimentalFeatures.buddyAssistEnabled else {
+            lastErrorMessage = "Buddy Assist is disabled until a production relay is available."
+            state = .idle
+            securePairingState = .unpaired
+            return
+        }
         guard !isDiveActive else {
             lastErrorMessage = preDivePairingDisclaimer
             state = .idle
@@ -127,11 +140,27 @@ final class BuddyAssistService: NSObject, ObservableObject {
         startScanningIfReady(centralManager)
     }
 
+    func connectToDiscoveredBuddy() {
+        guard ExperimentalFeatures.buddyAssistEnabled,
+              let peripheral = candidatePeripheral,
+              let centralManager else {
+            lastErrorMessage = "No buddy discovered yet."
+            return
+        }
+        connectedPeripheral = peripheral
+        connectedPeripheral?.delegate = self
+        candidatePeripheral = nil
+        discoveredBuddyName = nil
+        centralManager.connect(peripheral, options: nil)
+    }
+
     func stopPairing() {
         centralManager?.stopScan()
         if let connectedPeripheral {
             centralManager?.cancelPeripheralConnection(connectedPeripheral)
         }
+        candidatePeripheral = nil
+        discoveredBuddyName = nil
         connectedPeripheral = nil
         messageCharacteristic = nil
         stopPinging()
@@ -170,6 +199,8 @@ final class BuddyAssistService: NSObject, ObservableObject {
         defaults.removeObject(forKey: pairingSessionIdKey)
         defaults.removeObject(forKey: trustedBuddyFingerprintKey)
         defaults.removeObject(forKey: outgoingSequenceKey)
+        defaults.removeObject(forKey: replayEnvelopeKeysKey)
+        receivedEnvelopeKeys.removeAll()
     }
 
     func confirmSecurePairing() {
@@ -199,6 +230,10 @@ final class BuddyAssistService: NSObject, ObservableObject {
     }
 
     func send(_ message: BuddyAssistMessage) {
+        guard ExperimentalFeatures.buddyAssistEnabled else {
+            lastErrorMessage = "Buddy Assist is disabled until a production relay is available."
+            return
+        }
         guard let connectedPeripheral, let messageCharacteristic else {
             lastErrorMessage = "No buddy connected."
             return
@@ -337,6 +372,7 @@ final class BuddyAssistService: NSObject, ObservableObject {
             }
 
             receivedEnvelopeKeys.insert(replayKey)
+            persistReplayKeys()
             pruneReplayKeysIfNeeded()
             return BuddyAssistMessage.allCases.first { $0.payload == envelope.message }
         } catch {
@@ -378,6 +414,11 @@ final class BuddyAssistService: NSObject, ObservableObject {
     private func pruneReplayKeysIfNeeded() {
         guard receivedEnvelopeKeys.count > 128 else { return }
         receivedEnvelopeKeys = Set(receivedEnvelopeKeys.suffix(64))
+        persistReplayKeys()
+    }
+
+    private func persistReplayKeys() {
+        defaults.set(Array(receivedEnvelopeKeys), forKey: replayEnvelopeKeysKey)
     }
 
     private func startPinging() {
@@ -427,14 +468,23 @@ extension BuddyAssistService: CBCentralManagerDelegate {
     nonisolated func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi RSSI: NSNumber) {
         Task { @MainActor in
             let remoteId = peripheral.identifier.uuidString
-            if let pairedBuddyIdentifier, pairedBuddyIdentifier != remoteId {
+            if let pairedBuddyIdentifier {
+                guard pairedBuddyIdentifier == remoteId else { return }
+                updateProximity(rssi: RSSI.intValue)
+                connectedPeripheral = peripheral
+                connectedPeripheral?.delegate = self
+                central.stopScan()
+                central.connect(peripheral, options: nil)
                 return
             }
+
+            guard candidatePeripheral == nil || candidatePeripheral?.identifier == peripheral.identifier else { return }
+            candidatePeripheral = peripheral
+            discoveredBuddyName = peripheral.name ?? "DIRDIVING WATCH"
             updateProximity(rssi: RSSI.intValue)
-            connectedPeripheral = peripheral
-            connectedPeripheral?.delegate = self
             central.stopScan()
-            central.connect(peripheral, options: nil)
+            state = .scanning
+            securePairingState = .scanning
         }
     }
 

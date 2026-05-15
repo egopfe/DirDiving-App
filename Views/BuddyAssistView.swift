@@ -15,6 +15,10 @@ struct BuddyAssistView: View {
         ZStack {
             Color.black.ignoresSafeArea()
 
+            if !ExperimentalFeatures.buddyAssistEnabled {
+                disabledOverlay
+            }
+
             ScrollView {
                 VStack(spacing: 8) {
                     header
@@ -254,11 +258,15 @@ struct BuddyAssistView: View {
     private var controls: some View {
         VStack(spacing: 7) {
             HStack(spacing: 7) {
-                DiveCommandButton("PAIR", systemImage: "link", color: DiveUI.green) {
-                    buddyAssist.startPairing(isDiveActive: dive.isDiveActive)
+                DiveCommandButton(buddyAssist.hasDiscoveredBuddy ? "CONNECT" : "PAIR", systemImage: "link", color: DiveUI.green) {
+                    if buddyAssist.hasDiscoveredBuddy {
+                        buddyAssist.connectToDiscoveredBuddy()
+                    } else {
+                        buddyAssist.startPairing(isDiveActive: dive.isDiveActive)
+                    }
                 }
-                .disabled(dive.isDiveActive)
-                .opacity(dive.isDiveActive ? 0.42 : 1.0)
+                .disabled(dive.isDiveActive || !ExperimentalFeatures.buddyAssistEnabled)
+                .opacity(dive.isDiveActive || !ExperimentalFeatures.buddyAssistEnabled ? 0.42 : 1.0)
                 DiveCommandButton("TRUST", systemImage: "checkmark.shield", color: DiveUI.yellow) {
                     buddyAssist.confirmSecurePairing()
                 }
@@ -327,6 +335,21 @@ struct BuddyAssistView: View {
             return "PING 15s RSSI \(lastRSSI)"
         }
         return "PING 15s --"
+    }
+
+    private var disabledOverlay: some View {
+        DivePanel(stroke: DiveUI.red) {
+            VStack(spacing: 4) {
+                Text("BUDDY ASSIST DISABILITATO")
+                    .font(.caption.bold())
+                    .foregroundStyle(DiveUI.red)
+                Text("Funzione sperimentale non attiva in produzione.")
+                    .font(.caption2)
+                    .foregroundStyle(DiveUI.secondaryText)
+                    .multilineTextAlignment(.center)
+            }
+        }
+        .padding(24)
     }
 
     private func directionText(_ degrees: Double?) -> String {
