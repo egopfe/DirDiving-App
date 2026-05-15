@@ -21,7 +21,7 @@ struct MoreView: View {
                         }
                         DIRCard("BACKUP CLOUD", icon: "icloud") {
                             row("iCloud Sync", cloudSync.isICloudAvailable ? "Attivo" : "Non disponibile")
-                            row("Backup automatico", "Log, planner, Buddy Lab, Explore")
+                            row("Backup automatico", "Log e planner")
                             row("Ultimo evento", cloudSync.lastSyncStatus)
                             Button {
                                 logStore.synchronizeCloud()
@@ -36,14 +36,24 @@ struct MoreView: View {
                             }
                             .buttonStyle(.plain)
                         }
+                        DIRCard("REVIEWER", icon: "books.vertical") {
+                            Toggle(isOn: Binding(
+                                get: { logStore.includeDemoLogbook },
+                                set: { logStore.includeDemoLogbook = $0 }
+                            )) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Logbook dimostrativo")
+                                        .foregroundStyle(.white)
+                                    Text("Carica 5 immersioni demo per revisione App Store.")
+                                        .font(.caption2)
+                                        .foregroundStyle(DIRTheme.muted)
+                                }
+                            }
+                            .tint(DIRTheme.cyan)
+                        }
                         DIRCard("EXPORT", icon: "square.and.arrow.up") {
                             row("Subsurface", "CSV")
                             row("Bundle", "com.egopfe.dirdiving.ios")
-                        }
-                        DIRCard("EXPERIMENTAL", icon: "testtube.2") {
-                            row("Branch iOS", "codex/ios-experimental-features")
-                            row("Watch source", "codex/experimental-features")
-                            row("Buddy runtime", "Solo Apple Watch")
                         }
                         DIRWarningBox(text: "DIR DIVING e un supporto informativo per logbook, analisi e pianificazione preliminare.")
                     }
