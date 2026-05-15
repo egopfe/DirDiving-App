@@ -9,6 +9,7 @@ struct DIRDivingApp: App {
     @StateObject private var imageStore: UserImageStore
     @StateObject private var ascentSettings: AscentRateSettingsStore
     @StateObject private var navigationStore: AppNavigationStore
+    @StateObject private var watchSync: WatchSyncService
 
     init() {
         let logStore = DiveLogStore()
@@ -22,6 +23,7 @@ struct DIRDivingApp: App {
         _imageStore = StateObject(wrappedValue: UserImageStore())
         _ascentSettings = StateObject(wrappedValue: ascentSettings)
         _navigationStore = StateObject(wrappedValue: navigationStore)
+        _watchSync = StateObject(wrappedValue: WatchSyncService.shared)
     }
 
     var body: some Scene {
@@ -34,6 +36,7 @@ struct DIRDivingApp: App {
                 .environmentObject(imageStore)
                 .environmentObject(ascentSettings)
                 .environmentObject(navigationStore)
+                .environmentObject(watchSync)
         }
     }
 }

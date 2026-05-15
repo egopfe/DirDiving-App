@@ -15,6 +15,7 @@ final class DiveLogStore: ObservableObject {
         sessions.insert(session, at: 0)
         sessions = Array(sessions.sorted { $0.startDate > $1.startDate }.prefix(maxSessions))
         save()
+        WatchSyncService.shared.transfer(session)
     }
 
     func delete(at offsets: IndexSet) {
