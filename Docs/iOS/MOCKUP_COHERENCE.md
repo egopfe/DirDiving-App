@@ -68,4 +68,4 @@ File:
 - Real underwater thumbnail photos are represented by generated, photographic-style SwiftUI thumbnails until final media assets are supplied.
 - Buhlmann/deco calculations are simplified planning-assistant logic, not a certified decompression engine.
 - iCloud backup is represented as prepared/future status.
-- CSV export is implemented; `.ssrf` export is not implemented yet.
+- CSV export is implemented with depth, temperature, and entry/exit GPS columns when available; `.ssrf` export is not implemented yet.

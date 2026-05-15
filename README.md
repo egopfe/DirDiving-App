@@ -14,9 +14,9 @@ This branch contains the iPhone companion interface for DIR DIVING. It is intent
 - Dive planner with Buhlmann ZH-L16C planning logic.
 - Gas, MOD, decompression, and plan result screens.
 - Equipment screen.
-- Apple Watch sync status scaffold through WatchConnectivity.
+- Apple Watch log import through WatchConnectivity using direct messages and queued user-info delivery.
 - Local persistence with iCloud Key-Value Store mirroring for logbook sessions and planner inputs.
-- Subsurface CSV export support.
+- Subsurface CSV export support, including entry and exit GPS columns when available.
 - iOS companion visual system aligned to the supplied dark cyan mockup.
 
 Buddy Assist, Buddy Link, BLE pairing, and secure Buddy message authentication live only on the `codex/experimental-features` branch.
@@ -86,6 +86,17 @@ Implementation:
 - `iOSApp/Config/DIRDivingiOS.entitlements`
 
 Runtime note: iCloud sync requires the Apple Developer iCloud capability and the configured iCloud container to be enabled for the app identifier. Without the entitlement/capability at signing time, data is still saved locally and the UI reports iCloud as unavailable.
+
+## Watch Log Sync
+
+The companion imports saved dives sent by the watchOS app through `WatchConnectivity`.
+
+Supported delivery paths:
+
+- immediate `sendMessage` when the iPhone app is reachable;
+- queued `transferUserInfo` fallback for delivery when the iPhone app becomes available.
+
+Imported dives are de-duplicated by session identifier before being saved in the iOS logbook and mirrored to iCloud when available.
 
 ## Build Notes
 
