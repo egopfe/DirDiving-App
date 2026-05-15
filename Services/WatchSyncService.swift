@@ -55,6 +55,9 @@ extension WatchSyncService: WCSessionDelegate {
         Task { @MainActor in
             self.activationState = activationState
             self.lastSyncStatus = error?.localizedDescription ?? "Companion sync attivo"
+            if activationState == .activated {
+                WatchSyncAuth.publishSharedSecretIfNeeded()
+            }
         }
     }
 }

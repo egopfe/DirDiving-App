@@ -43,8 +43,7 @@ enum WatchDiveSyncCodec {
 
     private static func syncKey() -> SymmetricKey {
         let peer = WCSession.default.iOSAppBundleIdentifier ?? expectedCompanionBundleID
-        let seed = "dirdiving.watch.sync.v1|\(peer)"
-        return SymmetricKey(data: SHA256.hash(data: Data(seed.utf8)))
+        return WatchSyncAuth.syncKey(peerBundleID: peer)
     }
 
     private static func sign(_ transport: Transport, issuedAt: Date, body: Data) -> Transport {
