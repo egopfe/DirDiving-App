@@ -37,6 +37,15 @@ extension WatchSyncService: WCSessionDelegate {
         Task { @MainActor in
             self.activationState = activationState
             self.lastMessage = error?.localizedDescription ?? "Sessione Watch attiva"
+            if activationState == .activated {
+                WatchSyncAuth.ingestSharedSecretFromContext(WatchSyncAuth.cachedApplicationContext())
+            }
+        }
+    }
+
+    nonisolated func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
+        Task { @MainActor in
+            WatchSyncAuth.ingestSharedSecretFromContext(applicationContext)
         }
     }
 
