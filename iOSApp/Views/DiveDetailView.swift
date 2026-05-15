@@ -12,6 +12,7 @@ struct DiveDetailView: View {
     let session: DiveSession
     @State private var tab: DiveDetailTab = .summary
     @State private var csvURL: URL?
+    @State private var exportErrorMessage: String?
 
     var body: some View {
         ZStack {
@@ -202,7 +203,14 @@ struct DiveDetailView: View {
     private var exportBlock: some View {
         HStack {
             Button {
-                csvURL = SubsurfaceExportService.writeCSV(for: session)
+                switch SubsurfaceExportService.writeCSV(for: session) {
+                case .success(let url):
+                    csvURL = url
+                    exportErrorMessage = nil
+                case .failure(let error):
+                    csvURL = nil
+                    exportErrorMessage = error.localizedDescription
+                }
             } label: {
                 Image(systemName: "square.and.arrow.up")
                     .font(.title3)
@@ -218,6 +226,11 @@ struct DiveDetailView: View {
                         .padding(.vertical, 10)
                         .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan, lineWidth: 1))
                 }
+            } else if let exportErrorMessage {
+                Text(exportErrorMessage)
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.orange)
+                    .multilineTextAlignment(.trailing)
             } else {
                 Text("Modifica")
                     .font(.callout.weight(.semibold))
