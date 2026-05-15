@@ -10,6 +10,8 @@
     <string>DIR DIVING usa la posizione per salvare il punto GPS di inizio e fine immersione.</string>
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>DIR DIVING usa il Bluetooth per il collegamento sperimentale Buddy Assist tra watch.</string>
+    <key>WKCompanionAppBundleIdentifier</key>
+    <string>com.egopfe.dirmotion.ios</string>
     <key>WKSupportsAutomaticDepthLaunch</key>
     <true/>
     <key>WKBackgroundModes</key>

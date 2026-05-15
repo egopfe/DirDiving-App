@@ -4,6 +4,7 @@ import CoreBluetooth
 @MainActor
 protocol BuddyAssistPeripheralDelegate: AnyObject {
     func peripheralService(_ service: BuddyAssistPeripheralService, didReceiveHandshake data: Data, from central: CBCentral)
+    func peripheralService(_ service: BuddyAssistPeripheralService, didReceiveMessage data: Data, from central: CBCentral)
     func peripheralServiceDidBecomeReady(_ service: BuddyAssistPeripheralService)
 }
 
@@ -89,12 +90,14 @@ extension BuddyAssistPeripheralService: CBPeripheralManagerDelegate {
 
     nonisolated func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveWrite requests: [CBATTRequest]) {
         Task { @MainActor in
-            for request in requests where request.characteristic.uuid == BuddyAssistService.pairingCharacteristicUUID {
+            for request in requests {
                 guard let value = request.value else { continue }
-                delegate?.peripheralService(self, didReceiveHandshake: value, from: request.central)
-                if request.characteristic.properties.contains(.write) {
-                    peripheral.respond(to: request, withResult: .success)
+                if request.characteristic.uuid == BuddyAssistService.pairingCharacteristicUUID {
+                    delegate?.peripheralService(self, didReceiveHandshake: value, from: request.central)
+                } else if request.characteristic.uuid == BuddyAssistService.messageCharacteristicUUID {
+                    delegate?.peripheralService(self, didReceiveMessage: value, from: request.central)
                 }
+                peripheral.respond(to: request, withResult: .success)
             }
         }
     }

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DiveLogListView: View {
     @EnvironmentObject private var log: DiveLogStore
+    @EnvironmentObject private var watchSync: WatchSyncService
 
     var body: some View {
         ZStack {
@@ -10,6 +11,20 @@ struct DiveLogListView: View {
             ScrollView {
                 VStack(spacing: 8) {
                     header
+                    if let loadError = log.loadErrorMessage {
+                        DivePanel(stroke: DiveUI.red) {
+                            Text(loadError)
+                                .font(.caption2.bold())
+                                .foregroundStyle(DiveUI.red)
+                                .multilineTextAlignment(.center)
+                        }
+                    }
+                    DivePanel(stroke: DiveUI.blue) {
+                        Text(watchSync.lastSyncStatus)
+                            .font(.caption2.bold())
+                            .foregroundStyle(DiveUI.secondaryText)
+                            .multilineTextAlignment(.center)
+                    }
 
                     if log.sessions.isEmpty {
                         emptyState

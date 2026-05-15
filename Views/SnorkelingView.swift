@@ -7,7 +7,7 @@ struct SnorkelingView: View {
     @EnvironmentObject private var dive: DiveManager
 
     private var bearingDelta: Double {
-        let delta = exploration.activeWaypoint.targetBearing - compass.headingDegrees
+        let delta = exploration.liveTargetBearing - compass.headingDegrees
         if delta > 180 { return delta - 360 }
         if delta < -180 { return delta + 360 }
         return delta
@@ -27,9 +27,19 @@ struct SnorkelingView: View {
             .padding(.vertical, 10)
         }
         .background(Color.black)
-        .onAppear { gps.start() }
+        .onAppear {
+            compass.start()
+            gps.start()
+        }
+        .onDisappear {
+            gps.stop()
+            compass.stop()
+        }
         .onReceive(gps.$lastSpeedMetersPerSecond) { speed in
-            exploration.updateSnorkelingProgress(speedMetersPerSecond: speed)
+            exploration.updateSnorkelingProgress(
+                speedMetersPerSecond: speed,
+                currentPoint: gps.currentBestPoint()
+            )
         }
     }
 
@@ -73,13 +83,13 @@ struct SnorkelingView: View {
                     .minimumScaleFactor(0.7)
                 HStack {
                     DiveMetric("HEAD", value: String(format: "%.0f", compass.headingDegrees), unit: "°", color: .white)
-                    DiveMetric("TARGET", value: String(format: "%.0f", exploration.activeWaypoint.targetBearing), unit: "°", color: DiveUI.green)
+                    DiveMetric("TARGET", value: String(format: "%.0f", exploration.liveTargetBearing), unit: "°", color: DiveUI.green)
                     DiveMetric("DELTA", value: String(format: "%+.0f", bearingDelta), unit: "°", color: abs(bearingDelta) < 12 ? DiveUI.green : DiveUI.yellow)
                 }
                 HStack {
                     Label(exploration.gpsStatus, systemImage: "location")
                     Spacer()
-                    Text("\(Int(exploration.activeWaypoint.distanceMeters)) m")
+                    Text("\(Int(exploration.liveTargetDistanceMeters)) m")
                 }
                 .font(.caption2.bold())
                 .foregroundStyle(DiveUI.secondaryText)
@@ -137,7 +147,9 @@ struct SnorkelingView: View {
 
     private var controls: some View {
         HStack(spacing: 6) {
-            DiveCommandButton("START", systemImage: "play.fill", color: DiveUI.green) { exploration.startSnorkeling() }
+            DiveCommandButton("START", systemImage: "play.fill", color: DiveUI.green) {
+                exploration.startSnorkeling(entryPoint: gps.currentBestPoint())
+            }
             DiveCommandButton("NAV", systemImage: "location.north.fill", color: DiveUI.blue) { exploration.startNavigation() }
             DiveCommandButton("ENTRY", systemImage: "arrow.uturn.backward", color: DiveUI.yellow) { exploration.startReturnMode() }
         }

@@ -16,9 +16,16 @@ final class ExplorationStore: ObservableObject {
     @Published var apneaWarning: String?
     @Published var snorkelingWarning: String?
     @Published private(set) var snorkelingDistanceMeters: Double = 0
+    @Published private(set) var entryDistanceMeters: Double = 0
+    @Published private(set) var liveTargetBearing: Double = 0
+    @Published private(set) var liveTargetDistanceMeters: Double = 0
     private var snorkelingStartedAt: Date?
     private var snorkelingLastSampleAt: Date?
     private var snorkelingLastSpeedMetersPerSecond: Double = 0
+    private var snorkelingEntryPoint: GPSPoint?
+    private var currentPosition: GPSPoint?
+    private var apneaTimer: Timer?
+    private var recoveryTimer: Timer?
     private let cloudSync = CloudSyncStore()
     private let cloudKey = "dirdiving_watch_exploration_state"
     private var isReady = false
@@ -49,11 +56,12 @@ final class ExplorationStore: ObservableObject {
         return (distanceMeters / runtime) * 1.94384
     }
 
-    var entryDistanceMeters: Double {
-        guard snorkelingState == .returnMode || snorkelingState == .navigation else { return 0 }
-        return max(0, snorkelingDistanceMeters * 0.42)
+    var gpsStatus: String {
+        guard currentPosition != nil else { return "NO FIX" }
+        return snorkelingState == .active || snorkelingState == .navigation || snorkelingState == .returnMode
+            ? "SURFACE GPS"
+            : "LAST FIX"
     }
-    var gpsStatus: String { snorkelingState == .active ? "SURFACE GPS" : "LAST FIX" }
 
     init() {
         if let state = cloudSync.load(ExplorationState.self, forKey: cloudKey) {
@@ -80,17 +88,21 @@ final class ExplorationStore: ObservableObject {
         saveIfReady()
     }
 
-    func startSnorkeling() {
+    func startSnorkeling(entryPoint: GPSPoint?) {
         snorkelingState = .active
         snorkelingWarning = nil
         snorkelingStartedAt = Date()
         snorkelingLastSampleAt = snorkelingStartedAt
         snorkelingDistanceMeters = 0
         snorkelingLastSpeedMetersPerSecond = 0
+        snorkelingEntryPoint = entryPoint
+        currentPosition = entryPoint
+        entryDistanceMeters = 0
+        refreshNavigationMetrics()
         saveIfReady()
     }
 
-    func updateSnorkelingProgress(speedMetersPerSecond: Double) {
+    func updateSnorkelingProgress(speedMetersPerSecond: Double, currentPoint: GPSPoint?) {
         guard snorkelingState == .active || snorkelingState == .navigation || snorkelingState == .returnMode else { return }
         let now = Date()
         if snorkelingStartedAt == nil {
@@ -102,16 +114,45 @@ final class ExplorationStore: ObservableObject {
         snorkelingDistanceMeters += ((snorkelingLastSpeedMetersPerSecond + speed) / 2) * delta
         snorkelingLastSpeedMetersPerSecond = speed
         snorkelingLastSampleAt = now
+        if let currentPoint {
+            currentPosition = currentPoint
+            if snorkelingEntryPoint == nil {
+                snorkelingEntryPoint = currentPoint
+            }
+        }
+        refreshNavigationMetrics()
+    }
+
+    private func refreshNavigationMetrics() {
+        guard let currentPosition else {
+            entryDistanceMeters = 0
+            liveTargetBearing = activeWaypoint.targetBearing
+            liveTargetDistanceMeters = activeWaypoint.distanceMeters
+            return
+        }
+        if let entry = snorkelingEntryPoint {
+            entryDistanceMeters = GeoMath.distanceMeters(from: currentPosition, to: entry)
+        }
+        let target = GPSPoint(
+            latitude: activeWaypoint.latitude,
+            longitude: activeWaypoint.longitude,
+            horizontalAccuracy: currentPosition.horizontalAccuracy,
+            timestamp: currentPosition.timestamp
+        )
+        liveTargetBearing = GeoMath.bearingDegrees(from: currentPosition, to: target)
+        liveTargetDistanceMeters = GeoMath.distanceMeters(from: currentPosition, to: target)
     }
 
     func startNavigation() {
         snorkelingState = .navigation
+        refreshNavigationMetrics()
         saveIfReady()
     }
 
     func startReturnMode() {
         snorkelingState = .returnMode
         activeWaypointIndex = 0
+        refreshNavigationMetrics()
         saveIfReady()
     }
 
@@ -120,18 +161,23 @@ final class ExplorationStore: ObservableObject {
         snorkelingStartedAt = nil
         snorkelingLastSampleAt = nil
         snorkelingLastSpeedMetersPerSecond = 0
+        snorkelingEntryPoint = nil
+        currentPosition = nil
+        entryDistanceMeters = 0
         saveIfReady()
     }
 
     func nextWaypoint() {
         activeWaypointIndex = min(activeWaypointIndex + 1, waypoints.count - 1)
         snorkelingState = .navigation
+        refreshNavigationMetrics()
         saveIfReady()
     }
 
     func previousWaypoint() {
         activeWaypointIndex = max(activeWaypointIndex - 1, 0)
         snorkelingState = .navigation
+        refreshNavigationMetrics()
         saveIfReady()
     }
 
@@ -149,38 +195,72 @@ final class ExplorationStore: ObservableObject {
     }
 
     func startApneaSession() {
+        stopApneaTimers()
         apneaState = .surface
         apneaWarning = nil
         recoverySeconds = 0
+        currentApneaSeconds = 0
         saveIfReady()
     }
 
     func beginApneaDive() {
+        guard recoverySeconds <= 0 else {
+            apneaWarning = "ATTENDI FINE RECOVERY"
+            apneaState = .warning
+            saveIfReady()
+            return
+        }
+        stopApneaTimers()
         apneaState = .dive
         currentApneaSeconds = 0
         apneaCount += 1
+        apneaWarning = nil
+        apneaTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                guard let self, self.apneaState == .dive else { return }
+                self.currentApneaSeconds += 1
+                self.saveIfReady()
+            }
+        }
         saveIfReady()
     }
 
     func surfaceFromApnea(maxDepthMeters: Double) {
-        let plannedRecovery = max(currentApneaSeconds * 2, currentApneaSeconds * 1.8)
+        stopApneaTimers()
+        let diveDuration = currentApneaSeconds
+        let requiredRecovery = max(diveDuration * 2, 30)
         apneaDives.insert(
             ApneaDiveRecord(
-                durationSeconds: currentApneaSeconds,
+                durationSeconds: diveDuration,
                 maxDepthMeters: maxDepthMeters,
-                recoverySeconds: plannedRecovery
+                recoverySeconds: requiredRecovery
             ),
             at: 0
         )
-        recoverySeconds = plannedRecovery
+        recoverySeconds = requiredRecovery
         apneaState = .surface
-        if plannedRecovery < currentApneaSeconds * 2 {
-            apneaWarning = "RECOVERY INSUFFICIENTE"
-            apneaState = .warning
-        } else {
-            apneaWarning = nil
+        apneaWarning = nil
+        recoveryTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                guard let self else { return }
+                guard self.recoverySeconds > 0 else {
+                    self.stopApneaTimers()
+                    self.apneaWarning = nil
+                    self.saveIfReady()
+                    return
+                }
+                self.recoverySeconds -= 1
+                self.saveIfReady()
+            }
         }
         saveIfReady()
+    }
+
+    private func stopApneaTimers() {
+        apneaTimer?.invalidate()
+        apneaTimer = nil
+        recoveryTimer?.invalidate()
+        recoveryTimer = nil
     }
 
     func triggerApneaWarning(_ text: String) {

@@ -15,15 +15,22 @@ enum WatchSyncAuth {
         try? WCSession.default.updateApplicationContext([contextKey: secret.base64EncodedString()])
     }
 
+    static func hasPeerSecret() -> Bool {
+        loadPeerSecret() != nil
+    }
+
     static func ingestSharedSecretFromContext(_ context: [String: Any]) {
         guard let encoded = context[contextKey] as? String,
               let secret = Data(base64Encoded: encoded),
               secret.count >= 32 else { return }
         savePeerSecret(secret)
+        NotificationCenter.default.post(name: .watchSyncPeerSecretDidUpdate, object: nil)
     }
 
     static func syncKey(peerBundleID: String) -> SymmetricKey {
-        let secret = loadPeerSecret() ?? loadOrCreateLocalSecret()
+        guard let secret = loadPeerSecret() else {
+            return SymmetricKey(data: SHA256.hash(data: Data()))
+        }
         var material = secret
         material.append(Data(peerBundleID.utf8))
         return SymmetricKey(data: SHA256.hash(data: material))
@@ -33,7 +40,9 @@ enum WatchSyncAuth {
         if let existing = loadKeychain(account: keychainAccount) {
             return existing
         }
-        let generated = (try? SecureBuddyStore.randomKeyData(byteCount: 32)) ?? Data(UUID().uuidString.utf8)
+        guard let generated = try? SecureBuddyStore.randomKeyData(byteCount: 32) else {
+            return Data(SHA256.hash(data: Data("dirmotion.watch.sync.local".utf8)))
+        }
         saveKeychain(generated, account: keychainAccount)
         return generated
     }

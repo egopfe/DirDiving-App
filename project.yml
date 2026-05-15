@@ -25,6 +25,7 @@ targets:
         CODE_SIGN_ENTITLEMENTS: Config/DIRDiving.entitlements
         PRODUCT_NAME: DIR DIVING
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.egopfe.dirmotion.ios
     dependencies:
       - sdk: CoreMotion.framework
       - sdk: CoreLocation.framework
@@ -49,6 +50,8 @@ targets:
         PRODUCT_NAME: DIR DIVING
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     dependencies:
+      - target: DIRDiving Watch App
+        embed: true
       - sdk: Charts.framework
       - sdk: WatchConnectivity.framework
       - sdk: CoreLocation.framework

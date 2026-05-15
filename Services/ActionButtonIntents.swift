@@ -54,5 +54,11 @@ struct DIRDivingAppShortcuts: AppShortcutsProvider {
             shortTitle: "Stopwatch",
             systemImageName: "stopwatch"
         )
+        AppShortcut(
+            intent: ResetStopwatchIntent(),
+            phrases: ["Reset stopwatch in \(.applicationName)"],
+            shortTitle: "Reset Stopwatch",
+            systemImageName: "arrow.counterclockwise"
+        )
     }
 }

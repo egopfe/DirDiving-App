@@ -4,6 +4,7 @@ import SwiftUI
 @MainActor
 final class DiveLogStore: ObservableObject {
     @Published private(set) var sessions: [DiveSession] = []
+    @Published private(set) var loadErrorMessage: String?
     private let fileName = "dirdiving_sessions.json"
     private let cloudKey = "dirdiving_watch_dive_sessions"
     private let maxSessions = 40
@@ -63,6 +64,7 @@ final class DiveLogStore: ObservableObject {
             decoder.dateDecodingStrategy = .iso8601
             return try decoder.decode([DiveSession].self, from: Data(contentsOf: url))
         } catch {
+            loadErrorMessage = "Log locale non leggibile: \(error.localizedDescription)"
             return []
         }
     }

@@ -20,6 +20,8 @@ struct ApneaView: View {
             .padding(.vertical, 10)
         }
         .background(Color.black)
+        .onAppear { compass.start() }
+        .onDisappear { compass.stop() }
     }
 
     private var topBar: some View {
@@ -121,6 +123,9 @@ struct ApneaView: View {
         HStack(spacing: 6) {
             DiveCommandButton("START", systemImage: "play.fill", color: DiveUI.green) { exploration.startApneaSession() }
             DiveCommandButton("DIVE", systemImage: "arrow.down", color: DiveUI.yellow) { exploration.beginApneaDive() }
+            DiveCommandButton("SURFACE", systemImage: "arrow.up", color: DiveUI.blue) {
+                exploration.surfaceFromApnea(maxDepthMeters: dive.maxDepthMeters)
+            }
             DiveCommandButton("WARN", systemImage: "exclamationmark.triangle", color: DiveUI.red) {
                 exploration.triggerApneaWarning("APNEA TROPPO LUNGA")
             }

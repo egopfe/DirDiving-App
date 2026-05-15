@@ -77,7 +77,7 @@ final class DiveManager: NSObject, ObservableObject {
     func toggleStopwatch() { isStopwatchRunning ? stopStopwatch() : startStopwatch() }
 
     private func beginDiveIfNeeded() {
-        guard !isDiveActive else { return }
+        guard !isDiveActive, !isFinalizingDive else { return }
         gpsManager.start()
         isDiveActive = true
         sessionStart = Date()

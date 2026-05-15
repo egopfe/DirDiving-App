@@ -18,6 +18,9 @@ enum WatchDiveSyncCodec {
     }
 
     static func makePayload(session: DiveSession) throws -> [String: Any] {
+        guard WatchSyncAuth.hasPeerSecret() else {
+            throw WatchDiveSyncError.missingPeerSecret
+        }
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         let body = try encoder.encode(session)
@@ -66,10 +69,12 @@ enum WatchDiveSyncCodec {
 
 enum WatchDiveSyncError: LocalizedError {
     case payloadTooLarge
+    case missingPeerSecret
 
     var errorDescription: String? {
         switch self {
         case .payloadTooLarge: return "Payload sync troppo grande."
+        case .missingPeerSecret: return "Chiave sync companion non ancora disponibile."
         }
     }
 }

@@ -8,8 +8,9 @@ final class AscentRateSettingsStore: ObservableObject {
     }
 
     private let defaults: UserDefaults
-    private let key = "dirdiving_ascent_rate_limits"
+    private let key = "dirmotion_ascent_rate_limits"
     private let cloudSync = CloudSyncStore()
+    private var cloudObserver: NSObjectProtocol?
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -21,10 +22,28 @@ final class AscentRateSettingsStore: ObservableObject {
         } else {
             limits = .standard
         }
+        cloudObserver = NotificationCenter.default.addObserver(
+            forName: .cloudSyncDidChangeExternally,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in self?.reloadFromCloud() }
+        }
+    }
+
+    deinit {
+        if let cloudObserver {
+            NotificationCenter.default.removeObserver(cloudObserver)
+        }
     }
 
     func resetToStandard() {
         limits = .standard
+    }
+
+    private func reloadFromCloud() {
+        guard let cloudLimits = cloudSync.load(AscentRateLimits.self, forKey: key) else { return }
+        limits = cloudLimits
     }
 
     private func save() {

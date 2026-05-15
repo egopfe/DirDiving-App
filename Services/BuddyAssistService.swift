@@ -738,6 +738,13 @@ extension BuddyAssistService: BuddyAssistPeripheralDelegate {
             remotePeripheralId: central.identifier.uuidString
         )
     }
+
+    func peripheralService(_ service: BuddyAssistPeripheralService, didReceiveMessage data: Data, from central: CBCentral) {
+        _ = service
+        _ = central
+        guard let message = authenticatedMessage(from: data) else { return }
+        append(message, direction: .received)
+    }
 }
 
 private extension Data {
