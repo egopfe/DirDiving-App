@@ -23,6 +23,8 @@ struct ModeSelectionView: View {
                         modeCard(mode)
                     }
 
+                    ExperimentalConceptDeckView()
+
                     DivePanel(stroke: DiveUI.yellow) {
                         HStack(alignment: .top, spacing: 8) {
                             Image(systemName: "exclamationmark.triangle.fill")
