@@ -24,4 +24,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
     var notes: String?
     var gasLabel: DiveGasLabel
     var sacLitersMinute: Double?
+
+    static let demoNotesLabel = "Demo dive"
+
+    var isDemoDive: Bool { notes == Self.demoNotesLabel }
 }

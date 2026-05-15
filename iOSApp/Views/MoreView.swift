@@ -36,6 +36,21 @@ struct MoreView: View {
                             }
                             .buttonStyle(.plain)
                         }
+                        DIRCard("REVIEWER", icon: "books.vertical") {
+                            Toggle(isOn: Binding(
+                                get: { logStore.includeDemoLogbook },
+                                set: { logStore.includeDemoLogbook = $0 }
+                            )) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Logbook dimostrativo")
+                                        .foregroundStyle(.white)
+                                    Text("Carica 5 immersioni demo per revisione App Store.")
+                                        .font(.caption2)
+                                        .foregroundStyle(DIRTheme.muted)
+                                }
+                            }
+                            .tint(DIRTheme.cyan)
+                        }
                         DIRCard("EXPORT", icon: "square.and.arrow.up") {
                             row("Subsurface", "CSV")
                             row("Bundle", "com.egopfe.dirdiving.ios")
