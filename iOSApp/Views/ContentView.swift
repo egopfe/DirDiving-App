@@ -12,5 +12,7 @@ struct ContentView: View {
             MoreView().tabItem { Label("Altro", systemImage: "ellipsis") }
         }
         .tint(DIRTheme.cyan)
+        .toolbarBackground(DIRTheme.background, for: .tabBar)
+        .toolbarBackground(.visible, for: .tabBar)
     }
 }

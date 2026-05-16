@@ -7,16 +7,21 @@ struct EquipmentView: View {
                 DIRBackground()
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Attrezzatura")
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                        DIRCard("PIANIFICAZIONE COMPLETA", icon: "shippingbox.fill") {
+                        VStack(alignment: .leading, spacing: 7) {
+                            Text("Attrezzatura")
+                                .font(.system(size: 30, weight: .bold, design: .rounded))
+                                .foregroundStyle(.white)
+                            Text("Configuration, checklist and field-ready equipment overview")
+                                .font(.callout)
+                                .foregroundStyle(DIRTheme.muted)
+                        }
+                        DIRCard("PIANIFICAZIONE COMPLETA", icon: "shippingbox.fill", accent: DIRTheme.cyan) {
                             equipmentRow("Bombole", "2 x 12 L")
                             equipmentRow("Configurazione", "Backmount DIR")
                             equipmentRow("Gas default", "TRIMIX / EAN50 / EAN80")
                             equipmentRow("SAC default", "18 l/min")
                         }
-                        DIRCard("CHECKLIST", icon: "checklist") {
+                        DIRCard("CHECKLIST", icon: "checklist", accent: DIRTheme.green) {
                             equipmentRow("Backup mask", "Ready")
                             equipmentRow("Spool / SMB", "Ready")
                             equipmentRow("Computer backup", "Ready")

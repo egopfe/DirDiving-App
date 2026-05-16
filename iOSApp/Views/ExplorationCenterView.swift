@@ -12,6 +12,7 @@ struct ExplorationCenterView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         header
                         mapCard
+                        ExperimentalFutureConceptsView()
                         waypointPlanner
                         routeCard
                         apneaAnalytics
@@ -30,16 +31,16 @@ struct ExplorationCenterView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text("Explore")
-                .font(.system(size: 28, weight: .bold, design: .rounded))
+                .font(.system(size: 30, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
-            Text("Snorkeling mappe, route, waypoint e apnea analytics")
+            Text("Premium experimental dashboard for maps, routes, overlays and apnea concepts")
                 .font(.callout)
                 .foregroundStyle(DIRTheme.muted)
         }
     }
 
     private var mapCard: some View {
-        DIRCard("Snorkeling Map", icon: "map") {
+        DIRCard("Snorkeling Map", icon: "map", accent: DIRTheme.cyan) {
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(LinearGradient(colors: [Color(red: 0.0, green: 0.14, blue: 0.18), Color.black], startPoint: .topLeading, endPoint: .bottomTrailing))
@@ -73,7 +74,7 @@ struct ExplorationCenterView: View {
     }
 
     private var waypointPlanner: some View {
-        DIRCard("Waypoint Planning", icon: "mappin.and.ellipse") {
+        DIRCard("Waypoint Planning", icon: "mappin.and.ellipse", accent: DIRTheme.cyan) {
             VStack(spacing: 10) {
                 HStack {
                     Button {
@@ -106,7 +107,7 @@ struct ExplorationCenterView: View {
     }
 
     private var routeCard: some View {
-        DIRCard("Route Planning", icon: "point.topleft.down.curvedto.point.bottomright.up") {
+        DIRCard("Route Planning", icon: "point.topleft.down.curvedto.point.bottomright.up", accent: DIRTheme.green) {
             VStack(spacing: 12) {
                 HStack {
                     DIRMetricTile(title: "Waypoint", value: "\(store.route.waypoints.count)", color: DIRTheme.cyan)
@@ -121,7 +122,7 @@ struct ExplorationCenterView: View {
     }
 
     private var apneaAnalytics: some View {
-        DIRCard("Apnea Analytics", icon: "lungs") {
+        DIRCard("Apnea Analytics", icon: "lungs", accent: DIRTheme.yellow) {
             VStack(spacing: 12) {
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                     ForEach(store.apneaSummaries) { item in
@@ -149,7 +150,7 @@ struct ExplorationCenterView: View {
     }
 
     private var syncAndSettings: some View {
-        DIRCard("Sync & Warning Settings", icon: "applewatch") {
+        DIRCard("Sync & Warning Settings", icon: "applewatch", accent: DIRTheme.green) {
             VStack(spacing: 10) {
                 settingRow("Apnea warning", value: "\(Int(store.settings.apneaDurationWarningSeconds)) s")
                 settingRow("Recovery ratio", value: String(format: "%.1fx", store.settings.recoveryRatio))
@@ -165,7 +166,7 @@ struct ExplorationCenterView: View {
     }
 
     private var exportCard: some View {
-        DIRCard("Export", icon: "square.and.arrow.up") {
+        DIRCard("Export", icon: "square.and.arrow.up", accent: DIRTheme.cyan) {
             VStack(spacing: 10) {
                 HStack {
                     exportButton("GPX", action: store.exportGPX)

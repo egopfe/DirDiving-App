@@ -35,9 +35,9 @@ struct BuddyExperimentalView: View {
         HStack(alignment: .firstTextBaseline) {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Buddy Lab")
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
-                Text("Experimental iOS companion")
+                Text("Experimental iOS companion for buddy state, messages and direction previews")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(DIRTheme.cyan)
             }
@@ -47,7 +47,7 @@ struct BuddyExperimentalView: View {
     }
 
     private var securePairingCard: some View {
-        DIRCard("SECURE PAIRING", icon: "checkmark.shield") {
+        DIRCard("SECURE PAIRING", icon: "checkmark.shield", accent: DIRTheme.green) {
             VStack(spacing: 12) {
                 HStack {
                     labelValue("Buddy", store.status.buddyName)
@@ -71,7 +71,7 @@ struct BuddyExperimentalView: View {
     }
 
     private var linkCard: some View {
-        DIRCard("BUDDY LINK", icon: "dot.radiowaves.left.and.right") {
+        DIRCard("BUDDY LINK", icon: "dot.radiowaves.left.and.right", accent: store.status.signalState.color) {
             VStack(spacing: 12) {
                 HStack(spacing: 0) {
                     DIRMetricTile(title: "Stato", value: store.status.linkState.rawValue, color: store.status.linkState == .online ? DIRTheme.green : DIRTheme.red)
@@ -94,7 +94,7 @@ struct BuddyExperimentalView: View {
     }
 
     private var compassCard: some View {
-        DIRCard("ULTIMA DIREZIONE PLAUSIBILE", icon: "safari") {
+        DIRCard("ULTIMA DIREZIONE PLAUSIBILE", icon: "safari", accent: DIRTheme.cyan) {
             VStack(spacing: 0) {
                 directionRow("Heading", degrees: store.status.headingDegrees, color: DIRTheme.cyan)
                 Divider().overlay(DIRTheme.hairline)
@@ -106,7 +106,7 @@ struct BuddyExperimentalView: View {
     }
 
     private var messagesCard: some View {
-        DIRCard("PRESET MESSAGES", icon: "message") {
+        DIRCard("PRESET MESSAGES", icon: "message", accent: DIRTheme.yellow) {
             VStack(alignment: .leading, spacing: 12) {
                 LazyVGrid(columns: messageColumns, spacing: 10) {
                     ForEach(store.preparedMessages) { message in
@@ -137,7 +137,7 @@ struct BuddyExperimentalView: View {
     }
 
     private var syncCard: some View {
-        DIRCard("WATCH EXPERIMENTAL SYNC", icon: "applewatch") {
+        DIRCard("WATCH EXPERIMENTAL SYNC", icon: "applewatch", accent: DIRTheme.cyan) {
             VStack(alignment: .leading, spacing: 10) {
                 labelValue("Branch Watch", "codex/experimental-features")
                 labelValue("Branch iOS", "codex/ios-experimental-features")

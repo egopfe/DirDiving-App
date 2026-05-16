@@ -11,9 +11,14 @@ struct PlannerView: View {
                 DIRBackground()
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Planner")
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
+                        VStack(alignment: .leading, spacing: 7) {
+                            Text("Planner")
+                                .font(.system(size: 30, weight: .bold, design: .rounded))
+                                .foregroundStyle(.white)
+                            Text("Gas, deco profile and Buhlmann presentation with high-contrast technical cards")
+                                .font(.callout)
+                                .foregroundStyle(DIRTheme.muted)
+                        }
                         modePicker
                         profileCard
                         gasCards
@@ -61,7 +66,7 @@ struct PlannerView: View {
     }
 
     private var profileCard: some View {
-        DIRCard("Profilo Immersione", icon: nil) {
+        DIRCard("Profilo Immersione", icon: nil, accent: DIRTheme.cyan) {
             VStack(spacing: 0) {
                 plannerField("Profondita Massima", value: $store.input.plannedDepthMeters, unit: "m", step: 1)
                 Divider().overlay(DIRTheme.hairline)
@@ -102,7 +107,7 @@ struct PlannerView: View {
     }
 
     private var cylinderCard: some View {
-        DIRCard("BOMBOLA E CONSUMO", icon: "fuelpump") {
+        DIRCard("BOMBOLA E CONSUMO", icon: "fuelpump", accent: DIRTheme.cyan) {
             VStack(spacing: 0) {
                 plannerField("Volume", value: $store.input.cylinder.volumeLiters, unit: "L", step: 1)
                 Divider().overlay(DIRTheme.hairline)
@@ -133,7 +138,7 @@ struct PlannerView: View {
     }
 
     private var technicalAnalysisCard: some View {
-        DIRCard("DENSITA / END", icon: "gauge") {
+        DIRCard("DENSITA / END", icon: "gauge", accent: DIRTheme.yellow) {
             VStack(spacing: 0) {
                 HStack(spacing: 0) {
                     DIRMetricTile(title: "PPO2", value: Formatters.one(store.analysis.ppO2AtDepth), color: warningColor(ppO2: store.analysis.ppO2AtDepth))
@@ -155,7 +160,7 @@ struct PlannerView: View {
     }
 
     private var reserveCard: some View {
-        DIRCard("GAS RESERVE", icon: "gauge") {
+        DIRCard("GAS RESERVE", icon: "gauge", accent: DIRTheme.green) {
             VStack(spacing: 0) {
                 HStack(spacing: 0) {
                     DIRMetricTile(title: "Disponibile", value: Formatters.zero(store.input.availableGasLiters), unit: "L", color: DIRTheme.green)
@@ -179,7 +184,7 @@ struct PlannerView: View {
         if store.analysis.warnings.isEmpty {
             DIRWarningBox(text: "Planner informativo: verifica sempre piano, gas e procedure con training, team e strumenti certificati.")
         } else {
-            DIRCard("WARNING", icon: "exclamationmark.triangle.fill") {
+            DIRCard("WARNING", icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
                 VStack(alignment: .leading, spacing: 8) {
                     ForEach(store.analysis.warnings, id: \.self) { warning in
                         HStack(alignment: .top, spacing: 8) {
@@ -198,7 +203,7 @@ struct PlannerView: View {
     }
 
     private var teamPreviewCard: some View {
-        DIRCard("TEAM GAS MATCHING", icon: "person.2") {
+        DIRCard("TEAM GAS MATCHING", icon: "person.2", accent: DIRTheme.cyan) {
             VStack(spacing: 10) {
                 ForEach(store.input.teamMembers) { member in
                     HStack {
@@ -234,7 +239,7 @@ struct PlannerView: View {
                 .foregroundStyle(.black)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-                .background(RoundedRectangle(cornerRadius: 7).fill(DIRTheme.cyan))
+                .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.cyan).shadow(color: DIRTheme.cyan.opacity(0.28), radius: 14, x: 0, y: 8))
         }
         .buttonStyle(.plain)
         .padding(.top, 4)
@@ -291,7 +296,7 @@ struct GasMixCard: View {
     let showsHelium: Bool
 
     var body: some View {
-        DIRCard {
+        DIRCard(accent: accent) {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
                     Text(title)
@@ -503,7 +508,7 @@ struct PlanResultView: View {
     }
 
     private var ascentTable: some View {
-        DIRCard("PIANO DI RISALITA", icon: nil) {
+        DIRCard("PIANO DI RISALITA", icon: nil, accent: DIRTheme.cyan) {
             VStack(spacing: 9) {
                 tableRow(["Profondita", "Tempo", "Gas", "PPO2"], isHeader: true)
                 tableRow(["40.0 m", "20 min", "TRIMIX 18/45", "1.30"])
@@ -521,7 +526,7 @@ struct PlanResultView: View {
     }
 
     private var segmentTimeline: some View {
-        DIRCard("TIMELINE MULTI-SEGMENTO", icon: "list.bullet.rectangle") {
+        DIRCard("TIMELINE MULTI-SEGMENTO", icon: "list.bullet.rectangle", accent: DIRTheme.cyan) {
             VStack(spacing: 8) {
                 tableRow(["Tipo", "Prof.", "Min", "Gas"], isHeader: true)
                 ForEach(store.plan.segments) { segment in
@@ -537,7 +542,7 @@ struct PlanResultView: View {
     }
 
     private var gfComparisonCard: some View {
-        DIRCard("COMPARAZIONE GF", icon: "chart.line.uptrend.xyaxis") {
+        DIRCard("COMPARAZIONE GF", icon: "chart.line.uptrend.xyaxis", accent: DIRTheme.green) {
             VStack(spacing: 8) {
                 tableRow(["GF", "TTS", "Stops", "Nota"], isHeader: true)
                 ForEach(store.plan.gfComparisons) { comparison in
@@ -553,7 +558,7 @@ struct PlanResultView: View {
     }
 
     private var contingencyCard: some View {
-        DIRCard("CONTINGENZE", icon: "exclamationmark.triangle") {
+        DIRCard("CONTINGENZE", icon: "exclamationmark.triangle", accent: DIRTheme.yellow) {
             VStack(spacing: 10) {
                 ForEach(store.plan.contingencyPlans) { plan in
                     VStack(alignment: .leading, spacing: 5) {
@@ -578,7 +583,7 @@ struct PlanResultView: View {
     }
 
     private var teamMatchCard: some View {
-        DIRCard("TEAM GAS MATCH", icon: "person.2") {
+        DIRCard("TEAM GAS MATCH", icon: "person.2", accent: DIRTheme.cyan) {
             VStack(spacing: 8) {
                 tableRow(["Diver", "SAC", "Gas", "Status"], isHeader: true)
                 ForEach(store.plan.teamMatches) { match in
@@ -594,7 +599,7 @@ struct PlanResultView: View {
     }
 
     private var briefingCard: some View {
-        DIRCard("BRIEFING", icon: "doc.text") {
+        DIRCard("BRIEFING", icon: "doc.text", accent: DIRTheme.green) {
             VStack(alignment: .leading, spacing: 8) {
                 ForEach(store.plan.briefingLines, id: \.self) { line in
                     HStack(alignment: .top, spacing: 8) {
@@ -628,7 +633,7 @@ struct PlanResultView: View {
     }
 
     private var buhlmannChart: some View {
-        DIRCard("CURVA BUHLMANN ZH-L16C", icon: nil) {
+        DIRCard("CURVA BUHLMANN ZH-L16C", icon: nil, accent: DIRTheme.cyan) {
             Chart(store.buhlmann.curve) { point in
                 LineMark(
                     x: .value("Minutes", point.ndlMinutes),
