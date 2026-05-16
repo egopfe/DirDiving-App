@@ -7,8 +7,10 @@ final class DiveLogStore: ObservableObject {
     @Published private(set) var loadErrorMessage: String?
     private let fileName = "dirdiving_sessions.json"
     private let cloudKey = "dirdiving_watch_dive_sessions"
+    private let deletedCloudKey = "dirdiving_watch_deleted_session_ids"
     private let maxSessions = 40
     private let cloudSync = CloudSyncStore()
+    private var deletedSessionIDs: Set<UUID> = []
 
     init() {
         load()
@@ -22,13 +24,16 @@ final class DiveLogStore: ObservableObject {
     }
 
     func reloadFromPersistence() {
+        deletedSessionIDs = Set(cloudSync.load([UUID].self, forKey: deletedCloudKey) ?? Array(deletedSessionIDs))
         let localSessions = loadLocalSessions()
         let cloudSessions = cloudSync.load([DiveSession].self, forKey: cloudKey)
         sessions = mergeSessions(local: localSessions, cloud: cloudSessions)
+            .filter { !deletedSessionIDs.contains($0.id) }
             .sorted { $0.startDate > $1.startDate }
     }
 
     func add(_ session: DiveSession) {
+        guard !deletedSessionIDs.contains(session.id) else { return }
         sessions.insert(session, at: 0)
         sessions = Array(sessions.sorted { $0.startDate > $1.startDate }.prefix(maxSessions))
         save()
@@ -37,19 +42,25 @@ final class DiveLogStore: ObservableObject {
 
     func delete(id: UUID) {
         guard let index = sessions.firstIndex(where: { $0.id == id }) else { return }
+        deletedSessionIDs.insert(id)
         sessions.remove(at: index)
         save()
     }
 
     func delete(at offsets: IndexSet) {
+        for index in offsets {
+            deletedSessionIDs.insert(sessions[index].id)
+        }
         sessions.remove(atOffsets: offsets)
         save()
     }
 
     private func load() {
+        deletedSessionIDs = Set(cloudSync.load([UUID].self, forKey: deletedCloudKey) ?? [])
         let localSessions = loadLocalSessions()
         let cloudSessions = cloudSync.load([DiveSession].self, forKey: cloudKey)
         sessions = mergeSessions(local: localSessions, cloud: cloudSessions)
+            .filter { !deletedSessionIDs.contains($0.id) }
             .sorted { $0.startDate > $1.startDate }
         if !sessions.isEmpty {
             save()
@@ -93,6 +104,7 @@ final class DiveLogStore: ObservableObject {
             let data = try encoder.encode(sessions)
             try data.write(to: fileURL(), options: [.atomic, .completeFileProtection])
             cloudSync.save(sessions, forKey: cloudKey)
+            cloudSync.save(Array(deletedSessionIDs), forKey: deletedCloudKey)
         } catch { print("Save error: \(error.localizedDescription)") }
     }
 

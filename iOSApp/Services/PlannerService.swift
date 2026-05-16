@@ -4,6 +4,7 @@ enum PlannerService {
     static func makePlan(input: GasPlanInput) -> DivePlanResult {
         let ndl = BuhlmannPlanner.plan(depthMeters: input.plannedDepthMeters, o2Fraction: input.bottomGas.oxygen).ndlMinutes
         let needsDeco = input.plannedBottomMinutes > ndl || input.plannedDepthMeters >= 35
+        let analysis = GasPlanningService.analyze(input: input)
         let stops: [DecoStop]
         if needsDeco {
             stops = [
@@ -17,8 +18,23 @@ enum PlannerService {
             stops = [DecoStop(depthMeters: 5, minutes: 3, gas: input.bottomGas.label, ppO2: input.bottomGas.oxygen * 1.5)]
         }
         let ttr = Int(input.plannedBottomMinutes) + stops.map(\.minutes).reduce(0,+) + Int(input.plannedDepthMeters / 10.0)
-        let cns = min(100, input.plannedBottomMinutes * max(0, input.bottomGas.oxygen * input.ambientPressureBar - 0.5) * 2.2)
-        let otu = max(0, input.plannedBottomMinutes * pow(max(0.5, input.bottomGas.oxygen * input.ambientPressureBar) - 0.5, 0.83) * 5)
-        return DivePlanResult(ndlMinutes: ndl, ttrMinutes: ttr, decoStops: stops, cnsPercent: cns, otu: otu)
+        let segments = GasPlanningService.profileSegments(input: input, stops: stops)
+        let gfComparisons = GasPlanningService.gfComparisons(input: input, baseTTS: ttr, stopCount: stops.count)
+        let contingencies = GasPlanningService.contingencyPlans(input: input, baseAnalysis: analysis, baseTTS: ttr)
+        let teamMatches = GasPlanningService.teamGasMatches(input: input, minimumGasLiters: analysis.rockBottomLiters)
+        let briefing = GasPlanningService.briefingLines(input: input, analysis: analysis, tts: ttr, stops: stops)
+        return DivePlanResult(
+            ndlMinutes: ndl,
+            ttrMinutes: ttr,
+            decoStops: stops,
+            cnsPercent: analysis.cnsPercent,
+            otu: analysis.otu,
+            gasAnalysis: analysis,
+            segments: segments,
+            gfComparisons: gfComparisons,
+            contingencyPlans: contingencies,
+            teamMatches: teamMatches,
+            briefingLines: briefing
+        )
     }
 }

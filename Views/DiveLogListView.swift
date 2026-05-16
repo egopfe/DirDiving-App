@@ -95,5 +95,4 @@ struct DiveLogListView: View {
             .frame(width: 72)
         }
     }
-}
-
+}\n

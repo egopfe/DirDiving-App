@@ -335,5 +335,4 @@ struct BuddyAssistView: View {
         guard let degrees else { return "--" }
         return "\(Int(degrees.rounded()))\u{00B0}"
     }
-}
-
+}\n

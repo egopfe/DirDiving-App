@@ -3,11 +3,13 @@ import SwiftUI
 struct DIRCard<Content: View>: View {
     let title: String?
     let icon: String?
+    let accent: Color?
     @ViewBuilder let content: Content
 
-    init(_ title: String? = nil, icon: String? = nil, @ViewBuilder content: () -> Content) {
+    init(_ title: String? = nil, icon: String? = nil, accent: Color? = nil, @ViewBuilder content: () -> Content) {
         self.title = title
         self.icon = icon
+        self.accent = accent
         self.content = content()
     }
 
@@ -15,8 +17,15 @@ struct DIRCard<Content: View>: View {
         VStack(alignment: .leading, spacing: 14) {
             if let title {
                 HStack {
-                    if let icon { Image(systemName: icon).foregroundStyle(DIRTheme.cyan) }
-                    Text(title).font(.headline).foregroundStyle(.white)
+                    if let icon {
+                        Image(systemName: icon)
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(accent ?? DIRTheme.cyan)
+                    }
+                    Text(title.uppercased())
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .tracking(0.8)
+                        .foregroundStyle(.white)
                     Spacer()
                 }
             }
@@ -25,8 +34,34 @@ struct DIRCard<Content: View>: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
-                .fill(DIRTheme.surface.opacity(0.86))
-                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.hairline, lineWidth: 1))
+                .fill(
+                    LinearGradient(
+                        colors: [DIRTheme.surface2.opacity(0.84), DIRTheme.surface.opacity(0.96)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(alignment: .topLeading) {
+                    RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
+                        .fill(
+                            LinearGradient(
+                                colors: [.white.opacity(0.08), .clear],
+                                startPoint: .topLeading,
+                                endPoint: .center
+                            )
+                        )
+                        .blendMode(.screen)
+                }
+                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(accent.map { $0.opacity(0.5) } ?? DIRTheme.hairline, lineWidth: 1))
+                .overlay(alignment: .leading) {
+                    if let accent {
+                        RoundedRectangle(cornerRadius: 2)
+                            .fill(accent)
+                            .frame(width: 3)
+                            .padding(.vertical, 10)
+                    }
+                }
+                .shadow(color: (accent ?? DIRTheme.cyan).opacity(0.12), radius: 16, x: 0, y: 10)
         )
     }
 }

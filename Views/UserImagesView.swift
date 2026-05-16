@@ -80,5 +80,4 @@ struct UserImagesView: View {
             .padding(6)
         }
     }
-}
-
+}\n

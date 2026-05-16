@@ -115,5 +115,4 @@ struct DiveDetailView: View {
         }
         .font(.caption2.bold())
     }
-}
-
+}\n
