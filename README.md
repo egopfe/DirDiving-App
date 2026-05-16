@@ -458,8 +458,15 @@ La specifica Snorkeling sperimentale e in:
 Docs/SNORKELING_EXPERIMENTAL_SPEC.md
 ```
 
+La specifica Apnea sperimentale e in:
+
+```text
+Docs/APNEA_EXPERIMENTAL_SPEC.md
+```
+
 ## iOS Companion Roadmap
 
+- Mantenere `Apnea Review` come card UI-only finche i record Apnea Watch non vengono sincronizzati con un modello dedicato.
 - Collegare POI Watch a payload sync leggero e enrichment iOS.
 - Introdurre workflow MapLibre/OpenSeaMap/MBTiles sul companion iOS dopo valutazione licenze e prestazioni.
 - Mantenere logbook, planner, export e sync WatchConnectivity separati dai runtime sperimentali Watch.
