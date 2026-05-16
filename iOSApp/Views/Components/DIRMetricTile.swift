@@ -12,14 +12,14 @@ struct DIRMetricTile: View {
             HStack {
                 if let icon { Image(systemName: icon).font(.caption.weight(.bold)).foregroundStyle(color) }
                 Text(title.uppercased())
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .font(.system(size: 10, weight: .bold, design: .rounded))
                     .foregroundStyle(DIRTheme.muted)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
             }
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text(value)
-                    .font(.system(size: 24, weight: .semibold, design: .rounded))
+                    .font(.system(size: 25, weight: .bold, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(color)
                     .lineLimit(1)

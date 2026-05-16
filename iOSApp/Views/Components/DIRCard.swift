@@ -36,11 +36,22 @@ struct DIRCard<Content: View>: View {
             RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
                 .fill(
                     LinearGradient(
-                        colors: [DIRTheme.surface2.opacity(0.76), DIRTheme.surface.opacity(0.92)],
+                        colors: [DIRTheme.surface2.opacity(0.84), DIRTheme.surface.opacity(0.96)],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
                 )
+                .overlay(alignment: .topLeading) {
+                    RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
+                        .fill(
+                            LinearGradient(
+                                colors: [.white.opacity(0.08), .clear],
+                                startPoint: .topLeading,
+                                endPoint: .center
+                            )
+                        )
+                        .blendMode(.screen)
+                }
                 .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(accent.map { $0.opacity(0.5) } ?? DIRTheme.hairline, lineWidth: 1))
                 .overlay(alignment: .leading) {
                     if let accent {
@@ -50,7 +61,7 @@ struct DIRCard<Content: View>: View {
                             .padding(.vertical, 10)
                     }
                 }
-                .shadow(color: (accent ?? DIRTheme.cyan).opacity(0.08), radius: 12, x: 0, y: 8)
+                .shadow(color: (accent ?? DIRTheme.cyan).opacity(0.12), radius: 16, x: 0, y: 10)
         )
     }
 }

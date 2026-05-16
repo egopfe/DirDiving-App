@@ -11,7 +11,9 @@ struct ExplorationCenterView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         header
+                        dashboardHero
                         mapCard
+                        conceptStatusStrip
                         ExperimentalFutureConceptsView()
                         waypointPlanner
                         routeCard
@@ -29,23 +31,45 @@ struct ExplorationCenterView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text("Explore")
-                .font(.system(size: 30, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("Explore Lab")
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                Spacer()
+                mapBadge("EXPERIMENTAL", color: DIRTheme.yellow)
+            }
             Text("Premium experimental dashboard for maps, routes, overlays and apnea concepts")
                 .font(.callout)
                 .foregroundStyle(DIRTheme.muted)
+            HStack(spacing: 8) {
+                mapBadge("UI MOCKUPS", color: DIRTheme.cyan)
+                mapBadge("NO BACKEND", color: DIRTheme.green)
+                mapBadge("TODO ONLY", color: DIRTheme.orange)
+            }
+        }
+    }
+
+    private var dashboardHero: some View {
+        DIRCard("UNDERWATER EXPLORATION CONSOLE", icon: "sparkles", accent: DIRTheme.cyan) {
+            // TODO: Visual-only experimental dashboard. Do not connect AI, sync, networking or analytics engines here.
+            HStack(spacing: 12) {
+                heroMetric("Overlays", "7", DIRTheme.cyan, "square.3.layers.3d")
+                heroMetric("Route IQ", "--", DIRTheme.yellow, "point.topleft.down.curvedto.point.bottomright.up")
+                heroMetric("Readiness", "--%", DIRTheme.green, "bolt.heart")
+            }
         }
     }
 
     private var mapCard: some View {
         DIRCard("Snorkeling Map", icon: "map", accent: DIRTheme.cyan) {
             ZStack {
-                RoundedRectangle(cornerRadius: 8)
+                RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
                     .fill(LinearGradient(colors: [Color(red: 0.0, green: 0.14, blue: 0.18), Color.black], startPoint: .topLeading, endPoint: .bottomTrailing))
                     .frame(height: 230)
                     .overlay(gridOverlay)
+                    .overlay(mapBathymetryOverlay)
+                    .overlay(mapHotspotOverlay)
                 routeLine
                 ForEach(store.route.waypoints) { waypoint in
                     waypointPin(waypoint)
@@ -70,6 +94,16 @@ struct ExplorationCenterView: View {
                 }
                 .padding(12)
             }
+            .clipShape(RoundedRectangle(cornerRadius: DIRTheme.cardRadius))
+            .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.cyan.opacity(0.28), lineWidth: 1))
+        }
+    }
+
+    private var conceptStatusStrip: some View {
+        HStack(spacing: 12) {
+            conceptStatus("Marine", "Layers", DIRTheme.green, "leaf.fill")
+            conceptStatus("Bathymetry", "Mock", DIRTheme.cyan, "chart.xyaxis.line")
+            conceptStatus("Community", "Soon", DIRTheme.yellow, "person.3.fill")
         }
     }
 
@@ -197,15 +231,50 @@ struct ExplorationCenterView: View {
     }
 
     private var routeLine: some View {
-        Path { path in
+        let path = Path { path in
             let points = normalizedRoutePoints()
             guard let first = points.first else { return }
             path.move(to: first)
             for point in points.dropFirst() { path.addLine(to: point) }
         }
-        .stroke(DIRTheme.cyan, style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
+
+        return ZStack {
+            path
+                .stroke(DIRTheme.cyan.opacity(0.18), style: StrokeStyle(lineWidth: 11, lineCap: .round, lineJoin: .round))
+            path
+                .stroke(DIRTheme.cyan, style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
+                .shadow(color: DIRTheme.cyan.opacity(0.42), radius: 10)
+        }
         .frame(height: 230)
         .padding(.horizontal, 24)
+    }
+
+    private var mapBathymetryOverlay: some View {
+        ZStack {
+            ForEach(0..<5) { index in
+                RoundedRectangle(cornerRadius: CGFloat(34 + index * 10))
+                    .stroke(DIRTheme.cyan.opacity(0.055), lineWidth: 1)
+                    .frame(width: CGFloat(112 + index * 48), height: CGFloat(54 + index * 26))
+                    .rotationEffect(.degrees(Double(index * 7 - 10)))
+                    .offset(x: CGFloat(index * 18 - 28), y: CGFloat(index * -7 + 12))
+            }
+        }
+    }
+
+    private var mapHotspotOverlay: some View {
+        ZStack {
+            Circle()
+                .fill(DIRTheme.orange.opacity(0.16))
+                .frame(width: 90, height: 90)
+                .blur(radius: 12)
+                .offset(x: -82, y: 34)
+            Circle()
+                .fill(DIRTheme.green.opacity(0.12))
+                .frame(width: 120, height: 120)
+                .blur(radius: 16)
+                .offset(x: 72, y: -28)
+        }
+        .blendMode(.plusLighter)
     }
 
     private func waypointPin(_ waypoint: ExplorationWaypoint) -> some View {
@@ -245,6 +314,45 @@ struct ExplorationCenterView: View {
         }
         .padding(10)
         .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface2.opacity(0.55)))
+    }
+
+    private func heroMetric(_ title: String, _ value: String, _ color: Color, _ icon: String) -> some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.headline.weight(.bold))
+                .foregroundStyle(color)
+            Text(value)
+                .font(.title2.monospacedDigit().weight(.bold))
+                .foregroundStyle(.white)
+            Text(title.uppercased())
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(DIRTheme.muted)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .background(RoundedRectangle(cornerRadius: DIRTheme.compactRadius).fill(color.opacity(0.11)).overlay(RoundedRectangle(cornerRadius: DIRTheme.compactRadius).stroke(color.opacity(0.34), lineWidth: 1)))
+    }
+
+    private func conceptStatus(_ title: String, _ value: String, _ color: Color, _ icon: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(color)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title.uppercased())
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(DIRTheme.muted)
+                Text(value)
+                    .font(.callout.weight(.bold))
+                    .foregroundStyle(.white)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity)
+        .background(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).fill(DIRTheme.surface.opacity(0.74)).overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(color.opacity(0.34), lineWidth: 1)))
     }
 
     private func settingRow(_ title: String, value: String) -> some View {
