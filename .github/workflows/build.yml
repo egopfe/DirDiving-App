@@ -24,7 +24,10 @@ jobs:
 
       - name: Build watchOS target
         run: |
-          if grep -q "DIRDiving Watch App" project.yml; then
+          BRANCH_NAME="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+          if [[ "$BRANCH_NAME" == *"ios"* || "$BRANCH_NAME" == *"iOS"* ]]; then
+            echo "Skipping watch build for iOS-focused branch: $BRANCH_NAME"
+          elif grep -q "DIRDiving Watch App" project.yml; then
             xcodebuild build \
               -project DIRDiving.xcodeproj \
               -scheme "DIRDiving Watch App" \
