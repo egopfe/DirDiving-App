@@ -110,14 +110,15 @@ final class BuddyAssistService: NSObject, ObservableObject {
 
     override init() {
         defaults = .standard
-        pairedBuddyIdentifier = defaults.string(forKey: pairedBuddyIdentifierKey)
+        let loadedPairedBuddyIdentifier = defaults.string(forKey: pairedBuddyIdentifierKey)
+        pairedBuddyIdentifier = loadedPairedBuddyIdentifier
         pairedBuddyName = defaults.string(forKey: pairedBuddyNameKey)
         pairingSessionId = defaults.string(forKey: pairingSessionIdKey)
         trustedBuddyFingerprint = defaults.string(forKey: trustedBuddyFingerprintKey)
         outgoingSequence = defaults.integer(forKey: outgoingSequenceKey)
         receivedEnvelopeKeys = Set(defaults.stringArray(forKey: replayEnvelopeKeysKey) ?? [])
-        if let pairedBuddyIdentifier {
-            trustedKeyData = secureStore.loadBuddyKey(for: pairedBuddyIdentifier)
+        if let loadedPairedBuddyIdentifier {
+            trustedKeyData = secureStore.loadBuddyKey(for: loadedPairedBuddyIdentifier)
         }
         super.init()
         peripheralRelay.delegate = self
