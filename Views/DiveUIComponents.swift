@@ -250,24 +250,26 @@ struct DiveStatusPill: View {
 }
 
 struct DiveOctopusLogo: View {
+    var accent: Color = DiveUI.blue
+
     var body: some View {
         ZStack {
             Circle()
-                .fill(DiveUI.blue.opacity(0.22))
+                .fill(accent.opacity(0.22))
                 .frame(width: 21, height: 21)
                 .offset(y: -4)
-                .shadow(color: DiveUI.blue.opacity(0.55), radius: 5, x: 0, y: 0)
+                .shadow(color: accent.opacity(0.55), radius: 5, x: 0, y: 0)
             Circle()
-                .stroke(DiveUI.blue, lineWidth: 2)
+                .stroke(accent, lineWidth: 2)
                 .frame(width: 21, height: 21)
                 .offset(y: -4)
             HStack(spacing: 5) {
-                Circle().fill(DiveUI.blue).frame(width: 3, height: 3)
-                Circle().fill(DiveUI.blue).frame(width: 3, height: 3)
+                Circle().fill(accent).frame(width: 3, height: 3)
+                Circle().fill(accent).frame(width: 3, height: 3)
             }
             .offset(y: -5)
             DiveOctopusTentacles()
-                .stroke(DiveUI.blue, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+                .stroke(accent, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
                 .frame(width: 31, height: 18)
                 .offset(y: 8)
         }
