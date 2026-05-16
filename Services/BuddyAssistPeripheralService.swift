@@ -8,6 +8,20 @@ protocol BuddyAssistPeripheralDelegate: AnyObject {
     func peripheralServiceDidBecomeReady(_ service: BuddyAssistPeripheralService)
 }
 
+#if os(watchOS)
+@MainActor
+final class BuddyAssistPeripheralService {
+    weak var delegate: BuddyAssistPeripheralDelegate?
+
+    var isReady: Bool { false }
+
+    func start() {}
+    func stop() {}
+    func sendHandshake(_ data: Data) {
+        _ = data
+    }
+}
+#else
 @MainActor
 final class BuddyAssistPeripheralService: NSObject {
     private var peripheralManager: CBPeripheralManager?
@@ -102,3 +116,4 @@ extension BuddyAssistPeripheralService: CBPeripheralManagerDelegate {
         }
     }
 }
+#endif
