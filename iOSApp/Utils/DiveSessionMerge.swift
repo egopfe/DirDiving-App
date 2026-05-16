@@ -4,33 +4,33 @@ enum DiveSessionMerge {
     static func preferred(_ local: DiveSession, _ remote: DiveSession) -> DiveSession {
         let winner = newer(local, remote)
         let loser = winner.id == local.id ? remote : local
+        let entryGPS = winner.entryGPS ?? loser.entryGPS
+        let exitGPS = winner.exitGPS ?? loser.exitGPS
         let siteName = winner.siteName ?? loser.siteName
         let buddy = winner.buddy ?? loser.buddy
         let notes = winner.notes ?? loser.notes
         let sacLitersMinute = winner.sacLitersMinute ?? loser.sacLitersMinute
-        let entryGPS = winner.entryGPS ?? loser.entryGPS
-        let exitGPS = winner.exitGPS ?? loser.exitGPS
+        let isDemo = winner.isDemo || loser.isDemo
         let useLoserSamples = loser.samples.count > winner.samples.count
-        let samples = useLoserSamples ? loser.samples : winner.samples
 
         return DiveSession(
             id: winner.id,
-            startDate: min(winner.startDate, loser.startDate),
-            endDate: max(winner.endDate, loser.endDate),
-            durationSeconds: max(winner.durationSeconds, loser.durationSeconds),
-            maxDepthMeters: max(winner.maxDepthMeters, loser.maxDepthMeters),
+            startDate: useLoserSamples ? min(winner.startDate, loser.startDate) : winner.startDate,
+            endDate: useLoserSamples ? max(winner.endDate, loser.endDate) : winner.endDate,
+            durationSeconds: useLoserSamples ? max(winner.durationSeconds, loser.durationSeconds) : winner.durationSeconds,
+            maxDepthMeters: useLoserSamples ? max(winner.maxDepthMeters, loser.maxDepthMeters) : winner.maxDepthMeters,
             avgDepthMeters: useLoserSamples ? loser.avgDepthMeters : winner.avgDepthMeters,
             avgWaterTemperatureCelsius: winner.avgWaterTemperatureCelsius ?? loser.avgWaterTemperatureCelsius,
-            ttv: max(winner.ttv, loser.ttv),
+            ttv: useLoserSamples ? max(winner.ttv, loser.ttv) : winner.ttv,
             entryGPS: entryGPS,
             exitGPS: exitGPS,
-            samples: samples,
+            samples: useLoserSamples ? loser.samples : winner.samples,
             siteName: siteName,
             buddy: buddy,
             notes: notes,
             gasLabel: winner.gasLabel,
             sacLitersMinute: sacLitersMinute,
-            isDemo: winner.isDemo || loser.isDemo
+            isDemo: isDemo
         )
     }
 

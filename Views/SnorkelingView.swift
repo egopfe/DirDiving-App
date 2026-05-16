@@ -59,8 +59,11 @@ struct SnorkelingView: View {
         DivePanel(stroke: DiveUI.green) {
             VStack(spacing: 8) {
                 HStack(alignment: .lastTextBaseline, spacing: 6) {
+                    Image(systemName: "timer")
+                        .font(.system(size: 16, weight: .black))
+                        .foregroundStyle(DiveUI.green)
                     Text(Formatters.time(exploration.runtimeSeconds))
-                        .font(.system(size: 42, weight: .black, design: .rounded))
+                        .font(.system(size: 44, weight: .black, design: .rounded))
                         .minimumScaleFactor(0.68)
                         .lineLimit(1)
                         .monospacedDigit()
@@ -89,7 +92,7 @@ struct SnorkelingView: View {
                     headingDegrees: compass.headingDegrees,
                     bearingDelta: bearingDelta,
                     accent: abs(bearingDelta) < 12 ? DiveUI.green : DiveUI.blue,
-                    size: 108
+                    size: 112
                 )
 
                 VStack(alignment: .leading, spacing: 7) {
@@ -164,6 +167,7 @@ struct SnorkelingView: View {
                 ZStack {
                     Circle()
                         .fill(color.opacity(0.14))
+                        .shadow(color: color.opacity(0.28), radius: 8, x: 0, y: 0)
                     Circle()
                         .stroke(color.opacity(0.78), lineWidth: 1)
                     Image(systemName: "arrow.uturn.backward")

@@ -70,8 +70,7 @@ enum WatchDiveSyncCodec {
     }
 
     private static func syncKey() -> SymmetricKey {
-        let peer = expectedWatchBundleID
-        return WatchSyncAuth.syncKey(peerBundleID: peer)
+        WatchSyncAuth.syncKey(peerBundleID: expectedWatchBundleID)
     }
 
     private static func verify(_ transport: Transport) -> Bool {
