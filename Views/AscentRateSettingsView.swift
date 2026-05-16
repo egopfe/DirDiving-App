@@ -85,4 +85,4 @@ struct AscentRateSettingsView: View {
         }
         .buttonStyle(.plain)
     }
-}\n
+}
