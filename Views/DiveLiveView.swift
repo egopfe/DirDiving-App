@@ -51,13 +51,8 @@ struct DiveLiveView: View {
 
     private var immersionStatus: some View {
         HStack(spacing: 8) {
-            ZStack {
-                Circle()
-                    .fill((dive.isDiveActive ? DiveUI.green : DiveUI.blue).opacity(0.14))
-                    .frame(width: 30, height: 30)
-                Image(systemName: "water.waves")
-                    .font(.system(size: 15, weight: .black))
-            }
+            Image(systemName: "water.waves")
+                .font(.title3.bold())
             Text(dive.isDiveActive ? "IN IMMERSIONE" : "PRONTO")
                 .font(.system(size: 18, weight: .bold, design: .rounded))
                 .lineLimit(1)
@@ -65,7 +60,7 @@ struct DiveLiveView: View {
             Spacer(minLength: 0)
             DiveStatusPill(dive.isDiveActive ? "LIVE" : "STANDBY", color: dive.isDiveActive ? DiveUI.green : DiveUI.blue)
         }
-        .foregroundStyle(dive.isDiveActive ? DiveUI.green : DiveUI.blue)
+        .foregroundStyle(DiveUI.green)
     }
 
     private var ttvRuntimePanel: some View {
@@ -84,11 +79,11 @@ struct DiveLiveView: View {
     private func dashboardValue(title: String, value: String, suffix: String, color: Color) -> some View {
         VStack(spacing: 2) {
             Text(title)
-                .font(.system(size: 11, weight: .black, design: .rounded))
-                .foregroundStyle(DiveUI.secondaryText)
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
             HStack(alignment: .lastTextBaseline, spacing: 4) {
                 Text(value)
-                    .font(.system(size: 36, weight: .black, design: .rounded))
+                    .font(.system(size: 34, weight: .bold, design: .rounded))
                     .minimumScaleFactor(0.68)
                     .lineLimit(1)
                     .monospacedDigit()
@@ -156,7 +151,7 @@ struct DiveLiveView: View {
         VStack(spacing: 2) {
             Text(title)
                 .font(.system(size: 10, weight: .bold, design: .rounded))
-                .foregroundStyle(DiveUI.secondaryText)
+                .foregroundStyle(.white)
                 .lineLimit(1)
                 .minimumScaleFactor(0.58)
             HStack(alignment: .lastTextBaseline, spacing: 3) {
@@ -175,13 +170,7 @@ struct DiveLiveView: View {
         .padding(.horizontal, 5)
         .background(
             RoundedRectangle(cornerRadius: 11, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [DiveUI.blue.opacity(0.12), DiveUI.panelFill.opacity(0.82)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(DiveUI.panelFill.opacity(0.75))
                 .overlay(
                     RoundedRectangle(cornerRadius: 11, style: .continuous)
                         .stroke(.white.opacity(0.42), lineWidth: 1)
@@ -243,7 +232,6 @@ struct DiveLiveView: View {
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
                         .stroke(DiveUI.yellow.opacity(0.7), lineWidth: 1)
                 )
-                .shadow(color: DiveUI.yellow.opacity(0.28), radius: 8, x: 0, y: 0)
         )
     }
 

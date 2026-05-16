@@ -38,12 +38,12 @@ struct CompassView: View {
                     headingDegrees: compass.headingDegrees,
                     bearingDelta: bearingDelta,
                     accent: DiveUI.green,
-                    size: 148
+                    size: 138
                 )
 
                 HStack(alignment: .lastTextBaseline, spacing: 6) {
                     Text("\(Int(compass.headingDegrees.rounded()))")
-                        .font(.system(size: 50, weight: .black, design: .rounded))
+                        .font(.system(size: 44, weight: .black, design: .rounded))
                         .minimumScaleFactor(0.72)
                         .lineLimit(1)
                         .monospacedDigit()
@@ -69,14 +69,12 @@ struct CompassView: View {
                 ZStack {
                     Circle()
                         .fill((compass.bearingDegrees == nil ? DiveUI.subtleStroke : DiveUI.yellow).opacity(0.13))
-                        .shadow(color: (compass.bearingDegrees == nil ? DiveUI.subtleStroke : DiveUI.yellow).opacity(0.24), radius: 8, x: 0, y: 0)
                     Circle()
                         .stroke((compass.bearingDegrees == nil ? DiveUI.subtleStroke : DiveUI.yellow).opacity(0.75), lineWidth: 1)
                     Image(systemName: "location.north.line.fill")
                         .font(.title2.bold())
                         .foregroundStyle(compass.bearingDegrees == nil ? DiveUI.secondaryText : DiveUI.yellow)
                         .rotationEffect(.degrees(bearingDelta ?? 0))
-                        .animation(.easeInOut(duration: 0.24), value: bearingDelta ?? 0)
                 }
                 .frame(width: 48, height: 48)
 
