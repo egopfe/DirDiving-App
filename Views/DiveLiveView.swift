@@ -154,7 +154,7 @@ struct DiveLiveView: View {
 
     private var ttvRuntimePanel: some View {
         HStack(spacing: 0) {
-            dashboardValue(title: "TTV", value: Formatters.one(dive.ttv), unit: "min", color: DiveUI.green)
+            dashboardValue(title: "TTV", value: ttvText, unit: nil, color: DiveUI.green)
             Rectangle()
                 .fill(.white.opacity(0.34))
                 .frame(width: 1, height: 54)
@@ -172,7 +172,7 @@ struct DiveLiveView: View {
         )
     }
 
-    private func dashboardValue(title: String, value: String, unit: String, color: Color) -> some View {
+    private func dashboardValue(title: String, value: String, unit: String?, color: Color) -> some View {
         VStack(spacing: 4) {
             Text(title)
                 .font(.system(size: 13, weight: .semibold, design: .rounded))
@@ -184,10 +184,12 @@ struct DiveLiveView: View {
                     .lineLimit(1)
                     .monospacedDigit()
                     .foregroundStyle(color)
-                Text(unit)
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
-                    .foregroundStyle(color)
-                    .padding(.bottom, 5)
+                if let unit {
+                    Text(unit)
+                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .foregroundStyle(color)
+                        .padding(.bottom, 5)
+                }
             }
         }
         .frame(maxWidth: .infinity)
@@ -345,6 +347,10 @@ struct DiveLiveView: View {
     private var temperatureText: String {
         guard let temp = dive.currentTemperatureCelsius else { return "--.- \u{00B0}C" }
         return "\(Formatters.one(temp)) \u{00B0}C"
+    }
+
+    private var ttvText: String {
+        Formatters.one(dive.ttv).replacingOccurrences(of: ".", with: ",")
     }
 
     private var runtimeMinutes: String {
