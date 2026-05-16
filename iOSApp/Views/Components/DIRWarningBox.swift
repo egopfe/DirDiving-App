@@ -14,7 +14,7 @@ struct DIRWarningBox: View {
         .padding(14)
         .background(
             RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
-                .fill(DIRTheme.orange.opacity(0.15))
+                .fill(LinearGradient(colors: [DIRTheme.orange.opacity(0.18), DIRTheme.surface.opacity(0.72)], startPoint: .topLeading, endPoint: .bottomTrailing))
                 .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.orange.opacity(0.42), lineWidth: 1))
         )
     }

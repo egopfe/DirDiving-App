@@ -19,6 +19,7 @@ struct MoreView: View {
                                 .font(.callout)
                                 .foregroundStyle(DIRTheme.muted)
                         }
+                        systemStatus
                         DIRCard("SYNC WATCH", icon: "applewatch", accent: DIRTheme.cyan) {
                             row("Supportato", watchSync.isSupported ? "Si" : "No")
                             row("Stato", String(describing: watchSync.activationState))
@@ -67,6 +68,33 @@ struct MoreView: View {
             }
             .toolbar(.hidden, for: .navigationBar)
         }
+    }
+
+    private var systemStatus: some View {
+        HStack(spacing: 12) {
+            statusPill("WATCH", watchSync.isSupported ? DIRTheme.green : DIRTheme.orange)
+            statusPill("CLOUD", cloudSync.isICloudAvailable ? DIRTheme.green : DIRTheme.yellow)
+            statusPill("EXPORT", DIRTheme.cyan)
+        }
+    }
+
+    private func statusPill(_ text: String, _ color: Color) -> some View {
+        HStack(spacing: 7) {
+            Circle()
+                .fill(color)
+                .frame(width: 8, height: 8)
+                .shadow(color: color.opacity(0.45), radius: 5, x: 0, y: 0)
+            Text(text)
+                .font(.caption.weight(.bold))
+        }
+        .foregroundStyle(color)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 11)
+        .background(
+            RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
+                .fill(color.opacity(0.10))
+                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(color.opacity(0.32), lineWidth: 1))
+        )
     }
 
     private func row(_ title: String, _ value: String) -> some View {

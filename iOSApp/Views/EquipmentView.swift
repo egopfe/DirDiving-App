@@ -15,6 +15,7 @@ struct EquipmentView: View {
                                 .font(.callout)
                                 .foregroundStyle(DIRTheme.muted)
                         }
+                        equipmentHero
                         DIRCard("PIANIFICAZIONE COMPLETA", icon: "shippingbox.fill", accent: DIRTheme.cyan) {
                             equipmentRow("Bombole", "2 x 12 L")
                             equipmentRow("Configurazione", "Backmount DIR")
@@ -35,6 +36,27 @@ struct EquipmentView: View {
         }
     }
 
+    private var equipmentHero: some View {
+        HStack(spacing: 12) {
+            equipmentBadge("DIR", DIRTheme.cyan)
+            equipmentBadge("READY", DIRTheme.green)
+            equipmentBadge("FIELD", DIRTheme.yellow)
+        }
+    }
+
+    private func equipmentBadge(_ text: String, _ color: Color) -> some View {
+        Text(text)
+            .font(.caption.weight(.bold))
+            .foregroundStyle(color)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
+                    .fill(color.opacity(0.10))
+                    .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(color.opacity(0.34), lineWidth: 1))
+            )
+    }
+
     private func equipmentRow(_ title: String, _ value: String) -> some View {
         HStack {
             Text(title).foregroundStyle(DIRTheme.muted)
@@ -42,6 +64,6 @@ struct EquipmentView: View {
             Text(value).foregroundStyle(.white).bold()
         }
         .font(.callout)
-        .padding(.vertical, 5)
+        .padding(.vertical, 7)
     }
 }

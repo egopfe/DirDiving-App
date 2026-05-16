@@ -9,6 +9,7 @@ struct ExploreView: View {
                     VStack(alignment: .leading, spacing: 18) {
                         header
                         mapPreview
+                        routeStatusStrip
                         waypointCards
                         routeOverview
                         snorkelingPresentation
@@ -26,12 +27,26 @@ struct ExploreView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 7) {
-            Text("Explore")
-                .font(.system(size: 30, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+            HStack(alignment: .firstTextBaseline) {
+                Text("Explore")
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                Spacer()
+                Text("MARINE")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(DIRTheme.cyan)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Capsule().fill(DIRTheme.cyan.opacity(0.12)).overlay(Capsule().stroke(DIRTheme.cyan.opacity(0.45), lineWidth: 1)))
+            }
             Text("Marine route concepts, waypoint review and apnea/snorkeling presentation")
                 .font(.callout)
                 .foregroundStyle(DIRTheme.muted)
+            HStack(spacing: 8) {
+                statusBadge("WAYPOINTS", color: DIRTheme.cyan)
+                statusBadge("ROUTES", color: DIRTheme.green)
+                statusBadge("MAP UI", color: DIRTheme.yellow)
+            }
         }
     }
 
@@ -39,7 +54,7 @@ struct ExploreView: View {
         DIRCard("MAP PREVIEW", icon: "map", accent: DIRTheme.cyan) {
             // TODO: Replace this static visual placeholder with a map engine only after map scope is approved.
             ZStack {
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
                     .fill(
                         LinearGradient(
                             colors: [
@@ -51,6 +66,7 @@ struct ExploreView: View {
                         )
                     )
                     .overlay(gridOverlay)
+                    .overlay(bathymetryOverlay)
 
                 routeLine
 
@@ -88,7 +104,16 @@ struct ExploreView: View {
                 .padding(12)
             }
             .frame(height: 260)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .clipShape(RoundedRectangle(cornerRadius: DIRTheme.cardRadius))
+            .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.cyan.opacity(0.28), lineWidth: 1))
+        }
+    }
+
+    private var routeStatusStrip: some View {
+        HStack(spacing: 12) {
+            routeStatus("ENTRY", "SET", DIRTheme.green, "flag.fill")
+            routeStatus("ROUTE", "A-04", DIRTheme.cyan, "point.topleft.down.curvedto.point.bottomright.up")
+            routeStatus("RETURN", "214 deg", DIRTheme.yellow, "arrow.uturn.backward")
         }
     }
 
@@ -192,14 +217,32 @@ struct ExploreView: View {
     }
 
     private var routeLine: some View {
-        Path { path in
+        let path = Path { path in
             path.move(to: CGPoint(x: 36, y: 182))
             path.addCurve(to: CGPoint(x: 118, y: 126), control1: CGPoint(x: 58, y: 158), control2: CGPoint(x: 82, y: 142))
             path.addCurve(to: CGPoint(x: 214, y: 94), control1: CGPoint(x: 150, y: 110), control2: CGPoint(x: 182, y: 108))
             path.addCurve(to: CGPoint(x: 282, y: 60), control1: CGPoint(x: 242, y: 82), control2: CGPoint(x: 258, y: 70))
         }
-        .stroke(DIRTheme.cyan, style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
-        .shadow(color: DIRTheme.cyan.opacity(0.45), radius: 10)
+
+        return ZStack {
+            path
+                .stroke(DIRTheme.cyan.opacity(0.18), style: StrokeStyle(lineWidth: 12, lineCap: .round, lineJoin: .round))
+            path
+                .stroke(DIRTheme.cyan, style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round))
+                .shadow(color: DIRTheme.cyan.opacity(0.45), radius: 10)
+        }
+    }
+
+    private var bathymetryOverlay: some View {
+        ZStack {
+            ForEach(0..<4) { index in
+                RoundedRectangle(cornerRadius: CGFloat(42 + index * 12))
+                    .stroke(DIRTheme.cyan.opacity(0.055), lineWidth: 1)
+                    .frame(width: CGFloat(120 + index * 58), height: CGFloat(68 + index * 34))
+                    .rotationEffect(.degrees(Double(index * 8 - 12)))
+                    .offset(x: CGFloat(index * 18 - 24), y: CGFloat(index * -8 + 10))
+            }
+        }
     }
 
     private func mapPin(x: CGFloat, y: CGFloat, label: String, color: Color) -> some View {
@@ -236,8 +279,41 @@ struct ExploreView: View {
         .padding(14)
         .background(
             RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
-                .fill(DIRTheme.surface.opacity(0.82))
-                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(color.opacity(0.42), lineWidth: 1))
+                .fill(
+                    LinearGradient(
+                        colors: [color.opacity(0.14), DIRTheme.surface.opacity(0.88)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(color.opacity(0.48), lineWidth: 1))
+                .shadow(color: color.opacity(0.12), radius: 12, x: 0, y: 8)
+        )
+    }
+
+    private func routeStatus(_ title: String, _ value: String, _ color: Color, _ icon: String) -> some View {
+        HStack(spacing: 9) {
+            Image(systemName: icon)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(color)
+                .frame(width: 24, height: 24)
+                .background(Circle().fill(color.opacity(0.13)))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(DIRTheme.muted)
+                Text(value)
+                    .font(.callout.monospacedDigit().weight(.bold))
+                    .foregroundStyle(.white)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
+                .fill(DIRTheme.surface.opacity(0.74))
+                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(color.opacity(0.34), lineWidth: 1))
         )
     }
 

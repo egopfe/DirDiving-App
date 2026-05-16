@@ -11,9 +11,9 @@ struct DIRSearchBar: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .background(
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
                 .fill(DIRTheme.surface2.opacity(0.78))
-                .overlay(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.hairline, lineWidth: 1))
+                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.hairline, lineWidth: 1))
         )
     }
 }

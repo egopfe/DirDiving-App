@@ -15,6 +15,7 @@ struct LogbookView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         header
+                        logbookStatusStrip
                         DIRSearchBar(text: $search)
                         Text("MAGGIO 2024")
                             .font(.caption.weight(.semibold))
@@ -69,6 +70,32 @@ struct LogbookView: View {
                 .foregroundStyle(DIRTheme.muted)
         }
     }
+
+    private var logbookStatusStrip: some View {
+        HStack(spacing: 12) {
+            statusTile("Sessions", "\(logStore.sessions.count)", DIRTheme.cyan)
+            statusTile("Sync", "Ready", DIRTheme.green)
+            statusTile("Export", "CSV", DIRTheme.yellow)
+        }
+    }
+
+    private func statusTile(_ title: String, _ value: String, _ color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title.uppercased())
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(DIRTheme.muted)
+            Text(value)
+                .font(.callout.monospacedDigit().weight(.bold))
+                .foregroundStyle(color)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
+                .fill(DIRTheme.surface.opacity(0.74))
+                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(color.opacity(0.32), lineWidth: 1))
+        )
+    }
 }
 
 struct DiveLogCard: View {
@@ -114,9 +141,9 @@ struct DiveLogCard: View {
         .padding(10)
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .fill(DIRTheme.surface.opacity(0.8))
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(DIRTheme.hairline, lineWidth: 1))
-                .shadow(color: DIRTheme.cyan.opacity(0.06), radius: 10, x: 0, y: 6)
+                .fill(LinearGradient(colors: [DIRTheme.surface2.opacity(0.58), DIRTheme.surface.opacity(0.88)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                .overlay(RoundedRectangle(cornerRadius: 10).stroke(DIRTheme.cyan.opacity(0.18), lineWidth: 1))
+                .shadow(color: DIRTheme.cyan.opacity(0.08), radius: 12, x: 0, y: 7)
         )
     }
 

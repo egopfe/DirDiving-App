@@ -19,6 +19,7 @@ struct PlannerView: View {
                                 .font(.callout)
                                 .foregroundStyle(DIRTheme.muted)
                         }
+                        plannerHero
                         modePicker
                         profileCard
                         gasCards
@@ -33,6 +34,18 @@ struct PlannerView: View {
             .navigationDestination(isPresented: $showPlan) {
                 PlanResultView()
                     .environmentObject(store)
+            }
+        }
+    }
+
+    private var plannerHero: some View {
+        DIRCard("PLANNING CONSOLE", icon: "point.topleft.down.curvedto.point.bottomright.up", accent: DIRTheme.cyan) {
+            HStack(spacing: 0) {
+                DIRMetricTile(title: "Mode", value: store.mode.rawValue, color: DIRTheme.cyan, icon: "switch.2")
+                Divider().overlay(DIRTheme.hairline)
+                DIRMetricTile(title: "Depth", value: Formatters.zero(store.input.plannedDepthMeters), unit: "m", color: DIRTheme.yellow, icon: "arrow.down")
+                Divider().overlay(DIRTheme.hairline)
+                DIRMetricTile(title: "Bottom", value: Formatters.zero(store.input.plannedBottomMinutes), unit: "min", color: DIRTheme.green, icon: "timer")
             }
         }
     }
@@ -57,7 +70,11 @@ struct PlannerView: View {
             }
         }
         .padding(4)
-        .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface2.opacity(0.82)))
+        .background(
+            RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
+                .fill(DIRTheme.surface2.opacity(0.82))
+                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.hairline, lineWidth: 1))
+        )
     }
 
     private var profileCard: some View {

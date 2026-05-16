@@ -11,6 +11,7 @@ struct AnalysisView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         header
+                        analysisHero
                         DIRCard("ANALISI AVANZATE", icon: "chart.line.uptrend.xyaxis", accent: DIRTheme.cyan) {
                             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 0) {
                                 DIRMetricTile(title: "Immersioni", value: "\(logStore.sessions.count)", color: DIRTheme.cyan)
@@ -33,8 +34,15 @@ struct AnalysisView: View {
                             .chartYAxis { AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) } }
                             .chartPlotStyle { plot in
                                 plot
-                                    .background(.black.opacity(0.2))
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .background(
+                                        LinearGradient(
+                                            colors: [.black.opacity(0.32), DIRTheme.surface.opacity(0.32)],
+                                            startPoint: .top,
+                                            endPoint: .bottom
+                                        )
+                                    )
+                                    .clipShape(RoundedRectangle(cornerRadius: DIRTheme.compactRadius))
+                                    .overlay(RoundedRectangle(cornerRadius: DIRTheme.compactRadius).stroke(DIRTheme.hairline, lineWidth: 1))
                             }
                             .frame(height: 240)
                         }
@@ -46,6 +54,31 @@ struct AnalysisView: View {
             }
             .toolbar(.hidden, for: .navigationBar)
         }
+    }
+
+    private var analysisHero: some View {
+        HStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Operational Overview")
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(.white)
+                Text("Logbook trends, apnea readiness presentation and snorkeling summaries")
+                    .font(.footnote)
+                    .foregroundStyle(DIRTheme.muted)
+            }
+            Spacer()
+            Image(systemName: "waveform.path.ecg.rectangle")
+                .font(.system(size: 30, weight: .bold))
+                .foregroundStyle(DIRTheme.cyan)
+                .frame(width: 54, height: 54)
+                .background(RoundedRectangle(cornerRadius: 16).fill(DIRTheme.cyan.opacity(0.12)))
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
+                .fill(LinearGradient(colors: [DIRTheme.cyan.opacity(0.14), DIRTheme.surface.opacity(0.86)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.cyan.opacity(0.36), lineWidth: 1))
+        )
     }
 
     private var avgTemp: Double {
@@ -77,8 +110,21 @@ struct AnalysisView: View {
                     trendCard("Depth trend", "stable", DIRTheme.cyan)
                     trendCard("Surface interval", "visual", DIRTheme.green)
                 }
+                apneaDepthPreview
             }
         }
+    }
+
+    private var apneaDepthPreview: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("DEPTH CURVE PREVIEW")
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(DIRTheme.cyan)
+            AnalysisDepthTrendPreview()
+                .frame(height: 96)
+        }
+        .padding(12)
+        .background(RoundedRectangle(cornerRadius: DIRTheme.compactRadius).fill(.black.opacity(0.18)))
     }
 
     private var snorkelingSummary: some View {
@@ -135,5 +181,27 @@ struct AnalysisView: View {
         }
         .padding(12)
         .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface2.opacity(0.6)))
+    }
+}
+
+private struct AnalysisDepthTrendPreview: View {
+    var body: some View {
+        Canvas { context, size in
+            let gridColor = Color.white.opacity(0.08)
+            for y in stride(from: 0.0, through: size.height, by: 24) {
+                var grid = Path()
+                grid.move(to: CGPoint(x: 0, y: y))
+                grid.addLine(to: CGPoint(x: size.width, y: y))
+                context.stroke(grid, with: .color(gridColor), lineWidth: 1)
+            }
+
+            var path = Path()
+            path.move(to: CGPoint(x: 0, y: size.height * 0.18))
+            path.addCurve(to: CGPoint(x: size.width * 0.26, y: size.height * 0.82), control1: CGPoint(x: 30, y: 18), control2: CGPoint(x: 48, y: size.height * 0.82))
+            path.addLine(to: CGPoint(x: size.width * 0.52, y: size.height * 0.76))
+            path.addCurve(to: CGPoint(x: size.width, y: size.height * 0.2), control1: CGPoint(x: size.width * 0.68, y: size.height * 0.7), control2: CGPoint(x: size.width * 0.78, y: size.height * 0.24))
+            context.stroke(path, with: .color(DIRTheme.cyan), style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
+        }
+        .background(RoundedRectangle(cornerRadius: DIRTheme.compactRadius).fill(.black.opacity(0.22)))
     }
 }
