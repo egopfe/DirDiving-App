@@ -45,6 +45,7 @@ Implemented surfaces:
 - Premium dark-cyan snorkeling map mock surface with OSM/OpenSeaMap/offline-cache status, route line, waypoint pins, heatmap indicator, and route distance.
 - Waypoint planner with tap-style waypoint creation, category icons, coordinate display, route ordering controls, and Watch sync action.
 - Route planning card for waypoint count, distance, offline cache, and iPhone -> WatchConnectivity -> Watch cache workflow.
+- Apnea Review card with `Riepilogo`, `Grafico`, and `Dettagli` tabs, profile/route mock, and summary metrics.
 - Apnea analytics card with max depth, recovery trend, readiness score, fatigue trend, and apnea-duration chart.
 - Sync/settings card for apnea duration warning, recovery ratio, drift threshold, and waypoint auto-switch.
 - GPX/CSV export actions for route, marker, and analytics data.
@@ -56,6 +57,19 @@ Implementation files:
 - `iOSApp/Views/ExplorationCenterView.swift`
 
 Map note: the current branch provides a premium MapLibre/OpenSeaMap-ready UI surface and route model. A production map engine should be selected and validated on-device before replacing the coded map preview with live tiles/offline MBTiles.
+
+### Apnea Companion Review
+
+`ExplorationCenterView` includes an experimental `Apnea Review` card intended as the iPhone-side review entry point for Watch Apnea sessions.
+
+Current scope:
+
+- visual header and tab-style sections for `Riepilogo`, `Grafico`, and `Dettagli`;
+- dark-cyan mock profile/route surface;
+- placeholder metrics for profondita massima, tempo, and temperatura acqua;
+- explicit TODO boundaries for future synced Apnea session data.
+
+The card is UI-only. It does not change Watch runtime behavior, WatchConnectivity payloads, persistence models, GPS logic, compass logic, or dive/ascent/depth calculations.
 
 ### POI Enrichment Roadmap
 
