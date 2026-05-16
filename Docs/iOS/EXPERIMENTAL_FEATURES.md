@@ -57,6 +57,33 @@ Implementation files:
 
 Map note: the current branch provides a premium MapLibre/OpenSeaMap-ready UI surface and route model. A production map engine should be selected and validated on-device before replacing the coded map preview with live tiles/offline MBTiles.
 
+### POI Enrichment Roadmap
+
+The Apple Watch experimental branch treats `MARCATORE` as a lightweight Snorkeling Point Of Interest capture. The Watch-side payload is intentionally small: timestamp, last valid GPS coordinate, shallow depth when available, temperature when available, heading/bearing when available, active waypoint when available, session id when exposed, and an unenriched state.
+
+The iOS Companion is the intended enrichment surface after sync:
+
+- photo and video attachment;
+- comments;
+- category and tags;
+- marine species / observation notes;
+- route context and waypoint association;
+- export-ready marker data.
+
+The Watch UI should continue to show `Da arricchire su iPhone` or `Companion iOS` for fields that are not editable on-device.
+
+### Free Map / Offline Map Plan
+
+Experimental map work should prefer free/open-source map architecture:
+
+- MapLibre Native or a compatible SwiftUI wrapper if validated with the project.
+- OpenStreetMap-compatible base tiles.
+- OpenSeaMap as an optional marine overlay where license and usage allow it.
+- MBTiles for offline cache and future Watch sync snapshots.
+- GEBCO and EMODnet as future bathymetry overlays.
+
+Public OpenStreetMap tile servers have usage policies. A production app should use an approved tile provider, self-hosted tiles, or packaged MBTiles rather than hard-coding heavy public tile usage.
+
 ## iCloud Persistence
 
 The branch now includes local persistence plus iCloud Key-Value Store mirroring for iOS companion data.

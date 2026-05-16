@@ -414,3 +414,53 @@ Config/DIRDiving.entitlements
 ```
 
 The Apple water depth/submersion entitlement is intentionally not filled in yet because approval is pending. After Apple grants the entitlement, update this file and rebuild with the correct signing profile.
+
+## Branch Strategy
+
+La strategia branch corrente e:
+
+- `main`: codice stabile, orientato alla produzione Apple Watch, con Diving mode preservato come funzione primaria.
+- `main-iOS`: codice stabile per iOS Companion.
+- `codex/experimental-features`: ramo Apple Watch per UI e funzioni sperimentali Snorkeling, Apnea, Buddy Assist e schermate future.
+- `codex/ios-experimental-features`: ramo iOS per companion UI, pianificazione, mappe, enrichment POI e superfici sperimentali.
+
+Regole operative:
+
+- Il lavoro di allineamento UI-only non deve modificare business logic, calcoli immersione, GPS, algoritmi bussola, persistenza o state machine.
+- Ogni merge verso `main` deve preservare Diving mode, schermata live, warning risalita, haptic behavior, GPS entry/exit e log immersioni.
+- Le funzioni sperimentali restano isolate finche non sono validate su hardware, build XcodeGen e test manuali.
+- In caso di conflitto, preservare prima codice buildabile e comportamento Diving stabile, poi la UI master reference piu recente, poi gli aggiornamenti documentali.
+
+## Platform And Build Matrix
+
+| Branch | App | Stato | Note |
+| --- | --- | --- | --- |
+| `main` | Apple Watch | Stable | Diving mode, log, export, bussola, immagini, settings visuali. |
+| `codex/experimental-features` | Apple Watch | Experimental | Snorkeling Live, Mappa Waypoint, Mappa Ritorno, Direzione Waypoint, POI, Apnea, Buddy Assist. |
+| `main-iOS` | iOS Companion | Stable | Logbook, detail, planner/analysis surfaces, WatchConnectivity. |
+| `codex/ios-experimental-features` | iOS Companion | Experimental | Explore, route planning, waypoint management, future POI enrichment and map/offline workflows. |
+
+## UI Master References
+
+Le UI Apple Watch devono seguire `MASTER_REFERENCE_DIVING_LIVE.png` come riferimento canonico per densita, gerarchia, colore e bordo. Le UI iOS devono seguire `iOS_look_feel.png`.
+
+## Feature Matrix
+
+La matrice feature aggiornata e in:
+
+```text
+Docs/DIR_DIVING_Feature_Comparison.csv
+```
+
+La specifica Snorkeling sperimentale e in:
+
+```text
+Docs/SNORKELING_EXPERIMENTAL_SPEC.md
+```
+
+## iOS Companion Roadmap
+
+- Collegare POI Watch a payload sync leggero e enrichment iOS.
+- Introdurre workflow MapLibre/OpenSeaMap/MBTiles sul companion iOS dopo valutazione licenze e prestazioni.
+- Mantenere logbook, planner, export e sync WatchConnectivity separati dai runtime sperimentali Watch.
+- Validare build XcodeGen su macOS per ogni ramo prima dei merge.
