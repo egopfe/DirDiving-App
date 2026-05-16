@@ -8,7 +8,7 @@ The experimental branch currently contains:
 
 - Pre-water mode selector for Diving, Apnea, and Snorkeling.
 - Premium Snorkeling runtime with waypoint navigation, return-to-entry, categorized GPS markers, and compass bearing delta.
-- Premium Apnea runtime with apnea timer, recovery assistant, dive counter, compass block, and warning layer.
+- Premium Apnea runtime with menu, session type, open-water configuration, countdown, surface waiting, descent/bottom/ascent visual states, ascent alarm, recovery, summary, graph, details, save confirmation, logbook, and statistics surfaces.
 - User-configurable ascent-rate limits.
 - Buddy Assist preset messaging UI.
 - Buddy Link proximity indication.
@@ -50,7 +50,7 @@ Watch implementation:
 
 - `ModeSelectionView`: pre-water selector for Diving, Apnea, and Snorkeling.
 - `SnorkelingView`: runtime, distance, average speed, waypoint navigation, bearing delta arrow, GPS status, categorized GPS marker capture, return-to-entry, and drift-oriented safety panel.
-- `ApneaView`: apnea timer, recovery ratio, max/current depth, dive counter, compass heading, buddy reminder/no-movement warning surface, and manual warning trigger.
+- `ApneaView`: Apnea menu, session selection, open-water configuration, countdown, surface waiting, automatic dive start from depth, surface-end handling, recovery, summary, depth profile, details, save confirmation, logbook, and statistics.
 - `ExplorationStore`: shared state for mode selection, snorkeling route state, markers, apnea recovery, apnea records, and warnings.
 - `ExplorationModels`: activity modes, session states, marker categories, waypoints, GPS markers, and apnea records.
 
@@ -59,6 +59,28 @@ Operational boundaries:
 - GPS is treated as surface-first. Underwater navigation uses the last valid GPS fix plus compass/bearing context.
 - Snorkeling waypoints and return-to-entry are situational-awareness aids, not certified underwater navigation systems.
 - Apnea warning and recovery surfaces are training aids and do not replace buddy procedures, instruction, or certified safety devices.
+
+### Latest Apnea UI Scope
+
+The latest Apple Watch experimental Apnea work adds or restyles these screens:
+
+- `Home Mode Selection`: Apnea entry point from the pre-water selector.
+- `Apnea Menu`: `Sessione`, `Tabelle`, `Statistiche`, and `Logbook`.
+- `Session Type`: `Acque Libere` active, with `Dinamica`, `Statica`, and `Personalizzata` visible as disabled placeholders.
+- `Session Configuration`: UI rows for allarmi, intervallo superficie, and profondita max.
+- `Countdown`: automatic `03`, `02`, `01 / VAI` flow, with manual tap advance.
+- `Surface Waiting`: session active in surface state before immersion.
+- `Descent`, `Bottom`, and `Ascent`: visual states derived from existing depth/runtime data until a dedicated Apnea phase engine exists.
+- `Ascent Alarm`: reuses `DiveManager.ascentStatus.isOverLimit` without changing ascent thresholds or algorithms.
+- `Surface End`: uses `ExplorationStore.surfaceFromApnea(...)` to close the dive and start recovery.
+- `Recovery`: uses the existing recovery timer and `max(duration * 2, 30)` rule.
+- `Summary`, `Depth Profile`, `Details`, `Save Confirmation`, `Logbook`, and `Statistics`: complete UI path with real saved duration/max depth where exposed and TODO placeholders for missing samples, HR, water temperature, average depth, and aggregate metrics.
+
+Detailed Apnea documentation is available in:
+
+```text
+Docs/APNEA_EXPERIMENTAL_SPEC.md
+```
 
 ### Latest Snorkeling UI Scope
 

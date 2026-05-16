@@ -478,6 +478,12 @@ La specifica Snorkeling sperimentale e in:
 Docs/SNORKELING_EXPERIMENTAL_SPEC.md
 ```
 
+La specifica Apnea sperimentale e in:
+
+```text
+Docs/APNEA_EXPERIMENTAL_SPEC.md
+```
+
 ## Snorkeling Experimental Notes
 
 Snorkeling su Apple Watch experimental include:
@@ -491,6 +497,19 @@ Snorkeling su Apple Watch experimental include:
 - Allarmi snorkeling specifici, separati dai settings globali.
 
 Il Watch non modifica foto/commenti POI. Il companion iOS arricchira i POI dopo sync con foto, video, commenti, categorie, tag e note osservazione.
+
+## Apnea Experimental Notes
+
+Apnea su Apple Watch experimental include:
+
+- Home Apnea dal selettore modalita.
+- Menu con `Sessione`, `Tabelle`, `Statistiche` e `Logbook`.
+- Sessione `Acque Libere`, countdown `03`, `02`, `01 / VAI` e surface waiting.
+- Avvio automatico immersione da profondita e chiusura automatica al ritorno in superficie usando `ExplorationStore`.
+- Stati visuali per discesa, fondo, risalita, allarme risalita, superficie, recovery, riepilogo, grafico, dettagli e salvataggio.
+- Logbook e statistiche Apnea con dati reali dove esposti e placeholder TODO dove mancano campioni, HR, temperatura o aggregati.
+
+Il companion iOS experimental aggiunge `Apnea Review` come card UI-only in `ExplorationCenterView`, con profilo mock e metriche placeholder finche non esiste sincronizzazione record Apnea dedicata.
 
 ## Known Limitations
 
