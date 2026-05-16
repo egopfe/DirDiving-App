@@ -32,12 +32,18 @@ final class ExplorationPlanningStore: ObservableObject {
             exportStatus = saved.exportStatus
             syncStatus = saved.syncStatus
             offlineMapStatus = saved.offlineMapStatus
+            clearPersistedMockSuccessStates()
         }
         isReady = true
         saveIfReady()
     }
 
-    var routeDistanceMeters: Double { 742 }
+    var routeDistanceMeters: Double {
+        guard route.waypoints.count > 1 else { return 0 }
+        return zip(route.waypoints, route.waypoints.dropFirst()).reduce(0) { total, pair in
+            total + distanceMeters(from: pair.0, to: pair.1)
+        }
+    }
     var heatmapIntensity: Double { 0.74 }
     var readinessScore: Int { 82 }
     var fatigueTrend: String { "Bassa" }
@@ -89,19 +95,15 @@ final class ExplorationPlanningStore: ObservableObject {
     }
 
     func syncToWatch() {
-        syncStatus = "Route, waypoint e warning inviati al Watch"
-        route.syncReady = true
-        saveIfReady()
+        syncStatus = "Mock UI: nessun invio Watch eseguito"
     }
 
     func exportGPX() {
-        exportStatus = "GPX esportato: \(route.waypoints.count) waypoint"
-        saveIfReady()
+        exportStatus = "Mock UI: GPX non generato"
     }
 
     func exportCSV() {
-        exportStatus = "CSV esportato: analytics + marker"
-        saveIfReady()
+        exportStatus = "Mock UI: CSV non generato"
     }
 
     private func renumberRoute() {
@@ -125,6 +127,26 @@ final class ExplorationPlanningStore: ObservableObject {
             ),
             forKey: key
         )
+    }
+
+    private func clearPersistedMockSuccessStates() {
+        if exportStatus.localizedCaseInsensitiveContains("esportato") {
+            exportStatus = "Mock UI: export non generato"
+        }
+        if syncStatus.localizedCaseInsensitiveContains("inviati") {
+            syncStatus = "Mock UI: nessun invio Watch eseguito"
+        }
+    }
+
+    private func distanceMeters(from start: ExplorationWaypoint, to end: ExplorationWaypoint) -> Double {
+        let earthRadius = 6_371_000.0
+        let startLat = start.latitude * .pi / 180
+        let endLat = end.latitude * .pi / 180
+        let deltaLat = (end.latitude - start.latitude) * .pi / 180
+        let deltaLon = (end.longitude - start.longitude) * .pi / 180
+        let a = sin(deltaLat / 2) * sin(deltaLat / 2)
+            + cos(startLat) * cos(endLat) * sin(deltaLon / 2) * sin(deltaLon / 2)
+        return earthRadius * 2 * atan2(sqrt(a), sqrt(1 - a))
     }
 }
 

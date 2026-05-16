@@ -30,16 +30,34 @@ enum SubsurfaceExportService {
 
     static func writeCSV(for session: DiveSession) -> Result<URL, ExportError> {
         guard !session.samples.isEmpty else { return .failure(.emptySamples) }
+        cleanupTemporaryExports()
         let url = FileManager.default.temporaryDirectory
-            .appendingPathComponent("DIRDiving_\(session.id.uuidString.prefix(8)).csv")
+            .appendingPathComponent("DIRDiving_Export_\(UUID().uuidString).csv")
         do {
             guard let data = makeCSV(for: session).data(using: .utf8) else {
                 return .failure(.writeFailed("UTF-8"))
             }
-            try data.write(to: url, options: .atomic)
+            try data.write(to: url, options: [.atomic, .completeFileProtection])
             return .success(url)
         } catch {
             return .failure(.writeFailed(error.localizedDescription))
+        }
+    }
+
+    private static func cleanupTemporaryExports() {
+        let directory = FileManager.default.temporaryDirectory
+        guard let files = try? FileManager.default.contentsOfDirectory(
+            at: directory,
+            includingPropertiesForKeys: [.contentModificationDateKey],
+            options: [.skipsHiddenFiles]
+        ) else { return }
+
+        let expiration = Date().addingTimeInterval(-86_400)
+        for file in files where file.lastPathComponent.hasPrefix("DIRDiving_") && file.pathExtension == "csv" {
+            let values = try? file.resourceValues(forKeys: [.contentModificationDateKey])
+            if (values?.contentModificationDate ?? .distantPast) < expiration {
+                try? FileManager.default.removeItem(at: file)
+            }
         }
     }
 }

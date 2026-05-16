@@ -19,14 +19,18 @@ final class DiveLogStore: ObservableObject {
 
     private let cloudSync: CloudSyncStore?
     private let key = "dirdiving_ios_dive_sessions"
+    private let deletedKey = "dirdiving_ios_deleted_session_ids"
+    private var deletedSessionIDs: Set<UUID> = []
     private var isReady = false
 
     init(cloudSync: CloudSyncStore? = nil) {
         self.cloudSync = cloudSync
         includeDemoLogbook = UserDefaults.standard.bool(forKey: Self.includeDemoLogbookKey)
+        deletedSessionIDs = Set(cloudSync?.load([UUID].self, forKey: deletedKey) ?? [])
         let localSessions = loadLocalSessions()
         let cloudSessions = cloudSync?.load([DiveSession].self, forKey: key)
         sessions = mergedSessions(local: localSessions, cloud: cloudSessions)
+            .filter { !deletedSessionIDs.contains($0.id) }
             .sorted { $0.startDate > $1.startDate }
 
         if includeDemoLogbook, sessions.filter({ !$0.isDemoDive }).isEmpty {
@@ -48,26 +52,33 @@ final class DiveLogStore: ObservableObject {
     func reloadFromCloud() {
         guard isReady else { return }
         let localSessions = loadLocalSessions()
+        deletedSessionIDs = Set(cloudSync?.load([UUID].self, forKey: deletedKey) ?? Array(deletedSessionIDs))
         let cloudSessions = cloudSync?.load([DiveSession].self, forKey: key)
         sessions = mergedSessions(local: localSessions, cloud: cloudSessions)
+            .filter { !deletedSessionIDs.contains($0.id) }
             .sorted { $0.startDate > $1.startDate }
         applyDemoLogbookPreference()
     }
 
     func add(_ session: DiveSession) {
+        guard !deletedSessionIDs.contains(session.id) else { return }
         sessions.removeAll { $0.id == session.id }
         sessions.insert(session, at: 0)
         sessions = sessions.sorted { $0.startDate > $1.startDate }
     }
 
     func delete(id: UUID) {
+        deletedSessionIDs.insert(id)
         sessions.removeAll { $0.id == id }
+        saveIfReady()
     }
 
     func delete(at offsets: IndexSet) {
         for index in offsets.sorted(by: >) {
+            deletedSessionIDs.insert(sessions[index].id)
             sessions.remove(at: index)
         }
+        saveIfReady()
     }
 
     func synchronizeCloud() {
@@ -99,6 +110,7 @@ final class DiveLogStore: ObservableObject {
     private func saveIfReady() {
         guard isReady else { return }
         cloudSync?.save(sessions, forKey: key)
+        cloudSync?.save(Array(deletedSessionIDs), forKey: deletedKey)
     }
 
     private func applyDemoLogbookPreference() {

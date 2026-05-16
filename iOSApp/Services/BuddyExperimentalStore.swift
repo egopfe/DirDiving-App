@@ -18,6 +18,11 @@ final class BuddyExperimentalStore: ObservableObject {
         self.cloudSync = cloudSync
         if let saved = cloudSync?.load(BuddyLabState.self, forKey: key) {
             status = saved.status
+            if status.pairingState == .trusted {
+                status.pairingState = .verify
+                status.linkState = .lost
+                status.signalState = .distant
+            }
             selectedMessage = saved.selectedMessage
             preparedMessages = saved.preparedMessages
             lastAction = saved.lastAction
@@ -27,7 +32,7 @@ final class BuddyExperimentalStore: ObservableObject {
     }
 
     var canPrepareMessages: Bool {
-        status.pairingState == .trusted
+        false
     }
 
     func markPairingForReview() {
@@ -39,11 +44,10 @@ final class BuddyExperimentalStore: ObservableObject {
     }
 
     func markTrusted() {
-        status.pairingState = .trusted
-        status.linkState = .online
-        status.signalState = .near
-        lastAction = "Buddy trusted importato da Apple Watch"
-        saveIfReady()
+        status.pairingState = .verify
+        status.linkState = .lost
+        status.signalState = .distant
+        lastAction = "Mock UI: trusted pairing non implementato"
     }
 
     func simulateLostLink() {
@@ -55,6 +59,10 @@ final class BuddyExperimentalStore: ObservableObject {
     }
 
     func prepare(_ message: BuddyPresetMessage) {
+        guard canPrepareMessages else {
+            lastAction = "Mock UI: invio messaggi non implementato"
+            return
+        }
         selectedMessage = message
         status.lastMessage = message
         lastAction = "Messaggio \(message.rawValue) pronto per invio dal Watch"

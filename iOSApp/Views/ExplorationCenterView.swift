@@ -385,12 +385,14 @@ struct ExplorationCenterView: View {
     }
 
     private func normalizedRoutePoints() -> [CGPoint] {
-        [
-            CGPoint(x: 42, y: 178),
-            CGPoint(x: 110, y: 132),
-            CGPoint(x: 190, y: 92),
-            CGPoint(x: 274, y: 56),
-            CGPoint(x: 320, y: 132)
-        ]
+        let count = max(store.route.waypoints.count, 1)
+        guard count > 1 else { return [CGPoint(x: 42, y: 178)] }
+
+        return (0..<count).map { index in
+            let progress = Double(index) / Double(count - 1)
+            let x = 42 + 278 * progress
+            let y = 168 - 82 * sin(progress * .pi) + 28 * sin(progress * .pi * 2)
+            return CGPoint(x: x, y: y)
+        }
     }
 }

@@ -68,9 +68,9 @@ struct BuddyExperimentalStatus: Hashable, Codable {
     var lastMessage: BuddyPresetMessage
 
     static let preview = BuddyExperimentalStatus(
-        pairingState: .trusted,
-        linkState: .online,
-        signalState: .near,
+        pairingState: .verify,
+        linkState: .lost,
+        signalState: .distant,
         buddyName: "ULTRA WATCH 2",
         confirmationCode: "482-913",
         keyFingerprint: "B7:42:9C:18",

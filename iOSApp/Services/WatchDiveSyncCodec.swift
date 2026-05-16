@@ -25,6 +25,9 @@ enum WatchDiveSyncCodec {
         guard WCSession.default.activationState == .activated else {
             throw WatchDiveSyncError.sessionInactive
         }
+        guard WatchSyncAuth.hasPeerSecret() else {
+            throw WatchDiveSyncError.missingPeerSecret
+        }
 
         guard let data = payload[payloadKey] as? Data else {
             throw WatchDiveSyncError.missingPayload
@@ -107,6 +110,7 @@ enum WatchDiveSyncError: LocalizedError {
     case invalidSignature
     case invalidSession
     case sessionInactive
+    case missingPeerSecret
 
     var errorDescription: String? {
         switch self {
@@ -118,6 +122,7 @@ enum WatchDiveSyncError: LocalizedError {
         case .invalidSignature: return "Firma sync non valida."
         case .invalidSession: return "Sessione immersione non valida."
         case .sessionInactive: return "WatchConnectivity non attivo."
+        case .missingPeerSecret: return "Chiave sync Watch non ancora disponibile."
         }
     }
 }

@@ -30,16 +30,43 @@ final class CloudSyncStore: ObservableObject {
     }
 
     func load<T: Decodable>(_ type: T.Type, forKey key: String) -> T? {
-        if let cloudData = cloudStore.data(forKey: key),
+        let cloudData = cloudStore.data(forKey: key)
+        let localData = defaults.data(forKey: key)
+        let cloudModifiedAt = cloudStore.double(forKey: modifiedAtKey(for: key))
+        let localModifiedAt = defaults.double(forKey: modifiedAtKey(for: key))
+
+        if let cloudData, let localData {
+            if cloudModifiedAt > localModifiedAt,
+               let decoded = decode(type, from: cloudData) {
+                defaults.set(cloudData, forKey: key)
+                defaults.set(cloudModifiedAt, forKey: modifiedAtKey(for: key))
+                lastSyncStatus = "Dati caricati da iCloud"
+                return decoded
+            }
+
+            if let decoded = decode(type, from: localData) {
+                if localModifiedAt > cloudModifiedAt {
+                    cloudStore.set(localData, forKey: key)
+                    cloudStore.set(localModifiedAt, forKey: modifiedAtKey(for: key))
+                    synchronize()
+                    lastSyncStatus = "Dati locali piu recenti pronti per iCloud"
+                }
+                return decoded
+            }
+        }
+
+        if let cloudData,
            let decoded = decode(type, from: cloudData) {
             defaults.set(cloudData, forKey: key)
+            defaults.set(cloudModifiedAt, forKey: modifiedAtKey(for: key))
             lastSyncStatus = "Dati caricati da iCloud"
             return decoded
         }
 
-        if let localData = defaults.data(forKey: key),
+        if let localData,
            let decoded = decode(type, from: localData) {
             cloudStore.set(localData, forKey: key)
+            cloudStore.set(localModifiedAt, forKey: modifiedAtKey(for: key))
             synchronize()
             lastSyncStatus = "Dati locali pronti per iCloud"
             return decoded
@@ -54,8 +81,11 @@ final class CloudSyncStore: ObservableObject {
             return
         }
 
+        let modifiedAt = Date().timeIntervalSince1970
         defaults.set(data, forKey: key)
+        defaults.set(modifiedAt, forKey: modifiedAtKey(for: key))
         cloudStore.set(data, forKey: key)
+        cloudStore.set(modifiedAt, forKey: modifiedAtKey(for: key))
         synchronize()
         lastSyncStatus = isICloudAvailable ? "Salvato localmente e su iCloud" : "Salvato localmente, iCloud non disponibile"
     }
@@ -75,5 +105,9 @@ final class CloudSyncStore: ObservableObject {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         return try? decoder.decode(type, from: data)
+    }
+
+    private func modifiedAtKey(for key: String) -> String {
+        "\(key).__modifiedAt"
     }
 }
