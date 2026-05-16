@@ -42,7 +42,7 @@ struct ApneaView: View {
         DivePanel(stroke: exploration.apneaState == .warning ? DiveUI.red : DiveUI.yellow) {
             VStack(spacing: 7) {
                 Text(Formatters.time(exploration.currentApneaSeconds))
-                    .font(.system(size: 56, weight: .black, design: .rounded))
+                    .font(.system(size: 60, weight: .black, design: .rounded))
                     .minimumScaleFactor(0.62)
                     .lineLimit(1)
                     .monospacedDigit()
@@ -72,6 +72,7 @@ struct ApneaView: View {
                 ZStack {
                     Circle()
                         .fill(recoveryColor.opacity(0.13))
+                        .shadow(color: recoveryColor.opacity(0.28), radius: 8, x: 0, y: 0)
                     Circle()
                         .stroke(recoveryColor.opacity(0.78), lineWidth: 1)
                     Image(systemName: "timer")
@@ -83,9 +84,9 @@ struct ApneaView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("RECOVERY")
                         .font(.system(size: 10, weight: .black, design: .rounded))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(DiveUI.secondaryText)
                     Text(Formatters.time(exploration.recoverySeconds))
-                        .font(.system(size: 30, weight: .black, design: .rounded))
+                        .font(.system(size: 33, weight: .black, design: .rounded))
                         .minimumScaleFactor(0.72)
                         .monospacedDigit()
                         .foregroundStyle(recoveryColor)
@@ -145,7 +146,8 @@ struct ApneaView: View {
         return DivePanel(stroke: color) {
             HStack(spacing: 8) {
                 Image(systemName: hasWarning ? "exclamationmark.triangle.fill" : "checkmark.shield.fill")
-                    .font(.caption.bold())
+                    .font(.system(size: 16, weight: .black))
+                    .shadow(color: color.opacity(0.45), radius: 5, x: 0, y: 0)
                 Text(exploration.apneaWarning ?? "Buddy reminder, no-movement e depth warning attivi.")
                     .font(.system(size: 10, weight: .bold, design: .rounded))
                     .multilineTextAlignment(.leading)

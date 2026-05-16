@@ -5,12 +5,16 @@ struct AscentGaugeView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            VStack(alignment: .leading, spacing: 0) {
-                Text("VELOCITA")
-                Text("RISALITA")
+            HStack(spacing: 4) {
+                Image(systemName: status.isOverLimit ? "exclamationmark.triangle.fill" : "arrow.up")
+                    .font(.system(size: 10, weight: .black))
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("VELOCITA")
+                    Text("RISALITA")
+                }
             }
             .font(.system(size: 10, weight: .black, design: .rounded))
-            .foregroundStyle(.white)
+            .foregroundStyle(status.isOverLimit ? DiveUI.red : .white)
             .lineLimit(1)
             .minimumScaleFactor(0.78)
 
@@ -31,10 +35,16 @@ struct AscentGaugeView: View {
         .padding(.horizontal, 4)
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(DiveUI.panelFill.opacity(0.72))
+                .fill(
+                    LinearGradient(
+                        colors: [pointerColor.opacity(0.14), DiveUI.panelFill.opacity(0.82)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
                 .overlay(
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .stroke(DiveUI.hairline, lineWidth: 1)
+                        .stroke(pointerColor.opacity(0.62), lineWidth: 1)
                 )
         )
         .animation(.easeInOut(duration: 0.22), value: status.currentRateMetersPerMinute)
@@ -76,6 +86,7 @@ struct AscentGaugeView: View {
                         RoundedRectangle(cornerRadius: 4, style: .continuous)
                             .stroke(.white.opacity(0.7), lineWidth: 1)
                     )
+                    .shadow(color: pointerColor.opacity(0.24), radius: 5, x: 0, y: 0)
 
                 VStack(spacing: max((geometry.size.height - 6) / 5.0 - 1, 0)) {
                     ForEach(0..<6, id: \.self) { tick in
@@ -87,10 +98,10 @@ struct AscentGaugeView: View {
                 .frame(maxHeight: .infinity)
 
                 Triangle()
-                    .fill(.white)
+                    .fill(pointerColor)
                     .frame(width: 15, height: 17)
                     .rotationEffect(.degrees(180))
-                    .shadow(color: pointerColor.opacity(0.6), radius: 4, x: 0, y: 0)
+                    .shadow(color: pointerColor.opacity(0.75), radius: 6, x: 0, y: 0)
                     .offset(x: 25, y: pointerOffset(in: geometry.size.height))
             }
         }

@@ -9,7 +9,7 @@ struct ModeSelectionView: View {
             DiveScreenBackground()
 
             ScrollView {
-                VStack(spacing: 11) {
+                VStack(spacing: 12) {
                     DiveScreenHeader(
                         "DIR DIVING",
                         subtitle: "PRE-DIVE MODE SELECTOR",
@@ -18,6 +18,8 @@ struct ModeSelectionView: View {
                     )
 
                     selectorHero
+
+                    crownHint
 
                     ForEach(DIRActivityMode.allCases) { mode in
                         modeCard(mode)
@@ -47,13 +49,18 @@ struct ModeSelectionView: View {
                 ZStack {
                     Circle()
                         .fill(exploration.selectedMode.accent.opacity(0.14))
+                        .shadow(color: exploration.selectedMode.accent.opacity(0.38), radius: 10, x: 0, y: 0)
                     Circle()
                         .stroke(exploration.selectedMode.accent.opacity(0.8), lineWidth: 1)
+                    Circle()
+                        .trim(from: 0, to: 0.72)
+                        .stroke(exploration.selectedMode.accent.opacity(0.9), style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                        .rotationEffect(.degrees(-110))
                     Image(systemName: exploration.selectedMode.symbol)
-                        .font(.system(size: 27, weight: .black))
+                        .font(.system(size: 29, weight: .black))
                         .foregroundStyle(exploration.selectedMode.accent)
                 }
-                .frame(width: 58, height: 58)
+                .frame(width: 62, height: 62)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(exploration.selectedMode.rawValue.uppercased())
@@ -73,6 +80,25 @@ struct ModeSelectionView: View {
             }
         }
         .animation(.easeInOut(duration: 0.2), value: exploration.selectedMode)
+    }
+
+    private var crownHint: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "digitalcrown.horizontal.press")
+            Text("Crown to review modes")
+            Spacer(minLength: 0)
+            Image(systemName: "hand.tap.fill")
+            Text("Tap large card")
+        }
+        .font(.system(size: 9, weight: .bold, design: .rounded))
+        .foregroundStyle(DiveUI.mutedText)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(
+            Capsule()
+                .fill(.white.opacity(0.045))
+                .overlay(Capsule().stroke(DiveUI.hairline, lineWidth: 1))
+        )
     }
 
     private func modeCard(_ mode: DIRActivityMode) -> some View {
@@ -102,7 +128,7 @@ struct ModeSelectionView: View {
                             .font(.system(size: 21, weight: .black))
                             .foregroundStyle(mode.accent)
                     }
-                    .frame(width: 44, height: 44)
+                    .frame(width: 48, height: 48)
 
                     VStack(alignment: .leading, spacing: 3) {
                         Text(mode.rawValue)
@@ -118,13 +144,13 @@ struct ModeSelectionView: View {
                     Spacer(minLength: 0)
 
                     Image(systemName: isSelected ? "checkmark.circle.fill" : "chevron.right")
-                        .font(.caption.bold())
+                        .font(.system(size: isSelected ? 17 : 13, weight: .black))
                         .foregroundStyle(mode.accent)
                 }
             }
         }
         .buttonStyle(.plain)
-        .scaleEffect(isSelected ? 1.015 : 1)
+        .scaleEffect(isSelected ? 1.018 : 1)
         .animation(.easeInOut(duration: 0.18), value: isSelected)
     }
 
