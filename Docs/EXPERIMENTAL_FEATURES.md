@@ -60,6 +60,51 @@ Operational boundaries:
 - Snorkeling waypoints and return-to-entry are situational-awareness aids, not certified underwater navigation systems.
 - Apnea warning and recovery surfaces are training aids and do not replace buddy procedures, instruction, or certified safety devices.
 
+### Latest Snorkeling UI Scope
+
+The latest Apple Watch experimental Snorkeling work adds or restyles these UI-only screens:
+
+- `Snorkeling Live`: runtime, distance, average speed, current depth, GPS status, waypoint panel, marker, return, and BUSSOLA actions.
+- `Mappa Waypoint`: current position relative to the selected/next waypoint, with a lightweight dark marine map, dashed yellow route, target marker, zoom controls, and scale indicator.
+- `Mappa Ritorno`: separate return-to-entry map with cyan dashed route, home/entry marker, current marker, zoom controls, and scale indicator.
+- `Direzione Waypoint`: compass-style bearing surface for waypoint navigation. It is not the generic compass screen.
+- `GPS Marker`: confirmation screen for saved marker coordinates and category.
+- `Dettaglio Marcatore POI`: Watch-side POI metadata detail with `Da arricchire su iPhone` and `Foto/Note: Companion iOS`.
+- `Allarmi Snorkeling`: snorkeling-specific visual alarm thresholds for maximum depth, maximum time, maximum distance, and low battery.
+
+Terminology rule: use `BUSSOLA`, never `COMPASSO`.
+
+### POI / Marker Boundary
+
+The Watch marker action is a lightweight Point Of Interest capture, not a full editing workflow.
+
+Expected lightweight POI payload:
+
+- timestamp;
+- last valid GPS coordinate;
+- shallow/current depth if available;
+- temperature if available;
+- current heading/bearing if available;
+- active waypoint if available;
+- session id when exposed;
+- enrichment state (`isEnriched = false`) when a dedicated POI model is introduced.
+
+The Watch must not edit photos, videos, comments, tags, categories, species notes, or long observations. Those enrichment fields belong to the iOS Companion after sync.
+
+### Free Map / Offline Map Roadmap
+
+For Apple Watch, the current implementation intentionally uses SwiftUI map-like visuals and does not render online tiles.
+
+Future companion-side architecture:
+
+- MapLibre Native or a compatible SwiftUI wrapper after device validation.
+- OpenStreetMap-compatible base tiles.
+- Optional OpenSeaMap marine overlay where license and usage allow it.
+- MBTiles for packaged/offline cache.
+- GEBCO and/or EMODnet as future bathymetry overlays.
+
+Production apps should not hard-code heavy use of public OpenStreetMap tile servers. Prefer a self-hosted tile server, approved provider, or packaged MBTiles.
+
 Persistence:
 
 - The Watch experimental branch mirrors dive logs, ascent-rate settings, Snorkeling markers, Apnea records, active mode, waypoint state, and warning state to iCloud Key-Value Store when the app is signed with the iCloud capability.

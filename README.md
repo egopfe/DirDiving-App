@@ -414,3 +414,98 @@ Config/DIRDiving.entitlements
 ```
 
 The Apple water depth/submersion entitlement is intentionally not filled in yet because approval is pending. After Apple grants the entitlement, update this file and rebuild with the correct signing profile.
+
+## Branch Strategy
+
+La strategia branch corrente e:
+
+- `main`: codice stabile, orientato alla produzione Apple Watch, con Diving mode preservato come funzione primaria.
+- `main-iOS`: codice stabile per iOS Companion.
+- `codex/experimental-features`: ramo Apple Watch per UI e funzioni sperimentali Snorkeling, Apnea, Buddy Assist e schermate future.
+- `codex/ios-experimental-features`: ramo iOS per companion UI, pianificazione, mappe, enrichment POI e superfici sperimentali.
+
+Regole operative:
+
+- Il lavoro di allineamento UI-only non deve modificare business logic, calcoli immersione, GPS, algoritmi bussola, persistenza o state machine.
+- Ogni merge verso `main` deve preservare Diving mode, schermata live, warning risalita, haptic behavior, GPS entry/exit e log immersioni.
+- Le funzioni sperimentali restano isolate finche non sono validate su hardware, build XcodeGen e test manuali.
+- In caso di conflitto, preservare prima codice buildabile e comportamento Diving stabile, poi la UI master reference piu recente, poi gli aggiornamenti documentali.
+
+## Platform And Build Matrix
+
+| Branch | App | Stato | Note |
+| --- | --- | --- | --- |
+| `main` | Apple Watch | Stable | Diving mode, log, export, bussola, immagini, settings visuali. |
+| `codex/experimental-features` | Apple Watch | Experimental | Snorkeling Live, Mappa Waypoint, Mappa Ritorno, Direzione Waypoint, POI, Apnea, Buddy Assist. |
+| `main-iOS` | iOS Companion | Stable | Logbook, detail, planner/analysis surfaces, WatchConnectivity. |
+| `codex/ios-experimental-features` | iOS Companion | Experimental | Explore, route planning, waypoint management, future POI enrichment and map/offline workflows. |
+
+## Mode Selection
+
+La selezione modalita su Apple Watch separa:
+
+- `Diving`: dive computer principale con profondita, TTV, RunTime, cronometro, gauge risalita e warning.
+- `Snorkeling`: navigazione superficie con waypoint, ritorno al punto di partenza, marker/POI e mappe leggere.
+- `Apnea`: timer apnea, recovery assistant, counter e warning sperimentali.
+
+Le modalita condividono il design system nero/neon, ma non devono condividere logiche safety in modo implicito.
+
+## UI Master References
+
+Le UI Apple Watch devono seguire `MASTER_REFERENCE_DIVING_LIVE.png` come riferimento canonico per densita, gerarchia, colore e bordo. Le UI iOS devono seguire `iOS_look_feel.png`.
+
+Riferimenti recenti per Snorkeling sperimentale:
+
+- `01_snorkeling_live_final.png`
+- `02_Mappa_Waypoint_reference.png`
+- `03_Mappa_Ritorno_reference.png`
+- `04_Direzione_Waypoint_reference.png`
+- `05_Log_Marcatori_POI_AppleWatch_reference.png`
+- `06_Dettaglio_Marcatore_POI_AppleWatch_reference.png`
+- `08_Allarmi_Snorkeling_reference.png`
+
+## Feature Matrix
+
+La matrice feature aggiornata e in:
+
+```text
+Docs/DIR_DIVING_Feature_Comparison.csv
+```
+
+La specifica Snorkeling sperimentale e in:
+
+```text
+Docs/SNORKELING_EXPERIMENTAL_SPEC.md
+```
+
+## Snorkeling Experimental Notes
+
+Snorkeling su Apple Watch experimental include:
+
+- Live screen con runtime, distanza, velocita media, profondita attuale e GPS status.
+- Mappa Waypoint separata dalla Mappa Ritorno.
+- Direzione Waypoint come funzione compass-style verso il waypoint, non bussola generica.
+- `BUSSOLA` come terminologia obbligatoria; non usare `COMPASSO`.
+- `MARCATORE` come quick-capture POI leggero.
+- Dettaglio POI con metadata e nota `Da arricchire su iPhone`.
+- Allarmi snorkeling specifici, separati dai settings globali.
+
+Il Watch non modifica foto/commenti POI. Il companion iOS arricchira i POI dopo sync con foto, video, commenti, categorie, tag e note osservazione.
+
+## Known Limitations
+
+- GPS e affidabile solo in superficie; sott'acqua usare ultimo fix valido e contesto bussola/waypoint come supporto informativo.
+- Le mappe Watch sono leggere e SwiftUI-only; non scaricano tile online.
+- OpenStreetMap public tile server non devono essere usati hard-coded per traffico production pesante.
+- OpenSeaMap, GEBCO, EMODnet e MBTiles restano roadmap/future layer.
+- Apnea e Snorkeling experimental non sono dispositivi certificati di sicurezza.
+- Buddy Assist resta sperimentale e limitato dalle policy watchOS BLE.
+
+## Roadmap
+
+- Validare build XcodeGen su macOS per ogni ramo.
+- Collegare POI Watch a payload sync leggero e enrichment iOS.
+- Definire store persistente per soglie Snorkeling quando richiesto.
+- Introdurre workflow MapLibre/OpenSeaMap/MBTiles sul companion iOS dopo valutazione licenze e prestazioni.
+- Aggiungere report test hardware Apple Watch Ultra per Diving, Snorkeling e Apnea.
+- Preparare export e documentazione Subsurface piu completa per import CSV.
