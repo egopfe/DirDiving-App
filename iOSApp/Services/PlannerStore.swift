@@ -11,9 +11,11 @@ final class PlannerStore: ObservableObject {
     }
     @Published var plan = PlannerService.makePlan(input: GasPlanInput())
     @Published var buhlmann = BuhlmannPlanner.plan(depthMeters: 40, o2Fraction: 0.18)
+    var analysis: TechnicalGasAnalysis { GasPlanningService.analyze(input: input) }
+    var briefingText: String { plan.briefingLines.joined(separator: "\n") }
 
     private let cloudSync: CloudSyncStore?
-    private let key = "dirdiving_ios_planner_state"
+    private let key = "dirdiving_ios_experimental_planner_state"
     private var isReady = false
 
     init(cloudSync: CloudSyncStore? = nil) {
@@ -31,6 +33,11 @@ final class PlannerStore: ObservableObject {
         plan = PlannerService.makePlan(input: input)
         buhlmann = BuhlmannPlanner.plan(depthMeters: input.plannedDepthMeters, o2Fraction: input.bottomGas.oxygen)
         saveIfReady()
+    }
+
+    func updateTeamMember(_ member: TeamMember) {
+        guard let index = input.teamMembers.firstIndex(where: { $0.id == member.id }) else { return }
+        input.teamMembers[index] = member
     }
 
     private func saveIfReady() {

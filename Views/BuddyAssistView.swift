@@ -336,4 +336,3 @@ struct BuddyAssistView: View {
         return "\(Int(degrees.rounded()))\u{00B0}"
     }
 }
-

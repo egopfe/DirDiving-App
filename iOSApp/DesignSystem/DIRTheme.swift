@@ -12,5 +12,6 @@ enum DIRTheme {
     static let muted = Color.white.opacity(0.64)
     static let faint = Color.white.opacity(0.11)
     static let hairline = Color.white.opacity(0.14)
-    static let cardRadius: CGFloat = 10
+    static let cardRadius: CGFloat = 16
+    static let compactRadius: CGFloat = 10
 }

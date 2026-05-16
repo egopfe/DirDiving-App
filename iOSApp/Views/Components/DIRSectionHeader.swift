@@ -6,8 +6,15 @@ struct DIRSectionHeader: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text(title.uppercased()).font(.caption.weight(.bold)).tracking(1.3).foregroundStyle(DIRTheme.cyan)
-            if let subtitle { Text(subtitle).font(.footnote).foregroundStyle(DIRTheme.muted) }
+            Text(title.uppercased())
+                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .tracking(1.1)
+                .foregroundStyle(DIRTheme.cyan)
+            if let subtitle {
+                Text(subtitle)
+                    .font(.footnote)
+                    .foregroundStyle(DIRTheme.muted)
+            }
         }
     }
 }

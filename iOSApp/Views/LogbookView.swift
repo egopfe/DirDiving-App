@@ -51,17 +51,22 @@ struct LogbookView: View {
     }
 
     private var header: some View {
-        HStack(alignment: .firstTextBaseline) {
-            Text("Logbook")
-                .font(.system(size: 28, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-            Spacer()
-            Image(systemName: "plus")
-                .font(.title3.weight(.medium))
-                .foregroundStyle(DIRTheme.cyan)
-            Image(systemName: "ellipsis.circle")
-                .font(.title3.weight(.medium))
-                .foregroundStyle(DIRTheme.cyan)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("Logbook")
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                Spacer()
+                Image(systemName: "plus")
+                    .font(.title3.weight(.medium))
+                    .foregroundStyle(DIRTheme.cyan)
+                Image(systemName: "ellipsis.circle")
+                    .font(.title3.weight(.medium))
+                    .foregroundStyle(DIRTheme.cyan)
+            }
+            Text("Dive history, sync status and inspection-ready session cards")
+                .font(.callout)
+                .foregroundStyle(DIRTheme.muted)
         }
     }
 }
@@ -109,8 +114,9 @@ struct DiveLogCard: View {
         .padding(10)
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .fill(DIRTheme.surface.opacity(0.72))
+                .fill(DIRTheme.surface.opacity(0.8))
                 .overlay(RoundedRectangle(cornerRadius: 10).stroke(DIRTheme.hairline, lineWidth: 1))
+                .shadow(color: DIRTheme.cyan.opacity(0.06), radius: 10, x: 0, y: 6)
         )
     }
 

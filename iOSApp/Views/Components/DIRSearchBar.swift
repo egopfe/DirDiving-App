@@ -10,6 +10,10 @@ struct DIRSearchBar: View {
         .font(.callout)
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
-        .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface2.opacity(0.78)))
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(DIRTheme.surface2.opacity(0.78))
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.hairline, lineWidth: 1))
+        )
     }
 }
