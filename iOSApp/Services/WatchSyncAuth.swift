@@ -68,7 +68,7 @@ enum WatchSyncAuth {
     }
 
     private static func loadKeychain(account: String) -> Data? {
-        var query: [String: Any] = [
+        let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: keychainService,
             kSecAttrAccount as String: account,

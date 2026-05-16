@@ -70,7 +70,7 @@ enum WatchDiveSyncCodec {
     }
 
     private static func syncKey() -> SymmetricKey {
-        let peer = WCSession.default.watchAppBundleIdentifier ?? expectedWatchBundleID
+        let peer = expectedWatchBundleID
         return WatchSyncAuth.syncKey(peerBundleID: peer)
     }
 
