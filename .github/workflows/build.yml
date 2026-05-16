@@ -27,7 +27,7 @@ jobs:
           if grep -q "DIRDiving Watch App" project.yml; then
             xcodebuild build \
               -project DIRDiving.xcodeproj \
-              -target "DIRDiving Watch App" \
+              -scheme "DIRDiving Watch App" \
               -destination "generic/platform=watchOS Simulator" \
               CODE_SIGNING_ALLOWED=NO \
               CODE_SIGNING_REQUIRED=NO
@@ -40,7 +40,7 @@ jobs:
           if grep -q "DIRDiving iOS" project.yml; then
             xcodebuild build \
               -project DIRDiving.xcodeproj \
-              -target "DIRDiving iOS" \
+              -scheme "DIRDiving iOS" \
               -destination "generic/platform=iOS Simulator" \
               CODE_SIGNING_ALLOWED=NO \
               CODE_SIGNING_REQUIRED=NO
