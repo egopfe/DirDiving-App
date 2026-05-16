@@ -464,6 +464,21 @@ private func premiumMiniCard(_ title: String, value: String, symbol: String, col
     }
 }
 
+private func referenceChip(_ title: String, _ color: Color) -> some View {
+    Text(title)
+        .font(.system(size: 9, weight: .black, design: .rounded))
+        .foregroundStyle(color)
+        .lineLimit(1)
+        .minimumScaleFactor(0.72)
+        .frame(maxWidth: .infinity, minHeight: 30)
+        .background(
+            Capsule()
+                .fill(color.opacity(0.12))
+                .overlay(Capsule().stroke(color.opacity(0.68), lineWidth: 1))
+                .shadow(color: color.opacity(0.16), radius: 4, x: 0, y: 0)
+        )
+}
+
 private func metric(_ title: String, _ value: String, _ color: Color) -> some View {
     VStack(spacing: 2) {
         Text(title)
