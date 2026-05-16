@@ -17,6 +17,7 @@ struct ExplorationCenterView: View {
                         ExperimentalFutureConceptsView()
                         waypointPlanner
                         routeCard
+                        apneaCompanionReview
                         apneaAnalytics
                         syncAndSettings
                         exportCard
@@ -181,6 +182,165 @@ struct ExplorationCenterView: View {
                 .chartYAxis { AxisMarks(values: .automatic) { AxisGridLine().foregroundStyle(DIRTheme.hairline); AxisValueLabel().foregroundStyle(DIRTheme.muted) } }
             }
         }
+    }
+
+    private var apneaCompanionReview: some View {
+        DIRCard("Apnea Review", icon: "waveform.path.ecg", accent: DIRTheme.cyan) {
+            VStack(spacing: 0) {
+                HStack {
+                    Button {} label: {
+                        Image(systemName: "chevron.left")
+                            .font(.headline.weight(.semibold))
+                            .foregroundStyle(DIRTheme.cyan)
+                    }
+                    .buttonStyle(.plain)
+
+                    Spacer()
+
+                    Text("Apnea")
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(.white)
+
+                    Spacer()
+
+                    Image(systemName: "ellipsis")
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(DIRTheme.muted)
+                }
+                .padding(.horizontal, 10)
+                .padding(.top, 6)
+                .padding(.bottom, 12)
+
+                HStack(spacing: 0) {
+                    reviewTab("Riepilogo", isActive: true)
+                    reviewTab("Grafico", isActive: false)
+                    reviewTab("Dettagli", isActive: false)
+                }
+                .padding(.horizontal, 4)
+                .padding(.bottom, 12)
+
+                apneaReviewMap
+
+                // TODO: Replace placeholder metrics with synced Apnea session values when available.
+                HStack(spacing: 0) {
+                    reviewMetric("22.4", unit: "m", label: "Prof. max")
+                    Rectangle().fill(DIRTheme.hairline).frame(width: 1, height: 44)
+                    reviewMetric("1:55", unit: nil, label: "Tempo")
+                    Rectangle().fill(DIRTheme.hairline).frame(width: 1, height: 44)
+                    reviewMetric("10", unit: "°C", label: "Temp. acqua")
+                }
+                .padding(.top, 14)
+            }
+        }
+    }
+
+    private var apneaReviewMap: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 0)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.02, green: 0.18, blue: 0.24),
+                            Color(red: 0.01, green: 0.06, blue: 0.09)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(apneaReviewWaterTexture)
+
+            // TODO: Replace the static review path with synced Apnea GPS/profile data when available.
+            ApneaCompanionRouteShape()
+                .stroke(DIRTheme.cyan, style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
+                .shadow(color: DIRTheme.cyan.opacity(0.55), radius: 8)
+                .padding(32)
+
+            ForEach(apneaReviewPoints.indices, id: \.self) { index in
+                Circle()
+                    .fill(Color(red: 0.0, green: 0.30, blue: 0.82))
+                    .frame(width: 12, height: 12)
+                    .overlay(Circle().stroke(DIRTheme.cyan, lineWidth: 2))
+                    .position(apneaReviewPoints[index])
+            }
+
+            HStack {
+                Spacer()
+                VStack(spacing: 6) {
+                    Image(systemName: "mappin.circle.fill")
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(DIRTheme.cyan)
+                    Text("entry")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(DIRTheme.muted)
+                }
+                .padding(14)
+                .background(Circle().fill(Color.black.opacity(0.38)))
+                .padding(.trailing, 28)
+            }
+        }
+        .frame(height: 210)
+        .clipShape(RoundedRectangle(cornerRadius: 2, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 2, style: .continuous).stroke(DIRTheme.cyan.opacity(0.18), lineWidth: 1))
+    }
+
+    private var apneaReviewWaterTexture: some View {
+        ZStack {
+            ForEach(0..<5) { index in
+                Capsule()
+                    .fill(DIRTheme.cyan.opacity(0.055))
+                    .frame(width: CGFloat(170 + index * 42), height: 16)
+                    .rotationEffect(.degrees(Double(-18 + index * 6)))
+                    .offset(x: CGFloat(-95 + index * 34), y: CGFloat(-54 + index * 28))
+                    .blur(radius: 8)
+            }
+        }
+    }
+
+    private var apneaReviewPoints: [CGPoint] {
+        [
+            CGPoint(x: 78, y: 150),
+            CGPoint(x: 96, y: 78),
+            CGPoint(x: 174, y: 66),
+            CGPoint(x: 244, y: 88),
+            CGPoint(x: 248, y: 156),
+            CGPoint(x: 160, y: 160),
+            CGPoint(x: 132, y: 116)
+        ]
+    }
+
+    private func reviewTab(_ title: String, isActive: Bool) -> some View {
+        VStack(spacing: 8) {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(isActive ? .white : DIRTheme.muted)
+                .frame(maxWidth: .infinity)
+            Rectangle()
+                .fill(isActive ? DIRTheme.cyan : .clear)
+                .frame(height: 3)
+                .shadow(color: isActive ? DIRTheme.cyan.opacity(0.55) : .clear, radius: 4)
+        }
+    }
+
+    private func reviewMetric(_ value: String, unit: String?, label: String) -> some View {
+        VStack(spacing: 3) {
+            HStack(alignment: .lastTextBaseline, spacing: 3) {
+                Text(value)
+                    .font(.system(size: 28, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(.white)
+                if let unit {
+                    Text(unit)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white)
+                }
+            }
+            Text(label)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(DIRTheme.muted)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+        .frame(maxWidth: .infinity)
     }
 
     private var syncAndSettings: some View {
@@ -394,5 +554,28 @@ struct ExplorationCenterView: View {
             let y = 168 - 82 * sin(progress * .pi) + 28 * sin(progress * .pi * 2)
             return CGPoint(x: x, y: y)
         }
+    }
+}
+
+private struct ApneaCompanionRouteShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        let points: [CGPoint] = [
+            CGPoint(x: rect.minX + rect.width * 0.07, y: rect.minY + rect.height * 0.72),
+            CGPoint(x: rect.minX + rect.width * 0.16, y: rect.minY + rect.height * 0.25),
+            CGPoint(x: rect.minX + rect.width * 0.47, y: rect.minY + rect.height * 0.17),
+            CGPoint(x: rect.minX + rect.width * 0.84, y: rect.minY + rect.height * 0.38),
+            CGPoint(x: rect.minX + rect.width * 0.88, y: rect.minY + rect.height * 0.76),
+            CGPoint(x: rect.minX + rect.width * 0.46, y: rect.minY + rect.height * 0.80),
+            CGPoint(x: rect.minX + rect.width * 0.34, y: rect.minY + rect.height * 0.54),
+            CGPoint(x: rect.minX + rect.width * 0.07, y: rect.minY + rect.height * 0.72)
+        ]
+
+        var path = Path()
+        guard let first = points.first else { return path }
+        path.move(to: first)
+        for point in points.dropFirst() {
+            path.addLine(to: point)
+        }
+        return path
     }
 }
