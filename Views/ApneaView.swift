@@ -93,6 +93,7 @@ struct ApneaView: View {
         }
     }
 
+    @ViewBuilder
     private var sessionScreen: some View {
         if isApneaAscentAlarmVisible {
             apneaDepthStatusScreen(
