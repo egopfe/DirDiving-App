@@ -6,81 +6,62 @@ struct ModeSelectionView: View {
 
     var body: some View {
         ZStack {
-            DiveScreenBackground()
+            Color.black.ignoresSafeArea()
 
             ScrollView {
-                VStack(spacing: 11) {
-                    DiveScreenHeader(
-                        "DIR DIVING",
-                        subtitle: "PRE-DIVE MODE SELECTOR",
-                        accent: DiveUI.cyan,
-                        systemImage: "water.waves"
-                    )
-
-                    selectorHero
-
-                    ForEach(DIRActivityMode.allCases) { mode in
-                        modeCard(mode)
-                    }
-
-                    ExperimentalConceptDeckView()
-
-                    DivePanel(stroke: DiveUI.yellow) {
-                        HStack(alignment: .top, spacing: 8) {
-                            Image(systemName: "exclamationmark.triangle.fill")
-                                .font(.caption.bold())
-                            Text("Seleziona modalita prima di entrare in acqua. Pairing, waypoint e warning vanno preparati in superficie.")
-                                .font(.system(size: 10, weight: .semibold, design: .rounded))
-                                .multilineTextAlignment(.leading)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        .foregroundStyle(DiveUI.yellow)
-                    }
+                VStack(spacing: 8) {
+                    header
+                    apneaModeCard
+                    modeCard(.diving)
+                    modeCard(.snorkeling)
+                    settingsCard
                 }
-                .padding(.horizontal, DiveUI.screenPadding)
-                .padding(.vertical, 10)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 14)
             }
         }
     }
 
-    private var selectorHero: some View {
-        DivePanel(stroke: exploration.selectedMode.accent) {
-            HStack(spacing: 10) {
-                ZStack {
-                    Circle()
-                        .fill(exploration.selectedMode.accent.opacity(0.14))
-                    Circle()
-                        .stroke(exploration.selectedMode.accent.opacity(0.8), lineWidth: 1)
-                    Image(systemName: exploration.selectedMode.symbol)
-                        .font(.system(size: 27, weight: .black))
-                        .foregroundStyle(exploration.selectedMode.accent)
-                }
-                .frame(width: 58, height: 58)
+    private var header: some View {
+        HStack(alignment: .center, spacing: 8) {
+            DiveOctopusLogo(accent: DiveUI.blue)
+                .frame(width: 38, height: 34)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(exploration.selectedMode.rawValue.uppercased())
-                        .font(.system(size: 17, weight: .black, design: .rounded))
-                        .foregroundStyle(.white)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.72)
-                    Text(modeDescription(exploration.selectedMode))
-                        .font(.system(size: 10, weight: .semibold, design: .rounded))
-                        .foregroundStyle(DiveUI.secondaryText)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.72)
-                    DiveStatusPill("ACTIVE", color: exploration.selectedMode.accent, systemImage: "checkmark.circle.fill")
-                }
+            Text("DIR DIVING")
+                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                .foregroundStyle(DiveUI.yellow)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
 
-                Spacer(minLength: 0)
-            }
+            Spacer(minLength: 0)
+
+            // TODO: Wire to a shared watch clock if one is introduced.
+            Text("10:09")
+                .font(.system(size: 18, weight: .semibold, design: .rounded))
+                .monospacedDigit()
+                .foregroundStyle(.white)
         }
-        .animation(.easeInOut(duration: 0.2), value: exploration.selectedMode)
+        .padding(.bottom, 6)
+    }
+
+    private var apneaModeCard: some View {
+        Button {
+            exploration.select(.apnea)
+            navigation.selectedPage = .apnea
+        } label: {
+            modeRow(
+                title: "Apnea",
+                systemImage: DIRActivityMode.apnea.symbol,
+                accent: DiveUI.blue,
+                isHighlighted: true,
+                isSelected: exploration.selectedMode == .apnea
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     private func modeCard(_ mode: DIRActivityMode) -> some View {
-        let isSelected = exploration.selectedMode == mode
-
-        return Button {
+        Button {
             exploration.select(mode)
             switch mode {
             case .diving:
@@ -91,50 +72,90 @@ struct ModeSelectionView: View {
                 navigation.selectedPage = .snorkeling
             }
         } label: {
-            DivePanel(stroke: isSelected ? mode.accent : DiveUI.hairline) {
-                HStack(spacing: 10) {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .fill(mode.accent.opacity(isSelected ? 0.18 : 0.1))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                    .stroke(mode.accent.opacity(isSelected ? 0.9 : 0.45), lineWidth: 1)
-                            )
-                        Image(systemName: mode.symbol)
-                            .font(.system(size: 21, weight: .black))
-                            .foregroundStyle(mode.accent)
-                    }
-                    .frame(width: 44, height: 44)
-
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(mode.rawValue)
-                            .font(.system(size: 15, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .lineLimit(1)
-                        Text(modeDescription(mode))
-                            .font(.system(size: 10, weight: .medium, design: .rounded))
-                            .foregroundStyle(DiveUI.secondaryText)
-                            .lineLimit(2)
-                    }
-
-                    Spacer(minLength: 0)
-
-                    Image(systemName: isSelected ? "checkmark.circle.fill" : "chevron.right")
-                        .font(.caption.bold())
-                        .foregroundStyle(mode.accent)
-                }
-            }
+            modeRow(
+                title: mode.title,
+                systemImage: mode.symbol,
+                accent: mode == .diving ? DiveUI.blue : DiveUI.cyan,
+                isHighlighted: false,
+                isSelected: exploration.selectedMode == mode
+            )
         }
         .buttonStyle(.plain)
-        .scaleEffect(isSelected ? 1.015 : 1)
-        .animation(.easeInOut(duration: 0.18), value: isSelected)
     }
 
-    private func modeDescription(_ mode: DIRActivityMode) -> String {
-        switch mode {
-        case .diving: return "Dive computer premium"
-        case .apnea: return "Timer, recovery, depth warnings"
-        case .snorkeling: return "GPS route, waypoint, return-to-entry"
+    private var settingsCard: some View {
+        Button {
+            navigation.selectedPage = .ascentSettings
+        } label: {
+            modeRow(
+                title: "Impostazioni",
+                systemImage: "gearshape",
+                accent: DiveUI.secondaryText,
+                isHighlighted: false,
+                isSelected: false
+            )
         }
+        .buttonStyle(.plain)
+    }
+
+    private func modeRow(
+        title: String,
+        systemImage: String,
+        accent: Color,
+        isHighlighted: Bool,
+        isSelected: Bool
+    ) -> some View {
+        HStack(spacing: 12) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(accent.opacity(isHighlighted ? 0.26 : 0.1))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .stroke(accent.opacity(isHighlighted ? 0.85 : 0.42), lineWidth: isHighlighted ? 1.5 : 1)
+                    )
+
+                Image(systemName: systemImage)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundStyle(isHighlighted ? .white : accent)
+            }
+            .frame(width: 38, height: 38)
+
+            Text(title)
+                .font(.system(size: 20, weight: .semibold, design: .rounded))
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+                .foregroundStyle(isHighlighted ? .white : DiveUI.secondaryText)
+
+            Spacer(minLength: 0)
+
+            if isSelected {
+                Circle()
+                    .fill(accent)
+                    .frame(width: 7, height: 7)
+                    .shadow(color: accent.opacity(0.65), radius: 4, x: 0, y: 0)
+            }
+        }
+        .padding(.horizontal, 11)
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            isHighlighted ? DiveUI.blue.opacity(0.22) : DiveUI.panelFillRaised.opacity(0.88),
+                            DiveUI.panelFill.opacity(0.98)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .stroke(isHighlighted ? DiveUI.blue.opacity(0.95) : DiveUI.hairline, lineWidth: isHighlighted ? 1.6 : 1)
+                )
+                .shadow(color: isHighlighted ? DiveUI.blue.opacity(0.25) : .clear, radius: 5, x: 0, y: 0)
+        )
+        .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 }
