@@ -27,12 +27,15 @@ enum WatchSyncAuth {
         NotificationCenter.default.post(name: .watchSyncPeerSecretDidUpdate, object: nil)
     }
 
-    static func syncKey(peerBundleID: String) -> SymmetricKey {
+    static func syncKey(peerBundleID _: String) -> SymmetricKey {
         guard let secret = loadPeerSecret() else {
-            return SymmetricKey(data: SHA256.hash(data: Data("dirmotion.watch.sync.fallback|\(peerBundleID)".utf8)))
+            return SymmetricKey(data: SHA256.hash(data: Data()))
         }
-        var material = secret
-        material.append(Data(peerBundleID.utf8))
+        let localSecret = loadOrCreateLocalSecret()
+        let orderedSecrets = [localSecret, secret].sorted { $0.lexicographicallyPrecedes($1) }
+        var material = Data("dirdiving.watch.sync.v2|com.egopfe.dirdiving|com.egopfe.dirdiving.ios|".utf8)
+        material.append(orderedSecrets[0])
+        material.append(orderedSecrets[1])
         return SymmetricKey(data: SHA256.hash(data: material))
     }
 
