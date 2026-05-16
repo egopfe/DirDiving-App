@@ -9,17 +9,14 @@ struct DiveLiveView: View {
 
             GeometryReader { geometry in
                 let contentWidth = geometry.size.width - 18
-                let gaugeWidth = min(62, contentWidth * 0.25)
-                let leftWidth = contentWidth - gaugeWidth - 7
+                let gaugeWidth = min(58, contentWidth * 0.24)
+                let leftWidth = contentWidth - gaugeWidth - 8
 
-                VStack(spacing: 8) {
+                VStack(spacing: 7) {
                     if dive.isDiveActive && dive.ascentStatus.isOverLimit {
                         AscentWarningView(status: dive.ascentStatus)
                     } else if dive.isDiveActive {
-                        topBar
-                        immersionStatus
-                        liveMetrics(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
-                        controls
+                        activeDiveContent(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
                     } else {
                         preDiveWaitingContent
                     }
@@ -35,6 +32,17 @@ struct DiveLiveView: View {
             }
         }
         .animation(.easeInOut(duration: 0.18), value: dive.redWarningBlink)
+    }
+
+    private func activeDiveContent(leftWidth: CGFloat, gaugeWidth: CGFloat) -> some View {
+        VStack(spacing: 7) {
+            topBar
+            immersionStatus
+            ttvRuntimePanel
+            depthSection(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
+            stopwatchPanel
+            controls
+        }
     }
 
     private var preDiveWaitingContent: some View {
@@ -103,11 +111,11 @@ struct DiveLiveView: View {
     private var topBar: some View {
         HStack(alignment: .center) {
             HStack(spacing: 5) {
-                DiveOctopusLogo(accent: DiveUI.yellow)
-                    .frame(width: 23, height: 22, alignment: .leading)
-                    .scaleEffect(0.68)
+                DiveOctopusLogo(accent: DiveUI.blue)
+                    .frame(width: 29, height: 26, alignment: .leading)
+                    .scaleEffect(0.8)
                 Text("DIR DIVING")
-                    .font(.system(size: 11, weight: .black, design: .rounded))
+                    .font(.system(size: 15, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.yellow)
                     .lineLimit(1)
             }
@@ -117,13 +125,13 @@ struct DiveLiveView: View {
             VStack(alignment: .trailing, spacing: 1) {
                 // TODO: Replace this visual placeholder if a watch clock value becomes part of the view model.
                 Text("--:--")
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(.system(size: 20, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
                 HStack(spacing: 3) {
                     Image(systemName: "drop.fill")
-                        .font(.system(size: 10, weight: .bold))
+                        .font(.system(size: 13, weight: .bold))
                     Text(temperatureText)
-                        .font(.system(size: 12, weight: .bold, design: .rounded))
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
                         .monospacedDigit()
                 }
                 .foregroundStyle(DiveUI.blue)
@@ -132,9 +140,11 @@ struct DiveLiveView: View {
     }
 
     private var immersionStatus: some View {
-        HStack(spacing: 5) {
-            Text(dive.isDiveActive ? "IN IMMERSIONE" : "PRONTO")
-                .font(.system(size: 11, weight: .black, design: .rounded))
+        HStack(spacing: 8) {
+            Image(systemName: "water.waves")
+                .font(.system(size: 18, weight: .black))
+            Text("IN IMMERSIONE")
+                .font(.system(size: 15, weight: .black, design: .rounded))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
             Spacer(minLength: 0)
@@ -142,74 +152,81 @@ struct DiveLiveView: View {
         .foregroundStyle(DiveUI.green)
     }
 
-    private func liveMetrics(leftWidth: CGFloat, gaugeWidth: CGFloat) -> some View {
-        HStack(alignment: .top, spacing: 7) {
-            VStack(alignment: .leading, spacing: 6) {
-                depthReadout
-                ttvRuntimeCards
-            }
-            .frame(width: leftWidth, alignment: .leading)
+    private var ttvRuntimePanel: some View {
+        HStack(spacing: 0) {
+            dashboardValue(title: "TTV", value: Formatters.one(dive.ttv), unit: "min", color: DiveUI.green)
+            Rectangle()
+                .fill(.white.opacity(0.34))
+                .frame(width: 1, height: 54)
+            dashboardValue(title: "RunTime", value: runtimeMinutes, unit: "min", color: .white)
+        }
+        .frame(maxWidth: .infinity, minHeight: 70)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.black.opacity(0.42))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .stroke(DiveUI.green.opacity(0.86), lineWidth: 1.4)
+                )
+                .shadow(color: DiveUI.green.opacity(0.16), radius: 5, x: 0, y: 0)
+        )
+    }
 
-            AscentGaugeView(status: dive.ascentStatus)
-                .frame(width: gaugeWidth, height: 158)
-                .padding(.top, 7)
+    private func dashboardValue(title: String, value: String, unit: String, color: Color) -> some View {
+        VStack(spacing: 4) {
+            Text(title)
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+            HStack(alignment: .lastTextBaseline, spacing: 4) {
+                Text(value)
+                    .font(.system(size: 34, weight: .black, design: .rounded))
+                    .minimumScaleFactor(0.54)
+                    .lineLimit(1)
+                    .monospacedDigit()
+                    .foregroundStyle(color)
+                Text(unit)
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(color)
+                    .padding(.bottom, 5)
+            }
         }
         .frame(maxWidth: .infinity)
     }
 
-    private var ttvRuntimeCards: some View {
-        HStack(spacing: 6) {
-            dashboardValue(title: "TTV", value: Formatters.one(dive.ttv), unit: "min", color: DiveUI.green)
-            dashboardValue(title: "RunTime", value: runtimeMinutes, unit: "min", color: .white)
-        }
-    }
+    private func depthSection(leftWidth: CGFloat, gaugeWidth: CGFloat) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            VStack(alignment: .leading, spacing: 7) {
+                depthReadout
+                depthSummary
+            }
+            .frame(width: leftWidth, alignment: .leading)
 
-    private func dashboardValue(title: String, value: String, unit: String, color: Color) -> some View {
-        VStack(spacing: 1) {
-            Text(title)
-                .font(.system(size: 9, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-            Text(value)
-                .font(.system(size: 22, weight: .black, design: .rounded))
-                .minimumScaleFactor(0.62)
-                .lineLimit(1)
-                .monospacedDigit()
-                .foregroundStyle(color)
-            Text(unit)
-                .font(.system(size: 9, weight: .bold, design: .rounded))
-                .foregroundStyle(color)
+            AscentGaugeView(status: dive.ascentStatus)
+                .frame(width: gaugeWidth, height: 154)
         }
-        .frame(maxWidth: .infinity, minHeight: 54)
-        .background(
-            RoundedRectangle(cornerRadius: 6, style: .continuous)
-                .fill(Color.black.opacity(0.55))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 6, style: .continuous)
-                        .stroke(.white.opacity(0.35), lineWidth: 1.3)
-                )
-        )
+        .frame(maxWidth: .infinity)
     }
 
     private var depthReadout: some View {
         VStack(spacing: 0) {
             HStack(alignment: .lastTextBaseline, spacing: 4) {
                 Text(Formatters.one(dive.currentDepthMeters))
-                    .font(.system(size: 70, weight: .black, design: .rounded))
-                    .minimumScaleFactor(0.48)
+                    .font(.system(size: 72, weight: .black, design: .rounded))
+                    .minimumScaleFactor(0.42)
                     .lineLimit(1)
                     .monospacedDigit()
                     .foregroundStyle(dive.redWarningBlink ? DiveUI.red : .white)
                     .shadow(color: dive.redWarningBlink ? DiveUI.red.opacity(0.75) : .clear, radius: 8, x: 0, y: 0)
                     .layoutPriority(1)
                 Text("m")
-                    .font(.system(size: 21, weight: .black, design: .rounded))
-                    .foregroundStyle(.white)
-                    .padding(.bottom, 8)
+                    .font(.system(size: 31, weight: .black, design: .rounded))
+                    .foregroundStyle(DiveUI.blue)
+                    .padding(.bottom, 9)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
             Text("PROFONDITA ATTUALE")
-                .font(.system(size: 12, weight: .black, design: .rounded))
+                .font(.system(size: 15, weight: .black, design: .rounded))
                 .lineLimit(1)
                 .minimumScaleFactor(0.68)
                 .foregroundStyle(DiveUI.blue)
@@ -217,15 +234,86 @@ struct DiveLiveView: View {
         }
     }
 
+    private var depthSummary: some View {
+        HStack(spacing: 7) {
+            depthCard(title: "PROF. MASSIMA", value: dive.maxDepthMeters)
+            depthCard(title: "PROF. MEDIA", value: dive.averageDepthMeters)
+        }
+    }
+
+    private func depthCard(title: String, value: Double) -> some View {
+        VStack(spacing: 2) {
+            Text(title)
+                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.62)
+            HStack(alignment: .lastTextBaseline, spacing: 3) {
+                Text(Formatters.one(value))
+                    .font(.system(size: 25, weight: .black, design: .rounded))
+                    .foregroundStyle(DiveUI.blue)
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.62)
+                Text("m")
+                    .font(.system(size: 12, weight: .black, design: .rounded))
+                    .foregroundStyle(DiveUI.blue)
+                    .padding(.bottom, 2)
+            }
+        }
+        .frame(maxWidth: .infinity, minHeight: 55)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color.black.opacity(0.45))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(.white.opacity(0.34), lineWidth: 1.1)
+                )
+        )
+    }
+
+    private var stopwatchPanel: some View {
+        HStack(spacing: 15) {
+            Image(systemName: "stopwatch")
+                .font(.system(size: 35, weight: .black))
+                .foregroundStyle(DiveUI.yellow)
+
+            VStack(spacing: 0) {
+                Text(Formatters.time(dive.stopwatchTime))
+                    .font(.system(size: 39, weight: .black, design: .rounded))
+                    .foregroundStyle(DiveUI.yellow)
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.66)
+                Text("CRONOMETRO")
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundStyle(DiveUI.yellow)
+                    .lineLimit(1)
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .padding(.horizontal, 14)
+        .frame(maxWidth: .infinity, minHeight: 63)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(Color.black.opacity(0.44))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(DiveUI.yellow.opacity(0.9), lineWidth: 1.4)
+                )
+                .shadow(color: DiveUI.yellow.opacity(0.16), radius: 5, x: 0, y: 0)
+        )
+    }
+
     private var controls: some View {
         HStack(spacing: 7) {
-            DiveCommandButton("START", color: DiveUI.green) {
+            DiveCommandButton("START", systemImage: "play.fill", color: DiveUI.green) {
                 dive.startStopwatch()
             }
-            DiveCommandButton("STOP", color: DiveUI.red) {
+            DiveCommandButton("STOP", systemImage: "stop.fill", color: DiveUI.red) {
                 dive.stopStopwatch()
             }
-            DiveCommandButton("RESET", color: .white.opacity(0.86)) {
+            DiveCommandButton("RESET", systemImage: "arrow.clockwise", color: .white.opacity(0.78)) {
                 dive.resetStopwatch()
             }
         }
