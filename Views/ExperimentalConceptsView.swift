@@ -20,6 +20,7 @@ struct ExperimentalConceptDeckView: View {
             }
 
             ExperimentalExplorationOverview()
+            ExperimentalUnderwaterCompassConcept()
             ExperimentalRouteNavigationConcept()
             ExperimentalSafetyConcepts()
             ExperimentalApneaIntelligenceConcept()
@@ -62,12 +63,58 @@ private struct ExperimentalExplorationOverview: View {
     }
 }
 
+private struct ExperimentalUnderwaterCompassConcept: View {
+    var body: some View {
+        VStack(spacing: 8) {
+            // TODO: Connect this underwater compass concept only after sensor and bearing scope is approved.
+            conceptScreen(
+                title: "UNDERWATER COMPASS",
+                subtitle: "High-contrast visual heading concept",
+                symbol: "safari.fill",
+                color: DiveUI.cyan
+            ) {
+                HStack(spacing: 10) {
+                    ExperimentalCompassDial()
+                    VStack(alignment: .leading, spacing: 5) {
+                        routeRow("HEADING", "042\u{00B0}", DiveUI.cyan)
+                        routeRow("TARGET", "058\u{00B0}", DiveUI.green)
+                        routeRow("CROWN", "LEG PREVIEW", DiveUI.yellow)
+                    }
+                }
+            }
+
+            conceptScreen(
+                title: "ADVANCED ROUTE NAV",
+                subtitle: "Static multi-leg presentation",
+                symbol: "map.fill",
+                color: DiveUI.blue
+            ) {
+                RouteLegPreview()
+            }
+        }
+    }
+
+    private func routeRow(_ title: String, _ value: String, _ color: Color) -> some View {
+        HStack(spacing: 6) {
+            Text(title)
+                .font(.system(size: 8, weight: .black, design: .rounded))
+                .foregroundStyle(DiveUI.mutedText)
+            Spacer(minLength: 0)
+            Text(value)
+                .font(.system(size: 10, weight: .black, design: .rounded))
+                .foregroundStyle(color)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+    }
+}
+
 private struct ExperimentalRouteNavigationConcept: View {
     var body: some View {
         VStack(spacing: 8) {
             // TODO: Replace static preview bearings with validated route navigation when implemented.
             conceptScreen(
-                title: "ADVANCED WAYPOINT",
+                title: "ADVANCED WAYPOINT MODE",
                 subtitle: "Crown-first route preview",
                 symbol: "point.topleft.down.curvedto.point.bottomright.up",
                 color: DiveUI.blue
@@ -162,6 +209,36 @@ private struct ExperimentalSafetyConcepts: View {
             }
 
             conceptScreen(
+                title: "DRIFT WARNING",
+                subtitle: "Presentation concept only",
+                symbol: "water.waves",
+                color: DiveUI.yellow
+            ) {
+                HStack(spacing: 10) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(DiveUI.yellow.opacity(0.13))
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 34, weight: .black))
+                            .foregroundStyle(DiveUI.yellow)
+                            .rotationEffect(.degrees(12))
+                            .shadow(color: DiveUI.yellow.opacity(0.55), radius: 7, x: 0, y: 0)
+                    }
+                    .frame(width: 58, height: 58)
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("LATERAL PUSH")
+                            .font(.system(size: 17, weight: .black, design: .rounded))
+                            .foregroundStyle(.white)
+                        Text("NO DRIFT CALCULATION")
+                            .font(.system(size: 9, weight: .bold, design: .rounded))
+                            .foregroundStyle(DiveUI.yellow)
+                    }
+                    Spacer(minLength: 0)
+                }
+            }
+
+            conceptScreen(
                 title: "ROUTE DEVIATION",
                 subtitle: "Warning presentation concept",
                 symbol: "exclamationmark.triangle.fill",
@@ -210,14 +287,92 @@ private struct ExperimentalApneaIntelligenceConcept: View {
         VStack(spacing: 8) {
             // TODO: AI exploration, overlays, readiness and fatigue are static UI placeholders only.
             HStack(spacing: 8) {
-                miniCard("AI EXPLORATION", value: "TODO", symbol: "sparkles", color: DiveUI.cyan)
-                miniCard("MARINE OVERLAYS", value: "TODO", symbol: "leaf.fill", color: DiveUI.green)
+                premiumMiniCard("AI EXPLORATION", value: "CONCEPT", symbol: "sparkles", color: DiveUI.cyan)
+                premiumMiniCard("MARINE OVERLAYS", value: "LAYER", symbol: "leaf.fill", color: DiveUI.green)
             }
             HStack(spacing: 8) {
-                miniCard("APNEA READINESS", value: "--%", symbol: "lungs.fill", color: DiveUI.yellow)
-                miniCard("FATIGUE EST.", value: "N/A", symbol: "waveform.path.ecg", color: DiveUI.red)
+                premiumMiniCard("APNEA READINESS", value: "--%", symbol: "lungs.fill", color: DiveUI.yellow)
+                premiumMiniCard("FATIGUE EST.", value: "N/A", symbol: "waveform.path.ecg", color: DiveUI.red)
             }
         }
+    }
+}
+
+private struct ExperimentalCompassDial: View {
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(DiveUI.panelFill.opacity(0.85))
+            Circle()
+                .stroke(DiveUI.cyan.opacity(0.82), lineWidth: 2)
+                .shadow(color: DiveUI.cyan.opacity(0.38), radius: 7, x: 0, y: 0)
+            Circle()
+                .trim(from: 0, to: 0.18)
+                .stroke(DiveUI.yellow, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                .rotationEffect(.degrees(-64))
+            ForEach(0..<8, id: \.self) { tick in
+                Rectangle()
+                    .fill(tick % 2 == 0 ? .white.opacity(0.9) : DiveUI.hairline)
+                    .frame(width: 2, height: tick % 2 == 0 ? 10 : 6)
+                    .offset(y: -38)
+                    .rotationEffect(.degrees(Double(tick) * 45))
+            }
+            VStack(spacing: -1) {
+                Text("NE")
+                    .font(.system(size: 15, weight: .black, design: .rounded))
+                    .foregroundStyle(DiveUI.cyan)
+                Text("042\u{00B0}")
+                    .font(.system(size: 22, weight: .black, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(.white)
+            }
+            Image(systemName: "location.north.fill")
+                .font(.system(size: 18, weight: .black))
+                .foregroundStyle(DiveUI.yellow)
+                .offset(y: -27)
+                .rotationEffect(.degrees(16))
+        }
+        .frame(width: 92, height: 92)
+    }
+}
+
+private struct RouteLegPreview: View {
+    var body: some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 7) {
+                routeNode("01", color: DiveUI.green, isActive: false)
+                routeLine(DiveUI.green)
+                routeNode("02", color: DiveUI.cyan, isActive: true)
+                routeLine(DiveUI.yellow)
+                routeNode("03", color: DiveUI.yellow, isActive: false)
+            }
+            HStack(spacing: 0) {
+                metric("LEG", "02/05", DiveUI.cyan)
+                divider
+                metric("NEXT", "REEF", DiveUI.green)
+                divider
+                metric("DEV", "+09\u{00B0}", DiveUI.yellow)
+            }
+        }
+    }
+
+    private func routeNode(_ text: String, color: Color, isActive: Bool) -> some View {
+        Text(text)
+            .font(.system(size: 11, weight: .black, design: .rounded))
+            .foregroundStyle(isActive ? .black : color)
+            .frame(width: 32, height: 32)
+            .background(
+                Circle()
+                    .fill(isActive ? color : color.opacity(0.14))
+                    .overlay(Circle().stroke(color.opacity(0.9), lineWidth: 1))
+                    .shadow(color: color.opacity(isActive ? 0.5 : 0.18), radius: 6, x: 0, y: 0)
+            )
+    }
+
+    private func routeLine(_ color: Color) -> some View {
+        Capsule()
+            .fill(color.opacity(0.65))
+            .frame(height: 3)
     }
 }
 
@@ -250,10 +405,18 @@ private func conceptScreen<Content: View>(
     DivePanel(stroke: color) {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 7) {
-                Image(systemName: symbol)
-                    .font(.system(size: 16, weight: .black))
-                    .foregroundStyle(color)
-                    .frame(width: 22)
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(color.opacity(0.14))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .stroke(color.opacity(0.55), lineWidth: 1)
+                        )
+                    Image(systemName: symbol)
+                        .font(.system(size: 15, weight: .black))
+                        .foregroundStyle(color)
+                }
+                .frame(width: 28, height: 28)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(title)
                         .font(.system(size: 11, weight: .black, design: .rounded))
@@ -274,14 +437,20 @@ private func conceptScreen<Content: View>(
     }
 }
 
-private func miniCard(_ title: String, value: String, symbol: String, color: Color) -> some View {
+private func premiumMiniCard(_ title: String, value: String, symbol: String, color: Color) -> some View {
     DivePanel(stroke: color) {
         VStack(spacing: 5) {
-            Image(systemName: symbol)
-                .font(.system(size: 18, weight: .black))
-                .foregroundStyle(color)
+            ZStack {
+                Circle()
+                    .fill(color.opacity(0.14))
+                    .frame(width: 34, height: 34)
+                    .shadow(color: color.opacity(0.25), radius: 6, x: 0, y: 0)
+                Image(systemName: symbol)
+                    .font(.system(size: 16, weight: .black))
+                    .foregroundStyle(color)
+            }
             Text(value)
-                .font(.system(size: 20, weight: .black, design: .rounded))
+                .font(.system(size: 18, weight: .black, design: .rounded))
                 .foregroundStyle(.white)
                 .lineLimit(1)
             Text(title)
