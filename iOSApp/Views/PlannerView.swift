@@ -11,9 +11,14 @@ struct PlannerView: View {
                 DIRBackground()
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Planner")
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
+                        VStack(alignment: .leading, spacing: 7) {
+                            Text("Planner")
+                                .font(.system(size: 30, weight: .bold, design: .rounded))
+                                .foregroundStyle(.white)
+                            Text("Gas, deco profile and Buhlmann presentation with high-contrast technical cards")
+                                .font(.callout)
+                                .foregroundStyle(DIRTheme.muted)
+                        }
                         modePicker
                         profileCard
                         gasCards
@@ -56,7 +61,7 @@ struct PlannerView: View {
     }
 
     private var profileCard: some View {
-        DIRCard("Profilo Immersione", icon: nil) {
+        DIRCard("Profilo Immersione", icon: nil, accent: DIRTheme.cyan) {
             VStack(spacing: 0) {
                 plannerField("Profondita Massima", value: $store.input.plannedDepthMeters, unit: "m", step: 1)
                 Divider().overlay(DIRTheme.hairline)
@@ -85,7 +90,7 @@ struct PlannerView: View {
                 .foregroundStyle(.black)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-                .background(RoundedRectangle(cornerRadius: 7).fill(DIRTheme.cyan))
+                .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.cyan).shadow(color: DIRTheme.cyan.opacity(0.28), radius: 14, x: 0, y: 8))
         }
         .buttonStyle(.plain)
         .padding(.top, 4)
@@ -130,7 +135,7 @@ struct GasMixCard: View {
     let showsHelium: Bool
 
     var body: some View {
-        DIRCard {
+        DIRCard(accent: accent) {
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
                     Text(title)
@@ -310,7 +315,7 @@ struct PlanResultView: View {
     }
 
     private var ascentTable: some View {
-        DIRCard("PIANO DI RISALITA", icon: nil) {
+        DIRCard("PIANO DI RISALITA", icon: nil, accent: DIRTheme.cyan) {
             VStack(spacing: 9) {
                 tableRow(["Profondita", "Tempo", "Gas", "PPO2"], isHeader: true)
                 tableRow(["40.0 m", "20 min", "TRIMIX 18/45", "1.30"])
@@ -339,7 +344,7 @@ struct PlanResultView: View {
     }
 
     private var buhlmannChart: some View {
-        DIRCard("CURVA BUHLMANN ZH-L16C", icon: nil) {
+        DIRCard("CURVA BUHLMANN ZH-L16C", icon: nil, accent: DIRTheme.cyan) {
             Chart(store.buhlmann.curve) { point in
                 LineMark(
                     x: .value("Minutes", point.ndlMinutes),
