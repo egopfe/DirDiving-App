@@ -63,6 +63,9 @@ final class ExplorationStore: ObservableObject {
             : "LAST FIX"
     }
 
+    var hasSnorkelingPosition: Bool { currentPosition != nil }
+    var hasSnorkelingEntryPoint: Bool { snorkelingEntryPoint != nil }
+
     init() {
         if let state = cloudSync.load(ExplorationState.self, forKey: cloudKey) {
             selectedMode = state.selectedMode
@@ -181,16 +184,29 @@ final class ExplorationStore: ObservableObject {
         saveIfReady()
     }
 
-    func saveMarker(gpsPoint: GPSPoint?, depthMeters: Double, bearingDegrees: Double) {
+    @discardableResult
+    func saveMarker(gpsPoint: GPSPoint?, depthMeters: Double, temperatureCelsius: Double?, bearingDegrees: Double) -> GPSInterestMarker {
+        let sessionID = snorkelingStartedAt.map { "snorkeling-\(Int($0.timeIntervalSince1970))" }
         let marker = GPSInterestMarker(
             category: currentMarkerCategory,
             latitude: gpsPoint?.latitude,
             longitude: gpsPoint?.longitude,
             depthMeters: depthMeters,
+            temperatureCelsius: temperatureCelsius,
             distanceFromEntryMeters: entryDistanceMeters,
-            bearingDegrees: bearingDegrees
+            bearingDegrees: bearingDegrees,
+            activeWaypointName: activeWaypoint.name,
+            sessionID: sessionID,
+            isEnriched: false
         )
         markers.insert(marker, at: 0)
+        snorkelingWarning = gpsPoint == nil ? "GPS NON DISPONIBILE" : nil
+        saveIfReady()
+        return marker
+    }
+
+    func deleteMarker(id: UUID) {
+        markers.removeAll { $0.id == id }
         saveIfReady()
     }
 

@@ -6,6 +6,13 @@ struct SnorkelingView: View {
     @EnvironmentObject private var compass: CompassManager
     @EnvironmentObject private var dive: DiveManager
     @State private var screen: SnorkelingScreen = .live
+    @State private var selectedMarker: GPSInterestMarker?
+    @State private var lastSavedMarker: GPSInterestMarker?
+    @AppStorage(HapticService.experimentalHapticsEnabledKey) private var experimentalHapticsEnabled = true
+    @AppStorage("dirdiving_snorkeling_alarm_max_depth_meters") private var snorkelingAlarmMaxDepthMeters = 10.0
+    @AppStorage("dirdiving_snorkeling_alarm_max_minutes") private var snorkelingAlarmMaxMinutes = 60
+    @AppStorage("dirdiving_snorkeling_alarm_max_distance_km") private var snorkelingAlarmMaxDistanceKm = 5.0
+    @AppStorage("dirdiving_snorkeling_alarm_low_battery_percent") private var snorkelingAlarmLowBatteryPercent = 20
 
     private var bearingDelta: Double {
         let delta = exploration.liveTargetBearing - compass.headingDegrees
@@ -28,6 +35,20 @@ struct SnorkelingView: View {
                     mapScreen(mode: .returnToEntry)
                 case .waypointDirection:
                     waypointDirectionScreen
+                case .markerSaved:
+                    markerSavedScreen
+                case .markerLog:
+                    markerLogScreen
+                case .markerDetail:
+                    markerDetailScreen
+                case .settings:
+                    snorkelingSettingsScreen
+                case .alarms:
+                    snorkelingAlarmsScreen
+                case .compassCalibration:
+                    compassCalibrationScreen
+                case .mapLegend:
+                    mapLegendScreen
                 }
             }
         }
@@ -96,7 +117,7 @@ struct SnorkelingView: View {
                 .frame(maxWidth: .infinity, alignment: .center)
 
             waypointSummaryCard
-            SnorkelingWaypointMapView(waypointName: exploration.activeWaypoint.name)
+            SnorkelingWaypointMapView(waypointName: exploration.activeWaypoint.name, gpsOKText: gpsMapStatusText)
             backButton
         }
         .padding(.horizontal, 9)
@@ -115,8 +136,16 @@ struct SnorkelingView: View {
                 .minimumScaleFactor(0.78)
                 .frame(maxWidth: .infinity, alignment: .center)
 
-            returnSummaryCard
-            SnorkelingReturnMapView()
+            if exploration.hasSnorkelingEntryPoint {
+                returnSummaryCard
+                SnorkelingReturnMapView(gpsOKText: gpsMapStatusText)
+            } else {
+                unavailablePanel(
+                    title: "PUNTO DI PARTENZA NON DISPONIBILE",
+                    message: "Avvia la sessione in superficie con GPS disponibile per usare Mappa Ritorno.",
+                    color: DiveUI.yellow
+                )
+            }
             backButton
         }
         .padding(.horizontal, 9)
@@ -165,6 +194,16 @@ struct SnorkelingView: View {
             }
 
             Spacer()
+
+            Button {
+                screen = .settings
+            } label: {
+                Image(systemName: "gearshape")
+                    .font(.system(size: 17, weight: .black))
+                    .foregroundStyle(DiveUI.cyan)
+                    .frame(width: 28, height: 28)
+            }
+            .buttonStyle(.plain)
 
             VStack(alignment: .trailing, spacing: 1) {
                 HStack(spacing: 3) {
@@ -326,10 +365,10 @@ struct SnorkelingView: View {
                 .foregroundStyle(.white)
             Image(systemName: "cellularbars")
                 .font(.system(size: 29, weight: .black))
-                .foregroundStyle(DiveUI.green)
+                .foregroundStyle(exploration.hasSnorkelingPosition ? DiveUI.green : DiveUI.yellow)
             Text(gpsQualityText)
                 .font(.system(size: 12, weight: .black, design: .rounded))
-                .foregroundStyle(DiveUI.green)
+                .foregroundStyle(exploration.hasSnorkelingPosition ? DiveUI.green : DiveUI.yellow)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
 
@@ -344,7 +383,7 @@ struct SnorkelingView: View {
                 .foregroundStyle(.white)
             Text(signalText)
                 .font(.system(size: 11, weight: .black, design: .rounded))
-                .foregroundStyle(DiveUI.green)
+                .foregroundStyle(exploration.hasSnorkelingPosition ? DiveUI.green : DiveUI.yellow)
                 .lineLimit(2)
                 .minimumScaleFactor(0.62)
         }
@@ -644,6 +683,233 @@ struct SnorkelingView: View {
         )
     }
 
+    private var markerSavedScreen: some View {
+        let marker = lastSavedMarker
+        return VStack(spacing: 10) {
+            topBar(title: "SNORKELING", systemImage: "figure.pool.swim")
+            Spacer(minLength: 8)
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 64, weight: .black))
+                .foregroundStyle(DiveUI.green)
+                .shadow(color: DiveUI.green.opacity(0.42), radius: 8, x: 0, y: 0)
+            Text("MARCATORE\nSALVATO")
+                .font(.system(size: 18, weight: .black, design: .rounded))
+                .foregroundStyle(DiveUI.green)
+                .multilineTextAlignment(.center)
+            Text(marker?.latitude == nil ? "GPS non disponibile" : "Da arricchire su iPhone")
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundStyle(marker?.latitude == nil ? DiveUI.yellow : .white)
+                .multilineTextAlignment(.center)
+            markerCoordinateSummary(marker)
+            watchSyncBoundaryPanel(
+                title: "WATCH -> IPHONE POI",
+                message: "Payload locale pronto: coordinate, profondità, temperatura, direzione, waypoint e session id. Invio WatchConnectivity reale: TODO sync experimental.",
+                color: DiveUI.cyan
+            )
+            HStack(spacing: 8) {
+                compactAction("LOG", icon: "list.bullet.rectangle", color: DiveUI.cyan) {
+                    screen = .markerLog
+                }
+                compactAction("DETTAGLI", icon: "info.circle", color: DiveUI.green) {
+                    selectedMarker = marker
+                    screen = .markerDetail
+                }
+            }
+            backButton
+        }
+        .padding(.horizontal, 9)
+        .padding(.top, 9)
+        .padding(.bottom, 7)
+        .task(id: marker?.id) {
+            try? await Task.sleep(nanoseconds: 1_600_000_000)
+            await MainActor.run {
+                guard screen == .markerSaved else { return }
+                screen = .live
+            }
+        }
+    }
+
+    private var markerLogScreen: some View {
+        ScrollView {
+            VStack(spacing: 8) {
+                topBar(title: "MARCATORI", systemImage: "mappin.circle.fill")
+                Text("LOG MARCATORI")
+                    .font(.system(size: 15, weight: .black, design: .rounded))
+                    .foregroundStyle(DiveUI.cyan)
+                    .frame(maxWidth: .infinity)
+                if exploration.markers.isEmpty {
+                    unavailablePanel(
+                        title: "NESSUN MARCATORE",
+                        message: "Tocca MARCATORE nella schermata live per salvare un POI leggero.",
+                        color: DiveUI.secondaryText
+                    )
+                } else {
+                    ForEach(Array(exploration.markers.prefix(8))) { marker in
+                        Button {
+                            selectedMarker = marker
+                            screen = .markerDetail
+                        } label: {
+                            markerLogRow(marker)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                backButton
+            }
+            .padding(.horizontal, 9)
+            .padding(.top, 9)
+            .padding(.bottom, 7)
+        }
+    }
+
+    private var markerDetailScreen: some View {
+        let marker = selectedMarker ?? lastSavedMarker
+        return VStack(spacing: 9) {
+            topBar(title: "MARCATORI", systemImage: "mappin.circle.fill")
+            Text("DETTAGLIO MARCATORE")
+                .font(.system(size: 15, weight: .black, design: .rounded))
+                .foregroundStyle(DiveUI.cyan)
+                .frame(maxWidth: .infinity)
+            if let marker {
+                VStack(spacing: 7) {
+                    detailLine("Ora", value: Self.markerTimeFormatter.string(from: marker.timestamp), color: .white)
+                    detailLine("Distanza", value: marker.distanceFromEntryMeters > 0 ? "\(Int(marker.distanceFromEntryMeters.rounded())) m" : "--", color: DiveUI.yellow)
+                    detailLine("Direzione", value: "\(Int(marker.bearingDegrees.rounded()))° \(cardinal(for: marker.bearingDegrees))", color: DiveUI.yellow)
+                    detailLine("Profondità", value: "\(Formatters.one(marker.depthMeters)) m", color: DiveUI.blue)
+                    detailLine("Temperatura", value: marker.temperatureCelsius.map { "\(Formatters.one($0)) °C" } ?? "--", color: DiveUI.blue)
+                    detailLine("Waypoint", value: marker.activeWaypointName ?? "--", color: DiveUI.cyan)
+                    detailLine("Sessione", value: marker.sessionID ?? "--", color: DiveUI.secondaryText)
+                    detailLine("Stato", value: marker.isEnriched ? "Arricchito" : "Da arricchire su iPhone", color: marker.isEnriched ? DiveUI.green : DiveUI.yellow)
+                }
+                .padding(10)
+                .background(markerPanel(stroke: DiveUI.cyan.opacity(0.62)))
+                watchSyncBoundaryPanel(
+                    title: "SYNC POI NON INVIATO",
+                    message: "TODO sync: accodare POI, prevenire duplicati e confermare ricezione iPhone prima di segnare come sincronizzato.",
+                    color: DiveUI.yellow
+                )
+                Text("TODO Watch experimental: eliminazione marcatore con conferma dedicata.")
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .foregroundStyle(DiveUI.red)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else {
+                unavailablePanel(title: "MARCATORE NON DISPONIBILE", message: "Torna al log marcatori e seleziona un POI.", color: DiveUI.yellow)
+            }
+            backToMarkerLogButton
+        }
+        .padding(.horizontal, 9)
+        .padding(.top, 9)
+        .padding(.bottom, 7)
+    }
+
+    private var snorkelingSettingsScreen: some View {
+        ScrollView {
+            VStack(spacing: 8) {
+                topBar(title: "SNORKELING", systemImage: "gearshape")
+                Text("IMPOSTAZIONI SNORKELING")
+                    .font(.system(size: 14, weight: .black, design: .rounded))
+                    .foregroundStyle(DiveUI.cyan)
+                    .frame(maxWidth: .infinity)
+                settingsRow("Log Marcatori", subtitle: "\(exploration.markers.count) salvati", icon: "list.bullet.rectangle", color: DiveUI.green, destination: .markerLog)
+                settingsRow("Allarmi Snorkeling", subtitle: "Soglie sperimentali", icon: "bell", color: DiveUI.yellow, destination: .alarms)
+                settingsRow("Calibrazione Bussola", subtitle: "Istruzioni sensore", icon: "location.north.circle", color: DiveUI.cyan, destination: .compassCalibration)
+                settingsRow("Legenda Icone Mappe", subtitle: "Waypoint, entry e POI", icon: "map", color: DiveUI.blue, destination: .mapLegend)
+                Toggle(isOn: $experimentalHapticsEnabled) {
+                    Text("Haptic sperimentali")
+                        .font(.system(size: 13, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                }
+                .tint(DiveUI.green)
+                .padding(10)
+                .background(markerPanel(stroke: DiveUI.green.opacity(0.45)))
+                backButton
+            }
+            .padding(.horizontal, 9)
+            .padding(.top, 9)
+            .padding(.bottom, 7)
+        }
+    }
+
+    private var snorkelingAlarmsScreen: some View {
+        VStack(spacing: 9) {
+            topBar(title: "SNORKELING", systemImage: "bell")
+            Text("ALLARMI SNORKELING")
+                .font(.system(size: 15, weight: .black, design: .rounded))
+                .foregroundStyle(DiveUI.blue)
+            VStack(spacing: 0) {
+                persistedAlarmRow(
+                    "Profondità massima",
+                    value: "\(Formatters.one(snorkelingAlarmMaxDepthMeters)) m",
+                    decrement: { snorkelingAlarmMaxDepthMeters = max(1, snorkelingAlarmMaxDepthMeters - 0.5) },
+                    increment: { snorkelingAlarmMaxDepthMeters = min(40, snorkelingAlarmMaxDepthMeters + 0.5) }
+                )
+                persistedAlarmRow(
+                    "Tempo massimo",
+                    value: "\(snorkelingAlarmMaxMinutes) min",
+                    decrement: { snorkelingAlarmMaxMinutes = max(5, snorkelingAlarmMaxMinutes - 5) },
+                    increment: { snorkelingAlarmMaxMinutes = min(240, snorkelingAlarmMaxMinutes + 5) }
+                )
+                persistedAlarmRow(
+                    "Distanza massima",
+                    value: "\(Formatters.one(snorkelingAlarmMaxDistanceKm)) km",
+                    decrement: { snorkelingAlarmMaxDistanceKm = max(0.5, snorkelingAlarmMaxDistanceKm - 0.5) },
+                    increment: { snorkelingAlarmMaxDistanceKm = min(20, snorkelingAlarmMaxDistanceKm + 0.5) }
+                )
+                persistedAlarmRow(
+                    "Batteria bassa",
+                    value: "\(snorkelingAlarmLowBatteryPercent) %",
+                    decrement: { snorkelingAlarmLowBatteryPercent = max(5, snorkelingAlarmLowBatteryPercent - 5) },
+                    increment: { snorkelingAlarmLowBatteryPercent = min(50, snorkelingAlarmLowBatteryPercent + 5) }
+                )
+            }
+            .background(markerPanel(stroke: .white.opacity(0.28)))
+            Text("Persistenza locale AppStorage attiva. TODO Watch experimental: migrare in store Snorkeling dedicato e sincronizzare con iPhone quando il contratto settings sara definito.")
+                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .foregroundStyle(DiveUI.yellow)
+                .fixedSize(horizontal: false, vertical: true)
+            settingsBackButton
+        }
+        .padding(.horizontal, 9)
+        .padding(.top, 9)
+        .padding(.bottom, 7)
+    }
+
+    private var compassCalibrationScreen: some View {
+        VStack(spacing: 9) {
+            topBar(title: "BUSSOLA", systemImage: "location.north.circle")
+            unavailablePanel(
+                title: "CALIBRAZIONE BUSSOLA",
+                message: "Muovi lentamente Apple Watch formando un 8. Mantieni il Watch lontano da metallo, magneti e motori. Questa schermata non modifica gli algoritmi bussola.",
+                color: DiveUI.cyan
+            )
+            settingsBackButton
+        }
+        .padding(.horizontal, 9)
+        .padding(.top, 9)
+        .padding(.bottom, 7)
+    }
+
+    private var mapLegendScreen: some View {
+        ScrollView {
+            VStack(spacing: 8) {
+                topBar(title: "MAPPE", systemImage: "map")
+                Text("LEGENDA ICONE MAPPE")
+                    .font(.system(size: 14, weight: .black, design: .rounded))
+                    .foregroundStyle(DiveUI.cyan)
+                legendRow("location.north.fill", title: "Posizione attuale", color: DiveUI.green)
+                legendRow("scope", title: "Waypoint", color: DiveUI.yellow)
+                legendRow("house.circle", title: "Punto di partenza", color: DiveUI.cyan)
+                legendRow("mappin.circle.fill", title: "POI / Marcatore", color: DiveUI.green)
+                legendRow("point.topleft.down.curvedto.point.bottomright.up", title: "Rotta waypoint", color: DiveUI.yellow)
+                legendRow("arrow.uturn.backward", title: "Rotta ritorno", color: DiveUI.cyan)
+                settingsBackButton
+            }
+            .padding(.horizontal, 9)
+            .padding(.top, 9)
+            .padding(.bottom, 7)
+        }
+    }
+
     private func controls(kind: SnorkelingControlsKind) -> some View {
         HStack(spacing: 7) {
             DiveCommandButton("MARCATORE", systemImage: "mappin.circle.fill", color: DiveUI.green) {
@@ -666,11 +932,228 @@ struct SnorkelingView: View {
     }
 
     private func saveMarker() {
-        exploration.saveMarker(
-            gpsPoint: gps.currentBestPoint(),
+        let point = gps.currentBestPoint()
+        let marker = exploration.saveMarker(
+            gpsPoint: point,
             depthMeters: dive.currentDepthMeters,
+            temperatureCelsius: dive.currentTemperatureCelsius,
             bearingDegrees: compass.headingDegrees
         )
+        lastSavedMarker = marker
+        selectedMarker = marker
+        screen = .markerSaved
+        if point == nil {
+            HapticService.shared.warnIfNeeded()
+        } else {
+            HapticService.shared.confirm()
+        }
+    }
+
+    private func markerCoordinateSummary(_ marker: GPSInterestMarker?) -> some View {
+        VStack(spacing: 4) {
+            Text(marker?.latitude == nil ? "GPS NON DISPONIBILE" : coordinatePairText(marker))
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .foregroundStyle(marker?.latitude == nil ? DiveUI.yellow : .white)
+                .monospacedDigit()
+                .lineLimit(2)
+                .minimumScaleFactor(0.68)
+            Text("Sync POI verso iPhone: TODO sync experimental")
+                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .foregroundStyle(DiveUI.secondaryText)
+                .lineLimit(2)
+                .minimumScaleFactor(0.62)
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity)
+        .background(markerPanel(stroke: DiveUI.green.opacity(0.58)))
+    }
+
+    private func compactAction(_ title: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                Text(title)
+            }
+            .font(.system(size: 12, weight: .black, design: .rounded))
+            .foregroundStyle(color)
+            .frame(maxWidth: .infinity, minHeight: 42)
+            .background(markerPanel(stroke: color.opacity(0.72)))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func markerLogRow(_ marker: GPSInterestMarker) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: marker.category.symbol)
+                .font(.system(size: 18, weight: .black))
+                .foregroundStyle(marker.isEnriched ? DiveUI.green : DiveUI.yellow)
+                .frame(width: 30, height: 30)
+                .background(Circle().fill(Color.black.opacity(0.46)))
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(marker.category.rawValue) • \(Self.markerTimeFormatter.string(from: marker.timestamp))")
+                    .font(.system(size: 12, weight: .black, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                Text(marker.isEnriched ? "Arricchito" : "Da arricchire su iPhone")
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .foregroundStyle(marker.isEnriched ? DiveUI.green : DiveUI.yellow)
+                    .lineLimit(1)
+            }
+            Spacer(minLength: 0)
+            Text(marker.distanceFromEntryMeters > 0 ? "\(Int(marker.distanceFromEntryMeters.rounded())) m" : "--")
+                .font(.system(size: 12, weight: .black, design: .rounded))
+                .foregroundStyle(DiveUI.cyan)
+                .monospacedDigit()
+        }
+        .padding(9)
+        .background(markerPanel(stroke: DiveUI.cyan.opacity(0.36)))
+    }
+
+    private func detailLine(_ title: String, value: String, color: Color) -> some View {
+        HStack {
+            Text(title)
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .foregroundStyle(DiveUI.secondaryText)
+            Spacer(minLength: 8)
+            Text(value)
+                .font(.system(size: 12, weight: .black, design: .rounded))
+                .foregroundStyle(color)
+                .lineLimit(1)
+                .minimumScaleFactor(0.62)
+        }
+    }
+
+    private func settingsRow(_ title: String, subtitle: String, icon: String, color: Color, destination: SnorkelingScreen) -> some View {
+        Button {
+            screen = destination
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .black))
+                    .foregroundStyle(color)
+                    .frame(width: 28)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.system(size: 13, weight: .black, design: .rounded))
+                        .foregroundStyle(.white)
+                    Text(subtitle)
+                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .foregroundStyle(DiveUI.secondaryText)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 10, weight: .black))
+                    .foregroundStyle(.white.opacity(0.55))
+            }
+            .padding(10)
+            .background(markerPanel(stroke: color.opacity(0.38)))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func persistedAlarmRow(_ title: String, value: String, decrement: @escaping () -> Void, increment: @escaping () -> Void) -> some View {
+        HStack {
+            Text(title)
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+            Spacer()
+            Text(value)
+                .font(.system(size: 12, weight: .black, design: .rounded))
+                .foregroundStyle(DiveUI.yellow)
+                .monospacedDigit()
+            Button(action: decrement) {
+                Image(systemName: "minus")
+                    .font(.system(size: 10, weight: .black))
+                    .foregroundStyle(DiveUI.cyan)
+                    .frame(width: 24, height: 24)
+                    .background(RoundedRectangle(cornerRadius: 7).stroke(DiveUI.cyan.opacity(0.68), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            Button(action: increment) {
+                Image(systemName: "plus")
+                    .font(.system(size: 10, weight: .black))
+                    .foregroundStyle(DiveUI.cyan)
+                    .frame(width: 24, height: 24)
+                    .background(RoundedRectangle(cornerRadius: 7).stroke(DiveUI.cyan.opacity(0.68), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 8)
+        .frame(height: 40)
+    }
+
+    private var settingsBackButton: some View {
+        compactAction("IMPOSTAZIONI", icon: "arrow.left", color: DiveUI.blue) {
+            screen = .settings
+        }
+    }
+
+    private var backToMarkerLogButton: some View {
+        compactAction("LOG MARCATORI", icon: "arrow.left", color: DiveUI.blue) {
+            screen = .markerLog
+        }
+    }
+
+    private func legendRow(_ icon: String, title: String, color: Color) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 17, weight: .black))
+                .foregroundStyle(color)
+                .frame(width: 30)
+            Text(title)
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+            Spacer()
+        }
+        .padding(9)
+        .background(markerPanel(stroke: color.opacity(0.34)))
+    }
+
+    private func unavailablePanel(title: String, message: String, color: Color) -> some View {
+        VStack(spacing: 8) {
+            Text(title)
+                .font(.system(size: 13, weight: .black, design: .rounded))
+                .foregroundStyle(color)
+                .multilineTextAlignment(.center)
+            Text(message)
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white.opacity(0.82))
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, minHeight: 92)
+        .background(markerPanel(stroke: color.opacity(0.55)))
+    }
+
+    private func watchSyncBoundaryPanel(title: String, message: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            HStack(spacing: 5) {
+                Image(systemName: "arrow.triangle.2.circlepath")
+                    .font(.system(size: 11, weight: .black))
+                Text(title)
+                    .font(.system(size: 10, weight: .black, design: .rounded))
+            }
+            .foregroundStyle(color)
+            Text(message)
+                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white.opacity(0.78))
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(9)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(markerPanel(stroke: color.opacity(0.42)))
+    }
+
+    private func markerPanel(stroke: Color) -> some View {
+        RoundedRectangle(cornerRadius: 13, style: .continuous)
+            .fill(Color.black.opacity(0.48))
+            .overlay(RoundedRectangle(cornerRadius: 13, style: .continuous).stroke(stroke, lineWidth: 1.2))
+    }
+
+    private func coordinatePairText(_ marker: GPSInterestMarker?) -> String {
+        guard let latitude = marker?.latitude, let longitude = marker?.longitude else { return "GPS NON DISPONIBILE" }
+        return String(format: "%.5f, %.5f", latitude, longitude)
     }
 
     private var temperatureText: String {
@@ -692,11 +1175,15 @@ struct SnorkelingView: View {
     }
 
     private var gpsQualityText: String {
-        "OTTIMO"
+        exploration.hasSnorkelingPosition ? "SURFACE" : "NO FIX"
     }
 
     private var signalText: String {
-        "DISPONIBILE"
+        exploration.hasSnorkelingPosition ? "DISPONIBILE" : "GPS NON DISP."
+    }
+
+    private var gpsMapStatusText: String {
+        exploration.hasSnorkelingPosition ? "GPS OK" : "GPS NON DISPONIBILE"
     }
 
     private var directionCardinal: String {
@@ -726,8 +1213,7 @@ struct SnorkelingView: View {
     private func distanceText(for mode: SnorkelingMapMode) -> String {
         let distance = mode == .returnToEntry ? exploration.entryDistanceMeters : exploration.liveTargetDistanceMeters
         if mode == .returnToEntry && distance <= 0 {
-            // TODO: Replace this visual placeholder when the active snorkeling entry distance is available.
-            return "412"
+            return "--"
         }
         return "\(Int(distance.rounded()))"
     }
@@ -754,6 +1240,12 @@ struct SnorkelingView: View {
         default: return "NW"
         }
     }
+
+    private static let markerTimeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter
+    }()
 }
 
 private enum SnorkelingScreen: Equatable {
@@ -761,6 +1253,13 @@ private enum SnorkelingScreen: Equatable {
     case waypointMap
     case returnMap
     case waypointDirection
+    case markerSaved
+    case markerLog
+    case markerDetail
+    case settings
+    case alarms
+    case compassCalibration
+    case mapLegend
 }
 
 private enum SnorkelingControlsKind: Equatable {
@@ -850,22 +1349,25 @@ private enum SnorkelingMapMode: Equatable {
 
 private struct SnorkelingWaypointMapView: View {
     let waypointName: String
+    let gpsOKText: String
 
     var body: some View {
         SnorkelingRouteMapPanel(
             mode: .waypoint,
             waypointName: waypointName,
-            gpsOKText: "GPS OK"
+            gpsOKText: gpsOKText
         )
     }
 }
 
 private struct SnorkelingReturnMapView: View {
+    let gpsOKText: String
+
     var body: some View {
         SnorkelingRouteMapPanel(
             mode: .returnToEntry,
             waypointName: "INGRESSO",
-            gpsOKText: "GPS OK"
+            gpsOKText: gpsOKText
         )
     }
 }

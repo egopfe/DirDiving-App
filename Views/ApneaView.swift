@@ -5,6 +5,9 @@ struct ApneaView: View {
     @EnvironmentObject private var dive: DiveManager
     @EnvironmentObject private var compass: CompassManager
     @State private var screen: ApneaScreen = .menu
+    @State private var didNotifyRecoveryComplete = false
+    @AppStorage("dirdiving_apnea_surface_interval_seconds") private var surfaceIntervalSeconds: Double = 90
+    @AppStorage("dirdiving_apnea_max_depth_alarm_meters") private var maxDepthAlarmMeters: Double = 30
 
     var body: some View {
         ZStack {
@@ -31,6 +34,8 @@ struct ApneaView: View {
                         apneaSummaryScreen
                     case .openWaterConfig:
                         openWaterConfigScreen
+                    case .apneaAlarms:
+                        apneaAlarmsScreen
                     case .countdown03:
                         countdownScreen(current: .countdown03, header: "Pronto?", number: "03", message: "Respira e rilassati", next: .countdown02)
                     case .countdown02:
@@ -58,6 +63,17 @@ struct ApneaView: View {
         .onDisappear { compass.stop() }
         .onChange(of: dive.currentDepthMeters) { _, depth in
             handleApneaDepthChange(depth)
+        }
+        .onChange(of: isApneaAscentAlarmVisible) { _, visible in
+            if visible { HapticService.shared.warnIfNeeded() }
+        }
+        .onChange(of: exploration.recoverySeconds) { _, seconds in
+            if seconds <= 0 && !didNotifyRecoveryComplete && !exploration.apneaDives.isEmpty {
+                didNotifyRecoveryComplete = true
+                HapticService.shared.confirm()
+            } else if seconds > 0 {
+                didNotifyRecoveryComplete = false
+            }
         }
         .animation(.easeInOut(duration: 0.18), value: exploration.currentApneaSeconds)
         .animation(.easeInOut(duration: 0.18), value: exploration.recoverySeconds)
@@ -233,6 +249,12 @@ struct ApneaView: View {
                 // TODO: Replace with Apnea water temperature when the session record exposes it.
                 summaryRow("Temp. acqua", value: "10 °C", showsDivider: false)
             }
+            .padding(.bottom, 12)
+
+            HStack(spacing: 8) {
+                apneaActionButton("GRAFICO", icon: "chart.xyaxis.line", color: DiveUI.blue) { screen = .depthProfile }
+                apneaActionButton("MENU", icon: "list.bullet", color: DiveUI.secondaryText) { screen = .menu }
+            }
         }
         .frame(maxWidth: .infinity, minHeight: 260)
         .contentShape(Rectangle())
@@ -306,6 +328,12 @@ struct ApneaView: View {
                     .monospacedDigit()
                 }
             }
+            .padding(.bottom, 12)
+
+            HStack(spacing: 8) {
+                apneaActionButton("DETTAGLI", icon: "info.circle", color: DiveUI.blue) { screen = .details }
+                apneaActionButton("MENU", icon: "list.bullet", color: DiveUI.secondaryText) { screen = .menu }
+            }
         }
         .frame(maxWidth: .infinity, minHeight: 260)
         .contentShape(Rectangle())
@@ -341,6 +369,12 @@ struct ApneaView: View {
                 // TODO: Replace placeholders with live/session heart-rate aggregates when available.
                 summaryRow("FC media", value: "78 bpm", showsDivider: true)
                 summaryRow("FC max", value: "112 bpm", showsDivider: false)
+            }
+            .padding(.bottom, 12)
+
+            HStack(spacing: 8) {
+                apneaActionButton("SALVA", icon: "checkmark.circle", color: DiveUI.green) { screen = .saveConfirmation }
+                apneaActionButton("GRAFICO", icon: "chart.xyaxis.line", color: DiveUI.blue) { screen = .depthProfile }
             }
         }
         .frame(maxWidth: .infinity, minHeight: 260)
@@ -384,11 +418,25 @@ struct ApneaView: View {
                 .font(.system(size: 21, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
-                .padding(.top, 42)
+                .padding(.top, 24)
 
-            // TODO: Navigate to a dedicated Apnea logbook when available.
+            apneaSyncBoundaryPanel(
+                title: "WATCH -> IPHONE APNEA",
+                message: "Record locale salvato. TODO sync experimental: inviare durata, profondità max e recovery; profilo campioni reale non disponibile in questo pass.",
+                color: DiveUI.cyan
+            )
+            .padding(.top, 12)
+
+            HStack(spacing: 8) {
+                apneaActionButton("FINE", icon: "checkmark", color: DiveUI.green) { screen = .menu }
+                apneaActionButton("LOGBOOK", icon: "list.bullet.rectangle", color: DiveUI.blue) { screen = .logbook }
+            }
+            .padding(.top, 18)
         }
         .frame(maxWidth: .infinity, minHeight: 260)
+        .task {
+            HapticService.shared.confirm()
+        }
     }
 
     private var apneaLogbookScreen: some View {
@@ -602,28 +650,37 @@ struct ApneaView: View {
             configHeader("Acque Libere")
 
             VStack(spacing: 0) {
-                configRow(
-                    title: "Allarmi",
-                    value: "Configura",
-                    systemImage: "bell",
-                    showsDivider: true
-                )
-                configRow(
+                Button {
+                    screen = .apneaAlarms
+                } label: {
+                    configRow(
+                        title: "Allarmi",
+                        value: "Configura",
+                        systemImage: "bell",
+                        showsDivider: true
+                    )
+                }
+                .buttonStyle(.plain)
+                apneaAdjustRow(
                     title: "Intervallo Superficie",
-                    value: "01:30 min",
+                    value: Formatters.time(surfaceIntervalSeconds),
+                    unit: "min",
                     systemImage: "stopwatch",
-                    showsDivider: true
+                    decrement: { surfaceIntervalSeconds = max(30, surfaceIntervalSeconds - 15) },
+                    increment: { surfaceIntervalSeconds = min(600, surfaceIntervalSeconds + 15) }
                 )
-                configRow(
+                apneaAdjustRow(
                     title: "Profondità Max Allarme",
-                    value: "30.0 m",
+                    value: String(format: "%.1f", maxDepthAlarmMeters),
+                    unit: "m",
                     systemImage: "timer",
-                    showsDivider: false
+                    decrement: { maxDepthAlarmMeters = max(5, maxDepthAlarmMeters - 1) },
+                    increment: { maxDepthAlarmMeters = min(80, maxDepthAlarmMeters + 1) }
                 )
             }
 
             Button {
-                // TODO: Apply selected open-water apnea configuration when a dedicated config model exists.
+                HapticService.shared.notify()
                 screen = .countdown03
             } label: {
                 Text("INIZIA")
@@ -642,6 +699,24 @@ struct ApneaView: View {
                     )
             }
             .buttonStyle(.plain)
+        }
+    }
+
+    private var apneaAlarmsScreen: some View {
+        VStack(spacing: 10) {
+            submenuHeader("Allarmi Apnea")
+            DivePanel(stroke: DiveUI.yellow) {
+                VStack(spacing: 8) {
+                    configRow(title: "Intervallo superficie", value: Formatters.time(surfaceIntervalSeconds), systemImage: "stopwatch", showsDivider: true)
+                    configRow(title: "Profondità max", value: String(format: "%.1f m", maxDepthAlarmMeters), systemImage: "water.waves", showsDivider: true)
+                    configRow(title: "Risalita veloce", value: "DiveManager", systemImage: "arrow.up", showsDivider: false)
+                    apneaSyncBoundaryPanel(
+                        title: "SETTINGS SYNC TODO",
+                        message: "Persistenza locale AppStorage attiva. TODO sync: iPhone -> Watch settings e duplicati/offline queue non implementati.",
+                        color: DiveUI.yellow
+                    )
+                }
+            }
         }
     }
 
@@ -676,18 +751,25 @@ struct ApneaView: View {
                 .frame(width: 134, height: 34)
                 .shadow(color: DiveUI.blue.opacity(0.55), radius: 5, x: 0, y: 0)
                 .padding(.bottom, 18)
-
-            // TODO: Add countdown haptic tick when HapticService exposes a dedicated countdown API.
         }
         .frame(maxWidth: .infinity, minHeight: 260)
         .contentShape(Rectangle())
         .onTapGesture {
+            if next == .activeSession {
+                HapticService.shared.notify()
+            } else {
+                HapticService.shared.tick()
+            }
             advanceCountdown(to: next)
         }
         .task(id: current) {
+            HapticService.shared.tick()
             try? await Task.sleep(nanoseconds: 1_000_000_000)
             await MainActor.run {
                 guard screen == current else { return }
+                if next == .activeSession {
+                    HapticService.shared.notify()
+                }
                 advanceCountdown(to: next)
             }
         }
@@ -943,6 +1025,92 @@ struct ApneaView: View {
                     .padding(.leading, 48)
             }
         }
+    }
+
+    private func apneaAdjustRow(
+        title: String,
+        value: String,
+        unit: String,
+        systemImage: String,
+        decrement: @escaping () -> Void,
+        increment: @escaping () -> Void
+    ) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: systemImage)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(DiveUI.blue)
+                .frame(width: 28)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.68)
+                Text("\(value) \(unit)")
+                    .font(.system(size: 13, weight: .black, design: .rounded))
+                    .foregroundStyle(DiveUI.yellow)
+                    .monospacedDigit()
+            }
+            Spacer(minLength: 4)
+            Button(action: decrement) {
+                Image(systemName: "minus")
+                    .font(.system(size: 12, weight: .black))
+                    .foregroundStyle(DiveUI.blue)
+                    .frame(width: 30, height: 30)
+                    .background(RoundedRectangle(cornerRadius: 8).stroke(DiveUI.blue.opacity(0.75), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            Button(action: increment) {
+                Image(systemName: "plus")
+                    .font(.system(size: 12, weight: .black))
+                    .foregroundStyle(DiveUI.blue)
+                    .frame(width: 30, height: 30)
+                    .background(RoundedRectangle(cornerRadius: 8).stroke(DiveUI.blue.opacity(0.75), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 9)
+    }
+
+    private func apneaActionButton(_ title: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 5) {
+                Image(systemName: icon)
+                Text(title)
+            }
+            .font(.system(size: 11, weight: .black, design: .rounded))
+            .foregroundStyle(color)
+            .frame(maxWidth: .infinity, minHeight: 40)
+            .background(
+                RoundedRectangle(cornerRadius: 11, style: .continuous)
+                    .fill(Color.black.opacity(0.42))
+                    .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous).stroke(color.opacity(0.72), lineWidth: 1.2))
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func apneaSyncBoundaryPanel(title: String, message: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            HStack(spacing: 5) {
+                Image(systemName: "arrow.triangle.2.circlepath")
+                Text(title)
+            }
+            .font(.system(size: 10, weight: .black, design: .rounded))
+            .foregroundStyle(color)
+            Text(message)
+                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white.opacity(0.78))
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(9)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 11, style: .continuous)
+                .fill(Color.black.opacity(0.42))
+                .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous).stroke(color.opacity(0.55), lineWidth: 1.1))
+        )
     }
 
     private func summaryRow(_ title: String, value: String, showsDivider: Bool) -> some View {
@@ -1247,14 +1415,14 @@ struct ApneaView: View {
             HStack(spacing: 10) {
                 DiveBearingRing(headingDegrees: compass.headingDegrees, accent: DiveUI.green, size: 82)
                 VStack(alignment: .leading, spacing: 3) {
-                    Text("COMPASS")
+                    Text("BUSSOLA")
                         .font(.system(size: 11, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
                     Text("\(Int(compass.headingDegrees.rounded()))\u{00B0} heading")
                         .font(.system(size: 13, weight: .semibold, design: .rounded))
                         .monospacedDigit()
                         .foregroundStyle(DiveUI.secondaryText)
-                    Text("Visual reference only")
+                    Text("Riferimento visuale")
                         .font(.system(size: 9, weight: .medium, design: .rounded))
                         .foregroundStyle(DiveUI.mutedText)
                 }
@@ -1283,13 +1451,21 @@ struct ApneaView: View {
 
     private var controls: some View {
         HStack(spacing: 6) {
-            DiveCommandButton("START", systemImage: "play.fill", color: DiveUI.green) { exploration.startApneaSession() }
-            DiveCommandButton("DIVE", systemImage: "arrow.down", color: DiveUI.yellow) { exploration.beginApneaDive() }
+            DiveCommandButton("START", systemImage: "play.fill", color: DiveUI.green) {
+                exploration.startApneaSession()
+                HapticService.shared.notify()
+            }
+            DiveCommandButton("DIVE", systemImage: "arrow.down", color: DiveUI.yellow) {
+                exploration.beginApneaDive()
+                HapticService.shared.notify()
+            }
             DiveCommandButton("SURFACE", systemImage: "arrow.up", color: DiveUI.blue) {
                 exploration.surfaceFromApnea(maxDepthMeters: dive.maxDepthMeters)
+                HapticService.shared.confirm()
             }
             DiveCommandButton("WARN", systemImage: "exclamationmark.triangle", color: DiveUI.red) {
                 exploration.triggerApneaWarning("APNEA TROPPO LUNGA")
+                HapticService.shared.warnIfNeeded()
             }
         }
     }
@@ -1459,6 +1635,7 @@ private enum ApneaScreen: Equatable {
     case saveConfirmation
     case summary
     case openWaterConfig
+    case apneaAlarms
     case countdown03
     case countdown02
     case countdown01
