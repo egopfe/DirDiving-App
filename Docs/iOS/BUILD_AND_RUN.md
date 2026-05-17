@@ -25,7 +25,7 @@ Available schemes from `project.yml`:
 - `DIRDiving iOS`
 - `DIRDiving Watch App`
 
-The iOS Companion stable branch exposes Logbook, Dive Detail, Planner, Planner Result and Settings in the main tab bar. Settings contains WatchConnectivity status/retry, iCloud/manual sync, onboarding notes, units/export preferences, demo logbook and Subsurface export context. Placeholder-heavy Explore/Analysis/Equipment concepts are kept out of the stable tab bar.
+The iOS Companion stable branch exposes Logbook, Route Review, Analysis, Planner, Gear and Settings in the main tab bar. Settings contains WatchConnectivity status/retry, Watch conflict review, iCloud/manual sync, onboarding notes, local units/export status, demo logbook and Subsurface export context. Route Review, Analysis and Gear must use real local/logbook data or clearly label local-only limitations; placeholder-heavy experimental concepts remain out of the stable tab bar.
 
 UI-only visual alignment must not change planner calculations, sync, persistence, models, managers or navigation flows.
 

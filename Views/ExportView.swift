@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ExportView: View {
+    @Environment(\.dismiss) private var dismiss
     var fileName: String = "export.csv"
 
     var body: some View {
@@ -37,10 +38,23 @@ struct ExportView: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.78)
 
-                Spacer(minLength: 27)
+                Spacer(minLength: 16)
+
+                Button {
+                    dismiss()
+                } label: {
+                    Text("TORNA AI LOG")
+                        .font(.system(size: 10, weight: .black, design: .rounded))
+                        .foregroundStyle(DiveUI.yellow)
+                        .padding(.horizontal, 11)
+                        .padding(.vertical, 7)
+                        .background(Capsule().stroke(DiveUI.yellow.opacity(0.86), lineWidth: 1))
+                }
+                .buttonStyle(.plain)
+
+                Spacer(minLength: 11)
             }
             .padding(.horizontal, 12)
         }
-        // TODO: Pass the actual exported CSV filename when this completion screen is wired into export flow.
     }
 }
