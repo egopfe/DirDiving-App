@@ -2,6 +2,11 @@ import Foundation
 import Combine
 import CoreMotion
 
+enum DiveGPSConfirmation: Equatable {
+    case start(GPSPoint?)
+    case end(GPSPoint?)
+}
+
 @MainActor
 final class DiveManager: NSObject, ObservableObject {
     static private(set) weak var shared: DiveManager?
@@ -18,6 +23,13 @@ final class DiveManager: NSObject, ObservableObject {
     @Published var ascentStatus = AscentStatus.make(rate: 0, depth: 0)
     @Published var redWarningBlink = false
     @Published var lastErrorMessage: String?
+    @Published var gpsConfirmation: DiveGPSConfirmation?
+
+    private var ascentAlarmEnabled: Bool {
+        UserDefaults.standard.object(forKey: "dirdiving_watch_alarm_ascent_enabled") == nil
+            ? true
+            : UserDefaults.standard.bool(forKey: "dirdiving_watch_alarm_ascent_enabled")
+    }
 
     private let logStore: DiveLogStore
     private let gpsManager: GPSManager
@@ -86,6 +98,7 @@ final class DiveManager: NSObject, ObservableObject {
         gpsManager.captureBestEffortPoint(for: 6) { [weak self] point in
             guard let self, self.isDiveActive, !self.isFinalizingDive else { return }
             self.entryGPS = point ?? capturedAtStart
+            self.showGPSConfirmation(.start(self.entryGPS))
         }
         samples = []
         previousDepthSample = nil
@@ -123,6 +136,7 @@ final class DiveManager: NSObject, ObservableObject {
             guard let self else { return }
             self.isFinalizingDive = false
             self.exitGPS = point
+            self.showGPSConfirmation(.end(point))
             self.finalizeDive(start: start, end: end, entryGPS: capturedEntryGPS, exitGPS: point, samples: finishedSamples)
         }
     }
@@ -161,7 +175,7 @@ final class DiveManager: NSObject, ObservableObject {
         let deltaDepth = previous.depthMeters - sample.depthMeters
         let rate = max(0, (deltaDepth / deltaTime) * 60.0)
         ascentStatus = AscentStatus.make(rate: rate, depth: sample.depthMeters, limits: ascentSettings.limits)
-        if ascentStatus.isOverLimit {
+        if ascentStatus.isOverLimit, ascentAlarmEnabled {
             HapticService.shared.warnIfNeeded()
             startBlinking()
         } else { stopBlinking() }
@@ -175,6 +189,17 @@ final class DiveManager: NSObject, ObservableObject {
     }
 
     private func stopBlinking() { blinkTimer?.invalidate(); blinkTimer = nil; redWarningBlink = false }
+
+    private func showGPSConfirmation(_ confirmation: DiveGPSConfirmation) {
+        gpsConfirmation = confirmation
+        HapticService.shared.confirm()
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 2_400_000_000)
+            if self.gpsConfirmation == confirmation {
+                self.gpsConfirmation = nil
+            }
+        }
+    }
 }
 
 extension DiveManager: CMWaterSubmersionManagerDelegate {

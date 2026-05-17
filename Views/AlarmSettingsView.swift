@@ -1,6 +1,11 @@
 import SwiftUI
 
 struct AlarmSettingsView: View {
+    @AppStorage("dirdiving_watch_alarm_ascent_enabled") private var ascentAlarmEnabled = true
+    @AppStorage("dirdiving_watch_alarm_depth_enabled") private var depthAlarmEnabled = false
+    @AppStorage("dirdiving_watch_alarm_runtime_enabled") private var runtimeAlarmEnabled = false
+    @AppStorage("dirdiving_watch_alarm_battery_enabled") private var batteryAlarmEnabled = true
+
     var body: some View {
         ZStack {
             DiveScreenBackground()
@@ -14,10 +19,10 @@ struct AlarmSettingsView: View {
                     .frame(maxWidth: .infinity)
 
                 VStack(spacing: 4) {
-                    alarmRow(title: "Velocità risalita", threshold: "> 0.5 m/min", isOn: true)
-                    alarmRow(title: "Profondità massima", threshold: "> 40.0 m", isOn: false)
-                    alarmRow(title: "Tempo immersione", threshold: "> 60 min", isOn: false)
-                    alarmRow(title: "Batteria bassa", threshold: "< 20%", isOn: true)
+                    alarmRow(title: "Velocità risalita", threshold: "Usa limiti ASC SET", isOn: $ascentAlarmEnabled)
+                    alarmRow(title: "Profondità massima", threshold: "> 40.0 m", isOn: $depthAlarmEnabled)
+                    alarmRow(title: "Tempo immersione", threshold: "> 60 min", isOn: $runtimeAlarmEnabled)
+                    alarmRow(title: "Batteria bassa", threshold: "< 20%", isOn: $batteryAlarmEnabled)
                 }
             }
             .padding(.horizontal, 11)
@@ -40,16 +45,11 @@ struct AlarmSettingsView: View {
 
             Spacer()
 
-            // TODO: Replace this visual placeholder if a watch clock value becomes part of the view model.
-            Text("--:--")
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-                .monospacedDigit()
+            DiveClockText(size: 14)
         }
     }
 
-    private func alarmRow(title: String, threshold: String, isOn: Bool) -> some View {
-        // TODO: Wire toggle states to persistent alarm settings when those settings exist.
+    private func alarmRow(title: String, threshold: String, isOn: Binding<Bool>) -> some View {
         HStack(spacing: 8) {
             VStack(alignment: .leading, spacing: 1) {
                 Text(title)
@@ -65,7 +65,9 @@ struct AlarmSettingsView: View {
 
             Spacer(minLength: 0)
 
-            visualToggle(isOn: isOn)
+            Toggle("", isOn: isOn)
+                .labelsHidden()
+                .tint(DiveUI.green)
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
@@ -80,22 +82,4 @@ struct AlarmSettingsView: View {
         )
     }
 
-    private func visualToggle(isOn: Bool) -> some View {
-        ZStack(alignment: isOn ? .trailing : .leading) {
-            Capsule()
-                .fill(isOn ? DiveUI.green : .white.opacity(0.28))
-                .frame(width: 34, height: 19)
-                .overlay(
-                    Capsule()
-                        .stroke(.white.opacity(isOn ? 0.12 : 0.35), lineWidth: 1)
-                )
-            Circle()
-                .fill(.white)
-                .frame(width: 15, height: 15)
-                .padding(.horizontal, 2)
-                .shadow(color: .black.opacity(0.35), radius: 2, x: 0, y: 1)
-        }
-        .frame(width: 34, height: 19)
-        .accessibilityLabel(isOn ? "Attivo" : "Disattivo")
-    }
 }

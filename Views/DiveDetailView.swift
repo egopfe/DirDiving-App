@@ -35,11 +35,7 @@ struct DiveDetailView: View {
 
             Spacer()
 
-            // TODO: Replace this visual placeholder if a watch clock value becomes part of the view model.
-            Text("--:--")
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-                .monospacedDigit()
+            DiveClockText(size: 14)
         }
     }
 
@@ -95,12 +91,12 @@ struct DiveDetailView: View {
         VStack(spacing: 3) {
             gpsRow(
                 title: "PUNTO INIZIO",
-                coordinate: coordinateLine(for: session.entryGPS, fallback: "41.123456\u{00B0} N   16.987654\u{00B0} E"),
+                coordinate: coordinateLine(for: session.entryGPS, fallback: "GPS non disponibile"),
                 color: DiveUI.green
             )
             gpsRow(
                 title: "PUNTO FINE",
-                coordinate: coordinateLine(for: session.exitGPS, fallback: "41.124210\u{00B0} N   16.988210\u{00B0} E"),
+                coordinate: coordinateLine(for: session.exitGPS, fallback: "GPS non disponibile"),
                 color: DiveUI.red
             )
         }
@@ -189,7 +185,6 @@ struct DiveDetailView: View {
 
     private func coordinateLine(for point: GPSPoint?, fallback: String) -> String {
         guard let point else {
-            // TODO: Replace fallback coordinates when this detail is opened for a session without saved GPS data.
             return fallback
         }
         return "\(coordinateText(value: point.latitude, positive: "N", negative: "S"))   \(coordinateText(value: point.longitude, positive: "E", negative: "W"))"

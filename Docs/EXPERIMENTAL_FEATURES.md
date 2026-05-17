@@ -122,8 +122,21 @@ The Watch must not edit photos, videos, comments, tags, categories, species note
 Current sync boundary:
 
 - marker payloads are persisted locally in the experimental exploration state;
-- the UI clearly labels Watch -> iPhone POI sync as TODO;
-- offline queue, duplicate prevention, delivery acknowledgement and iOS enrichment save are not implemented in this pass.
+- the UI shows the latest experimental payload kind, delivery state and local queue count;
+- WatchConnectivity direct send/transferUserInfo is attempted where supported, with fallback queue status visible to the user;
+- persistent retry, duplicate prevention, production acknowledgement and iOS enrichment merge are still lab/roadmap work.
+
+### Latest Blocker Resolution Scope
+
+The latest experimental UX pass resolves the audit blockers by gating or labeling unsafe surfaces instead of pretending full production capability:
+
+- `SettingsView`, `AlarmSettingsView`, `AscentRateSettingsView` and `InfoView` are reachable from the experimental Watch navigation.
+- General Watch settings now persist metric-unit intent, experimental haptics, Always-On-safe intent and alarm thresholds through local `AppStorage` / existing settings stores.
+- Snorkeling depth/time/distance alarms are locally enforced; the low-battery threshold is explicitly marked as configured-only until a battery source is connected.
+- `DiveManager` exposes sensor availability so Watch UI can show `--` instead of valid-looking zero when depth is unavailable.
+- Apnea shows `HR OFF`, `BAT --` and `TEMP --` when no heart-rate, battery or Apnea temperature source exists.
+- Buddy Assist is labelled and gated as lab-only until a reliable watchOS BLE relay/companion architecture is validated.
+- Experimental POI and Apnea record sync use lightweight contracts with visible queue/delivery status; this is not yet a full offline sync system.
 
 ### Free Map / Offline Map Roadmap
 

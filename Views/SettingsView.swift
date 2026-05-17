@@ -1,54 +1,121 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @EnvironmentObject private var gps: GPSManager
+    @EnvironmentObject private var dive: DiveManager
+    @EnvironmentObject private var watchSync: WatchSyncService
+    @AppStorage("dirdiving_watch_haptics_enabled") private var hapticsEnabled = true
+
     var body: some View {
         ZStack {
             DiveScreenBackground()
 
-            VStack(spacing: 5) {
-                header
+            ScrollView {
+                VStack(spacing: 7) {
+                    header
 
-                Text("IMPOSTAZIONI")
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
+                    Text("IMPOSTAZIONI")
+                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
 
-                VStack(spacing: 3) {
+                    NavigationLink {
+                        AscentRateSettingsView()
+                    } label: {
+                        settingsRow(
+                            icon: "gauge",
+                            iconColor: DiveUI.green,
+                            title: "Velocità risalita",
+                            subtitle: "Limiti m/min persistenti",
+                            showsChevron: true
+                        )
+                    }
+                    .buttonStyle(.plain)
+
+                    NavigationLink {
+                        AlarmSettingsView()
+                    } label: {
+                        settingsRow(
+                            icon: "bell",
+                            iconColor: DiveUI.yellow,
+                            title: "Allarmi",
+                            subtitle: "Stato soglie e promemoria",
+                            showsChevron: true
+                        )
+                    }
+                    .buttonStyle(.plain)
+
                     settingsRow(
                         icon: "ruler",
                         iconColor: .white,
                         title: "Unità di misura",
-                        subtitle: "Metrico (m, \u{00B0}C)"
+                        subtitle: "Metrico fisso (m, \u{00B0}C)"
                     )
-                    settingsRow(
-                        icon: "bell",
-                        iconColor: DiveUI.yellow,
-                        title: "Allarmi",
-                        subtitle: "Impostazioni alert"
+                    statusRow(
+                        icon: "location.fill",
+                        iconColor: gps.authorizationStatus == .denied ? DiveUI.red : DiveUI.green,
+                        title: "GPS superficie",
+                        subtitle: gpsStatusText
+                    )
+                    statusRow(
+                        icon: "drop.fill",
+                        iconColor: dive.lastErrorMessage == nil ? DiveUI.green : DiveUI.yellow,
+                        title: "Sensore profondità",
+                        subtitle: dive.lastErrorMessage ?? "Pronto quando disponibile"
+                    )
+                    statusRow(
+                        icon: "applewatch.radiowaves.left.and.right",
+                        iconColor: watchSync.isSupported ? DiveUI.green : DiveUI.orange,
+                        title: "Sync companion",
+                        subtitle: watchSync.lastSyncStatus
                     )
                     settingsRow(
                         icon: "sun.max",
                         iconColor: DiveUI.yellow,
                         title: "Schermo",
-                        subtitle: "Luminosità, Always On"
+                        subtitle: "Gestito da watchOS"
                     )
-                    settingsRow(
-                        icon: "iphone.radiowaves.left.and.right",
-                        iconColor: DiveUI.blue,
-                        title: "Vibrazione",
-                        subtitle: "Attiva"
-                    )
-                    settingsRow(
-                        icon: "speaker.wave.2",
-                        iconColor: DiveUI.blue,
-                        title: "Suoni",
-                        subtitle: "Attivi"
-                    )
+                    Toggle(isOn: $hapticsEnabled) {
+                        settingsRow(
+                            icon: "iphone.radiowaves.left.and.right",
+                            iconColor: hapticsEnabled ? DiveUI.blue : .white.opacity(0.5),
+                            title: "Vibrazione",
+                            subtitle: hapticsEnabled ? "Attiva per warning e conferme" : "Disattivata"
+                        )
+                    }
+                    .toggleStyle(.switch)
+                    .tint(DiveUI.green)
+
+                    NavigationLink {
+                        InfoView()
+                    } label: {
+                        settingsRow(
+                            icon: "info.circle",
+                            iconColor: DiveUI.blue,
+                            title: "Info",
+                            subtitle: "App, sync, device",
+                            showsChevron: true
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
+                .padding(.horizontal, 11)
+                .padding(.top, 9)
+                .padding(.bottom, 8)
             }
-            .padding(.horizontal, 11)
-            .padding(.top, 9)
-            .padding(.bottom, 8)
+        }
+    }
+
+    private var gpsStatusText: String {
+        switch gps.authorizationStatus {
+        case .authorizedAlways, .authorizedWhenInUse:
+            return gps.lastPoint == nil ? "Autorizzato, in attesa fix" : "Fix disponibile"
+        case .denied, .restricted:
+            return "Permesso negato: abilita da iPhone"
+        case .notDetermined:
+            return "Richiesto al primo uso"
+        @unknown default:
+            return "Stato permesso sconosciuto"
         }
     }
 
@@ -66,16 +133,11 @@ struct SettingsView: View {
 
             Spacer()
 
-            // TODO: Replace this visual placeholder if a watch clock value becomes part of the view model.
-            Text("--:--")
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-                .monospacedDigit()
+            DiveClockText(size: 14)
         }
     }
 
-    private func settingsRow(icon: String, iconColor: Color, title: String, subtitle: String) -> some View {
-        // TODO: Wire these rows to real settings destinations when those view models exist.
+    private func settingsRow(icon: String, iconColor: Color, title: String, subtitle: String, showsChevron: Bool = false) -> some View {
         HStack(spacing: 9) {
             Image(systemName: icon)
                 .font(.system(size: 16, weight: .medium))
@@ -95,6 +157,12 @@ struct SettingsView: View {
             }
 
             Spacer(minLength: 0)
+
+            if showsChevron {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.42))
+            }
         }
         .padding(.horizontal, 9)
         .padding(.vertical, 5)
@@ -107,5 +175,9 @@ struct SettingsView: View {
                         .stroke(.white.opacity(0.24), lineWidth: 1)
                 )
         )
+    }
+
+    private func statusRow(icon: String, iconColor: Color, title: String, subtitle: String) -> some View {
+        settingsRow(icon: icon, iconColor: iconColor, title: title, subtitle: subtitle)
     }
 }

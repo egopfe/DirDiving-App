@@ -1,6 +1,10 @@
 import SwiftUI
+import WatchKit
 
 struct InfoView: View {
+    @EnvironmentObject private var watchSync: WatchSyncService
+    @State private var batteryLevel: Float = WKInterfaceDevice.current().batteryLevel
+
     var body: some View {
         ZStack {
             DiveScreenBackground()
@@ -14,15 +18,20 @@ struct InfoView: View {
                     .frame(maxWidth: .infinity)
 
                 VStack(spacing: 4) {
-                    infoRow(title: "Versione", value: "1.0.0")
+                    infoRow(title: "Versione", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "n/d")
                     deviceRow
                     batteryRow
-                    infoRow(title: "Spazio libero", value: "1.2 GB")
+                    infoRow(title: "Sync", value: watchSync.lastSyncStatus)
+                    infoRow(title: "Spazio libero", value: "Gestito da watchOS")
                 }
             }
             .padding(.horizontal, 11)
             .padding(.top, 9)
             .padding(.bottom, 8)
+        }
+        .onAppear {
+            WKInterfaceDevice.current().isBatteryMonitoringEnabled = true
+            batteryLevel = WKInterfaceDevice.current().batteryLevel
         }
     }
 
@@ -40,16 +49,11 @@ struct InfoView: View {
 
             Spacer()
 
-            // TODO: Replace this visual placeholder if a watch clock value becomes part of the view model.
-            Text("--:--")
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-                .monospacedDigit()
+            DiveClockText(size: 14)
         }
     }
 
     private func infoRow(title: String, value: String) -> some View {
-        // TODO: Wire to real app/device info when those values are exposed to the watch UI.
         HStack(alignment: .center) {
             Text(title)
                 .font(.system(size: 11, weight: .semibold, design: .rounded))
@@ -67,12 +71,11 @@ struct InfoView: View {
     }
 
     private var deviceRow: some View {
-        // TODO: Replace with the actual paired/watch device name if it becomes available to this view.
         VStack(alignment: .leading, spacing: 2) {
             Text("Dispositivo")
                 .font(.system(size: 11, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white)
-            Text("Apple Watch Ultra")
+            Text(WKInterfaceDevice.current().name)
                 .font(.system(size: 11, weight: .semibold, design: .rounded))
                 .foregroundStyle(DiveUI.blue)
                 .lineLimit(1)
@@ -84,14 +87,14 @@ struct InfoView: View {
     }
 
     private var batteryRow: some View {
-        // TODO: Replace placeholder percentage with the actual watch battery level when exposed.
+        let percent = batteryLevel >= 0 ? Int((batteryLevel * 100).rounded()) : -1
         VStack(spacing: 5) {
             HStack {
                 Text("Batteria")
                     .font(.system(size: 11, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
                 Spacer()
-                Text("78%")
+                Text(percent >= 0 ? "\(percent)%" : "n/d")
                     .font(.system(size: 11, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
                     .monospacedDigit()
@@ -103,7 +106,7 @@ struct InfoView: View {
                         .fill(.white.opacity(0.22))
                     Capsule()
                         .fill(DiveUI.green)
-                        .frame(width: geometry.size.width * 0.78)
+                        .frame(width: geometry.size.width * CGFloat(max(0, batteryLevel)))
                 }
             }
             .frame(height: 6)

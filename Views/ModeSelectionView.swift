@@ -19,17 +19,15 @@ struct ModeSelectionView: View {
 
                     selectorHero
 
-                    ForEach(DIRActivityMode.allCases) { mode in
+                    ForEach(stableModes) { mode in
                         modeCard(mode)
                     }
-
-                    ExperimentalConceptDeckView()
 
                     DivePanel(stroke: DiveUI.yellow) {
                         HStack(alignment: .top, spacing: 8) {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .font(.caption.bold())
-                            Text("Seleziona modalita prima di entrare in acqua. Pairing, waypoint e warning vanno preparati in superficie.")
+                            Text("Modalita stabile: Diving. Le funzioni sperimentali restano isolate dai rami experimental.")
                                 .font(.system(size: 10, weight: .semibold, design: .rounded))
                                 .multilineTextAlignment(.leading)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -77,6 +75,10 @@ struct ModeSelectionView: View {
         .animation(.easeInOut(duration: 0.2), value: exploration.selectedMode)
     }
 
+    private var stableModes: [DIRActivityMode] {
+        [.diving]
+    }
+
     private func modeCard(_ mode: DIRActivityMode) -> some View {
         let isSelected = exploration.selectedMode == mode
 
@@ -86,9 +88,9 @@ struct ModeSelectionView: View {
             case .diving:
                 navigation.selectedPage = .live
             case .apnea:
-                navigation.selectedPage = .apnea
+                navigation.selectedPage = .live
             case .snorkeling:
-                navigation.selectedPage = .snorkeling
+                navigation.selectedPage = .live
             }
         } label: {
             DivePanel(stroke: isSelected ? mode.accent : DiveUI.hairline) {

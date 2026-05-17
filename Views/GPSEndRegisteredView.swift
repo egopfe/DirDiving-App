@@ -69,26 +69,20 @@ struct GPSEndRegisteredView: View {
 
             Spacer()
 
-            // TODO: Replace this visual placeholder if a watch clock value becomes part of the view model.
-            Text("--:--")
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-                .monospacedDigit()
+            DiveClockText(size: 14)
         }
     }
 
     private var latitudeText: String {
         guard let point else {
-            // TODO: Use the captured end GPS latitude when this view receives completed dive context.
-            return "41.124210\u{00B0} N"
+            return "GPS NON DISPONIBILE"
         }
         return coordinateText(value: point.latitude, positive: "N", negative: "S")
     }
 
     private var longitudeText: String {
         guard let point else {
-            // TODO: Use the captured end GPS longitude when this view receives completed dive context.
-            return "16.988210\u{00B0} E"
+            return "FIX NON SALVATO"
         }
         return coordinateText(value: point.longitude, positive: "E", negative: "W")
     }

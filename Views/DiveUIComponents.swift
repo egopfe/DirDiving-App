@@ -125,6 +125,19 @@ struct DiveCommandButton: View {
     }
 }
 
+struct DiveClockText: View {
+    var size: CGFloat = 14
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 30)) { context in
+            Text(context.date, format: .dateTime.hour().minute())
+                .font(.system(size: size, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+                .monospacedDigit()
+        }
+    }
+}
+
 struct DiveMetric: View {
     let title: String
     let value: String
