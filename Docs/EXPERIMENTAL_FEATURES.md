@@ -53,6 +53,7 @@ Watch implementation:
 - `ApneaView`: Apnea menu, session selection, open-water configuration, countdown, surface waiting, automatic dive start from depth, surface-end handling, recovery, summary, depth profile, details, save confirmation, logbook, and statistics.
 - `ExplorationStore`: shared state for mode selection, snorkeling route state, markers, apnea recovery, apnea records, and warnings.
 - `ExplorationModels`: activity modes, session states, marker categories, waypoints, GPS markers, and apnea records.
+- `HapticService`: confirmation, warning, notification, and countdown tick haptics gated by the experimental haptic preference.
 
 Operational boundaries:
 
@@ -67,14 +68,15 @@ The latest Apple Watch experimental Apnea work adds or restyles these screens:
 - `Home Mode Selection`: Apnea entry point from the pre-water selector.
 - `Apnea Menu`: `Sessione`, `Tabelle`, `Statistiche`, and `Logbook`.
 - `Session Type`: `Acque Libere` active, with `Dinamica`, `Statica`, and `Personalizzata` visible as disabled placeholders.
-- `Session Configuration`: UI rows for allarmi, intervallo superficie, and profondita max.
-- `Countdown`: automatic `03`, `02`, `01 / VAI` flow, with manual tap advance.
+- `Session Configuration`: allarmi reachable, intervallo superficie and profondita max configurable with local `AppStorage` persistence.
+- `Countdown`: automatic `03`, `02`, `01 / VAI` flow, manual tap advance, and haptic tick/start feedback.
 - `Surface Waiting`: session active in surface state before immersion.
 - `Descent`, `Bottom`, and `Ascent`: visual states derived from existing depth/runtime data until a dedicated Apnea phase engine exists.
 - `Ascent Alarm`: reuses `DiveManager.ascentStatus.isOverLimit` without changing ascent thresholds or algorithms.
 - `Surface End`: uses `ExplorationStore.surfaceFromApnea(...)` to close the dive and start recovery.
 - `Recovery`: uses the existing recovery timer and `max(duration * 2, 30)` rule.
-- `Summary`, `Depth Profile`, `Details`, `Save Confirmation`, `Logbook`, and `Statistics`: complete UI path with real saved duration/max depth where exposed and TODO placeholders for missing samples, HR, water temperature, average depth, and aggregate metrics.
+- `Summary`, `Depth Profile`, `Details`, `Save Confirmation`, `Logbook`, and `Statistics`: complete UI path with explicit forward/back actions, real saved duration/max depth where exposed and TODO placeholders for missing samples, HR, water temperature, average depth, and aggregate metrics.
+- `Watch -> iPhone Apnea`: documented sync boundary for local apnea record payloads; full WatchConnectivity queue, duplicate prevention and sample-profile sync remain TODO.
 
 Detailed Apnea documentation is available in:
 
@@ -90,9 +92,13 @@ The latest Apple Watch experimental Snorkeling work adds or restyles these UI-on
 - `Mappa Waypoint`: current position relative to the selected/next waypoint, with a lightweight dark marine map, dashed yellow route, target marker, zoom controls, and scale indicator.
 - `Mappa Ritorno`: separate return-to-entry map with cyan dashed route, home/entry marker, current marker, zoom controls, and scale indicator.
 - `Direzione Waypoint`: compass-style bearing surface for waypoint navigation. It is not the generic compass screen.
-- `GPS Marker`: confirmation screen for saved marker coordinates and category.
+- `GPS Marker`: confirmation screen for saved marker coordinates/category, GPS unavailable state, haptic confirmation/warning, and links to log/detail.
 - `Dettaglio Marcatore POI`: Watch-side POI metadata detail with `Da arricchire su iPhone` and `Foto/Note: Companion iOS`.
-- `Allarmi Snorkeling`: snorkeling-specific visual alarm thresholds for maximum depth, maximum time, maximum distance, and low battery.
+- `Log Marcatori`: Watch-sized marker list with enrichment state and tap-to-detail.
+- `Impostazioni Snorkeling`: Log Marcatori, Allarmi, Calibrazione Bussola, Legenda Icone Mappe and experimental haptics.
+- `Allarmi Snorkeling`: snorkeling-specific thresholds for maximum depth, maximum time, maximum distance, and low battery persisted locally with `AppStorage`.
+- `Calibrazione Bussola`: instructional screen only; it does not change compass algorithms.
+- `Legenda Icone Mappe`: explains current position, waypoint, entry point, POI/marker, waypoint route and return route.
 
 Terminology rule: use `BUSSOLA`, never `COMPASSO`.
 
@@ -109,9 +115,15 @@ Expected lightweight POI payload:
 - current heading/bearing if available;
 - active waypoint if available;
 - session id when exposed;
-- enrichment state (`isEnriched = false`) when a dedicated POI model is introduced.
+- enrichment state (`isEnriched = false`).
 
 The Watch must not edit photos, videos, comments, tags, categories, species notes, or long observations. Those enrichment fields belong to the iOS Companion after sync.
+
+Current sync boundary:
+
+- marker payloads are persisted locally in the experimental exploration state;
+- the UI clearly labels Watch -> iPhone POI sync as TODO;
+- offline queue, duplicate prevention, delivery acknowledgement and iOS enrichment save are not implemented in this pass.
 
 ### Free Map / Offline Map Roadmap
 
@@ -130,6 +142,7 @@ Production apps should not hard-code heavy use of public OpenStreetMap tile serv
 Persistence:
 
 - The Watch experimental branch mirrors dive logs, ascent-rate settings, Snorkeling markers, Apnea records, active mode, waypoint state, and warning state to iCloud Key-Value Store when the app is signed with the iCloud capability.
+- Snorkeling alarm thresholds and Apnea configuration values use local `AppStorage` as incremental experimental persistence.
 - Secure Buddy keys remain in Keychain and are not copied into iCloud Key-Value Store.
 
 Screens using this system include:

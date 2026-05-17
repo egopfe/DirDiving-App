@@ -480,9 +480,9 @@ Regole operative:
 | Branch | App | Stato | Note |
 | --- | --- | --- | --- |
 | `main` | Apple Watch | Stable | Diving mode, log, export, bussola, immagini, settings raggiungibili, allarmi/haptic persistenti, GPS entry/exit confirmation. |
-| `codex/experimental-features` | Apple Watch | Experimental | Snorkeling Live, Mappa Waypoint, Mappa Ritorno, Direzione Waypoint, POI, Apnea, Buddy Assist. |
+| `codex/experimental-features` | Apple Watch | Experimental | Snorkeling Live, Mappa Waypoint, Mappa Ritorno, Direzione Waypoint, POI con log/dettaglio/conferma, allarmi Snorkeling persistenti locali, Apnea, haptics sperimentali e Buddy Assist. |
 | `main-iOS` | iOS Companion | Stable | Logbook, Dive Detail, Planner/Plan Result, Settings, WatchConnectivity, iCloud, onboarding e export Subsurface. |
-| `codex/ios-experimental-features` | iOS Companion | Experimental | Explore, route planning, waypoint management, future POI enrichment and map/offline workflows. |
+| `codex/ios-experimental-features` | iOS Companion | Experimental | Explore Lab, route planning, waypoint management, POI enrichment mock/TODO, Apnea Review interattiva, manifest sync sperimentale e note map/offline. |
 
 ## Mode Selection
 
@@ -543,11 +543,12 @@ Snorkeling su Apple Watch experimental include:
 - Mappa Waypoint separata dalla Mappa Ritorno.
 - Direzione Waypoint come funzione compass-style verso il waypoint, non bussola generica.
 - `BUSSOLA` come terminologia obbligatoria; non usare `COMPASSO`.
-- `MARCATORE` come quick-capture POI leggero.
-- Dettaglio POI con metadata e nota `Da arricchire su iPhone`.
-- Allarmi snorkeling specifici, separati dai settings globali.
+- `MARCATORE` come quick-capture POI leggero con conferma, haptic, payload timestamp/GPS/profondita/temperatura/bearing/waypoint/sessione quando disponibili e stato `Da arricchire su iPhone`.
+- Log Marcatori e Dettaglio POI raggiungibili da Watch, con metadata, stato enrichment e chiara boundary di sync verso iPhone.
+- Allarmi snorkeling specifici, separati dai settings globali, persistiti localmente con `AppStorage` in attesa di uno store dedicato.
+- Schermate raggiungibili per Calibrazione Bussola e Legenda Icone Mappe senza modificare algoritmi bussola o motore mappe.
 
-Il Watch non modifica foto/commenti POI. Il companion iOS arricchira i POI dopo sync con foto, video, commenti, categorie, tag e note osservazione.
+Il Watch non modifica foto/commenti POI. Il companion iOS espone una superficie di enrichment per foto, video, commenti, categorie, tag e note osservazione, ma media upload/save e sync reale restano marcati come TODO sperimentali.
 
 ## Apnea Experimental Notes
 
@@ -555,27 +556,39 @@ Apnea su Apple Watch experimental include:
 
 - Home Apnea dal selettore modalita.
 - Menu con `Sessione`, `Tabelle`, `Statistiche` e `Logbook`.
-- Sessione `Acque Libere`, countdown `03`, `02`, `01 / VAI` e surface waiting.
+- Sessione `Acque Libere`, configurazione locale persistente per intervallo superficie e profondita massima allarme, countdown `03`, `02`, `01 / VAI` con haptic tick e surface waiting.
 - Avvio automatico immersione da profondita e chiusura automatica al ritorno in superficie usando `ExplorationStore`.
 - Stati visuali per discesa, fondo, risalita, allarme risalita, superficie, recovery, riepilogo, grafico, dettagli e salvataggio.
 - Logbook e statistiche Apnea con dati reali dove esposti e placeholder TODO dove mancano campioni, HR, temperatura o aggregati.
+- Pannelli espliciti per `Watch -> iPhone Apnea` e settings sync, senza introdurre una nuova architettura WatchConnectivity.
 
-Il companion iOS experimental aggiunge `Apnea Review` come card UI-only in `ExplorationCenterView`, con profilo mock e metriche placeholder finche non esiste sincronizzazione record Apnea dedicata.
+Il companion iOS experimental aggiunge `Apnea Review` in `ExplorationCenterView` con tab interattivi `Riepilogo`, `Grafico` e `Dettagli`, profilo mock e metriche placeholder finche non esiste sincronizzazione record Apnea dedicata.
+
+## Latest Experimental UX Audit Fixes
+
+Il documento Word dell'audit e conservato in `Docs/EXPERIMENTAL_UX_INTERACTION_AUDIT_20260517.docx`. Gli ultimi fix implementati sui rami sperimentali aggiungono:
+
+- Watch Snorkeling: conferma `MARCATORE SALVATO`, haptic, log marcatori, dettaglio marcatore, GPS unavailable state, settings Snorkeling, allarmi persistenti locali, calibrazione Bussola e legenda mappe.
+- Watch Apnea: configurazione locale persistente, allarmi raggiungibili, haptic countdown/start/save/recovery, azioni esplicite su riepilogo/grafico/dettagli/salvataggio e boundary sync dichiarate.
+- iOS Experimental Explore Lab: sezioni Snorkeling Review, POI/Osservazioni, Waypoint Planning, Apnea Review e Experimental Settings; POI enrichment mock, manifest route/settings per Watch e note MBTiles/MapLibre/OpenSeaMap.
+- Tutte le funzioni non production-ready sono etichettate come `Mock`, `TODO`, `Non ancora sincronizzato` o `Sync sperimentale` per evitare false promesse UX.
 
 ## Known Limitations
 
 - GPS e affidabile solo in superficie; sott'acqua usare ultimo fix valido e contesto bussola/waypoint come supporto informativo.
 - Le mappe Watch sono leggere e SwiftUI-only; non scaricano tile online.
 - OpenStreetMap public tile server non devono essere usati hard-coded per traffico production pesante.
-- OpenSeaMap, GEBCO, EMODnet e MBTiles restano roadmap/future layer.
+- OpenSeaMap, GEBCO, EMODnet e MBTiles restano roadmap/future layer; il companion iOS mostra solo stato/TODO e non include ancora un motore MapLibre reale.
 - Apnea e Snorkeling experimental non sono dispositivi certificati di sicurezza.
 - Buddy Assist resta sperimentale e limitato dalle policy watchOS BLE.
+- Watch -> iPhone POI, Watch -> iPhone Apnea, iPhone -> Watch route/waypoint/settings, duplicate prevention e offline queue sono documentati come sync boundary sperimentali; non sono ancora una pipeline completa.
 
 ## Roadmap
 
 - Validare build XcodeGen su macOS per ogni ramo.
-- Collegare POI Watch a payload sync leggero e enrichment iOS.
-- Definire store persistente per soglie Snorkeling quando richiesto.
+- Collegare POI Watch a payload sync leggero e enrichment iOS, includendo queue offline e prevenzione duplicati.
+- Migrare gli allarmi Snorkeling da `AppStorage` locale a store dedicato quando il contratto dati sara stabile.
+- Collegare record Apnea Watch a review iOS senza simulare campioni profilo non ancora disponibili.
 - Introdurre workflow MapLibre/OpenSeaMap/MBTiles sul companion iOS dopo valutazione licenze e prestazioni.
 - Aggiungere report test hardware Apple Watch Ultra per Diving, Snorkeling e Apnea.
 - Preparare export e documentazione Subsurface piu completa per import CSV.
