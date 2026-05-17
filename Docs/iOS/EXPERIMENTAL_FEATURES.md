@@ -44,10 +44,11 @@ Implemented surfaces:
 - `Explore` tab in the main iOS tab bar.
 - Premium dark-cyan snorkeling map mock surface with OSM/OpenSeaMap/offline-cache status, route line, waypoint pins, heatmap indicator, and route distance.
 - Waypoint planner with tap-style waypoint creation, category icons, coordinate display, route ordering controls, and Watch sync action.
-- Route planning card for waypoint count, distance, offline cache, and iPhone -> WatchConnectivity -> Watch cache workflow.
-- Apnea Review card with `Riepilogo`, `Grafico`, and `Dettagli` tabs, profile/route mock, and summary metrics.
+- Route planning card for waypoint count, distance, offline cache status, and a mock manifest for future iPhone -> Watch route/settings delivery.
+- POI / Osservazioni card for photo, video, comments, category, tags, and species notes as explicit media/enrichment TODO actions.
+- Apnea Review card with interactive `Riepilogo`, `Grafico`, and `Dettagli` tabs and mock-data labels.
 - Apnea analytics card with max depth, recovery trend, readiness score, fatigue trend, and apnea-duration chart.
-- Sync/settings card for apnea duration warning, recovery ratio, drift threshold, and waypoint auto-switch.
+- Sync/settings card for apnea duration warning, recovery ratio, drift threshold, waypoint auto-switch, Watch -> iPhone POI, Watch -> iPhone Apnea, iPhone -> Watch route and iPhone -> Watch settings boundaries.
 - GPX/CSV export actions for route, marker, and analytics data.
 
 Implementation files:
@@ -56,7 +57,7 @@ Implementation files:
 - `iOSApp/Services/ExplorationPlanningStore.swift`
 - `iOSApp/Views/ExplorationCenterView.swift`
 
-Map note: the current branch provides a premium MapLibre/OpenSeaMap-ready UI surface and route model. A production map engine should be selected and validated on-device before replacing the coded map preview with live tiles/offline MBTiles.
+Map note: the current branch provides a premium MapLibre/OpenSeaMap-ready UI surface and route model. It does not ship a real map engine, public tile usage, or MBTiles cache. A production map engine should be selected and validated on-device before replacing the coded map preview with live tiles/offline MBTiles.
 
 ### Apnea Companion Review
 
@@ -86,6 +87,12 @@ The iOS Companion is the intended enrichment surface after sync:
 
 The Watch UI should continue to show `Da arricchire su iPhone` or `Companion iOS` for fields that are not editable on-device.
 
+Current implementation boundary:
+
+- enrichment tiles are reachable and update a local mock status string;
+- no real media picker, upload, file storage or save-to-POI pipeline is implemented;
+- Watch -> iPhone POI sync, offline queue, duplicate prevention and delivery acknowledgement remain TODO.
+
 ### Free Map / Offline Map Plan
 
 Experimental map work should prefer free/open-source map architecture:
@@ -98,6 +105,22 @@ Experimental map work should prefer free/open-source map architecture:
 
 Public OpenStreetMap tile servers have usage policies. A production app should use an approved tile provider, self-hosted tiles, or packaged MBTiles rather than hard-coding heavy public tile usage.
 
+The current Explore Lab includes an explicit MBTiles readiness status action. It only documents the intended MapLibre/OpenStreetMap/OpenSeaMap/GEBCO/EMODnet direction and does not add dependencies or live tile rendering.
+
+## Sync Boundary Status
+
+The iOS experimental branch intentionally stops short of a full sync architecture.
+
+Documented TODO boundaries:
+
+- Watch -> iPhone POIs: queue, duplicate prevention, delivery acknowledgement and enrichment merge.
+- Watch -> iPhone Apnea records: duration/max-depth/recovery payload first, sample profile later.
+- iPhone -> Watch waypoints/routes: mock manifest only in this pass.
+- iPhone -> Watch settings: payload contract not defined yet.
+- Offline queue: not implemented.
+
+The UI uses `Mock`, `TODO`, `Non ancora sincronizzato` and equivalent labels so experimental surfaces do not imply production sync.
+
 ## iCloud Persistence
 
 The branch now includes local persistence plus iCloud Key-Value Store mirroring for iOS companion data.
@@ -107,7 +130,7 @@ Persisted data:
 - Logbook sessions.
 - Technical planner state and gas inputs.
 - Buddy Lab companion state.
-- Explore route, waypoint, warning settings, and export/sync status.
+- Explore route, waypoint, warning settings, export/sync status, offline-map status and media-enrichment mock status.
 
 The implementation uses `CloudSyncStore` as a small persistence adapter around `UserDefaults` and `NSUbiquitousKeyValueStore`. iCloud sync becomes active only when the app is signed with the iCloud capability and the configured container is available for the Apple ID.
 
