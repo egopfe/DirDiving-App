@@ -6,6 +6,7 @@ struct LogbookView: View {
     @State private var search = ""
     @State private var showImporter = false
     @State private var importMessage: String?
+    @State private var pendingDelete: DiveSession?
 
     private var filtered: [DiveSession] {
         search.isEmpty ? logStore.sessions : logStore.sessions.filter { ($0.siteName ?? "").localizedCaseInsensitiveContains(search) }
@@ -20,36 +21,40 @@ struct LogbookView: View {
                         header
                         importStatus
                         logbookSearchBar
-                        Text("MAGGIO 2024")
-                            .font(.system(size: 11, weight: .semibold, design: .rounded))
-                            .tracking(0.6)
-                            .foregroundStyle(DIRTheme.cyan)
-                            .padding(.top, 4)
-                        ForEach(Array(filtered.enumerated()), id: \.element.id) { index, session in
-                            HStack(spacing: 7) {
-                                NavigationLink { DiveDetailView(session: session) } label: {
-                                    DiveLogCard(session: session, index: index)
-                                }
-                                .buttonStyle(.plain)
-
-                                if !session.isDemoDive {
-                                    Button(role: .destructive) {
-                                        logStore.delete(id: session.id)
-                                    } label: {
-                                        Image(systemName: "trash")
-                                            .font(.system(size: 13, weight: .bold))
-                                            .foregroundStyle(DIRTheme.red)
-                                            .frame(width: 30, height: 64)
-                                            .background(
-                                                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                                    .fill(DIRTheme.red.opacity(0.08))
-                                                    .overlay(
-                                                        RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                                            .stroke(DIRTheme.red.opacity(0.28), lineWidth: 1)
-                                                    )
-                                            )
+                        if filtered.isEmpty {
+                            emptyState
+                        } else {
+                            Text("MAGGIO 2024")
+                                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                                .tracking(0.6)
+                                .foregroundStyle(DIRTheme.cyan)
+                                .padding(.top, 4)
+                            ForEach(Array(filtered.enumerated()), id: \.element.id) { index, session in
+                                HStack(spacing: 7) {
+                                    NavigationLink { DiveDetailView(session: session) } label: {
+                                        DiveLogCard(session: session, index: index)
                                     }
                                     .buttonStyle(.plain)
+
+                                    if !session.isDemoDive {
+                                        Button(role: .destructive) {
+                                            pendingDelete = session
+                                        } label: {
+                                            Image(systemName: "trash")
+                                                .font(.system(size: 13, weight: .bold))
+                                                .foregroundStyle(DIRTheme.red)
+                                                .frame(width: 30, height: 64)
+                                                .background(
+                                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                                        .fill(DIRTheme.red.opacity(0.08))
+                                                        .overlay(
+                                                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                                                .stroke(DIRTheme.red.opacity(0.28), lineWidth: 1)
+                                                        )
+                                                )
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
                                 }
                             }
                         }
@@ -73,6 +78,26 @@ struct LogbookView: View {
                 case .failure(let error):
                     importMessage = error.localizedDescription
                 }
+            }
+            .confirmationDialog(
+                "Eliminare immersione?",
+                isPresented: Binding(
+                    get: { pendingDelete != nil },
+                    set: { if !$0 { pendingDelete = nil } }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Elimina", role: .destructive) {
+                    if let pendingDelete {
+                        logStore.delete(id: pendingDelete.id)
+                    }
+                    pendingDelete = nil
+                }
+                Button("Annulla", role: .cancel) {
+                    pendingDelete = nil
+                }
+            } message: {
+                Text("L'immersione verra rimossa dal logbook locale e dalla prossima sincronizzazione KVS.")
             }
         }
     }
@@ -132,6 +157,43 @@ struct LogbookView: View {
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
                         .stroke(Color.white.opacity(0.045), lineWidth: 1)
                 )
+        )
+    }
+
+    private var emptyState: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                Image(systemName: logStore.sessions.isEmpty ? "tray" : "magnifyingglass")
+                    .font(.title2.weight(.bold))
+                    .foregroundStyle(DIRTheme.cyan)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(logStore.sessions.isEmpty ? "Nessuna immersione registrata" : "Nessun risultato")
+                        .font(.headline.weight(.bold))
+                        .foregroundStyle(.white)
+                    Text(logStore.sessions.isEmpty ? "Sincronizza Apple Watch o importa un CSV Subsurface per iniziare." : "Modifica la ricerca o importa un nuovo CSV.")
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            Button {
+                showImporter = true
+            } label: {
+                Text(logStore.sessions.isEmpty ? "IMPORTA CSV" : "IMPORTA NUOVO CSV")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(DIRTheme.cyan)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 9)
+                    .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.7), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
+                .fill(DIRTheme.surface.opacity(0.86))
+                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.cyan.opacity(0.28), lineWidth: 1))
         )
     }
 }

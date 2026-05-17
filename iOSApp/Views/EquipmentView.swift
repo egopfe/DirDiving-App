@@ -2,6 +2,7 @@ import SwiftUI
 
 struct EquipmentView: View {
     @EnvironmentObject private var equipment: EquipmentStore
+    @State private var showResetConfirmation = false
 
     var body: some View {
         NavigationStack {
@@ -32,7 +33,7 @@ struct EquipmentView: View {
                             Toggle("Computer backup", isOn: $equipment.profile.backupComputerReady).tint(DIRTheme.cyan)
                         }
                         Button {
-                            equipment.reset()
+                            showResetConfirmation = true
                         } label: {
                             Text("Reset profilo standard")
                                 .font(.callout.weight(.semibold))
@@ -48,6 +49,14 @@ struct EquipmentView: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
+            .confirmationDialog("Resettare il profilo attrezzatura?", isPresented: $showResetConfirmation, titleVisibility: .visible) {
+                Button("Reset profilo", role: .destructive) {
+                    equipment.reset()
+                }
+                Button("Annulla", role: .cancel) {}
+            } message: {
+                Text("Bombole, gas, SAC e checklist torneranno ai valori standard salvati localmente.")
+            }
         }
     }
 

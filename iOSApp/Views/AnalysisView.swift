@@ -11,45 +11,49 @@ struct AnalysisView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         header
-                        analysisHero
-                        DIRCard("ANALISI AVANZATE", icon: "chart.line.uptrend.xyaxis", accent: DIRTheme.cyan) {
-                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 0) {
-                                DIRMetricTile(title: "Immersioni", value: "\(logStore.sessions.count)", color: DIRTheme.cyan)
-                                DIRMetricTile(title: "Max assoluta", value: Formatters.one(logStore.sessions.map(\.maxDepthMeters).max() ?? 0), unit: "m", color: DIRTheme.yellow)
-                                DIRMetricTile(title: "Runtime totale", value: Formatters.zero(logStore.sessions.map(\.durationSeconds).reduce(0, +) / 60), unit: "min")
-                                DIRMetricTile(title: "Temp media", value: Formatters.one(avgTemp), unit: "C")
-                                DIRMetricTile(title: "SAC medio", value: Formatters.one(avgSAC), unit: "l/min", color: DIRTheme.green)
-                                DIRMetricTile(title: "Route GPS", value: "\(RouteSummaryService.summaries(from: logStore.sessions).count)", color: DIRTheme.cyan)
+                        if logStore.sessions.isEmpty {
+                            emptyAnalysisState
+                        } else {
+                            analysisHero
+                            DIRCard("ANALISI AVANZATE", icon: "chart.line.uptrend.xyaxis", accent: DIRTheme.cyan) {
+                                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 0) {
+                                    DIRMetricTile(title: "Immersioni", value: "\(logStore.sessions.count)", color: DIRTheme.cyan)
+                                    DIRMetricTile(title: "Max assoluta", value: Formatters.one(logStore.sessions.map(\.maxDepthMeters).max() ?? 0), unit: "m", color: DIRTheme.yellow)
+                                    DIRMetricTile(title: "Runtime totale", value: Formatters.zero(logStore.sessions.map(\.durationSeconds).reduce(0, +) / 60), unit: "min")
+                                    DIRMetricTile(title: "Temp media", value: Formatters.one(avgTemp), unit: "C")
+                                    DIRMetricTile(title: "SAC medio", value: Formatters.one(avgSAC), unit: "l/min", color: DIRTheme.green)
+                                    DIRMetricTile(title: "Route GPS", value: "\(RouteSummaryService.summaries(from: logStore.sessions).count)", color: DIRTheme.cyan)
+                                }
                             }
-                        }
-                        DIRCard("PROFONDITA MASSIMA PER IMMERSIONE", icon: "chart.xyaxis.line", accent: DIRTheme.cyan) {
-                            Chart(logStore.sessions) { session in
-                                BarMark(
-                                    x: .value("Data", session.startDate, unit: .day),
-                                    y: .value("Max", session.maxDepthMeters)
-                                )
-                                .foregroundStyle(
-                                    LinearGradient(colors: [DIRTheme.cyan, DIRTheme.green], startPoint: .top, endPoint: .bottom)
-                                )
-                            }
-                            .chartXAxis { AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) } }
-                            .chartYAxis { AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) } }
-                            .chartPlotStyle { plot in
-                                plot
-                                    .background(
-                                        LinearGradient(
-                                            colors: [.black.opacity(0.32), DIRTheme.surface.opacity(0.32)],
-                                            startPoint: .top,
-                                            endPoint: .bottom
-                                        )
+                            DIRCard("PROFONDITA MASSIMA PER IMMERSIONE", icon: "chart.xyaxis.line", accent: DIRTheme.cyan) {
+                                Chart(logStore.sessions) { session in
+                                    BarMark(
+                                        x: .value("Data", session.startDate, unit: .day),
+                                        y: .value("Max", session.maxDepthMeters)
                                     )
-                                    .clipShape(RoundedRectangle(cornerRadius: DIRTheme.compactRadius))
-                                    .overlay(RoundedRectangle(cornerRadius: DIRTheme.compactRadius).stroke(DIRTheme.hairline, lineWidth: 1))
+                                    .foregroundStyle(
+                                        LinearGradient(colors: [DIRTheme.cyan, DIRTheme.green], startPoint: .top, endPoint: .bottom)
+                                    )
+                                }
+                                .chartXAxis { AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) } }
+                                .chartYAxis { AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) } }
+                                .chartPlotStyle { plot in
+                                    plot
+                                        .background(
+                                            LinearGradient(
+                                                colors: [.black.opacity(0.32), DIRTheme.surface.opacity(0.32)],
+                                                startPoint: .top,
+                                                endPoint: .bottom
+                                            )
+                                        )
+                                        .clipShape(RoundedRectangle(cornerRadius: DIRTheme.compactRadius))
+                                        .overlay(RoundedRectangle(cornerRadius: DIRTheme.compactRadius).stroke(DIRTheme.hairline, lineWidth: 1))
+                                }
+                                .frame(height: 240)
                             }
-                            .frame(height: 240)
+                            gasMixSummary
+                            routeSummary
                         }
-                        gasMixSummary
-                        routeSummary
                     }
                     .padding(16)
                 }
@@ -80,6 +84,36 @@ struct AnalysisView: View {
             RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
                 .fill(LinearGradient(colors: [DIRTheme.cyan.opacity(0.14), DIRTheme.surface.opacity(0.86)], startPoint: .topLeading, endPoint: .bottomTrailing))
                 .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.cyan.opacity(0.36), lineWidth: 1))
+        )
+    }
+
+    private var emptyAnalysisState: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 11) {
+                Image(systemName: "chart.line.uptrend.xyaxis")
+                    .font(.title2.weight(.bold))
+                    .foregroundStyle(DIRTheme.cyan)
+                    .frame(width: 46, height: 46)
+                    .background(RoundedRectangle(cornerRadius: 12).fill(DIRTheme.cyan.opacity(0.12)))
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Nessun dato da analizzare")
+                        .font(.headline.weight(.bold))
+                        .foregroundStyle(.white)
+                    Text("Le statistiche vengono calcolate solo da immersioni reali, importate o sincronizzate dal Watch.")
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            Text("Prossima azione: sincronizza Apple Watch o importa un CSV dal Logbook.")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(DIRTheme.cyan)
+        }
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
+                .fill(DIRTheme.surface.opacity(0.86))
+                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.cyan.opacity(0.30), lineWidth: 1))
         )
     }
 

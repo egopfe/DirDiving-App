@@ -10,10 +10,14 @@ struct ExploreView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 18) {
                         header
-                        routeStatusStrip
-                        waypointCards
-                        routeOverview
-                        syncExportStatus
+                        if routeSummaries.isEmpty {
+                            emptyRouteState
+                        } else {
+                            routeStatusStrip
+                            waypointCards
+                            routeOverview
+                            syncExportStatus
+                        }
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 10)
@@ -99,6 +103,37 @@ struct ExploreView: View {
             statusCard("ROUTE SOURCE", "\(routeSummaries.count) GPS logs", "applewatch", DIRTheme.cyan)
             statusCard("EXPORT STATUS", "CSV via Logbook", "square.and.arrow.up", DIRTheme.yellow)
         }
+    }
+
+    private var emptyRouteState: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 11) {
+                Image(systemName: "point.topleft.down.curvedto.point.bottomright.up")
+                    .font(.title2.weight(.bold))
+                    .foregroundStyle(DIRTheme.cyan)
+                    .frame(width: 44, height: 44)
+                    .background(RoundedRectangle(cornerRadius: 12).fill(DIRTheme.cyan.opacity(0.12)))
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Nessuna route disponibile")
+                        .font(.headline.weight(.bold))
+                        .foregroundStyle(.white)
+                    Text("Route Review usa solo punti GPS entry/exit presenti nei log. Nessun tracking subacqueo viene simulato.")
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            HStack(spacing: 10) {
+                emptyAction("Sincronizza Apple Watch", "applewatch")
+                emptyAction("Importa CSV", "square.and.arrow.down")
+            }
+        }
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
+                .fill(DIRTheme.surface.opacity(0.86))
+                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.cyan.opacity(0.30), lineWidth: 1))
+        )
     }
 
     private var routeSummaries: [RouteSummary] {
@@ -304,6 +339,15 @@ struct ExploreView: View {
             .padding(.horizontal, 8)
             .padding(.vertical, 5)
             .background(Capsule().fill(color.opacity(0.12)).overlay(Capsule().stroke(color.opacity(0.45), lineWidth: 1)))
+    }
+
+    private func emptyAction(_ title: String, _ icon: String) -> some View {
+        Label(title, systemImage: icon)
+            .font(.caption.weight(.bold))
+            .foregroundStyle(DIRTheme.cyan)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 9)
+            .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.62), lineWidth: 1))
     }
 }
 

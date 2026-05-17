@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct MoreView: View {
     @EnvironmentObject private var watchSync: WatchSyncService
@@ -25,16 +26,36 @@ struct MoreView: View {
                         systemStatus
                         onboardingCard
                         DIRCard("PREFERENZE APP", icon: "gearshape.fill", accent: DIRTheme.cyan) {
-                            row("Unità", "\(units) · locale")
-                            row("Export predefinito", exportFormat)
+                            lockedPreference("Unità", value: units, note: "Metrico-only su MAIN; conversione imperiale TODO.")
+                            lockedPreference("Export predefinito", value: exportFormat, note: "Unico formato disponibile oggi.")
                             row("Sync impostazioni", "Locale-only")
                             row("Planner safety", "Disclaimer richiesto")
-                            row("Permessi", "Gestiti da iOS")
+                            infoNote("Le preferenze sopra sono persistite localmente. Non vengono ancora inviate al Watch.")
+                        }
+                        DIRCard("ALLARMI E NOTIFICHE", icon: "bell.badge", accent: DIRTheme.yellow) {
+                            row("Allarmi immersione", "Gestiti su Apple Watch")
+                            row("Notifiche iOS", "Permessi gestiti da iOS")
+                            row("Stato autorizzazione", "Verifica in Impostazioni")
+                            Button {
+                                openAppSettings()
+                            } label: {
+                                actionLabel("Apri Impostazioni iOS", systemImage: "gearshape")
+                            }
+                            .buttonStyle(.plain)
+                            infoNote("TODO: sincronizzare soglie allarmi e haptics Watch quando esiste un contratto settings bidirezionale.")
                         }
                         DIRCard("SYNC WATCH", icon: "applewatch", accent: DIRTheme.cyan) {
                             row("Supportato", watchSync.isSupported ? "Si" : "No")
                             row("Stato", String(describing: watchSync.activationState))
                             row("Esito", watchSync.userVisibleState)
+                            row("Settings Watch", "Non sincronizzati")
+                            if !watchSync.isSupported || watchSync.activationState != .activated {
+                                emptyState(
+                                    title: "Sync Watch non attivo",
+                                    message: "Apri l'app Watch/iPhone e riprova. I log possono arrivare tramite coda quando WatchConnectivity torna disponibile.",
+                                    action: "Riprova Watch Sync"
+                                )
+                            }
                             row("Import riusciti", "\(watchSync.importedSessionCount)")
                             row("Import falliti", "\(watchSync.failedImportCount)")
                             row("Conflitti", "\(watchSync.conflicts.count)")
@@ -45,12 +66,7 @@ struct MoreView: View {
                             Button {
                                 watchSync.retryActivation(logStore: logStore)
                             } label: {
-                                Label("Riprova Watch Sync", systemImage: "arrow.triangle.2.circlepath")
-                                    .font(.callout.weight(.semibold))
-                                    .foregroundStyle(DIRTheme.cyan)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 10)
-                                    .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
+                                actionLabel("Riprova Watch Sync", systemImage: "arrow.triangle.2.circlepath")
                             }
                             .buttonStyle(.plain)
                         }
@@ -60,16 +76,18 @@ struct MoreView: View {
                             row("Conflitti cloud", "Ultimo salvataggio KVS")
                             row("Eliminazioni", "Rimozione locale + prossima sync")
                             row("Ultimo evento", cloudSync.lastSyncStatus)
+                            if !cloudSync.isICloudAvailable {
+                                emptyState(
+                                    title: "Backup cloud non disponibile",
+                                    message: "Abilita iCloud e verifica il profilo di firma. I dati restano salvati localmente.",
+                                    action: "Controlla iCloud"
+                                )
+                            }
                             Button {
                                 logStore.synchronizeCloud()
                                 cloudSync.synchronize()
                             } label: {
-                                Label("Sincronizza ora", systemImage: "icloud.and.arrow.up")
-                                    .font(.callout.weight(.semibold))
-                                    .foregroundStyle(DIRTheme.cyan)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 10)
-                                    .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
+                                actionLabel("Sincronizza ora", systemImage: "icloud.and.arrow.up")
                             }
                             .buttonStyle(.plain)
                         }
@@ -92,6 +110,7 @@ struct MoreView: View {
                             row("Formato", exportFormat)
                             row("Bundle", "com.egopfe.dirdiving.ios")
                             row("Import", "CSV Subsurface da Logbook")
+                            infoNote("Solo Subsurface CSV e disponibile oggi. Altri formati restano Planned/TODO.")
                         }
                         DIRWarningBox(text: "DIR DIVING non e un computer subacqueo certificato: usa log, planner e analisi come supporto informativo.")
                     }
@@ -155,6 +174,71 @@ struct MoreView: View {
         }
         .font(.callout)
         .padding(.vertical, 4)
+    }
+
+    private func lockedPreference(_ title: String, value: String, note: String) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(title)
+                    .foregroundStyle(DIRTheme.muted)
+                Spacer()
+                Text(value)
+                    .foregroundStyle(.white)
+                    .fontWeight(.semibold)
+            }
+            .font(.callout)
+            Text(note)
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.yellow)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.vertical, 5)
+    }
+
+    private func infoNote(_ text: String) -> some View {
+        Text(text)
+            .font(.caption)
+            .foregroundStyle(DIRTheme.muted)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface2.opacity(0.56)))
+    }
+
+    private func emptyState(title: String, message: String, action: String) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.callout.weight(.bold))
+                .foregroundStyle(.white)
+            Text(message)
+                .font(.caption)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(action.uppercased())
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(DIRTheme.cyan)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(DIRTheme.cyan.opacity(0.08))
+                .overlay(RoundedRectangle(cornerRadius: 10).stroke(DIRTheme.cyan.opacity(0.32), lineWidth: 1))
+        )
+    }
+
+    private func actionLabel(_ title: String, systemImage: String) -> some View {
+        Label(title, systemImage: systemImage)
+            .font(.callout.weight(.semibold))
+            .foregroundStyle(DIRTheme.cyan)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
+    }
+
+    private func openAppSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(url)
     }
 
     private func conflictRow(_ conflict: WatchSyncService.SyncConflict) -> some View {
