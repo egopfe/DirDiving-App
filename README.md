@@ -236,6 +236,17 @@ Il documento Word dell'audit e conservato in `Docs/EXPERIMENTAL_UX_INTERACTION_A
 - iOS Experimental Explore Lab: sezioni Snorkeling Review, POI/Osservazioni, Waypoint Planning, Apnea Review e Experimental Settings; POI enrichment mock, manifest route/settings per Watch e note MBTiles/MapLibre/OpenSeaMap.
 - Tutte le funzioni non production-ready sono etichettate come `Mock`, `TODO`, `Non ancora sincronizzato` o `Sync sperimentale`.
 
+## Latest Experimental Blocker Resolution
+
+Dopo il report `Docs/EXPERIMENTAL_FUNCTIONS_UX_AUDIT_20260517_PRE_MODIFICATION.docx`, i rami sperimentali hanno ricevuto un pass di contenimento UX senza modificare algoritmi GPS, bussola, profondita, risalita o decompressione:
+
+- Watch experimental: settings, allarmi, limiti risalita e info sono raggiungibili dalla navigazione sperimentale.
+- Watch Snorkeling: lifecycle sessione, allarmi enforce locali e stato sync POI queue/delivery sono visibili.
+- Watch Apnea: sensori non disponibili sono mostrati come `--`, `HR OFF`, `BAT --`, `TEMP --` invece di valori finti.
+- Watch Buddy Assist: flusso marcato `LAB-ONLY` e disabilitato finche il relay BLE Watch non e validato.
+- iOS Experimental: Planner result/export sono `PIANO LAB` / `EXPORT LAB`, dead affordances sono rimosse o etichettate, More espone impostazioni locali e diagnostica sync.
+- iOS Explore Lab: route/settings manifest usano queue locale con conteggio/stato e import experimental visibile, senza promettere merge production.
+
 ## Known Limitations
 
 - GPS e affidabile solo in superficie; sott'acqua usare ultimo fix valido e contesto bussola/waypoint come supporto informativo.
@@ -243,4 +254,4 @@ Il documento Word dell'audit e conservato in `Docs/EXPERIMENTAL_UX_INTERACTION_A
 - OpenStreetMap public tile server non devono essere usati hard-coded per traffico production pesante.
 - OpenSeaMap, GEBCO, EMODnet e MBTiles restano roadmap/future layer; il companion iOS mostra solo stato/TODO e non include ancora un motore MapLibre reale.
 - Apnea e Snorkeling experimental non sono dispositivi certificati di sicurezza.
-- Watch -> iPhone POI, Watch -> iPhone Apnea, iPhone -> Watch route/waypoint/settings, duplicate prevention e offline queue sono documentati come sync boundary sperimentali; non sono ancora una pipeline completa.
+- Watch -> iPhone POI, Watch -> iPhone Apnea, iPhone -> Watch route/waypoint/settings, duplicate prevention e offline queue hanno stato/queue UX sperimentale; non sono ancora una pipeline production completa.

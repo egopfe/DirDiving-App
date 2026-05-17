@@ -4,6 +4,9 @@ struct MoreView: View {
     @EnvironmentObject private var watchSync: WatchSyncService
     @EnvironmentObject private var cloudSync: CloudSyncStore
     @EnvironmentObject private var logStore: DiveLogStore
+    @AppStorage("dirdiving_ios_units") private var units = "Metrico (m, °C)"
+    @AppStorage("dirdiving_ios_export_format") private var exportFormat = "Subsurface CSV"
+    @AppStorage("dirdiving_ios_show_onboarding") private var showOnboarding = true
 
     var body: some View {
         NavigationStack {
@@ -12,18 +15,44 @@ struct MoreView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         VStack(alignment: .leading, spacing: 7) {
-                            Text("Altro")
+                            Text("Settings")
                                 .font(.system(size: 30, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
-                            Text("Watch sync, cloud backup, reviewer tools and export presentation")
+                            Text("Sync, cloud backup, units, export and review preferences")
                                 .font(.callout)
                                 .foregroundStyle(DIRTheme.muted)
                         }
                         systemStatus
+                        onboardingCard
+                        DIRCard("PREFERENZE APP", icon: "gearshape.fill", accent: DIRTheme.cyan) {
+                            Picker("Unità", selection: $units) {
+                                Text("Metrico (m, °C)").tag("Metrico (m, °C)")
+                            }
+                            .pickerStyle(.menu)
+                            .tint(DIRTheme.cyan)
+                            Picker("Export", selection: $exportFormat) {
+                                Text("Subsurface CSV").tag("Subsurface CSV")
+                            }
+                            .pickerStyle(.menu)
+                            .tint(DIRTheme.cyan)
+                            row("Planner safety", "Disclaimer richiesto")
+                            row("Permessi", "Gestiti da iOS")
+                        }
                         DIRCard("SYNC WATCH", icon: "applewatch", accent: DIRTheme.cyan) {
                             row("Supportato", watchSync.isSupported ? "Si" : "No")
                             row("Stato", String(describing: watchSync.activationState))
                             row("Ultimo evento", watchSync.lastMessage)
+                            Button {
+                                watchSync.activate(logStore: logStore)
+                            } label: {
+                                Label("Riattiva Watch Sync", systemImage: "arrow.triangle.2.circlepath")
+                                    .font(.callout.weight(.semibold))
+                                    .foregroundStyle(DIRTheme.cyan)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                                    .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
+                            }
+                            .buttonStyle(.plain)
                         }
                         DIRCard("BACKUP CLOUD", icon: "icloud", accent: DIRTheme.green) {
                             row("iCloud Sync", cloudSync.isICloudAvailable ? "Attivo" : "Non disponibile")
@@ -58,8 +87,9 @@ struct MoreView: View {
                             .tint(DIRTheme.cyan)
                         }
                         DIRCard("EXPORT", icon: "square.and.arrow.up", accent: DIRTheme.cyan) {
-                            row("Subsurface", "CSV")
+                            row("Formato", exportFormat)
                             row("Bundle", "com.egopfe.dirdiving.ios")
+                            row("Import", "Non disponibile in main")
                         }
                         DIRWarningBox(text: "DIR DIVING e un supporto informativo per logbook, analisi e pianificazione preliminare.")
                     }
@@ -75,6 +105,24 @@ struct MoreView: View {
             statusPill("WATCH", watchSync.isSupported ? DIRTheme.green : DIRTheme.orange)
             statusPill("CLOUD", cloudSync.isICloudAvailable ? DIRTheme.green : DIRTheme.yellow)
             statusPill("EXPORT", DIRTheme.cyan)
+        }
+    }
+
+    private var onboardingCard: some View {
+        DIRCard("ONBOARDING", icon: "questionmark.circle", accent: DIRTheme.yellow) {
+            Toggle("Mostra note operative", isOn: $showOnboarding)
+                .foregroundStyle(.white)
+                .tint(DIRTheme.cyan)
+            if showOnboarding {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Depth entitlement: i dati profondità arrivano dal Watch quando il profilo firmato abilita i sensori.")
+                    Text("GPS: entry/exit sono surface-only; nessun tracking subacqueo.")
+                    Text("Sync: se il Watch non e raggiungibile, i log arrivano tramite coda WatchConnectivity.")
+                    Text("Export: apri un dettaglio immersione e genera il CSV Subsurface.")
+                }
+                .font(.footnote)
+                .foregroundStyle(DIRTheme.muted)
+            }
         }
     }
 

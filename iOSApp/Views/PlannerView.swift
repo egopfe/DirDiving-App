@@ -8,26 +8,23 @@ struct PlannerView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                DIRBackground()
+                Color.black.ignoresSafeArea()
                 ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 16) {
-                        VStack(alignment: .leading, spacing: 7) {
+                    VStack(alignment: .leading, spacing: 13) {
+                        VStack(alignment: .leading, spacing: 8) {
                             Text("Planner")
-                                .font(.system(size: 30, weight: .bold, design: .rounded))
+                                .font(.system(size: 26, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
-                            Text("Gas, deco profile and Buhlmann presentation with high-contrast technical cards")
-                                .font(.callout)
-                                .foregroundStyle(DIRTheme.muted)
                         }
-                        plannerHero
                         modePicker
+                        plannerSafetyNotice
                         profileCard
                         gasCards
                         calculateButton
                     }
                     .padding(.horizontal, 16)
-                    .padding(.top, 10)
-                    .padding(.bottom, 18)
+                    .padding(.top, 12)
+                    .padding(.bottom, 22)
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -38,47 +35,61 @@ struct PlannerView: View {
         }
     }
 
-    private var plannerHero: some View {
-        DIRCard("PLANNING CONSOLE", icon: "point.topleft.down.curvedto.point.bottomright.up", accent: DIRTheme.cyan) {
+    private var modePicker: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Modalita")
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
             HStack(spacing: 0) {
-                DIRMetricTile(title: "Mode", value: store.mode.rawValue, color: DIRTheme.cyan, icon: "switch.2")
-                Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: "Depth", value: Formatters.zero(store.input.plannedDepthMeters), unit: "m", color: DIRTheme.yellow, icon: "arrow.down")
-                Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: "Bottom", value: Formatters.zero(store.input.plannedBottomMinutes), unit: "min", color: DIRTheme.green, icon: "timer")
+                ForEach(PlannerMode.allCases) { mode in
+                    Button {
+                        store.mode = mode
+                    } label: {
+                        Text(mode.rawValue)
+                            .font(.system(size: 12, weight: .semibold, design: .rounded))
+                            .foregroundStyle(store.mode == mode ? .black : .white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 8)
+                            .background(
+                                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                                    .fill(store.mode == mode ? DIRTheme.cyan : .clear)
+                                    .shadow(color: store.mode == mode ? DIRTheme.cyan.opacity(0.38) : .clear, radius: 5, x: 0, y: 0)
+                            )
+                    }
+                    .buttonStyle(.plain)
+                }
             }
+            .padding(3)
+            .background(
+                RoundedRectangle(cornerRadius: 7, style: .continuous)
+                    .fill(Color(red: 0.055, green: 0.070, blue: 0.095))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 7, style: .continuous)
+                            .stroke(Color.white.opacity(0.045), lineWidth: 1)
+                    )
+            )
         }
     }
 
-    private var modePicker: some View {
-        HStack(spacing: 0) {
-            ForEach(PlannerMode.allCases) { mode in
-                Button {
-                    store.mode = mode
-                } label: {
-                    Text(mode.rawValue)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(store.mode == mode ? .black : .white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(store.mode == mode ? DIRTheme.cyan : .clear)
-                        )
-                }
-                .buttonStyle(.plain)
-            }
-        }
-        .padding(4)
-        .background(
-            RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
-                .fill(DIRTheme.surface2.opacity(0.82))
-                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.hairline, lineWidth: 1))
-        )
+    private var plannerSafetyNotice: some View {
+        Text("Planner informativo non certificato. Non usare per eseguire immersioni reali senza strumenti validati, tabelle/agenzia e pianificazione conservativa.")
+            .font(.system(size: 11, weight: .semibold, design: .rounded))
+            .foregroundStyle(DIRTheme.yellow)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .fill(DIRTheme.yellow.opacity(0.10))
+                    .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).stroke(DIRTheme.yellow.opacity(0.42), lineWidth: 1))
+            )
     }
 
     private var profileCard: some View {
-        DIRCard("Profilo Immersione", icon: nil, accent: DIRTheme.cyan) {
+        VStack(alignment: .leading, spacing: 9) {
+            Text("Profilo Immersione")
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
             VStack(spacing: 0) {
                 plannerField("Profondita Massima", value: $store.input.plannedDepthMeters, unit: "m", step: 1)
                 Divider().overlay(DIRTheme.hairline)
@@ -86,6 +97,16 @@ struct PlannerView: View {
                 Divider().overlay(DIRTheme.hairline)
                 plannerField("Temperatura", value: $store.input.waterTemperatureCelsius, unit: "C", step: 1)
             }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 2)
+            .background(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(Color(red: 0.020, green: 0.035, blue: 0.048).opacity(0.94))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .stroke(Color.white.opacity(0.06), lineWidth: 1)
+                    )
+            )
         }
     }
 
@@ -103,11 +124,15 @@ struct PlannerView: View {
             showPlan = true
         } label: {
             Text("Calcola Piano")
-                .font(.callout.weight(.semibold))
+                .font(.system(size: 15, weight: .semibold, design: .rounded))
                 .foregroundStyle(.black)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.cyan).shadow(color: DIRTheme.cyan.opacity(0.28), radius: 14, x: 0, y: 8))
+                .padding(.vertical, 13)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(DIRTheme.cyan)
+                        .shadow(color: DIRTheme.cyan.opacity(0.34), radius: 10, x: 0, y: 6)
+                )
         }
         .buttonStyle(.plain)
         .padding(.top, 4)
@@ -116,32 +141,39 @@ struct PlannerView: View {
     private func plannerField(_ title: String, value: Binding<Double>, unit: String, step: Double) -> some View {
         HStack {
             Text(title)
-                .font(.callout)
+                .font(.system(size: 12, weight: .medium, design: .rounded))
                 .foregroundStyle(.white)
             Spacer()
             Text("\(Formatters.zero(value.wrappedValue)) \(unit)")
-                .font(.callout.monospacedDigit())
+                .font(.system(size: 12, weight: .semibold, design: .rounded).monospacedDigit())
                 .foregroundStyle(.white)
-                .frame(width: 82, alignment: .trailing)
-            HStack(spacing: 1) {
+                .frame(width: 72, alignment: .trailing)
+            HStack(spacing: 0) {
                 Button {
                     value.wrappedValue = max(0, value.wrappedValue - step)
                 } label: {
                     Image(systemName: "minus")
-                        .frame(width: 28, height: 24)
+                        .frame(width: 24, height: 22)
                 }
                 Button {
                     value.wrappedValue += step
                 } label: {
                     Image(systemName: "plus")
-                        .frame(width: 28, height: 24)
+                        .frame(width: 24, height: 22)
                 }
             }
-            .font(.caption.weight(.bold))
+            .font(.system(size: 10, weight: .bold))
             .foregroundStyle(DIRTheme.cyan)
-            .background(RoundedRectangle(cornerRadius: 5).fill(DIRTheme.surface2))
+            .background(
+                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                    .fill(Color(red: 0.045, green: 0.060, blue: 0.080))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 5, style: .continuous)
+                            .stroke(DIRTheme.cyan.opacity(0.18), lineWidth: 1)
+                    )
+            )
         }
-        .padding(.vertical, 10)
+        .padding(.vertical, 8)
     }
 }
 
@@ -152,35 +184,39 @@ struct GasMixCard: View {
     let showsHelium: Bool
 
     var body: some View {
-        DIRCard(accent: accent) {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack {
-                    Text(title)
-                        .font(.callout.weight(.semibold))
-                        .foregroundStyle(.white)
-                    Spacer()
-                    Image(systemName: "slider.horizontal.3")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(accent)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text(title)
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                Spacer()
+            }
+            HStack {
+                gasMetric("Miscela", mix.label, alignLeading: true)
+                gasAdjuster("O2", value: mix.oxygen, suffix: "%", step: 0.01) { setOxygen($0) }
+                if showsHelium {
+                    gasAdjuster("He", value: mix.helium, suffix: "%", step: 0.01) { setHelium($0) }
                 }
-                HStack {
-                    gasMetric("Miscela", mix.label, alignLeading: true)
-                    gasAdjuster("O2", value: mix.oxygen, suffix: "%", step: 0.01) { setOxygen($0) }
-                    if showsHelium {
-                        gasAdjuster("He", value: mix.helium, suffix: "%", step: 0.01) { setHelium($0) }
-                    }
-                    gasMetric("MOD", "\(Formatters.one(mix.modMeters)) m")
-                }
-                Divider().overlay(DIRTheme.hairline)
-                HStack {
-                    Text("PPO2 Max")
-                        .font(.caption)
-                        .foregroundStyle(DIRTheme.muted)
-                    Spacer()
-                    gasStepper(value: mix.maxPPO2, step: 0.05) { mix.maxPPO2 = min(max($0, 1.0), 1.6) }
-                }
+                gasMetric("MOD", "\(Formatters.one(mix.modMeters)) m")
+            }
+            Divider().overlay(DIRTheme.hairline)
+            HStack {
+                Text("PPO2 Max")
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(DIRTheme.muted)
+                Spacer()
+                gasStepper(value: mix.maxPPO2, step: 0.05) { mix.maxPPO2 = min(max($0, 1.0), 1.6) }
             }
         }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(Color(red: 0.020, green: 0.035, blue: 0.048).opacity(0.94))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(accent.opacity(0.42), lineWidth: 1)
+                )
+        )
         .overlay(alignment: .leading) {
             RoundedRectangle(cornerRadius: 2)
                 .fill(accent)
@@ -192,10 +228,10 @@ struct GasMixCard: View {
     private func gasMetric(_ title: String, _ value: String, alignLeading: Bool = false) -> some View {
         VStack(alignment: alignLeading ? .leading : .trailing, spacing: 5) {
             Text(title)
-                .font(.caption2)
+                .font(.system(size: 10, weight: .medium, design: .rounded))
                 .foregroundStyle(DIRTheme.muted)
             Text(value)
-                .font(.callout.monospacedDigit())
+                .font(.system(size: 12, weight: .medium, design: .rounded).monospacedDigit())
                 .foregroundStyle(.white)
         }
         .frame(maxWidth: .infinity, alignment: alignLeading ? .leading : .trailing)
@@ -204,21 +240,21 @@ struct GasMixCard: View {
     private func gasAdjuster(_ title: String, value: Double, suffix: String, step: Double, update: @escaping (Double) -> Void) -> some View {
         VStack(alignment: .trailing, spacing: 5) {
             Text(title)
-                .font(.caption2)
+                .font(.system(size: 10, weight: .medium, design: .rounded))
                 .foregroundStyle(DIRTheme.muted)
             HStack(spacing: 3) {
                 Button { update(value - step) } label: {
                     Image(systemName: "minus")
-                        .font(.caption2.weight(.bold))
+                        .font(.system(size: 8, weight: .bold))
                         .frame(width: 18, height: 18)
                 }
                 Text("\(Int(value * 100))\(suffix)")
-                    .font(.caption.monospacedDigit())
+                    .font(.system(size: 11, weight: .medium, design: .rounded).monospacedDigit())
                     .foregroundStyle(.white)
                     .frame(width: 42)
                 Button { update(value + step) } label: {
                     Image(systemName: "plus")
-                        .font(.caption2.weight(.bold))
+                        .font(.system(size: 8, weight: .bold))
                         .frame(width: 18, height: 18)
                 }
             }
@@ -234,7 +270,7 @@ struct GasMixCard: View {
                     .frame(width: 24, height: 22)
             }
             Text(Formatters.one(value))
-                .font(.callout.monospacedDigit())
+                .font(.system(size: 12, weight: .medium, design: .rounded).monospacedDigit())
                 .foregroundStyle(.white)
                 .frame(width: 42)
             Button { update(value + step) } label: {
@@ -262,26 +298,29 @@ struct PlanResultView: View {
 
     var body: some View {
         ZStack {
-            DIRBackground()
+            Color.black.ignoresSafeArea()
             ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 14) {
                     resultTabs
-                    resultGrid
-                    ascentTable
-                    buhlmannChart
+                    switch tab {
+                    case .plan:
+                        plannerSafetyNotice
+                        resultGrid
+                        ascentTable
+                    case .curve:
+                        buhlmannChart
+                    case .charts:
+                        resultGrid
+                        buhlmannChart
+                    }
                 }
                 .padding(.horizontal, 16)
-                .padding(.bottom, 18)
+                .padding(.top, 10)
+                .padding(.bottom, 22)
             }
         }
         .navigationTitle("Piano Immersione")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Image(systemName: "square.and.arrow.up")
-                    .foregroundStyle(DIRTheme.cyan)
-            }
-        }
     }
 
     private var resultTabs: some View {
@@ -290,9 +329,9 @@ struct PlanResultView: View {
                 Button {
                     tab = item
                 } label: {
-                    VStack(spacing: 10) {
+                    VStack(spacing: 8) {
                         Text(item.rawValue)
-                            .font(.caption.weight(.semibold))
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
                             .foregroundStyle(tab == item ? DIRTheme.cyan : .white.opacity(0.72))
                         Rectangle()
                             .fill(tab == item ? DIRTheme.cyan : .clear)
@@ -303,36 +342,45 @@ struct PlanResultView: View {
                 .frame(maxWidth: .infinity)
             }
         }
-        .padding(.top, 10)
+        .padding(.top, 2)
+    }
+
+    private var plannerSafetyNotice: some View {
+        Text("Output semplificato per revisione e studio. Non e un piano decompressivo certificato.")
+            .font(.system(size: 11, weight: .semibold, design: .rounded))
+            .foregroundStyle(DIRTheme.yellow)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(10)
+            .modifier(ResultPanelStyle(cornerRadius: 9))
     }
 
     private var resultGrid: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
-                DIRMetricTile(title: "TTR", value: "\(store.plan.ttrMinutes)", unit: "min")
+                resultMetric("TTR", value: "\(store.plan.ttrMinutes)", unit: "min")
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: "Deco Stops", value: "\(store.plan.decoStops.count)")
+                resultMetric("Deco Stops", value: "\(store.plan.decoStops.count)")
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: "OTU", value: Formatters.zero(store.plan.otu))
+                resultMetric("OTU", value: Formatters.zero(store.plan.otu))
             }
             Divider().overlay(DIRTheme.hairline)
             HStack(spacing: 0) {
-                DIRMetricTile(title: "Prof. Max", value: Formatters.zero(store.input.plannedDepthMeters), unit: "m")
+                resultMetric("Prof. Max", value: Formatters.zero(store.input.plannedDepthMeters), unit: "m")
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: "Tempo Fondo", value: Formatters.zero(store.input.plannedBottomMinutes), unit: "min")
+                resultMetric("Tempo Fondo", value: Formatters.zero(store.input.plannedBottomMinutes), unit: "min")
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: "CNS%", value: Formatters.zero(store.plan.cnsPercent), unit: "%")
+                resultMetric("CNS%", value: Formatters.zero(store.plan.cnsPercent), unit: "%")
             }
         }
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(DIRTheme.surface.opacity(0.72))
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(DIRTheme.hairline, lineWidth: 1))
-        )
+        .padding(.vertical, 2)
+        .modifier(ResultPanelStyle(cornerRadius: 9))
     }
 
     private var ascentTable: some View {
-        DIRCard("PIANO DI RISALITA", icon: nil, accent: DIRTheme.cyan) {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("PIANO DI RISALITA")
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .foregroundStyle(DIRTheme.cyan)
             VStack(spacing: 9) {
                 tableRow(["Profondita", "Tempo", "Gas", "PPO2"], isHeader: true)
                 tableRow(["40.0 m", "20 min", "TRIMIX 18/45", "1.30"])
@@ -347,13 +395,41 @@ struct PlanResultView: View {
                 tableRow(["0 m", "-", "SURFACE", "-"])
             }
         }
+        .padding(12)
+        .modifier(ResultPanelStyle(cornerRadius: 9))
+    }
+
+    private func resultMetric(_ title: String, value: String, unit: String? = nil) -> some View {
+        VStack(spacing: 5) {
+            Text(title)
+                .font(.system(size: 10, weight: .medium, design: .rounded))
+                .foregroundStyle(DIRTheme.muted)
+            HStack(alignment: .lastTextBaseline, spacing: 3) {
+                Text(value)
+                    .font(.system(size: 16, weight: .semibold, design: .rounded).monospacedDigit())
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+                if let unit = unit {
+                    Text(unit)
+                        .font(.system(size: 9, weight: .medium, design: .rounded))
+                        .foregroundStyle(DIRTheme.muted)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, minHeight: 56)
+        .padding(.horizontal, 4)
     }
 
     private func tableRow(_ values: [String], isHeader: Bool = false) -> some View {
         HStack {
             ForEach(values, id: \.self) { value in
                 Text(value)
-                    .font(isHeader ? .caption2.weight(.semibold) : .caption.monospacedDigit())
+                    .font(
+                        isHeader
+                            ? .system(size: 10, weight: .semibold, design: .rounded)
+                            : .system(size: 10, weight: .medium, design: .rounded).monospacedDigit()
+                    )
                     .foregroundStyle(isHeader ? DIRTheme.muted : .white)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -361,7 +437,10 @@ struct PlanResultView: View {
     }
 
     private var buhlmannChart: some View {
-        DIRCard("CURVA BUHLMANN ZH-L16C", icon: nil, accent: DIRTheme.cyan) {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("CURVA BUHLMANN ZH-L16C")
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .foregroundStyle(DIRTheme.cyan)
             Chart(store.buhlmann.curve) { point in
                 LineMark(
                     x: .value("Minutes", point.ndlMinutes),
@@ -370,16 +449,42 @@ struct PlanResultView: View {
                 )
                 .lineStyle(StrokeStyle(lineWidth: 2))
             }
+            .chartPlotStyle { plotArea in
+                plotArea
+                    .background(Color.black.opacity(0.18))
+                    .overlay(
+                        Rectangle()
+                            .stroke(DIRTheme.cyan.opacity(0.12), lineWidth: 1)
+                    )
+            }
             .chartXAxis {
                 AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
             }
             .chartYAxis {
                 AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
             }
-            .frame(height: 220)
+            .frame(height: 190)
         }
+        .padding(12)
+        .modifier(ResultPanelStyle(cornerRadius: 9))
     }
 }
+
+private struct ResultPanelStyle: ViewModifier {
+    let cornerRadius: CGFloat
+
+    func body(content: Content) -> some View {
+        content
+            .background(
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .fill(Color(red: 0.020, green: 0.035, blue: 0.048).opacity(0.94))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                            .stroke(Color.white.opacity(0.07), lineWidth: 1)
+                    )
+            )
+        }
+    }
 
 enum PlanTab: String, CaseIterable, Identifiable {
     case plan = "PIANO"

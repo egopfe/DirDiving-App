@@ -16,11 +16,11 @@ struct DiveDetailView: View {
 
     var body: some View {
         ZStack {
-            DIRBackground()
+            Color.black.ignoresSafeArea()
             ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 16) {
-                    segmentedTabs
+                VStack(alignment: .leading, spacing: 14) {
                     header
+                    segmentedTabs
                     switch tab {
                     case .summary:
                         metricGrid
@@ -35,17 +35,12 @@ struct DiveDetailView: View {
                     exportBlock
                 }
                 .padding(.horizontal, 16)
-                .padding(.bottom, 18)
+                .padding(.top, 10)
+                .padding(.bottom, 22)
             }
         }
         .navigationTitle(Formatters.detailTitle(session.startDate))
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Image(systemName: "ellipsis")
-                    .foregroundStyle(DIRTheme.cyan)
-            }
-        }
     }
 
     private var segmentedTabs: some View {
@@ -54,31 +49,35 @@ struct DiveDetailView: View {
                 Button {
                     tab = item
                 } label: {
-                    VStack(spacing: 10) {
+                    VStack(spacing: 9) {
                         Text(item.rawValue)
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(tab == item ? DIRTheme.cyan : .white.opacity(0.72))
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .tracking(0.5)
+                            .foregroundStyle(tab == item ? DIRTheme.cyan : DIRTheme.muted)
                         Rectangle()
                             .fill(tab == item ? DIRTheme.cyan : .clear)
-                            .frame(height: 2)
+                            .frame(height: 2.5)
+                            .shadow(color: tab == item ? DIRTheme.cyan.opacity(0.55) : .clear, radius: 5, x: 0, y: 0)
                     }
                 }
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
             }
         }
-        .padding(.top, 10)
+        .padding(.top, 2)
     }
 
     private var header: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 12) {
             DiveThumbnail(index: 0)
-                .frame(width: 86, height: 86)
-            VStack(alignment: .leading, spacing: 8) {
+                .frame(width: 82, height: 82)
+            VStack(alignment: .leading, spacing: 7) {
                 HStack(spacing: 6) {
                     Text(session.siteName ?? "Immersione")
                         .font(.system(size: 17, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.78)
                     Text("BUDDY")
                         .font(.system(size: 8, weight: .bold, design: .rounded))
                         .foregroundStyle(DIRTheme.yellow)
@@ -86,118 +85,218 @@ struct DiveDetailView: View {
                         .padding(.vertical, 1)
                         .overlay(RoundedRectangle(cornerRadius: 3).stroke(DIRTheme.yellow, lineWidth: 1))
                 }
-                Label(session.gasLabel.rawValue, systemImage: "circle")
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.78))
-                HStack(spacing: 16) {
-                    Label("Acqua Salata", systemImage: "drop")
-                    Label("\(Formatters.one(session.avgWaterTemperatureCelsius ?? 0)) C", systemImage: "thermometer")
+                HStack(spacing: 6) {
+                    Image(systemName: "circle")
+                        .font(.system(size: 7, weight: .bold))
+                    Text(session.gasLabel.rawValue)
                 }
-                .font(.caption)
-                .foregroundStyle(.white.opacity(0.78))
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundStyle(DIRTheme.muted)
+                HStack(spacing: 14) {
+                    Label("Acqua Salata", systemImage: "drop")
+                    Label(temperatureText, systemImage: "thermometer")
+                }
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundStyle(DIRTheme.muted)
             }
             Spacer()
         }
+        .padding(.top, 2)
     }
 
     private var metricGrid: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
-                DIRMetricTile(title: "Tempo", value: Formatters.time(session.durationSeconds), unit: "min")
+                detailMetric("Tempo", value: Formatters.time(session.durationSeconds), unit: "min")
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: "Max Profondita", value: Formatters.one(session.maxDepthMeters), unit: "m")
+                detailMetric("Max Profondita", value: Formatters.one(session.maxDepthMeters), unit: "m")
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: "Prof. Media", value: Formatters.one(session.avgDepthMeters), unit: "m")
+                detailMetric("Prof. Media", value: Formatters.one(session.avgDepthMeters), unit: "m")
             }
             Divider().overlay(DIRTheme.hairline)
             HStack(spacing: 0) {
-                DIRMetricTile(title: "TTR", value: Formatters.zero(session.ttv), unit: "min")
+                detailMetric("TTR", value: Formatters.zero(session.ttv), unit: "min")
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: "SAC", value: Formatters.one(session.sacLitersMinute ?? 0), unit: "l/min")
+                detailMetric("SAC", value: Formatters.one(session.sacLitersMinute ?? 0), unit: "l/min")
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: "Temperatura", value: Formatters.one(session.avgWaterTemperatureCelsius ?? 0), unit: "C")
+                detailMetric("Temperatura", value: Formatters.one(session.avgWaterTemperatureCelsius ?? 0), unit: "C")
             }
         }
         .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(DIRTheme.surface.opacity(0.72))
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(DIRTheme.hairline, lineWidth: 1))
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(Color(red: 0.030, green: 0.043, blue: 0.060).opacity(0.92))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(Color.white.opacity(0.06), lineWidth: 1)
+                )
         )
     }
 
     private var depthChart: some View {
-        DIRCard("PROFONDITA", icon: nil) {
+        VStack(alignment: .leading, spacing: 9) {
+            HStack {
+                Text("PROFONDITA")
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .tracking(0.7)
+                    .foregroundStyle(DIRTheme.cyan)
+                Spacer()
+                Image(systemName: "arrow.up.left.and.arrow.down.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(DIRTheme.cyan)
+            }
             Chart(session.samples) { sample in
                 LineMark(
                     x: .value("Tempo", sample.timestamp),
                     y: .value("Profondita", sample.depthMeters)
                 )
                 .foregroundStyle(DIRTheme.cyan)
-                .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
+                .lineStyle(StrokeStyle(lineWidth: 2.4, lineCap: .round, lineJoin: .round))
+                .interpolationMethod(.catmullRom)
             }
             .chartYScale(domain: [(session.maxDepthMeters + 8), 0])
             .chartXAxis {
                 AxisMarks(values: .automatic(desiredCount: 4)) {
-                    AxisGridLine().foregroundStyle(DIRTheme.faint)
+                    AxisGridLine().foregroundStyle(DIRTheme.cyan.opacity(0.08))
                     AxisValueLabel().foregroundStyle(DIRTheme.muted)
                 }
             }
             .chartYAxis {
                 AxisMarks(position: .leading) {
-                    AxisGridLine().foregroundStyle(DIRTheme.faint)
+                    AxisGridLine().foregroundStyle(DIRTheme.cyan.opacity(0.08))
                     AxisValueLabel().foregroundStyle(DIRTheme.muted)
                 }
             }
-            .frame(height: 220)
+            .frame(height: 210)
         }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(Color(red: 0.020, green: 0.035, blue: 0.048).opacity(0.94))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(DIRTheme.cyan.opacity(0.16), lineWidth: 1)
+                )
+        )
     }
 
     private var gasBlock: some View {
-        DIRCard("GAS UTILIZZATO", icon: nil) {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("GAS UTILIZZATO")
+                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .tracking(0.7)
+                .foregroundStyle(DIRTheme.cyan)
             HStack {
                 gasMetric("Inizio", "200", "bar", color: .white)
                 Spacer()
-                Image(systemName: "arrow.right").foregroundStyle(DIRTheme.muted)
+                Image(systemName: "arrow.right")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(DIRTheme.muted)
                 Spacer()
                 gasMetric("Fine", "50", "bar", color: .white)
                 Spacer()
                 gasMetric("Consumo", "150", "bar", color: DIRTheme.yellow)
             }
         }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(Color(red: 0.020, green: 0.035, blue: 0.048).opacity(0.94))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(DIRTheme.cyan.opacity(0.14), lineWidth: 1)
+                )
+        )
     }
 
     private func gasMetric(_ title: String, _ value: String, _ unit: String, color: Color) -> some View {
         VStack(alignment: .leading, spacing: 5) {
             Text(title)
-                .font(.caption)
+                .font(.system(size: 10, weight: .medium, design: .rounded))
                 .foregroundStyle(title == "Consumo" ? DIRTheme.yellow : DIRTheme.muted)
             HStack(alignment: .lastTextBaseline, spacing: 3) {
                 Text(value)
-                    .font(.title3.weight(.semibold))
+                    .font(.system(size: 20, weight: .semibold, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(color)
                 Text(unit)
-                    .font(.caption)
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
                     .foregroundStyle(DIRTheme.muted)
             }
         }
     }
 
+    private var temperatureText: String {
+        guard let temperature = session.avgWaterTemperatureCelsius else {
+            return "--.- C"
+        }
+        return "\(Formatters.one(temperature)) C"
+    }
+
+    private func detailMetric(_ title: String, value: String, unit: String) -> some View {
+        VStack(spacing: 6) {
+            Text(title)
+                .font(.system(size: 10, weight: .medium, design: .rounded))
+                .foregroundStyle(DIRTheme.muted)
+                .lineLimit(1)
+                .minimumScaleFactor(0.68)
+            HStack(alignment: .lastTextBaseline, spacing: 3) {
+                Text(value)
+                    .font(.system(size: 20, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+                Text(unit)
+                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .foregroundStyle(DIRTheme.muted)
+            }
+        }
+        .frame(maxWidth: .infinity, minHeight: 70)
+        .padding(.horizontal, 4)
+    }
+
     private var details: some View {
-        VStack(spacing: 14) {
-            DIRCard("GPS", icon: "location.fill") {
+        VStack(spacing: 12) {
+            darkPanel(title: "GPS", icon: "location.fill") {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Start: \(session.entryGPS?.coordinateText ?? "n/d")")
                     Text("End: \(session.exitGPS?.coordinateText ?? "n/d")")
                 }
-                .font(.callout.monospacedDigit())
+                .font(.system(size: 13, weight: .medium, design: .rounded).monospacedDigit())
                 .foregroundStyle(.white)
             }
-            DIRCard("Note", icon: "note.text") {
+            darkPanel(title: "Note", icon: "note.text") {
                 Text(session.notes ?? "Nessuna nota")
                     .foregroundStyle(DIRTheme.muted)
             }
         }
+    }
+
+    private func darkPanel<Content: View>(
+        title: String,
+        icon: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 7) {
+                Image(systemName: icon)
+                Text(title.uppercased())
+            }
+            .font(.system(size: 11, weight: .bold, design: .rounded))
+            .tracking(0.6)
+            .foregroundStyle(DIRTheme.cyan)
+            content()
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(Color(red: 0.020, green: 0.035, blue: 0.048).opacity(0.94))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(DIRTheme.cyan.opacity(0.14), lineWidth: 1)
+                )
+        )
     }
 
     private var exportBlock: some View {
@@ -212,9 +311,12 @@ struct DiveDetailView: View {
                     exportErrorMessage = error.localizedDescription
                 }
             } label: {
-                Image(systemName: "square.and.arrow.up")
-                    .font(.title3)
+                Text("Genera CSV Subsurface")
+                    .font(.callout.weight(.semibold))
                     .foregroundStyle(DIRTheme.cyan)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
             }
             Spacer()
             if let csvURL {
@@ -224,7 +326,7 @@ struct DiveDetailView: View {
                         .foregroundStyle(DIRTheme.cyan)
                         .padding(.horizontal, 18)
                         .padding(.vertical, 10)
-                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan, lineWidth: 1))
+                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
                 }
             } else if let exportErrorMessage {
                 Text(exportErrorMessage)
@@ -232,12 +334,9 @@ struct DiveDetailView: View {
                     .foregroundStyle(DIRTheme.orange)
                     .multilineTextAlignment(.trailing)
             } else {
-                Text("Modifica")
-                    .font(.callout.weight(.semibold))
-                    .foregroundStyle(DIRTheme.cyan)
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 10)
-                    .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan, lineWidth: 1))
+                Text("CSV non generato")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.muted)
             }
         }
         .padding(.top, 4)

@@ -11,18 +11,18 @@ struct LogbookView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                DIRBackground()
+                Color.black.ignoresSafeArea()
                 ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 12) {
                         header
-                        logbookStatusStrip
-                        DIRSearchBar(text: $search)
+                        logbookSearchBar
                         Text("MAGGIO 2024")
-                            .font(.caption.weight(.semibold))
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .tracking(0.6)
                             .foregroundStyle(DIRTheme.cyan)
-                            .padding(.top, 8)
+                            .padding(.top, 4)
                         ForEach(Array(filtered.enumerated()), id: \.element.id) { index, session in
-                            HStack(spacing: 8) {
+                            HStack(spacing: 7) {
                                 NavigationLink { DiveDetailView(session: session) } label: {
                                     DiveLogCard(session: session, index: index)
                                 }
@@ -33,9 +33,17 @@ struct LogbookView: View {
                                         logStore.delete(id: session.id)
                                     } label: {
                                         Image(systemName: "trash")
-                                            .font(.body.weight(.semibold))
+                                            .font(.system(size: 13, weight: .bold))
                                             .foregroundStyle(DIRTheme.red)
-                                            .frame(width: 36, height: 36)
+                                            .frame(width: 30, height: 64)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                                    .fill(DIRTheme.red.opacity(0.08))
+                                                    .overlay(
+                                                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                                            .stroke(DIRTheme.red.opacity(0.28), lineWidth: 1)
+                                                    )
+                                            )
                                     }
                                     .buttonStyle(.plain)
                                 }
@@ -43,8 +51,8 @@ struct LogbookView: View {
                         }
                     }
                     .padding(.horizontal, 16)
-                    .padding(.top, 10)
-                    .padding(.bottom, 18)
+                    .padding(.top, 12)
+                    .padding(.bottom, 20)
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -52,48 +60,36 @@ struct LogbookView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("Logbook")
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-                Spacer()
-                Image(systemName: "plus")
-                    .font(.title3.weight(.medium))
-                    .foregroundStyle(DIRTheme.cyan)
-                Image(systemName: "ellipsis.circle")
-                    .font(.title3.weight(.medium))
-                    .foregroundStyle(DIRTheme.cyan)
-            }
-            Text("Dive history, sync status and inspection-ready session cards")
-                .font(.callout)
-                .foregroundStyle(DIRTheme.muted)
-        }
-    }
-
-    private var logbookStatusStrip: some View {
-        HStack(spacing: 12) {
-            statusTile("Sessions", "\(logStore.sessions.count)", DIRTheme.cyan)
-            statusTile("Sync", "Ready", DIRTheme.green)
-            statusTile("Export", "CSV", DIRTheme.yellow)
-        }
-    }
-
-    private func statusTile(_ title: String, _ value: String, _ color: Color) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(title.uppercased())
-                .font(.caption2.weight(.bold))
-                .foregroundStyle(DIRTheme.muted)
-            Text(value)
-                .font(.callout.monospacedDigit().weight(.bold))
-                .foregroundStyle(color)
+            HStack(alignment: .center) {
+                Text("Logbook")
+                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                Spacer()
+            }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
+    }
+
+    private var logbookSearchBar: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(DIRTheme.muted)
+            TextField("Cerca immersioni", text: $search)
+                .font(.system(size: 13, weight: .regular, design: .rounded))
+                .foregroundStyle(.white)
+                .tint(DIRTheme.cyan)
+        }
+        .padding(.horizontal, 10)
+        .frame(height: 36)
         .background(
-            RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
-                .fill(DIRTheme.surface.opacity(0.74))
-                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(color.opacity(0.32), lineWidth: 1))
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color(red: 0.055, green: 0.070, blue: 0.095))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(Color.white.opacity(0.045), lineWidth: 1)
+                )
         )
     }
 }
@@ -103,16 +99,17 @@ struct DiveLogCard: View {
     let index: Int
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
             dateBlock
             DiveThumbnail(index: index)
-                .frame(width: 72, height: 72)
-            VStack(alignment: .leading, spacing: 6) {
+                .frame(width: 58, height: 58)
+            VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
                     Text(session.siteName ?? "Immersione")
-                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.76)
                     if session.buddy != nil {
                         Text("BUDDY")
                             .font(.system(size: 8, weight: .bold, design: .rounded))
@@ -123,41 +120,48 @@ struct DiveLogCard: View {
                     }
                 }
                 Text("Max \(Formatters.one(session.maxDepthMeters)) m")
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.86))
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(DIRTheme.muted)
                 HStack {
                     Text("T. \(Formatters.time(session.durationSeconds)) min")
-                    Spacer()
                     Text(session.gasLabel.rawValue)
+                        .padding(.leading, 8)
+                    Spacer(minLength: 4)
+                    Text(session.avgWaterTemperatureCelsius.map { "\(Formatters.one($0)) C" } ?? "--.- C")
                 }
-                .font(.caption)
-                .foregroundStyle(.white.opacity(0.86))
+                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .foregroundStyle(DIRTheme.muted)
             }
-            Spacer(minLength: 6)
+            Spacer(minLength: 4)
             Image(systemName: "chevron.right")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.white.opacity(0.72))
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(DIRTheme.muted.opacity(0.82))
         }
-        .padding(10)
+        .frame(maxWidth: .infinity, minHeight: 70, alignment: .leading)
+        .padding(.horizontal, 4)
+        .padding(.vertical, 5)
         .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(LinearGradient(colors: [DIRTheme.surface2.opacity(0.58), DIRTheme.surface.opacity(0.88)], startPoint: .topLeading, endPoint: .bottomTrailing))
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(DIRTheme.cyan.opacity(0.18), lineWidth: 1))
-                .shadow(color: DIRTheme.cyan.opacity(0.08), radius: 12, x: 0, y: 7)
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(Color(red: 0.030, green: 0.043, blue: 0.060).opacity(0.92))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .stroke(Color.white.opacity(0.045), lineWidth: 1)
+                )
         )
     }
 
     private var dateBlock: some View {
         VStack(spacing: 1) {
             Text(session.startDate.formatted(.dateTime.day()))
-                .font(.system(size: 27, weight: .bold, design: .rounded))
+                .font(.system(size: 23, weight: .bold, design: .rounded))
+                .monospacedDigit()
                 .foregroundStyle(.white)
             Text("MAG")
-                .font(.caption2.weight(.medium))
-                .foregroundStyle(.white.opacity(0.75))
+                .font(.system(size: 9, weight: .medium, design: .rounded))
+                .foregroundStyle(DIRTheme.muted)
             Text(Formatters.clock(session.startDate))
-                .font(.caption2.monospacedDigit())
-                .foregroundStyle(.white.opacity(0.75))
+                .font(.system(size: 9, weight: .regular, design: .rounded).monospacedDigit())
+                .foregroundStyle(DIRTheme.muted)
         }
         .frame(width: 38)
     }
@@ -178,21 +182,26 @@ struct DiveThumbnail: View {
     var body: some View {
         ZStack {
             LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing)
+            LinearGradient(colors: [.clear, .black.opacity(0.34)], startPoint: .top, endPoint: .bottom)
             Circle()
                 .fill(.white.opacity(0.16))
-                .frame(width: 52, height: 52)
-                .offset(x: -26, y: -30)
+                .frame(width: 42, height: 42)
+                .offset(x: -22, y: -24)
             Image(systemName: index == 2 ? "water.waves" : "photo")
-                .font(.system(size: 30, weight: .semibold))
-                .foregroundStyle(.white.opacity(0.82))
+                .font(.system(size: 25, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.78))
                 .rotationEffect(.degrees(index == 2 ? -18 : 0))
             ForEach(0..<5) { bubble in
                 Circle()
-                    .fill(.white.opacity(0.18))
+                    .fill(.white.opacity(0.16))
                     .frame(width: CGFloat(3 + bubble), height: CGFloat(3 + bubble))
-                    .offset(x: CGFloat(18 - bubble * 8), y: CGFloat(-22 + bubble * 9))
+                    .offset(x: CGFloat(15 - bubble * 7), y: CGFloat(-18 + bubble * 8))
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 6))
+        .overlay(
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .stroke(DIRTheme.cyan.opacity(0.18), lineWidth: 1)
+        )
     }
 }
