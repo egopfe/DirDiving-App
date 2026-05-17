@@ -41,11 +41,14 @@ struct MoreView: View {
                         DIRCard("SYNC WATCH", icon: "applewatch", accent: DIRTheme.cyan) {
                             row("Supportato", watchSync.isSupported ? "Si" : "No")
                             row("Stato", String(describing: watchSync.activationState))
+                            row("Esito", watchSync.userVisibleState)
+                            row("Import riusciti", "\(watchSync.importedSessionCount)")
+                            row("Import falliti", "\(watchSync.failedImportCount)")
                             row("Ultimo evento", watchSync.lastMessage)
                             Button {
-                                watchSync.activate(logStore: logStore)
+                                watchSync.retryActivation(logStore: logStore)
                             } label: {
-                                Label("Riattiva Watch Sync", systemImage: "arrow.triangle.2.circlepath")
+                                Label("Riprova Watch Sync", systemImage: "arrow.triangle.2.circlepath")
                                     .font(.callout.weight(.semibold))
                                     .foregroundStyle(DIRTheme.cyan)
                                     .frame(maxWidth: .infinity)
@@ -57,6 +60,7 @@ struct MoreView: View {
                         DIRCard("BACKUP CLOUD", icon: "icloud", accent: DIRTheme.green) {
                             row("iCloud Sync", cloudSync.isICloudAvailable ? "Attivo" : "Non disponibile")
                             row("Backup automatico", "Log e planner")
+                            row("Conflitti", "Risoluzione manuale non disponibile")
                             row("Ultimo evento", cloudSync.lastSyncStatus)
                             Button {
                                 logStore.synchronizeCloud()
@@ -90,6 +94,11 @@ struct MoreView: View {
                             row("Formato", exportFormat)
                             row("Bundle", "com.egopfe.dirdiving.ios")
                             row("Import", "Non disponibile in main")
+                        }
+                        DIRCard("FUNZIONI FUTURE", icon: "lock", accent: DIRTheme.yellow) {
+                            disabledFeatureRow("Explore", "Coming soon: mappe e route non sono release-ready in main.")
+                            disabledFeatureRow("Analysis", "Coming soon: analytics avanzate restano disabilitate in main.")
+                            disabledFeatureRow("Equipment", "Coming soon: profili attrezzatura richiedono persistenza dedicata.")
                         }
                         DIRWarningBox(text: "DIR DIVING e un supporto informativo per logbook, analisi e pianificazione preliminare.")
                     }
@@ -153,5 +162,27 @@ struct MoreView: View {
         }
         .font(.callout)
         .padding(.vertical, 4)
+    }
+
+    private func disabledFeatureRow(_ title: String, _ message: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(title)
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(.white)
+                Spacer()
+                Text("COMING SOON")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(DIRTheme.yellow)
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 3)
+                    .background(Capsule().stroke(DIRTheme.yellow.opacity(0.72), lineWidth: 1))
+            }
+            Text(message)
+                .font(.caption)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.vertical, 7)
     }
 }

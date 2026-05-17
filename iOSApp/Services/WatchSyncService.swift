@@ -7,26 +7,50 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published var isSupported = WCSession.isSupported()
     @Published var activationState: WCSessionActivationState = .notActivated
     @Published var lastMessage = "Non sincronizzato"
+    @Published private(set) var importedSessionCount = 0
+    @Published private(set) var failedImportCount = 0
     private weak var logStore: DiveLogStore?
     private var importedSessionIDs: Set<UUID> = []
+
+    var userVisibleState: String {
+        if !isSupported { return "Non supportato" }
+        if failedImportCount > 0 { return "Errore import: retry disponibile" }
+        if activationState == .activated { return "Attivo" }
+        return "In attesa attivazione"
+    }
 
     func activate(logStore: DiveLogStore) {
         self.logStore = logStore
         importedSessionIDs = WatchDiveSyncCodec.loadImportedSessionIDs()
-        guard WCSession.isSupported() else { return }
+        importedSessionCount = importedSessionIDs.count
+        guard WCSession.isSupported() else {
+            lastMessage = "WatchConnectivity non supportato"
+            return
+        }
         WCSession.default.delegate = self
         WCSession.default.activate()
+    }
+
+    func retryActivation(logStore: DiveLogStore) {
+        failedImportCount = 0
+        lastMessage = "Retry Watch Sync richiesto"
+        activate(logStore: logStore)
     }
 
     private func importSessionPayload(_ payload: [String: Any]) {
         do {
             let session = try WatchDiveSyncCodec.parseSession(from: payload)
-            guard !importedSessionIDs.contains(session.id) else { return }
+            guard !importedSessionIDs.contains(session.id) else {
+                lastMessage = "Immersione duplicata ignorata"
+                return
+            }
             logStore?.add(session)
             importedSessionIDs.insert(session.id)
             WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
+            importedSessionCount = importedSessionIDs.count
             lastMessage = "Immersione ricevuta dal Watch"
         } catch {
+            failedImportCount += 1
             lastMessage = "Errore sync Watch: \(error.localizedDescription)"
         }
     }
