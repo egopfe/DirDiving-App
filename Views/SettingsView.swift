@@ -1,11 +1,17 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @EnvironmentObject private var navigation: AppNavigationStore
+    @AppStorage(HapticService.experimentalHapticsEnabledKey) private var experimentalHapticsEnabled = true
+    @AppStorage("dirdiving_watch_metric_units") private var metricUnits = true
+    @AppStorage("dirdiving_watch_always_on_safe") private var alwaysOnSafe = true
+
     var body: some View {
         ZStack {
             DiveScreenBackground()
 
-            VStack(spacing: 5) {
+            ScrollView {
+            VStack(spacing: 7) {
                 header
 
                 Text("IMPOSTAZIONI")
@@ -13,42 +19,77 @@ struct SettingsView: View {
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
 
-                VStack(spacing: 3) {
-                    settingsRow(
+                VStack(spacing: 6) {
+                    Toggle(isOn: $metricUnits) {
+                        settingsRowContent(
                         icon: "ruler",
                         iconColor: .white,
                         title: "Unità di misura",
-                        subtitle: "Metrico (m, \u{00B0}C)"
-                    )
-                    settingsRow(
-                        icon: "bell",
-                        iconColor: DiveUI.yellow,
-                        title: "Allarmi",
-                        subtitle: "Impostazioni alert"
-                    )
-                    settingsRow(
-                        icon: "sun.max",
-                        iconColor: DiveUI.yellow,
-                        title: "Schermo",
-                        subtitle: "Luminosità, Always On"
-                    )
-                    settingsRow(
-                        icon: "iphone.radiowaves.left.and.right",
-                        iconColor: DiveUI.blue,
-                        title: "Vibrazione",
-                        subtitle: "Attiva"
-                    )
-                    settingsRow(
-                        icon: "speaker.wave.2",
-                        iconColor: DiveUI.blue,
-                        title: "Suoni",
-                        subtitle: "Attivi"
-                    )
+                        subtitle: metricUnits ? "Metrico (m, °C)" : "Imperiale LAB OFF"
+                        )
+                    }
+                    .tint(DiveUI.blue)
+                    Button {
+                        navigation.selectedPage = .alarmSettings
+                    } label: {
+                        settingsRowContent(
+                            icon: "bell",
+                            iconColor: DiveUI.yellow,
+                            title: "Allarmi",
+                            subtitle: "Apri soglie safety persistenti"
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    Toggle(isOn: $alwaysOnSafe) {
+                        settingsRowContent(
+                            icon: "sun.max",
+                            iconColor: DiveUI.yellow,
+                            title: "Schermo",
+                            subtitle: alwaysOnSafe ? "Always On safe: ON" : "Always On safe: OFF"
+                        )
+                    }
+                    .tint(DiveUI.yellow)
+                    Toggle(isOn: $experimentalHapticsEnabled) {
+                        settingsRowContent(
+                            icon: "iphone.radiowaves.left.and.right",
+                            iconColor: DiveUI.blue,
+                            title: "Haptics sperimentali",
+                            subtitle: experimentalHapticsEnabled ? "Attivi" : "Disattivati"
+                        )
+                    }
+                    .tint(DiveUI.green)
+                    Button {
+                        navigation.selectedPage = .ascentSettings
+                    } label: {
+                        settingsRowContent(
+                            icon: "arrow.up.right.circle",
+                            iconColor: DiveUI.blue,
+                            title: "Limiti risalita",
+                            subtitle: "Soglie applicate da DiveManager"
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    Button {
+                        navigation.selectedPage = .info
+                    } label: {
+                        settingsRowContent(
+                            icon: "info.circle",
+                            iconColor: DiveUI.cyan,
+                            title: "Info e limiti",
+                            subtitle: "Safety, mock e hardware"
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    Text("GPS e sync non hanno preferenze globali complete: usa le impostazioni Snorkeling/Apnea e i pannelli sync sperimentali.")
+                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .foregroundStyle(DiveUI.yellow)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
             .padding(.horizontal, 11)
             .padding(.top, 9)
             .padding(.bottom, 8)
+            }
         }
     }
 
@@ -66,7 +107,6 @@ struct SettingsView: View {
 
             Spacer()
 
-            // TODO: Replace this visual placeholder if a watch clock value becomes part of the view model.
             Text("--:--")
                 .font(.system(size: 14, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white)
@@ -74,8 +114,7 @@ struct SettingsView: View {
         }
     }
 
-    private func settingsRow(icon: String, iconColor: Color, title: String, subtitle: String) -> some View {
-        // TODO: Wire these rows to real settings destinations when those view models exist.
+    private func settingsRowContent(icon: String, iconColor: Color, title: String, subtitle: String) -> some View {
         HStack(spacing: 9) {
             Image(systemName: icon)
                 .font(.system(size: 16, weight: .medium))
@@ -105,7 +144,7 @@ struct SettingsView: View {
                 .overlay(
                     RoundedRectangle(cornerRadius: 7, style: .continuous)
                         .stroke(.white.opacity(0.24), lineWidth: 1)
-                )
+                    )
         )
     }
 }

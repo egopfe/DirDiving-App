@@ -18,6 +18,7 @@ final class DiveManager: NSObject, ObservableObject {
     @Published var ascentStatus = AscentStatus.make(rate: 0, depth: 0)
     @Published var redWarningBlink = false
     @Published var lastErrorMessage: String?
+    @Published var isDepthSensorAvailable = CMWaterSubmersionManager.waterSubmersionAvailable
 
     private let logStore: DiveLogStore
     private let gpsManager: GPSManager
@@ -55,9 +56,11 @@ final class DiveManager: NSObject, ObservableObject {
 
     private func configureSubmersion() {
         guard CMWaterSubmersionManager.waterSubmersionAvailable else {
+            isDepthSensorAvailable = false
             lastErrorMessage = "Sensore immersione non disponibile su questo dispositivo o simulatore."
             return
         }
+        isDepthSensorAvailable = true
         let manager = CMWaterSubmersionManager()
         manager.delegate = self
         submersionManager = manager

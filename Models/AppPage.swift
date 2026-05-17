@@ -6,7 +6,10 @@ enum AppPage: Hashable {
     case snorkeling
     case apnea
     case compass
+    case settings
+    case alarmSettings
     case ascentSettings
+    case info
     case userImages
     case diveLog
     case buddyAssist

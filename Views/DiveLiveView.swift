@@ -21,6 +21,9 @@ struct DiveLiveView: View {
                         preDiveWaitingContent
                     }
 
+                    if !dive.isDepthSensorAvailable {
+                        warningBanner("PROFONDITÀ NON DISPONIBILE - sensore non supportato o simulatore.")
+                    }
                     if let error = dive.lastErrorMessage {
                         warningBanner(error)
                     }
@@ -212,7 +215,7 @@ struct DiveLiveView: View {
     private var depthReadout: some View {
         VStack(spacing: 0) {
             HStack(alignment: .lastTextBaseline, spacing: 4) {
-                Text(Formatters.one(dive.currentDepthMeters))
+                Text(dive.isDepthSensorAvailable ? Formatters.one(dive.currentDepthMeters) : "--")
                     .font(.system(size: 72, weight: .black, design: .rounded))
                     .minimumScaleFactor(0.42)
                     .lineLimit(1)
@@ -220,7 +223,7 @@ struct DiveLiveView: View {
                     .foregroundStyle(dive.redWarningBlink ? DiveUI.red : .white)
                     .shadow(color: dive.redWarningBlink ? DiveUI.red.opacity(0.75) : .clear, radius: 8, x: 0, y: 0)
                     .layoutPriority(1)
-                Text("m")
+                Text(dive.isDepthSensorAvailable ? "m" : "")
                     .font(.system(size: 31, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.blue)
                     .padding(.bottom, 9)
@@ -238,12 +241,12 @@ struct DiveLiveView: View {
 
     private var depthSummary: some View {
         HStack(spacing: 7) {
-            depthCard(title: "PROF. MASSIMA", value: dive.maxDepthMeters)
-            depthCard(title: "PROF. MEDIA", value: dive.averageDepthMeters)
+            depthCard(title: "PROF. MASSIMA", value: dive.isDepthSensorAvailable ? Formatters.one(dive.maxDepthMeters) : "--")
+            depthCard(title: "PROF. MEDIA", value: dive.isDepthSensorAvailable ? Formatters.one(dive.averageDepthMeters) : "--")
         }
     }
 
-    private func depthCard(title: String, value: Double) -> some View {
+    private func depthCard(title: String, value: String) -> some View {
         VStack(spacing: 2) {
             Text(title)
                 .font(.system(size: 10, weight: .semibold, design: .rounded))
@@ -251,13 +254,13 @@ struct DiveLiveView: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.62)
             HStack(alignment: .lastTextBaseline, spacing: 3) {
-                Text(Formatters.one(value))
+                Text(value)
                     .font(.system(size: 25, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.blue)
                     .monospacedDigit()
                     .lineLimit(1)
                     .minimumScaleFactor(0.62)
-                Text("m")
+                Text(value == "--" ? "" : "m")
                     .font(.system(size: 12, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.blue)
                     .padding(.bottom, 2)

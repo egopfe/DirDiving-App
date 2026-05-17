@@ -573,6 +573,17 @@ Il documento Word dell'audit e conservato in `Docs/EXPERIMENTAL_UX_INTERACTION_A
 - iOS Experimental Explore Lab: sezioni Snorkeling Review, POI/Osservazioni, Waypoint Planning, Apnea Review e Experimental Settings; POI enrichment mock, manifest route/settings per Watch e note MBTiles/MapLibre/OpenSeaMap.
 - Tutte le funzioni non production-ready sono etichettate come `Mock`, `TODO`, `Non ancora sincronizzato` o `Sync sperimentale` per evitare false promesse UX.
 
+### Latest Experimental Blocker Resolution
+
+Dopo il report `Docs/EXPERIMENTAL_FUNCTIONS_UX_AUDIT_20260517_PRE_MODIFICATION.docx`, i rami sperimentali hanno ricevuto un pass di contenimento UX senza modificare algoritmi GPS, bussola, profondita, risalita o decompressione:
+
+- Watch experimental: `SettingsView`, `AlarmSettingsView`, `AscentRateSettingsView` e `InfoView` sono raggiungibili dalla navigazione sperimentale; le preferenze locali espongono unita metriche, haptics, Always-On safe, soglie generali e limiti risalita.
+- Watch Snorkeling: la sessione si avvia visibilmente, le soglie profondita/tempo/distanza sono enforce locali con haptic warning, la batteria resta indicata come non cablata, e i pannelli POI mostrano stato queue/delivery experimental.
+- Watch Apnea: profondita non disponibile mostra `--`; HR, batteria e temperatura non usano piu valori finti ma `HR OFF`, `BAT --`, `TEMP --`; profilo/statistiche restano chiaramente schematiche o TODO.
+- Watch Buddy Assist: il flusso e marcato `LAB-ONLY` e disabilitato finche l'architettura BLE/relay Watch non e validata.
+- iOS Experimental: Planner result e export sono marcati `PIANO LAB` / `EXPORT LAB`; Logbook e Dive Detail non mostrano piu affordance statiche come azioni reali; More espone impostazioni locali per unita, CSV export, diagnostica sync e gate safety mock.
+- iOS Explore Lab: route/settings manifest usano una coda locale sperimentale visibile con conteggio, stato e revisione manuale; il receiver iOS mostra il numero di payload experimental ricevuti e lo stato import, senza promettere merge production.
+
 ## Known Limitations
 
 - GPS e affidabile solo in superficie; sott'acqua usare ultimo fix valido e contesto bussola/waypoint come supporto informativo.
@@ -580,13 +591,13 @@ Il documento Word dell'audit e conservato in `Docs/EXPERIMENTAL_UX_INTERACTION_A
 - OpenStreetMap public tile server non devono essere usati hard-coded per traffico production pesante.
 - OpenSeaMap, GEBCO, EMODnet e MBTiles restano roadmap/future layer; il companion iOS mostra solo stato/TODO e non include ancora un motore MapLibre reale.
 - Apnea e Snorkeling experimental non sono dispositivi certificati di sicurezza.
-- Buddy Assist resta sperimentale e limitato dalle policy watchOS BLE.
-- Watch -> iPhone POI, Watch -> iPhone Apnea, iPhone -> Watch route/waypoint/settings, duplicate prevention e offline queue sono documentati come sync boundary sperimentali; non sono ancora una pipeline completa.
+- Buddy Assist resta sperimentale, lab-only e limitato dalle policy watchOS BLE.
+- Watch -> iPhone POI, Watch -> iPhone Apnea, iPhone -> Watch route/waypoint/settings, duplicate prevention e offline queue hanno stato/queue UX sperimentale; non sono ancora una pipeline production completa.
 
 ## Roadmap
 
 - Validare build XcodeGen su macOS per ogni ramo.
-- Collegare POI Watch a payload sync leggero e enrichment iOS, includendo queue offline e prevenzione duplicati.
+- Evolvere POI Watch e Apnea sync da queue/status sperimentale a pipeline persistente con ACK, retry, duplicate prevention e merge iOS.
 - Migrare gli allarmi Snorkeling da `AppStorage` locale a store dedicato quando il contratto dati sara stabile.
 - Collegare record Apnea Watch a review iOS senza simulare campioni profilo non ancora disponibili.
 - Introdurre workflow MapLibre/OpenSeaMap/MBTiles sul companion iOS dopo valutazione licenze e prestazioni.

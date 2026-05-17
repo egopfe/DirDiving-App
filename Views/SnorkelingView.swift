@@ -5,6 +5,7 @@ struct SnorkelingView: View {
     @EnvironmentObject private var gps: GPSManager
     @EnvironmentObject private var compass: CompassManager
     @EnvironmentObject private var dive: DiveManager
+    @StateObject private var watchSync = WatchSyncService.shared
     @State private var screen: SnorkelingScreen = .live
     @State private var selectedMarker: GPSInterestMarker?
     @State private var lastSavedMarker: GPSInterestMarker?
@@ -55,6 +56,7 @@ struct SnorkelingView: View {
         .onAppear {
             compass.start()
             gps.start()
+            startSnorkelingSessionIfNeeded()
         }
         .onDisappear {
             gps.stop()
@@ -65,6 +67,10 @@ struct SnorkelingView: View {
                 speedMetersPerSecond: speed,
                 currentPoint: gps.currentBestPoint()
             )
+            evaluateSnorkelingAlarms()
+        }
+        .onChange(of: dive.currentDepthMeters) { _, _ in
+            evaluateSnorkelingAlarms()
         }
     }
 
@@ -76,7 +82,10 @@ struct SnorkelingView: View {
 
             VStack(spacing: 7) {
                 topBar(title: "SNORKELING", systemImage: "figure.pool.swim")
-                statusRow("IN ATTIVITÀ")
+                statusRow(exploration.isSnorkelingSessionActive ? "IN ATTIVITÀ" : "SESSIONE NON AVVIATA")
+                if let warning = exploration.snorkelingWarning {
+                    snorkelingWarningPanel(warning)
+                }
                 activityMetricsPanel
                 depthAndGpsSection(leftWidth: leftWidth, rightWidth: rightWidth)
                 Button {
@@ -115,6 +124,7 @@ struct SnorkelingView: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.78)
                 .frame(maxWidth: .infinity, alignment: .center)
+            schematicMapNotice("MAPPA SCHEMATICA - NO TILE ONLINE")
 
             waypointSummaryCard
             SnorkelingWaypointMapView(waypointName: exploration.activeWaypoint.name, gpsOKText: gpsMapStatusText)
@@ -135,6 +145,7 @@ struct SnorkelingView: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.78)
                 .frame(maxWidth: .infinity, alignment: .center)
+            schematicMapNotice("RITORNO SCHEMATICO - ENTRY GPS SURFACE")
 
             if exploration.hasSnorkelingEntryPoint {
                 returnSummaryCard
@@ -703,7 +714,7 @@ struct SnorkelingView: View {
             markerCoordinateSummary(marker)
             watchSyncBoundaryPanel(
                 title: "WATCH -> IPHONE POI",
-                message: "Payload locale pronto: coordinate, profondità, temperatura, direzione, waypoint e session id. Invio WatchConnectivity reale: TODO sync experimental.",
+                message: "Payload accodato/inviato: \(watchSync.experimentalLastKind). Stato: \(watchSync.experimentalDeliveryState). Coda: \(watchSync.experimentalQueueCount).",
                 color: DiveUI.cyan
             )
             HStack(spacing: 8) {
@@ -784,9 +795,9 @@ struct SnorkelingView: View {
                 .padding(10)
                 .background(markerPanel(stroke: DiveUI.cyan.opacity(0.62)))
                 watchSyncBoundaryPanel(
-                    title: "SYNC POI NON INVIATO",
-                    message: "TODO sync: accodare POI, prevenire duplicati e confermare ricezione iPhone prima di segnare come sincronizzato.",
-                    color: DiveUI.yellow
+                    title: "SYNC POI EXPERIMENTAL",
+                    message: "Stato: \(watchSync.experimentalDeliveryState). Coda locale Watch: \(watchSync.experimentalQueueCount). ACK/retry persistente completo ancora LAB.",
+                    color: DiveUI.cyan
                 )
                 Text("TODO Watch experimental: eliminazione marcatore con conferma dedicata.")
                     .font(.system(size: 10, weight: .semibold, design: .rounded))
@@ -822,6 +833,11 @@ struct SnorkelingView: View {
                 .tint(DiveUI.green)
                 .padding(10)
                 .background(markerPanel(stroke: DiveUI.green.opacity(0.45)))
+                compactAction("TERMINA SESSIONE", icon: "stop.circle", color: DiveUI.red) {
+                    exploration.endSnorkeling()
+                    HapticService.shared.notify()
+                    screen = .live
+                }
                 backButton
             }
             .padding(.horizontal, 9)
@@ -857,13 +873,13 @@ struct SnorkelingView: View {
                 )
                 persistedAlarmRow(
                     "Batteria bassa",
-                    value: "\(snorkelingAlarmLowBatteryPercent) %",
+                    value: "\(snorkelingAlarmLowBatteryPercent) % OFF",
                     decrement: { snorkelingAlarmLowBatteryPercent = max(5, snorkelingAlarmLowBatteryPercent - 5) },
                     increment: { snorkelingAlarmLowBatteryPercent = min(50, snorkelingAlarmLowBatteryPercent + 5) }
                 )
             }
             .background(markerPanel(stroke: .white.opacity(0.28)))
-            Text("Persistenza locale AppStorage attiva. TODO Watch experimental: migrare in store Snorkeling dedicato e sincronizzare con iPhone quando il contratto settings sara definito.")
+            Text("Profondità, tempo e distanza sono enforce locali con haptic warning. Batteria è solo configurata: sensore batteria non collegato in questo pass.")
                 .font(.system(size: 10, weight: .semibold, design: .rounded))
                 .foregroundStyle(DiveUI.yellow)
                 .fixedSize(horizontal: false, vertical: true)
@@ -942,11 +958,47 @@ struct SnorkelingView: View {
         lastSavedMarker = marker
         selectedMarker = marker
         screen = .markerSaved
+        WatchSyncService.shared.transferExperimentalPOI(marker)
         if point == nil {
             HapticService.shared.warnIfNeeded()
         } else {
             HapticService.shared.confirm()
         }
+    }
+
+    private func startSnorkelingSessionIfNeeded() {
+        let point = gps.currentBestPoint()
+        exploration.startSnorkelingIfNeeded(entryPoint: point)
+        if point == nil {
+            HapticService.shared.warnIfNeeded()
+        } else {
+            HapticService.shared.notify()
+        }
+    }
+
+    private func evaluateSnorkelingAlarms() {
+        guard exploration.isSnorkelingSessionActive else { return }
+        if dive.currentDepthMeters >= snorkelingAlarmMaxDepthMeters {
+            triggerSnorkelingAlarm("ALLARME PROFONDITÀ \(Formatters.one(dive.currentDepthMeters)) m")
+            return
+        }
+        if exploration.runtimeSeconds / 60 >= Double(snorkelingAlarmMaxMinutes) {
+            triggerSnorkelingAlarm("ALLARME TEMPO \(snorkelingAlarmMaxMinutes) min")
+            return
+        }
+        if exploration.distanceMeters / 1_000 >= snorkelingAlarmMaxDistanceKm {
+            triggerSnorkelingAlarm("ALLARME DISTANZA \(Formatters.one(exploration.distanceMeters / 1_000)) km")
+            return
+        }
+        if exploration.snorkelingWarning?.hasPrefix("ALLARME") == true {
+            exploration.updateSnorkelingWarning(nil)
+        }
+    }
+
+    private func triggerSnorkelingAlarm(_ warning: String) {
+        guard exploration.snorkelingWarning != warning else { return }
+        exploration.updateSnorkelingWarning(warning)
+        HapticService.shared.warnIfNeeded()
     }
 
     private func markerCoordinateSummary(_ marker: GPSInterestMarker?) -> some View {
@@ -957,7 +1009,7 @@ struct SnorkelingView: View {
                 .monospacedDigit()
                 .lineLimit(2)
                 .minimumScaleFactor(0.68)
-            Text("Sync POI verso iPhone: TODO sync experimental")
+            Text("Sync POI: \(watchSync.experimentalDeliveryState)")
                 .font(.system(size: 9, weight: .semibold, design: .rounded))
                 .foregroundStyle(DiveUI.secondaryText)
                 .lineLimit(2)
@@ -980,6 +1032,34 @@ struct SnorkelingView: View {
             .background(markerPanel(stroke: color.opacity(0.72)))
         }
         .buttonStyle(.plain)
+    }
+
+    private func snorkelingWarningPanel(_ warning: String) -> some View {
+        HStack(spacing: 7) {
+            Image(systemName: warning.hasPrefix("ALLARME") ? "exclamationmark.triangle.fill" : "location.slash")
+                .font(.system(size: 14, weight: .black))
+            Text(warning)
+                .font(.system(size: 10, weight: .black, design: .rounded))
+                .lineLimit(2)
+                .minimumScaleFactor(0.62)
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(warning.hasPrefix("ALLARME") ? DiveUI.red : DiveUI.yellow)
+        .padding(.horizontal, 9)
+        .frame(maxWidth: .infinity, minHeight: 30)
+        .background(markerPanel(stroke: (warning.hasPrefix("ALLARME") ? DiveUI.red : DiveUI.yellow).opacity(0.62)))
+    }
+
+    private func schematicMapNotice(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: 9, weight: .black, design: .rounded))
+            .foregroundStyle(DiveUI.yellow)
+            .lineLimit(1)
+            .minimumScaleFactor(0.62)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .frame(maxWidth: .infinity)
+            .background(markerPanel(stroke: DiveUI.yellow.opacity(0.36)))
     }
 
     private func markerLogRow(_ marker: GPSInterestMarker) -> some View {

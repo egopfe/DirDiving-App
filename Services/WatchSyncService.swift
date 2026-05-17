@@ -9,8 +9,12 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published private(set) var isSupported = WCSession.isSupported()
     @Published private(set) var activationState: WCSessionActivationState = .notActivated
     @Published private(set) var lastSyncStatus = "Companion non sincronizzato"
+    @Published private(set) var experimentalQueueCount = 0
+    @Published private(set) var experimentalLastKind = "--"
+    @Published private(set) var experimentalDeliveryState = "Nessun payload experimental"
 
     private var pendingSessions: [DiveSession] = []
+    private var pendingExperimentalEnvelopes: [ExperimentalSyncEnvelope] = []
     private var peerSecretObserver: NSObjectProtocol?
 
     private override init() {
@@ -53,6 +57,34 @@ final class WatchSyncService: NSObject, ObservableObject {
         }
     }
 
+    func transferExperimentalPOI(_ marker: GPSInterestMarker) {
+        var payload: [String: String] = [
+            "id": marker.id.uuidString,
+            "category": marker.category.rawValue,
+            "timestamp": Self.isoFormatter.string(from: marker.timestamp),
+            "depthMeters": String(marker.depthMeters),
+            "distanceFromEntryMeters": String(marker.distanceFromEntryMeters),
+            "bearingDegrees": String(marker.bearingDegrees),
+            "isEnriched": String(marker.isEnriched)
+        ]
+        if let latitude = marker.latitude { payload["latitude"] = String(latitude) }
+        if let longitude = marker.longitude { payload["longitude"] = String(longitude) }
+        if let temperature = marker.temperatureCelsius { payload["temperatureCelsius"] = String(temperature) }
+        if let waypoint = marker.activeWaypointName { payload["activeWaypointName"] = waypoint }
+        if let sessionID = marker.sessionID { payload["sessionID"] = sessionID }
+        transferExperimentalEnvelope(ExperimentalSyncEnvelope(kind: .watchPOI, payload: payload))
+    }
+
+    func transferExperimentalApneaRecord(_ record: ApneaDiveRecord) {
+        let payload = [
+            "id": record.id.uuidString,
+            "durationSeconds": String(record.durationSeconds),
+            "maxDepthMeters": String(record.maxDepthMeters),
+            "recoverySeconds": String(record.recoverySeconds)
+        ]
+        transferExperimentalEnvelope(ExperimentalSyncEnvelope(kind: .watchApneaRecord, payload: payload))
+    }
+
     private func flushPendingTransfers() {
         guard WatchSyncAuth.hasPeerSecret(), !pendingSessions.isEmpty else { return }
         let queue = pendingSessions
@@ -86,6 +118,53 @@ final class WatchSyncService: NSObject, ObservableObject {
             lastSyncStatus = "Errore codifica sync: \(error.localizedDescription)"
         }
     }
+
+    private func transferExperimentalEnvelope(_ envelope: ExperimentalSyncEnvelope) {
+        experimentalLastKind = envelope.kind.rawValue
+        guard WCSession.isSupported() else {
+            lastSyncStatus = "Sync sperimentale non supportato"
+            experimentalDeliveryState = "WatchConnectivity non supportato"
+            return
+        }
+        do {
+            let payload = try envelope.userInfo()
+            if WCSession.default.isReachable {
+                WCSession.default.sendMessage(payload, replyHandler: { [weak self] _ in
+                    Task { @MainActor in
+                        self?.experimentalDeliveryState = "ACK companion ricevuto"
+                    }
+                }) { [weak self] error in
+                    Task { @MainActor in
+                        self?.queueExperimentalEnvelope(envelope, reason: error.localizedDescription)
+                        WCSession.default.transferUserInfo(payload)
+                    }
+                }
+                lastSyncStatus = "Sync sperimentale inviato: \(envelope.kind.rawValue)"
+                experimentalDeliveryState = "Invio diretto tentato"
+            } else {
+                queueExperimentalEnvelope(envelope, reason: "Companion non raggiungibile")
+                WCSession.default.transferUserInfo(payload)
+                lastSyncStatus = "Sync sperimentale in coda: \(envelope.kind.rawValue)"
+            }
+        } catch {
+            lastSyncStatus = "Errore contratto sync sperimentale: \(error.localizedDescription)"
+            experimentalDeliveryState = "Errore codifica payload"
+        }
+    }
+
+    private func queueExperimentalEnvelope(_ envelope: ExperimentalSyncEnvelope, reason: String) {
+        pendingExperimentalEnvelopes.insert(envelope, at: 0)
+        pendingExperimentalEnvelopes = Array(pendingExperimentalEnvelopes.prefix(20))
+        experimentalQueueCount = pendingExperimentalEnvelopes.count
+        experimentalLastKind = envelope.kind.rawValue
+        experimentalDeliveryState = "In coda: \(reason)"
+    }
+
+    private static let isoFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter
+    }()
 }
 
 extension WatchSyncService: WCSessionDelegate {

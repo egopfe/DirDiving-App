@@ -14,6 +14,8 @@ struct ModeSelectionView: View {
                     apneaModeCard
                     modeCard(.diving)
                     modeCard(.snorkeling)
+                    buddyCard
+                    ascentLimitsCard
                     settingsCard
                 }
                 .padding(.horizontal, 12)
@@ -85,7 +87,7 @@ struct ModeSelectionView: View {
 
     private var settingsCard: some View {
         Button {
-            navigation.selectedPage = .ascentSettings
+            navigation.selectedPage = .settings
         } label: {
             modeRow(
                 title: "Impostazioni",
@@ -94,6 +96,43 @@ struct ModeSelectionView: View {
                 isHighlighted: false,
                 isSelected: false
             )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var ascentLimitsCard: some View {
+        Button {
+            navigation.selectedPage = .ascentSettings
+        } label: {
+            modeRow(
+                title: "Limiti Risalita",
+                systemImage: "arrow.up.right.circle",
+                accent: DiveUI.blue,
+                isHighlighted: false,
+                isSelected: navigation.selectedPage == .ascentSettings
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var buddyCard: some View {
+        Button {
+            navigation.selectedPage = .buddyAssist
+        } label: {
+            VStack(alignment: .leading, spacing: 4) {
+                modeRow(
+                    title: "Buddy Assist",
+                    systemImage: "person.2.wave.2.fill",
+                    accent: DiveUI.yellow,
+                    isHighlighted: false,
+                    isSelected: navigation.selectedPage == .buddyAssist
+                )
+                Text("Sperimentale pre-dive: pairing e messaggi preset, non safety certificata.")
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .foregroundStyle(DiveUI.yellow)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, 11)
+            }
         }
         .buttonStyle(.plain)
     }

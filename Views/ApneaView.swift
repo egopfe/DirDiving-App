@@ -4,6 +4,7 @@ struct ApneaView: View {
     @EnvironmentObject private var exploration: ExplorationStore
     @EnvironmentObject private var dive: DiveManager
     @EnvironmentObject private var compass: CompassManager
+    @StateObject private var watchSync = WatchSyncService.shared
     @State private var screen: ApneaScreen = .menu
     @State private var didNotifyRecoveryComplete = false
     @AppStorage("dirdiving_apnea_surface_interval_seconds") private var surfaceIntervalSeconds: Double = 90
@@ -117,7 +118,7 @@ struct ApneaView: View {
                 depthText: apneaDepthText,
                 timeText: apneaElapsedText(defaultText: "1:46"),
                 stateText: "Risalita troppo veloce",
-                heartRateText: "74",
+                heartRateText: "HR OFF",
                 accent: DiveUI.red,
                 isAlarm: true
             )
@@ -131,7 +132,7 @@ struct ApneaView: View {
                 depthText: apneaDepthText,
                 timeText: apneaElapsedText(defaultText: "1:55"),
                 stateText: "Superficie",
-                heartRateText: "78"
+                heartRateText: "HR OFF"
             )
         } else if isApneaAscentVisible {
             apneaDepthStatusScreen(
@@ -139,7 +140,7 @@ struct ApneaView: View {
                 depthText: apneaDepthText,
                 timeText: apneaElapsedText(defaultText: "1:28"),
                 stateText: "Risalita",
-                heartRateText: "74"
+                heartRateText: "HR OFF"
             )
         } else if isApneaBottomVisible {
             apneaDepthStatusScreen(
@@ -171,7 +172,7 @@ struct ApneaView: View {
             depthText: apneaDepthText,
             timeText: apneaElapsedText(defaultText: "1:55"),
             stateText: "Superficie",
-            heartRateText: "78"
+            heartRateText: "HR OFF"
         )
         .contentShape(Rectangle())
         .onTapGesture {
@@ -244,12 +245,12 @@ struct ApneaView: View {
             VStack(spacing: 0) {
                 summaryRow("Tempo immersione", value: lastApneaDurationText, showsDivider: true)
                 summaryRow("Profondità massima", value: lastApneaMaxDepthText, showsDivider: true)
-                // TODO: Replace with Apnea-specific average depth when the session record exposes samples.
-                summaryRow("Profondità media", value: "12.8 m", showsDivider: true)
-                // TODO: Replace with Apnea water temperature when the session record exposes it.
-                summaryRow("Temp. acqua", value: "10 °C", showsDivider: false)
+                summaryRow("Profondità media", value: "TODO", showsDivider: true)
+                summaryRow("Temp. acqua", value: "TODO", showsDivider: false)
             }
             .padding(.bottom, 12)
+            apneaDataNotice("Campioni Apnea non sincronizzati: media e temperatura restano disabilitate.")
+                .padding(.bottom, 8)
 
             HStack(spacing: 8) {
                 apneaActionButton("GRAFICO", icon: "chart.xyaxis.line", color: DiveUI.blue) { screen = .depthProfile }
@@ -307,7 +308,6 @@ struct ApneaView: View {
                             Rectangle().fill(DiveUI.hairline).frame(height: 1)
                         }
 
-                        // TODO: Replace placeholder profile with Apnea sample data when records expose depth samples.
                         ApneaDepthProfileArea(points: placeholderProfilePoints)
                             .fill(DiveUI.blue.opacity(0.22))
                         ApneaDepthProfileLine(points: placeholderProfilePoints)
@@ -329,6 +329,8 @@ struct ApneaView: View {
                 }
             }
             .padding(.bottom, 12)
+            apneaDataNotice("PROFILO SCHEMATICO: non usa campioni profondità reali.")
+                .padding(.bottom, 8)
 
             HStack(spacing: 8) {
                 apneaActionButton("DETTAGLI", icon: "info.circle", color: DiveUI.blue) { screen = .details }
@@ -363,14 +365,14 @@ struct ApneaView: View {
             .padding(.bottom, 22)
 
             VStack(spacing: 0) {
-                // TODO: Replace placeholders with Apnea descent/ascent speed metrics when exposed by session records.
-                summaryRow("Vel. discesa", value: "1.2 m/s", showsDivider: true)
-                summaryRow("Vel. risalita", value: "0.9 m/s", showsDivider: true)
-                // TODO: Replace placeholders with live/session heart-rate aggregates when available.
-                summaryRow("FC media", value: "78 bpm", showsDivider: true)
-                summaryRow("FC max", value: "112 bpm", showsDivider: false)
+                summaryRow("Vel. discesa", value: "TODO", showsDivider: true)
+                summaryRow("Vel. risalita", value: "TODO", showsDivider: true)
+                summaryRow("FC media", value: "TODO", showsDivider: true)
+                summaryRow("FC max", value: "TODO", showsDivider: false)
             }
             .padding(.bottom, 12)
+            apneaDataNotice("Dettagli non disponibili senza samples Apnea, HR e aggregati validati.")
+                .padding(.bottom, 8)
 
             HStack(spacing: 8) {
                 apneaActionButton("SALVA", icon: "checkmark.circle", color: DiveUI.green) { screen = .saveConfirmation }
@@ -422,7 +424,7 @@ struct ApneaView: View {
 
             apneaSyncBoundaryPanel(
                 title: "WATCH -> IPHONE APNEA",
-                message: "Record locale salvato. TODO sync experimental: inviare durata, profondità max e recovery; profilo campioni reale non disponibile in questo pass.",
+                message: "Record salvato e payload experimental \(watchSync.experimentalLastKind). Stato: \(watchSync.experimentalDeliveryState). Coda: \(watchSync.experimentalQueueCount). Profilo campioni reale non disponibile.",
                 color: DiveUI.cyan
             )
             .padding(.top, 12)
@@ -509,11 +511,10 @@ struct ApneaView: View {
             .padding(.bottom, 8)
 
             statisticsRow("Prof. max", value: statisticsMaxDepthText)
-            // TODO: Replace placeholder total time with accumulated Apnea history when available.
-            statisticsRow("Tempo tot.", value: "45:32")
+            statisticsRow("Tempo tot.", value: "TODO")
             statisticsRow("Immersioni", value: statisticsDiveCountText)
-            // TODO: Replace placeholder average depth with persisted Apnea aggregate when available.
-            statisticsRow("Media prof.", value: "13.6 m")
+            statisticsRow("Media prof.", value: "TODO")
+            apneaDataNotice("Statistiche parziali: serve storico Apnea completo.")
         }
         .frame(maxWidth: .infinity, minHeight: 260)
     }
@@ -523,7 +524,7 @@ struct ApneaView: View {
         depthText: String,
         timeText: String,
         stateText: String,
-        heartRateText: String = "72",
+        heartRateText: String = "HR OFF",
         accent: Color = DiveUI.blue,
         isAlarm: Bool = false
     ) -> some View {
@@ -538,8 +539,7 @@ struct ApneaView: View {
                         .foregroundStyle(accent)
                     Spacer(minLength: 0)
                     VStack(alignment: .trailing, spacing: 2) {
-                        // TODO: Wire to live water/ambient temperature if exposed for Apnea.
-                        Text("10°")
+                        Text("TEMP --")
                             .font(.system(size: 18, weight: .semibold, design: .rounded))
                             .monospacedDigit()
                             .foregroundStyle(.white)
@@ -553,7 +553,7 @@ struct ApneaView: View {
                         .foregroundStyle(isAlarm ? accent : .white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.72)
-                    Text("m")
+                    Text(depthText == "--" ? "" : "m")
                         .font(.system(size: 17, weight: .bold, design: .rounded))
                         .foregroundStyle(accent)
                 }
@@ -585,19 +585,17 @@ struct ApneaView: View {
                         Image(systemName: "heart.fill")
                             .font(.system(size: 20, weight: .bold))
                             .foregroundStyle(DiveUI.red)
-                        // TODO: Replace with live heart-rate source when available.
                         Text(heartRateText)
-                            .font(.system(size: 20, weight: .semibold, design: .rounded))
+                            .font(.system(size: heartRateText == "HR OFF" ? 12 : 20, weight: .semibold, design: .rounded))
                             .monospacedDigit()
-                            .foregroundStyle(.white)
+                            .foregroundStyle(heartRateText == "HR OFF" ? DiveUI.yellow : .white)
                     }
 
                     Spacer(minLength: 0)
 
-                    // TODO: Replace with live battery source when available.
-                    Image(systemName: "battery.75percent")
-                        .font(.system(size: 23, weight: .semibold))
-                        .foregroundStyle(DiveUI.green)
+                    Text("BAT --")
+                        .font(.system(size: 12, weight: .black, design: .rounded))
+                        .foregroundStyle(DiveUI.yellow)
                 }
             }
             .frame(maxWidth: .infinity)
@@ -711,8 +709,8 @@ struct ApneaView: View {
                     configRow(title: "Profondità max", value: String(format: "%.1f m", maxDepthAlarmMeters), systemImage: "water.waves", showsDivider: true)
                     configRow(title: "Risalita veloce", value: "DiveManager", systemImage: "arrow.up", showsDivider: false)
                     apneaSyncBoundaryPanel(
-                        title: "SETTINGS SYNC TODO",
-                        message: "Persistenza locale AppStorage attiva. TODO sync: iPhone -> Watch settings e duplicati/offline queue non implementati.",
+                        title: "SETTINGS SYNC LAB",
+                        message: "Persistenza locale AppStorage attiva. iPhone -> Watch settings usa contratto experimental e resta in coda/ACK lab.",
                         color: DiveUI.yellow
                     )
                 }
@@ -1091,6 +1089,22 @@ struct ApneaView: View {
         .buttonStyle(.plain)
     }
 
+    private func apneaDataNotice(_ message: String) -> some View {
+        Text(message)
+            .font(.system(size: 9, weight: .black, design: .rounded))
+            .foregroundStyle(DiveUI.yellow)
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.horizontal, 9)
+            .padding(.vertical, 6)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(Color.black.opacity(0.42))
+                    .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(DiveUI.yellow.opacity(0.45), lineWidth: 1))
+            )
+    }
+
     private func apneaSyncBoundaryPanel(title: String, message: String, color: Color) -> some View {
         VStack(alignment: .leading, spacing: 5) {
             HStack(spacing: 5) {
@@ -1322,9 +1336,9 @@ struct ApneaView: View {
                 }
 
                 HStack(spacing: 0) {
-                    DiveMetric("DEPTH", value: String(format: "%.1f", dive.currentDepthMeters), unit: "m", color: DiveUI.blue, valueSize: 28)
+                    DiveMetric("DEPTH", value: dive.isDepthSensorAvailable ? String(format: "%.1f", dive.currentDepthMeters) : "--", unit: dive.isDepthSensorAvailable ? "m" : "", color: DiveUI.blue, valueSize: 28)
                     Rectangle().fill(DiveUI.hairline).frame(width: 1, height: 38)
-                    DiveMetric("MAX", value: String(format: "%.1f", dive.maxDepthMeters), unit: "m", color: DiveUI.blue, valueSize: 28)
+                    DiveMetric("MAX", value: dive.isDepthSensorAvailable ? String(format: "%.1f", dive.maxDepthMeters) : "--", unit: dive.isDepthSensorAvailable ? "m" : "", color: DiveUI.blue, valueSize: 28)
                 }
             }
         }
@@ -1460,7 +1474,8 @@ struct ApneaView: View {
                 HapticService.shared.notify()
             }
             DiveCommandButton("SURFACE", systemImage: "arrow.up", color: DiveUI.blue) {
-                exploration.surfaceFromApnea(maxDepthMeters: dive.maxDepthMeters)
+                let record = exploration.surfaceFromApnea(maxDepthMeters: dive.maxDepthMeters)
+                WatchSyncService.shared.transferExperimentalApneaRecord(record)
                 HapticService.shared.confirm()
             }
             DiveCommandButton("WARN", systemImage: "exclamationmark.triangle", color: DiveUI.red) {
@@ -1557,12 +1572,14 @@ struct ApneaView: View {
 
         if exploration.apneaState == .dive,
            depth < 0.5 {
-            exploration.surfaceFromApnea(maxDepthMeters: dive.maxDepthMeters)
+            let record = exploration.surfaceFromApnea(maxDepthMeters: dive.maxDepthMeters)
+            WatchSyncService.shared.transferExperimentalApneaRecord(record)
             screen = .surfaceEnd
         }
     }
 
     private var apneaDepthText: String {
+        guard dive.isDepthSensorAvailable else { return "--" }
         String(format: "%.1f", max(0, dive.currentDepthMeters))
     }
 
