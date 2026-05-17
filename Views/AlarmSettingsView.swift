@@ -5,6 +5,9 @@ struct AlarmSettingsView: View {
     @AppStorage("dirdiving_watch_alarm_depth_enabled") private var depthAlarmEnabled = false
     @AppStorage("dirdiving_watch_alarm_runtime_enabled") private var runtimeAlarmEnabled = false
     @AppStorage("dirdiving_watch_alarm_battery_enabled") private var batteryAlarmEnabled = true
+    @AppStorage("dirdiving_watch_alarm_depth_threshold_m") private var depthThresholdMeters = 40.0
+    @AppStorage("dirdiving_watch_alarm_runtime_threshold_min") private var runtimeThresholdMinutes = 60
+    @AppStorage("dirdiving_watch_alarm_battery_threshold_pct") private var batteryThresholdPercent = 20
 
     var body: some View {
         ZStack {
@@ -20,9 +23,24 @@ struct AlarmSettingsView: View {
 
                 VStack(spacing: 4) {
                     alarmRow(title: "Velocità risalita", threshold: "Usa limiti ASC SET", isOn: $ascentAlarmEnabled)
-                    alarmRow(title: "Profondità massima", threshold: "> 40.0 m", isOn: $depthAlarmEnabled)
-                    alarmRow(title: "Tempo immersione", threshold: "> 60 min", isOn: $runtimeAlarmEnabled)
-                    alarmRow(title: "Batteria bassa", threshold: "< 20%", isOn: $batteryAlarmEnabled)
+                    alarmRow(title: "Profondità massima", threshold: "> \(Formatters.one(depthThresholdMeters)) m", isOn: $depthAlarmEnabled)
+                    thresholdStepper(title: "Soglia profondità", value: "\(Formatters.one(depthThresholdMeters)) m", color: DiveUI.blue) {
+                        depthThresholdMeters = max(10, depthThresholdMeters - 1)
+                    } increase: {
+                        depthThresholdMeters = min(100, depthThresholdMeters + 1)
+                    }
+                    alarmRow(title: "Tempo immersione", threshold: "> \(runtimeThresholdMinutes) min", isOn: $runtimeAlarmEnabled)
+                    thresholdStepper(title: "Soglia tempo", value: "\(runtimeThresholdMinutes) min", color: DiveUI.yellow) {
+                        runtimeThresholdMinutes = max(10, runtimeThresholdMinutes - 5)
+                    } increase: {
+                        runtimeThresholdMinutes = min(240, runtimeThresholdMinutes + 5)
+                    }
+                    alarmRow(title: "Batteria bassa", threshold: "< \(batteryThresholdPercent)%", isOn: $batteryAlarmEnabled)
+                    thresholdStepper(title: "Soglia batteria", value: "\(batteryThresholdPercent)%", color: DiveUI.red) {
+                        batteryThresholdPercent = max(5, batteryThresholdPercent - 5)
+                    } increase: {
+                        batteryThresholdPercent = min(50, batteryThresholdPercent + 5)
+                    }
                 }
             }
             .padding(.horizontal, 11)
@@ -78,6 +96,51 @@ struct AlarmSettingsView: View {
                 .overlay(
                     RoundedRectangle(cornerRadius: 7, style: .continuous)
                         .stroke(.white.opacity(0.24), lineWidth: 1)
+                )
+        )
+    }
+
+    private func thresholdStepper(title: String, value: String, color: Color, decrease: @escaping () -> Void, increase: @escaping () -> Void) -> some View {
+        HStack(spacing: 7) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title)
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                Text(value)
+                    .font(.system(size: 12, weight: .black, design: .rounded))
+                    .foregroundStyle(color)
+                    .monospacedDigit()
+            }
+
+            Spacer(minLength: 0)
+
+            Button(action: decrease) {
+                Image(systemName: "minus")
+                    .font(.system(size: 11, weight: .black))
+                    .frame(width: 28, height: 26)
+                    .background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(color.opacity(0.18)))
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(color)
+
+            Button(action: increase) {
+                Image(systemName: "plus")
+                    .font(.system(size: 11, weight: .black))
+                    .frame(width: 28, height: 26)
+                    .background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(color.opacity(0.18)))
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(color)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .background(
+            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                .fill(color.opacity(0.10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .stroke(color.opacity(0.45), lineWidth: 1)
                 )
         )
     }

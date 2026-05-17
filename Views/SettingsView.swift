@@ -96,6 +96,12 @@ struct SettingsView: View {
                         title: "Schermo",
                         subtitle: "Gestito da watchOS"
                     )
+                    settingsRow(
+                        icon: "speaker.slash",
+                        iconColor: DiveUI.yellow,
+                        title: "Toni audio",
+                        subtitle: "Non usati sott'acqua; feedback via vibrazione"
+                    )
                     Toggle(isOn: $hapticsEnabled) {
                         settingsRow(
                             icon: "iphone.radiowaves.left.and.right",

@@ -12,10 +12,13 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published private(set) var pendingTransferCount = 0
 
     private var pendingSessions: [DiveSession] = []
+    private let pendingSessionsKey = "dirdiving_watch_pending_sync_sessions"
     private var peerSecretObserver: NSObjectProtocol?
 
     private override init() {
         super.init()
+        pendingSessions = loadPendingSessions()
+        pendingTransferCount = pendingSessions.count
         peerSecretObserver = NotificationCenter.default.addObserver(
             forName: .watchSyncPeerSecretDidUpdate,
             object: nil,
@@ -50,6 +53,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             pendingSessions.append(session)
             pendingSessions = pendingSessions.sorted { $0.startDate > $1.startDate }
             pendingTransferCount = pendingSessions.count
+            savePendingSessions()
             WatchSyncAuth.publishSharedSecretIfNeeded()
             lastSyncStatus = "In attesa chiave sync (\(pendingSessions.count) in coda)"
         }
@@ -74,6 +78,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         let queue = pendingSessions
         pendingSessions.removeAll()
         pendingTransferCount = 0
+        savePendingSessions()
         for session in queue.reversed() {
             send(session)
         }
@@ -98,10 +103,26 @@ final class WatchSyncService: NSObject, ObservableObject {
         } catch WatchDiveSyncError.missingPeerSecret {
             pendingSessions.insert(session, at: 0)
             pendingTransferCount = pendingSessions.count
+            savePendingSessions()
             WatchSyncAuth.publishSharedSecretIfNeeded()
             lastSyncStatus = "In attesa chiave sync companion"
         } catch {
             lastSyncStatus = "Errore codifica sync: \(error.localizedDescription)"
+        }
+    }
+
+    private func loadPendingSessions() -> [DiveSession] {
+        guard let data = UserDefaults.standard.data(forKey: pendingSessionsKey) else { return [] }
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return (try? decoder.decode([DiveSession].self, from: data)) ?? []
+    }
+
+    private func savePendingSessions() {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        if let data = try? encoder.encode(pendingSessions) {
+            UserDefaults.standard.set(data, forKey: pendingSessionsKey)
         }
     }
 }

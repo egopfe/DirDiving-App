@@ -36,6 +36,18 @@ final class DiveManager: NSObject, ObservableObject {
     }
     private var depthAlarmEnabled: Bool { UserDefaults.standard.bool(forKey: "dirdiving_watch_alarm_depth_enabled") }
     private var runtimeAlarmEnabled: Bool { UserDefaults.standard.bool(forKey: "dirdiving_watch_alarm_runtime_enabled") }
+    private var depthAlarmThresholdMeters: Double {
+        let stored = UserDefaults.standard.double(forKey: "dirdiving_watch_alarm_depth_threshold_m")
+        return stored > 0 ? stored : 40
+    }
+    private var runtimeAlarmThresholdMinutes: Int {
+        let stored = UserDefaults.standard.integer(forKey: "dirdiving_watch_alarm_runtime_threshold_min")
+        return stored > 0 ? stored : 60
+    }
+    private var batteryAlarmThresholdPercent: Int {
+        let stored = UserDefaults.standard.integer(forKey: "dirdiving_watch_alarm_battery_threshold_pct")
+        return stored > 0 ? stored : 20
+    }
     private var batteryAlarmEnabled: Bool {
         UserDefaults.standard.object(forKey: "dirdiving_watch_alarm_battery_enabled") == nil
             ? true
@@ -94,14 +106,19 @@ final class DiveManager: NSObject, ObservableObject {
     func startStopwatch() {
         guard !isStopwatchRunning else { return }
         isStopwatchRunning = true
+        HapticService.shared.confirm()
         stopwatchTimer?.invalidate()
         stopwatchTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.stopwatchTime += 1 }
         }
     }
 
-    func stopStopwatch() { isStopwatchRunning = false; stopwatchTimer?.invalidate(); stopwatchTimer = nil }
-    func resetStopwatch() { stopStopwatch(); stopwatchTime = 0 }
+    func stopStopwatch() { stopStopwatch(playHaptic: true) }
+    func resetStopwatch() {
+        stopStopwatch(playHaptic: false)
+        stopwatchTime = 0
+        HapticService.shared.confirm()
+    }
     func toggleStopwatch() { isStopwatchRunning ? stopStopwatch() : startStopwatch() }
 
     func startManualDive() {
@@ -201,20 +218,33 @@ final class DiveManager: NSObject, ObservableObject {
     }
 
     private func evaluateDepthAlarm() {
-        guard depthAlarmEnabled, maxDepthMeters > 40 else { return }
-        triggerAlarm("ALLARME PROFONDITÀ > 40 m", lastDate: &lastDepthAlarmDate)
+        let threshold = depthAlarmThresholdMeters
+        guard depthAlarmEnabled, maxDepthMeters > threshold else { return }
+        triggerAlarm("ALLARME PROFONDITÀ > \(Formatters.one(threshold)) m", lastDate: &lastDepthAlarmDate)
     }
 
     private func evaluateRuntimeAlarms() {
-        if runtimeAlarmEnabled, runtime > 60 * 60 {
-            triggerAlarm("ALLARME TEMPO > 60 min", lastDate: &lastRuntimeAlarmDate)
+        let runtimeThreshold = runtimeAlarmThresholdMinutes
+        if runtimeAlarmEnabled, runtime > TimeInterval(runtimeThreshold * 60) {
+            triggerAlarm("ALLARME TEMPO > \(runtimeThreshold) min", lastDate: &lastRuntimeAlarmDate)
         }
         if batteryAlarmEnabled {
             let device = WKInterfaceDevice.current()
             device.isBatteryMonitoringEnabled = true
-            if device.batteryLevel >= 0, device.batteryLevel < 0.2 {
-                triggerAlarm("ALLARME BATTERIA < 20%", lastDate: &lastBatteryAlarmDate)
+            let batteryThreshold = Float(batteryAlarmThresholdPercent) / 100
+            if device.batteryLevel >= 0, device.batteryLevel < batteryThreshold {
+                triggerAlarm("ALLARME BATTERIA < \(batteryAlarmThresholdPercent)%", lastDate: &lastBatteryAlarmDate)
             }
+        }
+    }
+
+    private func stopStopwatch(playHaptic: Bool) {
+        guard isStopwatchRunning || stopwatchTimer != nil else { return }
+        isStopwatchRunning = false
+        stopwatchTimer?.invalidate()
+        stopwatchTimer = nil
+        if playHaptic {
+            HapticService.shared.notify()
         }
     }
 
