@@ -115,6 +115,30 @@ The current code preview is stored at:
 Docs/LiveDiveImmersionPremiumPreview.png
 ```
 
+### Latest Stable iOS UI Alignment
+
+Il companion iOS stabile segue `iOS_look_feel.png` e i riferimenti specifici piu recenti:
+
+- `LogbookView`: titolo Logbook, ricerca scura, stacked dive cards, thumbnail e tabbar con attivo ciano.
+- `DiveDetailView`: tab riepilogo/grafici/dettagli, immagine sito, griglia metriche, grafico profondita ciano, gas card ed export.
+- `PlannerView`: titolo Planner, controllo segmentato modalita, input profilo, gas card con bordo neon e pulsante `Calcola Piano`.
+- `PlanResultView`: tab piano/curva/grafici, griglia riepilogo, tabella piano risalita e curva Bühlmann in pannello scuro.
+- `MoreView` / `Settings`: onboarding operativo, preferenze unita/export, stato Watch sync, cloud backup, retry sync e note Subsurface.
+
+Questi allineamenti sono UI-only: non cambiano calcoli planner, sync, persistenza, data flow, navigazione o modelli.
+
+### Stable UX / Accessibility Corrections
+
+Gli ultimi fix sulla superficie stable separano chiaramente i flussi production dalle funzioni sperimentali:
+
+- Apple Watch `main` espone solo il flusso stabile Diving, bussola, settings, immagini e log.
+- Apnea, Snorkeling e Buddy Assist restano documentati e isolati nei rami experimental.
+- La schermata `Settings` Watch e raggiungibile dalla navigazione principale e collega limiti risalita, allarmi persistenti, info device/batteria, stato GPS, stato sensore profondita, stato sync e preferenza haptic.
+- La bussola Watch usa azioni esplicite `SET BEARING` e `CLEAR`, senza promettere un callback del tasto laterale non controllato dall'app.
+- Le conferme GPS entry/exit sono mostrate dal lifecycle immersione e non usano coordinate finte quando il fix non e disponibile.
+- L'export Watch dalla lista esporta l'ultima immersione e mostra share/error feedback.
+- Il companion iOS stabile espone solo `Logbook`, `Planner` e `Settings`; le superfici placeholder `Explore`, `Analysis` e `Equipment` non sono nel tabbar stable.
+- Il planner iOS mostra disclaimer in-app e separa i tab risultato `PIANO`, `CURVA BÜHLMANN` e `GRAFICI`.
 ## Project Structure
 
 ```text
@@ -491,6 +515,10 @@ La selezione modalita su Apple Watch separa:
 - `Diving` su `main`: dive computer principale con profondita, TTV, RunTime, cronometro, gauge risalita, warning, bussola, settings, immagini e log.
 - `Snorkeling` su experimental: navigazione superficie con waypoint, ritorno al punto di partenza, marker/POI e mappe leggere.
 - `Apnea` su experimental: timer apnea, recovery assistant, counter e warning sperimentali.
+
+- `main-iOS` supporta revisione log, planner, settings, sync e export per Diving stabile.
+- Snorkeling companion planning e Apnea Review restano in `codex/ios-experimental-features`.
+- Le funzioni experimental non devono comparire nel tabbar stable senza validazione e merge esplicito.
 
 Le modalita condividono il design system nero/neon, ma non devono condividere logiche safety in modo implicito.
 
