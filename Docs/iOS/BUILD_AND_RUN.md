@@ -29,6 +29,13 @@ The iOS Companion stable branch exposes Logbook, Route Review, Analysis, Planner
 
 UI-only visual alignment must not change planner calculations, sync, persistence, models, managers or navigation flows.
 
+## Pre-release validation TODO
+
+- Verificare su macOS che `xcodegen generate` crei correttamente il progetto dal `project.yml` corrente.
+- Verificare che tutti i PNG referenziati da `iOSApp/Resources/Assets.xcassets/AppIcon.appiconset/Contents.json` siano presenti prima di una build App Store/TestFlight.
+- Eseguire almeno una build `DIRDiving iOS` con Xcode e Apple SDK reali; l'ambiente Windows non puo sostituire questa validazione.
+- Testare import/export CSV con file valido, file vuoto e file malformato prima della promozione release.
+
 ## Signing
 
 Configured values:

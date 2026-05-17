@@ -465,6 +465,22 @@ Gli ultimi aggiornamenti MAIN readiness aggiungono:
 
 Build finale, `xcodegen generate` e `xcodebuild` devono essere eseguiti su macOS.
 
+## Latest MAIN UX Audit And Documentation TODO
+
+Il report pre-modifica MAIN piu recente e:
+
+```text
+Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260517_CURRENT_PRE_MODIFICATION.docx
+```
+
+Stato documentato dopo l'audit:
+
+- Le superfici principali MAIN sono raggiungibili: Apple Watch `Diving`, `BUSSOLA`, settings, immagini, log/export; iOS `Logbook`, `Route Review`, `Analysis`, `Planner`, `Gear`, `Settings`.
+- Restano TODO UX non runtime: empty state iOS, conferme per delete/reset, accessibilita VoiceOver sui controlli custom, spiegazione Action Button/App Intents, e settings iOS realmente editabili o marcati read-only.
+- Restano TODO di allineamento sync: settings Watch/iOS local-only, coda sync ispezionabile per singola sessione, e policy cloud conflict oltre KVS.
+- Restano TODO build/config da verificare su macOS: `WatchSyncAuth` su MAIN usa un helper buddy/key escluso dal target MAIN; l'asset catalog iOS MAIN deve contenere i PNG citati da `AppIcon.appiconset/Contents.json`.
+- Nessun fix runtime e stato applicato durante l'audit; eventuali correzioni devono essere committate separatamente da questa documentazione.
+
 ## Entitlement Status
 
 The entitlements file currently exists at:
