@@ -134,6 +134,22 @@ Imported dives are de-duplicated by session identifier before being saved in the
 
 If a Watch payload conflicts with an existing local session, the companion stores a visible conflict record so the user can keep the local version or accept the Watch version. Deleted local sessions are tracked with tombstones and filtered on KVS reload to reduce accidental reappearance.
 
+## Latest MAIN UX Audit And Documentation TODO
+
+Il report pre-modifica MAIN piu recente e generato sul ramo Watch `main`:
+
+```text
+Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260517_CURRENT_PRE_MODIFICATION.docx
+```
+
+Stato documentato per il companion iOS MAIN:
+
+- Le superfici principali sono raggiungibili: `Logbook`, `Route Review`, `Analysis`, `Planner`, `Gear`, `Settings`.
+- Restano TODO UX non runtime: empty state, conferme per delete/reset, accessibilita VoiceOver sui controlli custom e copy coerente per settings local-only.
+- Restano TODO sync: settings Watch/iOS non sono ancora una pipeline bidirezionale production; i conflitti Watch sono visibili ma richiedono test device e policy prodotto.
+- Restano TODO build/config da verificare su macOS: l'asset catalog iOS MAIN deve contenere i PNG citati da `iOSApp/Resources/Assets.xcassets/AppIcon.appiconset/Contents.json`.
+- Nessun fix runtime e stato applicato durante l'audit; eventuali correzioni devono essere committate separatamente dalla documentazione.
+
 ## Build Notes
 
 Generate the project on macOS:
