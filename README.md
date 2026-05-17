@@ -33,6 +33,15 @@ DIR DIVING is a SwiftUI watchOS application for Apple Watch Ultra-class devices.
 
 Experimental branch documentation is available in [`Docs/EXPERIMENTAL_FEATURES.md`](Docs/EXPERIMENTAL_FEATURES.md).
 
+## Supported Platforms
+
+DIR DIVING e organizzato come progetto XcodeGen multi-target:
+
+- Apple Watch Ultra / watchOS 10+: app principale per Diving mode, bussola, log, GPS entry/exit, export e funzioni sperimentali isolate sui rami dedicati.
+- iPhone / iOS 17+: companion app per logbook, dettaglio immersione, planner, risultato piano, analisi, export e sync WatchConnectivity.
+
+Le istruzioni di build iOS companion sono anche in [`Docs/iOS/BUILD_AND_RUN.md`](Docs/iOS/BUILD_AND_RUN.md).
+
 ## Visual Design Standard
 
 DIR DIVING uses the supplied Apple Watch Ultra dive-computer screenshot as its product visual baseline.
@@ -63,6 +72,17 @@ This premium visual system is now applied across the watch UI, not only the live
 - `DiveLogListView` and `DiveDetailView`: log, detail, chart, GPS, and CSV export screens using the same metric panels and command buttons
 - `UserImagesView`: bundled image selector with the same black canvas and bordered action controls
 
+### iOS Companion Visual Alignment
+
+Il companion iOS stabile segue `iOS_look_feel.png` come riferimento master. Le schermate principali usano sfondo nero, pannelli charcoal, accento ciano, tabbar scura e numeri tecnici leggibili:
+
+- `LogbookView`: titolo Logbook, ricerca scura, lista immersioni a card, thumbnail e tabbar con attivo ciano.
+- `DiveDetailView`: tab riepilogo/grafici/dettagli, immagine sito, griglia metriche, grafico profondita ciano, gas card ed export.
+- `PlannerView`: titolo Planner, controllo segmentato modalita, input profilo, gas card con bordo neon e pulsante `Calcola Piano`.
+- `PlanResultView`: tab piano/curva/grafici, griglia riepilogo, tabella piano risalita e curva Bühlmann in pannello scuro.
+
+Questi allineamenti sono UI-only: non cambiano calcoli planner, sync, persistenza, data flow, navigazione o modelli.
+
 Implementation helpers live in:
 
 ```text
@@ -86,6 +106,7 @@ Docs/LiveDiveImmersionPremiumPreview.png
 ```text
 App/        watchOS app entry point and Info.plist
 Config/     entitlements file
+iOSApp/     iOS companion app, services, views, assets and entitlements
 Models/     dive sessions, samples, GPS points, ascent status
 Services/   dive, GPS, compass, haptics, export, image loading, App Intents
 Utils/      formatting helpers
@@ -132,6 +153,8 @@ Main screens:
 9. Dive log screen
 
 The compass is implemented as a full screen, not as a modal feature that must be launched. Bearing actions are contextual to the compass screen.
+
+Terminologia UI: nelle schermate italiane nuove usare `BUSSOLA`; non introdurre `COMPASSO`.
 
 ## Live Dive Screen
 
@@ -403,6 +426,11 @@ xcodegen generate
 
 Then open the generated Xcode project and build the watchOS target.
 
+Schemes principali generati da `project.yml`:
+
+- `DIRDiving Watch App`
+- `DIRDiving iOS`
+
 This environment cannot run a full watchOS `xcodebuild` validation because Xcode and the Apple watchOS SDK are not available here. Final validation should be performed on macOS with the target Apple Watch hardware or simulator configuration.
 
 ## Entitlement Status
@@ -437,12 +465,29 @@ Regole operative:
 | --- | --- | --- | --- |
 | `main` | Apple Watch | Stable | Diving mode, log, export, bussola, immagini, settings visuali. |
 | `codex/experimental-features` | Apple Watch | Experimental | Snorkeling Live, Mappa Waypoint, Mappa Ritorno, Direzione Waypoint, POI, Apnea, Buddy Assist. |
-| `main-iOS` | iOS Companion | Stable | Logbook, detail, planner/analysis surfaces, WatchConnectivity. |
+| `main-iOS` | iOS Companion | Stable | Logbook, Dive Detail, Planner e Plan Result allineati alla reference iOS, WatchConnectivity, export e analisi. |
 | `codex/ios-experimental-features` | iOS Companion | Experimental | Explore, route planning, waypoint management, future POI enrichment and map/offline workflows. |
 
 ## UI Master References
 
 Le UI Apple Watch devono seguire `MASTER_REFERENCE_DIVING_LIVE.png` come riferimento canonico per densita, gerarchia, colore e bordo. Le UI iOS devono seguire `iOS_look_feel.png`.
+
+Riferimenti recenti per iOS main:
+
+- `ios_logbook_reference.png`
+- `ios_dive_detail_reference.png`
+- `ios_planner_reference.png`
+- `ios_plan_result_reference.png`
+
+Riferimenti recenti per Snorkeling sperimentale:
+
+- `01_snorkeling_live_final.png`
+- `02_Mappa_Waypoint_reference.png`
+- `03_Mappa_Ritorno_reference.png`
+- `04_Direzione_Waypoint_reference.png`
+- `05_Log_Marcatori_POI_AppleWatch_reference.png`
+- `06_Dettaglio_Marcatore_POI_AppleWatch_reference.png`
+- `08_Allarmi_Snorkeling_reference.png`
 
 ## Feature Matrix
 
