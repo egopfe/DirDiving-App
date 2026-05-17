@@ -13,39 +13,47 @@ struct AlarmSettingsView: View {
         ZStack {
             DiveScreenBackground()
 
-            VStack(spacing: 5) {
-                header
+            ScrollView {
+                VStack(spacing: 6) {
+                    header
 
-                Text("ALLARMI")
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
+                    Text("ALLARMI")
+                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
 
-                VStack(spacing: 4) {
-                    alarmRow(title: "Velocità risalita", threshold: "Usa limiti ASC SET", isOn: $ascentAlarmEnabled)
-                    alarmRow(title: "Profondità massima", threshold: "> \(Formatters.one(depthThresholdMeters)) m", isOn: $depthAlarmEnabled)
-                    thresholdStepper(title: "Soglia profondità", value: "\(Formatters.one(depthThresholdMeters)) m", color: DiveUI.blue) {
-                        depthThresholdMeters = max(10, depthThresholdMeters - 1)
-                    } increase: {
-                        depthThresholdMeters = min(100, depthThresholdMeters + 1)
-                    }
-                    alarmRow(title: "Tempo immersione", threshold: "> \(runtimeThresholdMinutes) min", isOn: $runtimeAlarmEnabled)
-                    thresholdStepper(title: "Soglia tempo", value: "\(runtimeThresholdMinutes) min", color: DiveUI.yellow) {
-                        runtimeThresholdMinutes = max(10, runtimeThresholdMinutes - 5)
-                    } increase: {
-                        runtimeThresholdMinutes = min(240, runtimeThresholdMinutes + 5)
-                    }
-                    alarmRow(title: "Batteria bassa", threshold: "< \(batteryThresholdPercent)%", isOn: $batteryAlarmEnabled)
-                    thresholdStepper(title: "Soglia batteria", value: "\(batteryThresholdPercent)%", color: DiveUI.red) {
-                        batteryThresholdPercent = max(5, batteryThresholdPercent - 5)
-                    } increase: {
-                        batteryThresholdPercent = min(50, batteryThresholdPercent + 5)
+                    Text("Soglie locali sul Watch. Non sincronizzate con iPhone.")
+                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                        .foregroundStyle(DiveUI.secondaryText)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    VStack(spacing: 5) {
+                        alarmRow(title: "Velocità risalita", threshold: "Usa limiti ASC SET", isOn: $ascentAlarmEnabled)
+                        alarmRow(title: "Profondità massima", threshold: "> \(Formatters.one(depthThresholdMeters)) m", isOn: $depthAlarmEnabled)
+                        thresholdStepper(title: "Soglia profondità", value: "\(Formatters.one(depthThresholdMeters)) m", color: DiveUI.blue) {
+                            depthThresholdMeters = max(10, depthThresholdMeters - 1)
+                        } increase: {
+                            depthThresholdMeters = min(100, depthThresholdMeters + 1)
+                        }
+                        alarmRow(title: "Tempo immersione", threshold: "> \(runtimeThresholdMinutes) min", isOn: $runtimeAlarmEnabled)
+                        thresholdStepper(title: "Soglia tempo", value: "\(runtimeThresholdMinutes) min", color: DiveUI.yellow) {
+                            runtimeThresholdMinutes = max(10, runtimeThresholdMinutes - 5)
+                        } increase: {
+                            runtimeThresholdMinutes = min(240, runtimeThresholdMinutes + 5)
+                        }
+                        alarmRow(title: "Batteria bassa", threshold: "< \(batteryThresholdPercent)%", isOn: $batteryAlarmEnabled)
+                        thresholdStepper(title: "Soglia batteria", value: "\(batteryThresholdPercent)%", color: DiveUI.red) {
+                            batteryThresholdPercent = max(5, batteryThresholdPercent - 5)
+                        } increase: {
+                            batteryThresholdPercent = min(50, batteryThresholdPercent + 5)
+                        }
                     }
                 }
+                .padding(.horizontal, 11)
+                .padding(.top, 9)
+                .padding(.bottom, 8)
             }
-            .padding(.horizontal, 11)
-            .padding(.top, 9)
-            .padding(.bottom, 8)
         }
     }
 
@@ -117,24 +125,25 @@ struct AlarmSettingsView: View {
 
             Button(action: decrease) {
                 Image(systemName: "minus")
-                    .font(.system(size: 11, weight: .black))
-                    .frame(width: 28, height: 26)
-                    .background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(color.opacity(0.18)))
+                    .font(.system(size: 13, weight: .black))
+                    .frame(width: 40, height: 34)
+                    .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(color.opacity(0.18)))
             }
             .buttonStyle(.plain)
             .foregroundStyle(color)
 
             Button(action: increase) {
                 Image(systemName: "plus")
-                    .font(.system(size: 11, weight: .black))
-                    .frame(width: 28, height: 26)
-                    .background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(color.opacity(0.18)))
+                    .font(.system(size: 13, weight: .black))
+                    .frame(width: 40, height: 34)
+                    .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(color.opacity(0.18)))
             }
             .buttonStyle(.plain)
             .foregroundStyle(color)
         }
         .padding(.horizontal, 8)
-        .padding(.vertical, 5)
+        .padding(.vertical, 6)
+        .frame(minHeight: 46)
         .background(
             RoundedRectangle(cornerRadius: 7, style: .continuous)
                 .fill(color.opacity(0.10))

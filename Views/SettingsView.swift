@@ -49,7 +49,13 @@ struct SettingsView: View {
                         icon: "ruler",
                         iconColor: .white,
                         title: "Unità di misura",
-                        subtitle: "Metrico fisso (m, \u{00B0}C)"
+                        subtitle: "Locale Watch: metrico fisso (m, \u{00B0}C)"
+                    )
+                    settingsRow(
+                        icon: "iphone.slash",
+                        iconColor: DiveUI.yellow,
+                        title: "Sync impostazioni",
+                        subtitle: "Allarmi/haptics locali, non inviati a iPhone"
                     )
                     statusRow(
                         icon: "location.fill",
@@ -67,7 +73,7 @@ struct SettingsView: View {
                         icon: "applewatch.radiowaves.left.and.right",
                         iconColor: watchSync.isSupported ? DiveUI.green : DiveUI.orange,
                         title: "Sync companion",
-                        subtitle: watchSync.lastSyncStatus
+                        subtitle: watchSync.isSupported ? watchSync.lastSyncStatus : "Non disponibile: apri app iPhone"
                     )
                     statusRow(
                         icon: "tray.and.arrow.up",
@@ -101,6 +107,24 @@ struct SettingsView: View {
                         iconColor: DiveUI.yellow,
                         title: "Toni audio",
                         subtitle: "Non usati sott'acqua; feedback via vibrazione"
+                    )
+                    NavigationLink {
+                        WatchShortcutHelpView()
+                    } label: {
+                        settingsRow(
+                            icon: "button.programmable",
+                            iconColor: DiveUI.cyan,
+                            title: "Azione / Comandi",
+                            subtitle: "Setup shortcut se supportato",
+                            showsChevron: true
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    settingsRow(
+                        icon: "hand.tap",
+                        iconColor: dive.isDepthAutomationAvailable ? DiveUI.green : DiveUI.yellow,
+                        title: "Avvio manuale",
+                        subtitle: dive.isDepthAutomationAvailable ? "Fallback solo se sensore non disponibile" : "Disponibile su schermata live"
                     )
                     Toggle(isOn: $hapticsEnabled) {
                         settingsRow(
@@ -206,5 +230,86 @@ struct SettingsView: View {
 
     private func statusRow(icon: String, iconColor: Color, title: String, subtitle: String) -> some View {
         settingsRow(icon: icon, iconColor: iconColor, title: title, subtitle: subtitle)
+    }
+}
+
+private struct WatchShortcutHelpView: View {
+    var body: some View {
+        ZStack {
+            DiveScreenBackground()
+            ScrollView {
+                VStack(spacing: 8) {
+                    header
+                    Text("SHORTCUT")
+                        .font(.system(size: 11, weight: .black, design: .rounded))
+                        .foregroundStyle(.white)
+                    helpPanel(
+                        icon: "stopwatch",
+                        title: "Cronometro",
+                        body: "Configura START/STOP tramite Azione / Comandi Rapidi se watchOS espone l'intent."
+                    )
+                    helpPanel(
+                        icon: "arrow.clockwise",
+                        title: "Reset",
+                        body: "Reset cronometro e disponibile come intent separato quando supportato dal sistema."
+                    )
+                    helpPanel(
+                        icon: "exclamationmark.triangle",
+                        title: "Limite watchOS",
+                        body: "DIR DIVING non puo intercettare direttamente il tasto laterale o una pressione lunga arbitraria."
+                    )
+                    helpPanel(
+                        icon: "hand.tap",
+                        title: "Avvio manuale",
+                        body: "Se il rilevamento automatico profondita non e disponibile, usa AVVIO MANUALE nella schermata live."
+                    )
+                }
+                .padding(.horizontal, 11)
+                .padding(.top, 9)
+                .padding(.bottom, 8)
+            }
+        }
+    }
+
+    private var header: some View {
+        HStack(alignment: .center) {
+            HStack(spacing: 5) {
+                DiveOctopusLogo(accent: DiveUI.yellow)
+                    .frame(width: 23, height: 22, alignment: .leading)
+                    .scaleEffect(0.68)
+                Text("DIR DIVING")
+                    .font(.system(size: 11, weight: .black, design: .rounded))
+                    .foregroundStyle(DiveUI.yellow)
+                    .lineLimit(1)
+            }
+            Spacer()
+            DiveClockText(size: 14)
+        }
+    }
+
+    private func helpPanel(icon: String, title: String, body: String) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(DiveUI.cyan)
+                .frame(width: 24)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.system(size: 12, weight: .black, design: .rounded))
+                    .foregroundStyle(.white)
+                Text(body)
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .foregroundStyle(DiveUI.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(9)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color.black.opacity(0.52))
+                .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(DiveUI.cyan.opacity(0.35), lineWidth: 1))
+        )
     }
 }
