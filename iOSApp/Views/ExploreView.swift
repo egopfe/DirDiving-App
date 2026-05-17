@@ -51,7 +51,7 @@ struct ExploreView: View {
 
     private var routeStatusStrip: some View {
         let routes = routeSummaries
-        HStack(spacing: 12) {
+        return HStack(spacing: 12) {
             routeStatus("ROUTES", "\(routes.count)", DIRTheme.cyan, "point.topleft.down.curvedto.point.bottomright.up")
             routeStatus("DIST", Formatters.zero(totalDistance / 1000), DIRTheme.green, "ruler")
             routeStatus("LATEST", latestBearingText, DIRTheme.yellow, "location.north")
