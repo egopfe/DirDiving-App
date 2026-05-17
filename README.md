@@ -14,8 +14,11 @@ This branch contains the iPhone companion interface for DIR DIVING. It is intent
 - Dive planner with Buhlmann ZH-L16C planning logic.
 - Gas, MOD, decompression, and plan result screens.
 - Equipment screen.
+- Route Review from logged GPS entry/exit points.
+- Persistent equipment profile and checklist.
+- CSV import for compatible dive profiles.
 - Apple Watch log import through WatchConnectivity using direct messages and queued user-info delivery.
-- Local persistence with iCloud Key-Value Store mirroring for logbook sessions and planner inputs.
+- Local persistence with iCloud Key-Value Store mirroring for logbook sessions, planner inputs, equipment profile and deleted-session tombstones.
 - Subsurface CSV export support, including entry and exit GPS columns when available.
 - iOS companion visual system aligned to the supplied dark cyan mockup.
 
@@ -32,6 +35,7 @@ The iOS companion uses the supplied iPhone companion mockup as its product basel
 - Tab-based iPhone navigation.
 - Technical planner surfaces instead of marketing-style pages.
 - No Buddy/BLE screens in this branch.
+- No release-visible mock UI in MAIN; route review, analysis and equipment surfaces must use real local/logbook data or clearly label limitations.
 
 ### Latest Stable iOS UI Alignment
 
@@ -41,7 +45,10 @@ Il companion iOS stabile segue `iOS_look_feel.png` e i riferimenti specifici piu
 - `DiveDetailView`: tab riepilogo/grafici/dettagli, immagine sito, griglia metriche, grafico profondita ciano, gas card ed export.
 - `PlannerView`: titolo Planner, controllo segmentato modalita, input profilo, gas card con bordo neon e pulsante `Calcola Piano`.
 - `PlanResultView`: tab piano/curva/grafici, griglia riepilogo, tabella piano risalita e curva Bühlmann in pannello scuro.
-- `MoreView` / `Settings`: onboarding operativo, preferenze unita/export, stato Watch sync, cloud backup, retry sync e note Subsurface.
+- `ExploreView` / `Route Review`: route calcolate da GPS entry/exit dei log importati o sincronizzati.
+- `AnalysisView`: metriche reali da logbook, SAC medio, distribuzione gas e riepilogo route.
+- `EquipmentView`: profilo attrezzatura persistente, checklist e SAC pianificazione.
+- `MoreView` / `Settings`: onboarding operativo, preferenze locali unita/export, stato Watch sync, conflitti Watch, cloud backup KVS, retry sync e note Subsurface.
 
 Questi allineamenti sono UI-only: non cambiano calcoli planner, sync, persistenza, data flow, navigazione o modelli.
 
@@ -55,7 +62,7 @@ Gli ultimi fix sulla superficie stable separano chiaramente i flussi production 
 - La bussola Watch usa azioni esplicite `SET BEARING` e `CLEAR`, senza promettere un callback del tasto laterale non controllato dall'app.
 - Le conferme GPS entry/exit sono mostrate dal lifecycle immersione e non usano coordinate finte quando il fix non e disponibile.
 - L'export Watch dalla lista esporta l'ultima immersione e mostra share/error feedback.
-- Il companion iOS stabile espone solo `Logbook`, `Planner` e `Settings`; le superfici placeholder `Explore`, `Analysis` e `Equipment` non sono nel tabbar stable.
+- Il companion iOS stabile espone `Logbook`, `Route Review`, `Analysis`, `Planner`, `Gear` e `Settings`; queste superfici usano dati reali locali/logbook o copy esplicita sulle limitazioni.
 - Il planner iOS mostra disclaimer in-app e separa i tab risultato `PIANO`, `CURVA BÜHLMANN` e `GRAFICI`.
 ## Project Structure
 
@@ -101,6 +108,9 @@ Persisted data:
 
 - iOS logbook sessions.
 - Planner mode and gas-planning input.
+- Equipment profile and checklist.
+- Deleted-session tombstones used to avoid restoring removed logs from KVS reloads.
+- Watch sync conflict records for user review.
 
 Implementation:
 
@@ -121,6 +131,8 @@ Supported delivery paths:
 - queued `transferUserInfo` fallback for delivery when the iPhone app becomes available.
 
 Imported dives are de-duplicated by session identifier before being saved in the iOS logbook and mirrored to iCloud when available.
+
+If a Watch payload conflicts with an existing local session, the companion stores a visible conflict record so the user can keep the local version or accept the Watch version. Deleted local sessions are tracked with tombstones and filtered on KVS reload to reduce accidental reappearance.
 
 ## Build Notes
 
@@ -172,14 +184,14 @@ Regole operative:
 | --- | --- | --- | --- |
 | `main` | Apple Watch | Stable | Diving mode, log, export, bussola, immagini, settings raggiungibili, allarmi/haptic persistenti, GPS entry/exit confirmation. |
 | `codex/experimental-features` | Apple Watch | Experimental | Snorkeling Live, Mappa Waypoint, Mappa Ritorno, Direzione Waypoint, POI con log/dettaglio/conferma, allarmi Snorkeling persistenti locali, Apnea, haptics sperimentali e Buddy Assist. |
-| `main-iOS` | iOS Companion | Stable | Logbook, Dive Detail, Planner/Plan Result, Settings, WatchConnectivity, iCloud, onboarding e export Subsurface. |
+| `main-iOS` | iOS Companion | Stable | Logbook, Dive Detail, Route Review, Analysis, Planner/Plan Result, Gear, Settings, WatchConnectivity, iCloud KVS, CSV import/export e Subsurface. |
 | `codex/ios-experimental-features` | iOS Companion | Experimental | Explore Lab, route planning, waypoint management, POI enrichment mock/TODO, Apnea Review interattiva, manifest sync sperimentale e note map/offline. |
 
 ## Mode Availability
 
 La selezione modalita vive sull'app Apple Watch. Dal punto di vista iOS:
 
-- `main-iOS` supporta revisione log, planner, settings, sync e export per Diving stabile.
+- `main-iOS` supporta revisione log, Route Review da GPS entry/exit, Analysis, Gear, planner, settings, sync e export/import CSV per Diving stabile.
 - Snorkeling companion planning e Apnea Review restano in `codex/ios-experimental-features`.
 - Le funzioni experimental non devono comparire nel tabbar stable senza validazione e merge esplicito.
 
@@ -218,6 +230,7 @@ Docs/APNEA_EXPERIMENTAL_SPEC.md
 
 ## iOS Companion Roadmap
 
+- Validare su device iOS file import, share sheet, KVS tombstone e conflitti Watch.
 - Mantenere `Apnea Review` come card UI-only finche i record Apnea Watch non vengono sincronizzati con un modello dedicato.
 - Collegare POI Watch a payload sync leggero e enrichment iOS, includendo queue offline e prevenzione duplicati.
 - Mantenere `Apnea Review` con tab interattivi `Riepilogo`, `Grafico` e `Dettagli`, ma con etichette `Mock` / `TODO` finche non esistono record Apnea sincronizzati.
