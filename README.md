@@ -451,6 +451,21 @@ Schemes principali generati da `project.yml`:
 
 This environment cannot run a full watchOS `xcodebuild` validation because Xcode and the Apple watchOS SDK are not available here. Final validation should be performed on macOS with the target Apple Watch hardware or simulator configuration.
 
+## MAIN Readiness Notes
+
+Gli ultimi aggiornamenti MAIN readiness aggiungono:
+
+- app icon asset reference validation per Watch e iOS;
+- esclusione XcodeGen delle sorgenti experimental dai target MAIN;
+- rimozione della privacy string Bluetooth dal Watch MAIN, perche Buddy Assist non e una funzione production visibile;
+- allarmi Watch con soglie profondita, tempo e batteria editabili/persistite/applicate;
+- haptic feedback per START/STOP/RESET cronometro, rispettando il toggle haptics;
+- iOS Watch sync con conflitti visibili e risoluzione manuale;
+- tombstone iOS per evitare che log cancellati riappaiano da KVS;
+- import CSV iOS, profilo attrezzatura persistente, Route Review e Analysis basati su dati logbook;
+- planner iOS con warning dinamici e copy non certificato.
+
+Build finale, `xcodegen generate` e `xcodebuild` devono essere eseguiti su macOS.
 ## Entitlement Status
 
 The entitlements file currently exists at:
