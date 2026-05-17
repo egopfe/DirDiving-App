@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CompassView: View {
     @EnvironmentObject private var compass: CompassManager
+    @EnvironmentObject private var dive: DiveManager
 
     var body: some View {
         ZStack {
@@ -89,9 +90,34 @@ struct CompassView: View {
     }
 
     private var diveMetricsPanel: some View {
-        HStack(spacing: 7) {
-            inDiveMetric(title: "PROFONDITÀ", value: placeholderDepthText, unit: "m")
-            inDiveMetric(title: "RUNTIME", value: placeholderRuntimeText, unit: nil)
+        VStack(spacing: 6) {
+            if dive.isDiveActive {
+                HStack(spacing: 7) {
+                    inDiveMetric(title: "PROFONDITÀ", value: Formatters.one(dive.currentDepthMeters), unit: "m")
+                    inDiveMetric(title: "RUNTIME", value: Formatters.time(dive.runtime), unit: nil)
+                }
+            } else {
+                Text("Dati immersione non disponibili")
+                    .font(.system(size: 10, weight: .black, design: .rounded))
+                    .foregroundStyle(DiveUI.yellow)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity, minHeight: 39)
+                    .background(
+                        RoundedRectangle(cornerRadius: 7.5, style: .continuous)
+                            .fill(DiveUI.yellow.opacity(0.10))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 7.5, style: .continuous)
+                                    .stroke(DiveUI.yellow.opacity(0.65), lineWidth: 1)
+                            )
+                    )
+            }
+            if dive.isManualLifecycleActive {
+                Text("Sessione manuale: profondità automatica non disponibile")
+                    .font(.system(size: 9, weight: .semibold, design: .rounded))
+                    .foregroundStyle(DiveUI.yellow)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.72)
+            }
         }
     }
 
@@ -198,16 +224,6 @@ struct CompassView: View {
 
     private var headingText: String {
         "\(Int(compass.headingDegrees.rounded()))"
-    }
-
-    private var placeholderDepthText: String {
-        // TODO: Wire to current dive depth if CompassView receives dive context in the future.
-        "21.4"
-    }
-
-    private var placeholderRuntimeText: String {
-        // TODO: Wire to current dive runtime if CompassView receives dive context in the future.
-        "28:47"
     }
 
     private var cardinalMarkers: [CompassMarker] {

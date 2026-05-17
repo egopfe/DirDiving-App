@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import CoreMotion
+import WatchKit
 
 enum DiveGPSConfirmation: Equatable {
     case start(GPSPoint?)
@@ -23,12 +24,22 @@ final class DiveManager: NSObject, ObservableObject {
     @Published var ascentStatus = AscentStatus.make(rate: 0, depth: 0)
     @Published var redWarningBlink = false
     @Published var lastErrorMessage: String?
+    @Published var alarmWarningMessage: String?
     @Published var gpsConfirmation: DiveGPSConfirmation?
+    @Published var isDepthAutomationAvailable = CMWaterSubmersionManager.waterSubmersionAvailable
+    @Published var isManualLifecycleActive = false
 
     private var ascentAlarmEnabled: Bool {
         UserDefaults.standard.object(forKey: "dirdiving_watch_alarm_ascent_enabled") == nil
             ? true
             : UserDefaults.standard.bool(forKey: "dirdiving_watch_alarm_ascent_enabled")
+    }
+    private var depthAlarmEnabled: Bool { UserDefaults.standard.bool(forKey: "dirdiving_watch_alarm_depth_enabled") }
+    private var runtimeAlarmEnabled: Bool { UserDefaults.standard.bool(forKey: "dirdiving_watch_alarm_runtime_enabled") }
+    private var batteryAlarmEnabled: Bool {
+        UserDefaults.standard.object(forKey: "dirdiving_watch_alarm_battery_enabled") == nil
+            ? true
+            : UserDefaults.standard.bool(forKey: "dirdiving_watch_alarm_battery_enabled")
     }
 
     private let logStore: DiveLogStore
@@ -45,6 +56,9 @@ final class DiveManager: NSObject, ObservableObject {
     private var exitGPS: GPSPoint?
     private var previousDepthSample: DiveSample?
     private var isFinalizingDive = false
+    private var lastDepthAlarmDate: Date?
+    private var lastRuntimeAlarmDate: Date?
+    private var lastBatteryAlarmDate: Date?
 
     init(logStore: DiveLogStore, gpsManager: GPSManager, ascentSettings: AscentRateSettingsStore) {
         self.logStore = logStore
@@ -67,9 +81,11 @@ final class DiveManager: NSObject, ObservableObject {
 
     private func configureSubmersion() {
         guard CMWaterSubmersionManager.waterSubmersionAvailable else {
+            isDepthAutomationAvailable = false
             lastErrorMessage = "Sensore immersione non disponibile su questo dispositivo o simulatore."
             return
         }
+        isDepthAutomationAvailable = true
         let manager = CMWaterSubmersionManager()
         manager.delegate = self
         submersionManager = manager
@@ -88,10 +104,22 @@ final class DiveManager: NSObject, ObservableObject {
     func resetStopwatch() { stopStopwatch(); stopwatchTime = 0 }
     func toggleStopwatch() { isStopwatchRunning ? stopStopwatch() : startStopwatch() }
 
-    private func beginDiveIfNeeded() {
+    func startManualDive() {
+        guard !isDepthAutomationAvailable else { return }
+        beginDiveIfNeeded(isManual: true)
+    }
+
+    func endManualDive() {
+        guard isManualLifecycleActive else { return }
+        endDiveIfNeeded(isManual: true)
+    }
+
+    private func beginDiveIfNeeded(isManual: Bool = false) {
         guard !isDiveActive, !isFinalizingDive else { return }
         gpsManager.start()
         isDiveActive = true
+        isManualLifecycleActive = isManual
+        alarmWarningMessage = nil
         sessionStart = Date()
         entryGPS = gpsManager.currentBestPoint()
         let capturedAtStart = entryGPS
@@ -113,16 +141,19 @@ final class DiveManager: NSObject, ObservableObject {
                 guard let self else { return }
                 self.runtime += 1
                 self.ttv = self.averageDepthMeters + (self.runtime / 60.0)
+                self.evaluateRuntimeAlarms()
             }
         }
     }
 
-    private func endDiveIfNeeded() {
+    private func endDiveIfNeeded(isManual: Bool = false) {
         guard isDiveActive, let start = sessionStart, !isFinalizingDive else { return }
         let capturedEntryGPS = entryGPS
         exitGPS = gpsManager.currentBestPoint()
+        let capturedExitGPS = exitGPS
         isDiveActive = false
         isFinalizingDive = true
+        isManualLifecycleActive = false
         runtimeTimer?.invalidate()
         runtimeTimer = nil
         stopBlinking()
@@ -135,9 +166,11 @@ final class DiveManager: NSObject, ObservableObject {
         gpsManager.captureBestEffortPoint(for: 6) { [weak self] point in
             guard let self else { return }
             self.isFinalizingDive = false
-            self.exitGPS = point
-            self.showGPSConfirmation(.end(point))
-            self.finalizeDive(start: start, end: end, entryGPS: capturedEntryGPS, exitGPS: point, samples: finishedSamples)
+            let finalExitGPS = point ?? capturedExitGPS
+            self.exitGPS = finalExitGPS
+            self.showGPSConfirmation(.end(finalExitGPS))
+            self.finalizeDive(start: start, end: end, entryGPS: capturedEntryGPS, exitGPS: finalExitGPS, samples: finishedSamples)
+            self.gpsManager.stop()
         }
     }
 
@@ -162,8 +195,36 @@ final class DiveManager: NSObject, ObservableObject {
         averageDepthMeters = depths.reduce(0, +) / Double(max(depths.count, 1))
         maxDepthMeters = max(maxDepthMeters, sample.depthMeters)
         ttv = averageDepthMeters + (runtime / 60.0)
+        evaluateDepthAlarm()
         updateAscentRate(with: sample)
         previousDepthSample = sample
+    }
+
+    private func evaluateDepthAlarm() {
+        guard depthAlarmEnabled, maxDepthMeters > 40 else { return }
+        triggerAlarm("ALLARME PROFONDITÀ > 40 m", lastDate: &lastDepthAlarmDate)
+    }
+
+    private func evaluateRuntimeAlarms() {
+        if runtimeAlarmEnabled, runtime > 60 * 60 {
+            triggerAlarm("ALLARME TEMPO > 60 min", lastDate: &lastRuntimeAlarmDate)
+        }
+        if batteryAlarmEnabled {
+            let device = WKInterfaceDevice.current()
+            device.isBatteryMonitoringEnabled = true
+            if device.batteryLevel >= 0, device.batteryLevel < 0.2 {
+                triggerAlarm("ALLARME BATTERIA < 20%", lastDate: &lastBatteryAlarmDate)
+            }
+        }
+    }
+
+    private func triggerAlarm(_ message: String, lastDate: inout Date?) {
+        let now = Date()
+        if let lastDate, now.timeIntervalSince(lastDate) < 30 { return }
+        lastDate = now
+        alarmWarningMessage = message
+        HapticService.shared.warnIfNeeded()
+        startBlinking()
     }
 
     private func updateAscentRate(with sample: DiveSample) {

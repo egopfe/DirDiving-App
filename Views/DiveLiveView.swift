@@ -23,6 +23,9 @@ struct DiveLiveView: View {
                         preDiveWaitingContent
                     }
 
+                    if let alarm = dive.alarmWarningMessage {
+                        warningBanner(alarm)
+                    }
                     if let error = dive.lastErrorMessage {
                         warningBanner(error)
                     }
@@ -94,6 +97,11 @@ struct DiveLiveView: View {
                 .lineSpacing(2)
 
             Spacer(minLength: 16)
+
+            if !dive.isDepthAutomationAvailable {
+                manualFallbackPanel
+                Spacer(minLength: 8)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -148,7 +156,7 @@ struct DiveLiveView: View {
         HStack(spacing: 8) {
             Image(systemName: "water.waves")
                 .font(.system(size: 18, weight: .black))
-            Text("IN IMMERSIONE")
+            Text(dive.isManualLifecycleActive ? "IMMERSIONE MANUALE" : "IN IMMERSIONE")
                 .font(.system(size: 15, weight: .black, design: .rounded))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
@@ -313,17 +321,50 @@ struct DiveLiveView: View {
     }
 
     private var controls: some View {
-        HStack(spacing: 7) {
-            DiveCommandButton("START", systemImage: "play.fill", color: DiveUI.green) {
-                dive.startStopwatch()
+        VStack(spacing: 7) {
+            HStack(spacing: 7) {
+                DiveCommandButton("START", systemImage: "play.fill", color: DiveUI.green) {
+                    dive.startStopwatch()
+                }
+                DiveCommandButton("STOP", systemImage: "stop.fill", color: DiveUI.red) {
+                    dive.stopStopwatch()
+                }
+                DiveCommandButton("RESET", systemImage: "arrow.clockwise", color: .white.opacity(0.78)) {
+                    dive.resetStopwatch()
+                }
             }
-            DiveCommandButton("STOP", systemImage: "stop.fill", color: DiveUI.red) {
-                dive.stopStopwatch()
-            }
-            DiveCommandButton("RESET", systemImage: "arrow.clockwise", color: .white.opacity(0.78)) {
-                dive.resetStopwatch()
+            if dive.isManualLifecycleActive {
+                DiveCommandButton("FINE MANUALE", systemImage: "stop.circle.fill", color: DiveUI.red) {
+                    dive.endManualDive()
+                }
             }
         }
+    }
+
+    private var manualFallbackPanel: some View {
+        VStack(spacing: 8) {
+            Text("AUTOMAZIONE PROFONDITÀ NON DISPONIBILE")
+                .font(.system(size: 10, weight: .black, design: .rounded))
+                .foregroundStyle(DiveUI.yellow)
+                .multilineTextAlignment(.center)
+            Text("Puoi registrare una sessione manuale limitata: runtime e GPS sì, profondità automatica no.")
+                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            DiveCommandButton("AVVIO MANUALE", systemImage: "play.circle.fill", color: DiveUI.green) {
+                dive.startManualDive()
+            }
+        }
+        .padding(9)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(DiveUI.yellow.opacity(0.10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(DiveUI.yellow.opacity(0.7), lineWidth: 1)
+                )
+        )
     }
 
     private func warningBanner(_ error: String) -> some View {
