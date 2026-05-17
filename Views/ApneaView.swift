@@ -1580,7 +1580,7 @@ struct ApneaView: View {
 
     private var apneaDepthText: String {
         guard dive.isDepthSensorAvailable else { return "--" }
-        String(format: "%.1f", max(0, dive.currentDepthMeters))
+        return String(format: "%.1f", max(0, dive.currentDepthMeters))
     }
 
     private func apneaElapsedText(defaultText: String) -> String {
