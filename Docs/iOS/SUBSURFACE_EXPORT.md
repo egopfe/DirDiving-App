@@ -19,6 +19,8 @@ time_seconds,depth_m,temperature_c,entry_lat,entry_lon,exit_lat,exit_lon
 
 If the session has no samples, the UI shows an export error instead of a share action.
 
+The stable iOS companion also supports CSV import from Logbook for compatible files with `time_seconds`, `depth_m` and `temperature_c` columns. Optional `entry_lat`, `entry_lon`, `exit_lat` and `exit_lon` columns are preserved as surface GPS metadata.
+
 ### Apple Watch
 
 1. Open the dive log.
@@ -30,4 +32,10 @@ The export code is in:
 
 ```text
 Services/SubsurfaceExportService.swift
+```
+
+Import code on iOS lives in:
+
+```text
+iOSApp/Services/DiveImportService.swift
 ```
