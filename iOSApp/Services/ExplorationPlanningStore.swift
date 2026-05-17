@@ -12,6 +12,8 @@ final class ExplorationPlanningStore: ObservableObject {
     @Published var syncStatus = "Sync sperimentale: non ancora sincronizzato"
     @Published var offlineMapStatus = "MBTiles TODO: cache non implementata"
     @Published var mediaAttachmentStatus = "Media TODO: nessun allegato salvato"
+    @Published var experimentalSyncQueueCount = 0
+    @Published var syncQueueStatus = "Coda experimental vuota"
     private let cloudSync: CloudSyncStore?
     private let key = "dirdiving_ios_exploration_state"
     private var isReady = false
@@ -34,6 +36,8 @@ final class ExplorationPlanningStore: ObservableObject {
             syncStatus = saved.syncStatus
             offlineMapStatus = saved.offlineMapStatus
             mediaAttachmentStatus = saved.mediaAttachmentStatus ?? mediaAttachmentStatus
+            experimentalSyncQueueCount = saved.experimentalSyncQueueCount ?? 0
+            syncQueueStatus = saved.syncQueueStatus ?? syncQueueStatus
             clearPersistedMockSuccessStates()
         }
         isReady = true
@@ -97,11 +101,19 @@ final class ExplorationPlanningStore: ObservableObject {
     }
 
     func syncToWatch() {
-        syncStatus = "Mock UI: nessun invio Watch eseguito. TODO sync iPhone -> Watch waypoints/routes/settings."
+        let envelope = makeRouteManifestEnvelope()
+        enqueueExperimentalSync(envelope, note: "Route manifest pronto per invio Watch")
+        syncStatus = "SYNC QUEUE: \(envelope.kind.rawValue) accodato (\(route.waypoints.count) waypoint). Invio/ACK reale resta LAB."
+        saveIfReady()
     }
 
     func prepareWatchSyncManifest() {
-        syncStatus = "Manifest pronto: \(route.waypoints.count) waypoint, route \(route.name), settings sperimentali. Invio reale TODO."
+        let routeEnvelope = makeRouteManifestEnvelope()
+        let settingsEnvelope = makeSettingsEnvelope()
+        enqueueExperimentalSync(routeEnvelope, note: "Route manifest")
+        enqueueExperimentalSync(settingsEnvelope, note: "Settings manifest")
+        syncStatus = "Manifest accodati: \(routeEnvelope.kind.rawValue) + \(settingsEnvelope.kind.rawValue). Invio reale resta LAB."
+        saveIfReady()
     }
 
     func requestMediaAttachment(_ kind: String) {
@@ -114,12 +126,44 @@ final class ExplorationPlanningStore: ObservableObject {
         saveIfReady()
     }
 
+    func acknowledgeExperimentalQueue() {
+        experimentalSyncQueueCount = 0
+        syncQueueStatus = "Coda marcata come revisionata localmente. Nessun ACK Watch reale."
+        saveIfReady()
+    }
+
     func exportGPX() {
-        exportStatus = "Mock UI: GPX non generato. TODO route export."
+        exportStatus = "MOCK EXPORT: GPX non generato. Contratto route pronto, file reale TODO."
+        saveIfReady()
     }
 
     func exportCSV() {
-        exportStatus = "Mock UI: CSV non generato. TODO POI/route export."
+        exportStatus = "MOCK EXPORT: CSV non generato. POI/route export reale TODO."
+        saveIfReady()
+    }
+
+    func adjustApneaWarning(by delta: Double) {
+        settings.apneaDurationWarningSeconds = min(300, max(30, settings.apneaDurationWarningSeconds + delta))
+        syncStatus = "Settings locali aggiornati: sync Watch TODO"
+        saveIfReady()
+    }
+
+    func adjustRecoveryRatio(by delta: Double) {
+        settings.recoveryRatio = min(4.0, max(1.0, settings.recoveryRatio + delta))
+        syncStatus = "Settings locali aggiornati: sync Watch TODO"
+        saveIfReady()
+    }
+
+    func adjustDriftThreshold(by delta: Double) {
+        settings.driftThresholdMeters = min(1_000, max(50, settings.driftThresholdMeters + delta))
+        syncStatus = "Settings locali aggiornati: sync Watch TODO"
+        saveIfReady()
+    }
+
+    func adjustWaypointAutoSwitch(by delta: Double) {
+        settings.waypointAutoSwitchMeters = min(100, max(5, settings.waypointAutoSwitchMeters + delta))
+        syncStatus = "Settings locali aggiornati: sync Watch TODO"
+        saveIfReady()
     }
 
     private func renumberRoute() {
@@ -140,10 +184,42 @@ final class ExplorationPlanningStore: ObservableObject {
                 exportStatus: exportStatus,
                 syncStatus: syncStatus,
                 offlineMapStatus: offlineMapStatus,
-                mediaAttachmentStatus: mediaAttachmentStatus
+                mediaAttachmentStatus: mediaAttachmentStatus,
+                experimentalSyncQueueCount: experimentalSyncQueueCount,
+                syncQueueStatus: syncQueueStatus
             ),
             forKey: key
         )
+    }
+
+    private func makeRouteManifestEnvelope() -> ExperimentalSyncEnvelope {
+        ExperimentalSyncEnvelope(
+            kind: .companionRouteManifest,
+            payload: [
+                "routeID": route.id.uuidString,
+                "routeName": route.name,
+                "waypointCount": String(route.waypoints.count),
+                "distanceMeters": String(Int(routeDistanceMeters)),
+                "offlineCacheReady": String(route.offlineCacheReady)
+            ]
+        )
+    }
+
+    private func makeSettingsEnvelope() -> ExperimentalSyncEnvelope {
+        ExperimentalSyncEnvelope(
+            kind: .companionSettings,
+            payload: [
+                "apneaDurationWarningSeconds": String(Int(settings.apneaDurationWarningSeconds)),
+                "recoveryRatio": String(settings.recoveryRatio),
+                "driftThresholdMeters": String(Int(settings.driftThresholdMeters)),
+                "waypointAutoSwitchMeters": String(Int(settings.waypointAutoSwitchMeters))
+            ]
+        )
+    }
+
+    private func enqueueExperimentalSync(_ envelope: ExperimentalSyncEnvelope, note: String) {
+        experimentalSyncQueueCount = min(99, experimentalSyncQueueCount + 1)
+        syncQueueStatus = "\(note): \(envelope.kind.rawValue). Coda locale: \(experimentalSyncQueueCount)."
     }
 
     private func clearPersistedMockSuccessStates() {
@@ -175,4 +251,6 @@ private struct ExplorationPlanningState: Codable {
     var syncStatus: String
     var offlineMapStatus: String
     var mediaAttachmentStatus: String?
+    var experimentalSyncQueueCount: Int?
+    var syncQueueStatus: String?
 }

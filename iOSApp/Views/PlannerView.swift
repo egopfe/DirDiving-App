@@ -422,12 +422,20 @@ struct GasMixCard: View {
 struct PlanResultView: View {
     @EnvironmentObject private var store: PlannerStore
     @State private var tab: PlanTab = .plan
+    @State private var exportNotice: String?
 
     var body: some View {
         ZStack {
             DIRBackground()
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
+                    DIRWarningBox(text: "PIANO LAB: calcoli semplificati per revisione UI. Non usare come piano operativo o safety-critical.")
+                    if let exportNotice {
+                        Text(exportNotice)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(DIRTheme.yellow)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
                     resultTabs
                     resultGrid
                     ascentTable
@@ -446,8 +454,13 @@ struct PlanResultView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Image(systemName: "square.and.arrow.up")
-                    .foregroundStyle(DIRTheme.cyan)
+                Button {
+                    exportNotice = "Export piano LAB non generato: serve motore planner validato e formato export approvato."
+                } label: {
+                    Text("EXPORT LAB")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(DIRTheme.yellow)
+                }
             }
         }
     }

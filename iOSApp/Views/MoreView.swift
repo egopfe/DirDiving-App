@@ -4,6 +4,10 @@ struct MoreView: View {
     @EnvironmentObject private var watchSync: WatchSyncService
     @EnvironmentObject private var cloudSync: CloudSyncStore
     @EnvironmentObject private var logStore: DiveLogStore
+    @AppStorage("dirdiving_ios_metric_units") private var metricUnits = true
+    @AppStorage("dirdiving_ios_export_csv_enabled") private var csvExportEnabled = true
+    @AppStorage("dirdiving_ios_watch_sync_diagnostics") private var watchSyncDiagnostics = true
+    @AppStorage("dirdiving_ios_safety_mock_gates") private var safetyMockGates = true
 
     var body: some View {
         NavigationStack {
@@ -23,6 +27,11 @@ struct MoreView: View {
                             row("Supportato", watchSync.isSupported ? "Si" : "No")
                             row("Stato", String(describing: watchSync.activationState))
                             row("Ultimo evento", watchSync.lastMessage)
+                            row("Experimental RX", "\(watchSync.experimentalImportCount)")
+                            Text(watchSync.experimentalImportStatus)
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(DIRTheme.yellow)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                         DIRCard("BACKUP CLOUD", icon: "icloud", accent: DIRTheme.green) {
                             row("iCloud Sync", cloudSync.isICloudAvailable ? "Attivo" : "Non disponibile")
@@ -56,8 +65,22 @@ struct MoreView: View {
                             }
                             .tint(DIRTheme.cyan)
                         }
+                        DIRCard("SETTINGS", icon: "gearshape", accent: DIRTheme.cyan) {
+                            Toggle("Unità metriche (m, °C, bar)", isOn: $metricUnits)
+                                .tint(DIRTheme.cyan)
+                            Toggle("Export CSV abilitato", isOn: $csvExportEnabled)
+                                .tint(DIRTheme.cyan)
+                            Toggle("Diagnostica Watch Sync", isOn: $watchSyncDiagnostics)
+                                .tint(DIRTheme.cyan)
+                            Toggle("Gate safety per mock/lab", isOn: $safetyMockGates)
+                                .tint(DIRTheme.yellow)
+                            Text("Notifiche, permessi media e sync route/settings reale restano LAB finché i servizi non sono produzione-ready.")
+                                .font(.caption)
+                                .foregroundStyle(DIRTheme.yellow)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                         DIRCard("EXPORT", icon: "square.and.arrow.up", accent: DIRTheme.cyan) {
-                            row("Subsurface", "CSV")
+                            row("Subsurface", csvExportEnabled ? "CSV" : "Disabilitato")
                             row("Bundle", "com.egopfe.dirdiving.ios")
                         }
                         DIRWarningBox(text: "DIR DIVING e un supporto informativo per logbook, analisi e pianificazione preliminare.")

@@ -7,6 +7,8 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published var isSupported = WCSession.isSupported()
     @Published var activationState: WCSessionActivationState = .notActivated
     @Published var lastMessage = "Non sincronizzato"
+    @Published var experimentalImportCount = 0
+    @Published var experimentalImportStatus = "Nessun payload experimental ricevuto"
     private weak var logStore: DiveLogStore?
     private var importedSessionIDs: Set<UUID> = []
 
@@ -19,6 +21,9 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     private func importSessionPayload(_ payload: [String: Any]) {
+        if importExperimentalPayload(payload) {
+            return
+        }
         do {
             let session = try WatchDiveSyncCodec.parseSession(from: payload)
             guard !importedSessionIDs.contains(session.id) else { return }
@@ -29,6 +34,17 @@ final class WatchSyncService: NSObject, ObservableObject {
         } catch {
             lastMessage = "Errore sync Watch: \(error.localizedDescription)"
         }
+    }
+
+    private func importExperimentalPayload(_ payload: [String: Any]) -> Bool {
+        guard let envelope = payload["dirdivingExperimentalSync"] as? [String: Any],
+              let kind = envelope["kind"] as? String else {
+            return false
+        }
+        experimentalImportCount += 1
+        experimentalImportStatus = "Ricevuto \(kind). Import completo/merge LAB."
+        lastMessage = "Contratto experimental ricevuto: \(kind)"
+        return true
     }
 }
 
@@ -54,6 +70,17 @@ extension WatchSyncService: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
         Task { @MainActor in
             self.importSessionPayload(message)
+        }
+    }
+
+    nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
+        Task { @MainActor in
+            self.importSessionPayload(message)
+            replyHandler([
+                "ack": true,
+                "experimentalImportCount": self.experimentalImportCount,
+                "status": self.experimentalImportStatus
+            ])
         }
     }
 

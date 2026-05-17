@@ -132,6 +132,10 @@ struct BuddyExperimentalView: View {
                     }
                 }
                 labelValue("Pronto", store.selectedMessage.rawValue)
+                Text(store.canPrepareMessages ? "Messaggi pronti per handoff Watch." : "Messaggi disabilitati: il relay Watch/BLE non è produzione-ready.")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.yellow)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }

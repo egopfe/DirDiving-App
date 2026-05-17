@@ -25,7 +25,7 @@ struct ExplorationCenterView: View {
                         labSection("Apnea Review", subtitle: "Interactive review tabs with mock-data labels")
                         apneaCompanionReview
                         apneaAnalytics
-                        labSection("Experimental Settings", subtitle: "Read-only settings until sync contract exists")
+                        labSection("Experimental Settings", subtitle: "Editable local settings with explicit sync queue status")
                         syncAndSettings
                         exportCard
                     }
@@ -84,8 +84,8 @@ struct ExplorationCenterView: View {
                 }
                 VStack {
                     HStack {
-                        mapBadge("OSM", color: DIRTheme.cyan)
-                        mapBadge("OpenSeaMap", color: DIRTheme.green)
+                        mapBadge("SCHEMATIC", color: DIRTheme.yellow)
+                        mapBadge("NO TILES", color: DIRTheme.orange)
                         Spacer()
                         mapBadge(store.route.offlineCacheReady ? "Offline" : "MBTiles TODO", color: store.route.offlineCacheReady ? DIRTheme.green : DIRTheme.yellow)
                     }
@@ -132,22 +132,22 @@ struct ExplorationCenterView: View {
                     .foregroundStyle(DIRTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                    poiTodoTile("Foto", icon: "photo", note: "TODO media picker") {
+                    poiTodoTile("Foto", icon: "photo", note: "MOCK - no upload") {
                         store.requestMediaAttachment("Foto")
                     }
-                    poiTodoTile("Video", icon: "video", note: "TODO media picker") {
+                    poiTodoTile("Video", icon: "video", note: "MOCK - no upload") {
                         store.requestMediaAttachment("Video")
                     }
-                    poiTodoTile("Commenti", icon: "text.bubble", note: "TODO note editor") {
+                    poiTodoTile("Commenti", icon: "text.bubble", note: "MOCK - no save") {
                         store.requestMediaAttachment("Commenti")
                     }
-                    poiTodoTile("Categoria", icon: "tag", note: "TODO selector") {
+                    poiTodoTile("Categoria", icon: "tag", note: "MOCK selector") {
                         store.requestMediaAttachment("Categoria")
                     }
-                    poiTodoTile("Tag", icon: "number", note: "TODO tags") {
+                    poiTodoTile("Tag", icon: "number", note: "MOCK tags") {
                         store.requestMediaAttachment("Tag")
                     }
-                    poiTodoTile("Specie", icon: "fish", note: "TODO osservazioni") {
+                    poiTodoTile("Specie", icon: "fish", note: "MOCK note") {
                         store.requestMediaAttachment("Specie")
                     }
                 }
@@ -203,7 +203,7 @@ struct ExplorationCenterView: View {
                 Button {
                     store.prepareWatchSyncManifest()
                 } label: {
-                    Label("Prepara manifest Watch", systemImage: "doc.badge.gearshape")
+                        Label("Prepara manifest mock Watch", systemImage: "doc.badge.gearshape")
                         .font(.callout.weight(.semibold))
                         .foregroundStyle(DIRTheme.cyan)
                         .frame(maxWidth: .infinity)
@@ -211,7 +211,7 @@ struct ExplorationCenterView: View {
                         .background(RoundedRectangle(cornerRadius: 9).stroke(DIRTheme.cyan, lineWidth: 1))
                 }
                 .buttonStyle(.plain)
-                Text("Mock workflow: iPhone route -> TODO WatchConnectivity -> TODO cache locale Watch -> TODO disponibilita offline.")
+                Text("MOCK: prepara solo contratto dati locale. Nessun invio WatchConnectivity reale.")
                     .font(.caption)
                     .foregroundStyle(DIRTheme.muted)
             }
@@ -267,9 +267,7 @@ struct ExplorationCenterView: View {
 
                     Spacer()
 
-                    Image(systemName: "ellipsis")
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(DIRTheme.muted)
+                    mapBadge("MOCK DATA", color: DIRTheme.yellow)
                 }
                 .padding(.horizontal, 10)
                 .padding(.top, 6)
@@ -438,17 +436,39 @@ struct ExplorationCenterView: View {
     }
 
     private var syncAndSettings: some View {
-        DIRCard("Sync & Warning Settings", icon: "applewatch", accent: DIRTheme.green) {
+        DIRCard("Experimental Settings", icon: "applewatch", accent: DIRTheme.green) {
             VStack(spacing: 10) {
-                settingRow("Apnea warning", value: "\(Int(store.settings.apneaDurationWarningSeconds)) s")
-                settingRow("Recovery ratio", value: String(format: "%.1fx", store.settings.recoveryRatio))
-                settingRow("Drift threshold", value: "\(Int(store.settings.driftThresholdMeters)) m")
-                settingRow("Auto-switch", value: "\(Int(store.settings.waypointAutoSwitchMeters)) m")
+                adjustableSettingRow("Apnea warning", value: "\(Int(store.settings.apneaDurationWarningSeconds)) s", decrement: { store.adjustApneaWarning(by: -15) }, increment: { store.adjustApneaWarning(by: 15) })
+                adjustableSettingRow("Recovery ratio", value: String(format: "%.1fx", store.settings.recoveryRatio), decrement: { store.adjustRecoveryRatio(by: -0.1) }, increment: { store.adjustRecoveryRatio(by: 0.1) })
+                adjustableSettingRow("Drift threshold", value: "\(Int(store.settings.driftThresholdMeters)) m", decrement: { store.adjustDriftThreshold(by: -25) }, increment: { store.adjustDriftThreshold(by: 25) })
+                adjustableSettingRow("Auto-switch", value: "\(Int(store.settings.waypointAutoSwitchMeters)) m", decrement: { store.adjustWaypointAutoSwitch(by: -5) }, increment: { store.adjustWaypointAutoSwitch(by: 5) })
+                Text("Persistenza locale attiva. iPhone -> Watch settings sync resta TODO.")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(DIRTheme.yellow)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 Divider().overlay(DIRTheme.hairline)
-                syncBoundaryRow("Watch -> iPhone POI", value: "TODO queue + duplicate prevention")
-                syncBoundaryRow("Watch -> iPhone Apnea", value: "TODO records; no sample profile")
-                syncBoundaryRow("iPhone -> Watch route", value: "Manifest mock only")
-                syncBoundaryRow("iPhone -> Watch settings", value: "TODO settings payload")
+                syncBoundaryRow("Watch -> iPhone POI", value: "Envelope received only; merge/enrichment queue LAB")
+                syncBoundaryRow("Watch -> iPhone Apnea", value: "Record envelope only; no sample profile")
+                syncBoundaryRow("iPhone -> Watch route", value: "Local manifest queue")
+                syncBoundaryRow("iPhone -> Watch settings", value: "Local settings payload queue")
+                HStack(spacing: 10) {
+                    DIRMetricTile(title: "Sync queue", value: "\(store.experimentalSyncQueueCount)", color: store.experimentalSyncQueueCount == 0 ? DIRTheme.green : DIRTheme.yellow)
+                    Button {
+                        store.acknowledgeExperimentalQueue()
+                    } label: {
+                        Text("REVISIONA CODA")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(DIRTheme.cyan)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
+                    }
+                    .buttonStyle(.plain)
+                }
+                Text(store.syncQueueStatus)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.yellow)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 Button {
                     store.requestOfflineMapPreparation()
                 } label: {
@@ -476,8 +496,8 @@ struct ExplorationCenterView: View {
         DIRCard("Export", icon: "square.and.arrow.up", accent: DIRTheme.cyan) {
             VStack(spacing: 10) {
                 HStack {
-                    exportButton("GPX", action: store.exportGPX)
-                    exportButton("CSV", action: store.exportCSV)
+                    exportButton("MOCK GPX", action: store.exportGPX)
+                    exportButton("MOCK CSV", action: store.exportCSV)
                 }
                 Text(store.exportStatus)
                     .font(.caption)
@@ -667,6 +687,30 @@ struct ExplorationCenterView: View {
             Text(title).font(.callout).foregroundStyle(.white)
             Spacer()
             Text(value).font(.callout.monospacedDigit()).foregroundStyle(DIRTheme.cyan)
+        }
+    }
+
+    private func adjustableSettingRow(_ title: String, value: String, decrement: @escaping () -> Void, increment: @escaping () -> Void) -> some View {
+        HStack(spacing: 10) {
+            Text(title).font(.callout).foregroundStyle(.white)
+            Spacer()
+            Text(value).font(.callout.monospacedDigit().weight(.semibold)).foregroundStyle(DIRTheme.cyan)
+            Button(action: decrement) {
+                Image(systemName: "minus")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(DIRTheme.cyan)
+                    .frame(width: 30, height: 30)
+                    .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.7), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            Button(action: increment) {
+                Image(systemName: "plus")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(DIRTheme.cyan)
+                    .frame(width: 30, height: 30)
+                    .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.7), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
         }
     }
 

@@ -42,7 +42,8 @@ struct DiveDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Image(systemName: "ellipsis")
+                Text("CSV")
+                    .font(.caption.weight(.bold))
                     .foregroundStyle(DIRTheme.cyan)
             }
         }
@@ -154,14 +155,15 @@ struct DiveDetailView: View {
 
     private var gasBlock: some View {
         DIRCard("GAS UTILIZZATO", icon: nil) {
-            HStack {
-                gasMetric("Inizio", "200", "bar", color: .white)
-                Spacer()
-                Image(systemName: "arrow.right").foregroundStyle(DIRTheme.muted)
-                Spacer()
-                gasMetric("Fine", "50", "bar", color: .white)
-                Spacer()
-                gasMetric("Consumo", "150", "bar", color: DIRTheme.yellow)
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    gasMetric("Gas", session.gasLabel.rawValue, "", color: .white)
+                    Spacer()
+                    gasMetric("Pressioni", "--", "bar", color: DIRTheme.yellow)
+                }
+                Text("Pressioni iniziale/finale non disponibili nel record sincronizzato; valori placeholder rimossi.")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(DIRTheme.yellow)
             }
         }
     }
@@ -232,12 +234,11 @@ struct DiveDetailView: View {
                     .foregroundStyle(DIRTheme.orange)
                     .multilineTextAlignment(.trailing)
             } else {
-                Text("Modifica")
+                Text("Genera CSV per condividere")
                     .font(.callout.weight(.semibold))
-                    .foregroundStyle(DIRTheme.cyan)
+                    .foregroundStyle(DIRTheme.muted)
                     .padding(.horizontal, 18)
                     .padding(.vertical, 10)
-                    .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan, lineWidth: 1))
             }
         }
         .padding(.top, 4)

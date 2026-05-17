@@ -121,6 +121,17 @@ Documented TODO boundaries:
 
 The UI uses `Mock`, `TODO`, `Non ancora sincronizzato` and equivalent labels so experimental surfaces do not imply production sync.
 
+## Latest Blocker Resolution
+
+The latest iOS experimental pass focuses on making incomplete features safe and understandable:
+
+- `PlanResultView` displays `PIANO LAB` and `EXPORT LAB` because the technical planner output is still informational and not certified operational planning.
+- Logbook add/overflow and Dive Detail edit/ellipsis dead affordances are removed or replaced with explicit disabled/lab labels.
+- Dive Detail no longer shows hard-coded gas pressures as if they came from synced session data; unavailable pressures are shown as `--`.
+- Buddy Lab message preparation explains why messages are disabled when the Watch/BLE relay is not production-ready.
+- `WatchSyncService` records experimental import count/status for received envelopes.
+- `ExplorationPlanningStore` persists route/settings queue count and status alongside existing mock export/media/offline states.
+
 ## iCloud Persistence
 
 The branch now includes local persistence plus iCloud Key-Value Store mirroring for iOS companion data.
