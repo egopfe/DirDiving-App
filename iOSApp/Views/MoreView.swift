@@ -25,16 +25,9 @@ struct MoreView: View {
                         systemStatus
                         onboardingCard
                         DIRCard("PREFERENZE APP", icon: "gearshape.fill", accent: DIRTheme.cyan) {
-                            Picker("Unità", selection: $units) {
-                                Text("Metrico (m, °C)").tag("Metrico (m, °C)")
-                            }
-                            .pickerStyle(.menu)
-                            .tint(DIRTheme.cyan)
-                            Picker("Export", selection: $exportFormat) {
-                                Text("Subsurface CSV").tag("Subsurface CSV")
-                            }
-                            .pickerStyle(.menu)
-                            .tint(DIRTheme.cyan)
+                            row("Unità", "\(units) · locale")
+                            row("Export predefinito", exportFormat)
+                            row("Sync impostazioni", "Locale-only")
                             row("Planner safety", "Disclaimer richiesto")
                             row("Permessi", "Gestiti da iOS")
                         }
@@ -44,7 +37,11 @@ struct MoreView: View {
                             row("Esito", watchSync.userVisibleState)
                             row("Import riusciti", "\(watchSync.importedSessionCount)")
                             row("Import falliti", "\(watchSync.failedImportCount)")
+                            row("Conflitti", "\(watchSync.conflicts.count)")
                             row("Ultimo evento", watchSync.lastMessage)
+                            ForEach(watchSync.conflicts) { conflict in
+                                conflictRow(conflict)
+                            }
                             Button {
                                 watchSync.retryActivation(logStore: logStore)
                             } label: {
@@ -59,8 +56,9 @@ struct MoreView: View {
                         }
                         DIRCard("BACKUP CLOUD", icon: "icloud", accent: DIRTheme.green) {
                             row("iCloud Sync", cloudSync.isICloudAvailable ? "Attivo" : "Non disponibile")
-                            row("Backup automatico", "Log e planner")
-                            row("Conflitti", "Risoluzione manuale non disponibile")
+                            row("Backup automatico", "Log, planner e attrezzatura")
+                            row("Conflitti cloud", "Ultimo salvataggio KVS")
+                            row("Eliminazioni", "Rimozione locale + prossima sync")
                             row("Ultimo evento", cloudSync.lastSyncStatus)
                             Button {
                                 logStore.synchronizeCloud()
@@ -93,14 +91,9 @@ struct MoreView: View {
                         DIRCard("EXPORT", icon: "square.and.arrow.up", accent: DIRTheme.cyan) {
                             row("Formato", exportFormat)
                             row("Bundle", "com.egopfe.dirdiving.ios")
-                            row("Import", "Non disponibile in main")
+                            row("Import", "CSV Subsurface da Logbook")
                         }
-                        DIRCard("FUNZIONI FUTURE", icon: "lock", accent: DIRTheme.yellow) {
-                            disabledFeatureRow("Explore", "Coming soon: mappe e route non sono release-ready in main.")
-                            disabledFeatureRow("Analysis", "Coming soon: analytics avanzate restano disabilitate in main.")
-                            disabledFeatureRow("Equipment", "Coming soon: profili attrezzatura richiedono persistenza dedicata.")
-                        }
-                        DIRWarningBox(text: "DIR DIVING e un supporto informativo per logbook, analisi e pianificazione preliminare.")
+                        DIRWarningBox(text: "DIR DIVING non e un computer subacqueo certificato: usa log, planner e analisi come supporto informativo.")
                     }
                     .padding(16)
                 }
@@ -164,24 +157,30 @@ struct MoreView: View {
         .padding(.vertical, 4)
     }
 
-    private func disabledFeatureRow(_ title: String, _ message: String) -> some View {
+    private func conflictRow(_ conflict: WatchSyncService.SyncConflict) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Text(title)
+                Text("Conflitto \(conflict.incoming.startDate.formatted(.dateTime.day().month().hour().minute()))")
                     .font(.callout.weight(.semibold))
                     .foregroundStyle(.white)
                 Spacer()
-                Text("COMING SOON")
+                Text("REVIEW")
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(DIRTheme.yellow)
                     .padding(.horizontal, 7)
                     .padding(.vertical, 3)
                     .background(Capsule().stroke(DIRTheme.yellow.opacity(0.72), lineWidth: 1))
             }
-            Text(message)
+            Text("Locale: \(conflict.localSummary) | Watch: \(Formatters.one(conflict.incoming.maxDepthMeters)) m / \(Formatters.time(conflict.incoming.durationSeconds))")
                 .font(.caption)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
+            HStack(spacing: 8) {
+                Button("Mantieni locale") { watchSync.resolveConflictKeepingLocal(conflict) }
+                Button("Usa Watch") { watchSync.resolveConflictUsingIncoming(conflict) }
+            }
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(DIRTheme.cyan)
         }
         .padding(.vertical, 7)
     }

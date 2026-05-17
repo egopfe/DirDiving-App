@@ -363,6 +363,9 @@ struct PlanResultView: View {
             if let warning = store.buhlmann.warning {
                 Text(warning)
             }
+            ForEach(store.plan.warnings, id: \.self) { warning in
+                Text(warning)
+            }
         }
         .font(.system(size: 11, weight: .semibold, design: .rounded))
         .foregroundStyle(DIRTheme.yellow)

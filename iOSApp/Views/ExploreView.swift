@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct ExploreView: View {
+    @EnvironmentObject private var logStore: DiveLogStore
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -8,12 +10,9 @@ struct ExploreView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 18) {
                         header
-                        mapPreview
                         routeStatusStrip
                         waypointCards
                         routeOverview
-                        snorkelingPresentation
-                        apneaAnalyticsPlaceholders
                         syncExportStatus
                     }
                     .padding(.horizontal, 16)
@@ -28,7 +27,7 @@ struct ExploreView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 7) {
             HStack(alignment: .firstTextBaseline) {
-                Text("Explore")
+                Text("Route Review")
                     .font(.system(size: 32, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                 Spacer()
@@ -39,93 +38,34 @@ struct ExploreView: View {
                     .padding(.vertical, 6)
                     .background(Capsule().fill(DIRTheme.cyan.opacity(0.12)).overlay(Capsule().stroke(DIRTheme.cyan.opacity(0.45), lineWidth: 1)))
             }
-            Text("Marine route concepts, waypoint review and apnea/snorkeling presentation")
+            Text("Route calcolate dai punti GPS entry/exit dei log importati o sincronizzati.")
                 .font(.callout)
                 .foregroundStyle(DIRTheme.muted)
             HStack(spacing: 8) {
                 statusBadge("WAYPOINTS", color: DIRTheme.cyan)
                 statusBadge("ROUTES", color: DIRTheme.green)
-                statusBadge("MAP UI", color: DIRTheme.yellow)
+                statusBadge("GPS LOGS", color: DIRTheme.yellow)
             }
-        }
-    }
-
-    private var mapPreview: some View {
-        DIRCard("MAP PREVIEW", icon: "map", accent: DIRTheme.cyan) {
-            // TODO: Replace this static visual placeholder with a map engine only after map scope is approved.
-            ZStack {
-                RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color(red: 0.0, green: 0.06, blue: 0.08),
-                                Color(red: 0.0, green: 0.015, blue: 0.025)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .overlay(gridOverlay)
-                    .overlay(bathymetryOverlay)
-
-                routeLine
-
-                mapPin(x: -112, y: 44, label: "ENTRY", color: DIRTheme.green)
-                mapPin(x: -42, y: 4, label: "REEF", color: DIRTheme.cyan)
-                mapPin(x: 54, y: -24, label: "WRECK", color: DIRTheme.yellow)
-                mapPin(x: 122, y: -58, label: "EXIT", color: DIRTheme.orange)
-
-                VStack {
-                    HStack {
-                        statusBadge("OFFLINE", color: DIRTheme.green)
-                        statusBadge("OSM", color: DIRTheme.cyan)
-                        Spacer()
-                        statusBadge("UI ONLY", color: DIRTheme.yellow)
-                    }
-                    Spacer()
-                    HStack {
-                        Image(systemName: "location.north.fill")
-                            .font(.title2.weight(.bold))
-                            .foregroundStyle(DIRTheme.cyan)
-                            .rotationEffect(.degrees(38))
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("ROUTE A")
-                                .font(.caption.weight(.bold))
-                                .foregroundStyle(.white)
-                            Text("4 waypoint | 820 m")
-                                .font(.caption2)
-                                .foregroundStyle(DIRTheme.muted)
-                        }
-                        Spacer()
-                    }
-                    .padding(10)
-                    .background(RoundedRectangle(cornerRadius: 10).fill(.black.opacity(0.34)))
-                }
-                .padding(12)
-            }
-            .frame(height: 260)
-            .clipShape(RoundedRectangle(cornerRadius: DIRTheme.cardRadius))
-            .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.cyan.opacity(0.28), lineWidth: 1))
         }
     }
 
     private var routeStatusStrip: some View {
+        let routes = routeSummaries
         HStack(spacing: 12) {
-            routeStatus("ENTRY", "SET", DIRTheme.green, "flag.fill")
-            routeStatus("ROUTE", "A-04", DIRTheme.cyan, "point.topleft.down.curvedto.point.bottomright.up")
-            routeStatus("RETURN", "214 deg", DIRTheme.yellow, "arrow.uturn.backward")
+            routeStatus("ROUTES", "\(routes.count)", DIRTheme.cyan, "point.topleft.down.curvedto.point.bottomright.up")
+            routeStatus("DIST", Formatters.zero(totalDistance / 1000), DIRTheme.green, "ruler")
+            routeStatus("LATEST", latestBearingText, DIRTheme.yellow, "location.north")
         }
     }
 
     private var waypointCards: some View {
         VStack(alignment: .leading, spacing: 10) {
-            DIRSectionHeader(title: "Waypoint hierarchy", subtitle: "Visual-only route list with marine exploration priority")
+            DIRSectionHeader(title: "Waypoint hierarchy", subtitle: "Entry/exit points from real logged GPS data")
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
-                    waypointCard("Entry", "0 m", "Start point", DIRTheme.green, "flag.fill")
-                    waypointCard("Reef Nord", "280 m", "Marine layer", DIRTheme.cyan, "water.waves")
-                    waypointCard("Relitto", "620 m", "Reference", DIRTheme.yellow, "scope")
-                    waypointCard("Exit", "820 m", "Return bearing", DIRTheme.orange, "arrow.uturn.backward.circle")
+                    ForEach(routeSummaries) { route in
+                        waypointCard(route.name, "\(Formatters.zero(route.distanceMeters)) m", route.startDate.formatted(.dateTime.day().month().hour().minute()), DIRTheme.cyan, "mappin.and.ellipse")
+                    }
                 }
                 .padding(.vertical, 2)
             }
@@ -133,69 +73,45 @@ struct ExploreView: View {
     }
 
     private var routeOverview: some View {
-        DIRCard("ROUTE OVERVIEW", icon: "map", accent: DIRTheme.cyan) {
-            // TODO: Keep static until real route calculations are explicitly implemented.
+        DIRCard("ROUTE REVIEW", icon: "point.topleft.down.curvedto.point.bottomright.up", accent: DIRTheme.cyan) {
             VStack(spacing: 0) {
                 HStack(spacing: 0) {
-                    DIRMetricTile(title: "Bearing", value: "038", unit: "deg", color: DIRTheme.cyan, icon: "location.north")
+                    DIRMetricTile(title: "Bearing", value: latestBearingText, unit: nil, color: DIRTheme.cyan, icon: "location.north")
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: "Deviation", value: "+06", unit: "deg", color: DIRTheme.green, icon: "arrow.left.and.right")
+                    DIRMetricTile(title: "Distance", value: Formatters.zero(totalDistance), unit: "m", color: DIRTheme.green, icon: "arrow.left.and.right")
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: "Return", value: "214", unit: "deg", color: DIRTheme.yellow, icon: "arrow.uturn.backward")
+                    DIRMetricTile(title: "Fix", value: "\(routeSummaries.count)", color: DIRTheme.yellow, icon: "flag")
                 }
                 Divider().overlay(DIRTheme.hairline)
                 HStack(spacing: 0) {
-                    DIRMetricTile(title: "Entry", value: "SET", color: DIRTheme.green)
+                    DIRMetricTile(title: "Entry", value: routeSummaries.isEmpty ? "--" : "SET", color: DIRTheme.green)
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: "Exit", value: "READY", color: DIRTheme.cyan)
+                    DIRMetricTile(title: "Exit", value: routeSummaries.isEmpty ? "--" : "SET", color: DIRTheme.cyan)
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: "Drift", value: "LOW", color: DIRTheme.green)
+                    DIRMetricTile(title: "Source", value: "LOG", color: DIRTheme.green)
                 }
-            }
-        }
-    }
-
-    private var snorkelingPresentation: some View {
-        DIRCard("SNORKELING UX", icon: "figure.pool.swim", accent: DIRTheme.green) {
-            // TODO: Visual presentation only; no snorkeling engine, GPS route or sync is implemented here.
-            VStack(spacing: 12) {
-                HStack(spacing: 12) {
-                    progressRing(title: "Route", value: "68%", color: DIRTheme.cyan)
-                    VStack(alignment: .leading, spacing: 9) {
-                        infoRow("Active leg", "Reef Nord -> Relitto", DIRTheme.cyan)
-                        infoRow("Entry distance", "320 m", DIRTheme.yellow)
-                        infoRow("Exit hierarchy", "ENTRY / SAFE / EXIT", DIRTheme.green)
-                    }
-                }
-                HStack(spacing: 8) {
-                    statusBadge("WAYPOINT FIRST", color: DIRTheme.cyan)
-                    statusBadge("ENTRY VISIBLE", color: DIRTheme.green)
-                    statusBadge("DRIFT CUE", color: DIRTheme.yellow)
-                }
-            }
-        }
-    }
-
-    private var apneaAnalyticsPlaceholders: some View {
-        DIRCard("APNEA ANALYTICS", icon: "lungs.fill", accent: DIRTheme.yellow) {
-            // TODO: Static cards only; do not connect to readiness or fatigue analytics until approved.
-            VStack(spacing: 12) {
-                HStack(spacing: 12) {
-                    analyticsTile("Readiness", "--%", DIRTheme.yellow, "bolt.heart")
-                    analyticsTile("Recovery", "2.4x", DIRTheme.green, "timer")
-                    analyticsTile("Fatigue", "N/A", DIRTheme.red, "waveform.path.ecg")
-                }
-                DepthTrendPreview()
-                    .frame(height: 110)
             }
         }
     }
 
     private var syncExportStatus: some View {
         HStack(spacing: 12) {
-            statusCard("SYNC STATUS", "Prepared UI", "applewatch", DIRTheme.cyan)
-            statusCard("EXPORT STATUS", "Placeholder", "square.and.arrow.up", DIRTheme.yellow)
+            statusCard("ROUTE SOURCE", "\(routeSummaries.count) GPS logs", "applewatch", DIRTheme.cyan)
+            statusCard("EXPORT STATUS", "CSV via Logbook", "square.and.arrow.up", DIRTheme.yellow)
         }
+    }
+
+    private var routeSummaries: [RouteSummary] {
+        RouteSummaryService.summaries(from: logStore.sessions)
+    }
+
+    private var totalDistance: Double {
+        routeSummaries.map(\.distanceMeters).reduce(0, +)
+    }
+
+    private var latestBearingText: String {
+        guard let bearing = routeSummaries.first?.bearingDegrees else { return "--" }
+        return Formatters.zero(bearing)
     }
 
     private var gridOverlay: some View {

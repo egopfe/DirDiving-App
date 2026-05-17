@@ -14,6 +14,7 @@ struct DivePlanResult: Hashable {
     let decoStops: [DecoStop]
     let cnsPercent: Double
     let otu: Double
+    let warnings: [String]
 }
 
 struct NDLPoint: Identifiable, Hashable {

@@ -1,8 +1,11 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct LogbookView: View {
     @EnvironmentObject private var logStore: DiveLogStore
     @State private var search = ""
+    @State private var showImporter = false
+    @State private var importMessage: String?
 
     private var filtered: [DiveSession] {
         search.isEmpty ? logStore.sessions : logStore.sessions.filter { ($0.siteName ?? "").localizedCaseInsensitiveContains(search) }
@@ -15,6 +18,7 @@ struct LogbookView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 12) {
                         header
+                        importStatus
                         logbookSearchBar
                         Text("MAGGIO 2024")
                             .font(.system(size: 11, weight: .semibold, design: .rounded))
@@ -56,6 +60,20 @@ struct LogbookView: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
+            .fileImporter(isPresented: $showImporter, allowedContentTypes: [.commaSeparatedText, .plainText]) { result in
+                switch result {
+                case .success(let url):
+                    switch DiveImportService.importCSV(from: url) {
+                    case .success(let session):
+                        logStore.add(session)
+                        importMessage = "Import completato: \(session.siteName ?? "Immersione")"
+                    case .failure(let error):
+                        importMessage = error.localizedDescription
+                    }
+                case .failure(let error):
+                    importMessage = error.localizedDescription
+                }
+            }
         }
     }
 
@@ -67,7 +85,31 @@ struct LogbookView: View {
                     .foregroundStyle(.white)
                     .lineLimit(1)
                 Spacer()
+                Button {
+                    showImporter = true
+                } label: {
+                    Text("IMPORT CSV")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(DIRTheme.cyan)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                        .background(Capsule().stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
+                }
+                .buttonStyle(.plain)
             }
+        }
+    }
+
+    @ViewBuilder
+    private var importStatus: some View {
+        if let importMessage {
+            Text(importMessage)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(importMessage.contains("completato") ? DIRTheme.green : DIRTheme.yellow)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(10)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface.opacity(0.8)))
         }
     }
 

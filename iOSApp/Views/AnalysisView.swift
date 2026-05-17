@@ -18,6 +18,8 @@ struct AnalysisView: View {
                                 DIRMetricTile(title: "Max assoluta", value: Formatters.one(logStore.sessions.map(\.maxDepthMeters).max() ?? 0), unit: "m", color: DIRTheme.yellow)
                                 DIRMetricTile(title: "Runtime totale", value: Formatters.zero(logStore.sessions.map(\.durationSeconds).reduce(0, +) / 60), unit: "min")
                                 DIRMetricTile(title: "Temp media", value: Formatters.one(avgTemp), unit: "C")
+                                DIRMetricTile(title: "SAC medio", value: Formatters.one(avgSAC), unit: "l/min", color: DIRTheme.green)
+                                DIRMetricTile(title: "Route GPS", value: "\(RouteSummaryService.summaries(from: logStore.sessions).count)", color: DIRTheme.cyan)
                             }
                         }
                         DIRCard("PROFONDITA MASSIMA PER IMMERSIONE", icon: "chart.xyaxis.line", accent: DIRTheme.cyan) {
@@ -46,8 +48,8 @@ struct AnalysisView: View {
                             }
                             .frame(height: 240)
                         }
-                        apneaPresentation
-                        snorkelingSummary
+                        gasMixSummary
+                        routeSummary
                     }
                     .padding(16)
                 }
@@ -62,7 +64,7 @@ struct AnalysisView: View {
                 Text("Operational Overview")
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(.white)
-                Text("Logbook trends, apnea readiness presentation and snorkeling summaries")
+                Text("Logbook trends, gas usage and GPS route summaries from real session data")
                     .font(.footnote)
                     .foregroundStyle(DIRTheme.muted)
             }
@@ -86,64 +88,47 @@ struct AnalysisView: View {
         return values.isEmpty ? 0 : values.reduce(0, +) / Double(values.count)
     }
 
+    private var avgSAC: Double {
+        let values = logStore.sessions.compactMap(\.sacLitersMinute)
+        return values.isEmpty ? 0 : values.reduce(0, +) / Double(values.count)
+    }
+
     private var header: some View {
         VStack(alignment: .leading, spacing: 7) {
             Text("Analisi")
                 .font(.system(size: 30, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
-            Text("Clean operational metrics, trends and visual-only experimental summaries")
+            Text("Operational metrics, profile trends and route summaries from real logbook data")
                 .font(.callout)
                 .foregroundStyle(DIRTheme.muted)
         }
     }
 
-    private var apneaPresentation: some View {
-        DIRCard("APNEA READINESS", icon: "lungs.fill", accent: DIRTheme.yellow) {
-            // TODO: Static presentation only; connect readiness, recovery and fatigue analytics after product approval.
-            VStack(spacing: 12) {
-                HStack(spacing: 12) {
-                    analysisPill("Readiness", "--%", DIRTheme.yellow, "heart.fill")
-                    analysisPill("Recovery", "2.4x", DIRTheme.green, "timer")
-                    analysisPill("Fatigue", "N/A", DIRTheme.red, "waveform.path.ecg")
+    private var gasMixSummary: some View {
+        DIRCard("GAS MIX SUMMARY", icon: "circle.hexagongrid", accent: DIRTheme.green) {
+            VStack(spacing: 8) {
+                ForEach(DiveGasLabel.allCases) { gas in
+                    let count = logStore.sessions.filter { $0.gasLabel == gas }.count
+                    HStack {
+                        Text(gas.rawValue).foregroundStyle(.white)
+                        Spacer()
+                        Text("\(count)").foregroundStyle(DIRTheme.cyan).monospacedDigit()
+                    }
+                    .font(.callout.weight(.semibold))
                 }
-                HStack(spacing: 12) {
-                    trendCard("Depth trend", "stable", DIRTheme.cyan)
-                    trendCard("Surface interval", "visual", DIRTheme.green)
-                }
-                apneaDepthPreview
             }
         }
     }
 
-    private var apneaDepthPreview: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("DEPTH CURVE PREVIEW")
-                .font(.caption2.weight(.bold))
-                .foregroundStyle(DIRTheme.cyan)
-            AnalysisDepthTrendPreview()
-                .frame(height: 96)
-        }
-        .padding(12)
-        .background(RoundedRectangle(cornerRadius: DIRTheme.compactRadius).fill(.black.opacity(0.18)))
-    }
-
-    private var snorkelingSummary: some View {
-        DIRCard("SNORKELING SESSION SUMMARY", icon: "figure.pool.swim", accent: DIRTheme.green) {
-            // TODO: Placeholder presentation only; do not implement route analytics here.
-            VStack(spacing: 0) {
-                HStack(spacing: 0) {
-                    DIRMetricTile(title: "Routes", value: "--", color: DIRTheme.cyan)
-                    Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: "Entry/Exit", value: "UI", color: DIRTheme.green)
-                    Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: "Waypoints", value: "--", color: DIRTheme.yellow)
-                }
+    private var routeSummary: some View {
+        let routes = RouteSummaryService.summaries(from: logStore.sessions)
+        return DIRCard("GPS ROUTE SUMMARY", icon: "map", accent: DIRTheme.cyan) {
+            HStack(spacing: 0) {
+                DIRMetricTile(title: "Routes", value: "\(routes.count)", color: DIRTheme.cyan)
                 Divider().overlay(DIRTheme.hairline)
-                Text("Route overview, waypoint lists and entry/exit hierarchy are presented in Explore as UI-only concepts.")
-                    .font(.footnote)
-                    .foregroundStyle(DIRTheme.muted)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, 12)
+                DIRMetricTile(title: "Distance", value: Formatters.zero(routes.map(\.distanceMeters).reduce(0, +) / 1000), unit: "km", color: DIRTheme.green)
+                Divider().overlay(DIRTheme.hairline)
+                DIRMetricTile(title: "Latest", value: routes.first?.bearingDegrees.map { Formatters.zero($0) } ?? "--", unit: routes.first?.bearingDegrees == nil ? nil : "deg", color: DIRTheme.yellow)
             }
         }
     }
