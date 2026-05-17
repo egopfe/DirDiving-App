@@ -3,6 +3,7 @@ import Charts
 
 struct ExplorationCenterView: View {
     @EnvironmentObject private var store: ExplorationPlanningStore
+    @State private var selectedApneaReviewTab: ApneaReviewTab = .summary
 
     var body: some View {
         NavigationStack {
@@ -12,13 +13,19 @@ struct ExplorationCenterView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         header
                         dashboardHero
+                        labSection("Snorkeling Review", subtitle: "Mock route/map review until Watch session sync exists")
                         mapCard
                         conceptStatusStrip
                         ExperimentalFutureConceptsView()
+                        labSection("Waypoint Planning", subtitle: "Configured on iPhone; Watch sync is explicitly TODO")
                         waypointPlanner
                         routeCard
+                        labSection("POI / Osservazioni", subtitle: "Reachable enrichment surface, media/save still TODO")
+                        poiEnrichmentCard
+                        labSection("Apnea Review", subtitle: "Interactive review tabs with mock-data labels")
                         apneaCompanionReview
                         apneaAnalytics
+                        labSection("Experimental Settings", subtitle: "Read-only settings until sync contract exists")
                         syncAndSettings
                         exportCard
                     }
@@ -80,7 +87,7 @@ struct ExplorationCenterView: View {
                         mapBadge("OSM", color: DIRTheme.cyan)
                         mapBadge("OpenSeaMap", color: DIRTheme.green)
                         Spacer()
-                        mapBadge("Offline", color: store.route.offlineCacheReady ? DIRTheme.green : DIRTheme.yellow)
+                        mapBadge(store.route.offlineCacheReady ? "Offline" : "MBTiles TODO", color: store.route.offlineCacheReady ? DIRTheme.green : DIRTheme.yellow)
                     }
                     Spacer()
                     HStack {
@@ -97,6 +104,10 @@ struct ExplorationCenterView: View {
             }
             .clipShape(RoundedRectangle(cornerRadius: DIRTheme.cardRadius))
             .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.cyan.opacity(0.28), lineWidth: 1))
+            Text("TODO map engine: preparare MapLibre/OpenStreetMap/OpenSeaMap compatibile, MBTiles offline, overlay GEBCO/EMODnet e policy anti-abuso tile pubbliche.")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(DIRTheme.yellow)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -105,6 +116,46 @@ struct ExplorationCenterView: View {
             conceptStatus("Marine", "Layers", DIRTheme.green, "leaf.fill")
             conceptStatus("Bathymetry", "Mock", DIRTheme.cyan, "chart.xyaxis.line")
             conceptStatus("Community", "Soon", DIRTheme.yellow, "person.3.fill")
+        }
+    }
+
+    private var poiEnrichmentCard: some View {
+        DIRCard("POI / Osservazioni", icon: "mappin.circle", accent: DIRTheme.green) {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 10) {
+                    mapBadge("DA WATCH", color: DIRTheme.cyan)
+                    mapBadge("ENRICH TODO", color: DIRTheme.yellow)
+                    mapBadge("NO MEDIA SAVE", color: DIRTheme.orange)
+                }
+                Text("Superficie companion per arricchire i MARCATORI creati su Apple Watch. Il sync POI reale non e ancora implementato.")
+                    .font(.footnote)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                    poiTodoTile("Foto", icon: "photo", note: "TODO media picker") {
+                        store.requestMediaAttachment("Foto")
+                    }
+                    poiTodoTile("Video", icon: "video", note: "TODO media picker") {
+                        store.requestMediaAttachment("Video")
+                    }
+                    poiTodoTile("Commenti", icon: "text.bubble", note: "TODO note editor") {
+                        store.requestMediaAttachment("Commenti")
+                    }
+                    poiTodoTile("Categoria", icon: "tag", note: "TODO selector") {
+                        store.requestMediaAttachment("Categoria")
+                    }
+                    poiTodoTile("Tag", icon: "number", note: "TODO tags") {
+                        store.requestMediaAttachment("Tag")
+                    }
+                    poiTodoTile("Specie", icon: "fish", note: "TODO osservazioni") {
+                        store.requestMediaAttachment("Specie")
+                    }
+                }
+                Text(store.mediaAttachmentStatus)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.yellow)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
     }
 
@@ -149,7 +200,18 @@ struct ExplorationCenterView: View {
                     DIRMetricTile(title: "Distanza", value: "\(Int(store.routeDistanceMeters))", unit: "m", color: .white)
                     DIRMetricTile(title: "Cache", value: store.route.offlineCacheReady ? "ON" : "OFF", color: store.route.offlineCacheReady ? DIRTheme.green : DIRTheme.yellow)
                 }
-                Text("Workflow: iPhone route -> WatchConnectivity -> cache locale Watch -> disponibilita offline underwater.")
+                Button {
+                    store.prepareWatchSyncManifest()
+                } label: {
+                    Label("Prepara manifest Watch", systemImage: "doc.badge.gearshape")
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(DIRTheme.cyan)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 11)
+                        .background(RoundedRectangle(cornerRadius: 9).stroke(DIRTheme.cyan, lineWidth: 1))
+                }
+                .buttonStyle(.plain)
+                Text("Mock workflow: iPhone route -> TODO WatchConnectivity -> TODO cache locale Watch -> TODO disponibilita offline.")
                     .font(.caption)
                     .foregroundStyle(DIRTheme.muted)
             }
@@ -188,7 +250,9 @@ struct ExplorationCenterView: View {
         DIRCard("Apnea Review", icon: "waveform.path.ecg", accent: DIRTheme.cyan) {
             VStack(spacing: 0) {
                 HStack {
-                    Button {} label: {
+                    Button {
+                        selectedApneaReviewTab = .summary
+                    } label: {
                         Image(systemName: "chevron.left")
                             .font(.headline.weight(.semibold))
                             .foregroundStyle(DIRTheme.cyan)
@@ -197,7 +261,7 @@ struct ExplorationCenterView: View {
 
                     Spacer()
 
-                    Text("Apnea")
+                    Text("Apnea • MOCK")
                         .font(.headline.weight(.semibold))
                         .foregroundStyle(.white)
 
@@ -212,24 +276,54 @@ struct ExplorationCenterView: View {
                 .padding(.bottom, 12)
 
                 HStack(spacing: 0) {
-                    reviewTab("Riepilogo", isActive: true)
-                    reviewTab("Grafico", isActive: false)
-                    reviewTab("Dettagli", isActive: false)
+                    ForEach(ApneaReviewTab.allCases) { tab in
+                        Button {
+                            selectedApneaReviewTab = tab
+                        } label: {
+                            reviewTab(tab.title, isActive: selectedApneaReviewTab == tab)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
                 .padding(.horizontal, 4)
                 .padding(.bottom, 12)
 
-                apneaReviewMap
-
-                // TODO: Replace placeholder metrics with synced Apnea session values when available.
-                HStack(spacing: 0) {
-                    reviewMetric("22.4", unit: "m", label: "Prof. max")
-                    Rectangle().fill(DIRTheme.hairline).frame(width: 1, height: 44)
-                    reviewMetric("1:55", unit: nil, label: "Tempo")
-                    Rectangle().fill(DIRTheme.hairline).frame(width: 1, height: 44)
-                    reviewMetric("10", unit: "°C", label: "Temp. acqua")
+                switch selectedApneaReviewTab {
+                case .summary:
+                    apneaReviewMap
+                    HStack(spacing: 0) {
+                        reviewMetric("22.4", unit: "m", label: "Prof. max")
+                        Rectangle().fill(DIRTheme.hairline).frame(width: 1, height: 44)
+                        reviewMetric("1:55", unit: nil, label: "Tempo")
+                        Rectangle().fill(DIRTheme.hairline).frame(width: 1, height: 44)
+                        reviewMetric("10", unit: "°C", label: "Temp. acqua")
+                    }
+                    .padding(.top, 14)
+                case .graph:
+                    Chart(store.apneaDurationPoints) { point in
+                        LineMark(x: .value("Dive", point.label), y: .value("Seconds", point.value))
+                            .foregroundStyle(DIRTheme.cyan)
+                        AreaMark(x: .value("Dive", point.label), y: .value("Seconds", point.value))
+                            .foregroundStyle(DIRTheme.cyan.opacity(0.16))
+                    }
+                    .frame(height: 210)
+                    .chartXAxis { AxisMarks(values: .automatic) { AxisValueLabel().foregroundStyle(DIRTheme.muted) } }
+                    .chartYAxis { AxisMarks(values: .automatic) { AxisGridLine().foregroundStyle(DIRTheme.hairline); AxisValueLabel().foregroundStyle(DIRTheme.muted) } }
+                case .details:
+                    VStack(spacing: 10) {
+                        settingRow("Origine dati", value: "Mock locale")
+                        settingRow("Sync Watch", value: "TODO")
+                        settingRow("Campioni profondità", value: "Non sincronizzati")
+                        settingRow("HR / Temp", value: "Placeholder")
+                    }
+                    .padding(12)
+                    .background(RoundedRectangle(cornerRadius: 10).fill(DIRTheme.surface2.opacity(0.56)))
                 }
-                .padding(.top, 14)
+                Text("TODO iOS companion experimental: sostituire questi dati con record Apnea sincronizzati dal Watch.")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(DIRTheme.yellow)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, 12)
             }
         }
     }
@@ -351,9 +445,28 @@ struct ExplorationCenterView: View {
                 settingRow("Drift threshold", value: "\(Int(store.settings.driftThresholdMeters)) m")
                 settingRow("Auto-switch", value: "\(Int(store.settings.waypointAutoSwitchMeters)) m")
                 Divider().overlay(DIRTheme.hairline)
+                syncBoundaryRow("Watch -> iPhone POI", value: "TODO queue + duplicate prevention")
+                syncBoundaryRow("Watch -> iPhone Apnea", value: "TODO records; no sample profile")
+                syncBoundaryRow("iPhone -> Watch route", value: "Manifest mock only")
+                syncBoundaryRow("iPhone -> Watch settings", value: "TODO settings payload")
+                Button {
+                    store.requestOfflineMapPreparation()
+                } label: {
+                    Label("Verifica offline map / MBTiles", systemImage: "map")
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(DIRTheme.yellow)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 11)
+                        .background(RoundedRectangle(cornerRadius: 9).stroke(DIRTheme.yellow, lineWidth: 1))
+                }
+                .buttonStyle(.plain)
                 Text(store.syncStatus)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(DIRTheme.green)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text(store.offlineMapStatus)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.yellow)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
@@ -515,12 +628,66 @@ struct ExplorationCenterView: View {
         .background(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).fill(DIRTheme.surface.opacity(0.74)).overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(color.opacity(0.34), lineWidth: 1)))
     }
 
+    private func labSection(_ title: String, subtitle: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title.uppercased())
+                .font(.caption.weight(.bold))
+                .foregroundStyle(DIRTheme.cyan)
+            Text(subtitle)
+                .font(.caption)
+                .foregroundStyle(DIRTheme.muted)
+        }
+        .padding(.top, 4)
+    }
+
+    private func poiTodoTile(_ title: String, icon: String, note: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 7) {
+                Image(systemName: icon)
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(DIRTheme.cyan)
+                Text(title)
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(.white)
+                Text(note)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(DIRTheme.yellow)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.72)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(12)
+            .background(RoundedRectangle(cornerRadius: 10).fill(DIRTheme.surface2.opacity(0.58)).overlay(RoundedRectangle(cornerRadius: 10).stroke(DIRTheme.cyan.opacity(0.24), lineWidth: 1)))
+        }
+        .buttonStyle(.plain)
+    }
+
     private func settingRow(_ title: String, value: String) -> some View {
         HStack {
             Text(title).font(.callout).foregroundStyle(.white)
             Spacer()
             Text(value).font(.callout.monospacedDigit()).foregroundStyle(DIRTheme.cyan)
         }
+    }
+
+    private func syncBoundaryRow(_ title: String, value: String) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "arrow.triangle.2.circlepath")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(DIRTheme.cyan)
+                .padding(.top, 2)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.white)
+                Text(value)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(DIRTheme.yellow)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(10)
+        .background(RoundedRectangle(cornerRadius: 9).fill(DIRTheme.surface2.opacity(0.46)))
     }
 
     private func exportButton(_ title: String, action: @escaping () -> Void) -> some View {
@@ -553,6 +720,22 @@ struct ExplorationCenterView: View {
             let x = 42 + 278 * progress
             let y = 168 - 82 * sin(progress * .pi) + 28 * sin(progress * .pi * 2)
             return CGPoint(x: x, y: y)
+        }
+    }
+}
+
+private enum ApneaReviewTab: String, CaseIterable, Identifiable {
+    case summary
+    case graph
+    case details
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .summary: return "Riepilogo"
+        case .graph: return "Grafico"
+        case .details: return "Dettagli"
         }
     }
 }

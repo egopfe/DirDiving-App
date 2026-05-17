@@ -8,9 +8,10 @@ final class ExplorationPlanningStore: ObservableObject {
     @Published var settings = ExplorationSettings() {
         didSet { saveIfReady() }
     }
-    @Published var exportStatus = "GPX/CSV pronto"
-    @Published var syncStatus = "WatchConnectivity pronto"
-    @Published var offlineMapStatus = "MBTiles cache pianificata"
+    @Published var exportStatus = "Mock UI: export route non generato"
+    @Published var syncStatus = "Sync sperimentale: non ancora sincronizzato"
+    @Published var offlineMapStatus = "MBTiles TODO: cache non implementata"
+    @Published var mediaAttachmentStatus = "Media TODO: nessun allegato salvato"
     private let cloudSync: CloudSyncStore?
     private let key = "dirdiving_ios_exploration_state"
     private var isReady = false
@@ -23,7 +24,7 @@ final class ExplorationPlanningStore: ObservableObject {
             ExplorationWaypoint(name: "Relitto Basso", category: .wreck, latitude: 42.4036, longitude: 11.2060, colorName: "yellow", routeOrder: 3),
             ExplorationWaypoint(name: "Spot Foto", category: .photography, latitude: 42.4041, longitude: 11.2068, colorName: "white", routeOrder: 4)
         ]
-        route = SnorkelingRoutePlan(name: "Snorkel Mezzo", waypoints: points, offlineCacheReady: true, syncReady: true)
+        route = SnorkelingRoutePlan(name: "Snorkel Mezzo", waypoints: points, offlineCacheReady: false, syncReady: false)
         selectedWaypoint = points.first
         if let saved = cloudSync?.load(ExplorationPlanningState.self, forKey: key) {
             route = saved.route
@@ -32,6 +33,7 @@ final class ExplorationPlanningStore: ObservableObject {
             exportStatus = saved.exportStatus
             syncStatus = saved.syncStatus
             offlineMapStatus = saved.offlineMapStatus
+            mediaAttachmentStatus = saved.mediaAttachmentStatus ?? mediaAttachmentStatus
             clearPersistedMockSuccessStates()
         }
         isReady = true
@@ -78,7 +80,7 @@ final class ExplorationPlanningStore: ObservableObject {
         )
         route.waypoints.append(waypoint)
         selectedWaypoint = waypoint
-        exportStatus = "Route aggiornata"
+        exportStatus = "Waypoint mock aggiunto: export TODO"
         saveIfReady()
     }
 
@@ -95,22 +97,36 @@ final class ExplorationPlanningStore: ObservableObject {
     }
 
     func syncToWatch() {
-        syncStatus = "Mock UI: nessun invio Watch eseguito"
+        syncStatus = "Mock UI: nessun invio Watch eseguito. TODO sync iPhone -> Watch waypoints/routes/settings."
+    }
+
+    func prepareWatchSyncManifest() {
+        syncStatus = "Manifest pronto: \(route.waypoints.count) waypoint, route \(route.name), settings sperimentali. Invio reale TODO."
+    }
+
+    func requestMediaAttachment(_ kind: String) {
+        mediaAttachmentStatus = "\(kind): selezione mock. TODO media picker/storage iOS companion experimental."
+        saveIfReady()
+    }
+
+    func requestOfflineMapPreparation() {
+        offlineMapStatus = "MBTiles TODO: MapLibre/OSM/OpenSeaMap non inizializzati; GEBCO/EMODnet overlay pianificati."
+        saveIfReady()
     }
 
     func exportGPX() {
-        exportStatus = "Mock UI: GPX non generato"
+        exportStatus = "Mock UI: GPX non generato. TODO route export."
     }
 
     func exportCSV() {
-        exportStatus = "Mock UI: CSV non generato"
+        exportStatus = "Mock UI: CSV non generato. TODO POI/route export."
     }
 
     private func renumberRoute() {
         for idx in route.waypoints.indices {
             route.waypoints[idx].routeOrder = idx + 1
         }
-        exportStatus = "Ordine route aggiornato"
+        exportStatus = "Ordine route aggiornato: export TODO"
         saveIfReady()
     }
 
@@ -123,7 +139,8 @@ final class ExplorationPlanningStore: ObservableObject {
                 settings: settings,
                 exportStatus: exportStatus,
                 syncStatus: syncStatus,
-                offlineMapStatus: offlineMapStatus
+                offlineMapStatus: offlineMapStatus,
+                mediaAttachmentStatus: mediaAttachmentStatus
             ),
             forKey: key
         )
@@ -157,4 +174,5 @@ private struct ExplorationPlanningState: Codable {
     var exportStatus: String
     var syncStatus: String
     var offlineMapStatus: String
+    var mediaAttachmentStatus: String?
 }
