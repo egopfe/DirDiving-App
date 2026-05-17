@@ -41,9 +41,22 @@ Il companion iOS stabile segue `iOS_look_feel.png` e i riferimenti specifici piu
 - `DiveDetailView`: tab riepilogo/grafici/dettagli, immagine sito, griglia metriche, grafico profondita ciano, gas card ed export.
 - `PlannerView`: titolo Planner, controllo segmentato modalita, input profilo, gas card con bordo neon e pulsante `Calcola Piano`.
 - `PlanResultView`: tab piano/curva/grafici, griglia riepilogo, tabella piano risalita e curva Bühlmann in pannello scuro.
+- `MoreView` / `Settings`: onboarding operativo, preferenze unita/export, stato Watch sync, cloud backup, retry sync e note Subsurface.
 
 Questi allineamenti sono UI-only: non cambiano calcoli planner, sync, persistenza, data flow, navigazione o modelli.
 
+### Stable UX / Accessibility Corrections
+
+Gli ultimi fix sulla superficie stable separano chiaramente i flussi production dalle funzioni sperimentali:
+
+- Apple Watch `main` espone solo il flusso stabile Diving, bussola, settings, immagini e log.
+- Apnea, Snorkeling e Buddy Assist restano documentati e isolati nei rami experimental.
+- La schermata `Settings` Watch e raggiungibile dalla navigazione principale e collega limiti risalita, allarmi persistenti, info device/batteria, stato GPS, stato sensore profondita, stato sync e preferenza haptic.
+- La bussola Watch usa azioni esplicite `SET BEARING` e `CLEAR`, senza promettere un callback del tasto laterale non controllato dall'app.
+- Le conferme GPS entry/exit sono mostrate dal lifecycle immersione e non usano coordinate finte quando il fix non e disponibile.
+- L'export Watch dalla lista esporta l'ultima immersione e mostra share/error feedback.
+- Il companion iOS stabile espone solo `Logbook`, `Planner` e `Settings`; le superfici placeholder `Explore`, `Analysis` e `Equipment` non sono nel tabbar stable.
+- Il planner iOS mostra disclaimer in-app e separa i tab risultato `PIANO`, `CURVA BÜHLMANN` e `GRAFICI`.
 ## Project Structure
 
 ```text
@@ -149,6 +162,7 @@ Regole operative:
 
 - Il lavoro di allineamento UI-only non deve modificare business logic, calcoli immersione, GPS, algoritmi bussola, persistenza o state machine.
 - Ogni merge verso `main` deve preservare Diving mode, schermata live, warning risalita, haptic behavior, GPS entry/exit e log immersioni.
+- I rami `main` e `main-iOS` non devono esporre Apnea, Snorkeling, Buddy Assist o placeholder sperimentali come flussi production.
 - Le funzioni sperimentali restano isolate finche non sono validate su hardware, build XcodeGen e test manuali.
 - In caso di conflitto, preservare prima codice buildabile e comportamento Diving stabile, poi la UI master reference piu recente, poi gli aggiornamenti documentali.
 
@@ -156,10 +170,20 @@ Regole operative:
 
 | Branch | App | Stato | Note |
 | --- | --- | --- | --- |
-| `main` | Apple Watch | Stable | Diving mode, log, export, bussola, immagini, settings visuali. |
+| `main` | Apple Watch | Stable | Diving mode, log, export, bussola, immagini, settings raggiungibili, allarmi/haptic persistenti, GPS entry/exit confirmation. |
 | `codex/experimental-features` | Apple Watch | Experimental | Snorkeling Live, Mappa Waypoint, Mappa Ritorno, Direzione Waypoint, POI, Apnea, Buddy Assist. |
-| `main-iOS` | iOS Companion | Stable | Logbook, Dive Detail, Planner e Plan Result allineati alla reference iOS, WatchConnectivity, export e analisi. |
+| `main-iOS` | iOS Companion | Stable | Logbook, Dive Detail, Planner/Plan Result, Settings, WatchConnectivity, iCloud, onboarding e export Subsurface. |
 | `codex/ios-experimental-features` | iOS Companion | Experimental | Explore, route planning, waypoint management, future POI enrichment and map/offline workflows. |
+
+## Mode Availability
+
+La selezione modalita vive sull'app Apple Watch. Dal punto di vista iOS:
+
+- `main-iOS` supporta revisione log, planner, settings, sync e export per Diving stabile.
+- Snorkeling companion planning e Apnea Review restano in `codex/ios-experimental-features`.
+- Le funzioni experimental non devono comparire nel tabbar stable senza validazione e merge esplicito.
+
+Le modalita condividono il design system nero/neon, ma non devono condividere logiche safety in modo implicito.
 
 ## UI Master References
 
