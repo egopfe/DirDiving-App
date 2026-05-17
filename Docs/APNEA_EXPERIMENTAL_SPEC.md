@@ -19,8 +19,8 @@ Il flusso sperimentale Apnea e composto da:
 1. Home mode selection con `Apnea` evidenziabile dal selettore modalita.
 2. Menu Apnea con `Sessione`, `Tabelle`, `Statistiche` e `Logbook`.
 3. Selezione tipo sessione con `Acque Libere` attiva e `Dinamica`, `Statica`, `Personalizzata` come placeholder disabilitati.
-4. Configurazione `Acque Libere` con righe UI per allarmi, intervallo superficie e profondita massima.
-5. Countdown `03`, `02`, `01 / VAI` con avanzamento automatico e tap manuale.
+4. Configurazione `Acque Libere` con allarmi raggiungibili, intervallo superficie e profondita massima modificabili.
+5. Countdown `03`, `02`, `01 / VAI` con avanzamento automatico, tap manuale e haptic tick/start.
 6. Surface waiting: sessione attiva in superficie, timer immersione fermo, profondita a zero.
 7. Discesa: avvio automatico del timer Apnea quando la profondita supera la soglia UI di immersione.
 8. Fondo/profondita: visualizzazione grande della profondita e runtime.
@@ -47,16 +47,18 @@ Persistito oggi:
 - timer Apnea e recovery;
 - contatore immersioni;
 - warning Apnea.
+- configurazione locale sperimentale `Intervallo superficie` e `Profondita max allarme` tramite `AppStorage`.
 
-Non ancora persistito perche manca un modello dedicato:
+Non ancora persistito in un modello dedicato perche manca il contratto dati definitivo:
 
-- configurazione dettagliata sessione Apnea;
 - campioni profondita per grafico reale;
 - profondita media;
 - temperatura acqua Apnea;
 - frequenza cardiaca media/massima;
 - velocita discesa/risalita calcolate;
 - tipi sessione diversi da `Acque Libere`.
+
+Il pass corrente aggiunge boundary UI esplicite per `Watch -> iPhone Apnea`: durata, profondita massima e recovery sono disponibili come record locale, mentre profilo campioni reale, queue offline, duplicate prevention e conferma ricezione iPhone restano TODO sync.
 
 ## Sensori e limiti
 
@@ -71,12 +73,14 @@ Il ramo `codex/ios-experimental-features` include una card `Apnea Review` in `Ex
 
 La card mostra:
 
-- header `Apnea`;
-- tab visuali `Riepilogo`, `Grafico`, `Dettagli`;
+- header `Apnea • MOCK`;
+- tab interattivi `Riepilogo`, `Grafico`, `Dettagli`;
 - profilo/percorso mock in stile dark-cyan;
 - metriche placeholder per profondita massima, tempo e temperatura acqua.
 
 La sincronizzazione reale dei record Apnea Watch verso iOS resta TODO. Il companion non cambia runtime Watch, BLE, GPS o persistenza Watch.
+
+Il companion iOS experimental mostra sempre etichette `Mock`, `TODO`, `Non sincronizzato` o equivalenti per evitare di presentare dati locali come sync production.
 
 ## Sicurezza
 
