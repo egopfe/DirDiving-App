@@ -33,6 +33,17 @@ The iOS companion uses the supplied iPhone companion mockup as its product basel
 - Technical planner surfaces instead of marketing-style pages.
 - No Buddy/BLE screens in this branch.
 
+### Latest Stable iOS UI Alignment
+
+Il companion iOS stabile segue `iOS_look_feel.png` e i riferimenti specifici piu recenti:
+
+- `LogbookView`: titolo Logbook, ricerca scura, stacked dive cards, thumbnail e tabbar con attivo ciano.
+- `DiveDetailView`: tab riepilogo/grafici/dettagli, immagine sito, griglia metriche, grafico profondita ciano, gas card ed export.
+- `PlannerView`: titolo Planner, controllo segmentato modalita, input profilo, gas card con bordo neon e pulsante `Calcola Piano`.
+- `PlanResultView`: tab piano/curva/grafici, griglia riepilogo, tabella piano risalita e curva Bühlmann in pannello scuro.
+
+Questi allineamenti sono UI-only: non cambiano calcoli planner, sync, persistenza, data flow, navigazione o modelli.
+
 ## Project Structure
 
 ```text
@@ -108,6 +119,11 @@ xcodegen generate
 
 Then open the generated Xcode project and build the `DIRDiving iOS` target.
 
+Schemes principali generati da `project.yml`:
+
+- `DIRDiving iOS`
+- `DIRDiving Watch App`
+
 This Windows environment cannot run a real `xcodebuild` validation because Xcode and the Apple SDKs are not available here. Final validation should be performed on macOS with Xcode.
 
 ## Documentation
@@ -142,12 +158,19 @@ Regole operative:
 | --- | --- | --- | --- |
 | `main` | Apple Watch | Stable | Diving mode, log, export, bussola, immagini, settings visuali. |
 | `codex/experimental-features` | Apple Watch | Experimental | Snorkeling Live, Mappa Waypoint, Mappa Ritorno, Direzione Waypoint, POI, Apnea, Buddy Assist. |
-| `main-iOS` | iOS Companion | Stable | Logbook, detail, planner/analysis surfaces, WatchConnectivity. |
+| `main-iOS` | iOS Companion | Stable | Logbook, Dive Detail, Planner e Plan Result allineati alla reference iOS, WatchConnectivity, export e analisi. |
 | `codex/ios-experimental-features` | iOS Companion | Experimental | Explore, route planning, waypoint management, future POI enrichment and map/offline workflows. |
 
 ## UI Master References
 
 Le UI Apple Watch devono seguire `MASTER_REFERENCE_DIVING_LIVE.png` come riferimento canonico per densita, gerarchia, colore e bordo. Le UI iOS devono seguire `iOS_look_feel.png`.
+
+Riferimenti recenti per iOS main:
+
+- `ios_logbook_reference.png`
+- `ios_dive_detail_reference.png`
+- `ios_planner_reference.png`
+- `ios_plan_result_reference.png`
 
 ## Feature Matrix
 
