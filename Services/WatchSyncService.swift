@@ -9,6 +9,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published private(set) var isSupported = WCSession.isSupported()
     @Published private(set) var activationState: WCSessionActivationState = .notActivated
     @Published private(set) var lastSyncStatus = "Companion non sincronizzato"
+    @Published private(set) var pendingTransferCount = 0
 
     private var pendingSessions: [DiveSession] = []
     private var peerSecretObserver: NSObjectProtocol?
@@ -48,8 +49,23 @@ final class WatchSyncService: NSObject, ObservableObject {
         } else {
             pendingSessions.append(session)
             pendingSessions = pendingSessions.sorted { $0.startDate > $1.startDate }
+            pendingTransferCount = pendingSessions.count
             WatchSyncAuth.publishSharedSecretIfNeeded()
             lastSyncStatus = "In attesa chiave sync (\(pendingSessions.count) in coda)"
+        }
+    }
+
+    func retryPendingTransfers() {
+        guard WCSession.isSupported() else {
+            lastSyncStatus = "Retry non disponibile: WatchConnectivity non supportato"
+            return
+        }
+        activate()
+        WatchSyncAuth.publishSharedSecretIfNeeded()
+        if WatchSyncAuth.hasPeerSecret() {
+            flushPendingTransfers()
+        } else {
+            lastSyncStatus = "Retry richiesto: in attesa chiave companion (\(pendingTransferCount) in coda)"
         }
     }
 
@@ -57,6 +73,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         guard WatchSyncAuth.hasPeerSecret(), !pendingSessions.isEmpty else { return }
         let queue = pendingSessions
         pendingSessions.removeAll()
+        pendingTransferCount = 0
         for session in queue.reversed() {
             send(session)
         }
@@ -69,7 +86,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             if WCSession.default.isReachable {
                 WCSession.default.sendMessage(payload, replyHandler: nil) { [weak self] error in
                     Task { @MainActor in
-                        self?.lastSyncStatus = "Sync diretto non riuscito: \(error.localizedDescription)"
+                        self?.lastSyncStatus = "Sync diretto fallito; invio in coda: \(error.localizedDescription)"
                         WCSession.default.transferUserInfo(payload)
                     }
                 }
@@ -80,6 +97,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             }
         } catch WatchDiveSyncError.missingPeerSecret {
             pendingSessions.insert(session, at: 0)
+            pendingTransferCount = pendingSessions.count
             WatchSyncAuth.publishSharedSecretIfNeeded()
             lastSyncStatus = "In attesa chiave sync companion"
         } catch {

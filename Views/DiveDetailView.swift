@@ -3,6 +3,9 @@ import SwiftUI
 struct DiveDetailView: View {
     let session: DiveSession
     @State private var exportURL: URL?
+    @State private var exportMessage: String?
+    @State private var exportCompletionFileName: String?
+    @State private var showExportCompletion = false
 
     var body: some View {
         ZStack {
@@ -18,6 +21,9 @@ struct DiveDetailView: View {
             .padding(.horizontal, 10)
             .padding(.top, 9)
             .padding(.bottom, 8)
+        }
+        .navigationDestination(isPresented: $showExportCompletion) {
+            ExportView(fileName: exportCompletionFileName ?? "export.csv")
         }
     }
 
@@ -141,6 +147,14 @@ struct DiveDetailView: View {
         VStack(spacing: 8) {
             Button {
                 exportURL = SubsurfaceExportService.writeCSV(for: session)
+                exportMessage = exportURL == nil ? "Export CSV non riuscito" : nil
+                if let exportURL {
+                    exportCompletionFileName = exportURL.lastPathComponent
+                    showExportCompletion = true
+                    HapticService.shared.confirm()
+                } else {
+                    HapticService.shared.notify()
+                }
             } label: {
                 Text("ESPORTA (SUBSURFACE)")
                     .font(.system(size: 12, weight: .black, design: .rounded))
@@ -175,6 +189,11 @@ struct DiveDetailView: View {
                             .stroke(DiveUI.blue.opacity(0.82), lineWidth: 1)
                     )
                 }
+            } else if let exportMessage {
+                Text(exportMessage)
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .foregroundStyle(DiveUI.yellow)
+                    .multilineTextAlignment(.center)
             }
         }
     }

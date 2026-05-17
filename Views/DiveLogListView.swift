@@ -5,6 +5,8 @@ struct DiveLogListView: View {
     @EnvironmentObject private var watchSync: WatchSyncService
     @State private var listExportURL: URL?
     @State private var listExportMessage: String?
+    @State private var exportCompletionFileName: String?
+    @State private var showExportCompletion = false
 
     var body: some View {
         ZStack {
@@ -24,6 +26,9 @@ struct DiveLogListView: View {
                 .padding(.top, 9)
                 .padding(.bottom, 8)
             }
+        }
+        .navigationDestination(isPresented: $showExportCompletion) {
+            ExportView(fileName: exportCompletionFileName ?? "export.csv")
         }
     }
 
@@ -130,6 +135,8 @@ struct DiveLogListView: View {
                 if listExportURL == nil {
                     HapticService.shared.notify()
                 } else {
+                    exportCompletionFileName = listExportURL?.lastPathComponent
+                    showExportCompletion = true
                     HapticService.shared.confirm()
                 }
             } label: {

@@ -69,6 +69,27 @@ struct SettingsView: View {
                         title: "Sync companion",
                         subtitle: watchSync.lastSyncStatus
                     )
+                    statusRow(
+                        icon: "tray.and.arrow.up",
+                        iconColor: watchSync.pendingTransferCount == 0 ? DiveUI.green : DiveUI.yellow,
+                        title: "Coda sync",
+                        subtitle: "\(watchSync.pendingTransferCount) immersioni in attesa"
+                    )
+                    if watchSync.pendingTransferCount > 0 || watchSync.activationState != .activated {
+                        Button {
+                            watchSync.retryPendingTransfers()
+                            HapticService.shared.notify()
+                        } label: {
+                            settingsRow(
+                                icon: "arrow.triangle.2.circlepath",
+                                iconColor: DiveUI.cyan,
+                                title: "Riprova sync",
+                                subtitle: "Riattiva e svuota la coda se possibile",
+                                showsChevron: true
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
                     settingsRow(
                         icon: "sun.max",
                         iconColor: DiveUI.yellow,
