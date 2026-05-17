@@ -80,7 +80,10 @@ Il companion iOS stabile segue `iOS_look_feel.png` come riferimento master. Le s
 - `DiveDetailView`: tab riepilogo/grafici/dettagli, immagine sito, griglia metriche, grafico profondita ciano, gas card ed export.
 - `PlannerView`: titolo Planner, controllo segmentato modalita, input profilo, gas card con bordo neon e pulsante `Calcola Piano`.
 - `PlanResultView`: tab piano/curva/grafici, griglia riepilogo, tabella piano risalita e curva Bühlmann in pannello scuro.
-- `MoreView` / `Settings`: onboarding operativo, preferenze unita/export, stato Watch sync, cloud backup, retry sync e note Subsurface.
+- `ExploreView` / `Route Review`: revisione route da GPS entry/exit dei log, senza promettere un motore mappe production.
+- `AnalysisView`: metriche logbook reali, SAC medio, distribuzione gas e riepilogo route GPS.
+- `EquipmentView`: profilo attrezzatura persistente, checklist e SAC pianificazione.
+- `MoreView` / `Settings`: onboarding operativo, preferenze locali unita/export, stato Watch sync, conflitti Watch, cloud backup KVS, retry sync e note Subsurface.
 
 Questi allineamenti sono UI-only: non cambiano calcoli planner, sync, persistenza, data flow, navigazione o modelli.
 
@@ -94,7 +97,7 @@ Gli ultimi fix sulla superficie stable separano chiaramente `main` dalle funzion
 - La bussola Watch usa azioni esplicite `SET BEARING` e `CLEAR`, senza promettere un callback del tasto laterale non controllato dall'app.
 - Le conferme GPS entry/exit sono mostrate dal lifecycle immersione e non usano coordinate finte quando il fix non e disponibile.
 - L'export Watch dalla lista esporta l'ultima immersione e mostra share/error feedback.
-- Il companion iOS stabile espone solo `Logbook`, `Planner` e `Settings`; le superfici placeholder `Explore`, `Analysis` e `Equipment` non sono nel tabbar stable.
+- Il companion iOS stabile espone `Logbook`, `Route Review`, `Analysis`, `Planner`, `Gear` e `Settings`; queste superfici usano dati reali locali/logbook o copy esplicita sulle limitazioni.
 - Il planner iOS mostra disclaimer in-app e separa i tab risultato `PIANO`, `CURVA BÜHLMANN` e `GRAFICI`.
 
 Implementation helpers live in:
@@ -123,7 +126,10 @@ Il companion iOS stabile segue `iOS_look_feel.png` e i riferimenti specifici piu
 - `DiveDetailView`: tab riepilogo/grafici/dettagli, immagine sito, griglia metriche, grafico profondita ciano, gas card ed export.
 - `PlannerView`: titolo Planner, controllo segmentato modalita, input profilo, gas card con bordo neon e pulsante `Calcola Piano`.
 - `PlanResultView`: tab piano/curva/grafici, griglia riepilogo, tabella piano risalita e curva Bühlmann in pannello scuro.
-- `MoreView` / `Settings`: onboarding operativo, preferenze unita/export, stato Watch sync, cloud backup, retry sync e note Subsurface.
+- `ExploreView` / `Route Review`: revisione route da GPS entry/exit dei log, senza promettere un motore mappe production.
+- `AnalysisView`: metriche logbook reali, SAC medio, distribuzione gas e riepilogo route GPS.
+- `EquipmentView`: profilo attrezzatura persistente, checklist e SAC pianificazione.
+- `MoreView` / `Settings`: onboarding operativo, preferenze locali unita/export, stato Watch sync, conflitti Watch, cloud backup KVS, retry sync e note Subsurface.
 
 Questi allineamenti sono UI-only: non cambiano calcoli planner, sync, persistenza, data flow, navigazione o modelli.
 
@@ -137,7 +143,7 @@ Gli ultimi fix sulla superficie stable separano chiaramente i flussi production 
 - La bussola Watch usa azioni esplicite `SET BEARING` e `CLEAR`, senza promettere un callback del tasto laterale non controllato dall'app.
 - Le conferme GPS entry/exit sono mostrate dal lifecycle immersione e non usano coordinate finte quando il fix non e disponibile.
 - L'export Watch dalla lista esporta l'ultima immersione e mostra share/error feedback.
-- Il companion iOS stabile espone solo `Logbook`, `Planner` e `Settings`; le superfici placeholder `Explore`, `Analysis` e `Equipment` non sono nel tabbar stable.
+- Il companion iOS stabile espone `Logbook`, `Route Review`, `Analysis`, `Planner`, `Gear` e `Settings`; queste superfici usano dati reali locali/logbook o copy esplicita sulle limitazioni.
 - Il planner iOS mostra disclaimer in-app e separa i tab risultato `PIANO`, `CURVA BÜHLMANN` e `GRAFICI`.
 ## Project Structure
 
@@ -505,7 +511,7 @@ Regole operative:
 | --- | --- | --- | --- |
 | `main` | Apple Watch | Stable | Diving mode, log, export, bussola, immagini, settings raggiungibili, allarmi/haptic persistenti, GPS entry/exit confirmation. |
 | `codex/experimental-features` | Apple Watch | Experimental | Snorkeling Live, Mappa Waypoint, Mappa Ritorno, Direzione Waypoint, POI con log/dettaglio/conferma, allarmi Snorkeling persistenti locali, Apnea, haptics sperimentali e Buddy Assist. |
-| `main-iOS` | iOS Companion | Stable | Logbook, Dive Detail, Planner/Plan Result, Settings, WatchConnectivity, iCloud, onboarding e export Subsurface. |
+| `main-iOS` | iOS Companion | Stable | Logbook, Dive Detail, Route Review, Analysis, Planner/Plan Result, Gear, Settings, WatchConnectivity, iCloud KVS, CSV import/export e Subsurface. |
 | `codex/ios-experimental-features` | iOS Companion | Experimental | Explore Lab, route planning, waypoint management, POI enrichment mock/TODO, Apnea Review interattiva, manifest sync sperimentale e note map/offline. |
 
 ## Mode Selection
