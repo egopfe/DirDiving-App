@@ -78,12 +78,14 @@ struct DiveDetailView: View {
                         .foregroundStyle(.white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.78)
-                    Text("BUDDY")
-                        .font(.system(size: 8, weight: .bold, design: .rounded))
-                        .foregroundStyle(DIRTheme.yellow)
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 1)
-                        .overlay(RoundedRectangle(cornerRadius: 3).stroke(DIRTheme.yellow, lineWidth: 1))
+                    if session.buddy != nil {
+                        Text("BUDDY")
+                            .font(.system(size: 8, weight: .bold, design: .rounded))
+                            .foregroundStyle(DIRTheme.yellow)
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 1)
+                            .overlay(RoundedRectangle(cornerRadius: 3).stroke(DIRTheme.yellow, lineWidth: 1))
+                    }
                 }
                 HStack(spacing: 6) {
                     Image(systemName: "circle")
@@ -185,17 +187,14 @@ struct DiveDetailView: View {
                 .font(.system(size: 11, weight: .bold, design: .rounded))
                 .tracking(0.7)
                 .foregroundStyle(DIRTheme.cyan)
-            HStack {
-                gasMetric("Inizio", "200", "bar", color: .white)
-                Spacer()
-                Image(systemName: "arrow.right")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(DIRTheme.muted)
-                Spacer()
-                gasMetric("Fine", "50", "bar", color: .white)
-                Spacer()
-                gasMetric("Consumo", "150", "bar", color: DIRTheme.yellow)
+            HStack(spacing: 10) {
+                gasMetric("Miscela", session.gasLabel.rawValue, nil, color: .white)
+                gasMetric("Pressioni", "Non disponibile", nil, color: DIRTheme.yellow)
             }
+            Text("Pressioni iniziale/finale e consumo gas non sono presenti nel record sincronizzato.")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .padding(12)
         .background(
@@ -208,21 +207,24 @@ struct DiveDetailView: View {
         )
     }
 
-    private func gasMetric(_ title: String, _ value: String, _ unit: String, color: Color) -> some View {
+    private func gasMetric(_ title: String, _ value: String, _ unit: String?, color: Color) -> some View {
         VStack(alignment: .leading, spacing: 5) {
             Text(title)
                 .font(.system(size: 10, weight: .medium, design: .rounded))
-                .foregroundStyle(title == "Consumo" ? DIRTheme.yellow : DIRTheme.muted)
+                .foregroundStyle(title == "Pressioni" ? DIRTheme.yellow : DIRTheme.muted)
             HStack(alignment: .lastTextBaseline, spacing: 3) {
                 Text(value)
-                    .font(.system(size: 20, weight: .semibold, design: .rounded))
+                    .font(.system(size: title == "Pressioni" ? 14 : 20, weight: .semibold, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(color)
-                Text(unit)
-                    .font(.system(size: 11, weight: .medium, design: .rounded))
-                    .foregroundStyle(DIRTheme.muted)
+                if let unit {
+                    Text(unit)
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
+                        .foregroundStyle(DIRTheme.muted)
+                }
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var temperatureText: String {

@@ -305,11 +305,14 @@ struct PlanResultView: View {
                     switch tab {
                     case .plan:
                         plannerSafetyNotice
+                        modelNotice
                         resultGrid
                         ascentTable
                     case .curve:
+                        modelNotice
                         buhlmannChart
                     case .charts:
+                        modelNotice
                         resultGrid
                         buhlmannChart
                     }
@@ -346,12 +349,26 @@ struct PlanResultView: View {
     }
 
     private var plannerSafetyNotice: some View {
-        Text("Output semplificato per revisione e studio. Non e un piano decompressivo certificato.")
+        Text("MODELLO SEMPLIFICATO: valori indicativi per revisione e studio. Non e un piano decompressivo certificato.")
             .font(.system(size: 11, weight: .semibold, design: .rounded))
             .foregroundStyle(DIRTheme.yellow)
             .fixedSize(horizontal: false, vertical: true)
             .padding(10)
             .modifier(ResultPanelStyle(cornerRadius: 9))
+    }
+
+    private var modelNotice: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text("Valori indicativi calcolati dagli input correnti: \(Formatters.zero(store.input.plannedDepthMeters)) m / \(Formatters.zero(store.input.plannedBottomMinutes)) min / \(store.input.bottomGas.label).")
+            if let warning = store.buhlmann.warning {
+                Text(warning)
+            }
+        }
+        .font(.system(size: 11, weight: .semibold, design: .rounded))
+        .foregroundStyle(DIRTheme.yellow)
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(10)
+        .modifier(ResultPanelStyle(cornerRadius: 9))
     }
 
     private var resultGrid: some View {
@@ -383,7 +400,6 @@ struct PlanResultView: View {
                 .foregroundStyle(DIRTheme.cyan)
             VStack(spacing: 9) {
                 tableRow(["Profondita", "Tempo", "Gas", "PPO2"], isHeader: true)
-                tableRow(["40.0 m", "20 min", "TRIMIX 18/45", "1.30"])
                 ForEach(store.plan.decoStops) { stop in
                     tableRow([
                         "\(Formatters.one(stop.depthMeters)) m",
