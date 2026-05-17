@@ -24,6 +24,7 @@ final class DiveManager: NSObject, ObservableObject {
     @Published var redWarningBlink = false
     @Published var lastErrorMessage: String?
     @Published var gpsConfirmation: DiveGPSConfirmation?
+    @Published var isManualLifecycleActive = false
     @Published var isDepthSensorAvailable = CMWaterSubmersionManager.waterSubmersionAvailable
 
     private let logStore: DiveLogStore
