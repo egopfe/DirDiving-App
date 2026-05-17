@@ -2,6 +2,11 @@ import Foundation
 import Combine
 import CoreMotion
 
+enum DiveGPSConfirmation: Equatable {
+    case start(GPSPoint?)
+    case end(GPSPoint?)
+}
+
 @MainActor
 final class DiveManager: NSObject, ObservableObject {
     static private(set) weak var shared: DiveManager?
@@ -18,6 +23,7 @@ final class DiveManager: NSObject, ObservableObject {
     @Published var ascentStatus = AscentStatus.make(rate: 0, depth: 0)
     @Published var redWarningBlink = false
     @Published var lastErrorMessage: String?
+    @Published var gpsConfirmation: DiveGPSConfirmation?
     @Published var isDepthSensorAvailable = CMWaterSubmersionManager.waterSubmersionAvailable
 
     private let logStore: DiveLogStore
@@ -89,6 +95,7 @@ final class DiveManager: NSObject, ObservableObject {
         gpsManager.captureBestEffortPoint(for: 6) { [weak self] point in
             guard let self, self.isDiveActive, !self.isFinalizingDive else { return }
             self.entryGPS = point ?? capturedAtStart
+            self.showGPSConfirmation(.start(self.entryGPS))
         }
         samples = []
         previousDepthSample = nil
@@ -126,7 +133,9 @@ final class DiveManager: NSObject, ObservableObject {
             guard let self else { return }
             self.isFinalizingDive = false
             self.exitGPS = point
+            self.showGPSConfirmation(.end(point))
             self.finalizeDive(start: start, end: end, entryGPS: capturedEntryGPS, exitGPS: point, samples: finishedSamples)
+            self.gpsManager.stop()
         }
     }
 
@@ -178,6 +187,17 @@ final class DiveManager: NSObject, ObservableObject {
     }
 
     private func stopBlinking() { blinkTimer?.invalidate(); blinkTimer = nil; redWarningBlink = false }
+
+    private func showGPSConfirmation(_ confirmation: DiveGPSConfirmation) {
+        gpsConfirmation = confirmation
+        HapticService.shared.confirm()
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 2_400_000_000)
+            if self.gpsConfirmation == confirmation {
+                self.gpsConfirmation = nil
+            }
+        }
+    }
 }
 
 extension DiveManager: CMWaterSubmersionManagerDelegate {
