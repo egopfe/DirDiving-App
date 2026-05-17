@@ -549,6 +549,22 @@ Riferimenti recenti per Snorkeling sperimentale:
 - `06_Dettaglio_Marcatore_POI_AppleWatch_reference.png`
 - `08_Allarmi_Snorkeling_reference.png`
 
+## Latest MAIN UX Audit And Documentation TODO
+
+Il report pre-modifica MAIN piu recente e stato generato sul ramo `main`:
+
+```text
+Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260517_CURRENT_PRE_MODIFICATION.docx
+```
+
+Stato documentato dopo l'audit:
+
+- Le superfici principali MAIN sono raggiungibili: Apple Watch `Diving`, `BUSSOLA`, settings, immagini, log/export; iOS `Logbook`, `Route Review`, `Analysis`, `Planner`, `Gear`, `Settings`.
+- Le superfici di questo ramo restano experimental: Explore Lab, route/waypoint planning, POI enrichment mock/TODO, Apnea Review e queue/status sync sperimentale.
+- Restano TODO UX non runtime: empty state iOS, conferme per delete/reset, accessibilita VoiceOver sui controlli custom, spiegazione Action Button/App Intents, e settings iOS realmente editabili o marcati read-only.
+- Restano TODO build/config da verificare su macOS: `WatchSyncAuth` su MAIN usa un helper buddy/key escluso dal target MAIN; l'asset catalog iOS MAIN deve contenere i PNG citati da `AppIcon.appiconset/Contents.json`.
+- Nessun fix runtime e stato applicato durante l'audit; eventuali correzioni devono essere committate separatamente da questa documentazione.
+
 ## Feature Matrix
 
 La matrice feature aggiornata e in:
