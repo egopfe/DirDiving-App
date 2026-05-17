@@ -80,8 +80,22 @@ Il companion iOS stabile segue `iOS_look_feel.png` come riferimento master. Le s
 - `DiveDetailView`: tab riepilogo/grafici/dettagli, immagine sito, griglia metriche, grafico profondita ciano, gas card ed export.
 - `PlannerView`: titolo Planner, controllo segmentato modalita, input profilo, gas card con bordo neon e pulsante `Calcola Piano`.
 - `PlanResultView`: tab piano/curva/grafici, griglia riepilogo, tabella piano risalita e curva Bühlmann in pannello scuro.
+- `MoreView` / `Settings`: onboarding operativo, preferenze unita/export, stato Watch sync, cloud backup, retry sync e note Subsurface.
 
 Questi allineamenti sono UI-only: non cambiano calcoli planner, sync, persistenza, data flow, navigazione o modelli.
+
+### Stable UX / Accessibility Corrections
+
+Gli ultimi fix sulla superficie stable separano chiaramente `main` dalle funzioni sperimentali:
+
+- Apple Watch `main` espone solo il flusso stabile Diving, bussola, settings, immagini e log.
+- Apnea, Snorkeling e Buddy Assist restano documentati e isolati nei rami experimental.
+- La schermata `Settings` Watch e raggiungibile dalla navigazione principale e collega limiti risalita, allarmi persistenti, info device/batteria, stato GPS, stato sensore profondita, stato sync e preferenza haptic.
+- La bussola Watch usa azioni esplicite `SET BEARING` e `CLEAR`, senza promettere un callback del tasto laterale non controllato dall'app.
+- Le conferme GPS entry/exit sono mostrate dal lifecycle immersione e non usano coordinate finte quando il fix non e disponibile.
+- L'export Watch dalla lista esporta l'ultima immersione e mostra share/error feedback.
+- Il companion iOS stabile espone solo `Logbook`, `Planner` e `Settings`; le superfici placeholder `Explore`, `Analysis` e `Equipment` non sono nel tabbar stable.
+- Il planner iOS mostra disclaimer in-app e separa i tab risultato `PIANO`, `CURVA BÜHLMANN` e `GRAFICI`.
 
 Implementation helpers live in:
 
@@ -140,21 +154,20 @@ On the experimental branch, Snorkeling/Apnea exploration state is also mirrored 
 
 DIR DIVING uses a vertical page-based `TabView`, designed for Apple Watch navigation with the Digital Crown.
 
-Main screens:
+Main screens on `main`:
 
 1. Mode selector screen
 2. Live dive screen
-3. Snorkeling exploration screen
-4. Apnea assistant screen
-5. Compass screen
-6. Ascent-rate settings screen
-7. Buddy Assist screen
-8. User images screen
-9. Dive log screen
+3. Compass screen
+4. Settings screen
+5. User images screen
+6. Dive log screen
 
 The compass is implemented as a full screen, not as a modal feature that must be launched. Bearing actions are contextual to the compass screen.
 
 Terminologia UI: nelle schermate italiane nuove usare `BUSSOLA`; non introdurre `COMPASSO`.
+
+Experimental Apnea, Snorkeling and Buddy Assist screens are intentionally not part of `main` navigation. They remain in `codex/experimental-features` until hardware, UX, safety and build validation are complete.
 
 ## Live Dive Screen
 
@@ -350,8 +363,8 @@ Workflow:
 
 1. Open the dive log.
 2. Select a dive.
-3. Tap `Generate Subsurface CSV`.
-4. Tap the share button and send the CSV to iPhone, Mac, Files, AirDrop, or email.
+3. Tap `ESPORTA (SUBSURFACE)` on Watch detail or `Genera CSV Subsurface` on iOS detail.
+4. Tap the share button / `Condividi CSV` and send the CSV to iPhone, Mac, Files, AirDrop, or email.
 5. In Subsurface, open `File > Import > Import log files > CSV`.
 6. Map the columns:
    - `time_seconds` = elapsed time in seconds
@@ -359,6 +372,8 @@ Workflow:
    - `temperature_c` = water temperature in degrees Celsius
 
 The CSV also includes entry and exit latitude/longitude columns when available.
+
+The Watch log list also exposes `ESPORTA ULTIMA (SUBSURFACE)` for the latest saved dive and shows error feedback when no dive can be exported.
 
 ## User Images
 
@@ -456,6 +471,7 @@ Regole operative:
 
 - Il lavoro di allineamento UI-only non deve modificare business logic, calcoli immersione, GPS, algoritmi bussola, persistenza o state machine.
 - Ogni merge verso `main` deve preservare Diving mode, schermata live, warning risalita, haptic behavior, GPS entry/exit e log immersioni.
+- I rami `main` e `main-iOS` non devono esporre Apnea, Snorkeling, Buddy Assist o placeholder sperimentali come flussi production.
 - Le funzioni sperimentali restano isolate finche non sono validate su hardware, build XcodeGen e test manuali.
 - In caso di conflitto, preservare prima codice buildabile e comportamento Diving stabile, poi la UI master reference piu recente, poi gli aggiornamenti documentali.
 
@@ -463,10 +479,20 @@ Regole operative:
 
 | Branch | App | Stato | Note |
 | --- | --- | --- | --- |
-| `main` | Apple Watch | Stable | Diving mode, log, export, bussola, immagini, settings visuali. |
+| `main` | Apple Watch | Stable | Diving mode, log, export, bussola, immagini, settings raggiungibili, allarmi/haptic persistenti, GPS entry/exit confirmation. |
 | `codex/experimental-features` | Apple Watch | Experimental | Snorkeling Live, Mappa Waypoint, Mappa Ritorno, Direzione Waypoint, POI, Apnea, Buddy Assist. |
-| `main-iOS` | iOS Companion | Stable | Logbook, Dive Detail, Planner e Plan Result allineati alla reference iOS, WatchConnectivity, export e analisi. |
+| `main-iOS` | iOS Companion | Stable | Logbook, Dive Detail, Planner/Plan Result, Settings, WatchConnectivity, iCloud, onboarding e export Subsurface. |
 | `codex/ios-experimental-features` | iOS Companion | Experimental | Explore, route planning, waypoint management, future POI enrichment and map/offline workflows. |
+
+## Mode Selection
+
+La selezione modalita su Apple Watch separa:
+
+- `Diving` su `main`: dive computer principale con profondita, TTV, RunTime, cronometro, gauge risalita, warning, bussola, settings, immagini e log.
+- `Snorkeling` su experimental: navigazione superficie con waypoint, ritorno al punto di partenza, marker/POI e mappe leggere.
+- `Apnea` su experimental: timer apnea, recovery assistant, counter e warning sperimentali.
+
+Le modalita condividono il design system nero/neon, ma non devono condividere logiche safety in modo implicito.
 
 ## UI Master References
 
