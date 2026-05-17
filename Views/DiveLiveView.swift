@@ -13,7 +13,9 @@ struct DiveLiveView: View {
                 let leftWidth = contentWidth - gaugeWidth - 8
 
                 VStack(spacing: 7) {
-                    if dive.isDiveActive && dive.ascentStatus.isOverLimit {
+                    if let confirmation = dive.gpsConfirmation {
+                        gpsConfirmationView(confirmation)
+                    } else if dive.isDiveActive && dive.ascentStatus.isOverLimit {
                         AscentWarningView(status: dive.ascentStatus)
                     } else if dive.isDiveActive {
                         activeDiveContent(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
@@ -35,6 +37,16 @@ struct DiveLiveView: View {
             }
         }
         .animation(.easeInOut(duration: 0.18), value: dive.redWarningBlink)
+    }
+
+    @ViewBuilder
+    private func gpsConfirmationView(_ confirmation: DiveGPSConfirmation) -> some View {
+        switch confirmation {
+        case .start(let point):
+            GPSStartRegisteredView(point: point)
+        case .end(let point):
+            GPSEndRegisteredView(point: point)
+        }
     }
 
     private func activeDiveContent(leftWidth: CGFloat, gaugeWidth: CGFloat) -> some View {
@@ -103,11 +115,7 @@ struct DiveLiveView: View {
 
             Spacer()
 
-            // TODO: Replace this visual placeholder if a watch clock value becomes part of the view model.
-            Text("--:--")
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-                .monospacedDigit()
+            DiveClockText(size: 14)
         }
     }
 
@@ -126,10 +134,7 @@ struct DiveLiveView: View {
             Spacer()
 
             VStack(alignment: .trailing, spacing: 1) {
-                // TODO: Replace this visual placeholder if a watch clock value becomes part of the view model.
-                Text("--:--")
-                    .font(.system(size: 20, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
+                DiveClockText(size: 20)
                 HStack(spacing: 3) {
                     Image(systemName: "drop.fill")
                         .font(.system(size: 13, weight: .bold))
@@ -230,7 +235,7 @@ struct DiveLiveView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            Text("PROFONDITA ATTUALE")
+            Text("PROFONDITÀ ATTUALE")
                 .font(.system(size: 15, weight: .black, design: .rounded))
                 .lineLimit(1)
                 .minimumScaleFactor(0.68)

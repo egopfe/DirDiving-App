@@ -3,6 +3,8 @@ import SwiftUI
 struct DiveLogListView: View {
     @EnvironmentObject private var log: DiveLogStore
     @EnvironmentObject private var watchSync: WatchSyncService
+    @State private var listExportURL: URL?
+    @State private var listExportMessage: String?
 
     var body: some View {
         ZStack {
@@ -40,11 +42,7 @@ struct DiveLogListView: View {
 
                 Spacer()
 
-                // TODO: Replace this visual placeholder if a watch clock value becomes part of the view model.
-                Text("--:--")
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .monospacedDigit()
+                DiveClockText(size: 14)
             }
 
             Text("IMMERSIONI")
@@ -119,26 +117,55 @@ struct DiveLogListView: View {
     }
 
     private var exportButton: some View {
-        Button {
-            // TODO: Wire to a list-level Subsurface export when that workflow exists.
-        } label: {
-            Text("ESPORTA (SUBSURFACE)")
-                .font(.system(size: 12, weight: .black, design: .rounded))
-                .foregroundStyle(DiveUI.green)
-                .lineLimit(1)
-                .minimumScaleFactor(0.76)
-                .frame(maxWidth: .infinity, minHeight: 32)
+        VStack(spacing: 5) {
+            Button {
+                guard let latest = log.sessions.first else {
+                    listExportURL = nil
+                    listExportMessage = "Nessuna immersione da esportare"
+                    HapticService.shared.notify()
+                    return
+                }
+                listExportURL = SubsurfaceExportService.writeCSV(for: latest)
+                listExportMessage = listExportURL == nil ? "Export CSV non riuscito" : nil
+                if listExportURL == nil {
+                    HapticService.shared.notify()
+                } else {
+                    HapticService.shared.confirm()
+                }
+            } label: {
+                Text("ESPORTA ULTIMA (SUBSURFACE)")
+                    .font(.system(size: 12, weight: .black, design: .rounded))
+                    .foregroundStyle(DiveUI.green)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.76)
+                    .frame(maxWidth: .infinity, minHeight: 32)
+            }
+            .buttonStyle(.plain)
+            .background(
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .fill(DiveUI.green.opacity(0.12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 9, style: .continuous)
+                            .stroke(DiveUI.green.opacity(0.78), lineWidth: 1.2)
+                    )
+                    .shadow(color: DiveUI.green.opacity(0.18), radius: 5, x: 0, y: 0)
+            )
+
+            if let listExportURL {
+                ShareLink(item: listExportURL) {
+                    Text("CONDIVIDI CSV")
+                        .font(.system(size: 10, weight: .black, design: .rounded))
+                        .foregroundStyle(DiveUI.blue)
+                        .frame(maxWidth: .infinity, minHeight: 26)
+                        .background(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(DiveUI.blue.opacity(0.82), lineWidth: 1))
+                }
+            } else if let listExportMessage {
+                Text(listExportMessage)
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .foregroundStyle(DiveUI.yellow)
+                    .multilineTextAlignment(.center)
+            }
         }
-        .buttonStyle(.plain)
-        .background(
-            RoundedRectangle(cornerRadius: 9, style: .continuous)
-                .fill(DiveUI.green.opacity(0.12))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 9, style: .continuous)
-                        .stroke(DiveUI.green.opacity(0.78), lineWidth: 1.2)
-                )
-                .shadow(color: DiveUI.green.opacity(0.18), radius: 5, x: 0, y: 0)
-        )
     }
 
     private func logRow(session: DiveSession, index: Int) -> some View {

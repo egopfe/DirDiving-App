@@ -9,6 +9,7 @@ struct CompassView: View {
 
             VStack(spacing: 9) {
                 header
+                statusBanner
                 compassDial
                 diveMetricsPanel
                 controls
@@ -21,6 +22,15 @@ struct CompassView: View {
         .onDisappear { compass.stop() }
         .animation(.easeInOut(duration: 0.24), value: compass.headingDegrees)
         .animation(.easeInOut(duration: 0.24), value: compass.bearingDegrees ?? -1)
+    }
+
+    private var statusBanner: some View {
+        Text(compass.statusMessage)
+            .font(.system(size: 9, weight: .semibold, design: .rounded))
+            .foregroundStyle(compass.statusMessage.contains("negato") || compass.statusMessage.contains("non disponibile") ? DiveUI.yellow : DiveUI.secondaryText)
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+            .frame(maxWidth: .infinity)
     }
 
     private var header: some View {
@@ -37,11 +47,7 @@ struct CompassView: View {
 
             Spacer()
 
-            // TODO: Replace this visual placeholder if a watch clock value becomes part of the view model.
-            Text("--:--")
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-                .monospacedDigit()
+            DiveClockText(size: 14)
         }
     }
 
@@ -123,28 +129,52 @@ struct CompassView: View {
     }
 
     private var controls: some View {
-        Button {
-            compass.setBearing()
-        } label: {
-            Text("Premi tasto laterale\nper impostare bearing")
-                .font(.system(size: 12, weight: .black, design: .rounded))
-                .foregroundStyle(DiveUI.yellow)
-                .multilineTextAlignment(.center)
-                .lineLimit(2)
-                .minimumScaleFactor(0.7)
-                .frame(maxWidth: .infinity, minHeight: 31)
+        VStack(spacing: 6) {
+            if compass.bearingDegrees != nil {
+                Text("BEARING \(bearingText) | DELTA \(deltaText)")
+                    .font(.system(size: 10, weight: .black, design: .rounded))
+                    .foregroundStyle(DiveUI.yellow)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
+
+            HStack(spacing: 6) {
+                Button {
+                    compass.setBearing()
+                    HapticService.shared.confirm()
+                } label: {
+                    Text("SET BEARING")
+                        .font(.system(size: 11, weight: .black, design: .rounded))
+                        .foregroundStyle(DiveUI.yellow)
+                        .frame(maxWidth: .infinity, minHeight: 31)
+                }
+                .buttonStyle(.plain)
+                .background(commandBackground(DiveUI.yellow))
+
+                Button {
+                    compass.clearBearing()
+                    HapticService.shared.notify()
+                } label: {
+                    Text("CLEAR")
+                        .font(.system(size: 11, weight: .black, design: .rounded))
+                        .foregroundStyle(compass.bearingDegrees == nil ? .white.opacity(0.34) : DiveUI.red)
+                        .frame(maxWidth: .infinity, minHeight: 31)
+                }
+                .buttonStyle(.plain)
+                .disabled(compass.bearingDegrees == nil)
+                .background(commandBackground(compass.bearingDegrees == nil ? .white.opacity(0.34) : DiveUI.red))
+            }
         }
-        .buttonStyle(.plain)
-        .padding(.horizontal, 7)
-        .background(
-            RoundedRectangle(cornerRadius: 9, style: .continuous)
-                .fill(DiveUI.yellow.opacity(0.08))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 9, style: .continuous)
-                        .stroke(DiveUI.yellow, lineWidth: 1.7)
-                )
-                .shadow(color: DiveUI.yellow.opacity(0.24), radius: 5, x: 0, y: 0)
-        )
+    }
+
+    private func commandBackground(_ color: Color) -> some View {
+        RoundedRectangle(cornerRadius: 9, style: .continuous)
+            .fill(color.opacity(0.08))
+            .overlay(
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .stroke(color, lineWidth: 1.4)
+            )
+            .shadow(color: color.opacity(0.18), radius: 5, x: 0, y: 0)
     }
 
     private var bearingDelta: Double? {
@@ -158,6 +188,12 @@ struct CompassView: View {
     private var bearingText: String {
         guard let bearing = compass.bearingDegrees else { return "---" }
         return "\(Int(bearing.rounded()))\u{00B0}"
+    }
+
+    private var deltaText: String {
+        guard let bearingDelta else { return "---" }
+        let sign = bearingDelta >= 0 ? "+" : ""
+        return "\(sign)\(Int(bearingDelta.rounded()))\u{00B0}"
     }
 
     private var headingText: String {

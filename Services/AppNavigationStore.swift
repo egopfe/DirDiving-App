@@ -10,8 +10,4 @@ final class AppNavigationStore: ObservableObject {
     init() {
         Self.shared = self
     }
-
-    func openBuddyAssist() {
-        selectedPage = .buddyAssist
-    }
 }

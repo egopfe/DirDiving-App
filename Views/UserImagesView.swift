@@ -60,11 +60,7 @@ struct UserImagesView: View {
 
             Spacer()
 
-            // TODO: Replace this visual placeholder if a watch clock value becomes part of the view model.
-            Text("--:--")
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-                .monospacedDigit()
+            DiveClockText(size: 14)
         }
     }
 
@@ -170,11 +166,7 @@ struct UserImagesView: View {
         return VStack(spacing: 8) {
             HStack {
                 Spacer()
-                // TODO: Replace this visual placeholder if a watch clock value becomes part of the view model.
-                Text("--:--")
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .monospacedDigit()
+                DiveClockText(size: 14)
             }
             .padding(.horizontal, 12)
             .padding(.top, 9)
