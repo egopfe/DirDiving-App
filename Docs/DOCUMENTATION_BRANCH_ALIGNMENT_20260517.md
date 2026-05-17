@@ -102,3 +102,27 @@ merge: resolve documentation conflicts across branches
 - Non documentare GPS come tracking subacqueo.
 - Non promuovere Apnea/Snorkeling/Buddy a MAIN senza build, device QA e safety review.
 - Non modificare algoritmi GPS, bussola, profondita, risalita o planner durante lavori UI-only/docs.
+
+## Aggiornamento audit MAIN 2026-05-17 sera
+
+Nuovo artifact documentale generato su `main`:
+
+```text
+Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260517_CURRENT_PRE_MODIFICATION.docx
+```
+
+Sintesi documentale:
+
+- PR `#8` e `#9` risultano `CLEAN` con checks visibili passati, ma non devono essere mergiate automaticamente perche includono superfici experimental ampie.
+- Apple Watch MAIN resta production-oriented su Diving, `BUSSOLA`, settings, immagini, log, export e GPS entry/exit surface-only.
+- iOS MAIN resta production-oriented su Logbook, Route Review, Analysis, Planner, Gear, Settings, WatchConnectivity, KVS, import/export CSV.
+- Apnea, Snorkeling, Buddy Assist, Explore Lab, POI enrichment e Apnea Review restano experimental.
+- Non sono state applicate modifiche runtime durante l'audit; eventuali fix devono rimanere separati dai commit docs.
+
+Nuovi TODO non risolti in questo pass:
+
+- Verificare su macOS che `WatchSyncAuth` MAIN non dipenda da helper Buddy esclusi dal target MAIN.
+- Verificare che i PNG referenziati da `AppIcon.appiconset/Contents.json` siano presenti nel ramo iOS MAIN.
+- Completare o marcare read-only le preferenze iOS local-only.
+- Aggiungere empty state, conferme delete/reset e accessibility labels dove mancanti.
+- Eseguire `xcodegen generate` e build Watch/iOS su macOS prima di promozioni o merge production.
