@@ -73,9 +73,18 @@ Payload leggero previsto:
 - heading/bearing se disponibile;
 - waypoint attivo se disponibile;
 - session id quando esposto;
-- `isEnriched = false` quando il modello dedicato verra introdotto.
+- `isEnriched = false`.
 
-Il Watch non modifica foto, commenti o categorie avanzate. Il companion iOS arricchira i POI dopo sync con foto, video, commenti, categoria, tag e note di osservazione/specie. La UI Watch deve indicare `Da arricchire su iPhone` o `Companion iOS` dove pertinente.
+Stato implementato sul ramo experimental:
+
+- tap su `MARCATORE` salva un `GPSInterestMarker` leggero in `ExplorationStore`;
+- la UI mostra conferma `MARCATORE SALVATO`, check verde, haptic e link a `LOG` / `DETTAGLI`;
+- se il GPS non e disponibile, la UI mostra `GPS NON DISPONIBILE` e non finge coordinate;
+- `Log Marcatori` e `Dettaglio Marcatore` sono raggiungibili da `Impostazioni Snorkeling`;
+- il dettaglio mostra ora, distanza, direzione, profondita, temperatura, waypoint attivo, session id e stato `Da arricchire su iPhone`;
+- la UI dichiara esplicitamente che Watch -> iPhone POI sync, queue offline, duplicate prevention e conferma ricezione iPhone restano TODO.
+
+Il Watch non modifica foto, commenti o categorie avanzate. Il companion iOS espone la superficie di enrichment dopo sync con foto, video, commenti, categoria, tag e note di osservazione/specie, ma media picker/storage reali restano TODO sperimentali.
 
 ## Allarmi Snorkeling
 
@@ -86,7 +95,14 @@ Gli allarmi Snorkeling sono specifici della modalita e non includono settings gl
 - Distanza massima.
 - Batteria bassa.
 
-Finche non esiste uno store dedicato, le soglie sono placeholder UI con `TODO`.
+Stato attuale:
+
+- le soglie sono modificabili da Apple Watch;
+- la persistenza locale usa `AppStorage`;
+- non esiste ancora uno store Snorkeling dedicato;
+- sync iPhone -> Watch settings, duplicate prevention e offline queue sono TODO espliciti.
+
+Questa scelta mantiene la modifica incrementale e non introduce nuova architettura di persistenza.
 
 ## Limite GPS
 
@@ -103,6 +119,23 @@ Per il companion iOS, l'architettura preferita e:
 - GEBCO/EMODnet come overlay batimetrici futuri.
 
 Per Apple Watch, in questo pass non si scaricano tile online. La UI resta una mappa SwiftUI leggera. I server pubblici OpenStreetMap hanno policy d'uso: in produzione preferire server self-hosted, provider approvato o MBTiles pacchettizzati/offline.
+
+## Schermate Snorkeling raggiungibili
+
+La navigazione sperimentale Watch espone:
+
+- `Snorkeling Live`;
+- `Mappa Waypoint`;
+- `Mappa Ritorno`;
+- `Direzione Waypoint`;
+- `Log Marcatori`;
+- `Dettaglio Marcatore`;
+- `Impostazioni Snorkeling`;
+- `Allarmi Snorkeling`;
+- `Calibrazione Bussola`;
+- `Legenda Icone Mappe`.
+
+`Calibrazione Bussola` e istruttiva e non modifica gli algoritmi `CompassManager`. `Legenda Icone Mappe` documenta posizione corrente, waypoint, punto di partenza, POI/marcatore, rotta waypoint e rotta ritorno.
 
 ## Sicurezza
 
