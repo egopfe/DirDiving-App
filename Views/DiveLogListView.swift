@@ -7,6 +7,7 @@ struct DiveLogListView: View {
     @State private var listExportMessage: String?
     @State private var exportCompletionFileName: String?
     @State private var showExportCompletion = false
+    @State private var pendingDelete: DiveSession?
 
     var body: some View {
         ZStack {
@@ -29,6 +30,26 @@ struct DiveLogListView: View {
         }
         .navigationDestination(isPresented: $showExportCompletion) {
             ExportView(fileName: exportCompletionFileName ?? "export.csv")
+        }
+        .confirmationDialog(
+            "Eliminare immersione?",
+            isPresented: Binding(
+                get: { pendingDelete != nil },
+                set: { if !$0 { pendingDelete = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Elimina", role: .destructive) {
+                if let pendingDelete {
+                    log.delete(id: pendingDelete.id)
+                }
+                pendingDelete = nil
+            }
+            Button("Annulla", role: .cancel) {
+                pendingDelete = nil
+            }
+        } message: {
+            Text("Il log verra rimosso dal Watch. L'azione non parte piu da un singolo tap accidentale.")
         }
     }
 
@@ -66,10 +87,13 @@ struct DiveLogListView: View {
                     Text("NESSUNA IMMERSIONE")
                         .font(.system(size: 12, weight: .black, design: .rounded))
                         .foregroundStyle(DiveUI.yellow)
-                    Text("I log appariranno qui dopo la prima immersione.")
+                    Text("Avvia una nuova sessione o sincronizza da iPhone quando disponibile.")
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
                         .foregroundStyle(DiveUI.secondaryText)
                         .multilineTextAlignment(.center)
+                    Text("EXPORT NON DISPONIBILE")
+                        .font(.system(size: 9, weight: .black, design: .rounded))
+                        .foregroundStyle(DiveUI.cyan)
                 }
                 .padding(8)
             )
@@ -171,6 +195,11 @@ struct DiveLogListView: View {
                     .font(.system(size: 10, weight: .semibold, design: .rounded))
                     .foregroundStyle(DiveUI.yellow)
                     .multilineTextAlignment(.center)
+            } else if log.sessions.isEmpty {
+                Text("Export disponibile dopo il primo log salvato.")
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .foregroundStyle(DiveUI.secondaryText)
+                    .multilineTextAlignment(.center)
             }
         }
     }
@@ -224,7 +253,7 @@ struct DiveLogListView: View {
         .buttonStyle(.plain)
         .contextMenu {
             Button(role: .destructive) {
-                log.delete(id: session.id)
+                pendingDelete = session
             } label: {
                 Label("Elimina", systemImage: "trash")
             }

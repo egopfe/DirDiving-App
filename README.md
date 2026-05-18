@@ -466,6 +466,33 @@ Gli ultimi aggiornamenti MAIN readiness aggiungono:
 - planner iOS con warning dinamici e copy non certificato.
 
 Build finale, `xcodegen generate` e `xcodebuild` devono essere eseguiti su macOS.
+
+## Latest MAIN UX Audit Implementation
+
+Dopo il report `Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260517_CURRENT_PRE_MODIFICATION.docx`, i rami MAIN hanno ricevuto un pass UX mirato e separato dai rami sperimentali:
+
+- Watch MAIN: `Settings`, `AlarmSettings`, `DiveLive` e `DiveLogList` chiariscono metriche/local-only, shortcut/App Intents, avvio manuale, stato log vuoto, export non disponibile senza log e conferma delete.
+- Watch MAIN: le soglie allarme restano locali sul Watch, non sincronizzate con iPhone; i controlli +/- sono piu grandi e scrollabili per ridurre clipping e migliorare uso con guanti.
+- iOS MAIN: `Settings` marca unita/export come preferenze non editabili o local-only quando non esiste ancora un contratto sync production.
+- iOS MAIN: `Logbook`, `Route Review`, `Analysis` e `Gear` aggiungono empty state o conferme distruttive per import/sync assenti, nessuna rotta, nessuna statistica, delete immersione e reset profilo.
+- Non sono stati modificati algoritmi GPS, bussola, profondita, risalita, decompressione, persistenza dati o modelli business; il pass e UI/UX e copy-only salvo conferme SwiftUI.
+
+## Latest MAIN UX Audit And Documentation TODO
+
+Il report pre-modifica MAIN piu recente e:
+
+```text
+Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260517_CURRENT_PRE_MODIFICATION.docx
+```
+
+Stato documentato dopo l'audit:
+
+- Le superfici principali MAIN sono raggiungibili: Apple Watch `Diving`, `BUSSOLA`, settings, immagini, log/export; iOS `Logbook`, `Route Review`, `Analysis`, `Planner`, `Gear`, `Settings`.
+- Risolti nel pass MAIN UX: empty state iOS principali, conferme delete/reset, spiegazione Action Button/App Intents, copy di avvio manuale, settings iOS marcati read-only/local-only dove appropriato e controlli allarme Watch piu grandi.
+- Restano TODO di allineamento sync: settings Watch/iOS sono dichiarati local-only, coda sync ispezionabile per singola sessione e policy cloud conflict oltre KVS restano roadmap.
+- Restano TODO build/config da verificare su macOS: `WatchSyncAuth` su MAIN usa un helper buddy/key escluso dal target MAIN; l'asset catalog iOS MAIN deve contenere i PNG citati da `AppIcon.appiconset/Contents.json`.
+- L'audit resta snapshot pre-modifica; i fix MAIN UX successivi sono committati separatamente dalla documentazione.
+
 ## Entitlement Status
 
 The entitlements file currently exists at:
@@ -488,9 +515,9 @@ Stato documentato dopo l'audit:
 
 - Le superfici principali MAIN sono raggiungibili: Apple Watch `Diving`, `BUSSOLA`, settings, immagini, log/export; iOS `Logbook`, `Route Review`, `Analysis`, `Planner`, `Gear`, `Settings`.
 - Le superfici di questo ramo restano experimental: Snorkeling Live, Mappa Waypoint, Mappa Ritorno, Direzione Waypoint, Marcatori POI, Apnea e Buddy Assist lab-only.
-- Restano TODO UX non runtime: empty state iOS, conferme per delete/reset, accessibilita VoiceOver sui controlli custom, spiegazione Action Button/App Intents, e settings iOS realmente editabili o marcati read-only.
+- Risolti nel pass MAIN UX sui rami base: empty state iOS principali, conferme delete/reset, spiegazione Action Button/App Intents, copy avvio manuale, settings iOS marcati read-only/local-only e controlli allarme Watch piu grandi.
 - Restano TODO build/config da verificare su macOS: `WatchSyncAuth` su MAIN usa un helper buddy/key escluso dal target MAIN; l'asset catalog iOS MAIN deve contenere i PNG citati da `AppIcon.appiconset/Contents.json`.
-- Nessun fix runtime e stato applicato durante l'audit; eventuali correzioni devono essere committate separatamente da questa documentazione.
+- I fix MAIN UX sono stati merge-base su questo ramo; i conflitti runtime sperimentali sono risolti preservando le schermate Snorkeling/Apnea/Buddy del branch.
 
 ## Branch Strategy
 
@@ -513,10 +540,10 @@ Regole operative:
 
 | Branch | App | Stato | Note |
 | --- | --- | --- | --- |
-| `main` | Apple Watch | Stable | Diving mode, log, export, bussola, immagini, settings raggiungibili, allarmi/haptic persistenti, GPS entry/exit confirmation. |
-| `codex/experimental-features` | Apple Watch | Experimental | Snorkeling Live, Mappa Waypoint, Mappa Ritorno, Direzione Waypoint, POI con log/dettaglio/conferma, allarmi Snorkeling persistenti locali, Apnea, haptics sperimentali e Buddy Assist. |
-| `main-iOS` | iOS Companion | Stable | Logbook, Dive Detail, Route Review, Analysis, Planner/Plan Result, Gear, Settings, WatchConnectivity, iCloud KVS, CSV import/export e Subsurface. |
-| `codex/ios-experimental-features` | iOS Companion | Experimental | Explore Lab, route planning, waypoint management, POI enrichment mock/TODO, Apnea Review interattiva, manifest sync sperimentale e note map/offline. |
+| `main` | Apple Watch | Stable | Diving mode, log, export, BUSSOLA, immagini, settings raggiungibili, allarmi/haptic persistenti, GPS entry/exit confirmation, sync queue, helper shortcut/App Intents, empty state log e target membership senza experimental. |
+| `codex/experimental-features` | Apple Watch | Experimental | Snorkeling Live, Mappa Waypoint, Mappa Ritorno, Direzione Waypoint, POI con log/dettaglio/conferma, allarmi Snorkeling persistenti locali, Apnea, haptics sperimentali, settings sperimentali raggiungibili e Buddy Assist marcato lab-only. |
+| `main-iOS` | iOS Companion | Stable | Logbook, Dive Detail, Route Review, Analysis, Planner/Plan Result, Gear, Settings, WatchConnectivity, iCloud KVS, CSV import/export, Subsurface, empty state e conferme distruttive. |
+| `codex/ios-experimental-features` | iOS Companion | Experimental | Explore Lab, route planning, waypoint management, POI enrichment mock/TODO, Apnea Review interattiva, queue/status sync sperimentale, impostazioni locali editabili e note map/offline. |
 
 ## Mode Selection
 
