@@ -197,6 +197,26 @@ The compass is implemented as a full screen, not as a modal feature that must be
 
 Terminologia UI: nelle schermate italiane nuove usare `BUSSOLA`; non introdurre `COMPASSO`.
 
+## Latest MAIN UX Audit Implementation
+
+Dopo il report `Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260517_CURRENT_PRE_MODIFICATION.docx`, iOS MAIN ha ricevuto un pass UX mirato:
+
+- `Settings` espone unita/export come preferenze non editabili o local-only quando non esiste ancora un contratto sync production.
+- `Settings` chiarisce che gli allarmi immersione sono gestiti su Apple Watch e che i permessi notifiche iOS si recuperano dalle Impostazioni di sistema.
+- `Logbook`, `Route Review` e `Analysis` mostrano empty state quando non ci sono immersioni, route GPS surface-only o statistiche reali.
+- `Logbook` richiede conferma prima di eliminare una sessione e `Gear` richiede conferma prima del reset profilo.
+- Non sono stati modificati algoritmi GPS, bussola, profondita, risalita, planner, persistenza o modello sync; il pass e UI/UX e copy-only salvo conferme SwiftUI.
+
+## Latest MAIN UX Audit And Documentation TODO
+
+Stato documentato sul ramo base `main-iOS` dopo il pass UX:
+
+- Le superfici principali sono raggiungibili: `Logbook`, `Route Review`, `Analysis`, `Planner`, `Gear`, `Settings`.
+- Risolti nel pass MAIN UX: empty state principali, conferme delete/reset e copy coerente per settings read-only/local-only.
+- Restano TODO sync: settings Watch/iOS non sono ancora una pipeline bidirezionale production; i conflitti Watch richiedono test device e policy prodotto.
+- Restano TODO build/config da verificare su macOS: asset catalog iOS MAIN, `xcodegen generate` e build `DIRDiving iOS`.
+- Questo ramo mantiene Apnea/Snorkeling/Explore Lab come experimental e non li promuove a produzione.
+
 Experimental Apnea, Snorkeling and Buddy Assist screens are intentionally not part of `main` navigation. They remain in `codex/experimental-features` until hardware, UX, safety and build validation are complete.
 
 ## Live Dive Screen
@@ -509,9 +529,9 @@ Regole operative:
 
 | Branch | App | Stato | Note |
 | --- | --- | --- | --- |
-| `main` | Apple Watch | Stable | Diving mode, log, export, bussola, immagini, settings raggiungibili, allarmi/haptic persistenti, GPS entry/exit confirmation. |
+| `main` | Apple Watch | Stable | Diving mode, log, export, BUSSOLA, immagini, settings raggiungibili, allarmi/haptic persistenti, GPS entry/exit confirmation, helper shortcut/App Intents e empty state log. |
 | `codex/experimental-features` | Apple Watch | Experimental | Snorkeling Live, Mappa Waypoint, Mappa Ritorno, Direzione Waypoint, POI con log/dettaglio/conferma, allarmi Snorkeling persistenti locali, Apnea, haptics sperimentali e Buddy Assist. |
-| `main-iOS` | iOS Companion | Stable | Logbook, Dive Detail, Route Review, Analysis, Planner/Plan Result, Gear, Settings, WatchConnectivity, iCloud KVS, CSV import/export e Subsurface. |
+| `main-iOS` | iOS Companion | Stable | Logbook, Dive Detail, Route Review, Analysis, Planner/Plan Result, Gear, Settings, WatchConnectivity, iCloud KVS, CSV import/export, Subsurface, empty state e conferme distruttive. |
 | `codex/ios-experimental-features` | iOS Companion | Experimental | Explore Lab, route planning, waypoint management, POI enrichment mock/TODO, Apnea Review interattiva, manifest sync sperimentale e note map/offline. |
 
 ## Mode Selection
