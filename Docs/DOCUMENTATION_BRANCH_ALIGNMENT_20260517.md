@@ -92,9 +92,17 @@ Nuovi TODO non risolti in questo pass:
 
 - Verificare su macOS che `WatchSyncAuth` MAIN non dipenda da helper Buddy esclusi dal target MAIN.
 - Verificare che i PNG referenziati da `AppIcon.appiconset/Contents.json` siano presenti nel ramo iOS MAIN.
-- Completare o marcare read-only le preferenze iOS local-only.
-- Aggiungere empty state, conferme delete/reset e accessibility labels dove mancanti.
+- Validare su device le preferenze iOS ora marcate read-only/local-only.
+- Validare su device gli empty state e le conferme delete/reset aggiunti nel pass MAIN UX successivo.
 - Eseguire `xcodegen generate` e build Watch/iOS su macOS prima di promozioni o merge production.
+
+## Aggiornamento post MAIN UX implementation
+
+Il pass successivo all'audit ha corretto i principali gap UX MAIN senza modificare logica GPS, bussola, calcoli profondita/risalita/decompressione o modelli di persistenza:
+
+- Apple Watch MAIN: settings con note su metriche fisse, sync impostazioni local-only, Action Button/App Intents, avvio manuale; logbook con empty state, export non disponibile senza log e conferma delete; allarmi scrollabili con target piu grandi.
+- iOS MAIN: settings con unita/export read-only o local-only, permessi notifiche e allarmi Watch espliciti; Logbook, Route Review e Analysis con empty state; delete immersione e reset Gear con conferma distruttiva.
+- La documentazione continua a separare MAIN stable da Snorkeling, Apnea, Buddy Assist, Explore Lab e Apnea Review experimental.
 
 ## Issue / bug report con dipendenze e priorita
 
