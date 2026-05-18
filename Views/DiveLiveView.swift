@@ -207,6 +207,9 @@ struct DiveLiveView: View {
                 )
                 .shadow(color: DiveUI.green.opacity(0.16), radius: 5, x: 0, y: 0)
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("TTV sessione \(ttvText), runtime \(runtimeMinutes)")
+        .accessibilityHint("TTV informativo derivato da profondita media e durata; non e un valore decompressivo o time to surface.")
     }
 
     private func dashboardValue(title: String, value: String, unit: String?, color: Color) -> some View {

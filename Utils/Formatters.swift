@@ -11,4 +11,5 @@ enum Formatters {
     }
 
     static func one(_ value: Double) -> String { String(format: "%.1f", value) }
+    static func zero(_ value: Double) -> String { String(format: "%.0f", value) }
 }

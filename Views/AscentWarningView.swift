@@ -63,6 +63,9 @@ struct AscentWarningView: View {
             .padding(.top, 9)
             .padding(.bottom, 7)
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Risalita troppo veloce. Velocita \(Formatters.one(status.currentRateMetersPerMinute)) metri al minuto. Profondita \(Formatters.one(depthMeters)) metri. Runtime \(runtimeMinutes) minuti.")
+        .accessibilityHint("Rallenta la risalita. La schermata conserva profondita e runtime live.")
     }
 
     private var header: some View {

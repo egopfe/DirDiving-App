@@ -81,14 +81,32 @@ struct SettingsView: View {
                     statusRow(
                         icon: "tray.and.arrow.up",
                         iconColor: watchSync.pendingTransferCount == 0 ? DiveUI.green : DiveUI.yellow,
-                        title: "Coda sync",
-                        subtitle: "\(watchSync.pendingTransferCount) immersioni in attesa"
+                        title: "Sync pending",
+                        subtitle: "\(watchSync.pendingTransferCount) in attesa ack"
+                    )
+                    statusRow(
+                        icon: "paperplane.fill",
+                        iconColor: watchSync.sentTransferCount == 0 ? DiveUI.secondaryText : DiveUI.cyan,
+                        title: "Sync sent",
+                        subtitle: "\(watchSync.sentTransferCount) inviati o in transito"
+                    )
+                    statusRow(
+                        icon: "checkmark.seal.fill",
+                        iconColor: watchSync.acknowledgedTransferCount == 0 ? DiveUI.secondaryText : DiveUI.green,
+                        title: "Sync acknowledged",
+                        subtitle: "\(watchSync.acknowledgedTransferCount) confermati da iPhone"
                     )
                     settingsRow(
                         icon: "square.and.arrow.up",
                         iconColor: DiveUI.green,
                         title: "Export",
                         subtitle: "Subsurface CSV metrico; altri formati planned"
+                    )
+                    settingsRow(
+                        icon: "function",
+                        iconColor: DiveUI.green,
+                        title: "TTV live",
+                        subtitle: "Derivato prof. media + runtime; non safety/NDL"
                     )
                     statusRow(
                         icon: "exclamationmark.arrow.triangle.2.circlepath",
@@ -217,15 +235,14 @@ struct SettingsView: View {
                 icon: "ruler",
                 iconColor: .white,
                 title: "Unità di misura",
-                subtitle: watchUnits == "metric" ? "Display Watch: metrico" : "Display Watch: imperiale planned"
+                subtitle: "Display Watch: metrico"
             )
             Picker("Unità", selection: $watchUnits) {
                 Text("m").tag("metric")
-                Text("ft").tag("imperial")
             }
             .pickerStyle(.segmented)
             .tint(DiveUI.cyan)
-            Text("Dati, planner ed export restano metrici/Subsurface. Sync unità iPhone planned.")
+            Text("Imperiale non selezionabile finche la conversione Watch non e implementata. Export sempre metrico/Subsurface.")
                 .font(.system(size: 9, weight: .semibold, design: .rounded))
                 .foregroundStyle(DiveUI.yellow)
                 .fixedSize(horizontal: false, vertical: true)
@@ -237,6 +254,11 @@ struct SettingsView: View {
                 .fill(Color.black.opacity(0.52))
                 .overlay(RoundedRectangle(cornerRadius: 7, style: .continuous).stroke(.white.opacity(0.24), lineWidth: 1))
         )
+        .onAppear {
+            if watchUnits != "metric" {
+                watchUnits = "metric"
+            }
+        }
     }
 
     private var lastRetryText: String {
