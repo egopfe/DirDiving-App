@@ -657,3 +657,14 @@ Questo ramo resta experimental e non deve sovrascrivere `main-iOS` con mock o su
 - Planner MAIN: solo `Semplice` e comportamento attivo; `Avanzato` e `Tecnico` sono planned, con validazione input e acknowledgement safety.
 - Unita iOS MAIN: conversione display-only; planner, dati salvati, CSV e sync restano metrici.
 - iOS experimental puo continuare a mostrare Explore Lab, POI enrichment, Apnea Review e map/offline roadmap, ma deve etichettare mock/TODO chiaramente.
+
+Il pass piu recente mantiene `main-iOS` production-oriented e non promuove superfici Apnea/Snorkeling/Explore Lab dal ramo experimental:
+
+- Sync Watch: una peer secret mancante produce `Associazione Watch non verificata`; i payload non vengono trattati come fidati tramite fallback deterministico.
+- Cloud/logbook: i record locali e cloud vengono letti separatamente prima del merge per evitare conflazione silenziosa; tombstone delete restano espliciti ma richiedono test multi-device.
+- CSV import: la data sorgente viene preservata se presente, il file produce un ID deterministico per evitare duplicati su re-import, e gli errori su righe malformed sono visibili.
+- Route Review: gli empty state usano pulsanti reali per sincronizzare, importare CSV o aprire impostazioni; etichette non funzionali non devono sembrare azioni.
+- Planner: `Semplice` e la sola modalita comportamentale attiva; `Avanzato` e `Tecnico` restano planned, con validazione input e acknowledgement safety prima del piano.
+- Unita iOS: conversione coerente e display-only per profondita, temperatura, distanza e SAC; dati salvati, planner, import/export CSV e sync Watch restano metrici.
+
+Validazione richiesta fuori da Windows: `xcodegen generate`, build Xcode, test iPhone small/large screen, pairing Watch, import/re-import CSV, cloud KVS/delete e App Icon asset catalog.
