@@ -4,6 +4,8 @@ import Charts
 struct PlannerView: View {
     @EnvironmentObject private var store: PlannerStore
     @State private var showPlan = false
+    @State private var validationMessage: String?
+    @State private var safetyAccepted = false
 
     var body: some View {
         NavigationStack {
@@ -17,7 +19,11 @@ struct PlannerView: View {
                                 .foregroundStyle(.white)
                         }
                         modePicker
+                        if let validationMessage {
+                            validationNotice(validationMessage)
+                        }
                         plannerSafetyNotice
+                        safetyAcknowledgement
                         profileCard
                         gasCards
                         calculateButton
@@ -32,6 +38,11 @@ struct PlannerView: View {
                 PlanResultView()
                     .environmentObject(store)
             }
+            .onAppear {
+                if store.mode != .simple {
+                    store.mode = .simple
+                }
+            }
         }
     }
 
@@ -43,11 +54,13 @@ struct PlannerView: View {
             HStack(spacing: 0) {
                 ForEach(PlannerMode.allCases) { mode in
                     Button {
-                        store.mode = mode
+                        if mode == .simple {
+                            store.mode = mode
+                        }
                     } label: {
-                        Text(mode.rawValue)
+                        Text(modeLabel(mode))
                             .font(.system(size: 12, weight: .semibold, design: .rounded))
-                            .foregroundStyle(store.mode == mode ? .black : .white)
+                            .foregroundStyle(store.mode == mode ? Color.black : mode == .simple ? Color.white : DIRTheme.muted)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 8)
                             .background(
@@ -57,6 +70,7 @@ struct PlannerView: View {
                             )
                     }
                     .buttonStyle(.plain)
+                    .disabled(mode != .simple)
                 }
             }
             .padding(3)
@@ -72,7 +86,7 @@ struct PlannerView: View {
     }
 
     private var plannerSafetyNotice: some View {
-        Text("Planner informativo non certificato. Non usare per eseguire immersioni reali senza strumenti validati, tabelle/agenzia e pianificazione conservativa.")
+        Text("Piano indicativo. Non sostituisce un computer subacqueo certificato. Verifica sempre con strumenti certificati, tabelle/agenzia e pianificazione conservativa.")
             .font(.system(size: 11, weight: .semibold, design: .rounded))
             .foregroundStyle(DIRTheme.yellow)
             .fixedSize(horizontal: false, vertical: true)
@@ -83,6 +97,26 @@ struct PlannerView: View {
                     .fill(DIRTheme.yellow.opacity(0.10))
                     .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).stroke(DIRTheme.yellow.opacity(0.42), lineWidth: 1))
             )
+    }
+
+    private var safetyAcknowledgement: some View {
+        Toggle(isOn: $safetyAccepted) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text("Ho letto l'avviso safety")
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                Text("Il piano e indicativo e non va usato come unica fonte per l'immersione.")
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+            }
+        }
+        .tint(DIRTheme.cyan)
+        .padding(10)
+        .background(
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(DIRTheme.surface.opacity(0.72))
+                .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).stroke(DIRTheme.cyan.opacity(0.20), lineWidth: 1))
+        )
     }
 
     private var profileCard: some View {
@@ -120,6 +154,15 @@ struct PlannerView: View {
 
     private var calculateButton: some View {
         Button {
+            if let validation = validationError {
+                validationMessage = validation
+                return
+            }
+            guard safetyAccepted else {
+                validationMessage = "Conferma prima l'avviso safety: piano indicativo, non certificato."
+                return
+            }
+            validationMessage = nil
             store.calculate()
             showPlan = true
         } label: {
@@ -136,6 +179,54 @@ struct PlannerView: View {
         }
         .buttonStyle(.plain)
         .padding(.top, 4)
+    }
+
+    private func validationNotice(_ message: String) -> some View {
+        Text(message)
+            .font(.system(size: 11, weight: .semibold, design: .rounded))
+            .foregroundStyle(DIRTheme.red)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .fill(DIRTheme.red.opacity(0.10))
+                    .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).stroke(DIRTheme.red.opacity(0.42), lineWidth: 1))
+            )
+    }
+
+    private func modeLabel(_ mode: PlannerMode) -> String {
+        mode == .simple ? mode.rawValue : "\(mode.rawValue) · Planned"
+    }
+
+    private var validationError: String? {
+        let input = store.input
+        guard input.plannedDepthMeters >= 1, input.plannedDepthMeters <= 100 else {
+            return "Profondita non valida: usa 1-100 m."
+        }
+        guard input.plannedBottomMinutes >= 1, input.plannedBottomMinutes <= 240 else {
+            return "Tempo fondo non valido: usa 1-240 min."
+        }
+        guard input.cylinderVolumeLiters > 0, input.startPressureBar > input.reservePressureBar, input.reservePressureBar >= 0 else {
+            return "Gas non valido: volume bombola e pressioni devono lasciare riserva positiva."
+        }
+        guard input.sacLitersPerMinute > 0 else {
+            return "SAC non valido: deve essere maggiore di zero."
+        }
+        guard isValid(input.bottomGas), isValid(input.decoGas1), isValid(input.decoGas2) else {
+            return "Miscela non valida: O2/He devono restare entro 100% e PPO2 tra 1.0 e 1.6."
+        }
+        guard input.bottomGas.modMeters >= input.plannedDepthMeters else {
+            return "MOD gas fondo inferiore alla profondita pianificata."
+        }
+        return nil
+    }
+
+    private func isValid(_ gas: GasMix) -> Bool {
+        gas.oxygen >= 0.10 && gas.oxygen <= 1.0 &&
+        gas.helium >= 0 &&
+        gas.oxygen + gas.helium <= 1.0 &&
+        gas.maxPPO2 >= 1.0 && gas.maxPPO2 <= 1.6
     }
 
     private func plannerField(_ title: String, value: Binding<Double>, unit: String, step: Double) -> some View {

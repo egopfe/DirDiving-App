@@ -70,10 +70,13 @@ struct LogbookView: View {
                 case .success(let url):
                     switch DiveImportService.importCSV(from: url) {
                     case .success(let session):
+                        let alreadyImported = logStore.session(id: session.id) != nil
                         logStore.add(session)
-                        importMessage = "Import completato: \(session.siteName ?? "Immersione")"
+                        importMessage = alreadyImported
+                            ? "Import aggiornato: duplicato riconosciuto e non duplicato."
+                            : "Import completato: 1 importata, 0 duplicati, 0 errori."
                     case .failure(let error):
-                        importMessage = error.localizedDescription
+                        importMessage = "Import fallito: 0 importate, 0 duplicati, 1 errore. \(error.localizedDescription)"
                     }
                 case .failure(let error):
                     importMessage = error.localizedDescription

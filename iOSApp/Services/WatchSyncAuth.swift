@@ -29,7 +29,8 @@ enum WatchSyncAuth {
 
     static func syncKey(peerBundleID: String) -> SymmetricKey {
         guard let secret = loadPeerSecret() else {
-            return SymmetricKey(data: SHA256.hash(data: Data("dirmotion.watch.sync.fallback|\(peerBundleID)".utf8)))
+            assertionFailure("Watch sync key requested before peer secret verification.")
+            return SymmetricKey(data: Data(repeating: 0, count: 32))
         }
         var material = secret
         material.append(Data(peerBundleID.utf8))

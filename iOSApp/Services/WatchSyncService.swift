@@ -24,6 +24,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     var userVisibleState: String {
         if !isSupported { return "Non supportato" }
         if failedImportCount > 0 { return "Errore import: retry disponibile" }
+        if activationState == .activated, !WatchSyncAuth.hasPeerSecret() { return "Associazione Watch non verificata" }
         if activationState == .activated { return "Attivo" }
         return "In attesa attivazione"
     }

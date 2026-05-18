@@ -49,6 +49,13 @@ struct MoreView: View {
                             row("Stato", String(describing: watchSync.activationState))
                             row("Esito", watchSync.userVisibleState)
                             row("Settings Watch", "Non sincronizzati")
+                            if watchSync.activationState == .activated && !WatchSyncAuth.hasPeerSecret() {
+                                emptyState(
+                                    title: "Associazione Watch non verificata",
+                                    message: "La chiave di sync non e ancora stata ricevuta dal Watch. I payload non vengono trattati come attendibili finche l'associazione non e completata.",
+                                    action: "Riprova sincronizzazione"
+                                )
+                            }
                             if !watchSync.isSupported || watchSync.activationState != .activated {
                                 emptyState(
                                     title: "Sync Watch non attivo",

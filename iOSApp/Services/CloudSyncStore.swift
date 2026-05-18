@@ -48,6 +48,16 @@ final class CloudSyncStore: ObservableObject {
         return nil
     }
 
+    func loadLocal<T: Decodable>(_ type: T.Type, forKey key: String) -> T? {
+        guard let localData = defaults.data(forKey: key) else { return nil }
+        return decode(type, from: localData)
+    }
+
+    func loadCloud<T: Decodable>(_ type: T.Type, forKey key: String) -> T? {
+        guard let cloudData = cloudStore.data(forKey: key) else { return nil }
+        return decode(type, from: cloudData)
+    }
+
     func save<T: Encodable>(_ value: T, forKey key: String) {
         guard let data = encode(value) else {
             lastSyncStatus = "Errore codifica dati iCloud"

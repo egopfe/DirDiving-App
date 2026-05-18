@@ -28,7 +28,7 @@ final class DiveLogStore: ObservableObject {
         includeDemoLogbook = UserDefaults.standard.bool(forKey: Self.includeDemoLogbookKey)
         deletedSessionIDs = loadDeletedSessionIDs()
         let localSessions = loadLocalSessions()
-        let cloudSessions = cloudSync?.load([DiveSession].self, forKey: key)
+        let cloudSessions = cloudSync?.loadCloud([DiveSession].self, forKey: key)
         sessions = mergedSessions(local: localSessions, cloud: cloudSessions)
             .sorted { $0.startDate > $1.startDate }
 
@@ -52,7 +52,7 @@ final class DiveLogStore: ObservableObject {
         guard isReady else { return }
         deletedSessionIDs = loadDeletedSessionIDs()
         let localSessions = loadLocalSessions()
-        let cloudSessions = cloudSync?.load([DiveSession].self, forKey: key)
+        let cloudSessions = cloudSync?.loadCloud([DiveSession].self, forKey: key)
         sessions = mergedSessions(local: localSessions, cloud: cloudSessions)
             .sorted { $0.startDate > $1.startDate }
         applyDemoLogbookPreference()
@@ -90,7 +90,13 @@ final class DiveLogStore: ObservableObject {
     }
 
     private func loadLocalSessions() -> [DiveSession] {
-        cloudSync?.load([DiveSession].self, forKey: key) ?? []
+        if let local = cloudSync?.loadLocal([DiveSession].self, forKey: key) {
+            return local
+        }
+        guard let data = UserDefaults.standard.data(forKey: key) else { return [] }
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return (try? decoder.decode([DiveSession].self, from: data)) ?? []
     }
 
     private func mergedSessions(local: [DiveSession], cloud: [DiveSession]?) -> [DiveSession] {
@@ -117,8 +123,13 @@ final class DiveLogStore: ObservableObject {
     }
 
     private func loadDeletedSessionIDs() -> Set<UUID> {
-        let cloudIDs = cloudSync?.load([UUID].self, forKey: tombstoneKey) ?? []
-        let localIDs = (try? JSONDecoder().decode([UUID].self, from: UserDefaults.standard.data(forKey: tombstoneKey) ?? Data())) ?? []
+        let cloudIDs = cloudSync?.loadCloud([UUID].self, forKey: tombstoneKey) ?? []
+        let localIDs: [UUID]
+        if let decoded = cloudSync?.loadLocal([UUID].self, forKey: tombstoneKey) {
+            localIDs = decoded
+        } else {
+            localIDs = (try? JSONDecoder().decode([UUID].self, from: UserDefaults.standard.data(forKey: tombstoneKey) ?? Data())) ?? []
+        }
         return Set(cloudIDs + localIDs)
     }
 

@@ -1,8 +1,12 @@
 import SwiftUI
+import UIKit
+import UniformTypeIdentifiers
 
 struct ExploreView: View {
     @EnvironmentObject private var logStore: DiveLogStore
     @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
+    @State private var showImporter = false
+    @State private var importMessage: String?
 
     var body: some View {
         NavigationStack {
@@ -26,6 +30,14 @@ struct ExploreView: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
+            .fileImporter(isPresented: $showImporter, allowedContentTypes: [.commaSeparatedText, .plainText]) { result in
+                switch result {
+                case .success(let url):
+                    importRouteCSV(from: url)
+                case .failure(let error):
+                    importMessage = error.localizedDescription
+                }
+            }
         }
     }
 
@@ -126,8 +138,22 @@ struct ExploreView: View {
                 }
             }
             HStack(spacing: 10) {
-                emptyAction("Sincronizza Apple Watch", "applewatch")
-                emptyAction("Importa CSV", "square.and.arrow.down")
+                emptyAction("Sincronizza", "applewatch") {
+                    logStore.synchronizeCloud()
+                    importMessage = "Sync richiesta. Le route compariranno quando i log includono entry/exit GPS."
+                }
+                emptyAction("Importa CSV", "square.and.arrow.down") {
+                    showImporter = true
+                }
+                emptyAction("Impostazioni", "gearshape") {
+                    openAppSettings()
+                }
+            }
+            if let importMessage {
+                Text(importMessage)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(DIRTheme.yellow)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .padding(14)
@@ -347,13 +373,36 @@ struct ExploreView: View {
             .background(Capsule().fill(color.opacity(0.12)).overlay(Capsule().stroke(color.opacity(0.45), lineWidth: 1)))
     }
 
-    private func emptyAction(_ title: String, _ icon: String) -> some View {
-        Label(title, systemImage: icon)
-            .font(.caption.weight(.bold))
-            .foregroundStyle(DIRTheme.cyan)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 9)
-            .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.62), lineWidth: 1))
+    private func emptyAction(_ title: String, _ icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: icon)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(DIRTheme.cyan)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 9)
+                .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.62), lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func importRouteCSV(from url: URL) {
+        switch DiveImportService.importCSV(from: url) {
+        case .success(let session):
+            let alreadyImported = logStore.session(id: session.id) != nil
+            logStore.add(session)
+            importMessage = alreadyImported
+                ? "CSV gia importato: route aggiornata senza duplicati."
+                : "CSV importato: route disponibile se contiene entry/exit GPS."
+        case .failure(let error):
+            importMessage = error.localizedDescription
+        }
+    }
+
+    private func openAppSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(url)
     }
 }
 
