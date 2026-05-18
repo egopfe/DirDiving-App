@@ -701,3 +701,17 @@ Il pass piu recente mantiene MAIN e sperimentale separati e documenta i blocker 
 - iOS MAIN: conversioni unita restano display-only; dati salvati, planner, import/export CSV e sync Watch restano metrici.
 
 Restano obbligatori: build `xcodegen generate` / Xcode su macOS, test Apple Watch Ultra reale, validazione entitlement depth nel Developer portal e QA su import/export, sync, cloud KVS e schermate piccole.
+
+## Aggiornamento documentazione e audit post-fix 2026-05-18
+
+Il ramo `codex/experimental-features` resta experimental e non promuove Snorkeling, Apnea o Buddy Assist in MAIN. Gli aggiornamenti documentali correnti da preservare nei merge sono:
+
+- Feature matrix aggiornata con delete visibile Watch, depth diagnostics, sync queue clear/retry, GPS fix-source metadata, trust reset iOS, notification status, cloud merge-policy UI, CSV parser quotato e Gear save feedback.
+- Report post-fix pre-modifica disponibile su `main`: `Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260518_POST_FIX_PRE_MODIFICATION.md` / `.docx`.
+- PR #8 (`codex/experimental-features` -> `main`) e attualmente conflittuale e con build check falliti; non e safe-to-merge senza risoluzione conservativa, build macOS e QA Apple Watch.
+- Nei conflitti preservare prima codice buildabile e Diving MAIN, poi Snorkeling Live, Mappa Waypoint, Mappa Ritorno, GPS marker, return-to-entry, terminologia `BUSSOLA`, e infine documentazione piu recente.
+
+Blocker MAIN aperti da non correggere in questo pass documentale:
+
+- Watch MAIN: `AscentWarningView` usa `Formatters.zero`, ma il formatter Watch espone solo `time` e `one`.
+- iOS MAIN: `PlannerView.swift` ha una struttura brace/scope non valida vicino a `ResultPanelStyle` / `PlanTab`.
