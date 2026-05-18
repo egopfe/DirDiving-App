@@ -295,3 +295,16 @@ Dopo il report `Docs/EXPERIMENTAL_FUNCTIONS_UX_AUDIT_20260517_PRE_MODIFICATION.d
 - OpenSeaMap, GEBCO, EMODnet e MBTiles restano roadmap/future layer; il companion iOS mostra solo stato/TODO e non include ancora un motore MapLibre reale.
 - Apnea e Snorkeling experimental non sono dispositivi certificati di sicurezza.
 - Watch -> iPhone POI, Watch -> iPhone Apnea, iPhone -> Watch route/waypoint/settings, duplicate prevention e offline queue hanno stato/queue UX sperimentale; non sono ancora una pipeline production completa.
+
+## Aggiornamento pre-release 2026-05-18
+
+Il pass piu recente mantiene `main-iOS` production-oriented e non promuove superfici Apnea/Snorkeling/Explore Lab dal ramo experimental:
+
+- Sync Watch: una peer secret mancante produce `Associazione Watch non verificata`; i payload non vengono trattati come fidati tramite fallback deterministico.
+- Cloud/logbook: i record locali e cloud vengono letti separatamente prima del merge per evitare conflazione silenziosa; tombstone delete restano espliciti ma richiedono test multi-device.
+- CSV import: la data sorgente viene preservata se presente, il file produce un ID deterministico per evitare duplicati su re-import, e gli errori su righe malformed sono visibili.
+- Route Review: gli empty state usano pulsanti reali per sincronizzare, importare CSV o aprire impostazioni; etichette non funzionali non devono sembrare azioni.
+- Planner: `Semplice` e la sola modalita comportamentale attiva; `Avanzato` e `Tecnico` restano planned, con validazione input e acknowledgement safety prima del piano.
+- Unita iOS: conversione coerente e display-only per profondita, temperatura, distanza e SAC; dati salvati, planner, import/export CSV e sync Watch restano metrici.
+
+Validazione richiesta fuori da Windows: `xcodegen generate`, build Xcode, test iPhone small/large screen, pairing Watch, import/re-import CSV, cloud KVS/delete e App Icon asset catalog.
