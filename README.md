@@ -6,6 +6,16 @@ DIR DIVING is a SwiftUI watchOS application for Apple Watch Ultra-class devices.
 
 > Status note: the app is prepared for Apple water submersion APIs, but the depth/submersion entitlement is still pending. Until the entitlement is granted and the app is signed with it, `CMWaterSubmersionManager` may report entitlement-related errors and will not deliver production depth data.
 
+## Depth Entitlement And Signing Checklist
+
+Local configuration is internally aligned for the Watch target: `project.yml` points `DIRDiving Watch App` at `Config/DIRDiving.entitlements`, `App/Info.plist` declares `WKBackgroundModes` with `underwater-depth`, and the Watch entitlements include `com.apple.developer.coremotion.water-submersion`.
+
+External validation is still required before release:
+
+- On macOS/Xcode, run `xcodegen generate` and build the `DIRDiving Watch App` scheme with the Apple SDK.
+- In Apple Developer portal, confirm the App ID `com.egopfe.dirdiving` has the approved water submersion/depth entitlement and iCloud container `iCloud.com.egopfe.dirdiving`.
+- On a real Apple Watch Ultra-class device, confirm automatic depth launch and live `CMWaterSubmersionManager` depth samples; this cannot be validated from Windows or simulator alone.
+
 ## Features
 
 - Current, average, and maximum depth
@@ -501,7 +511,9 @@ The entitlements file currently exists at:
 Config/DIRDiving.entitlements
 ```
 
-The Apple water depth/submersion entitlement is intentionally not filled in yet because approval is pending. After Apple grants the entitlement, update this file and rebuild with the correct signing profile.
+Il file entitlements Watch include la chiave `com.apple.developer.coremotion.water-submersion`, coerente con `WKBackgroundModes` / `underwater-depth` in `App/Info.plist` e con `CODE_SIGN_ENTITLEMENTS: Config/DIRDiving.entitlements` in `project.yml`.
+
+Questa configurazione non equivale a validazione release: prima di TestFlight/App Store serve confermare in Apple Developer portal che l'App ID `com.egopfe.dirdiving` abbia l'entitlement depth/submersion approvato, poi generare/buildare con Xcode su macOS e validare su Apple Watch Ultra reale.
 
 ## Latest MAIN UX Audit And Documentation TODO
 
@@ -675,3 +687,17 @@ Questo ramo resta experimental: Snorkeling, Apnea e Buddy Assist non devono esse
 - L'avviso risalita MAIN mantiene contesto depth/RunTime senza cambiare algoritmi.
 - Aptica off resta visibile come `APTICA DISATTIVATA` / `AVVISI SOLO VISIVI`.
 - La documentazione sperimentale deve conservare Snorkeling Live, Mappa Waypoint, Mappa Ritorno, GPS marker, return-to-entry e terminologia `BUSSOLA`.
+
+Il pass piu recente mantiene MAIN e sperimentale separati e documenta i blocker corretti senza promuovere Apnea, Snorkeling o Buddy Assist in produzione:
+
+- Watch MAIN: `WatchSyncAuth` non dipende piu da `SecureBuddyStore`, che resta escluso dal target MAIN per evitare leakage Buddy/BLE.
+- Watch MAIN: le conferme GPS distinguono successo, ultimo punto noto e nessun fix; il GPS resta surface-only e non viene documentato come tracking subacqueo.
+- Watch MAIN: l'avviso risalita conserva profondita corrente e RunTime durante l'allarme; la logica di calcolo risalita non e stata modificata.
+- Watch MAIN: quando l'aptica e disattivata, la live UI mostra `APTICA DISATTIVATA` e `AVVISI SOLO VISIVI`.
+- iOS MAIN: sync Watch senza peer secret resta `Associazione Watch non verificata`; nessuna fallback key deterministica viene trattata come fidata.
+- iOS MAIN: import CSV preserva la data sorgente quando presente, usa ID deterministico da hash per evitare duplicati e mostra risultato import/duplicati/errori.
+- iOS MAIN: Route Review ha azioni reali per sync, import CSV e impostazioni; azioni non cablate non devono sembrare pulsanti.
+- iOS MAIN: Planner usa solo modalita semplice come comportamento attivo, marca modalita avanzate/tecniche come planned, valida input e richiede acknowledgement safety.
+- iOS MAIN: conversioni unita restano display-only; dati salvati, planner, import/export CSV e sync Watch restano metrici.
+
+Restano obbligatori: build `xcodegen generate` / Xcode su macOS, test Apple Watch Ultra reale, validazione entitlement depth nel Developer portal e QA su import/export, sync, cloud KVS e schermate piccole.
