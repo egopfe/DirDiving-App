@@ -674,3 +674,25 @@ Il pass piu recente mantiene MAIN e sperimentale separati e documenta i blocker 
 - iOS MAIN: conversioni unita restano display-only; dati salvati, planner, import/export CSV e sync Watch restano metrici.
 
 Restano obbligatori: build `xcodegen generate` / Xcode su macOS, test Apple Watch Ultra reale, validazione entitlement depth nel Developer portal e QA su import/export, sync, cloud KVS e schermate piccole.
+
+## Aggiornamento documentazione e audit post-fix 2026-05-18
+
+Il report post-fix pre-modifica corrente e stato aggiunto in:
+
+```text
+Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260518_POST_FIX_PRE_MODIFICATION.md
+Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260518_POST_FIX_PRE_MODIFICATION.docx
+```
+
+Stato documentale corrente:
+
+- Apple Watch MAIN include ora delete visibile da `DiveDetailView`, diagnostica depth entitlement/sensore/callback in `Info`, coda sync con retry/clear, metadata GPS fix/fallback/no-fix, stato UserImages vuoto e note export/units local-only.
+- iOS MAIN include Logbook con mesi dinamici, Explore con azioni separate `Sync Watch` / `Sync iCloud`, Analysis con azioni reali, reset/re-pair trust Watch, stato autorizzazione notifiche, policy cloud visibile, CSV parser con campi quotati e feedback `importate/duplicati/righe saltate`, e feedback `Salvato` su Gear.
+- La matrice `Docs/DIR_DIVING_Feature_Comparison.csv` separa Apple Watch Main, Apple Watch Experimental, iOS Main e iOS Experimental.
+- Le PR sperimentali aperte (#8 e #9) risultano conflittuali e con build check falliti; non sono considerate safe-to-merge finche non passano build macOS, review target membership e QA safety.
+
+Blocker aperti da risolvere in commit runtime separati, non in documentazione:
+
+- Watch MAIN: `AscentWarningView` usa `Formatters.zero`, ma il formatter Watch espone solo `time` e `one`.
+- iOS MAIN: `PlannerView.swift` ha una struttura brace/scope non valida vicino a `ResultPanelStyle` / `PlanTab`.
+- `Views/AscentGaugeView.swift` su Watch MAIN puo apparire modificato senza diff contenutistico per line endings; non va incluso in commit funzionali se resta stat-only.

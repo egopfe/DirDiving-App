@@ -22,6 +22,10 @@ backup/before-docs-merge-20260518-1337-main
 backup/before-docs-merge-20260518-1337-main-iOS
 backup/before-docs-merge-20260518-1337-watch-experimental
 backup/before-docs-merge-20260518-1337-ios-experimental
+backup/before-docs-merge-20260518-1903-main
+backup/before-docs-merge-20260518-1903-main-iOS
+backup/before-docs-merge-20260518-1903-watch-experimental
+backup/before-docs-merge-20260518-1903-ios-experimental
 ```
 
 ## Stato MAIN Apple Watch
@@ -56,19 +60,28 @@ backup/before-docs-merge-20260518-1337-ios-experimental
 - Mock/TODO/Non sincronizzato devono restare visibili finche i dati production non esistono.
 - Non importare superfici Watch experimental nel branch iOS MAIN come feature production.
 
+## Aggiornamento post-fix 2026-05-18 19:03
+
+- `main` e `main-iOS` sono allineati con `origin` prima di questo pass documentale; i rami experimental sono avanti ai rispettivi branch base ma indietro di 3 commit MAIN.
+- Il nuovo audit post-fix e in `Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260518_POST_FIX_PRE_MODIFICATION.md` e `.docx`.
+- Watch MAIN documenta delete visibile, depth diagnostics, coda sync retry/clear, metadata GPS fix/fallback/no-fix, UserImages empty state e limiti unit/export.
+- iOS MAIN documenta Logbook con mesi dinamici, Explore sync Watch/iCloud separati, Analysis actions, reset/re-pair trust Watch, stato notifiche, cloud merge-policy UI, CSV parser quotato e Gear save feedback.
+- Blocker runtime da correggere separatamente: Watch `AscentWarningView` usa `Formatters.zero` mancante; iOS `PlannerView.swift` ha struttura brace/scope non valida vicino a `ResultPanelStyle` / `PlanTab`.
+- `Views/AscentGaugeView.swift` su Watch MAIN puo risultare dirty senza diff contenutistico per line endings; non includerlo in commit funzionali se resta stat-only.
+
 ## PR aperte
 
 ### PR #8 - Update experimental Apnea workflow
 
 - Branch: `codex/experimental-features` -> `main`
-- GitHub: mergeable, `UNSTABLE`, build checks failing.
+- GitHub: `mergeable=CONFLICTING`, `mergeStateStatus=DIRTY`, build checks failing.
 - Rischio: ampia modifica runtime Watch experimental, inclusi Snorkeling/Apnea/Buddy e project membership.
 - Raccomandazione: non merge automatico; richiede build macOS, Apple Watch QA e review safety.
 
 ### PR #9 - Add experimental Apnea companion review
 
 - Branch: `codex/ios-experimental-features` -> `main-iOS`
-- GitHub: mergeable, `UNSTABLE`, build checks failing.
+- GitHub: `mergeable=CONFLICTING`, `mergeStateStatus=DIRTY`, build checks failing.
 - Rischio: modifica ampia con molti file Watch/root e companion experimental.
 - Raccomandazione: non merge automatico; richiede review target membership, build macOS e verifica che mock/lab non entrino in MAIN.
 
