@@ -668,3 +668,17 @@ Il pass piu recente mantiene `main-iOS` production-oriented e non promuove super
 - Unita iOS: conversione coerente e display-only per profondita, temperatura, distanza e SAC; dati salvati, planner, import/export CSV e sync Watch restano metrici.
 
 Validazione richiesta fuori da Windows: `xcodegen generate`, build Xcode, test iPhone small/large screen, pairing Watch, import/re-import CSV, cloud KVS/delete e App Icon asset catalog.
+
+## Aggiornamento documentazione e audit post-fix 2026-05-18
+
+Il ramo `codex/ios-experimental-features` resta experimental e non promuove Explore Lab, Apnea Review, POI enrichment o map/offline roadmap in `main-iOS`. Gli aggiornamenti documentali correnti da preservare nei merge sono:
+
+- Feature matrix aggiornata con Logbook mesi dinamici, Explore sync Watch/iCloud separati, Analysis actions, trust reset/re-pair, stato notifiche, cloud merge-policy UI, CSV parser quotato e Gear save feedback.
+- Report post-fix pre-modifica disponibile su `main`: `Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260518_POST_FIX_PRE_MODIFICATION.md` / `.docx`.
+- PR #9 (`codex/ios-experimental-features` -> `main-iOS`) e attualmente conflittuale e con build check falliti; non e safe-to-merge senza risoluzione conservativa, build macOS e review target membership.
+- Nei conflitti preservare prima codice buildabile e iOS MAIN stabile, poi Explore Lab/Apnea Review solo come superfici mock/TODO chiaramente etichettate.
+
+Blocker MAIN aperti da non correggere in questo pass documentale:
+
+- iOS MAIN: `PlannerView.swift` ha una struttura brace/scope non valida vicino a `ResultPanelStyle` / `PlanTab`.
+- Watch MAIN: `AscentWarningView` usa `Formatters.zero`, ma il formatter Watch espone solo `time` e `one`.
