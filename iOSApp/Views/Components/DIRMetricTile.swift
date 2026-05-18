@@ -7,6 +7,18 @@ struct DIRMetricTile: View {
     var color: Color = .white
     var icon: String?
 
+    init(title: String, value: String, unit: String? = nil, color: Color = .white, icon: String? = nil) {
+        self.title = title
+        self.value = value
+        self.unit = unit
+        self.color = color
+        self.icon = icon
+    }
+
+    init(title: String, measurement: DisplayMeasurement, color: Color = .white, icon: String? = nil) {
+        self.init(title: title, value: measurement.value, unit: measurement.unit, color: color, icon: icon)
+    }
+
     var body: some View {
         VStack(alignment: .center, spacing: 7) {
             HStack {

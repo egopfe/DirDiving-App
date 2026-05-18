@@ -3,6 +3,7 @@ import Charts
 
 struct AnalysisView: View {
     @EnvironmentObject private var logStore: DiveLogStore
+    @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
 
     var body: some View {
         NavigationStack {
@@ -18,10 +19,10 @@ struct AnalysisView: View {
                             DIRCard("ANALISI AVANZATE", icon: "chart.line.uptrend.xyaxis", accent: DIRTheme.cyan) {
                                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 0) {
                                     DIRMetricTile(title: "Immersioni", value: "\(logStore.sessions.count)", color: DIRTheme.cyan)
-                                    DIRMetricTile(title: "Max assoluta", value: Formatters.one(logStore.sessions.map(\.maxDepthMeters).max() ?? 0), unit: "m", color: DIRTheme.yellow)
+                                    DIRMetricTile(title: "Max assoluta", measurement: Formatters.depth(logStore.sessions.map(\.maxDepthMeters).max() ?? 0, units: unitPreference), color: DIRTheme.yellow)
                                     DIRMetricTile(title: "Runtime totale", value: Formatters.zero(logStore.sessions.map(\.durationSeconds).reduce(0, +) / 60), unit: "min")
-                                    DIRMetricTile(title: "Temp media", value: Formatters.one(avgTemp), unit: "C")
-                                    DIRMetricTile(title: "SAC medio", value: Formatters.one(avgSAC), unit: "l/min", color: DIRTheme.green)
+                                    DIRMetricTile(title: "Temp media", measurement: Formatters.temperature(avgTemp, units: unitPreference))
+                                    DIRMetricTile(title: "SAC medio", measurement: Formatters.sac(avgSAC, units: unitPreference), color: DIRTheme.green)
                                     DIRMetricTile(title: "Route GPS", value: "\(RouteSummaryService.summaries(from: logStore.sessions).count)", color: DIRTheme.cyan)
                                 }
                             }
@@ -29,7 +30,7 @@ struct AnalysisView: View {
                                 Chart(logStore.sessions) { session in
                                     BarMark(
                                         x: .value("Data", session.startDate, unit: .day),
-                                        y: .value("Max", session.maxDepthMeters)
+                                        y: .value("Max", Formatters.depthValue(session.maxDepthMeters, units: unitPreference))
                                     )
                                     .foregroundStyle(
                                         LinearGradient(colors: [DIRTheme.cyan, DIRTheme.green], startPoint: .top, endPoint: .bottom)
@@ -127,6 +128,10 @@ struct AnalysisView: View {
         return values.isEmpty ? 0 : values.reduce(0, +) / Double(values.count)
     }
 
+    private var unitPreference: IOSUnitPreference {
+        IOSUnitPreference.fromStorage(units)
+    }
+
     private var header: some View {
         VStack(alignment: .leading, spacing: 7) {
             Text("Analisi")
@@ -160,7 +165,7 @@ struct AnalysisView: View {
             HStack(spacing: 0) {
                 DIRMetricTile(title: "Routes", value: "\(routes.count)", color: DIRTheme.cyan)
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: "Distance", value: Formatters.zero(routes.map(\.distanceMeters).reduce(0, +) / 1000), unit: "km", color: DIRTheme.green)
+                DIRMetricTile(title: "Distance", measurement: Formatters.distance(routes.map(\.distanceMeters).reduce(0, +), units: unitPreference, prefersLargeUnit: true), color: DIRTheme.green)
                 Divider().overlay(DIRTheme.hairline)
                 DIRMetricTile(title: "Latest", value: routes.first?.bearingDegrees.map { Formatters.zero($0) } ?? "--", unit: routes.first?.bearingDegrees == nil ? nil : "deg", color: DIRTheme.yellow)
             }

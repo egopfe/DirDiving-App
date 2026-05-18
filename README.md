@@ -138,11 +138,12 @@ If a Watch payload conflicts with an existing local session, the companion store
 
 Dopo il report `Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260517_CURRENT_PRE_MODIFICATION.docx`, iOS MAIN ha ricevuto un pass UX mirato:
 
-- `Settings` espone unita/export come preferenze non editabili o local-only quando non esiste ancora un contratto sync production.
+- `Settings` espone unita iOS editabili e persistite localmente; la conversione e presentation-only per profondita, temperatura, distanza e SAC.
+- `Settings` mantiene export come preferenza non editabile perche oggi esiste solo Subsurface CSV.
 - `Settings` chiarisce che gli allarmi immersione sono gestiti su Apple Watch e che i permessi notifiche iOS si recuperano dalle Impostazioni di sistema.
 - `Logbook`, `Route Review` e `Analysis` mostrano empty state quando non ci sono immersioni, route GPS surface-only o statistiche reali.
 - `Logbook` richiede conferma prima di eliminare una sessione e `Gear` richiede conferma prima del reset profilo.
-- Non sono stati modificati algoritmi GPS, bussola, profondita, risalita, planner, persistenza o modello sync; il pass e UI/UX e copy-only salvo conferme SwiftUI.
+- Non sono stati modificati algoritmi GPS, bussola, profondita, risalita, planner, persistenza o modello sync; le conversioni unita non cambiano dati salvati, import/export CSV o calcoli planner.
 
 ## Latest MAIN UX Audit And Documentation TODO
 
@@ -155,7 +156,7 @@ Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260517_CURRENT_PRE_MODIFICATION.docx
 Stato documentato per il companion iOS MAIN:
 
 - Le superfici principali sono raggiungibili: `Logbook`, `Route Review`, `Analysis`, `Planner`, `Gear`, `Settings`.
-- Risolti nel pass MAIN UX: empty state principali, conferme delete/reset e copy coerente per settings read-only/local-only.
+- Risolti nel pass MAIN UX: empty state principali, conferme delete/reset, unita iOS editabili con formatter di conversione, export ancora marcato read-only e copy coerente per settings local-only.
 - Restano TODO sync: settings Watch/iOS non sono ancora una pipeline bidirezionale production; i conflitti Watch sono visibili ma richiedono test device e policy prodotto.
 - Restano TODO build/config da verificare su macOS: l'asset catalog iOS MAIN deve contenere i PNG citati da `iOSApp/Resources/Assets.xcassets/AppIcon.appiconset/Contents.json`.
 - L'audit resta snapshot pre-modifica; i fix MAIN UX successivi sono committati separatamente dalla documentazione.

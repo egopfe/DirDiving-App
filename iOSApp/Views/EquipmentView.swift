@@ -3,6 +3,7 @@ import SwiftUI
 struct EquipmentView: View {
     @EnvironmentObject private var equipment: EquipmentStore
     @State private var showResetConfirmation = false
+    @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
 
     var body: some View {
         NavigationStack {
@@ -110,15 +111,19 @@ struct EquipmentView: View {
             Button { equipment.profile.sacLitersMinute = max(5, equipment.profile.sacLitersMinute - 0.5) } label: {
                 Image(systemName: "minus").frame(width: 28, height: 26)
             }
-            Text("\(Formatters.one(equipment.profile.sacLitersMinute)) l/min")
+            Text(Formatters.sac(equipment.profile.sacLitersMinute, units: unitPreference).text)
                 .font(.callout.monospacedDigit().weight(.semibold))
                 .foregroundStyle(.white)
-                .frame(width: 92)
+                .frame(width: 104)
             Button { equipment.profile.sacLitersMinute = min(40, equipment.profile.sacLitersMinute + 0.5) } label: {
                 Image(systemName: "plus").frame(width: 28, height: 26)
             }
         }
         .foregroundStyle(DIRTheme.cyan)
         .padding(.vertical, 7)
+    }
+
+    private var unitPreference: IOSUnitPreference {
+        IOSUnitPreference.fromStorage(units)
     }
 }

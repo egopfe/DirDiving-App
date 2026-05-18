@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ExploreView: View {
     @EnvironmentObject private var logStore: DiveLogStore
+    @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
 
     var body: some View {
         NavigationStack {
@@ -55,9 +56,10 @@ struct ExploreView: View {
 
     private var routeStatusStrip: some View {
         let routes = routeSummaries
+        let distance = Formatters.distance(totalDistance, units: unitPreference, prefersLargeUnit: true)
         HStack(spacing: 12) {
             routeStatus("ROUTES", "\(routes.count)", DIRTheme.cyan, "point.topleft.down.curvedto.point.bottomright.up")
-            routeStatus("DIST", Formatters.zero(totalDistance / 1000), DIRTheme.green, "ruler")
+            routeStatus("DIST", distance.text, DIRTheme.green, "ruler")
             routeStatus("LATEST", latestBearingText, DIRTheme.yellow, "location.north")
         }
     }
@@ -68,7 +70,7 @@ struct ExploreView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(routeSummaries) { route in
-                        waypointCard(route.name, "\(Formatters.zero(route.distanceMeters)) m", route.startDate.formatted(.dateTime.day().month().hour().minute()), DIRTheme.cyan, "mappin.and.ellipse")
+                        waypointCard(route.name, Formatters.distance(route.distanceMeters, units: unitPreference).text, route.startDate.formatted(.dateTime.day().month().hour().minute()), DIRTheme.cyan, "mappin.and.ellipse")
                     }
                 }
                 .padding(.vertical, 2)
@@ -82,7 +84,7 @@ struct ExploreView: View {
                 HStack(spacing: 0) {
                     DIRMetricTile(title: "Bearing", value: latestBearingText, unit: nil, color: DIRTheme.cyan, icon: "location.north")
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: "Distance", value: Formatters.zero(totalDistance), unit: "m", color: DIRTheme.green, icon: "arrow.left.and.right")
+                    DIRMetricTile(title: "Distance", measurement: Formatters.distance(totalDistance, units: unitPreference), color: DIRTheme.green, icon: "arrow.left.and.right")
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: "Fix", value: "\(routeSummaries.count)", color: DIRTheme.yellow, icon: "flag")
                 }
@@ -147,6 +149,10 @@ struct ExploreView: View {
     private var latestBearingText: String {
         guard let bearing = routeSummaries.first?.bearingDegrees else { return "--" }
         return Formatters.zero(bearing)
+    }
+
+    private var unitPreference: IOSUnitPreference {
+        IOSUnitPreference.fromStorage(units)
     }
 
     private var gridOverlay: some View {

@@ -13,6 +13,7 @@ struct DiveDetailView: View {
     @State private var tab: DiveDetailTab = .summary
     @State private var csvURL: URL?
     @State private var exportErrorMessage: String?
+    @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
 
     var body: some View {
         ZStack {
@@ -111,17 +112,17 @@ struct DiveDetailView: View {
             HStack(spacing: 0) {
                 detailMetric("Tempo", value: Formatters.time(session.durationSeconds), unit: "min")
                 Divider().overlay(DIRTheme.hairline)
-                detailMetric("Max Profondita", value: Formatters.one(session.maxDepthMeters), unit: "m")
+                detailMetric("Max Profondita", measurement: Formatters.depth(session.maxDepthMeters, units: unitPreference))
                 Divider().overlay(DIRTheme.hairline)
-                detailMetric("Prof. Media", value: Formatters.one(session.avgDepthMeters), unit: "m")
+                detailMetric("Prof. Media", measurement: Formatters.depth(session.avgDepthMeters, units: unitPreference))
             }
             Divider().overlay(DIRTheme.hairline)
             HStack(spacing: 0) {
                 detailMetric("TTR", value: Formatters.zero(session.ttv), unit: "min")
                 Divider().overlay(DIRTheme.hairline)
-                detailMetric("SAC", value: Formatters.one(session.sacLitersMinute ?? 0), unit: "l/min")
+                detailMetric("SAC", measurement: Formatters.sac(session.sacLitersMinute ?? 0, units: unitPreference))
                 Divider().overlay(DIRTheme.hairline)
-                detailMetric("Temperatura", value: Formatters.one(session.avgWaterTemperatureCelsius ?? 0), unit: "C")
+                detailMetric("Temperatura", measurement: Formatters.temperature(session.avgWaterTemperatureCelsius ?? 0, units: unitPreference))
             }
         }
         .background(
@@ -149,13 +150,13 @@ struct DiveDetailView: View {
             Chart(session.samples) { sample in
                 LineMark(
                     x: .value("Tempo", sample.timestamp),
-                    y: .value("Profondita", sample.depthMeters)
+                    y: .value("Profondita", Formatters.depthValue(sample.depthMeters, units: unitPreference))
                 )
                 .foregroundStyle(DIRTheme.cyan)
                 .lineStyle(StrokeStyle(lineWidth: 2.4, lineCap: .round, lineJoin: .round))
                 .interpolationMethod(.catmullRom)
             }
-            .chartYScale(domain: [(session.maxDepthMeters + 8), 0])
+            .chartYScale(domain: [(Formatters.depthValue(session.maxDepthMeters + 8, units: unitPreference)), 0])
             .chartXAxis {
                 AxisMarks(values: .automatic(desiredCount: 4)) {
                     AxisGridLine().foregroundStyle(DIRTheme.cyan.opacity(0.08))
@@ -228,10 +229,11 @@ struct DiveDetailView: View {
     }
 
     private var temperatureText: String {
-        guard let temperature = session.avgWaterTemperatureCelsius else {
-            return "--.- C"
-        }
-        return "\(Formatters.one(temperature)) C"
+        Formatters.optionalTemperature(session.avgWaterTemperatureCelsius, units: unitPreference)
+    }
+
+    private var unitPreference: IOSUnitPreference {
+        IOSUnitPreference.fromStorage(units)
     }
 
     private func detailMetric(_ title: String, value: String, unit: String) -> some View {
@@ -255,6 +257,10 @@ struct DiveDetailView: View {
         }
         .frame(maxWidth: .infinity, minHeight: 70)
         .padding(.horizontal, 4)
+    }
+
+    private func detailMetric(_ title: String, measurement: DisplayMeasurement) -> some View {
+        detailMetric(title, value: measurement.value, unit: measurement.unit)
     }
 
     private var details: some View {

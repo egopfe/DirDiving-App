@@ -26,11 +26,11 @@ struct MoreView: View {
                         systemStatus
                         onboardingCard
                         DIRCard("PREFERENZE APP", icon: "gearshape.fill", accent: DIRTheme.cyan) {
-                            lockedPreference("Unità", value: units, note: "Metrico-only su MAIN; conversione imperiale TODO.")
+                            unitPreferencePicker
                             lockedPreference("Export predefinito", value: exportFormat, note: "Unico formato disponibile oggi.")
                             row("Sync impostazioni", "Locale-only")
                             row("Planner safety", "Disclaimer richiesto")
-                            infoNote("Le preferenze sopra sono persistite localmente. Non vengono ancora inviate al Watch.")
+                            infoNote("Le unità convertono la visualizzazione iOS di profondità, temperatura, distanza e SAC. Dati salvati, import/export CSV e planner restano metrici per compatibilità e sicurezza.")
                         }
                         DIRCard("ALLARMI E NOTIFICHE", icon: "bell.badge", accent: DIRTheme.yellow) {
                             row("Allarmi immersione", "Gestiti su Apple Watch")
@@ -147,6 +147,30 @@ struct MoreView: View {
         }
     }
 
+    private var unitPreferencePicker: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Unità")
+                    .foregroundStyle(DIRTheme.muted)
+                Spacer()
+                Text(IOSUnitPreference.fromStorage(units).shortLabel)
+                    .foregroundStyle(.white)
+                    .fontWeight(.semibold)
+            }
+            .font(.callout)
+            Picker("Unità", selection: $units) {
+                ForEach(IOSUnitPreference.allCases) { preference in
+                    Text(preference.shortLabel).tag(preference.rawValue)
+                }
+            }
+            .pickerStyle(.segmented)
+            Text("Persistita localmente; non sincronizzata con Apple Watch.")
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.yellow)
+        }
+        .padding(.vertical, 5)
+    }
+
     private func statusPill(_ text: String, _ color: Color) -> some View {
         HStack(spacing: 7) {
             Circle()
@@ -255,7 +279,7 @@ struct MoreView: View {
                     .padding(.vertical, 3)
                     .background(Capsule().stroke(DIRTheme.yellow.opacity(0.72), lineWidth: 1))
             }
-            Text("Locale: \(conflict.localSummary) | Watch: \(Formatters.one(conflict.incoming.maxDepthMeters)) m / \(Formatters.time(conflict.incoming.durationSeconds))")
+            Text("Locale: \(conflict.localSummary) | Watch: \(Formatters.depth(conflict.incoming.maxDepthMeters, units: IOSUnitPreference.fromStorage(units)).text) / \(Formatters.time(conflict.incoming.durationSeconds))")
                 .font(.caption)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)

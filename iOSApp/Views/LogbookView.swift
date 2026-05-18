@@ -201,6 +201,7 @@ struct LogbookView: View {
 struct DiveLogCard: View {
     let session: DiveSession
     let index: Int
+    @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
 
     var body: some View {
         HStack(spacing: 10) {
@@ -223,7 +224,7 @@ struct DiveLogCard: View {
                             .overlay(RoundedRectangle(cornerRadius: 3).stroke(DIRTheme.yellow, lineWidth: 1))
                     }
                 }
-                Text("Max \(Formatters.one(session.maxDepthMeters)) m")
+                Text("Max \(Formatters.depth(session.maxDepthMeters, units: unitPreference).text)")
                     .font(.system(size: 11, weight: .medium, design: .rounded))
                     .foregroundStyle(DIRTheme.muted)
                 HStack {
@@ -231,7 +232,7 @@ struct DiveLogCard: View {
                     Text(session.gasLabel.rawValue)
                         .padding(.leading, 8)
                     Spacer(minLength: 4)
-                    Text(session.avgWaterTemperatureCelsius.map { "\(Formatters.one($0)) C" } ?? "--.- C")
+                    Text(Formatters.optionalTemperature(session.avgWaterTemperatureCelsius, units: unitPreference))
                 }
                 .font(.system(size: 11, weight: .medium, design: .rounded))
                 .foregroundStyle(DIRTheme.muted)
@@ -252,6 +253,10 @@ struct DiveLogCard: View {
                         .stroke(Color.white.opacity(0.045), lineWidth: 1)
                 )
         )
+    }
+
+    private var unitPreference: IOSUnitPreference {
+        IOSUnitPreference.fromStorage(units)
     }
 
     private var dateBlock: some View {
