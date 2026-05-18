@@ -645,3 +645,15 @@ Dopo il report `Docs/EXPERIMENTAL_FUNCTIONS_UX_AUDIT_20260517_PRE_MODIFICATION.d
 - OpenSeaMap, GEBCO, EMODnet e MBTiles restano roadmap/future layer; il companion iOS mostra solo stato/TODO e non include ancora un motore MapLibre reale.
 - Apnea e Snorkeling experimental non sono dispositivi certificati di sicurezza.
 - Watch -> iPhone POI, Watch -> iPhone Apnea, iPhone -> Watch route/waypoint/settings, duplicate prevention e offline queue hanno stato/queue UX sperimentale; non sono ancora una pipeline production completa.
+
+## Aggiornamento pre-release 2026-05-18
+
+Questo ramo resta experimental e non deve sovrascrivere `main-iOS` con mock o superfici lab-only. Nei merge successivi preservare:
+
+- Sync Watch MAIN: peer secret mancante = `Associazione Watch non verificata`, senza trust silenzioso da fallback deterministico.
+- Logbook/cloud MAIN: lettura locale e cloud separata prima del merge, tombstone delete espliciti e nessuna sovrascrittura silenziosa intenzionale.
+- CSV import MAIN: data sorgente preservata quando presente, ID deterministico anti-duplicato, feedback import/duplicati/errori.
+- Route Review MAIN: empty state con azioni reali sync/import/settings.
+- Planner MAIN: solo `Semplice` e comportamento attivo; `Avanzato` e `Tecnico` sono planned, con validazione input e acknowledgement safety.
+- Unita iOS MAIN: conversione display-only; planner, dati salvati, CSV e sync restano metrici.
+- iOS experimental puo continuare a mostrare Explore Lab, POI enrichment, Apnea Review e map/offline roadmap, ma deve etichettare mock/TODO chiaramente.

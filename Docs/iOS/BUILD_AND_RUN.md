@@ -35,6 +35,9 @@ UI-only visual alignment must not change planner calculations, sync, persistence
 - Verificare che tutti i PNG referenziati da `iOSApp/Resources/Assets.xcassets/AppIcon.appiconset/Contents.json` siano presenti prima di una build App Store/TestFlight.
 - Eseguire almeno una build `DIRDiving iOS` con Xcode e Apple SDK reali; l'ambiente Windows non puo sostituire questa validazione.
 - Testare import/export CSV con file valido, file vuoto e file malformato prima della promozione release.
+- Watch MAIN: verificare che `WatchSyncAuth` compili senza `SecureBuddyStore` nel target MAIN e che le esclusioni experimental in `project.yml` restino coerenti.
+- Watch MAIN: verificare su Apple Developer portal e Apple Watch Ultra reale l'entitlement `com.apple.developer.coremotion.water-submersion`.
+- iOS MAIN: testare peer secret mancante/verificata per Watch sync, re-import CSV anti-duplicato, tombstone KVS/delete e Planner invalid-input/safety acknowledgement.
 
 ## Signing
 
