@@ -664,3 +664,14 @@ Dopo il report `Docs/EXPERIMENTAL_FUNCTIONS_UX_AUDIT_20260517_PRE_MODIFICATION.d
 - Introdurre workflow MapLibre/OpenSeaMap/MBTiles sul companion iOS dopo valutazione licenze e prestazioni.
 - Aggiungere report test hardware Apple Watch Ultra per Diving, Snorkeling e Apnea.
 - Preparare export e documentazione Subsurface piu completa per import CSV.
+
+## Aggiornamento pre-release 2026-05-18
+
+Questo ramo resta experimental: Snorkeling, Apnea e Buddy Assist non devono essere mergiati in `main` senza build macOS, review safety e QA hardware. Gli aggiornamenti MAIN da preservare nei merge successivi sono:
+
+- Diving MAIN resta il flusso stabile e deve mantenere live UI, BUSSOLA, GPS entry/exit surface-only, export Subsurface, settings/allarmi e log.
+- `WatchSyncAuth` MAIN e isolato da `SecureBuddyStore`; Buddy/BLE resta experimental.
+- GPS no-fix, ultimo punto noto e successo devono restare visivamente distinti.
+- L'avviso risalita MAIN mantiene contesto depth/RunTime senza cambiare algoritmi.
+- Aptica off resta visibile come `APTICA DISATTIVATA` / `AVVISI SOLO VISIVI`.
+- La documentazione sperimentale deve conservare Snorkeling Live, Mappa Waypoint, Mappa Ritorno, GPS marker, return-to-entry e terminologia `BUSSOLA`.
