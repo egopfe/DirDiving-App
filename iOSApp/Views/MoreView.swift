@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import UserNotifications
 
 struct MoreView: View {
     @EnvironmentObject private var watchSync: WatchSyncService
@@ -8,6 +9,8 @@ struct MoreView: View {
     @AppStorage("dirdiving_ios_units") private var units = "Metrico (m, °C)"
     @AppStorage("dirdiving_ios_export_format") private var exportFormat = "Subsurface CSV"
     @AppStorage("dirdiving_ios_show_onboarding") private var showOnboarding = true
+    @State private var notificationStatus = "Non verificato"
+    @State private var showResetPairingConfirmation = false
 
     var body: some View {
         NavigationStack {
@@ -35,7 +38,7 @@ struct MoreView: View {
                         DIRCard("ALLARMI E NOTIFICHE", icon: "bell.badge", accent: DIRTheme.yellow) {
                             row("Allarmi immersione", "Gestiti su Apple Watch")
                             row("Notifiche iOS", "Permessi gestiti da iOS")
-                            row("Stato autorizzazione", "Verifica in Impostazioni")
+                            row("Stato autorizzazione", notificationStatus)
                             Button {
                                 openAppSettings()
                             } label: {
@@ -48,6 +51,8 @@ struct MoreView: View {
                             row("Supportato", watchSync.isSupported ? "Si" : "No")
                             row("Stato", String(describing: watchSync.activationState))
                             row("Esito", watchSync.userVisibleState)
+                            row("Peer verificato", WatchSyncAuth.hasPeerSecret() ? "Si" : "No")
+                            row("Ultimo sync", watchSync.lastMessage)
                             row("Settings Watch", "Non sincronizzati")
                             if watchSync.activationState == .activated && !WatchSyncAuth.hasPeerSecret() {
                                 emptyState(
@@ -76,6 +81,13 @@ struct MoreView: View {
                                 actionLabel("Riprova Watch Sync", systemImage: "arrow.triangle.2.circlepath")
                             }
                             .buttonStyle(.plain)
+                            Button {
+                                showResetPairingConfirmation = true
+                            } label: {
+                                destructiveActionLabel("Reset trust / re-pair", systemImage: "lock.rotation")
+                            }
+                            .buttonStyle(.plain)
+                            infoNote("Il reset rimuove solo il peer secret locale attendibile. I payload Watch restano non verificati finche non arriva una nuova associazione sicura; non viene usata alcuna chiave deterministica di fallback.")
                         }
                         DIRCard("BACKUP CLOUD", icon: "icloud", accent: DIRTheme.green) {
                             row("iCloud Sync", cloudSync.isICloudAvailable ? "Attivo" : "Non disponibile")
@@ -83,6 +95,7 @@ struct MoreView: View {
                             row("Conflitti cloud", "Ultimo salvataggio KVS")
                             row("Eliminazioni", "Rimozione locale + prossima sync")
                             row("Ultimo evento", cloudSync.lastSyncStatus)
+                            infoNote("Merge cloud: log locali e iCloud vengono confrontati per ID stabile; se esistono due versioni dello stesso ID viene mantenuta la versione piu completa/recente secondo la policy dell'app. Attrezzatura e planner usano ultimo salvataggio KVS e non hanno ancora risoluzione per-campo.")
                             if !cloudSync.isICloudAvailable {
                                 emptyState(
                                     title: "Backup cloud non disponibile",
@@ -115,6 +128,9 @@ struct MoreView: View {
                         }
                         DIRCard("EXPORT", icon: "square.and.arrow.up", accent: DIRTheme.cyan) {
                             row("Formato", exportFormat)
+                            row("Subsurface CSV", "Default")
+                            row("GPX", "Planned")
+                            row("UDDF", "Planned")
                             row("Bundle", "com.egopfe.dirdiving.ios")
                             row("Import", "CSV Subsurface da Logbook")
                             infoNote("Solo Subsurface CSV e disponibile oggi. Altri formati restano Planned/TODO.")
@@ -125,6 +141,15 @@ struct MoreView: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
+            .onAppear { refreshNotificationStatus() }
+            .confirmationDialog("Resettare trust Watch?", isPresented: $showResetPairingConfirmation, titleVisibility: .visible) {
+                Button("Reset trust e nuova associazione", role: .destructive) {
+                    watchSync.resetPairingTrust(logStore: logStore)
+                }
+                Button("Annulla", role: .cancel) {}
+            } message: {
+                Text("La chiave peer verificata viene rimossa da questo iPhone. I nuovi payload saranno considerati non verificati finche Watch e iPhone non scambiano una nuova chiave attendibile.")
+            }
         }
     }
 
@@ -245,9 +270,9 @@ struct MoreView: View {
                 .font(.caption)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
-            Text(action.uppercased())
+            Text("Stato: \(action)")
                 .font(.caption2.weight(.bold))
-                .foregroundStyle(DIRTheme.cyan)
+                .foregroundStyle(DIRTheme.yellow)
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -267,9 +292,39 @@ struct MoreView: View {
             .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
     }
 
+    private func destructiveActionLabel(_ title: String, systemImage: String) -> some View {
+        Label(title, systemImage: systemImage)
+            .font(.callout.weight(.semibold))
+            .foregroundStyle(DIRTheme.red)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.red.opacity(0.78), lineWidth: 1))
+    }
+
     private func openAppSettings() {
         guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
         UIApplication.shared.open(url)
+    }
+
+    private func refreshNotificationStatus() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            let status: String
+            switch settings.authorizationStatus {
+            case .authorized:
+                status = "Authorized"
+            case .denied:
+                status = "Denied"
+            case .notDetermined:
+                status = "Not determined"
+            case .provisional:
+                status = "Provisional"
+            case .ephemeral:
+                status = "Ephemeral"
+            @unknown default:
+                status = "Sconosciuto"
+            }
+            Task { @MainActor in notificationStatus = status }
+        }
     }
 
     private func conflictRow(_ conflict: WatchSyncService.SyncConflict) -> some View {

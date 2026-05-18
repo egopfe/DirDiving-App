@@ -7,6 +7,7 @@ struct DIRDivingiOSApp: App {
     @StateObject private var watchSync = WatchSyncService()
     @StateObject private var plannerStore: PlannerStore
     @StateObject private var equipmentStore: EquipmentStore
+    @StateObject private var navigationStore = IOSNavigationStore()
 
     init() {
         let cloudSync = CloudSyncStore()
@@ -24,6 +25,7 @@ struct DIRDivingiOSApp: App {
                 .environmentObject(plannerStore)
                 .environmentObject(equipmentStore)
                 .environmentObject(cloudSync)
+                .environmentObject(navigationStore)
                 .preferredColorScheme(.dark)
                 .onAppear { watchSync.activate(logStore: logStore) }
         }

@@ -7,6 +7,12 @@ enum DiveGasLabel: String, Codable, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
+enum GPSFixSource: String, Codable, Hashable {
+    case fix
+    case fallback
+    case noFix
+}
+
 struct DiveSession: Identifiable, Codable, Hashable {
     let id: UUID
     let startDate: Date
@@ -18,6 +24,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
     let ttv: Double
     let entryGPS: GPSPoint?
     let exitGPS: GPSPoint?
+    let entryGPSFixSource: GPSFixSource
+    let exitGPSFixSource: GPSFixSource
     let samples: [DiveSample]
     var siteName: String?
     var buddy: String?
@@ -33,6 +41,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
     enum CodingKeys: String, CodingKey {
         case id, startDate, endDate, durationSeconds, maxDepthMeters, avgDepthMeters
         case avgWaterTemperatureCelsius, ttv, entryGPS, exitGPS, samples
+        case entryGPSFixSource, exitGPSFixSource
         case siteName, buddy, notes, gasLabel, sacLitersMinute, isDemo
     }
 
@@ -47,6 +56,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         ttv: Double,
         entryGPS: GPSPoint?,
         exitGPS: GPSPoint?,
+        entryGPSFixSource: GPSFixSource? = nil,
+        exitGPSFixSource: GPSFixSource? = nil,
         samples: [DiveSample],
         siteName: String? = nil,
         buddy: String? = nil,
@@ -65,6 +76,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         self.ttv = ttv
         self.entryGPS = entryGPS
         self.exitGPS = exitGPS
+        self.entryGPSFixSource = entryGPSFixSource ?? (entryGPS == nil ? .noFix : .fix)
+        self.exitGPSFixSource = exitGPSFixSource ?? (exitGPS == nil ? .noFix : .fix)
         self.samples = samples
         self.siteName = siteName
         self.buddy = buddy
@@ -86,6 +99,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         ttv = try container.decode(Double.self, forKey: .ttv)
         entryGPS = try container.decodeIfPresent(GPSPoint.self, forKey: .entryGPS)
         exitGPS = try container.decodeIfPresent(GPSPoint.self, forKey: .exitGPS)
+        entryGPSFixSource = try container.decodeIfPresent(GPSFixSource.self, forKey: .entryGPSFixSource) ?? (entryGPS == nil ? .noFix : .fix)
+        exitGPSFixSource = try container.decodeIfPresent(GPSFixSource.self, forKey: .exitGPSFixSource) ?? (exitGPS == nil ? .noFix : .fix)
         samples = try container.decode([DiveSample].self, forKey: .samples)
         siteName = try container.decodeIfPresent(String.self, forKey: .siteName)
         buddy = try container.decodeIfPresent(String.self, forKey: .buddy)
@@ -108,6 +123,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         try container.encode(ttv, forKey: .ttv)
         try container.encodeIfPresent(entryGPS, forKey: .entryGPS)
         try container.encodeIfPresent(exitGPS, forKey: .exitGPS)
+        try container.encode(entryGPSFixSource, forKey: .entryGPSFixSource)
+        try container.encode(exitGPSFixSource, forKey: .exitGPSFixSource)
         try container.encode(samples, forKey: .samples)
         try container.encodeIfPresent(siteName, forKey: .siteName)
         try container.encodeIfPresent(buddy, forKey: .buddy)

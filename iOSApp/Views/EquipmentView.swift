@@ -3,6 +3,7 @@ import SwiftUI
 struct EquipmentView: View {
     @EnvironmentObject private var equipment: EquipmentStore
     @State private var showResetConfirmation = false
+    @State private var savedFeedback: String?
     @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
 
     var body: some View {
@@ -20,6 +21,14 @@ struct EquipmentView: View {
                                 .foregroundStyle(DIRTheme.muted)
                         }
                         equipmentHero
+                        if let savedFeedback {
+                            Text(savedFeedback)
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(DIRTheme.green)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 7)
+                                .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.green.opacity(0.10)))
+                        }
                         DIRCard("PIANIFICAZIONE COMPLETA", icon: "shippingbox.fill", accent: DIRTheme.cyan) {
                             editableRow("Bombole", text: $equipment.profile.cylinders)
                             editableRow("Configurazione", text: $equipment.profile.configuration)
@@ -53,10 +62,14 @@ struct EquipmentView: View {
             .confirmationDialog("Resettare il profilo attrezzatura?", isPresented: $showResetConfirmation, titleVisibility: .visible) {
                 Button("Reset profilo", role: .destructive) {
                     equipment.reset()
+                    showSavedFeedback()
                 }
                 Button("Annulla", role: .cancel) {}
             } message: {
                 Text("Bombole, gas, SAC e checklist torneranno ai valori standard salvati localmente.")
+            }
+            .onChange(of: equipment.profile) { _, _ in
+                showSavedFeedback()
             }
         }
     }
@@ -125,5 +138,13 @@ struct EquipmentView: View {
 
     private var unitPreference: IOSUnitPreference {
         IOSUnitPreference.fromStorage(units)
+    }
+
+    private func showSavedFeedback() {
+        savedFeedback = "Salvato"
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 1_800_000_000)
+            savedFeedback = nil
+        }
     }
 }

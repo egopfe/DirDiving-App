@@ -48,6 +48,13 @@ final class WatchSyncService: NSObject, ObservableObject {
         activate(logStore: logStore)
     }
 
+    func resetPairingTrust(logStore: DiveLogStore) {
+        WatchSyncAuth.resetPeerTrust()
+        failedImportCount = 0
+        lastMessage = "Trust Watch resettato: attendi una nuova associazione verificata."
+        activate(logStore: logStore)
+    }
+
     private func importSessionPayload(_ payload: [String: Any]) {
         do {
             let session = try WatchDiveSyncCodec.parseSession(from: payload)

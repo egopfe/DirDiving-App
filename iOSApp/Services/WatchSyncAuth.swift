@@ -42,6 +42,11 @@ enum WatchSyncAuth {
         return WCSession.default.receivedApplicationContext
     }
 
+    static func resetPeerTrust() {
+        deleteKeychain(account: "\(keychainAccount)-peer")
+        NotificationCenter.default.post(name: .watchSyncPeerSecretDidUpdate, object: nil)
+    }
+
     private static func loadOrCreateLocalSecret() -> Data {
         if let existing = loadKeychain(account: keychainAccount) {
             return existing
@@ -92,6 +97,15 @@ enum WatchSyncAuth {
         attributes[kSecValueData as String] = data
         attributes[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
         SecItemAdd(attributes as CFDictionary, nil)
+    }
+
+    private static func deleteKeychain(account: String) {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: account
+        ]
+        SecItemDelete(query as CFDictionary)
     }
 
     private enum KeychainError: Error {

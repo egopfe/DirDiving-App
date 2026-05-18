@@ -1,9 +1,14 @@
 import SwiftUI
 import Charts
+import UniformTypeIdentifiers
 
 struct AnalysisView: View {
     @EnvironmentObject private var logStore: DiveLogStore
+    @EnvironmentObject private var watchSync: WatchSyncService
+    @EnvironmentObject private var navigation: IOSNavigationStore
     @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
+    @State private var showImporter = false
+    @State private var importMessage: String?
 
     var body: some View {
         NavigationStack {
@@ -60,6 +65,21 @@ struct AnalysisView: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
+            .fileImporter(isPresented: $showImporter, allowedContentTypes: [.commaSeparatedText, .plainText]) { result in
+                switch result {
+                case .success(let url):
+                    switch DiveImportService.importCSV(from: url) {
+                    case .success(let summary):
+                        let alreadyImported = logStore.session(id: summary.session.id) != nil
+                        logStore.add(summary.session)
+                        importMessage = summary.message(alreadyImported: alreadyImported)
+                    case .failure(let error):
+                        importMessage = error.localizedDescription
+                    }
+                case .failure(let error):
+                    importMessage = error.localizedDescription
+                }
+            }
         }
     }
 
@@ -109,6 +129,24 @@ struct AnalysisView: View {
             Text("Prossima azione: sincronizza Apple Watch o importa un CSV dal Logbook.")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(DIRTheme.cyan)
+            HStack(spacing: 10) {
+                emptyAction("Importa CSV", "square.and.arrow.down") {
+                    showImporter = true
+                }
+                emptyAction("Sync Watch", "applewatch") {
+                    watchSync.retryActivation(logStore: logStore)
+                    importMessage = "Sync Apple Watch richiesta."
+                }
+            }
+            emptyAction("Apri Logbook", "list.bullet.rectangle.portrait.fill") {
+                navigation.selectedTab = .logbook
+            }
+            if let importMessage {
+                Text(importMessage)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(DIRTheme.yellow)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
         .padding(14)
         .background(
@@ -116,6 +154,20 @@ struct AnalysisView: View {
                 .fill(DIRTheme.surface.opacity(0.86))
                 .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.cyan.opacity(0.30), lineWidth: 1))
         )
+    }
+
+    private func emptyAction(_ title: String, _ icon: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: icon)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(DIRTheme.cyan)
+                .lineLimit(1)
+                .minimumScaleFactor(0.78)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 9)
+                .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.68), lineWidth: 1))
+        }
+        .buttonStyle(.plain)
     }
 
     private var avgTemp: Double {

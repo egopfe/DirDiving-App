@@ -267,8 +267,8 @@ struct DiveDetailView: View {
         VStack(spacing: 12) {
             darkPanel(title: "GPS", icon: "location.fill") {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Start: \(session.entryGPS?.coordinateText ?? "n/d")")
-                    Text("End: \(session.exitGPS?.coordinateText ?? "n/d")")
+                    Text("Start: \(session.entryGPS?.coordinateText ?? "n/d") · \(fixSourceText(session.entryGPSFixSource))")
+                    Text("End: \(session.exitGPS?.coordinateText ?? "n/d") · \(fixSourceText(session.exitGPSFixSource))")
                 }
                 .font(.system(size: 13, weight: .medium, design: .rounded).monospacedDigit())
                 .foregroundStyle(.white)
@@ -305,6 +305,14 @@ struct DiveDetailView: View {
                         .stroke(DIRTheme.cyan.opacity(0.14), lineWidth: 1)
                 )
         )
+    }
+
+    private func fixSourceText(_ source: GPSFixSource) -> String {
+        switch source {
+        case .fix: return "fix superficie"
+        case .fallback: return "ultimo punto noto"
+        case .noFix: return "no-fix"
+        }
     }
 
     private var exportBlock: some View {

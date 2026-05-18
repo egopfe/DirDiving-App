@@ -2,6 +2,19 @@ import Foundation
 import CryptoKit
 
 enum DiveImportService {
+    struct ImportSummary {
+        let session: DiveSession
+        let skippedMalformedCount: Int
+        let sourceDatePreserved: Bool
+
+        func message(alreadyImported: Bool) -> String {
+            let imported = alreadyImported ? 0 : 1
+            let duplicates = alreadyImported ? 1 : 0
+            let dateStatus = sourceDatePreserved ? "data sorgente preservata" : "data sorgente mancante, usata data file"
+            return "Import: \(imported) importate, \(duplicates) duplicati, \(skippedMalformedCount) righe saltate; \(dateStatus)."
+        }
+    }
+
     enum ImportError: LocalizedError {
         case unreadableFile
         case missingColumns
@@ -18,7 +31,7 @@ enum DiveImportService {
         }
     }
 
-    static func importCSV(from url: URL) -> Result<DiveSession, ImportError> {
+    static func importCSV(from url: URL) -> Result<ImportSummary, ImportError> {
         let didAccess = url.startAccessingSecurityScopedResource()
         defer {
             if didAccess { url.stopAccessingSecurityScopedResource() }
@@ -28,12 +41,10 @@ enum DiveImportService {
             return .failure(.unreadableFile)
         }
 
-        let rows = contents
-            .split(whereSeparator: \.isNewline)
-            .map { $0.split(separator: ",", omittingEmptySubsequences: false).map(String.init) }
+        let rows = parseCSV(contents)
         guard let header = rows.first else { return .failure(.emptyProfile) }
 
-        func index(_ name: String) -> Int? { header.firstIndex(of: name) }
+        func index(_ name: String) -> Int? { header.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.firstIndex(of: name) }
         guard
             let timeIndex = index("time_seconds"),
             let depthIndex = index("depth_m"),
@@ -42,7 +53,8 @@ enum DiveImportService {
             return .failure(.missingColumns)
         }
 
-        let start = sourceStartDate(header: header, rows: Array(rows.dropFirst()), url: url)
+        let sourceDate = sourceStartDate(header: header, rows: Array(rows.dropFirst()), url: url)
+        let start = sourceDate.date
         var samples: [DiveSample] = []
         var entryGPS: GPSPoint?
         var exitGPS: GPSPoint?
@@ -83,7 +95,6 @@ enum DiveImportService {
             }
         }
 
-        guard invalidRowCount == 0 else { return .failure(.invalidRows(invalidRowCount)) }
         guard !samples.isEmpty else { return .failure(.emptyProfile) }
         let end = samples.last?.timestamp ?? start
         let depths = samples.map(\.depthMeters)
@@ -100,29 +111,87 @@ enum DiveImportService {
             ttv: avgDepth + end.timeIntervalSince(start) / 60,
             entryGPS: entryGPS,
             exitGPS: exitGPS,
+            entryGPSFixSource: entryGPS == nil ? .noFix : .fix,
+            exitGPSFixSource: exitGPS == nil ? .noFix : .fix,
             samples: samples,
             siteName: url.deletingPathExtension().lastPathComponent,
             notes: "Imported CSV · source date preserved when present, otherwise file date fallback",
             gasLabel: .oc
         )
-        return .success(session)
+        return .success(ImportSummary(session: session, skippedMalformedCount: invalidRowCount, sourceDatePreserved: sourceDate.preserved))
     }
 
-    private static func sourceStartDate(header: [String], rows: [[String]], url: URL) -> Date {
+    private static func parseCSV(_ contents: String) -> [[String]] {
+        var rows: [[String]] = []
+        var row: [String] = []
+        var field = ""
+        var inQuotes = false
+        var iterator = contents.makeIterator()
+
+        while let character = iterator.next() {
+            if character == "\"" {
+                if inQuotes {
+                    if let next = iterator.next() {
+                        if next == "\"" {
+                            field.append("\"")
+                        } else {
+                            inQuotes = false
+                            if next == "," {
+                                row.append(field)
+                                field = ""
+                            } else if next == "\n" {
+                                row.append(field)
+                                rows.append(row)
+                                row = []
+                                field = ""
+                            } else if next != "\r" {
+                                field.append(next)
+                            }
+                        }
+                    } else {
+                        inQuotes = false
+                    }
+                } else {
+                    inQuotes = true
+                }
+            } else if character == "," && !inQuotes {
+                row.append(field)
+                field = ""
+            } else if character == "\n" && !inQuotes {
+                row.append(field)
+                if row.contains(where: { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) {
+                    rows.append(row)
+                }
+                row = []
+                field = ""
+            } else if character != "\r" {
+                field.append(character)
+            }
+        }
+
+        row.append(field)
+        if row.contains(where: { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) {
+            rows.append(row)
+        }
+        return rows
+    }
+
+    private static func sourceStartDate(header: [String], rows: [[String]], url: URL) -> (date: Date, preserved: Bool) {
+        let normalizedHeader = header.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
         let candidates = ["start_date", "start_iso8601", "date", "datetime", "timestamp"]
         for column in candidates {
-            guard let columnIndex = header.firstIndex(of: column) else { continue }
+            guard let columnIndex = normalizedHeader.firstIndex(of: column) else { continue }
             for row in rows where row.count > columnIndex {
                 if let parsed = parseDate(row[columnIndex]) {
-                    return parsed
+                    return (parsed, true)
                 }
             }
         }
         if let values = try? url.resourceValues(forKeys: [.contentModificationDateKey]),
            let fileDate = values.contentModificationDate {
-            return fileDate
+            return (fileDate, false)
         }
-        return Date()
+        return (Date(), false)
     }
 
     private static func parseDate(_ rawValue: String) -> Date? {

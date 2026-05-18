@@ -12,6 +12,18 @@ struct LogbookView: View {
         search.isEmpty ? logStore.sessions : logStore.sessions.filter { ($0.siteName ?? "").localizedCaseInsensitiveContains(search) }
     }
 
+    private var groupedSessions: [LogbookMonthSection] {
+        let calendar = Calendar.current
+        let grouped = Dictionary(grouping: filtered) { session in
+            calendar.date(from: calendar.dateComponents([.year, .month], from: session.startDate)) ?? session.startDate
+        }
+        return grouped
+            .map { monthStart, sessions in
+                LogbookMonthSection(monthStart: monthStart, sessions: sessions.sorted { $0.startDate > $1.startDate })
+            }
+            .sorted { $0.monthStart > $1.monthStart }
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -24,36 +36,39 @@ struct LogbookView: View {
                         if filtered.isEmpty {
                             emptyState
                         } else {
-                            Text("MAGGIO 2024")
-                                .font(.system(size: 11, weight: .semibold, design: .rounded))
-                                .tracking(0.6)
-                                .foregroundStyle(DIRTheme.cyan)
-                                .padding(.top, 4)
-                            ForEach(Array(filtered.enumerated()), id: \.element.id) { index, session in
-                                HStack(spacing: 7) {
-                                    NavigationLink { DiveDetailView(session: session) } label: {
-                                        DiveLogCard(session: session, index: index)
-                                    }
-                                    .buttonStyle(.plain)
-
-                                    if !session.isDemoDive {
-                                        Button(role: .destructive) {
-                                            pendingDelete = session
-                                        } label: {
-                                            Image(systemName: "trash")
-                                                .font(.system(size: 13, weight: .bold))
-                                                .foregroundStyle(DIRTheme.red)
-                                                .frame(width: 30, height: 64)
-                                                .background(
-                                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                                        .fill(DIRTheme.red.opacity(0.08))
-                                                        .overlay(
-                                                            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                                                .stroke(DIRTheme.red.opacity(0.28), lineWidth: 1)
-                                                        )
-                                                )
+                            ForEach(groupedSessions) { section in
+                                Text(Self.monthHeaderFormatter.string(from: section.monthStart).uppercased())
+                                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                                    .tracking(0.6)
+                                    .foregroundStyle(DIRTheme.cyan)
+                                    .padding(.top, 4)
+                                ForEach(Array(section.sessions.enumerated()), id: \.element.id) { index, session in
+                                    HStack(spacing: 7) {
+                                        NavigationLink { DiveDetailView(session: session) } label: {
+                                            DiveLogCard(session: session, index: index)
                                         }
                                         .buttonStyle(.plain)
+
+                                        if !session.isDemoDive {
+                                            Button(role: .destructive) {
+                                                pendingDelete = session
+                                            } label: {
+                                                Image(systemName: "trash")
+                                                    .font(.system(size: 13, weight: .bold))
+                                                    .foregroundStyle(DIRTheme.red)
+                                                    .frame(width: 30, height: 64)
+                                                    .background(
+                                                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                                            .fill(DIRTheme.red.opacity(0.08))
+                                                            .overlay(
+                                                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                                                    .stroke(DIRTheme.red.opacity(0.28), lineWidth: 1)
+                                                            )
+                                                    )
+                                            }
+                                            .buttonStyle(.plain)
+                                            .accessibilityLabel("Elimina immersione")
+                                        }
                                     }
                                 }
                             }
@@ -69,12 +84,10 @@ struct LogbookView: View {
                 switch result {
                 case .success(let url):
                     switch DiveImportService.importCSV(from: url) {
-                    case .success(let session):
-                        let alreadyImported = logStore.session(id: session.id) != nil
-                        logStore.add(session)
-                        importMessage = alreadyImported
-                            ? "Import aggiornato: duplicato riconosciuto e non duplicato."
-                            : "Import completato: 1 importata, 0 duplicati, 0 errori."
+                    case .success(let summary):
+                        let alreadyImported = logStore.session(id: summary.session.id) != nil
+                        logStore.add(summary.session)
+                        importMessage = summary.message(alreadyImported: alreadyImported)
                     case .failure(let error):
                         importMessage = "Import fallito: 0 importate, 0 duplicati, 1 errore. \(error.localizedDescription)"
                     }
@@ -104,6 +117,13 @@ struct LogbookView: View {
             }
         }
     }
+
+    private static let monthHeaderFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "it_IT")
+        formatter.dateFormat = "LLLL yyyy"
+        return formatter
+    }()
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -268,7 +288,7 @@ struct DiveLogCard: View {
                 .font(.system(size: 23, weight: .bold, design: .rounded))
                 .monospacedDigit()
                 .foregroundStyle(.white)
-            Text("MAG")
+            Text(Self.monthAbbreviationFormatter.string(from: session.startDate).uppercased())
                 .font(.system(size: 9, weight: .medium, design: .rounded))
                 .foregroundStyle(DIRTheme.muted)
             Text(Formatters.clock(session.startDate))
@@ -277,6 +297,20 @@ struct DiveLogCard: View {
         }
         .frame(width: 38)
     }
+
+    private static let monthAbbreviationFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "it_IT")
+        formatter.dateFormat = "LLL"
+        return formatter
+    }()
+}
+
+private struct LogbookMonthSection: Identifiable {
+    let monthStart: Date
+    let sessions: [DiveSession]
+
+    var id: Date { monthStart }
 }
 
 struct DiveThumbnail: View {

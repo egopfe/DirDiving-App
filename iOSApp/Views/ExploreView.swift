@@ -4,6 +4,7 @@ import UniformTypeIdentifiers
 
 struct ExploreView: View {
     @EnvironmentObject private var logStore: DiveLogStore
+    @EnvironmentObject private var watchSync: WatchSyncService
     @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
     @State private var showImporter = false
     @State private var importMessage: String?
@@ -137,16 +138,24 @@ struct ExploreView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            HStack(spacing: 10) {
-                emptyAction("Sincronizza", "applewatch") {
-                    logStore.synchronizeCloud()
-                    importMessage = "Sync richiesta. Le route compariranno quando i log includono entry/exit GPS."
+            VStack(spacing: 9) {
+                HStack(spacing: 10) {
+                    emptyAction("Sync Watch", "applewatch") {
+                        watchSync.retryActivation(logStore: logStore)
+                        importMessage = "Sync Apple Watch richiesta. Le route compariranno quando i log includono entry/exit GPS."
+                    }
+                    emptyAction("Sync iCloud", "icloud.and.arrow.down") {
+                        logStore.synchronizeCloud()
+                        importMessage = "Sincronizzazione iCloud richiesta per aggiornare i log disponibili."
+                    }
                 }
-                emptyAction("Importa CSV", "square.and.arrow.down") {
-                    showImporter = true
-                }
-                emptyAction("Impostazioni", "gearshape") {
-                    openAppSettings()
+                HStack(spacing: 10) {
+                    emptyAction("Importa CSV", "square.and.arrow.down") {
+                        showImporter = true
+                    }
+                    emptyAction("Impostazioni", "gearshape") {
+                        openAppSettings()
+                    }
                 }
             }
             if let importMessage {
@@ -389,12 +398,10 @@ struct ExploreView: View {
 
     private func importRouteCSV(from url: URL) {
         switch DiveImportService.importCSV(from: url) {
-        case .success(let session):
-            let alreadyImported = logStore.session(id: session.id) != nil
-            logStore.add(session)
-            importMessage = alreadyImported
-                ? "CSV gia importato: route aggiornata senza duplicati."
-                : "CSV importato: route disponibile se contiene entry/exit GPS."
+        case .success(let summary):
+            let alreadyImported = logStore.session(id: summary.session.id) != nil
+            logStore.add(summary.session)
+            importMessage = summary.message(alreadyImported: alreadyImported)
         case .failure(let error):
             importMessage = error.localizedDescription
         }
