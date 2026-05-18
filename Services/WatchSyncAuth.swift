@@ -43,7 +43,7 @@ enum WatchSyncAuth {
         if let existing = loadKeychain(account: keychainAccount) {
             return existing
         }
-        guard let generated = try? SecureBuddyStore.randomKeyData(byteCount: 32) else {
+        guard let generated = try? randomKeyData(byteCount: 32) else {
             return Data(SHA256.hash(data: Data("dirmotion.watch.sync.local".utf8)))
         }
         saveKeychain(generated, account: keychainAccount)
@@ -56,6 +56,13 @@ enum WatchSyncAuth {
 
     private static func savePeerSecret(_ data: Data) {
         saveKeychain(data, account: "\(keychainAccount)-peer")
+    }
+
+    private static func randomKeyData(byteCount: Int) throws -> Data {
+        var bytes = [UInt8](repeating: 0, count: byteCount)
+        let status = SecRandomCopyBytes(kSecRandomDefault, bytes.count, &bytes)
+        guard status == errSecSuccess else { throw KeychainError.unhandledStatus(status) }
+        return Data(bytes)
     }
 
     private static func loadKeychain(account: String) -> Data? {
@@ -82,5 +89,9 @@ enum WatchSyncAuth {
         attributes[kSecValueData as String] = data
         attributes[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
         SecItemAdd(attributes as CFDictionary, nil)
+    }
+
+    private enum KeychainError: Error {
+        case unhandledStatus(OSStatus)
     }
 }

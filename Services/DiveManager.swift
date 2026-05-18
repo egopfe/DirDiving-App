@@ -4,8 +4,8 @@ import CoreMotion
 import WatchKit
 
 enum DiveGPSConfirmation: Equatable {
-    case start(GPSPoint?)
-    case end(GPSPoint?)
+    case start(point: GPSPoint?, fallback: Bool)
+    case end(point: GPSPoint?, fallback: Bool)
 }
 
 @MainActor
@@ -143,7 +143,7 @@ final class DiveManager: NSObject, ObservableObject {
         gpsManager.captureBestEffortPoint(for: 6) { [weak self] point in
             guard let self, self.isDiveActive, !self.isFinalizingDive else { return }
             self.entryGPS = point ?? capturedAtStart
-            self.showGPSConfirmation(.start(self.entryGPS))
+            self.showGPSConfirmation(.start(point: self.entryGPS, fallback: point == nil && capturedAtStart != nil))
         }
         samples = []
         previousDepthSample = nil
@@ -185,7 +185,7 @@ final class DiveManager: NSObject, ObservableObject {
             self.isFinalizingDive = false
             let finalExitGPS = point ?? capturedExitGPS
             self.exitGPS = finalExitGPS
-            self.showGPSConfirmation(.end(finalExitGPS))
+            self.showGPSConfirmation(.end(point: finalExitGPS, fallback: point == nil && capturedExitGPS != nil))
             self.finalizeDive(start: start, end: end, entryGPS: capturedEntryGPS, exitGPS: finalExitGPS, samples: finishedSamples)
             self.gpsManager.stop()
         }
