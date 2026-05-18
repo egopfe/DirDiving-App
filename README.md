@@ -308,3 +308,27 @@ Il pass piu recente mantiene `main-iOS` production-oriented e non promuove super
 - Unita iOS: conversione coerente e display-only per profondita, temperatura, distanza e SAC; dati salvati, planner, import/export CSV e sync Watch restano metrici.
 
 Validazione richiesta fuori da Windows: `xcodegen generate`, build Xcode, test iPhone small/large screen, pairing Watch, import/re-import CSV, cloud KVS/delete e App Icon asset catalog.
+
+## Aggiornamento documentazione e audit post-fix 2026-05-18
+
+Il report post-fix pre-modifica corrente e conservato sul ramo Watch `main`:
+
+```text
+Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260518_POST_FIX_PRE_MODIFICATION.md
+Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260518_POST_FIX_PRE_MODIFICATION.docx
+```
+
+Stato documentale corrente per iOS MAIN:
+
+- Logbook usa gruppi mese/anno dinamici con label italiane e continua a supportare import CSV e delete con conferma.
+- Explore separa chiaramente `Sync Watch` da `Sync iCloud`, evitando copy ambiguo su route GPS surface-only.
+- Analysis ha azioni reali per `Importa CSV`, `Sync Watch` e apertura Logbook.
+- Settings mostra reset/re-pair trust Watch con conferma, stato peer verificato, stato autorizzazione notifiche, policy cloud/merge e roadmap export.
+- CSV import gestisce campi quotati, righe malformed saltate, duplicate count e data sorgente preservata quando disponibile.
+- Gear mostra feedback discreto `Salvato` dopo auto-save.
+
+Blocker aperti da risolvere in commit runtime separati, non in documentazione:
+
+- iOS MAIN: `PlannerView.swift` ha una struttura brace/scope non valida vicino a `ResultPanelStyle` / `PlanTab`.
+- Watch MAIN: `AscentWarningView` usa `Formatters.zero`, ma il formatter Watch espone solo `time` e `one`.
+- Le PR sperimentali #8 e #9 sono conflittuali e con build check falliti; non sono safe-to-merge finche non passano build macOS, review target membership e QA safety.

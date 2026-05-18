@@ -38,6 +38,9 @@ UI-only visual alignment must not change planner calculations, sync, persistence
 - Watch MAIN: verificare che `WatchSyncAuth` compili senza `SecureBuddyStore` nel target MAIN e che le esclusioni experimental in `project.yml` restino coerenti.
 - Watch MAIN: verificare su Apple Developer portal e Apple Watch Ultra reale l'entitlement `com.apple.developer.coremotion.water-submersion`.
 - iOS MAIN: testare peer secret mancante/verificata per Watch sync, re-import CSV anti-duplicato, tombstone KVS/delete e Planner invalid-input/safety acknowledgement.
+- Watch MAIN: correggere in commit runtime separato il blocker `AscentWarningView` -> `Formatters.zero` prima della build release.
+- iOS MAIN: correggere in commit runtime separato la struttura `PlannerView.swift` / `ResultPanelStyle` / `PlanTab` prima della build release.
+- PR #8 e #9: non merge automatico finche `mergeable=CONFLICTING` e i build check restano falliti.
 
 ## Signing
 
