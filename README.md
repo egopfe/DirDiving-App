@@ -500,7 +500,7 @@ Stato documentato dopo l'audit:
 - Le superfici principali MAIN sono raggiungibili: Apple Watch `Diving`, `BUSSOLA`, settings, immagini, log/export; iOS `Logbook`, `Route Review`, `Analysis`, `Planner`, `Gear`, `Settings`.
 - Risolti nel pass MAIN UX: empty state iOS principali, conferme delete/reset, spiegazione Action Button/App Intents, copy di avvio manuale, settings iOS marcati read-only/local-only dove appropriato e controlli allarme Watch piu grandi.
 - Restano TODO di allineamento sync: settings Watch/iOS sono dichiarati local-only, coda sync ispezionabile per singola sessione e policy cloud conflict oltre KVS restano roadmap.
-- Restano TODO build/config da verificare su macOS: `WatchSyncAuth` su MAIN usa un helper buddy/key escluso dal target MAIN; l'asset catalog iOS MAIN deve contenere i PNG citati da `AppIcon.appiconset/Contents.json`.
+- Restano TODO build/config da verificare su macOS: l'asset catalog iOS MAIN deve contenere i PNG citati da `AppIcon.appiconset/Contents.json`; `xcodegen generate` e le build Watch/iOS devono confermare i fix runtime piu recenti.
 - L'audit resta snapshot pre-modifica; i fix MAIN UX successivi sono committati separatamente dalla documentazione.
 
 ## Entitlement Status
@@ -528,7 +528,7 @@ Stato documentato dopo l'audit:
 - Le superfici principali MAIN sono raggiungibili: Apple Watch `Diving`, `BUSSOLA`, settings, immagini, log/export; iOS `Logbook`, `Route Review`, `Analysis`, `Planner`, `Gear`, `Settings`.
 - Le superfici di questo ramo restano experimental: Snorkeling Live, Mappa Waypoint, Mappa Ritorno, Direzione Waypoint, Marcatori POI, Apnea e Buddy Assist lab-only.
 - Risolti nel pass MAIN UX sui rami base: empty state iOS principali, conferme delete/reset, spiegazione Action Button/App Intents, copy avvio manuale, settings iOS marcati read-only/local-only e controlli allarme Watch piu grandi.
-- Restano TODO build/config da verificare su macOS: `WatchSyncAuth` su MAIN usa un helper buddy/key escluso dal target MAIN; l'asset catalog iOS MAIN deve contenere i PNG citati da `AppIcon.appiconset/Contents.json`.
+- Restano TODO build/config da verificare su macOS: l'asset catalog iOS MAIN deve contenere i PNG citati da `AppIcon.appiconset/Contents.json`; `xcodegen generate` e le build Watch/iOS devono confermare i fix runtime piu recenti.
 - I fix MAIN UX sono stati merge-base su questo ramo; i conflitti runtime sperimentali sono risolti preservando le schermate Snorkeling/Apnea/Buddy del branch.
 
 ## Branch Strategy
@@ -711,7 +711,13 @@ Il ramo `codex/experimental-features` resta experimental e non promuove Snorkeli
 - PR #8 (`codex/experimental-features` -> `main`) e attualmente conflittuale e con build check falliti; non e safe-to-merge senza risoluzione conservativa, build macOS e QA Apple Watch.
 - Nei conflitti preservare prima codice buildabile e Diving MAIN, poi Snorkeling Live, Mappa Waypoint, Mappa Ritorno, GPS marker, return-to-entry, terminologia `BUSSOLA`, e infine documentazione piu recente.
 
-Blocker MAIN aperti da non correggere in questo pass documentale:
+Aggiornamento runtime MAIN 2026-05-18 20:22 da preservare nei merge:
 
-- Watch MAIN: `AscentWarningView` usa `Formatters.zero`, ma il formatter Watch espone solo `time` e `one`.
-- iOS MAIN: `PlannerView.swift` ha una struttura brace/scope non valida vicino a `ResultPanelStyle` / `PlanTab`.
+- Watch MAIN: il blocker `AscentWarningView` -> `Formatters.zero` e stato corretto aggiungendo il formatter zero-decimal Watch senza modificare `time` o `one`.
+- Watch MAIN: la coda WatchConnectivity ora distingue `pending`, `sent`, `delivered/acknowledged`, `failed` e last retry; i pending non vengono rimossi prima dell'ack diretto iPhone.
+- Watch MAIN: il label `TTV` resta visibile, ma la documentazione/UI lo descrive come metrica informativa derivata da profondita media e runtime, non come NDL/TTS/decompressione.
+- Watch MAIN: l'opzione imperiale e non selezionabile finche la conversione Watch non e implementata; export resta metrico/Subsurface.
+- iOS MAIN: il blocker `PlannerView.swift` / `ResultPanelStyle` / `PlanTab` e stato corretto mantenendo `PlanTab` a file scope.
+- iOS MAIN: CSV import valida durata, profondita, temperatura e range GPS, continua a gestire campi quotati e riporta importati, duplicati e righe malformate/scartate.
+- iOS MAIN: detail/analysis non mostrano piu SAC, temperatura o accuratezza GPS mancanti come zero misurati; usano `—` o `Non disponibile`.
+- iOS MAIN: export CSV include il GPS fix source entry/exit; Settings mostra una preview merge cloud locale/cloud/risultato senza promettere conflict resolver per-campo.
