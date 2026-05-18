@@ -66,6 +66,8 @@ final class DiveManager: NSObject, ObservableObject {
     private var samples: [DiveSample] = []
     private var entryGPS: GPSPoint?
     private var exitGPS: GPSPoint?
+    private var entryGPSFixSource: GPSFixSource = .noFix
+    private var exitGPSFixSource: GPSFixSource = .noFix
     private var previousDepthSample: DiveSample?
     private var isFinalizingDive = false
     private var lastDepthAlarmDate: Date?
@@ -140,9 +142,11 @@ final class DiveManager: NSObject, ObservableObject {
         sessionStart = Date()
         entryGPS = gpsManager.currentBestPoint()
         let capturedAtStart = entryGPS
+        entryGPSFixSource = capturedAtStart == nil ? .noFix : .fallback
         gpsManager.captureBestEffortPoint(for: 6) { [weak self] point in
             guard let self, self.isDiveActive, !self.isFinalizingDive else { return }
             self.entryGPS = point ?? capturedAtStart
+            self.entryGPSFixSource = point != nil ? .fix : (capturedAtStart == nil ? .noFix : .fallback)
             self.showGPSConfirmation(.start(point: self.entryGPS, fallback: point == nil && capturedAtStart != nil))
         }
         samples = []
@@ -166,8 +170,10 @@ final class DiveManager: NSObject, ObservableObject {
     private func endDiveIfNeeded(isManual: Bool = false) {
         guard isDiveActive, let start = sessionStart, !isFinalizingDive else { return }
         let capturedEntryGPS = entryGPS
+        let capturedEntryGPSFixSource = entryGPSFixSource
         exitGPS = gpsManager.currentBestPoint()
         let capturedExitGPS = exitGPS
+        exitGPSFixSource = capturedExitGPS == nil ? .noFix : .fallback
         isDiveActive = false
         isFinalizingDive = true
         isManualLifecycleActive = false
@@ -185,20 +191,21 @@ final class DiveManager: NSObject, ObservableObject {
             self.isFinalizingDive = false
             let finalExitGPS = point ?? capturedExitGPS
             self.exitGPS = finalExitGPS
+            self.exitGPSFixSource = point != nil ? .fix : (capturedExitGPS == nil ? .noFix : .fallback)
             self.showGPSConfirmation(.end(point: finalExitGPS, fallback: point == nil && capturedExitGPS != nil))
-            self.finalizeDive(start: start, end: end, entryGPS: capturedEntryGPS, exitGPS: finalExitGPS, samples: finishedSamples)
+            self.finalizeDive(start: start, end: end, entryGPS: capturedEntryGPS, exitGPS: finalExitGPS, entryGPSFixSource: capturedEntryGPSFixSource, exitGPSFixSource: self.exitGPSFixSource, samples: finishedSamples)
             self.gpsManager.stop()
         }
     }
 
-    private func finalizeDive(start: Date, end: Date, entryGPS: GPSPoint?, exitGPS: GPSPoint?, samples: [DiveSample]) {
+    private func finalizeDive(start: Date, end: Date, entryGPS: GPSPoint?, exitGPS: GPSPoint?, entryGPSFixSource: GPSFixSource, exitGPSFixSource: GPSFixSource, samples: [DiveSample]) {
         let depths = samples.map(\.depthMeters)
         let temps = samples.compactMap(\.temperatureCelsius)
         let avgDepth = depths.isEmpty ? 0 : depths.reduce(0, +) / Double(depths.count)
         let maxDepth = depths.max() ?? 0
         let avgTemp = temps.isEmpty ? nil : temps.reduce(0, +) / Double(temps.count)
         let duration = end.timeIntervalSince(start)
-        let session = DiveSession(startDate: start, endDate: end, durationSeconds: duration, maxDepthMeters: maxDepth, avgDepthMeters: avgDepth, avgWaterTemperatureCelsius: avgTemp, minWaterTemperatureCelsius: temps.min(), maxWaterTemperatureCelsius: temps.max(), ttv: avgDepth + (duration / 60.0), entryGPS: entryGPS, exitGPS: exitGPS, samples: samples)
+        let session = DiveSession(startDate: start, endDate: end, durationSeconds: duration, maxDepthMeters: maxDepth, avgDepthMeters: avgDepth, avgWaterTemperatureCelsius: avgTemp, minWaterTemperatureCelsius: temps.min(), maxWaterTemperatureCelsius: temps.max(), ttv: avgDepth + (duration / 60.0), entryGPS: entryGPS, exitGPS: exitGPS, entryGPSFixSource: entryGPSFixSource, exitGPSFixSource: exitGPSFixSource, samples: samples)
         logStore.add(session)
     }
 

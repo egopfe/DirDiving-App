@@ -5,6 +5,8 @@ struct SettingsView: View {
     @EnvironmentObject private var dive: DiveManager
     @EnvironmentObject private var watchSync: WatchSyncService
     @AppStorage("dirdiving_watch_haptics_enabled") private var hapticsEnabled = true
+    @AppStorage("dirdiving_watch_units") private var watchUnits = "metric"
+    @State private var showClearSyncQueueConfirmation = false
 
     var body: some View {
         ZStack {
@@ -45,23 +47,24 @@ struct SettingsView: View {
                     }
                     .buttonStyle(.plain)
 
-                    settingsRow(
-                        icon: "ruler",
-                        iconColor: .white,
-                        title: "Unità di misura",
-                        subtitle: "Locale Watch: metrico fisso (m, \u{00B0}C)"
-                    )
+                    unitPreferenceControl
                     settingsRow(
                         icon: "iphone.slash",
                         iconColor: DiveUI.yellow,
                         title: "Sync impostazioni",
-                        subtitle: "Allarmi/haptics locali, non inviati a iPhone"
+                        subtitle: "Locale a questo dispositivo; sync bidirezionale planned"
                     )
                     statusRow(
                         icon: "location.fill",
                         iconColor: gps.authorizationStatus == .denied ? DiveUI.red : DiveUI.green,
                         title: "GPS superficie",
                         subtitle: gpsStatusText
+                    )
+                    settingsRow(
+                        icon: "mappin.and.ellipse",
+                        iconColor: DiveUI.cyan,
+                        title: "Comportamento GPS",
+                        subtitle: "Solo entry/exit superficie; fallback etichettato"
                     )
                     statusRow(
                         icon: "drop.fill",
@@ -81,6 +84,18 @@ struct SettingsView: View {
                         title: "Coda sync",
                         subtitle: "\(watchSync.pendingTransferCount) immersioni in attesa"
                     )
+                    settingsRow(
+                        icon: "square.and.arrow.up",
+                        iconColor: DiveUI.green,
+                        title: "Export",
+                        subtitle: "Subsurface CSV metrico; altri formati planned"
+                    )
+                    statusRow(
+                        icon: "exclamationmark.arrow.triangle.2.circlepath",
+                        iconColor: watchSync.failedTransferCount == 0 ? DiveUI.green : DiveUI.red,
+                        title: "Errori sync",
+                        subtitle: "\(watchSync.failedTransferCount) falliti · retry \(lastRetryText)"
+                    )
                     if watchSync.pendingTransferCount > 0 || watchSync.activationState != .activated {
                         Button {
                             watchSync.retryPendingTransfers()
@@ -91,6 +106,21 @@ struct SettingsView: View {
                                 iconColor: DiveUI.cyan,
                                 title: "Riprova sync",
                                 subtitle: "Riattiva e svuota la coda se possibile",
+                                showsChevron: true
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    if watchSync.pendingTransferCount > 0 || watchSync.failedTransferCount > 0 {
+                        Button {
+                            showClearSyncQueueConfirmation = true
+                            HapticService.shared.notify()
+                        } label: {
+                            settingsRow(
+                                icon: "trash",
+                                iconColor: DiveUI.red,
+                                title: "Cancella coda fallita",
+                                subtitle: "Rimuove retry locali non inviati",
                                 showsChevron: true
                             )
                         }
@@ -155,6 +185,17 @@ struct SettingsView: View {
                 .padding(.bottom, 8)
             }
         }
+        .confirmationDialog("Cancellare coda sync?", isPresented: $showClearSyncQueueConfirmation, titleVisibility: .visible) {
+            Button("Cancella coda", role: .destructive) {
+                watchSync.clearFailedQueue()
+                HapticService.shared.notify()
+            }
+            Button("Annulla", role: .cancel) {
+                HapticService.shared.confirm()
+            }
+        } message: {
+            Text("Rimuove i trasferimenti Watch in attesa o falliti. Le immersioni gia salvate sul Watch restano nel log locale.")
+        }
     }
 
     private var gpsStatusText: String {
@@ -169,6 +210,45 @@ struct SettingsView: View {
             return "Stato permesso sconosciuto"
         }
     }
+
+    private var unitPreferenceControl: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            settingsRow(
+                icon: "ruler",
+                iconColor: .white,
+                title: "Unità di misura",
+                subtitle: watchUnits == "metric" ? "Display Watch: metrico" : "Display Watch: imperiale planned"
+            )
+            Picker("Unità", selection: $watchUnits) {
+                Text("m").tag("metric")
+                Text("ft").tag("imperial")
+            }
+            .pickerStyle(.segmented)
+            .tint(DiveUI.cyan)
+            Text("Dati, planner ed export restano metrici/Subsurface. Sync unità iPhone planned.")
+                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .foregroundStyle(DiveUI.yellow)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, 9)
+        .padding(.vertical, 7)
+        .background(
+            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                .fill(Color.black.opacity(0.52))
+                .overlay(RoundedRectangle(cornerRadius: 7, style: .continuous).stroke(.white.opacity(0.24), lineWidth: 1))
+        )
+    }
+
+    private var lastRetryText: String {
+        guard let date = watchSync.lastRetryDate else { return "mai" }
+        return Self.retryFormatter.string(from: date)
+    }
+
+    private static let retryFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        return formatter
+    }()
 
     private var header: some View {
         HStack(alignment: .center) {

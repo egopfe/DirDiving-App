@@ -10,6 +10,8 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published private(set) var activationState: WCSessionActivationState = .notActivated
     @Published private(set) var lastSyncStatus = "Companion non sincronizzato"
     @Published private(set) var pendingTransferCount = 0
+    @Published private(set) var failedTransferCount = 0
+    @Published private(set) var lastRetryDate: Date?
 
     private var pendingSessions: [DiveSession] = []
     private let pendingSessionsKey = "dirdiving_watch_pending_sync_sessions"
@@ -60,7 +62,9 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     func retryPendingTransfers() {
+        lastRetryDate = Date()
         guard WCSession.isSupported() else {
+            failedTransferCount += 1
             lastSyncStatus = "Retry non disponibile: WatchConnectivity non supportato"
             return
         }
@@ -71,6 +75,14 @@ final class WatchSyncService: NSObject, ObservableObject {
         } else {
             lastSyncStatus = "Retry richiesto: in attesa chiave companion (\(pendingTransferCount) in coda)"
         }
+    }
+
+    func clearFailedQueue() {
+        pendingSessions.removeAll()
+        pendingTransferCount = 0
+        failedTransferCount = 0
+        savePendingSessions()
+        lastSyncStatus = "Coda sync cancellata su richiesta"
     }
 
     private func flushPendingTransfers() {
@@ -107,6 +119,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             WatchSyncAuth.publishSharedSecretIfNeeded()
             lastSyncStatus = "In attesa chiave sync companion"
         } catch {
+            failedTransferCount += 1
             lastSyncStatus = "Errore codifica sync: \(error.localizedDescription)"
         }
     }

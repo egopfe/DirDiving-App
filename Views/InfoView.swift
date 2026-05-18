@@ -1,33 +1,38 @@
 import SwiftUI
 import WatchKit
+import CoreMotion
 
 struct InfoView: View {
     @EnvironmentObject private var watchSync: WatchSyncService
+    @EnvironmentObject private var dive: DiveManager
     @State private var batteryLevel: Float = WKInterfaceDevice.current().batteryLevel
 
     var body: some View {
         ZStack {
             DiveScreenBackground()
 
-            VStack(spacing: 5) {
-                header
+            ScrollView {
+                VStack(spacing: 5) {
+                    header
 
-                Text("INFO")
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
+                    Text("INFO")
+                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
 
-                VStack(spacing: 4) {
-                    infoRow(title: "Versione", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "n/d")
-                    deviceRow
-                    batteryRow
-                    infoRow(title: "Sync", value: watchSync.lastSyncStatus)
-                    infoRow(title: "Spazio libero", value: "Gestito da watchOS")
+                    VStack(spacing: 4) {
+                        infoRow(title: "Versione", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "n/d")
+                        deviceRow
+                        batteryRow
+                        depthDiagnostics
+                        infoRow(title: "Sync", value: watchSync.lastSyncStatus)
+                        infoRow(title: "Spazio libero", value: "Gestito da watchOS")
+                    }
                 }
+                .padding(.horizontal, 11)
+                .padding(.top, 9)
+                .padding(.bottom, 8)
             }
-            .padding(.horizontal, 11)
-            .padding(.top, 9)
-            .padding(.bottom, 8)
         }
         .onAppear {
             WKInterfaceDevice.current().isBatteryMonitoringEnabled = true
@@ -115,6 +120,38 @@ struct InfoView: View {
         .padding(.vertical, 7)
         .frame(minHeight: 42)
         .background(rowBackground)
+    }
+
+    private var depthDiagnostics: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            diagnosticRow("Entitlement profondità", "Configurato")
+            diagnosticRow("Sensore profondità", CMWaterSubmersionManager.waterSubmersionAvailable ? "Disponibile" : "Non disponibile")
+            diagnosticRow("Callback acqua", dive.isDepthAutomationAvailable ? "Pronto" : "Non verificabile")
+            Text("Richiede validazione reale su Apple Watch Ultra. Il simulatore/macOS non certifica profondità o pressione.")
+                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .foregroundStyle(DiveUI.yellow)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 7)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                .fill(DiveUI.blue.opacity(0.10))
+                .overlay(RoundedRectangle(cornerRadius: 7, style: .continuous).stroke(DiveUI.blue.opacity(0.45), lineWidth: 1))
+        )
+    }
+
+    private func diagnosticRow(_ title: String, _ value: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+            Spacer(minLength: 6)
+            Text(value)
+                .font(.system(size: 10, weight: .black, design: .rounded))
+                .foregroundStyle(value == "Configurato" || value == "Disponibile" || value == "Pronto" ? DiveUI.green : DiveUI.yellow)
+        }
     }
 
     private var rowBackground: some View {
