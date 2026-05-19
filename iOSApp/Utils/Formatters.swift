@@ -52,9 +52,8 @@ enum Formatters {
     }
 
     static func time(_ interval: TimeInterval) -> String {
-        let total = Int(interval)
-        let m = (total % 3600) / 60
-        return String(format: "%02d", m)
+        let minutes = max(0, Int((interval / 60).rounded()))
+        return String(format: "%02d", minutes)
     }
     static func stopwatch(_ interval: TimeInterval) -> String {
         let total = Int(interval)

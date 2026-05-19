@@ -1,91 +1,243 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct LogbookView: View {
     @EnvironmentObject private var logStore: DiveLogStore
     @State private var search = ""
+    @State private var showImporter = false
+    @State private var importMessage: String?
+    @State private var pendingDelete: DiveSession?
 
     private var filtered: [DiveSession] {
         search.isEmpty ? logStore.sessions : logStore.sessions.filter { ($0.siteName ?? "").localizedCaseInsensitiveContains(search) }
     }
 
+    private var groupedSessions: [LogbookMonthSection] {
+        let calendar = Calendar.current
+        let grouped = Dictionary(grouping: filtered) { session in
+            calendar.date(from: calendar.dateComponents([.year, .month], from: session.startDate)) ?? session.startDate
+        }
+        return grouped
+            .map { monthStart, sessions in
+                LogbookMonthSection(monthStart: monthStart, sessions: sessions.sorted { $0.startDate > $1.startDate })
+            }
+            .sorted { $0.monthStart > $1.monthStart }
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
-                DIRBackground()
+                Color.black.ignoresSafeArea()
                 ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 12) {
                         header
-                        DIRSearchBar(text: $search)
-                        Text("MAGGIO 2024")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(DIRTheme.cyan)
-                            .padding(.top, 8)
-                        ForEach(Array(filtered.enumerated()), id: \.element.id) { index, session in
-                            HStack(spacing: 8) {
-                                NavigationLink { DiveDetailView(session: session) } label: {
-                                    DiveLogCard(session: session, index: index)
-                                }
-                                .buttonStyle(.plain)
+                        importStatus
+                        logbookSearchBar
+                        if filtered.isEmpty {
+                            emptyState
+                        } else {
+                            ForEach(groupedSessions) { section in
+                                Text(Self.monthHeaderFormatter.string(from: section.monthStart).uppercased())
+                                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                                    .tracking(0.6)
+                                    .foregroundStyle(DIRTheme.cyan)
+                                    .padding(.top, 4)
+                                ForEach(Array(section.sessions.enumerated()), id: \.element.id) { index, session in
+                                    HStack(spacing: 7) {
+                                        NavigationLink { DiveDetailView(session: session) } label: {
+                                            DiveLogCard(session: session, index: index)
+                                        }
+                                        .buttonStyle(.plain)
 
-                                if !session.isDemoDive {
-                                    Button(role: .destructive) {
-                                        logStore.delete(id: session.id)
-                                    } label: {
-                                        Image(systemName: "trash")
-                                            .font(.body.weight(.semibold))
-                                            .foregroundStyle(DIRTheme.red)
-                                            .frame(width: 36, height: 36)
+                                        if !session.isDemoDive {
+                                            Button(role: .destructive) {
+                                                pendingDelete = session
+                                            } label: {
+                                                Image(systemName: "trash")
+                                                    .font(.system(size: 13, weight: .bold))
+                                                    .foregroundStyle(DIRTheme.red)
+                                                    .frame(width: 30, height: 64)
+                                                    .background(
+                                                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                                            .fill(DIRTheme.red.opacity(0.08))
+                                                            .overlay(
+                                                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                                                    .stroke(DIRTheme.red.opacity(0.28), lineWidth: 1)
+                                                            )
+                                                    )
+                                            }
+                                            .buttonStyle(.plain)
+                                            .accessibilityLabel("Elimina immersione")
+                                        }
                                     }
-                                    .buttonStyle(.plain)
                                 }
                             }
                         }
                     }
                     .padding(.horizontal, 16)
-                    .padding(.top, 10)
-                    .padding(.bottom, 18)
+                    .padding(.top, 12)
+                    .padding(.bottom, 20)
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
+            .fileImporter(isPresented: $showImporter, allowedContentTypes: [.commaSeparatedText, .plainText]) { result in
+                switch result {
+                case .success(let url):
+                    switch DiveImportService.importCSV(from: url) {
+                    case .success(let summary):
+                        let alreadyImported = logStore.session(id: summary.session.id) != nil
+                        logStore.add(summary.session)
+                        importMessage = summary.message(alreadyImported: alreadyImported)
+                    case .failure(let error):
+                        importMessage = "Import fallito: 0 importate, 0 duplicati, 1 errore. \(error.localizedDescription)"
+                    }
+                case .failure(let error):
+                    importMessage = error.localizedDescription
+                }
+            }
+            .confirmationDialog(
+                "Eliminare immersione?",
+                isPresented: Binding(
+                    get: { pendingDelete != nil },
+                    set: { if !$0 { pendingDelete = nil } }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button("Elimina", role: .destructive) {
+                    if let pendingDelete {
+                        logStore.delete(id: pendingDelete.id)
+                    }
+                    pendingDelete = nil
+                }
+                Button("Annulla", role: .cancel) {
+                    pendingDelete = nil
+                }
+            } message: {
+                Text("L'immersione verra rimossa dal logbook locale e dalla prossima sincronizzazione KVS.")
+            }
         }
     }
 
+    private static let monthHeaderFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "it_IT")
+        formatter.dateFormat = "LLLL yyyy"
+        return formatter
+    }()
+
     private var header: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .firstTextBaseline) {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .center) {
                 Text("Logbook")
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .font(.system(size: 26, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
+                    .lineLimit(1)
                 Spacer()
-                Text("ADD LAB OFF")
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(DIRTheme.yellow)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 5)
-                    .background(Capsule().stroke(DIRTheme.yellow, lineWidth: 1))
+                Button {
+                    showImporter = true
+                } label: {
+                    Text("IMPORT CSV")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(DIRTheme.cyan)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                        .background(Capsule().stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
+                }
+                .buttonStyle(.plain)
             }
-            Text("Dive history, sync status and inspection-ready session cards")
-                .font(.callout)
-                .foregroundStyle(DIRTheme.muted)
         }
+    }
+
+    @ViewBuilder
+    private var importStatus: some View {
+        if let importMessage {
+            Text(importMessage)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(importMessage.contains("completato") ? DIRTheme.green : DIRTheme.yellow)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(10)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface.opacity(0.8)))
+        }
+    }
+
+    private var logbookSearchBar: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(DIRTheme.muted)
+            TextField("Cerca immersioni", text: $search)
+                .font(.system(size: 13, weight: .regular, design: .rounded))
+                .foregroundStyle(.white)
+                .tint(DIRTheme.cyan)
+        }
+        .padding(.horizontal, 10)
+        .frame(height: 36)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color(red: 0.055, green: 0.070, blue: 0.095))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(Color.white.opacity(0.045), lineWidth: 1)
+                )
+        )
+    }
+
+    private var emptyState: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                Image(systemName: logStore.sessions.isEmpty ? "tray" : "magnifyingglass")
+                    .font(.title2.weight(.bold))
+                    .foregroundStyle(DIRTheme.cyan)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(logStore.sessions.isEmpty ? "Nessuna immersione registrata" : "Nessun risultato")
+                        .font(.headline.weight(.bold))
+                        .foregroundStyle(.white)
+                    Text(logStore.sessions.isEmpty ? "Sincronizza Apple Watch o importa un CSV Subsurface per iniziare." : "Modifica la ricerca o importa un nuovo CSV.")
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            Button {
+                showImporter = true
+            } label: {
+                Text(logStore.sessions.isEmpty ? "IMPORTA CSV" : "IMPORTA NUOVO CSV")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(DIRTheme.cyan)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 9)
+                    .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.7), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
+                .fill(DIRTheme.surface.opacity(0.86))
+                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.cyan.opacity(0.28), lineWidth: 1))
+        )
     }
 }
 
 struct DiveLogCard: View {
     let session: DiveSession
     let index: Int
+    @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
             dateBlock
             DiveThumbnail(index: index)
-                .frame(width: 72, height: 72)
-            VStack(alignment: .leading, spacing: 6) {
+                .frame(width: 58, height: 58)
+            VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
                     Text(session.siteName ?? "Immersione")
-                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.76)
                     if session.buddy != nil {
                         Text("BUDDY")
                             .font(.system(size: 8, weight: .bold, design: .rounded))
@@ -95,45 +247,70 @@ struct DiveLogCard: View {
                             .overlay(RoundedRectangle(cornerRadius: 3).stroke(DIRTheme.yellow, lineWidth: 1))
                     }
                 }
-                Text("Max \(Formatters.one(session.maxDepthMeters)) m")
-                    .font(.caption)
-                    .foregroundStyle(.white.opacity(0.86))
+                Text("Max \(Formatters.depth(session.maxDepthMeters, units: unitPreference).text)")
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundStyle(DIRTheme.muted)
                 HStack {
                     Text("T. \(Formatters.time(session.durationSeconds)) min")
-                    Spacer()
                     Text(session.gasLabel.rawValue)
+                        .padding(.leading, 8)
+                    Spacer(minLength: 4)
+                    Text(Formatters.optionalTemperature(session.avgWaterTemperatureCelsius, units: unitPreference))
                 }
-                .font(.caption)
-                .foregroundStyle(.white.opacity(0.86))
+                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .foregroundStyle(DIRTheme.muted)
             }
-            Spacer(minLength: 6)
+            Spacer(minLength: 4)
             Image(systemName: "chevron.right")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.white.opacity(0.72))
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(DIRTheme.muted.opacity(0.82))
         }
-        .padding(10)
+        .frame(maxWidth: .infinity, minHeight: 70, alignment: .leading)
+        .padding(.horizontal, 4)
+        .padding(.vertical, 5)
         .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(DIRTheme.surface.opacity(0.8))
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(DIRTheme.hairline, lineWidth: 1))
-                .shadow(color: DIRTheme.cyan.opacity(0.06), radius: 10, x: 0, y: 6)
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(Color(red: 0.030, green: 0.043, blue: 0.060).opacity(0.92))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .stroke(Color.white.opacity(0.045), lineWidth: 1)
+                )
         )
+    }
+
+    private var unitPreference: IOSUnitPreference {
+        IOSUnitPreference.fromStorage(units)
     }
 
     private var dateBlock: some View {
         VStack(spacing: 1) {
             Text(session.startDate.formatted(.dateTime.day()))
-                .font(.system(size: 27, weight: .bold, design: .rounded))
+                .font(.system(size: 23, weight: .bold, design: .rounded))
+                .monospacedDigit()
                 .foregroundStyle(.white)
-            Text("MAG")
-                .font(.caption2.weight(.medium))
-                .foregroundStyle(.white.opacity(0.75))
+            Text(Self.monthAbbreviationFormatter.string(from: session.startDate).uppercased())
+                .font(.system(size: 9, weight: .medium, design: .rounded))
+                .foregroundStyle(DIRTheme.muted)
             Text(Formatters.clock(session.startDate))
-                .font(.caption2.monospacedDigit())
-                .foregroundStyle(.white.opacity(0.75))
+                .font(.system(size: 9, weight: .regular, design: .rounded).monospacedDigit())
+                .foregroundStyle(DIRTheme.muted)
         }
         .frame(width: 38)
     }
+
+    private static let monthAbbreviationFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "it_IT")
+        formatter.dateFormat = "LLL"
+        return formatter
+    }()
+}
+
+private struct LogbookMonthSection: Identifiable {
+    let monthStart: Date
+    let sessions: [DiveSession]
+
+    var id: Date { monthStart }
 }
 
 struct DiveThumbnail: View {
@@ -151,21 +328,26 @@ struct DiveThumbnail: View {
     var body: some View {
         ZStack {
             LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing)
+            LinearGradient(colors: [.clear, .black.opacity(0.34)], startPoint: .top, endPoint: .bottom)
             Circle()
                 .fill(.white.opacity(0.16))
-                .frame(width: 52, height: 52)
-                .offset(x: -26, y: -30)
+                .frame(width: 42, height: 42)
+                .offset(x: -22, y: -24)
             Image(systemName: index == 2 ? "water.waves" : "photo")
-                .font(.system(size: 30, weight: .semibold))
-                .foregroundStyle(.white.opacity(0.82))
+                .font(.system(size: 25, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.78))
                 .rotationEffect(.degrees(index == 2 ? -18 : 0))
             ForEach(0..<5) { bubble in
                 Circle()
-                    .fill(.white.opacity(0.18))
+                    .fill(.white.opacity(0.16))
                     .frame(width: CGFloat(3 + bubble), height: CGFloat(3 + bubble))
-                    .offset(x: CGFloat(18 - bubble * 8), y: CGFloat(-22 + bubble * 9))
+                    .offset(x: CGFloat(15 - bubble * 7), y: CGFloat(-18 + bubble * 8))
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 6))
+        .overlay(
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .stroke(DIRTheme.cyan.opacity(0.18), lineWidth: 1)
+        )
     }
 }

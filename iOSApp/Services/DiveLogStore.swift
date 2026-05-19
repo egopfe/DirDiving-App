@@ -19,18 +19,17 @@ final class DiveLogStore: ObservableObject {
 
     private let cloudSync: CloudSyncStore?
     private let key = "dirdiving_ios_dive_sessions"
-    private let deletedKey = "dirdiving_ios_deleted_session_ids"
+    private let tombstoneKey = "dirdiving_ios_deleted_dive_session_ids"
     private var deletedSessionIDs: Set<UUID> = []
     private var isReady = false
 
     init(cloudSync: CloudSyncStore? = nil) {
         self.cloudSync = cloudSync
         includeDemoLogbook = UserDefaults.standard.bool(forKey: Self.includeDemoLogbookKey)
-        deletedSessionIDs = Set(cloudSync?.load([UUID].self, forKey: deletedKey) ?? [])
+        deletedSessionIDs = loadDeletedSessionIDs()
         let localSessions = loadLocalSessions()
-        let cloudSessions = cloudSync?.load([DiveSession].self, forKey: key)
+        let cloudSessions = cloudSync?.loadCloud([DiveSession].self, forKey: key)
         sessions = mergedSessions(local: localSessions, cloud: cloudSessions)
-            .filter { !deletedSessionIDs.contains($0.id) }
             .sorted { $0.startDate > $1.startDate }
 
         if includeDemoLogbook, sessions.filter({ !$0.isDemoDive }).isEmpty {
@@ -51,26 +50,30 @@ final class DiveLogStore: ObservableObject {
 
     func reloadFromCloud() {
         guard isReady else { return }
+        deletedSessionIDs = loadDeletedSessionIDs()
         let localSessions = loadLocalSessions()
-        deletedSessionIDs = Set(cloudSync?.load([UUID].self, forKey: deletedKey) ?? Array(deletedSessionIDs))
-        let cloudSessions = cloudSync?.load([DiveSession].self, forKey: key)
+        let cloudSessions = cloudSync?.loadCloud([DiveSession].self, forKey: key)
         sessions = mergedSessions(local: localSessions, cloud: cloudSessions)
-            .filter { !deletedSessionIDs.contains($0.id) }
             .sorted { $0.startDate > $1.startDate }
         applyDemoLogbookPreference()
     }
 
     func add(_ session: DiveSession) {
-        guard !deletedSessionIDs.contains(session.id) else { return }
+        deletedSessionIDs.remove(session.id)
+        saveDeletedSessionIDs()
         sessions.removeAll { $0.id == session.id }
         sessions.insert(session, at: 0)
         sessions = sessions.sorted { $0.startDate > $1.startDate }
     }
 
+    func session(id: UUID) -> DiveSession? {
+        sessions.first { $0.id == id }
+    }
+
     func delete(id: UUID) {
         deletedSessionIDs.insert(id)
+        saveDeletedSessionIDs()
         sessions.removeAll { $0.id == id }
-        saveIfReady()
     }
 
     func delete(at offsets: IndexSet) {
@@ -78,7 +81,7 @@ final class DiveLogStore: ObservableObject {
             deletedSessionIDs.insert(sessions[index].id)
             sessions.remove(at: index)
         }
-        saveIfReady()
+        saveDeletedSessionIDs()
     }
 
     func synchronizeCloud() {
@@ -87,7 +90,13 @@ final class DiveLogStore: ObservableObject {
     }
 
     private func loadLocalSessions() -> [DiveSession] {
-        cloudSync?.load([DiveSession].self, forKey: key) ?? []
+        if let local = cloudSync?.loadLocal([DiveSession].self, forKey: key) {
+            return local
+        }
+        guard let data = UserDefaults.standard.data(forKey: key) else { return [] }
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return (try? decoder.decode([DiveSession].self, from: data)) ?? []
     }
 
     private func mergedSessions(local: [DiveSession], cloud: [DiveSession]?) -> [DiveSession] {
@@ -104,13 +113,32 @@ final class DiveLogStore: ObservableObject {
                 }
             }
         }
-        return Array(byID.values)
+        return Array(byID.values).filter { !deletedSessionIDs.contains($0.id) }
     }
 
     private func saveIfReady() {
         guard isReady else { return }
         cloudSync?.save(sessions, forKey: key)
-        cloudSync?.save(Array(deletedSessionIDs), forKey: deletedKey)
+        saveDeletedSessionIDs()
+    }
+
+    private func loadDeletedSessionIDs() -> Set<UUID> {
+        let cloudIDs = cloudSync?.loadCloud([UUID].self, forKey: tombstoneKey) ?? []
+        let localIDs: [UUID]
+        if let decoded = cloudSync?.loadLocal([UUID].self, forKey: tombstoneKey) {
+            localIDs = decoded
+        } else {
+            localIDs = (try? JSONDecoder().decode([UUID].self, from: UserDefaults.standard.data(forKey: tombstoneKey) ?? Data())) ?? []
+        }
+        return Set(cloudIDs + localIDs)
+    }
+
+    private func saveDeletedSessionIDs() {
+        let ids = Array(deletedSessionIDs)
+        if let data = try? JSONEncoder().encode(ids) {
+            UserDefaults.standard.set(data, forKey: tombstoneKey)
+        }
+        cloudSync?.save(ids, forKey: tombstoneKey)
     }
 
     private func applyDemoLogbookPreference() {

@@ -27,21 +27,24 @@ enum WatchSyncAuth {
         NotificationCenter.default.post(name: .watchSyncPeerSecretDidUpdate, object: nil)
     }
 
-    static func syncKey(peerBundleID _: String) -> SymmetricKey {
+    static func syncKey(peerBundleID: String) -> SymmetricKey {
         guard let secret = loadPeerSecret() else {
-            return SymmetricKey(data: SHA256.hash(data: Data()))
+            assertionFailure("Watch sync key requested before peer secret verification.")
+            return SymmetricKey(data: Data(repeating: 0, count: 32))
         }
-        let localSecret = loadOrCreateLocalSecret()
-        let orderedSecrets = [localSecret, secret].sorted { $0.lexicographicallyPrecedes($1) }
-        var material = Data("dirdiving.watch.sync.v2|com.egopfe.dirdiving|com.egopfe.dirdiving.ios|".utf8)
-        material.append(orderedSecrets[0])
-        material.append(orderedSecrets[1])
+        var material = secret
+        material.append(Data(peerBundleID.utf8))
         return SymmetricKey(data: SHA256.hash(data: material))
     }
 
     static func cachedApplicationContext() -> [String: Any] {
         guard WCSession.isSupported() else { return [:] }
         return WCSession.default.receivedApplicationContext
+    }
+
+    static func resetPeerTrust() {
+        deleteKeychain(account: "\(keychainAccount)-peer")
+        NotificationCenter.default.post(name: .watchSyncPeerSecretDidUpdate, object: nil)
     }
 
     private static func loadOrCreateLocalSecret() -> Data {
@@ -71,7 +74,7 @@ enum WatchSyncAuth {
     }
 
     private static func loadKeychain(account: String) -> Data? {
-        let query: [String: Any] = [
+        var query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: keychainService,
             kSecAttrAccount as String: account,
@@ -94,6 +97,15 @@ enum WatchSyncAuth {
         attributes[kSecValueData as String] = data
         attributes[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
         SecItemAdd(attributes as CFDictionary, nil)
+    }
+
+    private static func deleteKeychain(account: String) {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: account
+        ]
+        SecItemDelete(query as CFDictionary)
     }
 
     private enum KeychainError: Error {

@@ -26,10 +26,6 @@ backup/before-docs-merge-20260518-1903-main
 backup/before-docs-merge-20260518-1903-main-iOS
 backup/before-docs-merge-20260518-1903-watch-experimental
 backup/before-docs-merge-20260518-1903-ios-experimental
-backup/before-docs-merge-20260518-2028-main
-backup/before-docs-merge-20260518-2028-main-iOS
-backup/before-docs-merge-20260518-2028-watch-experimental
-backup/before-docs-merge-20260518-2028-ios-experimental
 ```
 
 ## Stato MAIN Apple Watch
@@ -70,8 +66,7 @@ backup/before-docs-merge-20260518-2028-ios-experimental
 - Il nuovo audit post-fix e in `Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260518_POST_FIX_PRE_MODIFICATION.md` e `.docx` sul ramo Watch `main`.
 - Watch MAIN documenta delete visibile, depth diagnostics, coda sync retry/clear, metadata GPS fix/fallback/no-fix, UserImages empty state e limiti unit/export.
 - iOS MAIN documenta Logbook con mesi dinamici, Explore sync Watch/iCloud separati, Analysis actions, reset/re-pair trust Watch, stato notifiche, cloud merge-policy UI, CSV parser quotato e Gear save feedback.
-- Blocker runtime ora corretti nei commit MAIN locali: Watch `946d3c1` aggiunge `Formatters.zero`, mantiene TTV con copy non-safety, disabilita imperial Watch e rende la coda sync pending/sent/ack/failed; iOS `33bcb7e` corregge `PlannerView.swift`, valida CSV bounds, aggiunge ACK Watch reply, valori mancanti non-zero, GPS fix-source export e preview cloud merge.
-- Restano obbligatorie validazione `xcodegen generate` / Xcode su macOS e QA device; l'ambiente Windows non certifica build Apple SDK.
+- Blocker runtime da correggere separatamente: Watch `AscentWarningView` usa `Formatters.zero` mancante; iOS `PlannerView.swift` ha struttura brace/scope non valida vicino a `ResultPanelStyle` / `PlanTab`.
 - `Views/AscentGaugeView.swift` su Watch MAIN puo risultare dirty senza diff contenutistico per line endings; non includerlo in commit funzionali se resta stat-only.
 
 ## PR aperte
