@@ -54,6 +54,16 @@ Il companion iOS stabile segue `iOS_look_feel.png` e i riferimenti specifici piu
 
 Questi allineamenti sono UI-only: non cambiano calcoli planner, sync, persistenza, data flow, navigazione o modelli.
 
+### Pre-release backlog 2026-05-19 (SAF-3 + SAF-4 + companion docs)
+
+Commit `bf4718d` chiude le due rimanenze del backlog pre-release iOS senza toccare business logic:
+
+- **SAF-3** — `iOSApp/Views/DiveDetailView.swift` aggiunge accessibility label/hint sul tile `TTV info` (`TTV informativo … minuti` + hint *"TTV derivato da profondita media e durata; non e un valore decompressivo o time-to-surface."*) e una nota muted sotto la metric grid: *"TTV informativo: derivato da profondità media + runtime; non è un valore decompressivo o time-to-surface."*. Allineato al Watch (`TTV INFO` in `DiveUI.secondaryText`).
+- **SAF-4** — `iOSApp/Services/DiveImportService.swift` restringe i bound CSV ai valori del backlog 2026-05-19: `maxDepthMeters = 200`, `maxDurationSeconds = 28 800` (480 min), `temperatureRange = -2…40 °C`. Le righe fuori range vengono saltate e riportate da `ImportSummary.skippedMalformedCount`. Il formato CSV business (header/ordine colonne) non cambia.
+- **Documentazione** — `Docs/MAIN_PRE_RELEASE_OPEN_ITEMS_20260519.md` (item rinviati), `Docs/MAIN_PRE_RELEASE_SIMULATOR_QA_20260519.md` (checklist QA), `Docs/DOCUMENTATION_UPDATE_REPORT_20260519_PRE_RELEASE_BACKLOG.md` (report A–K).
+
+Nessuna modifica a decompressione, TTV/TTR algoritmi, modello gas, GPS, bussola o regole sync. Nessun file experimental toccato. Terminologia UI invariata (`BUSSOLA`, mai `COMPASSO`).
+
 ### Stable UX / Accessibility Corrections
 
 Gli ultimi fix sulla superficie stable separano chiaramente i flussi production dalle funzioni sperimentali:
