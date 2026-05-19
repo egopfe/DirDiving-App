@@ -6,6 +6,8 @@ enum DiveSessionMerge {
         let loser = winner.id == local.id ? remote : local
         let entryGPS = winner.entryGPS ?? loser.entryGPS
         let exitGPS = winner.exitGPS ?? loser.exitGPS
+        let entryGPSFixSource = winner.entryGPS == nil && loser.entryGPS != nil ? loser.entryGPSFixSource : winner.entryGPSFixSource
+        let exitGPSFixSource = winner.exitGPS == nil && loser.exitGPS != nil ? loser.exitGPSFixSource : winner.exitGPSFixSource
         let siteName = winner.siteName ?? loser.siteName
         let buddy = winner.buddy ?? loser.buddy
         let notes = winner.notes ?? loser.notes
@@ -24,6 +26,8 @@ enum DiveSessionMerge {
             ttv: useLoserSamples ? max(winner.ttv, loser.ttv) : winner.ttv,
             entryGPS: entryGPS,
             exitGPS: exitGPS,
+            entryGPSFixSource: entryGPSFixSource,
+            exitGPSFixSource: exitGPSFixSource,
             samples: useLoserSamples ? loser.samples : winner.samples,
             siteName: siteName,
             buddy: buddy,

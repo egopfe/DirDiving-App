@@ -122,6 +122,8 @@ struct DiveCommandButton: View {
             .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(title)
+        .accessibilityHint("Esegue il comando \(title.lowercased())")
     }
 }
 

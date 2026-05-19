@@ -1,7 +1,10 @@
 import SwiftUI
 
+/// **Screen intent (Watch MAIN):** in-water dashboard — depth hero, TTV/RunTime summary, ascent gauge, stopwatch, lifecycle controls.
+/// Visual target: black canvas, neon accents, rounded panels (`Docs/ReferenceUI/Watch_LIVE_reference.png`).
 struct DiveLiveView: View {
     @EnvironmentObject private var dive: DiveManager
+    @AppStorage(HapticService.hapticsEnabledKey) private var hapticsEnabled = true
 
     var body: some View {
         ZStack {
@@ -16,7 +19,7 @@ struct DiveLiveView: View {
                     if let confirmation = dive.gpsConfirmation {
                         gpsConfirmationView(confirmation)
                     } else if dive.isDiveActive && dive.ascentStatus.isOverLimit {
-                        AscentWarningView(status: dive.ascentStatus)
+                        AscentWarningView(status: dive.ascentStatus, depthMeters: dive.currentDepthMeters, runtime: dive.runtime)
                     } else if dive.isDiveActive {
                         activeDiveContent(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
                     } else {
@@ -42,10 +45,10 @@ struct DiveLiveView: View {
     @ViewBuilder
     private func gpsConfirmationView(_ confirmation: DiveGPSConfirmation) -> some View {
         switch confirmation {
-        case .start(let point):
-            GPSStartRegisteredView(point: point)
-        case .end(let point):
-            GPSEndRegisteredView(point: point)
+        case .start(let point, let fallback):
+            GPSStartRegisteredView(point: point, isFallback: fallback)
+        case .end(let point, let fallback):
+            GPSEndRegisteredView(point: point, isFallback: fallback)
         }
     }
 
@@ -53,6 +56,9 @@ struct DiveLiveView: View {
         VStack(spacing: 7) {
             topBar
             immersionStatus
+            if !hapticsEnabled {
+                hapticsOffBadge
+            }
             ttvRuntimePanel
             depthSection(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
             stopwatchPanel
@@ -160,6 +166,26 @@ struct DiveLiveView: View {
         .foregroundStyle(DiveUI.green)
     }
 
+    private var hapticsOffBadge: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "bell.slash.fill")
+                .font(.system(size: 12, weight: .black))
+            Text("APTICA DISATTIVATA")
+                .font(.system(size: 10, weight: .black, design: .rounded))
+            Spacer(minLength: 0)
+            Text("AVVISI SOLO VISIVI")
+                .font(.system(size: 9, weight: .black, design: .rounded))
+        }
+        .foregroundStyle(DiveUI.yellow)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(DiveUI.yellow.opacity(0.10))
+                .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(DiveUI.yellow.opacity(0.55), lineWidth: 1))
+        )
+    }
+
     private var ttvRuntimePanel: some View {
         HStack(spacing: 0) {
             dashboardValue(title: "TTV", value: ttvText, unit: nil, color: DiveUI.green)
@@ -178,6 +204,9 @@ struct DiveLiveView: View {
                 )
                 .shadow(color: DiveUI.green.opacity(0.16), radius: 5, x: 0, y: 0)
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("TTV sessione \(ttvText), runtime \(runtimeMinutes)")
+        .accessibilityHint("TTV informativo derivato da profondita media e durata; non e un valore decompressivo o time to surface.")
     }
 
     private func dashboardValue(title: String, value: String, unit: String?, color: Color) -> some View {

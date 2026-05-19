@@ -67,7 +67,7 @@ backup/before-docs-merge-20260518-2028-ios-experimental
 ## Aggiornamento post-fix 2026-05-18 19:03
 
 - `main` e `main-iOS` sono allineati con `origin` prima di questo pass documentale; i rami experimental sono avanti ai rispettivi branch base ma indietro di 3 commit MAIN.
-- Il nuovo audit post-fix e in `Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260518_POST_FIX_PRE_MODIFICATION.md` e `.docx` sul ramo Watch `main`.
+- Il nuovo audit post-fix e in `Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260518_POST_FIX_PRE_MODIFICATION.md` e `.docx`.
 - Watch MAIN documenta delete visibile, depth diagnostics, coda sync retry/clear, metadata GPS fix/fallback/no-fix, UserImages empty state e limiti unit/export.
 - iOS MAIN documenta Logbook con mesi dinamici, Explore sync Watch/iCloud separati, Analysis actions, reset/re-pair trust Watch, stato notifiche, cloud merge-policy UI, CSV parser quotato e Gear save feedback.
 - Blocker runtime ora corretti nei commit MAIN locali: Watch `946d3c1` aggiunge `Formatters.zero`, mantiene TTV con copy non-safety, disabilita imperial Watch e rende la coda sync pending/sent/ack/failed; iOS `33bcb7e` corregge `PlannerView.swift`, valida CSV bounds, aggiunge ACK Watch reply, valori mancanti non-zero, GPS fix-source export e preview cloud merge.

@@ -2,28 +2,46 @@ import SwiftUI
 
 struct DiveDetailView: View {
     let session: DiveSession
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var log: DiveLogStore
     @State private var exportURL: URL?
     @State private var exportMessage: String?
     @State private var exportCompletionFileName: String?
     @State private var showExportCompletion = false
+    @State private var showDeleteConfirmation = false
 
     var body: some View {
         ZStack {
             DiveScreenBackground()
 
-            VStack(spacing: 6) {
-                header
-                dateLine
-                summaryCards
-                gpsRows
-                exportPanel
+            ScrollView {
+                VStack(spacing: 6) {
+                    header
+                    dateLine
+                    summaryCards
+                    gpsRows
+                    exportPanel
+                    deletePanel
+                }
+                .padding(.horizontal, 10)
+                .padding(.top, 9)
+                .padding(.bottom, 8)
             }
-            .padding(.horizontal, 10)
-            .padding(.top, 9)
-            .padding(.bottom, 8)
         }
         .navigationDestination(isPresented: $showExportCompletion) {
             ExportView(fileName: exportCompletionFileName ?? "export.csv")
+        }
+        .confirmationDialog("Eliminare immersione?", isPresented: $showDeleteConfirmation, titleVisibility: .visible) {
+            Button("Elimina log", role: .destructive) {
+                log.delete(id: session.id)
+                HapticService.shared.notify()
+                dismiss()
+            }
+            Button("Annulla", role: .cancel) {
+                HapticService.shared.confirm()
+            }
+        } message: {
+            Text("Il log verra rimosso dal Watch e dalla prossima sincronizzazione.")
         }
     }
 
@@ -98,17 +116,19 @@ struct DiveDetailView: View {
             gpsRow(
                 title: "PUNTO INIZIO",
                 coordinate: coordinateLine(for: session.entryGPS, fallback: "GPS non disponibile"),
+                status: fixSourceText(session.entryGPSFixSource),
                 color: DiveUI.green
             )
             gpsRow(
                 title: "PUNTO FINE",
                 coordinate: coordinateLine(for: session.exitGPS, fallback: "GPS non disponibile"),
+                status: fixSourceText(session.exitGPSFixSource),
                 color: DiveUI.red
             )
         }
     }
 
-    private func gpsRow(title: String, coordinate: String, color: Color) -> some View {
+    private func gpsRow(title: String, coordinate: String, status: String, color: Color) -> some View {
         HStack(spacing: 6) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
@@ -121,6 +141,10 @@ struct DiveDetailView: View {
                     .monospacedDigit()
                     .lineLimit(1)
                     .minimumScaleFactor(0.58)
+                Text(status)
+                    .font(.system(size: 8, weight: .black, design: .rounded))
+                    .foregroundStyle(color)
+                    .lineLimit(1)
             }
 
             Spacer(minLength: 0)
@@ -198,6 +222,33 @@ struct DiveDetailView: View {
         }
     }
 
+    private var deletePanel: some View {
+        Button {
+            showDeleteConfirmation = true
+            HapticService.shared.notify()
+        } label: {
+            HStack(spacing: 7) {
+                Image(systemName: "trash.fill")
+                    .font(.system(size: 12, weight: .black))
+                Text("ELIMINA LOG")
+                    .font(.system(size: 11, weight: .black, design: .rounded))
+                Spacer(minLength: 0)
+                Text("CONFERMA")
+                    .font(.system(size: 9, weight: .black, design: .rounded))
+            }
+            .foregroundStyle(DiveUI.red)
+            .padding(.horizontal, 9)
+            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .fill(DiveUI.red.opacity(0.10))
+                    .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).stroke(DiveUI.red.opacity(0.72), lineWidth: 1.2))
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
     private var durationMinutesText: String {
         "\(max(0, Int((session.durationSeconds / 60).rounded())))"
     }
@@ -207,6 +258,14 @@ struct DiveDetailView: View {
             return fallback
         }
         return "\(coordinateText(value: point.latitude, positive: "N", negative: "S"))   \(coordinateText(value: point.longitude, positive: "E", negative: "W"))"
+    }
+
+    private func fixSourceText(_ source: GPSFixSource) -> String {
+        switch source {
+        case .fix: return "FIX SUPERFICIE"
+        case .fallback: return "ULTIMO PUNTO NOTO"
+        case .noFix: return "NO-FIX"
+        }
     }
 
     private func coordinateText(value: Double, positive: String, negative: String) -> String {

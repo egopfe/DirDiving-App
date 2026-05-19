@@ -60,7 +60,13 @@ struct MoreView: View {
                             row("Subsurface", "CSV")
                             row("Bundle", "com.egopfe.dirdiving.ios")
                         }
-                        DIRWarningBox(text: "DIR DIVING e un supporto informativo per logbook, analisi e pianificazione preliminare.")
+                        DIRWarningBox(
+                            text: "DIR DIVING e uno strumento di supporto per logbook, analisi e pianificazione preliminare. "
+                                + "Non sostituisce formazione, procedure del dive center, equipaggiamento certificato o il giudizio umano. "
+                                + "L'app non e un computer subacqueo certificato salvo esplicita omologazione futura. "
+                                + "Output del planner indicativi: verificarli con strumenti certificati. "
+                                + "GPS utile in superficie; sott'acqua e in copertura e inaffidabile o assente."
+                        )
                     }
                     .padding(16)
                 }

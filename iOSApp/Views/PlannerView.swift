@@ -15,7 +15,7 @@ struct PlannerView: View {
                             Text("Planner")
                                 .font(.system(size: 30, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
-                            Text("Gas, deco profile and Buhlmann presentation with high-contrast technical cards")
+                            Text("Gas, profilo deco e presentazione Bühlmann: schede ad alto contrasto. Output indicativo — verifica sempre con strumenti certificati.")
                                 .font(.callout)
                                 .foregroundStyle(DIRTheme.muted)
                         }
@@ -48,8 +48,10 @@ struct PlannerView: View {
                 Button {
                     store.mode = mode
                 } label: {
-                    Text(mode.rawValue)
+                    Text(plannerModeTabLabel(mode))
                         .font(.caption.weight(.semibold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.72)
                         .foregroundStyle(store.mode == mode ? .black : .white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
@@ -59,10 +61,21 @@ struct PlannerView: View {
                         )
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Modalita \(plannerModeTabLabel(mode))")
             }
         }
         .padding(4)
         .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface2.opacity(0.82)))
+    }
+
+    /// Display-only labels for the segmented control. `PlannerMode` raw values stay unchanged for Codable persistence.
+    private func plannerModeTabLabel(_ mode: PlannerMode) -> String {
+        switch mode {
+        case .recreational: return "Semplice"
+        case .advanced: return "Avanzato"
+        case .technical: return "Tecnico"
+        case .overhead: return "Overhead"
+        }
     }
 
     private var profileCard: some View {

@@ -28,9 +28,7 @@ struct UserImagesView: View {
 
             VStack(spacing: 4) {
                 if imageStore.imageNames.isEmpty {
-                    ForEach(placeholderRows) { row in
-                        placeholderImageRow(row)
-                    }
+                    imageEmptyState
                 } else {
                     ForEach(Array(imageStore.imageNames.enumerated()), id: \.element) { index, name in
                         imageRow(name: name, index: index)
@@ -99,34 +97,28 @@ struct UserImagesView: View {
         .contentShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
     }
 
-    private func placeholderImageRow(_ row: PlaceholderImageRow) -> some View {
-        // TODO: Replace placeholder rows with bundled UserImages assets when available.
-        HStack(spacing: 8) {
-            placeholderThumbnail(index: row.index)
-                .frame(width: 45, height: 26)
-
-            VStack(alignment: .leading, spacing: 1) {
-                Text("IMG \(row.index + 1)")
-                    .font(.system(size: 11, weight: .black, design: .rounded))
-                    .foregroundStyle(.white)
-                Text(row.caption)
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.65)
-            }
-
-            Spacer(minLength: 0)
+    private var imageEmptyState: some View {
+        VStack(spacing: 7) {
+            Image(systemName: "photo.on.rectangle.angled")
+                .font(.system(size: 24, weight: .black))
+                .foregroundStyle(DiveUI.cyan)
+            Text("NESSUNA IMMAGINE")
+                .font(.system(size: 12, weight: .black, design: .rounded))
+                .foregroundStyle(.white)
+            Text("Nessuna schermata o immagine di riferimento e inclusa in questa build.")
+                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .foregroundStyle(DiveUI.secondaryText)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(.horizontal, 6)
-        .padding(.vertical, 4)
-        .frame(minHeight: 35)
+        .padding(10)
+        .frame(maxWidth: .infinity, minHeight: 92)
         .background(
             RoundedRectangle(cornerRadius: 7, style: .continuous)
-                .fill(Color.black.opacity(0.5))
+                .fill(Color.black.opacity(0.52))
                 .overlay(
                     RoundedRectangle(cornerRadius: 7, style: .continuous)
-                        .stroke(row.index == 0 ? DiveUI.yellow : .white.opacity(0.2), lineWidth: row.index == 0 ? 1.4 : 1)
+                        .stroke(DiveUI.cyan.opacity(0.40), lineWidth: 1)
                 )
         )
     }
@@ -255,19 +247,4 @@ struct UserImagesView: View {
         }
     }
 
-    private var placeholderRows: [PlaceholderImageRow] {
-        [
-            PlaceholderImageRow(index: 0, caption: "Relitto"),
-            PlaceholderImageRow(index: 1, caption: "Paramuricea clavata"),
-            PlaceholderImageRow(index: 2, caption: "Grotta"),
-            PlaceholderImageRow(index: 3, caption: "Mappa sito")
-        ]
-    }
-}
-
-private struct PlaceholderImageRow: Identifiable {
-    let index: Int
-    let caption: String
-
-    var id: Int { index }
 }

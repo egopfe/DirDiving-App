@@ -4,6 +4,10 @@ enum DiveSessionMerge {
     static func preferred(_ local: DiveSession, _ remote: DiveSession) -> DiveSession {
         let winner = newer(local, remote)
         let loser = winner.id == local.id ? remote : local
+        let entryGPS = winner.entryGPS ?? loser.entryGPS
+        let exitGPS = winner.exitGPS ?? loser.exitGPS
+        let entryGPSFixSource = winner.entryGPS == nil && loser.entryGPS != nil ? loser.entryGPSFixSource : winner.entryGPSFixSource
+        let exitGPSFixSource = winner.exitGPS == nil && loser.exitGPS != nil ? loser.exitGPSFixSource : winner.exitGPSFixSource
         return DiveSession(
             id: winner.id,
             startDate: min(winner.startDate, loser.startDate),
@@ -15,8 +19,10 @@ enum DiveSessionMerge {
             minWaterTemperatureCelsius: minOptional(winner.minWaterTemperatureCelsius, loser.minWaterTemperatureCelsius),
             maxWaterTemperatureCelsius: maxOptional(winner.maxWaterTemperatureCelsius, loser.maxWaterTemperatureCelsius),
             ttv: max(winner.ttv, loser.ttv),
-            entryGPS: winner.entryGPS ?? loser.entryGPS,
-            exitGPS: winner.exitGPS ?? loser.exitGPS,
+            entryGPS: entryGPS,
+            exitGPS: exitGPS,
+            entryGPSFixSource: entryGPSFixSource,
+            exitGPSFixSource: exitGPSFixSource,
             samples: winner.samples.count >= loser.samples.count ? winner.samples : loser.samples
         )
     }

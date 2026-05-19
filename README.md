@@ -4,6 +4,12 @@ Copyright Federico Lombardo di Monte Iato 2026
 
 DIR DIVING is a SwiftUI watchOS application for Apple Watch Ultra-class devices. It focuses on essential in-water dive information, ascent-rate awareness, compass navigation, local dive logging, GPS entry/exit metadata, and CSV export for Subsurface.
 
+## Safety and limitations (MAIN)
+
+DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent awareness, and syncs to the iPhone companion for review and **indicative** planning. It is **not** a certified dive computer unless a future release explicitly documents certification. It does **not** replace training, dive-center rules, certified equipment, or human judgment. Planner and Bühlmann-style presentations are **indicative** — verify with certified tools. GPS is meaningful **at the surface**; underwater or poor-sky conditions mean fixes can be missing — missing data must not be read as “dive success.”
+
+**Recent MAIN UI/UX pass:** layout, typography, contrast, tab labels, accessibility text, empty states, disclaimers, and documentation only — **no** changes to decompression math, gas models, TTV/TTR calculations, SAC/CNS/OTU math, sensor sampling, or sync transport rules.
+
 > Status note: the app is prepared for Apple water submersion APIs, but the depth/submersion entitlement is still pending. Until the entitlement is granted and the app is signed with it, `CMWaterSubmersionManager` may report entitlement-related errors and will not deliver production depth data.
 
 ## Depth Entitlement And Signing Checklist
@@ -34,11 +40,8 @@ External validation is still required before release:
 - Red blinking warning and haptic feedback when ascent rate exceeds the current depth-band limit
 - GPS entry and exit points captured with a best-effort surface fix
 - Automatic WatchConnectivity transfer of saved dive logs to the iOS companion
-- Experimental pre-water selector for Diving, Apnea, and Snorkeling
-- Experimental Snorkeling mode with waypoint navigation, return-to-entry, GPS markers, and compass bearing delta
-- Experimental Apnea mode with apnea timer, recovery assistant, dive counter, depth warning surface, and compass block
-- Local persistence with iCloud Key-Value Store mirroring for dive logs, ascent-rate settings, and experimental exploration state
-- Experimental Buddy Assist screen for secure pre-dive buddy identification and preset messages over a future BLE pairing path
+- Stable pre-water selector for Diving on `main`; Snorkeling, Apnea and Buddy Assist remain isolated to experimental branches
+- Local persistence with iCloud Key-Value Store mirroring for dive logs, ascent-rate settings, Watch sync queues and supported iOS companion state
 - Custom image screen for bundled reference images, checklists, or static procedures
 
 Experimental branch documentation is available in [`Docs/EXPERIMENTAL_FEATURES.md`](Docs/EXPERIMENTAL_FEATURES.md).
@@ -50,7 +53,21 @@ DIR DIVING e organizzato come progetto XcodeGen multi-target:
 - Apple Watch Ultra / watchOS 10+: app principale per Diving mode, bussola, log, GPS entry/exit, export e funzioni sperimentali isolate sui rami dedicati.
 - iPhone / iOS 17+: companion app per logbook, dettaglio immersione, planner, risultato piano, analisi, export e sync WatchConnectivity.
 
-Le istruzioni di build iOS companion sono anche in [`Docs/iOS/BUILD_AND_RUN.md`](Docs/iOS/BUILD_AND_RUN.md).
+Le istruzioni di build sono in [`Docs/BUILD_VALIDATION.md`](Docs/BUILD_VALIDATION.md) e in [`Docs/iOS/BUILD_AND_RUN.md`](Docs/iOS/BUILD_AND_RUN.md).
+
+## Strategia dei rami (Branch Strategy)
+
+- **`main`**: codice orientato alla stabilità **Diving** su Apple Watch e al companion iOS incluso nello stesso workspace XcodeGen. Le funzioni Apnea, Snorkeling, Buddy Assist e le mappe sperimentali **non** fanno parte del target MAIN (`project.yml` esclude i file sperimentali dal build production). I merge verso `main` devono **preservare** il comportamento Diving, GPS surface-only, **BUSSOLA** (terminologia UI: non usare «COMPASSO»), export Subsurface e sync documentati.
+- **`main-iOS`**: ramo di lavoro storico/parallelo per allineamenti UI iOS; può divergere da `main`. Allineare la documentazione quando le feature companion sono equivalenti.
+- **`codex/experimental-features`**: Watch sperimentale (Snorkeling Live, mappe waypoint/ritorno, Apnea workflow esteso, Buddy Assist, ecc.). Non importare questi file nel target MAIN senza revisione esplicita.
+- **`codex/ios-experimental-features`**: iOS sperimentale (Explore Lab, Buddy Lab, concept mappe). Isolato da App Store candidate su `main`.
+- **Allineamenti UI-only** su `main`: possono toccare layout, copy, accessibilità e documentazione **senza** modificare algoritmi di decompressione, modello gas, calcoli TTV/TTR/SAC/CNS/OTU, sampling sensori o regole di sync — vedi [`Docs/MAIN_UX_COMPLETION_REPORT.md`](Docs/MAIN_UX_COMPLETION_REPORT.md).
+
+### Matrice funzionalità (CSV)
+
+La tabella aggiornata con colonne Area / Branch / App / Mode / Feature / Status / Description / UI Reference / Notes:
+
+[`Docs/DIR_DIVING_Feature_Comparison.csv`](Docs/DIR_DIVING_Feature_Comparison.csv)
 
 ## Visual Design Standard
 
@@ -75,10 +92,7 @@ This premium visual system is now applied across the watch UI, not only the live
 - `DiveLiveView`: primary dive computer screen with octopus logo, depth, TTV, RunTime, separated ascent gauge, stopwatch, and controls
 - `CompassView`: black full-screen compass surface with large heading, bearing panel, and bordered controls
 - `AscentRateSettingsView`: custom ascent-limit controls with color-coded depth bands
-- `ModeSelectionView`: pre-water activity selector using the same black technical panels
-- `SnorkelingView`: GPS route, waypoint, marker, and return-to-entry surface
-- `ApneaView`: apnea timer, recovery assistant, warning, and compass surface
-- `BuddyAssistView`: pre-dive pairing, Buddy Link, proximity, message, and compass panels using the same black technical visual language
+- `ModeSelectionView`: stable Diving selector using the same black technical panels; experimental modes are excluded from MAIN target membership
 - `DiveLogListView` and `DiveDetailView`: log, detail, chart, GPS, and CSV export screens using the same metric panels and command buttons
 - `UserImagesView`: bundled image selector with the same black canvas and bordered action controls
 
@@ -90,10 +104,9 @@ Il companion iOS stabile segue `iOS_look_feel.png` come riferimento master. Le s
 - `DiveDetailView`: tab riepilogo/grafici/dettagli, immagine sito, griglia metriche, grafico profondita ciano, gas card ed export.
 - `PlannerView`: titolo Planner, controllo segmentato modalita, input profilo, gas card con bordo neon e pulsante `Calcola Piano`.
 - `PlanResultView`: tab piano/curva/grafici, griglia riepilogo, tabella piano risalita e curva Bühlmann in pannello scuro.
-- `ExploreView` / `Route Review`: revisione route da GPS entry/exit dei log, senza promettere un motore mappe production.
-- `AnalysisView`: metriche logbook reali, SAC medio, distribuzione gas e riepilogo route GPS.
+- `AnalysisView`: metriche logbook reali, SAC medio, distribuzione gas, **riepilogo route GPS** da entry/exit dei log (nessun motore mappe esterno).
 - `EquipmentView`: profilo attrezzatura persistente, checklist e SAC pianificazione.
-- `MoreView` / `Settings`: onboarding operativo, preferenze locali unita/export, stato Watch sync, conflitti Watch, cloud backup KVS, retry sync e note Subsurface.
+- `MoreView` / `Settings`: onboarding operativo, preferenze locali unita/export, stato Watch sync, cloud backup, retry sync, conflitti Watch, tombstone iCloud KVS e note Subsurface.
 
 Questi allineamenti sono UI-only: non cambiano calcoli planner, sync, persistenza, data flow, navigazione o modelli.
 
@@ -107,8 +120,9 @@ Gli ultimi fix sulla superficie stable separano chiaramente `main` dalle funzion
 - La bussola Watch usa azioni esplicite `SET BEARING` e `CLEAR`, senza promettere un callback del tasto laterale non controllato dall'app.
 - Le conferme GPS entry/exit sono mostrate dal lifecycle immersione e non usano coordinate finte quando il fix non e disponibile.
 - L'export Watch dalla lista esporta l'ultima immersione e mostra share/error feedback.
-- Il companion iOS stabile espone `Logbook`, `Route Review`, `Analysis`, `Planner`, `Gear` e `Settings`; queste superfici usano dati reali locali/logbook o copy esplicita sulle limitazioni.
+- Il companion iOS stabile espone **cinque tab**: `Logbook`, `Analisi`, `Planner`, `Attrezzatura`, `Altro`; dati reali o etichettati come informativi/locali.
 - Il planner iOS mostra disclaimer in-app e separa i tab risultato `PIANO`, `CURVA BÜHLMANN` e `GRAFICI`.
+- Il progetto MAIN esclude Apnea, Snorkeling, Buddy Assist e concept experimental dal target membership generato da XcodeGen.
 
 Implementation helpers live in:
 
@@ -151,6 +165,9 @@ Persisted data:
 
 - Latest dive log sessions.
 - User-configurable ascent-rate limits.
+- Pending WatchConnectivity session queue for unsent Watch logs.
+- iOS companion profile/planner/equipment data where available.
+- Deleted iOS log tombstones, so KVS reloads do not silently restore removed sessions.
 
 Implementation:
 
@@ -161,7 +178,7 @@ Implementation:
 
 Runtime note: iCloud sync requires the Apple Developer iCloud capability and the configured iCloud container to be enabled for the app identifier. Without the entitlement/capability at signing time, data is still saved locally.
 
-On the experimental branch, Snorkeling/Apnea exploration state is also mirrored to iCloud. Secure Buddy authentication keys remain in Keychain and are intentionally not mirrored through iCloud Key-Value Store.
+On the experimental branches, Snorkeling/Apnea exploration state and lightweight sync queue status are also mirrored where implemented. Secure Buddy authentication keys remain in Keychain and are intentionally not mirrored through iCloud Key-Value Store.
 
 ## Main Navigation
 
@@ -180,7 +197,7 @@ The compass is implemented as a full screen, not as a modal feature that must be
 
 Terminologia UI: nelle schermate italiane nuove usare `BUSSOLA`; non introdurre `COMPASSO`.
 
-Experimental Apnea, Snorkeling and Buddy Assist screens are intentionally not part of `main` navigation. They remain in `codex/experimental-features` until hardware, UX, safety and build validation are complete.
+Experimental Apnea, Snorkeling and Buddy Assist screens are intentionally not part of `main` navigation or MAIN target membership. They remain in `codex/experimental-features` until hardware, UX, safety and build validation are complete.
 
 ## Live Dive Screen
 
@@ -320,7 +337,7 @@ Each saved session includes:
 
 ## Buddy Assist
 
-The experimental `BUDDY` screen is designed for quick preset messages between divers:
+Buddy Assist is experimental-only and is excluded from the current MAIN Watch target. The experimental `BUDDY` screen is designed for quick preset messages between divers:
 
 - `OK`
 - `RISALI`
@@ -360,7 +377,7 @@ Current implementation status:
 - Reads buddy RSSI every 15 seconds while connected.
 - Adds a `BuddyAssistService` with CoreBluetooth central-side scaffolding.
 - Defines a custom BLE service UUID and message characteristic UUID.
-- Adds the required Bluetooth privacy usage string to `Info.plist`.
+- Adds the required Bluetooth privacy usage string only on branches where the experimental Buddy/BLE surface is target-included.
 - Adds `Security.framework` for Keychain-backed trusted buddy keys.
 - Uses the shared premium visual system from `DiveUIComponents.swift`, with black canvas, thin status borders, large readable values, and blue/green/yellow/red functional colors.
 
@@ -472,7 +489,7 @@ Gli ultimi aggiornamenti MAIN readiness aggiungono:
 - haptic feedback per START/STOP/RESET cronometro, rispettando il toggle haptics;
 - iOS Watch sync con conflitti visibili e risoluzione manuale;
 - tombstone iOS per evitare che log cancellati riappaiano da KVS;
-- import CSV iOS, profilo attrezzatura persistente, Route Review e Analysis basati su dati logbook;
+- import CSV iOS, profilo attrezzatura persistente, tab **Analisi** con riepilogo route GPS e metriche logbook basate su dati reali;
 - planner iOS con warning dinamici e copy non certificato.
 
 Build finale, `xcodegen generate` e `xcodebuild` devono essere eseguiti su macOS.
@@ -484,7 +501,7 @@ Dopo il report `Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260517_CURRENT_PRE_MOD
 - Watch MAIN: `Settings`, `AlarmSettings`, `DiveLive` e `DiveLogList` chiariscono metriche/local-only, shortcut/App Intents, avvio manuale, stato log vuoto, export non disponibile senza log e conferma delete.
 - Watch MAIN: le soglie allarme restano locali sul Watch, non sincronizzate con iPhone; i controlli +/- sono piu grandi e scrollabili per ridurre clipping e migliorare uso con guanti.
 - iOS MAIN: `Settings` marca unita/export come preferenze non editabili o local-only quando non esiste ancora un contratto sync production.
-- iOS MAIN: `Logbook`, `Route Review`, `Analysis` e `Gear` aggiungono empty state o conferme distruttive per import/sync assenti, nessuna rotta, nessuna statistica, delete immersione e reset profilo.
+- iOS MAIN: `Logbook`, `Analisi` (route GPS + import/sync), `Planner`, `Attrezzatura` e `Altro` aggiungono empty state o conferme distruttive per import/sync assenti, nessuna rotta, nessuna statistica, delete immersione e reset profilo.
 - Non sono stati modificati algoritmi GPS, bussola, profondita, risalita, decompressione, persistenza dati o modelli business; il pass e UI/UX e copy-only salvo conferme SwiftUI.
 
 ## Latest MAIN UX Audit And Documentation TODO
@@ -497,9 +514,9 @@ Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260517_CURRENT_PRE_MODIFICATION.docx
 
 Stato documentato dopo l'audit:
 
-- Le superfici principali MAIN sono raggiungibili: Apple Watch `Diving`, `BUSSOLA`, settings, immagini, log/export; iOS `Logbook`, `Route Review`, `Analysis`, `Planner`, `Gear`, `Settings`.
+- Le superfici principali MAIN sono raggiungibili: Apple Watch `Diving`, `BUSSOLA`, settings, immagini, log/export; iOS `Logbook`, `Analisi`, `Planner`, `Attrezzatura`, `Altro` (cinque tab; route GPS in **Analisi**).
 - Risolti nel pass MAIN UX: empty state iOS principali, conferme delete/reset, spiegazione Action Button/App Intents, copy di avvio manuale, settings iOS marcati read-only/local-only dove appropriato e controlli allarme Watch piu grandi.
-- Restano TODO di allineamento sync: settings Watch/iOS sono dichiarati local-only, coda sync ispezionabile per singola sessione e policy cloud conflict oltre KVS restano roadmap.
+- Restano TODO di allineamento sync: settings Watch/iOS sono dichiarati local-only e la policy cloud conflict oltre KVS resta roadmap.
 - Restano TODO build/config da verificare su macOS: l'asset catalog iOS MAIN deve contenere i PNG citati da `AppIcon.appiconset/Contents.json`; `xcodegen generate` e le build Watch/iOS devono confermare i fix runtime piu recenti.
 - L'audit resta snapshot pre-modifica; i fix MAIN UX successivi sono committati separatamente dalla documentazione.
 
@@ -514,22 +531,6 @@ Config/DIRDiving.entitlements
 Il file entitlements Watch include la chiave `com.apple.developer.coremotion.water-submersion`, coerente con `WKBackgroundModes` / `underwater-depth` in `App/Info.plist` e con `CODE_SIGN_ENTITLEMENTS: Config/DIRDiving.entitlements` in `project.yml`.
 
 Questa configurazione non equivale a validazione release: prima di TestFlight/App Store serve confermare in Apple Developer portal che l'App ID `com.egopfe.dirdiving` abbia l'entitlement depth/submersion approvato, poi generare/buildare con Xcode su macOS e validare su Apple Watch Ultra reale.
-
-## Latest MAIN UX Audit And Documentation TODO
-
-Il report pre-modifica MAIN piu recente e stato generato sul ramo `main`:
-
-```text
-Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260517_CURRENT_PRE_MODIFICATION.docx
-```
-
-Stato documentato dopo l'audit:
-
-- Le superfici principali MAIN sono raggiungibili: Apple Watch `Diving`, `BUSSOLA`, settings, immagini, log/export; iOS `Logbook`, `Route Review`, `Analysis`, `Planner`, `Gear`, `Settings`.
-- Le superfici di questo ramo restano experimental: Snorkeling Live, Mappa Waypoint, Mappa Ritorno, Direzione Waypoint, Marcatori POI, Apnea e Buddy Assist lab-only.
-- Risolti nel pass MAIN UX sui rami base: empty state iOS principali, conferme delete/reset, spiegazione Action Button/App Intents, copy avvio manuale, settings iOS marcati read-only/local-only e controlli allarme Watch piu grandi.
-- Restano TODO build/config da verificare su macOS: l'asset catalog iOS MAIN deve contenere i PNG citati da `AppIcon.appiconset/Contents.json`; `xcodegen generate` e le build Watch/iOS devono confermare i fix runtime piu recenti.
-- I fix MAIN UX sono stati merge-base su questo ramo; i conflitti runtime sperimentali sono risolti preservando le schermate Snorkeling/Apnea/Buddy del branch.
 
 ## Branch Strategy
 
@@ -554,7 +555,7 @@ Regole operative:
 | --- | --- | --- | --- |
 | `main` | Apple Watch | Stable | Diving mode, log, export, BUSSOLA, immagini, settings raggiungibili, allarmi/haptic persistenti, GPS entry/exit confirmation, sync queue, helper shortcut/App Intents, empty state log e target membership senza experimental. |
 | `codex/experimental-features` | Apple Watch | Experimental | Snorkeling Live, Mappa Waypoint, Mappa Ritorno, Direzione Waypoint, POI con log/dettaglio/conferma, allarmi Snorkeling persistenti locali, Apnea, haptics sperimentali, settings sperimentali raggiungibili e Buddy Assist marcato lab-only. |
-| `main-iOS` | iOS Companion | Stable | Logbook, Dive Detail, Route Review, Analysis, Planner/Plan Result, Gear, Settings, WatchConnectivity, iCloud KVS, CSV import/export, Subsurface, empty state e conferme distruttive. |
+| `main-iOS` | iOS Companion | Stable | Logbook, Dive Detail, Analisi (route GPS), Planner/Plan Result, Attrezzatura, Altro/Settings, WatchConnectivity, iCloud KVS, CSV import/export, Subsurface, empty state e conferme distruttive. Storico: poteva esistere tab «Route Review» separata; su `main` unificato la route e in **Analisi**. |
 | `codex/ios-experimental-features` | iOS Companion | Experimental | Explore Lab, route planning, waypoint management, POI enrichment mock/TODO, Apnea Review interattiva, queue/status sync sperimentale, impostazioni locali editabili e note map/offline. |
 
 ## Mode Selection
@@ -679,15 +680,6 @@ Dopo il report `Docs/EXPERIMENTAL_FUNCTIONS_UX_AUDIT_20260517_PRE_MODIFICATION.d
 
 ## Aggiornamento pre-release 2026-05-18
 
-Questo ramo resta experimental: Snorkeling, Apnea e Buddy Assist non devono essere mergiati in `main` senza build macOS, review safety e QA hardware. Gli aggiornamenti MAIN da preservare nei merge successivi sono:
-
-- Diving MAIN resta il flusso stabile e deve mantenere live UI, BUSSOLA, GPS entry/exit surface-only, export Subsurface, settings/allarmi e log.
-- `WatchSyncAuth` MAIN e isolato da `SecureBuddyStore`; Buddy/BLE resta experimental.
-- GPS no-fix, ultimo punto noto e successo devono restare visivamente distinti.
-- L'avviso risalita MAIN mantiene contesto depth/RunTime senza cambiare algoritmi.
-- Aptica off resta visibile come `APTICA DISATTIVATA` / `AVVISI SOLO VISIVI`.
-- La documentazione sperimentale deve conservare Snorkeling Live, Mappa Waypoint, Mappa Ritorno, GPS marker, return-to-entry e terminologia `BUSSOLA`.
-
 Il pass piu recente mantiene MAIN e sperimentale separati e documenta i blocker corretti senza promuovere Apnea, Snorkeling o Buddy Assist in produzione:
 
 - Watch MAIN: `WatchSyncAuth` non dipende piu da `SecureBuddyStore`, che resta escluso dal target MAIN per evitare leakage Buddy/BLE.
@@ -696,22 +688,36 @@ Il pass piu recente mantiene MAIN e sperimentale separati e documenta i blocker 
 - Watch MAIN: quando l'aptica e disattivata, la live UI mostra `APTICA DISATTIVATA` e `AVVISI SOLO VISIVI`.
 - iOS MAIN: sync Watch senza peer secret resta `Associazione Watch non verificata`; nessuna fallback key deterministica viene trattata come fidata.
 - iOS MAIN: import CSV preserva la data sorgente quando presente, usa ID deterministico da hash per evitare duplicati e mostra risultato import/duplicati/errori.
-- iOS MAIN: Route Review ha azioni reali per sync, import CSV e impostazioni; azioni non cablate non devono sembrare pulsanti.
+- iOS MAIN: la tab **Analisi** include riepilogo route GPS, import CSV, sync Watch e empty state con azioni reali; le cinque tab companion sono Logbook / Analisi / Planner / Attrezzatura / Altro.
 - iOS MAIN: Planner usa solo modalita semplice come comportamento attivo, marca modalita avanzate/tecniche come planned, valida input e richiede acknowledgement safety.
 - iOS MAIN: conversioni unita restano display-only; dati salvati, planner, import/export CSV e sync Watch restano metrici.
 
 Restano obbligatori: build `xcodegen generate` / Xcode su macOS, test Apple Watch Ultra reale, validazione entitlement depth nel Developer portal e QA su import/export, sync, cloud KVS e schermate piccole.
 
+## Aggiornamento documentazione 2026-05-19
+
+- Aggiunti: [`Docs/BUILD_VALIDATION.md`](Docs/BUILD_VALIDATION.md), [`Docs/GLOSSARY.md`](Docs/GLOSSARY.md), [`Docs/RELEASE_CHECKLIST.md`](Docs/RELEASE_CHECKLIST.md), [`Docs/UI_UX_VISUAL_GUIDELINES.md`](Docs/UI_UX_VISUAL_GUIDELINES.md), [`CHANGELOG.md`](CHANGELOG.md), [`CONTRIBUTING.md`](CONTRIBUTING.md), report di sync [`Docs/DOCUMENTATION_SYNC_REPORT_20260519.md`](Docs/DOCUMENTATION_SYNC_REPORT_20260519.md), allineamento [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md).
+- Riferimenti visivi consolidati in `Docs/ReferenceUI/` (Watch live + iOS companion).
+- Matrice CSV aggiornata in coda (righe additive) per tab iOS a cinque voci e documentazione build.
+- PR **#8** e **#9**: al fetch risultano ancora **`mergeable: CONFLICTING`** / stato GitHub **DIRTY** — **non** mergeate automaticamente; vedi [`Docs/DOCUMENTATION_SYNC_REPORT_20260519.md`](Docs/DOCUMENTATION_SYNC_REPORT_20260519.md) e [`Docs/DOCUMENTATION_UPDATE_REPORT_20260519.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260519.md).
+
 ## Aggiornamento documentazione e audit post-fix 2026-05-18
 
-Il ramo `codex/experimental-features` resta experimental e non promuove Snorkeling, Apnea o Buddy Assist in MAIN. Gli aggiornamenti documentali correnti da preservare nei merge sono:
+Il report post-fix pre-modifica corrente e stato aggiunto in:
 
-- Feature matrix aggiornata con delete visibile Watch, depth diagnostics, sync queue clear/retry, GPS fix-source metadata, trust reset iOS, notification status, cloud merge-policy UI, CSV parser quotato e Gear save feedback.
-- Report post-fix pre-modifica disponibile su `main`: `Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260518_POST_FIX_PRE_MODIFICATION.md` / `.docx`.
-- PR #8 (`codex/experimental-features` -> `main`) e attualmente conflittuale e con build check falliti; non e safe-to-merge senza risoluzione conservativa, build macOS e QA Apple Watch.
-- Nei conflitti preservare prima codice buildabile e Diving MAIN, poi Snorkeling Live, Mappa Waypoint, Mappa Ritorno, GPS marker, return-to-entry, terminologia `BUSSOLA`, e infine documentazione piu recente.
+```text
+Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260518_POST_FIX_PRE_MODIFICATION.md
+Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260518_POST_FIX_PRE_MODIFICATION.docx
+```
 
-Aggiornamento runtime MAIN 2026-05-18 20:22 da preservare nei merge:
+Stato documentale corrente:
+
+- Apple Watch MAIN include ora delete visibile da `DiveDetailView`, diagnostica depth entitlement/sensore/callback in `Info`, coda sync con retry/clear, metadata GPS fix/fallback/no-fix, stato UserImages vuoto e note export/units local-only.
+- iOS MAIN include Logbook con mesi dinamici; **Analisi** con route GPS, import CSV, sync Watch e azioni empty state; reset/re-pair trust Watch; stato autorizzazione notifiche; policy cloud visibile; CSV parser con campi quotati e feedback `importate/duplicati/righe saltate`; feedback `Salvato` su Attrezzatura.
+- La matrice `Docs/DIR_DIVING_Feature_Comparison.csv` separa Apple Watch Main, Apple Watch Experimental, iOS Main e iOS Experimental.
+- Le PR sperimentali aperte (#8 e #9) risultano conflittuali e con build check falliti; non sono considerate safe-to-merge finche non passano build macOS, review target membership e QA safety.
+
+Aggiornamento runtime MAIN 2026-05-18 20:22:
 
 - Watch MAIN: il blocker `AscentWarningView` -> `Formatters.zero` e stato corretto aggiungendo il formatter zero-decimal Watch senza modificare `time` o `one`.
 - Watch MAIN: la coda WatchConnectivity ora distingue `pending`, `sent`, `delivered/acknowledged`, `failed` e last retry; i pending non vengono rimossi prima dell'ack diretto iPhone.
@@ -721,3 +727,4 @@ Aggiornamento runtime MAIN 2026-05-18 20:22 da preservare nei merge:
 - iOS MAIN: CSV import valida durata, profondita, temperatura e range GPS, continua a gestire campi quotati e riporta importati, duplicati e righe malformate/scartate.
 - iOS MAIN: detail/analysis non mostrano piu SAC, temperatura o accuratezza GPS mancanti come zero misurati; usano `—` o `Non disponibile`.
 - iOS MAIN: export CSV include il GPS fix source entry/exit; Settings mostra una preview merge cloud locale/cloud/risultato senza promettere conflict resolver per-campo.
+- `Views/AscentGaugeView.swift` su Watch MAIN puo apparire modificato senza diff contenutistico per line endings; non va incluso in commit funzionali se resta stat-only.

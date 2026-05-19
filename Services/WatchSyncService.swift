@@ -9,16 +9,24 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published private(set) var isSupported = WCSession.isSupported()
     @Published private(set) var activationState: WCSessionActivationState = .notActivated
     @Published private(set) var lastSyncStatus = "Companion non sincronizzato"
+    @Published private(set) var pendingTransferCount = 0
+    @Published private(set) var sentTransferCount = 0
+    @Published private(set) var acknowledgedTransferCount = 0
+    @Published private(set) var failedTransferCount = 0
+    @Published private(set) var lastRetryDate: Date?
     @Published private(set) var experimentalQueueCount = 0
     @Published private(set) var experimentalLastKind = "--"
     @Published private(set) var experimentalDeliveryState = "Nessun payload experimental"
 
     private var pendingSessions: [DiveSession] = []
+    private let pendingSessionsKey = "dirdiving_watch_pending_sync_sessions"
     private var pendingExperimentalEnvelopes: [ExperimentalSyncEnvelope] = []
     private var peerSecretObserver: NSObjectProtocol?
 
     private override init() {
         super.init()
+        pendingSessions = loadPendingSessions()
+        pendingTransferCount = pendingSessions.count
         peerSecretObserver = NotificationCenter.default.addObserver(
             forName: .watchSyncPeerSecretDidUpdate,
             object: nil,
@@ -46,14 +54,13 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     func transfer(_ session: DiveSession) {
         guard WCSession.isSupported() else { return }
+        enqueuePendingSession(session)
 
         if WatchSyncAuth.hasPeerSecret() {
-            send(session)
+            flushPendingTransfers()
         } else {
-            pendingSessions.append(session)
-            pendingSessions = pendingSessions.sorted { $0.startDate > $1.startDate }
             WatchSyncAuth.publishSharedSecretIfNeeded()
-            lastSyncStatus = "In attesa chiave sync (\(pendingSessions.count) in coda)"
+            lastSyncStatus = "Pending: in attesa chiave sync (\(pendingTransferCount) in coda)"
         }
     }
 
@@ -85,37 +92,111 @@ final class WatchSyncService: NSObject, ObservableObject {
         transferExperimentalEnvelope(ExperimentalSyncEnvelope(kind: .watchApneaRecord, payload: payload))
     }
 
-    private func flushPendingTransfers() {
-        guard WatchSyncAuth.hasPeerSecret(), !pendingSessions.isEmpty else { return }
-        let queue = pendingSessions
-        pendingSessions.removeAll()
-        for session in queue.reversed() {
-            send(session)
+    func retryPendingTransfers() {
+        lastRetryDate = Date()
+        guard WCSession.isSupported() else {
+            failedTransferCount += 1
+            lastSyncStatus = "Retry non disponibile: WatchConnectivity non supportato"
+            return
+        }
+        activate()
+        WatchSyncAuth.publishSharedSecretIfNeeded()
+        if WatchSyncAuth.hasPeerSecret() {
+            flushPendingTransfers()
+        } else {
+            lastSyncStatus = "Retry richiesto: in attesa chiave companion (\(pendingTransferCount) in coda)"
         }
     }
 
-    private func send(_ session: DiveSession) {
+    func clearFailedQueue() {
+        pendingSessions.removeAll()
+        pendingTransferCount = 0
+        sentTransferCount = 0
+        acknowledgedTransferCount = 0
+        failedTransferCount = 0
+        pendingExperimentalEnvelopes.removeAll()
+        experimentalQueueCount = 0
+        experimentalLastKind = "--"
+        experimentalDeliveryState = "Nessun payload experimental"
+        savePendingSessions()
+        lastSyncStatus = "Coda sync cancellata su richiesta"
+    }
+
+    private func flushPendingTransfers() {
+        guard WatchSyncAuth.hasPeerSecret(), !pendingSessions.isEmpty else { return }
+        let queue = pendingSessions
+        for session in queue.reversed() {
+            sendQueued(session)
+        }
+    }
+
+    private func sendQueued(_ session: DiveSession) {
         do {
             let payload = try WatchDiveSyncCodec.makePayload(session: session)
 
             if WCSession.default.isReachable {
-                WCSession.default.sendMessage(payload, replyHandler: nil) { [weak self] error in
+                WCSession.default.sendMessage(payload) { [weak self] reply in
                     Task { @MainActor in
-                        self?.lastSyncStatus = "Sync diretto non riuscito: \(error.localizedDescription)"
+                        if reply["status"] as? String == "acknowledged" {
+                            self?.removePendingSession(id: session.id)
+                            self?.acknowledgedTransferCount += 1
+                            self?.lastSyncStatus = "Delivered/acknowledged: immersione ricevuta dal companion"
+                        } else {
+                            self?.failedTransferCount += 1
+                            self?.lastSyncStatus = "Failed: iPhone non ha confermato import; pending conservato"
+                        }
+                    }
+                } errorHandler: { [weak self] error in
+                    Task { @MainActor in
+                        self?.failedTransferCount += 1
+                        self?.lastSyncStatus = "Failed: diretto non riuscito; sent via coda, ack pending: \(error.localizedDescription)"
+                        self?.sentTransferCount += 1
                         WCSession.default.transferUserInfo(payload)
                     }
                 }
-                lastSyncStatus = "Immersione inviata al companion"
+                sentTransferCount += 1
+                lastSyncStatus = "Sent: messaggio diretto inviato, attendo ack"
             } else {
                 WCSession.default.transferUserInfo(payload)
-                lastSyncStatus = "Immersione in coda per il companion"
+                sentTransferCount += 1
+                lastSyncStatus = "Sent: coda WatchConnectivity, ack pending"
             }
         } catch WatchDiveSyncError.missingPeerSecret {
-            pendingSessions.insert(session, at: 0)
+            enqueuePendingSession(session)
             WatchSyncAuth.publishSharedSecretIfNeeded()
-            lastSyncStatus = "In attesa chiave sync companion"
+            lastSyncStatus = "Pending: in attesa chiave sync companion"
         } catch {
-            lastSyncStatus = "Errore codifica sync: \(error.localizedDescription)"
+            failedTransferCount += 1
+            lastSyncStatus = "Failed: errore codifica sync: \(error.localizedDescription)"
+        }
+    }
+
+    private func enqueuePendingSession(_ session: DiveSession) {
+        pendingSessions.removeAll { $0.id == session.id }
+        pendingSessions.append(session)
+        pendingSessions = pendingSessions.sorted { $0.startDate > $1.startDate }
+        pendingTransferCount = pendingSessions.count
+        savePendingSessions()
+    }
+
+    private func removePendingSession(id: UUID) {
+        pendingSessions.removeAll { $0.id == id }
+        pendingTransferCount = pendingSessions.count
+        savePendingSessions()
+    }
+
+    private func loadPendingSessions() -> [DiveSession] {
+        guard let data = UserDefaults.standard.data(forKey: pendingSessionsKey) else { return [] }
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return (try? decoder.decode([DiveSession].self, from: data)) ?? []
+    }
+
+    private func savePendingSessions() {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        if let data = try? encoder.encode(pendingSessions) {
+            UserDefaults.standard.set(data, forKey: pendingSessionsKey)
         }
     }
 
@@ -184,6 +265,17 @@ extension WatchSyncService: WCSessionDelegate {
         Task { @MainActor in
             WatchSyncAuth.ingestSharedSecretFromContext(applicationContext)
             self.flushPendingTransfers()
+        }
+    }
+
+    nonisolated func session(_ session: WCSession, didFinish userInfoTransfer: WCSessionUserInfoTransfer, error: Error?) {
+        Task { @MainActor in
+            if let error {
+                self.failedTransferCount += 1
+                self.lastSyncStatus = "Failed: transferUserInfo non completato: \(error.localizedDescription)"
+            } else {
+                self.lastSyncStatus = "Sent: transferUserInfo completato, ack companion non confermato"
+            }
         }
     }
 }

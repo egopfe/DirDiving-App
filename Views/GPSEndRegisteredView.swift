@@ -2,9 +2,11 @@ import SwiftUI
 
 struct GPSEndRegisteredView: View {
     let point: GPSPoint?
+    let isFallback: Bool
 
-    init(point: GPSPoint? = nil) {
+    init(point: GPSPoint? = nil, isFallback: Bool = false) {
         self.point = point
+        self.isFallback = isFallback
     }
 
     var body: some View {
@@ -16,16 +18,16 @@ struct GPSEndRegisteredView: View {
 
                 Spacer(minLength: 25)
 
-                Image(systemName: "checkmark.circle")
+                Image(systemName: iconName)
                     .font(.system(size: 58, weight: .medium))
-                    .foregroundStyle(DiveUI.green)
-                    .shadow(color: DiveUI.green.opacity(0.32), radius: 7, x: 0, y: 0)
+                    .foregroundStyle(stateColor)
+                    .shadow(color: stateColor.opacity(0.32), radius: 7, x: 0, y: 0)
 
                 Spacer(minLength: 15)
 
-                Text("PUNTO FINE\nREGISTRATO")
+                Text(titleText)
                     .font(.system(size: 16, weight: .black, design: .rounded))
-                    .foregroundStyle(DiveUI.green)
+                    .foregroundStyle(stateColor)
                     .multilineTextAlignment(.center)
                     .lineSpacing(1)
 
@@ -41,10 +43,11 @@ struct GPSEndRegisteredView: View {
 
                 Spacer(minLength: 20)
 
-                Text("Immersione terminata")
+                Text(detailText)
                     .font(.system(size: 13, weight: .regular, design: .rounded))
                     .foregroundStyle(.white)
-                    .lineLimit(1)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
                     .minimumScaleFactor(0.78)
 
                 Spacer(minLength: 13)
@@ -85,6 +88,24 @@ struct GPSEndRegisteredView: View {
             return "FIX NON SALVATO"
         }
         return coordinateText(value: point.longitude, positive: "E", negative: "W")
+    }
+
+    private var stateColor: Color {
+        point == nil || isFallback ? DiveUI.yellow : DiveUI.green
+    }
+
+    private var iconName: String {
+        point == nil ? "exclamationmark.triangle" : (isFallback ? "location.circle" : "checkmark.circle")
+    }
+
+    private var titleText: String {
+        guard point != nil else { return "GPS NON DISPONIBILE\nPUNTO NON REGISTRATO" }
+        return isFallback ? "ULTIMO PUNTO NOTO\nUTILIZZATO" : "PUNTO FINE\nREGISTRATO"
+    }
+
+    private var detailText: String {
+        guard point != nil else { return "Immersione terminata senza coordinate GPS valide." }
+        return isFallback ? "Fix nuovo non disponibile. Fine salvata con ultimo punto noto." : "Immersione terminata"
     }
 
     private func coordinateText(value: Double, positive: String, negative: String) -> String {

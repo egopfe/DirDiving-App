@@ -1,11 +1,41 @@
 import SwiftUI
 
+private struct LogbookMonthSection: Identifiable {
+    let id: String
+    let title: String
+    let sessions: [DiveSession]
+}
+
 struct LogbookView: View {
     @EnvironmentObject private var logStore: DiveLogStore
     @State private var search = ""
 
     private var filtered: [DiveSession] {
         search.isEmpty ? logStore.sessions : logStore.sessions.filter { ($0.siteName ?? "").localizedCaseInsensitiveContains(search) }
+    }
+
+    private var monthSections: [LogbookMonthSection] {
+        let cal = Calendar.current
+        var buckets: [String: [DiveSession]] = [:]
+        for session in filtered {
+            let c = cal.dateComponents([.year, .month], from: session.startDate)
+            let key = String(format: "%04d-%02d", c.year ?? 0, c.month ?? 0)
+            buckets[key, default: []].append(session)
+        }
+        let keys = buckets.keys.sorted(by: >)
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "it_IT")
+        formatter.setLocalizedDateFormatFromTemplate("MMMM yyyy")
+        return keys.compactMap { key -> LogbookMonthSection? in
+            let parts = key.split(separator: "-")
+            guard parts.count == 2,
+                  let y = Int(parts[0]),
+                  let m = Int(parts[1]),
+                  let date = cal.date(from: DateComponents(year: y, month: m, day: 1)) else { return nil }
+            let title = formatter.string(from: date).uppercased()
+            let sessions = (buckets[key] ?? []).sorted { $0.startDate > $1.startDate }
+            return LogbookMonthSection(id: key, title: title, sessions: sessions)
+        }
     }
 
     var body: some View {
@@ -16,27 +46,34 @@ struct LogbookView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         header
                         DIRSearchBar(text: $search)
-                        Text("MAGGIO 2024")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(DIRTheme.cyan)
-                            .padding(.top, 8)
-                        ForEach(Array(filtered.enumerated()), id: \.element.id) { index, session in
-                            HStack(spacing: 8) {
-                                NavigationLink { DiveDetailView(session: session) } label: {
-                                    DiveLogCard(session: session, index: index)
-                                }
-                                .buttonStyle(.plain)
+                        if filtered.isEmpty {
+                            emptyLogbook
+                        } else {
+                            ForEach(monthSections) { section in
+                                Text(section.title)
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(DIRTheme.cyan)
+                                    .padding(.top, 8)
+                                ForEach(Array(section.sessions.enumerated()), id: \.element.id) { index, session in
+                                    HStack(spacing: 8) {
+                                        NavigationLink { DiveDetailView(session: session) } label: {
+                                            DiveLogCard(session: session, index: index)
+                                        }
+                                        .buttonStyle(.plain)
 
-                                if !session.isDemoDive {
-                                    Button(role: .destructive) {
-                                        logStore.delete(id: session.id)
-                                    } label: {
-                                        Image(systemName: "trash")
-                                            .font(.body.weight(.semibold))
-                                            .foregroundStyle(DIRTheme.red)
-                                            .frame(width: 36, height: 36)
+                                        if !session.isDemoDive {
+                                            Button(role: .destructive) {
+                                                logStore.delete(id: session.id)
+                                            } label: {
+                                                Image(systemName: "trash")
+                                                    .font(.body.weight(.semibold))
+                                                    .foregroundStyle(DIRTheme.red)
+                                                    .frame(width: 36, height: 36)
+                                            }
+                                            .buttonStyle(.plain)
+                                            .accessibilityLabel("Elimina immersione dal logbook")
+                                        }
                                     }
-                                    .buttonStyle(.plain)
                                 }
                             }
                         }
@@ -59,15 +96,37 @@ struct LogbookView: View {
                 Spacer()
                 Image(systemName: "plus")
                     .font(.title3.weight(.medium))
-                    .foregroundStyle(DIRTheme.cyan)
+                    .foregroundStyle(DIRTheme.cyan.opacity(0.45))
+                    .accessibilityHidden(true)
                 Image(systemName: "ellipsis.circle")
                     .font(.title3.weight(.medium))
-                    .foregroundStyle(DIRTheme.cyan)
+                    .foregroundStyle(DIRTheme.cyan.opacity(0.45))
+                    .accessibilityHidden(true)
             }
-            Text("Dive history, sync status and inspection-ready session cards")
+            Text("Cronologia immersioni: dati da Watch, import CSV o demo reviewer.")
                 .font(.callout)
                 .foregroundStyle(DIRTheme.muted)
         }
+    }
+
+    private var emptyLogbook: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Nessuna immersione")
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(.white)
+            Text("Sincronizza dal Apple Watch, importa un CSV da Analisi, oppure attiva il logbook dimostrativo in Altro.")
+                .font(.caption)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
+                .fill(DIRTheme.surface.opacity(0.86))
+                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.hairline, lineWidth: 1))
+        )
+        .padding(.top, 8)
     }
 }
 
@@ -125,9 +184,11 @@ struct DiveLogCard: View {
             Text(session.startDate.formatted(.dateTime.day()))
                 .font(.system(size: 27, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
-            Text("MAG")
+            Text(session.startDate.formatted(.dateTime.month(.abbreviated).locale(Locale(identifier: "it_IT"))).uppercased())
                 .font(.caption2.weight(.medium))
                 .foregroundStyle(.white.opacity(0.75))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
             Text(Formatters.clock(session.startDate))
                 .font(.caption2.monospacedDigit())
                 .foregroundStyle(.white.opacity(0.75))
