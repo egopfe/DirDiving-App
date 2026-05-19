@@ -83,6 +83,7 @@ struct DiveDetailView: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Torna al logbook")
+            .accessibilityHint("Chiude il dettaglio immersione.")
             DiveThumbnail(index: 0)
                 .frame(width: 82, height: 82)
             VStack(alignment: .leading, spacing: 7) {
@@ -344,20 +345,28 @@ struct DiveDetailView: View {
                 Text("Genera CSV Subsurface")
                     .font(.callout.weight(.semibold))
                     .foregroundStyle(DIRTheme.cyan)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
                     .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
             }
+            .accessibilityLabel("Genera CSV Subsurface")
+            .accessibilityHint("Crea un file CSV condivisibile per questa immersione.")
             Spacer()
             if let csvURL {
                 ShareLink(item: csvURL) {
                     Text("Condividi CSV")
                         .font(.callout.weight(.semibold))
                         .foregroundStyle(DIRTheme.cyan)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.78)
                         .padding(.horizontal, 18)
                         .padding(.vertical, 10)
                         .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
                 }
+                .accessibilityLabel("Condividi CSV")
+                .accessibilityHint("Apre il foglio di condivisione per il file Subsurface CSV.")
             } else if let exportErrorMessage {
                 Text(exportErrorMessage)
                     .font(.caption2)
@@ -367,8 +376,11 @@ struct DiveDetailView: View {
                 Text("CSV non generato")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(DIRTheme.muted)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
         }
         .padding(.top, 4)
+        .accessibilityElement(children: .contain)
     }
 }

@@ -23,9 +23,13 @@ struct MoreView: View {
                             Text("Settings")
                                 .font(.system(size: 30, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.78)
                             Text("Sync, cloud backup, units, export and review preferences")
                                 .font(.callout)
                                 .foregroundStyle(DIRTheme.muted)
+                                .lineLimit(2)
+                                .minimumScaleFactor(0.82)
                         }
                         systemStatus
                         onboardingCard
@@ -33,30 +37,32 @@ struct MoreView: View {
                             languagePreferencePicker
                             unitPreferencePicker
                             lockedPreference("Export predefinito", value: exportFormat, note: "Unico formato disponibile oggi.")
-                            row("Sync impostazioni", "Locale-only")
-                            row("Planner safety", "Disclaimer richiesto")
+                            infoRow("Sync impostazioni", "Locale-only")
+                            infoRow("Planner safety", "Disclaimer richiesto")
                             infoNote("Le unità convertono la visualizzazione iOS di profondità, temperatura, distanza e SAC. Dati salvati, import/export CSV e planner restano metrici per compatibilità e sicurezza.")
                         }
                         DIRCard("ALLARMI E NOTIFICHE", icon: "bell.badge", accent: DIRTheme.yellow) {
-                            row("Allarmi immersione", "Gestiti su Apple Watch")
-                            row("Notifiche iOS", "Permessi gestiti da iOS")
-                            row("Stato autorizzazione", notificationStatus)
+                            infoRow("Allarmi immersione", "Gestiti su Apple Watch")
+                            infoRow("Notifiche iOS", "Permessi gestiti da iOS")
+                            infoRow("Stato autorizzazione", notificationStatus)
                             Button {
                                 openAppSettings()
                             } label: {
                                 actionLabel("Apri Impostazioni iOS", systemImage: "gearshape")
                             }
                             .buttonStyle(.plain)
+                            .accessibilityLabel("Apri impostazioni notifiche iOS")
+                            .accessibilityHint("Richiede il permesso notifiche se non ancora deciso, poi apre le impostazioni di sistema.")
                             infoNote("TODO: sincronizzare soglie allarmi e haptics Watch quando esiste un contratto settings bidirezionale.")
                         }
                         DIRCard("SYNC WATCH", icon: "applewatch", accent: DIRTheme.cyan) {
-                            row("Supportato", watchSync.isSupported ? "Si" : "No")
-                            row("Stato", String(describing: watchSync.activationState))
-                            row("Esito", watchSync.userVisibleState)
-                            row("Peer verificato", WatchSyncAuth.hasPeerSecret() ? "Si" : "No")
-                            row("Ultimo sync", watchSync.lastMessage)
-                            row("Settings Watch", "Non sincronizzati")
-                            row("iPhone -> Watch", "TODO: push sicuro non abilitato")
+                            infoRow("Supportato", watchSync.isSupported ? "Si" : "No")
+                            infoRow("Stato", String(describing: watchSync.activationState))
+                            infoRow("Esito", watchSync.userVisibleState)
+                            infoRow("Peer verificato", WatchSyncAuth.hasPeerSecret() ? "Si" : "No")
+                            infoRow("Ultimo sync", watchSync.lastMessage)
+                            infoRow("Settings Watch", "Non sincronizzati")
+                            infoRow("iPhone -> Watch", "TODO: push sicuro non abilitato")
                             if watchSync.activationState == .activated && !WatchSyncAuth.hasPeerSecret() {
                                 emptyState(
                                     title: "Associazione Watch non verificata",
@@ -71,10 +77,11 @@ struct MoreView: View {
                                     action: "Riprova Watch Sync"
                                 )
                             }
-                            row("Import riusciti", "\(watchSync.importedSessionCount)")
-                            row("Import falliti", "\(watchSync.failedImportCount)")
-                            row("Conflitti", "\(watchSync.conflicts.count)")
-                            row("Ultimo evento", watchSync.lastMessage)
+                            infoRow("Import riusciti", "\(watchSync.importedSessionCount)")
+                            infoRow("Import falliti", "\(watchSync.failedImportCount)")
+                            infoRow("Conflitti", "\(watchSync.conflicts.count)")
+                            infoRow("Ultimo evento", watchSync.lastMessage)
+                            infoRow("Delivery per log", "TODO: stato per-sessione planned")
                             ForEach(watchSync.conflicts) { conflict in
                                 conflictRow(conflict)
                             }
@@ -86,6 +93,8 @@ struct MoreView: View {
                             }
                             .buttonStyle(.plain)
                             .disabled(retryWatchSyncDisabled)
+                            .accessibilityLabel("Riprova Watch Sync")
+                            .accessibilityHint(retryWatchSyncDisabled ? "Sync attivo e nessun retry necessario." : "Riattiva WatchConnectivity e riprova gli import.")
                             Button {
                                 UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 showResetPairingConfirmation = true
@@ -93,14 +102,16 @@ struct MoreView: View {
                                 destructiveActionLabel("Reset trust / re-pair", systemImage: "lock.rotation")
                             }
                             .buttonStyle(.plain)
+                            .accessibilityLabel("Reset trust Watch")
+                            .accessibilityHint("Rimuove solo il peer secret locale e richiede una nuova associazione verificata.")
                             infoNote("Il reset rimuove solo il peer secret locale attendibile. I payload Watch restano non verificati finche non arriva una nuova associazione sicura; non viene usata alcuna chiave deterministica di fallback.")
                         }
                         DIRCard("BACKUP CLOUD", icon: "icloud", accent: DIRTheme.green) {
-                            row("iCloud Sync", cloudSync.isICloudAvailable ? "Attivo" : "Non disponibile")
-                            row("Backup automatico", "Log, planner e attrezzatura")
-                            row("Conflitti cloud", "Ultimo salvataggio KVS")
-                            row("Eliminazioni", "Rimozione locale + prossima sync")
-                            row("Ultimo evento", cloudSync.lastSyncStatus)
+                            infoRow("iCloud Sync", cloudSync.isICloudAvailable ? "Attivo" : "Non disponibile")
+                            infoRow("Backup automatico", "Log, planner e attrezzatura")
+                            infoRow("Conflitti cloud", "Ultimo salvataggio KVS")
+                            infoRow("Eliminazioni", "Rimozione locale + prossima sync")
+                            infoRow("Ultimo evento", cloudSync.lastSyncStatus)
                             infoNote("Merge cloud: log locali e iCloud vengono confrontati per ID stabile; se esistono due versioni dello stesso ID viene mantenuta la versione piu completa/recente secondo la policy dell'app. Attrezzatura e planner usano ultimo salvataggio KVS e non hanno ancora risoluzione per-campo.")
                             if !cloudSync.isICloudAvailable {
                                 emptyState(
@@ -117,6 +128,8 @@ struct MoreView: View {
                                 actionLabel("Sincronizza ora", systemImage: "icloud.and.arrow.up")
                             }
                             .buttonStyle(.plain)
+                            .accessibilityLabel("Sincronizza cloud ora")
+                            .accessibilityHint("Forza salvataggio log locale e sincronizzazione iCloud KVS.")
                         }
                         DIRCard("REVIEWER", icon: "books.vertical", accent: DIRTheme.yellow) {
                             Toggle(isOn: Binding(
@@ -134,12 +147,12 @@ struct MoreView: View {
                             .tint(DIRTheme.cyan)
                         }
                         DIRCard("EXPORT", icon: "square.and.arrow.up", accent: DIRTheme.cyan) {
-                            row("Formato", exportFormat)
-                            row("Subsurface CSV", "Default")
-                            row("GPX", "Planned")
-                            row("UDDF", "Planned")
-                            row("Bundle", "com.egopfe.dirdiving.ios")
-                            row("Import", "CSV Subsurface da Logbook")
+                            infoRow("Formato", exportFormat)
+                            infoRow("Subsurface CSV", "Default")
+                            infoRow("GPX", "Planned")
+                            infoRow("UDDF", "Planned")
+                            infoRow("Bundle", "com.egopfe.dirdiving.ios")
+                            infoRow("Import", "CSV Subsurface da Logbook")
                             infoNote("Solo Subsurface CSV e disponibile oggi. Altri formati restano Planned/TODO.")
                         }
                         DIRWarningBox(text: "DIR DIVING non e un computer subacqueo certificato: usa log, planner e analisi come supporto informativo.")
@@ -183,6 +196,8 @@ struct MoreView: View {
             Text(selectedLanguage.companionDetail)
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.yellow)
+                .lineLimit(2)
+                .minimumScaleFactor(0.82)
             Text("Changing language does not change units, calculations or saved data.")
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
@@ -237,9 +252,13 @@ struct MoreView: View {
             Text("Persistita localmente; non sincronizzata con Apple Watch.")
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.yellow)
+                .lineLimit(2)
+                .minimumScaleFactor(0.82)
             Text("Contratto unidirezionale iOS -> Watch planned; oggi il Watch resta metrico.")
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
+                .lineLimit(2)
+                .minimumScaleFactor(0.82)
         }
         .padding(.vertical, 5)
     }
@@ -263,14 +282,29 @@ struct MoreView: View {
         )
     }
 
-    private func row(_ title: String, _ value: String) -> some View {
+    private func infoRow(_ title: String, _ value: String) -> some View {
         HStack {
-            Text(title).foregroundStyle(DIRTheme.muted)
+            Text(title)
+                .foregroundStyle(DIRTheme.muted)
+                .lineLimit(1)
+                .minimumScaleFactor(0.82)
             Spacer()
-            Text(value).foregroundStyle(.white)
+            Text(value)
+                .foregroundStyle(.white.opacity(0.86))
+                .fontWeight(.semibold)
+                .lineLimit(2)
+                .minimumScaleFactor(0.74)
+                .multilineTextAlignment(.trailing)
         }
-        .font(.callout)
-        .padding(.vertical, 4)
+        .font(.subheadline)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 7)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(DIRTheme.surface2.opacity(0.36))
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(.white.opacity(0.05), lineWidth: 1))
+        )
+        .accessibilityElement(children: .combine)
     }
 
     private func lockedPreference(_ title: String, value: String, note: String) -> some View {
@@ -328,6 +362,8 @@ struct MoreView: View {
         Label(title, systemImage: systemImage)
             .font(.callout.weight(.semibold))
             .foregroundStyle(DIRTheme.cyan)
+            .lineLimit(1)
+            .minimumScaleFactor(0.78)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 10)
             .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
@@ -337,6 +373,8 @@ struct MoreView: View {
         Label(title, systemImage: systemImage)
             .font(.callout.weight(.semibold))
             .foregroundStyle(DIRTheme.red)
+            .lineLimit(1)
+            .minimumScaleFactor(0.78)
             .frame(maxWidth: .infinity)
             .padding(.vertical, 10)
             .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.red.opacity(0.78), lineWidth: 1))

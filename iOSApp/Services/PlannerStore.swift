@@ -11,6 +11,7 @@ final class PlannerStore: ObservableObject {
     }
     @Published var plan = PlannerService.makePlan(input: GasPlanInput())
     @Published var buhlmann = BuhlmannPlanner.plan(depthMeters: 40, o2Fraction: 0.18)
+    @Published var safetyAcknowledged = false
 
     private let cloudSync: CloudSyncStore?
     private let key = "dirdiving_ios_planner_state"

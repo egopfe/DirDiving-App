@@ -5,7 +5,6 @@ struct PlannerView: View {
     @EnvironmentObject private var store: PlannerStore
     @State private var showPlan = false
     @State private var validationMessage: String?
-    @State private var safetyAccepted = false
 
     var body: some View {
         NavigationStack {
@@ -100,7 +99,7 @@ struct PlannerView: View {
     }
 
     private var safetyAcknowledgement: some View {
-        Toggle(isOn: $safetyAccepted) {
+        Toggle(isOn: $store.safetyAcknowledged) {
             VStack(alignment: .leading, spacing: 3) {
                 Text("Ho letto l'avviso safety")
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -158,7 +157,7 @@ struct PlannerView: View {
                 validationMessage = validation
                 return
             }
-            guard safetyAccepted else {
+            guard store.safetyAcknowledged else {
                 validationMessage = "Conferma prima l'avviso safety: piano indicativo, non certificato."
                 return
             }
