@@ -3,9 +3,12 @@ import CryptoKit
 
 enum DiveImportService {
     private static let maxRows = 20_000
-    private static let maxDepthMeters = 350.0
-    private static let maxDurationSeconds: TimeInterval = 86_400
-    private static let temperatureRange = -5.0...40.0
+    // SAF-4 audit bounds (2026-05-19): cap inputs at recreational/tech-safe
+    // ceilings. Tighter than physical maxima on purpose — invalid rows are
+    // skipped and reported via ImportSummary.skippedMalformedCount.
+    private static let maxDepthMeters = 200.0
+    private static let maxDurationSeconds: TimeInterval = 28_800 // 480 min
+    private static let temperatureRange = -2.0...40.0
 
     struct ImportSummary {
         let session: DiveSession

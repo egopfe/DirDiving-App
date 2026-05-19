@@ -133,11 +133,20 @@ struct DiveDetailView: View {
             Divider().overlay(DIRTheme.hairline)
             HStack(spacing: 0) {
                 detailMetric("TTV info", value: Formatters.zero(session.ttv), unit: "min")
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("TTV informativo \(Formatters.zero(session.ttv)) minuti")
+                    .accessibilityHint("TTV derivato da profondita media e durata; non e un valore decompressivo o time-to-surface.")
                 Divider().overlay(DIRTheme.hairline)
                 detailMetric("SAC", measurement: Formatters.sac(session.sacLitersMinute ?? 0, units: unitPreference))
                 Divider().overlay(DIRTheme.hairline)
                 detailMetric("Temperatura", measurement: Formatters.temperature(session.avgWaterTemperatureCelsius ?? 0, units: unitPreference))
             }
+            Text("TTV informativo: derivato da profondità media + runtime; non è un valore decompressivo o time-to-surface.")
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
