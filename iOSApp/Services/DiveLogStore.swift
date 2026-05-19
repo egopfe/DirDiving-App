@@ -19,7 +19,11 @@ final class DiveLogStore: ObservableObject {
 
     private let cloudSync: CloudSyncStore?
     private let key = "dirdiving_ios_dive_sessions"
-    private let tombstoneKey = "dirdiving_ios_deleted_dive_session_ids"
+    private let tombstoneKey = WatchSyncKeys.deletedSessionIDsKey
+    private let legacyTombstoneKeys = [
+        "dirdiving_watch_deleted_session_ids",
+        "dirdiving_ios_deleted_dive_session_ids"
+    ]
     private var deletedSessionIDs: Set<UUID> = []
     private var isReady = false
 
@@ -68,6 +72,10 @@ final class DiveLogStore: ObservableObject {
 
     func session(id: UUID) -> DiveSession? {
         sessions.first { $0.id == id }
+    }
+
+    func isDeleted(id: UUID) -> Bool {
+        deletedSessionIDs.contains(id)
     }
 
     func delete(id: UUID) {
@@ -123,22 +131,33 @@ final class DiveLogStore: ObservableObject {
     }
 
     private func loadDeletedSessionIDs() -> Set<UUID> {
-        let cloudIDs = cloudSync?.loadCloud([UUID].self, forKey: tombstoneKey) ?? []
-        let localIDs: [UUID]
-        if let decoded = cloudSync?.loadLocal([UUID].self, forKey: tombstoneKey) {
-            localIDs = decoded
-        } else {
-            localIDs = (try? JSONDecoder().decode([UUID].self, from: UserDefaults.standard.data(forKey: tombstoneKey) ?? Data())) ?? []
+        let keys = [tombstoneKey] + legacyTombstoneKeys
+        let ids = keys.flatMap { key in
+            (cloudSync?.loadCloud([UUID].self, forKey: key) ?? []) +
+            (cloudSync?.loadLocal([UUID].self, forKey: key) ?? loadDeletedSessionIDsFromDefaults(key: key))
         }
-        return Set(cloudIDs + localIDs)
+        let merged = Set(ids)
+        if !merged.isEmpty {
+            saveDeletedSessionIDs(merged)
+        }
+        return merged
     }
 
     private func saveDeletedSessionIDs() {
-        let ids = Array(deletedSessionIDs)
-        if let data = try? JSONEncoder().encode(ids) {
+        saveDeletedSessionIDs(deletedSessionIDs)
+    }
+
+    private func saveDeletedSessionIDs(_ ids: Set<UUID>) {
+        let values = Array(ids)
+        if let data = try? JSONEncoder().encode(values) {
             UserDefaults.standard.set(data, forKey: tombstoneKey)
         }
-        cloudSync?.save(ids, forKey: tombstoneKey)
+        cloudSync?.save(values, forKey: tombstoneKey)
+    }
+
+    private func loadDeletedSessionIDsFromDefaults(key: String) -> [UUID] {
+        guard let data = UserDefaults.standard.data(forKey: key) else { return [] }
+        return (try? JSONDecoder().decode([UUID].self, from: data)) ?? []
     }
 
     private func applyDemoLogbookPreference() {

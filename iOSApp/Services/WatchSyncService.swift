@@ -58,6 +58,13 @@ final class WatchSyncService: NSObject, ObservableObject {
     private func importSessionPayload(_ payload: [String: Any]) {
         do {
             let session = try WatchDiveSyncCodec.parseSession(from: payload)
+            guard logStore?.isDeleted(id: session.id) != true else {
+                importedSessionIDs.insert(session.id)
+                WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
+                importedSessionCount = importedSessionIDs.count
+                lastMessage = "Immersione cancellata ignorata dal tombstone"
+                return
+            }
             if let existing = logStore?.session(id: session.id), existing != session {
                 storeConflict(local: existing, incoming: session)
                 lastMessage = "Conflitto sync salvato per revisione"
@@ -79,6 +86,11 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     func resolveConflictUsingIncoming(_ conflict: SyncConflict) {
+        guard logStore?.isDeleted(id: conflict.id) != true else {
+            removeConflict(conflict)
+            lastMessage = "Conflitto ignorato: immersione gia cancellata"
+            return
+        }
         logStore?.add(conflict.incoming)
         importedSessionIDs.insert(conflict.id)
         WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)

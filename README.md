@@ -22,6 +22,8 @@ This branch contains the iPhone companion interface for DIR DIVING. It is intent
 - Subsurface CSV export support, including entry and exit GPS columns when available.
 - iOS companion visual system aligned to the supplied dark cyan mockup.
 
+`main-iOS` is the canonical iOS companion source for pre-release work. Watch production changes stay on `main`; experimental Apnea, Snorkeling, Buddy/BLE and Explore Lab surfaces stay on their experimental branches.
+
 Buddy Assist, Buddy Link, BLE pairing, and secure Buddy message authentication live only on the `codex/experimental-features` branch.
 
 ## Visual Design Standard

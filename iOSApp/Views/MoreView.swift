@@ -56,6 +56,7 @@ struct MoreView: View {
                             row("Peer verificato", WatchSyncAuth.hasPeerSecret() ? "Si" : "No")
                             row("Ultimo sync", watchSync.lastMessage)
                             row("Settings Watch", "Non sincronizzati")
+                            row("iPhone -> Watch", "TODO: push sicuro non abilitato")
                             if watchSync.activationState == .activated && !WatchSyncAuth.hasPeerSecret() {
                                 emptyState(
                                     title: "Associazione Watch non verificata",
@@ -78,12 +79,15 @@ struct MoreView: View {
                                 conflictRow(conflict)
                             }
                             Button {
+                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                                 watchSync.retryActivation(logStore: logStore)
                             } label: {
-                                actionLabel("Riprova Watch Sync", systemImage: "arrow.triangle.2.circlepath")
+                                actionLabel(retryWatchSyncDisabled ? "Riprova Watch Sync (idle)" : "Riprova Watch Sync", systemImage: "arrow.triangle.2.circlepath")
                             }
                             .buttonStyle(.plain)
+                            .disabled(retryWatchSyncDisabled)
                             Button {
+                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                                 showResetPairingConfirmation = true
                             } label: {
                                 destructiveActionLabel("Reset trust / re-pair", systemImage: "lock.rotation")
@@ -106,6 +110,7 @@ struct MoreView: View {
                                 )
                             }
                             Button {
+                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                                 logStore.synchronizeCloud()
                                 cloudSync.synchronize()
                             } label: {
@@ -146,6 +151,7 @@ struct MoreView: View {
             .onAppear { refreshNotificationStatus() }
             .confirmationDialog("Resettare trust Watch?", isPresented: $showResetPairingConfirmation, titleVisibility: .visible) {
                 Button("Reset trust e nuova associazione", role: .destructive) {
+                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     watchSync.resetPairingTrust(logStore: logStore)
                 }
                 Button("Annulla", role: .cancel) {}
@@ -231,6 +237,9 @@ struct MoreView: View {
             Text("Persistita localmente; non sincronizzata con Apple Watch.")
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.yellow)
+            Text("Contratto unidirezionale iOS -> Watch planned; oggi il Watch resta metrico.")
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
         }
         .padding(.vertical, 5)
     }
@@ -334,6 +343,21 @@ struct MoreView: View {
     }
 
     private func openAppSettings() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            if settings.authorizationStatus == .notDetermined {
+                UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in
+                    Task { @MainActor in
+                        refreshNotificationStatus()
+                        openSystemSettings()
+                    }
+                }
+            } else {
+                Task { @MainActor in openSystemSettings() }
+            }
+        }
+    }
+
+    private func openSystemSettings() {
         guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
         UIApplication.shared.open(url)
     }
@@ -385,5 +409,9 @@ struct MoreView: View {
             .foregroundStyle(DIRTheme.cyan)
         }
         .padding(.vertical, 7)
+    }
+
+    private var retryWatchSyncDisabled: Bool {
+        watchSync.activationState == .activated && watchSync.failedImportCount == 0 && watchSync.conflicts.isEmpty
     }
 }

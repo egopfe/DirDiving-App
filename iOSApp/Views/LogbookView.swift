@@ -1,5 +1,6 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import UIKit
 
 struct LogbookView: View {
     @EnvironmentObject private var logStore: DiveLogStore
@@ -88,6 +89,7 @@ struct LogbookView: View {
                         let alreadyImported = logStore.session(id: summary.session.id) != nil
                         logStore.add(summary.session)
                         importMessage = summary.message(alreadyImported: alreadyImported)
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                     case .failure(let error):
                         importMessage = "Import fallito: 0 importate, 0 duplicati, 1 errore. \(error.localizedDescription)"
                     }
@@ -106,6 +108,7 @@ struct LogbookView: View {
                 Button("Elimina", role: .destructive) {
                     if let pendingDelete {
                         logStore.delete(id: pendingDelete.id)
+                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
                     }
                     pendingDelete = nil
                 }

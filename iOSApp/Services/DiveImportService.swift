@@ -2,6 +2,11 @@ import Foundation
 import CryptoKit
 
 enum DiveImportService {
+    private static let maxRows = 20_000
+    private static let maxDepthMeters = 350.0
+    private static let maxDurationSeconds: TimeInterval = 86_400
+    private static let temperatureRange = -5.0...40.0
+
     struct ImportSummary {
         let session: DiveSession
         let skippedMalformedCount: Int
@@ -43,6 +48,7 @@ enum DiveImportService {
 
         let rows = parseCSV(contents)
         guard let header = rows.first else { return .failure(.emptyProfile) }
+        guard rows.count <= maxRows + 1 else { return .failure(.invalidRows(rows.count - 1)) }
 
         func index(_ name: String) -> Int? { header.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.firstIndex(of: name) }
         guard
@@ -65,15 +71,17 @@ enum DiveImportService {
             guard row.count > max(timeIndex, depthIndex, tempIndex),
                   let seconds = TimeInterval(row[timeIndex]),
                   seconds >= 0,
+                  seconds <= maxDurationSeconds,
                   let depth = Double(row[depthIndex]),
-                  depth >= 0 else {
+                  depth >= 0,
+                  depth <= maxDepthMeters else {
                 invalidRowCount += 1
                 continue
             }
             let temperature: Double?
             if row[tempIndex].isEmpty {
                 temperature = nil
-            } else if let parsedTemperature = Double(row[tempIndex]) {
+            } else if let parsedTemperature = Double(row[tempIndex]), temperatureRange.contains(parsedTemperature) {
                 temperature = parsedTemperature
             } else {
                 invalidRowCount += 1
@@ -84,13 +92,15 @@ enum DiveImportService {
             if entryGPS == nil,
                let latIndex = index("entry_lat"), let lonIndex = index("entry_lon"),
                row.count > max(latIndex, lonIndex),
-               let lat = Double(row[latIndex]), let lon = Double(row[lonIndex]) {
+               let lat = Double(row[latIndex]), let lon = Double(row[lonIndex]),
+               isValidCoordinate(latitude: lat, longitude: lon) {
                 entryGPS = GPSPoint(latitude: lat, longitude: lon, horizontalAccuracy: -1, timestamp: start)
             }
             if exitGPS == nil,
                let latIndex = index("exit_lat"), let lonIndex = index("exit_lon"),
                row.count > max(latIndex, lonIndex),
-               let lat = Double(row[latIndex]), let lon = Double(row[lonIndex]) {
+               let lat = Double(row[latIndex]), let lon = Double(row[lonIndex]),
+               isValidCoordinate(latitude: lat, longitude: lon) {
                 exitGPS = GPSPoint(latitude: lat, longitude: lon, horizontalAccuracy: -1, timestamp: start.addingTimeInterval(seconds))
             }
         }
@@ -220,5 +230,9 @@ enum DiveImportService {
             digest[8], digest[9],
             digest[10], digest[11], digest[12], digest[13], digest[14], digest[15]
         ))
+    }
+
+    private static func isValidCoordinate(latitude: Double, longitude: Double) -> Bool {
+        (-90...90).contains(latitude) && (-180...180).contains(longitude)
     }
 }

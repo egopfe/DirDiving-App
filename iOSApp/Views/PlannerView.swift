@@ -385,6 +385,7 @@ struct GasMixCard: View {
 
 struct PlanResultView: View {
     @EnvironmentObject private var store: PlannerStore
+    @Environment(\.dismiss) private var dismiss
     @State private var tab: PlanTab = .plan
 
     var body: some View {
@@ -392,6 +393,7 @@ struct PlanResultView: View {
             Color.black.ignoresSafeArea()
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 14) {
+                    resultHeader
                     resultTabs
                     switch tab {
                     case .plan:
@@ -415,6 +417,26 @@ struct PlanResultView: View {
         }
         .navigationTitle("Piano Immersione")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var resultHeader: some View {
+        HStack {
+            Button {
+                dismiss()
+            } label: {
+                Label("Back", systemImage: "chevron.left")
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(DIRTheme.cyan)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 7)
+                    .background(Capsule().stroke(DIRTheme.cyan.opacity(0.68), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            Spacer()
+            Text("Risultato piano")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(DIRTheme.muted)
+        }
     }
 
     private var resultTabs: some View {

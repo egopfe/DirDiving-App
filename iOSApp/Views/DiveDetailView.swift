@@ -1,5 +1,6 @@
 import SwiftUI
 import Charts
+import UIKit
 
 enum DiveDetailTab: String, CaseIterable, Identifiable {
     case summary = "RIEPILOGO"
@@ -10,6 +11,7 @@ enum DiveDetailTab: String, CaseIterable, Identifiable {
 
 struct DiveDetailView: View {
     let session: DiveSession
+    @Environment(\.dismiss) private var dismiss
     @State private var tab: DiveDetailTab = .summary
     @State private var csvURL: URL?
     @State private var exportErrorMessage: String?
@@ -70,6 +72,17 @@ struct DiveDetailView: View {
 
     private var header: some View {
         HStack(spacing: 12) {
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(DIRTheme.cyan)
+                    .frame(width: 30, height: 30)
+                    .background(Circle().stroke(DIRTheme.cyan.opacity(0.65), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Torna al logbook")
             DiveThumbnail(index: 0)
                 .frame(width: 82, height: 82)
             VStack(alignment: .leading, spacing: 7) {
@@ -118,7 +131,7 @@ struct DiveDetailView: View {
             }
             Divider().overlay(DIRTheme.hairline)
             HStack(spacing: 0) {
-                detailMetric("TTR", value: Formatters.zero(session.ttv), unit: "min")
+                detailMetric("TTV info", value: Formatters.zero(session.ttv), unit: "min")
                 Divider().overlay(DIRTheme.hairline)
                 detailMetric("SAC", measurement: Formatters.sac(session.sacLitersMinute ?? 0, units: unitPreference))
                 Divider().overlay(DIRTheme.hairline)
@@ -318,6 +331,7 @@ struct DiveDetailView: View {
     private var exportBlock: some View {
         HStack {
             Button {
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 switch SubsurfaceExportService.writeCSV(for: session) {
                 case .success(let url):
                     csvURL = url
