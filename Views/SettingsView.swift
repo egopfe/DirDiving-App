@@ -5,92 +5,129 @@ struct SettingsView: View {
     @AppStorage(HapticService.experimentalHapticsEnabledKey) private var experimentalHapticsEnabled = true
     @AppStorage("dirdiving_watch_metric_units") private var metricUnits = true
     @AppStorage("dirdiving_watch_always_on_safe") private var alwaysOnSafe = true
+    @AppStorage(DIRAppLanguage.storageKey) private var appLanguage = DIRAppLanguage.system.rawValue
 
     var body: some View {
         ZStack {
             DiveScreenBackground()
 
             ScrollView {
-            VStack(spacing: 7) {
-                header
+                VStack(spacing: 7) {
+                    header
 
-                Text("IMPOSTAZIONI")
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-
-                VStack(spacing: 6) {
-                    Toggle(isOn: $metricUnits) {
-                        settingsRowContent(
-                        icon: "ruler",
-                        iconColor: .white,
-                        title: "Unità di misura",
-                        subtitle: metricUnits ? "Metrico (m, °C)" : "Imperiale LAB OFF"
-                        )
-                    }
-                    .tint(DiveUI.blue)
-                    Button {
-                        navigation.selectedPage = .alarmSettings
-                    } label: {
-                        settingsRowContent(
-                            icon: "bell",
-                            iconColor: DiveUI.yellow,
-                            title: "Allarmi",
-                            subtitle: "Apri soglie safety persistenti"
-                        )
-                    }
-                    .buttonStyle(.plain)
-                    Toggle(isOn: $alwaysOnSafe) {
-                        settingsRowContent(
-                            icon: "sun.max",
-                            iconColor: DiveUI.yellow,
-                            title: "Schermo",
-                            subtitle: alwaysOnSafe ? "Always On safe: ON" : "Always On safe: OFF"
-                        )
-                    }
-                    .tint(DiveUI.yellow)
-                    Toggle(isOn: $experimentalHapticsEnabled) {
-                        settingsRowContent(
-                            icon: "iphone.radiowaves.left.and.right",
-                            iconColor: DiveUI.blue,
-                            title: "Haptics sperimentali",
-                            subtitle: experimentalHapticsEnabled ? "Attivi" : "Disattivati"
-                        )
-                    }
-                    .tint(DiveUI.green)
-                    Button {
-                        navigation.selectedPage = .ascentSettings
-                    } label: {
-                        settingsRowContent(
-                            icon: "arrow.up.right.circle",
-                            iconColor: DiveUI.blue,
-                            title: "Limiti risalita",
-                            subtitle: "Soglie applicate da DiveManager"
-                        )
-                    }
-                    .buttonStyle(.plain)
-                    Button {
-                        navigation.selectedPage = .info
-                    } label: {
-                        settingsRowContent(
-                            icon: "info.circle",
-                            iconColor: DiveUI.cyan,
-                            title: "Info e limiti",
-                            subtitle: "Safety, mock e hardware"
-                        )
-                    }
-                    .buttonStyle(.plain)
-                    Text("GPS e sync non hanno preferenze globali complete: usa le impostazioni Snorkeling/Apnea e i pannelli sync sperimentali.")
+                    Text("IMPOSTAZIONI")
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
-                        .foregroundStyle(DiveUI.yellow)
-                        .fixedSize(horizontal: false, vertical: true)
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+
+                    VStack(spacing: 6) {
+                        Toggle(isOn: $metricUnits) {
+                            settingsRowContent(
+                                icon: "ruler",
+                                iconColor: .white,
+                                title: "Unità di misura",
+                                subtitle: metricUnits ? "Metrico (m, °C)" : "Imperiale LAB OFF"
+                            )
+                        }
+                        .tint(DiveUI.blue)
+                        languagePreferenceControl
+                        Button {
+                            navigation.selectedPage = .alarmSettings
+                        } label: {
+                            settingsRowContent(
+                                icon: "bell",
+                                iconColor: DiveUI.yellow,
+                                title: "Allarmi",
+                                subtitle: "Apri soglie safety persistenti"
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        Toggle(isOn: $alwaysOnSafe) {
+                            settingsRowContent(
+                                icon: "sun.max",
+                                iconColor: DiveUI.yellow,
+                                title: "Schermo",
+                                subtitle: alwaysOnSafe ? "Always On safe: ON" : "Always On safe: OFF"
+                            )
+                        }
+                        .tint(DiveUI.yellow)
+                        Toggle(isOn: $experimentalHapticsEnabled) {
+                            settingsRowContent(
+                                icon: "iphone.radiowaves.left.and.right",
+                                iconColor: DiveUI.blue,
+                                title: "Haptics sperimentali",
+                                subtitle: experimentalHapticsEnabled ? "Attivi" : "Disattivati"
+                            )
+                        }
+                        .tint(DiveUI.green)
+                        Button {
+                            navigation.selectedPage = .ascentSettings
+                        } label: {
+                            settingsRowContent(
+                                icon: "arrow.up.right.circle",
+                                iconColor: DiveUI.blue,
+                                title: "Limiti risalita",
+                                subtitle: "Soglie applicate da DiveManager"
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        Button {
+                            navigation.selectedPage = .info
+                        } label: {
+                            settingsRowContent(
+                                icon: "info.circle",
+                                iconColor: DiveUI.cyan,
+                                title: "Info e limiti",
+                                subtitle: "Safety, mock e hardware"
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        Text("GPS e sync non hanno preferenze globali complete: usa le impostazioni Snorkeling/Apnea e i pannelli sync sperimentali.")
+                            .font(.system(size: 10, weight: .semibold, design: .rounded))
+                            .foregroundStyle(DiveUI.yellow)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
-            }
-            .padding(.horizontal, 11)
-            .padding(.top, 9)
-            .padding(.bottom, 8)
+                .padding(.horizontal, 11)
+                .padding(.top, 9)
+                .padding(.bottom, 8)
             }
         }
+    }
+
+    private var languagePreferenceControl: some View {
+        let selectedLanguage = DIRAppLanguage.fromStorage(appLanguage)
+
+        return VStack(alignment: .leading, spacing: 6) {
+            settingsRowContent(
+                icon: "globe",
+                iconColor: DiveUI.cyan,
+                title: "Lingua",
+                subtitle: "System Language / Italiano / English"
+            )
+            Picker("Lingua", selection: $appLanguage) {
+                ForEach(DIRAppLanguage.allCases) { language in
+                    Text(language.title).tag(language.rawValue)
+                }
+            }
+            .pickerStyle(.segmented)
+            .tint(DiveUI.cyan)
+            Text(selectedLanguage.watchDetail)
+                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .foregroundStyle(DiveUI.yellow)
+                .fixedSize(horizontal: false, vertical: true)
+            Text("Changing language does not change units, calculations or saved data.")
+                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .foregroundStyle(DiveUI.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, 9)
+        .padding(.vertical, 7)
+        .background(
+            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                .fill(Color.black.opacity(0.52))
+                .overlay(RoundedRectangle(cornerRadius: 7, style: .continuous).stroke(.white.opacity(0.24), lineWidth: 1))
+        )
     }
 
     private var header: some View {
@@ -122,11 +159,11 @@ struct SettingsView: View {
                 .frame(width: 24)
 
             VStack(alignment: .leading, spacing: 1) {
-                Text(title)
+                Text(LocalizedStringKey(title))
                     .font(.system(size: 11, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(1)
-                Text(subtitle)
+                Text(LocalizedStringKey(subtitle))
                     .font(.system(size: 10, weight: .regular, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(1)
@@ -144,7 +181,7 @@ struct SettingsView: View {
                 .overlay(
                     RoundedRectangle(cornerRadius: 7, style: .continuous)
                         .stroke(.white.opacity(0.24), lineWidth: 1)
-                    )
+                )
         )
     }
 }

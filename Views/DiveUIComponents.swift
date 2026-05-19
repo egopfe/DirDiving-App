@@ -98,7 +98,7 @@ struct DiveCommandButton: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 5) {
-                Text(title)
+                Text(LocalizedStringKey(title))
                     .font(.caption.bold())
                     .lineLimit(1)
                     .minimumScaleFactor(0.68)
@@ -122,8 +122,8 @@ struct DiveCommandButton: View {
             .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(title)
-        .accessibilityHint("Esegue il comando \(title.lowercased())")
+        .accessibilityLabel(Text(LocalizedStringKey(title)))
+        .accessibilityHint(Text("Esegue il comando"))
     }
 }
 
@@ -157,7 +157,7 @@ struct DiveMetric: View {
 
     var body: some View {
         VStack(spacing: 2) {
-            Text(title.uppercased())
+            Text(LocalizedStringKey(title.uppercased()))
                 .font(.system(size: 9, weight: .bold, design: .rounded))
                 .foregroundStyle(DiveUI.secondaryText)
                 .lineLimit(1)
@@ -202,12 +202,12 @@ struct DiveScreenHeader: View {
                     if let systemImage {
                         Image(systemName: systemImage)
                     }
-                    Text(title)
+                    Text(LocalizedStringKey(title))
                 }
                 .font(.caption.bold())
                 .foregroundStyle(accent)
                 if let subtitle {
-                    Text(subtitle)
+                    Text(LocalizedStringKey(subtitle))
                         .font(.system(size: 9, weight: .semibold, design: .rounded))
                         .foregroundStyle(DiveUI.secondaryText)
                         .lineLimit(1)
@@ -248,7 +248,7 @@ struct DiveStatusPill: View {
             if let systemImage {
                 Image(systemName: systemImage)
             }
-            Text(text)
+            Text(LocalizedStringKey(text))
         }
         .font(.system(size: 9, weight: .bold, design: .rounded))
         .lineLimit(1)

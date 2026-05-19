@@ -4,6 +4,7 @@ struct MoreView: View {
     @EnvironmentObject private var watchSync: WatchSyncService
     @EnvironmentObject private var cloudSync: CloudSyncStore
     @EnvironmentObject private var logStore: DiveLogStore
+    @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
 
     var body: some View {
         NavigationStack {
@@ -18,6 +19,11 @@ struct MoreView: View {
                             Text("Watch sync, cloud backup, reviewer tools and export presentation")
                                 .font(.callout)
                                 .foregroundStyle(DIRTheme.muted)
+                        }
+                        DIRCard("PREFERENZE APP", icon: "gearshape.fill", accent: DIRTheme.cyan) {
+                            languagePreferencePicker
+                            row("Sync impostazioni", "Locale-only")
+                            row("Planner safety", "Disclaimer richiesto")
                         }
                         DIRCard("SYNC WATCH", icon: "applewatch", accent: DIRTheme.cyan) {
                             row("Supportato", watchSync.isSupported ? "Si" : "No")
@@ -73,6 +79,36 @@ struct MoreView: View {
             }
             .toolbar(.hidden, for: .navigationBar)
         }
+    }
+
+    private var languagePreferencePicker: some View {
+        let selectedLanguage = DIRIOSAppLanguage.fromStorage(appLanguage)
+
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Lingua")
+                    .foregroundStyle(DIRTheme.muted)
+                Spacer()
+                Text(selectedLanguage.title)
+                    .foregroundStyle(.white)
+                    .fontWeight(.semibold)
+            }
+            .font(.callout)
+            Picker("Lingua", selection: $appLanguage) {
+                ForEach(DIRIOSAppLanguage.allCases) { language in
+                    Text(language.title).tag(language.rawValue)
+                }
+            }
+            .pickerStyle(.segmented)
+            Text(selectedLanguage.companionDetail)
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.yellow)
+            Text("Changing language does not change units, calculations or saved data.")
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.vertical, 5)
     }
 
     private func row(_ title: String, _ value: String) -> some View {

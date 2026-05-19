@@ -7,7 +7,7 @@ struct DIRWarningBox: View {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.subheadline.weight(.bold))
                 .foregroundStyle(DIRTheme.orange)
-            Text(text)
+            Text(LocalizedStringKey(text))
                 .font(.footnote.weight(.medium))
                 .foregroundStyle(.white.opacity(0.86))
         }
