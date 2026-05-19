@@ -1,13 +1,7 @@
 import SwiftUI
-import UIKit
-import UniformTypeIdentifiers
 
 struct ExploreView: View {
     @EnvironmentObject private var logStore: DiveLogStore
-    @EnvironmentObject private var watchSync: WatchSyncService
-    @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
-    @State private var showImporter = false
-    @State private var importMessage: String?
 
     var body: some View {
         NavigationStack {
@@ -31,14 +25,6 @@ struct ExploreView: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
-            .fileImporter(isPresented: $showImporter, allowedContentTypes: [.commaSeparatedText, .plainText]) { result in
-                switch result {
-                case .success(let url):
-                    importRouteCSV(from: url)
-                case .failure(let error):
-                    importMessage = error.localizedDescription
-                }
-            }
         }
     }
 
@@ -69,10 +55,9 @@ struct ExploreView: View {
 
     private var routeStatusStrip: some View {
         let routes = routeSummaries
-        let distance = Formatters.distance(totalDistance, units: unitPreference, prefersLargeUnit: true)
-        HStack(spacing: 12) {
+        return HStack(spacing: 12) {
             routeStatus("ROUTES", "\(routes.count)", DIRTheme.cyan, "point.topleft.down.curvedto.point.bottomright.up")
-            routeStatus("DIST", distance.text, DIRTheme.green, "ruler")
+            routeStatus("DIST", Formatters.zero(totalDistance / 1000), DIRTheme.green, "ruler")
             routeStatus("LATEST", latestBearingText, DIRTheme.yellow, "location.north")
         }
     }
@@ -83,7 +68,7 @@ struct ExploreView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(routeSummaries) { route in
-                        waypointCard(route.name, Formatters.distance(route.distanceMeters, units: unitPreference).text, route.startDate.formatted(.dateTime.day().month().hour().minute()), DIRTheme.cyan, "mappin.and.ellipse")
+                        waypointCard(route.name, "\(Formatters.zero(route.distanceMeters)) m", route.startDate.formatted(.dateTime.day().month().hour().minute()), DIRTheme.cyan, "mappin.and.ellipse")
                     }
                 }
                 .padding(.vertical, 2)
@@ -97,7 +82,7 @@ struct ExploreView: View {
                 HStack(spacing: 0) {
                     DIRMetricTile(title: "Bearing", value: latestBearingText, unit: nil, color: DIRTheme.cyan, icon: "location.north")
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: "Distance", measurement: Formatters.distance(totalDistance, units: unitPreference), color: DIRTheme.green, icon: "arrow.left.and.right")
+                    DIRMetricTile(title: "Distance", value: Formatters.zero(totalDistance), unit: "m", color: DIRTheme.green, icon: "arrow.left.and.right")
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: "Fix", value: "\(routeSummaries.count)", color: DIRTheme.yellow, icon: "flag")
                 }
@@ -138,31 +123,9 @@ struct ExploreView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            VStack(spacing: 9) {
-                HStack(spacing: 10) {
-                    emptyAction("Sync Watch", "applewatch") {
-                        watchSync.retryActivation(logStore: logStore)
-                        importMessage = "Sync Apple Watch richiesta. Le route compariranno quando i log includono entry/exit GPS."
-                    }
-                    emptyAction("Sync iCloud", "icloud.and.arrow.down") {
-                        logStore.synchronizeCloud()
-                        importMessage = "Sincronizzazione iCloud richiesta per aggiornare i log disponibili."
-                    }
-                }
-                HStack(spacing: 10) {
-                    emptyAction("Importa CSV", "square.and.arrow.down") {
-                        showImporter = true
-                    }
-                    emptyAction("Impostazioni", "gearshape") {
-                        openAppSettings()
-                    }
-                }
-            }
-            if let importMessage {
-                Text(importMessage)
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(DIRTheme.yellow)
-                    .fixedSize(horizontal: false, vertical: true)
+            HStack(spacing: 10) {
+                emptyAction("Sincronizza Apple Watch", "applewatch")
+                emptyAction("Importa CSV", "square.and.arrow.down")
             }
         }
         .padding(14)
@@ -184,10 +147,6 @@ struct ExploreView: View {
     private var latestBearingText: String {
         guard let bearing = routeSummaries.first?.bearingDegrees else { return "--" }
         return Formatters.zero(bearing)
-    }
-
-    private var unitPreference: IOSUnitPreference {
-        IOSUnitPreference.fromStorage(units)
     }
 
     private var gridOverlay: some View {
@@ -382,34 +341,13 @@ struct ExploreView: View {
             .background(Capsule().fill(color.opacity(0.12)).overlay(Capsule().stroke(color.opacity(0.45), lineWidth: 1)))
     }
 
-    private func emptyAction(_ title: String, _ icon: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Label(title, systemImage: icon)
-                .font(.caption.weight(.bold))
-                .foregroundStyle(DIRTheme.cyan)
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 9)
-                .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.62), lineWidth: 1))
-        }
-        .buttonStyle(.plain)
-    }
-
-    private func importRouteCSV(from url: URL) {
-        switch DiveImportService.importCSV(from: url) {
-        case .success(let summary):
-            let alreadyImported = logStore.session(id: summary.session.id) != nil
-            logStore.add(summary.session)
-            importMessage = summary.message(alreadyImported: alreadyImported)
-        case .failure(let error):
-            importMessage = error.localizedDescription
-        }
-    }
-
-    private func openAppSettings() {
-        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
-        UIApplication.shared.open(url)
+    private func emptyAction(_ title: String, _ icon: String) -> some View {
+        Label(title, systemImage: icon)
+            .font(.caption.weight(.bold))
+            .foregroundStyle(DIRTheme.cyan)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 9)
+            .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.62), lineWidth: 1))
     }
 }
 
