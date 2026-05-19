@@ -4,6 +4,14 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-19, pass documentazione security PT2)
+
+- Sezione **QA Security (audit F1–F12, baseline 2026-05-19)** in `Docs/RELEASE_CHECKLIST.md` con sotto-sezioni Auth/pairing, Persistenza/Data Protection, Sync protocol, Input validation, Logging/naming, Privacy/leakage.
+- Chiavi i18n `import.csv.too_large`, `import.csv.too_large.10mb`, `import.csv.unreadable`, `import.csv.missing_columns`, `import.csv.empty_profile` in `iOSApp/Resources/{en,it}.lproj/Localizable.strings` (additive; runtime in `DiveImportService.ImportError.errorDescription` restituisce ancora stringhe IT hardcoded — follow-up tecnico tracciato).
+- 3 righe additive in `Docs/DIR_DIVING_Feature_Comparison.csv` (Documentation × 2 + Localization Planned).
+- `Docs/DOCUMENTATION_UPDATE_REPORT_20260519_SECURITY_PT2.md` — report A–K.
+- Commenti di stato security su PR #8 (issuecomment `4488127946`) e PR #9 (issuecomment `4488128195`) tramite `gh pr comment --body-file`.
+
 ### Added (2026-05-19, pass documentazione security)
 
 - `Docs/DOCUMENTATION_UPDATE_REPORT_20260519_SECURITY.md` — report strutturato A–K post-pass remediation security.

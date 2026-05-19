@@ -64,3 +64,13 @@
 "tab.gear" = "Attrezzatura";
 "tab.more" = "Altro";
 "logbook.delete.a11y" = "Elimina immersione dal logbook";
+
+// Errori import (security audit F10).
+// NOTE: il runtime in DiveImportService.swift restituisce ancora stringhe IT hardcoded
+// via LocalizedError.errorDescription; queste chiavi sono pre-pubblicate qui per il
+// follow-up che passera a NSLocalizedString senza piu modificare il catalogo .strings.
+"import.csv.too_large" = "CSV troppo grande: limite %d MB.";
+"import.csv.too_large.10mb" = "CSV troppo grande: limite 10 MB.";
+"import.csv.unreadable" = "File import non leggibile.";
+"import.csv.missing_columns" = "CSV non compatibile: colonne richieste mancanti.";
+"import.csv.empty_profile" = "CSV senza campioni immersione.";

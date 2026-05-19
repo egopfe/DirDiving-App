@@ -64,3 +64,13 @@
 "tab.gear" = "Equipment";
 "tab.more" = "More";
 "logbook.delete.a11y" = "Delete dive from logbook";
+
+// Import errors (security audit F10).
+// NOTE: runtime in DiveImportService.swift currently returns hardcoded IT strings
+// via LocalizedError.errorDescription; these keys are kept here so a follow-up
+// PR can switch to NSLocalizedString without changing the .strings catalogs again.
+"import.csv.too_large" = "CSV too large: limit %d MB.";
+"import.csv.too_large.10mb" = "CSV too large: limit 10 MB.";
+"import.csv.unreadable" = "Import file unreadable.";
+"import.csv.missing_columns" = "CSV not compatible: required columns missing.";
+"import.csv.empty_profile" = "CSV without dive samples.";
