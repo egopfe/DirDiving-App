@@ -12,6 +12,51 @@ enum WatchDiveSyncCodec {
     static let importedSessionIDsKey = "dirdiving_ios_imported_session_ids"
 
     private static let expectedWatchBundleID = "com.egopfe.dirdiving"
+    private static let iosBundleID = "com.egopfe.dirdiving.ios"
+
+    static func makePayload(session: DiveSession) throws -> [String: Any] {
+        guard WatchSyncAuth.hasPeerSecret() else {
+            throw WatchDiveSyncError.unverifiedPeer
+        }
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let body = try encoder.encode(session)
+        guard body.count <= maxPayloadBytes else {
+            throw WatchDiveSyncError.payloadTooLarge
+        }
+
+        let issuedAt = Date()
+        let transport = Transport(
+            version: schemaVersion,
+            bundleID: Bundle.main.bundleIdentifier ?? iosBundleID,
+            issuedAt: issuedAt,
+            body: body,
+            signature: ""
+        )
+        let signed = sign(transport, issuedAt: issuedAt, body: body)
+        let transportData = try JSONEncoder().encode(signed)
+        guard transportData.count <= maxPayloadBytes else {
+            throw WatchDiveSyncError.payloadTooLarge
+        }
+        return [payloadKey: transportData]
+    }
+
+    private static func sign(_ transport: Transport, issuedAt: Date, body: Data) -> Transport {
+        let mac = hmac(version: transport.version, bundleID: transport.bundleID, issuedAt: issuedAt, body: body)
+        return Transport(
+            version: transport.version,
+            bundleID: transport.bundleID,
+            issuedAt: issuedAt,
+            body: body,
+            signature: mac
+        )
+    }
+
+    private static func hmac(version: Int, bundleID: String, issuedAt: Date, body: Data) -> String {
+        let canonical = "\(version)|\(bundleID)|\(issuedAt.timeIntervalSince1970)|\(body.base64EncodedString())"
+        let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: syncKey())
+        return Data(code).base64EncodedString()
+    }
 
     struct Transport: Codable {
         let version: Int

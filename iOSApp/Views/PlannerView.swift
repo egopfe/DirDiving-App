@@ -5,6 +5,10 @@ struct PlannerView: View {
     @EnvironmentObject private var store: PlannerStore
     @State private var showPlan = false
     @State private var validationMessage: String?
+    // SAF-9 launch token: a single static UUID per app launch. When the
+    // PlannerView re-appears with a stale token the safety toggle is reset.
+    private static let launchToken = UUID()
+    @State private var seenLaunchToken: UUID?
 
     var body: some View {
         NavigationStack {
@@ -41,6 +45,16 @@ struct PlannerView: View {
                 if store.mode != .simple {
                     store.mode = .simple
                 }
+                // SAF-9: per-launch acknowledgement of the planner safety
+                // disclaimer. The toggle resets the first time PlannerView
+                // appears in a given app launch; later re-appearances within
+                // the same launch preserve the user's ack so they don't have
+                // to re-tick when switching tabs.
+                if seenLaunchToken != Self.launchToken {
+                    store.safetyAcknowledged = false
+                    seenLaunchToken = Self.launchToken
+                    validationMessage = nil
+                }
             }
         }
     }
@@ -52,24 +66,24 @@ struct PlannerView: View {
                 .foregroundStyle(.white)
             HStack(spacing: 0) {
                 ForEach(PlannerMode.allCases) { mode in
-                    Button {
+                    // UX-M13: only `.simple` is interactive; other modes are
+                    // greyed out and explicitly non-tappable (no Button, no
+                    // contentShape) so the disabled state cannot be tapped.
+                    Group {
                         if mode == .simple {
-                            store.mode = mode
+                            Button {
+                                store.mode = mode
+                            } label: {
+                                modePickerLabel(mode)
+                            }
+                            .buttonStyle(.plain)
+                        } else {
+                            modePickerLabel(mode)
+                                .opacity(0.55)
+                                .accessibilityLabel("\(mode.rawValue) Planned")
+                                .accessibilityHint("Modalita pianificata, non disponibile in questa build.")
                         }
-                    } label: {
-                        Text(modeLabel(mode))
-                            .font(.system(size: 12, weight: .semibold, design: .rounded))
-                            .foregroundStyle(store.mode == mode ? Color.black : mode == .simple ? Color.white : DIRTheme.muted)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 8)
-                            .background(
-                                RoundedRectangle(cornerRadius: 5, style: .continuous)
-                                    .fill(store.mode == mode ? DIRTheme.cyan : .clear)
-                                    .shadow(color: store.mode == mode ? DIRTheme.cyan.opacity(0.38) : .clear, radius: 5, x: 0, y: 0)
-                            )
                     }
-                    .buttonStyle(.plain)
-                    .disabled(mode != .simple)
                 }
             }
             .padding(3)
@@ -155,14 +169,17 @@ struct PlannerView: View {
         Button {
             if let validation = validationError {
                 validationMessage = validation
+                HapticFeedback.error()
                 return
             }
             guard store.safetyAcknowledged else {
                 validationMessage = "Conferma prima l'avviso safety: piano indicativo, non certificato."
+                HapticFeedback.error()
                 return
             }
             validationMessage = nil
             store.calculate()
+            HapticFeedback.success()
             showPlan = true
         } label: {
             Text("Calcola Piano")
@@ -178,6 +195,8 @@ struct PlannerView: View {
         }
         .buttonStyle(.plain)
         .padding(.top, 4)
+        .accessibilityLabel("Calcola piano immersione")
+        .accessibilityHint("Valida i campi e i gas, poi apre il piano di risalita indicativo.")
     }
 
     private func validationNotice(_ message: String) -> some View {
@@ -196,6 +215,19 @@ struct PlannerView: View {
 
     private func modeLabel(_ mode: PlannerMode) -> String {
         mode == .simple ? mode.rawValue : "\(mode.rawValue) · Planned"
+    }
+
+    private func modePickerLabel(_ mode: PlannerMode) -> some View {
+        Text(modeLabel(mode))
+            .font(.system(size: 12, weight: .semibold, design: .rounded))
+            .foregroundStyle(store.mode == mode ? Color.black : mode == .simple ? Color.white : DIRTheme.muted)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 5, style: .continuous)
+                    .fill(store.mode == mode ? DIRTheme.cyan : .clear)
+                    .shadow(color: store.mode == mode ? DIRTheme.cyan.opacity(0.38) : .clear, radius: 5, x: 0, y: 0)
+            )
     }
 
     private var validationError: String? {

@@ -72,9 +72,14 @@ struct AnalysisView: View {
                     case .success(let summary):
                         let alreadyImported = logStore.session(id: summary.session.id) != nil
                         logStore.add(summary.session)
+                        if !alreadyImported {
+                            watchSync.pushSession(summary.session)
+                        }
                         importMessage = summary.message(alreadyImported: alreadyImported)
+                        HapticFeedback.success()
                     case .failure(let error):
                         importMessage = error.localizedDescription
+                        HapticFeedback.error()
                     }
                 case .failure(let error):
                     importMessage = error.localizedDescription

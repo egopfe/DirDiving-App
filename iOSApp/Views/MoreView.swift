@@ -1,6 +1,7 @@
 import SwiftUI
 import UIKit
 import UserNotifications
+import WatchConnectivity
 
 struct MoreView: View {
     @EnvironmentObject private var watchSync: WatchSyncService
@@ -46,23 +47,33 @@ struct MoreView: View {
                             infoRow("Notifiche iOS", "Permessi gestiti da iOS")
                             infoRow("Stato autorizzazione", notificationStatus)
                             Button {
-                                openAppSettings()
+                                HapticFeedback.tap()
+                                requestNotificationAuthorization()
+                            } label: {
+                                actionLabel("Richiedi permesso notifiche", systemImage: "bell.badge.fill")
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Richiedi permesso notifiche")
+                            .accessibilityHint("Apre il prompt iOS per autorizzare avvisi, suoni e badge.")
+                            Button {
+                                HapticFeedback.tap()
+                                openSystemSettings()
                             } label: {
                                 actionLabel("Apri Impostazioni iOS", systemImage: "gearshape")
                             }
                             .buttonStyle(.plain)
                             .accessibilityLabel("Apri impostazioni notifiche iOS")
-                            .accessibilityHint("Richiede il permesso notifiche se non ancora deciso, poi apre le impostazioni di sistema.")
-                            infoNote("TODO: sincronizzare soglie allarmi e haptics Watch quando esiste un contratto settings bidirezionale.")
+                            .accessibilityHint("Apre le Impostazioni di sistema per gestire i permessi notifiche.")
+                            infoNote("Soglie allarmi Watch restano locali · Planned: contratto settings bidirezionale.")
                         }
                         DIRCard("SYNC WATCH", icon: "applewatch", accent: DIRTheme.cyan) {
                             infoRow("Supportato", watchSync.isSupported ? "Si" : "No")
-                            infoRow("Stato", String(describing: watchSync.activationState))
+                            infoRow("Stato", activationStateLabel(watchSync.activationState))
                             infoRow("Esito", watchSync.userVisibleState)
                             infoRow("Peer verificato", WatchSyncAuth.hasPeerSecret() ? "Si" : "No")
                             infoRow("Ultimo sync", watchSync.lastMessage)
-                            infoRow("Settings Watch", "Non sincronizzati")
-                            infoRow("iPhone -> Watch", "TODO: push sicuro non abilitato")
+                            infoRow("Settings Watch", "Solo unità · Planned per allarmi")
+                            infoRow("iPhone -> Watch", WatchSyncAuth.hasPeerSecret() ? "Push verificato attivo (\(watchSync.pendingOutboundCount) pending)" : "In attesa peer secret · push gated")
                             if watchSync.activationState == .activated && !WatchSyncAuth.hasPeerSecret() {
                                 emptyState(
                                     title: "Associazione Watch non verificata",
@@ -86,7 +97,7 @@ struct MoreView: View {
                                 conflictRow(conflict)
                             }
                             Button {
-                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                HapticFeedback.confirm()
                                 watchSync.retryActivation(logStore: logStore)
                             } label: {
                                 actionLabel(retryWatchSyncDisabled ? "Riprova Watch Sync (idle)" : "Riprova Watch Sync", systemImage: "arrow.triangle.2.circlepath")
@@ -96,7 +107,7 @@ struct MoreView: View {
                             .accessibilityLabel("Riprova Watch Sync")
                             .accessibilityHint(retryWatchSyncDisabled ? "Sync attivo e nessun retry necessario." : "Riattiva WatchConnectivity e riprova gli import.")
                             Button {
-                                UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                                HapticFeedback.destructive()
                                 showResetPairingConfirmation = true
                             } label: {
                                 destructiveActionLabel("Reset trust / re-pair", systemImage: "lock.rotation")
@@ -121,7 +132,7 @@ struct MoreView: View {
                                 )
                             }
                             Button {
-                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                HapticFeedback.confirm()
                                 logStore.synchronizeCloud()
                                 cloudSync.synchronize()
                             } label: {
@@ -164,7 +175,7 @@ struct MoreView: View {
             .onAppear { refreshNotificationStatus() }
             .confirmationDialog("Resettare trust Watch?", isPresented: $showResetPairingConfirmation, titleVisibility: .visible) {
                 Button("Reset trust e nuova associazione", role: .destructive) {
-                    UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                    HapticFeedback.destructive()
                     watchSync.resetPairingTrust(logStore: logStore)
                 }
                 Button("Annulla", role: .cancel) {}
@@ -249,12 +260,15 @@ struct MoreView: View {
                 }
             }
             .pickerStyle(.segmented)
-            Text("Persistita localmente; non sincronizzata con Apple Watch.")
+            .onChange(of: units) { _, newValue in
+                watchSync.pushUnitsPreference(newValue)
+            }
+            Text("Persistita localmente; broadcast iOS -> Watch via WatchConnectivity context (solo metric oggi).")
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.yellow)
                 .lineLimit(2)
                 .minimumScaleFactor(0.82)
-            Text("Contratto unidirezionale iOS -> Watch planned; oggi il Watch resta metrico.")
+            Text("Contratto unidirezionale iOS -> Watch attivo: viene inviata la chiave \"units\" via applicationContext; oggi il Watch resta metrico finche la conversione locale non e implementata.")
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .lineLimit(2)
@@ -380,17 +394,25 @@ struct MoreView: View {
             .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.red.opacity(0.78), lineWidth: 1))
     }
 
-    private func openAppSettings() {
+    private func activationStateLabel(_ state: WCSessionActivationState) -> String {
+        switch state {
+        case .activated: return "Attivo"
+        case .inactive: return "Non attivo"
+        case .notActivated: return "In attesa"
+        @unknown default: return "Sconosciuto"
+        }
+    }
+
+    private func requestNotificationAuthorization() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
-            if settings.authorizationStatus == .notDetermined {
+            let status = settings.authorizationStatus
+            switch status {
+            case .notDetermined:
                 UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in
-                    Task { @MainActor in
-                        refreshNotificationStatus()
-                        openSystemSettings()
-                    }
+                    Task { @MainActor in refreshNotificationStatus() }
                 }
-            } else {
-                Task { @MainActor in openSystemSettings() }
+            default:
+                Task { @MainActor in refreshNotificationStatus() }
             }
         }
     }
@@ -440,8 +462,18 @@ struct MoreView: View {
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
             HStack(spacing: 8) {
-                Button("Mantieni locale") { watchSync.resolveConflictKeepingLocal(conflict) }
-                Button("Usa Watch") { watchSync.resolveConflictUsingIncoming(conflict) }
+                Button("Mantieni locale") {
+                    HapticFeedback.notify()
+                    watchSync.resolveConflictKeepingLocal(conflict)
+                }
+                .accessibilityLabel("Mantieni versione locale")
+                .accessibilityHint("Ignora la versione Watch per questo conflitto.")
+                Button("Usa Watch") {
+                    HapticFeedback.success()
+                    watchSync.resolveConflictUsingIncoming(conflict)
+                }
+                .accessibilityLabel("Usa versione Watch")
+                .accessibilityHint("Sostituisce la versione locale con quella ricevuta dal Watch.")
             }
             .font(.caption.weight(.semibold))
             .foregroundStyle(DIRTheme.cyan)

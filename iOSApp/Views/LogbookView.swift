@@ -5,6 +5,7 @@ import UIKit
 struct LogbookView: View {
     @EnvironmentObject private var logStore: DiveLogStore
     @EnvironmentObject private var navigation: IOSNavigationStore
+    @EnvironmentObject private var watchSync: WatchSyncService
     @State private var search = ""
     @State private var showImporter = false
     @State private var importMessage: String?
@@ -89,10 +90,14 @@ struct LogbookView: View {
                     case .success(let summary):
                         let alreadyImported = logStore.session(id: summary.session.id) != nil
                         logStore.add(summary.session)
+                        if !alreadyImported {
+                            watchSync.pushSession(summary.session)
+                        }
                         importMessage = summary.message(alreadyImported: alreadyImported)
-                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                        HapticFeedback.success()
                     case .failure(let error):
                         importMessage = "Import fallito: 0 importate, 0 duplicati, 1 errore. \(error.localizedDescription)"
+                        HapticFeedback.error()
                     }
                 case .failure(let error):
                     importMessage = error.localizedDescription
@@ -109,7 +114,7 @@ struct LogbookView: View {
                 Button("Elimina", role: .destructive) {
                     if let pendingDelete {
                         logStore.delete(id: pendingDelete.id)
-                        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+                        HapticFeedback.destructive()
                     }
                     pendingDelete = nil
                 }

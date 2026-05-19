@@ -43,6 +43,7 @@ struct EquipmentView: View {
                             Toggle("Computer backup", isOn: $equipment.profile.backupComputerReady).tint(DIRTheme.cyan)
                         }
                         Button {
+                            HapticFeedback.destructive()
                             showResetConfirmation = true
                         } label: {
                             Text("Reset profilo standard")
@@ -53,6 +54,8 @@ struct EquipmentView: View {
                                 .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel("Reset profilo attrezzatura")
+                        .accessibilityHint("Richiede conferma prima di ripristinare valori standard.")
                         DIRWarningBox(text: "Profilo attrezzatura salvato localmente e in iCloud KVS quando disponibile.")
                     }
                     .padding(16)
@@ -61,6 +64,7 @@ struct EquipmentView: View {
             .toolbar(.hidden, for: .navigationBar)
             .confirmationDialog("Resettare il profilo attrezzatura?", isPresented: $showResetConfirmation, titleVisibility: .visible) {
                 Button("Reset profilo", role: .destructive) {
+                    HapticFeedback.destructive()
                     equipment.reset()
                     showSavedFeedback()
                 }
