@@ -10,6 +10,7 @@ struct DIRDivingApp: App {
     @StateObject private var ascentSettings: AscentRateSettingsStore
     @StateObject private var navigationStore: AppNavigationStore
     @StateObject private var watchSync: WatchSyncService
+    @AppStorage(DIRAppLanguage.storageKey) private var appLanguage = DIRAppLanguage.system.rawValue
 
     init() {
         let logStore = DiveLogStore()
@@ -37,6 +38,7 @@ struct DIRDivingApp: App {
                 .environmentObject(ascentSettings)
                 .environmentObject(navigationStore)
                 .environmentObject(watchSync)
+                .environment(\.locale, DIRAppLanguage.fromStorage(appLanguage).locale)
         }
     }
 }

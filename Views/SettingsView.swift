@@ -6,6 +6,7 @@ struct SettingsView: View {
     @EnvironmentObject private var watchSync: WatchSyncService
     @AppStorage("dirdiving_watch_haptics_enabled") private var hapticsEnabled = true
     @AppStorage("dirdiving_watch_units") private var watchUnits = "metric"
+    @AppStorage(DIRAppLanguage.storageKey) private var appLanguage = DIRAppLanguage.system.rawValue
     @State private var showClearSyncQueueConfirmation = false
 
     var body: some View {
@@ -48,6 +49,7 @@ struct SettingsView: View {
                     .buttonStyle(.plain)
 
                     unitPreferenceControl
+                    languagePreferenceControl
                     settingsRow(
                         icon: "iphone.slash",
                         iconColor: DiveUI.yellow,
@@ -227,6 +229,41 @@ struct SettingsView: View {
         @unknown default:
             return "Stato permesso sconosciuto"
         }
+    }
+
+    private var languagePreferenceControl: some View {
+        let selectedLanguage = DIRAppLanguage.fromStorage(appLanguage)
+
+        return VStack(alignment: .leading, spacing: 6) {
+            settingsRow(
+                icon: "globe",
+                iconColor: DiveUI.cyan,
+                title: "Lingua",
+                subtitle: "System Language / Italiano / English"
+            )
+            Picker("Lingua", selection: $appLanguage) {
+                ForEach(DIRAppLanguage.allCases) { language in
+                    Text(language.title).tag(language.rawValue)
+                }
+            }
+            .pickerStyle(.segmented)
+            .tint(DiveUI.cyan)
+            Text(selectedLanguage.watchDetail)
+                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .foregroundStyle(DiveUI.yellow)
+                .fixedSize(horizontal: false, vertical: true)
+            Text("Changing language does not change units, calculations or saved data.")
+                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .foregroundStyle(DiveUI.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, 9)
+        .padding(.vertical, 7)
+        .background(
+            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                .fill(Color.black.opacity(0.52))
+                .overlay(RoundedRectangle(cornerRadius: 7, style: .continuous).stroke(.white.opacity(0.24), lineWidth: 1))
+        )
     }
 
     private var unitPreferenceControl: some View {
