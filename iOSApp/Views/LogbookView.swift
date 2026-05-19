@@ -8,13 +8,14 @@ private struct LogbookMonthSection: Identifiable {
 
 struct LogbookView: View {
     @EnvironmentObject private var logStore: DiveLogStore
+    @Environment(\.locale) private var locale
     @State private var search = ""
 
     private var filtered: [DiveSession] {
         search.isEmpty ? logStore.sessions : logStore.sessions.filter { ($0.siteName ?? "").localizedCaseInsensitiveContains(search) }
     }
 
-    private var monthSections: [LogbookMonthSection] {
+    private func makeMonthSections(locale: Locale) -> [LogbookMonthSection] {
         let cal = Calendar.current
         var buckets: [String: [DiveSession]] = [:]
         for session in filtered {
@@ -24,7 +25,7 @@ struct LogbookView: View {
         }
         let keys = buckets.keys.sorted(by: >)
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "it_IT")
+        formatter.locale = locale
         formatter.setLocalizedDateFormatFromTemplate("MMMM yyyy")
         return keys.compactMap { key -> LogbookMonthSection? in
             let parts = key.split(separator: "-")
@@ -49,7 +50,7 @@ struct LogbookView: View {
                         if filtered.isEmpty {
                             emptyLogbook
                         } else {
-                            ForEach(monthSections) { section in
+                            ForEach(makeMonthSections(locale: locale)) { section in
                                 Text(section.title)
                                     .font(.caption.weight(.semibold))
                                     .foregroundStyle(DIRTheme.cyan)
@@ -71,7 +72,7 @@ struct LogbookView: View {
                                                     .frame(width: 36, height: 36)
                                             }
                                             .buttonStyle(.plain)
-                                            .accessibilityLabel("Elimina immersione dal logbook")
+                                            .accessibilityLabel(Text(LocalizedStringKey("logbook.delete.a11y")))
                                         }
                                     }
                                 }
@@ -131,6 +132,7 @@ struct LogbookView: View {
 }
 
 struct DiveLogCard: View {
+    @Environment(\.locale) private var locale
     let session: DiveSession
     let index: Int
 
@@ -184,7 +186,7 @@ struct DiveLogCard: View {
             Text(session.startDate.formatted(.dateTime.day()))
                 .font(.system(size: 27, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
-            Text(session.startDate.formatted(.dateTime.month(.abbreviated).locale(Locale(identifier: "it_IT"))).uppercased())
+            Text(session.startDate.formatted(.dateTime.month(.abbreviated).locale(locale)).uppercased())
                 .font(.caption2.weight(.medium))
                 .foregroundStyle(.white.opacity(0.75))
                 .lineLimit(1)

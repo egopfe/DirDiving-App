@@ -13,6 +13,7 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ### Changed (2026-05-19, secondo pass)
 
+- i18n: tab bar iOS con chiavi `tab.*`; logbook con `@Environment(\.locale)` per sezioni mese e abbreviazioni card; hint accessibilità comandi Watch da `Localizable.strings`.
 - `README.md` — allineamento testi MAIN iOS: tab **Analisi** al posto di «Route Review» come superficie separata; matrice piattaforme `main-iOS` chiarita.
 - `Docs/DIR_DIVING_Feature_Comparison.csv` — riga «Explore» sostituita da voce **Analisi** per sync/empty state; nota su Route Review vs Analisi.
 - `CONTRIBUTING.md` — nota su PR conflittuali e uso `gh pr comment`.

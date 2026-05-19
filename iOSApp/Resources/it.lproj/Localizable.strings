@@ -57,3 +57,10 @@
 "PROFONDITA" = "PROFONDITÀ";
 "GAS UTILIZZATO" = "GAS UTILIZZATO";
 "BUDDY" = "BUDDY";
+
+"tab.logbook" = "Logbook";
+"tab.analysis" = "Analisi";
+"tab.planner" = "Planner";
+"tab.gear" = "Attrezzatura";
+"tab.more" = "Altro";
+"logbook.delete.a11y" = "Elimina immersione dal logbook";

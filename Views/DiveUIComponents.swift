@@ -123,7 +123,7 @@ struct DiveCommandButton: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text(LocalizedStringKey(title)))
-        .accessibilityHint(Text("Esegue il comando"))
+        .accessibilityHint(Text(LocalizedStringKey("accessibility.command_button.hint")))
     }
 }
 

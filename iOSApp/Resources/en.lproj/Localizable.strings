@@ -57,3 +57,10 @@
 "PROFONDITA" = "DEPTH";
 "GAS UTILIZZATO" = "GAS USED";
 "BUDDY" = "BUDDY";
+
+"tab.logbook" = "Logbook";
+"tab.analysis" = "Analysis";
+"tab.planner" = "Planner";
+"tab.gear" = "Equipment";
+"tab.more" = "More";
+"logbook.delete.a11y" = "Delete dive from logbook";

@@ -90,3 +90,5 @@
 "Planner safety" = "Planner safety";
 "Disclaimer richiesto" = "Disclaimer required";
 "Locale-only" = "Local only";
+
+"accessibility.command_button.hint" = "Runs the command";

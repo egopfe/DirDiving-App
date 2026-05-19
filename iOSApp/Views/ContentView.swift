@@ -21,19 +21,19 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $navigation.selectedTab) {
             LogbookView()
-                .tabItem { Label("Logbook", systemImage: "list.bullet.rectangle.portrait.fill") }
+                .tabItem { Label("tab.logbook", systemImage: "list.bullet.rectangle.portrait.fill") }
                 .tag(IOSTab.logbook)
             AnalysisView()
-                .tabItem { Label("Analisi", systemImage: "chart.xyaxis.line") }
+                .tabItem { Label("tab.analysis", systemImage: "chart.xyaxis.line") }
                 .tag(IOSTab.analysis)
             PlannerView()
-                .tabItem { Label("Planner", systemImage: "point.topleft.down.curvedto.point.bottomright.up") }
+                .tabItem { Label("tab.planner", systemImage: "point.topleft.down.curvedto.point.bottomright.up") }
                 .tag(IOSTab.planner)
             EquipmentView()
-                .tabItem { Label("Attrezzatura", systemImage: "shippingbox.fill") }
+                .tabItem { Label("tab.gear", systemImage: "shippingbox.fill") }
                 .tag(IOSTab.gear)
             MoreView()
-                .tabItem { Label("Altro", systemImage: "gearshape.fill") }
+                .tabItem { Label("tab.more", systemImage: "gearshape.fill") }
                 .tag(IOSTab.settings)
         }
         .tint(DIRTheme.cyan)
