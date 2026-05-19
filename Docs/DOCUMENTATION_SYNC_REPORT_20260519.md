@@ -22,8 +22,12 @@
 | `Docs/ReferenceUI/iOS_Companion_reference.png` |
 | `Docs/DOCUMENTATION_SYNC_REPORT_20260519.md` (questo file) |
 | `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md` |
+| `Docs/DOCUMENTATION_UPDATE_REPORT_20260519.md` |
+| `Docs/IOS_TAB_TARGET_MISMATCH_STATUS_20260519.md` |
 
 *File `.docx` di audit/roadmap possono restare non versionati se si preferisce limitare la dimensione del repository.*
+
+*Secondo pass 2026-05-19:* creato branch di sicurezza `backup/before-docs-merge-20260519` (puntatore a `HEAD` prima del commit documentazione). Verifica PR con `gh pr view`: #8 e #9 ancora `CONFLICTING` / `DIRTY`.
 
 ## B. Branch ispezionati
 
@@ -32,7 +36,7 @@
 
 ## C. Branch aggiornati (commit)
 
-- **Solo `main` (locale)** — commit documentazione pianificato su questo workspace. **Nessun** push forzato; altri branch non riscritti.
+- **`main` (locale):** eseguito commit **solo documentazione** (`docs: update DIR DIVING feature documentation and branch matrix`). **Nessun** push forzato; altri branch non riscritti.
 
 ## D. Conflitti trovati
 

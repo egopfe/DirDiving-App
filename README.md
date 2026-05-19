@@ -489,7 +489,7 @@ Gli ultimi aggiornamenti MAIN readiness aggiungono:
 - haptic feedback per START/STOP/RESET cronometro, rispettando il toggle haptics;
 - iOS Watch sync con conflitti visibili e risoluzione manuale;
 - tombstone iOS per evitare che log cancellati riappaiano da KVS;
-- import CSV iOS, profilo attrezzatura persistente, Route Review e Analysis basati su dati logbook;
+- import CSV iOS, profilo attrezzatura persistente, tab **Analisi** con riepilogo route GPS e metriche logbook basate su dati reali;
 - planner iOS con warning dinamici e copy non certificato.
 
 Build finale, `xcodegen generate` e `xcodebuild` devono essere eseguiti su macOS.
@@ -501,7 +501,7 @@ Dopo il report `Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260517_CURRENT_PRE_MOD
 - Watch MAIN: `Settings`, `AlarmSettings`, `DiveLive` e `DiveLogList` chiariscono metriche/local-only, shortcut/App Intents, avvio manuale, stato log vuoto, export non disponibile senza log e conferma delete.
 - Watch MAIN: le soglie allarme restano locali sul Watch, non sincronizzate con iPhone; i controlli +/- sono piu grandi e scrollabili per ridurre clipping e migliorare uso con guanti.
 - iOS MAIN: `Settings` marca unita/export come preferenze non editabili o local-only quando non esiste ancora un contratto sync production.
-- iOS MAIN: `Logbook`, `Route Review`, `Analysis` e `Gear` aggiungono empty state o conferme distruttive per import/sync assenti, nessuna rotta, nessuna statistica, delete immersione e reset profilo.
+- iOS MAIN: `Logbook`, `Analisi` (route GPS + import/sync), `Planner`, `Attrezzatura` e `Altro` aggiungono empty state o conferme distruttive per import/sync assenti, nessuna rotta, nessuna statistica, delete immersione e reset profilo.
 - Non sono stati modificati algoritmi GPS, bussola, profondita, risalita, decompressione, persistenza dati o modelli business; il pass e UI/UX e copy-only salvo conferme SwiftUI.
 
 ## Latest MAIN UX Audit And Documentation TODO
@@ -514,7 +514,7 @@ Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260517_CURRENT_PRE_MODIFICATION.docx
 
 Stato documentato dopo l'audit:
 
-- Le superfici principali MAIN sono raggiungibili: Apple Watch `Diving`, `BUSSOLA`, settings, immagini, log/export; iOS `Logbook`, `Route Review`, `Analysis`, `Planner`, `Gear`, `Settings`.
+- Le superfici principali MAIN sono raggiungibili: Apple Watch `Diving`, `BUSSOLA`, settings, immagini, log/export; iOS `Logbook`, `Analisi`, `Planner`, `Attrezzatura`, `Altro` (cinque tab; route GPS in **Analisi**).
 - Risolti nel pass MAIN UX: empty state iOS principali, conferme delete/reset, spiegazione Action Button/App Intents, copy di avvio manuale, settings iOS marcati read-only/local-only dove appropriato e controlli allarme Watch piu grandi.
 - Restano TODO di allineamento sync: settings Watch/iOS sono dichiarati local-only e la policy cloud conflict oltre KVS resta roadmap.
 - Restano TODO build/config da verificare su macOS: l'asset catalog iOS MAIN deve contenere i PNG citati da `AppIcon.appiconset/Contents.json`; `xcodegen generate` e le build Watch/iOS devono confermare i fix runtime piu recenti.
@@ -555,7 +555,7 @@ Regole operative:
 | --- | --- | --- | --- |
 | `main` | Apple Watch | Stable | Diving mode, log, export, BUSSOLA, immagini, settings raggiungibili, allarmi/haptic persistenti, GPS entry/exit confirmation, sync queue, helper shortcut/App Intents, empty state log e target membership senza experimental. |
 | `codex/experimental-features` | Apple Watch | Experimental | Snorkeling Live, Mappa Waypoint, Mappa Ritorno, Direzione Waypoint, POI con log/dettaglio/conferma, allarmi Snorkeling persistenti locali, Apnea, haptics sperimentali, settings sperimentali raggiungibili e Buddy Assist marcato lab-only. |
-| `main-iOS` | iOS Companion | Stable | Logbook, Dive Detail, Route Review, Analysis, Planner/Plan Result, Gear, Settings, WatchConnectivity, iCloud KVS, CSV import/export, Subsurface, empty state e conferme distruttive. |
+| `main-iOS` | iOS Companion | Stable | Logbook, Dive Detail, Analisi (route GPS), Planner/Plan Result, Attrezzatura, Altro/Settings, WatchConnectivity, iCloud KVS, CSV import/export, Subsurface, empty state e conferme distruttive. Storico: poteva esistere tab «Route Review» separata; su `main` unificato la route e in **Analisi**. |
 | `codex/ios-experimental-features` | iOS Companion | Experimental | Explore Lab, route planning, waypoint management, POI enrichment mock/TODO, Apnea Review interattiva, queue/status sync sperimentale, impostazioni locali editabili e note map/offline. |
 
 ## Mode Selection
@@ -699,7 +699,7 @@ Restano obbligatori: build `xcodegen generate` / Xcode su macOS, test Apple Watc
 - Aggiunti: [`Docs/BUILD_VALIDATION.md`](Docs/BUILD_VALIDATION.md), [`Docs/GLOSSARY.md`](Docs/GLOSSARY.md), [`Docs/RELEASE_CHECKLIST.md`](Docs/RELEASE_CHECKLIST.md), [`Docs/UI_UX_VISUAL_GUIDELINES.md`](Docs/UI_UX_VISUAL_GUIDELINES.md), [`CHANGELOG.md`](CHANGELOG.md), [`CONTRIBUTING.md`](CONTRIBUTING.md), report di sync [`Docs/DOCUMENTATION_SYNC_REPORT_20260519.md`](Docs/DOCUMENTATION_SYNC_REPORT_20260519.md), allineamento [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md).
 - Riferimenti visivi consolidati in `Docs/ReferenceUI/` (Watch live + iOS companion).
 - Matrice CSV aggiornata in coda (righe additive) per tab iOS a cinque voci e documentazione build.
-- PR **#8** e **#9**: al fetch risultano ancora **`mergeable: CONFLICTING`** / stato GitHub **DIRTY** — **non** mergeate automaticamente; vedi report di sync.
+- PR **#8** e **#9**: al fetch risultano ancora **`mergeable: CONFLICTING`** / stato GitHub **DIRTY** — **non** mergeate automaticamente; vedi [`Docs/DOCUMENTATION_SYNC_REPORT_20260519.md`](Docs/DOCUMENTATION_SYNC_REPORT_20260519.md) e [`Docs/DOCUMENTATION_UPDATE_REPORT_20260519.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260519.md).
 
 ## Aggiornamento documentazione e audit post-fix 2026-05-18
 

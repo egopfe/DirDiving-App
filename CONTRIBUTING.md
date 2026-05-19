@@ -14,6 +14,11 @@
 - Allineare `README.md` con `project.yml` (nomi scheme, piattaforme).
 - Build: seguire `Docs/BUILD_VALIDATION.md` su **macOS**.
 
+## Pull request GitHub
+
+- Se una PR risulta `CONFLICTING` / `DIRTY`, **non** mergeare da automazione: usare `gh pr view` e risolvere su macOS.
+- Dopo un pass solo-documentazione, e utile `gh pr comment` con stato e checklist (build, QA BUSSOLA/GPS surface-only).
+
 ## Branch
 
 - `main` = stabile Diving + companion iOS nello stesso repo.
