@@ -4,16 +4,11 @@ import WatchKit
 @MainActor
 final class HapticService {
     static let shared = HapticService()
-    static let hapticsEnabledKey = "dirdiving_watch_haptics_enabled"
+    static let experimentalHapticsEnabledKey = "dirdiving_watch_experimental_haptics_enabled"
     private var lastWarningDate: Date?
     private var lastBuddyNearDate: Date?
     private var lastBuddyDistantDate: Date?
-
-    private init() {
-        if UserDefaults.standard.object(forKey: Self.hapticsEnabledKey) == nil {
-            UserDefaults.standard.set(true, forKey: Self.hapticsEnabledKey)
-        }
-    }
+    private init() {}
 
     func warnIfNeeded() {
         guard hapticsEnabled else { return }
@@ -21,16 +16,6 @@ final class HapticService {
         if let lastWarningDate, now.timeIntervalSince(lastWarningDate) < 2 { return }
         lastWarningDate = now
         WKInterfaceDevice.current().play(.failure)
-    }
-
-    func confirm() {
-        guard hapticsEnabled else { return }
-        WKInterfaceDevice.current().play(.success)
-    }
-
-    func notify() {
-        guard hapticsEnabled else { return }
-        WKInterfaceDevice.current().play(.notification)
     }
 
     func buddyMessageReceived(isCritical: Bool) {
@@ -54,9 +39,24 @@ final class HapticService {
         WKInterfaceDevice.current().play(.retry)
     }
 
+    func confirm() {
+        guard hapticsEnabled else { return }
+        WKInterfaceDevice.current().play(.success)
+    }
+
+    func notify() {
+        guard hapticsEnabled else { return }
+        WKInterfaceDevice.current().play(.notification)
+    }
+
+    func tick() {
+        guard hapticsEnabled else { return }
+        WKInterfaceDevice.current().play(.click)
+    }
+
     private var hapticsEnabled: Bool {
-        UserDefaults.standard.object(forKey: Self.hapticsEnabledKey) == nil
+        UserDefaults.standard.object(forKey: Self.experimentalHapticsEnabledKey) == nil
             ? true
-            : UserDefaults.standard.bool(forKey: Self.hapticsEnabledKey)
+            : UserDefaults.standard.bool(forKey: Self.experimentalHapticsEnabledKey)
     }
 }

@@ -82,8 +82,7 @@ Stato implementato sul ramo experimental:
 - se il GPS non e disponibile, la UI mostra `GPS NON DISPONIBILE` e non finge coordinate;
 - `Log Marcatori` e `Dettaglio Marcatore` sono raggiungibili da `Impostazioni Snorkeling`;
 - il dettaglio mostra ora, distanza, direzione, profondita, temperatura, waypoint attivo, session id e stato `Da arricchire su iPhone`;
-- la UI mostra stato di sync sperimentale Watch -> iPhone con tipo payload, coda locale e stato delivery;
-- queue persistente completa, duplicate prevention production e conferma ricezione iPhone restano roadmap.
+- la UI dichiara esplicitamente che Watch -> iPhone POI sync, queue offline, duplicate prevention e conferma ricezione iPhone restano TODO.
 
 Il Watch non modifica foto, commenti o categorie avanzate. Il companion iOS espone la superficie di enrichment dopo sync con foto, video, commenti, categoria, tag e note di osservazione/specie, ma media picker/storage reali restano TODO sperimentali.
 
@@ -100,19 +99,8 @@ Stato attuale:
 
 - le soglie sono modificabili da Apple Watch;
 - la persistenza locale usa `AppStorage`;
-- profondita, tempo e distanza sono enforce locali con warning/haptic;
-- `Batteria bassa` resta configurata ma indicata come non cablata finche non esiste una sorgente batteria;
 - non esiste ancora uno store Snorkeling dedicato;
-- sync iPhone -> Watch settings, duplicate prevention e offline queue persistente sono LAB/roadmap espliciti.
-
-## Lifecycle sessione e stati indisponibili
-
-Il pass blocker-resolution ha reso visibile il lifecycle Snorkeling:
-
-- l'apertura della schermata Snorkeling avvia la sessione se necessario;
-- il punto entry viene acquisito dal miglior GPS disponibile, oppure la UI mostra `GPS NON DISPONIBILE - ENTRY PENDING`;
-- `Mappa Ritorno` resta non disponibile finche non esiste un entry point;
-- se il sensore profondita non e disponibile, i valori profondita devono mostrare `--` o warning dedicato, non `0.0` come dato reale.
+- sync iPhone -> Watch settings, duplicate prevention e offline queue sono TODO espliciti.
 
 Questa scelta mantiene la modifica incrementale e non introduce nuova architettura di persistenza.
 

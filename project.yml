@@ -11,27 +11,10 @@ targets:
     platform: watchOS
     sources:
       - App
-      - path: Models
-        excludes:
-          - ExplorationModels.swift
-          - BuddyAssistMessage.swift
-          - BuddyPairingHandshake.swift
-      - path: Services
-        excludes:
-          - ExplorationStore.swift
-          - BuddyAssistService.swift
-          - BuddyAssistPeripheralService.swift
-          - BuddyPairingKeyAgreement.swift
-          - SecureBuddyStore.swift
-      - path: Views
-        excludes:
-          - ApneaView.swift
-          - SnorkelingView.swift
-          - BuddyAssistView.swift
-          - ExperimentalConceptsView.swift
-      - path: Utils
-        excludes:
-          - ExperimentalFeatures.swift
+      - Models
+      - Services
+      - Views
+      - Utils
       - Resources
     settings:
       base:
@@ -46,6 +29,7 @@ targets:
     dependencies:
       - sdk: CoreMotion.framework
       - sdk: CoreLocation.framework
+      - sdk: CoreBluetooth.framework
       - sdk: Security.framework
       - sdk: WatchConnectivity.framework
       - sdk: WatchKit.framework
@@ -55,15 +39,7 @@ targets:
     type: application
     platform: iOS
     sources:
-      - path: iOSApp
-        excludes:
-          - Models/ExplorationModels.swift
-          - Models/BuddyExperimentalModels.swift
-          - Services/ExplorationPlanningStore.swift
-          - Services/BuddyExperimentalStore.swift
-          - Views/ExplorationCenterView.swift
-          - Views/ExperimentalFutureConceptsView.swift
-          - Views/BuddyExperimentalView.swift
+      - iOSApp
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios

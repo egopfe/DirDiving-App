@@ -26,8 +26,8 @@ struct DiveLiveView: View {
                         preDiveWaitingContent
                     }
 
-                    if let alarm = dive.alarmWarningMessage {
-                        warningBanner(alarm)
+                    if !dive.isDepthSensorAvailable {
+                        warningBanner("PROFONDITÀ NON DISPONIBILE - sensore non supportato o simulatore.")
                     }
                     if let error = dive.lastErrorMessage {
                         warningBanner(error)
@@ -103,11 +103,6 @@ struct DiveLiveView: View {
                 .lineSpacing(2)
 
             Spacer(minLength: 16)
-
-            if !dive.isDepthAutomationAvailable {
-                manualFallbackPanel
-                Spacer(minLength: 8)
-            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -162,7 +157,7 @@ struct DiveLiveView: View {
         HStack(spacing: 8) {
             Image(systemName: "water.waves")
                 .font(.system(size: 18, weight: .black))
-            Text(dive.isManualLifecycleActive ? "IMMERSIONE MANUALE" : "IN IMMERSIONE")
+            Text("IN IMMERSIONE")
                 .font(.system(size: 15, weight: .black, design: .rounded))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
@@ -254,7 +249,7 @@ struct DiveLiveView: View {
     private var depthReadout: some View {
         VStack(spacing: 0) {
             HStack(alignment: .lastTextBaseline, spacing: 4) {
-                Text(Formatters.one(dive.currentDepthMeters))
+                Text(dive.isDepthSensorAvailable ? Formatters.one(dive.currentDepthMeters) : "--")
                     .font(.system(size: 72, weight: .black, design: .rounded))
                     .minimumScaleFactor(0.42)
                     .lineLimit(1)
@@ -262,7 +257,7 @@ struct DiveLiveView: View {
                     .foregroundStyle(dive.redWarningBlink ? DiveUI.red : .white)
                     .shadow(color: dive.redWarningBlink ? DiveUI.red.opacity(0.75) : .clear, radius: 8, x: 0, y: 0)
                     .layoutPriority(1)
-                Text("m")
+                Text(dive.isDepthSensorAvailable ? "m" : "")
                     .font(.system(size: 31, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.blue)
                     .padding(.bottom, 9)
@@ -280,12 +275,12 @@ struct DiveLiveView: View {
 
     private var depthSummary: some View {
         HStack(spacing: 7) {
-            depthCard(title: "PROF. MASSIMA", value: dive.maxDepthMeters)
-            depthCard(title: "PROF. MEDIA", value: dive.averageDepthMeters)
+            depthCard(title: "PROF. MASSIMA", value: dive.isDepthSensorAvailable ? Formatters.one(dive.maxDepthMeters) : "--")
+            depthCard(title: "PROF. MEDIA", value: dive.isDepthSensorAvailable ? Formatters.one(dive.averageDepthMeters) : "--")
         }
     }
 
-    private func depthCard(title: String, value: Double) -> some View {
+    private func depthCard(title: String, value: String) -> some View {
         VStack(spacing: 2) {
             Text(title)
                 .font(.system(size: 10, weight: .semibold, design: .rounded))
@@ -293,13 +288,13 @@ struct DiveLiveView: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.62)
             HStack(alignment: .lastTextBaseline, spacing: 3) {
-                Text(Formatters.one(value))
+                Text(value)
                     .font(.system(size: 25, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.blue)
                     .monospacedDigit()
                     .lineLimit(1)
                     .minimumScaleFactor(0.62)
-                Text("m")
+                Text(value == "--" ? "" : "m")
                     .font(.system(size: 12, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.blue)
                     .padding(.bottom, 2)
@@ -350,55 +345,17 @@ struct DiveLiveView: View {
     }
 
     private var controls: some View {
-        VStack(spacing: 7) {
-            HStack(spacing: 7) {
-                DiveCommandButton("START", systemImage: "play.fill", color: DiveUI.green) {
-                    dive.startStopwatch()
-                }
-                DiveCommandButton("STOP", systemImage: "stop.fill", color: DiveUI.red) {
-                    dive.stopStopwatch()
-                }
-                DiveCommandButton("RESET", systemImage: "arrow.clockwise", color: .white.opacity(0.78)) {
-                    dive.resetStopwatch()
-                }
+        HStack(spacing: 7) {
+            DiveCommandButton("START", systemImage: "play.fill", color: DiveUI.green) {
+                dive.startStopwatch()
             }
-            if dive.isManualLifecycleActive {
-                DiveCommandButton("FINE MANUALE", systemImage: "stop.circle.fill", color: DiveUI.red) {
-                    dive.endManualDive()
-                }
+            DiveCommandButton("STOP", systemImage: "stop.fill", color: DiveUI.red) {
+                dive.stopStopwatch()
+            }
+            DiveCommandButton("RESET", systemImage: "arrow.clockwise", color: .white.opacity(0.78)) {
+                dive.resetStopwatch()
             }
         }
-    }
-
-    private var manualFallbackPanel: some View {
-        VStack(spacing: 8) {
-            Text("AUTOMAZIONE PROFONDITÀ NON DISPONIBILE")
-                .font(.system(size: 10, weight: .black, design: .rounded))
-                .foregroundStyle(DiveUI.yellow)
-                .multilineTextAlignment(.center)
-            Text("Rilevamento automatico profondità non disponibile. Usa avvio manuale.")
-                .font(.system(size: 11, weight: .black, design: .rounded))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-            Text("Sessione limitata: runtime e GPS sì, profondità automatica no.")
-                .font(.system(size: 10, weight: .semibold, design: .rounded))
-                .foregroundStyle(DiveUI.secondaryText)
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-            DiveCommandButton("AVVIO MANUALE", systemImage: "play.circle.fill", color: DiveUI.green) {
-                dive.startManualDive()
-            }
-        }
-        .padding(9)
-        .background(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(DiveUI.yellow.opacity(0.10))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .stroke(DiveUI.yellow.opacity(0.7), lineWidth: 1)
-                )
-        )
     }
 
     private func warningBanner(_ error: String) -> some View {
