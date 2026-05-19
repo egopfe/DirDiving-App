@@ -9,6 +9,7 @@ struct MoreView: View {
     @AppStorage("dirdiving_ios_units") private var units = "Metrico (m, °C)"
     @AppStorage("dirdiving_ios_export_format") private var exportFormat = "Subsurface CSV"
     @AppStorage("dirdiving_ios_show_onboarding") private var showOnboarding = true
+    @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
     @State private var notificationStatus = "Non verificato"
     @State private var showResetPairingConfirmation = false
 
@@ -29,6 +30,7 @@ struct MoreView: View {
                         systemStatus
                         onboardingCard
                         DIRCard("PREFERENZE APP", icon: "gearshape.fill", accent: DIRTheme.cyan) {
+                            languagePreferencePicker
                             unitPreferencePicker
                             lockedPreference("Export predefinito", value: exportFormat, note: "Unico formato disponibile oggi.")
                             row("Sync impostazioni", "Locale-only")
@@ -151,6 +153,36 @@ struct MoreView: View {
                 Text("La chiave peer verificata viene rimossa da questo iPhone. I nuovi payload saranno considerati non verificati finche Watch e iPhone non scambiano una nuova chiave attendibile.")
             }
         }
+    }
+
+    private var languagePreferencePicker: some View {
+        let selectedLanguage = DIRIOSAppLanguage.fromStorage(appLanguage)
+
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Lingua")
+                    .foregroundStyle(DIRTheme.muted)
+                Spacer()
+                Text(selectedLanguage.title)
+                    .foregroundStyle(.white)
+                    .fontWeight(.semibold)
+            }
+            .font(.callout)
+            Picker("Lingua", selection: $appLanguage) {
+                ForEach(DIRIOSAppLanguage.allCases) { language in
+                    Text(language.title).tag(language.rawValue)
+                }
+            }
+            .pickerStyle(.segmented)
+            Text(selectedLanguage.companionDetail)
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.yellow)
+            Text("Changing language does not change units, calculations or saved data.")
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.vertical, 5)
     }
 
     private var systemStatus: some View {
