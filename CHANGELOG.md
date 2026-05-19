@@ -4,6 +4,24 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-19, pass pre-release backlog — UX-H/M/L + SAF + simulator QA)
+
+- `Docs/MAIN_PRE_RELEASE_OPEN_ITEMS_20260519.md` — backlog rimanente / item rinviati post pre-release pass, con motivazione per Watch imperial conversion, GPX/UDDF exporter, per-field cloud merge per Equipment/Planner, side-button capture watchOS, convergenza branch `main` ↔ `main-iOS`.
+- `Docs/MAIN_PRE_RELEASE_SIMULATOR_QA_20260519.md` — checklist QA eseguibile su Watch Ultra, Watch piccolo, iPhone SE e iPhone Pro Max: build smoke test, UX-H1..H4 acceptance, SAF-3..SAF-10, App Intents, haptics matrix, a11y, Dynamic Type.
+- Sezione **Pre-release backlog (2026-05-19, UX-H/M/L + SAF-3..SAF-10)** in `README.md` con tabella di acceptance per area e procedura di reintegro dei 3 commit Watch backlog.
+- Branch di sicurezza locale `backup/before-docs-pre-release-pass-20260519` creato prima del commit documentazione di questo pass.
+- Branch di sicurezza locale `backup/main-watch-backlog-20260519` (creato in pass precedente) conserva i 3 commit Watch UX-H/M/L (`cbcabf7`, `c685155`, `efa53e4`) in attesa di riconciliazione con il cluster security F1–F12 sui file `Services/WatchSyncService.swift` e `Services/WatchDiveSyncCodec.swift`.
+- `Docs/DOCUMENTATION_UPDATE_REPORT_20260519_PRE_RELEASE_BACKLOG.md` — report strutturato A–K post-pass pre-release backlog.
+
+### Changed (2026-05-19, pass pre-release backlog)
+
+- Aggiunte righe additive in `Docs/DIR_DIVING_Feature_Comparison.csv` per i nuovi documenti, lo stato per-area UX-H/M/L + SAF-3..SAF-10, e l'evidenza del backup branch Watch backlog (status `Pending merge`).
+
+### Nota
+
+- Lato `origin/main-iOS` (commit `bf4718d`) sono già live SAF-3 (TTV info accessibility hint + nota muted in `iOSApp/Views/DiveDetailView.swift`) e SAF-4 (bound CSV `maxDepthMeters = 200`, `maxDurationSeconds = 28 800`, `temperatureRange = -2…40 °C` in `iOSApp/Services/DiveImportService.swift`).
+- Nessuna modifica a business logic, decompressione, TTV/TTR algoritmi, modello gas o regole sync in questo pass. Nessun file experimental toccato. Terminologia UI: `BUSSOLA`, mai `COMPASSO`.
+
 ### Added (2026-05-19, pass documentazione security PT2)
 
 - Sezione **QA Security (audit F1–F12, baseline 2026-05-19)** in `Docs/RELEASE_CHECKLIST.md` con sotto-sezioni Auth/pairing, Persistenza/Data Protection, Sync protocol, Input validation, Logging/naming, Privacy/leakage.

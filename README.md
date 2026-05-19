@@ -87,6 +87,52 @@ Audit statico in [`Docs/SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md`](Docs/SECU
 
 > Su `origin/main-iOS` (PR #9 / branch `codex/ios-experimental-features`) restano due regressioni note rispetto a `main`: rimozione di `.completeFileProtection`/cleanup nell'export iOS e rimozione dei bound di import CSV. Vedi sezione *Appendix A* dell'audit. Da bloccare in eventuali merge verso MAIN.
 
+## Pre-release backlog (2026-05-19, UX-H/M/L + SAF-3..SAF-10)
+
+Pass UX/Interaction/Feature Accessibility seguito dall'esecuzione MAIN PRE-RELEASE BACKLOG (vedi audit del 2026-05-19). Vincoli rispettati: nessuna modifica a business logic, decompressione, TTV/TTR, modello gas, regole sync; nessun ridisegno UI/UX; nessun file experimental toccato; terminologia UI invariata (`BUSSOLA`, mai `COMPASSO`).
+
+Nuovi documenti pubblicati su `main` e `main-iOS`:
+
+- [`Docs/MAIN_PRE_RELEASE_OPEN_ITEMS_20260519.md`](Docs/MAIN_PRE_RELEASE_OPEN_ITEMS_20260519.md) — backlog rimanente / item rinviati con motivazione (imperial Watch, GPX/UDDF exporter, per-field cloud merge, side-button capture watchOS, convergenza branch).
+- [`Docs/MAIN_PRE_RELEASE_SIMULATOR_QA_20260519.md`](Docs/MAIN_PRE_RELEASE_SIMULATOR_QA_20260519.md) — checklist QA eseguibile su Watch Ultra, Watch piccolo, iPhone SE, iPhone Pro Max (HEAD presence, ascent gauge co-visible, GPS banner compatto, alarm acknowledge cooldown, SAF-3/SAF-4, App Intents, haptics matrix, a11y, Dynamic Type).
+
+Backlog Watch eseguito ma **non ancora su `origin/main`** — i 3 commit pre-release Watch (`cbcabf7`, `c685155`, `efa53e4`) coprono UX-H1/H3/H4/H2 lato consumatore + UX-M1/M3/M4/M5/M8 + UX-L1/L2/L5/L6/L8/L9 + SAF-7 + App Intents (Start/End Manual Dive, Set/Clear Bearing, Acknowledge Alarm). Conservati nel branch locale **`backup/main-watch-backlog-20260519`** in attesa di riconciliazione con il cluster security F1–F12 (entrambi i lati editano `Services/WatchSyncService.swift` e `Services/WatchDiveSyncCodec.swift`). Procedura di reintegro suggerita:
+
+```bash
+git checkout main
+git fetch origin
+git cherry-pick cbcabf7 c685155 efa53e4
+# risolvere conflitti in Services/WatchSyncService.swift e
+# Services/WatchDiveSyncCodec.swift preferendo il commit security F1–F12 dove
+# tocca crittografia/protezione dati e il commit backlog dove tocca solo UX.
+git push origin main
+```
+
+Lato `main-iOS`, le due rimanenze (SAF-3 visual + SAF-4 bound CSV più aggressivi) sono già sul ramo come commit `bf4718d`:
+
+- **SAF-3 (iOS)**: `iOSApp/Views/DiveDetailView.swift` aggiunge label + hint accessibilità sul tile *TTV info* e una nota muted *"TTV informativo: derivato da profondità media + runtime; non è un valore decompressivo o time-to-surface."*. Allineato visivamente al Watch (`TTV INFO` in `DiveUI.secondaryText`).
+- **SAF-4 (iOS)**: `iOSApp/Services/DiveImportService.swift` restringe i bound CSV ai valori del backlog 2026-05-19: `maxDepthMeters = 200`, `maxDurationSeconds = 28 800` (480 min), `temperatureRange = -2…40 °C`. Le righe fuori range vengono saltate e contate (`ImportSummary.skippedMalformedCount`), il formato CSV business non cambia.
+
+Acceptance state per area:
+
+| Area | Item | Stato su `origin/main` (Watch) | Stato su `origin/main-iOS` (iOS) |
+|---|---|---|---|
+| UX-H1 / SAF-6 | Tombstone unified key `dirdiving_shared_deleted_session_ids` | Pending merge (backup) | Implemented |
+| UX-H2 | iOS → Watch verified push + Watch consumer | Pending merge (backup) | Implemented |
+| UX-H3 / SAF-1 | Ascent warning + gauge co-visible | Pending merge (backup) | n/a (Watch-only) |
+| UX-H4 / SAF-2 | GPS confirmation compact banner | Pending merge (backup) | n/a (Watch-only) |
+| UX-H5 | Canonical iOS branch (`main-iOS`) documented | Documented | Implemented |
+| UX-M1..M13 | UX cluster (ModeSelection, hidden nav, retry, toast, info-rows, units, activation labels, notif perm, planner modes, etc.) | Pending merge (Watch); Implemented (iOS) | Implemented |
+| UX-L1..L9 | LOW cluster (icon copy, units pill, dead code, CLEAR disabled, a11y, Dynamic Type, alarm step, dedupe delete) | Pending merge (Watch); Implemented (iOS) | Implemented |
+| SAF-3 | TTV semantics clarification | Pending (Watch backup) | Implemented (`bf4718d`) |
+| SAF-4 | CSV bound tightening | n/a | Implemented (`bf4718d`) |
+| SAF-7 | Haptics-off badge pre-dive | Pending merge (backup) | n/a |
+| SAF-8 | Alarm acknowledge with cooldown | Pending merge (backup) | n/a |
+| SAF-9 | Planner safety per-launch acknowledgement | n/a | Implemented |
+| SAF-10 | Per-session sync delivery status | TODO surfaced honestly in Settings/MoreView | TODO surfaced honestly |
+
+Build verification: `xcodegen generate` riesce su entrambi i worktree; `swiftc -parse/-typecheck` di tutti i file toccati passa su iOS 26.5 e watchOS 26.5 SDK. Full `xcodebuild` richiede l'installazione dei platform runtime (Xcode → Settings → Components, oppure `xcodebuild -downloadPlatform iOS` / `xcodebuild -downloadPlatform watchOS`); comandi completi in `Docs/MAIN_PRE_RELEASE_SIMULATOR_QA_20260519.md` §0.
+
 ## Lingue e internazionalizzazione (i18n)
 
 Da `fadd8a6` + `4cca72e` su `main`:
