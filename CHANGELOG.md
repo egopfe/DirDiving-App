@@ -4,6 +4,14 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-19, pass i18n)
+
+- `Docs/DOCUMENTATION_UPDATE_REPORT_20260519_I18N.md` — report strutturato A–K post-pass internazionalizzazione.
+- Sezione **Lingue e internazionalizzazione (i18n)** in `README.md` con descrizione enum, persistenza, locale runtime, picker e vincoli.
+- Voce roadmap i18n in `README.md`.
+- Colonna **Internationalization** nell'header di `Docs/DIR_DIVING_Feature_Comparison.csv` e righe additive *Localization* per Watch/iOS (selettore lingua, tabelle stringhe, logbook locale-aware, hint VoiceOver, gap residui, sync cross-device pianificato).
+- Backup branch locale `backup/before-docs-merge-20260519-i18n` prima del commit.
+
 ### Added (2026-05-19, secondo pass)
 
 - `Docs/DOCUMENTATION_UPDATE_REPORT_20260519.md` — report strutturato A–K (file aggiornati, branch, PR, rischi).

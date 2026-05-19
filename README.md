@@ -65,9 +65,23 @@ Le istruzioni di build sono in [`Docs/BUILD_VALIDATION.md`](Docs/BUILD_VALIDATIO
 
 ### Matrice funzionalità (CSV)
 
-La tabella aggiornata con colonne Area / Branch / App / Mode / Feature / Status / Description / UI Reference / Notes:
+La tabella aggiornata con colonne Area / Branch / App / Mode / Feature / Status / Description / UI Reference / Notes (più la colonna Internationalization aggiunta in coda per le nuove righe):
 
 [`Docs/DIR_DIVING_Feature_Comparison.csv`](Docs/DIR_DIVING_Feature_Comparison.csv)
+
+## Lingue e internazionalizzazione (i18n)
+
+Da `fadd8a6` + `4cca72e` su `main`:
+
+- **Selettore lingua per app**: `DIRAppLanguage` (Watch) e `DIRIOSAppLanguage` (iOS) in `App/DIRAppLanguage.swift` e `iOSApp/App/DIRIOSAppLanguage.swift`. Tre casi: **`system`**, **`it`** (Italiano), **`en`** (English).
+- **Persistenza**: `@AppStorage("dirdiving_app_language")` indipendente su Watch e iPhone (sandbox separati; non sincronizzato cross-device).
+- **Locale runtime**: `.environment(\.locale, …)` impostato sulla root `WindowGroup` di entrambe le app.
+- **Tabelle stringhe**: `Resources/{en,it}.lproj/Localizable.strings` (Watch) e `iOSApp/Resources/{en,it}.lproj/Localizable.strings` (iOS). Aggiunta più recente: chiavi stabili `tab.*` (Logbook/Analisi/Planner/Attrezzatura/Altro), `logbook.delete.a11y`, `accessibility.command_button.hint`.
+- **UI**: picker in Watch `SettingsView` (sezione *Lingua*) e in iOS `MoreView` con disclaimer *"Changing language does not change units, calculations or saved data."*
+- **Logbook iOS**: i mesi/intestazioni rispettano `@Environment(\.locale)` invece di forzare `it_IT`.
+- **Estensibilità**: per aggiungere una lingua bastano (a) un nuovo case negli enum `DIRAppLanguage`/`DIRIOSAppLanguage`, (b) una nuova cartella `xx.lproj/Localizable.strings`, (c) eventualmente estendere la fallback `supportedSystemLocale` (oggi `en`/`it`; altri sistemi cadono in italiano).
+- **Vincoli**: la modifica della lingua **non** cambia unità di misura, calcoli, persistenza o dati salvati.
+- **Debito noto**: molti `Text("…")` letterali nelle viste non sono ancora migrati alle tabelle; con `locale = en` resta del testo italiano fisso finché non viene chiavato. Da pianificare migrazione progressiva (eventualmente a String Catalog `.xcstrings`).
 
 ## Visual Design Standard
 
@@ -677,6 +691,7 @@ Dopo il report `Docs/EXPERIMENTAL_FUNCTIONS_UX_AUDIT_20260517_PRE_MODIFICATION.d
 - Introdurre workflow MapLibre/OpenSeaMap/MBTiles sul companion iOS dopo valutazione licenze e prestazioni.
 - Aggiungere report test hardware Apple Watch Ultra per Diving, Snorkeling e Apnea.
 - Preparare export e documentazione Subsurface piu completa per import CSV.
+- **i18n**: completare migrazione stringhe alle tabelle `Localizable.strings` (o `.xcstrings`); valutare unificazione `DIRAppLanguage` / `DIRIOSAppLanguage` in un modulo condiviso; eventuale sync preferenza lingua via WatchConnectivity.
 
 ## Aggiornamento pre-release 2026-05-18
 
