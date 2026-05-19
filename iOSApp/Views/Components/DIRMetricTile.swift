@@ -23,7 +23,7 @@ struct DIRMetricTile: View {
         VStack(alignment: .center, spacing: 7) {
             HStack {
                 if let icon { Image(systemName: icon).font(.caption.weight(.bold)).foregroundStyle(color) }
-                Text(title.uppercased())
+                Text(LocalizedStringKey(title.uppercased()))
                     .font(.system(size: 10, weight: .bold, design: .rounded))
                     .foregroundStyle(DIRTheme.muted)
                     .lineLimit(1)

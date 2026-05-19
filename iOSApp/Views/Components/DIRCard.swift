@@ -22,7 +22,7 @@ struct DIRCard<Content: View>: View {
                             .font(.subheadline.weight(.bold))
                             .foregroundStyle(accent ?? DIRTheme.cyan)
                     }
-                    Text(title.uppercased())
+                    Text(LocalizedStringKey(title.uppercased()))
                         .font(.system(size: 13, weight: .bold, design: .rounded))
                         .tracking(0.8)
                         .foregroundStyle(.white)

@@ -8,6 +8,7 @@ struct DIRDivingiOSApp: App {
     @StateObject private var plannerStore: PlannerStore
     @StateObject private var buddyExperimentalStore: BuddyExperimentalStore
     @StateObject private var explorationPlanningStore: ExplorationPlanningStore
+    @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
 
     init() {
         let cloudSync = CloudSyncStore()
@@ -27,6 +28,7 @@ struct DIRDivingiOSApp: App {
                 .environmentObject(buddyExperimentalStore)
                 .environmentObject(explorationPlanningStore)
                 .environmentObject(cloudSync)
+                .environment(\.locale, DIRIOSAppLanguage.fromStorage(appLanguage).locale)
                 .preferredColorScheme(.dark)
                 .onAppear { watchSync.activate(logStore: logStore) }
         }
