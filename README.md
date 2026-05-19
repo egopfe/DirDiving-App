@@ -69,6 +69,24 @@ La tabella aggiornata con colonne Area / Branch / App / Mode / Feature / Status 
 
 [`Docs/DIR_DIVING_Feature_Comparison.csv`](Docs/DIR_DIVING_Feature_Comparison.csv)
 
+## Sicurezza e sync (security baseline 2026-05-19)
+
+Audit statico in [`Docs/SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md`](Docs/SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md) (18 finding: 2 HIGH / 4 MEDIUM / 6 LOW / 6 INFO). Remediation F1–F12 applicate in commit `4136ec0`:
+
+- **Auth pairing**: `WatchSyncAuth.resetPeerTrust()` ripristinato su iOS MAIN; UI di reset associazione Watch ora funzionante.
+- **Sync key autoritativa**: algoritmo HMAC `v2 ordered-secrets` documentato con commento `MARK` su entrambi i `WatchSyncAuth.swift` (Watch + iOS). Cambi futuri richiedono bump di `WatchDiveSyncCodec.schemaVersion` + release coordinata.
+- **Data Protection**: Watch CSV export ora `[.atomic, .completeFileProtection]` con UUID filename e cleanup 24 h. Pending queue Watch (`dirdiving_watch_pending_sync_sessions.json`) e conflicts iOS (`dirdiving_ios_watch_sync_conflicts.json`) migrati da `UserDefaults` a `Documents/` con `.completeFileProtection`; legacy keys ripulite dopo migrazione one-shot.
+- **Replay window**: `WatchDiveSyncCodec.maxIssuedAtSkew` ridotto da **24 h → 1 h** (3 600 s).
+- **CSV import**: cap di **10 MB** con nuovo errore `.fileTooLarge`. Bound `maxDiveDurationSeconds / maxDepthMeters / validTemperatureRange / isValidGPS` confermati su MAIN.
+- **Naming canonical**: nuove costanti `dirdiving_*` (Keychain service iOS, `Notification.Name`, `AscentRateSettingsStore` key) con read-fallback dal legacy `dirmotion_*`. Nessuna chiave persistita rimossa direttamente.
+- **No deterministic fallback**: se `SecRandomCopyBytes` fallisce, il secret locale non viene più derivato in modo deterministico; il flusso fallisce in modo esplicito loggando via `os.Logger` con `privacy:.private`.
+- **Signed WatchConnectivity ack**: ack HMAC su `"ack|sessionID|issuedAt"`; iOS calcola e firma il reply, Watch verifica in tempo costante. Mantenuto fallback `status == acknowledged` per build iOS legacy (TODO follow-up: rimuovere quando il floor build sale).
+- **Logging**: `print` rimossi da `Services/DiveLogStore.swift` → `os.Logger` con `privacy:.private`. Nessun GPS/session content esposto in console.
+
+**Vincoli mantenuti**: nessuna modifica a GPS, BUSSOLA, calcoli profondità/risalita, decompressione, sampling sensori, formato CSV business (header/ordine colonne) e UI/UX.
+
+> Su `origin/main-iOS` (PR #9 / branch `codex/ios-experimental-features`) restano due regressioni note rispetto a `main`: rimozione di `.completeFileProtection`/cleanup nell'export iOS e rimozione dei bound di import CSV. Vedi sezione *Appendix A* dell'audit. Da bloccare in eventuali merge verso MAIN.
+
 ## Lingue e internazionalizzazione (i18n)
 
 Da `fadd8a6` + `4cca72e` su `main`:
