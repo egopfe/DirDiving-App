@@ -67,6 +67,10 @@ final class DiveLogStore: ObservableObject {
         sessions = sessions.sorted { $0.startDate > $1.startDate }
     }
 
+    func session(id: UUID) -> DiveSession? {
+        sessions.first { $0.id == id }
+    }
+
     func delete(id: UUID) {
         deletedSessionIDs.insert(id)
         sessions.removeAll { $0.id == id }

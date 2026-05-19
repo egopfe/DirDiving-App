@@ -64,7 +64,7 @@ struct SettingsView: View {
                         icon: "mappin.and.ellipse",
                         iconColor: DiveUI.cyan,
                         title: "Comportamento GPS",
-                        subtitle: "Solo entry/exit superficie; fallback etichettato"
+                        subtitle: "Solo in superficie; in acqua il segnale GPS non e attendibile. Coordinate mancanti = ultimo fix noto o non disponibile (etichettato)."
                     )
                     statusRow(
                         icon: "drop.fill",

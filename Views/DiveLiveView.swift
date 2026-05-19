@@ -1,5 +1,7 @@
 import SwiftUI
 
+/// **Screen intent (Watch MAIN):** in-water dashboard — depth hero, TTV/RunTime summary, ascent gauge, stopwatch, lifecycle controls.
+/// Visual target: black canvas, neon accents, rounded panels (`Docs/ReferenceUI/Watch_LIVE_reference.png`).
 struct DiveLiveView: View {
     @EnvironmentObject private var dive: DiveManager
     @AppStorage(HapticService.hapticsEnabledKey) private var hapticsEnabled = true

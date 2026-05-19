@@ -61,7 +61,6 @@ targets:
           - Models/BuddyExperimentalModels.swift
           - Services/ExplorationPlanningStore.swift
           - Services/BuddyExperimentalStore.swift
-          - Services/PlannerStore.swift
           - Views/ExplorationCenterView.swift
           - Views/ExperimentalFutureConceptsView.swift
           - Views/BuddyExperimentalView.swift

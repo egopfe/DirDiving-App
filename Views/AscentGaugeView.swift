@@ -37,6 +37,11 @@ struct AscentGaugeView: View {
                         .stroke(DiveUI.hairline, lineWidth: 1)
                 )
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Gauge velocita di risalita")
+        .accessibilityValue(
+            "Scala fino a \(Formatters.one(status.limitMetersPerMinute)) metri al minuto. Indicatore a \(Formatters.one(status.currentRateMetersPerMinute)) metri al minuto."
+        )
         .animation(.easeInOut(duration: 0.22), value: status.currentRateMetersPerMinute)
     }
 
