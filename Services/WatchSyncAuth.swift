@@ -2,16 +2,22 @@ import Foundation
 import CryptoKit
 import Security
 import WatchConnectivity
+import os
 
 enum WatchSyncAuth {
     static let contextKey = "dirdiving_watch_sync_secret"
     private static let keychainService = "com.egopfe.dirdiving.watch-sync"
     private static let keychainAccount = "shared-secret"
 
+    private static let logger = Logger(subsystem: "com.egopfe.dirdiving", category: "WatchSyncAuth")
+
     static func publishSharedSecretIfNeeded() {
         guard WCSession.isSupported(),
               WCSession.default.activationState == .activated else { return }
-        let secret = loadOrCreateLocalSecret()
+        guard let secret = loadOrCreateLocalSecret() else {
+            logger.error("Local Watch sync secret unavailable: SecRandomCopyBytes failed; refusing to publish a deterministic fallback.")
+            return
+        }
         try? WCSession.default.updateApplicationContext([contextKey: secret.base64EncodedString()])
     }
 
@@ -27,11 +33,21 @@ enum WatchSyncAuth {
         NotificationCenter.default.post(name: .watchSyncPeerSecretDidUpdate, object: nil)
     }
 
+    // MARK: - Sync key derivation
+    //
+    // Authoritative algorithm = `v2 ordered-secrets` (see Docs/SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md F2).
+    // BOTH sides (Watch + iOS) on `main` MUST keep this implementation byte-identical.
+    // Any change to the canonical string or the ordering rule REQUIRES a bump of
+    // `WatchDiveSyncCodec.schemaVersion` and a coordinated Watch/iOS release.
     static func syncKey(peerBundleID _: String) -> SymmetricKey {
         guard let secret = loadPeerSecret() else {
-            return SymmetricKey(data: SHA256.hash(data: Data()))
+            logger.error("syncKey requested without verified peer secret; returning zero key (callers must short-circuit via hasPeerSecret()).")
+            return SymmetricKey(data: Data(repeating: 0, count: 32))
         }
-        let localSecret = loadOrCreateLocalSecret()
+        guard let localSecret = loadOrCreateLocalSecret() else {
+            logger.error("syncKey requested but local secret unavailable; returning zero key.")
+            return SymmetricKey(data: Data(repeating: 0, count: 32))
+        }
         let orderedSecrets = [localSecret, secret].sorted { $0.lexicographicallyPrecedes($1) }
         var material = Data("dirdiving.watch.sync.v2|com.egopfe.dirdiving|com.egopfe.dirdiving.ios|".utf8)
         material.append(orderedSecrets[0])
@@ -39,12 +55,13 @@ enum WatchSyncAuth {
         return SymmetricKey(data: SHA256.hash(data: material))
     }
 
-    private static func loadOrCreateLocalSecret() -> Data {
+    private static func loadOrCreateLocalSecret() -> Data? {
         if let existing = loadKeychain(account: keychainAccount) {
             return existing
         }
         guard let generated = try? randomKeyData(byteCount: 32) else {
-            return Data(SHA256.hash(data: Data("dirmotion.watch.sync.local".utf8)))
+            // F7: never fall back to a deterministic secret — fail loud instead.
+            return nil
         }
         saveKeychain(generated, account: keychainAccount)
         return generated

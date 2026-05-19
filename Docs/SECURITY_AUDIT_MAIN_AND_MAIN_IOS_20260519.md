@@ -365,3 +365,24 @@ Nessuna delle remediation richiede nuove dipendenze esterne. Tutto è risolvibil
 ---
 
 **Autore audit:** review statico AI · **Branch report committato su:** `main` · **Backup pre-commit:** `backup/before-docs-merge-20260519-i18n`.
+
+---
+
+## Appendix A — Status remediation (2026-05-19)
+
+| # | Stato | Note |
+|---|-------|------|
+| F1 | **FIXED** | `WatchSyncAuth.resetPeerTrust()` + `deleteKeychain(account:service:)` aggiunti su `iOSApp/Services/WatchSyncAuth.swift`. |
+| F2 | **DOCUMENTED + ALIGNED** | Commento MARK su entrambi i `WatchSyncAuth.swift` MAIN. Algoritmo autoritativo = `v2 ordered-secrets`. Per cambiarlo serve bump `schemaVersion` e release coordinata. |
+| F3 | **FIXED** | `Services/SubsurfaceExportService.swift` ora usa `[.atomic, .completeFileProtection]`, UUID filename, `cleanupTemporaryExports()` 24 h. CSV business format invariato. |
+| F4 | **NO CHANGE NEEDED** | `iOSApp/Services/SubsurfaceExportService.swift` su `main` già conforme; non importare la versione `main-iOS` quando si effettueranno merge. |
+| F5 | **NO CHANGE NEEDED** | `iOSApp/Services/DiveImportService.swift` su `main` mantiene i bound. Stessa raccomandazione vs `main-iOS`. |
+| F6 | **FIXED** | `iOSApp/Services/WatchDiveSyncCodec.maxIssuedAtSkew = 3_600`. |
+| F7 | **FIXED** | `loadOrCreateLocalSecret() -> Data?`. Fallback deterministico rimosso. Logging via `os.Logger` `privacy:.private`. |
+| F8 | **FIXED + MIGRATION** | Nuove costanti `dirdiving_*`; legacy `dirmotion_*` letta come fallback one-shot. Nessuna chiave persistita rimossa direttamente. |
+| F9 | **FIXED + MIGRATION** | Pending Watch e conflicts iOS in `Documents/*.json` con `.completeFileProtection`; UserDefaults legacy ripuliti dopo migrazione. |
+| F10 | **FIXED** | `DiveImportService.maxImportBytes = 10 MB`, nuovo errore `.fileTooLarge`, doppio check size + bytes UTF-8. |
+| F11 | **PARTIAL FIX** | Ack firmato HMAC implementato; legacy `status == acknowledged` ancora accettato per compatibilità. **TODO(F11-followup)**: rendere firmato obbligatorio quando il floor build iOS sale. |
+| F12 | **FIXED** | `os.Logger` in `Services/DiveLogStore.swift` con `privacy:.private`. |
+
+UI/UX immutate. Nessuna modifica a algoritmi di immersione, decompressione, GPS o BUSSOLA. Nessun branch sperimentale toccato.

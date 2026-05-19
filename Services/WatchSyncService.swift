@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import WatchConnectivity
+import os
 
 @MainActor
 final class WatchSyncService: NSObject, ObservableObject {
@@ -16,8 +17,16 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published private(set) var lastRetryDate: Date?
 
     private var pendingSessions: [DiveSession] = []
-    private let pendingSessionsKey = "dirdiving_watch_pending_sync_sessions"
+
+    // F9: persist the pending queue to a Documents/ file with `.completeFileProtection`
+    // rather than UserDefaults, because each entry is a full DiveSession including
+    // GPS coordinates. The legacy UserDefaults key is migrated once on init.
+    private let legacyPendingSessionsKey = "dirdiving_watch_pending_sync_sessions"
+    private let pendingFileName = "dirdiving_watch_pending_sync_sessions.json"
+
     private var peerSecretObserver: NSObjectProtocol?
+
+    private static let logger = Logger(subsystem: "com.egopfe.dirdiving", category: "WatchSyncService")
 
     private override init() {
         super.init()
@@ -96,32 +105,50 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     private func sendQueued(_ session: DiveSession) {
         do {
-            let payload = try WatchDiveSyncCodec.makePayload(session: session)
+            let envelope = try WatchDiveSyncCodec.makePayload(session: session)
 
             if WCSession.default.isReachable {
-                WCSession.default.sendMessage(payload) { [weak self] reply in
+                WCSession.default.sendMessage(envelope.message) { [weak self] reply in
                     Task { @MainActor in
-                        if reply["status"] as? String == "acknowledged" {
-                            self?.removePendingSession(id: session.id)
-                            self?.acknowledgedTransferCount += 1
-                            self?.lastSyncStatus = "Delivered/acknowledged: immersione ricevuta dal companion"
+                        guard let self else { return }
+                        // F11: prefer the cryptographic ack. Fall back to the legacy
+                        // `status == acknowledged` only when the signature is absent,
+                        // so this rollout stays compatible with older iOS builds.
+                        // TODO(F11-followup): require the signed ack and treat the
+                        // legacy path as `failed` once the iOS floor build is bumped.
+                        let providedSignature = reply["ackSignature"] as? String
+                        let signedOK = WatchDiveSyncCodec.verifyAckSignature(
+                            providedSignature,
+                            sessionID: envelope.sessionID,
+                            issuedAt: envelope.issuedAt
+                        )
+                        let legacyOK = (reply["status"] as? String == "acknowledged")
+                        if signedOK {
+                            self.removePendingSession(id: session.id)
+                            self.acknowledgedTransferCount += 1
+                            self.lastSyncStatus = "Delivered/acknowledged: ack firmato dal companion"
+                        } else if legacyOK {
+                            self.removePendingSession(id: session.id)
+                            self.acknowledgedTransferCount += 1
+                            self.lastSyncStatus = "Delivered/acknowledged: ack legacy (companion da aggiornare)"
                         } else {
-                            self?.failedTransferCount += 1
-                            self?.lastSyncStatus = "Failed: iPhone non ha confermato import; pending conservato"
+                            self.failedTransferCount += 1
+                            self.lastSyncStatus = "Failed: iPhone non ha confermato import; pending conservato"
                         }
                     }
                 } errorHandler: { [weak self] error in
                     Task { @MainActor in
-                        self?.failedTransferCount += 1
-                        self?.lastSyncStatus = "Failed: diretto non riuscito; sent via coda, ack pending: \(error.localizedDescription)"
-                        self?.sentTransferCount += 1
-                        WCSession.default.transferUserInfo(payload)
+                        guard let self else { return }
+                        self.failedTransferCount += 1
+                        self.lastSyncStatus = "Failed: diretto non riuscito; sent via coda, ack pending: \(error.localizedDescription)"
+                        self.sentTransferCount += 1
+                        WCSession.default.transferUserInfo(envelope.message)
                     }
                 }
                 sentTransferCount += 1
                 lastSyncStatus = "Sent: messaggio diretto inviato, attendo ack"
             } else {
-                WCSession.default.transferUserInfo(payload)
+                WCSession.default.transferUserInfo(envelope.message)
                 sentTransferCount += 1
                 lastSyncStatus = "Sent: coda WatchConnectivity, ack pending"
             }
@@ -132,6 +159,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         } catch {
             failedTransferCount += 1
             lastSyncStatus = "Failed: errore codifica sync: \(error.localizedDescription)"
+            Self.logger.error("Watch sync encode failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 
@@ -149,18 +177,45 @@ final class WatchSyncService: NSObject, ObservableObject {
         savePendingSessions()
     }
 
+    private func pendingFileURL() -> URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent(pendingFileName)
+    }
+
     private func loadPendingSessions() -> [DiveSession] {
-        guard let data = UserDefaults.standard.data(forKey: pendingSessionsKey) else { return [] }
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
-        return (try? decoder.decode([DiveSession].self, from: data)) ?? []
+
+        let url = pendingFileURL()
+        if FileManager.default.fileExists(atPath: url.path),
+           let data = try? Data(contentsOf: url),
+           let decoded = try? decoder.decode([DiveSession].self, from: data) {
+            return decoded
+        }
+
+        // F9 migration: read once from UserDefaults, persist to the protected
+        // file, then drop the legacy key so PII no longer lives in UserDefaults.
+        guard let legacyData = UserDefaults.standard.data(forKey: legacyPendingSessionsKey) else { return [] }
+        let migrated = (try? decoder.decode([DiveSession].self, from: legacyData)) ?? []
+        if !migrated.isEmpty {
+            persistPendingSessions(migrated)
+        }
+        UserDefaults.standard.removeObject(forKey: legacyPendingSessionsKey)
+        return migrated
     }
 
     private func savePendingSessions() {
+        persistPendingSessions(pendingSessions)
+    }
+
+    private func persistPendingSessions(_ value: [DiveSession]) {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
-        if let data = try? encoder.encode(pendingSessions) {
-            UserDefaults.standard.set(data, forKey: pendingSessionsKey)
+        guard let data = try? encoder.encode(value) else { return }
+        do {
+            try data.write(to: pendingFileURL(), options: [.atomic, .completeFileProtection])
+        } catch {
+            Self.logger.error("Persist watch-sync pending sessions failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 }

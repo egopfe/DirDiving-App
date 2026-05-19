@@ -8,7 +8,10 @@ final class AscentRateSettingsStore: ObservableObject {
     }
 
     private let defaults: UserDefaults
-    private let key = "dirmotion_ascent_rate_limits"
+    // F8: canonical key uses `dirdiving` prefix; legacy `dirmotion` key is read once
+    // as a migration source and then re-saved under the canonical key.
+    private let key = "dirdiving_ascent_rate_limits"
+    private let legacyKey = "dirmotion_ascent_rate_limits"
     private let cloudSync = CloudSyncStore()
     private var cloudObserver: NSObjectProtocol?
 
@@ -19,6 +22,11 @@ final class AscentRateSettingsStore: ObservableObject {
         } else if let data = defaults.data(forKey: key),
            let decoded = try? JSONDecoder().decode(AscentRateLimits.self, from: data) {
             limits = decoded
+        } else if let cloudLegacy = cloudSync.load(AscentRateLimits.self, forKey: legacyKey) {
+            limits = cloudLegacy
+        } else if let legacyData = defaults.data(forKey: legacyKey),
+                  let decodedLegacy = try? JSONDecoder().decode(AscentRateLimits.self, from: legacyData) {
+            limits = decodedLegacy
         } else {
             limits = .standard
         }

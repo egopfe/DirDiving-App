@@ -20,6 +20,7 @@ enum DiveImportService {
         case missingColumns
         case emptyProfile
         case invalidRows(Int)
+        case fileTooLarge
 
         var errorDescription: String? {
             switch self {
@@ -27,9 +28,15 @@ enum DiveImportService {
             case .missingColumns: return "CSV non compatibile: colonne richieste mancanti."
             case .emptyProfile: return "CSV senza campioni immersione."
             case .invalidRows(let count): return "CSV non valido: \(count) righe con data, durata, profondita o temperatura non valide."
+            case .fileTooLarge: return "CSV troppo grande: limite \(Int(maxImportBytes / 1_048_576)) MB."
             }
         }
     }
+
+    // F10: cap CSV files at 10 MB before loading them into memory, so a giant
+    // user-selected file cannot OOM-crash the app. Bound chosen as a multiple of
+    // realistic Subsurface exports (hundreds of KB per dive).
+    static let maxImportBytes: Int = 10 * 1_048_576
 
     static func importCSV(from url: URL) -> Result<ImportSummary, ImportError> {
         let didAccess = url.startAccessingSecurityScopedResource()
@@ -37,8 +44,16 @@ enum DiveImportService {
             if didAccess { url.stopAccessingSecurityScopedResource() }
         }
 
+        if let values = try? url.resourceValues(forKeys: [.fileSizeKey]),
+           let size = values.fileSize, size > maxImportBytes {
+            return .failure(.fileTooLarge)
+        }
+
         guard let contents = try? String(contentsOf: url, encoding: .utf8) else {
             return .failure(.unreadableFile)
+        }
+        guard contents.utf8.count <= maxImportBytes else {
+            return .failure(.fileTooLarge)
         }
 
         let rows = parseCSV(contents)

@@ -1,8 +1,13 @@
 ﻿import Foundation
 import SwiftUI
+import os
 
 @MainActor
 final class DiveLogStore: ObservableObject {
+    // F12: structured logging via os.Logger so error details are redacted from
+    // the public device log and never accidentally surface GPS / session content.
+    private static let logger = Logger(subsystem: "com.egopfe.dirdiving", category: "DiveLogStore")
+
     @Published private(set) var sessions: [DiveSession] = []
     @Published private(set) var loadErrorMessage: String?
     private let fileName = "dirdiving_sessions.json"
@@ -105,7 +110,9 @@ final class DiveLogStore: ObservableObject {
             try data.write(to: fileURL(), options: [.atomic, .completeFileProtection])
             cloudSync.save(sessions, forKey: cloudKey)
             cloudSync.save(Array(deletedSessionIDs), forKey: deletedCloudKey)
-        } catch { print("Save error: \(error.localizedDescription)") }
+        } catch {
+            Self.logger.error("DiveLogStore save failed: \(error.localizedDescription, privacy: .private)")
+        }
     }
 
     private func fileURL() -> URL {

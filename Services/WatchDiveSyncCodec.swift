@@ -17,7 +17,16 @@ enum WatchDiveSyncCodec {
         let signature: String
     }
 
-    static func makePayload(session: DiveSession) throws -> [String: Any] {
+    // F11: callers (WatchSyncService) need the sessionID + issuedAt to verify
+    // the signed ack returned by the iOS companion. The legacy `acknowledged`
+    // string is still accepted for backward compatibility (older iOS builds).
+    struct PayloadEnvelope {
+        let message: [String: Any]
+        let sessionID: UUID
+        let issuedAt: Date
+    }
+
+    static func makePayload(session: DiveSession) throws -> PayloadEnvelope {
         guard WatchSyncAuth.hasPeerSecret() else {
             throw WatchDiveSyncError.missingPeerSecret
         }
@@ -41,7 +50,27 @@ enum WatchDiveSyncCodec {
         guard transportData.count <= maxPayloadBytes else {
             throw WatchDiveSyncError.payloadTooLarge
         }
-        return [payloadKey: transportData]
+        return PayloadEnvelope(
+            message: [payloadKey: transportData],
+            sessionID: session.id,
+            issuedAt: issuedAt
+        )
+    }
+
+    // F11: shared HMAC over the ack context. The iOS side computes the same
+    // string and returns the base64 signature; the Watch side compares it
+    // against the expected value using constant-time bytes.
+    static func ackSignature(sessionID: UUID, issuedAt: Date) -> String {
+        let canonical = "ack|\(sessionID.uuidString)|\(issuedAt.timeIntervalSince1970)"
+        let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: syncKey())
+        return Data(code).base64EncodedString()
+    }
+
+    static func verifyAckSignature(_ signature: String?, sessionID: UUID, issuedAt: Date) -> Bool {
+        guard let signature, let providedData = Data(base64Encoded: signature) else { return false }
+        let expected = ackSignature(sessionID: sessionID, issuedAt: issuedAt)
+        guard let expectedData = Data(base64Encoded: expected) else { return false }
+        return providedData.constantTimeEquals(expectedData)
     }
 
     private static func syncKey() -> SymmetricKey {
@@ -63,6 +92,13 @@ enum WatchDiveSyncCodec {
         let canonical = "\(version)|\(bundleID)|\(issuedAt.timeIntervalSince1970)|\(body.base64EncodedString())"
         let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: syncKey())
         return Data(code).base64EncodedString()
+    }
+}
+
+private extension Data {
+    func constantTimeEquals(_ other: Data) -> Bool {
+        guard count == other.count else { return false }
+        return zip(self, other).reduce(UInt8(0)) { $0 | ($1.0 ^ $1.1) } == 0
     }
 }
 

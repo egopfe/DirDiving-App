@@ -8,7 +8,11 @@ enum WatchDiveSyncCodec {
     static let maxPayloadBytes = 512_000
     static let maxSamples = 20_000
     static let maxDepthMeters = 350.0
-    static let maxIssuedAtSkew: TimeInterval = 86_400
+    // F6: tightened from 86_400 (24 h) to 3_600 (1 h) to shrink the replay window.
+    // WatchConnectivity is pairing-locked at the OS level, but a 1 h skew is more than
+    // enough for the usual Watch/iPhone clock drift while removing the day-long replay
+    // surface that the legacy value implied.
+    static let maxIssuedAtSkew: TimeInterval = 3_600
     static let importedSessionIDsKey = "dirdiving_ios_imported_session_ids"
 
     private static let expectedWatchBundleID = "com.egopfe.dirdiving"
@@ -21,7 +25,18 @@ enum WatchDiveSyncCodec {
         let signature: String
     }
 
+    struct ParsedPayload {
+        let session: DiveSession
+        let issuedAt: Date
+    }
+
     static func parseSession(from payload: [String: Any]) throws -> DiveSession {
+        try parsePayload(payload).session
+    }
+
+    // F11: full parse exposed so the receiver can sign the ack with the same
+    // (sessionID, issuedAt) that the sender used to derive its expected MAC.
+    static func parsePayload(from payload: [String: Any]) throws -> ParsedPayload {
         guard WCSession.default.activationState == .activated else {
             throw WatchDiveSyncError.sessionInactive
         }
@@ -57,7 +72,19 @@ enum WatchDiveSyncCodec {
         decoder.dateDecodingStrategy = .iso8601
         let session = try decoder.decode(DiveSession.self, from: transport.body)
         try validate(session)
-        return session
+        return ParsedPayload(session: session, issuedAt: transport.issuedAt)
+    }
+
+    // F11: ack signature recomputed and returned by iOS in response to a signed
+    // Watch payload. The Watch side validates this in constant time before
+    // declaring the dive acknowledged. The legacy `acknowledged` string path is
+    // kept on the Watch side for backward compatibility with older iOS builds.
+    // TODO(F11-followup): once the floor build is bumped, make the signed ack
+    // mandatory on both ends and remove the legacy string fallback.
+    static func ackSignature(sessionID: UUID, issuedAt: Date) -> String {
+        let canonical = "ack|\(sessionID.uuidString)|\(issuedAt.timeIntervalSince1970)"
+        let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: syncKey())
+        return Data(code).base64EncodedString()
     }
 
     static func loadImportedSessionIDs() -> Set<UUID> {

@@ -16,10 +16,39 @@ enum SubsurfaceExportService {
         return rows.joined(separator: "\n")
     }
 
+    // F3: Watch export now matches iOS hardening:
+    //  - file written with `.atomic` + `.completeFileProtection`
+    //  - filename uses an opaque UUID instead of the dive start date
+    //  - stale exports cleaned up after 24 h
+    // CSV business format (column order + headers) is intentionally unchanged.
     static func writeCSV(for session: DiveSession) -> URL? {
         let csv = makeCSV(for: session)
-        let fileName = "DIRDiving_\(session.startDate.formatted(.iso8601.year().month().day().time(includingFractionalSeconds: false))).csv".replacingOccurrences(of: ":", with: "-")
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
-        do { try csv.data(using: .utf8)?.write(to: url); return url } catch { return nil }
+        cleanupTemporaryExports()
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("DIRDiving_Export_\(UUID().uuidString).csv")
+        do {
+            guard let data = csv.data(using: .utf8) else { return nil }
+            try data.write(to: url, options: [.atomic, .completeFileProtection])
+            return url
+        } catch {
+            return nil
+        }
+    }
+
+    private static func cleanupTemporaryExports() {
+        let directory = FileManager.default.temporaryDirectory
+        guard let files = try? FileManager.default.contentsOfDirectory(
+            at: directory,
+            includingPropertiesForKeys: [.contentModificationDateKey],
+            options: [.skipsHiddenFiles]
+        ) else { return }
+
+        let expiration = Date().addingTimeInterval(-86_400)
+        for file in files where file.lastPathComponent.hasPrefix("DIRDiving_") && file.pathExtension == "csv" {
+            let values = try? file.resourceValues(forKeys: [.contentModificationDateKey])
+            if (values?.contentModificationDate ?? .distantPast) < expiration {
+                try? FileManager.default.removeItem(at: file)
+            }
+        }
     }
 }
