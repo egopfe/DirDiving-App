@@ -70,6 +70,10 @@
 "CLEAR" = "CLEAR";
 "RISALITA TROPPO VELOCE!" = "RISALITA TROPPO VELOCE!";
 "RALLENTA" = "RALLENTA";
+"ascent_alarm_title" = "RISALITA VELOCE";
+"ascent_alarm_instruction" = "RALLENTA";
+"ascent_alarm_speed_unit" = "m/min";
+"ascent_alarm_accessibility_hint" = "Rallenta la risalita. Profondita e gauge restano visibili.";
 
 "Altro" = "Altro";
 "PREFERENZE APP" = "PREFERENZE APP";

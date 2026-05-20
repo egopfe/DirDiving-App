@@ -274,9 +274,10 @@ final class DiveManager: NSObject, ObservableObject {
         let rate = max(0, (deltaDepth / deltaTime) * 60.0)
         ascentStatus = AscentStatus.make(rate: rate, depth: sample.depthMeters, limits: ascentSettings.limits)
         if ascentStatus.isOverLimit, ascentAlarmEnabled {
-            HapticService.shared.warnIfNeeded()
             startBlinking()
-        } else { stopBlinking() }
+        } else {
+            stopBlinking()
+        }
     }
 
     private func startBlinking() {

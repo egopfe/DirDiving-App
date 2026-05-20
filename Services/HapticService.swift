@@ -6,8 +6,13 @@ final class HapticService {
     static let shared = HapticService()
     static let hapticsEnabledKey = "dirdiving_watch_haptics_enabled"
     private var lastWarningDate: Date?
+    private var lastAscentAlarmRepeatDate: Date?
+    private var ascentAlarmSessionActive = false
     private var lastBuddyNearDate: Date?
     private var lastBuddyDistantDate: Date?
+
+    /// Minimum interval between repeated ascent-alarm haptics while the banner is active.
+    static let ascentAlarmRepeatInterval: TimeInterval = 1.75
 
     private init() {
         if UserDefaults.standard.object(forKey: Self.hapticsEnabledKey) == nil {
@@ -21,6 +26,33 @@ final class HapticService {
         if let lastWarningDate, now.timeIntervalSince(lastWarningDate) < 2 { return }
         lastWarningDate = now
         WKInterfaceDevice.current().play(.failure)
+    }
+
+    /// Strong warning when ascent speed first exceeds the configured limit.
+    func ascentAlarmTriggered() {
+        guard hapticsEnabled else { return }
+        ascentAlarmSessionActive = true
+        lastAscentAlarmRepeatDate = Date()
+        lastWarningDate = Date()
+        WKInterfaceDevice.current().play(.failure)
+    }
+
+    /// Repeating ascent warning while the inline alarm banner stays visible.
+    func ascentAlarmRepeatIfNeeded() {
+        guard hapticsEnabled, ascentAlarmSessionActive else { return }
+        let now = Date()
+        if let lastAscentAlarmRepeatDate,
+           now.timeIntervalSince(lastAscentAlarmRepeatDate) < Self.ascentAlarmRepeatInterval {
+            return
+        }
+        lastAscentAlarmRepeatDate = now
+        lastWarningDate = now
+        WKInterfaceDevice.current().play(.failure)
+    }
+
+    func ascentAlarmCleared() {
+        ascentAlarmSessionActive = false
+        lastAscentAlarmRepeatDate = nil
     }
 
     func confirm() {

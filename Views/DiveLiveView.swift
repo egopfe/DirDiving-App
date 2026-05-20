@@ -5,6 +5,11 @@ import SwiftUI
 struct DiveLiveView: View {
     @EnvironmentObject private var dive: DiveManager
     @AppStorage(HapticService.hapticsEnabledKey) private var hapticsEnabled = true
+    @State private var ascentHapticLoopTask: Task<Void, Never>?
+
+    private var showAscentAlarmBanner: Bool {
+        dive.isDiveActive && dive.ascentStatus.isOverLimit
+    }
 
     var body: some View {
         ZStack {
@@ -18,8 +23,6 @@ struct DiveLiveView: View {
                 VStack(spacing: 7) {
                     if let confirmation = dive.gpsConfirmation {
                         gpsConfirmationView(confirmation)
-                    } else if dive.isDiveActive && dive.ascentStatus.isOverLimit {
-                        AscentWarningView(status: dive.ascentStatus, depthMeters: dive.currentDepthMeters, runtime: dive.runtime)
                     } else if dive.isDiveActive {
                         activeDiveContent(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
                     } else {
@@ -40,6 +43,40 @@ struct DiveLiveView: View {
             }
         }
         .animation(.easeInOut(duration: 0.18), value: dive.redWarningBlink)
+        .onChange(of: showAscentAlarmBanner) { wasActive, isActive in
+            manageAscentAlarmHaptics(wasActive: wasActive, isActive: isActive)
+        }
+        .onDisappear {
+            ascentHapticLoopTask?.cancel()
+            HapticService.shared.ascentAlarmCleared()
+        }
+    }
+
+    private func manageAscentAlarmHaptics(wasActive: Bool, isActive: Bool) {
+        ascentHapticLoopTask?.cancel()
+        ascentHapticLoopTask = nil
+
+        guard isActive else {
+            if wasActive {
+                HapticService.shared.ascentAlarmCleared()
+            }
+            return
+        }
+
+        if !wasActive {
+            HapticService.shared.ascentAlarmTriggered()
+        }
+
+        ascentHapticLoopTask = Task {
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: UInt64(HapticService.ascentAlarmRepeatInterval * 1_000_000_000))
+                guard !Task.isCancelled else { return }
+                await MainActor.run {
+                    guard dive.isDiveActive, dive.ascentStatus.isOverLimit else { return }
+                    HapticService.shared.ascentAlarmRepeatIfNeeded()
+                }
+            }
+        }
     }
 
     @ViewBuilder
@@ -60,10 +97,18 @@ struct DiveLiveView: View {
                 hapticsOffBadge
             }
             ttvRuntimePanel
+            if showAscentAlarmBanner {
+                AscentWarningBannerView(
+                    rateMetersPerMinute: dive.ascentStatus.currentRateMetersPerMinute,
+                    isActive: true
+                )
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
             depthSection(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
             stopwatchPanel
             controls
         }
+        .animation(.easeInOut(duration: 0.3), value: showAscentAlarmBanner)
     }
 
     private var preDiveWaitingContent: some View {

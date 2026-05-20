@@ -70,6 +70,10 @@
 "CLEAR" = "CLEAR";
 "RISALITA TROPPO VELOCE!" = "ASCENT TOO FAST!";
 "RALLENTA" = "SLOW DOWN";
+"ascent_alarm_title" = "FAST ASCENT";
+"ascent_alarm_instruction" = "SLOW DOWN";
+"ascent_alarm_speed_unit" = "m/min";
+"ascent_alarm_accessibility_hint" = "Slow your ascent. Depth and gauge remain visible.";
 
 "Altro" = "More";
 "PREFERENZE APP" = "APP PREFERENCES";
