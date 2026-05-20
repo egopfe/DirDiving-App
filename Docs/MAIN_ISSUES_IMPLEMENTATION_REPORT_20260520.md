@@ -105,7 +105,7 @@ GPX/UDDF, branch convergence, language sync via WC, per-field cloud merge — **
 |---------|--------|
 | `xcodegen generate` | **PASS** |
 | `xcodebuild -scheme "DIRDiving iOS" -destination 'platform=iOS Simulator,name=iPhone 17' build` | **BUILD SUCCEEDED** |
-| Watch-only scheme | Not run in this pass (iOS scheme builds embedded Watch target) |
+| `xcodebuild -scheme "DIRDiving Watch App" -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm)' build` | **BUILD SUCCEEDED** |
 
 Fixes applied during build: `InfoView` `@ViewBuilder` on `batteryRow`; `SettingsView` `.wheel` picker (watchOS); `WatchDiveSyncCodec.parsePayload(from:)` on iOS.
 
