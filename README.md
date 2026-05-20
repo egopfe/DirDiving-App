@@ -6,6 +6,8 @@ DIR DIVING is a SwiftUI watchOS application for Apple Watch Ultra-class devices.
 
 ## Safety and limitations (MAIN)
 
+Disclaimer completo: [`Docs/SAFETY_DISCLAIMER.md`](Docs/SAFETY_DISCLAIMER.md) · TestFlight: [`Docs/TESTFLIGHT_REVIEW_NOTES.md`](Docs/TESTFLIGHT_REVIEW_NOTES.md) · Roadmap: [`Docs/ROADMAP.md`](Docs/ROADMAP.md)
+
 DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent awareness, and syncs to the iPhone companion for review and **indicative** planning. It is **not** a certified dive computer unless a future release explicitly documents certification. It does **not** replace training, dive-center rules, certified equipment, or human judgment. Planner and Bühlmann-style presentations are **indicative** — verify with certified tools. GPS is meaningful **at the surface**; underwater or poor-sky conditions mean fixes can be missing — missing data must not be read as “dive success.”
 
 **Recent MAIN UI/UX pass:** layout, typography, contrast, tab labels, accessibility text, empty states, disclaimers, and documentation only — **no** changes to decompression math, gas models, TTV/TTR calculations, SAC/CNS/OTU math, sensor sampling, or sync transport rules.
@@ -98,17 +100,9 @@ Nuovi documenti pubblicati su `main` e `main-iOS`:
 - [`Docs/MAIN_PRE_RELEASE_OPEN_ITEMS_20260519.md`](Docs/MAIN_PRE_RELEASE_OPEN_ITEMS_20260519.md) — backlog rimanente / item rinviati con motivazione (imperial Watch, GPX/UDDF exporter, per-field cloud merge, side-button capture watchOS, convergenza branch).
 - [`Docs/MAIN_PRE_RELEASE_SIMULATOR_QA_20260519.md`](Docs/MAIN_PRE_RELEASE_SIMULATOR_QA_20260519.md) — checklist QA eseguibile su Watch Ultra, Watch piccolo, iPhone SE, iPhone Pro Max (HEAD presence, ascent gauge co-visible, GPS banner compatto, alarm acknowledge cooldown, SAF-3/SAF-4, App Intents, haptics matrix, a11y, Dynamic Type).
 
-Backlog Watch eseguito ma **non ancora su `origin/main`** — i 3 commit pre-release Watch (`cbcabf7`, `c685155`, `efa53e4`) coprono UX-H1/H3/H4/H2 lato consumatore + UX-M1/M3/M4/M5/M8 + UX-L1/L2/L5/L6/L8/L9 + SAF-7 + App Intents (Start/End Manual Dive, Set/Clear Bearing, Acknowledge Alarm). Conservati nel branch locale **`backup/main-watch-backlog-20260519`** in attesa di riconciliazione con il cluster security F1–F12 (entrambi i lati editano `Services/WatchSyncService.swift` e `Services/WatchDiveSyncCodec.swift`). Procedura di reintegro suggerita:
+Backlog Watch (`cbcabf7`, `c685155`, `efa53e4`) **reintegrato su `main`** in commit **`a75a6c3`** (2026-05-20) tramite port manuale — non cherry-pick letterale — preservando security F1–F12 in `WatchSyncService` / `WatchDiveSyncCodec`. Il branch di riferimento **`backup/main-watch-backlog-20260519`** resta per audit storico.
 
-```bash
-git checkout main
-git fetch origin
-git cherry-pick cbcabf7 c685155 efa53e4
-# risolvere conflitti in Services/WatchSyncService.swift e
-# Services/WatchDiveSyncCodec.swift preferendo il commit security F1–F12 dove
-# tocca crittografia/protezione dati e il commit backlog dove tocca solo UX.
-git push origin main
-```
+Report implementazione: [`Docs/MAIN_ISSUES_IMPLEMENTATION_REPORT_20260520.md`](Docs/MAIN_ISSUES_IMPLEMENTATION_REPORT_20260520.md). Checklist issue: [`Docs/MAIN_BRANCH_ISSUES_AND_PRIORITIES_20260520.md`](Docs/MAIN_BRANCH_ISSUES_AND_PRIORITIES_20260520.md).
 
 Lato `main-iOS`, le due rimanenze (SAF-3 visual + SAF-4 bound CSV più aggressivi) sono già sul ramo come commit `bf4718d`:
 
@@ -119,17 +113,17 @@ Acceptance state per area:
 
 | Area | Item | Stato su `origin/main` (Watch) | Stato su `origin/main-iOS` (iOS) |
 |---|---|---|---|
-| UX-H1 / SAF-6 | Tombstone unified key `dirdiving_shared_deleted_session_ids` | Pending merge (backup) | Implemented |
-| UX-H2 | iOS → Watch verified push + Watch consumer | Pending merge (backup) | Implemented |
+| UX-H1 / SAF-6 | Tombstone unified key `dirdiving_shared_deleted_session_ids` | **Implemented** (`a75a6c3`) | Implemented |
+| UX-H2 | iOS → Watch verified push + Watch consumer | **Implemented** (`a75a6c3`) | Implemented |
 | UX-H3 / SAF-1 | Ascent warning + gauge co-visible | **Implemented** (banner inline 2026-05-20) | n/a (Watch-only) |
-| UX-H4 / SAF-2 | GPS confirmation compact banner | Pending merge (backup) | n/a (Watch-only) |
+| UX-H4 / SAF-2 | GPS confirmation compact banner | **Implemented** (`a75a6c3`) | n/a (Watch-only) |
 | UX-H5 | Canonical iOS branch (`main-iOS`) documented | Documented | Implemented |
-| UX-M1..M13 | UX cluster (ModeSelection, hidden nav, retry, toast, info-rows, units, activation labels, notif perm, planner modes, etc.) | Pending merge (Watch); Implemented (iOS) | Implemented |
-| UX-L1..L9 | LOW cluster (icon copy, units pill, dead code, CLEAR disabled, a11y, Dynamic Type, alarm step, dedupe delete) | Pending merge (Watch); Implemented (iOS) | Implemented |
-| SAF-3 | TTV semantics clarification | Pending (Watch backup) | Implemented (`bf4718d`) |
+| UX-M1..M13 | UX cluster (ModeSelection, hidden nav, retry, toast, info-rows, units, activation labels, notif perm, planner modes, etc.) | Partial (UserImages hide TODO); Implemented (iOS) | Implemented |
+| UX-L1..L9 | LOW cluster (icon copy, units pill, dead code, CLEAR disabled, a11y, Dynamic Type, alarm step, dedupe delete) | Partial + i18n 2026-05-20; Implemented (iOS) | Implemented |
+| SAF-3 | TTV semantics clarification | Partial (a11y hint localized) | Implemented (`bf4718d`) |
 | SAF-4 | CSV bound tightening | n/a | Implemented (`bf4718d`) |
-| SAF-7 | Haptics-off badge pre-dive | Pending merge (backup) | n/a |
-| SAF-8 | Alarm acknowledge with cooldown | Pending merge (backup) | n/a |
+| SAF-7 | Haptics-off badge pre-dive | **Implemented** (`a75a6c3`) | n/a |
+| SAF-8 | Alarm acknowledge with cooldown | **Implemented** (`a75a6c3`) | n/a |
 | SAF-9 | Planner safety per-launch acknowledgement | n/a | Implemented |
 | SAF-10 | Per-session sync delivery status | TODO surfaced honestly in Settings/MoreView | TODO surfaced honestly |
 
@@ -147,7 +141,9 @@ Da `fadd8a6` + `4cca72e` su `main`:
 - **Logbook iOS**: i mesi/intestazioni rispettano `@Environment(\.locale)` invece di forzare `it_IT`.
 - **Estensibilità**: per aggiungere una lingua bastano (a) un nuovo case negli enum `DIRAppLanguage`/`DIRIOSAppLanguage`, (b) una nuova cartella `xx.lproj/Localizable.strings`, (c) eventualmente estendere la fallback `supportedSystemLocale` (oggi `en`/`it`; altri sistemi cadono in italiano).
 - **Vincoli**: la modifica della lingua **non** cambia unità di misura, calcoli, persistenza o dati salvati.
-- **Debito noto**: molti `Text("…")` letterali nelle viste non sono ancora migrati alle tabelle; con `locale = en` resta del testo italiano fisso finché non viene chiavato. Da pianificare migrazione progressiva (eventualmente a String Catalog `.xcstrings`).
+- **Pass secondario 2026-05-20**: ~130+ chiavi Watch e ~90+ iOS in `Localizable.strings`; servizi sync/bussola/allarmi localizzati con `String(localized:)`; schermate Settings, log, export, planner header, Analysis empty state coperte. Stato messaggi sync: si aggiorna al prossimo evento dopo cambio lingua.
+- **Debito residuo**: alcune righe planner risultato, dettaglio GPS (`Start:`/`Accuratezza:`), warning dinamici del planner store, import CSV runtime (`DiveImportService` ancora IT hardcoded). Migrazione progressiva verso String Catalog `.xcstrings` opzionale.
+- **TestFlight / sicurezza**: [`Docs/TESTFLIGHT_REVIEW_NOTES.md`](Docs/TESTFLIGHT_REVIEW_NOTES.md), [`Docs/SAFETY_DISCLAIMER.md`](Docs/SAFETY_DISCLAIMER.md), [`Docs/ROADMAP.md`](Docs/ROADMAP.md).
 
 ## Visual Design Standard
 
