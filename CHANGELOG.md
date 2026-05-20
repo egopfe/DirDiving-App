@@ -4,6 +4,30 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-20, ascent alarm inline banner + documentation pass)
+
+- `Views/AscentWarningBannerView.swift` — banner rosso non bloccante tra TTV/RunTime e profondita (mockup `ascent_alarm.png`).
+- Chiavi i18n `ascent_alarm_*` in `Resources/{en,it}.lproj/Localizable.strings`.
+- `Docs/WATCH_MAIN_UX_CONVENTIONS.md` — baseline UX Watch MAIN (banner inline, no full-screen takeover).
+- `Docs/ASCENT_ALARM_IMPLEMENTATION_REPORT_20260520.md` — report implementazione A–J + QA checklist.
+- `Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260519_CURRENT_PRE_MODIFICATION.md` (+ `.docx`) — audit UX/interaction MAIN.
+- `Docs/DOCUMENTATION_UPDATE_REPORT_20260520.md` e `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260520.md` — report allineamento documentazione A–K.
+- Righe additive in `Docs/DIR_DIVING_Feature_Comparison.csv` per banner risalita, convenzioni UX, report audit/implementazione.
+
+### Changed (2026-05-20)
+
+- `Views/DiveLiveView.swift` — rimosso takeover full-screen 1 s; haptic risalita da live view; gauge sempre visibile.
+- `Views/AscentWarningView.swift` — wrapper sottile su `AscentWarningBannerView`.
+- `Services/HapticService.swift` — `ascentAlarmTriggered` / `ascentAlarmRepeatIfNeeded` / `ascentAlarmCleared`.
+- `Services/DiveManager.swift` — haptic risalita non invocati dal path di calcolo (solo UI).
+- `README.md` — baseline Watch UX 2026-05-20; tabella pre-release UX-H3 aggiornata a *Implemented* su main.
+- `Docs/DIR_DIVING_Feature_Comparison.csv` — voce «Avviso risalita» e UX-H3/SAF-1 allineate al banner inline.
+
+### Nota (2026-05-20)
+
+- L'audit `MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260519` descriveva policy **1 s full-screen** (revisione stakeholder 2026-05-20): il codice su `main` implementa ora il **banner inline** documentato in `WATCH_MAIN_UX_CONVENTIONS.md`. Nessuna modifica a soglie o algoritmi di risalita.
+- PR **#8** (`codex/experimental-features` → `main`) e **#9** (`codex/ios-experimental-features` → `main-iOS`): restano **non safe-to-merge** automaticamente (conflitti + regressioni security note su iOS experimental).
+
 ### Added (2026-05-19, pass pre-release backlog — UX-H/M/L + SAF + simulator QA)
 
 - `Docs/MAIN_PRE_RELEASE_OPEN_ITEMS_20260519.md` — backlog rimanente / item rinviati post pre-release pass, con motivazione per Watch imperial conversion, GPX/UDDF exporter, per-field cloud merge per Equipment/Planner, side-button capture watchOS, convergenza branch `main` ↔ `main-iOS`.

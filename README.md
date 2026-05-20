@@ -10,6 +10,8 @@ DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent 
 
 **Recent MAIN UI/UX pass:** layout, typography, contrast, tab labels, accessibility text, empty states, disclaimers, and documentation only — **no** changes to decompression math, gas models, TTV/TTR calculations, SAC/CNS/OTU math, sensor sampling, or sync transport rules.
 
+**Watch UX baseline (2026-05-20):** ascent over-limit shows a **red inline banner** on the live dive screen (non-blocking); depth, gauge, TTV, and controls stay visible. Details: [`Docs/WATCH_MAIN_UX_CONVENTIONS.md`](Docs/WATCH_MAIN_UX_CONVENTIONS.md).
+
 > Status note: the app is prepared for Apple water submersion APIs, but the depth/submersion entitlement is still pending. Until the entitlement is granted and the app is signed with it, `CMWaterSubmersionManager` may report entitlement-related errors and will not deliver production depth data.
 
 ## Depth Entitlement And Signing Checklist
@@ -119,7 +121,7 @@ Acceptance state per area:
 |---|---|---|---|
 | UX-H1 / SAF-6 | Tombstone unified key `dirdiving_shared_deleted_session_ids` | Pending merge (backup) | Implemented |
 | UX-H2 | iOS → Watch verified push + Watch consumer | Pending merge (backup) | Implemented |
-| UX-H3 / SAF-1 | Ascent warning + gauge co-visible | Pending merge (backup) | n/a (Watch-only) |
+| UX-H3 / SAF-1 | Ascent warning + gauge co-visible | **Implemented** (banner inline 2026-05-20) | n/a (Watch-only) |
 | UX-H4 / SAF-2 | GPS confirmation compact banner | Pending merge (backup) | n/a (Watch-only) |
 | UX-H5 | Canonical iOS branch (`main-iOS`) documented | Documented | Implemented |
 | UX-M1..M13 | UX cluster (ModeSelection, hidden nav, retry, toast, info-rows, units, activation labels, notif perm, planner modes, etc.) | Pending merge (Watch); Implemented (iOS) | Implemented |
