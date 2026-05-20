@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import WatchConnectivity
+import os
 
 @MainActor
 final class WatchSyncService: NSObject, ObservableObject {
@@ -17,12 +18,17 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published private(set) var importedSessionCount = 0
     @Published private(set) var failedImportCount = 0
     @Published private(set) var conflicts: [SyncConflict] = []
-    @Published private(set) var pendingOutboundCount = 0
     private weak var logStore: DiveLogStore?
     private var importedSessionIDs: Set<UUID> = []
-    private var pendingOutboundSessions: [DiveSession] = []
-    private let conflictsKey = "dirdiving_ios_watch_sync_conflicts"
-    private let pendingOutboundKey = "dirdiving_ios_pending_watch_outbound_sessions"
+
+    // F9: conflicts persisted to a Documents/ file with `.completeFileProtection`
+    // instead of UserDefaults. UserDefaults is not covered by Data Protection on a
+    // locked device, and conflicts carry full DiveSession content (GPS included).
+    // The legacy UserDefaults key is migrated once on init.
+    private let legacyConflictsKey = "dirdiving_ios_watch_sync_conflicts"
+    private let conflictsFileName = "dirdiving_ios_watch_sync_conflicts.json"
+
+    private static let logger = Logger(subsystem: "com.egopfe.dirdiving.ios", category: "WatchSyncService")
 
     var userVisibleState: String {
         if !isSupported { return "Non supportato" }
@@ -37,8 +43,6 @@ final class WatchSyncService: NSObject, ObservableObject {
         importedSessionIDs = WatchDiveSyncCodec.loadImportedSessionIDs()
         importedSessionCount = importedSessionIDs.count
         conflicts = loadConflicts()
-        pendingOutboundSessions = loadPendingOutbound()
-        pendingOutboundCount = pendingOutboundSessions.count
         guard WCSession.isSupported() else {
             lastMessage = "WatchConnectivity non supportato"
             return
@@ -60,139 +64,59 @@ final class WatchSyncService: NSObject, ObservableObject {
         activate(logStore: logStore)
     }
 
-    func pushSession(_ session: DiveSession) {
-        // UX-H2: gate every outbound push on the verified companion key; never
-        // ship raw payloads from iOS without HMAC. If the peer secret is not
-        // yet exchanged, queue the session and re-flush when the secret is
-        // received from the Watch.
-        guard WCSession.isSupported() else { return }
-        guard !importedSessionIDs.contains(session.id) else { return }
-        enqueueOutbound(session)
-        if WatchSyncAuth.hasPeerSecret() {
-            flushPendingOutbound()
-        } else {
-            WatchSyncAuth.publishSharedSecretIfNeeded()
-            lastMessage = "Push Watch in coda: in attesa associazione verificata (\(pendingOutboundCount) pending)"
-        }
+    func publishDeletedSessionIDs(_ ids: Set<UUID>) {
+        guard WCSession.isSupported(), WCSession.default.activationState == .activated, !ids.isEmpty else { return }
+        var existing = Set((WCSession.default.applicationContext[WatchSyncKeys.deletedSessionBroadcastKey] as? [String]) ?? [])
+        existing.formUnion(ids.map(\.uuidString))
+        WatchSyncAuth.mergeApplicationContext([WatchSyncKeys.deletedSessionBroadcastKey: Array(existing)])
+        lastMessage = "Tombstone inviata al Watch (\(ids.count))"
     }
 
-    func pushUnitsPreference(_ rawValue: String) {
-        // UX-M7: today Watch only supports metric. We still broadcast the
-        // canonical key so the contract is established; the Watch side
-        // explicitly ignores any non-metric value.
-        guard WCSession.isSupported(), WCSession.default.activationState == .activated else { return }
-        let canonical = rawValue == IOSUnitPreference.imperial.rawValue ? "imperial" : "metric"
-        do {
-            try WCSession.default.updateApplicationContext([WatchSyncKeys.unitsPreferenceKey: canonical])
-        } catch {
-            lastMessage = "Settings sync: contesto unità non aggiornato (\(error.localizedDescription))"
-        }
-    }
-
-    private func flushPendingOutbound() {
-        guard WatchSyncAuth.hasPeerSecret(), !pendingOutboundSessions.isEmpty else { return }
-        let queue = pendingOutboundSessions
-        for session in queue.reversed() {
-            sendQueuedOutbound(session)
-        }
-    }
-
-    private func sendQueuedOutbound(_ session: DiveSession) {
-        do {
-            let payload = try WatchDiveSyncCodec.makePayload(session: session)
-            if WCSession.default.isReachable {
-                WCSession.default.sendMessage(payload) { [weak self] reply in
-                    Task { @MainActor in
-                        if reply["status"] as? String == "acknowledged" {
-                            self?.removePendingOutbound(id: session.id)
-                            self?.lastMessage = "Push iPhone -> Watch: confermato"
-                        } else {
-                            self?.lastMessage = "Push iPhone -> Watch: ack non ricevuto, coda preservata"
-                        }
-                    }
-                } errorHandler: { [weak self] error in
-                    Task { @MainActor in
-                        self?.lastMessage = "Push diretto fallito, fallback coda: \(error.localizedDescription)"
-                        WCSession.default.transferUserInfo(payload)
-                    }
-                }
-            } else {
-                WCSession.default.transferUserInfo(payload)
-                lastMessage = "Push iPhone -> Watch: in coda WatchConnectivity"
+    private func ingestCompanionContext(_ context: [String: Any]) {
+        WatchSyncAuth.ingestSharedSecretFromContext(context)
+        if let strings = context[WatchSyncKeys.deletedSessionBroadcastKey] as? [String] {
+            let ids = Set(strings.compactMap(UUID.init(uuidString:)))
+            if !ids.isEmpty {
+                logStore?.applyRemoteDeletedSessionIDs(ids)
+                lastMessage = "Tombstone Watch applicata (\(ids.count))"
             }
-        } catch WatchDiveSyncError.unverifiedPeer {
-            WatchSyncAuth.publishSharedSecretIfNeeded()
-            lastMessage = "Push iPhone -> Watch: peer non ancora verificato (coda preservata)"
-        } catch {
-            lastMessage = "Push iPhone -> Watch fallito: \(error.localizedDescription)"
         }
     }
 
-    private func enqueueOutbound(_ session: DiveSession) {
-        pendingOutboundSessions.removeAll { $0.id == session.id }
-        pendingOutboundSessions.append(session)
-        pendingOutboundSessions = pendingOutboundSessions.sorted { $0.startDate > $1.startDate }
-        pendingOutboundCount = pendingOutboundSessions.count
-        savePendingOutbound()
+    private struct AckContext {
+        let sessionID: UUID
+        let issuedAt: Date
     }
 
-    private func removePendingOutbound(id: UUID) {
-        pendingOutboundSessions.removeAll { $0.id == id }
-        pendingOutboundCount = pendingOutboundSessions.count
-        savePendingOutbound()
-    }
-
-    private func loadPendingOutbound() -> [DiveSession] {
-        guard let data = UserDefaults.standard.data(forKey: pendingOutboundKey) else { return [] }
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        return (try? decoder.decode([DiveSession].self, from: data)) ?? []
-    }
-
-    private func savePendingOutbound() {
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
-        if let data = try? encoder.encode(pendingOutboundSessions) {
-            UserDefaults.standard.set(data, forKey: pendingOutboundKey)
-        }
-    }
-
-    private func importSessionPayload(_ payload: [String: Any]) {
+    @discardableResult
+    private func importSessionPayload(_ payload: [String: Any]) -> AckContext? {
         do {
-            let session = try WatchDiveSyncCodec.parseSession(from: payload)
-            guard logStore?.isDeleted(id: session.id) != true else {
-                importedSessionIDs.insert(session.id)
-                WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
-                importedSessionCount = importedSessionIDs.count
-                lastMessage = "Immersione cancellata ignorata dal tombstone"
-                return
-            }
+            let parsed = try WatchDiveSyncCodec.parsePayload(from: payload)
+            let session = parsed.session
             if let existing = logStore?.session(id: session.id), existing != session {
                 storeConflict(local: existing, incoming: session)
                 lastMessage = "Conflitto sync salvato per revisione"
-                return
+                return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
             }
             guard !importedSessionIDs.contains(session.id) else {
                 lastMessage = "Immersione duplicata ignorata"
-                return
+                return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
             }
             logStore?.add(session)
             importedSessionIDs.insert(session.id)
             WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
             importedSessionCount = importedSessionIDs.count
             lastMessage = "Immersione ricevuta dal Watch"
+            return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
         } catch {
             failedImportCount += 1
             lastMessage = "Errore sync Watch: \(error.localizedDescription)"
+            Self.logger.error("Watch sync import failed: \(error.localizedDescription, privacy: .private)")
+            return nil
         }
     }
 
     func resolveConflictUsingIncoming(_ conflict: SyncConflict) {
-        guard logStore?.isDeleted(id: conflict.id) != true else {
-            removeConflict(conflict)
-            lastMessage = "Conflitto ignorato: immersione gia cancellata"
-            return
-        }
         logStore?.add(conflict.incoming)
         importedSessionIDs.insert(conflict.id)
         WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
@@ -228,52 +152,99 @@ final class WatchSyncService: NSObject, ObservableObject {
         saveConflicts()
     }
 
+    private func conflictsFileURL() -> URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent(conflictsFileName)
+    }
+
     private func loadConflicts() -> [SyncConflict] {
-        guard let data = UserDefaults.standard.data(forKey: conflictsKey) else { return [] }
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
-        return (try? decoder.decode([SyncConflict].self, from: data)) ?? []
+
+        // Primary source: Documents/ file (with Data Protection).
+        let url = conflictsFileURL()
+        if FileManager.default.fileExists(atPath: url.path),
+           let data = try? Data(contentsOf: url),
+           let decoded = try? decoder.decode([SyncConflict].self, from: data) {
+            return decoded
+        }
+
+        // F9 migration: import once from UserDefaults, then write to the new file
+        // and clear the legacy key to keep PII out of UserDefaults going forward.
+        guard let legacyData = UserDefaults.standard.data(forKey: legacyConflictsKey) else { return [] }
+        let migrated = (try? decoder.decode([SyncConflict].self, from: legacyData)) ?? []
+        if !migrated.isEmpty {
+            persistConflicts(migrated)
+        }
+        UserDefaults.standard.removeObject(forKey: legacyConflictsKey)
+        return migrated
     }
 
     private func saveConflicts() {
+        persistConflicts(conflicts)
+    }
+
+    private func persistConflicts(_ value: [SyncConflict]) {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
-        if let data = try? encoder.encode(conflicts) {
-            UserDefaults.standard.set(data, forKey: conflictsKey)
+        guard let data = try? encoder.encode(value) else { return }
+        do {
+            try data.write(to: conflictsFileURL(), options: [.atomic, .completeFileProtection])
+        } catch {
+            Self.logger.error("Persist watch-sync conflicts failed: \(error.localizedDescription, privacy: .private)")
         }
     }
 }
 
 extension WatchSyncService: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        let context = session.receivedApplicationContext
         Task { @MainActor in
             self.activationState = activationState
             self.lastMessage = error?.localizedDescription ?? "Sessione Watch attiva"
             if activationState == .activated {
-                WatchSyncAuth.ingestSharedSecretFromContext(WatchSyncAuth.cachedApplicationContext())
+                self.ingestCompanionContext(context)
                 WatchSyncAuth.publishSharedSecretIfNeeded()
-                self.flushPendingOutbound()
             }
         }
     }
 
     nonisolated func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
         Task { @MainActor in
-            WatchSyncAuth.ingestSharedSecretFromContext(applicationContext)
+            self.ingestCompanionContext(applicationContext)
             WatchSyncAuth.publishSharedSecretIfNeeded()
-            self.flushPendingOutbound()
         }
     }
 
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
         Task { @MainActor in
-            self.importSessionPayload(message)
+            _ = self.importSessionPayload(message)
         }
     }
 
-    nonisolated func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
+    nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
         Task { @MainActor in
-            self.importSessionPayload(userInfo)
+            let beforeFailures = self.failedImportCount
+            let ackContext = self.importSessionPayload(message)
+            let acknowledged = self.failedImportCount == beforeFailures
+            var reply: [String: Any] = ["status": acknowledged ? "acknowledged" : "failed"]
+            if acknowledged, let ackContext {
+                // F11: signed ack lets the Watch confirm that this reply was produced
+                // by the same trusted iOS peer (constant-time HMAC over sessionID +
+                // issuedAt of the original payload). Watch-side fallback still
+                // accepts the legacy `acknowledged` string for older builds.
+                reply["ackSignature"] = WatchDiveSyncCodec.ackSignature(
+                    sessionID: ackContext.sessionID,
+                    issuedAt: ackContext.issuedAt
+                )
+            }
+            replyHandler(reply)
+        }
+    }
+
+    nonisolated func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
+        Task { @MainActor in
+            _ = self.importSessionPayload(userInfo)
         }
     }
 

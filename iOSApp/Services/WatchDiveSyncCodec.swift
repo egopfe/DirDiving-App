@@ -8,55 +8,14 @@ enum WatchDiveSyncCodec {
     static let maxPayloadBytes = 512_000
     static let maxSamples = 20_000
     static let maxDepthMeters = 350.0
-    static let maxIssuedAtSkew: TimeInterval = 86_400
+    // F6: tightened from 86_400 (24 h) to 3_600 (1 h) to shrink the replay window.
+    // WatchConnectivity is pairing-locked at the OS level, but a 1 h skew is more than
+    // enough for the usual Watch/iPhone clock drift while removing the day-long replay
+    // surface that the legacy value implied.
+    static let maxIssuedAtSkew: TimeInterval = 3_600
     static let importedSessionIDsKey = "dirdiving_ios_imported_session_ids"
 
     private static let expectedWatchBundleID = "com.egopfe.dirdiving"
-    private static let iosBundleID = "com.egopfe.dirdiving.ios"
-
-    static func makePayload(session: DiveSession) throws -> [String: Any] {
-        guard WatchSyncAuth.hasPeerSecret() else {
-            throw WatchDiveSyncError.unverifiedPeer
-        }
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
-        let body = try encoder.encode(session)
-        guard body.count <= maxPayloadBytes else {
-            throw WatchDiveSyncError.payloadTooLarge
-        }
-
-        let issuedAt = Date()
-        let transport = Transport(
-            version: schemaVersion,
-            bundleID: Bundle.main.bundleIdentifier ?? iosBundleID,
-            issuedAt: issuedAt,
-            body: body,
-            signature: ""
-        )
-        let signed = sign(transport, issuedAt: issuedAt, body: body)
-        let transportData = try JSONEncoder().encode(signed)
-        guard transportData.count <= maxPayloadBytes else {
-            throw WatchDiveSyncError.payloadTooLarge
-        }
-        return [payloadKey: transportData]
-    }
-
-    private static func sign(_ transport: Transport, issuedAt: Date, body: Data) -> Transport {
-        let mac = hmac(version: transport.version, bundleID: transport.bundleID, issuedAt: issuedAt, body: body)
-        return Transport(
-            version: transport.version,
-            bundleID: transport.bundleID,
-            issuedAt: issuedAt,
-            body: body,
-            signature: mac
-        )
-    }
-
-    private static func hmac(version: Int, bundleID: String, issuedAt: Date, body: Data) -> String {
-        let canonical = "\(version)|\(bundleID)|\(issuedAt.timeIntervalSince1970)|\(body.base64EncodedString())"
-        let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: syncKey())
-        return Data(code).base64EncodedString()
-    }
 
     struct Transport: Codable {
         let version: Int
@@ -66,12 +25,23 @@ enum WatchDiveSyncCodec {
         let signature: String
     }
 
+    struct ParsedPayload {
+        let session: DiveSession
+        let issuedAt: Date
+    }
+
     static func parseSession(from payload: [String: Any]) throws -> DiveSession {
+        try parsePayload(from: payload).session
+    }
+
+    // F11: full parse exposed so the receiver can sign the ack with the same
+    // (sessionID, issuedAt) that the sender used to derive its expected MAC.
+    static func parsePayload(from payload: [String: Any]) throws -> ParsedPayload {
         guard WCSession.default.activationState == .activated else {
             throw WatchDiveSyncError.sessionInactive
         }
         guard WatchSyncAuth.hasPeerSecret() else {
-            throw WatchDiveSyncError.unverifiedPeer
+            throw WatchDiveSyncError.missingPeerSecret
         }
 
         guard let data = payload[payloadKey] as? Data else {
@@ -102,7 +72,19 @@ enum WatchDiveSyncCodec {
         decoder.dateDecodingStrategy = .iso8601
         let session = try decoder.decode(DiveSession.self, from: transport.body)
         try validate(session)
-        return session
+        return ParsedPayload(session: session, issuedAt: transport.issuedAt)
+    }
+
+    // F11: ack signature recomputed and returned by iOS in response to a signed
+    // Watch payload. The Watch side validates this in constant time before
+    // declaring the dive acknowledged. The legacy `acknowledged` string path is
+    // kept on the Watch side for backward compatibility with older iOS builds.
+    // TODO(F11-followup): once the floor build is bumped, make the signed ack
+    // mandatory on both ends and remove the legacy string fallback.
+    static func ackSignature(sessionID: UUID, issuedAt: Date) -> String {
+        let canonical = "ack|\(sessionID.uuidString)|\(issuedAt.timeIntervalSince1970)"
+        let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: syncKey())
+        return Data(code).base64EncodedString()
     }
 
     static func loadImportedSessionIDs() -> Set<UUID> {
@@ -155,7 +137,7 @@ enum WatchDiveSyncError: LocalizedError {
     case invalidSignature
     case invalidSession
     case sessionInactive
-    case unverifiedPeer
+    case missingPeerSecret
 
     var errorDescription: String? {
         switch self {
@@ -167,7 +149,7 @@ enum WatchDiveSyncError: LocalizedError {
         case .invalidSignature: return "Firma sync non valida."
         case .invalidSession: return "Sessione immersione non valida."
         case .sessionInactive: return "WatchConnectivity non attivo."
-        case .unverifiedPeer: return "Associazione Watch non verificata."
+        case .missingPeerSecret: return "Chiave sync Watch non ancora disponibile."
         }
     }
 }
