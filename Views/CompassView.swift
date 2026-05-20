@@ -25,10 +25,16 @@ struct CompassView: View {
         .animation(.easeInOut(duration: 0.24), value: compass.bearingDegrees ?? -1)
     }
 
+    private var compassStatusIsWarning: Bool {
+        let message = compass.statusMessage
+        return message.localizedCaseInsensitiveContains(String(localized: "compass.keyword.denied"))
+            || message.localizedCaseInsensitiveContains(String(localized: "compass.keyword.unavailable"))
+    }
+
     private var statusBanner: some View {
         Text(compass.statusMessage)
             .font(.system(size: 9, weight: .semibold, design: .rounded))
-            .foregroundStyle(compass.statusMessage.contains("negato") || compass.statusMessage.contains("non disponibile") ? DiveUI.yellow : DiveUI.secondaryText)
+            .foregroundStyle(compassStatusIsWarning ? DiveUI.yellow : DiveUI.secondaryText)
             .lineLimit(1)
             .minimumScaleFactor(0.7)
             .frame(maxWidth: .infinity)

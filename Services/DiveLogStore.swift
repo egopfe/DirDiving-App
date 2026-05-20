@@ -112,7 +112,7 @@ final class DiveLogStore: ObservableObject {
             decoder.dateDecodingStrategy = .iso8601
             return try decoder.decode([DiveSession].self, from: Data(contentsOf: url))
         } catch {
-            loadErrorMessage = "Log locale non leggibile: \(error.localizedDescription)"
+            loadErrorMessage = String(format: String(localized: "Log locale non leggibile: %@"), error.localizedDescription)
             return []
         }
     }

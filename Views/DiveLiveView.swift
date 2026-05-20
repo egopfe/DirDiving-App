@@ -197,7 +197,7 @@ struct DiveLiveView: View {
 
             Spacer(minLength: 28)
 
-            Text("PRONTO PER\nL'IMMERSIONE")
+            Text(String(localized: "live.ready.title"))
                 .font(.system(size: 18, weight: .black, design: .rounded))
                 .foregroundStyle(DiveUI.blue)
                 .multilineTextAlignment(.center)
@@ -210,7 +210,7 @@ struct DiveLiveView: View {
                     .font(.system(size: 25, weight: .black))
                     .foregroundStyle(DiveUI.blue)
                     .symbolRenderingMode(.hierarchical)
-                Text("In attesa di avvio...")
+                Text(String(localized: "In attesa di avvio..."))
                     .font(.system(size: 14, weight: .regular, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(1)
@@ -221,7 +221,7 @@ struct DiveLiveView: View {
 
             Spacer(minLength: 31)
 
-            Text("Il punto GPS di inizio\nverrà registrato\nall'avvio dell'immersione.")
+            Text(String(localized: "Il punto GPS di inizio\nverrà registrato\nall'avvio dell'immersione."))
                 .font(.system(size: 13, weight: .regular, design: .rounded))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
@@ -287,7 +287,7 @@ struct DiveLiveView: View {
         HStack(spacing: 8) {
             Image(systemName: "water.waves")
                 .font(.system(size: 18, weight: .black))
-            Text(dive.isManualLifecycleActive ? "IMMERSIONE MANUALE" : "IN IMMERSIONE")
+            Text(dive.isManualLifecycleActive ? String(localized: "IMMERSIONE MANUALE") : String(localized: "IN IMMERSIONE"))
                 .font(.system(size: 15, weight: .black, design: .rounded))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
@@ -300,10 +300,10 @@ struct DiveLiveView: View {
         HStack(spacing: 6) {
             Image(systemName: "bell.slash.fill")
                 .font(.system(size: 12, weight: .black))
-            Text("APTICA DISATTIVATA")
+            Text(String(localized: "live.haptics.off"))
                 .font(.system(size: 10, weight: .black, design: .rounded))
             Spacer(minLength: 0)
-            Text("AVVISI SOLO VISIVI")
+            Text(String(localized: "live.haptics.visual_only"))
                 .font(.system(size: 9, weight: .black, design: .rounded))
         }
         .foregroundStyle(DiveUI.yellow)
@@ -336,7 +336,7 @@ struct DiveLiveView: View {
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("TTV sessione \(ttvText), runtime \(runtimeMinutes)")
-        .accessibilityHint("TTV informativo derivato da profondita media e durata; non e un valore decompressivo o time to surface.")
+        .accessibilityHint(String(localized: "TTV informativo derivato da profondita media e durata; non e un valore decompressivo o time to surface."))
     }
 
     private func dashboardValue(title: String, value: String, unit: String?, color: Color) -> some View {

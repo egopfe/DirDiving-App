@@ -138,7 +138,7 @@ struct AnalysisView: View {
                 }
                 emptyAction("Sync Watch", "applewatch") {
                     watchSync.retryActivation(logStore: logStore)
-                    importMessage = "Sync Apple Watch richiesta."
+                    importMessage = String(localized: "Sync Apple Watch richiesta.")
                 }
             }
             emptyAction("Apri Logbook", "list.bullet.rectangle.portrait.fill") {

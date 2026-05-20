@@ -236,20 +236,20 @@ final class DiveManager: NSObject, ObservableObject {
     private func evaluateDepthAlarm() {
         let threshold = depthAlarmThresholdMeters
         guard depthAlarmEnabled, maxDepthMeters > threshold else { return }
-        triggerAlarm("ALLARME PROFONDITÀ > \(Formatters.one(threshold)) m", lastDate: &lastDepthAlarmDate)
+        triggerAlarm(String(format: String(localized: "ALLARME PROFONDITÀ > %@ m"), Formatters.one(threshold)), lastDate: &lastDepthAlarmDate)
     }
 
     private func evaluateRuntimeAlarms() {
         let runtimeThreshold = runtimeAlarmThresholdMinutes
         if runtimeAlarmEnabled, runtime > TimeInterval(runtimeThreshold * 60) {
-            triggerAlarm("ALLARME TEMPO > \(runtimeThreshold) min", lastDate: &lastRuntimeAlarmDate)
+            triggerAlarm(String(format: String(localized: "ALLARME TEMPO > %lld min"), runtimeThreshold), lastDate: &lastRuntimeAlarmDate)
         }
         if batteryAlarmEnabled {
             let device = WKInterfaceDevice.current()
             device.isBatteryMonitoringEnabled = true
             let batteryThreshold = Float(batteryAlarmThresholdPercent) / 100
             if device.batteryLevel >= 0, device.batteryLevel < batteryThreshold {
-                triggerAlarm("ALLARME BATTERIA < \(batteryAlarmThresholdPercent)%", lastDate: &lastBatteryAlarmDate)
+                triggerAlarm(String(format: String(localized: "ALLARME BATTERIA < %lld%%"), batteryAlarmThresholdPercent), lastDate: &lastBatteryAlarmDate)
             }
         }
     }

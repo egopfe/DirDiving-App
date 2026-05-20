@@ -171,7 +171,7 @@ struct DiveDetailView: View {
         VStack(spacing: 8) {
             Button {
                 exportURL = SubsurfaceExportService.writeCSV(for: session)
-                exportMessage = exportURL == nil ? "Export CSV non riuscito" : nil
+                exportMessage = exportURL == nil ? String(localized: "Export CSV non riuscito") : nil
                 if let exportURL {
                     exportCompletionFileName = exportURL.lastPathComponent
                     showExportCompletion = true
@@ -262,9 +262,9 @@ struct DiveDetailView: View {
 
     private func fixSourceText(_ source: GPSFixSource) -> String {
         switch source {
-        case .fix: return "FIX SUPERFICIE"
-        case .fallback: return "ULTIMO PUNTO NOTO"
-        case .noFix: return "NO-FIX"
+        case .fix: return String(localized: "FIX SUPERFICIE")
+        case .fallback: return String(localized: "ULTIMO PUNTO NOTO")
+        case .noFix: return String(localized: "NO-FIX")
         }
     }
 

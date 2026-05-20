@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 final class CloudSyncStore: ObservableObject {
-    @Published private(set) var lastSyncStatus = "iCloud non ancora sincronizzato"
+    @Published private(set) var lastSyncStatus = String(localized: "iCloud non ancora sincronizzato")
     @Published private(set) var isICloudAvailable = FileManager.default.ubiquityIdentityToken != nil
 
     private let cloudStore = NSUbiquitousKeyValueStore.default
@@ -18,7 +18,7 @@ final class CloudSyncStore: ObservableObject {
         ) { [weak self] notification in
             Task { @MainActor in
                 self?.isICloudAvailable = FileManager.default.ubiquityIdentityToken != nil
-                self?.lastSyncStatus = "Aggiornamento ricevuto da iCloud"
+                self?.lastSyncStatus = String(localized: "Aggiornamento ricevuto da iCloud")
                 NotificationCenter.default.post(
                     name: .cloudSyncDidChangeExternally,
                     object: self,
@@ -40,7 +40,7 @@ final class CloudSyncStore: ObservableObject {
                let decoded = decode(type, from: cloudData) {
                 defaults.set(cloudData, forKey: key)
                 defaults.set(cloudModifiedAt, forKey: modifiedAtKey(for: key))
-                lastSyncStatus = "Dati caricati da iCloud"
+                lastSyncStatus = String(localized: "Dati caricati da iCloud")
                 return decoded
             }
 
@@ -49,7 +49,7 @@ final class CloudSyncStore: ObservableObject {
                     cloudStore.set(localData, forKey: key)
                     cloudStore.set(localModifiedAt, forKey: modifiedAtKey(for: key))
                     synchronize()
-                    lastSyncStatus = "Dati locali piu recenti pronti per iCloud"
+                    lastSyncStatus = String(localized: "Dati locali piu recenti pronti per iCloud")
                 }
                 return decoded
             }
@@ -59,7 +59,7 @@ final class CloudSyncStore: ObservableObject {
            let decoded = decode(type, from: cloudData) {
             defaults.set(cloudData, forKey: key)
             defaults.set(cloudModifiedAt, forKey: modifiedAtKey(for: key))
-            lastSyncStatus = "Dati caricati da iCloud"
+            lastSyncStatus = String(localized: "Dati caricati da iCloud")
             return decoded
         }
 
@@ -68,7 +68,7 @@ final class CloudSyncStore: ObservableObject {
             cloudStore.set(localData, forKey: key)
             cloudStore.set(localModifiedAt, forKey: modifiedAtKey(for: key))
             synchronize()
-            lastSyncStatus = "Dati locali pronti per iCloud"
+            lastSyncStatus = String(localized: "Dati locali pronti per iCloud")
             return decoded
         }
 
@@ -77,7 +77,7 @@ final class CloudSyncStore: ObservableObject {
 
     func save<T: Encodable>(_ value: T, forKey key: String) {
         guard let data = encode(value) else {
-            lastSyncStatus = "Errore codifica dati iCloud"
+            lastSyncStatus = String(localized: "Errore codifica dati iCloud")
             return
         }
 
@@ -87,7 +87,9 @@ final class CloudSyncStore: ObservableObject {
         cloudStore.set(data, forKey: key)
         cloudStore.set(modifiedAt, forKey: modifiedAtKey(for: key))
         synchronize()
-        lastSyncStatus = isICloudAvailable ? "Salvato localmente e su iCloud" : "Salvato localmente, iCloud non disponibile"
+        lastSyncStatus = isICloudAvailable
+            ? String(localized: "Salvato localmente e su iCloud")
+            : String(localized: "Salvato localmente, iCloud non disponibile")
     }
 
     func synchronize() {

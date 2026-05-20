@@ -8,7 +8,7 @@ final class CompassManager: NSObject, ObservableObject {
 
     @Published private(set) var headingDegrees: Double = 0
     @Published var bearingDegrees: Double?
-    @Published private(set) var statusMessage = "Bussola pronta"
+    @Published private(set) var statusMessage = String(localized: "Bussola pronta")
     private let locationManager = CLLocationManager()
 
     override init() {
@@ -21,10 +21,10 @@ final class CompassManager: NSObject, ObservableObject {
     func start() {
         locationManager.requestWhenInUseAuthorization()
         if CLLocationManager.headingAvailable() {
-            statusMessage = "Bussola attiva"
+            statusMessage = String(localized: "Bussola attiva")
             locationManager.startUpdatingHeading()
         } else {
-            statusMessage = "Bussola non disponibile"
+            statusMessage = String(localized: "Bussola non disponibile")
         }
     }
 
@@ -43,13 +43,15 @@ extension CompassManager: CLLocationManagerDelegate {
         Task { @MainActor in
             switch manager.authorizationStatus {
             case .denied, .restricted:
-                statusMessage = "Permesso posizione negato"
+                statusMessage = String(localized: "Permesso posizione negato")
             case .authorizedAlways, .authorizedWhenInUse:
-                statusMessage = CLLocationManager.headingAvailable() ? "Bussola attiva" : "Bussola non disponibile"
+                statusMessage = CLLocationManager.headingAvailable()
+                    ? String(localized: "Bussola attiva")
+                    : String(localized: "Bussola non disponibile")
             case .notDetermined:
-                statusMessage = "In attesa permesso posizione"
+                statusMessage = String(localized: "In attesa permesso posizione")
             @unknown default:
-                statusMessage = "Stato bussola sconosciuto"
+                statusMessage = String(localized: "Stato bussola sconosciuto")
             }
         }
     }
@@ -57,7 +59,7 @@ extension CompassManager: CLLocationManagerDelegate {
     nonisolated func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         Task { @MainActor in
             headingDegrees = newHeading.trueHeading >= 0 ? newHeading.trueHeading : newHeading.magneticHeading
-            statusMessage = "Bussola attiva"
+            statusMessage = String(localized: "Bussola attiva")
         }
     }
 }
