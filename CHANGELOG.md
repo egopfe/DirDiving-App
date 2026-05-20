@@ -4,6 +4,18 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-20, secondary i18n + documentation alignment)
+
+- Pass i18n secondario: espansione `Resources/{en,it}.lproj` e `iOSApp/Resources/{en,it}.lproj`; localizzazione messaggi sync, bussola, allarmi, Settings, log, export, Analysis/Planner header.
+- `Docs/SAFETY_DISCLAIMER.md`, `Docs/TESTFLIGHT_REVIEW_NOTES.md`, `Docs/ROADMAP.md`.
+- Aggiornamento `Docs/DIR_DIVING_Feature_Comparison.csv` (stati UX backlog → Implemented su `main` dove in `a75a6c3`).
+- `Docs/DOCUMENTATION_UPDATE_REPORT_20260520_POST_RELEASE.md` — report A–K allineamento documentazione.
+
+### Added (2026-05-20, MAIN issues implementation — code on main)
+
+- Commit `a75a6c3`: P0 inbound Watch sync, P1 tombstone unificata, GPS banner compatto, alarm OK, sync strip, App Intents; port manuale backlog preservando F1–F12.
+- `Docs/MAIN_ISSUES_IMPLEMENTATION_REPORT_20260520.md`, `Docs/MAIN_BRANCH_ISSUES_AND_PRIORITIES_20260520.md`.
+
 ### Added (2026-05-20, ascent alarm inline banner + documentation pass)
 
 - `Views/AscentWarningBannerView.swift` — banner rosso non bloccante tra TTV/RunTime e profondita (mockup `ascent_alarm.png`).

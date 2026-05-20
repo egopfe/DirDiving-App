@@ -19,8 +19,9 @@ Allineamento documentazione dopo `git fetch origin` e implementazione banner ris
 
 ### `main` (local vs `origin/main`)
 
-- Working tree include: ascent banner (Swift + strings), docs 20260520, audit 20260519.
-- Push richiesto dopo commit per pubblicare su `origin/main`.
+- Commit `a75a6c3`: P0/P1/P2 implementation (sync inbound, tombstones, GPS banner, alarm OK).
+- Commit docs + `fix(i18n)` secondario (questo pass 2026-05-20).
+- Push `origin/main` dopo commit documentazione/i18n.
 
 ### `main-iOS`
 
