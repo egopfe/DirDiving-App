@@ -64,6 +64,25 @@ final class WatchSyncService: NSObject, ObservableObject {
         activate(logStore: logStore)
     }
 
+    func publishDeletedSessionIDs(_ ids: Set<UUID>) {
+        guard WCSession.isSupported(), WCSession.default.activationState == .activated, !ids.isEmpty else { return }
+        var existing = Set((WCSession.default.applicationContext[WatchSyncKeys.deletedSessionBroadcastKey] as? [String]) ?? [])
+        existing.formUnion(ids.map(\.uuidString))
+        WatchSyncAuth.mergeApplicationContext([WatchSyncKeys.deletedSessionBroadcastKey: Array(existing)])
+        lastMessage = "Tombstone inviata al Watch (\(ids.count))"
+    }
+
+    private func ingestCompanionContext(_ context: [String: Any]) {
+        WatchSyncAuth.ingestSharedSecretFromContext(context)
+        if let strings = context[WatchSyncKeys.deletedSessionBroadcastKey] as? [String] {
+            let ids = Set(strings.compactMap(UUID.init(uuidString:)))
+            if !ids.isEmpty {
+                logStore?.applyRemoteDeletedSessionIDs(ids)
+                lastMessage = "Tombstone Watch applicata (\(ids.count))"
+            }
+        }
+    }
+
     private struct AckContext {
         let sessionID: UUID
         let issuedAt: Date
@@ -179,11 +198,12 @@ final class WatchSyncService: NSObject, ObservableObject {
 
 extension WatchSyncService: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        let context = session.receivedApplicationContext
         Task { @MainActor in
             self.activationState = activationState
             self.lastMessage = error?.localizedDescription ?? "Sessione Watch attiva"
             if activationState == .activated {
-                WatchSyncAuth.ingestSharedSecretFromContext(WatchSyncAuth.cachedApplicationContext())
+                self.ingestCompanionContext(context)
                 WatchSyncAuth.publishSharedSecretIfNeeded()
             }
         }
@@ -191,7 +211,7 @@ extension WatchSyncService: WCSessionDelegate {
 
     nonisolated func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
         Task { @MainActor in
-            WatchSyncAuth.ingestSharedSecretFromContext(applicationContext)
+            self.ingestCompanionContext(applicationContext)
             WatchSyncAuth.publishSharedSecretIfNeeded()
         }
     }

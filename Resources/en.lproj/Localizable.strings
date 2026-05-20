@@ -75,6 +75,16 @@
 "ascent_alarm_speed_unit" = "m/min";
 "ascent_alarm_accessibility_hint" = "Slow your ascent. Depth and gauge remain visible.";
 
+"gps.banner.start.title" = "GPS START SAVED";
+"gps.banner.end.title" = "GPS END SAVED";
+"gps.banner.coords" = "%.5f, %.5f";
+"gps.banner.unavailable" = "GPS unavailable";
+"alarm.acknowledge" = "OK";
+"live.ready.title" = "READY FOR\nDIVE";
+"live.ready.subtitle" = "Waiting for automatic dive start";
+"live.haptics.off" = "HAPTICS OFF";
+"live.haptics.visual_only" = "VISUAL ALERTS ONLY";
+
 "Altro" = "More";
 "PREFERENZE APP" = "APP PREFERENCES";
 "SYNC WATCH" = "SYNC WATCH";

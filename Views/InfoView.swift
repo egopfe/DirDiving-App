@@ -91,6 +91,7 @@ struct InfoView: View {
         .background(rowBackground)
     }
 
+    @ViewBuilder
     private var batteryRow: some View {
         let percent = batteryLevel >= 0 ? Int((batteryLevel * 100).rounded()) : -1
         VStack(spacing: 5) {

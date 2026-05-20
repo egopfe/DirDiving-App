@@ -4,6 +4,8 @@ import CoreLocation
 
 @MainActor
 final class CompassManager: NSObject, ObservableObject {
+    static private(set) weak var shared: CompassManager?
+
     @Published private(set) var headingDegrees: Double = 0
     @Published var bearingDegrees: Double?
     @Published private(set) var statusMessage = "Bussola pronta"
@@ -11,6 +13,7 @@ final class CompassManager: NSObject, ObservableObject {
 
     override init() {
         super.init()
+        Self.shared = self
         locationManager.delegate = self
         locationManager.headingFilter = 1
     }

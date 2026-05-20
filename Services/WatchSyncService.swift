@@ -15,15 +15,13 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published private(set) var acknowledgedTransferCount = 0
     @Published private(set) var failedTransferCount = 0
     @Published private(set) var lastRetryDate: Date?
+    @Published private(set) var importedFromCompanionCount = 0
 
     private var pendingSessions: [DiveSession] = []
-
-    // F9: persist the pending queue to a Documents/ file with `.completeFileProtection`
-    // rather than UserDefaults, because each entry is a full DiveSession including
-    // GPS coordinates. The legacy UserDefaults key is migrated once on init.
     private let legacyPendingSessionsKey = "dirdiving_watch_pending_sync_sessions"
     private let pendingFileName = "dirdiving_watch_pending_sync_sessions.json"
-
+    private weak var logStore: DiveLogStore?
+    private var importedFromCompanionIDs: Set<UUID> = []
     private var peerSecretObserver: NSObjectProtocol?
 
     private static let logger = Logger(subsystem: "com.egopfe.dirdiving", category: "WatchSyncService")
@@ -32,6 +30,8 @@ final class WatchSyncService: NSObject, ObservableObject {
         super.init()
         pendingSessions = loadPendingSessions()
         pendingTransferCount = pendingSessions.count
+        importedFromCompanionIDs = WatchDiveSyncCodec.loadImportedFromCompanionIDs()
+        importedFromCompanionCount = importedFromCompanionIDs.count
         peerSecretObserver = NotificationCenter.default.addObserver(
             forName: .watchSyncPeerSecretDidUpdate,
             object: nil,
@@ -40,6 +40,10 @@ final class WatchSyncService: NSObject, ObservableObject {
             Task { @MainActor in self?.flushPendingTransfers() }
         }
         activate()
+    }
+
+    func attachLogStore(_ store: DiveLogStore) {
+        logStore = store
     }
 
     deinit {
@@ -59,6 +63,7 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     func transfer(_ session: DiveSession) {
         guard WCSession.isSupported() else { return }
+        if importedFromCompanionIDs.contains(session.id) { return }
         enqueuePendingSession(session)
 
         if WatchSyncAuth.hasPeerSecret() {
@@ -67,6 +72,15 @@ final class WatchSyncService: NSObject, ObservableObject {
             WatchSyncAuth.publishSharedSecretIfNeeded()
             lastSyncStatus = "Pending: in attesa chiave sync (\(pendingTransferCount) in coda)"
         }
+    }
+
+    /// Broadcast tombstone UUIDs to iPhone via applicationContext (merge-safe).
+    func publishDeletedSessionIDs(_ ids: Set<UUID>) {
+        guard WCSession.isSupported(), !ids.isEmpty else { return }
+        var existing = Set((WCSession.default.applicationContext[WatchSyncKeys.deletedSessionBroadcastKey] as? [String]) ?? [])
+        existing.formUnion(ids.map(\.uuidString))
+        WatchSyncAuth.mergeApplicationContext([WatchSyncKeys.deletedSessionBroadcastKey: Array(existing)])
+        lastSyncStatus = "Tombstone inviata a iPhone (\(ids.count))"
     }
 
     func retryPendingTransfers() {
@@ -95,6 +109,48 @@ final class WatchSyncService: NSObject, ObservableObject {
         lastSyncStatus = "Coda sync cancellata su richiesta"
     }
 
+    private func ingestIncomingPayload(_ payload: [String: Any]) {
+        do {
+            let session = try WatchDiveSyncCodec.parseSession(from: payload)
+            if logStore?.isDeleted(id: session.id) == true {
+                rememberCompanionSession(id: session.id)
+                lastSyncStatus = "Import iPhone ignorato: tombstone presente"
+                return
+            }
+            if importedFromCompanionIDs.contains(session.id) {
+                lastSyncStatus = "Immersione iPhone duplicata ignorata"
+                return
+            }
+            rememberCompanionSession(id: session.id)
+            logStore?.addFromCompanion(session)
+            lastSyncStatus = "Immersione ricevuta da iPhone"
+        } catch {
+            failedTransferCount += 1
+            lastSyncStatus = "Errore import iPhone: \(error.localizedDescription)"
+            Self.logger.error("Watch import from companion failed: \(error.localizedDescription, privacy: .private)")
+        }
+    }
+
+    private func rememberCompanionSession(id: UUID) {
+        importedFromCompanionIDs.insert(id)
+        importedFromCompanionCount = importedFromCompanionIDs.count
+        WatchDiveSyncCodec.saveImportedFromCompanionIDs(importedFromCompanionIDs)
+    }
+
+    private func ingestCompanionContext(_ context: [String: Any]) {
+        WatchSyncAuth.ingestSharedSecretFromContext(context)
+        if let units = context[WatchSyncKeys.unitsPreferenceKey] as? String, units == "metric" {
+            UserDefaults.standard.set("metric", forKey: "dirdiving_watch_units")
+        }
+        if let strings = context[WatchSyncKeys.deletedSessionBroadcastKey] as? [String] {
+            let ids = Set(strings.compactMap(UUID.init(uuidString:)))
+            if !ids.isEmpty {
+                logStore?.applyRemoteDeletedSessionIDs(ids)
+                lastSyncStatus = "Tombstone iPhone applicata (\(ids.count))"
+            }
+        }
+    }
+
     private func flushPendingTransfers() {
         guard WatchSyncAuth.hasPeerSecret(), !pendingSessions.isEmpty else { return }
         let queue = pendingSessions
@@ -111,11 +167,6 @@ final class WatchSyncService: NSObject, ObservableObject {
                 WCSession.default.sendMessage(envelope.message) { [weak self] reply in
                     Task { @MainActor in
                         guard let self else { return }
-                        // F11: prefer the cryptographic ack. Fall back to the legacy
-                        // `status == acknowledged` only when the signature is absent,
-                        // so this rollout stays compatible with older iOS builds.
-                        // TODO(F11-followup): require the signed ack and treat the
-                        // legacy path as `failed` once the iOS floor build is bumped.
                         let providedSignature = reply["ackSignature"] as? String
                         let signedOK = WatchDiveSyncCodec.verifyAckSignature(
                             providedSignature,
@@ -193,8 +244,6 @@ final class WatchSyncService: NSObject, ObservableObject {
             return decoded
         }
 
-        // F9 migration: read once from UserDefaults, persist to the protected
-        // file, then drop the legacy key so PII no longer lives in UserDefaults.
         guard let legacyData = UserDefaults.standard.data(forKey: legacyPendingSessionsKey) else { return [] }
         let migrated = (try? decoder.decode([DiveSession].self, from: legacyData)) ?? []
         if !migrated.isEmpty {
@@ -222,11 +271,12 @@ final class WatchSyncService: NSObject, ObservableObject {
 
 extension WatchSyncService: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        let context = session.receivedApplicationContext
         Task { @MainActor in
             self.activationState = activationState
             self.lastSyncStatus = error?.localizedDescription ?? "Companion sync attivo"
             if activationState == .activated {
-                WatchSyncAuth.ingestSharedSecretFromContext(session.receivedApplicationContext)
+                self.ingestCompanionContext(context)
                 WatchSyncAuth.publishSharedSecretIfNeeded()
                 self.flushPendingTransfers()
             }
@@ -235,8 +285,27 @@ extension WatchSyncService: WCSessionDelegate {
 
     nonisolated func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
         Task { @MainActor in
-            WatchSyncAuth.ingestSharedSecretFromContext(applicationContext)
+            self.ingestCompanionContext(applicationContext)
             self.flushPendingTransfers()
+        }
+    }
+
+    nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+        Task { @MainActor in
+            self.ingestIncomingPayload(message)
+        }
+    }
+
+    nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
+        Task { @MainActor in
+            self.ingestIncomingPayload(message)
+            replyHandler(["status": "acknowledged"])
+        }
+    }
+
+    nonisolated func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
+        Task { @MainActor in
+            self.ingestIncomingPayload(userInfo)
         }
     }
 

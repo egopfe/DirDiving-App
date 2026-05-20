@@ -73,6 +73,7 @@ final class DiveManager: NSObject, ObservableObject {
     private var lastDepthAlarmDate: Date?
     private var lastRuntimeAlarmDate: Date?
     private var lastBatteryAlarmDate: Date?
+    private var lastAlarmDismissDate: Date?
 
     init(logStore: DiveLogStore, gpsManager: GPSManager, ascentSettings: AscentRateSettingsStore) {
         self.logStore = logStore
@@ -131,6 +132,14 @@ final class DiveManager: NSObject, ObservableObject {
     func endManualDive() {
         guard isManualLifecycleActive else { return }
         endDiveIfNeeded(isManual: true)
+    }
+
+    func dismissAlarmWarning() {
+        guard alarmWarningMessage != nil else { return }
+        alarmWarningMessage = nil
+        lastAlarmDismissDate = Date()
+        stopBlinking()
+        HapticService.shared.notify()
     }
 
     private func beginDiveIfNeeded(isManual: Bool = false) {
@@ -257,6 +266,7 @@ final class DiveManager: NSObject, ObservableObject {
 
     private func triggerAlarm(_ message: String, lastDate: inout Date?) {
         let now = Date()
+        if let lastAlarmDismissDate, now.timeIntervalSince(lastAlarmDismissDate) < 15 { return }
         if let lastDate, now.timeIntervalSince(lastDate) < 30 { return }
         lastDate = now
         alarmWarningMessage = message
@@ -293,7 +303,7 @@ final class DiveManager: NSObject, ObservableObject {
         gpsConfirmation = confirmation
         HapticService.shared.confirm()
         Task { @MainActor in
-            try? await Task.sleep(nanoseconds: 2_400_000_000)
+            try? await Task.sleep(nanoseconds: 1_400_000_000)
             if self.gpsConfirmation == confirmation {
                 self.gpsConfirmation = nil
             }

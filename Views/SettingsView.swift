@@ -246,7 +246,7 @@ struct SettingsView: View {
                     Text(language.title).tag(language.rawValue)
                 }
             }
-            .pickerStyle(.segmented)
+            .pickerStyle(.wheel)
             .tint(DiveUI.cyan)
             Text(selectedLanguage.watchDetail)
                 .font(.system(size: 9, weight: .semibold, design: .rounded))
@@ -277,7 +277,7 @@ struct SettingsView: View {
             Picker("Unità", selection: $watchUnits) {
                 Text("m").tag("metric")
             }
-            .pickerStyle(.segmented)
+            .pickerStyle(.wheel)
             .tint(DiveUI.cyan)
             Text("Imperiale non selezionabile finche la conversione Watch non e implementata. Export sempre metrico/Subsurface.")
                 .font(.system(size: 9, weight: .semibold, design: .rounded))

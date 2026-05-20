@@ -75,6 +75,16 @@
 "ascent_alarm_speed_unit" = "m/min";
 "ascent_alarm_accessibility_hint" = "Rallenta la risalita. Profondita e gauge restano visibili.";
 
+"gps.banner.start.title" = "GPS INIZIO REGISTRATO";
+"gps.banner.end.title" = "GPS FINE REGISTRATO";
+"gps.banner.coords" = "%.5f, %.5f";
+"gps.banner.unavailable" = "GPS non disponibile";
+"alarm.acknowledge" = "OK";
+"live.ready.title" = "PRONTO PER\nL'IMMERSIONE";
+"live.ready.subtitle" = "In attesa di immersione automatica";
+"live.haptics.off" = "APTICA DISATTIVATA";
+"live.haptics.visual_only" = "AVVISI SOLO VISIVI";
+
 "Altro" = "Altro";
 "PREFERENZE APP" = "PREFERENZE APP";
 "SYNC WATCH" = "SYNC WATCH";

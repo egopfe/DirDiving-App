@@ -4,6 +4,7 @@ import SwiftUI
 /// Visual target: black canvas, neon accents, rounded panels (`Docs/ReferenceUI/Watch_LIVE_reference.png`).
 struct DiveLiveView: View {
     @EnvironmentObject private var dive: DiveManager
+    @EnvironmentObject private var watchSync: WatchSyncService
     @AppStorage(HapticService.hapticsEnabledKey) private var hapticsEnabled = true
     @State private var ascentHapticLoopTask: Task<Void, Never>?
 
@@ -21,19 +22,24 @@ struct DiveLiveView: View {
                 let leftWidth = contentWidth - gaugeWidth - 8
 
                 VStack(spacing: 7) {
-                    if let confirmation = dive.gpsConfirmation {
-                        gpsConfirmationView(confirmation)
-                    } else if dive.isDiveActive {
+                    if watchSync.pendingTransferCount > 0 || watchSync.failedTransferCount > 0 {
+                        syncStatusStrip
+                    }
+                    if dive.isDiveActive {
                         activeDiveContent(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
                     } else {
                         preDiveWaitingContent
                     }
-
+                    if let confirmation = dive.gpsConfirmation {
+                        gpsConfirmationBanner(confirmation)
+                    }
                     if let alarm = dive.alarmWarningMessage {
-                        warningBanner(alarm)
+                        warningBanner(alarm, showAcknowledge: true) {
+                            dive.dismissAlarmWarning()
+                        }
                     }
                     if let error = dive.lastErrorMessage {
-                        warningBanner(error)
+                        warningBanner(error, showAcknowledge: false) {}
                     }
                 }
                 .padding(.horizontal, 9)
@@ -79,13 +85,87 @@ struct DiveLiveView: View {
         }
     }
 
-    @ViewBuilder
-    private func gpsConfirmationView(_ confirmation: DiveGPSConfirmation) -> some View {
+    private var syncStatusStrip: some View {
+        HStack(spacing: 6) {
+            Image(systemName: watchSync.failedTransferCount > 0 ? "exclamationmark.triangle.fill" : "arrow.triangle.2.circlepath")
+            Text(watchSync.lastSyncStatus)
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
+            Spacer(minLength: 0)
+            if watchSync.pendingTransferCount > 0 {
+                Text("\(watchSync.pendingTransferCount)")
+                    .font(.caption2.bold())
+                    .foregroundStyle(DiveUI.cyan)
+            }
+        }
+        .font(.caption2.bold())
+        .foregroundStyle(watchSync.failedTransferCount > 0 ? DiveUI.yellow : DiveUI.cyan)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill((watchSync.failedTransferCount > 0 ? DiveUI.yellow : DiveUI.cyan).opacity(0.10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .stroke((watchSync.failedTransferCount > 0 ? DiveUI.yellow : DiveUI.cyan).opacity(0.65), lineWidth: 1)
+                )
+        )
+    }
+
+    private func gpsConfirmationBanner(_ confirmation: DiveGPSConfirmation) -> some View {
+        HStack(spacing: 7) {
+            Image(systemName: gpsConfirmationIcon(confirmation))
+                .font(.system(size: 14, weight: .black))
+            VStack(alignment: .leading, spacing: 1) {
+                Text(gpsConfirmationTitle(confirmation))
+                    .font(.system(size: 10, weight: .black, design: .rounded))
+                Text(gpsConfirmationDetail(confirmation))
+                    .font(.system(size: 9, weight: .semibold, design: .rounded))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.66)
+            }
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(gpsConfirmationColor(confirmation))
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(gpsConfirmationColor(confirmation).opacity(0.11))
+                .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).stroke(gpsConfirmationColor(confirmation).opacity(0.72), lineWidth: 1))
+        )
+    }
+
+    private func gpsConfirmationIcon(_ confirmation: DiveGPSConfirmation) -> String {
         switch confirmation {
-        case .start(let point, let fallback):
-            GPSStartRegisteredView(point: point, isFallback: fallback)
-        case .end(let point, let fallback):
-            GPSEndRegisteredView(point: point, isFallback: fallback)
+        case .start(_, let fallback), .end(_, let fallback):
+            return fallback ? "location.fill.viewfinder" : "checkmark.circle.fill"
+        }
+    }
+
+    private func gpsConfirmationTitle(_ confirmation: DiveGPSConfirmation) -> String {
+        switch confirmation {
+        case .start: return String(localized: "gps.banner.start.title")
+        case .end: return String(localized: "gps.banner.end.title")
+        }
+    }
+
+    private func gpsConfirmationDetail(_ confirmation: DiveGPSConfirmation) -> String {
+        switch confirmation {
+        case .start(let point, _), .end(let point, _):
+            if let point {
+                return String(format: String(localized: "gps.banner.coords"), point.latitude, point.longitude)
+            }
+            return String(localized: "gps.banner.unavailable")
+        }
+    }
+
+    private func gpsConfirmationColor(_ confirmation: DiveGPSConfirmation) -> Color {
+        switch confirmation {
+        case .start(_, let fallback), .end(_, let fallback):
+            return fallback ? DiveUI.yellow : DiveUI.green
         }
     }
 
@@ -446,12 +526,17 @@ struct DiveLiveView: View {
         )
     }
 
-    private func warningBanner(_ error: String) -> some View {
+    private func warningBanner(_ message: String, showAcknowledge: Bool, acknowledge: @escaping () -> Void) -> some View {
         HStack(spacing: 6) {
             Image(systemName: "exclamationmark.triangle.fill")
-            Text(error)
+            Text(message)
                 .lineLimit(2)
                 .minimumScaleFactor(0.72)
+            if showAcknowledge {
+                Button(String(localized: "alarm.acknowledge"), action: acknowledge)
+                    .font(.caption2.bold())
+                    .foregroundStyle(DiveUI.cyan)
+            }
         }
         .font(.caption2.bold())
         .foregroundStyle(DiveUI.yellow)

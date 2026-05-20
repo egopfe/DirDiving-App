@@ -16,6 +16,17 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 - [ ] `xcodebuild` **DIRDiving Watch App** — `generic/platform=watchOS` — **PASS**  
 - [ ] `xcodebuild` **DIRDiving iOS** — `generic/platform=iOS` — **PASS**  
 
+## Depth entitlement (Apple Watch Ultra — field validation)
+
+**Not complete until executed on real hardware.** Entitlement is configured in `Config/DIRDiving.entitlements`; simulator does not certify submersion.
+
+- [ ] Apple Developer portal: App ID `com.egopfe.dirdiving` includes **water submersion** entitlement approved  
+- [ ] Provisioning profile used for Archive includes `com.apple.developer.coremotion.water-submersion`  
+- [ ] Real **Apple Watch Ultra**: automatic dive launch when submerged (if product expects it)  
+- [ ] Live depth samples from `CMWaterSubmersionManager` during test dive  
+- [ ] Manual dive fallback panel still works when sensor unavailable  
+- [ ] Info screen diagnostics match field result (not only “Configurato”)  
+
 ## Device matrix (manuale)
 
 - [ ] Apple Watch **Ultra** — live screen, gauge, START/STOP/RESET, testi non tagliati  
