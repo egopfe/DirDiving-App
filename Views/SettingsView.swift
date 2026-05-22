@@ -31,6 +31,17 @@ struct SettingsView: View {
                         }
                         .tint(DiveUI.blue)
                         languagePreferenceControl
+                        NavigationLink {
+                            WatchLegalSafetyView()
+                        } label: {
+                            settingsRowContent(
+                                icon: "checkmark.shield",
+                                iconColor: DiveUI.red,
+                                title: "Legal & Safety",
+                                subtitle: "NOT A DIVE COMPUTER"
+                            )
+                        }
+                        .buttonStyle(.plain)
                         Button {
                             navigation.selectedPage = .alarmSettings
                         } label: {

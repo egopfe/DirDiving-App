@@ -1,0 +1,49 @@
+DIR Diving – Complete Legal Disclaimer & Safety Notice
+
+This document contains the complete onboarding disclaimer for DIR Diving, including English and Italian versions, legal protections, liability limitations, and recommended acceptance workflow.
+
+ENGLISH VERSION
+
+IMPORTANT SAFETY NOTICE
+
+DIR Diving is NOT a dive computer. DIR Diving is a dive companion and monitoring application designed exclusively to display and record selected dive-related information such as depth, average depth, runtime, water temperature, GPS surface position, telemetry, navigation support, and dive logs. The application must never be used as the sole instrument for dive planning, decompression management, life-support decisions, emergency management, ascent decisions, gas management, or technical diving procedures.
+
+SENSOR AND DEVICE LIMITATIONS
+
+DIR Diving relies on Apple Watch sensors, watchOS APIs, Bluetooth communication, GPS systems, motion sensors, and depth/pressure sensors. These systems may malfunction, freeze, disconnect, or provide inaccurate readings without warning. Environmental conditions may affect the operation and reliability of the application.
+
+NO WARRANTY
+
+DIR Diving is provided 'AS IS' and 'AS AVAILABLE' without warranties of any kind. To the maximum extent permitted by law, the developers and distributors disclaim all liability for injuries, decompression sickness, death, equipment damage, data loss, or any direct or indirect damages.
+
+TRAINING REQUIREMENT
+
+DIR Diving is intended only for certified divers with appropriate training for the dives they perform. The app does not replace professional instruction, certification, or safe diving procedures.
+
+APPLE WATCH NOTICE
+
+DIR Diving is an independent application and is not certified, endorsed, or approved by Apple as a certified diving computer. Compatibility with Apple Watch models does not imply certification for life-support or decompression use.
+
+MEDICAL DISCLAIMER
+
+Diving exposes users to physiological stress and medical risks. Consult a qualified physician before diving. Never dive under the influence of alcohol, drugs, fatigue, or incompatible medical conditions.
+
+DATA AND LOGGING DISCLAIMER
+
+Dive logs, GPS tracks, telemetry, exported files, and synchronization data may contain inaccuracies or incomplete information. Such data must never be used as the sole basis for decompression analysis or medical evaluation.
+
+EXTRA LEGAL PROTECTIONS
+
+• Mandatory acceptance before app usage
+• Timestamped onboarding acceptance logging
+• Periodic re-acceptance after major updates
+• Separate Terms of Service and Privacy Policy
+• GDPR-compliant data management
+• Jurisdiction and governing law clause
+• Age restriction according to local laws
+• Explicit exclusion of life-support use
+• Explicit prohibition of sole reliance during dives
+
+USER ACKNOWLEDGMENT
+
+By using DIR Diving, the user acknowledges being a trained and responsible diver, understands the risks associated with diving, and accepts full responsibility for all diving activities.

@@ -10,6 +10,7 @@ struct DIRDivingApp: App {
     @StateObject private var ascentSettings: AscentRateSettingsStore
     @StateObject private var navigationStore: AppNavigationStore
     @StateObject private var watchSync: WatchSyncService
+    @StateObject private var legalAcceptance = LegalAcceptanceStore()
     @AppStorage(DIRAppLanguage.storageKey) private var appLanguage = DIRAppLanguage.system.rawValue
 
     init() {
@@ -29,7 +30,15 @@ struct DIRDivingApp: App {
 
     var body: some Scene {
         WindowGroup {
-            NavigationStack { ContentView() }
+            NavigationStack {
+                if legalAcceptance.requiresAcceptance {
+                    WatchLegalOnboardingView(
+                        languageCode: DIRAppLanguage.fromStorage(appLanguage).resolvedLanguageCode
+                    )
+                } else {
+                    ContentView()
+                }
+            }
                 .environmentObject(logStore)
                 .environmentObject(gpsManager)
                 .environmentObject(compassManager)
@@ -38,6 +47,7 @@ struct DIRDivingApp: App {
                 .environmentObject(ascentSettings)
                 .environmentObject(navigationStore)
                 .environmentObject(watchSync)
+                .environmentObject(legalAcceptance)
                 .environment(\.locale, DIRAppLanguage.fromStorage(appLanguage).locale)
         }
     }

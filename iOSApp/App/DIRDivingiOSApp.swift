@@ -8,6 +8,7 @@ struct DIRDivingiOSApp: App {
     @StateObject private var plannerStore: PlannerStore
     @StateObject private var equipmentStore: EquipmentStore
     @StateObject private var navigationStore = IOSNavigationStore()
+    @StateObject private var legalAcceptance = LegalAcceptanceStore()
     @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
 
     init() {
@@ -20,13 +21,22 @@ struct DIRDivingiOSApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            Group {
+                if legalAcceptance.requiresAcceptance {
+                    IOSLegalOnboardingView(
+                        languageCode: DIRIOSAppLanguage.fromStorage(appLanguage).resolvedLanguageCode
+                    )
+                } else {
+                    ContentView()
+                }
+            }
                 .environmentObject(logStore)
                 .environmentObject(watchSync)
                 .environmentObject(plannerStore)
                 .environmentObject(equipmentStore)
                 .environmentObject(cloudSync)
                 .environmentObject(navigationStore)
+                .environmentObject(legalAcceptance)
                 .environment(\.locale, DIRIOSAppLanguage.fromStorage(appLanguage).locale)
                 .preferredColorScheme(.dark)
                 .onAppear { watchSync.activate(logStore: logStore) }

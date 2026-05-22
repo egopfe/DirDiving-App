@@ -24,6 +24,21 @@ struct MoreView: View {
                             languagePreferencePicker
                             row("Sync impostazioni", "Locale-only")
                             row("Planner safety", "Disclaimer richiesto")
+                            NavigationLink {
+                                IOSLegalSafetyView()
+                            } label: {
+                                HStack {
+                                    Label("Legal & Safety", systemImage: "checkmark.shield")
+                                        .foregroundStyle(DIRTheme.cyan)
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption.weight(.bold))
+                                        .foregroundStyle(DIRTheme.muted)
+                                }
+                                .font(.callout.weight(.semibold))
+                                .padding(.vertical, 6)
+                            }
+                            .buttonStyle(.plain)
                         }
                         DIRCard("SYNC WATCH", icon: "applewatch", accent: DIRTheme.cyan) {
                             row("Supportato", watchSync.isSupported ? "Si" : "No")
