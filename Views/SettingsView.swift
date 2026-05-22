@@ -50,6 +50,18 @@ struct SettingsView: View {
 
                     unitPreferenceControl
                     languagePreferenceControl
+                    NavigationLink {
+                        WatchLegalSafetyView()
+                    } label: {
+                        settingsRow(
+                            icon: "checkmark.shield",
+                            iconColor: DiveUI.red,
+                            title: "Legal & Safety",
+                            subtitle: "NOT A DIVE COMPUTER",
+                            showsChevron: true
+                        )
+                    }
+                    .buttonStyle(.plain)
                     settingsRow(
                         icon: "iphone.slash",
                         iconColor: DiveUI.yellow,
