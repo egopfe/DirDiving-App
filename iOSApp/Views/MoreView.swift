@@ -40,6 +40,21 @@ struct MoreView: View {
                             lockedPreference("Export predefinito", value: exportFormat, note: "Unico formato disponibile oggi.")
                             infoRow("Sync impostazioni", "Locale-only")
                             infoRow("Planner safety", "Disclaimer richiesto")
+                            NavigationLink {
+                                IOSLegalSafetyView()
+                            } label: {
+                                HStack {
+                                    Label("Legal & Safety", systemImage: "checkmark.shield")
+                                        .foregroundStyle(DIRTheme.cyan)
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption.weight(.bold))
+                                        .foregroundStyle(DIRTheme.muted)
+                                }
+                                .font(.callout.weight(.semibold))
+                                .padding(.vertical, 6)
+                            }
+                            .buttonStyle(.plain)
                             infoNote("Le unità convertono la visualizzazione iOS di profondità, temperatura, distanza e SAC. Dati salvati, import/export CSV e planner restano metrici per compatibilità e sicurezza.")
                         }
                         DIRCard("ALLARMI E NOTIFICHE", icon: "bell.badge", accent: DIRTheme.yellow) {

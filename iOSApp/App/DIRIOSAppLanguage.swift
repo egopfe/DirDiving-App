@@ -21,6 +21,17 @@ enum DIRIOSAppLanguage: String, CaseIterable, Identifiable {
         }
     }
 
+    var resolvedLanguageCode: String {
+        switch self {
+        case .system:
+            return Self.supportedSystemLanguageCode
+        case .italian:
+            return "it"
+        case .english:
+            return "en"
+        }
+    }
+
     var title: LocalizedStringKey {
         switch self {
         case .system:
@@ -45,6 +56,17 @@ enum DIRIOSAppLanguage: String, CaseIterable, Identifiable {
 
     static func fromStorage(_ rawValue: String) -> DIRIOSAppLanguage {
         DIRIOSAppLanguage(rawValue: rawValue) ?? .system
+    }
+
+    private static var supportedSystemLanguageCode: String {
+        let preferred = Locale.preferredLanguages.first?.lowercased() ?? "it"
+        if preferred.hasPrefix("en") {
+            return "en"
+        }
+        if preferred.hasPrefix("it") {
+            return "it"
+        }
+        return "it"
     }
 
     private static var supportedSystemLocale: Locale {
