@@ -1,11 +1,51 @@
-# DIR DIVING — Safety Disclaimer
+# Disclaimer di sicurezza - DIR DIVING
 
-DIR DIVING is a dive companion and dive logging application.
+**Versione documento:** 2026-05-20 - rami `main` / `main-iOS`
 
-It is NOT:
-- a certified dive computer
-- a certified decompression computer
-- a life-support device
-- a replacement for certified diving instrumentation
+DIR DIVING (Apple Watch MAIN + iOS Companion) e uno strumento companion per log immersioni e supporto operativo. **Non** e un computer subacqueo certificato, **non** e un planner decompressivo certificato, **non** e un dispositivo life-support e **non** e un sistema di soccorso o navigazione sostitutivo.
 
-Users must always rely on certified diving equipment and proper diving training.
+## Cosa l'app non sostituisce
+
+L'app **non** deve essere usata come:
+
+- computer subacqueo primario;
+- planner decompressivo certificato;
+- sostituto di tabelle o procedure di agenzia;
+- sostituto di formazione tecnica o di team;
+- unica fonte per decisioni di sicurezza in immersione.
+
+Gli utenti devono sempre affidarsi a strumentazione certificata, formazione adeguata, procedure di centro immersioni/team e giudizio umano. I calcoli del planner iOS, i valori **TTV** live, le presentazioni stile Buhlmann e le curve sono **indicativi ed educativi**.
+
+## Profondita e sensore (Apple Watch Ultra)
+
+- L'entitlement **water submersion** va approvato in Apple Developer e validato su **hardware reale** (non simulatore).
+- Fino a validazione completa, la profondita automatica puo non essere disponibile: usare **avvio manuale** dove documentato.
+- Il simulatore e macOS **non** certificano profondita o pressione.
+
+## GPS (solo superficie)
+
+- GPS e metadata di **superficie** per ingresso/uscita e revisione percorso.
+- **Non** e tracking subacqueo affidabile; sott'acqua o con cielo coperto il fix puo mancare.
+- Coordinate mancanti o *ultimo punto noto* devono essere lette come etichettate, non come successo dell'immersione.
+
+## Bussola e snorkeling sperimentale
+
+- Terminologia UI: **BUSSOLA** (mai "COMPASSO").
+- **Return-to-entry** e mappe snorkeling su rami experimental sono ausili di consapevolezza situazionale, non navigazione certificata.
+
+## Sync e dati
+
+- Sync Watch <-> iPhone richiede pairing verificato; i dati possono essere in coda o in conflitto: controllare stato in Impostazioni / Altro.
+- Export **Subsurface CSV** e per flusso log; il formato business delle colonne non implica validazione decompressiva.
+
+## Planner iOS
+
+Il planner e la schermata risultato devono mantenere avvisi in-app visibili. Non rimuovere il disclaimer dal flusso utente salvo sostituzione con workflow certificato.
+
+## Rami sperimentali
+
+Apnea, Snorkeling (Live, Mappa Waypoint, Mappa Ritorno, POI), Buddy Assist e concept iOS **non** fanno parte del target MAIN (`project.yml` esclude i file). Non promuovere in release production senza review esplicita.
+
+---
+
+Vedi anche: [`Docs/iOS/SAFETY_DISCLAIMER.md`](iOS/SAFETY_DISCLAIMER.md) (inglese, focus companion).

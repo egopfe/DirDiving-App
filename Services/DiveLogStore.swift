@@ -4,15 +4,18 @@ import os
 
 @MainActor
 final class DiveLogStore: ObservableObject {
-    // F12: structured logging via os.Logger so error details are redacted from
-    // the public device log and never accidentally surface GPS / session content.
     private static let logger = Logger(subsystem: "com.egopfe.dirdiving", category: "DiveLogStore")
 
     @Published private(set) var sessions: [DiveSession] = []
     @Published private(set) var loadErrorMessage: String?
     private let fileName = "dirdiving_sessions.json"
     private let cloudKey = "dirdiving_watch_dive_sessions"
-    private let deletedCloudKey = "dirdiving_watch_deleted_session_ids"
+    private let deletedCloudKey = WatchSyncKeys.deletedSessionIDsKey
+    private let legacyDeletedCloudKeys = [
+        "dirdiving_watch_deleted_session_ids",
+        "dirdiving_ios_deleted_session_ids",
+        "dirdiving_ios_deleted_dive_session_ids"
+    ]
     private let maxSessions = 40
     private let cloudSync = CloudSyncStore()
     private var deletedSessionIDs: Set<UUID> = []
@@ -28,8 +31,12 @@ final class DiveLogStore: ObservableObject {
         }
     }
 
+    func isDeleted(id: UUID) -> Bool {
+        deletedSessionIDs.contains(id)
+    }
+
     func reloadFromPersistence() {
-        deletedSessionIDs = Set(cloudSync.load([UUID].self, forKey: deletedCloudKey) ?? Array(deletedSessionIDs))
+        deletedSessionIDs = loadDeletedSessionIDs()
         let localSessions = loadLocalSessions()
         let cloudSessions = cloudSync.load([DiveSession].self, forKey: cloudKey)
         sessions = mergeSessions(local: localSessions, cloud: cloudSessions)
@@ -37,12 +44,31 @@ final class DiveLogStore: ObservableObject {
             .sorted { $0.startDate > $1.startDate }
     }
 
+    /// Session created on-device (or finalized locally) — may sync to iPhone.
     func add(_ session: DiveSession) {
         guard !deletedSessionIDs.contains(session.id) else { return }
+        sessions.removeAll { $0.id == session.id }
         sessions.insert(session, at: 0)
         sessions = Array(sessions.sorted { $0.startDate > $1.startDate }.prefix(maxSessions))
         save()
         WatchSyncService.shared.transfer(session)
+    }
+
+    /// Session received from iPhone — do not echo back via transfer.
+    func addFromCompanion(_ session: DiveSession) {
+        guard !deletedSessionIDs.contains(session.id) else { return }
+        sessions.removeAll { $0.id == session.id }
+        sessions.insert(session, at: 0)
+        sessions = Array(sessions.sorted { $0.startDate > $1.startDate }.prefix(maxSessions))
+        save()
+    }
+
+    func applyRemoteDeletedSessionIDs(_ ids: Set<UUID>) {
+        guard !ids.isEmpty else { return }
+        deletedSessionIDs.formUnion(ids)
+        sessions.removeAll { deletedSessionIDs.contains($0.id) }
+        saveDeletedSessionIDs(deletedSessionIDs)
+        save()
     }
 
     func delete(id: UUID) {
@@ -50,18 +76,24 @@ final class DiveLogStore: ObservableObject {
         deletedSessionIDs.insert(id)
         sessions.remove(at: index)
         save()
+        WatchSyncService.shared.publishDeletedSessionIDs([id])
     }
 
     func delete(at offsets: IndexSet) {
+        var removed: Set<UUID> = []
         for index in offsets {
+            removed.insert(sessions[index].id)
             deletedSessionIDs.insert(sessions[index].id)
         }
         sessions.remove(atOffsets: offsets)
         save()
+        if !removed.isEmpty {
+            WatchSyncService.shared.publishDeletedSessionIDs(removed)
+        }
     }
 
     private func load() {
-        deletedSessionIDs = Set(cloudSync.load([UUID].self, forKey: deletedCloudKey) ?? [])
+        deletedSessionIDs = loadDeletedSessionIDs()
         let localSessions = loadLocalSessions()
         let cloudSessions = cloudSync.load([DiveSession].self, forKey: cloudKey)
         sessions = mergeSessions(local: localSessions, cloud: cloudSessions)
@@ -80,7 +112,7 @@ final class DiveLogStore: ObservableObject {
             decoder.dateDecodingStrategy = .iso8601
             return try decoder.decode([DiveSession].self, from: Data(contentsOf: url))
         } catch {
-            loadErrorMessage = "Log locale non leggibile: \(error.localizedDescription)"
+            loadErrorMessage = String(format: String(localized: "Log locale non leggibile: %@"), error.localizedDescription)
             return []
         }
     }
@@ -101,6 +133,33 @@ final class DiveLogStore: ObservableObject {
         return Array(byID.values)
     }
 
+    private func loadDeletedSessionIDs() -> Set<UUID> {
+        let ids = legacyDeletedCloudKeys.flatMap { key in
+            cloudSync.load([UUID].self, forKey: key) ?? loadDeletedSessionIDsFromDefaults(key: key)
+        }
+        var merged = Set(ids)
+        if let shared = cloudSync.load([UUID].self, forKey: deletedCloudKey) {
+            merged.formUnion(shared)
+        }
+        if !merged.isEmpty {
+            saveDeletedSessionIDs(merged)
+        }
+        return merged
+    }
+
+    private func loadDeletedSessionIDsFromDefaults(key: String) -> [UUID] {
+        guard let data = UserDefaults.standard.data(forKey: key) else { return [] }
+        return (try? JSONDecoder().decode([UUID].self, from: data)) ?? []
+    }
+
+    private func saveDeletedSessionIDs(_ ids: Set<UUID>) {
+        let values = Array(ids)
+        if let data = try? JSONEncoder().encode(values) {
+            UserDefaults.standard.set(data, forKey: deletedCloudKey)
+        }
+        cloudSync.save(values, forKey: deletedCloudKey)
+    }
+
     private func save() {
         do {
             let encoder = JSONEncoder()
@@ -109,7 +168,7 @@ final class DiveLogStore: ObservableObject {
             let data = try encoder.encode(sessions)
             try data.write(to: fileURL(), options: [.atomic, .completeFileProtection])
             cloudSync.save(sessions, forKey: cloudKey)
-            cloudSync.save(Array(deletedSessionIDs), forKey: deletedCloudKey)
+            saveDeletedSessionIDs(deletedSessionIDs)
         } catch {
             Self.logger.error("DiveLogStore save failed: \(error.localizedDescription, privacy: .private)")
         }

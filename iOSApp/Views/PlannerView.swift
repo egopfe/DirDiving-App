@@ -71,10 +71,10 @@ struct PlannerView: View {
     /// Display-only labels for the segmented control. `PlannerMode` raw values stay unchanged for Codable persistence.
     private func plannerModeTabLabel(_ mode: PlannerMode) -> String {
         switch mode {
-        case .recreational: return "Semplice"
-        case .advanced: return "Avanzato"
-        case .technical: return "Tecnico"
-        case .overhead: return "Overhead"
+        case .recreational: return String(localized: "Semplice")
+        case .advanced: return String(localized: "Avanzato")
+        case .technical: return String(localized: "Tecnico")
+        case .overhead: return String(localized: "Overhead")
         }
     }
 

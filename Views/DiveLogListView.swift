@@ -150,12 +150,12 @@ struct DiveLogListView: View {
             Button {
                 guard let latest = log.sessions.first else {
                     listExportURL = nil
-                    listExportMessage = "Nessuna immersione da esportare"
+                    listExportMessage = String(localized: "Nessuna immersione da esportare")
                     HapticService.shared.notify()
                     return
                 }
                 listExportURL = SubsurfaceExportService.writeCSV(for: latest)
-                listExportMessage = listExportURL == nil ? "Export CSV non riuscito" : nil
+                listExportMessage = listExportURL == nil ? String(localized: "Export CSV non riuscito") : nil
                 if listExportURL == nil {
                     HapticService.shared.notify()
                 } else {

@@ -31,6 +31,83 @@ struct ResetStopwatchIntent: AppIntent {
     }
 }
 
+struct StartManualDiveIntent: AppIntent {
+    static var title: LocalizedStringResource = "Start DIR DIVING Manual Dive"
+    static var description = IntentDescription("Start a manual DIR DIVING session when depth automation is unavailable.")
+
+    func perform() async throws -> some IntentResult {
+        try await MainActor.run {
+            guard let manager = DiveManager.shared else {
+                throw DIRDivingShortcutError.appStateUnavailable
+            }
+            manager.startManualDive()
+        }
+        return .result()
+    }
+}
+
+struct EndManualDiveIntent: AppIntent {
+    static var title: LocalizedStringResource = "End DIR DIVING Manual Dive"
+    static var description = IntentDescription("End the current manual DIR DIVING session.")
+
+    func perform() async throws -> some IntentResult {
+        try await MainActor.run {
+            guard let manager = DiveManager.shared else {
+                throw DIRDivingShortcutError.appStateUnavailable
+            }
+            manager.endManualDive()
+        }
+        return .result()
+    }
+}
+
+struct SetBearingIntent: AppIntent {
+    static var title: LocalizedStringResource = "Set DIR DIVING Bearing"
+    static var description = IntentDescription("Save the current compass heading as the DIR DIVING bearing.")
+
+    func perform() async throws -> some IntentResult {
+        try await MainActor.run {
+            guard let compass = CompassManager.shared else {
+                throw DIRDivingShortcutError.appStateUnavailable
+            }
+            compass.setBearing()
+            HapticService.shared.confirm()
+        }
+        return .result()
+    }
+}
+
+struct ClearBearingIntent: AppIntent {
+    static var title: LocalizedStringResource = "Clear DIR DIVING Bearing"
+    static var description = IntentDescription("Clear the saved DIR DIVING bearing.")
+
+    func perform() async throws -> some IntentResult {
+        try await MainActor.run {
+            guard let compass = CompassManager.shared else {
+                throw DIRDivingShortcutError.appStateUnavailable
+            }
+            compass.clearBearing()
+            HapticService.shared.notify()
+        }
+        return .result()
+    }
+}
+
+struct AcknowledgeAlarmIntent: AppIntent {
+    static var title: LocalizedStringResource = "Acknowledge DIR DIVING Alarm"
+    static var description = IntentDescription("Dismiss the current depth, time, or battery alarm banner.")
+
+    func perform() async throws -> some IntentResult {
+        try await MainActor.run {
+            guard let manager = DiveManager.shared else {
+                throw DIRDivingShortcutError.appStateUnavailable
+            }
+            manager.dismissAlarmWarning()
+        }
+        return .result()
+    }
+}
+
 private enum DIRDivingShortcutError: LocalizedError {
     case appStateUnavailable
 

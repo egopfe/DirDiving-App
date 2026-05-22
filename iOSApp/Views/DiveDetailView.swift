@@ -2,10 +2,19 @@ import SwiftUI
 import Charts
 
 enum DiveDetailTab: String, CaseIterable, Identifiable {
-    case summary = "RIEPILOGO"
-    case charts = "GRAFICI"
-    case details = "DETTAGLI"
+    case summary
+    case charts
+    case details
+
     var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .summary: String(localized: "RIEPILOGO")
+        case .charts: String(localized: "GRAFICI")
+        case .details: String(localized: "DETTAGLI")
+        }
+    }
 }
 
 struct DiveDetailView: View {
@@ -52,7 +61,7 @@ struct DiveDetailView: View {
                     tab = item
                 } label: {
                     VStack(spacing: 9) {
-                        Text(item.rawValue)
+                        Text(item.title)
                             .font(.system(size: 11, weight: .semibold, design: .rounded))
                             .tracking(0.5)
                             .foregroundStyle(tab == item ? DIRTheme.cyan : DIRTheme.muted)

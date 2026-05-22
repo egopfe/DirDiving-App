@@ -19,14 +19,19 @@ final class DiveLogStore: ObservableObject {
 
     private let cloudSync: CloudSyncStore?
     private let key = "dirdiving_ios_dive_sessions"
-    private let deletedKey = "dirdiving_ios_deleted_session_ids"
+    private let deletedKey = WatchSyncKeys.deletedSessionIDsKey
+    private let legacyDeletedKeys = [
+        "dirdiving_ios_deleted_session_ids",
+        "dirdiving_watch_deleted_session_ids"
+    ]
     private var deletedSessionIDs: Set<UUID> = []
     private var isReady = false
+    private weak var watchSync: WatchSyncService?
 
     init(cloudSync: CloudSyncStore? = nil) {
         self.cloudSync = cloudSync
         includeDemoLogbook = UserDefaults.standard.bool(forKey: Self.includeDemoLogbookKey)
-        deletedSessionIDs = Set(cloudSync?.load([UUID].self, forKey: deletedKey) ?? [])
+        deletedSessionIDs = loadDeletedSessionIDs()
         let localSessions = loadLocalSessions()
         let cloudSessions = cloudSync?.load([DiveSession].self, forKey: key)
         sessions = mergedSessions(local: localSessions, cloud: cloudSessions)
@@ -49,10 +54,21 @@ final class DiveLogStore: ObservableObject {
         }
     }
 
+    func attachWatchSync(_ service: WatchSyncService) {
+        watchSync = service
+    }
+
+    func applyRemoteDeletedSessionIDs(_ ids: Set<UUID>) {
+        guard !ids.isEmpty else { return }
+        deletedSessionIDs.formUnion(ids)
+        sessions.removeAll { deletedSessionIDs.contains($0.id) }
+        saveIfReady()
+    }
+
     func reloadFromCloud() {
         guard isReady else { return }
         let localSessions = loadLocalSessions()
-        deletedSessionIDs = Set(cloudSync?.load([UUID].self, forKey: deletedKey) ?? Array(deletedSessionIDs))
+        deletedSessionIDs = loadDeletedSessionIDs()
         let cloudSessions = cloudSync?.load([DiveSession].self, forKey: key)
         sessions = mergedSessions(local: localSessions, cloud: cloudSessions)
             .filter { !deletedSessionIDs.contains($0.id) }
@@ -75,14 +91,20 @@ final class DiveLogStore: ObservableObject {
         deletedSessionIDs.insert(id)
         sessions.removeAll { $0.id == id }
         saveIfReady()
+        watchSync?.publishDeletedSessionIDs([id])
     }
 
     func delete(at offsets: IndexSet) {
+        var removed: Set<UUID> = []
         for index in offsets.sorted(by: >) {
+            removed.insert(sessions[index].id)
             deletedSessionIDs.insert(sessions[index].id)
             sessions.remove(at: index)
         }
         saveIfReady()
+        if !removed.isEmpty {
+            watchSync?.publishDeletedSessionIDs(removed)
+        }
     }
 
     func synchronizeCloud() {
@@ -109,6 +131,26 @@ final class DiveLogStore: ObservableObject {
             }
         }
         return Array(byID.values)
+    }
+
+    private func loadDeletedSessionIDs() -> Set<UUID> {
+        var merged = Set<UUID>()
+        for legacyKey in legacyDeletedKeys {
+            if let legacy = cloudSync?.load([UUID].self, forKey: legacyKey) {
+                merged.formUnion(legacy)
+            }
+            if let data = UserDefaults.standard.data(forKey: legacyKey),
+               let decoded = try? JSONDecoder().decode([UUID].self, from: data) {
+                merged.formUnion(decoded)
+            }
+        }
+        if let shared = cloudSync?.load([UUID].self, forKey: deletedKey) {
+            merged.formUnion(shared)
+        }
+        if !merged.isEmpty {
+            cloudSync?.save(Array(merged), forKey: deletedKey)
+        }
+        return merged
     }
 
     private func saveIfReady() {

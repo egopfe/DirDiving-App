@@ -31,7 +31,7 @@ enum WatchDiveSyncCodec {
     }
 
     static func parseSession(from payload: [String: Any]) throws -> DiveSession {
-        try parsePayload(payload).session
+        try parsePayload(from: payload).session
     }
 
     // F11: full parse exposed so the receiver can sign the ack with the same

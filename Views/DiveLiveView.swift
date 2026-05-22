@@ -4,7 +4,13 @@ import SwiftUI
 /// Visual target: black canvas, neon accents, rounded panels (`Docs/ReferenceUI/Watch_LIVE_reference.png`).
 struct DiveLiveView: View {
     @EnvironmentObject private var dive: DiveManager
+    @EnvironmentObject private var watchSync: WatchSyncService
     @AppStorage(HapticService.hapticsEnabledKey) private var hapticsEnabled = true
+    @State private var ascentHapticLoopTask: Task<Void, Never>?
+
+    private var showAscentAlarmBanner: Bool {
+        dive.isDiveActive && dive.ascentStatus.isOverLimit
+    }
 
     var body: some View {
         ZStack {
@@ -16,21 +22,24 @@ struct DiveLiveView: View {
                 let leftWidth = contentWidth - gaugeWidth - 8
 
                 VStack(spacing: 7) {
-                    if let confirmation = dive.gpsConfirmation {
-                        gpsConfirmationView(confirmation)
-                    } else if dive.isDiveActive && dive.ascentStatus.isOverLimit {
-                        AscentWarningView(status: dive.ascentStatus, depthMeters: dive.currentDepthMeters, runtime: dive.runtime)
-                    } else if dive.isDiveActive {
+                    if watchSync.pendingTransferCount > 0 || watchSync.failedTransferCount > 0 {
+                        syncStatusStrip
+                    }
+                    if dive.isDiveActive {
                         activeDiveContent(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
                     } else {
                         preDiveWaitingContent
                     }
-
+                    if let confirmation = dive.gpsConfirmation {
+                        gpsConfirmationBanner(confirmation)
+                    }
                     if let alarm = dive.alarmWarningMessage {
-                        warningBanner(alarm)
+                        warningBanner(alarm, showAcknowledge: true) {
+                            dive.dismissAlarmWarning()
+                        }
                     }
                     if let error = dive.lastErrorMessage {
-                        warningBanner(error)
+                        warningBanner(error, showAcknowledge: false) {}
                     }
                 }
                 .padding(.horizontal, 9)
@@ -40,15 +49,123 @@ struct DiveLiveView: View {
             }
         }
         .animation(.easeInOut(duration: 0.18), value: dive.redWarningBlink)
+        .onChange(of: showAscentAlarmBanner) { wasActive, isActive in
+            manageAscentAlarmHaptics(wasActive: wasActive, isActive: isActive)
+        }
+        .onDisappear {
+            ascentHapticLoopTask?.cancel()
+            HapticService.shared.ascentAlarmCleared()
+        }
     }
 
-    @ViewBuilder
-    private func gpsConfirmationView(_ confirmation: DiveGPSConfirmation) -> some View {
+    private func manageAscentAlarmHaptics(wasActive: Bool, isActive: Bool) {
+        ascentHapticLoopTask?.cancel()
+        ascentHapticLoopTask = nil
+
+        guard isActive else {
+            if wasActive {
+                HapticService.shared.ascentAlarmCleared()
+            }
+            return
+        }
+
+        if !wasActive {
+            HapticService.shared.ascentAlarmTriggered()
+        }
+
+        ascentHapticLoopTask = Task {
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: UInt64(HapticService.ascentAlarmRepeatInterval * 1_000_000_000))
+                guard !Task.isCancelled else { return }
+                await MainActor.run {
+                    guard dive.isDiveActive, dive.ascentStatus.isOverLimit else { return }
+                    HapticService.shared.ascentAlarmRepeatIfNeeded()
+                }
+            }
+        }
+    }
+
+    private var syncStatusStrip: some View {
+        HStack(spacing: 6) {
+            Image(systemName: watchSync.failedTransferCount > 0 ? "exclamationmark.triangle.fill" : "arrow.triangle.2.circlepath")
+            Text(watchSync.lastSyncStatus)
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
+            Spacer(minLength: 0)
+            if watchSync.pendingTransferCount > 0 {
+                Text("\(watchSync.pendingTransferCount)")
+                    .font(.caption2.bold())
+                    .foregroundStyle(DiveUI.cyan)
+            }
+        }
+        .font(.caption2.bold())
+        .foregroundStyle(watchSync.failedTransferCount > 0 ? DiveUI.yellow : DiveUI.cyan)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill((watchSync.failedTransferCount > 0 ? DiveUI.yellow : DiveUI.cyan).opacity(0.10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .stroke((watchSync.failedTransferCount > 0 ? DiveUI.yellow : DiveUI.cyan).opacity(0.65), lineWidth: 1)
+                )
+        )
+    }
+
+    private func gpsConfirmationBanner(_ confirmation: DiveGPSConfirmation) -> some View {
+        HStack(spacing: 7) {
+            Image(systemName: gpsConfirmationIcon(confirmation))
+                .font(.system(size: 14, weight: .black))
+            VStack(alignment: .leading, spacing: 1) {
+                Text(gpsConfirmationTitle(confirmation))
+                    .font(.system(size: 10, weight: .black, design: .rounded))
+                Text(gpsConfirmationDetail(confirmation))
+                    .font(.system(size: 9, weight: .semibold, design: .rounded))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.66)
+            }
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(gpsConfirmationColor(confirmation))
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(gpsConfirmationColor(confirmation).opacity(0.11))
+                .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).stroke(gpsConfirmationColor(confirmation).opacity(0.72), lineWidth: 1))
+        )
+    }
+
+    private func gpsConfirmationIcon(_ confirmation: DiveGPSConfirmation) -> String {
         switch confirmation {
-        case .start(let point, let fallback):
-            GPSStartRegisteredView(point: point, isFallback: fallback)
-        case .end(let point, let fallback):
-            GPSEndRegisteredView(point: point, isFallback: fallback)
+        case .start(_, let fallback), .end(_, let fallback):
+            return fallback ? "location.fill.viewfinder" : "checkmark.circle.fill"
+        }
+    }
+
+    private func gpsConfirmationTitle(_ confirmation: DiveGPSConfirmation) -> String {
+        switch confirmation {
+        case .start: return String(localized: "gps.banner.start.title")
+        case .end: return String(localized: "gps.banner.end.title")
+        }
+    }
+
+    private func gpsConfirmationDetail(_ confirmation: DiveGPSConfirmation) -> String {
+        switch confirmation {
+        case .start(let point, _), .end(let point, _):
+            if let point {
+                return String(format: String(localized: "gps.banner.coords"), point.latitude, point.longitude)
+            }
+            return String(localized: "gps.banner.unavailable")
+        }
+    }
+
+    private func gpsConfirmationColor(_ confirmation: DiveGPSConfirmation) -> Color {
+        switch confirmation {
+        case .start(_, let fallback), .end(_, let fallback):
+            return fallback ? DiveUI.yellow : DiveUI.green
         }
     }
 
@@ -60,10 +177,18 @@ struct DiveLiveView: View {
                 hapticsOffBadge
             }
             ttvRuntimePanel
+            if showAscentAlarmBanner {
+                AscentWarningBannerView(
+                    rateMetersPerMinute: dive.ascentStatus.currentRateMetersPerMinute,
+                    isActive: true
+                )
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
             depthSection(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
             stopwatchPanel
             controls
         }
+        .animation(.easeInOut(duration: 0.3), value: showAscentAlarmBanner)
     }
 
     private var preDiveWaitingContent: some View {
@@ -72,7 +197,7 @@ struct DiveLiveView: View {
 
             Spacer(minLength: 28)
 
-            Text("PRONTO PER\nL'IMMERSIONE")
+            Text(String(localized: "live.ready.title"))
                 .font(.system(size: 18, weight: .black, design: .rounded))
                 .foregroundStyle(DiveUI.blue)
                 .multilineTextAlignment(.center)
@@ -85,7 +210,7 @@ struct DiveLiveView: View {
                     .font(.system(size: 25, weight: .black))
                     .foregroundStyle(DiveUI.blue)
                     .symbolRenderingMode(.hierarchical)
-                Text("In attesa di avvio...")
+                Text(String(localized: "In attesa di avvio..."))
                     .font(.system(size: 14, weight: .regular, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(1)
@@ -96,7 +221,7 @@ struct DiveLiveView: View {
 
             Spacer(minLength: 31)
 
-            Text("Il punto GPS di inizio\nverrà registrato\nall'avvio dell'immersione.")
+            Text(String(localized: "Il punto GPS di inizio\nverrà registrato\nall'avvio dell'immersione."))
                 .font(.system(size: 13, weight: .regular, design: .rounded))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
@@ -162,7 +287,7 @@ struct DiveLiveView: View {
         HStack(spacing: 8) {
             Image(systemName: "water.waves")
                 .font(.system(size: 18, weight: .black))
-            Text(dive.isManualLifecycleActive ? "IMMERSIONE MANUALE" : "IN IMMERSIONE")
+            Text(dive.isManualLifecycleActive ? String(localized: "IMMERSIONE MANUALE") : String(localized: "IN IMMERSIONE"))
                 .font(.system(size: 15, weight: .black, design: .rounded))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
@@ -175,10 +300,10 @@ struct DiveLiveView: View {
         HStack(spacing: 6) {
             Image(systemName: "bell.slash.fill")
                 .font(.system(size: 12, weight: .black))
-            Text("APTICA DISATTIVATA")
+            Text(String(localized: "live.haptics.off"))
                 .font(.system(size: 10, weight: .black, design: .rounded))
             Spacer(minLength: 0)
-            Text("AVVISI SOLO VISIVI")
+            Text(String(localized: "live.haptics.visual_only"))
                 .font(.system(size: 9, weight: .black, design: .rounded))
         }
         .foregroundStyle(DiveUI.yellow)
@@ -211,7 +336,7 @@ struct DiveLiveView: View {
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("TTV sessione \(ttvText), runtime \(runtimeMinutes)")
-        .accessibilityHint("TTV informativo derivato da profondita media e durata; non e un valore decompressivo o time to surface.")
+        .accessibilityHint(String(localized: "TTV informativo derivato da profondita media e durata; non e un valore decompressivo o time to surface."))
     }
 
     private func dashboardValue(title: String, value: String, unit: String?, color: Color) -> some View {
@@ -401,12 +526,17 @@ struct DiveLiveView: View {
         )
     }
 
-    private func warningBanner(_ error: String) -> some View {
+    private func warningBanner(_ message: String, showAcknowledge: Bool, acknowledge: @escaping () -> Void) -> some View {
         HStack(spacing: 6) {
             Image(systemName: "exclamationmark.triangle.fill")
-            Text(error)
+            Text(message)
                 .lineLimit(2)
                 .minimumScaleFactor(0.72)
+            if showAcknowledge {
+                Button(String(localized: "alarm.acknowledge"), action: acknowledge)
+                    .font(.caption2.bold())
+                    .foregroundStyle(DiveUI.cyan)
+            }
         }
         .font(.caption2.bold())
         .foregroundStyle(DiveUI.yellow)

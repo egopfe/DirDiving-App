@@ -84,19 +84,19 @@ struct SettingsView: View {
                         icon: "tray.and.arrow.up",
                         iconColor: watchSync.pendingTransferCount == 0 ? DiveUI.green : DiveUI.yellow,
                         title: "Sync pending",
-                        subtitle: "\(watchSync.pendingTransferCount) in attesa ack"
+                        subtitle: String(format: String(localized: "%lld in attesa ack"), watchSync.pendingTransferCount)
                     )
                     statusRow(
                         icon: "paperplane.fill",
                         iconColor: watchSync.sentTransferCount == 0 ? DiveUI.secondaryText : DiveUI.cyan,
                         title: "Sync sent",
-                        subtitle: "\(watchSync.sentTransferCount) inviati o in transito"
+                        subtitle: String(format: String(localized: "%lld inviati o in transito"), watchSync.sentTransferCount)
                     )
                     statusRow(
                         icon: "checkmark.seal.fill",
                         iconColor: watchSync.acknowledgedTransferCount == 0 ? DiveUI.secondaryText : DiveUI.green,
                         title: "Sync acknowledged",
-                        subtitle: "\(watchSync.acknowledgedTransferCount) confermati da iPhone"
+                        subtitle: String(format: String(localized: "%lld confermati da iPhone"), watchSync.acknowledgedTransferCount)
                     )
                     settingsRow(
                         icon: "square.and.arrow.up",
@@ -114,7 +114,7 @@ struct SettingsView: View {
                         icon: "exclamationmark.arrow.triangle.2.circlepath",
                         iconColor: watchSync.failedTransferCount == 0 ? DiveUI.green : DiveUI.red,
                         title: "Errori sync",
-                        subtitle: "\(watchSync.failedTransferCount) falliti · retry \(lastRetryText)"
+                        subtitle: String(format: String(localized: "%lld falliti · retry %@"), watchSync.failedTransferCount, lastRetryText)
                     )
                     if watchSync.pendingTransferCount > 0 || watchSync.activationState != .activated {
                         Button {
@@ -221,13 +221,15 @@ struct SettingsView: View {
     private var gpsStatusText: String {
         switch gps.authorizationStatus {
         case .authorizedAlways, .authorizedWhenInUse:
-            return gps.lastPoint == nil ? "Autorizzato, in attesa fix" : "Fix disponibile"
+            return gps.lastPoint == nil
+                ? String(localized: "Autorizzato, in attesa fix")
+                : String(localized: "Fix disponibile")
         case .denied, .restricted:
-            return "Permesso negato: abilita da iPhone"
+            return String(localized: "Permesso negato: abilita da iPhone")
         case .notDetermined:
-            return "Richiesto al primo uso"
+            return String(localized: "Richiesto al primo uso")
         @unknown default:
-            return "Stato permesso sconosciuto"
+            return String(localized: "Stato permesso sconosciuto")
         }
     }
 
@@ -246,7 +248,7 @@ struct SettingsView: View {
                     Text(language.title).tag(language.rawValue)
                 }
             }
-            .pickerStyle(.segmented)
+            .pickerStyle(.wheel)
             .tint(DiveUI.cyan)
             Text(selectedLanguage.watchDetail)
                 .font(.system(size: 9, weight: .semibold, design: .rounded))
@@ -277,7 +279,7 @@ struct SettingsView: View {
             Picker("Unità", selection: $watchUnits) {
                 Text("m").tag("metric")
             }
-            .pickerStyle(.segmented)
+            .pickerStyle(.wheel)
             .tint(DiveUI.cyan)
             Text("Imperiale non selezionabile finche la conversione Watch non e implementata. Export sempre metrico/Subsurface.")
                 .font(.system(size: 9, weight: .semibold, design: .rounded))
@@ -299,7 +301,7 @@ struct SettingsView: View {
     }
 
     private var lastRetryText: String {
-        guard let date = watchSync.lastRetryDate else { return "mai" }
+        guard let date = watchSync.lastRetryDate else { return String(localized: "mai") }
         return Self.retryFormatter.string(from: date)
     }
 

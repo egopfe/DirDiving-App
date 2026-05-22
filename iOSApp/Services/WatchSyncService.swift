@@ -14,7 +14,7 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     @Published var isSupported = WCSession.isSupported()
     @Published var activationState: WCSessionActivationState = .notActivated
-    @Published var lastMessage = "Non sincronizzato"
+    @Published var lastMessage = String(localized: "Non sincronizzato")
     @Published private(set) var importedSessionCount = 0
     @Published private(set) var failedImportCount = 0
     @Published private(set) var conflicts: [SyncConflict] = []
@@ -31,11 +31,11 @@ final class WatchSyncService: NSObject, ObservableObject {
     private static let logger = Logger(subsystem: "com.egopfe.dirdiving.ios", category: "WatchSyncService")
 
     var userVisibleState: String {
-        if !isSupported { return "Non supportato" }
-        if failedImportCount > 0 { return "Errore import: retry disponibile" }
-        if activationState == .activated, !WatchSyncAuth.hasPeerSecret() { return "Associazione Watch non verificata" }
-        if activationState == .activated { return "Attivo" }
-        return "In attesa attivazione"
+        if !isSupported { return String(localized: "Non supportato") }
+        if failedImportCount > 0 { return String(localized: "Errore import: retry disponibile") }
+        if activationState == .activated, !WatchSyncAuth.hasPeerSecret() { return String(localized: "Associazione Watch non verificata") }
+        if activationState == .activated { return String(localized: "Attivo") }
+        return String(localized: "In attesa attivazione")
     }
 
     func activate(logStore: DiveLogStore) {
@@ -44,7 +44,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         importedSessionCount = importedSessionIDs.count
         conflicts = loadConflicts()
         guard WCSession.isSupported() else {
-            lastMessage = "WatchConnectivity non supportato"
+            lastMessage = String(localized: "WatchConnectivity non supportato")
             return
         }
         WCSession.default.delegate = self
@@ -53,15 +53,34 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     func retryActivation(logStore: DiveLogStore) {
         failedImportCount = 0
-        lastMessage = "Retry Watch Sync richiesto"
+        lastMessage = String(localized: "Retry Watch Sync richiesto")
         activate(logStore: logStore)
     }
 
     func resetPairingTrust(logStore: DiveLogStore) {
         WatchSyncAuth.resetPeerTrust()
         failedImportCount = 0
-        lastMessage = "Trust Watch resettato: attendi una nuova associazione verificata."
+        lastMessage = String(localized: "Trust Watch resettato: attendi una nuova associazione verificata.")
         activate(logStore: logStore)
+    }
+
+    func publishDeletedSessionIDs(_ ids: Set<UUID>) {
+        guard WCSession.isSupported(), WCSession.default.activationState == .activated, !ids.isEmpty else { return }
+        var existing = Set((WCSession.default.applicationContext[WatchSyncKeys.deletedSessionBroadcastKey] as? [String]) ?? [])
+        existing.formUnion(ids.map(\.uuidString))
+        WatchSyncAuth.mergeApplicationContext([WatchSyncKeys.deletedSessionBroadcastKey: Array(existing)])
+        lastMessage = String(format: String(localized: "Tombstone inviata al Watch (%lld)"), ids.count)
+    }
+
+    private func ingestCompanionContext(_ context: [String: Any]) {
+        WatchSyncAuth.ingestSharedSecretFromContext(context)
+        if let strings = context[WatchSyncKeys.deletedSessionBroadcastKey] as? [String] {
+            let ids = Set(strings.compactMap(UUID.init(uuidString:)))
+            if !ids.isEmpty {
+                logStore?.applyRemoteDeletedSessionIDs(ids)
+                lastMessage = String(format: String(localized: "Tombstone Watch applicata (%lld)"), ids.count)
+            }
+        }
     }
 
     private struct AckContext {
@@ -76,22 +95,22 @@ final class WatchSyncService: NSObject, ObservableObject {
             let session = parsed.session
             if let existing = logStore?.session(id: session.id), existing != session {
                 storeConflict(local: existing, incoming: session)
-                lastMessage = "Conflitto sync salvato per revisione"
+                lastMessage = String(localized: "Conflitto sync salvato per revisione")
                 return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
             }
             guard !importedSessionIDs.contains(session.id) else {
-                lastMessage = "Immersione duplicata ignorata"
+                lastMessage = String(localized: "Immersione duplicata ignorata")
                 return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
             }
             logStore?.add(session)
             importedSessionIDs.insert(session.id)
             WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
             importedSessionCount = importedSessionIDs.count
-            lastMessage = "Immersione ricevuta dal Watch"
+            lastMessage = String(localized: "Immersione ricevuta dal Watch")
             return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
         } catch {
             failedImportCount += 1
-            lastMessage = "Errore sync Watch: \(error.localizedDescription)"
+            lastMessage = String(format: String(localized: "Errore sync Watch: %@"), error.localizedDescription)
             Self.logger.error("Watch sync import failed: \(error.localizedDescription, privacy: .private)")
             return nil
         }
@@ -103,7 +122,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
         importedSessionCount = importedSessionIDs.count
         removeConflict(conflict)
-        lastMessage = "Conflitto risolto: usata versione Watch"
+        lastMessage = String(localized: "Conflitto risolto: usata versione Watch")
     }
 
     func resolveConflictKeepingLocal(_ conflict: SyncConflict) {
@@ -111,7 +130,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
         importedSessionCount = importedSessionIDs.count
         removeConflict(conflict)
-        lastMessage = "Conflitto risolto: mantenuta versione locale"
+        lastMessage = String(localized: "Conflitto risolto: mantenuta versione locale")
     }
 
     private func storeConflict(local: DiveSession, incoming: DiveSession) {
@@ -179,11 +198,12 @@ final class WatchSyncService: NSObject, ObservableObject {
 
 extension WatchSyncService: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        let context = session.receivedApplicationContext
         Task { @MainActor in
             self.activationState = activationState
-            self.lastMessage = error?.localizedDescription ?? "Sessione Watch attiva"
+            self.lastMessage = error?.localizedDescription ?? String(localized: "Sessione Watch attiva")
             if activationState == .activated {
-                WatchSyncAuth.ingestSharedSecretFromContext(WatchSyncAuth.cachedApplicationContext())
+                self.ingestCompanionContext(context)
                 WatchSyncAuth.publishSharedSecretIfNeeded()
             }
         }
@@ -191,7 +211,7 @@ extension WatchSyncService: WCSessionDelegate {
 
     nonisolated func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
         Task { @MainActor in
-            WatchSyncAuth.ingestSharedSecretFromContext(applicationContext)
+            self.ingestCompanionContext(applicationContext)
             WatchSyncAuth.publishSharedSecretIfNeeded()
         }
     }

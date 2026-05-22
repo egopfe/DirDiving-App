@@ -4,6 +4,60 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-20, secondary i18n + documentation alignment)
+
+- Pass i18n secondario: espansione `Resources/{en,it}.lproj` e `iOSApp/Resources/{en,it}.lproj`; localizzazione messaggi sync, bussola, allarmi, Settings, log, export, Analysis/Planner header.
+- `Docs/SAFETY_DISCLAIMER.md`, `Docs/TESTFLIGHT_REVIEW_NOTES.md`, `Docs/ROADMAP.md`.
+- Aggiornamento `Docs/DIR_DIVING_Feature_Comparison.csv` (stati UX backlog → Implemented su `main` dove in `a75a6c3`).
+- `Docs/DOCUMENTATION_UPDATE_REPORT_20260520_POST_RELEASE.md` — report A–K allineamento documentazione.
+
+### Added (2026-05-20, MAIN issues implementation — code on main)
+
+- Commit `a75a6c3`: P0 inbound Watch sync, P1 tombstone unificata, GPS banner compatto, alarm OK, sync strip, App Intents; port manuale backlog preservando F1–F12.
+- `Docs/MAIN_ISSUES_IMPLEMENTATION_REPORT_20260520.md`, `Docs/MAIN_BRANCH_ISSUES_AND_PRIORITIES_20260520.md`.
+
+### Added (2026-05-20, ascent alarm inline banner + documentation pass)
+
+- `Views/AscentWarningBannerView.swift` — banner rosso non bloccante tra TTV/RunTime e profondita (mockup `ascent_alarm.png`).
+- Chiavi i18n `ascent_alarm_*` in `Resources/{en,it}.lproj/Localizable.strings`.
+- `Docs/WATCH_MAIN_UX_CONVENTIONS.md` — baseline UX Watch MAIN (banner inline, no full-screen takeover).
+- `Docs/ASCENT_ALARM_IMPLEMENTATION_REPORT_20260520.md` — report implementazione A–J + QA checklist.
+- `Docs/MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260519_CURRENT_PRE_MODIFICATION.md` (+ `.docx`) — audit UX/interaction MAIN.
+- `Docs/DOCUMENTATION_UPDATE_REPORT_20260520.md` e `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260520.md` — report allineamento documentazione A–K.
+- Righe additive in `Docs/DIR_DIVING_Feature_Comparison.csv` per banner risalita, convenzioni UX, report audit/implementazione.
+
+### Changed (2026-05-20)
+
+- `Views/DiveLiveView.swift` — rimosso takeover full-screen 1 s; haptic risalita da live view; gauge sempre visibile.
+- `Views/AscentWarningView.swift` — wrapper sottile su `AscentWarningBannerView`.
+- `Services/HapticService.swift` — `ascentAlarmTriggered` / `ascentAlarmRepeatIfNeeded` / `ascentAlarmCleared`.
+- `Services/DiveManager.swift` — haptic risalita non invocati dal path di calcolo (solo UI).
+- `README.md` — baseline Watch UX 2026-05-20; tabella pre-release UX-H3 aggiornata a *Implemented* su main.
+- `Docs/DIR_DIVING_Feature_Comparison.csv` — voce «Avviso risalita» e UX-H3/SAF-1 allineate al banner inline.
+
+### Nota (2026-05-20)
+
+- L'audit `MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260519` descriveva policy **1 s full-screen** (revisione stakeholder 2026-05-20): il codice su `main` implementa ora il **banner inline** documentato in `WATCH_MAIN_UX_CONVENTIONS.md`. Nessuna modifica a soglie o algoritmi di risalita.
+- PR **#8** (`codex/experimental-features` → `main`) e **#9** (`codex/ios-experimental-features` → `main-iOS`): restano **non safe-to-merge** automaticamente (conflitti + regressioni security note su iOS experimental).
+
+### Added (2026-05-19, pass pre-release backlog — UX-H/M/L + SAF + simulator QA)
+
+- `Docs/MAIN_PRE_RELEASE_OPEN_ITEMS_20260519.md` — backlog rimanente / item rinviati post pre-release pass, con motivazione per Watch imperial conversion, GPX/UDDF exporter, per-field cloud merge per Equipment/Planner, side-button capture watchOS, convergenza branch `main` ↔ `main-iOS`.
+- `Docs/MAIN_PRE_RELEASE_SIMULATOR_QA_20260519.md` — checklist QA eseguibile su Watch Ultra, Watch piccolo, iPhone SE e iPhone Pro Max: build smoke test, UX-H1..H4 acceptance, SAF-3..SAF-10, App Intents, haptics matrix, a11y, Dynamic Type.
+- Sezione **Pre-release backlog (2026-05-19, UX-H/M/L + SAF-3..SAF-10)** in `README.md` con tabella di acceptance per area e procedura di reintegro dei 3 commit Watch backlog.
+- Branch di sicurezza locale `backup/before-docs-pre-release-pass-20260519` creato prima del commit documentazione di questo pass.
+- Branch di sicurezza locale `backup/main-watch-backlog-20260519` (creato in pass precedente) conserva i 3 commit Watch UX-H/M/L (`cbcabf7`, `c685155`, `efa53e4`) in attesa di riconciliazione con il cluster security F1–F12 sui file `Services/WatchSyncService.swift` e `Services/WatchDiveSyncCodec.swift`.
+- `Docs/DOCUMENTATION_UPDATE_REPORT_20260519_PRE_RELEASE_BACKLOG.md` — report strutturato A–K post-pass pre-release backlog.
+
+### Changed (2026-05-19, pass pre-release backlog)
+
+- Aggiunte righe additive in `Docs/DIR_DIVING_Feature_Comparison.csv` per i nuovi documenti, lo stato per-area UX-H/M/L + SAF-3..SAF-10, e l'evidenza del backup branch Watch backlog (status `Pending merge`).
+
+### Nota
+
+- Lato `origin/main-iOS` (commit `bf4718d`) sono già live SAF-3 (TTV info accessibility hint + nota muted in `iOSApp/Views/DiveDetailView.swift`) e SAF-4 (bound CSV `maxDepthMeters = 200`, `maxDurationSeconds = 28 800`, `temperatureRange = -2…40 °C` in `iOSApp/Services/DiveImportService.swift`).
+- Nessuna modifica a business logic, decompressione, TTV/TTR algoritmi, modello gas o regole sync in questo pass. Nessun file experimental toccato. Terminologia UI: `BUSSOLA`, mai `COMPASSO`.
+
 ### Added (2026-05-19, pass documentazione security PT2)
 
 - Sezione **QA Security (audit F1–F12, baseline 2026-05-19)** in `Docs/RELEASE_CHECKLIST.md` con sotto-sezioni Auth/pairing, Persistenza/Data Protection, Sync protocol, Input validation, Logging/naming, Privacy/leakage.

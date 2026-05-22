@@ -91,6 +91,7 @@ struct InfoView: View {
         .background(rowBackground)
     }
 
+    @ViewBuilder
     private var batteryRow: some View {
         let percent = batteryLevel >= 0 ? Int((batteryLevel * 100).rounded()) : -1
         VStack(spacing: 5) {
@@ -124,9 +125,17 @@ struct InfoView: View {
 
     private var depthDiagnostics: some View {
         VStack(alignment: .leading, spacing: 5) {
-            diagnosticRow("Entitlement profondità", "Configurato")
-            diagnosticRow("Sensore profondità", CMWaterSubmersionManager.waterSubmersionAvailable ? "Disponibile" : "Non disponibile")
-            diagnosticRow("Callback acqua", dive.isDepthAutomationAvailable ? "Pronto" : "Non verificabile")
+            diagnosticRow(String(localized: "Entitlement profondità"), String(localized: "Configurato"))
+            diagnosticRow(
+                String(localized: "Sensore profondità"),
+                CMWaterSubmersionManager.waterSubmersionAvailable
+                    ? String(localized: "Disponibile")
+                    : String(localized: "Non disponibile")
+            )
+            diagnosticRow(
+                String(localized: "Callback acqua"),
+                dive.isDepthAutomationAvailable ? String(localized: "Pronto") : String(localized: "Non verificabile")
+            )
             Text("Richiede validazione reale su Apple Watch Ultra. Il simulatore/macOS non certifica profondità o pressione.")
                 .font(.system(size: 9, weight: .semibold, design: .rounded))
                 .foregroundStyle(DiveUI.yellow)
@@ -142,6 +151,15 @@ struct InfoView: View {
         )
     }
 
+    private func diagnosticValueIsPositive(_ value: String) -> Bool {
+        let positives = [
+            String(localized: "Configurato"),
+            String(localized: "Disponibile"),
+            String(localized: "Pronto")
+        ]
+        return positives.contains(value)
+    }
+
     private func diagnosticRow(_ title: String, _ value: String) -> some View {
         HStack {
             Text(title)
@@ -150,7 +168,7 @@ struct InfoView: View {
             Spacer(minLength: 6)
             Text(value)
                 .font(.system(size: 10, weight: .black, design: .rounded))
-                .foregroundStyle(value == "Configurato" || value == "Disponibile" || value == "Pronto" ? DiveUI.green : DiveUI.yellow)
+                .foregroundStyle(diagnosticValueIsPositive(value) ? DiveUI.green : DiveUI.yellow)
         }
     }
 
