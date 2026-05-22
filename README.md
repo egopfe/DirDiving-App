@@ -6,11 +6,26 @@ DIR DIVING is a SwiftUI watchOS application for Apple Watch Ultra-class devices.
 
 ## Safety and limitations (MAIN)
 
+Disclaimer completo: [`Docs/SAFETY_DISCLAIMER.md`](Docs/SAFETY_DISCLAIMER.md) · TestFlight: [`Docs/TESTFLIGHT_REVIEW_NOTES.md`](Docs/TESTFLIGHT_REVIEW_NOTES.md) · Roadmap: [`Docs/ROADMAP.md`](Docs/ROADMAP.md)
+
 DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent awareness, and syncs to the iPhone companion for review and **indicative** planning. It is **not** a certified dive computer unless a future release explicitly documents certification. It does **not** replace training, dive-center rules, certified equipment, or human judgment. Planner and Bühlmann-style presentations are **indicative** — verify with certified tools. GPS is meaningful **at the surface**; underwater or poor-sky conditions mean fixes can be missing — missing data must not be read as “dive success.”
 
 **Recent MAIN UI/UX pass:** layout, typography, contrast, tab labels, accessibility text, empty states, disclaimers, and documentation only — **no** changes to decompression math, gas models, TTV/TTR calculations, SAC/CNS/OTU math, sensor sampling, or sync transport rules.
 
+**Watch UX baseline (2026-05-20):** ascent over-limit shows a **red inline banner** on the live dive screen (non-blocking); depth, gauge, TTV, and controls stay visible. Details: [`Docs/WATCH_MAIN_UX_CONVENTIONS.md`](Docs/WATCH_MAIN_UX_CONVENTIONS.md).
+
 > Status note: the app is prepared for Apple water submersion APIs, but the depth/submersion entitlement is still pending. Until the entitlement is granted and the app is signed with it, `CMWaterSubmersionManager` may report entitlement-related errors and will not deliver production depth data.
+
+## Onboarding legale e accettazione disclaimer
+
+Dal pass del **2026-05-22** DIR DIVING mostra un flusso obbligatorio al primo avvio, o quando cambia la major version/revisione legale dell'app:
+
+1. **Welcome**: introduce il flusso safety/legal.
+2. **Safety Warning**: mostra in modo esplicito `DIR Diving is NOT a dive computer.`
+3. **Legal Disclaimer**: carica il disclaimer completo localizzato da `LegalDisclaimer.txt` in `en.lproj` o `it.lproj`, derivato dai DOCX legali approvati.
+4. **Acceptance**: richiede tutte le conferme obbligatorie prima di entrare nell'app.
+
+L'accettazione viene salvata in `UserDefaults` con timestamp, versione app accettata, major version, tipo dispositivo, lingua e revisione legale. La sezione **Settings -> Legal & Safety** / **Altro -> Legal & Safety** permette di rivedere disclaimer completo, versione accettata e timestamp. Questo gating non modifica telemetry, GPS, bussola, profondita, risalita, sync, export o modelli dati immersione.
 
 ## Depth Entitlement And Signing Checklist
 
@@ -43,6 +58,8 @@ External validation is still required before release:
 - Stable pre-water selector for Diving on `main`; Snorkeling, Apnea and Buddy Assist remain isolated to experimental branches
 - Local persistence with iCloud Key-Value Store mirroring for dive logs, ascent-rate settings, Watch sync queues and supported iOS companion state
 - Custom image screen for bundled reference images, checklists, or static procedures
+- First-launch legal onboarding with localized IT/EN full disclaimer and mandatory acceptance logging
+- Settings / Legal & Safety screen with accepted version, timestamp, language and full disclaimer
 
 Experimental branch documentation is available in [`Docs/EXPERIMENTAL_FEATURES.md`](Docs/EXPERIMENTAL_FEATURES.md).
 
@@ -57,7 +74,7 @@ Le istruzioni di build sono in [`Docs/BUILD_VALIDATION.md`](Docs/BUILD_VALIDATIO
 
 ## Strategia dei rami (Branch Strategy)
 
-- **`main`**: codice orientato alla stabilità **Diving** su Apple Watch e al companion iOS incluso nello stesso workspace XcodeGen. Le funzioni Apnea, Snorkeling, Buddy Assist e le mappe sperimentali **non** fanno parte del target MAIN (`project.yml` esclude i file sperimentali dal build production). I merge verso `main` devono **preservare** il comportamento Diving, GPS surface-only, **BUSSOLA** (terminologia UI: non usare «COMPASSO»), export Subsurface e sync documentati.
+- **`main`**: codice orientato alla stabilità **Diving** su Apple Watch e al companion iOS incluso nello stesso workspace XcodeGen. Le funzioni Apnea, Snorkeling, Buddy Assist e le mappe sperimentali **non** fanno parte del target MAIN (`project.yml` esclude i file sperimentali dal build production). I merge verso `main` devono **preservare** il comportamento Diving, GPS surface-only, **BUSSOLA** (terminologia UI: non usare «COMPASSO»), export Subsurface, sync documentati e onboarding legale.
 - **`main-iOS`**: ramo di lavoro storico/parallelo per allineamenti UI iOS; può divergere da `main`. Allineare la documentazione quando le feature companion sono equivalenti.
 - **`codex/experimental-features`**: Watch sperimentale (Snorkeling Live, mappe waypoint/ritorno, Apnea workflow esteso, Buddy Assist, ecc.). Non importare questi file nel target MAIN senza revisione esplicita.
 - **`codex/ios-experimental-features`**: iOS sperimentale (Explore Lab, Buddy Lab, concept mappe). Isolato da App Store candidate su `main`.
@@ -65,9 +82,82 @@ Le istruzioni di build sono in [`Docs/BUILD_VALIDATION.md`](Docs/BUILD_VALIDATIO
 
 ### Matrice funzionalità (CSV)
 
-La tabella aggiornata con colonne Area / Branch / App / Mode / Feature / Status / Description / UI Reference / Notes:
+La tabella aggiornata con colonne Area / Branch / App / Mode / Feature / Status / Description / UI Reference / Notes / internationalization & languages:
 
 [`Docs/DIR_DIVING_Feature_Comparison.csv`](Docs/DIR_DIVING_Feature_Comparison.csv)
+
+## Sicurezza e sync (security baseline 2026-05-19)
+
+Audit statico in [`Docs/SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md`](Docs/SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md) (18 finding: 2 HIGH / 4 MEDIUM / 6 LOW / 6 INFO). Remediation F1–F12 applicate in commit `4136ec0`:
+
+- **Auth pairing**: `WatchSyncAuth.resetPeerTrust()` ripristinato su iOS MAIN; UI di reset associazione Watch ora funzionante.
+- **Sync key autoritativa**: algoritmo HMAC `v2 ordered-secrets` documentato con commento `MARK` su entrambi i `WatchSyncAuth.swift` (Watch + iOS). Cambi futuri richiedono bump di `WatchDiveSyncCodec.schemaVersion` + release coordinata.
+- **Data Protection**: Watch CSV export ora `[.atomic, .completeFileProtection]` con UUID filename e cleanup 24 h. Pending queue Watch (`dirdiving_watch_pending_sync_sessions.json`) e conflicts iOS (`dirdiving_ios_watch_sync_conflicts.json`) migrati da `UserDefaults` a `Documents/` con `.completeFileProtection`; legacy keys ripulite dopo migrazione one-shot.
+- **Replay window**: `WatchDiveSyncCodec.maxIssuedAtSkew` ridotto da **24 h → 1 h** (3 600 s).
+- **CSV import**: cap di **10 MB** con nuovo errore `.fileTooLarge`. Bound `maxDiveDurationSeconds / maxDepthMeters / validTemperatureRange / isValidGPS` confermati su MAIN.
+- **Naming canonical**: nuove costanti `dirdiving_*` (Keychain service iOS, `Notification.Name`, `AscentRateSettingsStore` key) con read-fallback dal legacy `dirmotion_*`. Nessuna chiave persistita rimossa direttamente.
+- **No deterministic fallback**: se `SecRandomCopyBytes` fallisce, il secret locale non viene più derivato in modo deterministico; il flusso fallisce in modo esplicito loggando via `os.Logger` con `privacy:.private`.
+- **Signed WatchConnectivity ack**: ack HMAC su `"ack|sessionID|issuedAt"`; iOS calcola e firma il reply, Watch verifica in tempo costante. Mantenuto fallback `status == acknowledged` per build iOS legacy (TODO follow-up: rimuovere quando il floor build sale).
+- **Logging**: `print` rimossi da `Services/DiveLogStore.swift` → `os.Logger` con `privacy:.private`. Nessun GPS/session content esposto in console.
+
+**Vincoli mantenuti**: nessuna modifica a GPS, BUSSOLA, calcoli profondità/risalita, decompressione, sampling sensori, formato CSV business (header/ordine colonne) e UI/UX.
+
+> Su `origin/main-iOS` (PR #9 / branch `codex/ios-experimental-features`) restano due regressioni note rispetto a `main`: rimozione di `.completeFileProtection`/cleanup nell'export iOS e rimozione dei bound di import CSV. Vedi sezione *Appendix A* dell'audit. Da bloccare in eventuali merge verso MAIN.
+
+## Pre-release backlog (2026-05-19, UX-H/M/L + SAF-3..SAF-10)
+
+Pass UX/Interaction/Feature Accessibility seguito dall'esecuzione MAIN PRE-RELEASE BACKLOG (vedi audit del 2026-05-19). Vincoli rispettati: nessuna modifica a business logic, decompressione, TTV/TTR, modello gas, regole sync; nessun ridisegno UI/UX; nessun file experimental toccato; terminologia UI invariata (`BUSSOLA`, mai `COMPASSO`).
+
+Nuovi documenti pubblicati su `main` e `main-iOS`:
+
+- [`Docs/MAIN_PRE_RELEASE_OPEN_ITEMS_20260519.md`](Docs/MAIN_PRE_RELEASE_OPEN_ITEMS_20260519.md) — backlog rimanente / item rinviati con motivazione (imperial Watch, GPX/UDDF exporter, per-field cloud merge, side-button capture watchOS, convergenza branch).
+- [`Docs/MAIN_PRE_RELEASE_SIMULATOR_QA_20260519.md`](Docs/MAIN_PRE_RELEASE_SIMULATOR_QA_20260519.md) — checklist QA eseguibile su Watch Ultra, Watch piccolo, iPhone SE, iPhone Pro Max (HEAD presence, ascent gauge co-visible, GPS banner compatto, alarm acknowledge cooldown, SAF-3/SAF-4, App Intents, haptics matrix, a11y, Dynamic Type).
+
+Backlog Watch (`cbcabf7`, `c685155`, `efa53e4`) **reintegrato su `main`** in commit **`a75a6c3`** (2026-05-20) tramite port manuale — non cherry-pick letterale — preservando security F1–F12 in `WatchSyncService` / `WatchDiveSyncCodec`. Il branch di riferimento **`backup/main-watch-backlog-20260519`** resta per audit storico.
+
+Report implementazione: [`Docs/MAIN_ISSUES_IMPLEMENTATION_REPORT_20260520.md`](Docs/MAIN_ISSUES_IMPLEMENTATION_REPORT_20260520.md). Checklist issue: [`Docs/MAIN_BRANCH_ISSUES_AND_PRIORITIES_20260520.md`](Docs/MAIN_BRANCH_ISSUES_AND_PRIORITIES_20260520.md).
+
+Lato `main-iOS`, le due rimanenze (SAF-3 visual + SAF-4 bound CSV più aggressivi) sono già sul ramo come commit `bf4718d`:
+
+- **SAF-3 (iOS)**: `iOSApp/Views/DiveDetailView.swift` aggiunge label + hint accessibilità sul tile *TTV info* e una nota muted *"TTV informativo: derivato da profondità media + runtime; non è un valore decompressivo o time-to-surface."*. Allineato visivamente al Watch (`TTV INFO` in `DiveUI.secondaryText`).
+- **SAF-4 (iOS)**: `iOSApp/Services/DiveImportService.swift` restringe i bound CSV ai valori del backlog 2026-05-19: `maxDepthMeters = 200`, `maxDurationSeconds = 28 800` (480 min), `temperatureRange = -2…40 °C`. Le righe fuori range vengono saltate e contate (`ImportSummary.skippedMalformedCount`), il formato CSV business non cambia.
+
+Acceptance state per area:
+
+| Area | Item | Stato su `origin/main` (Watch) | Stato su `origin/main-iOS` (iOS) |
+|---|---|---|---|
+| UX-H1 / SAF-6 | Tombstone unified key `dirdiving_shared_deleted_session_ids` | **Implemented** (`a75a6c3`) | Implemented |
+| UX-H2 | iOS → Watch verified push + Watch consumer | **Implemented** (`a75a6c3`) | Implemented |
+| UX-H3 / SAF-1 | Ascent warning + gauge co-visible | **Implemented** (banner inline 2026-05-20) | n/a (Watch-only) |
+| UX-H4 / SAF-2 | GPS confirmation compact banner | **Implemented** (`a75a6c3`) | n/a (Watch-only) |
+| UX-H5 | Canonical iOS branch (`main-iOS`) documented | Documented | Implemented |
+| UX-M1..M13 | UX cluster (ModeSelection, hidden nav, retry, toast, info-rows, units, activation labels, notif perm, planner modes, etc.) | Partial (UserImages hide TODO); Implemented (iOS) | Implemented |
+| UX-L1..L9 | LOW cluster (icon copy, units pill, dead code, CLEAR disabled, a11y, Dynamic Type, alarm step, dedupe delete) | Partial + i18n 2026-05-20; Implemented (iOS) | Implemented |
+| SAF-3 | TTV semantics clarification | Partial (a11y hint localized) | Implemented (`bf4718d`) |
+| SAF-4 | CSV bound tightening | n/a | Implemented (`bf4718d`) |
+| SAF-7 | Haptics-off badge pre-dive | **Implemented** (`a75a6c3`) | n/a |
+| SAF-8 | Alarm acknowledge with cooldown | **Implemented** (`a75a6c3`) | n/a |
+| SAF-9 | Planner safety per-launch acknowledgement | n/a | Implemented |
+| SAF-10 | Per-session sync delivery status | TODO surfaced honestly in Settings/MoreView | TODO surfaced honestly |
+
+Build verification: `xcodegen generate` riesce su entrambi i worktree; `swiftc -parse/-typecheck` di tutti i file toccati passa su iOS 26.5 e watchOS 26.5 SDK. Full `xcodebuild` richiede l'installazione dei platform runtime (Xcode → Settings → Components, oppure `xcodebuild -downloadPlatform iOS` / `xcodebuild -downloadPlatform watchOS`); comandi completi in `Docs/MAIN_PRE_RELEASE_SIMULATOR_QA_20260519.md` §0.
+
+## Lingue e internazionalizzazione (i18n)
+
+Da `fadd8a6` + `4cca72e` su `main`:
+
+- **Selettore lingua per app**: `DIRAppLanguage` (Watch) e `DIRIOSAppLanguage` (iOS) in `App/DIRAppLanguage.swift` e `iOSApp/App/DIRIOSAppLanguage.swift`. Tre casi: **`system`**, **`it`** (Italiano), **`en`** (English).
+- **Persistenza**: `@AppStorage("dirdiving_app_language")` indipendente su Watch e iPhone (sandbox separati; non sincronizzato cross-device).
+- **Locale runtime**: `.environment(\.locale, …)` impostato sulla root `WindowGroup` di entrambe le app.
+- **Tabelle stringhe**: `Resources/{en,it}.lproj/Localizable.strings` (Watch) e `iOSApp/Resources/{en,it}.lproj/Localizable.strings` (iOS). Aggiunta più recente: chiavi stabili `tab.*` (Logbook/Analisi/Planner/Attrezzatura/Altro), `logbook.delete.a11y`, `accessibility.command_button.hint`.
+- **UI**: picker in Watch `SettingsView` (sezione *Lingua*) e in iOS `MoreView` con disclaimer *"Changing language does not change units, calculations or saved data."*
+- **Logbook iOS**: i mesi/intestazioni rispettano `@Environment(\.locale)` invece di forzare `it_IT`.
+- **Legal onboarding**: disclaimer completo localizzato in `Resources/{en,it}.lproj/LegalDisclaimer.txt` e `iOSApp/Resources/{en,it}.lproj/LegalDisclaimer.txt`; la lingua segue il selettore app o la lingua di sistema supportata.
+- **Estensibilità**: per aggiungere una lingua bastano (a) un nuovo case negli enum `DIRAppLanguage`/`DIRIOSAppLanguage`, (b) una nuova cartella `xx.lproj/Localizable.strings`, (c) eventualmente estendere la fallback `supportedSystemLocale` (oggi `en`/`it`; altri sistemi cadono in italiano).
+- **Vincoli**: la modifica della lingua **non** cambia unità di misura, calcoli, persistenza o dati salvati.
+- **Pass secondario 2026-05-20**: ~130+ chiavi Watch e ~90+ iOS in `Localizable.strings`; servizi sync/bussola/allarmi localizzati con `String(localized:)`; schermate Settings, log, export, planner header, Analysis empty state coperte. Stato messaggi sync: si aggiorna al prossimo evento dopo cambio lingua.
+- **Debito residuo**: alcune righe planner risultato, dettaglio GPS (`Start:`/`Accuratezza:`), warning dinamici del planner store, import CSV runtime (`DiveImportService` ancora IT hardcoded). Migrazione progressiva verso String Catalog `.xcstrings` opzionale.
+- **TestFlight / sicurezza**: [`Docs/TESTFLIGHT_REVIEW_NOTES.md`](Docs/TESTFLIGHT_REVIEW_NOTES.md), [`Docs/SAFETY_DISCLAIMER.md`](Docs/SAFETY_DISCLAIMER.md), [`Docs/ROADMAP.md`](Docs/ROADMAP.md).
 
 ## Visual Design Standard
 
@@ -123,6 +213,7 @@ Gli ultimi fix sulla superficie stable separano chiaramente `main` dalle funzion
 - Il companion iOS stabile espone **cinque tab**: `Logbook`, `Analisi`, `Planner`, `Attrezzatura`, `Altro`; dati reali o etichettati come informativi/locali.
 - Il planner iOS mostra disclaimer in-app e separa i tab risultato `PIANO`, `CURVA BÜHLMANN` e `GRAFICI`.
 - Il progetto MAIN esclude Apnea, Snorkeling, Buddy Assist e concept experimental dal target membership generato da XcodeGen.
+- L'onboarding legale usa lo stesso linguaggio visivo premium: Watch con pannelli neri, testo grande e controlli glove-friendly; iOS con card scure, accenti ciano/giallo/rosso e dark mode forzato.
 
 Implementation helpers live in:
 
@@ -677,6 +768,7 @@ Dopo il report `Docs/EXPERIMENTAL_FUNCTIONS_UX_AUDIT_20260517_PRE_MODIFICATION.d
 - Introdurre workflow MapLibre/OpenSeaMap/MBTiles sul companion iOS dopo valutazione licenze e prestazioni.
 - Aggiungere report test hardware Apple Watch Ultra per Diving, Snorkeling e Apnea.
 - Preparare export e documentazione Subsurface piu completa per import CSV.
+- **i18n**: completare migrazione stringhe alle tabelle `Localizable.strings` (o `.xcstrings`); valutare unificazione `DIRAppLanguage` / `DIRIOSAppLanguage` in un modulo condiviso; eventuale sync preferenza lingua via WatchConnectivity.
 
 ## Aggiornamento pre-release 2026-05-18
 

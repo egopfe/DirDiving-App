@@ -23,10 +23,19 @@
 - Azione primaria: bottone pieno ciano; secondaria: outline / ghost.  
 - Grafici: assi discreti, contrasto su griglia.  
 
+## Onboarding legale — principi
+
+- Deve rimanere coerente con la UI premium: fondo nero, pannelli scuri, testo molto leggibile, accenti funzionali ciano/giallo/verde/rosso.
+- Watch: pulsanti grandi, Digital Crown scroll, nessun testo minuscolo non leggibile sott'acqua.
+- iOS: card moderne, transizioni leggere, dark mode e gerarchia Apple-like.
+- Il testo **DIR Diving is NOT a dive computer.** deve essere visibile e ad alto contrasto.
+- L'accesso all'app dopo first launch deve passare da accettazione completa; non usare link o pulsanti che aggirino il flusso.
+
 ## Cosa non fare su MAIN
 
 - Non importare view/store da file **esclusi** in `project.yml` per il target iOS.  
 - Non introdurre layout che richiedono nuova logica di business per funzionare.
+- Non modificare telemetry, GPS, BUSSOLA, calcoli immersione o sync per motivi di sola presentazione.
 
 ---
 

@@ -12,8 +12,15 @@
 
 ## Prerequisites (macOS)
 
-- Xcode **15.4** (see `project.yml` → `options.xcodeVersion`)
+- Xcode **15.4+** (see `project.yml` → `options.xcodeVersion`; Xcode 16.x with iOS/watchOS **26.5** runtimes is common on current Macs)
 - XcodeGen installed (`brew install xcodegen` or equivalent)
+- **Platform runtimes** installed: Xcode → Settings → Platforms (or Components) → **iOS 26.5** and **watchOS 26.5** simulator support. Without these, `xcodebuild` reports *platform not installed* even when SDKs are present.
+
+Verify runtimes:
+
+```bash
+xcrun simctl list runtimes | grep -E 'iOS 26|watchOS 26'
+```
 
 ## Commands (repository root)
 
@@ -42,15 +49,32 @@ xcodebuild -scheme "DIRDiving iOS" \
   build
 ```
 
-### Optional: simulator destinations
-
-Use `xcodebuild -showdestinations -scheme "DIRDiving iOS"` to pick a concrete simulator ID, for example:
+### Simulator builds (recommended after runtimes install)
 
 ```bash
 xcodebuild -scheme "DIRDiving iOS" \
-  -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.0' \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
+  -configuration Debug \
+  build
+
+xcodebuild -scheme "DIRDiving Watch App" \
+  -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 2 (49mm)' \
+  -configuration Debug \
   build
 ```
+
+Use `xcodebuild -showdestinations -scheme "DIRDiving iOS"` if device names differ on your Mac.
+
+## Post-build smoke checks
+
+Dopo una build pulita, verificare anche:
+
+- primo avvio Watch: onboarding legale visibile prima della `ContentView`;
+- primo avvio iOS: onboarding legale visibile prima della tabbar companion;
+- lingua impostata su `System`, `Italiano`, `English`: disclaimer caricato da `LegalDisclaimer.txt` corretto;
+- bottone Continue disabilitato finche tutte le checkbox obbligatorie non sono selezionate;
+- Settings -> Legal & Safety mostra disclaimer completo, versione accettata e timestamp;
+- nessun cambiamento inatteso a Diving live, BUSSOLA, GPS entry/exit, export Subsurface e sync.
 
 ## Host note (Windows / CI without Xcode)
 
