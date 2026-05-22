@@ -1,6 +1,6 @@
 # Roadmap DIR DIVING
 
-**Aggiornato:** 2026-05-20
+**Aggiornato:** 2026-05-22
 
 ## Rilasciati su `main` (Watch MAIN + iOS nel workspace)
 
@@ -12,8 +12,9 @@
 | Bussola SET/CLEAR bearing | ✅ | Terminologia BUSSOLA |
 | Log + export Subsurface CSV | ✅ | |
 | Sync Watch ↔ iOS + tombstone unificata | ✅ | `a75a6c3` manual port backlog |
-| Security F1–F12 | ✅ | Audit 2026-05-19 |
+| Security F1-F12 | ✅ | Audit 2026-05-19 |
 | i18n IT/EN (primario + secondario) | 🟡 | Selettore lingua; migrazione stringhe in corso |
+| Onboarding legale + disclaimer IT/EN | ✅ | First launch, major update re-consent, Legal & Safety |
 | Entitlement profondità Ultra | 🟡 | Configurato; validazione hardware aperta |
 
 ## Prossimo (MAIN, pre–App Store)
@@ -23,6 +24,7 @@
 | P0 | Validazione depth su Watch Ultra reale | QA / Apple |
 | P1 | QA pairing sync bidirezionale su device | QA |
 | P2 | Completare i18n planner/GPS detail iOS | Localization |
+| P2 | Verifica legale contenuti Terms/Privacy URL prima App Store | Legal / App Store |
 | P2 | Convergenza documentazione `main` ↔ `main-iOS` | Process |
 | P3 | Hide tab UserImages se bundle vuoto | UX |
 | P3 | GPX/UDDF export | Feature |

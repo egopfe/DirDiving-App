@@ -4,6 +4,26 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-22, legal onboarding + docs alignment)
+
+- Flusso onboarding legale first-launch su Watch e iOS: Welcome, Safety Warning, Legal Disclaimer, Acceptance.
+- Disclaimer completo IT/EN incluso come `LegalDisclaimer.txt` nei bundle `Resources/{en,it}.lproj` e `iOSApp/Resources/{en,it}.lproj`.
+- Persistenza accettazione: timestamp, versione app, major version, device type, lingua e legal revision.
+- Sezione **Legal & Safety** nei settings Watch/iOS con disclaimer completo, versione accettata e timestamp.
+- Aggiornamento documentale additivo: README, safety disclaimer, roadmap, build/iOS notes, UI guidelines, branch alignment e matrice feature CSV/XLSX.
+- Vincoli rispettati: nessuna modifica a GPS, BUSSOLA, calcoli profondita/risalita, decompressione, sync, export o modelli dati.
+
+### Added (2026-05-22, branch/docs alignment)
+
+- `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260522.md` - report A-K su fetch, branch, PR #8/#9 e conflitti.
+- Merge `origin/main` in `main` con risoluzione conservativa dei soli conflitti documentali in `Docs/SAFETY_DISCLAIMER.md` e `Docs/TESTFLIGHT_REVIEW_NOTES.md`.
+- Fast-forward dei worktree `codex/experimental-features` e `codex/ios-experimental-features` ai rispettivi remote.
+- Righe additive in `Docs/DIR_DIVING_Feature_Comparison.csv` per report 2026-05-22 e stato PR aperte.
+
+### Nota (2026-05-22)
+
+- `main-iOS` resta divergente (local ahead 2 / behind 10) e richiede merge manuale: la preview mostra conflitti in documentazione e file runtime iOS. Nessuna risoluzione automatica e stata applicata per evitare cambi involontari a import CSV, sync o planner.
+
 ### Added (2026-05-20, secondary i18n + documentation alignment)
 
 - Pass i18n secondario: espansione `Resources/{en,it}.lproj` e `iOSApp/Resources/{en,it}.lproj`; localizzazione messaggi sync, bussola, allarmi, Settings, log, export, Analysis/Planner header.
