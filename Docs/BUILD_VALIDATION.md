@@ -65,6 +65,17 @@ xcodebuild -scheme "DIRDiving Watch App" \
 
 Use `xcodebuild -showdestinations -scheme "DIRDiving iOS"` if device names differ on your Mac.
 
+## Post-build smoke checks
+
+Dopo una build pulita, verificare anche:
+
+- primo avvio Watch: onboarding legale visibile prima della `ContentView`;
+- primo avvio iOS: onboarding legale visibile prima della tabbar companion;
+- lingua impostata su `System`, `Italiano`, `English`: disclaimer caricato da `LegalDisclaimer.txt` corretto;
+- bottone Continue disabilitato finche tutte le checkbox obbligatorie non sono selezionate;
+- Settings -> Legal & Safety mostra disclaimer completo, versione accettata e timestamp;
+- nessun cambiamento inatteso a Diving live, BUSSOLA, GPS entry/exit, export Subsurface e sync.
+
 ## Host note (Windows / CI without Xcode)
 
 This repository is often edited on Windows. **Apple builds cannot be asserted from Windows** unless a remote macOS runner executes the commands above. Any “build OK” claim must cite logs from those commands.

@@ -12,6 +12,7 @@
 
 - Aggiornare `Docs/DIR_DIVING_Feature_Comparison.csv` con **nuove righe** (non cancellare righe storiche senza approvazione).
 - Allineare `README.md` con `project.yml` (nomi scheme, piattaforme).
+- Aggiornare README/Docs quando cambiano onboarding legale, disclaimer, lingua o Branch Strategy.
 - Build: seguire `Docs/BUILD_VALIDATION.md` su **macOS**.
 
 ## Pull request GitHub
@@ -23,6 +24,7 @@
 
 - `main` = stabile Diving + companion iOS nello stesso repo.
 - Rami `codex/*` = sperimentale; non mergeare in `main` senza CI/review.
+- Le modifiche UI-only devono preservare onboarding legale, Diving mode, GPS surface-only, BUSSOLA, export Subsurface e sync documentati.
 
 ## Commit
 

@@ -4,6 +4,15 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-22, legal onboarding + docs alignment)
+
+- Flusso onboarding legale first-launch su Watch e iOS: Welcome, Safety Warning, Legal Disclaimer, Acceptance.
+- Disclaimer completo IT/EN incluso come `LegalDisclaimer.txt` nei bundle `Resources/{en,it}.lproj` e `iOSApp/Resources/{en,it}.lproj`.
+- Persistenza accettazione: timestamp, versione app, major version, device type, lingua e legal revision.
+- Sezione **Legal & Safety** nei settings Watch/iOS con disclaimer completo, versione accettata e timestamp.
+- Aggiornamento documentale additivo: README, safety disclaimer, roadmap, build/iOS notes, UI guidelines, branch alignment e matrice feature CSV/XLSX.
+- Vincoli rispettati: nessuna modifica a GPS, BUSSOLA, calcoli profondita/risalita, decompressione, sync, export o modelli dati.
+
 ### Added (2026-05-22, branch/docs alignment)
 
 - `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260522.md` - report A-K su fetch, branch, PR #8/#9 e conflitti.
