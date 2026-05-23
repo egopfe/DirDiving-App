@@ -19,7 +19,11 @@
 | Onboarding legale + disclaimer IT/EN | ✅ | First launch, major update re-consent, Legal & Safety |
 | Planner safety acknowledgment | ✅ | Toggle obbligatorio prima di Calcola Piano |
 | Mode Selection auto-skip (solo Diving) | ✅ | Cold launch → Live |
-| Entitlement profondità Ultra | 🟡 | Configurato; validazione hardware aperta |
+| Entitlement profondità Ultra | 🟡 | Configurato su `com.egopfe.dirdiving.ios.watch`; validazione hardware aperta |
+| Depth limits 35/38/40 m UI + haptics | ✅ | `6cda004` |
+| CSV import sempre in Logbook/More | ✅ | Readiness 100% UX pass |
+| Planner tab risultato funzionali | ✅ | Readiness 100% UX pass |
+| Legal disclaimer scroll gate | ✅ | Readiness 100% UX pass |
 
 ## Prossimo (MAIN, pre–App Store)
 
