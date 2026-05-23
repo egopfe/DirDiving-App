@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080" role="img" aria-label="DIR DIVING secure buddy pairing mockup">
+  <defs>
+    <linearGradient id="steel" x1="0" x2="1">
+      <stop offset="0" stop-color="#746c61"/>
+      <stop offset="0.5" stop-color="#d6c7b5"/>
+      <stop offset="1" stop-color="#514b44"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1080" height="1080" fill="#02070a"/>
+  <circle cx="126" cy="158" r="5" fill="#0b6ba5" opacity="0.8"/>
+  <circle cx="945" cy="235" r="8" fill="#16d9ff" opacity="0.35"/>
+  <circle cx="876" cy="835" r="4" fill="#16d9ff" opacity="0.45"/>
+  <circle cx="210" cy="846" r="7" fill="#0b6ba5" opacity="0.6"/>
+
+  <rect x="185" y="62" width="710" height="956" rx="126" fill="url(#steel)"/>
+  <rect x="217" y="92" width="646" height="896" rx="98" fill="#050607"/>
+  <rect x="242" y="118" width="596" height="842" rx="72" fill="#000"/>
+
+  <g transform="translate(282 152)">
+    <text x="0" y="40" fill="#007aff" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700">DIR</text>
+    <text x="78" y="40" fill="#16d9ff" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700">DIVING</text>
+    <text x="0" y="78" fill="#f4f4f5" font-family="Arial, Helvetica, sans-serif" font-size="22">Buddy Assist</text>
+    <circle cx="468" cy="32" r="13" fill="#2fff5f" filter="url(#glow)"/>
+    <text x="492" y="41" fill="#2fff5f" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700">PRE-DIVE</text>
+  </g>
+
+  <g transform="translate(282 268)">
+    <rect x="0" y="0" width="516" height="112" rx="22" fill="#030607" stroke="#f8d529" stroke-width="2"/>
+    <text x="258" y="32" text-anchor="middle" fill="#f8d529" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700">SECURE PAIRING REQUIRED</text>
+    <text x="258" y="66" text-anchor="middle" fill="#f4f4f5" font-family="Arial, Helvetica, sans-serif" font-size="21">Pair before entering the water.</text>
+    <text x="258" y="94" text-anchor="middle" fill="#8b949e" font-family="Arial, Helvetica, sans-serif" font-size="17">Pairing is locked during active dive.</text>
+  </g>
+
+  <g transform="translate(282 410)">
+    <rect x="0" y="0" width="516" height="280" rx="24" fill="#030607" stroke="#2fff5f" stroke-width="2"/>
+    <text x="28" y="43" fill="#2fff5f" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700">SECURE PAIRING</text>
+    <text x="438" y="43" fill="#f8d529" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" text-anchor="end">VERIFY</text>
+    <line x1="28" y1="66" x2="488" y2="66" stroke="#1b2b34"/>
+
+    <text x="28" y="104" fill="#f4f4f5" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">BUDDY</text>
+    <text x="488" y="104" fill="#007aff" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" text-anchor="end">ULTRA WATCH 2</text>
+
+    <text x="258" y="148" text-anchor="middle" fill="#f8d529" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700">VERIFY CODE ON BOTH WATCHES</text>
+    <text x="258" y="214" text-anchor="middle" fill="#f4f4f5" font-family="Arial, Helvetica, sans-serif" font-size="58" font-weight="700" letter-spacing="2">482-913</text>
+    <text x="258" y="248" text-anchor="middle" fill="#8b949e" font-family="Arial, Helvetica, sans-serif" font-size="18">Trust only if the buddy sees the same code.</text>
+  </g>
+
+  <g transform="translate(282 720)">
+    <rect x="0" y="0" width="242" height="72" rx="16" fill="#031308" stroke="#2fff5f" stroke-width="2"/>
+    <text x="121" y="46" text-anchor="middle" fill="#2fff5f" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700">TRUST</text>
+    <rect x="274" y="0" width="242" height="72" rx="16" fill="#130302" stroke="#ff3b30" stroke-width="2"/>
+    <text x="395" y="46" text-anchor="middle" fill="#ff3b30" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700">CANCEL</text>
+  </g>
+
+  <g transform="translate(282 826)">
+    <rect x="0" y="0" width="516" height="74" rx="18" fill="#030607" stroke="#007aff" stroke-width="2"/>
+    <text x="28" y="46" fill="#007aff" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700">AUTH</text>
+    <text x="488" y="46" text-anchor="end" fill="#f4f4f5" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700">HMAC-SHA256 + KEYCHAIN</text>
+  </g>
+</svg>

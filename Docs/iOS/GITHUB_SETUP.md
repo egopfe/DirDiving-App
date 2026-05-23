@@ -8,14 +8,14 @@ main-iOS
 
 ## Generate Xcode Project Locally
 
-From the repository root:
+From the **repository root** on branch `main` (unified Watch + iOS):
 
 ```bash
 xcodegen generate
 open DIRDiving.xcodeproj
 ```
 
-The generated `.xcodeproj` is intentionally not committed because it can be regenerated from `project.yml`.
+The generated `.xcodeproj` is intentionally not committed (see root `.gitignore`). Use **only** the project at the repo root — not copies under `.worktrees/` or old checkouts.
 
 ## GitHub Update
 

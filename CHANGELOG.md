@@ -4,6 +4,16 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-24, documentation alignment + MAIN readiness 100% UX)
+
+- Documentazione: README (pass `6cda004` depth limits + readiness 100% UX), CSV feature matrix, `DOCUMENTATION_UPDATE_REPORT_20260524.md`, aggiornamento branch alignment e PR status.
+- Codice UX (solo UI/i18n, nessun algoritmo): import CSV Logbook/More, tab planner funzionali, modalità planner onesta, export Watch informational, unità iOS metric-only, scroll legale obbligatorio, delete log senza contextMenu.
+- Audit e checklist: `MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523`, `TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523`.
+
+### Added (2026-05-23, depth limit safety — Watch)
+
+- Commit `6cda004`: UI/haptic/log per limiti operativi 35/38/40 m; onboarding depth-limits ack; revisione legale 2026-05-23.
+
 ### Added (2026-05-23, production readiness MAIN — code + docs)
 
 - Pass production readiness su `main` (`5e595ee`): product name build interni, iOS→Watch session push, UI conflitti sync in More, i18n Settings/live/Planner/import, planner safety ack, auto-skip Mode Selection, tab User Images condizionale, righe Settings informative.

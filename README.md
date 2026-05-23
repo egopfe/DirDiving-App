@@ -29,7 +29,9 @@ L'accettazione viene salvata in `UserDefaults` con timestamp, versione app accet
 
 ## Pass production readiness (2026-05-23, `main`)
 
-Commit **`5e595ee`** — miglioramenti **senza** modificare algoritmi immersione, GPS, bussola, TTV, planner math o modello crittografico sync:
+### Commit `5e595ee` — sync, i18n, build
+
+Miglioramenti **senza** modificare algoritmi immersione, GPS, bussola, TTV, planner math o modello crittografico sync:
 
 - Build: nomi prodotto interni `DIRDivingWatchApp` / `DIRDivingiOSApp` (nome utente **DIR DIVING** invariato in Info.plist).
 - Sync: **invio sessioni iPhone → Watch**, coda outbound, tracciamento ID inviati; card **conflitti sync** in Altro (Usa Watch / Mantieni iPhone).
@@ -37,7 +39,24 @@ Commit **`5e595ee`** — miglioramenti **senza** modificare algoritmi immersione
 - i18n: Settings Watch, pannello manuale live, More, Planner, errori import CSV; banner risalita EN **ASCENT TOO FAST** / **SLOW DOWN**.
 - Sicurezza UX: toggle riconoscimento planner indicativo prima di **Calcola Piano**.
 
-Report: [`Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md`](Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md) · Audit precedente: [`Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260522.md`](Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260522.md).
+### Commit `6cda004` — limiti profondità operativi (Watch)
+
+- Stati UI **35 / 38 / 40 m** con banner, haptic throttled e flag log `exceededSupportedDepthRange`.
+- Onboarding: checkbox obbligatoria sui limiti operativi documentati Apple; revisione legale **`2026-05-23`**.
+- Checklist QA: [`Docs/DEPTH_LIMIT_SAFETY_TEST_CHECKLIST.md`](Docs/DEPTH_LIMIT_SAFETY_TEST_CHECKLIST.md).
+
+### Pass MAIN readiness 100% (2026-05-23, UX — solo UI/i18n)
+
+Senza modifiche a GPS, BUSSOLA, calcoli profondità/risalita, TTV, planner/Bühlmann/gas math:
+
+- **Import CSV** sempre raggiungibile da Logbook e Altro (`CSVImportPanel`).
+- **Planner**: tab risultato PIANO / BUHLMANN / GRAFICI mostrano sezioni distinte; solo modalità **Avanzato** attiva (altre disabilitate, pianificate).
+- **Watch Settings**: riga Export solo informativa (export reale da Log immersioni).
+- **iOS unità**: sezione metrico-only onesta in Altro.
+- **Onboarding legale**: scroll obbligatorio sul disclaimer prima di Continue.
+- **Log Watch**: elimina con icona cestino + conferma (no `contextMenu` deprecato).
+
+Report: [`Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md`](Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md) · Audit UX: [`Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523.md`](Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523.md) · TestFlight esterno: [`Docs/TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](Docs/TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md).
 
 ## Depth Entitlement And Signing Checklist
 
@@ -46,7 +65,7 @@ Local configuration is internally aligned for the Watch target: `project.yml` po
 External validation is still required before release:
 
 - On macOS/Xcode, run `xcodegen generate` and build the `DIRDiving Watch App` scheme with the Apple SDK.
-- In Apple Developer portal, confirm the App ID `com.egopfe.dirdiving` has the approved water submersion/depth entitlement and iCloud container `iCloud.com.egopfe.dirdiving`.
+- In Apple Developer portal, confirm the App ID `com.egopfe.dirdiving.ios.watch` (Watch, embedded in iOS) has the approved water submersion/depth entitlement and iCloud container `iCloud.com.egopfe.dirdiving`.
 - On a real Apple Watch Ultra-class device, confirm automatic depth launch and live `CMWaterSubmersionManager` depth samples; this cannot be validated from Windows or simulator alone.
 
 ## Features
@@ -91,7 +110,8 @@ Le istruzioni di build sono in [`Docs/BUILD_VALIDATION.md`](Docs/BUILD_VALIDATIO
 - **`codex/experimental-features`**: Watch sperimentale (Snorkeling Live, mappe waypoint/ritorno, Apnea workflow esteso, Buddy Assist, ecc.). Non importare questi file nel target MAIN senza revisione esplicita.
 - **`codex/ios-experimental-features`**: iOS sperimentale (Explore Lab, Buddy Lab, concept mappe). Isolato da App Store candidate su `main`.
 - **Allineamenti UI-only** su `main`: possono toccare layout, copy, accessibilità e documentazione **senza** modificare algoritmi di decompressione, modello gas, calcoli TTV/TTR/SAC/CNS/OTU, sampling sensori o regole di sync — vedi [`Docs/MAIN_UX_COMPLETION_REPORT.md`](Docs/MAIN_UX_COMPLETION_REPORT.md).
-- **HEAD `main` consigliato** per release candidate Watch+iOS unificato; `main-iOS` resta worktree storico — allineare documentazione dopo merge manuale (vedi [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260523.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260523.md)).
+- **HEAD `main` consigliato** per release candidate Watch+iOS unificato (`6cda004`+); `main-iOS` resta worktree storico — allineare **solo documentazione** da `main` dopo merge manuale (vedi [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260523.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260523.md)).
+- **UI-only / documentazione**: non alterare Diving mode, GPS surface-only, **BUSSOLA** (mai COMPASSO), export Subsurface, sync HMAC, onboarding legale.
 
 ### Matrice funzionalità (CSV)
 
@@ -571,7 +591,15 @@ This repository is intended to be generated and built on macOS with Xcode and Xc
 
 ```bash
 xcodegen generate
+open DIRDiving.xcodeproj
 ```
+
+### Un solo progetto Xcode (importante)
+
+- **Apri solo** `DIRDiving.xcodeproj` nella **root** del repository (`DirDiving-App/`), dopo `xcodegen generate`.
+- Il file **non è versionato su Git** (si rigenera da `project.yml`). Eventuali copie in `.worktrees/` o cartelle vecchie vanno **eliminate** — non usarle in Xcode.
+- **Non** esistono più progetti separati Watch/iOS nel repo: uno workspace XcodeGen con due scheme (`DIRDiving Watch App`, `DIRDiving iOS`).
+- Dopo ogni `git pull` che modifica `project.yml`, riesegui `xcodegen generate` prima di aprire Xcode.
 
 Then open the generated Xcode project and build the watchOS target.
 
@@ -634,7 +662,7 @@ Config/DIRDiving.entitlements
 
 Il file entitlements Watch include la chiave `com.apple.developer.coremotion.water-submersion`, coerente con `WKBackgroundModes` / `underwater-depth` in `App/Info.plist` e con `CODE_SIGN_ENTITLEMENTS: Config/DIRDiving.entitlements` in `project.yml`.
 
-Questa configurazione non equivale a validazione release: prima di TestFlight/App Store serve confermare in Apple Developer portal che l'App ID `com.egopfe.dirdiving` abbia l'entitlement depth/submersion approvato, poi generare/buildare con Xcode su macOS e validare su Apple Watch Ultra reale.
+Questa configurazione non equivale a validazione release: prima di TestFlight/App Store serve confermare in Apple Developer portal che l'App ID **`com.egopfe.dirdiving.ios.watch`** (Watch embedded in **`com.egopfe.dirdiving.ios`**) abbia l'entitlement water submersion approvato, poi generare/buildare con Xcode su macOS e validare su Apple Watch Ultra reale. L'ID legacy `com.egopfe.dirdiving` non va usato per install embedded.
 
 ## Branch Strategy
 

@@ -58,13 +58,14 @@ Non ancora persistito in un modello dedicato perche manca il contratto dati defi
 - velocita discesa/risalita calcolate;
 - tipi sessione diversi da `Acque Libere`.
 
-Il pass corrente aggiunge boundary UI esplicite per `Watch -> iPhone Apnea`: durata, profondita massima e recovery sono disponibili come record locale, mentre profilo campioni reale, queue offline, duplicate prevention e conferma ricezione iPhone restano TODO sync.
+Il pass corrente aggiunge boundary UI esplicite per `Watch -> iPhone Apnea`: durata, profondita massima e recovery sono disponibili come record locale, mentre profilo campioni reale, duplicate prevention production e merge iOS restano roadmap. Il Watch mostra stato payload, delivery e coda sperimentale per evitare sync silenziosi.
 
 ## Sensori e limiti
 
 - La profondita viene letta dal flusso esistente `DiveManager`.
 - Il warning risalita riusa lo stato esistente `ascentStatus`; non modifica i calcoli di risalita.
-- Frequenza cardiaca, batteria e temperatura sono visualizzati come placeholder dove non esiste una sorgente dati Apnea dedicata.
+- Frequenza cardiaca, batteria e temperatura non usano valori finti: la UI mostra `HR OFF`, `BAT --` e `TEMP --` finche non esiste una sorgente dati Apnea dedicata.
+- Se il sensore profondita non e disponibile, la UI mostra `--` invece di una profondita zero apparentemente valida.
 - Il GPS non viene usato per tracking subacqueo Apnea; eventuali dati GPS restano surface-only come nel resto del progetto.
 
 ## Companion iOS
@@ -78,7 +79,7 @@ La card mostra:
 - profilo/percorso mock in stile dark-cyan;
 - metriche placeholder per profondita massima, tempo e temperatura acqua.
 
-La sincronizzazione reale dei record Apnea Watch verso iOS resta TODO. Il companion non cambia runtime Watch, BLE, GPS o persistenza Watch.
+La sincronizzazione dei record Apnea Watch verso iOS usa un contratto lightweight e stato import sperimentale; non e ancora una pipeline production con profilo campioni, retry persistente, merge e duplicate prevention. Il companion non cambia runtime Watch, BLE, GPS o persistenza Watch.
 
 Il companion iOS experimental mostra sempre etichette `Mock`, `TODO`, `Non sincronizzato` o equivalenti per evitare di presentare dati locali come sync production.
 

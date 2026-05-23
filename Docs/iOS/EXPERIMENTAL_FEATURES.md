@@ -48,8 +48,9 @@ Implemented surfaces:
 - POI / Osservazioni card for photo, video, comments, category, tags, and species notes as explicit media/enrichment TODO actions.
 - Apnea Review card with interactive `Riepilogo`, `Grafico`, and `Dettagli` tabs and mock-data labels.
 - Apnea analytics card with max depth, recovery trend, readiness score, fatigue trend, and apnea-duration chart.
-- Sync/settings card for apnea duration warning, recovery ratio, drift threshold, waypoint auto-switch, Watch -> iPhone POI, Watch -> iPhone Apnea, iPhone -> Watch route and iPhone -> Watch settings boundaries.
-- GPX/CSV export actions for route, marker, and analytics data.
+- Sync/settings card for apnea duration warning, recovery ratio, drift threshold, waypoint auto-switch, Watch -> iPhone POI, Watch -> iPhone Apnea, iPhone -> Watch route and iPhone -> Watch settings boundaries with visible experimental queue count/status.
+- GPX/CSV export actions for route, marker, and analytics data clearly labelled as mock export until a production exporter is implemented.
+- More/settings surface for local units, CSV export preference, Watch sync diagnostics, and safety gates for mock/lab features.
 
 Implementation files:
 
@@ -58,19 +59,6 @@ Implementation files:
 - `iOSApp/Views/ExplorationCenterView.swift`
 
 Map note: the current branch provides a premium MapLibre/OpenSeaMap-ready UI surface and route model. It does not ship a real map engine, public tile usage, or MBTiles cache. A production map engine should be selected and validated on-device before replacing the coded map preview with live tiles/offline MBTiles.
-
-### Apnea Companion Review
-
-`ExplorationCenterView` includes an experimental `Apnea Review` card intended as the iPhone-side review entry point for Watch Apnea sessions.
-
-Current scope:
-
-- visual header and tab-style sections for `Riepilogo`, `Grafico`, and `Dettagli`;
-- dark-cyan mock profile/route surface;
-- placeholder metrics for profondita massima, tempo, and temperatura acqua;
-- explicit TODO boundaries for future synced Apnea session data.
-
-The card is UI-only. It does not change Watch runtime behavior, WatchConnectivity payloads, persistence models, GPS logic, compass logic, or dive/ascent/depth calculations.
 
 ### POI Enrichment Roadmap
 
@@ -111,13 +99,13 @@ The current Explore Lab includes an explicit MBTiles readiness status action. It
 
 The iOS experimental branch intentionally stops short of a full sync architecture.
 
-Documented TODO boundaries:
+Documented boundaries:
 
-- Watch -> iPhone POIs: queue, duplicate prevention, delivery acknowledgement and enrichment merge.
-- Watch -> iPhone Apnea records: duration/max-depth/recovery payload first, sample profile later.
-- iPhone -> Watch waypoints/routes: mock manifest only in this pass.
-- iPhone -> Watch settings: payload contract not defined yet.
-- Offline queue: not implemented.
+- Watch -> iPhone POIs: experimental envelope receipt is visible; enrichment merge, duplicate prevention and production acknowledgement remain roadmap.
+- Watch -> iPhone Apnea records: duration/max-depth/recovery envelope first, sample profile later.
+- iPhone -> Watch waypoints/routes: local manifest queue is visible, but no production Watch delivery/ACK.
+- iPhone -> Watch settings: lightweight settings envelope is queued locally, but production delivery/merge remains roadmap.
+- Offline queue: visible local counter/status exists for UX review; persistent retry/flush policy is not production-ready.
 
 The UI uses `Mock`, `TODO`, `Non ancora sincronizzato` and equivalent labels so experimental surfaces do not imply production sync.
 
