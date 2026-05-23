@@ -15,7 +15,7 @@ enum WatchDiveSyncCodec {
     static let maxIssuedAtSkew: TimeInterval = 3_600
     static let importedSessionIDsKey = "dirdiving_ios_imported_session_ids"
 
-    private static let expectedWatchBundleID = "com.egopfe.dirdiving"
+    private static let expectedWatchBundleID = "com.egopfe.dirdiving.ios.watch"
 
     struct Transport: Codable {
         let version: Int

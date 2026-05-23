@@ -46,7 +46,7 @@ Local configuration is internally aligned for the Watch target: `project.yml` po
 External validation is still required before release:
 
 - On macOS/Xcode, run `xcodegen generate` and build the `DIRDiving Watch App` scheme with the Apple SDK.
-- In Apple Developer portal, confirm the App ID `com.egopfe.dirdiving` has the approved water submersion/depth entitlement and iCloud container `iCloud.com.egopfe.dirdiving`.
+- In Apple Developer portal, confirm the App ID `com.egopfe.dirdiving.ios.watch` (Watch, embedded in iOS) has the approved water submersion/depth entitlement and iCloud container `iCloud.com.egopfe.dirdiving`.
 - On a real Apple Watch Ultra-class device, confirm automatic depth launch and live `CMWaterSubmersionManager` depth samples; this cannot be validated from Windows or simulator alone.
 
 ## Features

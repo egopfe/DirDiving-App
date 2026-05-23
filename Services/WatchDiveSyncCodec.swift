@@ -46,7 +46,7 @@ enum WatchDiveSyncCodec {
         let issuedAt = Date()
         let transport = Transport(
             version: schemaVersion,
-            bundleID: Bundle.main.bundleIdentifier ?? "com.egopfe.dirdiving",
+            bundleID: Bundle.main.bundleIdentifier ?? "com.egopfe.dirdiving.ios.watch",
             issuedAt: issuedAt,
             body: body,
             signature: ""

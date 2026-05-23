@@ -63,7 +63,7 @@ enum WatchSyncAuth {
             return SymmetricKey(data: Data(repeating: 0, count: 32))
         }
         let orderedSecrets = [localSecret, secret].sorted { $0.lexicographicallyPrecedes($1) }
-        var material = Data("dirdiving.watch.sync.v2|com.egopfe.dirdiving|com.egopfe.dirdiving.ios|".utf8)
+        var material = Data("dirdiving.watch.sync.v2|com.egopfe.dirdiving.ios.watch|com.egopfe.dirdiving.ios|".utf8)
         material.append(orderedSecrets[0])
         material.append(orderedSecrets[1])
         return SymmetricKey(data: SHA256.hash(data: material))
