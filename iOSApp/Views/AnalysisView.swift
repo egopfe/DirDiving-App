@@ -129,7 +129,7 @@ struct AnalysisView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            Text("Prossima azione: sincronizza Apple Watch o importa un CSV dal Logbook.")
+            Text(String(localized: "analysis.empty.next_action"))
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(DIRTheme.cyan)
             HStack(spacing: 10) {

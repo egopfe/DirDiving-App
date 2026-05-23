@@ -5,6 +5,7 @@ struct MoreView: View {
     @EnvironmentObject private var cloudSync: CloudSyncStore
     @EnvironmentObject private var logStore: DiveLogStore
     @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
+    @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
 
     var body: some View {
         NavigationStack {
@@ -13,17 +14,18 @@ struct MoreView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         VStack(alignment: .leading, spacing: 7) {
-                            Text("Altro")
+                            Text(String(localized: "Altro"))
                                 .font(.system(size: 30, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
-                            Text("Watch sync, cloud backup, reviewer tools and export presentation")
+                            Text(String(localized: "more.header.subtitle"))
                                 .font(.callout)
                                 .foregroundStyle(DIRTheme.muted)
                         }
-                        DIRCard("PREFERENZE APP", icon: "gearshape.fill", accent: DIRTheme.cyan) {
+                        DIRCard(String(localized: "PREFERENZE APP"), icon: "gearshape.fill", accent: DIRTheme.cyan) {
                             languagePreferencePicker
-                            row("Sync impostazioni", "Locale-only")
-                            row("Planner safety", "Disclaimer richiesto")
+                            unitsPreferenceSection
+                            row(String(localized: "Sync impostazioni"), String(localized: "Locale-only"))
+                            row(String(localized: "Planner safety"), String(localized: "Disclaimer richiesto"))
                             NavigationLink {
                                 IOSLegalSafetyView()
                             } label: {
@@ -40,7 +42,7 @@ struct MoreView: View {
                             }
                             .buttonStyle(.plain)
                         }
-                        DIRCard("SYNC WATCH", icon: "applewatch", accent: DIRTheme.cyan) {
+                        DIRCard(String(localized: "SYNC WATCH"), icon: "applewatch", accent: DIRTheme.cyan) {
                             row(String(localized: "more.sync.supported"), watchSync.isSupported ? String(localized: "more.yes") : String(localized: "more.no"))
                             row(String(localized: "more.sync.state"), watchSync.userVisibleState)
                             row(String(localized: "more.sync.last_event"), watchSync.lastMessage)
@@ -59,15 +61,15 @@ struct MoreView: View {
                         if !watchSync.conflicts.isEmpty {
                             syncConflictsCard
                         }
-                        DIRCard("BACKUP CLOUD", icon: "icloud", accent: DIRTheme.green) {
-                            row("iCloud Sync", cloudSync.isICloudAvailable ? "Attivo" : "Non disponibile")
-                            row("Backup automatico", "Log e planner")
-                            row("Ultimo evento", cloudSync.lastSyncStatus)
+                        DIRCard(String(localized: "BACKUP CLOUD"), icon: "icloud", accent: DIRTheme.green) {
+                            row(String(localized: "iCloud Sync"), cloudSync.isICloudAvailable ? String(localized: "more.icloud.active") : String(localized: "more.icloud.unavailable"))
+                            row(String(localized: "Backup automatico"), String(localized: "Log e planner"))
+                            row(String(localized: "Ultimo evento"), cloudSync.lastSyncStatus)
                             Button {
                                 logStore.synchronizeCloud()
                                 cloudSync.synchronize()
                             } label: {
-                                Label("Sincronizza ora", systemImage: "icloud.and.arrow.up")
+                                Label(String(localized: "Sincronizza ora"), systemImage: "icloud.and.arrow.up")
                                     .font(.callout.weight(.semibold))
                                     .foregroundStyle(DIRTheme.cyan)
                                     .frame(maxWidth: .infinity)
@@ -76,24 +78,25 @@ struct MoreView: View {
                             }
                             .buttonStyle(.plain)
                         }
-                        DIRCard("REVIEWER", icon: "books.vertical", accent: DIRTheme.yellow) {
+                        DIRCard(String(localized: "REVIEWER"), icon: "books.vertical", accent: DIRTheme.yellow) {
                             Toggle(isOn: Binding(
                                 get: { logStore.includeDemoLogbook },
                                 set: { logStore.includeDemoLogbook = $0 }
                             )) {
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text("Logbook dimostrativo")
+                                    Text(String(localized: "Logbook dimostrativo"))
                                         .foregroundStyle(.white)
-                                    Text("Carica 5 immersioni demo per revisione App Store.")
+                                    Text(String(localized: "Carica 5 immersioni demo per revisione App Store."))
                                         .font(.caption2)
                                         .foregroundStyle(DIRTheme.muted)
                                 }
                             }
                             .tint(DIRTheme.cyan)
                         }
-                        DIRCard("EXPORT", icon: "square.and.arrow.up", accent: DIRTheme.cyan) {
-                            row("Subsurface", "CSV")
-                            row("Bundle", "com.egopfe.dirdiving.ios")
+                        DIRCard(String(localized: "EXPORT"), icon: "square.and.arrow.up", accent: DIRTheme.cyan) {
+                            row(String(localized: "Subsurface"), "CSV")
+                            row(String(localized: "Bundle"), "com.egopfe.dirdiving.ios")
+                            CSVImportPanel()
                         }
                         DIRWarningBox(
                             text: String(localized: "DIR DIVING e uno strumento di supporto per logbook, analisi e pianificazione preliminare. Non sostituisce formazione, procedure del dive center, equipaggiamento certificato o il giudizio umano. L'app non e un computer subacqueo certificato salvo esplicita omologazione futura. Output del planner indicativi: verificarli con strumenti certificati. GPS utile in superficie; sott'acqua e in copertura e inaffidabile o assente.")
@@ -106,12 +109,41 @@ struct MoreView: View {
         }
     }
 
+    private var unitsPreferenceSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(String(localized: "units.title"))
+                    .foregroundStyle(DIRTheme.muted)
+                Spacer()
+                Text(String(localized: "units.metric_only"))
+                    .foregroundStyle(.white)
+                    .fontWeight(.semibold)
+            }
+            .font(.callout)
+            Picker(String(localized: "units.title"), selection: $units) {
+                Text("m").tag(IOSUnitPreference.metric.rawValue)
+            }
+            .pickerStyle(.segmented)
+            .disabled(true)
+            Text(String(localized: "units.ios.footer"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.yellow)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.vertical, 5)
+        .onAppear {
+            if units != IOSUnitPreference.metric.rawValue {
+                units = IOSUnitPreference.metric.rawValue
+            }
+        }
+    }
+
     private var languagePreferencePicker: some View {
         let selectedLanguage = DIRIOSAppLanguage.fromStorage(appLanguage)
 
         return VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Lingua")
+                Text(String(localized: "Lingua"))
                     .foregroundStyle(DIRTheme.muted)
                 Spacer()
                 Text(selectedLanguage.title)

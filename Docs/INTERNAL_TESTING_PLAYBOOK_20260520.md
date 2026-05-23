@@ -1,10 +1,12 @@
 # Internal testing playbook — DIR DIVING MAIN
 
 **For:** developers and testers on branch `main`  
-**Updated:** 2026-05-20  
+**Updated:** 2026-05-23  
 **Goal:** reach confident **internal test** → **TestFlight** without surprises
 
 Use this as the single day-by-day guide. Detailed checklists live in linked docs.
+
+**TestFlight / entitlement blockers (external):** [`TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md)
 
 ---
 

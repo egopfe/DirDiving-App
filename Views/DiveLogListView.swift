@@ -32,24 +32,24 @@ struct DiveLogListView: View {
             ExportView(fileName: exportCompletionFileName ?? "export.csv")
         }
         .confirmationDialog(
-            "Eliminare immersione?",
+            String(localized: "log.delete.confirm.title"),
             isPresented: Binding(
                 get: { pendingDelete != nil },
                 set: { if !$0 { pendingDelete = nil } }
             ),
             titleVisibility: .visible
         ) {
-            Button("Elimina", role: .destructive) {
+            Button(String(localized: "log.delete.confirm.action"), role: .destructive) {
                 if let pendingDelete {
                     log.delete(id: pendingDelete.id)
                 }
                 pendingDelete = nil
             }
-            Button("Annulla", role: .cancel) {
+            Button(String(localized: "log.delete.cancel"), role: .cancel) {
                 pendingDelete = nil
             }
         } message: {
-            Text("Il log verra rimosso dal Watch. L'azione non parte piu da un singolo tap accidentale.")
+            Text(String(localized: "log.delete.confirm.message"))
         }
     }
 
@@ -71,7 +71,7 @@ struct DiveLogListView: View {
                 DiveClockText(size: 14)
             }
 
-            Text("IMMERSIONI")
+            Text(String(localized: "IMMERSIONI"))
                 .font(.system(size: 13, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white)
                 .kerning(0.4)
@@ -84,14 +84,14 @@ struct DiveLogListView: View {
             .fill(Color.black.opacity(0.54))
             .overlay(
                 VStack(spacing: 4) {
-                    Text("NESSUNA IMMERSIONE")
+                    Text(String(localized: "NESSUNA IMMERSIONE"))
                         .font(.system(size: 12, weight: .black, design: .rounded))
                         .foregroundStyle(DiveUI.yellow)
-                    Text("Avvia una nuova sessione o sincronizza da iPhone quando disponibile.")
+                    Text(String(localized: "log.empty.hint"))
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
                         .foregroundStyle(DiveUI.secondaryText)
                         .multilineTextAlignment(.center)
-                    Text("EXPORT NON DISPONIBILE")
+                    Text(String(localized: "log.export.unavailable"))
                         .font(.system(size: 9, weight: .black, design: .rounded))
                         .foregroundStyle(DiveUI.cyan)
                 }
@@ -164,7 +164,7 @@ struct DiveLogListView: View {
                     HapticService.shared.confirm()
                 }
             } label: {
-                Text("ESPORTA ULTIMA (SUBSURFACE)")
+                Text(String(localized: "log.export.latest"))
                     .font(.system(size: 12, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.green)
                     .lineLimit(1)
@@ -184,7 +184,7 @@ struct DiveLogListView: View {
 
             if let listExportURL {
                 ShareLink(item: listExportURL) {
-                    Text("CONDIVIDI CSV")
+                    Text(String(localized: "CONDIVIDI CSV"))
                         .font(.system(size: 10, weight: .black, design: .rounded))
                         .foregroundStyle(DiveUI.blue)
                         .frame(maxWidth: .infinity, minHeight: 26)
@@ -196,7 +196,7 @@ struct DiveLogListView: View {
                     .foregroundStyle(DiveUI.yellow)
                     .multilineTextAlignment(.center)
             } else if log.sessions.isEmpty {
-                Text("Export disponibile dopo il primo log salvato.")
+                Text(String(localized: "log.export.after_first"))
                     .font(.system(size: 10, weight: .semibold, design: .rounded))
                     .foregroundStyle(DiveUI.secondaryText)
                     .multilineTextAlignment(.center)
@@ -205,58 +205,64 @@ struct DiveLogListView: View {
     }
 
     private func logRow(session: DiveSession, index: Int) -> some View {
-        NavigationLink {
-            DiveDetailView(session: session)
-        } label: {
-            HStack(spacing: 8) {
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(alignment: .firstTextBaseline) {
-                        Text(logDate(session.startDate))
-                            .font(.system(size: 10, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .monospacedDigit()
-                        Spacer(minLength: 5)
-                        Text(logTime(session.startDate))
-                            .font(.system(size: 10, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .monospacedDigit()
+        HStack(spacing: 4) {
+            NavigationLink {
+                DiveDetailView(session: session)
+            } label: {
+                HStack(spacing: 8) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack(alignment: .firstTextBaseline) {
+                            Text(logDate(session.startDate))
+                                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white)
+                                .monospacedDigit()
+                            Spacer(minLength: 5)
+                            Text(logTime(session.startDate))
+                                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white)
+                                .monospacedDigit()
+                        }
+
+                        HStack(alignment: .lastTextBaseline, spacing: 13) {
+                            Text("\(Formatters.one(session.maxDepthMeters)) m")
+                                .font(.system(size: 14, weight: .black, design: .rounded))
+                                .foregroundStyle(.white)
+                                .monospacedDigit()
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.72)
+                            Text("\(durationMinutes(session.durationSeconds)) min")
+                                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white)
+                                .monospacedDigit()
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.72)
+                        }
                     }
 
-                    HStack(alignment: .lastTextBaseline, spacing: 13) {
-                        Text("\(Formatters.one(session.maxDepthMeters)) m")
-                            .font(.system(size: 14, weight: .black, design: .rounded))
-                            .foregroundStyle(.white)
-                            .monospacedDigit()
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.72)
-                        Text("\(durationMinutes(session.durationSeconds)) min")
-                            .font(.system(size: 13, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .monospacedDigit()
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.72)
-                    }
+                    Spacer(minLength: 0)
+
+                    Image(systemName: session.exceededSupportedDepthRange ? "exclamationmark.octagon.fill" : "mappin.circle.fill")
+                        .font(.system(size: 19, weight: .black))
+                        .foregroundStyle(session.exceededSupportedDepthRange ? DiveUI.red : DiveUI.green)
+                        .symbolRenderingMode(.hierarchical)
                 }
-
-                Spacer(minLength: 0)
-
-                Image(systemName: session.exceededSupportedDepthRange ? "exclamationmark.octagon.fill" : "mappin.circle.fill")
-                    .font(.system(size: 19, weight: .black))
-                    .foregroundStyle(session.exceededSupportedDepthRange ? DiveUI.red : DiveUI.green)
-                    .symbolRenderingMode(.hierarchical)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 4)
+                .frame(minHeight: 36)
+                .contentShape(Rectangle())
             }
-            .padding(.horizontal, 7)
-            .padding(.vertical, 4)
-            .frame(minHeight: 36)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .contextMenu {
-            Button(role: .destructive) {
+            .buttonStyle(.plain)
+
+            Button {
                 pendingDelete = session
             } label: {
-                Label("Elimina", systemImage: "trash")
+                Image(systemName: "trash")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(DiveUI.red)
+                    .frame(width: 28, height: 28)
             }
+            .buttonStyle(.plain)
+            .accessibilityLabel(String(localized: "log.delete.a11y"))
         }
     }
 

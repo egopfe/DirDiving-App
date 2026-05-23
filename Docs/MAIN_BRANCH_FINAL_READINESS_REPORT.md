@@ -1,164 +1,166 @@
 # DIR DIVING — MAIN Branch Final Readiness Report
 
 **Date:** 2026-05-23  
-**Branch:** `main` (audit-only implementation pass, no experimental branches)  
-**Baseline audit:** [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260522.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260522.md) (~83% overall)
+**Branch:** `main`  
+**Pass:** TestFlight-readiness fixes (Phases 0–10) — UI/i18n/discoverability only  
+**Baseline:** [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260523.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260523.md), [`MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523.md`](MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523.md)
 
 ---
 
-## Executive summary
+## 1. Branch confirmed
 
-| Dimension | Before | After (this pass) | Notes |
-|-----------|--------|-------------------|-------|
-| Overall MAIN | ~83% | **~92%** | Code/build/i18n/sync UX; device depth QA still external |
-| Compile readiness | ~90% | **~95%** | Named simulators: both schemes **BUILD SUCCEEDED** |
-| i18n | Partial | **Strong** | Watch Settings/live/manual, iOS More/Planner/import; some rows still IT-key pattern |
-| Sync reliability | Partial | **Improved** | iPhone→Watch push + conflict UI + queue logging |
-| TestFlight | Conditional | **Ready with device QA** | Pairing + tombstones + Ultra depth |
-| App Store | No | **No** | Legal/assets/field depth proof remain |
+| Check | Result |
+|-------|--------|
+| Branch | `main` |
+| Experimental branches/files | **Not modified** |
+| `project.yml` experimental excludes | **Unchanged** |
 
 ---
 
-## Modified files
+## 2. Files modified
 
-| File | Phase | Change summary |
-|------|-------|----------------|
-| [`project.yml`](../project.yml) | 1 | Internal `PRODUCT_NAME`: `DIRDivingWatchApp` / `DIRDivingiOSApp` (display name unchanged in Info.plist) |
-| [`Resources/Assets.xcassets/AppIcon.appiconset/icon_92_2x.png`](../Resources/Assets.xcassets/AppIcon.appiconset/) | 1 | Removed orphan unassigned asset |
-| [`Resources/en.lproj/Localizable.strings`](../Resources/en.lproj/Localizable.strings) | 2, 4, 7 | Ascent EN **ASCENT TOO FAST**; submersion error key |
-| [`Resources/it.lproj/Localizable.strings`](../Resources/it.lproj/Localizable.strings) | 2 | Submersion error key |
-| [`Utils/WatchModeSelectionPreferences.swift`](../Utils/WatchModeSelectionPreferences.swift) | 4 | Auto-skip Mode Selection when single stable mode (default on) |
-| [`Services/AppNavigationStore.swift`](../Services/AppNavigationStore.swift) | 4 | Cold launch → Live when skip enabled |
-| [`Views/ContentView.swift`](../Views/ContentView.swift) | 4, 9 | Hide Mode Selection tab + User Images tab when empty |
-| [`Views/DiveLiveView.swift`](../Views/DiveLiveView.swift) | 2, 4, 5, 7 | Localized manual panel; pre-dive haptics-off badge |
-| [`Views/SettingsView.swift`](../Views/SettingsView.swift) | 2, 5 | `String(localized:)` on key rows; informational vs interactive row styling |
-| [`Services/DiveManager.swift`](../Services/DiveManager.swift) | 2 | Localized submersion unavailable message |
-| [`Services/WatchSyncService.swift`](../Services/WatchSyncService.swift) | 3 | Diagnostic log on flush pending queue |
-| [`iOSApp/Services/WatchDiveSyncCodec.swift`](../iOSApp/Services/WatchDiveSyncCodec.swift) | 3 | `makePayload` for outbound iOS→Watch (same HMAC schema) |
-| [`iOSApp/Services/WatchSyncService.swift`](../iOSApp/Services/WatchSyncService.swift) | 3 | `transferToWatch`, `syncUnpushedSessionsToWatch`, outbound queue, pushed-ID tracking |
-| [`iOSApp/Services/DiveLogStore.swift`](../iOSApp/Services/DiveLogStore.swift) | 3 | `add(..., suppressWatchPush:)` + auto push on add |
-| [`iOSApp/Views/MoreView.swift`](../iOSApp/Views/MoreView.swift) | 2, 3, 6 | Localized disclaimer; sync push button; **conflict resolution card** |
-| [`iOSApp/Views/PlannerView.swift`](../iOSApp/Views/PlannerView.swift) | 2, 6 | Safety acknowledgment toggle gates **Calcola Piano** |
-| [`iOSApp/Services/DiveImportService.swift`](../iOSApp/Services/DiveImportService.swift) | 2, 6 | Localized errors + import summary (validation already present) |
-| [`iOSApp/Resources/en.lproj/Localizable.strings`](../iOSApp/Resources/en.lproj/Localizable.strings) | 2, 3, 6 | Import, planner, More/sync keys |
-| [`iOSApp/Resources/it.lproj/Localizable.strings`](../iOSApp/Resources/it.lproj/Localizable.strings) | 2, 3, 6 | Italian counterparts |
+| File | Phase | Summary |
+|------|-------|---------|
+| `iOSApp/Views/CSVImportPanel.swift` | 2 | Shared CSV import button + `fileImporter` |
+| `iOSApp/Views/LogbookView.swift` | 2, 5 | Import panel always visible; localized strings |
+| `iOSApp/Views/MoreView.swift` | 2, 5, 6 | Import in EXPORT card; units honesty section; i18n |
+| `iOSApp/Views/PlannerView.swift` | 3, 4, 5 | Result tabs switch content; mode picker disabled/planned; i18n |
+| `iOSApp/Views/AnalysisView.swift` | 2, 5 | Empty-state import hint |
+| `iOSApp/Views/DiveDetailView.swift` | 5 | Localized salinity label |
+| `iOSApp/Views/IOSLegalOnboardingView.swift` | 9 | Scroll-to-bottom gate for disclaimer |
+| `Views/SettingsView.swift` | 5, 7 | Informational export/TTV rows; Settings i18n |
+| `Views/DiveLogListView.swift` | 5, 8 | Trash button + confirm; no `contextMenu`; i18n |
+| `Views/WatchLegalOnboardingView.swift` | 9 | Scroll-to-bottom gate (Watch) |
+| `Resources/en.lproj/Localizable.strings` | 5, 7, 8 | Watch keys |
+| `Resources/it.lproj/Localizable.strings` | 5, 7, 8 | Watch keys |
+| `iOSApp/Resources/en.lproj/Localizable.strings` | 2–6, 9 | iOS keys |
+| `iOSApp/Resources/it.lproj/Localizable.strings` | 2–6, 9 | iOS keys |
+| `Docs/TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md` | 1 | External QA checklist |
+| `Docs/INTERNAL_TESTING_PLAYBOOK_20260520.md` | 1 | Link to entitlement QA doc |
+| `Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md` | 10 | This report |
 
-**Not modified (by design):** dive algorithms, TTV math, planner/Bühlmann math, sync crypto model, visual theme, experimental branches.
+**Not modified:** `DiveManager`, `PlannerService`, `BuhlmannPlanner`, `GasPlanningService`, TTV math, sync crypto, depth/ascent algorithms, visual theme assets.
 
 ---
 
-## Solved issues (mapped to audit)
+## 3. Issues fixed
 
-| Audit issue | Status | Evidence |
-|-------------|--------|----------|
-| Duplicate `DIR DIVING.app` on generic iOS sim | **Mitigated** | Separate internal product names; **named** sim builds succeed |
-| Watch AppIcon `icon_92_2x` warning | **Fixed** | Orphan PNG removed |
-| Hardcoded IT (Settings, live manual, More, Planner) | **Mostly fixed** | `String(localized:)` + new keys |
-| iPhone→Watch session push missing | **Fixed** | `transferToWatch` + `syncUnpushedSessionsToWatch` |
-| Sync conflicts invisible | **Fixed** | MoreView conflict card with Use Watch / Keep iPhone |
-| Mode Selection friction | **Fixed** | Auto-skip to Live (extensible flag) |
-| User Images empty tab | **Fixed** | Tab hidden when `imageNames.isEmpty` |
-| Ascent alarm EN strings | **Fixed** | ASCENT TOO FAST / SLOW DOWN |
-| Planner safety ack | **Fixed** | Toggle required before calculate |
-| CSV import errors IT-only | **Fixed** | Localized `ImportError` |
-| Settings informational vs interactive | **Fixed** | `informational` row style (opacity/subtitle) |
-| Pre-dive haptics-off visibility | **Fixed** | Badge on pre-dive + in-dive |
-| Watch sync queue transparency | **Improved** | `os.Logger` on flush |
+| Issue | Fix |
+|-------|-----|
+| CSV import hidden when logbook non-empty | **Importa CSV** in Logbook + More (`CSVImportPanel`) |
+| Planner result tabs non-functional | Tabs filter **PLAN / BUHLMANN / CHARTS** sections |
+| Planner mode misleading | Only **Avanzato** active; others disabled + footer note |
+| Watch Settings export row looks tappable | `informational: true` + subtitle points to Dive Log |
+| iOS units unclear | Metric-only picker (disabled) + explanatory footer in More |
+| Residual IT strings (primary flows) | Localized Watch Settings, log, More, Planner, legal prompt |
+| Legal honor-system scroll | ScrollView + bottom sentinel before Continue |
+| Watch log `contextMenu` | Replaced with trash button + confirmation dialog |
+| TestFlight external blockers undocumented | New entitlement + device QA checklist |
 
 ---
 
-## Unresolved issues / limitations
+## 4. Issues intentionally left open
 
-| Item | Severity | Why |
-|------|----------|-----|
-| **Real Watch Ultra depth** | HIGH | Requires Apple entitlement + physical water test (process, not code) |
-| **Physical sync/tombstone QA** | HIGH | Simulator WC limited; must run playbook Phase 3 on devices |
-| **Generic iOS Simulator build** | LOW | `generic/platform=iOS Simulator` can fail on Watch `AppIcon` arch slice in unified project; use named destination |
-| **Residual hardcoded IT** | LOW | Some Watch Settings rows, shortcut help, InfoView chrome still use literal IT (keys exist for many) |
-| **iOS PlanResult share icon** | LOW | Still display-only (out of scope) |
-| **Settings cross-sync** | LOW | Still local-only by design |
-| **Per-session sync delivery UI** | LOW | Aggregate counters only (SAF-10) |
-
----
-
-## Build validation (Phase 8)
-
-```bash
-xcodegen generate
-xcodebuild -scheme "DIRDiving Watch App" -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm)' build
-# → BUILD SUCCEEDED
-
-xcodebuild -scheme "DIRDiving iOS" -destination 'platform=iOS Simulator,name=iPhone 17' build
-# → BUILD SUCCEEDED
-```
-
-**Warnings (non-blocking):** deprecated `contextMenu` on Watch log; exhaustive switch in `DiveManager`; `WatchSyncAuth` `var`→`let` hint.
-
-**Experimental dependency:** `project.yml` excludes Apnea/Snorkeling/Buddy/Exploration — verified unchanged.
+| Item | Reason |
+|------|--------|
+| Apple **water submersion** entitlement approval | Apple Developer portal + physical Ultra |
+| **Underwater depth** validation | Device-only |
+| **Physical Watch↔iPhone** sync/tombstone QA | Device-only |
+| **App Store** listing / screenshots | Out of scope |
+| iOS PlanResult **share** toolbar | Still display-only (low priority) |
+| Settings **cross-sync** Watch↔iOS | Post-release product decision |
+| **Imperial** units | Not implemented; honestly labeled metric-only |
+| Generic `xcodebuild` unified project | Named simulators preferred (known AppIcon arch quirk) |
 
 ---
 
-## UI / UX policy compliance
+## 5. Business logic unchanged
 
-- Ascent alarm: **inline banner** between TTV and depth; gauge + depth + stopwatch remain visible; haptic ~1.75s; OK cooldown unchanged in `DiveManager`.
-- Visual identity: black/neon Watch, `DIRTheme` iOS — no palette or layout redesign.
-- Navigation: TabView / five-tab architecture preserved.
+Confirmed: no edits to dive start/stop logic, depth safety thresholds, ascent calculations, TTV derivation, planner/Bühlmann/gas algorithms, CSV parser schema, or sync HMAC protocol.
 
 ---
 
-## Screenshots checklist (manual)
+## 6. UI / UX style preserved
 
-- [ ] Watch live pre-dive with haptics off badge
-- [ ] Watch live ascent alarm EN + IT
-- [ ] Watch Settings informational rows (muted)
-- [ ] iOS More → sync conflicts card (simulate conflict)
-- [ ] iOS Planner safety toggle → Calcola Piano disabled until on
-- [ ] iOS EN locale: More disclaimer in English
+- Dark + cyan/yellow identity unchanged  
+- Reference layouts: `Docs/ReferenceUI/Watch_LIVE_reference.png`, `Docs/ReferenceUI/iOS_Companion_reference.png`  
+- No new experimental screens or mode tabs enabled  
 
 ---
 
-## TestFlight readiness
+## 7. Experimental untouched
 
-| Criterion | Ready? |
-|-----------|--------|
-| Builds on Mac | **Yes** (named simulators) |
-| No experimental in MAIN | **Yes** |
-| Sync code paths | **Yes** (device QA required) |
-| Safety disclaimers | **Yes** (legal onboarding + planner ack) |
-| Depth on Ultra | **No** until field test |
-
-**Recommendation:** Internal TestFlight after physical Phase 3 from [`INTERNAL_TESTING_PLAYBOOK_20260520.md`](INTERNAL_TESTING_PLAYBOOK_20260520.md).
+`project.yml` excludes remain: Apnea, Snorkeling, Buddy, Exploration sources.
 
 ---
 
-## App Store readiness
+## 8. Build results
 
-| Blocker | Status |
+| Command | Result |
 |---------|--------|
-| Privacy policy URL | External |
-| Depth entitlement proof | Device + Apple |
-| App icon all sizes (iOS archive) | Verify in Xcode Organizer |
-| 100% EN on all screens | Not claimed; primary flows improved |
+| `xcodegen generate` | **PASS** |
+| `xcodebuild` **DIRDiving Watch App** (Apple Watch Ultra 3 sim) | **BUILD SUCCEEDED** |
+| `xcodebuild` **DIRDiving iOS** (iPhone 17 sim) | **BUILD SUCCEEDED** |
+| `xcodebuild` generic iOS Simulator | Not re-run this pass (named sim OK) |
+
+### Phase 1 — Bundle / entitlements (verified in repo)
+
+| Item | Value |
+|------|--------|
+| Watch `PRODUCT_BUNDLE_IDENTIFIER` | `com.egopfe.dirdiving.ios.watch` |
+| iOS `PRODUCT_BUNDLE_IDENTIFIER` | `com.egopfe.dirdiving.ios` |
+| `WKCompanionAppBundleIdentifier` | `com.egopfe.dirdiving.ios` |
+| Watch entitlements | iCloud KVS + `com.apple.developer.coremotion.water-submersion` |
+| iOS entitlements | iCloud KVS |
+
+**Entitlement approval on Apple Developer portal:** **not verified in this pass** (see checklist).
 
 ---
 
-## Physical-device validations (mandatory)
+## 9. Remaining blockers
 
-1. Water submersion depth on **Apple Watch Ultra**
-2. Watch → iPhone log sync + delete tombstone both directions
-3. iPhone → Watch push after CSV import / log edit
-4. First-pairing peer secret exchange (both apps open)
-5. Ascent alarm in water: banner + gauge + haptics
+### TestFlight (internal)
 
----
+- [ ] Enable water submersion on `com.egopfe.dirdiving.ios.watch` (Developer portal)  
+- [ ] Physical Ultra underwater depth QA  
+- [ ] Physical sync QA per playbook  
+- [ ] Internal tester run through [`TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md)
 
-## Remaining App Store risks
+### App Store
 
-- Uncertified dive computer positioning (mitigated by copy)
-- Planner indicative output (mitigated by ack + warnings)
-- GPS surface-only (documented)
-- Partial i18n on tertiary screens
+- All TestFlight items above  
+- Store assets, privacy labels, marketing review  
+- Field evidence for depth-limit disclaimers  
 
 ---
 
-*Implementation pass complete · `main` · 2026-05-23*
+## 10. Readiness estimates (post-pass)
+
+| Dimension | Estimate |
+|-----------|----------|
+| **Internal / TestFlight readiness (code)** | **~96%** |
+| **Internal / TestFlight readiness (overall)** | **~88%** (device + entitlement external) |
+| **UX completeness** | **~92%** |
+| **i18n (EN primary flows)** | **~90%** |
+| **App Store readiness** | **No** |
+
+---
+
+## Mandatory final check
+
+| Criterion | Status |
+|-----------|--------|
+| Both targets build (named simulators) | **YES** |
+| No experimental dependencies in MAIN | **YES** |
+| UI matches references (no redesign) | **YES** |
+| No business logic changed | **YES** |
+| i18n obvious gaps closed | **Mostly YES** (shortcut help / some chrome IT remains LOW) |
+| Planner UI truthful | **YES** |
+| CSV import discoverable | **YES** |
+| TestFlight/depth docs complete | **YES** ([`TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md)) |
+
+**Verdict:** MAIN is **ready for internal TestFlight build upload** once Apple entitlement + physical QA checklists are signed off. **Not** ready for App Store or “100% consumer ready” without device validation.
+
+---
+
+*Report generated 2026-05-23 after Phases 0–10 implementation pass.*

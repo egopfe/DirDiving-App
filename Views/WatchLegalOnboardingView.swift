@@ -119,33 +119,35 @@ struct WatchLegalOnboardingView: View {
         VStack(spacing: 9) {
             DivePanel(stroke: DiveUI.yellow) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Legal Disclaimer")
+                    Text(String(localized: "Legal Disclaimer"))
                         .font(.system(size: 15, weight: .black, design: .rounded))
                         .foregroundStyle(DiveUI.yellow)
-                    Text(legalAcceptance.disclaimerText(languageCode: languageCode))
-                        .font(.system(size: 11, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.9))
-                        .fixedSize(horizontal: false, vertical: true)
 
-                    Button {
-                        disclaimerReachedBottom = true
-                        withAnimation(.easeInOut(duration: 0.2)) { step = 3 }
-                    } label: {
-                        HStack {
-                            Image(systemName: "doc.text.magnifyingglass")
-                            Text("I have scrolled to the bottom")
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text(legalAcceptance.disclaimerText(languageCode: languageCode))
+                                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.9))
+                                .fixedSize(horizontal: false, vertical: true)
+                            Color.clear
+                                .frame(height: 1)
+                                .onAppear { disclaimerReachedBottom = true }
                         }
-                        .font(.system(size: 12, weight: .black, design: .rounded))
-                        .foregroundStyle(DiveUI.yellow)
-                        .frame(maxWidth: .infinity, minHeight: 38)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .fill(DiveUI.yellow.opacity(0.13))
-                                .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(DiveUI.yellow, lineWidth: 1))
-                        )
                     }
-                    .buttonStyle(.plain)
-                    .padding(.top, 5)
+                    .frame(maxHeight: 118)
+
+                    if !disclaimerReachedBottom {
+                        Text(String(localized: "legal.scroll.prompt"))
+                            .font(.system(size: 10, weight: .semibold, design: .rounded))
+                            .foregroundStyle(DiveUI.secondaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    if disclaimerReachedBottom {
+                        DiveCommandButton(String(localized: "Continue"), systemImage: "chevron.right", color: DiveUI.yellow) {
+                            withAnimation(.easeInOut(duration: 0.2)) { step = 3 }
+                        }
+                    }
                 }
             }
         }

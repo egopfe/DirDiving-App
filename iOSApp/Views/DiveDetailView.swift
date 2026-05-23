@@ -109,7 +109,7 @@ struct DiveDetailView: View {
                 .font(.system(size: 12, weight: .medium, design: .rounded))
                 .foregroundStyle(DIRTheme.muted)
                 HStack(spacing: 14) {
-                    Label("Acqua Salata", systemImage: "drop")
+                    Label(String(localized: "detail.salinity.salt"), systemImage: "drop")
                     Label(temperatureText, systemImage: "thermometer")
                 }
                 .font(.system(size: 12, weight: .medium, design: .rounded))

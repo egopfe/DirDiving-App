@@ -10,7 +10,6 @@ struct LogbookView: View {
     @EnvironmentObject private var logStore: DiveLogStore
     @Environment(\.locale) private var locale
     @State private var search = ""
-
     private var filtered: [DiveSession] {
         search.isEmpty ? logStore.sessions : logStore.sessions.filter { ($0.siteName ?? "").localizedCaseInsensitiveContains(search) }
     }
@@ -47,6 +46,7 @@ struct LogbookView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         header
                         DIRSearchBar(text: $search)
+                        csvImportSection
                         if filtered.isEmpty {
                             emptyLogbook
                         } else {
@@ -88,6 +88,10 @@ struct LogbookView: View {
         }
     }
 
+    private var csvImportSection: some View {
+        CSVImportPanel()
+    }
+
     private var header: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
@@ -104,7 +108,7 @@ struct LogbookView: View {
                     .foregroundStyle(DIRTheme.cyan.opacity(0.45))
                     .accessibilityHidden(true)
             }
-            Text("Cronologia immersioni: dati da Watch, import CSV o demo reviewer.")
+            Text(String(localized: "logbook.header.subtitle"))
                 .font(.callout)
                 .foregroundStyle(DIRTheme.muted)
         }
@@ -115,7 +119,7 @@ struct LogbookView: View {
             Text("Nessuna immersione")
                 .font(.headline.weight(.semibold))
                 .foregroundStyle(.white)
-            Text("Sincronizza dal Apple Watch, importa un CSV da Analisi, oppure attiva il logbook dimostrativo in Altro.")
+            Text(String(localized: "logbook.empty.hint"))
                 .font(.caption)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)

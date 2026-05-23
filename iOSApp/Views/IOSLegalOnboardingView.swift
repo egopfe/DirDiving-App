@@ -118,25 +118,33 @@ struct IOSLegalOnboardingView: View {
 
     private var disclaimerScreen: some View {
         VStack(spacing: 16) {
-            DIRCard("Legal Disclaimer", icon: "doc.text.magnifyingglass", accent: DIRTheme.yellow) {
+            DIRCard(String(localized: "Legal Disclaimer"), icon: "doc.text.magnifyingglass", accent: DIRTheme.yellow) {
                 VStack(alignment: .leading, spacing: 14) {
-                    Text(legalAcceptance.disclaimerText(languageCode: languageCode))
-                        .font(.callout.weight(.medium))
-                        .foregroundStyle(.white.opacity(0.9))
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Button {
-                        disclaimerReachedBottom = true
-                        advance(to: 3)
-                    } label: {
-                        Label("I have scrolled to the bottom", systemImage: "checkmark.seal.fill")
-                            .font(.headline.weight(.bold))
-                            .foregroundStyle(DIRTheme.yellow)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 13)
-                            .background(RoundedRectangle(cornerRadius: 10).stroke(DIRTheme.yellow, lineWidth: 1))
+                    ScrollView(showsIndicators: true) {
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text(legalAcceptance.disclaimerText(languageCode: languageCode))
+                                .font(.callout.weight(.medium))
+                                .foregroundStyle(.white.opacity(0.9))
+                                .fixedSize(horizontal: false, vertical: true)
+                            Color.clear
+                                .frame(height: 1)
+                                .onAppear { disclaimerReachedBottom = true }
+                        }
                     }
-                    .buttonStyle(.plain)
+                    .frame(maxHeight: 280)
+
+                    if !disclaimerReachedBottom {
+                        Text(String(localized: "legal.scroll.prompt"))
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(DIRTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    if disclaimerReachedBottom {
+                        primaryButton(String(localized: "Continue"), systemImage: "chevron.right", color: DIRTheme.yellow) {
+                            advance(to: 3)
+                        }
+                    }
                 }
             }
         }

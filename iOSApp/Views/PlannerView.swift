@@ -13,10 +13,10 @@ struct PlannerView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         VStack(alignment: .leading, spacing: 7) {
-                            Text("Planner")
+                            Text(String(localized: "Planner"))
                                 .font(.system(size: 30, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
-                            Text("Gas, profilo deco e presentazione Bühlmann: schede ad alto contrasto. Output indicativo — verifica sempre con strumenti certificati.")
+                            Text(String(localized: "planner.header.subtitle"))
                                 .font(.callout)
                                 .foregroundStyle(DIRTheme.muted)
                         }
@@ -41,33 +41,65 @@ struct PlannerView: View {
                 PlanResultView()
                     .environmentObject(store)
             }
+            .onAppear {
+                if store.mode != .advanced {
+                    store.mode = .advanced
+                }
+            }
         }
     }
 
     private var modePicker: some View {
-        HStack(spacing: 0) {
-            ForEach(PlannerMode.allCases) { mode in
-                Button {
-                    store.mode = mode
-                } label: {
-                    Text(plannerModeTabLabel(mode))
-                        .font(.caption.weight(.semibold))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.72)
-                        .foregroundStyle(store.mode == mode ? .black : .white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(store.mode == mode ? DIRTheme.cyan : .clear)
-                        )
+        VStack(alignment: .leading, spacing: 6) {
+            Text(String(localized: "planner.mode.header"))
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(DIRTheme.muted)
+            HStack(spacing: 0) {
+                ForEach(PlannerMode.allCases) { mode in
+                    let isActive = mode == .advanced
+                    Button {
+                        guard isActive else { return }
+                        store.mode = mode
+                    } label: {
+                        Text(plannerModeTabLabel(mode))
+                            .font(.caption.weight(.semibold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.72)
+                            .foregroundStyle(store.mode == mode && isActive ? .black : .white.opacity(isActive ? 0.92 : 0.45))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(
+                                RoundedRectangle(cornerRadius: 6)
+                                    .fill(store.mode == mode && isActive ? DIRTheme.cyan : .clear)
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(!isActive)
+                    .accessibilityLabel(plannerModeAccessibilityLabel(mode, isActive: isActive))
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Modalita \(plannerModeTabLabel(mode))")
             }
+            .padding(4)
+            .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface2.opacity(0.82)))
+            Text(String(localized: "planner.mode.footer"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.yellow)
+                .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(4)
-        .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface2.opacity(0.82)))
+    }
+
+    private func plannerModeAccessibilityLabel(_ mode: PlannerMode, isActive: Bool) -> String {
+        let name = plannerModeTabLabel(mode)
+        if isActive {
+            return String(format: String(localized: "planner.mode.a11y.active"), name)
+        }
+        return String(format: String(localized: "planner.mode.a11y.planned"), name)
+    }
+
+    private func salinityLabel(_ mode: SalinityMode) -> String {
+        switch mode {
+        case .fresh: return String(localized: "salinity.fresh")
+        case .salt: return String(localized: "salinity.salt")
+        }
     }
 
     /// Display-only labels for the segmented control. `PlannerMode` raw values stay unchanged for Codable persistence.
@@ -81,28 +113,28 @@ struct PlannerView: View {
     }
 
     private var profileCard: some View {
-        DIRCard("Profilo Immersione", icon: nil, accent: DIRTheme.cyan) {
+        DIRCard(String(localized: "planner.profile.title"), icon: nil, accent: DIRTheme.cyan) {
             VStack(spacing: 0) {
-                plannerField("Profondita Massima", value: $store.input.plannedDepthMeters, unit: "m", step: 1)
+                plannerField(String(localized: "planner.field.max_depth"), value: $store.input.plannedDepthMeters, unit: "m", step: 1)
                 Divider().overlay(DIRTheme.hairline)
-                plannerField("Tempo al Fondo", value: $store.input.plannedBottomMinutes, unit: "min", step: 1)
+                plannerField(String(localized: "planner.field.bottom_time"), value: $store.input.plannedBottomMinutes, unit: "min", step: 1)
                 Divider().overlay(DIRTheme.hairline)
-                plannerField("Temperatura", value: $store.input.waterTemperatureCelsius, unit: "C", step: 1)
+                plannerField(String(localized: "planner.field.temperature"), value: $store.input.waterTemperatureCelsius, unit: "C", step: 1)
                 Divider().overlay(DIRTheme.hairline)
-                plannerField("Quota", value: $store.input.altitudeMeters, unit: "m", step: 100)
+                plannerField(String(localized: "planner.field.altitude"), value: $store.input.altitudeMeters, unit: "m", step: 100)
                 Divider().overlay(DIRTheme.hairline)
                 plannerField("GF Low", value: $store.input.gfLow, unit: "%", step: 5)
                 Divider().overlay(DIRTheme.hairline)
                 plannerField("GF High", value: $store.input.gfHigh, unit: "%", step: 5)
                 Divider().overlay(DIRTheme.hairline)
                 HStack {
-                    Text("Salinita")
+                    Text(String(localized: "planner.field.salinity"))
                         .font(.callout)
                         .foregroundStyle(.white)
                     Spacer()
-                    Picker("Salinita", selection: $store.input.salinity) {
+                    Picker(String(localized: "planner.field.salinity"), selection: $store.input.salinity) {
                         ForEach(SalinityMode.allCases) { mode in
-                            Text(mode.rawValue).tag(mode)
+                            Text(salinityLabel(mode)).tag(mode)
                         }
                     }
                     .labelsHidden()
@@ -463,20 +495,25 @@ struct PlanResultView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
                     resultTabs
-                    resultGrid
-                    ascentTable
-                    segmentTimeline
-                    gfComparisonCard
-                    contingencyCard
-                    teamMatchCard
-                    briefingCard
-                    buhlmannChart
+                    switch tab {
+                    case .plan:
+                        resultGrid
+                        ascentTable
+                        contingencyCard
+                        teamMatchCard
+                        briefingCard
+                    case .curve:
+                        buhlmannChart
+                    case .charts:
+                        segmentTimeline
+                        gfComparisonCard
+                    }
                 }
                 .padding(.horizontal, 16)
                 .padding(.bottom, 18)
             }
         }
-        .navigationTitle("Piano Immersione")
+        .navigationTitle(String(localized: "planner.result.title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -493,7 +530,7 @@ struct PlanResultView: View {
                     tab = item
                 } label: {
                     VStack(spacing: 10) {
-                        Text(item.rawValue)
+                        Text(item.title)
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(tab == item ? DIRTheme.cyan : .white.opacity(0.72))
                         Rectangle()
@@ -688,8 +725,17 @@ struct PlanResultView: View {
 }
 
 enum PlanTab: String, CaseIterable, Identifiable {
-    case plan = "PIANO"
-    case curve = "CURVA BUHLMANN"
-    case charts = "GRAFICI"
+    case plan
+    case curve
+    case charts
+
     var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .plan: return String(localized: "planner.tab.plan")
+        case .curve: return String(localized: "planner.tab.curve")
+        case .charts: return String(localized: "planner.tab.charts")
+        }
+    }
 }

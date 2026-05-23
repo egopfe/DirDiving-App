@@ -85,49 +85,51 @@ struct SettingsView: View {
                     statusRow(
                         icon: "drop.fill",
                         iconColor: dive.lastErrorMessage == nil ? DiveUI.green : DiveUI.yellow,
-                        title: "Sensore profondità",
-                        subtitle: dive.lastErrorMessage ?? "Pronto quando disponibile"
+                        title: String(localized: "Sensore profondità"),
+                        subtitle: dive.lastErrorMessage ?? String(localized: "settings.depth.ready")
                     )
                     statusRow(
                         icon: "applewatch.radiowaves.left.and.right",
                         iconColor: watchSync.isSupported ? DiveUI.green : DiveUI.orange,
-                        title: "Sync companion",
-                        subtitle: watchSync.isSupported ? watchSync.lastSyncStatus : "Non disponibile: apri app iPhone"
+                        title: String(localized: "Sync companion"),
+                        subtitle: watchSync.isSupported ? watchSync.lastSyncStatus : String(localized: "settings.sync.open_ios")
                     )
                     statusRow(
                         icon: "tray.and.arrow.up",
                         iconColor: watchSync.pendingTransferCount == 0 ? DiveUI.green : DiveUI.yellow,
-                        title: "Sync pending",
+                        title: String(localized: "Sync pending"),
                         subtitle: String(format: String(localized: "%lld in attesa ack"), watchSync.pendingTransferCount)
                     )
                     statusRow(
                         icon: "paperplane.fill",
                         iconColor: watchSync.sentTransferCount == 0 ? DiveUI.secondaryText : DiveUI.cyan,
-                        title: "Sync sent",
+                        title: String(localized: "Sync sent"),
                         subtitle: String(format: String(localized: "%lld inviati o in transito"), watchSync.sentTransferCount)
                     )
                     statusRow(
                         icon: "checkmark.seal.fill",
                         iconColor: watchSync.acknowledgedTransferCount == 0 ? DiveUI.secondaryText : DiveUI.green,
-                        title: "Sync acknowledged",
+                        title: String(localized: "Sync acknowledged"),
                         subtitle: String(format: String(localized: "%lld confermati da iPhone"), watchSync.acknowledgedTransferCount)
                     )
                     settingsRow(
                         icon: "square.and.arrow.up",
                         iconColor: DiveUI.green,
-                        title: "Export",
-                        subtitle: "Subsurface CSV metrico; altri formati planned"
+                        title: String(localized: "Export"),
+                        subtitle: String(localized: "settings.export.info"),
+                        informational: true
                     )
                     settingsRow(
                         icon: "function",
                         iconColor: DiveUI.green,
-                        title: "TTV live",
-                        subtitle: "Derivato prof. media + runtime; non safety/NDL"
+                        title: String(localized: "TTV live"),
+                        subtitle: String(localized: "settings.ttv.info"),
+                        informational: true
                     )
                     statusRow(
                         icon: "exclamationmark.arrow.triangle.2.circlepath",
                         iconColor: watchSync.failedTransferCount == 0 ? DiveUI.green : DiveUI.red,
-                        title: "Errori sync",
+                        title: String(localized: "Errori sync"),
                         subtitle: String(format: String(localized: "%lld falliti · retry %@"), watchSync.failedTransferCount, lastRetryText)
                     )
                     if watchSync.pendingTransferCount > 0 || watchSync.activationState != .activated {
@@ -138,8 +140,8 @@ struct SettingsView: View {
                             settingsRow(
                                 icon: "arrow.triangle.2.circlepath",
                                 iconColor: DiveUI.cyan,
-                                title: "Riprova sync",
-                                subtitle: "Riattiva e svuota la coda se possibile",
+                                title: String(localized: "Riprova sync"),
+                                subtitle: String(localized: "settings.sync.retry.subtitle"),
                                 showsChevron: true
                             )
                         }
@@ -153,8 +155,8 @@ struct SettingsView: View {
                             settingsRow(
                                 icon: "trash",
                                 iconColor: DiveUI.red,
-                                title: "Cancella coda fallita",
-                                subtitle: "Rimuove retry locali non inviati",
+                                title: String(localized: "Cancella coda fallita"),
+                                subtitle: String(localized: "settings.sync.clear.subtitle"),
                                 showsChevron: true
                             )
                         }
@@ -163,14 +165,16 @@ struct SettingsView: View {
                     settingsRow(
                         icon: "sun.max",
                         iconColor: DiveUI.yellow,
-                        title: "Schermo",
-                        subtitle: "Gestito da watchOS"
+                        title: String(localized: "Schermo"),
+                        subtitle: String(localized: "settings.display.watchos"),
+                        informational: true
                     )
                     settingsRow(
                         icon: "speaker.slash",
                         iconColor: DiveUI.yellow,
-                        title: "Toni audio",
-                        subtitle: "Non usati sott'acqua; feedback via vibrazione"
+                        title: String(localized: "Toni audio"),
+                        subtitle: String(localized: "settings.audio.info"),
+                        informational: true
                     )
                     NavigationLink {
                         WatchShortcutHelpView()
@@ -187,15 +191,16 @@ struct SettingsView: View {
                     settingsRow(
                         icon: "hand.tap",
                         iconColor: dive.isDepthAutomationAvailable ? DiveUI.green : DiveUI.yellow,
-                        title: "Avvio manuale",
-                        subtitle: dive.isDepthAutomationAvailable ? "Fallback solo se sensore non disponibile" : "Disponibile su schermata live"
+                        title: String(localized: "Avvio manuale"),
+                        subtitle: dive.isDepthAutomationAvailable ? String(localized: "settings.manual.fallback") : String(localized: "settings.manual.live"),
+                        informational: true
                     )
                     Toggle(isOn: $hapticsEnabled) {
                         settingsRow(
                             icon: "iphone.radiowaves.left.and.right",
                             iconColor: hapticsEnabled ? DiveUI.blue : .white.opacity(0.5),
-                            title: "Vibrazione",
-                            subtitle: hapticsEnabled ? "Attiva per warning e conferme" : "Disattivata"
+                            title: String(localized: "Vibrazione"),
+                            subtitle: hapticsEnabled ? String(localized: "settings.haptics.on") : String(localized: "settings.haptics.off")
                         )
                     }
                     .toggleStyle(.switch)
@@ -207,8 +212,8 @@ struct SettingsView: View {
                         settingsRow(
                             icon: "info.circle",
                             iconColor: DiveUI.blue,
-                            title: "Info",
-                            subtitle: "App, sync, device",
+                            title: String(localized: "Info"),
+                            subtitle: String(localized: "Info, sync, device"),
                             showsChevron: true
                         )
                     }
@@ -219,16 +224,16 @@ struct SettingsView: View {
                 .padding(.bottom, 8)
             }
         }
-        .confirmationDialog("Cancellare coda sync?", isPresented: $showClearSyncQueueConfirmation, titleVisibility: .visible) {
-            Button("Cancella coda", role: .destructive) {
+        .confirmationDialog(String(localized: "settings.sync.clear.confirm.title"), isPresented: $showClearSyncQueueConfirmation, titleVisibility: .visible) {
+            Button(String(localized: "settings.sync.clear.confirm.action"), role: .destructive) {
                 watchSync.clearFailedQueue()
                 HapticService.shared.notify()
             }
-            Button("Annulla", role: .cancel) {
+            Button(String(localized: "log.delete.cancel"), role: .cancel) {
                 HapticService.shared.confirm()
             }
         } message: {
-            Text("Rimuove i trasferimenti Watch in attesa o falliti. Le immersioni gia salvate sul Watch restano nel log locale.")
+            Text(String(localized: "settings.sync.clear.confirm.message"))
         }
     }
 
@@ -254,8 +259,9 @@ struct SettingsView: View {
             settingsRow(
                 icon: "globe",
                 iconColor: DiveUI.cyan,
-                title: "Lingua",
-                subtitle: "System Language / Italiano / English"
+                title: String(localized: "Lingua"),
+                subtitle: String(localized: "settings.language.subtitle"),
+                informational: true
             )
             Picker("Lingua", selection: $appLanguage) {
                 ForEach(DIRAppLanguage.allCases) { language in
@@ -287,15 +293,16 @@ struct SettingsView: View {
             settingsRow(
                 icon: "ruler",
                 iconColor: .white,
-                title: "Unità di misura",
-                subtitle: "Display Watch: metrico"
+                title: String(localized: "Unità di misura"),
+                subtitle: String(localized: "Display Watch: metrico"),
+                informational: true
             )
             Picker("Unità", selection: $watchUnits) {
                 Text("m").tag("metric")
             }
             .pickerStyle(.wheel)
             .tint(DiveUI.cyan)
-            Text("Imperiale non selezionabile finche la conversione Watch non e implementata. Export sempre metrico/Subsurface.")
+            Text(String(localized: "settings.units.imperial_note"))
                 .font(.system(size: 9, weight: .semibold, design: .rounded))
                 .foregroundStyle(DiveUI.yellow)
                 .fixedSize(horizontal: false, vertical: true)
