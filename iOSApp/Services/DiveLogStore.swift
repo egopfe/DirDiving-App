@@ -76,11 +76,14 @@ final class DiveLogStore: ObservableObject {
         applyDemoLogbookPreference()
     }
 
-    func add(_ session: DiveSession) {
+    func add(_ session: DiveSession, suppressWatchPush: Bool = false) {
         guard !deletedSessionIDs.contains(session.id) else { return }
         sessions.removeAll { $0.id == session.id }
         sessions.insert(session, at: 0)
         sessions = sessions.sorted { $0.startDate > $1.startDate }
+        if !suppressWatchPush {
+            watchSync?.transferToWatch(session)
+        }
     }
 
     func session(id: UUID) -> DiveSession? {

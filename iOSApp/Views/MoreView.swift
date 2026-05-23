@@ -41,9 +41,23 @@ struct MoreView: View {
                             .buttonStyle(.plain)
                         }
                         DIRCard("SYNC WATCH", icon: "applewatch", accent: DIRTheme.cyan) {
-                            row("Supportato", watchSync.isSupported ? "Si" : "No")
-                            row("Stato", String(describing: watchSync.activationState))
-                            row("Ultimo evento", watchSync.lastMessage)
+                            row(String(localized: "more.sync.supported"), watchSync.isSupported ? String(localized: "more.yes") : String(localized: "more.no"))
+                            row(String(localized: "more.sync.state"), watchSync.userVisibleState)
+                            row(String(localized: "more.sync.last_event"), watchSync.lastMessage)
+                            Button {
+                                watchSync.syncUnpushedSessionsToWatch()
+                            } label: {
+                                Label(String(localized: "more.sync.push_to_watch"), systemImage: "arrow.up.applewatch")
+                                    .font(.callout.weight(.semibold))
+                                    .foregroundStyle(DIRTheme.cyan)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                                    .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        if !watchSync.conflicts.isEmpty {
+                            syncConflictsCard
                         }
                         DIRCard("BACKUP CLOUD", icon: "icloud", accent: DIRTheme.green) {
                             row("iCloud Sync", cloudSync.isICloudAvailable ? "Attivo" : "Non disponibile")
@@ -82,11 +96,7 @@ struct MoreView: View {
                             row("Bundle", "com.egopfe.dirdiving.ios")
                         }
                         DIRWarningBox(
-                            text: "DIR DIVING e uno strumento di supporto per logbook, analisi e pianificazione preliminare. "
-                                + "Non sostituisce formazione, procedure del dive center, equipaggiamento certificato o il giudizio umano. "
-                                + "L'app non e un computer subacqueo certificato salvo esplicita omologazione futura. "
-                                + "Output del planner indicativi: verificarli con strumenti certificati. "
-                                + "GPS utile in superficie; sott'acqua e in copertura e inaffidabile o assente."
+                            text: String(localized: "DIR DIVING e uno strumento di supporto per logbook, analisi e pianificazione preliminare. Non sostituisce formazione, procedure del dive center, equipaggiamento certificato o il giudizio umano. L'app non e un computer subacqueo certificato salvo esplicita omologazione futura. Output del planner indicativi: verificarli con strumenti certificati. GPS utile in superficie; sott'acqua e in copertura e inaffidabile o assente.")
                         )
                     }
                     .padding(16)
@@ -126,11 +136,55 @@ struct MoreView: View {
         .padding(.vertical, 5)
     }
 
+    private var syncConflictsCard: some View {
+        DIRCard(String(localized: "more.sync.conflicts_title"), icon: "arrow.triangle.merge", accent: DIRTheme.orange) {
+            ForEach(watchSync.conflicts) { conflict in
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(conflict.localSummary)
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(.white)
+                    Text(String(format: String(localized: "more.sync.conflict_incoming"), Formatters.one(conflict.incoming.maxDepthMeters), Formatters.time(conflict.incoming.durationSeconds)))
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.muted)
+                    HStack(spacing: 8) {
+                        Button {
+                            watchSync.resolveConflictUsingIncoming(conflict)
+                        } label: {
+                            Text(String(localized: "more.sync.use_watch"))
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(DIRTheme.cyan)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                                .background(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan, lineWidth: 1))
+                        }
+                        .buttonStyle(.plain)
+                        Button {
+                            watchSync.resolveConflictKeepingLocal(conflict)
+                        } label: {
+                            Text(String(localized: "more.sync.keep_local"))
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(DIRTheme.yellow)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                                .background(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.yellow, lineWidth: 1))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.vertical, 4)
+                if conflict.id != watchSync.conflicts.last?.id {
+                    Divider().overlay(DIRTheme.hairline)
+                }
+            }
+        }
+    }
+
     private func row(_ title: String, _ value: String) -> some View {
         HStack {
             Text(title).foregroundStyle(DIRTheme.muted)
             Spacer()
             Text(value).foregroundStyle(.white)
+                .multilineTextAlignment(.trailing)
         }
         .font(.callout)
         .padding(.vertical, 4)

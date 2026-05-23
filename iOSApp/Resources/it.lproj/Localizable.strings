@@ -359,3 +359,35 @@
 "Not accepted" = "Non accettato";
 "Terms" = "Termini";
 "Privacy" = "Privacy";
+
+/* Production readiness — import */
+"import.error.unreadable" = "File import non leggibile.";
+"import.error.missing_columns" = "CSV non compatibile: colonne richieste mancanti.";
+"import.error.empty_profile" = "CSV senza campioni immersione.";
+"import.error.invalid_rows" = "CSV non valido: %lld righe con profondita, durata o temperatura non valide.";
+"import.error.file_too_large" = "CSV troppo grande: limite %lld MB.";
+"import.summary.format" = "Import: %lld importate, %lld duplicati, %lld righe malformate/scartate; %@.";
+"import.summary.date_preserved" = "data sorgente preservata";
+"import.summary.date_fallback" = "data sorgente mancante, usata data file";
+
+/* Production readiness — planner safety */
+"planner.safety_ack.label" = "Comprendo che l'output del planner e solo indicativo (non certificato).";
+"planner.safety_ack.hint" = "Obbligatorio prima di calcolare un piano.";
+"Planner informativo: verifica sempre piano, gas e procedure con training, team e strumenti certificati." = "Planner informativo: verifica sempre piano, gas e procedure con training, team e strumenti certificati.";
+
+/* Production readiness — More / sync */
+"more.sync.supported" = "Supportato";
+"more.sync.state" = "Stato";
+"more.sync.last_event" = "Ultimo evento";
+"more.sync.push_to_watch" = "Invia logbook al Watch";
+"more.yes" = "Si";
+"more.no" = "No";
+"more.sync.conflicts_title" = "CONFLITTI SYNC";
+"more.sync.conflict_incoming" = "Watch: %@ m / %@";
+"more.sync.use_watch" = "Usa Watch";
+"more.sync.keep_local" = "Mantieni iPhone";
+"In coda verso Watch (%lld) — attendi associazione" = "In coda verso Watch (%lld) — attendi associazione";
+"Immersione inviata al Watch" = "Immersione inviata al Watch";
+"Invio Watch in coda (transferUserInfo)" = "Invio Watch in coda (transferUserInfo)";
+"Invio Watch in coda (Watch non raggiungibile)" = "Invio Watch in coda (Watch non raggiungibile)";
+"Errore invio Watch: %@" = "Errore invio Watch: %@";

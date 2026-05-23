@@ -97,7 +97,7 @@ final class DiveManager: NSObject, ObservableObject {
     private func configureSubmersion() {
         guard CMWaterSubmersionManager.waterSubmersionAvailable else {
             isDepthAutomationAvailable = false
-            lastErrorMessage = "Sensore immersione non disponibile su questo dispositivo o simulatore."
+            lastErrorMessage = String(localized: "Sensore immersione non disponibile su questo dispositivo o simulatore.")
             return
         }
         isDepthAutomationAvailable = true

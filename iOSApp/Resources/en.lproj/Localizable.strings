@@ -361,3 +361,35 @@
 "Not accepted" = "Not accepted";
 "Terms" = "Terms";
 "Privacy" = "Privacy";
+
+/* Production readiness — import */
+"import.error.unreadable" = "Import file is not readable.";
+"import.error.missing_columns" = "Incompatible CSV: required columns missing.";
+"import.error.empty_profile" = "CSV has no dive samples.";
+"import.error.invalid_rows" = "Invalid CSV: %lld rows with invalid depth, duration or temperature.";
+"import.error.file_too_large" = "CSV too large: limit %lld MB.";
+"import.summary.format" = "Import: %lld imported, %lld duplicates, %lld malformed rows skipped; %@.";
+"import.summary.date_preserved" = "source date preserved";
+"import.summary.date_fallback" = "source date missing, file date used";
+
+/* Production readiness — planner safety */
+"planner.safety_ack.label" = "I understand the planner output is indicative only (not certified).";
+"planner.safety_ack.hint" = "Required before calculating a plan.";
+"Planner informativo: verifica sempre piano, gas e procedure con training, team e strumenti certificati." = "Indicative planner: always verify plan, gas and procedures with training, team and certified tools.";
+
+/* Production readiness — More / sync */
+"more.sync.supported" = "Supported";
+"more.sync.state" = "Status";
+"more.sync.last_event" = "Last event";
+"more.sync.push_to_watch" = "Push logbook to Watch";
+"more.yes" = "Yes";
+"more.no" = "No";
+"more.sync.conflicts_title" = "SYNC CONFLICTS";
+"more.sync.conflict_incoming" = "Watch: %@ m / %@";
+"more.sync.use_watch" = "Use Watch";
+"more.sync.keep_local" = "Keep iPhone";
+"In coda verso Watch (%lld) — attendi associazione" = "Queued to Watch (%lld) — wait for pairing";
+"Immersione inviata al Watch" = "Dive sent to Watch";
+"Invio Watch in coda (transferUserInfo)" = "Watch send queued (transferUserInfo)";
+"Invio Watch in coda (Watch non raggiungibile)" = "Watch send queued (Watch not reachable)";
+"Errore invio Watch: %@" = "Watch send error: %@";

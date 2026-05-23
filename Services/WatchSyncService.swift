@@ -154,6 +154,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     private func flushPendingTransfers() {
         guard WatchSyncAuth.hasPeerSecret(), !pendingSessions.isEmpty else { return }
         let queue = pendingSessions
+        Self.logger.info("Flushing \(queue.count, privacy: .public) pending Watch→iPhone session(s)")
         for session in queue.reversed() {
             sendQueued(session)
         }

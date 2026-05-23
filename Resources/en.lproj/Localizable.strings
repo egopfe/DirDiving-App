@@ -70,7 +70,7 @@
 "CLEAR" = "CLEAR";
 "RISALITA TROPPO VELOCE!" = "ASCENT TOO FAST!";
 "RALLENTA" = "SLOW DOWN";
-"ascent_alarm_title" = "FAST ASCENT";
+"ascent_alarm_title" = "ASCENT TOO FAST";
 "ascent_alarm_instruction" = "SLOW DOWN";
 "ascent_alarm_speed_unit" = "m/min";
 "ascent_alarm_accessibility_hint" = "Slow your ascent. Depth and gauge remain visible.";
@@ -239,6 +239,7 @@
 "Failed: transferUserInfo non completato: %@" = "Failed: transferUserInfo not completed: %@";
 "Sent: transferUserInfo completato, ack companion non confermato" = "Sent: transferUserInfo completed, companion ack not confirmed";
 "Non disponibile" = "Unavailable";
+"Sensore immersione non disponibile su questo dispositivo o simulatore." = "Dive sensor unavailable on this device or simulator.";
 
 /* Legal onboarding and safety */
 "WELCOME" = "WELCOME";

@@ -10,8 +10,16 @@ enum DiveImportService {
         func message(alreadyImported: Bool) -> String {
             let imported = alreadyImported ? 0 : 1
             let duplicates = alreadyImported ? 1 : 0
-            let dateStatus = sourceDatePreserved ? "data sorgente preservata" : "data sorgente mancante, usata data file"
-            return "Import: \(imported) importate, \(duplicates) duplicati, \(skippedMalformedCount) righe malformate/scartate; \(dateStatus)."
+            let dateStatus = sourceDatePreserved
+                ? String(localized: "import.summary.date_preserved")
+                : String(localized: "import.summary.date_fallback")
+            return String(
+                format: String(localized: "import.summary.format"),
+                imported,
+                duplicates,
+                skippedMalformedCount,
+                dateStatus
+            )
         }
     }
 
@@ -24,11 +32,11 @@ enum DiveImportService {
 
         var errorDescription: String? {
             switch self {
-            case .unreadableFile: return "File import non leggibile."
-            case .missingColumns: return "CSV non compatibile: colonne richieste mancanti."
-            case .emptyProfile: return "CSV senza campioni immersione."
-            case .invalidRows(let count): return "CSV non valido: \(count) righe con data, durata, profondita o temperatura non valide."
-            case .fileTooLarge: return "CSV troppo grande: limite \(Int(maxImportBytes / 1_048_576)) MB."
+            case .unreadableFile: return String(localized: "import.error.unreadable")
+            case .missingColumns: return String(localized: "import.error.missing_columns")
+            case .emptyProfile: return String(localized: "import.error.empty_profile")
+            case .invalidRows(let count): return String(format: String(localized: "import.error.invalid_rows"), count)
+            case .fileTooLarge: return String(format: String(localized: "import.error.file_too_large"), Int(maxImportBytes / 1_048_576))
             }
         }
     }

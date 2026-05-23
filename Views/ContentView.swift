@@ -2,19 +2,24 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject private var navigation: AppNavigationStore
+    @EnvironmentObject private var imageStore: UserImageStore
 
     var body: some View {
         TabView(selection: $navigation.selectedPage) {
-            ModeSelectionView()
-                .tag(AppPage.modeSelection)
+            if WatchModeSelectionPreferences.hasMultipleStableModes {
+                ModeSelectionView()
+                    .tag(AppPage.modeSelection)
+            }
             DiveLiveView()
                 .tag(AppPage.live)
             CompassView()
                 .tag(AppPage.compass)
             SettingsView()
                 .tag(AppPage.settings)
-            UserImagesView()
-                .tag(AppPage.userImages)
+            if !imageStore.imageNames.isEmpty {
+                UserImagesView()
+                    .tag(AppPage.userImages)
+            }
             DiveLogListView()
                 .tag(AppPage.diveLog)
         }

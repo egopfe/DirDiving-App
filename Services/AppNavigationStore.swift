@@ -9,5 +9,8 @@ final class AppNavigationStore: ObservableObject {
 
     init() {
         Self.shared = self
+        if WatchModeSelectionPreferences.skipWhenSingleMode, !WatchModeSelectionPreferences.hasMultipleStableModes {
+            selectedPage = .live
+        }
     }
 }

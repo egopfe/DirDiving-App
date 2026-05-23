@@ -239,6 +239,7 @@
 "Failed: transferUserInfo non completato: %@" = "Failed: transferUserInfo non completato: %@";
 "Sent: transferUserInfo completato, ack companion non confermato" = "Sent: transferUserInfo completato, ack companion non confermato";
 "Non disponibile" = "Non disponibile";
+"Sensore immersione non disponibile su questo dispositivo o simulatore." = "Sensore immersione non disponibile su questo dispositivo o simulatore.";
 
 /* Legal onboarding and safety */
 "WELCOME" = "BENVENUTO";

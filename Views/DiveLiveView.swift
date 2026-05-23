@@ -195,6 +195,11 @@ struct DiveLiveView: View {
         VStack(spacing: 0) {
             preDiveHeader
 
+            if !hapticsEnabled {
+                hapticsOffBadge
+                    .padding(.top, 6)
+            }
+
             Spacer(minLength: 28)
 
             Text(String(localized: "live.ready.title"))
@@ -394,7 +399,7 @@ struct DiveLiveView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            Text("PROFONDITÀ ATTUALE")
+            Text(String(localized: "PROFONDITÀ ATTUALE"))
                 .font(.system(size: 15, weight: .black, design: .rounded))
                 .lineLimit(1)
                 .minimumScaleFactor(0.68)
@@ -488,7 +493,7 @@ struct DiveLiveView: View {
                 }
             }
             if dive.isManualLifecycleActive {
-                DiveCommandButton("FINE MANUALE", systemImage: "stop.circle.fill", color: DiveUI.red) {
+                DiveCommandButton(String(localized: "FINE MANUALE"), systemImage: "stop.circle.fill", color: DiveUI.red) {
                     dive.endManualDive()
                 }
             }
@@ -497,21 +502,21 @@ struct DiveLiveView: View {
 
     private var manualFallbackPanel: some View {
         VStack(spacing: 8) {
-            Text("AUTOMAZIONE PROFONDITÀ NON DISPONIBILE")
+            Text(String(localized: "AUTOMAZIONE PROFONDITÀ NON DISPONIBILE"))
                 .font(.system(size: 10, weight: .black, design: .rounded))
                 .foregroundStyle(DiveUI.yellow)
                 .multilineTextAlignment(.center)
-            Text("Rilevamento automatico profondità non disponibile. Usa avvio manuale.")
+            Text(String(localized: "Rilevamento automatico profondità non disponibile. Usa avvio manuale."))
                 .font(.system(size: 11, weight: .black, design: .rounded))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-            Text("Sessione limitata: runtime e GPS sì, profondità automatica no.")
+            Text(String(localized: "Sessione limitata: runtime e GPS sì, profondità automatica no."))
                 .font(.system(size: 10, weight: .semibold, design: .rounded))
                 .foregroundStyle(DiveUI.secondaryText)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-            DiveCommandButton("AVVIO MANUALE", systemImage: "play.circle.fill", color: DiveUI.green) {
+            DiveCommandButton(String(localized: "AVVIO MANUALE"), systemImage: "play.circle.fill", color: DiveUI.green) {
                 dive.startManualDive()
             }
         }

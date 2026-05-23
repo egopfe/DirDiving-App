@@ -25,9 +25,47 @@ enum WatchDiveSyncCodec {
         let signature: String
     }
 
+    struct PayloadEnvelope {
+        let message: [String: Any]
+        let sessionID: UUID
+        let issuedAt: Date
+    }
+
     struct ParsedPayload {
         let session: DiveSession
         let issuedAt: Date
+    }
+
+    static func makePayload(session: DiveSession) throws -> PayloadEnvelope {
+        guard WatchSyncAuth.hasPeerSecret() else {
+            throw WatchDiveSyncError.missingPeerSecret
+        }
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let body = try encoder.encode(session)
+        guard body.count <= maxPayloadBytes else {
+            throw WatchDiveSyncError.payloadTooLarge
+        }
+
+        let issuedAt = Date()
+        let bundleID = Bundle.main.bundleIdentifier ?? "com.egopfe.dirdiving.ios"
+        let transport = Transport(
+            version: schemaVersion,
+            bundleID: bundleID,
+            issuedAt: issuedAt,
+            body: body,
+            signature: ""
+        )
+        let signed = sign(transport, issuedAt: issuedAt, body: body)
+        let transportData = try JSONEncoder().encode(signed)
+        guard transportData.count <= maxPayloadBytes else {
+            throw WatchDiveSyncError.payloadTooLarge
+        }
+        return PayloadEnvelope(
+            message: [payloadKey: transportData],
+            sessionID: session.id,
+            issuedAt: issuedAt
+        )
     }
 
     static func parseSession(from payload: [String: Any]) throws -> DiveSession {
@@ -101,6 +139,23 @@ enum WatchDiveSyncCodec {
 
     private static func syncKey() -> SymmetricKey {
         WatchSyncAuth.syncKey(peerBundleID: expectedWatchBundleID)
+    }
+
+    private static func sign(_ transport: Transport, issuedAt: Date, body: Data) -> Transport {
+        let mac = hmac(version: transport.version, bundleID: transport.bundleID, issuedAt: issuedAt, body: body)
+        return Transport(
+            version: transport.version,
+            bundleID: transport.bundleID,
+            issuedAt: issuedAt,
+            body: body,
+            signature: mac
+        )
+    }
+
+    private static func hmac(version: Int, bundleID: String, issuedAt: Date, body: Data) -> String {
+        let canonical = "\(version)|\(bundleID)|\(issuedAt.timeIntervalSince1970)|\(body.base64EncodedString())"
+        let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: syncKey())
+        return Data(code).base64EncodedString()
     }
 
     private static func verify(_ transport: Transport) -> Bool {

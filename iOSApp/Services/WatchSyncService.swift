@@ -20,6 +20,9 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published private(set) var conflicts: [SyncConflict] = []
     private weak var logStore: DiveLogStore?
     private var importedSessionIDs: Set<UUID> = []
+    private var pushedToWatchSessionIDs: Set<UUID> = []
+    private var pendingOutboundSessions: [DiveSession] = []
+    private let pushedToWatchIDsKey = "dirdiving_ios_pushed_to_watch_session_ids"
 
     // F9: conflicts persisted to a Documents/ file with `.completeFileProtection`
     // instead of UserDefaults. UserDefaults is not covered by Data Protection on a
@@ -42,6 +45,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         self.logStore = logStore
         importedSessionIDs = WatchDiveSyncCodec.loadImportedSessionIDs()
         importedSessionCount = importedSessionIDs.count
+        pushedToWatchSessionIDs = loadPushedToWatchSessionIDs()
         conflicts = loadConflicts()
         guard WCSession.isSupported() else {
             lastMessage = String(localized: "WatchConnectivity non supportato")
@@ -62,6 +66,29 @@ final class WatchSyncService: NSObject, ObservableObject {
         failedImportCount = 0
         lastMessage = String(localized: "Trust Watch resettato: attendi una nuova associazione verificata.")
         activate(logStore: logStore)
+    }
+
+    /// Push a logbook session to the paired Watch (skips demo dives and sessions received from Watch).
+    func transferToWatch(_ session: DiveSession) {
+        guard WCSession.isSupported() else { return }
+        guard !session.isDemoDive else { return }
+        guard !importedSessionIDs.contains(session.id) else { return }
+        guard !pushedToWatchSessionIDs.contains(session.id) else { return }
+        enqueueOutboundSession(session)
+        if WatchSyncAuth.hasPeerSecret() {
+            flushOutboundTransfers()
+        } else {
+            WatchSyncAuth.publishSharedSecretIfNeeded()
+            lastMessage = String(format: String(localized: "In coda verso Watch (%lld) — attendi associazione"), pendingOutboundSessions.count)
+        }
+    }
+
+    /// Incremental sync: push sessions not yet sent and not imported from Watch.
+    func syncUnpushedSessionsToWatch() {
+        guard let sessions = logStore?.sessions else { return }
+        for session in sessions where !session.isDemoDive {
+            transferToWatch(session)
+        }
     }
 
     func publishDeletedSessionIDs(_ ids: Set<UUID>) {
@@ -102,7 +129,7 @@ final class WatchSyncService: NSObject, ObservableObject {
                 lastMessage = String(localized: "Immersione duplicata ignorata")
                 return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
             }
-            logStore?.add(session)
+            logStore?.add(session, suppressWatchPush: true)
             importedSessionIDs.insert(session.id)
             WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
             importedSessionCount = importedSessionIDs.count
@@ -117,7 +144,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     func resolveConflictUsingIncoming(_ conflict: SyncConflict) {
-        logStore?.add(conflict.incoming)
+        logStore?.add(conflict.incoming, suppressWatchPush: true)
         importedSessionIDs.insert(conflict.id)
         WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
         importedSessionCount = importedSessionIDs.count
@@ -184,6 +211,69 @@ final class WatchSyncService: NSObject, ObservableObject {
         persistConflicts(conflicts)
     }
 
+    private func enqueueOutboundSession(_ session: DiveSession) {
+        pendingOutboundSessions.removeAll { $0.id == session.id }
+        pendingOutboundSessions.append(session)
+        pendingOutboundSessions.sort { $0.startDate > $1.startDate }
+    }
+
+    private func removeOutboundSession(id: UUID) {
+        pendingOutboundSessions.removeAll { $0.id == id }
+    }
+
+    private func flushOutboundTransfers() {
+        guard WatchSyncAuth.hasPeerSecret(), !pendingOutboundSessions.isEmpty else { return }
+        let queue = pendingOutboundSessions
+        for session in queue.reversed() {
+            sendOutbound(session)
+        }
+    }
+
+    private func sendOutbound(_ session: DiveSession) {
+        do {
+            let envelope = try WatchDiveSyncCodec.makePayload(session: session)
+            if WCSession.default.isReachable {
+                WCSession.default.sendMessage(envelope.message) { [weak self] _ in
+                    Task { @MainActor in
+                        self?.markPushedToWatch(session.id)
+                        self?.removeOutboundSession(id: session.id)
+                        self?.lastMessage = String(localized: "Immersione inviata al Watch")
+                    }
+                } errorHandler: { [weak self] _ in
+                    Task { @MainActor in
+                        WCSession.default.transferUserInfo(envelope.message)
+                        self?.lastMessage = String(localized: "Invio Watch in coda (transferUserInfo)")
+                    }
+                }
+            } else {
+                WCSession.default.transferUserInfo(envelope.message)
+                markPushedToWatch(session.id)
+                removeOutboundSession(id: session.id)
+                lastMessage = String(localized: "Invio Watch in coda (Watch non raggiungibile)")
+            }
+            Self.logger.info("Outbound session push queued id=\(session.id.uuidString, privacy: .public)")
+        } catch {
+            failedImportCount += 1
+            lastMessage = String(format: String(localized: "Errore invio Watch: %@"), error.localizedDescription)
+            Self.logger.error("Outbound Watch push failed: \(error.localizedDescription, privacy: .private)")
+        }
+    }
+
+    private func markPushedToWatch(_ id: UUID) {
+        pushedToWatchSessionIDs.insert(id)
+        savePushedToWatchSessionIDs()
+    }
+
+    private func loadPushedToWatchSessionIDs() -> Set<UUID> {
+        guard let strings = UserDefaults.standard.stringArray(forKey: pushedToWatchIDsKey) else { return [] }
+        return Set(strings.compactMap(UUID.init(uuidString:)))
+    }
+
+    private func savePushedToWatchSessionIDs() {
+        let trimmed = Array(pushedToWatchSessionIDs.suffix(256))
+        UserDefaults.standard.set(trimmed.map(\.uuidString), forKey: pushedToWatchIDsKey)
+    }
+
     private func persistConflicts(_ value: [SyncConflict]) {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
@@ -205,6 +295,7 @@ extension WatchSyncService: WCSessionDelegate {
             if activationState == .activated {
                 self.ingestCompanionContext(context)
                 WatchSyncAuth.publishSharedSecretIfNeeded()
+                self.flushOutboundTransfers()
             }
         }
     }
@@ -213,6 +304,7 @@ extension WatchSyncService: WCSessionDelegate {
         Task { @MainActor in
             self.ingestCompanionContext(applicationContext)
             WatchSyncAuth.publishSharedSecretIfNeeded()
+            self.flushOutboundTransfers()
         }
     }
 

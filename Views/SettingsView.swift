@@ -17,7 +17,7 @@ struct SettingsView: View {
                 VStack(spacing: 7) {
                     header
 
-                    Text("IMPOSTAZIONI")
+                    Text(String(localized: "IMPOSTAZIONI"))
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
@@ -28,8 +28,8 @@ struct SettingsView: View {
                         settingsRow(
                             icon: "gauge",
                             iconColor: DiveUI.green,
-                            title: "Velocità risalita",
-                            subtitle: "Limiti m/min persistenti",
+                            title: String(localized: "Velocità risalita"),
+                            subtitle: String(localized: "Limiti m/min persistenti"),
                             showsChevron: true
                         )
                     }
@@ -41,8 +41,8 @@ struct SettingsView: View {
                         settingsRow(
                             icon: "bell",
                             iconColor: DiveUI.yellow,
-                            title: "Allarmi",
-                            subtitle: "Stato soglie e promemoria",
+                            title: String(localized: "Allarmi"),
+                            subtitle: String(localized: "Stato soglie e promemoria"),
                             showsChevron: true
                         )
                     }
@@ -65,20 +65,22 @@ struct SettingsView: View {
                     settingsRow(
                         icon: "iphone.slash",
                         iconColor: DiveUI.yellow,
-                        title: "Sync impostazioni",
-                        subtitle: "Locale a questo dispositivo; sync bidirezionale planned"
+                        title: String(localized: "Sync impostazioni"),
+                        subtitle: String(localized: "Locale a questo dispositivo; sync bidirezionale planned"),
+                        informational: true
                     )
                     statusRow(
                         icon: "location.fill",
                         iconColor: gps.authorizationStatus == .denied ? DiveUI.red : DiveUI.green,
-                        title: "GPS superficie",
+                        title: String(localized: "GPS superficie"),
                         subtitle: gpsStatusText
                     )
                     settingsRow(
                         icon: "mappin.and.ellipse",
                         iconColor: DiveUI.cyan,
-                        title: "Comportamento GPS",
-                        subtitle: "Solo in superficie; in acqua il segnale GPS non e attendibile. Coordinate mancanti = ultimo fix noto o non disponibile (etichettato)."
+                        title: String(localized: "Comportamento GPS"),
+                        subtitle: String(localized: "Solo in superficie; in acqua il segnale GPS non e attendibile. Coordinate mancanti = ultimo fix noto o non disponibile (etichettato)."),
+                        informational: true
                     )
                     statusRow(
                         icon: "drop.fill",
@@ -341,7 +343,7 @@ struct SettingsView: View {
         }
     }
 
-    private func settingsRow(icon: String, iconColor: Color, title: String, subtitle: String, showsChevron: Bool = false) -> some View {
+    private func settingsRow(icon: String, iconColor: Color, title: String, subtitle: String, showsChevron: Bool = false, informational: Bool = false) -> some View {
         HStack(spacing: 9) {
             Image(systemName: icon)
                 .font(.system(size: 16, weight: .medium))
@@ -354,9 +356,9 @@ struct SettingsView: View {
                     .foregroundStyle(.white)
                     .lineLimit(1)
                 Text(subtitle)
-                    .font(.system(size: 10, weight: .regular, design: .rounded))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
+                    .font(.system(size: 10, weight: informational ? .medium : .regular, design: .rounded))
+                    .foregroundStyle(informational ? DiveUI.secondaryText : .white)
+                    .lineLimit(informational ? 3 : 1)
                     .minimumScaleFactor(0.72)
             }
 
@@ -370,10 +372,11 @@ struct SettingsView: View {
         }
         .padding(.horizontal, 9)
         .padding(.vertical, 5)
-        .frame(minHeight: 35)
+        .frame(minHeight: informational ? 38 : 35)
+        .opacity(informational ? 0.92 : 1)
         .background(
             RoundedRectangle(cornerRadius: 7, style: .continuous)
-                .fill(Color.black.opacity(0.52))
+                .fill(Color.black.opacity(informational ? 0.38 : 0.52))
                 .overlay(
                     RoundedRectangle(cornerRadius: 7, style: .continuous)
                         .stroke(.white.opacity(0.24), lineWidth: 1)
@@ -382,7 +385,7 @@ struct SettingsView: View {
     }
 
     private func statusRow(icon: String, iconColor: Color, title: String, subtitle: String) -> some View {
-        settingsRow(icon: icon, iconColor: iconColor, title: title, subtitle: subtitle)
+        settingsRow(icon: icon, iconColor: iconColor, title: title, subtitle: subtitle, informational: true)
     }
 }
 

@@ -3,6 +3,7 @@ import Charts
 
 struct PlannerView: View {
     @EnvironmentObject private var store: PlannerStore
+    @AppStorage("dirdiving_ios_planner_safety_acknowledged") private var plannerSafetyAcknowledged = false
     @State private var showPlan = false
 
     var body: some View {
@@ -27,6 +28,7 @@ struct PlannerView: View {
                         reserveCard
                         teamPreviewCard
                         plannerWarnings
+                        plannerSafetyAcknowledgment
                         calculateButton
                     }
                     .padding(.horizontal, 16)
@@ -195,7 +197,7 @@ struct PlannerView: View {
     @ViewBuilder
     private var plannerWarnings: some View {
         if store.analysis.warnings.isEmpty {
-            DIRWarningBox(text: "Planner informativo: verifica sempre piano, gas e procedure con training, team e strumenti certificati.")
+            DIRWarningBox(text: String(localized: "Planner informativo: verifica sempre piano, gas e procedure con training, team e strumenti certificati."))
         } else {
             DIRCard("WARNING", icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
                 VStack(alignment: .leading, spacing: 8) {
@@ -242,20 +244,39 @@ struct PlannerView: View {
         }
     }
 
+    private var plannerSafetyAcknowledgment: some View {
+        Toggle(isOn: $plannerSafetyAcknowledged) {
+            Text(String(localized: "planner.safety_ack.label"))
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(.white)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .tint(DIRTheme.cyan)
+        .padding(.vertical, 4)
+        .accessibilityHint(String(localized: "planner.safety_ack.hint"))
+    }
+
     private var calculateButton: some View {
         Button {
             store.calculate()
             showPlan = true
         } label: {
-            Text("Calcola Piano")
+            Text(String(localized: "Calcola Piano"))
                 .font(.callout.weight(.semibold))
-                .foregroundStyle(.black)
+                .foregroundStyle(plannerSafetyAcknowledged ? .black : DIRTheme.muted)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
-                .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.cyan).shadow(color: DIRTheme.cyan.opacity(0.28), radius: 14, x: 0, y: 8))
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(plannerSafetyAcknowledged ? DIRTheme.cyan : DIRTheme.surface2)
+                        .shadow(color: DIRTheme.cyan.opacity(plannerSafetyAcknowledged ? 0.28 : 0), radius: 14, x: 0, y: 8)
+                )
         }
         .buttonStyle(.plain)
+        .disabled(!plannerSafetyAcknowledged)
         .padding(.top, 4)
+        .accessibilityLabel(String(localized: "Calcola Piano"))
+        .accessibilityHint(String(localized: "planner.safety_ack.hint"))
     }
 
     private func plannerField(_ title: String, value: Binding<Double>, unit: String, step: Double) -> some View {
