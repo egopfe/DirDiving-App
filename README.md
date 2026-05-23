@@ -16,6 +16,17 @@ DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent 
 
 > Status note: the app is prepared for Apple water submersion APIs, but the depth/submersion entitlement is still pending. Until the entitlement is granted and the app is signed with it, `CMWaterSubmersionManager` may report entitlement-related errors and will not deliver production depth data.
 
+## Onboarding legale e accettazione disclaimer
+
+Dal pass del **2026-05-22** DIR DIVING mostra un flusso obbligatorio al primo avvio, o quando cambia la major version/revisione legale dell'app:
+
+1. **Welcome**: introduce il flusso safety/legal.
+2. **Safety Warning**: mostra in modo esplicito `DIR Diving is NOT a dive computer.`
+3. **Legal Disclaimer**: carica il disclaimer completo localizzato da `LegalDisclaimer.txt` in `en.lproj` o `it.lproj`, derivato dai DOCX legali approvati.
+4. **Acceptance**: richiede tutte le conferme obbligatorie prima di entrare nell'app.
+
+L'accettazione viene salvata in `UserDefaults` con timestamp, versione app accettata, major version, tipo dispositivo, lingua e revisione legale. La sezione **Settings -> Legal & Safety** / **Altro -> Legal & Safety** permette di rivedere disclaimer completo, versione accettata e timestamp. Questo gating non modifica telemetry, GPS, bussola, profondita, risalita, sync, export o modelli dati immersione.
+
 ## Depth Entitlement And Signing Checklist
 
 Local configuration is internally aligned for the Watch target: `project.yml` points `DIRDiving Watch App` at `Config/DIRDiving.entitlements`, `App/Info.plist` declares `WKBackgroundModes` with `underwater-depth`, and the Watch entitlements include `com.apple.developer.coremotion.water-submersion`.
@@ -47,6 +58,8 @@ External validation is still required before release:
 - Stable pre-water selector for Diving on `main`; Snorkeling, Apnea and Buddy Assist remain isolated to experimental branches
 - Local persistence with iCloud Key-Value Store mirroring for dive logs, ascent-rate settings, Watch sync queues and supported iOS companion state
 - Custom image screen for bundled reference images, checklists, or static procedures
+- First-launch legal onboarding with localized IT/EN full disclaimer and mandatory acceptance logging
+- Settings / Legal & Safety screen with accepted version, timestamp, language and full disclaimer
 
 Experimental branch documentation is available in [`Docs/EXPERIMENTAL_FEATURES.md`](Docs/EXPERIMENTAL_FEATURES.md).
 
@@ -61,7 +74,7 @@ Le istruzioni di build sono in [`Docs/BUILD_VALIDATION.md`](Docs/BUILD_VALIDATIO
 
 ## Strategia dei rami (Branch Strategy)
 
-- **`main`**: codice orientato alla stabilità **Diving** su Apple Watch e al companion iOS incluso nello stesso workspace XcodeGen. Le funzioni Apnea, Snorkeling, Buddy Assist e le mappe sperimentali **non** fanno parte del target MAIN (`project.yml` esclude i file sperimentali dal build production). I merge verso `main` devono **preservare** il comportamento Diving, GPS surface-only, **BUSSOLA** (terminologia UI: non usare «COMPASSO»), export Subsurface e sync documentati.
+- **`main`**: codice orientato alla stabilità **Diving** su Apple Watch e al companion iOS incluso nello stesso workspace XcodeGen. Le funzioni Apnea, Snorkeling, Buddy Assist e le mappe sperimentali **non** fanno parte del target MAIN (`project.yml` esclude i file sperimentali dal build production). I merge verso `main` devono **preservare** il comportamento Diving, GPS surface-only, **BUSSOLA** (terminologia UI: non usare «COMPASSO»), export Subsurface, sync documentati e onboarding legale.
 - **`main-iOS`**: ramo di lavoro storico/parallelo per allineamenti UI iOS; può divergere da `main`. Allineare la documentazione quando le feature companion sono equivalenti.
 - **`codex/experimental-features`**: Watch sperimentale (Snorkeling Live, mappe waypoint/ritorno, Apnea workflow esteso, Buddy Assist, ecc.). Non importare questi file nel target MAIN senza revisione esplicita.
 - **`codex/ios-experimental-features`**: iOS sperimentale (Explore Lab, Buddy Lab, concept mappe). Isolato da App Store candidate su `main`.
@@ -69,7 +82,7 @@ Le istruzioni di build sono in [`Docs/BUILD_VALIDATION.md`](Docs/BUILD_VALIDATIO
 
 ### Matrice funzionalità (CSV)
 
-La tabella aggiornata con colonne Area / Branch / App / Mode / Feature / Status / Description / UI Reference / Notes (più la colonna Internationalization aggiunta in coda per le nuove righe):
+La tabella aggiornata con colonne Area / Branch / App / Mode / Feature / Status / Description / UI Reference / Notes / internationalization & languages:
 
 [`Docs/DIR_DIVING_Feature_Comparison.csv`](Docs/DIR_DIVING_Feature_Comparison.csv)
 
@@ -139,6 +152,7 @@ Da `fadd8a6` + `4cca72e` su `main`:
 - **Tabelle stringhe**: `Resources/{en,it}.lproj/Localizable.strings` (Watch) e `iOSApp/Resources/{en,it}.lproj/Localizable.strings` (iOS). Aggiunta più recente: chiavi stabili `tab.*` (Logbook/Analisi/Planner/Attrezzatura/Altro), `logbook.delete.a11y`, `accessibility.command_button.hint`.
 - **UI**: picker in Watch `SettingsView` (sezione *Lingua*) e in iOS `MoreView` con disclaimer *"Changing language does not change units, calculations or saved data."*
 - **Logbook iOS**: i mesi/intestazioni rispettano `@Environment(\.locale)` invece di forzare `it_IT`.
+- **Legal onboarding**: disclaimer completo localizzato in `Resources/{en,it}.lproj/LegalDisclaimer.txt` e `iOSApp/Resources/{en,it}.lproj/LegalDisclaimer.txt`; la lingua segue il selettore app o la lingua di sistema supportata.
 - **Estensibilità**: per aggiungere una lingua bastano (a) un nuovo case negli enum `DIRAppLanguage`/`DIRIOSAppLanguage`, (b) una nuova cartella `xx.lproj/Localizable.strings`, (c) eventualmente estendere la fallback `supportedSystemLocale` (oggi `en`/`it`; altri sistemi cadono in italiano).
 - **Vincoli**: la modifica della lingua **non** cambia unità di misura, calcoli, persistenza o dati salvati.
 - **Pass secondario 2026-05-20**: ~130+ chiavi Watch e ~90+ iOS in `Localizable.strings`; servizi sync/bussola/allarmi localizzati con `String(localized:)`; schermate Settings, log, export, planner header, Analysis empty state coperte. Stato messaggi sync: si aggiorna al prossimo evento dopo cambio lingua.
@@ -199,6 +213,7 @@ Gli ultimi fix sulla superficie stable separano chiaramente `main` dalle funzion
 - Il companion iOS stabile espone **cinque tab**: `Logbook`, `Analisi`, `Planner`, `Attrezzatura`, `Altro`; dati reali o etichettati come informativi/locali.
 - Il planner iOS mostra disclaimer in-app e separa i tab risultato `PIANO`, `CURVA BÜHLMANN` e `GRAFICI`.
 - Il progetto MAIN esclude Apnea, Snorkeling, Buddy Assist e concept experimental dal target membership generato da XcodeGen.
+- L'onboarding legale usa lo stesso linguaggio visivo premium: Watch con pannelli neri, testo grande e controlli glove-friendly; iOS con card scure, accenti ciano/giallo/rosso e dark mode forzato.
 
 Implementation helpers live in:
 

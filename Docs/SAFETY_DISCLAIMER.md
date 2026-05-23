@@ -16,6 +16,17 @@ L'app **non** deve essere usata come:
 
 Gli utenti devono sempre affidarsi a strumentazione certificata, formazione adeguata, procedure di centro immersioni/team e giudizio umano. I calcoli del planner iOS, i valori **TTV** live, le presentazioni stile Buhlmann e le curve sono **indicativi ed educativi**.
 
+## Onboarding e accettazione obbligatoria
+
+Dal 2026-05-22 l'app mostra un onboarding legale al primo avvio su Apple Watch e iOS Companion. Il flusso include:
+
+- schermata di benvenuto;
+- avviso esplicito **DIR Diving is NOT a dive computer.**;
+- disclaimer completo scrollabile in italiano o inglese;
+- accettazione con conferme obbligatorie su certificazione subacquea, non uso come computer subacqueo, non uso come supporto vitale primario e accettazione termini/disclaimer.
+
+L'accettazione viene registrata localmente con timestamp, versione app accettata, major version, tipo dispositivo, lingua e revisione legale. Un cambio major version o revisione legale richiede nuova accettazione. La sezione **Legal & Safety** nei settings permette di rileggere il disclaimer completo e vedere i metadati di accettazione.
+
 ## Profondita e sensore (Apple Watch Ultra)
 
 - L'entitlement **water submersion** va approvato in Apple Developer e validato su **hardware reale** (non simulatore).

@@ -70,3 +70,14 @@ Nessuna PR aperta e risultata safe-to-merge automaticamente.
 - Nessuna modifica deliberata a GPS, algoritmi BUSSOLA, calcoli profondita/risalita, planner/decompressione o modelli di persistenza.
 - `origin/main` contiene gia modifiche runtime precedenti; questo pass le ha solo integrate tramite merge conservativo.
 - `main-iOS` non e stato mergeato perche la preview mostra conflitti runtime dove la scelta corretta richiede QA dedicata.
+
+## Aggiornamento successivo - onboarding legale 2026-05-22
+
+Dopo il commit `Add legal onboarding disclaimer flow`, i quattro branch principali risultano allineati ai rispettivi remoti e includono:
+
+- flusso first-launch Welcome / Safety Warning / Legal Disclaimer / Acceptance;
+- disclaimer completo IT/EN nel bundle Watch e iOS;
+- storage locale accettazione con timestamp, versione, major version, device type, lingua e legal revision;
+- sezione `Legal & Safety` in Settings/More.
+
+Il pass documentale successivo e registrato in [`Docs/DOCUMENTATION_UPDATE_REPORT_20260522_LEGAL_ONBOARDING.md`](DOCUMENTATION_UPDATE_REPORT_20260522_LEGAL_ONBOARDING.md). Le PR #8 e #9 restano aperte, `CONFLICTING` e non safe-to-merge automaticamente.
