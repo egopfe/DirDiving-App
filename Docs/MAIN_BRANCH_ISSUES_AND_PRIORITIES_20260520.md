@@ -1,8 +1,10 @@
 # DIR DIVING — MAIN: issues and priorities
 
-**Date:** 2026-05-20  
-**Branch:** `main` @ `b92e03a`  
-**Source:** [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260520.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260520.md)
+**Date:** 2026-05-20 (aggiornato 2026-05-23)  
+**Branch:** `main` @ `5e595ee` (production readiness)  
+**Source:** [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260522.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260522.md), [`MAIN_BRANCH_FINAL_READINESS_REPORT.md`](MAIN_BRANCH_FINAL_READINESS_REPORT.md)
+
+> **Nota 2026-05-23:** molte voci P0/P1/P2 sotto sono **risolte in codice** su `main` (`a75a6c3`, `5e595ee`). La tabella originale è conservata per storico; usare il report finale per lo stato corrente.
 
 Use this file as the single checklist of open issues, ordered by priority and release gate.
 

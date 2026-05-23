@@ -4,6 +4,13 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-23, production readiness MAIN — code + docs)
+
+- Pass production readiness su `main` (`5e595ee`): product name build interni, iOS→Watch session push, UI conflitti sync in More, i18n Settings/live/Planner/import, planner safety ack, auto-skip Mode Selection, tab User Images condizionale, righe Settings informative.
+- `Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md` — report finale A–K (~92% readiness post-pass).
+- Allineamento documentale: CSV feature matrix, README, ROADMAP, PR status, branch alignment 2026-05-23.
+- Vincoli: nessuna modifica a GPS, BUSSOLA, calcoli profondità/risalita, decompressione, planner math, crypto sync.
+
 ### Added (2026-05-22, legal onboarding + docs alignment)
 
 - Flusso onboarding legale first-launch su Watch e iOS: Welcome, Safety Warning, Legal Disclaimer, Acceptance.

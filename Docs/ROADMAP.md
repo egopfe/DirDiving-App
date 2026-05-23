@@ -1,6 +1,6 @@
 # Roadmap DIR DIVING
 
-**Aggiornato:** 2026-05-22
+**Aggiornato:** 2026-05-23
 
 ## Rilasciati su `main` (Watch MAIN + iOS nel workspace)
 
@@ -12,9 +12,13 @@
 | Bussola SET/CLEAR bearing | ✅ | Terminologia BUSSOLA |
 | Log + export Subsurface CSV | ✅ | |
 | Sync Watch ↔ iOS + tombstone unificata | ✅ | `a75a6c3` manual port backlog |
+| Sync iPhone → Watch (session push) | ✅ | `5e595ee` outbound queue + More push |
+| UI conflitti sync iOS | ✅ | `5e595ee` card in More |
 | Security F1-F12 | ✅ | Audit 2026-05-19 |
-| i18n IT/EN (primario + secondario) | 🟡 | Selettore lingua; migrazione stringhe in corso |
+| i18n IT/EN (primario + secondario) | 🟡 | Pass 2026-05-23; alcune righe Settings/shortcut ancora IT-key |
 | Onboarding legale + disclaimer IT/EN | ✅ | First launch, major update re-consent, Legal & Safety |
+| Planner safety acknowledgment | ✅ | Toggle obbligatorio prima di Calcola Piano |
+| Mode Selection auto-skip (solo Diving) | ✅ | Cold launch → Live |
 | Entitlement profondità Ultra | 🟡 | Configurato; validazione hardware aperta |
 
 ## Prossimo (MAIN, pre–App Store)
@@ -23,10 +27,10 @@
 |----------|------|------|
 | P0 | Validazione depth su Watch Ultra reale | QA / Apple |
 | P1 | QA pairing sync bidirezionale su device | QA |
-| P2 | Completare i18n planner/GPS detail iOS | Localization |
+| P2 | Completare i18n residuo (Settings shortcut, InfoView) | Localization |
 | P2 | Verifica legale contenuti Terms/Privacy URL prima App Store | Legal / App Store |
 | P2 | Convergenza documentazione `main` ↔ `main-iOS` | Process |
-| P3 | Hide tab UserImages se bundle vuoto | UX |
+| P3 | GPX/UDDF export | Feature |
 | P3 | GPX/UDDF export | Feature |
 | P4 | Settings sync bidirezionale unità | Feature |
 
