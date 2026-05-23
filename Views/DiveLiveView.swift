@@ -12,6 +12,14 @@ struct DiveLiveView: View {
         dive.isDiveActive && dive.ascentStatus.isOverLimit
     }
 
+    private var depthSafetyState: DepthSafetyState {
+        dive.depthSafetyState
+    }
+
+    private var depthReadoutStyle: DepthSafetyReadoutStyle {
+        DepthSafetyReadoutStyle.forState(depthSafetyState, redWarningBlink: dive.redWarningBlink)
+    }
+
     var body: some View {
         ZStack {
             DiveScreenBackground()
@@ -184,11 +192,23 @@ struct DiveLiveView: View {
                 )
                 .transition(.opacity.combined(with: .move(edge: .top)))
             }
+            if depthSafetyState != .normal {
+                DepthSafetyBannerView(state: depthSafetyState)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+            if dive.exceededSupportedDepthRange {
+                Text(String(localized: "depth.safety.exceeded.readings"))
+                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .foregroundStyle(DiveUI.red)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
             depthSection(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
             stopwatchPanel
             controls
         }
         .animation(.easeInOut(duration: 0.3), value: showAscentAlarmBanner)
+        .animation(.easeInOut(duration: 0.22), value: depthSafetyState)
     }
 
     private var preDiveWaitingContent: some View {
@@ -382,19 +402,20 @@ struct DiveLiveView: View {
     }
 
     private var depthReadout: some View {
-        VStack(spacing: 0) {
+        let style = depthReadoutStyle
+        return VStack(spacing: 0) {
             HStack(alignment: .lastTextBaseline, spacing: 4) {
                 Text(Formatters.one(dive.currentDepthMeters))
                     .font(.system(size: 72, weight: .black, design: .rounded))
                     .minimumScaleFactor(0.42)
                     .lineLimit(1)
                     .monospacedDigit()
-                    .foregroundStyle(dive.redWarningBlink ? DiveUI.red : .white)
-                    .shadow(color: dive.redWarningBlink ? DiveUI.red.opacity(0.75) : .clear, radius: 8, x: 0, y: 0)
+                    .foregroundStyle(style.depthColor)
+                    .shadow(color: style.depthShadow, radius: 8, x: 0, y: 0)
                     .layoutPriority(1)
                 Text("m")
                     .font(.system(size: 31, weight: .black, design: .rounded))
-                    .foregroundStyle(DiveUI.blue)
+                    .foregroundStyle(style.labelColor)
                     .padding(.bottom, 9)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -403,29 +424,45 @@ struct DiveLiveView: View {
                 .font(.system(size: 15, weight: .black, design: .rounded))
                 .lineLimit(1)
                 .minimumScaleFactor(0.68)
-                .foregroundStyle(DiveUI.blue)
+                .foregroundStyle(style.labelColor)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .padding(.horizontal, 4)
+        .padding(.vertical, 3)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(depthSafetyState == .normal ? Color.clear : Color.black.opacity(0.35))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(style.panelStroke, lineWidth: depthSafetyState == .normal ? 0 : 1.2)
+                )
+        )
     }
 
     private var depthSummary: some View {
-        HStack(spacing: 7) {
-            depthCard(title: "PROF. MASSIMA", value: dive.maxDepthMeters)
-            depthCard(title: "PROF. MEDIA", value: dive.averageDepthMeters)
+        Group {
+            if depthSafetyState.suppressesPositiveDepthReinforcement {
+                EmptyView()
+            } else {
+                HStack(spacing: 7) {
+                    depthCard(title: "PROF. MASSIMA", value: dive.maxDepthMeters, emphasize: false)
+                    depthCard(title: "PROF. MEDIA", value: dive.averageDepthMeters, emphasize: false)
+                }
+            }
         }
     }
 
-    private func depthCard(title: String, value: Double) -> some View {
+    private func depthCard(title: String, value: Double, emphasize: Bool) -> some View {
         VStack(spacing: 2) {
             Text(title)
                 .font(.system(size: 10, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(emphasize ? DiveUI.yellow : DiveUI.secondaryText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.62)
             HStack(alignment: .lastTextBaseline, spacing: 3) {
                 Text(Formatters.one(value))
                     .font(.system(size: 25, weight: .black, design: .rounded))
-                    .foregroundStyle(DiveUI.blue)
+                    .foregroundStyle(emphasize ? DiveUI.yellow : DiveUI.blue)
                     .monospacedDigit()
                     .lineLimit(1)
                     .minimumScaleFactor(0.62)

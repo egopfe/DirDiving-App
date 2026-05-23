@@ -278,3 +278,10 @@
 "Not accepted" = "Not accepted";
 "Terms" = "Terms";
 "Privacy" = "Privacy";
+"depth.safety.approaching.title" = "Maximum supported depth approaching";
+"depth.safety.exceeded.title" = "Depth outside supported operating range";
+"depth.safety.exceeded.ascend" = "Ascend within safe limits";
+"depth.safety.exceeded.readings" = "Readings may be outside the validated operating range";
+"depth.safety.log.outside_range" = "Outside supported operating range";
+"Outside supported operating range" = "Outside supported operating range";
+"I understand that DIR Diving is intended to operate only within Apple’s documented underwater API operating limits and that readings outside this range may be unreliable." = "I understand that DIR Diving is intended to operate only within Apple’s documented underwater API operating limits and that readings outside this range may be unreliable.";

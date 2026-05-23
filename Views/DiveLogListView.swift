@@ -240,9 +240,9 @@ struct DiveLogListView: View {
 
                 Spacer(minLength: 0)
 
-                Image(systemName: "mappin.circle.fill")
+                Image(systemName: session.exceededSupportedDepthRange ? "exclamationmark.octagon.fill" : "mappin.circle.fill")
                     .font(.system(size: 19, weight: .black))
-                    .foregroundStyle(DiveUI.green)
+                    .foregroundStyle(session.exceededSupportedDepthRange ? DiveUI.red : DiveUI.green)
                     .symbolRenderingMode(.hierarchical)
             }
             .padding(.horizontal, 7)

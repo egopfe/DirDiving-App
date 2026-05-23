@@ -19,6 +19,9 @@ struct DiveDetailView: View {
                     header
                     dateLine
                     summaryCards
+                    if session.exceededSupportedDepthRange {
+                        exceededDepthLogBanner
+                    }
                     gpsRows
                     exportPanel
                     deletePanel
@@ -74,9 +77,34 @@ struct DiveDetailView: View {
 
     private var summaryCards: some View {
         HStack(spacing: 4) {
-            detailMetricCard(title: "PROF. MASSIMA", value: Formatters.one(session.maxDepthMeters), unit: "m", color: DiveUI.blue)
+            detailMetricCard(
+                title: "PROF. MASSIMA",
+                value: Formatters.one(session.maxDepthMeters),
+                unit: "m",
+                color: session.exceededSupportedDepthRange ? DiveUI.red : DiveUI.blue
+            )
             detailMetricCard(title: "DURATA", value: durationMinutesText, unit: "min", color: .white)
         }
+    }
+
+    private var exceededDepthLogBanner: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "exclamationmark.octagon.fill")
+                .font(.system(size: 12, weight: .black))
+            Text(String(localized: "depth.safety.log.outside_range"))
+                .font(.system(size: 10, weight: .black, design: .rounded))
+                .lineLimit(2)
+                .minimumScaleFactor(0.72)
+        }
+        .foregroundStyle(DiveUI.red)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(DiveUI.red.opacity(0.12))
+                .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).stroke(DiveUI.red.opacity(0.72), lineWidth: 1))
+        )
     }
 
     private func detailMetricCard(title: String, value: String, unit: String, color: Color) -> some View {

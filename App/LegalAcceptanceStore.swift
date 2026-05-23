@@ -11,7 +11,7 @@ struct LegalAcceptanceRecord {
 }
 
 final class LegalAcceptanceStore: ObservableObject {
-    static let legalRevision = "2026-05-22"
+    static let legalRevision = "2026-05-23"
 
     @Published private(set) var record: LegalAcceptanceRecord?
 
@@ -24,6 +24,7 @@ final class LegalAcceptanceStore: ObservableObject {
         static let deviceType = "dirdiving_legal_acceptance_device_type"
         static let languageCode = "dirdiving_legal_acceptance_language_code"
         static let legalRevision = "dirdiving_legal_acceptance_revision"
+        static let depthLimitsAcknowledged = "dirdiving_legal_depth_limits_acknowledged"
     }
 
     init(defaults: UserDefaults = .standard) {
@@ -35,6 +36,7 @@ final class LegalAcceptanceStore: ObservableObject {
         guard let record else { return true }
         return record.appMajorVersion != Self.currentMajorVersion
             || record.legalRevision != Self.legalRevision
+            || !defaults.bool(forKey: Key.depthLimitsAcknowledged)
     }
 
     var acceptedVersionText: String {
@@ -52,7 +54,8 @@ final class LegalAcceptanceStore: ObservableObject {
         record?.languageCode.uppercased() ?? String(localized: "Not accepted")
     }
 
-    func accept(languageCode: String) {
+    func accept(languageCode: String, acknowledgedDepthOperatingLimits: Bool) {
+        guard acknowledgedDepthOperatingLimits else { return }
         let now = Date()
         defaults.set(now.timeIntervalSince1970, forKey: Key.timestamp)
         defaults.set(Self.currentAppVersion, forKey: Key.appVersion)
@@ -60,6 +63,7 @@ final class LegalAcceptanceStore: ObservableObject {
         defaults.set(Self.deviceType, forKey: Key.deviceType)
         defaults.set(languageCode, forKey: Key.languageCode)
         defaults.set(Self.legalRevision, forKey: Key.legalRevision)
+        defaults.set(true, forKey: Key.depthLimitsAcknowledged)
         record = Self.loadRecord(from: defaults)
     }
 

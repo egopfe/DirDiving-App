@@ -28,6 +28,10 @@ final class DiveManager: NSObject, ObservableObject {
     @Published var gpsConfirmation: DiveGPSConfirmation?
     @Published var isDepthAutomationAvailable = CMWaterSubmersionManager.waterSubmersionAvailable
     @Published var isManualLifecycleActive = false
+    @Published private(set) var depthSafetyState: DepthSafetyState = .normal
+    @Published private(set) var exceededSupportedDepthRange = false
+
+    private let depthLimitHaptics = DepthLimitHapticCoordinator()
 
     private var ascentAlarmEnabled: Bool {
         UserDefaults.standard.object(forKey: "dirdiving_watch_alarm_ascent_enabled") == nil
@@ -74,6 +78,7 @@ final class DiveManager: NSObject, ObservableObject {
     private var lastRuntimeAlarmDate: Date?
     private var lastBatteryAlarmDate: Date?
     private var lastAlarmDismissDate: Date?
+    private var activeDiveExceededSupportedDepth = false
 
     init(logStore: DiveLogStore, gpsManager: GPSManager, ascentSettings: AscentRateSettingsStore) {
         self.logStore = logStore
@@ -163,6 +168,9 @@ final class DiveManager: NSObject, ObservableObject {
         currentDepthMeters = 0
         averageDepthMeters = 0
         maxDepthMeters = 0
+        depthSafetyState = .normal
+        exceededSupportedDepthRange = false
+        depthLimitHaptics.reset()
         runtime = 0
         ttv = 0
         runtimeTimer?.invalidate()
@@ -214,7 +222,25 @@ final class DiveManager: NSObject, ObservableObject {
         let maxDepth = depths.max() ?? 0
         let avgTemp = temps.isEmpty ? nil : temps.reduce(0, +) / Double(temps.count)
         let duration = end.timeIntervalSince(start)
-        let session = DiveSession(startDate: start, endDate: end, durationSeconds: duration, maxDepthMeters: maxDepth, avgDepthMeters: avgDepth, avgWaterTemperatureCelsius: avgTemp, minWaterTemperatureCelsius: temps.min(), maxWaterTemperatureCelsius: temps.max(), ttv: avgDepth + (duration / 60.0), entryGPS: entryGPS, exitGPS: exitGPS, entryGPSFixSource: entryGPSFixSource, exitGPSFixSource: exitGPSFixSource, samples: samples)
+        let exceeded = activeDiveExceededSupportedDepth || maxDepth >= DepthSafetyConfiguration.maximumSupportedDepthMeters
+        let session = DiveSession(
+            startDate: start,
+            endDate: end,
+            durationSeconds: duration,
+            maxDepthMeters: maxDepth,
+            avgDepthMeters: avgDepth,
+            avgWaterTemperatureCelsius: avgTemp,
+            minWaterTemperatureCelsius: temps.min(),
+            maxWaterTemperatureCelsius: temps.max(),
+            ttv: avgDepth + (duration / 60.0),
+            entryGPS: entryGPS,
+            exitGPS: exitGPS,
+            entryGPSFixSource: entryGPSFixSource,
+            exitGPSFixSource: exitGPSFixSource,
+            samples: samples,
+            exceededSupportedDepthRange: exceeded
+        )
+        activeDiveExceededSupportedDepth = false
         logStore.add(session)
     }
 
@@ -228,14 +254,30 @@ final class DiveManager: NSObject, ObservableObject {
         averageDepthMeters = depths.reduce(0, +) / Double(max(depths.count, 1))
         maxDepthMeters = max(maxDepthMeters, sample.depthMeters)
         ttv = averageDepthMeters + (runtime / 60.0)
-        evaluateDepthAlarm()
+        updateDepthSafety(for: sample.depthMeters)
+        if depthSafetyState != .exceeded {
+            evaluateDepthAlarm()
+        }
         updateAscentRate(with: sample)
         previousDepthSample = sample
     }
 
+    private func updateDepthSafety(for depthMeters: Double) {
+        let state = DepthSafetyState.from(depthMeters: depthMeters)
+        depthSafetyState = state
+        if state == .exceeded {
+            activeDiveExceededSupportedDepth = true
+            exceededSupportedDepthRange = true
+        }
+        let hapticsEnabled = UserDefaults.standard.object(forKey: HapticService.hapticsEnabledKey) == nil
+            ? true
+            : UserDefaults.standard.bool(forKey: HapticService.hapticsEnabledKey)
+        depthLimitHaptics.handle(depthMeters: depthMeters, hapticsEnabled: hapticsEnabled)
+    }
+
     private func evaluateDepthAlarm() {
         let threshold = depthAlarmThresholdMeters
-        guard depthAlarmEnabled, maxDepthMeters > threshold else { return }
+        guard depthAlarmEnabled, maxDepthMeters > threshold, depthSafetyState != .exceeded else { return }
         triggerAlarm(String(format: String(localized: "ALLARME PROFONDITÀ > %@ m"), Formatters.one(threshold)), lastDate: &lastDepthAlarmDate)
     }
 

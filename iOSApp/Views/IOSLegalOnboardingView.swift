@@ -10,10 +10,12 @@ struct IOSLegalOnboardingView: View {
     @State private var understandsNotDiveComputer = false
     @State private var notPrimaryLifeSupport = false
     @State private var acceptedTerms = false
+    @State private var acknowledgedDepthOperatingLimits = false
     @State private var showExitGuidance = false
 
     private var canAccept: Bool {
         certifiedDiver && understandsNotDiveComputer && notPrimaryLifeSupport && acceptedTerms
+            && acknowledgedDepthOperatingLimits
     }
 
     var body: some View {
@@ -148,12 +150,19 @@ struct IOSLegalOnboardingView: View {
                     acceptanceToggle("I understand this is NOT a dive computer", isOn: $understandsNotDiveComputer)
                     acceptanceToggle("I will not use this app as a primary life-support instrument", isOn: $notPrimaryLifeSupport)
                     acceptanceToggle("I accept the Terms and Disclaimer", isOn: $acceptedTerms)
+                    acceptanceToggle(
+                        "I understand that DIR Diving is intended to operate only within Apple’s documented underwater API operating limits and that readings outside this range may be unreliable.",
+                        isOn: $acknowledgedDepthOperatingLimits
+                    )
                 }
             }
 
             Button {
                 guard disclaimerReachedBottom, canAccept else { return }
-                legalAcceptance.accept(languageCode: languageCode)
+                legalAcceptance.accept(
+                    languageCode: languageCode,
+                    acknowledgedDepthOperatingLimits: acknowledgedDepthOperatingLimits
+                )
             } label: {
                 Label("Continue", systemImage: "checkmark.seal.fill")
                     .font(.headline.weight(.bold))

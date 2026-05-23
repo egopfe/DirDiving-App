@@ -34,6 +34,9 @@ struct DiveDetailView: View {
                     switch tab {
                     case .summary:
                         metricGrid
+                        if session.exceededSupportedDepthRange {
+                            exceededDepthLogBanner
+                        }
                         ttvSafetyNote
                         depthChart
                         gasBlock
@@ -142,6 +145,22 @@ struct DiveDetailView: View {
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
                         .stroke(Color.white.opacity(0.06), lineWidth: 1)
                 )
+        )
+    }
+
+    private var exceededDepthLogBanner: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.octagon.fill")
+            Text(String(localized: "Outside supported operating range"))
+                .font(.system(size: 13, weight: .bold, design: .rounded))
+        }
+        .foregroundStyle(DIRTheme.red)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(DIRTheme.red.opacity(0.12))
+                .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(DIRTheme.red.opacity(0.7), lineWidth: 1))
         )
     }
 

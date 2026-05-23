@@ -23,7 +23,8 @@ enum DiveSessionMerge {
             exitGPS: exitGPS,
             entryGPSFixSource: entryGPSFixSource,
             exitGPSFixSource: exitGPSFixSource,
-            samples: winner.samples.count >= loser.samples.count ? winner.samples : loser.samples
+            samples: winner.samples.count >= loser.samples.count ? winner.samples : loser.samples,
+            exceededSupportedDepthRange: winner.exceededSupportedDepthRange || loser.exceededSupportedDepthRange
         )
     }
 

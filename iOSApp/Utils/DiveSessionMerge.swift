@@ -34,7 +34,8 @@ enum DiveSessionMerge {
             notes: notes,
             gasLabel: winner.gasLabel,
             sacLitersMinute: sacLitersMinute,
-            isDemo: isDemo
+            isDemo: isDemo,
+            exceededSupportedDepthRange: winner.exceededSupportedDepthRange || loser.exceededSupportedDepthRange
         )
     }
 
