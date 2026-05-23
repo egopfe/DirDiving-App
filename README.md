@@ -27,6 +27,18 @@ Dal pass del **2026-05-22** DIR DIVING mostra un flusso obbligatorio al primo av
 
 L'accettazione viene salvata in `UserDefaults` con timestamp, versione app accettata, major version, tipo dispositivo, lingua e revisione legale. La sezione **Settings -> Legal & Safety** / **Altro -> Legal & Safety** permette di rivedere disclaimer completo, versione accettata e timestamp. Questo gating non modifica telemetry, GPS, bussola, profondita, risalita, sync, export o modelli dati immersione.
 
+## Pass production readiness (2026-05-23, `main`)
+
+Commit **`5e595ee`** — miglioramenti **senza** modificare algoritmi immersione, GPS, bussola, TTV, planner math o modello crittografico sync:
+
+- Build: nomi prodotto interni `DIRDivingWatchApp` / `DIRDivingiOSApp` (nome utente **DIR DIVING** invariato in Info.plist).
+- Sync: **invio sessioni iPhone → Watch**, coda outbound, tracciamento ID inviati; card **conflitti sync** in Altro (Usa Watch / Mantieni iPhone).
+- UX Watch: salto automatico Mode Selection quando esiste solo Diving; tab **User Images** nascosta se bundle vuoto; badge aptica disattivata anche in pre-immersione.
+- i18n: Settings Watch, pannello manuale live, More, Planner, errori import CSV; banner risalita EN **ASCENT TOO FAST** / **SLOW DOWN**.
+- Sicurezza UX: toggle riconoscimento planner indicativo prima di **Calcola Piano**.
+
+Report: [`Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md`](Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md) · Audit precedente: [`Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260522.md`](Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260522.md).
+
 ## Depth Entitlement And Signing Checklist
 
 Local configuration is internally aligned for the Watch target: `project.yml` points `DIRDiving Watch App` at `Config/DIRDiving.entitlements`, `App/Info.plist` declares `WKBackgroundModes` with `underwater-depth`, and the Watch entitlements include `com.apple.developer.coremotion.water-submersion`.
@@ -79,6 +91,7 @@ Le istruzioni di build sono in [`Docs/BUILD_VALIDATION.md`](Docs/BUILD_VALIDATIO
 - **`codex/experimental-features`**: Watch sperimentale (Snorkeling Live, mappe waypoint/ritorno, Apnea workflow esteso, Buddy Assist, ecc.). Non importare questi file nel target MAIN senza revisione esplicita.
 - **`codex/ios-experimental-features`**: iOS sperimentale (Explore Lab, Buddy Lab, concept mappe). Isolato da App Store candidate su `main`.
 - **Allineamenti UI-only** su `main`: possono toccare layout, copy, accessibilità e documentazione **senza** modificare algoritmi di decompressione, modello gas, calcoli TTV/TTR/SAC/CNS/OTU, sampling sensori o regole di sync — vedi [`Docs/MAIN_UX_COMPLETION_REPORT.md`](Docs/MAIN_UX_COMPLETION_REPORT.md).
+- **HEAD `main` consigliato** per release candidate Watch+iOS unificato; `main-iOS` resta worktree storico — allineare documentazione dopo merge manuale (vedi [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260523.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260523.md)).
 
 ### Matrice funzionalità (CSV)
 
