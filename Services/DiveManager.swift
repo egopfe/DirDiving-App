@@ -317,6 +317,7 @@ extension DiveManager: CMWaterSubmersionManagerDelegate {
             switch event.state {
             case .submerged: beginDiveIfNeeded()
             case .notSubmerged: endDiveIfNeeded()
+            case .unknown: break
             @unknown default: break
             }
         }
