@@ -571,7 +571,15 @@ This repository is intended to be generated and built on macOS with Xcode and Xc
 
 ```bash
 xcodegen generate
+open DIRDiving.xcodeproj
 ```
+
+### Un solo progetto Xcode (importante)
+
+- **Apri solo** `DIRDiving.xcodeproj` nella **root** del repository (`DirDiving-App/`), dopo `xcodegen generate`.
+- Il file **non è versionato su Git** (si rigenera da `project.yml`). Eventuali copie in `.worktrees/` o cartelle vecchie vanno **eliminate** — non usarle in Xcode.
+- **Non** esistono più progetti separati Watch/iOS nel repo: uno workspace XcodeGen con due scheme (`DIRDiving Watch App`, `DIRDiving iOS`).
+- Dopo ogni `git pull` che modifica `project.yml`, riesegui `xcodegen generate` prima di aprire Xcode.
 
 Then open the generated Xcode project and build the watchOS target.
 
