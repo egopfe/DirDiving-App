@@ -99,8 +99,31 @@ final class WatchSyncService: NSObject, ObservableObject {
         lastMessage = String(format: String(localized: "Tombstone inviata al Watch (%lld)"), ids.count)
     }
 
+    func pushUnitsPreference(_ value: String) {
+        let preference = IOSUnitPreference.fromStorage(value)
+        guard WCSession.isSupported() else { return }
+        WatchSyncAuth.mergeApplicationContext([WatchSyncKeys.unitsPreferenceKey: preference.syncCode])
+    }
+
+    func sendPhotoToWatch(_ imageData: Data, fileName: String) {
+        guard WCSession.isSupported(), !imageData.isEmpty else { return }
+        let sanitized = fileName.replacingOccurrences(of: "/", with: "_")
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("DIRDivingPhoto_\(UUID().uuidString)_\(sanitized)")
+        do {
+            try imageData.write(to: url, options: [.atomic])
+            WCSession.default.transferFile(url, metadata: [WatchSyncKeys.companionPhotoFileNameKey: sanitized])
+            lastMessage = String(localized: "Foto inviata al Watch")
+        } catch {
+            lastMessage = String(format: String(localized: "Errore invio foto Watch: %@"), error.localizedDescription)
+        }
+    }
+
     private func ingestCompanionContext(_ context: [String: Any]) {
         WatchSyncAuth.ingestSharedSecretFromContext(context)
+        if let units = context[WatchSyncKeys.unitsPreferenceKey] as? String {
+            let preference = IOSUnitPreference.fromSyncCode(units)
+            UserDefaults.standard.set(preference.rawValue, forKey: IOSUnitPreference.storageKey)
+        }
         if let strings = context[WatchSyncKeys.deletedSessionBroadcastKey] as? [String] {
             let ids = Set(strings.compactMap(UUID.init(uuidString:)))
             if !ids.isEmpty {

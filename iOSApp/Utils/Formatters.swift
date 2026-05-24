@@ -6,6 +6,15 @@ enum IOSUnitPreference: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    var syncCode: String {
+        switch self {
+        case .metric: return "metric"
+        case .imperial: return "imperial"
+        }
+    }
+
+    static let storageKey = "dirdiving_ios_units"
+
     var shortLabel: String {
         switch self {
         case .metric: return "Metrico"
@@ -14,7 +23,18 @@ enum IOSUnitPreference: String, CaseIterable, Identifiable {
     }
 
     static func fromStorage(_ value: String) -> IOSUnitPreference {
-        IOSUnitPreference(rawValue: value) ?? .metric
+        switch value {
+        case imperial.rawValue, "imperial":
+            return .imperial
+        case metric.rawValue, "metric":
+            return .metric
+        default:
+            return .metric
+        }
+    }
+
+    static func fromSyncCode(_ code: String) -> IOSUnitPreference {
+        code == "imperial" ? .imperial : .metric
     }
 }
 

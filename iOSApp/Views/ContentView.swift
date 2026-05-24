@@ -1,34 +1,34 @@
 import SwiftUI
 
-/// Main iOS tab bar: five companion surfaces (Logbook, analysis, planner, equipment, settings).
-/// Intent: match stable reference layout — no experimental Lab targets.
+/// Main iOS tab bar: Planner first, then logbook, analysis, equipment, settings.
 enum IOSTab: Hashable {
+    case planner
     case logbook
     case analysis
-    case planner
     case gear
     case settings
 }
 
 @MainActor
 final class IOSNavigationStore: ObservableObject {
-    @Published var selectedTab: IOSTab = .logbook
+    @Published var selectedTab: IOSTab = .planner
 }
 
 struct ContentView: View {
     @EnvironmentObject private var navigation: IOSNavigationStore
+    @State private var showLaunchDisclaimer = true
 
     var body: some View {
         TabView(selection: $navigation.selectedTab) {
+            PlannerView()
+                .tabItem { Label("tab.planner", systemImage: "point.topleft.down.curvedto.point.bottomright.up") }
+                .tag(IOSTab.planner)
             LogbookView()
                 .tabItem { Label("tab.logbook", systemImage: "list.bullet.rectangle.portrait.fill") }
                 .tag(IOSTab.logbook)
             AnalysisView()
                 .tabItem { Label("tab.analysis", systemImage: "chart.xyaxis.line") }
                 .tag(IOSTab.analysis)
-            PlannerView()
-                .tabItem { Label("tab.planner", systemImage: "point.topleft.down.curvedto.point.bottomright.up") }
-                .tag(IOSTab.planner)
             EquipmentView()
                 .tabItem { Label("tab.gear", systemImage: "shippingbox.fill") }
                 .tag(IOSTab.gear)
@@ -40,5 +40,6 @@ struct ContentView: View {
         .toolbarBackground(DIRTheme.background, for: .tabBar)
         .toolbarBackground(.visible, for: .tabBar)
         .toolbarColorScheme(.dark, for: .tabBar)
+        .launchCompanionDisclaimer(isPresented: $showLaunchDisclaimer)
     }
 }

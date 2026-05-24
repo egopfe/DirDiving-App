@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct UserImagesView: View {
     @EnvironmentObject private var imageStore: UserImageStore
@@ -126,8 +127,7 @@ struct UserImagesView: View {
     private func thumbnail(resourceName: String?, index: Int) -> some View {
         ZStack {
             if let resourceName {
-                Image(resourceName, bundle: .main)
-                    .resizable()
+                storedImage(resourceName: resourceName)
                     .scaledToFill()
             } else {
                 placeholderThumbnail(index: index)
@@ -168,8 +168,7 @@ struct UserImagesView: View {
                 .foregroundStyle(.white)
                 .lineLimit(1)
 
-            Image(resourceName, bundle: .main)
-                .resizable()
+            storedImage(resourceName: resourceName)
                 .scaledToFill()
                 .frame(maxWidth: .infinity, maxHeight: 126)
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
@@ -232,6 +231,18 @@ struct UserImagesView: View {
             .replacingOccurrences(of: "_", with: " ")
             .replacingOccurrences(of: "-", with: " ")
             .capitalized
+    }
+
+    private func storedImage(resourceName: String) -> some View {
+        Group {
+            if resourceName.hasPrefix("/"), let uiImage = UIImage(contentsOfFile: resourceName) {
+                Image(uiImage: uiImage)
+                    .resizable()
+            } else {
+                Image(resourceName, bundle: .main)
+                    .resizable()
+            }
+        }
     }
 
     private func placeholderColors(for index: Int) -> [Color] {

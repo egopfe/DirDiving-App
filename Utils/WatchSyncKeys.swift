@@ -5,4 +5,5 @@ enum WatchSyncKeys {
     /// WatchConnectivity `applicationContext` broadcast of tombstone UUID strings.
     static let deletedSessionBroadcastKey = "dirdiving_deleted_session_ids"
     static let unitsPreferenceKey = "units"
+    static let companionPhotoFileNameKey = "photoFileName"
 }

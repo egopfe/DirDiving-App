@@ -14,7 +14,15 @@ enum SubsurfaceExportService {
     }
 
     static func makeCSV(for session: DiveSession) -> String {
-        var rows = ["time_seconds,depth_m,temperature_c,entry_lat,entry_lon,exit_lat,exit_lon"]
+        var rows = ["time_seconds,depth_m,temperature_c,entry_lat,entry_lon,exit_lat,exit_lon,is_manual,equipment,entry_pressure,exit_pressure,deco_notes"]
+        let manualMeta = [
+            session.isManual ? "1" : "0",
+            csvEscape(session.equipmentUsed ?? ""),
+            csvEscape(session.entryPressureText ?? ""),
+            csvEscape(session.exitPressureText ?? ""),
+            csvEscape(session.decompressionNotes ?? "")
+        ].joined(separator: ",")
+        rows.append("# session_meta,\(manualMeta)")
         guard let first = session.samples.first?.timestamp else { return rows.joined(separator: "\n") }
         for sample in session.samples {
             let seconds = Int(sample.timestamp.timeIntervalSince(first))
@@ -26,6 +34,10 @@ enum SubsurfaceExportService {
             rows.append("\(seconds),\(String(format: "%.2f", sample.depthMeters)),\(temp),\(entryLat),\(entryLon),\(exitLat),\(exitLon)")
         }
         return rows.joined(separator: "\n")
+    }
+
+    private static func csvEscape(_ value: String) -> String {
+        value.replacingOccurrences(of: "\"", with: "\"\"")
     }
 
     static func writeCSV(for session: DiveSession) -> Result<URL, ExportError> {

@@ -46,6 +46,7 @@ struct MoreView: View {
                             row(String(localized: "more.sync.supported"), watchSync.isSupported ? String(localized: "more.yes") : String(localized: "more.no"))
                             row(String(localized: "more.sync.state"), watchSync.userVisibleState)
                             row(String(localized: "more.sync.last_event"), watchSync.lastMessage)
+                            WatchPhotoTransferPanel()
                             Button {
                                 watchSync.syncUnpushedSessionsToWatch()
                             } label: {
@@ -110,31 +111,32 @@ struct MoreView: View {
     }
 
     private var unitsPreferenceSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        let preference = IOSUnitPreference.fromStorage(units)
+
+        return VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(String(localized: "units.title"))
                     .foregroundStyle(DIRTheme.muted)
                 Spacer()
-                Text(String(localized: "units.metric_only"))
+                Text(preference.shortLabel)
                     .foregroundStyle(.white)
                     .fontWeight(.semibold)
             }
             .font(.callout)
             Picker(String(localized: "units.title"), selection: $units) {
-                Text("m").tag(IOSUnitPreference.metric.rawValue)
+                ForEach(IOSUnitPreference.allCases) { option in
+                    Text(option.shortLabel).tag(option.rawValue)
+                }
             }
             .pickerStyle(.segmented)
-            .disabled(true)
-            Text(String(localized: "units.ios.footer"))
+            Text(String(localized: "settings.units.sync_note"))
                 .font(.caption2)
-                .foregroundStyle(DIRTheme.yellow)
+                .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.vertical, 5)
-        .onAppear {
-            if units != IOSUnitPreference.metric.rawValue {
-                units = IOSUnitPreference.metric.rawValue
-            }
+        .onChange(of: units) { _, newValue in
+            watchSync.pushUnitsPreference(newValue)
         }
     }
 

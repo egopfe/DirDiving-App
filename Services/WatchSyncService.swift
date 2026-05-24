@@ -83,6 +83,12 @@ final class WatchSyncService: NSObject, ObservableObject {
         lastSyncStatus = String(format: String(localized: "Tombstone inviata a iPhone (%lld)"), ids.count)
     }
 
+    func publishUnitsPreference(_ value: String) {
+        guard DIRUnitPreference(rawValue: value) != nil else { return }
+        guard WCSession.isSupported() else { return }
+        WatchSyncAuth.mergeApplicationContext([WatchSyncKeys.unitsPreferenceKey: value])
+    }
+
     func retryPendingTransfers() {
         lastRetryDate = Date()
         guard WCSession.isSupported() else {
@@ -139,8 +145,9 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     private func ingestCompanionContext(_ context: [String: Any]) {
         WatchSyncAuth.ingestSharedSecretFromContext(context)
-        if let units = context[WatchSyncKeys.unitsPreferenceKey] as? String, units == "metric" {
-            UserDefaults.standard.set("metric", forKey: "dirdiving_watch_units")
+        if let units = context[WatchSyncKeys.unitsPreferenceKey] as? String,
+           DIRUnitPreference(rawValue: units) != nil {
+            UserDefaults.standard.set(units, forKey: DIRUnitPreference.storageKey)
         }
         if let strings = context[WatchSyncKeys.deletedSessionBroadcastKey] as? [String] {
             let ids = Set(strings.compactMap(UUID.init(uuidString:)))
@@ -268,7 +275,19 @@ final class WatchSyncService: NSObject, ObservableObject {
             Self.logger.error("Persist watch-sync pending sessions failed: \(error.localizedDescription, privacy: .private)")
         }
     }
+
+    private func importCompanionPhoto(_ file: WCSessionFile) {
+        let fileName = (file.metadata?[WatchSyncKeys.companionPhotoFileNameKey] as? String)
+            ?? file.fileURL.lastPathComponent
+        do {
+            try UserImageStore.importCompanionPhoto(from: file.fileURL, fileName: fileName)
+            lastSyncStatus = String(localized: "Foto iPhone ricevuta")
+        } catch {
+            lastSyncStatus = String(format: String(localized: "Errore foto iPhone: %@"), error.localizedDescription)
+        }
+    }
 }
+
 
 extension WatchSyncService: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
@@ -318,6 +337,12 @@ extension WatchSyncService: WCSessionDelegate {
             } else {
                 self.lastSyncStatus = String(localized: "Sent: transferUserInfo completato, ack companion non confermato")
             }
+        }
+    }
+
+    nonisolated func session(_ session: WCSession, didReceive file: WCSessionFile) {
+        Task { @MainActor in
+            self.importCompanionPhoto(file)
         }
     }
 }

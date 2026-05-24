@@ -3,7 +3,7 @@ import Charts
 
 struct PlannerView: View {
     @EnvironmentObject private var store: PlannerStore
-    @AppStorage("dirdiving_ios_planner_safety_acknowledged") private var plannerSafetyAcknowledged = false
+    @State private var plannerSafetyAcknowledged = false
     @State private var showPlan = false
 
     var body: some View {
@@ -20,16 +20,20 @@ struct PlannerView: View {
                                 .font(.callout)
                                 .foregroundStyle(DIRTheme.muted)
                         }
-                        modePicker
-                        profileCard
-                        gasCards
-                        cylinderCard
-                        technicalAnalysisCard
-                        reserveCard
-                        teamPreviewCard
-                        plannerWarnings
                         plannerSafetyAcknowledgment
-                        calculateButton
+                        Group {
+                            modePicker
+                            profileCard
+                            gasCards
+                            cylinderCard
+                            technicalAnalysisCard
+                            reserveCard
+                            teamPreviewCard
+                            plannerWarnings
+                            calculateButton
+                        }
+                        .disabled(!plannerSafetyAcknowledged)
+                        .opacity(plannerSafetyAcknowledged ? 1 : 0.45)
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 10)

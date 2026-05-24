@@ -6,8 +6,17 @@ struct AlarmSettingsView: View {
     @AppStorage("dirdiving_watch_alarm_runtime_enabled") private var runtimeAlarmEnabled = false
     @AppStorage("dirdiving_watch_alarm_battery_enabled") private var batteryAlarmEnabled = true
     @AppStorage("dirdiving_watch_alarm_depth_threshold_m") private var depthThresholdMeters = 40.0
-    @AppStorage("dirdiving_watch_alarm_runtime_threshold_min") private var runtimeThresholdMinutes = 60
+    @AppStorage("dirdiving_watch_alarm_runtime_threshold_min") private var runtimeThresholdMinutes = 30
     @AppStorage("dirdiving_watch_alarm_battery_threshold_pct") private var batteryThresholdPercent = 20
+    @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
+
+    private var unitPreference: DIRUnitPreference { DIRUnitPreference.fromStorage(watchUnits) }
+
+    private var depthThresholdLabel: String {
+        let display = unitPreference.depthDisplay(meters: depthThresholdMeters)
+        return "\(Formatters.one(display.value)) \(display.unit)"
+    }
+
 
     var body: some View {
         ZStack {
@@ -30,8 +39,8 @@ struct AlarmSettingsView: View {
 
                     VStack(spacing: 5) {
                         alarmRow(title: "Velocità risalita", threshold: "Usa limiti ASC SET", isOn: $ascentAlarmEnabled)
-                        alarmRow(title: "Profondità massima", threshold: "> \(Formatters.one(depthThresholdMeters)) m", isOn: $depthAlarmEnabled)
-                        thresholdStepper(title: "Soglia profondità", value: "\(Formatters.one(depthThresholdMeters)) m", color: DiveUI.blue) {
+                        alarmRow(title: "Profondità massima", threshold: "> \(depthThresholdLabel)", isOn: $depthAlarmEnabled)
+                        thresholdStepper(title: "Soglia profondità", value: depthThresholdLabel, color: DiveUI.blue) {
                             depthThresholdMeters = max(10, depthThresholdMeters - 1)
                         } increase: {
                             depthThresholdMeters = min(100, depthThresholdMeters + 1)
@@ -55,6 +64,7 @@ struct AlarmSettingsView: View {
                 .padding(.bottom, 8)
             }
         }
+        .navigationTitle("Allarmi")
     }
 
     private var header: some View {

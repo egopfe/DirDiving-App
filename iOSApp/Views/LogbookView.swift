@@ -10,6 +10,7 @@ struct LogbookView: View {
     @EnvironmentObject private var logStore: DiveLogStore
     @Environment(\.locale) private var locale
     @State private var search = ""
+    @State private var showManualDiveEditor = false
     private var filtered: [DiveSession] {
         search.isEmpty ? logStore.sessions : logStore.sessions.filter { ($0.siteName ?? "").localizedCaseInsensitiveContains(search) }
     }
@@ -85,6 +86,9 @@ struct LogbookView: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
+            .navigationDestination(isPresented: $showManualDiveEditor) {
+                ManualDiveEditorView()
+            }
         }
     }
 
@@ -99,10 +103,15 @@ struct LogbookView: View {
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                 Spacer()
-                Image(systemName: "plus")
-                    .font(.title3.weight(.medium))
-                    .foregroundStyle(DIRTheme.cyan.opacity(0.45))
-                    .accessibilityHidden(true)
+                Button {
+                    showManualDiveEditor = true
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.title3.weight(.medium))
+                        .foregroundStyle(DIRTheme.cyan)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text(String(localized: "manual_dive.add.title")))
                 Image(systemName: "ellipsis.circle")
                     .font(.title3.weight(.medium))
                     .foregroundStyle(DIRTheme.cyan.opacity(0.45))
@@ -151,6 +160,14 @@ struct DiveLogCard: View {
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
                         .lineLimit(1)
+                    if session.isManual {
+                        Text("MANUAL")
+                            .font(.system(size: 8, weight: .bold, design: .rounded))
+                            .foregroundStyle(DIRTheme.orange)
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 1)
+                            .overlay(RoundedRectangle(cornerRadius: 3).stroke(DIRTheme.orange, lineWidth: 1))
+                    }
                     if session.buddy != nil {
                         Text("BUDDY")
                             .font(.system(size: 8, weight: .bold, design: .rounded))

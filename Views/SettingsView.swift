@@ -289,22 +289,27 @@ struct SettingsView: View {
     }
 
     private var unitPreferenceControl: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        let preference = DIRUnitPreference.fromStorage(watchUnits)
+
+        return VStack(alignment: .leading, spacing: 6) {
             settingsRow(
                 icon: "ruler",
                 iconColor: .white,
                 title: String(localized: "Unità di misura"),
-                subtitle: String(localized: "Display Watch: metrico"),
+                subtitle: preference == .metric
+                    ? String(localized: "Display Watch: metrico")
+                    : String(localized: "Display Watch: imperiale"),
                 informational: true
             )
             Picker("Unità", selection: $watchUnits) {
-                Text("m").tag("metric")
+                Text("Metrico (m)").tag(DIRUnitPreference.metric.rawValue)
+                Text("Imperial (ft)").tag(DIRUnitPreference.imperial.rawValue)
             }
             .pickerStyle(.wheel)
             .tint(DiveUI.cyan)
-            Text(String(localized: "settings.units.imperial_note"))
+            Text(String(localized: "settings.units.sync_note"))
                 .font(.system(size: 9, weight: .semibold, design: .rounded))
-                .foregroundStyle(DiveUI.yellow)
+                .foregroundStyle(DiveUI.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.horizontal, 9)
@@ -314,10 +319,8 @@ struct SettingsView: View {
                 .fill(Color.black.opacity(0.52))
                 .overlay(RoundedRectangle(cornerRadius: 7, style: .continuous).stroke(.white.opacity(0.24), lineWidth: 1))
         )
-        .onAppear {
-            if watchUnits != "metric" {
-                watchUnits = "metric"
-            }
+        .onChange(of: watchUnits) { _, newValue in
+            watchSync.publishUnitsPreference(newValue)
         }
     }
 
