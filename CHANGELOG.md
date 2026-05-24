@@ -4,6 +4,72 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-20, documentation post v9 — `d962117`)
+
+- **Documentazione:** [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md) panoramica funzioni IT; README, INDEX, ROADMAP, matrice CSV (righe v8/v9); report [`DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md), [`DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md), [`PR_STATUS_20260520_POST_V9.md`](Docs/PR_STATUS_20260520_POST_V9.md).
+- **Baseline codice documentata:** v9 Watch surface User Images + Planner/Bühlmann input sync; v8 planner gas/equipment/MOD.
+- **Vincoli:** solo documentazione; nessuna modifica runtime in questo pass.
+
+### Added (2026-05-20, v9 — `d962117`)
+
+- **Watch:** tab User Images sempre disponibile fuori immersione attiva; empty state localizzato; dettaglio immagine `scaledToFit`.
+- **iOS:** `PlannerStore.applyInputToPlanningOutputs()` aggiorna plan + Bühlmann su cambio input gas; refresh su `plannerCylinders`.
+- **Report:** [`Docs/DIR_DIVING_v9_IMPLEMENTATION_REPORT.md`](Docs/DIR_DIVING_v9_IMPLEMENTATION_REPORT.md).
+
+### Added (2026-05-20, v8 planner gas — `a36dc23`)
+
+- **iOS:** cilindri multipli, ruoli gas, Air/EAN/Trimix, PPO₂ 0.1, MOD Dalton, equipment template GAS, foto→Watch con preprocess.
+- **Report:** [`Docs/DIR_DIVING_v8_IMPLEMENTATION_REPORT.md`](Docs/DIR_DIVING_v8_IMPLEMENTATION_REPORT.md).
+
+### Added (2026-05-24, MAIN readiness pass — build, i18n, copy, QA docs)
+
+- **Build (Watch):** `return` mancanti in `AscentRateSettingsView.limitControl` e `DiveLogListView.logRow`; `xcodegen` + build simulator Watch/iOS **SUCCEEDED**.
+- **i18n (solo copy):** Equipment e Planner iOS localizzati EN/IT; disclaimer lingua in More; settings Watch sync/underwater/shortcuts; empty state User Images.
+- **Planner:** avviso metrico onesto (`planner.units.metric_notice`); nessuna modifica calcoli/algoritmi gas/deco.
+- **Watch copy:** unità sync vs locale; toni audio non implementati (haptics); RESET cronometro immediato; impostazioni disabilitate in immersione (sicurezza).
+- **Documentazione:** [`Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md`](Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md), [`Docs/APP_INTENTS_DEVICE_QA_CHECKLIST.md`](Docs/APP_INTENTS_DEVICE_QA_CHECKLIST.md), [`Docs/WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md`](Docs/WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md); aggiornati playbook TestFlight e `Docs/INDEX.md`.
+- **Vincoli:** nessuna modifica experimental, algoritmi immersione, TTV, planner math, sync logic, UI graphics.
+
+### Added (2026-05-24, Watch control strategy — `72fa15b`)
+
+- **Watch controls:** strategia esplicita per Digital Crown, touch, App Intents / Action Button e tasto laterale system-controlled.
+- **Underwater UX:** Live resta pagina primaria durante immersione attiva; BUSSOLA resta raggiungibile; Settings e preferenze sono scoraggiate/bloccate durante immersione.
+- **Threshold tuning:** soglie allarmi e limiti risalita regolabili anche con Digital Crown, mantenendo i controlli touch.
+- **Bussola:** feedback inline localizzato per `SET BEARING` / `CLEAR`.
+- **Haptics:** conferme coerenti per start/end dive, stopwatch e bearing; warning safety esistenti invariati.
+- **Documentazione:** `WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md`, convenzioni Watch, README, ROADMAP e feature matrix aggiornati.
+- **Vincoli:** nessuna modifica a GPS, BUSSOLA algoritmica, calcoli profondita/risalita, decompressione, TTV, planner o modelli persistence.
+
+### Added (2026-05-24, readiness R2–R4 + UX audits — `62e25d5`, `db72dce`, `876bcd2`)
+
+- **iOS (`62e25d5`):** persistenza ack sicurezza planner (`PlannerSafetyAcknowledgment`); surfacing errori decode iCloud in Altro; localizzazione Logbook / Dettaglio / Analisi (chiavi `detail.*`, `logbook.*`, `analysis.*`, `cloud.*`).
+- **Watch + iOS (`db72dce`):** etichette gauge risalita imperiali; catalogo 7 App Shortcuts; help tasto laterale; refresh dettaglio dopo edit immersione manuale.
+- **Watch + iOS (`876bcd2`):** fix audit UX (edit manuale, merge metadata, disclaimer companion, conflitti sync, scroll legale, allarme 30 min, unità Live/Log, CSV in Analisi, ecc.).
+- **Documentazione:** audit complete readiness 20260520/20260524; aggiornamento matrice CSV e README post `bd129ca`.
+
+### Added (2026-05-24, development notes — `f851b61`)
+
+- **Codice (UI/sync only):** unità metriche/imperiali con sync Watch↔iOS; disclaimer companion ogni avvio; allarmi Watch (default 30 min, profondità in unità selezionate); marchio `altosinistra`; iOS Planner prima tab; immersioni manuali; checklist attrezzatura editabile; invio foto al Watch; planner safety ack in cima con campi disabilitati se OFF.
+- **Documentazione:** README, CSV feature matrix, `DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md`, allineamento branch/PR 2026-05-24.
+- **Vincoli:** nessuna modifica GPS, BUSSOLA, calcoli profondità/risalita/decompressione; storage metrico canonico invariato.
+
+### Added (2026-05-24, documentation alignment + MAIN readiness 100% UX)
+
+- Documentazione: README (pass `6cda004` depth limits + readiness 100% UX), CSV feature matrix, `DOCUMENTATION_UPDATE_REPORT_20260524.md`, aggiornamento branch alignment e PR status.
+- Codice UX (solo UI/i18n, nessun algoritmo): import CSV Logbook/More, tab planner funzionali, modalità planner onesta, export Watch informational, unità iOS metric-only, scroll legale obbligatorio, delete log senza contextMenu.
+- Audit e checklist: `MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523`, `TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523`.
+
+### Added (2026-05-23, depth limit safety — Watch)
+
+- Commit `6cda004`: UI/haptic/log per limiti operativi 35/38/40 m; onboarding depth-limits ack; revisione legale 2026-05-23.
+
+### Added (2026-05-23, production readiness MAIN — code + docs)
+
+- Pass production readiness su `main` (`5e595ee`): product name build interni, iOS→Watch session push, UI conflitti sync in More, i18n Settings/live/Planner/import, planner safety ack, auto-skip Mode Selection, tab User Images condizionale, righe Settings informative.
+- `Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md` — report finale A–K (~92% readiness post-pass).
+- Allineamento documentale: CSV feature matrix, README, ROADMAP, PR status, branch alignment 2026-05-23.
+- Vincoli: nessuna modifica a GPS, BUSSOLA, calcoli profondità/risalita, decompressione, planner math, crypto sync.
+
 ### Added (2026-05-22, legal onboarding + docs alignment)
 
 - Flusso onboarding legale first-launch su Watch e iOS: Welcome, Safety Warning, Legal Disclaimer, Acceptance.
