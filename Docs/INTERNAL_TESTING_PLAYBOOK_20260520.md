@@ -281,6 +281,15 @@ Pool or controlled shallow test is enough for **internal** validation.
 
 ---
 
+## Device QA checklists (2026-05-24)
+
+| Doc | Use for |
+|-----|---------|
+| [`WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md`](WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md) | Watch↔iPhone sync, conflicts, tombstones, units context, pairing |
+| [`APP_INTENTS_DEVICE_QA_CHECKLIST.md`](APP_INTENTS_DEVICE_QA_CHECKLIST.md) | Seven Watch App Intents on hardware + Action Button mapping |
+
+---
+
 ## Related docs
 
 | Doc | Use for |

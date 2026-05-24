@@ -192,7 +192,7 @@ struct MoreView: View {
             Text(selectedLanguage.companionDetail)
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.yellow)
-            Text("Changing language does not change units, calculations or saved data.")
+            Text(String(localized: "more.language.units_disclaimer"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)

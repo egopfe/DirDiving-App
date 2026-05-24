@@ -51,7 +51,7 @@ struct AscentRateSettingsView: View {
         let upper = unitPreference == .metric ? 20.0 : 65.0
         let step = unitPreference == .metric ? 0.5 : 1.0
 
-        DivePanel(stroke: accent) {
+        return DivePanel(stroke: accent) {
             HStack(spacing: 8) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)

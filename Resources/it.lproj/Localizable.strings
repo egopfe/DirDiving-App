@@ -297,7 +297,7 @@
 "settings.sync.clear.confirm.action" = "Cancella coda";
 "settings.sync.clear.confirm.message" = "Rimuove i trasferimenti Watch in attesa o falliti. Le immersioni gia salvate sul Watch restano nel log locale.";
 "settings.display.watchos" = "Gestito da watchOS";
-"settings.audio.info" = "Non usati sott'acqua; feedback via vibrazione";
+"settings.audio.info" = "Toni audio non implementati; sott'acqua solo vibrazione.";
 "settings.manual.fallback" = "Fallback solo se sensore non disponibile";
 "settings.manual.live" = "Disponibile su schermata live";
 "settings.haptics.on" = "Attiva per warning e conferme";
@@ -309,10 +309,17 @@
 "live.stopwatch.start.a11y" = "Avvia cronometro";
 "live.stopwatch.stop.a11y" = "Ferma cronometro";
 "live.stopwatch.reset.a11y" = "Reset cronometro";
+"live.stopwatch.reset.hint" = "Reset immediato; usalo con intenzione.";
 "ascent.gauge.a11y" = "Gauge velocita di risalita";
 "ascent.gauge.a11y.value_format" = "Scala fino a %@ %@. Indicatore a %@ %@.";
 "settings.underwater.title" = "Modifica in superficie";
-"settings.underwater.body" = "Immersione attiva: Live e Bussola restano primarie. Cambia soglie e preferenze in superficie.";
+"settings.underwater.body" = "Durante immersione attiva la modifica impostazioni e disabilitata per sicurezza. Live e Bussola restano primarie; modifica soglie in superficie.";
+"settings.sync.settings_scope" = "Le unita si sincronizzano con iPhone se accoppiati. Allarmi, vibrazione e lingua restano su questo Watch.";
+"settings.language.scope_note" = "La lingua e locale su questo Watch. Le unita si sincronizzano se accoppiati; allarmi e vibrazione no.";
+"settings.shortcuts.action_title" = "Azione / Comandi";
+"settings.shortcuts.action_subtitle" = "Mappa intent DIR DIVING in Comandi watchOS o Action Button; l'app non intercetta il tasto laterale.";
+"user_images.empty.title" = "NESSUNA IMMAGINE";
+"user_images.empty.body" = "Nessuna schermata o immagine di riferimento e inclusa in questa build.";
 "shortcuts.help.crown.title" = "Digital Crown";
 "shortcuts.help.crown.body" = "Usa la Crown per navigazione pagine, scroll e regolazione soglie allarmi o risalita. I controlli touch restano disponibili.";
 "shortcuts.help.touch.title" = "Touch";
@@ -320,7 +327,7 @@
 "shortcuts.help.underwater.title" = "Sott'acqua";
 "shortcuts.help.underwater.body" = "Durante l'immersione Live resta primaria e Bussola resta raggiungibile. Le impostazioni sono pensate per la superficie.";
 "shortcuts.help.stopwatch.title" = "Cronometro";
-"shortcuts.help.stopwatch.body" = "Avvia/ferma e resetta il cronometro tramite Comandi Rapidi o Action Button quando watchOS elenca gli intent DIR DIVING.";
+"shortcuts.help.stopwatch.body" = "Avvia/ferma cronometro via Comandi o Action Button quando elencati. RESET e immediato — usalo con intenzione.";
 "shortcuts.help.reset.title" = "Reset";
 "shortcuts.help.reset.body" = "Il reset cronometro e un comando separato quando il sistema lo espone.";
 "shortcuts.help.bearing.title" = "Bussola";

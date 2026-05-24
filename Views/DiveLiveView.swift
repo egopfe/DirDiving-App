@@ -545,6 +545,7 @@ struct DiveLiveView: View {
                     dive.resetStopwatch()
                 }
                 .accessibilityLabel(String(localized: "live.stopwatch.reset.a11y"))
+                .accessibilityHint(String(localized: "live.stopwatch.reset.hint"))
             }
             if dive.isManualLifecycleActive {
                 DiveCommandButton(String(localized: "FINE MANUALE"), systemImage: "stop.circle.fill", color: DiveUI.red) {

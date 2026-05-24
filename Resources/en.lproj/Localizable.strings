@@ -297,7 +297,7 @@
 "settings.sync.clear.confirm.action" = "Clear queue";
 "settings.sync.clear.confirm.message" = "Removes pending or failed Watch transfers. Saved dives remain in the local log.";
 "settings.display.watchos" = "Managed by watchOS";
-"settings.audio.info" = "Not used underwater; feedback via haptics";
+"settings.audio.info" = "Audio tones are not implemented; underwater feedback uses haptics only.";
 "settings.manual.fallback" = "Fallback when sensor unavailable";
 "settings.manual.live" = "Available on live screen";
 "settings.haptics.on" = "Active for warnings and confirmations";
@@ -309,10 +309,17 @@
 "live.stopwatch.start.a11y" = "Start stopwatch";
 "live.stopwatch.stop.a11y" = "Stop stopwatch";
 "live.stopwatch.reset.a11y" = "Reset stopwatch";
+"live.stopwatch.reset.hint" = "Resets immediately; use intentionally.";
 "ascent.gauge.a11y" = "Ascent rate gauge";
 "ascent.gauge.a11y.value_format" = "Scale up to %@ %@. Indicator at %@ %@.";
 "settings.underwater.title" = "Edit on surface";
-"settings.underwater.body" = "Active dive: Live and Compass stay primary. Change thresholds and preferences on the surface.";
+"settings.underwater.body" = "During an active dive, settings editing is disabled for safety. Live and Compass stay primary; change thresholds on the surface.";
+"settings.sync.settings_scope" = "Units sync to iPhone when paired. Alarms, haptics, and language stay on this Watch.";
+"settings.language.scope_note" = "Language is local to this Watch. Units sync when paired; alarms and haptics do not.";
+"settings.shortcuts.action_title" = "Action / Commands";
+"settings.shortcuts.action_subtitle" = "Map DIR DIVING intents in watchOS Shortcuts or Action Button; the app cannot intercept the Side Button.";
+"user_images.empty.title" = "NO IMAGES";
+"user_images.empty.body" = "No reference screens or images are included in this build. Add assets in a future update if needed.";
 "shortcuts.help.crown.title" = "Digital Crown";
 "shortcuts.help.crown.body" = "Use Crown for page navigation, scrolling, and tuning alarm or ascent-rate thresholds. Touch controls remain available.";
 "shortcuts.help.touch.title" = "Touch";
@@ -320,7 +327,7 @@
 "shortcuts.help.underwater.title" = "Underwater";
 "shortcuts.help.underwater.body" = "During an active dive, Live remains primary and Compass stays reachable. Settings are intended for surface use.";
 "shortcuts.help.stopwatch.title" = "Stopwatch";
-"shortcuts.help.stopwatch.body" = "Toggle and reset stopwatch via Shortcuts or Action Button when watchOS lists DIR DIVING intents.";
+"shortcuts.help.stopwatch.body" = "Toggle stopwatch via Shortcuts or Action Button when listed. RESET is immediate — use intentionally.";
 "shortcuts.help.reset.title" = "Reset";
 "shortcuts.help.reset.body" = "Reset stopwatch is a separate shortcut when the system exposes it.";
 "shortcuts.help.bearing.title" = "Compass bearing";

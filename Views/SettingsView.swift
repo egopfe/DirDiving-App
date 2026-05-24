@@ -80,7 +80,7 @@ struct SettingsView: View {
                         icon: "iphone.slash",
                         iconColor: DiveUI.yellow,
                         title: String(localized: "Sync impostazioni"),
-                        subtitle: String(localized: "Locale a questo dispositivo; sync bidirezionale planned"),
+                        subtitle: String(localized: "settings.sync.settings_scope"),
                         informational: true
                     )
                     statusRow(
@@ -196,8 +196,8 @@ struct SettingsView: View {
                         settingsRow(
                             icon: "button.programmable",
                             iconColor: DiveUI.cyan,
-                            title: "Azione / Comandi",
-                            subtitle: "Setup shortcut se supportato",
+                            title: String(localized: "settings.shortcuts.action_title"),
+                            subtitle: String(localized: "settings.shortcuts.action_subtitle"),
                             showsChevron: true
                         )
                     }
@@ -288,7 +288,7 @@ struct SettingsView: View {
                 .font(.system(size: 9, weight: .semibold, design: .rounded))
                 .foregroundStyle(DiveUI.yellow)
                 .fixedSize(horizontal: false, vertical: true)
-            Text("Changing language does not change units, calculations or saved data.")
+            Text(String(localized: "settings.language.scope_note"))
                 .font(.system(size: 9, weight: .semibold, design: .rounded))
                 .foregroundStyle(DiveUI.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)

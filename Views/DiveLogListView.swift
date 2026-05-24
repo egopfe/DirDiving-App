@@ -210,7 +210,7 @@ struct DiveLogListView: View {
             meters: session.maxDepthMeters,
             units: DIRUnitPreference.fromStorage(watchUnits)
         )
-        HStack(spacing: 4) {
+        return HStack(spacing: 4) {
             NavigationLink {
                 DiveDetailView(session: session)
             } label: {

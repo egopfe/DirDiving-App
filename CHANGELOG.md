@@ -4,6 +4,15 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-24, MAIN readiness pass — build, i18n, copy, QA docs)
+
+- **Build (Watch):** `return` mancanti in `AscentRateSettingsView.limitControl` e `DiveLogListView.logRow`; `xcodegen` + build simulator Watch/iOS **SUCCEEDED**.
+- **i18n (solo copy):** Equipment e Planner iOS localizzati EN/IT; disclaimer lingua in More; settings Watch sync/underwater/shortcuts; empty state User Images.
+- **Planner:** avviso metrico onesto (`planner.units.metric_notice`); nessuna modifica calcoli/algoritmi gas/deco.
+- **Watch copy:** unità sync vs locale; toni audio non implementati (haptics); RESET cronometro immediato; impostazioni disabilitate in immersione (sicurezza).
+- **Documentazione:** [`Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md`](Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md), [`Docs/APP_INTENTS_DEVICE_QA_CHECKLIST.md`](Docs/APP_INTENTS_DEVICE_QA_CHECKLIST.md), [`Docs/WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md`](Docs/WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md); aggiornati playbook TestFlight e `Docs/INDEX.md`.
+- **Vincoli:** nessuna modifica experimental, algoritmi immersione, TTV, planner math, sync logic, UI graphics.
+
 ### Added (2026-05-24, Watch control strategy — `72fa15b`)
 
 - **Watch controls:** strategia esplicita per Digital Crown, touch, App Intents / Action Button e tasto laterale system-controlled.

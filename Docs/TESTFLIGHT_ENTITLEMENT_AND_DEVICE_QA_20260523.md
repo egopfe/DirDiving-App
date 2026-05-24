@@ -44,7 +44,23 @@
 | Offline | Airplane mode dive on Watch; sync completes when both online |
 | Tombstone | Delete on one side respects tombstone on other (playbook Phase 3) |
 
-Playbook: [`INTERNAL_TESTING_PLAYBOOK_20260520.md`](INTERNAL_TESTING_PLAYBOOK_20260520.md)
+Playbook: [`INTERNAL_TESTING_PLAYBOOK_20260520.md`](INTERNAL_TESTING_PLAYBOOK_20260520.md)  
+Detailed checklist: [`WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md`](WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md)
+
+---
+
+## 2b. App Intents (Watch hardware)
+
+| Check | Pass criteria |
+|-------|----------------|
+| Shortcuts visibility | DIR DIVING intents listed in watchOS Shortcuts |
+| Toggle / reset stopwatch | Live stopwatch responds |
+| Manual dive start/end | Session state changes on Live |
+| Bearing set/clear | Compass bearing updates |
+| Acknowledge alarm | Banner dismisses when alarm active |
+| Action Button | User-mapped intent runs (app cannot bind Side Button directly) |
+
+Checklist: [`APP_INTENTS_DEVICE_QA_CHECKLIST.md`](APP_INTENTS_DEVICE_QA_CHECKLIST.md)
 
 ---
 

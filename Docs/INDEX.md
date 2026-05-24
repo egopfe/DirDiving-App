@@ -1,7 +1,7 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-05-24  
-**Branch consigliato:** `main` @ `8a4d10e` (dopo `git pull`)  
+**Branch consigliato:** `main` (dopo `git pull`; ultimo pass readiness UX/i18n/build)  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.
 
 ---
@@ -40,10 +40,11 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | Lista log Watch in `m` fisso | `Views/DiveLogListView.swift` |
 | Profondità bussola in `m` fisso | `Views/CompassView.swift` |
 | Logbook iOS card in `m` fisso | `iOSApp/Views/LogbookView.swift` |
-| Planner metric-only vs unità globali | `iOSApp/Views/PlannerView.swift` |
+| Planner metric-only vs unità globali | `iOSApp/Views/PlannerView.swift` — **copy onesta** aggiunta (`planner.units.metric_notice`); calcoli restano metrici |
 | Copy unità obsolete | `iOSApp/Resources/*.lproj/Localizable.strings` |
+| Build opaque return (Watch) | `Views/AscentRateSettingsView.swift`, `Views/DiveLogListView.swift` — **risolto** (pass 2026-05-24) |
 
-> **Nota locale macOS:** il commit `8a4d10e` (*fix: address main readiness audit blockers*) segue l’audit e può aver chiuso parte di questi punti — confrontare il codice dopo il pull.
+> **Nota:** commit `8a4d10e` + pass successivo: build simulator Watch/iOS verde; i18n Equipment/Planner; checklist device QA in §6.
 
 **Audit readiness precedenti (storico):**
 
@@ -89,7 +90,9 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524_CURRENT_PRE_MODIFICATION.md`](MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524_CURRENT_PRE_MODIFICATION.md) | **Audit UX/interaction/accessibilità PRE-MOD** @ `8a4d10e` (`.docx` omonimo) |
 | [`MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524.md`](MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524.md) | Audit UX/a11y precedente (`.docx` omonimo) |
 | [`MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523.md`](MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523.md) | Audit precedente |
-| [`MAIN_BRANCH_FINAL_READINESS_REPORT.md`](MAIN_BRANCH_FINAL_READINESS_REPORT.md) | Report readiness 100% UX |
+| [`MAIN_BRANCH_FINAL_READINESS_REPORT.md`](MAIN_BRANCH_FINAL_READINESS_REPORT.md) | **Report finale** pass readiness ~94% (build, i18n, copy, QA docs; device-only residui) |
+| [`APP_INTENTS_DEVICE_QA_CHECKLIST.md`](APP_INTENTS_DEVICE_QA_CHECKLIST.md) | QA hardware: 7 App Intents + Action Button |
+| [`WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md`](WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md) | QA hardware: sync, conflitti, tombstone, unità |
 | [`MAIN_BRANCH_TARGETED_FIX_REPORT.md`](MAIN_BRANCH_TARGETED_FIX_REPORT.md) | Fix `db72dce` (gauge, intents, detail) |
 | [`MAIN_ISSUES_IMPLEMENTATION_REPORT_20260520.md`](MAIN_ISSUES_IMPLEMENTATION_REPORT_20260520.md) | Implementazione issue backlog |
 | [`MAIN_BRANCH_ISSUES_AND_PRIORITIES_20260520.md`](MAIN_BRANCH_ISSUES_AND_PRIORITIES_20260520.md) | Priorità issue |
@@ -126,7 +129,9 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) | Checklist release |
 | [`SAFETY_DISCLAIMER.md`](SAFETY_DISCLAIMER.md) | Disclaimer (root Docs) |
 | [`SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md`](SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md) | Audit security F1–F12 |
-| [`INTERNAL_TESTING_PLAYBOOK_20260520.md`](INTERNAL_TESTING_PLAYBOOK_20260520.md) | QA interno sync/tombstone |
+| [`INTERNAL_TESTING_PLAYBOOK_20260520.md`](INTERNAL_TESTING_PLAYBOOK_20260520.md) | QA interno giornaliero; link checklist device |
+| [`APP_INTENTS_DEVICE_QA_CHECKLIST.md`](APP_INTENTS_DEVICE_QA_CHECKLIST.md) | App Intents su Watch fisico |
+| [`WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md`](WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md) | Sync Watch↔iPhone su hardware |
 | [`MAIN_PRE_RELEASE_SIMULATOR_QA_20260519.md`](MAIN_PRE_RELEASE_SIMULATOR_QA_20260519.md) | QA simulatore |
 
 ---

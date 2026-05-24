@@ -58,6 +58,15 @@ Senza modifiche a GPS, BUSSOLA, calcoli profondità/risalita, TTV, planner/Bühl
 
 Report: [`Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md`](Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md) · Audit UX: [`Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523.md`](Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523.md) · TestFlight esterno: [`Docs/TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](Docs/TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md).
 
+### Pass MAIN readiness ~94% (2026-05-24, build + i18n + copy)
+
+Senza modifiche ad algoritmi, sync logic o UI graphics:
+
+- **Build:** fix compile Watch (`AscentRateSettingsView`, `DiveLogListView`); simulator Watch + iOS green.
+- **Copy/i18n:** planner metric notice; Equipment/Planner EN/IT; settings Watch sync scope; device QA checklists App Intents e sync.
+
+Indice: [`Docs/INDEX.md`](Docs/INDEX.md) · Report: [`Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md`](Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md) · QA device: [`Docs/APP_INTENTS_DEVICE_QA_CHECKLIST.md`](Docs/APP_INTENTS_DEVICE_QA_CHECKLIST.md), [`Docs/WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md`](Docs/WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md).
+
 ### Pass note sviluppo branch MAIN (`f851b61`, 2026-05-24)
 
 Implementazione di [`Docs/DIR_Diving_Main_Branch_Development_Notes.md`](Docs/DIR_Diving_Main_Branch_Development_Notes.md) — wiring UI e sync; **nessuna** modifica ad algoritmi GPS, **BUSSOLA**, profondità/risalita, decompressione o TTV business. Lo storage canonico resta metrico; le unità imperiali sono di **presentazione** e export CSV Subsurface resta in metri.
