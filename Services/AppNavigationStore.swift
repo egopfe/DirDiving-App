@@ -13,4 +13,16 @@ final class AppNavigationStore: ObservableObject {
             selectedPage = .live
         }
     }
+
+    /// Keeps `TabView` selection valid when optional pages (e.g. User Images) are removed from the hierarchy.
+    func clampSelectedPage(userImagesAvailable: Bool) {
+        if selectedPage == .userImages, !userImagesAvailable {
+            selectedPage = .live
+        }
+        if selectedPage == .modeSelection,
+           WatchModeSelectionPreferences.skipWhenSingleMode,
+           !WatchModeSelectionPreferences.hasMultipleStableModes {
+            selectedPage = .live
+        }
+    }
 }

@@ -26,6 +26,12 @@ struct ContentView: View {
                 .tag(AppPage.diveLog)
         }
         .tabViewStyle(.verticalPage)
+        .onAppear {
+            navigation.clampSelectedPage(userImagesAvailable: !imageStore.imageNames.isEmpty)
+        }
+        .onChange(of: imageStore.imageNames) { _, names in
+            navigation.clampSelectedPage(userImagesAvailable: !names.isEmpty)
+        }
         .onChange(of: dive.isDiveActive) { _, isActive in
             if isActive {
                 navigation.selectedPage = .live

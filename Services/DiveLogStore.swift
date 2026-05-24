@@ -81,11 +81,11 @@ final class DiveLogStore: ObservableObject {
 
     func delete(at offsets: IndexSet) {
         var removed: Set<UUID> = []
-        for index in offsets {
+        for index in offsets.sorted(by: >) where sessions.indices.contains(index) {
             removed.insert(sessions[index].id)
             deletedSessionIDs.insert(sessions[index].id)
+            sessions.remove(at: index)
         }
-        sessions.remove(atOffsets: offsets)
         save()
         if !removed.isEmpty {
             WatchSyncService.shared.publishDeletedSessionIDs(removed)

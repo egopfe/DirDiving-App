@@ -16,6 +16,11 @@ struct UserImagesView: View {
             }
         }
         .onAppear { imageStore.reload() }
+        .onChange(of: imageStore.imageNames) { _, names in
+            if let selectedName, !names.contains(selectedName) {
+                self.selectedName = nil
+            }
+        }
     }
 
     private var imageList: some View {
