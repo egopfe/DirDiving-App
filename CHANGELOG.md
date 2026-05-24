@@ -4,6 +4,13 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-24, readiness R2–R4 + UX audits — `62e25d5`, `db72dce`, `876bcd2`)
+
+- **iOS (`62e25d5`):** persistenza ack sicurezza planner (`PlannerSafetyAcknowledgment`); surfacing errori decode iCloud in Altro; localizzazione Logbook / Dettaglio / Analisi (chiavi `detail.*`, `logbook.*`, `analysis.*`, `cloud.*`).
+- **Watch + iOS (`db72dce`):** etichette gauge risalita imperiali; catalogo 7 App Shortcuts; help tasto laterale; refresh dettaglio dopo edit immersione manuale.
+- **Watch + iOS (`876bcd2`):** fix audit UX (edit manuale, merge metadata, disclaimer companion, conflitti sync, scroll legale, allarme 30 min, unità Live/Log, CSV in Analisi, ecc.).
+- **Documentazione:** audit complete readiness 20260520/20260524; aggiornamento matrice CSV e README post `bd129ca`.
+
 ### Added (2026-05-24, development notes — `f851b61`)
 
 - **Codice (UI/sync only):** unità metriche/imperiali con sync Watch↔iOS; disclaimer companion ogni avvio; allarmi Watch (default 30 min, profondità in unità selezionate); marchio `altosinistra`; iOS Planner prima tab; immersioni manuali; checklist attrezzatura editabile; invio foto al Watch; planner safety ack in cima con campi disabilitati se OFF.

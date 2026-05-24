@@ -229,3 +229,21 @@ Documentation,main,All,All,Development notes implementation f851b61,Implemented,
 Documentation,main,All,All,DOCUMENTATION_BRANCH_ALIGNMENT_20260524,Implemented,Allineamento branch post f851b61.,Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260524.md,Nessun merge PR automatico.,it
 Pull Requests,PR #8,Apple Watch,Experimental merge,Status 2026-05-24,TODO,CONFLICTING vs main @ f851b61.,https://github.com/egopfe/DirDiving-App/pull/8,Non auto-merge.,n/a
 Pull Requests,PR #9,iOS,Experimental merge,Status 2026-05-24,TODO,CONFLICTING vs main-iOS.,https://github.com/egopfe/DirDiving-App/pull/9,Ripristinare F4/F5 da main.,n/a
+UX,main,iOS,Companion,Manual dive edit from detail,Implemented,Modifica immersione manuale da DiveDetailView; refresh dopo save.,ios_dive_detail_reference.png,876bcd2; sessionID + onChange logStore.,"it, en manual_dive.*"
+UX,main,iOS,Sync,Merge preserves manual metadata,Implemented,DiveSessionMerge mantiene site/buddy/notes/pressures manuali su sync.,n/a,876bcd2; no algorithm change.,n/a
+UX,main,iOS,Planner,Remove mock ascent row,Implemented,Rimossa riga risalita mock da PlanResultView.,ios_plan_result_reference.png,876bcd2; planner math invariato.,it, en
+UX,main,Watch + iOS,All,Companion disclaimer persistence,Implemented,CompanionDisclaimerAcceptance revision 2026-05-24.,MASTER_REFERENCE_DIVING_LIVE.png,876bcd2; overlay ogni cold launch.,"it, en launch.companion_disclaimer.*"
+UX,main,iOS,Companion,Cloud sync conflict re-push,Implemented,Keep local re-pushes session after conflict resolution.,iOS_look_feel.png,876bcd2.,it, en
+UX,main,Apple Watch,Diving,Ascent gauge imperial labels,Implemented,Gauge e banner risalita mostrano ft/min quando unita imperiali.,MASTER_REFERENCE_DIVING_LIVE.png,db72dce; calcolo interno m/min.,"it, en"
+UX,main,Apple Watch,Settings,App Shortcuts catalog (7 intents),Implemented,DIRDivingAppShortcuts: stopwatch dive bearing alarm acknowledge.,settings_from_workflow.png,db72dce; side button via Shortcuts only.,"it, en"
+UX,main,Apple Watch,Settings,Shortcut help copy,Implemented,WatchShortcutHelpView in Settings.,settings_from_workflow.png,db72dce; TESTFLIGHT_REVIEW_NOTES allineato.,it, en
+UX,main,iOS,Companion,Dive detail refresh after manual edit,Implemented,onChange logStore.sessions aggiorna dettaglio.,ios_dive_detail_reference.png,db72dce.,it, en
+UX,main,iOS,Planner,Planner safety ack persisted,Implemented,PlannerSafetyAcknowledgment @AppStorage revision 2026-05-24.,ios_planner_reference.png,62e25d5; sostituisce session-only State.,it, en planner.safety_ack.*
+UX,main,iOS,More,iCloud decode error surfacing,Implemented,lastDecodeError in CloudSyncStore + UI arancione in Altro.,iOS_look_feel.png,62e25d5; clear prima di Sincronizza ora.,it, en cloud.*
+UX,main,iOS,Companion,Logbook detail analysis localization,Implemented,String(localized) per tab/metriche/empty/export su Logbook Detail Analysis.,iOS_look_feel.png,62e25d5 R4; Planner/Equipment parziale.,it, en detail.* analysis.* logbook.*
+Documentation,main,All,All,MAIN complete readiness audit 20260520,Implemented,Audit A-O compile UX safety; docx generator.,Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260520.md,62e25d5.,it, en
+Documentation,main,All,All,MAIN UX accessibility audit 20260524,Implemented,Audit interazione accessibilita post-fix.,Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524.md,8a87461+876bcd2 context.,it, en
+Documentation,main,All,All,DOCUMENTATION_UPDATE post bd129ca,Implemented,README CHANGELOG ROADMAP CSV alignment PR status.,Docs/DOCUMENTATION_UPDATE_REPORT_20260524.md,Pass documentazione 2026-05-24.,it
+UX,main,Apple Watch,Diving,Log list depth unit display,Planned,Lista log max depth hardcoded m dopo commit 3b7358b.,dive_log_from_workflow.png,Regressione vs unit preference; TODO restore WatchDepthFormatting.,it, en
+Pull Requests,PR #8,Apple Watch,Experimental merge,Status bd129ca,TODO,CONFLICTING vs main @ bd129ca.,https://github.com/egopfe/DirDiving-App/pull/8,Non auto-merge; preservare project.yml excludes.,n/a
+Pull Requests,PR #9,iOS,Experimental merge,Status bd129ca,TODO,CONFLICTING vs main-iOS.,https://github.com/egopfe/DirDiving-App/pull/9,Ripristinare F4/F5 da main prima merge.,n/a

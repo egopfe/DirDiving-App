@@ -1,6 +1,6 @@
 # Allineamento branch documentazione (2026-05-24)
 
-**Baseline `main`:** `f851b61` — `feat(main): implement development notes across Watch and iOS companion.`  
+**Baseline `main`:** `bd129ca` — merge post `62e25d5` (readiness R2–R4), `db72dce`, `876bcd2`.  
 **Fetch:** `origin` aggiornato in questo pass. **Nessun force-push.** **Nessun merge PR automatico.**
 
 ---
@@ -9,7 +9,7 @@
 
 | Branch | HEAD | Divergenza vs `main` (rev-list) | Azione documentazione |
 |--------|------|----------------------------------|------------------------|
-| `main` | `f851b61` | — | Sorgente canonica Watch+iOS unificato |
+| `main` | `bd129ca` | — | Sorgente canonica Watch+iOS unificato |
 | `main-iOS` | `3994b33` | ~172 behind / ~44 ahead | Sync **solo** file docs da `main` (commit dedicato) |
 | `origin/codex/experimental-features` | `6649335` | ~36 behind / ~28 ahead | Mantenere doc experimental; non merge in `main` |
 | `origin/codex/ios-experimental-features` | `9e5baca` | vs `main-iOS` | Mantenere Explore Lab isolato |
@@ -50,8 +50,17 @@ Dettaglio: [`PR_STATUS_20260524.md`](PR_STATUS_20260524.md).
 
 ## E. Commit suggeriti (questo pass)
 
-1. `main`: `docs: update feature matrix and branch alignment post f851b61`
-2. `main-iOS`: `docs: sync documentation from main @ f851b61`
+1. `main`: `docs: update feature matrix and branch alignment post bd129ca`
+2. `main-iOS`: `docs: sync documentation from main @ bd129ca`
+
+## F. Chiusura readiness audit (R2–R4)
+
+| ID | Stato su `main` @ `62e25d5`+ |
+|----|------------------------------|
+| R2 Planner ack persistito | ✅ `PlannerSafetyAcknowledgment` |
+| R3 iCloud decode UI | ✅ `CloudSyncStore.lastDecodeError` |
+| R4 i18n Logbook/Detail/Analysis | 🟡 Parziale; Planner/Equipment aperti |
+| R1 Ultra depth QA | ⏳ Hardware / entitlement — vedi TESTFLIGHT_ENTITLEMENT doc |
 
 ---
 
