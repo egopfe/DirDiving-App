@@ -10,9 +10,9 @@ enum DiveDetailTab: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .summary: String(localized: "RIEPILOGO")
-        case .charts: String(localized: "GRAFICI")
-        case .details: String(localized: "DETTAGLI")
+        case .summary: String(localized: "detail.tab.summary")
+        case .charts: String(localized: "detail.tab.charts")
+        case .details: String(localized: "detail.tab.details")
         }
     }
 }
@@ -116,13 +116,13 @@ struct DiveDetailView: View {
                 .frame(width: 82, height: 82)
             VStack(alignment: .leading, spacing: 7) {
                 HStack(spacing: 6) {
-                    Text(session.siteName ?? "Immersione")
+                    Text(session.siteName ?? String(localized: "detail.default_site"))
                         .font(.system(size: 17, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.78)
                     if session.buddy != nil {
-                        Text("BUDDY")
+                        Text(String(localized: "detail.buddy.badge"))
                             .font(.system(size: 8, weight: .bold, design: .rounded))
                             .foregroundStyle(DIRTheme.yellow)
                             .padding(.horizontal, 4)
@@ -152,11 +152,11 @@ struct DiveDetailView: View {
     private var metricGrid: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
-                detailMetric("Tempo", value: Formatters.time(session.durationSeconds), unit: "min")
+                detailMetric(String(localized: "detail.metric.duration"), value: Formatters.time(session.durationSeconds), unit: "min")
                 Divider().overlay(DIRTheme.hairline)
-                detailMetric("Max Profondita", measurement: Formatters.depth(session.maxDepthMeters, units: unitPreference))
+                detailMetric(String(localized: "detail.metric.max_depth"), measurement: Formatters.depth(session.maxDepthMeters, units: unitPreference))
                 Divider().overlay(DIRTheme.hairline)
-                detailMetric("Prof. Media", measurement: Formatters.depth(session.avgDepthMeters, units: unitPreference))
+                detailMetric(String(localized: "detail.metric.avg_depth"), measurement: Formatters.depth(session.avgDepthMeters, units: unitPreference))
             }
             Divider().overlay(DIRTheme.hairline)
             HStack(spacing: 0) {
@@ -180,7 +180,7 @@ struct DiveDetailView: View {
     private var exceededDepthLogBanner: some View {
         HStack(spacing: 8) {
             Image(systemName: "exclamationmark.octagon.fill")
-            Text(String(localized: "Outside supported operating range"))
+            Text(String(localized: "depth.safety.log.outside_range"))
                 .font(.system(size: 13, weight: .bold, design: .rounded))
         }
         .foregroundStyle(DIRTheme.red)
@@ -194,7 +194,7 @@ struct DiveDetailView: View {
     }
 
     private var ttvSafetyNote: some View {
-        Text("TTV: metrica informativa derivata da profondita media e durata. Non e NDL, TTS o guida decompressiva certificata.")
+        Text(String(localized: "detail.ttv.note"))
             .font(.caption2.weight(.semibold))
             .foregroundStyle(DIRTheme.yellow)
             .fixedSize(horizontal: false, vertical: true)
@@ -206,7 +206,7 @@ struct DiveDetailView: View {
     private var depthChart: some View {
         VStack(alignment: .leading, spacing: 9) {
             HStack {
-                Text("PROFONDITA")
+                Text(String(localized: "detail.chart.depth_title"))
                     .font(.system(size: 11, weight: .bold, design: .rounded))
                     .tracking(0.7)
                     .foregroundStyle(DIRTheme.cyan)
@@ -249,8 +249,14 @@ struct DiveDetailView: View {
                 )
         )
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Grafico profilo profondita")
-        .accessibilityValue("Profondita massima \(Formatters.depth(session.maxDepthMeters, units: unitPreference).text), durata \(Formatters.time(session.durationSeconds)) minuti")
+        .accessibilityLabel(String(localized: "detail.chart.depth_a11y"))
+        .accessibilityValue(
+            String(
+                format: String(localized: "detail.chart.depth_a11y_value"),
+                Formatters.depth(session.maxDepthMeters, units: unitPreference).text,
+                Formatters.time(session.durationSeconds)
+            )
+        )
     }
 
     private var gasBlock: some View {
@@ -292,10 +298,10 @@ struct DiveDetailView: View {
         VStack(alignment: .leading, spacing: 5) {
             Text(title)
                 .font(.system(size: 10, weight: .medium, design: .rounded))
-                .foregroundStyle(title == "Pressioni" ? DIRTheme.yellow : DIRTheme.muted)
+                .foregroundStyle(title == String(localized: "detail.gas.pressures") ? DIRTheme.yellow : DIRTheme.muted)
             HStack(alignment: .lastTextBaseline, spacing: 3) {
                 Text(value)
-                    .font(.system(size: title == "Pressioni" ? 14 : 20, weight: .semibold, design: .rounded))
+                    .font(.system(size: title == String(localized: "detail.gas.pressures") ? 14 : 20, weight: .semibold, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(color)
                 if let unit {
@@ -341,18 +347,18 @@ struct DiveDetailView: View {
     @ViewBuilder
     private var sacMetric: some View {
         if let sac = session.sacLitersMinute {
-            detailMetric("SAC", measurement: Formatters.sac(sac, units: unitPreference))
+            detailMetric(String(localized: "detail.metric.sac"), measurement: Formatters.sac(sac, units: unitPreference))
         } else {
-            detailMetric("SAC", value: "—", valueColor: DIRTheme.yellow)
+            detailMetric(String(localized: "detail.metric.sac"), value: "—", valueColor: DIRTheme.yellow)
         }
     }
 
     @ViewBuilder
     private var temperatureMetric: some View {
         if let temperature = session.avgWaterTemperatureCelsius {
-            detailMetric("Temperatura", measurement: Formatters.temperature(temperature, units: unitPreference))
+            detailMetric(String(localized: "detail.metric.temperature"), measurement: Formatters.temperature(temperature, units: unitPreference))
         } else {
-            detailMetric("Temperatura", value: "—", valueColor: DIRTheme.yellow)
+            detailMetric(String(localized: "detail.metric.temperature"), value: "—", valueColor: DIRTheme.yellow)
         }
     }
 
@@ -389,18 +395,18 @@ struct DiveDetailView: View {
 
     private var details: some View {
         VStack(spacing: 12) {
-            darkPanel(title: "GPS", icon: "location.fill") {
+            darkPanel(title: String(localized: "detail.panel.gps"), icon: "location.fill") {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Start: \(session.entryGPS?.coordinateText ?? "n/d") · \(fixSourceText(session.entryGPSFixSource))")
-                    Text("End: \(session.exitGPS?.coordinateText ?? "n/d") · \(fixSourceText(session.exitGPSFixSource))")
-                    Text("Accuratezza start: \(accuracyText(session.entryGPS))")
-                    Text("Accuratezza end: \(accuracyText(session.exitGPS))")
+                    Text("\(String(localized: "detail.gps.start")): \(session.entryGPS?.coordinateText ?? String(localized: "detail.not_available")) · \(fixSourceText(session.entryGPSFixSource))")
+                    Text("\(String(localized: "detail.gps.end")): \(session.exitGPS?.coordinateText ?? String(localized: "detail.not_available")) · \(fixSourceText(session.exitGPSFixSource))")
+                    Text("\(String(localized: "detail.gps.accuracy_start")): \(accuracyText(session.entryGPS))")
+                    Text("\(String(localized: "detail.gps.accuracy_end")): \(accuracyText(session.exitGPS))")
                 }
                 .font(.system(size: 13, weight: .medium, design: .rounded).monospacedDigit())
                 .foregroundStyle(.white)
             }
-            darkPanel(title: "Note", icon: "note.text") {
-                Text(session.notes ?? "Nessuna nota")
+            darkPanel(title: String(localized: "detail.panel.notes"), icon: "note.text") {
+                Text(session.notes ?? String(localized: "detail.notes.empty"))
                     .foregroundStyle(DIRTheme.muted)
             }
         }
@@ -435,14 +441,14 @@ struct DiveDetailView: View {
 
     private func fixSourceText(_ source: GPSFixSource) -> String {
         switch source {
-        case .fix: return "fix superficie"
-        case .fallback: return "ultimo punto noto"
-        case .noFix: return "no-fix"
+        case .fix: return String(localized: "detail.gps.fix_surface")
+        case .fallback: return String(localized: "detail.gps.fix_fallback")
+        case .noFix: return String(localized: "detail.gps.fix_none")
         }
     }
 
     private func accuracyText(_ point: GPSPoint?) -> String {
-        guard let point, point.horizontalAccuracy >= 0 else { return "Non disponibile" }
+        guard let point, point.horizontalAccuracy >= 0 else { return String(localized: "detail.not_available") }
         return "\(Formatters.zero(point.horizontalAccuracy)) m"
     }
 
@@ -458,7 +464,7 @@ struct DiveDetailView: View {
                     exportErrorMessage = error.localizedDescription
                 }
             } label: {
-                Text("Genera CSV Subsurface")
+                Text(String(localized: "detail.export.generate_csv"))
                     .font(.callout.weight(.semibold))
                     .foregroundStyle(DIRTheme.cyan)
                     .padding(.horizontal, 14)
@@ -468,7 +474,7 @@ struct DiveDetailView: View {
             Spacer()
             if let csvURL {
                 ShareLink(item: csvURL) {
-                    Text("Condividi CSV")
+                    Text(String(localized: "detail.export.share_csv"))
                         .font(.callout.weight(.semibold))
                         .foregroundStyle(DIRTheme.cyan)
                         .padding(.horizontal, 18)
@@ -481,7 +487,7 @@ struct DiveDetailView: View {
                     .foregroundStyle(DIRTheme.orange)
                     .multilineTextAlignment(.trailing)
             } else {
-                Text("CSV non generato")
+                Text(String(localized: "detail.export.csv_not_generated"))
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(DIRTheme.muted)
             }

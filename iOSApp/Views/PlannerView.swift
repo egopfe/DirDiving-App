@@ -3,8 +3,12 @@ import Charts
 
 struct PlannerView: View {
     @EnvironmentObject private var store: PlannerStore
-    @State private var plannerSafetyAcknowledged = false
+    @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
     @State private var showPlan = false
+
+    private var plannerSafetyAcknowledged: Bool {
+        plannerSafetyAckRevision == PlannerSafetyAcknowledgment.currentRevision
+    }
 
     var body: some View {
         NavigationStack {
@@ -281,7 +285,12 @@ struct PlannerView: View {
     }
 
     private var plannerSafetyAcknowledgment: some View {
-        Toggle(isOn: $plannerSafetyAcknowledged) {
+        Toggle(
+            isOn: Binding(
+                get: { plannerSafetyAcknowledged },
+                set: { plannerSafetyAckRevision = $0 ? PlannerSafetyAcknowledgment.currentRevision : "" }
+            )
+        ) {
             Text(String(localized: "planner.safety_ack.label"))
                 .font(.callout.weight(.semibold))
                 .foregroundStyle(.white)
