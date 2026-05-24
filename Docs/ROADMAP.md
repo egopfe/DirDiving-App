@@ -1,6 +1,6 @@
 # Roadmap DIR DIVING
 
-**Aggiornato:** 2026-05-23
+**Aggiornato:** 2026-05-24 (`main` @ `f851b61`)
 
 ## Rilasciati su `main` (Watch MAIN + iOS nel workspace)
 
@@ -24,6 +24,14 @@
 | CSV import sempre in Logbook/More | ✅ | Readiness 100% UX pass |
 | Planner tab risultato funzionali | ✅ | Readiness 100% UX pass |
 | Legal disclaimer scroll gate | ✅ | Readiness 100% UX pass |
+| Unità metriche/imperiali + sync WC | ✅ | `f851b61`; display-only, storage metrico |
+| Disclaimer companion ogni avvio | ✅ | `f851b61` |
+| Immersioni manuali iOS + export meta CSV | ✅ | `f851b61` |
+| Checklist attrezzatura editabile iOS | ✅ | `f851b61` |
+| Foto iPhone → Watch (UserImages) | ✅ | `f851b61` transferFile |
+| Tab iOS Planner prima | ✅ | `f851b61` |
+| Planner ack sessione in cima + field gate | ✅ | `f851b61` |
+| Marchio altosinistra header | 🟡 | PNG bundled; AppIcon store da rigenerare |
 
 ## Prossimo (MAIN, pre–App Store)
 
@@ -35,8 +43,8 @@
 | P2 | Verifica legale contenuti Terms/Privacy URL prima App Store | Legal / App Store |
 | P2 | Convergenza documentazione `main` ↔ `main-iOS` | Process |
 | P3 | GPX/UDDF export | Feature |
-| P3 | GPX/UDDF export | Feature |
-| P4 | Settings sync bidirezionale unità | Feature |
+| P3 | Rigenerare AppIcon da `Docs/ReferenceIcon/` | Assets |
+| P4 | Watch back navigation audit su tutte le sub-screen | UX |
 
 ## Rami experimental (non in target MAIN)
 

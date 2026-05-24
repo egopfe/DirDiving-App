@@ -2,7 +2,7 @@
 
 _Date: 2026-05-24_
 
-Branch: `main` (uncommitted working tree at time of report)
+Branch: `main` @ commit **`f851b61`** (push `origin/main`).
 
 ## Summary
 
@@ -40,4 +40,4 @@ Implemented the 11 feature areas from `Docs/DIR_Diving_Main_Branch_Development_N
 
 1. Regenerate **AppIcon** sets from `Docs/ReferenceIcon/apple watch icon.png` and `ios icon.png` for App Store Connect.
 2. Extend Watch back affordance audit to all sub-screens (Ascent, Info, Legal) if QA finds gaps.
-3. Commit + push when ready (not done in this pass).
+3. ~~Commit + push~~ — completato su `origin/main` @ `f851b61`.
