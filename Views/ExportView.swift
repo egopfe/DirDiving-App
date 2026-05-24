@@ -9,7 +9,14 @@ struct ExportView: View {
             DiveScreenBackground()
 
             VStack(spacing: 0) {
-                Spacer(minLength: 33)
+                HStack {
+                    WatchDetailBackButton()
+                    Spacer()
+                }
+                .padding(.horizontal, 12)
+                .padding(.top, 8)
+
+                Spacer(minLength: 20)
 
                 Image(systemName: "icloud.and.arrow.up")
                     .font(.system(size: 62, weight: .medium))

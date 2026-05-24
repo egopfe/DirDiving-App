@@ -13,6 +13,10 @@ struct InfoView: View {
 
             ScrollView {
                 VStack(spacing: 5) {
+                    HStack {
+                        WatchDetailBackButton()
+                        Spacer()
+                    }
                     header
 
                     Text("INFO")

@@ -162,6 +162,9 @@ struct UserImagesView: View {
         let index = imageIndex(for: name)
         return VStack(spacing: 8) {
             HStack {
+                WatchDetailBackButton {
+                    selectedName = nil
+                }
                 Spacer()
                 DiveClockText(size: 14)
             }

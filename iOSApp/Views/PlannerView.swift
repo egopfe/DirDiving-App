@@ -29,11 +29,11 @@ struct PlannerView: View {
                         Group {
                             modePicker
                             profileCard
-                            gasCards
-                            cylinderCard
+                            plannerCylindersCard
                             technicalAnalysisCard
                             reserveCard
                             teamPreviewCard
+                            plannerMODInputWarnings
                             plannerWarnings
                             calculateButton
                         }
@@ -54,6 +54,7 @@ struct PlannerView: View {
                 if store.mode != .advanced {
                     store.mode = .advanced
                 }
+                store.input.ensurePlannerCylindersFromLegacy()
             }
         }
     }
@@ -126,6 +127,24 @@ struct PlannerView: View {
             VStack(spacing: 0) {
                 plannerField(String(localized: "planner.field.max_depth"), value: $store.input.plannedDepthMeters, unit: "m", step: 1)
                 Divider().overlay(DIRTheme.hairline)
+                plannerField(String(localized: "planner.field.avg_depth"), value: $store.input.plannedAverageDepthMeters, unit: "m", step: 1)
+                Divider().overlay(DIRTheme.hairline)
+                HStack {
+                    Text(String(localized: "planner.field.planning_reference"))
+                        .font(.callout)
+                        .foregroundStyle(.white)
+                    Spacer()
+                    Picker(String(localized: "planner.field.planning_reference"), selection: $store.input.planningDepthReference) {
+                        Text(String(localized: "planner.reference.max_depth")).tag(PlanningDepthReference.maximumDepth)
+                        Text(String(localized: "planner.reference.avg_depth")).tag(PlanningDepthReference.averageDepth)
+                    }
+                    .labelsHidden()
+                    .tint(DIRTheme.cyan)
+                }
+                .padding(.vertical, 10)
+                Divider().overlay(DIRTheme.hairline)
+                DIRWarningBox(text: String(localized: "planner.emergency_gas.max_depth_rule"))
+                Divider().overlay(DIRTheme.hairline)
                 plannerField(String(localized: "planner.field.bottom_time"), value: $store.input.plannedBottomMinutes, unit: "min", step: 1)
                 Divider().overlay(DIRTheme.hairline)
                 plannerField(String(localized: "planner.field.temperature"), value: $store.input.waterTemperatureCelsius, unit: "C", step: 1)
@@ -154,42 +173,108 @@ struct PlannerView: View {
         }
     }
 
-    private var gasCards: some View {
-        VStack(spacing: 12) {
-            GasMixCard(title: String(localized: "planner.gas.bottom"), mix: $store.input.bottomGas, accent: DIRTheme.green, showsHelium: true)
-            GasMixCard(title: String(localized: "planner.gas.deco1"), mix: $store.input.decoGas1, accent: DIRTheme.yellow, showsHelium: false)
-            GasMixCard(title: String(localized: "planner.gas.deco2"), mix: $store.input.decoGas2, accent: DIRTheme.cyan, showsHelium: false)
-        }
-    }
-
-    private var cylinderCard: some View {
-        DIRCard(String(localized: "planner.card.cylinder"), icon: "fuelpump", accent: DIRTheme.cyan) {
-            VStack(spacing: 0) {
-                plannerField(String(localized: "planner.field.volume"), value: $store.input.cylinder.volumeLiters, unit: "L", step: 1)
-                Divider().overlay(DIRTheme.hairline)
-                plannerField(String(localized: "planner.field.start_pressure"), value: $store.input.cylinder.startPressure, unit: store.input.cylinder.pressureUnit.rawValue, step: 10)
-                Divider().overlay(DIRTheme.hairline)
-                plannerField(String(localized: "planner.field.reserve"), value: $store.input.cylinder.reservePressure, unit: store.input.cylinder.pressureUnit.rawValue, step: 5)
-                Divider().overlay(DIRTheme.hairline)
-                HStack {
-                    Text(String(localized: "planner.field.pressure_unit"))
+    private var plannerCylindersCard: some View {
+        DIRCard(String(localized: "planner.card.cylinders"), icon: "fuelpump", accent: DIRTheme.cyan) {
+            VStack(spacing: 12) {
+                ForEach($store.input.plannerCylinders) { $entry in
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text(String(localized: "planner.cylinder.title"))
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(DIRTheme.muted)
+                            Spacer()
+                            if store.input.plannerCylinders.count > 1 {
+                                Button(role: .destructive) {
+                                    store.input.plannerCylinders.removeAll { $0.id == entry.id }
+                                    store.input.syncLegacyGasesFromPlannerCylinders()
+                                } label: {
+                                    Text(String(localized: "planner.cylinder.remove"))
+                                        .font(.caption2.weight(.semibold))
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        HStack {
+                            Text(String(localized: "planner.cylinder.role"))
+                                .foregroundStyle(DIRTheme.muted)
+                            Spacer()
+                            Picker("", selection: $entry.role) {
+                                ForEach(GasRole.allCases) { role in
+                                    Text(role.localizedTitle).tag(role)
+                                }
+                            }
+                            .labelsHidden()
+                            .tint(DIRTheme.cyan)
+                        }
                         .font(.callout)
-                        .foregroundStyle(.white)
-                    Spacer()
-                    Picker(String(localized: "planner.field.pressure_unit"), selection: $store.input.cylinder.pressureUnit) {
-                        ForEach(PressureUnit.allCases) { unit in
-                            Text(unit.rawValue).tag(unit)
+                        HStack {
+                            Text(String(localized: "planner.cylinder.tank_size"))
+                                .foregroundStyle(DIRTheme.muted)
+                            Spacer()
+                            Picker("", selection: $entry.tankSize) {
+                                ForEach(TankSize.allCases) { size in
+                                    Text(size.rawValue).tag(size)
+                                }
+                            }
+                            .labelsHidden()
+                            .tint(DIRTheme.cyan)
+                        }
+                        .font(.callout)
+                        Text(
+                            String(
+                                format: String(localized: "planner.mod.value_format"),
+                                Formatters.one(entry.modMeters)
+                            )
+                        )
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(DIRTheme.cyan)
+                        if entry.role != .bottom {
+                            plannerField(
+                                String(localized: "planner.field.switch_depth"),
+                                value: $entry.switchDepthMeters,
+                                unit: "m",
+                                step: 1
+                            )
+                        }
+                        GasMixCard(
+                            title: entry.gas.label,
+                            mix: $entry.gas,
+                            accent: entry.role == .bottom ? DIRTheme.green : DIRTheme.yellow,
+                            showsHelium: entry.role == .bottom
+                        )
+                        .onChange(of: entry.gas) { _, _ in
+                            store.input.syncLegacyGasesFromPlannerCylinders()
+                        }
+                        if entry.isSwitchDepthBeyondMOD {
+                            Text(String(localized: "planner.mod.exceeds_allowed"))
+                                .font(.caption2.weight(.semibold))
+                                .foregroundStyle(DIRTheme.red)
                         }
                     }
-                    .labelsHidden()
-                    .tint(DIRTheme.cyan)
+                    Divider().overlay(DIRTheme.hairline)
                 }
-                .padding(.vertical, 10)
+                Button {
+                    store.input.plannerCylinders.append(
+                        PlannerCylinderEntry(
+                            role: .deco,
+                            tankSize: .liters12,
+                            gas: GasMix(name: "Deco", role: .deco, oxygen: 0.50, helium: 0, maxPPO2: 1.6)
+                        )
+                    )
+                } label: {
+                    Text(String(localized: "planner.cylinder.add"))
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(DIRTheme.cyan)
+                }
+                .buttonStyle(.plain)
                 Divider().overlay(DIRTheme.hairline)
                 plannerField(String(localized: "planner.field.sac_rmv"), value: $store.input.sacLitersPerMinute, unit: "L/min", step: 1)
                 Divider().overlay(DIRTheme.hairline)
                 plannerField(String(localized: "planner.field.sac_emergency"), value: $store.input.emergencySacLitersPerMinute, unit: "L/min", step: 1)
             }
+        }
+        .onChange(of: store.input.plannerCylinders) { _, _ in
+            store.input.syncLegacyGasesFromPlannerCylinders()
         }
     }
 
@@ -230,6 +315,40 @@ struct PlannerView: View {
                     DIRMetricTile(title: "Rock bottom", value: Formatters.zero(store.analysis.minimumGasBar), unit: "bar", color: DIRTheme.orange)
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: "Turn", value: Formatters.zero(store.analysis.turnPressureBar), unit: "bar", color: DIRTheme.cyan)
+                }
+            }
+        }
+    }
+
+    private var liveMODIssues: [MODValidationIssue] {
+        PlannerMODValidator.validatePlannerCylinders(input: store.input)
+    }
+
+    @ViewBuilder
+    private var plannerMODInputWarnings: some View {
+        if !liveMODIssues.isEmpty {
+            DIRCard(String(localized: "planner.mod.validation.title"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(liveMODIssues) { issue in
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(String(localized: "planner.mod.exceeds_allowed"))
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(DIRTheme.red)
+                            Text(
+                                String(
+                                    format: String(localized: "planner.mod.detail_format"),
+                                    issue.gasLabel,
+                                    Formatters.one(issue.switchDepthMeters),
+                                    Formatters.one(issue.modMeters)
+                                )
+                            )
+                            .font(.caption2)
+                            .foregroundStyle(.white)
+                        }
+                    }
+                    Text(String(localized: "planner.mod.incompatible"))
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.muted)
                 }
             }
         }
@@ -526,6 +645,7 @@ struct PlanResultView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
                     resultTabs
+                    modValidationSection
                     switch tab {
                     case .plan:
                         resultGrid
@@ -553,6 +673,39 @@ struct PlanResultView: View {
                         .foregroundStyle(DIRTheme.cyan)
                 }
                 .accessibilityLabel(Text(String(localized: "planner.export.share.a11y")))
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var modValidationSection: some View {
+        if !store.plan.modValidationIssues.isEmpty {
+            DIRCard(String(localized: "planner.mod.validation.title"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(store.plan.modValidationIssues) { issue in
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(String(localized: "planner.mod.exceeds_allowed"))
+                                .font(.callout.weight(.semibold))
+                                .foregroundStyle(DIRTheme.red)
+                            Text(
+                                String(
+                                    format: String(localized: "planner.mod.detail_format"),
+                                    issue.gasLabel,
+                                    Formatters.one(issue.switchDepthMeters),
+                                    Formatters.one(issue.modMeters)
+                                )
+                            )
+                            .font(.caption)
+                            .foregroundStyle(.white)
+                        }
+                    }
+                    Text(String(localized: "planner.mod.incompatible"))
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.muted)
+                    Text(String(localized: "planner.mod.hint"))
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.muted)
+                }
             }
         }
     }

@@ -75,6 +75,7 @@ struct DivePlanResult: Hashable {
     let contingencyPlans: [ContingencyPlan]
     let teamMatches: [TeamGasMatch]
     let briefingLines: [String]
+    let modValidationIssues: [MODValidationIssue]
 }
 
 struct NDLPoint: Identifiable, Hashable {

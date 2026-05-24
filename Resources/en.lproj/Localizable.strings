@@ -310,6 +310,8 @@
 "live.stopwatch.stop.a11y" = "Stop stopwatch";
 "live.stopwatch.reset.a11y" = "Reset stopwatch";
 "live.stopwatch.reset.hint" = "Resets immediately; use intentionally.";
+"watch.nav.back" = "Back";
+"watch.nav.back" = "Back";
 "ascent.gauge.a11y" = "Ascent rate gauge";
 "ascent.gauge.a11y.value_format" = "Scale up to %@ %@. Indicator at %@ %@.";
 "settings.underwater.title" = "Edit on surface";

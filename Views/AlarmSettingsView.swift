@@ -65,6 +65,7 @@ struct AlarmSettingsView: View {
             }
         }
         .navigationTitle("Allarmi")
+        .watchSubscreenBackToolbar()
     }
 
     private var runtimeThresholdBinding: Binding<Double> {

@@ -310,6 +310,8 @@
 "live.stopwatch.stop.a11y" = "Ferma cronometro";
 "live.stopwatch.reset.a11y" = "Reset cronometro";
 "live.stopwatch.reset.hint" = "Reset immediato; usalo con intenzione.";
+"watch.nav.back" = "Indietro";
+"watch.nav.back" = "Indietro";
 "ascent.gauge.a11y" = "Gauge velocita di risalita";
 "ascent.gauge.a11y.value_format" = "Scala fino a %@ %@. Indicatore a %@ %@.";
 "settings.underwater.title" = "Modifica in superficie";

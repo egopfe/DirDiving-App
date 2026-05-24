@@ -51,6 +51,7 @@ struct DiveDetailView: View {
 
     private var header: some View {
         HStack(alignment: .center) {
+            WatchDetailBackButton()
             HStack(spacing: 5) {
                 DiveOctopusLogo(accent: DiveUI.yellow)
                     .frame(width: 23, height: 22, alignment: .leading)

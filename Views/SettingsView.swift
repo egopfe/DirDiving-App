@@ -474,6 +474,7 @@ private struct WatchShortcutHelpView: View {
                 .padding(.bottom, 8)
             }
         }
+        .watchSubscreenBackToolbar()
     }
 
     private var header: some View {

@@ -5,6 +5,7 @@ struct EquipmentView: View {
     @State private var showResetConfirmation = false
     @State private var savedFeedback: String?
     @State private var newChecklistTitle = ""
+    @State private var showTemplatesSheet = false
     @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
 
     var body: some View {
@@ -39,11 +40,40 @@ struct EquipmentView: View {
                             sacRow
                         }
                         DIRCard(String(localized: "equipment.card.checklist"), icon: "checklist", accent: DIRTheme.green) {
+                            Button {
+                                showTemplatesSheet = true
+                            } label: {
+                                Text(String(localized: "equipment.my_equipment.button"))
+                                    .font(.callout.weight(.semibold))
+                                    .foregroundStyle(DIRTheme.cyan)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 8)
+                                    .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.7), lineWidth: 1))
+                            }
+                            .buttonStyle(.plain)
                             ForEach($equipment.profile.checklistItems) { $item in
                                 VStack(alignment: .leading, spacing: 6) {
                                     Toggle(item.title, isOn: $item.isReady).tint(DIRTheme.cyan)
-                                    editableRow(String(localized: "equipment.checklist.gas"), text: $item.gasText)
-                                    editableRow(String(localized: "equipment.checklist.pressure"), text: $item.pressureText)
+                                    Toggle(String(localized: "equipment.checklist.gas_flag"), isOn: $item.usesGas).tint(DIRTheme.yellow)
+                                    if item.usesGas {
+                                        HStack {
+                                            Text(String(localized: "equipment.checklist.tank_size"))
+                                                .foregroundStyle(DIRTheme.muted)
+                                            Spacer()
+                                            Picker("", selection: $item.tankSize) {
+                                                ForEach(TankSize.allCases) { size in
+                                                    Text(size.rawValue).tag(size)
+                                                }
+                                            }
+                                            .labelsHidden()
+                                            .tint(DIRTheme.cyan)
+                                        }
+                                        .font(.callout)
+                                        editableRow(String(localized: "equipment.checklist.pressure"), text: $item.pressureText)
+                                    } else {
+                                        editableRow(String(localized: "equipment.checklist.gas"), text: $item.gasText)
+                                        editableRow(String(localized: "equipment.checklist.pressure"), text: $item.pressureText)
+                                    }
                                     Button(role: .destructive) {
                                         equipment.profile.checklistItems.removeAll { $0.id == item.id }
                                     } label: {
@@ -99,6 +129,10 @@ struct EquipmentView: View {
             }
             .onChange(of: equipment.profile) { _, _ in
                 showSavedFeedback()
+            }
+            .sheet(isPresented: $showTemplatesSheet) {
+                EquipmentTemplatesSheet()
+                    .environmentObject(equipment)
             }
         }
     }

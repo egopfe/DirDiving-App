@@ -26,6 +26,85 @@ enum GasRole: String, CaseIterable, Identifiable, Codable {
     case deco = "Deco"
     case bailout = "Bailout"
     var id: String { rawValue }
+
+    var localizedTitle: String {
+        switch self {
+        case .travel: return String(localized: "gas.role.travel")
+        case .bottom: return String(localized: "gas.role.bottom")
+        case .deco: return String(localized: "gas.role.deco")
+        case .bailout: return String(localized: "gas.role.bailout")
+        }
+    }
+}
+
+enum PlanningDepthReference: String, CaseIterable, Identifiable, Codable {
+    case maximumDepth
+    case averageDepth
+    var id: String { rawValue }
+}
+
+struct PlannerCylinderEntry: Identifiable, Codable, Hashable {
+    var id = UUID()
+    var role: GasRole = .bottom
+    var tankSize: TankSize = .liters12
+    var gas: GasMix
+    /// Gas switch depth (m). Used for deco/travel cylinders; bottom uses planned max depth.
+    var switchDepthMeters: Double = 21
+    var startPressure: Double = 200
+    var reservePressure: Double = 50
+    var pressureUnit: PressureUnit = .bar
+
+    init(
+        id: UUID = UUID(),
+        role: GasRole = .bottom,
+        tankSize: TankSize = .liters12,
+        gas: GasMix,
+        switchDepthMeters: Double? = nil,
+        startPressure: Double = 200,
+        reservePressure: Double = 50,
+        pressureUnit: PressureUnit = .bar
+    ) {
+        self.id = id
+        self.role = role
+        self.tankSize = tankSize
+        self.gas = gas
+        self.switchDepthMeters = switchDepthMeters ?? Self.defaultSwitchDepth(for: role)
+        self.startPressure = startPressure
+        self.reservePressure = reservePressure
+        self.pressureUnit = pressureUnit
+    }
+
+    static func defaultSwitchDepth(for role: GasRole) -> Double {
+        switch role {
+        case .bottom: return 0
+        case .travel: return 30
+        case .deco: return 21
+        case .bailout: return 6
+        }
+    }
+
+    var modMeters: Double {
+        PlannerMODValidator.modMeters(oxygenFraction: gas.oxygen, maxPPO2: gas.maxPPO2)
+    }
+
+    var isSwitchDepthBeyondMOD: Bool {
+        switch role {
+        case .bottom:
+            return false
+        case .travel, .deco, .bailout:
+            return switchDepthMeters > modMeters + 0.05
+        }
+    }
+
+    var cylinder: Cylinder {
+        Cylinder(
+            name: tankSize.rawValue,
+            volumeLiters: tankSize.volumeLiters,
+            startPressure: startPressure,
+            reservePressure: reservePressure,
+            pressureUnit: pressureUnit
+        )
+    }
 }
 
 struct GasMix: Identifiable, Codable, Hashable {
@@ -97,6 +176,9 @@ struct GasPlanInput: Codable, Hashable {
     var emergencySacLitersPerMinute: Double = 30
     var teamSize: Double = 2
     var plannedDepthMeters: Double = 40
+    var plannedAverageDepthMeters: Double = 20
+    var planningDepthReference: PlanningDepthReference = .maximumDepth
+    var plannerCylinders: [PlannerCylinderEntry] = []
     var plannedBottomMinutes: Double = 20
     var waterTemperatureCelsius: Double = 24
     var salinity: SalinityMode = .salt
@@ -112,12 +194,53 @@ struct GasPlanInput: Codable, Hashable {
         TeamMember(name: "Diver A", sacLitersPerMinute: 18, cylinder: Cylinder(name: "Back gas", volumeLiters: 12, startPressure: 200, reservePressure: 50, pressureUnit: .bar)),
         TeamMember(name: "Diver B", sacLitersPerMinute: 20, cylinder: Cylinder(name: "Back gas", volumeLiters: 12, startPressure: 190, reservePressure: 50, pressureUnit: .bar))
     ]
-    var startPressureBar: Double { cylinder.startPressureBar }
-    var reservePressureBar: Double { cylinder.reservePressureBar }
-    var availableGasLiters: Double { cylinder.availableGasLiters }
-    var ambientPressureBar: Double { plannedDepthMeters / 10.0 + 1.0 }
+    var startPressureBar: Double { primaryCylinder.startPressureBar }
+    var reservePressureBar: Double { primaryCylinder.reservePressureBar }
+    var availableGasLiters: Double { primaryCylinder.availableGasLiters }
+    var primaryCylinder: Cylinder {
+        plannerCylinders.first(where: { $0.role == .bottom })?.cylinder ?? cylinder
+    }
+
+    /// Depth used for planning consumption / END / density (not emergency gas).
+    var effectivePlanningDepthMeters: Double {
+        switch planningDepthReference {
+        case .maximumDepth:
+            return plannedDepthMeters
+        case .averageDepth:
+            return min(plannedAverageDepthMeters, plannedDepthMeters)
+        }
+    }
+
+    var ambientPressureBar: Double { effectivePlanningDepthMeters / 10.0 + 1.0 }
     var estimatedConsumptionLiters: Double { sacLitersPerMinute * ambientPressureBar * plannedBottomMinutes }
     var estimatedRemainingLiters: Double { availableGasLiters - estimatedConsumptionLiters }
-    var estimatedRemainingBar: Double { estimatedRemainingLiters / max(cylinder.volumeLiters, 0.1) }
+    var estimatedRemainingBar: Double { estimatedRemainingLiters / max(primaryCylinder.volumeLiters, 0.1) }
     var estimatedRemainingPSI: Double { estimatedRemainingBar * 14.5038 }
+
+    mutating func ensurePlannerCylindersFromLegacy() {
+        guard plannerCylinders.isEmpty else { return }
+        plannerCylinders = [
+            PlannerCylinderEntry(
+                role: .bottom,
+                tankSize: TankSize.nearest(toVolumeLiters: cylinder.volumeLiters),
+                gas: bottomGas,
+                startPressure: cylinder.startPressure,
+                reservePressure: cylinder.reservePressure,
+                pressureUnit: cylinder.pressureUnit
+            ),
+            PlannerCylinderEntry(role: .deco, tankSize: .liters12, gas: decoGas1, switchDepthMeters: 21),
+            PlannerCylinderEntry(role: .deco, tankSize: .liters12, gas: decoGas2, switchDepthMeters: 9)
+        ]
+    }
+
+    mutating func syncLegacyGasesFromPlannerCylinders() {
+        ensurePlannerCylindersFromLegacy()
+        if let bottom = plannerCylinders.first(where: { $0.role == .bottom }) {
+            bottomGas = bottom.gas
+            cylinder = bottom.cylinder
+        }
+        let deco = plannerCylinders.filter { $0.role == .deco }
+        if deco.indices.contains(0) { decoGas1 = deco[0].gas }
+        if deco.indices.contains(1) { decoGas2 = deco[1].gas }
+    }
 }

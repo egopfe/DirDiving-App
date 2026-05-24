@@ -4,8 +4,16 @@ struct EquipmentChecklistItem: Identifiable, Codable, Hashable {
     var id: UUID = UUID()
     var title: String
     var isReady: Bool = false
+    var usesGas: Bool = false
     var gasText: String = ""
     var pressureText: String = ""
+    var tankSize: TankSize = .liters12
+}
+
+struct EquipmentTemplate: Identifiable, Codable, Hashable {
+    var id: UUID = UUID()
+    var name: String
+    var checklistItems: [EquipmentChecklistItem]
 }
 
 struct EquipmentProfile: Codable, Hashable {

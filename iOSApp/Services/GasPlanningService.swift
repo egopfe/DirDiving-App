@@ -7,8 +7,9 @@ enum GasPlanningService {
         let ppO2 = gas.oxygen * ata
         let density = gas.surfaceDensityGramsLiter * ata
         let rating = densityRating(density, warning: input.densityWarningLimit, danger: input.densityDangerLimit)
-        let end = equivalentNarcoticDepth(gas: gas, depthMeters: input.plannedDepthMeters)
-        let ead = equivalentAirDepth(gas: gas, depthMeters: input.plannedDepthMeters)
+        let planningDepth = input.effectivePlanningDepthMeters
+        let end = equivalentNarcoticDepth(gas: gas, depthMeters: planningDepth)
+        let ead = equivalentAirDepth(gas: gas, depthMeters: planningDepth)
         let consumption = input.sacLitersPerMinute * ata * input.plannedBottomMinutes
         let remaining = input.availableGasLiters - consumption
         let remainingBar = remaining / max(input.cylinder.volumeLiters, 0.1)
@@ -162,8 +163,8 @@ enum GasPlanningService {
         if ppO2 > input.bottomGas.maxPPO2 {
             values.append("PPO2 oltre limite gas")
         }
-        if input.plannedDepthMeters > input.bottomGas.modMeters {
-            values.append("Profilo oltre MOD")
+        if input.effectivePlanningDepthMeters > input.bottomGas.modMeters {
+            values.append(String(localized: "planner.warning.profile_above_mod"))
         }
         if density >= input.densityDangerLimit {
             values.append("Densita gas in zona rossa")

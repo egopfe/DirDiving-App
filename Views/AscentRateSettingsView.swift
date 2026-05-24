@@ -27,6 +27,7 @@ struct AscentRateSettingsView: View {
                 .padding(.vertical, 8)
             }
         }
+        .watchSubscreenBackToolbar()
     }
 
     private var header: some View {

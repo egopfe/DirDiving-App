@@ -24,12 +24,14 @@ final class PlannerStore: ObservableObject {
             mode = saved.mode
             input = saved.input
         }
+        input.ensurePlannerCylindersFromLegacy()
         calculate()
         isReady = true
         saveIfReady()
     }
 
     func calculate() {
+        input.syncLegacyGasesFromPlannerCylinders()
         plan = PlannerService.makePlan(input: input)
         buhlmann = BuhlmannPlanner.plan(depthMeters: input.plannedDepthMeters, o2Fraction: input.bottomGas.oxygen)
         saveIfReady()

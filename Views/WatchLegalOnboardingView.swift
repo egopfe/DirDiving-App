@@ -241,6 +241,10 @@ struct WatchLegalSafetyView: View {
 
             ScrollView {
                 VStack(spacing: 9) {
+                    HStack {
+                        WatchDetailBackButton()
+                        Spacer()
+                    }
                     DiveScreenHeader(
                         "Legal & Safety",
                         subtitle: "NOT A DIVE COMPUTER",
