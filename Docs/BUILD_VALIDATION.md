@@ -65,6 +65,23 @@ xcodebuild -scheme "DIRDiving Watch App" \
 
 Use `xcodebuild -showdestinations -scheme "DIRDiving iOS"` if device names differ on your Mac.
 
+## Troubleshooting
+
+### `Build input files cannot be found: GPSStartRegisteredView.swift` / `GPSEndRegisteredView.swift`
+
+**Cause:** Those Watch views were **removed** in commit `876bcd2` (*fix(main): resolve UX audit blockers*). Live dive uses an **inline GPS banner** instead. `DIRDiving.xcodeproj` is **not** in git (see `.gitignore`); an old generated project still lists the deleted files.
+
+**Fix (repository root):**
+
+```bash
+git pull origin main
+xcodegen generate
+```
+
+Then in Xcode: **Product → Clean Build Folder** (⇧⌘K), close and reopen `DIRDiving.xcodeproj`, build again.
+
+Do **not** recreate the deleted Swift files unless you intentionally revert that UX change.
+
 ## Post-build smoke checks
 
 Dopo una build pulita, verificare anche:
