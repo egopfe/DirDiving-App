@@ -1,7 +1,7 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-05-20  
-**Branch consigliato:** `main` @ `d962117` (dopo `git pull`)  
+**Branch consigliato:** `main` @ `cbe4de2` (dopo `git pull`; codice feature @ `d962117`)  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
 
