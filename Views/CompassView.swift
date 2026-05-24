@@ -3,7 +3,10 @@ import SwiftUI
 struct CompassView: View {
     @EnvironmentObject private var compass: CompassManager
     @EnvironmentObject private var dive: DiveManager
+    @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
     @State private var bearingToast: String?
+
+    private var unitPreference: DIRUnitPreference { DIRUnitPreference.fromStorage(watchUnits) }
 
     var body: some View {
         ZStack {
@@ -125,7 +128,8 @@ struct CompassView: View {
         VStack(spacing: 6) {
             if dive.isDiveActive {
                 HStack(spacing: 7) {
-                    inDiveMetric(title: "PROFONDITÀ", value: Formatters.one(dive.currentDepthMeters), unit: "m")
+                    let depthDisplay = WatchDepthFormatting.display(meters: dive.currentDepthMeters, units: unitPreference)
+                    inDiveMetric(title: "PROFONDITÀ", value: depthDisplay.valueText, unit: depthDisplay.unitLabel)
                     inDiveMetric(title: "RUNTIME", value: Formatters.time(dive.runtime), unit: nil)
                 }
             } else {

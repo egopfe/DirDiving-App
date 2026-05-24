@@ -3,6 +3,7 @@ import SwiftUI
 struct DiveLogListView: View {
     @EnvironmentObject private var log: DiveLogStore
     @EnvironmentObject private var watchSync: WatchSyncService
+    @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
     @State private var listExportURL: URL?
     @State private var listExportMessage: String?
     @State private var exportCompletionFileName: String?
@@ -205,6 +206,10 @@ struct DiveLogListView: View {
     }
 
     private func logRow(session: DiveSession, index: Int) -> some View {
+        let depthDisplay = WatchDepthFormatting.display(
+            meters: session.maxDepthMeters,
+            units: DIRUnitPreference.fromStorage(watchUnits)
+        )
         HStack(spacing: 4) {
             NavigationLink {
                 DiveDetailView(session: session)
@@ -224,7 +229,7 @@ struct DiveLogListView: View {
                         }
 
                         HStack(alignment: .lastTextBaseline, spacing: 13) {
-                            Text("\(Formatters.one(session.maxDepthMeters)) m")
+                            Text("\(depthDisplay.valueText) \(depthDisplay.unitLabel)")
                                 .font(.system(size: 14, weight: .black, design: .rounded))
                                 .foregroundStyle(.white)
                                 .monospacedDigit()

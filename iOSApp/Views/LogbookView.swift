@@ -146,8 +146,13 @@ struct LogbookView: View {
 
 struct DiveLogCard: View {
     @Environment(\.locale) private var locale
+    @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
     let session: DiveSession
     let index: Int
+
+    private var unitPreference: IOSUnitPreference {
+        IOSUnitPreference.fromStorage(units)
+    }
 
     var body: some View {
         HStack(spacing: 12) {
@@ -177,7 +182,7 @@ struct DiveLogCard: View {
                             .overlay(RoundedRectangle(cornerRadius: 3).stroke(DIRTheme.yellow, lineWidth: 1))
                     }
                 }
-                Text(String(format: String(localized: "logbook.card.max_depth"), Formatters.one(session.maxDepthMeters)))
+                Text(String(format: String(localized: "logbook.card.max_depth"), Formatters.depth(session.maxDepthMeters, units: unitPreference).text))
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.86))
                 HStack {

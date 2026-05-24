@@ -61,7 +61,8 @@ final class HapticService {
     }
 
     func criticalConfirm() {
-        confirm()
+        guard hapticsEnabled else { return }
+        WKInterfaceDevice.current().play(.notification)
     }
 
     func notify() {

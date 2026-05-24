@@ -46,7 +46,7 @@ final class DiveManager: NSObject, ObservableObject {
     }
     private var runtimeAlarmThresholdMinutes: Int {
         let stored = UserDefaults.standard.integer(forKey: "dirdiving_watch_alarm_runtime_threshold_min")
-        return stored > 0 ? stored : 60
+        return stored > 0 ? stored : WatchAlarmDefaults.runtimeThresholdMinutes
     }
     private var batteryAlarmThresholdPercent: Int {
         let stored = UserDefaults.standard.integer(forKey: "dirdiving_watch_alarm_battery_threshold_pct")
@@ -280,7 +280,9 @@ final class DiveManager: NSObject, ObservableObject {
     private func evaluateDepthAlarm() {
         let threshold = depthAlarmThresholdMeters
         guard depthAlarmEnabled, maxDepthMeters > threshold, depthSafetyState != .exceeded else { return }
-        triggerAlarm(String(format: String(localized: "ALLARME PROFONDITÀ > %@ m"), Formatters.one(threshold)), lastDate: &lastDepthAlarmDate)
+        let units = DIRUnitPreference.fromStorage(UserDefaults.standard.string(forKey: DIRUnitPreference.storageKey) ?? DIRUnitPreference.metric.rawValue)
+        let display = WatchDepthFormatting.display(meters: threshold, units: units)
+        triggerAlarm(String(format: String(localized: "ALLARME PROFONDITÀ > %@"), "\(display.valueText) \(display.unitLabel)"), lastDate: &lastDepthAlarmDate)
     }
 
     private func evaluateRuntimeAlarms() {

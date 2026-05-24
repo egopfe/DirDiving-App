@@ -211,7 +211,7 @@
 "Stato bussola sconosciuto" = "Stato bussola sconosciuto";
 "compass.keyword.denied" = "negato";
 "compass.keyword.unavailable" = "non disponibile";
-"ALLARME PROFONDITÀ > %@ m" = "DEPTH ALARM > %@ m";
+"ALLARME PROFONDITÀ > %@" = "ALLARME PROFONDITÀ > %@";
 "ALLARME TEMPO > %lld min" = "TIME ALARM > %lld min";
 "ALLARME BATTERIA < %lld%%" = "BATTERY ALARM < %lld%%";
 "Log locale non leggibile: %@" = "Log locale non leggibile: %@";

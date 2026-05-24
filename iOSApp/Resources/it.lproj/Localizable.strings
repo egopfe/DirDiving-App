@@ -179,7 +179,7 @@
 "Stato bussola sconosciuto" = "Stato bussola sconosciuto";
 "compass.keyword.denied" = "negato";
 "compass.keyword.unavailable" = "non disponibile";
-"ALLARME PROFONDITÀ > %@ m" = "DEPTH ALARM > %@ m";
+"ALLARME PROFONDITÀ > %@" = "ALLARME PROFONDITÀ > %@";
 "ALLARME TEMPO > %lld min" = "TIME ALARM > %lld min";
 "ALLARME BATTERIA < %lld%%" = "BATTERY ALARM < %lld%%";
 "Log locale non leggibile: %@" = "Log locale non leggibile: %@";
@@ -318,7 +318,7 @@
 "TIMELINE MULTI-SEGMENTO" = "TIMELINE MULTI-SEGMENTO";
 "COMPARAZIONE GF" = "COMPARAZIONE GF";
 "CONTINGENZE" = "CONTINGENZE";
-"PDF-ready: contenuto pronto per export briefing nella fase di condivisione iOS." = "PDF-ready: contenuto pronto per export briefing nella fase di condivisione iOS.";
+"PDF-ready: contenuto pronto per export briefing nella fase di condivisione iOS." = "Riepilogo pronto per la condivisione iOS.";
 "Non disponibile" = "Non disponibile";
 "Salvato" = "Salvato";
 
@@ -400,7 +400,7 @@
 "analysis.empty.next_action" = "Prossima azione: sincronizza Apple Watch o importa un CSV da Logbook o Altro.";
 "units.title" = "Unita di misura";
 "units.metric_only" = "Metrico (m)";
-"units.ios.footer" = "Conversione imperiale non implementata. Display ed export usano unita metriche. Il Watch e solo metrico.";
+"units.ios.footer" = "Le unità si sincronizzano tra iPhone e Watch se associati. L'export CSV resta metrico/Subsurface.";
 "more.header.subtitle" = "Sync Watch, backup cloud, strumenti reviewer ed export";
 "more.icloud.active" = "Attivo";
 "more.icloud.unavailable" = "Non disponibile";
@@ -528,7 +528,7 @@
 "logbook.title" = "Logbook";
 "logbook.empty.title" = "Nessuna immersione";
 "logbook.badge.manual" = "MANUAL";
-"logbook.card.max_depth" = "Max %.1f m";
+"logbook.card.max_depth" = "Max %@";
 "logbook.card.duration" = "T. %@ min";
 "analysis.title" = "Analisi";
 "analysis.subtitle" = "Metriche operative, trend profilo e riepilogo route GPS dai dati reali del logbook.";

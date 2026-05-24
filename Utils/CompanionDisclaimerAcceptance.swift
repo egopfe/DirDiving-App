@@ -1,16 +1,14 @@
 import Foundation
 
-/// Persists companion disclaimer acceptance; re-shown only when revision changes.
+/// Shows the lightweight companion disclaimer once per app launch.
 enum CompanionDisclaimerAcceptance {
-    static let currentRevision = "2026-05-24"
-
-    private static let revisionKey = "dirdiving_companion_disclaimer_revision"
+    private static var dismissedThisLaunch = false
 
     static var requiresDisplay: Bool {
-        UserDefaults.standard.string(forKey: revisionKey) != currentRevision
+        !dismissedThisLaunch
     }
 
     static func accept() {
-        UserDefaults.standard.set(currentRevision, forKey: revisionKey)
+        dismissedThisLaunch = true
     }
 }
