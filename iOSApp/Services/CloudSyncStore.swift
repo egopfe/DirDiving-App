@@ -1,13 +1,16 @@
 import Foundation
 import Combine
+import os
 
 @MainActor
 final class CloudSyncStore: ObservableObject {
     @Published private(set) var lastSyncStatus = String(localized: "iCloud non ancora sincronizzato")
     @Published private(set) var isICloudAvailable = FileManager.default.ubiquityIdentityToken != nil
+    @Published private(set) var lastDecodeError: String?
 
     private let cloudStore = NSUbiquitousKeyValueStore.default
     private let defaults: UserDefaults
+    private static let logger = Logger(subsystem: "com.egopfe.dirdiving.ios", category: "CloudSyncStore")
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -18,7 +21,7 @@ final class CloudSyncStore: ObservableObject {
         ) { [weak self] notification in
             Task { @MainActor in
                 self?.isICloudAvailable = FileManager.default.ubiquityIdentityToken != nil
-                self?.lastSyncStatus = String(localized: "Aggiornamento ricevuto da iCloud")
+                self?.lastSyncStatus = String(localized: "cloud.status.external_update")
                 NotificationCenter.default.post(
                     name: .cloudSyncDidChangeExternally,
                     object: self,
@@ -29,6 +32,10 @@ final class CloudSyncStore: ObservableObject {
         synchronize()
     }
 
+    func clearDecodeError() {
+        lastDecodeError = nil
+    }
+
     func load<T: Decodable>(_ type: T.Type, forKey key: String) -> T? {
         let cloudData = cloudStore.data(forKey: key)
         let localData = defaults.data(forKey: key)
@@ -36,40 +43,49 @@ final class CloudSyncStore: ObservableObject {
         let localModifiedAt = defaults.double(forKey: modifiedAtKey(for: key))
 
         if let cloudData, let localData {
-            if cloudModifiedAt > localModifiedAt,
-               let decoded = decode(type, from: cloudData) {
-                defaults.set(cloudData, forKey: key)
-                defaults.set(cloudModifiedAt, forKey: modifiedAtKey(for: key))
-                lastSyncStatus = String(localized: "Dati caricati da iCloud")
-                return decoded
+            if cloudModifiedAt > localModifiedAt {
+                if let decoded = decode(type, from: cloudData, key: key, source: String(localized: "cloud.source.icloud")) {
+                    defaults.set(cloudData, forKey: key)
+                    defaults.set(cloudModifiedAt, forKey: modifiedAtKey(for: key))
+                    lastSyncStatus = String(localized: "cloud.status.loaded_from_icloud")
+                    return decoded
+                }
+                recordDecodeFailure(key: key, source: String(localized: "cloud.source.icloud"))
             }
 
-            if let decoded = decode(type, from: localData) {
+            if let decoded = decode(type, from: localData, key: key, source: String(localized: "cloud.source.local")) {
                 if localModifiedAt > cloudModifiedAt {
                     cloudStore.set(localData, forKey: key)
                     cloudStore.set(localModifiedAt, forKey: modifiedAtKey(for: key))
                     synchronize()
-                    lastSyncStatus = String(localized: "Dati locali piu recenti pronti per iCloud")
+                    lastSyncStatus = String(localized: "cloud.status.local_newer_pending_icloud")
+                } else if lastDecodeError != nil {
+                    lastSyncStatus = String(localized: "cloud.status.using_local_after_icloud_error")
                 }
                 return decoded
             }
+            recordDecodeFailure(key: key, source: String(localized: "cloud.source.local"))
         }
 
-        if let cloudData,
-           let decoded = decode(type, from: cloudData) {
-            defaults.set(cloudData, forKey: key)
-            defaults.set(cloudModifiedAt, forKey: modifiedAtKey(for: key))
-            lastSyncStatus = String(localized: "Dati caricati da iCloud")
-            return decoded
+        if let cloudData {
+            if let decoded = decode(type, from: cloudData, key: key, source: String(localized: "cloud.source.icloud")) {
+                defaults.set(cloudData, forKey: key)
+                defaults.set(cloudModifiedAt, forKey: modifiedAtKey(for: key))
+                lastSyncStatus = String(localized: "cloud.status.loaded_from_icloud")
+                return decoded
+            }
+            recordDecodeFailure(key: key, source: String(localized: "cloud.source.icloud"))
         }
 
-        if let localData,
-           let decoded = decode(type, from: localData) {
-            cloudStore.set(localData, forKey: key)
-            cloudStore.set(localModifiedAt, forKey: modifiedAtKey(for: key))
-            synchronize()
-            lastSyncStatus = String(localized: "Dati locali pronti per iCloud")
-            return decoded
+        if let localData {
+            if let decoded = decode(type, from: localData, key: key, source: String(localized: "cloud.source.local")) {
+                cloudStore.set(localData, forKey: key)
+                cloudStore.set(localModifiedAt, forKey: modifiedAtKey(for: key))
+                synchronize()
+                lastSyncStatus = String(localized: "cloud.status.local_pending_icloud")
+                return decoded
+            }
+            recordDecodeFailure(key: key, source: String(localized: "cloud.source.local"))
         }
 
         return nil
@@ -77,7 +93,7 @@ final class CloudSyncStore: ObservableObject {
 
     func save<T: Encodable>(_ value: T, forKey key: String) {
         guard let data = encode(value) else {
-            lastSyncStatus = String(localized: "Errore codifica dati iCloud")
+            lastSyncStatus = String(localized: "cloud.status.encode_failed")
             return
         }
 
@@ -87,26 +103,76 @@ final class CloudSyncStore: ObservableObject {
         cloudStore.set(data, forKey: key)
         cloudStore.set(modifiedAt, forKey: modifiedAtKey(for: key))
         synchronize()
+        lastDecodeError = nil
         lastSyncStatus = isICloudAvailable
-            ? String(localized: "Salvato localmente e su iCloud")
-            : String(localized: "Salvato localmente, iCloud non disponibile")
+            ? String(localized: "cloud.status.saved_local_and_icloud")
+            : String(localized: "cloud.status.saved_local_only")
     }
 
     func synchronize() {
         cloudStore.synchronize()
         isICloudAvailable = FileManager.default.ubiquityIdentityToken != nil
+        if isICloudAvailable {
+            lastSyncStatus = String(localized: "cloud.status.sync_requested")
+        } else {
+            lastSyncStatus = String(localized: "cloud.status.icloud_unavailable")
+        }
     }
 
     private func encode<T: Encodable>(_ value: T) -> Data? {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
-        return try? encoder.encode(value)
+        do {
+            return try encoder.encode(value)
+        } catch {
+            lastSyncStatus = String(localized: "cloud.status.encode_failed")
+            Self.logger.error("iCloud encode failed: \(error.localizedDescription, privacy: .private)")
+            return nil
+        }
     }
 
-    private func decode<T: Decodable>(_ type: T.Type, from data: Data) -> T? {
+    private func decode<T: Decodable>(_ type: T.Type, from data: Data, key: String, source: String) -> T? {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
-        return try? decoder.decode(type, from: data)
+        do {
+            return try decoder.decode(type, from: data)
+        } catch {
+            recordDecodeFailure(key: key, source: source, underlying: error)
+            return nil
+        }
+    }
+
+    private func recordDecodeFailure(key: String, source: String, underlying: Error? = nil) {
+        let name = Self.friendlyKeyName(key)
+        let detail: String
+        if let underlying {
+            detail = String(
+                format: String(localized: "cloud.decode.error_with_reason"),
+                name,
+                source,
+                underlying.localizedDescription
+            )
+        } else {
+            detail = String(format: String(localized: "cloud.decode.error_format"), name, source)
+        }
+        if let existing = lastDecodeError, existing != detail {
+            lastDecodeError = "\(existing)\n\(detail)"
+        } else {
+            lastDecodeError = detail
+        }
+        lastSyncStatus = String(localized: "cloud.status.decode_failed")
+        Self.logger.error("iCloud decode failed key=\(key, privacy: .public) source=\(source, privacy: .public)")
+    }
+
+    private static func friendlyKeyName(_ key: String) -> String {
+        switch key {
+        case "dirdiving_ios_dive_sessions":
+            return String(localized: "cloud.key.dive_sessions")
+        case WatchSyncKeys.deletedSessionIDsKey:
+            return String(localized: "cloud.key.deleted_sessions")
+        default:
+            return key
+        }
     }
 
     private func modifiedAtKey(for key: String) -> String {

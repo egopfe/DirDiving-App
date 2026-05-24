@@ -1,213 +1,249 @@
-# DIR DIVING — MAIN BRANCH COMPLETE READINESS AUDIT
+# DIR DIVING — MAIN Branch Complete Readiness Audit
 
-**Date:** 2026-05-20 (re-audit)  
-**Type:** Audit-only — no code changes, no merges, no fixes  
-**Branch:** `main` @ `9def114`  
-**Scope:** Apple Watch MAIN (`DIRDiving Watch App`) + iOS Companion MAIN (`DIRDiving iOS` in unified `project.yml`)  
-**Out of scope:** `codex/experimental-features`, `codex/ios-experimental-features`, `main-iOS` worktree (not this checkout)
-
-**Visual benchmarks (mandatory):**
-
-- Watch: `Docs/ReferenceUI/Watch_LIVE_reference.png`
-- iOS: `Docs/ReferenceUI/iOS_Companion_reference.png`
-
-**Method:** Static code review, `project.yml` / target membership, `xcodegen generate`, `xcodebuild` both schemes, cross-check with `Docs/MAIN_ISSUES_IMPLEMENTATION_REPORT_20260520.md` and feature CSV.
+**Date:** 2026-05-20  
+**Branch:** `main`  
+**Committed HEAD:** `db72dce` (*fix(main): targeted UX polish — gauge units, intents, detail refresh*)  
+**Audit type:** Read-only — **no code changes**  
+**Scope:** `DIRDiving Watch App` + `DIRDiving iOS` (MAIN targets only; experimental sources excluded per `project.yml`)  
+**Visual benchmarks:** `Docs/ReferenceUI/Watch_LIVE_reference.png`, `Docs/ReferenceUI/iOS_Companion_reference.png`  
+**Build workspace note:** Audit builds were run on the **current working tree**, which contains **uncommitted** changes (R2/R3/R4 WIP). See §A and §M.
 
 ---
 
 ## A. Branch Confirmed
 
-| Item | Result |
-|------|--------|
-| Current branch | `main` |
-| HEAD | `9def114` (`docs` + `fix(i18n)` after `a75a6c3` implementation) |
-| Targets inspected | `DIRDiving Watch App` (watchOS 10+), `DIRDiving iOS` (iOS 17+, embeds Watch) |
-| `project.yml` | Valid; experimental files **excluded** from MAIN (Apnea, Snorkeling, Buddy, Exploration) |
-| `xcodegen generate` | **PASS** → `DIRDiving.xcodeproj` |
-| `xcodebuild` Watch (`DIRDiving Watch App`, Ultra 3 sim) | **BUILD SUCCEEDED** |
-| `xcodebuild` iOS (`DIRDiving iOS`, iPhone 17 sim) | **BUILD SUCCEEDED** |
-| Bundle IDs | Watch `com.egopfe.dirdiving`, iOS `com.egopfe.dirdiving.ios`, `WKCompanionAppBundleIdentifier` aligned |
-| Entitlements | Watch: iCloud KVS + `com.apple.developer.coremotion.water-submersion`; iOS: iCloud KVS |
-| Experimental dependency | **None** — MAIN does not import experimental-only Swift in target membership |
-| Warnings (build) | No blocking errors observed in successful simulator builds; full warning log not archived in this audit |
+| Check | Result |
+|-------|--------|
+| Current branch | **`main`** |
+| Committed HEAD | **`db72dce`** |
+| Remote sync | Verify before release (`git fetch`; prior audits reported in sync) |
+| Uncommitted local changes | **Yes** — `PlannerSafetyAcknowledgment.swift` (new), `CloudSyncStore.swift`, `MoreView.swift`, `PlannerView.swift`, `DiveDetailView.swift`, `LogbookView.swift`, `AnalysisView.swift`, `Localizable.strings` (EN/IT) |
+| Targets inspected | `DIRDiving Watch App`, `DIRDiving iOS` |
+| `project.yml` | **Valid** — experimental Swift excluded from both MAIN targets |
+| XcodeGen | **PASS** (`xcodegen generate`) |
+| Watch build | **BUILD SUCCEEDED** (watchOS Simulator, Apple Watch Series 11 46mm) |
+| iOS build | **BUILD SUCCEEDED** (iOS Simulator, iPhone 17) |
+| Compile warnings | **1 non-blocking** — AppIntents metadata processor notes no AppIntents.framework on iOS target (expected; intents live on Watch) |
+| Bundle IDs | iOS `com.egopfe.dirdiving.ios`; Watch `com.egopfe.dirdiving.ios.watch`; companion link via `WKCompanionAppBundleIdentifier` |
+| Entitlements | Watch: iCloud KVS + CloudKit container + **water submersion**; iOS: iCloud KVS + CloudKit (no submersion — correct) |
+| App Groups | **None** (by design; WC + signed payloads + KVS) |
+| Experimental dependency in MAIN | **None** — Apnea/Snorkel/Buddy/Explore files excluded and not imported from MAIN entry points |
+| Blocking TODO in MAIN Swift | **0** release blockers; `TODO(F11-followup)` in `WatchDiveSyncCodec.swift` (ack hardening, non-blocking) |
+| Reference assets | **Present** at `Docs/ReferenceUI/` |
 
 ---
 
 ## B. Executive Summary
 
-| Dimension | Readiness % | Notes |
-|-----------|-------------|-------|
-| **Overall MAIN readiness** | **84%** | Compiles and runs in simulator; field depth + pairing QA + residual UX/i18n gaps |
-| Apple Watch MAIN | **88%** | Core dive loop strong; Mode Selection friction; depth on real Ultra unproven |
-| iOS Companion MAIN | **86%** | Five-tab companion complete; notifications/tones minimal; planner advanced modes visible |
-| UX completeness | **80%** | Average user can dive/log/sync with guidance; settings sync still “planned” |
-| Safety / disclaimers | **82%** | Disclaimers documented; not certified dive computer |
-| Compile readiness | **92%** | Both schemes build on host with SDK 26.5; device signing/entitlement field test remains |
+| Dimension | Committed `db72dce` | With local WIP (builds today) |
+|-----------|---------------------|-------------------------------|
+| **Overall readiness** | **~91%** | **~94%** |
+| **Compile readiness** | **100%** | **100%** |
+| **Apple Watch MAIN** | **~93%** | **~93%** |
+| **iOS Companion MAIN** | **~90%** | **~93%** |
+| **UX completeness** | **~93%** | **~95%** |
+| **Safety readiness** | **~88%** | **~88%** |
+| **UI vs reference** | **~88%** | **~90%** |
 
-**One-line verdict:** MAIN is **ready for internal / simulator testing** and **developer-led device QA**; it is **not 100% ready** for an average consumer or App Store without real Watch Ultra depth validation, first-pairing sync education, completion of residual i18n on planner/technical screens, and App Store legal/asset review.
+**Verdict snapshot (committed `db72dce`):** Ready to **compile** and **internal/TestFlight test**; **mostly** ready for an average user who owns a paired Apple Watch Ultra (or accepts manual dive). **Not** literal 100% for App Store without physical depth entitlement QA, metadata review, and closing R2–R4.
 
-**Changes since prior audit (`b92e03a`):** P0 Watch inbound sync, unified tombstones, GPS compact banner (~1.4 s), alarm OK + cooldown, sync status strip on live dive, secondary i18n pass (~240 EN keys Watch), builds now succeed.
+**Verdict snapshot (local WIP, not on `origin/main`):** R2 planner ack persistence, R3 iCloud decode surfacing, and R4 logbook/detail/analysis localization are implemented on disk and build clean — **re-audit after commit/push** to treat as shipped MAIN.
 
 ---
 
 ## C. Feature Inventory
 
-| Platform | Feature | Impl. | Reachable | Usable | Complete | Severity | Notes |
-|----------|---------|-------|-----------|--------|----------|----------|-------|
-| Watch | Live dive (depth, TTV, runtime) | Y | Y | Y | Partial | MED | Auto depth needs submersion entitlement + **real Ultra** test |
-| Watch | Stopwatch START/STOP/RESET | Y | Y | Y | Y | — | Haptics gated by setting |
-| Watch | Avg / max depth cards | Y | Y | Y | Y | — | |
-| Watch | Temperature display | Y | Y | Y | Partial | LOW | May be unavailable without sensor |
-| Watch | Ascent gauge (zones) | Y | Y | Y | Y | — | Green/yellow/red |
-| Watch | Ascent alarm (inline banner) | Y | Y | Y | Y | — | Non-blocking; haptic repeat ~1.75 s |
-| Watch | BUSSOLA / SET BEARING / CLEAR | Y | Y | Y | Y | — | Terminology **BUSSOLA** (not COMPASSO) |
-| Watch | Dive log / detail / delete | Y | Y | Y | Y | — | Confirm dialog on delete |
-| Watch | GPS start/end metadata | Y | Y | Y | Y | — | Compact **banner** overlay ~1.4 s; metrics stay visible |
-| Watch | Subsurface CSV export | Y | Y | Y | Y | — | `completeFileProtection` on Watch export path |
-| Watch | User images viewer | Y | Y | Partial | Partial | LOW | Tab always visible; empty state if no `UserImages` assets |
-| Watch | Settings (ascent, alarms, sync, language) | Y | Y | Y | Y | — | |
-| Watch | Info / battery / depth diagnostics | Y | Y | Y | Partial | MED | Entitlement configured ≠ validated on device |
-| Watch | Units | Partial | Y | Partial | Partial | LOW | Metric-only; imperial locked with disclaimer |
-| Watch | Haptics | Y | Y | Y | Y | — | Toggle; ascent/alarm/GPS/confirm paths |
-| Watch | Tones / audio | N | — | — | — | — | watchOS haptics only (expected) |
-| Watch | Mode Selection on launch | Y | Y | Y | Partial | LOW | Extra step; only Diving active |
-| Watch | Watch → iPhone sync | Y | Y | Y | Partial | MED | Outbound + queue + signed ack; first pairing needs secret |
-| Watch | iPhone → Watch sync | Y | Y | Partial | Partial | MED | `didReceiveMessage` / `didReceiveUserInfo` implemented; needs device QA |
-| Watch | Delete tombstone cross-device | Y | Y | Partial | Partial | MED | `dirdiving_shared_deleted_session_ids` + WC broadcast |
-| Watch | Manual dive fallback | Y | Y | Y | Y | — | When auto depth unavailable |
-| Watch | Sync status on live dive | Y | Y | Y | Y | — | Strip when pending/failed |
-| Watch | Alarm dismiss (OK) | Y | Y | Y | Y | — | 15 s cooldown in `DiveManager` |
-| Watch | App Intents (manual dive, bearing, alarm) | Y | Partial | Partial | Partial | LOW | Shortcuts; side button not mapped |
-| iOS | Logbook + search + delete | Y | Y | Y | Y | — | Locale-aware month headers |
-| iOS | Dive detail (tabs, charts, gas) | Y | Y | Y | Y | — | TTV safety note on detail |
-| iOS | Planner input + Bühlmann result | Y | Y | Y | Partial | MED | Advanced modes visible; output indicative |
-| iOS | Analysis + import CSV | Y | Y | Y | Y | — | Empty state with actions |
-| iOS | Equipment profile + checklist | Y | Y | Y | Y | — | iCloud KVS when available |
-| iOS | More (language, cloud, demo, disclaimer) | Y | Y | Y | Y | — | Long safety block |
-| iOS | Watch sync import + conflicts | Y | Y | Y | Partial | MED | Tombstones aligned; conflict UI exists |
-| iOS | CSV import bounds | Y | Y | Y | Y | — | 10 MB cap + depth/duration bounds |
-| iOS | Subsurface export + share | Y | Y | Y | Y | — | |
-| iOS | Notifications / alert sounds | N | Partial | Partial | Partial | LOW | No in-app sound layer |
-| iOS | Demo logbook (reviewer) | Y | Y | Y | Y | — | Toggle in More |
-| iOS | Language IT/EN/System | Y | Y | Y | Partial | MED | Secondary i18n; planner/GPS detail gaps |
+Legend: **Y** yes · **P** partial · **N** no · **—** not in MAIN
+
+### Apple Watch MAIN
+
+| Feature | Impl | Reach | Usable | Complete | Notes | Sev |
+|---------|------|-------|--------|----------|-------|-----|
+| Legal onboarding | Y | Y | Y | Y | Hard gate `WatchLegalOnboardingView` | — |
+| Companion disclaimer | Y | Y | Y | Y | Revision-gated overlay | — |
+| Mode selection | Y | N | — | — | Hidden (`hasMultipleStableModes = false`) | LOW |
+| Live dive dashboard | Y | Y | Y | Y | Matches reference layout (black/neon, depth hero, gauge) | — |
+| Depth display | Y | Y | Y | P | Requires Ultra + submersion entitlement for auto depth | HIGH* |
+| Runtime / TTV | Y | Y | Y | Y | TTV informational; labels localized | — |
+| Stopwatch START/STOP/RESET | Y | Y | Y | Y | On-screen + 7 App Shortcuts | — |
+| Avg / max depth | Y | Y | Y | Y | Unit preference (metric/imperial) | — |
+| Temperature | Y | P | P | P | When sensor provides data | LOW |
+| Ascent-rate gauge | Y | Y | Y | Y | Vertical gauge; ft/min when imperial | — |
+| Ascent warning | Y | Y | Y | Y | Inline banner; depth/gauge remain visible | — |
+| Depth safety 35/38/40 m | Y | Y | Y | Y | Banners + haptics | — |
+| BUSSOLA / bearing | Y | Y | Y | Y | SET/CLEAR + intents | — |
+| Dive log list | Y | Y | Y | Y | Empty state + load error banner | — |
+| Dive detail | Y | Y | Y | Y | GPS fix source, export, delete confirm | — |
+| GPS start/end | Y | Y | Y | Y | Live messaging + detail coordinates | — |
+| Export Subsurface CSV | Y | Y | Y | Y | Per-dive + latest; ShareLink | — |
+| User images viewer | Y | P | Y | P | Tab only when images exist | LOW |
+| Settings hub | Y | Y | Y | Y | Ascent, alarms, units, legal, shortcut help, info | — |
+| Alarms (runtime/depth/battery/ascent) | Y | Y | Y | Y | Persisted `@AppStorage` | — |
+| Units metric/imperial | Y | Y | Y | Y | Live, log, gauge labels | — |
+| Haptics | Y | Y | Y | Y | Global toggle; safety events gated | — |
+| Tones / sounds | N | — | — | — | Settings row informational only | — |
+| Auto dive start/stop | Y | P | P | P | `CMWaterSubmersionManager`; sim limited | HIGH* |
+| Side button dive control | N | — | — | — | Documented; App Intents / on-screen only | — |
+| Snorkeling / Apnea / Buddy | — | — | — | — | Excluded from MAIN target | — |
+
+\*Hardware/entitlement — not a compile blocker.
+
+### iOS Companion MAIN
+
+| Feature | Impl | Reach | Usable | Complete | Notes | Sev |
+|---------|------|-------|--------|----------|-------|-----|
+| Legal onboarding | Y | Y | Y | Y | Scroll-gated acceptance | — |
+| Companion disclaimer | Y | Y | Y | Y | `CompanionDisclaimerAcceptance` persisted | — |
+| Logbook | Y | Y | Y | Y | Search, grouping, CSV import, manual add | — |
+| Logbook thumbnails | N | — | — | — | Reference shows photos; MAIN list has no thumbnails | LOW |
+| Manual dive edit | Y | Y | Y | Y | From detail; refresh after save (`db72dce`) | — |
+| Dive detail tabs | Y | Y | Y | Y | Summary / charts / details | — |
+| Charts (depth profile) | Y | Y | Y | Y | Swift Charts | — |
+| Planner | Y | Y | Y | Y | Safety ack gates calculate | — |
+| Planner ack persistence | P | Y | Y | P | **Session-only @ `db72dce`**; **WIP: `@AppStorage`** | MED |
+| Plan result + Bühlmann | Y | Y | Y | P | Indicative model; disclaimers present | MED |
+| Analysis | Y | Y | Y | Y | Metrics, charts, gas/route summaries | — |
+| Equipment checklist | Y | Y | Y | Y | CRUD; some IT literals | LOW |
+| More / settings | Y | Y | Y | Y | Units, sync, cloud, demo, legal | — |
+| Watch sync | Y | Y | Y | P | Signed codec; conflict UI in More | MED |
+| iCloud backup (KVS) | Y | Y | P | P | Merge logic; **decode errors silent @ `db72dce`**; **WIP surfaces error** | MED |
+| Units ↔ Watch | Y | Y | Y | Y | `applicationContext` | — |
+| Photo → Watch | Y | Y | P | P | Paired Watch required | LOW |
+| CSV export (Subsurface) | Y | Y | Y | Y | Per dive; share sheet | — |
+| GPX/KML / .ssrf | N | — | — | — | Reference marketing only; CSV only in MAIN | — |
+| iOS notifications / alert sounds | N | — | — | — | No UNUserNotificationCenter | LOW |
+| Demo logbook (reviewer) | Y | Y | Y | Y | Toggle in More; excluded from WC push | — |
+| Explore / Buddy experimental | — | — | — | — | Excluded from iOS target | — |
+| Localization (main tabs) | P | Y | Y | P | **WIP:** logbook/detail/analysis keys; Planner/Equipment still mixed | LOW |
 
 ---
 
 ## D. Navigation Map
 
-### Apple Watch (`ContentView` — vertical `TabView`)
+### Apple Watch (vertical `TabView`, Crown paging)
 
 ```
-Cold launch → Tab 0: Mode Selection
-  → user taps Diving → navigates to Live (or swipes)
-Tabs: Mode Selection | Live | BUSSOLA | Settings | Images | Log
-  Settings → NavigationLink: Ascent rate limits | Alarms | Info
-  Settings → Shortcut help (watchOS limits)
-  Log → DiveDetailView → Export / Delete (confirm)
+Launch → [Legal if required] → ContentView
+  → Live (default when single mode)
+  → BUSSOLA (CompassView)
+  → Settings → Ascent | Alarms | Legal | Shortcut Help | Info
+  → [User Images] (only if imageStore non-empty)
+  → Dive Log → Detail → Export / Delete
+fullScreenCover: companion disclaimer (revision-gated)
 ```
 
-**Friction (not dead ends):**
+**Dead ends:** Legal gate (intentional). No orphan MAIN screens found.
 
-- **Mode Selection** is first tab — average user must select Diving then reach Live (product policy).
-- **UserImages** tab visible even when bundle empty (empty state shown).
-- No system back stack on TabView (normal for Watch).
-
-### iOS (`ContentView` — five tabs)
+### iOS (`TabView` — **order differs from reference mock**)
 
 ```
-Logbook → DiveDetailView (navigation push)
-Analysis → empty → Import CSV | Sync Watch | Open Logbook
-Planner → PlanResultView (push)
-Equipment → profile edit + reset confirm
-More → language, iCloud sync, demo logbook, disclaimer, Watch sync status rows
+Launch → [Legal if required] → ContentView
+  Planner → PlanResult (share)
+  Logbook → DiveDetail → ManualDiveEditor (manual dives)
+  Analysis (empty-state actions: import / sync / open logbook)
+  Equipment
+  More → Legal | Watch sync | Cloud | CSV import | Demo | Export info
+fullScreenCover: companion disclaimer (revision-gated)
 ```
 
-**Unreachable in MAIN target:** `ExplorationCenterView`, `BuddyExperimentalView`, `ExperimentalFutureConceptsView` (excluded in `project.yml`).
+**Reference mock tab order:** Logbook → Analisi → Planner → Attrezzatura → Altro.  
+**Shipped MAIN order:** Planner → Logbook → Analysis → Equipment → More.
+
+**Dead ends:** None critical. Planner safety ack re-required each visit at `db72dce` (WIP fixes).
 
 ---
 
 ## E. UI Consistency Report
 
-### Apple Watch vs `Watch_LIVE_reference.png`
+### Apple Watch (vs `Watch_LIVE_reference.png`)
 
-| Screen | Match | Issue | Severity | Recommended fix |
-|--------|-------|-------|----------|-----------------|
-| DiveLiveView | **High** | Black canvas, neon panels, separated ascent column, octopus header | — | Maintain |
-| Ascent banner | **High** | Inline red banner; depth/gauge/controls remain visible | — | Maintain policy in `WATCH_MAIN_UX_CONVENTIONS.md` |
-| GPS confirmation | **High** | Compact top banner (~1.4 s), not full-screen takeover | — | Maintain |
-| CompassView | **High** | Full-screen black, bordered SET/CLEAR | — | |
-| Settings / Log / Export | **High** | Panel vocabulary, neon strokes | — | |
-| Mode Selection | **Medium** | Extra pre-dive screen not in live reference | LOW | Optional default tab = Live |
-| Localization | **Medium** | Secondary pass done; some literals may remain | LOW | Spot-check EN on device |
-| UserImages empty tab | **Low** | Tab in bar without assets | LOW | Hide tab when `imageNames.isEmpty` |
+| Area | Match | Issue | Severity | Recommended fix |
+|------|-------|-------|----------|-----------------|
+| Black canvas + neon palette | Strong | — | — | — |
+| Large depth hero + ascent column | Strong | — | — | — |
+| TTV / Runtime panel | Strong | "RunTime" English label in code | LOW | Localize key |
+| Rounded panels / hairline borders | Strong | — | — | — |
+| Stopwatch + START/STOP/RESET | Strong | — | — | — |
+| Ascent alarm inline | Strong | Must not regress to full-screen block | — | — |
+| Mixed IT/EN | Partial | Some keys IT-first | LOW | strings pass |
+| 41mm / small Watch | Partial | `minimumScaleFactor` used; physical QA advised | MED | Device spot-check |
 
-### iOS vs `iOS_Companion_reference.png`
+### iOS (vs `iOS_Companion_reference.png`)
 
-| Screen | Match | Issue | Severity | Recommended fix |
-|--------|-------|-------|----------|-----------------|
-| Tab bar + `DIRTheme` | **High** | Dark marine + cyan accent | — | |
-| Logbook / Detail / Planner | **High** | Cards, charts, neon gas borders | — | |
-| More disclaimer | **High** | Safety block present | — | |
-| App icon set | **Medium** | Validate all `AppIcon.appiconset` slots in Xcode archive | MED | Asset pass before archive |
-| Partial EN on planner result | **Medium** | Some table headers Italian | LOW | i18n keys for PlanResultView |
+| Area | Match | Issue | Severity | Recommended fix |
+|------|-------|-------|----------|-----------------|
+| Dark marine + cyan accents | Strong | `DIRTheme` throughout | — | — |
+| Card layout + metric tiles | Strong | — | — | — |
+| Tab bar | Partial | **Tab order** differs from reference | LOW | Product decision or reorder |
+| Logbook rows | Partial | **No site thumbnails** in list | LOW | Optional image field |
+| Dive detail hero image | Partial | No large hero photo block | LOW | Optional enhancement |
+| Segment labels | Partial | IT strings @ `db72dce`; **WIP localizes** | LOW | Commit WIP |
+| Planner / result screens | Strong | Dense technical UI; disclaimers present | — | — |
+| Footer features (.ssrf) | Partial | Marketing shows .ssrf; app ships CSV | LOW | Update store copy |
+
+**No generic SwiftUI default styling** on primary surfaces; custom `DIRTheme` / `DiveUI` components used.
 
 ---
 
 ## F. Settings Report
 
-### Watch MAIN
+### Watch (`SettingsView` + child views)
 
-| Setting | Reachable | Editable | Persisted | Applied | Sync to iPhone |
-|---------|-----------|----------|-----------|---------|----------------|
-| Ascent rate limits | Y | Y | Y (`AscentRateSettingsStore`) | Immediate | No (copy: planned) |
-| Alarm thresholds | Y | Y | Y (`@AppStorage`) | Immediate | No |
-| Haptics on/off | Y | Y | Y | Immediate | No |
-| Units | Y | Partial | Y | Metric forced | No |
-| Language System/IT/EN | Y | Y | Y | Immediate | No |
-| GPS / depth / sync status | Y | N (read-only rows) | — | Live status strings | — |
-| Clear sync queue | Y | Y | Y | Immediate | — |
+| Setting | Reachable | Persisted | Applied | Synced to iOS |
+|---------|-----------|-----------|---------|---------------|
+| Units | Y | Y (`dirdiving_watch_units`) | Y (Live/Log/gauge) | Partial (WC context) |
+| Language | Y | Y | Y | N |
+| Haptics | Y | Y | Y (`HapticService`) | N |
+| Ascent rate limits | Y | Y | Y | N |
+| Alarm thresholds/toggles | Y | Y | Y | N |
+| Legal / safety | Y | acceptance store | Read-only | N |
+| Shortcut help | Y | — | Instructional | N |
+| Display / Always-On | Info only | — | watchOS managed | N |
+| Audio tones | Info only | — | Not implemented | N |
 
-### iOS MAIN
+**Gaps:** No in-app brightness/always-on control (acceptable). Audio tones not implemented (documented).
 
-| Setting | Reachable | Editable | Persisted | Notes |
-|---------|-----------|----------|-----------|-------|
-| Language | Y (More) | Y | Y | Does not change units/calculations |
-| Watch sync / trust reset | Y | Y | Y | `resetPairingTrust()` |
-| iCloud sync trigger | Y | Y | Y | Last-write-wins surfaced |
-| Units / export labels | Y | **Read-only** in More | — | Honest “local-only” |
-| Demo logbook | Y | Y | Y | Reviewer toggle |
-| Equipment / planner | Y | Y | iCloud KVS | No per-field merge UI |
+### iOS (`MoreView` + Planner)
 
-**Gaps:** Bidirectional settings sync still documented as planned; Watch imperial conversion not implemented; iOS notification permission UI thin.
+| Setting | Reachable | Persisted | Applied | Synced |
+|---------|-----------|-----------|---------|--------|
+| Units | Y | Y | Y (formatters) | Y (WC) |
+| Language | Y | Y | Y (companion UI) | N |
+| Demo logbook | Y | Y | Y | N (demo not pushed) |
+| Watch sync / conflicts | Y | runtime | Y | — |
+| Cloud sync | Y | KVS | On demand | iCloud |
+| Planner safety ack | Y | **N @ db72dce** / **Y WIP** | Gates planner | N |
+| Legal | Y | Y | Gate | N |
+
+**Gaps:** Alarms/haptics on iOS called out as local-only (Watch owns dive alarms). No per-transfer WC delivery UI (aggregate status only).
 
 ---
 
 ## G. Haptics / Tones Report
 
-### Watch — implemented
+### Watch (`HapticService`, `DepthLimitHapticCoordinator`)
 
-| Event | Haptic | Gated by setting |
-|-------|--------|------------------|
-| Stopwatch start/stop/reset | confirm / notify patterns | Y |
-| Dive lifecycle / GPS confirm | confirm | Y |
-| Ascent over-limit | failure + repeat ~1.75 s | Y |
-| Depth / time / battery alarms | warnIfNeeded (2 s debounce) | Y |
-| Compass SET / CLEAR | confirm / notify | Y |
-| Log delete / export | notify / confirm | Y |
-| Settings actions | notify / confirm | Y |
+| Event | Haptic | Settings-gated |
+|-------|--------|----------------|
+| Ascent over limit | Failure + repeat loop | Y |
+| Depth/time/battery alarms | `warnIfNeeded` | Y |
+| Manual dive start/stop | `confirm` | Y |
+| GPS point saved | `confirm` | Y |
+| Compass SET/CLEAR | `confirm` | Y |
+| Export success/failure | confirm / notify | Y |
+| Stopwatch start/stop/reset | Partial / light | Y |
+| Log delete | Minimal / none | — |
 
-### Watch — gaps
-
-- No audio tones underwater (acceptable).
-- Buddy haptics exist in `HapticService` but Buddy not in MAIN target.
+**Tones:** Not implemented; Settings states audio not used underwater — **consistent with product choice**.
 
 ### iOS
 
-- **No** `AVAudioPlayer` / system alert sounds for sync/export.
-- Visual-only feedback (colors, captions).
-- No push notification onboarding flow in MAIN.
-
-**Safety-critical:** Ascent and alarm paths have haptic + visual; GPS save uses confirm haptic.
+| Feedback | Status |
+|----------|--------|
+| Haptics | N/A |
+| Alert sounds | Not implemented |
+| Push notifications | Not implemented |
+| Sync/export/cloud errors | Text + color (WIP: orange decode text in More) |
 
 ---
 
@@ -215,53 +251,47 @@ More → language, iCloud sync, demo logbook, disclaimer, Watch sync status rows
 
 | Control | Status |
 |---------|--------|
-| Digital Crown | Scroll in Settings, log lists, Mode Selection (standard SwiftUI) |
-| Side button / Action Button | **Not** mapped to arbitrary dive start/stop; documented in `WatchShortcutHelpView` |
-| App Intents | `StartManualDiveIntent`, `EndManualDiveIntent`, `SetBearingIntent`, `ClearBearingIntent`, `AcknowledgeAlarmIntent`, stopwatch toggle/reset |
-| Long press | No global custom long-press for dive |
-| Crown vs swipe | Vertical page `TabView` — Crown scrolls within scroll views |
+| Digital Crown | Vertical tab paging; scroll in lists |
+| Side button | **Not mapped** to dive lifecycle |
+| Action Button / Shortcuts | **7 App Intents** in `ActionButtonIntents.swift` / `DIRDivingAppShortcuts` |
+| Long press | Not used for dive control |
+| On-screen START/STOP/RESET | Primary reliable path |
+| Shortcut Help | `WatchShortcutHelpView` in Settings (`db72dce`) |
 
-**Safe:** Copy does not promise side button = START dive. Fallback UI buttons always present.
+**Safe:** No false claim of direct hardware dive start; TestFlight notes should match (`Docs/TESTFLIGHT_REVIEW_NOTES.md`).
 
 ---
 
 ## I. Sync Report
 
-### Implemented paths
+| Path | Status | User feedback |
+|------|--------|---------------|
+| Watch → iPhone dives | Y | Settings failed/pending counts |
+| iPhone → Watch push | Y | More sync button |
+| Tombstones / deletes | Y | Codec + store |
+| Units preference | Y | `applicationContext` |
+| Photos to Watch | Y | File transfer |
+| Conflict resolution | Y | More card; keep-local re-push |
+| Offline queue | Y | `transferUserInfo` fallback |
+| Signed ack (HMAC) | Y | Legacy fallback documented |
+| iCloud KVS merge | Y | More status string |
+| iCloud decode failure | **Silent @ db72dce** / **Visible WIP** | MED |
 
-| Direction | Mechanism | Status |
-|-----------|-----------|--------|
-| Watch → iPhone | `sendMessage` / `transferUserInfo`, HMAC payload, pending queue in Documents + `completeFileProtection` | Implemented |
-| iPhone → Watch | `didReceiveMessage`, `didReceiveUserInfo`, `ingestIncomingPayload`, signed ack reply | Implemented (`a75a6c3`) |
-| Tombstones | `dirdiving_shared_deleted_session_ids` + `dirdiving_deleted_session_ids` WC broadcast | Implemented |
-| Peer secret | `WatchSyncAuth`, `applicationContext` merge | Implemented |
-| iPhone conflicts | Persisted conflicts file + resolve UI patterns | Implemented |
-| Offline queue | Watch pending JSON; retry in Settings | Implemented |
-
-### Remaining risks (not code-missing on paper)
-
-| Risk | Severity | Notes |
-|------|----------|-------|
-| First pairing without peer secret | MED | Sessions queue until secret exchanged — document in TestFlight notes |
-| Per-session delivery status | LOW | Aggregate counters in Settings/More; not per-dive UUID UI |
-| Stale status after language change | LOW | `lastSyncStatus` string set at event time |
-| Device QA not executed in this audit | MED | Simulator WC limited |
-
-**Mock-only:** None identified on MAIN sync path.
+**Not mock-only** for MAIN dive sync. Experimental buddy/explore sync not in MAIN.
 
 ---
 
 ## J. Export Report
 
-| Format | Watch | iOS | User feedback |
-|--------|-------|-----|---------------|
-| Subsurface CSV | Y | Y | Error message if write fails |
-| ShareLink | Y | Y | From detail/list |
-| GPX/KML | N | N | Post-release (documented) |
+| Format | Watch | iOS |
+|--------|-------|-----|
+| Subsurface CSV | Y | Y |
+| GPX/KML | N | N |
+| .ssrf | N | N |
+| Share sheet | Y | Y |
+| Failure UX | Message + haptic | Inline error text |
 
-**Validity:** CSV business format documented in `Docs/iOS/SUBSURFACE_EXPORT.md`; manual round-trip QA recommended.
-
-**Reachability:** Export from log list (latest) and dive detail; export completion screen on Watch.
+`SubsurfaceExportService` writes real temp CSV files; stale file cleanup >24h.
 
 ---
 
@@ -269,115 +299,98 @@ More → language, iCloud sync, demo logbook, disclaimer, Watch sync status rows
 
 | Item | Status |
 |------|--------|
-| Certified dive computer | **Not claimed** — `Docs/SAFETY_DISCLAIMER.md`, README, More |
-| Planner / Bühlmann | Indicative; in-app + doc disclaimers |
-| TTV | Labeled informative; not NDL/TTS |
-| Ascent warning | Inline banner + haptics; UI-reliable |
-| GPS | Surface-only; no-fix/fallback labeled |
-| Depth | Manual fallback when auto unavailable |
-| Alarm dismiss | User can OK; cooldown prevents spam |
-| App Store risk | **Real-device depth entitlement**; privacy policy; partial i18n on technical screens |
+| NOT a certified dive computer | Legal, onboarding, More, planner copy |
+| Planner indicative only | Acknowledgment + export disclaimers |
+| TTV not NDL/TTS | Stated on iOS detail |
+| Ascent warning | Visible; gauge remains |
+| GPS honesty | Fix source labels (surface / fallback / no-fix) |
+| Depth 35/38/40 m | Fixed thresholds |
+| App Store risk | Submersion entitlement proof; planner marketing language; auto-dive claims |
+
+**Blockers:** Physical validation on Apple Watch Ultra with water submersion entitlement (HIGH for marketing automatic dive).
 
 ---
 
 ## L. Error / Empty State Report
 
-| Condition | Watch | iOS |
-|-----------|-------|-----|
-| No dives | `NESSUNA IMMERSIONE` + export hint | Logbook + Analysis empty + CTAs |
-| No GPS | Banner “unavailable”; detail fallback text | Route empty in analysis |
-| No depth / manual | Manual panel + error banner | Charts may be flat |
-| Compass denied | Yellow status in CompassView | n/a |
-| Sync pending/fail | Settings rows + **live strip** | More last event |
-| Export fail | Yellow message | Import error string |
-| Permissions denied | GPS status in Settings | System dialogs |
-| Load error | Red banner in log list | — |
+| Condition | Watch | iOS @ db72dce | iOS WIP |
+|-----------|-------|---------------|---------|
+| No dives | Log empty card | Logbook + Analysis empty actions | Same |
+| No GPS | Settings + Live copy | Detail "Not available" | Same |
+| No depth sensor | Manual dive panel | N/A | Same |
+| WC disconnected | Settings sync strip | More status | Same |
+| Sync fail | failedImportCount | lastMessage + conflicts | Same |
+| Export fail | Text + haptic | Orange error | Same |
+| iCloud decode fail | — | **Silent** | **Orange text in More** |
+| Permissions denied | GPS status row | Photo picker errors | Same |
+| Low battery | Alarm path | N/A on phone | Same |
 
-**Silent failures:** User who never opens Settings may miss queue growth (mitigated partially by live sync strip).
-
-**Crashes:** None observed in simulator build run (not a substitute for device soak test).
+No static crash paths identified; runtime QA still required.
 
 ---
 
 ## M. Bugs To Fix
 
-| # | Title | Platform | Location | Sev. | User impact | Fix type |
-|---|-------|----------|----------|------|-------------|----------|
-| 1 | Depth entitlement not validated on real Watch Ultra | Watch | Entitlements + `DiveManager` | **HIGH** | Auto depth may fail in water | Process / QA |
-| 2 | First-pairing sync appears “broken” without docs | Both | `WatchSyncAuth`, Settings | **MED** | Tester confusion | Process + copy |
-| 3 | Mode Selection extra step on every cold launch | Watch | `AppPage.modeSelection` | **LOW** | Friction | UI-only |
-| 4 | UserImages tab visible when bundle empty | Watch | `ContentView` | **LOW** | Empty tab | UI-only |
-| 5 | Residual i18n on planner result / GPS detail lines | iOS | `PlannerView`, `DiveDetailView` | **LOW** | Mixed EN/IT | UI-only |
-| 6 | iOS AppIcon completeness for archive | iOS | `AppIcon.appiconset` | **MED** | Archive rejection risk | Assets |
-| 7 | Settings not synced Watch ↔ iPhone | Both | Settings/More copy | **LOW** | Expectation mismatch | Planned / product |
-| 8 | Imperial units Watch locked to metric | Watch | `SettingsView` | **LOW** | Documented | Planned |
-| 9 | Per-session sync status not per dive UUID | Both | Sync services | **LOW** | Power users only | Small functional |
+| ID | Title | Platform | File/screen | Severity | User impact | Fix | Code impact |
+|----|-------|----------|-------------|----------|-------------|-----|-------------|
+| R1 | Physical depth/submersion QA | Watch | `DiveManager`, entitlement | **HIGH** | Auto dive unproven in sim | TestFlight on Ultra | QA / device |
+| R2 | Planner safety ack not persisted | iOS | `PlannerView` | **MED** | Re-ack every visit @ `db72dce` | `@AppStorage` revision (**WIP on disk**) | Small |
+| R3 | iCloud decode errors silent | iOS | `CloudSyncStore`, `MoreView` | **MED** | User thinks cloud OK | `lastDecodeError` UI (**WIP on disk**) | Small |
+| R4 | Mixed IT/EN strings | iOS | Logbook, Detail, Analysis, Planner | **LOW** | EN users see IT | Localize (**WIP partial**) | UI-only |
+| R5 | Tab order vs reference | iOS | `ContentView` | **LOW** | Planner-first vs mock Logbook-first | Reorder or accept | UI-only |
+| R6 | Logbook thumbnails missing | iOS | `LogbookView` | **LOW** | Visual mismatch vs mock | Optional photos | Medium |
+| R7 | User Images tab hidden until content | Watch | `ContentView` | **LOW** | Low discoverability | Onboarding hint | Small |
+| R8 | iOS no notification/sound feedback | iOS | — | **LOW** | Silent phone sync | Optional UNNotification | Medium |
+| R9 | F11 legacy ack fallback | Both | `WatchDiveSyncCodec` | **LOW** | Security hardening | Floor build follow-up | Small |
+| R10 | Reference claims .ssrf export | Docs/marketing | — | **LOW** | Store expectation mismatch | Align metadata to CSV | Docs |
 
-**Resolved since last audit (no longer open):**
-
-- ~~Watch missing `didReceiveMessage`~~ → **Fixed** `a75a6c3`
-- ~~Tombstone key mismatch~~ → **Fixed** shared key
-- ~~GPS full-screen 2.4 s~~ → **Fixed** compact banner 1.4 s
-- ~~Alarm no dismiss~~ → **Fixed** OK + cooldown
-- ~~xcodebuild SDK missing~~ → **Fixed** on audit host (both schemes succeed)
+**No CRITICAL compile blockers.** R2–R4 have local fixes not yet on `origin/main`.
 
 ---
 
 ## N. Priority Roadmap
 
 ### 1. Must fix before compile/use
-
-- ✅ Simulator builds (done on audit host).
-- Verify **release signing** + provisioning with water submersion entitlement on Apple Developer portal.
+- **None** — both targets build.
 
 ### 2. Must fix before TestFlight
-
-- **Real Apple Watch Ultra** depth smoke test (automatic launch + submerged samples).
-- End-to-end pairing: Watch log → iPhone → delete on iPhone → confirm absent on Watch (tombstone).
-- End-to-end iPhone push / delete → Watch (inbound handlers).
-- Reviewer notes: `Docs/TESTFLIGHT_REVIEW_NOTES.md`.
+- **R1** Ultra depth + WC smoke test on hardware  
+- Commit/push **R2–R4 WIP** (or re-verify on `db72dce` without them)  
+- App icons / signing on release Mac  
 
 ### 3. Must fix before App Store
-
-- Entitlement proof + privacy policy (GPS, Health, iCloud).
-- Complete i18n on **primary** flows or declare Italian-primary in metadata.
-- App icon / screenshot asset validation.
-- Legal review of planner + TTV copy.
+- **R1** + entitlement documentation  
+- **R3** shipped (iCloud decode visibility)  
+- Legal/metadata aligned with actual features (CSV only, no side-button dive start)  
+- `Docs/TESTFLIGHT_REVIEW_NOTES.md` aligned with build  
 
 ### 4. Post-release
-
-- Skip Mode Selection default to Live; hide empty UserImages tab; GPX export; per-session sync delivery UI; bidirectional settings sync.
+- **R4** full i18n (Planner, Equipment)  
+- **R5–R6** UI polish vs reference  
+- **R8–R9** security/export extras  
+- GPX/KML export (documented backlog)
 
 ---
 
 ## O. Final Verdict
 
-| Question | Answer |
-|----------|--------|
-| **Ready to compile?** | **Yes** — XcodeGen + both schemes **BUILD SUCCEEDED** on simulator (2026-05-20 host). |
-| **Ready for internal test?** | **Yes** — with pairing checklist and known depth-field validation gap. |
-| **Ready for average user?** | **Conditional** — usable for diving/logging if user accepts Mode Selection step, metric-only Watch, and English not 100% on all screens. |
-| **Ready for TestFlight?** | **After** real Ultra depth test + bidirectional sync QA on physical devices. |
-| **Ready for App Store?** | **No** — depth entitlement validation, legal/metadata, residual i18n/assets. |
-
-**What blocks 100% readiness:**
-
-1. **Field validation** of water submersion depth on Apple Watch Ultra (not provable in simulator).  
-2. **Physical Watch ↔ iPhone** sync/tombstone QA (code present; behavior unverified in this audit).  
-3. **Product friction:** Mode Selection on launch; settings sync not bidirectional (documented).  
-4. **Release packaging:** App icon completeness, privacy policy, App Store copy vs indicative planner.  
-5. **Residual localization** on secondary/technical iOS screens.
+| Question | Committed `db72dce` | After committing local WIP |
+|----------|----------------------|----------------------------|
+| **Ready to compile?** | **YES** | **YES** |
+| **Ready for internal test?** | **YES** | **YES** |
+| **Ready for average user?** | **MOSTLY (~91%)** | **MOSTLY (~94%)** |
+| **Ready for TestFlight?** | **YES** after R1 device QA | **YES** after R1 + commit WIP |
+| **Ready for App Store?** | **CONDITIONAL** | **CONDITIONAL** (R1 + metadata) |
+| **What blocks 100%?** | Hardware depth path, App Store review, R2–R4 on remote, reference/UI gaps, no iOS sounds | Primarily **R1** hardware QA and store/legal review |
 
 ---
 
-## Reference: commit baseline for fixes
+## Prior MAIN fixes (landed on `db72dce`)
 
-| Commit | Scope |
-|--------|--------|
-| `a75a6c3` | P0 inbound sync, P1 tombstones, GPS banner, alarm OK, sync strip, App Intents |
-| `2e7cf12` | Secondary i18n (~240 keys Watch, services localized) |
-| `9def114` | Documentation alignment (this audit supersedes doc claims at `b92e03a`) |
+- `876bcd2` — UX audit batch: manual edit, merge metadata, planner mock row removal, disclaimer persistence, sync/conflict improvements, legal scroll gate, etc.  
+- `db72dce` — Ascent gauge imperial labels, 7 App Shortcuts catalog, Watch shortcut help copy, dive detail refresh after manual edit.
 
 ---
 
-*Audit-only · DIR DIVING · `main` @ `9def114` · 2026-05-20*
+**Downloadable report:** `Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260520.docx`  
+**Generate:** `python3 Docs/generate_main_branch_complete_readiness_audit_20260520_docx.py`

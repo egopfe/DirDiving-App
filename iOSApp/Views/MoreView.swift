@@ -80,7 +80,15 @@ struct MoreView: View {
                             row(String(localized: "iCloud Sync"), cloudSync.isICloudAvailable ? String(localized: "more.icloud.active") : String(localized: "more.icloud.unavailable"))
                             row(String(localized: "Backup automatico"), String(localized: "Log e planner"))
                             row(String(localized: "Ultimo evento"), cloudSync.lastSyncStatus)
+                            if let cloudDecodeError = cloudSync.lastDecodeError {
+                                Text(cloudDecodeError)
+                                    .font(.caption2.weight(.semibold))
+                                    .foregroundStyle(DIRTheme.orange)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .accessibilityLabel(cloudDecodeError)
+                            }
                             Button {
+                                cloudSync.clearDecodeError()
                                 logStore.synchronizeCloud()
                                 cloudSync.synchronize()
                             } label: {

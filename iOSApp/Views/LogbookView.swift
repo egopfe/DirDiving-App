@@ -99,7 +99,7 @@ struct LogbookView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
-                Text("Logbook")
+                Text(String(localized: "logbook.title"))
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                 Spacer()
@@ -125,7 +125,7 @@ struct LogbookView: View {
 
     private var emptyLogbook: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Nessuna immersione")
+            Text(String(localized: "logbook.empty.title"))
                 .font(.headline.weight(.semibold))
                 .foregroundStyle(.white)
             Text(String(localized: "logbook.empty.hint"))
@@ -156,12 +156,12 @@ struct DiveLogCard: View {
                 .frame(width: 72, height: 72)
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
-                    Text(session.siteName ?? "Immersione")
+                    Text(session.siteName ?? String(localized: "detail.default_site"))
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
                         .lineLimit(1)
                     if session.isManual {
-                        Text("MANUAL")
+                        Text(String(localized: "logbook.badge.manual"))
                             .font(.system(size: 8, weight: .bold, design: .rounded))
                             .foregroundStyle(DIRTheme.orange)
                             .padding(.horizontal, 4)
@@ -169,7 +169,7 @@ struct DiveLogCard: View {
                             .overlay(RoundedRectangle(cornerRadius: 3).stroke(DIRTheme.orange, lineWidth: 1))
                     }
                     if session.buddy != nil {
-                        Text("BUDDY")
+                        Text(String(localized: "detail.buddy.badge"))
                             .font(.system(size: 8, weight: .bold, design: .rounded))
                             .foregroundStyle(DIRTheme.yellow)
                             .padding(.horizontal, 4)
@@ -177,11 +177,11 @@ struct DiveLogCard: View {
                             .overlay(RoundedRectangle(cornerRadius: 3).stroke(DIRTheme.yellow, lineWidth: 1))
                     }
                 }
-                Text("Max \(Formatters.one(session.maxDepthMeters)) m")
+                Text(String(format: String(localized: "logbook.card.max_depth"), Formatters.one(session.maxDepthMeters)))
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.86))
                 HStack {
-                    Text("T. \(Formatters.time(session.durationSeconds)) min")
+                    Text(String(format: String(localized: "logbook.card.duration"), Formatters.time(session.durationSeconds)))
                     Spacer()
                     Text(session.gasLabel.rawValue)
                 }
