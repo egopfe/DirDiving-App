@@ -48,7 +48,7 @@
 
 Nessun conflitto locale durante `git pull --rebase origin main`.
 
-PR #8 e #9 risultano `mergeable: CONFLICTING` via `gh pr view`; entrambe hanno check GitHub Actions `build` fallito. Sono non safe-to-merge.
+PR #8/#9 restano non safe-to-merge: post-push #8 risulta `mergeable: UNKNOWN`, #9 `mergeable: CONFLICTING`, ed entrambe hanno check GitHub Actions `build` fallito.
 
 ---
 
@@ -62,7 +62,7 @@ Nessuno.
 
 | PR | Branch | Base | Stato | Raccomandazione |
 |----|--------|------|-------|-----------------|
-| #8 Update experimental Apnea workflow | `codex/experimental-features` | `main` | `mergeable: CONFLICTING`, build failed | Review manuale; non auto-merge |
+| #8 Update experimental Apnea workflow | `codex/experimental-features` | `main` | `mergeable: UNKNOWN`, build failed | Review manuale; non auto-merge |
 | #9 Add experimental Apnea companion review | `codex/ios-experimental-features` | `main-iOS` | `mergeable: CONFLICTING`, build failed | Review manuale; non auto-merge |
 
 ---
