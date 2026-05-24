@@ -1,6 +1,8 @@
-# DIR DIVING — Report aggiornamento documentazione (2026-05-24)
+# DIR DIVING — Report aggiornamento documentazione (2026-05-24, post `f851b61`)
 
-**Tipo:** Allineamento documentazione + commit readiness UX + push `main`. Nessun merge PR automatico. Nessuna modifica GPS/BUSSOLA/calcoli.
+**Tipo:** Solo documentazione e allineamento Git. Nessun merge PR automatico. Nessuna modifica a GPS, BUSSOLA, calcoli immersione o persistenza modelli.
+
+**HEAD `main`:** `f851b61` — development notes (unità sync, disclaimer launch, manual dives, foto Watch, checklist, Planner first tab, ecc.).
 
 ---
 
@@ -8,87 +10,101 @@
 
 | File | Azione |
 |------|--------|
-| `README.md` | Pass `6cda004`, readiness 100% UX, bundle `.ios.watch`, branch strategy |
-| `CHANGELOG.md` | Voci 2026-05-24 e depth safety |
-| `Docs/ROADMAP.md` | Feature completate readiness pass |
-| `Docs/DIR_DIVING_Feature_Comparison.csv` | ~15 righe additive |
-| `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260523.md` | HEAD `6cda004` |
-| `Docs/PR_STATUS_20260523.md` | Baseline PR invariata |
-| `Docs/DOCUMENTATION_UPDATE_REPORT_20260524.md` | Questo file |
-| `Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md` | Già aggiornato nel pass UX |
-| `Docs/TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md` | Già presente |
-| `Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523.md` | Già presente |
+| `README.md` | Sezione pass `f851b61`; tab iOS Planner prima; HEAD branch strategy |
+| `CHANGELOG.md` | Voce Unreleased `f851b61` |
+| `Docs/ROADMAP.md` | Feature rilasciate + backlog aggiornato |
+| `Docs/DIR_DIVING_Feature_Comparison.csv` | Riga unità aggiornata + ~14 righe additive |
+| `Docs/DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md` | Stato commit/push |
+| `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260524.md` | **Nuovo** |
+| `Docs/PR_STATUS_20260524.md` | **Nuovo** |
+| `Docs/DOCUMENTATION_UPDATE_REPORT_20260524.md` | Questo file (aggiornato) |
 
-**Codice (commit separato):** `CSVImportPanel.swift`, Logbook, More, Planner, Settings Watch, DiveLogListView, legal onboarding, Localizable.strings.
+**Non modificati in questo pass (già validi):** `project.yml`, `Docs/BUILD_VALIDATION.md`, `CONTRIBUTING.md`, spec Snorkeling/Apnea experimental.
 
 ---
 
 ## B. Branch ispezionati
 
-| Branch | HEAD (fetch 2026-05-24) | Note |
-|--------|-------------------------|------|
-| `main` | `6cda004` | Allineato con `origin/main` |
-| `main-iOS` | diverge ~168 behind / 43 ahead vs `main` | Solo sync docs consigliato |
-| `codex/experimental-features` | `6649335` | Snorkeling/Apnea/Buddy isolati |
-| `codex/ios-experimental-features` | `9e5baca` | Explore Lab iOS |
-| `backup/before-docs-merge-20260524-readiness` | snapshot pre-commit | Backup locale |
+| Branch | HEAD | Note |
+|--------|------|------|
+| `main` | `f851b61` | Allineato `origin/main` |
+| `main-iOS` | `3994b33` | ~172 behind `main` — sync docs pianificato |
+| `codex/experimental-features` | `6649335` | Watch experimental |
+| `codex/ios-experimental-features` | `9e5baca` | iOS experimental |
+| `backup/before-docs-merge-20260524-docs` | `f851b61` | Backup locale |
 
 ---
 
-## C. Branch aggiornati
+## C. Branch aggiornati (questo pass)
 
 | Branch | Azione |
 |--------|--------|
-| `main` | Commit UX + docs + `git push origin main` |
-| `main-iOS` | **Non merge automatico** — copiare manualmente `Docs/*`, `README.md`, `CHANGELOG.md` da `main` se desiderato |
+| `main` | Commit documentazione + push |
+| `main-iOS` | Checkout file docs da `main` + commit + push |
 
 ---
 
-## D–E. Conflitti
+## D. Conflitti trovati
 
 | Contesto | Stato |
 |----------|--------|
-| PR #8 | CONFLICTING — non merge |
-| PR #9 | CONFLICTING — non merge |
-| `main-iOS` runtime merge | Non tentato |
-
-Nessun conflitto risolto in questo pass (solo `main` lineare).
+| PR #8 → `main` | CONFLICTING (documentale) |
+| PR #9 → `main-iOS` | CONFLICTING (documentale) |
+| `main` ↔ `main-iOS` runtime | Non tentato |
 
 ---
 
-## F–H. PR
+## E. Conflitti risolti
 
-| PR | Safe auto-merge | Motivo |
-|----|-----------------|--------|
-| [#8](https://github.com/egopfe/DirDiving-App/pull/8) | **No** | Experimental Watch in MAIN target |
-| [#9](https://github.com/egopfe/DirDiving-App/pull/9) | **No** | Regressioni security note iOS experimental |
+Nessuno in questo pass (solo documentazione lineare su `main`).
 
-**Manual checks:** `project.yml` excludes, build Watch+iOS, BUSSOLA, GPS surface-only, F1–F12.
+---
+
+## F. PR ispezionate
+
+| PR | Branch | Base |
+|----|--------|------|
+| #8 | `codex/experimental-features` | `main` |
+| #9 | `codex/ios-experimental-features` | `main-iOS` |
+
+---
+
+## G. PR safe to merge
+
+**Nessuna** senza review manuale, build macOS e verifica `project.yml` excludes.
+
+---
+
+## H. PR requiring manual review
+
+- **#8** — rischio inclusione Snorkeling/Apnea/Buddy in MAIN; verificare conflitti con `f851b61` units sync e Diving UI.
+- **#9** — rischio regressioni security export/import CSV; allineare a `main` F4/F5 prima del merge.
 
 ---
 
 ## I. Gap documentazione aperti
 
-- `Docs/Branch_Functionality_Matrix.xlsx` — rigenerare da CSV manualmente.
-- Shortcut help Watch / alcune righe InfoView ancora IT letterali (LOW).
-- Validazione entitlement Ultra su device reale (checklist esterna).
-- Convergenza runtime `main-iOS` ↔ `main` (processo, non docs).
+- `Docs/Branch_Functionality_Matrix.xlsx` — rigenerare manualmente da CSV se usato esternamente.
+- AppIcon App Store da `Docs/ReferenceIcon/apple watch icon.png` / `ios icon.png`.
+- Watch back navigation audit su tutte le sub-screen.
+- Convergenza **runtime** `main-iOS` ↔ `main` (processo separato dalla docs).
+- Alcune righe Settings/InfoView Watch ancora IT letterali (LOW i18n).
 
 ---
 
-## J. Commit suggeriti (eseguiti su `main`)
+## J. Commit eseguiti / suggeriti
 
-1. `feat(main): readiness 100% UX — import, planner UI, legal scroll, i18n`
-2. `docs: update feature matrix and branch alignment post readiness pass`
-
----
-
-## K. Rischi / assunzioni
-
-- `gh` CLI non disponibile in ambiente agent: stato PR da file `PR_STATUS_20260523.md` e fetch Git.
-- Build iOS/Watch verificate su macOS named simulators nel pass UX precedente.
-- Nessuna validazione entitlement Apple Developer portal in questo pass.
+1. `docs: update feature documentation and branch matrix post f851b61` — `main`
+2. `docs: sync documentation from main @ f851b61` — `main-iOS`
 
 ---
 
-*Report A–K — 2026-05-24*
+## K. Rischi e assunzioni
+
+- Stato PR **CONFLICTING** basato su report precedenti + divergenza branch; **non** verificato con `gh` (CLI assente).
+- Documentazione descrive unità imperiali come **display**; export Subsurface e storage restano metrici.
+- Snorkeling Live / Waypoint Map / Return Map restano **solo** su rami experimental — non documentati come MAIN production.
+
+---
+
+_Report generato in pass documentazione post-push codice `f851b61`._

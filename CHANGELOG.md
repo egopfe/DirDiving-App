@@ -4,6 +4,12 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-24, development notes — `f851b61`)
+
+- **Codice (UI/sync only):** unità metriche/imperiali con sync Watch↔iOS; disclaimer companion ogni avvio; allarmi Watch (default 30 min, profondità in unità selezionate); marchio `altosinistra`; iOS Planner prima tab; immersioni manuali; checklist attrezzatura editabile; invio foto al Watch; planner safety ack in cima con campi disabilitati se OFF.
+- **Documentazione:** README, CSV feature matrix, `DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md`, allineamento branch/PR 2026-05-24.
+- **Vincoli:** nessuna modifica GPS, BUSSOLA, calcoli profondità/risalita/decompressione; storage metrico canonico invariato.
+
 ### Added (2026-05-24, documentation alignment + MAIN readiness 100% UX)
 
 - Documentazione: README (pass `6cda004` depth limits + readiness 100% UX), CSV feature matrix, `DOCUMENTATION_UPDATE_REPORT_20260524.md`, aggiornamento branch alignment e PR status.
