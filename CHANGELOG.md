@@ -4,6 +4,23 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-20, documentation post v9 — `d962117`)
+
+- **Documentazione:** [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md) panoramica funzioni IT; README, INDEX, ROADMAP, matrice CSV (righe v8/v9); report [`DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md), [`DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md), [`PR_STATUS_20260520_POST_V9.md`](Docs/PR_STATUS_20260520_POST_V9.md).
+- **Baseline codice documentata:** v9 Watch surface User Images + Planner/Bühlmann input sync; v8 planner gas/equipment/MOD.
+- **Vincoli:** solo documentazione; nessuna modifica runtime in questo pass.
+
+### Added (2026-05-20, v9 — `d962117`)
+
+- **Watch:** tab User Images sempre disponibile fuori immersione attiva; empty state localizzato; dettaglio immagine `scaledToFit`.
+- **iOS:** `PlannerStore.applyInputToPlanningOutputs()` aggiorna plan + Bühlmann su cambio input gas; refresh su `plannerCylinders`.
+- **Report:** [`Docs/DIR_DIVING_v9_IMPLEMENTATION_REPORT.md`](Docs/DIR_DIVING_v9_IMPLEMENTATION_REPORT.md).
+
+### Added (2026-05-20, v8 planner gas — `a36dc23`)
+
+- **iOS:** cilindri multipli, ruoli gas, Air/EAN/Trimix, PPO₂ 0.1, MOD Dalton, equipment template GAS, foto→Watch con preprocess.
+- **Report:** [`Docs/DIR_DIVING_v8_IMPLEMENTATION_REPORT.md`](Docs/DIR_DIVING_v8_IMPLEMENTATION_REPORT.md).
+
 ### Added (2026-05-24, MAIN readiness pass — build, i18n, copy, QA docs)
 
 - **Build (Watch):** `return` mancanti in `AscentRateSettingsView.limitControl` e `DiveLogListView.logRow`; `xcodegen` + build simulator Watch/iOS **SUCCEEDED**.

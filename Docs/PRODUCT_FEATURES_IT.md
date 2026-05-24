@@ -1,0 +1,131 @@
+# DIR DIVING — Panoramica funzionalità (italiano)
+
+**Aggiornato:** 2026-05-20  
+**Branch di riferimento:** `main` @ `d962117`  
+**Spec prodotto corrente:** [`DIR_Diving_Complete_Development_Notes_UPDATED_v9.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v9.md)
+
+Documento additivo: integra README e matrice CSV senza sostituire audit o note legali dettagliate.
+
+---
+
+## Piattaforme
+
+| App | Target | Branch stabile | Branch sperimentale |
+|-----|--------|----------------|---------------------|
+| Apple Watch Ultra / watchOS 10+ | `DIRDiving Watch App` | `main` | `codex/experimental-features` |
+| iPhone companion iOS 17+ | `DIRDiving iOS` | `main` (workspace unificato) | `codex/ios-experimental-features` |
+| Worktree storico solo iOS | — | `main-iOS` (divergente; allineare docs da `main`) | — |
+
+Generazione progetto: `xcodegen generate` → `DIRDiving.xcodeproj` (non versionato).
+
+---
+
+## Onboarding e disclaimer
+
+- Flusso obbligatorio al primo avvio o cambio revisione legale: Welcome → Safety Warning → Disclaimer completo → Acceptance.
+- Testi IT/EN in `LegalDisclaimer.txt` per Watch e iOS.
+- Persistenza accettazione: versione app, major, device, lingua, timestamp.
+- **Settings → Legal & Safety** per rilettura.
+- Overlay companion a **ogni cold launch** (oltre onboarding) — `CompanionDisclaimerAcceptance`.
+- Checkbox limiti operativi profondità Apple (35/38/40 m); revisione legale `2026-05-23`.
+
+Vedi [`SAFETY_DISCLAIMER.md`](SAFETY_DISCLAIMER.md), [`TESTFLIGHT_REVIEW_NOTES.md`](TESTFLIGHT_REVIEW_NOTES.md).
+
+---
+
+## Modalità operative
+
+### Diving (MAIN — `main`)
+
+- Schermata live: profondità, TTV informativo, RunTime, gauge risalita, cronometro manuale, warning risalita inline (non full-screen).
+- **BUSSOLA** dedicata: heading, SET BEARING, CLEAR (terminologia UI: **BUSSOLA**, mai «COMPASSO»).
+- GPS ingresso/uscita **solo in superficie** (best-effort); nessun tracking subacqueo certificato.
+- Log ultime 40 immersioni, dettaglio, export CSV Subsurface, sync WatchConnectivity + iCloud KVS.
+- Settings: limiti risalita, allarmi (profondità default configurabile 30/40 m, tempo default 30 min), haptic, unità metrico/imperiale (display), info device/batteria, sync.
+- Immagini utente: tab sempre disponibile **fuori** immersione attiva; durante immersione solo Live + BUSSOLA.
+- App Intents / Action Button: cronometro, bearing, allarmi (quando watchOS espone gli intent).
+
+### Snorkeling (sperimentale — `codex/experimental-features`)
+
+- **Snorkeling Live:** runtime, distanza, velocità, profondità, GPS, waypoint, ritorno.
+- **Mappa Waypoint** e **Mappa Ritorno** (SwiftUI leggera, senza tile online su Watch).
+- **Direzione Waypoint:** bearing verso waypoint (non bussola generica).
+- **Return-to-entry:** ritorno al punto di partenza (logica snorkeling, non Diving).
+- Marcatori POI, log/dettaglio, allarmi snorkeling locali.
+- Non incluso nel target MAIN (`project.yml` excludes).
+
+Spec: [`SNORKELING_EXPERIMENTAL_SPEC.md`](SNORKELING_EXPERIMENTAL_SPEC.md).
+
+### Apnea (sperimentale — `codex/experimental-features`)
+
+- Menu Sessione / Tabelle / Statistiche / Logbook; acque libere con countdown e recovery.
+- Stati discesa/fondo/risalita/superficie; logbook parziale dove dati mancanti.
+- Non certificato; non nel target MAIN.
+
+Spec: [`APNEA_EXPERIMENTAL_SPEC.md`](APNEA_EXPERIMENTAL_SPEC.md).
+
+---
+
+## Companion iOS (MAIN)
+
+Cinque tab (ordine): **Planner**, Logbook, Analisi, Attrezzatura, Altro.
+
+| Area | Contenuto |
+|------|-----------|
+| **Planner** | Cilindri multipli, ruoli gas (Back / Travel / Deco / Bailout), mix Air/EAN/Trimix, PPO₂ step 0.1, MOD Dalton, riferimento pianificazione max/media, info emergenza su profondità max; risultati PIANO / BÜHLMANN / GRAFICI; ack sicurezza persistito; preview aggiornata su cambio input gas |
+| **Logbook** | Lista, dettaglio, immersioni manuali, import/export CSV |
+| **Analisi** | Metriche logbook, SAC, gas, riepilogo route GPS (entry/exit surface-only) |
+| **Attrezzatura** | Profilo, checklist editabile, **La mia attrezzatura** (template REC/TEC), switch GAS ON/OFF per voce |
+| **Altro** | Settings, sync Watch, iCloud, lingua IT/EN, invio foto Watch con validazione/resize |
+
+Export Subsurface: [`iOS/SUBSURFACE_EXPORT.md`](iOS/SUBSURFACE_EXPORT.md).
+
+Implementazione v8/v9: [`DIR_DIVING_v8_IMPLEMENTATION_REPORT.md`](DIR_DIVING_v8_IMPLEMENTATION_REPORT.md), [`DIR_DIVING_v9_IMPLEMENTATION_REPORT.md`](DIR_DIVING_v9_IMPLEMENTATION_REPORT.md).
+
+---
+
+## Design system UI/UX
+
+- Watch: sfondo nero, profondità oversize, accenti blu/verde/giallo/rosso, pannelli bordati — riferimento `MASTER_REFERENCE_DIVING_LIVE.png`, [`UI_UX_VISUAL_GUIDELINES.md`](UI_UX_VISUAL_GUIDELINES.md), [`WATCH_MAIN_UX_CONVENTIONS.md`](WATCH_MAIN_UX_CONVENTIONS.md).
+- iOS: dark mode, card charcoal, accenti ciano — `iOS_look_feel.png`, `Docs/ReferenceUI/`.
+- Pass UI-only **non** alterano algoritmi immersione, GPS, bussola, decompressione.
+
+---
+
+## Internazionalizzazione
+
+- Lingue: **Italiano** e **English** (`DIRAppLanguage` / `DIRIOSAppLanguage`: system / it / en).
+- Bundle: `Resources/{en,it}.lproj` (Watch), `iOSApp/Resources/{en,it}.lproj` (iOS).
+- Cambio lingua non modifica unità salvate, calcoli o persistenza.
+- Debito: alcuni messaggi runtime planner/import ancora da migrare.
+
+---
+
+## Strategia branch
+
+| Branch | Ruolo |
+|--------|--------|
+| `main` | Produzione Diving + companion; esclude sorgenti experimental da `project.yml` |
+| `main-iOS` | Storico parallelo; **202 commit behind** `main` a `d962117` — sync documentazione, merge codice solo con review |
+| `codex/experimental-features` | Watch Snorkeling/Apnea/Buddy |
+| `codex/ios-experimental-features` | iOS Explore Lab, mappe, POI enrichment |
+
+Regole merge: preservare Diving stabile, GPS surface-only, BUSSOLA, export Subsurface, security F1–F12. PR #8/#9: non auto-merge (vedi [`PR_STATUS_20260520_POST_V9.md`](PR_STATUS_20260520_POST_V9.md)).
+
+---
+
+## Limitazioni note
+
+- Non computer subacqueo certificato; planner/Bühlmann **indicativi** (trimix: disclaimer He non in compartimenti Bühlmann).
+- Entitlement water submersion: configurato, validazione Ultra reale aperta (R1).
+- GPS solo superficie; mappe Watch senza tile online.
+- Funzioni experimental non promosse in App Store candidate su `main`.
+
+---
+
+## Riferimenti rapidi
+
+- Indice: [`INDEX.md`](INDEX.md)
+- Matrice feature: [`DIR_DIVING_Feature_Comparison.csv`](DIR_DIVING_Feature_Comparison.csv)
+- Build: [`BUILD_VALIDATION.md`](BUILD_VALIDATION.md)
+- Roadmap: [`ROADMAP.md`](ROADMAP.md)

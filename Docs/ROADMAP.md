@@ -1,6 +1,6 @@
 # Roadmap DIR DIVING
 
-**Aggiornato:** 2026-05-24 (`main` @ `72fa15b`)
+**Aggiornato:** 2026-05-20 (`main` @ `d962117`)
 
 ## Rilasciati su `main` (Watch MAIN + iOS nel workspace)
 
@@ -39,6 +39,11 @@
 | Tab iOS Planner prima | ✅ | `f851b61` |
 | Planner ack in cima + field gate | ✅ | Persistenza `62e25d5`; gate campi `f851b61` |
 | Marchio altosinistra header | 🟡 | PNG bundled; AppIcon store da rigenerare |
+| Planner gas v8 (cilindri, ruoli, Air/EAN/Trimix, MOD) | ✅ | `a36dc23` |
+| Equipment template «La mia attrezzatura» + GAS switch | ✅ | `a36dc23` |
+| Foto iPhone→Watch con validazione/resize | ✅ | `a36dc23` |
+| Watch User Images in superficie (tab sempre) | ✅ | `d962117` |
+| Planner/Bühlmann sync su input gas | ✅ | `d962117` — algoritmo Bühlmann invariato |
 
 ## Prossimo (MAIN, pre–App Store)
 
