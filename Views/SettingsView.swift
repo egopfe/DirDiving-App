@@ -411,23 +411,33 @@ private struct WatchShortcutHelpView: View {
                         .foregroundStyle(.white)
                     helpPanel(
                         icon: "stopwatch",
-                        title: "Cronometro",
-                        body: "Configura START/STOP tramite Azione / Comandi Rapidi se watchOS espone l'intent."
+                        title: String(localized: "shortcuts.help.stopwatch.title"),
+                        body: String(localized: "shortcuts.help.stopwatch.body")
                     )
                     helpPanel(
                         icon: "arrow.clockwise",
-                        title: "Reset",
-                        body: "Reset cronometro e disponibile come intent separato quando supportato dal sistema."
+                        title: String(localized: "shortcuts.help.reset.title"),
+                        body: String(localized: "shortcuts.help.reset.body")
+                    )
+                    helpPanel(
+                        icon: "location.north.line",
+                        title: String(localized: "shortcuts.help.bearing.title"),
+                        body: String(localized: "shortcuts.help.bearing.body")
+                    )
+                    helpPanel(
+                        icon: "bell.slash",
+                        title: String(localized: "shortcuts.help.alarm.title"),
+                        body: String(localized: "shortcuts.help.alarm.body")
                     )
                     helpPanel(
                         icon: "exclamationmark.triangle",
-                        title: "Limite watchOS",
-                        body: "DIR DIVING non puo intercettare direttamente il tasto laterale o una pressione lunga arbitraria."
+                        title: String(localized: "shortcuts.help.side_button.title"),
+                        body: String(localized: "shortcuts.help.side_button.body")
                     )
                     helpPanel(
                         icon: "hand.tap",
-                        title: "Avvio manuale",
-                        body: "Se il rilevamento automatico profondita non e disponibile, usa AVVIO MANUALE nella schermata live."
+                        title: String(localized: "shortcuts.help.on_screen.title"),
+                        body: String(localized: "shortcuts.help.on_screen.body")
                     )
                 }
                 .padding(.horizontal, 11)

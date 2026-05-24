@@ -398,7 +398,7 @@ struct DiveLiveView: View {
             }
             .frame(width: leftWidth, alignment: .leading)
 
-            AscentGaugeView(status: dive.ascentStatus)
+            AscentGaugeView(status: dive.ascentStatus, units: unitPreference)
                 .frame(width: gaugeWidth, height: 154)
         }
         .frame(maxWidth: .infinity)

@@ -18,12 +18,19 @@ enum DiveDetailTab: String, CaseIterable, Identifiable {
 }
 
 struct DiveDetailView: View {
-    let session: DiveSession
+    let sessionID: UUID
+    @EnvironmentObject private var logStore: DiveLogStore
+    @State private var session: DiveSession
     @State private var tab: DiveDetailTab = .summary
     @State private var csvURL: URL?
     @State private var exportErrorMessage: String?
     @State private var showManualEditor = false
     @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
+
+    init(session: DiveSession) {
+        sessionID = session.id
+        _session = State(initialValue: session)
+    }
 
     var body: some View {
         ZStack {
@@ -72,6 +79,10 @@ struct DiveDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: $showManualEditor) {
             ManualDiveEditorView(existing: session)
+        }
+        .onChange(of: logStore.sessions) { _, _ in
+            guard let updated = logStore.session(id: sessionID), updated != session else { return }
+            session = updated
         }
     }
 
