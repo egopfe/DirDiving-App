@@ -1,7 +1,7 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-05-24  
-**Branch consigliato:** `main` (dopo `git pull`; ultimo pass readiness UX/i18n/build)  
+**Branch consigliato:** `main` @ `da355ba` (dopo `git pull`)  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.
 
 ---
@@ -42,9 +42,11 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | Logbook iOS card in `m` fisso | `iOSApp/Views/LogbookView.swift` |
 | Planner metric-only vs unità globali | `iOSApp/Views/PlannerView.swift` — **copy onesta** aggiunta (`planner.units.metric_notice`); calcoli restano metrici |
 | Copy unità obsolete | `iOSApp/Resources/*.lproj/Localizable.strings` |
-| Build opaque return (Watch) | `Views/AscentRateSettingsView.swift`, `Views/DiveLogListView.swift` — **risolto** (pass 2026-05-24) |
+| Build opaque return (Watch) | `Views/AscentRateSettingsView.swift`, `Views/DiveLogListView.swift` — **risolto** (`e1cc982`) |
+| TabView crash User Images | `Views/ContentView.swift`, `Services/AppNavigationStore.swift` — **risolto** (`fc08466`) |
+| Stale `DIRDiving.xcodeproj` (GPS views rimossi) | Rigenerare con `xcodegen` — vedi [`BUILD_VALIDATION.md`](BUILD_VALIDATION.md) § Troubleshooting |
 
-> **Nota:** commit `8a4d10e` + pass successivo: build simulator Watch/iOS verde; i18n Equipment/Planner; checklist device QA in §6.
+> **Nota:** `e1cc982`–`fc08466`: build simulator Watch/iOS verde; i18n Equipment/Planner; checklist device QA in §6.
 
 **Audit readiness precedenti (storico):**
 
@@ -66,7 +68,12 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`PR_STATUS_20260524.md`](PR_STATUS_20260524.md) | PR #8 / #9 — non auto-merge |
 | [`DOCUMENTATION_BRANCH_ALIGNMENT_20260523.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260523.md) | Allineamento precedente |
 | [`PR_STATUS_20260523.md`](PR_STATUS_20260523.md) | Stato PR storico |
+| [`PR_STATUS_20260520.md`](PR_STATUS_20260520.md) | Stato PR storico (20260520) |
 | [`DOCUMENTATION_SYNC_REPORT_20260519.md`](DOCUMENTATION_SYNC_REPORT_20260519.md) | Sync documentazione multi-branch |
+| [`DOCUMENTATION_BRANCH_ALIGNMENT_20260518.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260518.md) | Allineamento branch (archivio) |
+| [`DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md) | Allineamento branch (archivio) |
+| [`DOCUMENTATION_BRANCH_ALIGNMENT_20260520.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260520.md) | Allineamento branch (archivio) |
+| [`DOCUMENTATION_BRANCH_ALIGNMENT_20260522.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260522.md) | Allineamento branch (archivio) |
 
 ---
 
@@ -97,6 +104,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`MAIN_ISSUES_IMPLEMENTATION_REPORT_20260520.md`](MAIN_ISSUES_IMPLEMENTATION_REPORT_20260520.md) | Implementazione issue backlog |
 | [`MAIN_BRANCH_ISSUES_AND_PRIORITIES_20260520.md`](MAIN_BRANCH_ISSUES_AND_PRIORITIES_20260520.md) | Priorità issue |
 | [`DIR_Diving_Main_Branch_Development_Notes.md`](DIR_Diving_Main_Branch_Development_Notes.md) | Note prodotto (unità, disclaimer, manual dive) |
+| [`DIR_Diving_Complete_Development_Notes_25_05_2026.md`](DIR_Diving_Complete_Development_Notes_25_05_2026.md) | **Note sviluppo complete** iOS + Watch (icone, UX, backlog 2026-05-24) — `da355ba` |
 | [`DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md`](DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md) | Report `f851b61` |
 | [`iOS/BUILD_AND_RUN.md`](iOS/BUILD_AND_RUN.md) | Build companion iOS |
 | [`iOS/SUBSURFACE_EXPORT.md`](iOS/SUBSURFACE_EXPORT.md) | Export CSV |
@@ -125,7 +133,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 
 | Documento | Contenuto |
 |-----------|-----------|
-| [`BUILD_VALIDATION.md`](BUILD_VALIDATION.md) | `xcodegen`, scheme, build |
+| [`BUILD_VALIDATION.md`](BUILD_VALIDATION.md) | `xcodegen`, scheme, build; troubleshooting GPS views / `xcodegen generate` |
 | [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) | Checklist release |
 | [`SAFETY_DISCLAIMER.md`](SAFETY_DISCLAIMER.md) | Disclaimer (root Docs) |
 | [`SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md`](SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md) | Audit security F1–F12 |
@@ -211,9 +219,10 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 
 1. [`../README.md`](../README.md) — panoramica e branch strategy  
 2. [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260524.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260524.md) — **§B, §M, §N, §O**  
-3. [`DIR_DIVING_Feature_Comparison.csv`](DIR_DIVING_Feature_Comparison.csv) — stato feature  
-4. [`WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md`](WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md) — se lavori su Watch  
-5. [`TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md) — se lavori su TestFlight / R1  
+3. [`DIR_Diving_Complete_Development_Notes_25_05_2026.md`](DIR_Diving_Complete_Development_Notes_25_05_2026.md) — backlog prodotto corrente (icone, UX)  
+4. [`DIR_DIVING_Feature_Comparison.csv`](DIR_DIVING_Feature_Comparison.csv) — stato feature  
+5. [`WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md`](WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md) — se lavori su Watch  
+6. [`TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md) — se lavori su TestFlight / R1  
 
 ---
 
