@@ -13,7 +13,9 @@
 - Aggiornare `Docs/DIR_DIVING_Feature_Comparison.csv` con **nuove righe** (non cancellare righe storiche senza approvazione).
 - Allineare `README.md` con `project.yml` (nomi scheme, piattaforme).
 - Aggiornare README/Docs quando cambiano onboarding legale, disclaimer, lingua, unità/sync o Branch Strategy.
-- Specifiche prodotto MAIN: [`Docs/DIR_Diving_Main_Branch_Development_Notes.md`](Docs/DIR_Diving_Main_Branch_Development_Notes.md) e report [`Docs/DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md`](Docs/DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md).
+- Panoramica funzioni (IT): [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md).
+- Specifiche prodotto MAIN: note v9 [`Docs/DIR_Diving_Complete_Development_Notes_UPDATED_v9.md`](Docs/DIR_Diving_Complete_Development_Notes_UPDATED_v9.md); report [`Docs/DIR_DIVING_v9_IMPLEMENTATION_REPORT.md`](Docs/DIR_DIVING_v9_IMPLEMENTATION_REPORT.md).
+- Specifiche storiche: [`Docs/DIR_Diving_Main_Branch_Development_Notes.md`](Docs/DIR_Diving_Main_Branch_Development_Notes.md), [`Docs/DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md`](Docs/DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md).
 - Build: seguire `Docs/BUILD_VALIDATION.md` su **macOS**.
 
 ## Pull request GitHub

@@ -1,6 +1,6 @@
 # Roadmap DIR DIVING
 
-**Aggiornato:** 2026-05-24 (`main` @ `bd129ca`)
+**Aggiornato:** 2026-05-20 (`main` @ `d962117`)
 
 ## Rilasciati su `main` (Watch MAIN + iOS nel workspace)
 
@@ -21,6 +21,9 @@
 | iCloud decode error UI (iOS) | ✅ | `62e25d5` — `lastDecodeError` in Altro |
 | i18n Logbook/Detail/Analysis (iOS) | 🟡 | R4 `62e25d5`; Planner/Equipment ancora misto |
 | 7 App Shortcuts Watch | ✅ | `db72dce` |
+| Strategia controlli Watch | ✅ | `72fa15b`; Crown/touch/App Intents/Side Button documentati |
+| Digital Crown tuning soglie | ✅ | Allarmi + limiti risalita; touch fallback mantenuto |
+| Feedback SET/CLEAR bearing | ✅ | Toast IT/EN + haptic confirm |
 | Ascent gauge imperial labels | ✅ | `db72dce` (lista log: TODO unità `3b7358b`) |
 | Mode Selection auto-skip (solo Diving) | ✅ | Cold launch → Live |
 | Entitlement profondità Ultra | 🟡 | Configurato su `com.egopfe.dirdiving.ios.watch`; validazione hardware aperta |
@@ -36,6 +39,11 @@
 | Tab iOS Planner prima | ✅ | `f851b61` |
 | Planner ack in cima + field gate | ✅ | Persistenza `62e25d5`; gate campi `f851b61` |
 | Marchio altosinistra header | 🟡 | PNG bundled; AppIcon store da rigenerare |
+| Planner gas v8 (cilindri, ruoli, Air/EAN/Trimix, MOD) | ✅ | `a36dc23` |
+| Equipment template «La mia attrezzatura» + GAS switch | ✅ | `a36dc23` |
+| Foto iPhone→Watch con validazione/resize | ✅ | `a36dc23` |
+| Watch User Images in superficie (tab sempre) | ✅ | `d962117` |
+| Planner/Bühlmann sync su input gas | ✅ | `d962117` — algoritmo Bühlmann invariato |
 
 ## Prossimo (MAIN, pre–App Store)
 
@@ -50,6 +58,7 @@
 | P3 | GPX/UDDF export | Feature |
 | P3 | Rigenerare AppIcon da `Docs/ReferenceIcon/` | Assets |
 | P4 | Watch back navigation audit su tutte le sub-screen | UX |
+| P4 | Valutare long-press STOP/RESET solo dopo decisione prodotto | UX safety |
 
 ## Rami experimental (non in target MAIN)
 

@@ -2,7 +2,9 @@
 
 Copyright Federico Lombardo di Monte Iato 2026
 
-DIR DIVING is a SwiftUI watchOS application for Apple Watch Ultra-class devices. It focuses on essential in-water dive information, ascent-rate awareness, compass navigation, local dive logging, GPS entry/exit metadata, and CSV export for Subsurface.
+DIR DIVING is a SwiftUI **watchOS + iOS companion** project (XcodeGen) for Apple Watch Ultra-class devices and iPhone. The stable **`main`** branch delivers **Diving mode** on Watch (depth, ascent awareness, **BUSSOLA**, log, GPS surface entry/exit, Subsurface CSV) plus the iOS companion (logbook, planner, equipment, analysis, sync). Snorkeling, Apnea, and Buddy Assist live on **experimental** branches only.
+
+**Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](Docs/INDEX.md) · **HEAD consigliato:** `main` @ `d962117`
 
 ## Safety and limitations (MAIN)
 
@@ -10,7 +12,15 @@ Disclaimer completo: [`Docs/SAFETY_DISCLAIMER.md`](Docs/SAFETY_DISCLAIMER.md) ·
 
 DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent awareness, and syncs to the iPhone companion for review and **indicative** planning. It is **not** a certified dive computer unless a future release explicitly documents certification. It does **not** replace training, dive-center rules, certified equipment, or human judgment. Planner and Bühlmann-style presentations are **indicative** — verify with certified tools. GPS is meaningful **at the surface**; underwater or poor-sky conditions mean fixes can be missing — missing data must not be read as “dive success.”
 
-**Recent MAIN UI/UX pass:** layout, typography, contrast, tab labels, accessibility text, empty states, disclaimers, and documentation only — **no** changes to decompression math, gas models, TTV/TTR calculations, SAC/CNS/OTU math, sensor sampling, or sync transport rules.
+### Stato corrente (`main` @ `d962117`, 2026-05-20)
+
+| Pass | Commit | Contenuto |
+|------|--------|-----------|
+| v9 | `d962117` | Watch: tab **Immagini** sempre in superficie; iOS: sync live **Planner + Bühlmann** su cambio input gas |
+| v8 | `a36dc23` | Planner cilindri/ruoli gas Air/EAN/Trimix, MOD, equipment template GAS, foto→Watch, disclaimer trimix |
+| Readiness | `bd129ca`+ | Onboarding legale, sync, unità, control strategy Watch (`72fa15b`) |
+
+**Recent MAIN UI/UX pass:** layout, typography, contrast, tab labels, accessibility text, empty states, disclaimers, and documentation only — **no** changes to decompression **algorithm** internals; v8/v9 fixed **gas input propagation** to planner/Bühlmann without rewriting `BuhlmannPlanner` compartment math.
 
 **Watch UX baseline (2026-05-20):** ascent over-limit shows a **red inline banner** on the live dive screen (non-blocking); depth, gauge, TTV, and controls stay visible. Details: [`Docs/WATCH_MAIN_UX_CONVENTIONS.md`](Docs/WATCH_MAIN_UX_CONVENTIONS.md).
 
@@ -58,6 +68,15 @@ Senza modifiche a GPS, BUSSOLA, calcoli profondità/risalita, TTV, planner/Bühl
 
 Report: [`Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md`](Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md) · Audit UX: [`Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523.md`](Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523.md) · TestFlight esterno: [`Docs/TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](Docs/TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md).
 
+### Pass MAIN readiness ~94% (2026-05-24, build + i18n + copy)
+
+Senza modifiche ad algoritmi, sync logic o UI graphics:
+
+- **Build:** fix compile Watch (`AscentRateSettingsView`, `DiveLogListView`); simulator Watch + iOS green.
+- **Copy/i18n:** planner metric notice; Equipment/Planner EN/IT; settings Watch sync scope; device QA checklists App Intents e sync.
+
+Indice: [`Docs/INDEX.md`](Docs/INDEX.md) · Report: [`Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md`](Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md) · QA device: [`Docs/APP_INTENTS_DEVICE_QA_CHECKLIST.md`](Docs/APP_INTENTS_DEVICE_QA_CHECKLIST.md), [`Docs/WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md`](Docs/WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md).
+
 ### Pass note sviluppo branch MAIN (`f851b61`, 2026-05-24)
 
 Implementazione di [`Docs/DIR_Diving_Main_Branch_Development_Notes.md`](Docs/DIR_Diving_Main_Branch_Development_Notes.md) — wiring UI e sync; **nessuna** modifica ad algoritmi GPS, **BUSSOLA**, profondità/risalita, decompressione o TTV business. Lo storage canonico resta metrico; le unità imperiali sono di **presentazione** e export CSV Subsurface resta in metri.
@@ -85,6 +104,20 @@ Serie di commit **solo UI/copy/sync surface/i18n** (nessuna modifica GPS, BUSSOL
 Report: [`Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260520.md`](Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260520.md) · [`Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524.md`](Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524.md).
 
 **QA esterno ancora aperto (R1):** entitlement water submersion + profondità automatica su Apple Watch Ultra reale — [`Docs/TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](Docs/TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md).
+
+### Strategia controlli Apple Watch (2026-05-24, `72fa15b`)
+
+DIR DIVING su Apple Watch usa una strategia controlli coerente e review-safe, senza pretendere controlli hardware non supportati:
+
+| Controllo | Policy |
+|-----------|--------|
+| Digital Crown | Navigazione pagine, scroll e regolazione soglie allarmi/risalita dove presente |
+| Touch | Conferma primaria tramite pulsanti a schermo; le azioni distruttive restano confermate |
+| App Intents / Action Button | Solo tramite Comandi Rapidi / Action Button quando watchOS espone gli intent supportati |
+| Tasto laterale | Controllato dal sistema; DIR DIVING non lo sovrascrive direttamente |
+| Immersione attiva | Live resta primaria; BUSSOLA resta raggiungibile; Settings pensate per modifica in superficie |
+
+Dettagli: [`Docs/WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md`](Docs/WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md) e convenzioni in [`Docs/WATCH_MAIN_UX_CONVENTIONS.md`](Docs/WATCH_MAIN_UX_CONVENTIONS.md).
 
 ## Depth Entitlement And Signing Checklist
 
@@ -138,7 +171,7 @@ Le istruzioni di build sono in [`Docs/BUILD_VALIDATION.md`](Docs/BUILD_VALIDATIO
 - **`codex/experimental-features`**: Watch sperimentale (Snorkeling Live, mappe waypoint/ritorno, Apnea workflow esteso, Buddy Assist, ecc.). Non importare questi file nel target MAIN senza revisione esplicita.
 - **`codex/ios-experimental-features`**: iOS sperimentale (Explore Lab, Buddy Lab, concept mappe). Isolato da App Store candidate su `main`.
 - **Allineamenti UI-only** su `main`: possono toccare layout, copy, accessibilità e documentazione **senza** modificare algoritmi di decompressione, modello gas, calcoli TTV/TTR/SAC/CNS/OTU, sampling sensori o regole di sync — vedi [`Docs/MAIN_UX_COMPLETION_REPORT.md`](Docs/MAIN_UX_COMPLETION_REPORT.md).
-- **HEAD `main` consigliato** per release candidate Watch+iOS unificato (`bd129ca` — readiness R2–R4 + audit UX `876bcd2`/`db72dce`); `main-iOS` resta worktree storico — allineare **documentazione** da `main` dopo merge manuale (vedi [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260524.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260524.md)).
+- **HEAD `main` consigliato** per release candidate Watch+iOS unificato: **`d962117`** (v9) su `a36dc23` (v8 planner gas) + readiness `bd129ca` / control strategy `72fa15b`. `main-iOS` resta worktree storico (~202 commit behind) — allineare **documentazione** da `main` (vedi [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md)).
 - **UI-only / documentazione**: non alterare Diving mode, GPS surface-only, **BUSSOLA** (mai COMPASSO), export Subsurface, sync HMAC, onboarding legale.
 
 ### Matrice funzionalità (CSV)
@@ -146,6 +179,8 @@ Le istruzioni di build sono in [`Docs/BUILD_VALIDATION.md`](Docs/BUILD_VALIDATIO
 La tabella aggiornata con colonne Area / Branch / App / Mode / Feature / Status / Description / UI Reference / Notes / internationalization & languages:
 
 [`Docs/DIR_DIVING_Feature_Comparison.csv`](Docs/DIR_DIVING_Feature_Comparison.csv)
+
+**Indice completo documentazione:** [`Docs/INDEX.md`](Docs/INDEX.md) — ingresso consigliato, con scheda dedicata a [`Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260524.md`](Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260524.md) (sezioni A–O).
 
 ## Sicurezza e sync (security baseline 2026-05-19)
 
@@ -342,7 +377,7 @@ Main screens on `main`:
 2. Live dive screen
 3. Compass screen
 4. Settings screen
-5. User images screen
+5. User images screen (sempre in navigazione **fuori** immersione attiva; v9)
 6. Dive log screen
 
 The compass is implemented as a full screen, not as a modal feature that must be launched. Bearing actions are contextual to the compass screen.
@@ -559,7 +594,9 @@ The Watch log list also exposes `ESPORTA ULTIMA (SUBSURFACE)` for the latest sav
 
 ## User Images
 
-DIR DIVING includes a `Screens` view for bundled static images. This is useful for:
+Su **`main` @ `d962117`**, la tab **Immagini** è sempre presente quando non si è in immersione attiva (stato vuoto con istruzioni sync da iPhone). Durante l'immersione restano disponibili solo Live e BUSSOLA. Le foto inviate da iOS passano validazione/resize (`WatchPhotoPreprocessor`) con avviso IT/EN se la conversione riduce la leggibilità.
+
+DIR DIVING includes a `Screens` view for bundled static images and companion-synced photos. This is useful for:
 
 - Dive checklists
 - Personal procedures
@@ -694,9 +731,11 @@ Questa configurazione non equivale a validazione release: prima di TestFlight/Ap
 
 ## Branch Strategy
 
+Panoramica italiana estesa: [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md).
+
 La strategia branch corrente e:
 
-- `main`: codice stabile, orientato alla produzione Apple Watch, con Diving mode preservato come funzione primaria.
+- `main`: codice stabile @ **`d962117`**, orientato alla produzione Apple Watch + companion iOS nello stesso workspace, con Diving mode preservato come funzione primaria.
 - `main-iOS`: codice stabile per iOS Companion.
 - `codex/experimental-features`: ramo Apple Watch per UI e funzioni sperimentali Snorkeling, Apnea, Buddy Assist e schermate future.
 - `codex/ios-experimental-features`: ramo iOS per companion UI, pianificazione, mappe, enrichment POI e superfici sperimentali.
@@ -870,6 +909,18 @@ Restano obbligatori: build `xcodegen generate` / Xcode su macOS, test Apple Watc
 - **Modalità:** Diving su `main`; Snorkeling (Live, Mappa Waypoint, Mappa Ritorno, ritorno ingresso, POI) e Apnea su `codex/experimental-features` — vedi [`Docs/SNORKELING_EXPERIMENTAL_SPEC.md`](Docs/SNORKELING_EXPERIMENTAL_SPEC.md), [`Docs/APNEA_EXPERIMENTAL_SPEC.md`](Docs/APNEA_EXPERIMENTAL_SPEC.md).
 - **i18n:** pass R4 su Logbook/Dettaglio/Analisi; debito Planner/Equipment/alcuni messaggi runtime — vedi sezione Lingue sopra.
 - **Nota Watch post-`3b7358b`:** lista log mostra profondità max in `m` fisso (regressione display unità rispetto a `db72dce`); storage e export restano metrici — TODO QA se ripristinare `WatchDepthFormatting` in lista.
+
+## Aggiornamento documentazione 2026-05-20 (post v9 `d962117`)
+
+- Baseline codice: v8 planner gas (`a36dc23`), v9 Watch surface images + planner sync (`d962117`).
+- Aggiunti/aggiornati: [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md), [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md), [`Docs/PR_STATUS_20260520_POST_V9.md`](Docs/PR_STATUS_20260520_POST_V9.md), matrice CSV (righe v8/v9), README, INDEX, CHANGELOG, ROADMAP.
+- PR #8/#9: non merge automatico; vedi report PR post-v9.
+
+## Aggiornamento documentazione 2026-05-24 (control strategy `72fa15b`)
+
+- Aggiunta documentazione strategia controlli Watch: Crown, touch, App Intents / Action Button, tasto laterale system-controlled, haptics e navigazione sott'acqua.
+- Aggiornati README, CHANGELOG, ROADMAP, matrice feature CSV/XLSX e report [`Docs/DOCUMENTATION_UPDATE_REPORT_20260524_CONTROL_STRATEGY.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260524_CONTROL_STRATEGY.md).
+- PR #8 e #9 restano non safe-to-merge senza review manuale, build macOS e QA Diving/BUSSOLA/GPS surface-only.
 
 ## Aggiornamento documentazione e audit post-fix 2026-05-18
 
