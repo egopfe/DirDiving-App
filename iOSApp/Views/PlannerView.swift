@@ -493,6 +493,23 @@ struct PlanResultView: View {
     @EnvironmentObject private var store: PlannerStore
     @State private var tab: PlanTab = .plan
 
+    private var planShareText: String {
+        var lines = [String(localized: "planner.export.header")]
+        lines.append("TTR: \(store.plan.ttrMinutes) min")
+        lines.append("NDL: \(Formatters.one(store.plan.ndlMinutes)) min")
+        lines.append("CNS: \(Formatters.zero(store.plan.cnsPercent))% · OTU: \(Formatters.zero(store.plan.otu))")
+        if store.plan.decoStops.isEmpty {
+            lines.append(String(localized: "planner.export.no_deco_stops"))
+        } else {
+            lines.append(String(localized: "planner.export.deco_stops"))
+            for stop in store.plan.decoStops {
+                lines.append("  \(Formatters.one(stop.depthMeters)) m · \(stop.minutes) min · \(stop.gas) · PPO2 \(Formatters.one(stop.ppO2))")
+            }
+        }
+        lines.append(String(localized: "planner.export.indicative_footer"))
+        return lines.joined(separator: "\n")
+    }
+
     var body: some View {
         ZStack {
             DIRBackground()
@@ -521,8 +538,11 @@ struct PlanResultView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Image(systemName: "square.and.arrow.up")
-                    .foregroundStyle(DIRTheme.cyan)
+                ShareLink(item: planShareText) {
+                    Image(systemName: "square.and.arrow.up")
+                        .foregroundStyle(DIRTheme.cyan)
+                }
+                .accessibilityLabel(Text(String(localized: "planner.export.share.a11y")))
             }
         }
     }
@@ -586,7 +606,6 @@ struct PlanResultView: View {
         DIRCard("PIANO DI RISALITA", icon: nil, accent: DIRTheme.cyan) {
             VStack(spacing: 9) {
                 tableRow(["Profondita", "Tempo", "Gas", "PPO2"], isHeader: true)
-                tableRow(["40.0 m", "20 min", "TRIMIX 18/45", "1.30"])
                 ForEach(store.plan.decoStops) { stop in
                     tableRow([
                         "\(Formatters.one(stop.depthMeters)) m",

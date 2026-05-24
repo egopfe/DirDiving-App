@@ -23,6 +23,7 @@ struct LaunchCompanionDisclaimerOverlay: ViewModifier {
                             .fixedSize(horizontal: false, vertical: true)
                             .padding(.horizontal, 8)
                         DiveCommandButton(String(localized: "Continue"), systemImage: "checkmark", color: DiveUI.green) {
+                            CompanionDisclaimerAcceptance.accept()
                             isPresented = false
                         }
                     }

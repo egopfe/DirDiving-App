@@ -180,7 +180,14 @@ final class WatchSyncService: NSObject, ObservableObject {
         WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
         importedSessionCount = importedSessionIDs.count
         removeConflict(conflict)
-        lastMessage = String(localized: "Conflitto risolto: mantenuta versione locale")
+        if let local = logStore?.session(id: conflict.id), !local.isDemoDive {
+            pushedToWatchSessionIDs.remove(conflict.id)
+            savePushedToWatchSessionIDs()
+            transferToWatch(local)
+            lastMessage = String(localized: "more.sync.keep_local_repushed")
+        } else {
+            lastMessage = String(localized: "more.sync.keep_local_only")
+        }
     }
 
     private func storeConflict(local: DiveSession, incoming: DiveSession) {

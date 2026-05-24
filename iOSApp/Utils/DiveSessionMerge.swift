@@ -13,6 +13,11 @@ enum DiveSessionMerge {
         let notes = winner.notes ?? loser.notes
         let sacLitersMinute = winner.sacLitersMinute ?? loser.sacLitersMinute
         let isDemo = winner.isDemo || loser.isDemo
+        let isManual = winner.isManual || loser.isManual
+        let equipmentUsed = mergedString(winner.equipmentUsed, loser.equipmentUsed)
+        let entryPressureText = mergedString(winner.entryPressureText, loser.entryPressureText)
+        let exitPressureText = mergedString(winner.exitPressureText, loser.exitPressureText)
+        let decompressionNotes = mergedString(winner.decompressionNotes, loser.decompressionNotes)
         let useLoserSamples = loser.samples.count > winner.samples.count
 
         return DiveSession(
@@ -35,8 +40,23 @@ enum DiveSessionMerge {
             gasLabel: winner.gasLabel,
             sacLitersMinute: sacLitersMinute,
             isDemo: isDemo,
-            exceededSupportedDepthRange: winner.exceededSupportedDepthRange || loser.exceededSupportedDepthRange
+            exceededSupportedDepthRange: winner.exceededSupportedDepthRange || loser.exceededSupportedDepthRange,
+            isManual: isManual,
+            equipmentUsed: equipmentUsed,
+            entryPressureText: entryPressureText,
+            exitPressureText: exitPressureText,
+            decompressionNotes: decompressionNotes
         )
+    }
+
+    private static func mergedString(_ primary: String?, _ secondary: String?) -> String? {
+        if let primary, !primary.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return primary
+        }
+        if let secondary, !secondary.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return secondary
+        }
+        return nil
     }
 
     private static func newer(_ lhs: DiveSession, _ rhs: DiveSession) -> DiveSession {

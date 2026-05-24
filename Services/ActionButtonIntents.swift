@@ -120,15 +120,51 @@ struct DIRDivingAppShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
         AppShortcut(
             intent: ToggleStopwatchIntent(),
-            phrases: ["Toggle stopwatch in \(.applicationName)"],
+            phrases: [
+                "Toggle stopwatch in \(.applicationName)",
+                "Start or stop stopwatch in \(.applicationName)"
+            ],
             shortTitle: "Stopwatch",
             systemImageName: "stopwatch"
         )
         AppShortcut(
             intent: ResetStopwatchIntent(),
-            phrases: ["Reset stopwatch in \(.applicationName)"],
+            phrases: [
+                "Reset stopwatch in \(.applicationName)",
+                "Reset DIR stopwatch in \(.applicationName)"
+            ],
             shortTitle: "Reset Stopwatch",
             systemImageName: "arrow.counterclockwise"
+        )
+        AppShortcut(
+            intent: StartManualDiveIntent(),
+            phrases: ["Start manual dive in \(.applicationName)"],
+            shortTitle: "Manual Dive Start",
+            systemImageName: "figure.water.fitness"
+        )
+        AppShortcut(
+            intent: EndManualDiveIntent(),
+            phrases: ["End manual dive in \(.applicationName)"],
+            shortTitle: "Manual Dive End",
+            systemImageName: "figure.water.fitness"
+        )
+        AppShortcut(
+            intent: SetBearingIntent(),
+            phrases: ["Set bearing in \(.applicationName)"],
+            shortTitle: "Set Bearing",
+            systemImageName: "location.north.line"
+        )
+        AppShortcut(
+            intent: ClearBearingIntent(),
+            phrases: ["Clear bearing in \(.applicationName)"],
+            shortTitle: "Clear Bearing",
+            systemImageName: "location.slash"
+        )
+        AppShortcut(
+            intent: AcknowledgeAlarmIntent(),
+            phrases: ["Acknowledge alarm in \(.applicationName)"],
+            shortTitle: "Acknowledge Alarm",
+            systemImageName: "bell.slash"
         )
     }
 }

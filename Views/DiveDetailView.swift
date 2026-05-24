@@ -4,6 +4,7 @@ struct DiveDetailView: View {
     let session: DiveSession
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var log: DiveLogStore
+    @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
     @State private var exportURL: URL?
     @State private var exportMessage: String?
     @State private var exportCompletionFileName: String?
@@ -76,11 +77,12 @@ struct DiveDetailView: View {
     }
 
     private var summaryCards: some View {
-        HStack(spacing: 4) {
+        let depthDisplay = WatchDepthFormatting.display(meters: session.maxDepthMeters, units: DIRUnitPreference.fromStorage(watchUnits))
+        return HStack(spacing: 4) {
             detailMetricCard(
                 title: "PROF. MASSIMA",
-                value: Formatters.one(session.maxDepthMeters),
-                unit: "m",
+                value: depthDisplay.valueText,
+                unit: depthDisplay.unitLabel,
                 color: session.exceededSupportedDepthRange ? DiveUI.red : DiveUI.blue
             )
             detailMetricCard(title: "DURATA", value: durationMinutesText, unit: "min", color: .white)

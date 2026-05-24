@@ -303,7 +303,26 @@
 "settings.haptics.on" = "Attiva per warning e conferme";
 "settings.haptics.off" = "Disattivata";
 "settings.language.subtitle" = "System / Italiano / English";
-"settings.units.imperial_note" = "Imperiale non selezionabile finche la conversione Watch non e implementata. Export sempre metrico/Subsurface.";
+"settings.units.imperial_note" = "Profondita su Live e Log in piedi con unita imperiale. Export resta metrico/Subsurface.";
+"live.depth.a11y" = "Profondita attuale";
+"live.stopwatch.a11y" = "Cronometro";
+"live.stopwatch.start.a11y" = "Avvia cronometro";
+"live.stopwatch.stop.a11y" = "Ferma cronometro";
+"live.stopwatch.reset.a11y" = "Reset cronometro";
+"ascent.gauge.a11y" = "Gauge velocita di risalita";
+"ascent.gauge.a11y.value_format" = "Scala fino a %@ %@. Indicatore a %@ %@.";
+"shortcuts.help.stopwatch.title" = "Cronometro";
+"shortcuts.help.stopwatch.body" = "Avvia/ferma e resetta il cronometro tramite Comandi Rapidi o Action Button quando watchOS elenca gli intent DIR DIVING.";
+"shortcuts.help.reset.title" = "Reset";
+"shortcuts.help.reset.body" = "Il reset cronometro e un comando separato quando il sistema lo espone.";
+"shortcuts.help.bearing.title" = "Bussola";
+"shortcuts.help.bearing.body" = "Imposta o cancella il bearing salvato tramite Comandi Rapidi se supportato. Apri BUSSOLA per SET/CLEAR sullo schermo.";
+"shortcuts.help.alarm.title" = "Banner allarme";
+"shortcuts.help.alarm.body" = "Chiudi il banner profondita/tempo/batteria quando un allarme e visibile su Live.";
+"shortcuts.help.side_button.title" = "Tasto laterale (by design)";
+"shortcuts.help.side_button.body" = "DIR DIVING non puo sovrascrivere il tasto laterale fisico. Configura gli App Intent supportati in Comandi Rapidi o Action Button; avvio/stop immersione non e mappato direttamente sull'hardware.";
+"shortcuts.help.on_screen.title" = "Controlli a schermo";
+"shortcuts.help.on_screen.body" = "Usa START / STOP / RESET su Live per controllo affidabile. Usa AVVIO/FINE MANUALE solo se il rilevamento profondita automatico non e disponibile.";
 "log.delete.confirm.title" = "Eliminare immersione?";
 "log.delete.confirm.action" = "Elimina";
 "log.delete.cancel" = "Annulla";
@@ -316,7 +335,7 @@
 
 "launch.companion_disclaimer.title" = "Avviso companion";
 "launch.companion_disclaimer.body" = "DIR Diving non è da considerarsi un computer subacqueo o uno strumento di pianificazione. È soltanto un Diving Companion per aiutarti a tenere a mente le informazioni relative alle tue immersioni.";
-"settings.units.sync_note" = "Le unità si sincronizzano tra iPhone e Watch se associati. L'export CSV resta metrico/Subsurface.";
+"settings.units.sync_note" = "Unita sincronizzate con iPhone se associato. Live/Log seguono questo picker. Export CSV resta metrico.";
 "manual_dive.add.title" = "Aggiungi immersione manuale";
 "manual_dive.edit.title" = "Modifica immersione manuale";
 "manual_dive.site" = "Sito";

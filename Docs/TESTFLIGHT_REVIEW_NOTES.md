@@ -34,7 +34,7 @@ L'app **non** e presentata come computer subacqueo certificato.
 2. Planner e TTV **informativi**: non NDL/TTS certificati.
 3. GPS **inaffidabile** sott'acqua.
 4. Profondita automatica: validare su **Apple Watch Ultra** reale dopo entitlement.
-5. Side button Watch: **non** intercettabile dall'app; usare App Intents / Shortcuts dove supportato.
+5. Side button / Action Button Watch: l'app **non** puo intercettare direttamente il tasto laterale. Controlli immersione affidabili restano **START / STOP / RESET** sullo schermo Live. Comandi aggiuntivi (cronometro, immersione manuale, bussola, allarme) sono disponibili tramite **Comandi Rapidi / Action Button** solo dove watchOS espone gli App Intent registrati — vedi Impostazioni -> Azione / Comandi.
 
 ## Checklist QA consigliata (reviewer)
 

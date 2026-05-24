@@ -22,6 +22,7 @@ struct LaunchCompanionDisclaimerOverlay: ViewModifier {
                             .fixedSize(horizontal: false, vertical: true)
                             .padding(.horizontal, 8)
                         Button {
+                            CompanionDisclaimerAcceptance.accept()
                             isPresented = false
                         } label: {
                             Label(String(localized: "Continue"), systemImage: "checkmark")

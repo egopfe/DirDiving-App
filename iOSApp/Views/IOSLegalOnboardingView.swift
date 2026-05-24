@@ -120,18 +120,12 @@ struct IOSLegalOnboardingView: View {
         VStack(spacing: 16) {
             DIRCard(String(localized: "Legal Disclaimer"), icon: "doc.text.magnifyingglass", accent: DIRTheme.yellow) {
                 VStack(alignment: .leading, spacing: 14) {
-                    ScrollView(showsIndicators: true) {
-                        VStack(alignment: .leading, spacing: 0) {
-                            Text(legalAcceptance.disclaimerText(languageCode: languageCode))
-                                .font(.callout.weight(.medium))
-                                .foregroundStyle(.white.opacity(0.9))
-                                .fixedSize(horizontal: false, vertical: true)
-                            Color.clear
-                                .frame(height: 1)
-                                .onAppear { disclaimerReachedBottom = true }
-                        }
+                    LegalDisclaimerScrollGate(reachedBottom: $disclaimerReachedBottom, maxHeight: 280) {
+                        Text(legalAcceptance.disclaimerText(languageCode: languageCode))
+                            .font(.callout.weight(.medium))
+                            .foregroundStyle(.white.opacity(0.9))
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    .frame(maxHeight: 280)
 
                     if !disclaimerReachedBottom {
                         Text(String(localized: "legal.scroll.prompt"))

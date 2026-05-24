@@ -3,7 +3,7 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject private var navigation: AppNavigationStore
     @EnvironmentObject private var imageStore: UserImageStore
-    @State private var showLaunchDisclaimer = true
+    @State private var showLaunchDisclaimer = CompanionDisclaimerAcceptance.requiresDisplay
 
     var body: some View {
         TabView(selection: $navigation.selectedPage) {

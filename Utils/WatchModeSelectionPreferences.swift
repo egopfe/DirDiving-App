@@ -14,5 +14,6 @@ enum WatchModeSelectionPreferences {
         set { UserDefaults.standard.set(newValue, forKey: skipWhenSingleModeKey) }
     }
 
+    /// Dormant until Snorkeling/Apnea ship in MAIN; Mode Selection stays hidden when false.
     static let hasMultipleStableModes = false
 }
