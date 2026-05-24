@@ -1,8 +1,8 @@
-# DIR DIVING — Report aggiornamento documentazione (2026-05-24, post `f851b61`)
+# DIR DIVING — Report aggiornamento documentazione (2026-05-24, post `bd129ca`)
 
 **Tipo:** Solo documentazione e allineamento Git. Nessun merge PR automatico. Nessuna modifica a GPS, BUSSOLA, calcoli immersione o persistenza modelli.
 
-**HEAD `main`:** `f851b61` — development notes (unità sync, disclaimer launch, manual dives, foto Watch, checklist, Planner first tab, ecc.).
+**HEAD `main`:** `bd129ca` — include `62e25d5` (R2–R4 + audit), `db72dce`, `876bcd2`, `f851b61`, readiness pass.
 
 ---
 
@@ -10,28 +10,27 @@
 
 | File | Azione |
 |------|--------|
-| `README.md` | Sezione pass `f851b61`; tab iOS Planner prima; HEAD branch strategy |
-| `CHANGELOG.md` | Voce Unreleased `f851b61` |
-| `Docs/ROADMAP.md` | Feature rilasciate + backlog aggiornato |
-| `Docs/DIR_DIVING_Feature_Comparison.csv` | Riga unità aggiornata + ~14 righe additive |
-| `Docs/DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md` | Stato commit/push |
-| `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260524.md` | **Nuovo** |
-| `Docs/PR_STATUS_20260524.md` | **Nuovo** |
-| `Docs/DOCUMENTATION_UPDATE_REPORT_20260524.md` | Questo file (aggiornato) |
+| `README.md` | Pass audit `876bcd2`→`bd129ca`; HEAD branch strategy; onboarding/modalità/i18n; nota regressione log depth `3b7358b` |
+| `CHANGELOG.md` | Voce Unreleased post-readiness |
+| `Docs/ROADMAP.md` | HEAD `bd129ca`; R2–R4; P0 R1; P1 log unità |
+| `Docs/DIR_DIVING_Feature_Comparison.csv` | ~18 righe additive (876bcd2, db72dce, 62e25d5, PR status, log depth TODO) |
+| `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260524.md` | Baseline `bd129ca`; tabella R2–R4 |
+| `Docs/PR_STATUS_20260524.md` | Baseline `bd129ca` |
+| `Docs/DOCUMENTATION_UPDATE_REPORT_20260524.md` | Questo file |
 
-**Non modificati in questo pass (già validi):** `project.yml`, `Docs/BUILD_VALIDATION.md`, `CONTRIBUTING.md`, spec Snorkeling/Apnea experimental.
+**Non modificati:** `project.yml`, algoritmi runtime, spec experimental (salvo cross-ref).
 
 ---
 
 ## B. Branch ispezionati
 
-| Branch | HEAD | Note |
-|--------|------|------|
-| `main` | `f851b61` | Allineato `origin/main` |
-| `main-iOS` | `3994b33` | ~172 behind `main` — sync docs pianificato |
-| `codex/experimental-features` | `6649335` | Watch experimental |
-| `codex/ios-experimental-features` | `9e5baca` | iOS experimental |
-| `backup/before-docs-merge-20260524-docs` | `f851b61` | Backup locale |
+| Branch | HEAD (fetch) | Note |
+|--------|--------------|------|
+| `main` | `bd129ca` | Canonico Watch+iOS unificato |
+| `main-iOS` | divergente | Sync **solo** documentazione da `main` |
+| `origin/codex/experimental-features` | ~46 behind / ~28 ahead vs `main` | Snorkeling/Apnea/Buddy |
+| `origin/codex/ios-experimental-features` | vs `main-iOS` | Explore Lab |
+| `backup/before-docs-merge-20260524-post-readiness` | snapshot pre-pass | Backup locale |
 
 ---
 
@@ -40,7 +39,7 @@
 | Branch | Azione |
 |--------|--------|
 | `main` | Commit documentazione + push |
-| `main-iOS` | Checkout file docs da `main` + commit + push |
+| `main-iOS` | `git checkout main --` docs paths + commit + push |
 
 ---
 
@@ -48,63 +47,70 @@
 
 | Contesto | Stato |
 |----------|--------|
-| PR #8 → `main` | CONFLICTING (documentale) |
-| PR #9 → `main-iOS` | CONFLICTING (documentale) |
+| PR #8 → `main` | CONFLICTING — non mergeato |
+| PR #9 → `main-iOS` | CONFLICTING — non mergeato |
 | `main` ↔ `main-iOS` runtime | Non tentato |
 
 ---
 
 ## E. Conflitti risolti
 
-Nessuno in questo pass (solo documentazione lineare su `main`).
+Nessuno (pass solo documentazione).
 
 ---
 
 ## F. PR ispezionate
 
-| PR | Branch | Base |
-|----|--------|------|
-| #8 | `codex/experimental-features` | `main` |
-| #9 | `codex/ios-experimental-features` | `main-iOS` |
+| PR | Head | Base | Raccomandazione |
+|----|------|------|-----------------|
+| [#8](https://github.com/egopfe/DirDiving-App/pull/8) | `codex/experimental-features` | `main` | **Review manuale** — non auto-merge |
+| [#9](https://github.com/egopfe/DirDiving-App/pull/9) | `codex/ios-experimental-features` | `main-iOS` | **Review manuale** — ripristinare F4/F5 da `main` |
+
+Dettaglio: [`PR_STATUS_20260524.md`](PR_STATUS_20260524.md).
 
 ---
 
 ## G. PR safe to merge
 
-**Nessuna** senza review manuale, build macOS e verifica `project.yml` excludes.
+**Nessuna** senza build macOS, verifica `project.yml` excludes e QA Diving/BUSSOLA/GPS.
 
 ---
 
 ## H. PR requiring manual review
 
-- **#8** — rischio inclusione Snorkeling/Apnea/Buddy in MAIN; verificare conflitti con `f851b61` units sync e Diving UI.
-- **#9** — rischio regressioni security export/import CSV; allineare a `main` F4/F5 prima del merge.
+- **#8** — rischio promozione Snorkeling/Apnea/Buddy in MAIN; conflitti con unità sync, banner risalita, security F1–F12.
+- **#9** — regressioni export `.completeFileProtection` e bound CSV documentate in security audit.
 
 ---
 
-## I. Gap documentazione aperti
+## I. Documentation gaps still open
 
-- `Docs/Branch_Functionality_Matrix.xlsx` — rigenerare manualmente da CSV se usato esternamente.
-- AppIcon App Store da `Docs/ReferenceIcon/apple watch icon.png` / `ios icon.png`.
-- Watch back navigation audit su tutte le sub-screen.
-- Convergenza **runtime** `main-iOS` ↔ `main` (processo separato dalla docs).
-- Alcune righe Settings/InfoView Watch ancora IT letterali (LOW i18n).
-
----
-
-## J. Commit eseguiti / suggeriti
-
-1. `docs: update feature documentation and branch matrix post f851b61` — `main`
-2. `docs: sync documentation from main @ f851b61` — `main-iOS`
+| Gap | Priorità |
+|-----|----------|
+| R1 validazione Ultra + entitlement Apple | P0 |
+| i18n Planner / Equipment / messaggi runtime import | P2 |
+| Ripristino unità lista log Watch (`3b7358b`) | P1 |
+| Convergenza runtime `main-iOS` ↔ `main` | P2 (non solo docs) |
+| GPX/KML/.ssrf export | P3 |
+| AppIcon da `Docs/ReferenceIcon/` | P3 |
 
 ---
 
-## K. Rischi e assunzioni
+## J. Suggested next commits
 
-- Stato PR **CONFLICTING** basato su report precedenti + divergenza branch; **non** verificato con `gh` (CLI assente).
-- Documentazione descrive unità imperiali come **display**; export Subsurface e storage restano metrici.
-- Snorkeling Live / Waypoint Map / Return Map restano **solo** su rami experimental — non documentati come MAIN production.
+1. `docs: sync main-iOS documentation from main @ bd129ca` (se non già pushato)
+2. `fix(watch): restore imperial depth labels in dive log list` (opzionale — solo display)
+3. QA sign-off `TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA` con data/device
 
 ---
 
-_Report generato in pass documentazione post-push codice `f851b61`._
+## K. Risks / assumptions
+
+- **Assunzione:** PR #8/#9 restano CONFLICTING fino a risoluzione manuale su macOS.
+- **Assunzione:** `gh` CLI non disponibile in CI agent; URL PR verificati da documentazione storica.
+- **Rischio:** merge PR #8 in `main` senza excludes → inclusione target Snorkeling in produzione.
+- **Rischio:** `main-iOS` runtime divergente anche dopo sync docs — utenti non devono confondere branch per build release.
+
+---
+
+_Contenuti documentati: onboarding legale + disclaimer companion; Diving MAIN; Snorkeling/Apnea experimental; BUSSOLA; GPS surface-only; export Subsurface CSV; sync Watch↔iOS; iCloud KVS; i18n IT/EN; UI reference `Docs/ReferenceUI/`._

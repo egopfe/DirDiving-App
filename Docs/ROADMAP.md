@@ -1,6 +1,6 @@
 # Roadmap DIR DIVING
 
-**Aggiornato:** 2026-05-24 (`main` @ `f851b61`)
+**Aggiornato:** 2026-05-24 (`main` @ `bd129ca`)
 
 ## Rilasciati su `main` (Watch MAIN + iOS nel workspace)
 
@@ -17,7 +17,11 @@
 | Security F1-F12 | ✅ | Audit 2026-05-19 |
 | i18n IT/EN (primario + secondario) | 🟡 | Pass 2026-05-23; alcune righe Settings/shortcut ancora IT-key |
 | Onboarding legale + disclaimer IT/EN | ✅ | First launch, major update re-consent, Legal & Safety |
-| Planner safety acknowledgment | ✅ | Toggle obbligatorio prima di Calcola Piano |
+| Planner safety acknowledgment | ✅ | Persistito `2026-05-24` (`62e25d5`); toggle obbligatorio prima di Calcola Piano |
+| iCloud decode error UI (iOS) | ✅ | `62e25d5` — `lastDecodeError` in Altro |
+| i18n Logbook/Detail/Analysis (iOS) | 🟡 | R4 `62e25d5`; Planner/Equipment ancora misto |
+| 7 App Shortcuts Watch | ✅ | `db72dce` |
+| Ascent gauge imperial labels | ✅ | `db72dce` (lista log: TODO unità `3b7358b`) |
 | Mode Selection auto-skip (solo Diving) | ✅ | Cold launch → Live |
 | Entitlement profondità Ultra | 🟡 | Configurato su `com.egopfe.dirdiving.ios.watch`; validazione hardware aperta |
 | Depth limits 35/38/40 m UI + haptics | ✅ | `6cda004` |
@@ -30,14 +34,15 @@
 | Checklist attrezzatura editabile iOS | ✅ | `f851b61` |
 | Foto iPhone → Watch (UserImages) | ✅ | `f851b61` transferFile |
 | Tab iOS Planner prima | ✅ | `f851b61` |
-| Planner ack sessione in cima + field gate | ✅ | `f851b61` |
+| Planner ack in cima + field gate | ✅ | Persistenza `62e25d5`; gate campi `f851b61` |
 | Marchio altosinistra header | 🟡 | PNG bundled; AppIcon store da rigenerare |
 
 ## Prossimo (MAIN, pre–App Store)
 
 | Priorità | Item | Tipo |
 |----------|------|------|
-| P0 | Validazione depth su Watch Ultra reale | QA / Apple |
+| P0 | Validazione depth su Watch Ultra reale (R1) | QA / Apple — [`TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md) |
+| P1 | Ripristinare unità imperiali in lista log Watch | UX — regressione `3b7358b` |
 | P1 | QA pairing sync bidirezionale su device | QA |
 | P2 | Completare i18n residuo (Settings shortcut, InfoView) | Localization |
 | P2 | Verifica legale contenuti Terms/Privacy URL prima App Store | Legal / App Store |
