@@ -106,6 +106,8 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`DIR_Diving_Main_Branch_Development_Notes.md`](DIR_Diving_Main_Branch_Development_Notes.md) | Note prodotto (unità, disclaimer, manual dive) |
 | [`DIR_Diving_Complete_Development_Notes_25_05_2026.md`](DIR_Diving_Complete_Development_Notes_25_05_2026.md) | **Note sviluppo complete** iOS + Watch (icone, UX, backlog 2026-05-24) — `da355ba` |
 | [`DEVELOPMENT_NOTES_25_05_2026_IMPLEMENTATION_REPORT.md`](DEVELOPMENT_NOTES_25_05_2026_IMPLEMENTATION_REPORT.md) | **Report implementazione** note 25/05/2026 (build OK, file touchati) |
+| [`MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524_POST_DEV_NOTES.md`](MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524_POST_DEV_NOTES.md) | **Audit UX/interazione** MAIN post dev-notes @ `c23d4d4` |
+| [`MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524_POST_DEV_NOTES.docx`](MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524_POST_DEV_NOTES.docx) | Word · generatore `generate_main_branch_ux_interaction_accessibility_audit_20260524_post_dev_notes_docx.py` |
 | [`APP_ICON_UPDATE_NOTES.md`](APP_ICON_UPDATE_NOTES.md) | Rigenerazione icone + cache Simulator/Derived Data |
 | [`DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md`](DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md) | Report `f851b61` |
 | [`iOS/BUILD_AND_RUN.md`](iOS/BUILD_AND_RUN.md) | Build companion iOS |
