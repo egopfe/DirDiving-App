@@ -311,6 +311,14 @@
 "live.stopwatch.reset.a11y" = "Reset stopwatch";
 "ascent.gauge.a11y" = "Ascent rate gauge";
 "ascent.gauge.a11y.value_format" = "Scale up to %@ %@. Indicator at %@ %@.";
+"settings.underwater.title" = "Edit on surface";
+"settings.underwater.body" = "Active dive: Live and Compass stay primary. Change thresholds and preferences on the surface.";
+"shortcuts.help.crown.title" = "Digital Crown";
+"shortcuts.help.crown.body" = "Use Crown for page navigation, scrolling, and tuning alarm or ascent-rate thresholds. Touch controls remain available.";
+"shortcuts.help.touch.title" = "Touch";
+"shortcuts.help.touch.body" = "Use on-screen buttons for confirmation. Destructive log actions still require confirmation.";
+"shortcuts.help.underwater.title" = "Underwater";
+"shortcuts.help.underwater.body" = "During an active dive, Live remains primary and Compass stays reachable. Settings are intended for surface use.";
 "shortcuts.help.stopwatch.title" = "Stopwatch";
 "shortcuts.help.stopwatch.body" = "Toggle and reset stopwatch via Shortcuts or Action Button when watchOS lists DIR DIVING intents.";
 "shortcuts.help.reset.title" = "Reset";
@@ -320,9 +328,11 @@
 "shortcuts.help.alarm.title" = "Alarm banner";
 "shortcuts.help.alarm.body" = "Dismiss the current depth, time, or battery banner when an alarm is shown on Live.";
 "shortcuts.help.side_button.title" = "Side button (by design)";
-"shortcuts.help.side_button.body" = "DIR DIVING cannot override the physical side button. Configure supported App Intents in Shortcuts or Action Button; dive start/stop is not mapped to hardware directly.";
+"shortcuts.help.side_button.body" = "DIR DIVING cannot directly override the Apple Watch side button. Supported actions can be mapped through Shortcuts or Action Button when watchOS allows. On-screen controls remain the reliable primary controls.";
 "shortcuts.help.on_screen.title" = "On-screen controls";
 "shortcuts.help.on_screen.body" = "Use START / STOP / RESET on Live for reliable control. Use MANUAL START/END only when depth automation is unavailable.";
+"compass.bearing.set.toast" = "Bearing set";
+"compass.bearing.clear.toast" = "Bearing cleared";
 "log.delete.confirm.title" = "Delete dive?";
 "log.delete.confirm.action" = "Delete";
 "log.delete.cancel" = "Cancel";

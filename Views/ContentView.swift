@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject private var navigation: AppNavigationStore
+    @EnvironmentObject private var dive: DiveManager
     @EnvironmentObject private var imageStore: UserImageStore
     @State private var showLaunchDisclaimer = CompanionDisclaimerAcceptance.requiresDisplay
 
@@ -25,6 +26,17 @@ struct ContentView: View {
                 .tag(AppPage.diveLog)
         }
         .tabViewStyle(.verticalPage)
+        .onChange(of: dive.isDiveActive) { _, isActive in
+            if isActive {
+                navigation.selectedPage = .live
+            }
+        }
+        .onChange(of: navigation.selectedPage) { _, page in
+            guard dive.isDiveActive else { return }
+            if page != .live && page != .compass && page != .diveLog {
+                navigation.selectedPage = .live
+            }
+        }
         .launchCompanionDisclaimer(isPresented: $showLaunchDisclaimer)
     }
 }

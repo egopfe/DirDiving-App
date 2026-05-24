@@ -37,6 +37,19 @@ When `ascentStatus.isOverLimit` is true during an active dive:
 
 ---
 
+## Apple Watch controls
+
+| Control | Policy |
+|---------|--------|
+| Digital Crown | Page navigation, scrollable pages, and threshold tuning controls where present |
+| Touch | Primary confirmation path for on-screen actions |
+| Action Button | Supported only through watchOS Shortcuts / App Intents when watchOS exposes the actions |
+| Side Button | System-controlled; DIR DIVING does not directly override or remap it |
+
+During an active dive, Live remains the primary page and Compass remains reachable. Settings edits are intended for surface use so threshold/preference changes are not accidentally made underwater.
+
+---
+
 ## Related open items (not conventions)
 
 GPS start/end confirmation still uses a full-screen overlay for ~2.4 s — see audit UX-H2 / SAF-2; separate from this ascent alarm policy.

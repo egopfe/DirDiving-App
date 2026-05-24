@@ -40,19 +40,19 @@ struct AlarmSettingsView: View {
                     VStack(spacing: 5) {
                         alarmRow(title: "Velocità risalita", threshold: "Usa limiti ASC SET", isOn: $ascentAlarmEnabled)
                         alarmRow(title: "Profondità massima", threshold: "> \(depthThresholdLabel)", isOn: $depthAlarmEnabled)
-                        thresholdStepper(title: "Soglia profondità", value: depthThresholdLabel, color: DiveUI.blue) {
+                        crownThresholdStepper(title: "Soglia profondità", value: $depthThresholdMeters, display: depthThresholdLabel, range: 10...100, step: 1, color: DiveUI.blue) {
                             depthThresholdMeters = max(10, depthThresholdMeters - 1)
                         } increase: {
                             depthThresholdMeters = min(100, depthThresholdMeters + 1)
                         }
                         alarmRow(title: "Tempo immersione", threshold: "> \(runtimeThresholdMinutes) min", isOn: $runtimeAlarmEnabled)
-                        thresholdStepper(title: "Soglia tempo", value: "\(runtimeThresholdMinutes) min", color: DiveUI.yellow) {
+                        crownThresholdStepper(title: "Soglia tempo", value: runtimeThresholdBinding, display: "\(runtimeThresholdMinutes) min", range: 10...240, step: 5, color: DiveUI.yellow) {
                             runtimeThresholdMinutes = max(10, runtimeThresholdMinutes - 5)
                         } increase: {
                             runtimeThresholdMinutes = min(240, runtimeThresholdMinutes + 5)
                         }
                         alarmRow(title: "Batteria bassa", threshold: "< \(batteryThresholdPercent)%", isOn: $batteryAlarmEnabled)
-                        thresholdStepper(title: "Soglia batteria", value: "\(batteryThresholdPercent)%", color: DiveUI.red) {
+                        crownThresholdStepper(title: "Soglia batteria", value: batteryThresholdBinding, display: "\(batteryThresholdPercent)%", range: 5...50, step: 5, color: DiveUI.red) {
                             batteryThresholdPercent = max(5, batteryThresholdPercent - 5)
                         } increase: {
                             batteryThresholdPercent = min(50, batteryThresholdPercent + 5)
@@ -65,6 +65,20 @@ struct AlarmSettingsView: View {
             }
         }
         .navigationTitle("Allarmi")
+    }
+
+    private var runtimeThresholdBinding: Binding<Double> {
+        Binding(
+            get: { Double(runtimeThresholdMinutes) },
+            set: { runtimeThresholdMinutes = Int($0.rounded()) }
+        )
+    }
+
+    private var batteryThresholdBinding: Binding<Double> {
+        Binding(
+            get: { Double(batteryThresholdPercent) },
+            set: { batteryThresholdPercent = Int($0.rounded()) }
+        )
     }
 
     private var header: some View {
@@ -118,14 +132,14 @@ struct AlarmSettingsView: View {
         )
     }
 
-    private func thresholdStepper(title: String, value: String, color: Color, decrease: @escaping () -> Void, increase: @escaping () -> Void) -> some View {
+    private func crownThresholdStepper(title: String, value: Binding<Double>, display: String, range: ClosedRange<Double>, step: Double, color: Color, decrease: @escaping () -> Void, increase: @escaping () -> Void) -> some View {
         HStack(spacing: 7) {
             VStack(alignment: .leading, spacing: 1) {
                 Text(title)
                     .font(.system(size: 10, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(1)
-                Text(value)
+                Text(display)
                     .font(.system(size: 12, weight: .black, design: .rounded))
                     .foregroundStyle(color)
                     .monospacedDigit()
@@ -162,6 +176,8 @@ struct AlarmSettingsView: View {
                         .stroke(color.opacity(0.45), lineWidth: 1)
                 )
         )
+        .focusable(true)
+        .digitalCrownRotation(value, from: range.lowerBound, through: range.upperBound, by: step, sensitivity: .medium, isContinuous: false, isHapticFeedbackEnabled: true)
     }
 
 }

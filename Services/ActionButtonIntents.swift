@@ -87,7 +87,7 @@ struct ClearBearingIntent: AppIntent {
                 throw DIRDivingShortcutError.appStateUnavailable
             }
             compass.clearBearing()
-            HapticService.shared.notify()
+            HapticService.shared.confirm()
         }
         return .result()
     }

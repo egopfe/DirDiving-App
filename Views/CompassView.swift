@@ -3,6 +3,7 @@ import SwiftUI
 struct CompassView: View {
     @EnvironmentObject private var compass: CompassManager
     @EnvironmentObject private var dive: DiveManager
+    @State private var bearingToast: String?
 
     var body: some View {
         ZStack {
@@ -11,6 +12,10 @@ struct CompassView: View {
             VStack(spacing: 9) {
                 header
                 statusBanner
+                if let bearingToast {
+                    bearingFeedbackBanner(bearingToast)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                }
                 compassDial
                 diveMetricsPanel
                 controls
@@ -23,6 +28,7 @@ struct CompassView: View {
         .onDisappear { compass.stop() }
         .animation(.easeInOut(duration: 0.24), value: compass.headingDegrees)
         .animation(.easeInOut(duration: 0.24), value: compass.bearingDegrees ?? -1)
+        .animation(.easeInOut(duration: 0.18), value: bearingToast)
     }
 
     private var compassStatusIsWarning: Bool {
@@ -38,6 +44,26 @@ struct CompassView: View {
             .lineLimit(1)
             .minimumScaleFactor(0.7)
             .frame(maxWidth: .infinity)
+    }
+
+    private func bearingFeedbackBanner(_ message: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 11, weight: .black))
+            Text(message)
+                .font(.system(size: 10, weight: .black, design: .rounded))
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(DiveUI.green)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(DiveUI.green.opacity(0.10))
+                .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(DiveUI.green.opacity(0.68), lineWidth: 1))
+        )
     }
 
     private var header: some View {
@@ -174,6 +200,7 @@ struct CompassView: View {
                 Button {
                     compass.setBearing()
                     HapticService.shared.confirm()
+                    showBearingToast(String(localized: "compass.bearing.set.toast"))
                 } label: {
                     Text("SET BEARING")
                         .font(.system(size: 11, weight: .black, design: .rounded))
@@ -185,7 +212,8 @@ struct CompassView: View {
 
                 Button {
                     compass.clearBearing()
-                    HapticService.shared.notify()
+                    HapticService.shared.confirm()
+                    showBearingToast(String(localized: "compass.bearing.clear.toast"))
                 } label: {
                     Text("CLEAR")
                         .font(.system(size: 11, weight: .black, design: .rounded))
@@ -207,6 +235,16 @@ struct CompassView: View {
                     .stroke(color, lineWidth: 1.4)
             )
             .shadow(color: color.opacity(0.18), radius: 5, x: 0, y: 0)
+    }
+
+    private func showBearingToast(_ message: String) {
+        bearingToast = message
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 1_400_000_000)
+            if bearingToast == message {
+                bearingToast = nil
+            }
+        }
     }
 
     private var bearingDelta: Double? {

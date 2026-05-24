@@ -311,6 +311,14 @@
 "live.stopwatch.reset.a11y" = "Reset cronometro";
 "ascent.gauge.a11y" = "Gauge velocita di risalita";
 "ascent.gauge.a11y.value_format" = "Scala fino a %@ %@. Indicatore a %@ %@.";
+"settings.underwater.title" = "Modifica in superficie";
+"settings.underwater.body" = "Immersione attiva: Live e Bussola restano primarie. Cambia soglie e preferenze in superficie.";
+"shortcuts.help.crown.title" = "Digital Crown";
+"shortcuts.help.crown.body" = "Usa la Crown per navigazione pagine, scroll e regolazione soglie allarmi o risalita. I controlli touch restano disponibili.";
+"shortcuts.help.touch.title" = "Touch";
+"shortcuts.help.touch.body" = "Usa i pulsanti a schermo per confermare. Le azioni distruttive sui log richiedono ancora conferma.";
+"shortcuts.help.underwater.title" = "Sott'acqua";
+"shortcuts.help.underwater.body" = "Durante l'immersione Live resta primaria e Bussola resta raggiungibile. Le impostazioni sono pensate per la superficie.";
 "shortcuts.help.stopwatch.title" = "Cronometro";
 "shortcuts.help.stopwatch.body" = "Avvia/ferma e resetta il cronometro tramite Comandi Rapidi o Action Button quando watchOS elenca gli intent DIR DIVING.";
 "shortcuts.help.reset.title" = "Reset";
@@ -320,9 +328,11 @@
 "shortcuts.help.alarm.title" = "Banner allarme";
 "shortcuts.help.alarm.body" = "Chiudi il banner profondita/tempo/batteria quando un allarme e visibile su Live.";
 "shortcuts.help.side_button.title" = "Tasto laterale (by design)";
-"shortcuts.help.side_button.body" = "DIR DIVING non puo sovrascrivere il tasto laterale fisico. Configura gli App Intent supportati in Comandi Rapidi o Action Button; avvio/stop immersione non e mappato direttamente sull'hardware.";
+"shortcuts.help.side_button.body" = "DIR DIVING non puo sovrascrivere direttamente il tasto laterale di Apple Watch. Le azioni supportate possono essere mappate tramite Comandi Rapidi o Action Button quando watchOS lo consente. I controlli a schermo restano i controlli primari affidabili.";
 "shortcuts.help.on_screen.title" = "Controlli a schermo";
 "shortcuts.help.on_screen.body" = "Usa START / STOP / RESET su Live per controllo affidabile. Usa AVVIO/FINE MANUALE solo se il rilevamento profondita automatico non e disponibile.";
+"compass.bearing.set.toast" = "Rotta impostata";
+"compass.bearing.clear.toast" = "Rotta cancellata";
 "log.delete.confirm.title" = "Eliminare immersione?";
 "log.delete.confirm.action" = "Elimina";
 "log.delete.cancel" = "Annulla";

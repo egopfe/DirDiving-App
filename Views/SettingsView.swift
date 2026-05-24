@@ -22,6 +22,16 @@ struct SettingsView: View {
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
 
+                    if dive.isDiveActive {
+                        settingsRow(
+                            icon: "water.waves",
+                            iconColor: DiveUI.yellow,
+                            title: String(localized: "settings.underwater.title"),
+                            subtitle: String(localized: "settings.underwater.body"),
+                            informational: true
+                        )
+                    }
+
                     NavigationLink {
                         AscentRateSettingsView()
                     } label: {
@@ -34,6 +44,7 @@ struct SettingsView: View {
                         )
                     }
                     .buttonStyle(.plain)
+                    .disabled(dive.isDiveActive)
 
                     NavigationLink {
                         AlarmSettingsView()
@@ -47,9 +58,12 @@ struct SettingsView: View {
                         )
                     }
                     .buttonStyle(.plain)
+                    .disabled(dive.isDiveActive)
 
                     unitPreferenceControl
+                        .disabled(dive.isDiveActive)
                     languagePreferenceControl
+                        .disabled(dive.isDiveActive)
                     NavigationLink {
                         WatchLegalSafetyView()
                     } label: {
@@ -135,7 +149,7 @@ struct SettingsView: View {
                     if watchSync.pendingTransferCount > 0 || watchSync.activationState != .activated {
                         Button {
                             watchSync.retryPendingTransfers()
-                            HapticService.shared.notify()
+                            HapticService.shared.confirm()
                         } label: {
                             settingsRow(
                                 icon: "arrow.triangle.2.circlepath",
@@ -227,7 +241,7 @@ struct SettingsView: View {
         .confirmationDialog(String(localized: "settings.sync.clear.confirm.title"), isPresented: $showClearSyncQueueConfirmation, titleVisibility: .visible) {
             Button(String(localized: "settings.sync.clear.confirm.action"), role: .destructive) {
                 watchSync.clearFailedQueue()
-                HapticService.shared.notify()
+                HapticService.shared.confirm()
             }
             Button(String(localized: "log.delete.cancel"), role: .cancel) {
                 HapticService.shared.confirm()
@@ -409,6 +423,21 @@ private struct WatchShortcutHelpView: View {
                     Text("SHORTCUT")
                         .font(.system(size: 11, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
+                    helpPanel(
+                        icon: "digitalcrown.arrow.clockwise",
+                        title: String(localized: "shortcuts.help.crown.title"),
+                        body: String(localized: "shortcuts.help.crown.body")
+                    )
+                    helpPanel(
+                        icon: "hand.tap",
+                        title: String(localized: "shortcuts.help.touch.title"),
+                        body: String(localized: "shortcuts.help.touch.body")
+                    )
+                    helpPanel(
+                        icon: "water.waves",
+                        title: String(localized: "shortcuts.help.underwater.title"),
+                        body: String(localized: "shortcuts.help.underwater.body")
+                    )
                     helpPanel(
                         icon: "stopwatch",
                         title: String(localized: "shortcuts.help.stopwatch.title"),

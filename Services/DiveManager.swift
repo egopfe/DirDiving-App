@@ -152,6 +152,7 @@ final class DiveManager: NSObject, ObservableObject {
         gpsManager.start()
         isDiveActive = true
         isManualLifecycleActive = isManual
+        HapticService.shared.criticalConfirm()
         alarmWarningMessage = nil
         sessionStart = Date()
         entryGPS = gpsManager.currentBestPoint()
@@ -194,6 +195,7 @@ final class DiveManager: NSObject, ObservableObject {
         isDiveActive = false
         isFinalizingDive = true
         isManualLifecycleActive = false
+        HapticService.shared.criticalConfirm()
         runtimeTimer?.invalidate()
         runtimeTimer = nil
         stopBlinking()
@@ -302,7 +304,7 @@ final class DiveManager: NSObject, ObservableObject {
         stopwatchTimer?.invalidate()
         stopwatchTimer = nil
         if playHaptic {
-            HapticService.shared.notify()
+            HapticService.shared.confirm()
         }
     }
 

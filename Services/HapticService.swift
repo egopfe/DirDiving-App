@@ -60,9 +60,17 @@ final class HapticService {
         WKInterfaceDevice.current().play(.success)
     }
 
+    func criticalConfirm() {
+        confirm()
+    }
+
     func notify() {
         guard hapticsEnabled else { return }
         WKInterfaceDevice.current().play(.notification)
+    }
+
+    func nonCriticalFailure() {
+        notify()
     }
 
     func buddyMessageReceived(isCritical: Bool) {
