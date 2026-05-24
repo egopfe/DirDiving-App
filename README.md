@@ -161,6 +161,8 @@ La tabella aggiornata con colonne Area / Branch / App / Mode / Feature / Status 
 
 [`Docs/DIR_DIVING_Feature_Comparison.csv`](Docs/DIR_DIVING_Feature_Comparison.csv)
 
+**Indice completo documentazione:** [`Docs/INDEX.md`](Docs/INDEX.md) — ingresso consigliato, con scheda dedicata a [`Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260524.md`](Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260524.md) (sezioni A–O).
+
 ## Sicurezza e sync (security baseline 2026-05-19)
 
 Audit statico in [`Docs/SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md`](Docs/SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md) (18 finding: 2 HIGH / 4 MEDIUM / 6 LOW / 6 INFO). Remediation F1–F12 applicate in commit `4136ec0`:
