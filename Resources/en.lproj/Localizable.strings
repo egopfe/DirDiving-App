@@ -320,8 +320,10 @@
 "settings.language.scope_note" = "Language is local to this Watch. Units sync when paired; alarms and haptics do not.";
 "settings.shortcuts.action_title" = "Action / Commands";
 "settings.shortcuts.action_subtitle" = "Map DIR DIVING intents in watchOS Shortcuts or Action Button; the app cannot intercept the Side Button.";
+"user_images.list.title" = "SCREENS";
+"user_images.item.label" = "IMG %d";
 "user_images.empty.title" = "NO IMAGES";
-"user_images.empty.body" = "No reference screens or images are included in this build. Add assets in a future update if needed.";
+"user_images.empty.body" = "Send photos from the iPhone app to view them here before and during surface navigation.";
 "shortcuts.help.crown.title" = "Digital Crown";
 "shortcuts.help.crown.body" = "Use Crown for page navigation, scrolling, and tuning alarm or ascent-rate thresholds. Touch controls remain available.";
 "shortcuts.help.touch.title" = "Touch";

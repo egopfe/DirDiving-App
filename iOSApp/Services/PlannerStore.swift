@@ -7,7 +7,11 @@ final class PlannerStore: ObservableObject {
         didSet { saveIfReady() }
     }
     @Published var input = GasPlanInput() {
-        didSet { saveIfReady() }
+        didSet {
+            guard !isApplyingInputSideEffects else { return }
+            saveIfReady()
+            applyInputToPlanningOutputs()
+        }
     }
     @Published var plan = PlannerService.makePlan(input: GasPlanInput())
     @Published var buhlmann = BuhlmannPlanner.plan(
@@ -20,6 +24,7 @@ final class PlannerStore: ObservableObject {
     private let cloudSync: CloudSyncStore?
     private let key = "dirdiving_ios_experimental_planner_state"
     private var isReady = false
+    private var isApplyingInputSideEffects = false
 
     init(cloudSync: CloudSyncStore? = nil) {
         self.cloudSync = cloudSync
@@ -35,17 +40,23 @@ final class PlannerStore: ObservableObject {
     }
 
     func refreshDerivedPlanningPreview() {
-        input.normalizeAllPlannerGases()
-        input.syncLegacyGasesFromPlannerCylinders()
-        buhlmann = BuhlmannPlanner.plan(depthMeters: input.plannedDepthMeters, bottomGas: input.bottomGas)
+        applyInputToPlanningOutputs()
     }
 
     func calculate() {
+        applyInputToPlanningOutputs()
+        saveIfReady()
+    }
+
+    /// Keeps plan, Bühlmann NDL, and analysis in sync with current gas UI (algorithm unchanged; inputs only).
+    private func applyInputToPlanningOutputs() {
+        guard isReady else { return }
+        isApplyingInputSideEffects = true
         input.normalizeAllPlannerGases()
         input.syncLegacyGasesFromPlannerCylinders()
-        plan = PlannerService.makePlan(input: input)
         buhlmann = BuhlmannPlanner.plan(depthMeters: input.plannedDepthMeters, bottomGas: input.bottomGas)
-        saveIfReady()
+        plan = PlannerService.makePlan(input: input)
+        isApplyingInputSideEffects = false
     }
 
     func updateTeamMember(_ member: TeamMember) {

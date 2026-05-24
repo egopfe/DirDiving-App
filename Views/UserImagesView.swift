@@ -27,7 +27,7 @@ struct UserImagesView: View {
         VStack(spacing: 5) {
             header
 
-            Text("SCHERMI")
+            Text(String(localized: "user_images.list.title"))
                 .font(.system(size: 11, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
@@ -76,7 +76,7 @@ struct UserImagesView: View {
                 .frame(width: 45, height: 26)
 
             VStack(alignment: .leading, spacing: 1) {
-                Text("IMG \(index + 1)")
+                Text(String(format: String(localized: "user_images.item.label"), index + 1))
                     .font(.system(size: 11, weight: .black, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(1)
@@ -171,14 +171,14 @@ struct UserImagesView: View {
             .padding(.horizontal, 12)
             .padding(.top, 9)
 
-            Text("IMG \(index + 1)")
+            Text(String(format: String(localized: "user_images.item.label"), index + 1))
                 .font(.system(size: 12, weight: .black, design: .rounded))
                 .foregroundStyle(.white)
                 .lineLimit(1)
 
             storedImage(resourceName: resourceName)
-                .scaledToFill()
-                .frame(maxWidth: .infinity, maxHeight: 126)
+                .scaledToFit()
+                .frame(maxWidth: .infinity, maxHeight: 168)
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
@@ -199,7 +199,7 @@ struct UserImagesView: View {
             Button {
                 selectedName = nil
             } label: {
-                Text("SCHERMI")
+                Text(String(localized: "user_images.list.title"))
                     .font(.system(size: 9, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.yellow)
                     .padding(.horizontal, 9)

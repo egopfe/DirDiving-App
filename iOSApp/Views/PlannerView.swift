@@ -308,6 +308,7 @@ struct PlannerView: View {
         }
         .onChange(of: store.input.plannerCylinders) { _, _ in
             store.input.syncLegacyGasesFromPlannerCylinders()
+            store.refreshDerivedPlanningPreview()
         }
     }
 

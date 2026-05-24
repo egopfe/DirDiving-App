@@ -18,19 +18,17 @@ struct ContentView: View {
                 .tag(AppPage.compass)
             SettingsView()
                 .tag(AppPage.settings)
-            if !imageStore.imageNames.isEmpty {
-                UserImagesView()
-                    .tag(AppPage.userImages)
-            }
+            UserImagesView()
+                .tag(AppPage.userImages)
             DiveLogListView()
                 .tag(AppPage.diveLog)
         }
         .tabViewStyle(.verticalPage)
         .onAppear {
-            navigation.clampSelectedPage(userImagesAvailable: !imageStore.imageNames.isEmpty)
+            navigation.clampSelectedPage()
         }
-        .onChange(of: imageStore.imageNames) { _, names in
-            navigation.clampSelectedPage(userImagesAvailable: !names.isEmpty)
+        .onChange(of: imageStore.imageNames) { _, _ in
+            navigation.clampSelectedPage()
         }
         .onChange(of: dive.isDiveActive) { _, isActive in
             if isActive {
@@ -39,6 +37,7 @@ struct ContentView: View {
         }
         .onChange(of: navigation.selectedPage) { _, page in
             guard dive.isDiveActive else { return }
+            // During an active dive, only Live and Compass remain reachable (v9: images/menus available on surface).
             if page != .live && page != .compass {
                 navigation.selectedPage = .live
             }
