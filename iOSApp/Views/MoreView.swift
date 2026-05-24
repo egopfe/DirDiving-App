@@ -6,6 +6,7 @@ struct MoreView: View {
     @EnvironmentObject private var logStore: DiveLogStore
     @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
     @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
+    @State private var showResetPairingConfirm = false
 
     var body: some View {
         NavigationStack {
@@ -24,7 +25,9 @@ struct MoreView: View {
                         DIRCard(String(localized: "PREFERENZE APP"), icon: "gearshape.fill", accent: DIRTheme.cyan) {
                             languagePreferencePicker
                             unitsPreferenceSection
-                            row(String(localized: "Sync impostazioni"), String(localized: "Locale-only"))
+                            row(String(localized: "more.settings.sync_scope_title"), String(localized: "more.settings.sync_scope_value"))
+                            row(String(localized: "units.title"), String(localized: "more.settings.units_synced"))
+                            row(String(localized: "more.settings.local_only_title"), String(localized: "more.settings.local_only_value"))
                             row(String(localized: "Planner safety"), String(localized: "Disclaimer richiesto"))
                             NavigationLink {
                                 IOSLegalSafetyView()
@@ -56,6 +59,17 @@ struct MoreView: View {
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 10)
                                     .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
+                            }
+                            .buttonStyle(.plain)
+                            Button(role: .destructive) {
+                                showResetPairingConfirm = true
+                            } label: {
+                                Label(String(localized: "more.sync.reset_pairing"), systemImage: "arrow.counterclockwise")
+                                    .font(.callout.weight(.semibold))
+                                    .foregroundStyle(DIRTheme.orange)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                                    .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.orange.opacity(0.8), lineWidth: 1))
                             }
                             .buttonStyle(.plain)
                         }
@@ -107,6 +121,14 @@ struct MoreView: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
+            .alert(String(localized: "more.sync.reset_pairing"), isPresented: $showResetPairingConfirm) {
+                Button(String(localized: "Cancel"), role: .cancel) {}
+                Button(String(localized: "more.sync.reset_pairing_confirm"), role: .destructive) {
+                    watchSync.resetPairingTrust(logStore: logStore)
+                }
+            } message: {
+                Text(String(localized: "more.sync.reset_pairing_message"))
+            }
         }
     }
 

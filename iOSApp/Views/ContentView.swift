@@ -16,7 +16,7 @@ final class IOSNavigationStore: ObservableObject {
 
 struct ContentView: View {
     @EnvironmentObject private var navigation: IOSNavigationStore
-    @State private var showLaunchDisclaimer = true
+    @State private var showLaunchDisclaimer = CompanionDisclaimerAcceptance.requiresDisplay
 
     var body: some View {
         TabView(selection: $navigation.selectedTab) {

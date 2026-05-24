@@ -17,6 +17,9 @@ struct AnalysisView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         header
+                        if !logStore.sessions.isEmpty {
+                            CSVImportPanel()
+                        }
                         if logStore.sessions.isEmpty {
                             emptyAnalysisState
                         } else {

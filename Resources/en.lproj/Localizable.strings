@@ -303,7 +303,12 @@
 "settings.haptics.on" = "Active for warnings and confirmations";
 "settings.haptics.off" = "Disabled";
 "settings.language.subtitle" = "System / Italian / English";
-"settings.units.imperial_note" = "Imperial not selectable until Watch conversion is implemented. Export always metric/Subsurface.";
+"settings.units.imperial_note" = "Live and Log depth use feet when imperial is selected. Export stays metric/Subsurface.";
+"live.depth.a11y" = "Current depth";
+"live.stopwatch.a11y" = "Stopwatch";
+"live.stopwatch.start.a11y" = "Start stopwatch";
+"live.stopwatch.stop.a11y" = "Stop stopwatch";
+"live.stopwatch.reset.a11y" = "Reset stopwatch";
 "log.delete.confirm.title" = "Delete dive?";
 "log.delete.confirm.action" = "Delete";
 "log.delete.cancel" = "Cancel";
@@ -316,7 +321,7 @@
 
 "launch.companion_disclaimer.title" = "Companion notice";
 "launch.companion_disclaimer.body" = "DIR Diving must not be considered a dive computer or a dive planning instrument. It is only a Diving Companion intended to help you keep track of information related to your dives.";
-"settings.units.sync_note" = "Units sync between iPhone and Watch when paired. Export CSV remains metric/Subsurface.";
+"settings.units.sync_note" = "Units sync with iPhone when paired. Live/Log depth labels follow this picker. Export CSV stays metric.";
 "manual_dive.add.title" = "Add manual dive";
 "manual_dive.edit.title" = "Edit manual dive";
 "manual_dive.site" = "Site";

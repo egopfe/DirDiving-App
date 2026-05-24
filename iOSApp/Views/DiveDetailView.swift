@@ -22,6 +22,7 @@ struct DiveDetailView: View {
     @State private var tab: DiveDetailTab = .summary
     @State private var csvURL: URL?
     @State private var exportErrorMessage: String?
+    @State private var showManualEditor = false
     @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
 
     var body: some View {
@@ -46,6 +47,20 @@ struct DiveDetailView: View {
                     case .details:
                         details
                     }
+                    if session.isManual && !session.isDemoDive {
+                        Button {
+                            showManualEditor = true
+                        } label: {
+                            Text(String(localized: "manual_dive.edit.title"))
+                                .font(.callout.weight(.semibold))
+                                .foregroundStyle(DIRTheme.cyan)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityHint(Text(String(localized: "manual_dive.edit.a11y")))
+                    }
                     exportBlock
                 }
                 .padding(.horizontal, 16)
@@ -55,6 +70,9 @@ struct DiveDetailView: View {
         }
         .navigationTitle(Formatters.detailTitle(session.startDate))
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $showManualEditor) {
+            ManualDiveEditorView(existing: session)
+        }
     }
 
     private var segmentedTabs: some View {
@@ -226,18 +244,27 @@ struct DiveDetailView: View {
 
     private var gasBlock: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("GAS UTILIZZATO")
+            Text(String(localized: "detail.gas.title"))
                 .font(.system(size: 11, weight: .bold, design: .rounded))
                 .tracking(0.7)
                 .foregroundStyle(DIRTheme.cyan)
             HStack(spacing: 10) {
-                gasMetric("Miscela", session.gasLabel.rawValue, nil, color: .white)
-                gasMetric("Pressioni", "Non disponibile", nil, color: DIRTheme.yellow)
+                gasMetric(String(localized: "detail.gas.mix"), session.gasLabel.rawValue, nil, color: .white)
+                if let pressureSummary {
+                    gasMetric(String(localized: "detail.gas.pressures"), pressureSummary.value, pressureSummary.unit, color: DIRTheme.yellow)
+                }
             }
-            Text("Pressioni iniziale/finale e consumo gas non sono presenti nel record sincronizzato.")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(DIRTheme.muted)
-                .fixedSize(horizontal: false, vertical: true)
+            if let pressureFootnote {
+                Text(pressureFootnote)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else if !session.isManual {
+                Text(String(localized: "detail.gas.pressures_unavailable"))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
         .padding(12)
         .background(
@@ -268,6 +295,28 @@ struct DiveDetailView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var pressureSummary: (value: String, unit: String?)? {
+        let entry = session.entryPressureText?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let exit = session.exitPressureText?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        guard !entry.isEmpty || !exit.isEmpty else { return nil }
+        if !entry.isEmpty, !exit.isEmpty {
+            return ("\(entry) → \(exit)", nil)
+        }
+        return (entry.isEmpty ? exit : entry, nil)
+    }
+
+    private var pressureFootnote: String? {
+        let entry = session.entryPressureText?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let exit = session.exitPressureText?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        guard !entry.isEmpty, !exit.isEmpty,
+              let entryValue = Double(entry.replacingOccurrences(of: ",", with: ".")),
+              let exitValue = Double(exit.replacingOccurrences(of: ",", with: ".")) else {
+            return nil
+        }
+        let consumed = max(0, entryValue - exitValue)
+        return String(format: String(localized: "detail.gas.consumed_format"), Formatters.one(consumed))
     }
 
     private var temperatureText: String {

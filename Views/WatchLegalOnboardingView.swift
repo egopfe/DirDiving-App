@@ -123,18 +123,12 @@ struct WatchLegalOnboardingView: View {
                         .font(.system(size: 15, weight: .black, design: .rounded))
                         .foregroundStyle(DiveUI.yellow)
 
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 0) {
-                            Text(legalAcceptance.disclaimerText(languageCode: languageCode))
-                                .font(.system(size: 11, weight: .semibold, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.9))
-                                .fixedSize(horizontal: false, vertical: true)
-                            Color.clear
-                                .frame(height: 1)
-                                .onAppear { disclaimerReachedBottom = true }
-                        }
+                    LegalDisclaimerScrollGate(reachedBottom: $disclaimerReachedBottom, maxHeight: 118) {
+                        Text(legalAcceptance.disclaimerText(languageCode: languageCode))
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.9))
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    .frame(maxHeight: 118)
 
                     if !disclaimerReachedBottom {
                         Text(String(localized: "legal.scroll.prompt"))

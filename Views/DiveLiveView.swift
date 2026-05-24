@@ -6,7 +6,10 @@ struct DiveLiveView: View {
     @EnvironmentObject private var dive: DiveManager
     @EnvironmentObject private var watchSync: WatchSyncService
     @AppStorage(HapticService.hapticsEnabledKey) private var hapticsEnabled = true
+    @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
     @State private var ascentHapticLoopTask: Task<Void, Never>?
+
+    private var unitPreference: DIRUnitPreference { DIRUnitPreference.fromStorage(watchUnits) }
 
     private var showAscentAlarmBanner: Bool {
         dive.isDiveActive && dive.ascentStatus.isOverLimit
@@ -403,9 +406,10 @@ struct DiveLiveView: View {
 
     private var depthReadout: some View {
         let style = depthReadoutStyle
+        let depthDisplay = WatchDepthFormatting.display(meters: dive.currentDepthMeters, units: unitPreference)
         return VStack(spacing: 0) {
             HStack(alignment: .lastTextBaseline, spacing: 4) {
-                Text(Formatters.one(dive.currentDepthMeters))
+                Text(depthDisplay.valueText)
                     .font(.system(size: 72, weight: .black, design: .rounded))
                     .minimumScaleFactor(0.42)
                     .lineLimit(1)
@@ -413,12 +417,15 @@ struct DiveLiveView: View {
                     .foregroundStyle(style.depthColor)
                     .shadow(color: style.depthShadow, radius: 8, x: 0, y: 0)
                     .layoutPriority(1)
-                Text("m")
+                Text(depthDisplay.unitLabel)
                     .font(.system(size: 31, weight: .black, design: .rounded))
                     .foregroundStyle(style.labelColor)
                     .padding(.bottom, 9)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(String(localized: "live.depth.a11y"))
+            .accessibilityValue("\(depthDisplay.valueText) \(depthDisplay.unitLabel)")
 
             Text(String(localized: "PROFONDITÀ ATTUALE"))
                 .font(.system(size: 15, weight: .black, design: .rounded))
@@ -453,25 +460,29 @@ struct DiveLiveView: View {
     }
 
     private func depthCard(title: String, value: Double, emphasize: Bool) -> some View {
-        VStack(spacing: 2) {
+        let depthDisplay = WatchDepthFormatting.display(meters: value, units: unitPreference)
+        return VStack(spacing: 2) {
             Text(title)
                 .font(.system(size: 10, weight: .semibold, design: .rounded))
                 .foregroundStyle(emphasize ? DiveUI.yellow : DiveUI.secondaryText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.62)
             HStack(alignment: .lastTextBaseline, spacing: 3) {
-                Text(Formatters.one(value))
+                Text(depthDisplay.valueText)
                     .font(.system(size: 25, weight: .black, design: .rounded))
                     .foregroundStyle(emphasize ? DiveUI.yellow : DiveUI.blue)
                     .monospacedDigit()
                     .lineLimit(1)
                     .minimumScaleFactor(0.62)
-                Text("m")
+                Text(depthDisplay.unitLabel)
                     .font(.system(size: 12, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.blue)
                     .padding(.bottom, 2)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(title)
+        .accessibilityValue("\(depthDisplay.valueText) \(depthDisplay.unitLabel)")
         .frame(maxWidth: .infinity, minHeight: 55)
         .background(
             RoundedRectangle(cornerRadius: 8, style: .continuous)
@@ -514,6 +525,9 @@ struct DiveLiveView: View {
                 )
                 .shadow(color: DiveUI.yellow.opacity(0.16), radius: 5, x: 0, y: 0)
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(localized: "live.stopwatch.a11y"))
+        .accessibilityValue(Formatters.time(dive.stopwatchTime))
     }
 
     private var controls: some View {
@@ -522,12 +536,15 @@ struct DiveLiveView: View {
                 DiveCommandButton("START", systemImage: "play.fill", color: DiveUI.green) {
                     dive.startStopwatch()
                 }
+                .accessibilityLabel(String(localized: "live.stopwatch.start.a11y"))
                 DiveCommandButton("STOP", systemImage: "stop.fill", color: DiveUI.red) {
                     dive.stopStopwatch()
                 }
+                .accessibilityLabel(String(localized: "live.stopwatch.stop.a11y"))
                 DiveCommandButton("RESET", systemImage: "arrow.clockwise", color: .white.opacity(0.78)) {
                     dive.resetStopwatch()
                 }
+                .accessibilityLabel(String(localized: "live.stopwatch.reset.a11y"))
             }
             if dive.isManualLifecycleActive {
                 DiveCommandButton(String(localized: "FINE MANUALE"), systemImage: "stop.circle.fill", color: DiveUI.red) {
