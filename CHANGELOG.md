@@ -4,6 +4,16 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-24, Watch control strategy — `72fa15b`)
+
+- **Watch controls:** strategia esplicita per Digital Crown, touch, App Intents / Action Button e tasto laterale system-controlled.
+- **Underwater UX:** Live resta pagina primaria durante immersione attiva; BUSSOLA resta raggiungibile; Settings e preferenze sono scoraggiate/bloccate durante immersione.
+- **Threshold tuning:** soglie allarmi e limiti risalita regolabili anche con Digital Crown, mantenendo i controlli touch.
+- **Bussola:** feedback inline localizzato per `SET BEARING` / `CLEAR`.
+- **Haptics:** conferme coerenti per start/end dive, stopwatch e bearing; warning safety esistenti invariati.
+- **Documentazione:** `WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md`, convenzioni Watch, README, ROADMAP e feature matrix aggiornati.
+- **Vincoli:** nessuna modifica a GPS, BUSSOLA algoritmica, calcoli profondita/risalita, decompressione, TTV, planner o modelli persistence.
+
 ### Added (2026-05-24, readiness R2–R4 + UX audits — `62e25d5`, `db72dce`, `876bcd2`)
 
 - **iOS (`62e25d5`):** persistenza ack sicurezza planner (`PlannerSafetyAcknowledgment`); surfacing errori decode iCloud in Altro; localizzazione Logbook / Dettaglio / Analisi (chiavi `detail.*`, `logbook.*`, `analysis.*`, `cloud.*`).

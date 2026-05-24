@@ -86,6 +86,20 @@ Report: [`Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260520.md`](Docs/MAIN_BRAN
 
 **QA esterno ancora aperto (R1):** entitlement water submersion + profondità automatica su Apple Watch Ultra reale — [`Docs/TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](Docs/TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md).
 
+### Strategia controlli Apple Watch (2026-05-24, `72fa15b`)
+
+DIR DIVING su Apple Watch usa una strategia controlli coerente e review-safe, senza pretendere controlli hardware non supportati:
+
+| Controllo | Policy |
+|-----------|--------|
+| Digital Crown | Navigazione pagine, scroll e regolazione soglie allarmi/risalita dove presente |
+| Touch | Conferma primaria tramite pulsanti a schermo; le azioni distruttive restano confermate |
+| App Intents / Action Button | Solo tramite Comandi Rapidi / Action Button quando watchOS espone gli intent supportati |
+| Tasto laterale | Controllato dal sistema; DIR DIVING non lo sovrascrive direttamente |
+| Immersione attiva | Live resta primaria; BUSSOLA resta raggiungibile; Settings pensate per modifica in superficie |
+
+Dettagli: [`Docs/WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md`](Docs/WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md) e convenzioni in [`Docs/WATCH_MAIN_UX_CONVENTIONS.md`](Docs/WATCH_MAIN_UX_CONVENTIONS.md).
+
 ## Depth Entitlement And Signing Checklist
 
 Local configuration is internally aligned for the Watch target: `project.yml` points `DIRDiving Watch App` at `Config/DIRDiving.entitlements`, `App/Info.plist` declares `WKBackgroundModes` with `underwater-depth`, and the Watch entitlements include `com.apple.developer.coremotion.water-submersion`.
@@ -138,7 +152,7 @@ Le istruzioni di build sono in [`Docs/BUILD_VALIDATION.md`](Docs/BUILD_VALIDATIO
 - **`codex/experimental-features`**: Watch sperimentale (Snorkeling Live, mappe waypoint/ritorno, Apnea workflow esteso, Buddy Assist, ecc.). Non importare questi file nel target MAIN senza revisione esplicita.
 - **`codex/ios-experimental-features`**: iOS sperimentale (Explore Lab, Buddy Lab, concept mappe). Isolato da App Store candidate su `main`.
 - **Allineamenti UI-only** su `main`: possono toccare layout, copy, accessibilità e documentazione **senza** modificare algoritmi di decompressione, modello gas, calcoli TTV/TTR/SAC/CNS/OTU, sampling sensori o regole di sync — vedi [`Docs/MAIN_UX_COMPLETION_REPORT.md`](Docs/MAIN_UX_COMPLETION_REPORT.md).
-- **HEAD `main` consigliato** per release candidate Watch+iOS unificato (`bd129ca` — readiness R2–R4 + audit UX `876bcd2`/`db72dce`); `main-iOS` resta worktree storico — allineare **documentazione** da `main` dopo merge manuale (vedi [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260524.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260524.md)).
+- **HEAD `main` consigliato** per release candidate Watch+iOS unificato (`72fa15b` — `bd129ca` + Watch control strategy); `main-iOS` resta worktree storico — allineare **documentazione** da `main` dopo merge manuale (vedi [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260524.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260524.md)).
 - **UI-only / documentazione**: non alterare Diving mode, GPS surface-only, **BUSSOLA** (mai COMPASSO), export Subsurface, sync HMAC, onboarding legale.
 
 ### Matrice funzionalità (CSV)
@@ -870,6 +884,12 @@ Restano obbligatori: build `xcodegen generate` / Xcode su macOS, test Apple Watc
 - **Modalità:** Diving su `main`; Snorkeling (Live, Mappa Waypoint, Mappa Ritorno, ritorno ingresso, POI) e Apnea su `codex/experimental-features` — vedi [`Docs/SNORKELING_EXPERIMENTAL_SPEC.md`](Docs/SNORKELING_EXPERIMENTAL_SPEC.md), [`Docs/APNEA_EXPERIMENTAL_SPEC.md`](Docs/APNEA_EXPERIMENTAL_SPEC.md).
 - **i18n:** pass R4 su Logbook/Dettaglio/Analisi; debito Planner/Equipment/alcuni messaggi runtime — vedi sezione Lingue sopra.
 - **Nota Watch post-`3b7358b`:** lista log mostra profondità max in `m` fisso (regressione display unità rispetto a `db72dce`); storage e export restano metrici — TODO QA se ripristinare `WatchDepthFormatting` in lista.
+
+## Aggiornamento documentazione 2026-05-24 (control strategy `72fa15b`)
+
+- Aggiunta documentazione strategia controlli Watch: Crown, touch, App Intents / Action Button, tasto laterale system-controlled, haptics e navigazione sott'acqua.
+- Aggiornati README, CHANGELOG, ROADMAP, matrice feature CSV/XLSX e report [`Docs/DOCUMENTATION_UPDATE_REPORT_20260524_CONTROL_STRATEGY.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260524_CONTROL_STRATEGY.md).
+- PR #8 e #9 restano non safe-to-merge senza review manuale, build macOS e QA Diving/BUSSOLA/GPS surface-only.
 
 ## Aggiornamento documentazione e audit post-fix 2026-05-18
 
