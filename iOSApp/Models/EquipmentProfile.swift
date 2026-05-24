@@ -5,8 +5,10 @@ struct EquipmentChecklistItem: Identifiable, Codable, Hashable {
     var title: String
     var isReady: Bool = false
     var usesGas: Bool = false
+    var gasMixKind: GasMixKind = .air
     var gasText: String = ""
     var pressureText: String = ""
+    var pressureUnit: PressureUnit = .bar
     var tankSize: TankSize = .liters12
 }
 

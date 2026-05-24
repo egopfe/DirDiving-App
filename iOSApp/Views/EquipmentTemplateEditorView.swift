@@ -30,28 +30,7 @@ struct EquipmentTemplateEditorView: View {
                                     TextField(String(localized: "equipment.checklist.new_item"), text: $item.title)
                                         .foregroundStyle(.white)
                                     Toggle(String(localized: "equipment.checklist.gas_flag"), isOn: $item.usesGas).tint(DIRTheme.yellow)
-                                    if item.usesGas {
-                                        HStack {
-                                            Text(String(localized: "equipment.checklist.tank_size"))
-                                                .foregroundStyle(DIRTheme.muted)
-                                            Spacer()
-                                            Picker("", selection: $item.tankSize) {
-                                                ForEach(TankSize.allCases) { size in
-                                                    Text(size.rawValue).tag(size)
-                                                }
-                                            }
-                                            .labelsHidden()
-                                            .tint(DIRTheme.cyan)
-                                        }
-                                        .font(.callout)
-                                        TextField(String(localized: "equipment.checklist.pressure"), text: $item.pressureText)
-                                            .foregroundStyle(.white)
-                                    } else {
-                                        TextField(String(localized: "equipment.checklist.gas"), text: $item.gasText)
-                                            .foregroundStyle(.white)
-                                        TextField(String(localized: "equipment.checklist.pressure"), text: $item.pressureText)
-                                            .foregroundStyle(.white)
-                                    }
+                                    EquipmentChecklistGasSection(item: $item)
                                     Button(role: .destructive) {
                                         items.removeAll { $0.id == item.id }
                                     } label: {

@@ -75,6 +75,12 @@ enum PlannerMODValidator {
         return issues
     }
 
+    static func liveInputIssues(input: GasPlanInput) -> [MODValidationIssue] {
+        var working = input
+        working.syncLegacyGasesFromPlannerCylinders()
+        return validatePlannerCylinders(input: working)
+    }
+
     static func validateAll(input: GasPlanInput, requestedStops: [DecoStop]) -> [MODValidationIssue] {
         var combined = validatePlannerCylinders(input: input)
         let decoGases = input.plannerCylinders

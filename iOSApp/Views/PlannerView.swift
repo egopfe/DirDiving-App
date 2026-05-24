@@ -6,6 +6,9 @@ struct PlannerView: View {
     @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @State private var showPlan = false
+    @State private var showPlanningReferenceInfo = false
+    @State private var showCalculateError = false
+    @State private var calculateErrorMessage = ""
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
 
@@ -58,6 +61,17 @@ struct PlannerView: View {
                     store.mode = .advanced
                 }
                 store.input.ensurePlannerCylindersFromLegacy()
+                store.refreshDerivedPlanningPreview()
+            }
+            .alert(String(localized: "planner.reference.info.title"), isPresented: $showPlanningReferenceInfo) {
+                Button(String(localized: "OK"), role: .cancel) {}
+            } message: {
+                Text(String(localized: "planner.reference.info.message"))
+            }
+            .alert(String(localized: "planner.calculate.error.title"), isPresented: $showCalculateError) {
+                Button(String(localized: "OK"), role: .cancel) {}
+            } message: {
+                Text(calculateErrorMessage)
             }
         }
     }
@@ -132,10 +146,19 @@ struct PlannerView: View {
                 Divider().overlay(DIRTheme.hairline)
                 plannerDepthField(String(localized: "planner.field.avg_depth"), meters: $store.input.plannedAverageDepthMeters)
                 Divider().overlay(DIRTheme.hairline)
-                HStack {
+                HStack(spacing: 8) {
                     Text(String(localized: "planner.field.planning_reference"))
                         .font(.callout)
                         .foregroundStyle(.white)
+                    Button {
+                        showPlanningReferenceInfo = true
+                    } label: {
+                        Image(systemName: "info.circle")
+                            .font(.callout)
+                            .foregroundStyle(DIRTheme.cyan)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(String(localized: "planner.reference.info.title"))
                     Spacer()
                     Picker(String(localized: "planner.field.planning_reference"), selection: $store.input.planningDepthReference) {
                         Text(String(localized: "planner.reference.max_depth")).tag(PlanningDepthReference.maximumDepth)
@@ -143,10 +166,11 @@ struct PlannerView: View {
                     }
                     .labelsHidden()
                     .tint(DIRTheme.cyan)
+                    .onChange(of: store.input.planningDepthReference) { _, _ in
+                        store.refreshDerivedPlanningPreview()
+                    }
                 }
                 .padding(.vertical, 10)
-                Divider().overlay(DIRTheme.hairline)
-                DIRWarningBox(text: String(localized: "planner.emergency_gas.max_depth_rule"))
                 Divider().overlay(DIRTheme.hairline)
                 plannerField(String(localized: "planner.field.bottom_time"), value: $store.input.plannedBottomMinutes, unit: "min", step: 1)
                 Divider().overlay(DIRTheme.hairline)
@@ -239,13 +263,20 @@ struct PlannerView: View {
                             )
                         }
                         GasMixCard(
-                            title: entry.gas.label,
                             mix: $entry.gas,
                             accent: entry.role == .bottom ? DIRTheme.green : DIRTheme.yellow,
-                            showsHelium: entry.role == .bottom
-                        )
-                        .onChange(of: entry.gas) { _, _ in
+                            unitPreference: unitPreference
+                        ) {
                             store.input.syncLegacyGasesFromPlannerCylinders()
+                            store.refreshDerivedPlanningPreview()
+                        }
+                        .onChange(of: entry.role) { _, newRole in
+                            entry.gas.role = newRole
+                            store.input.syncLegacyGasesFromPlannerCylinders()
+                            store.refreshDerivedPlanningPreview()
+                        }
+                        .onChange(of: entry.switchDepthMeters) { _, _ in
+                            store.refreshDerivedPlanningPreview()
                         }
                         if entry.isSwitchDepthBeyondMOD {
                             Text(String(localized: "planner.mod.exceeds_allowed"))
@@ -323,7 +354,11 @@ struct PlannerView: View {
     }
 
     private var liveMODIssues: [MODValidationIssue] {
-        PlannerMODValidator.validatePlannerCylinders(input: store.input)
+        PlannerMODValidator.liveInputIssues(input: store.input)
+    }
+
+    private var canCalculatePlan: Bool {
+        plannerSafetyAcknowledged && liveMODIssues.isEmpty
     }
 
     @ViewBuilder
@@ -425,25 +460,41 @@ struct PlannerView: View {
 
     private var calculateButton: some View {
         Button {
+            store.input.normalizeAllPlannerGases()
+            store.input.syncLegacyGasesFromPlannerCylinders()
+            if store.input.hasInvalidGasMix {
+                calculateErrorMessage = String(localized: "planner.gas.mix_invalid")
+                showCalculateError = true
+                return
+            }
+            if PlannerGasSchedule.hasMODBlockingIssues(input: store.input) {
+                calculateErrorMessage = String(localized: "planner.mod.block_calculate")
+                showCalculateError = true
+                return
+            }
             store.calculate()
             showPlan = true
         } label: {
             Text(String(localized: "Calcola Piano"))
                 .font(.callout.weight(.semibold))
-                .foregroundStyle(plannerSafetyAcknowledged ? .black : DIRTheme.muted)
+                .foregroundStyle(canCalculatePlan ? .black : DIRTheme.muted)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
                 .background(
                     RoundedRectangle(cornerRadius: 8)
-                        .fill(plannerSafetyAcknowledged ? DIRTheme.cyan : DIRTheme.surface2)
-                        .shadow(color: DIRTheme.cyan.opacity(plannerSafetyAcknowledged ? 0.28 : 0), radius: 14, x: 0, y: 8)
+                        .fill(canCalculatePlan ? DIRTheme.cyan : DIRTheme.surface2)
+                        .shadow(color: DIRTheme.cyan.opacity(canCalculatePlan ? 0.28 : 0), radius: 14, x: 0, y: 8)
                 )
         }
         .buttonStyle(.plain)
-        .disabled(!plannerSafetyAcknowledged)
+        .disabled(!canCalculatePlan)
         .padding(.top, 4)
         .accessibilityLabel(String(localized: "Calcola Piano"))
-        .accessibilityHint(String(localized: "planner.safety_ack.hint"))
+        .accessibilityHint(
+            liveMODIssues.isEmpty
+                ? String(localized: "planner.safety_ack.hint")
+                : String(localized: "planner.mod.block_calculate")
+        )
     }
 
     private func depthDisplayBinding(_ meters: Binding<Double>) -> Binding<Double> {
@@ -525,136 +576,6 @@ struct PlannerView: View {
 
     private func warningColor(ppO2: Double) -> Color {
         ppO2 > store.input.bottomGas.maxPPO2 ? DIRTheme.red : DIRTheme.green
-    }
-}
-
-struct GasMixCard: View {
-    let title: String
-    @Binding var mix: GasMix
-    let accent: Color
-    let showsHelium: Bool
-
-    var body: some View {
-        DIRCard(accent: accent) {
-            VStack(alignment: .leading, spacing: 14) {
-                HStack {
-                    Text(title)
-                        .font(.callout.weight(.semibold))
-                        .foregroundStyle(.white)
-                    Spacer()
-                    Image(systemName: "slider.horizontal.3")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(accent)
-                }
-                HStack {
-                    gasMetric(String(localized: "planner.gas.mix_label"), mix.label, alignLeading: true)
-                    gasAdjuster("O2", value: mix.oxygen, suffix: "%", step: 0.01) { setOxygen($0) }
-                    if showsHelium {
-                        gasAdjuster("He", value: mix.helium, suffix: "%", step: 0.01) { setHelium($0) }
-                    }
-                    gasMetric("N2", "\(Int(mix.nitrogen * 100))%")
-                    gasMetric("MOD", "\(Formatters.one(mix.modMeters)) m")
-                }
-                Divider().overlay(DIRTheme.hairline)
-                VStack(spacing: 8) {
-                    HStack(spacing: 16) {
-                        gasLine("PPO2 Max", Formatters.one(mix.maxPPO2))
-                        gasLine(String(localized: "planner.gas.surface_density"), "\(Formatters.one(mix.surfaceDensityGramsLiter)) g/L")
-                    }
-                    HStack {
-                        Text(String(localized: "planner.gas.adjust_ppo2"))
-                            .font(.caption)
-                            .foregroundStyle(DIRTheme.muted)
-                        Spacer()
-                        gasStepper(value: mix.maxPPO2, step: 0.05) { mix.maxPPO2 = min(max($0, 1.0), 1.6) }
-                    }
-                }
-            }
-        }
-        .overlay(alignment: .leading) {
-            RoundedRectangle(cornerRadius: 2)
-                .fill(accent)
-                .frame(width: 3)
-                .padding(.vertical, 8)
-        }
-    }
-
-    private func gasMetric(_ title: String, _ value: String, alignLeading: Bool = false) -> some View {
-        VStack(alignment: alignLeading ? .leading : .trailing, spacing: 5) {
-            Text(title)
-                .font(.caption2)
-                .foregroundStyle(DIRTheme.muted)
-            Text(value)
-                .font(.callout.monospacedDigit())
-                .foregroundStyle(.white)
-        }
-        .frame(maxWidth: .infinity, alignment: alignLeading ? .leading : .trailing)
-    }
-
-    private func gasLine(_ title: String, _ value: String) -> some View {
-        HStack {
-            Text(title)
-                .font(.caption)
-                .foregroundStyle(DIRTheme.muted)
-            Spacer()
-            Text(value)
-                .font(.caption.monospacedDigit())
-                .foregroundStyle(.white)
-        }
-    }
-
-    private func gasAdjuster(_ title: String, value: Double, suffix: String, step: Double, update: @escaping (Double) -> Void) -> some View {
-        VStack(alignment: .trailing, spacing: 5) {
-            Text(title)
-                .font(.caption2)
-                .foregroundStyle(DIRTheme.muted)
-            HStack(spacing: 3) {
-                Button { update(value - step) } label: {
-                    Image(systemName: "minus")
-                        .font(.caption2.weight(.bold))
-                        .frame(width: 18, height: 18)
-                }
-                Text("\(Int(value * 100))\(suffix)")
-                    .font(.caption.monospacedDigit())
-                    .foregroundStyle(.white)
-                    .frame(width: 42)
-                Button { update(value + step) } label: {
-                    Image(systemName: "plus")
-                        .font(.caption2.weight(.bold))
-                        .frame(width: 18, height: 18)
-                }
-            }
-            .foregroundStyle(DIRTheme.cyan)
-        }
-        .frame(maxWidth: .infinity, alignment: .trailing)
-    }
-
-    private func gasStepper(value: Double, step: Double, update: @escaping (Double) -> Void) -> some View {
-        HStack(spacing: 5) {
-            Button { update(value - step) } label: {
-                Image(systemName: "minus")
-                    .frame(width: 24, height: 22)
-            }
-            Text(Formatters.one(value))
-                .font(.callout.monospacedDigit())
-                .foregroundStyle(.white)
-                .frame(width: 42)
-            Button { update(value + step) } label: {
-                Image(systemName: "plus")
-                    .frame(width: 24, height: 22)
-            }
-        }
-        .foregroundStyle(DIRTheme.cyan)
-    }
-
-    private func setOxygen(_ value: Double) {
-        let capped = min(max(value, 0.10), 1.0 - mix.helium)
-        mix.oxygen = capped
-    }
-
-    private func setHelium(_ value: Double) {
-        let capped = min(max(value, 0), 1.0 - mix.oxygen)
-        mix.helium = capped
     }
 }
 
@@ -961,22 +882,27 @@ struct PlanResultView: View {
     }
 
     private var buhlmannChart: some View {
-        DIRCard("CURVA BUHLMANN ZH-L16C", icon: nil, accent: DIRTheme.cyan) {
-            Chart(store.buhlmann.curve) { point in
-                LineMark(
-                    x: .value("Minutes", point.ndlMinutes),
-                    y: .value("Load", max(0, 100 - point.depthMeters * 1.5)),
-                    series: .value("Compartimenti", point.compartmentGroup)
-                )
-                .lineStyle(StrokeStyle(lineWidth: 2))
+        VStack(alignment: .leading, spacing: 12) {
+            if store.input.buhlmannUsesTrimixBackGas {
+                DIRWarningBox(text: String(localized: "planner.gas.trimix_buhlmann_disclaimer"))
             }
-            .chartXAxis {
-                AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
+            DIRCard("CURVA BUHLMANN ZH-L16C", icon: nil, accent: DIRTheme.cyan) {
+                Chart(store.buhlmann.curve) { point in
+                    LineMark(
+                        x: .value("Minutes", point.ndlMinutes),
+                        y: .value("Load", max(0, 100 - point.depthMeters * 1.5)),
+                        series: .value("Compartimenti", point.compartmentGroup)
+                    )
+                    .lineStyle(StrokeStyle(lineWidth: 2))
+                }
+                .chartXAxis {
+                    AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
+                }
+                .chartYAxis {
+                    AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
+                }
+                .frame(height: 220)
             }
-            .chartYAxis {
-                AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
-            }
-            .frame(height: 220)
         }
     }
 }

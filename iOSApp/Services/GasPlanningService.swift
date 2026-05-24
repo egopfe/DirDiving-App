@@ -51,18 +51,126 @@ enum GasPlanningService {
         gas.oxygen * (depthMeters / 10.0 + 1.0)
     }
 
-    static func profileSegments(input: GasPlanInput, stops: [DecoStop]) -> [DivePlanSegment] {
-        var segments: [DivePlanSegment] = [
-            DivePlanSegment(kind: .descent, depthMeters: input.plannedDepthMeters, minutes: max(1, input.plannedDepthMeters / 18.0), gas: input.bottomGas.label, note: "Discesa controllata"),
-            DivePlanSegment(kind: .bottom, depthMeters: input.plannedDepthMeters, minutes: input.plannedBottomMinutes, gas: input.bottomGas.label, note: "Tempo fondo pianificato")
-        ]
+    /// PPO₂ at depth capped by the gas mix maximum (used for deco stops and MOD-consistent display).
+    static func boundedPPO2(gas: GasMix, depthMeters: Double) -> Double {
+        min(gas.maxPPO2, ppO2(gas: gas, depthMeters: depthMeters))
+    }
 
-        for stop in stops {
-            segments.append(DivePlanSegment(kind: .gasSwitch, depthMeters: stop.depthMeters, minutes: 0.5, gas: stop.gas, note: "Verifica gas e PPO2"))
-            segments.append(DivePlanSegment(kind: .stop, depthMeters: stop.depthMeters, minutes: Double(stop.minutes), gas: stop.gas, note: "Sosta pianificata"))
+    static func profileSegments(input: GasPlanInput, stops: [DecoStop]) -> [DivePlanSegment] {
+        var segments: [DivePlanSegment] = []
+        let maxDepth = input.plannedDepthMeters
+        let bottom = PlannerGasSchedule.bottomGas(from: input)
+        let descentPoints = PlannerGasSchedule.descentSwitchPoints(input: input)
+
+        for (index, point) in descentPoints.enumerated() {
+            if index > 0 {
+                let switchDepth = descentPoints[index - 1].depthMeters
+                segments.append(
+                    DivePlanSegment(
+                        kind: .gasSwitch,
+                        depthMeters: switchDepth,
+                        minutes: 0.5,
+                        gas: point.gas.label,
+                        note: gasSwitchNote(for: point.role)
+                    )
+                )
+            }
+            let previousDepth = index == 0 ? 0 : descentPoints[index - 1].depthMeters
+            let legDepth = point.depthMeters - previousDepth
+            guard legDepth > 0 else { continue }
+            let minutes = max(1, legDepth / 18.0)
+            let note = point.role == .travel
+                ? String(localized: "planner.segment.travel_descent")
+                : String(localized: "planner.segment.back_gas_descent")
+            segments.append(
+                DivePlanSegment(
+                    kind: .descent,
+                    depthMeters: point.depthMeters,
+                    minutes: minutes,
+                    gas: point.gas.label,
+                    note: note
+                )
+            )
         }
 
-        segments.append(DivePlanSegment(kind: .ascent, depthMeters: 0, minutes: max(1, input.plannedDepthMeters / 9.0), gas: stops.last?.gas ?? input.bottomGas.label, note: "Risalita finale"))
+        if segments.isEmpty {
+            segments.append(
+                DivePlanSegment(
+                    kind: .descent,
+                    depthMeters: maxDepth,
+                    minutes: max(1, maxDepth / 18.0),
+                    gas: bottom.label,
+                    note: String(localized: "planner.segment.back_gas_descent")
+                )
+            )
+        }
+
+        segments.append(
+            DivePlanSegment(
+                kind: .bottom,
+                depthMeters: maxDepth,
+                minutes: input.plannedBottomMinutes,
+                gas: bottom.label,
+                note: String(localized: "planner.segment.bottom_time")
+            )
+        )
+
+        let shallowestStop = stops.map(\.depthMeters).min() ?? 0
+        for travel in PlannerGasSchedule.ascentTravelSwitchPoints(input: input, shallowestStopDepth: shallowestStop) {
+            segments.append(
+                DivePlanSegment(
+                    kind: .gasSwitch,
+                    depthMeters: travel.depthMeters,
+                    minutes: 0.5,
+                    gas: travel.gas.label,
+                    note: String(localized: "planner.segment.travel_ascent")
+                )
+            )
+        }
+
+        for stop in stops {
+            segments.append(
+                DivePlanSegment(
+                    kind: .gasSwitch,
+                    depthMeters: stop.depthMeters,
+                    minutes: 0.5,
+                    gas: stop.gas,
+                    note: String(localized: "planner.segment.deco_switch")
+                )
+            )
+            segments.append(
+                DivePlanSegment(
+                    kind: .stop,
+                    depthMeters: stop.depthMeters,
+                    minutes: Double(stop.minutes),
+                    gas: stop.gas,
+                    note: String(localized: "planner.segment.deco_stop")
+                )
+            )
+        }
+
+        for bailout in PlannerGasSchedule.bailoutCylinders(from: input) {
+            let depth = min(bailout.switchDepthMeters, bailout.modMeters)
+            segments.append(
+                DivePlanSegment(
+                    kind: .gasSwitch,
+                    depthMeters: depth,
+                    minutes: 0,
+                    gas: bailout.gas.label,
+                    note: String(localized: "planner.segment.bailout_emergency")
+                )
+            )
+        }
+
+        segments.append(
+            DivePlanSegment(
+                kind: .ascent,
+                depthMeters: 0,
+                minutes: max(1, maxDepth / 9.0),
+                gas: stops.last?.gas ?? bottom.label,
+                note: String(localized: "planner.segment.final_ascent")
+            )
+        )
         return segments
     }
 
@@ -110,6 +218,15 @@ enum GasPlanningService {
             "Oxygen: PPO2 \(String(format: "%.1f", analysis.ppO2AtDepth)), CNS \(Int(analysis.cnsPercent))%, OTU \(Int(analysis.otu)).",
             "Stops: \(stops.map { "\(Int($0.depthMeters))m/\($0.minutes)min \($0.gas)" }.joined(separator: ", "))."
         ]
+    }
+
+    private static func gasSwitchNote(for role: GasRole) -> String {
+        switch role {
+        case .travel: return String(localized: "planner.segment.switch_travel")
+        case .bottom: return String(localized: "planner.segment.switch_back_gas")
+        case .deco: return String(localized: "planner.segment.deco_switch")
+        case .bailout: return String(localized: "planner.segment.bailout_emergency")
+        }
     }
 
     private static func densityRating(_ density: Double, warning: Double, danger: Double) -> GasDensityRating {

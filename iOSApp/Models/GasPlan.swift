@@ -43,6 +43,21 @@ enum PlanningDepthReference: String, CaseIterable, Identifiable, Codable {
     var id: String { rawValue }
 }
 
+enum GasMixKind: String, CaseIterable, Identifiable, Codable {
+    case air
+    case ean
+    case trimix
+    var id: String { rawValue }
+
+    var localizedTitle: String {
+        switch self {
+        case .air: return String(localized: "gas.mix.air")
+        case .ean: return String(localized: "gas.mix.ean")
+        case .trimix: return String(localized: "gas.mix.trimix")
+        }
+    }
+}
+
 struct PlannerCylinderEntry: Identifiable, Codable, Hashable {
     var id = UUID()
     var role: GasRole = .bottom
@@ -111,12 +126,120 @@ struct GasMix: Identifiable, Codable, Hashable {
     var id = UUID()
     var name: String
     var role: GasRole = .bottom
+    var mixKind: GasMixKind = .trimix
     var oxygen: Double
     var helium: Double
     var maxPPO2: Double
     var isOxygenNarcotic: Bool = true
     var nitrogen: Double { max(0, 1.0 - oxygen - helium) }
-    var modMeters: Double { max(0, ((maxPPO2 / max(oxygen, 0.01)) - 1.0) * 10.0) }
+    var modMeters: Double { PlannerMODValidator.modMeters(oxygenFraction: oxygen, maxPPO2: maxPPO2) }
+    var isValidMix: Bool { oxygen > 0 && helium >= 0 && (oxygen + helium) <= 1.0001 }
+    var canEditOxygen: Bool { mixKind != .air }
+    var canEditHelium: Bool { mixKind == .trimix }
+
+    static func inferredKind(oxygen: Double, helium: Double) -> GasMixKind {
+        if helium > 0.001 { return .trimix }
+        if abs(oxygen - 0.21) < 0.005 { return .air }
+        return .ean
+    }
+
+    mutating func syncMixKindFromComposition() {
+        mixKind = Self.inferredKind(oxygen: oxygen, helium: helium)
+    }
+
+    mutating func applyMixKind(_ kind: GasMixKind) {
+        mixKind = kind
+        switch kind {
+        case .air:
+            oxygen = 0.21
+            helium = 0
+        case .ean:
+            helium = 0
+        case .trimix:
+            break
+        }
+        normalizeMixAndPPO2()
+    }
+
+    mutating func normalizeMixAndPPO2() {
+        maxPPO2 = (maxPPO2 * 10).rounded() / 10
+        maxPPO2 = min(max(1.0, maxPPO2), 1.6)
+        switch mixKind {
+        case .air:
+            oxygen = 0.21
+            helium = 0
+        case .ean:
+            helium = 0
+            oxygen = min(max(oxygen, 0.10), 1.0)
+        case .trimix:
+            helium = min(max(helium, 0), 1.0)
+            oxygen = min(max(oxygen, 0.10), max(0.10, 1.0 - helium))
+        }
+    }
+
+    mutating func setOxygenFraction(_ value: Double) {
+        guard canEditOxygen else { return }
+        switch mixKind {
+        case .air:
+            break
+        case .ean:
+            oxygen = min(max(value, 0.10), 1.0)
+        case .trimix:
+            let capped = min(max(value, 0.10), 1.0 - helium)
+            oxygen = capped
+        }
+    }
+
+    mutating func setHeliumFraction(_ value: Double) {
+        guard canEditHelium else { return }
+        helium = min(max(value, 0), 1.0 - oxygen)
+    }
+
+    mutating func setMaxPPO2(_ value: Double) {
+        maxPPO2 = min(max(1.0, (value * 10).rounded() / 10), 1.6)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, role, mixKind, oxygen, helium, maxPPO2, isOxygenNarcotic
+    }
+
+    init(
+        id: UUID = UUID(),
+        name: String,
+        role: GasRole = .bottom,
+        mixKind: GasMixKind? = nil,
+        oxygen: Double,
+        helium: Double,
+        maxPPO2: Double,
+        isOxygenNarcotic: Bool = true
+    ) {
+        self.id = id
+        self.name = name
+        self.role = role
+        self.oxygen = oxygen
+        self.helium = helium
+        self.maxPPO2 = maxPPO2
+        self.isOxygenNarcotic = isOxygenNarcotic
+        self.mixKind = mixKind ?? Self.inferredKind(oxygen: oxygen, helium: helium)
+        normalizeMixAndPPO2()
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        name = try container.decode(String.self, forKey: .name)
+        role = try container.decodeIfPresent(GasRole.self, forKey: .role) ?? .bottom
+        oxygen = try container.decode(Double.self, forKey: .oxygen)
+        helium = try container.decode(Double.self, forKey: .helium)
+        maxPPO2 = try container.decode(Double.self, forKey: .maxPPO2)
+        isOxygenNarcotic = try container.decodeIfPresent(Bool.self, forKey: .isOxygenNarcotic) ?? true
+        if let decodedKind = try container.decodeIfPresent(GasMixKind.self, forKey: .mixKind) {
+            mixKind = decodedKind
+        } else {
+            mixKind = Self.inferredKind(oxygen: oxygen, helium: helium)
+        }
+        normalizeMixAndPPO2()
+    }
     var surfaceDensityGramsLiter: Double {
         oxygen * 1.429 + nitrogen * 1.251 + helium * 0.1786
     }
@@ -235,12 +358,50 @@ struct GasPlanInput: Codable, Hashable {
 
     mutating func syncLegacyGasesFromPlannerCylinders() {
         ensurePlannerCylindersFromLegacy()
+        for index in plannerCylinders.indices {
+            plannerCylinders[index].gas.role = plannerCylinders[index].role
+            plannerCylinders[index].gas.normalizeMixAndPPO2()
+        }
         if let bottom = plannerCylinders.first(where: { $0.role == .bottom }) {
             bottomGas = bottom.gas
             cylinder = bottom.cylinder
         }
-        let deco = plannerCylinders.filter { $0.role == .deco }
+        let deco = plannerCylinders
+            .filter { $0.role == .deco }
+            .sorted { $0.switchDepthMeters > $1.switchDepthMeters }
         if deco.indices.contains(0) { decoGas1 = deco[0].gas }
         if deco.indices.contains(1) { decoGas2 = deco[1].gas }
+    }
+
+    mutating func normalizeAllPlannerGases() {
+        ensurePlannerCylindersFromLegacy()
+        for index in plannerCylinders.indices {
+            plannerCylinders[index].gas.normalizeMixAndPPO2()
+        }
+        bottomGas.normalizeMixAndPPO2()
+        decoGas1.normalizeMixAndPPO2()
+        decoGas2.normalizeMixAndPPO2()
+    }
+
+    var hasInvalidGasMix: Bool {
+        if plannerCylinders.isEmpty {
+            return !bottomGas.isValidMix || !decoGas1.isValidMix || !decoGas2.isValidMix
+        }
+        return plannerCylinders.contains { !$0.gas.isValidMix }
+    }
+
+    /// True when any planner gas is trimix (shows Bühlmann helium limitation disclaimer).
+    var includesTrimixGas: Bool {
+        if bottomGas.mixKind == .trimix { return true }
+        return plannerCylinders.contains { $0.gas.mixKind == .trimix }
+    }
+
+    /// Back gas used for simplified Bühlmann NDL (role `.bottom` or legacy `bottomGas`).
+    var buhlmannBackGas: GasMix {
+        plannerCylinders.first(where: { $0.role == .bottom })?.gas ?? bottomGas
+    }
+
+    var buhlmannUsesTrimixBackGas: Bool {
+        buhlmannBackGas.mixKind == .trimix
     }
 }

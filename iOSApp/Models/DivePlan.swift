@@ -88,6 +88,7 @@ struct NDLPoint: Identifiable, Hashable {
 struct BuhlmannPlanResult: Hashable {
     let depthMeters: Double
     let gasO2Fraction: Double
+    let heliumFraction: Double
     let nitrogenFraction: Double
     let ndlMinutes: Double
     let curve: [NDLPoint]

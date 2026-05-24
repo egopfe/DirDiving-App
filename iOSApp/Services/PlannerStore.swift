@@ -10,7 +10,10 @@ final class PlannerStore: ObservableObject {
         didSet { saveIfReady() }
     }
     @Published var plan = PlannerService.makePlan(input: GasPlanInput())
-    @Published var buhlmann = BuhlmannPlanner.plan(depthMeters: 40, o2Fraction: 0.18)
+    @Published var buhlmann = BuhlmannPlanner.plan(
+        depthMeters: 40,
+        bottomGas: GasMix(name: "Gas di Fondo", oxygen: 0.18, helium: 0.45, maxPPO2: 1.40)
+    )
     var analysis: TechnicalGasAnalysis { GasPlanningService.analyze(input: input) }
     var briefingText: String { plan.briefingLines.joined(separator: "\n") }
 
@@ -25,15 +28,23 @@ final class PlannerStore: ObservableObject {
             input = saved.input
         }
         input.ensurePlannerCylindersFromLegacy()
+        input.normalizeAllPlannerGases()
         calculate()
         isReady = true
         saveIfReady()
     }
 
+    func refreshDerivedPlanningPreview() {
+        input.normalizeAllPlannerGases()
+        input.syncLegacyGasesFromPlannerCylinders()
+        buhlmann = BuhlmannPlanner.plan(depthMeters: input.plannedDepthMeters, bottomGas: input.bottomGas)
+    }
+
     func calculate() {
+        input.normalizeAllPlannerGases()
         input.syncLegacyGasesFromPlannerCylinders()
         plan = PlannerService.makePlan(input: input)
-        buhlmann = BuhlmannPlanner.plan(depthMeters: input.plannedDepthMeters, o2Fraction: input.bottomGas.oxygen)
+        buhlmann = BuhlmannPlanner.plan(depthMeters: input.plannedDepthMeters, bottomGas: input.bottomGas)
         saveIfReady()
     }
 
