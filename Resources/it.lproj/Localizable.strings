@@ -327,7 +327,12 @@
 "shortcuts.help.touch.title" = "Touch";
 "shortcuts.help.touch.body" = "Usa i pulsanti a schermo per confermare. Le azioni distruttive sui log richiedono ancora conferma.";
 "shortcuts.help.underwater.title" = "Sott'acqua";
-"shortcuts.help.underwater.body" = "Durante l'immersione Live resta primaria e Bussola resta raggiungibile. Le impostazioni sono pensate per la superficie.";
+"shortcuts.help.underwater.body" = "Durante l'immersione restano solo Live e Bussola. Log, impostazioni e immagini dopo la fine immersione.";
+"live.auto_dive.waiting.title" = "Immersione automatica";
+"live.auto_dive.waiting.subtitle" = "Parte in immersione — non serve il tasto Avvio";
+"live.auto_dive.active.hint" = "L'immersione termina in superficie automaticamente.";
+"live.waiting.start" = "In attesa di avvio…";
+"live.gps.start.hint" = "Il punto GPS di inizio viene registrato all'avvio dell'immersione.";
 "shortcuts.help.stopwatch.title" = "Cronometro";
 "shortcuts.help.stopwatch.body" = "Avvia/ferma cronometro via Comandi o Action Button quando elencati. RESET e immediato — usalo con intenzione.";
 "shortcuts.help.reset.title" = "Reset";

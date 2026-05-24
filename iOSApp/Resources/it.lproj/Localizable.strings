@@ -552,7 +552,8 @@
 "analysis.metric.distance" = "Distanza";
 "analysis.metric.bearing" = "Rilevamento";
 
-"planner.units.metric_notice" = "Il planner usa unità metriche per i calcoli.";
+"planner.units.metric_notice" = "I calcoli gas restano metrici. Profondità e temperature seguono le unità in Altro.";
+"manual_dive.cancel" = "Annulla";
 "planner.gas.bottom" = "Gas di Fondo";
 "planner.gas.deco1" = "Gas di Decompressione 1";
 "planner.gas.deco2" = "Gas di Decompressione 2";
@@ -639,10 +640,10 @@
 "planner.cylinder.remove" = "Rimuovi";
 "planner.mod.validation.title" = "Validazione MOD";
 "planner.mod.exceeds_allowed" = "Cambio gas oltre la MOD consentita";
-"planner.mod.detail_format" = "%@ cambio a %@ m — MOD calcolata %@ m";
 "planner.mod.hint" = "Verifica la percentuale di ossigeno e la PPO₂ massima.";
 "planner.mod.calculated" = "MOD calcolata";
-"planner.mod.value_format" = "MOD calcolata: %@ m";
+"planner.mod.value_format" = "MOD calcolata: %@";
+"planner.mod.detail_format" = "%@ cambio a %@ — MOD calcolata %@";
 "planner.field.switch_depth" = "Profondità cambio gas";
 "equipment.template.cancel" = "Annulla";
 "planner.mod.incompatible" = "La profondità di cambio gas non è compatibile con il gas selezionato";

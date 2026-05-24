@@ -184,6 +184,12 @@ struct DiveLiveView: View {
         VStack(spacing: 7) {
             topBar
             immersionStatus
+            if dive.isDepthAutomationAvailable && !dive.isManualLifecycleActive {
+                Text(String(localized: "live.auto_dive.active.hint"))
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .foregroundStyle(DiveUI.secondaryText)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
             if !hapticsEnabled {
                 hapticsOffBadge
             }
@@ -233,31 +239,33 @@ struct DiveLiveView: View {
 
             Spacer(minLength: 24)
 
-            HStack(spacing: 9) {
-                Image(systemName: "mappin.circle.fill")
-                    .font(.system(size: 25, weight: .black))
-                    .foregroundStyle(DiveUI.blue)
-                    .symbolRenderingMode(.hierarchical)
-                Text(String(localized: "In attesa di avvio..."))
-                    .font(.system(size: 14, weight: .regular, design: .rounded))
+            if dive.isDepthAutomationAvailable {
+                autoDiveStatusPanel
+            } else {
+                HStack(spacing: 9) {
+                    Image(systemName: "mappin.circle.fill")
+                        .font(.system(size: 25, weight: .black))
+                        .foregroundStyle(DiveUI.blue)
+                        .symbolRenderingMode(.hierarchical)
+                    Text(String(localized: "live.waiting.start"))
+                        .font(.system(size: 14, weight: .regular, design: .rounded))
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.78)
+                    Spacer(minLength: 0)
+                }
+                .padding(.horizontal, 9)
+
+                Spacer(minLength: 20)
+
+                Text(String(localized: "live.gps.start.hint"))
+                    .font(.system(size: 13, weight: .regular, design: .rounded))
                     .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.78)
-                Spacer(minLength: 0)
-            }
-            .padding(.horizontal, 9)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(2)
 
-            Spacer(minLength: 31)
+                Spacer(minLength: 16)
 
-            Text(String(localized: "Il punto GPS di inizio\nverrà registrato\nall'avvio dell'immersione."))
-                .font(.system(size: 13, weight: .regular, design: .rounded))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .lineSpacing(2)
-
-            Spacer(minLength: 16)
-
-            if !dive.isDepthAutomationAvailable {
                 manualFallbackPanel
                 Spacer(minLength: 8)
             }
@@ -309,6 +317,41 @@ struct DiveLiveView: View {
                 .foregroundStyle(DiveUI.blue)
             }
         }
+    }
+
+    private var autoDiveStatusPanel: some View {
+        VStack(spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: "drop.fill")
+                    .font(.system(size: 22, weight: .black))
+                    .foregroundStyle(DiveUI.cyan)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(String(localized: "live.auto_dive.waiting.title"))
+                        .font(.system(size: 13, weight: .black, design: .rounded))
+                        .foregroundStyle(DiveUI.cyan)
+                    Text(String(localized: "live.auto_dive.waiting.subtitle"))
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .fill(DiveUI.cyan.opacity(0.12))
+                    .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).stroke(DiveUI.cyan.opacity(0.55), lineWidth: 1))
+            )
+
+            Text(String(localized: "live.gps.start.hint"))
+                .font(.system(size: 12, weight: .regular, design: .rounded))
+                .foregroundStyle(DiveUI.secondaryText)
+                .multilineTextAlignment(.center)
+                .lineSpacing(2)
+        }
+        .padding(.horizontal, 4)
     }
 
     private var immersionStatus: some View {

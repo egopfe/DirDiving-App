@@ -101,6 +101,28 @@ enum Formatters {
         }
     }
 
+    static func metersFromDepthDisplay(_ display: Double, units: IOSUnitPreference) -> Double {
+        switch units {
+        case .metric: return display
+        case .imperial: return display / metersToFeet
+        }
+    }
+
+    static func celsiusFromTemperatureDisplay(_ display: Double, units: IOSUnitPreference) -> Double {
+        switch units {
+        case .metric: return display
+        case .imperial: return (display - 32) * 5 / 9
+        }
+    }
+
+    static func depthUnitLabel(_ units: IOSUnitPreference) -> String {
+        units == .metric ? "m" : "ft"
+    }
+
+    static func temperatureUnitLabel(_ units: IOSUnitPreference) -> String {
+        units == .metric ? "C" : "F"
+    }
+
     static func temperature(_ celsius: Double, units: IOSUnitPreference) -> DisplayMeasurement {
         switch units {
         case .metric:

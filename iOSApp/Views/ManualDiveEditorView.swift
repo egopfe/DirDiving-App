@@ -35,9 +35,6 @@ struct ManualDiveEditorView: View {
             DIRBackground()
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text(existing == nil ? String(localized: "manual_dive.add.title") : String(localized: "manual_dive.edit.title"))
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
                     field(String(localized: "manual_dive.site"), text: $siteName)
                     DatePicker(String(localized: "manual_dive.start"), selection: $startDate, displayedComponents: [.date, .hourAndMinute])
                         .tint(DIRTheme.cyan)
@@ -79,7 +76,18 @@ struct ManualDiveEditorView: View {
                 .padding(16)
             }
         }
-        .toolbar(.hidden, for: .navigationBar)
+        .navigationTitle(existing == nil ? String(localized: "manual_dive.add.title") : String(localized: "manual_dive.edit.title"))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button(String(localized: "manual_dive.cancel")) { dismiss() }
+                    .foregroundStyle(DIRTheme.muted)
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(String(localized: "manual_dive.save")) { save() }
+                    .foregroundStyle(DIRTheme.cyan)
+            }
+        }
         .onAppear(perform: loadExisting)
     }
 

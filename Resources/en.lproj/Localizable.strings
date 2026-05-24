@@ -327,7 +327,12 @@
 "shortcuts.help.touch.title" = "Touch";
 "shortcuts.help.touch.body" = "Use on-screen buttons for confirmation. Destructive log actions still require confirmation.";
 "shortcuts.help.underwater.title" = "Underwater";
-"shortcuts.help.underwater.body" = "During an active dive, Live remains primary and Compass stays reachable. Settings are intended for surface use.";
+"shortcuts.help.underwater.body" = "During an active dive, only Live and Compass are reachable. Log, Settings, and images wait until the dive ends.";
+"live.auto_dive.waiting.title" = "Auto dive";
+"live.auto_dive.waiting.subtitle" = "Starts when submerged — no Start button needed";
+"live.auto_dive.active.hint" = "Dive ends automatically when you surface.";
+"live.waiting.start" = "Waiting to start…";
+"live.gps.start.hint" = "Start GPS point is recorded when the dive begins.";
 "shortcuts.help.stopwatch.title" = "Stopwatch";
 "shortcuts.help.stopwatch.body" = "Toggle stopwatch via Shortcuts or Action Button when listed. RESET is immediate — use intentionally.";
 "shortcuts.help.reset.title" = "Reset";

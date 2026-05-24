@@ -4,7 +4,10 @@ import Charts
 struct PlannerView: View {
     @EnvironmentObject private var store: PlannerStore
     @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
+    @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @State private var showPlan = false
+
+    private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
 
     private var plannerSafetyAcknowledged: Bool {
         plannerSafetyAckRevision == PlannerSafetyAcknowledgment.currentRevision
@@ -125,9 +128,9 @@ struct PlannerView: View {
     private var profileCard: some View {
         DIRCard(String(localized: "planner.profile.title"), icon: nil, accent: DIRTheme.cyan) {
             VStack(spacing: 0) {
-                plannerField(String(localized: "planner.field.max_depth"), value: $store.input.plannedDepthMeters, unit: "m", step: 1)
+                plannerDepthField(String(localized: "planner.field.max_depth"), meters: $store.input.plannedDepthMeters)
                 Divider().overlay(DIRTheme.hairline)
-                plannerField(String(localized: "planner.field.avg_depth"), value: $store.input.plannedAverageDepthMeters, unit: "m", step: 1)
+                plannerDepthField(String(localized: "planner.field.avg_depth"), meters: $store.input.plannedAverageDepthMeters)
                 Divider().overlay(DIRTheme.hairline)
                 HStack {
                     Text(String(localized: "planner.field.planning_reference"))
@@ -147,9 +150,9 @@ struct PlannerView: View {
                 Divider().overlay(DIRTheme.hairline)
                 plannerField(String(localized: "planner.field.bottom_time"), value: $store.input.plannedBottomMinutes, unit: "min", step: 1)
                 Divider().overlay(DIRTheme.hairline)
-                plannerField(String(localized: "planner.field.temperature"), value: $store.input.waterTemperatureCelsius, unit: "C", step: 1)
+                plannerTemperatureField(String(localized: "planner.field.temperature"), celsius: $store.input.waterTemperatureCelsius)
                 Divider().overlay(DIRTheme.hairline)
-                plannerField(String(localized: "planner.field.altitude"), value: $store.input.altitudeMeters, unit: "m", step: 100)
+                plannerDepthField(String(localized: "planner.field.altitude"), meters: $store.input.altitudeMeters, step: unitPreference == .metric ? 100 : 300)
                 Divider().overlay(DIRTheme.hairline)
                 plannerField("GF Low", value: $store.input.gfLow, unit: "%", step: 5)
                 Divider().overlay(DIRTheme.hairline)
@@ -223,16 +226,15 @@ struct PlannerView: View {
                         Text(
                             String(
                                 format: String(localized: "planner.mod.value_format"),
-                                Formatters.one(entry.modMeters)
+                                Formatters.depth(entry.modMeters, units: unitPreference).text
                             )
                         )
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(DIRTheme.cyan)
                         if entry.role != .bottom {
-                            plannerField(
+                            plannerDepthField(
                                 String(localized: "planner.field.switch_depth"),
-                                value: $entry.switchDepthMeters,
-                                unit: "m",
+                                meters: $entry.switchDepthMeters,
                                 step: 1
                             )
                         }
@@ -338,8 +340,8 @@ struct PlannerView: View {
                                 String(
                                     format: String(localized: "planner.mod.detail_format"),
                                     issue.gasLabel,
-                                    Formatters.one(issue.switchDepthMeters),
-                                    Formatters.one(issue.modMeters)
+                                    Formatters.depth(issue.switchDepthMeters, units: unitPreference).text,
+                                    Formatters.depth(issue.modMeters, units: unitPreference).text
                                 )
                             )
                             .font(.caption2)
@@ -442,6 +444,44 @@ struct PlannerView: View {
         .padding(.top, 4)
         .accessibilityLabel(String(localized: "Calcola Piano"))
         .accessibilityHint(String(localized: "planner.safety_ack.hint"))
+    }
+
+    private func depthDisplayBinding(_ meters: Binding<Double>) -> Binding<Double> {
+        Binding(
+            get: { Formatters.depthValue(meters.wrappedValue, units: unitPreference) },
+            set: { meters.wrappedValue = max(0, Formatters.metersFromDepthDisplay($0, units: unitPreference)) }
+        )
+    }
+
+    private func temperatureDisplayBinding(_ celsius: Binding<Double>) -> Binding<Double> {
+        Binding(
+            get: {
+                switch unitPreference {
+                case .metric: return celsius.wrappedValue
+                case .imperial: return celsius.wrappedValue * 9 / 5 + 32
+                }
+            },
+            set: { celsius.wrappedValue = Formatters.celsiusFromTemperatureDisplay($0, units: unitPreference) }
+        )
+    }
+
+    private func plannerDepthField(_ title: String, meters: Binding<Double>, step: Double = 1) -> some View {
+        let displayStep = unitPreference == .metric ? step : max(1, step * 3.280839895)
+        return plannerField(
+            title,
+            value: depthDisplayBinding(meters),
+            unit: Formatters.depthUnitLabel(unitPreference),
+            step: displayStep
+        )
+    }
+
+    private func plannerTemperatureField(_ title: String, celsius: Binding<Double>) -> some View {
+        plannerField(
+            title,
+            value: temperatureDisplayBinding(celsius),
+            unit: Formatters.temperatureUnitLabel(unitPreference),
+            step: unitPreference == .metric ? 1 : 2
+        )
     }
 
     private func plannerField(_ title: String, value: Binding<Double>, unit: String, step: Double) -> some View {
@@ -620,6 +660,13 @@ struct GasMixCard: View {
 
 struct PlanResultView: View {
     @EnvironmentObject private var store: PlannerStore
+    @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
+
+    private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
+
+    private func depthText(_ meters: Double) -> String {
+        Formatters.depth(meters, units: unitPreference).text
+    }
     @State private var tab: PlanTab = .plan
 
     private var planShareText: String {
@@ -691,8 +738,8 @@ struct PlanResultView: View {
                                 String(
                                     format: String(localized: "planner.mod.detail_format"),
                                     issue.gasLabel,
-                                    Formatters.one(issue.switchDepthMeters),
-                                    Formatters.one(issue.modMeters)
+                                    depthText(issue.switchDepthMeters),
+                                    depthText(issue.modMeters)
                                 )
                             )
                             .font(.caption)
@@ -743,7 +790,11 @@ struct PlanResultView: View {
             }
             Divider().overlay(DIRTheme.hairline)
             HStack(spacing: 0) {
-                DIRMetricTile(title: String(localized: "planner.result.max_depth"), value: Formatters.zero(store.input.plannedDepthMeters), unit: "m")
+                DIRMetricTile(
+                    title: String(localized: "planner.result.max_depth"),
+                    value: Formatters.depth(store.input.plannedDepthMeters, units: unitPreference).value,
+                    unit: Formatters.depth(store.input.plannedDepthMeters, units: unitPreference).unit
+                )
                 Divider().overlay(DIRTheme.hairline)
                 DIRMetricTile(title: String(localized: "planner.result.bottom_time"), value: Formatters.zero(store.input.plannedBottomMinutes), unit: "min")
                 Divider().overlay(DIRTheme.hairline)
@@ -753,7 +804,12 @@ struct PlanResultView: View {
             HStack(spacing: 0) {
                 DIRMetricTile(title: String(localized: "planner.metric.density"), value: Formatters.one(store.analysis.densityAtDepth), unit: "g/L", color: store.analysis.densityRating == .red ? DIRTheme.red : DIRTheme.cyan)
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: "END", value: Formatters.zero(store.analysis.endMeters), unit: "m", color: DIRTheme.yellow)
+                DIRMetricTile(
+                    title: "END",
+                    value: Formatters.depth(store.analysis.endMeters, units: unitPreference).value,
+                    unit: Formatters.depth(store.analysis.endMeters, units: unitPreference).unit,
+                    color: DIRTheme.yellow
+                )
                 Divider().overlay(DIRTheme.hairline)
                 DIRMetricTile(title: "Turn", value: Formatters.zero(store.analysis.turnPressureBar), unit: "bar", color: DIRTheme.cyan)
             }
@@ -776,13 +832,13 @@ struct PlanResultView: View {
                 ], isHeader: true)
                 ForEach(store.plan.decoStops) { stop in
                     tableRow([
-                        "\(Formatters.one(stop.depthMeters)) m",
+                        depthText(stop.depthMeters),
                         "\(stop.minutes) min",
                         stop.gas,
                         Formatters.one(stop.ppO2)
                     ])
                 }
-                tableRow(["0 m", "-", "SURFACE", "-"])
+                tableRow([depthText(0), "-", "SURFACE", "-"])
             }
         }
     }
@@ -799,7 +855,7 @@ struct PlanResultView: View {
                 ForEach(store.plan.segments) { segment in
                     tableRow([
                         segment.kind.rawValue,
-                        "\(Formatters.zero(segment.depthMeters)) m",
+                        depthText(segment.depthMeters),
                         Formatters.one(segment.minutes),
                         segment.gas
                     ])

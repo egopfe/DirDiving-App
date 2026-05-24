@@ -554,7 +554,8 @@
 "analysis.metric.distance" = "Distance";
 "analysis.metric.bearing" = "Bearing";
 
-"planner.units.metric_notice" = "The planner uses metric units for calculations.";
+"planner.units.metric_notice" = "Gas calculations use metric internally. Depths and temperatures follow your unit preference in More.";
+"manual_dive.cancel" = "Cancel";
 "planner.gas.bottom" = "Bottom gas";
 "planner.gas.deco1" = "Decompression gas 1";
 "planner.gas.deco2" = "Decompression gas 2";
@@ -641,10 +642,10 @@
 "planner.cylinder.remove" = "Remove";
 "planner.mod.validation.title" = "MOD validation";
 "planner.mod.exceeds_allowed" = "Gas switch exceeds allowed MOD";
-"planner.mod.detail_format" = "%@ switch at %@ m — calculated MOD %@ m";
 "planner.mod.hint" = "Check oxygen percentage and maximum PPO₂.";
 "planner.mod.calculated" = "Calculated MOD";
-"planner.mod.value_format" = "Calculated MOD: %@ m";
+"planner.mod.value_format" = "Calculated MOD: %@";
+"planner.mod.detail_format" = "%@ switch at %@ — calculated MOD %@";
 "planner.field.switch_depth" = "Gas switch depth";
 "equipment.template.cancel" = "Cancel";
 "planner.mod.incompatible" = "The gas switch depth is not compatible with the selected gas";

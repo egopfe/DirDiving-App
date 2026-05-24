@@ -39,7 +39,7 @@ struct ContentView: View {
         }
         .onChange(of: navigation.selectedPage) { _, page in
             guard dive.isDiveActive else { return }
-            if page != .live && page != .compass && page != .diveLog {
+            if page != .live && page != .compass {
                 navigation.selectedPage = .live
             }
         }
