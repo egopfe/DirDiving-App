@@ -1,7 +1,7 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-05-20  
-**Branch consigliato:** `main` @ `cbe4de2` (dopo `git pull`; codice feature @ `d962117`)  
+**Aggiornato:** 2026-05-25  
+**Branch consigliato:** `main` @ `60dd119` (allineato a `origin/main` al momento dell'ultimo controllo)  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
 
@@ -27,14 +27,14 @@
 
 ## 1. Documento principale (leggere per primo)
 
-### [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260524.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260524.md)
+### [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md)
 
-Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word: [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260524.docx`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260524.docx) · generatore: [`generate_main_branch_complete_readiness_audit_20260524_docx.py`](generate_main_branch_complete_readiness_audit_20260524_docx.py).
+Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word: [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.docx`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.docx). Audit pre-modifica redatto su `main` @ `21a7f41`, poi archiviato in forma datata su `origin/main` @ `60dd119`.
 
 | Sezione | Contenuto |
 |---------|-----------|
-| **A** | Branch, target, `project.yml`, build (nota: audit redatto su host senza Xcode; commit ispezionato `91f3c8d`) |
-| **B** | Executive summary (~74% overall nel report statico Windows) |
+| **A** | Branch, target, `project.yml`, build e separazione target MAIN / experimental |
+| **B** | Executive summary (~76% overall nel report 2026-05-25) |
 | **C** | Feature inventory (Watch + iOS: impl / reach / usable / complete) |
 | **D** | Navigation map (flussi Watch e iOS, dead end) |
 | **E** | UI consistency vs reference (`Docs/ReferenceUI/`) |
@@ -48,22 +48,20 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | **M** | **Bugs to fix** (tabella con file e severità) |
 | **N** | Priority roadmap (compile → TestFlight → App Store → post-release) |
 | **O** | Final verdict (compile / utente medio / TestFlight / App Store) |
-| **Validation log** | Comandi git/asset; build non eseguita su Windows |
+| **Validation log** | `xcodegen` + simulator build pass; generic device build bloccato da entitlement/provisioning |
 
-**Bug critici elencati in §M (verificare su `main` @ `8a4d10e` se già risolti):**
+**Bug critici elencati in §M (versione audit 2026-05-25; distinguere fra fix repo-side e blocchi esterni):**
 
 | Bug | File indicato |
 |-----|----------------|
-| Disclaimer non ogni launch | `Utils/CompanionDisclaimerAcceptance.swift`, `iOSApp/Utils/...` |
-| Default allarme runtime 60 vs 30 min | `Services/DiveManager.swift` |
-| Lista log Watch in `m` fisso | `Views/DiveLogListView.swift` |
-| Profondità bussola in `m` fisso | `Views/CompassView.swift` |
-| Logbook iOS card in `m` fisso | `iOSApp/Views/LogbookView.swift` |
-| Planner metric-only vs unità globali | `iOSApp/Views/PlannerView.swift` — **copy onesta** aggiunta (`planner.units.metric_notice`); calcoli restano metrici |
-| Copy unità obsolete | `iOSApp/Resources/*.lproj/Localizable.strings` |
-| Build opaque return (Watch) | `Views/AscentRateSettingsView.swift`, `Views/DiveLogListView.swift` — **risolto** (`e1cc982`) |
-| TabView crash User Images | `Views/ContentView.swift`, `Services/AppNavigationStore.swift` — **risolto** (`fc08466`) |
-| Stale `DIRDiving.xcodeproj` (GPS views rimossi) | Rigenerare con `xcodegen` — vedi [`BUILD_VALIDATION.md`](BUILD_VALIDATION.md) § Troubleshooting |
+| Entitlement `water-submersion` non approvato nel provisioning attivo | Apple Developer / profili / build generici |
+| Build generico iOS bloccato dal target Watch embedded | Coppia iOS + Watch release |
+| Automatic dive lifecycle non validato su hardware Ultra reale | Device QA |
+| Link Terms / Privacy puntavano alla root repo | `Views/WatchLegalOnboardingView.swift`, `iOSApp/Views/IOSLegalOnboardingView.swift` |
+| InfoView Watch sovrastimava readiness entitlement | `Views/InfoView.swift` |
+| Bussola Watch e planner / More iOS con copy mixed-language | `Views/CompassView.swift`, `iOSApp/Views/PlannerView.swift`, `iOSApp/Views/MoreView.swift` |
+| Sync solo aggregato, non per item/sessione | `Services/WatchSyncService.swift`, `iOSApp/Services/WatchSyncService.swift` |
+| Reset cronometro senza safeguard extra | `Views/DiveLiveView.swift` |
 
 > **Nota:** `e1cc982`–`fc08466`: build simulator Watch/iOS verde; i18n Equipment/Planner; checklist device QA in §6.
 
@@ -71,6 +69,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 
 | File | Uso |
 |------|-----|
+| [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260524.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260524.md) | Pass precedente, baseline immediata prima del dated audit 2026-05-25 |
 | [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260520.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260520.md) | Pass R2–R4, baseline `db72dce` / WIP |
 | [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260523.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260523.md) | Pass readiness 100% UX |
 | [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260522.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260522.md) | Onboarding legale |
@@ -166,6 +165,8 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`APP_ICON_UPDATE_NOTES.md`](APP_ICON_UPDATE_NOTES.md) | Icone app: `../Scripts/update_app_icons.sh`, Derived Data |
 | [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) | Checklist release |
 | [`SAFETY_DISCLAIMER.md`](SAFETY_DISCLAIMER.md) | Disclaimer (root Docs) |
+| [`TERMS_OF_USE.md`](TERMS_OF_USE.md) | Destinazione dedicata per Termini d'uso da Watch/iOS |
+| [`PRIVACY_AND_DATA_USE.md`](PRIVACY_AND_DATA_USE.md) | Destinazione dedicata per privacy / data use da Watch/iOS |
 | [`SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md`](SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md) | Audit security F1–F12 |
 | [`INTERNAL_TESTING_PLAYBOOK_20260520.md`](INTERNAL_TESTING_PLAYBOOK_20260520.md) | QA interno giornaliero; link checklist device |
 | [`APP_INTENTS_DEVICE_QA_CHECKLIST.md`](APP_INTENTS_DEVICE_QA_CHECKLIST.md) | App Intents su Watch fisico |
@@ -235,6 +236,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | Script | Output |
 |--------|--------|
 | [`generate_main_branch_complete_readiness_audit_20260524_docx.py`](generate_main_branch_complete_readiness_audit_20260524_docx.py) | `MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260524.docx` |
+| [`generate_main_branch_complete_readiness_audit_current_docx.py`](generate_main_branch_complete_readiness_audit_current_docx.py) | Generatore legacy del pass pre-modifica poi archiviato come `MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.docx` |
 | [`generate_main_branch_complete_readiness_audit_20260520_docx.py`](generate_main_branch_complete_readiness_audit_20260520_docx.py) | Audit 20260520 docx |
 | [`generate_main_branch_complete_readiness_audit_20260522_docx.py`](generate_main_branch_complete_readiness_audit_20260522_docx.py) | Audit 20260522 docx |
 | [`generate_main_branch_complete_readiness_audit_20260523_docx.py`](generate_main_branch_complete_readiness_audit_20260523_docx.py) | Audit 20260523 docx |
@@ -254,7 +256,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 1. [`../README.md`](../README.md) — panoramica e branch strategy  
 2. [`DIR_Diving_Complete_Development_Notes_UPDATED_v9.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v9.md) — **backlog prodotto corrente** (iOS + Watch)  
 3. [`DIR_DIVING_v8_IMPLEMENTATION_REPORT.md`](DIR_DIVING_v8_IMPLEMENTATION_REPORT.md) — cosa è già implementato in codice (v8) @ `a36dc23`  
-4. [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260524.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260524.md) — **§B, §M, §N, §O**  
+4. [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md) — **§B, §M, §N, §O**  
 5. [`DEVELOPMENT_NOTES_25_05_2026_IMPLEMENTATION_REPORT.md`](DEVELOPMENT_NOTES_25_05_2026_IMPLEMENTATION_REPORT.md) + [`MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524_POST_DEV_NOTES.md`](MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524_POST_DEV_NOTES.md) — implementazione 25/05 e gap UX  
 6. [`DIR_DIVING_Feature_Comparison.csv`](DIR_DIVING_Feature_Comparison.csv) — stato feature  
 7. [`BUILD_VALIDATION.md`](BUILD_VALIDATION.md) — `xcodegen generate` + build  
@@ -302,7 +304,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`INTERNAL_TESTING_PLAYBOOK_20260520.md`](INTERNAL_TESTING_PLAYBOOK_20260520.md) | §6 |
 | [`IOS_TAB_TARGET_MISMATCH_REPORT.md`](IOS_TAB_TARGET_MISMATCH_REPORT.md) | §4 |
 | [`IOS_TAB_TARGET_MISMATCH_STATUS_20260519.md`](IOS_TAB_TARGET_MISMATCH_STATUS_20260519.md) | §4 |
-| `MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260520.md` … `20260524.md` (+ `.docx`) | §1 |
+| `MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260520.md` … `2026-05-25.md` (+ `.docx`) | §1 |
 | [`MAIN_BRANCH_FINAL_READINESS_REPORT.md`](MAIN_BRANCH_FINAL_READINESS_REPORT.md) | §4 |
 | [`MAIN_BRANCH_ISSUES_AND_PRIORITIES_20260520.md`](MAIN_BRANCH_ISSUES_AND_PRIORITIES_20260520.md) | §4 |
 | [`MAIN_BRANCH_TARGETED_FIX_REPORT.md`](MAIN_BRANCH_TARGETED_FIX_REPORT.md) | §4 |
@@ -316,6 +318,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`MAIN_READINESS_100_IMPLEMENTATION_REPORT_20260517.md`](MAIN_READINESS_100_IMPLEMENTATION_REPORT_20260517.md) | §8 |
 | [`MAIN_UX_*`](MAIN_UX_COMPLETION_REPORT.md) | §8 |
 | [`PHASE0_MAIN_UX_PREFLIGHT_PLAN.md`](PHASE0_MAIN_UX_PREFLIGHT_PLAN.md) | §8 |
+| [`PRIVACY_AND_DATA_USE.md`](PRIVACY_AND_DATA_USE.md) | §6 |
 | [`PR_STATUS_20260520.md`](PR_STATUS_20260520.md) … [`PR_STATUS_20260524.md`](PR_STATUS_20260524.md) | §2 |
 | [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) | §6 |
 | [`ROADMAP.md`](ROADMAP.md) | §5 |
@@ -323,6 +326,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md`](SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md) | §6 |
 | [`SNORKELING_EXPERIMENTAL_SPEC.md`](SNORKELING_EXPERIMENTAL_SPEC.md) | §7 |
 | [`TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md), [`TESTFLIGHT_REVIEW_NOTES.md`](TESTFLIGHT_REVIEW_NOTES.md) | §3, §12 |
+| [`TERMS_OF_USE.md`](TERMS_OF_USE.md) | §6 |
 | [`UI_UX_VISUAL_GUIDELINES.md`](UI_UX_VISUAL_GUIDELINES.md) | §10 |
 | [`WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md`](WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md) | §3, §12 |
 | [`WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md`](WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md) | §4, §6 |
@@ -333,4 +337,4 @@ Altri asset in `Docs/`: `.docx`, `.csv`, `.xlsx`, `.py` (generatori §11), `Refe
 
 ---
 
-*Indice per ripresa lavoro su `main` @ `a36dc23`. Dopo nuovi documenti: aggiornare **§0**, §4, §9, §11, §12 e §14.*
+*Indice per ripresa lavoro su `main` @ `60dd119`. Dopo nuovi documenti: aggiornare **§1**, §6, §11, §12 e §14.*
