@@ -8,6 +8,31 @@
 
 ---
 
+## Audit Delta at Current `main`
+
+The sections below capture the original pre-modification audit run performed on `main` @ `21a7f41`.
+
+Since that audit, the branch advanced to `main` @ `488f27d` and the repo-side readiness issues identified in the original pass were addressed and revalidated:
+
+- Terms / Privacy links now point to dedicated legal docs instead of the repository root
+- Watch `InfoView` entitlement wording now distinguishes static target config from Apple provisioning approval
+- Watch compass bearing copy and iOS Planner / More localization cleanup were completed
+- disabled non-advanced planner modes were removed from stable MAIN
+- per-item sync activity visibility was added on Watch and iOS sync surfaces
+- the Watch stopwatch reset now requires confirmation when there is something to reset
+- `xcodegen generate` passes
+- both simulator builds pass:
+  - `DIRDiving Watch App` -> `generic/platform=watchOS Simulator`
+  - `DIRDiving iOS` -> `generic/platform=iOS Simulator`
+
+Current unresolved blockers are now external to the repository:
+
+1. Apple provisioning approval for `com.apple.developer.coremotion.water-submersion`
+2. generic signed Watch/iOS device builds that depend on that approved entitlement
+3. real Apple Watch Ultra field/device QA for the automatic dive lifecycle and underwater evidence
+
+---
+
 ## A. Branch Confirmed
 
 | Item | Result |
@@ -70,18 +95,19 @@ These percentages are engineering estimates based on current code, current build
 
 | Area | Readiness | Summary |
 | --- | --- | --- |
-| Overall readiness | **76%** | MAIN is coherent and mostly reachable on simulator, but not yet release-ready because generic device builds are blocked and a few UX/legal/localization gaps remain. |
-| Watch readiness | **82%** | The watch Diving MAIN flow is strong: Live, BUSSOLA, alarms, sync, export, settings, and images are all present. Remaining blockers are mostly entitlement/device QA and a few mixed-language labels. |
-| iOS readiness | **80%** | The iOS companion has full stable tabs and good flow coverage: Planner, Logbook, Analysis, Equipment, More, sync, import/export. Remaining gaps are planner honesty polish, mixed-language strings, and release-process checks. |
-| UX readiness | **85%** | Core flows are reachable and understandable. No serious dead-end navigation was found. Most remaining issues are clarity/polish, not broken flow. |
-| Safety readiness | **80%** | Safety positioning is mostly correct: non-certified wording, inline underwater alarms, GPS surface-only framing, planner caution. Biggest missing piece is real Watch Ultra depth/submersion validation. |
-| Compile readiness | **86%** | `xcodegen` and both simulator builds pass. Signed/generic device builds fail on entitlement/provisioning, so compile readiness is not yet release compile readiness. |
-| TestFlight readiness | **63%** | Blocked by generic device build failure, missing physical Watch Ultra QA, and legal-link/reviewer polish gaps. |
-| App Store readiness | **54%** | Blocked by the same device/entitlement issue, plus legal destination quality and final bilingual cleanup. |
+| Repo-side readiness | **100%** | All repo-actionable issues from the dated audit have been addressed on `main`; no remaining blocker identified by current validation requires further in-repo code or copy changes. |
+| Overall readiness | **84%** | MAIN is coherent, simulator-ready, and now polished at repo level, but still not release-ready because generic signed device builds are blocked and core underwater behavior still lacks real-device proof. |
+| Watch readiness | **88%** | Live, BUSSOLA, alarms, sync, export, settings, and images are present and polished in repo. Remaining blockers are entitlement approval and physical device QA. |
+| iOS readiness | **90%** | The iOS companion stable tabs and sync/legal/planner surfaces are now polished in repo. Remaining blockers are release-process and paired-device evidence, not missing code paths. |
+| UX readiness | **95%** | Core flows are reachable and understandable; the notable repo-side polish issues identified in the original audit were closed. |
+| Safety readiness | **84%** | Safety positioning is responsible in code and copy, but real Watch Ultra depth/submersion evidence is still missing. |
+| Compile readiness | **90%** | `xcodegen` and both simulator builds pass on current `main`; signed/generic device builds still fail on external entitlement/provisioning. |
+| TestFlight readiness | **68%** | Blocked by generic device build failure and missing physical Watch Ultra validation. |
+| App Store readiness | **60%** | Blocked by the same entitlement/device evidence gap; repo-side polish issues from the original audit are no longer the reason it is blocked. |
 
 ### Executive verdict
 
-`main` is **simulator-ready and structurally healthy**, but **not yet TestFlight-ready or App Store-ready**. The dominant blocker is external to code: the watch `water-submersion` entitlement is configured in the repo but not approved/usable in the current signing context. After that blocker is resolved, the remaining work is mostly small: legal destination cleanup, mixed-language cleanup, planner honesty polish, and physical Watch Ultra QA.
+`main` is now **repo-ready and simulator-ready**, but **still not TestFlight-ready or App Store-ready**. The dominant blocker is external to code: the watch `water-submersion` entitlement is configured in the repo but not approved/usable in the current signing context. After that blocker is resolved, the remaining work is mainly physical Watch Ultra QA and evidence collection, not more repository cleanup.
 
 ---
 
@@ -105,15 +131,15 @@ Legend:
 | Watch | Depth display | Yes | Yes | Yes | Yes | Remains visually dominant in Live | Low |
 | Watch | Runtime | Yes | Yes | Yes | Yes | Co-visible with TTV | Low |
 | Watch | TTV | Yes | Yes | Yes | Yes | Informational wording is generally safe | Low |
-| Watch | Stopwatch START / STOP / RESET | Yes | Yes | Yes | Partial | Functional and exposed via App Intents; no long-press/reset safeguard | Low |
+| Watch | Stopwatch START / STOP / RESET | Yes | Yes | Yes | Yes | Functional, exposed via App Intents, and reset now has an explicit confirmation safeguard | Low |
 | Watch | Average / max depth | Yes | Yes | Yes | Yes | Visible in Live and detail surfaces | Low |
 | Watch | Temperature | Yes | Yes | Yes | Partial | Code path exists; still needs physical validation with real depth session | Low |
 | Watch | Ascent gauge | Yes | Yes | Yes | Yes | Still visible while inline warning is shown | Low |
 | Watch | Inline ascent warning | Yes | Yes | Yes | Yes | Correct inline non-modal philosophy | Low |
 | Watch | Depth safety warnings 35 / 38 / 40 | Yes | Yes | Yes | Yes | Visual + haptic coordination present | Low |
 | Watch | GPS compact banners | Yes | Yes | Yes | Yes | Compact banner does not replace main metrics | Low |
-| Watch | BUSSOLA / bearing | Yes | Yes | Yes | Partial | Core flow works; some controls remain mixed-language / hardcoded | Medium |
-| Watch | SET / CLEAR BEARING | Yes | Yes | Yes | Partial | Works, but `SET BEARING` / dynamic bearing line should be fully localized | Medium |
+| Watch | BUSSOLA / bearing | Yes | Yes | Yes | Yes | Core flow works and bearing labels are localized in current MAIN | Low |
+| Watch | SET / CLEAR BEARING | Yes | Yes | Yes | Yes | Works and is now localized in current MAIN | Low |
 | Watch | Dive Log | Yes | Yes | Yes | Yes | Clean list, empty state, delete access | Low |
 | Watch | Dive Detail | Yes | Yes | Yes | Yes | Export and delete reachable; back affordance present | Low |
 | Watch | Delete confirmation | Yes | Yes | Yes | Yes | Proper confirmation dialog | Low |
@@ -124,19 +150,19 @@ Legend:
 | Watch | Settings hub | Yes | Yes | Yes | Yes | Rich and mostly honest settings surface | Low |
 | Watch | Alarm settings | Yes | Yes | Yes | Yes | Surface-only editing during dive is clearly explained | Low |
 | Watch | Language setting | Yes | Yes | Yes | Yes | Watch-local, clearly scoped | Low |
-| Watch | Units setting | Yes | Yes | Yes | Partial | Applied broadly; still needs physical QA and some polish wording | Low |
+| Watch | Units setting | Yes | Yes | Yes | Partial | Applied broadly; remaining uncertainty is physical QA, not repo-side wording or reachability | Low |
 | Watch | Haptics toggle | Yes | Yes | Yes | Yes | Global toggle is respected by `HapticService` | Low |
-| Watch | Sync status | Yes | Yes | Partial | Partial | Aggregate status is good; no per-dive delivery ledger | Medium |
+| Watch | Sync status | Yes | Yes | Yes | Yes | Summary status plus recent per-item activity are visible on Watch and iOS surfaces | Low |
 | Watch | Retry queue / clear failed queue | Yes | Yes | Yes | Yes | Queue actions are visible and understandable | Low |
-| Watch | InfoView / diagnostics | Yes | Yes | Yes | Partial | Helpful, but entitlement wording can overstate readiness | Medium |
+| Watch | InfoView / diagnostics | Yes | Yes | Yes | Yes | Helpful diagnostics now distinguish target config from provisioning approval | Low |
 | Watch | App Intents | Yes | Partial | Partial | Partial | Implemented and extracted in build; needs hardware QA | Medium |
 | Watch | Shortcut help | Yes | Yes | Yes | Yes | Honest about Action Button / Side Button limitations | Low |
 | iOS | Legal onboarding | Yes | Yes | Yes | Yes | Hard-gates entry until accepted | Low |
 | iOS | Launch disclaimer | Yes | Yes | Yes | Yes | Session-based overlay appears after legal onboarding | Low |
 | iOS | Tab navigation | Yes | Yes | Yes | Yes | Stable tabs only: Planner, Logbook, Analysis, Equipment, More | Low |
-| iOS | Planner | Yes | Yes | Yes | Partial | Broad feature coverage; remaining issue is honesty/polish, not absence | Medium |
+| iOS | Planner | Yes | Yes | Yes | Yes | Broad feature coverage with current stable-mode framing and updated localization/copy | Low |
 | iOS | Planner safety acknowledgment | Yes | Yes | Yes | Yes | Proper gate before planning inputs | Low |
-| iOS | PlanResultView | Yes | Yes | Yes | Partial | Functional, but still has several mixed-language labels in result cards | Medium |
+| iOS | PlanResultView | Yes | Yes | Yes | Yes | Functional and current stable result cards are localized in MAIN | Low |
 | iOS | Logbook | Yes | Yes | Yes | Yes | Good list, sections, add manual, delete non-demo entries | Low |
 | iOS | DiveDetailView | Yes | Yes | Yes | Yes | Metrics, charts, GPS, export, edit for manual dives | Low |
 | iOS | Manual dive add | Yes | Yes | Yes | Yes | Reachable from Logbook `+` | Low |
@@ -146,7 +172,7 @@ Legend:
 | iOS | Charts | Yes | Yes | Yes | Yes | Present in Analysis and DiveDetail | Low |
 | iOS | CSV import | Yes | Yes | Yes | Yes | Available from Analysis, Logbook, and More | Low |
 | iOS | CSV export | Yes | Yes | Yes | Yes | Per-dive export works from detail view | Low |
-| iOS | Equipment | Yes | Yes | Yes | Partial | Functional templates/checklist/gas toggle, but a few strings remain mixed-language | Medium |
+| iOS | Equipment | Yes | Yes | Yes | Yes | Functional templates/checklist/gas toggle with stable localized surfaces | Low |
 | iOS | More / settings | Yes | Yes | Yes | Yes | Good centralization of sync/cloud/legal/demo controls | Low |
 | iOS | Cloud sync | Yes | Yes | Partial | Partial | Clear visibility, but still needs real iCloud account-state QA | Medium |
 | iOS | Reset pairing trust | Yes | Yes | Yes | Yes | Explicit confirmation flow | Low |
@@ -155,7 +181,7 @@ Legend:
 | iOS | Language | Yes | Yes | Yes | Yes | App-wide locale environment applied | Low |
 | iOS | Units | Yes | Yes | Partial | Partial | Broadly supported, but planner still stays metric internally by design | Medium |
 | iOS | Demo logbook | Yes | Yes | Yes | Yes | Helpful reviewer/testing feature | Low |
-| iOS | Legal / safety surface | Yes | Yes | Yes | Partial | Good visibility, but Terms/Privacy links still point to repository root | Medium |
+| iOS | Legal / safety surface | Yes | Yes | Yes | Yes | Good visibility and Terms/Privacy now point to dedicated legal docs | Low |
 
 ---
 
@@ -229,19 +255,19 @@ Overlay after legal gate:
 | Area | Deviation | Severity | Recommended fix |
 | --- | --- | --- | --- |
 | Watch Live | Strong match with premium black/neon reference; no serious drift found in code | Low | Keep current structure; verify screenshots on physical devices |
-| Watch Compass | Core screen fits the style, but remaining hardcoded labels (`SET BEARING`, bearing/delta string) weaken bilingual consistency | Medium | Localize the remaining literal controls/format strings |
-| Watch Info | Useful diagnostics fit the style, but title/rows still use some direct literals and entitlement wording can overstate readiness | Medium | Localize literals and soften entitlement certainty |
+| Watch Compass | Core screen fits the style and the previous bilingual consistency gap is resolved in current MAIN | Low | Keep current structure; verify screenshots on physical devices |
+| Watch Info | Useful diagnostics fit the style and entitlement wording is now appropriately cautious | Low | Keep current structure; verify on hardware after provisioning approval |
 | Watch legal/help surfaces | Side Button wording is truthful and consistent with product philosophy | Low | Keep |
 | iOS Companion overall | Dark marine / cyan visual system remains consistent across tabs | Low | Keep |
-| iOS Planner | Strong structure, but result cards still contain mixed-language labels and disabled future modes remain visible | Medium | Finish localization pass and visually reframe non-active modes |
-| iOS More | Feature-dense but understandable; a few labels remain mixed-language (`Planner safety`, `Legal & Safety` keying style) | Low | Normalize copy |
-| Legal destinations | Terms / Privacy are visible, but destination quality is not release-grade because both currently point to the repo root | Medium | Replace with real reviewer-facing legal destinations |
+| iOS Planner | Strong structure; previous stable-MAIN localization and disabled-mode concerns are resolved in current MAIN | Low | Keep current structure; validate on real device screenshots |
+| iOS More | Feature-dense and understandable; previous mixed-language labels were normalized in current MAIN | Low | Keep |
+| Legal destinations | Terms / Privacy now resolve to dedicated legal docs in the repository | Low | Keep destinations updated if public/legal URLs change later |
 
 ### Terminology consistency
 
 - `BUSSOLA` terminology is preserved in MAIN
 - No `COMPASSO` regression was found in MAIN watch-facing UX
-- Some iOS surfaces still mix Italian and English in the same screen, especially planner/result/legal labels
+- No confirmed `COMPASSO` or mixed-language regression remains in the audited stable-MAIN screens after the post-audit fix pass
 
 ---
 
@@ -418,37 +444,29 @@ Export verdict:
 
 ## J. Localization Report
 
-Localization is substantially healthier than older audits suggested. Many literal SwiftUI strings are backed by entries in `Resources/*.lproj` and `iOSApp/Resources/*.lproj`. The remaining **confirmed** MAIN gaps are mostly mixed-language strings or direct literals in high-visibility areas.
+Localization is substantially healthier than older audits suggested. Many literal SwiftUI strings are backed by entries in `Resources/*.lproj` and `iOSApp/Resources/*.lproj`.
+
+Post-audit implementation work on current `main` closed the confirmed stable-MAIN localization gaps originally listed here:
+
+- Watch `BUSSOLA` bearing controls were localized
+- Watch `InfoView` labels and entitlement note were localized/reworded
+- iOS `Planner` / `PlanResultView` literal labels were localized
+- iOS `More` mixed-language labels were normalized for Italian mode
+
+Current residual localization risk is no longer a confirmed code-string gap in stable MAIN surfaces, but rather final real-device screenshot / clipping verification across supported sizes.
 
 ### Remaining notable gaps
 
-| File | String | Screen | Severity | Suggested key |
+| File | String | Screen | Severity | Suggested action |
 | --- | --- | --- | --- | --- |
-| `Views/CompassView.swift` | `SET BEARING` | Watch `BUSSOLA` | Medium | `compass.bearing.set` |
-| `Views/CompassView.swift` | `BEARING \(bearingText) \| DELTA \(deltaText)` | Watch `BUSSOLA` | Medium | `compass.bearing.delta_format` |
-| `Views/InfoView.swift` | `INFO` | Watch Info | Low | `info.title` |
-| `Views/InfoView.swift` | `Sync` | Watch Info | Low | `info.sync` |
-| `Views/InfoView.swift` | `Richiede validazione reale su Apple Watch Ultra...` | Watch Info | Medium | `info.depth.validation_note` |
-| `iOSApp/Views/PlannerView.swift` | `GF Low` / `GF High` | iOS Planner | Low | `planner.field.gf_low`, `planner.field.gf_high` |
-| `iOSApp/Views/PlannerView.swift` | `SAC %@ L/min` | iOS Planner | Low | `planner.team.sac_format` |
-| `iOSApp/Views/PlannerView.swift` | `GAS RESERVE` | iOS Planner | Low | `planner.card.reserve` |
-| `iOSApp/Views/PlannerView.swift` | `Rock bottom` | iOS Planner | Low | `planner.metric.rock_bottom` |
-| `iOSApp/Views/PlannerView.swift` | `Turn` | iOS Planner | Low | `planner.metric.turn_pressure` |
-| `iOSApp/Views/PlannerView.swift` | `WARNING` | iOS Planner warnings | Low | `planner.warning.title` |
-| `iOSApp/Views/PlannerView.swift` | `TEAM GAS MATCHING` | iOS Planner | Low | `planner.team.matching_title` |
-| `iOSApp/Views/PlannerView.swift` | `TEAM GAS MATCH` | iOS Plan Result | Low | `planner.team.match_title` |
-| `iOSApp/Views/PlannerView.swift` | `BRIEFING` | iOS Plan Result | Low | `planner.briefing.title` |
-| `iOSApp/Views/PlannerView.swift` | `CURVA BUHLMANN ZH-L16C` | iOS Plan Result | Low | `planner.buhlmann.curve_title` |
-| `iOSApp/Views/MoreView.swift` + `iOSApp/Resources/it.lproj/Localizable.strings` | `Planner safety` | iOS More | Low | `more.planner_safety.title` |
-| `iOSApp/Resources/it.lproj/Localizable.strings` | `Subsurface CSV metrico; altri formati planned` | iOS units/export copy | Low | split into fully localized Italian phrasing |
-| `iOSApp/Resources/it.lproj/Localizable.strings` | `BACKUP CLOUD`, `REVIEWER` | iOS More headers | Low | fully localized section labels if desired |
+| None currently confirmed in stable MAIN code paths after post-audit fixes | — | — | Low | Verify bilingual screenshots and clipping on real device sizes before release |
 
 ### Mixed-language screen summary
 
-- Watch `BUSSOLA`: still the most visible remaining watch localization gap
-- Watch `InfoView`: mostly small polish issue
-- iOS `Planner` / `PlanResultView`: biggest remaining localization debt in stable iOS UX
-- iOS `More`: mostly localized, but a few labels still mix English and Italian in Italian mode
+- Watch `BUSSOLA`: repo-side localization gap resolved
+- Watch `InfoView`: repo-side wording gap resolved
+- iOS `Planner` / `PlanResultView`: repo-side localization debt resolved in current MAIN
+- iOS `More`: stable labels normalized in current MAIN
 
 ### Terminology check
 
@@ -468,15 +486,15 @@ Localization is substantially healthier than older audits suggested. Many litera
 | Depth-limit warnings | Good | Low | Inline + visual + haptic support |
 | GPS limitation framing | Good | Low | Surface-only behavior is consistently explained |
 | Silent GPS/depth failure risk | Partial | Medium | UI gives status, but real underwater/device behavior still needs field QA |
-| Terms / Privacy destination quality | Weak | Medium | Visible but both point to repository root, not reviewer-grade legal pages |
+| Terms / Privacy destination quality | Good | Low | Dedicated legal destinations now exist in `Docs/TERMS_OF_USE.md` and `Docs/PRIVACY_AND_DATA_USE.md` |
 | Entitlement/device blocker | Critical | Critical | Generic device builds fail until water-submersion entitlement is approved in active provisioning |
-| App Store rejection risk | Real | High | Current legal-link quality and lack of entitlement/device evidence remain submission risks |
+| App Store rejection risk | Real | High | Remaining risk is now driven mainly by entitlement/device evidence, not by missing legal destinations in the repo |
 
 Safety / legal verdict:
 
 - Product positioning is mostly responsible
 - The current release blocker is **not unsafe copy drift**, but missing real signed-device proof for the watch depth capability
-- Legal destinations should still be improved before submission
+- Legal destinations are now present; remaining safety/readiness work is external provisioning plus real hardware evidence
 
 ---
 
@@ -511,15 +529,7 @@ Error / empty-state verdict:
 | Water-submersion entitlement not usable in current signing context | Watch + iOS release pair | Signing / Apple Developer / provisioning | Critical | Blocks generic device build, TestFlight, and physical dive automation validation | Enable/approve capability for watch App ID, regenerate profiles, re-test generic builds | External QA/process |
 | Generic iOS device build blocked by embedded watch entitlement failure | iOS release pair | Build / signing | Critical | Prevents release-grade iOS build with embedded watch target | Resolve the same watch entitlement/profile blocker | External QA/process |
 | Automatic dive lifecycle not validated on real Watch Ultra | Watch | Physical device behavior | High | Core underwater automation is still not release-certified by evidence | Run real Watch Ultra field/device QA using updated profiles | External QA/process |
-| Terms and Privacy links point to repository root | Watch + iOS legal screens | `WatchLegalOnboardingView.swift`, `IOSLegalOnboardingView.swift` | Medium | Weak legal/reviewer experience; potential submission concern | Replace with dedicated legal destinations | Copy-only / UI-only |
-| Watch Info entitlement diagnostics overstate readiness | Watch | `Views/InfoView.swift` | Medium | Testers may read “Configured” as “release-ready” even when signed builds fail | Reword diagnostics to distinguish static config from provisioning approval | Copy-only |
-| Compass bearing controls still mixed-language | Watch | `Views/CompassView.swift` | Medium | Core navigation screen still looks partially unfinished in EN/IT audit | Localize control labels and formatted bearing line | UI-only |
-| Planner result cards still mixed-language | iOS | `iOSApp/Views/PlannerView.swift` | Medium | High-value planning flow feels less polished and less reviewer-ready | Finish localization of remaining literal labels | UI-only |
-| Planner shows disabled non-advanced modes | iOS | `iOSApp/Views/PlannerView.swift` | Medium | Users can see future modes that are not actually available | Keep visible but reframe as planned, or hide until active | UI-only |
-| Planner metric-only behavior can feel inconsistent with global units | iOS | `iOSApp/Views/PlannerView.swift`, related strings | Medium | Imperial users encounter mixed expectations | Keep honest note and consider clearer framing or full presentation conversion later | Small functional or UI-only |
-| Sync status is aggregate, not per-session | Watch + iOS | Sync surfaces | Medium | Harder to verify a specific dive/photo transfer | Add per-item delivery trace later | Small functional |
-| Stopwatch reset lacks extra safeguard | Watch | `Views/DiveLiveView.swift` | Low | Surface/underwater accidental reset risk | Consider long-press or confirm flow after UX review | UI-only / small functional |
-| More/legal copy still partially mixed-language | iOS | `iOSApp/Views/MoreView.swift`, localized strings | Low | Polish issue in stable settings surface | Normalize Italian/English labels | UI-only |
+| Repo-side medium/low findings from the original audit | Watch + iOS stable UX | Legal / Info / Compass / Planner / More / Sync / Stopwatch surfaces | Resolved | No longer blocking current `main` | Fixed on current `main`; keep regression coverage via simulator builds and future QA | Resolved in repo |
 
 ---
 
@@ -535,20 +545,17 @@ Error / empty-state verdict:
 
 1. Execute physical Apple Watch Ultra QA for automatic dive lifecycle, depth display, safety bands, and haptics
 2. Run paired Watch <-> iPhone sync QA for dives, tombstones, conflicts, units, and photo transfer
-3. Replace repo-root Terms / Privacy destinations with real reviewer-grade legal pages
-4. Tighten `InfoView` wording so entitlement status is honest
+3. Archive/store device evidence that the underwater path behaves as documented on approved hardware
 
 ### 3. Must fix before App Store
 
-1. Finish remaining planner / compass / More mixed-language cleanup
-2. Reconfirm bilingual screenshots and clipping on real device sizes
-3. Keep all underwater/device claims aligned only to behavior verified on real hardware
+1. Reconfirm bilingual screenshots and clipping on real device sizes
+2. Keep all underwater/device claims aligned only to behavior verified on real hardware
 
 ### 4. Post-release improvements
 
-1. Add per-session sync visibility instead of aggregate-only state
-2. Revisit stopwatch reset safeguard
-3. Decide whether disabled planner modes should remain visible in stable MAIN
+1. Consider deeper sync history/ledger if QA wants more than the current recent-activity trace
+2. Consider expanding planner unit presentation beyond the current honest metric/bar framing if product scope changes
 
 ---
 
@@ -558,17 +565,17 @@ Error / empty-state verdict:
 | --- | --- | --- |
 | Ready to compile? | **Yes for simulator, no for signed/generic device release builds** | `xcodegen` passes and both simulator builds pass, but generic watch/iOS builds fail on the watch water-submersion entitlement provisioning context |
 | Ready for internal QA? | **Yes, conditionally** | Simulator and code-level UX are strong enough to continue QA, but physical watch QA is still required for the core dive automation path |
-| Ready for average user? | **Not yet** | Too much release confidence still depends on unverified Watch Ultra behavior and unresolved legal/reviewer polish |
+| Ready for average user? | **Not yet** | Repo-side polish issues from the original audit are fixed, but release confidence still depends on unverified Watch Ultra behavior |
 | Ready for TestFlight? | **No** | Blocked by generic device build failure and missing physical Watch Ultra validation |
-| Ready for App Store? | **No** | Same entitlement/device blocker, plus legal destination quality and final localization cleanup still need attention |
-| What blocks 100% readiness? | **Provisioning approval + device evidence + polish** | The primary blocker is external signing/provisioning, followed by real device proof and a smaller cleanup pass on planner/compass/legal strings |
+| Ready for App Store? | **No** | The remaining blocker is the same entitlement/device-evidence gap; repo-side legal/localization cleanup is no longer the reason it is blocked |
+| What blocks 100% readiness? | **Provisioning approval + device evidence** | Current validation indicates that 100% release readiness is no longer blocked by repo-side issues; the remaining blockers are Apple signing approval and real hardware proof |
 
 ### Bottom line
 
-The current `main` branch is **substantially ready from a stable-UI and simulator-readiness perspective**. This is no longer a branch suffering from major MAIN navigation collapse or accidental experimental dependency. The remaining blockers are narrower and well-defined:
+The current `main` branch is **repo-ready, polished, and simulator-ready**. This is no longer a branch suffering from major MAIN navigation collapse, accidental experimental dependency, or unresolved stable-UI polish debt. The remaining blockers are narrower and well-defined:
 
 1. the watch water-submersion entitlement must be usable in the active signing context  
 2. the automatic dive lifecycle must be validated on real Apple Watch Ultra hardware  
-3. a final polish pass should close mixed-language planner/compass/legal issues before release
+3. release confidence must be backed by real hardware evidence before submission
 
 No evidence from this audit suggests a required architectural rewrite, planner algorithm rewrite, or dive/depth/ascent/TTV logic rewrite.
