@@ -20,7 +20,8 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 
 **Not complete until executed on real hardware.** Entitlement is configured in `Config/DIRDiving.entitlements`; simulator does not certify submersion.
 
-- [ ] Apple Developer portal: App ID `com.egopfe.dirdiving` includes **water submersion** entitlement approved  
+- [ ] Apple Developer portal: Watch App ID `com.egopfe.dirdiving.ios.watch` includes **water submersion** entitlement approved
+- [ ] Apple Developer portal: embedded pair remains linked to iOS App ID `com.egopfe.dirdiving.ios`
 - [ ] Provisioning profile used for Archive includes `com.apple.developer.coremotion.water-submersion`  
 - [ ] Real **Apple Watch Ultra**: automatic dive launch when submerged (if product expects it)  
 - [ ] Live depth samples from `CMWaterSubmersionManager` during test dive  
@@ -43,7 +44,10 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 ## Sicurezza / copy
 
 - [ ] Disclaimer MAIN visibile (iOS `MoreView` / README)  
+- [ ] Link **Terms** / **Privacy** puntano ai documenti dedicati `Docs/TERMS_OF_USE.md` e `Docs/PRIVACY_AND_DATA_USE.md`
 - [ ] Nessun claim di certificazione non supportato  
+- [ ] Side Button descritto onestamente come system-controlled
+- [ ] Action Button descritto come disponibile solo tramite Shortcuts / App Intents quando watchOS lo espone
 
 ## QA Security (audit F1–F12, baseline 2026-05-19)
 

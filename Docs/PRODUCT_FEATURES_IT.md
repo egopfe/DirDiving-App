@@ -1,7 +1,7 @@
 # DIR DIVING — Panoramica funzionalità (italiano)
 
-**Aggiornato:** 2026-05-20  
-**Branch di riferimento:** `main` @ `d962117`  
+**Aggiornato:** 2026-05-25
+**Branch di riferimento:** `main` @ `ab398eb`
 **Spec prodotto corrente:** [`DIR_Diving_Complete_Development_Notes_UPDATED_v9.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v9.md)
 
 Documento additivo: integra README e matrice CSV senza sostituire audit o note legali dettagliate.
@@ -14,7 +14,7 @@ Documento additivo: integra README e matrice CSV senza sostituire audit o note l
 |-----|--------|----------------|---------------------|
 | Apple Watch Ultra / watchOS 10+ | `DIRDiving Watch App` | `main` | `codex/experimental-features` |
 | iPhone companion iOS 17+ | `DIRDiving iOS` | `main` (workspace unificato) | `codex/ios-experimental-features` |
-| Worktree storico solo iOS | — | `main-iOS` (divergente; allineare docs da `main`) | — |
+| Worktree storico solo iOS | — | `main-iOS` (divergente; non baseline release) | — |
 
 Generazione progetto: `xcodegen generate` → `DIRDiving.xcodeproj` (non versionato).
 
@@ -105,10 +105,10 @@ Implementazione v8/v9: [`DIR_DIVING_v8_IMPLEMENTATION_REPORT.md`](DIR_DIVING_v8_
 
 | Branch | Ruolo |
 |--------|--------|
-| `main` | Produzione Diving + companion; esclude sorgenti experimental da `project.yml` |
-| `main-iOS` | Storico parallelo; **202 commit behind** `main` a `d962117` — sync documentazione, merge codice solo con review |
+| `main` | Produzione Diving + companion iOS nello stesso workspace; esclude sorgenti experimental da `project.yml` |
+| `main-iOS` | Worktree storico divergente; usare solo per review manuali o port selettivi verso `main` |
 | `codex/experimental-features` | Watch Snorkeling/Apnea/Buddy |
-| `codex/ios-experimental-features` | iOS Explore Lab, mappe, POI enrichment |
+| `codex/ios-experimental-features` | iOS experimental companion: snorkeling/apnea/buddy/exploration concepts |
 
 Regole merge: preservare Diving stabile, GPS surface-only, BUSSOLA, export Subsurface, security F1–F12. PR #8/#9: non auto-merge (vedi [`PR_STATUS_20260520_POST_V9.md`](PR_STATUS_20260520_POST_V9.md)).
 

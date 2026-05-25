@@ -12,7 +12,7 @@
 
 The sections below capture the original pre-modification audit run performed on `main` @ `21a7f41`.
 
-Since that audit, the branch advanced to `main` @ `488f27d` and the repo-side readiness issues identified in the original pass were addressed and revalidated:
+Since that audit, the branch advanced to `main` @ `ab398eb` and the repo-side readiness issues identified in the original pass were addressed and revalidated:
 
 - Terms / Privacy links now point to dedicated legal docs instead of the repository root
 - Watch `InfoView` entitlement wording now distinguishes static target config from Apple provisioning approval
@@ -20,6 +20,7 @@ Since that audit, the branch advanced to `main` @ `488f27d` and the repo-side re
 - disabled non-advanced planner modes were removed from stable MAIN
 - per-item sync activity visibility was added on Watch and iOS sync surfaces
 - the Watch stopwatch reset now requires confirmation when there is something to reset
+- README, INDEX, roadmap, release notes, and UX conventions were realigned so the current MAIN architecture no longer points readers at stale branch/UX assumptions
 - `xcodegen generate` passes
 - both simulator builds pass:
   - `DIRDiving Watch App` -> `generic/platform=watchOS Simulator`

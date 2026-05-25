@@ -2,17 +2,19 @@
 
 This document tracks experimental iPhone companion work on the `codex/ios-experimental-features` branch.
 
-The branch starts from `main-iOS` and is intended to stay aligned with the Apple Watch experimental branch:
+The branch is a historical derivative of the older iOS worktree and is intended to stay aligned with the Apple Watch experimental branch without becoming the MAIN release baseline:
 
 ```text
 Apple Watch experimental branch: codex/experimental-features
 iOS experimental branch:         codex/ios-experimental-features
-Stable iOS branch:               main-iOS
+Stable MAIN runtime branch:      main
+Historical iOS worktree:         main-iOS
 ```
 
 ## Branch Rules
 
-- Keep stable iOS companion work on `main-iOS`.
+- Keep stable iOS companion runtime work on `main`.
+- Treat `main-iOS` as a historical/divergent worktree, not as the canonical release branch.
 - Keep exploratory iOS companion work on `codex/ios-experimental-features`.
 - Do not add Apple Watch targets back into this iOS branch.
 - Do not add Buddy/BLE watchOS runtime code directly to the iOS target.

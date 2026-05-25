@@ -1,6 +1,6 @@
 # Roadmap DIR DIVING
 
-**Aggiornato:** 2026-05-20 (`main` @ `d962117`)
+**Aggiornato:** 2026-05-25 (`main` @ `ab398eb`)
 
 ## Rilasciati su `main` (Watch MAIN + iOS nel workspace)
 
@@ -15,11 +15,11 @@
 | Sync iPhone → Watch (session push) | ✅ | `5e595ee` outbound queue + More push |
 | UI conflitti sync iOS | ✅ | `5e595ee` card in More |
 | Security F1-F12 | ✅ | Audit 2026-05-19 |
-| i18n IT/EN (primario + secondario) | 🟡 | Pass 2026-05-23; alcune righe Settings/shortcut ancora IT-key |
+| i18n IT/EN (primario + secondario) | ✅ | Pass principali chiusi su MAIN stabile; eventuali affinamenti futuri sono polish, non blocker repo-side |
 | Onboarding legale + disclaimer IT/EN | ✅ | First launch, major update re-consent, Legal & Safety |
 | Planner safety acknowledgment | ✅ | Persistito `2026-05-24` (`62e25d5`); toggle obbligatorio prima di Calcola Piano |
 | iCloud decode error UI (iOS) | ✅ | `62e25d5` — `lastDecodeError` in Altro |
-| i18n Logbook/Detail/Analysis (iOS) | 🟡 | R4 `62e25d5`; Planner/Equipment ancora misto |
+| i18n Logbook/Detail/Analysis (iOS) | ✅ | Copertura MAIN riallineata nei pass readiness 2026-05-24/25 |
 | 7 App Shortcuts Watch | ✅ | `db72dce` |
 | Strategia controlli Watch | ✅ | `72fa15b`; Crown/touch/App Intents/Side Button documentati |
 | Digital Crown tuning soglie | ✅ | Allarmi + limiti risalita; touch fallback mantenuto |
@@ -38,27 +38,31 @@
 | Foto iPhone → Watch (UserImages) | ✅ | `f851b61` transferFile |
 | Tab iOS Planner prima | ✅ | `f851b61` |
 | Planner ack in cima + field gate | ✅ | Persistenza `62e25d5`; gate campi `f851b61` |
-| Marchio altosinistra header | 🟡 | PNG bundled; AppIcon store da rigenerare |
+| Marchio altosinistra header | ✅ | Asset bundled nel design system corrente |
 | Planner gas v8 (cilindri, ruoli, Air/EAN/Trimix, MOD) | ✅ | `a36dc23` |
 | Equipment template «La mia attrezzatura» + GAS switch | ✅ | `a36dc23` |
 | Foto iPhone→Watch con validazione/resize | ✅ | `a36dc23` |
 | Watch User Images in superficie (tab sempre) | ✅ | `d962117` |
 | Planner/Bühlmann sync su input gas | ✅ | `d962117` — algoritmo Bühlmann invariato |
+| Terms / Privacy dedicati | ✅ | Docs legali dedicate usate da Watch e iOS onboarding/settings |
+| Sync activity recente Watch/iOS | ✅ | Visibilita recente per photo/session activity senza alterare il protocollo |
+| Safeguard reset cronometro Watch | ✅ | Conferma esplicita quando esiste tempo da resettare |
+| Docs / audit alignment 2026-05-25 | ✅ | README, INDEX, safety/release docs e matrix riallineati al MAIN corrente |
 
 ## Prossimo (MAIN, pre–App Store)
 
 | Priorità | Item | Tipo |
 |----------|------|------|
-| P0 | Validazione depth su Watch Ultra reale (R1) | QA / Apple — [`TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md) |
-| P1 | Ripristinare unità imperiali in lista log Watch | UX — regressione `3b7358b` |
-| P1 | QA pairing sync bidirezionale su device | QA |
-| P2 | Completare i18n residuo (Settings shortcut, InfoView) | Localization |
-| P2 | Verifica legale contenuti Terms/Privacy URL prima App Store | Legal / App Store |
-| P2 | Convergenza documentazione `main` ↔ `main-iOS` | Process |
+| P0 | Approvazione entitlement water-submersion + provisioning aggiornato | Apple Developer / Signing — [`TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md) |
+| P0 | Build generici firmati Watch + iOS con target embedded | Release / QA |
+| P1 | QA reale Apple Watch Ultra per lifecycle automatico, profondita e limiti 35/38/40 m | Hardware QA |
+| P1 | QA pairing/sync bidirezionale su device | Hardware QA |
+| P1 | QA App Intents / Action Button su Watch fisico | Hardware QA |
+| P2 | Verifica finale legale contenuti Terms/Privacy e copy App Review | Legal / App Store |
+| P2 | Convergenza documentazione `main` ↔ worktree storici (`main-iOS`, `codex/*`) senza merge runtime unsafe | Process |
 | P3 | GPX/UDDF export | Feature |
-| P3 | Rigenerare AppIcon da `Docs/ReferenceIcon/` | Assets |
-| P4 | Watch back navigation audit su tutte le sub-screen | UX |
-| P4 | Valutare long-press STOP/RESET solo dopo decisione prodotto | UX safety |
+| P3 | Rigenerare e validare AppIcon store da `Docs/ReferenceIcon/` | Assets |
+| P4 | Eventuale ledger sync per-session persistente oltre la recente activity | UX / diagnostics |
 
 ## Rami experimental (non in target MAIN)
 

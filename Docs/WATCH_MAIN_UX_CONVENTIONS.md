@@ -1,6 +1,6 @@
 # Watch MAIN — UX conventions (product baseline)
 
-**Last updated:** 2026-05-20  
+**Last updated:** 2026-05-25
 **Applies to:** Apple Watch `main` branch only (not experimental modes).
 
 These conventions are **accepted product behavior**. Future UI work should treat them as defaults unless the product owner explicitly requests a change.
@@ -31,9 +31,9 @@ When `ascentStatus.isOverLimit` is true during an active dive:
 
 ---
 
-## Mode selection on launch (accepted for now)
+## Mode selection on launch
 
-`ModeSelectionView` as the first vertical page on cold launch is **acceptable** for the current release.
+On current `main`, when Diving is the only stable mode, cold launch should **auto-skip** `ModeSelectionView` and enter the standard MAIN flow (legal gate if needed, then Live). `ModeSelectionView` remains dormant for future multi-mode stable builds and must not reappear on MAIN by accident.
 
 ---
 
@@ -50,6 +50,6 @@ During an active dive, Live remains the primary page and Compass remains reachab
 
 ---
 
-## Related open items (not conventions)
+## GPS confirmation behavior
 
-GPS start/end confirmation still uses a full-screen overlay for ~2.4 s — see audit UX-H2 / SAF-2; separate from this ascent alarm policy.
+GPS start/end confirmation on current MAIN uses a **compact inline banner** that preserves the live metrics context. Do not reintroduce a full-screen GPS takeover on the stable Diving flow.

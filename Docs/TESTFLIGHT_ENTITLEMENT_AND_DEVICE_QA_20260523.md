@@ -1,6 +1,6 @@
 # TestFlight & device QA — MAIN branch blockers (external)
 
-**Date:** 2026-05-23  
+**Date:** 2026-05-25
 **Branch:** `main`  
 **Purpose:** Track items that **cannot** be closed in code alone. Do **not** mark complete until performed on real hardware / Apple Developer.
 

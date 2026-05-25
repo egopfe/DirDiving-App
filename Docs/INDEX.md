@@ -1,7 +1,7 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-05-25  
-**Branch consigliato:** `main` @ `60dd119` (allineato a `origin/main` al momento dell'ultimo controllo)  
+**Branch consigliato:** `main` @ `ab398eb` (allineato a `origin/main` al momento dell'ultimo controllo)
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
 
@@ -15,7 +15,7 @@
 | [`DIR_Diving_Complete_Development_Notes_UPDATED_v8.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v8.md) | Note sviluppo v8 (stesso ambito di v9; in caso di differenze preferire **v9**) | Spec precedente |
 | [`DIR_DIVING_v8_IMPLEMENTATION_REPORT.md`](DIR_DIVING_v8_IMPLEMENTATION_REPORT.md) | Report implementazione v8 in codice: gas mix Air/EAN/Trimix, MOD, schedule travel/bailout, disclaimer trimix Bühlmann | **Completato** @ `a36dc23` |
 | [`DIR_DIVING_v9_IMPLEMENTATION_REPORT.md`](DIR_DIVING_v9_IMPLEMENTATION_REPORT.md) | Report implementazione v9: immagini Watch in superficie, sync Planner/Bühlmann su input | **Completato** @ `d962117` |
-| [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md) | Panoramica funzionalità MAIN/experimental, modalità, i18n, branch strategy | Corrente @ `d962117` |
+| [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md) | Panoramica funzionalità MAIN/experimental, modalità, i18n, branch strategy | Corrente @ `ab398eb` |
 | [`DIR_Diving_Complete_Development_Notes_25_05_2026.md`](DIR_Diving_Complete_Development_Notes_25_05_2026.md) | Prima versione note 25/05/2026 (stesso ambito; usare v9/v8 se in conflitto) | Archivio / baseline |
 | [`DEVELOPMENT_NOTES_25_05_2026_IMPLEMENTATION_REPORT.md`](DEVELOPMENT_NOTES_25_05_2026_IMPLEMENTATION_REPORT.md) | Implementazione codice note 25/05 (`c23d4d4`) | Completato |
 | [`APP_ICON_UPDATE_NOTES.md`](APP_ICON_UPDATE_NOTES.md) | Rigenerazione icone (`Scripts/update_app_icons.sh`) + cache Simulator | Operativo |
@@ -29,12 +29,12 @@
 
 ### [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md)
 
-Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word: [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.docx`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.docx). Audit pre-modifica redatto su `main` @ `21a7f41`, poi archiviato in forma datata su `origin/main` @ `60dd119`.
+Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word: [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.docx`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.docx). Audit pre-modifica redatto su `main` @ `21a7f41`, poi riallineato documentalmene sulla baseline corrente `main` @ `ab398eb`.
 
 | Sezione | Contenuto |
 |---------|-----------|
 | **A** | Branch, target, `project.yml`, build e separazione target MAIN / experimental |
-| **B** | Executive summary (~76% overall nel report 2026-05-25) |
+| **B** | Executive summary (repo-side 100%, overall 84% nel report 2026-05-25) |
 | **C** | Feature inventory (Watch + iOS: impl / reach / usable / complete) |
 | **D** | Navigation map (flussi Watch e iOS, dead end) |
 | **E** | UI consistency vs reference (`Docs/ReferenceUI/`) |
@@ -50,18 +50,14 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | **O** | Final verdict (compile / utente medio / TestFlight / App Store) |
 | **Validation log** | `xcodegen` + simulator build pass; generic device build bloccato da entitlement/provisioning |
 
-**Bug critici elencati in §M (versione audit 2026-05-25; distinguere fra fix repo-side e blocchi esterni):**
+**Bug critici elencati in §M (versione audit 2026-05-25; distinguere fra fix repo-side chiusi e blocchi esterni ancora aperti):**
 
 | Bug | File indicato |
 |-----|----------------|
 | Entitlement `water-submersion` non approvato nel provisioning attivo | Apple Developer / profili / build generici |
 | Build generico iOS bloccato dal target Watch embedded | Coppia iOS + Watch release |
 | Automatic dive lifecycle non validato su hardware Ultra reale | Device QA |
-| Link Terms / Privacy puntavano alla root repo | `Views/WatchLegalOnboardingView.swift`, `iOSApp/Views/IOSLegalOnboardingView.swift` |
-| InfoView Watch sovrastimava readiness entitlement | `Views/InfoView.swift` |
-| Bussola Watch e planner / More iOS con copy mixed-language | `Views/CompassView.swift`, `iOSApp/Views/PlannerView.swift`, `iOSApp/Views/MoreView.swift` |
-| Sync solo aggregato, non per item/sessione | `Services/WatchSyncService.swift`, `iOSApp/Services/WatchSyncService.swift` |
-| Reset cronometro senza safeguard extra | `Views/DiveLiveView.swift` |
+| Repo-side issues del dated audit | **Risolti** su `main` @ `ab398eb` (legal links dedicati, wording entitlement, BUSSOLA/planner i18n, recent sync activity, safeguard reset cronometro) |
 
 > **Nota:** `e1cc982`–`fc08466`: build simulator Watch/iOS verde; i18n Equipment/Planner; checklist device QA in §6.
 
@@ -80,6 +76,9 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 
 | Documento | Contenuto |
 |-----------|-----------|
+| [`DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md) | Allineamento corrente: `main` canonico, `main-iOS` worktree storico divergente, experimental isolato |
+| [`DOCUMENTATION_UPDATE_REPORT_20260525.md`](DOCUMENTATION_UPDATE_REPORT_20260525.md) | Report aggiornamento documentazione corrente |
+| [`PR_STATUS_20260525.md`](PR_STATUS_20260525.md) | Stato PR/merge safety 2026-05-25 con limiti ambiente correnti |
 | [`DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md) | Allineamento branch post v9 @ `d962117` |
 | [`DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md`](DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md) | Report A–K pass documentazione post v9 |
 | [`PR_STATUS_20260520_POST_V9.md`](PR_STATUS_20260520_POST_V9.md) | Stato PR #8/#9 post v9 |
@@ -204,6 +203,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 
 | Data | File |
 |------|------|
+| 20260525 | [`DOCUMENTATION_UPDATE_REPORT_20260525.md`](DOCUMENTATION_UPDATE_REPORT_20260525.md) |
 | 20260524 | [`DOCUMENTATION_UPDATE_REPORT_20260524.md`](DOCUMENTATION_UPDATE_REPORT_20260524.md), [`DOCUMENTATION_UPDATE_REPORT_20260524_CONTROL_STRATEGY.md`](DOCUMENTATION_UPDATE_REPORT_20260524_CONTROL_STRATEGY.md) |
 | 20260523 | [`DOCUMENTATION_UPDATE_REPORT_20260523.md`](DOCUMENTATION_UPDATE_REPORT_20260523.md) |
 | 20260522 | [`DOCUMENTATION_UPDATE_REPORT_20260522_LEGAL_ONBOARDING.md`](DOCUMENTATION_UPDATE_REPORT_20260522_LEGAL_ONBOARDING.md) |
@@ -212,6 +212,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 
 | Data | Branch alignment |
 |------|------------------|
+| 20260525 | [`DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md) |
 | 20260517–24 | [`DOCUMENTATION_BRANCH_ALIGNMENT_20260517.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260517.md) … [`DOCUMENTATION_BRANCH_ALIGNMENT_20260524.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260524.md) |
 
 ---
@@ -257,7 +258,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 2. [`DIR_Diving_Complete_Development_Notes_UPDATED_v9.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v9.md) — **backlog prodotto corrente** (iOS + Watch)  
 3. [`DIR_DIVING_v8_IMPLEMENTATION_REPORT.md`](DIR_DIVING_v8_IMPLEMENTATION_REPORT.md) — cosa è già implementato in codice (v8) @ `a36dc23`  
 4. [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md) — **§B, §M, §N, §O**  
-5. [`DEVELOPMENT_NOTES_25_05_2026_IMPLEMENTATION_REPORT.md`](DEVELOPMENT_NOTES_25_05_2026_IMPLEMENTATION_REPORT.md) + [`MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524_POST_DEV_NOTES.md`](MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524_POST_DEV_NOTES.md) — implementazione 25/05 e gap UX  
+5. [`DOCUMENTATION_UPDATE_REPORT_20260525.md`](DOCUMENTATION_UPDATE_REPORT_20260525.md) + [`DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md) — allineamento documentazione/branch corrente
 6. [`DIR_DIVING_Feature_Comparison.csv`](DIR_DIVING_Feature_Comparison.csv) — stato feature  
 7. [`BUILD_VALIDATION.md`](BUILD_VALIDATION.md) — `xcodegen generate` + build  
 8. [`WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md`](WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md) — se lavori su Watch  
@@ -295,9 +296,9 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`DIR_Diving_Main_Branch_Development_Notes.md`](DIR_Diving_Main_Branch_Development_Notes.md) | §4 |
 | [`DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md`](DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md) | §4 |
 | [`DIR_DIVING_v8_IMPLEMENTATION_REPORT.md`](DIR_DIVING_v8_IMPLEMENTATION_REPORT.md) | §0, §12 |
-| `DOCUMENTATION_BRANCH_ALIGNMENT_20260517.md` … `20260524.md` | §2, §9 |
+| `DOCUMENTATION_BRANCH_ALIGNMENT_20260517.md` … `20260525.md` | §2, §9 |
 | [`DOCUMENTATION_SYNC_REPORT_20260519.md`](DOCUMENTATION_SYNC_REPORT_20260519.md) | §2 |
-| `DOCUMENTATION_UPDATE_REPORT_20260519.md` … `20260524*.md` | §9 |
+| `DOCUMENTATION_UPDATE_REPORT_20260519.md` … `20260525.md` | §9 |
 | [`EXPERIMENTAL_FEATURES.md`](EXPERIMENTAL_FEATURES.md) | §7 |
 | [`GLOSSARY.md`](GLOSSARY.md) | §5 |
 | [`INDEX.md`](INDEX.md) | questo file |
@@ -319,7 +320,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`MAIN_UX_*`](MAIN_UX_COMPLETION_REPORT.md) | §8 |
 | [`PHASE0_MAIN_UX_PREFLIGHT_PLAN.md`](PHASE0_MAIN_UX_PREFLIGHT_PLAN.md) | §8 |
 | [`PRIVACY_AND_DATA_USE.md`](PRIVACY_AND_DATA_USE.md) | §6 |
-| [`PR_STATUS_20260520.md`](PR_STATUS_20260520.md) … [`PR_STATUS_20260524.md`](PR_STATUS_20260524.md) | §2 |
+| [`PR_STATUS_20260520.md`](PR_STATUS_20260520.md) … [`PR_STATUS_20260525.md`](PR_STATUS_20260525.md) | §2 |
 | [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) | §6 |
 | [`ROADMAP.md`](ROADMAP.md) | §5 |
 | [`SAFETY_DISCLAIMER.md`](SAFETY_DISCLAIMER.md) | §6 |
@@ -337,4 +338,4 @@ Altri asset in `Docs/`: `.docx`, `.csv`, `.xlsx`, `.py` (generatori §11), `Refe
 
 ---
 
-*Indice per ripresa lavoro su `main` @ `60dd119`. Dopo nuovi documenti: aggiornare **§1**, §6, §11, §12 e §14.*
+*Indice per ripresa lavoro su `main` @ `ab398eb`. Baseline documentale corrente: README + audit dated 2026-05-25 + report/documentation alignment 2026-05-25.*

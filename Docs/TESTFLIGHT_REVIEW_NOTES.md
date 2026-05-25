@@ -1,6 +1,6 @@
 # Note per TestFlight / App Review - DIR DIVING
 
-**Aggiornato:** 2026-05-20 - branch `main` (Watch) + `main-iOS` (companion)
+**Aggiornato:** 2026-05-25 - branch `main` (Watch + iOS companion unificati)
 
 ## Panoramica per il revisore
 
@@ -26,15 +26,16 @@ L'app **non** e presentata come computer subacqueo certificato.
 
 - Watch: Impostazioni -> **Lingua** (Sistema / Italiano / English).
 - iOS: Altro -> **Lingua** (segmented).
-- La lingua **non** cambia unita ne calcoli. Copertura EN estesa su schermate secondarie (2026-05-20); alcune stringhe planner/technical possono restare miste.
+- La lingua **non** cambia unita ne calcoli. MAIN stabile e allineato IT/EN nei flussi principali; eventuali verifiche residue restano QA device-side, non blocker repo-side.
 
 ## Limitazioni note (da dichiarare)
 
 1. **Non** computer subacqueo certificato.
 2. Planner e TTV **informativi**: non NDL/TTS certificati.
 3. GPS **inaffidabile** sott'acqua.
-4. Profondita automatica: validare su **Apple Watch Ultra** reale dopo entitlement.
-5. Side button / Action Button Watch: l'app **non** puo intercettare direttamente il tasto laterale. Controlli immersione affidabili restano **START / STOP / RESET** sullo schermo Live. Comandi aggiuntivi (cronometro, immersione manuale, bussola, allarme) sono disponibili tramite **Comandi Rapidi / Action Button** solo dove watchOS espone gli App Intent registrati — vedi Impostazioni -> Azione / Comandi.
+4. Profondita automatica: validare su **Apple Watch Ultra** reale dopo approvazione entitlement e provisioning corretto.
+5. Side Button / Action Button Watch: l'app **non** puo intercettare direttamente il tasto laterale. Controlli immersione affidabili restano **START / STOP / RESET** sullo schermo Live. Comandi aggiuntivi (cronometro, immersione manuale, BUSSOLA, allarme) sono disponibili tramite **Comandi Rapidi / Action Button** solo dove watchOS espone gli App Intent registrati — vedi Impostazioni -> Azione / Comandi.
+6. Terms / Privacy da onboarding e settings puntano a documenti dedicati, non alla root del repository.
 
 ## Checklist QA consigliata (reviewer)
 
@@ -46,6 +47,7 @@ L'app **non** e presentata come computer subacqueo certificato.
 - [ ] Allarme: pulsante OK + cooldown
 - [ ] Export CSV Subsurface da dettaglio immersione
 - [ ] Planner: disclaimer visibile; output indicativo
+- [ ] Settings / More: link Terms / Privacy raggiungibili e leggibili
 - [ ] Lingua EN: Settings, log, sync senza italiano evidente nelle schermate principali
 
 ## Build (interno)

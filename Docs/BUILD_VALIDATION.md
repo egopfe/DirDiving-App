@@ -1,6 +1,6 @@
 # Build validation — DIR DIVING (MAIN)
 
-**Branch:** `main` only.  
+**Branch:** `main` only (`ab398eb` at the latest documentation alignment pass).
 **Generator:** [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`project.yml` at repository root).
 
 ## Schemes and targets (from `project.yml`)
@@ -58,12 +58,22 @@ xcodebuild -scheme "DIRDiving iOS" \
   build
 
 xcodebuild -scheme "DIRDiving Watch App" \
-  -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 2 (49mm)' \
+  -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm)' \
   -configuration Debug \
   build
 ```
 
-Use `xcodebuild -showdestinations -scheme "DIRDiving iOS"` if device names differ on your Mac.
+Use `xcodebuild -showdestinations -scheme "DIRDiving iOS"` and `xcodebuild -showdestinations -scheme "DIRDiving Watch App"` if device names differ on your Mac.
+
+## Known release blocker
+
+Current `main` is simulator-buildable, but generic signed device builds can still fail before runtime validation if the active provisioning profile does not include the Watch entitlement:
+
+```text
+Entitlement com.apple.developer.coremotion.water-submersion not found and could not be included in profile.
+```
+
+This is an Apple Developer / signing issue, not a source-level compile failure in the repository.
 
 ## Troubleshooting
 

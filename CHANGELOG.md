@@ -4,6 +4,14 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-25, documentation / branch alignment — `ab398eb`)
+
+- **Documentazione:** riallineati `README.md`, `Docs/INDEX.md`, `Docs/PRODUCT_FEATURES_IT.md`, `Docs/ROADMAP.md`, `Docs/BUILD_VALIDATION.md`, `Docs/RELEASE_CHECKLIST.md`, `Docs/SAFETY_DISCLAIMER.md`, `Docs/TESTFLIGHT_REVIEW_NOTES.md`, `Docs/WATCH_MAIN_UX_CONVENTIONS.md`.
+- **Audit/report:** aggiornati `Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md`, `Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_CURRENT.md`; `Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md` marcato come report storico superseded.
+- **Nuovi report:** `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md`, `Docs/DOCUMENTATION_UPDATE_REPORT_20260525.md`, `Docs/PR_STATUS_20260525.md`.
+- **Branch strategy:** `main` confermato come baseline stabile Watch+iOS; `main-iOS` documentato come worktree storico divergente; `codex/*` mantenuti experimental-only.
+- **Vincoli:** solo documentazione/repository consistency; nessuna modifica runtime, business logic, planner math o sync architecture.
+
 ### Added (2026-05-20, documentation post v9 — `d962117`)
 
 - **Documentazione:** [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md) panoramica funzioni IT; README, INDEX, ROADMAP, matrice CSV (righe v8/v9); report [`DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md), [`DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md), [`PR_STATUS_20260520_POST_V9.md`](Docs/PR_STATUS_20260520_POST_V9.md).

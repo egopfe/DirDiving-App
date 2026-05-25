@@ -5,6 +5,8 @@
 **Audit source:** `Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524_CURRENT_PRE_MODIFICATION.md`  
 **Scope:** DIRDiving Watch App + DIRDiving iOS (MAIN targets only)
 
+> Historical report retained for traceability. The current authoritative readiness status is tracked in [`Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md) and the 2026-05-25 documentation alignment reports.
+
 ---
 
 ## 1. Branch confirmed
