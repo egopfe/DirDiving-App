@@ -12,12 +12,20 @@ final class WatchSyncService: NSObject, ObservableObject {
         let incoming: DiveSession
     }
 
+    struct SyncActivityItem: Identifiable, Hashable {
+        let id = UUID()
+        let title: String
+        let detail: String
+        let timestamp: Date
+    }
+
     @Published var isSupported = WCSession.isSupported()
     @Published var activationState: WCSessionActivationState = .notActivated
     @Published var lastMessage = String(localized: "Non sincronizzato")
     @Published private(set) var importedSessionCount = 0
     @Published private(set) var failedImportCount = 0
     @Published private(set) var conflicts: [SyncConflict] = []
+    @Published private(set) var recentActivity: [SyncActivityItem] = []
     private weak var logStore: DiveLogStore?
     private var importedSessionIDs: Set<UUID> = []
     private var pushedToWatchSessionIDs: Set<UUID> = []
@@ -32,6 +40,11 @@ final class WatchSyncService: NSObject, ObservableObject {
     private let conflictsFileName = "dirdiving_ios_watch_sync_conflicts.json"
 
     private static let logger = Logger(subsystem: "com.egopfe.dirdiving.ios", category: "WatchSyncService")
+    private static let activityDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd/MM HH:mm"
+        return formatter
+    }()
 
     var userVisibleState: String {
         if !isSupported { return String(localized: "Non supportato") }
@@ -113,6 +126,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             try imageData.write(to: url, options: [.atomic])
             WCSession.default.transferFile(url, metadata: [WatchSyncKeys.companionPhotoFileNameKey: sanitized])
             lastMessage = String(localized: "Foto inviata al Watch")
+            recordActivity(title: String(localized: "sync.activity.photo_to_watch"), detail: sanitized)
         } catch {
             lastMessage = String(format: String(localized: "Errore invio foto Watch: %@"), error.localizedDescription)
         }
@@ -146,6 +160,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             if let existing = logStore?.session(id: session.id), existing != session {
                 storeConflict(local: existing, incoming: session)
                 lastMessage = String(localized: "Conflitto sync salvato per revisione")
+                recordActivity(title: String(localized: "sync.activity.conflict"), detail: sessionSummary(session))
                 return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
             }
             guard !importedSessionIDs.contains(session.id) else {
@@ -157,6 +172,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
             importedSessionCount = importedSessionIDs.count
             lastMessage = String(localized: "Immersione ricevuta dal Watch")
+            recordActivity(title: String(localized: "sync.activity.received_from_watch"), detail: sessionSummary(session))
             return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
         } catch {
             failedImportCount += 1
@@ -245,6 +261,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         pendingOutboundSessions.removeAll { $0.id == session.id }
         pendingOutboundSessions.append(session)
         pendingOutboundSessions.sort { $0.startDate > $1.startDate }
+        recordActivity(title: String(localized: "sync.activity.pending_to_watch"), detail: sessionSummary(session))
     }
 
     private func removeOutboundSession(id: UUID) {
@@ -268,11 +285,13 @@ final class WatchSyncService: NSObject, ObservableObject {
                         self?.markPushedToWatch(session.id)
                         self?.removeOutboundSession(id: session.id)
                         self?.lastMessage = String(localized: "Immersione inviata al Watch")
+                        self?.recordActivity(title: String(localized: "sync.activity.sent_to_watch"), detail: self?.sessionSummary(session) ?? "")
                     }
                 } errorHandler: { [weak self] _ in
                     Task { @MainActor in
                         WCSession.default.transferUserInfo(envelope.message)
                         self?.lastMessage = String(localized: "Invio Watch in coda (transferUserInfo)")
+                        self?.recordActivity(title: String(localized: "sync.activity.queued_to_watch"), detail: self?.sessionSummary(session) ?? "")
                     }
                 }
             } else {
@@ -280,6 +299,7 @@ final class WatchSyncService: NSObject, ObservableObject {
                 markPushedToWatch(session.id)
                 removeOutboundSession(id: session.id)
                 lastMessage = String(localized: "Invio Watch in coda (Watch non raggiungibile)")
+                recordActivity(title: String(localized: "sync.activity.queued_to_watch"), detail: sessionSummary(session))
             }
             Self.logger.info("Outbound session push queued id=\(session.id.uuidString, privacy: .public)")
         } catch {
@@ -313,6 +333,21 @@ final class WatchSyncService: NSObject, ObservableObject {
         } catch {
             Self.logger.error("Persist watch-sync conflicts failed: \(error.localizedDescription, privacy: .private)")
         }
+    }
+
+    private func sessionSummary(_ session: DiveSession) -> String {
+        let started = Self.activityDateFormatter.string(from: session.startDate)
+        let minutes = Int((session.durationSeconds / 60).rounded())
+        return "\(started) · \(Formatters.one(session.maxDepthMeters)) m · \(minutes) min"
+    }
+
+    private func recordActivity(title: String, detail: String) {
+        let normalizedDetail = detail.isEmpty ? "—" : detail
+        recentActivity.insert(
+            SyncActivityItem(title: title, detail: normalizedDetail, timestamp: Date()),
+            at: 0
+        )
+        recentActivity = Array(recentActivity.prefix(6))
     }
 }
 

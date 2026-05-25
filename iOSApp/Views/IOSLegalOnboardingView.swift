@@ -1,5 +1,10 @@
 import SwiftUI
 
+private enum IOSLegalLinks {
+    static let termsURL = URL(string: "https://github.com/egopfe/DirDiving-App/blob/main/Docs/TERMS_OF_USE.md")!
+    static let privacyURL = URL(string: "https://github.com/egopfe/DirDiving-App/blob/main/Docs/PRIVACY_AND_DATA_USE.md")!
+}
+
 struct IOSLegalOnboardingView: View {
     @EnvironmentObject private var legalAcceptance: LegalAcceptanceStore
     let languageCode: String
@@ -264,7 +269,7 @@ struct IOSLegalSafetyView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Legal & Safety")
+                        Text(String(localized: "Legal & Safety"))
                             .font(.system(size: 30, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                         Text("DIR Diving is NOT a dive computer.")
@@ -272,26 +277,26 @@ struct IOSLegalSafetyView: View {
                             .foregroundStyle(DIRTheme.red)
                     }
 
-                    DIRCard("Acceptance Log", icon: "checkmark.seal.fill", accent: DIRTheme.green) {
-                        row("Version accepted", legalAcceptance.acceptedVersionText)
-                        row("Acceptance timestamp", legalAcceptance.acceptedTimestampText)
-                        row("Language", legalAcceptance.acceptedLanguageText)
+                    DIRCard(String(localized: "Acceptance Log"), icon: "checkmark.seal.fill", accent: DIRTheme.green) {
+                        row(String(localized: "Version accepted"), legalAcceptance.acceptedVersionText)
+                        row(String(localized: "Acceptance timestamp"), legalAcceptance.acceptedTimestampText)
+                        row(String(localized: "Language"), legalAcceptance.acceptedLanguageText)
                     }
 
-                    DIRCard("Full disclaimer", icon: "doc.text.magnifyingglass", accent: DIRTheme.yellow) {
+                    DIRCard(String(localized: "Full disclaimer"), icon: "doc.text.magnifyingglass", accent: DIRTheme.yellow) {
                         Text(legalAcceptance.disclaimerText(languageCode: languageCode))
                             .font(.callout.weight(.medium))
                             .foregroundStyle(.white.opacity(0.9))
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
-                    DIRCard("Terms & Privacy", icon: "link", accent: DIRTheme.cyan) {
-                        Link(destination: URL(string: "https://github.com/egopfe/DirDiving-App")!) {
-                            Label("Terms", systemImage: "doc.plaintext")
+                    DIRCard(String(localized: "Terms & Privacy"), icon: "link", accent: DIRTheme.cyan) {
+                        Link(destination: IOSLegalLinks.termsURL) {
+                            Label(String(localized: "Terms"), systemImage: "doc.plaintext")
                                 .foregroundStyle(DIRTheme.cyan)
                         }
-                        Link(destination: URL(string: "https://github.com/egopfe/DirDiving-App")!) {
-                            Label("Privacy", systemImage: "hand.raised")
+                        Link(destination: IOSLegalLinks.privacyURL) {
+                            Label(String(localized: "Privacy"), systemImage: "hand.raised")
                                 .foregroundStyle(DIRTheme.cyan)
                         }
                     }
@@ -299,7 +304,7 @@ struct IOSLegalSafetyView: View {
                 .padding(16)
             }
         }
-        .navigationTitle(Text("Legal & Safety"))
+        .navigationTitle(Text(String(localized: "Legal & Safety")))
         .navigationBarTitleDisplayMode(.inline)
     }
 

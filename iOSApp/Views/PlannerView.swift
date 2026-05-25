@@ -16,6 +16,10 @@ struct PlannerView: View {
         plannerSafetyAckRevision == PlannerSafetyAcknowledgment.currentRevision
     }
 
+    private var visiblePlannerModes: [PlannerMode] {
+        [.advanced]
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -82,27 +86,24 @@ struct PlannerView: View {
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(DIRTheme.muted)
             HStack(spacing: 0) {
-                ForEach(PlannerMode.allCases) { mode in
-                    let isActive = mode == .advanced
+                ForEach(visiblePlannerModes) { mode in
                     Button {
-                        guard isActive else { return }
                         store.mode = mode
                     } label: {
                         Text(plannerModeTabLabel(mode))
                             .font(.caption.weight(.semibold))
                             .lineLimit(1)
                             .minimumScaleFactor(0.72)
-                            .foregroundStyle(store.mode == mode && isActive ? .black : .white.opacity(isActive ? 0.92 : 0.45))
+                            .foregroundStyle(store.mode == mode ? .black : .white.opacity(0.92))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 10)
                             .background(
                                 RoundedRectangle(cornerRadius: 6)
-                                    .fill(store.mode == mode && isActive ? DIRTheme.cyan : .clear)
+                                    .fill(store.mode == mode ? DIRTheme.cyan : .clear)
                             )
                     }
                     .buttonStyle(.plain)
-                    .disabled(!isActive)
-                    .accessibilityLabel(plannerModeAccessibilityLabel(mode, isActive: isActive))
+                    .accessibilityLabel(plannerModeAccessibilityLabel(mode, isActive: true))
                 }
             }
             .padding(4)
@@ -178,9 +179,9 @@ struct PlannerView: View {
                 Divider().overlay(DIRTheme.hairline)
                 plannerDepthField(String(localized: "planner.field.altitude"), meters: $store.input.altitudeMeters, step: unitPreference == .metric ? 100 : 300)
                 Divider().overlay(DIRTheme.hairline)
-                plannerField("GF Low", value: $store.input.gfLow, unit: "%", step: 5)
+                plannerField(String(localized: "planner.field.gf_low"), value: $store.input.gfLow, unit: "%", step: 5)
                 Divider().overlay(DIRTheme.hairline)
-                plannerField("GF High", value: $store.input.gfHigh, unit: "%", step: 5)
+                plannerField(String(localized: "planner.field.gf_high"), value: $store.input.gfHigh, unit: "%", step: 5)
                 Divider().overlay(DIRTheme.hairline)
                 HStack {
                     Text(String(localized: "planner.field.salinity"))
@@ -314,17 +315,19 @@ struct PlannerView: View {
 
     private var technicalAnalysisCard: some View {
         DIRCard(String(localized: "planner.card.density_end"), icon: "gauge", accent: DIRTheme.yellow) {
+            let endMeasurement = Formatters.depth(store.analysis.endMeters, units: unitPreference)
+            let eadMeasurement = store.analysis.eadMeters.map { Formatters.depth($0, units: unitPreference) }
             VStack(spacing: 0) {
                 HStack(spacing: 0) {
                     DIRMetricTile(title: "PPO2", value: Formatters.one(store.analysis.ppO2AtDepth), color: warningColor(ppO2: store.analysis.ppO2AtDepth))
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: String(localized: "planner.metric.density"), value: Formatters.one(store.analysis.densityAtDepth), unit: "g/L", color: densityColor(store.analysis.densityRating))
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: "END", value: Formatters.zero(store.analysis.endMeters), unit: "m", color: store.analysis.endMeters > 30 ? DIRTheme.yellow : DIRTheme.green)
+                    DIRMetricTile(title: "END", value: endMeasurement.value, unit: endMeasurement.unit, color: store.analysis.endMeters > 30 ? DIRTheme.yellow : DIRTheme.green)
                 }
                 Divider().overlay(DIRTheme.hairline)
                 HStack(spacing: 0) {
-                    DIRMetricTile(title: "EAD", value: store.analysis.eadMeters.map { Formatters.zero($0) } ?? "-", unit: store.analysis.eadMeters == nil ? nil : "m", color: DIRTheme.cyan)
+                    DIRMetricTile(title: "EAD", value: eadMeasurement?.value ?? "-", unit: eadMeasurement?.unit, color: DIRTheme.cyan)
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: "CNS", value: Formatters.zero(store.analysis.cnsPercent), unit: "%", color: store.analysis.cnsPercent > 80 ? DIRTheme.red : DIRTheme.cyan)
                     Divider().overlay(DIRTheme.hairline)
@@ -335,7 +338,7 @@ struct PlannerView: View {
     }
 
     private var reserveCard: some View {
-        DIRCard("GAS RESERVE", icon: "gauge", accent: DIRTheme.green) {
+        DIRCard(String(localized: "planner.card.reserve"), icon: "gauge", accent: DIRTheme.green) {
             VStack(spacing: 0) {
                 HStack(spacing: 0) {
                     DIRMetricTile(title: String(localized: "planner.metric.available"), value: Formatters.zero(store.input.availableGasLiters), unit: "L", color: DIRTheme.green)
@@ -346,9 +349,9 @@ struct PlannerView: View {
                 }
                 Divider().overlay(DIRTheme.hairline)
                 HStack(spacing: 0) {
-                    DIRMetricTile(title: "Rock bottom", value: Formatters.zero(store.analysis.minimumGasBar), unit: "bar", color: DIRTheme.orange)
+                    DIRMetricTile(title: String(localized: "planner.metric.rock_bottom"), value: Formatters.zero(store.analysis.minimumGasBar), unit: "bar", color: DIRTheme.orange)
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: "Turn", value: Formatters.zero(store.analysis.turnPressureBar), unit: "bar", color: DIRTheme.cyan)
+                    DIRMetricTile(title: String(localized: "planner.metric.turn_pressure"), value: Formatters.zero(store.analysis.turnPressureBar), unit: "bar", color: DIRTheme.cyan)
                 }
             }
         }
@@ -397,7 +400,7 @@ struct PlannerView: View {
         if store.analysis.warnings.isEmpty {
             DIRWarningBox(text: String(localized: "planner.disclaimer.informative"))
         } else {
-            DIRCard("WARNING", icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
+            DIRCard(String(localized: "planner.warning.title"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
                 VStack(alignment: .leading, spacing: 8) {
                     ForEach(store.analysis.warnings, id: \.self) { warning in
                         HStack(alignment: .top, spacing: 8) {
@@ -416,7 +419,7 @@ struct PlannerView: View {
     }
 
     private var teamPreviewCard: some View {
-        DIRCard("TEAM GAS MATCHING", icon: "person.2", accent: DIRTheme.cyan) {
+        DIRCard(String(localized: "planner.team.matching_title"), icon: "person.2", accent: DIRTheme.cyan) {
             VStack(spacing: 10) {
                 ForEach(store.input.teamMembers) { member in
                     HStack {
@@ -424,12 +427,12 @@ struct PlannerView: View {
                             Text(member.name)
                                 .font(.callout.weight(.semibold))
                                 .foregroundStyle(.white)
-                            Text("SAC \(Formatters.zero(member.sacLitersPerMinute)) L/min")
+                            Text(String(format: String(localized: "planner.team.sac_format"), Formatters.zero(member.sacLitersPerMinute)))
                                 .font(.caption)
                                 .foregroundStyle(DIRTheme.muted)
                         }
                         Spacer()
-                        Text("\(Formatters.zero(member.cylinder.availableGasLiters)) L")
+                        Text(String(format: String(localized: "planner.team.available_gas_format"), Formatters.zero(member.cylinder.availableGasLiters)))
                             .font(.callout.monospacedDigit().weight(.semibold))
                             .foregroundStyle(DIRTheme.cyan)
                     }
@@ -601,7 +604,7 @@ struct PlanResultView: View {
         } else {
             lines.append(String(localized: "planner.export.deco_stops"))
             for stop in store.plan.decoStops {
-                lines.append("  \(Formatters.one(stop.depthMeters)) m · \(stop.minutes) min · \(stop.gas) · PPO2 \(Formatters.one(stop.ppO2))")
+                lines.append(String(format: String(localized: "planner.export.deco_stop_line"), depthText(stop.depthMeters), stop.minutes, stop.gas, Formatters.one(stop.ppO2)))
             }
         }
         lines.append(String(localized: "planner.export.indicative_footer"))
@@ -702,11 +705,12 @@ struct PlanResultView: View {
     }
 
     private var resultGrid: some View {
-        VStack(spacing: 0) {
+        let endMeasurement = Formatters.depth(store.analysis.endMeters, units: unitPreference)
+        return VStack(spacing: 0) {
             HStack(spacing: 0) {
                     DIRMetricTile(title: "TTR", value: "\(store.plan.ttrMinutes)", unit: "min")
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: "Deco Stops", value: "\(store.plan.decoStops.count)")
+                    DIRMetricTile(title: String(localized: "planner.result.deco_stops"), value: "\(store.plan.decoStops.count)")
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: "OTU", value: Formatters.zero(store.plan.otu))
             }
@@ -728,12 +732,12 @@ struct PlanResultView: View {
                 Divider().overlay(DIRTheme.hairline)
                 DIRMetricTile(
                     title: "END",
-                    value: Formatters.depth(store.analysis.endMeters, units: unitPreference).value,
-                    unit: Formatters.depth(store.analysis.endMeters, units: unitPreference).unit,
+                    value: endMeasurement.value,
+                    unit: endMeasurement.unit,
                     color: DIRTheme.yellow
                 )
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: "Turn", value: Formatters.zero(store.analysis.turnPressureBar), unit: "bar", color: DIRTheme.cyan)
+                DIRMetricTile(title: String(localized: "planner.metric.turn_pressure"), value: Formatters.zero(store.analysis.turnPressureBar), unit: "bar", color: DIRTheme.cyan)
             }
         }
         .background(
@@ -760,7 +764,7 @@ struct PlanResultView: View {
                         Formatters.one(stop.ppO2)
                     ])
                 }
-                tableRow([depthText(0), "-", "SURFACE", "-"])
+                tableRow([depthText(0), "-", String(localized: "planner.table.surface"), "-"])
             }
         }
     }
@@ -833,14 +837,19 @@ struct PlanResultView: View {
     }
 
     private var teamMatchCard: some View {
-        DIRCard("TEAM GAS MATCH", icon: "person.2", accent: DIRTheme.cyan) {
+        DIRCard(String(localized: "planner.team.match_title"), icon: "person.2", accent: DIRTheme.cyan) {
             VStack(spacing: 8) {
-                tableRow(["Diver", "SAC", "Gas", "Status"], isHeader: true)
+                tableRow([
+                    String(localized: "planner.table.diver"),
+                    String(localized: "planner.table.sac"),
+                    String(localized: "planner.table.gas"),
+                    String(localized: "planner.table.status")
+                ], isHeader: true)
                 ForEach(store.plan.teamMatches) { match in
                     tableRow([
                         match.diverName,
                         "\(Formatters.zero(match.sacLitersMinute))",
-                        "\(Formatters.zero(match.availableLiters)) L",
+                        String(format: String(localized: "planner.team.available_gas_format"), Formatters.zero(match.availableLiters)),
                         match.status
                     ])
                 }
@@ -849,7 +858,7 @@ struct PlanResultView: View {
     }
 
     private var briefingCard: some View {
-        DIRCard("BRIEFING", icon: "doc.text", accent: DIRTheme.green) {
+        DIRCard(String(localized: "planner.briefing.title"), icon: "doc.text", accent: DIRTheme.green) {
             VStack(alignment: .leading, spacing: 8) {
                 ForEach(store.plan.briefingLines, id: \.self) { line in
                     HStack(alignment: .top, spacing: 8) {
@@ -887,7 +896,7 @@ struct PlanResultView: View {
             if store.input.buhlmannUsesTrimixBackGas {
                 DIRWarningBox(text: String(localized: "planner.gas.trimix_buhlmann_disclaimer"))
             }
-            DIRCard("CURVA BUHLMANN ZH-L16C", icon: nil, accent: DIRTheme.cyan) {
+            DIRCard(String(localized: "planner.buhlmann.curve_title"), icon: nil, accent: DIRTheme.cyan) {
                 Chart(store.buhlmann.curve) { point in
                     LineMark(
                         x: .value("Minutes", point.ndlMinutes),

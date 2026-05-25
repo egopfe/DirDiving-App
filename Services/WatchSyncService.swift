@@ -7,6 +7,13 @@ import os
 final class WatchSyncService: NSObject, ObservableObject {
     static let shared = WatchSyncService()
 
+    struct SyncActivityItem: Identifiable, Hashable {
+        let id = UUID()
+        let title: String
+        let detail: String
+        let timestamp: Date
+    }
+
     @Published private(set) var isSupported = WCSession.isSupported()
     @Published private(set) var activationState: WCSessionActivationState = .notActivated
     @Published private(set) var lastSyncStatus = String(localized: "Companion non sincronizzato")
@@ -16,6 +23,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published private(set) var failedTransferCount = 0
     @Published private(set) var lastRetryDate: Date?
     @Published private(set) var importedFromCompanionCount = 0
+    @Published private(set) var recentActivity: [SyncActivityItem] = []
 
     private var pendingSessions: [DiveSession] = []
     private let legacyPendingSessionsKey = "dirdiving_watch_pending_sync_sessions"
@@ -25,6 +33,11 @@ final class WatchSyncService: NSObject, ObservableObject {
     private var peerSecretObserver: NSObjectProtocol?
 
     private static let logger = Logger(subsystem: "com.egopfe.dirdiving", category: "WatchSyncService")
+    private static let activityDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd/MM HH:mm"
+        return formatter
+    }()
 
     private override init() {
         super.init()
@@ -65,6 +78,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         guard WCSession.isSupported() else { return }
         if importedFromCompanionIDs.contains(session.id) { return }
         enqueuePendingSession(session)
+        recordActivity(title: String(localized: "sync.activity.pending_to_iphone"), detail: sessionSummary(session))
 
         if WatchSyncAuth.hasPeerSecret() {
             flushPendingTransfers()
@@ -130,6 +144,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             rememberCompanionSession(id: session.id)
             logStore?.addFromCompanion(session)
             lastSyncStatus = String(localized: "Immersione ricevuta da iPhone")
+            recordActivity(title: String(localized: "sync.activity.received_from_iphone"), detail: sessionSummary(session))
         } catch {
             failedTransferCount += 1
             lastSyncStatus = String(format: String(localized: "Errore import iPhone: %@"), error.localizedDescription)
@@ -186,10 +201,12 @@ final class WatchSyncService: NSObject, ObservableObject {
                             self.removePendingSession(id: session.id)
                             self.acknowledgedTransferCount += 1
                             self.lastSyncStatus = String(localized: "Delivered/acknowledged: ack firmato dal companion")
+                            self.recordActivity(title: String(localized: "sync.activity.delivered_to_iphone"), detail: self.sessionSummary(session))
                         } else if legacyOK {
                             self.removePendingSession(id: session.id)
                             self.acknowledgedTransferCount += 1
                             self.lastSyncStatus = String(localized: "Delivered/acknowledged: ack legacy (companion da aggiornare)")
+                            self.recordActivity(title: String(localized: "sync.activity.delivered_to_iphone"), detail: self.sessionSummary(session))
                         } else {
                             self.failedTransferCount += 1
                             self.lastSyncStatus = String(localized: "Failed: iPhone non ha confermato import; pending conservato")
@@ -202,14 +219,17 @@ final class WatchSyncService: NSObject, ObservableObject {
                         self.lastSyncStatus = String(format: String(localized: "Failed: diretto non riuscito; sent via coda, ack pending: %@"), error.localizedDescription)
                         self.sentTransferCount += 1
                         WCSession.default.transferUserInfo(envelope.message)
+                        self.recordActivity(title: String(localized: "sync.activity.queued_to_iphone"), detail: self.sessionSummary(session))
                     }
                 }
                 sentTransferCount += 1
                 lastSyncStatus = String(localized: "Sent: messaggio diretto inviato, attendo ack")
+                recordActivity(title: String(localized: "sync.activity.sent_to_iphone"), detail: sessionSummary(session))
             } else {
                 WCSession.default.transferUserInfo(envelope.message)
                 sentTransferCount += 1
                 lastSyncStatus = String(localized: "Sent: coda WatchConnectivity, ack pending")
+                recordActivity(title: String(localized: "sync.activity.queued_to_iphone"), detail: sessionSummary(session))
             }
         } catch WatchDiveSyncError.missingPeerSecret {
             enqueuePendingSession(session)
@@ -282,9 +302,25 @@ final class WatchSyncService: NSObject, ObservableObject {
         do {
             try UserImageStore.importCompanionPhoto(from: file.fileURL, fileName: fileName)
             lastSyncStatus = String(localized: "Foto iPhone ricevuta")
+            recordActivity(title: String(localized: "sync.activity.photo_from_iphone"), detail: fileName)
         } catch {
             lastSyncStatus = String(format: String(localized: "Errore foto iPhone: %@"), error.localizedDescription)
         }
+    }
+
+    private func sessionSummary(_ session: DiveSession) -> String {
+        let started = Self.activityDateFormatter.string(from: session.startDate)
+        let minutes = Int((session.durationSeconds / 60).rounded())
+        return "\(started) · \(Formatters.one(session.maxDepthMeters)) m · \(minutes) min"
+    }
+
+    private func recordActivity(title: String, detail: String) {
+        let normalizedDetail = detail.isEmpty ? "—" : detail
+        recentActivity.insert(
+            SyncActivityItem(title: title, detail: normalizedDetail, timestamp: Date()),
+            at: 0
+        )
+        recentActivity = Array(recentActivity.prefix(6))
     }
 }
 

@@ -28,12 +28,12 @@ struct MoreView: View {
                             row(String(localized: "more.settings.sync_scope_title"), String(localized: "more.settings.sync_scope_value"))
                             row(String(localized: "units.title"), String(localized: "more.settings.units_synced"))
                             row(String(localized: "more.settings.local_only_title"), String(localized: "more.settings.local_only_value"))
-                            row(String(localized: "Planner safety"), String(localized: "Disclaimer richiesto"))
+                            row(String(localized: "more.planner_safety.title"), String(localized: "Disclaimer richiesto"))
                             NavigationLink {
                                 IOSLegalSafetyView()
                             } label: {
                                 HStack {
-                                    Label("Legal & Safety", systemImage: "checkmark.shield")
+                                    Label(String(localized: "Legal & Safety"), systemImage: "checkmark.shield")
                                         .foregroundStyle(DIRTheme.cyan)
                                     Spacer()
                                     Image(systemName: "chevron.right")
@@ -49,6 +49,7 @@ struct MoreView: View {
                             row(String(localized: "more.sync.supported"), watchSync.isSupported ? String(localized: "more.yes") : String(localized: "more.no"))
                             row(String(localized: "more.sync.state"), watchSync.userVisibleState)
                             row(String(localized: "more.sync.last_event"), watchSync.lastMessage)
+                            syncActivitySection
                             WatchPhotoTransferPanel()
                             Button {
                                 watchSync.syncUnpushedSessionsToWatch()
@@ -238,6 +239,30 @@ struct MoreView: View {
                 .padding(.vertical, 4)
                 if conflict.id != watchSync.conflicts.last?.id {
                     Divider().overlay(DIRTheme.hairline)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var syncActivitySection: some View {
+        if !watchSync.recentActivity.isEmpty {
+            Divider().overlay(DIRTheme.hairline)
+            VStack(alignment: .leading, spacing: 8) {
+                Text(String(localized: "sync.activity.section_title"))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.muted)
+                ForEach(Array(watchSync.recentActivity.prefix(4))) { activity in
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(activity.title)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.white)
+                        Text(activity.detail)
+                            .font(.caption2)
+                            .foregroundStyle(DIRTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.vertical, 2)
                 }
             }
         }

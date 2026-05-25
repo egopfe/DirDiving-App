@@ -19,18 +19,18 @@ struct InfoView: View {
                     }
                     header
 
-                    Text("INFO")
+                    Text(String(localized: "info.title"))
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
 
                     VStack(spacing: 4) {
-                        infoRow(title: "Versione", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "n/d")
+                        infoRow(title: String(localized: "Versione"), value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "n/d")
                         deviceRow
                         batteryRow
                         depthDiagnostics
-                        infoRow(title: "Sync", value: watchSync.lastSyncStatus)
-                        infoRow(title: "Spazio libero", value: "Gestito da watchOS")
+                        infoRow(title: String(localized: "info.sync"), value: watchSync.lastSyncStatus)
+                        infoRow(title: String(localized: "Spazio libero"), value: String(localized: "Gestito da watchOS"))
                     }
                 }
                 .padding(.horizontal, 11)
@@ -81,7 +81,7 @@ struct InfoView: View {
 
     private var deviceRow: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text("Dispositivo")
+            Text(String(localized: "Dispositivo"))
                 .font(.system(size: 11, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white)
             Text(WKInterfaceDevice.current().name)
@@ -100,7 +100,7 @@ struct InfoView: View {
         let percent = batteryLevel >= 0 ? Int((batteryLevel * 100).rounded()) : -1
         VStack(spacing: 5) {
             HStack {
-                Text("Batteria")
+                Text(String(localized: "Batteria"))
                     .font(.system(size: 11, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
                 Spacer()
@@ -129,7 +129,7 @@ struct InfoView: View {
 
     private var depthDiagnostics: some View {
         VStack(alignment: .leading, spacing: 5) {
-            diagnosticRow(String(localized: "Entitlement profondità"), String(localized: "Configurato"))
+            diagnosticRow(String(localized: "Entitlement profondità"), String(localized: "info.depth.entitlement.review_required"))
             diagnosticRow(
                 String(localized: "Sensore profondità"),
                 CMWaterSubmersionManager.waterSubmersionAvailable
@@ -140,7 +140,7 @@ struct InfoView: View {
                 String(localized: "Callback acqua"),
                 dive.isDepthAutomationAvailable ? String(localized: "Pronto") : String(localized: "Non verificabile")
             )
-            Text("Richiede validazione reale su Apple Watch Ultra. Il simulatore/macOS non certifica profondità o pressione.")
+            Text(String(localized: "info.depth.validation_note"))
                 .font(.system(size: 9, weight: .semibold, design: .rounded))
                 .foregroundStyle(DiveUI.yellow)
                 .fixedSize(horizontal: false, vertical: true)
@@ -157,7 +157,6 @@ struct InfoView: View {
 
     private func diagnosticValueIsPositive(_ value: String) -> Bool {
         let positives = [
-            String(localized: "Configurato"),
             String(localized: "Disponibile"),
             String(localized: "Pronto")
         ]

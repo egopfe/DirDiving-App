@@ -8,6 +8,7 @@ struct DiveLiveView: View {
     @AppStorage(HapticService.hapticsEnabledKey) private var hapticsEnabled = true
     @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
     @State private var ascentHapticLoopTask: Task<Void, Never>?
+    @State private var showResetStopwatchConfirmation = false
 
     private var unitPreference: DIRUnitPreference { DIRUnitPreference.fromStorage(watchUnits) }
 
@@ -66,6 +67,14 @@ struct DiveLiveView: View {
         .onDisappear {
             ascentHapticLoopTask?.cancel()
             HapticService.shared.ascentAlarmCleared()
+        }
+        .confirmationDialog(String(localized: "live.stopwatch.reset.confirm.title"), isPresented: $showResetStopwatchConfirmation, titleVisibility: .visible) {
+            Button(String(localized: "live.stopwatch.reset.confirm.action"), role: .destructive) {
+                dive.resetStopwatch()
+            }
+            Button(String(localized: "log.delete.cancel"), role: .cancel) {}
+        } message: {
+            Text(String(localized: "live.stopwatch.reset.confirm.message"))
         }
     }
 
@@ -585,7 +594,11 @@ struct DiveLiveView: View {
                 }
                 .accessibilityLabel(String(localized: "live.stopwatch.stop.a11y"))
                 DiveCommandButton("RESET", systemImage: "arrow.clockwise", color: .white.opacity(0.78)) {
-                    dive.resetStopwatch()
+                    if dive.stopwatchTime > 0 {
+                        showResetStopwatchConfirmation = true
+                    } else {
+                        dive.resetStopwatch()
+                    }
                 }
                 .accessibilityLabel(String(localized: "live.stopwatch.reset.a11y"))
                 .accessibilityHint(String(localized: "live.stopwatch.reset.hint"))

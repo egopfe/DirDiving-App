@@ -70,8 +70,8 @@ struct SettingsView: View {
                         settingsRow(
                             icon: "checkmark.shield",
                             iconColor: DiveUI.red,
-                            title: "Legal & Safety",
-                            subtitle: "NOT A DIVE COMPUTER",
+                            title: String(localized: "Legal & Safety"),
+                            subtitle: String(localized: "NOT A DIVE COMPUTER"),
                             showsChevron: true
                         )
                     }
@@ -126,6 +126,9 @@ struct SettingsView: View {
                         title: String(localized: "Sync acknowledged"),
                         subtitle: String(format: String(localized: "%lld confermati da iPhone"), watchSync.acknowledgedTransferCount)
                     )
+                    if !watchSync.recentActivity.isEmpty {
+                        syncActivityPanel
+                    }
                     settingsRow(
                         icon: "square.and.arrow.up",
                         iconColor: DiveUI.green,
@@ -348,6 +351,36 @@ struct SettingsView: View {
         formatter.dateFormat = "HH:mm"
         return formatter
     }()
+
+    private var syncActivityPanel: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(String(localized: "sync.activity.section_title"))
+                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .foregroundStyle(DiveUI.secondaryText)
+            ForEach(Array(watchSync.recentActivity.prefix(4))) { activity in
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(activity.title)
+                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                    Text(activity.detail)
+                        .font(.system(size: 9, weight: .medium, design: .rounded))
+                        .foregroundStyle(DiveUI.secondaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.vertical, 2)
+            }
+        }
+        .padding(.horizontal, 9)
+        .padding(.vertical, 7)
+        .background(
+            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                .fill(Color.black.opacity(0.38))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .stroke(.white.opacity(0.24), lineWidth: 1)
+                )
+        )
+    }
 
     private var header: some View {
         HStack(alignment: .center) {

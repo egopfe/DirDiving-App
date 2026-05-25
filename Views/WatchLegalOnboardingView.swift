@@ -1,5 +1,10 @@
 import SwiftUI
 
+private enum WatchLegalLinks {
+    static let termsURL = "https://github.com/egopfe/DirDiving-App/blob/main/Docs/TERMS_OF_USE.md"
+    static let privacyURL = "https://github.com/egopfe/DirDiving-App/blob/main/Docs/PRIVACY_AND_DATA_USE.md"
+}
+
 struct WatchLegalOnboardingView: View {
     @EnvironmentObject private var legalAcceptance: LegalAcceptanceStore
     let languageCode: String
@@ -257,15 +262,15 @@ struct WatchLegalSafetyView: View {
                             Text("DIR Diving is NOT a dive computer.")
                                 .font(.system(size: 15, weight: .black, design: .rounded))
                                 .foregroundStyle(DiveUI.red)
-                            infoRow("Version accepted", legalAcceptance.acceptedVersionText)
-                            infoRow("Acceptance timestamp", legalAcceptance.acceptedTimestampText)
-                            infoRow("Language", legalAcceptance.acceptedLanguageText)
+                            infoRow(String(localized: "Version accepted"), legalAcceptance.acceptedVersionText)
+                            infoRow(String(localized: "Acceptance timestamp"), legalAcceptance.acceptedTimestampText)
+                            infoRow(String(localized: "Language"), legalAcceptance.acceptedLanguageText)
                         }
                     }
 
                     DivePanel(stroke: DiveUI.yellow) {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Full disclaimer")
+                            Text(String(localized: "Full disclaimer"))
                                 .font(.system(size: 14, weight: .black, design: .rounded))
                                 .foregroundStyle(DiveUI.yellow)
                             Text(legalAcceptance.disclaimerText(languageCode: languageCode))
@@ -276,8 +281,8 @@ struct WatchLegalSafetyView: View {
                     }
 
                     HStack(spacing: 8) {
-                        legalLink("Terms", url: "https://github.com/egopfe/DirDiving-App")
-                        legalLink("Privacy", url: "https://github.com/egopfe/DirDiving-App")
+                        legalLink("Terms", url: WatchLegalLinks.termsURL)
+                        legalLink("Privacy", url: WatchLegalLinks.privacyURL)
                     }
                 }
                 .padding(.horizontal, DiveUI.screenPadding)

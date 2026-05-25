@@ -129,8 +129,8 @@ struct CompassView: View {
             if dive.isDiveActive {
                 HStack(spacing: 7) {
                     let depthDisplay = WatchDepthFormatting.display(meters: dive.currentDepthMeters, units: unitPreference)
-                    inDiveMetric(title: "PROFONDITÀ", value: depthDisplay.valueText, unit: depthDisplay.unitLabel)
-                    inDiveMetric(title: "RUNTIME", value: Formatters.time(dive.runtime), unit: nil)
+                    inDiveMetric(title: String(localized: "compass.metric.depth"), value: depthDisplay.valueText, unit: depthDisplay.unitLabel)
+                    inDiveMetric(title: String(localized: "compass.metric.runtime"), value: Formatters.time(dive.runtime), unit: nil)
                 }
             } else {
                 Text("Dati immersione non disponibili")
@@ -193,7 +193,7 @@ struct CompassView: View {
     private var controls: some View {
         VStack(spacing: 6) {
             if compass.bearingDegrees != nil {
-                Text("BEARING \(bearingText) | DELTA \(deltaText)")
+                Text(String(format: String(localized: "compass.bearing.delta_format"), bearingText, deltaText))
                     .font(.system(size: 10, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.yellow)
                     .lineLimit(1)
@@ -206,7 +206,7 @@ struct CompassView: View {
                     HapticService.shared.confirm()
                     showBearingToast(String(localized: "compass.bearing.set.toast"))
                 } label: {
-                    Text("SET BEARING")
+                    Text(String(localized: "compass.bearing.set"))
                         .font(.system(size: 11, weight: .black, design: .rounded))
                         .foregroundStyle(DiveUI.yellow)
                         .frame(maxWidth: .infinity, minHeight: 31)
