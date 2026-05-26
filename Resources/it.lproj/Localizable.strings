@@ -298,8 +298,8 @@
 "settings.sync.clear.confirm.message" = "Rimuove i trasferimenti Watch in attesa o falliti. Le immersioni gia salvate sul Watch restano nel log locale.";
 "settings.display.watchos" = "Gestito da watchOS";
 "settings.audio.info" = "Toni audio non implementati; sott'acqua solo vibrazione.";
-"settings.manual.fallback" = "Fallback solo se sensore non disponibile";
-"settings.manual.live" = "Disponibile su schermata live";
+"settings.manual.fallback" = "Disponibile insieme all'avvio automatico";
+"settings.manual.live" = "Usa avvio manuale dalla schermata live";
 "settings.haptics.on" = "Attiva per warning e conferme";
 "settings.haptics.off" = "Disattivata";
 "settings.language.subtitle" = "System / Italiano / English";
@@ -334,7 +334,9 @@
 "shortcuts.help.underwater.title" = "Sott'acqua";
 "shortcuts.help.underwater.body" = "Durante l'immersione restano solo Live e Bussola. Log, impostazioni e immagini dopo la fine immersione.";
 "live.auto_dive.waiting.title" = "Immersione automatica";
-"live.auto_dive.waiting.subtitle" = "Parte in immersione — non serve il tasto Avvio";
+"live.auto_dive.waiting.subtitle" = "Parte automaticamente in immersione; puoi anche usare AVVIO MANUALE.";
+"live.manual_start.title" = "Avvio manuale";
+"live.manual_start.body" = "Avvia subito la sessione senza disattivare l'avvio automatico in immersione.";
 "live.auto_dive.active.hint" = "L'immersione termina in superficie automaticamente.";
 "live.waiting.start" = "In attesa di avvio…";
 "live.gps.start.hint" = "Il punto GPS di inizio viene registrato all'avvio dell'immersione.";

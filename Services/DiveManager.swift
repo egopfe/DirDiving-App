@@ -79,6 +79,7 @@ final class DiveManager: NSObject, ObservableObject {
     private var lastBatteryAlarmDate: Date?
     private var lastAlarmDismissDate: Date?
     private var activeDiveExceededSupportedDepth = false
+    private var hasObservedSubmersionDuringCurrentDive = false
 
     init(logStore: DiveLogStore, gpsManager: GPSManager, ascentSettings: AscentRateSettingsStore) {
         self.logStore = logStore
@@ -130,7 +131,6 @@ final class DiveManager: NSObject, ObservableObject {
     func toggleStopwatch() { isStopwatchRunning ? stopStopwatch() : startStopwatch() }
 
     func startManualDive() {
-        guard !isDepthAutomationAvailable else { return }
         beginDiveIfNeeded(isManual: true)
     }
 
@@ -152,6 +152,7 @@ final class DiveManager: NSObject, ObservableObject {
         gpsManager.start()
         isDiveActive = true
         isManualLifecycleActive = isManual
+        hasObservedSubmersionDuringCurrentDive = !isManual
         HapticService.shared.criticalConfirm()
         alarmWarningMessage = nil
         sessionStart = Date()
@@ -195,6 +196,7 @@ final class DiveManager: NSObject, ObservableObject {
         isDiveActive = false
         isFinalizingDive = true
         isManualLifecycleActive = false
+        hasObservedSubmersionDuringCurrentDive = false
         HapticService.shared.criticalConfirm()
         runtimeTimer?.invalidate()
         runtimeTimer = nil
@@ -361,8 +363,18 @@ extension DiveManager: CMWaterSubmersionManagerDelegate {
     nonisolated func manager(_ manager: CMWaterSubmersionManager, didUpdate event: CMWaterSubmersionEvent) {
         Task { @MainActor in
             switch event.state {
-            case .submerged: beginDiveIfNeeded()
-            case .notSubmerged: endDiveIfNeeded()
+            case .submerged:
+                if isDiveActive {
+                    hasObservedSubmersionDuringCurrentDive = true
+                    if isManualLifecycleActive {
+                        isManualLifecycleActive = false
+                    }
+                } else {
+                    beginDiveIfNeeded()
+                }
+            case .notSubmerged:
+                guard !isManualLifecycleActive || hasObservedSubmersionDuringCurrentDive else { return }
+                endDiveIfNeeded()
             case .unknown: break
             @unknown default: break
             }

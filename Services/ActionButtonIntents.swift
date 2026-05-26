@@ -33,7 +33,7 @@ struct ResetStopwatchIntent: AppIntent {
 
 struct StartManualDiveIntent: AppIntent {
     static var title: LocalizedStringResource = "Start DIR DIVING Manual Dive"
-    static var description = IntentDescription("Start a manual DIR DIVING session when depth automation is unavailable.")
+    static var description = IntentDescription("Start a manual DIR DIVING session without disabling automatic dive start.")
 
     func perform() async throws -> some IntentResult {
         try await MainActor.run {

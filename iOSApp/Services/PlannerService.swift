@@ -5,8 +5,9 @@ enum PlannerService {
         var working = input
         working.syncLegacyGasesFromPlannerCylinders()
         let bottom = PlannerGasSchedule.bottomGas(from: working)
-        let ndl = BuhlmannPlanner.plan(depthMeters: working.plannedDepthMeters, bottomGas: bottom).ndlMinutes
-        let needsDeco = working.plannedBottomMinutes > ndl || working.plannedDepthMeters >= 35
+        let planningDepth = working.buhlmannPlanningDepthMeters
+        let ndl = BuhlmannPlanner.plan(depthMeters: planningDepth, bottomGas: bottom).ndlMinutes
+        let needsDeco = working.plannedBottomMinutes > ndl || planningDepth >= 35
         let analysis = GasPlanningService.analyze(input: working)
         let stopPlan = PlannerGasSchedule.buildDecoStops(needsDeco: needsDeco, input: working)
         let requestedStops = stopPlan.requested

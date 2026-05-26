@@ -135,8 +135,9 @@ enum PlannerGasSchedule {
             return true
         }
         let bottom = bottomGas(from: working)
-        let ndl = BuhlmannPlanner.plan(depthMeters: working.plannedDepthMeters, bottomGas: bottom).ndlMinutes
-        let needsDeco = working.plannedBottomMinutes > ndl || working.plannedDepthMeters >= 35
+        let planningDepth = working.buhlmannPlanningDepthMeters
+        let ndl = BuhlmannPlanner.plan(depthMeters: planningDepth, bottomGas: bottom).ndlMinutes
+        let needsDeco = working.plannedBottomMinutes > ndl || planningDepth >= 35
         let stopPlan = buildDecoStops(needsDeco: needsDeco, input: working)
         return !PlannerMODValidator.validateAll(input: working, requestedStops: stopPlan.requested).isEmpty
     }

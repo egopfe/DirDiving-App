@@ -250,6 +250,9 @@ struct DiveLiveView: View {
 
             if dive.isDepthAutomationAvailable {
                 autoDiveStatusPanel
+                Spacer(minLength: 16)
+                surfaceManualStartPanel
+                Spacer(minLength: 8)
             } else {
                 HStack(spacing: 9) {
                     Image(systemName: "mappin.circle.fill")
@@ -361,6 +364,32 @@ struct DiveLiveView: View {
                 .lineSpacing(2)
         }
         .padding(.horizontal, 4)
+    }
+
+    private var surfaceManualStartPanel: some View {
+        VStack(spacing: 8) {
+            Text(String(localized: "live.manual_start.title"))
+                .font(.system(size: 10, weight: .black, design: .rounded))
+                .foregroundStyle(DiveUI.yellow)
+                .multilineTextAlignment(.center)
+            Text(String(localized: "live.manual_start.body"))
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            DiveCommandButton(String(localized: "AVVIO MANUALE"), systemImage: "play.circle.fill", color: DiveUI.green) {
+                dive.startManualDive()
+            }
+        }
+        .padding(9)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(DiveUI.yellow.opacity(0.10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(DiveUI.yellow.opacity(0.7), lineWidth: 1)
+                )
+        )
     }
 
     private var immersionStatus: some View {

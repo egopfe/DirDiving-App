@@ -54,7 +54,10 @@ final class PlannerStore: ObservableObject {
         isApplyingInputSideEffects = true
         input.normalizeAllPlannerGases()
         input.syncLegacyGasesFromPlannerCylinders()
-        buhlmann = BuhlmannPlanner.plan(depthMeters: input.plannedDepthMeters, bottomGas: input.bottomGas)
+        buhlmann = BuhlmannPlanner.plan(
+            depthMeters: input.buhlmannPlanningDepthMeters,
+            bottomGas: input.buhlmannBackGas
+        )
         plan = PlannerService.makePlan(input: input)
         isApplyingInputSideEffects = false
     }

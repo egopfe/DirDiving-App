@@ -298,8 +298,8 @@
 "settings.sync.clear.confirm.message" = "Removes pending or failed Watch transfers. Saved dives remain in the local log.";
 "settings.display.watchos" = "Managed by watchOS";
 "settings.audio.info" = "Audio tones are not implemented; underwater feedback uses haptics only.";
-"settings.manual.fallback" = "Fallback when sensor unavailable";
-"settings.manual.live" = "Available on live screen";
+"settings.manual.fallback" = "Available alongside automatic start";
+"settings.manual.live" = "Use manual start from the live screen";
 "settings.haptics.on" = "Active for warnings and confirmations";
 "settings.haptics.off" = "Disabled";
 "settings.language.subtitle" = "System / Italian / English";
@@ -334,7 +334,9 @@
 "shortcuts.help.underwater.title" = "Underwater";
 "shortcuts.help.underwater.body" = "During an active dive, only Live and Compass are reachable. Log, Settings, and images wait until the dive ends.";
 "live.auto_dive.waiting.title" = "Auto dive";
-"live.auto_dive.waiting.subtitle" = "Starts when submerged — no Start button needed";
+"live.auto_dive.waiting.subtitle" = "Starts automatically when submerged; MANUAL START is also available.";
+"live.manual_start.title" = "Manual start";
+"live.manual_start.body" = "Start the session now without disabling automatic start when submerged.";
 "live.auto_dive.active.hint" = "Dive ends automatically when you surface.";
 "live.waiting.start" = "Waiting to start…";
 "live.gps.start.hint" = "Start GPS point is recorded when the dive begins.";

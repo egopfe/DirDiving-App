@@ -11,7 +11,8 @@
 
 | Documento | Contenuto | Stato |
 |-----------|-----------|--------|
-| [`DIR_Diving_Complete_Development_Notes_UPDATED_v9.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v9.md) | **Note sviluppo complete aggiornate (v9)** — iOS + Watch: icone, equipment, planner gas/Bühlmann, MOD, Watch allarmi/nav, checklist GAS | **Corrente (spec)** — da `origin` @ `412b365` |
+| [`DIR_Diving_Complete_Development_Notes_UPDATED_v10.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v10.md) | **Note sviluppo complete aggiornate (v10)** — backlog/spec iOS + Apple Watch aggiornato al 2026-05-25 | **Corrente (spec)** — file locale indicizzato |
+| [`DIR_Diving_Complete_Development_Notes_UPDATED_v9.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v9.md) | **Note sviluppo complete aggiornate (v9)** — iOS + Watch: icone, equipment, planner gas/Bühlmann, MOD, Watch allarmi/nav, checklist GAS | Spec precedente |
 | [`DIR_Diving_Complete_Development_Notes_UPDATED_v8.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v8.md) | Note sviluppo v8 (stesso ambito di v9; in caso di differenze preferire **v9**) | Spec precedente |
 | [`DIR_DIVING_v8_IMPLEMENTATION_REPORT.md`](DIR_DIVING_v8_IMPLEMENTATION_REPORT.md) | Report implementazione v8 in codice: gas mix Air/EAN/Trimix, MOD, schedule travel/bailout, disclaimer trimix Bühlmann | **Completato** @ `a36dc23` |
 | [`DIR_DIVING_v9_IMPLEMENTATION_REPORT.md`](DIR_DIVING_v9_IMPLEMENTATION_REPORT.md) | Report implementazione v9: immagini Watch in superficie, sync Planner/Bühlmann su input | **Completato** @ `d962117` |
@@ -124,7 +125,8 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`MAIN_ISSUES_IMPLEMENTATION_REPORT_20260520.md`](MAIN_ISSUES_IMPLEMENTATION_REPORT_20260520.md) | Implementazione issue backlog |
 | [`MAIN_BRANCH_ISSUES_AND_PRIORITIES_20260520.md`](MAIN_BRANCH_ISSUES_AND_PRIORITIES_20260520.md) | Priorità issue |
 | [`DIR_Diving_Main_Branch_Development_Notes.md`](DIR_Diving_Main_Branch_Development_Notes.md) | Note prodotto storiche (unità, disclaimer, manual dive) |
-| [`DIR_Diving_Complete_Development_Notes_UPDATED_v9.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v9.md) | → vedi **§0** (spec prodotto **corrente**) |
+| [`DIR_Diving_Complete_Development_Notes_UPDATED_v10.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v10.md) | → vedi **§0** (spec prodotto **corrente**) |
+| [`DIR_Diving_Complete_Development_Notes_UPDATED_v9.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v9.md) | → vedi **§0** (spec prodotto precedente) |
 | [`DIR_Diving_Complete_Development_Notes_UPDATED_v8.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v8.md) | → vedi **§0** |
 | [`DIR_DIVING_v8_IMPLEMENTATION_REPORT.md`](DIR_DIVING_v8_IMPLEMENTATION_REPORT.md) | → vedi **§0** (implementazione v8 in codice) |
 | [`DIR_DIVING_v9_IMPLEMENTATION_REPORT.md`](DIR_DIVING_v9_IMPLEMENTATION_REPORT.md) | → vedi **§0** (implementazione v9 in codice) |
@@ -255,7 +257,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 ## 12. Percorso rapido (30 minuti)
 
 1. [`../README.md`](../README.md) — panoramica e branch strategy  
-2. [`DIR_Diving_Complete_Development_Notes_UPDATED_v9.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v9.md) — **backlog prodotto corrente** (iOS + Watch)  
+2. [`DIR_Diving_Complete_Development_Notes_UPDATED_v10.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v10.md) — **backlog prodotto corrente** (iOS + Watch)
 3. [`DIR_DIVING_v8_IMPLEMENTATION_REPORT.md`](DIR_DIVING_v8_IMPLEMENTATION_REPORT.md) — cosa è già implementato in codice (v8) @ `a36dc23`  
 4. [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md) — **§B, §M, §N, §O**  
 5. [`DOCUMENTATION_UPDATE_REPORT_20260525.md`](DOCUMENTATION_UPDATE_REPORT_20260525.md) + [`DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md) — allineamento documentazione/branch corrente
@@ -291,6 +293,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`DEPTH_LIMIT_SAFETY_TEST_CHECKLIST.md`](DEPTH_LIMIT_SAFETY_TEST_CHECKLIST.md) | §3 |
 | [`DEVELOPMENT_NOTES_25_05_2026_IMPLEMENTATION_REPORT.md`](DEVELOPMENT_NOTES_25_05_2026_IMPLEMENTATION_REPORT.md) | §0 |
 | [`DIR_Diving_Complete_Development_Notes_25_05_2026.md`](DIR_Diving_Complete_Development_Notes_25_05_2026.md) | §0 |
+| [`DIR_Diving_Complete_Development_Notes_UPDATED_v10.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v10.md) | §0, §4, §12 |
 | [`DIR_Diving_Complete_Development_Notes_UPDATED_v8.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v8.md) | §0, §4 |
 | [`DIR_Diving_Complete_Development_Notes_UPDATED_v9.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v9.md) | §0, §12 |
 | [`DIR_Diving_Main_Branch_Development_Notes.md`](DIR_Diving_Main_Branch_Development_Notes.md) | §4 |

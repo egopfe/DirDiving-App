@@ -334,6 +334,11 @@ struct GasPlanInput: Codable, Hashable {
         }
     }
 
+    /// Depth fed into the existing Bühlmann preview path. Emergency gas still uses max depth elsewhere.
+    var buhlmannPlanningDepthMeters: Double {
+        effectivePlanningDepthMeters
+    }
+
     var ambientPressureBar: Double { effectivePlanningDepthMeters / 10.0 + 1.0 }
     var estimatedConsumptionLiters: Double { sacLitersPerMinute * ambientPressureBar * plannedBottomMinutes }
     var estimatedRemainingLiters: Double { availableGasLiters - estimatedConsumptionLiters }
