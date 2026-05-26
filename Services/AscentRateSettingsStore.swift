@@ -30,6 +30,7 @@ final class AscentRateSettingsStore: ObservableObject {
         } else {
             limits = .standard
         }
+        limits = limits.normalized()
         cloudObserver = NotificationCenter.default.addObserver(
             forName: .cloudSyncDidChangeExternally,
             object: nil,
@@ -51,12 +52,13 @@ final class AscentRateSettingsStore: ObservableObject {
 
     private func reloadFromCloud() {
         guard let cloudLimits = cloudSync.load(AscentRateLimits.self, forKey: key) else { return }
-        limits = cloudLimits
+        limits = cloudLimits.normalized()
     }
 
     private func save() {
-        guard let data = try? JSONEncoder().encode(limits) else { return }
+        let normalizedLimits = limits.normalized()
+        guard let data = try? JSONEncoder().encode(normalizedLimits) else { return }
         defaults.set(data, forKey: key)
-        cloudSync.save(limits, forKey: key)
+        cloudSync.save(normalizedLimits, forKey: key)
     }
 }

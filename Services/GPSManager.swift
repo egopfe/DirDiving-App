@@ -24,17 +24,18 @@ final class GPSManager: NSObject, ObservableObject {
     func currentBestPoint() -> GPSPoint? { lastPoint }
 
     func captureBestEffortPoint(for seconds: TimeInterval, completion: @escaping @MainActor (GPSPoint?) -> Void) {
+        let captureDuration = seconds.isFinite ? min(60, max(0, seconds)) : 0
         requestAuthorization()
         locationManager.startUpdatingLocation()
 
         // Complete any in-flight capture before replacing it so callers are never stranded.
         finishBestEffortCapture()
 
-        let capture = BestEffortCapture(deadline: Date().addingTimeInterval(seconds), bestPoint: lastPoint, completion: completion)
+        let capture = BestEffortCapture(deadline: Date().addingTimeInterval(captureDuration), bestPoint: lastPoint, completion: completion)
         bestEffortCapture = capture
 
         Task { @MainActor in
-            try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+            try? await Task.sleep(nanoseconds: UInt64(captureDuration * 1_000_000_000))
             guard self.bestEffortCapture === capture else { return }
             self.finishBestEffortCapture()
         }
@@ -58,6 +59,14 @@ extension GPSManager: CLLocationManagerDelegate {
     nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
         Task { @MainActor in
+            guard location.coordinate.latitude.isFinite,
+                  location.coordinate.longitude.isFinite,
+                  location.horizontalAccuracy.isFinite,
+                  location.horizontalAccuracy >= 0,
+                  (-90...90).contains(location.coordinate.latitude),
+                  (-180...180).contains(location.coordinate.longitude) else {
+                return
+            }
             let point = GPSPoint(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude, horizontalAccuracy: location.horizontalAccuracy, timestamp: location.timestamp)
             if let previous = previousSpeedSample {
                 let delta = location.timestamp.timeIntervalSince(previous.date)

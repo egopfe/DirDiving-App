@@ -735,8 +735,11 @@ struct DiveLiveView: View {
     }
 
     private var temperatureText: String {
-        guard let temp = dive.currentTemperatureCelsius else { return "--.- \u{00B0}C" }
-        return "\(Formatters.one(temp)) \u{00B0}C"
+        guard let temp = dive.currentTemperatureCelsius else {
+            return "--.- \(unitPreference.temperatureUnitLabel)"
+        }
+        let display = unitPreference.temperatureDisplay(celsius: temp)
+        return "\(Formatters.one(display.value)) \(display.unit)"
     }
 
     private var ttvText: String {

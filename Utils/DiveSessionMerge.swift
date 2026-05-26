@@ -4,26 +4,51 @@ enum DiveSessionMerge {
     static func preferred(_ local: DiveSession, _ remote: DiveSession) -> DiveSession {
         let winner = newer(local, remote)
         let loser = winner.id == local.id ? remote : local
-        let entryGPS = winner.entryGPS ?? loser.entryGPS
-        let exitGPS = winner.exitGPS ?? loser.exitGPS
-        let entryGPSFixSource = winner.entryGPS == nil && loser.entryGPS != nil ? loser.entryGPSFixSource : winner.entryGPSFixSource
-        let exitGPSFixSource = winner.exitGPS == nil && loser.exitGPS != nil ? loser.exitGPSFixSource : winner.exitGPSFixSource
+        let winnerEntryGPS = validGPS(winner.entryGPS)
+        let loserEntryGPS = validGPS(loser.entryGPS)
+        let winnerExitGPS = validGPS(winner.exitGPS)
+        let loserExitGPS = validGPS(loser.exitGPS)
+        let entryGPS = winnerEntryGPS ?? loserEntryGPS
+        let exitGPS = winnerExitGPS ?? loserExitGPS
+        let entryGPSFixSource: GPSFixSource
+        if entryGPS == nil {
+            entryGPSFixSource = .noFix
+        } else {
+            entryGPSFixSource = winnerEntryGPS == nil && loserEntryGPS != nil ? loser.entryGPSFixSource : winner.entryGPSFixSource
+        }
+        let exitGPSFixSource: GPSFixSource
+        if exitGPS == nil {
+            exitGPSFixSource = .noFix
+        } else {
+            exitGPSFixSource = winnerExitGPS == nil && loserExitGPS != nil ? loser.exitGPSFixSource : winner.exitGPSFixSource
+        }
+        let startDate = min(winner.startDate, loser.startDate)
+        let endDate = max(max(winner.endDate, loser.endDate), startDate)
+        let selectedSamples = sanitizeSamples(winner.samples.count >= loser.samples.count ? winner.samples : loser.samples)
+            .filter { $0.timestamp >= startDate && $0.timestamp <= endDate }
+        let duration = max(0, endDate.timeIntervalSince(startDate))
+        let sampleDepths = selectedSamples.map(\.depthMeters)
+        let maxDepth = sampleDepths.max() ?? maxValid(winner.maxDepthMeters, loser.maxDepthMeters)
+        let avgDepth = selectedSamples.isEmpty
+            ? maxValid(winner.avgDepthMeters, loser.avgDepthMeters)
+            : DiveAlgorithm.timeWeightedAverageDepth(samples: selectedSamples, endDate: endDate)
+        let sampleTemperatures = selectedSamples.compactMap { DiveAlgorithm.sanitizedTemperatureCelsius($0.temperatureCelsius) }
         return DiveSession(
             id: winner.id,
-            startDate: min(winner.startDate, loser.startDate),
-            endDate: max(winner.endDate, loser.endDate),
-            durationSeconds: max(winner.durationSeconds, loser.durationSeconds),
-            maxDepthMeters: max(winner.maxDepthMeters, loser.maxDepthMeters),
-            avgDepthMeters: winner.samples.count >= loser.samples.count ? winner.avgDepthMeters : loser.avgDepthMeters,
-            avgWaterTemperatureCelsius: winner.avgWaterTemperatureCelsius ?? loser.avgWaterTemperatureCelsius,
-            minWaterTemperatureCelsius: minOptional(winner.minWaterTemperatureCelsius, loser.minWaterTemperatureCelsius),
-            maxWaterTemperatureCelsius: maxOptional(winner.maxWaterTemperatureCelsius, loser.maxWaterTemperatureCelsius),
-            ttv: max(winner.ttv, loser.ttv),
+            startDate: startDate,
+            endDate: endDate,
+            durationSeconds: duration,
+            maxDepthMeters: maxDepth,
+            avgDepthMeters: avgDepth,
+            avgWaterTemperatureCelsius: averageTemperature(sampleTemperatures, winner: winner, loser: loser),
+            minWaterTemperatureCelsius: sampleTemperatures.min() ?? minOptional(winner.minWaterTemperatureCelsius, loser.minWaterTemperatureCelsius),
+            maxWaterTemperatureCelsius: sampleTemperatures.max() ?? maxOptional(winner.maxWaterTemperatureCelsius, loser.maxWaterTemperatureCelsius),
+            ttv: DiveAlgorithm.ttvIndex(averageDepthMeters: avgDepth, durationSeconds: duration),
             entryGPS: entryGPS,
             exitGPS: exitGPS,
             entryGPSFixSource: entryGPSFixSource,
             exitGPSFixSource: exitGPSFixSource,
-            samples: winner.samples.count >= loser.samples.count ? winner.samples : loser.samples,
+            samples: selectedSamples,
             exceededSupportedDepthRange: winner.exceededSupportedDepthRange || loser.exceededSupportedDepthRange
         )
     }
@@ -57,5 +82,34 @@ enum DiveSessionMerge {
         case (let left?, nil): return left
         case (nil, nil): return nil
         }
+    }
+
+    private static func sanitizeSamples(_ samples: [DiveSample]) -> [DiveSample] {
+        DiveAlgorithm.sanitizedSamples(samples)
+    }
+
+    private static func maxValid(_ lhs: Double, _ rhs: Double) -> Double {
+        max(DiveAlgorithm.sanitizedDepthMeters(lhs) ?? 0, DiveAlgorithm.sanitizedDepthMeters(rhs) ?? 0)
+    }
+
+    private static func averageTemperature(_ sampleTemperatures: [Double], winner: DiveSession, loser: DiveSession) -> Double? {
+        if !sampleTemperatures.isEmpty {
+            return sampleTemperatures.reduce(0, +) / Double(sampleTemperatures.count)
+        }
+        return DiveAlgorithm.sanitizedTemperatureCelsius(winner.avgWaterTemperatureCelsius)
+            ?? DiveAlgorithm.sanitizedTemperatureCelsius(loser.avgWaterTemperatureCelsius)
+    }
+
+    private static func validGPS(_ point: GPSPoint?) -> GPSPoint? {
+        guard let point,
+              point.latitude.isFinite,
+              point.longitude.isFinite,
+              point.horizontalAccuracy.isFinite,
+              point.horizontalAccuracy >= 0,
+              (-90...90).contains(point.latitude),
+              (-180...180).contains(point.longitude) else {
+            return nil
+        }
+        return point
     }
 }

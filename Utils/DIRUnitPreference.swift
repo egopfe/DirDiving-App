@@ -30,8 +30,8 @@ enum DIRUnitPreference: String, CaseIterable, Identifiable, Codable {
 
     var temperatureUnitLabel: String {
         switch self {
-        case .metric: return "°C"
-        case .imperial: return "°F"
+        case .metric: return "\u{00B0}C"
+        case .imperial: return "\u{00B0}F"
         }
     }
 
@@ -62,8 +62,8 @@ enum DIRUnitPreference: String, CaseIterable, Identifiable, Codable {
 
     func temperatureDisplay(celsius: Double) -> (value: Double, unit: String) {
         switch self {
-        case .metric: return (celsius, "°C")
-        case .imperial: return (celsius * 9.0 / 5.0 + 32.0, "°F")
+        case .metric: return (celsius, "\u{00B0}C")
+        case .imperial: return (celsius * 9.0 / 5.0 + 32.0, "\u{00B0}F")
         }
     }
 

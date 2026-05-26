@@ -3,9 +3,10 @@ import Foundation
 enum SubsurfaceExportService {
     static func makeCSV(for session: DiveSession) -> String {
         var rows = ["time_seconds,depth_m,temperature_c,entry_lat,entry_lon,exit_lat,exit_lon"]
-        guard let firstTimestamp = session.samples.first?.timestamp else { return rows.joined(separator: "\n") }
-        for sample in session.samples {
-            let seconds = Int(sample.timestamp.timeIntervalSince(firstTimestamp))
+        let samples = exportableSamples(for: session)
+        guard let firstTimestamp = samples.first?.timestamp else { return rows.joined(separator: "\n") }
+        for sample in samples {
+            let seconds = max(0, Int(sample.timestamp.timeIntervalSince(firstTimestamp)))
             let temp = sample.temperatureCelsius.map { String(format: "%.1f", $0) } ?? ""
             let entryLat = session.entryGPS.map { String(format: "%.6f", $0.latitude) } ?? ""
             let entryLon = session.entryGPS.map { String(format: "%.6f", $0.longitude) } ?? ""
@@ -22,6 +23,7 @@ enum SubsurfaceExportService {
     //  - stale exports cleaned up after 24 h
     // CSV business format (column order + headers) is intentionally unchanged.
     static func writeCSV(for session: DiveSession) -> URL? {
+        guard !exportableSamples(for: session).isEmpty else { return nil }
         let csv = makeCSV(for: session)
         cleanupTemporaryExports()
         let url = FileManager.default.temporaryDirectory
@@ -50,5 +52,9 @@ enum SubsurfaceExportService {
                 try? FileManager.default.removeItem(at: file)
             }
         }
+    }
+
+    private static func exportableSamples(for session: DiveSession) -> [DiveSample] {
+        DiveAlgorithm.sanitizedSamples(session.samples)
     }
 }

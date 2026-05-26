@@ -14,13 +14,7 @@ struct AscentStatus: Codable, Hashable {
     var isOverLimit: Bool { zone == .red }
 
     static func limit(for depthMeters: Double) -> Double {
-        switch depthMeters {
-        case 30...40: return 10
-        case 20..<30: return 5
-        case 6..<20: return 3
-        case 0..<6: return 1
-        default: return 10
-        }
+        AscentRateLimits.standard.limit(for: depthMeters)
     }
 
     static func make(rate: Double, depth: Double) -> AscentStatus {
@@ -28,8 +22,9 @@ struct AscentStatus: Codable, Hashable {
     }
 
     static func make(rate: Double, depth: Double, limits: AscentRateLimits) -> AscentStatus {
-        let limit = limits.limit(for: depth)
-        let safeRate = max(0, rate)
+        let safeDepth = depth.isFinite ? max(0, depth) : 0
+        let limit = limits.limit(for: safeDepth)
+        let safeRate = rate.isFinite ? max(0, rate) : 0
         let zone: AscentZone = safeRate <= limit * 0.70 ? .green : (safeRate <= limit ? .yellow : .red)
         return AscentStatus(currentRateMetersPerMinute: safeRate, limitMetersPerMinute: limit, zone: zone)
     }

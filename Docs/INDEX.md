@@ -12,6 +12,7 @@ Questa sezione indicizza in modo additivo i file documentali e gli asset traccia
 
 | Documento / asset | Tipo | Nota |
 |-------------------|------|------|
+| [`CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md) | Audit algoritmico Watch MAIN | Audit 2026-05-26 su algoritmi, formule, costanti, edge case e test mancanti del target Apple Watch MAIN. |
 | [`Audits/DIR_DIVING_MAIN_BRANCH_READINESS_AUDIT_20260523.docx`](Audits/DIR_DIVING_MAIN_BRANCH_READINESS_AUDIT_20260523.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
 | [`DIR_DIVING_Piano_100_UX_UI_Watch_iOS_Sicurezza.docx`](DIR_DIVING_Piano_100_UX_UI_Watch_iOS_Sicurezza.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
 | [`EXPERIMENTAL_FUNCTIONS_UX_AUDIT_20260517_POST_FIX.docx`](EXPERIMENTAL_FUNCTIONS_UX_AUDIT_20260517_POST_FIX.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |

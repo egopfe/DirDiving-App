@@ -46,19 +46,21 @@ final class DiveLogStore: ObservableObject {
 
     /// Session created on-device (or finalized locally) — may sync to iPhone.
     func add(_ session: DiveSession) {
-        guard !deletedSessionIDs.contains(session.id) else { return }
-        sessions.removeAll { $0.id == session.id }
-        sessions.insert(session, at: 0)
+        let normalizedSession = DiveSessionMerge.preferred(session, session)
+        guard !deletedSessionIDs.contains(normalizedSession.id) else { return }
+        sessions.removeAll { $0.id == normalizedSession.id }
+        sessions.insert(normalizedSession, at: 0)
         sessions = Array(sessions.sorted { $0.startDate > $1.startDate }.prefix(maxSessions))
         save()
-        WatchSyncService.shared.transfer(session)
+        WatchSyncService.shared.transfer(normalizedSession)
     }
 
     /// Session received from iPhone — do not echo back via transfer.
     func addFromCompanion(_ session: DiveSession) {
-        guard !deletedSessionIDs.contains(session.id) else { return }
-        sessions.removeAll { $0.id == session.id }
-        sessions.insert(session, at: 0)
+        let normalizedSession = DiveSessionMerge.preferred(session, session)
+        guard !deletedSessionIDs.contains(normalizedSession.id) else { return }
+        sessions.removeAll { $0.id == normalizedSession.id }
+        sessions.insert(normalizedSession, at: 0)
         sessions = Array(sessions.sorted { $0.startDate > $1.startDate }.prefix(maxSessions))
         save()
     }
@@ -111,6 +113,7 @@ final class DiveLogStore: ObservableObject {
             let decoder = JSONDecoder()
             decoder.dateDecodingStrategy = .iso8601
             return try decoder.decode([DiveSession].self, from: Data(contentsOf: url))
+                .map { DiveSessionMerge.preferred($0, $0) }
         } catch {
             loadErrorMessage = String(format: String(localized: "Log locale non leggibile: %@"), error.localizedDescription)
             return []
@@ -120,14 +123,16 @@ final class DiveLogStore: ObservableObject {
     private func mergeSessions(local: [DiveSession], cloud: [DiveSession]?) -> [DiveSession] {
         var byID: [UUID: DiveSession] = [:]
         for session in local {
-            byID[session.id] = session
+            let normalized = DiveSessionMerge.preferred(session, session)
+            byID[normalized.id] = normalized
         }
         guard let cloud else { return Array(byID.values) }
         for session in cloud {
-            if let existing = byID[session.id] {
-                byID[session.id] = DiveSessionMerge.preferred(existing, session)
+            let normalized = DiveSessionMerge.preferred(session, session)
+            if let existing = byID[normalized.id] {
+                byID[normalized.id] = DiveSessionMerge.preferred(existing, normalized)
             } else {
-                byID[session.id] = session
+                byID[normalized.id] = normalized
             }
         }
         return Array(byID.values)

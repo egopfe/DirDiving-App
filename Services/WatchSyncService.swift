@@ -243,8 +243,9 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     private func enqueuePendingSession(_ session: DiveSession) {
-        pendingSessions.removeAll { $0.id == session.id }
-        pendingSessions.append(session)
+        let normalizedSession = DiveSessionMerge.preferred(session, session)
+        pendingSessions.removeAll { $0.id == normalizedSession.id }
+        pendingSessions.append(normalizedSession)
         pendingSessions = pendingSessions.sorted { $0.startDate > $1.startDate }
         pendingTransferCount = pendingSessions.count
         savePendingSessions()
@@ -269,11 +270,12 @@ final class WatchSyncService: NSObject, ObservableObject {
         if FileManager.default.fileExists(atPath: url.path),
            let data = try? Data(contentsOf: url),
            let decoded = try? decoder.decode([DiveSession].self, from: data) {
-            return decoded
+            return decoded.map { DiveSessionMerge.preferred($0, $0) }
         }
 
         guard let legacyData = UserDefaults.standard.data(forKey: legacyPendingSessionsKey) else { return [] }
-        let migrated = (try? decoder.decode([DiveSession].self, from: legacyData)) ?? []
+        let migrated = ((try? decoder.decode([DiveSession].self, from: legacyData)) ?? [])
+            .map { DiveSessionMerge.preferred($0, $0) }
         if !migrated.isEmpty {
             persistPendingSessions(migrated)
         }
@@ -288,7 +290,8 @@ final class WatchSyncService: NSObject, ObservableObject {
     private func persistPendingSessions(_ value: [DiveSession]) {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
-        guard let data = try? encoder.encode(value) else { return }
+        let normalizedValue = value.map { DiveSessionMerge.preferred($0, $0) }
+        guard let data = try? encoder.encode(normalizedValue) else { return }
         do {
             try data.write(to: pendingFileURL(), options: [.atomic, .completeFileProtection])
         } catch {

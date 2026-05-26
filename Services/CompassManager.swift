@@ -29,12 +29,13 @@ final class CompassManager: NSObject, ObservableObject {
     }
 
     func stop() { locationManager.stopUpdatingHeading() }
-    func setBearing() { bearingDegrees = headingDegrees }
+    func setBearing() { bearingDegrees = DiveAlgorithm.normalizedDegrees(headingDegrees) }
     func clearBearing() { bearingDegrees = nil }
 
     var cardinal: String {
         let directions = ["N","NE","E","SE","S","SW","W","NW"]
-        return directions[Int((headingDegrees + 22.5) / 45.0) % directions.count]
+        let normalized = DiveAlgorithm.normalizedDegrees(headingDegrees)
+        return directions[Int((normalized + 22.5) / 45.0) % directions.count]
     }
 }
 
@@ -58,8 +59,17 @@ extension CompassManager: CLLocationManagerDelegate {
 
     nonisolated func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
         Task { @MainActor in
-            headingDegrees = newHeading.trueHeading >= 0 ? newHeading.trueHeading : newHeading.magneticHeading
-            statusMessage = String(localized: "Bussola attiva")
+            let rawHeading = newHeading.trueHeading >= 0 ? newHeading.trueHeading : newHeading.magneticHeading
+            guard rawHeading.isFinite else {
+                statusMessage = String(localized: "Bussola non disponibile")
+                return
+            }
+            headingDegrees = DiveAlgorithm.normalizedDegrees(rawHeading)
+            if newHeading.headingAccuracy < 0 {
+                statusMessage = String(localized: "Bussola da calibrare")
+            } else {
+                statusMessage = String(localized: "Bussola attiva")
+            }
         }
     }
 }

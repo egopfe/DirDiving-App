@@ -265,15 +265,12 @@ struct CompassView: View {
 
     private var bearingDelta: Double? {
         guard let bearing = compass.bearingDegrees else { return nil }
-        let delta = bearing - compass.headingDegrees
-        if delta > 180 { return delta - 360 }
-        if delta < -180 { return delta + 360 }
-        return delta
+        return DiveAlgorithm.signedBearingDeltaDegrees(from: compass.headingDegrees, to: bearing)
     }
 
     private var bearingText: String {
         guard let bearing = compass.bearingDegrees else { return "---" }
-        return "\(Int(bearing.rounded()))\u{00B0}"
+        return "\(Int(DiveAlgorithm.normalizedDegrees(bearing).rounded()) % 360)\u{00B0}"
     }
 
     private var deltaText: String {
@@ -283,7 +280,7 @@ struct CompassView: View {
     }
 
     private var headingText: String {
-        "\(Int(compass.headingDegrees.rounded()))"
+        "\(Int(DiveAlgorithm.normalizedDegrees(compass.headingDegrees).rounded()) % 360)"
     }
 
     private var cardinalMarkers: [CompassMarker] {
