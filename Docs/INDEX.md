@@ -1,9 +1,57 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-05-26
-**Branch consigliato:** `main` @ `2322145` (baseline commit locale al momento del pass documentale 2026-05-26)
+**Branch consigliato:** `main` @ `9d8baa1` (HEAD locale e remoto verificati dopo `git pull --ff-only`, commit `9d8baa15cffb7cd60f30445e082ca2cf43ac7111`)
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+
+## Aggiornamento indice 2026-05-26 - documenti e asset indicizzati
+
+Questa sezione indicizza in modo additivo i file documentali e gli asset tracciati che non erano citati esplicitamente nell'indice precedente. Non cambia il contenuto dei documenti indicizzati.
+
+| Documento / asset | Tipo | Nota |
+|-------------------|------|------|
+| [`Audits/DIR_DIVING_MAIN_BRANCH_READINESS_AUDIT_20260523.docx`](Audits/DIR_DIVING_MAIN_BRANCH_READINESS_AUDIT_20260523.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`DIR_DIVING_Piano_100_UX_UI_Watch_iOS_Sicurezza.docx`](DIR_DIVING_Piano_100_UX_UI_Watch_iOS_Sicurezza.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`EXPERIMENTAL_FUNCTIONS_UX_AUDIT_20260517_POST_FIX.docx`](EXPERIMENTAL_FUNCTIONS_UX_AUDIT_20260517_POST_FIX.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`EXPERIMENTAL_FUNCTIONS_UX_AUDIT_20260517_PRE_MODIFICATION.docx`](EXPERIMENTAL_FUNCTIONS_UX_AUDIT_20260517_PRE_MODIFICATION.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`EXPERIMENTAL_UX_INTERACTION_AUDIT_20260517.docx`](EXPERIMENTAL_UX_INTERACTION_AUDIT_20260517.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`FeatureScreenshots/01-live-dive.png`](FeatureScreenshots/01-live-dive.png) | Asset / screenshot documentale | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`FeatureScreenshots/02-ascent-warning.png`](FeatureScreenshots/02-ascent-warning.png) | Asset / screenshot documentale | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`FeatureScreenshots/03-ascent-settings.png`](FeatureScreenshots/03-ascent-settings.png) | Asset / screenshot documentale | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`FeatureScreenshots/04-compass-bearing.png`](FeatureScreenshots/04-compass-bearing.png) | Asset / screenshot documentale | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`FeatureScreenshots/05-stopwatch-action.png`](FeatureScreenshots/05-stopwatch-action.png) | Asset / screenshot documentale | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`FeatureScreenshots/06-dive-log.png`](FeatureScreenshots/06-dive-log.png) | Asset / screenshot documentale | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`FeatureScreenshots/07-dive-detail-export.png`](FeatureScreenshots/07-dive-detail-export.png) | Asset / screenshot documentale | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`FeatureScreenshots/08-gps-entry-exit.png`](FeatureScreenshots/08-gps-entry-exit.png) | Asset / screenshot documentale | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`FeatureScreenshots/09-user-images.png`](FeatureScreenshots/09-user-images.png) | Asset / screenshot documentale | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`FeatureScreenshots/10-buddy-send.png`](FeatureScreenshots/10-buddy-send.png) | Asset / screenshot documentale | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`FeatureScreenshots/11-buddy-answer.png`](FeatureScreenshots/11-buddy-answer.png) | Asset / screenshot documentale | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`FeatureScreenshots/12-buddy-link-compass.png`](FeatureScreenshots/12-buddy-link-compass.png) | Asset / screenshot documentale | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`iOS/FeatureScreenshots/01-buddy-lab.png`](iOS/FeatureScreenshots/01-buddy-lab.png) | Asset / screenshot documentale | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`iOS/FeatureScreenshots/02-technical-planner.png`](iOS/FeatureScreenshots/02-technical-planner.png) | Asset / screenshot documentale | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`iOS/FeatureScreenshots/03-plan-result-v1-v2.png`](iOS/FeatureScreenshots/03-plan-result-v1-v2.png) | Asset / screenshot documentale | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`iOS/FeatureScreenshots/04-contingencies-briefing.png`](iOS/FeatureScreenshots/04-contingencies-briefing.png) | Asset / screenshot documentale | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260517.docx`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260517.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260519.docx`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260519.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260520.docx`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260520.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260522.docx`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260522.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260523.docx`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260523.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`MAIN_BRANCH_READINESS_AUDIT_FULL_20260519.docx`](MAIN_BRANCH_READINESS_AUDIT_FULL_20260519.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523.docx`](MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524.docx`](MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524_CURRENT_PRE_MODIFICATION.docx`](MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524_CURRENT_PRE_MODIFICATION.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_CURRENT.docx`](MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_CURRENT.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_CURRENT.md`](MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_CURRENT.md) | Documento Markdown | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260517_CURRENT_PRE_MODIFICATION.docx`](MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260517_CURRENT_PRE_MODIFICATION.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260517_PRE_MODIFICATION.docx`](MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260517_PRE_MODIFICATION.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260518_CURRENT_PRE_MODIFICATION.docx`](MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260518_CURRENT_PRE_MODIFICATION.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260518_POST_FIX_PRE_MODIFICATION.docx`](MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260518_POST_FIX_PRE_MODIFICATION.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260518_PRE_MODIFICATION.docx`](MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260518_PRE_MODIFICATION.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260519_CURRENT_PRE_MODIFICATION.docx`](MAIN_BRANCHES_UX_INTERACTION_AUDIT_20260519_CURRENT_PRE_MODIFICATION.docx) | Documento Word / audit storico | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`ReferenceIcon/apple watch icon.png`](<ReferenceIcon/apple watch icon.png>) | Asset / screenshot documentale | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
+| [`ReferenceIcon/ios icon.png`](<ReferenceIcon/ios icon.png>) | Asset / screenshot documentale | Indicizzato nel pass 2026-05-26; contenuto preservato senza modifiche. |
 
 ---
 
