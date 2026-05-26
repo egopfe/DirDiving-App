@@ -7,7 +7,6 @@ struct DiveLiveView: View {
     @EnvironmentObject private var watchSync: WatchSyncService
     @AppStorage(HapticService.hapticsEnabledKey) private var hapticsEnabled = true
     @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
-    @State private var ascentHapticLoopTask: Task<Void, Never>?
     @State private var showResetStopwatchConfirmation = false
 
     private var unitPreference: DIRUnitPreference { DIRUnitPreference.fromStorage(watchUnits) }
@@ -75,13 +74,6 @@ struct DiveLiveView: View {
             }
         }
         .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.18) : nil, value: dive.redWarningBlink)
-        .onChange(of: showAscentAlarmBanner) { wasActive, isActive in
-            manageAscentAlarmHaptics(wasActive: wasActive, isActive: isActive)
-        }
-        .onDisappear {
-            ascentHapticLoopTask?.cancel()
-            HapticService.shared.ascentAlarmCleared()
-        }
         .confirmationDialog(String(localized: "live.stopwatch.reset.confirm.title"), isPresented: $showResetStopwatchConfirmation, titleVisibility: .visible) {
             Button(String(localized: "live.stopwatch.reset.confirm.action"), role: .destructive) {
                 dive.resetStopwatch()
@@ -89,33 +81,6 @@ struct DiveLiveView: View {
             Button(String(localized: "log.delete.cancel"), role: .cancel) {}
         } message: {
             Text(String(localized: "live.stopwatch.reset.confirm.message"))
-        }
-    }
-
-    private func manageAscentAlarmHaptics(wasActive: Bool, isActive: Bool) {
-        ascentHapticLoopTask?.cancel()
-        ascentHapticLoopTask = nil
-
-        guard isActive else {
-            if wasActive {
-                HapticService.shared.ascentAlarmCleared()
-            }
-            return
-        }
-
-        if !wasActive {
-            HapticService.shared.ascentAlarmTriggered()
-        }
-
-        ascentHapticLoopTask = Task {
-            while !Task.isCancelled {
-                try? await Task.sleep(nanoseconds: UInt64(HapticService.ascentAlarmRepeatInterval * 1_000_000_000))
-                guard !Task.isCancelled else { return }
-                await MainActor.run {
-                    guard dive.isDiveActive, dive.ascentStatus.isOverLimit else { return }
-                    HapticService.shared.ascentAlarmRepeatIfNeeded()
-                }
-            }
         }
     }
 

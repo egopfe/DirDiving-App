@@ -6,6 +6,9 @@ enum DiveAlgorithmConfiguration {
     static let automaticStopDepthMeters = 0.3
     static let automaticStopDwellSeconds: TimeInterval = 8
     static let staleDepthSampleSeconds: TimeInterval = 8
+    static let maximumFutureDepthSampleSkewSeconds: TimeInterval = 1
+    static let frozenDepthSampleSeconds: TimeInterval = 30
+    static let frozenDepthToleranceMeters = 0.001
     static let ascentRateWindowSeconds: TimeInterval = 5
     static let minimumAscentDeltaSeconds: TimeInterval = 1
     static let maximumPlausibleDepthMeters = 350.0

@@ -45,6 +45,7 @@ final class DiveManager: NSObject, ObservableObject {
     @Published private(set) var exceededSupportedDepthRange = false
 
     private let depthLimitHaptics = DepthLimitHapticCoordinator()
+    private let ascentHaptics = AscentSafetyHapticCoordinator()
 
     private var ascentAlarmEnabled: Bool {
         UserDefaults.standard.object(forKey: "dirdiving_watch_alarm_ascent_enabled") == nil
@@ -93,9 +94,8 @@ final class DiveManager: NSObject, ObservableObject {
     private var lastAlarmDismissDate: Date?
     private var activeDiveExceededSupportedDepth = false
     private var hasObservedSubmersionDuringCurrentDive = false
-    private var automaticStartCandidateCount = 0
-    private var automaticStartCandidateDate: Date?
-    private var automaticSurfaceCandidateDate: Date?
+    private var depthValidationState = DepthSampleValidationState()
+    private var lifecycleAlgorithm = DiveLifecycleAlgorithm()
     private var automaticSurfaceEndTask: Task<Void, Never>?
     private var stopwatchAccumulatedTime: TimeInterval = 0
     private var stopwatchStartedAt: Date?
@@ -127,6 +127,7 @@ final class DiveManager: NSObject, ObservableObject {
                     depth: self.currentDepthMeters,
                     limits: limits
                 )
+                self.ascentHaptics.update(isOverLimit: self.isDiveActive && self.ascentStatus.isOverLimit && self.ascentAlarmEnabled)
             }
         }
         loadStopwatchState()
@@ -197,6 +198,7 @@ final class DiveManager: NSObject, ObservableObject {
         sessionStart = draft.startDate
         samples = restoredSamples
         previousDepthSample = restoredSamples.last
+        depthValidationState.restore(lastValidSample: restoredSamples.last)
         entryGPS = draft.entryGPS
         entryGPSFixSource = draft.entryGPSFixSource
         isDiveActive = true
@@ -227,41 +229,27 @@ final class DiveManager: NSObject, ObservableObject {
     }
 
     private func resetAutomaticLifecycleCandidates() {
-        automaticStartCandidateCount = 0
-        automaticStartCandidateDate = nil
-        automaticSurfaceCandidateDate = nil
+        lifecycleAlgorithm.reset()
         automaticSurfaceEndTask?.cancel()
         automaticSurfaceEndTask = nil
     }
 
-    private func evaluateAutomaticStartCandidate(depthMeters: Double, timestamp: Date) -> Bool {
-        guard depthMeters > DiveAlgorithmConfiguration.automaticStartDepthMeters else {
-            automaticStartCandidateCount = 0
-            automaticStartCandidateDate = nil
-            return false
-        }
-
-        if let candidateDate = automaticStartCandidateDate,
-           timestamp.timeIntervalSince(candidateDate) > DiveAlgorithmConfiguration.staleDepthSampleSeconds {
-            automaticStartCandidateCount = 0
-            automaticStartCandidateDate = nil
-        }
-
-        if automaticStartCandidateDate == nil {
-            automaticStartCandidateDate = timestamp
-        }
-        automaticStartCandidateCount += 1
-        return automaticStartCandidateCount >= DiveAlgorithmConfiguration.automaticStartRequiredSamples
+    private func evaluateLifecycle(with validatedSample: ValidatedDepthSample) -> DiveLifecycleAction {
+        lifecycleAlgorithm.evaluate(
+            validatedSample: validatedSample,
+            isDiveActive: isDiveActive,
+            isManualLifecycleActive: isManualLifecycleActive,
+            hasObservedSubmersion: hasObservedSubmersionDuringCurrentDive
+        )
     }
 
-    private func evaluateAutomaticSurfaceCandidate(depthMeters: Double, timestamp: Date) {
+    private func evaluateAutomaticSurfaceCandidate(validatedSample: ValidatedDepthSample) {
         guard isDiveActive, !isFinalizingDive else { return }
-        guard !isManualLifecycleActive || hasObservedSubmersionDuringCurrentDive else { return }
 
-        if depthMeters <= DiveAlgorithmConfiguration.automaticStopDepthMeters {
-            if automaticSurfaceCandidateDate == nil {
-                automaticSurfaceCandidateDate = timestamp
-            }
+        let action = evaluateLifecycle(with: validatedSample)
+        if action == .endDive {
+            endDiveIfNeeded()
+        } else if lifecycleAlgorithm.surfaceCandidateDate != nil {
             scheduleAutomaticSurfaceEnd()
         } else {
             cancelAutomaticSurfaceEnd()
@@ -277,21 +265,16 @@ final class DiveManager: NSObject, ObservableObject {
             await MainActor.run {
                 guard let self else { return }
                 self.automaticSurfaceEndTask = nil
-                guard let candidateDate = self.automaticSurfaceCandidateDate else { return }
                 guard self.isDiveActive, !self.isFinalizingDive else { return }
-                let dwell = Date().timeIntervalSince(candidateDate)
-                guard dwell >= DiveAlgorithmConfiguration.automaticStopDwellSeconds else { return }
-                let lastDepthTimestamp = self.previousDepthSample?.timestamp ?? .distantPast
-                let noDepthSampleAfterSurfaceEvent = lastDepthTimestamp <= candidateDate
-                guard self.currentDepthMeters <= DiveAlgorithmConfiguration.automaticStopDepthMeters
-                    || noDepthSampleAfterSurfaceEvent else { return }
-                self.endDiveIfNeeded()
+                if self.lifecycleAlgorithm.shouldEndAtSurface(currentDepthMeters: self.currentDepthMeters, timestamp: Date()) {
+                    self.endDiveIfNeeded()
+                }
             }
         }
     }
 
     private func cancelAutomaticSurfaceEnd() {
-        automaticSurfaceCandidateDate = nil
+        lifecycleAlgorithm.clearSurfaceCandidate()
         automaticSurfaceEndTask?.cancel()
         automaticSurfaceEndTask = nil
     }
@@ -398,6 +381,9 @@ final class DiveManager: NSObject, ObservableObject {
     private func beginDiveIfNeeded(isManual: Bool = false) {
         guard !isDiveActive, !isFinalizingDive else { return }
         resetAutomaticLifecycleCandidates()
+        if isManual {
+            depthValidationState.reset()
+        }
         gpsManager.start()
         isDiveActive = true
         isManualLifecycleActive = isManual
@@ -448,12 +434,14 @@ final class DiveManager: NSObject, ObservableObject {
         runtimeTimer?.invalidate()
         runtimeTimer = nil
         stopBlinking()
+        ascentHaptics.clear()
         let end = Date()
         let finishedSamples = sanitizedSamples(samples)
         sessionStart = nil
         samples = []
         previousDepthSample = nil
         entryGPS = nil
+        depthValidationState.reset()
         gpsManager.captureBestEffortPoint(for: 6) { [weak self] point in
             guard let self else { return }
             self.isFinalizingDive = false
@@ -498,20 +486,47 @@ final class DiveManager: NSObject, ObservableObject {
     }
 
     private func processDepthMeasurement(rawDepthMeters: Double?, timestamp: Date = Date(), temperatureCelsius: Double?) {
-        guard let depthMeters = DiveAlgorithm.sanitizedDepthMeters(rawDepthMeters) else {
-            lastErrorMessage = String(localized: "Campione profondita non valido ignorato.")
+        let validated = depthValidationState.validate(
+            rawDepthMeters: rawDepthMeters,
+            timestamp: timestamp,
+            temperatureCelsius: temperatureCelsius
+        )
+        guard let sample = validated.sample else {
+            lastErrorMessage = depthValidationMessage(validated.validity)
             return
         }
 
-        let safeTemperature = DiveAlgorithm.sanitizedTemperatureCelsius(temperatureCelsius)
         if !isDiveActive {
-            currentDepthMeters = depthMeters
-            currentTemperatureCelsius = safeTemperature
-            guard evaluateAutomaticStartCandidate(depthMeters: depthMeters, timestamp: timestamp) else { return }
+            currentDepthMeters = sample.depthMeters
+            currentTemperatureCelsius = sample.temperatureCelsius
+            guard evaluateLifecycle(with: validated) == .startDive else { return }
             beginDiveIfNeeded()
+        } else if isManualLifecycleActive,
+                  sample.depthMeters > DiveAlgorithmConfiguration.automaticStartDepthMeters {
+            hasObservedSubmersionDuringCurrentDive = true
+            isManualLifecycleActive = false
         }
 
-        addSample(depthMeters: depthMeters, timestamp: timestamp, temperatureCelsius: safeTemperature)
+        addSample(depthMeters: sample.depthMeters, timestamp: sample.timestamp, temperatureCelsius: sample.temperatureCelsius)
+    }
+
+    private func depthValidationMessage(_ validity: DepthSampleValidity) -> String {
+        switch validity {
+        case .valid:
+            return ""
+        case .missing:
+            return String(localized: "Campione profondita mancante: misurazione ignorata.")
+        case .stale:
+            return String(localized: "Campione profondita obsoleto: misurazione ignorata.")
+        case .frozen:
+            return String(localized: "Sensore profondita fermo: misurazione ignorata.")
+        case .spikeRejected:
+            return String(localized: "Variazione profondita non plausibile: campione ignorato.")
+        case .nonFinite:
+            return String(localized: "Campione profondita non finito: misurazione ignorata.")
+        case .outOfRange:
+            return String(localized: "Campione profondita fuori range: misurazione ignorata.")
+        }
     }
 
     private func addSample(depthMeters: Double, timestamp: Date = Date(), temperatureCelsius: Double?) {
@@ -536,7 +551,9 @@ final class DiveManager: NSObject, ObservableObject {
         updateAscentRate(with: sample)
         previousDepthSample = sample
         persistActiveDiveDraft()
-        evaluateAutomaticSurfaceCandidate(depthMeters: sample.depthMeters, timestamp: sample.timestamp)
+        evaluateAutomaticSurfaceCandidate(
+            validatedSample: ValidatedDepthSample(validity: .valid, rawDepthMeters: depthMeters, sample: sample)
+        )
     }
 
     private func updateDepthSafety(for depthMeters: Double) {
@@ -608,8 +625,10 @@ final class DiveManager: NSObject, ObservableObject {
         ascentStatus = AscentStatus.make(rate: rate, depth: sample.depthMeters, limits: ascentSettings.limits)
         if ascentStatus.isOverLimit, ascentAlarmEnabled {
             startBlinking()
+            ascentHaptics.update(isOverLimit: isDiveActive)
         } else {
             stopBlinking()
+            ascentHaptics.clear()
         }
     }
 
@@ -653,16 +672,18 @@ extension DiveManager: CMWaterSubmersionManagerDelegate {
                         isManualLifecycleActive = false
                     }
                     cancelAutomaticSurfaceEnd()
-                } else {
-                    automaticStartCandidateCount = max(
-                        automaticStartCandidateCount,
-                        DiveAlgorithmConfiguration.automaticStartRequiredSamples - 1
-                    )
-                    automaticStartCandidateDate = Date()
                 }
             case .notSubmerged:
                 guard !isManualLifecycleActive || hasObservedSubmersionDuringCurrentDive else { return }
-                evaluateAutomaticSurfaceCandidate(depthMeters: 0, timestamp: Date())
+                guard let previousDepthSample,
+                      previousDepthSample.depthMeters <= DiveAlgorithmConfiguration.automaticStopDepthMeters else { return }
+                evaluateAutomaticSurfaceCandidate(
+                    validatedSample: ValidatedDepthSample(
+                        validity: .valid,
+                        rawDepthMeters: previousDepthSample.depthMeters,
+                        sample: previousDepthSample
+                    )
+                )
             case .unknown: break
             @unknown default: break
             }

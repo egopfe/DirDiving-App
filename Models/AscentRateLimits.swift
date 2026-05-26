@@ -28,8 +28,11 @@ struct AscentRateLimits: Codable, Hashable {
     func limit(for depthMeters: Double) -> Double {
         let clean = normalized()
         guard depthMeters.isFinite else { return clean.fallbackMetersPerMinute }
+        if depthMeters > DepthSafetyConfiguration.maximumSupportedDepthMeters {
+            return min(clean.surfaceMetersPerMinute, clean.fallbackMetersPerMinute)
+        }
         switch depthMeters {
-        case 40...: return min(clean.deepMetersPerMinute, clean.fallbackMetersPerMinute)
+        case 40...: return clean.deepMetersPerMinute
         case 30..<40: return clean.deepMetersPerMinute
         case 20..<30: return clean.midMetersPerMinute
         case 6..<20: return clean.shallowMetersPerMinute

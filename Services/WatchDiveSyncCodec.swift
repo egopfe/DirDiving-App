@@ -163,62 +163,11 @@ enum WatchDiveSyncCodec {
     }
 
     private static func validate(_ session: DiveSession) throws {
-        guard session.durationSeconds.isFinite,
-              session.durationSeconds >= 0,
-              session.durationSeconds <= 86_400 else {
+        do {
+            try DiveSessionAlgorithmValidator.validate(session)
+        } catch {
             throw WatchDiveSyncError.invalidSession
         }
-        guard session.maxDepthMeters.isFinite,
-              session.avgDepthMeters.isFinite,
-              session.ttv.isFinite,
-              session.maxDepthMeters >= 0,
-              session.avgDepthMeters >= 0,
-              session.ttv >= 0,
-              session.maxDepthMeters <= maxDepthMeters,
-              session.avgDepthMeters <= maxDepthMeters else {
-            throw WatchDiveSyncError.invalidSession
-        }
-        guard session.samples.count <= maxSamples else {
-            throw WatchDiveSyncError.invalidSession
-        }
-        guard session.endDate >= session.startDate else {
-            throw WatchDiveSyncError.invalidSession
-        }
-        guard validateOptionalTemperature(session.avgWaterTemperatureCelsius),
-              validateOptionalTemperature(session.minWaterTemperatureCelsius),
-              validateOptionalTemperature(session.maxWaterTemperatureCelsius) else {
-            throw WatchDiveSyncError.invalidSession
-        }
-        for sample in session.samples {
-            guard sample.depthMeters.isFinite,
-                  sample.depthMeters >= 0,
-                  sample.depthMeters <= maxDepthMeters,
-                  validateOptionalTemperature(sample.temperatureCelsius) else {
-                throw WatchDiveSyncError.invalidSession
-            }
-            guard sample.timestamp >= session.startDate,
-                  sample.timestamp <= session.endDate else {
-                throw WatchDiveSyncError.invalidSession
-            }
-        }
-        guard validateOptionalGPS(session.entryGPS),
-              validateOptionalGPS(session.exitGPS) else {
-            throw WatchDiveSyncError.invalidSession
-        }
-    }
-
-    private static func validateOptionalTemperature(_ value: Double?) -> Bool {
-        value?.isFinite ?? true
-    }
-
-    private static func validateOptionalGPS(_ point: GPSPoint?) -> Bool {
-        guard let point else { return true }
-        return point.latitude.isFinite
-            && point.longitude.isFinite
-            && point.horizontalAccuracy.isFinite
-            && point.horizontalAccuracy >= 0
-            && (-90...90).contains(point.latitude)
-            && (-180...180).contains(point.longitude)
     }
 }
 
