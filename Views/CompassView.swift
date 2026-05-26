@@ -7,6 +7,13 @@ struct CompassView: View {
     @State private var bearingToast: String?
 
     private var unitPreference: DIRUnitPreference { DIRUnitPreference.fromStorage(watchUnits) }
+    private var missionModeActiveForCurrentDive: Bool { dive.isMissionModeActive && dive.isDiveActive }
+    private var missionModeProfile: MissionModeRuntimeProfile { dive.missionModeRuntimeProfile }
+    private var compassTransition: AnyTransition {
+        missionModeProfile.animationsEnabled
+            ? .opacity.combined(with: .move(edge: .top))
+            : .identity
+    }
 
     var body: some View {
         ZStack {
@@ -17,7 +24,7 @@ struct CompassView: View {
                 statusBanner
                 if let bearingToast {
                     bearingFeedbackBanner(bearingToast)
-                        .transition(.opacity.combined(with: .move(edge: .top)))
+                        .transition(compassTransition)
                 }
                 compassDial
                 diveMetricsPanel
@@ -29,9 +36,9 @@ struct CompassView: View {
         }
         .onAppear { compass.start() }
         .onDisappear { compass.stop() }
-        .animation(.easeInOut(duration: 0.24), value: compass.headingDegrees)
-        .animation(.easeInOut(duration: 0.24), value: compass.bearingDegrees ?? -1)
-        .animation(.easeInOut(duration: 0.18), value: bearingToast)
+        .animation(missionModeActiveForCurrentDive ? nil : .easeInOut(duration: 0.24), value: compass.headingDegrees)
+        .animation(missionModeActiveForCurrentDive ? nil : .easeInOut(duration: 0.24), value: compass.bearingDegrees ?? -1)
+        .animation(missionModeActiveForCurrentDive ? nil : .easeInOut(duration: 0.18), value: bearingToast)
     }
 
     private var compassStatusIsWarning: Bool {
@@ -238,7 +245,12 @@ struct CompassView: View {
                 RoundedRectangle(cornerRadius: 9, style: .continuous)
                     .stroke(color, lineWidth: 1.4)
             )
-            .shadow(color: color.opacity(0.18), radius: 5, x: 0, y: 0)
+            .shadow(
+                color: missionModeProfile.decorativeEffectsEnabled ? color.opacity(0.18) : .clear,
+                radius: missionModeProfile.decorativeEffectsEnabled ? 5 : 0,
+                x: 0,
+                y: 0
+            )
     }
 
     private func showBearingToast(_ message: String) {

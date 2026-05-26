@@ -12,7 +12,7 @@
 
 The sections below capture the original pre-modification audit run performed on `main` @ `21a7f41`.
 
-Since that audit, the branch advanced to `main` @ `ab398eb` and the repo-side readiness issues identified in the original pass were addressed and revalidated:
+Since that audit, the branch advanced first to `main` @ `ab398eb`, then to `main` @ `2322145`, and the repo-side readiness issues identified in the original pass were addressed and revalidated:
 
 - Terms / Privacy links now point to dedicated legal docs instead of the repository root
 - Watch `InfoView` entitlement wording now distinguishes static target config from Apple provisioning approval
@@ -20,6 +20,8 @@ Since that audit, the branch advanced to `main` @ `ab398eb` and the repo-side re
 - disabled non-advanced planner modes were removed from stable MAIN
 - per-item sync activity visibility was added on Watch and iOS sync surfaces
 - the Watch stopwatch reset now requires confirmation when there is something to reset
+- the Watch surface/live state now exposes an on-screen `Start Dive` action without disabling the automatic depth-driven lifecycle
+- Watch MAIN documentation now also covers Mission Mode, its runtime-only scope, and the minimal active-state indicator near the live header logo
 - README, INDEX, roadmap, release notes, and UX conventions were realigned so the current MAIN architecture no longer points readers at stale branch/UX assumptions
 - `xcodegen generate` passes
 - both simulator builds pass:
@@ -128,7 +130,7 @@ Legend:
 | Watch | Launch disclaimer | Yes | Yes | Yes | Yes | Shown once per cold launch after legal onboarding | Low |
 | Watch | Live Dive primary screen | Yes | Yes | Yes | Yes | Default main screen when only Diving is stable | Low |
 | Watch | Automatic dive lifecycle | Yes | Conditional | Partial | Partial | Code path exists, but real validation depends on Watch Ultra hardware plus approved entitlement | High |
-| Watch | Manual dive fallback | Yes | Yes | Yes | Partial | Good fallback when automatic depth is unavailable; still needs device QA for real-world clarity | Medium |
+| Watch | Manual dive start | Yes | Yes | Yes | Partial | Surface/live `Start Dive` is now visible and does not disable automatic depth-driven start; real hardware QA is still required | Medium |
 | Watch | Depth display | Yes | Yes | Yes | Yes | Remains visually dominant in Live | Low |
 | Watch | Runtime | Yes | Yes | Yes | Yes | Co-visible with TTV | Low |
 | Watch | TTV | Yes | Yes | Yes | Yes | Informational wording is generally safe | Low |
@@ -155,6 +157,8 @@ Legend:
 | Watch | Haptics toggle | Yes | Yes | Yes | Yes | Global toggle is respected by `HapticService` | Low |
 | Watch | Sync status | Yes | Yes | Yes | Yes | Summary status plus recent per-item activity are visible on Watch and iOS surfaces | Low |
 | Watch | Retry queue / clear failed queue | Yes | Yes | Yes | Yes | Queue actions are visible and understandable | Low |
+| Watch | Mission Mode | Yes | Yes | Yes | Yes | Runtime/UI optimization is scoped to active dives only; preference is local to Watch settings | Low |
+| Watch | Mission Mode active indicator | Yes | Yes | Yes | Yes | Minimal icon-only indicator near the live header logo; no layout takeover or safety regression implied | Low |
 | Watch | InfoView / diagnostics | Yes | Yes | Yes | Yes | Helpful diagnostics now distinguish target config from provisioning approval | Low |
 | Watch | App Intents | Yes | Partial | Partial | Partial | Implemented and extracted in build; needs hardware QA | Medium |
 | Watch | Shortcut help | Yes | Yes | Yes | Yes | Honest about Action Button / Side Button limitations | Low |

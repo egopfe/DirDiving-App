@@ -4,7 +4,7 @@ Copyright Federico Lombardo di Monte Iato 2026
 
 DIR DIVING is a SwiftUI **watchOS + iOS companion** project (XcodeGen) for Apple Watch Ultra-class devices and iPhone. The stable **`main`** branch delivers **Diving mode** on Watch (depth, ascent awareness, **BUSSOLA**, log, GPS surface entry/exit, Subsurface CSV) plus the iOS companion (logbook, planner, equipment, analysis, sync). Snorkeling, Apnea, and Buddy Assist live on **experimental** branches only.
 
-**Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](Docs/INDEX.md) · **HEAD consigliato:** `main` @ `ab398eb`
+**Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](Docs/INDEX.md) · **Baseline commit corrente:** `main` @ `2322145`
 
 ## Safety and limitations (MAIN)
 
@@ -12,7 +12,7 @@ Disclaimer completo: [`Docs/SAFETY_DISCLAIMER.md`](Docs/SAFETY_DISCLAIMER.md) ·
 
 DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent awareness, and syncs to the iPhone companion for review and **indicative** planning. It is **not** a certified dive computer unless a future release explicitly documents certification. It does **not** replace training, dive-center rules, certified equipment, or human judgment. Planner and Bühlmann-style presentations are **indicative** — verify with certified tools. GPS is meaningful **at the surface**; underwater or poor-sky conditions mean fixes can be missing — missing data must not be read as “dive success.”
 
-### Stato corrente (`main` @ `ab398eb`, 2026-05-25)
+### Stato corrente (`main` base `2322145`, 2026-05-26)
 
 | Pass | Commit | Contenuto |
 |------|--------|-----------|
@@ -20,6 +20,7 @@ DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent 
 | v8 | `a36dc23` | Planner cilindri/ruoli gas Air/EAN/Trimix, MOD, equipment template GAS, foto→Watch, disclaimer trimix |
 | Readiness | `bd129ca`+ | Onboarding legale, sync, unità, control strategy Watch (`72fa15b`) |
 | Audit/docs alignment | `ab398eb` | Report readiness aggiornato, riferimenti audit coerenti, documentazione MAIN/experimental riallineata |
+| v10 | `2322145` | Watch: pulsante **Start Dive** in superficie senza disattivare l'avvio automatico; iOS: riferimento pianificazione max/media e refresh input planner/Bühlmann allineati |
 
 **Recent MAIN UI/UX pass:** layout, typography, contrast, tab labels, accessibility text, empty states, disclaimers, and documentation only — **no** changes to decompression **algorithm** internals; v8/v9 fixed **gas input propagation** to planner/Bühlmann without rewriting `BuhlmannPlanner` compartment math.
 
@@ -143,6 +144,7 @@ External validation is still required before release:
 - CSV export compatible with Subsurface workflows
 - Integrated compass screen
 - Contextual `SET BEARING` / `CLEAR BEARING` compass action
+- On-screen `Start Dive` on Watch surface/live home state, with manual start that coexists with automatic depth-based dive start
 - Dynamic ascent-rate gauge with green, yellow, and red zones
 - User-configurable ascent-rate limits by depth band
 - Red blinking warning and haptic feedback when ascent rate exceeds the current depth-band limit
@@ -151,8 +153,10 @@ External validation is still required before release:
 - Stable pre-water selector for Diving on `main`; Snorkeling, Apnea and Buddy Assist remain isolated to experimental branches
 - Local persistence with iCloud Key-Value Store mirroring for dive logs, ascent-rate settings, Watch sync queues and supported iOS companion state
 - Custom image screen for bundled reference images, checklists, or static procedures
+- iPhone -> Watch image push with validation/resize on iOS and surface-side image viewing before entering an active dive
 - First-launch legal onboarding with localized IT/EN full disclaimer and mandatory acceptance logging
 - Settings / Legal & Safety screen with accepted version, timestamp, language and full disclaimer
+- Mission Mode auto-enable option for active dives only; runtime/UI optimization profile that reduces non-essential visual activity without altering safety-critical monitoring, dive calculations, sensor accuracy, ascent-rate logic, or GPS entry/exit logging, with a minimal active-state icon near the Watch header logo during the dive
 
 Experimental branch documentation is available in [`Docs/EXPERIMENTAL_FEATURES.md`](Docs/EXPERIMENTAL_FEATURES.md).
 
@@ -172,7 +176,7 @@ Le istruzioni di build sono in [`Docs/BUILD_VALIDATION.md`](Docs/BUILD_VALIDATIO
 - **`codex/experimental-features`**: Watch sperimentale (Snorkeling Live, mappe waypoint/ritorno, Apnea workflow esteso, Buddy Assist, ecc.). Non importare questi file nel target MAIN senza revisione esplicita.
 - **`codex/ios-experimental-features`**: iOS sperimentale (surface Snorkeling/Apnea/Buddy/exploration concepts). Isolato da App Store candidate su `main`.
 - **Allineamenti UI-only** su `main`: possono toccare layout, copy, accessibilità e documentazione **senza** modificare algoritmi di decompressione, modello gas, calcoli TTV/TTR/SAC/CNS/OTU, sampling sensori o regole di sync — vedi [`Docs/MAIN_UX_COMPLETION_REPORT.md`](Docs/MAIN_UX_COMPLETION_REPORT.md).
-- **HEAD `main` consigliato** per release candidate Watch+iOS unificato: **`ab398eb`**. Baseline funzionale: v8 planner gas (`a36dc23`), v9 sync/input refresh (`d962117`), control strategy (`72fa15b`), readiness refresh 2026-05-25. `main-iOS` resta worktree storico divergente: non riallineare codice senza review dedicata.
+- **HEAD `main` consigliato** per release candidate Watch+iOS unificato: **`2322145`** come baseline commit corrente. Baseline funzionale: v8 planner gas (`a36dc23`), v9 sync/input refresh (`d962117`), control strategy (`72fa15b`), readiness refresh 2026-05-25, `Start Dive` Watch e planner depth sync (`2322145`). `main-iOS` resta worktree storico divergente: non riallineare codice senza review dedicata.
 - **UI-only / documentazione**: non alterare Diving mode, GPS surface-only, **BUSSOLA** (mai COMPASSO), export Subsurface, sync HMAC, onboarding legale.
 
 ### Matrice funzionalità (CSV)
@@ -688,7 +692,9 @@ Gli ultimi aggiornamenti MAIN readiness aggiungono:
 - iOS Watch sync con conflitti visibili e risoluzione manuale;
 - tombstone iOS per evitare che log cancellati riappaiano da KVS;
 - import CSV iOS, profilo attrezzatura persistente, tab **Analisi** con riepilogo route GPS e metriche logbook basate su dati reali;
-- planner iOS con warning dinamici e copy non certificato.
+- planner iOS con warning dinamici e copy non certificato;
+- pulsante Watch **Start Dive** in superficie con coesistenza tra avvio manuale e avvio automatico da profondita;
+- Mission Mode Watch con toggle persistente, ottimizzazione runtime/UI solo durante immersione attiva e indicatore minimale vicino al logo header.
 
 Build finale, `xcodegen generate` e `xcodebuild` devono essere eseguiti su macOS.
 
@@ -736,7 +742,7 @@ Panoramica italiana estesa: [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURE
 
 La strategia branch corrente e:
 
-- `main`: codice stabile @ **`ab398eb`**, orientato alla produzione Apple Watch + companion iOS nello stesso workspace, con Diving mode preservato come funzione primaria.
+- `main`: codice stabile @ **`2322145`** come baseline commit corrente, orientato alla produzione Apple Watch + companion iOS nello stesso workspace, con Diving mode preservato come funzione primaria.
 - `main-iOS`: ramo/worktree storico divergente, utile per review manuali ma non canonico per la candidata release MAIN.
 - `codex/experimental-features`: ramo Apple Watch per UI e funzioni sperimentali Snorkeling, Apnea, Buddy Assist e schermate future.
 - `codex/ios-experimental-features`: ramo iOS per companion UI, pianificazione, mappe, enrichment POI e superfici sperimentali.
@@ -918,6 +924,12 @@ Restano obbligatori: build `xcodegen generate` / Xcode su macOS, test Apple Watc
 - Documenti correnti allineati: README, INDEX, ROADMAP, safety/release/TestFlight notes, UX conventions, audit correnti e matrice feature CSV.
 - Audit/readiness correnti aggiornati per riflettere i fix repo-side gia chiusi: legal links dedicati, wording entitlement onesto, localizzazione BUSSOLA/planner, recent sync activity, safeguard reset cronometro.
 - Nuovi report di processo: [`Docs/DOCUMENTATION_UPDATE_REPORT_20260525.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260525.md), [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md), [`Docs/PR_STATUS_20260525.md`](Docs/PR_STATUS_20260525.md).
+
+## Aggiornamento documentazione 2026-05-26
+
+- Baseline commit corrente verificata: `main` @ `2322145`; working tree locale con ulteriori aggiornamenti documentali e Mission Mode Watch.
+- README, indice documentazione, roadmap, note safety/release/TestFlight e audit correnti riallineati al MAIN attuale: `Start Dive` visibile in superficie, immagini visibili fuori immersione attiva, Mission Mode e relativo indicatore minimale.
+- Nuovi report di processo: [`Docs/DOCUMENTATION_UPDATE_REPORT_20260526.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260526.md), [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260526.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260526.md), [`Docs/PR_STATUS_20260526.md`](Docs/PR_STATUS_20260526.md).
 
 ## Aggiornamento documentazione 2026-05-20 (post v9 `d962117`)
 

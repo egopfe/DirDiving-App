@@ -1,8 +1,8 @@
 # DIR DIVING — Panoramica funzionalità (italiano)
 
-**Aggiornato:** 2026-05-25
-**Branch di riferimento:** `main` @ `ab398eb`
-**Spec prodotto corrente:** [`DIR_Diving_Complete_Development_Notes_UPDATED_v9.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v9.md)
+**Aggiornato:** 2026-05-26
+**Branch di riferimento:** `main` @ `2322145` (baseline commit) + pass documentale corrente
+**Spec prodotto corrente:** [`DIR_Diving_Complete_Development_Notes_UPDATED_v10.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v10.md)
 
 Documento additivo: integra README e matrice CSV senza sostituire audit o note legali dettagliate.
 
@@ -38,10 +38,12 @@ Vedi [`SAFETY_DISCLAIMER.md`](SAFETY_DISCLAIMER.md), [`TESTFLIGHT_REVIEW_NOTES.m
 ### Diving (MAIN — `main`)
 
 - Schermata live: profondità, TTV informativo, RunTime, gauge risalita, cronometro manuale, warning risalita inline (non full-screen).
+- **Start Dive** visibile in superficie sulla schermata iniziale/live del Watch: avvio manuale disponibile senza disattivare l'avvio automatico da profondità.
 - **BUSSOLA** dedicata: heading, SET BEARING, CLEAR (terminologia UI: **BUSSOLA**, mai «COMPASSO»).
 - GPS ingresso/uscita **solo in superficie** (best-effort); nessun tracking subacqueo certificato.
 - Log ultime 40 immersioni, dettaglio, export CSV Subsurface, sync WatchConnectivity + iCloud KVS.
 - Settings: limiti risalita, allarmi (profondità default configurabile 30/40 m, tempo default 30 min), haptic, unità metrico/imperiale (display), info device/batteria, sync.
+- **Mission Mode**: opzione locale Watch con toggle *Auto-enable on dive start*; si attiva solo dopo l'ingresso in stato immersione attiva, si disattiva a fine immersione, riduce solo animazioni/effetti non essenziali e mostra un indicatore icona minimale vicino al polpo solo durante l'immersione attiva.
 - Immagini utente: tab sempre disponibile **fuori** immersione attiva; durante immersione solo Live + BUSSOLA.
 - App Intents / Action Button: cronometro, bearing, allarmi (quando watchOS espone gli intent).
 
@@ -110,7 +112,7 @@ Implementazione v8/v9: [`DIR_DIVING_v8_IMPLEMENTATION_REPORT.md`](DIR_DIVING_v8_
 | `codex/experimental-features` | Watch Snorkeling/Apnea/Buddy |
 | `codex/ios-experimental-features` | iOS experimental companion: snorkeling/apnea/buddy/exploration concepts |
 
-Regole merge: preservare Diving stabile, GPS surface-only, BUSSOLA, export Subsurface, security F1–F12. PR #8/#9: non auto-merge (vedi [`PR_STATUS_20260520_POST_V9.md`](PR_STATUS_20260520_POST_V9.md)).
+Regole merge: preservare Diving stabile, GPS surface-only, BUSSOLA, export Subsurface, security F1–F12. PR #8/#9: non auto-merge (vedi [`PR_STATUS_20260526.md`](PR_STATUS_20260526.md)).
 
 ---
 

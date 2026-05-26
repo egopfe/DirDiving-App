@@ -1,7 +1,14 @@
 # Build validation — DIR DIVING (MAIN)
 
-**Branch:** `main` only (`ab398eb` at the latest documentation alignment pass).
+**Branch:** `main` only (`2322145` as current baseline commit for this documentation pass).
 **Generator:** [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`project.yml` at repository root).
+
+**Latest local validation (2026-05-26):**
+
+- `xcodegen generate` -> **PASS**
+- `xcodebuild -scheme "DIRDiving Watch App" -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm),OS=26.5' -configuration Debug build` -> **PASS**
+- `xcodebuild -scheme "DIRDiving iOS" -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5' -configuration Debug build` -> **PASS**
+- XCTest targets/files not present in the repository at the time of this pass
 
 ## Schemes and targets (from `project.yml`)
 

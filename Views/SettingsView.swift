@@ -4,6 +4,7 @@ struct SettingsView: View {
     @EnvironmentObject private var gps: GPSManager
     @EnvironmentObject private var dive: DiveManager
     @EnvironmentObject private var watchSync: WatchSyncService
+    @AppStorage(MissionModeSettings.autoEnableOnDiveStartKey) private var missionModeAutoEnableOnDiveStart = false
     @AppStorage("dirdiving_watch_haptics_enabled") private var hapticsEnabled = true
     @AppStorage("dirdiving_watch_units") private var watchUnits = "metric"
     @AppStorage(DIRAppLanguage.storageKey) private var appLanguage = DIRAppLanguage.system.rawValue
@@ -212,6 +213,8 @@ struct SettingsView: View {
                         subtitle: dive.isDepthAutomationAvailable ? String(localized: "settings.manual.fallback") : String(localized: "settings.manual.live"),
                         informational: true
                     )
+                    missionModeControl
+                        .disabled(dive.isDiveActive)
                     Toggle(isOn: $hapticsEnabled) {
                         settingsRow(
                             icon: "iphone.radiowaves.left.and.right",
@@ -375,6 +378,50 @@ struct SettingsView: View {
         .background(
             RoundedRectangle(cornerRadius: 7, style: .continuous)
                 .fill(Color.black.opacity(0.38))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .stroke(.white.opacity(0.24), lineWidth: 1)
+                )
+        )
+    }
+
+    private var missionModeControl: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 9) {
+                Image(systemName: "bolt.fill")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(DiveUI.yellow)
+                    .frame(width: 24)
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(String(localized: "settings.mission_mode.title"))
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
+                    Text(String(localized: "settings.mission_mode.toggle"))
+                        .font(.system(size: 10, weight: .medium, design: .rounded))
+                        .foregroundStyle(DiveUI.secondaryText)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.72)
+                }
+
+                Spacer(minLength: 0)
+
+                Toggle("", isOn: $missionModeAutoEnableOnDiveStart)
+                    .labelsHidden()
+                    .tint(DiveUI.green)
+            }
+
+            Text(String(localized: "settings.mission_mode.footnote"))
+                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .foregroundStyle(DiveUI.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, 9)
+        .padding(.vertical, 7)
+        .background(
+            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                .fill(Color.black.opacity(0.52))
                 .overlay(
                     RoundedRectangle(cornerRadius: 7, style: .continuous)
                         .stroke(.white.opacity(0.24), lineWidth: 1)

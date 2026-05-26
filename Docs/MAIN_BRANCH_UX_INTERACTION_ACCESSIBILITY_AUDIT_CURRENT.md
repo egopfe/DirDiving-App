@@ -2,7 +2,7 @@
 
 **Date:** 2026-05-25  
 **Branch audited:** `main` @ `ab398eb`
-**Functional baseline on `main`:** stable MAIN including legal revision flow, inline ascent warning policy, compact GPS overlays, App Intents catalog, iPhone -> Watch push, recent sync activity surfaces, stopwatch reset safeguard, and aligned current documentation.
+**Functional baseline on `main`:** stable MAIN including legal revision flow, inline ascent warning policy, compact GPS overlays, visible Watch `Start Dive`, App Intents catalog, iPhone -> Watch push, recent sync activity surfaces, Mission Mode on Watch, stopwatch reset safeguard, and aligned current documentation.
 **Audit type:** Pre-modification audit of runtime UX, navigation, settings, hardware interaction, localization, sync UX, and build/release readiness.  
 **Scope included:** Apple Watch MAIN target, iOS Companion MAIN target.  
 **Scope excluded:** experimental branches and excluded sources in `project.yml` (`Snorkeling`, `Apnea`, `Buddy Assist`, exploration/experimental-only UI).  
@@ -43,7 +43,7 @@ Legend:
 | Launch disclaimer | Yes | Yes | Yes | No | No | No | LOW | `LaunchCompanionDisclaimerOverlay` appears once per app launch after legal onboarding. |
 | Live Dive default entry | Yes | Yes | Yes | No | No | No | LOW | `ContentView` defaults to `.live` when only Diving is stable. |
 | Automatic dive lifecycle | Yes | Conditional | Partial | No | No | Yes | HIGH | Requires Watch hardware + approved water-submersion entitlement; simulator cannot certify it. |
-| Manual dive fallback | Yes | Conditional | Yes | No | No | Yes | MEDIUM | Clear fallback path exists when depth automation is unavailable; intentionally absent when automation is available. |
+| Manual dive start | Yes | Yes | Yes | No | No | Yes | MEDIUM | Visible on-screen `Start Dive` path exists on the Watch surface/live state; automatic depth-driven lifecycle still needs real hardware QA. |
 | Depth readout | Yes | Yes | Yes | No | No | No | LOW | Depth stays visually dominant on Live and respects unit preference. |
 | TTV | Yes | Yes | Yes | No | No | No | LOW | Visible on Live; disclaimer copy clarifies it is informative, not decompression/TTS. |
 | Runtime | Yes | Yes | Yes | No | No | No | LOW | Co-visible with TTV on Live. |
@@ -68,6 +68,8 @@ Legend:
 | Haptics toggle | Yes | Yes | Yes | No | No | No | LOW | Global watch haptic toggle is respected by `HapticService`. |
 | Sync status | Yes | Yes | Partial | No | No | Yes | MEDIUM | Aggregate status is supplemented by recent activity items; a persisted per-session delivery ledger is still not present. |
 | Retry / clear sync queue | Yes | Yes | Yes | No | No | No | LOW | Present in watch Settings when queue is pending/failed. |
+| Mission Mode | Yes | Yes | Yes | No | No | No | LOW | Watch setting is visible and local; activation is limited to active dive runtime. |
+| Mission Mode active indicator | Yes | Yes | Yes | No | No | No | LOW | Small icon-only status indicator near the live header logo; visible only during active dive with Mission Mode active. |
 | App Intents catalog | Yes | Partial | Partial | No | No | Yes | MEDIUM | Intents are compiled and metadata-extracted, but physical Watch QA is still required. |
 | Shortcut help | Yes | Yes | Yes | No | No | No | LOW | Help screen honestly explains Action Button/Side Button limits. |
 | Info / diagnostics | Yes | Yes | Yes | No | No | No | LOW | Useful diagnostics; copy now distinguishes static target config from real Apple provisioning/device validation. |
@@ -217,9 +219,10 @@ Overlay after legal gate:
 | Haptics | Yes | Yes | Yes | No | `dirdiving_watch_haptics_enabled`. |
 | Ascent limits | Yes | Yes | Yes | No | Stored via `AscentRateSettingsStore`; cloud-backed on Watch side. |
 | Alarm toggles + thresholds | Yes | Yes | Yes | No | Watch-local by design. |
+| Mission Mode auto-enable | Yes | Yes | Yes | No | Watch-local setting; enabled only for post-start active dive runtime. |
 | Legal / safety | Yes | Yes | Yes | No | Acceptance and current disclaimer visible. |
 | GPS status | Yes | Read-only | Yes | No | Surface-only behavior explained. |
-| Depth diagnostics | Yes | Read-only | Yes | No | Good diagnostics, but wording around entitlement readiness is too optimistic. |
+| Depth diagnostics | Yes | Read-only | Yes | No | Good diagnostics; current wording distinguishes target configuration from Apple entitlement/provisioning approval. |
 | Sync queue status | Yes | Runtime state | Yes | N/A | Pending/sent/acknowledged/failed counters and retry/clear actions. |
 | Export info | Info only | — | — | No | Export action lives in Dive Log, not Settings. |
 | Brightness / Always-On | Info only | — | — | No | Honest watchOS-managed copy. |
@@ -285,7 +288,7 @@ Overlay after legal gate:
 | Swipe navigation on Watch | Implemented | Vertical page movement via watchOS `TabView`. |
 | Side Button direct control | Not supported | Correctly documented as system-controlled; no false hardware-override claim found. |
 | Long press behavior | Minimal by design | No custom long-press workflow is required; destructive actions rely on explicit confirmation where needed, including stopwatch reset. |
-| On-screen fallback for critical actions | Implemented | Stopwatch, manual dive fallback, bearing set/clear, alarm acknowledge all have visible on-screen paths. |
+| On-screen fallback for critical actions | Implemented | Stopwatch, manual dive start, bearing set/clear, alarm acknowledge all have visible on-screen paths. |
 
 ### 4.2 App Intents catalog
 

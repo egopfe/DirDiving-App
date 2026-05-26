@@ -1,6 +1,6 @@
 # Watch MAIN — UX conventions (product baseline)
 
-**Last updated:** 2026-05-25
+**Last updated:** 2026-05-26
 **Applies to:** Apple Watch `main` branch only (not experimental modes).
 
 These conventions are **accepted product behavior**. Future UI work should treat them as defaults unless the product owner explicitly requests a change.
@@ -37,6 +37,22 @@ On current `main`, when Diving is the only stable mode, cold launch should **aut
 
 ---
 
+## Surface manual dive entry
+
+On current `main`, the Watch surface/live home state must expose an on-screen **Start Dive** action.
+
+| Requirement | Policy |
+|-------------|--------|
+| Visibility | Visible on the surface/live entry state before an active dive begins |
+| Interaction | Starts a manual dive session without requiring the user to wait for automatic depth detection |
+| Automatic start | Must remain active; manual start does **not** disable the automatic depth-driven lifecycle |
+| Duplicate protection | Must not create a second session if a dive is already active |
+| Layout | Reuse existing button style/patterns; no redesign of the live header or primary metric hierarchy |
+
+This manual entry is a stable MAIN affordance, not an experimental fallback hidden behind sensor unavailability.
+
+---
+
 ## Apple Watch controls
 
 | Control | Policy |
@@ -53,3 +69,21 @@ During an active dive, Live remains the primary page and Compass remains reachab
 ## GPS confirmation behavior
 
 GPS start/end confirmation on current MAIN uses a **compact inline banner** that preserves the live metrics context. Do not reintroduce a full-screen GPS takeover on the stable Diving flow.
+
+---
+
+## Mission Mode
+
+Mission Mode on current MAIN is a **runtime/UI optimization profile only** for active dives.
+
+| Requirement | Policy |
+|-------------|--------|
+| Activation | Only after `isDiveActive == true` and only if the Watch setting **Auto-enable on dive start** is enabled |
+| Dive start paths | Both automatic depth-driven start and manual start paths are covered |
+| Deactivation | Automatic at dive end; persisted preference remains unchanged |
+| Allowed optimizations | Reduce non-essential animations, shadows, and decorative effects on existing Watch MAIN views |
+| Visual indicator | A very small static icon-only status mark may appear near the octopus icon in the live header, only while Mission Mode is active during an active dive |
+| Forbidden changes | No change to depth sampling, logging, ascent logic, warning logic, GPS lifecycle metadata, or dive calculations |
+| Layout | No redesign, no new large banners, no replacement of the existing live/compass layout |
+
+Mission Mode must **not** suppress or delay safety-critical information. Depth, runtime, ascent warning state, supported-depth warnings, existing haptics, and other critical alerts remain active.

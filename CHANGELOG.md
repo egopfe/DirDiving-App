@@ -4,6 +4,21 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-26, documentation / branch alignment refresh)
+
+- **Documentazione corrente:** riallineati `README.md`, `Docs/INDEX.md`, `Docs/PRODUCT_FEATURES_IT.md`, `Docs/ROADMAP.md`, `Docs/BUILD_VALIDATION.md`, `Docs/RELEASE_CHECKLIST.md`, `Docs/TESTFLIGHT_REVIEW_NOTES.md`, `Docs/SAFETY_DISCLAIMER.md`, `Docs/WATCH_MAIN_UX_CONVENTIONS.md`.
+- **Audit correnti:** aggiornati `Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md` e `Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_CURRENT.md` per riflettere il Watch `Start Dive`, Mission Mode e la narrativa branch corrente.
+- **Nuovi report:** `Docs/DOCUMENTATION_UPDATE_REPORT_20260526.md`, `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260526.md`, `Docs/PR_STATUS_20260526.md`.
+- **Branch strategy:** `main` confermato come baseline stabile; `main-iOS` confermato come worktree storico divergente; `codex/*` mantenuti experimental-only.
+
+### Added (2026-05-26, Mission Mode — Watch MAIN)
+
+- **Watch MAIN:** nuova impostazione `Mission Mode` con toggle persistente **Auto-enable on dive start** (`dirdiving.missionMode.autoEnableOnDiveStart`), default OFF.
+- **Lifecycle:** Mission Mode si attiva solo dopo il passaggio a immersione attiva e si disattiva automaticamente a fine immersione; coperti sia avvio automatico da sensore sia avvio manuale.
+- **Runtime/UI only:** ridotte animazioni, transizioni e shadow decorative non essenziali su Live e BUSSOLA; warning safety, profondita, runtime, logica risalita, logging e GPS entry/exit restano invariati.
+- **Indicatore UI:** piccola icona statica vicino al polpo nell'header live, visibile solo quando Mission Mode e attivo durante una immersione attiva.
+- **Documentazione:** aggiornati `README.md`, `Docs/PRODUCT_FEATURES_IT.md`, `Docs/WATCH_MAIN_UX_CONVENTIONS.md`, `Docs/SAFETY_DISCLAIMER.md`, `Docs/INDEX.md`; nuovo documento `Docs/MISSION_MODE_MAIN_WATCH.md`; matrice CSV aggiornata.
+
 ### Added (2026-05-25, documentation / branch alignment — `ab398eb`)
 
 - **Documentazione:** riallineati `README.md`, `Docs/INDEX.md`, `Docs/PRODUCT_FEATURES_IT.md`, `Docs/ROADMAP.md`, `Docs/BUILD_VALIDATION.md`, `Docs/RELEASE_CHECKLIST.md`, `Docs/SAFETY_DISCLAIMER.md`, `Docs/TESTFLIGHT_REVIEW_NOTES.md`, `Docs/WATCH_MAIN_UX_CONVENTIONS.md`.

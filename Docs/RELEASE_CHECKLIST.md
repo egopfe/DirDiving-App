@@ -31,6 +31,7 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 ## Device matrix (manuale)
 
 - [ ] Apple Watch **Ultra** — live screen, gauge, START/STOP/RESET, testi non tagliati  
+- [ ] Apple Watch **Ultra** — pulsante **Start Dive** visibile in superficie; avvia sessione manuale senza impedire il successivo lifecycle automatico da profondita
 - [ ] Apple Watch **41/45 mm** — stesse schermate  
 - [ ] iPhone **piccolo** (es. SE class) — tab bar + Logbook  
 - [ ] iPhone **Pro Max** — card e grafici  
@@ -40,6 +41,8 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 - [ ] Logbook **vuoto** — empty state + passi successivi  
 - [ ] Export **fallito** — messaggio esplicito  
 - [ ] Aptica Watch **off** — badge “avvisi solo visivi” visibile  
+- [ ] Immagini sync iPhone -> Watch leggibili e raggiungibili fuori immersione attiva
+- [ ] Mission Mode: toggle visibile in Settings, attivazione solo durante immersione attiva, indicatore minimale visibile solo quando attivo
 
 ## Sicurezza / copy
 

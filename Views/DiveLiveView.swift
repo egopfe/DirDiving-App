@@ -24,6 +24,20 @@ struct DiveLiveView: View {
         DepthSafetyReadoutStyle.forState(depthSafetyState, redWarningBlink: dive.redWarningBlink)
     }
 
+    private var missionModeProfile: MissionModeRuntimeProfile {
+        dive.missionModeRuntimeProfile
+    }
+
+    private var showsMissionModeIndicator: Bool {
+        dive.isDiveActive && dive.isMissionModeActive
+    }
+
+    private var activeDiveTransition: AnyTransition {
+        missionModeProfile.animationsEnabled
+            ? .opacity.combined(with: .move(edge: .top))
+            : .identity
+    }
+
     var body: some View {
         ZStack {
             DiveScreenBackground()
@@ -60,7 +74,7 @@ struct DiveLiveView: View {
                 .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
             }
         }
-        .animation(.easeInOut(duration: 0.18), value: dive.redWarningBlink)
+        .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.18) : nil, value: dive.redWarningBlink)
         .onChange(of: showAscentAlarmBanner) { wasActive, isActive in
             manageAscentAlarmHaptics(wasActive: wasActive, isActive: isActive)
         }
@@ -208,11 +222,11 @@ struct DiveLiveView: View {
                     rateMetersPerMinute: dive.ascentStatus.currentRateMetersPerMinute,
                     isActive: true
                 )
-                .transition(.opacity.combined(with: .move(edge: .top)))
+                .transition(activeDiveTransition)
             }
             if depthSafetyState != .normal {
                 DepthSafetyBannerView(state: depthSafetyState)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                    .transition(activeDiveTransition)
             }
             if dive.exceededSupportedDepthRange {
                 Text(String(localized: "depth.safety.exceeded.readings"))
@@ -225,8 +239,8 @@ struct DiveLiveView: View {
             stopwatchPanel
             controls
         }
-        .animation(.easeInOut(duration: 0.3), value: showAscentAlarmBanner)
-        .animation(.easeInOut(duration: 0.22), value: depthSafetyState)
+        .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.3) : nil, value: showAscentAlarmBanner)
+        .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.22) : nil, value: depthSafetyState)
     }
 
     private var preDiveWaitingContent: some View {
@@ -309,6 +323,12 @@ struct DiveLiveView: View {
                 DiveOctopusLogo(accent: DiveUI.blue)
                     .frame(width: 29, height: 26, alignment: .leading)
                     .scaleEffect(0.8)
+                    .overlay(alignment: .topTrailing) {
+                        if showsMissionModeIndicator {
+                            MissionModeIndicatorView()
+                                .offset(x: 2, y: -1)
+                        }
+                    }
                 Text("DIR DIVING")
                     .font(.system(size: 15, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.yellow)
@@ -441,7 +461,12 @@ struct DiveLiveView: View {
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .stroke(DiveUI.green.opacity(0.86), lineWidth: 1.4)
                 )
-                .shadow(color: DiveUI.green.opacity(0.16), radius: 5, x: 0, y: 0)
+                .shadow(
+                    color: missionModeProfile.decorativeEffectsEnabled ? DiveUI.green.opacity(0.16) : .clear,
+                    radius: missionModeProfile.decorativeEffectsEnabled ? 5 : 0,
+                    x: 0,
+                    y: 0
+                )
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("TTV sessione \(ttvText), runtime \(runtimeMinutes)")
@@ -496,7 +521,12 @@ struct DiveLiveView: View {
                     .lineLimit(1)
                     .monospacedDigit()
                     .foregroundStyle(style.depthColor)
-                    .shadow(color: style.depthShadow, radius: 8, x: 0, y: 0)
+                    .shadow(
+                        color: missionModeProfile.decorativeEffectsEnabled ? style.depthShadow : .clear,
+                        radius: missionModeProfile.decorativeEffectsEnabled ? 8 : 0,
+                        x: 0,
+                        y: 0
+                    )
                     .layoutPriority(1)
                 Text(depthDisplay.unitLabel)
                     .font(.system(size: 31, weight: .black, design: .rounded))
@@ -604,7 +634,12 @@ struct DiveLiveView: View {
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
                         .stroke(DiveUI.yellow.opacity(0.9), lineWidth: 1.4)
                 )
-                .shadow(color: DiveUI.yellow.opacity(0.16), radius: 5, x: 0, y: 0)
+                .shadow(
+                    color: missionModeProfile.decorativeEffectsEnabled ? DiveUI.yellow.opacity(0.16) : .clear,
+                    radius: missionModeProfile.decorativeEffectsEnabled ? 5 : 0,
+                    x: 0,
+                    y: 0
+                )
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(String(localized: "live.stopwatch.a11y"))

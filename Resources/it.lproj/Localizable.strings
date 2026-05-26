@@ -300,6 +300,9 @@
 "settings.audio.info" = "Toni audio non implementati; sott'acqua solo vibrazione.";
 "settings.manual.fallback" = "Disponibile insieme all'avvio automatico";
 "settings.manual.live" = "Usa avvio manuale dalla schermata live";
+"settings.mission_mode.title" = "Mission Mode";
+"settings.mission_mode.toggle" = "Attiva automaticamente all'inizio immersione";
+"settings.mission_mode.footnote" = "Riduce l'attivita visiva non essenziale durante l'immersione attiva mantenendo attivi alert di sicurezza e dati immersione.";
 "settings.haptics.on" = "Attiva per warning e conferme";
 "settings.haptics.off" = "Disattivata";
 "settings.language.subtitle" = "System / Italiano / English";

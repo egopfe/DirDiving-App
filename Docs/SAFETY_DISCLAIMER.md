@@ -1,6 +1,6 @@
 # Disclaimer di sicurezza - DIR DIVING
 
-**Versione documento:** 2026-05-25 - baseline `main` @ `ab398eb`
+**Versione documento:** 2026-05-26 - baseline `main` @ `2322145` + pass documentale corrente
 
 DIR DIVING (Apple Watch MAIN + iOS Companion) e uno strumento companion per log immersioni e supporto operativo. **Non** e un computer subacqueo certificato, **non** e un planner decompressivo certificato, **non** e un dispositivo life-support e **non** e un sistema di soccorso o navigazione sostitutivo.
 
@@ -33,8 +33,17 @@ L'accettazione viene registrata localmente con timestamp, versione app accettata
 
 - L'entitlement **water submersion** va approvato in Apple Developer e validato su **hardware reale** (non simulatore).
 - Fino a validazione completa, la profondita automatica puo non essere disponibile: usare **avvio manuale** dove documentato.
+- Il pulsante Watch **Start Dive** e un percorso manuale di superficie; non disattiva l'avvio automatico da profondita quando il sensore e disponibile.
 - Il simulatore e macOS **non** certificano profondita o pressione.
 - Le soglie 35 / 38 / 40 m sono una politica di discouragement e logging, non una certificazione di sicurezza.
+
+## Mission Mode
+
+- Mission Mode e un profilo di ottimizzazione runtime/UI del Watch MAIN, non una modalita immersione separata.
+- Se abilitato, si attiva **solo dopo** l'inizio dell'immersione attiva e si disattiva automaticamente a fine immersione.
+- **Non** riduce monitoraggio safety-critical, **non** cambia warning, **non** modifica campionamento profondita, logging, GPS entry/exit, calcoli o algoritmi immersione.
+- Riduce solo animazioni/effetti visivi non essenziali su superfici gia esistenti.
+- L'indicatore Mission Mode nel live header e solo una conferma di stato minima; non sostituisce warning o metriche di sicurezza.
 
 ## GPS (solo superficie)
 

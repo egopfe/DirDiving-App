@@ -28,6 +28,7 @@ final class DiveManager: NSObject, ObservableObject {
     @Published var gpsConfirmation: DiveGPSConfirmation?
     @Published var isDepthAutomationAvailable = CMWaterSubmersionManager.waterSubmersionAvailable
     @Published var isManualLifecycleActive = false
+    @Published private(set) var isMissionModeActive = false
     @Published private(set) var depthSafetyState: DepthSafetyState = .normal
     @Published private(set) var exceededSupportedDepthRange = false
 
@@ -80,6 +81,14 @@ final class DiveManager: NSObject, ObservableObject {
     private var lastAlarmDismissDate: Date?
     private var activeDiveExceededSupportedDepth = false
     private var hasObservedSubmersionDuringCurrentDive = false
+
+    private var missionModeAutoEnableOnDiveStart: Bool {
+        UserDefaults.standard.bool(forKey: MissionModeSettings.autoEnableOnDiveStartKey)
+    }
+
+    var missionModeRuntimeProfile: MissionModeRuntimeProfile {
+        isMissionModeActive ? .mission : .standard
+    }
 
     init(logStore: DiveLogStore, gpsManager: GPSManager, ascentSettings: AscentRateSettingsStore) {
         self.logStore = logStore
@@ -153,6 +162,7 @@ final class DiveManager: NSObject, ObservableObject {
         isDiveActive = true
         isManualLifecycleActive = isManual
         hasObservedSubmersionDuringCurrentDive = !isManual
+        applyMissionModeIfNeededOnDiveStart()
         HapticService.shared.criticalConfirm()
         alarmWarningMessage = nil
         sessionStart = Date()
@@ -197,6 +207,7 @@ final class DiveManager: NSObject, ObservableObject {
         isFinalizingDive = true
         isManualLifecycleActive = false
         hasObservedSubmersionDuringCurrentDive = false
+        deactivateMissionModeOnDiveEnd()
         HapticService.shared.criticalConfirm()
         runtimeTimer?.invalidate()
         runtimeTimer = nil
@@ -356,6 +367,14 @@ final class DiveManager: NSObject, ObservableObject {
                 self.gpsConfirmation = nil
             }
         }
+    }
+
+    func applyMissionModeIfNeededOnDiveStart() {
+        isMissionModeActive = missionModeAutoEnableOnDiveStart
+    }
+
+    func deactivateMissionModeOnDiveEnd() {
+        isMissionModeActive = false
     }
 }
 

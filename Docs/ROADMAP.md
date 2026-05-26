@@ -1,6 +1,6 @@
 # Roadmap DIR DIVING
 
-**Aggiornato:** 2026-05-25 (`main` @ `ab398eb`)
+**Aggiornato:** 2026-05-26 (`main` base `2322145`, con pass documentale corrente)
 
 ## Rilasciati su `main` (Watch MAIN + iOS nel workspace)
 
@@ -44,10 +44,13 @@
 | Foto iPhone→Watch con validazione/resize | ✅ | `a36dc23` |
 | Watch User Images in superficie (tab sempre) | ✅ | `d962117` |
 | Planner/Bühlmann sync su input gas | ✅ | `d962117` — algoritmo Bühlmann invariato |
+| Start Dive manuale visibile su Watch | ✅ | `2322145` — avvio manuale in superficie senza disattivare l'avvio automatico |
+| Mission Mode Watch + indicatore attivo | ✅ | Working tree/doc pass 2026-05-26; ottimizzazione runtime/UI senza regressioni safety-critical documentate |
 | Terms / Privacy dedicati | ✅ | Docs legali dedicate usate da Watch e iOS onboarding/settings |
 | Sync activity recente Watch/iOS | ✅ | Visibilita recente per photo/session activity senza alterare il protocollo |
 | Safeguard reset cronometro Watch | ✅ | Conferma esplicita quando esiste tempo da resettare |
 | Docs / audit alignment 2026-05-25 | ✅ | README, INDEX, safety/release docs e matrix riallineati al MAIN corrente |
+| Docs / branch / PR alignment 2026-05-26 | ✅ | README, INDEX, roadmap, current audits, branch/PR reports riallineati alla baseline MAIN attuale |
 
 ## Prossimo (MAIN, pre–App Store)
 

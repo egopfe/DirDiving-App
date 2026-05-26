@@ -1,6 +1,6 @@
 # Note per TestFlight / App Review - DIR DIVING
 
-**Aggiornato:** 2026-05-25 - branch `main` (Watch + iOS companion unificati)
+**Aggiornato:** 2026-05-26 - branch `main` (Watch + iOS companion unificati)
 
 ## Panoramica per il revisore
 
@@ -35,7 +35,8 @@ L'app **non** e presentata come computer subacqueo certificato.
 3. GPS **inaffidabile** sott'acqua.
 4. Profondita automatica: validare su **Apple Watch Ultra** reale dopo approvazione entitlement e provisioning corretto.
 5. Side Button / Action Button Watch: l'app **non** puo intercettare direttamente il tasto laterale. Controlli immersione affidabili restano **START / STOP / RESET** sullo schermo Live. Comandi aggiuntivi (cronometro, immersione manuale, BUSSOLA, allarme) sono disponibili tramite **Comandi Rapidi / Action Button** solo dove watchOS espone gli App Intent registrati — vedi Impostazioni -> Azione / Comandi.
-6. Terms / Privacy da onboarding e settings puntano a documenti dedicati, non alla root del repository.
+6. Mission Mode e solo un profilo di ottimizzazione runtime/UI per immersione attiva: non riduce monitoraggio safety-critical, non modifica logica immersione o sensori e usa solo un indicatore visivo minimale.
+7. Terms / Privacy da onboarding e settings puntano a documenti dedicati, non alla root del repository.
 
 ## Checklist QA consigliata (reviewer)
 
@@ -45,6 +46,8 @@ L'app **non** e presentata come computer subacqueo certificato.
 - [ ] Live dive: profondita, gauge risalita, TTV, cronometro visibili con banner GPS compatto
 - [ ] Banner risalita rosso: gauge e profondita restano visibili
 - [ ] Allarme: pulsante OK + cooldown
+- [ ] Surface state Watch: **Start Dive** visibile e avvio manuale disponibile senza rimuovere l'avvio automatico da profondita
+- [ ] Mission Mode: toggle Settings + indicatore header verificati; nessun cambiamento ai dati safety-critical
 - [ ] Export CSV Subsurface da dettaglio immersione
 - [ ] Planner: disclaimer visibile; output indicativo
 - [ ] Settings / More: link Terms / Privacy raggiungibili e leggibili

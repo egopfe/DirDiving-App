@@ -300,6 +300,9 @@
 "settings.audio.info" = "Audio tones are not implemented; underwater feedback uses haptics only.";
 "settings.manual.fallback" = "Available alongside automatic start";
 "settings.manual.live" = "Use manual start from the live screen";
+"settings.mission_mode.title" = "Mission Mode";
+"settings.mission_mode.toggle" = "Auto-enable on dive start";
+"settings.mission_mode.footnote" = "Reduces non-essential visual activity during active dives while keeping safety alerts and dive data active.";
 "settings.haptics.on" = "Active for warnings and confirmations";
 "settings.haptics.off" = "Disabled";
 "settings.language.subtitle" = "System / Italian / English";
