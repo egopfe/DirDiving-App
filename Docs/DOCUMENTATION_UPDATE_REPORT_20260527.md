@@ -60,7 +60,7 @@ No local file conflicts were found during the documentation pass.
 
 Open GitHub PR status:
 
-- PR #8: `codex/experimental-features` -> `main`, `CONFLICTING`
+- PR #8: `codex/experimental-features` -> `main`, `UNKNOWN` / `CONFLICTING` observed; treat as unsafe
 - PR #9: `codex/ios-experimental-features` -> `main-iOS`, `CONFLICTING`
 
 ---
