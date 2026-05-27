@@ -4,6 +4,26 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-19, documentation / branch alignment — baseline `92e639a`)
+
+- **Baseline commit:** README, INDEX, ROADMAP, PRODUCT_FEATURES_IT, SAFETY_DISCLAIMER, BUILD_VALIDATION e matrice CSV riallineati a `main` @ `92e639a`.
+- **Algorithm hardening documentato:** pass `ddaf2d7` → `92e639a` indicizzato con [`Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md) e audit [`Docs/CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](Docs/CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md).
+- **Nuovi report:** [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260519.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260519.md), [`Docs/PR_STATUS_20260519.md`](Docs/PR_STATUS_20260519.md).
+- **Feature matrix:** righe additivi per algorithm validation pipeline, XCTest target, stale backlog rows riallineate a Implemented dove già presenti su `main`.
+- **Branch strategy:** `main` = baseline stabile; `main-iOS` = worktree storico divergente; `codex/*` = experimental-only.
+- **Vincoli:** solo documentazione/repository consistency; nessuna modifica runtime in questo pass.
+
+### Added (2026-05-26, Watch algorithm release-hard — `92e639a`)
+
+- **Watch MAIN:** depth sample validation pipeline, automatic dive lifecycle algorithm, time-weighted average depth, centralized ascent/T compass math, `AscentSafetyHapticCoordinator`, timestamp-derived runtime/stopwatch.
+- **Tests:** target `DIRDiving Watch Algorithm Tests` + `Tests/WatchAlgorithmTests/DiveAlgorithmTests.swift`.
+- **Report:** [`Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md).
+
+### Added (2026-05-26, Watch algorithm audit — `ddaf2d7`)
+
+- **Watch MAIN:** audit matematico/algoritmico completo; hardening iniziale su DiveManager, merge, sync codec, export.
+- **Report:** [`Docs/CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](Docs/CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md).
+
 ### Added (2026-05-26, documentation / branch alignment refresh)
 
 - **Documentazione corrente:** riallineati `README.md`, `Docs/INDEX.md`, `Docs/PRODUCT_FEATURES_IT.md`, `Docs/ROADMAP.md`, `Docs/BUILD_VALIDATION.md`, `Docs/RELEASE_CHECKLIST.md`, `Docs/TESTFLIGHT_REVIEW_NOTES.md`, `Docs/SAFETY_DISCLAIMER.md`, `Docs/WATCH_MAIN_UX_CONVENTIONS.md`.

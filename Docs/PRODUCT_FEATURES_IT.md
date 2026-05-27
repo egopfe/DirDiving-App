@@ -1,7 +1,7 @@
 # DIR DIVING — Panoramica funzionalità (italiano)
 
-**Aggiornato:** 2026-05-26
-**Branch di riferimento:** `main` @ `2322145` (baseline commit) + pass documentale corrente
+**Aggiornato:** 2026-05-19
+**Branch di riferimento:** `main` @ `92e639a` (baseline commit) + pass documentale corrente
 **Spec prodotto corrente:** [`DIR_Diving_Complete_Development_Notes_UPDATED_v10.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v10.md)
 
 Documento additivo: integra README e matrice CSV senza sostituire audit o note legali dettagliate.
@@ -46,6 +46,7 @@ Vedi [`SAFETY_DISCLAIMER.md`](SAFETY_DISCLAIMER.md), [`TESTFLIGHT_REVIEW_NOTES.m
 - **Mission Mode**: opzione locale Watch con toggle *Auto-enable on dive start*; si attiva solo dopo l'ingresso in stato immersione attiva, si disattiva a fine immersione, riduce solo animazioni/effetti non essenziali e mostra un indicatore icona minimale vicino al polpo solo durante l'immersione attiva.
 - Immagini utente: tab sempre disponibile **fuori** immersione attiva; durante immersione solo Live + BUSSOLA.
 - App Intents / Action Button: cronometro, bearing, allarmi (quando watchOS espone gli intent).
+- **Algorithm hardening MAIN (`92e639a`):** pipeline depth validata, lifecycle automatico >1 m con debounce, TTV/time-weighted average depth, haptic coordinator fuori da SwiftUI view; resta **non certificato** — vedi [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md).
 
 ### Snorkeling (sperimentale — `codex/experimental-features`)
 

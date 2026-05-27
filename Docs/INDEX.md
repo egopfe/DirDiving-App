@@ -1,10 +1,26 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-05-26
-**Branch consigliato:** `main` @ `9d8baa1` (HEAD locale e remoto verificati dopo `git pull --ff-only`, commit `9d8baa15cffb7cd60f30445e082ca2cf43ac7111`)
+**Aggiornato:** 2026-05-19
+**Branch consigliato:** `main` @ `92e639a` (HEAD locale e remoto allineati dopo `git fetch --all --prune`)
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
 
+
+## Aggiornamento indice 2026-05-19 — baseline `92e639a` + algorithm hardening
+
+Pass documentale additivo su `main` @ `92e639a`:
+
+| Documento | Contenuto |
+|-----------|-----------|
+| [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md) | Release-hard pass Watch MAIN @ `92e639a`: depth validator, lifecycle, TTV, haptic coordinator, XCTest |
+| [`CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md) | Audit matematico/algoritmico Watch MAIN @ `ddaf2d7` |
+| [`DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md) | Allineamento branch strategy, MAIN vs experimental, conflict policy |
+| [`DOCUMENTATION_UPDATE_REPORT_20260519.md`](DOCUMENTATION_UPDATE_REPORT_20260519.md) | Report A–O del pass documentale corrente |
+| [`PR_STATUS_20260519.md`](PR_STATUS_20260519.md) | Stato PR #8 / #9 e raccomandazioni merge |
+
+Riferimenti UI obbligatori: [`ReferenceUI/Watch_LIVE_reference.png`](ReferenceUI/Watch_LIVE_reference.png), [`ReferenceUI/iOS_Companion_reference.png`](ReferenceUI/iOS_Companion_reference.png), [`FeatureScreenshots/02-ascent-warning.png`](FeatureScreenshots/02-ascent-warning.png).
+
+---
 
 ## Aggiornamento indice 2026-05-26 - documenti e asset indicizzati
 

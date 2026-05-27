@@ -1,6 +1,6 @@
 # Disclaimer di sicurezza - DIR DIVING
 
-**Versione documento:** 2026-05-26 - baseline `main` @ `2322145` + pass documentale corrente
+**Versione documento:** 2026-05-19 — baseline `main` @ `92e639a` + pass documentale corrente
 
 DIR DIVING (Apple Watch MAIN + iOS Companion) e uno strumento companion per log immersioni e supporto operativo. **Non** e un computer subacqueo certificato, **non** e un planner decompressivo certificato, **non** e un dispositivo life-support e **non** e un sistema di soccorso o navigazione sostitutivo.
 

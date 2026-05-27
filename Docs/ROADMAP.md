@@ -1,6 +1,6 @@
 # Roadmap DIR DIVING
 
-**Aggiornato:** 2026-05-26 (`main` base `2322145`, con pass documentale corrente)
+**Aggiornato:** 2026-05-19 (`main` base `92e639a`, con pass documentale corrente)
 
 ## Rilasciati su `main` (Watch MAIN + iOS nel workspace)
 
@@ -45,10 +45,12 @@
 | Watch User Images in superficie (tab sempre) | ✅ | `d962117` |
 | Planner/Bühlmann sync su input gas | ✅ | `d962117` — algoritmo Bühlmann invariato |
 | Start Dive manuale visibile su Watch | ✅ | `2322145` — avvio manuale in superficie senza disattivare l'avvio automatico |
-| Mission Mode Watch + indicatore attivo | ✅ | Working tree/doc pass 2026-05-26; ottimizzazione runtime/UI senza regressioni safety-critical documentate |
 | Terms / Privacy dedicati | ✅ | Docs legali dedicate usate da Watch e iOS onboarding/settings |
 | Sync activity recente Watch/iOS | ✅ | Visibilita recente per photo/session activity senza alterare il protocollo |
 | Safeguard reset cronometro Watch | ✅ | Conferma esplicita quando esiste tempo da resettare |
+| Mission Mode Watch + indicatore attivo | ✅ | `9d8baa1`; ottimizzazione runtime/UI senza regressioni safety-critical documentate |
+| Watch algorithm release-hard pass | ✅ | `ddaf2d7` → `92e639a`; validator depth, lifecycle, TTV/time-weighted avg, haptic coordinator, XCTest |
+| Docs / branch / PR alignment 2026-05-19 | ✅ | README, INDEX, roadmap, safety/release docs, matrix e branch strategy @ `92e639a` |
 | Docs / audit alignment 2026-05-25 | ✅ | README, INDEX, safety/release docs e matrix riallineati al MAIN corrente |
 | Docs / branch / PR alignment 2026-05-26 | ✅ | README, INDEX, roadmap, current audits, branch/PR reports riallineati alla baseline MAIN attuale |
 
@@ -58,6 +60,7 @@
 |----------|------|------|
 | P0 | Approvazione entitlement water-submersion + provisioning aggiornato | Apple Developer / Signing — [`TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md) |
 | P0 | Build generici firmati Watch + iOS con target embedded | Release / QA |
+| P1 | Esecuzione XCTest `DIRDiving Watch Algorithm Tests` su macOS/Xcode | Release / QA — [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md) |
 | P1 | QA reale Apple Watch Ultra per lifecycle automatico, profondita e limiti 35/38/40 m | Hardware QA |
 | P1 | QA pairing/sync bidirezionale su device | Hardware QA |
 | P1 | QA App Intents / Action Button su Watch fisico | Hardware QA |

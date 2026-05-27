@@ -14,7 +14,7 @@
 - Allineare `README.md` con `project.yml` (nomi scheme, piattaforme).
 - Aggiornare README/Docs quando cambiano onboarding legale, disclaimer, lingua, unità/sync o Branch Strategy.
 - Panoramica funzioni (IT): [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md).
-- Specifiche prodotto MAIN: note v9 [`Docs/DIR_Diving_Complete_Development_Notes_UPDATED_v9.md`](Docs/DIR_Diving_Complete_Development_Notes_UPDATED_v9.md); report [`Docs/DIR_DIVING_v9_IMPLEMENTATION_REPORT.md`](Docs/DIR_DIVING_v9_IMPLEMENTATION_REPORT.md).
+- Specifiche prodotto MAIN: note v10 [`Docs/DIR_Diving_Complete_Development_Notes_UPDATED_v10.md`](Docs/DIR_Diving_Complete_Development_Notes_UPDATED_v10.md); algorithm audit [`Docs/CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](Docs/CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md) e hardening [`Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md).
 - Specifiche storiche: [`Docs/DIR_Diving_Main_Branch_Development_Notes.md`](Docs/DIR_Diving_Main_Branch_Development_Notes.md), [`Docs/DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md`](Docs/DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md).
 - Build: seguire `Docs/BUILD_VALIDATION.md` su **macOS**.
 

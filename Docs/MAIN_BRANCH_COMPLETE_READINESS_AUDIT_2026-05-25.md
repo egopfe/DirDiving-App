@@ -12,7 +12,7 @@
 
 The sections below capture the original pre-modification audit run performed on `main` @ `21a7f41`.
 
-Since that audit, the branch advanced first to `main` @ `ab398eb`, then to `main` @ `2322145`, and the repo-side readiness issues identified in the original pass were addressed and revalidated:
+Since that audit, the branch advanced to `main` @ `92e639a`, and the repo-side readiness issues identified in the original pass were addressed and revalidated:
 
 - Terms / Privacy links now point to dedicated legal docs instead of the repository root
 - Watch `InfoView` entitlement wording now distinguishes static target config from Apple provisioning approval
@@ -22,7 +22,8 @@ Since that audit, the branch advanced first to `main` @ `ab398eb`, then to `main
 - the Watch stopwatch reset now requires confirmation when there is something to reset
 - the Watch surface/live state now exposes an on-screen `Start Dive` action without disabling the automatic depth-driven lifecycle
 - Watch MAIN documentation now also covers Mission Mode, its runtime-only scope, and the minimal active-state indicator near the live header logo
-- README, INDEX, roadmap, release notes, and UX conventions were realigned so the current MAIN architecture no longer points readers at stale branch/UX assumptions
+- Watch MAIN algorithm hardening (`ddaf2d7` → `92e639a`) adds validated depth pipeline, lifecycle algorithm, TTV/time-weighted average depth consistency, haptic coordinator, and XCTest coverage — see [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md)
+- README, INDEX, roadmap, release notes, and UX conventions were realigned so the current MAIN architecture no longer points readers at stale branch/UX assumptions (latest pass 2026-05-19 @ `92e639a`)
 - `xcodegen generate` passes
 - both simulator builds pass:
   - `DIRDiving Watch App` -> `generic/platform=watchOS Simulator`
