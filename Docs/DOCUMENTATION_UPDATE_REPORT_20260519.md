@@ -1,100 +1,140 @@
-# Report aggiornamento documentazione DIR DIVING — 2026-05-19 (pass completo)
+# DIR DIVING — Documentation Update Report 2026-05-19
 
-Documento di chiusura per allineamento **solo documentazione** dopo `git fetch origin`, ispezione branch locali/remoti e PR GitHub. Nessuna modifica a logica runtime richiesta da questa attività.
-
----
-
-## A. File aggiornati
-
-| File | Tipo modifica |
-|------|----------------|
-| `README.md` | Allineamento testuale MAIN iOS (tab **Analisi**, niente «Route Review» come tab separata su `main` unificato); matrice piattaforme `main-iOS`; sezioni readiness/audit. |
-| `Docs/DIR_DIVING_Feature_Comparison.csv` | Righe additive (Return-to-entry snorkeling, waypoint/bearing); correzione riga Explore → Analisi; nota su Route Review vs Analisi; righe doc per nuovi report. |
-| `CHANGELOG.md` | Voce `[Unreleased]` aggiornata per questo pass. |
-| `CONTRIBUTING.md` | Nota operativa su PR conflittuali e commenti `gh pr`. |
-| `Docs/DOCUMENTATION_SYNC_REPORT_20260519.md` | Riferimento backup branch e timestamp verifica PR. |
-| `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md` | Append operazioni 2026-05-19 (backup, commit docs-only). |
-| `Docs/IOS_TAB_TARGET_MISMATCH_STATUS_20260519.md` | Versionato (stato HEAD vs working tree). |
-| `Docs/DOCUMENTATION_UPDATE_REPORT_20260519.md` | Questo file (report A–K). |
-
-Non sono stati eliminati file `.md` o `.docx` esistenti. File `.docx` non tracciati restano fuori dal commit (dimensione / policy repo).
+**Date:** 2026-05-19  
+**Baseline:** `main` @ `92e639a`  
+**Pass type:** documentation / repository consistency only
 
 ---
 
-## B. Branch ispezionati
+## A. Files updated
 
-- **Locali:** `main` (corrente), `main-iOS`, `codex/experimental-features`, `codex/ios-experimental-features`, molti `backup/*`.
-- **Remote (post-`git fetch origin`):** `origin/main`, `origin/main-iOS`, `origin/codex/experimental-features`, `origin/codex/ios-experimental-features`.
-
----
-
-## C. Branch aggiornati (commit)
-
-- **`main` (locale):** un commit **solo documentazione** (`docs: …`). Nessun merge da rami experimental verso `main` in questo pass.
-- **Altri branch:** non modificati (nessun cherry-pick cross-branch automatico).
-
-È stato creato il branch di sicurezza **`backup/before-docs-merge-20260519`** puntato a `HEAD` **prima** del commit documentazione.
-
----
-
-## D. Conflitti trovati
-
-- **PR #8** (`codex/experimental-features` → `main`): `mergeable: CONFLICTING`, `mergeStateStatus: DIRTY`.
-- **PR #9** (`codex/ios-experimental-features` → `main-iOS`): `mergeable: CONFLICTING`, `mergeStateStatus: DIRTY`.
+| File | Change |
+|------|--------|
+| `README.md` | Baseline commit `92e639a`; algorithm hardening pass; branch strategy HEAD |
+| `CHANGELOG.md` | Docs pass + algorithm hardening entries |
+| `CONTRIBUTING.md` | v10 notes + algorithm audit references |
+| `Docs/INDEX.md` | 2026-05-19 index section; baseline update |
+| `Docs/PRODUCT_FEATURES_IT.md` | Baseline + algorithm hardening summary |
+| `Docs/ROADMAP.md` | Algorithm hardening shipped; docs pass; P1 XCTest QA |
+| `Docs/BUILD_VALIDATION.md` | Baseline + `DIRDiving Watch Algorithm Tests` target |
+| `Docs/SAFETY_DISCLAIMER.md` | Baseline version line |
+| `Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md` | Audit delta for `92e639a` |
+| `Docs/DIR_DIVING_Feature_Comparison.csv` | Stale Planned→Implemented; algorithm rows; docs rows |
 
 ---
 
-## E. Conflitti risolti
+## B. Docs created
 
-- **Nessuno** nel repository locale: non è stato eseguito merge delle PR (scope runtime + conflitti; rischio oltre documentazione).
-
----
-
-## F. PR ispezionate
-
-| PR | Titolo | Base | URL |
-|----|--------|------|-----|
-| **#8** | Update experimental Apnea workflow | `main` | `https://github.com/egopfe/DirDiving-App/pull/8` |
-| **#9** | Add experimental Apnea companion review | `main-iOS` | `https://github.com/egopfe/DirDiving-App/pull/9` |
-
-Entrambe includono molti file `.swift` e `project.yml`; #9 aggiunge anche asset e workflow CI.
+| File | Purpose |
+|------|---------|
+| `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md` | Branch alignment strategy |
+| `Docs/DOCUMENTATION_UPDATE_REPORT_20260519.md` | This report |
+| `Docs/PR_STATUS_20260519.md` | Live PR inspection |
 
 ---
 
-## G. PR considerate *safe to merge* (automatico)
+## C. Branches inspected
 
-- **Nessuna** nello stato attuale (conflitti GitHub + modifiche runtime estese).
-
----
-
-## H. PR che richiedono revisione manuale
-
-- **#8:** risoluzione conflitti su macOS, `xcodegen generate`, build `DIRDiving Watch App`, QA Snorkeling Live / mappe / Apnea, verifica **BUSSOLA** e GPS surface-only, nessuna regressione Diving MAIN.
-- **#9:** stesso tipo di verifica per iOS + base **`main-iOS`** (non `main`); allineare strategia se il prodotto vuole unificare verso `main` unificato.
-
-È stato lasciato un **commento** sulle PR (via `gh pr comment`) con riepilogo stato e raccomandazione *non merge* finché i conflitti non sono risolti dal maintainer.
+`main`, `main-iOS`, `codex/experimental-features`, `codex/ios-experimental-features`, all `backup/*` refs, all `origin/*` refs.
 
 ---
 
-## I. Lacune documentali ancora aperte
+## D. Branches updated
 
-- Esecuzione e annotazione build **macOS** (`xcodegen` + `xcodebuild`) in `Docs/RELEASE_CHECKLIST.md` o report dedicato.
-- Eventuale file Excel `Branch_Functionality_Matrix.xlsx` presente solo in alcuni branch PR: su `main` la fonte resta **`Docs/DIR_DIVING_Feature_Comparison.csv`** finché l’Excel non viene aggiunto in modo non ridondante.
-- Allineamento paragrafo-per-paragrafo `README` tra `main` e `main-iOS` se i branch divergono ancora sul companion.
-- Chiusura **Definition of Done** iOS tab/target: commit runtime iOS ancora separato (vedi `Docs/IOS_TAB_TARGET_MISMATCH_STATUS_20260519.md`).
+- **`main`:** documentation pass (this commit)
+- **Other branches:** not modified in this pass (runtime isolation preserved)
 
 ---
 
-## J. Commit suggeriti (prossimi)
+## E. Conflicts found
 
-1. **`docs: update DIR DIVING feature documentation and branch matrix`** — questo pass (solo file in sezione A).
-2. **`fix(ios): align ContentView and app entry with MAIN target`** — quando il team committa le modifiche Swift iOS non ancora su `HEAD`.
-3. **`merge: …`** — solo dopo risoluzione manuale conflitti PR #8 / #9 e CI verde.
+None during this docs-only pass on `main`.
+
+Prior note: `main-iOS` had merge conflicts when syncing earlier; resolved by reset to `origin/main-iOS` @ `5023d71`.
 
 ---
 
-## K. Rischi / assunzioni
+## F. Conflicts resolved
 
-- L’agente non ha eseguito `xcodebuild` (ambiente Windows).
-- I metadati PR sono stati letti con `gh pr view`; lo stato Actions potrebbe differire — da verificare su GitHub.
-- **Assunzione:** le modifiche Swift/iOS nel working tree non committate restano responsabilità del team per commit dedicato; la documentazione le menziona dove pertinente (mismatch tab).
+None in this pass.
+
+---
+
+## G. PRs inspected
+
+| PR | Title | Base | Head | State |
+|----|-------|------|------|-------|
+| #8 | Update experimental Apnea workflow | `main` | `codex/experimental-features` | OPEN |
+| #9 | Add experimental Apnea companion review | `main-iOS` | `codex/ios-experimental-features` | OPEN |
+
+Details: [`PR_STATUS_20260519.md`](PR_STATUS_20260519.md)
+
+---
+
+## H. PRs safe to merge
+
+**None automatically.** Both PRs touch experimental runtime surfaces and large doc matrices; require manual macOS build + target isolation review.
+
+---
+
+## I. PRs requiring manual review
+
+- **PR #8:** Watch experimental Apnea/Snorkeling/Buddy — high runtime risk if merged to `main`
+- **PR #9:** iOS experimental Apnea review — high runtime risk; base branch `main-iOS` is divergent historical worktree
+
+---
+
+## J. Remaining documentation gaps
+
+- `Branch_Functionality_Matrix.xlsx` not regenerated in this pass (binary; preserve existing)
+- Some historical audit `.docx` files retain older branch assumptions (preserved intentionally)
+- `main-iOS`-specific README sections on experimental branches may lag unified `main` narrative
+- Import CSV runtime strings still partially hardcoded IT (`DiveImportService`) — documented as Planned in CSV
+
+---
+
+## K. Remaining release blockers
+
+| Blocker | Type |
+|---------|------|
+| Water submersion entitlement approval + Ultra hardware QA | Apple / P0 |
+| XCTest `DIRDiving Watch Algorithm Tests` execution on macOS | QA / P1 |
+| Signed generic device builds Watch + iOS | Release / P0 |
+| App Intents / Action Button physical Watch QA | Hardware / P1 |
+| Terms/Privacy final legal review for App Store | Legal / P2 |
+
+---
+
+## L. Suggested next commits
+
+1. `docs: align DIR DIVING architecture and release documentation` (this pass on `main`)
+2. `docs: propagate baseline alignment to codex/* branches` (optional follow-up, docs-only cherry-pick)
+3. Runtime follow-ups only after explicit issue: log list imperial depth display, import.csv localization
+
+---
+
+## M. Risks / assumptions
+
+- Assumed `92e639a` is the correct stable HEAD (verified against `origin/main`)
+- Algorithm hardening docs describe code changes already merged; this pass does not re-validate XCTest execution
+- Experimental PR bodies claim no algorithm changes; merge still risks `project.yml` target pollution
+- Windows environment cannot run `xcodegen` / `xcodebuild` locally
+
+---
+
+## N. Experimental isolation confirmation
+
+`project.yml` on `main` excludes from MAIN targets:
+
+- Watch: `ApneaView`, `SnorkelingView`, `BuddyAssistView`, `ExperimentalConceptsView`, exploration/buddy services
+- iOS: exploration/buddy experimental views and stores
+
+Documentation consistently marks Snorkeling, Apnea, Buddy Assist as **experimental only**.
+
+---
+
+## O. MAIN stability confirmation
+
+- No runtime files modified in this pass
+- Diving mode, GPS surface-only, BUSSOLA, inline warnings, sync, planner (iOS), legal onboarding documented as stable on `main`
+- Watch algorithm hardening (`92e639a`) documented as release-hard for internal validation pending device QA
