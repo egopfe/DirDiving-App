@@ -129,6 +129,7 @@ enum PlannerGasSchedule {
     }
 
     static func hasMODBlockingIssues(input: GasPlanInput) -> Bool {
+        guard PlannerInputValidator.validate(input).isValid else { return true }
         var working = input
         working.syncLegacyGasesFromPlannerCylinders()
         if !PlannerMODValidator.validatePlannerCylinders(input: working).isEmpty {
@@ -136,18 +137,23 @@ enum PlannerGasSchedule {
         }
         let bottom = bottomGas(from: working)
         let planningDepth = working.buhlmannPlanningDepthMeters
-        let ndl = BuhlmannPlanner.plan(depthMeters: planningDepth, bottomGas: bottom).ndlMinutes
-        let needsDeco = working.plannedBottomMinutes > ndl || planningDepth >= 35
+        let buhlmann = BuhlmannPlanner.plan(depthMeters: planningDepth, bottomGas: bottom)
+        let needsDeco = buhlmann.modelState == .simplifiedReferenceOnly
+            && (working.plannedBottomMinutes > buhlmann.ndlMinutes || planningDepth >= 35)
         let stopPlan = buildDecoStops(needsDeco: needsDeco, input: working)
         return !PlannerMODValidator.validateAll(input: working, requestedStops: stopPlan.requested).isEmpty
     }
 
     static func makeDecoStop(depthMeters: Double, minutes: Int, gas: GasMix) -> DecoStop {
+        let actualPPO2 = GasPlanningService.ppO2(gas: gas, depthMeters: depthMeters)
+        let states: [PlannerResultState] = actualPPO2 > gas.maxPPO2 ? [.PPO2Exceeded] : []
         DecoStop(
             depthMeters: depthMeters,
             minutes: minutes,
             gas: gas.label,
-            ppO2: GasPlanningService.boundedPPO2(gas: gas, depthMeters: depthMeters)
+            ppO2: actualPPO2,
+            maxPPO2: gas.maxPPO2,
+            states: states
         )
     }
 

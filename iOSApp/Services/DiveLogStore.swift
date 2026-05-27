@@ -34,9 +34,10 @@ final class DiveLogStore: ObservableObject {
         deletedSessionIDs = loadDeletedSessionIDs()
         let localSessions = loadLocalSessions()
         let cloudSessions = cloudSync?.load([DiveSession].self, forKey: key)
-        sessions = mergedSessions(local: localSessions, cloud: cloudSessions)
-            .filter { !deletedSessionIDs.contains($0.id) }
-            .sorted { $0.startDate > $1.startDate }
+        sessions = IOSDiveLogbookPolicy.normalizeAndCap(
+            mergedSessions(local: localSessions, cloud: cloudSessions)
+                .filter { !deletedSessionIDs.contains($0.id) }
+        )
 
         if includeDemoLogbook, sessions.filter({ !$0.isDemoDive }).isEmpty {
             insertDemoDives()
@@ -62,6 +63,7 @@ final class DiveLogStore: ObservableObject {
         guard !ids.isEmpty else { return }
         deletedSessionIDs.formUnion(ids)
         sessions.removeAll { deletedSessionIDs.contains($0.id) }
+        sessions = IOSDiveLogbookPolicy.normalizeAndCap(sessions)
         saveIfReady()
     }
 
@@ -70,19 +72,21 @@ final class DiveLogStore: ObservableObject {
         let localSessions = loadLocalSessions()
         deletedSessionIDs = loadDeletedSessionIDs()
         let cloudSessions = cloudSync?.load([DiveSession].self, forKey: key)
-        sessions = mergedSessions(local: localSessions, cloud: cloudSessions)
-            .filter { !deletedSessionIDs.contains($0.id) }
-            .sorted { $0.startDate > $1.startDate }
+        sessions = IOSDiveLogbookPolicy.normalizeAndCap(
+            mergedSessions(local: localSessions, cloud: cloudSessions)
+                .filter { !deletedSessionIDs.contains($0.id) }
+        )
         applyDemoLogbookPreference()
     }
 
     func add(_ session: DiveSession, suppressWatchPush: Bool = false) {
         guard !deletedSessionIDs.contains(session.id) else { return }
+        guard let storedSession = try? DiveSessionAlgorithmValidator.normalizedForStorage(session, allowEmptySamples: true) else { return }
         sessions.removeAll { $0.id == session.id }
-        sessions.insert(session, at: 0)
-        sessions = sessions.sorted { $0.startDate > $1.startDate }
+        sessions.insert(storedSession, at: 0)
+        sessions = IOSDiveLogbookPolicy.normalizeAndCap(sessions)
         if !suppressWatchPush {
-            watchSync?.transferToWatch(session)
+            watchSync?.transferToWatch(storedSession)
         }
     }
 
@@ -133,7 +137,7 @@ final class DiveLogStore: ObservableObject {
                 }
             }
         }
-        return Array(byID.values)
+        return IOSDiveLogbookPolicy.normalizeAndCap(Array(byID.values))
     }
 
     private func loadDeletedSessionIDs() -> Set<UUID> {
@@ -179,7 +183,7 @@ final class DiveLogStore: ObservableObject {
         let durations = [62, 54, 74, 47, 41]
         let gases: [DiveGasLabel] = [.trimix, .oc, .trimix, .nitrox, .oc]
 
-        sessions = names.enumerated().map { idx, name in
+        sessions = IOSDiveLogbookPolicy.normalizeAndCap(names.enumerated().map { idx, name in
             let demoID = DemoDiveCatalog.sessionIDs[idx]
             let start = Calendar.current.date(
                 from: DateComponents(year: 2024, month: 5, day: days[idx], hour: times[idx].0, minute: times[idx].1)
@@ -224,6 +228,6 @@ final class DiveLogStore: ObservableObject {
                 sacLitersMinute: 18.2 + Double(idx),
                 isDemo: true
             )
-        }
+        })
     }
 }

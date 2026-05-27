@@ -18,35 +18,53 @@ enum DiveSessionMerge {
         let entryPressureText = mergedString(winner.entryPressureText, loser.entryPressureText)
         let exitPressureText = mergedString(winner.exitPressureText, loser.exitPressureText)
         let decompressionNotes = mergedString(winner.decompressionNotes, loser.decompressionNotes)
-        let useLoserSamples = loser.samples.count > winner.samples.count
+        let startDate = min(winner.startDate, loser.startDate)
+        let endDate = max(winner.endDate, loser.endDate)
+        let samples = mergedSamples(winner.samples, loser.samples, startDate: startDate, endDate: endDate)
+        let summary = DiveProfileMath.summary(samples: samples, startDate: startDate, endDate: endDate)
 
         return DiveSession(
             id: winner.id,
-            startDate: useLoserSamples ? min(winner.startDate, loser.startDate) : winner.startDate,
-            endDate: useLoserSamples ? max(winner.endDate, loser.endDate) : winner.endDate,
-            durationSeconds: useLoserSamples ? max(winner.durationSeconds, loser.durationSeconds) : winner.durationSeconds,
-            maxDepthMeters: useLoserSamples ? max(winner.maxDepthMeters, loser.maxDepthMeters) : winner.maxDepthMeters,
-            avgDepthMeters: useLoserSamples ? loser.avgDepthMeters : winner.avgDepthMeters,
-            avgWaterTemperatureCelsius: winner.avgWaterTemperatureCelsius ?? loser.avgWaterTemperatureCelsius,
-            ttv: useLoserSamples ? max(winner.ttv, loser.ttv) : winner.ttv,
+            startDate: startDate,
+            endDate: endDate,
+            durationSeconds: summary.durationSeconds,
+            maxDepthMeters: summary.samples.isEmpty ? max(winner.maxDepthMeters, loser.maxDepthMeters) : summary.maxDepthMeters,
+            avgDepthMeters: summary.samples.isEmpty ? max(0, min(winner.avgDepthMeters, loser.avgDepthMeters)) : summary.averageDepthMeters,
+            avgWaterTemperatureCelsius: summary.averageTemperatureCelsius ?? winner.avgWaterTemperatureCelsius ?? loser.avgWaterTemperatureCelsius,
+            ttv: summary.samples.isEmpty ? max(winner.ttv, loser.ttv) : summary.ttv,
             entryGPS: entryGPS,
             exitGPS: exitGPS,
             entryGPSFixSource: entryGPSFixSource,
             exitGPSFixSource: exitGPSFixSource,
-            samples: useLoserSamples ? loser.samples : winner.samples,
+            samples: summary.samples,
             siteName: siteName,
             buddy: buddy,
             notes: notes,
             gasLabel: winner.gasLabel,
             sacLitersMinute: sacLitersMinute,
             isDemo: isDemo,
-            exceededSupportedDepthRange: winner.exceededSupportedDepthRange || loser.exceededSupportedDepthRange,
+            exceededSupportedDepthRange: winner.exceededSupportedDepthRange || loser.exceededSupportedDepthRange || summary.exceededSupportedDepthRange,
             isManual: isManual,
             equipmentUsed: equipmentUsed,
             entryPressureText: entryPressureText,
             exitPressureText: exitPressureText,
             decompressionNotes: decompressionNotes
         )
+    }
+
+    private static func mergedSamples(_ first: [DiveSample], _ second: [DiveSample], startDate: Date, endDate: Date) -> [DiveSample] {
+        let candidates = DiveProfileMath.sanitizedSamples(first + second)
+            .filter { $0.timestamp >= startDate && $0.timestamp <= endDate }
+        var byTimestamp: [TimeInterval: DiveSample] = [:]
+        for sample in candidates {
+            let key = sample.timestamp.timeIntervalSinceReferenceDate.rounded(.toNearestOrAwayFromZero)
+            if let existing = byTimestamp[key] {
+                byTimestamp[key] = sample.depthMeters >= existing.depthMeters ? sample : existing
+            } else {
+                byTimestamp[key] = sample
+            }
+        }
+        return byTimestamp.values.sorted { $0.timestamp < $1.timestamp }
     }
 
     private static func mergedString(_ primary: String?, _ secondary: String?) -> String? {

@@ -131,9 +131,14 @@ struct GasMix: Identifiable, Codable, Hashable {
     var helium: Double
     var maxPPO2: Double
     var isOxygenNarcotic: Bool = true
-    var nitrogen: Double { max(0, 1.0 - oxygen - helium) }
+    var nitrogen: Double { 1.0 - oxygen - helium }
     var modMeters: Double { PlannerMODValidator.modMeters(oxygenFraction: oxygen, maxPPO2: maxPPO2) }
-    var isValidMix: Bool { oxygen > 0 && helium >= 0 && (oxygen + helium) <= 1.0001 }
+    var isValidMix: Bool {
+        GasMixValidator.validate(oxygen: oxygen, helium: helium, maxPPO2: maxPPO2)
+            .states
+            .filter { [.invalidInput, .unsupportedGas].contains($0) }
+            .isEmpty
+    }
     var canEditOxygen: Bool { mixKind != .air }
     var canEditHelium: Bool { mixKind == .trimix }
 
@@ -221,7 +226,6 @@ struct GasMix: Identifiable, Codable, Hashable {
         self.maxPPO2 = maxPPO2
         self.isOxygenNarcotic = isOxygenNarcotic
         self.mixKind = mixKind ?? Self.inferredKind(oxygen: oxygen, helium: helium)
-        normalizeMixAndPPO2()
     }
 
     init(from decoder: Decoder) throws {
@@ -238,10 +242,10 @@ struct GasMix: Identifiable, Codable, Hashable {
         } else {
             mixKind = Self.inferredKind(oxygen: oxygen, helium: helium)
         }
-        normalizeMixAndPPO2()
     }
     var surfaceDensityGramsLiter: Double {
-        oxygen * 1.429 + nitrogen * 1.251 + helium * 0.1786
+        guard isValidMix else { return 0 }
+        return oxygen * 1.429 + nitrogen * 1.251 + helium * 0.1786
     }
     var label: String {
         if helium > 0 { return "TX \(Int(oxygen*100))/\(Int(helium*100))" }
@@ -257,9 +261,18 @@ struct Cylinder: Codable, Hashable {
     var reservePressure: Double = 50
     var pressureUnit: PressureUnit = .bar
 
-    var startPressureBar: Double { pressureUnit == .bar ? startPressure : startPressure / 14.5038 }
-    var reservePressureBar: Double { pressureUnit == .bar ? reservePressure : reservePressure / 14.5038 }
-    var availableGasLiters: Double { max(0, volumeLiters * (startPressureBar - reservePressureBar)) }
+    var startPressureBar: Double { pressureUnit == .bar ? startPressure : IOSUnitConversions.bar(fromPSI: startPressure) }
+    var reservePressureBar: Double { pressureUnit == .bar ? reservePressure : IOSUnitConversions.bar(fromPSI: reservePressure) }
+    var availableGasLiters: Double {
+        guard volumeLiters.isFinite,
+              volumeLiters > 0,
+              startPressureBar.isFinite,
+              reservePressureBar.isFinite,
+              startPressureBar > reservePressureBar else {
+            return 0
+        }
+        return volumeLiters * (startPressureBar - reservePressureBar)
+    }
 }
 
 struct TeamMember: Identifiable, Codable, Hashable {
@@ -285,6 +298,7 @@ struct TechnicalGasAnalysis: Hashable {
     let cnsPercent: Double
     let otu: Double
     let warnings: [String]
+    let states: [PlannerResultState]
 }
 
 enum GasDensityRating: String, Hashable {
@@ -339,11 +353,19 @@ struct GasPlanInput: Codable, Hashable {
         effectivePlanningDepthMeters
     }
 
-    var ambientPressureBar: Double { effectivePlanningDepthMeters / 10.0 + 1.0 }
+    var ambientPressureBar: Double { IOSUnitConversions.ambientPressureBar(depthMeters: effectivePlanningDepthMeters) }
     var estimatedConsumptionLiters: Double { sacLitersPerMinute * ambientPressureBar * plannedBottomMinutes }
     var estimatedRemainingLiters: Double { availableGasLiters - estimatedConsumptionLiters }
-    var estimatedRemainingBar: Double { estimatedRemainingLiters / max(primaryCylinder.volumeLiters, 0.1) }
-    var estimatedRemainingPSI: Double { estimatedRemainingBar * 14.5038 }
+    var estimatedRemainingBar: Double {
+        primaryCylinder.volumeLiters > 0 ? estimatedRemainingLiters / primaryCylinder.volumeLiters : 0
+    }
+    var estimatedRemainingPSI: Double { IOSUnitConversions.psi(fromBar: estimatedRemainingBar) }
+    var allGases: [GasMix] {
+        if plannerCylinders.isEmpty {
+            return [bottomGas, decoGas1, decoGas2]
+        }
+        return plannerCylinders.map(\.gas)
+    }
 
     mutating func ensurePlannerCylindersFromLegacy() {
         guard plannerCylinders.isEmpty else { return }
@@ -365,7 +387,6 @@ struct GasPlanInput: Codable, Hashable {
         ensurePlannerCylindersFromLegacy()
         for index in plannerCylinders.indices {
             plannerCylinders[index].gas.role = plannerCylinders[index].role
-            plannerCylinders[index].gas.normalizeMixAndPPO2()
         }
         if let bottom = plannerCylinders.first(where: { $0.role == .bottom }) {
             bottomGas = bottom.gas

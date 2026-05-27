@@ -361,8 +361,12 @@ struct PlannerView: View {
         PlannerMODValidator.liveInputIssues(input: store.input)
     }
 
+    private var liveValidation: PlannerValidationResult {
+        PlannerInputValidator.validate(store.input)
+    }
+
     private var canCalculatePlan: Bool {
-        plannerSafetyAcknowledged && liveMODIssues.isEmpty
+        plannerSafetyAcknowledged && liveValidation.isValid && liveMODIssues.isEmpty
     }
 
     @ViewBuilder
@@ -464,10 +468,9 @@ struct PlannerView: View {
 
     private var calculateButton: some View {
         Button {
-            store.input.normalizeAllPlannerGases()
-            store.input.syncLegacyGasesFromPlannerCylinders()
-            if store.input.hasInvalidGasMix {
-                calculateErrorMessage = String(localized: "planner.gas.mix_invalid")
+            let validation = PlannerInputValidator.validate(store.input)
+            if !validation.isValid {
+                calculateErrorMessage = validation.messages.first ?? String(localized: "planner.gas.mix_invalid")
                 showCalculateError = true
                 return
             }
@@ -513,7 +516,7 @@ struct PlannerView: View {
             get: {
                 switch unitPreference {
                 case .metric: return celsius.wrappedValue
-                case .imperial: return celsius.wrappedValue * 9 / 5 + 32
+                case .imperial: return IOSUnitConversions.fahrenheit(fromCelsius: celsius.wrappedValue)
                 }
             },
             set: { celsius.wrappedValue = Formatters.celsiusFromTemperatureDisplay($0, units: unitPreference) }
@@ -521,7 +524,7 @@ struct PlannerView: View {
     }
 
     private func plannerDepthField(_ title: String, meters: Binding<Double>, step: Double = 1) -> some View {
-        let displayStep = unitPreference == .metric ? step : max(1, step * 3.280839895)
+        let displayStep = unitPreference == .metric ? step : max(1, IOSUnitConversions.feet(fromMeters: step))
         return plannerField(
             title,
             value: depthDisplayBinding(meters),

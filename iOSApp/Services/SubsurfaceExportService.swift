@@ -1,7 +1,7 @@
 import Foundation
 
 enum SubsurfaceExportService {
-    enum ExportError: LocalizedError {
+    enum ExportError: LocalizedError, Equatable {
         case emptySamples
         case writeFailed(String)
 
@@ -13,24 +13,39 @@ enum SubsurfaceExportService {
         }
     }
 
-    static func makeCSV(for session: DiveSession) -> String {
+    static func makeCSV(for session: DiveSession) -> String? {
+        guard let normalized = try? DiveSessionAlgorithmValidator.normalizedForStorage(
+            session,
+            allowEmptySamples: false,
+            maxDepthMeters: IOSAlgorithmConfiguration.maxImportExportDepthMeters
+        ) else {
+            return nil
+        }
+        let samples = DiveProfileMath.sanitizedSamples(
+            normalized.samples,
+            maxDepthMeters: IOSAlgorithmConfiguration.maxImportExportDepthMeters
+        )
+        guard let first = samples.first?.timestamp else { return nil }
         var rows = ["time_seconds,depth_m,temperature_c,entry_lat,entry_lon,exit_lat,exit_lon,is_manual,equipment,entry_pressure,exit_pressure,deco_notes"]
         let manualMeta = [
-            session.isManual ? "1" : "0",
-            csvEscape(session.equipmentUsed ?? ""),
-            csvEscape(session.entryPressureText ?? ""),
-            csvEscape(session.exitPressureText ?? ""),
-            csvEscape(session.decompressionNotes ?? "")
+            normalized.isManual ? "1" : "0",
+            csvEscape(normalized.equipmentUsed ?? ""),
+            csvEscape(normalized.entryPressureText ?? ""),
+            csvEscape(normalized.exitPressureText ?? ""),
+            csvEscape(normalized.decompressionNotes ?? "")
         ].joined(separator: ",")
         rows.append("# session_meta,\(manualMeta)")
-        guard let first = session.samples.first?.timestamp else { return rows.joined(separator: "\n") }
-        for sample in session.samples {
-            let seconds = Int(sample.timestamp.timeIntervalSince(first))
+        var previousSeconds = 0
+        for sample in samples {
+            let elapsed = sample.timestamp.timeIntervalSince(first)
+            guard elapsed.isFinite, elapsed >= 0 else { return nil }
+            let seconds = max(previousSeconds, Int(elapsed.rounded()))
+            previousSeconds = seconds
             let temp = sample.temperatureCelsius.map { String(format: "%.1f", $0) } ?? ""
-            let entryLat = session.entryGPS.map { String(format: "%.6f", $0.latitude) } ?? ""
-            let entryLon = session.entryGPS.map { String(format: "%.6f", $0.longitude) } ?? ""
-            let exitLat = session.exitGPS.map { String(format: "%.6f", $0.latitude) } ?? ""
-            let exitLon = session.exitGPS.map { String(format: "%.6f", $0.longitude) } ?? ""
+            let entryLat = normalized.entryGPS.map { String(format: "%.6f", $0.latitude) } ?? ""
+            let entryLon = normalized.entryGPS.map { String(format: "%.6f", $0.longitude) } ?? ""
+            let exitLat = normalized.exitGPS.map { String(format: "%.6f", $0.latitude) } ?? ""
+            let exitLon = normalized.exitGPS.map { String(format: "%.6f", $0.longitude) } ?? ""
             rows.append("\(seconds),\(String(format: "%.2f", sample.depthMeters)),\(temp),\(entryLat),\(entryLon),\(exitLat),\(exitLon)")
         }
         return rows.joined(separator: "\n")
@@ -46,7 +61,7 @@ enum SubsurfaceExportService {
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent("DIRDiving_Export_\(UUID().uuidString).csv")
         do {
-            guard let data = makeCSV(for: session).data(using: .utf8) else {
+            guard let csv = makeCSV(for: session), let data = csv.data(using: .utf8) else {
                 return .failure(.writeFailed("UTF-8"))
             }
             try data.write(to: url, options: [.atomic, .completeFileProtection])

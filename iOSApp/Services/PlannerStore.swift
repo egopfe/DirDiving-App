@@ -33,7 +33,6 @@ final class PlannerStore: ObservableObject {
             input = saved.input
         }
         input.ensurePlannerCylindersFromLegacy()
-        input.normalizeAllPlannerGases()
         calculate()
         isReady = true
         saveIfReady()
@@ -52,7 +51,6 @@ final class PlannerStore: ObservableObject {
     private func applyInputToPlanningOutputs() {
         guard isReady else { return }
         isApplyingInputSideEffects = true
-        input.normalizeAllPlannerGases()
         input.syncLegacyGasesFromPlannerCylinders()
         buhlmann = BuhlmannPlanner.plan(
             depthMeters: input.buhlmannPlanningDepthMeters,

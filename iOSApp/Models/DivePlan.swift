@@ -6,6 +6,17 @@ struct DecoStop: Identifiable, Hashable {
     let minutes: Int
     let gas: String
     let ppO2: Double
+    let maxPPO2: Double
+    let states: [PlannerResultState]
+
+    init(depthMeters: Double, minutes: Int, gas: String, ppO2: Double, maxPPO2: Double = 1.6, states: [PlannerResultState] = []) {
+        self.depthMeters = depthMeters
+        self.minutes = minutes
+        self.gas = gas
+        self.ppO2 = ppO2
+        self.maxPPO2 = maxPPO2
+        self.states = states
+    }
 }
 
 enum DiveSegmentKind: String, CaseIterable, Identifiable, Codable {
@@ -76,6 +87,8 @@ struct DivePlanResult: Hashable {
     let teamMatches: [TeamGasMatch]
     let briefingLines: [String]
     let modValidationIssues: [MODValidationIssue]
+    let states: [PlannerResultState]
+    let buhlmannState: BuhlmannModelState
 }
 
 struct NDLPoint: Identifiable, Hashable {
@@ -93,4 +106,5 @@ struct BuhlmannPlanResult: Hashable {
     let ndlMinutes: Double
     let curve: [NDLPoint]
     let warning: String?
+    let modelState: BuhlmannModelState
 }

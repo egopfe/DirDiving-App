@@ -111,6 +111,48 @@ targets:
         DEVELOPMENT_TEAM: C6FKKPB6A9
     dependencies:
       - sdk: XCTest.framework
+  DIRDiving iOS Algorithm Tests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - Tests/iOSAlgorithmTests
+      - iOSApp/Models/DemoDiveCatalog.swift
+      - iOSApp/Models/DivePlan.swift
+      - iOSApp/Models/DiveSample.swift
+      - iOSApp/Models/DiveSession.swift
+      - iOSApp/Models/GasPlan.swift
+      - iOSApp/Models/GPSPoint.swift
+      - iOSApp/Models/TankSize.swift
+      - iOSApp/Services/BuhlmannPlanner.swift
+      - iOSApp/Services/DiveImportService.swift
+      - iOSApp/Services/GasPlanningService.swift
+      - iOSApp/Services/PlannerGasSchedule.swift
+      - iOSApp/Services/PlannerMODValidator.swift
+      - iOSApp/Services/PlannerService.swift
+      - iOSApp/Services/RouteSummaryService.swift
+      - iOSApp/Services/SubsurfaceExportService.swift
+      - iOSApp/Services/WatchDiveSyncCodec.swift
+      - iOSApp/Services/WatchSyncAuth.swift
+      - iOSApp/Utils/DiveProfileMath.swift
+      - iOSApp/Utils/DiveSessionAlgorithmValidator.swift
+      - iOSApp/Utils/DiveSessionMerge.swift
+      - iOSApp/Utils/GasMixValidator.swift
+      - iOSApp/Utils/IOSAlgorithmConfiguration.swift
+      - iOSApp/Utils/IOSDiveLogbookPolicy.swift
+      - iOSApp/Utils/IOSUnitConversions.swift
+      - iOSApp/Utils/PlannerInputValidator.swift
+      - iOSApp/Utils/PlannerResultState.swift
+      - iOSApp/Utils/WatchSyncNotifications.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios.algorithmtests
+        GENERATE_INFOPLIST_FILE: YES
+        DEVELOPMENT_TEAM: C6FKKPB6A9
+    dependencies:
+      - sdk: XCTest.framework
+      - sdk: CryptoKit.framework
+      - sdk: Security.framework
+      - sdk: WatchConnectivity.framework
 schemes:
   DIRDiving Watch App:
     build:
@@ -123,6 +165,16 @@ schemes:
     build:
       targets:
         DIRDiving iOS: all
+    test:
+      targets:
+        - DIRDiving iOS Algorithm Tests
+  DIRDiving iOS Algorithm Tests:
+    build:
+      targets:
+        DIRDiving iOS Algorithm Tests: all
+    test:
+      targets:
+        - DIRDiving iOS Algorithm Tests
   DIRDiving Watch Algorithm Tests:
     build:
       targets:

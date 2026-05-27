@@ -3,8 +3,12 @@ import Foundation
 enum GasPlanningService {
     static func analyze(input: GasPlanInput) -> TechnicalGasAnalysis {
         let gas = input.bottomGas
+        let validation = PlannerInputValidator.validate(input)
+        guard validation.isValid else {
+            return unavailableAnalysis(input: input, gas: gas, validation: validation)
+        }
         let ata = input.ambientPressureBar
-        let ppO2 = gas.oxygen * ata
+        let ppO2 = ppO2(gas: gas, depthMeters: input.effectivePlanningDepthMeters)
         let density = gas.surfaceDensityGramsLiter * ata
         let rating = densityRating(density, warning: input.densityWarningLimit, danger: input.densityDangerLimit)
         let planningDepth = input.effectivePlanningDepthMeters
@@ -12,21 +16,27 @@ enum GasPlanningService {
         let ead = equivalentAirDepth(gas: gas, depthMeters: planningDepth)
         let consumption = input.sacLitersPerMinute * ata * input.plannedBottomMinutes
         let remaining = input.availableGasLiters - consumption
-        let remainingBar = remaining / max(input.cylinder.volumeLiters, 0.1)
+        let remainingBar = remaining / input.primaryCylinder.volumeLiters
         let rockBottom = rockBottomLiters(input: input)
-        let minimumGasBar = rockBottom / max(input.cylinder.volumeLiters, 0.1)
-        let usableBeforeMinimum = max(0, input.availableGasLiters - rockBottom)
-        let turnPressure = min(input.startPressureBar, max(input.reservePressureBar, input.startPressureBar - (usableBeforeMinimum / 2.0 / max(input.cylinder.volumeLiters, 0.1))))
+        let minimumGasBar = rockBottom / input.primaryCylinder.volumeLiters
+        let usableBeforeMinimum = input.availableGasLiters - rockBottom
+        let turnPressure = usableBeforeMinimum > 0
+            ? min(input.startPressureBar, max(input.reservePressureBar, input.startPressureBar - (usableBeforeMinimum / 2.0 / input.primaryCylinder.volumeLiters)))
+            : input.reservePressureBar
         let cns = oxygenExposureCNS(ppO2: ppO2, minutes: input.plannedBottomMinutes)
         let otu = oxygenToxicityUnits(ppO2: ppO2, minutes: input.plannedBottomMinutes)
-        let warnings = makeWarnings(
-            input: input,
-            ppO2: ppO2,
-            density: density,
-            endMeters: end,
-            remainingLiters: remaining,
-            rockBottomLiters: rockBottom
+        let states = mergeStates(
+            validation.states,
+            makeStates(
+                input: input,
+                ppO2: ppO2,
+                density: density,
+                endMeters: end,
+                remainingLiters: remaining,
+                rockBottomLiters: rockBottom
+            )
         )
+        let warnings = makeWarnings(states: states)
 
         return TechnicalGasAnalysis(
             gas: gas,
@@ -43,17 +53,18 @@ enum GasPlanningService {
             turnPressureBar: turnPressure,
             cnsPercent: cns,
             otu: otu,
-            warnings: warnings
+            warnings: warnings,
+            states: states
         )
     }
 
     static func ppO2(gas: GasMix, depthMeters: Double) -> Double {
-        gas.oxygen * (depthMeters / 10.0 + 1.0)
+        GasMixValidator.actualPPO2(oxygenFraction: gas.oxygen, depthMeters: depthMeters) ?? 0
     }
 
     /// PPO₂ at depth capped by the gas mix maximum (used for deco stops and MOD-consistent display).
     static func boundedPPO2(gas: GasMix, depthMeters: Double) -> Double {
-        min(gas.maxPPO2, ppO2(gas: gas, depthMeters: depthMeters))
+        ppO2(gas: gas, depthMeters: depthMeters)
     }
 
     static func profileSegments(input: GasPlanInput, stops: [DecoStop]) -> [DivePlanSegment] {
@@ -236,20 +247,21 @@ enum GasPlanningService {
     }
 
     private static func equivalentNarcoticDepth(gas: GasMix, depthMeters: Double) -> Double {
+        guard gas.isValidMix, depthMeters.isFinite, depthMeters >= 0 else { return 0 }
         let narcoticFraction = gas.nitrogen + (gas.isOxygenNarcotic ? gas.oxygen : 0)
         let airNarcoticFraction = 0.79 + (gas.isOxygenNarcotic ? 0.21 : 0)
-        let narcoticPressure = (depthMeters / 10.0 + 1.0) * narcoticFraction
+        let narcoticPressure = IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters) * narcoticFraction
         return max(0, ((narcoticPressure / max(airNarcoticFraction, 0.01)) - 1.0) * 10.0)
     }
 
     private static func equivalentAirDepth(gas: GasMix, depthMeters: Double) -> Double? {
-        guard gas.helium == 0, gas.oxygen > 0.21 else { return nil }
-        let nitrogenPressure = (depthMeters / 10.0 + 1.0) * gas.nitrogen
+        guard gas.isValidMix, gas.helium == 0, gas.oxygen > 0.21, depthMeters.isFinite, depthMeters >= 0 else { return nil }
+        let nitrogenPressure = IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters) * gas.nitrogen
         return max(0, ((nitrogenPressure / 0.79) - 1.0) * 10.0)
     }
 
     private static func rockBottomLiters(input: GasPlanInput) -> Double {
-        let averageAscentATA = ((input.plannedDepthMeters / 2.0) / 10.0) + 1.0
+        let averageAscentATA = IOSUnitConversions.ambientPressureBar(depthMeters: input.plannedDepthMeters / 2.0)
         let ascentMinutes = max(3, input.plannedDepthMeters / 9.0)
         let problemSolvingMinutes = 1.0
         let safetyStopMinutes = input.plannedDepthMeters > 10 ? 3.0 : 0.0
@@ -275,25 +287,63 @@ enum GasPlanningService {
         return minutes * pow((0.5 / (ppO2 - 0.5)), -0.833)
     }
 
-    private static func makeWarnings(input: GasPlanInput, ppO2: Double, density: Double, endMeters: Double, remainingLiters: Double, rockBottomLiters: Double) -> [String] {
-        var values: [String] = []
+    private static func makeStates(input: GasPlanInput, ppO2: Double, density: Double, endMeters: Double, remainingLiters: Double, rockBottomLiters: Double) -> [PlannerResultState] {
+        var values: [PlannerResultState] = [.validReference, .simplifiedReferenceOnly]
         if ppO2 > input.bottomGas.maxPPO2 {
-            values.append("PPO2 oltre limite gas")
+            values.append(.PPO2Exceeded)
         }
         if input.effectivePlanningDepthMeters > input.bottomGas.modMeters {
-            values.append(String(localized: "planner.warning.profile_above_mod"))
+            values.append(.MODExceeded)
         }
         if density >= input.densityDangerLimit {
-            values.append("Densita gas in zona rossa")
+            values.append(.gasDensityDanger)
         } else if density >= input.densityWarningLimit {
-            values.append("Densita gas in warning")
+            values.append(.gasDensityWarning)
         }
         if endMeters > 30 {
-            values.append("END elevata")
+            values.append(.simplifiedReferenceOnly)
         }
         if remainingLiters < rockBottomLiters {
-            values.append("Gas residuo sotto rock bottom")
+            values.append(.belowReserve)
         }
-        return values
+        if remainingLiters < 0 {
+            values.append(.insufficientGas)
+        }
+        return Array(Set(values)).sorted { $0.rawValue < $1.rawValue }
+    }
+
+    private static func makeWarnings(states: [PlannerResultState]) -> [String] {
+        states.compactMap(\.warningText)
+    }
+
+    private static func mergeStates(_ groups: [PlannerResultState]...) -> [PlannerResultState] {
+        var seen = Set<PlannerResultState>()
+        var merged: [PlannerResultState] = []
+        for state in groups.flatMap({ $0 }) where seen.insert(state).inserted {
+            merged.append(state)
+        }
+        return merged
+    }
+
+    private static func unavailableAnalysis(input: GasPlanInput, gas: GasMix, validation: PlannerValidationResult) -> TechnicalGasAnalysis {
+        let states = validation.states.isEmpty ? [.invalidInput] : validation.states
+        return TechnicalGasAnalysis(
+            gas: gas,
+            ppO2AtDepth: 0,
+            densityAtDepth: 0,
+            densityRating: .red,
+            endMeters: 0,
+            eadMeters: nil,
+            consumptionLiters: 0,
+            remainingLiters: 0,
+            remainingBar: 0,
+            rockBottomLiters: 0,
+            minimumGasBar: 0,
+            turnPressureBar: 0,
+            cnsPercent: 0,
+            otu: 0,
+            warnings: makeWarnings(states: states),
+            states: states
+        )
     }
 }

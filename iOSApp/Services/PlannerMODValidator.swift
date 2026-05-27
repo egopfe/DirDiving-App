@@ -13,8 +13,7 @@ struct MODValidationIssue: Identifiable, Hashable {
 enum PlannerMODValidator {
     /// MOD (m) = ((PPO₂ max / FO₂) - 1) × 10 — Dalton / best mix (FO₂ from mix, including trimix helium fraction).
     static func modMeters(oxygenFraction: Double, maxPPO2: Double) -> Double {
-        let fo2 = max(oxygenFraction, 0.01)
-        return max(0, ((maxPPO2 / fo2) - 1.0) * 10.0)
+        GasMixValidator.modMeters(oxygenFraction: oxygenFraction, maxPPO2: maxPPO2) ?? 0
     }
 
     static func modMeters(for gas: GasMix) -> Double {

@@ -143,8 +143,8 @@ struct ManualDiveEditorView: View {
     }
 
     private func save() {
-        let maxMeters = unitPreference == .metric ? maxDepthInput : maxDepthInput / 3.280839895
-        let avgMeters = unitPreference == .metric ? avgDepthInput : avgDepthInput / 3.280839895
+        let maxMeters = unitPreference == .metric ? maxDepthInput : IOSUnitConversions.meters(fromFeet: maxDepthInput)
+        let avgMeters = unitPreference == .metric ? avgDepthInput : IOSUnitConversions.meters(fromFeet: avgDepthInput)
         guard maxMeters >= avgMeters else {
             validationMessage = String(localized: "manual_dive.validation.depth_order")
             return
@@ -159,14 +159,15 @@ struct ManualDiveEditorView: View {
             maxDepthMeters: maxMeters,
             avgDepthMeters: avgMeters
         )
-        let ttv = avgMeters * (duration / 60.0)
+        let summary = DiveProfileMath.summary(samples: samples, startDate: startDate, endDate: endDate)
+        let ttv = DiveProfileMath.ttvIndex(averageDepthMeters: summary.averageDepthMeters, durationSeconds: duration)
         let session = DiveSession(
             id: existing?.id ?? UUID(),
             startDate: startDate,
             endDate: endDate,
             durationSeconds: duration,
-            maxDepthMeters: maxMeters,
-            avgDepthMeters: avgMeters,
+            maxDepthMeters: summary.maxDepthMeters,
+            avgDepthMeters: summary.averageDepthMeters,
             avgWaterTemperatureCelsius: nil,
             ttv: ttv,
             entryGPS: entryGPS,
@@ -193,17 +194,22 @@ struct ManualDiveEditorView: View {
     private func makeGPS(lat: String, lon: String, timestamp: Date) -> GPSPoint? {
         guard let latitude = Double(lat.replacingOccurrences(of: ",", with: ".")),
               let longitude = Double(lon.replacingOccurrences(of: ",", with: ".")) else { return nil }
-        return GPSPoint(latitude: latitude, longitude: longitude, horizontalAccuracy: 10, timestamp: timestamp)
+        let point = GPSPoint(latitude: latitude, longitude: longitude, horizontalAccuracy: 10, timestamp: timestamp)
+        return DiveProfileMath.isValidGPS(point) ? point : nil
     }
 }
 
 enum ManualDiveSampleBuilder {
     static func makeSamples(startDate: Date, endDate: Date, maxDepthMeters: Double, avgDepthMeters: Double) -> [DiveSample] {
-        let mid = startDate.addingTimeInterval(endDate.timeIntervalSince(startDate) / 2)
+        let duration = max(1, endDate.timeIntervalSince(startDate))
+        let ratio = maxDepthMeters > 0 ? min(1, max(0, avgDepthMeters / maxDepthMeters)) : 0
+        let descentEnd = startDate.addingTimeInterval(min(1, duration * 0.05))
+        let holdEnd = startDate.addingTimeInterval(max(1, duration * ratio))
         return [
             DiveSample(timestamp: startDate, depthMeters: 0, temperatureCelsius: nil),
-            DiveSample(timestamp: mid, depthMeters: maxDepthMeters, temperatureCelsius: nil),
-            DiveSample(timestamp: endDate, depthMeters: avgDepthMeters, temperatureCelsius: nil)
+            DiveSample(timestamp: descentEnd, depthMeters: maxDepthMeters, temperatureCelsius: nil),
+            DiveSample(timestamp: holdEnd, depthMeters: maxDepthMeters, temperatureCelsius: nil),
+            DiveSample(timestamp: endDate, depthMeters: 0, temperatureCelsius: nil)
         ]
     }
 }
