@@ -125,10 +125,10 @@ Live PR metadata was available through `gh pr list`.
 
 | PR | Head -> base | Mergeable | Risk | Recommendation |
 |----|--------------|-----------|------|----------------|
-| #8 `Update experimental Apnea workflow` | `codex/experimental-features` -> `main` | `CONFLICTING` | high runtime risk | do not auto-merge |
+| #8 `Update experimental Apnea workflow` | `codex/experimental-features` -> `main` | `UNKNOWN` at final refresh; previously reported conflicting | high runtime risk | do not auto-merge |
 | #9 `Add experimental Apnea companion review` | `codex/ios-experimental-features` -> `main-iOS` | `CONFLICTING` | high runtime risk | do not auto-merge |
 
-Both PRs are experimental and conflict with their base branches. They require manual review, macOS/Xcode validation and explicit safety signoff before any merge.
+Both PRs are experimental and require manual review, macOS/Xcode validation and explicit safety signoff before any merge. PR #8 must be treated as unsafe while GitHub reports `UNKNOWN` mergeability.
 
 ---
 

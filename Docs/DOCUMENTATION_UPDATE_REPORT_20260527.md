@@ -58,9 +58,9 @@ Branches intentionally not modified:
 
 No local file conflicts were found during the documentation pass.
 
-Open GitHub PR conflicts:
+Open GitHub PR status:
 
-- PR #8: `codex/experimental-features` -> `main`, `CONFLICTING`
+- PR #8: `codex/experimental-features` -> `main`, `UNKNOWN` at final refresh; treat as unsafe until manually reviewed
 - PR #9: `codex/ios-experimental-features` -> `main-iOS`, `CONFLICTING`
 
 ---

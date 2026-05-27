@@ -945,7 +945,7 @@ Restano obbligatori: build `xcodegen generate` / Xcode su macOS, test Apple Watc
 - Documentazione MAIN riallineata a legal onboarding, warning profondita 35/38/40 m, banner risalita inline, overlay GPS compatti, App Intents/Action Button via Shortcuts, Side Button system-controlled, sync Watch <-> iPhone, push iPhone -> Watch, tombstone, edit manuale, planner safety acknowledgement, User Images conditional visibility e mode auto-skip.
 - Stato algoritmico documentato: Watch MAIN release-hard/final hardening, iOS MAIN algorithm hardening, e assessment iOS Buhlmann multigas/helium che conferma supporto attuale parziale e piano per motore ZHL-16C+GF+He futuro.
 - Nuovi report di processo: [`Docs/DOCUMENTATION_UPDATE_REPORT_20260527.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260527.md), [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md), [`Docs/PR_STATUS_20260527.md`](Docs/PR_STATUS_20260527.md).
-- PR #8 e #9 controllate con `gh`: entrambe aperte e conflittuali; non mergeate perche experimental e fuori perimetro MAIN.
+- PR #8 e #9 controllate con `gh`: entrambe aperte, experimental e non safe-to-merge automaticamente; #8 puo risultare `UNKNOWN` mentre GitHub ricalcola la mergeability, #9 resta `CONFLICTING`.
 
 ## Aggiornamento documentazione 2026-05-20 (post v9 `d962117`)
 

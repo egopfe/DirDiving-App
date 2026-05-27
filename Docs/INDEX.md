@@ -33,7 +33,7 @@ Pass documentale additivo su `main` dopo `37e4464`:
 | [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md) | Final hardening Watch MAIN: cap 40 log, temperatura plausibile, export vuoto, GPS fallback, conversioni |
 | [`DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md) | Stato branch, divergenze, policy merge e isolamento experimental |
 | [`DOCUMENTATION_UPDATE_REPORT_20260527.md`](DOCUMENTATION_UPDATE_REPORT_20260527.md) | Report A-O del pass documentale corrente |
-| [`PR_STATUS_20260527.md`](PR_STATUS_20260527.md) | PR #8/#9 live via `gh`, entrambe conflittuali e non safe-to-merge automaticamente |
+| [`PR_STATUS_20260527.md`](PR_STATUS_20260527.md) | PR #8/#9 live via `gh`, experimental e non safe-to-merge automaticamente |
 
 Nota corrente: Snorkeling, Apnea, Buddy Assist e concept iOS experimental restano esclusi dai target MAIN in `project.yml`; le schermate e gli screenshot experimental sono documentati ma non promossi in runtime stabile.
 
@@ -161,7 +161,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | Documento | Contenuto |
 |-----------|-----------|
 | [`DOCUMENTATION_BRANCH_ALIGNMENT_20260526.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260526.md) | Allineamento corrente 2026-05-26: `main` baseline stabile, `main-iOS` worktree storico divergente, `codex/*` experimental-only |
-| [`DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md) | Allineamento corrente 2026-05-27: `main` stabile, branch tracciati allineati ai remoti, PR #8/#9 conflittuali e experimental |
+| [`DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md) | Allineamento corrente 2026-05-27: `main` stabile, branch tracciati allineati ai remoti, PR #8/#9 experimental e non auto-merge |
 | [`DOCUMENTATION_UPDATE_REPORT_20260526.md`](DOCUMENTATION_UPDATE_REPORT_20260526.md) | Report aggiornamento documentazione/repository consistency corrente |
 | [`DOCUMENTATION_UPDATE_REPORT_20260527.md`](DOCUMENTATION_UPDATE_REPORT_20260527.md) | Report aggiornamento documentazione/repository consistency corrente post iOS algorithm/Buhlmann assessment |
 | [`PR_STATUS_20260526.md`](PR_STATUS_20260526.md) | Stato PR/merge safety 2026-05-26 con divergenza branch aggiornata e limiti ambiente correnti |
