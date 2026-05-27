@@ -15,6 +15,8 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 - [ ] `xcodegen generate` senza errori  
 - [ ] `xcodebuild` **DIRDiving Watch App** — `generic/platform=watchOS` — **PASS**  
 - [ ] `xcodebuild` **DIRDiving iOS** — `generic/platform=iOS` — **PASS**  
+- [ ] `xcodebuild test` **DIRDiving Watch Algorithm Tests** — **PASS**
+- [ ] `xcodebuild test` **DIRDiving iOS Algorithm Tests** — **PASS**
 
 ## Depth entitlement (Apple Watch Ultra — field validation)
 
@@ -51,6 +53,13 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 - [ ] Nessun claim di certificazione non supportato  
 - [ ] Side Button descritto onestamente come system-controlled
 - [ ] Action Button descritto come disponibile solo tramite Shortcuts / App Intents quando watchOS lo espone
+- [ ] Planner iOS descritto come riferimento non certificato; Buhlmann multigas/helium completo non dichiarato finche non esiste motore ZHL-16C+GF+He validato.
+
+## QA algoritmico MAIN
+
+- [ ] Watch MAIN: verificare `Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md` e test su cap log 40, temperatura plausibile, export vuoto, GPS fallback e conversioni.
+- [ ] iOS MAIN: verificare `Docs/DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md` e test su planner/gas validation, import/export/sync, logbook time-weighted math, route math e safe states.
+- [ ] iOS planner: verificare che trimix/helium non produca output Buhlmann N2-only spacciato per decompressione certificata; riferirsi a `Docs/DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md`.
 
 ## QA Security (audit F1–F12, baseline 2026-05-19)
 

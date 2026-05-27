@@ -1,6 +1,6 @@
 # Build validation — DIR DIVING (MAIN)
 
-**Branch:** `main` only (`92e639a` as current baseline commit for this documentation pass).
+**Branch:** `main` only (`37e4464` as baseline before the 2026-05-27 documentation pass).
 **Generator:** [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`project.yml` at repository root).
 
 **Latest local validation (2026-05-19):**
@@ -8,7 +8,8 @@
 - `xcodegen generate` -> **PASS** (last verified 2026-05-26 on macOS)
 - `xcodebuild -scheme "DIRDiving Watch App" -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm),OS=26.5' -configuration Debug build` -> **PASS**
 - `xcodebuild -scheme "DIRDiving iOS" -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5' -configuration Debug build` -> **PASS**
-- XCTest target **`DIRDiving Watch Algorithm Tests`** present @ `92e639a`; full test execution requires macOS/Xcode (not validated from Windows)
+- XCTest target **`DIRDiving Watch Algorithm Tests`** present; full test execution requires macOS/Xcode (not validated from Windows)
+- XCTest target **`DIRDiving iOS Algorithm Tests`** present in `project.yml`; full test execution requires macOS/Xcode (not validated from Windows)
 
 ## Schemes and targets (from `project.yml`)
 
@@ -16,6 +17,8 @@
 |--------|--------|----------|
 | `DIRDiving Watch App` | `DIRDiving Watch App` | watchOS **10.0**+ |
 | `DIRDiving iOS` | `DIRDiving iOS` | iOS **17.0**+ |
+| `DIRDiving Watch Algorithm Tests` | `DIRDiving Watch Algorithm Tests` | watchOS **10.0**+ |
+| `DIRDiving iOS Algorithm Tests` | `DIRDiving iOS Algorithm Tests` | iOS **17.0**+ |
 
 ## Prerequisites (macOS)
 
@@ -71,6 +74,18 @@ xcodebuild -scheme "DIRDiving Watch App" \
 ```
 
 Use `xcodebuild -showdestinations -scheme "DIRDiving iOS"` and `xcodebuild -showdestinations -scheme "DIRDiving Watch App"` if device names differ on your Mac.
+
+### Algorithm tests
+
+```bash
+xcodebuild test -scheme "DIRDiving Watch Algorithm Tests" \
+  -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm)'
+
+xcodebuild test -scheme "DIRDiving iOS Algorithm Tests" \
+  -destination 'platform=iOS Simulator,name=iPhone 17'
+```
+
+The tests validate the release-hardening documented in `DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md` and `DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`.
 
 ## Known release blocker
 

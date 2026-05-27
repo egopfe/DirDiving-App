@@ -1,6 +1,6 @@
 # Roadmap DIR DIVING
 
-**Aggiornato:** 2026-05-19 (`main` base `92e639a`, con pass documentale corrente)
+**Aggiornato:** 2026-05-27 (`main` base `37e4464` prima del pass documentale corrente)
 
 ## Rilasciati su `main` (Watch MAIN + iOS nel workspace)
 
@@ -50,9 +50,13 @@
 | Safeguard reset cronometro Watch | ✅ | Conferma esplicita quando esiste tempo da resettare |
 | Mission Mode Watch + indicatore attivo | ✅ | `9d8baa1`; ottimizzazione runtime/UI senza regressioni safety-critical documentate |
 | Watch algorithm release-hard pass | ✅ | `ddaf2d7` → `92e639a`; validator depth, lifecycle, TTV/time-weighted avg, haptic coordinator, XCTest |
+| Watch algorithm final hardening | ✅ | Cap 40 sessioni su load/reload, temperatura plausibile, export vuoto bloccato, GPS fallback policy, conversioni centralizzate |
+| iOS algorithm release-hard pass | ✅ | Validator iOS, planner/gas safe states, import/export/sync/logbook math, route math, test `DIRDiving iOS Algorithm Tests` |
+| iOS Buhlmann multigas assessment | ✅ | Report documentale: supporto attuale parziale/N2-only reference; ZHL-16C+GF+He multigas completo resta roadmap dedicata |
 | Docs / branch / PR alignment 2026-05-19 | ✅ | README, INDEX, roadmap, safety/release docs, matrix e branch strategy @ `92e639a` |
 | Docs / audit alignment 2026-05-25 | ✅ | README, INDEX, safety/release docs e matrix riallineati al MAIN corrente |
 | Docs / branch / PR alignment 2026-05-26 | ✅ | README, INDEX, roadmap, current audits, branch/PR reports riallineati alla baseline MAIN attuale |
+| Docs / branch / PR alignment 2026-05-27 | ✅ | README, INDEX, roadmap, release/TestFlight notes, matrix e PR reports riallineati a `37e4464` + docs algorithm/Buhlmann |
 
 ## Prossimo (MAIN, pre–App Store)
 
@@ -61,9 +65,11 @@
 | P0 | Approvazione entitlement water-submersion + provisioning aggiornato | Apple Developer / Signing — [`TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md) |
 | P0 | Build generici firmati Watch + iOS con target embedded | Release / QA |
 | P1 | Esecuzione XCTest `DIRDiving Watch Algorithm Tests` su macOS/Xcode | Release / QA — [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md) |
+| P1 | Esecuzione XCTest `DIRDiving iOS Algorithm Tests` su macOS/Xcode | Release / QA — [`DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md) |
 | P1 | QA reale Apple Watch Ultra per lifecycle automatico, profondita e limiti 35/38/40 m | Hardware QA |
 | P1 | QA pairing/sync bidirezionale su device | Hardware QA |
 | P1 | QA App Intents / Action Button su Watch fisico | Hardware QA |
+| P2 | Se si vuole pianificazione tecnica multigas/helium completa, implementare motore Buhlmann ZHL-16C + GF + He secondo assessment | Planner roadmap — [`DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md`](DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md) |
 | P2 | Verifica finale legale contenuti Terms/Privacy e copy App Review | Legal / App Store |
 | P2 | Convergenza documentazione `main` ↔ worktree storici (`main-iOS`, `codex/*`) senza merge runtime unsafe | Process |
 | P3 | GPX/UDDF export | Feature |

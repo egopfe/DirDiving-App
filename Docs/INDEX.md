@@ -1,7 +1,7 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-05-19
-**Branch consigliato:** `main` @ `92e639a` (HEAD locale e remoto allineati dopo `git fetch --all --prune`)
+**Aggiornato:** 2026-05-27
+**Branch consigliato:** `main` @ `37e4464` prima del pass documentale 2026-05-27; usare l'ultimo commit remoto `origin/main` dopo `git fetch --all --prune`
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
 
@@ -19,6 +19,23 @@ Pass documentale additivo su `main` @ `92e639a`:
 | [`PR_STATUS_20260519.md`](PR_STATUS_20260519.md) | Stato PR #8 / #9 e raccomandazioni merge |
 
 Riferimenti UI obbligatori: [`ReferenceUI/Watch_LIVE_reference.png`](ReferenceUI/Watch_LIVE_reference.png), [`ReferenceUI/iOS_Companion_reference.png`](ReferenceUI/iOS_Companion_reference.png), [`FeatureScreenshots/02-ascent-warning.png`](FeatureScreenshots/02-ascent-warning.png).
+
+---
+
+## Aggiornamento indice 2026-05-27 - current architecture, algorithm docs, branch safety
+
+Pass documentale additivo su `main` dopo `37e4464`:
+
+| Documento | Contenuto |
+|-----------|-----------|
+| [`DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md) | Hardening iOS MAIN: validator, planner/gas safe states, import/export/sync/logbook math e test iOS |
+| [`DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md`](DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md) | Assessment iOS MAIN: Buhlmann multigas/helium non completo, piano implementativo ZHL-16C+GF+He |
+| [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md) | Final hardening Watch MAIN: cap 40 log, temperatura plausibile, export vuoto, GPS fallback, conversioni |
+| [`DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md) | Stato branch, divergenze, policy merge e isolamento experimental |
+| [`DOCUMENTATION_UPDATE_REPORT_20260527.md`](DOCUMENTATION_UPDATE_REPORT_20260527.md) | Report A-O del pass documentale corrente |
+| [`PR_STATUS_20260527.md`](PR_STATUS_20260527.md) | PR #8/#9 live via `gh`, entrambe conflittuali e non safe-to-merge automaticamente |
+
+Nota corrente: Snorkeling, Apnea, Buddy Assist e concept iOS experimental restano esclusi dai target MAIN in `project.yml`; le schermate e gli screenshot experimental sono documentati ma non promossi in runtime stabile.
 
 ---
 
@@ -144,8 +161,11 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | Documento | Contenuto |
 |-----------|-----------|
 | [`DOCUMENTATION_BRANCH_ALIGNMENT_20260526.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260526.md) | Allineamento corrente 2026-05-26: `main` baseline stabile, `main-iOS` worktree storico divergente, `codex/*` experimental-only |
+| [`DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md) | Allineamento corrente 2026-05-27: `main` stabile, branch tracciati allineati ai remoti, PR #8/#9 conflittuali e experimental |
 | [`DOCUMENTATION_UPDATE_REPORT_20260526.md`](DOCUMENTATION_UPDATE_REPORT_20260526.md) | Report aggiornamento documentazione/repository consistency corrente |
+| [`DOCUMENTATION_UPDATE_REPORT_20260527.md`](DOCUMENTATION_UPDATE_REPORT_20260527.md) | Report aggiornamento documentazione/repository consistency corrente post iOS algorithm/Buhlmann assessment |
 | [`PR_STATUS_20260526.md`](PR_STATUS_20260526.md) | Stato PR/merge safety 2026-05-26 con divergenza branch aggiornata e limiti ambiente correnti |
+| [`PR_STATUS_20260527.md`](PR_STATUS_20260527.md) | Stato PR/merge safety 2026-05-27 da `gh pr list` |
 | [`DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md) | Allineamento corrente: `main` canonico, `main-iOS` worktree storico divergente, experimental isolato |
 | [`DOCUMENTATION_UPDATE_REPORT_20260525.md`](DOCUMENTATION_UPDATE_REPORT_20260525.md) | Report aggiornamento documentazione corrente |
 | [`PR_STATUS_20260525.md`](PR_STATUS_20260525.md) | Stato PR/merge safety 2026-05-25 con limiti ambiente correnti |
@@ -235,6 +255,9 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`BUILD_VALIDATION.md`](BUILD_VALIDATION.md) | `xcodegen`, scheme, build; troubleshooting GPS views / `xcodegen generate` |
 | [`APP_ICON_UPDATE_NOTES.md`](APP_ICON_UPDATE_NOTES.md) | Icone app: `../Scripts/update_app_icons.sh`, Derived Data |
 | [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) | Checklist release |
+| [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md) | Hardening algoritmico finale Watch MAIN |
+| [`DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md) | Hardening algoritmico iOS MAIN |
+| [`DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md`](DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md) | Piano assessment per motore Buhlmann multigas/helium iOS |
 | [`SAFETY_DISCLAIMER.md`](SAFETY_DISCLAIMER.md) | Disclaimer (root Docs) |
 | [`TERMS_OF_USE.md`](TERMS_OF_USE.md) | Destinazione dedicata per Termini d'uso da Watch/iOS |
 | [`PRIVACY_AND_DATA_USE.md`](PRIVACY_AND_DATA_USE.md) | Destinazione dedicata per privacy / data use da Watch/iOS |
@@ -275,6 +298,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 
 | Data | File |
 |------|------|
+| 20260527 | [`DOCUMENTATION_UPDATE_REPORT_20260527.md`](DOCUMENTATION_UPDATE_REPORT_20260527.md) |
 | 20260526 | [`DOCUMENTATION_UPDATE_REPORT_20260526.md`](DOCUMENTATION_UPDATE_REPORT_20260526.md) |
 | 20260525 | [`DOCUMENTATION_UPDATE_REPORT_20260525.md`](DOCUMENTATION_UPDATE_REPORT_20260525.md) |
 | 20260524 | [`DOCUMENTATION_UPDATE_REPORT_20260524.md`](DOCUMENTATION_UPDATE_REPORT_20260524.md), [`DOCUMENTATION_UPDATE_REPORT_20260524_CONTROL_STRATEGY.md`](DOCUMENTATION_UPDATE_REPORT_20260524_CONTROL_STRATEGY.md) |
@@ -285,6 +309,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 
 | Data | Branch alignment |
 |------|------------------|
+| 20260527 | [`DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md) |
 | 20260526 | [`DOCUMENTATION_BRANCH_ALIGNMENT_20260526.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260526.md) |
 | 20260525 | [`DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md) |
 | 20260517–24 | [`DOCUMENTATION_BRANCH_ALIGNMENT_20260517.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260517.md) … [`DOCUMENTATION_BRANCH_ALIGNMENT_20260524.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260524.md) |
@@ -413,4 +438,4 @@ Altri asset in `Docs/`: `.docx`, `.csv`, `.xlsx`, `.py` (generatori §11), `Refe
 
 ---
 
-*Indice per ripresa lavoro su `main` @ `2322145` come baseline commit corrente. Baseline documentale corrente: README + audit dated 2026-05-25 + report/documentation alignment 2026-05-26.*
+*Indice per ripresa lavoro su `main` @ `37e4464` come baseline documentale pre-pass 2026-05-27. Baseline documentale corrente: README + audit dated 2026-05-25 + report/documentation alignment 2026-05-27.*

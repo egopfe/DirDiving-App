@@ -4,6 +4,14 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-27, documentation / branch alignment refresh)
+
+- **Documentazione corrente:** riallineati `README.md`, `Docs/INDEX.md`, `Docs/ROADMAP.md`, `Docs/RELEASE_CHECKLIST.md`, `Docs/TESTFLIGHT_REVIEW_NOTES.md` e `Docs/DIR_DIVING_Feature_Comparison.csv` alla baseline `main` @ `37e4464` e agli ultimi documenti algorithm/Buhlmann.
+- **Nuovi report:** `Docs/DOCUMENTATION_UPDATE_REPORT_20260527.md`, `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md`, `Docs/PR_STATUS_20260527.md`.
+- **Algorithm docs:** indicizzati Watch final hardening, iOS algorithm hardening e assessment iOS Buhlmann multigas/helium.
+- **Branch/PR policy:** `main` confermato stabile; `main-iOS` storico/divergente; `codex/*` experimental-only. PR #8/#9 ispezionate via `gh`, entrambe conflittuali e non safe-to-merge automaticamente.
+- **Vincoli:** solo documentazione/repository consistency; nessuna modifica runtime, UI, UX, planner, sync, GPS, BUSSOLA o persistence.
+
 ### Added (2026-05-19, documentation / branch alignment — baseline `92e639a`)
 
 - **Baseline commit:** README, INDEX, ROADMAP, PRODUCT_FEATURES_IT, SAFETY_DISCLAIMER, BUILD_VALIDATION e matrice CSV riallineati a `main` @ `92e639a`.

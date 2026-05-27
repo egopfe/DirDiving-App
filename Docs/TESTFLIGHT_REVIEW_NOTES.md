@@ -1,12 +1,18 @@
 # Note per TestFlight / App Review - DIR DIVING
 
-**Aggiornato:** 2026-05-26 - branch `main` (Watch + iOS companion unificati)
+**Aggiornato:** 2026-05-27 - branch `main` (Watch + iOS companion unificati)
 
 ## Panoramica per il revisore
 
 DIR DIVING e uno strumento companion per Apple Watch Ultra e iPhone: **log immersioni**, monitoraggio profondita dove l'entitlement lo consente, **consapevolezza risalita** (banner non bloccante), **BUSSOLA**, **GPS di superficie** (ingresso/uscita), sync Watch/iPhone ed export CSV Subsurface. Include planner **indicativo** su iOS, non certificato.
 
 L'app **non** e presentata come computer subacqueo certificato.
+
+Lo stato algoritmico MAIN e documentato in:
+
+- [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md) per Watch MAIN.
+- [`DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md) per iOS MAIN.
+- [`DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md`](DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md) per il piano futuro Buhlmann ZHL-16C multigas/helium. La release MAIN corrente non deve essere descritta come decompression planner certificato o motore multigas helium completo.
 
 ## Account e dati demo
 
@@ -37,6 +43,7 @@ L'app **non** e presentata come computer subacqueo certificato.
 5. Side Button / Action Button Watch: l'app **non** puo intercettare direttamente il tasto laterale. Controlli immersione affidabili restano **START / STOP / RESET** sullo schermo Live. Comandi aggiuntivi (cronometro, immersione manuale, BUSSOLA, allarme) sono disponibili tramite **Comandi Rapidi / Action Button** solo dove watchOS espone gli App Intent registrati — vedi Impostazioni -> Azione / Comandi.
 6. Mission Mode e solo un profilo di ottimizzazione runtime/UI per immersione attiva: non riduce monitoraggio safety-critical, non modifica logica immersione o sensori e usa solo un indicatore visivo minimale.
 7. Terms / Privacy da onboarding e settings puntano a documenti dedicati, non alla root del repository.
+8. Buhlmann/NDL sul companion iOS rimane riferimento informativo secondo lo stato implementato: trimix/helium completo richiede motore dedicato e validazione matematica futura.
 
 ## Checklist QA consigliata (reviewer)
 
@@ -50,6 +57,7 @@ L'app **non** e presentata come computer subacqueo certificato.
 - [ ] Mission Mode: toggle Settings + indicatore header verificati; nessun cambiamento ai dati safety-critical
 - [ ] Export CSV Subsurface da dettaglio immersione
 - [ ] Planner: disclaimer visibile; output indicativo
+- [ ] Planner: gas/NDL safe states visibili; nessun output trimix/helium presentato come decompressione certificata
 - [ ] Settings / More: link Terms / Privacy raggiungibili e leggibili
 - [ ] Lingua EN: Settings, log, sync senza italiano evidente nelle schermate principali
 
