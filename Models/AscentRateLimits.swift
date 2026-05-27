@@ -31,6 +31,10 @@ struct AscentRateLimits: Codable, Hashable {
         if depthMeters > DepthSafetyConfiguration.maximumSupportedDepthMeters {
             return min(clean.surfaceMetersPerMinute, clean.fallbackMetersPerMinute)
         }
+        // Boundary convention is upper-band inclusive at 40, 30, 20, and 6 m:
+        // 40.00 and 30.00 use the 10 m/min band, 20.00 uses 5 m/min,
+        // and 6.00 uses 3 m/min. Values just shallower than a boundary move
+        // to the slower band. Depth above 40 m is conservative.
         switch depthMeters {
         case 40...: return clean.deepMetersPerMinute
         case 30..<40: return clean.deepMetersPerMinute

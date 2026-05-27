@@ -16,7 +16,6 @@ final class DiveLogStore: ObservableObject {
         "dirdiving_ios_deleted_session_ids",
         "dirdiving_ios_deleted_dive_session_ids"
     ]
-    private let maxSessions = 40
     private let cloudSync = CloudSyncStore()
     private var deletedSessionIDs: Set<UUID> = []
 
@@ -40,8 +39,6 @@ final class DiveLogStore: ObservableObject {
         let localSessions = loadLocalSessions()
         let cloudSessions = cloudSync.load([DiveSession].self, forKey: cloudKey)
         sessions = mergeSessions(local: localSessions, cloud: cloudSessions)
-            .filter { !deletedSessionIDs.contains($0.id) }
-            .sorted { $0.startDate > $1.startDate }
     }
 
     /// Session created on-device (or finalized locally) — may sync to iPhone.
@@ -50,7 +47,7 @@ final class DiveLogStore: ObservableObject {
         guard !deletedSessionIDs.contains(normalizedSession.id) else { return }
         sessions.removeAll { $0.id == normalizedSession.id }
         sessions.insert(normalizedSession, at: 0)
-        sessions = Array(sessions.sorted { $0.startDate > $1.startDate }.prefix(maxSessions))
+        sessions = DiveLogbookPolicy.normalizedAndCapped(sessions, deletedIDs: deletedSessionIDs)
         save()
         WatchSyncService.shared.transfer(normalizedSession)
     }
@@ -61,7 +58,7 @@ final class DiveLogStore: ObservableObject {
         guard !deletedSessionIDs.contains(normalizedSession.id) else { return }
         sessions.removeAll { $0.id == normalizedSession.id }
         sessions.insert(normalizedSession, at: 0)
-        sessions = Array(sessions.sorted { $0.startDate > $1.startDate }.prefix(maxSessions))
+        sessions = DiveLogbookPolicy.normalizedAndCapped(sessions, deletedIDs: deletedSessionIDs)
         save()
     }
 
@@ -99,8 +96,6 @@ final class DiveLogStore: ObservableObject {
         let localSessions = loadLocalSessions()
         let cloudSessions = cloudSync.load([DiveSession].self, forKey: cloudKey)
         sessions = mergeSessions(local: localSessions, cloud: cloudSessions)
-            .filter { !deletedSessionIDs.contains($0.id) }
-            .sorted { $0.startDate > $1.startDate }
         if !sessions.isEmpty {
             save()
         }
@@ -121,21 +116,7 @@ final class DiveLogStore: ObservableObject {
     }
 
     private func mergeSessions(local: [DiveSession], cloud: [DiveSession]?) -> [DiveSession] {
-        var byID: [UUID: DiveSession] = [:]
-        for session in local {
-            let normalized = DiveSessionMerge.preferred(session, session)
-            byID[normalized.id] = normalized
-        }
-        guard let cloud else { return Array(byID.values) }
-        for session in cloud {
-            let normalized = DiveSessionMerge.preferred(session, session)
-            if let existing = byID[normalized.id] {
-                byID[normalized.id] = DiveSessionMerge.preferred(existing, normalized)
-            } else {
-                byID[normalized.id] = normalized
-            }
-        }
-        return Array(byID.values)
+        DiveLogbookPolicy.mergedAndCapped(local: local, cloud: cloud, deletedIDs: deletedSessionIDs)
     }
 
     private func loadDeletedSessionIDs() -> Set<UUID> {

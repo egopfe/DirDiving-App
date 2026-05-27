@@ -45,7 +45,7 @@ enum DIRUnitPreference: String, CaseIterable, Identifiable, Codable {
     func depthDisplay(meters: Double) -> (value: Double, unit: String) {
         switch self {
         case .metric: return (meters, "m")
-        case .imperial: return (meters * 3.280839895, "ft")
+        case .imperial: return (DIRUnitConversions.metersToFeet(meters), "ft")
         }
     }
 
@@ -56,28 +56,28 @@ enum DIRUnitPreference: String, CaseIterable, Identifiable, Codable {
     func depthInputToMeters(_ value: Double) -> Double {
         switch self {
         case .metric: return value
-        case .imperial: return value / 3.280839895
+        case .imperial: return DIRUnitConversions.feetToMeters(value)
         }
     }
 
     func temperatureDisplay(celsius: Double) -> (value: Double, unit: String) {
         switch self {
         case .metric: return (celsius, "\u{00B0}C")
-        case .imperial: return (celsius * 9.0 / 5.0 + 32.0, "\u{00B0}F")
+        case .imperial: return (DIRUnitConversions.celsiusToFahrenheit(celsius), "\u{00B0}F")
         }
     }
 
     func pressureDisplay(bar: Double) -> (value: Double, unit: String) {
         switch self {
         case .metric: return (bar, "bar")
-        case .imperial: return (bar * 14.5037738, "psi")
+        case .imperial: return (DIRUnitConversions.barToPSI(bar), "psi")
         }
     }
 
     func ascentRateDisplay(metersPerMinute: Double) -> (value: Double, unit: String) {
         switch self {
         case .metric: return (metersPerMinute, "m/min")
-        case .imperial: return (metersPerMinute * 3.280839895, "ft/min")
+        case .imperial: return (DIRUnitConversions.metersPerMinuteToFeetPerMinute(metersPerMinute), "ft/min")
         }
     }
 }

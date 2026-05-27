@@ -94,8 +94,11 @@ targets:
       - Models/AscentRateLimits.swift
       - Models/AscentStatus.swift
       - Utils/DIRUnitPreference.swift
+      - Utils/DIRUnitConversions.swift
       - Utils/DepthSafetyConfiguration.swift
       - Utils/DiveAlgorithmConfiguration.swift
+      - Utils/DiveLogbookPolicy.swift
+      - Utils/GPSFallbackPolicy.swift
       - Utils/DepthSampleValidation.swift
       - Utils/DiveLifecycleAlgorithm.swift
       - Utils/DiveSessionAlgorithmValidator.swift

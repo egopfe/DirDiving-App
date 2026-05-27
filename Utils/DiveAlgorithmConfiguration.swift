@@ -14,6 +14,10 @@ enum DiveAlgorithmConfiguration {
     static let maximumPlausibleDepthMeters = 350.0
     static let maximumPlausibleDepthChangeMetersPerMinute = 90.0
     static let activeDiveDraftExpirationSeconds: TimeInterval = 12 * 60 * 60
+    static let minimumPlausibleWaterTemperatureCelsius = -2.0
+    static let maximumPlausibleWaterTemperatureCelsius = 40.0
+    static let maximumGPSFallbackAgeSeconds: TimeInterval = 300
+    static let maximumGPSFallbackHorizontalAccuracyMeters = 50.0
 }
 
 enum DiveAlgorithm {
@@ -25,6 +29,10 @@ enum DiveAlgorithm {
 
     static func sanitizedTemperatureCelsius(_ rawTemperature: Double?) -> Double? {
         guard let rawTemperature, rawTemperature.isFinite else { return nil }
+        guard rawTemperature >= DiveAlgorithmConfiguration.minimumPlausibleWaterTemperatureCelsius,
+              rawTemperature <= DiveAlgorithmConfiguration.maximumPlausibleWaterTemperatureCelsius else {
+            return nil
+        }
         return rawTemperature
     }
 

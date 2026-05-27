@@ -67,7 +67,7 @@ enum DiveSessionMerge {
     }
 
     private static func minOptional(_ lhs: Double?, _ rhs: Double?) -> Double? {
-        switch (lhs, rhs) {
+        switch (DiveAlgorithm.sanitizedTemperatureCelsius(lhs), DiveAlgorithm.sanitizedTemperatureCelsius(rhs)) {
         case let (left?, right?): return min(left, right)
         case (nil, let right?): return right
         case (let left?, nil): return left
@@ -76,7 +76,7 @@ enum DiveSessionMerge {
     }
 
     private static func maxOptional(_ lhs: Double?, _ rhs: Double?) -> Double? {
-        switch (lhs, rhs) {
+        switch (DiveAlgorithm.sanitizedTemperatureCelsius(lhs), DiveAlgorithm.sanitizedTemperatureCelsius(rhs)) {
         case let (left?, right?): return max(left, right)
         case (nil, let right?): return right
         case (let left?, nil): return left

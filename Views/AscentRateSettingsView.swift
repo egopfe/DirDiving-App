@@ -44,7 +44,7 @@ struct AscentRateSettingsView: View {
         let displayBinding = Binding<Double>(
             get: { unitPreference.ascentRateDisplay(metersPerMinute: value.wrappedValue).value },
             set: { newValue in
-                let metersPerMinute = unitPreference == .metric ? newValue : newValue / 3.280839895
+                let metersPerMinute = unitPreference == .metric ? newValue : DIRUnitConversions.feetPerMinuteToMetersPerMinute(newValue)
                 value.wrappedValue = min(20, max(0.5, metersPerMinute))
             }
         )

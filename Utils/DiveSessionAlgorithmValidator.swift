@@ -79,7 +79,8 @@ enum DiveSessionAlgorithmValidator {
     }
 
     private static func validTemperature(_ value: Double?) -> Bool {
-        value?.isFinite ?? true
+        guard let value else { return true }
+        return DiveAlgorithm.sanitizedTemperatureCelsius(value) != nil
     }
 
     private static func validGPS(_ point: GPSPoint?) -> Bool {

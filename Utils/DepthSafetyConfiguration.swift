@@ -14,6 +14,7 @@ enum DepthSafetyState: Equatable {
     case exceeded
 
     static func from(depthMeters: Double) -> DepthSafetyState {
+        guard depthMeters.isFinite else { return .normal }
         let depth = max(0, depthMeters)
         if depth >= DepthSafetyConfiguration.maximumSupportedDepthMeters {
             return .exceeded
