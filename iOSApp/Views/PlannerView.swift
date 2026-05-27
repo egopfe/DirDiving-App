@@ -231,33 +231,7 @@ struct PlannerView: View {
     }
 
     private var validationError: String? {
-        let input = store.input
-        guard input.plannedDepthMeters >= 1, input.plannedDepthMeters <= 100 else {
-            return "Profondita non valida: usa 1-100 m."
-        }
-        guard input.plannedBottomMinutes >= 1, input.plannedBottomMinutes <= 240 else {
-            return "Tempo fondo non valido: usa 1-240 min."
-        }
-        guard input.cylinderVolumeLiters > 0, input.startPressureBar > input.reservePressureBar, input.reservePressureBar >= 0 else {
-            return "Gas non valido: volume bombola e pressioni devono lasciare riserva positiva."
-        }
-        guard input.sacLitersPerMinute > 0 else {
-            return "SAC non valido: deve essere maggiore di zero."
-        }
-        guard isValid(input.bottomGas), isValid(input.decoGas1), isValid(input.decoGas2) else {
-            return "Miscela non valida: O2/He devono restare entro 100% e PPO2 tra 1.0 e 1.6."
-        }
-        guard input.bottomGas.modMeters >= input.plannedDepthMeters else {
-            return "MOD gas fondo inferiore alla profondita pianificata."
-        }
-        return nil
-    }
-
-    private func isValid(_ gas: GasMix) -> Bool {
-        gas.oxygen >= 0.10 && gas.oxygen <= 1.0 &&
-        gas.helium >= 0 &&
-        gas.oxygen + gas.helium <= 1.0 &&
-        gas.maxPPO2 >= 1.0 && gas.maxPPO2 <= 1.6
+        PlannerInputValidator.errorMessage(for: store.input)
     }
 
     private func plannerField(_ title: String, value: Binding<Double>, unit: String, step: Double) -> some View {
@@ -552,7 +526,7 @@ struct PlanResultView: View {
                         "\(Formatters.one(stop.depthMeters)) m",
                         "\(stop.minutes) min",
                         stop.gas,
-                        Formatters.one(stop.ppO2)
+                        "\(Formatters.one(stop.ppO2))/\(Formatters.one(stop.maxPPO2))"
                     ])
                 }
                 tableRow(["0 m", "-", "SURFACE", "-"])
@@ -601,7 +575,7 @@ struct PlanResultView: View {
 
     private var buhlmannChart: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("CURVA BUHLMANN ZH-L16C")
+            Text("RIF. BUHLMANN N2")
                 .font(.system(size: 11, weight: .semibold, design: .rounded))
                 .foregroundStyle(DIRTheme.cyan)
             Chart(store.buhlmann.curve) { point in

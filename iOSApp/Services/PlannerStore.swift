@@ -10,7 +10,7 @@ final class PlannerStore: ObservableObject {
         didSet { saveIfReady() }
     }
     @Published var plan = PlannerService.makePlan(input: GasPlanInput())
-    @Published var buhlmann = BuhlmannPlanner.plan(depthMeters: 40, o2Fraction: 0.18)
+    @Published var buhlmann = BuhlmannPlanner.plan(depthMeters: 40, gas: GasPlanInput().bottomGas)
     @Published var safetyAcknowledged = false
 
     private let cloudSync: CloudSyncStore?
@@ -30,7 +30,7 @@ final class PlannerStore: ObservableObject {
 
     func calculate() {
         plan = PlannerService.makePlan(input: input)
-        buhlmann = BuhlmannPlanner.plan(depthMeters: input.plannedDepthMeters, o2Fraction: input.bottomGas.oxygen)
+        buhlmann = BuhlmannPlanner.plan(depthMeters: input.plannedDepthMeters, gas: input.bottomGas)
         saveIfReady()
     }
 

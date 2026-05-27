@@ -18,8 +18,21 @@ targets:
         INFOPLIST_FILE: iOSApp/App/Info.plist
         CODE_SIGN_ENTITLEMENTS: iOSApp/Config/DIRDivingiOS.entitlements
         PRODUCT_NAME: DIR DIVING
+        PRODUCT_MODULE_NAME: DIRDivingiOS
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     dependencies:
       - sdk: Charts.framework
       - sdk: WatchConnectivity.framework
       - sdk: CoreLocation.framework
+  DIRDiving iOS Tests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - Tests/iOSAlgorithmTests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios.tests
+        PRODUCT_MODULE_NAME: DIRDivingiOSTests
+        DEVELOPMENT_TEAM: C6FKKPB6A9
+    dependencies:
+      - target: DIRDiving iOS

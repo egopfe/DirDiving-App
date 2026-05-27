@@ -34,9 +34,10 @@ final class DiveLogStore: ObservableObject {
         deletedSessionIDs = loadDeletedSessionIDs()
         let localSessions = loadLocalSessions()
         let cloudSessions = cloudSync?.load([DiveSession].self, forKey: key)
-        sessions = mergedSessions(local: localSessions, cloud: cloudSessions)
-            .filter { !deletedSessionIDs.contains($0.id) }
-            .sorted { $0.startDate > $1.startDate }
+        sessions = DiveProfileMath.trimToLogLimit(
+            mergedSessions(local: localSessions, cloud: cloudSessions)
+                .filter { !deletedSessionIDs.contains($0.id) }
+        )
 
         if includeDemoLogbook, sessions.filter({ !$0.isDemoDive }).isEmpty {
             insertDemoDives()
@@ -70,17 +71,19 @@ final class DiveLogStore: ObservableObject {
         let localSessions = loadLocalSessions()
         deletedSessionIDs = loadDeletedSessionIDs()
         let cloudSessions = cloudSync?.load([DiveSession].self, forKey: key)
-        sessions = mergedSessions(local: localSessions, cloud: cloudSessions)
-            .filter { !deletedSessionIDs.contains($0.id) }
-            .sorted { $0.startDate > $1.startDate }
+        sessions = DiveProfileMath.trimToLogLimit(
+            mergedSessions(local: localSessions, cloud: cloudSessions)
+                .filter { !deletedSessionIDs.contains($0.id) }
+        )
         applyDemoLogbookPreference()
     }
 
     func add(_ session: DiveSession) {
-        guard !deletedSessionIDs.contains(session.id) else { return }
-        sessions.removeAll { $0.id == session.id }
-        sessions.insert(session, at: 0)
-        sessions = sessions.sorted { $0.startDate > $1.startDate }
+        let normalizedSession = DiveSessionMerge.preferred(session, session)
+        guard !deletedSessionIDs.contains(normalizedSession.id) else { return }
+        sessions.removeAll { $0.id == normalizedSession.id }
+        sessions.insert(normalizedSession, at: 0)
+        sessions = DiveProfileMath.trimToLogLimit(sessions)
     }
 
     func session(id: UUID) -> DiveSession? {
@@ -119,14 +122,14 @@ final class DiveLogStore: ObservableObject {
     private func mergedSessions(local: [DiveSession], cloud: [DiveSession]?) -> [DiveSession] {
         var byID: [UUID: DiveSession] = [:]
         for session in local {
-            byID[session.id] = session
+            byID[session.id] = DiveSessionMerge.preferred(session, session)
         }
         if let cloud {
             for session in cloud {
                 if let existing = byID[session.id] {
                     byID[session.id] = DiveSessionMerge.preferred(existing, session)
                 } else {
-                    byID[session.id] = session
+                    byID[session.id] = DiveSessionMerge.preferred(session, session)
                 }
             }
         }
@@ -201,16 +204,22 @@ final class DiveLogStore: ObservableObject {
                     temperatureCelsius: 24 - Double(idx)
                 )
             }
-            let avg = samples.map(\.depthMeters).reduce(0, +) / Double(samples.count)
+            let metrics = DiveProfileMath.derivedMetrics(
+                samples: samples,
+                fallbackStart: start,
+                fallbackEnd: start.addingTimeInterval(duration)
+            )
             return DiveSession(
                 id: demoID,
-                startDate: start,
-                endDate: start.addingTimeInterval(duration),
-                durationSeconds: duration,
-                maxDepthMeters: samples.map(\.depthMeters).max() ?? maxDepth,
-                avgDepthMeters: avg,
-                avgWaterTemperatureCelsius: 24 - Double(idx),
-                ttv: idx == 0 ? 24 : avg + duration / 60,
+                startDate: metrics.startDate,
+                endDate: metrics.endDate,
+                durationSeconds: metrics.durationSeconds,
+                maxDepthMeters: metrics.maxDepthMeters,
+                avgDepthMeters: metrics.avgDepthMeters,
+                avgWaterTemperatureCelsius: metrics.avgWaterTemperatureCelsius,
+                minWaterTemperatureCelsius: metrics.minWaterTemperatureCelsius,
+                maxWaterTemperatureCelsius: metrics.maxWaterTemperatureCelsius,
+                ttv: metrics.ttv,
                 entryGPS: GPSPoint(latitude: 38.1157 + Double(idx) * 0.001, longitude: 13.3615, horizontalAccuracy: 15, timestamp: start),
                 exitGPS: GPSPoint(latitude: 38.1162 + Double(idx) * 0.001, longitude: 13.3620, horizontalAccuracy: 18, timestamp: start.addingTimeInterval(duration)),
                 samples: samples,
@@ -219,8 +228,10 @@ final class DiveLogStore: ObservableObject {
                 notes: DiveSession.demoNotesLabel,
                 gasLabel: gases[idx],
                 sacLitersMinute: 18.2 + Double(idx),
-                isDemo: true
+                isDemo: true,
+                exceededSupportedDepthRange: metrics.exceededSupportedDepthRange
             )
         }
+        sessions = DiveProfileMath.trimToLogLimit(sessions)
     }
 }

@@ -6,6 +6,8 @@ struct DecoStop: Identifiable, Hashable {
     let minutes: Int
     let gas: String
     let ppO2: Double
+    let maxPPO2: Double
+    let isPPO2Exceeded: Bool
 }
 
 struct DivePlanResult: Hashable {
@@ -15,6 +17,8 @@ struct DivePlanResult: Hashable {
     let cnsPercent: Double
     let otu: Double
     let warnings: [String]
+    let states: Set<PlannerResultState>
+    let modelState: BuhlmannModelState
 }
 
 struct NDLPoint: Identifiable, Hashable {
@@ -31,4 +35,5 @@ struct BuhlmannPlanResult: Hashable {
     let ndlMinutes: Double
     let curve: [NDLPoint]
     let warning: String?
+    let modelState: BuhlmannModelState
 }

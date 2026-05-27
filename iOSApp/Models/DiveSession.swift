@@ -21,6 +21,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
     let maxDepthMeters: Double
     let avgDepthMeters: Double
     let avgWaterTemperatureCelsius: Double?
+    let minWaterTemperatureCelsius: Double?
+    let maxWaterTemperatureCelsius: Double?
     let ttv: Double
     let entryGPS: GPSPoint?
     let exitGPS: GPSPoint?
@@ -33,6 +35,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
     var gasLabel: DiveGasLabel
     var sacLitersMinute: Double?
     var isDemo: Bool
+    let exceededSupportedDepthRange: Bool
 
     static let demoNotesLabel = "Demo dive"
 
@@ -40,9 +43,10 @@ struct DiveSession: Identifiable, Codable, Hashable {
 
     enum CodingKeys: String, CodingKey {
         case id, startDate, endDate, durationSeconds, maxDepthMeters, avgDepthMeters
-        case avgWaterTemperatureCelsius, ttv, entryGPS, exitGPS, samples
+        case avgWaterTemperatureCelsius, minWaterTemperatureCelsius, maxWaterTemperatureCelsius, ttv, entryGPS, exitGPS, samples
         case entryGPSFixSource, exitGPSFixSource
         case siteName, buddy, notes, gasLabel, sacLitersMinute, isDemo
+        case exceededSupportedDepthRange
     }
 
     init(
@@ -53,6 +57,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         maxDepthMeters: Double,
         avgDepthMeters: Double,
         avgWaterTemperatureCelsius: Double?,
+        minWaterTemperatureCelsius: Double? = nil,
+        maxWaterTemperatureCelsius: Double? = nil,
         ttv: Double,
         entryGPS: GPSPoint?,
         exitGPS: GPSPoint?,
@@ -64,7 +70,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         notes: String? = nil,
         gasLabel: DiveGasLabel = .oc,
         sacLitersMinute: Double? = nil,
-        isDemo: Bool = false
+        isDemo: Bool = false,
+        exceededSupportedDepthRange: Bool = false
     ) {
         self.id = id
         self.startDate = startDate
@@ -73,6 +80,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         self.maxDepthMeters = maxDepthMeters
         self.avgDepthMeters = avgDepthMeters
         self.avgWaterTemperatureCelsius = avgWaterTemperatureCelsius
+        self.minWaterTemperatureCelsius = minWaterTemperatureCelsius
+        self.maxWaterTemperatureCelsius = maxWaterTemperatureCelsius
         self.ttv = ttv
         self.entryGPS = entryGPS
         self.exitGPS = exitGPS
@@ -85,6 +94,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         self.gasLabel = gasLabel
         self.sacLitersMinute = sacLitersMinute
         self.isDemo = isDemo
+        self.exceededSupportedDepthRange = exceededSupportedDepthRange
+            || maxDepthMeters > IOSAlgorithmConfiguration.maximumRecommendedDepthMeters
     }
 
     init(from decoder: Decoder) throws {
@@ -96,6 +107,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         maxDepthMeters = try container.decode(Double.self, forKey: .maxDepthMeters)
         avgDepthMeters = try container.decode(Double.self, forKey: .avgDepthMeters)
         avgWaterTemperatureCelsius = try container.decodeIfPresent(Double.self, forKey: .avgWaterTemperatureCelsius)
+        minWaterTemperatureCelsius = try container.decodeIfPresent(Double.self, forKey: .minWaterTemperatureCelsius)
+        maxWaterTemperatureCelsius = try container.decodeIfPresent(Double.self, forKey: .maxWaterTemperatureCelsius)
         ttv = try container.decode(Double.self, forKey: .ttv)
         entryGPS = try container.decodeIfPresent(GPSPoint.self, forKey: .entryGPS)
         exitGPS = try container.decodeIfPresent(GPSPoint.self, forKey: .exitGPS)
@@ -109,6 +122,9 @@ struct DiveSession: Identifiable, Codable, Hashable {
         sacLitersMinute = try container.decodeIfPresent(Double.self, forKey: .sacLitersMinute)
         let decodedDemo = try container.decodeIfPresent(Bool.self, forKey: .isDemo) ?? false
         isDemo = decodedDemo || DemoDiveCatalog.isDemoSession(id: id) || notes == Self.demoNotesLabel
+        let decodedExceeded = try container.decodeIfPresent(Bool.self, forKey: .exceededSupportedDepthRange) ?? false
+        exceededSupportedDepthRange = decodedExceeded
+            || maxDepthMeters > IOSAlgorithmConfiguration.maximumRecommendedDepthMeters
     }
 
     func encode(to encoder: Encoder) throws {
@@ -120,6 +136,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         try container.encode(maxDepthMeters, forKey: .maxDepthMeters)
         try container.encode(avgDepthMeters, forKey: .avgDepthMeters)
         try container.encodeIfPresent(avgWaterTemperatureCelsius, forKey: .avgWaterTemperatureCelsius)
+        try container.encodeIfPresent(minWaterTemperatureCelsius, forKey: .minWaterTemperatureCelsius)
+        try container.encodeIfPresent(maxWaterTemperatureCelsius, forKey: .maxWaterTemperatureCelsius)
         try container.encode(ttv, forKey: .ttv)
         try container.encodeIfPresent(entryGPS, forKey: .entryGPS)
         try container.encodeIfPresent(exitGPS, forKey: .exitGPS)
@@ -132,5 +150,33 @@ struct DiveSession: Identifiable, Codable, Hashable {
         try container.encode(gasLabel, forKey: .gasLabel)
         try container.encodeIfPresent(sacLitersMinute, forKey: .sacLitersMinute)
         try container.encode(isDemo, forKey: .isDemo)
+        try container.encode(exceededSupportedDepthRange, forKey: .exceededSupportedDepthRange)
+    }
+
+    func replacingDerivedValues(with metrics: DiveProfileDerivedMetrics) -> DiveSession {
+        DiveSession(
+            id: id,
+            startDate: metrics.startDate,
+            endDate: metrics.endDate,
+            durationSeconds: metrics.durationSeconds,
+            maxDepthMeters: metrics.maxDepthMeters,
+            avgDepthMeters: metrics.avgDepthMeters,
+            avgWaterTemperatureCelsius: metrics.avgWaterTemperatureCelsius,
+            minWaterTemperatureCelsius: metrics.minWaterTemperatureCelsius,
+            maxWaterTemperatureCelsius: metrics.maxWaterTemperatureCelsius,
+            ttv: metrics.ttv,
+            entryGPS: entryGPS,
+            exitGPS: exitGPS,
+            entryGPSFixSource: entryGPSFixSource,
+            exitGPSFixSource: exitGPSFixSource,
+            samples: metrics.samples,
+            siteName: siteName,
+            buddy: buddy,
+            notes: notes,
+            gasLabel: gasLabel,
+            sacLitersMinute: sacLitersMinute,
+            isDemo: isDemo,
+            exceededSupportedDepthRange: exceededSupportedDepthRange || metrics.exceededSupportedDepthRange
+        )
     }
 }

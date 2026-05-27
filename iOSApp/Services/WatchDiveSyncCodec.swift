@@ -6,8 +6,8 @@ enum WatchDiveSyncCodec {
     static let payloadKey = "dirdiving_dive_session"
     static let schemaVersion = 1
     static let maxPayloadBytes = 512_000
-    static let maxSamples = 20_000
-    static let maxDepthMeters = 350.0
+    static let maxSamples = IOSAlgorithmConfiguration.maximumProfileSamples
+    static let maxDepthMeters = IOSAlgorithmConfiguration.maximumSyncDepthMeters
     // F6: tightened from 86_400 (24 h) to 3_600 (1 h) to shrink the replay window.
     // WatchConnectivity is pairing-locked at the OS level, but a 1 h skew is more than
     // enough for the usual Watch/iPhone clock drift while removing the day-long replay
@@ -71,8 +71,8 @@ enum WatchDiveSyncCodec {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let session = try decoder.decode(DiveSession.self, from: transport.body)
-        try validate(session)
-        return ParsedPayload(session: session, issuedAt: transport.issuedAt)
+        let normalizedSession = try validate(session)
+        return ParsedPayload(session: normalizedSession, issuedAt: transport.issuedAt)
     }
 
     // F11: ack signature recomputed and returned by iOS in response to a signed
@@ -112,17 +112,14 @@ enum WatchDiveSyncCodec {
         return received.constantTimeEquals(expectedData)
     }
 
-    private static func validate(_ session: DiveSession) throws {
-        guard session.durationSeconds >= 0, session.durationSeconds <= 86_400 else {
+    private static func validate(_ session: DiveSession) throws -> DiveSession {
+        guard session.samples.count <= maxSamples,
+              session.maxDepthMeters <= maxDepthMeters else {
             throw WatchDiveSyncError.invalidSession
         }
-        guard session.maxDepthMeters >= 0, session.maxDepthMeters <= maxDepthMeters else {
-            throw WatchDiveSyncError.invalidSession
-        }
-        guard session.samples.count <= maxSamples else {
-            throw WatchDiveSyncError.invalidSession
-        }
-        guard session.endDate >= session.startDate else {
+        do {
+            return try DiveSessionAlgorithmValidator.normalized(session)
+        } catch {
             throw WatchDiveSyncError.invalidSession
         }
     }
