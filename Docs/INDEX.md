@@ -1,7 +1,7 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-05-27
-**Branch consigliato:** `main` @ `37e4464` prima del pass documentale 2026-05-27; usare l'ultimo commit remoto `origin/main` dopo `git fetch --all --prune`
+**Aggiornato:** 2026-05-28
+**Branch consigliato:** `main` @ `bc08707` (latest `origin/main` verificato con `git fetch --all --prune`)
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
 
@@ -22,6 +22,26 @@ Riferimenti UI obbligatori: [`ReferenceUI/Watch_LIVE_reference.png`](ReferenceUI
 
 ---
 
+## Aggiornamento indice 2026-05-28 - iOS gas+Buhlmann plan e refresh algoritmico
+
+Pass documentale additivo su `main` tra `d1d48d5` -> `2edc46e` -> `9ee1912` -> `bc08707`:
+
+| Documento | Stato | Contenuto |
+|-----------|-------|-----------|
+| [`DIR_DIVING_IOS_GAS_BUHLMANN_PLANNER_IMPROVEMENT_PLAN.md`](DIR_DIVING_IOS_GAS_BUHLMANN_PLANNER_IMPROVEMENT_PLAN.md) | **Nuovo** | Piano operativo miglioramenti planner gas+Buhlmann iOS: obiettivi, criteri qualità, piano test e readiness |
+| [`DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md`](DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md) | Nuovo (pass 2026-05-28) | Cross-check esterno su envelope di riferimento Air/Nitrox/Trimix |
+| [`DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md) | Aggiornato | Hardening iOS planner/Buhlmann e policy safety/reference |
+| [`DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md) | Aggiornato | Design engine Buhlmann multigas e note implementative correnti |
+| [`DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md) | Aggiornato | Verifica matematica estesa + copertura casi edge |
+| [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md) | Aggiornato | Fixture/test aggiornati per regressioni numeriche |
+| [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md) | Aggiornato | Limiti planner/reference esplicitati post hardening |
+| [`DIR_DIVING_Feature_Comparison.csv`](DIR_DIVING_Feature_Comparison.csv) | Aggiornato | Matrice feature aggiornata con stato iOS planner/Buhlmann |
+| [`INDEX.md`](INDEX.md) | Aggiornato | Indicizzazione completa file nuovi/aggiornati 2026-05-28 |
+
+Nota: aggiornamenti 2026-05-28 sono documentali/di validazione; non promuovono feature experimental nel runtime MAIN.
+
+---
+
 ## Aggiornamento indice 2026-05-27 - current architecture, algorithm docs, branch safety
 
 Pass documentale additivo su `main` dopo `37e4464`:
@@ -33,6 +53,7 @@ Pass documentale additivo su `main` dopo `37e4464`:
 | [`DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md) | Verifica matematica Buhlmann: costanti, formule, GF, NDL, multigas, robustezza numerica |
 | [`DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md`](DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md) | Cross-check esterno a tolleranza larga con fixture decotengu ZHL-16C |
 | [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md) | Fixture/test iOS Algorithm per air, nitrox, trimix, deco gases, GF e helium loading |
+| [`DIR_DIVING_IOS_GAS_BUHLMANN_PLANNER_IMPROVEMENT_PLAN.md`](DIR_DIVING_IOS_GAS_BUHLMANN_PLANNER_IMPROVEMENT_PLAN.md) | Piano migliorativo iOS per planner gas + Buhlmann: scope, hardening, QA e criteri release-ready |
 | [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md) | Limiti planner iOS: reference-only, assunzioni pressione, QA esterna richiesta |
 | [`DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md`](DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md) | Assessment pre-implementazione con nota 2026-05-28 che rimanda al motore implementato |
 | [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md) | Final hardening Watch MAIN: cap 40 log, temperatura plausibile, export vuoto, GPS fallback, conversioni |
@@ -267,6 +288,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md) | Fixture e test iOS Buhlmann |
 | [`DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md`](DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md) | Envelope di riferimento esterno per Air, Nitrox e Trimix multigas |
 | [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md) | Limiti planner reference-only |
+| [`DIR_DIVING_IOS_GAS_BUHLMANN_PLANNER_IMPROVEMENT_PLAN.md`](DIR_DIVING_IOS_GAS_BUHLMANN_PLANNER_IMPROVEMENT_PLAN.md) | Piano migliorativo planner gas+Buhlmann iOS (scope, roadmap, QA) |
 | [`DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md`](DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md) | Assessment pre-implementazione ora superseded da design/fixture |
 | [`SAFETY_DISCLAIMER.md`](SAFETY_DISCLAIMER.md) | Disclaimer (root Docs) |
 | [`TERMS_OF_USE.md`](TERMS_OF_USE.md) | Destinazione dedicata per Termini d'uso da Watch/iOS |
@@ -406,6 +428,13 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`DIR_Diving_Main_Branch_Development_Notes.md`](DIR_Diving_Main_Branch_Development_Notes.md) | §4 |
 | [`DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md`](DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md) | §4 |
 | [`DIR_DIVING_v8_IMPLEMENTATION_REPORT.md`](DIR_DIVING_v8_IMPLEMENTATION_REPORT.md) | §0, §12 |
+| [`DIR_DIVING_IOS_GAS_BUHLMANN_PLANNER_IMPROVEMENT_PLAN.md`](DIR_DIVING_IOS_GAS_BUHLMANN_PLANNER_IMPROVEMENT_PLAN.md) | §6 |
+| [`DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md) | §6 |
+| [`DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md) | §6 |
+| [`DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md) | §6 |
+| [`DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md`](DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md) | §6 |
+| [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md) | §6 |
+| [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md) | §6 |
 | `DOCUMENTATION_BRANCH_ALIGNMENT_20260517.md` … `20260525.md` | §2, §9 |
 | [`DOCUMENTATION_SYNC_REPORT_20260519.md`](DOCUMENTATION_SYNC_REPORT_20260519.md) | §2 |
 | `DOCUMENTATION_UPDATE_REPORT_20260519.md` … `20260525.md` | §9 |
@@ -448,4 +477,4 @@ Altri asset in `Docs/`: `.docx`, `.csv`, `.xlsx`, `.py` (generatori §11), `Refe
 
 ---
 
-*Indice per ripresa lavoro su `main` @ `37e4464` come baseline documentale pre-pass 2026-05-27. Baseline documentale corrente: README + audit dated 2026-05-25 + report/documentation alignment 2026-05-27.*
+*Indice per ripresa lavoro su `main` @ `bc08707` come baseline documentale corrente (pass 2026-05-28 incluso).*
