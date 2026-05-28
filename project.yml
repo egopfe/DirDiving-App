@@ -130,10 +130,14 @@ targets:
       - iOSApp/Services/BuhlmannPlanner.swift
       - iOSApp/Services/DiveImportService.swift
       - iOSApp/Services/GasPlanningService.swift
+      - iOSApp/Services/OxygenExposureModels.swift
       - iOSApp/Services/PlannerGasSchedule.swift
       - iOSApp/Services/PlannerMODValidator.swift
+      - iOSApp/Services/PlannerEnvironment.swift
       - iOSApp/Services/PlannerService.swift
+      - iOSApp/Services/RepetitiveDivePlannerService.swift
       - iOSApp/Services/RouteSummaryService.swift
+      - iOSApp/Services/ScheduleGasConsumptionService.swift
       - iOSApp/Services/SubsurfaceExportService.swift
       - iOSApp/Services/WatchDiveSyncCodec.swift
       - iOSApp/Services/WatchSyncAuth.swift

@@ -1,0 +1,1 @@
+{"id":"gf-50-80","isValid":true,"depthMeters":45,"bottomMinutes":22,"gfLow":50,"gfHigh":80,"gases":[{"name":"TX18/35","role":"bottom","oxygen":0.18,"helium":0.35,"maxPPO2":1.4,"switchDepthMeters":45},{"name":"EAN50","role":"deco","oxygen":0.5,"helium":0.0,"maxPPO2":1.6,"switchDepthMeters":21}],"expectedTTSRangeMinutes":{"min":20,"max":85},"toleranceMinutes":20}

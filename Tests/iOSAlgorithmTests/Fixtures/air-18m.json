@@ -1,0 +1,1 @@
+{"id":"air-18m","isValid":true,"depthMeters":18,"bottomMinutes":35,"gfLow":30,"gfHigh":70,"gases":[{"name":"Air","role":"bottom","oxygen":0.21,"helium":0.0,"maxPPO2":1.4,"switchDepthMeters":18}],"expectedTTSRangeMinutes":{"min":37,"max":60},"toleranceMinutes":10}

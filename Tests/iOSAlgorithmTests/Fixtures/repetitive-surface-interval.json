@@ -1,0 +1,1 @@
+{"id":"repetitive-surface-interval","isValid":true,"depthMeters":30,"bottomMinutes":20,"gfLow":30,"gfHigh":70,"gases":[{"name":"EAN32","role":"bottom","oxygen":0.32,"helium":0.0,"maxPPO2":1.4,"switchDepthMeters":30}],"expectedTTSRangeMinutes":{"min":20,"max":70},"toleranceMinutes":20}
