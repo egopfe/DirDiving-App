@@ -81,15 +81,18 @@ The `DIRDiving iOS Algorithm Tests` target now includes:
 
 - `BuhlmannConstantsTests`
 - `BuhlmannGasValidationTests`
+- `BuhlmannPressureModelTests`
 - `BuhlmannTissueLoadingTests`
+- `BuhlmannSchreinerEquationTests`
 - `BuhlmannCeilingTests`
 - `BuhlmannNDLTests`
 - `BuhlmannGradientFactorTests`
 - `BuhlmannMultigasPlannerTests`
 - `BuhlmannTrimixHeliumTests`
 - `BuhlmannReferenceFixtureTests`
+- `BuhlmannNumericalRobustnessTests`
 
-Coverage includes air, nitrox 32, trimix bottom gas, EAN50 deco gas, oxygen deco gas, GF 30/70 vs 50/80, invalid O2+He mixes, MOD exceeded, hypoxic gas use, gas switch too deep, helium tissue loading, mixed N2/He ceilings, no fake 999-minute NDL, and tolerance-based numerical checks.
+Coverage includes air, nitrox 32, trimix bottom gas, EAN50 deco gas, oxygen deco gas, GF 30/70 vs 50/80, invalid O2+He mixes, MOD exceeded, hypoxic gas use, gas switch too deep, helium tissue loading, mixed N2/He ceilings, pressure model checks, Schreiner loading checks, no fake 999-minute NDL, invalid segment handling, zero/negative/unsupported profile values, and tolerance-based numerical checks.
 
 ## Remaining Limitations
 

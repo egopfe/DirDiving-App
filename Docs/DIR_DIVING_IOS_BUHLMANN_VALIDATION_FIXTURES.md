@@ -22,13 +22,16 @@ On Windows, Xcode tooling is unavailable; validation is limited to static code i
 |---|---|
 | `BuhlmannConstantsTests.swift` | ZHL-16C N2/He constant counts and boundary values |
 | `BuhlmannGasValidationTests.swift` | invalid gas mixes, MOD/PPO2, hypoxic gas, gas-switch depth |
+| `BuhlmannPressureModelTests.swift` | ambient pressure, water vapor, inspired N2/He, oxygen non-inert handling |
 | `BuhlmannTissueLoadingTests.swift` | air saturation, helium loading, finite Schreiner loading |
+| `BuhlmannSchreinerEquationTests.swift` | zero/negative duration handling, on/off-gassing and gas-switch loading |
 | `BuhlmannCeilingTests.swift` | GF ceiling behavior and mixed N2/He ceiling sanity |
 | `BuhlmannNDLTests.swift` | tissue-state NDL, no fake 999-minute fallback, trimix preview |
 | `BuhlmannGradientFactorTests.swift` | GF interpolation and GF 30/70 vs 50/80 behavior |
 | `BuhlmannMultigasPlannerTests.swift` | trimix + EAN50 + O2 schedule, PlannerService integration |
 | `BuhlmannTrimixHeliumTests.swift` | trimix fractions, heliox composition, valid helium planner output |
 | `BuhlmannReferenceFixtureTests.swift` | air/nitrox ordering, trimix stop schedule, invalid fixture fail-closed |
+| `BuhlmannNumericalRobustnessTests.swift` | invalid profile values, zero depth/time, invalid segments, finite outputs, unit round trips |
 
 ## Required Fixture Profiles
 

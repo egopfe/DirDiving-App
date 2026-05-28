@@ -4,7 +4,7 @@ Copyright Federico Lombardo di Monte Iato 2026
 
 DIR DIVING is a SwiftUI **watchOS + iOS companion** project (XcodeGen) for Apple Watch Ultra-class devices and iPhone. The stable **`main`** branch delivers **Diving mode** on Watch (depth, ascent awareness, **BUSSOLA**, log, GPS surface entry/exit, Subsurface CSV) plus the iOS companion (logbook, planner, equipment, analysis, sync). Snorkeling, Apnea, and Buddy Assist live on **experimental** branches only.
 
-**Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](Docs/INDEX.md) · **Baseline commit corrente:** `main` @ `37e4464` prima del pass documentale 2026-05-27
+**Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](Docs/INDEX.md) · **Baseline commit corrente:** `main` aggiornato al commit corrente remoto
 
 ## Safety and limitations (MAIN)
 
@@ -25,7 +25,8 @@ DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent 
 | Algorithm hardening | `ddaf2d7` → `92e639a` | Pipeline depth validata, lifecycle automatico, TTV/time-weighted avg, haptic coordinator, XCTest `DIRDiving Watch Algorithm Tests`; vedi [`Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md) |
 | Watch algorithm final hardening | corrente | Cap logbook 40 sessioni su load/reload, temperature bounds, export vuoto bloccato, policy GPS fallback, conversioni centralizzate; vedi [`Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md`](Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md) |
 | iOS algorithm hardening | corrente | Validatori iOS centralizzati, planner/gas/NDL safe states, import/export/sync/logbook hardening, test `DIRDiving iOS Algorithm Tests`; vedi [`Docs/DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`](Docs/DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md) |
-| iOS Buhlmann multigas assessment | `37e4464` | Assessment MAIN iOS: supporto Buhlmann multigas/helium non completo; piano per motore ZHL-16C+GF+He release-hard senza modifiche codice; vedi [`Docs/DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md`](Docs/DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md) |
+| iOS Buhlmann multigas assessment | `37e4464` | Assessment MAIN iOS pre-implementazione: identificava supporto Buhlmann multigas/helium incompleto e piano per motore ZHL-16C+GF+He; vedi [`Docs/DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md`](Docs/DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md) |
+| iOS Buhlmann ZHL-16C multigas engine | corrente | Motore iOS-only ZHL-16C N2+He con Air/Nitrox/Trimix/Heliox, GF Low/High, NDL tissue-state, gas switch e stop da ceiling; reference-only/non certificato. Vedi [`Docs/DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](Docs/DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md), [`Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md). |
 | Docs alignment | pass 2026-05-19 | README, INDEX, matrice CSV, branch strategy, audit delta; vedi [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md) |
 
 **Pass documentale 2026-05-27:** README, indice, roadmap, matrice feature, release/TestFlight notes e report branch/PR sono riallineati alla baseline MAIN corrente. Le modifiche sono documentali: non cambiano UI, UX, calcoli immersione, planner, sync, persistenza, GPS, BUSSOLA o target membership.
@@ -184,7 +185,7 @@ Le istruzioni di build sono in [`Docs/BUILD_VALIDATION.md`](Docs/BUILD_VALIDATIO
 - **`codex/experimental-features`**: Watch sperimentale (Snorkeling Live, mappe waypoint/ritorno, Apnea workflow esteso, Buddy Assist, ecc.). Non importare questi file nel target MAIN senza revisione esplicita.
 - **`codex/ios-experimental-features`**: iOS sperimentale (surface Snorkeling/Apnea/Buddy/exploration concepts). Isolato da App Store candidate su `main`.
 - **Allineamenti UI-only** su `main`: possono toccare layout, copy, accessibilità e documentazione **senza** modificare algoritmi di decompressione, modello gas, calcoli TTV/TTR/SAC/CNS/OTU, sampling sensori o regole di sync — vedi [`Docs/MAIN_UX_COMPLETION_REPORT.md`](Docs/MAIN_UX_COMPLETION_REPORT.md).
-- **HEAD `main` consigliato** per release candidate Watch+iOS unificato: **`37e4464`** come baseline documentale pre-pass 2026-05-27, poi il commit documentale corrente. Baseline funzionale: v8 planner gas (`a36dc23`), v9 sync/input refresh (`d962117`), control strategy (`72fa15b`), readiness refresh 2026-05-25, `Start Dive` Watch (`2322145`), Mission Mode (`9d8baa1`), Watch algorithm release-hard pass (`92e639a`) + final hardening docs, iOS algorithm hardening e assessment Buhlmann multigas (`37e4464`). `main-iOS` resta worktree storico divergente: non riallineare codice senza review dedicata.
+- **HEAD `main` consigliato** per release candidate Watch+iOS unificato: il commit corrente remoto. Baseline funzionale: v8 planner gas (`a36dc23`), v9 sync/input refresh (`d962117`), control strategy (`72fa15b`), readiness refresh 2026-05-25, `Start Dive` Watch (`2322145`), Mission Mode (`9d8baa1`), Watch algorithm release-hard pass (`92e639a`) + final hardening docs, iOS algorithm hardening, assessment Buhlmann multigas (`37e4464`) e motore iOS-only ZHL-16C N2+He corrente. `main-iOS` resta worktree storico divergente: non riallineare codice senza review dedicata.
 - **UI-only / documentazione**: non alterare Diving mode, GPS surface-only, **BUSSOLA** (mai COMPASSO), export Subsurface, sync HMAC, onboarding legale.
 
 ### Matrice funzionalità (CSV)
@@ -943,9 +944,16 @@ Restano obbligatori: build `xcodegen generate` / Xcode su macOS, test Apple Watc
 
 - Baseline verificata prima del pass: `main` @ `37e4464`; branch locali tracciati allineati ai rispettivi remoti (`main`, `main-iOS`, `codex/experimental-features`, `codex/ios-experimental-features`).
 - Documentazione MAIN riallineata a legal onboarding, warning profondita 35/38/40 m, banner risalita inline, overlay GPS compatti, App Intents/Action Button via Shortcuts, Side Button system-controlled, sync Watch <-> iPhone, push iPhone -> Watch, tombstone, edit manuale, planner safety acknowledgement, User Images conditional visibility e mode auto-skip.
-- Stato algoritmico documentato: Watch MAIN release-hard/final hardening, iOS MAIN algorithm hardening, e assessment iOS Buhlmann multigas/helium che conferma supporto attuale parziale e piano per motore ZHL-16C+GF+He futuro.
+- Stato algoritmico documentato al 2026-05-27: Watch MAIN release-hard/final hardening, iOS MAIN algorithm hardening, e assessment iOS Buhlmann multigas/helium pre-implementazione.
 - Nuovi report di processo: [`Docs/DOCUMENTATION_UPDATE_REPORT_20260527.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260527.md), [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md), [`Docs/PR_STATUS_20260527.md`](Docs/PR_STATUS_20260527.md).
 - PR #8 e #9 controllate con `gh`: entrambe aperte, experimental e non safe-to-merge automaticamente; #8 alterna `UNKNOWN` / `CONFLICTING`, #9 risulta `CONFLICTING`.
+
+## Aggiornamento iOS Buhlmann 2026-05-28
+
+- Implementato motore iOS-only Buhlmann ZHL-16C N2+He sotto `iOSApp/Algorithms/Buhlmann/`, integrato nel planner companion senza modificare Watch, watchOS, UI premium o branch sperimentali.
+- Supporto reference-only per Air, Nitrox, Trimix, Heliox, travel/bottom/deco gas, GF Low/High, NDL tissue-state, gas switch e stop generati da ceiling.
+- Aggiunta verifica matematica dedicata: [`Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md).
+- Validazione locale eseguita in modalita Windows static analysis; build `xcodegen`/`xcodebuild` e XCTest completi restano da eseguire su macOS.
 
 ## Aggiornamento documentazione 2026-05-20 (post v9 `d962117`)
 
