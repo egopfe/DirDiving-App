@@ -16,6 +16,9 @@ enum PlannerResultState: String, Codable, Hashable, CaseIterable {
     case PPO2Exceeded
     case gasDensityWarning
     case gasDensityDanger
+    case invalidEnvironment
+    case gasAllocationIncomplete
+    case oxygenExposureElevated
 
     var warningText: String? {
         switch self {
@@ -49,6 +52,12 @@ enum PlannerResultState: String, Codable, Hashable, CaseIterable {
             return "Densita gas elevata: verificare respirabilita con strumenti certificati."
         case .gasDensityDanger:
             return "Densita gas critica: profilo non consigliato."
+        case .invalidEnvironment:
+            return "Ambiente (altitudine/salinita) non valido: calcolo bloccato."
+        case .gasAllocationIncomplete:
+            return "Allocazione gas/cilindri incompleta: risultato non valido."
+        case .oxygenExposureElevated:
+            return "Esposizione ossigeno elevata (CNS/OTU): riferimento non certificato."
         }
     }
 }

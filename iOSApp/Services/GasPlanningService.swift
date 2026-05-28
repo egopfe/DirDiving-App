@@ -63,20 +63,65 @@ enum GasPlanningService {
         guard !enginePlan.segments.isEmpty, enginePlan.modelState == .validReference else {
             return base
         }
+        let environment: PlannerEnvironment
+        switch PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) {
+        case .success(let value):
+            environment = value
+        case .failure:
+            return TechnicalGasAnalysis(
+                gas: base.gas,
+                ppO2AtDepth: base.ppO2AtDepth,
+                densityAtDepth: base.densityAtDepth,
+                densityRating: base.densityRating,
+                endMeters: base.endMeters,
+                eadMeters: base.eadMeters,
+                consumptionLiters: base.consumptionLiters,
+                remainingLiters: base.remainingLiters,
+                remainingBar: base.remainingBar,
+                rockBottomLiters: base.rockBottomLiters,
+                minimumGasBar: base.minimumGasBar,
+                turnPressureBar: base.turnPressureBar,
+                cnsPercent: base.cnsPercent,
+                otu: base.otu,
+                warnings: makeWarnings(states: mergeStates(base.states, [.invalidEnvironment])),
+                states: mergeStates(base.states, [.invalidEnvironment])
+            )
+        }
 
-        var cns = 0.0
-        var otu = 0.0
+        var cns = base.cnsPercent
+        var otu = base.otu
         var maxDensity = base.densityAtDepth
         for segment in enginePlan.segments where segment.minutes.isFinite && segment.minutes > 0 {
             let depth = max(0, segment.depthMeters)
-            let ppo2 = segment.gas.ppO2(depthMeters: depth)
-            cns += oxygenExposureCNS(ppO2: ppo2, minutes: segment.minutes)
-            otu += oxygenToxicityUnits(ppO2: ppo2, minutes: segment.minutes)
             let density = surfaceDensityGramsPerLiter(gas: segment.gas)
-                * IOSUnitConversions.ambientPressureBar(depthMeters: depth)
+                * (IOSUnitConversions.ambientPressureBar(depthMeters: depth, environment: environment) ?? 0)
             if density.isFinite {
                 maxDensity = max(maxDensity, density)
             }
+        }
+        switch OxygenExposureModel.from(segments: enginePlan.segments, environment: environment) {
+        case .success(let exposure):
+            cns = exposure.cnsPercent
+            otu = exposure.otu
+        case .failure:
+            return TechnicalGasAnalysis(
+                gas: base.gas,
+                ppO2AtDepth: base.ppO2AtDepth,
+                densityAtDepth: base.densityAtDepth,
+                densityRating: base.densityRating,
+                endMeters: base.endMeters,
+                eadMeters: base.eadMeters,
+                consumptionLiters: base.consumptionLiters,
+                remainingLiters: base.remainingLiters,
+                remainingBar: base.remainingBar,
+                rockBottomLiters: base.rockBottomLiters,
+                minimumGasBar: base.minimumGasBar,
+                turnPressureBar: base.turnPressureBar,
+                cnsPercent: base.cnsPercent,
+                otu: base.otu,
+                warnings: makeWarnings(states: mergeStates(base.states, [.invalidEnvironment])),
+                states: mergeStates(base.states, [.invalidEnvironment])
+            )
         }
 
         let densityRating = densityRating(maxDensity, warning: input.densityWarningLimit, danger: input.densityDangerLimit)
@@ -85,6 +130,51 @@ enum GasPlanningService {
             states = mergeStates(states, [.gasDensityDanger])
         } else if maxDensity >= input.densityWarningLimit {
             states = mergeStates(states, [.gasDensityWarning])
+        }
+        switch ScheduleGasConsumptionService.analyze(input: input, enginePlan: enginePlan, environment: environment) {
+        case .success(let ledger):
+            let firstRemainingBar = ledger.entries.first?.remainingBar ?? base.remainingBar
+            let firstRemainingLiters = ledger.entries.first?.remainingLiters ?? base.remainingLiters
+            if ledger.warnings.contains(where: {
+                if case .reserveBreached = $0 { return true }
+                return false
+            }) {
+                states = mergeStates(states, [.belowReserve])
+            }
+            if ledger.warnings.contains(where: {
+                if case .minimumGasBreached = $0 { return true }
+                return false
+            }) {
+                states = mergeStates(states, [.insufficientGas])
+            }
+            if ledger.warnings.contains(where: {
+                if case .lostGasContingencyFailed = $0 { return true }
+                return false
+            }) {
+                states = mergeStates(states, [.belowReserve])
+            }
+            let oxygenState: [PlannerResultState] = cns >= 80 || otu >= 300 ? [.oxygenExposureElevated] : []
+            states = mergeStates(states, oxygenState)
+            return TechnicalGasAnalysis(
+                gas: base.gas,
+                ppO2AtDepth: base.ppO2AtDepth,
+                densityAtDepth: maxDensity,
+                densityRating: densityRating,
+                endMeters: base.endMeters,
+                eadMeters: base.eadMeters,
+                consumptionLiters: ledger.totalConsumedLiters,
+                remainingLiters: firstRemainingLiters,
+                remainingBar: firstRemainingBar,
+                rockBottomLiters: base.rockBottomLiters,
+                minimumGasBar: base.minimumGasBar,
+                turnPressureBar: base.turnPressureBar,
+                cnsPercent: min(300, cns),
+                otu: otu,
+                warnings: makeWarnings(states: states),
+                states: states
+            )
+        case .failure:
+            states = mergeStates(states, [.gasAllocationIncomplete])
         }
 
         return TechnicalGasAnalysis(
