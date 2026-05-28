@@ -70,6 +70,7 @@ Validation:
 
 - N2 and He are loaded independently.
 - Gas switches preserve tissue state and change subsequent inspired pressures.
+- Gas-switch dwell time is modeled as `0.5 min` at switch depth and contributes to runtime/TTS metrics.
 - Zero, negative, or non-finite durations return the unchanged state.
 - Valid inputs are expected to keep pressures finite and nonnegative.
 
@@ -140,6 +141,7 @@ Policy:
 - NDL is tissue-state based.
 - Binary search finds the longest bottom time that can surface directly within GF High tolerance.
 - Descent, bottom loading, and final ascent are simulated.
+- Non-air-saturated initial tissue state can be supplied for repetitive/reference planning.
 - Air, nitrox, trimix, and heliox use the same N2/He loading path.
 - Fake high values such as `999` are not returned as valid NDL.
 
@@ -161,6 +163,13 @@ Flow:
 8. Hold until the next shallower stop is allowed by the current GF.
 9. Continue until surface.
 
+Runtime policy:
+
+- `ttsMinutes`: time from end of bottom loading to surface.
+- `totalRuntimeMinutes`: descent + bottom + gas-switch dwell + ascent/stops.
+- `bottomMinutes`: planned bottom loading time only.
+- `descentMinutes`: modeled descent time.
+
 Covered by `BuhlmannMultigasPlannerTests` and `BuhlmannTrimixHeliumTests`.
 
 ## 9. Numerical Robustness
@@ -175,6 +184,7 @@ The engine validates:
 - bottom segment duration/depth/gas
 - MOD and minimum operating PPO2
 - gas switch depths
+- full respired segment gas range: the gas must remain breathable at the shallow end and below max PPO2 at the deep end
 
 Invalid states return typed blocking issues and `modelState == invalidInput` or `modelIncomplete`.
 
@@ -202,6 +212,7 @@ Static checks completed:
 - Forbidden-file check confirmed no Watch, root Watch, entitlement, or experimental files were modified.
 - Swift brace-balance inspection passed for the Buhlmann engine and iOS algorithm tests.
 - Project target membership checked: new Buhlmann engine files are included in the iOS Algorithm Tests source list; test folder source path includes the new test files.
+- External reference-envelope values generated from `decotengu 0.14.1` are documented in `DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md` and covered by `BuhlmannReleaseHardeningTests`.
 
 ## Remaining Required Validation
 
@@ -210,5 +221,4 @@ Before release claims are broadened:
 - Run `xcodegen generate` on macOS.
 - Build `DIRDiving iOS` on macOS.
 - Run `DIRDiving iOS Algorithm Tests` on macOS.
-- Cross-check fixture output against an independent trusted ZHL-16C + GF reference implementation and document tolerances.
-
+- Expand the independent ZHL-16C + GF reference fixture set beyond the current Air/Nitrox/Trimix external envelopes and document tighter tolerances.

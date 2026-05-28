@@ -953,6 +953,7 @@ Restano obbligatori: build `xcodegen generate` / Xcode su macOS, test Apple Watc
 - Implementato motore iOS-only Buhlmann ZHL-16C N2+He sotto `iOSApp/Algorithms/Buhlmann/`, integrato nel planner companion senza modificare Watch, watchOS, UI premium o branch sperimentali.
 - Supporto reference-only per Air, Nitrox, Trimix, Heliox, travel/bottom/deco gas, GF Low/High, NDL tissue-state, gas switch e stop generati da ceiling.
 - Aggiunta verifica matematica dedicata: [`Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md).
+- Hardening successivo: validazione gas sull'intero segmento respirato, separazione TTS/runtime, gas-switch dwell modellato nei tessuti, seed di stato tessutale per profili ripetitivi/reference e cross-check esterno a tolleranza larga in [`Docs/DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md).
 - Validazione locale eseguita in modalita Windows static analysis; build `xcodegen`/`xcodebuild` e XCTest completi restano da eseguire su macOS.
 
 ## Aggiornamento documentazione 2026-05-20 (post v9 `d962117`)

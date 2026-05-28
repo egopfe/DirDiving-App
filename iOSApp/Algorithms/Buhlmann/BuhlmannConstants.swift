@@ -6,6 +6,7 @@ enum BuhlmannConstants {
     static let defaultDescentRateMetersPerMinute = 18.0
     static let defaultAscentRateMetersPerMinute = 9.0
     static let stopIntervalMeters = 3.0
+    static let gasSwitchMinutes = 0.5
     static let maxStopMinutesPerDepth = 180
     static let maxScheduleMinutes = 720
     static let minBreathablePPO2Bar = 0.16

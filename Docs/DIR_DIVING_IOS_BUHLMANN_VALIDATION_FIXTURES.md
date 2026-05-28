@@ -32,6 +32,7 @@ On Windows, Xcode tooling is unavailable; validation is limited to static code i
 | `BuhlmannTrimixHeliumTests.swift` | trimix fractions, heliox composition, valid helium planner output |
 | `BuhlmannReferenceFixtureTests.swift` | air/nitrox ordering, trimix stop schedule, invalid fixture fail-closed |
 | `BuhlmannNumericalRobustnessTests.swift` | invalid profile values, zero depth/time, invalid segments, finite outputs, unit round trips |
+| `BuhlmannReleaseHardeningTests.swift` | external reference envelopes, TTS/runtime split, residual tissue seed, full segment gas-operability checks |
 
 ## Required Fixture Profiles
 
@@ -48,6 +49,9 @@ On Windows, Xcode tooling is unavailable; validation is limited to static code i
 - Gas switch deeper than gas MOD.
 - Helium tissue loading.
 - Mixed N2/He ceiling calculation.
+- External reference-envelope profiles generated with `decotengu 0.14.1`.
+- Repetitive/reference planning seeded from a previous final tissue state.
+- Segment gas validation across the full breathed depth range.
 
 ## Acceptance Expectations
 
@@ -57,6 +61,8 @@ On Windows, Xcode tooling is unavailable; validation is limited to static code i
 - NDL values are finite or unavailable; `999` is never returned as a valid NDL.
 - Deco stop PPO2 is actual PPO2 and never clipped to max PPO2.
 - Stops are generated from compartment ceilings, not static templates.
+- `ttsMinutes` is time to surface from end of bottom loading; `totalRuntimeMinutes` includes descent, bottom, validated ascent/travel/deco switches, ascent and stops.
+- Gas-switch dwell contributes to tissue loading and runtime accounting.
 
 ## External Validation Still Required
 

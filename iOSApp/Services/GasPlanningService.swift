@@ -58,6 +58,55 @@ enum GasPlanningService {
         )
     }
 
+    static func analyze(input: GasPlanInput, enginePlan: BuhlmannEngineResult) -> TechnicalGasAnalysis {
+        let base = analyze(input: input)
+        guard !enginePlan.segments.isEmpty, enginePlan.modelState == .validReference else {
+            return base
+        }
+
+        var cns = 0.0
+        var otu = 0.0
+        var maxDensity = base.densityAtDepth
+        for segment in enginePlan.segments where segment.minutes.isFinite && segment.minutes > 0 {
+            let depth = max(0, segment.depthMeters)
+            let ppo2 = segment.gas.ppO2(depthMeters: depth)
+            cns += oxygenExposureCNS(ppO2: ppo2, minutes: segment.minutes)
+            otu += oxygenToxicityUnits(ppO2: ppo2, minutes: segment.minutes)
+            let density = surfaceDensityGramsPerLiter(gas: segment.gas)
+                * IOSUnitConversions.ambientPressureBar(depthMeters: depth)
+            if density.isFinite {
+                maxDensity = max(maxDensity, density)
+            }
+        }
+
+        let densityRating = densityRating(maxDensity, warning: input.densityWarningLimit, danger: input.densityDangerLimit)
+        var states = base.states
+        if maxDensity >= input.densityDangerLimit {
+            states = mergeStates(states, [.gasDensityDanger])
+        } else if maxDensity >= input.densityWarningLimit {
+            states = mergeStates(states, [.gasDensityWarning])
+        }
+
+        return TechnicalGasAnalysis(
+            gas: base.gas,
+            ppO2AtDepth: base.ppO2AtDepth,
+            densityAtDepth: maxDensity,
+            densityRating: densityRating,
+            endMeters: base.endMeters,
+            eadMeters: base.eadMeters,
+            consumptionLiters: base.consumptionLiters,
+            remainingLiters: base.remainingLiters,
+            remainingBar: base.remainingBar,
+            rockBottomLiters: base.rockBottomLiters,
+            minimumGasBar: base.minimumGasBar,
+            turnPressureBar: base.turnPressureBar,
+            cnsPercent: min(300, cns),
+            otu: otu,
+            warnings: makeWarnings(states: states),
+            states: states
+        )
+    }
+
     static func ppO2(gas: GasMix, depthMeters: Double) -> Double {
         GasMixValidator.actualPPO2(oxygenFraction: gas.oxygen, depthMeters: depthMeters) ?? 0
     }
@@ -285,6 +334,13 @@ enum GasPlanningService {
     private static func oxygenToxicityUnits(ppO2: Double, minutes: Double) -> Double {
         guard ppO2 > 0.5 else { return 0 }
         return minutes * pow((0.5 / (ppO2 - 0.5)), -0.833)
+    }
+
+    private static func surfaceDensityGramsPerLiter(gas: BuhlmannGas) -> Double {
+        guard gas.isCompositionValid else { return 0 }
+        return gas.oxygenFraction * 1.429
+            + gas.nitrogenFraction * 1.251
+            + gas.heliumFraction * 0.1786
     }
 
     private static func makeStates(input: GasPlanInput, ppO2: Double, density: Double, endMeters: Double, remainingLiters: Double, rockBottomLiters: Double) -> [PlannerResultState] {

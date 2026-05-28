@@ -12,6 +12,7 @@ struct BuhlmannPlanRequest: Hashable {
     var descentRateMetersPerMinute: Double = BuhlmannConstants.defaultDescentRateMetersPerMinute
     var ascentRateMetersPerMinute: Double = BuhlmannConstants.defaultAscentRateMetersPerMinute
     var stopIntervalMeters: Double = BuhlmannConstants.stopIntervalMeters
+    var initialTissueState: BuhlmannTissueState = .airSaturated()
 }
 
 struct BuhlmannBottomSegment: Hashable {
@@ -40,6 +41,11 @@ struct BuhlmannRuntimeSegment: Hashable {
 struct BuhlmannEngineResult: Hashable {
     let ndlMinutes: Double?
     let ttsMinutes: Int
+    let totalRuntimeMinutes: Int
+    let descentMinutes: Double
+    let bottomMinutes: Double
+    let gasSwitchMinutes: Double
+    let finalTissueState: BuhlmannTissueState?
     let stops: [BuhlmannDecompressionStop]
     let segments: [BuhlmannRuntimeSegment]
     let issues: [BuhlmannPlanIssue]
@@ -57,6 +63,11 @@ enum BuhlmannEngine {
             return BuhlmannEngineResult(
                 ndlMinutes: nil,
                 ttsMinutes: 0,
+                totalRuntimeMinutes: 0,
+                descentMinutes: 0,
+                bottomMinutes: 0,
+                gasSwitchMinutes: 0,
+                finalTissueState: nil,
                 stops: [],
                 segments: [],
                 issues: validationIssues,
@@ -64,15 +75,15 @@ enum BuhlmannEngine {
             )
         }
 
-        let initial = BuhlmannTissueState.airSaturated()
         var runtimeSegments: [BuhlmannRuntimeSegment] = []
-        let afterDescent = loadDescent(request, startingState: initial, segments: &runtimeSegments)
-        let bottom = loadBottomSegments(request, startingState: afterDescent, segments: &runtimeSegments)
+        let descent = loadDescent(request, startingState: request.initialTissueState, segments: &runtimeSegments)
+        let bottom = loadBottomSegments(request, startingState: descent.state, startingGas: descent.gas, segments: &runtimeSegments)
 
         let ndl = noDecompressionLimit(
             depthMeters: request.maxDepthMeters,
             gas: request.bottomGas,
-            gfHigh: request.gfHigh
+            gfHigh: request.gfHigh,
+            initialTissueState: request.initialTissueState
         )
         let schedule = decompressionSchedule(
             request: request,
@@ -84,15 +95,25 @@ enum BuhlmannEngine {
 
         return BuhlmannEngineResult(
             ndlMinutes: ndl,
-            ttsMinutes: schedule.ttsMinutes + Int(ceil(bottom.minutes)),
+            ttsMinutes: Int(ceil(schedule.elapsedMinutes)),
+            totalRuntimeMinutes: Int(ceil(descent.elapsedMinutes + bottom.elapsedMinutes + schedule.elapsedMinutes)),
+            descentMinutes: descent.elapsedMinutes,
+            bottomMinutes: bottom.bottomMinutes,
+            gasSwitchMinutes: descent.gasSwitchMinutes + bottom.gasSwitchMinutes + schedule.gasSwitchMinutes,
+            finalTissueState: schedule.state,
             stops: schedule.stops,
             segments: runtimeSegments,
-            issues: schedule.limitReached ? [.calculationLimitReached] : [],
-            modelState: schedule.limitReached ? .modelIncomplete : .validReference
+            issues: schedule.issues,
+            modelState: schedule.issues.isEmpty ? .validReference : .modelIncomplete
         )
     }
 
-    static func noDecompressionLimit(depthMeters: Double, gas: BuhlmannGas, gfHigh: Double) -> Double? {
+    static func noDecompressionLimit(
+        depthMeters: Double,
+        gas: BuhlmannGas,
+        gfHigh: Double,
+        initialTissueState: BuhlmannTissueState = .airSaturated()
+    ) -> Double? {
         guard depthMeters.isFinite,
               depthMeters >= IOSAlgorithmConfiguration.minPlannerDepthMeters,
               depthMeters <= IOSAlgorithmConfiguration.maxPlannerDepthMeters,
@@ -111,10 +132,9 @@ enum BuhlmannEngine {
         guard validate(request).isEmpty else { return nil }
 
         func canSurface(afterBottomMinutes minutes: Double) -> Bool {
-            let initial = BuhlmannTissueState.airSaturated()
             var segments: [BuhlmannRuntimeSegment] = []
-            let descended = loadDescent(request, startingState: initial, segments: &segments)
-            let bottom = descended.loadedConstantDepth(depthMeters: depthMeters, minutes: minutes, gas: gas)
+            let descended = loadDescent(request, startingState: initialTissueState, segments: &segments)
+            let bottom = descended.state.loadedConstantDepth(depthMeters: depthMeters, minutes: minutes, gas: gas)
             let ascentMinutes = max(0.1, depthMeters / BuhlmannConstants.defaultAscentRateMetersPerMinute)
             let surfaced = bottom.loadedLinearDepth(fromDepthMeters: depthMeters, toDepthMeters: 0, minutes: ascentMinutes, gas: gas)
             return surfaced.ceiling(gf: gfHigh / 100.0).depthMeters <= 0.01
@@ -222,12 +242,16 @@ enum BuhlmannEngine {
         if bottomSegmentMinutes > IOSAlgorithmConfiguration.maxBottomTimeMinutes {
             issues.append(.invalidProfile("Bottom segments exceed maximum bottom time."))
         }
+        issues.append(contentsOf: validateGasUseRanges(request))
         return uniqueIssues(issues)
     }
 
     private struct ScheduleResult {
         var stops: [BuhlmannDecompressionStop]
-        var ttsMinutes: Int
+        var elapsedMinutes: Double
+        var gasSwitchMinutes: Double
+        var state: BuhlmannTissueState
+        var issues: [BuhlmannPlanIssue]
         var limitReached: Bool
     }
 
@@ -241,11 +265,21 @@ enum BuhlmannEngine {
         let gfLow = request.gfLow / 100.0
         let firstCeiling = stateAtBottom.ceiling(gf: gfLow).depthMeters
         guard firstCeiling > 0.01 else {
-            let ascentMinutes = max(0.1, currentDepthMeters / request.ascentRateMetersPerMinute)
-            segments.append(
-                BuhlmannRuntimeSegment(kind: .ascent, depthMeters: 0, minutes: ascentMinutes, gas: startingGas, note: "Final ascent")
+            let ascent = loadAscentToSurface(
+                request: request,
+                startingState: stateAtBottom,
+                startingDepth: currentDepthMeters,
+                startingGas: startingGas,
+                segments: &segments
             )
-            return ScheduleResult(stops: [], ttsMinutes: Int(ceil(ascentMinutes)), limitReached: false)
+            return ScheduleResult(
+                stops: [],
+                elapsedMinutes: ascent.elapsedMinutes,
+                gasSwitchMinutes: ascent.gasSwitchMinutes,
+                state: ascent.state,
+                issues: uniqueIssues(ascent.issues),
+                limitReached: !ascent.issues.isEmpty
+            )
         }
 
         let firstStopDepth = min(currentDepthMeters, ceilToStop(firstCeiling, interval: request.stopIntervalMeters))
@@ -254,14 +288,21 @@ enum BuhlmannEngine {
         var state = stateAtBottom
         var stopDepth = firstStopDepth
         var stops: [BuhlmannDecompressionStop] = []
-        var elapsed = 0
+        var elapsed = 0.0
+        var gasSwitchElapsed = 0.0
+        var issues: [BuhlmannPlanIssue] = []
         var limitReached = false
 
         while stopDepth > 0.01 {
             if currentDepth > stopDepth {
+                guard currentGas.isOperational(fromDepthMeters: currentDepth, toDepthMeters: stopDepth) else {
+                    issues.append(.gasNotOperationalInSegment(currentGas.name))
+                    limitReached = true
+                    break
+                }
                 let ascentMinutes = max(0.1, (currentDepth - stopDepth) / request.ascentRateMetersPerMinute)
                 state = state.loadedLinearDepth(fromDepthMeters: currentDepth, toDepthMeters: stopDepth, minutes: ascentMinutes, gas: currentGas)
-                elapsed += Int(ceil(ascentMinutes))
+                elapsed += ascentMinutes
                 segments.append(
                     BuhlmannRuntimeSegment(kind: .ascent, depthMeters: stopDepth, minutes: ascentMinutes, gas: currentGas, note: "Ascent to stop")
                 )
@@ -271,8 +312,11 @@ enum BuhlmannEngine {
             let nextGas = bestAscentGas(atDepth: stopDepth, currentGas: currentGas, request: request)
             if nextGas != currentGas {
                 currentGas = nextGas
+                state = state.loadedConstantDepth(depthMeters: stopDepth, minutes: BuhlmannConstants.gasSwitchMinutes, gas: currentGas)
+                elapsed += BuhlmannConstants.gasSwitchMinutes
+                gasSwitchElapsed += BuhlmannConstants.gasSwitchMinutes
                 segments.append(
-                    BuhlmannRuntimeSegment(kind: .gasSwitch, depthMeters: stopDepth, minutes: 0.5, gas: currentGas, note: "Gas switch")
+                    BuhlmannRuntimeSegment(kind: .gasSwitch, depthMeters: stopDepth, minutes: BuhlmannConstants.gasSwitchMinutes, gas: currentGas, note: "Gas switch")
                 )
             }
 
@@ -284,7 +328,8 @@ enum BuhlmannEngine {
                 if ceiling <= nextDepth + 0.05 {
                     break
                 }
-                if stopMinutes >= BuhlmannConstants.maxStopMinutesPerDepth || elapsed >= BuhlmannConstants.maxScheduleMinutes {
+                if stopMinutes >= BuhlmannConstants.maxStopMinutesPerDepth || elapsed >= Double(BuhlmannConstants.maxScheduleMinutes) {
+                    issues.append(.calculationLimitReached)
                     limitReached = true
                     break
                 }
@@ -318,26 +363,51 @@ enum BuhlmannEngine {
         }
 
         if !limitReached, currentDepth > 0 {
-            let ascentMinutes = max(0.1, currentDepth / request.ascentRateMetersPerMinute)
-            _ = state.loadedLinearDepth(fromDepthMeters: currentDepth, toDepthMeters: 0, minutes: ascentMinutes, gas: currentGas)
-            elapsed += Int(ceil(ascentMinutes))
-            segments.append(
-                BuhlmannRuntimeSegment(kind: .ascent, depthMeters: 0, minutes: ascentMinutes, gas: currentGas, note: "Final ascent")
+            let ascent = loadAscentToSurface(
+                request: request,
+                startingState: state,
+                startingDepth: currentDepth,
+                startingGas: currentGas,
+                segments: &segments
             )
+            state = ascent.state
+            elapsed += ascent.elapsedMinutes
+            gasSwitchElapsed += ascent.gasSwitchMinutes
+            issues.append(contentsOf: ascent.issues)
+            limitReached = limitReached || !ascent.issues.isEmpty
         }
-        return ScheduleResult(stops: stops, ttsMinutes: elapsed, limitReached: limitReached)
+        return ScheduleResult(stops: stops, elapsedMinutes: elapsed, gasSwitchMinutes: gasSwitchElapsed, state: state, issues: uniqueIssues(issues), limitReached: limitReached)
+    }
+
+    private struct AscentLoadResult {
+        var state: BuhlmannTissueState
+        var gas: BuhlmannGas
+        var elapsedMinutes: Double
+        var gasSwitchMinutes: Double
+        var issues: [BuhlmannPlanIssue]
     }
 
     private struct BottomLoadResult {
         var state: BuhlmannTissueState
         var depthMeters: Double
         var gas: BuhlmannGas
-        var minutes: Double
+        var bottomMinutes: Double
+        var elapsedMinutes: Double
+        var gasSwitchMinutes: Double
+    }
+
+    private struct DescentLoadResult {
+        var state: BuhlmannTissueState
+        var depthMeters: Double
+        var gas: BuhlmannGas
+        var elapsedMinutes: Double
+        var gasSwitchMinutes: Double
     }
 
     private static func loadBottomSegments(
         _ request: BuhlmannPlanRequest,
         startingState: BuhlmannTissueState,
+        startingGas: BuhlmannGas,
         segments: inout [BuhlmannRuntimeSegment]
     ) -> BottomLoadResult {
         let plannedSegments = request.bottomSegments.isEmpty
@@ -346,8 +416,10 @@ enum BuhlmannEngine {
 
         var state = startingState
         var currentDepth = request.maxDepthMeters
-        var currentGas = request.bottomGas
+        var currentGas = startingGas
         var totalMinutes = 0.0
+        var elapsedMinutes = 0.0
+        var gasSwitchMinutes = 0.0
 
         for segment in plannedSegments {
             if abs(segment.depthMeters - currentDepth) > 0.01 {
@@ -355,6 +427,7 @@ enum BuhlmannEngine {
                 let transitionRate = isDescending ? request.descentRateMetersPerMinute : request.ascentRateMetersPerMinute
                 let transitionMinutes = max(0.1, abs(segment.depthMeters - currentDepth) / transitionRate)
                 state = state.loadedLinearDepth(fromDepthMeters: currentDepth, toDepthMeters: segment.depthMeters, minutes: transitionMinutes, gas: currentGas)
+                elapsedMinutes += transitionMinutes
                 segments.append(
                     BuhlmannRuntimeSegment(kind: isDescending ? .descent : .ascent, depthMeters: segment.depthMeters, minutes: transitionMinutes, gas: currentGas, note: "Bottom transition")
                 )
@@ -362,28 +435,41 @@ enum BuhlmannEngine {
             }
             if segment.gas != currentGas {
                 currentGas = segment.gas
+                state = state.loadedConstantDepth(depthMeters: currentDepth, minutes: BuhlmannConstants.gasSwitchMinutes, gas: currentGas)
+                elapsedMinutes += BuhlmannConstants.gasSwitchMinutes
+                gasSwitchMinutes += BuhlmannConstants.gasSwitchMinutes
                 segments.append(
-                    BuhlmannRuntimeSegment(kind: .gasSwitch, depthMeters: currentDepth, minutes: 0.5, gas: currentGas, note: "Bottom gas switch")
+                    BuhlmannRuntimeSegment(kind: .gasSwitch, depthMeters: currentDepth, minutes: BuhlmannConstants.gasSwitchMinutes, gas: currentGas, note: "Bottom gas switch")
                 )
             }
             state = state.loadedConstantDepth(depthMeters: segment.depthMeters, minutes: segment.minutes, gas: segment.gas)
             totalMinutes += segment.minutes
+            elapsedMinutes += segment.minutes
             segments.append(
                 BuhlmannRuntimeSegment(kind: .bottom, depthMeters: segment.depthMeters, minutes: segment.minutes, gas: segment.gas, note: "Bottom segment")
             )
         }
 
-        return BottomLoadResult(state: state, depthMeters: currentDepth, gas: currentGas, minutes: totalMinutes)
+        return BottomLoadResult(
+            state: state,
+            depthMeters: currentDepth,
+            gas: currentGas,
+            bottomMinutes: totalMinutes,
+            elapsedMinutes: elapsedMinutes,
+            gasSwitchMinutes: gasSwitchMinutes
+        )
     }
 
     private static func loadDescent(
         _ request: BuhlmannPlanRequest,
         startingState: BuhlmannTissueState,
         segments: inout [BuhlmannRuntimeSegment]
-    ) -> BuhlmannTissueState {
+    ) -> DescentLoadResult {
         var state = startingState
         var currentDepth = 0.0
         var currentGas = firstDescentGas(for: request)
+        var elapsedMinutes = 0.0
+        var gasSwitchMinutes = 0.0
         let switches = request.travelGases
             .filter { $0.switchDepthMeters > 0.5 && $0.switchDepthMeters < request.maxDepthMeters - 0.5 }
             .sorted { $0.switchDepthMeters < $1.switchDepthMeters }
@@ -394,26 +480,156 @@ enum BuhlmannEngine {
             guard targetDepth > currentDepth else { continue }
             let minutes = max(0.1, (targetDepth - currentDepth) / request.descentRateMetersPerMinute)
             state = state.loadedLinearDepth(fromDepthMeters: currentDepth, toDepthMeters: targetDepth, minutes: minutes, gas: currentGas)
+            elapsedMinutes += minutes
             segments.append(
                 BuhlmannRuntimeSegment(kind: .descent, depthMeters: targetDepth, minutes: minutes, gas: currentGas, note: "Descent segment")
             )
             currentDepth = targetDepth
             if switchGas != currentGas {
                 currentGas = switchGas
+                state = state.loadedConstantDepth(depthMeters: currentDepth, minutes: BuhlmannConstants.gasSwitchMinutes, gas: currentGas)
+                elapsedMinutes += BuhlmannConstants.gasSwitchMinutes
+                gasSwitchMinutes += BuhlmannConstants.gasSwitchMinutes
                 segments.append(
-                    BuhlmannRuntimeSegment(kind: .gasSwitch, depthMeters: currentDepth, minutes: 0.5, gas: currentGas, note: "Gas switch")
+                    BuhlmannRuntimeSegment(kind: .gasSwitch, depthMeters: currentDepth, minutes: BuhlmannConstants.gasSwitchMinutes, gas: currentGas, note: "Gas switch")
                 )
             }
         }
-        return state
+        return DescentLoadResult(
+            state: state,
+            depthMeters: currentDepth,
+            gas: currentGas,
+            elapsedMinutes: elapsedMinutes,
+            gasSwitchMinutes: gasSwitchMinutes
+        )
+    }
+
+    private static func loadAscentToSurface(
+        request: BuhlmannPlanRequest,
+        startingState: BuhlmannTissueState,
+        startingDepth: Double,
+        startingGas: BuhlmannGas,
+        segments: inout [BuhlmannRuntimeSegment]
+    ) -> AscentLoadResult {
+        var state = startingState
+        var currentDepth = max(0, startingDepth)
+        var currentGas = startingGas
+        var elapsedMinutes = 0.0
+        var gasSwitchMinutes = 0.0
+        var issues: [BuhlmannPlanIssue] = []
+
+        func switchToBestGasIfNeeded(at depth: Double) {
+            let nextGas = bestAscentGas(atDepth: depth, currentGas: currentGas, request: request)
+            guard nextGas != currentGas else { return }
+            currentGas = nextGas
+            state = state.loadedConstantDepth(depthMeters: depth, minutes: BuhlmannConstants.gasSwitchMinutes, gas: currentGas)
+            elapsedMinutes += BuhlmannConstants.gasSwitchMinutes
+            gasSwitchMinutes += BuhlmannConstants.gasSwitchMinutes
+            segments.append(
+                BuhlmannRuntimeSegment(kind: .gasSwitch, depthMeters: depth, minutes: BuhlmannConstants.gasSwitchMinutes, gas: currentGas, note: "Ascent gas switch")
+            )
+        }
+
+        switchToBestGasIfNeeded(at: currentDepth)
+        for targetDepth in ascentSwitchDepths(fromDepthMeters: currentDepth, request: request) + [0.0] {
+            guard currentDepth > targetDepth + 0.01 else {
+                switchToBestGasIfNeeded(at: currentDepth)
+                continue
+            }
+            guard currentGas.isOperational(fromDepthMeters: currentDepth, toDepthMeters: targetDepth) else {
+                issues.append(.gasNotOperationalInSegment(currentGas.name))
+                return AscentLoadResult(
+                    state: state,
+                    gas: currentGas,
+                    elapsedMinutes: elapsedMinutes,
+                    gasSwitchMinutes: gasSwitchMinutes,
+                    issues: uniqueIssues(issues)
+                )
+            }
+            let minutes = max(0.1, (currentDepth - targetDepth) / request.ascentRateMetersPerMinute)
+            state = state.loadedLinearDepth(fromDepthMeters: currentDepth, toDepthMeters: targetDepth, minutes: minutes, gas: currentGas)
+            elapsedMinutes += minutes
+            segments.append(
+                BuhlmannRuntimeSegment(kind: .ascent, depthMeters: targetDepth, minutes: minutes, gas: currentGas, note: targetDepth <= 0.01 ? "Final ascent" : "Ascent segment")
+            )
+            currentDepth = targetDepth
+            switchToBestGasIfNeeded(at: currentDepth)
+        }
+
+        return AscentLoadResult(
+            state: state,
+            gas: currentGas,
+            elapsedMinutes: elapsedMinutes,
+            gasSwitchMinutes: gasSwitchMinutes,
+            issues: uniqueIssues(issues)
+        )
     }
 
     private static func firstDescentGas(for request: BuhlmannPlanRequest) -> BuhlmannGas {
         request.travelGases.sorted { $0.switchDepthMeters < $1.switchDepthMeters }.first ?? request.bottomGas
     }
 
+    private static func ascentSwitchDepths(fromDepthMeters depth: Double, request: BuhlmannPlanRequest) -> [Double] {
+        let depths = (request.travelGases + request.decoGases)
+            .map(\.switchDepthMeters)
+            .filter { $0.isFinite && $0 > 0.05 && $0 < depth - 0.05 }
+        return Array(Set(depths)).sorted(by: >)
+    }
+
+    private static func validateGasUseRanges(_ request: BuhlmannPlanRequest) -> [BuhlmannPlanIssue] {
+        var issues: [BuhlmannPlanIssue] = []
+        var currentDepth = 0.0
+        var currentGas = firstDescentGas(for: request)
+        let descentSwitches = request.travelGases
+            .filter { $0.switchDepthMeters > 0.5 && $0.switchDepthMeters < request.maxDepthMeters - 0.5 }
+            .sorted { $0.switchDepthMeters < $1.switchDepthMeters }
+            + [request.bottomGas]
+
+        for switchGas in descentSwitches {
+            let targetDepth = switchGas.role == .bottom ? request.maxDepthMeters : switchGas.switchDepthMeters
+            if targetDepth > currentDepth {
+                issues.append(contentsOf: operationalIssues(for: currentGas, fromDepth: currentDepth, toDepth: targetDepth))
+                currentDepth = targetDepth
+            }
+            currentGas = switchGas
+        }
+
+        let bottomSegments = request.bottomSegments.isEmpty
+            ? [BuhlmannBottomSegment(depthMeters: request.maxDepthMeters, minutes: request.bottomMinutes, gas: request.bottomGas)]
+            : request.bottomSegments
+        for segment in bottomSegments {
+            if abs(segment.depthMeters - currentDepth) > 0.01 {
+                issues.append(contentsOf: operationalIssues(for: currentGas, fromDepth: currentDepth, toDepth: segment.depthMeters))
+                currentDepth = segment.depthMeters
+            }
+            issues.append(contentsOf: operationalIssues(for: segment.gas, fromDepth: segment.depthMeters, toDepth: segment.depthMeters))
+            currentGas = segment.gas
+        }
+
+        return issues
+    }
+
+    private static func operationalIssues(for gas: BuhlmannGas, fromDepth: Double, toDepth: Double) -> [BuhlmannPlanIssue] {
+        guard gas.isCompositionValid, fromDepth.isFinite, toDepth.isFinite else {
+            return [.invalidGas(gas.name)]
+        }
+        let shallow = max(0, min(fromDepth, toDepth))
+        let deep = max(fromDepth, toDepth)
+        var issues: [BuhlmannPlanIssue] = []
+        if gas.ppO2(depthMeters: shallow) < BuhlmannConstants.minBreathablePPO2Bar {
+            issues.append(.hypoxicGasTooShallow(gas.name))
+        }
+        if gas.ppO2(depthMeters: deep) > gas.maxPPO2Bar + 0.000_1 {
+            issues.append(.ppo2Exceeded(gas.name))
+        }
+        if issues.isEmpty, !gas.isOperational(fromDepthMeters: fromDepth, toDepthMeters: toDepth) {
+            issues.append(.gasNotOperationalInSegment(gas.name))
+        }
+        return issues
+    }
+
     private static func bestAscentGas(atDepth depth: Double, currentGas: BuhlmannGas, request: BuhlmannPlanRequest) -> BuhlmannGas {
-        let candidates = request.decoGases
+        let candidates = (request.decoGases + request.travelGases)
             .filter { $0.switchDepthMeters + 0.05 >= depth }
             .filter { gas in
                 let ppo2 = gas.ppO2(depthMeters: depth)

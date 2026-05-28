@@ -12,7 +12,7 @@ enum PlannerService {
         let planningDepth = working.buhlmannPlanningDepthMeters
         let buhlmann = BuhlmannPlanner.plan(depthMeters: planningDepth, bottomGas: bottom)
         let enginePlan = BuhlmannPlanner.enginePlan(input: working)
-        let analysis = GasPlanningService.analyze(input: working)
+        let analysis = GasPlanningService.analyze(input: working, enginePlan: enginePlan)
         let stops = BuhlmannPlanner.decoStops(input: working)
 
         let modIssues = PlannerMODValidator.validatePlannerCylinders(input: working)

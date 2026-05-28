@@ -60,6 +60,16 @@ struct BuhlmannGas: Hashable {
         max(0, oxygenFraction) * IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters)
     }
 
+    func isOperational(fromDepthMeters: Double, toDepthMeters: Double) -> Bool {
+        guard isCompositionValid, fromDepthMeters.isFinite, toDepthMeters.isFinite else { return false }
+        let shallow = max(0, min(fromDepthMeters, toDepthMeters))
+        let deep = max(fromDepthMeters, toDepthMeters)
+        let minPPO2 = ppO2(depthMeters: shallow)
+        let maxPPO2 = ppO2(depthMeters: deep)
+        return minPPO2 >= BuhlmannConstants.minBreathablePPO2Bar
+            && maxPPO2 <= maxPPO2Bar + 0.000_1
+    }
+
     func modMeters() -> Double? {
         GasMixValidator.modMeters(oxygenFraction: oxygenFraction, maxPPO2: maxPPO2Bar)
     }
@@ -94,6 +104,7 @@ enum BuhlmannPlanIssue: Hashable {
     case ppo2Exceeded(String)
     case modExceeded(String)
     case gasSwitchTooDeep(String)
+    case gasNotOperationalInSegment(String)
     case calculationLimitReached
 
     var isBlocking: Bool {

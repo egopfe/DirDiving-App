@@ -38,8 +38,12 @@ The engine is a planning reference only. It is not a certified decompression com
 - Decompression stops are generated from tissue ceilings instead of static stop templates.
 - GF Low / GF High now drive ceiling and stop propagation math.
 - NDL is tissue-state based and never returns fake `999` values.
-- TTS/TTR is generated from bottom time plus ascent/stop schedule.
+- TTS is separated from total runtime; total runtime includes descent, bottom, gas-switch dwell, ascent and stops.
 - PPO2 is exposed as actual PPO2 with max PPO2 separate; over-limit values are not clipped.
+- Gas validation now checks the whole breathed segment range, not only isolated switch/depth points.
+- Repetitive/reference planning can be seeded with a non-air-saturated initial tissue state.
+- Gas-switch dwell is modeled in tissue loading and runtime accounting.
+- External reference-envelope values are documented from `decotengu 0.14.1`.
 
 ## P2 / P3 Hardening Kept
 
@@ -55,7 +59,7 @@ The current iOS MAIN planner uses a complete ZHL-16C N2+He compartment engine fo
 
 - Air and nitrox plans use N2 tissue loading.
 - Trimix and heliox plans use N2+He tissue loading.
-- Deco gases alter tissue loading after gas switches.
+- Travel and deco gases alter tissue loading after gas switches, including validated ascent gas switches on no-stop returns.
 - Gas switches are validated against MOD and minimum PPO2.
 - Static stop templates are no longer the source of planner decompression stops.
 - CNS/OTU and gas-density values remain separate reference estimates.
@@ -73,6 +77,7 @@ Central validators and the Buhlmann engine reject or flag:
 - Bottom-gas MOD exceeded.
 - Deco/travel gas switch deeper than MOD.
 - Hypoxic gas used shallower than breathable PPO2.
+- Gas not operational across the full breathed segment.
 - Invalid cylinder, SAC/RMV, pressure, GPS, sample, import, export, and sync values from the previous hardening pass.
 
 ## Test Coverage Added
@@ -91,13 +96,14 @@ The `DIRDiving iOS Algorithm Tests` target now includes:
 - `BuhlmannTrimixHeliumTests`
 - `BuhlmannReferenceFixtureTests`
 - `BuhlmannNumericalRobustnessTests`
+- `BuhlmannReleaseHardeningTests`
 
-Coverage includes air, nitrox 32, trimix bottom gas, EAN50 deco gas, oxygen deco gas, GF 30/70 vs 50/80, invalid O2+He mixes, MOD exceeded, hypoxic gas use, gas switch too deep, helium tissue loading, mixed N2/He ceilings, pressure model checks, Schreiner loading checks, no fake 999-minute NDL, invalid segment handling, zero/negative/unsupported profile values, and tolerance-based numerical checks.
+Coverage includes air, nitrox 32, trimix bottom gas, EAN50 deco gas, oxygen deco gas, GF 30/70 vs 50/80, invalid O2+He mixes, MOD exceeded, hypoxic gas use, gas switch too deep, helium tissue loading, mixed N2/He ceilings, pressure model checks, Schreiner loading checks, no fake 999-minute NDL, invalid segment handling, zero/negative/unsupported profile values, full-segment gas operability, external reference envelopes, residual tissue seed, and tolerance-based numerical checks.
 
 ## Remaining Limitations
 
 - This is a reference planner, not a certified decompression engine or dive computer.
-- Validation fixtures are deterministic internal regression fixtures; independent external validation against a trusted decompression reference implementation is still required before any stronger claim.
+- A first external reference-envelope cross-check is documented; a larger independent validation campaign is still required before any stronger claim.
 - Salinity and altitude are still stored and documented, but not yet used to alter ambient pressure.
 - CNS/OTU remain simplified reference estimates.
 - Physical-device, Xcode, simulator, and TestFlight validation must run on macOS.

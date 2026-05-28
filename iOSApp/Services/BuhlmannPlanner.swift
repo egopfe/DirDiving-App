@@ -158,6 +158,8 @@ enum BuhlmannPlanner {
                 states.append(.PPO2Exceeded)
             case .modExceeded, .gasSwitchTooDeep:
                 states.append(.MODExceeded)
+            case .gasNotOperationalInSegment:
+                states.append(.unsupportedGas)
             case .calculationLimitReached:
                 states.append(.modelIncomplete)
             }

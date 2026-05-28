@@ -14,7 +14,7 @@ The engine is informational and non-certified. It must never be presented as a l
 - `BuhlmannConstants.swift`: ZHL-16C N2/He constants, water vapor pressure, stop interval, ascent/descent assumptions.
 - `BuhlmannGas.swift`: validated gas model, PPO2, MOD, minimum operating depth, gas labels, plan issues.
 - `BuhlmannTissueModel.swift`: tissue compartments, Schreiner loading, mixed coefficient ceiling calculation.
-- `BuhlmannEngine.swift`: request/result model, validation, NDL search, GF interpolation, multigas stop schedule.
+- `BuhlmannEngine.swift`: request/result model, validation, NDL search, GF interpolation, multigas stop schedule, runtime/TTS accounting, residual tissue seed.
 - `BuhlmannPlanner.swift`: iOS planner adapter from `GasPlanInput` to the pure engine.
 
 ## Mathematical Model
@@ -27,13 +27,16 @@ The engine is informational and non-certified. It must never be presented as a l
 - Gradient factors: GF Low at first stop, GF High at the surface, interpolated by depth.
 - Stops: rounded to the configured 3 m interval and propagated until the next shallower stop is allowed.
 - Optional multiple bottom segments: each segment carries its own depth, duration, and gas.
+- Gas-switch dwell: `0.5 min` at switch depth, included in tissue loading and runtime accounting.
+- Runtime semantics: `ttsMinutes` is time-to-surface from the end of bottom loading; `totalRuntimeMinutes` includes descent, bottom, gas switches, ascent and stops.
+- Initial tissue state: air-saturated by default; `BuhlmannPlanRequest.initialTissueState` can seed repetitive/reference planning.
 
 ## Gas Strategy
 
 - Bottom gas is used for descent and bottom loading unless travel gases are provided.
 - Multiple bottom segments can be passed to the pure engine for staged bottom gas/time/depth loading.
 - Travel gases are used during descent at configured switch depths.
-- Deco gases are selected on ascent when the current stop depth is at or shallower than their switch depth and PPO2 is within bounds.
+- Travel and deco gases are selected on ascent when the current segment/stop depth is at or shallower than their switch depth and PPO2 is within bounds, including no-stop returns.
 - Higher oxygen deco gases are preferred when validated at the current stop depth.
 
 ## Safety Validation
@@ -47,6 +50,7 @@ The engine fails closed for invalid profile or gas states:
 - bottom gas above MOD
 - deco/travel gas switch deeper than MOD
 - gas used shallower than minimum breathable PPO2
+- gas that is not operational across the full breathed segment
 - schedule propagation limit reached
 
 ## Integration Boundary
