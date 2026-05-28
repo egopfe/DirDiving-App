@@ -20,6 +20,13 @@ final class PlannerStore: ObservableObject {
     )
     var analysis: TechnicalGasAnalysis { GasPlanningService.analyze(input: input) }
     var briefingText: String { plan.briefingLines.joined(separator: "\n") }
+    @Published var repetitivePlanningEnabled: Bool = false {
+        didSet { saveIfReady() }
+    }
+    @Published var surfaceIntervalMinutes: Double = 60 {
+        didSet { saveIfReady() }
+    }
+    @Published private(set) var lastTissueSnapshot: TissueSnapshot?
 
     private let cloudSync: CloudSyncStore?
     private let key = "dirdiving_ios_experimental_planner_state"
@@ -31,6 +38,9 @@ final class PlannerStore: ObservableObject {
         if let saved = cloudSync?.load(PlannerState.self, forKey: key) {
             mode = saved.mode
             input = saved.input
+            repetitivePlanningEnabled = saved.repetitivePlanningEnabled
+            surfaceIntervalMinutes = saved.surfaceIntervalMinutes
+            lastTissueSnapshot = saved.lastTissueSnapshot
         }
         input.ensurePlannerCylindersFromLegacy()
         calculate()
@@ -56,7 +66,15 @@ final class PlannerStore: ObservableObject {
             depthMeters: input.buhlmannPlanningDepthMeters,
             bottomGas: input.buhlmannBackGas
         )
-        plan = PlannerService.makePlan(input: input)
+        plan = PlannerService.makePlan(
+            input: input,
+            repetitiveSnapshot: repetitivePlanningEnabled ? lastTissueSnapshot : nil,
+            surfaceIntervalMinutes: surfaceIntervalMinutes
+        )
+        if let environment = try? makeEnvironment(),
+           let snapshot = RepetitiveDivePlannerService.makeSnapshot(from: BuhlmannPlanner.enginePlan(input: input), environment: environment) {
+            lastTissueSnapshot = snapshot
+        }
         isApplyingInputSideEffects = false
     }
 
@@ -67,11 +85,32 @@ final class PlannerStore: ObservableObject {
 
     private func saveIfReady() {
         guard isReady else { return }
-        cloudSync?.save(PlannerState(mode: mode, input: input), forKey: key)
+        cloudSync?.save(
+            PlannerState(
+                mode: mode,
+                input: input,
+                repetitivePlanningEnabled: repetitivePlanningEnabled,
+                surfaceIntervalMinutes: surfaceIntervalMinutes,
+                lastTissueSnapshot: lastTissueSnapshot
+            ),
+            forKey: key
+        )
+    }
+
+    private func makeEnvironment() throws -> PlannerEnvironment {
+        switch PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) {
+        case .success(let environment):
+            return environment
+        case .failure:
+            throw NSError(domain: "PlannerEnvironment", code: 2)
+        }
     }
 }
 
 private struct PlannerState: Codable {
     var mode: PlannerMode
     var input: GasPlanInput
+    var repetitivePlanningEnabled: Bool = false
+    var surfaceIntervalMinutes: Double = 60
+    var lastTissueSnapshot: TissueSnapshot?
 }

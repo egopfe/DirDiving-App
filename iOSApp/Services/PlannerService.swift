@@ -2,6 +2,14 @@ import Foundation
 
 enum PlannerService {
     static func makePlan(input: GasPlanInput) -> DivePlanResult {
+        makePlan(input: input, repetitiveSnapshot: nil, surfaceIntervalMinutes: 0)
+    }
+
+    static func makePlan(
+        input: GasPlanInput,
+        repetitiveSnapshot: TissueSnapshot?,
+        surfaceIntervalMinutes: Double
+    ) -> DivePlanResult {
         let validation = PlannerInputValidator.validate(input)
         guard validation.isValid else {
             return unavailablePlan(input: input, validation: validation)
@@ -11,7 +19,14 @@ enum PlannerService {
         let bottom = PlannerGasSchedule.bottomGas(from: working)
         let planningDepth = working.buhlmannPlanningDepthMeters
         let buhlmann = BuhlmannPlanner.plan(depthMeters: planningDepth, bottomGas: bottom)
-        let enginePlan = BuhlmannPlanner.enginePlan(input: working)
+        let enginePlan: BuhlmannEngineResult
+        if let snapshot = repetitiveSnapshot,
+           let environment = try? makeEnvironment(from: working),
+           let request = try? makeSeededRequest(input: working, snapshot: snapshot, surfaceIntervalMinutes: surfaceIntervalMinutes, environment: environment) {
+            enginePlan = BuhlmannEngine.plan(request)
+        } else {
+            enginePlan = BuhlmannPlanner.enginePlan(input: working)
+        }
         let analysis = GasPlanningService.analyze(input: working, enginePlan: enginePlan)
         let stops = BuhlmannPlanner.decoStops(input: working)
 
@@ -99,5 +114,34 @@ enum PlannerService {
             merged.append(state)
         }
         return merged
+    }
+
+    private static func makeEnvironment(from input: GasPlanInput) throws -> PlannerEnvironment {
+        switch PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) {
+        case .success(let environment):
+            return environment
+        case .failure:
+            throw NSError(domain: "PlannerEnvironment", code: 3)
+        }
+    }
+
+    private static func makeSeededRequest(
+        input: GasPlanInput,
+        snapshot: TissueSnapshot,
+        surfaceIntervalMinutes: Double,
+        environment: PlannerEnvironment
+    ) throws -> BuhlmannPlanRequest {
+        let base = BuhlmannPlanner.makeRequest(input: input)
+        switch RepetitiveDivePlannerService.seedRequest(
+            base,
+            snapshot: snapshot,
+            surfaceIntervalMinutes: surfaceIntervalMinutes,
+            environment: environment
+        ) {
+        case .success(let request):
+            return request
+        case .failure:
+            throw NSError(domain: "RepetitivePlanner", code: 1)
+        }
     }
 }
