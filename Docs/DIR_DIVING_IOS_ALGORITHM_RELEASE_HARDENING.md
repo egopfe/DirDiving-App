@@ -9,6 +9,14 @@ DIR DIVING iOS remains a non-certified informational diving companion. Planner, 
 
 This pass upgrades iOS MAIN from a conservative safe-reference planner to an isolated Buhlmann ZHL-16C multigas planning reference engine with nitrogen and helium tissue loading. It preserves the premium dark UI, navigation, layout, colors, icons, Apple Watch code, watchOS targets, experimental files, and legal/safety positioning.
 
+Additional hardening in this pass:
+
+- schedule-based gas consumption ledger from generated runtime segments
+- altitude/salinity planner environment pressure model with fail-closed validation
+- repetitive planning reference seed via tissue snapshots and surface-interval off-gassing
+- segment-based CNS/OTU accumulation with typed warning states
+- golden/regression fixture framework (`Tests/iOSAlgorithmTests/Fixtures/*.json`)
+
 ## Buhlmann Engine Status
 
 Implemented in `iOSApp/Algorithms/Buhlmann/`:

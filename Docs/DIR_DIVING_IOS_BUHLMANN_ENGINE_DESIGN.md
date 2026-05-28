@@ -19,8 +19,8 @@ The engine is informational and non-certified. It must never be presented as a l
 
 ## Mathematical Model
 
-- Surface pressure: `1.0 bar`.
-- Depth conversion: project canonical `10 m/bar` approximation through `IOSUnitConversions`.
+- Surface pressure: environment-derived from altitude (`PlannerEnvironment` / `AmbientPressureModel`).
+- Depth conversion: water-column pressure derived from water density (fresh vs salt) with legacy fallback where environment is unavailable.
 - Inspired inert gas pressure: `(ambient pressure - water vapor pressure) * inert fraction`.
 - Tissue loading: exponential Haldane loading at constant depth and Schreiner-style loading for linear ascent/descent.
 - Ceiling: per-compartment mixed N2/He a/b coefficients weighted by current inert gas tissue pressures.
@@ -30,6 +30,7 @@ The engine is informational and non-certified. It must never be presented as a l
 - Gas-switch dwell: `0.5 min` at switch depth, included in tissue loading and runtime accounting.
 - Runtime semantics: `ttsMinutes` is time-to-surface from the end of bottom loading; `totalRuntimeMinutes` includes descent, bottom, gas switches, ascent and stops.
 - Initial tissue state: air-saturated by default; `BuhlmannPlanRequest.initialTissueState` can seed repetitive/reference planning.
+- Repetitive planning reference: optional `TissueSnapshot` + `SurfaceIntervalModel` off-gassing seed for subsequent plans.
 
 ## Gas Strategy
 

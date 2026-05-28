@@ -31,6 +31,8 @@ On Windows, Xcode tooling is unavailable; validation is limited to static code i
 | `BuhlmannMultigasPlannerTests.swift` | trimix + EAN50 + O2 schedule, PlannerService integration |
 | `BuhlmannTrimixHeliumTests.swift` | trimix fractions, heliox composition, valid helium planner output |
 | `BuhlmannReferenceFixtureTests.swift` | air/nitrox ordering, trimix stop schedule, invalid fixture fail-closed |
+| `BuhlmannGoldenFixtureTests.swift` | golden fixture parser + deterministic fixture execution and range validation |
+| `PlannerRegressionFixtureTests.swift` | invalid-fixture fail-closed checks and GF conservatism regression |
 | `BuhlmannNumericalRobustnessTests.swift` | invalid profile values, zero depth/time, invalid segments, finite outputs, unit round trips |
 | `BuhlmannReleaseHardeningTests.swift` | external reference envelopes, TTS/runtime split, residual tissue seed, full segment gas-operability checks |
 
@@ -52,6 +54,7 @@ On Windows, Xcode tooling is unavailable; validation is limited to static code i
 - External reference-envelope profiles generated with `decotengu 0.14.1`.
 - Repetitive/reference planning seeded from a previous final tissue state.
 - Segment gas validation across the full breathed depth range.
+- Fixture sources/tolerances documented in `Docs/DIR_DIVING_IOS_BUHLMANN_FIXTURE_SOURCES.md`.
 
 ## Acceptance Expectations
 

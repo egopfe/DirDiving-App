@@ -21,8 +21,8 @@ The iOS planner now includes a ZHL-16C N2+He multigas reference engine:
 
 ## Current Assumptions
 
-- Ambient pressure uses the project-wide `10 m/bar` depth approximation.
-- Surface pressure is treated as `1.0 bar`.
+- Planner environment now supports altitude-aware surface pressure and salinity-aware water density via `PlannerEnvironment`.
+- Legacy fallback remains `1.0 bar` / `10 m/bar` only when environment data is invalid or unavailable.
 - Water vapor pressure is fixed at `0.0627 bar`.
 - Stops are rounded to 3 m intervals.
 - Default descent rate is 18 m/min.
@@ -32,7 +32,7 @@ The iOS planner now includes a ZHL-16C N2+He multigas reference engine:
 
 ## Known Limitations
 
-- Salinity and altitude are stored but do not yet alter ambient pressure.
+- Altitude/salinity support is bounded (input guardrails): out-of-range values fail closed.
 - A first external reference-envelope cross-check exists, but a larger independent validation campaign is still required before stronger release claims.
 - The planner does not replace real-time decompression control.
 - The planner does not account for individual physiology, workload, thermal stress, repetitive-dive edge cases beyond current tissue-state input, or equipment failures.

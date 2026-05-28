@@ -41,11 +41,11 @@ inspiredHeBar = dryPressureBar * heliumFraction
 
 Assumptions:
 
-- Surface pressure: `1.0 bar`.
-- Depth approximation: `10 m/bar`.
+- Surface pressure: environment-derived barometric approximation (altitude-aware).
+- Depth approximation: density-aware pressure/depth conversion (freshwater vs saltwater).
 - Water vapour pressure: `0.0627 bar`.
 - Oxygen is not loaded as an inert gas.
-- Salinity and altitude are stored by the planner but currently marked reference-only and do not alter ambient pressure.
+- Salinity and altitude are validated and applied through `PlannerEnvironment`; invalid environment values fail closed.
 
 Covered by `BuhlmannPressureModelTests`.
 
