@@ -42,12 +42,21 @@ enum IOSUnitConversions {
     }
 
     static func ambientPressureBar(depthMeters: Double) -> Double {
-        IOSAlgorithmConfiguration.surfacePressureBar
+        return IOSAlgorithmConfiguration.surfacePressureBar
             + max(0, depthMeters) / IOSAlgorithmConfiguration.metersPerBarApproximation
     }
 
     static func depthMeters(forPressureBar pressureBar: Double) -> Double {
-        max(0, pressureBar - IOSAlgorithmConfiguration.surfacePressureBar)
+        return max(0, pressureBar - IOSAlgorithmConfiguration.surfacePressureBar)
             * IOSAlgorithmConfiguration.metersPerBarApproximation
     }
+
+    static func ambientPressureBar(depthMeters: Double, environment: PlannerEnvironment) -> Double? {
+        AmbientPressureModel.ambientPressureBar(depthMeters: depthMeters, environment: environment)
+    }
+
+    static func depthMeters(forPressureBar pressureBar: Double, environment: PlannerEnvironment) -> Double? {
+        AmbientPressureModel.depthMeters(ambientPressureBar: pressureBar, environment: environment)
+    }
+
 }

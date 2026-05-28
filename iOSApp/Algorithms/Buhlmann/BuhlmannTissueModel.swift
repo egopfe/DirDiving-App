@@ -1,6 +1,6 @@
 import Foundation
 
-struct BuhlmannTissueCompartment: Hashable {
+struct BuhlmannTissueCompartment: Hashable, Codable {
     var nitrogenPressure: Double
     var heliumPressure: Double
 }
@@ -10,7 +10,7 @@ struct BuhlmannCeiling: Hashable {
     let controllingCompartment: Int
 }
 
-struct BuhlmannTissueState: Hashable {
+struct BuhlmannTissueState: Hashable, Codable {
     var compartments: [BuhlmannTissueCompartment]
 
     static func airSaturated() -> BuhlmannTissueState {
@@ -23,16 +23,26 @@ struct BuhlmannTissueState: Hashable {
         return BuhlmannTissueState(compartments: compartments)
     }
 
-    func loadedConstantDepth(depthMeters: Double, minutes: Double, gas: BuhlmannGas) -> BuhlmannTissueState {
-        loadedLinearDepth(fromDepthMeters: depthMeters, toDepthMeters: depthMeters, minutes: minutes, gas: gas)
+    static func airSaturated(surfacePressureBar: Double) -> BuhlmannTissueState {
+        let pn2 = (surfacePressureBar - BuhlmannConstants.waterVaporPressureBar)
+            * BuhlmannConstants.nitrogenFractionAir
+        let compartments = Array(
+            repeating: BuhlmannTissueCompartment(nitrogenPressure: max(0, pn2), heliumPressure: 0),
+            count: BuhlmannConstants.compartmentCount
+        )
+        return BuhlmannTissueState(compartments: compartments)
     }
 
-    func loadedLinearDepth(fromDepthMeters: Double, toDepthMeters: Double, minutes: Double, gas: BuhlmannGas) -> BuhlmannTissueState {
+    func loadedConstantDepth(depthMeters: Double, minutes: Double, gas: BuhlmannGas, environment: PlannerEnvironment? = nil) -> BuhlmannTissueState {
+        loadedLinearDepth(fromDepthMeters: depthMeters, toDepthMeters: depthMeters, minutes: minutes, gas: gas, environment: environment)
+    }
+
+    func loadedLinearDepth(fromDepthMeters: Double, toDepthMeters: Double, minutes: Double, gas: BuhlmannGas, environment: PlannerEnvironment? = nil) -> BuhlmannTissueState {
         guard minutes.isFinite, minutes > 0 else { return self }
-        let startN2 = gas.inspiredPressure(depthMeters: fromDepthMeters, inert: .nitrogen)
-        let endN2 = gas.inspiredPressure(depthMeters: toDepthMeters, inert: .nitrogen)
-        let startHe = gas.inspiredPressure(depthMeters: fromDepthMeters, inert: .helium)
-        let endHe = gas.inspiredPressure(depthMeters: toDepthMeters, inert: .helium)
+        let startN2 = gas.inspiredPressure(depthMeters: fromDepthMeters, inert: .nitrogen, environment: environment)
+        let endN2 = gas.inspiredPressure(depthMeters: toDepthMeters, inert: .nitrogen, environment: environment)
+        let startHe = gas.inspiredPressure(depthMeters: fromDepthMeters, inert: .helium, environment: environment)
+        let endHe = gas.inspiredPressure(depthMeters: toDepthMeters, inert: .helium, environment: environment)
         let rateN2 = (endN2 - startN2) / minutes
         let rateHe = (endHe - startHe) / minutes
 

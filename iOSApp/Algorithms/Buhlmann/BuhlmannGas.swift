@@ -45,8 +45,9 @@ struct BuhlmannGas: Hashable {
         )
     }
 
-    func inspiredPressure(depthMeters: Double, inert: BuhlmannInertGas) -> Double {
-        let ambient = IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters)
+    func inspiredPressure(depthMeters: Double, inert: BuhlmannInertGas, environment: PlannerEnvironment? = nil) -> Double {
+        let ambient = environment.flatMap { IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters, environment: $0) }
+            ?? IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters)
         let dryPressure = max(0, ambient - BuhlmannConstants.waterVaporPressureBar)
         switch inert {
         case .nitrogen:
@@ -56,16 +57,18 @@ struct BuhlmannGas: Hashable {
         }
     }
 
-    func ppO2(depthMeters: Double) -> Double {
-        max(0, oxygenFraction) * IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters)
+    func ppO2(depthMeters: Double, environment: PlannerEnvironment? = nil) -> Double {
+        let ambient = environment.flatMap { IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters, environment: $0) }
+            ?? IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters)
+        return max(0, oxygenFraction) * ambient
     }
 
-    func isOperational(fromDepthMeters: Double, toDepthMeters: Double) -> Bool {
+    func isOperational(fromDepthMeters: Double, toDepthMeters: Double, environment: PlannerEnvironment? = nil) -> Bool {
         guard isCompositionValid, fromDepthMeters.isFinite, toDepthMeters.isFinite else { return false }
         let shallow = max(0, min(fromDepthMeters, toDepthMeters))
         let deep = max(fromDepthMeters, toDepthMeters)
-        let minPPO2 = ppO2(depthMeters: shallow)
-        let maxPPO2 = ppO2(depthMeters: deep)
+        let minPPO2 = ppO2(depthMeters: shallow, environment: environment)
+        let maxPPO2 = ppO2(depthMeters: deep, environment: environment)
         return minPPO2 >= BuhlmannConstants.minBreathablePPO2Bar
             && maxPPO2 <= maxPPO2Bar + 0.000_1
     }

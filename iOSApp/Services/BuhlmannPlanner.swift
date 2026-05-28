@@ -170,6 +170,13 @@ enum BuhlmannPlanner {
     static func makeRequest(input: GasPlanInput) -> BuhlmannPlanRequest {
         var working = input
         working.syncLegacyGasesFromPlannerCylinders()
+        let plannerEnvironment: PlannerEnvironment
+        switch PlannerEnvironment.make(altitudeMeters: working.altitudeMeters, salinity: working.salinity) {
+        case .success(let environment):
+            plannerEnvironment = environment
+        case .failure:
+            plannerEnvironment = .seaLevelSaltWater
+        }
         let bottomEntry = working.plannerCylinders.first(where: { $0.role == .bottom })
         let bottomGas = BuhlmannGas(
             gas: bottomEntry?.gas ?? working.bottomGas,
@@ -191,7 +198,9 @@ enum BuhlmannPlanner {
             travelGases: travelGases,
             decoGases: decoGases,
             gfLow: working.gfLow,
-            gfHigh: working.gfHigh
+            gfHigh: working.gfHigh,
+            initialTissueState: BuhlmannTissueState.airSaturated(surfacePressureBar: plannerEnvironment.surfacePressureBar),
+            plannerEnvironment: plannerEnvironment
         )
     }
 
