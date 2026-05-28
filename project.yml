@@ -123,6 +123,10 @@ targets:
       - iOSApp/Models/GasPlan.swift
       - iOSApp/Models/GPSPoint.swift
       - iOSApp/Models/TankSize.swift
+      - iOSApp/Algorithms/Buhlmann/BuhlmannConstants.swift
+      - iOSApp/Algorithms/Buhlmann/BuhlmannGas.swift
+      - iOSApp/Algorithms/Buhlmann/BuhlmannTissueModel.swift
+      - iOSApp/Algorithms/Buhlmann/BuhlmannEngine.swift
       - iOSApp/Services/BuhlmannPlanner.swift
       - iOSApp/Services/DiveImportService.swift
       - iOSApp/Services/GasPlanningService.swift

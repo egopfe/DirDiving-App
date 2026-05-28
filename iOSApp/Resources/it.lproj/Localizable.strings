@@ -666,7 +666,7 @@
 "planner.reference.info.title" = "Riferimento pianificazione";
 "planner.reference.info.message" = "Il riferimento di pianificazione può utilizzare profondità media o massima. Per motivi di sicurezza, il gas di emergenza viene sempre calcolato utilizzando la profondità massima.";
 "planner.gas.mix_invalid" = "Miscela non valida: ossigeno, elio e azoto devono totalizzare il 100%.";
-"planner.gas.trimix_buhlmann_disclaimer" = "Miscela trimix: l'elio (He) non è calcolato nell'algoritmo Bühlmann ZHL-16C semplificato di questo planner. NDL e stime decompressive usano solo il carico di azoto (N₂), con N₂ = 100% − O₂ − He. Risultati solo indicativi—per immersioni reali usa strumenti trimix dedicati o un computer subacqueo certificato.";
+"planner.gas.trimix_buhlmann_disclaimer" = "Miscela trimix: il planner usa un motore Bühlmann ZHL-16C N₂+He multigas come riferimento non certificato. Verifica sempre il profilo con strumenti trimix dedicati o un computer subacqueo certificato.";
 "planner.gas.oxygen" = "Ossigeno";
 "planner.gas.helium" = "Elio";
 "planner.gas.nitrogen" = "Azoto";

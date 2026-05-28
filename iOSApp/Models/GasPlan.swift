@@ -249,6 +249,7 @@ struct GasMix: Identifiable, Codable, Hashable {
     }
     var label: String {
         if helium > 0 { return "TX \(Int(oxygen*100))/\(Int(helium*100))" }
+        if oxygen > 0.985 { return "O2" }
         if oxygen > 0.21 { return "EAN\(Int(oxygen*100))" }
         return "AIR"
     }

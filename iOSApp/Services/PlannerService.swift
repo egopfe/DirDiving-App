@@ -11,27 +11,27 @@ enum PlannerService {
         let bottom = PlannerGasSchedule.bottomGas(from: working)
         let planningDepth = working.buhlmannPlanningDepthMeters
         let buhlmann = BuhlmannPlanner.plan(depthMeters: planningDepth, bottomGas: bottom)
-        let needsDeco = buhlmann.modelState == .simplifiedReferenceOnly
-            && (working.plannedBottomMinutes > buhlmann.ndlMinutes || planningDepth >= 35)
+        let enginePlan = BuhlmannPlanner.enginePlan(input: working)
         let analysis = GasPlanningService.analyze(input: working)
-        let stopPlan = PlannerGasSchedule.buildDecoStops(needsDeco: needsDeco, input: working)
-        let requestedStops = stopPlan.requested
-        let stops = stopPlan.applied
+        let stops = BuhlmannPlanner.decoStops(input: working)
 
-        let modIssues = PlannerMODValidator.validateAll(input: working, requestedStops: requestedStops)
-        var states = mergedStates(validation.states, analysis.states, plannerStates(from: buhlmann.modelState))
+        let modIssues = PlannerMODValidator.validatePlannerCylinders(input: working)
+        var states = mergedStates(
+            validation.states,
+            analysis.states,
+            plannerStates(from: enginePlan.modelState),
+            BuhlmannPlanner.plannerStates(from: enginePlan.issues)
+        )
         if !modIssues.isEmpty {
             states = mergedStates(states, [.MODExceeded])
         }
         if stops.contains(where: { $0.states.contains(.PPO2Exceeded) }) {
             states = mergedStates(states, [.PPO2Exceeded])
         }
-        let ttr = Int(working.plannedBottomMinutes)
-            + stops.map(\.minutes).reduce(0,+)
-            + Int(working.plannedDepthMeters / IOSAlgorithmConfiguration.metersPerBarApproximation)
-        let segments = GasPlanningService.profileSegments(input: working, stops: stops)
+        let ttr = enginePlan.ttsMinutes
+        let segments = BuhlmannPlanner.runtimeSegments(input: working)
         let scheduleLines = PlannerGasSchedule.roleScheduleLines(input: working)
-        let gfComparisons = GasPlanningService.gfComparisons(input: working, baseTTS: ttr, stopCount: stops.count)
+        let gfComparisons = BuhlmannPlanner.gfComparisons(input: working)
         let contingencies = GasPlanningService.contingencyPlans(input: working, baseAnalysis: analysis, baseTTS: ttr)
         let teamMatches = GasPlanningService.teamGasMatches(input: working, minimumGasLiters: analysis.rockBottomLiters)
         var briefing = GasPlanningService.briefingLines(input: working, analysis: analysis, tts: ttr, stops: stops)
@@ -50,7 +50,7 @@ enum PlannerService {
             briefingLines: briefing,
             modValidationIssues: modIssues,
             states: states,
-            buhlmannState: buhlmann.modelState
+            buhlmannState: enginePlan.modelState
         )
     }
 
@@ -78,7 +78,7 @@ enum PlannerService {
     private static func plannerStates(from buhlmannState: BuhlmannModelState) -> [PlannerResultState] {
         switch buhlmannState {
         case .validReference:
-            return [.validReference]
+            return [.validReference, .nonCertifiedReference]
         case .simplifiedReferenceOnly:
             return [.simplifiedReferenceOnly]
         case .unsupportedTrimix:

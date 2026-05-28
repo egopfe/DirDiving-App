@@ -46,12 +46,13 @@ final class IOSAlgorithmTests: XCTestCase {
     func testTrimixDoesNotUseN2OnlyBuhlmannOutput() {
         let trimix = GasMix(name: "TX 18/45", oxygen: 0.18, helium: 0.45, maxPPO2: 1.4)
         let buhlmann = BuhlmannPlanner.plan(depthMeters: 40, bottomGas: trimix)
-        XCTAssertEqual(buhlmann.modelState, .unsupportedTrimix)
-        XCTAssertEqual(buhlmann.ndlMinutes, 0)
+        XCTAssertEqual(buhlmann.modelState, .validReference)
+        XCTAssertGreaterThanOrEqual(buhlmann.ndlMinutes, 0)
+        XCTAssertLessThan(buhlmann.ndlMinutes, 999)
 
         let plan = PlannerService.makePlan(input: plannerInput(depth: 40, bottomMinutes: 20, gas: trimix))
-        XCTAssertTrue(plan.states.contains(.unsupportedTrimix))
-        XCTAssertTrue(plan.states.contains(.modelIncomplete))
+        XCTAssertFalse(plan.states.contains(.unsupportedTrimix))
+        XCTAssertTrue(plan.states.contains(.nonCertifiedReference))
     }
 
     func testBuhlmannNoLongerReturns999AsValidNDL() {

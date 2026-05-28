@@ -52,7 +52,7 @@
 | Watch algorithm release-hard pass | ✅ | `ddaf2d7` → `92e639a`; validator depth, lifecycle, TTV/time-weighted avg, haptic coordinator, XCTest |
 | Watch algorithm final hardening | ✅ | Cap 40 sessioni su load/reload, temperatura plausibile, export vuoto bloccato, GPS fallback policy, conversioni centralizzate |
 | iOS algorithm release-hard pass | ✅ | Validator iOS, planner/gas safe states, import/export/sync/logbook math, route math, test `DIRDiving iOS Algorithm Tests` |
-| iOS Buhlmann multigas assessment | ✅ | Report documentale: supporto attuale parziale/N2-only reference; ZHL-16C+GF+He multigas completo resta roadmap dedicata |
+| iOS Buhlmann ZHL-16C multigas engine | ✅ | Motore reference iOS-only con N2+He, GF, NDL tissue-state e soste generate; non certificato, da validare esternamente |
 | Docs / branch / PR alignment 2026-05-19 | ✅ | README, INDEX, roadmap, safety/release docs, matrix e branch strategy @ `92e639a` |
 | Docs / audit alignment 2026-05-25 | ✅ | README, INDEX, safety/release docs e matrix riallineati al MAIN corrente |
 | Docs / branch / PR alignment 2026-05-26 | ✅ | README, INDEX, roadmap, current audits, branch/PR reports riallineati alla baseline MAIN attuale |
@@ -69,7 +69,7 @@
 | P1 | QA reale Apple Watch Ultra per lifecycle automatico, profondita e limiti 35/38/40 m | Hardware QA |
 | P1 | QA pairing/sync bidirezionale su device | Hardware QA |
 | P1 | QA App Intents / Action Button su Watch fisico | Hardware QA |
-| P2 | Se si vuole pianificazione tecnica multigas/helium completa, implementare motore Buhlmann ZHL-16C + GF + He secondo assessment | Planner roadmap — [`DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md`](DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md) |
+| P2 | Validazione matematica esterna del motore Buhlmann ZHL-16C + GF + He con fixture indipendenti prima di claim release piu forti | Planner QA — [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md) |
 | P2 | Verifica finale legale contenuti Terms/Privacy e copy App Review | Legal / App Store |
 | P2 | Convergenza documentazione `main` ↔ worktree storici (`main-iOS`, `codex/*`) senza merge runtime unsafe | Process |
 | P3 | GPX/UDDF export | Feature |

@@ -62,7 +62,7 @@ enum GasPlanningService {
         GasMixValidator.actualPPO2(oxygenFraction: gas.oxygen, depthMeters: depthMeters) ?? 0
     }
 
-    /// PPO₂ at depth capped by the gas mix maximum (used for deco stops and MOD-consistent display).
+    /// Actual PPO2 at depth. Over-limit states are reported separately; the value is never clipped.
     static func boundedPPO2(gas: GasMix, depthMeters: Double) -> Double {
         ppO2(gas: gas, depthMeters: depthMeters)
     }

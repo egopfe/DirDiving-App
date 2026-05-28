@@ -12,7 +12,7 @@ Lo stato algoritmico MAIN e documentato in:
 
 - [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md) per Watch MAIN.
 - [`DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md) per iOS MAIN.
-- [`DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md`](DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md) per il piano futuro Buhlmann ZHL-16C multigas/helium. La release MAIN corrente non deve essere descritta come decompression planner certificato o motore multigas helium completo.
+- [`DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md) e [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md) per il motore Buhlmann ZHL-16C N2+He multigas reference. La release MAIN corrente non deve essere descritta come decompression planner certificato.
 
 ## Account e dati demo
 
@@ -43,7 +43,7 @@ Lo stato algoritmico MAIN e documentato in:
 5. Side Button / Action Button Watch: l'app **non** puo intercettare direttamente il tasto laterale. Controlli immersione affidabili restano **START / STOP / RESET** sullo schermo Live. Comandi aggiuntivi (cronometro, immersione manuale, BUSSOLA, allarme) sono disponibili tramite **Comandi Rapidi / Action Button** solo dove watchOS espone gli App Intent registrati — vedi Impostazioni -> Azione / Comandi.
 6. Mission Mode e solo un profilo di ottimizzazione runtime/UI per immersione attiva: non riduce monitoraggio safety-critical, non modifica logica immersione o sensori e usa solo un indicatore visivo minimale.
 7. Terms / Privacy da onboarding e settings puntano a documenti dedicati, non alla root del repository.
-8. Buhlmann/NDL sul companion iOS rimane riferimento informativo secondo lo stato implementato: trimix/helium completo richiede motore dedicato e validazione matematica futura.
+8. Buhlmann/NDL sul companion iOS rimane riferimento informativo: trimix/helium usano il motore N2+He implementato, ma richiedono validazione matematica esterna prima di claim piu forti.
 
 ## Checklist QA consigliata (reviewer)
 

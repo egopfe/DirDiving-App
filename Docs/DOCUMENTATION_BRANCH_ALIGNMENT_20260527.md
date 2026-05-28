@@ -115,7 +115,7 @@ Never overwrite:
 - Action Button / Side Button truthfulness
 - Watch <-> iPhone sync safety docs
 - non-certified planner wording
-- iOS Buhlmann multigas assessment limitations
+- iOS Buhlmann multigas engine design and reference-only limitations
 
 ---
 
@@ -152,7 +152,7 @@ The 2026-05-27 documentation pass updates `main` only. It does not rewrite histo
 
 - `main-iOS` remains a historical divergent branch and should not be treated as the production iOS source of truth without a dedicated diff and port plan.
 - PR #8 and PR #9 remain open and conflicting.
-- A complete iOS Buhlmann ZHL-16C + Gradient Factor + Helium multigas engine is not implemented yet; it is documented as future work in the assessment report.
+- Superseded 2026-05-28: iOS MAIN now includes an isolated Buhlmann ZHL-16C + Gradient Factor + Helium multigas reference engine; external validation remains required.
 - Apple water-submersion entitlement, provisioning and real Apple Watch Ultra QA remain external release blockers.
 
 ---

@@ -26,10 +26,10 @@ enum PlannerInputValidator {
             result.add(.invalidInput, message: "Tempo al fondo non valido.")
         }
 
-        if !input.sacLitersMinute.isFinite || input.sacLitersMinute <= 0 {
+        if !input.sacLitersPerMinute.isFinite || input.sacLitersPerMinute <= 0 {
             result.add(.invalidInput, message: "SAC/RMV non valido.")
         }
-        if !input.emergencySacLitersMinute.isFinite || input.emergencySacLitersMinute <= 0 {
+        if !input.emergencySacLitersPerMinute.isFinite || input.emergencySacLitersPerMinute <= 0 {
             result.add(.invalidInput, message: "SAC di emergenza non valido.")
         }
         if input.teamSize < 1 {

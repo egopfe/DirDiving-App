@@ -2,6 +2,14 @@
 
 ## Executive Verdict
 
+Implementation update 2026-05-28: this file is the pre-implementation assessment. The iOS MAIN branch now includes an isolated Buhlmann ZHL-16C N2+He multigas planning reference engine under `iOSApp/Algorithms/Buhlmann/`, integrated into the iOS planner without touching Watch or experimental files. Current implementation details are tracked in:
+
+- `Docs/DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`
+- `Docs/DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`
+- `Docs/DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`
+
+The engine remains non-certified and informational; external validation against an independent reference implementation is still required before stronger release claims.
+
 **Partial.** The iOS Companion MAIN branch has a hardened **reference planner shell** with gas validation, MOD/PPO2, END/EAD, density, CNS/OTU estimates, static stop templates, and a simplified N2-only Buhlmann-style NDL preview.
 
 It does **not** contain a complete release-hard Buhlmann ZHL-16C multigas engine with Helium tissue loading, Trimix decompression, real Gradient Factor ceiling logic, or generated decompression schedules.

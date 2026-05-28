@@ -8,6 +8,7 @@ enum PlannerResultState: String, Codable, Hashable, CaseIterable {
     case unsupportedTrimix
     case modelIncomplete
     case simplifiedReferenceOnly
+    case nonCertifiedReference
     case unavailable
     case insufficientGas
     case belowReserve
@@ -32,6 +33,8 @@ enum PlannerResultState: String, Codable, Hashable, CaseIterable {
             return "Modello semplificato: usare solo come riferimento non certificato."
         case .simplifiedReferenceOnly:
             return "Output reference-only: non e un piano decompressivo certificato."
+        case .nonCertifiedReference:
+            return "Buhlmann ZHL-16C reference-only: non e un piano decompressivo certificato."
         case .unavailable:
             return "Calcolo non disponibile con gli input correnti."
         case .insufficientGas:

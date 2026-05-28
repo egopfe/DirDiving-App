@@ -96,7 +96,7 @@ None.
 ## J. Remaining documentation gaps
 
 - Older historical reports still preserve previous baselines for traceability and may mention stale commit hashes. Current entry points now point to 2026-05-27.
-- The full iOS Buhlmann ZHL-16C + GF + Helium multigas engine remains a future implementation plan, not current runtime behavior.
+- Superseded 2026-05-28: the iOS Buhlmann ZHL-16C + GF + Helium multigas reference engine is now implemented in iOS MAIN; external validation remains required.
 - Any future experimental promotion needs a dedicated branch-by-branch docs refresh after runtime merge decisions.
 
 ---
@@ -118,10 +118,7 @@ This pass should be committed as:
 docs: align current DIR DIVING branch and release docs
 ```
 
-Future runtime work should use separate commits:
-
-- `feat(ios): add Buhlmann ZHL-16C multigas reference engine`
-- `test(ios): add Buhlmann multigas validation fixtures`
+The Buhlmann runtime work was subsequently implemented as iOS-only code and tests; preserve the docs/code separation in future changes.
 - `docs: update planner certification and helium limitations`
 
 ---
@@ -131,7 +128,7 @@ Future runtime work should use separate commits:
 - Assumption: `main` remains the production-oriented source for both Apple Watch and iOS companion in the unified XcodeGen project.
 - Assumption: `main-iOS` remains historical/divergent unless the user requests a dedicated reconciliation.
 - Risk: merging PR #8/#9 without manual review could reintroduce experimental runtime files or stale docs into stable MAIN.
-- Risk: claiming complete Buhlmann multigas/helium support before implementation would be legally and technically misleading.
+- Risk: claiming certified decompression authority remains legally and technically misleading even with the reference engine implemented.
 
 ---
 

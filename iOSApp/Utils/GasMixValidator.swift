@@ -25,10 +25,6 @@ enum GasMixValidator {
             result.add(.invalidInput)
             result.add(.PPO2Exceeded)
         }
-        if helium > 0, result.isValid {
-            result.add(.unsupportedTrimix)
-            result.add(.modelIncomplete)
-        }
         return result
     }
 

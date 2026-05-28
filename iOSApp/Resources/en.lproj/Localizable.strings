@@ -668,7 +668,7 @@
 "planner.reference.info.title" = "Planning reference";
 "planner.reference.info.message" = "The planning reference can use average or maximum depth. For safety reasons, emergency gas is always calculated using maximum depth.";
 "planner.gas.mix_invalid" = "Invalid gas mix: oxygen, helium, and nitrogen must total 100%.";
-"planner.gas.trimix_buhlmann_disclaimer" = "Trimix selected: helium (He) is not computed in the simplified Bühlmann ZHL-16C model used by this planner. NDL and decompression estimates apply nitrogen (N₂) loading only, using N₂ = 100% − O₂ − He. Results are indicative only—use trimix-specific planning tools or a certified dive computer for real dives.";
+"planner.gas.trimix_buhlmann_disclaimer" = "Trimix selected: the planner uses a Bühlmann ZHL-16C N₂+He multigas engine as a non-certified reference. Always verify the profile with trimix-specific planning tools or a certified dive computer.";
 "planner.gas.oxygen" = "Oxygen";
 "planner.gas.helium" = "Helium";
 "planner.gas.nitrogen" = "Nitrogen";
