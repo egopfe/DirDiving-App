@@ -948,6 +948,12 @@ Restano obbligatori: build `xcodegen generate` / Xcode su macOS, test Apple Watc
 - Nuovi report di processo: [`Docs/DOCUMENTATION_UPDATE_REPORT_20260527.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260527.md), [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md), [`Docs/PR_STATUS_20260527.md`](Docs/PR_STATUS_20260527.md).
 - PR #8 e #9 controllate con `gh`: entrambe aperte, experimental e non safe-to-merge automaticamente; #8 alterna `UNKNOWN` / `CONFLICTING`, #9 risulta `CONFLICTING`.
 
+## Aggiornamento documentazione 2026-05-29 (`570964e`)
+
+- Baseline: `main` @ `570964e`, allineato a `origin/main` dopo sync remoto (hardening Watch/iOS, motore Buhlmann, golden fixtures, reaudit).
+- Indicizzati audit in root: [`DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md), [`DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md), [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md).
+- Indicizzati in `Docs/`: [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md); aggiornato [`Docs/INDEX.md`](Docs/INDEX.md).
+
 ## Aggiornamento iOS Buhlmann 2026-05-28
 
 - Implementato motore iOS-only Buhlmann ZHL-16C N2+He sotto `iOSApp/Algorithms/Buhlmann/`, integrato nel planner companion senza modificare Watch, watchOS, UI premium o branch sperimentali.

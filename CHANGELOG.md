@@ -4,6 +4,12 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-29, documentation indexing — `570964e`)
+
+- **Indice:** [`Docs/INDEX.md`](Docs/INDEX.md) aggiornato con audit root Watch/iOS, reaudit Buhlmann e UX readiness planner iOS.
+- **Audit root:** [`DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md), [`DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md), [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md).
+- **Docs:** [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) indicizzato in §4, §6, §12, §13, §14.
+
 ### Added (2026-05-27, documentation / branch alignment refresh)
 
 - **Documentazione corrente:** riallineati `README.md`, `Docs/INDEX.md`, `Docs/ROADMAP.md`, `Docs/RELEASE_CHECKLIST.md`, `Docs/TESTFLIGHT_REVIEW_NOTES.md` e `Docs/DIR_DIVING_Feature_Comparison.csv` alla baseline `main` @ `37e4464` e agli ultimi documenti algorithm/Buhlmann.
