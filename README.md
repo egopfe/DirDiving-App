@@ -960,6 +960,7 @@ Restano obbligatori: build `xcodegen generate` / Xcode su macOS, test Apple Watc
 - Supporto reference-only per Air, Nitrox, Trimix, Heliox, travel/bottom/deco gas, GF Low/High, NDL tissue-state, gas switch e stop generati da ceiling.
 - Aggiunta verifica matematica dedicata: [`Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md).
 - Hardening successivo: validazione gas sull'intero segmento respirato, separazione TTS/runtime, gas-switch dwell modellato nei tessuti, seed di stato tessutale per profili ripetitivi/reference e cross-check esterno a tolleranza larga in [`Docs/DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md).
+- Re-audit statico post-implementazione: [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) — motore non più placeholder-only; P1/P2 residui prima di claim release-hard.
 - Validazione locale eseguita in modalita Windows static analysis; build `xcodegen`/`xcodebuild` e XCTest completi restano da eseguire su macOS.
 
 ## Aggiornamento documentazione 2026-05-20 (post v9 `d962117`)

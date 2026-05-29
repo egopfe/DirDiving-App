@@ -51,6 +51,7 @@ Pass documentale additivo su `main` tra `d1d48d5` -> `2edc46e` -> `9ee1912` -> `
 | [`DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md) | Aggiornato | Verifica matematica estesa + copertura casi edge |
 | [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md) | Aggiornato | Fixture/test aggiornati per regressioni numeriche |
 | [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md) | Aggiornato | Limiti planner/reference esplicitati post hardening |
+| [`DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) | **Nuovo** | Re-audit statico planner Buhlmann/gas iOS @ `76fce90`–`a7d2961`: motore ZHL-16C N2+He, golden fixtures, finding P1/P2 |
 | [`DIR_DIVING_Feature_Comparison.csv`](DIR_DIVING_Feature_Comparison.csv) | Aggiornato | Matrice feature aggiornata con stato iOS planner/Buhlmann |
 | [`INDEX.md`](INDEX.md) | Aggiornato | Indicizzazione completa file nuovi/aggiornati 2026-05-28 |
 
@@ -195,6 +196,12 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260520.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260520.md) | Pass R2–R4, baseline `db72dce` / WIP |
 | [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260523.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260523.md) | Pass readiness 100% UX |
 | [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260522.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260522.md) | Onboarding legale |
+
+**Audit planner / Buhlmann iOS MAIN (read-only, 2026-05-28):**
+
+| File | Uso |
+|------|-----|
+| [`DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) | Re-audit post motore ZHL-16C N2+He, golden fixtures e hardening gas: scope iOS-only, verdict, file ispezionati, finding P1/P2; complementa [`DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md) e [`../DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md`](../DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md) |
 
 ---
 

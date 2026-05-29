@@ -53,6 +53,7 @@
 | Watch algorithm final hardening | ✅ | Cap 40 sessioni su load/reload, temperatura plausibile, export vuoto bloccato, GPS fallback policy, conversioni centralizzate |
 | iOS algorithm release-hard pass | ✅ | Validator iOS, planner/gas safe states, import/export/sync/logbook math, route math, test `DIRDiving iOS Algorithm Tests` |
 | iOS Buhlmann ZHL-16C multigas engine | ✅ | Motore reference iOS-only con N2+He, GF, NDL tissue-state e soste generate; non certificato, da validare esternamente |
+| iOS Buhlmann re-audit 2026-05-28 | ✅ | Re-audit statico post golden fixtures: no P0; P1/P2 residui — [`DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) |
 | Docs / branch / PR alignment 2026-05-19 | ✅ | README, INDEX, roadmap, safety/release docs, matrix e branch strategy @ `92e639a` |
 | Docs / audit alignment 2026-05-25 | ✅ | README, INDEX, safety/release docs e matrix riallineati al MAIN corrente |
 | Docs / branch / PR alignment 2026-05-26 | ✅ | README, INDEX, roadmap, current audits, branch/PR reports riallineati alla baseline MAIN attuale |
@@ -69,7 +70,7 @@
 | P1 | QA reale Apple Watch Ultra per lifecycle automatico, profondita e limiti 35/38/40 m | Hardware QA |
 | P1 | QA pairing/sync bidirezionale su device | Hardware QA |
 | P1 | QA App Intents / Action Button su Watch fisico | Hardware QA |
-| P2 | Validazione matematica esterna del motore Buhlmann ZHL-16C + GF + He con fixture indipendenti prima di claim release piu forti | Planner QA — [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md) |
+| P2 | Validazione matematica esterna del motore Buhlmann ZHL-16C + GF + He con fixture indipendenti prima di claim release piu forti | Planner QA — [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md), re-audit [`DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) |
 | P2 | Verifica finale legale contenuti Terms/Privacy e copy App Review | Legal / App Store |
 | P2 | Convergenza documentazione `main` ↔ worktree storici (`main-iOS`, `codex/*`) senza merge runtime unsafe | Process |
 | P3 | GPX/UDDF export | Feature |
