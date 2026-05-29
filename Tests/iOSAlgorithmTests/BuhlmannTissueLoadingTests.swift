@@ -23,6 +23,6 @@ final class BuhlmannTissueLoadingTests: XCTestCase {
         let ascended = descended.loadedLinearDepth(fromDepthMeters: 50, toDepthMeters: 21, minutes: 4, gas: gas)
 
         XCTAssertTrue(ascended.compartments.allSatisfy { $0.nitrogenPressure.isFinite && $0.heliumPressure.isFinite })
-        XCTAssertGreaterThanOrEqual(ascended.ceiling(gf: 0.30).depthMeters, 0)
+        XCTAssertGreaterThanOrEqual(ascended.ceiling(gf: 0.30, environment: .seaLevelSaltWater).depthMeters, 0)
     }
 }

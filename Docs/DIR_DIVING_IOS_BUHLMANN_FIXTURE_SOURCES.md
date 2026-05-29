@@ -1,6 +1,6 @@
 # DIR DIVING iOS Buhlmann Fixture Sources
 
-Date: 2026-05-28
+Date: 2026-05-29 (reaudit hardening pass)
 
 This document records fixture assumptions used by `Tests/iOSAlgorithmTests/Fixtures/*.json`.
 
@@ -18,6 +18,8 @@ This document records fixture assumptions used by `Tests/iOSAlgorithmTests/Fixtu
 - GF comparison: `gf-30-70.json`, `gf-50-80.json`
 - Pressure context profiles: `altitude-profile.json`, `fresh-vs-salt-profile.json`
 - Repetitive planning profile: `repetitive-surface-interval.json`
+- Duplicate label / stable ID profile: `duplicate-gas-labels.json`
+- Oxygen exposure deco profile: `oxygen-exposure-deco.json`
 - Contingency profile: `lost-deco-gas.json`
 - Invalid/fail-closed fixtures:
   - `invalid-gas-composition.json`
@@ -28,8 +30,9 @@ This document records fixture assumptions used by `Tests/iOSAlgorithmTests/Fixtu
 ## Tolerance Policy
 
 - TTS/stop expectations are range-based, not exact decompression equivalence.
-- Default tolerance in fixtures is explicit (`toleranceMinutes`).
+- Default tolerance in fixtures is explicit (`toleranceMinutes`); parser rejects malformed/incomplete schema.
 - Invalid fixtures must fail closed with blocking model issues.
+- No fixture path may return fake `999` NDL or NaN/infinity outputs.
 
 ## External References
 

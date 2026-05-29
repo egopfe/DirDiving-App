@@ -14,21 +14,32 @@ enum PlannerService {
         guard validation.isValid else {
             return unavailablePlan(input: input, validation: validation)
         }
+        guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) else {
+            var invalidValidation = validation
+            invalidValidation.add(.invalidEnvironment, message: "Ambiente planner non valido.")
+            return unavailablePlan(input: input, validation: invalidValidation)
+        }
+
         var working = input
         working.syncLegacyGasesFromPlannerCylinders()
-        let bottom = PlannerGasSchedule.bottomGas(from: working)
-        let planningDepth = working.buhlmannPlanningDepthMeters
-        let buhlmann = BuhlmannPlanner.plan(depthMeters: planningDepth, bottomGas: bottom)
-        let enginePlan: BuhlmannEngineResult
+        let baseRequest = BuhlmannPlanner.makeRequest(input: working, environment: environment)
+        let request: BuhlmannPlanRequest
         if let snapshot = repetitiveSnapshot,
-           let environment = try? makeEnvironment(from: working),
-           let request = try? makeSeededRequest(input: working, snapshot: snapshot, surfaceIntervalMinutes: surfaceIntervalMinutes, environment: environment) {
-            enginePlan = BuhlmannEngine.plan(request)
+           let seeded = try? makeSeededRequest(
+               input: working,
+               baseRequest: baseRequest,
+               snapshot: snapshot,
+               surfaceIntervalMinutes: surfaceIntervalMinutes,
+               environment: environment
+           ) {
+            request = seeded
         } else {
-            enginePlan = BuhlmannPlanner.enginePlan(input: working)
+            request = baseRequest
         }
+
+        let enginePlan = BuhlmannEngine.plan(request)
         let analysis = GasPlanningService.analyze(input: working, enginePlan: enginePlan)
-        let stops = BuhlmannPlanner.decoStops(input: working)
+        let stops = BuhlmannPlanner.decoStops(from: enginePlan)
 
         let modIssues = PlannerMODValidator.validatePlannerCylinders(input: working)
         var states = mergedStates(
@@ -44,15 +55,19 @@ enum PlannerService {
             states = mergedStates(states, [.PPO2Exceeded])
         }
         let ttr = enginePlan.ttsMinutes
-        let segments = BuhlmannPlanner.runtimeSegments(input: working)
+        let segments = BuhlmannPlanner.runtimeSegments(from: enginePlan)
         let scheduleLines = PlannerGasSchedule.roleScheduleLines(input: working)
-        let gfComparisons = BuhlmannPlanner.gfComparisons(input: working)
-        let contingencies = GasPlanningService.contingencyPlans(input: working, baseAnalysis: analysis, baseTTS: ttr)
+        let gfComparisons = BuhlmannPlanner.gfComparisons(baseRequest: {
+            var seededBase = baseRequest
+            seededBase.initialTissueState = request.initialTissueState
+            return seededBase
+        }())
+        let contingencies = GasPlanningService.contingencyPlans(input: working, baseAnalysis: analysis, baseTTS: ttr, environment: environment)
         let teamMatches = GasPlanningService.teamGasMatches(input: working, minimumGasLiters: analysis.rockBottomLiters)
         var briefing = GasPlanningService.briefingLines(input: working, analysis: analysis, tts: ttr, stops: stops)
         briefing.insert(contentsOf: scheduleLines, at: min(1, briefing.count))
         return DivePlanResult(
-            ndlMinutes: buhlmann.ndlMinutes,
+            ndlMinutes: enginePlan.ndlMinutes ?? 0,
             ttrMinutes: ttr,
             decoStops: stops,
             cnsPercent: analysis.cnsPercent,
@@ -116,24 +131,15 @@ enum PlannerService {
         return merged
     }
 
-    private static func makeEnvironment(from input: GasPlanInput) throws -> PlannerEnvironment {
-        switch PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) {
-        case .success(let environment):
-            return environment
-        case .failure:
-            throw NSError(domain: "PlannerEnvironment", code: 3)
-        }
-    }
-
     private static func makeSeededRequest(
         input: GasPlanInput,
+        baseRequest: BuhlmannPlanRequest,
         snapshot: TissueSnapshot,
         surfaceIntervalMinutes: Double,
         environment: PlannerEnvironment
     ) throws -> BuhlmannPlanRequest {
-        let base = BuhlmannPlanner.makeRequest(input: input)
         switch RepetitiveDivePlannerService.seedRequest(
-            base,
+            baseRequest,
             snapshot: snapshot,
             surfaceIntervalMinutes: surfaceIntervalMinutes,
             environment: environment

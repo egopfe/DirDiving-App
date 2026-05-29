@@ -1,6 +1,6 @@
 # DIR DIVING iOS Buhlmann Validation Fixtures
 
-Date: 2026-05-28  
+Date: 2026-05-29 (reaudit hardening pass)  
 Scope: iOS Companion MAIN only
 
 ## Test Target
@@ -34,7 +34,22 @@ On Windows, Xcode tooling is unavailable; validation is limited to static code i
 | `BuhlmannGoldenFixtureTests.swift` | golden fixture parser + deterministic fixture execution and range validation |
 | `PlannerRegressionFixtureTests.swift` | invalid-fixture fail-closed checks and GF conservatism regression |
 | `BuhlmannNumericalRobustnessTests.swift` | invalid profile values, zero depth/time, invalid segments, finite outputs, unit round trips |
-| `BuhlmannReleaseHardeningTests.swift` | external reference envelopes, TTS/runtime split, residual tissue seed, full segment gas-operability checks |
+| `BuhlmannReauditFixTests.swift` | 2026-05-28 reaudit fixes: environment NDL/ceiling, repetitive canonical result, duplicate labels, rock-bottom, surface interval, oxygen exposure, GF seeded tissue |
+| `BuhlmannReleaseHardeningTests.swift` | external reference envelopes, TTS/runtime split, residual tissue seed, full segment gas-operability checks, travel-gas ascent waypoints |
+
+## Extended Golden Fixture Schema (2026-05-29)
+
+JSON fixtures under `Tests/iOSAlgorithmTests/Fixtures/` may include:
+
+- `environment` (`altitudeMeters`, `salinity`)
+- `priorDive` (depth, bottom time, surface interval) for repetitive seeding
+- `expectedTTSRangeMinutes`, `expectedNDLRangeMinutes`, `expectedFirstStopDepthMeters`
+- `gasMixId` / `cylinderId` on fixture gases for stable identity tests
+- `toleranceMinutes` (required; malformed fixtures without it are rejected)
+
+Additional profiles: `duplicate-gas-labels.json`, `oxygen-exposure-deco.json`.
+
+Fixture JSON files are bundled as test resources via `project.yml` (`Tests/iOSAlgorithmTests/Fixtures`).
 
 ## Required Fixture Profiles
 

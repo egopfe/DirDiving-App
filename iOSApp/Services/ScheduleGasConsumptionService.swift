@@ -8,6 +8,7 @@ enum GasUsageWarningState: Hashable {
 }
 
 struct GasCylinderAllocation: Hashable {
+    let cylinderId: UUID
     let gasLabel: String
     let role: GasRole
     let cylinderVolumeLiters: Double
@@ -20,7 +21,9 @@ struct GasCylinderAllocation: Hashable {
 
 struct GasConsumptionLedger: Hashable {
     struct Entry: Hashable {
+        let cylinderId: UUID
         let gasLabel: String
+        let role: GasRole
         let consumedLiters: Double
         let remainingLiters: Double
         let remainingBar: Double
@@ -30,12 +33,24 @@ struct GasConsumptionLedger: Hashable {
     let totalConsumedLiters: Double
     let totalRemainingLiters: Double
     let warnings: [GasUsageWarningState]
+
+    func entry(for cylinderId: UUID) -> Entry? {
+        entries.first { $0.cylinderId == cylinderId }
+    }
+
+    func bottomGasEntry(from input: GasPlanInput) -> Entry? {
+        if let bottomId = input.plannerCylinders.first(where: { $0.role == .bottom })?.id,
+           let entry = entry(for: bottomId) {
+            return entry
+        }
+        return entries.first(where: { $0.role == .bottom }) ?? entries.first
+    }
 }
 
 enum ScheduleGasConsumptionService {
     enum Error: Swift.Error, Hashable {
         case invalidSegment
-        case missingCylinderAllocation(String)
+        case missingCylinderAllocation(UUID)
         case invalidCylinder
     }
 
@@ -51,7 +66,7 @@ enum ScheduleGasConsumptionService {
         let allocations = makeAllocations(input: input)
         guard !allocations.isEmpty else { return .failure(.invalidCylinder) }
 
-        var consumedByGas: [String: Double] = [:]
+        var consumedByCylinder: [UUID: Double] = [:]
         for segment in enginePlan.segments {
             guard segment.minutes.isFinite, segment.minutes >= 0, segment.depthMeters.isFinite else {
                 return .failure(.invalidSegment)
@@ -64,17 +79,19 @@ enum ScheduleGasConsumptionService {
             guard consumed.isFinite, consumed >= 0 else {
                 return .failure(.invalidSegment)
             }
-            consumedByGas[segment.gas.label, default: 0] += consumed
+            let key = segment.gas.allocationKey
+            consumedByCylinder[key, default: 0] += consumed
         }
 
         var entries: [GasConsumptionLedger.Entry] = []
         var warnings: [GasUsageWarningState] = []
         var totalConsumed = 0.0
         var totalRemaining = 0.0
+        let rockBottom = rockBottomLiters(input: input, environment: environment)
 
-        for (gas, consumed) in consumedByGas {
-            guard let allocation = allocations[gas] else {
-                return .failure(.missingCylinderAllocation(gas))
+        for (cylinderId, consumed) in consumedByCylinder {
+            guard let allocation = allocations[cylinderId] else {
+                return .failure(.missingCylinderAllocation(cylinderId))
             }
             guard allocation.cylinderVolumeLiters.isFinite, allocation.cylinderVolumeLiters > 0 else {
                 return .failure(.invalidCylinder)
@@ -87,18 +104,20 @@ enum ScheduleGasConsumptionService {
             }
 
             if remainingLiters < allocation.reserveLiters {
-                warnings.append(.reserveBreached(gas: gas))
+                warnings.append(.reserveBreached(gas: allocation.gasLabel))
             }
-            if remainingLiters < rockBottomLiters(input: input) {
-                warnings.append(.minimumGasBreached(gas: gas))
+            if remainingLiters < rockBottom {
+                warnings.append(.minimumGasBreached(gas: allocation.gasLabel))
             }
             if remainingLiters - (consumed * 0.3) < allocation.reserveLiters {
-                warnings.append(.lostGasContingencyFailed(gas: gas))
+                warnings.append(.lostGasContingencyFailed(gas: allocation.gasLabel))
             }
 
             entries.append(
                 .init(
-                    gasLabel: gas,
+                    cylinderId: cylinderId,
+                    gasLabel: allocation.gasLabel,
+                    role: allocation.role,
                     consumedLiters: consumed,
                     remainingLiters: remainingLiters,
                     remainingBar: remainingBar
@@ -110,7 +129,12 @@ enum ScheduleGasConsumptionService {
 
         return .success(
             GasConsumptionLedger(
-                entries: entries.sorted { $0.gasLabel < $1.gasLabel },
+                entries: entries.sorted { lhs, rhs in
+                    if lhs.role.sortOrder != rhs.role.sortOrder {
+                        return lhs.role.sortOrder < rhs.role.sortOrder
+                    }
+                    return lhs.gasLabel < rhs.gasLabel
+                },
                 totalConsumedLiters: totalConsumed,
                 totalRemainingLiters: totalRemaining,
                 warnings: warnings
@@ -118,7 +142,7 @@ enum ScheduleGasConsumptionService {
         )
     }
 
-    private static func makeAllocations(input: GasPlanInput) -> [String: GasCylinderAllocation] {
+    private static func makeAllocations(input: GasPlanInput) -> [UUID: GasCylinderAllocation] {
         let cylinders = input.plannerCylinders.isEmpty ? [
             PlannerCylinderEntry(
                 role: .bottom,
@@ -130,25 +154,39 @@ enum ScheduleGasConsumptionService {
             )
         ] : input.plannerCylinders
 
-        return Dictionary(uniqueKeysWithValues: cylinders.map { entry in
+        var result: [UUID: GasCylinderAllocation] = [:]
+        for entry in cylinders {
             let cylinder = entry.cylinder
-            return (
-                entry.gas.label,
-                GasCylinderAllocation(
-                    gasLabel: entry.gas.label,
-                    role: entry.role,
-                    cylinderVolumeLiters: cylinder.volumeLiters,
-                    startPressureBar: cylinder.startPressureBar,
-                    reservePressureBar: cylinder.reservePressureBar
-                )
+            result[entry.id] = GasCylinderAllocation(
+                cylinderId: entry.id,
+                gasLabel: entry.gas.label,
+                role: entry.role,
+                cylinderVolumeLiters: cylinder.volumeLiters,
+                startPressureBar: cylinder.startPressureBar,
+                reservePressureBar: cylinder.reservePressureBar
             )
-        })
+        }
+        return result
     }
 
-    private static func rockBottomLiters(input: GasPlanInput) -> Double {
-        let averageAscentATA = IOSUnitConversions.ambientPressureBar(depthMeters: input.plannedDepthMeters / 2.0)
+    static func rockBottomLiters(input: GasPlanInput, environment: PlannerEnvironment) -> Double {
+        let averageAscentDepth = input.plannedDepthMeters / 2.0
+        let averageAscentATA = AmbientPressureModel.ambientPressureBar(depthMeters: averageAscentDepth, environment: environment) ?? environment.surfacePressureBar
         let ascentMinutes = max(3, input.plannedDepthMeters / 9.0)
         let emergencyMinutes = 1.0 + ascentMinutes + (input.plannedDepthMeters > 10 ? 3.0 : 0.0)
-        return input.emergencySacLitersPerMinute * max(1, input.teamSize) * averageAscentATA * emergencyMinutes
+        let value = input.emergencySacLitersPerMinute * max(1, input.teamSize) * averageAscentATA * emergencyMinutes
+        guard value.isFinite, value >= 0 else { return 0 }
+        return value
+    }
+}
+
+private extension GasRole {
+    var sortOrder: Int {
+        switch self {
+        case .bottom: return 0
+        case .travel: return 1
+        case .deco: return 2
+        case .bailout: return 3
+        }
     }
 }

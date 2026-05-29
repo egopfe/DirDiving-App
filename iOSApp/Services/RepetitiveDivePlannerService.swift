@@ -16,7 +16,7 @@ struct SurfaceIntervalModel: Hashable {
     func offGas(_ state: BuhlmannTissueState, environment: PlannerEnvironment) -> BuhlmannTissueState? {
         guard minutes.isFinite, minutes >= 0 else { return nil }
         guard let air = BuhlmannGas.makeAir(environment: environment) else { return nil }
-        return state.loadedConstantDepth(depthMeters: 0, minutes: minutes, gas: air)
+        return state.loadedConstantDepth(depthMeters: 0, minutes: minutes, gas: air, environment: environment)
     }
 }
 

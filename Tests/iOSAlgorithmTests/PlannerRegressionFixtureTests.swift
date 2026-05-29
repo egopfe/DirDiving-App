@@ -6,7 +6,7 @@ final class PlannerRegressionFixtureTests: XCTestCase {
         let invalid = fixtures.filter { !$0.isValid }
         XCTAssertFalse(invalid.isEmpty)
         for fixture in invalid {
-            let result = BuhlmannEngine.plan(fixture.makeRequest())
+            let result = BuhlmannEngine.plan(try fixture.makeRequest())
             XCTAssertTrue(result.hasBlockingIssues, "Fixture \(fixture.id) should fail closed")
             XCTAssertEqual(result.modelState, .invalidInput, "Fixture \(fixture.id) must return invalid input state")
         }
@@ -19,8 +19,8 @@ final class PlannerRegressionFixtureTests: XCTestCase {
             XCTFail("GF fixtures missing")
             return
         }
-        let conservativePlan = BuhlmannEngine.plan(conservative.makeRequest())
-        let aggressivePlan = BuhlmannEngine.plan(aggressive.makeRequest())
+        let conservativePlan = BuhlmannEngine.plan(try conservative.makeRequest())
+        let aggressivePlan = BuhlmannEngine.plan(try aggressive.makeRequest())
         XCTAssertGreaterThanOrEqual(conservativePlan.ttsMinutes, aggressivePlan.ttsMinutes)
     }
 }

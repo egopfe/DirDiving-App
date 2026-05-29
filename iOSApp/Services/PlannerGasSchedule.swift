@@ -72,7 +72,7 @@ enum PlannerGasSchedule {
     static func makeDecoStop(depthMeters: Double, minutes: Int, gas: GasMix) -> DecoStop {
         let actualPPO2 = GasPlanningService.ppO2(gas: gas, depthMeters: depthMeters)
         let states: [PlannerResultState] = actualPPO2 > gas.maxPPO2 ? [.PPO2Exceeded] : []
-        DecoStop(
+        return DecoStop(
             depthMeters: depthMeters,
             minutes: minutes,
             gas: gas.label,

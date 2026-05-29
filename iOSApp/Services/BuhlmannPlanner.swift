@@ -1,15 +1,21 @@
 import Foundation
 
 enum BuhlmannPlanner {
-    static func plan(depthMeters: Double, bottomGas: GasMix) -> BuhlmannPlanResult {
-        plan(depthMeters: depthMeters, o2Fraction: bottomGas.oxygen, heliumFraction: bottomGas.helium, maxPPO2: bottomGas.maxPPO2)
+    static func plan(depthMeters: Double, bottomGas: GasMix, environment: PlannerEnvironment = .seaLevelSaltWater) -> BuhlmannPlanResult {
+        plan(depthMeters: depthMeters, o2Fraction: bottomGas.oxygen, heliumFraction: bottomGas.helium, maxPPO2: bottomGas.maxPPO2, environment: environment)
     }
 
-    static func plan(depthMeters: Double, o2Fraction: Double, heliumFraction: Double = 0) -> BuhlmannPlanResult {
-        plan(depthMeters: depthMeters, o2Fraction: o2Fraction, heliumFraction: heliumFraction, maxPPO2: 1.4)
+    static func plan(depthMeters: Double, o2Fraction: Double, heliumFraction: Double = 0, environment: PlannerEnvironment = .seaLevelSaltWater) -> BuhlmannPlanResult {
+        plan(depthMeters: depthMeters, o2Fraction: o2Fraction, heliumFraction: heliumFraction, maxPPO2: 1.4, environment: environment)
     }
 
-    static func plan(depthMeters: Double, o2Fraction: Double, heliumFraction: Double = 0, maxPPO2: Double) -> BuhlmannPlanResult {
+    static func plan(
+        depthMeters: Double,
+        o2Fraction: Double,
+        heliumFraction: Double = 0,
+        maxPPO2: Double,
+        environment: PlannerEnvironment = .seaLevelSaltWater
+    ) -> BuhlmannPlanResult {
         guard depthMeters.isFinite,
               depthMeters >= IOSAlgorithmConfiguration.minPlannerDepthMeters,
               depthMeters <= IOSAlgorithmConfiguration.maxPlannerDepthMeters else {
@@ -53,7 +59,9 @@ enum BuhlmannPlanner {
             travelGases: [],
             decoGases: [],
             gfLow: 30,
-            gfHigh: 85
+            gfHigh: 85,
+            initialTissueState: .airSaturated(surfacePressureBar: environment.surfacePressureBar),
+            plannerEnvironment: environment
         )
         guard BuhlmannEngine.validate(previewRequest).isEmpty else {
             return BuhlmannPlanResult(
@@ -68,29 +76,53 @@ enum BuhlmannPlanner {
             )
         }
 
-        let ndlValue = BuhlmannEngine.noDecompressionLimit(depthMeters: depthMeters, gas: gas, gfHigh: 85) ?? 0
+        let ndlValue = BuhlmannEngine.noDecompressionLimit(
+            depthMeters: depthMeters,
+            gas: gas,
+            gfHigh: 85,
+            plannerEnvironment: environment
+        ) ?? 0
         return BuhlmannPlanResult(
             depthMeters: depthMeters,
             gasO2Fraction: o2Fraction,
             heliumFraction: heliumFraction,
             nitrogenFraction: max(0, gas.nitrogenFraction),
             ndlMinutes: ndlValue,
-            curve: ndlCurve(for: gas),
+            curve: ndlCurve(for: gas, environment: environment),
             warning: "Buhlmann ZHL-16C N2+He multigas reference-only: non e un piano decompressivo certificato.",
             modelState: .validReference
         )
     }
 
     static func enginePlan(input: GasPlanInput) -> BuhlmannEngineResult {
-        BuhlmannEngine.plan(makeRequest(input: input))
+        guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) else {
+            return BuhlmannEngineResult(
+                ndlMinutes: nil,
+                ttsMinutes: 0,
+                totalRuntimeMinutes: 0,
+                descentMinutes: 0,
+                bottomMinutes: 0,
+                gasSwitchMinutes: 0,
+                finalTissueState: nil,
+                stops: [],
+                segments: [],
+                issues: [.invalidProfile("Invalid planner environment.")],
+                modelState: .invalidInput
+            )
+        }
+        return BuhlmannEngine.plan(makeRequest(input: input, environment: environment))
+    }
+
+    static func decoStops(from enginePlan: BuhlmannEngineResult) -> [DecoStop] {
+        enginePlan.stops.map(makeDecoStop)
     }
 
     static func decoStops(input: GasPlanInput) -> [DecoStop] {
-        enginePlan(input: input).stops.map(makeDecoStop)
+        decoStops(from: enginePlan(input: input))
     }
 
-    static func runtimeSegments(input: GasPlanInput) -> [DivePlanSegment] {
-        enginePlan(input: input).segments.map { segment in
+    static func runtimeSegments(from enginePlan: BuhlmannEngineResult) -> [DivePlanSegment] {
+        enginePlan.segments.map { segment in
             DivePlanSegment(
                 kind: segment.kind,
                 depthMeters: segment.depthMeters,
@@ -101,18 +133,22 @@ enum BuhlmannPlanner {
         }
     }
 
-    static func gfComparisons(input: GasPlanInput) -> [GFComparison] {
+    static func runtimeSegments(input: GasPlanInput) -> [DivePlanSegment] {
+        runtimeSegments(from: enginePlan(input: input))
+    }
+
+    static func gfComparisons(baseRequest: BuhlmannPlanRequest) -> [GFComparison] {
         let presets: [(String, Double, Double)] = [
             ("20/80", 20, 80),
             ("30/70", 30, 70),
             ("40/85", 40, 85),
-            ("CUSTOM", input.gfLow, input.gfHigh)
+            ("CUSTOM", baseRequest.gfLow, baseRequest.gfHigh)
         ]
         return presets.map { label, low, high in
-            var copy = input
+            var copy = baseRequest
             copy.gfLow = low
             copy.gfHigh = high
-            let result = enginePlan(input: copy)
+            let result = BuhlmannEngine.plan(copy)
             let note = high <= 70 ? "Conservativo" : "Piu aggressivo"
             return GFComparison(
                 label: label,
@@ -125,7 +161,18 @@ enum BuhlmannPlanner {
         }
     }
 
-    static func ndl(depthMeters: Double, nitrogenFraction: Double) -> Double? {
+    static func gfComparisons(input: GasPlanInput) -> [GFComparison] {
+        guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) else {
+            return []
+        }
+        return gfComparisons(baseRequest: makeRequest(input: input, environment: environment))
+    }
+
+    static func ndl(
+        depthMeters: Double,
+        nitrogenFraction: Double,
+        environment: PlannerEnvironment = .seaLevelSaltWater
+    ) -> Double? {
         guard depthMeters.isFinite,
               nitrogenFraction.isFinite,
               depthMeters >= IOSAlgorithmConfiguration.minPlannerDepthMeters,
@@ -141,7 +188,13 @@ enum BuhlmannPlanner {
             maxPPO2Bar: 1.6,
             switchDepthMeters: depthMeters
         )
-        return BuhlmannEngine.noDecompressionLimit(depthMeters: depthMeters, gas: gas, gfHigh: 85)
+        return BuhlmannEngine.noDecompressionLimit(
+            depthMeters: depthMeters,
+            gas: gas,
+            gfHigh: 85,
+            initialTissueState: .airSaturated(surfacePressureBar: environment.surfacePressureBar),
+            plannerEnvironment: environment
+        )
     }
 
     static func plannerStates(from issues: [BuhlmannPlanIssue]) -> [PlannerResultState] {
@@ -168,28 +221,39 @@ enum BuhlmannPlanner {
     }
 
     static func makeRequest(input: GasPlanInput) -> BuhlmannPlanRequest {
+        guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) else {
+            return BuhlmannPlanRequest(
+                maxDepthMeters: input.plannedDepthMeters,
+                bottomMinutes: input.plannedBottomMinutes,
+                bottomGas: BuhlmannGas(gas: input.bottomGas, role: .bottom, switchDepthMeters: input.plannedDepthMeters),
+                travelGases: [],
+                decoGases: [],
+                gfLow: input.gfLow,
+                gfHigh: input.gfHigh,
+                initialTissueState: .airSaturated(),
+                plannerEnvironment: .seaLevelSaltWater
+            )
+        }
+        return makeRequest(input: input, environment: environment)
+    }
+
+    static func makeRequest(input: GasPlanInput, environment: PlannerEnvironment) -> BuhlmannPlanRequest {
         var working = input
         working.syncLegacyGasesFromPlannerCylinders()
-        let plannerEnvironment: PlannerEnvironment
-        switch PlannerEnvironment.make(altitudeMeters: working.altitudeMeters, salinity: working.salinity) {
-        case .success(let environment):
-            plannerEnvironment = environment
-        case .failure:
-            plannerEnvironment = .seaLevelSaltWater
-        }
         let bottomEntry = working.plannerCylinders.first(where: { $0.role == .bottom })
         let bottomGas = BuhlmannGas(
             gas: bottomEntry?.gas ?? working.bottomGas,
             role: .bottom,
-            switchDepthMeters: working.plannedDepthMeters
+            switchDepthMeters: working.plannedDepthMeters,
+            cylinderId: bottomEntry?.id
         )
         let travelGases = working.plannerCylinders
             .filter { $0.role == .travel }
-            .map { BuhlmannGas(gas: $0.gas, role: .travel, switchDepthMeters: $0.switchDepthMeters) }
+            .map { BuhlmannGas(gas: $0.gas, role: .travel, switchDepthMeters: $0.switchDepthMeters, cylinderId: $0.id) }
             .sorted { $0.switchDepthMeters < $1.switchDepthMeters }
         let decoGases = working.plannerCylinders
             .filter { $0.role == .deco }
-            .map { BuhlmannGas(gas: $0.gas, role: .deco, switchDepthMeters: $0.switchDepthMeters) }
+            .map { BuhlmannGas(gas: $0.gas, role: .deco, switchDepthMeters: $0.switchDepthMeters, cylinderId: $0.id) }
             .sorted { $0.switchDepthMeters > $1.switchDepthMeters }
         return BuhlmannPlanRequest(
             maxDepthMeters: working.plannedDepthMeters,
@@ -199,14 +263,19 @@ enum BuhlmannPlanner {
             decoGases: decoGases,
             gfLow: working.gfLow,
             gfHigh: working.gfHigh,
-            initialTissueState: BuhlmannTissueState.airSaturated(surfacePressureBar: plannerEnvironment.surfacePressureBar),
-            plannerEnvironment: plannerEnvironment
+            initialTissueState: BuhlmannTissueState.airSaturated(surfacePressureBar: environment.surfacePressureBar),
+            plannerEnvironment: environment
         )
     }
 
-    private static func ndlCurve(for gas: BuhlmannGas) -> [NDLPoint] {
+    private static func ndlCurve(for gas: BuhlmannGas, environment: PlannerEnvironment) -> [NDLPoint] {
         stride(from: 6.0, through: 60.0, by: 3.0).map { depth in
-            let ndlValue = BuhlmannEngine.noDecompressionLimit(depthMeters: depth, gas: gas, gfHigh: 85) ?? 0
+            let ndlValue = BuhlmannEngine.noDecompressionLimit(
+                depthMeters: depth,
+                gas: gas,
+                gfHigh: 85,
+                plannerEnvironment: environment
+            ) ?? 0
             let group: String
             switch depth {
             case ..<18: group = "1-4"
@@ -218,7 +287,7 @@ enum BuhlmannPlanner {
         }
     }
 
-    private static func makeDecoStop(_ stop: BuhlmannDecompressionStop) -> DecoStop {
+    static func makeDecoStop(_ stop: BuhlmannDecompressionStop) -> DecoStop {
         let states: [PlannerResultState] = stop.ppO2 > stop.maxPPO2 ? [.PPO2Exceeded] : []
         return DecoStop(
             depthMeters: stop.depthMeters,

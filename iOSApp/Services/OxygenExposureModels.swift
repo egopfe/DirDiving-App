@@ -1,6 +1,6 @@
 import Foundation
 
-enum OxygenExposureWarningState: Hashable {
+enum OxygenExposureWarningState: Hashable, Error {
     case elevatedCNS(Double)
     case elevatedOTU(Double)
     case invalidExposureInput

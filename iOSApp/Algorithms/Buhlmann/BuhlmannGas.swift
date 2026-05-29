@@ -1,12 +1,16 @@
 import Foundation
 
 struct BuhlmannGas: Hashable {
+    let gasMixId: UUID
+    let cylinderId: UUID?
     let name: String
     let role: GasRole
     let oxygenFraction: Double
     let heliumFraction: Double
     let maxPPO2Bar: Double
     let switchDepthMeters: Double
+
+    var allocationKey: UUID { cylinderId ?? gasMixId }
 
     var nitrogenFraction: Double {
         1.0 - oxygenFraction - heliumFraction
@@ -25,7 +29,18 @@ struct BuhlmannGas: Hashable {
         return "AIR"
     }
 
-    init(name: String, role: GasRole, oxygenFraction: Double, heliumFraction: Double, maxPPO2Bar: Double, switchDepthMeters: Double) {
+    init(
+        name: String,
+        role: GasRole,
+        oxygenFraction: Double,
+        heliumFraction: Double,
+        maxPPO2Bar: Double,
+        switchDepthMeters: Double,
+        gasMixId: UUID = UUID(),
+        cylinderId: UUID? = nil
+    ) {
+        self.gasMixId = gasMixId
+        self.cylinderId = cylinderId
         self.name = name
         self.role = role
         self.oxygenFraction = oxygenFraction
@@ -34,14 +49,16 @@ struct BuhlmannGas: Hashable {
         self.switchDepthMeters = switchDepthMeters
     }
 
-    init(gas: GasMix, role: GasRole? = nil, switchDepthMeters: Double = 0) {
+    init(gas: GasMix, role: GasRole? = nil, switchDepthMeters: Double = 0, cylinderId: UUID? = nil) {
         self.init(
             name: gas.name,
             role: role ?? gas.role,
             oxygenFraction: gas.oxygen,
             heliumFraction: gas.helium,
             maxPPO2Bar: gas.maxPPO2,
-            switchDepthMeters: switchDepthMeters
+            switchDepthMeters: switchDepthMeters,
+            gasMixId: gas.id,
+            cylinderId: cylinderId
         )
     }
 

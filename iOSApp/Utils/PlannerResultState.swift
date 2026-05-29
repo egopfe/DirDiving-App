@@ -80,6 +80,7 @@ struct PlannerValidationResult: Hashable {
             && !states.contains(.unsupportedDepth)
             && !states.contains(.unsupportedGas)
             && !states.contains(.unavailable)
+            && !states.contains(.invalidEnvironment)
     }
 
     mutating func add(_ state: PlannerResultState, message: String? = nil) {

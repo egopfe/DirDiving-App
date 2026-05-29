@@ -47,9 +47,15 @@ enum PlannerInputValidator {
             || input.gfLow >= input.gfHigh {
             result.add(.invalidInput, message: "Gradient factor non validi.")
         }
-        if !input.altitudeMeters.isFinite {
-            result.add(.invalidInput, message: "Altitudine non valida.")
+        if case .failure(let error) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) {
+            switch error {
+            case .invalidAltitude:
+                result.add(.invalidEnvironment, message: "Altitudine fuori dal range valido (-500–4500 m).")
+            case .invalidSalinity:
+                result.add(.invalidEnvironment, message: "Salinita non valida.")
+            }
         }
+
         if !input.densityWarningLimit.isFinite
             || !input.densityDangerLimit.isFinite
             || input.densityWarningLimit <= 0
@@ -57,8 +63,8 @@ enum PlannerInputValidator {
             result.add(.invalidInput, message: "Limiti densita gas non validi.")
         }
 
-        for cylinder in input.plannerCylinders {
-            result.merge(validate(cylinder: cylinder))
+        for entry in input.plannerCylinders {
+            result.merge(validate(cylinder: entry.cylinder))
         }
         result.merge(validate(cylinder: input.primaryCylinder))
         for member in input.teamMembers {
@@ -70,10 +76,6 @@ enum PlannerInputValidator {
 
         for gas in input.allGases {
             result.merge(GasMixValidator.validate(gas))
-        }
-
-        if input.salinity != .salt || abs(input.altitudeMeters) > .ulpOfOne {
-            result.add(.simplifiedReferenceOnly, message: "Salinita e altitudine sono memorizzate ma non modificano il modello reference attuale.")
         }
 
         if result.states.isEmpty {

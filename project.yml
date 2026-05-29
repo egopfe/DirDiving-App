@@ -151,6 +151,9 @@ targets:
       - iOSApp/Utils/PlannerInputValidator.swift
       - iOSApp/Utils/PlannerResultState.swift
       - iOSApp/Utils/WatchSyncNotifications.swift
+    resources:
+      - path: Tests/iOSAlgorithmTests/Fixtures
+        type: folder
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios.algorithmtests

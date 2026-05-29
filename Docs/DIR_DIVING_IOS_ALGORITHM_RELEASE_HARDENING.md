@@ -1,6 +1,6 @@
 # DIR DIVING iOS Algorithm Release Hardening
 
-Date: 2026-05-28
+Date: 2026-05-29 (reaudit hardening pass)
 Scope: iOS Companion MAIN branch only
 
 DIR DIVING iOS remains a non-certified informational diving companion. Planner, gas, NDL, CNS/OTU, END/EAD, route, import, export, sync, and Buhlmann outputs must not be used as certified decompression or life-support advice.
@@ -16,6 +16,24 @@ Additional hardening in this pass:
 - repetitive planning reference seed via tissue snapshots and surface-interval off-gassing
 - segment-based CNS/OTU accumulation with typed warning states
 - golden/regression fixture framework (`Tests/iOSAlgorithmTests/Fixtures/*.json`)
+
+## 2026-05-28 Reaudit Fixes (P1–P3)
+
+| ID | Fix |
+|---|---|
+| P1.1 | Environment-aware ceiling depth conversion via `AmbientPressureModel` |
+| P1.2 | `PlannerEnvironment` threaded through all NDL and GF comparison paths |
+| P1.3 | Single canonical `BuhlmannEngineResult` per `PlannerService.makePlan` |
+| P1.4 | Cylinder UUID ledger; duplicate gas labels no longer crash |
+| P2.1 | Per-cylinder gas ledger + bottom-gas remaining pressure summary |
+| P2.2 | Rock-bottom/reserve through `PlannerEnvironment` |
+| P2.3 | Environment validation fail-closed; removed misleading “not applied” messaging |
+| P2.4 | Surface-interval off-gassing uses `PlannerEnvironment` |
+| P3.1 | Extended golden fixture schema + new altitude/fresh/repetitive/trimix/oxygen/duplicate-label fixtures |
+| P3.2 | `OxygenExposureModel` CNS/OTU validation tests and fail-closed invalid input |
+| P3.3 | Stable `gasMixId` / `cylinderId` on `BuhlmannGas`; labels display-only |
+
+macOS validation (2026-05-29): `DIRDiving iOS` build succeeded; `DIRDiving iOS Algorithm Tests` — **TEST SUCCEEDED**.
 
 ## Buhlmann Engine Status
 

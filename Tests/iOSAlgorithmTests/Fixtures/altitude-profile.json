@@ -1,1 +1,15 @@
-{"id":"altitude-profile","isValid":true,"depthMeters":30,"bottomMinutes":18,"gfLow":30,"gfHigh":70,"gases":[{"name":"Air","role":"bottom","oxygen":0.21,"helium":0.0,"maxPPO2":1.4,"switchDepthMeters":30}],"expectedTTSRangeMinutes":{"min":22,"max":75},"toleranceMinutes":20}
+{
+  "id": "altitude-profile",
+  "isValid": true,
+  "depthMeters": 30,
+  "bottomMinutes": 18,
+  "gfLow": 30,
+  "gfHigh": 70,
+  "environment": { "altitudeMeters": 1500, "salinity": "salt" },
+  "gases": [
+    { "name": "Air", "role": "bottom", "oxygen": 0.21, "helium": 0.0, "maxPPO2": 1.4, "switchDepthMeters": 30 }
+  ],
+  "expectedTTSRangeMinutes": { "min": 22, "max": 75 },
+  "expectedNDLRangeMinutes": { "min": 8, "max": 35 },
+  "toleranceMinutes": 20
+}

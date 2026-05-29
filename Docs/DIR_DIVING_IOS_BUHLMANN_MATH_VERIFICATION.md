@@ -1,6 +1,6 @@
 # DIR DIVING iOS Buhlmann Math Verification
 
-Date: 2026-05-28  
+Date: 2026-05-29 (reaudit hardening pass)  
 Scope: iOS Companion MAIN only
 
 DIR DIVING iOS remains a non-certified informational planning reference. This verification documents the mathematical model used by the iOS-only Buhlmann ZHL-16C multigas engine and the static Windows verification performed in this repository pass.
@@ -33,10 +33,11 @@ Implemented in `BuhlmannGas.inspiredPressure(depthMeters:inert:)`.
 Formula:
 
 ```text
-ambientPressureBar = surfacePressureBar + max(0, depthMeters) / 10
+ambientPressureBar = surfacePressureBar + (waterDensity * g * depthMeters) / 100000
 dryPressureBar = max(0, ambientPressureBar - waterVaporPressureBar)
 inspiredN2Bar = dryPressureBar * nitrogenFraction
 inspiredHeBar = dryPressureBar * heliumFraction
+ceilingDepthMeters = AmbientPressureModel.depthMeters(ambientPressureBar: toleratedPamb, environment: plannerEnvironment)
 ```
 
 Assumptions:
@@ -98,7 +99,7 @@ Covered by `BuhlmannConstantsTests` and `BuhlmannNumericalRobustnessTests`.
 
 ## 5. Ceiling And M-Value Math
 
-Implemented in `BuhlmannTissueState.ceiling(gf:)`.
+Implemented in `BuhlmannTissueState.ceiling(gf:environment:)`.
 
 For each compartment:
 
@@ -106,17 +107,17 @@ For each compartment:
 M(Pamb) = a + Pamb / b
 toleratedTissue = Pamb + GF * (M(Pamb) - Pamb)
 Pamb = (Ptissue - GF * a) / (1 + GF * (1 / b - 1))
-ceilingDepth = max(0, (Pamb - surfacePressureBar) * 10)
+ceilingDepth = AmbientPressureModel.depthMeters(ambientPressureBar: toleratedPamb, environment: plannerEnvironment)
 ```
 
 Behavior:
 
 - The controlling compartment is the one producing the deepest ceiling.
-- Ceilings are clamped to nonnegative depths.
+- Ceilings are clamped to nonnegative depths and use environment-aware depth conversion (altitude + salinity).
 - First stop depth is derived from the GF Low ceiling and rounded up to the configured 3 m interval.
 - Stop schedules are generated from ceilings, not static templates.
 
-Covered by `BuhlmannCeilingTests` and `BuhlmannReferenceFixtureTests`.
+Covered by `BuhlmannCeilingTests`, `BuhlmannPressureModelTests`, and `BuhlmannReauditFixTests`.
 
 ## 6. Gradient Factor Logic
 
@@ -140,12 +141,25 @@ Policy:
 
 - NDL is tissue-state based.
 - Binary search finds the longest bottom time that can surface directly within GF High tolerance.
-- Descent, bottom loading, and final ascent are simulated.
+- Descent, bottom loading, and final ascent are simulated with the request `PlannerEnvironment`.
 - Non-air-saturated initial tissue state can be supplied for repetitive/reference planning.
 - Air, nitrox, trimix, and heliox use the same N2/He loading path.
 - Fake high values such as `999` are not returned as valid NDL.
 
-Covered by `BuhlmannNDLTests` and `BuhlmannReferenceFixtureTests`.
+Covered by `BuhlmannNDLTests`, `BuhlmannReauditFixTests`, and `BuhlmannReferenceFixtureTests`.
+
+## 11. Oxygen Exposure (CNS / OTU)
+
+Implemented in `OxygenExposureModels.swift` (`CNSClockModel`, `OTUModel`, `OxygenExposureModel`).
+
+Assumptions:
+
+- NOAA-style single-limit CNS clock bands above `0.5 bar` PPO2 (720 / 210 / 150 / 45 / 10 minute limits by band).
+- OTU accumulation uses the standard `(0.5 / (PPO2 - 0.5))^-0.833` minute weighting above `0.5 bar`.
+- Invalid segment depth/duration or non-finite results fail closed via `OxygenExposureWarningState.invalidExposureInput`.
+- Project tolerance: reference-only aggregation; warnings at CNS ≥ 80% and OTU ≥ 300.
+
+Covered by `BuhlmannReauditFixTests` and schedule-aware analysis in `GasPlanningService`.
 
 ## 8. Multigas Decompression Algorithm
 
@@ -201,18 +215,11 @@ The planner must remain:
 
 Existing disclaimer and safety documentation remain in force.
 
-## Windows Static Verification
+## macOS Verification (2026-05-29)
 
-This pass ran on Windows, where `xcodegen`, `xcodebuild`, and `swift` were unavailable. Per project instructions, no Apple build tooling was run.
-
-Static checks completed:
-
-- Repository alignment checked against `origin/main`.
-- `git diff --check` passed.
-- Forbidden-file check confirmed no Watch, root Watch, entitlement, or experimental files were modified.
-- Swift brace-balance inspection passed for the Buhlmann engine and iOS algorithm tests.
-- Project target membership checked: new Buhlmann engine files are included in the iOS Algorithm Tests source list; test folder source path includes the new test files.
-- External reference-envelope values generated from `decotengu 0.14.1` are documented in `DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md` and covered by `BuhlmannReleaseHardeningTests`.
+- `xcodegen generate`
+- `xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving iOS" -destination 'platform=iOS Simulator,name=iPhone 17' build` — succeeded
+- `xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving iOS Algorithm Tests" -destination 'platform=iOS Simulator,name=iPhone 17' test` — succeeded
 
 ## Remaining Required Validation
 

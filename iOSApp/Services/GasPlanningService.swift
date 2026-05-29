@@ -7,24 +7,46 @@ enum GasPlanningService {
         guard validation.isValid else {
             return unavailableAnalysis(input: input, gas: gas, validation: validation)
         }
-        let ata = input.ambientPressureBar
-        let ppO2 = ppO2(gas: gas, depthMeters: input.effectivePlanningDepthMeters)
+        guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) else {
+            var invalid = validation
+            invalid.add(.invalidEnvironment, message: "Ambiente planner non valido.")
+            return unavailableAnalysis(input: input, gas: gas, validation: invalid)
+        }
+        let planningDepth = input.effectivePlanningDepthMeters
+        let ata = AmbientPressureModel.ambientPressureBar(depthMeters: planningDepth, environment: environment) ?? environment.surfacePressureBar
+        let ppO2 = boundedPPO2(gas: gas, depthMeters: planningDepth, environment: environment)
         let density = gas.surfaceDensityGramsLiter * ata
         let rating = densityRating(density, warning: input.densityWarningLimit, danger: input.densityDangerLimit)
-        let planningDepth = input.effectivePlanningDepthMeters
-        let end = equivalentNarcoticDepth(gas: gas, depthMeters: planningDepth)
-        let ead = equivalentAirDepth(gas: gas, depthMeters: planningDepth)
+        let end = equivalentNarcoticDepth(gas: gas, depthMeters: planningDepth, environment: environment)
+        let ead = equivalentAirDepth(gas: gas, depthMeters: planningDepth, environment: environment)
         let consumption = input.sacLitersPerMinute * ata * input.plannedBottomMinutes
         let remaining = input.availableGasLiters - consumption
         let remainingBar = remaining / input.primaryCylinder.volumeLiters
-        let rockBottom = rockBottomLiters(input: input)
+        let rockBottom = rockBottomLiters(input: input, environment: environment)
         let minimumGasBar = rockBottom / input.primaryCylinder.volumeLiters
         let usableBeforeMinimum = input.availableGasLiters - rockBottom
         let turnPressure = usableBeforeMinimum > 0
             ? min(input.startPressureBar, max(input.reservePressureBar, input.startPressureBar - (usableBeforeMinimum / 2.0 / input.primaryCylinder.volumeLiters)))
             : input.reservePressureBar
-        let cns = oxygenExposureCNS(ppO2: ppO2, minutes: input.plannedBottomMinutes)
-        let otu = oxygenToxicityUnits(ppO2: ppO2, minutes: input.plannedBottomMinutes)
+        let bottomSegment = BuhlmannRuntimeSegment(
+            kind: .bottom,
+            depthMeters: planningDepth,
+            minutes: input.plannedBottomMinutes,
+            gas: BuhlmannGas(gas: gas, role: .bottom, switchDepthMeters: planningDepth),
+            note: "Bottom"
+        )
+        let exposure = OxygenExposureModel.from(segments: [bottomSegment], environment: environment)
+        let cns: Double
+        let otu: Double
+        switch exposure {
+        case .success(let model):
+            cns = model.cnsPercent
+            otu = model.otu
+        case .failure:
+            var invalid = validation
+            invalid.add(.invalidEnvironment, message: "Esposizione ossigeno non valida.")
+            return unavailableAnalysis(input: input, gas: gas, validation: invalid)
+        }
         let states = mergeStates(
             validation.states,
             makeStates(
@@ -133,8 +155,9 @@ enum GasPlanningService {
         }
         switch ScheduleGasConsumptionService.analyze(input: input, enginePlan: enginePlan, environment: environment) {
         case .success(let ledger):
-            let firstRemainingBar = ledger.entries.first?.remainingBar ?? base.remainingBar
-            let firstRemainingLiters = ledger.entries.first?.remainingLiters ?? base.remainingLiters
+            let bottomEntry = ledger.bottomGasEntry(from: input)
+            let summaryRemainingBar = bottomEntry?.remainingBar ?? base.remainingBar
+            let summaryRemainingLiters = bottomEntry?.remainingLiters ?? base.remainingLiters
             if ledger.warnings.contains(where: {
                 if case .reserveBreached = $0 { return true }
                 return false
@@ -163,9 +186,9 @@ enum GasPlanningService {
                 endMeters: base.endMeters,
                 eadMeters: base.eadMeters,
                 consumptionLiters: ledger.totalConsumedLiters,
-                remainingLiters: firstRemainingLiters,
-                remainingBar: firstRemainingBar,
-                rockBottomLiters: base.rockBottomLiters,
+                remainingLiters: summaryRemainingLiters,
+                remainingBar: summaryRemainingBar,
+                rockBottomLiters: rockBottomLiters(input: input, environment: environment),
                 minimumGasBar: base.minimumGasBar,
                 turnPressureBar: base.turnPressureBar,
                 cnsPercent: min(300, cns),
@@ -197,13 +220,14 @@ enum GasPlanningService {
         )
     }
 
-    static func ppO2(gas: GasMix, depthMeters: Double) -> Double {
-        GasMixValidator.actualPPO2(oxygenFraction: gas.oxygen, depthMeters: depthMeters) ?? 0
+    static func ppO2(gas: GasMix, depthMeters: Double, environment: PlannerEnvironment = .seaLevelSaltWater) -> Double {
+        guard let ambient = AmbientPressureModel.ambientPressureBar(depthMeters: depthMeters, environment: environment) else { return 0 }
+        return max(0, gas.oxygen * ambient)
     }
 
     /// Actual PPO2 at depth. Over-limit states are reported separately; the value is never clipped.
-    static func boundedPPO2(gas: GasMix, depthMeters: Double) -> Double {
-        ppO2(gas: gas, depthMeters: depthMeters)
+    static func boundedPPO2(gas: GasMix, depthMeters: Double, environment: PlannerEnvironment = .seaLevelSaltWater) -> Double {
+        ppO2(gas: gas, depthMeters: depthMeters, environment: environment)
     }
 
     static func profileSegments(input: GasPlanInput, stops: [DecoStop]) -> [DivePlanSegment] {
@@ -339,10 +363,16 @@ enum GasPlanningService {
         }
     }
 
-    static func contingencyPlans(input: GasPlanInput, baseAnalysis: TechnicalGasAnalysis, baseTTS: Int) -> [ContingencyPlan] {
+    static func contingencyPlans(
+        input: GasPlanInput,
+        baseAnalysis: TechnicalGasAnalysis,
+        baseTTS: Int,
+        environment: PlannerEnvironment = .seaLevelSaltWater
+    ) -> [ContingencyPlan] {
         let lostGasLiters = baseAnalysis.rockBottomLiters * 1.35
-        let delayedLiters = input.sacLitersPerMinute * input.ambientPressureBar * 5
-        let extendedLiters = input.sacLitersPerMinute * input.ambientPressureBar * 10
+        let bottomATA = AmbientPressureModel.ambientPressureBar(depthMeters: input.effectivePlanningDepthMeters, environment: environment) ?? environment.surfacePressureBar
+        let delayedLiters = input.sacLitersPerMinute * bottomATA * 5
+        let extendedLiters = input.sacLitersPerMinute * bottomATA * 10
         return [
             ContingencyPlan(scenario: .lostGas, ttsMinutes: baseTTS + 8, gasRequiredLiters: lostGasLiters, action: "Switch team protocol, usare gas disponibile e risalita conservativa.", warning: "Validare con procedura team"),
             ContingencyPlan(scenario: .delayedAscent, ttsMinutes: baseTTS + 5, gasRequiredLiters: baseAnalysis.consumptionLiters + delayedLiters, action: "Aggiungere buffer di risalita e controllare CNS/OTU.", warning: "Rischio gas reserve"),
@@ -385,45 +415,24 @@ enum GasPlanningService {
         return .green
     }
 
-    private static func equivalentNarcoticDepth(gas: GasMix, depthMeters: Double) -> Double {
+    private static func equivalentNarcoticDepth(gas: GasMix, depthMeters: Double, environment: PlannerEnvironment) -> Double {
         guard gas.isValidMix, depthMeters.isFinite, depthMeters >= 0 else { return 0 }
         let narcoticFraction = gas.nitrogen + (gas.isOxygenNarcotic ? gas.oxygen : 0)
         let airNarcoticFraction = 0.79 + (gas.isOxygenNarcotic ? 0.21 : 0)
-        let narcoticPressure = IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters) * narcoticFraction
+        let ambient = AmbientPressureModel.ambientPressureBar(depthMeters: depthMeters, environment: environment) ?? environment.surfacePressureBar
+        let narcoticPressure = ambient * narcoticFraction
         return max(0, ((narcoticPressure / max(airNarcoticFraction, 0.01)) - 1.0) * 10.0)
     }
 
-    private static func equivalentAirDepth(gas: GasMix, depthMeters: Double) -> Double? {
+    private static func equivalentAirDepth(gas: GasMix, depthMeters: Double, environment: PlannerEnvironment) -> Double? {
         guard gas.isValidMix, gas.helium == 0, gas.oxygen > 0.21, depthMeters.isFinite, depthMeters >= 0 else { return nil }
-        let nitrogenPressure = IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters) * gas.nitrogen
+        let ambient = AmbientPressureModel.ambientPressureBar(depthMeters: depthMeters, environment: environment) ?? environment.surfacePressureBar
+        let nitrogenPressure = ambient * gas.nitrogen
         return max(0, ((nitrogenPressure / 0.79) - 1.0) * 10.0)
     }
 
-    private static func rockBottomLiters(input: GasPlanInput) -> Double {
-        let averageAscentATA = IOSUnitConversions.ambientPressureBar(depthMeters: input.plannedDepthMeters / 2.0)
-        let ascentMinutes = max(3, input.plannedDepthMeters / 9.0)
-        let problemSolvingMinutes = 1.0
-        let safetyStopMinutes = input.plannedDepthMeters > 10 ? 3.0 : 0.0
-        let emergencyMinutes = problemSolvingMinutes + ascentMinutes + safetyStopMinutes
-        return input.emergencySacLitersPerMinute * max(1, input.teamSize) * averageAscentATA * emergencyMinutes
-    }
-
-    private static func oxygenExposureCNS(ppO2: Double, minutes: Double) -> Double {
-        guard ppO2 > 0.5 else { return 0 }
-        let limitMinutes: Double
-        switch ppO2 {
-        case ..<1.0: limitMinutes = 720
-        case ..<1.2: limitMinutes = 210
-        case ..<1.4: limitMinutes = 150
-        case ..<1.6: limitMinutes = 45
-        default: limitMinutes = 10
-        }
-        return min(300, minutes / limitMinutes * 100)
-    }
-
-    private static func oxygenToxicityUnits(ppO2: Double, minutes: Double) -> Double {
-        guard ppO2 > 0.5 else { return 0 }
-        return minutes * pow((0.5 / (ppO2 - 0.5)), -0.833)
+    private static func rockBottomLiters(input: GasPlanInput, environment: PlannerEnvironment) -> Double {
+        ScheduleGasConsumptionService.rockBottomLiters(input: input, environment: environment)
     }
 
     private static func surfaceDensityGramsPerLiter(gas: BuhlmannGas) -> Double {
@@ -434,7 +443,7 @@ enum GasPlanningService {
     }
 
     private static func makeStates(input: GasPlanInput, ppO2: Double, density: Double, endMeters: Double, remainingLiters: Double, rockBottomLiters: Double) -> [PlannerResultState] {
-        var values: [PlannerResultState] = [.validReference, .simplifiedReferenceOnly]
+        var values: [PlannerResultState] = [.validReference, .nonCertifiedReference]
         if ppO2 > input.bottomGas.maxPPO2 {
             values.append(.PPO2Exceeded)
         }

@@ -63,7 +63,9 @@ enum BuhlmannTestSupport {
         travelGases: [BuhlmannGas] = [],
         decoGases: [BuhlmannGas] = [],
         gfLow: Double = 30,
-        gfHigh: Double = 70
+        gfHigh: Double = 70,
+        environment: PlannerEnvironment = .seaLevelSaltWater,
+        initialTissueState: BuhlmannTissueState? = nil
     ) -> BuhlmannPlanRequest {
         BuhlmannPlanRequest(
             maxDepthMeters: depth,
@@ -72,7 +74,9 @@ enum BuhlmannTestSupport {
             travelGases: travelGases,
             decoGases: decoGases,
             gfLow: gfLow,
-            gfHigh: gfHigh
+            gfHigh: gfHigh,
+            initialTissueState: initialTissueState ?? .airSaturated(surfacePressureBar: environment.surfacePressureBar),
+            plannerEnvironment: environment
         )
     }
 

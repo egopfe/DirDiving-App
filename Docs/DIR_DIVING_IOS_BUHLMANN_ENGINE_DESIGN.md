@@ -1,6 +1,6 @@
 # DIR DIVING iOS Buhlmann Engine Design
 
-Date: 2026-05-28  
+Date: 2026-05-29 (reaudit hardening pass)  
 Scope: iOS Companion MAIN only
 
 ## Purpose
@@ -23,8 +23,9 @@ The engine is informational and non-certified. It must never be presented as a l
 - Depth conversion: water-column pressure derived from water density (fresh vs salt) with legacy fallback where environment is unavailable.
 - Inspired inert gas pressure: `(ambient pressure - water vapor pressure) * inert fraction`.
 - Tissue loading: exponential Haldane loading at constant depth and Schreiner-style loading for linear ascent/descent.
-- Ceiling: per-compartment mixed N2/He a/b coefficients weighted by current inert gas tissue pressures.
+- Ceiling: per-compartment mixed N2/He a/b coefficients weighted by current inert gas tissue pressures; tolerated ambient pressure is converted back to depth with `AmbientPressureModel.depthMeters` using the same `PlannerEnvironment` as tissue loading (no sea-level-only fallback in ceiling paths).
 - Gradient factors: GF Low at first stop, GF High at the surface, interpolated by depth.
+- NDL: tissue-state search uses `PlannerEnvironment` for descent, bottom, ascent, and ceiling checks; no silent sea-level saltwater fallback in engine NDL paths.
 - Stops: rounded to the configured 3 m interval and propagated until the next shallower stop is allowed.
 - Optional multiple bottom segments: each segment carries its own depth, duration, and gas.
 - Gas-switch dwell: `0.5 min` at switch depth, included in tissue loading and runtime accounting.
@@ -37,8 +38,19 @@ The engine is informational and non-certified. It must never be presented as a l
 - Bottom gas is used for descent and bottom loading unless travel gases are provided.
 - Multiple bottom segments can be passed to the pure engine for staged bottom gas/time/depth loading.
 - Travel gases are used during descent at configured switch depths.
-- Travel and deco gases are selected on ascent when the current segment/stop depth is at or shallower than their switch depth and PPO2 is within bounds, including no-stop returns.
+- Travel and deco gases are selected on ascent when the current segment/stop depth is at or shallower than their switch depth and PPO2 is within bounds, including no-stop returns and decompression ascents between stops (travel switch depths are honored as ascent waypoints).
 - Higher oxygen deco gases are preferred when validated at the current stop depth.
+
+## PlannerService Canonical Result
+
+`PlannerService.makePlan` runs one `BuhlmannEngine.plan` per request. Stops, runtime segments, TTS, NDL, GF comparisons, and gas-consumption inputs are derived from that single engine result. Repetitive planning seeds `initialTissueState` before the canonical run; helper paths must not recompute deco metrics from a clean-dive assumption.
+
+## Gas Identity And Ledger
+
+- `BuhlmannGas` carries stable `gasMixId` and optional `cylinderId`; `allocationKey` is used internally for consumption ledgers.
+- Display labels are not used as algorithmic identity.
+- `ScheduleGasConsumptionService` allocates consumption per cylinder UUID, allowing duplicate display labels.
+- `GasPlanningService.analyze(input:enginePlan:)` exposes per-cylinder ledger entries and uses bottom-gas remaining pressure in summaries.
 
 ## Safety Validation
 

@@ -69,7 +69,7 @@ struct BuhlmannTissueState: Hashable, Codable {
         return BuhlmannTissueState(compartments: loaded)
     }
 
-    func ceiling(gf: Double) -> BuhlmannCeiling {
+    func ceiling(gf: Double, environment: PlannerEnvironment) -> BuhlmannCeiling {
         let fraction = max(0, min(1, gf))
         var maxDepth = 0.0
         var controlling = 0
@@ -82,7 +82,8 @@ struct BuhlmannTissueState: Hashable, Codable {
             let denominator = 1.0 + fraction * ((1.0 / b) - 1.0)
             guard denominator.isFinite, denominator > 0 else { continue }
             let toleratedAmbient = (total - fraction * a) / denominator
-            let depth = IOSUnitConversions.depthMeters(forPressureBar: toleratedAmbient)
+            guard toleratedAmbient.isFinite, toleratedAmbient >= environment.surfacePressureBar else { continue }
+            let depth = AmbientPressureModel.depthMeters(ambientPressureBar: toleratedAmbient, environment: environment) ?? 0
             if depth > maxDepth {
                 maxDepth = depth
                 controlling = index
