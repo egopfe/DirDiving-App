@@ -948,6 +948,12 @@ Restano obbligatori: build `xcodegen generate` / Xcode su macOS, test Apple Watc
 - Nuovi report di processo: [`Docs/DOCUMENTATION_UPDATE_REPORT_20260527.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260527.md), [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md), [`Docs/PR_STATUS_20260527.md`](Docs/PR_STATUS_20260527.md).
 - PR #8 e #9 controllate con `gh`: entrambe aperte, experimental e non safe-to-merge automaticamente; #8 alterna `UNKNOWN` / `CONFLICTING`, #9 risulta `CONFLICTING`.
 
+## Aggiornamento documentazione 2026-05-29 (`69e69b2`)
+
+- Baseline: `main` @ `69e69b2`, allineato a `origin/main` — fix reaudit Bühlmann P1–P3; XCTest iOS verde su macOS.
+- **Audit UX/UI planner iOS:** [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md) — verdict *Partially ready*; gap UI (repetitive planning, ledger per cilindro, copy ambiente) indicizzato in [`Docs/INDEX.md`](Docs/INDEX.md) §1, §4, §6, §13.
+- Re-audit math risolto: [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) + [`Docs/DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`](Docs/DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md).
+
 ## Aggiornamento documentazione 2026-05-29 (`570964e`)
 
 - Baseline: `main` @ `570964e`, allineato a `origin/main` dopo sync remoto (hardening Watch/iOS, motore Buhlmann, golden fixtures, reaudit).

@@ -4,6 +4,16 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Fixed (2026-05-29, iOS Buhlmann reaudit — `69e69b2`)
+
+- **Algoritmo iOS:** fix P1–P3 da [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) — environment-aware ceiling/NDL, canonical engine result, stable cylinder IDs, fixture/tests; `DIRDiving iOS Algorithm Tests` verde su macOS.
+
+### Added (2026-05-29, documentation indexing — `69e69b2`)
+
+- **Indice:** [`Docs/INDEX.md`](Docs/INDEX.md) aggiornato @ `69e69b2`; sezione dedicata reaudit fix + **UX readiness audit**.
+- **Audit root UX/UI:** [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md) indicizzato in §1, §4, §6, §13, §14; relazione reaudit math → fix algoritmico → gap UI residui.
+- **Docs:** aggiornati README, ROADMAP, CONTRIBUTING e hardening docs post-fix.
+
 ### Added (2026-05-29, documentation indexing — `570964e`)
 
 - **Indice:** [`Docs/INDEX.md`](Docs/INDEX.md) aggiornato con audit root Watch/iOS, reaudit Buhlmann e UX readiness planner iOS.
