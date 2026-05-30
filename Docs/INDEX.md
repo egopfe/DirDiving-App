@@ -7,6 +7,16 @@
 
 ---
 
+## Aggiornamento indice 2026-05-30 — comprehensive Bühlmann readiness audit
+
+Pass read-only su `main` @ `e1370f7` (math, consistency, UX/UI, tests, docs; **88/88 XCTest pass**):
+
+| Documento | Posizione | Contenuto |
+|-----------|-----------|-----------|
+| [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md) | `Docs/` | **Comprehensive readiness audit** — verdict **Almost Ready**; P1–P4 matrix + implementation plan |
+
+---
+
 ## Aggiornamento indice 2026-05-30 — Phase 15 UX fix + re-audit READY
 
 Pass UX/UI su `main` @ `3237262` (fix P1–P3 presentation; algoritmo invariato @ `69e69b2`; XCTest `BuhlmannUxReadinessTests` verde):
