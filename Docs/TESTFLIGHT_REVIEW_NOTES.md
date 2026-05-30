@@ -1,6 +1,6 @@
 # Note per TestFlight / App Review - DIR DIVING
 
-**Aggiornato:** 2026-05-27 - branch `main` (Watch + iOS companion unificati)
+**Aggiornato:** 2026-05-30 — branch `main` @ `3237262` (Watch + iOS companion unificati)
 
 ## Panoramica per il revisore
 
@@ -12,7 +12,8 @@ Lo stato algoritmico MAIN e documentato in:
 
 - [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md) per Watch MAIN.
 - [`DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md) per iOS MAIN.
-- [`DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md) e [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md) per il motore Buhlmann ZHL-16C N2+He multigas reference. La release MAIN corrente non deve essere descritta come decompression planner certificato.
+- [`DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md) e [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md) per il motore Buhlmann ZHL-16C N2+He multigas reference.
+- [`DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md) per UX/UI readiness post-fix @ `3237262` (verdict **READY**). La release MAIN corrente non deve essere descritta come decompression planner certificato.
 
 ## Account e dati demo
 
@@ -58,6 +59,8 @@ Lo stato algoritmico MAIN e documentato in:
 - [ ] Export CSV Subsurface da dettaglio immersione
 - [ ] Planner: disclaimer visibile; output indicativo
 - [ ] Planner: gas/NDL safe states visibili; nessun output trimix/helium presentato come decompressione certificata
+- [ ] Planner: repetitive planning card visibile quando abilitata; gas ledger per cilindro in risultato; header no-deco/deco-required; disclaimer CNS/OTU reference-only
+- [ ] Planner: environment (altitudine/salinità) mostra copy coerente con input
 - [ ] Settings / More: link Terms / Privacy raggiungibili e leggibili
 - [ ] Lingua EN: Settings, log, sync senza italiano evidente nelle schermate principali
 
