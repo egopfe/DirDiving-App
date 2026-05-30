@@ -473,6 +473,7 @@ enum PlannerUserFacingCopy {
         case .stale: return .snapshotStale
         case .schemaMismatch: return .snapshotSchemaMismatch
         case .invalidEnvironment: return .snapshotEnvironmentMismatch
+        case .invalidSurfaceInterval: return .surfaceIntervalRejected
         }
     }
 

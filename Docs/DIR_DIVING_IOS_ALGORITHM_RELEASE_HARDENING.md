@@ -146,10 +146,30 @@ Coverage includes air, nitrox 32, trimix bottom gas, EAN50 deco gas, oxygen deco
 
 - This is a reference planner, not a certified decompression engine or dive computer.
 - A first external reference-envelope cross-check is documented; a larger independent validation campaign is still required before any stronger claim.
-- Salinity and altitude are still stored and documented, but not yet used to alter ambient pressure.
+- Salinity and altitude are applied via `PlannerEnvironment` to ambient pressure, NDL, ceiling, consumption, and preview paths when valid.
 - CNS/OTU remain simplified reference estimates.
 - Physical-device, Xcode, simulator, and TestFlight validation must run on macOS.
 
 ## Release Position
 
 iOS MAIN can now be described as having a Buhlmann ZHL-16C N2+He multigas planning reference engine for internal validation, while still requiring external mathematical validation and App Store/TestFlight QA before release claims are broadened.
+
+## 2026-05-29 Comprehensive Readiness Pass
+
+| ID | Item | Resolution |
+|---|---|---|
+| P1-1 | External validation campaign | Documented — `DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md` |
+| P1-2 | Dual surface-pressure baseline | Fixed — unified `1.01325 bar` in Bühlmann constants and `airSaturated()` |
+| P2-1 | Preview ignores planner environment | Fixed — `PlannerStore` passes `PlannerEnvironment` |
+| P2-2 | Repetitive snapshot semantics | UI/docs clarify prior reference plan; snapshot persists on Calculate only |
+| P2-3 | `surfaceIntervalRejected` never emitted | Fixed — `invalidSurfaceInterval` error mapped |
+| P2-4 | Physical accessibility QA | Checklist — `DIR_DIVING_IOS_PHYSICAL_ACCESSIBILITY_QA.md` |
+| P2-5 | CNS/OTU model simplicity | Documented in limitations |
+| P3-1 | Bailout not in engine schedule | Documented + UI hint |
+| P3-2 | Legacy 10 m/bar fallback | Replaced in Bühlmann paths |
+| P3-3 | GF comparison performance | In-memory cache (outputs unchanged) |
+| P3-4 | Calculation progress | Progress indicator on Calculate button |
+| P4-1 | Logbook tissue seed | Documented future enhancement |
+| P4-2 | Team gas matching | Existing polish; no algorithm change |
+
+New test file: `BuhlmannComprehensiveReadinessFixTests.swift`.

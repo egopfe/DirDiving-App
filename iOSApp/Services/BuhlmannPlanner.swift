@@ -1,12 +1,12 @@
 import Foundation
 
 enum BuhlmannPlanner {
-    static func plan(depthMeters: Double, bottomGas: GasMix, environment: PlannerEnvironment = .seaLevelSaltWater) -> BuhlmannPlanResult {
-        plan(depthMeters: depthMeters, o2Fraction: bottomGas.oxygen, heliumFraction: bottomGas.helium, maxPPO2: bottomGas.maxPPO2, environment: environment)
+    static func plan(depthMeters: Double, bottomGas: GasMix, environment: PlannerEnvironment = .seaLevelSaltWater, gfHigh: Double = 85) -> BuhlmannPlanResult {
+        plan(depthMeters: depthMeters, o2Fraction: bottomGas.oxygen, heliumFraction: bottomGas.helium, maxPPO2: bottomGas.maxPPO2, environment: environment, gfHigh: gfHigh)
     }
 
-    static func plan(depthMeters: Double, o2Fraction: Double, heliumFraction: Double = 0, environment: PlannerEnvironment = .seaLevelSaltWater) -> BuhlmannPlanResult {
-        plan(depthMeters: depthMeters, o2Fraction: o2Fraction, heliumFraction: heliumFraction, maxPPO2: 1.4, environment: environment)
+    static func plan(depthMeters: Double, o2Fraction: Double, heliumFraction: Double = 0, environment: PlannerEnvironment = .seaLevelSaltWater, gfHigh: Double = 85) -> BuhlmannPlanResult {
+        plan(depthMeters: depthMeters, o2Fraction: o2Fraction, heliumFraction: heliumFraction, maxPPO2: 1.4, environment: environment, gfHigh: gfHigh)
     }
 
     static func plan(
@@ -14,7 +14,8 @@ enum BuhlmannPlanner {
         o2Fraction: Double,
         heliumFraction: Double = 0,
         maxPPO2: Double,
-        environment: PlannerEnvironment = .seaLevelSaltWater
+        environment: PlannerEnvironment = .seaLevelSaltWater,
+        gfHigh: Double = 85
     ) -> BuhlmannPlanResult {
         guard depthMeters.isFinite,
               depthMeters >= IOSAlgorithmConfiguration.minPlannerDepthMeters,
@@ -79,7 +80,7 @@ enum BuhlmannPlanner {
         let ndlValue = BuhlmannEngine.noDecompressionLimit(
             depthMeters: depthMeters,
             gas: gas,
-            gfHigh: 85,
+            gfHigh: gfHigh,
             plannerEnvironment: environment
         ) ?? 0
         return BuhlmannPlanResult(
@@ -88,7 +89,7 @@ enum BuhlmannPlanner {
             heliumFraction: heliumFraction,
             nitrogenFraction: max(0, gas.nitrogenFraction),
             ndlMinutes: ndlValue,
-            curve: ndlCurve(for: gas, environment: environment),
+            curve: ndlCurve(for: gas, environment: environment, gfHigh: gfHigh),
             warning: "Buhlmann ZHL-16C N2+He multigas reference-only: non e un piano decompressivo certificato.",
             modelState: .validReference
         )
@@ -138,6 +139,16 @@ enum BuhlmannPlanner {
     }
 
     static func gfComparisons(baseRequest: BuhlmannPlanRequest) -> [GFComparison] {
+        let key = GFComparisonCacheStorage.key(for: baseRequest)
+        if let cached = GFComparisonCache.shared.value(for: key) {
+            return cached
+        }
+        let computed = computeGFComparisons(baseRequest: baseRequest)
+        GFComparisonCache.shared.store(computed, for: key)
+        return computed
+    }
+
+    private static func computeGFComparisons(baseRequest: BuhlmannPlanRequest) -> [GFComparison] {
         let presets: [(String, Double, Double)] = [
             ("20/80", 20, 80),
             ("30/70", 30, 70),
@@ -268,12 +279,12 @@ enum BuhlmannPlanner {
         )
     }
 
-    private static func ndlCurve(for gas: BuhlmannGas, environment: PlannerEnvironment) -> [NDLPoint] {
+    private static func ndlCurve(for gas: BuhlmannGas, environment: PlannerEnvironment, gfHigh: Double) -> [NDLPoint] {
         stride(from: 6.0, through: 60.0, by: 3.0).map { depth in
             let ndlValue = BuhlmannEngine.noDecompressionLimit(
                 depthMeters: depth,
                 gas: gas,
-                gfHigh: 85,
+                gfHigh: gfHigh,
                 plannerEnvironment: environment
             ) ?? 0
             let group: String
@@ -306,5 +317,59 @@ enum BuhlmannPlanner {
             result.append(state)
         }
         return result
+    }
+
+    #if DEBUG
+    static func clearGFComparisonCacheForTesting() {
+        GFComparisonCache.shared.clear()
+    }
+    #endif
+
+    private enum GFComparisonCache {
+        static let shared = GFComparisonCacheStorage()
+    }
+
+    private final class GFComparisonCacheStorage {
+        private var entries: [String: [GFComparison]] = [:]
+        private let maxEntries = 32
+
+        func value(for key: String) -> [GFComparison]? {
+            entries[key]
+        }
+
+        func store(_ value: [GFComparison], for key: String) {
+            if entries.count >= maxEntries {
+                entries.removeAll(keepingCapacity: true)
+            }
+            entries[key] = value
+        }
+
+        func clear() {
+            entries.removeAll()
+        }
+
+        static func key(for request: BuhlmannPlanRequest) -> String {
+            var parts: [String] = [
+                String(format: "%.4f", request.bottomGas.oxygenFraction),
+                String(format: "%.4f", request.bottomGas.heliumFraction),
+                String(format: "%.2f", request.maxDepthMeters),
+                String(format: "%.2f", request.bottomMinutes),
+                String(format: "%.0f", request.gfLow),
+                String(format: "%.0f", request.gfHigh),
+                String(format: "%.5f", request.plannerEnvironment.surfacePressureBar),
+                String(format: "%.1f", request.plannerEnvironment.waterDensityKgPerM3)
+            ]
+            let tissue = request.initialTissueState.compartments
+                .map { String(format: "%.4f,%.4f", $0.nitrogenPressure, $0.heliumPressure) }
+                .joined(separator: ";")
+            parts.append(tissue)
+            let travel = request.travelGases
+                .map { String(format: "%.1f:%.3f:%.3f", $0.switchDepthMeters, $0.oxygenFraction, $0.heliumFraction) }
+                .joined(separator: ",")
+            let deco = request.decoGases
+                .map { String(format: "%.1f:%.3f:%.3f", $0.switchDepthMeters, $0.oxygenFraction, $0.heliumFraction) }
+                .joined(separator: ",")
+            return parts.joined(separator: "|") + "|t:\(travel)|d:\(deco)"
+        }
     }
 }

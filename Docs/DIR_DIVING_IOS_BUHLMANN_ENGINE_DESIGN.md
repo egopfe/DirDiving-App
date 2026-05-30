@@ -60,7 +60,7 @@ UI surfaces engine outputs without changing math:
 - **Schedule gas ledger:** per-cylinder consumed liters, remaining liters/bar, reserve/minimum-gas/lost-gas flags; allocation failures fail visibly instead of showing aggregate-only bottom estimates.
 - **Environment:** active altitude/salinity copy states they adjust ambient pressure, ceiling, NDL, consumption, and surface-interval math; invalid environment blocks planning with corrective hints.
 - **Result header:** explicit reference-only badge for no-deco, deco-required, repetitive, environment-adjusted, invalid, unsupported profile, and no-solution states.
-- **CNS/OTU:** labeled as reference estimates with threshold hints (CNS ≥ 80%, OTU ≥ 300 flagged elevated).
+- **CNS/OTU:** NOAA piecewise single-exposure CNS limits (seven segments, Baker/NOAA Diving Manual) with ramp integration on descent/ascent segments; Lambertsen OTU (UPTD) with Baker Eq. 2 for linear PPO2 ramps. Still reference-only — not certified exposure limits.
 
 Remaining UX limitations: calculation is synchronous (no progress spinner); Dynamic Type stress on dense stepper cards may still require scrolling; physical-device VoiceOver walkthrough recommended before release.
 
@@ -81,3 +81,26 @@ The engine fails closed for invalid profile or gas states:
 ## Integration Boundary
 
 The engine is iOS-only. It does not modify Apple Watch runtime behavior, watchOS targets, Watch connectivity runtime logic, dive telemetry, depth/ascent calculations, or experimental feature files.
+
+## Comprehensive Readiness Implementation (2026-05-29)
+
+### Environment consistency
+
+- `BuhlmannConstants.seaLevelSurfacePressureBar` = `1.01325` bar aligns with `PlannerEnvironment.seaLevelSaltWater`.
+- `BuhlmannTissueState.airSaturated()` uses that constant by default.
+- `BuhlmannGas` nil-environment ambient pressure uses ISA sea-level saltwater formula — not legacy `1.0 bar + 10 m/bar`.
+- `PlannerStore` passes `PlannerEnvironment` into preview `BuhlmannPlanner.plan` so NDL curve matches plan environment.
+
+### Repetitive planning
+
+- Snapshot persists only on explicit **Calculate Plan** — not on every input keystroke.
+- Snapshot source: prior calculated reference plan output (not dive log).
+- `.surfaceIntervalRejected` emitted for invalid surface interval minutes.
+
+### Bailout
+
+- Bailout role remains outside primary `BuhlmannEngine` schedule; documented and surfaced in UI hint.
+
+### Performance
+
+- GF comparison results cached in-memory (`GFComparisonCache`) — outputs unchanged, repeat calls faster.

@@ -90,3 +90,18 @@ macOS @ `3237262`:
 ## Safety Positioning (Unchanged)
 
 DIR DIVING iOS remains a **non-certified informational companion**. The Bühlmann planner is a **planning reference only** — not certified decompression advice and not real-time dive-computer behavior.
+
+---
+
+## Addendum — Comprehensive Readiness UX (2026-05-29)
+
+| Area | Update |
+|---|---|
+| Environment preview | NDL curve now uses same altitude/salinity as plan |
+| Repetitive copy | Explicit “not from dive log” string; snapshot on Calculate only |
+| Surface interval | `.surfaceIntervalRejected` surfaced in UI |
+| Bailout | Schedule hint in plan result when bailout configured |
+| Calculate UX | Progress indicator during synchronous calculation |
+| GF charts | Cached comparisons — no output change |
+
+Verdict unchanged for presentation layer: **READY**. Physical-device a11y remains manual QA per `DIR_DIVING_IOS_PHYSICAL_ACCESSIBILITY_QA.md`.

@@ -14,16 +14,10 @@ struct BuhlmannTissueState: Hashable, Codable {
     var compartments: [BuhlmannTissueCompartment]
 
     static func airSaturated() -> BuhlmannTissueState {
-        let pn2 = (IOSAlgorithmConfiguration.surfacePressureBar - BuhlmannConstants.waterVaporPressureBar)
-            * BuhlmannConstants.nitrogenFractionAir
-        let compartments = Array(
-            repeating: BuhlmannTissueCompartment(nitrogenPressure: pn2, heliumPressure: 0),
-            count: BuhlmannConstants.compartmentCount
-        )
-        return BuhlmannTissueState(compartments: compartments)
+        airSaturated(surfacePressureBar: BuhlmannConstants.seaLevelSurfacePressureBar)
     }
 
-    static func airSaturated(surfacePressureBar: Double) -> BuhlmannTissueState {
+    private static func saturatedCompartments(surfacePressureBar: Double) -> BuhlmannTissueState {
         let pn2 = (surfacePressureBar - BuhlmannConstants.waterVaporPressureBar)
             * BuhlmannConstants.nitrogenFractionAir
         let compartments = Array(
@@ -31,6 +25,10 @@ struct BuhlmannTissueState: Hashable, Codable {
             count: BuhlmannConstants.compartmentCount
         )
         return BuhlmannTissueState(compartments: compartments)
+    }
+
+    static func airSaturated(surfacePressureBar: Double) -> BuhlmannTissueState {
+        saturatedCompartments(surfacePressureBar: surfacePressureBar)
     }
 
     func loadedConstantDepth(depthMeters: Double, minutes: Double, gas: BuhlmannGas, environment: PlannerEnvironment? = nil) -> BuhlmannTissueState {

@@ -724,7 +724,6 @@
 "planner.repetitive.toggle.a11y" = "Attiva o disattiva la pianificazione ripetitiva Bühlmann di riferimento.";
 "planner.repetitive.surface_interval" = "Intervallo superficie";
 "planner.repetitive.snapshot.status" = "Snapshot tessuti";
-"planner.repetitive.snapshot.source" = "Origine: piano di riferimento calcolato in precedenza";
 "planner.repetitive.snapshot.loaded" = "Caricato";
 "planner.repetitive.snapshot.missing" = "Mancante";
 "planner.repetitive.snapshot.disabled" = "Disattivato";
@@ -734,6 +733,10 @@
 "planner.repetitive.reference_only" = "Pianificazione ripetitiva solo di riferimento, non consiglio decompressivo certificato.";
 "planner.repetitive.clean_dive" = "Riferimento immersione pulita: tessuti saturi d'aria in superficie (nessun carico residuo).";
 "planner.repetitive.result_badge" = "Piano di riferimento ripetitivo";
+"planner.repetitive.not_from_log" = "Lo snapshot tessuti proviene da un piano di riferimento calcolato in precedenza — non dal logbook né dai dati tessuti del watch. Il seeding da immersione registrata non è implementato.";
+"planner.repetitive.snapshot.source" = "Origine: piano di riferimento calcolato in precedenza (non logbook)";
+"planner.bailout.schedule_hint" = "Il gas bailout è configurato per riserva d'emergenza e contingenza — non fa parte dello schedule decompressivo Bühlmann primario.";
+"planner.calculate.in_progress" = "Calcolo in corso…";
 "planner.gas_ledger.title" = "LIBRO GAS SCHEDULE";
 "planner.gas_ledger.subtitle" = "Consumo per bombola dal runtime schedule Bühlmann (non stime solo-fondo).";
 "planner.gas_ledger.remaining_pressure" = "Residuo";
@@ -760,8 +763,10 @@
 "planner.gas_ledger.warning.allocation.title" = "Allocazione incompleta";
 "planner.gas_ledger.warning.allocation.message" = "%@ non può essere allocato completamente sulle bombole.";
 "planner.gas_ledger.warning.allocation.hint" = "Controlla ruoli gas, profondità cambio e assegnazioni bombole.";
-"planner.oxygen_exposure.disclaimer" = "CNS e OTU sono stime di riferimento (non guida certificata all'esposizione ossigeno). Soglie: CNS ≥ 80% e OTU ≥ 300 segnalati come elevati.";
-"planner.oxygen_exposure.a11y" = "CNS e OTU sono stime di riferimento, non guida certificata all'esposizione ossigeno.";
+"planner.oxygen_exposure.disclaimer" = "CNS usa limiti NOAA singolo/giornaliero con recupero superficie/pausa aria 90 min; OTU usa UPTD Lambertsen con soglie REPEX giornaliere (850) e settimanali (1800). Solo pianificazione di riferimento — non guida certificata.";
+"planner.oxygen_exposure.a11y" = "CNS e OTU usano modelli NOAA con recupero superficie e limiti giornalieri, non guida certificata.";
+"planner.oxygen_exposure.daily_summary" = "Riferimento giornaliero: CNS %@%% · OTU 24h %@";
+"planner.oxygen_exposure.air_break_applied" = "Recupero CNS in pausa aria applicato dove PPO₂ ≤ 0,5 bar.";
 "planner.result.warnings.title" = "AVVISI PIANO";
 "planner.header.reference_only.hint" = "Riferimento Bühlmann — non consiglio decompressivo certificato né comportamento di computer subacqueo in tempo reale.";
 "planner.header.no_deco.title" = "Riferimento no-deco";

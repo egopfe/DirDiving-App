@@ -35,52 +35,33 @@ enum GasPlanningService {
             gas: BuhlmannGas(gas: gas, role: .bottom, switchDepthMeters: planningDepth),
             note: "Bottom"
         )
-        let exposure = OxygenExposureModel.from(segments: [bottomSegment], environment: environment)
-        let cns: Double
-        let otu: Double
-        switch exposure {
-        case .success(let model):
-            cns = model.cnsPercent
-            otu = model.otu
+        switch OxygenExposureModel.from(segments: [bottomSegment], environment: environment, carryover: .zero) {
+        case .success(let exposure):
+            return buildAnalysis(
+                input: input,
+                gas: gas,
+                ppO2: ppO2,
+                density: density,
+                rating: rating,
+                end: end,
+                ead: ead,
+                consumption: consumption,
+                remaining: remaining,
+                remainingBar: remainingBar,
+                rockBottom: rockBottom,
+                minimumGasBar: minimumGasBar,
+                turnPressure: turnPressure,
+                exposure: exposure,
+                extraStates: validation.states
+            )
         case .failure:
             var invalid = validation
             invalid.add(.invalidEnvironment, message: "Esposizione ossigeno non valida.")
             return unavailableAnalysis(input: input, gas: gas, validation: invalid)
         }
-        let states = mergeStates(
-            validation.states,
-            makeStates(
-                input: input,
-                ppO2: ppO2,
-                density: density,
-                endMeters: end,
-                remainingLiters: remaining,
-                rockBottomLiters: rockBottom
-            )
-        )
-        let warnings = makeWarnings(states: states)
-
-        return TechnicalGasAnalysis(
-            gas: gas,
-            ppO2AtDepth: ppO2,
-            densityAtDepth: density,
-            densityRating: rating,
-            endMeters: end,
-            eadMeters: ead,
-            consumptionLiters: consumption,
-            remainingLiters: remaining,
-            remainingBar: remainingBar,
-            rockBottomLiters: rockBottom,
-            minimumGasBar: minimumGasBar,
-            turnPressureBar: turnPressure,
-            cnsPercent: cns,
-            otu: otu,
-            warnings: warnings,
-            states: states
-        )
     }
 
-    static func analyze(input: GasPlanInput, enginePlan: BuhlmannEngineResult) -> TechnicalGasAnalysis {
+    static func analyze(input: GasPlanInput, enginePlan: BuhlmannEngineResult, oxygenCarryover: OxygenExposureCarryover = .zero) -> TechnicalGasAnalysis {
         let base = analyze(input: input)
         guard !enginePlan.segments.isEmpty, enginePlan.modelState == .validReference else {
             return base
@@ -105,13 +86,15 @@ enum GasPlanningService {
                 turnPressureBar: base.turnPressureBar,
                 cnsPercent: base.cnsPercent,
                 otu: base.otu,
+                cnsDailyPercent: base.cnsDailyPercent,
+                otuDaily24h: base.otuDaily24h,
+                otuWeekly: base.otuWeekly,
+                airBreakRecoveryApplied: base.airBreakRecoveryApplied,
                 warnings: makeWarnings(states: mergeStates(base.states, [.invalidEnvironment])),
                 states: mergeStates(base.states, [.invalidEnvironment])
             )
         }
 
-        var cns = base.cnsPercent
-        var otu = base.otu
         var maxDensity = base.densityAtDepth
         for segment in enginePlan.segments where segment.minutes.isFinite && segment.minutes > 0 {
             let depth = max(0, segment.depthMeters)
@@ -121,10 +104,11 @@ enum GasPlanningService {
                 maxDensity = max(maxDensity, density)
             }
         }
-        switch OxygenExposureModel.from(segments: enginePlan.segments, environment: environment) {
+
+        var exposureResult: OxygenExposureResult?
+        switch OxygenExposureModel.from(segments: enginePlan.segments, environment: environment, carryover: oxygenCarryover) {
         case .success(let exposure):
-            cns = exposure.cnsPercent
-            otu = exposure.otu
+            exposureResult = exposure
         case .failure:
             return TechnicalGasAnalysis(
                 gas: base.gas,
@@ -141,13 +125,32 @@ enum GasPlanningService {
                 turnPressureBar: base.turnPressureBar,
                 cnsPercent: base.cnsPercent,
                 otu: base.otu,
+                cnsDailyPercent: base.cnsDailyPercent,
+                otuDaily24h: base.otuDaily24h,
+                otuWeekly: base.otuWeekly,
+                airBreakRecoveryApplied: base.airBreakRecoveryApplied,
                 warnings: makeWarnings(states: mergeStates(base.states, [.invalidEnvironment])),
                 states: mergeStates(base.states, [.invalidEnvironment])
             )
         }
 
+        guard let exposure = exposureResult else {
+            return base
+        }
+
         let densityRating = densityRating(maxDensity, warning: input.densityWarningLimit, danger: input.densityDangerLimit)
-        var states = base.states
+        var states = mergeStates(
+            base.states,
+            makeStates(
+                input: input,
+                ppO2: base.ppO2AtDepth,
+                density: maxDensity,
+                endMeters: base.endMeters,
+                remainingLiters: base.remainingLiters,
+                rockBottomLiters: base.rockBottomLiters
+            ),
+            exposurePlannerStates(from: exposure)
+        )
         if maxDensity >= input.densityDangerLimit {
             states = mergeStates(states, [.gasDensityDanger])
         } else if maxDensity >= input.densityWarningLimit {
@@ -176,8 +179,6 @@ enum GasPlanningService {
             }) {
                 states = mergeStates(states, [.belowReserve])
             }
-            let oxygenState: [PlannerResultState] = cns >= 80 || otu >= 300 ? [.oxygenExposureElevated] : []
-            states = mergeStates(states, oxygenState)
             return TechnicalGasAnalysis(
                 gas: base.gas,
                 ppO2AtDepth: base.ppO2AtDepth,
@@ -191,8 +192,12 @@ enum GasPlanningService {
                 rockBottomLiters: rockBottomLiters(input: input, environment: environment),
                 minimumGasBar: base.minimumGasBar,
                 turnPressureBar: base.turnPressureBar,
-                cnsPercent: min(300, cns),
-                otu: otu,
+                cnsPercent: min(300, exposure.cnsSinglePercent),
+                otu: exposure.otuDive,
+                cnsDailyPercent: min(300, exposure.cnsDailyPercent),
+                otuDaily24h: exposure.otuDaily24h,
+                otuWeekly: exposure.otuWeekly,
+                airBreakRecoveryApplied: exposure.airBreakRecoveryApplied,
                 warnings: makeWarnings(states: states),
                 states: states
             )
@@ -213,8 +218,12 @@ enum GasPlanningService {
             rockBottomLiters: base.rockBottomLiters,
             minimumGasBar: base.minimumGasBar,
             turnPressureBar: base.turnPressureBar,
-            cnsPercent: min(300, cns),
-            otu: otu,
+            cnsPercent: min(300, exposure.cnsSinglePercent),
+            otu: exposure.otuDive,
+            cnsDailyPercent: min(300, exposure.cnsDailyPercent),
+            otuDaily24h: exposure.otuDaily24h,
+            otuWeekly: exposure.otuWeekly,
+            airBreakRecoveryApplied: exposure.airBreakRecoveryApplied,
             warnings: makeWarnings(states: states),
             states: states
         )
@@ -395,7 +404,7 @@ enum GasPlanningService {
             "GF: \(Int(input.gfLow))/\(Int(input.gfHigh)); TTS/TTR estimate \(tts) min.",
             "Gas: turn \(Int(analysis.turnPressureBar)) bar, minimum gas \(Int(analysis.minimumGasBar)) bar.",
             "Respirability: density \(String(format: "%.1f", analysis.densityAtDepth)) g/L, END \(Int(analysis.endMeters))m.",
-            "Oxygen: PPO2 \(String(format: "%.1f", analysis.ppO2AtDepth)), CNS \(Int(analysis.cnsPercent))%, OTU \(Int(analysis.otu)).",
+            "Oxygen: PPO2 \(String(format: "%.1f", analysis.ppO2AtDepth)), CNS \(Int(analysis.cnsPercent))% (daily \(Int(analysis.cnsDailyPercent))%), OTU dive \(Int(analysis.otu)), OTU 24h \(Int(analysis.otuDaily24h)).",
             "Stops: \(stops.map { "\(Int($0.depthMeters))m/\($0.minutes)min \($0.gas)" }.joined(separator: ", "))."
         ]
     }
@@ -480,6 +489,63 @@ enum GasPlanningService {
         return merged
     }
 
+    private static func buildAnalysis(
+        input: GasPlanInput,
+        gas: GasMix,
+        ppO2: Double,
+        density: Double,
+        rating: GasDensityRating,
+        end: Double,
+        ead: Double?,
+        consumption: Double,
+        remaining: Double,
+        remainingBar: Double,
+        rockBottom: Double,
+        minimumGasBar: Double,
+        turnPressure: Double,
+        exposure: OxygenExposureResult,
+        extraStates: [PlannerResultState]
+    ) -> TechnicalGasAnalysis {
+        let states = mergeStates(
+            extraStates,
+            makeStates(
+                input: input,
+                ppO2: ppO2,
+                density: density,
+                endMeters: end,
+                remainingLiters: remaining,
+                rockBottomLiters: rockBottom
+            ),
+            exposurePlannerStates(from: exposure)
+        )
+        return TechnicalGasAnalysis(
+            gas: gas,
+            ppO2AtDepth: ppO2,
+            densityAtDepth: density,
+            densityRating: rating,
+            endMeters: end,
+            eadMeters: ead,
+            consumptionLiters: consumption,
+            remainingLiters: remaining,
+            remainingBar: remainingBar,
+            rockBottomLiters: rockBottom,
+            minimumGasBar: minimumGasBar,
+            turnPressureBar: turnPressure,
+            cnsPercent: min(300, exposure.cnsSinglePercent),
+            otu: exposure.otuDive,
+            cnsDailyPercent: min(300, exposure.cnsDailyPercent),
+            otuDaily24h: exposure.otuDaily24h,
+            otuWeekly: exposure.otuWeekly,
+            airBreakRecoveryApplied: exposure.airBreakRecoveryApplied,
+            warnings: makeWarnings(states: states),
+            states: states
+        )
+    }
+
+    private static func exposurePlannerStates(from exposure: OxygenExposureResult) -> [PlannerResultState] {
+        exposure.warningStates.isEmpty ? [] : [.oxygenExposureElevated]
+    }
+
     private static func unavailableAnalysis(input: GasPlanInput, gas: GasMix, validation: PlannerValidationResult) -> TechnicalGasAnalysis {
         let states = validation.states.isEmpty ? [.invalidInput] : validation.states
         return TechnicalGasAnalysis(
@@ -497,6 +563,10 @@ enum GasPlanningService {
             turnPressureBar: 0,
             cnsPercent: 0,
             otu: 0,
+            cnsDailyPercent: 0,
+            otuDaily24h: 0,
+            otuWeekly: 0,
+            airBreakRecoveryApplied: false,
             warnings: makeWarnings(states: states),
             states: states
         )

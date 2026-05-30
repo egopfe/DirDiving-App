@@ -298,6 +298,10 @@ struct TechnicalGasAnalysis: Hashable {
     let turnPressureBar: Double
     let cnsPercent: Double
     let otu: Double
+    let cnsDailyPercent: Double
+    let otuDaily24h: Double
+    let otuWeekly: Double
+    let airBreakRecoveryApplied: Bool
     let warnings: [String]
     let states: [PlannerResultState]
 }

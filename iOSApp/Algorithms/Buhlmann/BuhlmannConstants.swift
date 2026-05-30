@@ -3,6 +3,10 @@ import Foundation
 enum BuhlmannConstants {
     static let compartmentCount = 16
     static let waterVaporPressureBar = 0.0627
+    /// Matches `PlannerEnvironment.seaLevelSaltWater.surfacePressureBar` (ISA sea-level barometric).
+    static let seaLevelSurfacePressureBar = 1.01325
+    /// Matches `WaterDensityModel.saltwaterDensityKgPerM3` for Bühlmann fallback pressure paths.
+    static let saltwaterDensityKgPerM3 = 1_025.0
     static let defaultDescentRateMetersPerMinute = 18.0
     static let defaultAscentRateMetersPerMinute = 9.0
     static let stopIntervalMeters = 3.0

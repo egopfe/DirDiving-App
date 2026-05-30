@@ -85,3 +85,15 @@ Fixture JSON files are bundled as test resources via `project.yml` (`Tests/iOSAl
 ## External Validation Still Required
 
 These fixtures are deterministic regression fixtures for the project implementation. Before stronger release claims, compare output against a trusted independent ZHL-16C + GF implementation and preserve tolerances in this document.
+
+## 2026-05-29 Fixture Extensions
+
+New automated coverage in `BuhlmannComprehensiveReadinessFixTests`:
+
+- Preview NDL vs plan NDL alignment (same environment, ±0.5 min).
+- Altitude and salinity preview NDL divergence.
+- Sea-level saturated tissue vs `PlannerEnvironment.seaLevelSaltWater`.
+- Repetitive snapshot states: missing, stale, schema mismatch, surface interval rejected.
+- GF comparison cache output stability.
+
+External validation campaign checklist: `DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md`.

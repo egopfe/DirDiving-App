@@ -66,8 +66,13 @@ enum PlannerService {
         )
 
         let enginePlan = BuhlmannEngine.plan(request)
+        let oxygenCarryover = resolvedOxygenCarryover(
+            repetitivePlanningEnabled: repetitivePlanningEnabled,
+            snapshot: repetitiveSnapshot,
+            surfaceIntervalMinutes: surfaceIntervalMinutes
+        )
         let ledgerResult = ScheduleGasConsumptionService.analyze(input: working, enginePlan: enginePlan, environment: environment)
-        let analysis = GasPlanningService.analyze(input: working, enginePlan: enginePlan)
+        let analysis = GasPlanningService.analyze(input: working, enginePlan: enginePlan, oxygenCarryover: oxygenCarryover)
         let stops = BuhlmannPlanner.decoStops(from: enginePlan)
 
         let modIssues = PlannerMODValidator.validatePlannerCylinders(input: working)
@@ -245,6 +250,16 @@ enum PlannerService {
             .snapshotEnvironmentMismatch,
             .surfaceIntervalRejected
         ].contains(state)
+    }
+
+    private static func resolvedOxygenCarryover(
+        repetitivePlanningEnabled: Bool,
+        snapshot: TissueSnapshot?,
+        surfaceIntervalMinutes: Double
+    ) -> OxygenExposureCarryover {
+        guard repetitivePlanningEnabled, let snapshot else { return .zero }
+        let base = snapshot.oxygenCarryover ?? .zero
+        return OxygenExposureModel.applySurfaceInterval(to: base, minutes: surfaceIntervalMinutes)
     }
 
     private static func seedRepetitiveRequest(

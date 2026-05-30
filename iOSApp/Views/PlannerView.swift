@@ -291,6 +291,10 @@ struct PlannerView: View {
                         .font(.caption2)
                         .foregroundStyle(DIRTheme.yellow)
                         .fixedSize(horizontal: false, vertical: true)
+                    Text(String(localized: "planner.repetitive.not_from_log"))
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
                 } else {
                     Text(String(localized: "planner.repetitive.clean_dive"))
                         .font(.caption)
@@ -502,6 +506,16 @@ struct PlannerView: View {
                     .foregroundStyle(DIRTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityLabel(String(localized: "planner.oxygen_exposure.a11y"))
+                Text(
+                    String(
+                        format: String(localized: "planner.oxygen_exposure.daily_summary"),
+                        Formatters.zero(store.analysis.cnsDailyPercent),
+                        Formatters.zero(store.analysis.otuDaily24h)
+                    )
+                )
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
@@ -651,9 +665,15 @@ struct PlannerView: View {
             store.calculate()
             showPlan = true
         } label: {
-            Text(String(localized: "Calcola Piano"))
-                .font(.callout.weight(.semibold))
-                .foregroundStyle(canCalculatePlan ? .black : DIRTheme.muted)
+            HStack(spacing: 8) {
+                if store.isCalculating {
+                    ProgressView()
+                        .tint(.black)
+                }
+                Text(String(localized: store.isCalculating ? "planner.calculate.in_progress" : "Calcola Piano"))
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(canCalculatePlan ? .black : DIRTheme.muted)
+            }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
                 .background(
@@ -663,7 +683,7 @@ struct PlannerView: View {
                 )
         }
         .buttonStyle(.plain)
-        .disabled(!canCalculatePlan)
+        .disabled(!canCalculatePlan || store.isCalculating)
         .padding(.top, 4)
         .accessibilityLabel(String(localized: "Calcola Piano"))
         .accessibilityHint(
@@ -812,6 +832,7 @@ struct PlanResultView: View {
                     resultTabs
                     modValidationSection
                     resultWarningsSection
+                    bailoutScheduleHint
                     switch tab {
                     case .plan:
                         resultGrid
@@ -908,6 +929,13 @@ struct PlanResultView: View {
                     }
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private var bailoutScheduleHint: some View {
+        if !PlannerGasSchedule.bailoutCylinders(from: store.input).isEmpty {
+            DIRWarningBox(text: String(localized: "planner.bailout.schedule_hint"))
         }
     }
 
@@ -1100,12 +1128,30 @@ struct PlanResultView: View {
                 DIRMetricTile(title: "CNS%", value: Formatters.zero(store.plan.cnsPercent), unit: "%")
             }
             Divider().overlay(DIRTheme.hairline)
-            Text(String(localized: "planner.oxygen_exposure.disclaimer"))
+            VStack(spacing: 4) {
+                Text(String(localized: "planner.oxygen_exposure.disclaimer"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text(
+                    String(
+                        format: String(localized: "planner.oxygen_exposure.daily_summary"),
+                        Formatters.zero(store.plan.gasAnalysis.cnsDailyPercent),
+                        Formatters.zero(store.plan.gasAnalysis.otuDaily24h)
+                    )
+                )
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
+                if store.plan.gasAnalysis.airBreakRecoveryApplied {
+                    Text(String(localized: "planner.oxygen_exposure.air_break_applied"))
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.yellow)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
             HStack(spacing: 0) {
                 DIRMetricTile(title: String(localized: "planner.metric.density"), value: Formatters.one(store.analysis.densityAtDepth), unit: "g/L", color: store.analysis.densityRating == .red ? DIRTheme.red : DIRTheme.cyan)
                 Divider().overlay(DIRTheme.hairline)

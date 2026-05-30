@@ -7,6 +7,7 @@ final class BuhlmannUxReadinessTests: XCTestCase {
         .snapshotCorrupt,
         .snapshotSchemaMismatch,
         .snapshotEnvironmentMismatch,
+        .surfaceIntervalRejected,
         .gasAllocationIncomplete,
         .missingCylinder,
         .noValidDecompressionSolution,
@@ -39,7 +40,8 @@ final class BuhlmannUxReadinessTests: XCTestCase {
             (.corrupted, .snapshotCorrupt),
             (.stale, .snapshotStale),
             (.schemaMismatch, .snapshotSchemaMismatch),
-            (.invalidEnvironment, .snapshotEnvironmentMismatch)
+            (.invalidEnvironment, .snapshotEnvironmentMismatch),
+            (.invalidSurfaceInterval, .surfaceIntervalRejected)
         ]
         for (error, expected) in mapping {
             XCTAssertEqual(PlannerUserFacingCopy.snapshotIssue(for: error), expected)

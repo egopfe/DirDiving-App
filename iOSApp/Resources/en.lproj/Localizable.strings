@@ -726,7 +726,6 @@
 "planner.repetitive.toggle.a11y" = "Enable or disable repetitive Bühlmann reference planning.";
 "planner.repetitive.surface_interval" = "Surface interval";
 "planner.repetitive.snapshot.status" = "Tissue snapshot";
-"planner.repetitive.snapshot.source" = "Source: prior calculated plan reference";
 "planner.repetitive.snapshot.loaded" = "Loaded";
 "planner.repetitive.snapshot.missing" = "Missing";
 "planner.repetitive.snapshot.disabled" = "Disabled";
@@ -736,6 +735,10 @@
 "planner.repetitive.reference_only" = "Repetitive planning is reference-only and not certified decompression advice.";
 "planner.repetitive.clean_dive" = "Clean-dive reference: air-saturated tissue at surface (no residual load applied).";
 "planner.repetitive.result_badge" = "Repetitive reference plan";
+"planner.repetitive.not_from_log" = "Tissue snapshot is from a prior calculated reference plan — not from dive log or watch tissue data. Logbook-derived seeding is not implemented.";
+"planner.repetitive.snapshot.source" = "Source: prior calculated reference plan (not dive log)";
+"planner.bailout.schedule_hint" = "Bailout gas is configured for emergency reserve and contingency — it is not part of the primary Bühlmann decompression schedule.";
+"planner.calculate.in_progress" = "Calculating…";
 "planner.gas_ledger.title" = "SCHEDULE GAS LEDGER";
 "planner.gas_ledger.subtitle" = "Per-cylinder consumption from the Bühlmann runtime schedule (not bottom-only estimates).";
 "planner.gas_ledger.remaining_pressure" = "Remaining";
@@ -762,8 +765,10 @@
 "planner.gas_ledger.warning.allocation.title" = "Allocation incomplete";
 "planner.gas_ledger.warning.allocation.message" = "%@ could not be fully allocated across cylinders.";
 "planner.gas_ledger.warning.allocation.hint" = "Check gas roles, switch depths, and cylinder assignments.";
-"planner.oxygen_exposure.disclaimer" = "CNS and OTU are reference estimates only (not certified oxygen exposure guidance). Threshold hints: CNS ≥ 80% and OTU ≥ 300 are flagged as elevated.";
-"planner.oxygen_exposure.a11y" = "CNS and OTU are reference estimates only, not certified oxygen exposure guidance.";
+"planner.oxygen_exposure.disclaimer" = "CNS uses NOAA piecewise single- and daily-exposure limits with 90-minute surface/air-break recovery; OTU uses Lambertsen UPTD with NOAA REPEX daily (850) and weekly (1800) reference thresholds. Planning reference only — not certified oxygen exposure guidance.";
+"planner.oxygen_exposure.a11y" = "CNS and OTU use NOAA-style reference models with surface recovery and daily limits, not certified oxygen exposure guidance.";
+"planner.oxygen_exposure.daily_summary" = "Daily reference: CNS %@%% · OTU 24h %@";
+"planner.oxygen_exposure.air_break_applied" = "In-water air-break CNS recovery applied where PPO₂ ≤ 0.5 bar.";
 "planner.result.warnings.title" = "PLAN WARNINGS";
 "planner.header.reference_only.hint" = "Bühlmann-based planning reference only — not certified decompression advice or real-time dive-computer behavior.";
 "planner.header.no_deco.title" = "No-deco reference";

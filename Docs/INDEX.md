@@ -7,6 +7,18 @@
 
 ---
 
+## Aggiornamento indice 2026-05-29 — comprehensive readiness implementation
+
+Implementazione P1–P4 da [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md) (**104/104 XCTest pass**, iPhone 17 sim):
+
+| Documento | Posizione | Contenuto |
+|-----------|-----------|-----------|
+| [`DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md`](DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md) | `Docs/` | **Completion report** — verdict **READY FOR INTERNAL VALIDATION** |
+| [`DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md`](DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md) | `Docs/` | External validation campaign checklist |
+| [`DIR_DIVING_IOS_PHYSICAL_ACCESSIBILITY_QA.md`](DIR_DIVING_IOS_PHYSICAL_ACCESSIBILITY_QA.md) | `Docs/` | Physical a11y QA matrix |
+
+---
+
 ## Aggiornamento indice 2026-05-30 — comprehensive Bühlmann readiness audit
 
 Pass read-only su `main` @ `e1370f7` (math, consistency, UX/UI, tests, docs; **88/88 XCTest pass**):

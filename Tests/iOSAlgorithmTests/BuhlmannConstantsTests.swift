@@ -20,6 +20,19 @@ final class BuhlmannConstantsTests: XCTestCase {
         XCTAssertEqual(BuhlmannConstants.bHe.last ?? 0, 0.9267, accuracy: 0.0001)
     }
 
+    func testSeaLevelSurfacePressureMatchesPlannerEnvironment() {
+        XCTAssertEqual(
+            BuhlmannConstants.seaLevelSurfacePressureBar,
+            PlannerEnvironment.seaLevelSaltWater.surfacePressureBar,
+            accuracy: 0.00001
+        )
+        XCTAssertEqual(
+            BuhlmannConstants.saltwaterDensityKgPerM3,
+            WaterDensityModel.saltwaterDensityKgPerM3,
+            accuracy: 0.1
+        )
+    }
+
     func testMixedGasCoefficientsStayBetweenNitrogenAndHeliumCoefficients() {
         let a = BuhlmannConstants.coefficientA(index: 0, pn2: 0.5, phe: 0.5)
         let b = BuhlmannConstants.coefficientB(index: 0, pn2: 0.5, phe: 0.5)

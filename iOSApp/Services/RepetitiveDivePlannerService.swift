@@ -5,9 +5,24 @@ struct TissueSnapshot: Codable, Hashable {
     let plannerEnvironment: PlannerEnvironment
     let tissueState: BuhlmannTissueState
     let schemaVersion: Int
+    let oxygenCarryover: OxygenExposureCarryover?
 
-    static let currentSchemaVersion = 1
+    static let currentSchemaVersion = 2
     static let maxAge: TimeInterval = 60 * 60 * 24 * 14
+
+    init(
+        createdAt: Date,
+        plannerEnvironment: PlannerEnvironment,
+        tissueState: BuhlmannTissueState,
+        schemaVersion: Int = TissueSnapshot.currentSchemaVersion,
+        oxygenCarryover: OxygenExposureCarryover? = nil
+    ) {
+        self.createdAt = createdAt
+        self.plannerEnvironment = plannerEnvironment
+        self.tissueState = tissueState
+        self.schemaVersion = schemaVersion
+        self.oxygenCarryover = oxygenCarryover
+    }
 }
 
 struct SurfaceIntervalModel: Hashable {
@@ -27,21 +42,30 @@ enum RepetitiveDivePlannerService {
         case stale
         case schemaMismatch
         case invalidEnvironment
+        case invalidSurfaceInterval
     }
 
     static func makeSnapshot(from result: BuhlmannEngineResult, environment: PlannerEnvironment) -> TissueSnapshot? {
         guard let tissue = result.finalTissueState else { return nil }
+        let oxygenCarryover: OxygenExposureCarryover?
+        switch OxygenExposureModel.from(segments: result.segments, environment: environment, carryover: .zero) {
+        case .success(let exposure):
+            oxygenCarryover = exposure.carryoverEnd
+        case .failure:
+            oxygenCarryover = nil
+        }
         return TissueSnapshot(
             createdAt: Date(),
             plannerEnvironment: environment,
             tissueState: tissue,
-            schemaVersion: TissueSnapshot.currentSchemaVersion
+            schemaVersion: TissueSnapshot.currentSchemaVersion,
+            oxygenCarryover: oxygenCarryover
         )
     }
 
     static func validateSnapshot(_ snapshot: TissueSnapshot?) -> Result<TissueSnapshot, SnapshotError> {
         guard let snapshot else { return .failure(.missing) }
-        guard snapshot.schemaVersion == TissueSnapshot.currentSchemaVersion else {
+        guard snapshot.schemaVersion == 1 || snapshot.schemaVersion == TissueSnapshot.currentSchemaVersion else {
             return .failure(.schemaMismatch)
         }
         if Date().timeIntervalSince(snapshot.createdAt) > TissueSnapshot.maxAge {
@@ -62,6 +86,9 @@ enum RepetitiveDivePlannerService {
         case .success(let valid):
             guard valid.plannerEnvironment == environment else {
                 return .failure(.invalidEnvironment)
+            }
+            guard surfaceIntervalMinutes.isFinite, surfaceIntervalMinutes >= 0 else {
+                return .failure(.invalidSurfaceInterval)
             }
             let interval = SurfaceIntervalModel(minutes: surfaceIntervalMinutes)
             guard let offGassed = interval.offGas(valid.tissueState, environment: environment) else {

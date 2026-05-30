@@ -150,16 +150,19 @@ Covered by `BuhlmannNDLTests`, `BuhlmannReauditFixTests`, and `BuhlmannReference
 
 ## 11. Oxygen Exposure (CNS / OTU)
 
-Implemented in `OxygenExposureModels.swift` (`CNSClockModel`, `OTUModel`, `OxygenExposureModel`).
+Implemented in `OxygenExposureModels.swift` (`NOAACNSLimitTable`, `NOAACNSDailyLimitTable`, `CNSRecoveryModel`, `OTUREPEXLimits`, `OTUModel`, `OxygenExposureModel`).
 
 Assumptions:
 
-- NOAA-style single-limit CNS clock bands above `0.5 bar` PPO2 (720 / 210 / 150 / 45 / 10 minute limits by band).
-- OTU accumulation uses the standard `(0.5 / (PPO2 - 0.5))^-0.833` minute weighting above `0.5 bar`.
+- **CNS single:** NOAA 1991 piecewise-linear `Tlimit(PPO2)` segments. Constant depth uses `minutes / Tlimit × 100`. Descent/ascent ramps integrate in 0.05-minute steps along linear PPO2 change.
+- **CNS daily (24 h):** NOAA daily limit table with linear interpolation between knots 1.0–1.6 bar; parallel accumulation using daily limits.
+- **CNS recovery:** 90-minute half-time decay when inspired PPO₂ ≤ 0.5 bar (surface interval and in-water air breaks).
+- **OTU dive:** Lambertsen UPTD — constant depth `(0.5 / (PPO2 − 0.5))^(5/6) × minutes`; linear ramps use Baker Eq. 2 with PPO2 clipped at 0.5 bar when crossing the toxicity threshold.
+- **OTU daily / weekly:** REPEX reference thresholds — dive OTU ≥ 300, daily 24 h ≥ 850, weekly ≥ 1 800; daily resets after 24 h SI, weekly after 7 d.
+- **Repetitive carryover:** `TissueSnapshot` schema v2 stores `oxygenCarryover`; `PlannerService` applies surface-interval decay/resets before the next plan.
 - Invalid segment depth/duration or non-finite results fail closed via `OxygenExposureWarningState.invalidExposureInput`.
-- Project tolerance: reference-only aggregation; warnings at CNS ≥ 80% and OTU ≥ 300.
 
-Covered by `BuhlmannReauditFixTests` and schedule-aware analysis in `GasPlanningService`.
+Covered by `OxygenExposureDeepModelTests` (14 tests), `BuhlmannReauditFixTests`, and schedule-aware analysis in `GasPlanningService`.
 
 ## 8. Multigas Decompression Algorithm
 
@@ -229,3 +232,13 @@ Before release claims are broadened:
 - Build `DIRDiving iOS` on macOS.
 - Run `DIRDiving iOS Algorithm Tests` on macOS.
 - Expand the independent ZHL-16C + GF reference fixture set beyond the current Air/Nitrox/Trimix external envelopes and document tighter tolerances.
+
+## 11. Environment Baseline Unification (2026-05-29)
+
+| Item | Before | After |
+|---|---|---|
+| Default `airSaturated()` surface pressure | `1.0 bar` via `IOSAlgorithmConfiguration` | `1.01325 bar` via `BuhlmannConstants.seaLevelSurfacePressureBar` |
+| Preview NDL environment | Default sea-level only (ignored planner altitude/salinity) | Same `PlannerEnvironment` as `PlannerService.makePlan` |
+| Nil-environment Bühlmann gas pressure | Legacy `IOSUnitConversions.ambientPressureBar(depthMeters:)` | ISA sea-level saltwater constants in `BuhlmannGas` |
+
+Verified by `BuhlmannComprehensiveReadinessFixTests` and `BuhlmannConstantsTests.testSeaLevelSurfacePressureMatchesPlannerEnvironment`.

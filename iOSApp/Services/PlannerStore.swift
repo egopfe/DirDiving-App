@@ -26,6 +26,7 @@ final class PlannerStore: ObservableObject {
     @Published var surfaceIntervalMinutes: Double = 60 {
         didSet { saveIfReady() }
     }
+    @Published private(set) var isCalculating = false
     @Published private(set) var lastTissueSnapshot: TissueSnapshot?
 
     private let cloudSync: CloudSyncStore?
@@ -53,26 +54,34 @@ final class PlannerStore: ObservableObject {
     }
 
     func calculate() {
-        applyInputToPlanningOutputs()
+        guard isReady else { return }
+        isCalculating = true
+        defer { isCalculating = false }
+        applyInputToPlanningOutputs(persistSnapshot: true)
         saveIfReady()
     }
 
     /// Keeps plan, Bühlmann NDL, and analysis in sync with current gas UI (algorithm unchanged; inputs only).
-    private func applyInputToPlanningOutputs() {
+    private func applyInputToPlanningOutputs(persistSnapshot: Bool = false) {
         guard isReady else { return }
         isApplyingInputSideEffects = true
         input.syncLegacyGasesFromPlannerCylinders()
-        buhlmann = BuhlmannPlanner.plan(
-            depthMeters: input.buhlmannPlanningDepthMeters,
-            bottomGas: input.buhlmannBackGas
-        )
+        if case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) {
+            buhlmann = BuhlmannPlanner.plan(
+                depthMeters: input.buhlmannPlanningDepthMeters,
+                bottomGas: input.buhlmannBackGas,
+                environment: environment,
+                gfHigh: input.gfHigh
+            )
+        }
         plan = PlannerService.makePlan(
             input: input,
             repetitivePlanningEnabled: repetitivePlanningEnabled,
             repetitiveSnapshot: repetitivePlanningEnabled ? lastTissueSnapshot : nil,
             surfaceIntervalMinutes: surfaceIntervalMinutes
         )
-        if let environment = try? makeEnvironment(),
+        if persistSnapshot,
+           let environment = try? makeEnvironment(),
            let snapshot = RepetitiveDivePlannerService.makeSnapshot(from: BuhlmannPlanner.enginePlan(input: input), environment: environment) {
             lastTissueSnapshot = snapshot
         }

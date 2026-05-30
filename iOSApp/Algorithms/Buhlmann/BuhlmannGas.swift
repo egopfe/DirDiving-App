@@ -63,8 +63,7 @@ struct BuhlmannGas: Hashable {
     }
 
     func inspiredPressure(depthMeters: Double, inert: BuhlmannInertGas, environment: PlannerEnvironment? = nil) -> Double {
-        let ambient = environment.flatMap { IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters, environment: $0) }
-            ?? IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters)
+        let ambient = Self.ambientPressureBar(depthMeters: depthMeters, environment: environment)
         let dryPressure = max(0, ambient - BuhlmannConstants.waterVaporPressureBar)
         switch inert {
         case .nitrogen:
@@ -75,9 +74,19 @@ struct BuhlmannGas: Hashable {
     }
 
     func ppO2(depthMeters: Double, environment: PlannerEnvironment? = nil) -> Double {
-        let ambient = environment.flatMap { IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters, environment: $0) }
-            ?? IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters)
+        let ambient = Self.ambientPressureBar(depthMeters: depthMeters, environment: environment)
         return max(0, oxygenFraction) * ambient
+    }
+
+    /// Bühlmann paths use `AmbientPressureModel` when environment is provided; otherwise ISA sea-level saltwater constants.
+    private static func ambientPressureBar(depthMeters: Double, environment: PlannerEnvironment?) -> Double {
+        guard depthMeters.isFinite, depthMeters >= 0 else { return 0 }
+        if let environment,
+           let pressure = IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters, environment: environment) {
+            return pressure
+        }
+        return BuhlmannConstants.seaLevelSurfacePressureBar
+            + (BuhlmannConstants.saltwaterDensityKgPerM3 * 9.80665 * depthMeters) / 100_000.0
     }
 
     func isOperational(fromDepthMeters: Double, toDepthMeters: Double, environment: PlannerEnvironment? = nil) -> Bool {
@@ -94,9 +103,15 @@ struct BuhlmannGas: Hashable {
         GasMixValidator.modMeters(oxygenFraction: oxygenFraction, maxPPO2: maxPPO2Bar)
     }
 
-    func minimumOperatingDepthMeters(minPPO2: Double = BuhlmannConstants.minBreathablePPO2Bar) -> Double {
+    func minimumOperatingDepthMeters(minPPO2: Double = BuhlmannConstants.minBreathablePPO2Bar, environment: PlannerEnvironment? = nil) -> Double {
         guard oxygenFraction.isFinite, oxygenFraction > 0 else { return Double.infinity }
-        return IOSUnitConversions.depthMeters(forPressureBar: minPPO2 / oxygenFraction)
+        let targetAmbient = minPPO2 / oxygenFraction
+        if let environment,
+           let depth = IOSUnitConversions.depthMeters(forPressureBar: targetAmbient, environment: environment) {
+            return depth
+        }
+        let delta = max(0, targetAmbient - BuhlmannConstants.seaLevelSurfacePressureBar)
+        return delta * 100_000.0 / (BuhlmannConstants.saltwaterDensityKgPerM3 * 9.80665)
     }
 
     var isCompositionValid: Bool {

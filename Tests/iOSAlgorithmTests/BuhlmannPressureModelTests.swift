@@ -13,7 +13,9 @@ final class BuhlmannPressureModelTests: XCTestCase {
 
     func testInspiredNitrogenAndHeliumPressureSubtractWaterVapor() {
         let gas = BuhlmannTestSupport.trimix1845(switchDepth: 50)
-        let dryAmbient = IOSUnitConversions.ambientPressureBar(depthMeters: 50) - BuhlmannConstants.waterVaporPressureBar
+        let ambient = BuhlmannConstants.seaLevelSurfacePressureBar
+            + (BuhlmannConstants.saltwaterDensityKgPerM3 * 9.80665 * 50) / 100_000.0
+        let dryAmbient = ambient - BuhlmannConstants.waterVaporPressureBar
 
         XCTAssertEqual(
             gas.inspiredPressure(depthMeters: 50, inert: .nitrogen),
@@ -23,6 +25,18 @@ final class BuhlmannPressureModelTests: XCTestCase {
         XCTAssertEqual(
             gas.inspiredPressure(depthMeters: 50, inert: .helium),
             dryAmbient * gas.heliumFraction,
+            accuracy: 0.0001
+        )
+    }
+
+    func testInspiredPressureWithEnvironmentUsesAmbientPressureModel() {
+        let gas = BuhlmannTestSupport.trimix1845(switchDepth: 50)
+        let sea = PlannerEnvironment.seaLevelSaltWater
+        let ambient = AmbientPressureModel.ambientPressureBar(depthMeters: 50, environment: sea)!
+        let dryAmbient = ambient - BuhlmannConstants.waterVaporPressureBar
+        XCTAssertEqual(
+            gas.inspiredPressure(depthMeters: 50, inert: .nitrogen, environment: sea),
+            dryAmbient * gas.nitrogenFraction,
             accuracy: 0.0001
         )
     }
