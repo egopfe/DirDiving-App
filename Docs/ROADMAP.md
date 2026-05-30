@@ -1,6 +1,6 @@
 # Roadmap DIR DIVING
 
-**Aggiornato:** 2026-05-30 (`main` @ `156fc40`)
+**Aggiornato:** 2026-05-30 (`main` @ `8ddc2fe`)
 
 ## Rilasciati su `main` (Watch MAIN + iOS nel workspace)
 
@@ -55,7 +55,7 @@
 | iOS Buhlmann ZHL-16C multigas engine | ✅ | Motore reference iOS-only con N2+He, GF, NDL tissue-state e soste generate; non certificato, da validare esternamente |
 | iOS Buhlmann re-audit 2026-05-28 | ✅ | P1–P3 risolti @ `69e69b2` — [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) |
 | iOS Buhlmann UX/UI readiness | ✅ | Fix @ `3237262`; re-audit **Ready** — [`Docs/DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md) |
-| Docs Phase 15 alignment | ✅ | @ `156fc40` — [`DOCUMENTATION_BRANCH_ALIGNMENT_20260530.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260530.md) |
+| Docs Phase 15 alignment | ✅ | @ `8ddc2fe` — [`DOCUMENTATION_BRANCH_ALIGNMENT_20260530.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260530.md) |
 | Docs / audit alignment 2026-05-25 | ✅ | README, INDEX, safety/release docs e matrix riallineati al MAIN corrente |
 | Docs / branch / PR alignment 2026-05-26 | ✅ | README, INDEX, roadmap, current audits, branch/PR reports riallineati alla baseline MAIN attuale |
 | Docs / branch / PR alignment 2026-05-27 | ✅ | README, INDEX, roadmap, release/TestFlight notes, matrix e PR reports riallineati a `37e4464` + docs algorithm/Buhlmann |
