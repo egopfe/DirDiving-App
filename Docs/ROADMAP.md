@@ -1,6 +1,6 @@
 # Roadmap DIR DIVING
 
-**Aggiornato:** 2026-05-29 (`main` @ `69e69b2`)
+**Aggiornato:** 2026-05-30 (`main` @ `3237262`)
 
 ## Rilasciati su `main` (Watch MAIN + iOS nel workspace)
 
@@ -54,8 +54,8 @@
 | iOS algorithm release-hard pass | ✅ | Validator iOS, planner/gas safe states, import/export/sync/logbook math, route math, test `DIRDiving iOS Algorithm Tests` |
 | iOS Buhlmann ZHL-16C multigas engine | ✅ | Motore reference iOS-only con N2+He, GF, NDL tissue-state e soste generate; non certificato, da validare esternamente |
 | iOS Buhlmann re-audit 2026-05-28 | ✅ | P1–P3 risolti @ `69e69b2` — [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) |
-| iOS Buhlmann UX/UI readiness audit 2026-05-28 | 🟡 | *Partially ready* — [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](../DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md); gap UI repetitive/ledger/ambiente |
-| Docs / branch / PR alignment 2026-05-19 | ✅ | README, INDEX, roadmap, safety/release docs, matrix e branch strategy @ `92e639a` |
+| iOS Buhlmann UX/UI readiness | ✅ | Fix @ `3237262`; re-audit **Ready** — [`Docs/DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md) |
+| Docs Phase 15 alignment | ✅ | @ `3237262` — [`DOCUMENTATION_BRANCH_ALIGNMENT_20260530.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260530.md) |
 | Docs / audit alignment 2026-05-25 | ✅ | README, INDEX, safety/release docs e matrix riallineati al MAIN corrente |
 | Docs / branch / PR alignment 2026-05-26 | ✅ | README, INDEX, roadmap, current audits, branch/PR reports riallineati alla baseline MAIN attuale |
 | Docs / branch / PR alignment 2026-05-27 | ✅ | README, INDEX, roadmap, release/TestFlight notes, matrix e PR reports riallineati a `37e4464` + docs algorithm/Buhlmann |
@@ -71,8 +71,8 @@
 | P1 | QA reale Apple Watch Ultra per lifecycle automatico, profondita e limiti 35/38/40 m | Hardware QA |
 | P1 | QA pairing/sync bidirezionale su device | Hardware QA |
 | P1 | QA App Intents / Action Button su Watch fisico | Hardware QA |
-| P2 | UX planner Bühlmann: repetitive planning visibile, ledger per cilindro, copy ambiente coerente | Planner UX — [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](../DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md) |
-| P2 | Validazione matematica esterna del motore Buhlmann ZHL-16C + GF + He con fixture indipendenti prima di claim release piu forti | Planner QA — [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md), re-audit [`DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) |
+| P2 | Validazione matematica esterna del motore Buhlmann ZHL-16C + GF + He | Planner QA — [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md) |
+| P2 | VoiceOver / Dynamic Type QA fisica su planner iOS | UX QA — post `3237262` |
 | P2 | Verifica finale legale contenuti Terms/Privacy e copy App Review | Legal / App Store |
 | P2 | Convergenza documentazione `main` ↔ worktree storici (`main-iOS`, `codex/*`) senza merge runtime unsafe | Process |
 | P3 | GPX/UDDF export | Feature |

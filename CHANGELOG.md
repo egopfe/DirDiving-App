@@ -4,6 +4,14 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-30, Phase 15 documentation alignment)
+
+- Phase 15 docs: README, INDEX, ROADMAP, CSV, release/TestFlight, re-audit, consistency report, final readiness report @ `3237262`.
+
+### Fixed (2026-05-30, iOS Bühlmann UX/UI — `3237262`)
+
+- UX P1–P3 planner presentation fix; verification [`DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md); re-audit **Ready** [`Docs/DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](Docs/DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md).
+
 ### Fixed (2026-05-29, iOS Buhlmann reaudit — `69e69b2`)
 
 - **Algoritmo iOS:** fix P1–P3 da [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) — environment-aware ceiling/NDL, canonical engine result, stable cylinder IDs, fixture/tests; `DIRDiving iOS Algorithm Tests` verde su macOS.

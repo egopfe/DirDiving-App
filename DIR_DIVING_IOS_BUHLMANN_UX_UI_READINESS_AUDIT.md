@@ -1,6 +1,7 @@
 # DIR Diving iOS Bühlmann UX/UI Readiness Audit
 
 Date: 2026-05-28  
+**Superseded by:** [`Docs/DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](Docs/DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md) (2026-05-30, verdict **READY** after fix @ `3237262`)  
 Branch audited: `main` (iOS Companion only) @ `570964e` (pre-algorithm fix); algorithm P1–P3 resolved @ `69e69b2` — see [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md)  
 Indexed in: [`Docs/INDEX.md`](Docs/INDEX.md) §1, §4, §6, §13  
 Audit type: read-only UX/UI readiness audit after latest Bühlmann multigas planner work

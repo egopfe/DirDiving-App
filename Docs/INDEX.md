@@ -1,9 +1,26 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-05-29  
-**Branch consigliato:** `main` @ `69e69b2` (`origin/main` allineato)
+**Aggiornato:** 2026-05-30  
+**Branch consigliato:** `main` @ `3237262` (`origin/main` allineato)
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-05-30 — Phase 15 UX fix + re-audit READY
+
+Pass UX/UI su `main` @ `3237262` (fix P1–P3 presentation; algoritmo invariato @ `69e69b2`; XCTest `BuhlmannUxReadinessTests` verde):
+
+| Documento | Posizione | Contenuto |
+|-----------|-----------|-----------|
+| [`DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md) | `Docs/` | **Post-fix re-audit** — verdict **READY**; matrice issue originale → SOLVED |
+| [`../DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md`](../DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md) | **Root repo** | Verifica implementazione fix UX @ `3237262` |
+| [`../DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](../DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md) | **Root repo** | Audit originale (2026-05-28) *Partially ready* — **superseded** da re-audit |
+| [`../DIR_DIVING_FINAL_IMPLEMENTATION_AND_READINESS_REPORT.md`](../DIR_DIVING_FINAL_IMPLEMENTATION_AND_READINESS_REPORT.md) | **Root repo** | Report Phase 15 — verdict **READY FOR INTERNAL VALIDATION** |
+| [`DIR_DIVING_REPOSITORY_CONSISTENCY_REPORT.md`](DIR_DIVING_REPOSITORY_CONSISTENCY_REPORT.md) | `Docs/` | Consistency audit pre-commit Phase 15 |
+| [`DOCUMENTATION_BRANCH_ALIGNMENT_20260530.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260530.md) | `Docs/` | Branch strategy + MAIN capabilities @ `3237262` |
+
+Relazione: reaudit math → fix @ `69e69b2` → UX audit gaps → fix @ `3237262` → re-audit **READY**.
 
 ---
 
