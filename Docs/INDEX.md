@@ -1,7 +1,7 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-05-30  
-**Branch consigliato:** `main` @ `3237262` (`origin/main` allineato)
+**Branch consigliato:** `main` @ `156fc40` (`origin/main` allineato)
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
 

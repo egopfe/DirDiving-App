@@ -1,6 +1,6 @@
 # DIR DIVING — Branch alignment (2026-05-30)
 
-**Baseline:** `main` @ `3237262` + Phase 15 documentation commits  
+**Baseline:** `main` @ `156fc40` (Phase 15 complete; UX fix @ `3237262`)  
 **Remote:** `origin` → `https://github.com/egopfe/DirDiving-App`
 
 ## Branch strategy (authoritative)

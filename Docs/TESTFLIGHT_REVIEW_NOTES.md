@@ -1,6 +1,6 @@
 # Note per TestFlight / App Review - DIR DIVING
 
-**Aggiornato:** 2026-05-30 — branch `main` @ `3237262` (Watch + iOS companion unificati)
+**Aggiornato:** 2026-05-30 — branch `main` @ `156fc40` (Watch + iOS companion unificati)
 
 ## Panoramica per il revisore
 

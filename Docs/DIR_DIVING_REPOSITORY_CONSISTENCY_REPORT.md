@@ -9,7 +9,7 @@ Remote: `origin` → `https://github.com/egopfe/DirDiving-App`
 | Check | Status |
 |---|---|
 | Working tree clean (pre Phase 15 docs) | PASS @ `3237262` |
-| Local `main` == `origin/main` | PASS @ `3237262` |
+| Local `main` == `origin/main` | PASS @ `156fc40` |
 | Conflict markers in repo | PASS (none found) |
 | Watch files in UX fix commit | PASS (none modified) |
 | Experimental files in UX fix commit | PASS (none modified) |
@@ -96,4 +96,4 @@ Post Phase 15 alignment:
 
 ## Verdict
 
-**Repository consistency: PASS** for MAIN @ `3237262` + Phase 15 documentation alignment.
+**Repository consistency: PASS** for MAIN @ `156fc40` (Phase 15 complete; `origin/main` synced).
