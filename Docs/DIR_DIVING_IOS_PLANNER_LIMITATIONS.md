@@ -42,6 +42,16 @@ The iOS planner now includes a ZHL-16C N2+He multigas reference engine:
 - The planner does not account for individual physiology, workload, thermal stress, repetitive-dive edge cases beyond current tissue-state input, or equipment failures.
 - Physical-device QA and App Store/TestFlight review remain required.
 
+## UX Presentation (2026-05-29)
+
+The iOS planner UI now exposes repetitive planning, schedule gas ledger, environment pressure assumptions, typed warning taxonomy, CNS/OTU reference-only labeling, and explicit result headers. These are presentation layers on top of the existing reference engine — not certified decompression advice.
+
+Remaining UX limitations:
+
+- No async calculation progress indicator (plans compute synchronously on device).
+- Large Dynamic Type sizes may require additional scrolling on dense planner cards.
+- VoiceOver focus order improved but not exhaustively validated on physical hardware.
+
 ## Fail-Closed Policy
 
 The planner must not silently normalize unsafe input into valid-looking output. Invalid gas mixes, invalid gradient factors, MOD violations, hypoxic gas use, invalid switch depths, and impossible profile values must surface as blocking states or unavailable output.

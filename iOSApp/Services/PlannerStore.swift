@@ -68,6 +68,7 @@ final class PlannerStore: ObservableObject {
         )
         plan = PlannerService.makePlan(
             input: input,
+            repetitivePlanningEnabled: repetitivePlanningEnabled,
             repetitiveSnapshot: repetitivePlanningEnabled ? lastTissueSnapshot : nil,
             surfaceIntervalMinutes: surfaceIntervalMinutes
         )

@@ -50,9 +50,9 @@ enum PlannerInputValidator {
         if case .failure(let error) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) {
             switch error {
             case .invalidAltitude:
-                result.add(.invalidEnvironment, message: "Altitudine fuori dal range valido (-500–4500 m).")
+                result.add(.invalidEnvironment, message: String(localized: "planner.environment.invalid_altitude.message"))
             case .invalidSalinity:
-                result.add(.invalidEnvironment, message: "Salinita non valida.")
+                result.add(.invalidEnvironment, message: String(localized: "planner.environment.invalid_salinity.message"))
             }
         }
 

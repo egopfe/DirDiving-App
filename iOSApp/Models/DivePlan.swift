@@ -89,6 +89,12 @@ struct DivePlanResult: Hashable {
     let modValidationIssues: [MODValidationIssue]
     let states: [PlannerResultState]
     let buhlmannState: BuhlmannModelState
+    let resultHeader: PlannerResultHeader
+    let repetitiveContext: RepetitivePlanningContext?
+    let environmentSummary: PlannerEnvironmentSummary?
+    let gasLedger: GasConsumptionLedger?
+    let gasLedgerFailure: GasLedgerFailureReason?
+    let userFacingWarnings: [PlannerUserFacingMessage]
 }
 
 struct NDLPoint: Identifiable, Hashable {

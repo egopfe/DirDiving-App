@@ -35,6 +35,22 @@ Additional hardening in this pass:
 
 macOS validation (2026-05-29): `DIRDiving iOS` build succeeded; `DIRDiving iOS Algorithm Tests` — **TEST SUCCEEDED**.
 
+## 2026-05-29 UX/UI Readiness Pass
+
+Presentation-only updates (no Bühlmann/gas math changes):
+
+- Repetitive planning controls and fail-closed snapshot status in `PlannerView`
+- Schedule gas ledger result card (per-cylinder consumed/remaining/reserve flags)
+- Environment pressure-model messaging aligned with active altitude/salinity behavior
+- Typed `PlannerResultState` → title/message/severity/corrective-hint mapping
+- Explicit result header badge (no-deco vs deco-required vs invalid vs repetitive vs environment-adjusted)
+- CNS/OTU reference-only disclaimer where values appear
+- VoiceOver labels and non-truncating warning copy on planner input/result flows
+
+Warning taxonomy includes snapshot missing/stale/corrupt/schema mismatch, gas allocation incomplete, missing cylinder, no valid decompression solution, invalid environment, and elevated oxygen exposure. All safety-critical states expose corrective hints; none imply certified decompression authority or real-time dive-computer behavior.
+
+See `DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md` for acceptance verification.
+
 ## Buhlmann Engine Status
 
 Implemented in `iOSApp/Algorithms/Buhlmann/`:

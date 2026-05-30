@@ -39,6 +39,7 @@ struct PlannerView: View {
                         Group {
                             modePicker
                             profileCard
+                            repetitivePlanningCard
                             plannerCylindersCard
                             technicalAnalysisCard
                             reserveCard
@@ -197,8 +198,170 @@ struct PlannerView: View {
                     .tint(DIRTheme.cyan)
                 }
                 .padding(.vertical, 10)
+                environmentStatusRow
             }
         }
+    }
+
+    private var environmentStatusRow: some View {
+        Group {
+            Divider().overlay(DIRTheme.hairline)
+            if liveValidation.states.contains(.invalidEnvironment),
+               case .failure(let error) = PlannerEnvironment.make(altitudeMeters: store.input.altitudeMeters, salinity: store.input.salinity) {
+                let summary = PlannerUserFacingCopy.invalidEnvironmentSummary(for: store.input, error: error)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(String(localized: "planner.environment.invalid.title"))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(DIRTheme.red)
+                    Text(summary.statusMessage)
+                        .font(.caption)
+                        .foregroundStyle(.white)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if let hint = summary.correctiveHint {
+                        Text(hint)
+                            .font(.caption2)
+                            .foregroundStyle(DIRTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .padding(.vertical, 10)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(String(localized: "planner.environment.invalid.a11y"))
+            } else if let summary = store.plan.environmentSummary {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(summary.isActive ? String(localized: "planner.environment.active.title") : String(localized: "planner.environment.default.title"))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(summary.isActive ? DIRTheme.cyan : DIRTheme.muted)
+                    Text(summary.statusMessage)
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if summary.isActive {
+                        Text(
+                            String(
+                                format: String(localized: "planner.environment.active.detail"),
+                                Formatters.one(summary.surfacePressureBar),
+                                Formatters.zero(summary.waterDensityKgPerM3)
+                            )
+                        )
+                        .font(.caption2.monospacedDigit())
+                        .foregroundStyle(.white.opacity(0.86))
+                        .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .padding(.vertical, 10)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(summary.statusMessage)
+            }
+        }
+    }
+
+    private var repetitivePlanningCard: some View {
+        DIRCard(String(localized: "planner.repetitive.title"), icon: "arrow.triangle.2.circlepath", accent: DIRTheme.yellow) {
+            VStack(alignment: .leading, spacing: 10) {
+                Toggle(isOn: $store.repetitivePlanningEnabled) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(String(localized: "planner.repetitive.toggle"))
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(.white)
+                        Text(String(localized: "planner.repetitive.toggle_hint"))
+                            .font(.caption2)
+                            .foregroundStyle(DIRTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .tint(DIRTheme.cyan)
+                .accessibilityHint(String(localized: "planner.repetitive.toggle.a11y"))
+
+                if store.repetitivePlanningEnabled {
+                    Divider().overlay(DIRTheme.hairline)
+                    plannerField(
+                        String(localized: "planner.repetitive.surface_interval"),
+                        value: $store.surfaceIntervalMinutes,
+                        unit: "min",
+                        step: 5
+                    )
+                    repetitiveSnapshotStatusView
+                    if let context = store.plan.repetitiveContext, context.tissueStateApplied {
+                        DIRWarningBox(text: String(localized: "planner.repetitive.active_notice"))
+                    } else if let issue = store.plan.repetitiveContext?.snapshotIssue {
+                        plannerStateWarning(issue.userFacingMessage)
+                    }
+                    Text(String(localized: "planner.repetitive.reference_only"))
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.yellow)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    Text(String(localized: "planner.repetitive.clean_dive"))
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+    }
+
+    private var repetitiveSnapshotStatusView: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(String(localized: "planner.repetitive.snapshot.status"))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.muted)
+                Spacer()
+                Text(repetitiveSnapshotStatusLabel)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(repetitiveSnapshotStatusColor)
+            }
+            if let createdAt = store.lastTissueSnapshot?.createdAt {
+                Text(
+                    String(
+                        format: String(localized: "planner.repetitive.snapshot.timestamp"),
+                        createdAt.formatted(date: .abbreviated, time: .shortened)
+                    )
+                )
+                .font(.caption2.monospacedDigit())
+                .foregroundStyle(.white.opacity(0.86))
+            }
+            if let source = store.plan.repetitiveContext?.snapshotSource {
+                Text(source)
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(repetitiveSnapshotAccessibilityLabel)
+    }
+
+    private var repetitiveSnapshotStatusLabel: String {
+        guard store.repetitivePlanningEnabled else {
+            return String(localized: "planner.repetitive.snapshot.disabled")
+        }
+        if store.plan.repetitiveContext?.tissueStateApplied == true {
+            return String(localized: "planner.repetitive.snapshot.loaded")
+        }
+        if store.lastTissueSnapshot == nil {
+            return String(localized: "planner.repetitive.snapshot.missing")
+        }
+        if let issue = store.plan.repetitiveContext?.snapshotIssue {
+            return issue.userFacingMessage.title
+        }
+        return String(localized: "planner.repetitive.snapshot.unavailable")
+    }
+
+    private var repetitiveSnapshotStatusColor: Color {
+        if store.plan.repetitiveContext?.tissueStateApplied == true {
+            return DIRTheme.green
+        }
+        if store.repetitivePlanningEnabled && store.plan.repetitiveContext?.snapshotIssue != nil {
+            return DIRTheme.red
+        }
+        return DIRTheme.yellow
+    }
+
+    private var repetitiveSnapshotAccessibilityLabel: String {
+        [repetitiveSnapshotStatusLabel, store.plan.repetitiveContext?.snapshotIssue?.userFacingMessage.correctiveHint]
+            .compactMap { $0 }
+            .joined(separator: ". ")
     }
 
     private var plannerCylindersCard: some View {
@@ -333,6 +496,12 @@ struct PlannerView: View {
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: "OTU", value: Formatters.zero(store.analysis.otu), color: DIRTheme.cyan)
                 }
+                Divider().overlay(DIRTheme.hairline)
+                Text(String(localized: "planner.oxygen_exposure.disclaimer"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityLabel(String(localized: "planner.oxygen_exposure.a11y"))
             }
         }
     }
@@ -584,6 +753,26 @@ struct PlannerView: View {
     private func warningColor(ppO2: Double) -> Color {
         ppO2 > store.input.bottomGas.maxPPO2 ? DIRTheme.red : DIRTheme.green
     }
+
+    private func plannerStateWarning(_ message: PlannerUserFacingMessage) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(message.title)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(message.severity == .blocking ? DIRTheme.red : DIRTheme.yellow)
+            Text(message.message)
+                .font(.caption)
+                .foregroundStyle(.white)
+                .fixedSize(horizontal: false, vertical: true)
+            if let hint = message.correctiveHint {
+                Text(hint)
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(message.accessibilityLabel)
+    }
 }
 
 struct PlanResultView: View {
@@ -619,11 +808,14 @@ struct PlanResultView: View {
             DIRBackground()
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
+                    resultHeaderBadge
                     resultTabs
                     modValidationSection
+                    resultWarningsSection
                     switch tab {
                     case .plan:
                         resultGrid
+                        gasLedgerCard
                         ascentTable
                         contingencyCard
                         teamMatchCard
@@ -649,6 +841,184 @@ struct PlanResultView: View {
                 }
                 .accessibilityLabel(Text(String(localized: "planner.export.share.a11y")))
             }
+        }
+    }
+
+    private var resultHeaderBadge: some View {
+        let header = store.plan.resultHeader
+        let accent = resultHeaderAccent(header.severity)
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: resultHeaderIcon(header.kind))
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(accent)
+                Text(header.title)
+                    .font(.callout.weight(.bold))
+                    .foregroundStyle(.white)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Text(header.subtitle)
+                .font(.caption)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+            if store.plan.repetitiveContext?.tissueStateApplied == true {
+                Text(String(localized: "planner.repetitive.result_badge"))
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(DIRTheme.yellow)
+            }
+            Text(String(localized: "planner.header.reference_only.hint"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
+                .fill(accent.opacity(0.12))
+                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(accent.opacity(0.45), lineWidth: 1))
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(header.title). \(header.subtitle)")
+    }
+
+    @ViewBuilder
+    private var resultWarningsSection: some View {
+        let warnings = store.plan.userFacingWarnings.filter { $0.severity != .info }
+        if !warnings.isEmpty {
+            DIRCard(String(localized: "planner.result.warnings.title"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
+                VStack(alignment: .leading, spacing: 10) {
+                    ForEach(warnings) { warning in
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(warning.title)
+                                .font(.callout.weight(.semibold))
+                                .foregroundStyle(warning.severity == .blocking ? DIRTheme.red : DIRTheme.yellow)
+                            Text(warning.message)
+                                .font(.caption)
+                                .foregroundStyle(.white)
+                                .fixedSize(horizontal: false, vertical: true)
+                            if let hint = warning.correctiveHint {
+                                Text(hint)
+                                    .font(.caption2)
+                                    .foregroundStyle(DIRTheme.muted)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel(warning.accessibilityLabel)
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var gasLedgerCard: some View {
+        if let failure = store.plan.gasLedgerFailure {
+            DIRCard(String(localized: "planner.gas_ledger.title"), icon: "fuelpump", accent: DIRTheme.red) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(failure.userFacingMessage.title)
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(DIRTheme.red)
+                    Text(failure.userFacingMessage.message)
+                        .font(.caption)
+                        .foregroundStyle(.white)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if let hint = failure.userFacingMessage.correctiveHint {
+                        Text(hint)
+                            .font(.caption2)
+                            .foregroundStyle(DIRTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+        } else if let ledger = store.plan.gasLedger {
+            DIRCard(String(localized: "planner.gas_ledger.title"), icon: "fuelpump", accent: DIRTheme.cyan) {
+                VStack(spacing: 10) {
+                    Text(String(localized: "planner.gas_ledger.subtitle"))
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+                    ForEach(ledger.entries, id: \.cylinderId) { entry in
+                        gasLedgerEntryRow(entry, ledger: ledger)
+                        Divider().overlay(DIRTheme.hairline)
+                    }
+                }
+            }
+        }
+    }
+
+    private func gasLedgerEntryRow(_ entry: GasConsumptionLedger.Entry, ledger: GasConsumptionLedger) -> some View {
+        let cylinderLabel = store.input.plannerCylinders.first(where: { $0.id == entry.cylinderId })?.tankSize.rawValue
+            ?? store.input.primaryCylinder.name
+        let reserveBreached = ledger.warnings.contains {
+            if case .reserveBreached(let gas) = $0 { return gas == entry.gasLabel }
+            return false
+        }
+        let minimumBreached = ledger.warnings.contains {
+            if case .minimumGasBreached(let gas) = $0 { return gas == entry.gasLabel }
+            return false
+        }
+        let lostGasFailed = ledger.warnings.contains {
+            if case .lostGasContingencyFailed(let gas) = $0 { return gas == entry.gasLabel }
+            return false
+        }
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(entry.gasLabel)
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(.white)
+                    Text("\(entry.role.localizedTitle) · \(cylinderLabel)")
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.muted)
+                }
+                Spacer()
+                if reserveBreached || minimumBreached || lostGasFailed {
+                    Text(String(localized: "planner.gas_ledger.reserve_flag"))
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(DIRTheme.red)
+                }
+            }
+            HStack(spacing: 0) {
+                DIRMetricTile(title: String(localized: "planner.metric.consumption"), value: Formatters.zero(entry.consumedLiters), unit: "L", color: DIRTheme.yellow)
+                Divider().overlay(DIRTheme.hairline)
+                DIRMetricTile(title: String(localized: "planner.metric.remaining"), value: Formatters.zero(entry.remainingLiters), unit: "L", color: entry.remainingLiters < 0 ? DIRTheme.red : DIRTheme.green)
+                Divider().overlay(DIRTheme.hairline)
+                DIRMetricTile(title: String(localized: "planner.gas_ledger.remaining_pressure"), value: Formatters.zero(entry.remainingBar), unit: "bar", color: reserveBreached ? DIRTheme.red : DIRTheme.cyan)
+            }
+            if lostGasFailed {
+                Text(String(localized: "planner.gas_ledger.warning.lost_gas.message"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.yellow)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(
+            String(
+                format: String(localized: "planner.gas_ledger.entry.a11y"),
+                entry.gasLabel,
+                Formatters.zero(entry.consumedLiters),
+                Formatters.zero(entry.remainingBar)
+            )
+        )
+    }
+
+    private func resultHeaderAccent(_ severity: PlannerWarningSeverity) -> Color {
+        switch severity {
+        case .info: return DIRTheme.cyan
+        case .warning: return DIRTheme.yellow
+        case .blocking: return DIRTheme.red
+        }
+    }
+
+    private func resultHeaderIcon(_ kind: PlannerResultHeaderKind) -> String {
+        switch kind {
+        case .noDecoReference: return "checkmark.circle"
+        case .decoRequiredReference: return "arrow.up.circle"
+        case .invalidInput, .unsupportedProfile, .noValidDecompressionSolution: return "xmark.octagon"
+        case .repetitiveReferencePlan: return "arrow.triangle.2.circlepath"
+        case .environmentAdjustedReferencePlan: return "mountain.2"
         }
     }
 
@@ -730,6 +1100,12 @@ struct PlanResultView: View {
                 DIRMetricTile(title: "CNS%", value: Formatters.zero(store.plan.cnsPercent), unit: "%")
             }
             Divider().overlay(DIRTheme.hairline)
+            Text(String(localized: "planner.oxygen_exposure.disclaimer"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
             HStack(spacing: 0) {
                 DIRMetricTile(title: String(localized: "planner.metric.density"), value: Formatters.one(store.analysis.densityAtDepth), unit: "g/L", color: store.analysis.densityRating == .red ? DIRTheme.red : DIRTheme.cyan)
                 Divider().overlay(DIRTheme.hairline)

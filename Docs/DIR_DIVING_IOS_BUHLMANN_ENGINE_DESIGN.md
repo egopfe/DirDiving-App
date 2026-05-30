@@ -52,6 +52,18 @@ The engine is informational and non-certified. It must never be presented as a l
 - `ScheduleGasConsumptionService` allocates consumption per cylinder UUID, allowing duplicate display labels.
 - `GasPlanningService.analyze(input:enginePlan:)` exposes per-cylinder ledger entries and uses bottom-gas remaining pressure in summaries.
 
+## Planner UX Presentation (2026-05-29)
+
+UI surfaces engine outputs without changing math:
+
+- **Repetitive planning:** toggle, surface-interval minutes, snapshot timestamp/source, applied vs rejected states, and typed snapshot failures (missing/stale/corrupt/schema/environment mismatch).
+- **Schedule gas ledger:** per-cylinder consumed liters, remaining liters/bar, reserve/minimum-gas/lost-gas flags; allocation failures fail visibly instead of showing aggregate-only bottom estimates.
+- **Environment:** active altitude/salinity copy states they adjust ambient pressure, ceiling, NDL, consumption, and surface-interval math; invalid environment blocks planning with corrective hints.
+- **Result header:** explicit reference-only badge for no-deco, deco-required, repetitive, environment-adjusted, invalid, unsupported profile, and no-solution states.
+- **CNS/OTU:** labeled as reference estimates with threshold hints (CNS ≥ 80%, OTU ≥ 300 flagged elevated).
+
+Remaining UX limitations: calculation is synchronous (no progress spinner); Dynamic Type stress on dense stepper cards may still require scrolling; physical-device VoiceOver walkthrough recommended before release.
+
 ## Safety Validation
 
 The engine fails closed for invalid profile or gas states:

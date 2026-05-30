@@ -53,7 +53,12 @@ final class BuhlmannReauditFixTests: XCTestCase {
             return XCTFail("Expected tissue snapshot")
         }
 
-        let repetitive = PlannerService.makePlan(input: input, repetitiveSnapshot: snapshot, surfaceIntervalMinutes: 45)
+        let repetitive = PlannerService.makePlan(
+            input: input,
+            repetitivePlanningEnabled: true,
+            repetitiveSnapshot: snapshot,
+            surfaceIntervalMinutes: 45
+        )
         XCTAssertGreaterThanOrEqual(repetitive.ndlMinutes, 0)
         XCTAssertLessThan(repetitive.ndlMinutes, 999)
         if let cleanNDL = Optional(clean.ndlMinutes), cleanNDL > 0, repetitive.ndlMinutes > 0 {
