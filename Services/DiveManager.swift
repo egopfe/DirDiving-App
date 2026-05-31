@@ -39,6 +39,8 @@ final class DiveManager: NSObject, ObservableObject {
     @Published var alarmWarningMessage: String?
     @Published var gpsConfirmation: DiveGPSConfirmation?
     @Published var isDepthAutomationAvailable = CMWaterSubmersionManager.waterSubmersionAvailable
+    /// Experimental Apnea/Snorkeling surfaces use this legacy name for sensor availability.
+    var isDepthSensorAvailable: Bool { isDepthAutomationAvailable }
     @Published var isManualLifecycleActive = false
     @Published private(set) var isMissionModeActive = false
     @Published private(set) var depthSafetyState: DepthSafetyState = .normal

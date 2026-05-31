@@ -5,6 +5,7 @@ import WatchKit
 final class HapticService {
     static let shared = HapticService()
     static let hapticsEnabledKey = "dirdiving_watch_haptics_enabled"
+    static let experimentalHapticsEnabledKey = "dirdiving_watch_experimental_haptics_enabled"
     private var lastWarningDate: Date?
     private var lastAscentAlarmRepeatDate: Date?
     private var ascentAlarmSessionActive = false
@@ -70,6 +71,11 @@ final class HapticService {
         WKInterfaceDevice.current().play(.notification)
     }
 
+    func tick() {
+        guard experimentalHapticsEnabled else { return }
+        WKInterfaceDevice.current().play(.click)
+    }
+
     func nonCriticalFailure() {
         notify()
     }
@@ -99,5 +105,11 @@ final class HapticService {
         UserDefaults.standard.object(forKey: Self.hapticsEnabledKey) == nil
             ? true
             : UserDefaults.standard.bool(forKey: Self.hapticsEnabledKey)
+    }
+
+    private var experimentalHapticsEnabled: Bool {
+        UserDefaults.standard.object(forKey: Self.experimentalHapticsEnabledKey) == nil
+            ? true
+            : UserDefaults.standard.bool(forKey: Self.experimentalHapticsEnabledKey)
     }
 }
