@@ -1,44 +1,85 @@
 import SwiftUI
 
 struct AlarmSettingsView: View {
-    @AppStorage("dirdiving_alarm_ascent_enabled") private var ascentAlarmEnabled = true
-    @AppStorage("dirdiving_alarm_depth_enabled") private var depthAlarmEnabled = false
-    @AppStorage("dirdiving_alarm_runtime_enabled") private var runtimeAlarmEnabled = false
-    @AppStorage("dirdiving_alarm_battery_enabled") private var batteryAlarmEnabled = true
-    @AppStorage("dirdiving_alarm_max_depth_meters") private var maxDepthMeters = 40.0
-    @AppStorage("dirdiving_alarm_max_runtime_minutes") private var maxRuntimeMinutes = 60
-    @AppStorage("dirdiving_alarm_low_battery_percent") private var lowBatteryPercent = 20
+    @AppStorage("dirdiving_watch_alarm_ascent_enabled") private var ascentAlarmEnabled = true
+    @AppStorage("dirdiving_watch_alarm_depth_enabled") private var depthAlarmEnabled = false
+    @AppStorage("dirdiving_watch_alarm_runtime_enabled") private var runtimeAlarmEnabled = false
+    @AppStorage("dirdiving_watch_alarm_battery_enabled") private var batteryAlarmEnabled = true
+    @AppStorage("dirdiving_watch_alarm_depth_threshold_m") private var depthThresholdMeters = 40.0
+    @AppStorage("dirdiving_watch_alarm_runtime_threshold_min") private var runtimeThresholdMinutes = WatchAlarmDefaults.runtimeThresholdMinutes
+    @AppStorage("dirdiving_watch_alarm_battery_threshold_pct") private var batteryThresholdPercent = 20
+    @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
+
+    private var unitPreference: DIRUnitPreference { DIRUnitPreference.fromStorage(watchUnits) }
+
+    private var depthThresholdLabel: String {
+        let display = unitPreference.depthDisplay(meters: depthThresholdMeters)
+        return "\(Formatters.one(display.value)) \(display.unit)"
+    }
+
 
     var body: some View {
         ZStack {
             DiveScreenBackground()
 
-            VStack(spacing: 5) {
-                header
+            ScrollView {
+                VStack(spacing: 6) {
+                    header
 
-                Text("ALLARMI")
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
+                    Text("ALLARMI")
+                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
 
-                VStack(spacing: 4) {
-                    alarmToggle(title: "Velocità risalita", threshold: "DiveManager limits", isOn: $ascentAlarmEnabled)
-                    alarmToggle(title: "Profondità massima", threshold: "> \(Formatters.one(maxDepthMeters)) m", isOn: $depthAlarmEnabled)
-                    alarmAdjustRow(title: "Soglia profondità", value: "\(Formatters.one(maxDepthMeters)) m", decrement: { maxDepthMeters = max(10, maxDepthMeters - 1) }, increment: { maxDepthMeters = min(80, maxDepthMeters + 1) })
-                    alarmToggle(title: "Tempo immersione", threshold: "> \(maxRuntimeMinutes) min", isOn: $runtimeAlarmEnabled)
-                    alarmAdjustRow(title: "Soglia tempo", value: "\(maxRuntimeMinutes) min", decrement: { maxRuntimeMinutes = max(10, maxRuntimeMinutes - 5) }, increment: { maxRuntimeMinutes = min(240, maxRuntimeMinutes + 5) })
-                    alarmToggle(title: "Batteria bassa", threshold: "< \(lowBatteryPercent)%", isOn: $batteryAlarmEnabled)
-                    alarmAdjustRow(title: "Soglia batteria", value: "\(lowBatteryPercent)%", decrement: { lowBatteryPercent = max(5, lowBatteryPercent - 5) }, increment: { lowBatteryPercent = min(50, lowBatteryPercent + 5) })
+                    Text("Soglie locali sul Watch. Non sincronizzate con iPhone.")
+                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                        .foregroundStyle(DiveUI.secondaryText)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    VStack(spacing: 5) {
+                        alarmRow(title: "Velocità risalita", threshold: "Usa limiti ASC SET", isOn: $ascentAlarmEnabled)
+                        alarmRow(title: "Profondità massima", threshold: "> \(depthThresholdLabel)", isOn: $depthAlarmEnabled)
+                        crownThresholdStepper(title: "Soglia profondità", value: $depthThresholdMeters, display: depthThresholdLabel, range: 10...100, step: 1, color: DiveUI.blue) {
+                            depthThresholdMeters = max(10, depthThresholdMeters - 1)
+                        } increase: {
+                            depthThresholdMeters = min(100, depthThresholdMeters + 1)
+                        }
+                        alarmRow(title: "Tempo immersione", threshold: "> \(runtimeThresholdMinutes) min", isOn: $runtimeAlarmEnabled)
+                        crownThresholdStepper(title: "Soglia tempo", value: runtimeThresholdBinding, display: "\(runtimeThresholdMinutes) min", range: 10...240, step: 5, color: DiveUI.yellow) {
+                            runtimeThresholdMinutes = max(10, runtimeThresholdMinutes - 5)
+                        } increase: {
+                            runtimeThresholdMinutes = min(240, runtimeThresholdMinutes + 5)
+                        }
+                        alarmRow(title: "Batteria bassa", threshold: "< \(batteryThresholdPercent)%", isOn: $batteryAlarmEnabled)
+                        crownThresholdStepper(title: "Soglia batteria", value: batteryThresholdBinding, display: "\(batteryThresholdPercent)%", range: 5...50, step: 5, color: DiveUI.red) {
+                            batteryThresholdPercent = max(5, batteryThresholdPercent - 5)
+                        } increase: {
+                            batteryThresholdPercent = min(50, batteryThresholdPercent + 5)
+                        }
+                    }
                 }
-                Text("Le soglie generali sono persistenti. Risalita usa i limiti Ascent; profondità/tempo/batteria globale sono configurate ma non sostituiscono gli allarmi specifici Snorkeling/Apnea.")
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
-                    .foregroundStyle(DiveUI.yellow)
-                    .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 11)
+                .padding(.top, 9)
+                .padding(.bottom, 8)
             }
-            .padding(.horizontal, 11)
-            .padding(.top, 9)
-            .padding(.bottom, 8)
         }
+        .navigationTitle("Allarmi")
+        .watchSubscreenBackToolbar()
+    }
+
+    private var runtimeThresholdBinding: Binding<Double> {
+        Binding(
+            get: { Double(runtimeThresholdMinutes) },
+            set: { runtimeThresholdMinutes = Int($0.rounded()) }
+        )
+    }
+
+    private var batteryThresholdBinding: Binding<Double> {
+        Binding(
+            get: { Double(batteryThresholdPercent) },
+            set: { batteryThresholdPercent = Int($0.rounded()) }
+        )
     }
 
     private var header: some View {
@@ -55,62 +96,89 @@ struct AlarmSettingsView: View {
 
             Spacer()
 
-            // TODO: Replace this visual placeholder if a watch clock value becomes part of the view model.
-            Text("--:--")
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-                .monospacedDigit()
+            DiveClockText(size: 14)
         }
     }
 
-    private func alarmToggle(title: String, threshold: String, isOn: Binding<Bool>) -> some View {
-        Toggle(isOn: isOn) {
-            alarmContent(title: title, threshold: threshold)
-        }
-        .tint(DiveUI.green)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 6)
-        .frame(minHeight: 39)
-        .background(rowBackground)
-    }
-
-    private func alarmAdjustRow(title: String, value: String, decrement: @escaping () -> Void, increment: @escaping () -> Void) -> some View {
+    private func alarmRow(title: String, threshold: String, isOn: Binding<Bool>) -> some View {
         HStack(spacing: 8) {
-            alarmContent(title: title, threshold: value)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title)
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                Text(threshold)
+                    .font(.system(size: 10, weight: .regular, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
+
             Spacer(minLength: 0)
-            Button(action: decrement) { Image(systemName: "minus").frame(width: 24, height: 24) }
-                .buttonStyle(.plain)
-                .foregroundStyle(DiveUI.cyan)
-            Button(action: increment) { Image(systemName: "plus").frame(width: 24, height: 24) }
-                .buttonStyle(.plain)
-                .foregroundStyle(DiveUI.cyan)
+
+            Toggle("", isOn: isOn)
+                .labelsHidden()
+                .tint(DiveUI.green)
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
         .frame(minHeight: 39)
-        .background(rowBackground)
-    }
-
-    private func alarmContent(title: String, threshold: String) -> some View {
-        VStack(alignment: .leading, spacing: 1) {
-            Text(title)
-                .font(.system(size: 11, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-                .lineLimit(1)
-            Text(threshold)
-                .font(.system(size: 10, weight: .regular, design: .rounded))
-                .foregroundStyle(.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
-        }
-    }
-
-    private var rowBackground: some View {
-        RoundedRectangle(cornerRadius: 7, style: .continuous)
-            .fill(Color.black.opacity(0.52))
-            .overlay(
+        .background(
             RoundedRectangle(cornerRadius: 7, style: .continuous)
-                .stroke(.white.opacity(0.24), lineWidth: 1)
-            )
+                .fill(Color.black.opacity(0.52))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .stroke(.white.opacity(0.24), lineWidth: 1)
+                )
+        )
     }
+
+    private func crownThresholdStepper(title: String, value: Binding<Double>, display: String, range: ClosedRange<Double>, step: Double, color: Color, decrease: @escaping () -> Void, increase: @escaping () -> Void) -> some View {
+        HStack(spacing: 7) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title)
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                Text(display)
+                    .font(.system(size: 12, weight: .black, design: .rounded))
+                    .foregroundStyle(color)
+                    .monospacedDigit()
+            }
+
+            Spacer(minLength: 0)
+
+            Button(action: decrease) {
+                Image(systemName: "minus")
+                    .font(.system(size: 13, weight: .black))
+                    .frame(width: 40, height: 34)
+                    .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(color.opacity(0.18)))
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(color)
+
+            Button(action: increase) {
+                Image(systemName: "plus")
+                    .font(.system(size: 13, weight: .black))
+                    .frame(width: 40, height: 34)
+                    .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(color.opacity(0.18)))
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(color)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .frame(minHeight: 46)
+        .background(
+            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                .fill(color.opacity(0.10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .stroke(color.opacity(0.45), lineWidth: 1)
+                )
+        )
+        .focusable(true)
+        .digitalCrownRotation(value, from: range.lowerBound, through: range.upperBound, by: step, sensitivity: .medium, isContinuous: false, isHapticFeedbackEnabled: true)
+    }
+
 }

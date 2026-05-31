@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct UserImagesView: View {
     @EnvironmentObject private var imageStore: UserImageStore
@@ -15,13 +16,18 @@ struct UserImagesView: View {
             }
         }
         .onAppear { imageStore.reload() }
+        .onChange(of: imageStore.imageNames) { _, names in
+            if let selectedName, !names.contains(selectedName) {
+                self.selectedName = nil
+            }
+        }
     }
 
     private var imageList: some View {
         VStack(spacing: 5) {
             header
 
-            Text("SCHERMI")
+            Text(String(localized: "user_images.list.title"))
                 .font(.system(size: 11, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
@@ -70,7 +76,7 @@ struct UserImagesView: View {
                 .frame(width: 45, height: 26)
 
             VStack(alignment: .leading, spacing: 1) {
-                Text("IMG \(index + 1)")
+                Text(String(format: String(localized: "user_images.item.label"), index + 1))
                     .font(.system(size: 11, weight: .black, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(1)
@@ -102,10 +108,10 @@ struct UserImagesView: View {
             Image(systemName: "photo.on.rectangle.angled")
                 .font(.system(size: 24, weight: .black))
                 .foregroundStyle(DiveUI.cyan)
-            Text("NESSUNA IMMAGINE")
+            Text(String(localized: "user_images.empty.title"))
                 .font(.system(size: 12, weight: .black, design: .rounded))
                 .foregroundStyle(.white)
-            Text("Nessuna schermata o immagine di riferimento e inclusa in questa build.")
+            Text(String(localized: "user_images.empty.body"))
                 .font(.system(size: 10, weight: .semibold, design: .rounded))
                 .foregroundStyle(DiveUI.secondaryText)
                 .multilineTextAlignment(.center)
@@ -126,8 +132,7 @@ struct UserImagesView: View {
     private func thumbnail(resourceName: String?, index: Int) -> some View {
         ZStack {
             if let resourceName {
-                Image(resourceName, bundle: .main)
-                    .resizable()
+                storedImage(resourceName: resourceName)
                     .scaledToFill()
             } else {
                 placeholderThumbnail(index: index)
@@ -157,21 +162,23 @@ struct UserImagesView: View {
         let index = imageIndex(for: name)
         return VStack(spacing: 8) {
             HStack {
+                WatchDetailBackButton {
+                    selectedName = nil
+                }
                 Spacer()
                 DiveClockText(size: 14)
             }
             .padding(.horizontal, 12)
             .padding(.top, 9)
 
-            Text("IMG \(index + 1)")
+            Text(String(format: String(localized: "user_images.item.label"), index + 1))
                 .font(.system(size: 12, weight: .black, design: .rounded))
                 .foregroundStyle(.white)
                 .lineLimit(1)
 
-            Image(resourceName, bundle: .main)
-                .resizable()
-                .scaledToFill()
-                .frame(maxWidth: .infinity, maxHeight: 126)
+            storedImage(resourceName: resourceName)
+                .scaledToFit()
+                .frame(maxWidth: .infinity, maxHeight: 168)
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
@@ -192,7 +199,7 @@ struct UserImagesView: View {
             Button {
                 selectedName = nil
             } label: {
-                Text("SCHERMI")
+                Text(String(localized: "user_images.list.title"))
                     .font(.system(size: 9, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.yellow)
                     .padding(.horizontal, 9)
@@ -232,6 +239,18 @@ struct UserImagesView: View {
             .replacingOccurrences(of: "_", with: " ")
             .replacingOccurrences(of: "-", with: " ")
             .capitalized
+    }
+
+    private func storedImage(resourceName: String) -> some View {
+        Group {
+            if resourceName.hasPrefix("/"), let uiImage = UIImage(contentsOfFile: resourceName) {
+                Image(uiImage: uiImage)
+                    .resizable()
+            } else {
+                Image(resourceName, bundle: .main)
+                    .resizable()
+            }
+        }
     }
 
     private func placeholderColors(for index: Int) -> [Color] {

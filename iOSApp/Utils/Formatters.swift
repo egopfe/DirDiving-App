@@ -6,6 +6,15 @@ enum IOSUnitPreference: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    var syncCode: String {
+        switch self {
+        case .metric: return "metric"
+        case .imperial: return "imperial"
+        }
+    }
+
+    static let storageKey = "dirdiving_ios_units"
+
     var shortLabel: String {
         switch self {
         case .metric: return "Metrico"
@@ -14,7 +23,18 @@ enum IOSUnitPreference: String, CaseIterable, Identifiable {
     }
 
     static func fromStorage(_ value: String) -> IOSUnitPreference {
-        IOSUnitPreference(rawValue: value) ?? .metric
+        switch value {
+        case imperial.rawValue, "imperial":
+            return .imperial
+        case metric.rawValue, "metric":
+            return .metric
+        default:
+            return .metric
+        }
+    }
+
+    static func fromSyncCode(_ code: String) -> IOSUnitPreference {
+        code == "imperial" ? .imperial : .metric
     }
 }
 
@@ -26,10 +46,8 @@ struct DisplayMeasurement {
 }
 
 enum Formatters {
-    private static let metersToFeet = 3.280_839_895
     private static let metersToKilometers = 0.001
     private static let metersToMiles = 0.000_621_371
-    private static let litersToCubicFeet = 0.035_314_7
 
     private static let clockFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -70,15 +88,37 @@ enum Formatters {
         case .metric:
             return DisplayMeasurement(value: one(meters), unit: "m")
         case .imperial:
-            return DisplayMeasurement(value: zero(meters * metersToFeet), unit: "ft")
+            return DisplayMeasurement(value: zero(IOSUnitConversions.feet(fromMeters: meters)), unit: "ft")
         }
     }
 
     static func depthValue(_ meters: Double, units: IOSUnitPreference) -> Double {
         switch units {
         case .metric: return meters
-        case .imperial: return meters * metersToFeet
+        case .imperial: return IOSUnitConversions.feet(fromMeters: meters)
         }
+    }
+
+    static func metersFromDepthDisplay(_ display: Double, units: IOSUnitPreference) -> Double {
+        switch units {
+        case .metric: return display
+        case .imperial: return IOSUnitConversions.meters(fromFeet: display)
+        }
+    }
+
+    static func celsiusFromTemperatureDisplay(_ display: Double, units: IOSUnitPreference) -> Double {
+        switch units {
+        case .metric: return display
+        case .imperial: return IOSUnitConversions.celsius(fromFahrenheit: display)
+        }
+    }
+
+    static func depthUnitLabel(_ units: IOSUnitPreference) -> String {
+        units == .metric ? "m" : "ft"
+    }
+
+    static func temperatureUnitLabel(_ units: IOSUnitPreference) -> String {
+        units == .metric ? "C" : "F"
     }
 
     static func temperature(_ celsius: Double, units: IOSUnitPreference) -> DisplayMeasurement {
@@ -86,7 +126,7 @@ enum Formatters {
         case .metric:
             return DisplayMeasurement(value: one(celsius), unit: "C")
         case .imperial:
-            return DisplayMeasurement(value: one(celsius * 9 / 5 + 32), unit: "F")
+            return DisplayMeasurement(value: one(IOSUnitConversions.fahrenheit(fromCelsius: celsius)), unit: "F")
         }
     }
 
@@ -111,7 +151,7 @@ enum Formatters {
             if prefersLargeUnit || meters >= 1609.344 {
                 return DisplayMeasurement(value: one(meters * metersToMiles), unit: "mi")
             }
-            return DisplayMeasurement(value: zero(meters * metersToFeet), unit: "ft")
+            return DisplayMeasurement(value: zero(IOSUnitConversions.feet(fromMeters: meters)), unit: "ft")
         }
     }
 
@@ -120,7 +160,7 @@ enum Formatters {
         case .metric:
             return DisplayMeasurement(value: one(litersMinute), unit: "l/min")
         case .imperial:
-            return DisplayMeasurement(value: one(litersMinute * litersToCubicFeet), unit: "cu ft/min")
+            return DisplayMeasurement(value: one(IOSUnitConversions.cubicFeet(fromLiters: litersMinute)), unit: "cu ft/min")
         }
     }
 }

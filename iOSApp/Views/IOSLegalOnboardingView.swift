@@ -1,5 +1,10 @@
 import SwiftUI
 
+private enum IOSLegalLinks {
+    static let termsURL = URL(string: "https://github.com/egopfe/DirDiving-App/blob/main/Docs/TERMS_OF_USE.md")!
+    static let privacyURL = URL(string: "https://github.com/egopfe/DirDiving-App/blob/main/Docs/PRIVACY_AND_DATA_USE.md")!
+}
+
 struct IOSLegalOnboardingView: View {
     @EnvironmentObject private var legalAcceptance: LegalAcceptanceStore
     let languageCode: String
@@ -10,10 +15,12 @@ struct IOSLegalOnboardingView: View {
     @State private var understandsNotDiveComputer = false
     @State private var notPrimaryLifeSupport = false
     @State private var acceptedTerms = false
+    @State private var acknowledgedDepthOperatingLimits = false
     @State private var showExitGuidance = false
 
     private var canAccept: Bool {
         certifiedDiver && understandsNotDiveComputer && notPrimaryLifeSupport && acceptedTerms
+            && acknowledgedDepthOperatingLimits
     }
 
     var body: some View {
@@ -116,25 +123,27 @@ struct IOSLegalOnboardingView: View {
 
     private var disclaimerScreen: some View {
         VStack(spacing: 16) {
-            DIRCard("Legal Disclaimer", icon: "doc.text.magnifyingglass", accent: DIRTheme.yellow) {
+            DIRCard(String(localized: "Legal Disclaimer"), icon: "doc.text.magnifyingglass", accent: DIRTheme.yellow) {
                 VStack(alignment: .leading, spacing: 14) {
-                    Text(legalAcceptance.disclaimerText(languageCode: languageCode))
-                        .font(.callout.weight(.medium))
-                        .foregroundStyle(.white.opacity(0.9))
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Button {
-                        disclaimerReachedBottom = true
-                        advance(to: 3)
-                    } label: {
-                        Label("I have scrolled to the bottom", systemImage: "checkmark.seal.fill")
-                            .font(.headline.weight(.bold))
-                            .foregroundStyle(DIRTheme.yellow)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 13)
-                            .background(RoundedRectangle(cornerRadius: 10).stroke(DIRTheme.yellow, lineWidth: 1))
+                    LegalDisclaimerScrollGate(reachedBottom: $disclaimerReachedBottom, maxHeight: 280) {
+                        Text(legalAcceptance.disclaimerText(languageCode: languageCode))
+                            .font(.callout.weight(.medium))
+                            .foregroundStyle(.white.opacity(0.9))
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    .buttonStyle(.plain)
+
+                    if !disclaimerReachedBottom {
+                        Text(String(localized: "legal.scroll.prompt"))
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(DIRTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    if disclaimerReachedBottom {
+                        primaryButton(String(localized: "Continue"), systemImage: "chevron.right", color: DIRTheme.yellow) {
+                            advance(to: 3)
+                        }
+                    }
                 }
             }
         }
@@ -148,12 +157,19 @@ struct IOSLegalOnboardingView: View {
                     acceptanceToggle("I understand this is NOT a dive computer", isOn: $understandsNotDiveComputer)
                     acceptanceToggle("I will not use this app as a primary life-support instrument", isOn: $notPrimaryLifeSupport)
                     acceptanceToggle("I accept the Terms and Disclaimer", isOn: $acceptedTerms)
+                    acceptanceToggle(
+                        "I understand that DIR Diving is intended to operate only within Apple’s documented underwater API operating limits and that readings outside this range may be unreliable.",
+                        isOn: $acknowledgedDepthOperatingLimits
+                    )
                 }
             }
 
             Button {
                 guard disclaimerReachedBottom, canAccept else { return }
-                legalAcceptance.accept(languageCode: languageCode)
+                legalAcceptance.accept(
+                    languageCode: languageCode,
+                    acknowledgedDepthOperatingLimits: acknowledgedDepthOperatingLimits
+                )
             } label: {
                 Label("Continue", systemImage: "checkmark.seal.fill")
                     .font(.headline.weight(.bold))
@@ -253,7 +269,7 @@ struct IOSLegalSafetyView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text("Legal & Safety")
+                        Text(String(localized: "Legal & Safety"))
                             .font(.system(size: 30, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                         Text("DIR Diving is NOT a dive computer.")
@@ -261,26 +277,26 @@ struct IOSLegalSafetyView: View {
                             .foregroundStyle(DIRTheme.red)
                     }
 
-                    DIRCard("Acceptance Log", icon: "checkmark.seal.fill", accent: DIRTheme.green) {
-                        row("Version accepted", legalAcceptance.acceptedVersionText)
-                        row("Acceptance timestamp", legalAcceptance.acceptedTimestampText)
-                        row("Language", legalAcceptance.acceptedLanguageText)
+                    DIRCard(String(localized: "Acceptance Log"), icon: "checkmark.seal.fill", accent: DIRTheme.green) {
+                        row(String(localized: "Version accepted"), legalAcceptance.acceptedVersionText)
+                        row(String(localized: "Acceptance timestamp"), legalAcceptance.acceptedTimestampText)
+                        row(String(localized: "Language"), legalAcceptance.acceptedLanguageText)
                     }
 
-                    DIRCard("Full disclaimer", icon: "doc.text.magnifyingglass", accent: DIRTheme.yellow) {
+                    DIRCard(String(localized: "Full disclaimer"), icon: "doc.text.magnifyingglass", accent: DIRTheme.yellow) {
                         Text(legalAcceptance.disclaimerText(languageCode: languageCode))
                             .font(.callout.weight(.medium))
                             .foregroundStyle(.white.opacity(0.9))
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
-                    DIRCard("Terms & Privacy", icon: "link", accent: DIRTheme.cyan) {
-                        Link(destination: URL(string: "https://github.com/egopfe/DirDiving-App")!) {
-                            Label("Terms", systemImage: "doc.plaintext")
+                    DIRCard(String(localized: "Terms & Privacy"), icon: "link", accent: DIRTheme.cyan) {
+                        Link(destination: IOSLegalLinks.termsURL) {
+                            Label(String(localized: "Terms"), systemImage: "doc.plaintext")
                                 .foregroundStyle(DIRTheme.cyan)
                         }
-                        Link(destination: URL(string: "https://github.com/egopfe/DirDiving-App")!) {
-                            Label("Privacy", systemImage: "hand.raised")
+                        Link(destination: IOSLegalLinks.privacyURL) {
+                            Label(String(localized: "Privacy"), systemImage: "hand.raised")
                                 .foregroundStyle(DIRTheme.cyan)
                         }
                     }
@@ -288,7 +304,7 @@ struct IOSLegalSafetyView: View {
                 .padding(16)
             }
         }
-        .navigationTitle(Text("Legal & Safety"))
+        .navigationTitle(Text(String(localized: "Legal & Safety")))
         .navigationBarTitleDisplayMode(.inline)
     }
 

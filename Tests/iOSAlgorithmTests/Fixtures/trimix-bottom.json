@@ -1,0 +1,1 @@
+{"id":"trimix-bottom","isValid":true,"depthMeters":50,"bottomMinutes":25,"gfLow":30,"gfHigh":70,"gases":[{"name":"TX18/45","role":"bottom","oxygen":0.18,"helium":0.45,"maxPPO2":1.4,"switchDepthMeters":50}],"expectedTTSRangeMinutes":{"min":30,"max":200},"toleranceMinutes":25}

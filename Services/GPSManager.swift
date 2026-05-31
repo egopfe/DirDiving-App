@@ -7,6 +7,7 @@ final class GPSManager: NSObject, ObservableObject {
     @Published private(set) var lastPoint: GPSPoint?
     @Published private(set) var lastSpeedMetersPerSecond: Double = 0
     @Published private(set) var authorizationStatus: CLAuthorizationStatus = .notDetermined
+    @Published private(set) var fallbackQuality: GPSFallbackQuality = .unavailable
     private let locationManager = CLLocationManager()
     private var previousSpeedSample: (point: GPSPoint, date: Date)?
     private var bestEffortCapture: BestEffortCapture?
@@ -21,20 +22,25 @@ final class GPSManager: NSObject, ObservableObject {
     func requestAuthorization() { locationManager.requestWhenInUseAuthorization() }
     func start() { requestAuthorization(); locationManager.startUpdatingLocation() }
     func stop() { locationManager.stopUpdatingLocation() }
-    func currentBestPoint() -> GPSPoint? { lastPoint }
+    func currentBestPoint() -> GPSPoint? {
+        let assessment = GPSFallbackPolicy.assess(lastPoint)
+        fallbackQuality = assessment.quality
+        return assessment.point
+    }
 
     func captureBestEffortPoint(for seconds: TimeInterval, completion: @escaping @MainActor (GPSPoint?) -> Void) {
+        let captureDuration = seconds.isFinite ? min(60, max(0, seconds)) : 0
         requestAuthorization()
         locationManager.startUpdatingLocation()
 
         // Complete any in-flight capture before replacing it so callers are never stranded.
         finishBestEffortCapture()
 
-        let capture = BestEffortCapture(deadline: Date().addingTimeInterval(seconds), bestPoint: lastPoint, completion: completion)
+        let capture = BestEffortCapture(deadline: Date().addingTimeInterval(captureDuration), bestPoint: currentBestPoint(), completion: completion)
         bestEffortCapture = capture
 
         Task { @MainActor in
-            try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
+            try? await Task.sleep(nanoseconds: UInt64(captureDuration * 1_000_000_000))
             guard self.bestEffortCapture === capture else { return }
             self.finishBestEffortCapture()
         }
@@ -59,6 +65,9 @@ extension GPSManager: CLLocationManagerDelegate {
         guard let location = locations.last else { return }
         Task { @MainActor in
             let point = GPSPoint(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude, horizontalAccuracy: location.horizontalAccuracy, timestamp: location.timestamp)
+            guard GPSFallbackPolicy.isStructurallyValid(point) else { return }
+            let assessment = GPSFallbackPolicy.assess(point)
+            fallbackQuality = assessment.quality
             if let previous = previousSpeedSample {
                 let delta = location.timestamp.timeIntervalSince(previous.date)
                 if delta > 0.25 {
@@ -75,12 +84,13 @@ extension GPSManager: CLLocationManagerDelegate {
             }
             lastPoint = point
             if let capture = bestEffortCapture {
+                guard let usablePoint = assessment.point else { return }
                 if let current = capture.bestPoint {
-                    let hasBetterAccuracy = point.horizontalAccuracy >= 0 && point.horizontalAccuracy < current.horizontalAccuracy
-                    let isNewerUnknownAccuracy = current.horizontalAccuracy < 0 && point.timestamp > current.timestamp
-                    if hasBetterAccuracy || isNewerUnknownAccuracy { capture.bestPoint = point }
+                    let hasBetterAccuracy = usablePoint.horizontalAccuracy < current.horizontalAccuracy
+                    let isNewerEqualAccuracy = usablePoint.horizontalAccuracy == current.horizontalAccuracy && usablePoint.timestamp > current.timestamp
+                    if hasBetterAccuracy || isNewerEqualAccuracy { capture.bestPoint = usablePoint }
                 } else {
-                    capture.bestPoint = point
+                    capture.bestPoint = usablePoint
                 }
 
                 if Date() >= capture.deadline { finishBestEffortCapture() }

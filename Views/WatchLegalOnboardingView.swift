@@ -1,5 +1,10 @@
 import SwiftUI
 
+private enum WatchLegalLinks {
+    static let termsURL = "https://github.com/egopfe/DirDiving-App/blob/main/Docs/TERMS_OF_USE.md"
+    static let privacyURL = "https://github.com/egopfe/DirDiving-App/blob/main/Docs/PRIVACY_AND_DATA_USE.md"
+}
+
 struct WatchLegalOnboardingView: View {
     @EnvironmentObject private var legalAcceptance: LegalAcceptanceStore
     let languageCode: String
@@ -10,10 +15,12 @@ struct WatchLegalOnboardingView: View {
     @State private var understandsNotDiveComputer = false
     @State private var notPrimaryLifeSupport = false
     @State private var acceptedTerms = false
+    @State private var acknowledgedDepthOperatingLimits = false
     @State private var showExitGuidance = false
 
     private var canAccept: Bool {
         certifiedDiver && understandsNotDiveComputer && notPrimaryLifeSupport && acceptedTerms
+            && acknowledgedDepthOperatingLimits
     }
 
     var body: some View {
@@ -117,33 +124,29 @@ struct WatchLegalOnboardingView: View {
         VStack(spacing: 9) {
             DivePanel(stroke: DiveUI.yellow) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Legal Disclaimer")
+                    Text(String(localized: "Legal Disclaimer"))
                         .font(.system(size: 15, weight: .black, design: .rounded))
                         .foregroundStyle(DiveUI.yellow)
-                    Text(legalAcceptance.disclaimerText(languageCode: languageCode))
-                        .font(.system(size: 11, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white.opacity(0.9))
-                        .fixedSize(horizontal: false, vertical: true)
 
-                    Button {
-                        disclaimerReachedBottom = true
-                        withAnimation(.easeInOut(duration: 0.2)) { step = 3 }
-                    } label: {
-                        HStack {
-                            Image(systemName: "doc.text.magnifyingglass")
-                            Text("I have scrolled to the bottom")
-                        }
-                        .font(.system(size: 12, weight: .black, design: .rounded))
-                        .foregroundStyle(DiveUI.yellow)
-                        .frame(maxWidth: .infinity, minHeight: 38)
-                        .background(
-                            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .fill(DiveUI.yellow.opacity(0.13))
-                                .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(DiveUI.yellow, lineWidth: 1))
-                        )
+                    LegalDisclaimerScrollGate(reachedBottom: $disclaimerReachedBottom, maxHeight: 118) {
+                        Text(legalAcceptance.disclaimerText(languageCode: languageCode))
+                            .font(.system(size: 11, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.9))
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    .buttonStyle(.plain)
-                    .padding(.top, 5)
+
+                    if !disclaimerReachedBottom {
+                        Text(String(localized: "legal.scroll.prompt"))
+                            .font(.system(size: 10, weight: .semibold, design: .rounded))
+                            .foregroundStyle(DiveUI.secondaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    if disclaimerReachedBottom {
+                        DiveCommandButton(String(localized: "Continue"), systemImage: "chevron.right", color: DiveUI.yellow) {
+                            withAnimation(.easeInOut(duration: 0.2)) { step = 3 }
+                        }
+                    }
                 }
             }
         }
@@ -160,12 +163,19 @@ struct WatchLegalOnboardingView: View {
                     acceptanceToggle("I understand this is NOT a dive computer", isOn: $understandsNotDiveComputer)
                     acceptanceToggle("I will not use this app as a primary life-support instrument", isOn: $notPrimaryLifeSupport)
                     acceptanceToggle("I accept the Terms and Disclaimer", isOn: $acceptedTerms)
+                    acceptanceToggle(
+                        "I understand that DIR Diving is intended to operate only within Apple’s documented underwater API operating limits and that readings outside this range may be unreliable.",
+                        isOn: $acknowledgedDepthOperatingLimits
+                    )
                 }
             }
 
             Button {
                 guard disclaimerReachedBottom, canAccept else { return }
-                legalAcceptance.accept(languageCode: languageCode)
+                legalAcceptance.accept(
+                    languageCode: languageCode,
+                    acknowledgedDepthOperatingLimits: acknowledgedDepthOperatingLimits
+                )
             } label: {
                 HStack {
                     Text("Continue")
@@ -236,6 +246,10 @@ struct WatchLegalSafetyView: View {
 
             ScrollView {
                 VStack(spacing: 9) {
+                    HStack {
+                        WatchDetailBackButton()
+                        Spacer()
+                    }
                     DiveScreenHeader(
                         "Legal & Safety",
                         subtitle: "NOT A DIVE COMPUTER",
@@ -248,15 +262,15 @@ struct WatchLegalSafetyView: View {
                             Text("DIR Diving is NOT a dive computer.")
                                 .font(.system(size: 15, weight: .black, design: .rounded))
                                 .foregroundStyle(DiveUI.red)
-                            infoRow("Version accepted", legalAcceptance.acceptedVersionText)
-                            infoRow("Acceptance timestamp", legalAcceptance.acceptedTimestampText)
-                            infoRow("Language", legalAcceptance.acceptedLanguageText)
+                            infoRow(String(localized: "Version accepted"), legalAcceptance.acceptedVersionText)
+                            infoRow(String(localized: "Acceptance timestamp"), legalAcceptance.acceptedTimestampText)
+                            infoRow(String(localized: "Language"), legalAcceptance.acceptedLanguageText)
                         }
                     }
 
                     DivePanel(stroke: DiveUI.yellow) {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Full disclaimer")
+                            Text(String(localized: "Full disclaimer"))
                                 .font(.system(size: 14, weight: .black, design: .rounded))
                                 .foregroundStyle(DiveUI.yellow)
                             Text(legalAcceptance.disclaimerText(languageCode: languageCode))
@@ -267,8 +281,8 @@ struct WatchLegalSafetyView: View {
                     }
 
                     HStack(spacing: 8) {
-                        legalLink("Terms", url: "https://github.com/egopfe/DirDiving-App")
-                        legalLink("Privacy", url: "https://github.com/egopfe/DirDiving-App")
+                        legalLink("Terms", url: WatchLegalLinks.termsURL)
+                        legalLink("Privacy", url: WatchLegalLinks.privacyURL)
                     }
                 }
                 .padding(.horizontal, DiveUI.screenPadding)

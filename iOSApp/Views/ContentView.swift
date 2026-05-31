@@ -1,44 +1,45 @@
 import SwiftUI
 
-/// Main iOS tab bar: five companion surfaces (Logbook, analysis, planner, equipment, settings).
-/// Intent: match stable reference layout — no experimental Lab targets.
+/// Main iOS tab bar: Planner first, then logbook, analysis, equipment, settings.
 enum IOSTab: Hashable {
+    case planner
     case logbook
     case analysis
-    case planner
     case gear
     case settings
 }
 
 @MainActor
 final class IOSNavigationStore: ObservableObject {
-    @Published var selectedTab: IOSTab = .logbook
+    @Published var selectedTab: IOSTab = .planner
 }
 
 struct ContentView: View {
     @EnvironmentObject private var navigation: IOSNavigationStore
+    @State private var showLaunchDisclaimer = CompanionDisclaimerAcceptance.requiresDisplay
 
     var body: some View {
         TabView(selection: $navigation.selectedTab) {
+            PlannerView()
+                .tabItem { Label("tab.planner", systemImage: "point.topleft.down.curvedto.point.bottomright.up") }
+                .tag(IOSTab.planner)
             LogbookView()
-                .tabItem { Label("Logbook", systemImage: "list.bullet.rectangle.portrait.fill") }
+                .tabItem { Label("tab.logbook", systemImage: "list.bullet.rectangle.portrait.fill") }
                 .tag(IOSTab.logbook)
             AnalysisView()
-                .tabItem { Label("Analisi", systemImage: "chart.xyaxis.line") }
+                .tabItem { Label("tab.analysis", systemImage: "chart.xyaxis.line") }
                 .tag(IOSTab.analysis)
-            PlannerView()
-                .tabItem { Label("Planner", systemImage: "point.topleft.down.curvedto.point.bottomright.up") }
-                .tag(IOSTab.planner)
             EquipmentView()
-                .tabItem { Label("Attrezzatura", systemImage: "shippingbox.fill") }
+                .tabItem { Label("tab.gear", systemImage: "shippingbox.fill") }
                 .tag(IOSTab.gear)
             MoreView()
-                .tabItem { Label("Altro", systemImage: "gearshape.fill") }
+                .tabItem { Label("tab.more", systemImage: "gearshape.fill") }
                 .tag(IOSTab.settings)
         }
         .tint(DIRTheme.cyan)
         .toolbarBackground(DIRTheme.background, for: .tabBar)
         .toolbarBackground(.visible, for: .tabBar)
         .toolbarColorScheme(.dark, for: .tabBar)
+        .launchCompanionDisclaimer(isPresented: $showLaunchDisclaimer)
     }
 }

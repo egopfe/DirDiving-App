@@ -3,6 +3,17 @@ import SwiftUI
 struct CompassView: View {
     @EnvironmentObject private var compass: CompassManager
     @EnvironmentObject private var dive: DiveManager
+    @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
+    @State private var bearingToast: String?
+
+    private var unitPreference: DIRUnitPreference { DIRUnitPreference.fromStorage(watchUnits) }
+    private var missionModeActiveForCurrentDive: Bool { dive.isMissionModeActive && dive.isDiveActive }
+    private var missionModeProfile: MissionModeRuntimeProfile { dive.missionModeRuntimeProfile }
+    private var compassTransition: AnyTransition {
+        missionModeProfile.animationsEnabled
+            ? .opacity.combined(with: .move(edge: .top))
+            : .identity
+    }
 
     var body: some View {
         ZStack {
@@ -11,6 +22,10 @@ struct CompassView: View {
             VStack(spacing: 9) {
                 header
                 statusBanner
+                if let bearingToast {
+                    bearingFeedbackBanner(bearingToast)
+                        .transition(compassTransition)
+                }
                 compassDial
                 diveMetricsPanel
                 controls
@@ -21,17 +36,44 @@ struct CompassView: View {
         }
         .onAppear { compass.start() }
         .onDisappear { compass.stop() }
-        .animation(.easeInOut(duration: 0.24), value: compass.headingDegrees)
-        .animation(.easeInOut(duration: 0.24), value: compass.bearingDegrees ?? -1)
+        .animation(missionModeActiveForCurrentDive ? nil : .easeInOut(duration: 0.24), value: compass.headingDegrees)
+        .animation(missionModeActiveForCurrentDive ? nil : .easeInOut(duration: 0.24), value: compass.bearingDegrees ?? -1)
+        .animation(missionModeActiveForCurrentDive ? nil : .easeInOut(duration: 0.18), value: bearingToast)
+    }
+
+    private var compassStatusIsWarning: Bool {
+        let message = compass.statusMessage
+        return message.localizedCaseInsensitiveContains(String(localized: "compass.keyword.denied"))
+            || message.localizedCaseInsensitiveContains(String(localized: "compass.keyword.unavailable"))
     }
 
     private var statusBanner: some View {
         Text(compass.statusMessage)
             .font(.system(size: 9, weight: .semibold, design: .rounded))
-            .foregroundStyle(compass.statusMessage.contains("negato") || compass.statusMessage.contains("non disponibile") ? DiveUI.yellow : DiveUI.secondaryText)
+            .foregroundStyle(compassStatusIsWarning ? DiveUI.yellow : DiveUI.secondaryText)
             .lineLimit(1)
             .minimumScaleFactor(0.7)
             .frame(maxWidth: .infinity)
+    }
+
+    private func bearingFeedbackBanner(_ message: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 11, weight: .black))
+            Text(message)
+                .font(.system(size: 10, weight: .black, design: .rounded))
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(DiveUI.green)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(DiveUI.green.opacity(0.10))
+                .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(DiveUI.green.opacity(0.68), lineWidth: 1))
+        )
     }
 
     private var header: some View {
@@ -93,8 +135,9 @@ struct CompassView: View {
         VStack(spacing: 6) {
             if dive.isDiveActive {
                 HStack(spacing: 7) {
-                    inDiveMetric(title: "PROFONDITÀ", value: Formatters.one(dive.currentDepthMeters), unit: "m")
-                    inDiveMetric(title: "RUNTIME", value: Formatters.time(dive.runtime), unit: nil)
+                    let depthDisplay = WatchDepthFormatting.display(meters: dive.currentDepthMeters, units: unitPreference)
+                    inDiveMetric(title: String(localized: "compass.metric.depth"), value: depthDisplay.valueText, unit: depthDisplay.unitLabel)
+                    inDiveMetric(title: String(localized: "compass.metric.runtime"), value: Formatters.time(dive.runtime), unit: nil)
                 }
             } else {
                 Text("Dati immersione non disponibili")
@@ -157,7 +200,7 @@ struct CompassView: View {
     private var controls: some View {
         VStack(spacing: 6) {
             if compass.bearingDegrees != nil {
-                Text("BEARING \(bearingText) | DELTA \(deltaText)")
+                Text(String(format: String(localized: "compass.bearing.delta_format"), bearingText, deltaText))
                     .font(.system(size: 10, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.yellow)
                     .lineLimit(1)
@@ -168,8 +211,9 @@ struct CompassView: View {
                 Button {
                     compass.setBearing()
                     HapticService.shared.confirm()
+                    showBearingToast(String(localized: "compass.bearing.set.toast"))
                 } label: {
-                    Text("SET BEARING")
+                    Text(String(localized: "compass.bearing.set"))
                         .font(.system(size: 11, weight: .black, design: .rounded))
                         .foregroundStyle(DiveUI.yellow)
                         .frame(maxWidth: .infinity, minHeight: 31)
@@ -179,7 +223,8 @@ struct CompassView: View {
 
                 Button {
                     compass.clearBearing()
-                    HapticService.shared.notify()
+                    HapticService.shared.confirm()
+                    showBearingToast(String(localized: "compass.bearing.clear.toast"))
                 } label: {
                     Text("CLEAR")
                         .font(.system(size: 11, weight: .black, design: .rounded))
@@ -200,20 +245,32 @@ struct CompassView: View {
                 RoundedRectangle(cornerRadius: 9, style: .continuous)
                     .stroke(color, lineWidth: 1.4)
             )
-            .shadow(color: color.opacity(0.18), radius: 5, x: 0, y: 0)
+            .shadow(
+                color: missionModeProfile.decorativeEffectsEnabled ? color.opacity(0.18) : .clear,
+                radius: missionModeProfile.decorativeEffectsEnabled ? 5 : 0,
+                x: 0,
+                y: 0
+            )
+    }
+
+    private func showBearingToast(_ message: String) {
+        bearingToast = message
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 1_400_000_000)
+            if bearingToast == message {
+                bearingToast = nil
+            }
+        }
     }
 
     private var bearingDelta: Double? {
         guard let bearing = compass.bearingDegrees else { return nil }
-        let delta = bearing - compass.headingDegrees
-        if delta > 180 { return delta - 360 }
-        if delta < -180 { return delta + 360 }
-        return delta
+        return DiveAlgorithm.signedBearingDeltaDegrees(from: compass.headingDegrees, to: bearing)
     }
 
     private var bearingText: String {
         guard let bearing = compass.bearingDegrees else { return "---" }
-        return "\(Int(bearing.rounded()))\u{00B0}"
+        return "\(Int(DiveAlgorithm.normalizedDegrees(bearing).rounded()) % 360)\u{00B0}"
     }
 
     private var deltaText: String {
@@ -223,7 +280,7 @@ struct CompassView: View {
     }
 
     private var headingText: String {
-        "\(Int(compass.headingDegrees.rounded()))"
+        "\(Int(DiveAlgorithm.normalizedDegrees(compass.headingDegrees).rounded()) % 360)"
     }
 
     private var cardinalMarkers: [CompassMarker] {

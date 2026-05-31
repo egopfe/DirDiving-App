@@ -33,6 +33,12 @@ struct DiveSession: Identifiable, Codable, Hashable {
     var gasLabel: DiveGasLabel
     var sacLitersMinute: Double?
     var isDemo: Bool
+    var exceededSupportedDepthRange: Bool
+    var isManual: Bool
+    var equipmentUsed: String?
+    var entryPressureText: String?
+    var exitPressureText: String?
+    var decompressionNotes: String?
 
     static let demoNotesLabel = "Demo dive"
 
@@ -42,7 +48,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         case id, startDate, endDate, durationSeconds, maxDepthMeters, avgDepthMeters
         case avgWaterTemperatureCelsius, ttv, entryGPS, exitGPS
         case entryGPSFixSource, exitGPSFixSource, samples
-        case siteName, buddy, notes, gasLabel, sacLitersMinute, isDemo
+        case siteName, buddy, notes, gasLabel, sacLitersMinute, isDemo, exceededSupportedDepthRange
+        case isManual, equipmentUsed, entryPressureText, exitPressureText, decompressionNotes
     }
 
     init(
@@ -64,7 +71,13 @@ struct DiveSession: Identifiable, Codable, Hashable {
         notes: String? = nil,
         gasLabel: DiveGasLabel = .oc,
         sacLitersMinute: Double? = nil,
-        isDemo: Bool = false
+        isDemo: Bool = false,
+        exceededSupportedDepthRange: Bool = false,
+        isManual: Bool = false,
+        equipmentUsed: String? = nil,
+        entryPressureText: String? = nil,
+        exitPressureText: String? = nil,
+        decompressionNotes: String? = nil
     ) {
         self.id = id
         self.startDate = startDate
@@ -85,6 +98,13 @@ struct DiveSession: Identifiable, Codable, Hashable {
         self.gasLabel = gasLabel
         self.sacLitersMinute = sacLitersMinute
         self.isDemo = isDemo
+        self.exceededSupportedDepthRange = exceededSupportedDepthRange
+            || maxDepthMeters >= 40.0
+        self.isManual = isManual
+        self.equipmentUsed = equipmentUsed
+        self.entryPressureText = entryPressureText
+        self.exitPressureText = exitPressureText
+        self.decompressionNotes = decompressionNotes
     }
 
     init(from decoder: Decoder) throws {
@@ -109,6 +129,13 @@ struct DiveSession: Identifiable, Codable, Hashable {
         sacLitersMinute = try container.decodeIfPresent(Double.self, forKey: .sacLitersMinute)
         let decodedDemo = try container.decodeIfPresent(Bool.self, forKey: .isDemo) ?? false
         isDemo = decodedDemo || DemoDiveCatalog.isDemoSession(id: id) || notes == Self.demoNotesLabel
+        let decodedExceeded = try container.decodeIfPresent(Bool.self, forKey: .exceededSupportedDepthRange) ?? false
+        exceededSupportedDepthRange = decodedExceeded || maxDepthMeters >= 40.0
+        isManual = try container.decodeIfPresent(Bool.self, forKey: .isManual) ?? false
+        equipmentUsed = try container.decodeIfPresent(String.self, forKey: .equipmentUsed)
+        entryPressureText = try container.decodeIfPresent(String.self, forKey: .entryPressureText)
+        exitPressureText = try container.decodeIfPresent(String.self, forKey: .exitPressureText)
+        decompressionNotes = try container.decodeIfPresent(String.self, forKey: .decompressionNotes)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -132,5 +159,11 @@ struct DiveSession: Identifiable, Codable, Hashable {
         try container.encode(gasLabel, forKey: .gasLabel)
         try container.encodeIfPresent(sacLitersMinute, forKey: .sacLitersMinute)
         try container.encode(isDemo, forKey: .isDemo)
+        try container.encode(exceededSupportedDepthRange, forKey: .exceededSupportedDepthRange)
+        try container.encode(isManual, forKey: .isManual)
+        try container.encodeIfPresent(equipmentUsed, forKey: .equipmentUsed)
+        try container.encodeIfPresent(entryPressureText, forKey: .entryPressureText)
+        try container.encodeIfPresent(exitPressureText, forKey: .exitPressureText)
+        try container.encodeIfPresent(decompressionNotes, forKey: .decompressionNotes)
     }
 }

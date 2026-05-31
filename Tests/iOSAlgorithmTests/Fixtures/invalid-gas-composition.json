@@ -1,0 +1,1 @@
+{"id":"invalid-gas-composition","isValid":false,"depthMeters":30,"bottomMinutes":20,"gfLow":30,"gfHigh":70,"gases":[{"name":"BadMix","role":"bottom","oxygen":0.9,"helium":0.3,"maxPPO2":1.4,"switchDepthMeters":30}],"expectedTTSRangeMinutes":null,"toleranceMinutes":0}

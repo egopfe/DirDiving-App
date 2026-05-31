@@ -2,6 +2,9 @@ import SwiftUI
 
 struct AscentGaugeView: View {
     let status: AscentStatus
+    var units: DIRUnitPreference = .metric
+
+    private var rateUnitLabel: String { units.ascentRateUnitLabel }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
@@ -22,9 +25,11 @@ struct AscentGaugeView: View {
                     .frame(width: 31, height: 126)
             }
 
-            Text("m/min")
+            Text(rateUnitLabel)
                 .font(.system(size: 10, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
                 .frame(width: 64, alignment: .trailing)
         }
         .padding(.vertical, 6)
@@ -38,10 +43,8 @@ struct AscentGaugeView: View {
                 )
         )
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Gauge velocita di risalita")
-        .accessibilityValue(
-            "Scala fino a \(Formatters.one(status.limitMetersPerMinute)) metri al minuto. Indicatore a \(Formatters.one(status.currentRateMetersPerMinute)) metri al minuto."
-        )
+        .accessibilityLabel(String(localized: "ascent.gauge.a11y"))
+        .accessibilityValue(ascentAccessibilityValue)
         .animation(.easeInOut(duration: 0.22), value: status.currentRateMetersPerMinute)
     }
 
@@ -57,7 +60,7 @@ struct AscentGaugeView: View {
         return VStack(alignment: .trailing, spacing: 0) {
             ForEach(Array(ticks.enumerated()), id: \.offset) { index, tick in
                 if index > 0 { Spacer(minLength: 0) }
-                scaleLabel(Formatters.one(tick.0), tick.1)
+                scaleLabel(formattedRate(tick.0), tick.1)
             }
         }
     }
@@ -120,6 +123,22 @@ struct AscentGaugeView: View {
     private func pointerOffset(in height: CGFloat) -> CGFloat {
         let ratio = min(max(status.currentRateMetersPerMinute / max(status.limitMetersPerMinute, 0.1), 0), 1)
         return -height * ratio
+    }
+
+    private func formattedRate(_ metersPerMinute: Double) -> String {
+        Formatters.one(units.ascentRateDisplay(metersPerMinute: metersPerMinute).value)
+    }
+
+    private var ascentAccessibilityValue: String {
+        let limit = units.ascentRateDisplay(metersPerMinute: status.limitMetersPerMinute)
+        let current = units.ascentRateDisplay(metersPerMinute: status.currentRateMetersPerMinute)
+        return String(
+            format: String(localized: "ascent.gauge.a11y.value_format"),
+            Formatters.one(limit.value),
+            limit.unit,
+            Formatters.one(current.value),
+            current.unit
+        )
     }
 }
 

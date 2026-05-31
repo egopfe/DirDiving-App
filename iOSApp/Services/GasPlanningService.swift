@@ -3,65 +3,357 @@ import Foundation
 enum GasPlanningService {
     static func analyze(input: GasPlanInput) -> TechnicalGasAnalysis {
         let gas = input.bottomGas
-        let ata = input.ambientPressureBar
-        let ppO2 = gas.oxygen * ata
+        let validation = PlannerInputValidator.validate(input)
+        guard validation.isValid else {
+            return unavailableAnalysis(input: input, gas: gas, validation: validation)
+        }
+        guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) else {
+            var invalid = validation
+            invalid.add(.invalidEnvironment, message: "Ambiente planner non valido.")
+            return unavailableAnalysis(input: input, gas: gas, validation: invalid)
+        }
+        let planningDepth = input.effectivePlanningDepthMeters
+        let ata = AmbientPressureModel.ambientPressureBar(depthMeters: planningDepth, environment: environment) ?? environment.surfacePressureBar
+        let ppO2 = boundedPPO2(gas: gas, depthMeters: planningDepth, environment: environment)
         let density = gas.surfaceDensityGramsLiter * ata
         let rating = densityRating(density, warning: input.densityWarningLimit, danger: input.densityDangerLimit)
-        let end = equivalentNarcoticDepth(gas: gas, depthMeters: input.plannedDepthMeters)
-        let ead = equivalentAirDepth(gas: gas, depthMeters: input.plannedDepthMeters)
+        let end = equivalentNarcoticDepth(gas: gas, depthMeters: planningDepth, environment: environment)
+        let ead = equivalentAirDepth(gas: gas, depthMeters: planningDepth, environment: environment)
         let consumption = input.sacLitersPerMinute * ata * input.plannedBottomMinutes
         let remaining = input.availableGasLiters - consumption
-        let remainingBar = remaining / max(input.cylinder.volumeLiters, 0.1)
-        let rockBottom = rockBottomLiters(input: input)
-        let minimumGasBar = rockBottom / max(input.cylinder.volumeLiters, 0.1)
-        let usableBeforeMinimum = max(0, input.availableGasLiters - rockBottom)
-        let turnPressure = min(input.startPressureBar, max(input.reservePressureBar, input.startPressureBar - (usableBeforeMinimum / 2.0 / max(input.cylinder.volumeLiters, 0.1))))
-        let cns = oxygenExposureCNS(ppO2: ppO2, minutes: input.plannedBottomMinutes)
-        let otu = oxygenToxicityUnits(ppO2: ppO2, minutes: input.plannedBottomMinutes)
-        let warnings = makeWarnings(
-            input: input,
-            ppO2: ppO2,
-            density: density,
-            endMeters: end,
-            remainingLiters: remaining,
-            rockBottomLiters: rockBottom
+        let remainingBar = remaining / input.primaryCylinder.volumeLiters
+        let rockBottom = rockBottomLiters(input: input, environment: environment)
+        let minimumGasBar = rockBottom / input.primaryCylinder.volumeLiters
+        let usableBeforeMinimum = input.availableGasLiters - rockBottom
+        let turnPressure = usableBeforeMinimum > 0
+            ? min(input.startPressureBar, max(input.reservePressureBar, input.startPressureBar - (usableBeforeMinimum / 2.0 / input.primaryCylinder.volumeLiters)))
+            : input.reservePressureBar
+        let bottomSegment = BuhlmannRuntimeSegment(
+            kind: .bottom,
+            depthMeters: planningDepth,
+            minutes: input.plannedBottomMinutes,
+            gas: BuhlmannGas(gas: gas, role: .bottom, switchDepthMeters: planningDepth),
+            note: "Bottom"
         )
+        switch OxygenExposureModel.from(segments: [bottomSegment], environment: environment, carryover: .zero) {
+        case .success(let exposure):
+            return buildAnalysis(
+                input: input,
+                gas: gas,
+                ppO2: ppO2,
+                density: density,
+                rating: rating,
+                end: end,
+                ead: ead,
+                consumption: consumption,
+                remaining: remaining,
+                remainingBar: remainingBar,
+                rockBottom: rockBottom,
+                minimumGasBar: minimumGasBar,
+                turnPressure: turnPressure,
+                exposure: exposure,
+                extraStates: validation.states
+            )
+        case .failure:
+            var invalid = validation
+            invalid.add(.invalidEnvironment, message: "Esposizione ossigeno non valida.")
+            return unavailableAnalysis(input: input, gas: gas, validation: invalid)
+        }
+    }
+
+    static func analyze(input: GasPlanInput, enginePlan: BuhlmannEngineResult, oxygenCarryover: OxygenExposureCarryover = .zero) -> TechnicalGasAnalysis {
+        let base = analyze(input: input)
+        guard !enginePlan.segments.isEmpty, enginePlan.modelState == .validReference else {
+            return base
+        }
+        let environment: PlannerEnvironment
+        switch PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) {
+        case .success(let value):
+            environment = value
+        case .failure:
+            return TechnicalGasAnalysis(
+                gas: base.gas,
+                ppO2AtDepth: base.ppO2AtDepth,
+                densityAtDepth: base.densityAtDepth,
+                densityRating: base.densityRating,
+                endMeters: base.endMeters,
+                eadMeters: base.eadMeters,
+                consumptionLiters: base.consumptionLiters,
+                remainingLiters: base.remainingLiters,
+                remainingBar: base.remainingBar,
+                rockBottomLiters: base.rockBottomLiters,
+                minimumGasBar: base.minimumGasBar,
+                turnPressureBar: base.turnPressureBar,
+                cnsPercent: base.cnsPercent,
+                otu: base.otu,
+                cnsDailyPercent: base.cnsDailyPercent,
+                otuDaily24h: base.otuDaily24h,
+                otuWeekly: base.otuWeekly,
+                airBreakRecoveryApplied: base.airBreakRecoveryApplied,
+                warnings: makeWarnings(states: mergeStates(base.states, [.invalidEnvironment])),
+                states: mergeStates(base.states, [.invalidEnvironment])
+            )
+        }
+
+        var maxDensity = base.densityAtDepth
+        for segment in enginePlan.segments where segment.minutes.isFinite && segment.minutes > 0 {
+            let depth = max(0, segment.depthMeters)
+            let density = surfaceDensityGramsPerLiter(gas: segment.gas)
+                * (IOSUnitConversions.ambientPressureBar(depthMeters: depth, environment: environment) ?? 0)
+            if density.isFinite {
+                maxDensity = max(maxDensity, density)
+            }
+        }
+
+        var exposureResult: OxygenExposureResult?
+        switch OxygenExposureModel.from(segments: enginePlan.segments, environment: environment, carryover: oxygenCarryover) {
+        case .success(let exposure):
+            exposureResult = exposure
+        case .failure:
+            return TechnicalGasAnalysis(
+                gas: base.gas,
+                ppO2AtDepth: base.ppO2AtDepth,
+                densityAtDepth: base.densityAtDepth,
+                densityRating: base.densityRating,
+                endMeters: base.endMeters,
+                eadMeters: base.eadMeters,
+                consumptionLiters: base.consumptionLiters,
+                remainingLiters: base.remainingLiters,
+                remainingBar: base.remainingBar,
+                rockBottomLiters: base.rockBottomLiters,
+                minimumGasBar: base.minimumGasBar,
+                turnPressureBar: base.turnPressureBar,
+                cnsPercent: base.cnsPercent,
+                otu: base.otu,
+                cnsDailyPercent: base.cnsDailyPercent,
+                otuDaily24h: base.otuDaily24h,
+                otuWeekly: base.otuWeekly,
+                airBreakRecoveryApplied: base.airBreakRecoveryApplied,
+                warnings: makeWarnings(states: mergeStates(base.states, [.invalidEnvironment])),
+                states: mergeStates(base.states, [.invalidEnvironment])
+            )
+        }
+
+        guard let exposure = exposureResult else {
+            return base
+        }
+
+        let densityRating = densityRating(maxDensity, warning: input.densityWarningLimit, danger: input.densityDangerLimit)
+        var states = mergeStates(
+            base.states,
+            makeStates(
+                input: input,
+                ppO2: base.ppO2AtDepth,
+                density: maxDensity,
+                endMeters: base.endMeters,
+                remainingLiters: base.remainingLiters,
+                rockBottomLiters: base.rockBottomLiters
+            ),
+            exposurePlannerStates(from: exposure)
+        )
+        if maxDensity >= input.densityDangerLimit {
+            states = mergeStates(states, [.gasDensityDanger])
+        } else if maxDensity >= input.densityWarningLimit {
+            states = mergeStates(states, [.gasDensityWarning])
+        }
+        switch ScheduleGasConsumptionService.analyze(input: input, enginePlan: enginePlan, environment: environment) {
+        case .success(let ledger):
+            let bottomEntry = ledger.bottomGasEntry(from: input)
+            let summaryRemainingBar = bottomEntry?.remainingBar ?? base.remainingBar
+            let summaryRemainingLiters = bottomEntry?.remainingLiters ?? base.remainingLiters
+            if ledger.warnings.contains(where: {
+                if case .reserveBreached = $0 { return true }
+                return false
+            }) {
+                states = mergeStates(states, [.belowReserve])
+            }
+            if ledger.warnings.contains(where: {
+                if case .minimumGasBreached = $0 { return true }
+                return false
+            }) {
+                states = mergeStates(states, [.insufficientGas])
+            }
+            if ledger.warnings.contains(where: {
+                if case .lostGasContingencyFailed = $0 { return true }
+                return false
+            }) {
+                states = mergeStates(states, [.belowReserve])
+            }
+            return TechnicalGasAnalysis(
+                gas: base.gas,
+                ppO2AtDepth: base.ppO2AtDepth,
+                densityAtDepth: maxDensity,
+                densityRating: densityRating,
+                endMeters: base.endMeters,
+                eadMeters: base.eadMeters,
+                consumptionLiters: ledger.totalConsumedLiters,
+                remainingLiters: summaryRemainingLiters,
+                remainingBar: summaryRemainingBar,
+                rockBottomLiters: rockBottomLiters(input: input, environment: environment),
+                minimumGasBar: base.minimumGasBar,
+                turnPressureBar: base.turnPressureBar,
+                cnsPercent: min(300, exposure.cnsSinglePercent),
+                otu: exposure.otuDive,
+                cnsDailyPercent: min(300, exposure.cnsDailyPercent),
+                otuDaily24h: exposure.otuDaily24h,
+                otuWeekly: exposure.otuWeekly,
+                airBreakRecoveryApplied: exposure.airBreakRecoveryApplied,
+                warnings: makeWarnings(states: states),
+                states: states
+            )
+        case .failure:
+            states = mergeStates(states, [.gasAllocationIncomplete])
+        }
 
         return TechnicalGasAnalysis(
-            gas: gas,
-            ppO2AtDepth: ppO2,
-            densityAtDepth: density,
-            densityRating: rating,
-            endMeters: end,
-            eadMeters: ead,
-            consumptionLiters: consumption,
-            remainingLiters: remaining,
-            remainingBar: remainingBar,
-            rockBottomLiters: rockBottom,
-            minimumGasBar: minimumGasBar,
-            turnPressureBar: turnPressure,
-            cnsPercent: cns,
-            otu: otu,
-            warnings: warnings
+            gas: base.gas,
+            ppO2AtDepth: base.ppO2AtDepth,
+            densityAtDepth: maxDensity,
+            densityRating: densityRating,
+            endMeters: base.endMeters,
+            eadMeters: base.eadMeters,
+            consumptionLiters: base.consumptionLiters,
+            remainingLiters: base.remainingLiters,
+            remainingBar: base.remainingBar,
+            rockBottomLiters: base.rockBottomLiters,
+            minimumGasBar: base.minimumGasBar,
+            turnPressureBar: base.turnPressureBar,
+            cnsPercent: min(300, exposure.cnsSinglePercent),
+            otu: exposure.otuDive,
+            cnsDailyPercent: min(300, exposure.cnsDailyPercent),
+            otuDaily24h: exposure.otuDaily24h,
+            otuWeekly: exposure.otuWeekly,
+            airBreakRecoveryApplied: exposure.airBreakRecoveryApplied,
+            warnings: makeWarnings(states: states),
+            states: states
         )
     }
 
-    static func ppO2(gas: GasMix, depthMeters: Double) -> Double {
-        gas.oxygen * (depthMeters / 10.0 + 1.0)
+    static func ppO2(gas: GasMix, depthMeters: Double, environment: PlannerEnvironment = .seaLevelSaltWater) -> Double {
+        guard let ambient = AmbientPressureModel.ambientPressureBar(depthMeters: depthMeters, environment: environment) else { return 0 }
+        return max(0, gas.oxygen * ambient)
+    }
+
+    /// Actual PPO2 at depth. Over-limit states are reported separately; the value is never clipped.
+    static func boundedPPO2(gas: GasMix, depthMeters: Double, environment: PlannerEnvironment = .seaLevelSaltWater) -> Double {
+        ppO2(gas: gas, depthMeters: depthMeters, environment: environment)
     }
 
     static func profileSegments(input: GasPlanInput, stops: [DecoStop]) -> [DivePlanSegment] {
-        var segments: [DivePlanSegment] = [
-            DivePlanSegment(kind: .descent, depthMeters: input.plannedDepthMeters, minutes: max(1, input.plannedDepthMeters / 18.0), gas: input.bottomGas.label, note: "Discesa controllata"),
-            DivePlanSegment(kind: .bottom, depthMeters: input.plannedDepthMeters, minutes: input.plannedBottomMinutes, gas: input.bottomGas.label, note: "Tempo fondo pianificato")
-        ]
+        var segments: [DivePlanSegment] = []
+        let maxDepth = input.plannedDepthMeters
+        let bottom = PlannerGasSchedule.bottomGas(from: input)
+        let descentPoints = PlannerGasSchedule.descentSwitchPoints(input: input)
 
-        for stop in stops {
-            segments.append(DivePlanSegment(kind: .gasSwitch, depthMeters: stop.depthMeters, minutes: 0.5, gas: stop.gas, note: "Verifica gas e PPO2"))
-            segments.append(DivePlanSegment(kind: .stop, depthMeters: stop.depthMeters, minutes: Double(stop.minutes), gas: stop.gas, note: "Sosta pianificata"))
+        for (index, point) in descentPoints.enumerated() {
+            if index > 0 {
+                let switchDepth = descentPoints[index - 1].depthMeters
+                segments.append(
+                    DivePlanSegment(
+                        kind: .gasSwitch,
+                        depthMeters: switchDepth,
+                        minutes: 0.5,
+                        gas: point.gas.label,
+                        note: gasSwitchNote(for: point.role)
+                    )
+                )
+            }
+            let previousDepth = index == 0 ? 0 : descentPoints[index - 1].depthMeters
+            let legDepth = point.depthMeters - previousDepth
+            guard legDepth > 0 else { continue }
+            let minutes = max(1, legDepth / 18.0)
+            let note = point.role == .travel
+                ? String(localized: "planner.segment.travel_descent")
+                : String(localized: "planner.segment.back_gas_descent")
+            segments.append(
+                DivePlanSegment(
+                    kind: .descent,
+                    depthMeters: point.depthMeters,
+                    minutes: minutes,
+                    gas: point.gas.label,
+                    note: note
+                )
+            )
         }
 
-        segments.append(DivePlanSegment(kind: .ascent, depthMeters: 0, minutes: max(1, input.plannedDepthMeters / 9.0), gas: stops.last?.gas ?? input.bottomGas.label, note: "Risalita finale"))
+        if segments.isEmpty {
+            segments.append(
+                DivePlanSegment(
+                    kind: .descent,
+                    depthMeters: maxDepth,
+                    minutes: max(1, maxDepth / 18.0),
+                    gas: bottom.label,
+                    note: String(localized: "planner.segment.back_gas_descent")
+                )
+            )
+        }
+
+        segments.append(
+            DivePlanSegment(
+                kind: .bottom,
+                depthMeters: maxDepth,
+                minutes: input.plannedBottomMinutes,
+                gas: bottom.label,
+                note: String(localized: "planner.segment.bottom_time")
+            )
+        )
+
+        let shallowestStop = stops.map(\.depthMeters).min() ?? 0
+        for travel in PlannerGasSchedule.ascentTravelSwitchPoints(input: input, shallowestStopDepth: shallowestStop) {
+            segments.append(
+                DivePlanSegment(
+                    kind: .gasSwitch,
+                    depthMeters: travel.depthMeters,
+                    minutes: 0.5,
+                    gas: travel.gas.label,
+                    note: String(localized: "planner.segment.travel_ascent")
+                )
+            )
+        }
+
+        for stop in stops {
+            segments.append(
+                DivePlanSegment(
+                    kind: .gasSwitch,
+                    depthMeters: stop.depthMeters,
+                    minutes: 0.5,
+                    gas: stop.gas,
+                    note: String(localized: "planner.segment.deco_switch")
+                )
+            )
+            segments.append(
+                DivePlanSegment(
+                    kind: .stop,
+                    depthMeters: stop.depthMeters,
+                    minutes: Double(stop.minutes),
+                    gas: stop.gas,
+                    note: String(localized: "planner.segment.deco_stop")
+                )
+            )
+        }
+
+        for bailout in PlannerGasSchedule.bailoutCylinders(from: input) {
+            let depth = min(bailout.switchDepthMeters, bailout.modMeters)
+            segments.append(
+                DivePlanSegment(
+                    kind: .gasSwitch,
+                    depthMeters: depth,
+                    minutes: 0,
+                    gas: bailout.gas.label,
+                    note: String(localized: "planner.segment.bailout_emergency")
+                )
+            )
+        }
+
+        segments.append(
+            DivePlanSegment(
+                kind: .ascent,
+                depthMeters: 0,
+                minutes: max(1, maxDepth / 9.0),
+                gas: stops.last?.gas ?? bottom.label,
+                note: String(localized: "planner.segment.final_ascent")
+            )
+        )
         return segments
     }
 
@@ -80,10 +372,16 @@ enum GasPlanningService {
         }
     }
 
-    static func contingencyPlans(input: GasPlanInput, baseAnalysis: TechnicalGasAnalysis, baseTTS: Int) -> [ContingencyPlan] {
+    static func contingencyPlans(
+        input: GasPlanInput,
+        baseAnalysis: TechnicalGasAnalysis,
+        baseTTS: Int,
+        environment: PlannerEnvironment = .seaLevelSaltWater
+    ) -> [ContingencyPlan] {
         let lostGasLiters = baseAnalysis.rockBottomLiters * 1.35
-        let delayedLiters = input.sacLitersPerMinute * input.ambientPressureBar * 5
-        let extendedLiters = input.sacLitersPerMinute * input.ambientPressureBar * 10
+        let bottomATA = AmbientPressureModel.ambientPressureBar(depthMeters: input.effectivePlanningDepthMeters, environment: environment) ?? environment.surfacePressureBar
+        let delayedLiters = input.sacLitersPerMinute * bottomATA * 5
+        let extendedLiters = input.sacLitersPerMinute * bottomATA * 10
         return [
             ContingencyPlan(scenario: .lostGas, ttsMinutes: baseTTS + 8, gasRequiredLiters: lostGasLiters, action: "Switch team protocol, usare gas disponibile e risalita conservativa.", warning: "Validare con procedura team"),
             ContingencyPlan(scenario: .delayedAscent, ttsMinutes: baseTTS + 5, gasRequiredLiters: baseAnalysis.consumptionLiters + delayedLiters, action: "Aggiungere buffer di risalita e controllare CNS/OTU.", warning: "Rischio gas reserve"),
@@ -106,9 +404,18 @@ enum GasPlanningService {
             "GF: \(Int(input.gfLow))/\(Int(input.gfHigh)); TTS/TTR estimate \(tts) min.",
             "Gas: turn \(Int(analysis.turnPressureBar)) bar, minimum gas \(Int(analysis.minimumGasBar)) bar.",
             "Respirability: density \(String(format: "%.1f", analysis.densityAtDepth)) g/L, END \(Int(analysis.endMeters))m.",
-            "Oxygen: PPO2 \(String(format: "%.1f", analysis.ppO2AtDepth)), CNS \(Int(analysis.cnsPercent))%, OTU \(Int(analysis.otu)).",
+            "Oxygen: PPO2 \(String(format: "%.1f", analysis.ppO2AtDepth)), CNS \(Int(analysis.cnsPercent))% (daily \(Int(analysis.cnsDailyPercent))%), OTU dive \(Int(analysis.otu)), OTU 24h \(Int(analysis.otuDaily24h)).",
             "Stops: \(stops.map { "\(Int($0.depthMeters))m/\($0.minutes)min \($0.gas)" }.joined(separator: ", "))."
         ]
+    }
+
+    private static func gasSwitchNote(for role: GasRole) -> String {
+        switch role {
+        case .travel: return String(localized: "planner.segment.switch_travel")
+        case .bottom: return String(localized: "planner.segment.switch_back_gas")
+        case .deco: return String(localized: "planner.segment.deco_switch")
+        case .bailout: return String(localized: "planner.segment.bailout_emergency")
+        }
     }
 
     private static func densityRating(_ density: Double, warning: Double, danger: Double) -> GasDensityRating {
@@ -117,65 +424,151 @@ enum GasPlanningService {
         return .green
     }
 
-    private static func equivalentNarcoticDepth(gas: GasMix, depthMeters: Double) -> Double {
+    private static func equivalentNarcoticDepth(gas: GasMix, depthMeters: Double, environment: PlannerEnvironment) -> Double {
+        guard gas.isValidMix, depthMeters.isFinite, depthMeters >= 0 else { return 0 }
         let narcoticFraction = gas.nitrogen + (gas.isOxygenNarcotic ? gas.oxygen : 0)
         let airNarcoticFraction = 0.79 + (gas.isOxygenNarcotic ? 0.21 : 0)
-        let narcoticPressure = (depthMeters / 10.0 + 1.0) * narcoticFraction
+        let ambient = AmbientPressureModel.ambientPressureBar(depthMeters: depthMeters, environment: environment) ?? environment.surfacePressureBar
+        let narcoticPressure = ambient * narcoticFraction
         return max(0, ((narcoticPressure / max(airNarcoticFraction, 0.01)) - 1.0) * 10.0)
     }
 
-    private static func equivalentAirDepth(gas: GasMix, depthMeters: Double) -> Double? {
-        guard gas.helium == 0, gas.oxygen > 0.21 else { return nil }
-        let nitrogenPressure = (depthMeters / 10.0 + 1.0) * gas.nitrogen
+    private static func equivalentAirDepth(gas: GasMix, depthMeters: Double, environment: PlannerEnvironment) -> Double? {
+        guard gas.isValidMix, gas.helium == 0, gas.oxygen > 0.21, depthMeters.isFinite, depthMeters >= 0 else { return nil }
+        let ambient = AmbientPressureModel.ambientPressureBar(depthMeters: depthMeters, environment: environment) ?? environment.surfacePressureBar
+        let nitrogenPressure = ambient * gas.nitrogen
         return max(0, ((nitrogenPressure / 0.79) - 1.0) * 10.0)
     }
 
-    private static func rockBottomLiters(input: GasPlanInput) -> Double {
-        let averageAscentATA = ((input.plannedDepthMeters / 2.0) / 10.0) + 1.0
-        let ascentMinutes = max(3, input.plannedDepthMeters / 9.0)
-        let problemSolvingMinutes = 1.0
-        let safetyStopMinutes = input.plannedDepthMeters > 10 ? 3.0 : 0.0
-        let emergencyMinutes = problemSolvingMinutes + ascentMinutes + safetyStopMinutes
-        return input.emergencySacLitersPerMinute * max(1, input.teamSize) * averageAscentATA * emergencyMinutes
+    private static func rockBottomLiters(input: GasPlanInput, environment: PlannerEnvironment) -> Double {
+        ScheduleGasConsumptionService.rockBottomLiters(input: input, environment: environment)
     }
 
-    private static func oxygenExposureCNS(ppO2: Double, minutes: Double) -> Double {
-        guard ppO2 > 0.5 else { return 0 }
-        let limitMinutes: Double
-        switch ppO2 {
-        case ..<1.0: limitMinutes = 720
-        case ..<1.2: limitMinutes = 210
-        case ..<1.4: limitMinutes = 150
-        case ..<1.6: limitMinutes = 45
-        default: limitMinutes = 10
-        }
-        return min(300, minutes / limitMinutes * 100)
+    private static func surfaceDensityGramsPerLiter(gas: BuhlmannGas) -> Double {
+        guard gas.isCompositionValid else { return 0 }
+        return gas.oxygenFraction * 1.429
+            + gas.nitrogenFraction * 1.251
+            + gas.heliumFraction * 0.1786
     }
 
-    private static func oxygenToxicityUnits(ppO2: Double, minutes: Double) -> Double {
-        guard ppO2 > 0.5 else { return 0 }
-        return minutes * pow((0.5 / (ppO2 - 0.5)), -0.833)
-    }
-
-    private static func makeWarnings(input: GasPlanInput, ppO2: Double, density: Double, endMeters: Double, remainingLiters: Double, rockBottomLiters: Double) -> [String] {
-        var values: [String] = []
+    private static func makeStates(input: GasPlanInput, ppO2: Double, density: Double, endMeters: Double, remainingLiters: Double, rockBottomLiters: Double) -> [PlannerResultState] {
+        var values: [PlannerResultState] = [.validReference, .nonCertifiedReference]
         if ppO2 > input.bottomGas.maxPPO2 {
-            values.append("PPO2 oltre limite gas")
+            values.append(.PPO2Exceeded)
         }
-        if input.plannedDepthMeters > input.bottomGas.modMeters {
-            values.append("Profilo oltre MOD")
+        if input.effectivePlanningDepthMeters > input.bottomGas.modMeters {
+            values.append(.MODExceeded)
         }
         if density >= input.densityDangerLimit {
-            values.append("Densita gas in zona rossa")
+            values.append(.gasDensityDanger)
         } else if density >= input.densityWarningLimit {
-            values.append("Densita gas in warning")
+            values.append(.gasDensityWarning)
         }
         if endMeters > 30 {
-            values.append("END elevata")
+            values.append(.simplifiedReferenceOnly)
         }
         if remainingLiters < rockBottomLiters {
-            values.append("Gas residuo sotto rock bottom")
+            values.append(.belowReserve)
         }
-        return values
+        if remainingLiters < 0 {
+            values.append(.insufficientGas)
+        }
+        return Array(Set(values)).sorted { $0.rawValue < $1.rawValue }
+    }
+
+    private static func makeWarnings(states: [PlannerResultState]) -> [String] {
+        states.compactMap(\.warningText)
+    }
+
+    private static func mergeStates(_ groups: [PlannerResultState]...) -> [PlannerResultState] {
+        var seen = Set<PlannerResultState>()
+        var merged: [PlannerResultState] = []
+        for state in groups.flatMap({ $0 }) where seen.insert(state).inserted {
+            merged.append(state)
+        }
+        return merged
+    }
+
+    private static func buildAnalysis(
+        input: GasPlanInput,
+        gas: GasMix,
+        ppO2: Double,
+        density: Double,
+        rating: GasDensityRating,
+        end: Double,
+        ead: Double?,
+        consumption: Double,
+        remaining: Double,
+        remainingBar: Double,
+        rockBottom: Double,
+        minimumGasBar: Double,
+        turnPressure: Double,
+        exposure: OxygenExposureResult,
+        extraStates: [PlannerResultState]
+    ) -> TechnicalGasAnalysis {
+        let states = mergeStates(
+            extraStates,
+            makeStates(
+                input: input,
+                ppO2: ppO2,
+                density: density,
+                endMeters: end,
+                remainingLiters: remaining,
+                rockBottomLiters: rockBottom
+            ),
+            exposurePlannerStates(from: exposure)
+        )
+        return TechnicalGasAnalysis(
+            gas: gas,
+            ppO2AtDepth: ppO2,
+            densityAtDepth: density,
+            densityRating: rating,
+            endMeters: end,
+            eadMeters: ead,
+            consumptionLiters: consumption,
+            remainingLiters: remaining,
+            remainingBar: remainingBar,
+            rockBottomLiters: rockBottom,
+            minimumGasBar: minimumGasBar,
+            turnPressureBar: turnPressure,
+            cnsPercent: min(300, exposure.cnsSinglePercent),
+            otu: exposure.otuDive,
+            cnsDailyPercent: min(300, exposure.cnsDailyPercent),
+            otuDaily24h: exposure.otuDaily24h,
+            otuWeekly: exposure.otuWeekly,
+            airBreakRecoveryApplied: exposure.airBreakRecoveryApplied,
+            warnings: makeWarnings(states: states),
+            states: states
+        )
+    }
+
+    private static func exposurePlannerStates(from exposure: OxygenExposureResult) -> [PlannerResultState] {
+        exposure.warningStates.isEmpty ? [] : [.oxygenExposureElevated]
+    }
+
+    private static func unavailableAnalysis(input: GasPlanInput, gas: GasMix, validation: PlannerValidationResult) -> TechnicalGasAnalysis {
+        let states = validation.states.isEmpty ? [.invalidInput] : validation.states
+        return TechnicalGasAnalysis(
+            gas: gas,
+            ppO2AtDepth: 0,
+            densityAtDepth: 0,
+            densityRating: .red,
+            endMeters: 0,
+            eadMeters: nil,
+            consumptionLiters: 0,
+            remainingLiters: 0,
+            remainingBar: 0,
+            rockBottomLiters: 0,
+            minimumGasBar: 0,
+            turnPressureBar: 0,
+            cnsPercent: 0,
+            otu: 0,
+            cnsDailyPercent: 0,
+            otuDaily24h: 0,
+            otuWeekly: 0,
+            airBreakRecoveryApplied: false,
+            warnings: makeWarnings(states: states),
+            states: states
+        )
     }
 }

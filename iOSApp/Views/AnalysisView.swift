@@ -17,21 +17,24 @@ struct AnalysisView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         header
+                        if !logStore.sessions.isEmpty {
+                            CSVImportPanel()
+                        }
                         if logStore.sessions.isEmpty {
                             emptyAnalysisState
                         } else {
                             analysisHero
-                            DIRCard("ANALISI AVANZATE", icon: "chart.line.uptrend.xyaxis", accent: DIRTheme.cyan) {
+                            DIRCard(String(localized: "analysis.card.advanced"), icon: "chart.line.uptrend.xyaxis", accent: DIRTheme.cyan) {
                                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 0) {
-                                    DIRMetricTile(title: "Immersioni", value: "\(logStore.sessions.count)", color: DIRTheme.cyan)
-                                    DIRMetricTile(title: "Max assoluta", measurement: Formatters.depth(logStore.sessions.map(\.maxDepthMeters).max() ?? 0, units: unitPreference), color: DIRTheme.yellow)
-                                    DIRMetricTile(title: "Runtime totale", value: Formatters.zero(logStore.sessions.map(\.durationSeconds).reduce(0, +) / 60), unit: "min")
+                                    DIRMetricTile(title: String(localized: "analysis.metric.dives"), value: "\(logStore.sessions.count)", color: DIRTheme.cyan)
+                                    DIRMetricTile(title: String(localized: "analysis.metric.max_depth"), measurement: Formatters.depth(logStore.sessions.map(\.maxDepthMeters).max() ?? 0, units: unitPreference), color: DIRTheme.yellow)
+                                    DIRMetricTile(title: String(localized: "analysis.metric.total_runtime"), value: Formatters.zero(logStore.sessions.map(\.durationSeconds).reduce(0, +) / 60), unit: "min")
                                     avgTemperatureTile
                                     avgSACTile
-                                    DIRMetricTile(title: "Route GPS", value: "\(RouteSummaryService.summaries(from: logStore.sessions).count)", color: DIRTheme.cyan)
+                                    DIRMetricTile(title: String(localized: "analysis.metric.gps_routes"), value: "\(RouteSummaryService.summaries(from: logStore.sessions).count)", color: DIRTheme.cyan)
                                 }
                             }
-                            DIRCard("PROFONDITA MASSIMA PER IMMERSIONE", icon: "chart.xyaxis.line", accent: DIRTheme.cyan) {
+                            DIRCard(String(localized: "analysis.card.max_depth"), icon: "chart.xyaxis.line", accent: DIRTheme.cyan) {
                                 Chart(logStore.sessions) { session in
                                     BarMark(
                                         x: .value("Data", session.startDate, unit: .day),
@@ -57,8 +60,14 @@ struct AnalysisView: View {
                                 }
                                 .frame(height: 240)
                                 .accessibilityElement(children: .ignore)
-                                .accessibilityLabel("Grafico profondita massima per immersione")
-                                .accessibilityValue("Mostra \(logStore.sessions.count) immersioni; massimo \(Formatters.depth(logStore.sessions.map(\.maxDepthMeters).max() ?? 0, units: unitPreference).text)")
+                                .accessibilityLabel(String(localized: "analysis.chart.max_depth_a11y"))
+                                .accessibilityValue(
+                                    String(
+                                        format: String(localized: "analysis.chart.max_depth_a11y_value"),
+                                        logStore.sessions.count,
+                                        Formatters.depth(logStore.sessions.map(\.maxDepthMeters).max() ?? 0, units: unitPreference).text
+                                    )
+                                )
                             }
                             gasMixSummary
                             routeSummary
@@ -89,10 +98,10 @@ struct AnalysisView: View {
     private var analysisHero: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 6) {
-                Text("Panoramica operativa")
+                Text(String(localized: "analysis.hero.title"))
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(.white)
-                Text("Logbook trends, gas usage and GPS route summaries from real session data")
+                Text(String(localized: "analysis.hero.subtitle"))
                     .font(.footnote)
                     .foregroundStyle(DIRTheme.muted)
             }
@@ -120,16 +129,16 @@ struct AnalysisView: View {
                     .frame(width: 46, height: 46)
                     .background(RoundedRectangle(cornerRadius: 12).fill(DIRTheme.cyan.opacity(0.12)))
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Nessun dato da analizzare")
+                    Text(String(localized: "analysis.empty.title"))
                         .font(.headline.weight(.bold))
                         .foregroundStyle(.white)
-                    Text("Le statistiche vengono calcolate solo da immersioni reali, importate o sincronizzate dal Watch.")
+                    Text(String(localized: "analysis.empty.body"))
                         .font(.caption)
                         .foregroundStyle(DIRTheme.muted)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            Text("Prossima azione: sincronizza Apple Watch o importa un CSV dal Logbook.")
+            Text(String(localized: "analysis.empty.next_action"))
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(DIRTheme.cyan)
             HStack(spacing: 10) {
@@ -138,7 +147,7 @@ struct AnalysisView: View {
                 }
                 emptyAction("Sync Watch", "applewatch") {
                     watchSync.retryActivation(logStore: logStore)
-                    importMessage = "Sync Apple Watch richiesta."
+                    importMessage = String(localized: "Sync Apple Watch richiesta.")
                 }
             }
             emptyAction("Apri Logbook", "list.bullet.rectangle.portrait.fill") {
@@ -182,9 +191,9 @@ struct AnalysisView: View {
     private var avgTemperatureTile: some View {
         let values = logStore.sessions.compactMap(\.avgWaterTemperatureCelsius)
         if values.isEmpty {
-            DIRMetricTile(title: "Temp media", value: "—", color: DIRTheme.yellow)
+            DIRMetricTile(title: String(localized: "analysis.metric.avg_temp"), value: "—", color: DIRTheme.yellow)
         } else {
-            DIRMetricTile(title: "Temp media", measurement: Formatters.temperature(avgTemp, units: unitPreference))
+            DIRMetricTile(title: String(localized: "analysis.metric.avg_temp"), measurement: Formatters.temperature(avgTemp, units: unitPreference))
         }
     }
 
@@ -197,9 +206,9 @@ struct AnalysisView: View {
     private var avgSACTile: some View {
         let values = logStore.sessions.compactMap(\.sacLitersMinute)
         if values.isEmpty {
-            DIRMetricTile(title: "SAC medio", value: "—", color: DIRTheme.yellow)
+            DIRMetricTile(title: String(localized: "analysis.metric.avg_sac"), value: "—", color: DIRTheme.yellow)
         } else {
-            DIRMetricTile(title: "SAC medio", measurement: Formatters.sac(avgSAC, units: unitPreference), color: DIRTheme.green)
+            DIRMetricTile(title: String(localized: "analysis.metric.avg_sac"), measurement: Formatters.sac(avgSAC, units: unitPreference), color: DIRTheme.green)
         }
     }
 
@@ -209,17 +218,17 @@ struct AnalysisView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 7) {
-            Text("Analisi")
+            Text(String(localized: "analysis.title"))
                 .font(.system(size: 30, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
-            Text("Metriche operative, trend profilo e riepilogo route GPS dai dati reali del logbook.")
+            Text(String(localized: "analysis.subtitle"))
                 .font(.callout)
                 .foregroundStyle(DIRTheme.muted)
         }
     }
 
     private var gasMixSummary: some View {
-        DIRCard("RIEPILOGO GAS", icon: "circle.hexagongrid", accent: DIRTheme.green) {
+        DIRCard(String(localized: "analysis.card.gas_summary"), icon: "circle.hexagongrid", accent: DIRTheme.green) {
             VStack(spacing: 8) {
                 ForEach(DiveGasLabel.allCases) { gas in
                     let count = logStore.sessions.filter { $0.gasLabel == gas }.count
@@ -236,13 +245,13 @@ struct AnalysisView: View {
 
     private var routeSummary: some View {
         let routes = RouteSummaryService.summaries(from: logStore.sessions)
-        return DIRCard("ROUTE GPS (RIEPILOGO)", icon: "map", accent: DIRTheme.cyan) {
+        return DIRCard(String(localized: "analysis.card.route_summary"), icon: "map", accent: DIRTheme.cyan) {
             HStack(spacing: 0) {
-                DIRMetricTile(title: "Percorsi", value: "\(routes.count)", color: DIRTheme.cyan)
+                DIRMetricTile(title: String(localized: "analysis.metric.routes"), value: "\(routes.count)", color: DIRTheme.cyan)
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: "Distanza", measurement: Formatters.distance(routes.map(\.distanceMeters).reduce(0, +), units: unitPreference, prefersLargeUnit: true), color: DIRTheme.green)
+                DIRMetricTile(title: String(localized: "analysis.metric.distance"), measurement: Formatters.distance(routes.map(\.distanceMeters).reduce(0, +), units: unitPreference, prefersLargeUnit: true), color: DIRTheme.green)
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: "Rilevamento", value: routes.first?.bearingDegrees.map { Formatters.zero($0) } ?? "--", unit: routes.first?.bearingDegrees == nil ? nil : "°", color: DIRTheme.yellow)
+                DIRMetricTile(title: String(localized: "analysis.metric.bearing"), value: routes.first?.bearingDegrees.map { Formatters.zero($0) } ?? "--", unit: routes.first?.bearingDegrees == nil ? nil : "°", color: DIRTheme.yellow)
             }
         }
     }

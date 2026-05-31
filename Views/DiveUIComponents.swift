@@ -123,7 +123,7 @@ struct DiveCommandButton: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text(LocalizedStringKey(title)))
-        .accessibilityHint(Text("Esegue il comando"))
+        .accessibilityHint(Text(LocalizedStringKey("accessibility.command_button.hint")))
     }
 }
 
@@ -268,6 +268,19 @@ struct DiveOctopusLogo: View {
     var accent: Color = DiveUI.blue
 
     var body: some View {
+        Group {
+            if Bundle.main.url(forResource: "altosinistra", withExtension: "png") != nil {
+                Image("altosinistra")
+                    .resizable()
+                    .scaledToFit()
+            } else {
+                drawnLogo
+            }
+        }
+        .frame(width: 36, height: 32)
+    }
+
+    private var drawnLogo: some View {
         ZStack {
             Circle()
                 .fill(accent.opacity(0.22))
@@ -288,7 +301,6 @@ struct DiveOctopusLogo: View {
                 .frame(width: 31, height: 18)
                 .offset(y: 8)
         }
-        .frame(width: 36, height: 32)
     }
 }
 

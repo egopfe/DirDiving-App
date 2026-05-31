@@ -1,0 +1,1 @@
+{"id":"air-40m","isValid":true,"depthMeters":40,"bottomMinutes":15,"gfLow":30,"gfHigh":70,"gases":[{"name":"Air","role":"bottom","oxygen":0.21,"helium":0.0,"maxPPO2":1.4,"switchDepthMeters":40}],"expectedTTSRangeMinutes":{"min":20,"max":90},"toleranceMinutes":20}

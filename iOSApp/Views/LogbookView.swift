@@ -8,13 +8,14 @@ private struct LogbookMonthSection: Identifiable {
 
 struct LogbookView: View {
     @EnvironmentObject private var logStore: DiveLogStore
+    @Environment(\.locale) private var locale
     @State private var search = ""
-
+    @State private var showManualDiveEditor = false
     private var filtered: [DiveSession] {
         search.isEmpty ? logStore.sessions : logStore.sessions.filter { ($0.siteName ?? "").localizedCaseInsensitiveContains(search) }
     }
 
-    private var monthSections: [LogbookMonthSection] {
+    private func makeMonthSections(locale: Locale) -> [LogbookMonthSection] {
         let cal = Calendar.current
         var buckets: [String: [DiveSession]] = [:]
         for session in filtered {
@@ -24,7 +25,7 @@ struct LogbookView: View {
         }
         let keys = buckets.keys.sorted(by: >)
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "it_IT")
+        formatter.locale = locale
         formatter.setLocalizedDateFormatFromTemplate("MMMM yyyy")
         return keys.compactMap { key -> LogbookMonthSection? in
             let parts = key.split(separator: "-")
@@ -46,10 +47,11 @@ struct LogbookView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         header
                         DIRSearchBar(text: $search)
+                        csvImportSection
                         if filtered.isEmpty {
                             emptyLogbook
                         } else {
-                            ForEach(monthSections) { section in
+                            ForEach(makeMonthSections(locale: locale)) { section in
                                 Text(section.title)
                                     .font(.caption.weight(.semibold))
                                     .foregroundStyle(DIRTheme.cyan)
@@ -71,7 +73,7 @@ struct LogbookView: View {
                                                     .frame(width: 36, height: 36)
                                             }
                                             .buttonStyle(.plain)
-                                            .accessibilityLabel("Elimina immersione dal logbook")
+                                            .accessibilityLabel(Text(LocalizedStringKey("logbook.delete.a11y")))
                                         }
                                     }
                                 }
@@ -84,26 +86,38 @@ struct LogbookView: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
+            .navigationDestination(isPresented: $showManualDiveEditor) {
+                ManualDiveEditorView()
+            }
         }
+    }
+
+    private var csvImportSection: some View {
+        CSVImportPanel()
     }
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
-                Text("Logbook")
+                Text(String(localized: "logbook.title"))
                     .font(.system(size: 30, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                 Spacer()
-                Image(systemName: "plus")
-                    .font(.title3.weight(.medium))
-                    .foregroundStyle(DIRTheme.cyan.opacity(0.45))
-                    .accessibilityHidden(true)
+                Button {
+                    showManualDiveEditor = true
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.title3.weight(.medium))
+                        .foregroundStyle(DIRTheme.cyan)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text(String(localized: "manual_dive.add.title")))
                 Image(systemName: "ellipsis.circle")
                     .font(.title3.weight(.medium))
                     .foregroundStyle(DIRTheme.cyan.opacity(0.45))
                     .accessibilityHidden(true)
             }
-            Text("Cronologia immersioni: dati da Watch, import CSV o demo reviewer.")
+            Text(String(localized: "logbook.header.subtitle"))
                 .font(.callout)
                 .foregroundStyle(DIRTheme.muted)
         }
@@ -111,10 +125,10 @@ struct LogbookView: View {
 
     private var emptyLogbook: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Nessuna immersione")
+            Text(String(localized: "logbook.empty.title"))
                 .font(.headline.weight(.semibold))
                 .foregroundStyle(.white)
-            Text("Sincronizza dal Apple Watch, importa un CSV da Analisi, oppure attiva il logbook dimostrativo in Altro.")
+            Text(String(localized: "logbook.empty.hint"))
                 .font(.caption)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
@@ -131,8 +145,14 @@ struct LogbookView: View {
 }
 
 struct DiveLogCard: View {
+    @Environment(\.locale) private var locale
+    @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
     let session: DiveSession
     let index: Int
+
+    private var unitPreference: IOSUnitPreference {
+        IOSUnitPreference.fromStorage(units)
+    }
 
     var body: some View {
         HStack(spacing: 12) {
@@ -141,12 +161,20 @@ struct DiveLogCard: View {
                 .frame(width: 72, height: 72)
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
-                    Text(session.siteName ?? "Immersione")
+                    Text(session.siteName ?? String(localized: "detail.default_site"))
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
                         .lineLimit(1)
+                    if session.isManual {
+                        Text(String(localized: "logbook.badge.manual"))
+                            .font(.system(size: 8, weight: .bold, design: .rounded))
+                            .foregroundStyle(DIRTheme.orange)
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 1)
+                            .overlay(RoundedRectangle(cornerRadius: 3).stroke(DIRTheme.orange, lineWidth: 1))
+                    }
                     if session.buddy != nil {
-                        Text("BUDDY")
+                        Text(String(localized: "detail.buddy.badge"))
                             .font(.system(size: 8, weight: .bold, design: .rounded))
                             .foregroundStyle(DIRTheme.yellow)
                             .padding(.horizontal, 4)
@@ -154,11 +182,11 @@ struct DiveLogCard: View {
                             .overlay(RoundedRectangle(cornerRadius: 3).stroke(DIRTheme.yellow, lineWidth: 1))
                     }
                 }
-                Text("Max \(Formatters.one(session.maxDepthMeters)) m")
+                Text(String(format: String(localized: "logbook.card.max_depth"), Formatters.depth(session.maxDepthMeters, units: unitPreference).text))
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.86))
                 HStack {
-                    Text("T. \(Formatters.time(session.durationSeconds)) min")
+                    Text(String(format: String(localized: "logbook.card.duration"), Formatters.time(session.durationSeconds)))
                     Spacer()
                     Text(session.gasLabel.rawValue)
                 }
@@ -184,7 +212,7 @@ struct DiveLogCard: View {
             Text(session.startDate.formatted(.dateTime.day()))
                 .font(.system(size: 27, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
-            Text(session.startDate.formatted(.dateTime.month(.abbreviated).locale(Locale(identifier: "it_IT"))).uppercased())
+            Text(session.startDate.formatted(.dateTime.month(.abbreviated).locale(locale)).uppercased())
                 .font(.caption2.weight(.medium))
                 .foregroundStyle(.white.opacity(0.75))
                 .lineLimit(1)

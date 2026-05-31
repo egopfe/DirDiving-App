@@ -4,7 +4,38 @@ import SwiftUI
 /// Visual target: black canvas, neon accents, rounded panels (`Docs/ReferenceUI/Watch_LIVE_reference.png`).
 struct DiveLiveView: View {
     @EnvironmentObject private var dive: DiveManager
+    @EnvironmentObject private var watchSync: WatchSyncService
     @AppStorage(HapticService.hapticsEnabledKey) private var hapticsEnabled = true
+    @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
+    @State private var showResetStopwatchConfirmation = false
+
+    private var unitPreference: DIRUnitPreference { DIRUnitPreference.fromStorage(watchUnits) }
+
+    private var showAscentAlarmBanner: Bool {
+        dive.isDiveActive && dive.ascentStatus.isOverLimit
+    }
+
+    private var depthSafetyState: DepthSafetyState {
+        dive.depthSafetyState
+    }
+
+    private var depthReadoutStyle: DepthSafetyReadoutStyle {
+        DepthSafetyReadoutStyle.forState(depthSafetyState, redWarningBlink: dive.redWarningBlink)
+    }
+
+    private var missionModeProfile: MissionModeRuntimeProfile {
+        dive.missionModeRuntimeProfile
+    }
+
+    private var showsMissionModeIndicator: Bool {
+        dive.isDiveActive && dive.isMissionModeActive
+    }
+
+    private var activeDiveTransition: AnyTransition {
+        missionModeProfile.animationsEnabled
+            ? .opacity.combined(with: .move(edge: .top))
+            : .identity
+    }
 
     var body: some View {
         ZStack {
@@ -16,21 +47,24 @@ struct DiveLiveView: View {
                 let leftWidth = contentWidth - gaugeWidth - 8
 
                 VStack(spacing: 7) {
-                    if let confirmation = dive.gpsConfirmation {
-                        gpsConfirmationView(confirmation)
-                    } else if dive.isDiveActive && dive.ascentStatus.isOverLimit {
-                        AscentWarningView(status: dive.ascentStatus, depthMeters: dive.currentDepthMeters, runtime: dive.runtime)
-                    } else if dive.isDiveActive {
+                    if watchSync.pendingTransferCount > 0 || watchSync.failedTransferCount > 0 {
+                        syncStatusStrip
+                    }
+                    if dive.isDiveActive {
                         activeDiveContent(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
                     } else {
                         preDiveWaitingContent
                     }
-
-                    if !dive.isDepthSensorAvailable {
-                        warningBanner("PROFONDITÀ NON DISPONIBILE - sensore non supportato o simulatore.")
+                    if let confirmation = dive.gpsConfirmation {
+                        gpsConfirmationBanner(confirmation)
+                    }
+                    if let alarm = dive.alarmWarningMessage {
+                        warningBanner(alarm, showAcknowledge: true) {
+                            dive.dismissAlarmWarning()
+                        }
                     }
                     if let error = dive.lastErrorMessage {
-                        warningBanner(error)
+                        warningBanner(error, showAcknowledge: false) {}
                     }
                 }
                 .padding(.horizontal, 9)
@@ -39,16 +73,98 @@ struct DiveLiveView: View {
                 .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
             }
         }
-        .animation(.easeInOut(duration: 0.18), value: dive.redWarningBlink)
+        .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.18) : nil, value: dive.redWarningBlink)
+        .confirmationDialog(String(localized: "live.stopwatch.reset.confirm.title"), isPresented: $showResetStopwatchConfirmation, titleVisibility: .visible) {
+            Button(String(localized: "live.stopwatch.reset.confirm.action"), role: .destructive) {
+                dive.resetStopwatch()
+            }
+            Button(String(localized: "log.delete.cancel"), role: .cancel) {}
+        } message: {
+            Text(String(localized: "live.stopwatch.reset.confirm.message"))
+        }
     }
 
-    @ViewBuilder
-    private func gpsConfirmationView(_ confirmation: DiveGPSConfirmation) -> some View {
+    private var syncStatusStrip: some View {
+        HStack(spacing: 6) {
+            Image(systemName: watchSync.failedTransferCount > 0 ? "exclamationmark.triangle.fill" : "arrow.triangle.2.circlepath")
+            Text(watchSync.lastSyncStatus)
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
+            Spacer(minLength: 0)
+            if watchSync.pendingTransferCount > 0 {
+                Text("\(watchSync.pendingTransferCount)")
+                    .font(.caption2.bold())
+                    .foregroundStyle(DiveUI.cyan)
+            }
+        }
+        .font(.caption2.bold())
+        .foregroundStyle(watchSync.failedTransferCount > 0 ? DiveUI.yellow : DiveUI.cyan)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill((watchSync.failedTransferCount > 0 ? DiveUI.yellow : DiveUI.cyan).opacity(0.10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .stroke((watchSync.failedTransferCount > 0 ? DiveUI.yellow : DiveUI.cyan).opacity(0.65), lineWidth: 1)
+                )
+        )
+    }
+
+    private func gpsConfirmationBanner(_ confirmation: DiveGPSConfirmation) -> some View {
+        HStack(spacing: 7) {
+            Image(systemName: gpsConfirmationIcon(confirmation))
+                .font(.system(size: 14, weight: .black))
+            VStack(alignment: .leading, spacing: 1) {
+                Text(gpsConfirmationTitle(confirmation))
+                    .font(.system(size: 10, weight: .black, design: .rounded))
+                Text(gpsConfirmationDetail(confirmation))
+                    .font(.system(size: 9, weight: .semibold, design: .rounded))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.66)
+            }
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(gpsConfirmationColor(confirmation))
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(gpsConfirmationColor(confirmation).opacity(0.11))
+                .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).stroke(gpsConfirmationColor(confirmation).opacity(0.72), lineWidth: 1))
+        )
+    }
+
+    private func gpsConfirmationIcon(_ confirmation: DiveGPSConfirmation) -> String {
         switch confirmation {
-        case .start(let point, let fallback):
-            GPSStartRegisteredView(point: point, isFallback: fallback)
-        case .end(let point, let fallback):
-            GPSEndRegisteredView(point: point, isFallback: fallback)
+        case .start(_, let fallback), .end(_, let fallback):
+            return fallback ? "location.fill.viewfinder" : "checkmark.circle.fill"
+        }
+    }
+
+    private func gpsConfirmationTitle(_ confirmation: DiveGPSConfirmation) -> String {
+        switch confirmation {
+        case .start: return String(localized: "gps.banner.start.title")
+        case .end: return String(localized: "gps.banner.end.title")
+        }
+    }
+
+    private func gpsConfirmationDetail(_ confirmation: DiveGPSConfirmation) -> String {
+        switch confirmation {
+        case .start(let point, _), .end(let point, _):
+            if let point {
+                return String(format: String(localized: "gps.banner.coords"), point.latitude, point.longitude)
+            }
+            return String(localized: "gps.banner.unavailable")
+        }
+    }
+
+    private func gpsConfirmationColor(_ confirmation: DiveGPSConfirmation) -> Color {
+        switch confirmation {
+        case .start(_, let fallback), .end(_, let fallback):
+            return fallback ? DiveUI.yellow : DiveUI.green
         }
     }
 
@@ -56,23 +172,54 @@ struct DiveLiveView: View {
         VStack(spacing: 7) {
             topBar
             immersionStatus
+            if dive.isDepthAutomationAvailable && !dive.isManualLifecycleActive {
+                Text(String(localized: "live.auto_dive.active.hint"))
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .foregroundStyle(DiveUI.secondaryText)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
             if !hapticsEnabled {
                 hapticsOffBadge
             }
             ttvRuntimePanel
+            if showAscentAlarmBanner {
+                AscentWarningBannerView(
+                    rateMetersPerMinute: dive.ascentStatus.currentRateMetersPerMinute,
+                    isActive: true
+                )
+                .transition(activeDiveTransition)
+            }
+            if depthSafetyState != .normal {
+                DepthSafetyBannerView(state: depthSafetyState)
+                    .transition(activeDiveTransition)
+            }
+            if dive.exceededSupportedDepthRange {
+                Text(String(localized: "depth.safety.exceeded.readings"))
+                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .foregroundStyle(DiveUI.red)
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
             depthSection(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
             stopwatchPanel
             controls
         }
+        .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.3) : nil, value: showAscentAlarmBanner)
+        .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.22) : nil, value: depthSafetyState)
     }
 
     private var preDiveWaitingContent: some View {
         VStack(spacing: 0) {
             preDiveHeader
 
+            if !hapticsEnabled {
+                hapticsOffBadge
+                    .padding(.top, 6)
+            }
+
             Spacer(minLength: 28)
 
-            Text("PRONTO PER\nL'IMMERSIONE")
+            Text(String(localized: "live.ready.title"))
                 .font(.system(size: 18, weight: .black, design: .rounded))
                 .foregroundStyle(DiveUI.blue)
                 .multilineTextAlignment(.center)
@@ -80,29 +227,39 @@ struct DiveLiveView: View {
 
             Spacer(minLength: 24)
 
-            HStack(spacing: 9) {
-                Image(systemName: "mappin.circle.fill")
-                    .font(.system(size: 25, weight: .black))
-                    .foregroundStyle(DiveUI.blue)
-                    .symbolRenderingMode(.hierarchical)
-                Text("In attesa di avvio...")
-                    .font(.system(size: 14, weight: .regular, design: .rounded))
+            if dive.isDepthAutomationAvailable {
+                autoDiveStatusPanel
+                Spacer(minLength: 16)
+                surfaceManualStartPanel
+                Spacer(minLength: 8)
+            } else {
+                HStack(spacing: 9) {
+                    Image(systemName: "mappin.circle.fill")
+                        .font(.system(size: 25, weight: .black))
+                        .foregroundStyle(DiveUI.blue)
+                        .symbolRenderingMode(.hierarchical)
+                    Text(String(localized: "live.waiting.start"))
+                        .font(.system(size: 14, weight: .regular, design: .rounded))
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.78)
+                    Spacer(minLength: 0)
+                }
+                .padding(.horizontal, 9)
+
+                Spacer(minLength: 20)
+
+                Text(String(localized: "live.gps.start.hint"))
+                    .font(.system(size: 13, weight: .regular, design: .rounded))
                     .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.78)
-                Spacer(minLength: 0)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(2)
+
+                Spacer(minLength: 16)
+
+                manualFallbackPanel
+                Spacer(minLength: 8)
             }
-            .padding(.horizontal, 9)
-
-            Spacer(minLength: 31)
-
-            Text("Il punto GPS di inizio\nverrà registrato\nall'avvio dell'immersione.")
-                .font(.system(size: 13, weight: .regular, design: .rounded))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .lineSpacing(2)
-
-            Spacer(minLength: 16)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -131,6 +288,12 @@ struct DiveLiveView: View {
                 DiveOctopusLogo(accent: DiveUI.blue)
                     .frame(width: 29, height: 26, alignment: .leading)
                     .scaleEffect(0.8)
+                    .overlay(alignment: .topTrailing) {
+                        if showsMissionModeIndicator {
+                            MissionModeIndicatorView()
+                                .offset(x: 2, y: -1)
+                        }
+                    }
                 Text("DIR DIVING")
                     .font(.system(size: 15, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.yellow)
@@ -153,11 +316,72 @@ struct DiveLiveView: View {
         }
     }
 
+    private var autoDiveStatusPanel: some View {
+        VStack(spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: "drop.fill")
+                    .font(.system(size: 22, weight: .black))
+                    .foregroundStyle(DiveUI.cyan)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(String(localized: "live.auto_dive.waiting.title"))
+                        .font(.system(size: 13, weight: .black, design: .rounded))
+                        .foregroundStyle(DiveUI.cyan)
+                    Text(String(localized: "live.auto_dive.waiting.subtitle"))
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    .fill(DiveUI.cyan.opacity(0.12))
+                    .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).stroke(DiveUI.cyan.opacity(0.55), lineWidth: 1))
+            )
+
+            Text(String(localized: "live.gps.start.hint"))
+                .font(.system(size: 12, weight: .regular, design: .rounded))
+                .foregroundStyle(DiveUI.secondaryText)
+                .multilineTextAlignment(.center)
+                .lineSpacing(2)
+        }
+        .padding(.horizontal, 4)
+    }
+
+    private var surfaceManualStartPanel: some View {
+        VStack(spacing: 8) {
+            Text(String(localized: "live.manual_start.title"))
+                .font(.system(size: 10, weight: .black, design: .rounded))
+                .foregroundStyle(DiveUI.yellow)
+                .multilineTextAlignment(.center)
+            Text(String(localized: "live.manual_start.body"))
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            DiveCommandButton(String(localized: "AVVIO MANUALE"), systemImage: "play.circle.fill", color: DiveUI.green) {
+                dive.startManualDive()
+            }
+        }
+        .padding(9)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(DiveUI.yellow.opacity(0.10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(DiveUI.yellow.opacity(0.7), lineWidth: 1)
+                )
+        )
+    }
+
     private var immersionStatus: some View {
         HStack(spacing: 8) {
             Image(systemName: "water.waves")
                 .font(.system(size: 18, weight: .black))
-            Text("IN IMMERSIONE")
+            Text(dive.isManualLifecycleActive ? String(localized: "IMMERSIONE MANUALE") : String(localized: "IN IMMERSIONE"))
                 .font(.system(size: 15, weight: .black, design: .rounded))
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
@@ -170,10 +394,10 @@ struct DiveLiveView: View {
         HStack(spacing: 6) {
             Image(systemName: "bell.slash.fill")
                 .font(.system(size: 12, weight: .black))
-            Text("APTICA DISATTIVATA")
+            Text(String(localized: "live.haptics.off"))
                 .font(.system(size: 10, weight: .black, design: .rounded))
             Spacer(minLength: 0)
-            Text("AVVISI SOLO VISIVI")
+            Text(String(localized: "live.haptics.visual_only"))
                 .font(.system(size: 9, weight: .black, design: .rounded))
         }
         .foregroundStyle(DiveUI.yellow)
@@ -202,11 +426,16 @@ struct DiveLiveView: View {
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .stroke(DiveUI.green.opacity(0.86), lineWidth: 1.4)
                 )
-                .shadow(color: DiveUI.green.opacity(0.16), radius: 5, x: 0, y: 0)
+                .shadow(
+                    color: missionModeProfile.decorativeEffectsEnabled ? DiveUI.green.opacity(0.16) : .clear,
+                    radius: missionModeProfile.decorativeEffectsEnabled ? 5 : 0,
+                    x: 0,
+                    y: 0
+                )
         )
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("TTV sessione \(ttvText), runtime \(runtimeMinutes)")
-        .accessibilityHint("TTV informativo derivato da profondita media e durata; non e un valore decompressivo o time to surface.")
+        .accessibilityHint(String(localized: "TTV informativo derivato da profondita media e durata; non e un valore decompressivo o time to surface."))
     }
 
     private func dashboardValue(title: String, value: String, unit: String?, color: Color) -> some View {
@@ -240,66 +469,96 @@ struct DiveLiveView: View {
             }
             .frame(width: leftWidth, alignment: .leading)
 
-            AscentGaugeView(status: dive.ascentStatus)
+            AscentGaugeView(status: dive.ascentStatus, units: unitPreference)
                 .frame(width: gaugeWidth, height: 154)
         }
         .frame(maxWidth: .infinity)
     }
 
     private var depthReadout: some View {
-        VStack(spacing: 0) {
+        let style = depthReadoutStyle
+        let depthDisplay = WatchDepthFormatting.display(meters: dive.currentDepthMeters, units: unitPreference)
+        return VStack(spacing: 0) {
             HStack(alignment: .lastTextBaseline, spacing: 4) {
-                Text(dive.isDepthSensorAvailable ? Formatters.one(dive.currentDepthMeters) : "--")
+                Text(depthDisplay.valueText)
                     .font(.system(size: 72, weight: .black, design: .rounded))
                     .minimumScaleFactor(0.42)
                     .lineLimit(1)
                     .monospacedDigit()
-                    .foregroundStyle(dive.redWarningBlink ? DiveUI.red : .white)
-                    .shadow(color: dive.redWarningBlink ? DiveUI.red.opacity(0.75) : .clear, radius: 8, x: 0, y: 0)
+                    .foregroundStyle(style.depthColor)
+                    .shadow(
+                        color: missionModeProfile.decorativeEffectsEnabled ? style.depthShadow : .clear,
+                        radius: missionModeProfile.decorativeEffectsEnabled ? 8 : 0,
+                        x: 0,
+                        y: 0
+                    )
                     .layoutPriority(1)
-                Text(dive.isDepthSensorAvailable ? "m" : "")
+                Text(depthDisplay.unitLabel)
                     .font(.system(size: 31, weight: .black, design: .rounded))
-                    .foregroundStyle(DiveUI.blue)
+                    .foregroundStyle(style.labelColor)
                     .padding(.bottom, 9)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(String(localized: "live.depth.a11y"))
+            .accessibilityValue("\(depthDisplay.valueText) \(depthDisplay.unitLabel)")
 
-            Text("PROFONDITÀ ATTUALE")
+            Text(String(localized: "PROFONDITÀ ATTUALE"))
                 .font(.system(size: 15, weight: .black, design: .rounded))
                 .lineLimit(1)
                 .minimumScaleFactor(0.68)
-                .foregroundStyle(DiveUI.blue)
+                .foregroundStyle(style.labelColor)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .padding(.horizontal, 4)
+        .padding(.vertical, 3)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(depthSafetyState == .normal ? Color.clear : Color.black.opacity(0.35))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(style.panelStroke, lineWidth: depthSafetyState == .normal ? 0 : 1.2)
+                )
+        )
     }
 
     private var depthSummary: some View {
-        HStack(spacing: 7) {
-            depthCard(title: "PROF. MASSIMA", value: dive.isDepthSensorAvailable ? Formatters.one(dive.maxDepthMeters) : "--")
-            depthCard(title: "PROF. MEDIA", value: dive.isDepthSensorAvailable ? Formatters.one(dive.averageDepthMeters) : "--")
+        Group {
+            if depthSafetyState.suppressesPositiveDepthReinforcement {
+                EmptyView()
+            } else {
+                HStack(spacing: 7) {
+                    depthCard(title: "PROF. MASSIMA", value: dive.maxDepthMeters, emphasize: false)
+                    depthCard(title: "PROF. MEDIA", value: dive.averageDepthMeters, emphasize: false)
+                }
+            }
         }
     }
 
-    private func depthCard(title: String, value: String) -> some View {
-        VStack(spacing: 2) {
+    private func depthCard(title: String, value: Double, emphasize: Bool) -> some View {
+        let depthDisplay = WatchDepthFormatting.display(meters: value, units: unitPreference)
+        return VStack(spacing: 2) {
             Text(title)
                 .font(.system(size: 10, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
+                .foregroundStyle(emphasize ? DiveUI.yellow : DiveUI.secondaryText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.62)
             HStack(alignment: .lastTextBaseline, spacing: 3) {
-                Text(value)
+                Text(depthDisplay.valueText)
                     .font(.system(size: 25, weight: .black, design: .rounded))
-                    .foregroundStyle(DiveUI.blue)
+                    .foregroundStyle(emphasize ? DiveUI.yellow : DiveUI.blue)
                     .monospacedDigit()
                     .lineLimit(1)
                     .minimumScaleFactor(0.62)
-                Text(value == "--" ? "" : "m")
+                Text(depthDisplay.unitLabel)
                     .font(.system(size: 12, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.blue)
                     .padding(.bottom, 2)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(title)
+        .accessibilityValue("\(depthDisplay.valueText) \(depthDisplay.unitLabel)")
         .frame(maxWidth: .infinity, minHeight: 55)
         .background(
             RoundedRectangle(cornerRadius: 8, style: .continuous)
@@ -340,30 +599,89 @@ struct DiveLiveView: View {
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
                         .stroke(DiveUI.yellow.opacity(0.9), lineWidth: 1.4)
                 )
-                .shadow(color: DiveUI.yellow.opacity(0.16), radius: 5, x: 0, y: 0)
+                .shadow(
+                    color: missionModeProfile.decorativeEffectsEnabled ? DiveUI.yellow.opacity(0.16) : .clear,
+                    radius: missionModeProfile.decorativeEffectsEnabled ? 5 : 0,
+                    x: 0,
+                    y: 0
+                )
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(localized: "live.stopwatch.a11y"))
+        .accessibilityValue(Formatters.time(dive.stopwatchTime))
     }
 
     private var controls: some View {
-        HStack(spacing: 7) {
-            DiveCommandButton("START", systemImage: "play.fill", color: DiveUI.green) {
-                dive.startStopwatch()
+        VStack(spacing: 7) {
+            HStack(spacing: 7) {
+                DiveCommandButton("START", systemImage: "play.fill", color: DiveUI.green) {
+                    dive.startStopwatch()
+                }
+                .accessibilityLabel(String(localized: "live.stopwatch.start.a11y"))
+                DiveCommandButton("STOP", systemImage: "stop.fill", color: DiveUI.red) {
+                    dive.stopStopwatch()
+                }
+                .accessibilityLabel(String(localized: "live.stopwatch.stop.a11y"))
+                DiveCommandButton("RESET", systemImage: "arrow.clockwise", color: .white.opacity(0.78)) {
+                    if dive.stopwatchTime > 0 {
+                        showResetStopwatchConfirmation = true
+                    } else {
+                        dive.resetStopwatch()
+                    }
+                }
+                .accessibilityLabel(String(localized: "live.stopwatch.reset.a11y"))
+                .accessibilityHint(String(localized: "live.stopwatch.reset.hint"))
             }
-            DiveCommandButton("STOP", systemImage: "stop.fill", color: DiveUI.red) {
-                dive.stopStopwatch()
-            }
-            DiveCommandButton("RESET", systemImage: "arrow.clockwise", color: .white.opacity(0.78)) {
-                dive.resetStopwatch()
+            if dive.isManualLifecycleActive {
+                DiveCommandButton(String(localized: "FINE MANUALE"), systemImage: "stop.circle.fill", color: DiveUI.red) {
+                    dive.endManualDive()
+                }
             }
         }
     }
 
-    private func warningBanner(_ error: String) -> some View {
+    private var manualFallbackPanel: some View {
+        VStack(spacing: 8) {
+            Text(String(localized: "AUTOMAZIONE PROFONDITÀ NON DISPONIBILE"))
+                .font(.system(size: 10, weight: .black, design: .rounded))
+                .foregroundStyle(DiveUI.yellow)
+                .multilineTextAlignment(.center)
+            Text(String(localized: "Rilevamento automatico profondità non disponibile. Usa avvio manuale."))
+                .font(.system(size: 11, weight: .black, design: .rounded))
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(String(localized: "Sessione limitata: runtime e GPS sì, profondità automatica no."))
+                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .foregroundStyle(DiveUI.secondaryText)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            DiveCommandButton(String(localized: "AVVIO MANUALE"), systemImage: "play.circle.fill", color: DiveUI.green) {
+                dive.startManualDive()
+            }
+        }
+        .padding(9)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(DiveUI.yellow.opacity(0.10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .stroke(DiveUI.yellow.opacity(0.7), lineWidth: 1)
+                )
+        )
+    }
+
+    private func warningBanner(_ message: String, showAcknowledge: Bool, acknowledge: @escaping () -> Void) -> some View {
         HStack(spacing: 6) {
             Image(systemName: "exclamationmark.triangle.fill")
-            Text(error)
+            Text(message)
                 .lineLimit(2)
                 .minimumScaleFactor(0.72)
+            if showAcknowledge {
+                Button(String(localized: "alarm.acknowledge"), action: acknowledge)
+                    .font(.caption2.bold())
+                    .foregroundStyle(DiveUI.cyan)
+            }
         }
         .font(.caption2.bold())
         .foregroundStyle(DiveUI.yellow)
@@ -382,8 +700,11 @@ struct DiveLiveView: View {
     }
 
     private var temperatureText: String {
-        guard let temp = dive.currentTemperatureCelsius else { return "--.- \u{00B0}C" }
-        return "\(Formatters.one(temp)) \u{00B0}C"
+        guard let temp = dive.currentTemperatureCelsius else {
+            return "--.- \(unitPreference.temperatureUnitLabel)"
+        }
+        let display = unitPreference.temperatureDisplay(celsius: temp)
+        return "\(Formatters.one(display.value)) \(display.unit)"
     }
 
     private var ttvText: String {

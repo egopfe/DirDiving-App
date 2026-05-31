@@ -39,7 +39,10 @@ struct DIRDivingiOSApp: App {
                 .environmentObject(legalAcceptance)
                 .environment(\.locale, DIRIOSAppLanguage.fromStorage(appLanguage).locale)
                 .preferredColorScheme(.dark)
-                .onAppear { watchSync.activate(logStore: logStore) }
+                .onAppear {
+                    logStore.attachWatchSync(watchSync)
+                    watchSync.activate(logStore: logStore)
+                }
         }
     }
 }

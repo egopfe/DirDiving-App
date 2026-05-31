@@ -26,6 +26,7 @@ struct DIRDivingApp: App {
         _ascentSettings = StateObject(wrappedValue: ascentSettings)
         _navigationStore = StateObject(wrappedValue: navigationStore)
         _watchSync = StateObject(wrappedValue: WatchSyncService.shared)
+        WatchSyncService.shared.attachLogStore(logStore)
     }
 
     var body: some Scene {

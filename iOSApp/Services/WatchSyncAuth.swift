@@ -2,11 +2,18 @@ import Foundation
 import CryptoKit
 import Security
 import WatchConnectivity
+import os
 
 enum WatchSyncAuth {
     static let contextKey = "dirdiving_watch_sync_secret"
-    private static let keychainService = "com.egopfe.dirmotion.watch-sync"
+
+    // F8: primary keychainService uses the canonical product prefix `dirdiving`.
+    // The legacy `dirmotion` service is read as a one-shot migration source only.
+    private static let keychainService = "com.egopfe.dirdiving.watch-sync"
+    private static let legacyKeychainService = "com.egopfe.dirmotion.watch-sync"
     private static let keychainAccount = "shared-secret"
+
+    private static let logger = Logger(subsystem: "com.egopfe.dirdiving.ios", category: "WatchSyncAuth")
 
     static func hasPeerSecret() -> Bool {
         loadPeerSecret() != nil
@@ -15,8 +22,24 @@ enum WatchSyncAuth {
     static func publishSharedSecretIfNeeded() {
         guard WCSession.isSupported(),
               WCSession.default.activationState == .activated else { return }
-        let secret = loadOrCreateLocalSecret()
-        try? WCSession.default.updateApplicationContext([contextKey: secret.base64EncodedString()])
+        guard let secret = loadOrCreateLocalSecret() else {
+            logger.error("Local Watch sync secret unavailable: SecRandomCopyBytes failed; refusing to publish a deterministic fallback.")
+            return
+        }
+        mergeApplicationContext([contextKey: secret.base64EncodedString()])
+    }
+
+    static func mergeApplicationContext(_ updates: [String: Any]) {
+        guard WCSession.isSupported(),
+              WCSession.default.activationState == .activated else { return }
+        var context = WCSession.default.applicationContext
+        for (key, value) in updates {
+            context[key] = value
+        }
+        if context[contextKey] == nil, let secret = loadOrCreateLocalSecret() {
+            context[contextKey] = secret.base64EncodedString()
+        }
+        try? WCSession.default.updateApplicationContext(context)
     }
 
     static func ingestSharedSecretFromContext(_ context: [String: Any]) {
@@ -27,13 +50,23 @@ enum WatchSyncAuth {
         NotificationCenter.default.post(name: .watchSyncPeerSecretDidUpdate, object: nil)
     }
 
+    // MARK: - Sync key derivation
+    //
+    // Authoritative algorithm = `v2 ordered-secrets` (see Docs/SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md F2).
+    // BOTH sides (Watch + iOS) on `main` MUST keep this implementation byte-identical.
+    // Any change to the canonical string or the ordering rule REQUIRES a bump of
+    // `WatchDiveSyncCodec.schemaVersion` and a coordinated Watch/iOS release.
     static func syncKey(peerBundleID _: String) -> SymmetricKey {
         guard let secret = loadPeerSecret() else {
-            return SymmetricKey(data: SHA256.hash(data: Data()))
+            logger.error("syncKey requested without verified peer secret; returning zero key (callers must short-circuit via hasPeerSecret()).")
+            return SymmetricKey(data: Data(repeating: 0, count: 32))
         }
-        let localSecret = loadOrCreateLocalSecret()
+        guard let localSecret = loadOrCreateLocalSecret() else {
+            logger.error("syncKey requested but local secret unavailable; returning zero key.")
+            return SymmetricKey(data: Data(repeating: 0, count: 32))
+        }
         let orderedSecrets = [localSecret, secret].sorted { $0.lexicographicallyPrecedes($1) }
-        var material = Data("dirdiving.watch.sync.v2|com.egopfe.dirdiving|com.egopfe.dirdiving.ios|".utf8)
+        var material = Data("dirdiving.watch.sync.v2|com.egopfe.dirdiving.ios.watch|com.egopfe.dirdiving.ios|".utf8)
         material.append(orderedSecrets[0])
         material.append(orderedSecrets[1])
         return SymmetricKey(data: SHA256.hash(data: material))
@@ -44,23 +77,39 @@ enum WatchSyncAuth {
         return WCSession.default.receivedApplicationContext
     }
 
-    private static func loadOrCreateLocalSecret() -> Data {
-        if let existing = loadKeychain(account: keychainAccount) {
+    // F1: explicit peer-trust reset used by the iOS UI to force a fresh pairing handshake.
+    static func resetPeerTrust() {
+        deleteKeychain(account: "\(keychainAccount)-peer", service: keychainService)
+        deleteKeychain(account: "\(keychainAccount)-peer", service: legacyKeychainService)
+        NotificationCenter.default.post(name: .watchSyncPeerSecretDidUpdate, object: nil)
+    }
+
+    private static func loadOrCreateLocalSecret() -> Data? {
+        if let existing = loadKeychain(account: keychainAccount, service: keychainService) {
             return existing
         }
-        guard let generated = try? randomKeyData(byteCount: 32) else {
-            return Data(SHA256.hash(data: Data("dirmotion.ios.sync.local".utf8)))
+        // F8 migration: adopt the legacy `dirmotion` secret only once, then re-save under the canonical service.
+        if let legacy = loadKeychain(account: keychainAccount, service: legacyKeychainService) {
+            saveKeychain(legacy, account: keychainAccount, service: keychainService)
+            return legacy
         }
-        saveKeychain(generated, account: keychainAccount)
+        guard let generated = try? randomKeyData(byteCount: 32) else {
+            // F7: never fall back to a deterministic secret — fail loud instead.
+            return nil
+        }
+        saveKeychain(generated, account: keychainAccount, service: keychainService)
         return generated
     }
 
     private static func loadPeerSecret() -> Data? {
-        loadKeychain(account: "\(keychainAccount)-peer")
+        if let secret = loadKeychain(account: "\(keychainAccount)-peer", service: keychainService) {
+            return secret
+        }
+        return loadKeychain(account: "\(keychainAccount)-peer", service: legacyKeychainService)
     }
 
     private static func savePeerSecret(_ data: Data) {
-        saveKeychain(data, account: "\(keychainAccount)-peer")
+        saveKeychain(data, account: "\(keychainAccount)-peer", service: keychainService)
     }
 
     private static func randomKeyData(byteCount: Int) throws -> Data {
@@ -70,10 +119,10 @@ enum WatchSyncAuth {
         return Data(bytes)
     }
 
-    private static func loadKeychain(account: String) -> Data? {
+    private static func loadKeychain(account: String, service: String) -> Data? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: keychainService,
+            kSecAttrService as String: service,
             kSecAttrAccount as String: account,
             kSecReturnData as String: true,
             kSecMatchLimit as String: kSecMatchLimitOne
@@ -83,10 +132,10 @@ enum WatchSyncAuth {
         return result as? Data
     }
 
-    private static func saveKeychain(_ data: Data, account: String) {
+    private static func saveKeychain(_ data: Data, account: String, service: String) {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: keychainService,
+            kSecAttrService as String: service,
             kSecAttrAccount as String: account
         ]
         SecItemDelete(query as CFDictionary)
@@ -94,6 +143,15 @@ enum WatchSyncAuth {
         attributes[kSecValueData as String] = data
         attributes[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
         SecItemAdd(attributes as CFDictionary, nil)
+    }
+
+    private static func deleteKeychain(account: String, service: String) {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account
+        ]
+        SecItemDelete(query as CFDictionary)
     }
 
     private enum KeychainError: Error {

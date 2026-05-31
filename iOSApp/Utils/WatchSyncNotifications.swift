@@ -1,5 +1,6 @@
 import Foundation
 
 extension Notification.Name {
-    static let watchSyncPeerSecretDidUpdate = Notification.Name("dirmotion.watchSyncPeerSecretDidUpdate")
+    // F8: canonical name now uses the `dirdiving` prefix; in-process only, never persisted.
+    static let watchSyncPeerSecretDidUpdate = Notification.Name("dirdiving.watchSyncPeerSecretDidUpdate")
 }

@@ -9,5 +9,17 @@ final class AppNavigationStore: ObservableObject {
 
     init() {
         Self.shared = self
+        if WatchModeSelectionPreferences.skipWhenSingleMode, !WatchModeSelectionPreferences.hasMultipleStableModes {
+            selectedPage = .live
+        }
+    }
+
+    /// Keeps `TabView` selection valid when optional pages are removed from the hierarchy.
+    func clampSelectedPage() {
+        if selectedPage == .modeSelection,
+           WatchModeSelectionPreferences.skipWhenSingleMode,
+           !WatchModeSelectionPreferences.hasMultipleStableModes {
+            selectedPage = .live
+        }
     }
 }

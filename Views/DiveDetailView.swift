@@ -4,6 +4,7 @@ struct DiveDetailView: View {
     let session: DiveSession
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var log: DiveLogStore
+    @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
     @State private var exportURL: URL?
     @State private var exportMessage: String?
     @State private var exportCompletionFileName: String?
@@ -19,6 +20,9 @@ struct DiveDetailView: View {
                     header
                     dateLine
                     summaryCards
+                    if session.exceededSupportedDepthRange {
+                        exceededDepthLogBanner
+                    }
                     gpsRows
                     exportPanel
                     deletePanel
@@ -47,6 +51,7 @@ struct DiveDetailView: View {
 
     private var header: some View {
         HStack(alignment: .center) {
+            WatchDetailBackButton()
             HStack(spacing: 5) {
                 DiveOctopusLogo(accent: DiveUI.yellow)
                     .frame(width: 23, height: 22, alignment: .leading)
@@ -73,10 +78,36 @@ struct DiveDetailView: View {
     }
 
     private var summaryCards: some View {
-        HStack(spacing: 4) {
-            detailMetricCard(title: "PROF. MASSIMA", value: Formatters.one(session.maxDepthMeters), unit: "m", color: DiveUI.blue)
+        let depthDisplay = WatchDepthFormatting.display(meters: session.maxDepthMeters, units: DIRUnitPreference.fromStorage(watchUnits))
+        return HStack(spacing: 4) {
+            detailMetricCard(
+                title: "PROF. MASSIMA",
+                value: depthDisplay.valueText,
+                unit: depthDisplay.unitLabel,
+                color: session.exceededSupportedDepthRange ? DiveUI.red : DiveUI.blue
+            )
             detailMetricCard(title: "DURATA", value: durationMinutesText, unit: "min", color: .white)
         }
+    }
+
+    private var exceededDepthLogBanner: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "exclamationmark.octagon.fill")
+                .font(.system(size: 12, weight: .black))
+            Text(String(localized: "depth.safety.log.outside_range"))
+                .font(.system(size: 10, weight: .black, design: .rounded))
+                .lineLimit(2)
+                .minimumScaleFactor(0.72)
+        }
+        .foregroundStyle(DiveUI.red)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(DiveUI.red.opacity(0.12))
+                .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).stroke(DiveUI.red.opacity(0.72), lineWidth: 1))
+        )
     }
 
     private func detailMetricCard(title: String, value: String, unit: String, color: Color) -> some View {
@@ -171,7 +202,7 @@ struct DiveDetailView: View {
         VStack(spacing: 8) {
             Button {
                 exportURL = SubsurfaceExportService.writeCSV(for: session)
-                exportMessage = exportURL == nil ? "Export CSV non riuscito" : nil
+                exportMessage = exportURL == nil ? String(localized: "Export CSV non riuscito") : nil
                 if let exportURL {
                     exportCompletionFileName = exportURL.lastPathComponent
                     showExportCompletion = true
@@ -262,9 +293,9 @@ struct DiveDetailView: View {
 
     private func fixSourceText(_ source: GPSFixSource) -> String {
         switch source {
-        case .fix: return "FIX SUPERFICIE"
-        case .fallback: return "ULTIMO PUNTO NOTO"
-        case .noFix: return "NO-FIX"
+        case .fix: return String(localized: "FIX SUPERFICIE")
+        case .fallback: return String(localized: "ULTIMO PUNTO NOTO")
+        case .noFix: return String(localized: "NO-FIX")
         }
     }
 
