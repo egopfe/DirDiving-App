@@ -1,0 +1,15 @@
+{
+  "id": "fresh-vs-salt-profile",
+  "isValid": true,
+  "depthMeters": 36,
+  "bottomMinutes": 20,
+  "gfLow": 30,
+  "gfHigh": 70,
+  "environment": { "altitudeMeters": 0, "salinity": "fresh" },
+  "gases": [
+    { "name": "Air", "role": "bottom", "oxygen": 0.21, "helium": 0.0, "maxPPO2": 1.4, "switchDepthMeters": 36 }
+  ],
+  "expectedTTSRangeMinutes": { "min": 24, "max": 80 },
+  "expectedNDLRangeMinutes": { "min": 5, "max": 40 },
+  "toleranceMinutes": 20
+}

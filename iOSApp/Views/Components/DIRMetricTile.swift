@@ -42,5 +42,7 @@ struct DIRMetricTile: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 13)
         .background(RoundedRectangle(cornerRadius: 0).fill(Color.clear))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(title), \(value) \(unit ?? "")")
     }
 }

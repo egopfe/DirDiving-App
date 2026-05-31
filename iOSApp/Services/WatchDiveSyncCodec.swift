@@ -5,17 +5,17 @@ import WatchConnectivity
 enum WatchDiveSyncCodec {
     static let payloadKey = "dirdiving_dive_session"
     static let schemaVersion = 1
-    static let maxPayloadBytes = 512_000
-    static let maxSamples = IOSAlgorithmConfiguration.maximumProfileSamples
-    static let maxDepthMeters = IOSAlgorithmConfiguration.maximumSyncDepthMeters
+    static let maxPayloadBytes = IOSAlgorithmConfiguration.maxSyncPayloadBytes
+    static let maxSamples = IOSAlgorithmConfiguration.maxProfileSampleCount
+    static let maxDepthMeters = IOSAlgorithmConfiguration.maxSyncDepthMeters
     // F6: tightened from 86_400 (24 h) to 3_600 (1 h) to shrink the replay window.
     // WatchConnectivity is pairing-locked at the OS level, but a 1 h skew is more than
     // enough for the usual Watch/iPhone clock drift while removing the day-long replay
     // surface that the legacy value implied.
-    static let maxIssuedAtSkew: TimeInterval = 3_600
+    static let maxIssuedAtSkew: TimeInterval = IOSAlgorithmConfiguration.syncIssuedAtSkewSeconds
     static let importedSessionIDsKey = "dirdiving_ios_imported_session_ids"
 
-    private static let expectedWatchBundleID = "com.egopfe.dirdiving"
+    private static let expectedWatchBundleID = "com.egopfe.dirdiving.ios.watch"
 
     struct Transport: Codable {
         let version: Int
@@ -25,9 +25,48 @@ enum WatchDiveSyncCodec {
         let signature: String
     }
 
+    struct PayloadEnvelope {
+        let message: [String: Any]
+        let sessionID: UUID
+        let issuedAt: Date
+    }
+
     struct ParsedPayload {
         let session: DiveSession
         let issuedAt: Date
+    }
+
+    static func makePayload(session: DiveSession) throws -> PayloadEnvelope {
+        guard WatchSyncAuth.hasPeerSecret() else {
+            throw WatchDiveSyncError.missingPeerSecret
+        }
+        let validatedSession = try validateForSync(session)
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let body = try encoder.encode(validatedSession)
+        guard body.count <= maxPayloadBytes else {
+            throw WatchDiveSyncError.payloadTooLarge
+        }
+
+        let issuedAt = Date()
+        let bundleID = Bundle.main.bundleIdentifier ?? "com.egopfe.dirdiving.ios"
+        let transport = Transport(
+            version: schemaVersion,
+            bundleID: bundleID,
+            issuedAt: issuedAt,
+            body: body,
+            signature: ""
+        )
+        let signed = sign(transport, issuedAt: issuedAt, body: body)
+        let transportData = try JSONEncoder().encode(signed)
+        guard transportData.count <= maxPayloadBytes else {
+            throw WatchDiveSyncError.payloadTooLarge
+        }
+        return PayloadEnvelope(
+            message: [payloadKey: transportData],
+            sessionID: validatedSession.id,
+            issuedAt: issuedAt
+        )
     }
 
     static func parseSession(from payload: [String: Any]) throws -> DiveSession {
@@ -71,8 +110,8 @@ enum WatchDiveSyncCodec {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let session = try decoder.decode(DiveSession.self, from: transport.body)
-        let normalizedSession = try validate(session)
-        return ParsedPayload(session: normalizedSession, issuedAt: transport.issuedAt)
+        let validatedSession = try validateForSync(session)
+        return ParsedPayload(session: validatedSession, issuedAt: transport.issuedAt)
     }
 
     // F11: ack signature recomputed and returned by iOS in response to a signed
@@ -95,12 +134,42 @@ enum WatchDiveSyncCodec {
     }
 
     static func saveImportedSessionIDs(_ ids: Set<UUID>) {
-        let trimmed = Array(ids.suffix(128))
-        UserDefaults.standard.set(trimmed.map(\.uuidString), forKey: importedSessionIDsKey)
+        var order = loadImportedSessionIDOrder().filter { ids.contains($0) }
+        for id in ids where !order.contains(id) {
+            order.append(id)
+        }
+        if order.count > WatchSyncBoundedIDStore.maxImportedSessionIDs {
+            order.removeFirst(order.count - WatchSyncBoundedIDStore.maxImportedSessionIDs)
+        }
+        UserDefaults.standard.set(order.map(\.uuidString), forKey: importedSessionIDsKey)
+    }
+
+    private static func loadImportedSessionIDOrder() -> [UUID] {
+        guard let strings = UserDefaults.standard.stringArray(forKey: importedSessionIDsKey) else {
+            return []
+        }
+        return strings.compactMap(UUID.init(uuidString:))
     }
 
     private static func syncKey() -> SymmetricKey {
         WatchSyncAuth.syncKey(peerBundleID: expectedWatchBundleID)
+    }
+
+    private static func sign(_ transport: Transport, issuedAt: Date, body: Data) -> Transport {
+        let mac = hmac(version: transport.version, bundleID: transport.bundleID, issuedAt: issuedAt, body: body)
+        return Transport(
+            version: transport.version,
+            bundleID: transport.bundleID,
+            issuedAt: issuedAt,
+            body: body,
+            signature: mac
+        )
+    }
+
+    private static func hmac(version: Int, bundleID: String, issuedAt: Date, body: Data) -> String {
+        let canonical = "\(version)|\(bundleID)|\(issuedAt.timeIntervalSince1970)|\(body.base64EncodedString())"
+        let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: syncKey())
+        return Data(code).base64EncodedString()
     }
 
     private static func verify(_ transport: Transport) -> Bool {
@@ -112,13 +181,14 @@ enum WatchDiveSyncCodec {
         return received.constantTimeEquals(expectedData)
     }
 
-    private static func validate(_ session: DiveSession) throws -> DiveSession {
-        guard session.samples.count <= maxSamples,
-              session.maxDepthMeters <= maxDepthMeters else {
-            throw WatchDiveSyncError.invalidSession
-        }
+    static func validateForSync(_ session: DiveSession) throws -> DiveSession {
+        guard session.samples.count <= maxSamples else { throw WatchDiveSyncError.invalidSession }
         do {
-            return try DiveSessionAlgorithmValidator.normalized(session)
+            return try DiveSessionAlgorithmValidator.normalizedForStorage(
+                session,
+                allowEmptySamples: false,
+                maxDepthMeters: maxDepthMeters
+            )
         } catch {
             throw WatchDiveSyncError.invalidSession
         }

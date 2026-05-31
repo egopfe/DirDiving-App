@@ -1,6 +1,6 @@
 # Allineamento branch documentazione (2026-05-24)
 
-**Baseline `main`:** `bd129ca` — merge post `62e25d5` (readiness R2–R4), `db72dce`, `876bcd2`.  
+**Baseline `main`:** `72fa15b` — `bd129ca` + Watch control strategy (`Digital Crown`, touch, App Intents / Action Button, side-button copy).
 **Fetch:** `origin` aggiornato in questo pass. **Nessun force-push.** **Nessun merge PR automatico.**
 
 ---
@@ -9,9 +9,9 @@
 
 | Branch | HEAD | Divergenza vs `main` (rev-list) | Azione documentazione |
 |--------|------|----------------------------------|------------------------|
-| `main` | `bd129ca` | — | Sorgente canonica Watch+iOS unificato |
-| `main-iOS` | `3994b33` | ~172 behind / ~44 ahead | Sync **solo** file docs da `main` (commit dedicato) |
-| `origin/codex/experimental-features` | `6649335` | ~36 behind / ~28 ahead | Mantenere doc experimental; non merge in `main` |
+| `main` | `72fa15b` locale / `86ef349` remote prima del push | ahead 1 vs `origin/main` | Sorgente canonica Watch+iOS unificato; push richiesto |
+| `main-iOS` | `e3b733a` remote | ~183 behind / ~46 ahead vs `origin/main` | Sync documentazione consigliato dopo push main |
+| `origin/codex/experimental-features` | `6649335` | ~47 behind / ~28 ahead | Mantenere doc experimental; non merge in `main` |
 | `origin/codex/ios-experimental-features` | `9e5baca` | vs `main-iOS` | Mantenere Explore Lab isolato |
 | `backup/before-docs-merge-20260524-docs` | `f851b61` | snapshot | Backup pre-pass documentazione |
 
@@ -50,8 +50,8 @@ Dettaglio: [`PR_STATUS_20260524.md`](PR_STATUS_20260524.md).
 
 ## E. Commit suggeriti (questo pass)
 
-1. `main`: `docs: update feature matrix and branch alignment post bd129ca`
-2. `main-iOS`: `docs: sync documentation from main @ bd129ca`
+1. `main`: `docs: update DIR DIVING documentation after Watch control strategy`
+2. `main-iOS`: `docs: sync documentation from main @ 72fa15b`
 
 ## F. Chiusura readiness audit (R2–R4)
 

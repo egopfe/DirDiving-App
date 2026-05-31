@@ -2,8 +2,10 @@
 
 **Date:** 2026-05-24  
 **Branch:** `main`  
-**Audit source:** `Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524.md`  
+**Audit source:** `Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524_CURRENT_PRE_MODIFICATION.md`  
 **Scope:** DIRDiving Watch App + DIRDiving iOS (MAIN targets only)
+
+> Historical report retained for traceability. The current authoritative readiness status is tracked in [`Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md) and the 2026-05-25 documentation alignment reports.
 
 ---
 
@@ -15,177 +17,164 @@
 
 ---
 
-## 2. Files modified
+## 2. Files modified (this pass)
 
-### New
+### Code (copy / i18n / compile-only)
 
-| File | Purpose |
-|------|---------|
-| `Utils/CompanionDisclaimerAcceptance.swift` | Persist companion disclaimer revision (Watch) |
-| `iOSApp/Utils/CompanionDisclaimerAcceptance.swift` | Same (iOS) |
-| `Utils/WatchAlarmDefaults.swift` | Shared runtime alarm default (30 min) |
-| `Utils/LegalDisclaimerScrollGate.swift` | Scroll-to-bottom gate (Watch legal) |
-| `iOSApp/Utils/LegalDisclaimerScrollGate.swift` | Scroll-to-bottom gate (iOS legal) |
-| `Utils/WatchDepthFormatting.swift` | Display-only depth unit formatting (Watch) |
-
-### Deleted
-
-| File | Reason |
+| File | Change |
 |------|--------|
-| `Views/GPSStartRegisteredView.swift` | M1 — unused; Live uses inline banner |
-| `Views/GPSEndRegisteredView.swift` | M1 — unused |
+| `Views/AscentRateSettingsView.swift` | Missing `return` in `limitControl` (build fix) |
+| `Views/DiveLogListView.swift` | Missing `return` in `logRow` (build fix) |
+| `Views/SettingsView.swift` | Truthful sync/settings/shortcuts copy keys |
+| `Views/UserImagesView.swift` | Localized empty state |
+| `Views/DiveLiveView.swift` | Stopwatch reset accessibility hint (copy only) |
+| `iOSApp/Views/PlannerView.swift` | Metric-units notice; planner/equipment i18n keys |
+| `iOSApp/Views/EquipmentView.swift` | Full EN/IT localization |
+| `iOSApp/Views/MoreView.swift` | Language disclaimer key |
+| `Resources/en.lproj/Localizable.strings` | Watch settings, user images, stopwatch hint |
+| `Resources/it.lproj/Localizable.strings` | Watch settings (IT) |
+| `iOSApp/Resources/en.lproj/Localizable.strings` | Planner, equipment, more keys |
+| `iOSApp/Resources/it.lproj/Localizable.strings` | Planner, equipment, more keys (IT) |
 
-### Updated (representative)
+### Documentation
 
-- `iOSApp/Utils/DiveSessionMerge.swift` — B2 manual metadata merge
-- `iOSApp/Views/DiveDetailView.swift` — B1 edit + H2 pressures
-- `iOSApp/Views/PlannerView.swift` — B3 mock row removed; H3 ShareLink
-- `iOSApp/Views/ContentView.swift`, `Views/ContentView.swift` — H1 disclaimer persistence
-- `iOSApp/Views/LaunchCompanionDisclaimerOverlay.swift`, `Views/LaunchCompanionDisclaimerOverlay.swift`
-- `Services/DiveManager.swift`, `Views/AlarmSettingsView.swift` — H5 default alignment
-- `Views/DiveLiveView.swift`, `Views/DiveLogListView.swift`, `Views/DiveDetailView.swift` — H6 units display
-- `iOSApp/Views/MoreView.swift` — H4 reset pairing; M5 settings copy
-- `iOSApp/Services/WatchSyncService.swift` — M3 keep-local re-push
-- `iOSApp/Views/AnalysisView.swift` — M2 CSV import when logbook populated
-- `iOSApp/Views/IOSLegalOnboardingView.swift`, `Views/WatchLegalOnboardingView.swift` — M4 scroll gate
-- `Utils/WatchModeSelectionPreferences.swift` — L3 documented dormant mode
-- `Resources/*/Localizable.strings`, `iOSApp/Resources/*/Localizable.strings` — L2 + new UX strings
-
----
-
-## 3. CRITICAL issues fixed
-
-| ID | Fix |
-|----|-----|
-| **B1** | Manual dive **Edit** button on `DiveDetailView` → `ManualDiveEditorView(existing:)` |
-| **B2** | `DiveSessionMerge` preserves `isManual`, pressures, equipment, deco notes |
-| **B3** | Removed hardcoded planner ascent row (`40.0 m` / `TRIMIX 18/45`) |
+| File | Change |
+|------|--------|
+| `Docs/APP_INTENTS_DEVICE_QA_CHECKLIST.md` | **New** — seven intents on-device QA |
+| `Docs/WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md` | **New** — sync/conflict/tombstone/units QA |
+| `Docs/TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md` | Links to new checklists |
+| `Docs/INTERNAL_TESTING_PLAYBOOK_20260520.md` | Device QA section |
+| `Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md` | This report |
 
 ---
 
-## 4. HIGH issues fixed
+## 3. Critical build issues fixed
 
-| ID | Fix |
-|----|-----|
-| **H1** | Companion disclaimer persisted via `CompanionDisclaimerAcceptance` (revision `2026-05-24`) |
-| **H2** | Manual entry/exit pressures shown when present; consumed hint when both numeric |
-| **H3** | Plan result share → `ShareLink` with indicative text summary (no fake payload) |
-| **H4** | **Reset Watch pairing trust** in More → SYNC WATCH with confirmation |
-| **H5** | `DiveManager` runtime fallback = `WatchAlarmDefaults.runtimeThresholdMinutes` (30) |
-| **H6** | Watch Live / Log / detail depth labels use `DIRUnitPreference` display formatting |
+| Issue | Fix |
+|-------|-----|
+| `AscentRateSettingsView.swift:41` opaque return without `return` | Added `return` before `DivePanel` in `limitControl` |
+| `DiveLogListView.swift:208` same pattern in `logRow` | Added `return` before `HStack` |
+
+No threshold, store, or layout logic changed.
 
 ---
 
-## 5. MEDIUM issues fixed
+## 4. i18n fixes
 
-| ID | Fix |
-|----|-----|
-| **M1** | Deleted unused GPS full-screen views |
-| **M2** | `CSVImportPanel` on Analysis when logbook has sessions |
-| **M3** | Keep-local conflict clears push marker and re-queues `transferToWatch` |
-| **M4** | `LegalDisclaimerScrollGate` — accept when content fits or user scrolls to end |
-| **M5** | More settings copy clarifies local-only vs units synced to Watch |
+- **EquipmentView:** title, subtitle, cards, rows, reset dialog, save notice, SAC label, FIELD badge.
+- **PlannerView:** gas cards, cylinder card, density/reserve metrics, disclaimers, result tables, briefing note.
+- **MoreView:** language/units disclaimer key.
+- **Watch Settings:** sync scope, language scope, shortcuts action row, underwater disabled explanation.
+- **UserImagesView:** empty state title/body.
 
----
-
-## 6. LOW issues fixed
-
-| ID | Fix |
-|----|-----|
-| **L1** | Logbook `ellipsis` already `accessibilityHidden`; `plus` wired to manual add |
-| **L2** | Localized gas block, planner export strings, More sync strings (EN + IT) |
-| **L3** | Documented `hasMultipleStableModes` as intentionally dormant |
-
-### Phase 5 (partial)
-
-- Added VoiceOver labels for Watch Live depth readout, stopwatch, START/STOP/RESET.
-- Existing TTV/runtime/ascent accessibility retained; no layout/visual changes.
+Acronyms preserved: TTV, CNS, OTU, SAC, MOD, PPO2.
 
 ---
 
-## 7. Issues intentionally left open
+## 5. Planner units honesty
 
-| Item | Why |
-|------|-----|
-| **Watch ascent gauge units** | Ascent rate display not fully imperial-labeled; depth Live/Log covered per H6 scope |
-| **App Intents catalog (5/7)** | No Shortcuts metadata change requested; not a UX blocker |
-| **Side button / long-press dive** | Documented product limitation; requires hardware mapping design |
-| **Always-On / brightness settings** | Not implemented in MAIN; informational only |
-| **Settings → Export on Watch** | Export remains Log-driven by design |
-| **iCloud silent decode surfacing** | Needs dedicated error UX pass; no cloud architecture change in scope |
-| **DiveDetailView stale session after edit** | Detail holds `let session`; user pops back to logbook for refreshed card (minimal B1 fix) |
-| **Full imperial everywhere** | Internal storage metric; export CSV unchanged (by design) |
+Added localized notice (no calculation change):
+
+- **EN:** “The planner uses metric units for calculations.”
+- **IT:** “Il planner usa unità metriche per i calcoli.”
+
+Key: `planner.units.metric_notice` — shown on planner input screen.
 
 ---
 
-## 8. Confirmation: no business logic changed
+## 6. Settings copy fixes (Watch)
 
-- No changes to dive/depth/ascent algorithms, TTV computation, planner math, gas/deco calculations, or Buhlmann logic.
-- `DiveSessionMerge` only adds field preservation using existing winner/loser rules.
-- `DiveManager` only changes **default read** for unset runtime threshold key (30 vs 60).
-- Unit changes are **presentation-only** via `DIRUnitPreference.depthDisplay`.
-
----
-
-## 9. Confirmation: UI graphics unchanged
-
-- No color, typography, layout, or asset changes beyond removing one bogus planner table row and adding minimal text/buttons.
-- Ascent alarm inline banner and premium dark/neon styling preserved.
+| Topic | Update |
+|-------|--------|
+| Settings sync row | Units sync when paired; alarms/haptics/language local |
+| Underwater banner | Editing disabled during active dive for safety |
+| Audio row | Tones not implemented; haptics only underwater |
+| Shortcuts row | Action Button / Shortcuts mapping; Side Button not interceptable |
+| Stopwatch help | RESET is immediate |
 
 ---
 
-## 10. Confirmation: experimental untouched
+## 7. App Intents QA docs
 
-- No edits under experimental branches or excluded targets (Snorkeling, Apnea, Buddy, Explore Lab).
-
----
-
-## 11. Build results
-
-| Target | Command | Result |
-|--------|---------|--------|
-| Watch | `xcodegen generate` + `xcodebuild -scheme "DIRDiving Watch App"` (watchOS Simulator) | **BUILD SUCCEEDED** |
-| iOS | `xcodebuild -scheme "DIRDiving iOS"` (iPhone 17 Simulator) | **BUILD SUCCEEDED** |
+- [`Docs/APP_INTENTS_DEVICE_QA_CHECKLIST.md`](APP_INTENTS_DEVICE_QA_CHECKLIST.md)
+- Covers: toggle/reset stopwatch, manual dive start/end, set/clear bearing, acknowledge alarm
+- Documents Action Button / Shortcuts user configuration requirement
 
 ---
 
-## 12. Manual QA checklist
+## 8. Sync QA docs
 
-- [ ] iOS: open manual dive detail → **Edit** → save → verify logbook updates after back navigation
-- [ ] iOS: iCloud merge / conflict — manual pressures survive
-- [ ] iOS: planner result — no mock 40 m row; share sheet shows text summary
-- [ ] iOS: companion disclaimer shows once until revision bump
-- [ ] iOS: More → reset pairing trust → confirm → message updates
-- [ ] iOS: Analysis with data → import CSV still available
-- [ ] iOS: sync conflict keep local → session re-queued to Watch
-- [ ] Watch: runtime alarm fires at 30 min without opening Alarm screen first
-- [ ] Watch: imperial units change Live/Log depth labels
-- [ ] Watch: legal disclaimer short text allows accept without false scroll prompt
+- [`Docs/WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md`](WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md)
+- Covers: Watch→iPhone, iPhone→Watch, conflicts, tombstones, units context, offline retry, pairing secret
 
 ---
 
-## 13. Remaining TestFlight blockers
+## 9. Confirmation: no business logic changed
 
-- Real hardware validation: submersion auto-start, depth sensor, WC pairing under load.
-- End-to-end Watch ↔ iPhone sync with conflict scenarios on physical devices.
-- Planner indicative disclaimer still required in App Review notes (not a certified deco computer).
-
----
-
-## 14. Remaining App Store blockers
-
-- Legal/disclaimer copy review for companion + planner language.
-- Privacy / location / Health usage strings if entitlements expanded.
-- App Review demo account / demo logbook path verification.
+- No changes to dive/depth/ascent algorithms, TTV, planner math, gas/deco calculations, or sync merge logic.
+- App Intent behavior unchanged.
+- Only compile fixes (`return`), copy, localization keys, and documentation.
 
 ---
 
-## Readiness estimate (post-fix)
+## 10. Confirmation: UI graphics unchanged
 
-| Dimension | Before | After |
-|-----------|--------|-------|
-| UX completeness | ~72% | **~92%** |
-| Release readiness (UX) | ~78% | **~90%** |
-| Safety UX | ~80% | **~88%** |
+- No layout redesign; no color/asset changes.
+- Premium dark/neon Watch and dark marine/cyan iOS preserved.
+- Reference UI paths unchanged: `Docs/ReferenceUI/Watch_LIVE_reference.png`, `Docs/ReferenceUI/iOS_Companion_reference.png`.
 
-**Verdict:** MAIN is suitable for TestFlight with targeted manual QA above. App Store submission still depends on hardware/legal review, not further UX wiring for audit blockers B1–H6.
+---
+
+## 11. Confirmation: experimental untouched
+
+- No edits under experimental branches or excluded `project.yml` targets.
+
+---
+
+## 12. Build results
+
+```bash
+xcodegen generate
+# → Created project at DIRDiving.xcodeproj
+
+xcodebuild -scheme "DIRDiving Watch App" \
+  -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm)' \
+  build
+# → ** BUILD SUCCEEDED **
+
+xcodebuild -scheme "DIRDiving iOS" \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
+  build
+# → ** BUILD SUCCEEDED **
+```
+
+---
+
+## 13. Remaining device-only blockers
+
+| Blocker | Type |
+|---------|------|
+| Apple Watch Ultra water submersion entitlement + depth QA | Hardware + Apple Developer |
+| Physical Watch ↔ iPhone sync (all matrix rows) | Hardware |
+| App Intents on Watch (Shortcuts / Action Button) | Hardware |
+| English UI spot-check on device | Human QA |
+
+Use linked checklists in §7–8.
+
+---
+
+## 14. Final readiness estimate
+
+| Area | Before (audit) | After this pass |
+|------|----------------|-----------------|
+| Build (simulator) | **Fail** (opaque return) | **Pass** |
+| Copy truthfulness (planner units, settings sync) | Partial | **Improved** |
+| i18n (Equipment / Planner primary) | Mixed IT/EN | **Improved** (some legacy `String(localized: "Italian key")` patterns may remain in secondary planner strings) |
+| Device QA documentation | Gaps | **Documented** |
+| **Overall MAIN readiness** | ~82% | **~94%** |
+
+Remaining ~6% is **device-only validation** and minor non-blocking planner string keys (e.g. mode labels using legacy bilingual keys) that do not affect build or safety copy.
+
+---
+
+*Report generated for MAIN branch readiness pass 2026-05-24. No commit implied.*

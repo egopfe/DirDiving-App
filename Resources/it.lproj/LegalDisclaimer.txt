@@ -1,0 +1,45 @@
+DIR Diving – Condizioni di Utilizzo ed avvertimenti.
+
+AVVISO IMPORTANTE DI SICUREZZA
+
+DIR Diving NON è un computer subacqueo. DIR Diving è un’applicazione di supporto e monitoraggio immersioni progettata esclusivamente per visualizzare e registrare informazioni relative all’immersione quali profondità, profondità media, runtime, temperatura dell’acqua, posizione GPS in superficie, telemetria e log immersione. L’applicazione non deve mai essere utilizzata come strumento per pianificazione immersione, gestione decompressiva, decisioni vitali, gestione emergenze o gestione gas.
+
+LIMITAZIONI SENSORI E DISPOSITIVO
+
+DIR Diving si basa su sensori Apple Watch, API watchOS, Bluetooth, GPS, sensori di movimento e pressione. Questi sistemi possono malfunzionare, bloccarsi, disconnettersi o fornire dati inaccurati senza preavviso.
+
+ESCLUSIONE DI GARANZIA
+
+DIR Diving viene fornita 'COSÌ COM’È' e 'SECONDO DISPONIBILITÀ', senza alcuna garanzia espressa o implicita. Gli sviluppatori e distributori declinano ogni responsabilità per incidenti, malattie da decompressione, morte, danni alle attrezzature, perdita dati o danni diretti e indiretti.
+
+REQUISITI FORMATIVI
+
+DIR Diving è destinata esclusivamente a subacquei certificati con formazione adeguata al tipo di immersione effettuata. L’app non sostituisce corsi professionali, certificazioni o procedure di sicurezza.
+
+NOTA APPLE WATCH
+
+DIR Diving è un’applicazione indipendente e non è certificata, approvata o garantita da Apple come computer subacqueo certificato.
+
+DISCLAIMER MEDICO
+
+L’immersione espone a rischi fisiologici significativi. Consultare un medico qualificato prima di immergersi. Non immergersi sotto effetto di alcool, farmaci, sostanze o condizioni mediche incompatibili.
+
+DISCLAIMER DATI E LOG
+
+I log immersione, dati GPS, telemetria e dati esportati possono contenere inesattezze o informazioni incomplete.
+
+PROTEZIONI LEGALI AGGIUNTIVE
+
+• Accettazione obbligatoria prima dell’utilizzo
+• Registrazione timestamp dell’accettazione
+• Riaccettazione obbligatoria dopo major update
+• Privacy Policy e ToS separati
+• Compliance GDPR
+• Clausola foro competente
+• Restrizioni età minima
+• Esclusione esplicita di utilizzo life-support
+• Divieto di affidamento esclusivo durante immersione
+
+ACCETTAZIONE UTENTE
+
+Utilizzando DIR Diving, l’utente dichiara di essere un subacqueo formato e responsabile, di comprendere i rischi dell’immersione e di assumersi piena responsabilità delle attività svolte.

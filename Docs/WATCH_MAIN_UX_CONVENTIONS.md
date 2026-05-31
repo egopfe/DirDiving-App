@@ -1,6 +1,6 @@
 # Watch MAIN — UX conventions (product baseline)
 
-**Last updated:** 2026-05-20  
+**Last updated:** 2026-05-26
 **Applies to:** Apple Watch `main` branch only (not experimental modes).
 
 These conventions are **accepted product behavior**. Future UI work should treat them as defaults unless the product owner explicitly requests a change.
@@ -31,12 +31,59 @@ When `ascentStatus.isOverLimit` is true during an active dive:
 
 ---
 
-## Mode selection on launch (accepted for now)
+## Mode selection on launch
 
-`ModeSelectionView` as the first vertical page on cold launch is **acceptable** for the current release.
+On current `main`, when Diving is the only stable mode, cold launch should **auto-skip** `ModeSelectionView` and enter the standard MAIN flow (legal gate if needed, then Live). `ModeSelectionView` remains dormant for future multi-mode stable builds and must not reappear on MAIN by accident.
 
 ---
 
-## Related open items (not conventions)
+## Surface manual dive entry
 
-GPS start/end confirmation still uses a full-screen overlay for ~2.4 s — see audit UX-H2 / SAF-2; separate from this ascent alarm policy.
+On current `main`, the Watch surface/live home state must expose an on-screen **Start Dive** action.
+
+| Requirement | Policy |
+|-------------|--------|
+| Visibility | Visible on the surface/live entry state before an active dive begins |
+| Interaction | Starts a manual dive session without requiring the user to wait for automatic depth detection |
+| Automatic start | Must remain active; manual start does **not** disable the automatic depth-driven lifecycle |
+| Duplicate protection | Must not create a second session if a dive is already active |
+| Layout | Reuse existing button style/patterns; no redesign of the live header or primary metric hierarchy |
+
+This manual entry is a stable MAIN affordance, not an experimental fallback hidden behind sensor unavailability.
+
+---
+
+## Apple Watch controls
+
+| Control | Policy |
+|---------|--------|
+| Digital Crown | Page navigation, scrollable pages, and threshold tuning controls where present |
+| Touch | Primary confirmation path for on-screen actions |
+| Action Button | Supported only through watchOS Shortcuts / App Intents when watchOS exposes the actions |
+| Side Button | System-controlled; DIR DIVING does not directly override or remap it |
+
+During an active dive, Live remains the primary page and Compass remains reachable. Settings edits are intended for surface use so threshold/preference changes are not accidentally made underwater.
+
+---
+
+## GPS confirmation behavior
+
+GPS start/end confirmation on current MAIN uses a **compact inline banner** that preserves the live metrics context. Do not reintroduce a full-screen GPS takeover on the stable Diving flow.
+
+---
+
+## Mission Mode
+
+Mission Mode on current MAIN is a **runtime/UI optimization profile only** for active dives.
+
+| Requirement | Policy |
+|-------------|--------|
+| Activation | Only after `isDiveActive == true` and only if the Watch setting **Auto-enable on dive start** is enabled |
+| Dive start paths | Both automatic depth-driven start and manual start paths are covered |
+| Deactivation | Automatic at dive end; persisted preference remains unchanged |
+| Allowed optimizations | Reduce non-essential animations, shadows, and decorative effects on existing Watch MAIN views |
+| Visual indicator | A very small static icon-only status mark may appear near the octopus icon in the live header, only while Mission Mode is active during an active dive |
+| Forbidden changes | No change to depth sampling, logging, ascent logic, warning logic, GPS lifecycle metadata, or dive calculations |
+| Layout | No redesign, no new large banners, no replacement of the existing live/compass layout |
+
+Mission Mode must **not** suppress or delay safety-critical information. Depth, runtime, ascent warning state, supported-depth warnings, existing haptics, and other critical alerts remain active.

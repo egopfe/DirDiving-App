@@ -10,8 +10,16 @@ enum DiveImportService {
         func message(alreadyImported: Bool) -> String {
             let imported = alreadyImported ? 0 : 1
             let duplicates = alreadyImported ? 1 : 0
-            let dateStatus = sourceDatePreserved ? "data sorgente preservata" : "data sorgente mancante, usata data file"
-            return "Import: \(imported) importate, \(duplicates) duplicati, \(skippedMalformedCount) righe saltate; \(dateStatus)."
+            let dateStatus = sourceDatePreserved
+                ? String(localized: "import.summary.date_preserved")
+                : String(localized: "import.summary.date_fallback")
+            return String(
+                format: String(localized: "import.summary.format"),
+                imported,
+                duplicates,
+                skippedMalformedCount,
+                dateStatus
+            )
         }
     }
 
@@ -20,16 +28,28 @@ enum DiveImportService {
         case missingColumns
         case emptyProfile
         case invalidRows(Int)
+        case fileTooLarge
 
         var errorDescription: String? {
             switch self {
-            case .unreadableFile: return "File import non leggibile."
-            case .missingColumns: return "CSV non compatibile: colonne richieste mancanti."
-            case .emptyProfile: return "CSV senza campioni immersione."
-            case .invalidRows(let count): return "CSV non valido: \(count) righe con data, durata, profondita o temperatura non valide."
+            case .unreadableFile: return String(localized: "import.error.unreadable")
+            case .missingColumns: return String(localized: "import.error.missing_columns")
+            case .emptyProfile: return String(localized: "import.error.empty_profile")
+            case .invalidRows(let count):
+                return String(
+                    format: String(localized: "import.error.invalid_rows"),
+                    count,
+                    Int(IOSAlgorithmConfiguration.maxImportExportDepthMeters)
+                )
+            case .fileTooLarge: return String(format: String(localized: "import.error.file_too_large"), Int(maxImportBytes / 1_048_576))
             }
         }
     }
+
+    // F10: cap CSV files at 10 MB before loading them into memory, so a giant
+    // user-selected file cannot OOM-crash the app. Bound chosen as a multiple of
+    // realistic Subsurface exports (hundreds of KB per dive).
+    static let maxImportBytes: Int = IOSAlgorithmConfiguration.maxImportBytes
 
     static func importCSV(from url: URL) -> Result<ImportSummary, ImportError> {
         let didAccess = url.startAccessingSecurityScopedResource()
@@ -37,14 +57,24 @@ enum DiveImportService {
             if didAccess { url.stopAccessingSecurityScopedResource() }
         }
 
+        if let values = try? url.resourceValues(forKeys: [.fileSizeKey]),
+           let size = values.fileSize, size > maxImportBytes {
+            return .failure(.fileTooLarge)
+        }
+
         guard let contents = try? String(contentsOf: url, encoding: .utf8) else {
             return .failure(.unreadableFile)
         }
+        guard contents.utf8.count <= maxImportBytes else {
+            return .failure(.fileTooLarge)
+        }
 
         let rows = parseCSV(contents)
-        guard let header = rows.first else { return .failure(.emptyProfile) }
-        guard rows.count <= IOSAlgorithmConfiguration.maximumImportRows + 1 else {
-            return .failure(.invalidRows(rows.count - 1))
+        guard let header = rows.first(where: { row in
+            let normalized = row.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            return normalized.contains("time_seconds") && normalized.contains("depth_m")
+        }) else {
+            return .failure(.emptyProfile)
         }
 
         func index(_ name: String) -> Int? {
@@ -58,108 +88,248 @@ enum DiveImportService {
             return .failure(.missingColumns)
         }
 
-        let sourceDate = sourceStartDate(header: header, rows: Array(rows.dropFirst()), url: url)
+        let metadata = parseMetadata(from: rows)
+        let dataRows = rows.filter { !isMetadataOrCommentRow($0) && $0 != header }
+        let sourceDate = sourceStartDate(
+            header: header,
+            rows: dataRows,
+            metadata: metadata,
+            url: url
+        )
         let start = sourceDate.date
         var samples: [DiveSample] = []
         var entryGPS: GPSPoint?
         var exitGPS: GPSPoint?
         var invalidRowCount = 0
 
-        for row in rows.dropFirst() {
+        for row in dataRows {
             guard row.contains(where: { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) else { continue }
+            let normalizedRow = row.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             guard row.count > max(timeIndex, depthIndex, tempIndex),
-                  let seconds = TimeInterval(row[timeIndex]),
+                  let seconds = TimeInterval(normalizedRow[timeIndex]),
                   seconds.isFinite,
-                  seconds >= 0,
-                  seconds <= IOSAlgorithmConfiguration.maximumImportDurationSeconds,
-                  let depth = Double(row[depthIndex]),
-                  depth.isFinite,
-                  depth >= 0,
-                  depth <= IOSAlgorithmConfiguration.maximumImportDepthMeters else {
+                  (0...IOSAlgorithmConfiguration.maxDiveDurationSeconds).contains(seconds),
+                  let depth = Double(normalizedRow[depthIndex]),
+                  DiveProfileMath.sanitizedDepthMeters(depth, maxDepthMeters: IOSAlgorithmConfiguration.maxImportExportDepthMeters) != nil else {
                 invalidRowCount += 1
                 continue
             }
-
             let temperature: Double?
-            if row[tempIndex].isEmpty {
+            if normalizedRow[tempIndex].isEmpty {
                 temperature = nil
-            } else if let parsedTemperature = Double(row[tempIndex]),
+            } else if let parsedTemperature = Double(normalizedRow[tempIndex]),
                       let validTemperature = DiveProfileMath.sanitizedTemperatureCelsius(parsedTemperature) {
                 temperature = validTemperature
             } else {
                 invalidRowCount += 1
                 continue
             }
-
-            samples.append(
-                DiveSample(
-                    timestamp: start.addingTimeInterval(seconds),
-                    depthMeters: depth,
-                    temperatureCelsius: temperature
-                )
-            )
+            samples.append(DiveSample(timestamp: start.addingTimeInterval(seconds), depthMeters: depth, temperatureCelsius: temperature))
+            if samples.count > IOSAlgorithmConfiguration.maxProfileSampleCount {
+                return .failure(.invalidRows(invalidRowCount + 1))
+            }
 
             if entryGPS == nil,
                let latIndex = index("entry_lat"), let lonIndex = index("entry_lon"),
                row.count > max(latIndex, lonIndex),
-               let lat = Double(row[latIndex]), let lon = Double(row[lonIndex]),
-               isValidCoordinate(latitude: lat, longitude: lon) {
-                entryGPS = GPSPoint(
-                    latitude: lat,
-                    longitude: lon,
-                    horizontalAccuracy: IOSAlgorithmConfiguration.importedGPSUnknownAccuracyMeters,
-                    timestamp: start
-                )
+               !normalizedRow[latIndex].isEmpty || !normalizedRow[lonIndex].isEmpty {
+                if let lat = Double(normalizedRow[latIndex]), let lon = Double(normalizedRow[lonIndex]),
+                   isValidGPS(latitude: lat, longitude: lon) {
+                    entryGPS = GPSPoint(
+                        latitude: lat,
+                        longitude: lon,
+                        horizontalAccuracy: IOSAlgorithmConfiguration.importedGPSHorizontalAccuracyMeters,
+                        timestamp: start
+                    )
+                } else {
+                    invalidRowCount += 1
+                }
             }
             if exitGPS == nil,
                let latIndex = index("exit_lat"), let lonIndex = index("exit_lon"),
                row.count > max(latIndex, lonIndex),
-               let lat = Double(row[latIndex]), let lon = Double(row[lonIndex]),
-               isValidCoordinate(latitude: lat, longitude: lon) {
-                exitGPS = GPSPoint(
-                    latitude: lat,
-                    longitude: lon,
-                    horizontalAccuracy: IOSAlgorithmConfiguration.importedGPSUnknownAccuracyMeters,
-                    timestamp: start.addingTimeInterval(seconds)
-                )
+               !normalizedRow[latIndex].isEmpty || !normalizedRow[lonIndex].isEmpty {
+                if let lat = Double(normalizedRow[latIndex]), let lon = Double(normalizedRow[lonIndex]),
+                   isValidGPS(latitude: lat, longitude: lon) {
+                    exitGPS = GPSPoint(
+                        latitude: lat,
+                        longitude: lon,
+                        horizontalAccuracy: IOSAlgorithmConfiguration.importedGPSHorizontalAccuracyMeters,
+                        timestamp: start.addingTimeInterval(seconds)
+                    )
+                } else {
+                    invalidRowCount += 1
+                }
             }
         }
 
-        let orderedSamples = DiveProfileMath.sanitizedSamples(samples, maxDepthMeters: IOSAlgorithmConfiguration.maximumImportDepthMeters)
-        guard !orderedSamples.isEmpty else { return .failure(.emptyProfile) }
-        let metrics = DiveProfileMath.derivedMetrics(
-            samples: orderedSamples,
-            fallbackStart: start,
-            fallbackEnd: orderedSamples.last?.timestamp ?? start
+        let sortedSamples = DiveProfileMath.sanitizedSamples(
+            samples,
+            maxDepthMeters: IOSAlgorithmConfiguration.maxImportExportDepthMeters
         )
-        let session = DiveSession(
-            id: importID(contents: contents),
-            startDate: metrics.startDate,
-            endDate: metrics.endDate,
-            durationSeconds: metrics.durationSeconds,
-            maxDepthMeters: metrics.maxDepthMeters,
-            avgDepthMeters: metrics.avgDepthMeters,
-            avgWaterTemperatureCelsius: metrics.avgWaterTemperatureCelsius,
-            minWaterTemperatureCelsius: metrics.minWaterTemperatureCelsius,
-            maxWaterTemperatureCelsius: metrics.maxWaterTemperatureCelsius,
-            ttv: metrics.ttv,
+        guard !sortedSamples.isEmpty else { return .failure(.emptyProfile) }
+        let end = metadata.endDate ?? sortedSamples.last?.timestamp ?? start
+        let summary = DiveProfileMath.summary(
+            samples: sortedSamples,
+            startDate: start,
+            endDate: end,
+            maxDepthLimit: IOSAlgorithmConfiguration.maxImportExportDepthMeters
+        )
+        let sessionID = metadata.sessionID ?? importID(contents: contents)
+        let importedSession = DiveSession(
+            id: sessionID,
+            startDate: start,
+            endDate: end,
+            durationSeconds: summary.durationSeconds,
+            maxDepthMeters: summary.maxDepthMeters,
+            avgDepthMeters: summary.averageDepthMeters,
+            avgWaterTemperatureCelsius: summary.averageTemperatureCelsius,
+            ttv: summary.ttv,
             entryGPS: entryGPS,
             exitGPS: exitGPS,
             entryGPSFixSource: entryGPS == nil ? .noFix : .fallback,
             exitGPSFixSource: exitGPS == nil ? .noFix : .fallback,
-            samples: metrics.samples,
-            siteName: url.deletingPathExtension().lastPathComponent,
-            notes: "Imported CSV - source date preserved when present, otherwise file date fallback",
-            gasLabel: .oc,
-            exceededSupportedDepthRange: metrics.exceededSupportedDepthRange
+            samples: sortedSamples,
+            siteName: metadata.siteName ?? url.deletingPathExtension().lastPathComponent,
+            buddy: metadata.buddy,
+            notes: metadata.sessionID == nil
+                ? "Imported CSV · source date preserved when present, otherwise file date fallback"
+                : "Imported CSV · DIRDiving metadata restored",
+            gasLabel: metadata.gasLabel ?? .oc,
+            sacLitersMinute: metadata.sacLitersMinute,
+            isManual: metadata.isManual ?? false,
+            equipmentUsed: metadata.equipmentUsed,
+            entryPressureText: metadata.entryPressureText,
+            exitPressureText: metadata.exitPressureText,
+            decompressionNotes: metadata.decompressionNotes
         )
-        return .success(
-            ImportSummary(
-                session: session,
-                skippedMalformedCount: invalidRowCount,
-                sourceDatePreserved: sourceDate.preserved
-            )
-        )
+        guard let session = try? DiveSessionAlgorithmValidator.normalizedForStorage(
+            importedSession,
+            allowEmptySamples: false,
+            maxDepthMeters: IOSAlgorithmConfiguration.maxImportExportDepthMeters
+        ) else {
+            return .failure(.invalidRows(invalidRowCount + 1))
+        }
+        return .success(ImportSummary(session: session, skippedMalformedCount: invalidRowCount, sourceDatePreserved: sourceDate.preserved))
+    }
+
+    private struct CSVSessionMetadata {
+        var sessionID: UUID?
+        var startDate: Date?
+        var endDate: Date?
+        var isManual: Bool?
+        var equipmentUsed: String?
+        var entryPressureText: String?
+        var exitPressureText: String?
+        var decompressionNotes: String?
+        var siteName: String?
+        var buddy: String?
+        var gasLabel: DiveGasLabel?
+        var sacLitersMinute: Double?
+    }
+
+    private static func isMetadataOrCommentRow(_ row: [String]) -> Bool {
+        guard let first = row.first?.trimmingCharacters(in: .whitespacesAndNewlines), !first.isEmpty else {
+            return true
+        }
+        return first.hasPrefix("#")
+    }
+
+    private static func parseMetadata(from rows: [[String]]) -> CSVSessionMetadata {
+        var metadata = CSVSessionMetadata()
+        for row in rows {
+            guard let first = row.first?.trimmingCharacters(in: .whitespacesAndNewlines), first.hasPrefix("#") else { continue }
+            if first == "# session_meta", row.count >= 6 {
+                if metadata.isManual == nil {
+                    metadata.isManual = row[1].trimmingCharacters(in: .whitespacesAndNewlines) == "1"
+                }
+                if metadata.equipmentUsed == nil {
+                    metadata.equipmentUsed = nonEmpty(row.count > 2 ? row[2] : nil)
+                }
+                if metadata.entryPressureText == nil {
+                    metadata.entryPressureText = nonEmpty(row.count > 3 ? row[3] : nil)
+                }
+                if metadata.exitPressureText == nil {
+                    metadata.exitPressureText = nonEmpty(row.count > 4 ? row[4] : nil)
+                }
+                if metadata.decompressionNotes == nil {
+                    metadata.decompressionNotes = nonEmpty(row.count > 5 ? row[5] : nil)
+                }
+                continue
+            }
+            let line = row.joined(separator: ",").trimmingCharacters(in: .whitespacesAndNewlines)
+            if line.hasPrefix("# dirdiving_") {
+                applyDirdivingMetadataLine(line, to: &metadata)
+            }
+        }
+        return metadata
+    }
+
+    private static func applyDirdivingMetadataLine(_ line: String, to metadata: inout CSVSessionMetadata) {
+        let body = line.dropFirst(2)
+        guard let colon = body.firstIndex(of: ":") else { return }
+        let key = String(body[..<colon]).trimmingCharacters(in: .whitespacesAndNewlines)
+        let value = String(body[body.index(after: colon)...]).trimmingCharacters(in: .whitespacesAndNewlines)
+        switch key {
+        case "dirdiving_session_id":
+            metadata.sessionID = UUID(uuidString: value)
+        case "dirdiving_start_date":
+            metadata.startDate = parseDate(value)
+        case "dirdiving_end_date":
+            metadata.endDate = parseDate(value)
+        case "dirdiving_is_manual":
+            metadata.isManual = value == "1"
+        case "dirdiving_equipment":
+            metadata.equipmentUsed = nonEmpty(value)
+        case "dirdiving_entry_pressure":
+            metadata.entryPressureText = nonEmpty(value)
+        case "dirdiving_exit_pressure":
+            metadata.exitPressureText = nonEmpty(value)
+        case "dirdiving_deco_notes":
+            metadata.decompressionNotes = nonEmpty(value)
+        case "dirdiving_site_name":
+            metadata.siteName = nonEmpty(value)
+        case "dirdiving_buddy":
+            metadata.buddy = nonEmpty(value)
+        case "dirdiving_gas_label":
+            metadata.gasLabel = DiveGasLabel(rawValue: value)
+        case "dirdiving_sac":
+            metadata.sacLitersMinute = Double(value)
+        default:
+            break
+        }
+    }
+
+    private static func nonEmpty(_ value: String?) -> String? {
+        guard let value else { return nil }
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    private static func sourceStartDate(
+        header: [String],
+        rows: [[String]],
+        metadata: CSVSessionMetadata,
+        url: URL
+    ) -> (date: Date, preserved: Bool) {
+        if let startDate = metadata.startDate {
+            return (startDate, true)
+        }
+        let normalizedHeader = header.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+        let candidates = ["start_date", "start_iso8601", "date", "datetime", "timestamp"]
+        for column in candidates {
+            guard let columnIndex = normalizedHeader.firstIndex(of: column) else { continue }
+            for row in rows where row.count > columnIndex {
+                if let parsed = parseDate(row[columnIndex]) {
+                    return (parsed, true)
+                }
+            }
+        }
+        if let values = try? url.resourceValues(forKeys: [.contentModificationDateKey]),
+           let fileDate = values.contentModificationDate {
+            return (fileDate, false)
+        }
+        return (Date(), false)
     }
 
     private static func parseCSV(_ contents: String) -> [[String]] {
@@ -218,21 +388,7 @@ enum DiveImportService {
     }
 
     private static func sourceStartDate(header: [String], rows: [[String]], url: URL) -> (date: Date, preserved: Bool) {
-        let normalizedHeader = header.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-        let candidates = ["start_date", "start_iso8601", "date", "datetime", "timestamp"]
-        for column in candidates {
-            guard let columnIndex = normalizedHeader.firstIndex(of: column) else { continue }
-            for row in rows where row.count > columnIndex {
-                if let parsed = parseDate(row[columnIndex]) {
-                    return (parsed, true)
-                }
-            }
-        }
-        if let values = try? url.resourceValues(forKeys: [.contentModificationDateKey]),
-           let fileDate = values.contentModificationDate {
-            return (fileDate, false)
-        }
-        return (Date(), false)
+        sourceStartDate(header: header, rows: rows, metadata: CSVSessionMetadata(), url: url)
     }
 
     private static func parseDate(_ rawValue: String) -> Date? {
@@ -263,7 +419,14 @@ enum DiveImportService {
         ))
     }
 
-    private static func isValidCoordinate(latitude: Double, longitude: Double) -> Bool {
-        latitude.isFinite && longitude.isFinite && (-90...90).contains(latitude) && (-180...180).contains(longitude)
+    private static func isValidGPS(latitude: Double, longitude: Double) -> Bool {
+        DiveProfileMath.isValidGPS(
+            GPSPoint(
+                latitude: latitude,
+                longitude: longitude,
+                horizontalAccuracy: IOSAlgorithmConfiguration.importedGPSHorizontalAccuracyMeters,
+                timestamp: Date()
+            )
+        )
     }
 }

@@ -6,5 +6,7 @@
     <string>DIR DIVING</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>DIR DIVING usa la posizione per mostrare i punti GPS di inizio e fine immersione sincronizzati dal Watch.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>DIR DIVING usa la libreria foto per inviare immagini di riferimento al Watch associato.</string>
 </dict>
 </plist>

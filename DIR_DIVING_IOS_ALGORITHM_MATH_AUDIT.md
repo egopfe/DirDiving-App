@@ -1,336 +1,587 @@
-# DIR DIVING iOS Companion MAIN Algorithm And Mathematical Logic Audit
+# DIR DIVING iOS Companion MAIN Algorithm and Mathematical Logic Audit
 
-Date: 2026-05-27
-
-Branch audited: `main-iOS`
-
-Scope: iOS Companion MAIN branch only. This audit did not inspect or modify Apple Watch implementation logic beyond repository/project context, did not inspect experimental branches, and did not change UI, UX, business logic, algorithms, or source code.
+Audit date: 2026-05-27  
+Repository: `egopfe/DirDiving-App`  
+Branch audited: `main`  
+Scope: iOS Companion MAIN app only  
+Mode: audit/report only; no application code changes
 
 ## Executive Summary
 
-The iOS Companion MAIN branch contains real numerical logic in four main areas:
+The iOS Companion MAIN branch includes a premium dark UI and a substantial set of planning/logbook/sync/export features, but the algorithmic layer is not yet release-hard for technical dive planning.
 
-- Gas planning input model and gas consumption estimates.
-- A simplified Buhlmann/NDL reference model.
-- Planner output generation for TTR, indicative stops, CNS and OTU.
-- Logbook import/export, Watch sync session validation, route distance/bearing and unit display conversion.
+The strongest parts are:
 
-The implementation is useful as a demonstrator and informational companion, but it is not mathematically release-hard for dive planning. The main concern is not ordinary arithmetic failure; it is that simplified or heuristic planner outputs are displayed with terms such as Buhlmann, NDL, deco stops, CNS, OTU and TTR. The UI does include safety disclaimers and an acknowledgement gate, which reduces risk, but the underlying calculations are not complete enough to be treated as decompression, gas-management, or technical-diving planning.
+- basic gas consumption formulas exist and are readable
+- MOD and PPO2 calculations exist
+- gas density, END, EAD, CNS, and OTU reference calculations exist
+- Subsurface-style CSV import/export exists
+- WatchConnectivity payloads are HMAC signed
+- planner UI includes safety acknowledgement and non-certified wording
+- experimental iOS files are excluded from the main iOS target by `project.yml`
 
-Overall assessment:
+The main algorithmic risks are:
 
-- Gas planning implementation status: partial, metric-only core, simple single-cylinder estimate, no rock-bottom, no turn pressure, no validated multi-cylinder gas strategy.
-- Buhlmann/no-deco implementation status: simplified N2-only reference calculation, not a full Buhlmann ZH-L16C planner.
-- PPO2/MOD status: basic formulas present; bottom gas MOD validation exists; deco gas PPO2 is displayed but clipped in planner output.
-- Logbook math status: Watch values are mostly preserved, but iOS import and merge can produce derived-value inconsistencies.
-- Export status: works for nonempty samples, but does not sort/sanitize sample order and can export negative elapsed seconds for out-of-order data.
-- Test coverage status: no XCTest target or automated iOS algorithm tests were found.
+- the planner generates actionable-looking technical outputs from simplified/reference math
+- Buhlmann is N2-only and does not model helium compartments, even though trimix is a first-class gas in the MAIN planner
+- generated decompression stops are static schedule logic, not propagated Buhlmann ceilings
+- invalid programmatic planner inputs can still calculate because validation is UI-oriented and normalization silently clamps values
+- stop PPO2 can be hidden by `boundedPPO2`, which reports a capped value rather than actual PPO2
+- iOS imported/logged average depth is arithmetic, not time-weighted
+- manual dive TTV uses multiplication instead of the Watch MAIN formula
+- sync/import/merge/export validation is much weaker on iOS than on the Watch MAIN hardening path
+- route math does not validate GPS coordinates before Haversine/bearing calculations
+- there is no iOS XCTest target in `project.yml`
 
-Verdict: not ready to call iOS Companion MAIN algorithmically release-hard. It is acceptable as an internal informational planner/logbook only if the simplified nature remains explicit and tester-facing. P0/P1 items below should be resolved before presenting planner outputs as production-quality planning.
+Overall readiness:
+
+- Gas planning formulas: **partial**
+- Buhlmann/no-decompression logic: **simplified reference only; not full ZHL-16C**
+- Trimix planning: **not mathematically validated**
+- Import/export integrity: **partial**
+- Sync payload validation: **partial**
+- Unit conversion system: **duplicated and not centralized**
+- iOS algorithm test coverage: **missing**
+
+The app's legal/safety copy correctly states that DIR DIVING is not a certified dive computer. However, the mathematical output is technical enough that the planner should either be hardened with typed validation/unavailable states or explicitly blocked from producing actionable-looking plans for unsupported modes such as trimix/decompression.
+
+## Branch and Target Confirmation
+
+Current branch during audit:
+
+- `main`
+- local and `origin/main` were aligned before this report
+
+Relevant `project.yml` state:
+
+- iOS target: `DIRDiving iOS`
+- iOS bundle ID: `com.egopfe.dirdiving.ios`
+- excluded from iOS MAIN target:
+  - `iOSApp/Models/ExplorationModels.swift`
+  - `iOSApp/Models/BuddyExperimentalModels.swift`
+  - `iOSApp/Services/ExplorationPlanningStore.swift`
+  - `iOSApp/Services/BuddyExperimentalStore.swift`
+  - `iOSApp/Views/ExplorationCenterView.swift`
+  - `iOSApp/Views/ExperimentalFutureConceptsView.swift`
+  - `iOSApp/Views/BuddyExperimentalView.swift`
+- only test target currently present: `DIRDiving Watch Algorithm Tests`
+- no iOS algorithm test target found
 
 ## Files Inspected
 
-Primary iOS algorithm/model files:
+Primary iOS algorithm/model/service files:
 
-- `iOSApp/Models/GasPlan.swift`
 - `iOSApp/Models/DivePlan.swift`
-- `iOSApp/Services/PlannerService.swift`
+- `iOSApp/Models/DiveSample.swift`
+- `iOSApp/Models/DiveSession.swift`
+- `iOSApp/Models/GasPlan.swift`
+- `iOSApp/Models/GPSPoint.swift`
+- `iOSApp/Models/TankSize.swift`
 - `iOSApp/Services/BuhlmannPlanner.swift`
+- `iOSApp/Services/GasPlanningService.swift`
+- `iOSApp/Services/PlannerGasSchedule.swift`
+- `iOSApp/Services/PlannerMODValidator.swift`
+- `iOSApp/Services/PlannerService.swift`
+- `iOSApp/Services/PlannerStore.swift`
 - `iOSApp/Services/DiveImportService.swift`
-- `iOSApp/Services/SubsurfaceExportService.swift`
 - `iOSApp/Services/DiveLogStore.swift`
-- `iOSApp/Utils/DiveSessionMerge.swift`
+- `iOSApp/Services/RouteSummaryService.swift`
+- `iOSApp/Services/SubsurfaceExportService.swift`
 - `iOSApp/Services/WatchDiveSyncCodec.swift`
 - `iOSApp/Services/WatchSyncService.swift`
+- `iOSApp/Services/WatchSyncAuth.swift`
+- `iOSApp/Utils/DiveSessionMerge.swift`
 - `iOSApp/Utils/Formatters.swift`
-- `iOSApp/Services/RouteSummaryService.swift`
-- `iOSApp/Models/DiveSession.swift`
-- `iOSApp/Models/DiveSample.swift`
-- `iOSApp/Models/GPSPoint.swift`
-- `iOSApp/Models/EquipmentProfile.swift`
-- `iOSApp/Services/PlannerStore.swift`
-- `iOSApp/Services/EquipmentStore.swift`
+- `iOSApp/Utils/PlannerSafetyAcknowledgment.swift`
+
+Relevant iOS views inspected for algorithm entry points and safety framing:
+
 - `iOSApp/Views/PlannerView.swift`
+- `iOSApp/Views/ManualDiveEditorView.swift`
 - `iOSApp/Views/DiveDetailView.swift`
 - `iOSApp/Views/AnalysisView.swift`
 - `iOSApp/Views/MoreView.swift`
-- `iOSApp/Views/EquipmentView.swift`
+- `iOSApp/Views/IOSLegalOnboardingView.swift`
 
-Project and safety context:
+Project/test files:
 
 - `project.yml`
-- `iOSApp/Resources/en.lproj/LegalDisclaimer.txt`
-- `iOSApp/Resources/it.lproj/LegalDisclaimer.txt`
-- `README.md`
-- `Docs/DIR_DIVING_Feature_Comparison.csv`
+- `Tests/WatchAlgorithmTests/DiveAlgorithmTests.swift` as evidence that only Watch algorithm tests exist
+
+Documents checked for safety positioning:
+
+- `Docs/iOS/SAFETY_DISCLAIMER.md`
+- `Docs/SAFETY_DISCLAIMER.md`
 - `Docs/GLOSSARY.md`
+- `Docs/iOS/MOCKUP_COHERENCE.md`
 
 ## Algorithms Found
 
+### Planner Orchestration
+
+Found in:
+
+- `PlannerStore`
+- `PlannerService`
+- `PlannerView`
+
+Flow:
+
+1. `PlannerStore.input` stores `GasPlanInput`.
+2. `PlannerStore.applyInputToPlanningOutputs()` normalizes planner gases.
+3. `BuhlmannPlanner.plan()` computes a simplified NDL preview.
+4. `PlannerService.makePlan()` computes:
+   - NDL
+   - `needsDeco`
+   - gas analysis
+   - static/role-aware deco stops
+   - MOD validation issues
+   - TTR
+   - segments
+   - GF comparisons
+   - contingency plans
+   - team gas matching
+   - briefing text
+
+Assessment: coherent as a UI reference workflow, but not a mathematically validated technical planner.
+
 ### Gas Planning
 
-Source: `iOSApp/Models/GasPlan.swift`
-
-Found formulas:
+Found in:
 
-- Nitrogen fraction: `max(0, 1.0 - oxygen - helium)` at line 22.
-- MOD: `((maxPPO2 / max(oxygen, 0.01)) - 1.0) * 10.0` clamped to zero at line 23.
-- PSI to bar: `psi / 14.5038` at lines 43-44.
-- Available gas: `cylinderVolumeLiters * (startPressureBar - reservePressureBar)` at line 45.
-- Ambient pressure: `plannedDepthMeters / 10.0 + 1.0` at line 46.
-- Gas consumption: `SAC * ambientPressureBar * plannedBottomMinutes` at line 47.
-- Remaining gas liters: available minus estimated consumption at line 48.
-- Remaining bar: remaining liters divided by cylinder volume with `max(cylinderVolumeLiters, 0.1)` at line 49.
-- Remaining PSI: remaining bar times `14.5038` at line 50.
-
-Correctness assessment:
+- `GasPlanningService.analyze(input:)`
+- `GasPlanInput`
+- `Cylinder`
+- `TeamMember`
 
-- The simple SAC/RMV gas consumption estimate is dimensionally coherent for metric single-cylinder planning.
-- Reserve gas is handled as pressure reserve and subtracted from usable pressure.
-- PSI conversion is present, but the planner UI appears metric-centric and there is no complete imperial planner input workflow.
-- No finite-value guards exist in the model itself. UI validation catches ordinary negative/zero values before calculate, but persisted or programmatic invalid values can still reach `PlannerService`.
-- No rock-bottom/minimum gas formula, turn pressure, buddy reserve, cylinder working-pressure validation, multi-cylinder allocation, deco gas consumption, or gas switch accounting was found.
+Main calculations:
 
-### Buhlmann / No-Decompression
+- ambient pressure approximation
+- PPO2 at planning depth
+- gas density at planning depth
+- END
+- EAD for nitrox
+- gas consumption
+- remaining gas
+- rock-bottom/minimum gas
+- turn pressure
+- CNS
+- OTU
+- team gas matching
 
-Source: `iOSApp/Services/BuhlmannPlanner.swift`
+Assessment: formulas are understandable but not centrally validated. Programmatic invalid inputs can produce apparently valid output.
 
-Found constants and formulas:
+### MOD / PPO2
 
-- N2 half-times: 16 compartment values at line 4.
-- N2 `a` and `b` coefficients at lines 5-6.
-- Nitrogen fraction in `plan`: `max(0, min(0.79, 1.0 - o2Fraction))` at line 8.
-- Inspired PN2: `(ambient - waterVaporPressure) * nitrogenFraction` at lines 24-25.
-- Compartment rate: `log(2.0) / halfTimesN2[i]` at line 28.
-- Surface M-value approximation: `(surfacePressure / bN2[i]) + aN2[i]` at line 29.
-- NDL control time: `-log(ratio) / k` at line 32.
-- Infinite NDL fallback: `999` minutes at line 34.
+Found in:
 
-Implementation status:
+- `PlannerMODValidator`
+- `GasPlanningService.ppO2`
+- `GasPlanningService.boundedPPO2`
+- `PlannerGasSchedule.makeDecoStop`
 
-- This is not a full Buhlmann ZH-L16C decompression planner.
-- It models N2 only.
-- It ignores helium tissue loading despite the default bottom gas being trimix.
-- It has no gradient factors.
-- It has no ascent/descent model.
-- It has no repetitive/multi-level tissue state.
-- It has no decompression ceiling propagation.
-- It has no gas switch tissue model.
-- It has no validated CNS/OTU table model.
-- The chart displayed as a Buhlmann curve uses generated reference points and a presentation transform, not compartment load values.
+Assessment: actual PPO2 is calculated for bottom analysis, but deco-stop PPO2 is bounded/clipped, which can hide actual PPO2 over-limit in plan output.
 
-Correctness assessment:
+### Buhlmann / NDL
 
-- The calculation is internally deterministic for finite inputs.
-- It is best classified as a simplified static NDL reference.
-- The function name, tab label, chart title and warning text mention Buhlmann ZH-L16C. Although the UI says "semplificato", the output still uses decompression-planning vocabulary that can be over-trusted.
-- For impossible or extreme gas inputs called directly, `fn2` can be forced to zero and return 999 minutes, which is unsafe if UI validation is bypassed.
+Found in:
 
-### Planner Output
+- `BuhlmannPlanner`
 
-Source: `iOSApp/Services/PlannerService.swift`
+Implementation:
 
-Found formulas:
+- 16 N2 half-times
+- 16 N2 `a` coefficients
+- 16 N2 `b` coefficients
+- simplified inspired nitrogen pressure calculation
+- no helium compartments
+- no tissue history across profile
+- no gas switching model
+- no gradient-factor ceiling propagation
+- no decompression stop calculation from tissue ceilings
+- returns `999` when the controlling compartment remains infinity
 
-- `needsDeco = plannedBottomMinutes > ndl || plannedDepthMeters >= 35` at line 7.
-- Ceiling heuristic: `min(21, max(3, floor(depth / 3) * 3 - 3))` at line 19.
-- Stop depths every 3 m to 3 m at line 20.
-- Deco gas selection: `decoGas1` at 12 m or deeper, else `decoGas2` at line 23.
-- Stop pressure: `1.0 + depth / 10.0` at line 24.
-- Base stop minutes: 2, 3 or 5 minutes depending on depth at line 25.
-- Extra stop minutes: `ceil(overrun / 10.0)` at line 26.
-- Stop PPO2 displayed as `min(gas.maxPPO2, gas.oxygen * pressure)` at line 27.
-- Safety stop for no-deco path: fixed 5 m / 3 minutes at line 30.
-- TTR: bottom time + stop minutes + `Int(depth / 10.0)` at line 32.
-- CNS estimate: `minutes * max(0, O2 * ambientPressure - 0.5) * 2.2`, capped at 100 at line 33.
-- OTU estimate: `minutes * pow(max(0.5, O2 * ambientPressure) - 0.5, 0.83) * 5` at line 34.
+Assessment: simplified N2-only no-decompression reference. It must not be treated as full Buhlmann ZHL-16C.
 
-Implementation status:
+### Decompression Stops / TTR
 
-- The planner output is heuristic.
-- Deco stop placement and stop duration are not generated by a validated decompression algorithm.
-- TTR is not ascent-rate based and does not account for gas switches, stop-to-stop travel time, or final ascent in a validated way.
-- CNS/OTU formulas are simplified and not table-based.
+Found in:
 
-Correctness assessment:
+- `PlannerGasSchedule.buildDecoStops`
+- `PlannerService.makePlan`
 
-- Calculations are deterministic for ordinary UI-validated inputs.
-- The formulas are not suitable for actual decompression planning.
-- `min(gas.maxPPO2, gas.oxygen * pressure)` can understate displayed PPO2 if the actual computed value exceeds maxPPO2. For safety, output should show actual PPO2 plus a warning, not clip it down.
-- `plannedDepthMeters >= 35` forces deco-like stops even if NDL says otherwise. This is conservative as a visual warning but not mathematically derived.
+Implementation:
 
-Example outputs reproduced from current formulas:
+- `needsDeco` if planned bottom time > simplified NDL or planning depth >= 35 m
+- if no deco is needed, a 5 m / 3 min stop is still returned
+- if deco is needed, static stops are generated:
+  - deep switch stop
+  - 15 m
+  - shallow switch stop
+  - 6 m
+  - 3 m
+- stop depths are clamped to MOD via `min(requestedDepth, mod)`
+- TTR is bottom minutes + stop minutes + `plannedDepth / 10`
 
-- Air 21% at 30 m for 20 min: NDL about 16.3 min, needs deco true, stops 21/18/15/12/9/6/3 m, TTR 52 min.
-- Nitrox 32 at 30 m for 20 min: NDL about 28.0 min, no deco path, 5 m / 3 min stop, TTR 26 min.
-- Default trimix 18/45 at 40 m for 20 min: helium ignored by NDL, NDL about 8.8 min, TTR 60 min.
+Assessment: this is not a decompression algorithm. It is a static schedule/reference output.
 
-### Partial Pressure / MOD / Gas Fractions
+### Logbook / Profile Math
 
-Sources: `iOSApp/Models/GasPlan.swift`, `iOSApp/Views/PlannerView.swift`, `iOSApp/Services/PlannerService.swift`
+Found in:
 
-Found formulas:
+- `DiveImportService`
+- `DiveLogStore`
+- `DiveSessionMerge`
+- `ManualDiveEditorView`
+- `AnalysisView`
 
-- PPO2 at depth: `oxygen * (1 + depth / 10)` in planner output.
-- MOD: `((maxPPO2 / oxygen) - 1) * 10`.
-- Nitrogen fraction: `max(0, 1 - O2 - He)`.
-- UI validation: O2 0.10...1.0, He >= 0, O2 + He <= 1.0, maxPPO2 1.0...1.6.
+Implementation:
 
-Correctness assessment:
+- imported CSV average depth uses arithmetic mean
+- imported CSV TTV = arithmetic average depth + duration minutes
+- manual dive TTV = average depth * duration minutes
+- demo logbook average depth uses arithmetic mean
+- merge may preserve existing derived values rather than recomputing from selected samples
 
-- Basic PPO2 and MOD equations are standard for metric seawater approximation.
-- O2 and He validation is present in `PlannerView`.
-- Nitrogen fraction uses clamping and can mask invalid mixes in model-level or decoded persisted input.
-- PPN2, END and EAD are not implemented.
-- Saltwater/freshwater assumptions are not configurable; all pressure math uses 10 m/bar.
+Assessment: inconsistent with Watch MAIN hardened time-weighted average depth and TTV formula.
 
-### Gas Density / Respirability
+### CSV Import / Export
 
-No gas density formula was found.
+Found in:
 
-Status:
+- `DiveImportService`
+- `SubsurfaceExportService`
 
-- No gas density calculation from mix, depth and pressure.
-- No density warning threshold.
-- No END/EAD proxy warning.
+Implementation:
 
-Risk:
+- CSV import supports `time_seconds`, `depth_m`, `temperature_c`
+- optional GPS columns are read
+- invalid rows are skipped
+- export writes a CSV-like profile with additional manual metadata
+- export rejects empty samples at `writeCSV`, but `makeCSV` can still return header/meta-only output for empty sessions
 
-- For trimix/technical-looking inputs, absence of density/respirability warnings is a planning completeness gap.
+Assessment: useful but not robust enough for corrupted or unsorted profile data.
 
-### Dive Planner Inputs
+### Watch Sync
 
-Source: `iOSApp/Views/PlannerView.swift`
+Found in:
 
-UI validation found:
+- `WatchDiveSyncCodec`
+- `WatchSyncService`
+- `WatchSyncAuth`
 
-- Depth: 1...100 m at lines 235-236.
-- Bottom time: 1...240 minutes at lines 238-239.
-- Cylinder volume > 0, startPressureBar > reservePressureBar, reserve >= 0 at lines 241-242.
-- SAC > 0 at lines 244-245.
-- Gas mix O2/He/PPO2 bounds at lines 247-260.
-- Bottom gas MOD must be >= planned depth at lines 250-251.
-- Safety acknowledgement is required before navigation to plan output.
+Implementation:
 
-Correctness assessment:
+- HMAC-signed transport envelope
+- peer secret via WatchConnectivity/keychain
+- max payload size
+- max issued-at skew
+- basic session-level validation
 
-- UI-level validation is a strong guard for normal user flows.
-- Validation is not centralized in the model/service layer.
-- `PlannerStore.calculate()` can still generate output for invalid persisted/programmatic values.
-- Temperature has a planner input but is not used in the calculations.
-- Pressure unit exists in the model but is not exposed as a full unit workflow in the planner UI.
+Assessment: transport security is stronger than mathematical validation. Payload validation does not validate per-sample math deeply enough.
 
-### Planner Output Consistency
+### Route Math
 
-Sources: `PlannerService`, `PlannerStore`, `PlannerView`
+Found in:
 
-Assessment:
+- `RouteSummaryService`
 
-- `PlannerStore.calculate()` computes both `plan` and `buhlmann` from the same `GasPlanInput`.
-- `PlanResultView` displays values from `store.plan` and `store.buhlmann`.
-- Output warnings are shown.
-- There is no saved plan export.
-- There is no immutable plan snapshot when opening the result; subsequent store changes can alter outputs.
+Implementation:
 
-### Logbook Calculations
+- Haversine distance
+- initial bearing normalized to 0..<360
 
-Sources: `DiveImportService`, `DiveLogStore`, `DiveSessionMerge`, `DiveDetailView`, `AnalysisView`
+Assessment: formula is standard, but coordinate validation is missing before computation.
 
-Found formulas:
+## Mathematical Formulas Found
 
-- Imported average depth: arithmetic mean of sample depths at `DiveImportService.swift:115`.
-- Imported TTV: average depth + duration minutes at `DiveImportService.swift:124`.
-- Demo average depth: arithmetic mean in `DiveLogStore`.
-- Analysis averages: arithmetic mean of session avg temperatures and SAC values.
-- Detail graph uses session sample values directly.
+### Ambient Pressure
 
-Correctness assessment:
+```text
+ambient_pressure_bar = depth_m / 10 + 1
+```
 
-- Imported average depth is not time-weighted.
-- Import does not require monotonic timestamps.
-- Import end time is the timestamp of the last row, not the maximum sample timestamp.
-- Out-of-order rows can create mathematically inconsistent duration/profile/export.
-- iOS merge can combine duration/max/TTV/sample arrays from different versions without recomputing derived values.
-- Watch synced values are not recomputed, which is good for preserving Watch authority, but weak validation means corrupted payloads can still enter.
+Used in gas consumption, PPO2, density, END, EAD, and Buhlmann inspired gas approximation.
 
-### Subsurface Export
+Limitation: salinity and altitude fields exist but do not appear to change pressure math.
 
-Source: `iOSApp/Services/SubsurfaceExportService.swift`
+### PPO2
 
-Found behavior:
+```text
+PPO2 = FO2 * ambient_pressure_bar
+```
 
-- Header: `time_seconds,depth_m,temperature_c,entry_lat,entry_lon,exit_lat,exit_lon`.
-- Elapsed seconds are based on first sample timestamp.
-- Samples are exported in stored order.
-- Empty sample write returns failure.
-- `makeCSV` can still produce header-only CSV if called directly.
+Used in bottom gas analysis.
 
-Correctness assessment:
+Issue: stop PPO2 uses:
 
-- Export unit is metric, consistent with Subsurface-style CSV.
-- Sample order is not sorted.
-- Negative elapsed seconds can be exported if samples are out of order.
-- Non-finite depth/temperature/GPS values are not filtered.
-- Gas mix is not exported.
-- Exported derived data may not match logbook fields if session data was merged inconsistently.
+```text
+bounded_PPO2 = min(gas.maxPPO2, actual_PPO2)
+```
 
-### Unit Conversion System
+This hides over-limit actual PPO2 values in stop output.
 
-Source: `iOSApp/Utils/Formatters.swift`
+### MOD
 
-Found constants:
+```text
+MOD_m = ((max_PPO2 / FO2) - 1) * 10
+```
 
-- meters to feet: `3.280839895`.
-- meters to kilometers: `0.001`.
-- meters to miles: `0.000621371`.
-- liters to cubic feet: `0.0353147`.
-- Celsius to Fahrenheit: `C * 9 / 5 + 32`.
+Implementation clamps FO2 to at least 0.01, which avoids divide-by-zero but can hide invalid gas.
 
-Correctness assessment:
+### Nitrogen Fraction
 
-- Display conversion formulas are standard.
-- Conversion is presentation-only; stored values are metric.
-- There is no round-trip conversion API.
-- No centralized pressure conversion exists outside `GasPlan`.
-- Temperature unit labels are plain `C` / `F` rather than degree symbols.
-- No finite-value guard in formatters; NaN/infinity can render into UI strings.
+```text
+FN2 = max(0.01, min(0.79, 1 - FO2 - FHe))
+```
 
-### Route Distance / Bearing
+Issue: invalid/unsupported gas states are converted into a bounded number, not rejected.
 
-Source: `iOSApp/Services/RouteSummaryService.swift`
+### Gas Density
 
-Found formulas:
+```text
+surface_density_g_L = FO2 * 1.429 + FN2 * 1.251 + FHe * 0.1786
+density_at_depth_g_L = surface_density_g_L * ATA
+```
 
-- Haversine distance with earth radius 6,371,000 m.
-- Initial bearing normalized to 0..<360.
+Assessment: reasonable approximation if inputs are validated.
 
-Correctness assessment:
+### END
 
-- Formula is standard for GPS surface entry/exit estimates.
-- No coordinate finite/range validation is performed here.
-- Invalid GPS from sync/import can produce NaN outputs.
+```text
+narcotic_fraction = FN2 + (FO2 if oxygen is treated narcotic)
+air_narcotic_fraction = 0.79 + (0.21 if oxygen is treated narcotic)
+narcotic_pressure = ATA * narcotic_fraction
+END_m = max(0, ((narcotic_pressure / air_narcotic_fraction) - 1) * 10)
+```
 
-## Constants And Thresholds Found
+Assessment: standard simplified approach; depends on policy choice for oxygen narcotic behavior.
 
-- Planner depth validation: 1...100 m.
-- Planner bottom time validation: 1...240 min.
-- Gas O2 validation: 0.10...1.0.
-- Gas PPO2 validation: 1.0...1.6.
-- Default cylinder: 12 L.
-- Default pressure: 200 bar start, 50 bar reserve.
-- Default SAC/RMV: 18 L/min.
-- Pressure conversion: 14.5038 psi/bar.
-- Depth pressure approximation: 10 m/bar.
-- Import max rows: 20,000.
-- Import max depth: 200 m.
-- Import max duration: 28,800 s / 480 min.
-- Import temperature range: -2...40 C.
-- Watch sync max payload: 512,000 bytes.
-- Watch sync max samples: 20,000.
-- Watch sync max depth: 350 m.
-- Watch sync max duration: 86,400 s.
-- Watch sync issued-at skew: 3,600 s.
-- Local log documentation mentions latest 40 dives, but the iOS store does not enforce a 40-session cap in `DiveLogStore`.
+### EAD
+
+```text
+PN2 = ATA * FN2
+EAD_m = max(0, ((PN2 / 0.79) - 1) * 10)
+```
+
+Only returned for helium == 0 and oxygen > 0.21.
+
+### Gas Consumption
+
+```text
+consumption_L = SAC_L_min * ATA * bottom_minutes
+remaining_L = available_L - consumption_L
+remaining_bar = remaining_L / cylinder_volume_L
+```
+
+Issue: volume denominator uses `max(volume, 0.1)`, masking zero or invalid cylinder size.
+
+### Cylinder Available Gas
+
+```text
+available_L = max(0, volume_L * (start_pressure_bar - reserve_pressure_bar))
+```
+
+Issue: start pressure <= reserve pressure is converted to 0 available gas rather than invalid input state.
+
+### Rock Bottom / Minimum Gas
+
+```text
+average_ascent_ATA = ((planned_depth / 2) / 10) + 1
+ascent_minutes = max(3, planned_depth / 9)
+emergency_minutes = 1 + ascent_minutes + safety_stop_minutes
+rock_bottom_L = emergency_SAC * team_size * average_ascent_ATA * emergency_minutes
+minimum_gas_bar = rock_bottom_L / cylinder_volume_L
+```
+
+Assessment: simplified heuristic. It is not documented as a formal minimum-gas method with stop/gas-switch propagation.
+
+### Turn Pressure
+
+```text
+usable_before_minimum = max(0, available_L - rock_bottom_L)
+turn_pressure_bar = min(start_bar, max(reserve_bar, start_bar - usable_before_minimum / 2 / cylinder_volume_L))
+```
+
+Assessment: simple half-usable-gas turn pressure. Invalid cylinder inputs can be masked.
+
+### CNS
+
+Piecewise exposure limits based on PPO2:
+
+- PPO2 < 1.0: 720 min
+- PPO2 < 1.2: 210 min
+- PPO2 < 1.4: 150 min
+- PPO2 < 1.6: 45 min
+- PPO2 >= 1.6: 10 min
+
+```text
+CNS_percent = min(300, minutes / limit_minutes * 100)
+```
+
+Assessment: simplified reference.
+
+### OTU
+
+```text
+OTU = minutes * pow(0.5 / (PPO2 - 0.5), -0.833)
+```
+
+Assessment: common-style approximation above PPO2 0.5; no validation around extreme invalid PPO2 inputs.
+
+### Buhlmann NDL
+
+For each N2 compartment:
+
+```text
+k = ln(2) / half_time
+m0 = surface_pressure / b + a
+ratio = (m0 - inspired_PN2) / (surface_PN2 - inspired_PN2)
+NDL = -ln(ratio) / k
+```
+
+Assessment: simplified no-decompression estimate only. It is not full profile-based Buhlmann ZHL-16C.
+
+### Import Average Depth
+
+```text
+avg_depth = sum(depth_samples) / sample_count
+```
+
+Issue: arithmetic average, not time-weighted.
+
+### Manual Dive TTV
+
+```text
+ttv = avg_depth_m * duration_minutes
+```
+
+Issue: inconsistent with Watch MAIN hardened formula, where TTV/index is average depth + runtime minutes.
+
+### Route Distance
+
+Haversine formula:
+
+```text
+a = sin(dLat/2)^2 + cos(lat1) * cos(lat2) * sin(dLon/2)^2
+distance = earth_radius * 2 * atan2(sqrt(a), sqrt(1 - a))
+```
+
+Issue: no input validation/clamping of `a` before sqrt.
+
+### Route Bearing
+
+```text
+degrees = atan2(y, x) * 180 / pi
+bearing = (degrees + 360) % 360
+```
+
+Issue: no input validation for coordinates.
+
+## Buhlmann / No-Decompression Implementation Status
+
+Status: **simplified N2-only reference, not full Buhlmann ZHL-16C**.
+
+Implemented:
+
+- N2 half-time table
+- N2 `a` and `b` coefficient arrays
+- simple NDL-style calculation
+- curve data for charting
+
+Not implemented:
+
+- helium compartments
+- combined N2/He tissue loading
+- descent/ascent tissue history
+- multi-segment exposure propagation
+- gas-switch tissue updates
+- gradient-factor ceiling calculation
+- decompression stop propagation
+- validated test vectors
+- altitude/salinity pressure adjustment
+- CNS/OTU across multi-segment profile
+
+Critical observation:
+
+The default planner bottom gas is trimix (`O2 18%, He 45%`). The Buhlmann planner subtracts helium from nitrogen fraction but does not model helium tissue loading. That can make NDL/reference outputs look more favorable without accounting for helium decompression obligations.
+
+## Gas Planning Implementation Status
+
+Status: **partial reference implementation**.
+
+Implemented:
+
+- ambient pressure approximation
+- PPO2 at depth
+- MOD
+- gas density estimate
+- END
+- EAD for nitrox
+- consumption in liters
+- remaining gas in liters/bar
+- rock-bottom heuristic
+- turn pressure heuristic
+- CNS/OTU approximations
+- team gas match heuristic
+- MOD issue list
+
+Not fully implemented or weak:
+
+- no central validator for `GasPlanInput`
+- no typed result state such as invalid input, unsupported gas, model incomplete, insufficient gas, or unavailable
+- invalid cylinder volume can be hidden by denominator clamping
+- start pressure <= reserve pressure becomes 0 available gas
+- invalid gas fractions are normalized/clamped in the model instead of always rejected
+- no true PPN2 output
+- no full trimix decompression model
+- no multi-gas gas consumption by segment
+- no validated salt/freshwater/altitude pressure model despite fields existing
+- no single central unit conversion helper
+
+## Constants and Thresholds Found
+
+### Planner Defaults
+
+- default planned max depth: 40 m
+- default planned average depth: 20 m
+- default bottom time: 20 min
+- default SAC/RMV: 18 L/min
+- default emergency SAC: 30 L/min
+- default team size: 2
+- default water temperature: 24 C
+- default GF low/high: 30/70
+- default density warning/danger: 5.2 / 6.2 g/L
+- default bottom gas: TX 18/45
+- default deco gases: EAN50 and EAN80
+- default cylinder: 12 L, 200 bar, 50 bar reserve
+
+### Gas Constants
+
+- O2 surface density: 1.429 g/L
+- N2 surface density: 1.251 g/L
+- He surface density: 0.1786 g/L
+- pressure conversion: 14.5038 psi/bar in `GasPlan`, 14.5038-like constants elsewhere
+- meters-to-feet: 3.280839895 in `Formatters` and direct usage in `ManualDiveEditorView`/`PlannerView`
+- liters-to-cubic-feet: 0.0353147
+
+### Import / Sync / Export
+
+- import max file size: 10 MB
+- import max dive duration: 24 h
+- import max depth: 300 m
+- import valid temperature: -5...40 C
+- sync max payload: 512,000 bytes
+- sync max samples: 20,000
+- sync max depth: 350 m
+- sync max issued-at skew: 1 h
+- temporary export cleanup: 24 h
+
+### Safety
+
+- `DiveSession` flags exceeded supported depth at 40 m
+- planner MOD uses +0.05 m tolerance for switch-depth checks
+- CNS capped at 300%
 
 ## Correctness Assessment By Audit Area
 
@@ -338,331 +589,460 @@ Correctness assessment:
 
 Status: partial.
 
-The simple gas estimate is coherent for a single metric cylinder:
+Correct:
 
-`usable liters = cylinder liters * (start pressure bar - reserve pressure bar)`
+- SAC/RMV consumption formula is standard: SAC * ATA * minutes.
+- Available gas in liters from cylinder volume and pressure delta is conceptually correct.
+- Remaining gas and turn pressure are understandable.
+- Rock-bottom heuristic is conservative in spirit.
 
-`consumption liters = SAC l/min * ambient pressure bar * bottom minutes`
+Issues:
 
-Missing or weak:
-
-- No rock-bottom/minimum gas.
-- No turn pressure.
-- No buddy gas requirement.
-- No deco gas consumption.
-- No gas switch accounting.
-- No multi-cylinder pressure/volume model.
-- No service-level finite validation.
-- Negative remaining gas is allowed numerically and only warned.
+- no central validator blocks zero/negative/non-finite cylinder volume, SAC/RMV, depth, time, pressure, or gas fractions before calculation
+- `max(volume, 0.1)` masks invalid cylinder volume
+- `availableGasLiters` hides start pressure <= reserve pressure by returning 0
+- no typed warning/result state; warnings are strings
+- gas consumption is bottom-phase only and does not consume different gases by segment
+- pressure conversion constants are duplicated and slightly inconsistent
+- imperial pressure/display logic is partial; planner results still show bar in several places
 
 ### 2. Buhlmann / No-Decompression / Dive Table Logic
 
-Status: simplified reference, not full Buhlmann.
+Status: simplified reference only.
 
-The code uses N2 half-times and coefficients, but does not implement a complete Buhlmann decompression model. It should not be presented as a validated ZH-L16C plan. Current warnings help, but the planner still displays "CURVA BUHLMANN ZH-L16C", "Deco Stops", "TTR", "CNS%" and "OTU".
+Correct:
+
+- coefficient arrays are present for N2.
+- inspired PN2 and compartment equation are recognizable.
+
+Issues:
+
+- no helium compartments
+- no gas switches
+- no tissue loading over a profile
+- no gradient factor ceiling/stop algorithm
+- no validated decompression stop propagation
+- trimix input can produce NDL based only on reduced nitrogen fraction
+- `999` NDL fallback can look like a real number instead of unavailable
+- deco stops are static schedule, not generated from Buhlmann ceilings
+- GF comparisons are heuristic multipliers, not real GF decompression plans
 
 ### 3. PPO2 / PPN2 / Partial Pressure
 
-Status: basic PPO2/MOD only.
+Status: partial.
 
-PPO2 and MOD are present. PPN2, END and EAD are absent. Invalid gas mixes are handled in the UI, but not in service/model entry points.
+Correct:
+
+- PPO2 = FO2 * ATA is implemented.
+- MOD formula is implemented.
+- EAD and END are implemented as simplified formulas.
+
+Issues:
+
+- stop PPO2 is clipped through `boundedPPO2`, hiding actual over-limit PPO2
+- PPN2 is not exposed as its own validated output
+- invalid gas fractions can be clamped or normalized instead of rejected
+- salinity/water type does not alter pressure conversion
+- altitude does not alter ambient pressure
 
 ### 4. Gas Density / Respirability
 
-Status: not implemented.
+Status: partial.
 
-No density or respirability calculation was found.
+Correct:
+
+- gas density approximation is implemented as surface density * ATA.
+- warning/danger thresholds exist.
+
+Issues:
+
+- no validation for non-finite gas fractions/depth before density calculation
+- trimix respirability output can look validated while decompression model is not
+- no typed "gas density unavailable" state
 
 ### 5. Dive Planner Inputs
 
-Status: UI-validated, not service-validated.
+Status: weak.
 
-The visible "Calcola Piano" flow blocks common invalid inputs, but persisted or programmatic invalid input can still be calculated by `PlannerStore.calculate()` and `PlannerService.makePlan()`.
+Issues:
+
+- validation is spread across UI controls, model normalization, and MOD checks
+- `PlannerService.makePlan` can be called directly with invalid data
+- no central `PlannerInputValidator`
+- no central `GasMixValidator`
+- no hard upper depth/time bounds in service layer
+- GF values are not service-validated for order/range
+- zero SAC/RMV, zero cylinder, negative pressures, and unsupported depths are not rejected centrally
+- planner state persists via cloud without a validation gate
 
 ### 6. Planner Output Consistency
 
-Status: internally consistent within one calculation, not validated as decompression output.
+Status: partial.
 
-`PlannerStore` computes both planner and Buhlmann outputs from current input. The issue is algorithmic authority, not synchronization between screens.
+Issues:
+
+- `store.plan` and `store.analysis` are computed separately; both use current `input`, but `analysis` is a computed property and can diverge conceptually from a previously calculated plan
+- NDL, TTR, deco stops, GF comparison, and segments are not generated by one validated decompression model
+- plan share/export can distribute indicative outputs
+- MOD validation reports issues, but applied stops also clamp depths to MOD, which may hide the requested unsafe stop depth in the primary table
 
 ### 7. Logbook Calculations
 
-Status: partial.
+Status: inconsistent.
 
-Imported CSV sessions recalculate average depth arithmetically, not time-weighted. Sync validation is too weak to guarantee finite samples and ordered timestamps. Merge can preserve inconsistent derived fields.
+Issues:
+
+- imported CSV average depth is arithmetic rather than time-weighted
+- demo sessions use arithmetic average
+- manual dive TTV formula is inconsistent with Watch MAIN formula
+- manual sample builder uses only three synthetic samples and does not make the stored average depth mathematically match time-weighted profile
+- merge does not recompute derived values from selected samples
+- iOS may preserve Watch-derived values, but import/manual paths can create divergent values
 
 ### 8. Subsurface Export
 
-Status: functional but not robust.
+Status: partial.
 
-Export refuses empty sample arrays, but does not sort, sanitize or validate samples. Out-of-order timestamps can generate negative elapsed seconds.
+Correct:
 
-### 9. Unit Conversion
+- `writeCSV` rejects empty sample arrays.
+- output includes profile samples and manual metadata.
+- temporary files are written atomically with complete file protection.
 
-Status: display-only and mostly correct.
+Issues:
 
-Core storage remains metric. Display conversion constants are reasonable. There is duplication and missing pressure/round-trip coverage.
+- `makeCSV` still returns header/meta-only CSV for empty profiles
+- samples are not sorted before export
+- negative elapsed seconds can be produced for unsorted samples
+- invalid sample depths/temperatures are not filtered
+- GPS values are exported without revalidation
+- gas fields are not exported as structured gas mix fields
+- output does not guarantee consistency with recomputed logbook values
+
+### 9. Unit Conversion System
+
+Status: partial.
+
+Issues:
+
+- conversion constants are duplicated:
+  - meters-to-feet in `Formatters`, `ManualDiveEditorView`, `PlannerView`
+  - psi/bar in `GasPlan`
+  - liters-to-cubic-feet only in `Formatters`
+- no central iOS unit conversion helper
+- no round-trip tests
+- planner output often remains metric/bar even when UI preference is imperial
 
 ### 10. Mathematical Robustness
 
-Status: insufficient for release-hard status.
+Status: not release-hard.
 
-Primary risks:
+Risks:
 
-- NaN/infinity can enter through decoded persisted/synced `DiveSession`.
-- Planner services do not enforce finite input validation.
-- Buhlmann and planner methods can return plausible-looking output for invalid inputs if UI validation is bypassed.
-- Merge/import/export can produce inconsistent sessions.
+- NaN/infinity values can reach planner calculations via programmatic or corrupted persisted input
+- `max(..., 0.1)` hides invalid cylinder volumes
+- `max(oxygen, 0.01)` hides invalid FO2 in MOD
+- `999` hides Buhlmann "no controlling compartment" as a real NDL
+- route formulas can produce NaN from invalid GPS
+- sync validation does not validate samples, GPS, average depth, TTV, or profile order
+- merge can create mathematically inconsistent sessions
 
 ### 11. Certification / Safety Positioning
 
-Status: safety copy is present, algorithm labels still need tightening.
+Status: mostly safe in copy, weaker in output semantics.
 
-Positive:
+Good:
 
-- Legal onboarding says DIR Diving is not a dive computer.
-- Planner requires safety acknowledgement.
-- Planner warnings say simplified/non-certified.
+- legal onboarding includes "DIR Diving is NOT a dive computer."
+- More/Legal copy states non-certified positioning.
+- planner safety acknowledgement exists.
+- planner disclaimer/informative copy exists.
+- docs clearly state iOS planner is not certified.
 
-Remaining risk:
+Risk:
 
-- Labels like Buhlmann ZH-L16C, Deco Stops, TTR, CNS%, OTU can imply more authority than the current math supports.
+- result screen presents `Piano Immersione`, deco stops, Buhlmann curve, CNS, OTU, GF comparisons, turn pressure, and briefing lines. Those outputs can look operationally authoritative even if copy says indicative.
+- default trimix/technical planner makes unsupported math especially risky.
 
 ### 12. Test Coverage
 
-Status: missing.
+Status: missing for iOS algorithms.
 
-No iOS XCTest target was found in `project.yml`, and no iOS algorithm tests were found.
+Project status:
+
+- no iOS XCTest target found in `project.yml`
+- only `DIRDiving Watch Algorithm Tests` exists
+
+No automated iOS tests found for:
+
+- gas planning
+- SAC/RMV
+- cylinder pressure conversions
+- PPO2 / PPN2
+- MOD
+- EAD / END
+- gas density
+- CNS / OTU
+- Buhlmann / NDL
+- planner invalid inputs
+- logbook import average depth
+- manual dive TTV
+- Subsurface export sorting/validation
+- Watch sync payload validation
+- route distance/bearing validation
 
 ## Safety-Critical Issues
 
-### P0-01: Planner shows decompression-like outputs from heuristic logic
+### P0 - Safety-Critical
 
-Files:
+1. **Actionable-looking technical planner output is generated from simplified/reference math**
+   - Files: `iOSApp/Services/BuhlmannPlanner.swift`, `iOSApp/Services/PlannerService.swift`, `iOSApp/Services/PlannerGasSchedule.swift`, `iOSApp/Views/PlannerView.swift`
+   - Impact: user can receive deco stops, GF comparisons, TTR, CNS/OTU, END, gas turn pressure, and shareable briefing from a model that is not full Buhlmann ZHL-16C and not validated for decompression use.
+   - Mitigation already present: non-certified disclaimers and safety acknowledgement.
+   - Recommended fix: return typed states such as `simplifiedReferenceOnly`, `modelIncomplete`, `unsupportedTrimix`, `unavailable`, and avoid presenting unsupported outputs as a plan.
 
-- `iOSApp/Services/PlannerService.swift`
-- `iOSApp/Services/BuhlmannPlanner.swift`
-- `iOSApp/Views/PlannerView.swift`
+2. **Trimix planner uses N2-only Buhlmann preview**
+   - Files: `iOSApp/Models/GasPlan.swift`, `iOSApp/Services/BuhlmannPlanner.swift`, `iOSApp/Services/PlannerService.swift`
+   - Impact: helium reduces nitrogen fraction in the simplified NDL estimate, but helium tissue loading is not modeled. This can make trimix output mathematically misleading.
+   - Recommended fix: for trimix, return `modelIncomplete` unless a full N2+He Buhlmann engine is implemented and tested.
 
-Impact:
+### P1 - Mathematical Correctness
 
-The app presents stops, TTR, CNS, OTU and Buhlmann-labelled curves, but the underlying logic is simplified and not a validated decompression model.
+1. **Manual dive TTV formula is inconsistent**
+   - File: `iOSApp/Views/ManualDiveEditorView.swift`
+   - Current: `ttv = avgDepth * durationMinutes`
+   - Watch MAIN formula: `ttv = avgDepth + durationMinutes`
+   - Impact: manual iOS dives can store huge/inconsistent TTV values.
 
-Recommended fix:
+2. **Stop PPO2 is clipped**
+   - Files: `iOSApp/Services/GasPlanningService.swift`, `iOSApp/Services/PlannerGasSchedule.swift`
+   - Current: `min(gas.maxPPO2, actualPPO2)`
+   - Impact: actual PPO2 over limit is hidden in stop output.
 
-Either demote this to a clearly labelled "study/reference only" output with non-actionable terminology, or replace it with a tested decompression-planning engine with explicit scope, validation, references and test vectors.
+3. **Buhlmann returns `999` as valid NDL**
+   - File: `iOSApp/Services/BuhlmannPlanner.swift`
+   - Impact: "unbounded/no controlling compartment" is displayed as a numeric NDL, not an unavailable/simplified state.
 
-### P0-02: Buhlmann implementation ignores helium while default gas is trimix
+4. **Planner service accepts invalid programmatic input**
+   - Files: `iOSApp/Services/PlannerService.swift`, `iOSApp/Services/GasPlanningService.swift`, `iOSApp/Models/GasPlan.swift`
+   - Impact: invalid depth, time, pressure, cylinder volume, SAC/RMV, gas fractions, and GF values can produce outputs.
 
-Files:
+5. **Imported average depth is arithmetic, not time-weighted**
+   - File: `iOSApp/Services/DiveImportService.swift`
+   - Impact: imported logbook values can diverge from Watch MAIN math and actual time-at-depth profile.
 
-- `iOSApp/Models/GasPlan.swift`
-- `iOSApp/Services/BuhlmannPlanner.swift`
+### P2 - Data Integrity
 
-Impact:
+1. **Watch sync validation is shallow**
+   - File: `iOSApp/Services/WatchDiveSyncCodec.swift`
+   - Missing validation: per-sample finite depth, temperature, timestamp order, GPS range, duration consistency, max/average/TTV consistency.
 
-Default bottom gas is `TX 18/45`, but `BuhlmannPlanner` only uses O2 to infer N2 and ignores helium compartments. A technical-looking trimix plan can produce NDL/deco outputs that are not physically complete.
+2. **DiveSessionMerge mixes derived fields**
+   - File: `iOSApp/Utils/DiveSessionMerge.swift`
+   - Impact: max depth, average depth, TTV, duration, and sample arrays can be taken from different versions without recomputation.
 
-Recommended fix:
+3. **CSV export does not sort or validate samples**
+   - File: `iOSApp/Services/SubsurfaceExportService.swift`
+   - Impact: unsorted samples can create negative elapsed seconds; invalid samples can be exported.
 
-For MAIN, either disable trimix-driven Buhlmann outputs or implement full N2/He tissue loading with validated coefficients and tests.
+4. **CSV import uses `horizontalAccuracy = -1`**
+   - File: `iOSApp/Services/DiveImportService.swift`
+   - Impact: imported GPS points violate the nonnegative accuracy convention used elsewhere.
 
-### P0-03: Service-level planner validation missing
+5. **Route summary does not validate GPS**
+   - File: `iOSApp/Services/RouteSummaryService.swift`
+   - Impact: invalid GPS can generate NaN distance/bearing.
 
-Files:
+6. **iOS logbook does not enforce a 40-session cap**
+   - File: `iOSApp/Services/DiveLogStore.swift`
+   - Impact: if product/docs expect latest 40 sessions across platforms, iOS can grow unbounded except storage constraints.
 
-- `iOSApp/Services/PlannerService.swift`
-- `iOSApp/Services/PlannerStore.swift`
-- `iOSApp/Models/GasPlan.swift`
+### P3 - Maintainability
 
-Impact:
+1. **Unit conversions are duplicated**
+   - Files: `Formatters.swift`, `GasPlan.swift`, `ManualDiveEditorView.swift`, `PlannerView.swift`
 
-UI validation is bypassable through persisted state, cloud KVS, future code paths or tests. Invalid values can produce plausible-looking outputs such as 999 min NDL.
+2. **Magic numbers are spread across planner/import/sync/export**
+   - Examples: 10 m/bar, 14.5038 psi/bar, 3.280839895 ft/m, max depths 300/350/40, temperature -5...40, density 5.2/6.2.
 
-Recommended fix:
+3. **Warnings are strings rather than typed states**
+   - Files: `GasPlanningService.swift`, planner views.
 
-Centralize validation in a `PlannerInputValidator` used by the UI and service before any calculation.
+4. **No iOS algorithm tests**
+   - File: `project.yml`
 
-## Priority Ranking
+5. **Planner fields exist but are unused in pressure math**
+   - `salinity` and `altitudeMeters` are persisted but not used in ambient pressure calculation.
 
-### P0 Safety-Critical
+## Required Test Scenarios To Add
 
-1. Heuristic decompression-like planner output is too authoritative for the current math.
-2. Trimix input is accepted while Buhlmann model ignores helium.
-3. Planner service lacks canonical validation, allowing invalid persisted/programmatic inputs to calculate.
+### Gas / Planner
 
-### P1 Mathematical Correctness
+- Air 21% O2 at 30 m / 20 min
+- Nitrox 32 at 30 m / 20 min
+- Trimix returns unsupported/modelIncomplete unless full N2+He model exists
+- O2 + He > 100% rejected
+- O2 > 100% rejected
+- O2 <= 0 rejected
+- He < 0 rejected
+- zero cylinder size rejected
+- zero SAC/RMV rejected
+- start pressure <= reserve pressure rejected
+- negative depth rejected
+- unsupported deep depth rejected/unavailable
+- MOD exceeded generates typed warning/error
+- actual stop PPO2 over max is exposed and warned, not clipped
+- gas density finite for valid inputs
+- gas density unavailable for invalid inputs
 
-1. iOS import average depth is arithmetic, not time-weighted.
-2. Import does not enforce monotonic sample timestamps.
-3. Export does not sort or sanitize samples and may emit negative elapsed seconds.
-4. Sync validation does not check finite values, sample timestamps, GPS validity or derived consistency.
-5. Merge combines derived values and sample arrays without recomputation.
-6. PPO2 display for stops clips actual PPO2 to `maxPPO2`, hiding over-limit values.
-7. `GasMix.nitrogen` clamps invalid mixes to zero instead of preserving invalidity.
-8. `BuhlmannPlanner` returns `999` for infinite control time without distinguishing "not computable" from "effectively no limit".
+### Buhlmann / NDL
 
-### P2 Data Integrity
+- Buhlmann disabled/unavailable state does not produce actionable stops
+- invalid gas does not return 999 min NDL
+- simplified model returns `simplifiedReferenceOnly`
+- helium > 0 returns `modelIncomplete` unless full He model exists
+- GF comparison does not pretend to be a real decompression plan
+- NDL outputs are finite or explicitly unavailable
 
-1. iOS `DiveLogStore` does not enforce a documented 40-session cap.
-2. GPS route calculations do not validate finite/ranged coordinates.
-3. CSV export omits gas mix fields.
-4. Import uses `horizontalAccuracy = -1` for imported GPS, which is semantically invalid for accuracy.
-5. Demo dives contain one hardcoded TTV value inconsistent with the generic formula.
+### Unit Conversions
 
-### P3 Maintainability
+- meters/feet round trip
+- bar/psi round trip
+- liters/cubic feet conversion
+- Celsius/Fahrenheit conversion
+- m/min/ft/min if displayed
 
-1. Unit conversion constants are split between `Formatters` and `GasPlan`.
-2. Planner validation lives in `PlannerView`, not shared with services.
-3. Safety-critical constants and formulas lack test-vector references.
-4. There are no automated iOS algorithm tests.
-5. Several strings show source-encoding artifacts in terminal display, which is not mathematical but can affect user trust.
+### Logbook / Import / Export
 
-## Edge Cases
+- time-weighted average depth with irregular samples
+- empty profile rejected
+- out-of-order timestamps sorted or rejected
+- negative elapsed export impossible
+- NaN depth rejected
+- infinity depth rejected
+- invalid temperature rejected
+- invalid GPS rejected
+- imported GPS uses valid accuracy semantics
+- manual dive TTV matches canonical formula
+- merge recomputes derived fields
+- CSV export with missing gas data is documented or includes gas fields
 
-### Required Scenarios
+### Sync
 
-- Air dive 21% O2 at 30 m:
-  - Current formula yields NDL about 16.3 min for a 20 min plan, so the heuristic deco branch is triggered.
-  - This may be conservative, but the stop schedule is not Buhlmann-derived.
+- corrupted sample rejected
+- sample outside session range rejected
+- invalid GPS rejected
+- inconsistent max/average/TTV rejected or recomputed
+- payload with valid signature but invalid math rejected
 
-- Nitrox 32 at 30 m:
-  - Current formula yields NDL about 28.0 min for a 20 min plan, so a 5 m / 3 min safety stop is shown.
-  - MOD at PPO2 1.4 is about 33.8 m, so validation passes for 30 m.
+### Route
 
-- Invalid gas mix above 100%:
-  - UI blocks O2 + He > 1.0.
-  - Model/service can still be called directly with invalid values.
-
-- Zero cylinder size:
-  - UI blocks it.
-  - Model `estimatedRemainingBar` uses `max(cylinderVolumeLiters, 0.1)`, which can hide invalidity if called directly.
-
-- Zero SAC/RMV:
-  - UI blocks it.
-  - Service does not.
-
-- Negative depth:
-  - UI blocks depth below 1 m.
-  - Service/model can calculate ambient pressure below 1 bar for direct calls.
-
-- Very deep unsupported depth:
-  - UI allows up to 100 m.
-  - Import allows 200 m.
-  - Watch sync validation allows 350 m.
-  - These ranges are inconsistent and should be centralized.
-
-- Metric to imperial round trip:
-  - Display-only conversion exists; no round-trip API or tests.
-
-- BAR to PSI round trip:
-  - `GasPlan` uses 14.5038; no central pressure conversion or tests.
-
-- Profile with missing samples:
-  - Export write fails when sample array is empty.
-  - Charts may show empty chart if a stored session has no samples.
-
-- Profile with out-of-order timestamps:
-  - Import accepts it.
-  - Export can produce negative elapsed seconds.
-
-- Buhlmann disabled / placeholder / unavailable:
-  - No unavailable state exists; planner always calculates.
-
-- Planner output with incomplete inputs:
-  - UI validation blocks common incomplete inputs.
-  - Service-level validation missing.
-
-- Export with missing gas data:
-  - Export ignores gas data entirely and still succeeds.
-
-## Missing Tests
-
-No existing automated tests were found for:
-
-- Gas planning.
-- SAC/RMV.
-- Pressure conversion.
-- PPO2/PPN2.
-- MOD.
-- Buhlmann/no-deco logic.
-- NDL lookup.
-- Logbook profile calculation.
-- Subsurface export.
-- Invalid inputs.
-
-Recommended XCTest scenarios:
-
-1. Air 21% at 30 m / 20 min returns expected NDL branch and warnings.
-2. Nitrox 32 at 30 m validates MOD and no-deco branch behavior.
-3. O2 + He > 100% rejected by shared validator.
-4. O2 > 100% rejected by shared validator.
-5. O2 <= 0 rejected by shared validator.
-6. Zero cylinder size rejected.
-7. Zero SAC/RMV rejected.
-8. Negative depth rejected.
-9. Depth above supported planner range rejected or marked unavailable.
-10. Metric to imperial depth round trip within tolerance.
-11. Bar to PSI round trip within tolerance.
-12. Liters to cubic feet display conversion within tolerance.
-13. Time-weighted average depth with irregular samples.
-14. Imported CSV with missing samples returns empty-profile error.
-15. Imported CSV with out-of-order timestamps is sorted or rejected.
-16. Imported CSV with NaN/Infinity depth rejected.
-17. Sync payload with NaN/Infinity derived values rejected.
-18. Sync payload with sample timestamp outside session rejected.
-19. Merge recomputes duration, max depth, average depth and TTV.
-20. Empty export rejected.
-21. Export with unsorted samples sorts or rejects.
-22. Export with missing gas data either documents omission or emits explicit empty gas fields.
-23. Buhlmann unavailable/placeholder mode returns a non-actionable state.
-24. Planner with incomplete inputs never yields valid-looking plan output.
-25. Deco stop PPO2 shows actual PPO2 and warning when over limit.
+- invalid latitude rejected
+- invalid longitude rejected
+- NaN route output impossible
+- identical entry/exit returns zero distance and defined/empty bearing behavior
 
 ## Recommended Fixes
 
-### Release-Hard Algorithm Path
+### Immediate Release-Hardening
 
 1. Add a central iOS algorithm module:
    - `IOSAlgorithmConfiguration`
    - `IOSUnitConversions`
    - `PlannerInputValidator`
    - `GasMixValidator`
-   - `DiveSessionAlgorithmValidator`
    - `DiveProfileMath`
+   - `DiveSessionAlgorithmValidator`
+   - `PlannerResultState`
+   - `BuhlmannModelState`
 
-2. Move all planner validation out of `PlannerView` and into shared services.
+2. Make `PlannerService.makePlan` refuse invalid inputs and return typed states.
 
-3. Decide product strategy for planner:
-   - Option A: keep current simple planner but remove decompression-authoritative labels.
-   - Option B: implement a validated planner with full N2/He Buhlmann, GF, tissue state, ascent/descent, gas switches and test vectors.
+3. For trimix, either:
+   - implement full Buhlmann ZHL-16C N2+He with validated test vectors, or
+   - return `modelIncomplete/unsupportedTrimix` and suppress actionable deco outputs.
 
-4. Make all planning functions return typed result states:
-   - valid
-   - invalid input
-   - unsupported depth
-   - insufficient model
-   - warning/unsafe
+4. Replace `boundedPPO2` output with:
+   - actual PPO2
+   - max allowed PPO2
+   - over-limit warning state
 
-5. Recompute imported/merged derived values from sorted, validated samples:
-   - duration
-   - max depth
-   - time-weighted average depth
-   - TTV/index
-   - temperature average/min/max if supported
+5. Replace arithmetic import/logbook average depth with time-weighted average.
 
-6. Harden sync/import/export:
-   - finite checks
-   - monotonic timestamps
-   - range checks
-   - sorted samples
-   - no negative elapsed seconds
-   - no header-only success path
+6. Fix manual dive TTV to the canonical informational formula.
 
-7. Add an XCTest target for iOS algorithms.
+7. Harden sync/import/export validation to reject or repair corrupted data deterministically.
 
-## Final Audit Conclusion
+8. Add an iOS XCTest target and algorithm test suite.
 
-The iOS Companion MAIN branch is not currently algorithmically release-hard. It is a strong UI/logbook companion with explicit safety copy, but the planner and decompression-adjacent outputs need either stronger mathematical implementation or stronger demotion to non-actionable reference material.
+### Before TestFlight
 
-No code was modified during this audit. Only this report file was created.
+1. Keep planner safety acknowledgement mandatory.
+2. Keep non-certified wording visible in planner and export/share output.
+3. Add explicit "simplified reference only" labels where technical outputs remain.
+4. Run all iOS algorithm tests on macOS/Xcode.
+5. Validate iOS/Watch sync with corrupted payload tests.
+
+### Before App Store
+
+1. Legal review of technical planner wording.
+2. App Review notes clarifying non-certified planner.
+3. Physical device sync/export/import QA.
+4. Decide whether MAIN iOS should expose technical planner by default or gate it behind a stronger warning/unavailable state.
+
+## Final Verdict
+
+### Ready To Compile?
+
+This audit did not run Xcode because the current environment is Windows and has no `xcodebuild`/XcodeGen runtime available. Static inspection found no immediate syntax edits because no code was changed.
+
+### Algorithmically Release-Hard?
+
+No. The iOS Companion MAIN branch is not yet algorithmically release-hard for technical planning.
+
+### Ready For Internal QA?
+
+Yes, as an informational planner/logbook candidate, if testers understand that planner outputs are simplified and non-certified.
+
+### Ready For TestFlight?
+
+Not from an algorithmic standpoint unless the planner is clearly treated as simplified reference and unsupported trimix/deco states are blocked or labeled more strongly.
+
+### Ready For Average User?
+
+Not for technical dive planning. Logbook and sync workflows are closer, but import/export/merge/sync math still needs hardening.
+
+### Ready For App Store?
+
+Not until planner mathematical limitations, test coverage, legal copy, and unsupported trimix/deco behavior are resolved.
+
+## Priority Roadmap
+
+### Must Fix Before Calling iOS MAIN Algorithmically Release-Hard
+
+- add central validators
+- block invalid planner input
+- remove actionable trimix output from N2-only Buhlmann path
+- expose actual PPO2, not clipped PPO2
+- replace 999 NDL fallback with unavailable/simplified state
+- fix manual TTV formula
+- time-weight imported/logbook averages
+- validate sync samples and derived fields
+- add iOS algorithm tests
+
+### Must Fix Before TestFlight
+
+- export/import sorting and invalid sample handling
+- route GPS validation
+- merge derived-value recomputation
+- unit conversion centralization
+- planner share text safety review
+
+### Can Fix Post-Release If Planner Is Gated/Reference-Only
+
+- full N2+He Buhlmann model
+- multi-segment gas consumption
+- altitude/salinity pressure model
+- complete Subsurface gas export fields
+- formal rock-bottom/team gas configuration model
+
