@@ -222,11 +222,11 @@ All active branches merged/pushed through `e952b55`:
 
 ### Branch sync (2026-05-31, post UI/UX docs)
 
-All active branches merged/pushed through `21da64e`:
+All active branches merged/pushed through `e0ec385`:
 
 | Branch | Commit |
 |--------|--------|
-| `main` | `21da64e` |
+| `main` | `e0ec385` |
 | `main-iOS` | `6e7e30e` |
 | `codex/experimental-features` | `48b3f3a` |
 | `codex/ios-experimental-features` | `78890c5` |

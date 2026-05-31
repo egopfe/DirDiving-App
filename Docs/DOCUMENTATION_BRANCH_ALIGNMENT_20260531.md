@@ -1,6 +1,6 @@
 # Documentation branch alignment — 2026-05-31 (readiness 100%)
 
-**Baseline:** `main` = `origin/main` @ `21da64e` (Watch + iOS algorithmic + UI/UX readiness 100% codice, 2026-05-31)  
+**Baseline:** `main` = `origin/main` @ `e0ec385` (Watch + iOS algorithmic + UI/UX readiness 100% codice, 2026-05-31)  
 **Algorithm commits:** Watch WMATH remediation @ `f654bec` + iOS @ `dce89e7`  
 **UI/UX commits:** P0–P2 @ `d796bfd` + P3 @ `c8f91f6`  
 **CI:** `macos-latest` runner (may fail if Actions minutes exhausted)
@@ -9,7 +9,7 @@
 
 | Branch | Role | Docs state | Sync @ |
 |--------|------|------------|--------|
-| `main` | Stable Watch Diving + iOS Companion MAIN | Authoritative; algorithm + UI/UX readiness 100% (codice) | `21da64e` |
+| `main` | Stable Watch Diving + iOS Companion MAIN | Authoritative; algorithm + UI/UX readiness 100% (codice) | `e0ec385` |
 | `main-iOS` | Historical / divergent iOS worktree | Merged `main`; not separate release baseline | `6e7e30e` |
 | `codex/experimental-features` | Watch experimental (Apnea, Snorkeling, Buddy) | Merged readiness + UI/UX docs from `main`; experimental runtime unchanged | `48b3f3a` |
 | `codex/ios-experimental-features` | iOS experimental companion | Merged readiness + UI/UX implementation + docs | `78890c5` |
