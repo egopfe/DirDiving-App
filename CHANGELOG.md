@@ -4,6 +4,13 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-31, Watch MAIN algorithmic readiness 100%)
+
+- **Algoritmo Watch:** remediation WMATH-HIGH-001 → INFO-014 — depth callback silence watchdog, GPS fix/fallback/no-fix banners, manual/no-depth sync (Policy A), auto-start sample retention, persistence class, CSV time origin, `MonotonicElapsedClock`, independent blink/haptic sources, gauge/zone alignment, imperial ascent banner, temperature freshness.
+- **iOS companion:** `hasDepthProfile`, sync validation manual no-depth, logbook/detail UI `RUNTIME/GPS`.
+- **Test:** `WatchReadinessAlgorithmTests` + `WatchManualNoDepthSyncTests`; Watch + iOS algorithm suites **PASS** (Ultra 3 / iPhone 17 sim).
+- **Documentazione:** [`Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md), [`Docs/WATCH_MANUAL_NODEPTH_SYNC_POLICY.md`](Docs/WATCH_MANUAL_NODEPTH_SYNC_POLICY.md).
+
 ### Added (2026-05-31, iOS MAIN algorithmic readiness 100% — `dce89e7`)
 
 - **Algoritmo iOS:** audit remediation B2–B5 — `AmbientPressureModel` unificato MOD/PPO₂; toggle profondità max/media end-to-end; merge iCloud per sessione; CSV `# session_meta` round-trip; incomplete calc guard; contingencies engine-driven; demo isolation in Analysis; time-weighted temperature.

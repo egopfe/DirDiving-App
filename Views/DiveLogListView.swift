@@ -229,12 +229,20 @@ struct DiveLogListView: View {
                         }
 
                         HStack(alignment: .lastTextBaseline, spacing: 13) {
-                            Text("\(depthDisplay.valueText) \(depthDisplay.unitLabel)")
-                                .font(.system(size: 14, weight: .black, design: .rounded))
-                                .foregroundStyle(.white)
-                                .monospacedDigit()
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.72)
+                            if session.isManual, !session.hasDepthProfile {
+                                Text(String(localized: "log.row.manual.nodepth"))
+                                    .font(.system(size: 11, weight: .black, design: .rounded))
+                                    .foregroundStyle(DiveUI.cyan)
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.72)
+                            } else {
+                                Text("\(depthDisplay.valueText) \(depthDisplay.unitLabel)")
+                                    .font(.system(size: 14, weight: .black, design: .rounded))
+                                    .foregroundStyle(.white)
+                                    .monospacedDigit()
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.72)
+                            }
                             Text("\(durationMinutes(session.durationSeconds)) min")
                                 .font(.system(size: 13, weight: .semibold, design: .rounded))
                                 .foregroundStyle(.white)

@@ -138,3 +138,37 @@ PR #8 / #9: unchanged — not safe-to-merge automatically (see `PR_STATUS_202605
 ### Branch sync
 
 All active branches merged/pushed through `1d69d88`: `main`, `main-iOS`, `codex/experimental-features`, `codex/ios-experimental-features`, `codex/watch-main-algorithm-audit-current`.
+
+---
+
+## Part 3 — Watch MAIN readiness 100% documentation pass (2026-05-31)
+
+**Trigger:** Runtime remediation WMATH-HIGH-001 → INFO-014 + companion iOS sync/UI; XCTest Watch + iOS **PASS**.
+
+### Files created
+
+| File | Purpose |
+|------|---------|
+| `Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md` | Final Watch readiness report |
+| `Docs/WATCH_MANUAL_NODEPTH_SYNC_POLICY.md` | Manual/no-depth sync Policy A |
+
+### Files updated
+
+| File | Change |
+|------|--------|
+| `README.md` | Watch readiness 100% row; baseline note |
+| `CHANGELOG.md` | Unreleased Watch readiness entry |
+| `Docs/INDEX.md` | § Watch readiness 100%; audit refs updated from ~82% |
+| `Docs/WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md` | Post-remediation note + resolved blockers |
+| `Docs/ROADMAP.md` | Released Watch readiness 100%; P1 XCTest marked pass |
+| `Docs/BUILD_VALIDATION.md` | Watch build + algorithm tests PASS |
+| `Docs/TESTFLIGHT_REVIEW_NOTES.md` | Watch QA checklist items 2026-05-31 |
+| `Docs/PR_STATUS_20260531.md` | PR #10 superseded by main merge |
+| `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260531.md` | Branch sync note |
+
+### Test count (Watch)
+
+| Suite | Result |
+|-------|--------|
+| `DIRDiving Watch Algorithm Tests` | **PASS** (Ultra 3 sim; incl. `WatchReadinessAlgorithmTests`) |
+| `DIRDiving iOS Algorithm Tests` | **PASS** (+ `WatchManualNoDepthSyncTests`) |

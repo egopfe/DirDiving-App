@@ -31,12 +31,14 @@ final class HapticService {
 
     /// Strong warning when ascent speed first exceeds the configured limit.
     func ascentAlarmTriggered() {
-        guard hapticsEnabled else { return }
         ascentAlarmSessionActive = true
         lastAscentAlarmRepeatDate = Date()
+        guard hapticsEnabled else { return }
         lastWarningDate = Date()
         WKInterfaceDevice.current().play(.failure)
     }
+
+    var isAscentAlarmSessionActive: Bool { ascentAlarmSessionActive }
 
     /// Repeating ascent warning while the inline alarm banner stays visible.
     func ascentAlarmRepeatIfNeeded() {

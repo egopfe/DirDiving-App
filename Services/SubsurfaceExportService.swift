@@ -4,9 +4,9 @@ enum SubsurfaceExportService {
     static func makeCSV(for session: DiveSession) -> String? {
         var rows = ["time_seconds,depth_m,temperature_c,entry_lat,entry_lon,exit_lat,exit_lon"]
         let samples = exportableSamples(for: session)
-        guard let firstTimestamp = samples.first?.timestamp else { return nil }
+        guard !samples.isEmpty else { return nil }
         for sample in samples {
-            let seconds = max(0, Int(sample.timestamp.timeIntervalSince(firstTimestamp)))
+            let seconds = max(0, Int(sample.timestamp.timeIntervalSince(session.startDate)))
             let temp = sample.temperatureCelsius.map { String(format: "%.1f", $0) } ?? ""
             let entryLat = session.entryGPS.map { String(format: "%.6f", $0.latitude) } ?? ""
             let entryLon = session.entryGPS.map { String(format: "%.6f", $0.longitude) } ?? ""

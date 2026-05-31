@@ -165,7 +165,14 @@ struct DiveLogCard: View {
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
                         .lineLimit(1)
-                    if session.isManual {
+                    if session.isManual, !session.hasDepthProfile {
+                        Text(String(localized: "logbook.badge.manual.nodepth"))
+                            .font(.system(size: 8, weight: .bold, design: .rounded))
+                            .foregroundStyle(DIRTheme.cyan)
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 1)
+                            .overlay(RoundedRectangle(cornerRadius: 3).stroke(DIRTheme.cyan, lineWidth: 1))
+                    } else if session.isManual {
                         Text(String(localized: "logbook.badge.manual"))
                             .font(.system(size: 8, weight: .bold, design: .rounded))
                             .foregroundStyle(DIRTheme.orange)
@@ -182,7 +189,7 @@ struct DiveLogCard: View {
                             .overlay(RoundedRectangle(cornerRadius: 3).stroke(DIRTheme.yellow, lineWidth: 1))
                     }
                 }
-                Text(String(format: String(localized: "logbook.card.max_depth"), Formatters.depth(session.maxDepthMeters, units: unitPreference).text))
+                Text(maxDepthLine)
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.86))
                 HStack {
@@ -205,6 +212,13 @@ struct DiveLogCard: View {
                 .overlay(RoundedRectangle(cornerRadius: 10).stroke(DIRTheme.hairline, lineWidth: 1))
                 .shadow(color: DIRTheme.cyan.opacity(0.06), radius: 10, x: 0, y: 6)
         )
+    }
+
+    private var maxDepthLine: String {
+        if session.isManual, !session.hasDepthProfile {
+            return String(localized: "logbook.card.runtime_gps_only")
+        }
+        return String(format: String(localized: "logbook.card.max_depth"), Formatters.depth(session.maxDepthMeters, units: unitPreference).text)
     }
 
     private var dateBlock: some View {
