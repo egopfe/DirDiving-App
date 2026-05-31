@@ -517,6 +517,11 @@ private struct WatchShortcutHelpView: View {
                         body: String(localized: "shortcuts.help.crown.body")
                     )
                     helpPanel(
+                        icon: "water.waves",
+                        title: String(localized: "shortcuts.help.mode_selection.title"),
+                        body: String(localized: "shortcuts.help.mode_selection.body")
+                    )
+                    helpPanel(
                         icon: "hand.tap",
                         title: String(localized: "shortcuts.help.touch.title"),
                         body: String(localized: "shortcuts.help.touch.body")

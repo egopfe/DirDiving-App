@@ -454,3 +454,13 @@
 "alarm.threshold.battery_format" = "< %lld%%";
 "alarm.display.runtime_minutes" = "%lld min";
 "legal.exit.title" = "Esci dall'app";
+
+/* Watch MAIN UI/UX P3 polish (2026-05-31) */
+"mode.selection.header.title" = "DIR DIVING";
+"mode.selection.header.subtitle" = "SELETTORE MODALITA PRE-IMMERSIONE";
+"mode.selection.experimental_notice" = "Modalita stabile: solo Diving. Le funzioni sperimentali restano sui rami experimental.";
+"mode.selection.diving.title" = "DIVING";
+"mode.selection.diving.subtitle" = "Companion immersione premium";
+"mode.selection.diving.active" = "ATTIVA";
+"shortcuts.help.mode_selection.title" = "Selezione modalita";
+"shortcuts.help.mode_selection.body" = "Con una sola modalita stabile l'app apre Live Dive automaticamente. La selezione compare quando saranno disponibili piu modalita.";

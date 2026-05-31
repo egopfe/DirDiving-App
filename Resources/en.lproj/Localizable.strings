@@ -454,3 +454,13 @@
 "alarm.threshold.battery_format" = "< %lld%%";
 "alarm.display.runtime_minutes" = "%lld min";
 "legal.exit.title" = "Exit App";
+
+/* Watch MAIN UI/UX P3 polish (2026-05-31) */
+"mode.selection.header.title" = "DIR DIVING";
+"mode.selection.header.subtitle" = "PRE-DIVE MODE SELECTOR";
+"mode.selection.experimental_notice" = "Stable mode: Diving only. Experimental features stay on experimental branches.";
+"mode.selection.diving.title" = "DIVING";
+"mode.selection.diving.subtitle" = "Dive companion premium";
+"mode.selection.diving.active" = "ACTIVE";
+"shortcuts.help.mode_selection.title" = "Mode selection";
+"shortcuts.help.mode_selection.body" = "When only Diving is available, the app opens Live Dive automatically. Mode Selection appears when multiple stable modes ship.";

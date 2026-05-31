@@ -956,3 +956,11 @@
 "equipment.picker.gas_type.a11y" = "Tipo gas";
 "equipment.picker.pressure_unit.a11y" = "Unità pressione";
 "equipment.picker.tank_size.a11y" = "Dimensione bombola";
+
+/* iOS MAIN UI/UX P3 polish (2026-05-31) */
+"logbook.search.placeholder" = "Cerca immersioni, sito, buddy, gas…";
+"logbook.search.a11y" = "Cerca nel logbook";
+"logbook.delete.confirm.title" = "Eliminare immersione?";
+"logbook.delete.confirm.message" = "L'immersione verrà rimossa dal logbook su questo dispositivo.";
+"logbook.delete.confirm.action" = "Elimina";
+"logbook.delete.cancel" = "Annulla";

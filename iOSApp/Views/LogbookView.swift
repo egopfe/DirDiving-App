@@ -11,8 +11,20 @@ struct LogbookView: View {
     @Environment(\.locale) private var locale
     @State private var search = ""
     @State private var showManualDiveEditor = false
+    @State private var pendingDeleteID: UUID?
+
     private var filtered: [DiveSession] {
-        search.isEmpty ? logStore.sessions : logStore.sessions.filter { ($0.siteName ?? "").localizedCaseInsensitiveContains(search) }
+        guard !search.isEmpty else { return logStore.sessions }
+        return logStore.sessions.filter { matchesSearch($0, query: search) }
+    }
+
+    private func matchesSearch(_ session: DiveSession, query: String) -> Bool {
+        if (session.siteName ?? "").localizedCaseInsensitiveContains(query) { return true }
+        if (session.buddy ?? "").localizedCaseInsensitiveContains(query) { return true }
+        if (session.notes ?? "").localizedCaseInsensitiveContains(query) { return true }
+        if (session.equipmentUsed ?? "").localizedCaseInsensitiveContains(query) { return true }
+        if session.gasLabel.rawValue.localizedCaseInsensitiveContains(query) { return true }
+        return false
     }
 
     private var hasMixedDemoAndRealDives: Bool {
@@ -66,23 +78,17 @@ struct LogbookView: View {
                                     .foregroundStyle(DIRTheme.cyan)
                                     .padding(.top, 8)
                                 ForEach(Array(section.sessions.enumerated()), id: \.element.id) { index, session in
-                                    HStack(spacing: 8) {
-                                        NavigationLink { DiveDetailView(session: session) } label: {
-                                            DiveLogCard(session: session, index: index)
-                                        }
-                                        .buttonStyle(.plain)
-
+                                    NavigationLink { DiveDetailView(session: session) } label: {
+                                        DiveLogCard(session: session, index: index)
+                                    }
+                                    .buttonStyle(.plain)
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                         if !session.isDemoDive {
                                             Button(role: .destructive) {
-                                                logStore.delete(id: session.id)
+                                                pendingDeleteID = session.id
                                             } label: {
-                                                Image(systemName: "trash")
-                                                    .font(.body.weight(.semibold))
-                                                    .foregroundStyle(DIRTheme.red)
-                                                    .frame(width: 36, height: 36)
+                                                Label(String(localized: "logbook.delete.a11y"), systemImage: "trash")
                                             }
-                                            .buttonStyle(.plain)
-                                            .accessibilityLabel(Text(LocalizedStringKey("logbook.delete.a11y")))
                                         }
                                     }
                                 }
@@ -97,6 +103,26 @@ struct LogbookView: View {
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(isPresented: $showManualDiveEditor) {
                 ManualDiveEditorView()
+            }
+            .confirmationDialog(
+                String(localized: "logbook.delete.confirm.title"),
+                isPresented: Binding(
+                    get: { pendingDeleteID != nil },
+                    set: { if !$0 { pendingDeleteID = nil } }
+                ),
+                titleVisibility: .visible
+            ) {
+                Button(String(localized: "logbook.delete.confirm.action"), role: .destructive) {
+                    if let id = pendingDeleteID {
+                        logStore.delete(id: id)
+                    }
+                    pendingDeleteID = nil
+                }
+                Button(String(localized: "logbook.delete.cancel"), role: .cancel) {
+                    pendingDeleteID = nil
+                }
+            } message: {
+                Text(String(localized: "logbook.delete.confirm.message"))
             }
         }
     }

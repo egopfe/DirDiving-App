@@ -87,9 +87,10 @@ All P0–P2 audit issues remediated in code. Remaining gap is **physical device 
 
 | ID | Status | Notes |
 |----|--------|-------|
-| I-UX-026 | **Deferred** | CSV import path consolidation — low risk, no blocker |
-| I-UX-035 | **Deferred** | Search scope expansion — post-release polish |
-| I-UX-036 | **Deferred** | Delete UX — acceptable with confirmation |
+| I-UX-026 | **Fixed** | `AnalysisView.swift` | Duplicate `fileImporter` removed; empty state uses shared `CSVImportPanel` |
+| I-UX-035 | **Fixed** | `LogbookView.swift`, `DIRSearchBar.swift` | Search matches site, buddy, notes, equipment, gas |
+| I-UX-036 | **Fixed** | `LogbookView.swift` | Swipe-to-delete + confirmation dialog; inline trash removed |
+| W-UX-008 | **Fixed** | `ModeSelectionView.swift`, `WatchModeSelectionPreferences.swift`, `SettingsView` | Localized dormant mode UI + shortcut help documents behavior |
 
 ---
 
@@ -171,9 +172,8 @@ Only **process/external** items remain:
 
 1. Physical device QA (§ I) — cannot be closed in simulator alone  
 2. App Store Connect assets and review narrative  
-3. Optional P3 polish (I-UX-026, I-UX-035) — non-blocking  
 
-No open P0/P1/P2 UI/UX code blockers.
+All P0–P3 UI/UX code items are closed.
 
 ---
 

@@ -68,7 +68,7 @@
 | X-UX-008 | Fixed — DEMO badge + mixed banner |
 | X-UX-010 | Fixed — shortcut error i18n |
 
-**Deferred (P3, low risk):** I-UX-026 CSV path consolidation, I-UX-035 search scope — documented only; no user-facing blocker.
+**Deferred (P3, low risk):** None — I-UX-026, I-UX-035, I-UX-036, W-UX-008 closed in follow-up commit.
 
 ---
 
