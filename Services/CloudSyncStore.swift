@@ -29,6 +29,31 @@ final class CloudSyncStore: ObservableObject {
         synchronize()
     }
 
+    func removeValue(forKey key: String) {
+        defaults.removeObject(forKey: key)
+        defaults.removeObject(forKey: modifiedAtKey(for: key))
+        cloudStore.removeObject(forKey: key)
+        cloudStore.removeObject(forKey: modifiedAtKey(for: key))
+        synchronize()
+        lastSyncStatus = "Dati sensibili rimossi da iCloud KVS"
+    }
+
+    func loadRawLocalData(forKey key: String) -> Data? {
+        defaults.data(forKey: key)
+    }
+
+    func loadRawCloudData(forKey key: String) -> Data? {
+        cloudStore.data(forKey: key)
+    }
+
+    func decodeLocal<T: Decodable>(_ type: T.Type, from data: Data) -> T? {
+        decode(type, from: data)
+    }
+
+    func decodeCloud<T: Decodable>(_ type: T.Type, from data: Data) -> T? {
+        decode(type, from: data)
+    }
+
     func load<T: Decodable>(_ type: T.Type, forKey key: String) -> T? {
         let cloudData = cloudStore.data(forKey: key)
         let localData = defaults.data(forKey: key)

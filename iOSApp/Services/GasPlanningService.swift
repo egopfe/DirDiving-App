@@ -508,7 +508,7 @@ enum GasPlanningService {
         if ppO2 > input.bottomGas.maxPPO2 {
             values.append(.PPO2Exceeded)
         }
-        if input.effectivePlanningDepthMeters > input.bottomGas.modMeters {
+        if input.plannedDepthMeters > input.bottomGas.modMeters {
             values.append(.MODExceeded)
         }
         if density >= input.densityDangerLimit {

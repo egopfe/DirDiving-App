@@ -353,9 +353,9 @@ struct GasPlanInput: Codable, Hashable {
         }
     }
 
-    /// Depth fed into the existing Bühlmann preview path. Emergency gas still uses max depth elsewhere.
+    /// Conservative depth fed into Buhlmann/MOD safety paths. Average depth is only for consumption summaries.
     var buhlmannPlanningDepthMeters: Double {
-        effectivePlanningDepthMeters
+        plannedDepthMeters
     }
 
     var plannerEnvironment: PlannerEnvironment {

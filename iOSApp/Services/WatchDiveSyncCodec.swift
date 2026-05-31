@@ -114,16 +114,33 @@ enum WatchDiveSyncCodec {
         return ParsedPayload(session: validatedSession, issuedAt: transport.issuedAt)
     }
 
-    // F11: ack signature recomputed and returned by iOS in response to a signed
-    // Watch payload. The Watch side validates this in constant time before
-    // declaring the dive acknowledged. The legacy `acknowledged` string path is
-    // kept on the Watch side for backward compatibility with older iOS builds.
-    // TODO(F11-followup): once the floor build is bumped, make the signed ack
-    // mandatory on both ends and remove the legacy string fallback.
+    // SYNC-001/SYNC-003: ack signature recomputed from the signed payload
+    // context. Senders validate this in constant time before declaring the dive
+    // acknowledged; unsigned `acknowledged` strings are not accepted.
     static func ackSignature(sessionID: UUID, issuedAt: Date) -> String {
         let canonical = "ack|\(sessionID.uuidString)|\(issuedAt.timeIntervalSince1970)"
         let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: syncKey())
         return Data(code).base64EncodedString()
+    }
+
+    static func verifyAckSignature(_ signature: String?, sessionID: UUID, issuedAt: Date) -> Bool {
+        guard let signature, let providedData = Data(base64Encoded: signature) else { return false }
+        let expected = ackSignature(sessionID: sessionID, issuedAt: issuedAt)
+        guard let expectedData = Data(base64Encoded: expected) else { return false }
+        return providedData.constantTimeEquals(expectedData)
+    }
+
+    static func sessionID(fromOutboundPayload payload: [String: Any]) -> UUID? {
+        guard let data = payload[payloadKey] as? Data,
+              data.count <= maxPayloadBytes,
+              let transport = try? JSONDecoder().decode(Transport.self, from: data),
+              transport.version == schemaVersion,
+              transport.body.count <= maxPayloadBytes else {
+            return nil
+        }
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return (try? decoder.decode(DiveSession.self, from: transport.body))?.id
     }
 
     static func loadImportedSessionIDs() -> Set<UUID> {

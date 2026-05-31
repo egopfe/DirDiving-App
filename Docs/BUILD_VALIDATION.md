@@ -1,7 +1,7 @@
 # Build validation — DIR DIVING (MAIN)
 
-**Branch:** `main` (`origin/main`) @ `bfbc3e7` — Watch + iOS algorithmic + UI/UX readiness 100% (codice, 2026-05-31)  
-**Algorithm baseline:** iOS @ `dce89e7`; Watch WMATH-HIGH → INFO-014 @ `f654bec`; UI/UX P0–P3 @ `c8f91f6`  
+**Branch:** latest fetched `origin/main` @ `1de70dd`; security remediation work is tracked on `codex/main-full-code-security-remediation-current` (2026-05-31).
+**Algorithm baseline:** iOS @ `dce89e7`; Watch WMATH-HIGH -> INFO-014 @ `f654bec`; UI/UX P0-P3 @ `c8f91f6`
 **Watch compile fix:** GPS fallback types in `Services/GPSManager.swift` @ `06e4c67`; explicit Watch target sources in `project.yml` @ `bfbc3e7`  
 **Generator:** [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`project.yml` at repository root). **`DIRDiving.xcodeproj/` is gitignored — always run `xcodegen generate` after pull/checkout.**
 
@@ -54,6 +54,19 @@ cd /path/to/DirDiving-App/.worktrees/watch-audit && xcodegen generate
 
 Then open `DIRDiving.xcodeproj` from that same directory. Stale projects cause **“Cannot find type in scope”** errors for Watch algorithm files even when source exists on disk.
 
+## Required Validation Flow
+
+`DIRDiving.xcodeproj` is generated output and is intentionally gitignored. Every `xcodebuild` command below assumes this sequence has just run in the same checkout:
+
+```bash
+cd /path/to/DirDiving-App
+xcodegen generate
+xcodebuild -list -project DIRDiving.xcodeproj
+xcrun simctl list devices
+```
+
+If any checkout, branch switch, pull, or worktree change occurs, repeat `xcodegen generate` before the next `xcodebuild`.
+
 ## Commands (repository root)
 
 Regenerate the Xcode project:
@@ -67,6 +80,7 @@ xcodegen generate
 
 ```bash
 xcodebuild -scheme "DIRDiving Watch App" \
+  -project DIRDiving.xcodeproj \
   -destination 'generic/platform=watchOS' \
   -configuration Debug \
   build
@@ -76,6 +90,7 @@ xcodebuild -scheme "DIRDiving Watch App" \
 
 ```bash
 xcodebuild -scheme "DIRDiving iOS" \
+  -project DIRDiving.xcodeproj \
   -destination 'generic/platform=iOS' \
   -configuration Debug \
   build
@@ -85,11 +100,13 @@ xcodebuild -scheme "DIRDiving iOS" \
 
 ```bash
 xcodebuild -scheme "DIRDiving iOS" \
+  -project DIRDiving.xcodeproj \
   -destination 'platform=iOS Simulator,name=iPhone 17' \
   -configuration Debug \
   build
 
 xcodebuild -scheme "DIRDiving Watch App" \
+  -project DIRDiving.xcodeproj \
   -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm)' \
   -configuration Debug \
   build
@@ -101,9 +118,11 @@ Use `xcodebuild -showdestinations -scheme "DIRDiving iOS"` and `xcodebuild -show
 
 ```bash
 xcodebuild test -scheme "DIRDiving Watch Algorithm Tests" \
+  -project DIRDiving.xcodeproj \
   -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm)'
 
 xcodebuild test -scheme "DIRDiving iOS Algorithm Tests" \
+  -project DIRDiving.xcodeproj \
   -destination 'platform=iOS Simulator,name=iPhone 17'
 ```
 

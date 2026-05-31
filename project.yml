@@ -48,6 +48,7 @@ targets:
       - Utils/DiveSessionPersistenceClass.swift
       - Models/DiveGPSConfirmation.swift
       - Services/SubsurfaceExportService.swift
+      - Services/UserImageStore.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.watch.algorithmtests

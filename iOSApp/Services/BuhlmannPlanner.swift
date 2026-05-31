@@ -252,14 +252,7 @@ enum BuhlmannPlanner {
         var working = input
         working.syncLegacyGasesFromPlannerCylinders()
         // Bailout cylinders remain schedule-only; BuhlmannPlanRequest has no bailoutGases slot.
-        let planningDepth: Double = {
-            switch working.planningDepthReference {
-            case .averageDepth:
-                return working.effectivePlanningDepthMeters
-            case .maximumDepth:
-                return working.plannedDepthMeters
-            }
-        }()
+        let planningDepth = working.buhlmannPlanningDepthMeters
         let bottomEntry = working.plannerCylinders.first(where: { $0.role == .bottom })
         let bottomGas = BuhlmannGas(
             gas: bottomEntry?.gas ?? working.bottomGas,
