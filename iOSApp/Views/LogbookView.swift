@@ -1,8 +1,11 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import UIKit
 
 struct LogbookView: View {
     @EnvironmentObject private var logStore: DiveLogStore
+    @EnvironmentObject private var navigation: IOSNavigationStore
+    @EnvironmentObject private var watchSync: WatchSyncService
     @State private var search = ""
     @State private var showImporter = false
     @State private var importMessage: String?
@@ -87,9 +90,14 @@ struct LogbookView: View {
                     case .success(let summary):
                         let alreadyImported = logStore.session(id: summary.session.id) != nil
                         logStore.add(summary.session)
+                        if !alreadyImported {
+                            watchSync.pushSession(summary.session)
+                        }
                         importMessage = summary.message(alreadyImported: alreadyImported)
+                        HapticFeedback.success()
                     case .failure(let error):
                         importMessage = "Import fallito: 0 importate, 0 duplicati, 1 errore. \(error.localizedDescription)"
+                        HapticFeedback.error()
                     }
                 case .failure(let error):
                     importMessage = error.localizedDescription
@@ -106,6 +114,7 @@ struct LogbookView: View {
                 Button("Elimina", role: .destructive) {
                     if let pendingDelete {
                         logStore.delete(id: pendingDelete.id)
+                        HapticFeedback.destructive()
                     }
                     pendingDelete = nil
                 }
@@ -132,6 +141,7 @@ struct LogbookView: View {
                     .font(.system(size: 26, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.76)
                 Spacer()
                 Button {
                     showImporter = true
@@ -139,11 +149,15 @@ struct LogbookView: View {
                     Text("IMPORT CSV")
                         .font(.caption2.weight(.bold))
                         .foregroundStyle(DIRTheme.cyan)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 6)
                         .background(Capsule().stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel("Importa CSV")
+                .accessibilityHint("Apre il file importer per importare un profilo Subsurface CSV.")
             }
         }
     }
@@ -193,6 +207,8 @@ struct LogbookView: View {
                     Text(logStore.sessions.isEmpty ? "Nessuna immersione registrata" : "Nessun risultato")
                         .font(.headline.weight(.bold))
                         .foregroundStyle(.white)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.82)
                     Text(logStore.sessions.isEmpty ? "Sincronizza Apple Watch o importa un CSV Subsurface per iniziare." : "Modifica la ricerca o importa un nuovo CSV.")
                         .font(.caption)
                         .foregroundStyle(DIRTheme.muted)
@@ -210,6 +226,23 @@ struct LogbookView: View {
                     .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.7), lineWidth: 1))
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(logStore.sessions.isEmpty ? "Importa CSV" : "Importa nuovo CSV")
+            .accessibilityHint("Apre il file importer per aggiungere un log.")
+            Button {
+                navigation.selectedTab = .settings
+            } label: {
+                Text("IMPOSTAZIONI SYNC")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(DIRTheme.muted)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 9)
+                    .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.muted.opacity(0.45), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Apri impostazioni sync")
+            .accessibilityHint("Passa alla tab Settings per controllare Watch Sync.")
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)

@@ -26,11 +26,6 @@ struct DisplayMeasurement {
 }
 
 enum Formatters {
-    private static let metersToFeet = 3.280_839_895
-    private static let metersToKilometers = 0.001
-    private static let metersToMiles = 0.000_621_371
-    private static let litersToCubicFeet = 0.035_314_7
-
     private static let clockFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
@@ -70,14 +65,14 @@ enum Formatters {
         case .metric:
             return DisplayMeasurement(value: one(meters), unit: "m")
         case .imperial:
-            return DisplayMeasurement(value: zero(meters * metersToFeet), unit: "ft")
+            return DisplayMeasurement(value: zero(IOSUnitConversions.feet(fromMeters: meters)), unit: "ft")
         }
     }
 
     static func depthValue(_ meters: Double, units: IOSUnitPreference) -> Double {
         switch units {
         case .metric: return meters
-        case .imperial: return meters * metersToFeet
+        case .imperial: return IOSUnitConversions.feet(fromMeters: meters)
         }
     }
 
@@ -86,7 +81,7 @@ enum Formatters {
         case .metric:
             return DisplayMeasurement(value: one(celsius), unit: "C")
         case .imperial:
-            return DisplayMeasurement(value: one(celsius * 9 / 5 + 32), unit: "F")
+            return DisplayMeasurement(value: one(IOSUnitConversions.fahrenheit(fromCelsius: celsius)), unit: "F")
         }
     }
 
@@ -104,14 +99,14 @@ enum Formatters {
         switch units {
         case .metric:
             if prefersLargeUnit || meters >= 1000 {
-                return DisplayMeasurement(value: one(meters * metersToKilometers), unit: "km")
+                return DisplayMeasurement(value: one(IOSUnitConversions.kilometers(fromMeters: meters)), unit: "km")
             }
             return DisplayMeasurement(value: zero(meters), unit: "m")
         case .imperial:
             if prefersLargeUnit || meters >= 1609.344 {
-                return DisplayMeasurement(value: one(meters * metersToMiles), unit: "mi")
+                return DisplayMeasurement(value: one(IOSUnitConversions.miles(fromMeters: meters)), unit: "mi")
             }
-            return DisplayMeasurement(value: zero(meters * metersToFeet), unit: "ft")
+            return DisplayMeasurement(value: zero(IOSUnitConversions.feet(fromMeters: meters)), unit: "ft")
         }
     }
 
@@ -120,7 +115,7 @@ enum Formatters {
         case .metric:
             return DisplayMeasurement(value: one(litersMinute), unit: "l/min")
         case .imperial:
-            return DisplayMeasurement(value: one(litersMinute * litersToCubicFeet), unit: "cu ft/min")
+            return DisplayMeasurement(value: one(IOSUnitConversions.cubicFeet(fromLiters: litersMinute)), unit: "cu ft/min")
         }
     }
 }

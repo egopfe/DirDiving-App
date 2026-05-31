@@ -1,6 +1,6 @@
 # Build validation — DIR DIVING (MAIN)
 
-**Branch:** `main` only.
+**Branch:** `main` only.  
 **Generator:** [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`project.yml` at repository root).
 
 ## Schemes and targets (from `project.yml`)
@@ -84,11 +84,11 @@ This repository is often edited on Windows. **Apple builds cannot be asserted fr
 
 Use [`Docs/RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) and record:
 
-- Date
-- `git rev-parse HEAD`
-- Simulator build (pass/fail)
-- Physical Watch + iPhone (pass/fail)
-- Apple Watch Ultra spot-check (layout, legibility, crown paging)
+- Date  
+- `git rev-parse HEAD`  
+- Simulator build (pass/fail)  
+- Physical Watch + iPhone (pass/fail)  
+- Apple Watch Ultra spot-check (layout, legibility, crown paging)  
 
 ---
 

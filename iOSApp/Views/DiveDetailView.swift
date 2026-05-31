@@ -1,5 +1,6 @@
 import SwiftUI
 import Charts
+import UIKit
 
 enum DiveDetailTab: String, CaseIterable, Identifiable {
     case summary = "RIEPILOGO"
@@ -10,6 +11,7 @@ enum DiveDetailTab: String, CaseIterable, Identifiable {
 
 struct DiveDetailView: View {
     let session: DiveSession
+    @Environment(\.dismiss) private var dismiss
     @State private var tab: DiveDetailTab = .summary
     @State private var csvURL: URL?
     @State private var exportErrorMessage: String?
@@ -70,6 +72,18 @@ struct DiveDetailView: View {
 
     private var header: some View {
         HStack(spacing: 12) {
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(DIRTheme.cyan)
+                    .frame(width: 30, height: 30)
+                    .background(Circle().stroke(DIRTheme.cyan.opacity(0.65), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Torna al logbook")
+            .accessibilityHint("Chiude il dettaglio immersione.")
             DiveThumbnail(index: 0)
                 .frame(width: 82, height: 82)
             VStack(alignment: .leading, spacing: 7) {
@@ -118,12 +132,21 @@ struct DiveDetailView: View {
             }
             Divider().overlay(DIRTheme.hairline)
             HStack(spacing: 0) {
-                detailMetric("TTR", value: Formatters.zero(session.ttv), unit: "min")
+                detailMetric("TTV info", value: Formatters.zero(session.ttv), unit: "min")
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("TTV informativo \(Formatters.zero(session.ttv)) minuti")
+                    .accessibilityHint("TTV derivato da profondita media e durata; non e un valore decompressivo o time-to-surface.")
                 Divider().overlay(DIRTheme.hairline)
                 detailMetric("SAC", measurement: Formatters.sac(session.sacLitersMinute ?? 0, units: unitPreference))
                 Divider().overlay(DIRTheme.hairline)
                 detailMetric("Temperatura", measurement: Formatters.temperature(session.avgWaterTemperatureCelsius ?? 0, units: unitPreference))
             }
+            Text("TTV informativo: derivato da profondità media + runtime; non è un valore decompressivo o time-to-surface.")
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -318,6 +341,7 @@ struct DiveDetailView: View {
     private var exportBlock: some View {
         HStack {
             Button {
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 switch SubsurfaceExportService.writeCSV(for: session) {
                 case .success(let url):
                     csvURL = url
@@ -330,20 +354,28 @@ struct DiveDetailView: View {
                 Text("Genera CSV Subsurface")
                     .font(.callout.weight(.semibold))
                     .foregroundStyle(DIRTheme.cyan)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
                     .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
             }
+            .accessibilityLabel("Genera CSV Subsurface")
+            .accessibilityHint("Crea un file CSV condivisibile per questa immersione.")
             Spacer()
             if let csvURL {
                 ShareLink(item: csvURL) {
                     Text("Condividi CSV")
                         .font(.callout.weight(.semibold))
                         .foregroundStyle(DIRTheme.cyan)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.78)
                         .padding(.horizontal, 18)
                         .padding(.vertical, 10)
                         .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
                 }
+                .accessibilityLabel("Condividi CSV")
+                .accessibilityHint("Apre il foglio di condivisione per il file Subsurface CSV.")
             } else if let exportErrorMessage {
                 Text(exportErrorMessage)
                     .font(.caption2)
@@ -353,8 +385,11 @@ struct DiveDetailView: View {
                 Text("CSV non generato")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(DIRTheme.muted)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
         }
         .padding(.top, 4)
+        .accessibilityElement(children: .contain)
     }
 }

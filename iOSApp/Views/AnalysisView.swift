@@ -72,9 +72,14 @@ struct AnalysisView: View {
                     case .success(let summary):
                         let alreadyImported = logStore.session(id: summary.session.id) != nil
                         logStore.add(summary.session)
+                        if !alreadyImported {
+                            watchSync.pushSession(summary.session)
+                        }
                         importMessage = summary.message(alreadyImported: alreadyImported)
+                        HapticFeedback.success()
                     case .failure(let error):
                         importMessage = error.localizedDescription
+                        HapticFeedback.error()
                     }
                 case .failure(let error):
                     importMessage = error.localizedDescription
@@ -224,60 +229,4 @@ struct AnalysisView: View {
         }
     }
 
-    private func analysisPill(_ title: String, _ value: String, _ color: Color, _ icon: String) -> some View {
-        VStack(spacing: 7) {
-            Image(systemName: icon)
-                .foregroundStyle(color)
-            Text(value)
-                .font(.title3.monospacedDigit().weight(.bold))
-                .foregroundStyle(.white)
-            Text(title)
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(DIRTheme.muted)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 12)
-        .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface2.opacity(0.6)))
-    }
-
-    private func trendCard(_ title: String, _ value: String, _ color: Color) -> some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 3) {
-                Text(title)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(DIRTheme.muted)
-                Text(value.uppercased())
-                    .font(.callout.weight(.bold))
-                    .foregroundStyle(.white)
-            }
-            Spacer()
-            Circle()
-                .fill(color)
-                .frame(width: 10, height: 10)
-        }
-        .padding(12)
-        .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface2.opacity(0.6)))
-    }
-}
-
-private struct AnalysisDepthTrendPreview: View {
-    var body: some View {
-        Canvas { context, size in
-            let gridColor = Color.white.opacity(0.08)
-            for y in stride(from: 0.0, through: size.height, by: 24) {
-                var grid = Path()
-                grid.move(to: CGPoint(x: 0, y: y))
-                grid.addLine(to: CGPoint(x: size.width, y: y))
-                context.stroke(grid, with: .color(gridColor), lineWidth: 1)
-            }
-
-            var path = Path()
-            path.move(to: CGPoint(x: 0, y: size.height * 0.18))
-            path.addCurve(to: CGPoint(x: size.width * 0.26, y: size.height * 0.82), control1: CGPoint(x: 30, y: 18), control2: CGPoint(x: 48, y: size.height * 0.82))
-            path.addLine(to: CGPoint(x: size.width * 0.52, y: size.height * 0.76))
-            path.addCurve(to: CGPoint(x: size.width, y: size.height * 0.2), control1: CGPoint(x: size.width * 0.68, y: size.height * 0.7), control2: CGPoint(x: size.width * 0.78, y: size.height * 0.24))
-            context.stroke(path, with: .color(DIRTheme.cyan), style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
-        }
-        .background(RoundedRectangle(cornerRadius: DIRTheme.compactRadius).fill(.black.opacity(0.22)))
-    }
 }

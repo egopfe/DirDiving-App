@@ -1,17 +1,12 @@
 import SwiftUI
-import UIKit
-import UserNotifications
 
 struct MoreView: View {
     @EnvironmentObject private var watchSync: WatchSyncService
     @EnvironmentObject private var cloudSync: CloudSyncStore
     @EnvironmentObject private var logStore: DiveLogStore
-    @AppStorage("dirdiving_ios_units") private var units = "Metrico (m, °C)"
-    @AppStorage("dirdiving_ios_export_format") private var exportFormat = "Subsurface CSV"
-    @AppStorage("dirdiving_ios_show_onboarding") private var showOnboarding = true
     @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
-    @State private var notificationStatus = "Non verificato"
-    @State private var showResetPairingConfirmation = false
+    @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
+    @State private var showResetPairingConfirm = false
 
     var body: some View {
         NavigationStack {
@@ -20,26 +15,25 @@ struct MoreView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         VStack(alignment: .leading, spacing: 7) {
-                            Text("Settings")
+                            Text(String(localized: "Altro"))
                                 .font(.system(size: 30, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
-                            Text("Sync, cloud backup, units, export and review preferences")
+                            Text(String(localized: "more.header.subtitle"))
                                 .font(.callout)
                                 .foregroundStyle(DIRTheme.muted)
                         }
-                        systemStatus
-                        onboardingCard
-                        DIRCard("PREFERENZE APP", icon: "gearshape.fill", accent: DIRTheme.cyan) {
+                        DIRCard(String(localized: "PREFERENZE APP"), icon: "gearshape.fill", accent: DIRTheme.cyan) {
                             languagePreferencePicker
-                            unitPreferencePicker
-                            lockedPreference("Export predefinito", value: exportFormat, note: "Unico formato disponibile oggi.")
-                            row("Sync impostazioni", "Locale-only")
-                            row("Planner safety", "Disclaimer richiesto")
+                            unitsPreferenceSection
+                            row(String(localized: "more.settings.sync_scope_title"), String(localized: "more.settings.sync_scope_value"))
+                            row(String(localized: "units.title"), String(localized: "more.settings.units_synced"))
+                            row(String(localized: "more.settings.local_only_title"), String(localized: "more.settings.local_only_value"))
+                            row(String(localized: "more.planner_safety.title"), String(localized: "Disclaimer richiesto"))
                             NavigationLink {
                                 IOSLegalSafetyView()
                             } label: {
                                 HStack {
-                                    Label("Legal & Safety", systemImage: "checkmark.shield")
+                                    Label(String(localized: "Legal & Safety"), systemImage: "checkmark.shield")
                                         .foregroundStyle(DIRTheme.cyan)
                                     Spacer()
                                     Image(systemName: "chevron.right")
@@ -50,123 +44,130 @@ struct MoreView: View {
                                 .padding(.vertical, 6)
                             }
                             .buttonStyle(.plain)
-                            infoNote("Le unità convertono la visualizzazione iOS di profondità, temperatura, distanza e SAC. Dati salvati, import/export CSV e planner restano metrici per compatibilità e sicurezza.")
                         }
-                        DIRCard("ALLARMI E NOTIFICHE", icon: "bell.badge", accent: DIRTheme.yellow) {
-                            row("Allarmi immersione", "Gestiti su Apple Watch")
-                            row("Notifiche iOS", "Permessi gestiti da iOS")
-                            row("Stato autorizzazione", notificationStatus)
+                        DIRCard(String(localized: "SYNC WATCH"), icon: "applewatch", accent: DIRTheme.cyan) {
+                            row(String(localized: "more.sync.supported"), watchSync.isSupported ? String(localized: "more.yes") : String(localized: "more.no"))
+                            row(String(localized: "more.sync.state"), watchSync.userVisibleState)
+                            row(String(localized: "more.sync.last_event"), watchSync.lastMessage)
+                            syncActivitySection
+                            WatchPhotoTransferPanel()
                             Button {
-                                openAppSettings()
+                                watchSync.syncUnpushedSessionsToWatch()
                             } label: {
-                                actionLabel("Apri Impostazioni iOS", systemImage: "gearshape")
+                                Label(String(localized: "more.sync.push_to_watch"), systemImage: "arrow.up.applewatch")
+                                    .font(.callout.weight(.semibold))
+                                    .foregroundStyle(DIRTheme.cyan)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                                    .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
                             }
                             .buttonStyle(.plain)
-                            infoNote("TODO: sincronizzare soglie allarmi e haptics Watch quando esiste un contratto settings bidirezionale.")
-                        }
-                        DIRCard("SYNC WATCH", icon: "applewatch", accent: DIRTheme.cyan) {
-                            row("Supportato", watchSync.isSupported ? "Si" : "No")
-                            row("Stato", String(describing: watchSync.activationState))
-                            row("Esito", watchSync.userVisibleState)
-                            row("Peer verificato", WatchSyncAuth.hasPeerSecret() ? "Si" : "No")
-                            row("Ultimo sync", watchSync.lastMessage)
-                            row("Settings Watch", "Non sincronizzati")
-                            if watchSync.activationState == .activated && !WatchSyncAuth.hasPeerSecret() {
-                                emptyState(
-                                    title: "Associazione Watch non verificata",
-                                    message: "La chiave di sync non e ancora stata ricevuta dal Watch. I payload non vengono trattati come attendibili finche l'associazione non e completata.",
-                                    action: "Riprova sincronizzazione"
-                                )
-                            }
-                            if !watchSync.isSupported || watchSync.activationState != .activated {
-                                emptyState(
-                                    title: "Sync Watch non attivo",
-                                    message: "Apri l'app Watch/iPhone e riprova. I log possono arrivare tramite coda quando WatchConnectivity torna disponibile.",
-                                    action: "Riprova Watch Sync"
-                                )
-                            }
-                            row("Import riusciti", "\(watchSync.importedSessionCount)")
-                            row("Import falliti", "\(watchSync.failedImportCount)")
-                            row("Conflitti", "\(watchSync.conflicts.count)")
-                            row("Ultimo evento", watchSync.lastMessage)
-                            ForEach(watchSync.conflicts) { conflict in
-                                conflictRow(conflict)
-                            }
-                            Button {
-                                watchSync.retryActivation(logStore: logStore)
+                            Button(role: .destructive) {
+                                showResetPairingConfirm = true
                             } label: {
-                                actionLabel("Riprova Watch Sync", systemImage: "arrow.triangle.2.circlepath")
+                                Label(String(localized: "more.sync.reset_pairing"), systemImage: "arrow.counterclockwise")
+                                    .font(.callout.weight(.semibold))
+                                    .foregroundStyle(DIRTheme.orange)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                                    .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.orange.opacity(0.8), lineWidth: 1))
                             }
                             .buttonStyle(.plain)
-                            Button {
-                                showResetPairingConfirmation = true
-                            } label: {
-                                destructiveActionLabel("Reset trust / re-pair", systemImage: "lock.rotation")
-                            }
-                            .buttonStyle(.plain)
-                            infoNote("Il reset rimuove solo il peer secret locale attendibile. I payload Watch restano non verificati finche non arriva una nuova associazione sicura; non viene usata alcuna chiave deterministica di fallback.")
                         }
-                        DIRCard("BACKUP CLOUD", icon: "icloud", accent: DIRTheme.green) {
-                            row("iCloud Sync", cloudSync.isICloudAvailable ? "Attivo" : "Non disponibile")
-                            row("Backup automatico", "Log, planner e attrezzatura")
-                            row("Conflitti cloud", "Ultimo salvataggio KVS")
-                            row("Eliminazioni", "Rimozione locale + prossima sync")
-                            row("Ultimo evento", cloudSync.lastSyncStatus)
-                            infoNote("Merge cloud: log locali e iCloud vengono confrontati per ID stabile; se esistono due versioni dello stesso ID viene mantenuta la versione piu completa/recente secondo la policy dell'app. Attrezzatura e planner usano ultimo salvataggio KVS e non hanno ancora risoluzione per-campo.")
-                            if !cloudSync.isICloudAvailable {
-                                emptyState(
-                                    title: "Backup cloud non disponibile",
-                                    message: "Abilita iCloud e verifica il profilo di firma. I dati restano salvati localmente.",
-                                    action: "Controlla iCloud"
-                                )
+                        if !watchSync.conflicts.isEmpty {
+                            syncConflictsCard
+                        }
+                        DIRCard(String(localized: "BACKUP CLOUD"), icon: "icloud", accent: DIRTheme.green) {
+                            row(String(localized: "iCloud Sync"), cloudSync.isICloudAvailable ? String(localized: "more.icloud.active") : String(localized: "more.icloud.unavailable"))
+                            row(String(localized: "Backup automatico"), String(localized: "Log e planner"))
+                            row(String(localized: "Ultimo evento"), cloudSync.lastSyncStatus)
+                            if let cloudDecodeError = cloudSync.lastDecodeError {
+                                Text(cloudDecodeError)
+                                    .font(.caption2.weight(.semibold))
+                                    .foregroundStyle(DIRTheme.orange)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .accessibilityLabel(cloudDecodeError)
                             }
                             Button {
+                                cloudSync.clearDecodeError()
                                 logStore.synchronizeCloud()
                                 cloudSync.synchronize()
                             } label: {
-                                actionLabel("Sincronizza ora", systemImage: "icloud.and.arrow.up")
+                                Label(String(localized: "Sincronizza ora"), systemImage: "icloud.and.arrow.up")
+                                    .font(.callout.weight(.semibold))
+                                    .foregroundStyle(DIRTheme.cyan)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 10)
+                                    .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
                             }
                             .buttonStyle(.plain)
                         }
-                        DIRCard("REVIEWER", icon: "books.vertical", accent: DIRTheme.yellow) {
+                        DIRCard(String(localized: "REVIEWER"), icon: "books.vertical", accent: DIRTheme.yellow) {
                             Toggle(isOn: Binding(
                                 get: { logStore.includeDemoLogbook },
                                 set: { logStore.includeDemoLogbook = $0 }
                             )) {
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text("Logbook dimostrativo")
+                                    Text(String(localized: "Logbook dimostrativo"))
                                         .foregroundStyle(.white)
-                                    Text("Carica 5 immersioni demo per revisione App Store.")
+                                    Text(String(localized: "Carica 5 immersioni demo per revisione App Store."))
                                         .font(.caption2)
                                         .foregroundStyle(DIRTheme.muted)
                                 }
                             }
                             .tint(DIRTheme.cyan)
                         }
-                        DIRCard("EXPORT", icon: "square.and.arrow.up", accent: DIRTheme.cyan) {
-                            row("Formato", exportFormat)
-                            row("Subsurface CSV", "Default")
-                            row("GPX", "Planned")
-                            row("UDDF", "Planned")
-                            row("Bundle", "com.egopfe.dirdiving.ios")
-                            row("Import", "CSV Subsurface da Logbook")
-                            infoNote("Solo Subsurface CSV e disponibile oggi. Altri formati restano Planned/TODO.")
+                        DIRCard(String(localized: "EXPORT"), icon: "square.and.arrow.up", accent: DIRTheme.cyan) {
+                            row(String(localized: "Subsurface"), "CSV")
+                            row(String(localized: "Bundle"), "com.egopfe.dirdiving.ios")
+                            CSVImportPanel()
                         }
-                        DIRWarningBox(text: "DIR DIVING non e un computer subacqueo certificato: usa log, planner e analisi come supporto informativo.")
+                        DIRWarningBox(
+                            text: String(localized: "DIR DIVING e uno strumento di supporto per logbook, analisi e pianificazione preliminare. Non sostituisce formazione, procedure del dive center, equipaggiamento certificato o il giudizio umano. L'app non e un computer subacqueo certificato salvo esplicita omologazione futura. Output del planner indicativi: verificarli con strumenti certificati. GPS utile in superficie; sott'acqua e in copertura e inaffidabile o assente.")
+                        )
                     }
                     .padding(16)
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
-            .onAppear { refreshNotificationStatus() }
-            .confirmationDialog("Resettare trust Watch?", isPresented: $showResetPairingConfirmation, titleVisibility: .visible) {
-                Button("Reset trust e nuova associazione", role: .destructive) {
+            .alert(String(localized: "more.sync.reset_pairing"), isPresented: $showResetPairingConfirm) {
+                Button(String(localized: "Cancel"), role: .cancel) {}
+                Button(String(localized: "more.sync.reset_pairing_confirm"), role: .destructive) {
                     watchSync.resetPairingTrust(logStore: logStore)
                 }
-                Button("Annulla", role: .cancel) {}
             } message: {
-                Text("La chiave peer verificata viene rimossa da questo iPhone. I nuovi payload saranno considerati non verificati finche Watch e iPhone non scambiano una nuova chiave attendibile.")
+                Text(String(localized: "more.sync.reset_pairing_message"))
             }
+        }
+    }
+
+    private var unitsPreferenceSection: some View {
+        let preference = IOSUnitPreference.fromStorage(units)
+
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(String(localized: "units.title"))
+                    .foregroundStyle(DIRTheme.muted)
+                Spacer()
+                Text(preference.shortLabel)
+                    .foregroundStyle(.white)
+                    .fontWeight(.semibold)
+            }
+            .font(.callout)
+            Picker(String(localized: "units.title"), selection: $units) {
+                ForEach(IOSUnitPreference.allCases) { option in
+                    Text(option.shortLabel).tag(option.rawValue)
+                }
+            }
+            .pickerStyle(.segmented)
+            Text(String(localized: "settings.units.sync_note"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.vertical, 5)
+        .onChange(of: units) { _, newValue in
+            watchSync.pushUnitsPreference(newValue)
         }
     }
 
@@ -175,7 +176,7 @@ struct MoreView: View {
 
         return VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Lingua")
+                Text(String(localized: "Lingua"))
                     .foregroundStyle(DIRTheme.muted)
                 Spacer()
                 Text(selectedLanguage.title)
@@ -192,7 +193,7 @@ struct MoreView: View {
             Text(selectedLanguage.companionDetail)
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.yellow)
-            Text("Changing language does not change units, calculations or saved data.")
+            Text(String(localized: "more.language.units_disclaimer"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
@@ -200,73 +201,71 @@ struct MoreView: View {
         .padding(.vertical, 5)
     }
 
-    private var systemStatus: some View {
-        HStack(spacing: 12) {
-            statusPill("WATCH", watchSync.isSupported ? DIRTheme.green : DIRTheme.orange)
-            statusPill("CLOUD", cloudSync.isICloudAvailable ? DIRTheme.green : DIRTheme.yellow)
-            statusPill("EXPORT", DIRTheme.cyan)
-        }
-    }
-
-    private var onboardingCard: some View {
-        DIRCard("ONBOARDING", icon: "questionmark.circle", accent: DIRTheme.yellow) {
-            Toggle("Mostra note operative", isOn: $showOnboarding)
-                .foregroundStyle(.white)
-                .tint(DIRTheme.cyan)
-            if showOnboarding {
+    private var syncConflictsCard: some View {
+        DIRCard(String(localized: "more.sync.conflicts_title"), icon: "arrow.triangle.merge", accent: DIRTheme.orange) {
+            ForEach(watchSync.conflicts) { conflict in
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Depth entitlement: i dati profondità arrivano dal Watch quando il profilo firmato abilita i sensori.")
-                    Text("GPS: entry/exit sono surface-only; nessun tracking subacqueo.")
-                    Text("Sync: se il Watch non e raggiungibile, i log arrivano tramite coda WatchConnectivity.")
-                    Text("Export: apri un dettaglio immersione e genera il CSV Subsurface.")
+                    Text(conflict.localSummary)
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(.white)
+                    Text(String(format: String(localized: "more.sync.conflict_incoming"), Formatters.one(conflict.incoming.maxDepthMeters), Formatters.time(conflict.incoming.durationSeconds)))
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.muted)
+                    HStack(spacing: 8) {
+                        Button {
+                            watchSync.resolveConflictUsingIncoming(conflict)
+                        } label: {
+                            Text(String(localized: "more.sync.use_watch"))
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(DIRTheme.cyan)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                                .background(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan, lineWidth: 1))
+                        }
+                        .buttonStyle(.plain)
+                        Button {
+                            watchSync.resolveConflictKeepingLocal(conflict)
+                        } label: {
+                            Text(String(localized: "more.sync.keep_local"))
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(DIRTheme.yellow)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                                .background(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.yellow, lineWidth: 1))
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
-                .font(.footnote)
-                .foregroundStyle(DIRTheme.muted)
+                .padding(.vertical, 4)
+                if conflict.id != watchSync.conflicts.last?.id {
+                    Divider().overlay(DIRTheme.hairline)
+                }
             }
         }
     }
 
-    private var unitPreferencePicker: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("Unità")
+    @ViewBuilder
+    private var syncActivitySection: some View {
+        if !watchSync.recentActivity.isEmpty {
+            Divider().overlay(DIRTheme.hairline)
+            VStack(alignment: .leading, spacing: 8) {
+                Text(String(localized: "sync.activity.section_title"))
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(DIRTheme.muted)
-                Spacer()
-                Text(IOSUnitPreference.fromStorage(units).shortLabel)
-                    .foregroundStyle(.white)
-                    .fontWeight(.semibold)
-            }
-            .font(.callout)
-            Picker("Unità", selection: $units) {
-                ForEach(IOSUnitPreference.allCases) { preference in
-                    Text(preference.shortLabel).tag(preference.rawValue)
+                ForEach(Array(watchSync.recentActivity.prefix(4))) { activity in
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(activity.title)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.white)
+                        Text(activity.detail)
+                            .font(.caption2)
+                            .foregroundStyle(DIRTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.vertical, 2)
                 }
             }
-            .pickerStyle(.segmented)
-            Text("Persistita localmente; non sincronizzata con Apple Watch.")
-                .font(.caption2)
-                .foregroundStyle(DIRTheme.yellow)
         }
-        .padding(.vertical, 5)
-    }
-
-    private func statusPill(_ text: String, _ color: Color) -> some View {
-        HStack(spacing: 7) {
-            Circle()
-                .fill(color)
-                .frame(width: 8, height: 8)
-                .shadow(color: color.opacity(0.45), radius: 5, x: 0, y: 0)
-            Text(text)
-                .font(.caption.weight(.bold))
-        }
-        .foregroundStyle(color)
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 11)
-        .background(
-            RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
-                .fill(color.opacity(0.10))
-                .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(color.opacity(0.32), lineWidth: 1))
-        )
     }
 
     private func row(_ title: String, _ value: String) -> some View {
@@ -274,131 +273,9 @@ struct MoreView: View {
             Text(title).foregroundStyle(DIRTheme.muted)
             Spacer()
             Text(value).foregroundStyle(.white)
+                .multilineTextAlignment(.trailing)
         }
         .font(.callout)
         .padding(.vertical, 4)
-    }
-
-    private func lockedPreference(_ title: String, value: String, note: String) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text(title)
-                    .foregroundStyle(DIRTheme.muted)
-                Spacer()
-                Text(value)
-                    .foregroundStyle(.white)
-                    .fontWeight(.semibold)
-            }
-            .font(.callout)
-            Text(note)
-                .font(.caption2)
-                .foregroundStyle(DIRTheme.yellow)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(.vertical, 5)
-    }
-
-    private func infoNote(_ text: String) -> some View {
-        Text(text)
-            .font(.caption)
-            .foregroundStyle(DIRTheme.muted)
-            .fixedSize(horizontal: false, vertical: true)
-            .padding(10)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface2.opacity(0.56)))
-    }
-
-    private func emptyState(title: String, message: String, action: String) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(title)
-                .font(.callout.weight(.bold))
-                .foregroundStyle(.white)
-            Text(message)
-                .font(.caption)
-                .foregroundStyle(DIRTheme.muted)
-                .fixedSize(horizontal: false, vertical: true)
-            Text("Stato: \(action)")
-                .font(.caption2.weight(.bold))
-                .foregroundStyle(DIRTheme.yellow)
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(DIRTheme.cyan.opacity(0.08))
-                .overlay(RoundedRectangle(cornerRadius: 10).stroke(DIRTheme.cyan.opacity(0.32), lineWidth: 1))
-        )
-    }
-
-    private func actionLabel(_ title: String, systemImage: String) -> some View {
-        Label(title, systemImage: systemImage)
-            .font(.callout.weight(.semibold))
-            .foregroundStyle(DIRTheme.cyan)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 10)
-            .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
-    }
-
-    private func destructiveActionLabel(_ title: String, systemImage: String) -> some View {
-        Label(title, systemImage: systemImage)
-            .font(.callout.weight(.semibold))
-            .foregroundStyle(DIRTheme.red)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 10)
-            .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.red.opacity(0.78), lineWidth: 1))
-    }
-
-    private func openAppSettings() {
-        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
-        UIApplication.shared.open(url)
-    }
-
-    private func refreshNotificationStatus() {
-        UNUserNotificationCenter.current().getNotificationSettings { settings in
-            let status: String
-            switch settings.authorizationStatus {
-            case .authorized:
-                status = "Authorized"
-            case .denied:
-                status = "Denied"
-            case .notDetermined:
-                status = "Not determined"
-            case .provisional:
-                status = "Provisional"
-            case .ephemeral:
-                status = "Ephemeral"
-            @unknown default:
-                status = "Sconosciuto"
-            }
-            Task { @MainActor in notificationStatus = status }
-        }
-    }
-
-    private func conflictRow(_ conflict: WatchSyncService.SyncConflict) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text("Conflitto \(conflict.incoming.startDate.formatted(.dateTime.day().month().hour().minute()))")
-                    .font(.callout.weight(.semibold))
-                    .foregroundStyle(.white)
-                Spacer()
-                Text("REVIEW")
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(DIRTheme.yellow)
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 3)
-                    .background(Capsule().stroke(DIRTheme.yellow.opacity(0.72), lineWidth: 1))
-            }
-            Text("Locale: \(conflict.localSummary) | Watch: \(Formatters.depth(conflict.incoming.maxDepthMeters, units: IOSUnitPreference.fromStorage(units)).text) / \(Formatters.time(conflict.incoming.durationSeconds))")
-                .font(.caption)
-                .foregroundStyle(DIRTheme.muted)
-                .fixedSize(horizontal: false, vertical: true)
-            HStack(spacing: 8) {
-                Button("Mantieni locale") { watchSync.resolveConflictKeepingLocal(conflict) }
-                Button("Usa Watch") { watchSync.resolveConflictUsingIncoming(conflict) }
-            }
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(DIRTheme.cyan)
-        }
-        .padding(.vertical, 7)
     }
 }

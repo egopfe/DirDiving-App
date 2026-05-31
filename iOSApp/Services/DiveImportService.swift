@@ -43,8 +43,13 @@ enum DiveImportService {
 
         let rows = parseCSV(contents)
         guard let header = rows.first else { return .failure(.emptyProfile) }
+        guard rows.count <= IOSAlgorithmConfiguration.maximumImportRows + 1 else {
+            return .failure(.invalidRows(rows.count - 1))
+        }
 
-        func index(_ name: String) -> Int? { header.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.firstIndex(of: name) }
+        func index(_ name: String) -> Int? {
+            header.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.firstIndex(of: name)
+        }
         guard
             let timeIndex = index("time_seconds"),
             let depthIndex = index("depth_m"),
@@ -64,61 +69,97 @@ enum DiveImportService {
             guard row.contains(where: { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) else { continue }
             guard row.count > max(timeIndex, depthIndex, tempIndex),
                   let seconds = TimeInterval(row[timeIndex]),
+                  seconds.isFinite,
                   seconds >= 0,
+                  seconds <= IOSAlgorithmConfiguration.maximumImportDurationSeconds,
                   let depth = Double(row[depthIndex]),
-                  depth >= 0 else {
+                  depth.isFinite,
+                  depth >= 0,
+                  depth <= IOSAlgorithmConfiguration.maximumImportDepthMeters else {
                 invalidRowCount += 1
                 continue
             }
+
             let temperature: Double?
             if row[tempIndex].isEmpty {
                 temperature = nil
-            } else if let parsedTemperature = Double(row[tempIndex]) {
-                temperature = parsedTemperature
+            } else if let parsedTemperature = Double(row[tempIndex]),
+                      let validTemperature = DiveProfileMath.sanitizedTemperatureCelsius(parsedTemperature) {
+                temperature = validTemperature
             } else {
                 invalidRowCount += 1
                 continue
             }
-            samples.append(DiveSample(timestamp: start.addingTimeInterval(seconds), depthMeters: max(0, depth), temperatureCelsius: temperature))
+
+            samples.append(
+                DiveSample(
+                    timestamp: start.addingTimeInterval(seconds),
+                    depthMeters: depth,
+                    temperatureCelsius: temperature
+                )
+            )
 
             if entryGPS == nil,
                let latIndex = index("entry_lat"), let lonIndex = index("entry_lon"),
                row.count > max(latIndex, lonIndex),
-               let lat = Double(row[latIndex]), let lon = Double(row[lonIndex]) {
-                entryGPS = GPSPoint(latitude: lat, longitude: lon, horizontalAccuracy: -1, timestamp: start)
+               let lat = Double(row[latIndex]), let lon = Double(row[lonIndex]),
+               isValidCoordinate(latitude: lat, longitude: lon) {
+                entryGPS = GPSPoint(
+                    latitude: lat,
+                    longitude: lon,
+                    horizontalAccuracy: IOSAlgorithmConfiguration.importedGPSUnknownAccuracyMeters,
+                    timestamp: start
+                )
             }
             if exitGPS == nil,
                let latIndex = index("exit_lat"), let lonIndex = index("exit_lon"),
                row.count > max(latIndex, lonIndex),
-               let lat = Double(row[latIndex]), let lon = Double(row[lonIndex]) {
-                exitGPS = GPSPoint(latitude: lat, longitude: lon, horizontalAccuracy: -1, timestamp: start.addingTimeInterval(seconds))
+               let lat = Double(row[latIndex]), let lon = Double(row[lonIndex]),
+               isValidCoordinate(latitude: lat, longitude: lon) {
+                exitGPS = GPSPoint(
+                    latitude: lat,
+                    longitude: lon,
+                    horizontalAccuracy: IOSAlgorithmConfiguration.importedGPSUnknownAccuracyMeters,
+                    timestamp: start.addingTimeInterval(seconds)
+                )
             }
         }
 
-        guard !samples.isEmpty else { return .failure(.emptyProfile) }
-        let end = samples.last?.timestamp ?? start
-        let depths = samples.map(\.depthMeters)
-        let temps = samples.compactMap(\.temperatureCelsius)
-        let avgDepth = depths.reduce(0, +) / Double(depths.count)
+        let orderedSamples = DiveProfileMath.sanitizedSamples(samples, maxDepthMeters: IOSAlgorithmConfiguration.maximumImportDepthMeters)
+        guard !orderedSamples.isEmpty else { return .failure(.emptyProfile) }
+        let metrics = DiveProfileMath.derivedMetrics(
+            samples: orderedSamples,
+            fallbackStart: start,
+            fallbackEnd: orderedSamples.last?.timestamp ?? start
+        )
         let session = DiveSession(
             id: importID(contents: contents),
-            startDate: start,
-            endDate: end,
-            durationSeconds: end.timeIntervalSince(start),
-            maxDepthMeters: depths.max() ?? 0,
-            avgDepthMeters: avgDepth,
-            avgWaterTemperatureCelsius: temps.isEmpty ? nil : temps.reduce(0, +) / Double(temps.count),
-            ttv: avgDepth + end.timeIntervalSince(start) / 60,
+            startDate: metrics.startDate,
+            endDate: metrics.endDate,
+            durationSeconds: metrics.durationSeconds,
+            maxDepthMeters: metrics.maxDepthMeters,
+            avgDepthMeters: metrics.avgDepthMeters,
+            avgWaterTemperatureCelsius: metrics.avgWaterTemperatureCelsius,
+            minWaterTemperatureCelsius: metrics.minWaterTemperatureCelsius,
+            maxWaterTemperatureCelsius: metrics.maxWaterTemperatureCelsius,
+            ttv: metrics.ttv,
             entryGPS: entryGPS,
             exitGPS: exitGPS,
-            entryGPSFixSource: entryGPS == nil ? .noFix : .fix,
-            exitGPSFixSource: exitGPS == nil ? .noFix : .fix,
-            samples: samples,
+            entryGPSFixSource: entryGPS == nil ? .noFix : .fallback,
+            exitGPSFixSource: exitGPS == nil ? .noFix : .fallback,
+            samples: metrics.samples,
             siteName: url.deletingPathExtension().lastPathComponent,
-            notes: "Imported CSV · source date preserved when present, otherwise file date fallback",
-            gasLabel: .oc
+            notes: "Imported CSV - source date preserved when present, otherwise file date fallback",
+            gasLabel: .oc,
+            exceededSupportedDepthRange: metrics.exceededSupportedDepthRange
         )
-        return .success(ImportSummary(session: session, skippedMalformedCount: invalidRowCount, sourceDatePreserved: sourceDate.preserved))
+        return .success(
+            ImportSummary(
+                session: session,
+                skippedMalformedCount: invalidRowCount,
+                sourceDatePreserved: sourceDate.preserved
+            )
+        )
     }
 
     private static func parseCSV(_ contents: String) -> [[String]] {
@@ -220,5 +261,9 @@ enum DiveImportService {
             digest[8], digest[9],
             digest[10], digest[11], digest[12], digest[13], digest[14], digest[15]
         ))
+    }
+
+    private static func isValidCoordinate(latitude: Double, longitude: Double) -> Bool {
+        latitude.isFinite && longitude.isFinite && (-90...90).contains(latitude) && (-180...180).contains(longitude)
     }
 }

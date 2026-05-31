@@ -19,18 +19,25 @@ final class DiveLogStore: ObservableObject {
 
     private let cloudSync: CloudSyncStore?
     private let key = "dirdiving_ios_dive_sessions"
-    private let tombstoneKey = "dirdiving_ios_deleted_dive_session_ids"
+    private let deletedKey = WatchSyncKeys.deletedSessionIDsKey
+    private let legacyDeletedKeys = [
+        "dirdiving_ios_deleted_session_ids",
+        "dirdiving_watch_deleted_session_ids"
+    ]
     private var deletedSessionIDs: Set<UUID> = []
     private var isReady = false
+    private weak var watchSync: WatchSyncService?
 
     init(cloudSync: CloudSyncStore? = nil) {
         self.cloudSync = cloudSync
         includeDemoLogbook = UserDefaults.standard.bool(forKey: Self.includeDemoLogbookKey)
         deletedSessionIDs = loadDeletedSessionIDs()
         let localSessions = loadLocalSessions()
-        let cloudSessions = cloudSync?.loadCloud([DiveSession].self, forKey: key)
-        sessions = mergedSessions(local: localSessions, cloud: cloudSessions)
-            .sorted { $0.startDate > $1.startDate }
+        let cloudSessions = cloudSync?.load([DiveSession].self, forKey: key)
+        sessions = DiveProfileMath.trimToLogLimit(
+            mergedSessions(local: localSessions, cloud: cloudSessions)
+                .filter { !deletedSessionIDs.contains($0.id) }
+        )
 
         if includeDemoLogbook, sessions.filter({ !$0.isDemoDive }).isEmpty {
             insertDemoDives()
@@ -48,22 +55,35 @@ final class DiveLogStore: ObservableObject {
         }
     }
 
+    func attachWatchSync(_ service: WatchSyncService) {
+        watchSync = service
+    }
+
+    func applyRemoteDeletedSessionIDs(_ ids: Set<UUID>) {
+        guard !ids.isEmpty else { return }
+        deletedSessionIDs.formUnion(ids)
+        sessions.removeAll { deletedSessionIDs.contains($0.id) }
+        saveIfReady()
+    }
+
     func reloadFromCloud() {
         guard isReady else { return }
-        deletedSessionIDs = loadDeletedSessionIDs()
         let localSessions = loadLocalSessions()
-        let cloudSessions = cloudSync?.loadCloud([DiveSession].self, forKey: key)
-        sessions = mergedSessions(local: localSessions, cloud: cloudSessions)
-            .sorted { $0.startDate > $1.startDate }
+        deletedSessionIDs = loadDeletedSessionIDs()
+        let cloudSessions = cloudSync?.load([DiveSession].self, forKey: key)
+        sessions = DiveProfileMath.trimToLogLimit(
+            mergedSessions(local: localSessions, cloud: cloudSessions)
+                .filter { !deletedSessionIDs.contains($0.id) }
+        )
         applyDemoLogbookPreference()
     }
 
     func add(_ session: DiveSession) {
-        deletedSessionIDs.remove(session.id)
-        saveDeletedSessionIDs()
-        sessions.removeAll { $0.id == session.id }
-        sessions.insert(session, at: 0)
-        sessions = sessions.sorted { $0.startDate > $1.startDate }
+        let normalizedSession = DiveSessionMerge.preferred(session, session)
+        guard !deletedSessionIDs.contains(normalizedSession.id) else { return }
+        sessions.removeAll { $0.id == normalizedSession.id }
+        sessions.insert(normalizedSession, at: 0)
+        sessions = DiveProfileMath.trimToLogLimit(sessions)
     }
 
     func session(id: UUID) -> DiveSession? {
@@ -72,16 +92,22 @@ final class DiveLogStore: ObservableObject {
 
     func delete(id: UUID) {
         deletedSessionIDs.insert(id)
-        saveDeletedSessionIDs()
         sessions.removeAll { $0.id == id }
+        saveIfReady()
+        watchSync?.publishDeletedSessionIDs([id])
     }
 
     func delete(at offsets: IndexSet) {
+        var removed: Set<UUID> = []
         for index in offsets.sorted(by: >) {
+            removed.insert(sessions[index].id)
             deletedSessionIDs.insert(sessions[index].id)
             sessions.remove(at: index)
         }
-        saveDeletedSessionIDs()
+        saveIfReady()
+        if !removed.isEmpty {
+            watchSync?.publishDeletedSessionIDs(removed)
+        }
     }
 
     func synchronizeCloud() {
@@ -90,55 +116,50 @@ final class DiveLogStore: ObservableObject {
     }
 
     private func loadLocalSessions() -> [DiveSession] {
-        if let local = cloudSync?.loadLocal([DiveSession].self, forKey: key) {
-            return local
-        }
-        guard let data = UserDefaults.standard.data(forKey: key) else { return [] }
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        return (try? decoder.decode([DiveSession].self, from: data)) ?? []
+        cloudSync?.load([DiveSession].self, forKey: key) ?? []
     }
 
     private func mergedSessions(local: [DiveSession], cloud: [DiveSession]?) -> [DiveSession] {
         var byID: [UUID: DiveSession] = [:]
         for session in local {
-            byID[session.id] = session
+            byID[session.id] = DiveSessionMerge.preferred(session, session)
         }
         if let cloud {
             for session in cloud {
                 if let existing = byID[session.id] {
                     byID[session.id] = DiveSessionMerge.preferred(existing, session)
                 } else {
-                    byID[session.id] = session
+                    byID[session.id] = DiveSessionMerge.preferred(session, session)
                 }
             }
         }
-        return Array(byID.values).filter { !deletedSessionIDs.contains($0.id) }
+        return Array(byID.values)
+    }
+
+    private func loadDeletedSessionIDs() -> Set<UUID> {
+        var merged = Set<UUID>()
+        for legacyKey in legacyDeletedKeys {
+            if let legacy = cloudSync?.load([UUID].self, forKey: legacyKey) {
+                merged.formUnion(legacy)
+            }
+            if let data = UserDefaults.standard.data(forKey: legacyKey),
+               let decoded = try? JSONDecoder().decode([UUID].self, from: data) {
+                merged.formUnion(decoded)
+            }
+        }
+        if let shared = cloudSync?.load([UUID].self, forKey: deletedKey) {
+            merged.formUnion(shared)
+        }
+        if !merged.isEmpty {
+            cloudSync?.save(Array(merged), forKey: deletedKey)
+        }
+        return merged
     }
 
     private func saveIfReady() {
         guard isReady else { return }
         cloudSync?.save(sessions, forKey: key)
-        saveDeletedSessionIDs()
-    }
-
-    private func loadDeletedSessionIDs() -> Set<UUID> {
-        let cloudIDs = cloudSync?.loadCloud([UUID].self, forKey: tombstoneKey) ?? []
-        let localIDs: [UUID]
-        if let decoded = cloudSync?.loadLocal([UUID].self, forKey: tombstoneKey) {
-            localIDs = decoded
-        } else {
-            localIDs = (try? JSONDecoder().decode([UUID].self, from: UserDefaults.standard.data(forKey: tombstoneKey) ?? Data())) ?? []
-        }
-        return Set(cloudIDs + localIDs)
-    }
-
-    private func saveDeletedSessionIDs() {
-        let ids = Array(deletedSessionIDs)
-        if let data = try? JSONEncoder().encode(ids) {
-            UserDefaults.standard.set(data, forKey: tombstoneKey)
-        }
-        cloudSync?.save(ids, forKey: tombstoneKey)
+        cloudSync?.save(Array(deletedSessionIDs), forKey: deletedKey)
     }
 
     private func applyDemoLogbookPreference() {
@@ -183,16 +204,22 @@ final class DiveLogStore: ObservableObject {
                     temperatureCelsius: 24 - Double(idx)
                 )
             }
-            let avg = samples.map(\.depthMeters).reduce(0, +) / Double(samples.count)
+            let metrics = DiveProfileMath.derivedMetrics(
+                samples: samples,
+                fallbackStart: start,
+                fallbackEnd: start.addingTimeInterval(duration)
+            )
             return DiveSession(
                 id: demoID,
-                startDate: start,
-                endDate: start.addingTimeInterval(duration),
-                durationSeconds: duration,
-                maxDepthMeters: samples.map(\.depthMeters).max() ?? maxDepth,
-                avgDepthMeters: avg,
-                avgWaterTemperatureCelsius: 24 - Double(idx),
-                ttv: idx == 0 ? 24 : avg + duration / 60,
+                startDate: metrics.startDate,
+                endDate: metrics.endDate,
+                durationSeconds: metrics.durationSeconds,
+                maxDepthMeters: metrics.maxDepthMeters,
+                avgDepthMeters: metrics.avgDepthMeters,
+                avgWaterTemperatureCelsius: metrics.avgWaterTemperatureCelsius,
+                minWaterTemperatureCelsius: metrics.minWaterTemperatureCelsius,
+                maxWaterTemperatureCelsius: metrics.maxWaterTemperatureCelsius,
+                ttv: metrics.ttv,
                 entryGPS: GPSPoint(latitude: 38.1157 + Double(idx) * 0.001, longitude: 13.3615, horizontalAccuracy: 15, timestamp: start),
                 exitGPS: GPSPoint(latitude: 38.1162 + Double(idx) * 0.001, longitude: 13.3620, horizontalAccuracy: 18, timestamp: start.addingTimeInterval(duration)),
                 samples: samples,
@@ -201,8 +228,10 @@ final class DiveLogStore: ObservableObject {
                 notes: DiveSession.demoNotesLabel,
                 gasLabel: gases[idx],
                 sacLitersMinute: 18.2 + Double(idx),
-                isDemo: true
+                isDemo: true,
+                exceededSupportedDepthRange: metrics.exceededSupportedDepthRange
             )
         }
+        sessions = DiveProfileMath.trimToLogLimit(sessions)
     }
 }
