@@ -96,4 +96,45 @@ PR #8 / #9: unchanged — not safe-to-merge automatically (see `PR_STATUS_202605
 
 1. Execute external validation and append results to completion report
 2. Run physical a11y QA and check off `RELEASE_CHECKLIST.md`
-3. Refresh `DIR_DIVING_FINAL_IMPLEMENTATION_AND_READINESS_REPORT.md` HEAD to `dae29b8` when Phase 16 sign-off is requested
+3. Refresh `DIR_DIVING_FINAL_IMPLEMENTATION_AND_READINESS_REPORT.md` HEAD to `1d69d88` when Phase 16 sign-off is requested
+
+---
+
+## Part 2 — iOS MAIN readiness 100% documentation pass (@ `dce89e7` / `1d69d88`)
+
+**Trigger:** Runtime remediation committed @ `dce89e7`; CI fix @ `1d69d88`. Prior Part 1 covered CNS/OTU @ `dae29b8`.
+
+### Files created
+
+| File | Purpose |
+|------|---------|
+| `Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md` | Final readiness report (already in repo from runtime commit) |
+| `Docs/SUBSURFACE_CSV_ROUNDTRIP.md` | CSV metadata round-trip spec + QA |
+| `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260531.md` | Branch + PR sync state |
+| `Docs/PR_STATUS_20260531.md` | Open PR #8/#9/#10 status |
+
+### Files updated (this pass)
+
+| File | Change |
+|------|--------|
+| `README.md` | Baseline `1d69d88`; readiness 100% row; 154 tests |
+| `CHANGELOG.md` | Unreleased entries for `dce89e7`, `1d69d88` |
+| `Docs/INDEX.md` | § readiness 100% @ `dce89e7` |
+| `Docs/DIR_DIVING_IOS_PLANNER_LIMITATIONS.md` | Pressure, planning depth, cloud, CSV, incomplete calc, OTU progressive recovery |
+| `Docs/iOS/SUBSURFACE_EXPORT.md` | `# session_meta` block |
+| `Docs/BUILD_VALIDATION.md` | Local validation @ `1d69d88`, 154 tests |
+| `Docs/TESTFLIGHT_REVIEW_NOTES.md` | Baseline + QA items for new behaviours |
+| `Docs/ROADMAP.md` | Released row readiness 100% |
+| `Docs/PRODUCT_FEATURES_IT.md` | Baseline + planner features |
+| `Docs/DIR_DIVING_Feature_Comparison.csv` | New rows B2–B5 fixes |
+| `Docs/IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md` | Post-remediation status note |
+
+### Test count
+
+| Before | After |
+|--------|-------|
+| 119 iOS algorithm XCTest | **154** executed, **1 skipped**, **0 failures** (local iPhone 17 sim) |
+
+### Branch sync
+
+All active branches merged/pushed through `1d69d88`: `main`, `main-iOS`, `codex/experimental-features`, `codex/ios-experimental-features`, `codex/watch-main-algorithm-audit-current`.

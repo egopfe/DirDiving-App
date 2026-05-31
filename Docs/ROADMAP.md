@@ -1,6 +1,6 @@
 # Roadmap DIR DIVING
 
-**Aggiornato:** 2026-05-31 (`main` = `origin/main` @ `dae29b8`)
+**Aggiornato:** 2026-05-31 (`main` = `origin/main` @ `1d69d88`)
 
 ## Rilasciati su `main` (Watch MAIN + iOS nel workspace)
 
@@ -55,7 +55,7 @@
 | iOS Buhlmann ZHL-16C multigas engine | ✅ | Motore reference iOS-only con N2+He, GF, NDL tissue-state e soste generate; non certificato, da validare esternamente |
 | iOS Buhlmann re-audit 2026-05-28 | ✅ | P1–P3 risolti @ `69e69b2` — [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) |
 | iOS Buhlmann UX/UI readiness | ✅ | Fix @ `3237262`; re-audit **Ready** — [`Docs/DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md) |
-| iOS comprehensive NOAA CNS/OTU | ✅ | @ `dae29b8` — single/daily CNS, recovery, REPEX OTU, snapshot v2; **119/119** XCTest |
+| iOS MAIN algorithmic readiness 100% | ✅ | @ `dce89e7` — audit B2–B5; [`Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md); **154** XCTest |
 | iOS Bühlmann readiness P1–P4 | ✅ | @ `dae29b8` — [`Docs/DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md`](DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md) |
 | Docs alignment 2026-05-31 | ✅ | [`DOCUMENTATION_UPDATE_REPORT_20260531.md`](DOCUMENTATION_UPDATE_REPORT_20260531.md) |
 | Docs Phase 15 alignment | ✅ | [`DOCUMENTATION_BRANCH_ALIGNMENT_20260530.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260530.md) |
