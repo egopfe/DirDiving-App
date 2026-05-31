@@ -74,6 +74,9 @@ struct DiveLiveView: View {
             }
         }
         .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.18) : nil, value: dive.redWarningBlink)
+        .onChange(of: hapticsEnabled) { _, _ in
+            dive.resyncHapticsAfterPreferenceChange()
+        }
         .confirmationDialog(String(localized: "live.stopwatch.reset.confirm.title"), isPresented: $showResetStopwatchConfirmation, titleVisibility: .visible) {
             Button(String(localized: "live.stopwatch.reset.confirm.action"), role: .destructive) {
                 dive.resetStopwatch()
@@ -138,17 +141,24 @@ struct DiveLiveView: View {
     }
 
     private func gpsConfirmationIcon(_ confirmation: DiveGPSConfirmation) -> String {
-        switch confirmation {
-        case .start(_, let fallback), .end(_, let fallback):
-            return fallback ? "location.fill.viewfinder" : "checkmark.circle.fill"
+        switch confirmation.presentation {
+        case .fix: return "checkmark.circle.fill"
+        case .fallback: return "location.fill.viewfinder"
+        case .noFix: return "location.slash.fill"
         }
     }
 
     private func gpsConfirmationTitle(_ confirmation: DiveGPSConfirmation) -> String {
-        switch confirmation {
-        case .start: return String(localized: "gps.banner.start.title")
-        case .end: return String(localized: "gps.banner.end.title")
+        let key: String
+        switch (confirmation.isStart, confirmation.presentation) {
+        case (true, .fix): key = "gps.banner.start.fix.title"
+        case (true, .fallback): key = "gps.banner.start.fallback.title"
+        case (true, .noFix): key = "gps.banner.start.nofix.title"
+        case (false, .fix): key = "gps.banner.end.fix.title"
+        case (false, .fallback): key = "gps.banner.end.fallback.title"
+        case (false, .noFix): key = "gps.banner.end.nofix.title"
         }
+        return String(localized: String.LocalizationValue(key))
     }
 
     private func gpsConfirmationDetail(_ confirmation: DiveGPSConfirmation) -> String {
@@ -162,10 +172,56 @@ struct DiveLiveView: View {
     }
 
     private func gpsConfirmationColor(_ confirmation: DiveGPSConfirmation) -> Color {
-        switch confirmation {
-        case .start(_, let fallback), .end(_, let fallback):
-            return fallback ? DiveUI.yellow : DiveUI.green
+        switch confirmation.presentation {
+        case .fix: return DiveUI.green
+        case .fallback: return DiveUI.yellow
+        case .noFix: return DiveUI.red
         }
+    }
+
+    private var depthStaleBanner: some View {
+        inlineStatusBanner(
+            systemImage: "waveform.path.ecg.rectangle",
+            title: String(localized: "live.depth.stale.title"),
+            detail: dive.depthDataUsesLastKnownReading
+                ? String(localized: "live.depth.stale.last_known")
+                : String(localized: "live.depth.stale.body"),
+            color: DiveUI.yellow
+        )
+    }
+
+    private var manualNoDepthBanner: some View {
+        inlineStatusBanner(
+            systemImage: "hand.tap.fill",
+            title: String(localized: "live.manual.nodepth.title"),
+            detail: String(localized: "live.manual.nodepth.body"),
+            color: DiveUI.cyan
+        )
+    }
+
+    private func inlineStatusBanner(systemImage: String, title: String, detail: String, color: Color) -> some View {
+        HStack(spacing: 7) {
+            Image(systemName: systemImage)
+                .font(.system(size: 14, weight: .black))
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title)
+                    .font(.system(size: 10, weight: .black, design: .rounded))
+                Text(detail)
+                    .font(.system(size: 9, weight: .semibold, design: .rounded))
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.66)
+            }
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(color)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(color.opacity(0.11))
+                .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).stroke(color.opacity(0.72), lineWidth: 1))
+        )
     }
 
     private func activeDiveContent(leftWidth: CGFloat, gaugeWidth: CGFloat) -> some View {
@@ -185,9 +241,17 @@ struct DiveLiveView: View {
             if showAscentAlarmBanner {
                 AscentWarningBannerView(
                     rateMetersPerMinute: dive.ascentStatus.currentRateMetersPerMinute,
-                    isActive: true
+                    isActive: true,
+                    units: unitPreference
                 )
                 .transition(activeDiveTransition)
+            }
+            if dive.isDepthDataStale {
+                depthStaleBanner
+                    .transition(activeDiveTransition)
+            } else if dive.isManualNoDepthSession {
+                manualNoDepthBanner
+                    .transition(activeDiveTransition)
             }
             if depthSafetyState != .normal {
                 DepthSafetyBannerView(state: depthSafetyState)
@@ -478,6 +542,7 @@ struct DiveLiveView: View {
     private var depthReadout: some View {
         let style = depthReadoutStyle
         let depthDisplay = WatchDepthFormatting.display(meters: dive.currentDepthMeters, units: unitPreference)
+        let depthOpacity = dive.isDepthDataStale ? 0.72 : 1.0
         return VStack(spacing: 0) {
             HStack(alignment: .lastTextBaseline, spacing: 4) {
                 Text(depthDisplay.valueText)
@@ -486,6 +551,7 @@ struct DiveLiveView: View {
                     .lineLimit(1)
                     .monospacedDigit()
                     .foregroundStyle(style.depthColor)
+                    .opacity(depthOpacity)
                     .shadow(
                         color: missionModeProfile.decorativeEffectsEnabled ? style.depthShadow : .clear,
                         radius: missionModeProfile.decorativeEffectsEnabled ? 8 : 0,
@@ -496,6 +562,7 @@ struct DiveLiveView: View {
                 Text(depthDisplay.unitLabel)
                     .font(.system(size: 31, weight: .black, design: .rounded))
                     .foregroundStyle(style.labelColor)
+                    .opacity(depthOpacity)
                     .padding(.bottom, 9)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -503,11 +570,11 @@ struct DiveLiveView: View {
             .accessibilityLabel(String(localized: "live.depth.a11y"))
             .accessibilityValue("\(depthDisplay.valueText) \(depthDisplay.unitLabel)")
 
-            Text(String(localized: "PROFONDITÀ ATTUALE"))
+            Text(dive.isDepthDataStale ? String(localized: "live.depth.stale.label") : String(localized: "PROFONDITÀ ATTUALE"))
                 .font(.system(size: 15, weight: .black, design: .rounded))
                 .lineLimit(1)
                 .minimumScaleFactor(0.68)
-                .foregroundStyle(style.labelColor)
+                .foregroundStyle(dive.isDepthDataStale ? DiveUI.yellow : style.labelColor)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal, 4)

@@ -37,6 +37,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
     var isDemo: Bool
     var exceededSupportedDepthRange: Bool
     var isManual: Bool
+    var hasDepthProfile: Bool
     var equipmentUsed: String?
     var entryPressureText: String?
     var exitPressureText: String?
@@ -51,7 +52,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
         case avgWaterTemperatureCelsius, ttv, entryGPS, exitGPS
         case entryGPSFixSource, exitGPSFixSource, samples
         case siteName, buddy, notes, gasLabel, sacLitersMinute, isDemo, exceededSupportedDepthRange
-        case isManual, equipmentUsed, entryPressureText, exitPressureText, decompressionNotes
+        case isManual, hasDepthProfile, equipmentUsed, entryPressureText, exitPressureText, decompressionNotes
     }
 
     init(
@@ -76,6 +77,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
         isDemo: Bool = false,
         exceededSupportedDepthRange: Bool = false,
         isManual: Bool = false,
+        hasDepthProfile: Bool? = nil,
         equipmentUsed: String? = nil,
         entryPressureText: String? = nil,
         exitPressureText: String? = nil,
@@ -103,6 +105,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
         self.exceededSupportedDepthRange = exceededSupportedDepthRange
             || maxDepthMeters >= 40.0
         self.isManual = isManual
+        self.hasDepthProfile = hasDepthProfile ?? !samples.isEmpty
         self.equipmentUsed = equipmentUsed
         self.entryPressureText = entryPressureText
         self.exitPressureText = exitPressureText
@@ -134,6 +137,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
         let decodedExceeded = try container.decodeIfPresent(Bool.self, forKey: .exceededSupportedDepthRange) ?? false
         exceededSupportedDepthRange = decodedExceeded || maxDepthMeters >= 40.0
         isManual = try container.decodeIfPresent(Bool.self, forKey: .isManual) ?? false
+        hasDepthProfile = try container.decodeIfPresent(Bool.self, forKey: .hasDepthProfile) ?? !samples.isEmpty
         equipmentUsed = try container.decodeIfPresent(String.self, forKey: .equipmentUsed)
         entryPressureText = try container.decodeIfPresent(String.self, forKey: .entryPressureText)
         exitPressureText = try container.decodeIfPresent(String.self, forKey: .exitPressureText)
@@ -163,6 +167,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
         try container.encode(isDemo, forKey: .isDemo)
         try container.encode(exceededSupportedDepthRange, forKey: .exceededSupportedDepthRange)
         try container.encode(isManual, forKey: .isManual)
+        try container.encode(hasDepthProfile, forKey: .hasDepthProfile)
         try container.encodeIfPresent(equipmentUsed, forKey: .equipmentUsed)
         try container.encodeIfPresent(entryPressureText, forKey: .entryPressureText)
         try container.encodeIfPresent(exitPressureText, forKey: .exitPressureText)

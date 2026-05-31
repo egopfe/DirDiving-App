@@ -48,6 +48,12 @@ final class DepthLimitHapticCoordinator {
         }
     }
 
+    private var hapticsEnabledNow: Bool {
+        UserDefaults.standard.object(forKey: HapticService.hapticsEnabledKey) == nil
+            ? true
+            : UserDefaults.standard.bool(forKey: HapticService.hapticsEnabledKey)
+    }
+
     private func playHaptic(for state: DepthSafetyState, isInitialTransition: Bool) {
         let device = WKInterfaceDevice.current()
         switch state {
@@ -58,15 +64,17 @@ final class DepthLimitHapticCoordinator {
         case .critical:
             device.play(.failure)
             if isInitialTransition {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    device.play(.retry)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { [weak self] in
+                    guard self?.hapticsEnabledNow == true else { return }
+                    WKInterfaceDevice.current().play(.retry)
                 }
             }
         case .exceeded:
             device.play(.failure)
             if isInitialTransition {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                    device.play(.failure)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
+                    guard self?.hapticsEnabledNow == true else { return }
+                    WKInterfaceDevice.current().play(.failure)
                 }
             } else {
                 device.play(.retry)

@@ -23,8 +23,12 @@ struct DiveSession: Identifiable, Codable, Hashable {
     let exitGPSFixSource: GPSFixSource
     let samples: [DiveSample]
     let exceededSupportedDepthRange: Bool
+    /// Watch manual lifecycle start (runtime/GPS-only when no depth profile).
+    let isManual: Bool
+    /// False for manual surface/runtime logs without depth samples.
+    let hasDepthProfile: Bool
 
-    init(id: UUID = UUID(), startDate: Date, endDate: Date, durationSeconds: TimeInterval, maxDepthMeters: Double, avgDepthMeters: Double, avgWaterTemperatureCelsius: Double?, minWaterTemperatureCelsius: Double?, maxWaterTemperatureCelsius: Double?, ttv: Double, entryGPS: GPSPoint?, exitGPS: GPSPoint?, entryGPSFixSource: GPSFixSource? = nil, exitGPSFixSource: GPSFixSource? = nil, samples: [DiveSample], exceededSupportedDepthRange: Bool = false) {
+    init(id: UUID = UUID(), startDate: Date, endDate: Date, durationSeconds: TimeInterval, maxDepthMeters: Double, avgDepthMeters: Double, avgWaterTemperatureCelsius: Double?, minWaterTemperatureCelsius: Double?, maxWaterTemperatureCelsius: Double?, ttv: Double, entryGPS: GPSPoint?, exitGPS: GPSPoint?, entryGPSFixSource: GPSFixSource? = nil, exitGPSFixSource: GPSFixSource? = nil, samples: [DiveSample], exceededSupportedDepthRange: Bool = false, isManual: Bool = false, hasDepthProfile: Bool? = nil) {
         self.id = id
         self.startDate = startDate
         self.endDate = endDate
@@ -42,13 +46,15 @@ struct DiveSession: Identifiable, Codable, Hashable {
         self.samples = samples
         self.exceededSupportedDepthRange = exceededSupportedDepthRange
             || maxDepthMeters >= DepthSafetyConfiguration.maximumSupportedDepthMeters
+        self.isManual = isManual
+        self.hasDepthProfile = hasDepthProfile ?? !samples.isEmpty
     }
 
     enum CodingKeys: String, CodingKey {
         case id, startDate, endDate, durationSeconds, maxDepthMeters, avgDepthMeters
         case avgWaterTemperatureCelsius, minWaterTemperatureCelsius, maxWaterTemperatureCelsius, ttv
         case entryGPS, exitGPS, entryGPSFixSource, exitGPSFixSource, samples
-        case exceededSupportedDepthRange
+        case exceededSupportedDepthRange, isManual, hasDepthProfile
     }
 
     init(from decoder: Decoder) throws {
@@ -71,6 +77,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         let decodedExceeded = try container.decodeIfPresent(Bool.self, forKey: .exceededSupportedDepthRange) ?? false
         exceededSupportedDepthRange = decodedExceeded
             || maxDepthMeters >= DepthSafetyConfiguration.maximumSupportedDepthMeters
+        isManual = try container.decodeIfPresent(Bool.self, forKey: .isManual) ?? false
+        hasDepthProfile = try container.decodeIfPresent(Bool.self, forKey: .hasDepthProfile) ?? !samples.isEmpty
     }
 
     func encode(to encoder: Encoder) throws {
@@ -91,5 +99,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
         try container.encode(exitGPSFixSource, forKey: .exitGPSFixSource)
         try container.encode(samples, forKey: .samples)
         try container.encode(exceededSupportedDepthRange, forKey: .exceededSupportedDepthRange)
+        try container.encode(isManual, forKey: .isManual)
+        try container.encode(hasDepthProfile, forKey: .hasDepthProfile)
     }
 }

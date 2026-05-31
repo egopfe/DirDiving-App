@@ -46,11 +46,14 @@ struct DiveDetailView: View {
                         if session.exceededSupportedDepthRange {
                             exceededDepthLogBanner
                         }
+                        if session.isManual, !session.hasDepthProfile {
+                            watchManualNoDepthBanner
+                        }
                         ttvSafetyNote
-                        depthChart
+                        depthProfileSection
                         gasBlock
                     case .charts:
-                        depthChart
+                        depthProfileSection
                         gasBlock
                     case .details:
                         details
@@ -208,6 +211,48 @@ struct DiveDetailView: View {
             .padding(.horizontal, 10)
             .padding(.vertical, 8)
             .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface2.opacity(0.56)))
+    }
+
+    @ViewBuilder
+    private var depthProfileSection: some View {
+        if session.hasDepthProfile {
+            depthChart
+        } else {
+            noDepthProfilePlaceholder
+        }
+    }
+
+    private var watchManualNoDepthBanner: some View {
+        Text(String(localized: "detail.manual.nodepth.banner"))
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(DIRTheme.cyan)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(10)
+            .background(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(DIRTheme.cyan.opacity(0.10))
+                    .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(DIRTheme.cyan.opacity(0.55), lineWidth: 1))
+            )
+    }
+
+    private var noDepthProfilePlaceholder: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(String(localized: "detail.chart.no_profile_title"))
+                .font(.system(size: 11, weight: .bold, design: .rounded))
+                .foregroundStyle(DIRTheme.cyan)
+            Text(String(localized: "detail.chart.no_profile_body"))
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(Color(red: 0.020, green: 0.035, blue: 0.048).opacity(0.94))
+                .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(DIRTheme.cyan.opacity(0.16), lineWidth: 1))
+        )
     }
 
     private var depthChart: some View {
@@ -471,6 +516,11 @@ struct DiveDetailView: View {
     private var exportBlock: some View {
         HStack {
             Button {
+                guard session.hasDepthProfile else {
+                    csvURL = nil
+                    exportErrorMessage = String(localized: "detail.export.no_profile")
+                    return
+                }
                 switch SubsurfaceExportService.writeCSV(for: session) {
                 case .success(let url):
                     csvURL = url

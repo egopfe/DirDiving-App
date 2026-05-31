@@ -77,8 +77,23 @@
 
 "gps.banner.start.title" = "GPS INIZIO REGISTRATO";
 "gps.banner.end.title" = "GPS FINE REGISTRATO";
+"gps.banner.start.fix.title" = "FIX GPS SALVATO";
+"gps.banner.end.fix.title" = "FIX GPS SALVATO";
+"gps.banner.start.fallback.title" = "ULTIMA POSIZIONE USATA";
+"gps.banner.end.fallback.title" = "ULTIMA POSIZIONE USATA";
+"gps.banner.start.nofix.title" = "GPS NON DISPONIBILE";
+"gps.banner.end.nofix.title" = "GPS NON DISPONIBILE";
 "gps.banner.coords" = "%.5f, %.5f";
 "gps.banner.unavailable" = "GPS non disponibile";
+"live.depth.stale.title" = "Dati profondità non aggiornati";
+"live.depth.stale.body" = "Non considerare attendibile la profondità live.";
+"live.depth.stale.last_known" = "Ultima profondità nota — non attuale.";
+"live.depth.stale.label" = "ULTIMA PROFONDITÀ";
+"live.manual.nodepth.title" = "Sessione manuale";
+"live.manual.nodepth.body" = "Solo runtime e GPS — nessun profilo profondità.";
+"log.manual.nodepth.banner" = "Sessione manuale senza profilo profondità — esportazione non disponibile; sincronizzabile su iPhone come log manuale.";
+"log.export.manual.nodepth.unavailable" = "Nessun profilo profondità da esportare per questa sessione manuale.";
+"log.row.manual.nodepth" = "RUNTIME/GPS";
 "alarm.acknowledge" = "OK";
 "live.ready.title" = "PRONTO PER\nL'IMMERSIONE";
 "live.ready.subtitle" = "In attesa di immersione automatica";
