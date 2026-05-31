@@ -1,8 +1,8 @@
 # DIR DIVING — Panoramica funzionalità (italiano)
 
-**Aggiornato:** 2026-05-20  
-**Branch di riferimento:** `main` @ `d962117`  
-**Spec prodotto corrente:** [`DIR_Diving_Complete_Development_Notes_UPDATED_v9.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v9.md)
+**Aggiornato:** 2026-05-31  
+**Branch di riferimento:** `main` @ `dae29b8` (`origin/main`)  
+**Spec prodotto corrente:** [`DIR_Diving_Complete_Development_Notes_UPDATED_v10.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v10.md)
 
 Documento additivo: integra README e matrice CSV senza sostituire audit o note legali dettagliate.
 
@@ -14,7 +14,7 @@ Documento additivo: integra README e matrice CSV senza sostituire audit o note l
 |-----|--------|----------------|---------------------|
 | Apple Watch Ultra / watchOS 10+ | `DIRDiving Watch App` | `main` | `codex/experimental-features` |
 | iPhone companion iOS 17+ | `DIRDiving iOS` | `main` (workspace unificato) | `codex/ios-experimental-features` |
-| Worktree storico solo iOS | — | `main-iOS` (divergente; allineare docs da `main`) | — |
+| Worktree storico solo iOS | — | `main-iOS` (divergente; non baseline release) | — |
 
 Generazione progetto: `xcodegen generate` → `DIRDiving.xcodeproj` (non versionato).
 
@@ -38,12 +38,15 @@ Vedi [`SAFETY_DISCLAIMER.md`](SAFETY_DISCLAIMER.md), [`TESTFLIGHT_REVIEW_NOTES.m
 ### Diving (MAIN — `main`)
 
 - Schermata live: profondità, TTV informativo, RunTime, gauge risalita, cronometro manuale, warning risalita inline (non full-screen).
+- **Start Dive** visibile in superficie sulla schermata iniziale/live del Watch: avvio manuale disponibile senza disattivare l'avvio automatico da profondità.
 - **BUSSOLA** dedicata: heading, SET BEARING, CLEAR (terminologia UI: **BUSSOLA**, mai «COMPASSO»).
 - GPS ingresso/uscita **solo in superficie** (best-effort); nessun tracking subacqueo certificato.
 - Log ultime 40 immersioni, dettaglio, export CSV Subsurface, sync WatchConnectivity + iCloud KVS.
 - Settings: limiti risalita, allarmi (profondità default configurabile 30/40 m, tempo default 30 min), haptic, unità metrico/imperiale (display), info device/batteria, sync.
+- **Mission Mode**: opzione locale Watch con toggle *Auto-enable on dive start*; si attiva solo dopo l'ingresso in stato immersione attiva, si disattiva a fine immersione, riduce solo animazioni/effetti non essenziali e mostra un indicatore icona minimale vicino al polpo solo durante l'immersione attiva.
 - Immagini utente: tab sempre disponibile **fuori** immersione attiva; durante immersione solo Live + BUSSOLA.
 - App Intents / Action Button: cronometro, bearing, allarmi (quando watchOS espone gli intent).
+- **Algorithm hardening MAIN (`92e639a`):** pipeline depth validata, lifecycle automatico >1 m con debounce, TTV/time-weighted average depth, haptic coordinator fuori da SwiftUI view; resta **non certificato** — vedi [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md).
 
 ### Snorkeling (sperimentale — `codex/experimental-features`)
 
@@ -72,7 +75,8 @@ Cinque tab (ordine): **Planner**, Logbook, Analisi, Attrezzatura, Altro.
 
 | Area | Contenuto |
 |------|-----------|
-| **Planner** | Cilindri multipli, ruoli gas (Back / Travel / Deco / Bailout), mix Air/EAN/Trimix, PPO₂ step 0.1, MOD Dalton, riferimento pianificazione max/media, info emergenza su profondità max; risultati PIANO / BÜHLMANN / GRAFICI; ack sicurezza persistito; preview aggiornata su cambio input gas |
+| **Planner** | Cilindri multipli, ruoli gas (Back / Travel / Deco / Bailout), mix Air/EAN/Trimix, PPO₂ step 0.1, MOD Dalton, riferimento pianificazione max/media; motore **Bühlmann ZHL-16C N2+He** reference con GF, NDL, soste generate; risultati PIANO / BÜHLMANN / GRAFICI; pianificazione ripetitiva con snapshot tessuti v2 e carryover CNS/OTU; ledger gas per cilindro; ambiente altitudine/salinità; ack sicurezza persistito |
+| **CNS / OTU (planner)** | Modello NOAA di riferimento: limiti singolo e giornaliero, recupero superficie/pausa aria (90 min), OTU Lambertsen con soglie REPEX giornaliere/settimanali; integrazione su profilo completo (discesa, fondo, deco); **solo pianificazione di riferimento — non guida certificata** |
 | **Logbook** | Lista, dettaglio, immersioni manuali, import/export CSV |
 | **Analisi** | Metriche logbook, SAC, gas, riepilogo route GPS (entry/exit surface-only) |
 | **Attrezzatura** | Profilo, checklist editabile, **La mia attrezzatura** (template REC/TEC), switch GAS ON/OFF per voce |
@@ -105,18 +109,19 @@ Implementazione v8/v9: [`DIR_DIVING_v8_IMPLEMENTATION_REPORT.md`](DIR_DIVING_v8_
 
 | Branch | Ruolo |
 |--------|--------|
-| `main` | Produzione Diving + companion; esclude sorgenti experimental da `project.yml` |
-| `main-iOS` | Storico parallelo; **202 commit behind** `main` a `d962117` — sync documentazione, merge codice solo con review |
+| `main` | Produzione Diving + companion iOS nello stesso workspace; esclude sorgenti experimental da `project.yml` |
+| `main-iOS` | Worktree storico divergente; usare solo per review manuali o port selettivi verso `main` |
 | `codex/experimental-features` | Watch Snorkeling/Apnea/Buddy |
-| `codex/ios-experimental-features` | iOS Explore Lab, mappe, POI enrichment |
+| `codex/ios-experimental-features` | iOS experimental companion: snorkeling/apnea/buddy/exploration concepts |
 
-Regole merge: preservare Diving stabile, GPS surface-only, BUSSOLA, export Subsurface, security F1–F12. PR #8/#9: non auto-merge (vedi [`PR_STATUS_20260520_POST_V9.md`](PR_STATUS_20260520_POST_V9.md)).
+Regole merge: preservare Diving stabile, GPS surface-only, BUSSOLA, export Subsurface, security F1–F12. PR #8/#9: non auto-merge (vedi [`PR_STATUS_20260526.md`](PR_STATUS_20260526.md)).
 
 ---
 
 ## Limitazioni note
 
 - Non computer subacqueo certificato; planner/Bühlmann **indicativi** (trimix: disclaimer He non in compartimenti Bühlmann).
+- CNS/OTU: modello NOAA-style comprehensive ma **reference-only** — non sostituisce computer, tabelle produttore o guida medica.
 - Entitlement water submersion: configurato, validazione Ultra reale aperta (R1).
 - GPS solo superficie; mappe Watch senza tile online.
 - Funzioni experimental non promosse in App Store candidate su `main`.

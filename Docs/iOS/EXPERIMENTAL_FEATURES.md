@@ -2,17 +2,19 @@
 
 This document tracks experimental iPhone companion work on the `codex/ios-experimental-features` branch.
 
-The branch starts from `main-iOS` and is intended to stay aligned with the Apple Watch experimental branch:
+The branch is a historical derivative of the older iOS worktree and is intended to stay aligned with the Apple Watch experimental branch without becoming the MAIN release baseline:
 
 ```text
 Apple Watch experimental branch: codex/experimental-features
 iOS experimental branch:         codex/ios-experimental-features
-Stable iOS branch:               main-iOS
+Stable MAIN runtime branch:      main
+Historical iOS worktree:         main-iOS
 ```
 
 ## Branch Rules
 
-- Keep stable iOS companion work on `main-iOS`.
+- Keep stable iOS companion runtime work on `main`.
+- Treat `main-iOS` as a historical/divergent worktree, not as the canonical release branch.
 - Keep exploratory iOS companion work on `codex/ios-experimental-features`.
 - Do not add Apple Watch targets back into this iOS branch.
 - Do not add Buddy/BLE watchOS runtime code directly to the iOS target.
@@ -144,7 +146,7 @@ The branch also implements the first technical-planner requirements from `DIR_DI
 - PPO2 at planned depth.
 - Gas density at planned depth with green/warning/danger rating using 5.2 g/L and 6.2 g/L defaults.
 - END and EAD calculations.
-- CNS% and OTU indicative calculations.
+- CNS% and OTU indicative calculations (NOAA-style reference model: single/daily CNS, REPEX OTU thresholds — not certified exposure guidance).
 - Planner warnings for MOD/PPO2, density, END, and gas reserve issues.
 - Premium iOS cards for gas planning, density/END, reserve, warnings, and plan output.
 - V1 multi-segment timeline for descent, bottom, ascent, stops, and gas switches.
