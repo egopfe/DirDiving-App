@@ -79,6 +79,18 @@ Executed from `C:\Users\egopf\Documents\GitHub\DirDiving-App`.
 - Watch algorithm tests pass: Not proven here; blocked by missing macOS/Xcode toolchain.
 - Simulator builds do not require underwater entitlement in source/project configuration: preserved; final proof requires macOS simulator build.
 
+## Pull Request CI Status
+
+Draft PR: `https://github.com/egopfe/DirDiving-App/pull/11`
+
+GitHub Actions run `26722492326` failed before any workflow step started. Job metadata showed `runner_id: 0`, no steps, and the check annotation was:
+
+```text
+The job was not started because recent account payments have failed or your spending limit needs to be increased. Please check the 'Billing & plans' section in your settings
+```
+
+This is an external GitHub billing/spending-limit blocker, not an actionable source or CI-script failure in this branch.
+
 ## Remaining Risks
 
 - Mandatory macOS validation remains open: `xcodegen generate`, both simulator builds, both algorithm test schemes, and simulator device listing.
