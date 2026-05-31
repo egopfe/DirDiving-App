@@ -6,7 +6,7 @@
 **Target:** `DIRDiving iOS` (iOS Companion MAIN only)  
 **Mode:** Read-only audit — no application code changes
 
-> **Update 2026-05-31:** Readiness remediation complete on `main` @ `dce89e7`. See [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md). **Post-remediation estimate: 100%** (code criteria; external QA still required per report § K). Scores below reflect **pre-remediation** audit @ `4d5aabc`.
+> **Update 2026-05-31:** Readiness remediation complete on `main` @ `dce89e7`. See [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md). **Post-remediation estimate: 100%** (code criteria; external QA still required per report § K). Scores below reflect **pre-remediation** audit @ `4d5aabc`. **Watch MAIN audit parallelo:** [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md).
 
 ---
 
