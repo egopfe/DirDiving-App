@@ -59,7 +59,7 @@ struct MoreView: View {
                             Button {
                                 watchSync.syncUnpushedSessionsToWatch()
                             } label: {
-                                Label(String(localized: "more.sync.push_to_watch"), systemImage: "arrow.up.applewatch")
+                                Label(String(localized: "more.sync.push_to_watch"), systemImage: "applewatch.and.arrow.forward")
                                     .font(.callout.weight(.semibold))
                                     .foregroundStyle(DIRTheme.cyan)
                                     .frame(maxWidth: .infinity)
