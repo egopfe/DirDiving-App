@@ -1,18 +1,18 @@
 # Documentation branch alignment — 2026-05-31 (readiness 100%)
 
-**Baseline:** `main` = `origin/main` (Watch MAIN readiness 100% pass, 2026-05-31)  
-**Algorithm commits:** Watch WMATH remediation + iOS `dce89e7`  
+**Baseline:** `main` = `origin/main` @ `e952b55` (Watch MAIN readiness 100% pass, 2026-05-31)  
+**Algorithm commits:** Watch WMATH remediation @ `f654bec` + iOS `dce89e7`  
 **CI:** `macos-latest` runner (may fail if Actions minutes exhausted)
 
 ## Branch roles
 
-| Branch | Role | Docs state |
-|--------|------|------------|
-| `main` | Stable Watch Diving + iOS Companion MAIN | Authoritative; Watch + iOS readiness 100% reports |
-| `main-iOS` | Historical / divergent iOS worktree | Merged `main`; not separate release baseline |
-| `codex/experimental-features` | Watch experimental (Apnea, Snorkeling, Buddy) | Merged readiness docs from `main`; experimental runtime unchanged in scope |
-| `codex/ios-experimental-features` | iOS experimental companion | Merged readiness implementation + docs |
-| `codex/watch-main-algorithm-audit-current` | Watch MAIN audit (PR #10) | Superseded by `main` remediation; close PR #10 recommended |
+| Branch | Role | Docs state | Sync @ |
+|--------|------|------------|--------|
+| `main` | Stable Watch Diving + iOS Companion MAIN | Authoritative; Watch + iOS readiness 100% reports | `e952b55` |
+| `main-iOS` | Historical / divergent iOS worktree | Merged `main`; not separate release baseline | `0a3073e` |
+| `codex/experimental-features` | Watch experimental (Apnea, Snorkeling, Buddy) | Merged readiness docs from `main`; experimental runtime unchanged in scope | `0e08748` |
+| `codex/ios-experimental-features` | iOS experimental companion | Merged readiness implementation + docs | `62c1dec` |
+| `codex/watch-main-algorithm-audit-current` | Watch MAIN audit (PR #10) | Superseded by `main` remediation; close PR #10 recommended | `70511d1` |
 
 ## Open pull requests (2026-05-31)
 
@@ -22,7 +22,15 @@
 | [#9](https://github.com/egopfe/DirDiving-App/pull/9) | `codex/ios-experimental-features` → `main` | None | Experimental iOS |
 | [#10](https://github.com/egopfe/DirDiving-App/pull/10) | `codex/watch-main-algorithm-audit-current` → `main` | None | Superseded — full remediation on `main`; close PR recommended |
 
-All branches to be synced with `main` after Watch readiness commit. CI Build workflow may fail if GitHub Actions macOS minutes are exhausted.
+All branches merged/pushed through `e952b55`:
+
+| Branch | Commit | Notes |
+|--------|--------|-------|
+| `main` | `e952b55` | Watch readiness 100% + INDEX baseline |
+| `main-iOS` | `0a3073e` | LogbookView conflict resolved (unitPreference + maxDepthLine) |
+| `codex/experimental-features` | `0e08748` | Docs/runtime from main; experimental scope unchanged |
+| `codex/ios-experimental-features` | `62c1dec` | `project.yml` Watch Algorithm Tests target from main |
+| `codex/watch-main-algorithm-audit-current` | `70511d1` | Superseded; audit doc from main |
 
 ## Conflict policy
 

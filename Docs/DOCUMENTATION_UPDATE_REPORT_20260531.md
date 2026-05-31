@@ -172,3 +172,15 @@ All active branches merged/pushed through `1d69d88`: `main`, `main-iOS`, `codex/
 |-------|--------|
 | `DIRDiving Watch Algorithm Tests` | **PASS** (Ultra 3 sim; incl. `WatchReadinessAlgorithmTests`) |
 | `DIRDiving iOS Algorithm Tests` | **PASS** (+ `WatchManualNoDepthSyncTests`) |
+
+### Branch sync (2026-05-31, post Watch readiness)
+
+All active branches merged/pushed through `e952b55`:
+
+| Branch | Commit |
+|--------|--------|
+| `main` | `e952b55` |
+| `main-iOS` | `0a3073e` |
+| `codex/experimental-features` | `0e08748` |
+| `codex/ios-experimental-features` | `62c1dec` |
+| `codex/watch-main-algorithm-audit-current` | `70511d1` |
