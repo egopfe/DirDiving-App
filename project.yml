@@ -23,6 +23,38 @@ targets:
       - sdk: Charts.framework
       - sdk: WatchConnectivity.framework
       - sdk: CoreLocation.framework
+  DIRDiving Watch Algorithm Tests:
+    type: bundle.unit-test
+    platform: watchOS
+    sources:
+      - Tests/WatchAlgorithmTests
+      - Models/DiveSample.swift
+      - Models/DiveSession.swift
+      - Models/GPSPoint.swift
+      - Models/AscentRateLimits.swift
+      - Models/AscentStatus.swift
+      - Utils/DIRUnitPreference.swift
+      - Utils/DIRUnitConversions.swift
+      - Utils/DepthSafetyConfiguration.swift
+      - Utils/DiveAlgorithmConfiguration.swift
+      - Utils/DiveLogbookPolicy.swift
+      - Utils/GPSFallbackPolicy.swift
+      - Utils/DepthSampleValidation.swift
+      - Utils/DiveLifecycleAlgorithm.swift
+      - Utils/DiveSessionAlgorithmValidator.swift
+      - Utils/DiveSessionMerge.swift
+      - Utils/MonotonicElapsedClock.swift
+      - Utils/GPSConfirmationPresentation.swift
+      - Utils/DiveSessionPersistenceClass.swift
+      - Models/DiveGPSConfirmation.swift
+      - Services/SubsurfaceExportService.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.watch.algorithmtests
+        GENERATE_INFOPLIST_FILE: YES
+        DEVELOPMENT_TEAM: C6FKKPB6A9
+    dependencies:
+      - sdk: XCTest.framework
   DIRDiving iOS Algorithm Tests:
     type: bundle.unit-test
     platform: iOS

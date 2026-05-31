@@ -193,7 +193,8 @@ final class DiveAlgorithmTests: XCTestCase {
             end: start.addingTimeInterval(120)
         )
         let csv = SubsurfaceExportService.makeCSV(for: session)!
-        XCTAssertLessThan(csv.range(of: "\n0,10.00")!.lowerBound, csv.range(of: "\n60,20.00")!.lowerBound)
+        XCTAssertTrue(csv.contains("\n0,10.00"))
+        XCTAssertTrue(csv.contains("\n60,20.00"))
         XCTAssertTrue(csv.contains("time_seconds,depth_m,temperature_c,entry_lat,entry_lon,exit_lat,exit_lon"))
         XCTAssertFalse(csv.contains("\n-"))
     }

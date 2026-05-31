@@ -535,6 +535,12 @@
 "logbook.title" = "Logbook";
 "logbook.empty.title" = "Nessuna immersione";
 "logbook.badge.manual" = "MANUAL";
+"logbook.badge.manual.nodepth" = "RUNTIME/GPS";
+"logbook.card.runtime_gps_only" = "Solo runtime e GPS — nessun profilo profondità";
+"detail.manual.nodepth.banner" = "Sessione Watch manuale senza profilo profondità. Mostrati runtime, TTV e GPS; esportazione CSV non disponibile.";
+"detail.chart.no_profile_title" = "NESSUN PROFILO PROFONDITÀ";
+"detail.chart.no_profile_body" = "Questo log non ha campioni di profondità. Può essere una sessione Watch manuale senza sensore immersione.";
+"detail.export.no_profile" = "Nessun profilo profondità da esportare per questa sessione.";
 "logbook.card.max_depth" = "Max %@";
 "logbook.card.duration" = "T. %@ min";
 "analysis.title" = "Analisi";

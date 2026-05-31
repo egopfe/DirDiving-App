@@ -537,6 +537,12 @@
 "logbook.title" = "Logbook";
 "logbook.empty.title" = "No dives yet";
 "logbook.badge.manual" = "MANUAL";
+"logbook.badge.manual.nodepth" = "RUNTIME/GPS";
+"logbook.card.runtime_gps_only" = "Runtime and GPS only — no depth profile";
+"detail.manual.nodepth.banner" = "Manual Watch session without depth profile. Runtime, TTV, and GPS are shown; CSV export is not available.";
+"detail.chart.no_profile_title" = "NO DEPTH PROFILE";
+"detail.chart.no_profile_body" = "This log has no depth samples. It may be a manual Watch session recorded without an underwater depth sensor.";
+"detail.export.no_profile" = "No depth profile to export for this session.";
 "logbook.card.max_depth" = "Max %@";
 "logbook.card.duration" = "T. %@ min";
 "analysis.title" = "Analysis";

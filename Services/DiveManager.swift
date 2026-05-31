@@ -3,11 +3,6 @@ import Combine
 import CoreMotion
 import WatchKit
 
-enum DiveGPSConfirmation: Equatable {
-    case start(point: GPSPoint?, fallback: Bool)
-    case end(point: GPSPoint?, fallback: Bool)
-}
-
 @MainActor
 final class DiveManager: NSObject, ObservableObject {
     static private(set) weak var shared: DiveManager?
@@ -43,6 +38,15 @@ final class DiveManager: NSObject, ObservableObject {
     @Published private(set) var isMissionModeActive = false
     @Published private(set) var depthSafetyState: DepthSafetyState = .normal
     @Published private(set) var exceededSupportedDepthRange = false
+    @Published private(set) var isDepthDataStale = false
+    @Published private(set) var depthDataUsesLastKnownReading = false
+
+    private enum AlarmBlinkSource: Hashable {
+        case ascent
+        case depth
+        case runtime
+        case battery
+    }
 
     private let depthLimitHaptics = DepthLimitHapticCoordinator()
     private let ascentHaptics = AscentSafetyHapticCoordinator()
@@ -99,6 +103,13 @@ final class DiveManager: NSObject, ObservableObject {
     private var automaticSurfaceEndTask: Task<Void, Never>?
     private var stopwatchAccumulatedTime: TimeInterval = 0
     private var stopwatchStartedAt: Date?
+    private var runtimeClock = MonotonicElapsedClock()
+    private var stopwatchClock = MonotonicElapsedClock()
+    private var lastAcceptedDepthSampleAt: Date?
+    private var lastTemperatureSampleAt: Date?
+    private var sessionStartedManually = false
+    private var activeBlinkSources: Set<AlarmBlinkSource> = []
+    private var lastReportedRuntime: TimeInterval = 0
 
     private let activeDiveDraftFileName = "dirdiving_active_dive_draft.json"
     private let stopwatchAccumulatedKey = "dirdiving_watch_stopwatch_accumulated"
@@ -203,6 +214,7 @@ final class DiveManager: NSObject, ObservableObject {
         entryGPSFixSource = draft.entryGPSFixSource
         isDiveActive = true
         isManualLifecycleActive = draft.isManualLifecycleActive
+        sessionStartedManually = draft.isManualLifecycleActive
         activeDiveExceededSupportedDepth = draft.activeDiveExceededSupportedDepth
         exceededSupportedDepthRange = draft.activeDiveExceededSupportedDepth
         hasObservedSubmersionDuringCurrentDive = draft.hasObservedSubmersionDuringCurrentDive
@@ -223,6 +235,10 @@ final class DiveManager: NSObject, ObservableObject {
                 limits: ascentSettings.limits
             )
         }
+        runtimeClock.reset(anchorDate: draft.startDate)
+        lastReportedRuntime = max(0, Date().timeIntervalSince(draft.startDate))
+        runtime = lastReportedRuntime
+        lastAcceptedDepthSampleAt = restoredSamples.last?.timestamp
         updateRuntimeFromClock(evaluateAlarms: false)
         gpsManager.start()
         startRuntimeTimer()
@@ -290,18 +306,66 @@ final class DiveManager: NSObject, ObservableObject {
     }
 
     private func updateRuntimeFromClock(evaluateAlarms: Bool = true) {
-        guard let start = sessionStart else { return }
-        runtime = max(0, Date().timeIntervalSince(start))
+        guard sessionStart != nil else { return }
+        runtime = runtimeClock.elapsed()
+        lastReportedRuntime = runtime
+        evaluateDepthCallbackFreshness()
         ttv = DiveAlgorithm.ttvIndex(averageDepthMeters: averageDepthMeters, durationSeconds: runtime)
         if evaluateAlarms {
             evaluateRuntimeAlarms()
         }
     }
 
+    private func evaluateDepthCallbackFreshness(now: Date = Date()) {
+        guard isDiveActive else {
+            isDepthDataStale = false
+            depthDataUsesLastKnownReading = false
+            return
+        }
+        if isManualNoDepthSession {
+            isDepthDataStale = false
+            depthDataUsesLastKnownReading = false
+            return
+        }
+        guard isDepthAutomationAvailable else {
+            isDepthDataStale = false
+            depthDataUsesLastKnownReading = false
+            return
+        }
+
+        let threshold = DiveAlgorithmConfiguration.activeDepthCallbackSilenceSeconds
+        if let lastAcceptedDepthSampleAt {
+            let age = now.timeIntervalSince(lastAcceptedDepthSampleAt)
+            if age > threshold {
+                isDepthDataStale = true
+                depthDataUsesLastKnownReading = true
+            } else {
+                isDepthDataStale = false
+                depthDataUsesLastKnownReading = false
+            }
+            return
+        }
+
+        if let sessionStart, now.timeIntervalSince(sessionStart) > threshold {
+            isDepthDataStale = true
+            depthDataUsesLastKnownReading = false
+        } else {
+            isDepthDataStale = false
+            depthDataUsesLastKnownReading = false
+        }
+    }
+
+    var isManualNoDepthSession: Bool {
+        isDiveActive && !isDepthAutomationAvailable && isManualLifecycleActive
+    }
+
     private func loadStopwatchState() {
         stopwatchAccumulatedTime = max(0, UserDefaults.standard.double(forKey: stopwatchAccumulatedKey))
         if UserDefaults.standard.bool(forKey: stopwatchRunningKey) {
             stopwatchStartedAt = UserDefaults.standard.object(forKey: stopwatchStartedAtKey) as? Date ?? Date()
+            if let stopwatchStartedAt {
+                stopwatchClock.reset(anchorDate: stopwatchStartedAt)
+            }
             isStopwatchRunning = true
             updateStopwatchFromClock()
             startStopwatchTimer()
@@ -333,16 +397,18 @@ final class DiveManager: NSObject, ObservableObject {
     }
 
     private func updateStopwatchFromClock() {
-        guard isStopwatchRunning, let startedAt = stopwatchStartedAt else {
+        guard isStopwatchRunning, stopwatchStartedAt != nil else {
             stopwatchTime = stopwatchAccumulatedTime
             return
         }
-        stopwatchTime = max(0, stopwatchAccumulatedTime + Date().timeIntervalSince(startedAt))
+        stopwatchTime = stopwatchAccumulatedTime + stopwatchClock.elapsed()
     }
 
     func startStopwatch() {
         guard !isStopwatchRunning else { return }
-        stopwatchStartedAt = Date()
+        let now = Date()
+        stopwatchStartedAt = now
+        stopwatchClock.reset(anchorDate: now)
         isStopwatchRunning = true
         updateStopwatchFromClock()
         startStopwatchTimer()
@@ -374,11 +440,17 @@ final class DiveManager: NSObject, ObservableObject {
         guard alarmWarningMessage != nil else { return }
         alarmWarningMessage = nil
         lastAlarmDismissDate = Date()
-        stopBlinking()
+        stopBlinking(source: .depth)
+        stopBlinking(source: .runtime)
+        stopBlinking(source: .battery)
         HapticService.shared.notify()
     }
 
-    private func beginDiveIfNeeded(isManual: Bool = false) {
+    func resyncHapticsAfterPreferenceChange() {
+        ascentHaptics.refreshHapticsAfterPreferenceChange()
+    }
+
+    private func beginDiveIfNeeded(isManual: Bool = false, sessionStart: Date? = nil) {
         guard !isDiveActive, !isFinalizingDive else { return }
         resetAutomaticLifecycleCandidates()
         if isManual {
@@ -387,11 +459,17 @@ final class DiveManager: NSObject, ObservableObject {
         gpsManager.start()
         isDiveActive = true
         isManualLifecycleActive = isManual
+        sessionStartedManually = isManual
         hasObservedSubmersionDuringCurrentDive = !isManual
         applyMissionModeIfNeededOnDiveStart()
         HapticService.shared.criticalConfirm()
         alarmWarningMessage = nil
-        sessionStart = Date()
+        let start = sessionStart ?? Date()
+        self.sessionStart = start
+        runtimeClock.reset(anchorDate: start)
+        lastAcceptedDepthSampleAt = nil
+        isDepthDataStale = false
+        depthDataUsesLastKnownReading = false
         entryGPS = gpsManager.currentBestPoint()
         let capturedAtStart = entryGPS
         entryGPSFixSource = capturedAtStart == nil ? .noFix : .fallback
@@ -412,6 +490,7 @@ final class DiveManager: NSObject, ObservableObject {
         depthLimitHaptics.reset()
         runtime = 0
         ttv = 0
+        lastReportedRuntime = 0
         persistActiveDiveDraft()
         startRuntimeTimer()
     }
@@ -433,8 +512,11 @@ final class DiveManager: NSObject, ObservableObject {
         HapticService.shared.criticalConfirm()
         runtimeTimer?.invalidate()
         runtimeTimer = nil
-        stopBlinking()
+        stopAllBlinking()
         ascentHaptics.clear()
+        runtimeClock.clear()
+        isDepthDataStale = false
+        depthDataUsesLastKnownReading = false
         let end = Date()
         let finishedSamples = sanitizedSamples(samples)
         sessionStart = nil
@@ -463,6 +545,7 @@ final class DiveManager: NSObject, ObservableObject {
         let avgTemp = temps.isEmpty ? nil : temps.reduce(0, +) / Double(temps.count)
         let duration = max(0, end.timeIntervalSince(start))
         let exceeded = activeDiveExceededSupportedDepth || maxDepth >= DepthSafetyConfiguration.maximumSupportedDepthMeters
+        let hasDepthProfile = !validSamples.isEmpty
         let session = DiveSession(
             startDate: start,
             endDate: end,
@@ -478,9 +561,12 @@ final class DiveManager: NSObject, ObservableObject {
             entryGPSFixSource: entryGPSFixSource,
             exitGPSFixSource: exitGPSFixSource,
             samples: validSamples,
-            exceededSupportedDepthRange: exceeded
+            exceededSupportedDepthRange: exceeded,
+            isManual: sessionStartedManually,
+            hasDepthProfile: hasDepthProfile
         )
         activeDiveExceededSupportedDepth = false
+        sessionStartedManually = false
         logStore.add(session)
         clearActiveDiveDraft()
     }
@@ -498,9 +584,14 @@ final class DiveManager: NSObject, ObservableObject {
 
         if !isDiveActive {
             currentDepthMeters = sample.depthMeters
-            currentTemperatureCelsius = sample.temperatureCelsius
+            currentTemperatureCelsius = resolvedTemperatureForDepthSample(sample.temperatureCelsius, at: sample.timestamp)
             guard evaluateLifecycle(with: validated) == .startDive else { return }
-            beginDiveIfNeeded()
+            beginDiveIfNeeded(isManual: false, sessionStart: sample.timestamp)
+            addSample(
+                depthMeters: sample.depthMeters,
+                timestamp: sample.timestamp,
+                temperatureCelsius: resolvedTemperatureForDepthSample(sample.temperatureCelsius, at: sample.timestamp)
+            )
         } else if isManualLifecycleActive,
                   sample.depthMeters > DiveAlgorithmConfiguration.automaticStartDepthMeters {
             hasObservedSubmersionDuringCurrentDive = true
@@ -537,10 +628,19 @@ final class DiveManager: NSObject, ObservableObject {
             return
         }
 
-        currentDepthMeters = sample.depthMeters
-        currentTemperatureCelsius = temperatureCelsius
+        let resolvedTemperature = resolvedTemperatureForDepthSample(temperatureCelsius, at: timestamp)
+        let storedSample = DiveSample(
+            timestamp: timestamp,
+            depthMeters: depthMeters,
+            temperatureCelsius: resolvedTemperature
+        )
+        currentDepthMeters = storedSample.depthMeters
+        currentTemperatureCelsius = resolvedTemperature
         lastErrorMessage = nil
-        samples.append(sample)
+        lastAcceptedDepthSampleAt = timestamp
+        isDepthDataStale = false
+        depthDataUsesLastKnownReading = false
+        samples.append(storedSample)
         averageDepthMeters = DiveAlgorithm.timeWeightedAverageDepth(samples: samples, endDate: sample.timestamp)
         maxDepthMeters = max(maxDepthMeters, sample.depthMeters)
         updateRuntimeFromClock(evaluateAlarms: false)
@@ -548,8 +648,8 @@ final class DiveManager: NSObject, ObservableObject {
         if depthSafetyState != .exceeded {
             evaluateDepthAlarm()
         }
-        updateAscentRate(with: sample)
-        previousDepthSample = sample
+        updateAscentRate(with: storedSample)
+        previousDepthSample = storedSample
         persistActiveDiveDraft()
         evaluateAutomaticSurfaceCandidate(
             validatedSample: ValidatedDepthSample(validity: .valid, rawDepthMeters: depthMeters, sample: sample)
@@ -569,25 +669,48 @@ final class DiveManager: NSObject, ObservableObject {
         depthLimitHaptics.handle(depthMeters: depthMeters, hapticsEnabled: hapticsEnabled)
     }
 
+    private func resolvedTemperatureForDepthSample(_ temperatureCelsius: Double?, at timestamp: Date) -> Double? {
+        let receivedAt = Date()
+        if let lastTemperatureSampleAt {
+            guard receivedAt.timeIntervalSince(lastTemperatureSampleAt) <= DiveAlgorithmConfiguration.staleTemperatureSeconds else {
+                return nil
+            }
+        }
+        return DiveAlgorithm.sanitizedTemperatureCelsius(temperatureCelsius ?? currentTemperatureCelsius)
+    }
+
     private func evaluateDepthAlarm() {
+        guard !isDepthDataStale else { return }
         let threshold = depthAlarmThresholdMeters
         guard depthAlarmEnabled, maxDepthMeters > threshold, depthSafetyState != .exceeded else { return }
         let units = DIRUnitPreference.fromStorage(UserDefaults.standard.string(forKey: DIRUnitPreference.storageKey) ?? DIRUnitPreference.metric.rawValue)
         let display = WatchDepthFormatting.display(meters: threshold, units: units)
-        triggerAlarm(String(format: String(localized: "ALLARME PROFONDITÀ > %@"), "\(display.valueText) \(display.unitLabel)"), lastDate: &lastDepthAlarmDate)
+        triggerAlarm(
+            String(format: String(localized: "ALLARME PROFONDITÀ > %@"), "\(display.valueText) \(display.unitLabel)"),
+            lastDate: &lastDepthAlarmDate,
+            blinkSource: .depth
+        )
     }
 
     private func evaluateRuntimeAlarms() {
         let runtimeThreshold = runtimeAlarmThresholdMinutes
         if runtimeAlarmEnabled, runtime > TimeInterval(runtimeThreshold * 60) {
-            triggerAlarm(String(format: String(localized: "ALLARME TEMPO > %lld min"), runtimeThreshold), lastDate: &lastRuntimeAlarmDate)
+            triggerAlarm(
+                String(format: String(localized: "ALLARME TEMPO > %lld min"), runtimeThreshold),
+                lastDate: &lastRuntimeAlarmDate,
+                blinkSource: .runtime
+            )
         }
         if batteryAlarmEnabled {
             let device = WKInterfaceDevice.current()
             device.isBatteryMonitoringEnabled = true
             let batteryThreshold = Float(batteryAlarmThresholdPercent) / 100
             if device.batteryLevel >= 0, device.batteryLevel < batteryThreshold {
-                triggerAlarm(String(format: String(localized: "ALLARME BATTERIA < %lld%%"), batteryAlarmThresholdPercent), lastDate: &lastBatteryAlarmDate)
+                triggerAlarm(
+                    String(format: String(localized: "ALLARME BATTERIA < %lld%%"), batteryAlarmThresholdPercent),
+                    lastDate: &lastBatteryAlarmDate,
+                    blinkSource: .battery
+                )
             }
         }
     }
@@ -597,6 +720,7 @@ final class DiveManager: NSObject, ObservableObject {
         updateStopwatchFromClock()
         stopwatchAccumulatedTime = stopwatchTime
         stopwatchStartedAt = nil
+        stopwatchClock.clear()
         isStopwatchRunning = false
         stopwatchTimer?.invalidate()
         stopwatchTimer = nil
@@ -606,14 +730,14 @@ final class DiveManager: NSObject, ObservableObject {
         }
     }
 
-    private func triggerAlarm(_ message: String, lastDate: inout Date?) {
+    private func triggerAlarm(_ message: String, lastDate: inout Date?, blinkSource: AlarmBlinkSource) {
         let now = Date()
         if let lastAlarmDismissDate, now.timeIntervalSince(lastAlarmDismissDate) < 15 { return }
         if let lastDate, now.timeIntervalSince(lastDate) < 30 { return }
         lastDate = now
         alarmWarningMessage = message
         HapticService.shared.warnIfNeeded()
-        startBlinking()
+        startBlinking(source: blinkSource)
     }
 
     private func updateAscentRate(with sample: DiveSample) {
@@ -624,22 +748,38 @@ final class DiveManager: NSObject, ObservableObject {
         let rate = DiveAlgorithm.ascentRateMetersPerMinute(samples: samples, current: sample)
         ascentStatus = AscentStatus.make(rate: rate, depth: sample.depthMeters, limits: ascentSettings.limits)
         if ascentStatus.isOverLimit, ascentAlarmEnabled {
-            startBlinking()
+            startBlinking(source: .ascent)
             ascentHaptics.update(isOverLimit: isDiveActive)
         } else {
-            stopBlinking()
+            stopBlinking(source: .ascent)
             ascentHaptics.clear()
         }
     }
 
-    private func startBlinking() {
+    private func startBlinking(source: AlarmBlinkSource) {
+        activeBlinkSources.insert(source)
         guard blinkTimer == nil else { return }
         blinkTimer = Timer.scheduledTimer(withTimeInterval: 0.45, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.redWarningBlink.toggle() }
         }
     }
 
-    private func stopBlinking() { blinkTimer?.invalidate(); blinkTimer = nil; redWarningBlink = false }
+    private func stopBlinking(source: AlarmBlinkSource) {
+        activeBlinkSources.remove(source)
+        reconcileBlinkTimer()
+    }
+
+    private func stopAllBlinking() {
+        activeBlinkSources.removeAll()
+        reconcileBlinkTimer()
+    }
+
+    private func reconcileBlinkTimer() {
+        guard activeBlinkSources.isEmpty else { return }
+        blinkTimer?.invalidate()
+        blinkTimer = nil
+        redWarningBlink = false
+    }
 
     private func showGPSConfirmation(_ confirmation: DiveGPSConfirmation) {
         gpsConfirmation = confirmation
@@ -701,9 +841,11 @@ extension DiveManager: CMWaterSubmersionManagerDelegate {
 
     nonisolated func manager(_ manager: CMWaterSubmersionManager, didUpdate measurement: CMWaterTemperature) {
         Task { @MainActor in
+            let receivedAt = Date()
             currentTemperatureCelsius = DiveAlgorithm.sanitizedTemperatureCelsius(
                 measurement.temperature.converted(to: .celsius).value
             )
+            lastTemperatureSampleAt = receivedAt
         }
     }
 

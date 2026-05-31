@@ -204,6 +204,7 @@ enum DiveProfileMath {
             isDemo: session.isDemo,
             exceededSupportedDepthRange: session.exceededSupportedDepthRange || summary.exceededSupportedDepthRange,
             isManual: session.isManual,
+            hasDepthProfile: !summary.samples.isEmpty || session.hasDepthProfile,
             equipmentUsed: session.equipmentUsed,
             entryPressureText: session.entryPressureText,
             exitPressureText: session.exitPressureText,

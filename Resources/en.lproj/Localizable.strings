@@ -77,8 +77,23 @@
 
 "gps.banner.start.title" = "GPS START SAVED";
 "gps.banner.end.title" = "GPS END SAVED";
+"gps.banner.start.fix.title" = "GPS FIX SAVED";
+"gps.banner.end.fix.title" = "GPS FIX SAVED";
+"gps.banner.start.fallback.title" = "LAST KNOWN POSITION USED";
+"gps.banner.end.fallback.title" = "LAST KNOWN POSITION USED";
+"gps.banner.start.nofix.title" = "GPS UNAVAILABLE";
+"gps.banner.end.nofix.title" = "GPS UNAVAILABLE";
 "gps.banner.coords" = "%.5f, %.5f";
 "gps.banner.unavailable" = "GPS unavailable";
+"live.depth.stale.title" = "Depth data not updating";
+"live.depth.stale.body" = "Do not trust the live depth reading.";
+"live.depth.stale.last_known" = "Last known depth — not current.";
+"live.depth.stale.label" = "LAST DEPTH READING";
+"live.manual.nodepth.title" = "Manual session";
+"live.manual.nodepth.body" = "Runtime and GPS only — no depth profile.";
+"log.manual.nodepth.banner" = "Manual session without depth profile — export unavailable; syncs to iPhone as manual log.";
+"log.export.manual.nodepth.unavailable" = "No depth profile to export for this manual session.";
+"log.row.manual.nodepth" = "RUNTIME/GPS";
 "alarm.acknowledge" = "OK";
 "live.ready.title" = "READY FOR\nDIVE";
 "live.ready.subtitle" = "Waiting for automatic dive start";

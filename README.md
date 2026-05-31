@@ -4,7 +4,7 @@ Copyright Federico Lombardo di Monte Iato 2026
 
 DIR DIVING is a SwiftUI **watchOS + iOS companion** project (XcodeGen) for Apple Watch Ultra-class devices and iPhone. The stable **`main`** branch delivers **Diving mode** on Watch (depth, ascent awareness, **BUSSOLA**, log, GPS surface entry/exit, Subsurface CSV) plus the iOS companion (logbook, planner, equipment, analysis, sync). Snorkeling, Apnea, and Buddy Assist live on **experimental** branches only.
 
-**Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](Docs/INDEX.md) · **Baseline commit corrente:** `main` = `origin/main` @ `1d69d88`
+**Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](Docs/INDEX.md) · **Baseline:** `main` = `origin/main` (Watch + iOS MAIN readiness 100% pass, 2026-05-31)
 
 ## Safety and limitations (MAIN)
 
@@ -16,6 +16,7 @@ DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent 
 
 | Pass | Commit | Contenuto |
 |------|--------|-----------|
+| Watch MAIN algorithmic readiness 100% | corrente | Audit WMATH-HIGH → INFO-014: depth watchdog, GPS states, manual/no-depth sync, monotonic runtime, blink/haptics — [`Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) |
 | iOS MAIN algorithmic readiness 100% | `dce89e7` | Audit B2–B5: pressure/MOD unificato, toggle max/avg depth, cloud merge per sessione, CSV metadata, demo Analysis isolation — [`Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) |
 | iOS comprehensive CNS/OTU + Bühlmann readiness | `dae29b8` | NOAA single/daily CNS, surface/air-break recovery, REPEX OTU, snapshot v2 oxygen carryover, P1–P4 readiness — [`Docs/DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md`](Docs/DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md) |
 | iOS Bühlmann UX/UI readiness | `3237262` | Fix P1–P3 UX planner; verdict **Ready** — [`DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md) |
@@ -31,9 +32,11 @@ DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent 
 | iOS Buhlmann ZHL-16C multigas engine | corrente | Motore iOS-only ZHL-16C N2+He con Air/Nitrox/Trimix/Heliox, GF Low/High, NDL tissue-state, gas switch e stop da ceiling; reference-only/non certificato. Vedi [`Docs/DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](Docs/DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md), [`Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md). |
 | Docs alignment | pass 2026-05-19 | README, INDEX, matrice CSV, branch strategy, audit delta; vedi [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md) |
 
-**Pass documentale (2026-05-31):** readiness 100% @ `dce89e7` + allineamento docs — [`Docs/DOCUMENTATION_UPDATE_REPORT_20260531.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260531.md). **iOS planner:** multigas Bühlmann ZHL-16C, `AmbientPressureModel` unificato, toggle profondità max/media, merge iCloud per sessione, CSV round-trip metadata — **non certificato**.
+**Pass documentale (2026-05-31):** Watch MAIN readiness 100% (codice) + iOS readiness 100% @ `dce89e7` — [`Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260531.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260531.md). **Watch:** depth watchdog, GPS no-fix, manual/no-depth sync, monotonic runtime — QA fisica Ultra ancora richiesta. **iOS planner:** multigas Bühlmann ZHL-16C — **non certificato**.
 
-**Recent algorithm pass (`dce89e7`):** risoluzione audit B2–B5; **154/154** algorithm tests (1 skipped) on iPhone 17 sim; vedi [`Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md).
+**Recent Watch algorithm pass (2026-05-31):** WMATH-HIGH-001 → INFO-014; Watch + iOS sync XCTest verde su simulatori; vedi [`Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md).
+
+**Recent iOS algorithm pass (`dce89e7`):** risoluzione audit B2–B5; **154/154** algorithm tests (1 skipped) on iPhone 17 sim; vedi [`Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md).
 
 **Prior pass (`dae29b8`):** comprehensive NOAA CNS/OTU; Bühlmann readiness P1–P4; 119 XCTest baseline before expanded suite.
 

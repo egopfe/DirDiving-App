@@ -186,7 +186,7 @@ enum WatchDiveSyncCodec {
         do {
             return try DiveSessionAlgorithmValidator.normalizedForStorage(
                 session,
-                allowEmptySamples: false,
+                allowEmptySamples: session.isManual && !session.hasDepthProfile,
                 maxDepthMeters: maxDepthMeters
             )
         } catch {
