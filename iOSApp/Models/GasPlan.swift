@@ -358,7 +358,22 @@ struct GasPlanInput: Codable, Hashable {
         effectivePlanningDepthMeters
     }
 
-    var ambientPressureBar: Double { IOSUnitConversions.ambientPressureBar(depthMeters: effectivePlanningDepthMeters) }
+    var plannerEnvironment: PlannerEnvironment {
+        switch PlannerEnvironment.make(altitudeMeters: altitudeMeters, salinity: salinity) {
+        case .success(let environment):
+            return environment
+        case .failure:
+            return .seaLevelSaltWater
+        }
+    }
+
+    var ambientPressureBar: Double {
+        if case .success(let environment) = PlannerEnvironment.make(altitudeMeters: altitudeMeters, salinity: salinity),
+           let pressure = IOSUnitConversions.ambientPressureBar(depthMeters: effectivePlanningDepthMeters, environment: environment) {
+            return pressure
+        }
+        return IOSUnitConversions.ambientPressureBar(depthMeters: effectivePlanningDepthMeters)
+    }
     var estimatedConsumptionLiters: Double { sacLitersPerMinute * ambientPressureBar * plannedBottomMinutes }
     var estimatedRemainingLiters: Double { availableGasLiters - estimatedConsumptionLiters }
     var estimatedRemainingBar: Double {

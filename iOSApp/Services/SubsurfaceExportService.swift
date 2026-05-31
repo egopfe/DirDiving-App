@@ -27,6 +27,7 @@ enum SubsurfaceExportService {
         )
         guard let first = samples.first?.timestamp else { return nil }
         var rows = ["time_seconds,depth_m,temperature_c,entry_lat,entry_lon,exit_lat,exit_lon,is_manual,equipment,entry_pressure,exit_pressure,deco_notes"]
+        rows.append(contentsOf: metadataLines(for: normalized))
         let manualMeta = [
             normalized.isManual ? "1" : "0",
             csvEscape(normalized.equipmentUsed ?? ""),
@@ -49,6 +50,25 @@ enum SubsurfaceExportService {
             rows.append("\(seconds),\(String(format: "%.2f", sample.depthMeters)),\(temp),\(entryLat),\(entryLon),\(exitLat),\(exitLon)")
         }
         return rows.joined(separator: "\n")
+    }
+
+    private static func metadataLines(for session: DiveSession) -> [String] {
+        let formatter = ISO8601DateFormatter()
+        return [
+            "# session_meta",
+            "# dirdiving_session_id: \(session.id.uuidString)",
+            "# dirdiving_start_date: \(formatter.string(from: session.startDate))",
+            "# dirdiving_end_date: \(formatter.string(from: session.endDate))",
+            "# dirdiving_is_manual: \(session.isManual ? 1 : 0)",
+            "# dirdiving_equipment: \(csvEscape(session.equipmentUsed ?? ""))",
+            "# dirdiving_entry_pressure: \(csvEscape(session.entryPressureText ?? ""))",
+            "# dirdiving_exit_pressure: \(csvEscape(session.exitPressureText ?? ""))",
+            "# dirdiving_deco_notes: \(csvEscape(session.decompressionNotes ?? ""))",
+            "# dirdiving_site_name: \(csvEscape(session.siteName ?? ""))",
+            "# dirdiving_buddy: \(csvEscape(session.buddy ?? ""))",
+            "# dirdiving_gas_label: \(session.gasLabel.rawValue)",
+            "# dirdiving_sac: \(session.sacLitersMinute.map { String(format: "%.2f", $0) } ?? "")"
+        ]
     }
 
     private static func csvEscape(_ value: String) -> String {

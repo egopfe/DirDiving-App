@@ -14,6 +14,8 @@ enum BuhlmannConstants {
     static let maxStopMinutesPerDepth = 180
     static let maxScheduleMinutes = 720
     static let minBreathablePPO2Bar = 0.16
+    /// Allows standard recreational deco switch depths (e.g. 6 m O2 @ 1.6 bar) under ISA ambient pressure.
+    static let decoGasSwitchPPO2ToleranceBar = 0.02
     static let oxygenFractionAir = 0.21
     static let nitrogenFractionAir = 0.79
 

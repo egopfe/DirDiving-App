@@ -59,14 +59,8 @@ enum PlannerGasSchedule {
         guard PlannerInputValidator.validate(input).isValid else { return true }
         var working = input
         working.syncLegacyGasesFromPlannerCylinders()
-        if !PlannerMODValidator.validatePlannerCylinders(input: working).isEmpty {
-            return true
-        }
         let enginePlan = BuhlmannPlanner.enginePlan(input: working)
-        if enginePlan.hasBlockingIssues {
-            return true
-        }
-        return false
+        return enginePlan.hasBlockingIssues
     }
 
     static func makeDecoStop(depthMeters: Double, minutes: Int, gas: GasMix) -> DecoStop {
@@ -105,5 +99,16 @@ enum PlannerGasSchedule {
             )
         }
         return lines
+    }
+
+    /// Bailout cylinders are schedule-only in this reference planner — not passed to `BuhlmannEngine`.
+    static func bailoutAvailabilityWarnings(input: GasPlanInput) -> [String] {
+        bailoutCylinders(from: input).map { bailout in
+            String(
+                format: String(localized: "planner.bailout.engine_excluded"),
+                bailout.gas.label,
+                Int(min(bailout.switchDepthMeters, bailout.modMeters))
+            )
+        }
     }
 }

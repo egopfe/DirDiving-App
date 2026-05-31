@@ -357,35 +357,87 @@ enum GasPlanningService {
         return segments
     }
 
-    static func gfComparisons(input: GasPlanInput, baseTTS: Int, stopCount: Int) -> [GFComparison] {
-        let presets: [(String, Double, Double, Double)] = [
-            ("20/80", 20, 80, 1.08),
-            ("30/70", 30, 70, 1.00),
-            ("40/85", 40, 85, 0.88),
-            ("CUSTOM", input.gfLow, input.gfHigh, max(0.72, min(1.24, (100 - input.gfHigh + input.gfLow) / 100.0 + 0.75)))
-        ]
-
-        return presets.map { preset in
-            let tts = max(1, Int(Double(baseTTS) * preset.3))
-            let note = preset.2 <= 70 ? "Conservativo" : "Piu aggressivo"
-            return GFComparison(label: preset.0, gfLow: preset.1, gfHigh: preset.2, ttsMinutes: tts, stopCount: max(1, Int(Double(stopCount) * preset.3.rounded())), conservatismNote: note)
-        }
-    }
-
     static func contingencyPlans(
         input: GasPlanInput,
         baseAnalysis: TechnicalGasAnalysis,
         baseTTS: Int,
         environment: PlannerEnvironment = .seaLevelSaltWater
     ) -> [ContingencyPlan] {
-        let lostGasLiters = baseAnalysis.rockBottomLiters * 1.35
-        let bottomATA = AmbientPressureModel.ambientPressureBar(depthMeters: input.effectivePlanningDepthMeters, environment: environment) ?? environment.surfacePressureBar
-        let delayedLiters = input.sacLitersPerMinute * bottomATA * 5
-        let extendedLiters = input.sacLitersPerMinute * bottomATA * 10
+        let baseRequest = BuhlmannPlanner.makeRequest(input: input, environment: environment)
+
+        func ttsMinutes(for request: BuhlmannPlanRequest) -> Int {
+            BuhlmannEngine.plan(request).ttsMinutes
+        }
+
+        func gasRequiredLiters(for request: BuhlmannPlanRequest) -> Double {
+            let plan = BuhlmannEngine.plan(request)
+            switch ScheduleGasConsumptionService.analyze(input: input, enginePlan: plan, environment: environment) {
+            case .success(let ledger):
+                return ledger.totalConsumedLiters
+            case .failure:
+                let bottomATA = AmbientPressureModel.ambientPressureBar(
+                    depthMeters: request.maxDepthMeters,
+                    environment: environment
+                ) ?? environment.surfacePressureBar
+                return input.sacLitersPerMinute * bottomATA * request.bottomMinutes
+            }
+        }
+
+        var delayed = baseRequest
+        delayed.bottomMinutes += 5
+        var extended = baseRequest
+        extended.bottomMinutes += 10
+        var deeper = baseRequest
+        deeper.maxDepthMeters = min(
+            IOSAlgorithmConfiguration.maxPlannerDepthMeters,
+            baseRequest.maxDepthMeters + 3
+        )
+        let sourceBottom = deeper.bottomGas
+        deeper.bottomGas = BuhlmannGas(
+            name: sourceBottom.name,
+            role: sourceBottom.role,
+            oxygenFraction: sourceBottom.oxygenFraction,
+            heliumFraction: sourceBottom.heliumFraction,
+            maxPPO2Bar: sourceBottom.maxPPO2Bar,
+            switchDepthMeters: deeper.maxDepthMeters,
+            gasMixId: sourceBottom.gasMixId,
+            cylinderId: sourceBottom.cylinderId
+        )
+
+        let lostGasLiters = baseAnalysis.rockBottomLiters
+        let delayedTTS = ttsMinutes(for: delayed)
+        let extendedTTS = ttsMinutes(for: extended)
+        let deeperTTS = ttsMinutes(for: deeper)
+        let extendedLiters = gasRequiredLiters(for: extended)
+        let deeperLiters = gasRequiredLiters(for: deeper)
+        let stressTTS = max(extendedTTS, deeperTTS)
+        let stressLiters = extendedTTS >= deeperTTS ? extendedLiters : deeperLiters
+        let stressAction = extendedTTS >= deeperTTS
+            ? String(localized: "planner.contingency.extended_bottom.action")
+            : String(format: String(localized: "planner.contingency.deeper_depth.action"), Int(deeper.maxDepthMeters))
+
         return [
-            ContingencyPlan(scenario: .lostGas, ttsMinutes: baseTTS + 8, gasRequiredLiters: lostGasLiters, action: "Switch team protocol, usare gas disponibile e risalita conservativa.", warning: "Validare con procedura team"),
-            ContingencyPlan(scenario: .delayedAscent, ttsMinutes: baseTTS + 5, gasRequiredLiters: baseAnalysis.consumptionLiters + delayedLiters, action: "Aggiungere buffer di risalita e controllare CNS/OTU.", warning: "Rischio gas reserve"),
-            ContingencyPlan(scenario: .extendedBottom, ttsMinutes: baseTTS + 12, gasRequiredLiters: baseAnalysis.consumptionLiters + extendedLiters, action: "Ricalcolare turn pressure e soste prima del briefing.", warning: "Possibile deco aggiuntiva")
+            ContingencyPlan(
+                scenario: .lostGas,
+                ttsMinutes: baseTTS,
+                gasRequiredLiters: lostGasLiters,
+                action: String(localized: "planner.contingency.lost_gas.action"),
+                warning: String(localized: "planner.contingency.lost_gas.warning")
+            ),
+            ContingencyPlan(
+                scenario: .delayedAscent,
+                ttsMinutes: delayedTTS,
+                gasRequiredLiters: gasRequiredLiters(for: delayed),
+                action: String(localized: "planner.contingency.delayed_ascent.action"),
+                warning: String(localized: "planner.contingency.delayed_ascent.warning")
+            ),
+            ContingencyPlan(
+                scenario: .extendedBottom,
+                ttsMinutes: stressTTS,
+                gasRequiredLiters: stressLiters,
+                action: stressAction,
+                warning: String(localized: "planner.contingency.extended_bottom.warning")
+            )
         ]
     }
 
