@@ -1,6 +1,6 @@
 # Note per TestFlight / App Review - DIR DIVING
 
-**Aggiornato:** 2026-05-31 — branch `main` = `origin/main` @ `dae29b8`
+**Aggiornato:** 2026-05-31 — branch `main` = `origin/main` @ `1d69d88` (algorithm @ `dce89e7`)
 
 ## Panoramica per il revisore
 
@@ -61,6 +61,12 @@ Lo stato algoritmico MAIN e documentato in:
 - [ ] Planner: disclaimer visibile; output indicativo
 - [ ] Planner: gas/NDL safe states visibili; nessun output trimix/helium presentato come decompressione certificata
 - [ ] Planner: repetitive planning card visibile quando abilitata; gas ledger per cilindro in risultato; header no-deco/deco-required; disclaimer CNS/OTU reference-only con riepilogo daily CNS / OTU 24h; nota air-break se applicabile (@ `dae29b8`)
+- [ ] Planner @ `dce89e7`: toggle profondità max/media; risultato mostra reference depth usata; MOD/PPO₂ coerenti con ambiente altitudine/salinità
+- [ ] Planner @ `dce89e7`: calcolo incompleto mostra messaggio esplicito — non usare come piano
+- [ ] CSV: export da Logbook → re-import → start date e note preservate ([`SUBSURFACE_CSV_ROUNDTRIP.md`](SUBSURFACE_CSV_ROUNDTRIP.md))
+- [ ] iCloud: edit note su device A + pressioni manuali su device B → merge preserva entrambi
+- [ ] Analysis: con demo ON, statistiche default escludono demo; toggle include se desiderato
+- [ ] Manual dive: save con input invalido mostra errore (form non perso)
 - [ ] Planner: environment (altitudine/salinità) mostra copy coerente con input
 - [ ] Settings / More: link Terms / Privacy raggiungibili e leggibili
 - [ ] Lingua EN: Settings, log, sync senza italiano evidente nelle schermate principali

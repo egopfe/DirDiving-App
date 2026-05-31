@@ -4,6 +4,16 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-31, iOS MAIN algorithmic readiness 100% — `dce89e7`)
+
+- **Algoritmo iOS:** audit remediation B2–B5 — `AmbientPressureModel` unificato MOD/PPO₂; toggle profondità max/media end-to-end; merge iCloud per sessione; CSV `# session_meta` round-trip; incomplete calc guard; contingencies engine-driven; demo isolation in Analysis; time-weighted temperature.
+- **Test:** 11 nuove suite + **154/154** `DIRDiving iOS Algorithm Tests` (1 skipped) su iPhone 17 sim.
+- **Documentazione:** [`Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md), [`Docs/SUBSURFACE_CSV_ROUNDTRIP.md`](Docs/SUBSURFACE_CSV_ROUNDTRIP.md), branch alignment + PR status 2026-05-31.
+
+### Added (2026-05-31, CI runner — `1d69d88`)
+
+- **CI:** Build workflow `runs-on: macos-latest` (fix runner non assegnato su `macos-15`).
+
 ### Added (2026-05-31, comprehensive NOAA CNS/OTU + docs alignment — `dae29b8`)
 
 - **Algoritmo iOS:** modello CNS/OTU comprehensive — limiti NOAA singolo e giornaliero, recupero superficie/pausa aria 90 min, soglie REPEX OTU (300 / 850 / 1800), carryover ossigeno su snapshot v2, integrazione su profilo completo.

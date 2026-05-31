@@ -6,7 +6,7 @@
 **Target:** `DIRDiving iOS` (iOS Companion MAIN only)  
 **Mode:** Read-only audit — no application code changes
 
-> **Update 2026-05-31:** Readiness remediation complete on `main`. See [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md).
+> **Update 2026-05-31:** Readiness remediation complete on `main` @ `dce89e7`. See [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md). **Post-remediation estimate: 100%** (code criteria; external QA still required per report § K). Scores below reflect **pre-remediation** audit @ `4d5aabc`.
 
 ---
 
@@ -49,12 +49,16 @@
 
 ### What blocks 100% algorithmic readiness
 
-1. Environment-unified pressure/MOD path across validator, display, and engine.  
-2. Planning-depth reference semantics aligned end-to-end (average vs max).  
-3. Field-level cloud merge or documented single-writer policy with user-visible conflict UI.  
-4. CSV round-trip preserving start date and manual metadata.  
-5. Analysis dashboard excluding demo sessions when demo toggle is ON.  
-6. Contingency / mock GF helper code removed or wired to engine recomputation.
+**Status @ `dce89e7`:** Items 1–6 below **implemented** on `main`. Remaining gaps are **external QA** — see [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) § J–K.
+
+1. ~~Environment-unified pressure/MOD path across validator, display, and engine.~~ ✅  
+2. ~~Planning-depth reference semantics aligned end-to-end (average vs max).~~ ✅  
+3. ~~Field-level cloud merge or documented single-writer policy with user-visible conflict UI.~~ ✅  
+4. ~~CSV round-trip preserving start date and manual metadata.~~ ✅  
+5. ~~Analysis dashboard excluding demo sessions when demo toggle is ON.~~ ✅  
+6. ~~Contingency / mock GF helper code removed or wired to engine recomputation.~~ ✅  
+
+**Still open (process / infra):**
 
 ---
 

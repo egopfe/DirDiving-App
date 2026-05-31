@@ -1,7 +1,7 @@
 # DIR DIVING — Panoramica funzionalità (italiano)
 
 **Aggiornato:** 2026-05-31  
-**Branch di riferimento:** `main` @ `dae29b8` (`origin/main`)  
+**Branch di riferimento:** `main` @ `1d69d88` (`origin/main`; algorithm @ `dce89e7`)  
 **Spec prodotto corrente:** [`DIR_Diving_Complete_Development_Notes_UPDATED_v10.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v10.md)
 
 Documento additivo: integra README e matrice CSV senza sostituire audit o note legali dettagliate.
