@@ -14,7 +14,10 @@
 - Allineare `README.md` con `project.yml` (nomi scheme, piattaforme).
 - Aggiornare README/Docs quando cambiano onboarding legale, disclaimer, lingua, unità/sync o Branch Strategy.
 - Panoramica funzioni (IT): [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md).
-- Specifiche prodotto MAIN: note v9 [`Docs/DIR_Diving_Complete_Development_Notes_UPDATED_v9.md`](Docs/DIR_Diving_Complete_Development_Notes_UPDATED_v9.md); report [`Docs/DIR_DIVING_v9_IMPLEMENTATION_REPORT.md`](Docs/DIR_DIVING_v9_IMPLEMENTATION_REPORT.md).
+- Specifiche prodotto MAIN: note v10 [`Docs/DIR_Diving_Complete_Development_Notes_UPDATED_v10.md`](Docs/DIR_Diving_Complete_Development_Notes_UPDATED_v10.md).
+- Audit algoritmi (read-only): Watch pre-hardening [`Docs/CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](Docs/CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md); Watch post-hardening [`DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md); iOS [`DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md); hardening [`Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md), [`Docs/DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`](Docs/DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md).
+- Buhlmann iOS: design/verifica in [`Docs/INDEX.md`](Docs/INDEX.md) §6; reaudit [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) (P1–P3 fix @ `69e69b2`); UX fix @ `3237262` — re-audit **Ready** [`Docs/DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](Docs/DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md), verification [`DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md); audit originale [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md) superseded.
+- Mission Mode Watch: [`Docs/MISSION_MODE_MAIN_WATCH.md`](Docs/MISSION_MODE_MAIN_WATCH.md).
 - Specifiche storiche: [`Docs/DIR_Diving_Main_Branch_Development_Notes.md`](Docs/DIR_Diving_Main_Branch_Development_Notes.md), [`Docs/DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md`](Docs/DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md).
 - Build: seguire `Docs/BUILD_VALIDATION.md` su **macOS**.
 

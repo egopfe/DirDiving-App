@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# Xcode / XcodeGen (regenerate from project.yml — do not commit)
+DIRDiving.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+*.xcuserstate
+DerivedData/
+.build/
+
+# Local git worktrees (separate checkout; generate xcodeproj only in repo root)
+.worktrees/
