@@ -76,4 +76,22 @@ The iOS planner UI exposes repetitive planning, schedule gas ledger, environment
 
 ## Fail-Closed Policy
 
-The planner must not silently normalize unsafe input into valid-looking output. Invalid gas mixes, gradient factors, MOD violations, hypoxic gas, invalid switch depths, impossible profiles, and invalid repetitive state must surface as blocking states or unavailable output.
+The planner must not silently normalize unsafe input into valid-looking output. Invalid gas mixes, gradient factors, MOD violations, hypoxic gas, invalid switch depths, impossible profiles, invalid repetitive state, and **incomplete decompression schedules** must surface as blocking states or unavailable output.
+
+## Algorithmic readiness pass (2026-05-31 @ `dce89e7`)
+
+Implemented per [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) and [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md):
+
+| Area | Behaviour |
+|------|-----------|
+| **Pressure / MOD / PPO₂** | Single `AmbientPressureModel` path via `PlannerEnvironment`; actual PPO₂ shown when over limit |
+| **Planning depth** | User toggle max vs average depth; end-to-end NDL, deco, gas, contingencies |
+| **Cloud sync** | Per-session merge via `DiveSessionMerge.preferred`; conflict list published |
+| **CSV** | `# session_meta` export/import — see [`SUBSURFACE_CSV_ROUNDTRIP.md`](SUBSURFACE_CSV_ROUNDTRIP.md) |
+| **Incomplete calc** | Partial stops suppressed; explicit incomplete message (EN/IT) |
+| **Contingencies** | Engine-driven recomputation; no mock GF helper in production path |
+| **Analysis** | Demo dives excluded from aggregates by default; optional include toggle |
+| **Depth limits** | Centralized in `IOSAlgorithmConfiguration` with documented CSV/sync/planner ranges |
+| **OTU recovery** | Progressive budget decay between binary reset windows |
+
+**Tests:** 154 iOS algorithm XCTest (1 skipped), 0 failures local iPhone 17 sim @ `dce89e7`.

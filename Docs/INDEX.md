@@ -1,9 +1,27 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-05-31  
-**Branch consigliato:** `main` = `origin/main` @ `dae29b8`  
+**Branch consigliato:** `main` = `origin/main` @ `1d69d88`  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-05-31 — iOS MAIN algorithmic readiness 100% @ `dce89e7`
+
+Remediation completa da audit [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) (76% @ `4d5aabc` → **100%** criteri codice @ `dce89e7`):
+
+| Documento | Posizione | Contenuto |
+|-----------|-----------|-----------|
+| [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) | `Docs/` | **Report finale** — B2–B5 risolti, 154/154 XCTest, build locale OK |
+| [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | `Docs/` | Audit read-only originale + link al report 100% |
+| [`SUBSURFACE_CSV_ROUNDTRIP.md`](SUBSURFACE_CSV_ROUNDTRIP.md) | `Docs/` | CSV `# session_meta` export/import round-trip |
+| [`DOCUMENTATION_BRANCH_ALIGNMENT_20260531.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260531.md) | `Docs/` | Branch strategy + PR #8/#9/#10 @ `1d69d88` |
+| [`PR_STATUS_20260531.md`](PR_STATUS_20260531.md) | `Docs/` | Stato PR aperti, CI, raccomandazioni merge |
+| [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md) | `Docs/` | Pressure unificato, planning depth toggle, cloud merge, incomplete calc |
+| [`DOCUMENTATION_UPDATE_REPORT_20260531.md`](DOCUMENTATION_UPDATE_REPORT_20260531.md) | `Docs/` | Pass documentale CNS/OTU + readiness 100% |
+
+Implementazione runtime (non Watch experimental): pressure `AmbientPressureModel`, toggle max/avg depth, merge cloud per sessione, CSV metadata, demo isolation Analysis, engine contingencies, **154 XCTest** (1 skipped) iPhone 17 sim.
 
 ---
 
