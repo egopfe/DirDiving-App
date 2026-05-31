@@ -23,6 +23,7 @@ struct ManualDiveEditorView: View {
     @State private var notes = ""
     @State private var gasLabel: DiveGasLabel = .oc
     @State private var validationMessage: String?
+    @State private var showSaveFailureAlert = false
 
     init(existing: DiveSession? = nil) {
         self.existing = existing
@@ -89,6 +90,11 @@ struct ManualDiveEditorView: View {
             }
         }
         .onAppear(perform: loadExisting)
+        .alert(String(localized: "manual_dive.save_failed.title"), isPresented: $showSaveFailureAlert) {
+            Button(String(localized: "manual_dive.save_failed.dismiss"), role: .cancel) {}
+        } message: {
+            Text(String(localized: "manual_dive.save_failed.message"))
+        }
     }
 
     private func field(_ title: String, text: Binding<String>, keyboard: UIKeyboardType = .default) -> some View {
@@ -183,10 +189,9 @@ struct ManualDiveEditorView: View {
             exitPressureText: exitPressureText.isEmpty ? nil : exitPressureText,
             decompressionNotes: decompressionNotes.isEmpty ? nil : decompressionNotes
         )
-        if existing == nil {
-            logStore.add(session)
-        } else {
-            logStore.add(session)
+        guard logStore.add(session) else {
+            showSaveFailureAlert = true
+            return
         }
         dismiss()
     }

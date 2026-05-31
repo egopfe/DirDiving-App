@@ -291,24 +291,30 @@ struct OxygenExposureModel: Hashable {
         guard minutes.isFinite, minutes >= 0 else { return carryover }
         let cnsSingle = CNSRecoveryModel.decayedPercent(carryover.cnsSinglePercent, minutes: minutes)
         let cnsDaily = CNSRecoveryModel.decayedPercent(carryover.cnsDailyPercent, minutes: minutes)
-        let otuDaily: Double
-        if minutes >= OTUREPEXLimits.dailyResetSurfaceIntervalMinutes {
-            otuDaily = 0
-        } else {
-            otuDaily = carryover.otuDaily24h
-        }
-        let otuWeekly: Double
-        if minutes >= OTUREPEXLimits.weeklyResetSurfaceIntervalMinutes {
-            otuWeekly = 0
-        } else {
-            otuWeekly = carryover.otuWeekly
-        }
+        let otuDaily = decayedOTUBudget(
+            carryover.otuDaily24h,
+            minutes: minutes,
+            resetWindowMinutes: OTUREPEXLimits.dailyResetSurfaceIntervalMinutes
+        )
+        let otuWeekly = decayedOTUBudget(
+            carryover.otuWeekly,
+            minutes: minutes,
+            resetWindowMinutes: OTUREPEXLimits.weeklyResetSurfaceIntervalMinutes
+        )
         return OxygenExposureCarryover(
             cnsSinglePercent: cnsSingle,
             cnsDailyPercent: cnsDaily,
             otuDaily24h: otuDaily,
             otuWeekly: otuWeekly
         )
+    }
+
+    private static func decayedOTUBudget(_ value: Double, minutes: Double, resetWindowMinutes: Double) -> Double {
+        guard value.isFinite, value > 0, minutes.isFinite, minutes > 0 else { return max(0, value) }
+        guard resetWindowMinutes.isFinite, resetWindowMinutes > 0 else { return value }
+        if minutes >= resetWindowMinutes { return 0 }
+        let factor = max(0, 1 - minutes / resetWindowMinutes)
+        return max(0, value * factor)
     }
 
     private static func integrateSegment(
@@ -329,9 +335,14 @@ struct OxygenExposureModel: Hashable {
         let dt = minutes / Double(steps)
 
         for step in 0..<steps {
-            let alpha = (Double(step) + 0.5) / Double(steps)
-            let depth = startDepthMeters + (endDepthMeters - startDepthMeters) * alpha
-            guard let ppO2 = inspiredPPO2(depthMeters: depth, gas: gas, environment: environment) else {
+            let alphaStart = Double(step) / Double(steps)
+            let alphaEnd = Double(step + 1) / Double(steps)
+            let depthStart = startDepthMeters + (endDepthMeters - startDepthMeters) * alphaStart
+            let depthEnd = startDepthMeters + (endDepthMeters - startDepthMeters) * alphaEnd
+            let depthMid = startDepthMeters + (endDepthMeters - startDepthMeters) * ((Double(step) + 0.5) / Double(steps))
+            guard let ppO2Start = inspiredPPO2(depthMeters: depthStart, gas: gas, environment: environment),
+                  let ppO2End = inspiredPPO2(depthMeters: depthEnd, gas: gas, environment: environment),
+                  let ppO2 = inspiredPPO2(depthMeters: depthMid, gas: gas, environment: environment) else {
                 return .failure(.invalidExposureInput)
             }
 
@@ -344,10 +355,20 @@ struct OxygenExposureModel: Hashable {
                 }
                 cnsSingle += (dt / singleLimit) * 100
                 cnsDaily += (dt / dailyLimit) * 100
-                guard let otuIncrement = OTUModel.otuIncrementConstant(ppO2: ppO2, minutes: dt) else {
+                let otuIncrement: Double?
+                if abs(ppO2End - ppO2Start) > 1e-9 {
+                    otuIncrement = OTUModel.otuIncrementLinearRamp(
+                        ppO2Initial: ppO2Start,
+                        ppO2Final: ppO2End,
+                        minutes: dt
+                    )
+                } else {
+                    otuIncrement = OTUModel.otuIncrementConstant(ppO2: ppO2, minutes: dt)
+                }
+                guard let increment = otuIncrement else {
                     return .failure(.invalidExposureInput)
                 }
-                otuDive += otuIncrement
+                otuDive += increment
             } else {
                 let before = cnsSingle
                 cnsSingle = CNSRecoveryModel.decayedPercent(cnsSingle, minutes: dt)

@@ -109,6 +109,36 @@ enum DiveProfileMath {
         return safeAverage + safeDuration / 60.0
     }
 
+    static func timeWeightedAverageTemperature(samples: [DiveSample], endDate: Date? = nil) -> Double? {
+        let sorted = sanitizedSamples(samples)
+        guard let first = sorted.first else { return nil }
+
+        var weightedTemperatureSeconds = 0.0
+        var totalSeconds = 0.0
+
+        for pair in zip(sorted, sorted.dropFirst()) {
+            let delta = pair.1.timestamp.timeIntervalSince(pair.0.timestamp)
+            guard delta > 0, delta.isFinite else { continue }
+            guard let temperature = sanitizedTemperatureCelsius(pair.0.temperatureCelsius) else { continue }
+            weightedTemperatureSeconds += temperature * delta
+            totalSeconds += delta
+        }
+
+        if let endDate, endDate > sorted.last!.timestamp {
+            let delta = endDate.timeIntervalSince(sorted.last!.timestamp)
+            if delta.isFinite, delta > 0,
+               let temperature = sanitizedTemperatureCelsius(sorted.last!.temperatureCelsius) {
+                weightedTemperatureSeconds += temperature * delta
+                totalSeconds += delta
+            }
+        }
+
+        if totalSeconds <= 0 {
+            return sanitizedTemperatureCelsius(first.temperatureCelsius)
+        }
+        return weightedTemperatureSeconds / totalSeconds
+    }
+
     static func summary(
         samples: [DiveSample],
         startDate: Date,
@@ -120,8 +150,7 @@ enum DiveProfileMath {
         let duration = max(0, endDate.timeIntervalSince(startDate))
         let maxDepth = cleanSamples.map(\.depthMeters).max() ?? 0
         let averageDepth = timeWeightedAverageDepth(samples: cleanSamples, endDate: endDate)
-        let temperatures = cleanSamples.compactMap { sanitizedTemperatureCelsius($0.temperatureCelsius) }
-        let averageTemperature = temperatures.isEmpty ? nil : temperatures.reduce(0, +) / Double(temperatures.count)
+        let averageTemperature = timeWeightedAverageTemperature(samples: cleanSamples, endDate: endDate)
         return DiveProfileSummary(
             samples: cleanSamples,
             durationSeconds: duration,

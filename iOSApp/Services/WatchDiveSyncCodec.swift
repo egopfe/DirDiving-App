@@ -134,8 +134,21 @@ enum WatchDiveSyncCodec {
     }
 
     static func saveImportedSessionIDs(_ ids: Set<UUID>) {
-        let trimmed = Array(ids.suffix(128))
-        UserDefaults.standard.set(trimmed.map(\.uuidString), forKey: importedSessionIDsKey)
+        var order = loadImportedSessionIDOrder().filter { ids.contains($0) }
+        for id in ids where !order.contains(id) {
+            order.append(id)
+        }
+        if order.count > WatchSyncBoundedIDStore.maxImportedSessionIDs {
+            order.removeFirst(order.count - WatchSyncBoundedIDStore.maxImportedSessionIDs)
+        }
+        UserDefaults.standard.set(order.map(\.uuidString), forKey: importedSessionIDsKey)
+    }
+
+    private static func loadImportedSessionIDOrder() -> [UUID] {
+        guard let strings = UserDefaults.standard.stringArray(forKey: importedSessionIDsKey) else {
+            return []
+        }
+        return strings.compactMap(UUID.init(uuidString:))
     }
 
     private static func syncKey() -> SymmetricKey {

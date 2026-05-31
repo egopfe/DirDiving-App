@@ -208,8 +208,12 @@ enum BuhlmannEngine {
             if gas.ppO2(depthMeters: request.maxDepthMeters, environment: request.plannerEnvironment) > gas.maxPPO2Bar + 0.000_1, gas.role == .bottom {
                 issues.append(.ppo2Exceeded(gas.name))
             }
-            if let mod = gas.modMeters(), gas.switchDepthMeters > mod + 0.05, gas.role != .bottom {
-                issues.append(.gasSwitchTooDeep(gas.name))
+            if gas.role != .bottom {
+                let switchPPO2 = gas.ppO2(depthMeters: gas.switchDepthMeters, environment: request.plannerEnvironment)
+                // Standard recreational switch depths (e.g. 6 m O2) may sit marginally above ISA MOD at 1.6 bar.
+                if switchPPO2 > gas.maxPPO2Bar + BuhlmannConstants.decoGasSwitchPPO2ToleranceBar {
+                    issues.append(.gasSwitchTooDeep(gas.name))
+                }
             }
             if gas.ppO2(depthMeters: gas.switchDepthMeters, environment: request.plannerEnvironment) < BuhlmannConstants.minBreathablePPO2Bar, gas.role != .bottom {
                 issues.append(.hypoxicGasTooShallow(gas.name))
@@ -223,7 +227,8 @@ enum BuhlmannEngine {
         if request.bottomGas.ppO2(depthMeters: request.maxDepthMeters, environment: request.plannerEnvironment) < BuhlmannConstants.minBreathablePPO2Bar {
             issues.append(.hypoxicGasTooShallow(request.bottomGas.name))
         }
-        if let mod = request.bottomGas.modMeters(), request.maxDepthMeters > mod + 0.05 {
+        if request.bottomGas.ppO2(depthMeters: request.maxDepthMeters, environment: request.plannerEnvironment)
+            > request.bottomGas.maxPPO2Bar + 0.000_1 {
             issues.append(.modExceeded(request.bottomGas.name))
         }
         var bottomSegmentMinutes = 0.0
@@ -240,7 +245,8 @@ enum BuhlmannEngine {
             if segment.gas.ppO2(depthMeters: segment.depthMeters, environment: request.plannerEnvironment) < BuhlmannConstants.minBreathablePPO2Bar {
                 issues.append(.hypoxicGasTooShallow(segment.gas.name))
             }
-            if let mod = segment.gas.modMeters(), segment.depthMeters > mod + 0.05 {
+            if segment.gas.ppO2(depthMeters: segment.depthMeters, environment: request.plannerEnvironment)
+                > segment.gas.maxPPO2Bar + 0.000_1 {
                 issues.append(.modExceeded(segment.gas.name))
             }
         }

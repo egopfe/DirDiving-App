@@ -21,6 +21,7 @@ enum PlannerResultState: String, Codable, Hashable, CaseIterable {
     case gasAllocationIncomplete
     case oxygenExposureElevated
     case noValidDecompressionSolution
+    case calculationIncomplete
     case repetitivePlanningActive
     case snapshotMissing
     case snapshotStale
@@ -63,6 +64,7 @@ enum PlannerResultHeaderKind: String, Codable, Hashable, CaseIterable {
     case invalidInput
     case unsupportedProfile
     case noValidDecompressionSolution
+    case calculationIncomplete
     case repetitiveReferencePlan
     case environmentAdjustedReferencePlan
 
@@ -338,6 +340,14 @@ enum PlannerUserFacingCopy {
                 hintKey: "planner.state.no_deco_solution.hint",
                 severity: .blocking
             )
+        case .calculationIncomplete:
+            return localized(
+                id: state.rawValue,
+                titleKey: "planner.state.calculation_incomplete.title",
+                messageKey: "planner.state.calculation_incomplete.message",
+                hintKey: "planner.state.calculation_incomplete.hint",
+                severity: .blocking
+            )
         case .repetitivePlanningActive:
             return localized(
                 id: state.rawValue,
@@ -445,6 +455,14 @@ enum PlannerUserFacingCopy {
                 titleKey: "planner.header.no_deco_solution.title",
                 messageKey: "planner.header.no_deco_solution.message",
                 hintKey: "planner.header.no_deco_solution.hint",
+                severity: .blocking
+            )
+        case .calculationIncomplete:
+            return localized(
+                id: kind.rawValue,
+                titleKey: "planner.header.calculation_incomplete.title",
+                messageKey: "planner.header.calculation_incomplete.message",
+                hintKey: "planner.header.calculation_incomplete.hint",
                 severity: .blocking
             )
         case .repetitiveReferencePlan:
@@ -592,6 +610,8 @@ enum PlannerPresentationSupport {
             kind = .invalidInput
         } else if states.contains(.unsupportedProfile) {
             kind = .unsupportedProfile
+        } else if states.contains(.calculationIncomplete) {
+            kind = .calculationIncomplete
         } else if states.contains(.noValidDecompressionSolution) || states.contains(.modelIncomplete) && !stops.isEmpty {
             kind = .noValidDecompressionSolution
         } else if repetitiveContext?.tissueStateApplied == true {
