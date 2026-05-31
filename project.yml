@@ -128,6 +128,7 @@ targets:
       - iOSApp/Algorithms/Buhlmann/BuhlmannTissueModel.swift
       - iOSApp/Algorithms/Buhlmann/BuhlmannEngine.swift
       - iOSApp/Services/BuhlmannPlanner.swift
+      - iOSApp/Services/CloudSyncStore.swift
       - iOSApp/Services/DiveImportService.swift
       - iOSApp/Services/GasPlanningService.swift
       - iOSApp/Services/OxygenExposureModels.swift
@@ -144,13 +145,18 @@ targets:
       - iOSApp/Utils/DiveProfileMath.swift
       - iOSApp/Utils/DiveSessionAlgorithmValidator.swift
       - iOSApp/Utils/DiveSessionMerge.swift
+      - iOSApp/Utils/DiveSessionMergeConflict.swift
       - iOSApp/Utils/GasMixValidator.swift
       - iOSApp/Utils/IOSAlgorithmConfiguration.swift
       - iOSApp/Utils/IOSDiveLogbookPolicy.swift
       - iOSApp/Utils/IOSUnitConversions.swift
       - iOSApp/Utils/PlannerInputValidator.swift
+      - iOSApp/Utils/PlanCalculationCompleteness.swift
       - iOSApp/Utils/PlannerResultState.swift
+      - iOSApp/Utils/WatchSyncSessionDiff.swift
+      - iOSApp/Utils/CloudSyncNotifications.swift
       - iOSApp/Utils/WatchSyncNotifications.swift
+      - iOSApp/Utils/WatchSyncKeys.swift
     resources:
       - path: Tests/iOSAlgorithmTests/Fixtures
         type: folder

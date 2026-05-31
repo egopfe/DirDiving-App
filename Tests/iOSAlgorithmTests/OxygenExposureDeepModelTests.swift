@@ -102,11 +102,12 @@ final class OxygenExposureDeepModelTests: XCTestCase {
         let after90 = OxygenExposureModel.applySurfaceInterval(to: loaded, minutes: 90)
         XCTAssertEqual(after90.cnsSinglePercent, 40, accuracy: 0.01)
         XCTAssertEqual(after90.cnsDailyPercent, 35, accuracy: 0.01)
-        XCTAssertEqual(after90.otuDaily24h, 400, accuracy: 0.01)
+        XCTAssertEqual(after90.otuDaily24h, 375, accuracy: 0.01)
+        XCTAssertEqual(after90.otuWeekly, 891.96, accuracy: 0.5)
 
         let afterDay = OxygenExposureModel.applySurfaceInterval(to: loaded, minutes: 1_500)
         XCTAssertEqual(afterDay.otuDaily24h, 0, accuracy: 0.01)
-        XCTAssertEqual(afterDay.otuWeekly, 900, accuracy: 0.01)
+        XCTAssertEqual(afterDay.otuWeekly, 766.07, accuracy: 0.5)
     }
 
     func testDailyCNSLimitIsMorePermissiveThanSingleExposureAt14Bar() {

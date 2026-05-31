@@ -73,16 +73,22 @@ enum PlannerService {
         )
         let ledgerResult = ScheduleGasConsumptionService.analyze(input: working, enginePlan: enginePlan, environment: environment)
         let analysis = GasPlanningService.analyze(input: working, enginePlan: enginePlan, oxygenCarryover: oxygenCarryover)
-        let stops = BuhlmannPlanner.decoStops(from: enginePlan)
+        let rawStops = BuhlmannPlanner.decoStops(from: enginePlan)
+        let completenessResolution = PlanCalculationCompletenessResolver.resolve(
+            enginePlan: enginePlan,
+            stops: rawStops
+        )
+        let stops = completenessResolution.presentationStops
 
-        let modIssues = PlannerMODValidator.validatePlannerCylinders(input: working)
+        let modIssues = PlannerMODValidator.validatePlannerCylinders(input: working, environment: environment)
         var states = mergedStates(
             validation.states,
             analysis.states,
             repetitiveStates,
             plannerStates(from: enginePlan.modelState),
             BuhlmannPlanner.plannerStates(from: enginePlan.issues),
-            engineIssueStates(from: enginePlan.issues)
+            engineIssueStates(from: enginePlan.issues),
+            completenessResolution.extraStates
         )
         if !modIssues.isEmpty {
             states = mergedStates(states, [.MODExceeded])
@@ -132,6 +138,7 @@ enum PlannerService {
         return DivePlanResult(
             ndlMinutes: enginePlan.ndlMinutes ?? 0,
             ttrMinutes: ttr,
+            calculationCompleteness: completenessResolution.completeness,
             decoStops: stops,
             cnsPercent: analysis.cnsPercent,
             otu: analysis.otu,
@@ -186,6 +193,7 @@ enum PlannerService {
         return DivePlanResult(
             ndlMinutes: 0,
             ttrMinutes: 0,
+            calculationCompleteness: .noDecompressionSolution,
             decoStops: [],
             cnsPercent: 0,
             otu: 0,
@@ -329,7 +337,7 @@ enum PlannerService {
             case .invalidProfile:
                 states.append(.unsupportedProfile)
             case .calculationLimitReached:
-                states.append(.noValidDecompressionSolution)
+                break
             default:
                 continue
             }

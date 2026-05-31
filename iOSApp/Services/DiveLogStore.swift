@@ -17,6 +17,8 @@ final class DiveLogStore: ObservableObject {
         }
     }
 
+    @Published private(set) var sessionMergeConflicts: [DiveSessionMergeConflict] = []
+
     private let cloudSync: CloudSyncStore?
     private let key = "dirdiving_ios_dive_sessions"
     private let deletedKey = WatchSyncKeys.deletedSessionIDsKey
@@ -33,7 +35,8 @@ final class DiveLogStore: ObservableObject {
         includeDemoLogbook = UserDefaults.standard.bool(forKey: Self.includeDemoLogbookKey)
         deletedSessionIDs = loadDeletedSessionIDs()
         let localSessions = loadLocalSessions()
-        let cloudSessions = cloudSync?.load([DiveSession].self, forKey: key)
+        let cloudSessions = loadRawCloudSessions()
+        sessionMergeConflicts = DiveSessionMergeConflictDetector.detect(local: localSessions, cloud: cloudSessions ?? [])
         sessions = IOSDiveLogbookPolicy.normalizeAndCap(
             mergedSessions(local: localSessions, cloud: cloudSessions)
                 .filter { !deletedSessionIDs.contains($0.id) }
@@ -71,7 +74,8 @@ final class DiveLogStore: ObservableObject {
         guard isReady else { return }
         let localSessions = loadLocalSessions()
         deletedSessionIDs = loadDeletedSessionIDs()
-        let cloudSessions = cloudSync?.load([DiveSession].self, forKey: key)
+        let cloudSessions = loadRawCloudSessions()
+        sessionMergeConflicts = DiveSessionMergeConflictDetector.detect(local: localSessions, cloud: cloudSessions ?? [])
         sessions = IOSDiveLogbookPolicy.normalizeAndCap(
             mergedSessions(local: localSessions, cloud: cloudSessions)
                 .filter { !deletedSessionIDs.contains($0.id) }
@@ -79,15 +83,19 @@ final class DiveLogStore: ObservableObject {
         applyDemoLogbookPreference()
     }
 
-    func add(_ session: DiveSession, suppressWatchPush: Bool = false) {
-        guard !deletedSessionIDs.contains(session.id) else { return }
-        guard let storedSession = try? DiveSessionAlgorithmValidator.normalizedForStorage(session, allowEmptySamples: true) else { return }
+    @discardableResult
+    func add(_ session: DiveSession, suppressWatchPush: Bool = false) -> Bool {
+        guard !deletedSessionIDs.contains(session.id) else { return false }
+        guard let storedSession = try? DiveSessionAlgorithmValidator.normalizedForStorage(session, allowEmptySamples: true) else {
+            return false
+        }
         sessions.removeAll { $0.id == session.id }
         sessions.insert(storedSession, at: 0)
         sessions = IOSDiveLogbookPolicy.normalizeAndCap(sessions)
         if !suppressWatchPush {
             watchSync?.transferToWatch(storedSession)
         }
+        return true
     }
 
     func session(id: UUID) -> DiveSession? {
@@ -120,7 +128,24 @@ final class DiveLogStore: ObservableObject {
     }
 
     private func loadLocalSessions() -> [DiveSession] {
-        cloudSync?.load([DiveSession].self, forKey: key) ?? []
+        let data = cloudSync?.loadRawLocalData(forKey: key) ?? UserDefaults.standard.data(forKey: key)
+        guard let data else { return [] }
+        if let decoded = cloudSync?.decodeLocal([DiveSession].self, from: data) {
+            return decoded
+        }
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return (try? decoder.decode([DiveSession].self, from: data)) ?? []
+    }
+
+    private func loadRawCloudSessions() -> [DiveSession]? {
+        guard let data = cloudSync?.loadRawCloudData(forKey: key) else { return nil }
+        if let decoded = cloudSync?.decodeCloud([DiveSession].self, from: data) {
+            return decoded
+        }
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return try? decoder.decode([DiveSession].self, from: data)
     }
 
     private func mergedSessions(local: [DiveSession], cloud: [DiveSession]?) -> [DiveSession] {

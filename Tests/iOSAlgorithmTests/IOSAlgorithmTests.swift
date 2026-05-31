@@ -99,6 +99,21 @@ final class IOSAlgorithmTests: XCTestCase {
         XCTAssertEqual(DiveProfileMath.ttvIndex(averageDepthMeters: 20, durationSeconds: 30 * 60), 50, accuracy: 0.001)
     }
 
+    func testTimeWeightedAverageTemperatureUsesDurationNotSampleCount() {
+        let start = Date(timeIntervalSince1970: 1_000)
+        let end = start.addingTimeInterval(100)
+        let samples = [
+            DiveSample(timestamp: start, depthMeters: 10, temperatureCelsius: 20),
+            DiveSample(timestamp: start.addingTimeInterval(10), depthMeters: 30, temperatureCelsius: 30),
+            DiveSample(timestamp: end, depthMeters: 0, temperatureCelsius: 20)
+        ]
+        let weighted = DiveProfileMath.timeWeightedAverageTemperature(samples: samples, endDate: end)
+        let simpleMean = (20.0 + 30.0 + 20.0) / 3.0
+        XCTAssertNotNil(weighted)
+        XCTAssertNotEqual(weighted!, simpleMean, accuracy: 0.001)
+        XCTAssertEqual(weighted!, 29.0, accuracy: 0.001)
+    }
+
     func testImportSortsSamplesAndRejectsInvalidRows() throws {
         let csv = """
         time_seconds,depth_m,temperature_c,entry_lat,entry_lon,exit_lat,exit_lon
@@ -132,7 +147,11 @@ final class IOSAlgorithmTests: XCTestCase {
         ])
         let csv = SubsurfaceExportService.makeCSV(for: unsorted)
         XCTAssertNotNil(csv)
-        XCTAssertFalse(csv?.contains("-") ?? true)
+        let sampleRows = csv?
+            .split(separator: "\n")
+            .map(String.init)
+            .filter { !$0.hasPrefix("#") && !$0.hasPrefix("time_seconds") } ?? []
+        XCTAssertFalse(sampleRows.contains { $0.contains("-") })
     }
 
     func testInvalidDepthTemperatureAndGPSAreRejected() {

@@ -157,10 +157,23 @@ final class WatchSyncService: NSObject, ObservableObject {
         do {
             let parsed = try WatchDiveSyncCodec.parsePayload(from: payload)
             let session = parsed.session
-            if let existing = logStore?.session(id: session.id), existing != session {
-                storeConflict(local: existing, incoming: session)
-                lastMessage = String(localized: "Conflitto sync salvato per revisione")
-                recordActivity(title: String(localized: "sync.activity.conflict"), detail: sessionSummary(session))
+            if let existing = logStore?.session(id: session.id) {
+                if WatchSyncSessionDiff.hasSignificantDifference(local: existing, incoming: session) {
+                    storeConflict(local: existing, incoming: session)
+                    lastMessage = String(localized: "Conflitto sync salvato per revisione")
+                    recordActivity(title: String(localized: "sync.activity.conflict"), detail: sessionSummary(session))
+                    return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
+                }
+                logStore?.add(session, suppressWatchPush: true)
+                importedSessionIDs = WatchSyncBoundedIDStore.merge(
+                    session.id,
+                    into: importedSessionIDs,
+                    maxCount: WatchSyncBoundedIDStore.maxImportedSessionIDs
+                )
+                WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
+                importedSessionCount = importedSessionIDs.count
+                lastMessage = String(localized: "Immersione aggiornata dal Watch")
+                recordActivity(title: String(localized: "sync.activity.received_from_watch"), detail: sessionSummary(session))
                 return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
             }
             guard !importedSessionIDs.contains(session.id) else {
@@ -168,7 +181,11 @@ final class WatchSyncService: NSObject, ObservableObject {
                 return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
             }
             logStore?.add(session, suppressWatchPush: true)
-            importedSessionIDs.insert(session.id)
+            importedSessionIDs = WatchSyncBoundedIDStore.merge(
+                session.id,
+                into: importedSessionIDs,
+                maxCount: WatchSyncBoundedIDStore.maxImportedSessionIDs
+            )
             WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
             importedSessionCount = importedSessionIDs.count
             lastMessage = String(localized: "Immersione ricevuta dal Watch")
@@ -212,7 +229,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             SyncConflict(
                 id: incoming.id,
                 detectedAt: Date(),
-                localSummary: "\(Formatters.one(local.maxDepthMeters)) m / \(Formatters.time(local.durationSeconds))",
+                localSummary: WatchSyncSessionDiff.conflictSummary(local: local, incoming: incoming),
                 incoming: incoming
             ),
             at: 0
@@ -309,19 +326,34 @@ final class WatchSyncService: NSObject, ObservableObject {
         }
     }
 
-    private func markPushedToWatch(_ id: UUID) {
-        pushedToWatchSessionIDs.insert(id)
-        savePushedToWatchSessionIDs()
+    private func savePushedToWatchSessionIDs() {
+        var order = loadPushedToWatchSessionIDOrder().filter { pushedToWatchSessionIDs.contains($0) }
+        for id in pushedToWatchSessionIDs where !order.contains(id) {
+            order.append(id)
+        }
+        if order.count > WatchSyncBoundedIDStore.maxPushedToWatchSessionIDs {
+            order.removeFirst(order.count - WatchSyncBoundedIDStore.maxPushedToWatchSessionIDs)
+        }
+        UserDefaults.standard.set(order.map(\.uuidString), forKey: pushedToWatchIDsKey)
+        pushedToWatchSessionIDs = Set(order)
     }
 
     private func loadPushedToWatchSessionIDs() -> Set<UUID> {
-        guard let strings = UserDefaults.standard.stringArray(forKey: pushedToWatchIDsKey) else { return [] }
-        return Set(strings.compactMap(UUID.init(uuidString:)))
+        Set(loadPushedToWatchSessionIDOrder())
     }
 
-    private func savePushedToWatchSessionIDs() {
-        let trimmed = Array(pushedToWatchSessionIDs.suffix(256))
-        UserDefaults.standard.set(trimmed.map(\.uuidString), forKey: pushedToWatchIDsKey)
+    private func loadPushedToWatchSessionIDOrder() -> [UUID] {
+        guard let strings = UserDefaults.standard.stringArray(forKey: pushedToWatchIDsKey) else { return [] }
+        return strings.compactMap(UUID.init(uuidString:))
+    }
+
+    private func markPushedToWatch(_ id: UUID) {
+        pushedToWatchSessionIDs = WatchSyncBoundedIDStore.merge(
+            id,
+            into: pushedToWatchSessionIDs,
+            maxCount: WatchSyncBoundedIDStore.maxPushedToWatchSessionIDs
+        )
+        savePushedToWatchSessionIDs()
     }
 
     private func persistConflicts(_ value: [SyncConflict]) {

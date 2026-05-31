@@ -251,11 +251,20 @@ enum BuhlmannPlanner {
     static func makeRequest(input: GasPlanInput, environment: PlannerEnvironment) -> BuhlmannPlanRequest {
         var working = input
         working.syncLegacyGasesFromPlannerCylinders()
+        // Bailout cylinders remain schedule-only; BuhlmannPlanRequest has no bailoutGases slot.
+        let planningDepth: Double = {
+            switch working.planningDepthReference {
+            case .averageDepth:
+                return working.effectivePlanningDepthMeters
+            case .maximumDepth:
+                return working.plannedDepthMeters
+            }
+        }()
         let bottomEntry = working.plannerCylinders.first(where: { $0.role == .bottom })
         let bottomGas = BuhlmannGas(
             gas: bottomEntry?.gas ?? working.bottomGas,
             role: .bottom,
-            switchDepthMeters: working.plannedDepthMeters,
+            switchDepthMeters: planningDepth,
             cylinderId: bottomEntry?.id
         )
         let travelGases = working.plannerCylinders
@@ -267,7 +276,7 @@ enum BuhlmannPlanner {
             .map { BuhlmannGas(gas: $0.gas, role: .deco, switchDepthMeters: $0.switchDepthMeters, cylinderId: $0.id) }
             .sorted { $0.switchDepthMeters > $1.switchDepthMeters }
         return BuhlmannPlanRequest(
-            maxDepthMeters: working.plannedDepthMeters,
+            maxDepthMeters: planningDepth,
             bottomMinutes: working.plannedBottomMinutes,
             bottomGas: bottomGas,
             travelGases: travelGases,
