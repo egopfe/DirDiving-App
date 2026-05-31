@@ -1,6 +1,6 @@
 # Documentation branch alignment — 2026-05-31 (readiness 100%)
 
-**Baseline:** `main` = `origin/main` @ `e952b55` (Watch MAIN readiness 100% pass, 2026-05-31)  
+**Baseline:** `main` = `origin/main` @ `ac47480` (Watch MAIN readiness 100% pass, 2026-05-31)  
 **Algorithm commits:** Watch WMATH remediation @ `f654bec` + iOS `dce89e7`  
 **CI:** `macos-latest` runner (may fail if Actions minutes exhausted)
 
@@ -8,11 +8,11 @@
 
 | Branch | Role | Docs state | Sync @ |
 |--------|------|------------|--------|
-| `main` | Stable Watch Diving + iOS Companion MAIN | Authoritative; Watch + iOS readiness 100% reports | `e952b55` |
-| `main-iOS` | Historical / divergent iOS worktree | Merged `main`; not separate release baseline | `0a3073e` |
-| `codex/experimental-features` | Watch experimental (Apnea, Snorkeling, Buddy) | Merged readiness docs from `main`; experimental runtime unchanged in scope | `0e08748` |
-| `codex/ios-experimental-features` | iOS experimental companion | Merged readiness implementation + docs | `62c1dec` |
-| `codex/watch-main-algorithm-audit-current` | Watch MAIN audit (PR #10) | Superseded by `main` remediation; close PR #10 recommended | `70511d1` |
+| `main` | Stable Watch Diving + iOS Companion MAIN | Authoritative; Watch + iOS readiness 100% reports | `ac47480` |
+| `main-iOS` | Historical / divergent iOS worktree | Merged `main`; not separate release baseline | `dd8edae` |
+| `codex/experimental-features` | Watch experimental (Apnea, Snorkeling, Buddy) | Merged readiness docs from `main`; experimental runtime unchanged in scope | `8e1a6ff` |
+| `codex/ios-experimental-features` | iOS experimental companion | Merged readiness implementation + docs | `b02a658` |
+| `codex/watch-main-algorithm-audit-current` | Watch MAIN audit (PR #10) | Superseded by `main` remediation; close PR #10 recommended | `82a4cb3` |
 
 ## Open pull requests (2026-05-31)
 
@@ -26,11 +26,11 @@ All branches merged/pushed through `e952b55`:
 
 | Branch | Commit | Notes |
 |--------|--------|-------|
-| `main` | `e952b55` | Watch readiness 100% + INDEX baseline |
-| `main-iOS` | `0a3073e` | LogbookView conflict resolved (unitPreference + maxDepthLine) |
-| `codex/experimental-features` | `0e08748` | Docs/runtime from main; experimental scope unchanged |
-| `codex/ios-experimental-features` | `62c1dec` | `project.yml` Watch Algorithm Tests target from main |
-| `codex/watch-main-algorithm-audit-current` | `70511d1` | Superseded; audit doc from main |
+| `main` | `ac47480` | Watch readiness 100% + branch sync docs |
+| `main-iOS` | `dd8edae` | LogbookView conflict resolved (unitPreference + maxDepthLine) |
+| `codex/experimental-features` | `8e1a6ff` | Docs/runtime from main; experimental scope unchanged |
+| `codex/ios-experimental-features` | `b02a658` | `project.yml` Watch Algorithm Tests target from main |
+| `codex/watch-main-algorithm-audit-current` | `82a4cb3` | Superseded; audit doc from main |
 
 ## Conflict policy
 
