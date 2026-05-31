@@ -31,17 +31,33 @@ struct ManualDiveEditorView: View {
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(units) }
 
+    private var isMetadataOnlyEditMode: Bool {
+        guard let existing else { return false }
+        return existing.isManual && !existing.hasDepthProfile
+    }
+
+    private var showsSyntheticProfileDisclosure: Bool {
+        !isMetadataOnlyEditMode
+    }
+
     var body: some View {
         ZStack {
             DIRBackground()
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
+                    if isMetadataOnlyEditMode {
+                        metadataOnlyBanner
+                    } else if showsSyntheticProfileDisclosure {
+                        syntheticProfileDisclosure
+                    }
                     field(String(localized: "manual_dive.site"), text: $siteName)
                     DatePicker(String(localized: "manual_dive.start"), selection: $startDate, displayedComponents: [.date, .hourAndMinute])
                         .tint(DIRTheme.cyan)
                     stepperField(String(localized: "manual_dive.duration"), value: $durationMinutes, suffix: "min", step: 5, range: 5...300)
-                    stepperField(String(localized: "manual_dive.max_depth"), value: $maxDepthInput, suffix: unitPreference == .metric ? "m" : "ft", step: 1, range: 1...120)
-                    stepperField(String(localized: "manual_dive.avg_depth"), value: $avgDepthInput, suffix: unitPreference == .metric ? "m" : "ft", step: 1, range: 1...120)
+                    if !isMetadataOnlyEditMode {
+                        stepperField(String(localized: "manual_dive.max_depth"), value: $maxDepthInput, suffix: unitPreference == .metric ? "m" : "ft", step: 1, range: 1...120)
+                        stepperField(String(localized: "manual_dive.avg_depth"), value: $avgDepthInput, suffix: unitPreference == .metric ? "m" : "ft", step: 1, range: 1...120)
+                    }
                     field(String(localized: "manual_dive.entry_lat"), text: $entryLatitude, keyboard: .decimalPad)
                     field(String(localized: "manual_dive.entry_lon"), text: $entryLongitude, keyboard: .decimalPad)
                     field(String(localized: "manual_dive.exit_lat"), text: $exitLatitude, keyboard: .decimalPad)
@@ -97,6 +113,36 @@ struct ManualDiveEditorView: View {
         }
     }
 
+    private var metadataOnlyBanner: some View {
+        Text(String(localized: "manual_dive.edit.nodepth.banner"))
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(DIRTheme.cyan)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(10)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(DIRTheme.cyan.opacity(0.10))
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.55), lineWidth: 1))
+            )
+            .accessibilityLabel(String(localized: "manual_dive.edit.nodepth.banner"))
+    }
+
+    private var syntheticProfileDisclosure: some View {
+        Text(String(localized: "manual_dive.synthetic_profile.disclosure"))
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(DIRTheme.yellow)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(10)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(DIRTheme.yellow.opacity(0.10))
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.yellow.opacity(0.45), lineWidth: 1))
+            )
+            .accessibilityLabel(String(localized: "manual_dive.synthetic_profile.disclosure"))
+    }
+
     private func field(_ title: String, text: Binding<String>, keyboard: UIKeyboardType = .default) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title).font(.caption.weight(.semibold)).foregroundStyle(DIRTheme.muted)
@@ -114,12 +160,15 @@ struct ManualDiveEditorView: View {
             Text(title).font(.caption.weight(.semibold)).foregroundStyle(DIRTheme.muted)
             HStack {
                 Button("-") { value.wrappedValue = max(range.lowerBound, value.wrappedValue - step) }
+                    .accessibilityLabel(String(format: String(localized: "manual_dive.stepper.decrease.a11y"), title))
                 Spacer()
                 Text("\(Formatters.one(value.wrappedValue)) \(suffix)")
                     .foregroundStyle(.white)
                     .fontWeight(.semibold)
+                    .accessibilityLabel(String(format: String(localized: "manual_dive.stepper.value.a11y"), title, Formatters.one(value.wrappedValue), suffix))
                 Spacer()
                 Button("+") { value.wrappedValue = min(range.upperBound, value.wrappedValue + step) }
+                    .accessibilityLabel(String(format: String(localized: "manual_dive.stepper.increase.a11y"), title))
             }
             .font(.callout.weight(.bold))
             .padding(10)
@@ -149,6 +198,55 @@ struct ManualDiveEditorView: View {
     }
 
     private func save() {
+        if isMetadataOnlyEditMode {
+            saveMetadataOnly()
+        } else {
+            saveWithSyntheticProfile()
+        }
+    }
+
+    private func saveMetadataOnly() {
+        guard let existing else { return }
+        let duration = durationMinutes * 60
+        let endDate = startDate.addingTimeInterval(duration)
+        let entryGPS = makeGPS(lat: entryLatitude, lon: entryLongitude, timestamp: startDate)
+        let exitGPS = makeGPS(lat: exitLatitude, lon: exitLongitude, timestamp: endDate)
+        let session = DiveSession(
+            id: existing.id,
+            startDate: startDate,
+            endDate: endDate,
+            durationSeconds: duration,
+            maxDepthMeters: existing.maxDepthMeters,
+            avgDepthMeters: existing.avgDepthMeters,
+            avgWaterTemperatureCelsius: existing.avgWaterTemperatureCelsius,
+            ttv: existing.ttv,
+            entryGPS: entryGPS,
+            exitGPS: exitGPS,
+            entryGPSFixSource: existing.entryGPSFixSource,
+            exitGPSFixSource: existing.exitGPSFixSource,
+            samples: [],
+            siteName: siteName.isEmpty ? String(localized: "manual_dive.default_site") : siteName,
+            buddy: existing.buddy,
+            notes: notes.isEmpty ? nil : notes,
+            gasLabel: gasLabel,
+            sacLitersMinute: existing.sacLitersMinute,
+            isDemo: existing.isDemo,
+            exceededSupportedDepthRange: existing.exceededSupportedDepthRange,
+            isManual: true,
+            hasDepthProfile: false,
+            equipmentUsed: equipmentUsed.isEmpty ? nil : equipmentUsed,
+            entryPressureText: entryPressureText.isEmpty ? nil : entryPressureText,
+            exitPressureText: exitPressureText.isEmpty ? nil : exitPressureText,
+            decompressionNotes: decompressionNotes.isEmpty ? nil : decompressionNotes
+        )
+        guard logStore.add(session) else {
+            showSaveFailureAlert = true
+            return
+        }
+        dismiss()
+    }
+
+    private func saveWithSyntheticProfile() {
         let maxMeters = unitPreference == .metric ? maxDepthInput : IOSUnitConversions.meters(fromFeet: maxDepthInput)
         let avgMeters = unitPreference == .metric ? avgDepthInput : IOSUnitConversions.meters(fromFeet: avgDepthInput)
         guard maxMeters >= avgMeters else {
@@ -174,13 +272,13 @@ struct ManualDiveEditorView: View {
             durationSeconds: duration,
             maxDepthMeters: summary.maxDepthMeters,
             avgDepthMeters: summary.averageDepthMeters,
-            avgWaterTemperatureCelsius: nil,
+            avgWaterTemperatureCelsius: existing?.avgWaterTemperatureCelsius,
             ttv: ttv,
             entryGPS: entryGPS,
             exitGPS: exitGPS,
             samples: samples,
             siteName: siteName.isEmpty ? String(localized: "manual_dive.default_site") : siteName,
-            buddy: nil,
+            buddy: existing?.buddy,
             notes: notes.isEmpty ? nil : notes,
             gasLabel: gasLabel,
             isManual: true,

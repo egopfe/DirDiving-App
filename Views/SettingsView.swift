@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @EnvironmentObject private var navigation: AppNavigationStore
     @EnvironmentObject private var gps: GPSManager
     @EnvironmentObject private var dive: DiveManager
     @EnvironmentObject private var watchSync: WatchSyncService
@@ -130,13 +131,20 @@ struct SettingsView: View {
                     if !watchSync.recentActivity.isEmpty {
                         syncActivityPanel
                     }
-                    settingsRow(
-                        icon: "square.and.arrow.up",
-                        iconColor: DiveUI.green,
-                        title: String(localized: "Export"),
-                        subtitle: String(localized: "settings.export.info"),
-                        informational: true
-                    )
+                    Button {
+                        navigation.selectedPage = .diveLog
+                        HapticService.shared.confirm()
+                    } label: {
+                        settingsRow(
+                            icon: "square.and.arrow.up",
+                            iconColor: DiveUI.green,
+                            title: String(localized: "Export"),
+                            subtitle: String(localized: "settings.export.from_logbook"),
+                            showsChevron: true
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(dive.isDiveActive)
                     settingsRow(
                         icon: "function",
                         iconColor: DiveUI.green,

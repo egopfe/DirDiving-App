@@ -145,16 +145,19 @@ struct GasMixCard: View {
                         .frame(width: 18, height: 18)
                 }
                 .disabled(!enabled)
+                .accessibilityLabel(String(format: String(localized: "planner.gas.stepper.decrease.a11y"), title))
                 Text("\(Int(value * 100))\(suffix)")
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(enabled ? .white : DIRTheme.muted)
                     .frame(width: 42)
+                    .accessibilityLabel(String(format: String(localized: "planner.gas.stepper.value.a11y"), title, Int(value * 100), suffix))
                 Button { update(value + step) } label: {
                     Image(systemName: "plus")
                         .font(.caption2.weight(.bold))
                         .frame(width: 18, height: 18)
                 }
                 .disabled(!enabled)
+                .accessibilityLabel(String(format: String(localized: "planner.gas.stepper.increase.a11y"), title))
             }
             .foregroundStyle(enabled ? DIRTheme.cyan : DIRTheme.muted)
         }
@@ -163,21 +166,25 @@ struct GasMixCard: View {
     }
 
     private func gasStepper(value: Double, step: Double, enabled: Bool, update: @escaping (Double) -> Void) -> some View {
-        HStack(spacing: 5) {
+        let label = String(localized: "planner.gas.adjust_ppo2")
+        return HStack(spacing: 5) {
             Button { update(value - step) } label: {
                 Image(systemName: "minus")
                     .frame(width: 24, height: 22)
             }
             .disabled(!enabled)
+            .accessibilityLabel(String(format: String(localized: "planner.gas.stepper.decrease.a11y"), label))
             Text(Formatters.one(value))
                 .font(.callout.monospacedDigit())
                 .foregroundStyle(.white)
                 .frame(width: 42)
+                .accessibilityLabel(String(format: String(localized: "planner.gas.stepper.value.a11y"), label, Formatters.one(value), ""))
             Button { update(value + step) } label: {
                 Image(systemName: "plus")
                     .frame(width: 24, height: 22)
             }
             .disabled(!enabled)
+            .accessibilityLabel(String(format: String(localized: "planner.gas.stepper.increase.a11y"), label))
         }
         .foregroundStyle(DIRTheme.cyan)
     }

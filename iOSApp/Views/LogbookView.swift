@@ -15,6 +15,12 @@ struct LogbookView: View {
         search.isEmpty ? logStore.sessions : logStore.sessions.filter { ($0.siteName ?? "").localizedCaseInsensitiveContains(search) }
     }
 
+    private var hasMixedDemoAndRealDives: Bool {
+        let hasDemo = logStore.sessions.contains { $0.isDemoDive }
+        let hasReal = logStore.sessions.contains { !$0.isDemoDive }
+        return hasDemo && hasReal
+    }
+
     private func makeMonthSections(locale: Locale) -> [LogbookMonthSection] {
         let cal = Calendar.current
         var buckets: [String: [DiveSession]] = [:]
@@ -46,6 +52,9 @@ struct LogbookView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         header
+                        if hasMixedDemoAndRealDives {
+                            mixedDemoBanner
+                        }
                         DIRSearchBar(text: $search)
                         csvImportSection
                         if filtered.isEmpty {
@@ -112,10 +121,6 @@ struct LogbookView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(Text(String(localized: "manual_dive.add.title")))
-                Image(systemName: "ellipsis.circle")
-                    .font(.title3.weight(.medium))
-                    .foregroundStyle(DIRTheme.cyan.opacity(0.45))
-                    .accessibilityHidden(true)
             }
             Text(String(localized: "logbook.header.subtitle"))
                 .font(.callout)
@@ -142,6 +147,21 @@ struct LogbookView: View {
         )
         .padding(.top, 8)
     }
+
+    private var mixedDemoBanner: some View {
+        Text(String(localized: "logbook.demo.mixed.banner"))
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(DIRTheme.yellow)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(12)
+            .background(
+                RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
+                    .fill(DIRTheme.yellow.opacity(0.10))
+                    .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.yellow.opacity(0.45), lineWidth: 1))
+            )
+            .accessibilityLabel(String(localized: "logbook.demo.mixed.banner"))
+    }
 }
 
 struct DiveLogCard: View {
@@ -165,7 +185,15 @@ struct DiveLogCard: View {
                         .font(.system(size: 15, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
                         .lineLimit(1)
-                    if session.isManual, !session.hasDepthProfile {
+                    if session.isDemoDive {
+                        Text(String(localized: "logbook.badge.demo"))
+                            .font(.system(size: 8, weight: .bold, design: .rounded))
+                            .foregroundStyle(DIRTheme.green)
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 1)
+                            .overlay(RoundedRectangle(cornerRadius: 3).stroke(DIRTheme.green, lineWidth: 1))
+                            .accessibilityLabel(String(localized: "logbook.badge.demo.a11y"))
+                    } else if session.isManual, !session.hasDepthProfile {
                         Text(String(localized: "logbook.badge.manual.nodepth"))
                             .font(.system(size: 8, weight: .bold, design: .rounded))
                             .foregroundStyle(DIRTheme.cyan)
@@ -212,6 +240,26 @@ struct DiveLogCard: View {
                 .overlay(RoundedRectangle(cornerRadius: 10).stroke(DIRTheme.hairline, lineWidth: 1))
                 .shadow(color: DIRTheme.cyan.opacity(0.06), radius: 10, x: 0, y: 6)
         )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(consolidatedAccessibilityLabel)
+    }
+
+    private var consolidatedAccessibilityLabel: String {
+        let site = session.siteName ?? String(localized: "detail.default_site")
+        let date = session.startDate.formatted(date: .abbreviated, time: .shortened)
+        let duration = String(format: String(localized: "logbook.card.duration"), Formatters.time(session.durationSeconds))
+        var parts = [site, date, maxDepthLine, duration, session.gasLabel.rawValue]
+        if session.isDemoDive {
+            parts.append(String(localized: "logbook.badge.demo.a11y"))
+        } else if session.isManual, !session.hasDepthProfile {
+            parts.append(String(localized: "logbook.badge.manual.nodepth"))
+        } else if session.isManual {
+            parts.append(String(localized: "logbook.badge.manual"))
+        }
+        if session.buddy != nil {
+            parts.append(String(localized: "detail.buddy.badge"))
+        }
+        return parts.joined(separator: ", ")
     }
 
     private var maxDepthLine: String {

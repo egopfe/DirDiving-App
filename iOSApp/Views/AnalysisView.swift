@@ -148,15 +148,15 @@ struct AnalysisView: View {
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(DIRTheme.cyan)
             HStack(spacing: 10) {
-                emptyAction("Importa CSV", "square.and.arrow.down") {
+                emptyAction(String(localized: "analysis.empty.import_csv"), "square.and.arrow.down") {
                     showImporter = true
                 }
-                emptyAction("Sync Watch", "applewatch") {
+                emptyAction(String(localized: "analysis.empty.sync_watch"), "applewatch") {
                     watchSync.retryActivation(logStore: logStore)
-                    importMessage = String(localized: "Sync Apple Watch richiesta.")
+                    importMessage = String(localized: "analysis.empty.sync_requested")
                 }
             }
-            emptyAction("Apri Logbook", "list.bullet.rectangle.portrait.fill") {
+            emptyAction(String(localized: "analysis.empty.open_logbook"), "list.bullet.rectangle.portrait.fill") {
                 navigation.selectedTab = .logbook
             }
             if let importMessage {

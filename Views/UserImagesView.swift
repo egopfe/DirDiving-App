@@ -101,6 +101,9 @@ struct UserImagesView: View {
                 )
         )
         .contentShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(format: String(localized: "user_images.a11y.row"), index + 1, imageCaption(for: name)))
+        .accessibilityHint(String(localized: "user_images.a11y.row.hint"))
     }
 
     private var imageEmptyState: some View {
@@ -143,6 +146,7 @@ struct UserImagesView: View {
             RoundedRectangle(cornerRadius: 4, style: .continuous)
                 .stroke(.white.opacity(0.25), lineWidth: 0.7)
         )
+        .accessibilityHidden(true)
     }
 
     private func placeholderThumbnail(index: Int) -> some View {
@@ -185,6 +189,7 @@ struct UserImagesView: View {
                         .stroke(.white.opacity(0.18), lineWidth: 1)
                 )
                 .padding(.horizontal, 13)
+                .accessibilityLabel(String(format: String(localized: "user_images.a11y.detail"), index + 1, imageCaption(for: name)))
 
             Text(imageCaption(for: name))
                 .font(.system(size: 10, weight: .semibold, design: .rounded))

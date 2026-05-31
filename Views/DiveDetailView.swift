@@ -36,19 +36,19 @@ struct DiveDetailView: View {
             }
         }
         .navigationDestination(isPresented: $showExportCompletion) {
-            ExportView(fileName: exportCompletionFileName ?? "export.csv")
+            ExportView(fileName: exportCompletionFileName ?? "export.csv", exportURL: exportURL)
         }
-        .confirmationDialog("Eliminare immersione?", isPresented: $showDeleteConfirmation, titleVisibility: .visible) {
-            Button("Elimina log", role: .destructive) {
+        .confirmationDialog(String(localized: "log.delete.confirm.title"), isPresented: $showDeleteConfirmation, titleVisibility: .visible) {
+            Button(String(localized: "log.delete.confirm.action"), role: .destructive) {
                 log.delete(id: session.id)
                 HapticService.shared.notify()
                 dismiss()
             }
-            Button("Annulla", role: .cancel) {
+            Button(String(localized: "log.delete.cancel"), role: .cancel) {
                 HapticService.shared.confirm()
             }
         } message: {
-            Text("Il log verra rimosso dal Watch e dalla prossima sincronizzazione.")
+            Text(String(localized: "log.delete.confirm.message"))
         }
     }
 
