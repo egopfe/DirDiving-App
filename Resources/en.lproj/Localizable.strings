@@ -428,3 +428,39 @@
 "watch_photo.title" = "Send photo to Watch";
 "watch_photo.pick" = "Choose photo";
 "watch_photo.error.load" = "Could not load the selected photo.";
+
+"nav.underwater.blocked" = "Settings locked during dive";
+"nav.crown.hint.title" = "Swipe the Crown";
+"nav.crown.hint.body" = "Turn the Digital Crown to reach Logbook, Settings, and Images.";
+"nav.crown.hint.dismiss" = "GOT IT";
+"settings.export.from_logbook" = "Export from Logbook";
+"export.complete.title" = "EXPORT\nCOMPLETE";
+"export.complete.subsurface" = "ready for Subsurface";
+"export.back_to_logs" = "BACK TO LOGS";
+"compass.a11y.heading_format" = "Heading %@ degrees, %@";
+"compass.bearing.set.a11y" = "Set bearing to current heading";
+"compass.bearing.clear.a11y" = "Clear saved bearing";
+"compass.bearing.clear" = "CLEAR";
+"mission_mode.a11y.active" = "Mission Mode active";
+"user_images.a11y.row" = "Image %d, %@";
+"user_images.a11y.row.hint" = "Double tap to view full image";
+"user_images.a11y.detail" = "Full image %d, %@";
+"shortcut.error.app_unavailable" = "DIR DIVING is not ready: open the app on your Watch and try again.";
+"shortcut.error.stopwatch_reset_blocked" = "Stopwatch reset blocked: use on-screen confirmation when time is running.";
+"ascent.band.depth_range" = "%@-%@ %@";
+"ascent.band.other" = "OTHER";
+"alarm.threshold.depth_format" = "> %@";
+"alarm.threshold.runtime_format" = "> %lld min";
+"alarm.threshold.battery_format" = "< %lld%%";
+"alarm.display.runtime_minutes" = "%lld min";
+"legal.exit.title" = "Exit App";
+
+/* Watch MAIN UI/UX P3 polish (2026-05-31) */
+"mode.selection.header.title" = "DIR DIVING";
+"mode.selection.header.subtitle" = "PRE-DIVE MODE SELECTOR";
+"mode.selection.experimental_notice" = "Stable mode: Diving only. Experimental features stay on experimental branches.";
+"mode.selection.diving.title" = "DIVING";
+"mode.selection.diving.subtitle" = "Dive companion premium";
+"mode.selection.diving.active" = "ACTIVE";
+"shortcuts.help.mode_selection.title" = "Mode selection";
+"shortcuts.help.mode_selection.body" = "When only Diving is available, the app opens Live Dive automatically. Mode Selection appears when multiple stable modes ship.";

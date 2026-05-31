@@ -428,3 +428,39 @@
 "watch_photo.title" = "Invia foto al Watch";
 "watch_photo.pick" = "Scegli foto";
 "watch_photo.error.load" = "Impossibile caricare la foto selezionata.";
+
+"nav.underwater.blocked" = "Impostazioni bloccate in immersione";
+"nav.crown.hint.title" = "Gira la Corona";
+"nav.crown.hint.body" = "Usa la Digital Crown per Log immersioni, Impostazioni e Immagini.";
+"nav.crown.hint.dismiss" = "OK";
+"settings.export.from_logbook" = "Esporta da Log immersioni";
+"export.complete.title" = "ESPORTAZIONE\nCOMPLETATA";
+"export.complete.subsurface" = "pronto per Subsurface";
+"export.back_to_logs" = "TORNA AI LOG";
+"compass.a11y.heading_format" = "Direzione %@ gradi, %@";
+"compass.bearing.set.a11y" = "Imposta bearing sulla direzione attuale";
+"compass.bearing.clear.a11y" = "Cancella bearing salvato";
+"compass.bearing.clear" = "CLEAR";
+"mission_mode.a11y.active" = "Mission Mode attivo";
+"user_images.a11y.row" = "Immagine %d, %@";
+"user_images.a11y.row.hint" = "Tocca due volte per aprire l'immagine";
+"user_images.a11y.detail" = "Immagine completa %d, %@";
+"shortcut.error.app_unavailable" = "DIR DIVING non e pronto: apri l'app sul Watch e riprova.";
+"shortcut.error.stopwatch_reset_blocked" = "Reset cronometro bloccato: usa la conferma a schermo se il tempo e in corso.";
+"ascent.band.depth_range" = "%@-%@ %@";
+"ascent.band.other" = "ALTRO";
+"alarm.threshold.depth_format" = "> %@";
+"alarm.threshold.runtime_format" = "> %lld min";
+"alarm.threshold.battery_format" = "< %lld%%";
+"alarm.display.runtime_minutes" = "%lld min";
+"legal.exit.title" = "Esci dall'app";
+
+/* Watch MAIN UI/UX P3 polish (2026-05-31) */
+"mode.selection.header.title" = "DIR DIVING";
+"mode.selection.header.subtitle" = "SELETTORE MODALITA PRE-IMMERSIONE";
+"mode.selection.experimental_notice" = "Modalita stabile: solo Diving. Le funzioni sperimentali restano sui rami experimental.";
+"mode.selection.diving.title" = "DIVING";
+"mode.selection.diving.subtitle" = "Companion immersione premium";
+"mode.selection.diving.active" = "ATTIVA";
+"shortcuts.help.mode_selection.title" = "Selezione modalita";
+"shortcuts.help.mode_selection.body" = "Con una sola modalita stabile l'app apre Live Dive automaticamente. La selezione compare quando saranno disponibili piu modalita.";

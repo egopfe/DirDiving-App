@@ -3,6 +3,7 @@ import SwiftUI
 struct ExportView: View {
     @Environment(\.dismiss) private var dismiss
     var fileName: String = "export.csv"
+    var exportURL: URL?
 
     var body: some View {
         ZStack {
@@ -25,7 +26,7 @@ struct ExportView: View {
 
                 Spacer(minLength: 23)
 
-                Text("ESPORTAZIONE\nCOMPLETATA")
+                Text(String(localized: "export.complete.title"))
                     .font(.system(size: 16, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.green)
                     .multilineTextAlignment(.center)
@@ -39,18 +40,38 @@ struct ExportView: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.78)
 
-                Text("pronto per Subsurface")
+                Text(String(localized: "export.complete.subsurface"))
                     .font(.system(size: 12, weight: .regular, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.78)
 
-                Spacer(minLength: 16)
+                Spacer(minLength: 12)
+
+                if let exportURL {
+                    ShareLink(item: exportURL) {
+                        HStack(spacing: 5) {
+                            Text(String(localized: "CONDIVIDI CSV"))
+                            Image(systemName: "square.and.arrow.up")
+                        }
+                        .font(.system(size: 10, weight: .black, design: .rounded))
+                        .foregroundStyle(DiveUI.blue)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 7)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .stroke(DiveUI.blue.opacity(0.82), lineWidth: 1)
+                        )
+                    }
+                    .padding(.horizontal, 4)
+                }
+
+                Spacer(minLength: 12)
 
                 Button {
                     dismiss()
                 } label: {
-                    Text("TORNA AI LOG")
+                    Text(String(localized: "export.back_to_logs"))
                         .font(.system(size: 10, weight: .black, design: .rounded))
                         .foregroundStyle(DiveUI.yellow)
                         .padding(.horizontal, 11)

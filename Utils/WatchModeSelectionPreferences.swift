@@ -15,5 +15,7 @@ enum WatchModeSelectionPreferences {
     }
 
     /// Dormant until Snorkeling/Apnea ship in MAIN; Mode Selection stays hidden when false.
+    /// When false, `ContentView` omits `ModeSelectionView` and cold launch opens Live Dive (`AppNavigationStore`).
+    /// Experimental modes remain on `codex/experimental-features` only — never exposed here.
     static let hasMultipleStableModes = false
 }

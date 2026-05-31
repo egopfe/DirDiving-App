@@ -129,6 +129,9 @@ struct CompassView: View {
             }
         }
         .frame(width: 156, height: 156)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(localized: "BUSSOLA"))
+        .accessibilityValue(String(format: String(localized: "compass.a11y.heading_format"), headingText, compass.cardinal))
     }
 
     private var diveMetricsPanel: some View {
@@ -220,13 +223,14 @@ struct CompassView: View {
                 }
                 .buttonStyle(.plain)
                 .background(commandBackground(DiveUI.yellow))
+                .accessibilityLabel(String(localized: "compass.bearing.set.a11y"))
 
                 Button {
                     compass.clearBearing()
                     HapticService.shared.confirm()
                     showBearingToast(String(localized: "compass.bearing.clear.toast"))
                 } label: {
-                    Text("CLEAR")
+                    Text(String(localized: "compass.bearing.clear"))
                         .font(.system(size: 11, weight: .black, design: .rounded))
                         .foregroundStyle(compass.bearingDegrees == nil ? .white.opacity(0.34) : DiveUI.red)
                         .frame(maxWidth: .infinity, minHeight: 31)
@@ -234,6 +238,7 @@ struct CompassView: View {
                 .buttonStyle(.plain)
                 .disabled(compass.bearingDegrees == nil)
                 .background(commandBackground(compass.bearingDegrees == nil ? .white.opacity(0.34) : DiveUI.red))
+                .accessibilityLabel(String(localized: "compass.bearing.clear.a11y"))
             }
         }
     }
