@@ -1,8 +1,11 @@
 import Foundation
 import Combine
+import os
 
 @MainActor
 final class DiveLogStore: ObservableObject {
+    private static let logger = Logger(subsystem: "com.egopfe.dirdiving.ios", category: "DiveLogStore")
+
     static let includeDemoLogbookKey = "dirdiving_ios_include_demo_logbook"
 
     @Published private(set) var sessions: [DiveSession] = [] {
@@ -20,9 +23,11 @@ final class DiveLogStore: ObservableObject {
     @Published private(set) var sessionMergeConflicts: [DiveSessionMergeConflict] = []
 
     private var conflictLocalSnapshots: [UUID: DiveSession] = [:]
+    private var conflictCloudSnapshots: [UUID: DiveSession] = [:]
 
     private let cloudSync: CloudSyncStore?
     private let key = "dirdiving_ios_dive_sessions"
+    private let protectedFileName = "dirdiving_ios_dive_sessions.json"
     private let deletedKey = WatchSyncKeys.deletedSessionIDsKey
     private let legacyDeletedKeys = [
         "dirdiving_ios_deleted_session_ids",
@@ -133,13 +138,15 @@ final class DiveLogStore: ObservableObject {
         guard let local = conflictLocalSnapshots[sessionID] ?? sessions.first(where: { $0.id == sessionID }) else { return }
         applyResolvedSession(local)
         conflictLocalSnapshots.removeValue(forKey: sessionID)
+        conflictCloudSnapshots.removeValue(forKey: sessionID)
     }
 
     func resolveSessionMergeConflictUsingCloud(sessionID: UUID) {
-        guard let cloudSessions = loadRawCloudSessions(),
-              let cloud = cloudSessions.first(where: { $0.id == sessionID }) else { return }
+        let cloud = conflictCloudSnapshots[sessionID] ?? loadRawCloudSessions()?.first(where: { $0.id == sessionID })
+        guard let cloud else { return }
         applyResolvedSession(cloud)
         conflictLocalSnapshots.removeValue(forKey: sessionID)
+        conflictCloudSnapshots.removeValue(forKey: sessionID)
     }
 
     private func applyResolvedSession(_ session: DiveSession) {
@@ -166,9 +173,39 @@ final class DiveLogStore: ObservableObject {
                 conflictIDs.contains(session.id) ? (session.id, session) : nil
             }
         )
+        conflictCloudSnapshots = Dictionary(
+            uniqueKeysWithValues: cloud.compactMap { session in
+                conflictIDs.contains(session.id) ? (session.id, session) : nil
+            }
+        )
     }
 
     private func loadLocalSessions() -> [DiveSession] {
+        if let protected = loadProtectedSessions() {
+            return protected
+        }
+        let legacy = loadLegacyLocalSessions()
+        if !legacy.isEmpty {
+            persistProtectedSessions(legacy)
+        }
+        return legacy
+    }
+
+    private func loadProtectedSessions() -> [DiveSession]? {
+        let url = protectedFileURL()
+        guard FileManager.default.fileExists(atPath: url.path),
+              let data = try? Data(contentsOf: url) else { return nil }
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        do {
+            return try decoder.decode([DiveSession].self, from: data)
+        } catch {
+            Self.logger.error("Protected iOS logbook decode failed: \(error.localizedDescription, privacy: .private)")
+            return nil
+        }
+    }
+
+    private func loadLegacyLocalSessions() -> [DiveSession] {
         let data = cloudSync?.loadRawLocalData(forKey: key) ?? UserDefaults.standard.data(forKey: key)
         guard let data else { return [] }
         if let decoded = cloudSync?.decodeLocal([DiveSession].self, from: data) {
@@ -229,8 +266,35 @@ final class DiveLogStore: ObservableObject {
 
     private func saveIfReady() {
         guard isReady else { return }
-        cloudSync?.save(sessions, forKey: key)
+        persistProtectedSessions(sessions)
         cloudSync?.save(Array(deletedSessionIDs), forKey: deletedKey)
+        removeLegacySessionPayload()
+    }
+
+    private func persistProtectedSessions(_ sessions: [DiveSession]) {
+        do {
+            let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .iso8601
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            let data = try encoder.encode(sessions)
+            try data.write(to: protectedFileURL(), options: [.atomic, .completeFileProtection])
+        } catch {
+            Self.logger.error("Protected iOS logbook save failed: \(error.localizedDescription, privacy: .private)")
+        }
+    }
+
+    private func protectedFileURL() -> URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent(protectedFileName)
+    }
+
+    private func removeLegacySessionPayload() {
+        if let cloudSync {
+            cloudSync.removeValue(forKey: key)
+        } else {
+            UserDefaults.standard.removeObject(forKey: key)
+            UserDefaults.standard.removeObject(forKey: "\(key).__modifiedAt")
+        }
     }
 
     private func applyDemoLogbookPreference() {

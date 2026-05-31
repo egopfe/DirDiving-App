@@ -83,7 +83,7 @@ Rif. `Docs/SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md` (Appendix A) e commit `
 
 - [ ] **F6** — Tampering del campo `issuedAt` > 1 h fuori dal `Date()` corrente → import iOS rigetta con `WatchDiveSyncError.stalePayload`.
 - [ ] **F11** — iPhone con build aggiornata: il reply include `ackSignature` HMAC; Watch logga "ack firmato dal companion".
-- [ ] **F11 legacy fallback** — iPhone con build precedente (no `ackSignature`): Watch logga "ack legacy" e la pending queue si svuota comunque.
+- [ ] **Signed ACK enforcement** — iPhone con build precedente o reply senza `ackSignature`: Watch mostra errore e conserva la pending queue.
 - [ ] Tampering del campo `body` con MAC valido per body originale → `WatchDiveSyncError.invalidSignature`.
 
 ### Input validation

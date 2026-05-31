@@ -52,7 +52,7 @@ struct AscentGaugeView: View {
         let limit = max(status.limitMetersPerMinute, 0.5)
         let ticks: [(Double, Color)] = [
             (limit, DiveUI.red),
-            (limit * 0.75, DiveUI.yellow),
+            (limit * AscentStatus.greenThresholdRatio, DiveUI.yellow),
             (limit * 0.5, DiveUI.green),
             (limit * 0.25, DiveUI.green),
             (0, DiveUI.green)
@@ -71,13 +71,7 @@ struct AscentGaugeView: View {
                 RoundedRectangle(cornerRadius: 4, style: .continuous)
                     .fill(.white.opacity(0.08))
                     .overlay(
-                        VStack(spacing: 0) {
-                            Rectangle().fill(DiveUI.red)
-                            Rectangle().fill(DiveUI.yellow)
-                            Rectangle().fill(DiveUI.green)
-                        }
-                        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
-                        .padding(2)
+                        gaugeBands
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 4, style: .continuous)
@@ -100,6 +94,29 @@ struct AscentGaugeView: View {
                     .shadow(color: pointerColor.opacity(0.6), radius: 4, x: 0, y: 0)
                     .offset(x: 25, y: pointerOffset(in: geometry.size.height))
             }
+        }
+    }
+
+    private var gaugeBands: some View {
+        GeometryReader { geometry in
+            let height = max(geometry.size.height - 4, 0)
+            let greenHeight = height * CGFloat(AscentStatus.greenThresholdRatio)
+            let yellowHeight = height * CGFloat(AscentStatus.redThresholdRatio - AscentStatus.greenThresholdRatio)
+            ZStack(alignment: .top) {
+                VStack(spacing: 0) {
+                    Rectangle()
+                        .fill(DiveUI.yellow)
+                        .frame(height: yellowHeight)
+                    Rectangle()
+                        .fill(DiveUI.green)
+                        .frame(height: greenHeight)
+                }
+                Rectangle()
+                    .fill(DiveUI.red)
+                    .frame(height: max(2, height * 0.04))
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+            .padding(2)
         }
     }
 

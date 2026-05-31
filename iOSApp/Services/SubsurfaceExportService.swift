@@ -30,10 +30,10 @@ enum SubsurfaceExportService {
         rows.append(contentsOf: metadataLines(for: normalized))
         let manualMeta = [
             normalized.isManual ? "1" : "0",
-            csvEscape(normalized.equipmentUsed ?? ""),
-            csvEscape(normalized.entryPressureText ?? ""),
-            csvEscape(normalized.exitPressureText ?? ""),
-            csvEscape(normalized.decompressionNotes ?? "")
+            csvField(normalized.equipmentUsed ?? ""),
+            csvField(normalized.entryPressureText ?? ""),
+            csvField(normalized.exitPressureText ?? ""),
+            csvField(normalized.decompressionNotes ?? "")
         ].joined(separator: ",")
         rows.append("# session_meta,\(manualMeta)")
         var previousSeconds = 0
@@ -47,7 +47,21 @@ enum SubsurfaceExportService {
             let entryLon = normalized.entryGPS.map { String(format: "%.6f", $0.longitude) } ?? ""
             let exitLat = normalized.exitGPS.map { String(format: "%.6f", $0.latitude) } ?? ""
             let exitLon = normalized.exitGPS.map { String(format: "%.6f", $0.longitude) } ?? ""
-            rows.append("\(seconds),\(String(format: "%.2f", sample.depthMeters)),\(temp),\(entryLat),\(entryLon),\(exitLat),\(exitLon)")
+            let fields = [
+                String(seconds),
+                String(format: "%.2f", sample.depthMeters),
+                temp,
+                entryLat,
+                entryLon,
+                exitLat,
+                exitLon,
+                normalized.isManual ? "1" : "0",
+                normalized.equipmentUsed ?? "",
+                normalized.entryPressureText ?? "",
+                normalized.exitPressureText ?? "",
+                normalized.decompressionNotes ?? ""
+            ].map(csvField)
+            rows.append(fields.joined(separator: ","))
         }
     }
 
@@ -59,19 +73,23 @@ enum SubsurfaceExportService {
             "# dirdiving_start_date: \(formatter.string(from: session.startDate))",
             "# dirdiving_end_date: \(formatter.string(from: session.endDate))",
             "# dirdiving_is_manual: \(session.isManual ? 1 : 0)",
-            "# dirdiving_equipment: \(csvEscape(session.equipmentUsed ?? ""))",
-            "# dirdiving_entry_pressure: \(csvEscape(session.entryPressureText ?? ""))",
-            "# dirdiving_exit_pressure: \(csvEscape(session.exitPressureText ?? ""))",
-            "# dirdiving_deco_notes: \(csvEscape(session.decompressionNotes ?? ""))",
-            "# dirdiving_site_name: \(csvEscape(session.siteName ?? ""))",
-            "# dirdiving_buddy: \(csvEscape(session.buddy ?? ""))",
+            "# dirdiving_equipment: \(csvField(session.equipmentUsed ?? ""))",
+            "# dirdiving_entry_pressure: \(csvField(session.entryPressureText ?? ""))",
+            "# dirdiving_exit_pressure: \(csvField(session.exitPressureText ?? ""))",
+            "# dirdiving_deco_notes: \(csvField(session.decompressionNotes ?? ""))",
+            "# dirdiving_site_name: \(csvField(session.siteName ?? ""))",
+            "# dirdiving_buddy: \(csvField(session.buddy ?? ""))",
             "# dirdiving_gas_label: \(session.gasLabel.rawValue)",
             "# dirdiving_sac: \(session.sacLitersMinute.map { String(format: "%.2f", $0) } ?? "")"
         ]
     }
 
-    private static func csvEscape(_ value: String) -> String {
-        value.replacingOccurrences(of: "\"", with: "\"\"")
+    private static func csvField(_ value: String) -> String {
+        let escaped = value.replacingOccurrences(of: "\"", with: "\"\"")
+        if escaped.contains(",") || escaped.contains("\"") || escaped.contains("\n") || escaped.contains("\r") {
+            return "\"\(escaped)\""
+        }
+        return escaped
     }
 
     static func writeCSV(for session: DiveSession) -> Result<URL, ExportError> {
