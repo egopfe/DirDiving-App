@@ -6,6 +6,17 @@ struct AscentRateSettingsView: View {
 
     private var unitPreference: DIRUnitPreference { DIRUnitPreference.fromStorage(watchUnits) }
 
+    private func depthBandLabel(fromMeters upper: Double, toMeters lower: Double) -> String {
+        let upperDisplay = unitPreference.depthDisplay(meters: upper)
+        let lowerDisplay = unitPreference.depthDisplay(meters: lower)
+        return String(
+            format: String(localized: "ascent.band.depth_range"),
+            Formatters.one(upperDisplay.value),
+            Formatters.one(lowerDisplay.value),
+            upperDisplay.unit
+        )
+    }
+
     var body: some View {
         ZStack {
             DiveScreenBackground()
@@ -13,11 +24,11 @@ struct AscentRateSettingsView: View {
             ScrollView {
                 VStack(spacing: 10) {
                     header
-                    limitControl("40-30 m", value: $settings.limits.deepMetersPerMinute, accent: DiveUI.red)
-                    limitControl("30-20 m", value: $settings.limits.midMetersPerMinute, accent: DiveUI.orange)
-                    limitControl("20-6 m", value: $settings.limits.shallowMetersPerMinute, accent: DiveUI.yellow)
-                    limitControl("6-0 m", value: $settings.limits.surfaceMetersPerMinute, accent: DiveUI.green)
-                    limitControl("OTHER", value: $settings.limits.fallbackMetersPerMinute, accent: DiveUI.blue)
+                    limitControl(depthBandLabel(fromMeters: 40, toMeters: 30), value: $settings.limits.deepMetersPerMinute, accent: DiveUI.red)
+                    limitControl(depthBandLabel(fromMeters: 30, toMeters: 20), value: $settings.limits.midMetersPerMinute, accent: DiveUI.orange)
+                    limitControl(depthBandLabel(fromMeters: 20, toMeters: 6), value: $settings.limits.shallowMetersPerMinute, accent: DiveUI.yellow)
+                    limitControl(depthBandLabel(fromMeters: 6, toMeters: 0), value: $settings.limits.surfaceMetersPerMinute, accent: DiveUI.green)
+                    limitControl(String(localized: "ascent.band.other"), value: $settings.limits.fallbackMetersPerMinute, accent: DiveUI.blue)
 
                     DiveCommandButton("RESET STD", systemImage: "arrow.clockwise", color: .white.opacity(0.78)) {
                         settings.resetToStandard()

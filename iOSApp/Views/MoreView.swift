@@ -15,25 +15,25 @@ struct MoreView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         VStack(alignment: .leading, spacing: 7) {
-                            Text(String(localized: "Altro"))
+                            Text(String(localized: "more.title"))
                                 .font(.system(size: 30, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
                             Text(String(localized: "more.header.subtitle"))
                                 .font(.callout)
                                 .foregroundStyle(DIRTheme.muted)
                         }
-                        DIRCard(String(localized: "PREFERENZE APP"), icon: "gearshape.fill", accent: DIRTheme.cyan) {
+                        DIRCard(String(localized: "more.section.preferences"), icon: "gearshape.fill", accent: DIRTheme.cyan) {
                             languagePreferencePicker
                             unitsPreferenceSection
                             row(String(localized: "more.settings.sync_scope_title"), String(localized: "more.settings.sync_scope_value"))
                             row(String(localized: "units.title"), String(localized: "more.settings.units_synced"))
                             row(String(localized: "more.settings.local_only_title"), String(localized: "more.settings.local_only_value"))
-                            row(String(localized: "more.planner_safety.title"), String(localized: "Disclaimer richiesto"))
+                            row(String(localized: "more.planner_safety.title"), String(localized: "more.disclaimer.required"))
                             NavigationLink {
                                 IOSLegalSafetyView()
                             } label: {
                                 HStack {
-                                    Label(String(localized: "Legal & Safety"), systemImage: "checkmark.shield")
+                                    Label(String(localized: "more.legal_safety"), systemImage: "checkmark.shield")
                                         .foregroundStyle(DIRTheme.cyan)
                                     Spacer()
                                     Image(systemName: "chevron.right")
@@ -45,10 +45,12 @@ struct MoreView: View {
                             }
                             .buttonStyle(.plain)
                         }
-                        DIRCard(String(localized: "SYNC WATCH"), icon: "applewatch", accent: DIRTheme.cyan) {
+                        DIRCard(String(localized: "more.section.sync_watch"), icon: "applewatch", accent: DIRTheme.cyan) {
                             row(String(localized: "more.sync.supported"), watchSync.isSupported ? String(localized: "more.yes") : String(localized: "more.no"))
                             row(String(localized: "more.sync.state"), watchSync.userVisibleState)
                             row(String(localized: "more.sync.last_event"), watchSync.lastMessage)
+                            row(String(localized: "more.sync.queue_count"), "\(watchSync.pendingWatchQueueCount)")
+                            row(String(localized: "more.sync.last_success"), formattedWatchLastSuccess)
                             syncActivitySection
                             WatchPhotoTransferPanel()
                             Button {
@@ -75,12 +77,16 @@ struct MoreView: View {
                             .buttonStyle(.plain)
                         }
                         if !watchSync.conflicts.isEmpty {
-                            syncConflictsCard
+                            watchSyncConflictsCard
                         }
-                        DIRCard(String(localized: "BACKUP CLOUD"), icon: "icloud", accent: DIRTheme.green) {
-                            row(String(localized: "iCloud Sync"), cloudSync.isICloudAvailable ? String(localized: "more.icloud.active") : String(localized: "more.icloud.unavailable"))
-                            row(String(localized: "Backup automatico"), String(localized: "Log e planner"))
-                            row(String(localized: "Ultimo evento"), cloudSync.lastSyncStatus)
+                        if !logStore.sessionMergeConflicts.isEmpty {
+                            cloudMergeConflictsCard
+                        }
+                        DIRCard(String(localized: "more.section.cloud_backup"), icon: "icloud", accent: DIRTheme.green) {
+                            row(String(localized: "more.icloud.sync_title"), cloudSync.isICloudAvailable ? String(localized: "more.icloud.active") : String(localized: "more.icloud.unavailable"))
+                            row(String(localized: "more.icloud.backup_scope"), String(localized: "more.icloud.backup_scope_value"))
+                            row(String(localized: "more.icloud.last_event"), cloudSync.lastSyncStatus)
+                            row(String(localized: "more.icloud.last_success"), formattedCloudLastSuccess)
                             if let cloudDecodeError = cloudSync.lastDecodeError {
                                 Text(cloudDecodeError)
                                     .font(.caption2.weight(.semibold))
@@ -93,31 +99,38 @@ struct MoreView: View {
                                 logStore.synchronizeCloud()
                                 cloudSync.synchronize()
                             } label: {
-                                Label(String(localized: "Sincronizza ora"), systemImage: "icloud.and.arrow.up")
-                                    .font(.callout.weight(.semibold))
-                                    .foregroundStyle(DIRTheme.cyan)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 10)
-                                    .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
+                                HStack(spacing: 8) {
+                                    if cloudSync.isSynchronizing {
+                                        ProgressView()
+                                            .tint(DIRTheme.cyan)
+                                    }
+                                    Label(String(localized: "more.icloud.sync_now"), systemImage: "icloud.and.arrow.up")
+                                        .font(.callout.weight(.semibold))
+                                        .foregroundStyle(DIRTheme.cyan)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
                             }
                             .buttonStyle(.plain)
+                            .disabled(cloudSync.isSynchronizing)
                         }
-                        DIRCard(String(localized: "REVIEWER"), icon: "books.vertical", accent: DIRTheme.yellow) {
+                        DIRCard(String(localized: "more.section.reviewer"), icon: "books.vertical", accent: DIRTheme.yellow) {
                             Toggle(isOn: Binding(
                                 get: { logStore.includeDemoLogbook },
                                 set: { logStore.includeDemoLogbook = $0 }
                             )) {
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text(String(localized: "Logbook dimostrativo"))
+                                    Text(String(localized: "more.reviewer.demo_logbook"))
                                         .foregroundStyle(.white)
-                                    Text(String(localized: "Carica 5 immersioni demo per revisione App Store."))
+                                    Text(String(localized: "more.reviewer.demo_logbook_hint"))
                                         .font(.caption2)
                                         .foregroundStyle(DIRTheme.muted)
                                 }
                             }
                             .tint(DIRTheme.cyan)
                         }
-                        DIRCard(String(localized: "EXPORT"), icon: "square.and.arrow.up", accent: DIRTheme.cyan) {
+                        DIRCard(String(localized: "more.section.export"), icon: "square.and.arrow.up", accent: DIRTheme.cyan) {
                             row(String(localized: "Subsurface"), "CSV")
                             row(String(localized: "Bundle"), "com.egopfe.dirdiving.ios")
                             CSVImportPanel()
@@ -139,6 +152,20 @@ struct MoreView: View {
                 Text(String(localized: "more.sync.reset_pairing_message"))
             }
         }
+    }
+
+    private var formattedWatchLastSuccess: String {
+        guard let date = watchSync.lastSuccessfulSyncDate else {
+            return String(localized: "more.sync.last_success.none")
+        }
+        return date.formatted(date: .abbreviated, time: .shortened)
+    }
+
+    private var formattedCloudLastSuccess: String {
+        guard let date = cloudSync.lastSuccessfulSyncDate else {
+            return String(localized: "more.sync.last_success.none")
+        }
+        return date.formatted(date: .abbreviated, time: .shortened)
     }
 
     private var unitsPreferenceSection: some View {
@@ -176,7 +203,7 @@ struct MoreView: View {
 
         return VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(String(localized: "Lingua"))
+                Text(String(localized: "more.language.title"))
                     .foregroundStyle(DIRTheme.muted)
                 Spacer()
                 Text(selectedLanguage.title)
@@ -184,7 +211,7 @@ struct MoreView: View {
                     .fontWeight(.semibold)
             }
             .font(.callout)
-            Picker("Lingua", selection: $appLanguage) {
+            Picker(String(localized: "more.language.title"), selection: $appLanguage) {
                 ForEach(DIRIOSAppLanguage.allCases) { language in
                     Text(language.title).tag(language.rawValue)
                 }
@@ -201,7 +228,7 @@ struct MoreView: View {
         .padding(.vertical, 5)
     }
 
-    private var syncConflictsCard: some View {
+    private var watchSyncConflictsCard: some View {
         DIRCard(String(localized: "more.sync.conflicts_title"), icon: "arrow.triangle.merge", accent: DIRTheme.orange) {
             ForEach(watchSync.conflicts) { conflict in
                 VStack(alignment: .leading, spacing: 8) {
@@ -238,6 +265,58 @@ struct MoreView: View {
                 }
                 .padding(.vertical, 4)
                 if conflict.id != watchSync.conflicts.last?.id {
+                    Divider().overlay(DIRTheme.hairline)
+                }
+            }
+        }
+    }
+
+    private var cloudMergeConflictsCard: some View {
+        let grouped = Dictionary(grouping: logStore.sessionMergeConflicts, by: \.sessionID)
+        let sessionIDs = grouped.keys.sorted { $0.uuidString < $1.uuidString }
+
+        return DIRCard(String(localized: "cloud.merge.conflicts_title"), icon: "arrow.triangle.merge", accent: DIRTheme.orange) {
+            ForEach(sessionIDs, id: \.self) { sessionID in
+                let conflicts = grouped[sessionID] ?? []
+                VStack(alignment: .leading, spacing: 8) {
+                    if let siteName = logStore.session(id: sessionID)?.siteName, !siteName.isEmpty {
+                        Text(siteName)
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(.white)
+                    }
+                    ForEach(conflicts) { conflict in
+                        Text(conflict.userMessage)
+                            .font(.caption)
+                            .foregroundStyle(DIRTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    HStack(spacing: 8) {
+                        Button {
+                            logStore.resolveSessionMergeConflictUsingCloud(sessionID: sessionID)
+                        } label: {
+                            Text(String(localized: "cloud.merge.use_icloud"))
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(DIRTheme.cyan)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                                .background(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan, lineWidth: 1))
+                        }
+                        .buttonStyle(.plain)
+                        Button {
+                            logStore.resolveSessionMergeConflictKeepingLocal(sessionID: sessionID)
+                        } label: {
+                            Text(String(localized: "cloud.merge.keep_local"))
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(DIRTheme.yellow)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                                .background(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.yellow, lineWidth: 1))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.vertical, 4)
+                if sessionID != sessionIDs.last {
                     Divider().overlay(DIRTheme.hairline)
                 }
             }

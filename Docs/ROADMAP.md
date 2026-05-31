@@ -1,6 +1,6 @@
 # Roadmap DIR DIVING
 
-**Aggiornato:** 2026-05-31 (`main` = `origin/main` @ `1d69d88`)
+**Aggiornato:** 2026-05-31 (`main` = `origin/main` @ `c8f91f6`)
 
 ## Rilasciati su `main` (Watch MAIN + iOS nel workspace)
 
@@ -59,6 +59,7 @@
 | iOS Buhlmann UX/UI readiness | ✅ | Fix @ `3237262`; re-audit **Ready** — [`Docs/DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md) |
 | iOS MAIN algorithmic readiness 100% | ✅ | @ `dce89e7` — audit B2–B5; [`Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md); **154** XCTest |
 | iOS Bühlmann readiness P1–P4 | ✅ | @ `dae29b8` — [`Docs/DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md`](DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md) |
+| MAIN UI/UX readiness 100% (codice) | ✅ | @ `c8f91f6` — [`Docs/MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md`](MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md); QA fisica § I ancora richiesta |
 | Docs alignment 2026-05-31 | ✅ | [`DOCUMENTATION_UPDATE_REPORT_20260531.md`](DOCUMENTATION_UPDATE_REPORT_20260531.md) |
 | Docs Phase 15 alignment | ✅ | [`DOCUMENTATION_BRANCH_ALIGNMENT_20260530.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260530.md) |
 | Docs / audit alignment 2026-05-25 | ✅ | README, INDEX, safety/release docs e matrix riallineati al MAIN corrente |

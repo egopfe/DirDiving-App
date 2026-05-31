@@ -184,3 +184,42 @@ All active branches merged/pushed through `e952b55`:
 | `codex/experimental-features` | `8e1a6ff` |
 | `codex/ios-experimental-features` | `b02a658` |
 | `codex/watch-main-algorithm-audit-current` | `82a4cb3` |
+
+---
+
+## Part 4 — MAIN UI/UX readiness 100% documentation pass (@ `c8f91f6`)
+
+**Trigger:** Runtime remediation P0–P2 @ `d796bfd` + P3 @ `c8f91f6`. Builds + algorithm tests **PASS** (Watch Ultra 3 + iPhone 17 sim).
+
+### Files created (runtime pass, prior commits)
+
+| File | Purpose |
+|------|---------|
+| `Docs/MAIN_UI_UX_READINESS_AUDIT_CURRENT.md` | Read-only pre-fix audit (83/86/81%) |
+| `Docs/MAIN_UI_UX_READINESS_AUDIT_LONG_PRE_FIX.md` | Issue inventory pre-fix |
+| `Docs/MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md` | Post-fix verdict 100% (codice) |
+| `Docs/MAIN_UI_UX_READINESS_QA_ANALYSIS.md` | Build/test QA synthesis |
+
+### Files updated (this pass)
+
+| File | Change |
+|------|--------|
+| `README.md` | Baseline `c8f91f6`; UI/UX readiness row |
+| `CHANGELOG.md` | Unreleased UI/UX entries @ `d796bfd` / `c8f91f6` |
+| `Docs/INDEX.md` | § MAIN UI/UX readiness @ `c8f91f6` |
+| `Docs/ROADMAP.md` | Released UI/UX 100% row |
+| `Docs/BUILD_VALIDATION.md` | UI/UX baseline note |
+| `Docs/TESTFLIGHT_REVIEW_NOTES.md` | UI/UX post-fix doc ref |
+| `Docs/PR_STATUS_20260531.md` | Baseline + QA § I |
+| `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260531.md` | Branch sync @ `c8f91f6` |
+| `Docs/MAIN_UI_UX_READINESS_AUDIT_CURRENT.md` | Supersession note → post-fix report |
+| `Docs/DIR_DIVING_Feature_Comparison.csv` | Row 68 fixed; +12 UI/UX/doc rows |
+
+### CSV highlights
+
+- Row **68** (iOS logbook destructive confirmations): TODO → **Implemented** @ `c8f91f6`
+- New rows: Live scroll, legal i18n, Crown hint, Policy A edit, DEMO badge, iCloud conflicts, expanded search, CSVImportPanel, mode selection docs, UI/UX audit docs
+
+### Branch sync (2026-05-31, post UI/UX docs)
+
+All active branches merged/pushed through `c8f91f6` (see `DOCUMENTATION_BRANCH_ALIGNMENT_20260531.md` for commit SHAs after sync).

@@ -26,7 +26,10 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published private(set) var failedImportCount = 0
     @Published private(set) var conflicts: [SyncConflict] = []
     @Published private(set) var recentActivity: [SyncActivityItem] = []
+    @Published private(set) var lastSuccessfulSyncDate: Date?
     private weak var logStore: DiveLogStore?
+
+    var pendingWatchQueueCount: Int { pendingOutboundSessions.count }
     private var importedSessionIDs: Set<UUID> = []
     private var pushedToWatchSessionIDs: Set<UUID> = []
     private var pendingOutboundSessions: [DiveSession] = []
@@ -173,7 +176,7 @@ final class WatchSyncService: NSObject, ObservableObject {
                 WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
                 importedSessionCount = importedSessionIDs.count
                 lastMessage = String(localized: "Immersione aggiornata dal Watch")
-                recordActivity(title: String(localized: "sync.activity.received_from_watch"), detail: sessionSummary(session))
+                recordActivity(title: String(localized: "sync.activity.received_from_watch"), detail: sessionSummary(session), marksSuccess: true)
                 return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
             }
             guard !importedSessionIDs.contains(session.id) else {
@@ -189,7 +192,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
             importedSessionCount = importedSessionIDs.count
             lastMessage = String(localized: "Immersione ricevuta dal Watch")
-            recordActivity(title: String(localized: "sync.activity.received_from_watch"), detail: sessionSummary(session))
+            recordActivity(title: String(localized: "sync.activity.received_from_watch"), detail: sessionSummary(session), marksSuccess: true)
             return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
         } catch {
             failedImportCount += 1
@@ -302,7 +305,7 @@ final class WatchSyncService: NSObject, ObservableObject {
                         self?.markPushedToWatch(session.id)
                         self?.removeOutboundSession(id: session.id)
                         self?.lastMessage = String(localized: "Immersione inviata al Watch")
-                        self?.recordActivity(title: String(localized: "sync.activity.sent_to_watch"), detail: self?.sessionSummary(session) ?? "")
+                        self?.recordActivity(title: String(localized: "sync.activity.sent_to_watch"), detail: self?.sessionSummary(session) ?? "", marksSuccess: true)
                     }
                 } errorHandler: { [weak self] _ in
                     Task { @MainActor in
@@ -373,13 +376,17 @@ final class WatchSyncService: NSObject, ObservableObject {
         return "\(started) · \(Formatters.one(session.maxDepthMeters)) m · \(minutes) min"
     }
 
-    private func recordActivity(title: String, detail: String) {
+    private func recordActivity(title: String, detail: String, marksSuccess: Bool = false) {
         let normalizedDetail = detail.isEmpty ? "—" : detail
+        let timestamp = Date()
         recentActivity.insert(
-            SyncActivityItem(title: title, detail: normalizedDetail, timestamp: Date()),
+            SyncActivityItem(title: title, detail: normalizedDetail, timestamp: timestamp),
             at: 0
         )
         recentActivity = Array(recentActivity.prefix(6))
+        if marksSuccess {
+            lastSuccessfulSyncDate = timestamp
+        }
     }
 }
 

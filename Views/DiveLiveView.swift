@@ -225,51 +225,76 @@ struct DiveLiveView: View {
     }
 
     private func activeDiveContent(leftWidth: CGFloat, gaugeWidth: CGFloat) -> some View {
-        VStack(spacing: 7) {
-            topBar
-            immersionStatus
-            if dive.isDepthAutomationAvailable && !dive.isManualLifecycleActive {
-                Text(String(localized: "live.auto_dive.active.hint"))
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
-                    .foregroundStyle(DiveUI.secondaryText)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            if !hapticsEnabled {
-                hapticsOffBadge
-            }
-            ttvRuntimePanel
-            if showAscentAlarmBanner {
-                AscentWarningBannerView(
-                    rateMetersPerMinute: dive.ascentStatus.currentRateMetersPerMinute,
-                    isActive: true,
-                    units: unitPreference
-                )
-                .transition(activeDiveTransition)
-            }
-            if dive.isDepthDataStale {
-                depthStaleBanner
+        ScrollView {
+            VStack(spacing: activeDiveSpacing) {
+                topBar
+                immersionStatus
+                if dive.isDepthAutomationAvailable && !dive.isManualLifecycleActive {
+                    Text(String(localized: "live.auto_dive.active.hint"))
+                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .foregroundStyle(DiveUI.secondaryText)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                if !hapticsEnabled {
+                    hapticsOffBadge
+                }
+                ttvRuntimePanel
+                    .layoutPriority(2)
+                if showAscentAlarmBanner {
+                    AscentWarningBannerView(
+                        rateMetersPerMinute: dive.ascentStatus.currentRateMetersPerMinute,
+                        isActive: true,
+                        units: unitPreference
+                    )
                     .transition(activeDiveTransition)
-            } else if dive.isManualNoDepthSession {
-                manualNoDepthBanner
-                    .transition(activeDiveTransition)
+                }
+                if dive.isDepthDataStale {
+                    depthStaleBanner
+                        .transition(activeDiveTransition)
+                } else if dive.isManualNoDepthSession {
+                    manualNoDepthBanner
+                        .transition(activeDiveTransition)
+                }
+                if depthSafetyState != .normal {
+                    DepthSafetyBannerView(state: depthSafetyState)
+                        .transition(activeDiveTransition)
+                }
+                if dive.exceededSupportedDepthRange {
+                    Text(String(localized: "depth.safety.exceeded.readings"))
+                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .foregroundStyle(DiveUI.red)
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                depthSection(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
+                    .layoutPriority(2)
+                stopwatchPanel
+                controls
+                    .layoutPriority(1)
             }
-            if depthSafetyState != .normal {
-                DepthSafetyBannerView(state: depthSafetyState)
-                    .transition(activeDiveTransition)
-            }
-            if dive.exceededSupportedDepthRange {
-                Text(String(localized: "depth.safety.exceeded.readings"))
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
-                    .foregroundStyle(DiveUI.red)
-                    .multilineTextAlignment(.leading)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            depthSection(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
-            stopwatchPanel
-            controls
         }
+        .scrollIndicators(.hidden)
         .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.3) : nil, value: showAscentAlarmBanner)
         .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.22) : nil, value: depthSafetyState)
+    }
+
+    private var activeBannerCount: Int {
+        var count = 0
+        if showAscentAlarmBanner { count += 1 }
+        if dive.isDepthDataStale || dive.isManualNoDepthSession { count += 1 }
+        if depthSafetyState != .normal { count += 1 }
+        if dive.exceededSupportedDepthRange { count += 1 }
+        if !hapticsEnabled { count += 1 }
+        if dive.isDepthAutomationAvailable && !dive.isManualLifecycleActive { count += 1 }
+        return count
+    }
+
+    private var activeDiveSpacing: CGFloat {
+        switch activeBannerCount {
+        case 0...1: return 7
+        case 2...3: return 4
+        default: return 3
+        }
     }
 
     private var preDiveWaitingContent: some View {

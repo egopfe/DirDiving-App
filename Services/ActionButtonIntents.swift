@@ -25,6 +25,9 @@ struct ResetStopwatchIntent: AppIntent {
             guard let manager = DiveManager.shared else {
                 throw DIRDivingShortcutError.appStateUnavailable
             }
+            if manager.stopwatchTime > 0 {
+                throw DIRDivingShortcutError.stopwatchResetBlocked
+            }
             manager.resetStopwatch()
         }
         return .result()
@@ -110,9 +113,15 @@ struct AcknowledgeAlarmIntent: AppIntent {
 
 private enum DIRDivingShortcutError: LocalizedError {
     case appStateUnavailable
+    case stopwatchResetBlocked
 
     var errorDescription: String? {
-        "DIR DIVING non e pronto: apri l'app sul Watch e riprova."
+        switch self {
+        case .appStateUnavailable:
+            return String(localized: "shortcut.error.app_unavailable")
+        case .stopwatchResetBlocked:
+            return String(localized: "shortcut.error.stopwatch_reset_blocked")
+        }
     }
 }
 
