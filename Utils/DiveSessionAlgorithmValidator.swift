@@ -30,6 +30,18 @@ enum DiveSessionAlgorithmValidator {
             throw DiveSessionAlgorithmValidationError.invalidSession
         }
 
+        if session.samples.isEmpty {
+            guard session.isManual, !session.hasDepthProfile else {
+                throw DiveSessionAlgorithmValidationError.invalidSession
+            }
+            let normalized = DiveSessionMerge.preferred(session, session)
+            guard abs(normalized.durationSeconds - session.durationSeconds) < 0.001,
+                  abs(normalized.ttv - session.ttv) < 0.001 else {
+                throw DiveSessionAlgorithmValidationError.invalidSession
+            }
+            return
+        }
+
         var previousSample: DiveSample?
         for sample in session.samples {
             guard let sanitizedDepth = DiveAlgorithm.sanitizedDepthMeters(sample.depthMeters),

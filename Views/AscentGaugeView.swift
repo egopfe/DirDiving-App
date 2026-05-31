@@ -105,10 +105,11 @@ struct AscentGaugeView: View {
     }
 
     private var pointerColor: Color {
-        let ratio = status.currentRateMetersPerMinute / max(status.limitMetersPerMinute, 0.1)
-        if ratio >= 0.75 { return DiveUI.red }
-        if ratio >= 0.5 { return DiveUI.yellow }
-        return DiveUI.green
+        switch status.zone {
+        case .green: return DiveUI.green
+        case .yellow: return DiveUI.yellow
+        case .red: return DiveUI.red
+        }
     }
 
     private func scaleLabel(_ text: String, _ color: Color) -> some View {

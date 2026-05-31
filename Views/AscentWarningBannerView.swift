@@ -5,6 +5,7 @@ import SwiftUI
 struct AscentWarningBannerView: View {
     let rateMetersPerMinute: Double
     let isActive: Bool
+    var units: DIRUnitPreference = .metric
 
     @State private var borderPulse = false
 
@@ -95,9 +96,8 @@ struct AscentWarningBannerView: View {
     }
 
     private var speedLine: String {
-        let value = Formatters.one(rateMetersPerMinute)
-        let unit = String(localized: "ascent_alarm_speed_unit", bundle: .main)
-        return "+\(value) \(unit)"
+        let display = units.ascentRateDisplay(metersPerMinute: rateMetersPerMinute)
+        return "+\(Formatters.one(display.value)) \(display.unit)"
     }
 
     private var accessibilitySummary: String {

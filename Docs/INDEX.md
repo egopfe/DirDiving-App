@@ -1,9 +1,23 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-05-31  
-**Branch consigliato:** `main` = `origin/main` @ `3134859`  
+**Branch consigliato:** `main` = `origin/main` @ `b1b7953`  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-05-31 — Watch MAIN algorithmic readiness 100%
+
+Remediation completa da audit [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) (82% pre-remediation → **100%** criteri codice; QA fisica § L ancora richiesta):
+
+| Documento | Posizione | Contenuto |
+|-----------|-----------|-----------|
+| [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) | `Docs/` | **Report finale** — WMATH-HIGH/MED/LOW/INFO risolti, XCTest Watch + iOS sync |
+| [`WATCH_MANUAL_NODEPTH_SYNC_POLICY.md`](WATCH_MANUAL_NODEPTH_SYNC_POLICY.md) | `Docs/` | Policy A: sessioni manuali senza profilo — sync iOS, export disabilitato |
+| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | `Docs/` | Audit read-only originale + link al report 100% |
+
+Implementazione runtime Watch: depth silence watchdog, GPS fix/fallback/no-fix, `MonotonicElapsedClock`, blink/haptic indipendenti, gauge/zone alignment, CSV time origin, persistence class, iOS logbook manual no-depth UI.
 
 ---
 
@@ -25,13 +39,15 @@ Implementazione runtime (non Watch experimental): pressure `AmbientPressureModel
 
 ---
 
-## Aggiornamento indice 2026-05-31 — Watch MAIN algorithm audit (current) @ PR #10
+## Aggiornamento indice 2026-05-31 — Watch MAIN algorithm audit (current)
 
 Audit read-only su **Apple Watch MAIN** (`DIRDiving Watch App` only), parallelo a [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md):
 
 | Documento | Posizione | Contenuto |
 |-----------|-----------|-----------|
-| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | `Docs/` | **Audit corrente Watch MAIN** — readiness ~82%; sensor silence, gauge zones, sync/export edge cases; roadmap P0–P3 |
+| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | `Docs/` | **Audit corrente Watch MAIN** — pre-remediation ~82%; remediation **100%** codice → [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) |
+| [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) | `Docs/` | Report finale readiness 100% (codice) + QA fisica § L |
+| [`WATCH_MANUAL_NODEPTH_SYNC_POLICY.md`](WATCH_MANUAL_NODEPTH_SYNC_POLICY.md) | `Docs/` | Policy sync sessioni manuali senza profilo |
 | [`CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md) | `Docs/` | Audit pre-hardening @ `ddaf2d7` (storico) |
 | [`../DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](../DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md) | **Root repo** | Audit post-hardening 2026-05-27 |
 | [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md) | `Docs/` | Implementazione hardening @ `92e639a` |
@@ -348,7 +364,9 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md`](WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md) | Crown, Settings, App Intents, haptics (`72fa15b`) |
 | [`WATCH_MAIN_UX_CONVENTIONS.md`](WATCH_MAIN_UX_CONVENTIONS.md) | Banner risalita inline, layout Live, BUSSOLA |
 | [`MISSION_MODE_MAIN_WATCH.md`](MISSION_MODE_MAIN_WATCH.md) | Mission Mode MAIN: persistenza, attivazione/disattivazione, scope runtime e safety exclusions |
-| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | **Audit corrente** Watch MAIN @ `main` (2026-05-31): readiness ~82%, blockers sensor/sync/gauge |
+| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | **Audit corrente** Watch MAIN @ `main`: pre-audit ~82%; post-remediation **100%** codice — [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) |
+| [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) | Report readiness 100% Watch MAIN (codice + test) |
+| [`WATCH_MANUAL_NODEPTH_SYNC_POLICY.md`](WATCH_MANUAL_NODEPTH_SYNC_POLICY.md) | Policy sync manual/no-depth Watch → iOS |
 | [`CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md) | Audit Watch pre-hardening @ `ddaf2d7` |
 | [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md) | Release-hard pass @ `92e639a` + XCTest |
 | [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md) | Final hardening: cap log 40, temperature, export vuoto, GPS fallback |
@@ -366,7 +384,8 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 |-----------|-----------|
 | [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | **Audit corrente** iOS Companion MAIN — 76% @ audit → 100% @ `dce89e7` |
 | [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) | Report remediation iOS MAIN @ `dce89e7` |
-| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | Audit corrente Watch MAIN (parallelo iOS) — ~82%, PR #10 |
+| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | Audit corrente Watch MAIN — remediation **100%** codice |
+| [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) | Report finale Watch MAIN readiness |
 | [`MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524_CURRENT_PRE_MODIFICATION.md`](MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524_CURRENT_PRE_MODIFICATION.md) | **Audit UX/interaction/accessibilità PRE-MOD** @ `8a4d10e` (`.docx` omonimo) |
 | [`MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524.md`](MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524.md) | Audit UX/a11y precedente (`.docx` omonimo) |
 | [`MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523.md`](MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523.md) | Audit precedente |

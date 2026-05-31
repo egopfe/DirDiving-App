@@ -1,7 +1,7 @@
 # Build validation — DIR DIVING (MAIN)
 
-**Branch:** `main` @ `1d69d88` (`origin/main`)  
-**Algorithm baseline:** `dce89e7` (iOS MAIN readiness 100%)  
+**Branch:** `main` (`origin/main`) — Watch MAIN readiness 100% pass (2026-05-31)  
+**Algorithm baseline:** iOS @ `dce89e7`; Watch WMATH-HIGH → INFO-014 remediation  
 **Generator:** [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`project.yml` at repository root).
 
 **Latest local validation (2026-05-31):**
@@ -9,7 +9,8 @@
 - `xcodegen generate` → **PASS**
 - `xcodebuild -scheme "DIRDiving iOS" -destination 'platform=iOS Simulator,name=iPhone 17' build` → **PASS**
 - `xcodebuild test -scheme "DIRDiving iOS Algorithm Tests" -destination 'platform=iOS Simulator,name=iPhone 17'` → **PASS** (154 executed, 1 skipped, 0 failures)
-- `xcodebuild -scheme "DIRDiving Watch App" -destination 'generic/platform=watchOS Simulator' build` → **PASS** (experimental branch verified separately)
+- `xcodebuild -scheme "DIRDiving Watch App" -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm)' build` → **PASS**
+- `xcodebuild test -scheme "DIRDiving Watch Algorithm Tests" -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm)'` → **PASS** (all tests incl. `WatchReadinessAlgorithmTests`)
 
 **GitHub Actions:** Build workflow uses `macos-latest`. Jobs may fail immediately if macOS runner minutes are exhausted (no runner assigned). Local builds are authoritative until CI billing is restored.
 
