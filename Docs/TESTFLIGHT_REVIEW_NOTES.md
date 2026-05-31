@@ -1,6 +1,6 @@
 # Note per TestFlight / App Review - DIR DIVING
 
-**Aggiornato:** 2026-05-31 — branch `main` = `origin/main` (Watch + iOS MAIN readiness 100% pass)
+**Aggiornato:** 2026-05-31 — branch `main` = `origin/main` @ `c8f91f6` (Watch + iOS MAIN algorithmic + UI/UX readiness 100% codice)
 
 ## Panoramica per il revisore
 
@@ -18,6 +18,7 @@ Lo stato algoritmico MAIN e documentato in:
 - [`DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md) e [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md) per il motore Buhlmann ZHL-16C N2+He multigas reference.
 - [`DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md) per UX/UI readiness post-fix @ `3237262` (verdict **READY**).
 - [`DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md`](DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md) per CNS/OTU comprehensive NOAA e readiness P1–P4 @ `dae29b8`. La release MAIN corrente non deve essere descritta come decompression planner certificato.
+- [`MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md`](MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md) per UI/UX readiness MAIN @ `c8f91f6` (verdict **Internal TestFlight UI/UX YES**; QA fisica § I ancora richiesta).
 
 ## Account e dati demo
 

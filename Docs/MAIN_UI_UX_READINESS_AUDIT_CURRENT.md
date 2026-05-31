@@ -1,7 +1,9 @@
 # DIR DIVING — MAIN Branch UI/UX Readiness Audit (Current)
 
+> **Nota (2026-05-31):** Audit read-only **pre-fix** (83% / 86% / 81%). Remediation completa P0–P3 su `main` @ `c8f91f6`. Per lo stato corrente usare [`MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md`](MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md) e [`MAIN_UI_UX_READINESS_QA_ANALYSIS.md`](MAIN_UI_UX_READINESS_QA_ANALYSIS.md).
+
 **Date:** 2026-05-31  
-**Branch:** `main` @ `3ad40d6`  
+**Branch:** `main` @ `02eb9d8` (baseline audit; superseded by post-fix @ `c8f91f6`)  
 **Scope:** Apple Watch MAIN (`DIRDiving Watch App`) + iOS Companion MAIN (`DIRDiving iOS`)  
 **Audit type:** Read-only — no code modified  
 **Visual benchmarks:** `Docs/ReferenceUI/Watch_LIVE_reference.png`, `Docs/ReferenceUI/iOS_Companion_reference.png` (both present)

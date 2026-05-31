@@ -1,9 +1,24 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-05-31  
-**Branch consigliato:** `main` = `origin/main` @ `fbc9fa0`  
+**Branch consigliato:** `main` = `origin/main` @ `c8f91f6`  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-05-31 — MAIN UI/UX readiness 100% @ `c8f91f6`
+
+Remediation completa da audit [`MAIN_UI_UX_READINESS_AUDIT_CURRENT.md`](MAIN_UI_UX_READINESS_AUDIT_CURRENT.md) (83% Watch / 86% iOS / 81% cross-app → **100%** criteri codice; QA fisica ancora richiesta):
+
+| Documento | Posizione | Contenuto |
+|-----------|-----------|-----------|
+| [`MAIN_UI_UX_READINESS_AUDIT_CURRENT.md`](MAIN_UI_UX_READINESS_AUDIT_CURRENT.md) | `Docs/` | Audit read-only pre-fix (baseline storico @ `02eb9d8`) |
+| [`MAIN_UI_UX_READINESS_AUDIT_LONG_PRE_FIX.md`](MAIN_UI_UX_READINESS_AUDIT_LONG_PRE_FIX.md) | `Docs/` | Conferma issue pre-implementazione |
+| [`MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md`](MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md) | `Docs/` | **Report post-fix** — P0–P3 chiusi; Internal TestFlight UI/UX YES |
+| [`MAIN_UI_UX_READINESS_QA_ANALYSIS.md`](MAIN_UI_UX_READINESS_QA_ANALYSIS.md) | `Docs/` | QA sintetica build/test + file modificati |
+
+Implementazione: Live Dive scroll/compact banners, legal onboarding i18n, Crown hint, underwater lock toast, Policy A no-depth edit, DEMO badge, iCloud conflict UI, planner team preview, logbook search/swipe-delete, CSV import unificato via `CSVImportPanel`.
 
 ---
 

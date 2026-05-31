@@ -1,7 +1,7 @@
 # Build validation — DIR DIVING (MAIN)
 
-**Branch:** `main` (`origin/main`) — Watch MAIN readiness 100% pass (2026-05-31)  
-**Algorithm baseline:** iOS @ `dce89e7`; Watch WMATH-HIGH → INFO-014 remediation  
+**Branch:** `main` (`origin/main`) @ `c8f91f6` — Watch + iOS algorithmic + UI/UX readiness 100% (codice, 2026-05-31)  
+**Algorithm baseline:** iOS @ `dce89e7`; Watch WMATH-HIGH → INFO-014 @ `f654bec`; UI/UX P0–P3 @ `c8f91f6`  
 **Generator:** [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`project.yml` at repository root).
 
 **Latest local validation (2026-05-31):**
