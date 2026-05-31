@@ -15,6 +15,19 @@ targets:
       - Services
       - Views
       - Utils
+      # Explicit membership for algorithm/runtime core (prevents stale-xcodeproj "not in scope" errors).
+      - Utils/MissionModeRuntimeProfile.swift
+      - Utils/WatchNavigationHints.swift
+      - Utils/DiveSessionPersistenceClass.swift
+      - Utils/DepthSampleValidation.swift
+      - Utils/DiveLifecycleAlgorithm.swift
+      - Utils/MonotonicElapsedClock.swift
+      - Utils/GPSConfirmationPresentation.swift
+      - Utils/DiveAlgorithmConfiguration.swift
+      - Utils/DiveSessionAlgorithmValidator.swift
+      - Models/DiveGPSConfirmation.swift
+      - Services/AscentSafetyHapticCoordinator.swift
+      - Services/GPSManager.swift
       - Resources
     settings:
       base:
