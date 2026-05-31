@@ -1,19 +1,20 @@
 # Documentation branch alignment — 2026-05-31 (readiness 100%)
 
-**Baseline:** `main` = `origin/main` @ `c8f3bd5` (Watch + iOS algorithmic + UI/UX readiness 100% codice, 2026-05-31)  
+**Baseline:** `main` = `origin/main` @ `bfbc3e7` (Watch compile fix + XcodeGen source pin, 2026-05-31)  
 **Algorithm commits:** Watch WMATH remediation @ `f654bec` + iOS @ `dce89e7`  
 **UI/UX commits:** P0–P2 @ `d796bfd` + P3 @ `c8f91f6`  
+**Watch compile:** GPS fallback colocated @ `06e4c67`; explicit Watch target sources @ `bfbc3e7`  
 **CI:** `macos-latest` runner (may fail if Actions minutes exhausted)
 
 ## Branch roles
 
 | Branch | Role | Docs state | Sync @ |
 |--------|------|------------|--------|
-| `main` | Stable Watch Diving + iOS Companion MAIN | Authoritative; algorithm + UI/UX readiness 100% (codice) | `c8f3bd5` |
-| `main-iOS` | Historical / divergent iOS worktree | Merged `main`; not separate release baseline | `0b9a7d4` |
-| `codex/experimental-features` | Watch experimental (Apnea, Snorkeling, Buddy) | Merged readiness + UI/UX docs from `main`; experimental runtime unchanged | `7f4779f` |
-| `codex/ios-experimental-features` | iOS experimental companion | Merged readiness + UI/UX implementation + docs | `a39a073` |
-| `codex/watch-main-algorithm-audit-current` | Watch MAIN audit (PR #10) | Superseded by `main` remediation; close PR #10 recommended | `962ceb1` |
+| `main` | Stable Watch Diving + iOS Companion MAIN | Authoritative; algorithm + UI/UX readiness 100% (codice) | `bfbc3e7` |
+| `main-iOS` | Historical / divergent iOS worktree | Merged `main`; not separate release baseline | `1958e27` |
+| `codex/experimental-features` | Watch experimental (Apnea, Snorkeling, Buddy) | Merged readiness + UI/UX docs from `main`; experimental runtime unchanged | `8e66a92` |
+| `codex/ios-experimental-features` | iOS experimental companion | Merged readiness + UI/UX implementation + docs | `e5ce7d2` |
+| `codex/watch-main-algorithm-audit-current` | Watch MAIN audit (PR #10) | Superseded by `main` remediation; close PR #10 recommended | `be28cdc` |
 
 ## Open pull requests (2026-05-31)
 
