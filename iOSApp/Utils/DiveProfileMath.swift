@@ -91,10 +91,10 @@ enum DiveProfileMath {
             totalSeconds += delta
         }
 
-        if let endDate, endDate > sorted.last!.timestamp {
-            let delta = endDate.timeIntervalSince(sorted.last!.timestamp)
+        if let endDate, let last = sorted.last, endDate > last.timestamp {
+            let delta = endDate.timeIntervalSince(last.timestamp)
             if delta.isFinite, delta > 0 {
-                weightedDepthSeconds += sorted.last!.depthMeters * delta
+                weightedDepthSeconds += last.depthMeters * delta
                 totalSeconds += delta
             }
         }
@@ -124,10 +124,10 @@ enum DiveProfileMath {
             totalSeconds += delta
         }
 
-        if let endDate, endDate > sorted.last!.timestamp {
-            let delta = endDate.timeIntervalSince(sorted.last!.timestamp)
+        if let endDate, let last = sorted.last, endDate > last.timestamp {
+            let delta = endDate.timeIntervalSince(last.timestamp)
             if delta.isFinite, delta > 0,
-               let temperature = sanitizedTemperatureCelsius(sorted.last!.temperatureCelsius) {
+               let temperature = sanitizedTemperatureCelsius(last.temperatureCelsius) {
                 weightedTemperatureSeconds += temperature * delta
                 totalSeconds += delta
             }

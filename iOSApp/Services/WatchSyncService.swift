@@ -34,6 +34,9 @@ final class WatchSyncService: NSObject, ObservableObject {
     private var pushedToWatchSessionIDs: Set<UUID> = []
     private var pendingOutboundSessions: [DiveSession] = []
     private let pushedToWatchIDsKey = "dirdiving_ios_pushed_to_watch_session_ids"
+    private let pendingOutboundFileName = "dirdiving_ios_pending_watch_sync_sessions.json"
+    private static let maxPhotoTransferBytes = 10 * 1_024 * 1_024
+    private static let allowedPhotoExtensions: Set<String> = ["png", "jpg", "jpeg", "heic"]
 
     // F9: conflicts persisted to a Documents/ file with `.completeFileProtection`
     // instead of UserDefaults. UserDefaults is not covered by Data Protection on a
@@ -62,6 +65,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         importedSessionIDs = WatchDiveSyncCodec.loadImportedSessionIDs()
         importedSessionCount = importedSessionIDs.count
         pushedToWatchSessionIDs = loadPushedToWatchSessionIDs()
+        pendingOutboundSessions = mergedPendingOutbound(pendingOutboundSessions + loadPendingOutboundSessions())
         conflicts = loadConflicts()
         guard WCSession.isSupported() else {
             lastMessage = String(localized: "WatchConnectivity non supportato")
@@ -123,16 +127,39 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     func sendPhotoToWatch(_ imageData: Data, fileName: String) {
         guard WCSession.isSupported(), !imageData.isEmpty else { return }
-        let sanitized = fileName.replacingOccurrences(of: "/", with: "_")
+        guard imageData.count <= Self.maxPhotoTransferBytes,
+              let sanitized = Self.sanitizedPhotoFileName(fileName) else {
+            failedImportCount += 1
+            lastMessage = String(localized: "Errore invio foto Watch: file non valido")
+            return
+        }
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("DIRDivingPhoto_\(UUID().uuidString)_\(sanitized)")
         do {
-            try imageData.write(to: url, options: [.atomic])
+            try imageData.write(to: url, options: [.atomic, .completeFileProtection])
             WCSession.default.transferFile(url, metadata: [WatchSyncKeys.companionPhotoFileNameKey: sanitized])
             lastMessage = String(localized: "Foto inviata al Watch")
             recordActivity(title: String(localized: "sync.activity.photo_to_watch"), detail: sanitized)
         } catch {
             lastMessage = String(format: String(localized: "Errore invio foto Watch: %@"), error.localizedDescription)
         }
+    }
+
+    private static func sanitizedPhotoFileName(_ fileName: String) -> String? {
+        let lastPathComponent = URL(fileURLWithPath: fileName).lastPathComponent
+        let url = URL(fileURLWithPath: lastPathComponent)
+        let pathExtension = url.pathExtension.lowercased()
+        guard allowedPhotoExtensions.contains(pathExtension) else { return nil }
+
+        let rawBaseName = url.deletingPathExtension().lastPathComponent
+        let allowedCharacters = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-_ "))
+        let cleanedScalars = rawBaseName.unicodeScalars.map { scalar in
+            allowedCharacters.contains(scalar) ? Character(scalar) : "_"
+        }
+        let cleanedBaseName = String(cleanedScalars)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .prefix(80)
+        guard !cleanedBaseName.isEmpty else { return nil }
+        return "\(cleanedBaseName).\(pathExtension)"
     }
 
     private func ingestCompanionContext(_ context: [String: Any]) {
@@ -281,11 +308,13 @@ final class WatchSyncService: NSObject, ObservableObject {
         pendingOutboundSessions.removeAll { $0.id == session.id }
         pendingOutboundSessions.append(session)
         pendingOutboundSessions.sort { $0.startDate > $1.startDate }
+        savePendingOutboundSessions()
         recordActivity(title: String(localized: "sync.activity.pending_to_watch"), detail: sessionSummary(session))
     }
 
     private func removeOutboundSession(id: UUID) {
         pendingOutboundSessions.removeAll { $0.id == id }
+        savePendingOutboundSessions()
     }
 
     private func flushOutboundTransfers() {
@@ -300,12 +329,24 @@ final class WatchSyncService: NSObject, ObservableObject {
         do {
             let envelope = try WatchDiveSyncCodec.makePayload(session: session)
             if WCSession.default.isReachable {
-                WCSession.default.sendMessage(envelope.message) { [weak self] _ in
+                WCSession.default.sendMessage(envelope.message) { [weak self] reply in
                     Task { @MainActor in
-                        self?.markPushedToWatch(session.id)
-                        self?.removeOutboundSession(id: session.id)
-                        self?.lastMessage = String(localized: "Immersione inviata al Watch")
-                        self?.recordActivity(title: String(localized: "sync.activity.sent_to_watch"), detail: self?.sessionSummary(session) ?? "", marksSuccess: true)
+                        guard let self else { return }
+                        let signedOK = WatchDiveSyncCodec.verifyAckSignature(
+                            reply["ackSignature"] as? String,
+                            sessionID: envelope.sessionID,
+                            issuedAt: envelope.issuedAt
+                        )
+                        guard signedOK else {
+                            self.failedImportCount += 1
+                            self.lastMessage = String(localized: "Watch non ha confermato con ack firmato; sessione conservata in coda")
+                            self.recordActivity(title: String(localized: "sync.activity.pending_to_watch"), detail: self.sessionSummary(session))
+                            return
+                        }
+                        self.markPushedToWatch(session.id)
+                        self.removeOutboundSession(id: session.id)
+                        self.lastMessage = String(localized: "Immersione inviata al Watch")
+                        self.recordActivity(title: String(localized: "sync.activity.sent_to_watch"), detail: self.sessionSummary(session), marksSuccess: true)
                     }
                 } errorHandler: { [weak self] _ in
                     Task { @MainActor in
@@ -316,8 +357,6 @@ final class WatchSyncService: NSObject, ObservableObject {
                 }
             } else {
                 WCSession.default.transferUserInfo(envelope.message)
-                markPushedToWatch(session.id)
-                removeOutboundSession(id: session.id)
                 lastMessage = String(localized: "Invio Watch in coda (Watch non raggiungibile)")
                 recordActivity(title: String(localized: "sync.activity.queued_to_watch"), detail: sessionSummary(session))
             }
@@ -357,6 +396,47 @@ final class WatchSyncService: NSObject, ObservableObject {
             maxCount: WatchSyncBoundedIDStore.maxPushedToWatchSessionIDs
         )
         savePushedToWatchSessionIDs()
+    }
+
+    private func pendingOutboundFileURL() -> URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent(pendingOutboundFileName)
+    }
+
+    private func loadPendingOutboundSessions() -> [DiveSession] {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let url = pendingOutboundFileURL()
+        guard FileManager.default.fileExists(atPath: url.path),
+              let data = try? Data(contentsOf: url),
+              let decoded = try? decoder.decode([DiveSession].self, from: data) else {
+            return []
+        }
+        return mergedPendingOutbound(decoded)
+    }
+
+    private func savePendingOutboundSessions() {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let value = mergedPendingOutbound(pendingOutboundSessions)
+        guard let data = try? encoder.encode(value) else { return }
+        do {
+            try data.write(to: pendingOutboundFileURL(), options: [.atomic, .completeFileProtection])
+        } catch {
+            Self.logger.error("Persist iOS pending Watch sync sessions failed: \(error.localizedDescription, privacy: .private)")
+        }
+    }
+
+    private func mergedPendingOutbound(_ sessions: [DiveSession]) -> [DiveSession] {
+        var byID: [UUID: DiveSession] = [:]
+        for session in sessions {
+            if let existing = byID[session.id] {
+                byID[session.id] = DiveSessionMerge.preferred(existing, session)
+            } else {
+                byID[session.id] = session
+            }
+        }
+        return byID.values.sorted { $0.startDate > $1.startDate }
     }
 
     private func persistConflicts(_ value: [SyncConflict]) {
@@ -425,10 +505,8 @@ extension WatchSyncService: WCSessionDelegate {
             let acknowledged = self.failedImportCount == beforeFailures
             var reply: [String: Any] = ["status": acknowledged ? "acknowledged" : "failed"]
             if acknowledged, let ackContext {
-                // F11: signed ack lets the Watch confirm that this reply was produced
-                // by the same trusted iOS peer (constant-time HMAC over sessionID +
-                // issuedAt of the original payload). Watch-side fallback still
-                // accepts the legacy `acknowledged` string for older builds.
+                // SYNC-001/SYNC-003: signed ack lets the Watch confirm that this
+                // reply was produced by the same trusted iOS peer.
                 reply["ackSignature"] = WatchDiveSyncCodec.ackSignature(
                     sessionID: ackContext.sessionID,
                     issuedAt: ackContext.issuedAt
@@ -441,6 +519,25 @@ extension WatchSyncService: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
         Task { @MainActor in
             _ = self.importSessionPayload(userInfo)
+        }
+    }
+
+    nonisolated func session(_ session: WCSession, didFinish userInfoTransfer: WCSessionUserInfoTransfer, error: Error?) {
+        Task { @MainActor in
+            if let error {
+                self.failedImportCount += 1
+                self.lastMessage = String(format: String(localized: "Invio Watch in coda non completato: %@"), error.localizedDescription)
+                return
+            }
+            guard let id = WatchDiveSyncCodec.sessionID(fromOutboundPayload: userInfoTransfer.userInfo) else {
+                self.failedImportCount += 1
+                self.lastMessage = String(localized: "Invio Watch completato ma sessione non identificabile")
+                return
+            }
+            self.markPushedToWatch(id)
+            self.removeOutboundSession(id: id)
+            self.lastMessage = String(localized: "Immersione consegnata al Watch via coda")
+            self.recordActivity(title: String(localized: "sync.activity.sent_to_watch"), detail: id.uuidString, marksSuccess: true)
         }
     }
 

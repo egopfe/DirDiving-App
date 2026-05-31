@@ -54,7 +54,7 @@ enum PlannerMODValidator {
             switch entry.role {
             case .bottom:
                 if let issue = validateGasSwitch(
-                    depthMeters: working.effectivePlanningDepthMeters,
+                    depthMeters: working.plannedDepthMeters,
                     gas: entry.gas,
                     role: .bottom,
                     environment: environment

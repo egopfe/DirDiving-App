@@ -7,6 +7,9 @@ enum AscentZone: String, Codable {
 }
 
 struct AscentStatus: Codable, Hashable {
+    static let greenThresholdRatio = 0.70
+    static let redThresholdRatio = 1.0
+
     let currentRateMetersPerMinute: Double
     let limitMetersPerMinute: Double
     let zone: AscentZone
@@ -25,8 +28,20 @@ struct AscentStatus: Codable, Hashable {
         let safeDepth = depth.isFinite ? max(0, depth) : 0
         let limit = limits.limit(for: safeDepth)
         let safeRate = rate.isFinite ? max(0, rate) : 0
-        let zone: AscentZone = safeRate <= limit * 0.70 ? .green : (safeRate <= limit ? .yellow : .red)
+        let zone = zone(forRate: safeRate, limit: limit)
         return AscentStatus(currentRateMetersPerMinute: safeRate, limitMetersPerMinute: limit, zone: zone)
+    }
+
+    static func zone(forRate rate: Double, limit: Double) -> AscentZone {
+        let safeLimit = limit.isFinite ? max(limit, 0.1) : 0.1
+        let safeRate = rate.isFinite ? max(0, rate) : 0
+        if safeRate <= safeLimit * greenThresholdRatio {
+            return .green
+        }
+        if safeRate <= safeLimit * redThresholdRatio {
+            return .yellow
+        }
+        return .red
     }
 }
 
