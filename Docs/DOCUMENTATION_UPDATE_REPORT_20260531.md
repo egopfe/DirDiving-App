@@ -179,8 +179,8 @@ All active branches merged/pushed through `e952b55`:
 
 | Branch | Commit |
 |--------|--------|
-| `main` | `e952b55` |
-| `main-iOS` | `0a3073e` |
-| `codex/experimental-features` | `0e08748` |
-| `codex/ios-experimental-features` | `62c1dec` |
-| `codex/watch-main-algorithm-audit-current` | `70511d1` |
+| `main` | `ac47480` |
+| `main-iOS` | `dd8edae` |
+| `codex/experimental-features` | `8e1a6ff` |
+| `codex/ios-experimental-features` | `b02a658` |
+| `codex/watch-main-algorithm-audit-current` | `82a4cb3` |
