@@ -4,6 +4,13 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-31, MAIN UI/UX readiness 100% — `c8f91f6`)
+
+- **Watch MAIN UI/UX:** Live Dive scroll + compact banner stacking; legal onboarding IT/EN; Crown first-run hint; underwater navigation toast; reset stopwatch intent guard; export ShareLink; compass/images a11y; tiered battery bar; alarm/ascent i18n + imperial bands; mode selection documented.
+- **iOS MAIN UI/UX:** Policy A no-depth metadata-only edit; DEMO badge + mixed-logbook banner; iCloud merge conflict UI; planner team preview-only; sync status clarity; tab/picker a11y; synthetic manual profile disclosure; logbook expanded search; swipe-to-delete + confirmation; Analysis CSV via shared `CSVImportPanel`.
+- **Documentazione:** [`Docs/MAIN_UI_UX_READINESS_AUDIT_CURRENT.md`](Docs/MAIN_UI_UX_READINESS_AUDIT_CURRENT.md), [`Docs/MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md`](Docs/MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md), [`Docs/MAIN_UI_UX_READINESS_QA_ANALYSIS.md`](Docs/MAIN_UI_UX_READINESS_QA_ANALYSIS.md), INDEX/CSV/README/ROADMAP alignment @ `c8f91f6`.
+- **Verdict (codice):** Watch/iOS/cross-app UI/UX **100%**; Internal TestFlight UI/UX **YES**; external TestFlight/App Store dopo QA fisica.
+
 ### Added (2026-05-31, Watch MAIN algorithmic readiness 100%)
 
 - **Algoritmo Watch:** remediation WMATH-HIGH-001 → INFO-014 — depth callback silence watchdog, GPS fix/fallback/no-fix banners, manual/no-depth sync (Policy A), auto-start sample retention, persistence class, CSV time origin, `MonotonicElapsedClock`, independent blink/haptic sources, gauge/zone alignment, imperial ascent banner, temperature freshness.

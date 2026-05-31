@@ -1,6 +1,5 @@
 import SwiftUI
 import Charts
-import UniformTypeIdentifiers
 
 struct AnalysisView: View {
     @EnvironmentObject private var logStore: DiveLogStore
@@ -8,8 +7,7 @@ struct AnalysisView: View {
     @EnvironmentObject private var navigation: IOSNavigationStore
     @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
     @AppStorage("dirdiving_ios_analysis_include_demo") private var includeDemoInAnalysis = false
-    @State private var showImporter = false
-    @State private var importMessage: String?
+    @State private var syncStatusMessage: String?
 
     private var analysisSessions: [DiveSession] {
         includeDemoInAnalysis ? logStore.sessions : logStore.sessions.filter { !$0.isDemoDive }
@@ -83,21 +81,6 @@ struct AnalysisView: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
-            .fileImporter(isPresented: $showImporter, allowedContentTypes: [.commaSeparatedText, .plainText]) { result in
-                switch result {
-                case .success(let url):
-                    switch DiveImportService.importCSV(from: url) {
-                    case .success(let summary):
-                        let alreadyImported = logStore.session(id: summary.session.id) != nil
-                        logStore.add(summary.session)
-                        importMessage = summary.message(alreadyImported: alreadyImported)
-                    case .failure(let error):
-                        importMessage = error.localizedDescription
-                    }
-                case .failure(let error):
-                    importMessage = error.localizedDescription
-                }
-            }
         }
     }
 
@@ -147,20 +130,18 @@ struct AnalysisView: View {
             Text(String(localized: "analysis.empty.next_action"))
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(DIRTheme.cyan)
+            CSVImportPanel()
             HStack(spacing: 10) {
-                emptyAction("Importa CSV", "square.and.arrow.down") {
-                    showImporter = true
-                }
-                emptyAction("Sync Watch", "applewatch") {
+                emptyAction(String(localized: "analysis.empty.sync_watch"), "applewatch") {
                     watchSync.retryActivation(logStore: logStore)
-                    importMessage = String(localized: "Sync Apple Watch richiesta.")
+                    syncStatusMessage = String(localized: "analysis.empty.sync_requested")
+                }
+                emptyAction(String(localized: "analysis.empty.open_logbook"), "list.bullet.rectangle.portrait.fill") {
+                    navigation.selectedTab = .logbook
                 }
             }
-            emptyAction("Apri Logbook", "list.bullet.rectangle.portrait.fill") {
-                navigation.selectedTab = .logbook
-            }
-            if let importMessage {
-                Text(importMessage)
+            if let syncStatusMessage {
+                Text(syncStatusMessage)
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(DIRTheme.yellow)
                     .fixedSize(horizontal: false, vertical: true)

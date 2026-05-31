@@ -95,6 +95,13 @@ struct InfoView: View {
         .background(rowBackground)
     }
 
+    private var batteryBarColor: Color {
+        guard batteryLevel >= 0 else { return DiveUI.secondaryText }
+        if batteryLevel > 0.5 { return DiveUI.green }
+        if batteryLevel > 0.2 { return DiveUI.yellow }
+        return DiveUI.red
+    }
+
     @ViewBuilder
     private var batteryRow: some View {
         let percent = batteryLevel >= 0 ? Int((batteryLevel * 100).rounded()) : -1
@@ -115,7 +122,7 @@ struct InfoView: View {
                     Capsule()
                         .fill(.white.opacity(0.22))
                     Capsule()
-                        .fill(DiveUI.green)
+                        .fill(batteryBarColor)
                         .frame(width: geometry.size.width * CGFloat(max(0, batteryLevel)))
                 }
             }

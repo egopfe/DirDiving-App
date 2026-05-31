@@ -26,33 +26,33 @@ struct AlarmSettingsView: View {
                 VStack(spacing: 6) {
                     header
 
-                    Text("ALLARMI")
+                    Text(String(localized: "ALLARMI"))
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
 
-                    Text("Soglie locali sul Watch. Non sincronizzate con iPhone.")
+                    Text(String(localized: "Soglie locali sul Watch. Non sincronizzate con iPhone."))
                         .font(.system(size: 9, weight: .semibold, design: .rounded))
                         .foregroundStyle(DiveUI.secondaryText)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
 
                     VStack(spacing: 5) {
-                        alarmRow(title: "Velocità risalita", threshold: "Usa limiti ASC SET", isOn: $ascentAlarmEnabled)
-                        alarmRow(title: "Profondità massima", threshold: "> \(depthThresholdLabel)", isOn: $depthAlarmEnabled)
-                        crownThresholdStepper(title: "Soglia profondità", value: $depthThresholdMeters, display: depthThresholdLabel, range: 10...100, step: 1, color: DiveUI.blue) {
+                        alarmRow(title: String(localized: "Velocità risalita"), threshold: String(localized: "Usa limiti ASC SET"), isOn: $ascentAlarmEnabled)
+                        alarmRow(title: String(localized: "Profondità massima"), threshold: String(format: String(localized: "alarm.threshold.depth_format"), depthThresholdLabel), isOn: $depthAlarmEnabled)
+                        crownThresholdStepper(title: String(localized: "Soglia profondità"), value: $depthThresholdMeters, display: depthThresholdLabel, range: 10...100, step: 1, color: DiveUI.blue) {
                             depthThresholdMeters = max(10, depthThresholdMeters - 1)
                         } increase: {
                             depthThresholdMeters = min(100, depthThresholdMeters + 1)
                         }
-                        alarmRow(title: "Tempo immersione", threshold: "> \(runtimeThresholdMinutes) min", isOn: $runtimeAlarmEnabled)
-                        crownThresholdStepper(title: "Soglia tempo", value: runtimeThresholdBinding, display: "\(runtimeThresholdMinutes) min", range: 10...240, step: 5, color: DiveUI.yellow) {
+                        alarmRow(title: String(localized: "Tempo immersione"), threshold: String(format: String(localized: "alarm.threshold.runtime_format"), runtimeThresholdMinutes), isOn: $runtimeAlarmEnabled)
+                        crownThresholdStepper(title: String(localized: "Soglia tempo"), value: runtimeThresholdBinding, display: String(format: String(localized: "alarm.display.runtime_minutes"), runtimeThresholdMinutes), range: 10...240, step: 5, color: DiveUI.yellow) {
                             runtimeThresholdMinutes = max(10, runtimeThresholdMinutes - 5)
                         } increase: {
                             runtimeThresholdMinutes = min(240, runtimeThresholdMinutes + 5)
                         }
-                        alarmRow(title: "Batteria bassa", threshold: "< \(batteryThresholdPercent)%", isOn: $batteryAlarmEnabled)
-                        crownThresholdStepper(title: "Soglia batteria", value: batteryThresholdBinding, display: "\(batteryThresholdPercent)%", range: 5...50, step: 5, color: DiveUI.red) {
+                        alarmRow(title: String(localized: "Batteria bassa"), threshold: String(format: String(localized: "alarm.threshold.battery_format"), batteryThresholdPercent), isOn: $batteryAlarmEnabled)
+                        crownThresholdStepper(title: String(localized: "Soglia batteria"), value: batteryThresholdBinding, display: "\(batteryThresholdPercent)%", range: 5...50, step: 5, color: DiveUI.red) {
                             batteryThresholdPercent = max(5, batteryThresholdPercent - 5)
                         } increase: {
                             batteryThresholdPercent = min(50, batteryThresholdPercent + 5)
@@ -64,7 +64,7 @@ struct AlarmSettingsView: View {
                 .padding(.bottom, 8)
             }
         }
-        .navigationTitle("Allarmi")
+        .navigationTitle(String(localized: "Allarmi"))
         .watchSubscreenBackToolbar()
     }
 

@@ -16,6 +16,7 @@ struct EquipmentChecklistGasSection: View {
                 }
                 .labelsHidden()
                 .tint(DIRTheme.cyan)
+                .accessibilityLabel(String(localized: "equipment.picker.gas_type.a11y"))
             }
             .font(.callout)
             HStack {
@@ -29,6 +30,7 @@ struct EquipmentChecklistGasSection: View {
                 }
                 .labelsHidden()
                 .tint(DIRTheme.cyan)
+                .accessibilityLabel(String(localized: "equipment.picker.pressure_unit.a11y"))
             }
             .font(.callout)
             HStack {
@@ -42,6 +44,7 @@ struct EquipmentChecklistGasSection: View {
                 }
                 .labelsHidden()
                 .tint(DIRTheme.cyan)
+                .accessibilityLabel(String(localized: "equipment.picker.tank_size.a11y"))
             }
             .font(.callout)
             HStack {
