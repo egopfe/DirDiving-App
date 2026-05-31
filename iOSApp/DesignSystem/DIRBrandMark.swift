@@ -1,10 +1,12 @@
 import SwiftUI
+import UIKit
 
 struct DIRBrandMark: View {
     var body: some View {
         Group {
-            if Bundle.main.url(forResource: "altosinistra", withExtension: "png") != nil {
-                Image("altosinistra")
+            if let url = Bundle.main.url(forResource: "altosinistra", withExtension: "png"),
+               let uiImage = UIImage(contentsOfFile: url.path) {
+                Image(uiImage: uiImage)
                     .resizable()
                     .scaledToFit()
             } else {
