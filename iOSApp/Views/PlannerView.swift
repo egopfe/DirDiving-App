@@ -16,10 +16,6 @@ struct PlannerView: View {
         plannerSafetyAckRevision == PlannerSafetyAcknowledgment.currentRevision
     }
 
-    private var visiblePlannerModes: [PlannerMode] {
-        [.advanced]
-    }
-
     var body: some View {
         NavigationStack {
             ZStack {
@@ -83,45 +79,20 @@ struct PlannerView: View {
 
     private var modePicker: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(String(localized: "planner.mode.header"))
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(DIRTheme.muted)
-            HStack(spacing: 0) {
-                ForEach(visiblePlannerModes) { mode in
-                    Button {
-                        store.mode = mode
-                    } label: {
-                        Text(plannerModeTabLabel(mode))
-                            .font(.caption.weight(.semibold))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.72)
-                            .foregroundStyle(store.mode == mode ? .black : .white.opacity(0.92))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
-                            .background(
-                                RoundedRectangle(cornerRadius: 6)
-                                    .fill(store.mode == mode ? DIRTheme.cyan : .clear)
-                            )
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(plannerModeAccessibilityLabel(mode, isActive: true))
-                }
+            HStack(spacing: 8) {
+                Image(systemName: "slider.horizontal.3")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.cyan)
+                Text(String(localized: "planner.mode.advanced_only"))
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(.white)
             }
-            .padding(4)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 10)
+            .padding(.horizontal, 12)
             .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface2.opacity(0.82)))
-            Text(String(localized: "planner.mode.footer"))
-                .font(.caption2)
-                .foregroundStyle(DIRTheme.yellow)
-                .fixedSize(horizontal: false, vertical: true)
+            .accessibilityLabel(String(localized: "planner.mode.advanced_only"))
         }
-    }
-
-    private func plannerModeAccessibilityLabel(_ mode: PlannerMode, isActive: Bool) -> String {
-        let name = plannerModeTabLabel(mode)
-        if isActive {
-            return String(format: String(localized: "planner.mode.a11y.active"), name)
-        }
-        return String(format: String(localized: "planner.mode.a11y.planned"), name)
     }
 
     private func salinityLabel(_ mode: SalinityMode) -> String {
@@ -622,6 +593,10 @@ struct PlannerView: View {
     private var teamPreviewCard: some View {
         DIRCard(String(localized: "planner.team.matching_title"), icon: "person.2", accent: DIRTheme.cyan) {
             VStack(spacing: 10) {
+                Text(String(localized: "planner.team.preview_only"))
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(DIRTheme.yellow)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 ForEach(store.input.teamMembers) { member in
                     HStack {
                         VStack(alignment: .leading, spacing: 3) {
@@ -639,9 +614,10 @@ struct PlannerView: View {
                     }
                     Divider().overlay(DIRTheme.hairline)
                 }
-                Text(String(localized: "planner.team.v2_note"))
+                Text(String(localized: "planner.team.preview_only_notice"))
                     .font(.footnote)
                     .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
@@ -1157,6 +1133,8 @@ struct PlanResultView: View {
                 }
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
+                .accessibilityLabel(tabAccessibilityLabel(for: item))
+                .accessibilityAddTraits(tab == item ? .isSelected : [])
             }
         }
         .padding(.top, 2)
@@ -1186,6 +1164,13 @@ struct PlanResultView: View {
         .fixedSize(horizontal: false, vertical: true)
         .padding(10)
         .modifier(ResultPanelStyle(cornerRadius: 9))
+    }
+
+    private func tabAccessibilityLabel(for item: PlanTab) -> String {
+        if tab == item {
+            return String(format: String(localized: "planner.tab.a11y.selected"), item.title)
+        }
+        return String(format: String(localized: "planner.tab.a11y.unselected"), item.title)
     }
 
     private var resultGrid: some View {

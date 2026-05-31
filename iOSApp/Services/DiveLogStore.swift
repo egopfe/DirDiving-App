@@ -19,6 +19,8 @@ final class DiveLogStore: ObservableObject {
 
     @Published private(set) var sessionMergeConflicts: [DiveSessionMergeConflict] = []
 
+    private var conflictLocalSnapshots: [UUID: DiveSession] = [:]
+
     private let cloudSync: CloudSyncStore?
     private let key = "dirdiving_ios_dive_sessions"
     private let deletedKey = WatchSyncKeys.deletedSessionIDsKey
@@ -36,7 +38,7 @@ final class DiveLogStore: ObservableObject {
         deletedSessionIDs = loadDeletedSessionIDs()
         let localSessions = loadLocalSessions()
         let cloudSessions = loadRawCloudSessions()
-        sessionMergeConflicts = DiveSessionMergeConflictDetector.detect(local: localSessions, cloud: cloudSessions ?? [])
+        updateMergeConflictState(local: localSessions, cloud: cloudSessions ?? [])
         sessions = IOSDiveLogbookPolicy.normalizeAndCap(
             mergedSessions(local: localSessions, cloud: cloudSessions)
                 .filter { !deletedSessionIDs.contains($0.id) }
@@ -75,7 +77,7 @@ final class DiveLogStore: ObservableObject {
         let localSessions = loadLocalSessions()
         deletedSessionIDs = loadDeletedSessionIDs()
         let cloudSessions = loadRawCloudSessions()
-        sessionMergeConflicts = DiveSessionMergeConflictDetector.detect(local: localSessions, cloud: cloudSessions ?? [])
+        updateMergeConflictState(local: localSessions, cloud: cloudSessions ?? [])
         sessions = IOSDiveLogbookPolicy.normalizeAndCap(
             mergedSessions(local: localSessions, cloud: cloudSessions)
                 .filter { !deletedSessionIDs.contains($0.id) }
@@ -127,6 +129,45 @@ final class DiveLogStore: ObservableObject {
         cloudSync?.synchronize()
     }
 
+    func resolveSessionMergeConflictKeepingLocal(sessionID: UUID) {
+        guard let local = conflictLocalSnapshots[sessionID] ?? sessions.first(where: { $0.id == sessionID }) else { return }
+        applyResolvedSession(local)
+        conflictLocalSnapshots.removeValue(forKey: sessionID)
+    }
+
+    func resolveSessionMergeConflictUsingCloud(sessionID: UUID) {
+        guard let cloudSessions = loadRawCloudSessions(),
+              let cloud = cloudSessions.first(where: { $0.id == sessionID }) else { return }
+        applyResolvedSession(cloud)
+        conflictLocalSnapshots.removeValue(forKey: sessionID)
+    }
+
+    private func applyResolvedSession(_ session: DiveSession) {
+        let allowEmpty = session.isManual && !session.hasDepthProfile
+        guard let storedSession = try? DiveSessionAlgorithmValidator.normalizedForStorage(session, allowEmptySamples: allowEmpty) else {
+            return
+        }
+        sessions.removeAll { $0.id == session.id }
+        sessions.insert(storedSession, at: 0)
+        sessions = IOSDiveLogbookPolicy.normalizeAndCap(sessions)
+        saveIfReady()
+        refreshMergeConflicts()
+    }
+
+    private func refreshMergeConflicts() {
+        updateMergeConflictState(local: loadLocalSessions(), cloud: loadRawCloudSessions() ?? [])
+    }
+
+    private func updateMergeConflictState(local: [DiveSession], cloud: [DiveSession]) {
+        sessionMergeConflicts = DiveSessionMergeConflictDetector.detect(local: local, cloud: cloud)
+        let conflictIDs = Set(sessionMergeConflicts.map(\.sessionID))
+        conflictLocalSnapshots = Dictionary(
+            uniqueKeysWithValues: local.compactMap { session in
+                conflictIDs.contains(session.id) ? (session.id, session) : nil
+            }
+        )
+    }
+
     private func loadLocalSessions() -> [DiveSession] {
         let data = cloudSync?.loadRawLocalData(forKey: key) ?? UserDefaults.standard.data(forKey: key)
         guard let data else { return [] }
@@ -156,7 +197,8 @@ final class DiveLogStore: ObservableObject {
         if let cloud {
             for session in cloud {
                 if let existing = byID[session.id] {
-                    byID[session.id] = DiveSessionMerge.preferred(existing, session)
+                    let hasConflict = sessionMergeConflicts.contains { $0.sessionID == session.id }
+                    byID[session.id] = hasConflict ? existing : DiveSessionMerge.preferred(existing, session)
                 } else {
                     byID[session.id] = session
                 }

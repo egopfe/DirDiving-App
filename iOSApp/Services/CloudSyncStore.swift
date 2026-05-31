@@ -4,9 +4,11 @@ import os
 
 @MainActor
 final class CloudSyncStore: ObservableObject {
-    @Published private(set) var lastSyncStatus = String(localized: "iCloud non ancora sincronizzato")
+    @Published private(set) var lastSyncStatus = String(localized: "cloud.status.not_yet_synced")
     @Published private(set) var isICloudAvailable = FileManager.default.ubiquityIdentityToken != nil
     @Published private(set) var lastDecodeError: String?
+    @Published private(set) var isSynchronizing = false
+    @Published private(set) var lastSuccessfulSyncDate: Date?
 
     private let cloudStore = NSUbiquitousKeyValueStore.default
     private let defaults: UserDefaults
@@ -133,15 +135,24 @@ final class CloudSyncStore: ObservableObject {
         lastSyncStatus = isICloudAvailable
             ? String(localized: "cloud.status.saved_local_and_icloud")
             : String(localized: "cloud.status.saved_local_only")
+        if isICloudAvailable {
+            lastSuccessfulSyncDate = Date()
+        }
     }
 
     func synchronize() {
+        isSynchronizing = true
         cloudStore.synchronize()
         isICloudAvailable = FileManager.default.ubiquityIdentityToken != nil
         if isICloudAvailable {
             lastSyncStatus = String(localized: "cloud.status.sync_requested")
+            lastSuccessfulSyncDate = Date()
         } else {
             lastSyncStatus = String(localized: "cloud.status.icloud_unavailable")
+        }
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 900_000_000)
+            isSynchronizing = false
         }
     }
 

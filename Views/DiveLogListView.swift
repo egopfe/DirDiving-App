@@ -30,7 +30,7 @@ struct DiveLogListView: View {
             }
         }
         .navigationDestination(isPresented: $showExportCompletion) {
-            ExportView(fileName: exportCompletionFileName ?? "export.csv")
+            ExportView(fileName: exportCompletionFileName ?? "export.csv", exportURL: listExportURL)
         }
         .confirmationDialog(
             String(localized: "log.delete.confirm.title"),

@@ -10,8 +10,8 @@ struct ModeSelectionView: View {
             ScrollView {
                 VStack(spacing: 11) {
                     DiveScreenHeader(
-                        "DIR DIVING",
-                        subtitle: "PRE-DIVE MODE SELECTOR",
+                        String(localized: "mode.selection.header.title"),
+                        subtitle: String(localized: "mode.selection.header.subtitle"),
                         accent: DiveUI.cyan,
                         systemImage: "water.waves"
                     )
@@ -26,7 +26,7 @@ struct ModeSelectionView: View {
                         HStack(alignment: .top, spacing: 8) {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .font(.caption.bold())
-                            Text("Modalita stabile: Diving. Le funzioni sperimentali restano isolate dai rami experimental.")
+                            Text(String(localized: "mode.selection.experimental_notice"))
                                 .font(.system(size: 10, weight: .semibold, design: .rounded))
                                 .multilineTextAlignment(.leading)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -55,17 +55,17 @@ struct ModeSelectionView: View {
                 .frame(width: 58, height: 58)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("DIVING")
+                    Text(String(localized: "mode.selection.diving.title"))
                         .font(.system(size: 17, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.72)
-                    Text("Dive computer premium")
+                    Text(String(localized: "mode.selection.diving.subtitle"))
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
                         .foregroundStyle(DiveUI.secondaryText)
                         .lineLimit(2)
                         .minimumScaleFactor(0.72)
-                    DiveStatusPill("ACTIVE", color: DiveUI.cyan, systemImage: "checkmark.circle.fill")
+                    DiveStatusPill(String(localized: "mode.selection.diving.active"), color: DiveUI.cyan, systemImage: "checkmark.circle.fill")
                 }
 
                 Spacer(minLength: 0)
@@ -74,7 +74,14 @@ struct ModeSelectionView: View {
     }
 
     private var stableModes: [StableMode] {
-        [StableMode(title: "Diving", symbol: "water.waves", accent: DiveUI.cyan, description: "Dive computer premium")]
+        [
+            StableMode(
+                title: String(localized: "mode.selection.diving.title"),
+                symbol: "water.waves",
+                accent: DiveUI.cyan,
+                description: String(localized: "mode.selection.diving.subtitle")
+            )
+        ]
     }
 
     private func modeCard(_ mode: StableMode) -> some View {

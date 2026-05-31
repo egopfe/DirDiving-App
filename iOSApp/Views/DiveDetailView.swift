@@ -109,9 +109,18 @@ struct DiveDetailView: View {
                 }
                 .buttonStyle(.plain)
                 .frame(maxWidth: .infinity)
+                .accessibilityLabel(detailTabAccessibilityLabel(for: item))
+                .accessibilityAddTraits(tab == item ? .isSelected : [])
             }
         }
         .padding(.top, 2)
+    }
+
+    private func detailTabAccessibilityLabel(for item: DiveDetailTab) -> String {
+        if tab == item {
+            return String(format: String(localized: "detail.tab.a11y.selected"), item.title)
+        }
+        return String(format: String(localized: "detail.tab.a11y.unselected"), item.title)
     }
 
     private var header: some View {
@@ -142,7 +151,7 @@ struct DiveDetailView: View {
                 .font(.system(size: 12, weight: .medium, design: .rounded))
                 .foregroundStyle(DIRTheme.muted)
                 HStack(spacing: 14) {
-                    Label(String(localized: "detail.salinity.salt"), systemImage: "drop")
+                    Label(salinityText, systemImage: "drop")
                     Label(temperatureText, systemImage: "thermometer")
                 }
                 .font(.system(size: 12, weight: .medium, design: .rounded))
@@ -390,6 +399,10 @@ struct DiveDetailView: View {
 
     private var temperatureText: String {
         Formatters.optionalTemperature(session.avgWaterTemperatureCelsius, units: unitPreference)
+    }
+
+    private var salinityText: String {
+        String(localized: "detail.salinity.not_recorded")
     }
 
     private var unitPreference: IOSUnitPreference {

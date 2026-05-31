@@ -52,8 +52,8 @@ struct AscentGaugeView: View {
         let limit = max(status.limitMetersPerMinute, 0.5)
         let ticks: [(Double, Color)] = [
             (limit, DiveUI.red),
-            (limit * 0.75, DiveUI.orange),
-            (limit * 0.5, DiveUI.yellow),
+            (limit * 0.75, DiveUI.yellow),
+            (limit * 0.5, DiveUI.green),
             (limit * 0.25, DiveUI.green),
             (0, DiveUI.green)
         ]
@@ -73,7 +73,6 @@ struct AscentGaugeView: View {
                     .overlay(
                         VStack(spacing: 0) {
                             Rectangle().fill(DiveUI.red)
-                            Rectangle().fill(DiveUI.orange)
                             Rectangle().fill(DiveUI.yellow)
                             Rectangle().fill(DiveUI.green)
                         }
