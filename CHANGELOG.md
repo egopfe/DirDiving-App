@@ -4,6 +4,88 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-31, comprehensive NOAA CNS/OTU + docs alignment — `dae29b8`)
+
+- **Algoritmo iOS:** modello CNS/OTU comprehensive — limiti NOAA singolo e giornaliero, recupero superficie/pausa aria 90 min, soglie REPEX OTU (300 / 850 / 1800), carryover ossigeno su snapshot v2, integrazione su profilo completo.
+- **Test:** `OxygenExposureDeepModelTests` (14 test); suite **119/119** `DIRDiving iOS Algorithm Tests` su iPhone 17 sim.
+- **Documentazione:** README, INDEX, ROADMAP, CSV, PRODUCT_FEATURES_IT, GLOSSARY, completion report, engine design, hardening, improvement plan, changelog allineati @ `dae29b8`.
+- **Report:** [`Docs/DOCUMENTATION_UPDATE_REPORT_20260531.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260531.md).
+
+### Added (2026-05-30, Phase 15 documentation alignment)
+
+- Phase 15 docs: README, INDEX, ROADMAP, CSV, release/TestFlight, re-audit, consistency report, final readiness report @ `3237262`.
+
+### Fixed (2026-05-30, iOS Bühlmann UX/UI — `3237262`)
+
+- UX P1–P3 planner presentation fix; verification [`DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md); re-audit **Ready** [`Docs/DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](Docs/DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md).
+
+### Fixed (2026-05-29, iOS Buhlmann reaudit — `69e69b2`)
+
+- **Algoritmo iOS:** fix P1–P3 da [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) — environment-aware ceiling/NDL, canonical engine result, stable cylinder IDs, fixture/tests; `DIRDiving iOS Algorithm Tests` verde su macOS.
+
+### Added (2026-05-29, documentation indexing — `69e69b2`)
+
+- **Indice:** [`Docs/INDEX.md`](Docs/INDEX.md) aggiornato @ `69e69b2`; sezione dedicata reaudit fix + **UX readiness audit**.
+- **Audit root UX/UI:** [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md) indicizzato in §1, §4, §6, §13, §14; relazione reaudit math → fix algoritmico → gap UI residui.
+- **Docs:** aggiornati README, ROADMAP, CONTRIBUTING e hardening docs post-fix.
+
+### Added (2026-05-29, documentation indexing — `570964e`)
+
+- **Indice:** [`Docs/INDEX.md`](Docs/INDEX.md) aggiornato con audit root Watch/iOS, reaudit Buhlmann e UX readiness planner iOS.
+- **Audit root:** [`DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md), [`DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md), [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md).
+- **Docs:** [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) indicizzato in §1, §4, §6, §12, §13, §14 e pass 2026-05-28; aggiornati README e ROADMAP.
+
+### Added (2026-05-27, documentation / branch alignment refresh)
+
+- **Documentazione corrente:** riallineati `README.md`, `Docs/INDEX.md`, `Docs/ROADMAP.md`, `Docs/RELEASE_CHECKLIST.md`, `Docs/TESTFLIGHT_REVIEW_NOTES.md` e `Docs/DIR_DIVING_Feature_Comparison.csv` alla baseline `main` @ `37e4464` e agli ultimi documenti algorithm/Buhlmann.
+- **Nuovi report:** `Docs/DOCUMENTATION_UPDATE_REPORT_20260527.md`, `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md`, `Docs/PR_STATUS_20260527.md`.
+- **Algorithm docs:** indicizzati Watch final hardening, iOS algorithm hardening e assessment iOS Buhlmann multigas/helium.
+- **Branch/PR policy:** `main` confermato stabile; `main-iOS` storico/divergente; `codex/*` experimental-only. PR #8/#9 ispezionate via `gh`, entrambe experimental e non safe-to-merge automaticamente.
+- **Vincoli:** solo documentazione/repository consistency; nessuna modifica runtime, UI, UX, planner, sync, GPS, BUSSOLA o persistence.
+
+### Added (2026-05-19, documentation / branch alignment — baseline `92e639a`)
+
+- **Baseline commit:** README, INDEX, ROADMAP, PRODUCT_FEATURES_IT, SAFETY_DISCLAIMER, BUILD_VALIDATION e matrice CSV riallineati a `main` @ `92e639a`.
+- **Algorithm hardening documentato:** pass `ddaf2d7` → `92e639a` indicizzato con [`Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md) e audit [`Docs/CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](Docs/CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md).
+- **Nuovi report:** [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260519.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260519.md), [`Docs/PR_STATUS_20260519.md`](Docs/PR_STATUS_20260519.md).
+- **Feature matrix:** righe additivi per algorithm validation pipeline, XCTest target, stale backlog rows riallineate a Implemented dove già presenti su `main`.
+- **Branch strategy:** `main` = baseline stabile; `main-iOS` = worktree storico divergente; `codex/*` = experimental-only.
+- **Vincoli:** solo documentazione/repository consistency; nessuna modifica runtime in questo pass.
+
+### Added (2026-05-26, Watch algorithm release-hard — `92e639a`)
+
+- **Watch MAIN:** depth sample validation pipeline, automatic dive lifecycle algorithm, time-weighted average depth, centralized ascent/T compass math, `AscentSafetyHapticCoordinator`, timestamp-derived runtime/stopwatch.
+- **Tests:** target `DIRDiving Watch Algorithm Tests` + `Tests/WatchAlgorithmTests/DiveAlgorithmTests.swift`.
+- **Report:** [`Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md).
+
+### Added (2026-05-26, Watch algorithm audit — `ddaf2d7`)
+
+- **Watch MAIN:** audit matematico/algoritmico completo; hardening iniziale su DiveManager, merge, sync codec, export.
+- **Report:** [`Docs/CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](Docs/CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md).
+
+### Added (2026-05-26, documentation / branch alignment refresh)
+
+- **Documentazione corrente:** riallineati `README.md`, `Docs/INDEX.md`, `Docs/PRODUCT_FEATURES_IT.md`, `Docs/ROADMAP.md`, `Docs/BUILD_VALIDATION.md`, `Docs/RELEASE_CHECKLIST.md`, `Docs/TESTFLIGHT_REVIEW_NOTES.md`, `Docs/SAFETY_DISCLAIMER.md`, `Docs/WATCH_MAIN_UX_CONVENTIONS.md`.
+- **Audit correnti:** aggiornati `Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md` e `Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_CURRENT.md` per riflettere il Watch `Start Dive`, Mission Mode e la narrativa branch corrente.
+- **Nuovi report:** `Docs/DOCUMENTATION_UPDATE_REPORT_20260526.md`, `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260526.md`, `Docs/PR_STATUS_20260526.md`.
+- **Branch strategy:** `main` confermato come baseline stabile; `main-iOS` confermato come worktree storico divergente; `codex/*` mantenuti experimental-only.
+
+### Added (2026-05-26, Mission Mode — Watch MAIN)
+
+- **Watch MAIN:** nuova impostazione `Mission Mode` con toggle persistente **Auto-enable on dive start** (`dirdiving.missionMode.autoEnableOnDiveStart`), default OFF.
+- **Lifecycle:** Mission Mode si attiva solo dopo il passaggio a immersione attiva e si disattiva automaticamente a fine immersione; coperti sia avvio automatico da sensore sia avvio manuale.
+- **Runtime/UI only:** ridotte animazioni, transizioni e shadow decorative non essenziali su Live e BUSSOLA; warning safety, profondita, runtime, logica risalita, logging e GPS entry/exit restano invariati.
+- **Indicatore UI:** piccola icona statica vicino al polpo nell'header live, visibile solo quando Mission Mode e attivo durante una immersione attiva.
+- **Documentazione:** aggiornati `README.md`, `Docs/PRODUCT_FEATURES_IT.md`, `Docs/WATCH_MAIN_UX_CONVENTIONS.md`, `Docs/SAFETY_DISCLAIMER.md`, `Docs/INDEX.md`; nuovo documento `Docs/MISSION_MODE_MAIN_WATCH.md`; matrice CSV aggiornata.
+
+### Added (2026-05-25, documentation / branch alignment — `ab398eb`)
+
+- **Documentazione:** riallineati `README.md`, `Docs/INDEX.md`, `Docs/PRODUCT_FEATURES_IT.md`, `Docs/ROADMAP.md`, `Docs/BUILD_VALIDATION.md`, `Docs/RELEASE_CHECKLIST.md`, `Docs/SAFETY_DISCLAIMER.md`, `Docs/TESTFLIGHT_REVIEW_NOTES.md`, `Docs/WATCH_MAIN_UX_CONVENTIONS.md`.
+- **Audit/report:** aggiornati `Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md`, `Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_CURRENT.md`; `Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md` marcato come report storico superseded.
+- **Nuovi report:** `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md`, `Docs/DOCUMENTATION_UPDATE_REPORT_20260525.md`, `Docs/PR_STATUS_20260525.md`.
+- **Branch strategy:** `main` confermato come baseline stabile Watch+iOS; `main-iOS` documentato come worktree storico divergente; `codex/*` mantenuti experimental-only.
+- **Vincoli:** solo documentazione/repository consistency; nessuna modifica runtime, business logic, planner math o sync architecture.
+
 ### Added (2026-05-20, documentation post v9 — `d962117`)
 
 - **Documentazione:** [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md) panoramica funzioni IT; README, INDEX, ROADMAP, matrice CSV (righe v8/v9); report [`DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md), [`DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md), [`PR_STATUS_20260520_POST_V9.md`](Docs/PR_STATUS_20260520_POST_V9.md).
