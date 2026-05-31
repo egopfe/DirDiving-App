@@ -1,6 +1,6 @@
 # Roadmap DIR DIVING
 
-**Aggiornato:** 2026-05-20 (`main` @ `d962117`)
+**Aggiornato:** 2026-05-31 (`main` = `origin/main` @ `dae29b8`)
 
 ## Rilasciati su `main` (Watch MAIN + iOS nel workspace)
 
@@ -15,11 +15,11 @@
 | Sync iPhone → Watch (session push) | ✅ | `5e595ee` outbound queue + More push |
 | UI conflitti sync iOS | ✅ | `5e595ee` card in More |
 | Security F1-F12 | ✅ | Audit 2026-05-19 |
-| i18n IT/EN (primario + secondario) | 🟡 | Pass 2026-05-23; alcune righe Settings/shortcut ancora IT-key |
+| i18n IT/EN (primario + secondario) | ✅ | Pass principali chiusi su MAIN stabile; eventuali affinamenti futuri sono polish, non blocker repo-side |
 | Onboarding legale + disclaimer IT/EN | ✅ | First launch, major update re-consent, Legal & Safety |
 | Planner safety acknowledgment | ✅ | Persistito `2026-05-24` (`62e25d5`); toggle obbligatorio prima di Calcola Piano |
 | iCloud decode error UI (iOS) | ✅ | `62e25d5` — `lastDecodeError` in Altro |
-| i18n Logbook/Detail/Analysis (iOS) | 🟡 | R4 `62e25d5`; Planner/Equipment ancora misto |
+| i18n Logbook/Detail/Analysis (iOS) | ✅ | Copertura MAIN riallineata nei pass readiness 2026-05-24/25 |
 | 7 App Shortcuts Watch | ✅ | `db72dce` |
 | Strategia controlli Watch | ✅ | `72fa15b`; Crown/touch/App Intents/Side Button documentati |
 | Digital Crown tuning soglie | ✅ | Allarmi + limiti risalita; touch fallback mantenuto |
@@ -38,27 +38,49 @@
 | Foto iPhone → Watch (UserImages) | ✅ | `f851b61` transferFile |
 | Tab iOS Planner prima | ✅ | `f851b61` |
 | Planner ack in cima + field gate | ✅ | Persistenza `62e25d5`; gate campi `f851b61` |
-| Marchio altosinistra header | 🟡 | PNG bundled; AppIcon store da rigenerare |
+| Marchio altosinistra header | ✅ | Asset bundled nel design system corrente |
 | Planner gas v8 (cilindri, ruoli, Air/EAN/Trimix, MOD) | ✅ | `a36dc23` |
 | Equipment template «La mia attrezzatura» + GAS switch | ✅ | `a36dc23` |
 | Foto iPhone→Watch con validazione/resize | ✅ | `a36dc23` |
 | Watch User Images in superficie (tab sempre) | ✅ | `d962117` |
 | Planner/Bühlmann sync su input gas | ✅ | `d962117` — algoritmo Bühlmann invariato |
+| Start Dive manuale visibile su Watch | ✅ | `2322145` — avvio manuale in superficie senza disattivare l'avvio automatico |
+| Terms / Privacy dedicati | ✅ | Docs legali dedicate usate da Watch e iOS onboarding/settings |
+| Sync activity recente Watch/iOS | ✅ | Visibilita recente per photo/session activity senza alterare il protocollo |
+| Safeguard reset cronometro Watch | ✅ | Conferma esplicita quando esiste tempo da resettare |
+| Mission Mode Watch + indicatore attivo | ✅ | `9d8baa1`; ottimizzazione runtime/UI senza regressioni safety-critical documentate |
+| Watch algorithm release-hard pass | ✅ | `ddaf2d7` → `92e639a`; validator depth, lifecycle, TTV/time-weighted avg, haptic coordinator, XCTest |
+| Watch algorithm final hardening | ✅ | Cap 40 sessioni su load/reload, temperatura plausibile, export vuoto bloccato, GPS fallback policy, conversioni centralizzate |
+| iOS algorithm release-hard pass | ✅ | Validator iOS, planner/gas safe states, import/export/sync/logbook math, route math, test `DIRDiving iOS Algorithm Tests` |
+| iOS Buhlmann ZHL-16C multigas engine | ✅ | Motore reference iOS-only con N2+He, GF, NDL tissue-state e soste generate; non certificato, da validare esternamente |
+| iOS Buhlmann re-audit 2026-05-28 | ✅ | P1–P3 risolti @ `69e69b2` — [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) |
+| iOS Buhlmann UX/UI readiness | ✅ | Fix @ `3237262`; re-audit **Ready** — [`Docs/DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md) |
+| iOS comprehensive NOAA CNS/OTU | ✅ | @ `dae29b8` — single/daily CNS, recovery, REPEX OTU, snapshot v2; **119/119** XCTest |
+| iOS Bühlmann readiness P1–P4 | ✅ | @ `dae29b8` — [`Docs/DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md`](DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md) |
+| Docs alignment 2026-05-31 | ✅ | [`DOCUMENTATION_UPDATE_REPORT_20260531.md`](DOCUMENTATION_UPDATE_REPORT_20260531.md) |
+| Docs Phase 15 alignment | ✅ | [`DOCUMENTATION_BRANCH_ALIGNMENT_20260530.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260530.md) |
+| Docs / audit alignment 2026-05-25 | ✅ | README, INDEX, safety/release docs e matrix riallineati al MAIN corrente |
+| Docs / branch / PR alignment 2026-05-26 | ✅ | README, INDEX, roadmap, current audits, branch/PR reports riallineati alla baseline MAIN attuale |
+| Docs / branch / PR alignment 2026-05-27 | ✅ | README, INDEX, roadmap, release/TestFlight notes, matrix e PR reports riallineati a `37e4464` + docs algorithm/Buhlmann |
 
 ## Prossimo (MAIN, pre–App Store)
 
 | Priorità | Item | Tipo |
 |----------|------|------|
-| P0 | Validazione depth su Watch Ultra reale (R1) | QA / Apple — [`TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md) |
-| P1 | Ripristinare unità imperiali in lista log Watch | UX — regressione `3b7358b` |
-| P1 | QA pairing sync bidirezionale su device | QA |
-| P2 | Completare i18n residuo (Settings shortcut, InfoView) | Localization |
-| P2 | Verifica legale contenuti Terms/Privacy URL prima App Store | Legal / App Store |
-| P2 | Convergenza documentazione `main` ↔ `main-iOS` | Process |
+| P0 | Approvazione entitlement water-submersion + provisioning aggiornato | Apple Developer / Signing — [`TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md) |
+| P0 | Build generici firmati Watch + iOS con target embedded | Release / QA |
+| P1 | Esecuzione XCTest `DIRDiving Watch Algorithm Tests` su macOS/Xcode | Release / QA — [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md) |
+| P1 | Esecuzione XCTest `DIRDiving iOS Algorithm Tests` su macOS/Xcode | Release / QA — [`DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md) |
+| P1 | QA reale Apple Watch Ultra per lifecycle automatico, profondita e limiti 35/38/40 m | Hardware QA |
+| P1 | QA pairing/sync bidirezionale su device | Hardware QA |
+| P1 | QA App Intents / Action Button su Watch fisico | Hardware QA |
+| P2 | Validazione matematica esterna del motore Buhlmann ZHL-16C + GF + He | Planner QA — [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md) |
+| P2 | VoiceOver / Dynamic Type QA fisica su planner iOS | UX QA — post `3237262` |
+| P2 | Verifica finale legale contenuti Terms/Privacy e copy App Review | Legal / App Store |
+| P2 | Convergenza documentazione `main` ↔ worktree storici (`main-iOS`, `codex/*`) senza merge runtime unsafe | Process |
 | P3 | GPX/UDDF export | Feature |
-| P3 | Rigenerare AppIcon da `Docs/ReferenceIcon/` | Assets |
-| P4 | Watch back navigation audit su tutte le sub-screen | UX |
-| P4 | Valutare long-press STOP/RESET solo dopo decisione prodotto | UX safety |
+| P3 | Rigenerare e validare AppIcon store da `Docs/ReferenceIcon/` | Assets |
+| P4 | Eventuale ledger sync per-session persistente oltre la recente activity | UX / diagnostics |
 
 ## Rami experimental (non in target MAIN)
 

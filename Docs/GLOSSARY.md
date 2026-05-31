@@ -9,8 +9,8 @@ Testi di supporto per README, schermate e VoiceOver. **Non sostituiscono formazi
 | **SAC** | Surface Air Consumption / consumo indicativo in litri/minuto derivato dai dati di sessione. | Dipende da qualità dei campioni e ipotesi sul cilindro; valore indicativo. |
 | **MOD** | Maximum Operating Depth per il mix gas corrente e PPO2 massima impostata. | Limite teorico da cross-check con tabelle e procedure reali. |
 | **PPO2** | Pressione parziale ossigeno prevista per il gas in uso alla profondità considerata. | Supervisione umana obbligatoria. |
-| **CNS** | Indice frazionario ossigeno cumulativo (modello in planner). | Indicativo; non sostituisce analisi da strumenti certificati. |
-| **OTU** | Oxygen Toxicity Unit (modello in planner). | Indicativo. |
+| **CNS** | Central Nervous System oxygen toxicity index in planner — NOAA-style single- and daily-exposure limits with 90 min surface/air-break recovery. | Reference-only; non sostituisce clock CNS del computer o tabelle produttore. |
+| **OTU** | Oxygen Toxicity Unit (Lambertsen UPTD) in planner — dive, daily 24 h, and weekly totals with REPEX-style reference thresholds (300 / 850 / 1800). | Reference-only; indicativo. |
 | **Punto GPS ingresso** | Coordinata (o fallback etichettato) salvato in **superficie** all’inizio sessione quando i permessi e il segnale lo consentono. | GPS in acqua è inaffidabile o assente. |
 | **Punto GPS uscita** | Come sopra, alla fine sessione in superficie. | Può mancare: mostrare stato “non disponibile” senza tono da “successo” ingannevole. |
 | **Velocità di risalita** | Stima o misura della velocità verticale verso la superficie, confrontata con limiti configurati. | I colori del gauge sono **feedback visivo** su soglie già definite dall’app; questo glossario non modifica soglie. |
