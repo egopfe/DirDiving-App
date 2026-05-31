@@ -1403,7 +1403,7 @@ struct PlanResultView: View {
 
     private func tableRow(_ values: [String], isHeader: Bool = false) -> some View {
         HStack {
-            ForEach(values, id: \.self) { value in
+            ForEach(Array(values.enumerated()), id: \.offset) { _, value in
                 Text(value)
                     .font(
                         isHeader
