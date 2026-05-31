@@ -49,7 +49,9 @@ enum DiveSessionMerge {
             entryGPSFixSource: entryGPSFixSource,
             exitGPSFixSource: exitGPSFixSource,
             samples: selectedSamples,
-            exceededSupportedDepthRange: winner.exceededSupportedDepthRange || loser.exceededSupportedDepthRange
+            exceededSupportedDepthRange: winner.exceededSupportedDepthRange || loser.exceededSupportedDepthRange,
+            isManual: winner.isManual || loser.isManual,
+            hasDepthProfile: !selectedSamples.isEmpty || winner.hasDepthProfile || loser.hasDepthProfile
         )
     }
 

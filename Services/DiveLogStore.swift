@@ -45,11 +45,26 @@ final class DiveLogStore: ObservableObject {
     func add(_ session: DiveSession) {
         let normalizedSession = DiveSessionMerge.preferred(session, session)
         guard !deletedSessionIDs.contains(normalizedSession.id) else { return }
+
+        switch DiveSessionPersistenceClass.classify(normalizedSession) {
+        case .invalid(let reason):
+            loadErrorMessage = reason
+            return
+        case .profileExportable, .manualNoDepth:
+            break
+        }
+
         sessions.removeAll { $0.id == normalizedSession.id }
         sessions.insert(normalizedSession, at: 0)
         sessions = DiveLogbookPolicy.normalizedAndCapped(sessions, deletedIDs: deletedSessionIDs)
         save()
-        WatchSyncService.shared.transfer(normalizedSession)
+        if DiveSessionPersistenceClass.classify(normalizedSession).allowsSync {
+            WatchSyncService.shared.transfer(normalizedSession)
+        }
+    }
+
+    func persistenceClass(for session: DiveSession) -> DiveSessionPersistenceClass {
+        DiveSessionPersistenceClass.classify(DiveSessionMerge.preferred(session, session))
     }
 
     /// Session received from iPhone — do not echo back via transfer.

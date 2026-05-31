@@ -6,6 +6,9 @@ enum DiveAlgorithmConfiguration {
     static let automaticStopDepthMeters = 0.3
     static let automaticStopDwellSeconds: TimeInterval = 8
     static let staleDepthSampleSeconds: TimeInterval = 8
+    /// Active-dive watchdog: no accepted depth callbacks for this long marks depth stale.
+    static let activeDepthCallbackSilenceSeconds: TimeInterval = staleDepthSampleSeconds
+    static let staleTemperatureSeconds: TimeInterval = 30
     static let maximumFutureDepthSampleSkewSeconds: TimeInterval = 1
     static let frozenDepthSampleSeconds: TimeInterval = 30
     static let frozenDepthToleranceMeters = 0.001

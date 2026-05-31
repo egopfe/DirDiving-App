@@ -103,6 +103,10 @@ targets:
       - Utils/DiveLifecycleAlgorithm.swift
       - Utils/DiveSessionAlgorithmValidator.swift
       - Utils/DiveSessionMerge.swift
+      - Utils/MonotonicElapsedClock.swift
+      - Utils/GPSConfirmationPresentation.swift
+      - Utils/DiveSessionPersistenceClass.swift
+      - Models/DiveGPSConfirmation.swift
       - Services/SubsurfaceExportService.swift
     settings:
       base:

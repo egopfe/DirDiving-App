@@ -23,6 +23,9 @@ struct DiveDetailView: View {
                     if session.exceededSupportedDepthRange {
                         exceededDepthLogBanner
                     }
+                    if session.isManual && !session.hasDepthProfile {
+                        manualNoDepthLogBanner
+                    }
                     gpsRows
                     exportPanel
                     deletePanel
@@ -198,9 +201,44 @@ struct DiveDetailView: View {
         )
     }
 
+    private var sessionPersistenceClass: DiveSessionPersistenceClass {
+        log.persistenceClass(for: session)
+    }
+
+    private var manualNoDepthLogBanner: some View {
+        Text(String(localized: "log.manual.nodepth.banner"))
+            .font(.system(size: 10, weight: .bold, design: .rounded))
+            .foregroundStyle(DiveUI.cyan)
+            .multilineTextAlignment(.leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
+            .background(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(DiveUI.cyan.opacity(0.10))
+                    .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(DiveUI.cyan.opacity(0.65), lineWidth: 1))
+            )
+    }
+
     private var exportPanel: some View {
         VStack(spacing: 8) {
+            if !sessionPersistenceClass.allowsExport {
+                Text(session.isManual && !session.hasDepthProfile
+                     ? String(localized: "log.export.manual.nodepth.unavailable")
+                     : String(localized: "log.export.unavailable"))
+                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .foregroundStyle(DiveUI.yellow)
+                    .multilineTextAlignment(.center)
+            }
+
             Button {
+                guard sessionPersistenceClass.allowsExport else {
+                    exportMessage = session.isManual && !session.hasDepthProfile
+                        ? String(localized: "log.export.manual.nodepth.unavailable")
+                        : String(localized: "Export CSV non riuscito")
+                    HapticService.shared.notify()
+                    return
+                }
                 exportURL = SubsurfaceExportService.writeCSV(for: session)
                 exportMessage = exportURL == nil ? String(localized: "Export CSV non riuscito") : nil
                 if let exportURL {

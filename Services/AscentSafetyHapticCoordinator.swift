@@ -13,6 +13,12 @@ final class AscentSafetyHapticCoordinator {
         }
     }
 
+    func refreshHapticsAfterPreferenceChange() {
+        guard isAlarmActive else { return }
+        HapticService.shared.ascentAlarmTriggered()
+        restartRepeatTaskIfNeeded()
+    }
+
     func clear() {
         repeatTask?.cancel()
         repeatTask = nil
@@ -23,9 +29,19 @@ final class AscentSafetyHapticCoordinator {
     }
 
     private func startIfNeeded() {
-        guard !isAlarmActive else { return }
+        let wasActive = isAlarmActive
         isAlarmActive = true
-        HapticService.shared.ascentAlarmTriggered()
+        if !wasActive {
+            HapticService.shared.ascentAlarmTriggered()
+        } else {
+            HapticService.shared.ascentAlarmRepeatIfNeeded()
+        }
+        restartRepeatTaskIfNeeded()
+    }
+
+    private func restartRepeatTaskIfNeeded() {
+        guard isAlarmActive else { return }
+        repeatTask?.cancel()
         repeatTask = Task {
             while !Task.isCancelled {
                 try? await Task.sleep(nanoseconds: UInt64(HapticService.ascentAlarmRepeatInterval * 1_000_000_000))

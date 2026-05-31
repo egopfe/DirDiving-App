@@ -1,5 +1,9 @@
 # DIR DIVING Watch MAIN Algorithm and Mathematical Functions Audit - Current
 
+> **Update 2026-05-31:** Readiness remediation complete on `main`. See [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md). **Post-remediation estimate: 100%** (code criteria; physical QA still required per report § L). Scores below reflect **pre-remediation** audit @ `main`. **Parallelo iOS:** [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md).
+
+> **Indice:** [`INDEX.md`](INDEX.md) · **Parallelo iOS:** [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) · **Report 100%:** [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) · **Policy manual/no-depth:** [`WATCH_MANUAL_NODEPTH_SYNC_POLICY.md`](WATCH_MANUAL_NODEPTH_SYNC_POLICY.md)
+
 Date: 2026-05-31
 Branch audited: `main`
 Remote: `https://github.com/egopfe/DirDiving-App.git`
@@ -558,11 +562,13 @@ No. App Store readiness requires the high/medium findings above, macOS/Xcode bui
 
 ### What Blocks 100% Algorithmic Readiness?
 
-- Lack of active freshness watchdog when depth callbacks stop entirely.
-- GPS no-fix UI state compressed into the success/fallback path.
-- Watch local log semantics not fully aligned with export and iOS sync validation.
-- Auto-start timestamp ordering can exclude the first triggering sample.
-- Wall-clock runtime/stopwatch assumptions under system time changes.
-- Alarm/haptic source state not fully independent across simultaneous or preference-changing conditions.
+> **Update 2026-05-31:** Software remediation on `main` addresses the items below. See [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) § H and [`WATCH_MANUAL_NODEPTH_SYNC_POLICY.md`](WATCH_MANUAL_NODEPTH_SYNC_POLICY.md). **Physical-device validation** is still required before external TestFlight.
+
+- ~~Lack of active freshness watchdog when depth callbacks stop entirely.~~ → WMATH-HIGH-001 fixed
+- ~~GPS no-fix UI state compressed into the success/fallback path.~~ → WMATH-HIGH-002 fixed
+- ~~Watch local log semantics not fully aligned with export and iOS sync validation.~~ → WMATH-HIGH-003 / MED-005 fixed
+- ~~Auto-start timestamp ordering can exclude the first triggering sample.~~ → WMATH-MED-004 fixed
+- ~~Wall-clock runtime/stopwatch assumptions under system time changes.~~ → WMATH-MED-007 fixed
+- ~~Alarm/haptic source state not fully independent across simultaneous or preference-changing conditions.~~ → WMATH-MED-008 / MED-009 fixed
 - Physical-device validation is still required for CoreMotion underwater behavior, haptics, GPS, WatchConnectivity, and app lifecycle recovery.
 

@@ -1,6 +1,6 @@
 # Note per TestFlight / App Review - DIR DIVING
 
-**Aggiornato:** 2026-05-31 — branch `main` = `origin/main` @ `1d69d88` (algorithm @ `dce89e7`)
+**Aggiornato:** 2026-05-31 — branch `main` = `origin/main` (Watch + iOS MAIN readiness 100% pass)
 
 ## Panoramica per il revisore
 
@@ -10,7 +10,10 @@ L'app **non** e presentata come computer subacqueo certificato.
 
 Lo stato algoritmico MAIN e documentato in:
 
-- [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md) per Watch MAIN.
+- [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) per Watch MAIN (codice 100%; QA fisica § L).
+- [`WATCH_MANUAL_NODEPTH_SYNC_POLICY.md`](WATCH_MANUAL_NODEPTH_SYNC_POLICY.md) per sessioni manuali senza profilo profondità.
+- [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) per iOS MAIN.
+- [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md) per hardening Watch precedente.
 - [`DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md) per iOS MAIN.
 - [`DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md) e [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md) per il motore Buhlmann ZHL-16C N2+He multigas reference.
 - [`DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md) per UX/UI readiness post-fix @ `3237262` (verdict **READY**).
@@ -56,6 +59,10 @@ Lo stato algoritmico MAIN e documentato in:
 - [ ] Banner risalita rosso: gauge e profondita restano visibili
 - [ ] Allarme: pulsante OK + cooldown
 - [ ] Surface state Watch: **Start Dive** visibile e avvio manuale disponibile senza rimuovere l'avvio automatico da profondita
+- [ ] Watch @ 2026-05-31: banner **depth data not updating** se callbacks profondità cessano in immersione
+- [ ] Watch @ 2026-05-31: GPS entry/exit — fix verde / fallback giallo / no-fix rosso (non verde su nil)
+- [ ] Watch @ 2026-05-31: sessione manuale senza profilo → sync iPhone badge **RUNTIME/GPS**; export CSV non disponibile
+- [ ] Watch @ 2026-05-31: haptics disattivati poi riattivati durante allarme risalita → haptics riprendono
 - [ ] Mission Mode: toggle Settings + indicatore header verificati; nessun cambiamento ai dati safety-critical
 - [ ] Export CSV Subsurface da dettaglio immersione
 - [ ] Planner: disclaimer visibile; output indicativo
