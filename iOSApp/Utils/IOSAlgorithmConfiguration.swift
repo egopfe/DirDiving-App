@@ -10,9 +10,15 @@ enum IOSAlgorithmConfiguration {
     static let surfacePressureBar = 1.0
 
     static let minPlannerDepthMeters = 0.1
+    /// Bühlmann reference planner input ceiling.
     static let maxPlannerDepthMeters = 120.0
+    /// CSV import/export and Subsurface round-trip sample ceiling.
     static let maxImportExportDepthMeters = 300.0
+    /// Watch sync and on-device profile normalization ceiling (allows deeper logged dives than import/export).
     static let maxSyncDepthMeters = 350.0
+    /// Documented operating envelope for UI warnings and supported-depth flags.
+    static let supportedOperatingDepthMeters = maxSyncDepthMeters
+
     static let maxBottomTimeMinutes = 600.0
     static let maxDiveDurationSeconds: TimeInterval = 24 * 60 * 60
 

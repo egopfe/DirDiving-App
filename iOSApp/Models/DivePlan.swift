@@ -77,6 +77,7 @@ struct TeamGasMatch: Identifiable, Hashable {
 struct DivePlanResult: Hashable {
     let ndlMinutes: Double
     let ttrMinutes: Int
+    let calculationCompleteness: PlanCalculationCompleteness
     let decoStops: [DecoStop]
     let cnsPercent: Double
     let otu: Double

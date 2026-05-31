@@ -6,6 +6,8 @@
 **Target:** `DIRDiving iOS` (iOS Companion MAIN only)  
 **Mode:** Read-only audit — no application code changes
 
+> **Update 2026-05-31:** Readiness remediation complete on `main`. See [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md).
+
 ---
 
 ## A. Executive Summary

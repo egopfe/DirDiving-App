@@ -172,6 +172,10 @@ struct PlannerView: View {
                         store.refreshDerivedPlanningPreview()
                     }
                 }
+                Text(String(localized: "planner.reference.helper"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
                 .padding(.vertical, 10)
                 Divider().overlay(DIRTheme.hairline)
                 plannerField(String(localized: "planner.field.bottom_time"), value: $store.input.plannedBottomMinutes, unit: "min", step: 1)
@@ -541,7 +545,7 @@ struct PlannerView: View {
     }
 
     private var liveMODIssues: [MODValidationIssue] {
-        PlannerMODValidator.liveInputIssues(input: store.input)
+        PlannerMODValidator.liveInputIssues(input: store.input, environment: store.input.plannerEnvironment)
     }
 
     private var liveValidation: PlannerValidationResult {
@@ -865,6 +869,17 @@ struct PlanResultView: View {
         }
     }
 
+    private var referenceDepthSummary: String {
+        let label: String
+        switch store.input.planningDepthReference {
+        case .maximumDepth:
+            label = String(localized: "planner.result.reference_depth.max")
+        case .averageDepth:
+            label = String(localized: "planner.result.reference_depth.average")
+        }
+        return String(format: String(localized: "planner.result.reference_depth"), label)
+    }
+
     private var resultHeaderBadge: some View {
         let header = store.plan.resultHeader
         let accent = resultHeaderAccent(header.severity)
@@ -882,11 +897,21 @@ struct PlanResultView: View {
                 .font(.caption)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
+            if store.plan.calculationCompleteness == .incompletePartialStops {
+                Text(String(localized: "planner.result.calculation_incomplete"))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.red)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             if store.plan.repetitiveContext?.tissueStateApplied == true {
                 Text(String(localized: "planner.repetitive.result_badge"))
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(DIRTheme.yellow)
             }
+            Text(referenceDepthSummary)
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
             Text(String(localized: "planner.header.reference_only.hint"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
@@ -935,7 +960,15 @@ struct PlanResultView: View {
     @ViewBuilder
     private var bailoutScheduleHint: some View {
         if !PlannerGasSchedule.bailoutCylinders(from: store.input).isEmpty {
-            DIRWarningBox(text: String(localized: "planner.bailout.schedule_hint"))
+            VStack(alignment: .leading, spacing: 8) {
+                DIRWarningBox(text: String(localized: "planner.bailout.schedule_hint"))
+                ForEach(PlannerGasSchedule.bailoutAvailabilityWarnings(input: store.input), id: \.self) { warning in
+                    Text(warning)
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.yellow)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
         }
     }
 
@@ -1044,7 +1077,7 @@ struct PlanResultView: View {
         switch kind {
         case .noDecoReference: return "checkmark.circle"
         case .decoRequiredReference: return "arrow.up.circle"
-        case .invalidInput, .unsupportedProfile, .noValidDecompressionSolution: return "xmark.octagon"
+        case .invalidInput, .unsupportedProfile, .noValidDecompressionSolution, .calculationIncomplete: return "xmark.octagon"
         case .repetitiveReferencePlan: return "arrow.triangle.2.circlepath"
         case .environmentAdjustedReferencePlan: return "mountain.2"
         }
@@ -1174,22 +1207,29 @@ struct PlanResultView: View {
 
     private var ascentTable: some View {
         DIRCard(String(localized: "planner.result.ascent_plan"), icon: nil, accent: DIRTheme.cyan) {
-            VStack(spacing: 9) {
-                tableRow([
-                    String(localized: "planner.table.depth"),
-                    String(localized: "planner.table.time"),
-                    String(localized: "planner.table.gas"),
-                    "PPO2"
-                ], isHeader: true)
-                ForEach(store.plan.decoStops) { stop in
+            if store.plan.calculationCompleteness == .incompletePartialStops {
+                Text(String(localized: "planner.result.calculation_incomplete"))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.red)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else {
+                VStack(spacing: 9) {
                     tableRow([
-                        depthText(stop.depthMeters),
-                        "\(stop.minutes) min",
-                        stop.gas,
-                        Formatters.one(stop.ppO2)
-                    ])
+                        String(localized: "planner.table.depth"),
+                        String(localized: "planner.table.time"),
+                        String(localized: "planner.table.gas"),
+                        "PPO2"
+                    ], isHeader: true)
+                    ForEach(store.plan.decoStops) { stop in
+                        tableRow([
+                            depthText(stop.depthMeters),
+                            "\(stop.minutes) min",
+                            stop.gas,
+                            Formatters.one(stop.ppO2)
+                        ])
+                    }
+                    tableRow([depthText(0), "-", String(localized: "planner.table.surface"), "-"])
                 }
-                tableRow([depthText(0), "-", String(localized: "planner.table.surface"), "-"])
             }
         }
     }
@@ -1322,6 +1362,10 @@ struct PlanResultView: View {
                 DIRWarningBox(text: String(localized: "planner.gas.trimix_buhlmann_disclaimer"))
             }
             DIRCard(String(localized: "planner.buhlmann.curve_title"), icon: nil, accent: DIRTheme.cyan) {
+                Text(String(localized: "planner.buhlmann.curve_disclaimer"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
                 Chart(store.buhlmann.curve) { point in
                     LineMark(
                         x: .value("Minutes", point.ndlMinutes),

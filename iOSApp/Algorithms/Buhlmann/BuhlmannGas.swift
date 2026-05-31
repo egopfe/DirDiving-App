@@ -99,8 +99,13 @@ struct BuhlmannGas: Hashable {
             && maxPPO2 <= maxPPO2Bar + 0.000_1
     }
 
-    func modMeters() -> Double? {
-        GasMixValidator.modMeters(oxygenFraction: oxygenFraction, maxPPO2: maxPPO2Bar)
+    func modMeters(environment: PlannerEnvironment? = nil) -> Double? {
+        let resolved = environment ?? .seaLevelSaltWater
+        return GasMixValidator.modMeters(
+            oxygenFraction: oxygenFraction,
+            maxPPO2: maxPPO2Bar,
+            environment: resolved
+        )
     }
 
     func minimumOperatingDepthMeters(minPPO2: Double = BuhlmannConstants.minBreathablePPO2Bar, environment: PlannerEnvironment? = nil) -> Double {

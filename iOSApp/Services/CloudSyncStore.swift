@@ -36,6 +36,22 @@ final class CloudSyncStore: ObservableObject {
         lastDecodeError = nil
     }
 
+    func loadRawLocalData(forKey key: String) -> Data? {
+        defaults.data(forKey: key)
+    }
+
+    func loadRawCloudData(forKey key: String) -> Data? {
+        cloudStore.data(forKey: key)
+    }
+
+    func decodeLocal<T: Decodable>(_ type: T.Type, from data: Data) -> T? {
+        decode(type, from: data, key: "local", source: String(localized: "cloud.source.local"))
+    }
+
+    func decodeCloud<T: Decodable>(_ type: T.Type, from data: Data) -> T? {
+        decode(type, from: data, key: "cloud", source: String(localized: "cloud.source.icloud"))
+    }
+
     func load<T: Decodable>(_ type: T.Type, forKey key: String) -> T? {
         let cloudData = cloudStore.data(forKey: key)
         let localData = defaults.data(forKey: key)

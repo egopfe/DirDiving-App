@@ -11,17 +11,25 @@ struct MODValidationIssue: Identifiable, Hashable {
 }
 
 enum PlannerMODValidator {
-    /// MOD (m) = ((PPO₂ max / FO₂) - 1) × 10 — Dalton / best mix (FO₂ from mix, including trimix helium fraction).
-    static func modMeters(oxygenFraction: Double, maxPPO2: Double) -> Double {
-        GasMixValidator.modMeters(oxygenFraction: oxygenFraction, maxPPO2: maxPPO2) ?? 0
+    static func modMeters(
+        oxygenFraction: Double,
+        maxPPO2: Double,
+        environment: PlannerEnvironment = .seaLevelSaltWater
+    ) -> Double {
+        GasMixValidator.modMeters(oxygenFraction: oxygenFraction, maxPPO2: maxPPO2, environment: environment) ?? 0
     }
 
-    static func modMeters(for gas: GasMix) -> Double {
-        modMeters(oxygenFraction: gas.oxygen, maxPPO2: gas.maxPPO2)
+    static func modMeters(for gas: GasMix, environment: PlannerEnvironment = .seaLevelSaltWater) -> Double {
+        modMeters(oxygenFraction: gas.oxygen, maxPPO2: gas.maxPPO2, environment: environment)
     }
 
-    static func validateGasSwitch(depthMeters: Double, gas: GasMix, role: GasRole? = nil) -> MODValidationIssue? {
-        let mod = modMeters(for: gas)
+    static func validateGasSwitch(
+        depthMeters: Double,
+        gas: GasMix,
+        role: GasRole? = nil,
+        environment: PlannerEnvironment = .seaLevelSaltWater
+    ) -> MODValidationIssue? {
+        let mod = modMeters(for: gas, environment: environment)
         guard depthMeters > mod + 0.05 else { return nil }
         return MODValidationIssue(
             gasLabel: gas.label,
@@ -34,7 +42,10 @@ enum PlannerMODValidator {
     }
 
     /// Validates every planner cylinder and the planned bottom depth against each gas MOD.
-    static func validatePlannerCylinders(input: GasPlanInput) -> [MODValidationIssue] {
+    static func validatePlannerCylinders(
+        input: GasPlanInput,
+        environment: PlannerEnvironment = .seaLevelSaltWater
+    ) -> [MODValidationIssue] {
         var working = input
         working.ensurePlannerCylindersFromLegacy()
         var issues: [MODValidationIssue] = []
@@ -43,9 +54,10 @@ enum PlannerMODValidator {
             switch entry.role {
             case .bottom:
                 if let issue = validateGasSwitch(
-                    depthMeters: working.plannedDepthMeters,
+                    depthMeters: working.effectivePlanningDepthMeters,
                     gas: entry.gas,
-                    role: .bottom
+                    role: .bottom,
+                    environment: environment
                 ) {
                     issues.append(issue)
                 }
@@ -53,7 +65,8 @@ enum PlannerMODValidator {
                 if let issue = validateGasSwitch(
                     depthMeters: entry.switchDepthMeters,
                     gas: entry.gas,
-                    role: entry.role
+                    role: entry.role,
+                    environment: environment
                 ) {
                     issues.append(issue)
                 }
@@ -62,31 +75,47 @@ enum PlannerMODValidator {
         return issues
     }
 
-    static func validateDecoStops(stops: [DecoStop], gases: [GasMix]) -> [MODValidationIssue] {
+    static func validateDecoStops(
+        stops: [DecoStop],
+        gases: [GasMix],
+        environment: PlannerEnvironment = .seaLevelSaltWater
+    ) -> [MODValidationIssue] {
         guard !stops.isEmpty, !gases.isEmpty else { return [] }
         var issues: [MODValidationIssue] = []
         for (index, stop) in stops.enumerated() {
             let gas = gases[min(index, gases.count - 1)]
-            if let issue = validateGasSwitch(depthMeters: stop.depthMeters, gas: gas, role: .deco) {
+            if let issue = validateGasSwitch(
+                depthMeters: stop.depthMeters,
+                gas: gas,
+                role: .deco,
+                environment: environment
+            ) {
                 issues.append(issue)
             }
         }
         return issues
     }
 
-    static func liveInputIssues(input: GasPlanInput) -> [MODValidationIssue] {
+    static func liveInputIssues(
+        input: GasPlanInput,
+        environment: PlannerEnvironment = .seaLevelSaltWater
+    ) -> [MODValidationIssue] {
         var working = input
         working.syncLegacyGasesFromPlannerCylinders()
-        return validatePlannerCylinders(input: working)
+        return validatePlannerCylinders(input: working, environment: environment)
     }
 
-    static func validateAll(input: GasPlanInput, requestedStops: [DecoStop]) -> [MODValidationIssue] {
-        var combined = validatePlannerCylinders(input: input)
+    static func validateAll(
+        input: GasPlanInput,
+        requestedStops: [DecoStop],
+        environment: PlannerEnvironment = .seaLevelSaltWater
+    ) -> [MODValidationIssue] {
+        var combined = validatePlannerCylinders(input: input, environment: environment)
         let decoGases = input.plannerCylinders
             .filter { $0.role == .deco }
             .map(\.gas)
         let stopGases = decoGases.isEmpty ? [input.decoGas1, input.decoGas2] : decoGases
-        combined.append(contentsOf: validateDecoStops(stops: requestedStops, gases: stopGases))
+        combined.append(contentsOf: validateDecoStops(stops: requestedStops, gases: stopGases, environment: environment))
         return deduplicated(combined)
     }
 

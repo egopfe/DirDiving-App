@@ -40,20 +40,35 @@ enum GasMixValidator {
         return 1.0 - oxygen - helium
     }
 
-    static func actualPPO2(oxygenFraction: Double, depthMeters: Double) -> Double? {
+    static func actualPPO2(
+        oxygenFraction: Double,
+        depthMeters: Double,
+        environment: PlannerEnvironment = .seaLevelSaltWater
+    ) -> Double? {
         guard oxygenFraction.isFinite, depthMeters.isFinite, oxygenFraction > 0, depthMeters >= 0 else {
             return nil
         }
-        return oxygenFraction * IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters)
+        let ambient = IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters, environment: environment)
+            ?? IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters)
+        return oxygenFraction * ambient
     }
 
-    static func modMeters(oxygenFraction: Double, maxPPO2: Double) -> Double? {
+    static func modMeters(
+        oxygenFraction: Double,
+        maxPPO2: Double,
+        environment: PlannerEnvironment = .seaLevelSaltWater
+    ) -> Double? {
         guard oxygenFraction.isFinite,
               maxPPO2.isFinite,
               oxygenFraction > 0,
               maxPPO2 > 0 else {
             return nil
         }
-        return IOSUnitConversions.depthMeters(forPressureBar: maxPPO2 / oxygenFraction)
+        return IOSUnitConversions.depthMeters(forPressureBar: maxPPO2 / oxygenFraction, environment: environment)
+            ?? IOSUnitConversions.depthMeters(forPressureBar: maxPPO2 / oxygenFraction)
+    }
+
+    static func modMeters(for gas: GasMix, environment: PlannerEnvironment = .seaLevelSaltWater) -> Double? {
+        modMeters(oxygenFraction: gas.oxygen, maxPPO2: gas.maxPPO2, environment: environment)
     }
 }
