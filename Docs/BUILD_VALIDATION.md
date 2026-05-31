@@ -1,8 +1,9 @@
 # Build validation — DIR DIVING (MAIN)
 
-**Branch:** `main` (`origin/main`) @ `c8f91f6` — Watch + iOS algorithmic + UI/UX readiness 100% (codice, 2026-05-31)  
+**Branch:** `main` (`origin/main`) @ `bfbc3e7` — Watch + iOS algorithmic + UI/UX readiness 100% (codice, 2026-05-31)  
 **Algorithm baseline:** iOS @ `dce89e7`; Watch WMATH-HIGH → INFO-014 @ `f654bec`; UI/UX P0–P3 @ `c8f91f6`  
-**Generator:** [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`project.yml` at repository root).
+**Watch compile fix:** GPS fallback types in `Services/GPSManager.swift` @ `06e4c67`; explicit Watch target sources in `project.yml` @ `bfbc3e7`  
+**Generator:** [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`project.yml` at repository root). **`DIRDiving.xcodeproj/` is gitignored — always run `xcodegen generate` after pull/checkout.**
 
 **Latest local validation (2026-05-31):**
 
@@ -34,6 +35,24 @@ Verify runtimes:
 ```bash
 xcrun simctl list runtimes | grep -E 'iOS 26|watchOS 26'
 ```
+
+## XcodeGen workflow (required before Xcode)
+
+`DIRDiving.xcodeproj` is **not committed** (see root `.gitignore`). Every checkout and worktree must regenerate it:
+
+```bash
+# MAIN repo root
+cd /path/to/DirDiving-App
+xcodegen generate
+
+# Worktrees (each has its own project.yml variant)
+cd /path/to/DirDiving-App/.worktrees/main-iOS && xcodegen generate
+cd /path/to/DirDiving-App/.worktrees/codex-experimental && xcodegen generate
+cd /path/to/DirDiving-App/.worktrees/codex-ios-experimental && xcodegen generate
+cd /path/to/DirDiving-App/.worktrees/watch-audit && xcodegen generate
+```
+
+Then open `DIRDiving.xcodeproj` from that same directory. Stale projects cause **“Cannot find type in scope”** errors for Watch algorithm files even when source exists on disk.
 
 ## Commands (repository root)
 
