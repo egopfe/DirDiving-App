@@ -16,7 +16,7 @@ enum DiveUI {
     static let mutedText = Color.white.opacity(0.52)
     static let subtleStroke = Color.white.opacity(0.28)
     static let hairline = Color.white.opacity(0.16)
-    static let panelRadius: CGFloat = 14
+    static let panelRadius: CGFloat = 12
     static let screenPadding: CGFloat = 10
 }
 
@@ -41,11 +41,6 @@ struct DiveScreenBackground: View {
                 startRadius: 8,
                 endRadius: 150
             )
-            LinearGradient(
-                colors: [.white.opacity(0.035), .clear, DiveUI.blue.opacity(0.045)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
         }
         .ignoresSafeArea()
     }
@@ -62,28 +57,17 @@ struct DivePanel<Content: View>: View {
 
     var body: some View {
         content
-            .padding(11)
+            .padding(10)
             .frame(maxWidth: .infinity)
             .background(
                 RoundedRectangle(cornerRadius: DiveUI.panelRadius, style: .continuous)
                     .fill(
                         LinearGradient(
-                            colors: [DiveUI.panelFillRaised.opacity(0.98), DiveUI.panelFill.opacity(0.99)],
+                            colors: [DiveUI.panelFillRaised.opacity(0.94), DiveUI.panelFill.opacity(0.98)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                     )
-                    .overlay(alignment: .topLeading) {
-                        RoundedRectangle(cornerRadius: DiveUI.panelRadius, style: .continuous)
-                            .fill(
-                                LinearGradient(
-                                    colors: [.white.opacity(0.08), .clear],
-                                    startPoint: .topLeading,
-                                    endPoint: .center
-                                )
-                            )
-                            .blendMode(.screen)
-                    }
                     .overlay(
                         RoundedRectangle(cornerRadius: DiveUI.panelRadius, style: .continuous)
                             .stroke(stroke.opacity(0.88), lineWidth: 1)
@@ -93,7 +77,7 @@ struct DivePanel<Content: View>: View {
                             .stroke(.white.opacity(0.055), lineWidth: 0.7)
                             .padding(1)
                     )
-                    .shadow(color: stroke.opacity(0.22), radius: 7, x: 0, y: 0)
+                    .shadow(color: stroke.opacity(0.18), radius: 5, x: 0, y: 0)
             )
     }
 }
@@ -114,36 +98,45 @@ struct DiveCommandButton: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 5) {
-                Text(title)
-                    .font(.system(size: 11, weight: .black, design: .rounded))
+                Text(LocalizedStringKey(title))
+                    .font(.caption.bold())
                     .lineLimit(1)
                     .minimumScaleFactor(0.68)
                 if let systemImage {
                     Image(systemName: systemImage)
-                        .font(.system(size: 11, weight: .black))
+                        .font(.caption.bold())
                 }
             }
             .foregroundStyle(color)
-            .frame(maxWidth: .infinity, minHeight: 39)
+            .frame(maxWidth: .infinity, minHeight: 34)
             .padding(.horizontal, 5)
             .background(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [color.opacity(0.2), color.opacity(0.08)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .fill(color.opacity(0.13))
                     .overlay(
                         RoundedRectangle(cornerRadius: 10, style: .continuous)
                             .stroke(color.opacity(0.86), lineWidth: 1)
                     )
-                    .shadow(color: color.opacity(0.24), radius: 6, x: 0, y: 0)
+                    .shadow(color: color.opacity(0.16), radius: 4, x: 0, y: 0)
             )
             .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(Text(LocalizedStringKey(title)))
+        .accessibilityHint(Text(LocalizedStringKey("accessibility.command_button.hint")))
+    }
+}
+
+struct DiveClockText: View {
+    var size: CGFloat = 14
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 30)) { context in
+            Text(context.date, format: .dateTime.hour().minute())
+                .font(.system(size: size, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+                .monospacedDigit()
+        }
     }
 }
 
@@ -164,14 +157,14 @@ struct DiveMetric: View {
 
     var body: some View {
         VStack(spacing: 2) {
-            Text(title.uppercased())
-                .font(.system(size: 9, weight: .black, design: .rounded))
+            Text(LocalizedStringKey(title.uppercased()))
+                .font(.system(size: 9, weight: .bold, design: .rounded))
                 .foregroundStyle(DiveUI.secondaryText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.62)
             HStack(alignment: .lastTextBaseline, spacing: 3) {
                 Text(value)
-                    .font(.system(size: valueSize, weight: .bold, design: .rounded))
+                    .font(.system(size: valueSize, weight: .regular, design: .rounded))
                     .minimumScaleFactor(0.62)
                     .lineLimit(1)
                     .monospacedDigit()
@@ -209,12 +202,12 @@ struct DiveScreenHeader: View {
                     if let systemImage {
                         Image(systemName: systemImage)
                     }
-                    Text(title)
+                    Text(LocalizedStringKey(title))
                 }
                 .font(.caption.bold())
                 .foregroundStyle(accent)
                 if let subtitle {
-                    Text(subtitle)
+                    Text(LocalizedStringKey(subtitle))
                         .font(.system(size: 9, weight: .semibold, design: .rounded))
                         .foregroundStyle(DiveUI.secondaryText)
                         .lineLimit(1)
@@ -233,8 +226,7 @@ struct DiveScreenHeader: View {
             .padding(.vertical, 4)
             .background(
                 Capsule()
-                    .fill(.white.opacity(0.045))
-                    .overlay(Capsule().stroke(DiveUI.hairline, lineWidth: 1))
+                    .stroke(DiveUI.hairline, lineWidth: 1)
             )
         }
     }
@@ -256,7 +248,7 @@ struct DiveStatusPill: View {
             if let systemImage {
                 Image(systemName: systemImage)
             }
-            Text(text)
+            Text(LocalizedStringKey(text))
         }
         .font(.system(size: 9, weight: .bold, design: .rounded))
         .lineLimit(1)
@@ -266,36 +258,49 @@ struct DiveStatusPill: View {
         .padding(.vertical, 4)
         .background(
             Capsule()
-                .fill(color.opacity(0.14))
+                .fill(color.opacity(0.12))
                 .overlay(Capsule().stroke(color.opacity(0.72), lineWidth: 1))
-                .shadow(color: color.opacity(0.14), radius: 4, x: 0, y: 0)
         )
     }
 }
 
 struct DiveOctopusLogo: View {
+    var accent: Color = DiveUI.blue
+
     var body: some View {
+        Group {
+            if Bundle.main.url(forResource: "altosinistra", withExtension: "png") != nil {
+                Image("altosinistra")
+                    .resizable()
+                    .scaledToFit()
+            } else {
+                drawnLogo
+            }
+        }
+        .frame(width: 36, height: 32)
+    }
+
+    private var drawnLogo: some View {
         ZStack {
             Circle()
-                .fill(DiveUI.blue.opacity(0.22))
+                .fill(accent.opacity(0.22))
                 .frame(width: 21, height: 21)
                 .offset(y: -4)
-                .shadow(color: DiveUI.blue.opacity(0.55), radius: 5, x: 0, y: 0)
+                .shadow(color: accent.opacity(0.55), radius: 5, x: 0, y: 0)
             Circle()
-                .stroke(DiveUI.blue, lineWidth: 2)
+                .stroke(accent, lineWidth: 2)
                 .frame(width: 21, height: 21)
                 .offset(y: -4)
             HStack(spacing: 5) {
-                Circle().fill(DiveUI.blue).frame(width: 3, height: 3)
-                Circle().fill(DiveUI.blue).frame(width: 3, height: 3)
+                Circle().fill(accent).frame(width: 3, height: 3)
+                Circle().fill(accent).frame(width: 3, height: 3)
             }
             .offset(y: -5)
             DiveOctopusTentacles()
-                .stroke(DiveUI.blue, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+                .stroke(accent, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
                 .frame(width: 31, height: 18)
                 .offset(y: 8)
         }
-        .frame(width: 36, height: 32)
     }
 }
 

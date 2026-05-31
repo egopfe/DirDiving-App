@@ -2,6 +2,9 @@ import SwiftUI
 
 struct AscentRateSettingsView: View {
     @EnvironmentObject private var settings: AscentRateSettingsStore
+    @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
+
+    private var unitPreference: DIRUnitPreference { DIRUnitPreference.fromStorage(watchUnits) }
 
     var body: some View {
         ZStack {
@@ -24,6 +27,7 @@ struct AscentRateSettingsView: View {
                 .padding(.vertical, 8)
             }
         }
+        .watchSubscreenBackToolbar()
     }
 
     private var header: some View {
@@ -36,18 +40,30 @@ struct AscentRateSettingsView: View {
     }
 
     private func limitControl(_ title: String, value: Binding<Double>, accent: Color) -> some View {
-        DivePanel(stroke: accent) {
+        let display = unitPreference.ascentRateDisplay(metersPerMinute: value.wrappedValue)
+        let displayBinding = Binding<Double>(
+            get: { unitPreference.ascentRateDisplay(metersPerMinute: value.wrappedValue).value },
+            set: { newValue in
+                let metersPerMinute = unitPreference == .metric ? newValue : DIRUnitConversions.feetPerMinuteToMetersPerMinute(newValue)
+                value.wrappedValue = min(20, max(0.5, metersPerMinute))
+            }
+        )
+        let lower = unitPreference == .metric ? 0.5 : 1.0
+        let upper = unitPreference == .metric ? 20.0 : 65.0
+        let step = unitPreference == .metric ? 0.5 : 1.0
+
+        return DivePanel(stroke: accent) {
             HStack(spacing: 8) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
                         .font(.system(size: 11, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
                     HStack(alignment: .lastTextBaseline, spacing: 3) {
-                        Text(Formatters.one(value.wrappedValue))
+                        Text(Formatters.one(display.value))
                             .font(.system(size: 32, weight: .black, design: .rounded))
                             .monospacedDigit()
                             .foregroundStyle(accent)
-                        Text("m/min")
+                        Text(display.unit)
                             .font(.caption2.bold())
                             .foregroundStyle(.white)
                     }
@@ -57,14 +73,16 @@ struct AscentRateSettingsView: View {
 
                 HStack(spacing: 6) {
                     stepButton("-", color: .white.opacity(0.78)) {
-                        value.wrappedValue = max(0.5, value.wrappedValue - 0.5)
+                        displayBinding.wrappedValue = max(lower, displayBinding.wrappedValue - step)
                     }
                     stepButton("+", color: accent) {
-                        value.wrappedValue = min(20, value.wrappedValue + 0.5)
+                        displayBinding.wrappedValue = min(upper, displayBinding.wrappedValue + step)
                     }
                 }
                 .frame(width: 82)
             }
+            .focusable(true)
+            .digitalCrownRotation(displayBinding, from: lower, through: upper, by: step, sensitivity: .medium, isContinuous: false, isHapticFeedbackEnabled: true)
         }
     }
 
@@ -85,4 +103,4 @@ struct AscentRateSettingsView: View {
         }
         .buttonStyle(.plain)
     }
-}\n
+}

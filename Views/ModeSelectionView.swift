@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct ModeSelectionView: View {
-    @EnvironmentObject private var exploration: ExplorationStore
     @EnvironmentObject private var navigation: AppNavigationStore
 
     var body: some View {
@@ -9,7 +8,7 @@ struct ModeSelectionView: View {
             DiveScreenBackground()
 
             ScrollView {
-                VStack(spacing: 12) {
+                VStack(spacing: 11) {
                     DiveScreenHeader(
                         "DIR DIVING",
                         subtitle: "PRE-DIVE MODE SELECTOR",
@@ -19,9 +18,7 @@ struct ModeSelectionView: View {
 
                     selectorHero
 
-                    crownHint
-
-                    ForEach(DIRActivityMode.allCases) { mode in
+                    ForEach(stableModes) { mode in
                         modeCard(mode)
                     }
 
@@ -29,7 +26,7 @@ struct ModeSelectionView: View {
                         HStack(alignment: .top, spacing: 8) {
                             Image(systemName: "exclamationmark.triangle.fill")
                                 .font(.caption.bold())
-                            Text("Seleziona modalita prima di entrare in acqua. Pairing, waypoint e warning vanno preparati in superficie.")
+                            Text("Modalita stabile: Diving. Le funzioni sperimentali restano isolate dai rami experimental.")
                                 .font(.system(size: 10, weight: .semibold, design: .rounded))
                                 .multilineTextAlignment(.leading)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -44,98 +41,67 @@ struct ModeSelectionView: View {
     }
 
     private var selectorHero: some View {
-        DivePanel(stroke: exploration.selectedMode.accent) {
+        DivePanel(stroke: DiveUI.cyan) {
             HStack(spacing: 10) {
                 ZStack {
                     Circle()
-                        .fill(exploration.selectedMode.accent.opacity(0.14))
-                        .shadow(color: exploration.selectedMode.accent.opacity(0.38), radius: 10, x: 0, y: 0)
+                        .fill(DiveUI.cyan.opacity(0.14))
                     Circle()
-                        .stroke(exploration.selectedMode.accent.opacity(0.8), lineWidth: 1)
-                    Circle()
-                        .trim(from: 0, to: 0.72)
-                        .stroke(exploration.selectedMode.accent.opacity(0.9), style: StrokeStyle(lineWidth: 3, lineCap: .round))
-                        .rotationEffect(.degrees(-110))
-                    Image(systemName: exploration.selectedMode.symbol)
-                        .font(.system(size: 29, weight: .black))
-                        .foregroundStyle(exploration.selectedMode.accent)
+                        .stroke(DiveUI.cyan.opacity(0.8), lineWidth: 1)
+                    Image(systemName: "water.waves")
+                        .font(.system(size: 27, weight: .black))
+                        .foregroundStyle(DiveUI.cyan)
                 }
-                .frame(width: 62, height: 62)
+                .frame(width: 58, height: 58)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(exploration.selectedMode.rawValue.uppercased())
+                    Text("DIVING")
                         .font(.system(size: 17, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.72)
-                    Text(modeDescription(exploration.selectedMode))
+                    Text("Dive computer premium")
                         .font(.system(size: 10, weight: .semibold, design: .rounded))
                         .foregroundStyle(DiveUI.secondaryText)
                         .lineLimit(2)
                         .minimumScaleFactor(0.72)
-                    DiveStatusPill("ACTIVE", color: exploration.selectedMode.accent, systemImage: "checkmark.circle.fill")
+                    DiveStatusPill("ACTIVE", color: DiveUI.cyan, systemImage: "checkmark.circle.fill")
                 }
 
                 Spacer(minLength: 0)
             }
         }
-        .animation(.easeInOut(duration: 0.2), value: exploration.selectedMode)
     }
 
-    private var crownHint: some View {
-        HStack(spacing: 6) {
-            Image(systemName: "digitalcrown.horizontal.press")
-            Text("Crown to review modes")
-            Spacer(minLength: 0)
-            Image(systemName: "hand.tap.fill")
-            Text("Tap large card")
-        }
-        .font(.system(size: 9, weight: .bold, design: .rounded))
-        .foregroundStyle(DiveUI.mutedText)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
-        .background(
-            Capsule()
-                .fill(.white.opacity(0.045))
-                .overlay(Capsule().stroke(DiveUI.hairline, lineWidth: 1))
-        )
+    private var stableModes: [StableMode] {
+        [StableMode(title: "Diving", symbol: "water.waves", accent: DiveUI.cyan, description: "Dive computer premium")]
     }
 
-    private func modeCard(_ mode: DIRActivityMode) -> some View {
-        let isSelected = exploration.selectedMode == mode
-
-        return Button {
-            exploration.select(mode)
-            switch mode {
-            case .diving:
-                navigation.selectedPage = .live
-            case .apnea:
-                navigation.selectedPage = .apnea
-            case .snorkeling:
-                navigation.selectedPage = .snorkeling
-            }
+    private func modeCard(_ mode: StableMode) -> some View {
+        Button {
+            navigation.selectedPage = .live
         } label: {
-            DivePanel(stroke: isSelected ? mode.accent : DiveUI.hairline) {
+            DivePanel(stroke: mode.accent) {
                 HStack(spacing: 10) {
                     ZStack {
                         RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .fill(mode.accent.opacity(isSelected ? 0.18 : 0.1))
+                            .fill(mode.accent.opacity(0.18))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                    .stroke(mode.accent.opacity(isSelected ? 0.9 : 0.45), lineWidth: 1)
+                                    .stroke(mode.accent.opacity(0.9), lineWidth: 1)
                             )
                         Image(systemName: mode.symbol)
                             .font(.system(size: 21, weight: .black))
                             .foregroundStyle(mode.accent)
                     }
-                    .frame(width: 48, height: 48)
+                    .frame(width: 44, height: 44)
 
                     VStack(alignment: .leading, spacing: 3) {
-                        Text(mode.rawValue)
+                        Text(mode.title)
                             .font(.system(size: 15, weight: .bold, design: .rounded))
                             .foregroundStyle(.white)
                             .lineLimit(1)
-                        Text(modeDescription(mode))
+                        Text(mode.description)
                             .font(.system(size: 10, weight: .medium, design: .rounded))
                             .foregroundStyle(DiveUI.secondaryText)
                             .lineLimit(2)
@@ -143,22 +109,20 @@ struct ModeSelectionView: View {
 
                     Spacer(minLength: 0)
 
-                    Image(systemName: isSelected ? "checkmark.circle.fill" : "chevron.right")
-                        .font(.system(size: isSelected ? 17 : 13, weight: .black))
+                    Image(systemName: "chevron.right")
+                        .font(.caption.bold())
                         .foregroundStyle(mode.accent)
                 }
             }
         }
         .buttonStyle(.plain)
-        .scaleEffect(isSelected ? 1.018 : 1)
-        .animation(.easeInOut(duration: 0.18), value: isSelected)
     }
+}
 
-    private func modeDescription(_ mode: DIRActivityMode) -> String {
-        switch mode {
-        case .diving: return "Dive computer premium"
-        case .apnea: return "Timer, recovery, depth warnings"
-        case .snorkeling: return "GPS route, waypoint, return-to-entry"
-        }
-    }
+private struct StableMode: Identifiable {
+    let id = UUID()
+    let title: String
+    let symbol: String
+    let accent: Color
+    let description: String
 }

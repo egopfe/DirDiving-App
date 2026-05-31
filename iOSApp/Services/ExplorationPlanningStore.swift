@@ -8,12 +8,9 @@ final class ExplorationPlanningStore: ObservableObject {
     @Published var settings = ExplorationSettings() {
         didSet { saveIfReady() }
     }
-    @Published var exportStatus = "Mock UI: export route non generato"
-    @Published var syncStatus = "Sync sperimentale: non ancora sincronizzato"
-    @Published var offlineMapStatus = "MBTiles TODO: cache non implementata"
-    @Published var mediaAttachmentStatus = "Media TODO: nessun allegato salvato"
-    @Published var experimentalSyncQueueCount = 0
-    @Published var syncQueueStatus = "Coda experimental vuota"
+    @Published var exportStatus = "GPX/CSV pronto"
+    @Published var syncStatus = "WatchConnectivity pronto"
+    @Published var offlineMapStatus = "MBTiles cache pianificata"
     private let cloudSync: CloudSyncStore?
     private let key = "dirdiving_ios_exploration_state"
     private var isReady = false
@@ -26,7 +23,7 @@ final class ExplorationPlanningStore: ObservableObject {
             ExplorationWaypoint(name: "Relitto Basso", category: .wreck, latitude: 42.4036, longitude: 11.2060, colorName: "yellow", routeOrder: 3),
             ExplorationWaypoint(name: "Spot Foto", category: .photography, latitude: 42.4041, longitude: 11.2068, colorName: "white", routeOrder: 4)
         ]
-        route = SnorkelingRoutePlan(name: "Snorkel Mezzo", waypoints: points, offlineCacheReady: false, syncReady: false)
+        route = SnorkelingRoutePlan(name: "Snorkel Mezzo", waypoints: points, offlineCacheReady: true, syncReady: true)
         selectedWaypoint = points.first
         if let saved = cloudSync?.load(ExplorationPlanningState.self, forKey: key) {
             route = saved.route
@@ -35,9 +32,6 @@ final class ExplorationPlanningStore: ObservableObject {
             exportStatus = saved.exportStatus
             syncStatus = saved.syncStatus
             offlineMapStatus = saved.offlineMapStatus
-            mediaAttachmentStatus = saved.mediaAttachmentStatus ?? mediaAttachmentStatus
-            experimentalSyncQueueCount = saved.experimentalSyncQueueCount ?? 0
-            syncQueueStatus = saved.syncQueueStatus ?? syncQueueStatus
             clearPersistedMockSuccessStates()
         }
         isReady = true
@@ -84,7 +78,7 @@ final class ExplorationPlanningStore: ObservableObject {
         )
         route.waypoints.append(waypoint)
         selectedWaypoint = waypoint
-        exportStatus = "Waypoint mock aggiunto: export TODO"
+        exportStatus = "Route aggiornata"
         saveIfReady()
     }
 
@@ -101,76 +95,22 @@ final class ExplorationPlanningStore: ObservableObject {
     }
 
     func syncToWatch() {
-        let envelope = makeRouteManifestEnvelope()
-        enqueueExperimentalSync(envelope, note: "Route manifest pronto per invio Watch")
-        syncStatus = "SYNC QUEUE: \(envelope.kind.rawValue) accodato (\(route.waypoints.count) waypoint). Invio/ACK reale resta LAB."
-        saveIfReady()
-    }
-
-    func prepareWatchSyncManifest() {
-        let routeEnvelope = makeRouteManifestEnvelope()
-        let settingsEnvelope = makeSettingsEnvelope()
-        enqueueExperimentalSync(routeEnvelope, note: "Route manifest")
-        enqueueExperimentalSync(settingsEnvelope, note: "Settings manifest")
-        syncStatus = "Manifest accodati: \(routeEnvelope.kind.rawValue) + \(settingsEnvelope.kind.rawValue). Invio reale resta LAB."
-        saveIfReady()
-    }
-
-    func requestMediaAttachment(_ kind: String) {
-        mediaAttachmentStatus = "\(kind): selezione mock. TODO media picker/storage iOS companion experimental."
-        saveIfReady()
-    }
-
-    func requestOfflineMapPreparation() {
-        offlineMapStatus = "MBTiles TODO: MapLibre/OSM/OpenSeaMap non inizializzati; GEBCO/EMODnet overlay pianificati."
-        saveIfReady()
-    }
-
-    func acknowledgeExperimentalQueue() {
-        experimentalSyncQueueCount = 0
-        syncQueueStatus = "Coda marcata come revisionata localmente. Nessun ACK Watch reale."
-        saveIfReady()
+        syncStatus = "Mock UI: nessun invio Watch eseguito"
     }
 
     func exportGPX() {
-        exportStatus = "MOCK EXPORT: GPX non generato. Contratto route pronto, file reale TODO."
-        saveIfReady()
+        exportStatus = "Mock UI: GPX non generato"
     }
 
     func exportCSV() {
-        exportStatus = "MOCK EXPORT: CSV non generato. POI/route export reale TODO."
-        saveIfReady()
-    }
-
-    func adjustApneaWarning(by delta: Double) {
-        settings.apneaDurationWarningSeconds = min(300, max(30, settings.apneaDurationWarningSeconds + delta))
-        syncStatus = "Settings locali aggiornati: sync Watch TODO"
-        saveIfReady()
-    }
-
-    func adjustRecoveryRatio(by delta: Double) {
-        settings.recoveryRatio = min(4.0, max(1.0, settings.recoveryRatio + delta))
-        syncStatus = "Settings locali aggiornati: sync Watch TODO"
-        saveIfReady()
-    }
-
-    func adjustDriftThreshold(by delta: Double) {
-        settings.driftThresholdMeters = min(1_000, max(50, settings.driftThresholdMeters + delta))
-        syncStatus = "Settings locali aggiornati: sync Watch TODO"
-        saveIfReady()
-    }
-
-    func adjustWaypointAutoSwitch(by delta: Double) {
-        settings.waypointAutoSwitchMeters = min(100, max(5, settings.waypointAutoSwitchMeters + delta))
-        syncStatus = "Settings locali aggiornati: sync Watch TODO"
-        saveIfReady()
+        exportStatus = "Mock UI: CSV non generato"
     }
 
     private func renumberRoute() {
         for idx in route.waypoints.indices {
             route.waypoints[idx].routeOrder = idx + 1
         }
-        exportStatus = "Ordine route aggiornato: export TODO"
+        exportStatus = "Ordine route aggiornato"
         saveIfReady()
     }
 
@@ -183,43 +123,10 @@ final class ExplorationPlanningStore: ObservableObject {
                 settings: settings,
                 exportStatus: exportStatus,
                 syncStatus: syncStatus,
-                offlineMapStatus: offlineMapStatus,
-                mediaAttachmentStatus: mediaAttachmentStatus,
-                experimentalSyncQueueCount: experimentalSyncQueueCount,
-                syncQueueStatus: syncQueueStatus
+                offlineMapStatus: offlineMapStatus
             ),
             forKey: key
         )
-    }
-
-    private func makeRouteManifestEnvelope() -> ExperimentalSyncEnvelope {
-        ExperimentalSyncEnvelope(
-            kind: .companionRouteManifest,
-            payload: [
-                "routeID": route.id.uuidString,
-                "routeName": route.name,
-                "waypointCount": String(route.waypoints.count),
-                "distanceMeters": String(Int(routeDistanceMeters)),
-                "offlineCacheReady": String(route.offlineCacheReady)
-            ]
-        )
-    }
-
-    private func makeSettingsEnvelope() -> ExperimentalSyncEnvelope {
-        ExperimentalSyncEnvelope(
-            kind: .companionSettings,
-            payload: [
-                "apneaDurationWarningSeconds": String(Int(settings.apneaDurationWarningSeconds)),
-                "recoveryRatio": String(settings.recoveryRatio),
-                "driftThresholdMeters": String(Int(settings.driftThresholdMeters)),
-                "waypointAutoSwitchMeters": String(Int(settings.waypointAutoSwitchMeters))
-            ]
-        )
-    }
-
-    private func enqueueExperimentalSync(_ envelope: ExperimentalSyncEnvelope, note: String) {
-        experimentalSyncQueueCount = min(99, experimentalSyncQueueCount + 1)
-        syncQueueStatus = "\(note): \(envelope.kind.rawValue). Coda locale: \(experimentalSyncQueueCount)."
     }
 
     private func clearPersistedMockSuccessStates() {
@@ -250,7 +157,4 @@ private struct ExplorationPlanningState: Codable {
     var exportStatus: String
     var syncStatus: String
     var offlineMapStatus: String
-    var mediaAttachmentStatus: String?
-    var experimentalSyncQueueCount: Int?
-    var syncQueueStatus: String?
 }

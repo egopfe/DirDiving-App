@@ -3,193 +3,28 @@ options:
   bundleIdPrefix: com.egopfe
   xcodeVersion: "15.4"
   deploymentTarget:
-    watchOS: "10.0"
     iOS: "17.0"
 targets:
-  DIRDiving Watch App:
-    type: application
-    platform: watchOS
-    sources:
-      - App
-      - path: Models
-        excludes:
-          - ExplorationModels.swift
-          - BuddyAssistMessage.swift
-          - BuddyPairingHandshake.swift
-      - path: Services
-        excludes:
-          - ExplorationStore.swift
-          - BuddyAssistService.swift
-          - BuddyAssistPeripheralService.swift
-          - BuddyPairingKeyAgreement.swift
-          - SecureBuddyStore.swift
-      - path: Views
-        excludes:
-          - ApneaView.swift
-          - SnorkelingView.swift
-          - BuddyAssistView.swift
-          - ExperimentalConceptsView.swift
-      - path: Utils
-        excludes:
-          - ExperimentalFeatures.swift
-      - Resources
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios.watch
-        DEVELOPMENT_TEAM: C6FKKPB6A9
-        CODE_SIGN_STYLE: Automatic
-        GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_FILE: App/Info.plist
-        INFOPLIST_KEY_CFBundleIdentifier: com.egopfe.dirdiving.ios.watch
-        CODE_SIGN_ENTITLEMENTS: Config/DIRDiving.entitlements
-        PRODUCT_NAME: DIRDivingWatchApp
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.egopfe.dirdiving.ios
-    dependencies:
-      - sdk: CoreMotion.framework
-      - sdk: CoreLocation.framework
-      - sdk: Security.framework
-      - sdk: WatchConnectivity.framework
-      - sdk: WatchKit.framework
-      - sdk: Charts.framework
-      - sdk: AppIntents.framework
   DIRDiving iOS:
     type: application
     platform: iOS
     sources:
-      - path: iOSApp
-        excludes:
-          - Models/ExplorationModels.swift
-          - Models/BuddyExperimentalModels.swift
-          - Services/ExplorationPlanningStore.swift
-          - Services/BuddyExperimentalStore.swift
-          - Views/ExplorationCenterView.swift
-          - Views/ExperimentalFutureConceptsView.swift
-          - Views/BuddyExperimentalView.swift
+      - iOSApp
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios
         DEVELOPMENT_TEAM: C6FKKPB6A9
         CODE_SIGN_STYLE: Automatic
-        GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_FILE: iOSApp/App/Info.plist
-        INFOPLIST_KEY_CFBundleIdentifier: com.egopfe.dirdiving.ios
         CODE_SIGN_ENTITLEMENTS: iOSApp/Config/DIRDivingiOS.entitlements
-        PRODUCT_NAME: DIRDivingiOSApp
+        PRODUCT_NAME: DIR DIVING
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     dependencies:
-      - target: DIRDiving Watch App
-        embed: true
       - sdk: Charts.framework
       - sdk: WatchConnectivity.framework
       - sdk: CoreLocation.framework
-  DIRDiving Watch Algorithm Tests:
-    type: bundle.unit-test
-    platform: watchOS
-    sources:
-      - Tests/WatchAlgorithmTests
-      - Models/DiveSample.swift
-      - Models/DiveSession.swift
-      - Models/GPSPoint.swift
-      - Models/AscentRateLimits.swift
-      - Models/AscentStatus.swift
-      - Utils/DIRUnitPreference.swift
-      - Utils/DIRUnitConversions.swift
-      - Utils/DepthSafetyConfiguration.swift
-      - Utils/DiveAlgorithmConfiguration.swift
-      - Utils/DiveLogbookPolicy.swift
-      - Utils/GPSFallbackPolicy.swift
-      - Utils/DepthSampleValidation.swift
-      - Utils/DiveLifecycleAlgorithm.swift
-      - Utils/DiveSessionAlgorithmValidator.swift
-      - Utils/DiveSessionMerge.swift
-      - Services/SubsurfaceExportService.swift
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.watch.algorithmtests
-        GENERATE_INFOPLIST_FILE: YES
-        DEVELOPMENT_TEAM: C6FKKPB6A9
-    dependencies:
-      - sdk: XCTest.framework
-  DIRDiving iOS Algorithm Tests:
-    type: bundle.unit-test
-    platform: iOS
-    sources:
-      - Tests/iOSAlgorithmTests
-      - iOSApp/Models/DemoDiveCatalog.swift
-      - iOSApp/Models/DivePlan.swift
-      - iOSApp/Models/DiveSample.swift
-      - iOSApp/Models/DiveSession.swift
-      - iOSApp/Models/GasPlan.swift
-      - iOSApp/Models/GPSPoint.swift
-      - iOSApp/Models/TankSize.swift
-      - iOSApp/Algorithms/Buhlmann/BuhlmannConstants.swift
-      - iOSApp/Algorithms/Buhlmann/BuhlmannGas.swift
-      - iOSApp/Algorithms/Buhlmann/BuhlmannTissueModel.swift
-      - iOSApp/Algorithms/Buhlmann/BuhlmannEngine.swift
-      - iOSApp/Services/BuhlmannPlanner.swift
-      - iOSApp/Services/DiveImportService.swift
-      - iOSApp/Services/GasPlanningService.swift
-      - iOSApp/Services/OxygenExposureModels.swift
-      - iOSApp/Services/PlannerGasSchedule.swift
-      - iOSApp/Services/PlannerMODValidator.swift
-      - iOSApp/Services/PlannerEnvironment.swift
-      - iOSApp/Services/PlannerService.swift
-      - iOSApp/Services/RepetitiveDivePlannerService.swift
-      - iOSApp/Services/RouteSummaryService.swift
-      - iOSApp/Services/ScheduleGasConsumptionService.swift
-      - iOSApp/Services/SubsurfaceExportService.swift
-      - iOSApp/Services/WatchDiveSyncCodec.swift
-      - iOSApp/Services/WatchSyncAuth.swift
-      - iOSApp/Utils/DiveProfileMath.swift
-      - iOSApp/Utils/DiveSessionAlgorithmValidator.swift
-      - iOSApp/Utils/DiveSessionMerge.swift
-      - iOSApp/Utils/GasMixValidator.swift
-      - iOSApp/Utils/IOSAlgorithmConfiguration.swift
-      - iOSApp/Utils/IOSDiveLogbookPolicy.swift
-      - iOSApp/Utils/IOSUnitConversions.swift
-      - iOSApp/Utils/PlannerInputValidator.swift
-      - iOSApp/Utils/PlannerResultState.swift
-      - iOSApp/Utils/WatchSyncNotifications.swift
-    resources:
-      - path: Tests/iOSAlgorithmTests/Fixtures
-        type: folder
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios.algorithmtests
-        GENERATE_INFOPLIST_FILE: YES
-        DEVELOPMENT_TEAM: C6FKKPB6A9
-    dependencies:
-      - sdk: XCTest.framework
-      - sdk: CryptoKit.framework
-      - sdk: Security.framework
-      - sdk: WatchConnectivity.framework
 schemes:
-  DIRDiving Watch App:
-    build:
-      targets:
-        DIRDiving Watch App: all
-    test:
-      targets:
-        - DIRDiving Watch Algorithm Tests
   DIRDiving iOS:
     build:
       targets:
         DIRDiving iOS: all
-    test:
-      targets:
-        - DIRDiving iOS Algorithm Tests
-  DIRDiving iOS Algorithm Tests:
-    build:
-      targets:
-        DIRDiving iOS Algorithm Tests: all
-    test:
-      targets:
-        - DIRDiving iOS Algorithm Tests
-  DIRDiving Watch Algorithm Tests:
-    build:
-      targets:
-        DIRDiving Watch Algorithm Tests: all
-    test:
-      targets:
-        - DIRDiving Watch Algorithm Tests

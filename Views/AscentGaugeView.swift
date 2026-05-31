@@ -2,19 +2,18 @@ import SwiftUI
 
 struct AscentGaugeView: View {
     let status: AscentStatus
+    var units: DIRUnitPreference = .metric
+
+    private var rateUnitLabel: String { units.ascentRateUnitLabel }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            HStack(spacing: 4) {
-                Image(systemName: status.isOverLimit ? "exclamationmark.triangle.fill" : "arrow.up")
-                    .font(.system(size: 10, weight: .black))
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("VELOCITA")
-                    Text("RISALITA")
-                }
+            VStack(alignment: .leading, spacing: 0) {
+                Text("VELOCITA")
+                Text("RISALITA")
             }
             .font(.system(size: 10, weight: .black, design: .rounded))
-            .foregroundStyle(status.isOverLimit ? DiveUI.red : .white)
+            .foregroundStyle(.white)
             .lineLimit(1)
             .minimumScaleFactor(0.78)
 
@@ -26,27 +25,26 @@ struct AscentGaugeView: View {
                     .frame(width: 31, height: 126)
             }
 
-            Text("m/min")
+            Text(rateUnitLabel)
                 .font(.system(size: 10, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
                 .frame(width: 64, alignment: .trailing)
         }
         .padding(.vertical, 6)
         .padding(.horizontal, 4)
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [pointerColor.opacity(0.14), DiveUI.panelFill.opacity(0.82)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(DiveUI.panelFill.opacity(0.72))
                 .overlay(
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .stroke(pointerColor.opacity(0.62), lineWidth: 1)
+                        .stroke(DiveUI.hairline, lineWidth: 1)
                 )
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(localized: "ascent.gauge.a11y"))
+        .accessibilityValue(ascentAccessibilityValue)
         .animation(.easeInOut(duration: 0.22), value: status.currentRateMetersPerMinute)
     }
 
@@ -62,7 +60,7 @@ struct AscentGaugeView: View {
         return VStack(alignment: .trailing, spacing: 0) {
             ForEach(Array(ticks.enumerated()), id: \.offset) { index, tick in
                 if index > 0 { Spacer(minLength: 0) }
-                scaleLabel(Formatters.one(tick.0), tick.1)
+                scaleLabel(formattedRate(tick.0), tick.1)
             }
         }
     }
@@ -86,7 +84,6 @@ struct AscentGaugeView: View {
                         RoundedRectangle(cornerRadius: 4, style: .continuous)
                             .stroke(.white.opacity(0.7), lineWidth: 1)
                     )
-                    .shadow(color: pointerColor.opacity(0.24), radius: 5, x: 0, y: 0)
 
                 VStack(spacing: max((geometry.size.height - 6) / 5.0 - 1, 0)) {
                     ForEach(0..<6, id: \.self) { tick in
@@ -98,10 +95,10 @@ struct AscentGaugeView: View {
                 .frame(maxHeight: .infinity)
 
                 Triangle()
-                    .fill(pointerColor)
+                    .fill(.white)
                     .frame(width: 15, height: 17)
                     .rotationEffect(.degrees(180))
-                    .shadow(color: pointerColor.opacity(0.75), radius: 6, x: 0, y: 0)
+                    .shadow(color: pointerColor.opacity(0.6), radius: 4, x: 0, y: 0)
                     .offset(x: 25, y: pointerOffset(in: geometry.size.height))
             }
         }
@@ -126,6 +123,22 @@ struct AscentGaugeView: View {
     private func pointerOffset(in height: CGFloat) -> CGFloat {
         let ratio = min(max(status.currentRateMetersPerMinute / max(status.limitMetersPerMinute, 0.1), 0), 1)
         return -height * ratio
+    }
+
+    private func formattedRate(_ metersPerMinute: Double) -> String {
+        Formatters.one(units.ascentRateDisplay(metersPerMinute: metersPerMinute).value)
+    }
+
+    private var ascentAccessibilityValue: String {
+        let limit = units.ascentRateDisplay(metersPerMinute: status.limitMetersPerMinute)
+        let current = units.ascentRateDisplay(metersPerMinute: status.currentRateMetersPerMinute)
+        return String(
+            format: String(localized: "ascent.gauge.a11y.value_format"),
+            Formatters.one(limit.value),
+            limit.unit,
+            Formatters.one(current.value),
+            current.unit
+        )
     }
 }
 

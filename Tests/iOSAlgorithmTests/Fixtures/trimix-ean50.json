@@ -1,0 +1,1 @@
+{"id":"trimix-ean50","isValid":true,"depthMeters":50,"bottomMinutes":25,"gfLow":30,"gfHigh":70,"gases":[{"name":"TX18/45","role":"bottom","oxygen":0.18,"helium":0.45,"maxPPO2":1.4,"switchDepthMeters":50},{"name":"EAN50","role":"deco","oxygen":0.5,"helium":0.0,"maxPPO2":1.6,"switchDepthMeters":21}],"expectedTTSRangeMinutes":{"min":25,"max":110},"toleranceMinutes":20}

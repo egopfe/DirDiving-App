@@ -1,21 +1,36 @@
 import SwiftUI
 import Charts
-import UIKit
 
 enum DiveDetailTab: String, CaseIterable, Identifiable {
-    case summary = "RIEPILOGO"
-    case charts = "GRAFICI"
-    case details = "DETTAGLI"
+    case summary
+    case charts
+    case details
+
     var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .summary: String(localized: "detail.tab.summary")
+        case .charts: String(localized: "detail.tab.charts")
+        case .details: String(localized: "detail.tab.details")
+        }
+    }
 }
 
 struct DiveDetailView: View {
-    let session: DiveSession
-    @Environment(\.dismiss) private var dismiss
+    let sessionID: UUID
+    @EnvironmentObject private var logStore: DiveLogStore
+    @State private var session: DiveSession
     @State private var tab: DiveDetailTab = .summary
     @State private var csvURL: URL?
     @State private var exportErrorMessage: String?
+    @State private var showManualEditor = false
     @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
+
+    init(session: DiveSession) {
+        sessionID = session.id
+        _session = State(initialValue: session)
+    }
 
     var body: some View {
         ZStack {
@@ -27,6 +42,10 @@ struct DiveDetailView: View {
                     switch tab {
                     case .summary:
                         metricGrid
+                        if session.exceededSupportedDepthRange {
+                            exceededDepthLogBanner
+                        }
+                        ttvSafetyNote
                         depthChart
                         gasBlock
                     case .charts:
@@ -34,6 +53,20 @@ struct DiveDetailView: View {
                         gasBlock
                     case .details:
                         details
+                    }
+                    if session.isManual && !session.isDemoDive {
+                        Button {
+                            showManualEditor = true
+                        } label: {
+                            Text(String(localized: "manual_dive.edit.title"))
+                                .font(.callout.weight(.semibold))
+                                .foregroundStyle(DIRTheme.cyan)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityHint(Text(String(localized: "manual_dive.edit.a11y")))
                     }
                     exportBlock
                 }
@@ -44,6 +77,13 @@ struct DiveDetailView: View {
         }
         .navigationTitle(Formatters.detailTitle(session.startDate))
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $showManualEditor) {
+            ManualDiveEditorView(existing: session)
+        }
+        .onChange(of: logStore.sessions) { _, _ in
+            guard let updated = logStore.session(id: sessionID), updated != session else { return }
+            session = updated
+        }
     }
 
     private var segmentedTabs: some View {
@@ -53,7 +93,7 @@ struct DiveDetailView: View {
                     tab = item
                 } label: {
                     VStack(spacing: 9) {
-                        Text(item.rawValue)
+                        Text(item.title)
                             .font(.system(size: 11, weight: .semibold, design: .rounded))
                             .tracking(0.5)
                             .foregroundStyle(tab == item ? DIRTheme.cyan : DIRTheme.muted)
@@ -72,29 +112,17 @@ struct DiveDetailView: View {
 
     private var header: some View {
         HStack(spacing: 12) {
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(DIRTheme.cyan)
-                    .frame(width: 30, height: 30)
-                    .background(Circle().stroke(DIRTheme.cyan.opacity(0.65), lineWidth: 1))
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Torna al logbook")
-            .accessibilityHint("Chiude il dettaglio immersione.")
             DiveThumbnail(index: 0)
                 .frame(width: 82, height: 82)
             VStack(alignment: .leading, spacing: 7) {
                 HStack(spacing: 6) {
-                    Text(session.siteName ?? "Immersione")
+                    Text(session.siteName ?? String(localized: "detail.default_site"))
                         .font(.system(size: 17, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.78)
                     if session.buddy != nil {
-                        Text("BUDDY")
+                        Text(String(localized: "detail.buddy.badge"))
                             .font(.system(size: 8, weight: .bold, design: .rounded))
                             .foregroundStyle(DIRTheme.yellow)
                             .padding(.horizontal, 4)
@@ -110,7 +138,7 @@ struct DiveDetailView: View {
                 .font(.system(size: 12, weight: .medium, design: .rounded))
                 .foregroundStyle(DIRTheme.muted)
                 HStack(spacing: 14) {
-                    Label("Acqua Salata", systemImage: "drop")
+                    Label(String(localized: "detail.salinity.salt"), systemImage: "drop")
                     Label(temperatureText, systemImage: "thermometer")
                 }
                 .font(.system(size: 12, weight: .medium, design: .rounded))
@@ -124,29 +152,20 @@ struct DiveDetailView: View {
     private var metricGrid: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
-                detailMetric("Tempo", value: Formatters.time(session.durationSeconds), unit: "min")
+                detailMetric(String(localized: "detail.metric.duration"), value: Formatters.time(session.durationSeconds), unit: "min")
                 Divider().overlay(DIRTheme.hairline)
-                detailMetric("Max Profondita", measurement: Formatters.depth(session.maxDepthMeters, units: unitPreference))
+                detailMetric(String(localized: "detail.metric.max_depth"), measurement: Formatters.depth(session.maxDepthMeters, units: unitPreference))
                 Divider().overlay(DIRTheme.hairline)
-                detailMetric("Prof. Media", measurement: Formatters.depth(session.avgDepthMeters, units: unitPreference))
+                detailMetric(String(localized: "detail.metric.avg_depth"), measurement: Formatters.depth(session.avgDepthMeters, units: unitPreference))
             }
             Divider().overlay(DIRTheme.hairline)
             HStack(spacing: 0) {
-                detailMetric("TTV info", value: Formatters.zero(session.ttv), unit: "min")
-                    .accessibilityElement(children: .combine)
-                    .accessibilityLabel("TTV informativo \(Formatters.zero(session.ttv)) minuti")
-                    .accessibilityHint("TTV derivato da profondita media e durata; non e un valore decompressivo o time-to-surface.")
+                detailMetric("TTV", value: Formatters.zero(session.ttv))
                 Divider().overlay(DIRTheme.hairline)
-                detailMetric("SAC", measurement: Formatters.sac(session.sacLitersMinute ?? 0, units: unitPreference))
+                sacMetric
                 Divider().overlay(DIRTheme.hairline)
-                detailMetric("Temperatura", measurement: Formatters.temperature(session.avgWaterTemperatureCelsius ?? 0, units: unitPreference))
+                temperatureMetric
             }
-            Text("TTV informativo: derivato da profondità media + runtime; non è un valore decompressivo o time-to-surface.")
-                .font(.caption2)
-                .foregroundStyle(DIRTheme.muted)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .fixedSize(horizontal: false, vertical: true)
         }
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -158,10 +177,36 @@ struct DiveDetailView: View {
         )
     }
 
+    private var exceededDepthLogBanner: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "exclamationmark.octagon.fill")
+            Text(String(localized: "depth.safety.log.outside_range"))
+                .font(.system(size: 13, weight: .bold, design: .rounded))
+        }
+        .foregroundStyle(DIRTheme.red)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(DIRTheme.red.opacity(0.12))
+                .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(DIRTheme.red.opacity(0.7), lineWidth: 1))
+        )
+    }
+
+    private var ttvSafetyNote: some View {
+        Text(String(localized: "detail.ttv.note"))
+            .font(.caption2.weight(.semibold))
+            .foregroundStyle(DIRTheme.yellow)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface2.opacity(0.56)))
+    }
+
     private var depthChart: some View {
         VStack(alignment: .leading, spacing: 9) {
             HStack {
-                Text("PROFONDITA")
+                Text(String(localized: "detail.chart.depth_title"))
                     .font(.system(size: 11, weight: .bold, design: .rounded))
                     .tracking(0.7)
                     .foregroundStyle(DIRTheme.cyan)
@@ -203,22 +248,40 @@ struct DiveDetailView: View {
                         .stroke(DIRTheme.cyan.opacity(0.16), lineWidth: 1)
                 )
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(localized: "detail.chart.depth_a11y"))
+        .accessibilityValue(
+            String(
+                format: String(localized: "detail.chart.depth_a11y_value"),
+                Formatters.depth(session.maxDepthMeters, units: unitPreference).text,
+                Formatters.time(session.durationSeconds)
+            )
+        )
     }
 
     private var gasBlock: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("GAS UTILIZZATO")
+            Text(String(localized: "detail.gas.title"))
                 .font(.system(size: 11, weight: .bold, design: .rounded))
                 .tracking(0.7)
                 .foregroundStyle(DIRTheme.cyan)
             HStack(spacing: 10) {
-                gasMetric("Miscela", session.gasLabel.rawValue, nil, color: .white)
-                gasMetric("Pressioni", "Non disponibile", nil, color: DIRTheme.yellow)
+                gasMetric(String(localized: "detail.gas.mix"), session.gasLabel.rawValue, nil, color: .white)
+                if let pressureSummary {
+                    gasMetric(String(localized: "detail.gas.pressures"), pressureSummary.value, pressureSummary.unit, color: DIRTheme.yellow)
+                }
             }
-            Text("Pressioni iniziale/finale e consumo gas non sono presenti nel record sincronizzato.")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(DIRTheme.muted)
-                .fixedSize(horizontal: false, vertical: true)
+            if let pressureFootnote {
+                Text(pressureFootnote)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else if !session.isManual {
+                Text(String(localized: "detail.gas.pressures_unavailable"))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
         .padding(12)
         .background(
@@ -235,10 +298,10 @@ struct DiveDetailView: View {
         VStack(alignment: .leading, spacing: 5) {
             Text(title)
                 .font(.system(size: 10, weight: .medium, design: .rounded))
-                .foregroundStyle(title == "Pressioni" ? DIRTheme.yellow : DIRTheme.muted)
+                .foregroundStyle(title == String(localized: "detail.gas.pressures") ? DIRTheme.yellow : DIRTheme.muted)
             HStack(alignment: .lastTextBaseline, spacing: 3) {
                 Text(value)
-                    .font(.system(size: title == "Pressioni" ? 14 : 20, weight: .semibold, design: .rounded))
+                    .font(.system(size: title == String(localized: "detail.gas.pressures") ? 14 : 20, weight: .semibold, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(color)
                 if let unit {
@@ -251,6 +314,28 @@ struct DiveDetailView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    private var pressureSummary: (value: String, unit: String?)? {
+        let entry = session.entryPressureText?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let exit = session.exitPressureText?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        guard !entry.isEmpty || !exit.isEmpty else { return nil }
+        if !entry.isEmpty, !exit.isEmpty {
+            return ("\(entry) → \(exit)", nil)
+        }
+        return (entry.isEmpty ? exit : entry, nil)
+    }
+
+    private var pressureFootnote: String? {
+        let entry = session.entryPressureText?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let exit = session.exitPressureText?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        guard !entry.isEmpty, !exit.isEmpty,
+              let entryValue = Double(entry.replacingOccurrences(of: ",", with: ".")),
+              let exitValue = Double(exit.replacingOccurrences(of: ",", with: ".")) else {
+            return nil
+        }
+        let consumed = max(0, entryValue - exitValue)
+        return String(format: String(localized: "detail.gas.consumed_format"), Formatters.one(consumed))
+    }
+
     private var temperatureText: String {
         Formatters.optionalTemperature(session.avgWaterTemperatureCelsius, units: unitPreference)
     }
@@ -259,7 +344,25 @@ struct DiveDetailView: View {
         IOSUnitPreference.fromStorage(units)
     }
 
-    private func detailMetric(_ title: String, value: String, unit: String) -> some View {
+    @ViewBuilder
+    private var sacMetric: some View {
+        if let sac = session.sacLitersMinute {
+            detailMetric(String(localized: "detail.metric.sac"), measurement: Formatters.sac(sac, units: unitPreference))
+        } else {
+            detailMetric(String(localized: "detail.metric.sac"), value: "—", valueColor: DIRTheme.yellow)
+        }
+    }
+
+    @ViewBuilder
+    private var temperatureMetric: some View {
+        if let temperature = session.avgWaterTemperatureCelsius {
+            detailMetric(String(localized: "detail.metric.temperature"), measurement: Formatters.temperature(temperature, units: unitPreference))
+        } else {
+            detailMetric(String(localized: "detail.metric.temperature"), value: "—", valueColor: DIRTheme.yellow)
+        }
+    }
+
+    private func detailMetric(_ title: String, value: String, unit: String? = nil, valueColor: Color = .white) -> some View {
         VStack(spacing: 6) {
             Text(title)
                 .font(.system(size: 10, weight: .medium, design: .rounded))
@@ -270,16 +373,20 @@ struct DiveDetailView: View {
                 Text(value)
                     .font(.system(size: 20, weight: .semibold, design: .rounded))
                     .monospacedDigit()
-                    .foregroundStyle(.white)
+                    .foregroundStyle(valueColor)
                     .lineLimit(1)
                     .minimumScaleFactor(0.72)
-                Text(unit)
-                    .font(.system(size: 10, weight: .medium, design: .rounded))
-                    .foregroundStyle(DIRTheme.muted)
+                if let unit {
+                    Text(unit)
+                        .font(.system(size: 10, weight: .medium, design: .rounded))
+                        .foregroundStyle(DIRTheme.muted)
+                }
             }
         }
         .frame(maxWidth: .infinity, minHeight: 70)
         .padding(.horizontal, 4)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(title) \(value) \(unit ?? "")")
     }
 
     private func detailMetric(_ title: String, measurement: DisplayMeasurement) -> some View {
@@ -288,16 +395,18 @@ struct DiveDetailView: View {
 
     private var details: some View {
         VStack(spacing: 12) {
-            darkPanel(title: "GPS", icon: "location.fill") {
+            darkPanel(title: String(localized: "detail.panel.gps"), icon: "location.fill") {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Start: \(session.entryGPS?.coordinateText ?? "n/d") · \(fixSourceText(session.entryGPSFixSource))")
-                    Text("End: \(session.exitGPS?.coordinateText ?? "n/d") · \(fixSourceText(session.exitGPSFixSource))")
+                    Text("\(String(localized: "detail.gps.start")): \(session.entryGPS?.coordinateText ?? String(localized: "detail.not_available")) · \(fixSourceText(session.entryGPSFixSource))")
+                    Text("\(String(localized: "detail.gps.end")): \(session.exitGPS?.coordinateText ?? String(localized: "detail.not_available")) · \(fixSourceText(session.exitGPSFixSource))")
+                    Text("\(String(localized: "detail.gps.accuracy_start")): \(accuracyText(session.entryGPS))")
+                    Text("\(String(localized: "detail.gps.accuracy_end")): \(accuracyText(session.exitGPS))")
                 }
                 .font(.system(size: 13, weight: .medium, design: .rounded).monospacedDigit())
                 .foregroundStyle(.white)
             }
-            darkPanel(title: "Note", icon: "note.text") {
-                Text(session.notes ?? "Nessuna nota")
+            darkPanel(title: String(localized: "detail.panel.notes"), icon: "note.text") {
+                Text(session.notes ?? String(localized: "detail.notes.empty"))
                     .foregroundStyle(DIRTheme.muted)
             }
         }
@@ -332,16 +441,20 @@ struct DiveDetailView: View {
 
     private func fixSourceText(_ source: GPSFixSource) -> String {
         switch source {
-        case .fix: return "fix superficie"
-        case .fallback: return "ultimo punto noto"
-        case .noFix: return "no-fix"
+        case .fix: return String(localized: "detail.gps.fix_surface")
+        case .fallback: return String(localized: "detail.gps.fix_fallback")
+        case .noFix: return String(localized: "detail.gps.fix_none")
         }
+    }
+
+    private func accuracyText(_ point: GPSPoint?) -> String {
+        guard let point, point.horizontalAccuracy >= 0 else { return String(localized: "detail.not_available") }
+        return "\(Formatters.zero(point.horizontalAccuracy)) m"
     }
 
     private var exportBlock: some View {
         HStack {
             Button {
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 switch SubsurfaceExportService.writeCSV(for: session) {
                 case .success(let url):
                     csvURL = url
@@ -351,45 +464,34 @@ struct DiveDetailView: View {
                     exportErrorMessage = error.localizedDescription
                 }
             } label: {
-                Text("Genera CSV Subsurface")
+                Text(String(localized: "detail.export.generate_csv"))
                     .font(.callout.weight(.semibold))
                     .foregroundStyle(DIRTheme.cyan)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.78)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
                     .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
             }
-            .accessibilityLabel("Genera CSV Subsurface")
-            .accessibilityHint("Crea un file CSV condivisibile per questa immersione.")
             Spacer()
             if let csvURL {
                 ShareLink(item: csvURL) {
-                    Text("Condividi CSV")
+                    Text(String(localized: "detail.export.share_csv"))
                         .font(.callout.weight(.semibold))
                         .foregroundStyle(DIRTheme.cyan)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.78)
                         .padding(.horizontal, 18)
                         .padding(.vertical, 10)
                         .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
                 }
-                .accessibilityLabel("Condividi CSV")
-                .accessibilityHint("Apre il foglio di condivisione per il file Subsurface CSV.")
             } else if let exportErrorMessage {
                 Text(exportErrorMessage)
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.orange)
                     .multilineTextAlignment(.trailing)
             } else {
-                Text("CSV non generato")
+                Text(String(localized: "detail.export.csv_not_generated"))
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(DIRTheme.muted)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
             }
         }
         .padding(.top, 4)
-        .accessibilityElement(children: .contain)
     }
 }

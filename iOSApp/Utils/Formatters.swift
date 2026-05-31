@@ -6,6 +6,15 @@ enum IOSUnitPreference: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    var syncCode: String {
+        switch self {
+        case .metric: return "metric"
+        case .imperial: return "imperial"
+        }
+    }
+
+    static let storageKey = "dirdiving_ios_units"
+
     var shortLabel: String {
         switch self {
         case .metric: return "Metrico"
@@ -14,7 +23,18 @@ enum IOSUnitPreference: String, CaseIterable, Identifiable {
     }
 
     static func fromStorage(_ value: String) -> IOSUnitPreference {
-        IOSUnitPreference(rawValue: value) ?? .metric
+        switch value {
+        case imperial.rawValue, "imperial":
+            return .imperial
+        case metric.rawValue, "metric":
+            return .metric
+        default:
+            return .metric
+        }
+    }
+
+    static func fromSyncCode(_ code: String) -> IOSUnitPreference {
+        code == "imperial" ? .imperial : .metric
     }
 }
 
@@ -26,6 +46,9 @@ struct DisplayMeasurement {
 }
 
 enum Formatters {
+    private static let metersToKilometers = 0.001
+    private static let metersToMiles = 0.000_621_371
+
     private static let clockFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
@@ -76,6 +99,28 @@ enum Formatters {
         }
     }
 
+    static func metersFromDepthDisplay(_ display: Double, units: IOSUnitPreference) -> Double {
+        switch units {
+        case .metric: return display
+        case .imperial: return IOSUnitConversions.meters(fromFeet: display)
+        }
+    }
+
+    static func celsiusFromTemperatureDisplay(_ display: Double, units: IOSUnitPreference) -> Double {
+        switch units {
+        case .metric: return display
+        case .imperial: return IOSUnitConversions.celsius(fromFahrenheit: display)
+        }
+    }
+
+    static func depthUnitLabel(_ units: IOSUnitPreference) -> String {
+        units == .metric ? "m" : "ft"
+    }
+
+    static func temperatureUnitLabel(_ units: IOSUnitPreference) -> String {
+        units == .metric ? "C" : "F"
+    }
+
     static func temperature(_ celsius: Double, units: IOSUnitPreference) -> DisplayMeasurement {
         switch units {
         case .metric:
@@ -99,12 +144,12 @@ enum Formatters {
         switch units {
         case .metric:
             if prefersLargeUnit || meters >= 1000 {
-                return DisplayMeasurement(value: one(IOSUnitConversions.kilometers(fromMeters: meters)), unit: "km")
+                return DisplayMeasurement(value: one(meters * metersToKilometers), unit: "km")
             }
             return DisplayMeasurement(value: zero(meters), unit: "m")
         case .imperial:
             if prefersLargeUnit || meters >= 1609.344 {
-                return DisplayMeasurement(value: one(IOSUnitConversions.miles(fromMeters: meters)), unit: "mi")
+                return DisplayMeasurement(value: one(meters * metersToMiles), unit: "mi")
             }
             return DisplayMeasurement(value: zero(IOSUnitConversions.feet(fromMeters: meters)), unit: "ft")
         }
