@@ -165,26 +165,40 @@ final class WatchSyncService: NSObject, ObservableObject {
         lastSyncStatus = String(localized: "Coda sync cancellata su richiesta")
     }
 
-    private func ingestIncomingPayload(_ payload: [String: Any]) {
+    private struct AckContext {
+        let sessionID: UUID
+        let issuedAt: Date
+    }
+
+    @discardableResult
+    private func ingestIncomingPayload(_ payload: [String: Any]) -> AckContext? {
         do {
-            let session = try WatchDiveSyncCodec.parseSession(from: payload)
+            let parsed = try WatchDiveSyncCodec.parsePayload(from: payload)
+            let session = parsed.session
             if logStore?.isDeleted(id: session.id) == true {
                 rememberCompanionSession(id: session.id)
                 lastSyncStatus = String(localized: "Import iPhone ignorato: tombstone presente")
-                return
+                return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
             }
             if importedFromCompanionIDs.contains(session.id) {
                 lastSyncStatus = String(localized: "Immersione iPhone duplicata ignorata")
-                return
+                return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
+            }
+            guard let logStore else {
+                failedTransferCount += 1
+                lastSyncStatus = String(localized: "Errore import iPhone: log store non disponibile")
+                return nil
             }
             rememberCompanionSession(id: session.id)
-            logStore?.addFromCompanion(session)
+            logStore.addFromCompanion(session)
             lastSyncStatus = String(localized: "Immersione ricevuta da iPhone")
             recordActivity(title: String(localized: "sync.activity.received_from_iphone"), detail: sessionSummary(session))
+            return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
         } catch {
             failedTransferCount += 1
             lastSyncStatus = String(format: String(localized: "Errore import iPhone: %@"), error.localizedDescription)
             Self.logger.error("Watch import from companion failed: \(error.localizedDescription, privacy: .private)")
+            return nil
         }
     }
 
@@ -232,20 +246,14 @@ final class WatchSyncService: NSObject, ObservableObject {
                             sessionID: envelope.sessionID,
                             issuedAt: envelope.issuedAt
                         )
-                        let legacyOK = (reply["status"] as? String == "acknowledged")
                         if signedOK {
                             self.removePendingSession(id: session.id)
                             self.acknowledgedTransferCount += 1
                             self.lastSyncStatus = String(localized: "Delivered/acknowledged: ack firmato dal companion")
                             self.recordActivity(title: String(localized: "sync.activity.delivered_to_iphone"), detail: self.sessionSummary(session))
-                        } else if legacyOK {
-                            self.removePendingSession(id: session.id)
-                            self.acknowledgedTransferCount += 1
-                            self.lastSyncStatus = String(localized: "Delivered/acknowledged: ack legacy (companion da aggiornare)")
-                            self.recordActivity(title: String(localized: "sync.activity.delivered_to_iphone"), detail: self.sessionSummary(session))
                         } else {
                             self.failedTransferCount += 1
-                            self.lastSyncStatus = String(localized: "Failed: iPhone non ha confermato import; pending conservato")
+                            self.lastSyncStatus = String(localized: "Failed: iPhone non ha confermato con ack firmato; pending conservato")
                         }
                     }
                 } errorHandler: { [weak self] error in
@@ -440,8 +448,17 @@ extension WatchSyncService: WCSessionDelegate {
 
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
         Task { @MainActor in
-            self.ingestIncomingPayload(message)
-            replyHandler(["status": "acknowledged"])
+            if let ackContext = self.ingestIncomingPayload(message) {
+                replyHandler([
+                    "status": "acknowledged",
+                    "ackSignature": WatchDiveSyncCodec.ackSignature(
+                        sessionID: ackContext.sessionID,
+                        issuedAt: ackContext.issuedAt
+                    )
+                ])
+            } else {
+                replyHandler(["status": "failed"])
+            }
         }
     }
 

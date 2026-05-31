@@ -127,11 +127,15 @@ final class WatchReadinessAlgorithmTests: XCTestCase {
 
     func testAscentGaugeZoneMatchesAscentStatusAtBoundaries() {
         let limit = AscentStatus.make(rate: 0, depth: 3).limitMetersPerMinute
+        XCTAssertEqual(AscentStatus.greenThresholdRatio, 0.70)
+        XCTAssertEqual(AscentStatus.redThresholdRatio, 1.0)
         XCTAssertEqual(AscentStatus.make(rate: limit * 0.50, depth: 3).zone, .green)
         XCTAssertEqual(AscentStatus.make(rate: limit * 0.70, depth: 3).zone, .green)
         XCTAssertEqual(AscentStatus.make(rate: limit * 0.80, depth: 3).zone, .yellow)
         XCTAssertEqual(AscentStatus.make(rate: limit, depth: 3).zone, .yellow)
         XCTAssertEqual(AscentStatus.make(rate: limit * 1.01, depth: 3).zone, .red)
+        XCTAssertEqual(AscentStatus.zone(forRate: limit * 0.70, limit: limit), .green)
+        XCTAssertEqual(AscentStatus.zone(forRate: limit * 0.71, limit: limit), .yellow)
     }
 
     func testImperialAscentBannerUsesFeetPerMinute() {

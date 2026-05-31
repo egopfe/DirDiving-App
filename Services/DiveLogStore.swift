@@ -37,8 +37,11 @@ final class DiveLogStore: ObservableObject {
     func reloadFromPersistence() {
         deletedSessionIDs = loadDeletedSessionIDs()
         let localSessions = loadLocalSessions()
-        let cloudSessions = cloudSync.load([DiveSession].self, forKey: cloudKey)
-        sessions = mergeSessions(local: localSessions, cloud: cloudSessions)
+        let legacySessions = loadLegacyCloudSessions()
+        sessions = mergeSessions(local: localSessions, cloud: legacySessions)
+        if legacySessions != nil {
+            save()
+        }
     }
 
     /// Session created on-device (or finalized locally) — may sync to iPhone.
@@ -109,10 +112,12 @@ final class DiveLogStore: ObservableObject {
     private func load() {
         deletedSessionIDs = loadDeletedSessionIDs()
         let localSessions = loadLocalSessions()
-        let cloudSessions = cloudSync.load([DiveSession].self, forKey: cloudKey)
-        sessions = mergeSessions(local: localSessions, cloud: cloudSessions)
+        let legacySessions = loadLegacyCloudSessions()
+        sessions = mergeSessions(local: localSessions, cloud: legacySessions)
         if !sessions.isEmpty {
             save()
+        } else if legacySessions != nil {
+            cloudSync.removeValue(forKey: cloudKey)
         }
     }
 
@@ -128,6 +133,19 @@ final class DiveLogStore: ObservableObject {
             loadErrorMessage = String(format: String(localized: "Log locale non leggibile: %@"), error.localizedDescription)
             return []
         }
+    }
+
+    private func loadLegacyCloudSessions() -> [DiveSession]? {
+        var merged: [DiveSession] = []
+        if let localData = cloudSync.loadRawLocalData(forKey: cloudKey),
+           let local = cloudSync.decodeLocal([DiveSession].self, from: localData) {
+            merged.append(contentsOf: local)
+        }
+        if let cloudData = cloudSync.loadRawCloudData(forKey: cloudKey),
+           let cloud = cloudSync.decodeCloud([DiveSession].self, from: cloudData) {
+            merged = mergeSessions(local: merged, cloud: cloud)
+        }
+        return merged.isEmpty ? nil : merged
     }
 
     private func mergeSessions(local: [DiveSession], cloud: [DiveSession]?) -> [DiveSession] {
@@ -168,7 +186,7 @@ final class DiveLogStore: ObservableObject {
             encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
             let data = try encoder.encode(sessions)
             try data.write(to: fileURL(), options: [.atomic, .completeFileProtection])
-            cloudSync.save(sessions, forKey: cloudKey)
+            cloudSync.removeValue(forKey: cloudKey)
             saveDeletedSessionIDs(deletedSessionIDs)
         } catch {
             Self.logger.error("DiveLogStore save failed: \(error.localizedDescription, privacy: .private)")

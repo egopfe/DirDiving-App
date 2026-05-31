@@ -1,7 +1,7 @@
 import XCTest
 
 final class PlanningDepthReferenceTests: XCTestCase {
-    func testMakeRequestUsesAverageDepthWhenReferenceIsAverage() {
+    func testMakeRequestUsesMaximumDepthEvenWhenReferenceIsAverage() {
         var input = BuhlmannTestSupport.gasPlanInput(depth: 50, bottomMinutes: 20)
         input.planningDepthReference = .averageDepth
         input.plannedAverageDepthMeters = 28
@@ -10,8 +10,8 @@ final class PlanningDepthReferenceTests: XCTestCase {
         }
 
         let request = BuhlmannPlanner.makeRequest(input: input, environment: environment)
-        XCTAssertEqual(request.maxDepthMeters, 28, accuracy: 0.001)
-        XCTAssertEqual(request.bottomGas.switchDepthMeters, 28, accuracy: 0.001)
+        XCTAssertEqual(request.maxDepthMeters, 50, accuracy: 0.001)
+        XCTAssertEqual(request.bottomGas.switchDepthMeters, 50, accuracy: 0.001)
     }
 
     func testMakeRequestUsesMaximumDepthWhenReferenceIsMaximum() {
@@ -27,7 +27,7 @@ final class PlanningDepthReferenceTests: XCTestCase {
         XCTAssertEqual(request.bottomGas.switchDepthMeters, 50, accuracy: 0.001)
     }
 
-    func testMODBottomValidationUsesEffectivePlanningDepth() {
+    func testMODBottomValidationUsesPlannedMaxDepthEvenWhenAverageIsSafe() {
         var input = BuhlmannTestSupport.gasPlanInput(depth: 50)
         input.planningDepthReference = .averageDepth
         input.plannedAverageDepthMeters = 30
@@ -39,12 +39,9 @@ final class PlanningDepthReferenceTests: XCTestCase {
             return XCTFail("Expected valid environment")
         }
 
-        let issuesAtAverage = PlannerMODValidator.validatePlannerCylinders(input: input, environment: environment)
-        XCTAssertTrue(issuesAtAverage.isEmpty)
-
-        input.planningDepthReference = .maximumDepth
-        let issuesAtMax = PlannerMODValidator.validatePlannerCylinders(input: input, environment: environment)
-        XCTAssertFalse(issuesAtMax.isEmpty)
+        let issues = PlannerMODValidator.validatePlannerCylinders(input: input, environment: environment)
+        XCTAssertFalse(issues.isEmpty)
+        XCTAssertEqual(issues.first?.cylinderRole, .bottom)
     }
 
     func testBuhlmannPreviewUsesSamePlanningDepthAsEngine() {
@@ -64,5 +61,14 @@ final class PlanningDepthReferenceTests: XCTestCase {
         let request = BuhlmannPlanner.makeRequest(input: input, environment: environment)
         XCTAssertEqual(input.buhlmannPlanningDepthMeters, request.maxDepthMeters, accuracy: 0.001)
         XCTAssertEqual(preview.depthMeters, request.maxDepthMeters, accuracy: 0.001)
+    }
+
+    func testAverageDepthStillFeedsConsumptionEstimate() {
+        var input = BuhlmannTestSupport.gasPlanInput(depth: 50, bottomMinutes: 10)
+        input.planningDepthReference = .averageDepth
+        input.plannedAverageDepthMeters = 25
+
+        XCTAssertEqual(input.effectivePlanningDepthMeters, 25, accuracy: 0.001)
+        XCTAssertEqual(input.buhlmannPlanningDepthMeters, 50, accuracy: 0.001)
     }
 }
