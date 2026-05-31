@@ -1,8 +1,10 @@
 import SwiftUI
 
 private enum IOSLegalLinks {
-    static let termsURL = URL(string: "https://github.com/egopfe/DirDiving-App/blob/main/Docs/TERMS_OF_USE.md")!
-    static let privacyURL = URL(string: "https://github.com/egopfe/DirDiving-App/blob/main/Docs/PRIVACY_AND_DATA_USE.md")!
+    static let termsURL = URL(string: "https://github.com/egopfe/DirDiving-App/blob/main/Docs/TERMS_OF_USE.md")
+        ?? URL(fileURLWithPath: "")
+    static let privacyURL = URL(string: "https://github.com/egopfe/DirDiving-App/blob/main/Docs/PRIVACY_AND_DATA_USE.md")
+        ?? URL(fileURLWithPath: "")
 }
 
 struct IOSLegalOnboardingView: View {

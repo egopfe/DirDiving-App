@@ -79,6 +79,21 @@ final class CloudSessionMergeTests: XCTestCase {
         XCTAssertEqual(decodedCloud.first?.siteName, "Cloud Only")
     }
 
+    func testCloudSyncStoreCanRemoveLegacyFullSessionPayload() throws {
+        let key = "dirdiving_ios_dive_sessions"
+        let session = makeSession(siteName: "Legacy Defaults")
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        defaults.set(try encoder.encode([session]), forKey: key)
+
+        let cloudSync = CloudSyncStore(defaults: defaults)
+        XCTAssertNotNil(cloudSync.loadRawLocalData(forKey: key))
+
+        cloudSync.removeValue(forKey: key)
+
+        XCTAssertNil(cloudSync.loadRawLocalData(forKey: key))
+    }
+
     private func decodeLocalSessions(from data: Data?, cloudSync: CloudSyncStore) -> [DiveSession] {
         guard let data else { return [] }
         return cloudSync.decodeLocal([DiveSession].self, from: data) ?? []
