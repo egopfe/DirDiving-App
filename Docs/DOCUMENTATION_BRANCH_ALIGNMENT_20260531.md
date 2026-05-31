@@ -9,11 +9,11 @@
 
 | Branch | Role | Docs state | Sync @ |
 |--------|------|------------|--------|
-| `main` | Stable Watch Diving + iOS Companion MAIN | Authoritative; algorithm + UI/UX readiness 100% (codice) | `c8f91f6` |
-| `main-iOS` | Historical / divergent iOS worktree | Merged `main`; not separate release baseline | TBD post-sync |
-| `codex/experimental-features` | Watch experimental (Apnea, Snorkeling, Buddy) | Merged readiness + UI/UX docs from `main`; experimental runtime unchanged | TBD post-sync |
-| `codex/ios-experimental-features` | iOS experimental companion | Merged readiness + UI/UX implementation + docs | TBD post-sync |
-| `codex/watch-main-algorithm-audit-current` | Watch MAIN audit (PR #10) | Superseded by `main` remediation; close PR #10 recommended | TBD post-sync |
+| `main` | Stable Watch Diving + iOS Companion MAIN | Authoritative; algorithm + UI/UX readiness 100% (codice) | `409e844` |
+| `main-iOS` | Historical / divergent iOS worktree | Merged `main`; not separate release baseline | `f461d12` |
+| `codex/experimental-features` | Watch experimental (Apnea, Snorkeling, Buddy) | Merged readiness + UI/UX docs from `main`; experimental runtime unchanged | `42a2c13` |
+| `codex/ios-experimental-features` | iOS experimental companion | Merged readiness + UI/UX implementation + docs | `bddd1e0` |
+| `codex/watch-main-algorithm-audit-current` | Watch MAIN audit (PR #10) | Superseded by `main` remediation; close PR #10 recommended | `f6696f6` |
 
 ## Open pull requests (2026-05-31)
 

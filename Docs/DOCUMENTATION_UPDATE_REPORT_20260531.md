@@ -222,4 +222,12 @@ All active branches merged/pushed through `e952b55`:
 
 ### Branch sync (2026-05-31, post UI/UX docs)
 
-All active branches merged/pushed through `c8f91f6` (see `DOCUMENTATION_BRANCH_ALIGNMENT_20260531.md` for commit SHAs after sync).
+All active branches merged/pushed through `409e844`:
+
+| Branch | Commit |
+|--------|--------|
+| `main` | `409e844` |
+| `main-iOS` | `f461d12` |
+| `codex/experimental-features` | `42a2c13` |
+| `codex/ios-experimental-features` | `bddd1e0` |
+| `codex/watch-main-algorithm-audit-current` | `f6696f6` |
