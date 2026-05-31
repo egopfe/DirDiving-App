@@ -150,7 +150,7 @@ struct GasMixCard: View {
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(enabled ? .white : DIRTheme.muted)
                     .frame(width: 42)
-                    .accessibilityLabel(String(format: String(localized: "planner.gas.stepper.value.a11y"), title, Int(value * 100), suffix))
+                    .accessibilityLabel(String(format: String(localized: "planner.gas.stepper.value.a11y"), title, String(Int(value * 100)), suffix))
                 Button { update(value + step) } label: {
                     Image(systemName: "plus")
                         .font(.caption2.weight(.bold))
