@@ -51,6 +51,25 @@ Warning taxonomy includes snapshot missing/stale/corrupt/schema mismatch, gas al
 
 See `DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md` for acceptance verification.
 
+## 2026-05-31 Comprehensive CNS/OTU Model
+
+Runtime implementation in `OxygenExposureModels.swift` (`dae29b8`):
+
+| Component | Description |
+|---|---|
+| `NOAACNSLimitTable` | NOAA 1991 single-exposure piecewise-linear limits |
+| `NOAACNSDailyLimitTable` | 24 h daily CNS limits with interpolation 1.0–1.6 bar |
+| `CNSRecoveryModel` | 90 min half-time decay during surface interval and segments with PPO₂ ≤ 0.5 bar |
+| `OTUModel` | Lambertsen UPTD; constant depth and Baker Eq. 2 ramp integration |
+| `OTUREPEXLimits` | Elevated dive OTU ≥ 300; daily 24 h ≥ 850; weekly ≥ 1800; reset windows 24 h / 7 d |
+| `OxygenExposureCarryover` | Repetitive state: single/daily CNS, daily/weekly OTU |
+| `TissueSnapshot` v2 | Optional `oxygenCarryover` persisted on Calculate |
+| `PlannerService` | Applies surface-interval decay/resets before next plan |
+
+Tests: `OxygenExposureDeepModelTests` (14 cases). Suite total: **119/119** pass on iPhone 17 sim.
+
+Positioning unchanged: reference planning only — not certified oxygen exposure guidance.
+
 ## Buhlmann Engine Status
 
 Implemented in `iOSApp/Algorithms/Buhlmann/`:

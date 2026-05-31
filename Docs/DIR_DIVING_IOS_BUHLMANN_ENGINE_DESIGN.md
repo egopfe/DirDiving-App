@@ -60,9 +60,9 @@ UI surfaces engine outputs without changing math:
 - **Schedule gas ledger:** per-cylinder consumed liters, remaining liters/bar, reserve/minimum-gas/lost-gas flags; allocation failures fail visibly instead of showing aggregate-only bottom estimates.
 - **Environment:** active altitude/salinity copy states they adjust ambient pressure, ceiling, NDL, consumption, and surface-interval math; invalid environment blocks planning with corrective hints.
 - **Result header:** explicit reference-only badge for no-deco, deco-required, repetitive, environment-adjusted, invalid, unsupported profile, and no-solution states.
-- **CNS/OTU:** NOAA piecewise single-exposure CNS limits (seven segments, Baker/NOAA Diving Manual) with ramp integration on descent/ascent segments; Lambertsen OTU (UPTD) with Baker Eq. 2 for linear PPO2 ramps. Still reference-only — not certified exposure limits.
+- **CNS/OTU:** Comprehensive NOAA-style reference model — single- and daily-exposure CNS limits (Baker/NOAA), 90-minute surface and in-water air-break recovery (PPO₂ ≤ 0.5 bar), Lambertsen OTU with Baker Eq. 2 ramp integration, REPEX daily (850) and weekly (1800) thresholds, repetitive carryover via tissue snapshot schema v2. UI shows daily CNS / OTU 24h summary and air-break note. Still reference-only — not certified exposure authority.
 
-Remaining UX limitations: calculation is synchronous (no progress spinner); Dynamic Type stress on dense stepper cards may still require scrolling; physical-device VoiceOver walkthrough recommended before release.
+Remaining UX limitations: Dynamic Type stress on dense stepper cards may still require scrolling; physical-device VoiceOver walkthrough recommended before release.
 
 ## Safety Validation
 

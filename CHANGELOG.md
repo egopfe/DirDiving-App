@@ -4,6 +4,13 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-05-31, comprehensive NOAA CNS/OTU + docs alignment — `dae29b8`)
+
+- **Algoritmo iOS:** modello CNS/OTU comprehensive — limiti NOAA singolo e giornaliero, recupero superficie/pausa aria 90 min, soglie REPEX OTU (300 / 850 / 1800), carryover ossigeno su snapshot v2, integrazione su profilo completo.
+- **Test:** `OxygenExposureDeepModelTests` (14 test); suite **119/119** `DIRDiving iOS Algorithm Tests` su iPhone 17 sim.
+- **Documentazione:** README, INDEX, ROADMAP, CSV, PRODUCT_FEATURES_IT, GLOSSARY, completion report, engine design, hardening, improvement plan, changelog allineati @ `dae29b8`.
+- **Report:** [`Docs/DOCUMENTATION_UPDATE_REPORT_20260531.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260531.md).
+
 ### Added (2026-05-30, Phase 15 documentation alignment)
 
 - Phase 15 docs: README, INDEX, ROADMAP, CSV, release/TestFlight, re-audit, consistency report, final readiness report @ `3237262`.

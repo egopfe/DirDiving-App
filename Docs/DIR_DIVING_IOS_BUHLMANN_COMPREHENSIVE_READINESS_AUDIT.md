@@ -1,6 +1,7 @@
 # DIR Diving iOS Bühlmann Comprehensive Readiness Audit
 
 **Date:** 2026-05-30  
+**Implementation follow-up:** P1–P4 + comprehensive CNS/OTU implemented @ `dae29b8` (2026-05-31) — see [`DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md`](DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md). **119/119** XCTest pass. Verdict below reflects **pre-implementation** audit state.
 **Auditor scope:** Read-only static inspection + macOS build/test execution  
 **Repository:** `main` @ `af39283` (= `origin/main`, synced)  
 **Platform:** macOS (Darwin), Xcode iOS Simulator `iPhone 17`, iOS SDK 26.5  
@@ -125,7 +126,7 @@ Watch targets exist in the repo but were **not inspected for modification** per 
 | **NDL** | ✅ Correct | Binary search on tissue state; environment-aware; returns `maxBottomTimeMinutes` cap (600), not fake 999; monotonic with depth in tests |
 | **Multigas** | ✅ Correct | Bottom/travel/deco roles; switch ordering; `bestAscentGas` prefers higher O2 when valid; segment operational validation |
 | **Repetitive planning** | ⚠️ Partial | Snapshot + surface-interval off-gassing on air at surface; environment match enforced; **semantic limitation**: snapshot sourced from prior *plan output*, not dive log |
-| **Oxygen exposure** | ⚠️ Partial | Simplified CNS clock + OTU power model; monotonic; fail-closed on invalid segments; **not** full NOAA multi-table model |
+| **Oxygen exposure** | ✅ Implemented @ `dae29b8` | Comprehensive NOAA model: single + daily CNS, 90 min recovery, REPEX OTU, air-break, snapshot v2 carryover — see limitations doc |
 | **Gas consumption** | ✅ Correct | Schedule ledger from engine segments × SAC × ambient ATA; per-cylinder UUID keys; reserve/rock-bottom/lost-gas heuristics |
 | **Numerical robustness** | ✅ Correct | Fail-closed on NaN/invalid GF/depth; coefficient epsilon guard; finite outputs asserted in tests |
 
@@ -289,7 +290,7 @@ Fixtures encode depth, GF, gases, environment (where applicable), and expected T
 | P2-2 | Repetitive snapshot semantics | `PlannerStore.swift`, `RepetitiveDivePlannerService.swift` | Snapshot updated from current `enginePlan` after each recalc | Users may think snapshot = prior **logged** dive tissue | Clarify UI copy + docs; optional future: seed from dive log export | UI strings state “prior reference plan”; doc updated |
 | P2-3 | `surfaceIntervalRejected` never emitted | `PlannerResultState.swift`, `PlannerService.swift` | Grep shows enum only | Dead warning state; maintenance noise | Emit when SI invalid, or remove state + copy | Test covers emission or state removed |
 | P2-4 | Physical accessibility QA gap | `PlannerView.swift` | Docs note VoiceOver/Dynamic Type not hardware-validated | Release UX risk | Manual QA matrix on device | Signed QA checklist |
-| P2-5 | CNS/OTU model simplicity | `OxygenExposureModels.swift` | Stepwise CNS clock, single OTU formula | Reference estimates only — acceptable if labeled | Keep disclaimers; avoid stronger claims in marketing | UI disclaimer visible in plan result |
+| P2-5 | CNS/OTU model simplicity | `OxygenExposureModels.swift` | ~~Stepwise CNS clock~~ → **Implemented:** NOAA single/daily, recovery, REPEX, carryover @ `dae29b8` | Reference estimates with documented model | Keep disclaimers; avoid stronger claims in marketing | ✅ UI disclaimer + daily summary visible |
 
 ---
 

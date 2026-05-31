@@ -4,7 +4,7 @@ Copyright Federico Lombardo di Monte Iato 2026
 
 DIR DIVING is a SwiftUI **watchOS + iOS companion** project (XcodeGen) for Apple Watch Ultra-class devices and iPhone. The stable **`main`** branch delivers **Diving mode** on Watch (depth, ascent awareness, **BUSSOLA**, log, GPS surface entry/exit, Subsurface CSV) plus the iOS companion (logbook, planner, equipment, analysis, sync). Snorkeling, Apnea, and Buddy Assist live on **experimental** branches only.
 
-**Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](Docs/INDEX.md) · **Baseline commit corrente:** `main` = `origin/main` (synced; `git rev-parse --short HEAD` → `de146f7`)
+**Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](Docs/INDEX.md) · **Baseline commit corrente:** `main` = `origin/main` @ `dae29b8`
 
 ## Safety and limitations (MAIN)
 
@@ -12,10 +12,11 @@ Disclaimer completo: [`Docs/SAFETY_DISCLAIMER.md`](Docs/SAFETY_DISCLAIMER.md) ·
 
 DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent awareness, and syncs to the iPhone companion for review and **indicative** planning. It is **not** a certified dive computer unless a future release explicitly documents certification. It does **not** replace training, dive-center rules, certified equipment, or human judgment. Planner and Bühlmann-style presentations are **indicative** — verify with certified tools. GPS is meaningful **at the surface**; underwater or poor-sky conditions mean fixes can be missing — missing data must not be read as “dive success.”
 
-### Stato corrente (`main` = `origin/main`, 2026-05-30)
+### Stato corrente (`main` = `origin/main`, 2026-05-31)
 
 | Pass | Commit | Contenuto |
 |------|--------|-----------|
+| iOS comprehensive CNS/OTU + Bühlmann readiness | `dae29b8` | NOAA single/daily CNS, surface/air-break recovery, REPEX OTU, snapshot v2 oxygen carryover, P1–P4 readiness — [`Docs/DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md`](Docs/DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md) |
 | iOS Bühlmann UX/UI readiness | `3237262` | Fix P1–P3 UX planner; verdict **Ready** — [`DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md) |
 | iOS Bühlmann reaudit algorithm | `69e69b2` | Fix P1–P3 algoritmo — [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) |
 | iOS Bühlmann ZHL-16C engine | corrente | Reference N2+He multigas — [`Docs/DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](Docs/DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md) |
@@ -29,9 +30,11 @@ DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent 
 | iOS Buhlmann ZHL-16C multigas engine | corrente | Motore iOS-only ZHL-16C N2+He con Air/Nitrox/Trimix/Heliox, GF Low/High, NDL tissue-state, gas switch e stop da ceiling; reference-only/non certificato. Vedi [`Docs/DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](Docs/DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md), [`Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md). |
 | Docs alignment | pass 2026-05-19 | README, INDEX, matrice CSV, branch strategy, audit delta; vedi [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md) |
 
-**Pass documentale Phase 15 (2026-05-30):** documentazione allineata a `3237262` — [`DIR_DIVING_FINAL_IMPLEMENTATION_AND_READINESS_REPORT.md`](DIR_DIVING_FINAL_IMPLEMENTATION_AND_READINESS_REPORT.md). **iOS planner:** multigas, environment-aware pressure, repetitive UX, gas ledger, typed warnings — **reference-only, non certificato**.
+**Pass documentale (2026-05-31):** documentazione allineata a `dae29b8` — [`Docs/DOCUMENTATION_UPDATE_REPORT_20260531.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260531.md). **iOS planner:** multigas Bühlmann ZHL-16C, environment-aware pressure, repetitive planning con carryover CNS/OTU, gas ledger, NOAA-style CNS/OTU reference — **non certificato**.
 
-**Recent MAIN UI/UX pass (`3237262`):** repetitive planning visibility, schedule gas ledger, environment copy, result headers, CNS/OTU disclaimers — presentation only; no Bühlmann math changes.
+**Recent algorithm pass (`dae29b8`):** comprehensive NOAA CNS/OTU (daily limits, 90 min recovery, REPEX OTU thresholds, air-break recovery, tissue snapshot v2); Bühlmann readiness P1–P4; **119/119** algorithm tests on iPhone 17 sim.
+
+**Recent MAIN UI/UX pass (`3237262`):** repetitive planning visibility, schedule gas ledger, environment copy, result headers, CNS/OTU disclaimers — presentation layer; algorithm expanded @ `dae29b8`.
 
 **Watch UX baseline (2026-05-20):** ascent over-limit shows a **red inline banner** on the live dive screen (non-blocking); depth, gauge, TTV, and controls stay visible. Details: [`Docs/WATCH_MAIN_UX_CONVENTIONS.md`](Docs/WATCH_MAIN_UX_CONVENTIONS.md).
 

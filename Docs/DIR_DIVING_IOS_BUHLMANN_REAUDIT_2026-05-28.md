@@ -190,11 +190,11 @@ Recommended fix:
 
 ### P3.2 Oxygen exposure model needs stronger external validation
 
-The CNS / OTU model is now formalized, but it should be validated against documented tables and daily exposure behavior.
+The CNS / OTU model is now formalized. **Follow-up @ `dae29b8`:** comprehensive NOAA single/daily limits, surface/air-break recovery, REPEX OTU, snapshot v2 carryover — see [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md) and `OxygenExposureDeepModelTests`.
 
-Recommended fix:
+Recommended fix (historical):
 
-- Add fixture tests for CNS / OTU.
+- ~~Add fixture tests for CNS / OTU.~~ → **Done @ `dae29b8`:** 14 cases in `OxygenExposureDeepModelTests`; suite **119/119** pass.
 - Document source assumptions and tolerances.
 
 ### P3.3 Gas identity is too label-dependent

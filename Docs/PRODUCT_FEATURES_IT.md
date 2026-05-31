@@ -1,7 +1,7 @@
 # DIR DIVING — Panoramica funzionalità (italiano)
 
-**Aggiornato:** 2026-05-19
-**Branch di riferimento:** `main` @ `92e639a` (baseline commit) + pass documentale corrente
+**Aggiornato:** 2026-05-31  
+**Branch di riferimento:** `main` @ `dae29b8` (`origin/main`)  
 **Spec prodotto corrente:** [`DIR_Diving_Complete_Development_Notes_UPDATED_v10.md`](DIR_Diving_Complete_Development_Notes_UPDATED_v10.md)
 
 Documento additivo: integra README e matrice CSV senza sostituire audit o note legali dettagliate.
@@ -75,7 +75,8 @@ Cinque tab (ordine): **Planner**, Logbook, Analisi, Attrezzatura, Altro.
 
 | Area | Contenuto |
 |------|-----------|
-| **Planner** | Cilindri multipli, ruoli gas (Back / Travel / Deco / Bailout), mix Air/EAN/Trimix, PPO₂ step 0.1, MOD Dalton, riferimento pianificazione max/media, info emergenza su profondità max; risultati PIANO / BÜHLMANN / GRAFICI; ack sicurezza persistito; preview aggiornata su cambio input gas |
+| **Planner** | Cilindri multipli, ruoli gas (Back / Travel / Deco / Bailout), mix Air/EAN/Trimix, PPO₂ step 0.1, MOD Dalton, riferimento pianificazione max/media; motore **Bühlmann ZHL-16C N2+He** reference con GF, NDL, soste generate; risultati PIANO / BÜHLMANN / GRAFICI; pianificazione ripetitiva con snapshot tessuti v2 e carryover CNS/OTU; ledger gas per cilindro; ambiente altitudine/salinità; ack sicurezza persistito |
+| **CNS / OTU (planner)** | Modello NOAA di riferimento: limiti singolo e giornaliero, recupero superficie/pausa aria (90 min), OTU Lambertsen con soglie REPEX giornaliere/settimanali; integrazione su profilo completo (discesa, fondo, deco); **solo pianificazione di riferimento — non guida certificata** |
 | **Logbook** | Lista, dettaglio, immersioni manuali, import/export CSV |
 | **Analisi** | Metriche logbook, SAC, gas, riepilogo route GPS (entry/exit surface-only) |
 | **Attrezzatura** | Profilo, checklist editabile, **La mia attrezzatura** (template REC/TEC), switch GAS ON/OFF per voce |
@@ -120,6 +121,7 @@ Regole merge: preservare Diving stabile, GPS surface-only, BUSSOLA, export Subsu
 ## Limitazioni note
 
 - Non computer subacqueo certificato; planner/Bühlmann **indicativi** (trimix: disclaimer He non in compartimenti Bühlmann).
+- CNS/OTU: modello NOAA-style comprehensive ma **reference-only** — non sostituisce computer, tabelle produttore o guida medica.
 - Entitlement water submersion: configurato, validazione Ultra reale aperta (R1).
 - GPS solo superficie; mappe Watch senza tile online.
 - Funzioni experimental non promosse in App Store candidate su `main`.

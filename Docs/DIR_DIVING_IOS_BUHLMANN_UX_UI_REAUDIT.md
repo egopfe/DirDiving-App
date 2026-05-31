@@ -34,7 +34,7 @@ All P1, P2, and P3 UX/UI readiness issues from the 2026-05-28 audit are resolved
 |---|---|---|---|---|---|
 | P2-4 | No-deco vs deco-required implicit only | `resultHeaderBadge` with `PlannerResultHeaderKind` + reference-only hint | `PlannerView.swift`, `PlannerResultState.swift`, `PlannerService.swift`, localization | `testNoDecoVersusDecoRequiredHeaders` | **SOLVED** |
 | P2-5 | Typed states not mapped to distinct UX copy | `PlannerUserFacingCopy` for all `PlannerResultState` + snapshot/ledger failures | `PlannerResultState.swift`, `PlannerService.swift`, localization | `testAllPlannerResultStatesHaveUserFacingCopy`, `testSafetyCriticalStatesAreNotGeneric` | **SOLVED** |
-| P2-6 | CNS/OTU without reference-only context | Disclaimer on analysis tiles and result grid; elevated exposure typed state | `PlannerView.swift`, `PlannerResultState.swift`, localization | `testOxygenExposureStateIncludesReferencePositioning` | **SOLVED** |
+| P2-6 | CNS/OTU without reference-only context | Disclaimer + daily CNS/OTU 24h summary + air-break note; comprehensive NOAA model @ `dae29b8` | `PlannerView.swift`, `OxygenExposureModels.swift`, localization | `OxygenExposureDeepModelTests`, `testOxygenExposureStateIncludesReferencePositioning` | **SOLVED** |
 | P2-7 | Accessibility gaps on dense planner cards | VoiceOver labels/hints on environment, repetitive, warnings, ledger, header; non-truncating warning text | `PlannerView.swift` | Static a11y audit | **SOLVED** (physical VoiceOver walkthrough still recommended) |
 
 ### P3 — UI consistency and feedback states

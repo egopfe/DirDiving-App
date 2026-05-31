@@ -1,7 +1,7 @@
 # DIR DIVING iOS Bühlmann Implementation Completion Report
 
-**Date:** 2026-05-29  
-**Branch:** `main` (local implementation pass)  
+**Date:** 2026-05-31 (updated post comprehensive CNS/OTU)  
+**Branch:** `main` @ `dae29b8` (`origin/main`)  
 **Scope:** iOS Companion MAIN — Bühlmann planner only (no Watch / experimental)  
 **Simulator:** iPhone 17, iOS SDK 26.5  
 
@@ -21,7 +21,7 @@ The iOS Companion Bühlmann planner resolves all in-repo P1–P4 implementation 
 |---|---|
 | `xcodegen generate` | ✅ PASS |
 | `xcodebuild` **DIRDiving iOS** → iPhone 17 sim | ✅ BUILD SUCCEEDED |
-| `xcodebuild test` **DIRDiving iOS Algorithm Tests** → iPhone 17 sim | ✅ **104 tests, 0 failures** |
+| `xcodebuild test` **DIRDiving iOS Algorithm Tests** → iPhone 17 sim | ✅ **119 tests, 0 failures** |
 | Watch files modified | ✅ None |
 | Experimental files modified | ✅ None |
 | Certified-deco language introduced | ✅ None |
@@ -38,7 +38,7 @@ The iOS Companion Bühlmann planner resolves all in-repo P1–P4 implementation 
 | **P2-2** | Repetitive snapshot semantics unclear | UI copy “not from dive log”; snapshot persists on Calculate only; source string updated | **SOLVED** |
 | **P2-3** | `surfaceIntervalRejected` never emitted | `invalidSurfaceInterval` error + mapping in `PlannerUserFacingCopy` | **SOLVED** |
 | **P2-4** | Physical accessibility QA gap | `DIR_DIVING_IOS_PHYSICAL_ACCESSIBILITY_QA.md` checklist | **Documented — manual QA required** |
-| **P2-5** | CNS/OTU model simplicity | Limitations doc + existing UI disclaimers reinforced | **SOLVED (docs/copy)** |
+| **P2-5** | CNS/OTU model simplicity | Comprehensive NOAA model: single + daily CNS, 90 min recovery, REPEX OTU, air-break, snapshot v2 carryover; UI daily summary | **SOLVED** |
 | **P3-1** | Bailout not in Bühlmann engine schedule | Documented + `planner.bailout.schedule_hint` in plan result | **SOLVED** |
 | **P3-2** | Legacy 10 m/bar in Bühlmann paths | `BuhlmannGas` uses ISA sea-level saltwater fallback constants | **SOLVED** |
 | **P3-3** | GF comparison performance | In-memory `GFComparisonCache` (outputs unchanged) | **SOLVED** |
@@ -56,6 +56,7 @@ The iOS Companion Bühlmann planner resolves all in-repo P1–P4 implementation 
 | `Docs/DIR_DIVING_IOS_PHYSICAL_ACCESSIBILITY_QA.md` |
 | `Docs/DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md` |
 | `Tests/iOSAlgorithmTests/BuhlmannComprehensiveReadinessFixTests.swift` |
+| `Tests/iOSAlgorithmTests/OxygenExposureDeepModelTests.swift` |
 
 ---
 
@@ -68,15 +69,20 @@ The iOS Companion Bühlmann planner resolves all in-repo P1–P4 implementation 
 
 ### Services / Utils / Views
 - `iOSApp/Services/BuhlmannPlanner.swift`
+- `iOSApp/Services/GasPlanningService.swift`
+- `iOSApp/Services/OxygenExposureModels.swift`
+- `iOSApp/Services/PlannerService.swift`
 - `iOSApp/Services/PlannerStore.swift`
 - `iOSApp/Services/RepetitiveDivePlannerService.swift`
 - `iOSApp/Utils/PlannerResultState.swift`
+- `iOSApp/Models/GasPlan.swift`
 - `iOSApp/Views/PlannerView.swift`
 - `iOSApp/Resources/en.lproj/Localizable.strings`
 - `iOSApp/Resources/it.lproj/Localizable.strings`
 
 ### Tests
 - `Tests/iOSAlgorithmTests/BuhlmannComprehensiveReadinessFixTests.swift` (new)
+- `Tests/iOSAlgorithmTests/OxygenExposureDeepModelTests.swift` (new)
 - `Tests/iOSAlgorithmTests/BuhlmannConstantsTests.swift`
 - `Tests/iOSAlgorithmTests/BuhlmannPressureModelTests.swift`
 - `Tests/iOSAlgorithmTests/BuhlmannUxReadinessTests.swift`
@@ -106,7 +112,16 @@ The iOS Companion Bühlmann planner resolves all in-repo P1–P4 implementation 
 - `BuhlmannPressureModelTests` — Bühlmann fallback pressure formula
 - `BuhlmannUxReadinessTests` — `surfaceIntervalRejected` mapping
 
-**Total:** 104 XCTest cases, all passing (was 88 at audit time).
+**New (`OxygenExposureDeepModelTests`, 14 cases):**
+- NOAA single-exposure limit table sanity
+- Surface-interval CNS decay and OTU daily reset after 24 h
+- Daily vs single CNS limit divergence at 1.4 bar PPO₂
+- In-water air-break CNS recovery (O₂ → air segment)
+- Repetitive carryover accumulation
+- REPEX daily OTU warning threshold
+- Snapshot v2 oxygen carryover storage; schema v1 backward compatibility
+
+**Total:** 119 XCTest cases, all passing (was 88 at initial audit; 104 after readiness pass).
 
 ---
 
@@ -141,6 +156,7 @@ The iOS Companion Bühlmann planner resolves all in-repo P1–P4 implementation 
 2. Complete physical accessibility checklist on iPhone SE + standard device
 3. TestFlight build smoke test on device
 4. Verify repetitive flow: Calculate → enable repetitive → second Calculate with SI
+5. Verify CNS/OTU daily summary and air-break note on deco profiles with O₂ then air segments
 
 ---
 

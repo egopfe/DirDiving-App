@@ -146,7 +146,7 @@ The branch also implements the first technical-planner requirements from `DIR_DI
 - PPO2 at planned depth.
 - Gas density at planned depth with green/warning/danger rating using 5.2 g/L and 6.2 g/L defaults.
 - END and EAD calculations.
-- CNS% and OTU indicative calculations.
+- CNS% and OTU indicative calculations (NOAA-style reference model: single/daily CNS, REPEX OTU thresholds — not certified exposure guidance).
 - Planner warnings for MOD/PPO2, density, END, and gas reserve issues.
 - Premium iOS cards for gas planning, density/END, reserve, warnings, and plan output.
 - V1 multi-segment timeline for descent, bottom, ascent, stops, and gas switches.

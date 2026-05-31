@@ -60,7 +60,8 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 - [ ] Watch MAIN: verificare `Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md` e test su cap log 40, temperatura plausibile, export vuoto, GPS fallback e conversioni.
 - [ ] iOS MAIN: verificare `Docs/DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md` e test su planner/gas validation, import/export/sync, logbook time-weighted math, route math e safe states.
 - [ ] iOS planner: verificare che trimix/helium usino il motore N2+He e restino reference-only; riferirsi a `Docs/DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md` e `Docs/DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`.
-- [ ] iOS planner UX (@ `3237262`): repetitive planning toggle + status; environment altitude/salinity messaging; schedule gas ledger card; result header badges (no-deco/deco-required); typed warnings; CNS/OTU reference disclaimers; VoiceOver labels su card risultato — vedi [`DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md).
+- [ ] iOS planner UX (@ `3237262` + `dae29b8`): repetitive planning toggle + status; environment altitude/salinity messaging; schedule gas ledger card; result header badges (no-deco/deco-required); typed warnings; CNS/OTU reference disclaimers with **daily CNS / OTU 24h summary** and air-break note; VoiceOver labels su card risultato — vedi [`DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md).
+- [ ] iOS planner CNS/OTU algorithm (@ `dae29b8`): deco profile with O₂ then air shows lower CNS than O₂ alone; repetitive second dive carries prior CNS/OTU after short SI; 24 h SI resets daily OTU — vedi [`OxygenExposureDeepModelTests.swift`](../Tests/iOSAlgorithmTests/OxygenExposureDeepModelTests.swift).
 
 ## QA Security (audit F1–F12, baseline 2026-05-19)
 

@@ -162,39 +162,39 @@ Expose the existing residual tissue state capability through a controlled iOS pl
 
 ## Phase 4: CNS / OTU Formalization
 
+**Status: ✅ Implemented @ `dae29b8` (2026-05-31)**
+
 ### Objective
 
 Formalize oxygen exposure calculations as documented, segment-based reference estimates.
 
-### Proposed Components
+### Implemented Components
 
-- `OxygenExposureModel`
-- `CNSClockModel`
-- `OTUModel`
-- `OxygenExposureWarningState`
+- `OxygenExposureModels.swift` — `NOAACNSLimitTable`, `NOAACNSDailyLimitTable`, `CNSRecoveryModel`, `OTUREPEXLimits`, `OTUModel`, `OxygenExposureModel`, `OxygenExposureCarryover`
+- `OxygenExposureWarningState` — elevated single/daily CNS, dive/daily/weekly OTU
+- `TissueSnapshot` schema v2 — optional `oxygenCarryover`
+- `PlannerService` / `GasPlanningService` — full-profile exposure with repetitive carryover
 
-### Functional Requirements
+### Functional Requirements (met)
 
-- Accumulate CNS per generated segment using actual segment PPO2 and duration.
-- Accumulate OTU/UPTD per generated segment.
-- Centralize oxygen exposure thresholds and assumptions.
-- Add typed warnings for elevated CNS/OTU exposure.
-- Document NOAA/recognized oxygen exposure assumptions and project tolerances.
-- Keep all oxygen toxicity values reference-only.
+- Accumulate CNS (single + daily) and OTU per generated segment with ramp integration on descent/ascent
+- 90 min half-time CNS recovery during surface interval and in-water air breaks (PPO₂ ≤ 0.5 bar)
+- REPEX reference thresholds: dive OTU ≥ 300, daily 24 h ≥ 850, weekly ≥ 1800
+- Typed warnings for elevated exposure; fail-closed on invalid segments
+- Documented in `DIR_DIVING_IOS_PLANNER_LIMITATIONS.md` and `DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md` §11
+- Reference-only positioning preserved in UI (`planner.oxygen_exposure.*`)
 
-### Tests
+### Tests (`OxygenExposureDeepModelTests`, 14 cases)
 
-- PPO2 below threshold produces zero or negligible exposure.
-- EAN50 and O2 deco segments increase CNS/OTU.
-- Long decompression profile creates oxygen warning state.
-- Invalid PPO2 or duration fails closed.
-- CNS/OTU are monotonic when exposure is added.
+- NOAA table sanity; surface-interval decay; daily vs single limit at 1.4 bar
+- Air-break recovery; repetitive carryover; REPEX daily OTU warning
+- Snapshot v2 carryover; schema v1 backward compatibility
 
 ### Acceptance Criteria
 
-- CNS/OTU are schedule-aware, deterministic, and documented.
-- No oxygen exposure result can be NaN or infinite.
-- Warnings remain conservative and reference-only.
+- ✅ Schedule-aware, deterministic, documented
+- ✅ No NaN/infinite results on valid input; invalid input fails closed
+- ✅ **119/119** `DIRDiving iOS Algorithm Tests` pass on iPhone 17 sim
 
 ## Phase 5: Golden Fixtures And Regression Suite
 

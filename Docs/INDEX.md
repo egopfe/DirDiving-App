@@ -1,15 +1,32 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-05-30  
-**Branch consigliato:** `main` = `origin/main` (allineato)
+**Aggiornato:** 2026-05-31  
+**Branch consigliato:** `main` = `origin/main` @ `dae29b8`  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
 
 ---
 
+## Aggiornamento indice 2026-05-31 — comprehensive NOAA CNS/OTU + readiness @ `dae29b8`
+
+Implementazione runtime + documentazione allineata (**119/119 XCTest pass**, iPhone 17 sim):
+
+| Documento | Posizione | Contenuto |
+|-----------|-----------|-----------|
+| [`DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md`](DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md) | `Docs/` | P1–P4 + **comprehensive CNS/OTU** — verdict **READY FOR INTERNAL VALIDATION** |
+| [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md) | `Docs/` | Daily CNS, surface/air-break recovery, REPEX OTU, snapshot v2 carryover |
+| [`DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md) | `Docs/` | §11 oxygen exposure — NOAA single/daily, recovery, REPEX |
+| [`OxygenExposureDeepModelTests.swift`](../Tests/iOSAlgorithmTests/OxygenExposureDeepModelTests.swift) | `Tests/` | 14 test CNS/OTU (decay, daily limits, air-break, carryover) |
+| [`DIR_DIVING_Feature_Comparison.csv`](DIR_DIVING_Feature_Comparison.csv) | `Docs/` | Righe algorithm/UX CNS/OTU comprehensive @ `dae29b8` |
+| [`DOCUMENTATION_UPDATE_REPORT_20260531.md`](DOCUMENTATION_UPDATE_REPORT_20260531.md) | `Docs/` | Report A–K allineamento documentazione post CNS/OTU |
+
+Relazione: comprehensive readiness @ `f7de936` → implementazione P1–P4 + NOAA CNS/OTU @ `dae29b8`.
+
+---
+
 ## Aggiornamento indice 2026-05-29 — comprehensive readiness implementation
 
-Implementazione P1–P4 da [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md) (**104/104 XCTest pass**, iPhone 17 sim):
+Implementazione P1–P4 da [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md) (**119/119 XCTest pass** @ `dae29b8`, iPhone 17 sim):
 
 | Documento | Posizione | Contenuto |
 |-----------|-----------|-----------|
