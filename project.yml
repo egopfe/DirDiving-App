@@ -3,8 +3,71 @@ options:
   bundleIdPrefix: com.egopfe
   xcodeVersion: "15.4"
   deploymentTarget:
+    watchOS: "10.0"
     iOS: "17.0"
 targets:
+  DIRDiving Watch App:
+    type: application
+    platform: watchOS
+    sources:
+      - App
+      - path: Models
+        excludes:
+          - ExplorationModels.swift
+          - BuddyAssistMessage.swift
+          - BuddyPairingHandshake.swift
+      - path: Services
+        excludes:
+          - ExplorationStore.swift
+          - BuddyAssistService.swift
+          - BuddyAssistPeripheralService.swift
+          - BuddyPairingKeyAgreement.swift
+          - SecureBuddyStore.swift
+      - path: Views
+        excludes:
+          - ApneaView.swift
+          - SnorkelingView.swift
+          - BuddyAssistView.swift
+          - ExperimentalConceptsView.swift
+      - path: Utils
+        excludes:
+          - ExperimentalFeatures.swift
+      # Explicit membership for algorithm/runtime core (prevents stale-xcodeproj "not in scope" errors).
+      - Utils/MissionModeRuntimeProfile.swift
+      - Utils/DiveDepthMeasurementIngestion.swift
+      - Utils/GPSFallbackPolicy.swift
+      - Utils/WatchNavigationHints.swift
+      - Utils/DiveSessionPersistenceClass.swift
+      - Utils/DepthSampleValidation.swift
+      - Utils/DiveLifecycleAlgorithm.swift
+      - Utils/MonotonicElapsedClock.swift
+      - Utils/GPSConfirmationPresentation.swift
+      - Utils/DiveAlgorithmConfiguration.swift
+      - Utils/DiveSessionAlgorithmValidator.swift
+      - Models/DiveGPSConfirmation.swift
+      - Services/AscentSafetyHapticCoordinator.swift
+      - Services/GPSManager.swift
+      - Resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios.watch
+        DEVELOPMENT_TEAM: C6FKKPB6A9
+        CODE_SIGN_STYLE: Automatic
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_FILE: App/Info.plist
+        INFOPLIST_KEY_CFBundleIdentifier: com.egopfe.dirdiving.ios.watch
+        CODE_SIGN_ENTITLEMENTS: Config/DIRDiving.entitlements
+        PRODUCT_NAME: DIRDivingWatchApp
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.egopfe.dirdiving.ios
+    dependencies:
+      - sdk: CoreMotion.framework
+      - sdk: CoreLocation.framework
+      - sdk: Security.framework
+      - sdk: WatchConnectivity.framework
+      - sdk: WatchKit.framework
+      - sdk: Charts.framework
+      - sdk: AppIntents.framework
   DIRDiving iOS:
     type: application
     platform: iOS
@@ -15,11 +78,15 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios
         DEVELOPMENT_TEAM: C6FKKPB6A9
         CODE_SIGN_STYLE: Automatic
+        GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_FILE: iOSApp/App/Info.plist
+        INFOPLIST_KEY_CFBundleIdentifier: com.egopfe.dirdiving.ios
         CODE_SIGN_ENTITLEMENTS: iOSApp/Config/DIRDivingiOS.entitlements
         PRODUCT_NAME: DIR DIVING
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     dependencies:
+      - target: DIRDiving Watch App
+        embed: true
       - sdk: Charts.framework
       - sdk: WatchConnectivity.framework
       - sdk: CoreLocation.framework
@@ -29,6 +96,25 @@ targets:
     sources:
       - Tests/WatchAlgorithmTests
       - Utils/MissionModeRuntimeProfile.swift
+      - Utils/DiveDepthMeasurementIngestion.swift
+      - Utils/GPSFallbackPolicy.swift
+      - Services/DiveManager.swift
+      - Services/DiveLogStore.swift
+      - Services/AscentRateSettingsStore.swift
+      - Services/GPSManager.swift
+      - Services/HapticService.swift
+      - Services/AscentSafetyHapticCoordinator.swift
+      - Services/DepthLimitHapticCoordinator.swift
+      - Services/CloudSyncStore.swift
+      - Services/WatchSyncService.swift
+      - Services/WatchSyncAuth.swift
+      - Services/WatchDiveSyncCodec.swift
+      - Utils/CloudSyncNotifications.swift
+      - Utils/WatchSyncKeys.swift
+      - Utils/WatchSyncNotifications.swift
+      - Utils/Formatters.swift
+      - Utils/WatchAlarmDefaults.swift
+      - Utils/WatchDepthFormatting.swift
       - Models/DiveSample.swift
       - Models/DiveSession.swift
       - Models/GPSPoint.swift
@@ -39,7 +125,6 @@ targets:
       - Utils/DepthSafetyConfiguration.swift
       - Utils/DiveAlgorithmConfiguration.swift
       - Utils/DiveLogbookPolicy.swift
-      - Services/GPSManager.swift
       - Utils/DepthSampleValidation.swift
       - Utils/DiveLifecycleAlgorithm.swift
       - Utils/DiveSessionAlgorithmValidator.swift
@@ -57,6 +142,10 @@ targets:
         DEVELOPMENT_TEAM: C6FKKPB6A9
     dependencies:
       - sdk: XCTest.framework
+      - sdk: WatchKit.framework
+      - sdk: WatchConnectivity.framework
+      - sdk: CoreLocation.framework
+      - sdk: CoreMotion.framework
   DIRDiving iOS Algorithm Tests:
     type: bundle.unit-test
     platform: iOS
@@ -118,7 +207,31 @@ targets:
       - sdk: Security.framework
       - sdk: WatchConnectivity.framework
 schemes:
+  DIRDiving Watch App:
+    build:
+      targets:
+        DIRDiving Watch App: all
+    test:
+      targets:
+        - DIRDiving Watch Algorithm Tests
   DIRDiving iOS:
     build:
       targets:
         DIRDiving iOS: all
+    test:
+      targets:
+        - DIRDiving iOS Algorithm Tests
+  DIRDiving iOS Algorithm Tests:
+    build:
+      targets:
+        DIRDiving iOS Algorithm Tests: all
+    test:
+      targets:
+        - DIRDiving iOS Algorithm Tests
+  DIRDiving Watch Algorithm Tests:
+    build:
+      targets:
+        DIRDiving Watch Algorithm Tests: all
+    test:
+      targets:
+        - DIRDiving Watch Algorithm Tests

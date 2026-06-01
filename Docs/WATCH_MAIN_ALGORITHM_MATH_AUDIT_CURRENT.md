@@ -1,10 +1,19 @@
 # Apple Watch MAIN — Algorithm & Mathematical Functions Audit (Current)
 
 **Date:** 2026-06-01  
-**Branch:** `main` @ `3154719`  
+**Branch:** `main` (audit baseline @ `3154719`; remediation 2026-06-01)  
 **Target:** `DIRDiving Watch App` only  
-**Mode:** Read-only static audit (no code changes)  
-**Related:** [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) (remediation @ `ac47480`), [`WATCH_MISSION_MODE_UX_SAFETY_VERIFICATION_REPORT.md`](WATCH_MISSION_MODE_UX_SAFETY_VERIFICATION_REPORT.md) (Mission Mode is **UI-only**, not dive math)
+**Mode:** Static audit + remediation tracking  
+**Related:** [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) (remediation @ `ac47480`), [`WATCH_MAIN_ALGORITHM_READINESS_100_FINAL_QA.md`](WATCH_MAIN_ALGORITHM_READINESS_100_FINAL_QA.md) (latest QA), [`WATCH_MISSION_MODE_UX_SAFETY_VERIFICATION_REPORT.md`](WATCH_MISSION_MODE_UX_SAFETY_VERIFICATION_REPORT.md) (Mission Mode is **UI-only**, not dive math)
+
+### Remediation update (2026-06-01)
+
+| ID | Status |
+|----|--------|
+| WMATH-MED-015 | **Fixed** — `DiveDepthMeasurementIngestion` + guarded trailing `addSample` in `processDepthMeasurement` |
+| WMATH-LOW-016 | **Fixed** — temperature freshness vs depth sample timestamp; integration tests |
+| Integration tests | **Added** — `DiveManagerAlgorithmIntegrationTests`, codec/export tests |
+| Hardware QA | **Checklist only** — [`WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md`](WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md) (not executed) |
 
 ---
 
@@ -12,10 +21,10 @@
 
 | Metric | Estimate | Notes |
 |--------|----------|--------|
-| **Watch MAIN algorithm readiness** | **~88%** | Core math centralized in `DiveAlgorithm` + validators; strong unit tests; hardware QA still required |
-| **Mathematical robustness** | **~90%** | Sanitization, finite checks, caps on ascent rate and depth; time-weighted average well defined |
-| **Safety algorithm confidence** | **~86%** | Depth 35/38/40 m, ascent bands, alarms, stale-depth watchdog present; one duplicate-sample path on auto-start |
-| **TestFlight (algorithm)** | **Ready with caveats** | Prior HIGH blockers addressed in code; validate on Ultra hardware |
+| **Watch MAIN algorithm readiness** | **~92%** (code ~98%) | WMATH-MED-015/016 fixed; hardware QA still required |
+| **Mathematical robustness** | **~92%** | Sanitization, finite checks, caps on ascent rate and depth; time-weighted average well defined |
+| **Safety algorithm confidence** | **~90%** | Depth 35/38/40 m, ascent bands, alarms, stale-depth watchdog; auto-start sample path corrected |
+| **TestFlight (algorithm)** | **Ready with caveats** | Prior HIGH blockers addressed; validate on Ultra hardware |
 | **App Store (algorithm)** | **Ready with caveats** | Non-certified positioning preserved; physical validation mandatory |
 
 ### Critical blockers (algorithm)
@@ -26,7 +35,6 @@
 
 | ID | Severity | Topic |
 |----|----------|--------|
-| WMATH-MED-015 | MEDIUM | Duplicate `addSample` on automatic dive start may reject second identical-timestamp sample and surface spurious depth error |
 | — | Process | Apple Watch Ultra underwater CoreMotion + GPS + WC sync not replaceable by simulator |
 
 ### App Store algorithm blockers
@@ -71,7 +79,7 @@
 | Orchestration | `Services/DiveManager.swift` |
 | Ascent limits | `Models/AscentRateLimits.swift`, `Models/AscentStatus.swift`, `Services/AscentRateSettingsStore.swift` |
 | Haptics | `Services/HapticService.swift`, `Services/AscentSafetyHapticCoordinator.swift`, `Services/DepthLimitHapticCoordinator.swift` |
-| GPS | `Services/GPSManager.swift`, `Utils/GPSFallbackPolicy.swift` (in `GPSManager.swift`) |
+| GPS | `Services/GPSManager.swift`, `Utils/GPSFallbackPolicy.swift` |
 | Compass | `Services/CompassManager.swift`, `DiveAlgorithm.normalizedDegrees` |
 | Persistence | `Services/DiveLogStore.swift`, `Models/DiveSession.swift` |
 | Sync | `Services/WatchDiveSyncCodec.swift`, `Utils/DiveSessionMerge.swift`, `Utils/DiveSessionAlgorithmValidator.swift` |
@@ -229,8 +237,8 @@ Haptics: caution 30s; critical 15s; exceeded 10s (`DepthLimitHapticCoordinator`)
 
 | ID | Sev | Family | Location | Title | Safety | Proposed fix | Impact |
 |----|-----|--------|----------|-------|--------|--------------|--------|
-| WMATH-MED-015 | MED | Depth pipeline | `DiveManager.processDepthMeasurement` | Duplicate `addSample` on auto dive start | Low — second call likely **rejected** (`deltaTime==0`); may flash error string | Remove unconditional trailing `addSample` or `return` after start branch | Small functional |
-| WMATH-LOW-016 | LOW | Depth input | `didUpdate measurement` | Temperature not passed into depth measurement path | Low — depth samples may lack contemporaneous temp | Pass sanitized temp from measurement when available | Small functional |
+| WMATH-MED-015 | MED | Depth pipeline | `DiveManager.processDepthMeasurement` | ~~Duplicate `addSample` on auto dive start~~ | **Fixed 2026-06-01** — `DiveDepthMeasurementIngestion` guard | — |
+| WMATH-LOW-016 | LOW | Depth input | `resolvedTemperatureForDepthSample` | ~~Temperature freshness vs wall clock~~ | **Fixed 2026-06-01** — compare depth timestamp to last temp reading | — |
 | WMATH-LOW-017 | LOW | Ascent UI | `AscentGaugeView` | Gauge keeps SwiftUI animation when Mission Mode disables Live animations | None | INFO — gauge animation independent by design | UI-only |
 | WMATH-INFO-018 | INFO | Mission Mode | `DiveLiveView` | Mission Mode disables blink/banner **animations** only | Low visual | Documented in UX audit; optional keep blink animation when alarms active | UI-only |
 | WMATH-INFO-019 | INFO | Product | TTV copy | TTV is not deco | N/A | Maintain disclaimers in legal/README | Copy-only |
@@ -375,7 +383,7 @@ None identified (project builds).
 
 ### 2. Must fix before internal TestFlight
 
-- WMATH-MED-015 duplicate `addSample` on auto start (avoid spurious error / sample confusion)
+- ~~WMATH-MED-015~~ fixed (see remediation update)
 
 ### 3. Must fix before external TestFlight
 
@@ -389,7 +397,7 @@ None identified (project builds).
 
 ### 5. Post-release
 
-- WMATH-LOW-016 temperature on depth callback  
+- ~~WMATH-LOW-016~~ fixed — temperature freshness vs depth sample time  
 - Integration tests for `DiveManager` orchestration  
 - Optional Mission Mode: preserve alarm blink animation (UX)
 
