@@ -793,6 +793,11 @@
 "planner.oxygen_exposure.a11y" = "CNS e OTU usano modelli NOAA con recupero superficie e limiti giornalieri, non guida certificata.";
 "planner.oxygen_exposure.daily_summary" = "Riferimento giornaliero: CNS %@%% · OTU 24h %@";
 "planner.oxygen_exposure.air_break_applied" = "Recupero CNS in pausa aria applicato dove PPO₂ ≤ 0,5 bar.";
+"planner.metric.cns_descent_bottom" = "CNS Discesa + Fondo";
+"planner.cns_descent_bottom.warning" = "Attenzione: il CNS accumulato durante discesa e fondo supera il 15% del budget massimo CNS.";
+"more.settings.cns_descent_bottom_check" = "Controllo CNS 15% discesa + fondo";
+"more.settings.cns_descent_bottom_check_hint" = "Se attivo, il planner evidenzia il CNS da discesa e fondo oltre il 15% del budget giornaliero di riferimento.";
+"more.settings.cns_descent_bottom_check.a11y" = "Attiva o disattiva l'avviso CNS discesa e fondo al quindici per cento nel planner.";
 "planner.result.warnings.title" = "AVVISI PIANO";
 "planner.header.reference_only.hint" = "Riferimento Bühlmann — non consiglio decompressivo certificato né comportamento di computer subacqueo in tempo reale.";
 "planner.header.no_deco.title" = "Riferimento no-deco";
