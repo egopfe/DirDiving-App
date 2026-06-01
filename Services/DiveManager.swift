@@ -36,6 +36,8 @@ final class DiveManager: NSObject, ObservableObject {
     @Published var isDepthAutomationAvailable = CMWaterSubmersionManager.waterSubmersionAvailable
     @Published var isManualLifecycleActive = false
     @Published private(set) var isMissionModeActive = false
+    @Published private(set) var missionModeActivationSource: MissionModeActivationSource?
+    @Published private(set) var missionModeManualPendingForSession = false
     @Published private(set) var depthSafetyState: DepthSafetyState = .normal
     @Published private(set) var exceededSupportedDepthRange = false
     @Published private(set) var isDepthDataStale = false
@@ -122,6 +124,10 @@ final class DiveManager: NSObject, ObservableObject {
 
     var missionModeRuntimeProfile: MissionModeRuntimeProfile {
         isMissionModeActive ? .mission : .standard
+    }
+
+    var missionModeWillActivateOnNextDive: Bool {
+        missionModeAutoEnableOnDiveStart || missionModeManualPendingForSession
     }
 
     init(logStore: DiveLogStore, gpsManager: GPSManager, ascentSettings: AscentRateSettingsStore) {
@@ -242,6 +248,7 @@ final class DiveManager: NSObject, ObservableObject {
         updateRuntimeFromClock(evaluateAlarms: false)
         gpsManager.start()
         startRuntimeTimer()
+        applyMissionModeIfNeededOnDiveStart(restored: true)
     }
 
     private func resetAutomaticLifecycleCandidates() {
@@ -792,12 +799,48 @@ final class DiveManager: NSObject, ObservableObject {
         }
     }
 
-    func applyMissionModeIfNeededOnDiveStart() {
-        isMissionModeActive = missionModeAutoEnableOnDiveStart
+    func applyMissionModeIfNeededOnDiveStart(restored: Bool = false) {
+        let shouldActivate = MissionModeLifecycle.shouldActivateRuntime(
+            autoEnablePreference: missionModeAutoEnableOnDiveStart,
+            manualPendingForSession: missionModeManualPendingForSession
+        )
+        isMissionModeActive = shouldActivate
+        missionModeActivationSource = MissionModeLifecycle.activationSource(
+            autoEnablePreference: missionModeAutoEnableOnDiveStart,
+            manualPendingForSession: missionModeManualPendingForSession,
+            restored: restored
+        )
+    }
+
+    func setMissionModeActive(_ active: Bool, source: MissionModeActivationSource) {
+        if active {
+            if isDiveActive {
+                isMissionModeActive = true
+                missionModeActivationSource = source
+            } else {
+                missionModeManualPendingForSession = true
+                isMissionModeActive = false
+                missionModeActivationSource = nil
+            }
+        } else {
+            missionModeManualPendingForSession = false
+            isMissionModeActive = false
+            missionModeActivationSource = nil
+        }
+    }
+
+    func enableMissionModeManually() {
+        setMissionModeActive(true, source: .manual)
+    }
+
+    func disableMissionModeManually() {
+        setMissionModeActive(false, source: .manual)
     }
 
     func deactivateMissionModeOnDiveEnd() {
         isMissionModeActive = false
+        missionModeManualPendingForSession = false
+        missionModeActivationSource = nil
     }
 }
 

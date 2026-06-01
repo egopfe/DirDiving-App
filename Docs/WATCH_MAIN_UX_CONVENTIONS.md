@@ -74,16 +74,17 @@ GPS start/end confirmation on current MAIN uses a **compact inline banner** that
 
 ## Mission Mode
 
-Mission Mode on current MAIN is a **runtime/UI optimization profile only** for active dives.
+Mission Mode on current MAIN is a **DIR DIVING internal runtime/UI optimization profile**. It is **not** Apple Watch system Low Power Mode.
 
 | Requirement | Policy |
 |-------------|--------|
-| Activation | Only after `isDiveActive == true` and only if the Watch setting **Auto-enable on dive start** is enabled |
-| Dive start paths | Both automatic depth-driven start and manual start paths are covered |
-| Deactivation | Automatic at dive end; persisted preference remains unchanged |
-| Allowed optimizations | Reduce non-essential animations, shadows, and decorative effects on existing Watch MAIN views |
-| Visual indicator | A very small static icon-only status mark may appear near the octopus icon in the live header, only while Mission Mode is active during an active dive |
-| Forbidden changes | No change to depth sampling, logging, ascent logic, warning logic, GPS lifecycle metadata, or dive calculations |
-| Layout | No redesign, no new large banners, no replacement of the existing live/compass layout |
+| Activation | After `isDiveActive == true` when auto-enable is on, manual pending from surface, manual toggle on Live, or draft restore with auto-enable on |
+| Dive start paths | Automatic depth-driven and manual start; active-dive draft restore re-applies when auto-enable is on |
+| Deactivation | Automatic at dive end; auto-enable preference unchanged; manual pending cleared |
+| Manual control | Surface: Settings enable/disable; active dive: compact bolt control on Live header (Settings shows hint) |
+| Allowed optimizations | Reduce non-essential animations and decorative shadows on Live and Compass only |
+| Visual indicator | Small bolt control near the octopus on Live during active dive (filled = on, outline = off) |
+| Forbidden changes | No change to depth sampling, logging, ascent logic, warning logic, alarm thresholds, haptics policy, GPS, or dive calculations |
+| Copy | Settings and Info must state Mission Mode does not enable Apple system Low Power Mode |
 
 Mission Mode must **not** suppress or delay safety-critical information. Depth, runtime, ascent warning state, supported-depth warnings, existing haptics, and other critical alerts remain active.

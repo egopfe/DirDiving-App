@@ -222,7 +222,6 @@ struct SettingsView: View {
                         informational: true
                     )
                     missionModeControl
-                        .disabled(dive.isDiveActive)
                     Toggle(isOn: $hapticsEnabled) {
                         settingsRow(
                             icon: "iphone.radiowaves.left.and.right",
@@ -393,6 +392,18 @@ struct SettingsView: View {
         )
     }
 
+    private var missionModeStatusText: String {
+        if dive.isDiveActive {
+            return dive.isMissionModeActive
+                ? String(localized: "settings.mission_mode.status.active")
+                : String(localized: "settings.mission_mode.status.inactive")
+        }
+        if dive.missionModeWillActivateOnNextDive {
+            return String(localized: "settings.mission_mode.status.will_auto")
+        }
+        return String(localized: "settings.mission_mode.status.inactive")
+    }
+
     private var missionModeControl: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 9) {
@@ -418,9 +429,53 @@ struct SettingsView: View {
                 Toggle("", isOn: $missionModeAutoEnableOnDiveStart)
                     .labelsHidden()
                     .tint(DiveUI.green)
+                    .disabled(dive.isDiveActive)
             }
 
-            Text(String(localized: "settings.mission_mode.footnote"))
+            settingsRow(
+                icon: "circle.fill",
+                iconColor: dive.isMissionModeActive ? DiveUI.green : DiveUI.secondaryText,
+                title: String(localized: "settings.mission_mode.status.title"),
+                subtitle: missionModeStatusText,
+                informational: true
+            )
+
+            if dive.isDiveActive {
+                Text(String(localized: "settings.mission_mode.live_hint"))
+                    .font(.system(size: 9, weight: .semibold, design: .rounded))
+                    .foregroundStyle(DiveUI.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else {
+                HStack(spacing: 6) {
+                    if dive.isMissionModeActive || dive.missionModeManualPendingForSession {
+                        missionModeActionButton(
+                            title: String(localized: "settings.mission_mode.disable_now"),
+                            tint: DiveUI.red
+                        ) {
+                            dive.disableMissionModeManually()
+                        }
+                    } else {
+                        missionModeActionButton(
+                            title: String(localized: "settings.mission_mode.enable_now"),
+                            tint: DiveUI.green
+                        ) {
+                            dive.enableMissionModeManually()
+                        }
+                    }
+                }
+            }
+
+            Text(String(localized: "settings.mission_mode.effects"))
+                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .foregroundStyle(DiveUI.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text(String(localized: "settings.mission_mode.safety_note"))
+                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .foregroundStyle(DiveUI.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text(String(localized: "settings.mission_mode.apple_lpm_disclaimer"))
                 .font(.system(size: 9, weight: .semibold, design: .rounded))
                 .foregroundStyle(DiveUI.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
@@ -435,6 +490,25 @@ struct SettingsView: View {
                         .stroke(.white.opacity(0.24), lineWidth: 1)
                 )
         )
+    }
+
+    private func missionModeActionButton(title: String, tint: Color, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 10, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 6)
+                .background(
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(tint.opacity(0.35))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                .stroke(tint.opacity(0.65), lineWidth: 1)
+                        )
+                )
+        }
+        .buttonStyle(.plain)
     }
 
     private var header: some View {
