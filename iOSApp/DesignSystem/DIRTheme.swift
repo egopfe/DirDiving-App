@@ -14,4 +14,14 @@ enum DIRTheme {
     static let hairline = Color.white.opacity(0.14)
     static let cardRadius: CGFloat = 16
     static let compactRadius: CGFloat = 10
+
+    // Spacing scale (iOS Companion)
+    static let spaceXS: CGFloat = 4
+    static let spaceS: CGFloat = 8
+    static let spaceM: CGFloat = 12
+    static let spaceL: CGFloat = 16
+    static let spaceXL: CGFloat = 24
+    static let screenPadding: CGFloat = 16
+    static let cardPadding: CGFloat = 16
+    static let buttonMinHeight: CGFloat = 44
 }

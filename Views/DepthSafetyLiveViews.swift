@@ -38,14 +38,14 @@ struct DepthSafetyBannerView: View {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.system(size: 13, weight: .black))
                 Text(title)
-                    .font(.system(size: 11, weight: .black, design: .rounded))
+                    .font(DiveUI.Typography.bannerTitle)
                     .lineLimit(3)
                     .minimumScaleFactor(0.72)
                     .fixedSize(horizontal: false, vertical: true)
             }
             if let subtitle {
                 Text(subtitle)
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .font(DiveUI.Typography.bannerSubtitle)
                     .lineLimit(2)
                     .minimumScaleFactor(0.72)
             }

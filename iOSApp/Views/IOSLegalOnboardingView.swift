@@ -88,8 +88,9 @@ struct IOSLegalOnboardingView: View {
                         .font(.system(size: 26, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                     Text("Before using the app, review and accept the safety disclaimer.")
-                        .font(.body)
+                        .font(DIRTypography.body)
                         .foregroundStyle(DIRTheme.muted)
+                        .lineSpacing(DIRTypography.bodyLineSpacing)
                     safetyBadge
                 }
             }
@@ -129,9 +130,7 @@ struct IOSLegalOnboardingView: View {
                 VStack(alignment: .leading, spacing: 14) {
                     LegalDisclaimerScrollGate(reachedBottom: $disclaimerReachedBottom, maxHeight: 280) {
                         Text(legalAcceptance.disclaimerText(languageCode: languageCode))
-                            .font(.callout.weight(.medium))
-                            .foregroundStyle(.white.opacity(0.9))
-                            .fixedSize(horizontal: false, vertical: true)
+                            .dirLegalBodyStyle()
                     }
 
                     if !disclaimerReachedBottom {
@@ -272,8 +271,7 @@ struct IOSLegalSafetyView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading, spacing: 6) {
                         Text(String(localized: "Legal & Safety"))
-                            .font(.system(size: 30, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
+                            .dirScreenTitleStyle()
                         Text("DIR Diving is NOT a dive computer.")
                             .font(.headline.weight(.bold))
                             .foregroundStyle(DIRTheme.red)
@@ -287,9 +285,7 @@ struct IOSLegalSafetyView: View {
 
                     DIRCard(String(localized: "Full disclaimer"), icon: "doc.text.magnifyingglass", accent: DIRTheme.yellow) {
                         Text(legalAcceptance.disclaimerText(languageCode: languageCode))
-                            .font(.callout.weight(.medium))
-                            .foregroundStyle(.white.opacity(0.9))
-                            .fixedSize(horizontal: false, vertical: true)
+                            .dirLegalBodyStyle()
                     }
 
                     DIRCard(String(localized: "Terms & Privacy"), icon: "link", accent: DIRTheme.cyan) {
