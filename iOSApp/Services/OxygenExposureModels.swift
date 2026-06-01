@@ -9,6 +9,17 @@ enum OxygenExposureWarningState: Hashable, Error {
     case invalidExposureInput
 }
 
+/// Planner-only informational rule: CNS accumulated on descent + bottom vs daily budget reference.
+enum CNSDescentBottomPlannerRule {
+    static let maximumDailyCNSBudgetPercent = 100.0
+    static let warningThresholdPercent = 15.0
+
+    static func exceedsPlannerThreshold(percent: Double) -> Bool {
+        guard percent.isFinite else { return false }
+        return percent > warningThresholdPercent
+    }
+}
+
 /// Carry-over state for repetitive / multi-dive oxygen exposure planning.
 struct OxygenExposureCarryover: Codable, Hashable {
     let cnsSinglePercent: Double
@@ -204,6 +215,16 @@ struct OxygenExposureModel: Hashable {
 
     static func from(segments: [BuhlmannRuntimeSegment], environment: PlannerEnvironment) -> Result<OxygenExposureModel, OxygenExposureWarningState> {
         from(segments: segments, environment: environment, carryover: .zero).map(asLegacyModel)
+    }
+
+    /// CNS% from descent and bottom segments only (same integration model; no carryover; excludes ascent/deco/gas switches).
+    static func cnsPercentDescentAndBottom(
+        segments: [BuhlmannRuntimeSegment],
+        environment: PlannerEnvironment
+    ) -> Result<Double, OxygenExposureWarningState> {
+        let filtered = segments.filter { $0.kind == .descent || $0.kind == .bottom }
+        guard !filtered.isEmpty else { return .success(0) }
+        return from(segments: filtered, environment: environment, carryover: .zero).map(\.cnsSinglePercent)
     }
 
     static func from(
