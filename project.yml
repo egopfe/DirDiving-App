@@ -17,6 +17,8 @@ targets:
       - Utils
       # Explicit membership for algorithm/runtime core (prevents stale-xcodeproj "not in scope" errors).
       - Utils/MissionModeRuntimeProfile.swift
+      - Utils/DiveDepthMeasurementIngestion.swift
+      - Utils/GPSFallbackPolicy.swift
       - Utils/WatchNavigationHints.swift
       - Utils/DiveSessionPersistenceClass.swift
       - Utils/DepthSampleValidation.swift
@@ -78,6 +80,25 @@ targets:
     sources:
       - Tests/WatchAlgorithmTests
       - Utils/MissionModeRuntimeProfile.swift
+      - Utils/DiveDepthMeasurementIngestion.swift
+      - Utils/GPSFallbackPolicy.swift
+      - Services/DiveManager.swift
+      - Services/DiveLogStore.swift
+      - Services/AscentRateSettingsStore.swift
+      - Services/GPSManager.swift
+      - Services/HapticService.swift
+      - Services/AscentSafetyHapticCoordinator.swift
+      - Services/DepthLimitHapticCoordinator.swift
+      - Services/CloudSyncStore.swift
+      - Services/WatchSyncService.swift
+      - Services/WatchSyncAuth.swift
+      - Services/WatchDiveSyncCodec.swift
+      - Utils/CloudSyncNotifications.swift
+      - Utils/WatchSyncKeys.swift
+      - Utils/WatchSyncNotifications.swift
+      - Utils/Formatters.swift
+      - Utils/WatchAlarmDefaults.swift
+      - Utils/WatchDepthFormatting.swift
       - Models/DiveSample.swift
       - Models/DiveSession.swift
       - Models/GPSPoint.swift
@@ -88,7 +109,6 @@ targets:
       - Utils/DepthSafetyConfiguration.swift
       - Utils/DiveAlgorithmConfiguration.swift
       - Utils/DiveLogbookPolicy.swift
-      - Services/GPSManager.swift
       - Utils/DepthSampleValidation.swift
       - Utils/DiveLifecycleAlgorithm.swift
       - Utils/DiveSessionAlgorithmValidator.swift
@@ -106,6 +126,10 @@ targets:
         DEVELOPMENT_TEAM: C6FKKPB6A9
     dependencies:
       - sdk: XCTest.framework
+      - sdk: WatchKit.framework
+      - sdk: WatchConnectivity.framework
+      - sdk: CoreLocation.framework
+      - sdk: CoreMotion.framework
   DIRDiving iOS Algorithm Tests:
     type: bundle.unit-test
     platform: iOS
