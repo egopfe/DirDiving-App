@@ -193,6 +193,7 @@ targets:
       - iOSApp/Utils/IOSAlgorithmConfiguration.swift
       - iOSApp/Utils/IOSDiveLogbookPolicy.swift
       - iOSApp/Utils/IOSUnitConversions.swift
+      - iOSApp/Utils/Formatters.swift
       - iOSApp/Utils/PlannerInputValidator.swift
       - iOSApp/Utils/PlannerCNSDescentBottomCheckSettings.swift
       - iOSApp/Utils/PlanCalculationCompleteness.swift
@@ -201,6 +202,10 @@ targets:
       - iOSApp/Utils/CloudSyncNotifications.swift
       - iOSApp/Utils/WatchSyncNotifications.swift
       - iOSApp/Utils/WatchSyncKeys.swift
+      - iOSApp/Utils/AnalysisDashboardMath.swift
+      - iOSApp/Utils/ManualDiveEditorDefaults.swift
+      - iOSApp/Utils/RouteSummaryAggregation.swift
+      - iOSApp/Utils/PressureDisplayMath.swift
     resources:
       - path: Tests/iOSAlgorithmTests/Fixtures
         type: folder

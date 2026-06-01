@@ -123,6 +123,18 @@ enum CNSRecoveryModel {
     }
 }
 
+enum OxygenExposureDisplay {
+    static let cnsDisplayCapPercent = 300.0
+
+    static func formatCNSPercent(_ value: Double) -> String {
+        guard value.isFinite else { return "—" }
+        if value >= cnsDisplayCapPercent - 0.5 {
+            return ">300%"
+        }
+        return Formatters.one(value)
+    }
+}
+
 /// NOAA REPEX / Hamilton pulmonary OTU daily and weekly planning limits.
 enum OTUREPEXLimits {
     static let singleDiveElevatedOTU = 300.0

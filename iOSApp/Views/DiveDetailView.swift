@@ -379,15 +379,11 @@ struct DiveDetailView: View {
     }
 
     private var pressureFootnote: String? {
-        let entry = session.entryPressureText?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        let exit = session.exitPressureText?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        guard !entry.isEmpty, !exit.isEmpty,
-              let entryValue = Double(entry.replacingOccurrences(of: ",", with: ".")),
-              let exitValue = Double(exit.replacingOccurrences(of: ",", with: ".")) else {
-            return nil
-        }
-        let consumed = max(0, entryValue - exitValue)
-        return String(format: String(localized: "detail.gas.consumed_format"), Formatters.one(consumed))
+        PressureDisplayMath.consumedDisplay(
+            entryText: session.entryPressureText ?? "",
+            exitText: session.exitPressureText ?? "",
+            units: unitPreference
+        )
     }
 
     private var temperatureText: String {

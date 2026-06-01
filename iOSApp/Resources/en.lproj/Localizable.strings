@@ -597,8 +597,16 @@
 "planner.team.available_gas_format" = "%@ L";
 "planner.briefing.title" = "BRIEFING";
 "planner.buhlmann.curve_title" = "BUHLMANN ZH-L16C CURVE";
-"planner.buhlmann.curve_disclaimer" = "Illustrative NDL curve only — the Y axis is a cosmetic compartment grouping, not tissue loading or ceiling.";
-"planner.result.calculation_incomplete" = "Decompression schedule incomplete — partial stops were suppressed because the engine did not converge.";
+"planner.buhlmann.curve_disclaimer" = "Reference NDL curve from the Bühlmann engine (non-certified). Depth vs NDL minutes; not tissue loading or a certified decompression plan.";
+"planner.buhlmann.axis.depth" = "Depth (m)";
+"planner.buhlmann.axis.ndl" = "NDL (min)";
+"planner.result.calculation_incomplete" = "Incomplete calculation";
+"planner.result.calculation_incomplete.detail" = "Stops are not shown because the calculation limit was reached. Do not use this result as a dive plan.";
+"planner.result.calculation_incomplete.recovery" = "Try reducing depth, bottom time, gradient factors, or gas complexity.";
+"planner.ndl.reference_ascent_footnote" = "NDL uses a fixed 9 m/min reference ascent in the engine; your ascent-rate setting applies to the deco schedule.";
+"planner.gas.bottom_phase_estimate_footnote" = "Consumption estimate covers bottom phase only until a full plan is calculated.";
+"planner.gas.turn_pressure_rule_footnote" = "Turn pressure is a reference rule-of-thumb (half of usable gas above rock bottom), not a certified procedure.";
+"analysis.metric.bearing_first_of_many" = "Bearing (1st of %d)";
 "planner.result.deco_stops" = "Deco stops";
 "planner.export.deco_stop_line" = "  %@ · %d min · %@ · PPO2 %@";
 "planner.table.surface" = "SURFACE";
@@ -786,7 +794,7 @@
 "planner.gas_ledger.warning.minimum.message" = "%@ remaining gas is below the modeled minimum gas requirement.";
 "planner.gas_ledger.warning.minimum.hint" = "Review rock-bottom assumptions and emergency SAC settings.";
 "planner.gas_ledger.warning.lost_gas.title" = "Lost-gas contingency";
-"planner.gas_ledger.warning.lost_gas.message" = "%@ may not cover the lost-gas contingency margin.";
+"planner.gas_ledger.warning.lost_gas.message" = "%@ may not cover the lost-gas rule-of-thumb margin (30%% of consumed gas vs reserve).";
 "planner.gas_ledger.warning.lost_gas.hint" = "Treat this as a planning warning only; verify with team procedures.";
 "planner.gas_ledger.warning.allocation.title" = "Allocation incomplete";
 "planner.gas_ledger.warning.allocation.message" = "%@ could not be fully allocated across cylinders.";

@@ -469,7 +469,7 @@ struct PlannerView: View {
                 HStack(spacing: 0) {
                     DIRMetricTile(title: "EAD", value: eadMeasurement?.value ?? "-", unit: eadMeasurement?.unit, color: DIRTheme.cyan)
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: "CNS", value: Formatters.zero(store.analysis.cnsPercent), unit: "%", color: store.analysis.cnsPercent > 80 ? DIRTheme.red : DIRTheme.cyan)
+                    DIRMetricTile(title: "CNS", value: store.analysis.cnsPercentDisplay, unit: "%", color: store.analysis.cnsPercent > 80 ? DIRTheme.red : DIRTheme.cyan)
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: "OTU", value: Formatters.zero(store.analysis.otu), color: DIRTheme.cyan)
                 }
@@ -509,6 +509,16 @@ struct PlannerView: View {
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: String(localized: "planner.metric.turn_pressure"), value: Formatters.zero(store.analysis.turnPressureBar), unit: "bar", color: DIRTheme.cyan)
                 }
+                if store.analysis.usesBottomPhaseConsumptionEstimate {
+                    Text(String(localized: "planner.gas.bottom_phase_estimate_footnote"))
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.muted)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                Text(String(localized: "planner.gas.turn_pressure_rule_footnote"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
     }
@@ -877,10 +887,7 @@ struct PlanResultView: View {
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
             if store.plan.calculationCompleteness == .incompletePartialStops {
-                Text(String(localized: "planner.result.calculation_incomplete"))
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(DIRTheme.red)
-                    .fixedSize(horizontal: false, vertical: true)
+                incompleteCalculationBanner
             }
             if store.plan.repetitiveContext?.tissueStateApplied == true {
                 Text(String(localized: "planner.repetitive.result_badge"))
@@ -904,6 +911,33 @@ struct PlanResultView: View {
         )
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(header.title). \(header.subtitle)")
+    }
+
+    private var incompleteCalculationBanner: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(String(localized: "planner.result.calculation_incomplete"))
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(DIRTheme.red)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(String(localized: "planner.result.calculation_incomplete.detail"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(String(localized: "planner.result.calculation_incomplete.recovery"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(10)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(DIRTheme.red.opacity(0.12))
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.red.opacity(0.45), lineWidth: 1))
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(
+            "\(String(localized: "planner.result.calculation_incomplete")) \(String(localized: "planner.result.calculation_incomplete.detail"))"
+        )
     }
 
     @ViewBuilder
@@ -1146,8 +1180,17 @@ struct PlanResultView: View {
                 Divider().overlay(DIRTheme.hairline)
                 DIRMetricTile(title: String(localized: "planner.result.bottom_time"), value: Formatters.zero(store.input.plannedBottomMinutes), unit: "min")
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: "CNS%", value: Formatters.zero(store.plan.cnsPercent), unit: "%")
+                DIRMetricTile(title: "CNS%", value: store.plan.gasAnalysis.cnsPercentDisplay, unit: "%")
             }
+            Divider().overlay(DIRTheme.hairline)
+            HStack(spacing: 0) {
+                DIRMetricTile(title: "NDL", value: Formatters.one(store.plan.ndlMinutes), unit: "min")
+            }
+            Text(String(localized: "planner.ndl.reference_ascent_footnote"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 4)
             Divider().overlay(DIRTheme.hairline)
             HStack(spacing: 0) {
                 DIRMetricTile(
@@ -1219,10 +1262,7 @@ struct PlanResultView: View {
     private var ascentTable: some View {
         DIRCard(String(localized: "planner.result.ascent_plan"), icon: nil, accent: DIRTheme.cyan) {
             if store.plan.calculationCompleteness == .incompletePartialStops {
-                Text(String(localized: "planner.result.calculation_incomplete"))
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(DIRTheme.red)
-                    .fixedSize(horizontal: false, vertical: true)
+                incompleteCalculationBanner
             } else {
                 VStack(spacing: 9) {
                     tableRow([
@@ -1379,8 +1419,8 @@ struct PlanResultView: View {
                     .fixedSize(horizontal: false, vertical: true)
                 Chart(store.buhlmann.curve) { point in
                     LineMark(
-                        x: .value("Minutes", point.ndlMinutes),
-                        y: .value("Load", max(0, 100 - point.depthMeters * 1.5)),
+                        x: .value(String(localized: "planner.buhlmann.axis.depth"), point.depthMeters),
+                        y: .value(String(localized: "planner.buhlmann.axis.ndl"), point.ndlMinutes),
                         series: .value("Compartimenti", point.compartmentGroup)
                     )
                     .lineStyle(StrokeStyle(lineWidth: 2))
@@ -1388,9 +1428,11 @@ struct PlanResultView: View {
                 .chartXAxis {
                     AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
                 }
+                .chartXAxisLabel(String(localized: "planner.buhlmann.axis.depth"))
                 .chartYAxis {
                     AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
                 }
+                .chartYAxisLabel(String(localized: "planner.buhlmann.axis.ndl"))
                 .frame(height: 220)
             }
         }
