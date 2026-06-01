@@ -196,7 +196,6 @@
 "Errore import iPhone: %@" = "iPhone import error: %@";
 "Tombstone iPhone applicata (%lld)" = "iPhone tombstone applied (%lld)";
 "Delivered/acknowledged: ack firmato dal companion" = "Delivered/acknowledged: signed ack from companion";
-"Delivered/acknowledged: ack legacy (companion da aggiornare)" = "Delivered/acknowledged: legacy ack (update companion)";
 "Failed: iPhone non ha confermato import; pending conservato" = "Failed: iPhone did not confirm import; pending kept";
 "Failed: diretto non riuscito; sent via coda, ack pending: %@" = "Failed: direct send failed; sent via queue, ack pending: %@";
 "Sent: messaggio diretto inviato, attendo ack" = "Sent: direct message sent, awaiting ack";
@@ -676,11 +675,11 @@
 "planner.field.avg_depth" = "Average depth";
 "planner.field.planning_reference" = "Planning reference";
 "planner.reference.max_depth" = "Maximum depth";
-"planner.reference.avg_depth" = "Average depth";
+"planner.reference.avg_depth" = "Average depth (consumption)";
 "planner.emergency_gas.max_depth_rule" = "Emergency gas is always calculated using maximum depth (not editable).";
 "planner.reference.info.title" = "Planning reference";
-"planner.reference.info.message" = "The planning reference can use average or maximum depth. For safety reasons, emergency gas is always calculated using maximum depth.";
-"planner.reference.helper" = "Emergency gas and ascent always use maximum depth.";
+"planner.reference.info.message" = "Average depth affects gas consumption summaries only. MOD checks, Buhlmann safety calculations, emergency gas, and ascent always use planned maximum depth.";
+"planner.reference.helper" = "MOD, Buhlmann safety, emergency gas, and ascent always use maximum depth.";
 "planner.result.reference_depth" = "Reference depth: %@";
 "planner.result.reference_depth.max" = "Maximum";
 "planner.result.reference_depth.average" = "Average";

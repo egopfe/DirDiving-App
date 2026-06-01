@@ -46,6 +46,14 @@ final class CloudSyncStore: ObservableObject {
         cloudStore.data(forKey: key)
     }
 
+    func removeValue(forKey key: String) {
+        defaults.removeObject(forKey: key)
+        defaults.removeObject(forKey: modifiedAtKey(for: key))
+        cloudStore.removeObject(forKey: key)
+        cloudStore.removeObject(forKey: modifiedAtKey(for: key))
+        synchronize()
+    }
+
     func decodeLocal<T: Decodable>(_ type: T.Type, from data: Data) -> T? {
         decode(type, from: data, key: "local", source: String(localized: "cloud.source.local"))
     }

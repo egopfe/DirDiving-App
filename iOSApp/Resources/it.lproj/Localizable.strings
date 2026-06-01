@@ -196,7 +196,6 @@
 "Errore import iPhone: %@" = "iPhone import error: %@";
 "Tombstone iPhone applicata (%lld)" = "iPhone tombstone applied (%lld)";
 "Delivered/acknowledged: ack firmato dal companion" = "Delivered/acknowledged: signed ack from companion";
-"Delivered/acknowledged: ack legacy (companion da aggiornare)" = "Delivered/acknowledged: legacy ack (update companion)";
 "Failed: iPhone non ha confermato import; pending conservato" = "Failed: iPhone non ha confermato import; pending conservato";
 "Failed: diretto non riuscito; sent via coda, ack pending: %@" = "Failed: diretto non riuscito; sent via coda, ack pending: %@";
 "Sent: messaggio diretto inviato, attendo ack" = "Sent: direct message sent, awaiting ack";
@@ -674,11 +673,11 @@
 "planner.field.avg_depth" = "Profondità media";
 "planner.field.planning_reference" = "Riferimento pianificazione";
 "planner.reference.max_depth" = "Profondità massima";
-"planner.reference.avg_depth" = "Profondità media";
+"planner.reference.avg_depth" = "Profondità media (consumi)";
 "planner.emergency_gas.max_depth_rule" = "Il gas di emergenza è sempre calcolato con la profondità massima (non modificabile).";
 "planner.reference.info.title" = "Riferimento pianificazione";
-"planner.reference.info.message" = "Il riferimento di pianificazione può utilizzare profondità media o massima. Per motivi di sicurezza, il gas di emergenza viene sempre calcolato utilizzando la profondità massima.";
-"planner.reference.helper" = "Gas di emergenza e risalita usano sempre la profondità massima.";
+"planner.reference.info.message" = "La profondità media modifica solo i riepiloghi di consumo gas. Controlli MOD, sicurezza Buhlmann, gas di emergenza e risalita usano sempre la profondità massima pianificata.";
+"planner.reference.helper" = "MOD, sicurezza Buhlmann, gas di emergenza e risalita usano sempre la profondità massima.";
 "planner.result.reference_depth" = "Profondità di riferimento: %@";
 "planner.result.reference_depth.max" = "Massima";
 "planner.result.reference_depth.average" = "Media";
