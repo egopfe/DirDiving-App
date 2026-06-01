@@ -1222,6 +1222,29 @@ struct PlanResultView: View {
                 .accessibilityElement(children: .combine)
             }
             Divider().overlay(DIRTheme.hairline)
+            HStack(spacing: 0) {
+                DIRMetricTile(
+                    title: String(localized: "planner.metric.cns_descent_bottom"),
+                    value: Formatters.zero(store.plan.gasAnalysis.cnsDescentBottomPercent),
+                    unit: "%",
+                    color: cnsDescentBottomWarningActive ? DIRTheme.red : DIRTheme.cyan,
+                    icon: cnsDescentBottomWarningActive ? "exclamationmark.triangle.fill" : nil
+                )
+            }
+            if cnsDescentBottomWarningActive {
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(DIRTheme.red)
+                    Text(String(localized: "planner.cns_descent_bottom.warning"))
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(DIRTheme.red)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.horizontal, 12)
+                .accessibilityElement(children: .combine)
+            }
+            Divider().overlay(DIRTheme.hairline)
             VStack(spacing: 4) {
                 Text(String(localized: "planner.oxygen_exposure.disclaimer"))
                     .font(.caption2)
