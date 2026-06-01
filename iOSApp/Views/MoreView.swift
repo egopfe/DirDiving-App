@@ -9,6 +9,7 @@ struct MoreView: View {
     @EnvironmentObject private var logStore: DiveLogStore
     @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
     @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
+    @AppStorage(PlannerCNSDescentBottomCheckSettings.storageKey) private var cnsDescentBottomCheckEnabled = PlannerCNSDescentBottomCheckSettings.defaultEnabled
     @State private var showResetPairingConfirm = false
 
     var body: some View {
@@ -31,6 +32,7 @@ struct MoreView: View {
                             row(String(localized: "units.title"), String(localized: "more.settings.units_synced"))
                             row(String(localized: "more.settings.local_only_title"), String(localized: "more.settings.local_only_value"))
                             row(String(localized: "more.planner_safety.title"), String(localized: "more.disclaimer.required"))
+                            cnsDescentBottomCheckToggle
                             NavigationLink {
                                 IOSLegalSafetyView()
                             } label: {
@@ -200,6 +202,22 @@ struct MoreView: View {
         .onChange(of: units) { _, newValue in
             watchSync.pushUnitsPreference(newValue)
         }
+    }
+
+    private var cnsDescentBottomCheckToggle: some View {
+        Toggle(isOn: $cnsDescentBottomCheckEnabled) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(String(localized: "more.settings.cns_descent_bottom_check"))
+                    .foregroundStyle(.white)
+                Text(String(localized: "more.settings.cns_descent_bottom_check_hint"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .tint(DIRTheme.cyan)
+        .padding(.vertical, 4)
+        .accessibilityHint(Text(String(localized: "more.settings.cns_descent_bottom_check.a11y")))
     }
 
     private var languagePreferencePicker: some View {

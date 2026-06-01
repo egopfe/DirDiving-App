@@ -794,8 +794,13 @@ struct PlannerView: View {
 struct PlanResultView: View {
     @EnvironmentObject private var store: PlannerStore
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
+    @AppStorage(PlannerCNSDescentBottomCheckSettings.storageKey) private var cnsDescentBottomCheckEnabled = PlannerCNSDescentBottomCheckSettings.defaultEnabled
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
+
+    private var cnsDescentBottomWarningActive: Bool {
+        store.plan.gasAnalysis.cnsDescentBottomExceedsPlannerThreshold(checkEnabled: cnsDescentBottomCheckEnabled)
+    }
 
     private func depthText(_ meters: Double) -> String {
         Formatters.depth(meters, units: unitPreference).text
@@ -1192,6 +1197,29 @@ struct PlanResultView: View {
                 DIRMetricTile(title: String(localized: "planner.result.bottom_time"), value: Formatters.zero(store.input.plannedBottomMinutes), unit: "min")
                 Divider().overlay(DIRTheme.hairline)
                 resultMetric("CNS%", value: Formatters.zero(store.plan.cnsPercent), unit: "%")
+            }
+            Divider().overlay(DIRTheme.hairline)
+            HStack(spacing: 0) {
+                DIRMetricTile(
+                    title: String(localized: "planner.metric.cns_descent_bottom"),
+                    value: Formatters.zero(store.plan.gasAnalysis.cnsDescentBottomPercent),
+                    unit: "%",
+                    color: cnsDescentBottomWarningActive ? DIRTheme.red : DIRTheme.cyan,
+                    icon: cnsDescentBottomWarningActive ? "exclamationmark.triangle.fill" : nil
+                )
+            }
+            if cnsDescentBottomWarningActive {
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(DIRTheme.red)
+                    Text(String(localized: "planner.cns_descent_bottom.warning"))
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(DIRTheme.red)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.horizontal, 12)
+                .accessibilityElement(children: .combine)
             }
             Divider().overlay(DIRTheme.hairline)
             VStack(spacing: 4) {
