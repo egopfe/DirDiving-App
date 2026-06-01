@@ -55,7 +55,8 @@ Primary Watch algorithm and service files:
 - `Services/AscentSafetyHapticCoordinator.swift`
 - `Services/DepthLimitHapticCoordinator.swift`
 - `Services/HapticService.swift`
-- `Services/MissionModeService.swift`
+- `Services/DiveManager.swift` (Mission Mode lifecycle)
+- `Utils/MissionModeRuntimeProfile.swift`
 - `Services/SettingsStore.swift`
 - `Services/AlarmSettingsStore.swift`
 - `Services/AscentSettingsStore.swift`
@@ -252,7 +253,7 @@ Assessment: good. Remaining limitation: fallback points do not have explicit max
 
 ### Mission Mode
 
-Implemented by `MissionModeService` and `MissionModeRuntimeProfile`.
+Implemented by `DiveManager` and `MissionModeRuntimeProfile` (UI/runtime only; no dive math changes).
 
 Behavior observed:
 
