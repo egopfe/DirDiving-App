@@ -578,10 +578,16 @@ final class DiveManager: NSObject, ObservableObject {
         clearActiveDiveDraft()
     }
 
-    private func processDepthMeasurement(rawDepthMeters: Double?, timestamp: Date = Date(), temperatureCelsius: Double?) {
+    private func processDepthMeasurement(
+        rawDepthMeters: Double?,
+        timestamp: Date = Date(),
+        receivedAt: Date? = nil,
+        temperatureCelsius: Double?
+    ) {
         let validated = depthValidationState.validate(
             rawDepthMeters: rawDepthMeters,
             timestamp: timestamp,
+            receivedAt: receivedAt ?? Date(),
             temperatureCelsius: temperatureCelsius
         )
         guard let sample = validated.sample else {
@@ -589,23 +595,34 @@ final class DiveManager: NSObject, ObservableObject {
             return
         }
 
+        var sampleAddedInPreDiveBranch = false
         if !isDiveActive {
             currentDepthMeters = sample.depthMeters
             currentTemperatureCelsius = resolvedTemperatureForDepthSample(sample.temperatureCelsius, at: sample.timestamp)
-            guard evaluateLifecycle(with: validated) == .startDive else { return }
-            beginDiveIfNeeded(isManual: false, sessionStart: sample.timestamp)
-            addSample(
-                depthMeters: sample.depthMeters,
-                timestamp: sample.timestamp,
-                temperatureCelsius: resolvedTemperatureForDepthSample(sample.temperatureCelsius, at: sample.timestamp)
-            )
+            if evaluateLifecycle(with: validated) == .startDive {
+                beginDiveIfNeeded(isManual: false, sessionStart: sample.timestamp)
+                addSample(
+                    depthMeters: sample.depthMeters,
+                    timestamp: sample.timestamp,
+                    temperatureCelsius: resolvedTemperatureForDepthSample(sample.temperatureCelsius, at: sample.timestamp)
+                )
+                sampleAddedInPreDiveBranch = true
+            }
         } else if isManualLifecycleActive,
                   sample.depthMeters > DiveAlgorithmConfiguration.automaticStartDepthMeters {
             hasObservedSubmersionDuringCurrentDive = true
             isManualLifecycleActive = false
         }
 
-        addSample(depthMeters: sample.depthMeters, timestamp: sample.timestamp, temperatureCelsius: sample.temperatureCelsius)
+        guard DiveDepthMeasurementIngestion.shouldInvokeAddSampleAfterPreDiveBranch(
+            sampleAddedInPreDiveBranch: sampleAddedInPreDiveBranch
+        ) else { return }
+
+        addSample(
+            depthMeters: sample.depthMeters,
+            timestamp: sample.timestamp,
+            temperatureCelsius: resolvedTemperatureForDepthSample(temperatureCelsius, at: sample.timestamp)
+        )
     }
 
     private func depthValidationMessage(_ validity: DepthSampleValidity) -> String {
@@ -677,9 +694,8 @@ final class DiveManager: NSObject, ObservableObject {
     }
 
     private func resolvedTemperatureForDepthSample(_ temperatureCelsius: Double?, at timestamp: Date) -> Double? {
-        let receivedAt = Date()
         if let lastTemperatureSampleAt {
-            guard receivedAt.timeIntervalSince(lastTemperatureSampleAt) <= DiveAlgorithmConfiguration.staleTemperatureSeconds else {
+            guard timestamp.timeIntervalSince(lastTemperatureSampleAt) <= DiveAlgorithmConfiguration.staleTemperatureSeconds else {
                 return nil
             }
         }
@@ -894,5 +910,43 @@ extension DiveManager: CMWaterSubmersionManagerDelegate {
 
     nonisolated func manager(_ manager: CMWaterSubmersionManager, errorOccurred error: Error) {
         Task { @MainActor in lastErrorMessage = error.localizedDescription }
+    }
+}
+
+// MARK: - Algorithm test hooks (Watch algorithm test target, @testable)
+
+extension DiveManager {
+    var testHook_sampleCount: Int { samples.count }
+
+    var testHook_samples: [DiveSample] { samples }
+
+    var testHook_lastErrorMessage: String? { lastErrorMessage }
+
+    var testHook_isDepthDataStale: Bool { isDepthDataStale }
+
+    func testHook_processDepthMeasurement(
+        rawDepthMeters: Double?,
+        timestamp: Date = Date(),
+        temperatureCelsius: Double? = nil
+    ) {
+        processDepthMeasurement(
+            rawDepthMeters: rawDepthMeters,
+            timestamp: timestamp,
+            receivedAt: timestamp,
+            temperatureCelsius: temperatureCelsius
+        )
+    }
+
+    func testHook_setDepthAutomationAvailableForTests(_ available: Bool) {
+        isDepthAutomationAvailable = available
+    }
+
+    func testHook_setCurrentTemperatureForTests(_ celsius: Double?, receivedAt: Date = Date()) {
+        currentTemperatureCelsius = DiveAlgorithm.sanitizedTemperatureCelsius(celsius)
+        lastTemperatureSampleAt = celsius == nil ? nil : receivedAt
+    }
+
+    func testHook_evaluateDepthCallbackFreshness(at date: Date) {
+        evaluateDepthCallbackFreshness(now: date)
     }
 }
