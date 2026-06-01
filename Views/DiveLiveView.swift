@@ -180,7 +180,7 @@ struct DiveLiveView: View {
     }
 
     private var depthStaleBanner: some View {
-        inlineStatusBanner(
+        DiveInlineStatusBanner(
             systemImage: "waveform.path.ecg.rectangle",
             title: String(localized: "live.depth.stale.title"),
             detail: dive.depthDataUsesLastKnownReading
@@ -191,36 +191,11 @@ struct DiveLiveView: View {
     }
 
     private var manualNoDepthBanner: some View {
-        inlineStatusBanner(
+        DiveInlineStatusBanner(
             systemImage: "hand.tap.fill",
             title: String(localized: "live.manual.nodepth.title"),
             detail: String(localized: "live.manual.nodepth.body"),
             color: DiveUI.cyan
-        )
-    }
-
-    private func inlineStatusBanner(systemImage: String, title: String, detail: String, color: Color) -> some View {
-        HStack(spacing: 7) {
-            Image(systemName: systemImage)
-                .font(.system(size: 14, weight: .black))
-            VStack(alignment: .leading, spacing: 1) {
-                Text(title)
-                    .font(.system(size: 10, weight: .black, design: .rounded))
-                Text(detail)
-                    .font(.system(size: 9, weight: .semibold, design: .rounded))
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.66)
-            }
-            Spacer(minLength: 0)
-        }
-        .foregroundStyle(color)
-        .padding(.horizontal, 8)
-        .padding(.vertical, 5)
-        .frame(maxWidth: .infinity)
-        .background(
-            RoundedRectangle(cornerRadius: 9, style: .continuous)
-                .fill(color.opacity(0.11))
-                .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).stroke(color.opacity(0.72), lineWidth: 1))
         )
     }
 
@@ -384,7 +359,7 @@ struct DiveLiveView: View {
                         }
                     }
                 Text("DIR DIVING")
-                    .font(.system(size: 15, weight: .black, design: .rounded))
+                    .font(DiveUI.Typography.brandTitle)
                     .foregroundStyle(DiveUI.yellow)
                     .lineLimit(1)
             }
@@ -471,7 +446,7 @@ struct DiveLiveView: View {
             Image(systemName: "water.waves")
                 .font(.system(size: 18, weight: .black))
             Text(dive.isManualLifecycleActive ? String(localized: "IMMERSIONE MANUALE") : String(localized: "IN IMMERSIONE"))
-                .font(.system(size: 15, weight: .black, design: .rounded))
+                .font(DiveUI.Typography.statusTitle)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
             Spacer(minLength: 0)
@@ -530,18 +505,18 @@ struct DiveLiveView: View {
     private func dashboardValue(title: String, value: String, unit: String?, color: Color) -> some View {
         VStack(spacing: 4) {
             Text(title)
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .font(DiveUI.Typography.dashboardLabel)
                 .foregroundStyle(.white)
             HStack(alignment: .lastTextBaseline, spacing: 4) {
                 Text(value)
-                    .font(.system(size: 34, weight: .black, design: .rounded))
+                    .font(DiveUI.Typography.dashboardValue)
                     .minimumScaleFactor(0.54)
                     .lineLimit(1)
                     .monospacedDigit()
                     .foregroundStyle(color)
                 if let unit {
                     Text(unit)
-                        .font(.system(size: 12, weight: .semibold, design: .rounded))
+                        .font(DiveUI.Typography.dashboardUnit)
                         .foregroundStyle(color)
                         .padding(.bottom, 5)
                 }
@@ -571,7 +546,7 @@ struct DiveLiveView: View {
         return VStack(spacing: 0) {
             HStack(alignment: .lastTextBaseline, spacing: 4) {
                 Text(depthDisplay.valueText)
-                    .font(.system(size: 72, weight: .black, design: .rounded))
+                    .font(DiveUI.Typography.metricValueHero)
                     .minimumScaleFactor(0.42)
                     .lineLimit(1)
                     .monospacedDigit()
@@ -585,7 +560,7 @@ struct DiveLiveView: View {
                     )
                     .layoutPriority(1)
                 Text(depthDisplay.unitLabel)
-                    .font(.system(size: 31, weight: .black, design: .rounded))
+                    .font(DiveUI.Typography.metricUnitHero)
                     .foregroundStyle(style.labelColor)
                     .opacity(depthOpacity)
                     .padding(.bottom, 9)
@@ -596,7 +571,7 @@ struct DiveLiveView: View {
             .accessibilityValue("\(depthDisplay.valueText) \(depthDisplay.unitLabel)")
 
             Text(dive.isDepthDataStale ? String(localized: "live.depth.stale.label") : String(localized: "PROFONDITÀ ATTUALE"))
-                .font(.system(size: 15, weight: .black, design: .rounded))
+                .font(DiveUI.Typography.depthCaption)
                 .lineLimit(1)
                 .minimumScaleFactor(0.68)
                 .foregroundStyle(dive.isDepthDataStale ? DiveUI.yellow : style.labelColor)

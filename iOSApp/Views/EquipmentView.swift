@@ -16,11 +16,9 @@ struct EquipmentView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         VStack(alignment: .leading, spacing: 7) {
                             Text(String(localized: "equipment.title"))
-                                .font(.system(size: 30, weight: .bold, design: .rounded))
-                                .foregroundStyle(.white)
+                                .dirScreenTitleStyle()
                             Text(String(localized: "equipment.subtitle"))
-                                .font(.callout)
-                                .foregroundStyle(DIRTheme.muted)
+                                .dirScreenSubtitleStyle()
                         }
                         equipmentHero
                         if let savedFeedback {
@@ -56,6 +54,7 @@ struct EquipmentView: View {
                                     Toggle(item.title, isOn: $item.isReady).tint(DIRTheme.cyan)
                                     Toggle(String(localized: "equipment.checklist.gas_flag"), isOn: $item.usesGas).tint(DIRTheme.yellow)
                                     EquipmentChecklistGasSection(item: $item)
+                                        .animation(.easeInOut(duration: 0.2), value: item.usesGas)
                                     Button(role: .destructive) {
                                         equipment.profile.checklistItems.removeAll { $0.id == item.id }
                                     } label: {

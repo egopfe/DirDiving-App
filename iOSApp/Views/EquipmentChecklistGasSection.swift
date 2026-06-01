@@ -5,6 +5,7 @@ struct EquipmentChecklistGasSection: View {
 
     var body: some View {
         if item.usesGas {
+            VStack(alignment: .leading, spacing: DIRTheme.spaceS) {
             HStack {
                 Text(String(localized: "equipment.checklist.gas_type"))
                     .foregroundStyle(DIRTheme.muted)
@@ -56,7 +57,18 @@ struct EquipmentChecklistGasSection: View {
                     .foregroundStyle(.white)
                     .tint(DIRTheme.cyan)
             }
-            .font(.callout)
+            .font(DIRTypography.body)
+            }
+            .padding(DIRTheme.spaceM)
+            .background(
+                RoundedRectangle(cornerRadius: DIRTheme.compactRadius, style: .continuous)
+                    .fill(DIRTheme.surface.opacity(0.65))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: DIRTheme.compactRadius, style: .continuous)
+                            .stroke(DIRTheme.yellow.opacity(0.35), lineWidth: 1)
+                    )
+            )
+            .transition(.opacity.combined(with: .move(edge: .top)))
         }
     }
 }
