@@ -168,6 +168,7 @@ targets:
       - iOSApp/Utils/IOSDiveLogbookPolicy.swift
       - iOSApp/Utils/IOSUnitConversions.swift
       - iOSApp/Utils/PlannerInputValidator.swift
+      - iOSApp/Utils/PlannerCNSDescentBottomCheckSettings.swift
       - iOSApp/Utils/PlanCalculationCompleteness.swift
       - iOSApp/Utils/PlannerResultState.swift
       - iOSApp/Utils/WatchSyncSessionDiff.swift

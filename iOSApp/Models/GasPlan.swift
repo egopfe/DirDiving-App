@@ -297,6 +297,8 @@ struct TechnicalGasAnalysis: Hashable {
     let minimumGasBar: Double
     let turnPressureBar: Double
     let cnsPercent: Double
+    /// CNS% integrated only over descent + bottom planner segments (informational; planner-only 15% rule).
+    let cnsDescentBottomPercent: Double
     let otu: Double
     let cnsDailyPercent: Double
     let otuDaily24h: Double
@@ -304,6 +306,10 @@ struct TechnicalGasAnalysis: Hashable {
     let airBreakRecoveryApplied: Bool
     let warnings: [String]
     let states: [PlannerResultState]
+
+    func cnsDescentBottomExceedsPlannerThreshold(checkEnabled: Bool) -> Bool {
+        checkEnabled && CNSDescentBottomPlannerRule.exceedsPlannerThreshold(percent: cnsDescentBottomPercent)
+    }
 }
 
 enum GasDensityRating: String, Hashable {

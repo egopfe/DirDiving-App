@@ -796,6 +796,11 @@
 "planner.oxygen_exposure.a11y" = "CNS and OTU use NOAA-style reference models with surface recovery and daily limits, not certified oxygen exposure guidance.";
 "planner.oxygen_exposure.daily_summary" = "Daily reference: CNS %@%% · OTU 24h %@";
 "planner.oxygen_exposure.air_break_applied" = "In-water air-break CNS recovery applied where PPO₂ ≤ 0.5 bar.";
+"planner.metric.cns_descent_bottom" = "CNS Descent + Bottom";
+"planner.cns_descent_bottom.warning" = "Warning: CNS accumulated during descent and bottom time exceeds 15% of the maximum CNS budget.";
+"more.settings.cns_descent_bottom_check" = "CNS Descent + Bottom 15% check";
+"more.settings.cns_descent_bottom_check_hint" = "When on, the planner highlights CNS from descent and bottom time above 15% of the reference daily budget.";
+"more.settings.cns_descent_bottom_check.a11y" = "Toggles the planner CNS descent and bottom fifteen percent warning.";
 "planner.result.warnings.title" = "PLAN WARNINGS";
 "planner.header.reference_only.hint" = "Bühlmann-based planning reference only — not certified decompression advice or real-time dive-computer behavior.";
 "planner.header.no_deco.title" = "No-deco reference";
