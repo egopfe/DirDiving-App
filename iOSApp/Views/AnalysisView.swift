@@ -226,11 +226,9 @@ struct AnalysisView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 7) {
             Text(String(localized: "analysis.title"))
-                .font(.system(size: 30, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+                .dirScreenTitleStyle()
             Text(String(localized: "analysis.subtitle"))
-                .font(.callout)
-                .foregroundStyle(DIRTheme.muted)
+                .dirScreenSubtitleStyle()
         }
     }
 

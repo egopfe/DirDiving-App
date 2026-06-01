@@ -20,7 +20,7 @@ struct SettingsView: View {
                     header
 
                     Text(String(localized: "IMPOSTAZIONI"))
-                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .font(DiveUI.Typography.settingsSection)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
 

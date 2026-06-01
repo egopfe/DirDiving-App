@@ -23,8 +23,8 @@ struct DIRCard<Content: View>: View {
                             .foregroundStyle(accent ?? DIRTheme.cyan)
                     }
                     Text(LocalizedStringKey(title.uppercased()))
-                        .font(.system(size: 13, weight: .bold, design: .rounded))
-                        .tracking(0.8)
+                        .font(DIRTypography.cardTitle)
+                        .tracking(DIRTypography.sectionTracking)
                         .foregroundStyle(.white)
                     Spacer()
                 }
