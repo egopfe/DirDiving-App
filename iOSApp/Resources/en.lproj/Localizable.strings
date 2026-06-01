@@ -978,3 +978,15 @@
 "logbook.delete.confirm.message" = "This dive will be removed from your logbook on this device.";
 "logbook.delete.confirm.action" = "Delete";
 "logbook.delete.cancel" = "Cancel";
+
+/* MAIN UI remediation 2026-06-01 */
+"ios.legal.hero.subtitle" = "iOS Companion";
+"ios.legal.hero.onboarding_caption" = "Legal and safety onboarding";
+"ios.legal.exit_alert.title" = "Exit App";
+"ios.legal.exit_alert.confirm" = "I Understand";
+"ios.legal.step.format" = "Step %d of %d";
+"more.safety.footer" = "DIR DIVING supports logbook, analysis and preliminary planning. It does not replace training, dive-center procedures, certified equipment or human judgment. The app is not a certified dive computer unless explicitly approved in the future. Planner output is indicative: verify with certified tools. GPS is useful on the surface; underwater or under cover it is unreliable or absent.";
+"planner.buhlmann.chart.a11y.label" = "Reference NDL curve chart";
+"planner.buhlmann.chart.a11y.hint" = "Depth versus NDL minutes from the Bühlmann engine. Reference only, not tissue loading or a certified decompression plan.";
+"analysis.chart.a11y.label" = "Dive analysis chart";
+"analysis.chart.a11y.hint" = "Summary of selected dives. Demo dives excluded unless reviewer toggle is on.";

@@ -1434,6 +1434,9 @@ struct PlanResultView: View {
                 }
                 .chartYAxisLabel(String(localized: "planner.buhlmann.axis.ndl"))
                 .frame(height: 220)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(String(localized: "planner.buhlmann.chart.a11y.label"))
+                .accessibilityHint(String(localized: "planner.buhlmann.chart.a11y.hint"))
             }
         }
     }

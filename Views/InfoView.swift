@@ -78,6 +78,8 @@ struct InfoView: View {
         .padding(.vertical, 7)
         .frame(minHeight: 34)
         .background(rowBackground)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(format: String(localized: "info.row.a11y.format"), title, value))
     }
 
     private var deviceRow: some View {
@@ -163,7 +165,7 @@ struct InfoView: View {
         VStack(alignment: .leading, spacing: 5) {
             diagnosticRow(String(localized: "Entitlement profondità"), String(localized: "info.depth.entitlement.review_required"))
             diagnosticRow(
-                String(localized: "Sensore profondità"),
+                String(localized: "settings.row.depth_sensor.title"),
                 CMWaterSubmersionManager.waterSubmersionAvailable
                     ? String(localized: "Disponibile")
                     : String(localized: "Non disponibile")

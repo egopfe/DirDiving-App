@@ -480,3 +480,106 @@
 "mode.selection.diving.active" = "ATTIVA";
 "shortcuts.help.mode_selection.title" = "Selezione modalita";
 "shortcuts.help.mode_selection.body" = "Con una sola modalita stabile l'app apre Live Dive automaticamente. La selezione compare quando saranno disponibili piu modalita.";
+/* MAIN UI remediation — semantic keys */
+
+"settings.header.title" = "IMPOSTAZIONI";
+"settings.row.ascent_rate.title" = "Velocità risalita";
+"settings.row.ascent_rate.subtitle" = "Limiti m/min persistenti";
+"settings.row.alarms.title" = "Allarmi";
+"settings.row.alarms.subtitle" = "Stato soglie e promemoria";
+"settings.row.export_logbook.title" = "Apri Logbook per esportare";
+"settings.row.export_logbook.subtitle" = "Export CSV Subsurface dal log immersioni";
+"settings.row.gps_surface.title" = "GPS superficie";
+"settings.row.gps_behavior.title" = "Comportamento GPS";
+"settings.row.gps_behavior.subtitle" = "Solo in superficie; in acqua il GPS non è attendibile. Coordinate mancanti = ultimo fix o non disponibile (etichettato).";
+"settings.row.depth_sensor.title" = "Sensore profondità";
+"settings.row.sync_companion.title" = "Sync companion";
+"settings.row.sync_pending.title" = "Sync pending";
+"settings.row.sync_sent.title" = "Sync sent";
+"settings.row.sync_ack.title" = "Sync acknowledged";
+"settings.row.ttv.title" = "TTV live";
+"settings.row.sync_errors.title" = "Errori sync";
+"settings.row.retry_sync.title" = "Riprova sync";
+"settings.row.clear_queue.title" = "Cancella coda fallita";
+"settings.row.display.title" = "Schermo";
+"settings.row.audio.title" = "Toni audio";
+"settings.row.manual_start.title" = "Avvio manuale";
+"settings.row.haptics.title" = "Vibrazione";
+"settings.row.info.title" = "Info";
+"settings.row.info.subtitle" = "Info, sync, device";
+"settings.row.language.title" = "Lingua";
+"settings.row.units.title" = "Unità di misura";
+"settings.row.units.metric" = "Metrico (m)";
+"settings.row.units.imperial" = "Imperial (ft)";
+"settings.informational.badge" = "INFO";
+"settings.informational.a11y.hint" = "Solo informativo. Non è un pulsante.";
+
+"alarms.header.title" = "ALLARMI";
+"alarms.local_scope.note" = "Soglie locali sul Watch. Non sincronizzate con iPhone.";
+"alarms.row.ascent_rate.title" = "Velocità risalita";
+"alarms.row.ascent_rate.threshold" = "Usa limiti ASC SET";
+"alarms.row.max_depth.title" = "Profondità massima";
+"alarms.row.depth_threshold.title" = "Soglia profondità";
+"alarms.row.runtime.title" = "Tempo immersione";
+"alarms.row.runtime_threshold.title" = "Soglia tempo";
+"alarms.row.battery.title" = "Batteria bassa";
+"alarms.row.battery_threshold.title" = "Soglia batteria";
+"alarms.nav.title" = "Allarmi";
+
+"logbook.header.title" = "IMMERSIONI";
+"logbook.empty.title" = "NESSUNA IMMERSIONE";
+"logbook.export.none" = "Nessuna immersione da esportare";
+"logbook.export.failed" = "Export CSV non riuscito";
+"logbook.detail.export.button" = "ESPORTA (SUBSURFACE)";
+"logbook.detail.delete.button" = "ELIMINA LOG";
+"logbook.detail.delete.confirm" = "CONFERMA";
+
+"live.stopwatch.title" = "CRONOMETRO";
+"live.depth.current.label" = "PROFONDITÀ ATTUALE";
+"live.status.in_dive" = "IN IMMERSIONE";
+"live.status.manual_dive" = "IMMERSIONE MANUALE";
+"live.manual.start.button" = "AVVIO MANUALE";
+"live.manual.end.button" = "FINE MANUALE";
+"live.depth.automation.unavailable.title" = "AUTOMAZIONE PROFONDITÀ NON DISPONIBILE";
+"live.depth.automation.unavailable.body" = "Rilevamento automatico profondità non disponibile. Usa avvio manuale.";
+"live.depth.automation.limited" = "Sessione limitata: runtime e GPS sì, profondità automatica no.";
+
+"ascent.gauge.title" = "VELOCITÀ RISALITA";
+
+"compass.idle.no_dive_data" = "Dati immersione non disponibili";
+"compass.idle.manual_no_depth" = "Sessione manuale: profondità automatica non disponibile";
+
+"gps.fix.surface" = "FIX SUPERFICIE";
+"gps.fix.last_known" = "ULTIMO PUNTO NOTO";
+"gps.fix.no_fix" = "NO-FIX";
+
+"intent.toggle_stopwatch.title" = "Cronometro DIR DIVING";
+"intent.toggle_stopwatch.description" = "Avvia o ferma il cronometro manuale DIR DIVING.";
+"intent.reset_stopwatch.title" = "Reset cronometro DIR DIVING";
+"intent.reset_stopwatch.description" = "Azzera il cronometro manuale DIR DIVING.";
+"intent.start_manual_dive.title" = "Avvia immersione manuale DIR DIVING";
+"intent.start_manual_dive.description" = "Avvia una sessione manuale senza disattivare l'avvio automatico.";
+"intent.end_manual_dive.title" = "Termina immersione manuale DIR DIVING";
+"intent.end_manual_dive.description" = "Termina la sessione manuale in corso.";
+"intent.set_bearing.title" = "Imposta bearing DIR DIVING";
+"intent.set_bearing.description" = "Salva l'heading BUSSOLA corrente come bearing DIR DIVING.";
+"intent.clear_bearing.title" = "Cancella bearing DIR DIVING";
+"intent.clear_bearing.description" = "Cancella il bearing salvato.";
+"intent.ack_alarm.title" = "Conferma allarme DIR DIVING";
+"intent.ack_alarm.description" = "Chiudi il banner allarme profondità, tempo o batteria.";
+"intent.shortcut.stopwatch" = "Cronometro";
+"intent.shortcut.reset_stopwatch" = "Reset cronometro";
+"intent.shortcut.manual_start" = "Avvio manuale";
+"intent.shortcut.manual_end" = "Fine manuale";
+"intent.shortcut.set_bearing" = "Imposta bearing";
+"intent.shortcut.clear_bearing" = "Cancella bearing";
+"intent.shortcut.ack_alarm" = "Conferma allarme";
+
+"settings.a11y.mission_mode" = "Modalità Missione";
+"settings.a11y.units" = "Unità di misura";
+"settings.a11y.language" = "Lingua app";
+"settings.a11y.haptics" = "Vibrazione";
+"settings.a11y.export_logbook" = "Apri log immersioni per esportare CSV";
+"logbook.row.a11y.format" = "%@, profondità max %@, durata %@";
+"logbook.detail.a11y.summary" = "Riepilogo immersione";
+"info.row.a11y.format" = "%@, %@";

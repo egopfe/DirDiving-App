@@ -976,3 +976,15 @@
 "logbook.delete.confirm.message" = "L'immersione verrà rimossa dal logbook su questo dispositivo.";
 "logbook.delete.confirm.action" = "Elimina";
 "logbook.delete.cancel" = "Annulla";
+
+/* MAIN UI remediation 2026-06-01 */
+"ios.legal.hero.subtitle" = "Companion iOS";
+"ios.legal.hero.onboarding_caption" = "Onboarding legale e di sicurezza";
+"ios.legal.exit_alert.title" = "Esci dall'app";
+"ios.legal.exit_alert.confirm" = "Ho capito";
+"ios.legal.step.format" = "Passaggio %d di %d";
+"more.safety.footer" = "DIR DIVING è uno strumento di supporto per logbook, analisi e pianificazione preliminare. Non sostituisce formazione, procedure del dive center, equipaggiamento certificato o il giudizio umano. L'app non è un computer subacqueo certificato salvo esplicita omologazione futura. Output del planner indicativi: verificarli con strumenti certificati. GPS utile in superficie; sott'acqua o in copertura è inaffidabile o assente.";
+"planner.buhlmann.chart.a11y.label" = "Grafico curva NDL di riferimento";
+"planner.buhlmann.chart.a11y.hint" = "Profondità versus minuti NDL dal motore Bühlmann. Solo riferimento, non carico tissutale né piano decompressivo certificato.";
+"analysis.chart.a11y.label" = "Grafico analisi immersioni";
+"analysis.chart.a11y.hint" = "Riepilogo immersioni selezionate. Immersioni demo escluse salvo toggle revisore.";
