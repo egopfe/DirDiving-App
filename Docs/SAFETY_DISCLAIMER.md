@@ -39,11 +39,12 @@ L'accettazione viene registrata localmente con timestamp, versione app accettata
 
 ## Mission Mode
 
-- Mission Mode e un profilo di ottimizzazione runtime/UI del Watch MAIN, non una modalita immersione separata.
-- Se abilitato, si attiva **solo dopo** l'inizio dell'immersione attiva e si disattiva automaticamente a fine immersione.
-- **Non** riduce monitoraggio safety-critical, **non** cambia warning, **non** modifica campionamento profondita, logging, GPS entry/exit, calcoli o algoritmi immersione.
-- Riduce solo animazioni/effetti visivi non essenziali su superfici gia esistenti.
-- L'indicatore Mission Mode nel live header e solo una conferma di stato minima; non sostituisce warning o metriche di sicurezza.
+- Mission Mode e un profilo **interno DIR DIVING** di ottimizzazione runtime/UI del Watch MAIN, non una modalita immersione separata e **non** la modalita Basso Consumo di sistema di Apple Watch.
+- DIR DIVING **non** puo attivare il Basso Consumo di sistema tramite API pubblica.
+- Auto-enable all'inizio immersione, controllo manuale da Settings (superficie) o fulmine in Live (immersione attiva); disattivazione automatica a fine immersione.
+- **Non** riduce monitoraggio safety-critical, **non** cambia warning, **non** modifica campionamento profondita, logging, GPS entry/exit, calcoli, soglie allarme o algoritmi immersione.
+- Riduce solo animazioni/effetti visivi non essenziali su Live e Bussola.
+- L'indicatore/controllo fulmine nel live header non sostituisce warning o metriche di sicurezza.
 
 ## GPS (solo superficie)
 

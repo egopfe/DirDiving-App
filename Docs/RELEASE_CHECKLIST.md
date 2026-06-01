@@ -44,7 +44,7 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 - [ ] Export **fallito** — messaggio esplicito  
 - [ ] Aptica Watch **off** — badge “avvisi solo visivi” visibile  
 - [ ] Immagini sync iPhone -> Watch leggibili e raggiungibili fuori immersione attiva
-- [ ] Mission Mode: toggle visibile in Settings, attivazione solo durante immersione attiva, indicatore minimale visibile solo quando attivo
+- [ ] Mission Mode: auto-enable in Settings, stato/manuale superficie, fulmine in Live durante immersione, disclaimer ≠ Apple Basso Consumo, draft restore con auto-enable ON
 
 ## Sicurezza / copy
 

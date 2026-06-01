@@ -101,6 +101,7 @@ targets:
     platform: watchOS
     sources:
       - Tests/WatchAlgorithmTests
+      - Utils/MissionModeRuntimeProfile.swift
       - Models/DiveSample.swift
       - Models/DiveSession.swift
       - Models/GPSPoint.swift

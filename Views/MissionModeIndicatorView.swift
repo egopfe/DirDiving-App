@@ -1,12 +1,19 @@
 import SwiftUI
 
 struct MissionModeIndicatorView: View {
+    var isActive: Bool
+
     var body: some View {
-        Image(systemName: "bolt.fill")
+        Image(systemName: isActive ? "bolt.fill" : "bolt")
             .font(.system(size: 8, weight: .black))
-            .foregroundStyle(DiveUI.cyan.opacity(0.88))
+            .foregroundStyle(isActive ? DiveUI.cyan.opacity(0.88) : DiveUI.secondaryText.opacity(0.72))
             .symbolRenderingMode(.hierarchical)
-            .accessibilityLabel(String(localized: "mission_mode.a11y.active"))
+            .accessibilityLabel(
+                isActive
+                    ? String(localized: "mission_mode.a11y.active")
+                    : String(localized: "mission_mode.a11y.inactive")
+            )
+            .accessibilityHint(String(localized: "mission_mode.a11y.hint"))
             .accessibilitySortPriority(-1)
     }
 }

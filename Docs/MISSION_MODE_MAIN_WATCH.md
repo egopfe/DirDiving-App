@@ -1,89 +1,95 @@
 # Mission Mode — Watch MAIN
 
-**Aggiornato:** 2026-05-26
+**Aggiornato:** 2026-05-29
 **Ambito:** solo Apple Watch `main` (nessun file experimental, nessun cambiamento companion iOS richiesto)
 
 ---
 
 ## Scopo
 
-Mission Mode e un profilo di ottimizzazione runtime/UI per immersioni attive su Apple Watch MAIN. Riduce attivita visive non essenziali durante la sessione senza cambiare logica immersione, warning safety, campionamento profondita, logging o GPS di superficie.
+Mission Mode e un **profilo interno DIR DIVING** di ottimizzazione runtime/UI per immersioni attive su Apple Watch MAIN. Riduce animazioni ed effetti decorativi non essenziali durante la sessione.
+
+**Non** attiva la modalita Basso Consumo di sistema di Apple Watch. DIR DIVING non puo abilitarla tramite API pubblica.
+
+Mission Mode **non** cambia logica immersione, warning safety, campionamento profondita, logging, GPS, allarmi, aptica (salvo il toggle aptico globale), WatchConnectivity o calcoli.
 
 ---
 
-## Persistenza impostazione
+## Persistenza
 
-- Setting Watch: **Mission Mode**
-- Toggle: **Auto-enable on dive start**
-- Persistenza locale: `@AppStorage`
-- Chiave: `dirdiving.missionMode.autoEnableOnDiveStart`
-- Default: **OFF**
-
-La preferenza resta salvata dopo riavvio app/dispositivo. Lo stato runtime attivo **non** viene persistito.
-
----
-
-## Condizioni di attivazione
-
-Mission Mode si attiva **solo** dopo che l'app entra in stato immersione attiva (`isDiveActive == true`) e **solo** se la preferenza auto-enable e attiva.
-
-Path coperti:
-
-- avvio automatico da sensore / `CMWaterSubmersionManager`
-- avvio manuale dalla schermata live / ready
-
-Mission Mode **non** avvia un'immersione da solo e non modifica la logica che decide quando l'immersione inizia.
+| Elemento | Persistito? | Chiave / nota |
+|----------|-------------|---------------|
+| Auto-enable on dive start | Si (`@AppStorage`) | `dirdiving.missionMode.autoEnableOnDiveStart` — default **OFF** |
+| Stato runtime attivo | No | Solo sessione corrente |
+| Override manuale pre-immersione | No | `missionModeManualPendingForSession` — azzerato a fine immersione |
+| Draft immersione attiva | Si (senza flag Mission) | Ripristino riesegue `applyMissionModeIfNeededOnDiveStart(restored:)` |
 
 ---
 
-## Condizioni di disattivazione
+## Attivazione
 
-Mission Mode viene disattivato automaticamente quando la sessione immersione termina.
+Mission Mode runtime si attiva quando:
 
-- Lo stato runtime torna a `false`
-- La preferenza utente resta invariata
+1. **Auto-enable** e ON e l'app entra in immersione attiva (`beginDiveIfNeeded`), oppure
+2. L'utente sceglie **Attiva ora** in Settings (superficie) — pending per la prossima immersione, oppure
+3. L'utente tocca il **fulmine** in Live durante immersione attiva (controllo manuale compatto), oppure
+4. Un **draft immersione attiva** valido viene ripristinato e auto-enable e ON (`restored`).
 
----
-
-## Ambito ottimizzazione runtime
-
-Quando Mission Mode e attivo durante una dive session:
-
-- vengono ridotte/disattivate animazioni non essenziali nelle view Watch MAIN gia esistenti;
-- vengono ridotti glow/shadow decorativi non critici;
-- le transizioni non essenziali possono diventare immediate per ridurre overhead di rendering.
-
-L'ottimizzazione si applica solo a superfici UI gia presenti, in particolare Live e BUSSOLA, senza cambiare layout core o flusso navigazione.
+Path avvio immersione coperti: automatico da sensore e manuale da Live.
 
 ---
 
-## Indicatore visivo
+## Disattivazione
 
-Quando Mission Mode e attivo durante una sessione immersione attiva, il Watch MAIN mostra un indicatore icona minimale vicino all'icona polpo nell'area superiore sinistra del live display.
+- Fine immersione: runtime disattivato; preferenza auto-enable invariata; pending manuale azzerato.
+- **Disattiva ora** in Settings (superficie) o fulmine in Live: disattiva runtime e pending manuale; non modifica auto-enable.
 
-- visibile solo se `isDiveActive == true` e `isMissionModeActive == true`;
-- nascosto fuori immersione e nelle altre schermate;
-- solo icona, nessun testo;
-- nessun banner, pannello o overlay aggiuntivo;
-- nessuna animazione continua o timer dedicato.
+---
 
-Scopo: indicare lo stato di ottimizzazione runtime in modo professionale e non invasivo, senza cambiare la gerarchia visiva del live screen.
+## Settings (Watch)
+
+Sezione **Modalità Missione** / **Mission Mode**:
+
+- Toggle auto-enable (disabilitato durante immersione attiva)
+- Riga stato (attiva / non attiva / si attivera alla prossima immersione)
+- Attiva ora / Disattiva ora (superficie)
+- Durante immersione: hint per usare il fulmine in Live
+- Testo effetti, esclusioni safety, disclaimer Apple Basso Consumo
+
+---
+
+## Effetti runtime (codice)
+
+Quando Mission Mode e attivo:
+
+- `MissionModeRuntimeProfile.mission`: `animationsEnabled = false`, `decorativeEffectsEnabled = false`
+- Applicato a **Live** e **Bussola** (animazioni SwiftUI e shadow decorativi)
+
+Non sono presenti campi morti (`uiRefreshInterval` rimosso). Nessun throttling di campionamento profondita, GPS, allarmi, logging o aptica.
+
+---
+
+## Indicatore Live
+
+- Controllo compatto sul logo (fulmine): pieno = attivo, contorno = non attivo
+- Accessibilita EN/IT con hint sul profilo interno
+- Non copre profondita, runtime, TTV o gauge risalita
+
+---
+
+## Info — Basso Consumo Apple (solo lettura)
+
+`InfoView` mostra se `ProcessInfo.processInfo.isLowPowerModeEnabled` e attivo sul sistema, con nota che DIR DIVING non puo attivarlo.
 
 ---
 
 ## Esclusioni di sicurezza
 
-Mission Mode **non** modifica:
+Invariato rispetto alla policy prodotto: nessuna modifica a profondita, runtime, warning risalita, limiti profondita, aptica safety, campionamento, logging, GPS, calcoli.
 
-- profondita attuale / media / massima;
-- runtime immersione;
-- logica warning risalita;
-- warning limiti profondita supportata;
-- alert aptici gia implementati;
-- accuratezza campionamento profondita;
-- accuratezza logging immersione;
-- GPS entry/exit logging behavior;
-- calcoli dive / deco / planner;
-- business logic di start/end dive.
+---
 
-Mission Mode e quindi **solo** un profilo di ottimizzazione runtime/UI, non una modalita safety ridotta e non una modalita di risparmio che degrada monitoraggio critico.
+## Test e QA hardware
+
+- Test unitari: `Tests/WatchAlgorithmTests/MissionModeTests.swift`
+- Impatto batteria reale: validare su hardware prima di claim marketing

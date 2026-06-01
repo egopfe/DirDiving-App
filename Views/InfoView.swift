@@ -28,6 +28,7 @@ struct InfoView: View {
                         infoRow(title: String(localized: "Versione"), value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "n/d")
                         deviceRow
                         batteryRow
+                        appleLowPowerModeRow
                         depthDiagnostics
                         infoRow(title: String(localized: "info.sync"), value: watchSync.lastSyncStatus)
                         infoRow(title: String(localized: "Spazio libero"), value: String(localized: "Gestito da watchOS"))
@@ -91,6 +92,30 @@ struct InfoView: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
+        .frame(maxWidth: .infinity, minHeight: 42, alignment: .leading)
+        .background(rowBackground)
+    }
+
+    private var appleLowPowerModeRow: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(String(localized: "info.apple_lpm.title"))
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+            Text(
+                ProcessInfo.processInfo.isLowPowerModeEnabled
+                    ? String(localized: "info.apple_lpm.on")
+                    : String(localized: "info.apple_lpm.off")
+            )
+            .font(.system(size: 10, weight: .semibold, design: .rounded))
+            .foregroundStyle(DiveUI.blue)
+            .fixedSize(horizontal: false, vertical: true)
+            Text(String(localized: "info.apple_lpm.cannot_enable"))
+                .font(.system(size: 9, weight: .medium, design: .rounded))
+                .foregroundStyle(DiveUI.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 7)
         .frame(maxWidth: .infinity, minHeight: 42, alignment: .leading)
         .background(rowBackground)
     }

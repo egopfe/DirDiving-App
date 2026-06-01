@@ -27,8 +27,8 @@ struct DiveLiveView: View {
         dive.missionModeRuntimeProfile
     }
 
-    private var showsMissionModeIndicator: Bool {
-        dive.isDiveActive && dive.isMissionModeActive
+    private var showsMissionModeControl: Bool {
+        dive.isDiveActive
     }
 
     private var activeDiveTransition: AnyTransition {
@@ -346,6 +346,20 @@ struct DiveLiveView: View {
         }
     }
 
+    private var missionModeLiveToggle: some View {
+        Button {
+            if dive.isMissionModeActive {
+                dive.disableMissionModeManually()
+            } else {
+                dive.enableMissionModeManually()
+            }
+        } label: {
+            MissionModeIndicatorView(isActive: dive.isMissionModeActive)
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(.isButton)
+    }
+
     private var topBar: some View {
         HStack(alignment: .center) {
             HStack(spacing: 5) {
@@ -353,8 +367,8 @@ struct DiveLiveView: View {
                     .frame(width: 29, height: 26, alignment: .leading)
                     .scaleEffect(0.8)
                     .overlay(alignment: .topTrailing) {
-                        if showsMissionModeIndicator {
-                            MissionModeIndicatorView()
+                        if showsMissionModeControl {
+                            missionModeLiveToggle
                                 .offset(x: 2, y: -1)
                         }
                     }
