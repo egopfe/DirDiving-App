@@ -135,8 +135,7 @@ struct LogbookView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
                 Text(String(localized: "logbook.title"))
-                    .font(.system(size: 30, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .dirScreenTitleStyle()
                 Spacer()
                 Button {
                     showManualDiveEditor = true
@@ -318,10 +317,10 @@ struct DiveThumbnail: View {
 
     private var colors: [Color] {
         [
-            [DIRTheme.cyan, Color(red: 0.03, green: 0.22, blue: 0.30)],
-            [Color(red: 0.0, green: 0.58, blue: 0.70), Color(red: 0.01, green: 0.11, blue: 0.16)],
-            [Color(red: 0.04, green: 0.70, blue: 0.82), Color(red: 0.0, green: 0.06, blue: 0.10)],
-            [Color(red: 0.02, green: 0.42, blue: 0.58), Color(red: 0.0, green: 0.07, blue: 0.11)]
+            [DIRTheme.cyan, DIRTheme.surface2],
+            [DIRTheme.cyan.opacity(0.85), DIRTheme.surface],
+            [DIRTheme.green.opacity(0.75), DIRTheme.surface2],
+            [DIRTheme.cyan.opacity(0.65), DIRTheme.background]
         ][index % 4]
     }
 

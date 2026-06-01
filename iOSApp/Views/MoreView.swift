@@ -16,8 +16,7 @@ struct MoreView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         VStack(alignment: .leading, spacing: 7) {
                             Text(String(localized: "more.title"))
-                                .font(.system(size: 30, weight: .bold, design: .rounded))
-                                .foregroundStyle(.white)
+                                .dirScreenTitleStyle()
                             Text(String(localized: "more.header.subtitle"))
                                 .font(.callout)
                                 .foregroundStyle(DIRTheme.muted)

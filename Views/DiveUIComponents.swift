@@ -19,6 +19,40 @@ enum DiveUI {
     static let hairline = Color.white.opacity(0.16)
     static let panelRadius: CGFloat = 12
     static let screenPadding: CGFloat = 10
+
+    // Spacing scale (Apple Watch)
+    static let spaceXS: CGFloat = 3
+    static let spaceS: CGFloat = 6
+    static let spaceM: CGFloat = 8
+    static let spaceL: CGFloat = 10
+
+    enum Typography {
+        static let brandTitle: Font = .system(size: 15, weight: .black, design: .rounded)
+        static let brandTitleCompact: Font = .system(size: 11, weight: .black, design: .rounded)
+        static let clock: Font = .system(size: 14, weight: .semibold, design: .rounded)
+        static let clockLarge: Font = .system(size: 20, weight: .semibold, design: .rounded)
+        static let metricLabel: Font = .system(size: 9, weight: .bold, design: .rounded)
+        static let metricValue: Font = .system(size: 24, weight: .regular, design: .rounded)
+        static let metricValueHero: Font = .system(size: 72, weight: .black, design: .rounded)
+        static let metricUnitHero: Font = .system(size: 31, weight: .black, design: .rounded)
+        static let metricUnit: Font = .caption2.bold()
+        static let dashboardLabel: Font = .system(size: 13, weight: .semibold, design: .rounded)
+        static let dashboardValue: Font = .system(size: 34, weight: .black, design: .rounded)
+        static let dashboardUnit: Font = .system(size: 12, weight: .semibold, design: .rounded)
+        static let depthCaption: Font = .system(size: 15, weight: .black, design: .rounded)
+        static let statusTitle: Font = .system(size: 15, weight: .black, design: .rounded)
+        static let bannerTitle: Font = .system(size: 11, weight: .black, design: .rounded)
+        static let bannerSubtitle: Font = .system(size: 10, weight: .bold, design: .rounded)
+        static let bannerDetail: Font = .system(size: 9, weight: .semibold, design: .rounded)
+        static let settingsSection: Font = .system(size: 10, weight: .semibold, design: .rounded)
+        static let commandButton: Font = .caption.bold()
+        static let readyTitle: Font = .system(size: 18, weight: .black, design: .rounded)
+    }
+
+    /// Ascent alarm palette — high contrast, aligned with `DiveUI.red` family.
+    static let alarmRed = Color(red: 1.0, green: 0.22, blue: 0.18)
+    static let alarmFill = Color(red: 0.12, green: 0.02, blue: 0.02)
+    static let alarmText = Color.white.opacity(0.96)
 }
 
 struct DiveScreenBackground: View {
@@ -100,7 +134,7 @@ struct DiveCommandButton: View {
         Button(action: action) {
             HStack(spacing: 5) {
                 Text(LocalizedStringKey(title))
-                    .font(.caption.bold())
+                    .font(DiveUI.Typography.commandButton)
                     .lineLimit(1)
                     .minimumScaleFactor(0.68)
                 if let systemImage {
@@ -109,7 +143,7 @@ struct DiveCommandButton: View {
                 }
             }
             .foregroundStyle(color)
-            .frame(maxWidth: .infinity, minHeight: 34)
+            .frame(maxWidth: .infinity, minHeight: 36)
             .padding(.horizontal, 5)
             .background(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -125,6 +159,53 @@ struct DiveCommandButton: View {
         .buttonStyle(.plain)
         .accessibilityLabel(Text(LocalizedStringKey(title)))
         .accessibilityHint(Text(LocalizedStringKey("accessibility.command_button.hint")))
+    }
+}
+
+/// Compact high-contrast status/warning strip for Watch live surfaces.
+struct DiveInlineStatusBanner: View {
+    let systemImage: String
+    let title: String
+    let detail: String?
+    let color: Color
+
+    init(systemImage: String, title: String, detail: String? = nil, color: Color) {
+        self.systemImage = systemImage
+        self.title = title
+        self.detail = detail
+        self.color = color
+    }
+
+    var body: some View {
+        HStack(spacing: DiveUI.spaceS) {
+            Image(systemName: systemImage)
+                .font(.system(size: 14, weight: .black))
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title)
+                    .font(DiveUI.Typography.bannerTitle)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.72)
+                if let detail {
+                    Text(detail)
+                        .font(DiveUI.Typography.bannerDetail)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.66)
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(color)
+        .padding(.horizontal, DiveUI.spaceM)
+        .padding(.vertical, 5)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(color.opacity(0.11))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .stroke(color.opacity(0.72), lineWidth: 1)
+                )
+        )
     }
 }
 
@@ -159,20 +240,20 @@ struct DiveMetric: View {
     var body: some View {
         VStack(spacing: 2) {
             Text(LocalizedStringKey(title.uppercased()))
-                .font(.system(size: 9, weight: .bold, design: .rounded))
+                .font(DiveUI.Typography.metricLabel)
                 .foregroundStyle(DiveUI.secondaryText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.62)
             HStack(alignment: .lastTextBaseline, spacing: 3) {
                 Text(value)
-                    .font(.system(size: valueSize, weight: .regular, design: .rounded))
+                    .font(.system(size: valueSize, weight: .regular, design: .rounded)) // valueSize override for compact metrics
                     .minimumScaleFactor(0.62)
                     .lineLimit(1)
                     .monospacedDigit()
                     .foregroundStyle(color)
                 if let unit {
                     Text(unit)
-                        .font(.caption2.bold())
+                        .font(DiveUI.Typography.metricUnit)
                         .foregroundStyle(color)
                         .lineLimit(1)
                 }
