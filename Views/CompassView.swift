@@ -49,7 +49,7 @@ struct CompassView: View {
 
     private var statusBanner: some View {
         Text(compass.statusMessage)
-            .font(.system(size: 9, weight: .semibold, design: .rounded))
+            .font(DiveUI.Typography.bannerDetail)
             .foregroundStyle(compassStatusIsWarning ? DiveUI.yellow : DiveUI.secondaryText)
             .lineLimit(1)
             .minimumScaleFactor(0.7)
@@ -61,7 +61,7 @@ struct CompassView: View {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 11, weight: .black))
             Text(message)
-                .font(.system(size: 10, weight: .black, design: .rounded))
+                .font(DiveUI.Typography.bannerTitle)
                 .lineLimit(1)
                 .minimumScaleFactor(0.72)
             Spacer(minLength: 0)

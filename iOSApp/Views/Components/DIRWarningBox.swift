@@ -8,8 +8,10 @@ struct DIRWarningBox: View {
                 .font(.subheadline.weight(.bold))
                 .foregroundStyle(DIRTheme.orange)
             Text(LocalizedStringKey(text))
-                .font(.footnote.weight(.medium))
-                .foregroundStyle(.white.opacity(0.86))
+                .font(DIRTypography.footnote.weight(.medium))
+                .foregroundStyle(.white.opacity(0.9))
+                .lineSpacing(DIRTypography.bodyLineSpacing)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .padding(14)
         .background(

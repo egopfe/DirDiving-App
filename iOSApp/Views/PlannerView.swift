@@ -24,11 +24,9 @@ struct PlannerView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         VStack(alignment: .leading, spacing: 7) {
                             Text(String(localized: "Planner"))
-                                .font(.system(size: 30, weight: .bold, design: .rounded))
-                                .foregroundStyle(.white)
+                                .dirScreenTitleStyle()
                             Text(String(localized: "planner.header.subtitle"))
-                                .font(.callout)
-                                .foregroundStyle(DIRTheme.muted)
+                                .dirScreenSubtitleStyle()
                         }
                         plannerSafetyAcknowledgment
                         DIRWarningBox(text: String(localized: "planner.units.metric_notice"))
