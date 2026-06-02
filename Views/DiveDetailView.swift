@@ -235,12 +235,12 @@ struct DiveDetailView: View {
                 guard sessionPersistenceClass.allowsExport else {
                     exportMessage = session.isManual && !session.hasDepthProfile
                         ? String(localized: "log.export.manual.nodepth.unavailable")
-                        : String(localized: "Export CSV non riuscito")
+                        : String(localized: "logbook.export.failed")
                     HapticService.shared.notify()
                     return
                 }
                 exportURL = SubsurfaceExportService.writeCSV(for: session)
-                exportMessage = exportURL == nil ? String(localized: "Export CSV non riuscito") : nil
+                exportMessage = exportURL == nil ? String(localized: "logbook.export.failed") : nil
                 if let exportURL {
                     exportCompletionFileName = exportURL.lastPathComponent
                     showExportCompletion = true
@@ -331,9 +331,9 @@ struct DiveDetailView: View {
 
     private func fixSourceText(_ source: GPSFixSource) -> String {
         switch source {
-        case .fix: return String(localized: "FIX SUPERFICIE")
-        case .fallback: return String(localized: "ULTIMO PUNTO NOTO")
-        case .noFix: return String(localized: "NO-FIX")
+        case .fix: return String(localized: "gps.fix.surface")
+        case .fallback: return String(localized: "gps.fix.last_known")
+        case .noFix: return String(localized: "gps.fix.no_fix")
         }
     }
 

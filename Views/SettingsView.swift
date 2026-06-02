@@ -19,7 +19,7 @@ struct SettingsView: View {
                 VStack(spacing: 7) {
                     header
 
-                    Text(String(localized: "IMPOSTAZIONI"))
+                    Text(String(localized: "settings.header.title"))
                         .font(DiveUI.Typography.settingsSection)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
@@ -40,8 +40,8 @@ struct SettingsView: View {
                         settingsRow(
                             icon: "gauge",
                             iconColor: DiveUI.green,
-                            title: String(localized: "Velocità risalita"),
-                            subtitle: String(localized: "Limiti m/min persistenti"),
+                            title: String(localized: "settings.row.ascent_rate.title"),
+                            subtitle: String(localized: "settings.row.ascent_rate.subtitle"),
                             showsChevron: true
                         )
                     }
@@ -54,8 +54,8 @@ struct SettingsView: View {
                         settingsRow(
                             icon: "bell",
                             iconColor: DiveUI.yellow,
-                            title: String(localized: "Allarmi"),
-                            subtitle: String(localized: "Stato soglie e promemoria"),
+                            title: String(localized: "settings.row.alarms.title"),
+                            subtitle: String(localized: "settings.row.alarms.subtitle"),
                             showsChevron: true
                         )
                     }
@@ -88,44 +88,44 @@ struct SettingsView: View {
                     statusRow(
                         icon: "location.fill",
                         iconColor: gps.authorizationStatus == .denied ? DiveUI.red : DiveUI.green,
-                        title: String(localized: "GPS superficie"),
+                        title: String(localized: "settings.row.gps_surface.title"),
                         subtitle: gpsStatusText
                     )
                     settingsRow(
                         icon: "mappin.and.ellipse",
                         iconColor: DiveUI.cyan,
-                        title: String(localized: "Comportamento GPS"),
-                        subtitle: String(localized: "Solo in superficie; in acqua il segnale GPS non e attendibile. Coordinate mancanti = ultimo fix noto o non disponibile (etichettato)."),
+                        title: String(localized: "settings.row.gps_behavior.title"),
+                        subtitle: String(localized: "settings.row.gps_behavior.subtitle"),
                         informational: true
                     )
                     statusRow(
                         icon: "drop.fill",
                         iconColor: dive.lastErrorMessage == nil ? DiveUI.green : DiveUI.yellow,
-                        title: String(localized: "Sensore profondità"),
+                        title: String(localized: "settings.row.depth_sensor.title"),
                         subtitle: dive.lastErrorMessage ?? String(localized: "settings.depth.ready")
                     )
                     statusRow(
                         icon: "applewatch.radiowaves.left.and.right",
                         iconColor: watchSync.isSupported ? DiveUI.green : DiveUI.orange,
-                        title: String(localized: "Sync companion"),
+                        title: String(localized: "settings.row.sync_companion.title"),
                         subtitle: watchSync.isSupported ? watchSync.lastSyncStatus : String(localized: "settings.sync.open_ios")
                     )
                     statusRow(
                         icon: "tray.and.arrow.up",
                         iconColor: watchSync.pendingTransferCount == 0 ? DiveUI.green : DiveUI.yellow,
-                        title: String(localized: "Sync pending"),
+                        title: String(localized: "settings.row.sync_pending.title"),
                         subtitle: String(format: String(localized: "%lld in attesa ack"), watchSync.pendingTransferCount)
                     )
                     statusRow(
                         icon: "paperplane.fill",
                         iconColor: watchSync.sentTransferCount == 0 ? DiveUI.secondaryText : DiveUI.cyan,
-                        title: String(localized: "Sync sent"),
+                        title: String(localized: "settings.row.sync_sent.title"),
                         subtitle: String(format: String(localized: "%lld inviati o in transito"), watchSync.sentTransferCount)
                     )
                     statusRow(
                         icon: "checkmark.seal.fill",
                         iconColor: watchSync.acknowledgedTransferCount == 0 ? DiveUI.secondaryText : DiveUI.green,
-                        title: String(localized: "Sync acknowledged"),
+                        title: String(localized: "settings.row.sync_ack.title"),
                         subtitle: String(format: String(localized: "%lld confermati da iPhone"), watchSync.acknowledgedTransferCount)
                     )
                     if !watchSync.recentActivity.isEmpty {
@@ -138,24 +138,26 @@ struct SettingsView: View {
                         settingsRow(
                             icon: "square.and.arrow.up",
                             iconColor: DiveUI.green,
-                            title: String(localized: "Export"),
-                            subtitle: String(localized: "settings.export.from_logbook"),
+                            title: String(localized: "settings.row.export_logbook.title"),
+                            subtitle: String(localized: "settings.row.export_logbook.subtitle"),
                             showsChevron: true
                         )
                     }
                     .buttonStyle(.plain)
                     .disabled(dive.isDiveActive)
+                    .accessibilityLabel(String(localized: "settings.a11y.export_logbook"))
+                    .accessibilityHint(String(localized: "settings.row.export_logbook.subtitle"))
                     settingsRow(
                         icon: "function",
                         iconColor: DiveUI.green,
-                        title: String(localized: "TTV live"),
+                        title: String(localized: "settings.row.ttv.title"),
                         subtitle: String(localized: "settings.ttv.info"),
                         informational: true
                     )
                     statusRow(
                         icon: "exclamationmark.arrow.triangle.2.circlepath",
                         iconColor: watchSync.failedTransferCount == 0 ? DiveUI.green : DiveUI.red,
-                        title: String(localized: "Errori sync"),
+                        title: String(localized: "settings.row.sync_errors.title"),
                         subtitle: String(format: String(localized: "%lld falliti · retry %@"), watchSync.failedTransferCount, lastRetryText)
                     )
                     if watchSync.pendingTransferCount > 0 || watchSync.activationState != .activated {
@@ -166,7 +168,7 @@ struct SettingsView: View {
                             settingsRow(
                                 icon: "arrow.triangle.2.circlepath",
                                 iconColor: DiveUI.cyan,
-                                title: String(localized: "Riprova sync"),
+                                title: String(localized: "settings.row.retry_sync.title"),
                                 subtitle: String(localized: "settings.sync.retry.subtitle"),
                                 showsChevron: true
                             )
@@ -181,7 +183,7 @@ struct SettingsView: View {
                             settingsRow(
                                 icon: "trash",
                                 iconColor: DiveUI.red,
-                                title: String(localized: "Cancella coda fallita"),
+                                title: String(localized: "settings.row.clear_queue.title"),
                                 subtitle: String(localized: "settings.sync.clear.subtitle"),
                                 showsChevron: true
                             )
@@ -191,14 +193,14 @@ struct SettingsView: View {
                     settingsRow(
                         icon: "sun.max",
                         iconColor: DiveUI.yellow,
-                        title: String(localized: "Schermo"),
+                        title: String(localized: "settings.row.display.title"),
                         subtitle: String(localized: "settings.display.watchos"),
                         informational: true
                     )
                     settingsRow(
                         icon: "speaker.slash",
                         iconColor: DiveUI.yellow,
-                        title: String(localized: "Toni audio"),
+                        title: String(localized: "settings.row.audio.title"),
                         subtitle: String(localized: "settings.audio.info"),
                         informational: true
                     )
@@ -217,7 +219,7 @@ struct SettingsView: View {
                     settingsRow(
                         icon: "hand.tap",
                         iconColor: dive.isDepthAutomationAvailable ? DiveUI.green : DiveUI.yellow,
-                        title: String(localized: "Avvio manuale"),
+                        title: String(localized: "settings.row.manual_start.title"),
                         subtitle: dive.isDepthAutomationAvailable ? String(localized: "settings.manual.fallback") : String(localized: "settings.manual.live"),
                         informational: true
                     )
@@ -226,12 +228,27 @@ struct SettingsView: View {
                         settingsRow(
                             icon: "iphone.radiowaves.left.and.right",
                             iconColor: hapticsEnabled ? DiveUI.blue : .white.opacity(0.5),
-                            title: String(localized: "Vibrazione"),
+                            title: String(localized: "settings.row.haptics.title"),
                             subtitle: hapticsEnabled ? String(localized: "settings.haptics.on") : String(localized: "settings.haptics.off")
                         )
                     }
                     .toggleStyle(.switch)
                     .tint(DiveUI.green)
+
+                    if DeveloperSettings.isDeveloperSectionVisible {
+                        NavigationLink {
+                            DeveloperSettingsView()
+                        } label: {
+                            settingsRow(
+                                icon: "hammer.fill",
+                                iconColor: DiveUI.yellow,
+                                title: String(localized: "developer.section.title"),
+                                subtitle: String(localized: "developer.section.subtitle"),
+                                showsChevron: true
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
 
                     NavigationLink {
                         InfoView()
@@ -239,8 +256,8 @@ struct SettingsView: View {
                         settingsRow(
                             icon: "info.circle",
                             iconColor: DiveUI.blue,
-                            title: String(localized: "Info"),
-                            subtitle: String(localized: "Info, sync, device"),
+                            title: String(localized: "settings.row.info.title"),
+                            subtitle: String(localized: "settings.row.info.subtitle"),
                             showsChevron: true
                         )
                     }
@@ -286,7 +303,7 @@ struct SettingsView: View {
             settingsRow(
                 icon: "globe",
                 iconColor: DiveUI.cyan,
-                title: String(localized: "Lingua"),
+                title: String(localized: "settings.row.language.title"),
                 subtitle: String(localized: "settings.language.subtitle"),
                 informational: true
             )
@@ -322,15 +339,15 @@ struct SettingsView: View {
             settingsRow(
                 icon: "ruler",
                 iconColor: .white,
-                title: String(localized: "Unità di misura"),
+                title: String(localized: "settings.row.units.title"),
                 subtitle: preference == .metric
-                    ? String(localized: "Display Watch: metrico")
-                    : String(localized: "Display Watch: imperiale"),
+                    ? String(localized: "settings.row.units.metric")
+                    : String(localized: "settings.row.units.imperial"),
                 informational: true
             )
             Picker("Unità", selection: $watchUnits) {
-                Text("Metrico (m)").tag(DIRUnitPreference.metric.rawValue)
-                Text("Imperial (ft)").tag(DIRUnitPreference.imperial.rawValue)
+                Text(String(localized: "settings.row.units.metric")).tag(DIRUnitPreference.metric.rawValue)
+                Text(String(localized: "settings.row.units.imperial")).tag(DIRUnitPreference.imperial.rawValue)
             }
             .pickerStyle(.wheel)
             .tint(DiveUI.cyan)
@@ -430,6 +447,7 @@ struct SettingsView: View {
                     .labelsHidden()
                     .tint(DiveUI.green)
                     .disabled(dive.isDiveActive)
+                    .accessibilityLabel(String(localized: "settings.a11y.mission_mode"))
             }
 
             settingsRow(
@@ -537,15 +555,30 @@ struct SettingsView: View {
                 .frame(width: 24)
 
             VStack(alignment: .leading, spacing: 1) {
-                Text(title)
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
+                HStack(spacing: 4) {
+                    Text(title)
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .lineLimit(informational ? 2 : 1)
+                        .minimumScaleFactor(0.72)
+                    if informational {
+                        Text(String(localized: "settings.informational.badge"))
+                            .font(.system(size: 8, weight: .black, design: .rounded))
+                            .foregroundStyle(DiveUI.secondaryText)
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 2)
+                            .background(
+                                Capsule()
+                                    .stroke(DiveUI.secondaryText.opacity(0.5), lineWidth: 0.5)
+                            )
+                    }
+                }
                 Text(subtitle)
                     .font(.system(size: 10, weight: informational ? .medium : .regular, design: .rounded))
                     .foregroundStyle(informational ? DiveUI.secondaryText : .white)
-                    .lineLimit(informational ? 3 : 1)
-                    .minimumScaleFactor(0.72)
+                    .lineLimit(informational ? 4 : 2)
+                    .minimumScaleFactor(0.68)
+                    .fixedSize(horizontal: false, vertical: informational)
             }
 
             Spacer(minLength: 0)
@@ -554,18 +587,25 @@ struct SettingsView: View {
                 Image(systemName: "chevron.right")
                     .font(.system(size: 10, weight: .bold))
                     .foregroundStyle(.white.opacity(0.42))
+            } else if informational {
+                Image(systemName: "info.circle")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(DiveUI.secondaryText.opacity(0.85))
             }
         }
         .padding(.horizontal, 9)
         .padding(.vertical, 5)
         .frame(minHeight: informational ? 38 : 35)
-        .opacity(informational ? 0.92 : 1)
+        .opacity(informational ? 0.88 : 1)
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(informational ? [] : (showsChevron ? .isButton : []))
+        .accessibilityHint(informational ? String(localized: "settings.informational.a11y.hint") : "")
         .background(
             RoundedRectangle(cornerRadius: 7, style: .continuous)
                 .fill(Color.black.opacity(informational ? 0.38 : 0.52))
                 .overlay(
                     RoundedRectangle(cornerRadius: 7, style: .continuous)
-                        .stroke(.white.opacity(0.24), lineWidth: 1)
+                        .stroke(.white.opacity(informational ? 0.14 : 0.24), lineWidth: 1)
                 )
         )
     }

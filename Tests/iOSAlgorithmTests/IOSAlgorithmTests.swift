@@ -131,6 +131,27 @@ final class IOSAlgorithmTests: XCTestCase {
         XCTAssertGreaterThan(summary.session.avgDepthMeters, 0)
     }
 
+    func testImportRejectsOverlongSingleLineCSV() throws {
+        let csv = "time_seconds,depth_m,temperature_c," + String(repeating: "x", count: IOSAlgorithmConfiguration.maxImportCSVRowCharacters + 10)
+        let url = try temporaryCSV(csv)
+        let result = DiveImportService.importCSV(from: url)
+        guard case .failure(.invalidRows(let count)) = result else {
+            XCTFail("Expected invalidRows failure for overlong row")
+            return
+        }
+        XCTAssertGreaterThanOrEqual(count, 1)
+    }
+
+    func testImportRejectsBinaryPayload() throws {
+        let data = Data([0x74, 0x65, 0x73, 0x74, 0x00, 0x66, 0x69, 0x6c, 0x65])
+        let url = try temporaryCSVData(data)
+        let result = DiveImportService.importCSV(from: url)
+        guard case .failure(.unreadableFile) = result else {
+            XCTFail("Expected unreadableFile for binary payload")
+            return
+        }
+    }
+
     func testExportRejectsEmptyAndProducesMonotonicCSV() {
         let empty = makeSession(samples: [])
         XCTAssertNil(SubsurfaceExportService.makeCSV(for: empty))
@@ -288,6 +309,13 @@ final class IOSAlgorithmTests: XCTestCase {
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent("DIRDivingTest_\(UUID().uuidString).csv")
         try contents.write(to: url, atomically: true, encoding: .utf8)
+        return url
+    }
+
+    private func temporaryCSVData(_ data: Data) throws -> URL {
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("DIRDivingTest_\(UUID().uuidString).csv")
+        try data.write(to: url, options: .atomic)
         return url
     }
 }

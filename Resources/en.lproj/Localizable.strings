@@ -480,3 +480,116 @@
 "mode.selection.diving.active" = "ACTIVE";
 "shortcuts.help.mode_selection.title" = "Mode selection";
 "shortcuts.help.mode_selection.body" = "When only Diving is available, the app opens Live Dive automatically. Mode Selection appears when multiple stable modes ship.";
+/* MAIN UI remediation — semantic keys (merged into Localizable.strings) */
+
+"settings.header.title" = "SETTINGS";
+"settings.row.ascent_rate.title" = "Ascent rate";
+"settings.row.ascent_rate.subtitle" = "Persistent m/min limits";
+"settings.row.alarms.title" = "Alerts";
+"settings.row.alarms.subtitle" = "Thresholds and reminders";
+"settings.row.export_logbook.title" = "Export from Logbook";
+"settings.row.export_logbook.subtitle" = "Open Logbook to export";
+"settings.row.gps_surface.title" = "Surface GPS";
+"settings.row.gps_behavior.title" = "GPS behavior";
+"settings.row.gps_behavior.subtitle" = "Surface only. Underwater GPS is unreliable. Missing coordinates use last fix or are labeled unavailable.";
+"settings.row.depth_sensor.title" = "Depth sensor";
+"settings.row.sync_companion.title" = "Companion sync";
+"settings.row.sync_pending.title" = "Sync pending";
+"settings.row.sync_sent.title" = "Sync sent";
+"settings.row.sync_ack.title" = "Sync acknowledged";
+"settings.row.ttv.title" = "Live TTV";
+"settings.row.sync_errors.title" = "Sync errors";
+"settings.row.retry_sync.title" = "Retry sync";
+"settings.row.clear_queue.title" = "Clear failed queue";
+"settings.row.display.title" = "Display";
+"settings.row.audio.title" = "Audio tones";
+"settings.row.manual_start.title" = "Manual start";
+"settings.row.haptics.title" = "Haptics";
+"settings.row.info.title" = "Info";
+"settings.row.info.subtitle" = "App, sync, device";
+"settings.row.language.title" = "Language";
+"settings.row.units.title" = "Units";
+"settings.row.units.metric" = "Metric (m)";
+"settings.row.units.imperial" = "Imperial (ft)";
+"settings.informational.badge" = "INFO";
+"settings.informational.a11y.hint" = "Information only. Not a button.";
+
+"alarms.header.title" = "ALERTS";
+"alarms.local_scope.note" = "Local thresholds on Watch. Not synced with iPhone.";
+"alarms.row.ascent_rate.title" = "Ascent rate";
+"alarms.row.ascent_rate.threshold" = "Uses ASC SET limits";
+"alarms.row.max_depth.title" = "Max depth";
+"alarms.row.depth_threshold.title" = "Depth threshold";
+"alarms.row.runtime.title" = "Dive time";
+"alarms.row.runtime_threshold.title" = "Time threshold";
+"alarms.row.battery.title" = "Low battery";
+"alarms.row.battery_threshold.title" = "Battery threshold";
+"alarms.nav.title" = "Alerts";
+
+"logbook.header.title" = "DIVES";
+"logbook.empty.title" = "NO DIVES";
+"logbook.export.none" = "No dives to export";
+"logbook.export.failed" = "CSV export failed";
+"logbook.detail.export.button" = "EXPORT (SUBSURFACE)";
+"logbook.detail.delete.button" = "DELETE LOG";
+"logbook.detail.delete.confirm" = "CONFIRM";
+
+"live.stopwatch.title" = "TIMER";
+"live.depth.current.label" = "CURRENT DEPTH";
+"live.status.in_dive" = "IN DIVE";
+"live.status.manual_dive" = "MANUAL DIVE";
+"live.manual.start.button" = "MANUAL START";
+"live.manual.end.button" = "END MANUAL";
+"live.depth.automation.unavailable.title" = "DEPTH AUTOMATION UNAVAILABLE";
+"live.depth.automation.unavailable.body" = "Automatic depth detection unavailable. Use manual start.";
+"live.depth.automation.limited" = "Limited session: runtime and GPS yes, no automatic depth.";
+
+"ascent.gauge.title" = "ASCENT RATE";
+
+"compass.idle.no_dive_data" = "Dive data unavailable";
+"compass.idle.manual_no_depth" = "Manual session: automatic depth unavailable";
+
+"gps.fix.surface" = "SURFACE FIX";
+"gps.fix.last_known" = "LAST KNOWN POINT";
+"gps.fix.no_fix" = "NO-FIX";
+
+"intent.toggle_stopwatch.title" = "Toggle DIR DIVING Stopwatch";
+"intent.toggle_stopwatch.description" = "Start or stop the DIR DIVING manual stopwatch.";
+"intent.reset_stopwatch.title" = "Reset DIR DIVING Stopwatch";
+"intent.reset_stopwatch.description" = "Reset the DIR DIVING manual stopwatch.";
+"intent.start_manual_dive.title" = "Start DIR DIVING Manual Dive";
+"intent.start_manual_dive.description" = "Start a manual DIR DIVING session without disabling automatic dive start.";
+"intent.end_manual_dive.title" = "End DIR DIVING Manual Dive";
+"intent.end_manual_dive.description" = "End the current manual DIR DIVING session.";
+"intent.set_bearing.title" = "Set DIR DIVING Bearing";
+"intent.set_bearing.description" = "Save the current BUSSOLA heading as the DIR DIVING bearing.";
+"intent.clear_bearing.title" = "Clear DIR DIVING Bearing";
+"intent.clear_bearing.description" = "Clear the saved DIR DIVING bearing.";
+"intent.ack_alarm.title" = "Acknowledge DIR DIVING Alarm";
+"intent.ack_alarm.description" = "Dismiss the current depth, time, or battery alarm banner.";
+"intent.shortcut.stopwatch" = "Stopwatch";
+"intent.shortcut.reset_stopwatch" = "Reset Stopwatch";
+"intent.shortcut.manual_start" = "Manual Dive Start";
+"intent.shortcut.manual_end" = "Manual Dive End";
+"intent.shortcut.set_bearing" = "Set Bearing";
+"intent.shortcut.clear_bearing" = "Clear Bearing";
+"intent.shortcut.ack_alarm" = "Acknowledge Alarm";
+
+"settings.a11y.mission_mode" = "Mission Mode";
+"settings.a11y.units" = "Units of measure";
+"settings.a11y.language" = "App language";
+"settings.a11y.haptics" = "Haptics";
+"settings.a11y.export_logbook" = "Export from Logbook, opens Logbook screen";
+"logbook.row.a11y.format" = "%@, max depth %@, duration %@";
+"logbook.detail.a11y.summary" = "Dive summary";
+"info.row.a11y.format" = "%@, %@";
+
+"developer.section.title" = "Developer";
+"developer.section.subtitle" = "Internal testing tools";
+"developer.sensor_source.title" = "Sensor Source";
+"developer.sensor_source.automatic" = "Automatic";
+"developer.sensor_source.apple_sensor" = "Apple Sensor";
+"developer.sensor_source.simulation" = "Simulation";
+"developer.sensor_source.footer" = "Developer testing option. Not visible to end users.";
+"developer.sensor_source.apple_fallback" = "Apple depth sensor unavailable. Falling back to Simulation Mode.";
+"developer.unlock.confirmed" = "Developer settings are now visible in Settings.";

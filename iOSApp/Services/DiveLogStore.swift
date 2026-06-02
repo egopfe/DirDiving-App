@@ -267,8 +267,18 @@ final class DiveLogStore: ObservableObject {
     private func saveIfReady() {
         guard isReady else { return }
         persistProtectedSessions(sessions)
+        syncCloudSessionsBackup()
         cloudSync?.save(Array(deletedSessionIDs), forKey: deletedKey)
-        removeLegacySessionPayload()
+    }
+
+    /// Merges per session ID before writing iCloud backup so blob LWW cannot drop unrelated dives.
+    private func syncCloudSessionsBackup() {
+        guard let cloudSync else { return }
+        let cloud = loadRawCloudSessions() ?? []
+        updateMergeConflictState(local: sessions, cloud: cloud)
+        let merged = mergedSessions(local: sessions, cloud: cloud)
+            .filter { !deletedSessionIDs.contains($0.id) }
+        cloudSync.save(merged, forKey: key)
     }
 
     private func persistProtectedSessions(_ sessions: [DiveSession]) {
@@ -352,7 +362,7 @@ final class DiveLogStore: ObservableObject {
                 maxDepthMeters: samples.map(\.depthMeters).max() ?? maxDepth,
                 avgDepthMeters: avg,
                 avgWaterTemperatureCelsius: 24 - Double(idx),
-                ttv: idx == 0 ? 24 : avg + duration / 60,
+                ttv: DiveProfileMath.ttvIndex(averageDepthMeters: avg, durationSeconds: duration),
                 entryGPS: GPSPoint(latitude: 38.1157 + Double(idx) * 0.001, longitude: 13.3615, horizontalAccuracy: 15, timestamp: start),
                 exitGPS: GPSPoint(latitude: 38.1162 + Double(idx) * 0.001, longitude: 13.3620, horizontalAccuracy: 18, timestamp: start.addingTimeInterval(duration)),
                 samples: samples,

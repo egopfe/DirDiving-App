@@ -19,7 +19,7 @@ struct PlannerView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.black.ignoresSafeArea()
+                DIRBackground()
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         VStack(alignment: .leading, spacing: 7) {
@@ -46,8 +46,8 @@ struct PlannerView: View {
                         .opacity(plannerSafetyAcknowledged ? 1 : 0.45)
                     }
                     .padding(.horizontal, 16)
-                    .padding(.top, 12)
-                    .padding(.bottom, 22)
+                    .padding(.top, 10)
+                    .padding(.bottom, 18)
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -173,16 +173,6 @@ struct PlannerView: View {
                 .padding(.vertical, 10)
                 environmentStatusRow
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 2)
-            .background(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(Color(red: 0.020, green: 0.035, blue: 0.048).opacity(0.94))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10, style: .continuous)
-                            .stroke(Color.white.opacity(0.06), lineWidth: 1)
-                    )
-            )
         }
     }
 
@@ -479,10 +469,16 @@ struct PlannerView: View {
                 HStack(spacing: 0) {
                     DIRMetricTile(title: "EAD", value: eadMeasurement?.value ?? "-", unit: eadMeasurement?.unit, color: DIRTheme.cyan)
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: "CNS", value: Formatters.zero(store.analysis.cnsPercent), unit: "%", color: store.analysis.cnsPercent > 80 ? DIRTheme.red : DIRTheme.cyan)
+                    DIRMetricTile(
+                        title: String(localized: "planner.metric.cns_preview"),
+                        value: store.analysis.cnsPercentDisplay,
+                        unit: "%",
+                        color: store.analysis.cnsPercent > 80 ? DIRTheme.red : DIRTheme.cyan
+                    )
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: "OTU", value: Formatters.zero(store.analysis.otu), color: DIRTheme.cyan)
                 }
+                plannerMutedFootnote(String(localized: "planner.metric.cns_preview.footnote"))
                 Divider().overlay(DIRTheme.hairline)
                 Text(String(localized: "planner.oxygen_exposure.disclaimer"))
                     .font(.caption2)
@@ -519,6 +515,16 @@ struct PlannerView: View {
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: String(localized: "planner.metric.turn_pressure"), value: Formatters.zero(store.analysis.turnPressureBar), unit: "bar", color: DIRTheme.cyan)
                 }
+                if store.analysis.usesBottomPhaseConsumptionEstimate {
+                    Text(String(localized: "planner.gas.bottom_phase_estimate_footnote"))
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.muted)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                Text(String(localized: "planner.gas.turn_pressure_rule_footnote"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
     }
@@ -651,7 +657,6 @@ struct PlannerView: View {
                 return
             }
             store.calculate()
-            HapticFeedback.success()
             showPlan = true
         } label: {
             HStack(spacing: 8) {
@@ -723,11 +728,11 @@ struct PlannerView: View {
     private func plannerField(_ title: String, value: Binding<Double>, unit: String, step: Double) -> some View {
         HStack {
             Text(title)
-                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .font(.callout)
                 .foregroundStyle(.white)
             Spacer()
             Text("\(Formatters.zero(value.wrappedValue)) \(unit)")
-                .font(.system(size: 12, weight: .semibold, design: .rounded).monospacedDigit())
+                .font(.callout.monospacedDigit())
                 .foregroundStyle(.white)
                 .frame(width: 96, alignment: .trailing)
             HStack(spacing: 1) {
@@ -735,27 +740,20 @@ struct PlannerView: View {
                     value.wrappedValue = max(0, value.wrappedValue - step)
                 } label: {
                     Image(systemName: "minus")
-                        .frame(width: 24, height: 22)
+                        .frame(width: 28, height: 24)
                 }
                 Button {
                     value.wrappedValue += step
                 } label: {
                     Image(systemName: "plus")
-                        .frame(width: 24, height: 22)
+                        .frame(width: 28, height: 24)
                 }
             }
-            .font(.system(size: 10, weight: .bold))
+            .font(.caption.weight(.bold))
             .foregroundStyle(DIRTheme.cyan)
-            .background(
-                RoundedRectangle(cornerRadius: 5, style: .continuous)
-                    .fill(Color(red: 0.045, green: 0.060, blue: 0.080))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 5, style: .continuous)
-                            .stroke(DIRTheme.cyan.opacity(0.18), lineWidth: 1)
-                    )
-            )
+            .background(RoundedRectangle(cornerRadius: 5).fill(DIRTheme.surface2))
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, 10)
     }
 
     private func densityColor(_ rating: GasDensityRating) -> Color {
@@ -768,6 +766,16 @@ struct PlannerView: View {
 
     private func warningColor(ppO2: Double) -> Color {
         ppO2 > store.input.bottomGas.maxPPO2 ? DIRTheme.red : DIRTheme.green
+    }
+
+    private func plannerMutedFootnote(_ text: String) -> some View {
+        Text(text)
+            .font(.caption2)
+            .foregroundStyle(DIRTheme.muted)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
     }
 
     private func plannerStateWarning(_ message: PlannerUserFacingMessage) -> some View {
@@ -802,6 +810,46 @@ struct PlanResultView: View {
         store.plan.gasAnalysis.cnsDescentBottomExceedsPlannerThreshold(checkEnabled: cnsDescentBottomCheckEnabled)
     }
 
+    private var cnsDescentBottomTileAccessibilityLabel: String {
+        let value = Formatters.zero(store.plan.gasAnalysis.cnsDescentBottomPercent)
+        let base = "\(String(localized: "planner.metric.cns_descent_bottom")), \(value) percent"
+        guard cnsDescentBottomWarningActive else { return base }
+        return "\(String(localized: "planner.accessibility.cns_descent_bottom.warning.label")) \(base)"
+    }
+
+    private var cnsDescentBottomWarningBanner: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .top, spacing: 8) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(DIRTheme.red)
+                Text(String(localized: "planner.cns_descent_bottom.warning"))
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(DIRTheme.red)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Text(String(localized: "planner.cns_descent_bottom.warning.hint"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(localized: "planner.accessibility.cns_descent_bottom.warning.label"))
+        .accessibilityHint(String(localized: "planner.accessibility.cns_descent_bottom.warning.hint"))
+    }
+
+    private func plannerResultMutedFootnote(_ text: String) -> some View {
+        Text(text)
+            .font(.caption2)
+            .foregroundStyle(DIRTheme.muted)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 4)
+    }
+
     private func depthText(_ meters: Double) -> String {
         Formatters.depth(meters, units: unitPreference).text
     }
@@ -826,7 +874,7 @@ struct PlanResultView: View {
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+            DIRBackground()
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
                     resultHeaderBadge
@@ -850,8 +898,7 @@ struct PlanResultView: View {
                     }
                 }
                 .padding(.horizontal, 16)
-                .padding(.top, 10)
-                .padding(.bottom, 22)
+                .padding(.bottom, 18)
             }
         }
         .navigationTitle(String(localized: "planner.result.title"))
@@ -896,10 +943,7 @@ struct PlanResultView: View {
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
             if store.plan.calculationCompleteness == .incompletePartialStops {
-                Text(String(localized: "planner.result.calculation_incomplete"))
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(DIRTheme.red)
-                    .fixedSize(horizontal: false, vertical: true)
+                incompleteCalculationBanner
             }
             if store.plan.repetitiveContext?.tissueStateApplied == true {
                 Text(String(localized: "planner.repetitive.result_badge"))
@@ -923,6 +967,33 @@ struct PlanResultView: View {
         )
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(header.title). \(header.subtitle)")
+    }
+
+    private var incompleteCalculationBanner: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(String(localized: "planner.result.calculation_incomplete"))
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(DIRTheme.red)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(String(localized: "planner.result.calculation_incomplete.detail"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(String(localized: "planner.result.calculation_incomplete.recovery"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(10)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(DIRTheme.red.opacity(0.12))
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.red.opacity(0.45), lineWidth: 1))
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(
+            "\(String(localized: "planner.result.calculation_incomplete")) \(String(localized: "planner.result.calculation_incomplete.detail"))"
+        )
     }
 
     @ViewBuilder
@@ -1111,11 +1182,6 @@ struct PlanResultView: View {
                         .foregroundStyle(DIRTheme.muted)
                 }
             }
-            .buttonStyle(.plain)
-            Spacer()
-            Text("Risultato piano")
-                .font(.caption.weight(.bold))
-                .foregroundStyle(DIRTheme.muted)
         }
     }
 
@@ -1140,33 +1206,7 @@ struct PlanResultView: View {
                 .accessibilityAddTraits(tab == item ? .isSelected : [])
             }
         }
-        .padding(.top, 2)
-    }
-
-    private var plannerSafetyNotice: some View {
-        Text("MODELLO SEMPLIFICATO: valori indicativi per revisione e studio. Non e un piano decompressivo certificato.")
-            .font(.system(size: 11, weight: .semibold, design: .rounded))
-            .foregroundStyle(DIRTheme.yellow)
-            .fixedSize(horizontal: false, vertical: true)
-            .padding(10)
-            .modifier(ResultPanelStyle(cornerRadius: 9))
-    }
-
-    private var modelNotice: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            Text("Valori indicativi calcolati dagli input correnti: \(Formatters.zero(store.input.plannedDepthMeters)) m / \(Formatters.zero(store.input.plannedBottomMinutes)) min / \(store.input.bottomGas.label).")
-            if let warning = store.buhlmann.warning {
-                Text(warning)
-            }
-            ForEach(store.plan.warnings, id: \.self) { warning in
-                Text(warning)
-            }
-        }
-        .font(.system(size: 11, weight: .semibold, design: .rounded))
-        .foregroundStyle(DIRTheme.yellow)
-        .fixedSize(horizontal: false, vertical: true)
-        .padding(10)
-        .modifier(ResultPanelStyle(cornerRadius: 9))
+        .padding(.top, 10)
     }
 
     private func tabAccessibilityLabel(for item: PlanTab) -> String {
@@ -1196,8 +1236,22 @@ struct PlanResultView: View {
                 Divider().overlay(DIRTheme.hairline)
                 DIRMetricTile(title: String(localized: "planner.result.bottom_time"), value: Formatters.zero(store.input.plannedBottomMinutes), unit: "min")
                 Divider().overlay(DIRTheme.hairline)
-                resultMetric("CNS%", value: Formatters.zero(store.plan.cnsPercent), unit: "%")
+                DIRMetricTile(
+                    title: String(localized: "planner.metric.cns_full_plan"),
+                    value: store.plan.gasAnalysis.cnsPercentDisplay,
+                    unit: "%"
+                )
             }
+            plannerResultMutedFootnote(String(localized: "planner.metric.cns_full_plan.footnote"))
+            Divider().overlay(DIRTheme.hairline)
+            HStack(spacing: 0) {
+                DIRMetricTile(title: "NDL", value: Formatters.one(store.plan.ndlMinutes), unit: "min")
+            }
+            Text(String(localized: "planner.ndl.reference_ascent_footnote"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 4)
             Divider().overlay(DIRTheme.hairline)
             HStack(spacing: 0) {
                 DIRMetricTile(
@@ -1207,43 +1261,22 @@ struct PlanResultView: View {
                     color: cnsDescentBottomWarningActive ? DIRTheme.red : DIRTheme.cyan,
                     icon: cnsDescentBottomWarningActive ? "exclamationmark.triangle.fill" : nil
                 )
+                .accessibilityLabel(cnsDescentBottomTileAccessibilityLabel)
             }
+            plannerResultMutedFootnote(String(localized: "planner.metric.cns_descent_bottom.footnote"))
             if cnsDescentBottomWarningActive {
-                HStack(alignment: .top, spacing: 8) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(DIRTheme.red)
-                    Text(String(localized: "planner.cns_descent_bottom.warning"))
-                        .font(.caption2.weight(.medium))
-                        .foregroundStyle(DIRTheme.red)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .padding(.horizontal, 12)
-                .accessibilityElement(children: .combine)
+                cnsDescentBottomWarningBanner
             }
             Divider().overlay(DIRTheme.hairline)
             HStack(spacing: 0) {
                 DIRMetricTile(
-                    title: String(localized: "planner.metric.cns_descent_bottom"),
-                    value: Formatters.zero(store.plan.gasAnalysis.cnsDescentBottomPercent),
+                    title: String(localized: "planner.metric.cns_ascent_deco_estimate"),
+                    value: Formatters.zero(store.plan.gasAnalysis.cnsAscentDecoEstimatePercent),
                     unit: "%",
-                    color: cnsDescentBottomWarningActive ? DIRTheme.red : DIRTheme.cyan,
-                    icon: cnsDescentBottomWarningActive ? "exclamationmark.triangle.fill" : nil
+                    color: DIRTheme.cyan
                 )
             }
-            if cnsDescentBottomWarningActive {
-                HStack(alignment: .top, spacing: 8) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(DIRTheme.red)
-                    Text(String(localized: "planner.cns_descent_bottom.warning"))
-                        .font(.caption2.weight(.medium))
-                        .foregroundStyle(DIRTheme.red)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .padding(.horizontal, 12)
-                .accessibilityElement(children: .combine)
-            }
+            plannerResultMutedFootnote(String(localized: "planner.metric.cns_ascent_deco_estimate.footnote"))
             Divider().overlay(DIRTheme.hairline)
             VStack(spacing: 4) {
                 Text(String(localized: "planner.oxygen_exposure.disclaimer"))
@@ -1282,17 +1315,17 @@ struct PlanResultView: View {
                 DIRMetricTile(title: String(localized: "planner.metric.turn_pressure"), value: Formatters.zero(store.analysis.turnPressureBar), unit: "bar", color: DIRTheme.cyan)
             }
         }
-        .padding(.vertical, 2)
-        .modifier(ResultPanelStyle(cornerRadius: 9))
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(DIRTheme.surface.opacity(0.72))
+                .overlay(RoundedRectangle(cornerRadius: 10).stroke(DIRTheme.hairline, lineWidth: 1))
+        )
     }
 
     private var ascentTable: some View {
         DIRCard(String(localized: "planner.result.ascent_plan"), icon: nil, accent: DIRTheme.cyan) {
             if store.plan.calculationCompleteness == .incompletePartialStops {
-                Text(String(localized: "planner.result.calculation_incomplete"))
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(DIRTheme.red)
-                    .fixedSize(horizontal: false, vertical: true)
+                incompleteCalculationBanner
             } else {
                 VStack(spacing: 9) {
                     tableRow([
@@ -1424,41 +1457,13 @@ struct PlanResultView: View {
                     .foregroundStyle(DIRTheme.muted)
             }
         }
-        .padding(12)
-        .modifier(ResultPanelStyle(cornerRadius: 9))
-    }
-
-    private func resultMetric(_ title: String, value: String, unit: String? = nil) -> some View {
-        VStack(spacing: 5) {
-            Text(title)
-                .font(.system(size: 10, weight: .medium, design: .rounded))
-                .foregroundStyle(DIRTheme.muted)
-            HStack(alignment: .lastTextBaseline, spacing: 3) {
-                Text(value)
-                    .font(.system(size: 16, weight: .semibold, design: .rounded).monospacedDigit())
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-                if let unit = unit {
-                    Text(unit)
-                        .font(.system(size: 9, weight: .medium, design: .rounded))
-                        .foregroundStyle(DIRTheme.muted)
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, minHeight: 56)
-        .padding(.horizontal, 4)
     }
 
     private func tableRow(_ values: [String], isHeader: Bool = false) -> some View {
         HStack {
             ForEach(Array(values.enumerated()), id: \.offset) { _, value in
                 Text(value)
-                    .font(
-                        isHeader
-                            ? .system(size: 10, weight: .semibold, design: .rounded)
-                            : .system(size: 10, weight: .medium, design: .rounded).monospacedDigit()
-                    )
+                    .font(isHeader ? .caption2.weight(.semibold) : .caption.monospacedDigit())
                     .foregroundStyle(isHeader ? DIRTheme.muted : .white)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -1477,8 +1482,8 @@ struct PlanResultView: View {
                     .fixedSize(horizontal: false, vertical: true)
                 Chart(store.buhlmann.curve) { point in
                     LineMark(
-                        x: .value("Minutes", point.ndlMinutes),
-                        y: .value("Load", max(0, 100 - point.depthMeters * 1.5)),
+                        x: .value(String(localized: "planner.buhlmann.axis.depth"), point.depthMeters),
+                        y: .value(String(localized: "planner.buhlmann.axis.ndl"), point.ndlMinutes),
                         series: .value("Compartimenti", point.compartmentGroup)
                     )
                     .lineStyle(StrokeStyle(lineWidth: 2))
@@ -1486,32 +1491,19 @@ struct PlanResultView: View {
                 .chartXAxis {
                     AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
                 }
+                .chartXAxisLabel(String(localized: "planner.buhlmann.axis.depth"))
                 .chartYAxis {
                     AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
                 }
+                .chartYAxisLabel(String(localized: "planner.buhlmann.axis.ndl"))
                 .frame(height: 220)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(String(localized: "planner.buhlmann.chart.a11y.label"))
+                .accessibilityHint(String(localized: "planner.buhlmann.chart.a11y.hint"))
             }
         }
-        .padding(12)
-        .modifier(ResultPanelStyle(cornerRadius: 9))
     }
 }
-
-private struct ResultPanelStyle: ViewModifier {
-    let cornerRadius: CGFloat
-
-    func body(content: Content) -> some View {
-        content
-            .background(
-                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                    .fill(Color(red: 0.020, green: 0.035, blue: 0.048).opacity(0.94))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                            .stroke(Color.white.opacity(0.07), lineWidth: 1)
-                    )
-            )
-        }
-    }
 
 enum PlanTab: String, CaseIterable, Identifiable {
     case plan
