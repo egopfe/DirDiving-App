@@ -10,8 +10,8 @@ struct ManualDiveEditorView: View {
     @State private var siteName = ""
     @State private var startDate = Date()
     @State private var durationMinutes = 45.0
-    @State private var maxDepthInput = 30.0
-    @State private var avgDepthInput = 18.0
+    @State private var maxDepthInput = ManualDiveEditorDefaults.defaultMaxDepthInput(units: .metric)
+    @State private var avgDepthInput = ManualDiveEditorDefaults.defaultAverageDepthInput(units: .metric)
     @State private var entryLatitude = ""
     @State private var entryLongitude = ""
     @State private var exitLatitude = ""
@@ -105,7 +105,17 @@ struct ManualDiveEditorView: View {
                     .foregroundStyle(DIRTheme.cyan)
             }
         }
-        .onAppear(perform: loadExisting)
+        .onAppear {
+            if existing == nil {
+                applyDefaultDepthInputs()
+            } else {
+                loadExisting()
+            }
+        }
+        .onChange(of: units) { _, _ in
+            guard existing == nil else { return }
+            applyDefaultDepthInputs()
+        }
         .alert(String(localized: "manual_dive.save_failed.title"), isPresented: $showSaveFailureAlert) {
             Button(String(localized: "manual_dive.save_failed.dismiss"), role: .cancel) {}
         } message: {
@@ -178,6 +188,11 @@ struct ManualDiveEditorView: View {
         }
     }
 
+    private func applyDefaultDepthInputs() {
+        maxDepthInput = ManualDiveEditorDefaults.defaultMaxDepthInput(units: unitPreference)
+        avgDepthInput = ManualDiveEditorDefaults.defaultAverageDepthInput(units: unitPreference)
+    }
+
     private func loadExisting() {
         guard let existing else { return }
         siteName = existing.siteName ?? ""
@@ -247,8 +262,8 @@ struct ManualDiveEditorView: View {
     }
 
     private func saveWithSyntheticProfile() {
-        let maxMeters = unitPreference == .metric ? maxDepthInput : IOSUnitConversions.meters(fromFeet: maxDepthInput)
-        let avgMeters = unitPreference == .metric ? avgDepthInput : IOSUnitConversions.meters(fromFeet: avgDepthInput)
+        let maxMeters = ManualDiveEditorDefaults.depthMeters(fromInput: maxDepthInput, units: unitPreference)
+        let avgMeters = ManualDiveEditorDefaults.depthMeters(fromInput: avgDepthInput, units: unitPreference)
         guard maxMeters >= avgMeters else {
             validationMessage = String(localized: "manual_dive.validation.depth_order")
             return

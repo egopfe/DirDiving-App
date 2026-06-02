@@ -70,6 +70,14 @@ Tests: `OxygenExposureDeepModelTests` (14 cases). Suite total: **119/119** pass 
 
 Positioning unchanged: reference planning only — not certified oxygen exposure guidance.
 
+## Planner CNS/OTU UI (2026-06-02)
+
+- Result screen labels: **CNS (full plan)**, **CNS Descent + Bottom**, **CNS ascent/deco (est.)**, **OTU** in the existing PLAN tab metric grid.
+- Pre-calculation label: **CNS (bottom preview)** with footnote before full plan calculation.
+- EN/IT footnotes state full-plan CNS includes decompression segments; descent+bottom excludes ascent/deco stops.
+- 15% warning: red tile + localized warning + action hint + VoiceOver label/hint when threshold exceeded.
+- Tests: `PlannerCNSCopyTests`, `CNSDescentBottomTests` (math unchanged).
+
 ## Buhlmann Engine Status
 
 Implemented in `iOSApp/Algorithms/Buhlmann/`:

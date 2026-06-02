@@ -306,9 +306,26 @@ struct TechnicalGasAnalysis: Hashable {
     let airBreakRecoveryApplied: Bool
     let warnings: [String]
     let states: [PlannerResultState]
+    /// True when consumption/remaining omit ascent/deco schedule (bottom-phase estimate only).
+    let usesBottomPhaseConsumptionEstimate: Bool
+
+    var cnsPercentDisplay: String {
+        OxygenExposureDisplay.formatCNSPercent(cnsPercent)
+    }
+
+    var cnsDailyPercentDisplay: String {
+        OxygenExposureDisplay.formatCNSPercent(cnsDailyPercent)
+    }
 
     func cnsDescentBottomExceedsPlannerThreshold(checkEnabled: Bool) -> Bool {
         checkEnabled && CNSDescentBottomPlannerRule.exceedsPlannerThreshold(percent: cnsDescentBottomPercent)
+    }
+
+    /// Derived presentation-only difference (full-plan CNS minus descent+bottom); not a separate gas-by-gas model.
+    var cnsAscentDecoEstimatePercent: Double {
+        let delta = cnsPercent - cnsDescentBottomPercent
+        guard delta.isFinite else { return 0 }
+        return min(300, max(0, delta))
     }
 }
 
@@ -378,7 +395,7 @@ struct GasPlanInput: Codable, Hashable {
            let pressure = IOSUnitConversions.ambientPressureBar(depthMeters: effectivePlanningDepthMeters, environment: environment) {
             return pressure
         }
-        return IOSUnitConversions.ambientPressureBar(depthMeters: effectivePlanningDepthMeters)
+        return IOSUnitConversions.displayOnlyAmbientPressureBar(depthMeters: effectivePlanningDepthMeters)
     }
     var estimatedConsumptionLiters: Double { sacLitersPerMinute * ambientPressureBar * plannedBottomMinutes }
     var estimatedRemainingLiters: Double { availableGasLiters - estimatedConsumptionLiters }

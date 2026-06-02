@@ -1,10 +1,9 @@
 import Foundation
 import Combine
-import CoreMotion
 import WatchKit
 
 @MainActor
-final class DiveManager: NSObject, ObservableObject {
+final class DiveManager: ObservableObject {
     static private(set) weak var shared: DiveManager?
 
     private struct ActiveDiveDraft: Codable {
@@ -33,7 +32,8 @@ final class DiveManager: NSObject, ObservableObject {
     @Published var lastErrorMessage: String?
     @Published var alarmWarningMessage: String?
     @Published var gpsConfirmation: DiveGPSConfirmation?
-    @Published var isDepthAutomationAvailable = CMWaterSubmersionManager.waterSubmersionAvailable
+    @Published var isDepthAutomationAvailable = false
+    @Published var developerSensorSourceWarning: String?
     /// Experimental Apnea/Snorkeling surfaces use this legacy name for sensor availability.
     var isDepthSensorAvailable: Bool { isDepthAutomationAvailable }
     @Published var isManualLifecycleActive = false
@@ -83,7 +83,7 @@ final class DiveManager: NSObject, ObservableObject {
     private let logStore: DiveLogStore
     private let gpsManager: GPSManager
     private let ascentSettings: AscentRateSettingsStore
-    private var submersionManager: CMWaterSubmersionManager?
+    private var depthSensorProvider: DepthSensorProvider?
     private var runtimeTimer: Timer?
     private var stopwatchTimer: Timer?
     private var blinkTimer: Timer?
@@ -136,7 +136,6 @@ final class DiveManager: NSObject, ObservableObject {
         self.logStore = logStore
         self.gpsManager = gpsManager
         self.ascentSettings = ascentSettings
-        super.init()
         Self.shared = self
         settingsCancellable = ascentSettings.$limits.sink { [weak self] limits in
             Task { @MainActor in
@@ -150,20 +149,80 @@ final class DiveManager: NSObject, ObservableObject {
             }
         }
         loadStopwatchState()
-        configureSubmersion()
+        configureDepthSensorProvider()
         restoreActiveDiveDraftIfAvailable()
     }
 
-    private func configureSubmersion() {
-        guard CMWaterSubmersionManager.waterSubmersionAvailable else {
-            isDepthAutomationAvailable = false
-            lastErrorMessage = String(localized: "Sensore immersione non disponibile su questo dispositivo o simulatore.")
-            return
+    func reloadDepthSensorConfiguration() {
+        configureDepthSensorProvider()
+    }
+
+    private func configureDepthSensorProvider() {
+        depthSensorProvider?.stop()
+        depthSensorProvider = nil
+        developerSensorSourceWarning = nil
+
+        var mode = DeveloperSettings.sensorSourceMode
+        if mode == .appleSensor, !AppleDepthSensorProvider.isAvailable {
+            DeveloperSettings.persistSensorSource(.simulation)
+            mode = .simulation
+            developerSensorSourceWarning = String(localized: "developer.sensor_source.apple_fallback")
         }
-        isDepthAutomationAvailable = true
-        let manager = CMWaterSubmersionManager()
-        manager.delegate = self
-        submersionManager = manager
+
+        let provider = SensorProviderFactory.makeProvider(mode: mode)
+        provider.onDepthMeasurement = { [weak self] depth, timestamp, temperature in
+            self?.processDepthMeasurement(
+                rawDepthMeters: depth,
+                timestamp: timestamp,
+                receivedAt: timestamp,
+                temperatureCelsius: temperature
+            )
+        }
+        provider.onSubmersionState = { [weak self] state in
+            self?.handleSubmersionState(state)
+        }
+        provider.onTemperature = { [weak self] celsius, receivedAt in
+            self?.currentTemperatureCelsius = DiveAlgorithm.sanitizedTemperatureCelsius(celsius)
+            self?.lastTemperatureSampleAt = celsius == nil ? nil : receivedAt
+        }
+        provider.onError = { [weak self] message in
+            self?.lastErrorMessage = message
+        }
+        provider.start()
+        depthSensorProvider = provider
+
+        switch mode {
+        case .simulation, .automatic:
+            isDepthAutomationAvailable = true
+        case .appleSensor:
+            isDepthAutomationAvailable = AppleDepthSensorProvider.isAvailable
+        }
+    }
+
+    private func handleSubmersionState(_ state: DepthSensorSubmersionState) {
+        switch state {
+        case .submerged:
+            if isDiveActive {
+                hasObservedSubmersionDuringCurrentDive = true
+                if isManualLifecycleActive {
+                    isManualLifecycleActive = false
+                }
+                cancelAutomaticSurfaceEnd()
+            }
+        case .notSubmerged:
+            guard !isManualLifecycleActive || hasObservedSubmersionDuringCurrentDive else { return }
+            guard let previousDepthSample,
+                  previousDepthSample.depthMeters <= DiveAlgorithmConfiguration.automaticStopDepthMeters else { return }
+            evaluateAutomaticSurfaceCandidate(
+                validatedSample: ValidatedDepthSample(
+                    validity: .valid,
+                    rawDepthMeters: previousDepthSample.depthMeters,
+                    sample: previousDepthSample
+                )
+            )
+        case .unknown:
+            break
+        }
     }
 
     private func activeDiveDraftURL() -> URL {
@@ -859,59 +918,6 @@ final class DiveManager: NSObject, ObservableObject {
         isMissionModeActive = false
         missionModeManualPendingForSession = false
         missionModeActivationSource = nil
-    }
-}
-
-extension DiveManager: CMWaterSubmersionManagerDelegate {
-    nonisolated func manager(_ manager: CMWaterSubmersionManager, didUpdate event: CMWaterSubmersionEvent) {
-        Task { @MainActor in
-            switch event.state {
-            case .submerged:
-                if isDiveActive {
-                    hasObservedSubmersionDuringCurrentDive = true
-                    if isManualLifecycleActive {
-                        isManualLifecycleActive = false
-                    }
-                    cancelAutomaticSurfaceEnd()
-                }
-            case .notSubmerged:
-                guard !isManualLifecycleActive || hasObservedSubmersionDuringCurrentDive else { return }
-                guard let previousDepthSample,
-                      previousDepthSample.depthMeters <= DiveAlgorithmConfiguration.automaticStopDepthMeters else { return }
-                evaluateAutomaticSurfaceCandidate(
-                    validatedSample: ValidatedDepthSample(
-                        validity: .valid,
-                        rawDepthMeters: previousDepthSample.depthMeters,
-                        sample: previousDepthSample
-                    )
-                )
-            case .unknown: break
-            @unknown default: break
-            }
-        }
-    }
-
-    nonisolated func manager(_ manager: CMWaterSubmersionManager, didUpdate measurement: CMWaterSubmersionMeasurement) {
-        Task { @MainActor in
-            processDepthMeasurement(
-                rawDepthMeters: measurement.depth?.converted(to: .meters).value,
-                temperatureCelsius: currentTemperatureCelsius
-            )
-        }
-    }
-
-    nonisolated func manager(_ manager: CMWaterSubmersionManager, didUpdate measurement: CMWaterTemperature) {
-        Task { @MainActor in
-            let receivedAt = Date()
-            currentTemperatureCelsius = DiveAlgorithm.sanitizedTemperatureCelsius(
-                measurement.temperature.converted(to: .celsius).value
-            )
-            lastTemperatureSampleAt = receivedAt
-        }
-    }
-
-    nonisolated func manager(_ manager: CMWaterSubmersionManager, errorOccurred error: Error) {
-        Task { @MainActor in lastErrorMessage = error.localizedDescription }
     }
 }
 

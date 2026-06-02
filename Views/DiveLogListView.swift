@@ -72,7 +72,7 @@ struct DiveLogListView: View {
                 DiveClockText(size: 14)
             }
 
-            Text(String(localized: "IMMERSIONI"))
+            Text(String(localized: "logbook.header.title"))
                 .font(.system(size: 13, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white)
                 .kerning(0.4)
@@ -85,7 +85,7 @@ struct DiveLogListView: View {
             .fill(Color.black.opacity(0.54))
             .overlay(
                 VStack(spacing: 4) {
-                    Text(String(localized: "NESSUNA IMMERSIONE"))
+                    Text(String(localized: "logbook.empty.title"))
                         .font(.system(size: 12, weight: .black, design: .rounded))
                         .foregroundStyle(DiveUI.yellow)
                     Text(String(localized: "log.empty.hint"))
@@ -151,12 +151,12 @@ struct DiveLogListView: View {
             Button {
                 guard let latest = log.sessions.first else {
                     listExportURL = nil
-                    listExportMessage = String(localized: "Nessuna immersione da esportare")
+                    listExportMessage = String(localized: "logbook.export.none")
                     HapticService.shared.notify()
                     return
                 }
                 listExportURL = SubsurfaceExportService.writeCSV(for: latest)
-                listExportMessage = listExportURL == nil ? String(localized: "Export CSV non riuscito") : nil
+                listExportMessage = listExportURL == nil ? String(localized: "logbook.export.failed") : nil
                 if listExportURL == nil {
                     HapticService.shared.notify()
                 } else {
@@ -265,6 +265,16 @@ struct DiveLogListView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(
+                String(
+                    format: String(localized: "logbook.row.a11y.format"),
+                    logDate(session.startDate),
+                    session.isManual && !session.hasDepthProfile
+                        ? String(localized: "log.row.manual.nodepth")
+                        : "\(depthDisplay.valueText) \(depthDisplay.unitLabel)",
+                    durationMinutes(session.durationSeconds)
+                )
+            )
 
             Button {
                 pendingDelete = session

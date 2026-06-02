@@ -82,8 +82,11 @@ enum PlannerMODValidator {
     ) -> [MODValidationIssue] {
         guard !stops.isEmpty, !gases.isEmpty else { return [] }
         var issues: [MODValidationIssue] = []
-        for (index, stop) in stops.enumerated() {
-            let gas = gases[min(index, gases.count - 1)]
+        for stop in stops {
+            let gas = gases.first { $0.label == stop.gas }
+                ?? gases.first { stop.gas.localizedCaseInsensitiveContains($0.label) }
+                ?? gases.first
+            guard let gas else { continue }
             if let issue = validateGasSwitch(
                 depthMeters: stop.depthMeters,
                 gas: gas,

@@ -60,6 +60,21 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
 
+      - name: Verify generated project has no drift
+        run: git diff --exit-code -- DIRDiving.xcodeproj
+
+      - name: Verify MAIN target isolation policy
+        run: |
+          BRANCH_NAME="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+          if [[ "$BRANCH_NAME" == "main" ]]; then
+            ./Scripts/check_main_target_isolation.sh
+          else
+            echo "Skipping MAIN isolation check for branch: $BRANCH_NAME"
+          fi
+
+      - name: Secret scan
+        run: ./Scripts/check_secrets.sh
+
       - name: Build watchOS target
         run: |
           BRANCH_NAME="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"

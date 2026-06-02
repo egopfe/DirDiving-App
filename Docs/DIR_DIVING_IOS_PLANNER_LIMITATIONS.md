@@ -50,6 +50,21 @@ The iOS planner now includes a ZHL-16C N2+He multigas reference engine:
 - Schedule segments reconstruct start/end depth from runtime order so exposure reflects descent and ascent, not just target depth.
 - Still **reference-only** — not certified oxygen exposure authority; not a substitute for manufacturer tables, medical guidance, or dive-computer CNS clocks.
 
+## CNS / OTU UI clarity (2026-06-02)
+
+| UI label | Scope |
+|----------|--------|
+| **CNS (bottom preview)** | Pre-calculation only; bottom-phase estimate — not the full planned profile. |
+| **CNS (full plan)** | After calculation; includes descent, bottom, ascent, decompression stops, and decompression gases. |
+| **CNS Descent + Bottom** | After calculation; descent + bottom only — excludes ascent and decompression stops. |
+| **CNS ascent/deco (est.)** | Derived difference (full plan minus descent+bottom); not a certified per-gas CNS ledger. |
+
+**15% rule:** When descent+bottom CNS exceeds 15% of the reference maximum CNS budget (100%), the planner shows a red value, localized warning, and corrective hint (EN/IT). User can disable the warning highlight in **More** settings; values remain visible.
+
+**Accessibility:** Warning banner exposes dedicated VoiceOver label and hint (EN/IT).
+
+**Remaining limitation:** No separate certified breakdown of CNS contribution per decompression gas cylinder — only schedule PPO₂ in the ascent table.
+
 ## Current Assumptions
 
 - Planner environment supports altitude-aware surface pressure and salinity-aware water density via `PlannerEnvironment`; invalid altitude/salinity fail closed with `.invalidEnvironment`.

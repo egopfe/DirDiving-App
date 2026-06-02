@@ -9,6 +9,8 @@ struct ContentView: View {
 
     var body: some View {
         TabView(selection: $navigation.selectedPage) {
+            // MAIN stable runtime is single-mode Diving. Keep this scaffold hidden unless
+            // multiple stable modes are explicitly enabled in a future non-experimental release.
             if WatchModeSelectionPreferences.hasMultipleStableModes {
                 ModeSelectionView()
                     .tag(AppPage.modeSelection)

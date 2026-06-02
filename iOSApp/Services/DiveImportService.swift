@@ -69,7 +69,15 @@ enum DiveImportService {
             return .failure(.fileTooLarge)
         }
 
-        let rows = parseCSV(contents)
+        guard !contents.contains("\0") else {
+            return .failure(.unreadableFile)
+        }
+        guard maxLineLength(in: contents) <= IOSAlgorithmConfiguration.maxImportCSVRowCharacters else {
+            return .failure(.invalidRows(1))
+        }
+        guard let rows = parseCSV(contents) else {
+            return .failure(.invalidRows(1))
+        }
         guard let header = rows.first(where: { row in
             let normalized = row.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             return normalized.contains("time_seconds") && normalized.contains("depth_m")
@@ -332,7 +340,7 @@ enum DiveImportService {
         return (Date(), false)
     }
 
-    private static func parseCSV(_ contents: String) -> [[String]] {
+    private static func parseCSV(_ contents: String) -> [[String]]? {
         var rows: [[String]] = []
         var row: [String] = []
         var field = ""
@@ -349,9 +357,15 @@ enum DiveImportService {
                             inQuotes = false
                             if next == "," {
                                 row.append(field)
+                                if row.count > IOSAlgorithmConfiguration.maxImportCSVColumns {
+                                    return nil
+                                }
                                 field = ""
                             } else if next == "\n" {
                                 row.append(field)
+                                if row.count > IOSAlgorithmConfiguration.maxImportCSVColumns {
+                                    return nil
+                                }
                                 rows.append(row)
                                 row = []
                                 field = ""
@@ -367,9 +381,15 @@ enum DiveImportService {
                 }
             } else if character == "," && !inQuotes {
                 row.append(field)
+                if row.count > IOSAlgorithmConfiguration.maxImportCSVColumns {
+                    return nil
+                }
                 field = ""
             } else if character == "\n" && !inQuotes {
                 row.append(field)
+                if row.count > IOSAlgorithmConfiguration.maxImportCSVColumns {
+                    return nil
+                }
                 if row.contains(where: { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) {
                     rows.append(row)
                 }
@@ -378,13 +398,33 @@ enum DiveImportService {
             } else if character != "\r" {
                 field.append(character)
             }
+            if field.count > IOSAlgorithmConfiguration.maxImportCSVFieldCharacters {
+                return nil
+            }
         }
 
         row.append(field)
+        if row.count > IOSAlgorithmConfiguration.maxImportCSVColumns {
+            return nil
+        }
         if row.contains(where: { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) {
             rows.append(row)
         }
         return rows
+    }
+
+    private static func maxLineLength(in contents: String) -> Int {
+        var current = 0
+        var longest = 0
+        for scalar in contents.unicodeScalars {
+            if scalar == "\n" {
+                longest = max(longest, current)
+                current = 0
+            } else if scalar != "\r" {
+                current += 1
+            }
+        }
+        return max(longest, current)
     }
 
     private static func sourceStartDate(header: [String], rows: [[String]], url: URL) -> (date: Date, preserved: Bool) {

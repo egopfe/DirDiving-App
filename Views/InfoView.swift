@@ -1,11 +1,12 @@
 import SwiftUI
 import WatchKit
-import CoreMotion
 
 struct InfoView: View {
     @EnvironmentObject private var watchSync: WatchSyncService
     @EnvironmentObject private var dive: DiveManager
     @State private var batteryLevel: Float = WKInterfaceDevice.current().batteryLevel
+    @State private var versionTapCount = 0
+    @State private var developerUnlockedNotice = false
 
     var body: some View {
         ZStack {
@@ -25,7 +26,7 @@ struct InfoView: View {
                         .frame(maxWidth: .infinity)
 
                     VStack(spacing: 4) {
-                        infoRow(title: String(localized: "Versione"), value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "n/d")
+                        versionRow
                         deviceRow
                         batteryRow
                         appleLowPowerModeRow
@@ -43,6 +44,19 @@ struct InfoView: View {
             WKInterfaceDevice.current().isBatteryMonitoringEnabled = true
             batteryLevel = WKInterfaceDevice.current().batteryLevel
         }
+        .alert(String(localized: "developer.section.title"), isPresented: $developerUnlockedNotice) {
+            Button(String(localized: "OK"), role: .cancel) {}
+        } message: {
+            Text(String(localized: "developer.unlock.confirmed"))
+        }
+    }
+
+    private var versionRow: some View {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "n/d"
+        return infoRow(title: String(localized: "Versione"), value: version)
+            .developerVersionUnlock(tapCount: $versionTapCount) {
+                developerUnlockedNotice = true
+            }
     }
 
     private var header: some View {
@@ -78,6 +92,8 @@ struct InfoView: View {
         .padding(.vertical, 7)
         .frame(minHeight: 34)
         .background(rowBackground)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(format: String(localized: "info.row.a11y.format"), title, value))
     }
 
     private var deviceRow: some View {
@@ -163,8 +179,12 @@ struct InfoView: View {
         VStack(alignment: .leading, spacing: 5) {
             diagnosticRow(String(localized: "Entitlement profondità"), String(localized: "info.depth.entitlement.review_required"))
             diagnosticRow(
-                String(localized: "Sensore profondità"),
-                CMWaterSubmersionManager.waterSubmersionAvailable
+                String(localized: "developer.sensor_source.title"),
+                sensorSourceLabel
+            )
+            diagnosticRow(
+                String(localized: "settings.row.depth_sensor.title"),
+                dive.isDepthAutomationAvailable
                     ? String(localized: "Disponibile")
                     : String(localized: "Non disponibile")
             )
@@ -204,6 +224,17 @@ struct InfoView: View {
             Text(value)
                 .font(.system(size: 10, weight: .black, design: .rounded))
                 .foregroundStyle(diagnosticValueIsPositive(value) ? DiveUI.green : DiveUI.yellow)
+        }
+    }
+
+    private var sensorSourceLabel: String {
+        switch DeveloperSettings.sensorSourceMode {
+        case .automatic:
+            return String(localized: "developer.sensor_source.automatic")
+        case .appleSensor:
+            return String(localized: "developer.sensor_source.apple_sensor")
+        case .simulation:
+            return String(localized: "developer.sensor_source.simulation")
         }
     }
 

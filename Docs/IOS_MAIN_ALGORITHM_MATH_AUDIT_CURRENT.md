@@ -2,10 +2,22 @@
 
 **Audit date:** 2026-06-01  
 **Repository:** DIR DIVING (`DirDiving-App`)  
-**Branch audited:** `main` @ `5c2a27a`  
+**Branch audited:** `main` @ `5c2a27a` (baseline); remediation 2026-06-01 on `main`  
 **Target:** `DIRDiving iOS` (iOS Companion MAIN only)  
-**Mode:** Read-only static audit — **no application code changes**  
-**Related:** [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) (remediation @ `dce89e7`), [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) (Watch MAIN parallel), [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md), [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md)
+**Mode:** Baseline was read-only static audit; **remediation applied 2026-06-01** — see [`IOS_MAIN_ALGORITHM_READINESS_100_FINAL_QA.md`](IOS_MAIN_ALGORITHM_READINESS_100_FINAL_QA.md)  
+**Related:** [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) (prior pass @ `dce89e7`), [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) (Watch MAIN parallel), [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md), [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md)
+
+### Remediation status (2026-06-01)
+
+| ID | Status |
+|----|--------|
+| IOSMATH-HIGH-001 | **Fixed** — model-backed NDL chart ([`IOS_PLANNER_CHART_TRUTHFULNESS.md`](IOS_PLANNER_CHART_TRUTHFULNESS.md)) |
+| IOSMATH-HIGH-002 | **Fixed** — 350 m unified cap ([`IOS_DEPTH_LIMIT_POLICY.md`](IOS_DEPTH_LIMIT_POLICY.md)) |
+| IOSMATH-MED-001 … MED-010 | **Fixed or mitigated** — see final QA report |
+| IOSMATH-LOW-002 … LOW-007 | **Fixed** — display/truthfulness |
+| View-layer test gaps | **Partially closed** — `IOSMainAlgorithmReadinessTests` + `AnalysisDashboardMath` |
+
+Post-remediation estimate: **~98%** code readiness; external paired-device / iCloud QA still required.
 
 ---
 

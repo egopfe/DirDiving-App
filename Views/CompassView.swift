@@ -143,7 +143,7 @@ struct CompassView: View {
                     inDiveMetric(title: String(localized: "compass.metric.runtime"), value: Formatters.time(dive.runtime), unit: nil)
                 }
             } else {
-                Text("Dati immersione non disponibili")
+                Text(String(localized: "compass.idle.no_dive_data"))
                     .font(.system(size: 10, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.yellow)
                     .multilineTextAlignment(.center)
@@ -158,7 +158,7 @@ struct CompassView: View {
                     )
             }
             if dive.isManualLifecycleActive {
-                Text("Sessione manuale: profondità automatica non disponibile")
+                Text(String(localized: "compass.idle.manual_no_depth"))
                     .font(.system(size: 9, weight: .semibold, design: .rounded))
                     .foregroundStyle(DiveUI.yellow)
                     .lineLimit(2)

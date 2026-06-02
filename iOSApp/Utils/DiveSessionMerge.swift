@@ -29,7 +29,9 @@ enum DiveSessionMerge {
             endDate: endDate,
             durationSeconds: summary.durationSeconds,
             maxDepthMeters: summary.samples.isEmpty ? max(winner.maxDepthMeters, loser.maxDepthMeters) : summary.maxDepthMeters,
-            avgDepthMeters: summary.samples.isEmpty ? max(0, min(winner.avgDepthMeters, loser.avgDepthMeters)) : summary.averageDepthMeters,
+            avgDepthMeters: summary.samples.isEmpty
+                ? mergedManualAverageDepthMeters(winner: winner, loser: loser)
+                : summary.averageDepthMeters,
             avgWaterTemperatureCelsius: summary.averageTemperatureCelsius ?? winner.avgWaterTemperatureCelsius ?? loser.avgWaterTemperatureCelsius,
             ttv: summary.samples.isEmpty ? max(winner.ttv, loser.ttv) : summary.ttv,
             entryGPS: entryGPS,
@@ -75,6 +77,18 @@ enum DiveSessionMerge {
             return secondary
         }
         return nil
+    }
+
+    /// When neither side has a depth profile, keep the newer session's average depth; if missing, the larger trusted value (never `min`, which under-reports).
+    private static func mergedManualAverageDepthMeters(winner: DiveSession, loser: DiveSession) -> Double {
+        let winnerAvg = winner.avgDepthMeters
+        let loserAvg = loser.avgDepthMeters
+        if winnerAvg > 0, loserAvg > 0 {
+            return max(winnerAvg, loserAvg)
+        }
+        if winnerAvg > 0 { return winnerAvg }
+        if loserAvg > 0 { return loserAvg }
+        return 0
     }
 
     private static func newer(_ lhs: DiveSession, _ rhs: DiveSession) -> DiveSession {
