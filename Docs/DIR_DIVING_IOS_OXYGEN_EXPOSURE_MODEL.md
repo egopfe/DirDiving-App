@@ -58,13 +58,27 @@ Implemented in `CNSDescentBottomPlannerRule` (`OxygenExposureModels.swift`).
 
 ### UI (informational only)
 
-**Settings (More tab):** toggle `dirdiving_ios_planner_cns_descent_bottom_check_enabled` (default **on**). When off, the CNS Descent + Bottom value still appears in planner results but the 15% warning styling and message are suppressed.
+**Pre-calculation (Planner input — DENSITY / END card):**
 
-Shown in the planner **result** grid alongside CNS% and OTU:
+- **CNS (bottom preview)** — bottom-phase reference only; footnote states full-plan CNS appears after **Calcola Piano**.
+- **OTU** — preview alongside preview CNS.
 
-- Label: localized “CNS Descent + Bottom” / “CNS Discesa + Fondo”
-- Value > 15%: existing red accent + warning triangle (no new color system)
-- Warning copy shown only when threshold exceeded (IT/EN localized)
+**Post-calculation (Dive plan result — PLAN tab grid):**
+
+| Label (EN) | Meaning |
+|------------|---------|
+| **CNS (full plan)** | Total CNS for the complete planned profile (descent, bottom, ascent, decompression stops, decompression gases). |
+| **CNS Descent + Bottom** | CNS integrated only on descent + bottom segments; excludes ascent and decompression stops. |
+| **CNS ascent/deco (est.)** | Derived `max(0, fullPlanCNS − descentBottomCNS)`; informational only — not a per-gas certified breakdown. |
+| **OTU** | Full-profile OTU reference estimate. |
+
+Footnotes (EN/IT) clarify inclusion/exclusion and reference-only posture.
+
+**15% planner warning (result screen):**
+
+- Toggle: **More → CNS Descent + Bottom 15% check** (`dirdiving_ios_planner_cns_descent_bottom_check_enabled`, default **on**).
+- When **CNS Descent + Bottom > 15%** and toggle on: value turns red, warning triangle, red warning text + action-oriented hint, VoiceOver label/hint.
+- Does **not** change decompression stops, gas selection, or Bühlmann math.
 
 This does **not** change decompression stops, gas selection, or Bühlmann math.
 

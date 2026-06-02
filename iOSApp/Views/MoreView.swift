@@ -8,6 +8,8 @@ struct MoreView: View {
     @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
     @AppStorage(PlannerCNSDescentBottomCheckSettings.storageKey) private var cnsDescentBottomCheckEnabled = PlannerCNSDescentBottomCheckSettings.defaultEnabled
     @State private var showResetPairingConfirm = false
+    @State private var versionTapCount = 0
+    @State private var developerUnlockedNotice = false
 
     var body: some View {
         NavigationStack {
@@ -30,6 +32,23 @@ struct MoreView: View {
                             row(String(localized: "more.settings.local_only_title"), String(localized: "more.settings.local_only_value"))
                             row(String(localized: "more.planner_safety.title"), String(localized: "more.disclaimer.required"))
                             cnsDescentBottomCheckToggle
+                            if DeveloperSettings.isDeveloperSectionVisible {
+                                NavigationLink {
+                                    DeveloperSettingsView()
+                                } label: {
+                                    HStack {
+                                        Label(String(localized: "developer.section.title"), systemImage: "hammer.fill")
+                                            .foregroundStyle(DIRTheme.yellow)
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption.weight(.bold))
+                                            .foregroundStyle(DIRTheme.muted)
+                                    }
+                                    .font(.callout.weight(.semibold))
+                                    .padding(.vertical, 6)
+                                }
+                                .buttonStyle(.plain)
+                            }
                             NavigationLink {
                                 IOSLegalSafetyView()
                             } label: {
@@ -136,14 +155,20 @@ struct MoreView: View {
                             row(String(localized: "Bundle"), "com.egopfe.dirdiving.ios")
                             CSVImportPanel()
                         }
+                        appVersionRow
                         DIRWarningBox(
-                            text: String(localized: "DIR DIVING e uno strumento di supporto per logbook, analisi e pianificazione preliminare. Non sostituisce formazione, procedure del dive center, equipaggiamento certificato o il giudizio umano. L'app non e un computer subacqueo certificato salvo esplicita omologazione futura. Output del planner indicativi: verificarli con strumenti certificati. GPS utile in superficie; sott'acqua e in copertura e inaffidabile o assente.")
+                            text: String(localized: "more.safety.footer")
                         )
                     }
                     .padding(16)
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
+            .alert(String(localized: "developer.section.title"), isPresented: $developerUnlockedNotice) {
+                Button(String(localized: "OK"), role: .cancel) {}
+            } message: {
+                Text(String(localized: "developer.unlock.confirmed"))
+            }
             .alert(String(localized: "more.sync.reset_pairing"), isPresented: $showResetPairingConfirm) {
                 Button(String(localized: "Cancel"), role: .cancel) {}
                 Button(String(localized: "more.sync.reset_pairing_confirm"), role: .destructive) {
@@ -204,7 +229,7 @@ struct MoreView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(String(localized: "more.settings.cns_descent_bottom_check"))
                     .foregroundStyle(.white)
-                Text(String(localized: "more.settings.cns_descent_bottom_check_hint"))
+                Text(String(localized: "planner.settings.cns_descent_bottom_15_check.description"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -361,6 +386,16 @@ struct MoreView: View {
                     .padding(.vertical, 2)
                 }
             }
+        }
+    }
+
+    private var appVersionRow: some View {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "n/d"
+        return DIRCard(String(localized: "more.section.about"), icon: "info.circle", accent: DIRTheme.muted) {
+            row(String(localized: "Versione"), version)
+                .developerVersionUnlock(tapCount: $versionTapCount) {
+                    developerUnlockedNotice = true
+                }
         }
     }
 

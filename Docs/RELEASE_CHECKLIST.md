@@ -13,10 +13,14 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 ## Build
 
 - [ ] `xcodegen generate` senza errori  
+- [ ] `git diff --exit-code -- DIRDiving.xcodeproj` (nessun drift post-generate)
 - [ ] `xcodebuild` **DIRDiving Watch App** — `generic/platform=watchOS` — **PASS**  
 - [ ] `xcodebuild` **DIRDiving iOS** — `generic/platform=iOS` — **PASS**  
 - [ ] `xcodebuild test` **DIRDiving Watch Algorithm Tests** — **PASS**
 - [ ] `xcodebuild test` **DIRDiving iOS Algorithm Tests** — **PASS**
+- [ ] `./Scripts/check_main_target_isolation.sh` — **PASS**
+- [ ] `./Scripts/check_secrets.sh` — **PASS**
+- [ ] `./Scripts/validate_main_release_readiness.sh` — **PASS**
 
 ## Depth entitlement (Apple Watch Ultra — field validation)
 
@@ -54,6 +58,8 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 - [ ] Side Button descritto onestamente come system-controlled
 - [ ] Action Button descritto come disponibile solo tramite Shortcuts / App Intents quando watchOS lo espone
 - [ ] Planner iOS descritto come riferimento non certificato; il motore Buhlmann ZHL-16C N2+He multigas e presente ma richiede validazione esterna prima di claim piu forti.
+- [ ] TTV Watch descritto come indice informativo (non NDL/TTS/deco)
+- [ ] Mission Mode descritto come profilo runtime/UI interno (non Apple Basso Consumo)
 
 ## QA algoritmico MAIN
 
@@ -110,3 +116,14 @@ Approvazione release: __________________ Data: ________
 ---
 
 *Checklist documentale; non modifica il codice.*
+
+## Gate esterni obbligatori (non chiudibili solo da codice)
+
+- [ ] `Docs/WATCH_ULTRA_PHYSICAL_QA_MATRIX.md`
+- [ ] `Docs/IOS_DYNAMIC_TYPE_VOICEOVER_QA_MATRIX.md`
+- [ ] `Docs/WATCH_IOS_SYNC_QA_MATRIX.md`
+- [ ] `Docs/ICLOUD_TWO_DEVICE_QA_MATRIX.md`
+- [ ] `Docs/CSV_SUBSURFACE_QA_MATRIX.md`
+- [ ] `Docs/PLANNER_GOLDEN_VALIDATION_QA_MATRIX.md`
+- [ ] `Docs/TESTFLIGHT_RELEASE_GATE_CHECKLIST.md`
+- [ ] `Docs/APP_STORE_RELEASE_GATE_CHECKLIST.md`

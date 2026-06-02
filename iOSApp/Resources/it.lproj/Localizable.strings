@@ -595,8 +595,16 @@
 "planner.team.available_gas_format" = "%@ L";
 "planner.briefing.title" = "BRIEFING";
 "planner.buhlmann.curve_title" = "CURVA BUHLMANN ZH-L16C";
-"planner.buhlmann.curve_disclaimer" = "Curva NDL solo illustrativa — l'asse Y è un raggruppamento cosmetico dei compartimenti, non carico tessuti o ceiling.";
-"planner.result.calculation_incomplete" = "Schedule decompressivo incompleto — le soste parziali sono state nascoste perché il motore non ha convergito.";
+"planner.buhlmann.curve_disclaimer" = "Curva NDL di riferimento dal motore Bühlmann (non certificata). Profondità vs minuti NDL; non è carico tissutale né piano decompressivo certificato.";
+"planner.buhlmann.axis.depth" = "Profondità (m)";
+"planner.buhlmann.axis.ndl" = "NDL (min)";
+"planner.result.calculation_incomplete" = "Calcolo incompleto";
+"planner.result.calculation_incomplete.detail" = "Le soste non sono mostrate perché è stato raggiunto il limite di calcolo. Non usare questo risultato come piano immersione.";
+"planner.result.calculation_incomplete.recovery" = "Prova a ridurre profondità, tempo di fondo, fattori di gradiente o complessità gas.";
+"planner.ndl.reference_ascent_footnote" = "L'NDL usa una risalita di riferimento fissa a 9 m/min nel motore; l'impostazione risalita vale per lo schedule deco.";
+"planner.gas.bottom_phase_estimate_footnote" = "Il consumo stimato copre solo la fase di fondo finché non calcoli un piano completo.";
+"planner.gas.turn_pressure_rule_footnote" = "La pressione di inversione è una regola empirica (metà del gas utile sopra rock bottom), non una procedura certificata.";
+"analysis.metric.bearing_first_of_many" = "Direzione (1ª di %d)";
 "planner.result.deco_stops" = "Soste deco";
 "planner.export.deco_stop_line" = "  %@ · %d min · %@ · PPO2 %@";
 "planner.table.surface" = "SUPERFICIE";
@@ -784,7 +792,7 @@
 "planner.gas_ledger.warning.minimum.message" = "Il gas residuo di %@ è sotto il minimo modellato.";
 "planner.gas_ledger.warning.minimum.hint" = "Rivedi rock-bottom e SAC di emergenza.";
 "planner.gas_ledger.warning.lost_gas.title" = "Contingenza lost gas";
-"planner.gas_ledger.warning.lost_gas.message" = "%@ potrebbe non coprire il margine lost-gas.";
+"planner.gas_ledger.warning.lost_gas.message" = "%@ potrebbe non coprire il margine lost-gas empirico (30%% del consumato vs riserva).";
 "planner.gas_ledger.warning.lost_gas.hint" = "Solo avviso di pianificazione: verifica con procedure di team.";
 "planner.gas_ledger.warning.allocation.title" = "Allocazione incompleta";
 "planner.gas_ledger.warning.allocation.message" = "%@ non può essere allocato completamente sulle bombole.";
@@ -793,10 +801,21 @@
 "planner.oxygen_exposure.a11y" = "CNS e OTU usano modelli NOAA con recupero superficie e limiti giornalieri, non guida certificata.";
 "planner.oxygen_exposure.daily_summary" = "Riferimento giornaliero: CNS %@%% · OTU 24h %@";
 "planner.oxygen_exposure.air_break_applied" = "Recupero CNS in pausa aria applicato dove PPO₂ ≤ 0,5 bar.";
+"planner.metric.cns_full_plan" = "CNS (piano completo)";
+"planner.metric.cns_full_plan.footnote" = "Include discesa, fondo, risalita e decompressione. Stima solo di riferimento.";
+"planner.metric.cns_preview" = "CNS (anteprima fondo)";
+"planner.metric.cns_preview.footnote" = "Il CNS del piano completo è disponibile dopo il calcolo del piano.";
 "planner.metric.cns_descent_bottom" = "CNS Discesa + Fondo";
+"planner.metric.cns_descent_bottom.footnote" = "Solo discesa e fondo; esclude risalita e soste decompressive.";
+"planner.metric.cns_ascent_deco_estimate" = "CNS risalita/deco (stima)";
+"planner.metric.cns_ascent_deco_estimate.footnote" = "Differenza derivata dal CNS del piano completo; solo riferimento.";
 "planner.cns_descent_bottom.warning" = "Attenzione: il CNS accumulato durante discesa e fondo supera il 15% del budget massimo CNS.";
+"planner.cns_descent_bottom.warning.hint" = "Valuta di ridurre il tempo di fondo, ridurre l'esposizione all'O₂ o ripianificare la strategia dei gas. Solo riferimento — verifica con metodi certificati.";
+"planner.settings.cns_descent_bottom_15_check.description" = "Mostra un avviso quando il CNS di discesa + fondo supera il 15% del budget massimo CNS.";
+"planner.accessibility.cns_descent_bottom.warning.label" = "Avviso CNS discesa e fondo. Il valore supera il quindici percento del budget massimo CNS.";
+"planner.accessibility.cns_descent_bottom.warning.hint" = "Controlla tempo di fondo, frazione di ossigeno e strategia dei gas. È solo una stima di riferimento.";
 "more.settings.cns_descent_bottom_check" = "Controllo CNS 15% discesa + fondo";
-"more.settings.cns_descent_bottom_check_hint" = "Se attivo, il planner evidenzia il CNS da discesa e fondo oltre il 15% del budget giornaliero di riferimento.";
+"more.settings.cns_descent_bottom_check_hint" = "Mostra un avviso quando il CNS di discesa + fondo supera il 15% del budget massimo CNS.";
 "more.settings.cns_descent_bottom_check.a11y" = "Attiva o disattiva l'avviso CNS discesa e fondo al quindici per cento nel planner.";
 "planner.result.warnings.title" = "AVVISI PIANO";
 "planner.header.reference_only.hint" = "Riferimento Bühlmann — non consiglio decompressivo certificato né comportamento di computer subacqueo in tempo reale.";
@@ -968,3 +987,26 @@
 "logbook.delete.confirm.message" = "L'immersione verrà rimossa dal logbook su questo dispositivo.";
 "logbook.delete.confirm.action" = "Elimina";
 "logbook.delete.cancel" = "Annulla";
+
+/* MAIN UI remediation 2026-06-01 */
+"ios.legal.hero.subtitle" = "Companion iOS";
+"ios.legal.hero.onboarding_caption" = "Onboarding legale e di sicurezza";
+"ios.legal.exit_alert.title" = "Esci dall'app";
+"ios.legal.exit_alert.confirm" = "Ho capito";
+"ios.legal.step.format" = "Passaggio %d di %d";
+"more.safety.footer" = "DIR DIVING è uno strumento di supporto per logbook, analisi e pianificazione preliminare. Non sostituisce formazione, procedure del dive center, equipaggiamento certificato o il giudizio umano. L'app non è un computer subacqueo certificato salvo esplicita omologazione futura. Output del planner indicativi: verificarli con strumenti certificati. GPS utile in superficie; sott'acqua o in copertura è inaffidabile o assente.";
+"planner.buhlmann.chart.a11y.label" = "Grafico curva NDL di riferimento";
+"planner.buhlmann.chart.a11y.hint" = "Profondità versus minuti NDL dal motore Bühlmann. Solo riferimento, non carico tissutale né piano decompressivo certificato.";
+"analysis.chart.a11y.label" = "Grafico analisi immersioni";
+"analysis.chart.a11y.hint" = "Riepilogo immersioni selezionate. Immersioni demo escluse salvo toggle revisore.";
+
+"more.section.about" = "Informazioni";
+"developer.section.title" = "Sviluppatore";
+"developer.section.subtitle" = "Strumenti di test interni";
+"developer.sensor_source.title" = "Sorgente sensore";
+"developer.sensor_source.automatic" = "Automatico";
+"developer.sensor_source.apple_sensor" = "Sensore Apple";
+"developer.sensor_source.simulation" = "Simulazione";
+"developer.sensor_source.footer" = "Opzione di test per sviluppatori. Non visibile agli utenti finali.";
+"developer.sensor_source.apple_fallback" = "Sensore di profondità Apple non disponibile. Passaggio alla modalità Simulazione.";
+"developer.unlock.confirmed" = "Le impostazioni sviluppatore sono ora visibili in Altro.";

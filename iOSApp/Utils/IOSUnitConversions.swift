@@ -41,14 +41,24 @@ enum IOSUnitConversions {
         feetPerMinute / IOSAlgorithmConfiguration.metersPerMinuteToFeetPerMinute
     }
 
+    /// Display-only fallback when no planner environment is available. Do not use for MOD/PPO₂ validation.
+    static func displayOnlyAmbientPressureBar(depthMeters: Double) -> Double {
+        AmbientPressureModel.ambientPressureBar(
+            depthMeters: depthMeters,
+            environment: .seaLevelSaltWater
+        ) ?? (IOSAlgorithmConfiguration.surfacePressureBar
+            + max(0, depthMeters) / IOSAlgorithmConfiguration.metersPerBarApproximation)
+    }
+
+    @available(*, deprecated, message: "Use ambientPressureBar(depthMeters:environment:) for safety paths.")
     static func ambientPressureBar(depthMeters: Double) -> Double {
-        return IOSAlgorithmConfiguration.surfacePressureBar
-            + max(0, depthMeters) / IOSAlgorithmConfiguration.metersPerBarApproximation
+        displayOnlyAmbientPressureBar(depthMeters: depthMeters)
     }
 
     static func depthMeters(forPressureBar pressureBar: Double) -> Double {
-        return max(0, pressureBar - IOSAlgorithmConfiguration.surfacePressureBar)
-            * IOSAlgorithmConfiguration.metersPerBarApproximation
+        AmbientPressureModel.depthMeters(ambientPressureBar: pressureBar, environment: .seaLevelSaltWater)
+            ?? max(0, pressureBar - IOSAlgorithmConfiguration.surfacePressureBar)
+                * IOSAlgorithmConfiguration.metersPerBarApproximation
     }
 
     static func ambientPressureBar(depthMeters: Double, environment: PlannerEnvironment) -> Double? {

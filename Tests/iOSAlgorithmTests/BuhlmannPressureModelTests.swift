@@ -1,14 +1,21 @@
 import XCTest
 
 final class BuhlmannPressureModelTests: XCTestCase {
-    func testAmbientPressureUsesProjectTenMetersPerBarApproximation() {
-        XCTAssertEqual(IOSUnitConversions.ambientPressureBar(depthMeters: 0), 1.0, accuracy: 0.0001)
-        XCTAssertEqual(IOSUnitConversions.ambientPressureBar(depthMeters: 30), 4.0, accuracy: 0.0001)
-        XCTAssertEqual(IOSUnitConversions.depthMeters(forPressureBar: 4.0), 30.0, accuracy: 0.0001)
+    func testDisplayAmbientPressureUsesAmbientPressureModelAtSeaLevel() {
+        let sea = PlannerEnvironment.seaLevelSaltWater
+        let surface = AmbientPressureModel.ambientPressureBar(depthMeters: 0, environment: sea)!
+        let at30 = AmbientPressureModel.ambientPressureBar(depthMeters: 30, environment: sea)!
+        XCTAssertEqual(IOSUnitConversions.ambientPressureBar(depthMeters: 0), surface, accuracy: 0.0001)
+        XCTAssertEqual(IOSUnitConversions.ambientPressureBar(depthMeters: 30), at30, accuracy: 0.0001)
+        XCTAssertEqual(IOSUnitConversions.depthMeters(forPressureBar: at30), 30.0, accuracy: 0.05)
     }
 
     func testNegativeDepthIsClampedToSurfacePressureForPressureModel() {
-        XCTAssertEqual(IOSUnitConversions.ambientPressureBar(depthMeters: -10), 1.0, accuracy: 0.0001)
+        XCTAssertEqual(
+            IOSUnitConversions.ambientPressureBar(depthMeters: -10),
+            IOSAlgorithmConfiguration.surfacePressureBar,
+            accuracy: 0.0001
+        )
     }
 
     func testInspiredNitrogenAndHeliumPressureSubtractWaterVapor() {
