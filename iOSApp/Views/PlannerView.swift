@@ -469,10 +469,16 @@ struct PlannerView: View {
                 HStack(spacing: 0) {
                     DIRMetricTile(title: "EAD", value: eadMeasurement?.value ?? "-", unit: eadMeasurement?.unit, color: DIRTheme.cyan)
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: "CNS", value: store.analysis.cnsPercentDisplay, unit: "%", color: store.analysis.cnsPercent > 80 ? DIRTheme.red : DIRTheme.cyan)
+                    DIRMetricTile(
+                        title: String(localized: "planner.metric.cns_preview"),
+                        value: store.analysis.cnsPercentDisplay,
+                        unit: "%",
+                        color: store.analysis.cnsPercent > 80 ? DIRTheme.red : DIRTheme.cyan
+                    )
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: "OTU", value: Formatters.zero(store.analysis.otu), color: DIRTheme.cyan)
                 }
+                plannerMutedFootnote(String(localized: "planner.metric.cns_preview.footnote"))
                 Divider().overlay(DIRTheme.hairline)
                 Text(String(localized: "planner.oxygen_exposure.disclaimer"))
                     .font(.caption2)
@@ -762,6 +768,16 @@ struct PlannerView: View {
         ppO2 > store.input.bottomGas.maxPPO2 ? DIRTheme.red : DIRTheme.green
     }
 
+    private func plannerMutedFootnote(_ text: String) -> some View {
+        Text(text)
+            .font(.caption2)
+            .foregroundStyle(DIRTheme.muted)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+    }
+
     private func plannerStateWarning(_ message: PlannerUserFacingMessage) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(message.title)
@@ -792,6 +808,46 @@ struct PlanResultView: View {
 
     private var cnsDescentBottomWarningActive: Bool {
         store.plan.gasAnalysis.cnsDescentBottomExceedsPlannerThreshold(checkEnabled: cnsDescentBottomCheckEnabled)
+    }
+
+    private var cnsDescentBottomTileAccessibilityLabel: String {
+        let value = Formatters.zero(store.plan.gasAnalysis.cnsDescentBottomPercent)
+        let base = "\(String(localized: "planner.metric.cns_descent_bottom")), \(value) percent"
+        guard cnsDescentBottomWarningActive else { return base }
+        return "\(String(localized: "planner.accessibility.cns_descent_bottom.warning.label")) \(base)"
+    }
+
+    private var cnsDescentBottomWarningBanner: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .top, spacing: 8) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(DIRTheme.red)
+                Text(String(localized: "planner.cns_descent_bottom.warning"))
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(DIRTheme.red)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Text(String(localized: "planner.cns_descent_bottom.warning.hint"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(localized: "planner.accessibility.cns_descent_bottom.warning.label"))
+        .accessibilityHint(String(localized: "planner.accessibility.cns_descent_bottom.warning.hint"))
+    }
+
+    private func plannerResultMutedFootnote(_ text: String) -> some View {
+        Text(text)
+            .font(.caption2)
+            .foregroundStyle(DIRTheme.muted)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 4)
     }
 
     private func depthText(_ meters: Double) -> String {
@@ -1180,8 +1236,13 @@ struct PlanResultView: View {
                 Divider().overlay(DIRTheme.hairline)
                 DIRMetricTile(title: String(localized: "planner.result.bottom_time"), value: Formatters.zero(store.input.plannedBottomMinutes), unit: "min")
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: "CNS%", value: store.plan.gasAnalysis.cnsPercentDisplay, unit: "%")
+                DIRMetricTile(
+                    title: String(localized: "planner.metric.cns_full_plan"),
+                    value: store.plan.gasAnalysis.cnsPercentDisplay,
+                    unit: "%"
+                )
             }
+            plannerResultMutedFootnote(String(localized: "planner.metric.cns_full_plan.footnote"))
             Divider().overlay(DIRTheme.hairline)
             HStack(spacing: 0) {
                 DIRMetricTile(title: "NDL", value: Formatters.one(store.plan.ndlMinutes), unit: "min")
@@ -1200,20 +1261,22 @@ struct PlanResultView: View {
                     color: cnsDescentBottomWarningActive ? DIRTheme.red : DIRTheme.cyan,
                     icon: cnsDescentBottomWarningActive ? "exclamationmark.triangle.fill" : nil
                 )
+                .accessibilityLabel(cnsDescentBottomTileAccessibilityLabel)
             }
+            plannerResultMutedFootnote(String(localized: "planner.metric.cns_descent_bottom.footnote"))
             if cnsDescentBottomWarningActive {
-                HStack(alignment: .top, spacing: 8) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(DIRTheme.red)
-                    Text(String(localized: "planner.cns_descent_bottom.warning"))
-                        .font(.caption2.weight(.medium))
-                        .foregroundStyle(DIRTheme.red)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .padding(.horizontal, 12)
-                .accessibilityElement(children: .combine)
+                cnsDescentBottomWarningBanner
             }
+            Divider().overlay(DIRTheme.hairline)
+            HStack(spacing: 0) {
+                DIRMetricTile(
+                    title: String(localized: "planner.metric.cns_ascent_deco_estimate"),
+                    value: Formatters.zero(store.plan.gasAnalysis.cnsAscentDecoEstimatePercent),
+                    unit: "%",
+                    color: DIRTheme.cyan
+                )
+            }
+            plannerResultMutedFootnote(String(localized: "planner.metric.cns_ascent_deco_estimate.footnote"))
             Divider().overlay(DIRTheme.hairline)
             VStack(spacing: 4) {
                 Text(String(localized: "planner.oxygen_exposure.disclaimer"))

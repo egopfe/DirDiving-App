@@ -204,7 +204,7 @@ struct MoreView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(String(localized: "more.settings.cns_descent_bottom_check"))
                     .foregroundStyle(.white)
-                Text(String(localized: "more.settings.cns_descent_bottom_check_hint"))
+                Text(String(localized: "planner.settings.cns_descent_bottom_15_check.description"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)

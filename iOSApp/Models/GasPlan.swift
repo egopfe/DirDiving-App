@@ -320,6 +320,13 @@ struct TechnicalGasAnalysis: Hashable {
     func cnsDescentBottomExceedsPlannerThreshold(checkEnabled: Bool) -> Bool {
         checkEnabled && CNSDescentBottomPlannerRule.exceedsPlannerThreshold(percent: cnsDescentBottomPercent)
     }
+
+    /// Derived presentation-only difference (full-plan CNS minus descent+bottom); not a separate gas-by-gas model.
+    var cnsAscentDecoEstimatePercent: Double {
+        let delta = cnsPercent - cnsDescentBottomPercent
+        guard delta.isFinite else { return 0 }
+        return min(300, max(0, delta))
+    }
 }
 
 enum GasDensityRating: String, Hashable {
