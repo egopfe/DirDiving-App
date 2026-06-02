@@ -583,3 +583,13 @@
 "logbook.row.a11y.format" = "%@, profondità max %@, durata %@";
 "logbook.detail.a11y.summary" = "Riepilogo immersione";
 "info.row.a11y.format" = "%@, %@";
+
+"developer.section.title" = "Sviluppatore";
+"developer.section.subtitle" = "Strumenti di test interni";
+"developer.sensor_source.title" = "Sorgente sensore";
+"developer.sensor_source.automatic" = "Automatico";
+"developer.sensor_source.apple_sensor" = "Sensore Apple";
+"developer.sensor_source.simulation" = "Simulazione";
+"developer.sensor_source.footer" = "Opzione di test per sviluppatori. Non visibile agli utenti finali.";
+"developer.sensor_source.apple_fallback" = "Sensore di profondità Apple non disponibile. Passaggio alla modalità Simulazione.";
+"developer.unlock.confirmed" = "Le impostazioni sviluppatore sono ora visibili in Impostazioni.";

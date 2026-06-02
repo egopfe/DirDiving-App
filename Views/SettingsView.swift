@@ -235,6 +235,21 @@ struct SettingsView: View {
                     .toggleStyle(.switch)
                     .tint(DiveUI.green)
 
+                    if DeveloperSettings.isDeveloperSectionVisible {
+                        NavigationLink {
+                            DeveloperSettingsView()
+                        } label: {
+                            settingsRow(
+                                icon: "hammer.fill",
+                                iconColor: DiveUI.yellow,
+                                title: String(localized: "developer.section.title"),
+                                subtitle: String(localized: "developer.section.subtitle"),
+                                showsChevron: true
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+
                     NavigationLink {
                         InfoView()
                     } label: {

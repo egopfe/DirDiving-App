@@ -999,3 +999,14 @@
 "planner.buhlmann.chart.a11y.hint" = "Profondità versus minuti NDL dal motore Bühlmann. Solo riferimento, non carico tissutale né piano decompressivo certificato.";
 "analysis.chart.a11y.label" = "Grafico analisi immersioni";
 "analysis.chart.a11y.hint" = "Riepilogo immersioni selezionate. Immersioni demo escluse salvo toggle revisore.";
+
+"more.section.about" = "Informazioni";
+"developer.section.title" = "Sviluppatore";
+"developer.section.subtitle" = "Strumenti di test interni";
+"developer.sensor_source.title" = "Sorgente sensore";
+"developer.sensor_source.automatic" = "Automatico";
+"developer.sensor_source.apple_sensor" = "Sensore Apple";
+"developer.sensor_source.simulation" = "Simulazione";
+"developer.sensor_source.footer" = "Opzione di test per sviluppatori. Non visibile agli utenti finali.";
+"developer.sensor_source.apple_fallback" = "Sensore di profondità Apple non disponibile. Passaggio alla modalità Simulazione.";
+"developer.unlock.confirmed" = "Le impostazioni sviluppatore sono ora visibili in Altro.";

@@ -1001,3 +1001,14 @@
 "planner.buhlmann.chart.a11y.hint" = "Depth versus NDL minutes from the Bühlmann engine. Reference only, not tissue loading or a certified decompression plan.";
 "analysis.chart.a11y.label" = "Dive analysis chart";
 "analysis.chart.a11y.hint" = "Summary of selected dives. Demo dives excluded unless reviewer toggle is on.";
+
+"more.section.about" = "About";
+"developer.section.title" = "Developer";
+"developer.section.subtitle" = "Internal testing tools";
+"developer.sensor_source.title" = "Sensor Source";
+"developer.sensor_source.automatic" = "Automatic";
+"developer.sensor_source.apple_sensor" = "Apple Sensor";
+"developer.sensor_source.simulation" = "Simulation";
+"developer.sensor_source.footer" = "Developer testing option. Not visible to end users.";
+"developer.sensor_source.apple_fallback" = "Apple depth sensor unavailable. Falling back to Simulation Mode.";
+"developer.unlock.confirmed" = "Developer settings are now visible in More.";

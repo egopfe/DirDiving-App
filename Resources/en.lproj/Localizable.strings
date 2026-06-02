@@ -583,3 +583,13 @@
 "logbook.row.a11y.format" = "%@, max depth %@, duration %@";
 "logbook.detail.a11y.summary" = "Dive summary";
 "info.row.a11y.format" = "%@, %@";
+
+"developer.section.title" = "Developer";
+"developer.section.subtitle" = "Internal testing tools";
+"developer.sensor_source.title" = "Sensor Source";
+"developer.sensor_source.automatic" = "Automatic";
+"developer.sensor_source.apple_sensor" = "Apple Sensor";
+"developer.sensor_source.simulation" = "Simulation";
+"developer.sensor_source.footer" = "Developer testing option. Not visible to end users.";
+"developer.sensor_source.apple_fallback" = "Apple depth sensor unavailable. Falling back to Simulation Mode.";
+"developer.unlock.confirmed" = "Developer settings are now visible in Settings.";
