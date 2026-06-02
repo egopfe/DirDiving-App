@@ -10,7 +10,11 @@ struct AnalysisView: View {
     @State private var syncStatusMessage: String?
 
     private var analysisSessions: [DiveSession] {
-        includeDemoInAnalysis ? logStore.sessions : logStore.sessions.filter { !$0.isDemoDive }
+        AnalysisDashboardMath.sessionsForAnalysis(all: logStore.sessions, includeDemo: includeDemoInAnalysis)
+    }
+
+    private var analysisSummary: AnalysisDashboardMath.Summary {
+        AnalysisDashboardMath.summary(from: analysisSessions)
     }
 
     var body: some View {
@@ -30,9 +34,9 @@ struct AnalysisView: View {
                             demoAnalysisToggle
                             DIRCard(String(localized: "analysis.card.advanced"), icon: "chart.line.uptrend.xyaxis", accent: DIRTheme.cyan) {
                                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 0) {
-                                    DIRMetricTile(title: String(localized: "analysis.metric.dives"), value: "\(analysisSessions.count)", color: DIRTheme.cyan)
-                                    DIRMetricTile(title: String(localized: "analysis.metric.max_depth"), measurement: Formatters.depth(analysisSessions.map(\.maxDepthMeters).max() ?? 0, units: unitPreference), color: DIRTheme.yellow)
-                                    DIRMetricTile(title: String(localized: "analysis.metric.total_runtime"), value: Formatters.zero(analysisSessions.map(\.durationSeconds).reduce(0, +) / 60), unit: "min")
+                                    DIRMetricTile(title: String(localized: "analysis.metric.dives"), value: "\(analysisSummary.diveCount)", color: DIRTheme.cyan)
+                                    DIRMetricTile(title: String(localized: "analysis.metric.max_depth"), measurement: Formatters.depth(analysisSummary.maxDepthMeters, units: unitPreference), color: DIRTheme.yellow)
+                                    DIRMetricTile(title: String(localized: "analysis.metric.total_runtime"), value: Formatters.zero(analysisSummary.totalRuntimeMinutes), unit: "min")
                                     avgTemperatureTile
                                     avgSACTile
                                     DIRMetricTile(title: String(localized: "analysis.metric.gps_routes"), value: "\(RouteSummaryService.summaries(from: analysisSessions).count)", color: DIRTheme.cyan)
@@ -169,33 +173,21 @@ struct AnalysisView: View {
         .buttonStyle(.plain)
     }
 
-    private var avgTemp: Double {
-        let values = analysisSessions.compactMap(\.avgWaterTemperatureCelsius)
-        return values.isEmpty ? 0 : values.reduce(0, +) / Double(values.count)
-    }
-
     @ViewBuilder
     private var avgTemperatureTile: some View {
-        let values = analysisSessions.compactMap(\.avgWaterTemperatureCelsius)
-        if values.isEmpty {
-            DIRMetricTile(title: String(localized: "analysis.metric.avg_temp"), value: "—", color: DIRTheme.yellow)
+        if let avg = analysisSummary.averageWaterTemperatureCelsius {
+            DIRMetricTile(title: String(localized: "analysis.metric.avg_temp"), measurement: Formatters.temperature(avg, units: unitPreference))
         } else {
-            DIRMetricTile(title: String(localized: "analysis.metric.avg_temp"), measurement: Formatters.temperature(avgTemp, units: unitPreference))
+            DIRMetricTile(title: String(localized: "analysis.metric.avg_temp"), value: "—", color: DIRTheme.yellow)
         }
-    }
-
-    private var avgSAC: Double {
-        let values = analysisSessions.compactMap(\.sacLitersMinute)
-        return values.isEmpty ? 0 : values.reduce(0, +) / Double(values.count)
     }
 
     @ViewBuilder
     private var avgSACTile: some View {
-        let values = analysisSessions.compactMap(\.sacLitersMinute)
-        if values.isEmpty {
-            DIRMetricTile(title: String(localized: "analysis.metric.avg_sac"), value: "—", color: DIRTheme.yellow)
+        if let avg = analysisSummary.averageSACLitersPerMinute {
+            DIRMetricTile(title: String(localized: "analysis.metric.avg_sac"), measurement: Formatters.sac(avg, units: unitPreference), color: DIRTheme.green)
         } else {
-            DIRMetricTile(title: String(localized: "analysis.metric.avg_sac"), measurement: Formatters.sac(avgSAC, units: unitPreference), color: DIRTheme.green)
+            DIRMetricTile(title: String(localized: "analysis.metric.avg_sac"), value: "—", color: DIRTheme.yellow)
         }
     }
 
@@ -249,14 +241,29 @@ struct AnalysisView: View {
     }
 
     private var routeSummary: some View {
-        let routes = RouteSummaryService.summaries(from: analysisSessions)
+        let aggregate = RouteSummaryAggregation.aggregate(from: analysisSessions)
+        let bearingTitle: String = {
+            switch aggregate.bearingScope {
+            case .none:
+                return String(localized: "analysis.metric.bearing")
+            case .singleRoute:
+                return String(localized: "analysis.metric.bearing")
+            case .firstOfMany(let count):
+                return String(format: String(localized: "analysis.metric.bearing_first_of_many"), count)
+            }
+        }()
         return DIRCard(String(localized: "analysis.card.route_summary"), icon: "map", accent: DIRTheme.cyan) {
             HStack(spacing: 0) {
-                DIRMetricTile(title: String(localized: "analysis.metric.routes"), value: "\(routes.count)", color: DIRTheme.cyan)
+                DIRMetricTile(title: String(localized: "analysis.metric.routes"), value: "\(aggregate.routeCount)", color: DIRTheme.cyan)
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: String(localized: "analysis.metric.distance"), measurement: Formatters.distance(routes.map(\.distanceMeters).reduce(0, +), units: unitPreference, prefersLargeUnit: true), color: DIRTheme.green)
+                DIRMetricTile(title: String(localized: "analysis.metric.distance"), measurement: Formatters.distance(aggregate.totalDistanceMeters, units: unitPreference, prefersLargeUnit: true), color: DIRTheme.green)
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: String(localized: "analysis.metric.bearing"), value: routes.first?.bearingDegrees.map { Formatters.zero($0) } ?? "--", unit: routes.first?.bearingDegrees == nil ? nil : "°", color: DIRTheme.yellow)
+                DIRMetricTile(
+                    title: bearingTitle,
+                    value: aggregate.bearingDegrees.map { Formatters.zero($0) } ?? "--",
+                    unit: aggregate.bearingDegrees == nil ? nil : "°",
+                    color: DIRTheme.yellow
+                )
             }
         }
     }

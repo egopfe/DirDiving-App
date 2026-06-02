@@ -2,8 +2,10 @@ import AppIntents
 import Foundation
 
 struct ToggleStopwatchIntent: AppIntent {
-    static var title: LocalizedStringResource = "Toggle DIR DIVING Stopwatch"
-    static var description = IntentDescription("Start or stop the DIR DIVING manual stopwatch.")
+    static var title: LocalizedStringResource = "intent.toggle_stopwatch.title"
+    static var description: IntentDescription {
+        IntentDescription(LocalizedStringResource("intent.toggle_stopwatch.description"))
+    }
 
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
@@ -17,8 +19,10 @@ struct ToggleStopwatchIntent: AppIntent {
 }
 
 struct ResetStopwatchIntent: AppIntent {
-    static var title: LocalizedStringResource = "Reset DIR DIVING Stopwatch"
-    static var description = IntentDescription("Reset the DIR DIVING manual stopwatch.")
+    static var title: LocalizedStringResource = "intent.reset_stopwatch.title"
+    static var description: IntentDescription {
+        IntentDescription(LocalizedStringResource("intent.reset_stopwatch.description"))
+    }
 
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
@@ -35,8 +39,10 @@ struct ResetStopwatchIntent: AppIntent {
 }
 
 struct StartManualDiveIntent: AppIntent {
-    static var title: LocalizedStringResource = "Start DIR DIVING Manual Dive"
-    static var description = IntentDescription("Start a manual DIR DIVING session without disabling automatic dive start.")
+    static var title: LocalizedStringResource = "intent.start_manual_dive.title"
+    static var description: IntentDescription {
+        IntentDescription(LocalizedStringResource("intent.start_manual_dive.description"))
+    }
 
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
@@ -50,8 +56,10 @@ struct StartManualDiveIntent: AppIntent {
 }
 
 struct EndManualDiveIntent: AppIntent {
-    static var title: LocalizedStringResource = "End DIR DIVING Manual Dive"
-    static var description = IntentDescription("End the current manual DIR DIVING session.")
+    static var title: LocalizedStringResource = "intent.end_manual_dive.title"
+    static var description: IntentDescription {
+        IntentDescription(LocalizedStringResource("intent.end_manual_dive.description"))
+    }
 
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
@@ -65,8 +73,10 @@ struct EndManualDiveIntent: AppIntent {
 }
 
 struct SetBearingIntent: AppIntent {
-    static var title: LocalizedStringResource = "Set DIR DIVING Bearing"
-    static var description = IntentDescription("Save the current compass heading as the DIR DIVING bearing.")
+    static var title: LocalizedStringResource = "intent.set_bearing.title"
+    static var description: IntentDescription {
+        IntentDescription(LocalizedStringResource("intent.set_bearing.description"))
+    }
 
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
@@ -81,8 +91,10 @@ struct SetBearingIntent: AppIntent {
 }
 
 struct ClearBearingIntent: AppIntent {
-    static var title: LocalizedStringResource = "Clear DIR DIVING Bearing"
-    static var description = IntentDescription("Clear the saved DIR DIVING bearing.")
+    static var title: LocalizedStringResource = "intent.clear_bearing.title"
+    static var description: IntentDescription {
+        IntentDescription(LocalizedStringResource("intent.clear_bearing.description"))
+    }
 
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
@@ -97,8 +109,10 @@ struct ClearBearingIntent: AppIntent {
 }
 
 struct AcknowledgeAlarmIntent: AppIntent {
-    static var title: LocalizedStringResource = "Acknowledge DIR DIVING Alarm"
-    static var description = IntentDescription("Dismiss the current depth, time, or battery alarm banner.")
+    static var title: LocalizedStringResource = "intent.ack_alarm.title"
+    static var description: IntentDescription {
+        IntentDescription(LocalizedStringResource("intent.ack_alarm.description"))
+    }
 
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
@@ -133,7 +147,7 @@ struct DIRDivingAppShortcuts: AppShortcutsProvider {
                 "Toggle stopwatch in \(.applicationName)",
                 "Start or stop stopwatch in \(.applicationName)"
             ],
-            shortTitle: "Stopwatch",
+            shortTitle: LocalizedStringResource("intent.shortcut.stopwatch"),
             systemImageName: "stopwatch"
         )
         AppShortcut(
@@ -142,37 +156,37 @@ struct DIRDivingAppShortcuts: AppShortcutsProvider {
                 "Reset stopwatch in \(.applicationName)",
                 "Reset DIR stopwatch in \(.applicationName)"
             ],
-            shortTitle: "Reset Stopwatch",
+            shortTitle: LocalizedStringResource("intent.shortcut.reset_stopwatch"),
             systemImageName: "arrow.counterclockwise"
         )
         AppShortcut(
             intent: StartManualDiveIntent(),
             phrases: ["Start manual dive in \(.applicationName)"],
-            shortTitle: "Manual Dive Start",
+            shortTitle: LocalizedStringResource("intent.shortcut.manual_start"),
             systemImageName: "figure.water.fitness"
         )
         AppShortcut(
             intent: EndManualDiveIntent(),
             phrases: ["End manual dive in \(.applicationName)"],
-            shortTitle: "Manual Dive End",
+            shortTitle: LocalizedStringResource("intent.shortcut.manual_end"),
             systemImageName: "figure.water.fitness"
         )
         AppShortcut(
             intent: SetBearingIntent(),
             phrases: ["Set bearing in \(.applicationName)"],
-            shortTitle: "Set Bearing",
+            shortTitle: LocalizedStringResource("intent.shortcut.set_bearing"),
             systemImageName: "location.north.line"
         )
         AppShortcut(
             intent: ClearBearingIntent(),
             phrases: ["Clear bearing in \(.applicationName)"],
-            shortTitle: "Clear Bearing",
+            shortTitle: LocalizedStringResource("intent.shortcut.clear_bearing"),
             systemImageName: "location.slash"
         )
         AppShortcut(
             intent: AcknowledgeAlarmIntent(),
             phrases: ["Acknowledge alarm in \(.applicationName)"],
-            shortTitle: "Acknowledge Alarm",
+            shortTitle: LocalizedStringResource("intent.shortcut.ack_alarm"),
             systemImageName: "bell.slash"
         )
     }

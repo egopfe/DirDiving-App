@@ -8,14 +8,13 @@ struct AscentGaugeView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            VStack(alignment: .leading, spacing: 0) {
-                Text("VELOCITA")
-                Text("RISALITA")
-            }
-            .font(.system(size: 10, weight: .black, design: .rounded))
-            .foregroundStyle(.white)
-            .lineLimit(1)
-            .minimumScaleFactor(0.78)
+            Text(String(localized: "ascent.gauge.title"))
+                .font(.system(size: 9, weight: .black, design: .rounded))
+                .foregroundStyle(.white)
+                .lineLimit(2)
+                .minimumScaleFactor(0.65)
+                .multilineTextAlignment(.leading)
+                .frame(width: 64, alignment: .leading)
 
             HStack(alignment: .center, spacing: 5) {
                 scaleLabels

@@ -48,8 +48,9 @@ enum GasMixValidator {
         guard oxygenFraction.isFinite, depthMeters.isFinite, oxygenFraction > 0, depthMeters >= 0 else {
             return nil
         }
-        let ambient = IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters, environment: environment)
-            ?? IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters)
+        guard let ambient = IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters, environment: environment) else {
+            return nil
+        }
         return oxygenFraction * ambient
     }
 

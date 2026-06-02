@@ -46,16 +46,17 @@ struct IOSLegalOnboardingView: View {
                         }
                     }
                     .transition(.opacity.combined(with: .move(edge: .trailing)))
+                    .accessibilityLabel(String(format: String(localized: "ios.legal.step.format"), step + 1, 4))
                 }
                 .padding(20)
                 .padding(.top, 18)
                 .padding(.bottom, 28)
             }
         }
-        .alert("Exit App", isPresented: $showExitGuidance) {
-            Button("I Understand", role: .cancel) {}
+        .alert(String(localized: "ios.legal.exit_alert.title"), isPresented: $showExitGuidance) {
+            Button(String(localized: "ios.legal.exit_alert.confirm"), role: .cancel) {}
         } message: {
-            Text("Close DIR Diving from the system app switcher if you do not accept the safety terms.")
+            Text(String(localized: "Close DIR Diving from the system app switcher if you do not accept the safety terms."))
         }
     }
 
@@ -70,10 +71,10 @@ struct IOSLegalOnboardingView: View {
                     .foregroundStyle(.white)
                 Spacer()
             }
-            Text("iOS Companion")
+            Text(String(localized: "ios.legal.hero.subtitle"))
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(DIRTheme.muted)
-            Text("Legal and safety onboarding")
+            Text(String(localized: "ios.legal.hero.onboarding_caption"))
                 .font(.caption.weight(.bold))
                 .foregroundStyle(DIRTheme.cyan)
                 .textCase(.uppercase)

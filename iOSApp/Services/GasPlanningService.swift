@@ -60,7 +60,8 @@ enum GasPlanningService {
                 turnPressure: turnPressure,
                 exposure: exposure,
                 cnsDescentBottomPercent: previewDescentBottomCNS,
-                extraStates: validation.states
+                extraStates: validation.states,
+                usesBottomPhaseConsumptionEstimate: true
             )
         case .failure:
             var invalid = validation
@@ -102,7 +103,8 @@ enum GasPlanningService {
                 otuWeekly: base.otuWeekly,
                 airBreakRecoveryApplied: base.airBreakRecoveryApplied,
                 warnings: makeWarnings(states: mergeStates(base.states, [.invalidEnvironment])),
-                states: mergeStates(base.states, [.invalidEnvironment])
+                states: mergeStates(base.states, [.invalidEnvironment]),
+                usesBottomPhaseConsumptionEstimate: base.usesBottomPhaseConsumptionEstimate
             )
         }
 
@@ -142,7 +144,8 @@ enum GasPlanningService {
                 otuWeekly: base.otuWeekly,
                 airBreakRecoveryApplied: base.airBreakRecoveryApplied,
                 warnings: makeWarnings(states: mergeStates(base.states, [.invalidEnvironment])),
-                states: mergeStates(base.states, [.invalidEnvironment])
+                states: mergeStates(base.states, [.invalidEnvironment]),
+                usesBottomPhaseConsumptionEstimate: base.usesBottomPhaseConsumptionEstimate
             )
         }
 
@@ -212,7 +215,8 @@ enum GasPlanningService {
                 otuWeekly: exposure.otuWeekly,
                 airBreakRecoveryApplied: exposure.airBreakRecoveryApplied,
                 warnings: makeWarnings(states: states),
-                states: states
+                states: states,
+                usesBottomPhaseConsumptionEstimate: false
             )
         case .failure:
             states = mergeStates(states, [.gasAllocationIncomplete])
@@ -239,7 +243,8 @@ enum GasPlanningService {
             otuWeekly: exposure.otuWeekly,
             airBreakRecoveryApplied: exposure.airBreakRecoveryApplied,
             warnings: makeWarnings(states: states),
-            states: states
+            states: states,
+            usesBottomPhaseConsumptionEstimate: false
         )
     }
 
@@ -584,7 +589,8 @@ enum GasPlanningService {
         turnPressure: Double,
         exposure: OxygenExposureResult,
         cnsDescentBottomPercent: Double,
-        extraStates: [PlannerResultState]
+        extraStates: [PlannerResultState],
+        usesBottomPhaseConsumptionEstimate: Bool = false
     ) -> TechnicalGasAnalysis {
         let states = mergeStates(
             extraStates,
@@ -619,7 +625,8 @@ enum GasPlanningService {
             otuWeekly: exposure.otuWeekly,
             airBreakRecoveryApplied: exposure.airBreakRecoveryApplied,
             warnings: makeWarnings(states: states),
-            states: states
+            states: states,
+            usesBottomPhaseConsumptionEstimate: usesBottomPhaseConsumptionEstimate
         )
     }
 
@@ -650,7 +657,8 @@ enum GasPlanningService {
             otuWeekly: 0,
             airBreakRecoveryApplied: false,
             warnings: makeWarnings(states: states),
-            states: states
+            states: states,
+            usesBottomPhaseConsumptionEstimate: false
         )
     }
 }

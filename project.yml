@@ -44,6 +44,13 @@ targets:
       - Utils/GPSConfirmationPresentation.swift
       - Utils/DiveAlgorithmConfiguration.swift
       - Utils/DiveSessionAlgorithmValidator.swift
+      - Utils/SensorSourceMode.swift
+      - Utils/DeveloperSettings.swift
+      - Utils/DeveloperVersionUnlock.swift
+      - Services/DepthSensorProvider.swift
+      - Services/SensorProviderFactory.swift
+      - Services/AppleDepthSensorProvider.swift
+      - Services/MockDepthSensorProvider.swift
       - Models/DiveGPSConfirmation.swift
       - Services/AscentSafetyHapticCoordinator.swift
       - Services/GPSManager.swift
@@ -98,6 +105,7 @@ targets:
       - sdk: Charts.framework
       - sdk: WatchConnectivity.framework
       - sdk: CoreLocation.framework
+      - sdk: CoreMotion.framework
   DIRDiving Watch Algorithm Tests:
     type: bundle.unit-test
     platform: watchOS
@@ -107,6 +115,12 @@ targets:
       - Utils/DiveDepthMeasurementIngestion.swift
       - Utils/GPSFallbackPolicy.swift
       - Services/DiveManager.swift
+      - Utils/SensorSourceMode.swift
+      - Utils/DeveloperSettings.swift
+      - Services/DepthSensorProvider.swift
+      - Services/SensorProviderFactory.swift
+      - Services/AppleDepthSensorProvider.swift
+      - Services/MockDepthSensorProvider.swift
       - Services/DiveLogStore.swift
       - Services/AscentRateSettingsStore.swift
       - Services/GPSManager.swift
@@ -193,7 +207,10 @@ targets:
       - iOSApp/Utils/IOSAlgorithmConfiguration.swift
       - iOSApp/Utils/IOSDiveLogbookPolicy.swift
       - iOSApp/Utils/IOSUnitConversions.swift
+      - iOSApp/Utils/Formatters.swift
       - iOSApp/Utils/PlannerInputValidator.swift
+      - iOSApp/Utils/SensorSourceMode.swift
+      - iOSApp/Utils/DeveloperSettings.swift
       - iOSApp/Utils/PlannerCNSDescentBottomCheckSettings.swift
       - iOSApp/Utils/PlanCalculationCompleteness.swift
       - iOSApp/Utils/PlannerResultState.swift
@@ -201,6 +218,10 @@ targets:
       - iOSApp/Utils/CloudSyncNotifications.swift
       - iOSApp/Utils/WatchSyncNotifications.swift
       - iOSApp/Utils/WatchSyncKeys.swift
+      - iOSApp/Utils/AnalysisDashboardMath.swift
+      - iOSApp/Utils/ManualDiveEditorDefaults.swift
+      - iOSApp/Utils/RouteSummaryAggregation.swift
+      - iOSApp/Utils/PressureDisplayMath.swift
     resources:
       - path: Tests/iOSAlgorithmTests/Fixtures
         type: folder

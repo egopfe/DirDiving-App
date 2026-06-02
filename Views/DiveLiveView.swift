@@ -440,7 +440,7 @@ struct DiveLiveView: View {
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-            DiveCommandButton(String(localized: "AVVIO MANUALE"), systemImage: "play.circle.fill", color: DiveUI.green) {
+            DiveCommandButton(String(localized: "live.manual.start.button"), systemImage: "play.circle.fill", color: DiveUI.green) {
                 dive.startManualDive()
             }
         }
@@ -459,7 +459,7 @@ struct DiveLiveView: View {
         HStack(spacing: 8) {
             Image(systemName: "water.waves")
                 .font(.system(size: 18, weight: .black))
-            Text(dive.isManualLifecycleActive ? String(localized: "IMMERSIONE MANUALE") : String(localized: "IN IMMERSIONE"))
+            Text(dive.isManualLifecycleActive ? String(localized: "live.status.manual_dive") : String(localized: "live.status.in_dive"))
                 .font(DiveUI.Typography.statusTitle)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
@@ -584,7 +584,7 @@ struct DiveLiveView: View {
             .accessibilityLabel(String(localized: "live.depth.a11y"))
             .accessibilityValue("\(depthDisplay.valueText) \(depthDisplay.unitLabel)")
 
-            Text(dive.isDepthDataStale ? String(localized: "live.depth.stale.label") : String(localized: "PROFONDITÀ ATTUALE"))
+            Text(dive.isDepthDataStale ? String(localized: "live.depth.stale.label") : String(localized: "live.depth.current.label"))
                 .font(DiveUI.Typography.depthCaption)
                 .lineLimit(1)
                 .minimumScaleFactor(0.68)
@@ -664,7 +664,7 @@ struct DiveLiveView: View {
                     .monospacedDigit()
                     .lineLimit(1)
                     .minimumScaleFactor(0.66)
-                Text("CRONOMETRO")
+                Text(String(localized: "live.stopwatch.title"))
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(DiveUI.yellow)
                     .lineLimit(1)
@@ -714,7 +714,7 @@ struct DiveLiveView: View {
                 .accessibilityHint(String(localized: "live.stopwatch.reset.hint"))
             }
             if dive.isManualLifecycleActive {
-                DiveCommandButton(String(localized: "FINE MANUALE"), systemImage: "stop.circle.fill", color: DiveUI.red) {
+                DiveCommandButton(String(localized: "live.manual.end.button"), systemImage: "stop.circle.fill", color: DiveUI.red) {
                     dive.endManualDive()
                 }
             }
@@ -723,21 +723,21 @@ struct DiveLiveView: View {
 
     private var manualFallbackPanel: some View {
         VStack(spacing: 8) {
-            Text(String(localized: "AUTOMAZIONE PROFONDITÀ NON DISPONIBILE"))
+            Text(String(localized: "live.depth.automation.unavailable.title"))
                 .font(.system(size: 10, weight: .black, design: .rounded))
                 .foregroundStyle(DiveUI.yellow)
                 .multilineTextAlignment(.center)
-            Text(String(localized: "Rilevamento automatico profondità non disponibile. Usa avvio manuale."))
+            Text(String(localized: "live.depth.automation.unavailable.body"))
                 .font(.system(size: 11, weight: .black, design: .rounded))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-            Text(String(localized: "Sessione limitata: runtime e GPS sì, profondità automatica no."))
+            Text(String(localized: "live.depth.automation.limited"))
                 .font(.system(size: 10, weight: .semibold, design: .rounded))
                 .foregroundStyle(DiveUI.secondaryText)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
-            DiveCommandButton(String(localized: "AVVIO MANUALE"), systemImage: "play.circle.fill", color: DiveUI.green) {
+            DiveCommandButton(String(localized: "live.manual.start.button"), systemImage: "play.circle.fill", color: DiveUI.green) {
                 dive.startManualDive()
             }
         }

@@ -151,7 +151,8 @@ final class CNSDescentBottomTests: XCTestCase {
             otuWeekly: 0,
             airBreakRecoveryApplied: false,
             warnings: [],
-            states: []
+            states: [],
+            usesBottomPhaseConsumptionEstimate: false
         )
         XCTAssertTrue(analysis.cnsDescentBottomExceedsPlannerThreshold(checkEnabled: true))
         XCTAssertFalse(analysis.cnsDescentBottomExceedsPlannerThreshold(checkEnabled: false))

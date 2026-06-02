@@ -12,6 +12,7 @@ final class AppNavigationStore: ObservableObject {
 
     init() {
         Self.shared = self
+        // Defensive clamp for MAIN: mode selection stays unreachable when only Diving is stable.
         if WatchModeSelectionPreferences.skipWhenSingleMode, !WatchModeSelectionPreferences.hasMultipleStableModes {
             selectedPage = .live
         }

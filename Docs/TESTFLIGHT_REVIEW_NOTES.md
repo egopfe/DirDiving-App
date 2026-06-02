@@ -1,10 +1,10 @@
 # Note per TestFlight / App Review - DIR DIVING
 
-**Aggiornato:** 2026-05-31 — branch `main` = `origin/main` @ `c8f91f6` (Watch + iOS MAIN algorithmic + UI/UX readiness 100% codice)
+**Aggiornato:** 2026-06-02 — branch `main` (readiness 100% code/static/docs; physical QA gates tracked separately)
 
 ## Panoramica per il revisore
 
-DIR DIVING e uno strumento companion per Apple Watch Ultra e iPhone: **log immersioni**, monitoraggio profondita dove l'entitlement lo consente, **consapevolezza risalita** (banner non bloccante), **BUSSOLA**, **GPS di superficie** (ingresso/uscita), sync Watch/iPhone ed export CSV Subsurface. Include planner **indicativo** su iOS, non certificato.
+DIR DIVING e uno strumento companion per Apple Watch Ultra e iPhone: **log immersioni**, monitoraggio profondita dove l'entitlement lo consente, **consapevolezza risalita** (banner non bloccante), **BUSSOLA**, **GPS di superficie** (ingresso/uscita), sync Watch/iPhone ed export CSV Subsurface. Include planner iOS **reference-only** (non certificato).
 
 L'app **non** e presentata come computer subacqueo certificato.
 
@@ -43,13 +43,14 @@ Lo stato algoritmico MAIN e documentato in:
 ## Limitazioni note (da dichiarare)
 
 1. **Non** computer subacqueo certificato.
-2. Planner e TTV **informativi**: non NDL/TTS certificati.
+2. Planner iOS e TTV Watch sono **informativi**: TTV non e NDL/TTS/deco e il planner non e certificato.
 3. GPS **inaffidabile** sott'acqua.
 4. Profondita automatica: validare su **Apple Watch Ultra** reale dopo approvazione entitlement e provisioning corretto.
 5. Side Button / Action Button Watch: l'app **non** puo intercettare direttamente il tasto laterale. Controlli immersione affidabili restano **START / STOP / RESET** sullo schermo Live. Comandi aggiuntivi (cronometro, immersione manuale, BUSSOLA, allarme) sono disponibili tramite **Comandi Rapidi / Action Button** solo dove watchOS espone gli App Intent registrati — vedi Impostazioni -> Azione / Comandi.
 6. Mission Mode e solo un profilo di ottimizzazione runtime/UI per immersione attiva: non riduce monitoraggio safety-critical, non modifica logica immersione o sensori e usa solo un indicatore visivo minimale.
 7. Terms / Privacy da onboarding e settings puntano a documenti dedicati, non alla root del repository.
 8. Buhlmann/NDL sul companion iOS rimane riferimento informativo: trimix/helium usano il motore N2+He implementato, ma richiedono validazione matematica esterna prima di claim piu forti.
+9. Le checklist fisiche (Watch Ultra reale, VoiceOver end-to-end, iCloud due dispositivi, screenshot canonical) restano gate esterni non chiudibili da codice.
 
 ## Checklist QA consigliata (reviewer)
 

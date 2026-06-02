@@ -12,6 +12,14 @@ Disclaimer completo: [`Docs/SAFETY_DISCLAIMER.md`](Docs/SAFETY_DISCLAIMER.md) ·
 
 DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent awareness, and syncs to the iPhone companion for review and **indicative** planning. It is **not** a certified dive computer unless a future release explicitly documents certification. It does **not** replace training, dive-center rules, certified equipment, or human judgment. Planner and Bühlmann-style presentations are **indicative** — verify with certified tools. GPS is meaningful **at the surface**; underwater or poor-sky conditions mean fixes can be missing — missing data must not be read as “dive success.”
 
+## Build and generated project policy
+
+- Run `xcodegen generate` before opening/building `DIRDiving.xcodeproj`.
+- Do not manually edit generated `.xcodeproj` contents.
+- Regenerate after every `project.yml` change.
+- Run `./Scripts/validate_main_release_readiness.sh` before release.
+- Full workflow: [`Docs/BUILD_AND_XCODEGEN_WORKFLOW.md`](Docs/BUILD_AND_XCODEGEN_WORKFLOW.md).
+
 ### Stato corrente (`main` = `origin/main`, 2026-05-31)
 
 | Pass | Commit | Contenuto |
