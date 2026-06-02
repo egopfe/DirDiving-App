@@ -14,7 +14,7 @@ L'app **non** deve essere usata come:
 - sostituto di formazione tecnica o di team;
 - unica fonte per decisioni di sicurezza in immersione.
 
-Gli utenti devono sempre affidarsi a strumentazione certificata, formazione adeguata, procedure di centro immersioni/team e giudizio umano. I calcoli del planner iOS, i valori **TTV** live, le presentazioni stile Buhlmann e le curve sono **indicativi ed educativi**.
+Gli utenti devono sempre affidarsi a strumentazione certificata, formazione adeguata, procedure di centro immersioni/team e giudizio umano. I calcoli del planner iOS, i valori **TTV** live (indice informativo, non NDL/TTS/deco), le presentazioni stile Buhlmann e le curve sono **indicativi ed educativi**.
 
 La filosofia UX MAIN privilegia warning **non bloccanti** sott'acqua: i banner di risalita e profondita scoraggiano comportamenti a rischio senza nascondere profondita, runtime, gauge o controlli critici.
 
@@ -66,7 +66,7 @@ L'accettazione viene registrata localmente con timestamp, versione app accettata
 
 ## Planner iOS
 
-Il planner e la schermata risultato devono mantenere avvisi in-app visibili. Il riferimento di pianificazione puo usare profondita media o massima, ma il gas di emergenza resta sempre legato alla profondita massima. Non rimuovere il disclaimer dal flusso utente salvo sostituzione con workflow certificato.
+Il planner e la schermata risultato devono mantenere avvisi in-app visibili. Il planner iOS e **reference-only** (non pianificazione decompressiva certificata). Il riferimento di pianificazione puo usare profondita media o massima, ma il gas di emergenza resta sempre legato alla profondita massima. Non rimuovere il disclaimer dal flusso utente salvo sostituzione con workflow certificato.
 
 ## Rami sperimentali
 

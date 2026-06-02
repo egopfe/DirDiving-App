@@ -487,8 +487,8 @@
 "settings.row.ascent_rate.subtitle" = "Persistent m/min limits";
 "settings.row.alarms.title" = "Alerts";
 "settings.row.alarms.subtitle" = "Thresholds and reminders";
-"settings.row.export_logbook.title" = "Open Logbook to export";
-"settings.row.export_logbook.subtitle" = "CSV Subsurface export from dive log";
+"settings.row.export_logbook.title" = "Export from Logbook";
+"settings.row.export_logbook.subtitle" = "Open Logbook to export";
 "settings.row.gps_surface.title" = "Surface GPS";
 "settings.row.gps_behavior.title" = "GPS behavior";
 "settings.row.gps_behavior.subtitle" = "Surface only. Underwater GPS is unreliable. Missing coordinates use last fix or are labeled unavailable.";
@@ -579,7 +579,7 @@
 "settings.a11y.units" = "Units of measure";
 "settings.a11y.language" = "App language";
 "settings.a11y.haptics" = "Haptics";
-"settings.a11y.export_logbook" = "Open dive log to export CSV";
+"settings.a11y.export_logbook" = "Export from Logbook, opens Logbook screen";
 "logbook.row.a11y.format" = "%@, max depth %@, duration %@";
 "logbook.detail.a11y.summary" = "Dive summary";
 "info.row.a11y.format" = "%@, %@";

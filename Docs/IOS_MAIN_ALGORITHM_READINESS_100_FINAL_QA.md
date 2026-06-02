@@ -59,6 +59,11 @@
 ---
 
 ## D. Issues fixed by ID
+## Policy wording sync (2026-06-02)
+
+- iOS planner remains reference-only and non-certified.
+- No certified dive-computer positioning is introduced.
+- Physical validation and external golden comparison remain explicit external gates.
 
 | ID | Status | Summary |
 |----|--------|---------|

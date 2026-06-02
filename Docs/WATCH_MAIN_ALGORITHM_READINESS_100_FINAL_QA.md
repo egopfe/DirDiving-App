@@ -78,6 +78,11 @@ iOS sync codec: **not modified** in this pass; iOS algorithm tests **not re-run*
 - **Completion:** Not performed in this session (no fabricated results)
 
 ## J. Remaining external QA required
+## Policy wording sync (2026-06-02)
+
+- TTV on Watch remains an informational index only (not NDL/TTS/deco).
+- Mission Mode remains an internal DIR DIVING runtime/UI profile, not Apple system Low Power Mode.
+- Depth entitlement and real hardware validation remain required before stronger claims.
 
 1. Execute hardware checklist on **Apple Watch Ultra** in real water.
 2. Validate stale-depth banner on device with live CoreMotion callbacks.

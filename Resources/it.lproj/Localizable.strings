@@ -487,8 +487,8 @@
 "settings.row.ascent_rate.subtitle" = "Limiti m/min persistenti";
 "settings.row.alarms.title" = "Allarmi";
 "settings.row.alarms.subtitle" = "Stato soglie e promemoria";
-"settings.row.export_logbook.title" = "Apri Logbook per esportare";
-"settings.row.export_logbook.subtitle" = "Export CSV Subsurface dal log immersioni";
+"settings.row.export_logbook.title" = "Esporta dal Logbook";
+"settings.row.export_logbook.subtitle" = "Apri Logbook per esportare";
 "settings.row.gps_surface.title" = "GPS superficie";
 "settings.row.gps_behavior.title" = "Comportamento GPS";
 "settings.row.gps_behavior.subtitle" = "Solo in superficie; in acqua il GPS non è attendibile. Coordinate mancanti = ultimo fix o non disponibile (etichettato).";
@@ -579,7 +579,7 @@
 "settings.a11y.units" = "Unità di misura";
 "settings.a11y.language" = "Lingua app";
 "settings.a11y.haptics" = "Vibrazione";
-"settings.a11y.export_logbook" = "Apri log immersioni per esportare CSV";
+"settings.a11y.export_logbook" = "Esporta dal Logbook, apre la schermata Logbook";
 "logbook.row.a11y.format" = "%@, profondità max %@, durata %@";
 "logbook.detail.a11y.summary" = "Riepilogo immersione";
 "info.row.a11y.format" = "%@, %@";

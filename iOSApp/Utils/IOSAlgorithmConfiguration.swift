@@ -37,6 +37,9 @@ enum IOSAlgorithmConfiguration {
     static let maxProfileSampleCount = 20_000
     static let maxSyncPayloadBytes = 512 * 1024
     static let maxImportBytes = 10 * 1024 * 1024
+    static let maxImportCSVColumns = 64
+    static let maxImportCSVFieldCharacters = 4_096
+    static let maxImportCSVRowCharacters = 16_384
 
     static let gasDensityWarningGramsPerLiter = 5.2
     static let gasDensityDangerGramsPerLiter = 6.2
