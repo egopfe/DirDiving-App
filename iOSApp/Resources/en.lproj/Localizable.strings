@@ -1014,3 +1014,26 @@
 "developer.sensor_source.footer" = "Developer testing option. Not visible to end users.";
 "developer.sensor_source.apple_fallback" = "Apple depth sensor unavailable. Falling back to Simulation Mode.";
 "developer.unlock.confirmed" = "Developer settings are now visible in More.";
+
+/* Audit remediation 2026-06-03 */
+"cloud.merge.duplicate_session.local" = "Duplicate session ID detected in local logbook";
+"cloud.merge.duplicate_session.cloud" = "Duplicate session ID detected in iCloud payload";
+"planner.validation.invalid_environment" = "Invalid planner environment.";
+"planner.validation.invalid_oxygen_exposure" = "Invalid oxygen exposure calculation.";
+"planner.briefing.mode" = "Mode: planned as %.0fm / %d min, %@.";
+"planner.briefing.gf_tts" = "GF: %d/%d; TTS/TTR estimate %d min.";
+"planner.briefing.gas_pressure" = "Gas: turn %d bar, minimum gas %d bar.";
+"planner.briefing.respirability" = "Respirability: density %.1f g/L, END %d m.";
+"planner.briefing.oxygen" = "Oxygen: PPO2 %.1f, CNS %d%% (daily %d%%), OTU dive %d, OTU 24h %d.";
+"planner.briefing.stops" = "Stops: %@.";
+"planner.buhlmann.invalid_input" = "Bühlmann unavailable for invalid input.";
+"planner.buhlmann.invalid_gas" = "Invalid mix: Bühlmann unavailable.";
+"planner.buhlmann.invalid_profile" = "Bühlmann unavailable: profile or mix outside validated limits.";
+"planner.buhlmann.reference_disclaimer" = "Bühlmann ZHL-16C N2+He multigas reference-only: not a certified decompression plan.";
+"planner.gf.conservative" = "Conservative";
+"planner.gf.aggressive" = "More aggressive";
+"planner.gas_ledger.unused_title" = "Unused planned gas";
+"planner.gas_ledger.unused_planned" = "Unused planned gas";
+"planner.gas_ledger.unused_standby" = "Standby / bailout gas";
+"planner.gas_ledger.available_gas" = "Available";
+"planner.gas_ledger.not_consumed_note" = "Not consumed by generated plan";

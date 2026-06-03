@@ -1012,3 +1012,26 @@
 "developer.sensor_source.footer" = "Opzione di test per sviluppatori. Non visibile agli utenti finali.";
 "developer.sensor_source.apple_fallback" = "Sensore di profondità Apple non disponibile. Passaggio alla modalità Simulazione.";
 "developer.unlock.confirmed" = "Le impostazioni sviluppatore sono ora visibili in Altro.";
+
+/* Audit remediation 2026-06-03 */
+"cloud.merge.duplicate_session.local" = "ID sessione duplicato rilevato nel logbook locale";
+"cloud.merge.duplicate_session.cloud" = "ID sessione duplicato rilevato nel payload iCloud";
+"planner.validation.invalid_environment" = "Ambiente planner non valido.";
+"planner.validation.invalid_oxygen_exposure" = "Esposizione ossigeno non valida.";
+"planner.briefing.mode" = "Modalità: pianificato a %.0f m / %d min, %@.";
+"planner.briefing.gf_tts" = "GF: %d/%d; stima TTS/TTR %d min.";
+"planner.briefing.gas_pressure" = "Gas: turn %d bar, gas minimo %d bar.";
+"planner.briefing.respirability" = "Respirabilità: densità %.1f g/L, END %d m.";
+"planner.briefing.oxygen" = "Ossigeno: PPO2 %.1f, CNS %d%% (giornaliero %d%%), OTU immersione %d, OTU 24h %d.";
+"planner.briefing.stops" = "Stop: %@.";
+"planner.buhlmann.invalid_input" = "Bühlmann non disponibile per input non validi.";
+"planner.buhlmann.invalid_gas" = "Miscela non valida: Bühlmann non disponibile.";
+"planner.buhlmann.invalid_profile" = "Bühlmann non disponibile: profilo o miscela fuori dai limiti validati.";
+"planner.buhlmann.reference_disclaimer" = "Bühlmann ZHL-16C N2+He multigas reference-only: non è un piano decompressivo certificato.";
+"planner.gf.conservative" = "Conservativo";
+"planner.gf.aggressive" = "Più aggressivo";
+"planner.gas_ledger.unused_title" = "Gas pianificato non usato";
+"planner.gas_ledger.unused_planned" = "Gas pianificato non usato";
+"planner.gas_ledger.unused_standby" = "Gas standby / bailout";
+"planner.gas_ledger.available_gas" = "Disponibile";
+"planner.gas_ledger.not_consumed_note" = "Non consumato dal piano generato";

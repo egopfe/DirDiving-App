@@ -184,6 +184,7 @@ targets:
       - iOSApp/Algorithms/Buhlmann/BuhlmannGas.swift
       - iOSApp/Algorithms/Buhlmann/BuhlmannTissueModel.swift
       - iOSApp/Algorithms/Buhlmann/BuhlmannEngine.swift
+      - iOSApp/Algorithms/Buhlmann/BuhlmannPlanPreflightValidator.swift
       - iOSApp/Services/BuhlmannPlanner.swift
       - iOSApp/Services/CloudSyncStore.swift
       - iOSApp/Services/DiveImportService.swift
@@ -203,6 +204,7 @@ targets:
       - iOSApp/Utils/DiveSessionAlgorithmValidator.swift
       - iOSApp/Utils/DiveSessionMerge.swift
       - iOSApp/Utils/DiveSessionMergeConflict.swift
+      - iOSApp/Utils/DiveSessionCollectionIntegrity.swift
       - iOSApp/Utils/GasMixValidator.swift
       - iOSApp/Utils/IOSAlgorithmConfiguration.swift
       - iOSApp/Utils/IOSDiveLogbookPolicy.swift

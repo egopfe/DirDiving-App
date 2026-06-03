@@ -90,11 +90,11 @@ enum DiveImportService {
         }
         guard
             let timeIndex = index("time_seconds"),
-            let depthIndex = index("depth_m"),
-            let tempIndex = index("temperature_c")
+            let depthIndex = index("depth_m")
         else {
             return .failure(.missingColumns)
         }
+        let tempIndex = index("temperature_c")
 
         let metadata = parseMetadata(from: rows)
         let dataRows = rows.filter { !isMetadataOrCommentRow($0) && $0 != header }
@@ -113,7 +113,7 @@ enum DiveImportService {
         for row in dataRows {
             guard row.contains(where: { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) else { continue }
             let normalizedRow = row.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            guard row.count > max(timeIndex, depthIndex, tempIndex),
+            guard row.count > max(timeIndex, depthIndex),
                   let seconds = TimeInterval(normalizedRow[timeIndex]),
                   seconds.isFinite,
                   (0...IOSAlgorithmConfiguration.maxDiveDurationSeconds).contains(seconds),
@@ -123,14 +123,22 @@ enum DiveImportService {
                 continue
             }
             let temperature: Double?
-            if normalizedRow[tempIndex].isEmpty {
-                temperature = nil
-            } else if let parsedTemperature = Double(normalizedRow[tempIndex]),
-                      let validTemperature = DiveProfileMath.sanitizedTemperatureCelsius(parsedTemperature) {
-                temperature = validTemperature
+            if let tempIndex {
+                guard row.count > tempIndex else {
+                    invalidRowCount += 1
+                    continue
+                }
+                if normalizedRow[tempIndex].isEmpty {
+                    temperature = nil
+                } else if let parsedTemperature = Double(normalizedRow[tempIndex]),
+                          let validTemperature = DiveProfileMath.sanitizedTemperatureCelsius(parsedTemperature) {
+                    temperature = validTemperature
+                } else {
+                    invalidRowCount += 1
+                    continue
+                }
             } else {
-                invalidRowCount += 1
-                continue
+                temperature = nil
             }
             samples.append(DiveSample(timestamp: start.addingTimeInterval(seconds), depthMeters: depth, temperatureCelsius: temperature))
             if samples.count > IOSAlgorithmConfiguration.maxProfileSampleCount {

@@ -118,15 +118,20 @@ enum WatchDiveSyncCodec {
     // context. Senders validate this in constant time before declaring the dive
     // acknowledged; unsigned `acknowledged` strings are not accepted.
     static func ackSignature(sessionID: UUID, issuedAt: Date) -> String {
+        guard WatchSyncAuth.hasPeerSecret(),
+              let key = try? WatchSyncAuth.deriveSyncKey(peerBundleID: expectedWatchBundleID) else { return "" }
         let canonical = "ack|\(sessionID.uuidString)|\(issuedAt.timeIntervalSince1970)"
-        let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: syncKey())
+        let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: key)
         return Data(code).base64EncodedString()
     }
 
     static func verifyAckSignature(_ signature: String?, sessionID: UUID, issuedAt: Date) -> Bool {
-        guard let signature, let providedData = Data(base64Encoded: signature) else { return false }
+        guard let signature,
+              !signature.isEmpty,
+              signature != "acknowledged",
+              let providedData = Data(base64Encoded: signature) else { return false }
         let expected = ackSignature(sessionID: sessionID, issuedAt: issuedAt)
-        guard let expectedData = Data(base64Encoded: expected) else { return false }
+        guard !expected.isEmpty, let expectedData = Data(base64Encoded: expected) else { return false }
         return providedData.constantTimeEquals(expectedData)
     }
 
@@ -168,8 +173,8 @@ enum WatchDiveSyncCodec {
         return strings.compactMap(UUID.init(uuidString:))
     }
 
-    private static func syncKey() -> SymmetricKey {
-        WatchSyncAuth.syncKey(peerBundleID: expectedWatchBundleID)
+    private static func syncKey() throws -> SymmetricKey {
+        try WatchSyncAuth.deriveSyncKey(peerBundleID: expectedWatchBundleID)
     }
 
     private static func sign(_ transport: Transport, issuedAt: Date, body: Data) -> Transport {
@@ -184,14 +189,16 @@ enum WatchDiveSyncCodec {
     }
 
     private static func hmac(version: Int, bundleID: String, issuedAt: Date, body: Data) -> String {
+        guard let key = try? syncKey() else { return "" }
         let canonical = "\(version)|\(bundleID)|\(issuedAt.timeIntervalSince1970)|\(body.base64EncodedString())"
-        let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: syncKey())
+        let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: key)
         return Data(code).base64EncodedString()
     }
 
     private static func verify(_ transport: Transport) -> Bool {
+        guard let key = try? syncKey() else { return false }
         let canonical = "\(transport.version)|\(transport.bundleID)|\(transport.issuedAt.timeIntervalSince1970)|\(transport.body.base64EncodedString())"
-        let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: syncKey())
+        let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: key)
         let expected = Data(code).base64EncodedString()
         guard let received = Data(base64Encoded: transport.signature) else { return false }
         guard let expectedData = Data(base64Encoded: expected) else { return false }

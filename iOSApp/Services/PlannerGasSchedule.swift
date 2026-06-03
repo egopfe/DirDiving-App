@@ -63,8 +63,8 @@ enum PlannerGasSchedule {
         return enginePlan.hasBlockingIssues
     }
 
-    static func makeDecoStop(depthMeters: Double, minutes: Int, gas: GasMix) -> DecoStop {
-        let actualPPO2 = GasPlanningService.ppO2(gas: gas, depthMeters: depthMeters)
+    static func makeDecoStop(depthMeters: Double, minutes: Int, gas: GasMix, environment: PlannerEnvironment = .seaLevelSaltWater) -> DecoStop {
+        let actualPPO2 = GasPlanningService.ppO2(gas: gas, depthMeters: depthMeters, environment: environment)
         let states: [PlannerResultState] = actualPPO2 > gas.maxPPO2 ? [.PPO2Exceeded] : []
         return DecoStop(
             depthMeters: depthMeters,
@@ -76,7 +76,8 @@ enum PlannerGasSchedule {
         )
     }
 
-    static func roleScheduleLines(input: GasPlanInput) -> [String] {
+    static func roleScheduleLines(input: GasPlanInput, environment: PlannerEnvironment? = nil) -> [String] {
+        let resolvedEnvironment = environment ?? input.plannerEnvironment
         var lines: [String] = []
         let travels = sortedTravelCylinders(from: input)
         if !travels.isEmpty {
@@ -94,7 +95,7 @@ enum PlannerGasSchedule {
                 String(
                     format: String(localized: "planner.schedule.bailout"),
                     bailout.gas.label,
-                    Int(min(bailout.switchDepthMeters, bailout.modMeters))
+                    Int(min(bailout.switchDepthMeters, bailout.modMeters(environment: resolvedEnvironment)))
                 )
             )
         }
@@ -102,12 +103,13 @@ enum PlannerGasSchedule {
     }
 
     /// Bailout cylinders are schedule-only in this reference planner — not passed to `BuhlmannEngine`.
-    static func bailoutAvailabilityWarnings(input: GasPlanInput) -> [String] {
-        bailoutCylinders(from: input).map { bailout in
+    static func bailoutAvailabilityWarnings(input: GasPlanInput, environment: PlannerEnvironment? = nil) -> [String] {
+        let resolvedEnvironment = environment ?? input.plannerEnvironment
+        return bailoutCylinders(from: input).map { bailout in
             String(
                 format: String(localized: "planner.bailout.engine_excluded"),
                 bailout.gas.label,
-                Int(min(bailout.switchDepthMeters, bailout.modMeters))
+                Int(min(bailout.switchDepthMeters, bailout.modMeters(environment: resolvedEnvironment)))
             )
         }
     }

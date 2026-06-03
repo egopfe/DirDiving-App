@@ -4,6 +4,7 @@ struct GasMixCard: View {
     @Binding var mix: GasMix
     let accent: Color
     var unitPreference: IOSUnitPreference = .metric
+    var plannerEnvironment: PlannerEnvironment = .seaLevelSaltWater
     var onMixChanged: (() -> Void)? = nil
 
     var body: some View {
@@ -54,7 +55,7 @@ struct GasMixCard: View {
                         .font(.caption)
                         .foregroundStyle(DIRTheme.muted)
                     Spacer()
-                    Text(Formatters.depth(mix.modMeters, units: unitPreference).text)
+                    Text(Formatters.depth(mix.modMeters(environment: plannerEnvironment), units: unitPreference).text)
                         .font(.caption.monospacedDigit().weight(.semibold))
                         .foregroundStyle(DIRTheme.cyan)
                 }

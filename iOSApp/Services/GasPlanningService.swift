@@ -9,7 +9,7 @@ enum GasPlanningService {
         }
         guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) else {
             var invalid = validation
-            invalid.add(.invalidEnvironment, message: "Ambiente planner non valido.")
+            invalid.add(.invalidEnvironment, message: String(localized: "planner.validation.invalid_environment"))
             return unavailableAnalysis(input: input, gas: gas, validation: invalid)
         }
         let planningDepth = input.effectivePlanningDepthMeters
@@ -65,7 +65,7 @@ enum GasPlanningService {
             )
         case .failure:
             var invalid = validation
-            invalid.add(.invalidEnvironment, message: "Esposizione ossigeno non valida.")
+            invalid.add(.invalidEnvironment, message: String(localized: "planner.validation.invalid_oxygen_exposure"))
             return unavailableAnalysis(input: input, gas: gas, validation: invalid)
         }
     }
@@ -162,7 +162,8 @@ enum GasPlanningService {
                 density: maxDensity,
                 endMeters: base.endMeters,
                 remainingLiters: base.remainingLiters,
-                rockBottomLiters: base.rockBottomLiters
+                rockBottomLiters: base.rockBottomLiters,
+                environment: environment
             ),
             exposurePlannerStates(from: exposure)
         )
@@ -365,7 +366,8 @@ enum GasPlanningService {
         }
 
         for bailout in PlannerGasSchedule.bailoutCylinders(from: input) {
-            let depth = min(bailout.switchDepthMeters, bailout.modMeters)
+            let environment = input.plannerEnvironment
+            let depth = min(bailout.switchDepthMeters, bailout.modMeters(environment: environment))
             segments.append(
                 DivePlanSegment(
                     kind: .gasSwitch,
@@ -484,12 +486,40 @@ enum GasPlanningService {
 
     static func briefingLines(input: GasPlanInput, analysis: TechnicalGasAnalysis, tts: Int, stops: [DecoStop]) -> [String] {
         [
-            "Mode: planned as \(input.plannedDepthMeters)m / \(Int(input.plannedBottomMinutes))min, \(input.bottomGas.label).",
-            "GF: \(Int(input.gfLow))/\(Int(input.gfHigh)); TTS/TTR estimate \(tts) min.",
-            "Gas: turn \(Int(analysis.turnPressureBar)) bar, minimum gas \(Int(analysis.minimumGasBar)) bar.",
-            "Respirability: density \(String(format: "%.1f", analysis.densityAtDepth)) g/L, END \(Int(analysis.endMeters))m.",
-            "Oxygen: PPO2 \(String(format: "%.1f", analysis.ppO2AtDepth)), CNS \(Int(analysis.cnsPercent))% (daily \(Int(analysis.cnsDailyPercent))%), OTU dive \(Int(analysis.otu)), OTU 24h \(Int(analysis.otuDaily24h)).",
-            "Stops: \(stops.map { "\(Int($0.depthMeters))m/\($0.minutes)min \($0.gas)" }.joined(separator: ", "))."
+            String(
+                format: String(localized: "planner.briefing.mode"),
+                input.plannedDepthMeters,
+                Int(input.plannedBottomMinutes),
+                input.bottomGas.label
+            ),
+            String(
+                format: String(localized: "planner.briefing.gf_tts"),
+                Int(input.gfLow),
+                Int(input.gfHigh),
+                tts
+            ),
+            String(
+                format: String(localized: "planner.briefing.gas_pressure"),
+                Int(analysis.turnPressureBar),
+                Int(analysis.minimumGasBar)
+            ),
+            String(
+                format: String(localized: "planner.briefing.respirability"),
+                analysis.densityAtDepth,
+                Int(analysis.endMeters)
+            ),
+            String(
+                format: String(localized: "planner.briefing.oxygen"),
+                analysis.ppO2AtDepth,
+                Int(analysis.cnsPercent),
+                Int(analysis.cnsDailyPercent),
+                Int(analysis.otu),
+                Int(analysis.otuDaily24h)
+            ),
+            String(
+                format: String(localized: "planner.briefing.stops"),
+                stops.map { "\(Int($0.depthMeters))m/\($0.minutes)min \($0.gas)" }.joined(separator: ", ")
+            )
         ]
     }
 
@@ -535,12 +565,20 @@ enum GasPlanningService {
             + gas.heliumFraction * 0.1786
     }
 
-    private static func makeStates(input: GasPlanInput, ppO2: Double, density: Double, endMeters: Double, remainingLiters: Double, rockBottomLiters: Double) -> [PlannerResultState] {
+    private static func makeStates(
+        input: GasPlanInput,
+        ppO2: Double,
+        density: Double,
+        endMeters: Double,
+        remainingLiters: Double,
+        rockBottomLiters: Double,
+        environment: PlannerEnvironment = .seaLevelSaltWater
+    ) -> [PlannerResultState] {
         var values: [PlannerResultState] = [.validReference, .nonCertifiedReference]
         if ppO2 > input.bottomGas.maxPPO2 {
             values.append(.PPO2Exceeded)
         }
-        if input.plannedDepthMeters > input.bottomGas.modMeters {
+        if input.plannedDepthMeters > input.bottomGas.modMeters(environment: environment) {
             values.append(.MODExceeded)
         }
         if density >= input.densityDangerLimit {
@@ -600,7 +638,8 @@ enum GasPlanningService {
                 density: density,
                 endMeters: end,
                 remainingLiters: remaining,
-                rockBottomLiters: rockBottom
+                rockBottomLiters: rockBottom,
+                environment: input.plannerEnvironment
             ),
             exposurePlannerStates(from: exposure)
         )
