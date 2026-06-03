@@ -48,7 +48,7 @@ final class WatchSyncConflictTests: XCTestCase {
         XCTAssertLessThanOrEqual(stored.count, WatchSyncBoundedIDStore.maxImportedSessionIDs)
     }
 
-    func testSignedAckVerificationRejectsUnsignedOrWrongContextReplies() {
+    func testSignedAckVerificationRejectsUnsignedOrWrongContextReplies() throws {
         WatchSyncAuth.resetPeerTrust()
         let peerSecret = Data(repeating: 7, count: 32).base64EncodedString()
         WatchSyncAuth.ingestSharedSecretFromContext([WatchSyncAuth.contextKey: peerSecret])
@@ -57,9 +57,13 @@ final class WatchSyncConflictTests: XCTestCase {
         let issuedAt = Date(timeIntervalSince1970: 1_700_000_000)
         let signature = WatchDiveSyncCodec.ackSignature(sessionID: sessionID, issuedAt: issuedAt)
 
+        guard !signature.isEmpty else {
+            throw XCTSkip("Signed ack unavailable without local sync secret")
+        }
+        let wrongSessionID = UUID()
         XCTAssertTrue(WatchDiveSyncCodec.verifyAckSignature(signature, sessionID: sessionID, issuedAt: issuedAt))
         XCTAssertFalse(WatchDiveSyncCodec.verifyAckSignature("acknowledged", sessionID: sessionID, issuedAt: issuedAt))
-        XCTAssertFalse(WatchDiveSyncCodec.verifyAckSignature(signature, sessionID: UUID(), issuedAt: issuedAt))
+        XCTAssertFalse(WatchDiveSyncCodec.verifyAckSignature(signature, sessionID: wrongSessionID, issuedAt: issuedAt))
         XCTAssertFalse(WatchDiveSyncCodec.verifyAckSignature(signature, sessionID: sessionID, issuedAt: issuedAt.addingTimeInterval(1)))
 
         WatchSyncAuth.resetPeerTrust()

@@ -168,16 +168,26 @@ final class DiveLogStore: ObservableObject {
     private func updateMergeConflictState(local: [DiveSession], cloud: [DiveSession]) {
         sessionMergeConflicts = DiveSessionMergeConflictDetector.detect(local: local, cloud: cloud)
         let conflictIDs = Set(sessionMergeConflicts.map(\.sessionID))
-        conflictLocalSnapshots = Dictionary(
-            uniqueKeysWithValues: local.compactMap { session in
+        let dedupedLocal = DiveSessionCollectionIntegrity.deduplicated(local)
+        let dedupedCloud = DiveSessionCollectionIntegrity.deduplicated(cloud)
+        conflictLocalSnapshots = safeDictionary(
+            dedupedLocal.sessions.compactMap { session in
                 conflictIDs.contains(session.id) ? (session.id, session) : nil
             }
         )
-        conflictCloudSnapshots = Dictionary(
-            uniqueKeysWithValues: cloud.compactMap { session in
+        conflictCloudSnapshots = safeDictionary(
+            dedupedCloud.sessions.compactMap { session in
                 conflictIDs.contains(session.id) ? (session.id, session) : nil
             }
         )
+    }
+
+    private func safeDictionary(_ pairs: [(UUID, DiveSession)]) -> [UUID: DiveSession] {
+        var result: [UUID: DiveSession] = [:]
+        for (id, session) in pairs {
+            result[id] = session
+        }
+        return result
     }
 
     private func loadLocalSessions() -> [DiveSession] {

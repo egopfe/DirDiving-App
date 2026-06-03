@@ -10,6 +10,12 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 | Commit `HEAD` | __________ |
 | Esecutore | __________ |
 
+## Audit remediation (2026-06-03)
+
+- [ ] Review [`DIR_DIVING_FULL_CODE_AUDIT_2026-06-03_REMEDIATION_REPORT.md`](DIR_DIVING_FULL_CODE_AUDIT_2026-06-03_REMEDIATION_REPORT.md)
+- [ ] Optional CSV import without `temperature_c` verified on device (see [`CSV_IMPORT_EXPORT_POLICY.md`](CSV_IMPORT_EXPORT_POLICY.md))
+- [ ] Watch GPS lifecycle policy reviewed ([`WATCH_GPS_LIFECYCLE_POLICY.md`](WATCH_GPS_LIFECYCLE_POLICY.md))
+
 ## Build
 
 - [ ] `xcodegen generate` senza errori  

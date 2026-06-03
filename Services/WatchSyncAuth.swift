@@ -4,6 +4,11 @@ import Security
 import WatchConnectivity
 import os
 
+enum WatchSyncAuthError: Error, Equatable {
+    case missingPeerSecret
+    case missingLocalSecret
+}
+
 enum WatchSyncAuth {
     static let contextKey = "dirdiving_watch_sync_secret"
     private static let keychainService = "com.egopfe.dirdiving.watch-sync"
@@ -53,14 +58,14 @@ enum WatchSyncAuth {
     // BOTH sides (Watch + iOS) on `main` MUST keep this implementation byte-identical.
     // Any change to the canonical string or the ordering rule REQUIRES a bump of
     // `WatchDiveSyncCodec.schemaVersion` and a coordinated Watch/iOS release.
-    static func syncKey(peerBundleID _: String) -> SymmetricKey {
+    static func deriveSyncKey(peerBundleID _: String) throws -> SymmetricKey {
         guard let secret = loadPeerSecret() else {
-            logger.error("syncKey requested without verified peer secret; returning zero key (callers must short-circuit via hasPeerSecret()).")
-            return SymmetricKey(data: Data(repeating: 0, count: 32))
+            logger.error("deriveSyncKey requested without verified peer secret.")
+            throw WatchSyncAuthError.missingPeerSecret
         }
         guard let localSecret = loadOrCreateLocalSecret() else {
-            logger.error("syncKey requested but local secret unavailable; returning zero key.")
-            return SymmetricKey(data: Data(repeating: 0, count: 32))
+            logger.error("deriveSyncKey requested but local secret unavailable.")
+            throw WatchSyncAuthError.missingLocalSecret
         }
         let orderedSecrets = [localSecret, secret].sorted { $0.lexicographicallyPrecedes($1) }
         var material = Data("dirdiving.watch.sync.v2|com.egopfe.dirdiving.ios.watch|com.egopfe.dirdiving.ios|".utf8)
@@ -73,6 +78,8 @@ enum WatchSyncAuth {
         if let existing = loadKeychain(account: keychainAccount) {
             return existing
         }
+        // Watch builds always used the canonical `dirdiving` keychain service; legacy `dirmotion`
+        // migration is implemented on iOS only (see iOSApp/Services/WatchSyncAuth.swift).
         guard let generated = try? randomKeyData(byteCount: 32) else {
             // F7: never fall back to a deterministic secret — fail loud instead.
             return nil

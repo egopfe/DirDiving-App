@@ -29,7 +29,17 @@ struct GasConsumptionLedger: Hashable {
         let remainingBar: Double
     }
 
+    struct UnusedPlannedEntry: Hashable {
+        let cylinderId: UUID
+        let gasLabel: String
+        let role: GasRole
+        let availableLiters: Double
+        let availableBar: Double
+        let isStandbyOrBailout: Bool
+    }
+
     let entries: [Entry]
+    let unusedPlannedEntries: [UnusedPlannedEntry]
     let totalConsumedLiters: Double
     let totalRemainingLiters: Double
     let warnings: [GasUsageWarningState]
@@ -84,6 +94,7 @@ enum ScheduleGasConsumptionService {
         }
 
         var entries: [GasConsumptionLedger.Entry] = []
+        var unusedPlannedEntries: [GasConsumptionLedger.UnusedPlannedEntry] = []
         var warnings: [GasUsageWarningState] = []
         var totalConsumed = 0.0
         var totalRemaining = 0.0
@@ -127,9 +138,31 @@ enum ScheduleGasConsumptionService {
             totalRemaining += remainingLiters
         }
 
+        let consumedCylinderIDs = Set(consumedByCylinder.keys)
+        for (cylinderId, allocation) in allocations where !consumedCylinderIDs.contains(cylinderId) {
+            let availableLiters = allocation.startLiters
+            let availableBar = allocation.cylinderVolumeLiters > 0 ? availableLiters / allocation.cylinderVolumeLiters : 0
+            unusedPlannedEntries.append(
+                .init(
+                    cylinderId: cylinderId,
+                    gasLabel: allocation.gasLabel,
+                    role: allocation.role,
+                    availableLiters: availableLiters,
+                    availableBar: availableBar,
+                    isStandbyOrBailout: allocation.role == .bailout || allocation.role == .travel
+                )
+            )
+        }
+
         return .success(
             GasConsumptionLedger(
                 entries: entries.sorted { lhs, rhs in
+                    if lhs.role.sortOrder != rhs.role.sortOrder {
+                        return lhs.role.sortOrder < rhs.role.sortOrder
+                    }
+                    return lhs.gasLabel < rhs.gasLabel
+                },
+                unusedPlannedEntries: unusedPlannedEntries.sorted { lhs, rhs in
                     if lhs.role.sortOrder != rhs.role.sortOrder {
                         return lhs.role.sortOrder < rhs.role.sortOrder
                     }

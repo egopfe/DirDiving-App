@@ -391,7 +391,7 @@ struct PlannerView: View {
                         Text(
                             String(
                                 format: String(localized: "planner.mod.value_format"),
-                                Formatters.depth(entry.modMeters, units: unitPreference).text
+                                Formatters.depth(entry.modMeters(environment: store.input.plannerEnvironment), units: unitPreference).text
                             )
                         )
                         .font(.caption.weight(.semibold))
@@ -406,7 +406,8 @@ struct PlannerView: View {
                         GasMixCard(
                             mix: $entry.gas,
                             accent: entry.role == .bottom ? DIRTheme.green : DIRTheme.yellow,
-                            unitPreference: unitPreference
+                            unitPreference: unitPreference,
+                            plannerEnvironment: store.input.plannerEnvironment
                         ) {
                             store.input.syncLegacyGasesFromPlannerCylinders()
                             store.refreshDerivedPlanningPreview()
@@ -419,7 +420,7 @@ struct PlannerView: View {
                         .onChange(of: entry.switchDepthMeters) { _, _ in
                             store.refreshDerivedPlanningPreview()
                         }
-                        if entry.isSwitchDepthBeyondMOD {
+                        if entry.isSwitchDepthBeyondMOD(environment: store.input.plannerEnvironment) {
                             Text(String(localized: "planner.mod.exceeds_allowed"))
                                 .font(.caption2.weight(.semibold))
                                 .foregroundStyle(DIRTheme.red)
@@ -1076,6 +1077,16 @@ struct PlanResultView: View {
                         gasLedgerEntryRow(entry, ledger: ledger)
                         Divider().overlay(DIRTheme.hairline)
                     }
+                    if !ledger.unusedPlannedEntries.isEmpty {
+                        Text(String(localized: "planner.gas_ledger.unused_title"))
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(DIRTheme.muted)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        ForEach(ledger.unusedPlannedEntries, id: \.cylinderId) { entry in
+                            unusedGasLedgerEntryRow(entry)
+                            Divider().overlay(DIRTheme.hairline)
+                        }
+                    }
                 }
             }
         }
@@ -1136,6 +1147,49 @@ struct PlanResultView: View {
                 Formatters.zero(entry.remainingBar)
             )
         )
+    }
+
+    private func unusedGasLedgerEntryRow(_ entry: GasConsumptionLedger.UnusedPlannedEntry) -> some View {
+        let cylinderLabel = store.input.plannerCylinders.first(where: { $0.id == entry.cylinderId })?.tankSize.rawValue
+            ?? store.input.primaryCylinder.name
+        let subtitle = entry.isStandbyOrBailout
+            ? String(localized: "planner.gas_ledger.unused_standby")
+            : String(localized: "planner.gas_ledger.unused_planned")
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(entry.gasLabel)
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(.white)
+                    Text("\(entry.role.localizedTitle) · \(cylinderLabel)")
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.muted)
+                }
+                Spacer()
+                Text(subtitle)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(DIRTheme.yellow)
+            }
+            HStack(spacing: 0) {
+                DIRMetricTile(
+                    title: String(localized: "planner.gas_ledger.available_gas"),
+                    value: Formatters.zero(entry.availableLiters),
+                    unit: "L",
+                    color: DIRTheme.cyan
+                )
+                Divider().overlay(DIRTheme.hairline)
+                DIRMetricTile(
+                    title: String(localized: "planner.gas_ledger.remaining_pressure"),
+                    value: Formatters.zero(entry.availableBar),
+                    unit: "bar",
+                    color: DIRTheme.cyan
+                )
+            }
+            Text(String(localized: "planner.gas_ledger.not_consumed_note"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
     }
 
     private func resultHeaderAccent(_ severity: PlannerWarningSeverity) -> Color {

@@ -20,11 +20,44 @@ struct DiveSessionMergeConflict: Identifiable, Hashable {
 
 enum DiveSessionMergeConflictDetector {
     static func detect(local: [DiveSession], cloud: [DiveSession]) -> [DiveSessionMergeConflict] {
-        let cloudByID = Dictionary(uniqueKeysWithValues: cloud.map { ($0.id, $0) })
-        var conflicts: [DiveSessionMergeConflict] = []
-        for localSession in local {
+        let dedupedLocal = DiveSessionCollectionIntegrity.deduplicated(local)
+        let dedupedCloud = DiveSessionCollectionIntegrity.deduplicated(cloud)
+        var conflicts = duplicateSessionIDConflicts(
+            localDuplicates: dedupedLocal.duplicateSessionIDs,
+            cloudDuplicates: dedupedCloud.duplicateSessionIDs
+        )
+        let cloudByID = Dictionary(uniqueKeysWithValues: dedupedCloud.sessions.map { ($0.id, $0) })
+        for localSession in dedupedLocal.sessions {
             guard let cloudSession = cloudByID[localSession.id] else { continue }
             conflicts.append(contentsOf: detect(local: localSession, cloud: cloudSession))
+        }
+        return conflicts
+    }
+
+    private static func duplicateSessionIDConflicts(
+        localDuplicates: [UUID],
+        cloudDuplicates: [UUID]
+    ) -> [DiveSessionMergeConflict] {
+        var conflicts: [DiveSessionMergeConflict] = []
+        for sessionID in localDuplicates {
+            conflicts.append(
+                DiveSessionMergeConflict(
+                    sessionID: sessionID,
+                    fieldName: "duplicateSessionID",
+                    localValue: String(localized: "cloud.merge.duplicate_session.local"),
+                    cloudValue: "—"
+                )
+            )
+        }
+        for sessionID in cloudDuplicates where !localDuplicates.contains(sessionID) {
+            conflicts.append(
+                DiveSessionMergeConflict(
+                    sessionID: sessionID,
+                    fieldName: "duplicateSessionID",
+                    localValue: "—",
+                    cloudValue: String(localized: "cloud.merge.duplicate_session.cloud")
+                )
+            )
         }
         return conflicts
     }
