@@ -369,6 +369,11 @@ struct DiveDetailView: View {
     }
 
     private var pressureSummary: (value: String, unit: String?)? {
+        if let entryBar = session.entryPressureBar, let exitBar = session.exitPressureBar {
+            let entry = PressureDisplayMath.formatPressureValue(entryBar, units: unitPreference)
+            let exit = PressureDisplayMath.formatPressureValue(exitBar, units: unitPreference)
+            return ("\(entry) → \(exit)", nil)
+        }
         let entry = session.entryPressureText?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         let exit = session.exitPressureText?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         guard !entry.isEmpty || !exit.isEmpty else { return nil }
@@ -382,6 +387,8 @@ struct DiveDetailView: View {
         PressureDisplayMath.consumedDisplay(
             entryText: session.entryPressureText ?? "",
             exitText: session.exitPressureText ?? "",
+            entryBar: session.entryPressureBar,
+            exitBar: session.exitPressureBar,
             units: unitPreference
         )
     }

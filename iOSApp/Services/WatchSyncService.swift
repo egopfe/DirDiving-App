@@ -453,7 +453,12 @@ final class WatchSyncService: NSObject, ObservableObject {
     private func sessionSummary(_ session: DiveSession) -> String {
         let started = Self.activityDateFormatter.string(from: session.startDate)
         let minutes = Int((session.durationSeconds / 60).rounded())
-        return "\(started) · \(Formatters.one(session.maxDepthMeters)) m · \(minutes) min"
+        return String(
+            format: String(localized: "sync.activity.session_summary"),
+            started,
+            Formatters.one(session.maxDepthMeters),
+            minutes
+        )
     }
 
     private func recordActivity(title: String, detail: String, marksSuccess: Bool = false) {

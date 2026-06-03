@@ -61,6 +61,7 @@ enum GasPlanningService {
                 exposure: exposure,
                 cnsDescentBottomPercent: previewDescentBottomCNS,
                 extraStates: validation.states,
+                exposureSegments: [bottomSegment],
                 usesBottomPhaseConsumptionEstimate: true
             )
         case .failure:
@@ -165,7 +166,7 @@ enum GasPlanningService {
                 rockBottomLiters: base.rockBottomLiters,
                 environment: environment
             ),
-            exposurePlannerStates(from: exposure)
+            exposurePlannerStates(from: exposure, segments: enginePlan.segments, environment: environment)
         )
         if maxDensity >= input.densityDangerLimit {
             states = mergeStates(states, [.gasDensityDanger])
@@ -544,14 +545,24 @@ enum GasPlanningService {
         let airNarcoticFraction = 0.79 + (gas.isOxygenNarcotic ? 0.21 : 0)
         let ambient = AmbientPressureModel.ambientPressureBar(depthMeters: depthMeters, environment: environment) ?? environment.surfacePressureBar
         let narcoticPressure = ambient * narcoticFraction
-        return max(0, ((narcoticPressure / max(airNarcoticFraction, 0.01)) - 1.0) * 10.0)
+        let equivalentAmbient = narcoticPressure / max(airNarcoticFraction, 0.01)
+        guard equivalentAmbient.isFinite, equivalentAmbient >= environment.surfacePressureBar,
+              let endMeters = AmbientPressureModel.depthMeters(ambientPressureBar: equivalentAmbient, environment: environment) else {
+            return 0
+        }
+        return max(0, endMeters)
     }
 
     private static func equivalentAirDepth(gas: GasMix, depthMeters: Double, environment: PlannerEnvironment) -> Double? {
         guard gas.isValidMix, gas.helium == 0, gas.oxygen > 0.21, depthMeters.isFinite, depthMeters >= 0 else { return nil }
         let ambient = AmbientPressureModel.ambientPressureBar(depthMeters: depthMeters, environment: environment) ?? environment.surfacePressureBar
         let nitrogenPressure = ambient * gas.nitrogen
-        return max(0, ((nitrogenPressure / 0.79) - 1.0) * 10.0)
+        let equivalentAmbient = nitrogenPressure / 0.79
+        guard equivalentAmbient.isFinite, equivalentAmbient >= environment.surfacePressureBar,
+              let eadMeters = AmbientPressureModel.depthMeters(ambientPressureBar: equivalentAmbient, environment: environment) else {
+            return nil
+        }
+        return max(0, eadMeters)
     }
 
     private static func rockBottomLiters(input: GasPlanInput, environment: PlannerEnvironment) -> Double {
@@ -628,6 +639,7 @@ enum GasPlanningService {
         exposure: OxygenExposureResult,
         cnsDescentBottomPercent: Double,
         extraStates: [PlannerResultState],
+        exposureSegments: [BuhlmannRuntimeSegment] = [],
         usesBottomPhaseConsumptionEstimate: Bool = false
     ) -> TechnicalGasAnalysis {
         let states = mergeStates(
@@ -641,7 +653,7 @@ enum GasPlanningService {
                 rockBottomLiters: rockBottom,
                 environment: input.plannerEnvironment
             ),
-            exposurePlannerStates(from: exposure)
+            exposurePlannerStates(from: exposure, segments: exposureSegments, environment: input.plannerEnvironment)
         )
         return TechnicalGasAnalysis(
             gas: gas,
@@ -669,8 +681,26 @@ enum GasPlanningService {
         )
     }
 
-    private static func exposurePlannerStates(from exposure: OxygenExposureResult) -> [PlannerResultState] {
-        exposure.warningStates.isEmpty ? [] : [.oxygenExposureElevated]
+    private static func exposurePlannerStates(
+        from exposure: OxygenExposureResult,
+        segments: [BuhlmannRuntimeSegment] = [],
+        environment: PlannerEnvironment = .seaLevelSaltWater
+    ) -> [PlannerResultState] {
+        var states: [PlannerResultState] = []
+        if segmentsExceedGasPPO2Limit(segments, environment: environment) {
+            states.append(.PPO2Exceeded)
+        }
+        if !exposure.warningStates.isEmpty {
+            states.append(.oxygenExposureElevated)
+        }
+        return states
+    }
+
+    private static func segmentsExceedGasPPO2Limit(_ segments: [BuhlmannRuntimeSegment], environment: PlannerEnvironment) -> Bool {
+        segments.contains { segment in
+            let ppO2 = segment.gas.ppO2(depthMeters: segment.depthMeters, environment: environment)
+            return ppO2 > segment.gas.maxPPO2Bar + 0.000_1
+        }
     }
 
     private static func unavailableAnalysis(input: GasPlanInput, gas: GasMix, validation: PlannerValidationResult) -> TechnicalGasAnalysis {

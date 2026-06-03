@@ -208,6 +208,8 @@ enum DiveProfileMath {
             equipmentUsed: session.equipmentUsed,
             entryPressureText: session.entryPressureText,
             exitPressureText: session.exitPressureText,
+            entryPressureBar: session.entryPressureBar,
+            exitPressureBar: session.exitPressureBar,
             decompressionNotes: session.decompressionNotes
         )
     }

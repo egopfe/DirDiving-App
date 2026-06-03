@@ -39,6 +39,8 @@ struct GasConsumptionLedger: Hashable {
     }
 
     let entries: [Entry]
+    /// Planned cylinders not referenced by the generated Bühlmann schedule (includes bailout/standby).
+    /// `totalConsumedLiters` counts schedule gases only; unused entries are informational.
     let unusedPlannedEntries: [UnusedPlannedEntry]
     let totalConsumedLiters: Double
     let totalRemainingLiters: Double

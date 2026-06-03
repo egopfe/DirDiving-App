@@ -1037,3 +1037,18 @@
 "planner.gas_ledger.unused_standby" = "Standby / bailout gas";
 "planner.gas_ledger.available_gas" = "Available";
 "planner.gas_ledger.not_consumed_note" = "Not consumed by generated plan";
+
+/* iOS MAIN algorithm audit remediation 2026-06-02 */
+"export.subsurface.error.empty_samples" = "No samples to export.";
+"export.subsurface.error.write_failed" = "CSV export failed: %@";
+"sync.codec.error.missing_payload" = "Missing sync payload.";
+"sync.codec.error.payload_too_large" = "Sync payload is too large.";
+"sync.codec.error.unsupported_version" = "Unsupported sync version.";
+"sync.codec.error.invalid_sender" = "Invalid sync sender.";
+"sync.codec.error.stale_payload" = "Sync payload expired.";
+"sync.codec.error.invalid_signature" = "Invalid sync signature.";
+"sync.codec.error.invalid_session" = "Invalid dive session.";
+"sync.codec.error.session_inactive" = "WatchConnectivity is not active.";
+"sync.codec.error.missing_peer_secret" = "Watch sync key is not available yet.";
+"sync.activity.session_summary" = "%1$@ · %2$@ m · %3$lld min";
+"analysis.metric.arithmetic_mean.note" = "SAC and temperature averages are simple arithmetic means across dives, not duration-weighted.";

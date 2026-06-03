@@ -1035,3 +1035,18 @@
 "planner.gas_ledger.unused_standby" = "Gas standby / bailout";
 "planner.gas_ledger.available_gas" = "Disponibile";
 "planner.gas_ledger.not_consumed_note" = "Non consumato dal piano generato";
+
+/* iOS MAIN algorithm audit remediation 2026-06-02 */
+"export.subsurface.error.empty_samples" = "Nessun campione da esportare.";
+"export.subsurface.error.write_failed" = "Export CSV non riuscito: %@";
+"sync.codec.error.missing_payload" = "Payload sync mancante.";
+"sync.codec.error.payload_too_large" = "Payload sync troppo grande.";
+"sync.codec.error.unsupported_version" = "Versione sync non supportata.";
+"sync.codec.error.invalid_sender" = "Mittente sync non valido.";
+"sync.codec.error.stale_payload" = "Payload sync scaduto.";
+"sync.codec.error.invalid_signature" = "Firma sync non valida.";
+"sync.codec.error.invalid_session" = "Sessione immersione non valida.";
+"sync.codec.error.session_inactive" = "WatchConnectivity non attivo.";
+"sync.codec.error.missing_peer_secret" = "Chiave sync Watch non ancora disponibile.";
+"sync.activity.session_summary" = "%1$@ · %2$@ m · %3$lld min";
+"analysis.metric.arithmetic_mean.note" = "SAC e temperatura media sono medie aritmetiche tra immersioni, non medie ponderate per durata.";

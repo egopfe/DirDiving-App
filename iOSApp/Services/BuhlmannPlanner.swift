@@ -77,10 +77,12 @@ enum BuhlmannPlanner {
             )
         }
 
+        let initialTissueState = BuhlmannTissueState.airSaturated(surfacePressureBar: environment.surfacePressureBar)
         let ndlValue = BuhlmannEngine.noDecompressionLimit(
             depthMeters: depthMeters,
             gas: gas,
             gfHigh: gfHigh,
+            initialTissueState: initialTissueState,
             plannerEnvironment: environment
         ) ?? 0
         return BuhlmannPlanResult(
@@ -284,11 +286,13 @@ enum BuhlmannPlanner {
     }
 
     private static func ndlCurve(for gas: BuhlmannGas, environment: PlannerEnvironment, gfHigh: Double) -> [NDLPoint] {
-        stride(from: 6.0, through: 60.0, by: 3.0).map { depth in
+        let initialTissueState = BuhlmannTissueState.airSaturated(surfacePressureBar: environment.surfacePressureBar)
+        return stride(from: 6.0, through: 60.0, by: 3.0).map { depth in
             let ndlValue = BuhlmannEngine.noDecompressionLimit(
                 depthMeters: depth,
                 gas: gas,
                 gfHigh: gfHigh,
+                initialTissueState: initialTissueState,
                 plannerEnvironment: environment
             ) ?? 0
             let group: String
