@@ -23,3 +23,9 @@
 - MAIN targets: `DIRDiving Watch App`, `DIRDiving iOS`.
 - Experimental files remain excluded per `project.yml`.
 - This workflow does not certify physical QA, underwater tests, or App Store asset completeness.
+
+## Watch entitlements (Simulation / dev device builds)
+
+- Default signing uses `Config/DIRDiving.entitlements` **without** `com.apple.developer.coremotion.water-submersion`.
+- This allows iPhone + Apple Watch device installs while depth runs in **Simulation** mode (`MockDepthSensorProvider`).
+- After Apple grants the Submerged Depth and Pressure capability, point `CODE_SIGN_ENTITLEMENTS` in `project.yml` to `Config/DIRDiving.WithWaterSubmersion.entitlements` for production archives.
