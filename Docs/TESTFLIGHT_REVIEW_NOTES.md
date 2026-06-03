@@ -10,6 +10,7 @@ L'app **non** e presentata come computer subacqueo certificato.
 
 Lo stato algoritmico MAIN e documentato in:
 
+- [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) — remediation Watch MAIN 2026-06-03 (pending finalization, load filter, frozen surface, haptics token).
 - [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) per Watch MAIN (codice 100%; QA fisica § L).
 - [`WATCH_MANUAL_NODEPTH_SYNC_POLICY.md`](WATCH_MANUAL_NODEPTH_SYNC_POLICY.md) per sessioni manuali senza profilo profondità.
 - [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) per iOS MAIN.

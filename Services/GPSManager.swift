@@ -11,6 +11,14 @@ final class GPSManager: NSObject, ObservableObject {
     private let locationManager = CLLocationManager()
     private var previousSpeedSample: (point: GPSPoint, date: Date)?
     private var bestEffortCapture: BestEffortCapture?
+    var testHook_holdBestEffortCapture = false
+    private var heldBestEffortCompletion: (@MainActor (GPSPoint?) -> Void)?
+
+    func testHook_completeHeldBestEffortCapture(with point: GPSPoint? = nil) {
+        guard let completion = heldBestEffortCompletion else { return }
+        heldBestEffortCompletion = nil
+        completion(point)
+    }
 
     override init() {
         super.init()
@@ -41,6 +49,11 @@ final class GPSManager: NSObject, ObservableObject {
 
         // Complete any in-flight capture before replacing it so callers are never stranded.
         finishBestEffortCapture()
+
+        if testHook_holdBestEffortCapture {
+            heldBestEffortCompletion = completion
+            return
+        }
 
         let capture = BestEffortCapture(
             deadline: Date().addingTimeInterval(captureDuration),

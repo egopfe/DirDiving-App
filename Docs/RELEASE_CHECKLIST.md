@@ -14,6 +14,7 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 
 - [ ] Review [`DIR_DIVING_FULL_CODE_AUDIT_2026-06-03_REMEDIATION_REPORT.md`](DIR_DIVING_FULL_CODE_AUDIT_2026-06-03_REMEDIATION_REPORT.md)
 - [ ] Review [`IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md)
+- [ ] Review [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md)
 - [ ] Optional CSV import without `temperature_c` verified on device (see [`CSV_IMPORT_EXPORT_POLICY.md`](CSV_IMPORT_EXPORT_POLICY.md))
 - [ ] Manual pressure bar storage verified when switching metric/imperial (see remediation report IOS-AUDIT-006)
 - [ ] Subsurface external import QA (see [`SUBSURFACE_EXPORT_COMPATIBILITY_QA.md`](SUBSURFACE_EXPORT_COMPATIBILITY_QA.md))

@@ -34,7 +34,8 @@ enum DiveAlgorithmSelfCheck {
 
     private static func ascentLimitFailures() -> [String] {
         let cases: [(Double, Double)] = [
-            (45, 10),
+            (45, 1),
+            (40.01, 1),
             (35, 10),
             (25, 5),
             (10, 3),

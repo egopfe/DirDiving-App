@@ -154,6 +154,7 @@ targets:
       - Utils/MonotonicElapsedClock.swift
       - Utils/GPSConfirmationPresentation.swift
       - Utils/DiveSessionPersistenceClass.swift
+      - Utils/DiveAlgorithmSelfCheck.swift
       - Models/DiveGPSConfirmation.swift
       - Services/SubsurfaceExportService.swift
       - Services/UserImageStore.swift
