@@ -105,8 +105,13 @@ struct EquipmentView: View {
             } message: {
                 Text(String(localized: "equipment.reset.confirm.message"))
             }
-            .onAppear {
-                equipment.profile.syncLegacyChecklistFlags()
+            .task {
+                var profile = equipment.profile
+                let beforeCount = profile.checklistItems.count
+                profile.syncLegacyChecklistFlags()
+                if profile.checklistItems.count != beforeCount {
+                    equipment.profile = profile
+                }
             }
             .onChange(of: equipment.profile) { _, _ in
                 showSavedFeedback()

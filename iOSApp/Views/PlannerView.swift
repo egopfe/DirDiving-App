@@ -55,7 +55,7 @@ struct PlannerView: View {
                 PlanResultView()
                     .environmentObject(store)
             }
-            .onAppear {
+            .task {
                 if store.mode != .advanced {
                     store.mode = .advanced
                 }
