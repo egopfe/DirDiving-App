@@ -1,468 +1,670 @@
-# iOS Companion MAIN — Algorithm & Mathematical Functions Audit (Current)
+# iOS Companion MAIN Algorithm and Mathematical Functions Audit - Current
 
-**Audit date:** 2026-06-01  
-**Repository:** DIR DIVING (`DirDiving-App`)  
-**Branch audited:** `main` @ `5c2a27a` (baseline); remediation 2026-06-01 on `main`  
-**Target:** `DIRDiving iOS` (iOS Companion MAIN only)  
-**Mode:** Baseline was read-only static audit; **remediation applied 2026-06-01** — see [`IOS_MAIN_ALGORITHM_READINESS_100_FINAL_QA.md`](IOS_MAIN_ALGORITHM_READINESS_100_FINAL_QA.md)  
-**Related:** [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) (prior pass @ `dce89e7`), [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) (Watch MAIN parallel), [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md), [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md)
+**Audit date:** 2026-06-03
+**Repository:** DIR DIVING (`DirDiving-App`)
+**Branch audited:** `main`
+**Code baseline inspected after remote update:** `6a5054f`
+**Target audited:** `DIRDiving iOS` only
+**Mode:** Read-only static audit on Windows. No code, UI, UX, graphics, navigation, Watch, or experimental files were modified.
 
-### Remediation status (2026-06-01)
+## Scope Confirmation
 
-| ID | Status |
-|----|--------|
-| IOSMATH-HIGH-001 | **Fixed** — model-backed NDL chart ([`IOS_PLANNER_CHART_TRUTHFULNESS.md`](IOS_PLANNER_CHART_TRUTHFULNESS.md)) |
-| IOSMATH-HIGH-002 | **Fixed** — 350 m unified cap ([`IOS_DEPTH_LIMIT_POLICY.md`](IOS_DEPTH_LIMIT_POLICY.md)) |
-| IOSMATH-MED-001 … MED-010 | **Fixed or mitigated** — see final QA report |
-| IOSMATH-LOW-002 … LOW-007 | **Fixed** — display/truthfulness |
-| View-layer test gaps | **Partially closed** — `IOSMainAlgorithmReadinessTests` + `AnalysisDashboardMath` |
-
-Post-remediation estimate: **~98%** code readiness; external paired-device / iCloud QA still required.
-
----
-
-## A. Executive Summary
+This audit is limited to the iOS Companion MAIN branch code included by `project.yml` in the `DIRDiving iOS` target. The project file excludes the experimental iOS files listed below from the MAIN iOS target:
 
-### Readiness scores (iOS Companion MAIN @ `5c2a27a`)
+- `iOSApp/Models/ExplorationModels.swift`
+- `iOSApp/Models/BuddyExperimentalModels.swift`
+- `iOSApp/Services/ExplorationPlanningStore.swift`
+- `iOSApp/Services/BuddyExperimentalStore.swift`
+- `iOSApp/Views/ExplorationCenterView.swift`
+- `iOSApp/Views/ExperimentalFutureConceptsView.swift`
+- `iOSApp/Views/BuddyExperimentalView.swift`
 
-| Dimension | Score | Notes |
-|-----------|------:|-------|
-| **Overall algorithmic readiness** | **~89%** | Real ZHL-16C reference planner, strong XCTest suite; residual UX/display and cross-layer depth-cap inconsistencies |
-| **Mathematical robustness** | **~91%** | Schreiner loading, GF deco, bounded integration, validators, finite guards |
-| **Planner confidence** | **~86%** | Engine is substantive and labeled non-certified; NDL curve chart axis is **not** physiological |
-| **Sync / data integrity confidence** | **~88%** | HMAC watch codec, per-session merge + conflict UI, CSV metadata round-trip; empty-profile merge edge case |
-| **Unit / display consistency** | **~87%** | Metric storage; `Formatters` + `IOSUnitConversions`; documented split between Bühlmann max depth vs gas “effective” depth |
-| **Automated test coverage (algorithms)** | **~90%** | **173** `func test*` in `Tests/iOSAlgorithmTests/`; gaps in view-level stats, manual editor, route distance |
+Apple Watch code was not audited except where needed to understand iOS-consumed sync models and payload validation. No Watch source file was modified.
 
-### Critical blockers (algorithm)
-
-**None at CRITICAL severity** for a **non-certified informational** companion with existing disclaimers and reference-only planner copy.
-
-### TestFlight blockers (algorithm / data)
-
-| ID | Severity | Topic |
-|----|----------|--------|
-| IOSMATH-HIGH-001 | HIGH | Bühlmann NDL chart Y-axis is decorative (`100 − depth×1.5`), not model output — misread risk |
-| IOSMATH-HIGH-002 | HIGH | Depth cap **300 m** (CSV import/export) vs **350 m** (watch sync / logbook normalize) — cross-layer inconsistency |
-| — | Process | Paired Watch ↔ iPhone round-trip in water / field GPS not replaceable by simulator |
-| — | Process | External planner reference validation campaign (documented in Bühlmann readiness docs) |
+## 1. Executive Summary
 
-### App Store blockers (algorithm / data)
-
-- All TestFlight process items above  
-- Verified Subsurface CSV regression on supported fields (automated tests exist; field sign-off recommended)  
-- iCloud conflict + tombstone scenarios on two devices  
-- Marketing must not claim certified decompression / NDL authority  
+### Overall Verdict
 
-### Prior audit remediation status (@ `dce89e7`, verified still present in code)
-
-| Legacy ID | Topic | Status @ `5c2a27a` |
-|-----------|--------|---------------------|
-| B2 | Unified `PlannerEnvironment` / `AmbientPressureModel` for MOD/PPO₂ | **Resolved** — `GasMixValidator.modMeters(environment:)` |
-| B3 | Planning depth: Bühlmann uses max; gas uses `effectivePlanningDepthMeters` | **Resolved by design** — documented in `GasPlan` comments + `PlanningDepthReferenceTests` |
-| B4 | Cloud merge | **Improved** — per-session `DiveSessionMerge.preferred` + `DiveSessionMergeConflictDetector` |
-| B5 | CSV start date / `# session_meta` | **Resolved** — `SubsurfaceExportService` / `DiveImportService` |
-| — | Analysis demo exclusion default | **Resolved** — `includeDemoInAnalysis` default `false` |
-
-### What blocks 100% algorithmic readiness
+The iOS Companion MAIN branch contains a substantive algorithmic layer: centralized unit conversions, planner input validation, gas mix validation, a ZHL-16C N2/He Buhlmann reference engine, time-weighted dive profile math, sync payload validation, CSV import/export guards, route math validation, and a broad iOS algorithm XCTest suite.
 
-1. **Hardware / paired-device QA** (Watch sync, GPS, real profiles)  
-2. **IOSMATH-HIGH-001** — chart labeling or axis tied to real NDL/compartment data  
-3. **IOSMATH-HIGH-002** — align or document depth ceilings across import/export vs sync  
-4. **View-layer test gaps** — Analysis aggregates, manual editor imperial defaults, route math  
-5. **Process** — CI billing / external golden validation sign-off (if required by release policy)  
-
----
-
-## Phase 0 — Preflight
-
-### 0.1 Branch & git status
+During publication, `origin/main` advanced to `6a5054f` with remediation changes that addressed the highest-priority audit findings around environment-aware MOD display, duplicate session collection integrity, and CSV temperature-column compatibility. This report therefore reflects the post-pull code baseline and separates remediated items from remaining P2/P3 hardening work.
 
-```
-Branch: main @ 5c2a27a
-Working tree: dirty (Watch MAIN algorithm remediation in progress; iOS sources unchanged in dirty set)
-```
-
-### 0.2 Experimental exclusion (`project.yml` → `DIRDiving iOS`)
-
-| Excluded path | Reason |
-|---------------|--------|
-| `iOSApp/Models/ExplorationModels.swift` | Exploration Lab |
-| `iOSApp/Models/BuddyExperimentalModels.swift` | Buddy experimental |
-| `iOSApp/Services/ExplorationPlanningStore.swift` | Exploration |
-| `iOSApp/Services/BuddyExperimentalStore.swift` | Buddy |
-| `iOSApp/Views/ExplorationCenterView.swift` | Exploration UI |
-| `iOSApp/Views/ExperimentalFutureConceptsView.swift` | Experimental concepts |
-| `iOSApp/Views/BuddyExperimentalView.swift` | Buddy UI |
+The implementation is close to release-hard for internal validation. No P0/P1 algorithm blocker remains by static inspection, but several P2/P3 consistency, physical QA, and macOS build/test validation items should still be completed before calling the iOS Companion planner fully release-hard.
 
-### 0.3 iOS MAIN build surface
+### Readiness Estimate
 
-- **Target:** `DIRDiving iOS` — sources `iOSApp/**` minus excludes above  
-- **Embedded:** `DIRDiving Watch App` (companion only; Watch runtime code not audited here except shared codecs/models consumed by iOS)  
-- **Tests:** `DIRDiving iOS Algorithm Tests` — `Tests/iOSAlgorithmTests/**` + listed algorithm sources  
-
-### 0.4 Files inspected (core)
-
-| Layer | Paths |
-|-------|--------|
-| Planner | `PlannerService.swift`, `BuhlmannPlanner.swift`, `PlannerGasSchedule.swift`, `PlannerMODValidator.swift`, `PlannerEnvironment.swift`, `RepetitiveDivePlannerService.swift`, `PlannerStore.swift` |
-| Bühlmann | `iOSApp/Algorithms/Buhlmann/*.swift` |
-| Gas / exposure | `GasPlanningService.swift`, `ScheduleGasConsumptionService.swift`, `OxygenExposureModels.swift` |
-| Logbook / profile | `DiveLogStore.swift`, `DiveProfileMath.swift`, `DiveSessionMerge.swift`, `DiveSessionAlgorithmValidator.swift` |
-| Import/export | `DiveImportService.swift`, `SubsurfaceExportService.swift` |
-| Sync | `WatchDiveSyncCodec.swift`, `WatchSyncService.swift`, `CloudSyncStore.swift`, `WatchSyncSessionDiff.swift` |
-| Models | `DiveSession.swift`, `DiveSample.swift`, `GasPlan.swift`, `DivePlan.swift`, `TankSize.swift`, `DemoDiveCatalog.swift` |
-| Utils | `IOSAlgorithmConfiguration.swift`, `IOSUnitConversions.swift`, `Formatters.swift`, `GasMixValidator.swift`, `PlannerInputValidator.swift`, `PlanCalculationCompleteness.swift`, `PlannerResultState.swift`, `IOSDiveLogbookPolicy.swift` |
-| UI (math display) | `PlannerView.swift`, `DiveDetailView.swift`, `LogbookView.swift`, `AnalysisView.swift`, `ManualDiveEditorView.swift`, `CSVImportPanel.swift` |
-| Equipment | `EquipmentStore.swift` (persistence only) |
-| Tests | `Tests/iOSAlgorithmTests/*.swift` (34 files, 173 test methods) |
-
----
+| Area | Static readiness | Notes |
+|---|---:|---|
+| Buhlmann ZHL-16C engine | 90% | Real N2/He tissue loading and GF-driven schedules are present; preview NDL environment seeding still needs correction. |
+| Gas planning | 90% | Central validation is strong and MOD display/helper paths were made environment-aware in the remote remediation commit. |
+| Logbook derived math | 92% | Time-weighted profile math is centralized and reused; manual/metadata edge cases are handled conservatively. |
+| CSV import/export | 89% | Empty exports and invalid samples are rejected; optional temperature column support is now present; external compatibility still needs regression. |
+| Watch sync validation on iOS | 91% | HMAC and mathematical validation are present; duplicate session collection integrity was hardened in the remote remediation commit. |
+| Route/GPS math | 93% | Coordinates are validated, route distance uses Haversine, and bearing is normalized. |
+| Unit conversion consistency | 89% | Central conversion helpers exist; pressure text fields still have unit-semantics ambiguity. |
+| Automated algorithm tests | 90% | Large iOS algorithm suite exists; targeted gaps remain for the findings below. |
 
-## B. Algorithm Inventory
+### Severity Summary
 
-### 1. Planner / dive planning
+| Severity | Count | Summary |
+|---|---:|---|
+| CRITICAL | 0 | No immediate non-certified informational-app critical math blocker found by static inspection. |
+| HIGH | 0 | Prior high-severity findings were remediated by `6a5054f`. |
+| MEDIUM | 4 | Buhlmann preview NDL environment seeding, ascent/deco gas preflight coverage, END/EAD depth conversion, pressure entry unit semantics. |
+| LOW | 3 | Localized service strings, Subsurface regression, bailout ledger clarity. |
+| INFO | 2 | Oxygen exposure extrapolation positioning; arithmetic summary choices should remain documented. |
 
-| Symbol | File | Inputs | Outputs | Units | Safety |
-|--------|------|--------|---------|-------|--------|
-| `PlannerService.makePlan` | `PlannerService.swift` | `GasPlanInput`, env, optional tissue snapshot | `DivePlanResult` | m, min, bar, % | Orchestrates reference plan |
-| `PlannerInputValidator.validate` | `PlannerInputValidator.swift` | Depth 0.1–120 m, bottom 0–600 min, GF, gases, temp | Errors / warnings | — | Blocks invalid input |
-| `PlannerSafetyAcknowledgment` | `PlannerSafetyAcknowledgment.swift` | UserDefaults revision | Bool gate | — | Procedural only |
-| `PlanCalculationCompletenessResolver` | `PlanCalculationCompleteness.swift` | Engine result + stops | complete / incomplete / no solution | — | Hides partial stops on limit |
+### Build/Test Status
 
-### 2. Bühlmann / decompression display
+This audit ran on Windows. Per project constraints, `xcodegen`, `xcodebuild`, and XCTest were not executed. The report is based on static source inspection, project file inspection, and test inventory.
 
-| Symbol | File | Inputs | Outputs | Notes |
-|--------|------|--------|---------|-------|
-| `BuhlmannEngine.plan` | `BuhlmannEngine.swift` | `BuhlmannPlanRequest` | NDL, TTS, stops, segments, tissue | ZHL-16C N₂+He, GF deco |
-| `noDecompressionLimit` | `BuhlmannEngine.swift` | Depth, gases, GF high | minutes | Binary search 0–600; ascent **9 m/min** fixed |
-| `decompressionSchedule` | `BuhlmannEngine.swift` | Bottom time, rates, switches | `[DecoStop]` | 3 m ladder; 180 min/stop; 720 min total caps |
-| `BuhlmannPlanner.ndlCurve` | `BuhlmannPlanner.swift` | Depth 6…60 step 3 | `[NDLPoint]` | Compartment **labels** only |
-| Chart series | `PlannerView.swift` | `ndlCurve` | Swift Charts | Y = `max(0, 100 − depth×1.5)` — **illustrative** |
+## 2. Algorithm Inventory
 
-**Implementation class:** Real reference engine, **not** certified deco computer. Copy: `BuhlmannPlanner.warning`, `PlannerResultState.nonCertifiedReference`.
+### 2.1 Buhlmann Planning Engine
 
-### 3. Gas planning
+Primary files:
 
-| Symbol | File | Formula / behavior |
-|--------|------|-------------------|
-| `GasPlanningService.analyze` | `GasPlanningService.swift` | PPO₂, density, END, SAC×ATA×minutes, turn pressure, CNS/OTU when segments available |
-| `ScheduleGasConsumptionService` | `ScheduleGasConsumptionService.swift` | Per-segment `SAC × ATA(depth) × min`; rock bottom with emergency SAC × team × ATA(depth/2) × emergency minutes |
-| `GasPlan.estimatedConsumptionLiters` | `GasPlan.swift` | `SAC × ambientPressureBar(effective depth) × bottomMinutes` |
+- `iOSApp/Algorithms/Buhlmann/BuhlmannConstants.swift`
+- `iOSApp/Algorithms/Buhlmann/BuhlmannEngine.swift`
+- `iOSApp/Algorithms/Buhlmann/BuhlmannGas.swift`
+- `iOSApp/Algorithms/Buhlmann/BuhlmannTissueModel.swift`
+- `iOSApp/Services/BuhlmannPlanner.swift`
+- `iOSApp/Services/PlannerService.swift`
 
-### 4. PPO₂ / MOD / gas safety
+Algorithms found:
 
-| Symbol | File | Rule |
-|--------|------|------|
-| `GasMixValidator` | `GasMixValidator.swift` | O₂ ∈ (0,1], He ≥ 0, O₂+He ≤ 1; maxPPO₂ 1.0–1.6 bar; `modMeters` via environment |
-| `PlannerMODValidator` | `PlannerMODValidator.swift` | Switch depth > MOD + 0.05 m → issue |
-| `BuhlmannGas.isOperational` | `BuhlmannGas.swift` | PPO₂ 0.16…max along depth path |
+- ZHL-16C N2 and He half-times.
+- ZHL-16C N2 and He a/b coefficients.
+- Independent N2 and He tissue loading.
+- Constant-depth exponential loading.
+- Schreiner-style linear depth segment loading.
+- Inspired inert gas pressure with water vapour subtraction.
+- Environment-aware ambient pressure model.
+- Mixed N2/He weighted a/b coefficients.
+- Ceiling calculation with gradient factor.
+- GF Low / GF High interpolation by stop depth.
+- Tissue-state-based NDL search.
+- Multigas ascent/decompression schedule generation.
+- Gas switch selection with operating-depth validation.
 
-### 5. SAC / gas consumption
+Assessment:
 
-- Default SAC **18 L/min**, emergency **30 L/min** (`GasPlanInput`, `TankSize` presets).  
-- **No SAC estimation from logged profile** in audited files — stored `sacLitersMinute` is user/import metadata.  
-- Turn pressure: half of usable gas above rock bottom (rule-of-thumb).
+- The engine is not a placeholder. It is a real Buhlmann reference engine.
+- The app continues to position the output as non-certified reference planning, which is appropriate.
+- Remaining risk is mostly around integration consistency, environment propagation, and preflight validation coverage.
 
-### 6. CNS / OTU / oxygen exposure
+### 2.2 Gas Planning and Gas Validation
 
-| Model | File | Method |
-|-------|------|--------|
-| CNS | `OxygenExposureModels.swift` | NOAA 1991 piecewise; recovery half-time 90 min @ PPO₂ ≤ 0.5 |
-| OTU | `OxygenExposureModels.swift` | Lambertsen/Baker; ramp integral step 0.05 min |
-| Limits | `OxygenExposureModels.swift` | CNS single/daily warn 80%; OTU dive 300 / daily 850 / weekly 1800 |
-| Planner rule | `CNSDescentBottomPlannerRule` | Warn if descent+bottom CNS > **15%** |
-| Display cap | `GasPlanningService` | CNS capped at **300%** for display |
+Primary files:
 
-### 7. Dive log statistics
+- `iOSApp/Services/GasPlanningService.swift`
+- `iOSApp/Utils/GasMixValidator.swift`
+- `iOSApp/Services/PlannerMODValidator.swift`
+- `iOSApp/Services/ScheduleGasConsumptionService.swift`
+- `iOSApp/Models/GasPlan.swift`
+- `iOSApp/Services/PlannerGasSchedule.swift`
 
-| Symbol | File | Behavior |
-|--------|------|----------|
-| `DiveProfileMath.summary` | `DiveProfileMath.swift` | Time-weighted avg depth, max, TTV, temps, exceeded ≥40 m |
-| `DiveProfileMath.ttvIndex` | `DiveProfileMath.swift` | `avgDepth + durationSeconds/60` |
-| `AnalysisView` aggregates | `AnalysisView.swift` | Count, max depth, sum duration, mean SAC/temp, route count |
-| `LogbookView` grouping | `LogbookView.swift` | Calendar month buckets, text search |
+Algorithms found:
 
-### 8. Depth profile / charts
+- O2/He/N2 fraction validation.
+- PPO2 calculation.
+- MOD calculation.
+- Minimum operating depth for hypoxic mixes.
+- PPN2, EAD, END estimates.
+- Gas density estimate from mix and ambient pressure.
+- SAC/RMV gas use estimation.
+- Engine schedule gas ledger.
+- Rock-bottom style emergency reserve estimate.
+- CNS and OTU estimates through oxygen exposure models.
 
-| Symbol | File | Behavior |
-|--------|------|----------|
-| `DiveDetailView` chart | `DiveDetailView.swift` | Catmull-Rom; Y domain `[depthValue(max+8), 0]` (surface at top) |
-| Sample storage | `DiveSample.swift` | `depthMeters`, `temperatureCelsius?`, `timestamp` (metric) |
+Assessment:
 
-### 9. Analysis dashboard
+- Validation is generally centralized and conservative.
+- Current planner display paths now use environment-aware MOD helpers; legacy sea-level helpers remain documented for older callers.
+- Gas planning output should continue to be described as a reference calculation, not certified decompression or gas-management advice.
 
-- Tiles from `analysisSessions` (demo excluded by default).  
-- Bar chart: max depth per dive day — auto Y scale.  
-- Route card: sum distance; bearing from **first** route only.
+### 2.3 Planner Inputs and Result States
 
-### 10. Manual dive add/edit
+Primary files:
 
-| Symbol | File | Behavior |
-|--------|------|----------|
-| `ManualDiveSampleBuilder` | `ManualDiveEditorView.swift` | 4-point synthetic profile → `DiveProfileMath.summary` |
-| Metadata-only path | `ManualDiveEditorView.swift` | Preserves depths when `!hasDepthProfile` |
-| GPS | `ManualDiveEditorView.swift` | `horizontalAccuracy: 10` if coords valid |
+- `iOSApp/Utils/PlannerInputValidator.swift`
+- `iOSApp/Utils/PlannerResultState.swift`
+- `iOSApp/Services/PlannerStore.swift`
+- `iOSApp/Services/PlannerService.swift`
+- `iOSApp/Views/PlannerView.swift`
 
-### 11–13. CSV import / export / Subsurface
+Algorithms and validation found:
 
-| Path | Cap | Key rules |
-|------|-----|-----------|
-| Import | 10 MB, ≤20k samples | Requires `time_seconds`, `depth_m`, `temperature_c` columns; depth ≤ **300 m** |
-| Export | Same 300 m normalize | `# session_meta`, `# dirdiving_start_date`, monotonic `time_seconds` from `startDate` |
-| Validator | Storage | Stored max/avg/ttv must match recomputed within 0.25/0.25/0.5 |
+- Depth/time range validation.
+- Cylinder volume, SAC/RMV, start/reserve pressure validation.
+- O2/He/GF validation.
+- Typed planner result states including invalid input, unsupported gas/depth, PPO2 exceeded, MOD exceeded, gas density warning/danger, model incomplete, simplified reference, and unavailable states.
 
-### 14. Watch sync numerical consistency
+Assessment:
 
-- Payload: JSON `DiveSession` + HMAC; skew ≤ 3600 s; depth ≤ **350 m** in `WatchDiveSyncCodec.validateForSync`.  
-- Manual no-depth: empty samples allowed when `isManual && !hasDepthProfile`.  
-- iOS `WatchSyncService`: passes session through codec; display strings only.
+- Planner validation is strong and mostly no longer view-only.
+- Additional boundary tests should verify that persisted/programmatic invalid input paths cannot bypass validator logic.
 
-### 15. Cloud merge / KVS
+### 2.4 Logbook and Dive Profile Math
 
-- `CloudSyncStore`: newer `modifiedAt` wins for **blob** keys.  
-- `DiveLogStore`: union by session ID; `DiveSessionMerge.preferred` unless field-level conflict flagged.  
-- `DiveSessionMergeConflictDetector`: user resolves keep-local vs use-cloud.
+Primary files:
 
-### 16. Unit conversion / formatting
+- `iOSApp/Utils/DiveProfileMath.swift`
+- `iOSApp/Utils/DiveSessionAlgorithmValidator.swift`
+- `iOSApp/Utils/DiveSessionMerge.swift`
+- `iOSApp/Services/DiveLogStore.swift`
+- `iOSApp/Utils/IOSDiveLogbookPolicy.swift`
 
-- `IOSUnitConversions`: m↔ft, bar↔psi, L↔cu ft, °C↔°F, m/min↔ft/min.  
-- Fallback ATA: `1 + depth/10` when environment build fails.  
-- `Formatters`: display precision; export depths remain metric in CSV.
+Algorithms found:
 
-### 17. GPS / route
-
-- `RouteSummaryService`: haversine, earth radius 6_371_000 m; bearing 0…360.
+- Sample sanitization.
+- Timestamp sorting and same-timestamp deduplication.
+- Time-weighted average depth.
+- Max depth recomputation.
+- Duration recomputation.
+- Canonical DIR Diving TTV/index: average depth plus duration minutes.
+- Temperature average/min/max over valid samples.
+- GPS validation.
+- 40-session cap policy.
+- Merge recomputation from canonical sample sets.
 
-### 18. Equipment / checklist
+Assessment:
 
-- `EquipmentStore`: checklist/templates JSON — **no dive math**.
+- The derived math layer is one of the strongest parts of the iOS codebase.
+- Duplicate session collection integrity has been hardened; continue paired-device/iCloud regression testing.
 
-### 19. Demo isolation
+### 2.5 CSV Import and Export
 
-- `DemoDiveCatalog` fixed UUIDs; `isDemo` flag; Analysis toggle; demo non-deletable in logbook.  
-- `insertDemoDives`: synthetic profiles; **idx 0 TTV hardcoded 24** (inconsistent with formula).
+Primary files:
 
-### 20. Edge / empty paths
-
-- Empty logbook → empty analysis with import CTAs.  
-- No profile → detail chart placeholder; export blocked.  
-- Engine `calculationLimitReached` → completeness incomplete, **presentation stops cleared**.
-
----
-
-## C. Findings by Family
-
-### Planner / Bühlmann
+- `iOSApp/Services/DiveImportService.swift`
+- `iOSApp/Services/SubsurfaceExportService.swift`
+- `iOSApp/Views/CSVImportPanel.swift`
 
-| ID | Sev | Title | Location | User impact | Safety | Fix priority | Impact |
-|----|-----|-------|----------|-------------|--------|--------------|--------|
-| IOSMATH-HIGH-001 | HIGH | NDL chart Y-axis is non-physiological | `PlannerView.swift` ~1383 | Users may treat chart as tissue loading | Misread as certified science | P2 TestFlight | UI-only / copy |
-| IOSMATH-MED-001 | MED | NDL search uses fixed 9 m/min ascent | `BuhlmannEngine.noDecompressionLimit` | NDL differs from user ascent rate setting | Conservative/aggressive vs user expectation | P3 | Small functional |
-| IOSMATH-MED-002 | MED | `calculationLimitReached` clears all stops in UI | `PlanCalculationCompletenessResolver` | Partial deco hidden | May underestimate required stops | P2 | Small functional |
-| IOSMATH-MED-003 | MED | `BuhlmannPlanner.plan` preview validates GF 85 while NDL uses param | `BuhlmannPlanner.swift` | Preview edge inconsistency | Low direct risk | P4 | Small functional |
-| IOSMATH-LOW-001 | LOW | NDL curve compartment groups are display labels only | `BuhlmannPlanner.ndlCurve` | Cosmetic | Low | P5 | Copy-only |
-| IOSMATH-INFO-001 | INFO | Bailout cylinders excluded from engine | `PlannerGasSchedule` / `makeRequest` | Schedule-only bailout | Documented | — | — |
-| IOSMATH-INFO-002 | INFO | Repetitive surface interval loads on air @ maxPPO2 1.4 | `RepetitiveDivePlannerService` | SI model simplification | Informational | — | — |
-
-### Gas / SAC / CNS / OTU
-
-| ID | Sev | Title | Location | User impact | Safety | Fix priority | Impact |
-|----|-----|-------|----------|-------------|--------|--------------|--------|
-| IOSMATH-MED-004 | MED | Simple `analyze(input:)` ignores ascent/deco SAC | `GasPlanningService` | Underestimates gas without full engine | Planning optimism | P3 | Document / wire engine |
-| IOSMATH-MED-005 | MED | Lost-gas warning uses 30% consumed heuristic | `ScheduleGasConsumptionService` | False +/- vs real rules | Informational contingency | P4 | Small functional |
-| IOSMATH-LOW-002 | LOW | CNS display cap 300% | `GasPlanningService` / exposure | Masks extreme integration | Display only | P5 | UI-only |
-| IOSMATH-LOW-003 | LOW | Turn pressure = half usable above rock bottom | `GasPlanningService` | Non-standard rule | Informational | P5 | Copy |
-| IOSMATH-INFO-003 | INFO | END > 30 m → `simplifiedReferenceOnly` | `GasPlanningService` | Policy flag | Informational | — | — |
-
-### Logbook / profile / merge
-
-| ID | Sev | Title | Location | User impact | Safety | Fix priority | Impact |
-|----|-----|-------|----------|-------------|--------|--------------|--------|
-| IOSMATH-HIGH-002 | HIGH | Import/export 300 m vs sync 350 m | `IOSAlgorithmConfiguration` | Watch dive fails CSV re-export | Data friction | P2 TestFlight | Small functional / doc |
-| IOSMATH-MED-006 | MED | Empty-profile merge uses `min(avg)` not summary | `DiveSessionMerge.preferred` L32 | Under-reported avg after merge | Stats wrong | P3 | Small functional |
-| IOSMATH-MED-007 | MED | Imperial manual defaults 30/18 not converted on new dive | `ManualDiveEditorView` | Wrong depths in ft mode | Incorrect log | P2 | Small functional |
-| IOSMATH-LOW-004 | LOW | Demo dive idx 0 TTV = 24 fixed | `DiveLogStore.insertDemoDives` | Demo analysis skew | Demo only | P5 | Small functional |
-| IOSMATH-INFO-004 | INFO | `exceededSupportedDepthRange` forced if max ≥ 40 m | `DiveSession` init/decode | Aligns with Watch policy | Informational | — | — |
-
-### Analysis / UI display
+Algorithms found:
 
-| ID | Sev | Title | Location | User impact | Safety | Fix priority | Impact |
-|----|-----|-------|----------|-------------|--------|--------------|--------|
-| IOSMATH-MED-008 | MED | Route bearing uses first route only | `AnalysisView` | Misleading multi-dive routes | Navigation info wrong | P4 | UI-only |
-| IOSMATH-LOW-005 | LOW | Salinity always “not recorded” | `DiveDetailView` | Static placeholder | No false numeric | P5 | Copy |
-| IOSMATH-LOW-006 | LOW | Pressure footnote: raw `entry-exit` without unit conversion | `DiveDetailView` | Wrong if mixed units typed | Low | P5 | UI-only |
-| IOSMATH-INFO-005 | INFO | Analysis excludes demo by default | `AnalysisView` | Correct isolation | — | — | — |
-
-### Sync / cloud / import-export
-
-| ID | Sev | Title | Location | User impact | Safety | Fix priority | Impact |
-|----|-----|-------|----------|-------------|--------|--------------|--------|
-| IOSMATH-MED-009 | MED | Cloud blob LWW; per-session merge on conflict only | `CloudSyncStore` + `DiveLogStore` | Rare whole-logbook overwrite | Data loss risk | P3 | Process + UI |
-| IOSMATH-LOW-007 | LOW | Deco stop MOD validation indexes gases by stop order | `PlannerMODValidator.validateDecoStops` | Wrong gas if order mismatched | MOD display | P4 | Small functional |
-| IOSMATH-INFO-006 | INFO | CSV export repeats GPS/meta on every sample row | `SubsurfaceExportService` | Large files | No math error | — | — |
+- CSV parser with quote handling.
+- File size and row length guardrails.
+- Required time/depth headers.
+- Invalid row rejection.
+- Timestamp normalization.
+- Depth and temperature sanitization.
+- GPS validation.
+- Empty-profile export rejection.
+- Monotonic elapsed-seconds export.
 
-### Units / environment
-
-| ID | Sev | Title | Location | User impact | Safety | Fix priority | Impact |
-|----|-----|-------|----------|-------------|--------|--------------|--------|
-| IOSMATH-MED-010 | MED | Fallback `1 + depth/10` when env build fails | `IOSUnitConversions` | Diverges from altitude/salinity model | MOD/PPO₂ error | P3 | Small functional |
-| IOSMATH-INFO-007 | INFO | Bühlmann depth always max; gas uses effective depth | `GasPlan` | Documented split | Intentional | — | — |
-
----
-
-## D. Edge Case Matrix (selected)
-
-| Case | Expected (code intent) | Observed / risk | Tested |
-|------|------------------------|-----------------|--------|
-| Planner depth 0 | Rejected (< 0.1 m) | Validator error | Yes |
-| Depth 120 m | Allowed | Engine runs | Yes |
-| Depth > 120 m | Blocked | Validator | Yes |
-| Bottom 0 min | Invalid / edge | Validator | Partial |
-| Bottom > NDL | Deco or `noDecompressionSolution` | Completeness resolver | Yes |
-| GF low ≥ high | Blocked | Validator | Yes |
-| O₂ fraction 0 | Invalid mix | `GasMixValidator` | Yes |
-| Imperial planner display | Metric internally | Formatters | Partial |
-| Empty logbook | Zero aggregates | Analysis empty state | Partial |
-| Demo only + analysis default off | Empty analysis | By design | Yes (`AnalysisDemoIsolationTests`) |
-| Watch dive 320 m deep | Sync OK @ 350 | CSV export/import fails @ 300 | **Gap** |
-| Manual no-depth | Sync allowed | `WatchManualNoDepthSyncTests` | Yes |
-| Merge empty profiles | min(avg) | IOSMATH-MED-006 | **Gap** |
-| Single sample profile | Avg = sample depth | `DiveProfileMath` | Yes |
-| CSV duplicate import | Same session id hash | Import service | Partial |
-| iCloud malformed JSON | `lastDecodeError` | `CloudSyncStore` | Partial |
-| Engine 720 min cap | Incomplete, stops cleared | Completeness | Yes |
-
----
-
-## E. Unit / Integration Test Plan
-
-| Priority | Feature | Input | Expected | Criteria |
-|----------|---------|-------|----------|----------|
-| P1 | NDL chart labeling | Open Bühlmann tab | Disclaimer + non-physiological axis | No certified implication |
-| P1 | Depth 300/350 policy | Session max 320 m | Sync OK; export documents limit | Document or align caps |
-| P1 | `DiveSessionMerge` empty samples | Two manuals merged | avg = summary or documented min rule | Unit test |
-| P2 | Manual editor imperial | New dive, imperial units | Defaults converted from 30/18 m | ft depths ≈ 98/59 |
-| P2 | `RouteSummaryService` | Known lat/lon pair | Distance ±1%, bearing | Unit test |
-| P2 | Analysis aggregates | 3 dives mixed nil SAC | Mean ignores nils | Unit test |
-| P3 | NDL ascent rate | User ascent 6 m/min | Document NDL uses 9 | Spec test or fix |
-| P3 | Gas simple vs engine | Same plan | Engine remaining ≤ simple | Integration |
-| P4 | Demo TTV consistency | `insertDemoDives` | TTV = avg + duration/60 all indices | Unit test |
-
-**Existing coverage:** Bühlmann golden fixtures, pressure unification, CSV metadata round-trip, cloud merge, CNS/OTU deep model, planning depth reference, watch sync conflicts — see `Tests/iOSAlgorithmTests/`.
-
----
-
-## F. Paired Watch/iPhone Test Plan
-
-| # | Scenario | Pass criteria |
-|---|----------|---------------|
-| 1 | Watch auto dive → iOS receive | max/avg/ttv/samples match within validator tolerances |
-| 2 | iOS manual edit → push Watch | Pressures, notes, depths preserved |
-| 3 | Delete tombstone both sides | Session absent after sync |
-| 4 | Conflict same session edit | Conflict UI; resolution preserves chosen math fields |
-| 5 | Manual no-depth Watch session | iOS logbook + no export profile |
-| 6 | Deep dive > 300 m on Watch | iOS displays; CSV export behavior documented |
-| 7 | Unit preference mismatch | Display converts; stored metric unchanged |
-
----
+Assessment:
 
-## G. CSV Import/Export Regression Plan
+- Empty export and malformed depth values are guarded.
+- Compatibility should be tested against real external CSV/Subsurface-style inputs.
+- `temperature_c` is currently mandatory even though temperature values themselves can be optional.
 
-| Case | File | Expected |
-|------|------|----------|
-| G1 | Valid Subsurface + `# dirdiving_start_date` | Start preserved; samples ≤300 m |
-| G2 | Re-export → re-import | Metadata + profile within tolerance |
-| G3 | Missing temperature column | Import OK, nil temps |
-| G4 | Row depth 301 m | Row rejected / import fail |
-| G5 | 20,001 samples | Fail gracefully |
-| G6 | Imperial UI session | Export depths still metric in CSV |
-| G7 | Manual pressure metadata | Round-trip in comments |
+### 2.6 Sync, Cloud Merge, and Data Integrity
 
-Automated: `CSVMetadataRoundTripTests`, `IOSAlgorithmTests` import sections.
+Primary files:
 
----
+- `iOSApp/Services/WatchDiveSyncCodec.swift`
+- `iOSApp/Services/WatchSyncService.swift`
+- `iOSApp/Services/CloudSyncStore.swift`
+- `iOSApp/Utils/WatchSyncSessionDiff.swift`
+- `iOSApp/Utils/DiveSessionMergeConflict.swift`
+- `iOSApp/Services/DiveLogStore.swift`
 
-## H. Cloud Merge Validation Plan
+Algorithms found:
 
-| Case | Steps | Expected |
-|------|-------|----------|
-| H1 | Edit dive A on device 1, sync | Cloud updated |
-| H2 | Edit same field on device 2 | Conflict surfaced |
-| H3 | Resolve keep-local | Local math fields win |
-| H4 | Resolve use-cloud | Cloud math fields win |
-| H5 | Malformed cloud blob | `lastDecodeError` visible |
-| H6 | Delete dive + sync | Tombstone / absent |
+- HMAC-protected Watch payloads.
+- Payload-size limit.
+- Issued-at skew guard.
+- Peer-secret checks.
+- Session normalization before storage.
+- Conflict detection.
+- Tombstone-aware session merging.
+- Offline outbound queue.
 
-Automated: `CloudSessionMergeTests`, `DiveSessionMergeConflict` flows in store tests.
+Assessment:
 
----
+- Watch sync math/data validation is broadly robust.
+- Duplicate IDs inside cloud/conflict arrays can still trigger `Dictionary(uniqueKeysWithValues:)` traps.
 
-## I. Planner Boundary Validation Plan
+### 2.7 Route and GPS Math
 
-| Depth (m) | Bottom (min) | Gas | Expected |
-|-----------|--------------|-----|----------|
-| 0.05 | 30 | Air | Invalid depth |
-| 6 | 0 | Air | Edge NDL |
-| 40 | 25 | EAN32 | MOD/PPO₂ warnings possible |
-| 60 | 20 | Trimix | Deco schedule |
-| 120 | 10 | Air | At ceiling |
-| 121 | 10 | Air | Blocked |
-| 30 | 601 | Air | Blocked |
-| 30 | NDL+1 | Air | Deco or no solution state |
+Primary files:
 
-Automated: `BuhlmannNDLTests`, `BuhlmannGoldenFixtureTests`, `PlannerRegressionFixtureTests`, `PlanCalculationCompletenessTests`.
+- `iOSApp/Services/RouteSummaryService.swift`
+- `iOSApp/Utils/RouteSummaryAggregation.swift`
+- `iOSApp/Models/GPSPoint.swift`
 
----
+Algorithms found:
 
-## J. Prioritized Roadmap
+- Coordinate finite/range validation.
+- Haversine distance.
+- Bearing normalization to `0..<360`.
+- Identical-point handling.
+- Aggregated route summary.
 
-### 1. Must fix before compile/use
-- None identified (project builds; algorithms guarded).
+Assessment:
 
-### 2. Must fix before internal TestFlight
-- IOSMATH-HIGH-001 (chart axis disclaimer or fix)  
-- IOSMATH-HIGH-002 (depth cap policy doc or alignment)  
-- IOSMATH-MED-007 (imperial manual defaults)
+- Route math is conservative and finite-safe.
 
-### 3. Must fix before external TestFlight
-- Paired device sync matrix (§ F)  
-- IOSMATH-MED-002 (partial stops presentation policy)  
-- CSV regression sign-off (§ G)
+### 2.8 Unit Conversion and Display Formatting
 
-### 4. Must fix before App Store
-- External QA per `IOS_MAIN_ALGORITHM_READINESS_100_REPORT` § K  
-- iCloud conflict H1–H6  
-- Planner safety acknowledgement on device  
+Primary files:
 
-### 5. Post-release improvements
-- IOSMATH-MED-001 NDL ascent rate alignment  
-- IOSMATH-MED-004 simple gas path  
-- IOSMATH-MED-008 route bearing aggregate  
-- Remove dead `AnalysisDepthTrendPreview` code  
+- `iOSApp/Utils/IOSAlgorithmConfiguration.swift`
+- `iOSApp/Utils/IOSUnitConversions.swift`
+- `iOSApp/Utils/Formatters.swift`
+- `iOSApp/Utils/PressureDisplayMath.swift`
 
----
+Algorithms found:
 
-## K. Final Verdict
+- Meters/feet.
+- Bar/psi.
+- Liters/cubic feet.
+- Celsius/Fahrenheit.
+- M/min and ft/min.
+- Ambient pressure approximation.
 
-| Question | Answer |
-|----------|--------|
-| **Mathematically ready (code)?** | **Yes, with caveats** — core engine, validators, and 173 tests provide strong coverage; known issues are mostly display, cross-layer caps, and merge edge cases. |
-| **Planner safe enough for internal test?** | **Yes** — reference-only labeling, acknowledgement gate, blocking validators; **not** for treating output as authorized deco instructions. |
-| **Sync/data ready?** | **Mostly** — HMAC watch codec, per-session merge conflicts, CSV metadata; complete field QA on devices still required. |
-| **Ready for TestFlight?** | **Yes with documented caveats** (HIGH-001/002, paired QA, demo toggle off for external testers). |
-| **Ready for App Store?** | **Conditional** — same as TestFlight plus marketing/legal alignment and two-device iCloud validation. |
-| **What blocks 100%?** | (1) External/hardware QA, (2) misleading NDL chart axis, (3) 300 vs 350 m policy, (4) view-layer test gaps, (5) optional NDL/gas presentation refinements. |
+Assessment:
 
----
+- Core conversion constants are centralized.
+- Manual pressure-entry text does not retain its original unit, so display semantics can become ambiguous after unit preference changes.
 
-## Product positioning (verified)
+## 3. Findings by Family
 
-- iOS Companion is an **informational/educational** tool; Bühlmann output is **reference-only**, not a certified decompression plan.  
-- TTV on logged dives: **`avgDepth + runtimeMinutes`** (informational index).  
-- No claim that planner NDL/TTS replaces certified dive computers or tables.  
-- Watch MAIN math is separate; iOS consumes `DiveSession` / sync codec with documented depth ceilings.
+### IOS-AUDIT-001 - Environment-aware MOD mismatch in helper/display paths
 
----
+**Severity:** Remediated P1
+**Family:** Planner, gas planning, UI-adjacent math display
+**Files/screens:** `iOSApp/Models/GasPlan.swift`, `iOSApp/Views/PlannerGasMixCard.swift`, `iOSApp/Views/PlannerView.swift`, `iOSApp/Services/GasPlanningService.swift`, `iOSApp/Services/PlannerGasSchedule.swift`
 
-*Audit performed read-only on `main` @ `5c2a27a`. Supersedes readiness percentages in the 2026-05-31 audit body that referenced pre-remediation `4d5aabc` blockers B2–B5 (now resolved in code). Implementation history: [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) @ `dce89e7`.*
+Status after pulling `origin/main` at `6a5054f`: remediated. `GasMix` and `PlannerCylinderEntry` now expose environment-aware MOD helpers, planner cards receive `plannerEnvironment`, cylinder rows use `entry.modMeters(environment:)`, and `GasPlanningService` uses environment-aware MOD state checks.
+
+Legacy sea-level helpers remain for older callers, but they are documented as sea-level convenience paths and should not be used for current planner warnings.
+
+Impact:
+
+- The prior environment-display mismatch is closed by static inspection.
+- Keep regression tests for altitude/freshwater MOD consistency so future UI or helper changes do not regress to sea-level defaults.
+
+Recommended fix:
+
+- Add/keep tests for freshwater/altitude MOD display consistency and switch-depth warnings.
+
+### IOS-AUDIT-002 - Duplicate cloud/session ID crash risk remediated
+
+**Severity:** Remediated P1
+**Family:** Cloud merge, sync conflict detection, data integrity
+**Files:** `iOSApp/Utils/DiveSessionMergeConflict.swift`, `iOSApp/Services/DiveLogStore.swift`, `iOSApp/Utils/DiveSessionCollectionIntegrity.swift`
+
+Status after pulling `origin/main` at `6a5054f`: remediated. Duplicate session IDs are collapsed through `DiveSessionCollectionIntegrity.deduplicated(_:)`, duplicate IDs are surfaced as conflict metadata, and `DiveLogStore` now uses a safe dictionary builder for conflict snapshots.
+
+Impact:
+
+- The prior crash risk is closed by static inspection.
+- Device/iCloud regression tests are still recommended.
+
+Recommended fix:
+
+- Keep tests for duplicate cloud IDs, duplicate local IDs, and mixed tombstone/live duplicates.
+
+### IOS-AUDIT-003 - Buhlmann preview NDL/curve can use sea-level tissue saturation at non-sea-level environments
+
+**Severity:** MEDIUM
+**Family:** Buhlmann planner integration
+**File:** `iOSApp/Services/BuhlmannPlanner.swift`
+
+`BuhlmannPlanner.enginePlan(input:)` seeds initial tissue state with `PlannerEnvironment.surfacePressureBar`. However, `BuhlmannPlanner.plan(depthMeters:bottomGas:environment:gfHigh:)` and `ndlCurve` call `BuhlmannEngine.noDecompressionLimit(... plannerEnvironment: environment)` without explicitly passing an environment-saturated initial tissue state.
+
+Impact:
+
+- At altitude or freshwater/salinity variants, preview NDL/curve values can diverge from the plan engine path.
+- Sea-level use is likely unaffected.
+
+Recommended fix:
+
+- Pass `initialTissueState: .airSaturated(surfacePressureBar: environment.surfacePressureBar)` in preview NDL and curve calls.
+- Add tests comparing preview NDL with engine plan NDL at altitude and sea level.
+
+### IOS-AUDIT-004 - Full ascent/deco gas envelope is not completely preflighted
+
+**Severity:** MEDIUM
+**Family:** Buhlmann multigas validation
+**File:** `iOSApp/Algorithms/Buhlmann/BuhlmannEngine.swift`
+
+`BuhlmannEngine.validateGasUseRanges` preflights descent and bottom segment operational ranges. Runtime ascent/decompression gas use is still protected by `ascendSegment`, which can fail with `.gasNotOperationalInSegment`, but not all possible deco/ascent gas-envelope conflicts are surfaced before schedule propagation starts.
+
+Impact:
+
+- Invalid or borderline multigas schedules should fail closed, but the error can occur late in propagation.
+- Better preflight would improve planner predictability and error messaging.
+
+Recommended fix:
+
+- Add a preflight pass that checks every configured switch gas and expected usable depth band against MOD and minimum operating depth.
+- Add tests for gas switch too deep, hypoxic gas too shallow, and oxygen/EAN50 switch depth boundaries.
+
+### IOS-AUDIT-005 - END/EAD depth conversion uses fixed 10 m/bar after environment-aware pressure
+
+**Severity:** MEDIUM
+**Family:** Gas planning, environment consistency
+**File:** `iOSApp/Services/GasPlanningService.swift`
+
+`equivalentNarcoticDepth` and `equivalentAirDepth` use environment-aware ambient pressure, but convert equivalent pressure back to depth using a fixed `* 10.0` approximation rather than `AmbientPressureModel.depthMeters(...)`.
+
+Impact:
+
+- Sea-level saltwater values are plausible.
+- Altitude/freshwater/salinity-adjusted outputs can diverge from the rest of the planner environment model.
+
+Recommended fix:
+
+- Convert equivalent ambient pressure back to depth through the active `AmbientPressureModel`.
+- Add tests for END/EAD in sea-level saltwater and an altitude/freshwater environment.
+
+### IOS-AUDIT-006 - Manual pressure text fields do not retain source unit
+
+**Severity:** MEDIUM
+**Family:** Manual dive metadata, unit semantics
+**Files:** `iOSApp/Views/ManualDiveEditorView.swift`, `iOSApp/Utils/PressureDisplayMath.swift`, `iOSApp/Models/DiveSession.swift`
+
+Manual pressure values are stored as text fields. `PressureDisplayMath` computes consumed pressure from those strings and labels the result with the current unit preference. If a user entered bar values and later switches to imperial, the displayed consumed pressure can be relabeled as psi.
+
+Impact:
+
+- The stored values are not converted incorrectly, but the unit label can become misleading.
+- This is not a core planner math bug, but it affects logbook correctness perception.
+
+Recommended fix:
+
+- Store the unit used when pressure values are entered, or normalize manual pressure to a canonical numeric unit.
+- Add regression tests for manual pressure display after unit preference changes.
+
+### IOS-AUDIT-007 - Optional CSV `temperature_c` support remediated
+
+**Severity:** Remediated P3
+**Family:** CSV import compatibility
+**File:** `iOSApp/Services/DiveImportService.swift`
+
+Status after pulling `origin/main` at `6a5054f`: remediated. Import now requires `time_seconds` and `depth_m`, while `temperature_c` is optional.
+
+Impact:
+
+- Broader CSV compatibility is now supported by static inspection.
+
+Recommended fix:
+
+- Add tests for CSV without temperature column and CSV with invalid temperature data.
+
+### IOS-AUDIT-008 - Hardcoded service/status strings remain
+
+**Severity:** LOW
+**Family:** Localization and status output
+**Files:** `iOSApp/Services/BuhlmannPlanner.swift`, `iOSApp/Services/DiveImportService.swift`, `iOSApp/Services/SubsurfaceExportService.swift`, `iOSApp/Services/WatchDiveSyncCodec.swift`, `iOSApp/Services/WatchSyncService.swift`
+
+Several algorithm/service outputs still contain hardcoded Italian or English strings. Many are not mathematical bugs, but they affect localized error interpretation.
+
+Impact:
+
+- EN/IT mode can show mixed-language service errors.
+- Safety and planner warning clarity can vary by locale.
+
+Recommended fix:
+
+- Move service-facing status copy to localization keys while keeping algorithmic states typed and language-neutral.
+
+### IOS-AUDIT-009 - Subsurface export compatibility needs external regression
+
+**Severity:** LOW
+**Family:** Export interoperability
+**File:** `iOSApp/Services/SubsurfaceExportService.swift`
+
+The export path is finite-safe and rejects empty profiles, but the produced CSV should be verified against current Subsurface import behavior and expected metadata handling.
+
+Impact:
+
+- The export is internally consistent, but external import fidelity is not proven by static inspection.
+
+Recommended fix:
+
+- Add external-tool regression fixtures or documented manual Subsurface import validation.
+
+### IOS-AUDIT-010 - Analysis session averages are arithmetic over sessions
+
+**Severity:** INFO
+**Family:** Analytics semantics
+**File:** `iOSApp/Utils/AnalysisDashboardMath.swift`
+
+Dashboard SAC and temperature summaries are arithmetic across sessions rather than duration-weighted. This can be an intentional product choice, but should remain documented.
+
+Impact:
+
+- No finite-safety issue.
+- Users may interpret averages differently.
+
+Recommended fix:
+
+- Document the aggregation semantics, or add separate weighted metrics if desired.
+
+### IOS-AUDIT-011 - Oxygen exposure extrapolates over high PPO2 while relying on separate warnings
+
+**Severity:** INFO
+**Family:** Oxygen exposure estimates
+**File:** `iOSApp/Services/OxygenExposureModels.swift`
+
+PPO2 values above NOAA table limits are extrapolated/clamped for exposure accumulation. Planner state warnings should already flag PPO2 over-limit situations.
+
+Impact:
+
+- Exposure estimates remain finite, but high-PPO2 schedules must never appear normal.
+
+Recommended fix:
+
+- Keep PPO2Exceeded state dominant in warning ordering.
+- Add tests that high PPO2 generates both finite exposure values and a clear over-limit state.
+
+### IOS-AUDIT-012 - Unused/bailout cylinders are not part of the main consumption ledger
+
+**Severity:** LOW
+**Family:** Gas planning ledger semantics
+**File:** `iOSApp/Services/ScheduleGasConsumptionService.swift`
+
+The engine ledger accounts for gases used in the generated schedule. Bailout cylinders are intentionally separate and not included as consumed schedule gases.
+
+Impact:
+
+- This is acceptable if the UI and docs make bailout availability distinct from planned gas consumption.
+
+Recommended fix:
+
+- Keep bailout separate, but add tests/documentation confirming planned-gas ledger vs bailout reserve semantics.
+
+## 4. Edge Case Matrix
+
+| Edge case | Current behavior | Risk | Recommended test/fix |
+|---|---|---|---|
+| Negative depth planner input | Rejected by shared validation | Low | Keep boundary tests. |
+| Depth above planner max | Rejected/unavailable | Low | Keep unsupported-depth tests. |
+| Depth above import/export max | Sanitizer rejects profiles beyond cap | Low | Verify 350 m cap consistency across iOS paths. |
+| O2 <= 0 or O2 > 1 | Rejected | Low | Existing gas validator tests should remain. |
+| O2 + He > 1 | Rejected | Low | Existing trimix invalid tests should remain. |
+| Hypoxic gas at surface | Engine validates minimum operating depth | Medium | Add more switch-depth boundary tests. |
+| Deco gas switch too deep | Runtime and validator checks exist | Medium | Add preflight tests across all switch gases. |
+| Altitude/freshwater planner | Environment model exists | Medium | Fix NDL preview and MOD helper environment propagation. |
+| Zero/negative segment duration | Engine returns/fails safely | Low | Keep numerical robustness tests. |
+| Duplicate cloud session IDs | Deduplicated before conflict dictionaries | Low | Keep duplicate-ID regression tests. |
+| Empty export profile | Rejected | Low | Keep export tests. |
+| CSV without temperature column | Accepted if required time/depth columns are present | Low | Keep optional-temperature regression tests. |
+| Invalid GPS | Sanitized/rejected | Low | Keep route/import/sync tests. |
+| Identical route points | Distance zero, bearing unavailable | Low | Keep route tests. |
+| Manual pressure after unit switch | Unit label can be misleading | Medium | Store pressure unit or canonicalize numeric pressure. |
+
+## 5. Unit and Integration Test Plan
+
+### Buhlmann Engine Tests
+
+- Verify NDL preview equals `enginePlan` NDL at sea level and altitude.
+- Verify GF 30/70 remains more conservative than GF 50/80 for representative profiles.
+- Verify switch gases are preflighted before schedule propagation.
+- Verify oxygen and EAN50 switch-depth boundaries.
+- Verify hypoxic trimix minimum operating depth boundaries.
+- Verify no compartment pressure becomes NaN, infinite, or negative from valid inputs.
+
+### Gas Planning Tests
+
+- Verify all MOD displays and helper warnings use the same `PlannerEnvironment`.
+- Verify actual PPO2 and MODExceeded state align for freshwater/altitude cases.
+- Verify END/EAD convert equivalent pressure back through `AmbientPressureModel`.
+- Verify gas density warning/danger boundaries.
+- Verify bailout cylinders remain separate from scheduled gas consumption.
+
+### Logbook and Manual Entry Tests
+
+- Verify manual pressure values retain correct unit semantics after user preference changes.
+- Verify metadata-only manual dives keep canonical TTV/index.
+- Verify 41st session pruning remains newest-40 deterministic.
+- Verify time-weighted average remains stable with irregular sample spacing.
+
+### Import/Export Tests
+
+- CSV without `temperature_c` imports if time/depth are valid.
+- CSV with invalid finite temperature rejects or skips rows according to documented policy.
+- Export never succeeds with header-only data.
+- Export elapsed seconds remain monotonic and nonnegative.
+- External Subsurface import fixture round-trip preserves depth/time profile.
+
+### Sync and Cloud Tests
+
+- Duplicate cloud session IDs do not crash.
+- Duplicate local session IDs are merged or rejected deterministically.
+- Tombstones beat live duplicates according to policy.
+- Corrupted sample arrays are rejected before logbook insertion.
+- Valid signature with invalid math payload still fails validation.
+
+## 6. Paired Watch/iPhone Test Plan
+
+These checks require physical devices or macOS/iOS simulator infrastructure and were not executed during this Windows static audit.
+
+| Scenario | Expected result |
+---|---|
+| Watch records valid dive and syncs to iPhone | iOS log shows recomputed finite duration, max depth, average depth, TTV, GPS, and profile samples. |
+| Watch sends corrupted sample payload | iOS rejects before storage and reports sync failure. |
+| Watch sends duplicate session update | iOS merges deterministically and recomputes derived fields. |
+| iPhone pushes log/session update to Watch | Watch receives only validated sessions. |
+| Paired devices offline then reconnect | Retry queue drains without duplicate logs. |
+| Tombstone/delete sync | Deleted sessions stay deleted across both devices. |
+| Unit preference mismatch | iOS display converts values without altering canonical stored metric values. |
+| No peer secret / reset trust | Sync fails closed and can be repaired through documented trust reset flow. |
+
+## 7. CSV Import/Export Regression Plan
+
+1. Import a minimal valid CSV with `time_seconds` and `depth_m` only.
+2. Import a full CSV with temperature, GPS, notes, and metadata.
+3. Import CSV with out-of-order rows and verify deterministic sorting or rejection.
+4. Import CSV with NaN/infinity tokens and verify rejection.
+5. Import CSV with row count above `maxProfileSampleCount` and verify rejection.
+6. Export a valid synced Watch session and verify:
+   - nonempty sample profile
+   - monotonic elapsed seconds
+   - finite depth and temperature fields
+   - stable metadata headers
+7. Attempt export for empty sample profile and verify failure.
+8. Import exported CSV into Subsurface or a documented compatibility harness.
+
+## 8. Cloud Merge Validation Plan
+
+1. Cloud payload with duplicate live sessions sharing the same ID.
+2. Cloud payload with duplicate tombstones sharing the same ID.
+3. Local live session versus cloud tombstone.
+4. Local tombstone versus cloud live session.
+5. Same session with complementary samples.
+6. Same session with conflicting samples and metadata.
+7. Corrupted cloud payload containing invalid GPS or invalid depth.
+8. Decode failure of cloud payload.
+9. iCloud unavailable state.
+10. Two-device concurrent edit followed by conflict resolution.
+
+Acceptance requirement:
+
+- No merge path may crash.
+- All accepted sessions must pass `DiveSessionAlgorithmValidator`.
+- All stored sessions must respect the newest-40 logbook cap.
+
+## 9. Planner Boundary Validation Plan
+
+| Boundary | Expected result |
+|---|---|
+| Depth 0 m | Invalid or unavailable for dive plan. |
+| Depth 0.1 m | Valid only if project considers it meaningful minimum planner depth. |
+| Depth 120 m | Upper supported planner boundary. |
+| Depth 120.01 m | Unsupported depth. |
+| Bottom time 0 | Invalid. |
+| Bottom time 600 min | Upper supported boundary. |
+| O2 0 | Invalid. |
+| O2 1.0 | Valid only within PPO2/MOD constraints. |
+| He < 0 | Invalid. |
+| O2 + He = 1 | Valid if PPO2/MOD/min-depth constraints pass. |
+| O2 + He > 1 | Invalid. |
+| GF low = GF high | Invalid. |
+| GF low > GF high | Invalid. |
+| PPO2 exactly max | Allowed if policy says inclusive. |
+| PPO2 above max | PPO2Exceeded / invalid operational state. |
+| Hypoxic mix at surface | Gas not operational. |
+| Deco gas switch above MOD | Invalid switch. |
+| Freshwater/altitude environment | All MOD, pressure, NDL, END/EAD paths must use same environment. |
+
+## 10. Prioritized Roadmap
+
+### P0 - Must Fix Before External Safety Claims
+
+No P0 issues were found in this static audit, assuming the app remains explicitly non-certified and reference-only.
+
+### P1 - Must Fix Before Calling iOS MAIN Fully Algorithmically Release-Hard
+
+No open P1 item remains by static inspection after pulling remediation commit `6a5054f`.
+
+### P2 - Must Fix Before Broad TestFlight
+
+1. Pass environment-saturated initial tissue to preview NDL/curve paths.
+2. Add or verify full ascent/deco gas-envelope preflight coverage.
+3. Convert END/EAD equivalent pressure back through `AmbientPressureModel`.
+4. Preserve or canonicalize manual pressure-entry units.
+5. Run macOS `xcodegen`, iOS build, and iOS algorithm XCTest suite.
+
+### P3 - Must Fix Before App Store Submission
+
+1. Add external Subsurface import/export regression sign-off.
+2. Localize remaining service/status strings.
+3. Document analysis average semantics.
+4. Document planned-gas ledger versus bailout reserve semantics.
+
+### P4 - Post-Release Hardening
+
+1. Add additional external Buhlmann fixture comparisons from independent tools.
+2. Add field tests for paired Watch/iPhone sync after real dives.
+3. Add richer diagnostics for cloud conflict sources.
+
+## 11. Final Verdict
+
+### Ready to compile?
+
+Not verified in this audit because the environment is Windows and Apple build tools were intentionally not run. Static inspection did not find obvious iOS compile blockers in the audited algorithm files, but macOS build validation is still required.
+
+### Ready for internal algorithm QA?
+
+Yes. The codebase has enough validators and tests to support meaningful internal QA. The remaining P2/P3 items should be part of the next QA/fix pass.
+
+### Ready to call the iOS Companion MAIN planner algorithmically release-hard?
+
+Close, but not fully signed off. The prior P1 environment-display and duplicate-ID risks are remediated by `6a5054f`; remaining P2 items should still be closed and macOS build/tests must be run before a 100% release-hard claim.
+
+### Ready for TestFlight?
+
+Not from this audit alone. Before TestFlight, run macOS build/tests and fix or explicitly sign off the remaining P2 roadmap items.
+
+### Ready for App Store?
+
+Not yet. App Store readiness still requires physical paired-device QA, external export/import validation, localization cleanup, and continued strict non-certified safety positioning.
+
+### Bottom Line
+
+The iOS MAIN branch is in a strong state and no placeholder-only planner was found. The Buhlmann and gas-planning system is real and mostly well isolated from UI. After pulling the remote remediation commit, the highest-priority issues are closed by static inspection. The remaining work is not a rewrite: it is targeted P2/P3 integration hardening, physical/macOS validation, and regression coverage.
