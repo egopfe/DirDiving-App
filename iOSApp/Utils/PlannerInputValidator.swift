@@ -30,7 +30,7 @@ enum PlannerInputValidator {
             result.add(.invalidInput, message: "SAC/RMV non valido.")
         }
         if !input.emergencySacLitersPerMinute.isFinite || input.emergencySacLitersPerMinute <= 0 {
-            result.add(.invalidInput, message: "SAC di emergenza non valido.")
+            result.add(.invalidInput, message: String(localized: "planner.validation.sac_buddy_invalid"))
         }
         if input.teamSize < 1 {
             result.add(.invalidInput, message: "Team size non valido.")
