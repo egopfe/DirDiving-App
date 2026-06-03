@@ -227,7 +227,7 @@
 "BOMBOLA E CONSUMO" = "CYLINDER & CONSUMPTION";
 "Pressione iniziale" = "Starting pressure";
 "Riserva" = "Reserve";
-"SAC emergenza" = "Emergency SAC";
+"SAC emergenza" = "SAC Buddy";
 "DENSITA / END" = "DENSITY / END";
 "Densita" = "Density";
 "Disponibile" = "Available";
@@ -577,7 +577,9 @@
 "planner.field.reserve" = "Reserve";
 "planner.field.pressure_unit" = "Pressure unit";
 "planner.field.sac_rmv" = "SAC/RMV";
-"planner.field.sac_emergency" = "Emergency SAC";
+"planner.field.sac_emergency" = "SAC Buddy";
+"planner.section.consumption" = "Consumption";
+"planner.validation.sac_buddy_invalid" = "Invalid buddy SAC.";
 "planner.card.density_end" = "DENSITY / END";
 "planner.metric.density" = "Density";
 "planner.metric.available" = "Available";
@@ -792,7 +794,7 @@
 "planner.gas_ledger.warning.reserve.hint" = "Increase start pressure, reduce bottom time, or adjust cylinders.";
 "planner.gas_ledger.warning.minimum.title" = "Minimum gas / rock bottom";
 "planner.gas_ledger.warning.minimum.message" = "%@ remaining gas is below the modeled minimum gas requirement.";
-"planner.gas_ledger.warning.minimum.hint" = "Review rock-bottom assumptions and emergency SAC settings.";
+"planner.gas_ledger.warning.minimum.hint" = "Review rock-bottom assumptions and buddy SAC settings.";
 "planner.gas_ledger.warning.lost_gas.title" = "Lost-gas contingency";
 "planner.gas_ledger.warning.lost_gas.message" = "%@ may not cover the lost-gas rule-of-thumb margin (30%% of consumed gas vs reserve).";
 "planner.gas_ledger.warning.lost_gas.hint" = "Treat this as a planning warning only; verify with team procedures.";

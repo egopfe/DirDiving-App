@@ -442,6 +442,10 @@ struct PlannerView: View {
                 }
                 .buttonStyle(.plain)
                 Divider().overlay(DIRTheme.hairline)
+                Text(String(localized: "planner.section.consumption"))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.muted)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 plannerField(String(localized: "planner.field.sac_rmv"), value: $store.input.sacLitersPerMinute, unit: "L/min", step: 1)
                 Divider().overlay(DIRTheme.hairline)
                 plannerField(String(localized: "planner.field.sac_emergency"), value: $store.input.emergencySacLitersPerMinute, unit: "L/min", step: 1)
