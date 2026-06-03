@@ -12,5 +12,7 @@
     </array>
     <key>com.apple.developer.ubiquity-kvstore-identifier</key>
     <string>$(TeamIdentifierPrefix)com.egopfe.dirdiving</string>
+    <key>com.apple.developer.coremotion.water-submersion</key>
+    <true/>
 </dict>
 </plist>
