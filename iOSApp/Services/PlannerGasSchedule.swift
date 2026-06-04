@@ -130,15 +130,24 @@ enum PlannerGasSchedule {
     /// Warn when travel gas is present but bottom gas still switches only at max depth (default bottom switch depth).
     static func travelToBottomSwitchLimitationWarnings(
         input: GasPlanInput,
-        environment: PlannerEnvironment = .seaLevelSaltWater
+        environment: PlannerEnvironment? = nil
     ) -> [String] {
-        guard !sortedTravelCylinders(from: input).isEmpty else { return [] }
-        let bottomSwitch = bottomGasSwitchDepthMeters(from: input)
-        let usesMaxDepthSwitch = abs(bottomSwitch - input.plannedDepthMeters) < 0.5
-        guard usesMaxDepthSwitch else { return [] }
-        let bottom = bottomGas(from: input)
-        let ppO2AtMax = GasPlanningService.ppO2(gas: bottom, depthMeters: input.plannedDepthMeters, environment: environment)
-        if bottom.oxygen <= 0.18 || ppO2AtMax < BuhlmannConstants.minBreathablePPO2Bar + 0.01 {
+        var working = input
+        working.syncLegacyGasesFromPlannerCylinders()
+        let resolvedEnvironment = environment ?? working.plannerEnvironment
+        guard !sortedTravelCylinders(from: working).isEmpty else { return [] }
+        let bottomSwitch = bottomGasSwitchDepthMeters(from: working)
+        guard abs(bottomSwitch - working.plannedDepthMeters) < 0.5 else { return [] }
+        let bottom = working.bottomGas
+        let ppO2AtMax = GasPlanningService.ppO2(
+            gas: bottom,
+            depthMeters: working.plannedDepthMeters,
+            environment: resolvedEnvironment
+        )
+        let isTrimixWithTravel = bottom.helium > 0.001
+        let isLowOxygenFraction = bottom.oxygen <= 0.18 + 1e-6
+        let isHypoxicAtMaxDepth = ppO2AtMax < BuhlmannConstants.minBreathablePPO2Bar + 0.02
+        if isTrimixWithTravel && (isLowOxygenFraction || isHypoxicAtMaxDepth) {
             return [String(localized: "planner.limitation.travel_bottom_switch_simplified")]
         }
         return []
