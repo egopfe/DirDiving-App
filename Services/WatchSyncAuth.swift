@@ -22,28 +22,48 @@ enum WatchSyncAuth {
 
     private static let logger = Logger(subsystem: "com.egopfe.dirdiving", category: "WatchSyncAuth")
 
-    static func publishSharedSecretIfNeeded() {
-        guard WCSession.isSupported(),
-              WCSession.default.activationState == .activated else { return }
+    static func isApplicationContextDeliveryReady(
+        activationState: WCSessionActivationState,
+        isCompanionAppInstalled: Bool
+    ) -> Bool {
+        activationState == .activated && isCompanionAppInstalled
+    }
+
+    static func canPublishApplicationContext(session: WCSession = .default) -> Bool {
+        guard WCSession.isSupported() else { return false }
+        return isApplicationContextDeliveryReady(
+            activationState: session.activationState,
+            isCompanionAppInstalled: session.isCompanionAppInstalled
+        )
+    }
+
+    static func publishSharedSecretIfNeeded(session: WCSession = .default) {
+        guard canPublishApplicationContext(session: session) else { return }
         guard let secret = loadOrCreateLocalSecret() else {
             logger.error("Local Watch sync secret unavailable: SecRandomCopyBytes failed; refusing to publish a deterministic fallback.")
             return
         }
-        mergeApplicationContext([contextKey: secret.base64EncodedString()])
+        mergeApplicationContext([contextKey: secret.base64EncodedString()], session: session)
     }
 
     /// Merges keys into the current WC applicationContext without dropping peer secret or tombstones.
-    static func mergeApplicationContext(_ updates: [String: Any]) {
-        guard WCSession.isSupported(),
-              WCSession.default.activationState == .activated else { return }
-        var context = WCSession.default.applicationContext
+    @discardableResult
+    static func mergeApplicationContext(_ updates: [String: Any], session: WCSession = .default) -> Bool {
+        guard canPublishApplicationContext(session: session) else { return false }
+        var context = session.applicationContext
         for (key, value) in updates {
             context[key] = value
         }
         if context[contextKey] == nil, let secret = loadOrCreateLocalSecret() {
             context[contextKey] = secret.base64EncodedString()
         }
-        try? WCSession.default.updateApplicationContext(context)
+        do {
+            try session.updateApplicationContext(context)
+            return true
+        } catch {
+            logger.error("updateApplicationContext failed: \(error.localizedDescription, privacy: .public)")
+            return false
+        }
     }
 
     static func hasPeerSecret() -> Bool {

@@ -980,6 +980,10 @@
 "more.icloud.backup_on" = "Backup cloud attivo";
 "more.icloud.backup_off" = "Solo locale (backup cloud disattivato)";
 "sync.trust.mismatch" = "La fiducia di sincronizzazione è cambiata. Reimposta la fiducia di abbinamento per riconnettere Apple Watch/iPhone.";
+"sync.watch_app_not_installed" = "Installa DIR DIVING sull'Apple Watch abbinato per sincronizzare tramite contesto applicazione.";
+"sync.watch_app_not_installed.status" = "App Watch non installata";
+"sync.watch_not_paired" = "Abbina un Apple Watch a questo iPhone per abilitare la sincronizzazione.";
+"sync.watch_not_paired.status" = "Nessun Apple Watch abbinato";
 "more.reviewer.demo_logbook" = "Logbook dimostrativo";
 "more.reviewer.demo_logbook_hint" = "Carica 5 immersioni demo per revisione App Store.";
 "more.language.title" = "Lingua";

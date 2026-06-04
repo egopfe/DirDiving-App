@@ -982,6 +982,10 @@
 "more.icloud.backup_on" = "Cloud backup on";
 "more.icloud.backup_off" = "Local only (cloud backup off)";
 "sync.trust.mismatch" = "Sync trust changed. Reset pairing trust to reconnect this Watch/iPhone.";
+"sync.watch_app_not_installed" = "Install DIR DIVING on your paired Apple Watch to sync via application context.";
+"sync.watch_app_not_installed.status" = "Watch app not installed";
+"sync.watch_not_paired" = "Pair an Apple Watch with this iPhone to enable Watch sync.";
+"sync.watch_not_paired.status" = "No paired Apple Watch";
 "more.reviewer.demo_logbook" = "Demo logbook";
 "more.reviewer.demo_logbook_hint" = "Loads 5 demo dives for App Store review.";
 "more.language.title" = "Language";
