@@ -3,7 +3,7 @@
 **Date:** 2026-06-01  
 **Branch:** `main` @ working tree (post PR #11 security merge baseline `8cdce8c`)  
 **Scope:** Apple Watch MAIN + iOS Companion MAIN — visual/typography only  
-**Prior UI audits:** [`Docs/MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md`](Docs/MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md), [`Docs/UI_UX_VISUAL_GUIDELINES.md`](Docs/UI_UX_VISUAL_GUIDELINES.md)
+**Prior UI audits:** [`Docs/MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md`](MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md), [`Docs/UI_UX_VISUAL_GUIDELINES.md`](UI_UX_VISUAL_GUIDELINES.md)
 
 ---
 
