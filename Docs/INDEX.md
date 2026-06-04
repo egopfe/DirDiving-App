@@ -25,6 +25,7 @@ Tutti i file Markdown che erano nella root del repository sono stati spostati in
 | [`DIR_DIVING_GRAPHICS_UI_TEXT_AUDIT_CURRENT.md`](DIR_DIVING_GRAPHICS_UI_TEXT_AUDIT_CURRENT.md) | `Docs/` | Audit grafica/testo |
 | [`MAIN_BRANCH_FULL_CODE_SECURITY_AUDIT_CURRENT.md`](MAIN_BRANCH_FULL_CODE_SECURITY_AUDIT_CURRENT.md) | `Docs/` | Audit security current |
 | [`MAIN_BRANCH_FULL_CODE_SECURITY_REMEDIATION_REPORT.md`](MAIN_BRANCH_FULL_CODE_SECURITY_REMEDIATION_REPORT.md) | `Docs/` | Report remediation security |
+| [`DIR_DIVING_SECURITY_EXPLOIT_AUDIT_AND_REMEDIATION_PLAN_20260604.md`](DIR_DIVING_SECURITY_EXPLOIT_AUDIT_AND_REMEDIATION_PLAN_20260604.md) | `Docs/` | Audit security/exploit 2026-06-04 con piano remediation P1-P3 |
 
 ---
 
