@@ -25,27 +25,47 @@ enum DiveUI {
     static let spaceS: CGFloat = 6
     static let spaceM: CGFloat = 8
     static let spaceL: CGFloat = 10
+    static let spaceXL: CGFloat = 12
 
+    enum Layout {
+        static let settingsRowInteractiveMinHeight: CGFloat = 44
+        static let settingsRowInfoMinHeight: CGFloat = 40
+        static let settingsRowLegalMinHeight: CGFloat = 48
+        static let commandButtonMinHeight: CGFloat = 40
+        static let compassActionMinHeight: CGFloat = 38
+        static let alarmStepperMinHeight: CGFloat = 40
+    }
+
+    /// Watch-native readability hierarchy (audit: DIR_DIVING_WATCH_UI_TEXT_VISIBILITY_AUDIT_CURRENT).
     enum Typography {
         static let brandTitle: Font = .system(size: 15, weight: .black, design: .rounded)
-        static let brandTitleCompact: Font = .system(size: 11, weight: .black, design: .rounded)
+        static let brandTitleCompact: Font = .system(size: 12, weight: .black, design: .rounded)
         static let clock: Font = .system(size: 14, weight: .semibold, design: .rounded)
         static let clockLarge: Font = .system(size: 20, weight: .semibold, design: .rounded)
-        static let metricLabel: Font = .system(size: 9, weight: .bold, design: .rounded)
+        static let screenTitle: Font = .system(size: 15, weight: .black, design: .rounded)
+        static let sectionHeading: Font = .system(size: 12.5, weight: .bold, design: .rounded)
+        static let rowTitle: Font = .system(size: 13.5, weight: .semibold, design: .rounded)
+        static let rowSubtitle: Font = .system(size: 11.5, weight: .medium, design: .rounded)
+        static let statusValue: Font = .system(size: 13, weight: .semibold, design: .rounded)
+        static let warningTitle: Font = .system(size: 13, weight: .black, design: .rounded)
+        static let warningBody: Font = .system(size: 11.5, weight: .semibold, design: .rounded)
+        static let secondaryLabel: Font = .system(size: 11, weight: .semibold, design: .rounded)
+        static let unitLabel: Font = .system(size: 11, weight: .semibold, design: .rounded)
+        static let metricLabel: Font = .system(size: 11, weight: .bold, design: .rounded)
         static let metricValue: Font = .system(size: 24, weight: .regular, design: .rounded)
         static let metricValueHero: Font = .system(size: 72, weight: .black, design: .rounded)
         static let metricUnitHero: Font = .system(size: 31, weight: .black, design: .rounded)
-        static let metricUnit: Font = .caption2.bold()
+        static let metricUnit: Font = unitLabel
         static let dashboardLabel: Font = .system(size: 13, weight: .semibold, design: .rounded)
         static let dashboardValue: Font = .system(size: 34, weight: .black, design: .rounded)
         static let dashboardUnit: Font = .system(size: 12, weight: .semibold, design: .rounded)
         static let depthCaption: Font = .system(size: 15, weight: .black, design: .rounded)
         static let statusTitle: Font = .system(size: 15, weight: .black, design: .rounded)
-        static let bannerTitle: Font = .system(size: 11, weight: .black, design: .rounded)
-        static let bannerSubtitle: Font = .system(size: 10, weight: .bold, design: .rounded)
-        static let bannerDetail: Font = .system(size: 9, weight: .semibold, design: .rounded)
-        static let settingsSection: Font = .system(size: 10, weight: .semibold, design: .rounded)
-        static let commandButton: Font = .caption.bold()
+        static let bannerTitle: Font = warningTitle
+        static let bannerSubtitle: Font = warningBody
+        static let bannerDetail: Font = secondaryLabel
+        static let settingsSection: Font = sectionHeading
+        static let commandButton: Font = .system(size: 12, weight: .bold, design: .rounded)
         static let readyTitle: Font = .system(size: 18, weight: .black, design: .rounded)
     }
 
@@ -117,6 +137,85 @@ struct DivePanel<Content: View>: View {
     }
 }
 
+struct WatchSettingsSectionHeader: View {
+    let title: String
+
+    var body: some View {
+        Text(LocalizedStringKey(title))
+            .font(DiveUI.Typography.sectionHeading)
+            .foregroundStyle(DiveUI.cyan)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.top, DiveUI.spaceM)
+            .padding(.bottom, 2)
+    }
+}
+
+struct WatchSettingsRow: View {
+    let icon: String
+    let iconColor: Color
+    let title: String
+    let subtitle: String
+    var showsChevron: Bool = false
+    var informational: Bool = false
+    var legal: Bool = false
+    var statusEmphasis: Bool = false
+
+    private var minHeight: CGFloat {
+        if legal { return DiveUI.Layout.settingsRowLegalMinHeight }
+        if informational { return DiveUI.Layout.settingsRowInfoMinHeight }
+        return DiveUI.Layout.settingsRowInteractiveMinHeight
+    }
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: icon)
+                .font(.system(size: 18, weight: .medium))
+                .foregroundStyle(iconColor)
+                .frame(width: 26)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(DiveUI.Typography.rowTitle)
+                    .foregroundStyle(.white)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.9)
+                Text(subtitle)
+                    .font(statusEmphasis ? DiveUI.Typography.statusValue : DiveUI.Typography.rowSubtitle)
+                    .foregroundStyle(statusEmphasis ? .white : (informational ? DiveUI.secondaryText : .white.opacity(0.92)))
+                    .lineLimit(informational || statusEmphasis ? 3 : 2)
+                    .fixedSize(horizontal: false, vertical: informational || statusEmphasis)
+            }
+
+            Spacer(minLength: 0)
+
+            if showsChevron {
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.5))
+            } else if informational {
+                Image(systemName: "info.circle")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(DiveUI.secondaryText)
+                    .accessibilityLabel(Text(LocalizedStringKey("settings.informational.a11y.hint")))
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .frame(minHeight: minHeight)
+        .opacity(informational && !statusEmphasis ? 0.94 : 1)
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(informational ? [] : (showsChevron ? .isButton : []))
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(Color.black.opacity(informational && !statusEmphasis ? 0.38 : 0.52))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(.white.opacity(informational && !statusEmphasis ? 0.16 : 0.24), lineWidth: 1)
+                )
+        )
+    }
+}
+
 struct DiveCommandButton: View {
     let title: String
     let systemImage: String?
@@ -135,15 +234,15 @@ struct DiveCommandButton: View {
             HStack(spacing: 5) {
                 Text(LocalizedStringKey(title))
                     .font(DiveUI.Typography.commandButton)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.68)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.85)
                 if let systemImage {
                     Image(systemName: systemImage)
-                        .font(.caption.bold())
+                        .font(.system(size: 12, weight: .bold))
                 }
             }
             .foregroundStyle(color)
-            .frame(maxWidth: .infinity, minHeight: 36)
+            .frame(maxWidth: .infinity, minHeight: DiveUI.Layout.commandButtonMinHeight)
             .padding(.horizontal, 5)
             .background(
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -184,12 +283,12 @@ struct DiveInlineStatusBanner: View {
                 Text(title)
                     .font(DiveUI.Typography.bannerTitle)
                     .lineLimit(2)
-                    .minimumScaleFactor(0.72)
+                    .minimumScaleFactor(0.9)
                 if let detail {
                     Text(detail)
                         .font(DiveUI.Typography.bannerDetail)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.66)
+                        .lineLimit(3)
+                        .minimumScaleFactor(0.9)
                 }
             }
             Spacer(minLength: 0)
@@ -242,12 +341,12 @@ struct DiveMetric: View {
             Text(LocalizedStringKey(title.uppercased()))
                 .font(DiveUI.Typography.metricLabel)
                 .foregroundStyle(DiveUI.secondaryText)
-                .lineLimit(1)
-                .minimumScaleFactor(0.62)
+                .lineLimit(2)
+                .minimumScaleFactor(0.88)
             HStack(alignment: .lastTextBaseline, spacing: 3) {
                 Text(value)
                     .font(.system(size: valueSize, weight: .regular, design: .rounded)) // valueSize override for compact metrics
-                    .minimumScaleFactor(0.62)
+                    .minimumScaleFactor(0.85)
                     .lineLimit(1)
                     .monospacedDigit()
                     .foregroundStyle(color)
@@ -290,18 +389,18 @@ struct DiveScreenHeader: View {
                 .foregroundStyle(accent)
                 if let subtitle {
                     Text(LocalizedStringKey(subtitle))
-                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                        .font(DiveUI.Typography.secondaryLabel)
                         .foregroundStyle(DiveUI.secondaryText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.9)
                 }
             }
             Spacer()
             HStack(spacing: 3) {
                 Image(systemName: "digitalcrown.horizontal.press")
-                    .font(.caption2.bold())
+                    .font(.system(size: 10, weight: .bold))
                 Text("CROWN")
-                    .font(.system(size: 8, weight: .bold, design: .rounded))
+                    .font(.system(size: 10, weight: .bold, design: .rounded))
             }
             .foregroundStyle(DiveUI.mutedText)
             .padding(.horizontal, 6)
@@ -332,9 +431,9 @@ struct DiveStatusPill: View {
             }
             Text(LocalizedStringKey(text))
         }
-        .font(.system(size: 9, weight: .bold, design: .rounded))
-        .lineLimit(1)
-        .minimumScaleFactor(0.72)
+        .font(DiveUI.Typography.secondaryLabel)
+        .lineLimit(2)
+        .minimumScaleFactor(0.9)
         .foregroundStyle(color)
         .padding(.horizontal, 7)
         .padding(.vertical, 4)

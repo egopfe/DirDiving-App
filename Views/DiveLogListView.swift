@@ -93,7 +93,7 @@ struct DiveLogListView: View {
                         .foregroundStyle(DiveUI.secondaryText)
                         .multilineTextAlignment(.center)
                     Text(String(localized: "log.export.unavailable"))
-                        .font(.system(size: 9, weight: .black, design: .rounded))
+                        .font(DiveUI.Typography.secondaryLabel)
                         .foregroundStyle(DiveUI.cyan)
                 }
                 .padding(8)
@@ -169,8 +169,8 @@ struct DiveLogListView: View {
                     .font(.system(size: 12, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.green)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.76)
-                    .frame(maxWidth: .infinity, minHeight: 32)
+                    .minimumScaleFactor(0.9)
+                    .frame(maxWidth: .infinity, minHeight: 40)
             }
             .buttonStyle(.plain)
             .background(
@@ -218,12 +218,12 @@ struct DiveLogListView: View {
                     VStack(alignment: .leading, spacing: 2) {
                         HStack(alignment: .firstTextBaseline) {
                             Text(logDate(session.startDate))
-                                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                                .font(DiveUI.Typography.secondaryLabel)
                                 .foregroundStyle(.white)
                                 .monospacedDigit()
                             Spacer(minLength: 5)
                             Text(logTime(session.startDate))
-                                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                                .font(DiveUI.Typography.secondaryLabel)
                                 .foregroundStyle(.white)
                                 .monospacedDigit()
                         }
@@ -234,21 +234,21 @@ struct DiveLogListView: View {
                                     .font(.system(size: 11, weight: .black, design: .rounded))
                                     .foregroundStyle(DiveUI.cyan)
                                     .lineLimit(1)
-                                    .minimumScaleFactor(0.72)
+                                    .minimumScaleFactor(0.9)
                             } else {
                                 Text("\(depthDisplay.valueText) \(depthDisplay.unitLabel)")
                                     .font(.system(size: 14, weight: .black, design: .rounded))
                                     .foregroundStyle(.white)
                                     .monospacedDigit()
                                     .lineLimit(1)
-                                    .minimumScaleFactor(0.72)
+                                    .minimumScaleFactor(0.85)
                             }
                             Text("\(durationMinutes(session.durationSeconds)) min")
                                 .font(.system(size: 13, weight: .semibold, design: .rounded))
                                 .foregroundStyle(.white)
                                 .monospacedDigit()
                                 .lineLimit(1)
-                                .minimumScaleFactor(0.72)
+                                .minimumScaleFactor(0.9)
                         }
                     }
 

@@ -168,16 +168,26 @@ final class DiveLogStore: ObservableObject {
     private func updateMergeConflictState(local: [DiveSession], cloud: [DiveSession]) {
         sessionMergeConflicts = DiveSessionMergeConflictDetector.detect(local: local, cloud: cloud)
         let conflictIDs = Set(sessionMergeConflicts.map(\.sessionID))
-        conflictLocalSnapshots = Dictionary(
-            uniqueKeysWithValues: local.compactMap { session in
+        let dedupedLocal = DiveSessionCollectionIntegrity.deduplicated(local)
+        let dedupedCloud = DiveSessionCollectionIntegrity.deduplicated(cloud)
+        conflictLocalSnapshots = safeDictionary(
+            dedupedLocal.sessions.compactMap { session in
                 conflictIDs.contains(session.id) ? (session.id, session) : nil
             }
         )
-        conflictCloudSnapshots = Dictionary(
-            uniqueKeysWithValues: cloud.compactMap { session in
+        conflictCloudSnapshots = safeDictionary(
+            dedupedCloud.sessions.compactMap { session in
                 conflictIDs.contains(session.id) ? (session.id, session) : nil
             }
         )
+    }
+
+    private func safeDictionary(_ pairs: [(UUID, DiveSession)]) -> [UUID: DiveSession] {
+        var result: [UUID: DiveSession] = [:]
+        for (id, session) in pairs {
+            result[id] = session
+        }
+        return result
     }
 
     private func loadLocalSessions() -> [DiveSession] {
@@ -273,7 +283,7 @@ final class DiveLogStore: ObservableObject {
 
     /// Merges per session ID before writing iCloud backup so blob LWW cannot drop unrelated dives.
     private func syncCloudSessionsBackup() {
-        guard let cloudSync else { return }
+        guard CloudBackupSettings.isEnabled, let cloudSync else { return }
         let cloud = loadRawCloudSessions() ?? []
         updateMergeConflictState(local: sessions, cloud: cloud)
         let merged = mergedSessions(local: sessions, cloud: cloud)

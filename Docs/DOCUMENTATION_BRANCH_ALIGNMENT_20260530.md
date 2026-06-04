@@ -1,6 +1,6 @@
 # DIR DIVING — Branch alignment (2026-05-30)
 
-**Baseline:** `main` = `origin/main` @ `dae29b8` (Phase 15 + comprehensive CNS/OTU; prior UX fix @ `3237262`)  
+**Baseline:** `main` = `origin/main` @ `dae29b8` (Phase 15 + comprehensive CNS/OTU; prior UX fix @ `3237262`)
 **Remote:** `origin` → `https://github.com/egopfe/DirDiving-App`
 
 ## Branch strategy (authoritative)
@@ -41,8 +41,8 @@ After `3237262`:
 ## Documentation chain
 
 1. Algorithm reaudit: [`DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) → fix @ `69e69b2`
-2. UX readiness audit: [`../DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](../DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md) → gaps identified
-3. UX fix: `3237262` → [`../DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md`](../DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md)
+2. UX readiness audit: [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md) → gaps identified
+3. UX fix: `3237262` → [`DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md)
 4. UX re-audit: [`DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md) → **READY**
 5. Repository consistency: [`DIR_DIVING_REPOSITORY_CONSISTENCY_REPORT.md`](DIR_DIVING_REPOSITORY_CONSISTENCY_REPORT.md)
 

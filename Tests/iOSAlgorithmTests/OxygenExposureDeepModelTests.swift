@@ -22,11 +22,14 @@ final class OxygenExposureDeepModelTests: XCTestCase {
         XCTAssertEqual(OTUModel.otuIncrementConstant(ppO2: 0.5, minutes: 60) ?? -1, 0, accuracy: 0.0001)
     }
 
-    func testOTUConstantMatchesLegacyPowerFormula() {
+    func testOTUConstantUsesCanonicalLambertsenDirection() {
         let ppO2 = 1.35
         let minutes = 12.0
-        let expected = minutes * pow((0.5 / (ppO2 - 0.5)), 5.0 / 6.0)
+        let expected = minutes * pow(((ppO2 - 0.5) / 0.5), 5.0 / 6.0)
         XCTAssertEqual(OTUModel.otuIncrementConstant(ppO2: ppO2, minutes: minutes) ?? 0, expected, accuracy: 0.0001)
+        let at16 = OTUModel.otuIncrementConstant(ppO2: 1.6, minutes: minutes) ?? 0
+        let at10 = OTUModel.otuIncrementConstant(ppO2: 1.0, minutes: minutes) ?? 0
+        XCTAssertGreaterThan(at16, at10)
     }
 
     func testLinearRampOTUExceedsConstantAtMeanPPO2ForDescent() {

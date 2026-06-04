@@ -3,13 +3,24 @@ import XCTest
 
 @MainActor
 final class DeveloperSensorSourceTests: XCTestCase {
-    func testDefaultSensorSourceIsSimulation() {
+    func testDefaultSensorSourceIsAutomatic() {
         let defaults = UserDefaults(suiteName: "DeveloperSensorSourceTests")!
-        defaults.removeObject(forKey: SensorSourceMode.storageKey)
-        XCTAssertEqual(
-            SensorSourceMode(rawValue: defaults.string(forKey: SensorSourceMode.storageKey) ?? SensorSourceMode.simulation.rawValue),
-            .simulation
-        )
+        defaults.removePersistentDomain(forName: "DeveloperSensorSourceTests")
+        UserDefaults.standard.removeObject(forKey: SensorSourceMode.storageKey)
+        XCTAssertEqual(SensorSourceMode.persisted, .automatic)
+    }
+
+    func testStoredSimulationResolvesToAutomaticInReleasePolicy() {
+        SensorSourceMode.persist(.simulation)
+        #if DEBUG
+        XCTAssertEqual(SensorSourceMode.runtimeMode, .simulation)
+        #else
+        if DeveloperSettings.allowsSimulationSensorSelection {
+            XCTAssertEqual(SensorSourceMode.runtimeMode, .simulation)
+        } else {
+            XCTAssertEqual(SensorSourceMode.runtimeMode, .automatic)
+        }
+        #endif
     }
 
     func testFactorySimulationNeverUsesAppleTypeName() {

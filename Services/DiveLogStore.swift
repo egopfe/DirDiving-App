@@ -38,7 +38,10 @@ final class DiveLogStore: ObservableObject {
         deletedSessionIDs = loadDeletedSessionIDs()
         let localSessions = loadLocalSessions()
         let legacySessions = loadLegacyCloudSessions()
-        sessions = mergeSessions(local: localSessions, cloud: legacySessions)
+        sessions = DiveLogbookPolicy.normalizedAndCapped(
+            applyLoadIntegrityFilter(to: mergeSessions(local: localSessions, cloud: legacySessions)),
+            deletedIDs: deletedSessionIDs
+        )
         if legacySessions != nil {
             save()
         }
@@ -113,7 +116,10 @@ final class DiveLogStore: ObservableObject {
         deletedSessionIDs = loadDeletedSessionIDs()
         let localSessions = loadLocalSessions()
         let legacySessions = loadLegacyCloudSessions()
-        sessions = mergeSessions(local: localSessions, cloud: legacySessions)
+        sessions = DiveLogbookPolicy.normalizedAndCapped(
+            applyLoadIntegrityFilter(to: mergeSessions(local: localSessions, cloud: legacySessions)),
+            deletedIDs: deletedSessionIDs
+        )
         if !sessions.isEmpty {
             save()
         } else if legacySessions != nil {
@@ -125,14 +131,52 @@ final class DiveLogStore: ObservableObject {
         let url = fileURL()
         guard FileManager.default.fileExists(atPath: url.path) else { return [] }
         do {
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
-            return try decoder.decode([DiveSession].self, from: Data(contentsOf: url))
-                .map { DiveSessionMerge.preferred($0, $0) }
+            let data = try Data(contentsOf: url)
+            let decoded = try decodeSessionsResiliently(from: data)
+            let filtered = DiveLogbookPolicy.filterValidLoadedSessions(decoded)
+            if filtered.quarantinedCount > 0 {
+                loadErrorMessage = String(
+                    format: String(localized: "%lld sessioni non valide escluse dal log locale."),
+                    filtered.quarantinedCount
+                )
+            }
+            return filtered.sessions
         } catch {
             loadErrorMessage = String(format: String(localized: "Log locale non leggibile: %@"), error.localizedDescription)
             return []
         }
+    }
+
+    private func decodeSessionsResiliently(from data: Data) throws -> [DiveSession] {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        if let sessions = try? decoder.decode([DiveSession].self, from: data) {
+            return sessions
+        }
+        guard let jsonArray = try JSONSerialization.jsonObject(with: data) as? [Any] else {
+            throw CocoaError(.propertyListReadCorrupt)
+        }
+        var sessions: [DiveSession] = []
+        for element in jsonArray {
+            guard JSONSerialization.isValidJSONObject(element),
+                  let elementData = try? JSONSerialization.data(withJSONObject: element),
+                  let session = try? decoder.decode(DiveSession.self, from: elementData) else {
+                continue
+            }
+            sessions.append(session)
+        }
+        return sessions
+    }
+
+    private func applyLoadIntegrityFilter(to merged: [DiveSession]) -> [DiveSession] {
+        let filtered = DiveLogbookPolicy.filterValidLoadedSessions(merged)
+        if filtered.quarantinedCount > 0 {
+            loadErrorMessage = String(
+                format: String(localized: "%lld sessioni non valide escluse dal log."),
+                filtered.quarantinedCount
+            )
+        }
+        return filtered.sessions
     }
 
     private func loadLegacyCloudSessions() -> [DiveSession]? {

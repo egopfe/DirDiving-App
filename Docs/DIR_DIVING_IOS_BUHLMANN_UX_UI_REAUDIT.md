@@ -1,10 +1,10 @@
 # DIR Diving iOS Bühlmann UX/UI Re-Audit
 
-Date: 2026-05-30  
-Branch: `main` @ `3237262`  
-Prior audit: [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](../DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md) (2026-05-28, *Partially ready*)  
-Fix commit: `3237262` — `fix(ios): resolve Bühlmann planner UX/UI readiness audit (P1–P3)`  
-Verification: [`DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md`](../DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md)
+Date: 2026-05-30
+Branch: `main` @ `3237262`
+Prior audit: [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md) (2026-05-28, *Partially ready*)
+Fix commit: `3237262` — `fix(ios): resolve Bühlmann planner UX/UI readiness audit (P1–P3)`
+Verification: [`DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md)
 
 ## Executive Verdict
 

@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct DeveloperSettingsView: View {
-    @AppStorage(SensorSourceMode.storageKey) private var sensorSourceRaw = SensorSourceMode.simulation.rawValue
+    @AppStorage(SensorSourceMode.storageKey) private var sensorSourceRaw = SensorSourceMode.automatic.rawValue
     @State private var showAppleFallbackAlert = false
 
     private var sensorSource: SensorSourceMode {
-        get { SensorSourceMode(rawValue: sensorSourceRaw) ?? .simulation }
+        get { SensorSourceMode(rawValue: sensorSourceRaw) ?? .automatic }
         nonmutating set { sensorSourceRaw = newValue.rawValue }
     }
 
@@ -23,7 +23,7 @@ struct DeveloperSettingsView: View {
                     }
 
                     DIRCard(String(localized: "developer.sensor_source.title"), icon: "waveform.path", accent: DIRTheme.yellow) {
-                        ForEach(SensorSourceMode.allCases) { mode in
+                        ForEach(SensorSourceMode.selectableModes) { mode in
                             sensorSourceRow(mode)
                         }
                         Text(String(localized: "developer.sensor_source.footer"))
@@ -64,8 +64,9 @@ struct DeveloperSettingsView: View {
     private func applySensorSource(_ mode: SensorSourceMode) {
         if mode == .appleSensor, !AppleDepthSensorAvailability.isAvailable {
             showAppleFallbackAlert = true
-            sensorSourceRaw = SensorSourceMode.simulation.rawValue
-            DeveloperSettings.persistSensorSource(.simulation)
+            let fallback: SensorSourceMode = DeveloperSettings.allowsSimulationSensorSelection ? .simulation : .automatic
+            sensorSourceRaw = fallback.rawValue
+            DeveloperSettings.persistSensorSource(fallback)
             return
         }
         sensorSourceRaw = mode.rawValue

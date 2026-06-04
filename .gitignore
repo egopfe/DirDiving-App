@@ -11,3 +11,7 @@ DerivedData/
 
 # Local git worktrees (separate checkout; generate xcodeproj only in repo root)
 .worktrees/
+
+# Branch/code snapshot archives (SEC-P2-003) — store in Releases, not source
+*.zip
+!approved-source-fixtures/**/*.zip

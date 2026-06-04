@@ -17,6 +17,8 @@ enum DiveSessionMerge {
         let equipmentUsed = mergedString(winner.equipmentUsed, loser.equipmentUsed)
         let entryPressureText = mergedString(winner.entryPressureText, loser.entryPressureText)
         let exitPressureText = mergedString(winner.exitPressureText, loser.exitPressureText)
+        let entryPressureBar = winner.entryPressureBar ?? loser.entryPressureBar
+        let exitPressureBar = winner.exitPressureBar ?? loser.exitPressureBar
         let decompressionNotes = mergedString(winner.decompressionNotes, loser.decompressionNotes)
         let startDate = min(winner.startDate, loser.startDate)
         let endDate = max(winner.endDate, loser.endDate)
@@ -50,6 +52,8 @@ enum DiveSessionMerge {
             equipmentUsed: equipmentUsed,
             entryPressureText: entryPressureText,
             exitPressureText: exitPressureText,
+            entryPressureBar: entryPressureBar,
+            exitPressureBar: exitPressureBar,
             decompressionNotes: decompressionNotes
         )
     }

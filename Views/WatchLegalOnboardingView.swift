@@ -137,7 +137,7 @@ struct WatchLegalOnboardingView: View {
 
                     if !disclaimerReachedBottom {
                         Text(String(localized: "legal.scroll.prompt"))
-                            .font(.system(size: 10, weight: .semibold, design: .rounded))
+                            .font(DiveUI.Typography.rowSubtitle)
                             .foregroundStyle(DiveUI.secondaryText)
                             .fixedSize(horizontal: false, vertical: true)
                     }
@@ -274,7 +274,7 @@ struct WatchLegalSafetyView: View {
                                 .font(.system(size: 14, weight: .black, design: .rounded))
                                 .foregroundStyle(DiveUI.yellow)
                             Text(legalAcceptance.disclaimerText(languageCode: languageCode))
-                                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                                .font(DiveUI.Typography.rowSubtitle)
                                 .foregroundStyle(.white.opacity(0.9))
                                 .fixedSize(horizontal: false, vertical: true)
                         }
@@ -295,7 +295,7 @@ struct WatchLegalSafetyView: View {
     private func infoRow(_ title: String, _ value: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(title)
-                .font(.system(size: 9, weight: .bold, design: .rounded))
+                .font(DiveUI.Typography.secondaryLabel)
                 .foregroundStyle(DiveUI.secondaryText)
             Text(value)
                 .font(.system(size: 11, weight: .semibold, design: .rounded))

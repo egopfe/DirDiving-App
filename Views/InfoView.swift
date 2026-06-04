@@ -126,7 +126,7 @@ struct InfoView: View {
             .foregroundStyle(DiveUI.blue)
             .fixedSize(horizontal: false, vertical: true)
             Text(String(localized: "info.apple_lpm.cannot_enable"))
-                .font(.system(size: 9, weight: .medium, design: .rounded))
+                .font(DiveUI.Typography.rowSubtitle)
                 .foregroundStyle(DiveUI.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -171,7 +171,7 @@ struct InfoView: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 7)
-        .frame(minHeight: 42)
+        .frame(minHeight: 44)
         .background(rowBackground)
     }
 
@@ -193,7 +193,7 @@ struct InfoView: View {
                 dive.isDepthAutomationAvailable ? String(localized: "Pronto") : String(localized: "Non verificabile")
             )
             Text(String(localized: "info.depth.validation_note"))
-                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .font(DiveUI.Typography.rowSubtitle)
                 .foregroundStyle(DiveUI.yellow)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -218,11 +218,11 @@ struct InfoView: View {
     private func diagnosticRow(_ title: String, _ value: String) -> some View {
         HStack {
             Text(title)
-                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .font(DiveUI.Typography.rowTitle)
                 .foregroundStyle(.white)
             Spacer(minLength: 6)
             Text(value)
-                .font(.system(size: 10, weight: .black, design: .rounded))
+                .font(DiveUI.Typography.statusValue)
                 .foregroundStyle(diagnosticValueIsPositive(value) ? DiveUI.green : DiveUI.yellow)
         }
     }

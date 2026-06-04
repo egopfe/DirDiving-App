@@ -98,16 +98,25 @@ struct PlannerCylinderEntry: Identifiable, Codable, Hashable {
         }
     }
 
+    /// Sea-level saltwater MOD for legacy callers; prefer `modMeters(environment:)`.
     var modMeters: Double {
-        PlannerMODValidator.modMeters(oxygenFraction: gas.oxygen, maxPPO2: gas.maxPPO2)
+        modMeters(environment: .seaLevelSaltWater)
+    }
+
+    func modMeters(environment: PlannerEnvironment) -> Double {
+        PlannerMODValidator.modMeters(oxygenFraction: gas.oxygen, maxPPO2: gas.maxPPO2, environment: environment)
     }
 
     var isSwitchDepthBeyondMOD: Bool {
+        isSwitchDepthBeyondMOD(environment: .seaLevelSaltWater)
+    }
+
+    func isSwitchDepthBeyondMOD(environment: PlannerEnvironment) -> Bool {
         switch role {
         case .bottom:
             return false
         case .travel, .deco, .bailout:
-            return switchDepthMeters > modMeters + 0.05
+            return switchDepthMeters > modMeters(environment: environment) + 0.05
         }
     }
 
@@ -132,7 +141,12 @@ struct GasMix: Identifiable, Codable, Hashable {
     var maxPPO2: Double
     var isOxygenNarcotic: Bool = true
     var nitrogen: Double { 1.0 - oxygen - helium }
-    var modMeters: Double { PlannerMODValidator.modMeters(oxygenFraction: oxygen, maxPPO2: maxPPO2) }
+    /// Sea-level saltwater MOD for legacy callers; prefer `modMeters(environment:)`.
+    var modMeters: Double { modMeters(environment: .seaLevelSaltWater) }
+
+    func modMeters(environment: PlannerEnvironment) -> Double {
+        PlannerMODValidator.modMeters(oxygenFraction: oxygen, maxPPO2: maxPPO2, environment: environment)
+    }
     var isValidMix: Bool {
         GasMixValidator.validate(oxygen: oxygen, helium: helium, maxPPO2: maxPPO2)
             .states

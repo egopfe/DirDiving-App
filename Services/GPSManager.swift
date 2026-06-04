@@ -11,6 +11,14 @@ final class GPSManager: NSObject, ObservableObject {
     private let locationManager = CLLocationManager()
     private var previousSpeedSample: (point: GPSPoint, date: Date)?
     private var bestEffortCapture: BestEffortCapture?
+    var testHook_holdBestEffortCapture = false
+    private var heldBestEffortCompletion: (@MainActor (GPSPoint?) -> Void)?
+
+    func testHook_completeHeldBestEffortCapture(with point: GPSPoint? = nil) {
+        guard let completion = heldBestEffortCompletion else { return }
+        heldBestEffortCompletion = nil
+        completion(point)
+    }
 
     override init() {
         super.init()
@@ -28,7 +36,13 @@ final class GPSManager: NSObject, ObservableObject {
         return assessment.point
     }
 
-    func captureBestEffortPoint(for seconds: TimeInterval, completion: @escaping @MainActor (GPSPoint?) -> Void) {
+    /// Starts a timed best-effort capture. When `stopUpdatesWhenComplete` is true, location updates stop after completion.
+    /// Dive session entry/exit capture leaves updates running because `DiveManager` owns the broader GPS lifecycle.
+    func captureBestEffortPoint(
+        for seconds: TimeInterval,
+        stopUpdatesWhenComplete: Bool = false,
+        completion: @escaping @MainActor (GPSPoint?) -> Void
+    ) {
         let captureDuration = seconds.isFinite ? min(60, max(0, seconds)) : 0
         requestAuthorization()
         locationManager.startUpdatingLocation()
@@ -36,7 +50,17 @@ final class GPSManager: NSObject, ObservableObject {
         // Complete any in-flight capture before replacing it so callers are never stranded.
         finishBestEffortCapture()
 
-        let capture = BestEffortCapture(deadline: Date().addingTimeInterval(captureDuration), bestPoint: currentBestPoint(), completion: completion)
+        if testHook_holdBestEffortCapture {
+            heldBestEffortCompletion = completion
+            return
+        }
+
+        let capture = BestEffortCapture(
+            deadline: Date().addingTimeInterval(captureDuration),
+            bestPoint: currentBestPoint(),
+            stopUpdatesWhenComplete: stopUpdatesWhenComplete,
+            completion: completion
+        )
         bestEffortCapture = capture
 
         Task { @MainActor in
@@ -50,6 +74,9 @@ final class GPSManager: NSObject, ObservableObject {
         guard let capture = bestEffortCapture else { return }
         bestEffortCapture = nil
         capture.completion(capture.bestPoint)
+        if capture.stopUpdatesWhenComplete {
+            locationManager.stopUpdatingLocation()
+        }
     }
 }
 
@@ -102,11 +129,18 @@ extension GPSManager: CLLocationManagerDelegate {
 private final class BestEffortCapture {
     let deadline: Date
     var bestPoint: GPSPoint?
+    let stopUpdatesWhenComplete: Bool
     let completion: @MainActor (GPSPoint?) -> Void
 
-    init(deadline: Date, bestPoint: GPSPoint?, completion: @escaping @MainActor (GPSPoint?) -> Void) {
+    init(
+        deadline: Date,
+        bestPoint: GPSPoint?,
+        stopUpdatesWhenComplete: Bool,
+        completion: @escaping @MainActor (GPSPoint?) -> Void
+    ) {
         self.deadline = deadline
         self.bestPoint = bestPoint
+        self.stopUpdatesWhenComplete = stopUpdatesWhenComplete
         self.completion = completion
     }
 }

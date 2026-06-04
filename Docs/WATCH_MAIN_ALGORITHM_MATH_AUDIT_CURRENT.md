@@ -1,427 +1,461 @@
-# Apple Watch MAIN — Algorithm & Mathematical Functions Audit (Current)
+# Apple Watch MAIN Algorithm and Mathematical Functions Audit - Current
 
-**Date:** 2026-06-01  
-**Branch:** `main` (audit baseline @ `3154719`; remediation 2026-06-01)  
-**Target:** `DIRDiving Watch App` only  
-**Mode:** Static audit + remediation tracking  
-**Related:** [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) (remediation @ `ac47480`), [`WATCH_MAIN_ALGORITHM_READINESS_100_FINAL_QA.md`](WATCH_MAIN_ALGORITHM_READINESS_100_FINAL_QA.md) (latest QA), [`WATCH_MISSION_MODE_UX_SAFETY_VERIFICATION_REPORT.md`](WATCH_MISSION_MODE_UX_SAFETY_VERIFICATION_REPORT.md) (Mission Mode is **UI-only**, not dive math)
-
-### Remediation update (2026-06-01)
-
-| ID | Status |
-|----|--------|
-| WMATH-MED-015 | **Fixed** — `DiveDepthMeasurementIngestion` + guarded trailing `addSample` in `processDepthMeasurement` |
-| WMATH-LOW-016 | **Fixed** — temperature freshness vs depth sample timestamp; integration tests |
-| Integration tests | **Added** — `DiveManagerAlgorithmIntegrationTests`, codec/export tests |
-| Hardware QA | **Checklist only** — [`WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md`](WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md) (not executed) |
-
----
+**Audit date:** 2026-06-03
+**Repository:** DIR DIVING (`DirDiving-App`)
+**Branch audited:** `main`
+**Commit audited:** `3b7325bb54e02b9c5bb00ad2049c18eba1d6bdd0`
+**Remote sync check:** `HEAD...origin/main = 0 0` after `git fetch origin`
+**Target audited:** `DIRDiving Watch App` only
+**Mode:** Read-only static audit on Windows. No code, UI, UX, business logic, persistence, sync, Watch algorithms, iOS algorithms, or experimental files were modified.
 
 ## A. Executive Summary
 
-| Metric | Estimate | Notes |
-|--------|----------|--------|
-| **Watch MAIN algorithm readiness** | **~92%** (code ~98%) | WMATH-MED-015/016 fixed; hardware QA still required |
-| **Mathematical robustness** | **~92%** | Sanitization, finite checks, caps on ascent rate and depth; time-weighted average well defined |
-| **Safety algorithm confidence** | **~90%** | Depth 35/38/40 m, ascent bands, alarms, stale-depth watchdog; auto-start sample path corrected |
-| **TestFlight (algorithm)** | **Ready with caveats** | Prior HIGH blockers addressed; validate on Ultra hardware |
-| **App Store (algorithm)** | **Ready with caveats** | Non-certified positioning preserved; physical validation mandatory |
+### Readiness Scores
 
-### Critical blockers (algorithm)
+| Dimension | Estimate | Notes |
+|---|---:|---|
+| Watch MAIN algorithm readiness | 90% | Strong validated pipeline, lifecycle debounce, time-weighted average, TTV/index, haptics and sync guards. One high lifecycle persistence issue remains. |
+| Mathematical robustness | 92% | Finite guards, plausible bounds, 350 m hard cap, temperature bounds, monotonic elapsed clock, centralized unit conversions. |
+| Safety algorithm confidence | 88% | Depth 35/38/40 m safety state, ascent-rate zones, haptic throttles and stale-depth banners are present; physical underwater QA still required. |
+| Runtime/timer confidence | 91% | Runtime and stopwatch use elapsed clocks rather than simple counters; wall-clock skew is bounded. |
+| Sync/export numerical confidence | 89% | Session validator, HMAC payloads, export-empty rejection and 40-log policy are present; invalid persisted queue/session filtering still deserves hardening. |
+| Test coverage confidence | 88% | Watch algorithm tests cover many core paths; missing tests remain around finalization interruption, frozen-surface simulation and haptic delayed pulses. |
 
-**None at CRITICAL severity** for a non-certified companion app with existing disclaimers.
+### Critical Blockers
 
-### TestFlight algorithm blockers
+No CRITICAL mathematical blocker was found for a non-certified informational companion app.
+
+### Highest Priority Blocker
 
 | ID | Severity | Topic |
-|----|----------|--------|
-| — | Process | Apple Watch Ultra underwater CoreMotion + GPS + WC sync not replaceable by simulator |
+|---|---|---|
+| WATCHMATH-HIGH-001 | HIGH | Active dive draft can survive if the app is terminated during the 6-second exit GPS finalization window, allowing a finished dive to restore as active. |
 
-### App Store algorithm blockers
+### TestFlight Blockers
 
-- Same as TestFlight process blockers  
-- Marketing must not claim certified dive-computer / NDL / TTS behavior  
-- TTV must remain described as informational index (`avgDepth + runtimeMinutes`)
+- Fix or explicitly mitigate `WATCHMATH-HIGH-001`.
+- Run Watch algorithm tests on macOS/Xcode.
+- Validate CoreMotion depth entitlement behavior on Apple Watch Ultra hardware.
+- Validate GPS entry/exit capture on real device, including no-fix and fallback cases.
+- Validate Watch-to-iPhone sync with physical paired devices.
 
-### Quick answers (product rule)
+### App Store Blockers
 
-| Domain | Affected by algorithms? |
-|--------|-------------------------|
-| Depth sampling / display meaning | Core pipeline in `DiveManager` + `DepthSampleValidation` — **not** Mission Mode |
-| Ascent / alarms / haptics | **Independent** of Mission Mode |
-| GPS / sync / export | Metric storage internal; display may be imperial |
-| TTV | `DiveAlgorithm.ttvIndex` — **not** decompression |
+- Same TestFlight blockers above.
+- Maintain explicit "NOT A DIVE COMPUTER" positioning.
+- Keep TTV described as an informational index, not NDL/TTS/decompression guidance.
+- Complete physical underwater QA for depth sensor, ascent warning, stale sensor and haptic behavior.
 
----
+## B. Preflight and Files Inspected
 
-## B. Scope Confirmation
-
-### Phase 0 — Preflight
+### Branch and Repository
 
 | Check | Result |
-|-------|--------|
-| Branch | `main` |
-| `git status` | Clean @ audit time (`3154719`) |
+|---|---|
+| Current branch | `main` |
+| Local/remote divergence | `0 0` after fetch |
+| Working tree before report write | clean |
 | Watch target | `DIRDiving Watch App` |
-| Experimental excluded | Yes (`project.yml` lines 15–34) |
-| iOS | Inspected only for shared `DiveSession` / sync codec compatibility |
+| iOS scope | not audited except shared model/sync compatibility context |
 
-### Watch MAIN algorithm source map (core)
+### Experimental Exclusion
 
-| Layer | Primary files |
-|-------|----------------|
-| Configuration | `Utils/DiveAlgorithmConfiguration.swift` |
-| Pure math | `Utils/DiveAlgorithm.swift` (in same file as configuration) |
-| Validation | `Utils/DepthSampleValidation.swift` |
-| Lifecycle | `Utils/DiveLifecycleAlgorithm.swift` |
-| Depth safety | `Utils/DepthSafetyConfiguration.swift` |
-| Runtime clock | `Utils/MonotonicElapsedClock.swift` |
-| Orchestration | `Services/DiveManager.swift` |
-| Ascent limits | `Models/AscentRateLimits.swift`, `Models/AscentStatus.swift`, `Services/AscentRateSettingsStore.swift` |
-| Haptics | `Services/HapticService.swift`, `Services/AscentSafetyHapticCoordinator.swift`, `Services/DepthLimitHapticCoordinator.swift` |
-| GPS | `Services/GPSManager.swift`, `Utils/GPSFallbackPolicy.swift` |
-| Compass | `Services/CompassManager.swift`, `DiveAlgorithm.normalizedDegrees` |
-| Persistence | `Services/DiveLogStore.swift`, `Models/DiveSession.swift` |
-| Sync | `Services/WatchDiveSyncCodec.swift`, `Utils/DiveSessionMerge.swift`, `Utils/DiveSessionAlgorithmValidator.swift` |
-| Export | `Services/SubsurfaceExportService.swift` |
-| Units / display | `Utils/DIRUnitConversions.swift`, `Utils/DIRUnitPreference.swift`, `Utils/WatchDepthFormatting.swift`, `Utils/Formatters.swift` |
-| UI (displays math) | `Views/DiveLiveView.swift`, `Views/AscentGaugeView.swift`, `Views/DepthSafetyLiveViews.swift`, `Views/AlarmSettingsView.swift` |
+`project.yml` excludes the following from Watch MAIN:
+
+- `Models/ExplorationModels.swift`
+- `Models/BuddyAssistMessage.swift`
+- `Models/BuddyPairingHandshake.swift`
+- `Services/ExplorationStore.swift`
+- `Services/BuddyAssistService.swift`
+- `Services/BuddyAssistPeripheralService.swift`
+- `Services/BuddyPairingKeyAgreement.swift`
+- `Services/SecureBuddyStore.swift`
+- `Views/ApneaView.swift`
+- `Views/SnorkelingView.swift`
+- `Views/BuddyAssistView.swift`
+- `Views/ExperimentalConceptsView.swift`
+- `Utils/ExperimentalFeatures.swift`
+
+### Primary Files Inspected
+
+| Family | Files |
+|---|---|
+| Depth sensor and lifecycle | `Services/DiveManager.swift`, `Services/DepthSensorProvider.swift`, `Services/AppleDepthSensorProvider.swift`, `Services/MockDepthSensorProvider.swift`, `Services/SensorProviderFactory.swift`, `Utils/DepthSampleValidation.swift`, `Utils/DiveLifecycleAlgorithm.swift`, `Utils/DiveDepthMeasurementIngestion.swift`, `Utils/DiveAlgorithmConfiguration.swift` |
+| Runtime/timers | `Services/DiveManager.swift`, `Utils/MonotonicElapsedClock.swift` |
+| Depth statistics and TTV | `Utils/DiveAlgorithmConfiguration.swift`, `Models/DiveSample.swift`, `Models/DiveSession.swift`, `Utils/DiveSessionAlgorithmValidator.swift`, `Utils/DiveSessionMerge.swift` |
+| Ascent rate and gauge | `Models/AscentRateLimits.swift`, `Models/AscentStatus.swift`, `Services/AscentRateSettingsStore.swift`, `Views/AscentGaugeView.swift`, `Views/AscentWarningView.swift`, `Views/AscentWarningBannerView.swift` |
+| Alarms and haptics | `Services/HapticService.swift`, `Services/AscentSafetyHapticCoordinator.swift`, `Services/DepthLimitHapticCoordinator.swift`, `Views/AlarmSettingsView.swift`, `Views/DepthSafetyLiveViews.swift` |
+| GPS | `Services/GPSManager.swift`, `Utils/GPSFallbackPolicy.swift`, `Utils/GPSConfirmationPresentation.swift`, `Models/GPSPoint.swift` |
+| Compass/BUSSOLA | `Services/CompassManager.swift`, `Views/CompassView.swift` |
+| Units/formatting | `Utils/DIRUnitPreference.swift`, `Utils/DIRUnitConversions.swift`, `Utils/WatchDepthFormatting.swift`, `Utils/Formatters.swift` |
+| Logbook/export/sync | `Services/DiveLogStore.swift`, `Services/SubsurfaceExportService.swift`, `Services/WatchDiveSyncCodec.swift`, `Services/WatchSyncService.swift`, `Services/WatchSyncAuth.swift`, `Utils/DiveLogbookPolicy.swift`, `Utils/DiveSessionPersistenceClass.swift` |
+| Settings/shortcuts | `Views/SettingsView.swift`, `Views/AscentRateSettingsView.swift`, `Services/ActionButtonIntents.swift` |
 | Tests | `Tests/WatchAlgorithmTests/*.swift` |
 
-**Mission Mode** (`Utils/MissionModeRuntimeProfile.swift`, `DiveManager` lifecycle flags): **excluded from algorithm inventory** — verified UI/runtime only; does not alter formulas (see Mission Mode UX audit).
+## C. Algorithm Inventory
 
----
+### 1. Depth Sensor and Underwater State Algorithms
 
-## C. Algorithm Inventory (by family)
+| Type/function | Inputs | Outputs | Units | Assumptions | Persistence/UI/safety |
+|---|---|---|---|---|---|
+| `AppleDepthSensorProvider` | `CMWaterSubmersionMeasurement.depth`, `CMWaterTemperature` | depth measurement, temperature, submersion state | meters, Celsius | Apple API depth is converted to meters; timestamp is receipt `Date()` | feeds `DiveManager`; requires Apple underwater entitlement/hardware |
+| `MockDepthSensorProvider` | timer | repeated 0 m, 20 C | meters, Celsius | simulation only | useful without entitlement, but exact repeated zero interacts with frozen detector |
+| `DepthSampleValidationState.validate` | raw depth, timestamp, receivedAt, temp | `ValidatedDepthSample` with validity | meters, Celsius | finite depths; negative finite clamped to zero; max plausible 350 m | prevents invalid depth poisoning live metrics, logs and export |
+| `DiveAlgorithm.sanitizedDepthMeters` | optional depth | finite nonnegative depth or nil | meters | rejects NaN/infinity and >350 m | reused by samples/session validation/export |
+| `DiveAlgorithm.sanitizedTemperatureCelsius` | optional temp | temp or nil | Celsius | valid water temp -2...40 C | prevents implausible temp pollution |
+| `DiveManager.evaluateDepthCallbackFreshness` | last accepted sample age | stale flags | seconds | silence >8 s is stale when depth automation active | UI stale banner and alarm suppression |
 
-### 1. Depth sensor / underwater state
+### 2. Dive Lifecycle Algorithms
 
-| Symbol | File | Inputs | Outputs | Units | Thresholds / assumptions |
-|--------|------|--------|---------|-------|---------------------------|
-| `sanitizedDepthMeters` | `DiveAlgorithm` | Raw depth | m or nil | m | ≥0, ≤350, finite |
-| `DepthSampleValidationState.validate` | `DepthSampleValidation.swift` | Raw depth, timestamps | `ValidatedDepthSample` | m, s | Stale ±8s skew; frozen 30s @ 0.001m; spike 90 m/min |
-| `processDepthMeasurement` | `DiveManager` | CoreMotion depth (m), temp | Live depth, samples | m, °C | Uses entitlement `CMWaterSubmersionManager` |
-| Submersion delegate | `DiveManager` | `CMWaterSubmersionEvent` | Manual/auto lifecycle hints | — | Submerged clears manual-only surface end block |
+| Type/function | Inputs | Outputs | Thresholds | Notes |
+|---|---|---|---|---|
+| `DiveLifecycleAlgorithm.evaluateStart` | valid depth samples | `.startDive` | depth >1.0 m, 2 samples | prevents one-sample accidental start |
+| `DiveLifecycleAlgorithm.evaluateStop` | valid shallow sample | `.endDive` candidate | <=0.3 m | dwell-based end |
+| `shouldEndAtSurface` | current depth and candidate date | Bool | <=0.3 m for 8 s | avoids shallow oscillation start/stop loops |
+| `DiveManager.beginDiveIfNeeded` | manual/auto event | active dive state | one active dive only | captures entry GPS, resets metrics, starts runtime |
+| `DiveManager.endDiveIfNeeded` | manual/auto end | finalization path | GPS capture 6 s | records exit GPS, finalizes log |
 
-**Persistence:** Samples in memory + `ActiveDiveDraft` JSON.  
-**Safety:** High — gates all dive math.
+### 3. Time, Runtime and Stopwatch Algorithms
 
-### 2. Dive lifecycle
+| Type/function | Inputs | Outputs | Robustness |
+|---|---|---|---|
+| `MonotonicElapsedClock.elapsed` | wall clock, system uptime | nondecreasing elapsed seconds | rejects large forward wall-clock skew and backward clock movement |
+| `DiveManager.updateRuntimeFromClock` | active session anchor | runtime, TTV | uses clock elapsed, not `+= 1` counters |
+| `DiveManager.startStopwatch/stopStopwatch/resetStopwatch` | user/App Intent actions | stopwatch state | persists accumulated time, startedAt and running flag |
+| `Formatters.time` | TimeInterval | `MM:SS` or `HH:MM:SS` | integer truncation, nonnegative handled by callers |
 
-| Symbol | File | Behavior |
-|--------|------|----------|
-| `DiveLifecycleAlgorithm.evaluate` | `DiveLifecycleAlgorithm.swift` | Start: depth > **1.0 m**, **2** consecutive samples; stop: ≤ **0.3 m** for **8 s** dwell |
-| `beginDiveIfNeeded` / `endDiveIfNeeded` | `DiveManager.swift` | Guards duplicate start (`!isDiveActive`, `!isFinalizingDive`); GPS 6s best-effort capture |
-| Manual lifecycle | `DiveManager` | `startManualDive`; auto-end blocked until submersion observed if manual |
+### 4. Depth Statistics Algorithms
 
-**Assumptions:** Validated samples only; manual no-depth when sensor unavailable (`isManualNoDepthSession`).
+| Algorithm | Formula/behavior | Stored/displayed fields |
+|---|---|---|
+| Current depth | latest accepted validated sample | `currentDepthMeters` |
+| Max depth | max accepted sample depth | `maxDepthMeters`, log max, export samples |
+| Average depth | time-weighted integration over sorted sanitized samples; tail to end date if supplied | live `averageDepthMeters`, final `avgDepthMeters`, TTV input |
+| Temperature summary | arithmetic over valid sample temperatures | avg/min/max water temp |
+| Invalid samples | rejected before sample list | not stored/exported/synced |
 
-### 3. Time / runtime / stopwatch
+### 5. Ascent-Rate Algorithms
 
-| Symbol | File | Behavior |
-|--------|------|----------|
-| `MonotonicElapsedClock.elapsed` | `MonotonicElapsedClock.swift` | Blends wall clock + `systemUptime`; forward skew cap 120s; non-decreasing |
-| `updateRuntimeFromClock` | `DiveManager` | 1 Hz timer; updates `runtime`, `ttv`, alarms |
-| Stopwatch | `DiveManager` | Separate `stopwatchClock`; persisted UserDefaults |
+| Algorithm | Inputs | Output | Rule |
+|---|---|---|---|
+| `DiveAlgorithm.ascentRateMetersPerMinute` | accepted sample window | ascent rate m/min | positive ascent only; descent/stationary -> 0; 5 s rolling window; minimum 1 s delta; capped at 90 m/min |
+| `AscentRateLimits.limit(for:)` | depth | allowed m/min | >40 -> conservative 1; 40/30 upper-band inclusive; 20/6 boundaries as documented |
+| `AscentStatus.zone` | current rate and depth limit | green/yellow/red | green <=70% limit; yellow <=100%; red >limit |
+| `AscentGaugeView` | `AscentStatus` | visual gauge | displays in metric or imperial while internal math stays metric |
 
-### 4. Depth statistics
+### 6. Alarm and Haptic Algorithms
 
-| Symbol | Formula | Notes |
-|--------|---------|-------|
-| `timeWeightedAverageDepth` | Σ(depth×Δt)/ΣΔt | Tail to `endDate` on finalize; empty→0 |
-| `maxDepthMeters` | max(samples) | Live + session |
-| `currentDepthMeters` | Last accepted sample | Stale flag if no callback >8s |
+| Component | Logic | Throttle |
+|---|---|---|
+| Ascent alarm | red zone triggers inline banner, blink and ascent haptic coordinator | repeat interval 1.75 s |
+| Depth alarm | optional custom depth alarm if max depth is `>` threshold and not exceeded safety range | general alarm throttle 30 s |
+| Runtime alarm | optional runtime alarm if runtime is `>` threshold minutes | general alarm throttle 30 s |
+| Battery alarm | enabled by default, warns below configured percent | general alarm throttle 30 s |
+| Depth-limit haptics | state-based caution/critical/exceeded haptics | 30/15/10 s by severity |
+| Acknowledge | hides alarm warning and suppresses general alarm for 15 s | visual + haptic |
 
-### 5. Ascent rate
+### 7. Depth Safety Algorithms
 
-| Symbol | Formula | Notes |
-|--------|---------|-------|
-| `ascentRateMetersPerMinute` | max(0, (refDepth−currentDepth)/Δt×60) | 5s window; min Δt **1s**; cap **90 m/min**; **descent → 0** |
-| `AscentRateLimits.limit(for:)` | Depth bands | 40–30:10; 30–20:5; 20–6:3; 0–6:1; >40: min(surface,fallback) |
+| State | Boundary | Behavior |
+|---|---:|---|
+| Normal | <35 m | normal display |
+| Caution | >=35 m and <38 m | yellow warning |
+| Critical | >=38 m and <40 m | orange warning |
+| Exceeded | >=40 m | red warning, persisted `exceededSupportedDepthRange`, suppresses positive depth reinforcement |
 
-### 6. Ascent gauge / zones
+### 8. TTV / Live Metric Algorithm
 
-| Symbol | Behavior |
-|--------|----------|
-| `AscentStatus.zone` | Green ≤70% limit; yellow ≤100%; red > limit |
-| `AscentGaugeView.pointerOffset` | rate/limit clamped 0…1 |
-| Display | Imperial via `DIRUnitPreference.ascentRateDisplay` |
+Current Watch MAIN semantics are explicit and consistent:
 
-### 7. Alarms
+```text
+TTV/index = timeWeightedAverageDepthMeters + runtimeMinutes
+```
 
-| Alarm | Default (UI / engine) | Threshold | Cooldown |
-|-------|----------------------|-------------|----------|
-| Ascent | ON / ON | Zone red + `ascentAlarmEnabled` | Haptic repeat **1.75s** |
-| Depth | OFF / OFF | max depth > stored m (default **40**) | 30s between triggers |
-| Runtime | OFF / OFF | runtime > stored min (default **30**) | 30s |
-| Battery | ON / ON | level < stored % (default **20**) | 30s |
-| Acknowledge | — | Suppresses new alarms **15s** | — |
-| Blink | — | 0.45s timer; sources: ascent/depth/runtime/battery | Independent sets |
+This is not NDL, TTS, decompression time or a certified dive-computer metric. It is persisted in `DiveSession.ttv`, recomputed in `DiveSessionMerge.preferred`, and shown in live and settings copy as an informational index.
 
-### 8. Depth safety limits
+### 9. Compass / Bearing Algorithms
 
-| Depth (m) | State |
-|-----------|--------|
-| < 35 | normal |
-| ≥ 35 | caution |
-| ≥ 38 | critical |
-| ≥ 40 | exceeded |
+| Component | Behavior |
+---|---|
+| Heading source | true heading if available, magnetic fallback otherwise |
+| Normalization | `DiveAlgorithm.normalizedDegrees`, range `0..<360` |
+| Bearing set | stores normalized current heading |
+| Bearing delta | signed wraparound delta in `[-180, 180]` |
+| Terminology | UI uses BUSSOLA, no COMPASSO regression found in inspected Watch MAIN files |
 
-Haptics: caution 30s; critical 15s; exceeded 10s (`DepthLimitHapticCoordinator`).  
-`exceeded` suppresses positive depth reinforcement in UI (`DepthSafetyState.suppressesPositiveDepthReinforcement`).
+### 10. GPS Algorithms
 
-### 9. TTV / live metric
+| Component | Behavior |
+---|---|
+| `GPSFallbackPolicy` | accepts structurally valid point only if age <=300 s and accuracy <=50 m |
+| `GPSManager.currentBestPoint` | returns usable fallback only and records quality |
+| `captureBestEffortPoint` | starts updates, completes previous capture before replacement, waits up to 60 s clamped |
+| Entry/exit source | `.fix`, `.fallback`, `.noFix` persisted and displayed |
+| UI banner | green for fix, yellow for fallback, red for no fix |
 
-| Symbol | Formula |
-|--------|---------|
-| `ttvIndex` | `max(0, avgDepthM) + max(0, durationSeconds/60)` |
+### 11. Unit Conversion and Formatting
 
-**Semantics:** Informational load index — **not** NDL/TTS/deco. Live `ttv` recomputed each second from live average + runtime.
+| Unit | Conversion |
+---|---|
+| meters <-> feet | `3.280839895` feet/m |
+| Celsius <-> Fahrenheit | standard formula |
+| bar <-> psi | `14.5037738` psi/bar |
+| m/min <-> ft/min | uses meters/feet conversion |
 
-### 10. Compass / bearing
+Internal storage remains metric. Export remains metric by design.
 
-| Symbol | Behavior |
-|--------|----------|
-| Heading | `trueHeading` if ≥0 else `magneticHeading`; normalized 0…360 |
-| `setBearing` | Stores normalized heading as bearing |
-| Cardinal | 8-point from heading+22.5° |
+### 12. Export, Sync and Persistence
 
-### 11. GPS entry/exit
-
-| Symbol | Behavior |
-|--------|----------|
-| `GPSFallbackPolicy.assess` | Age ≤300s; accuracy ≤50m; valid lat/lon |
-| Capture | 6s best-effort window; fix vs fallback vs noFix sources |
-| UI | `.fix` green; `.fallback` yellow; `.noFix` **red** (`DiveLiveView` + `GPSConfirmationPresentation`) |
-
-### 12. Unit conversion / formatting
-
-| API | Storage | Display |
-|-----|---------|---------|
-| `DIRUnitConversions` | — | m↔ft, °C↔°F, m/min↔ft/min |
-| `WatchDepthFormatting` | meters | `Formatters.one` + unit label |
-| Export CSV | **meters** | `%.2f` depth, `%.1f` temp |
-
-### 13. Haptic timing
-
-| Service | Throttle |
-|---------|----------|
-| `warnIfNeeded` | 2s |
-| Ascent repeat | 1.75s |
-| Depth limit | 30/15/10s by state |
-| Buddy pulses | 8s / 12s (not Watch MAIN dive path) |
-
-### 14–16. Export / sync / persistence
-
-| Path | Behavior |
-|------|----------|
-| `finalizeDive` | Recomputes avg/max/ttv from sanitized samples |
-| `SubsurfaceExportService` | `time_seconds` = sample−`startDate`; requires non-empty exportable samples |
-| `WatchDiveSyncCodec` | Validates session; max 20k samples, 350m, signed payload |
-| `DiveSessionPersistenceClass` | Manual no-depth: sync allowed, export disabled (policy) |
-| Draft restore | 12h expiration; restores samples + `applyMissionMode` (UI only) |
-
----
+| Family | Behavior |
+---|---|
+| Logbook persistence | JSON in documents with `.atomic` and complete file protection |
+| Log cap | newest 40 sessions after local/cloud merge and tombstone filtering |
+| Export | CSV rejects empty sample profile, sorts/sanitizes samples, writes protected temp file with opaque UUID name |
+| Sync payload | HMAC, schema version, bundle check, issued-at skew, 512 KB payload cap, validator before sending/parsing |
+| Tombstones | delete IDs persisted locally and via cloud key |
 
 ## D. Findings by Family
 
-### Resolved HIGH (verified in code @ `3154719`)
+### WATCHMATH-HIGH-001 - Active dive draft can restore after termination during exit GPS finalization
 
-| ID | Title | Status | Evidence |
-|----|-------|--------|----------|
-| WMATH-HIGH-001 | Depth callback silence watchdog | **Fixed** | `evaluateDepthCallbackFreshness()` in `updateRuntimeFromClock`; `isDepthDataStale`, `depthStaleBanner` |
-| WMATH-HIGH-002 | GPS no-fix green success | **Fixed** | `gpsConfirmationColor`: `.noFix` → `DiveUI.red`; localized no-fix titles |
-| WMATH-HIGH-003 | Manual/no-depth sync rejection | **Fixed** | `DiveSession.isManual` + `hasDepthProfile`; validator allows empty samples when manual; `WatchReadinessAlgorithmTests` |
+**Family:** Dive lifecycle, persistence, GPS finalization
+**File/function:** `Services/DiveManager.swift`, `endDiveIfNeeded`, `finalizeDive`, `persistActiveDiveDraft`, `restoreActiveDiveDraftIfAvailable`
+**Severity:** HIGH
+**Priority:** Must fix before internal/external TestFlight
+**Estimated code impact:** small functional
 
-### Open / new findings
+**User impact:** If the app is terminated after `endDiveIfNeeded` starts but before the 6-second exit GPS capture completes, the final session may not be saved and the previous active-dive draft can still exist on disk. On next launch, `restoreActiveDiveDraftIfAvailable` can restore that already-ended dive as active.
 
-| ID | Sev | Family | Location | Title | Safety | Proposed fix | Impact |
-|----|-----|--------|----------|-------|--------|--------------|--------|
-| WMATH-MED-015 | MED | Depth pipeline | `DiveManager.processDepthMeasurement` | ~~Duplicate `addSample` on auto dive start~~ | **Fixed 2026-06-01** — `DiveDepthMeasurementIngestion` guard | — |
-| WMATH-LOW-016 | LOW | Depth input | `resolvedTemperatureForDepthSample` | ~~Temperature freshness vs wall clock~~ | **Fixed 2026-06-01** — compare depth timestamp to last temp reading | — |
-| WMATH-LOW-017 | LOW | Ascent UI | `AscentGaugeView` | Gauge keeps SwiftUI animation when Mission Mode disables Live animations | None | INFO — gauge animation independent by design | UI-only |
-| WMATH-INFO-018 | INFO | Mission Mode | `DiveLiveView` | Mission Mode disables blink/banner **animations** only | Low visual | Documented in UX audit; optional keep blink animation when alarms active | UI-only |
-| WMATH-INFO-019 | INFO | Product | TTV copy | TTV is not deco | N/A | Maintain disclaimers in legal/README | Copy-only |
-| WMATH-INFO-020 | INFO | Ascent bands | `AscentRateLimits` | At exactly 40.0 m, limit 10 m/min; >40 uses 1 m/min | By design | Document boundary table (already in code comments) | INFO |
+**Safety impact:** Medium. It can mislead the user into seeing a stale active dive or duplicate/incorrect log lifecycle state. It does not change depth math directly, but it affects runtime/log trust.
 
-No **CRITICAL** or unfixed **HIGH** algorithm issues identified in static review.
+**Mathematical explanation:** `endDiveIfNeeded` captures `end = Date()`, sets `isDiveActive = false`, clears in-memory session state, then waits for `gpsManager.captureBestEffortPoint(for: 6)` before calling `finalizeDive`, where `clearActiveDiveDraft()` is finally executed. If process termination occurs in that window, the active-dive draft remains valid for up to 12 hours.
 
----
+**Proposed solution:** Persist an explicit finalizing state, or clear/convert the active draft before the asynchronous GPS wait and finalize with the best available exit GPS immediately, updating exit GPS later only if safe. Add tests that simulate termination during finalization and verify no active dive restores.
 
-## E. Phase Reports (PASS/FAIL)
+### WATCHMATH-MED-002 - Frozen-depth detection can create false warnings for exact stable surface/simulator readings
 
-### Phase 2 — Depth sensor / underwater (PASS)
+**Family:** Depth sensor / simulator fallback
+**File/function:** `Utils/DepthSampleValidation.swift`, `Services/MockDepthSensorProvider.swift`, `Services/DiveManager.processDepthMeasurement`
+**Severity:** MEDIUM
+**Priority:** Must fix before broad TestFlight if simulation mode is used by testers
+**Estimated code impact:** small functional
 
-| Check | Result |
-|-------|--------|
-| Units from API | `measurement.depth?.converted(to: .meters)` |
-| Sign | Negative raw clamped to 0 in validation |
-| nil/NaN/out of range | Rejected with validity enum |
-| Simulator / manual | `isDepthAutomationAvailable`; manual no-depth session |
-| Start/stop thresholds | 1.0 m ×2 samples; 0.3 m ×8 s |
+**User impact:** The default simulation provider emits exact `0 m` every second. After 30 seconds, the frozen-depth detector can classify the stream as `.frozen`, causing a "sensor stopped" style error while the user is simply waiting at the surface.
 
-**Risk:** MED-015 spurious error on first callback after start.
+**Safety impact:** Low to medium. On real sensors, noise usually prevents exact 0.001 m equality for 30 seconds, but a very stable sensor or simulator can trigger a false stale/frozen warning.
 
-### Phase 3 — Dive lifecycle (PASS)
+**Mathematical explanation:** Frozen detection uses a 0.001 m tolerance and a 30 s window. This is mathematically useful for a stuck sensor but too strict for exact simulated zero and possibly for long flat stable depth.
 
-Duplicate session prevented; `isFinalizingDive` gate; draft restore; submersion unblocks manual auto-end.
+**Proposed solution:** Gate frozen detection by source/state, suppress it for inactive surface simulation, or require active sensor-owned dive plus additional evidence before showing user-facing frozen warnings. Add pre-dive simulation and stable-depth tests.
 
-### Phase 4 — Time / runtime / stopwatch (PASS)
+### WATCHMATH-MED-003 - Invalid legacy sessions can remain visible after load even if export/sync validators reject them later
 
-Monotonic clock tested; 1s runtime timer; stopwatch independent.
+**Family:** Persistence / replay consistency
+**File/function:** `Services/DiveLogStore.swift`, `Utils/DiveLogbookPolicy.swift`, `Utils/DiveSessionPersistenceClass.swift`
+**Severity:** MEDIUM
+**Priority:** Must fix before external TestFlight
+**Estimated code impact:** small functional
 
-### Phase 5 — Depth statistics (PASS)
+**User impact:** Locally persisted legacy/corrupted sessions are normalized and capped during load, but the load path does not explicitly filter every session through `DiveSessionPersistenceClass.classify`. Invalid sessions can be visible in the log until export/sync paths reject them.
 
-Time-weighted average matches tests; finalize uses same `DiveAlgorithm` paths as live.
+**Safety impact:** Low. This affects logbook trust and export consistency more than live safety.
 
-### Phase 6 — Ascent rate / gauge (PASS)
+**Mathematical explanation:** `add` validates through persistence classification, but `loadLocalSessions` maps decoded sessions through `DiveSessionMerge.preferred` and then policy-normalizes. Some invalid no-sample or inconsistent metadata shapes can survive display while later validators classify them invalid.
 
-Positive ascent only; imperial display via preference; zone boundaries unit-tested.
+**Proposed solution:** Filter or quarantine invalid sessions during load/reload, set `loadErrorMessage`, and add tests for corrupted persisted JSON sessions.
 
-### Phase 7 — Alarm logic (PASS)
+### WATCHMATH-LOW-004 - Delayed depth-limit secondary haptics can fire after state changes
 
-Defaults: ascent/battery ON in UI; depth/runtime OFF — matches engine nil-coalescing for ascent/battery. Settings keys used in `DiveManager`.
+**Family:** Haptic timing / depth safety
+**File/function:** `Services/DepthLimitHapticCoordinator.swift`, `playHaptic` delayed closures
+**Severity:** LOW
+**Priority:** Must fix before App Store polish
+**Estimated code impact:** small functional
 
-### Phase 8 — Depth safety (PASS)
+**User impact:** On first transition to critical/exceeded, a secondary delayed haptic can play after 0.25-0.35 s. The delayed closure checks whether haptics are enabled, but not whether the depth safety state is still the same.
 
-35/38/40 thresholds tested; exceeded flag persisted on session; max depth cards hidden when exceeded (UI policy).
+**Safety impact:** Low. This can produce an extra warning pulse after the condition has already cleared.
 
-### Phase 9 — TTV (PASS)
+**Mathematical explanation:** The haptic schedule is time-based but not token/state-bound. Rapid threshold crossing and immediate return can leave a pending delayed pulse.
 
-Formula consistent live and finalize; not presented as NDL in algorithm layer.
+**Proposed solution:** Store a state token or transition generation and verify it before playing delayed pulses. Add tests for rapid 38 m/40 m threshold crossing and return.
 
-### Phase 10 — Compass (PASS)
+### WATCHMATH-LOW-005 - `DiveAlgorithmSelfCheck` has stale ascent-limit expectation
 
-Normalization and bearing delta in `DiveAlgorithm`; true heading preferred.
+**Family:** Internal self-check / maintainability
+**File/function:** `Utils/DiveAlgorithmSelfCheck.swift`, `ascentLimitFailures`
+**Severity:** LOW
+**Priority:** Must fix before App Store or remove from build surface
+**Estimated code impact:** copy-only or small functional
 
-### Phase 11 — GPS (PASS)
+**User impact:** None in normal app flow because this helper is not user-facing.
 
-No-fix red; fallback yellow; 6s capture; coordinates validated before store.
+**Safety impact:** Low. A developer running the helper can receive a false failure because it expects `45 m -> 10 m/min`, while current release-hard logic and tests use conservative `>40 m -> 1 m/min`.
 
-### Phase 12 — Units (PASS)
+**Mathematical explanation:** `AscentRateLimits.standard.limit(for: 45)` returns 1 m/min by design, but the self-check still expects 10.
 
-Internal metric; Live/Log/Gauge use `DIRUnitPreference`; export metric by design.
+**Proposed solution:** Update the self-check expected case to match `DiveAlgorithmTests.testAscentLimitBandsAndZoneBoundaries`, or remove the helper if XCTest is the canonical validation path.
 
-### Phase 13 — Haptics (PASS)
+### WATCHMATH-INFO-006 - Alarm exact-boundary behavior uses strict greater-than
 
-Global toggle respected; ascent repeat decoupled from generic warn throttle; depth coordinator re-checks preference on delayed pulses.
+**Family:** Alarm logic
+**File/function:** `Services/DiveManager.evaluateDepthAlarm`, `evaluateRuntimeAlarms`
+**Severity:** INFO
+**Priority:** Document and test
+**Estimated code impact:** tests/copy-only unless product wants `>=`
 
-### Phase 14 — Export / sync (PASS)
+**User impact:** Depth and runtime alarms trigger above the configured threshold, not exactly at it.
 
-CSV uses sanitized samples; sync validator aligned with manual no-depth policy; merge recomputes ttv/avg.
+**Safety impact:** Low if this is intentional, because labels use `>` semantics.
 
----
+**Mathematical explanation:** `maxDepthMeters > threshold` and `runtime > threshold * 60` are strict comparisons. This is mathematically consistent with current message copy, but boundary tests should lock it.
 
-## F. Edge Case Matrix (selected)
+**Proposed solution:** Add explicit tests for threshold exactly reached, just below, and just above. Change only if product wants inclusive threshold semantics.
 
-| Edge case | Expected (code) | Tested? |
-|-----------|-----------------|---------|
-| depth nil | Reject `.missing` | Unit yes |
-| depth NaN | `.nonFinite` | Unit yes |
-| depth < 0 | Clamped to 0 | Unit yes |
-| start 0.9 m | No start | Unit yes |
-| start 1.1 m ×2 | Start dive | Unit yes |
-| spike 10→30 in 1s | `.spikeRejected` | Unit yes |
-| frozen 30s | `.frozen` | Unit yes |
-| sensor silent 8s+ active dive | Stale banner | Unit threshold; runtime manual QA |
-| auto start double addSample | 2nd rejected | **Not tested** — MED-015 |
-| TTV at 0 depth | avg+0 | Partial |
-| ascent descent | rate 0 | Unit yes |
-| GPS no fix | Red banner | Unit presentation |
-| manual no-depth sync | Allowed | `WatchReadinessAlgorithmTests` |
-| draft >12h | Discarded | Code only |
-| Mission Mode on | Math unchanged | UX audit |
+### WATCHMATH-INFO-007 - Mission Mode is correctly non-mathematical
 
----
-
-## G. Unit / Integration Test Plan (add — audit does not implement)
-
-| Priority | Test | Input | Expected |
-|----------|------|-------|----------|
-| P0 | Auto-start single sample | One valid start sample after lifecycle | Exactly **1** sample in array; no error message |
-| P0 | Stale depth 8s | Active dive, no callbacks | `isDepthDataStale == true` |
-| P1 | Runtime monotonic | Clock skew simulation | Non-decreasing runtime |
-| P1 | finalize vs live TTV | End dive | Session TTV == formula(avg, duration) |
-| P1 | GPS presentation | nil/fix/fallback | Colors map fix/fallback/noFix |
-| P2 | Alarm threshold boundary | depth 40.0 vs 40.01 | Alarm only when enabled and >threshold |
-| P2 | Sync round-trip | Manual no-depth session | Codec encode/decode succeeds |
-| P2 | Export time_seconds | Known samples | Seconds from startDate |
-
-Existing coverage: `DiveAlgorithmTests`, `WatchReadinessAlgorithmTests`, `MissionModeTests` (lifecycle only), `UserImageStorePolicyTests`.
-
----
-
-## H. Physical Watch Ultra Test Plan
-
-1. Automatic dive start at ~1–2 m — verify runtime, TTV, samples in log.  
-2. Surface 8+ s — auto end; exit GPS banner color truthful.  
-3. Fast ascent — red zone, inline banner, haptic cadence ~1.75s (haptics ON).  
-4. Depth 35/38/40 m — caution/critical/exceeded visuals + depth haptics.  
-5. Kill app mid-dive — draft restore; depth/TDV continuity.  
-6. Manual start on simulator/no sensor — no-depth session; sync to iPhone.  
-7. Imperial mode — Live depth ft, gauge ft/min, export still metric.  
-8. Mission Mode ON — confirm depth/ascent/GPS unchanged (UX audit).  
-9. Background 2+ min — runtime monotonic; stale depth if callbacks stop.
-
----
-
-## I. Underwater Validation Plan
-
-- Shallow pool: start/stop thresholds, ascent gauge stability.  
-- 30–40 m profile (if site permits): depth safety transitions only within supported API range; **not** certification.  
-- Compare max/avg depth vs reference device — informational only.  
-- GPS at surface entry/exit — expect no underwater fix.  
-- Document callback rate vs battery.
-
----
-
-## J. Prioritized Roadmap
-
-### 1. Must fix before compile/use
-
-None identified (project builds).
-
-### 2. Must fix before internal TestFlight
-
-- ~~WMATH-MED-015~~ fixed (see remediation update)
-
-### 3. Must fix before external TestFlight
-
-- Complete Ultra test plan §H  
-- Confirm stale-depth banner underwater
-
-### 4. Must fix before App Store
-
-- Evidence log for HIGH fixes + manual/no-depth sync  
-- Legal copy for TTV and depth limits unchanged
-
-### 5. Post-release
-
-- ~~WMATH-LOW-016~~ fixed — temperature freshness vs depth sample time  
-- Integration tests for `DiveManager` orchestration  
-- Optional Mission Mode: preserve alarm blink animation (UX)
-
----
-
-## K. Final Verdict
-
-| Question | Answer |
-|----------|--------|
-| **Mathematically ready?** | **Yes** for defined non-certified semantics, ~88–90% static confidence |
-| **Safe enough for internal test?** | **Yes**, after fixing or accepting MED-015 and completing device QA |
-| **Ready for TestFlight?** | **Yes with caveats** (hardware + MED-015) |
-| **Ready for App Store?** | **Yes with caveats** (physical validation + copy discipline) |
-| **Blocks 100% algorithmic readiness?** | Hardware QA; MED-015; broader `DiveManager` integration tests; entitlement-dependent depth on real water |
-
-### Domain checklist
-
-| Domain | Affected by Mission Mode? | Algorithm verdict |
-|--------|----------------------------|-------------------|
-| Depth sampling/display | No | PASS |
-| Ascent/alarms/haptics | No | PASS |
-| GPS/logging/sync/export | No | PASS |
-| TTV semantics | No | PASS (informational index) |
-
----
-
-*End of audit. No source files were modified.*
+**Family:** Simulator/real-device behavior assumptions
+**File/function:** `Utils/MissionModeRuntimeProfile.swift`, `Services/DiveManager.swift`
+**Severity:** INFO
+**Priority:** Keep documented
+**Estimated code impact:** none
+
+Mission Mode only affects visual/decorative runtime profile flags and lifecycle activation source. Existing tests verify it does not alter TTV, average depth, depth safety thresholds or ascent-rate formulas.
+
+## E. Edge Case Matrix
+
+| Edge case | Expected behavior | Observed from code | Status |
+|---|---|---|---|
+| depth nil | reject sample as missing | `.missing` validity | covered |
+| depth NaN/infinity | reject | `.nonFinite` | covered |
+| depth <0 finite | clamp to 0 | `max(0, rawDepthMeters)` | covered |
+| depth 0 while inactive | no auto start | lifecycle stays `.none` | covered |
+| depth 0 repeated 30 s | no user-facing false error preferred | can become `.frozen` | finding |
+| depth 0.9 | no start | below >1.0 threshold | covered |
+| depth 1.1 once | no start | requires two samples | covered |
+| sustained >1.0 | start | `.startDive` after two samples | covered |
+| surface <=0.3 briefly | no end | dwell required | covered |
+| surface <=0.3 for 8 s | end | `.endDive` | covered |
+| app killed during active dive | restore draft | draft restore implemented | covered conceptually |
+| app killed during finalization | should not restore active dive | draft can survive | finding |
+| stable depth | ascent 0 | descent/stationary -> 0 | covered |
+| fast ascent | red zone | over-limit red | covered |
+| >40 m depth | exceeded safety and conservative ascent limit | state `.exceeded`, limit 1 if >40 | covered |
+| exactly 40 m | exceeded safety, ascent limit 10 | current convention | covered |
+| invalid temperature | rejected | temp sanitizer nil | covered |
+| GPS stale | no usable fallback | `GPSFallbackQuality.stale` | covered |
+| GPS poor accuracy | no usable fallback | `lowAccuracy` | covered |
+| empty export | rejected | nil CSV/write URL | covered |
+| invalid sync session | rejected | validator -> invalidSession | covered |
+| haptics disabled | no haptic playback | haptic guards exist | partially covered |
+| delayed haptic after condition clears | should not play stale pulse | state not rechecked | finding |
+| exact alarm threshold | product-dependent | strict `>` | needs explicit test |
+
+## F. Unit and Integration Test Plan
+
+| Priority | Feature | Input | Expected output | Pass/fail criteria |
+|---|---|---|---|---|
+| P1 | Finalization persistence | start dive, trigger end, terminate before GPS completion | no active draft restore; session finalized or safely pending | no phantom active dive on relaunch |
+| P1 | Active draft restore | app relaunch during active dive | active dive restores with samples and runtime | runtime, avg/max and samples consistent |
+| P2 | Stable surface simulation | 0 m every second for >30 s while inactive | no scary frozen sensor warning | pre-dive UI remains truthful |
+| P2 | Stable active depth | exact same valid depth for >30 s | policy-defined result | no false alarm if product suppresses frozen stable-depth |
+| P2 | Load corrupted session | invalid persisted JSON session | filtered/quarantined with load error | not exportable/syncable/visible as normal |
+| P2 | Depth alarm boundary | threshold, threshold +/- 0.1 | current strict `>` behavior locked | exact threshold does not fire unless product changes |
+| P2 | Runtime alarm boundary | threshold seconds, +1 second | current strict `>` behavior locked | no off-by-one ambiguity |
+| P2 | Depth haptic delayed pulse | cross 38/40 then immediately return normal | no stale delayed haptic after state clear | pulse token/state verified |
+| P2 | Haptics disabled under active ascent alarm | disable then re-enable | disabled suppresses; re-enable resumes only if still over limit | no duplicate haptic spam |
+| P2 | GPS entry/exit no fix | no location authorization/fix | `.noFix`, red banner, no crash | saved log has no invalid GPS |
+| P2 | GPS fallback | fresh accurate point, stale point, low-accuracy point | usable/stale/lowAccuracy | matches `GPSFallbackPolicy` |
+| P2 | Sync invalid payload | valid HMAC but corrupt session | parse rejects before log insertion | no invalid log |
+| P3 | Export sorted profile | out-of-order samples | sorted nonnegative elapsed seconds | CSV monotonic |
+| P3 | Unit conversions | metric/imperial round trips | values within tolerance | no display/storage mismatch |
+| P3 | Compass wraparound | 350 -> 10 and 10 -> 350 | +20 and -20 | signed delta correct |
+
+## G. Physical Watch Ultra Test Plan
+
+| Priority | Scenario | Expected result |
+|---|---|---|
+| P1 | Real Apple Watch Ultra depth entitlement present | `AppleDepthSensorProvider.isAvailable` true in automatic/apple mode | no simulation fallback |
+| P1 | No entitlement / unsupported device | simulation/manual fallback clearly shown | no misleading depth automation claim |
+| P1 | Real submersion start | automatic start only after sustained >1 m | no start at shallow splashes |
+| P1 | Real surfacing | end only after sustained <=0.3 m dwell | no rapid stop/start loop |
+| P1 | Long flat depth | no false frozen warning from normal sensor behavior | stable reading handled truthfully |
+| P1 | Fast ascent drill in controlled conditions | ascent banner + haptic fire | red warning, no full-screen takeover |
+| P2 | 35/38/40 m boundary simulation or controlled bench feed | caution/critical/exceeded states | correct visual and haptic cadence |
+| P2 | GPS start at surface | fix/fallback/no-fix banner truthful | entry GPS stored with correct source |
+| P2 | GPS exit at surface | fix/fallback/no-fix banner truthful | exit GPS stored with correct source |
+| P2 | Watch-to-iPhone sync | valid completed log syncs | no duplicates, ack handling correct |
+| P2 | Offline sync queue | dive completed while iPhone unavailable | pending queue persists and retries |
+
+## H. Underwater Validation Plan
+
+1. Dry-run all settings before water: units, haptics, alarms, ascent limits, legal/safety copy.
+2. Surface GPS fix test: wait for good fix, start/end manual no-depth log, verify stored entry/exit.
+3. Shallow water test below 1 m: verify no automatic dive start.
+4. Controlled descent past 1 m: verify auto start after two accepted samples.
+5. Stable-depth hold: verify no false frozen/stale warnings on real sensor.
+6. Slow ascent inside configured limits: verify green/yellow zones and no red haptics.
+7. Simulated rapid ascent or bench-fed rapid sample changes: verify red warning and haptics.
+8. Surface dwell: verify automatic end after dwell, no duplicate finalization.
+9. App interruption during active dive: relaunch and confirm draft restore.
+10. App interruption during finalization window: verify fixed behavior once `WATCHMATH-HIGH-001` is remediated.
+11. Sync completed log to iPhone: verify max/avg depth, runtime, TTV, GPS and samples match.
+
+## I. Prioritized Roadmap
+
+### 1. Must Fix Before Compile/Use
+
+No compile/use blocker was found by static inspection. Xcode build was not run on Windows.
+
+### 2. Must Fix Before Internal TestFlight
+
+1. `WATCHMATH-HIGH-001`: finalization-window draft restore risk.
+2. Run `xcodegen generate` and Watch algorithm tests on macOS.
+3. Validate AppleDepthSensorProvider availability on Watch Ultra with entitlement.
+
+### 3. Must Fix Before External TestFlight
+
+1. `WATCHMATH-MED-002`: frozen-depth false warning in simulation/stable zero path.
+2. `WATCHMATH-MED-003`: filter/quarantine invalid loaded legacy sessions.
+3. Add boundary tests for alarm strict `>` thresholds.
+4. Add state-token tests for delayed depth-limit haptics.
+
+### 4. Must Fix Before App Store
+
+1. Complete underwater physical validation plan.
+2. Complete paired Watch/iPhone sync validation on real devices.
+3. Update or remove stale `DiveAlgorithmSelfCheck`.
+4. Keep marketing and in-app copy clear that DIR DIVING is not a certified dive computer.
+
+### 5. Post-Release Improvements
+
+1. Add richer diagnostics for depth sensor unavailable/stale/frozen distinctions.
+2. Add export round-trip verification with external tools.
+3. Add optional debug telemetry for GPS fallback quality transitions.
+4. Add additional App Intent tests for hardware action workflows.
+
+## J. Final Verdict
+
+### Mathematically Ready?
+
+Mostly, but not 100%. Core formulas and validators are strong: validated depth pipeline, lifecycle debounce, time-weighted average depth, TTV/index, ascent-rate windows, safety states, unit conversions, export rejection and sync validation are all present. The finalization-window draft issue must be fixed before a full release-hard claim.
+
+### Safe Enough for Internal Test?
+
+Yes, for controlled internal testing with known caveats. Internal testers must know the app is non-certified and that physical Watch Ultra validation is still required.
+
+### Ready for TestFlight?
+
+Not yet for broad TestFlight. Fix `WATCHMATH-HIGH-001`, run macOS build/tests, and validate CoreMotion depth behavior on physical Watch Ultra first.
+
+### Ready for App Store?
+
+No. App Store readiness requires physical underwater validation, paired-device sync validation, completion of P1/P2 fixes, and continued non-certified safety positioning.
+
+### What Blocks 100% Algorithmic Readiness?
+
+1. Finalization-window persistence bug.
+2. Frozen-depth false-positive policy for simulation/stable readings.
+3. Invalid persisted-session filtering on load.
+4. Physical Watch Ultra depth/GPS/sync validation.
+5. macOS build and XCTest execution.

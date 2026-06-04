@@ -6,4 +6,5 @@ extension Notification.Name {
     // legacy `dirmotion` string is kept solely as a literal reference for grep history.
     // Both Watch poster/observer stay aligned by referencing this single symbol.
     static let watchSyncPeerSecretDidUpdate = Notification.Name("dirdiving.watchSyncPeerSecretDidUpdate")
+    static let watchSyncPeerSecretMismatch = Notification.Name("dirdiving.watchSyncPeerSecretMismatch")
 }
