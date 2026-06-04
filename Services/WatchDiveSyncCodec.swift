@@ -116,9 +116,12 @@ enum WatchDiveSyncCodec {
     }
 
     static func verifyAckSignature(_ signature: String?, sessionID: UUID, issuedAt: Date) -> Bool {
-        guard let signature, let providedData = Data(base64Encoded: signature) else { return false }
+        guard let signature,
+              !signature.isEmpty,
+              signature != "acknowledged",
+              let providedData = Data(base64Encoded: signature) else { return false }
         let expected = ackSignature(sessionID: sessionID, issuedAt: issuedAt)
-        guard let expectedData = Data(base64Encoded: expected) else { return false }
+        guard !expected.isEmpty, let expectedData = Data(base64Encoded: expected) else { return false }
         return providedData.constantTimeEquals(expectedData)
     }
 

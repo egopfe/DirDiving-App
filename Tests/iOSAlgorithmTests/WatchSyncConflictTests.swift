@@ -51,7 +51,7 @@ final class WatchSyncConflictTests: XCTestCase {
     func testSignedAckVerificationRejectsUnsignedOrWrongContextReplies() throws {
         WatchSyncAuth.resetPeerTrust()
         let peerSecret = Data(repeating: 7, count: 32).base64EncodedString()
-        WatchSyncAuth.ingestSharedSecretFromContext([WatchSyncAuth.contextKey: peerSecret])
+        XCTAssertEqual(WatchSyncAuth.ingestSharedSecretFromContext([WatchSyncAuth.contextKey: peerSecret]), .acceptedFirstTrust)
 
         let sessionID = UUID()
         let issuedAt = Date(timeIntervalSince1970: 1_700_000_000)

@@ -27,6 +27,7 @@ struct DIRDivingApp: App {
         _navigationStore = StateObject(wrappedValue: navigationStore)
         _watchSync = StateObject(wrappedValue: WatchSyncService.shared)
         WatchSyncService.shared.attachLogStore(logStore)
+        SensorSourceMode.applyReleaseSafeMigrationIfNeeded()
     }
 
     var body: some Scene {

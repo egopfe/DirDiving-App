@@ -54,6 +54,7 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     var userVisibleState: String {
         if !isSupported { return String(localized: "Non supportato") }
+        if WatchSyncAuth.peerSecretMismatchDetected { return String(localized: "sync.trust.mismatch") }
         if failedImportCount > 0 { return String(localized: "Errore import: retry disponibile") }
         if activationState == .activated, !WatchSyncAuth.hasPeerSecret() { return String(localized: "Associazione Watch non verificata") }
         if activationState == .activated { return String(localized: "Attivo") }
@@ -163,7 +164,12 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     private func ingestCompanionContext(_ context: [String: Any]) {
-        WatchSyncAuth.ingestSharedSecretFromContext(context)
+        switch WatchSyncAuth.ingestSharedSecretFromContext(context) {
+        case .rejectedMismatch:
+            lastMessage = String(localized: "sync.trust.mismatch")
+        case .acceptedFirstTrust, .unchanged:
+            break
+        }
         if let units = context[WatchSyncKeys.unitsPreferenceKey] as? String {
             let preference = IOSUnitPreference.fromSyncCode(units)
             UserDefaults.standard.set(preference.rawValue, forKey: IOSUnitPreference.storageKey)

@@ -959,6 +959,11 @@
 "more.icloud.last_event" = "Last event";
 "more.icloud.last_success" = "Last successful sync";
 "more.icloud.sync_now" = "Sync now";
+"more.icloud.backup_toggle" = "Cloud backup";
+"more.icloud.backup_privacy" = "Cloud backup stores your dive logs, timestamps, GPS points, notes, gas and equipment data in iCloud Key-Value Store. Keep this off if you want logs to remain local to this device.";
+"more.icloud.backup_on" = "Cloud backup on";
+"more.icloud.backup_off" = "Local only (cloud backup off)";
+"sync.trust.mismatch" = "Sync trust changed. Reset pairing trust to reconnect this Watch/iPhone.";
 "more.reviewer.demo_logbook" = "Demo logbook";
 "more.reviewer.demo_logbook_hint" = "Loads 5 demo dives for App Store review.";
 "more.language.title" = "Language";

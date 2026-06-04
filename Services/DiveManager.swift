@@ -98,6 +98,7 @@ final class DiveManager: ObservableObject {
     @Published var gpsConfirmation: DiveGPSConfirmation?
     @Published var isDepthAutomationAvailable = false
     @Published var developerSensorSourceWarning: String?
+    @Published private(set) var isSimulationDepthActive = false
     @Published var isManualLifecycleActive = false
     @Published private(set) var isMissionModeActive = false
     @Published private(set) var missionModeActivationSource: MissionModeActivationSource?
@@ -227,12 +228,14 @@ final class DiveManager: ObservableObject {
 
         var mode = DeveloperSettings.sensorSourceMode
         if mode == .appleSensor, !AppleDepthSensorProvider.isAvailable {
-            DeveloperSettings.persistSensorSource(.simulation)
-            mode = .simulation
+            let fallback: SensorSourceMode = DeveloperSettings.allowsSimulationSensorSelection ? .simulation : .automatic
+            DeveloperSettings.persistSensorSource(fallback)
+            mode = fallback
             developerSensorSourceWarning = String(localized: "developer.sensor_source.apple_fallback")
         }
 
         let provider = SensorProviderFactory.makeProvider(mode: mode)
+        isSimulationDepthActive = provider is MockDepthSensorProvider
         provider.onDepthMeasurement = { [weak self] depth, timestamp, temperature in
             self?.processDepthMeasurement(
                 rawDepthMeters: depth,

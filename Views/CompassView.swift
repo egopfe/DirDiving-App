@@ -52,7 +52,7 @@ struct CompassView: View {
             .font(DiveUI.Typography.bannerDetail)
             .foregroundStyle(compassStatusIsWarning ? DiveUI.yellow : DiveUI.secondaryText)
             .lineLimit(1)
-            .minimumScaleFactor(0.7)
+            .minimumScaleFactor(0.9)
             .frame(maxWidth: .infinity)
     }
 
@@ -63,7 +63,7 @@ struct CompassView: View {
             Text(message)
                 .font(DiveUI.Typography.bannerTitle)
                 .lineLimit(1)
-                .minimumScaleFactor(0.72)
+                .minimumScaleFactor(0.9)
             Spacer(minLength: 0)
         }
         .foregroundStyle(DiveUI.green)
@@ -115,7 +115,7 @@ struct CompassView: View {
                 HStack(alignment: .lastTextBaseline, spacing: 2) {
                     Text(headingText)
                         .font(.system(size: 36, weight: .black, design: .rounded))
-                        .minimumScaleFactor(0.72)
+                        .minimumScaleFactor(0.9)
                         .lineLimit(1)
                         .monospacedDigit()
                         .foregroundStyle(.white)
@@ -144,10 +144,10 @@ struct CompassView: View {
                 }
             } else {
                 Text(String(localized: "compass.idle.no_dive_data"))
-                    .font(.system(size: 10, weight: .black, design: .rounded))
+                    .font(DiveUI.Typography.secondaryLabel)
                     .foregroundStyle(DiveUI.yellow)
                     .multilineTextAlignment(.center)
-                    .frame(maxWidth: .infinity, minHeight: 39)
+                    .frame(maxWidth: .infinity, minHeight: 42)
                     .background(
                         RoundedRectangle(cornerRadius: 7.5, style: .continuous)
                             .fill(DiveUI.yellow.opacity(0.10))
@@ -159,10 +159,10 @@ struct CompassView: View {
             }
             if dive.isManualLifecycleActive {
                 Text(String(localized: "compass.idle.manual_no_depth"))
-                    .font(.system(size: 9, weight: .semibold, design: .rounded))
+                    .font(DiveUI.Typography.rowSubtitle)
                     .foregroundStyle(DiveUI.yellow)
                     .lineLimit(2)
-                    .minimumScaleFactor(0.72)
+                    .minimumScaleFactor(0.9)
             }
         }
     }
@@ -170,26 +170,26 @@ struct CompassView: View {
     private func inDiveMetric(title: String, value: String, unit: String?) -> some View {
         VStack(spacing: 0) {
             Text(title)
-                .font(.system(size: 8, weight: .black, design: .rounded))
+                .font(DiveUI.Typography.metricLabel)
                 .foregroundStyle(DiveUI.blue)
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
+                .lineLimit(2)
+                .minimumScaleFactor(0.9)
             HStack(alignment: .lastTextBaseline, spacing: 2) {
                 Text(value)
                     .font(.system(size: 20, weight: .black, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(DiveUI.blue)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                    .minimumScaleFactor(0.9)
                 if let unit {
                     Text(unit)
-                        .font(.system(size: 9, weight: .black, design: .rounded))
+                        .font(DiveUI.Typography.unitLabel)
                         .foregroundStyle(DiveUI.blue)
                         .padding(.bottom, 2)
                 }
             }
         }
-        .frame(maxWidth: .infinity, minHeight: 39)
+        .frame(maxWidth: .infinity, minHeight: 42)
         .background(
             RoundedRectangle(cornerRadius: 7.5, style: .continuous)
                 .fill(Color.black.opacity(0.46))
@@ -207,7 +207,7 @@ struct CompassView: View {
                     .font(.system(size: 10, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.yellow)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.72)
+                    .minimumScaleFactor(0.9)
             }
 
             HStack(spacing: 6) {
@@ -217,9 +217,9 @@ struct CompassView: View {
                     showBearingToast(String(localized: "compass.bearing.set.toast"))
                 } label: {
                     Text(String(localized: "compass.bearing.set"))
-                        .font(.system(size: 11, weight: .black, design: .rounded))
+                        .font(DiveUI.Typography.commandButton)
                         .foregroundStyle(DiveUI.yellow)
-                        .frame(maxWidth: .infinity, minHeight: 31)
+                        .frame(maxWidth: .infinity, minHeight: DiveUI.Layout.compassActionMinHeight)
                 }
                 .buttonStyle(.plain)
                 .background(commandBackground(DiveUI.yellow))
@@ -231,9 +231,9 @@ struct CompassView: View {
                     showBearingToast(String(localized: "compass.bearing.clear.toast"))
                 } label: {
                     Text(String(localized: "compass.bearing.clear"))
-                        .font(.system(size: 11, weight: .black, design: .rounded))
+                        .font(DiveUI.Typography.commandButton)
                         .foregroundStyle(compass.bearingDegrees == nil ? .white.opacity(0.34) : DiveUI.red)
-                        .frame(maxWidth: .infinity, minHeight: 31)
+                        .frame(maxWidth: .infinity, minHeight: DiveUI.Layout.compassActionMinHeight)
                 }
                 .buttonStyle(.plain)
                 .disabled(compass.bearingDegrees == nil)

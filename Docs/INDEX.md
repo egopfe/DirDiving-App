@@ -25,11 +25,160 @@ Tutti i file Markdown che erano nella root del repository sono stati spostati in
 | [`DIR_DIVING_GRAPHICS_UI_TEXT_AUDIT_CURRENT.md`](DIR_DIVING_GRAPHICS_UI_TEXT_AUDIT_CURRENT.md) | `Docs/` | Audit grafica/testo |
 | [`MAIN_BRANCH_FULL_CODE_SECURITY_AUDIT_CURRENT.md`](MAIN_BRANCH_FULL_CODE_SECURITY_AUDIT_CURRENT.md) | `Docs/` | Audit security current |
 | [`MAIN_BRANCH_FULL_CODE_SECURITY_REMEDIATION_REPORT.md`](MAIN_BRANCH_FULL_CODE_SECURITY_REMEDIATION_REPORT.md) | `Docs/` | Report remediation security |
-| [`DIR_DIVING_SECURITY_EXPLOIT_AUDIT_AND_REMEDIATION_PLAN_20260604.md`](DIR_DIVING_SECURITY_EXPLOIT_AUDIT_AND_REMEDIATION_PLAN_20260604.md) | `Docs/` | Audit security/exploit 2026-06-04 con piano remediation P1-P3 |
+| [`DIR_DIVING_SECURITY_EXPLOIT_AUDIT_AND_REMEDIATION_PLAN_20260604.md`](DIR_DIVING_SECURITY_EXPLOIT_AUDIT_AND_REMEDIATION_PLAN_20260604.md) | `Docs/` | Audit security/exploit 2026-06-04 — piano remediation P1–P3 (vedi sezione dedicata sotto) |
 
 ---
 
-## Aggiornamento indice 2026-05-31 — MAIN UI/UX readiness 100% @ `c8f91f6`
+## Aggiornamento indice 2026-06-04 — Security exploit audit & remediation plan
+
+Audit statico **security / exploitability** su branch `main` @ `d2ad45b`. Report + piano remediation only (build/test non eseguiti sull’host audit Windows; comandi macOS in § finale del report).
+
+| Campo | Valore |
+|-------|--------|
+| **Documento** | [`DIR_DIVING_SECURITY_EXPLOIT_AUDIT_AND_REMEDIATION_PLAN_20260604.md`](DIR_DIVING_SECURITY_EXPLOIT_AUDIT_AND_REMEDIATION_PLAN_20260604.md) |
+| **Percorso** | `Docs/DIR_DIVING_SECURITY_EXPLOIT_AUDIT_AND_REMEDIATION_PLAN_20260604.md` |
+| **Data** | 2026-06-04 |
+| **Commit audit** | `d2ad45b` |
+| **Modalità** | Static audit, report-only |
+| **P0** | Nessuno |
+| **Verdetto** | Parziale — fix **P1** prima di TestFlight/App Store esterno |
+
+### Controlli positivi (Executive Summary)
+
+- HMAC-SHA256 su payload Watch↔iPhone; sync bounded (size, schema, bundle ID, skew).
+- Keychain `AfterFirstUnlockThisDeviceOnly`; CSV import bounded; export `.completeFileProtection`.
+- Nessun client rete arbitrario evidente nei path MAIN auditati; secret scan regex senza secret in sorgente.
+
+### Mappa sezioni report
+
+| § | Titolo | Contenuto chiave |
+|---|--------|------------------|
+| — | Executive Summary | Controlli forti; rischi trust-boundary / privacy / safety-integrity / repo hygiene |
+| — | Scope | Watch + iOS MAIN, WCSession, Keychain, iCloud KVS, CSV, foto, legal gate, App Intents, CI |
+| — | Severity Model | P0–P3 + INFO |
+| — | Findings | `SEC-P1-001` … `SEC-P3-002` (dettaglio sotto) |
+| — | Remediation Roadmap | Phase 1–4 (P1 release-blocking → docs/privacy) |
+| — | Suggested Implementation Order | Ordine 1–8 per ID finding |
+| — | Proposed Tests | Watch / iOS / repo-CI |
+| — | macOS Validation Commands | `xcodegen`, build Watch/iOS, algorithm tests |
+| — | Physical QA Requirements | Ultra, Action Button, WCSession, iCloud, foto, legal revision |
+| — | Final Verdict | No P0; P1 blocca release “security-hard” |
+
+### Indice findings (priorità)
+
+| ID | Sev | Area | File / evidenza principale |
+|----|-----|------|----------------------------|
+| **SEC-P1-001** | P1 | App Intents bypass legal onboarding | `ActionButtonIntents.swift`, `DIRDivingApp.swift`, `DiveManager.swift` → gate `LegalAcceptanceGate` |
+| **SEC-P1-002** | P1 | Simulation sensor in release | `SensorSourceMode.swift`, `SensorProviderFactory.swift`, `DeveloperVersionUnlock.swift`, `InfoView` / `MoreView` |
+| **SEC-P1-003** | P1 | iCloud KVS backup automatico log sensibili | `CloudSyncStore`, `DiveLogStore` (iOS), opt-in default off |
+| **SEC-P2-001** | P2 | Peer secret overwrite da application context | `WatchSyncAuth.swift` (Watch + iOS), TOFU pinning |
+| **SEC-P2-002** | P2 | Foto Watch senza decode/validazione contenuto | `UserImageStore.swift`, `WatchPhotoPreprocessor`, `WatchSyncService` |
+| **SEC-P2-003** | P2 | ZIP tracciato bypass secret scan | `DirDiving-All-Branches-*.zip`, `Scripts/check_secrets.sh` |
+| **SEC-P3-001** | P3 | Watch ACK verifier parità iOS | `WatchDiveSyncCodec` / ACK legacy `"acknowledged"` |
+| **SEC-P3-002** | P3 | GitHub Actions least-privilege | `.github/workflows/build.yml` → `permissions: contents: read` |
+
+### Roadmap remediation (Phase 1–4)
+
+| Phase | Priorità | Task principali |
+|-------|----------|-----------------|
+| **1** | P1 | Legal gate App Intents; sensor `.automatic` in release; cloud backup opt-in |
+| **2** | P2 | Peer-secret TOFU; ACK guard Watch; test sync |
+| **3** | P2–P3 | Validazione immagine Watch; rimozione ZIP da repo; CI permissions |
+| **4** | P2 | Privacy docs, TestFlight notes, security checklist, QA App Intents |
+
+### Ordine implementazione suggerito (report § Suggested Implementation Order)
+
+1. `SEC-P1-001` → 2. `SEC-P1-002` → 3. `SEC-P1-003` → 4. `SEC-P2-001` → 5. `SEC-P2-002` → 6. `SEC-P2-003` → 7. `SEC-P3-001` → 8. `SEC-P3-002`
+
+### Documenti correlati
+
+| Documento | Relazione |
+|-----------|-----------|
+| [`MAIN_BRANCH_FULL_CODE_SECURITY_AUDIT_CURRENT.md`](MAIN_BRANCH_FULL_CODE_SECURITY_AUDIT_CURRENT.md) | Audit security precedente (baseline storica) |
+| [`MAIN_BRANCH_FULL_CODE_SECURITY_REMEDIATION_REPORT.md`](MAIN_BRANCH_FULL_CODE_SECURITY_REMEDIATION_REPORT.md) | Report remediation security storico |
+| [`SECURITY_STATIC_CHECKLIST.md`](SECURITY_STATIC_CHECKLIST.md) | Checklist statica release |
+| [`SECURITY_PRIVACY_RELEASE_EVIDENCE.md`](SECURITY_PRIVACY_RELEASE_EVIDENCE.md) | Evidenze privacy/release |
+| [`Scripts/check_secrets.sh`](../Scripts/check_secrets.sh) | Secret scan (ZIP esclusi — vedi SEC-P2-003) |
+| [`TESTFLIGHT_REVIEW_NOTES.md`](TESTFLIGHT_REVIEW_NOTES.md) | Note reviewer (simulation/cloud policy) |
+
+**Commit doc su `main`:** `40bf110` (`docs: add security exploit remediation plan`).  
+**Remediation implementata:** [`DIR_DIVING_SECURITY_REMEDIATION_REPORT_20260604.md`](DIR_DIVING_SECURITY_REMEDIATION_REPORT_20260604.md) — SEC-P1–P3 chiusi in codice/repo.
+
+---
+
+## Aggiornamento indice 2026-06-04 — Watch UI text visibility audit (current)
+
+Audit read-only su **Apple Watch MAIN** (`DIRDiving Watch App` only). Nessuna modifica codice; solo report statico SwiftUI.
+
+| Campo | Valore |
+|-------|--------|
+| **Documento** | [`DIR_DIVING_WATCH_UI_TEXT_VISIBILITY_AUDIT_CURRENT.md`](DIR_DIVING_WATCH_UI_TEXT_VISIBILITY_AUDIT_CURRENT.md) |
+| **Data audit** | 2026-06-04 |
+| **Branch** | `main` |
+| **Target** | `DIRDiving Watch App` |
+| **Modalità** | Report-only (build/test non eseguiti) |
+| **Readiness testo/UI** | **78%** |
+| **Verdetto Settings** | Issue piccolo testo **confermata** (P1); Live Dive **forte** |
+| **Benchmark** | Oceanic+, Garmin Descent, watchOS native density |
+
+### Mappa sezioni report
+
+| § | Titolo | Contenuto chiave |
+|---|--------|------------------|
+| 1 | Executive Summary | 78% readiness; P1 Settings + warning text; P2 secondarie |
+| 2 | Scope Confirmed | View incluse/escluse da `project.yml` |
+| 3 | Screen-by-Screen Audit | Home, Live Dive, Settings, Alarm/Ascent settings, Compass, Images, Logs, Info, Legal, Banners |
+| 4 | Settings Deep Dive | 8 pt badge, 11/10 pt rows, `minimumScaleFactor(0.68)`, target 13/14 pt |
+| 5 | Typography Inventory | `DiveUI.Typography.*`, 7–72 pt, `.caption2`, scale factors |
+| 6 | Color and Contrast | Palette `DiveUI`, muted/disabled, warning colors |
+| 7 | UX Fluidity | TabView, scroll, tap targets 31–44 pt |
+| 8 | Benchmark Comparison | Oceanic+ / Garmin / watchOS |
+| 9 | Prioritized Remediation Plan | P0 none; P1 Settings + warnings; P2 polish; P3 optional |
+| 10 | Acceptance Criteria | Criteri fix futuro (44 pt rows, no micro-text, ecc.) |
+| 11 | No-Code-Change Confirmation | Solo questo file creato/aggiornato |
+| 12 | Final Verdict | Prossimo pass: UI-only typography/spacing |
+
+### Indice per schermata (severità)
+
+| Schermata | Severità | File principali |
+|-----------|----------|-----------------|
+| Settings | **P1** | `SettingsView.swift`, `DiveUIComponents.swift` |
+| Warning banners / safety | **P1** (testo) / P2 (layout) | `AscentWarningBannerView.swift`, `DepthSafetyLiveViews.swift`, `DiveLiveView.swift` |
+| Live Dive | P2 | `DiveLiveView.swift`, `AscentGaugeView.swift`, … |
+| Compass | P2 | `CompassView.swift` |
+| User Images | P2 | `UserImagesView.swift` |
+| Logs / Dive Detail / Export | P2 | `DiveLogListView.swift`, `DiveDetailView.swift`, `ExportView.swift` |
+| Info / diagnostics | P2 | `InfoView.swift` |
+| Legal onboarding | P2 | `WatchLegalOnboardingView.swift` |
+| Alarm settings | P2 | `AlarmSettingsView.swift` |
+| Ascent rate settings | P3 | `AscentRateSettingsView.swift` |
+| Mode selection | P3 | `ModeSelectionView.swift` (di solito nascosta in MAIN) |
+
+### Indice remediation P1–P3 (§9)
+
+| ID | Priorità | Azione | File |
+|----|----------|--------|------|
+| 1 | P1 | Restyle Settings typography/density | `SettingsView.swift`, `DiveUIComponents.swift` |
+| 2 | P1 | Warning title/body più grandi | `AscentWarningBannerView.swift`, `DepthSafetyLiveViews.swift`, `DiveLiveView.swift` |
+| 3 | P1 | Ridurre copy Settings; dettaglio in Info/Legal | `SettingsView.swift`, `InfoView.swift`, `WatchLegalOnboardingView.swift` |
+| 4 | P2 | Eliminare label 7–8 pt secondarie | `DiveDetailView.swift`, `DiveLogListView.swift`, `CompassView.swift`, `UserImagesView.swift`, `InfoView.swift` |
+| 5 | P2 | Tap target 40–44 pt | `DiveUIComponents.swift`, `CompassView.swift`, `SettingsView.swift`, `AlarmSettingsView.swift` |
+| 6 | P2 | Coordinate/status-first su Watch | `DiveDetailView.swift`, `DiveLogListView.swift` |
+| 7–10 | P3 | Header uniformi, stroke, l10n IT, QA Dynamic Type | Vari |
+
+### Documenti correlati
+
+| Documento | Relazione |
+|-----------|-----------|
+| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | Audit **algoritmi** Watch (separato da questo audit **UI/testo**) |
+| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) | Remediation algoritmi @ `39b3d4e` / `ba21813` |
+| [`MAIN_UI_UX_READINESS_AUDIT_CURRENT.md`](MAIN_UI_UX_READINESS_AUDIT_CURRENT.md) | Audit UX cross-app (baseline storico) |
+| [`DIR_DIVING_GRAPHICS_UI_TEXT_AUDIT_CURRENT.md`](DIR_DIVING_GRAPHICS_UI_TEXT_AUDIT_CURRENT.md) | Audit grafica/testo (ambito diverso) |
+| [`WATCH_MAIN_UX_CONVENTIONS.md`](WATCH_MAIN_UX_CONVENTIONS.md) | Convenzioni UX Watch MAIN |
+
+**Esclusi da scope** (non in target audit): `ApneaView`, `SnorkelingView`, `BuddyAssistView`, `ExperimentalConceptsView`, iOS Companion.
+
+---
 
 Remediation completa da audit [`MAIN_UI_UX_READINESS_AUDIT_CURRENT.md`](MAIN_UI_UX_READINESS_AUDIT_CURRENT.md) (83% Watch / 86% iOS / 81% cross-app → **100%** criteri codice; QA fisica ancora richiesta):
 

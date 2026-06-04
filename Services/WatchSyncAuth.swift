@@ -9,6 +9,12 @@ enum WatchSyncAuthError: Error, Equatable {
     case missingLocalSecret
 }
 
+enum WatchSyncPeerSecretIngestResult: Equatable {
+    case acceptedFirstTrust
+    case unchanged
+    case rejectedMismatch
+}
+
 enum WatchSyncAuth {
     static let contextKey = "dirdiving_watch_sync_secret"
     private static let keychainService = "com.egopfe.dirdiving.watch-sync"
@@ -44,12 +50,45 @@ enum WatchSyncAuth {
         loadPeerSecret() != nil
     }
 
-    static func ingestSharedSecretFromContext(_ context: [String: Any]) {
+    private static let peerSecretMismatchKey = "dirdiving_watch_sync_peer_secret_mismatch"
+
+    static var peerSecretMismatchDetected: Bool {
+        UserDefaults.standard.bool(forKey: peerSecretMismatchKey)
+    }
+
+    @discardableResult
+    static func ingestSharedSecretFromContext(_ context: [String: Any]) -> WatchSyncPeerSecretIngestResult {
         guard let encoded = context[contextKey] as? String,
               let secret = Data(base64Encoded: encoded),
-              secret.count >= 32 else { return }
+              secret.count >= 32 else { return .unchanged }
+        if let existing = loadPeerSecret() {
+            if existing.constantTimeEquals(secret) {
+                clearPeerSecretMismatch()
+                return .unchanged
+            }
+            logger.warning("Rejected Watch sync peer secret replacement (TOFU pinning).")
+            setPeerSecretMismatch(true)
+            NotificationCenter.default.post(name: .watchSyncPeerSecretMismatch, object: nil)
+            return .rejectedMismatch
+        }
         savePeerSecret(secret)
+        clearPeerSecretMismatch()
         NotificationCenter.default.post(name: .watchSyncPeerSecretDidUpdate, object: nil)
+        return .acceptedFirstTrust
+    }
+
+    static func resetPeerTrust() {
+        deleteKeychain(account: "\(keychainAccount)-peer")
+        clearPeerSecretMismatch()
+        NotificationCenter.default.post(name: .watchSyncPeerSecretDidUpdate, object: nil)
+    }
+
+    private static func setPeerSecretMismatch(_ value: Bool) {
+        UserDefaults.standard.set(value, forKey: peerSecretMismatchKey)
+    }
+
+    private static func clearPeerSecretMismatch() {
+        UserDefaults.standard.set(false, forKey: peerSecretMismatchKey)
     }
 
     // MARK: - Sync key derivation
@@ -96,6 +135,15 @@ enum WatchSyncAuth {
         saveKeychain(data, account: "\(keychainAccount)-peer")
     }
 
+    private static func deleteKeychain(account: String) {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: account
+        ]
+        SecItemDelete(query as CFDictionary)
+    }
+
     private static func randomKeyData(byteCount: Int) throws -> Data {
         var bytes = [UInt8](repeating: 0, count: byteCount)
         let status = SecRandomCopyBytes(kSecRandomDefault, bytes.count, &bytes)
@@ -131,5 +179,12 @@ enum WatchSyncAuth {
 
     private enum KeychainError: Error {
         case unhandledStatus(OSStatus)
+    }
+}
+
+private extension Data {
+    func constantTimeEquals(_ other: Data) -> Bool {
+        guard count == other.count else { return false }
+        return zip(self, other).reduce(UInt8(0)) { $0 | ($1.0 ^ $1.1) } == 0
     }
 }

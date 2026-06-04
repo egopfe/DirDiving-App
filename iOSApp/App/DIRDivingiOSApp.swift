@@ -17,6 +17,7 @@ struct DIRDivingiOSApp: App {
         _logStore = StateObject(wrappedValue: DiveLogStore(cloudSync: cloudSync))
         _plannerStore = StateObject(wrappedValue: PlannerStore(cloudSync: cloudSync))
         _equipmentStore = StateObject(wrappedValue: EquipmentStore(cloudSync: cloudSync))
+        SensorSourceMode.applyReleaseSafeMigrationIfNeeded()
     }
 
     var body: some Scene {

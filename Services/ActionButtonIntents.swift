@@ -1,6 +1,15 @@
 import AppIntents
 import Foundation
 
+@MainActor
+private func requireLegalAcceptanceForSafetyIntent() throws {
+    do {
+        try LegalAcceptanceGate.requireAccepted()
+    } catch LegalAcceptanceGateError.notAccepted {
+        throw DIRDivingShortcutError.legalAcceptanceRequired
+    }
+}
+
 struct ToggleStopwatchIntent: AppIntent {
     static var title: LocalizedStringResource = "intent.toggle_stopwatch.title"
     static var description: IntentDescription {
@@ -9,6 +18,7 @@ struct ToggleStopwatchIntent: AppIntent {
 
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
+            try requireLegalAcceptanceForSafetyIntent()
             guard let manager = DiveManager.shared else {
                 throw DIRDivingShortcutError.appStateUnavailable
             }
@@ -26,6 +36,7 @@ struct ResetStopwatchIntent: AppIntent {
 
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
+            try requireLegalAcceptanceForSafetyIntent()
             guard let manager = DiveManager.shared else {
                 throw DIRDivingShortcutError.appStateUnavailable
             }
@@ -46,6 +57,7 @@ struct StartManualDiveIntent: AppIntent {
 
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
+            try requireLegalAcceptanceForSafetyIntent()
             guard let manager = DiveManager.shared else {
                 throw DIRDivingShortcutError.appStateUnavailable
             }
@@ -63,6 +75,7 @@ struct EndManualDiveIntent: AppIntent {
 
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
+            try requireLegalAcceptanceForSafetyIntent()
             guard let manager = DiveManager.shared else {
                 throw DIRDivingShortcutError.appStateUnavailable
             }
@@ -80,6 +93,7 @@ struct SetBearingIntent: AppIntent {
 
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
+            try requireLegalAcceptanceForSafetyIntent()
             guard let compass = CompassManager.shared else {
                 throw DIRDivingShortcutError.appStateUnavailable
             }
@@ -98,6 +112,7 @@ struct ClearBearingIntent: AppIntent {
 
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
+            try requireLegalAcceptanceForSafetyIntent()
             guard let compass = CompassManager.shared else {
                 throw DIRDivingShortcutError.appStateUnavailable
             }
@@ -116,6 +131,7 @@ struct AcknowledgeAlarmIntent: AppIntent {
 
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
+            try requireLegalAcceptanceForSafetyIntent()
             guard let manager = DiveManager.shared else {
                 throw DIRDivingShortcutError.appStateUnavailable
             }
@@ -128,6 +144,7 @@ struct AcknowledgeAlarmIntent: AppIntent {
 private enum DIRDivingShortcutError: LocalizedError {
     case appStateUnavailable
     case stopwatchResetBlocked
+    case legalAcceptanceRequired
 
     var errorDescription: String? {
         switch self {
@@ -135,6 +152,8 @@ private enum DIRDivingShortcutError: LocalizedError {
             return String(localized: "shortcut.error.app_unavailable")
         case .stopwatchResetBlocked:
             return String(localized: "shortcut.error.stopwatch_reset_blocked")
+        case .legalAcceptanceRequired:
+            return String(localized: "shortcut.error.legal_acceptance_required")
         }
     }
 }

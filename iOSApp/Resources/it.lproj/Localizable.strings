@@ -957,6 +957,11 @@
 "more.icloud.last_event" = "Ultimo evento";
 "more.icloud.last_success" = "Ultima sync riuscita";
 "more.icloud.sync_now" = "Sincronizza ora";
+"more.icloud.backup_toggle" = "Backup cloud";
+"more.icloud.backup_privacy" = "Il backup cloud salva log immersioni, orari, punti GPS, note, gas e attrezzatura in iCloud Key-Value Store. Tienilo disattivato se vuoi mantenere i log solo su questo dispositivo.";
+"more.icloud.backup_on" = "Backup cloud attivo";
+"more.icloud.backup_off" = "Solo locale (backup cloud disattivato)";
+"sync.trust.mismatch" = "La fiducia di sincronizzazione è cambiata. Reimposta la fiducia di abbinamento per riconnettere Apple Watch/iPhone.";
 "more.reviewer.demo_logbook" = "Logbook dimostrativo";
 "more.reviewer.demo_logbook_hint" = "Carica 5 immersioni demo per revisione App Store.";
 "more.language.title" = "Lingua";
