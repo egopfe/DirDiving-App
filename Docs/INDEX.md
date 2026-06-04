@@ -106,6 +106,88 @@ Audit statico **security / exploitability** su branch `main` @ `d2ad45b`. Report
 
 ---
 
+## Aggiornamento indice 2026-06-04 — iOS Bühlmann comprehensive readiness audit (updated)
+
+Audit statico read-only su **iOS Companion MAIN — Planner only** (`DIRDiving iOS`). Nessuna modifica codice; report-only (host audit Windows: `xcodegen`/`xcodebuild` non eseguiti).
+
+| Campo | Valore |
+|-------|--------|
+| **Documento** | [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md) |
+| **Percorso** | `Docs/DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md` |
+| **Data** | 2026-06-04 |
+| **Commit doc** | `63ee0b4` (`docs: add updated iOS Buhlmann readiness audit`) |
+| **Baseline audit** | `40bf110` (pre-report; post-security plan doc) |
+| **Scope** | Motore ZHL-16C N2+He, planner services, CNS/OTU, UX/UI planner, test/docs |
+| **Modalità** | Static audit only |
+| **Verdetto** | **Partially ready** — core Bühlmann + CNS 15% rule forti; **OTU constant-depth formula** bloccante |
+
+### Relazione con audit precedenti
+
+| Documento | Relazione |
+|-----------|-----------|
+| [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md) | Audit comprehensive @ `e1370f7` (2026-05-30) — verdict *Almost Ready*; **baseline storica** |
+| [`DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md`](DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md) | Implementazione P1–P4 + CNS/OTU @ `dae29b8` — da ri-validare dopo fix OTU |
+| [`DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md) | §11 oxygen exposure — allineare formula OTU dopo fix |
+| [`DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md`](DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md) | Campagna validazione esterna (P1 pending) |
+| [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md) | Limiti reference-only planner |
+
+### Mappa sezioni report
+
+| § | Titolo | Contenuto chiave |
+|---|--------|------------------|
+| — | Executive Verdict | *Partially ready*; blocker OTU inverted constant-depth |
+| — | Scope Confirmation | iOS MAIN planner only; Watch/experimental esclusi |
+| — | Repository State | `main`, `40bf110`, Windows static |
+| — | Files Inspected | Engine, planner services, views, tests, l10n |
+| — | Buhlmann Mathematical Model Assessment | ZHL-16C, GF, NDL, multigas, trimix |
+| — | CNS / OTU / 15% Rule Assessment | CNS full plan + descent+bottom 15% warning; **OTU correctness** |
+| — | Algorithmic Consistency Assessment | Validation, gas planning, result states |
+| — | Numerical Robustness Assessment | Edge cases, OTU formula |
+| — | UX/UI Readiness Assessment | Planner discoverability, safety copy |
+| — | CNS UI/UX Visibility Matrix | Tabella visibilità CNS/OTU in UI |
+| — | Test Coverage Assessment | Gap test OTU vs riferimento indipendente |
+| — | Documentation Assessment | Docs OTU da correggere con codice |
+| — | Risk Matrix | P0–P4 findings |
+| — | Release Readiness Verdict | OTU not ready; Bühlmann core largely coherent |
+| — | Implementation Plan | Phase 1–5 (OTU fix → macOS validation) |
+| — | Protected Files / Areas | Watch + experimental iOS esclusi |
+| — | Recommended Next Cursor / Codex Command | Prompt fix OTU + test (non eseguire automaticamente) |
+| — | Final Recommendations | Fix OTU prima di release-hard |
+| — | Audit Certification | Report-only, no commit dal audit |
+
+### Indice findings (priorità)
+
+| ID | Sev | Area | Sintesi |
+|----|-----|------|---------|
+| **OTU inverted** | P0/P1 | Oxygen exposure | `OxygenExposureModels.swift` — formula costante-depth apparentemente invertita; sottostima OTU a PPO2 elevato |
+| **External validation** | P1 | Decompression reference | Campagna esterna ancora pending |
+| **OTU tests self-referential** | P1 | Tests | Test validano implementazione, non riferimento canonico |
+| **Travel gas switch** | P2 | Multigas | Switch depth travel→bottom semplificato |
+| **macOS build/test stale** | P2 | Release process | Validazione macOS su HEAD corrente richiesta |
+| **Build validation docs stale** | P2 | Documentation | Conteggi test/docs da aggiornare |
+| **Hardcoded IT validation** | P3 | Localization | Messaggi validator planner |
+| **Persistence key `experimental`** | P3 | Maintainability | Naming chiave planner |
+| **Share/export CNS label** | P3 | UX copy | Etichette export generiche |
+| **Bailout schedule-only** | P3 | Planning model | Documentato come limite |
+| **Physical a11y QA** | P4 | UX validation | Dynamic Type / VoiceOver su device |
+| **No exact equivalence claim** | P4 | Legal/docs | Reference-only — OK se esplicito |
+
+### Piano implementazione (Phase 1–5)
+
+| Phase | Focus |
+|-------|--------|
+| **1** | Correggere formula OTU + test monotonicità / fixture PPO2 0.6–1.6 |
+| **2** | Campagna validazione esterna Bühlmann (NDL, stop, TTS, gas switch) |
+| **3** | Modello travel gas switch depth |
+| **4** | Localization + copy share/export CNS/OTU |
+| **5** | `xcodegen`, build iOS, iOS Algorithm Tests su macOS |
+
+**Esclusi da scope:** Apple Watch MAIN, file experimental iOS in `project.yml`, branch experimental.
+
+**Remediation implementata:** [`DIR_DIVING_IOS_BUHLMANN_READINESS_REMEDIATION_REPORT.md`](DIR_DIVING_IOS_BUHLMANN_READINESS_REMEDIATION_REPORT.md) — OTU fix, test canonici, switch depth fondo, export CNS, l10n validator.
+
+---
+
 ## Aggiornamento indice 2026-06-04 — Watch UI text visibility audit (current)
 
 Audit read-only su **Apple Watch MAIN** (`DIRDiving Watch App` only). Nessuna modifica codice; solo report statico SwiftUI.
@@ -278,7 +360,8 @@ Pass read-only su `main` @ `e1370f7` (math, consistency, UX/UI, tests, docs; **8
 
 | Documento | Posizione | Contenuto |
 |-----------|-----------|-----------|
-| [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md) | `Docs/` | **Comprehensive readiness audit** — verdict **Almost Ready**; P1–P4 matrix + implementation plan |
+| [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md) | `Docs/` | **Comprehensive readiness audit** @ `e1370f7` — verdict **Almost Ready**; baseline storica |
+| [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md) | `Docs/` | **Audit aggiornato 2026-06-04** @ `63ee0b4` — verdict **Partially ready**; blocker OTU; CNS 15% OK — vedi sezione indice 2026-06-04 sopra |
 
 ---
 
@@ -503,10 +586,12 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260523.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260523.md) | Pass readiness 100% UX |
 | [`MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260522.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260522.md) | Onboarding legale |
 
-**Audit planner / Buhlmann iOS MAIN (read-only, 2026-05-28):**
+**Audit planner / Bühlmann iOS MAIN (read-only):**
 
 | File | Uso |
 |------|-----|
+| [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md) | **Audit comprehensive corrente** (2026-06-04 @ `63ee0b4`): Bühlmann + CNS/OTU + UX planner; verdict *Partially ready*; **P0/P1 OTU formula** |
+| [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md) | Audit comprehensive @ `e1370f7` (2026-05-30) — superseded per snapshot OTU/post-`40bf110` dall’audit **UPDATED** |
 | [`DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) | Re-audit post motore ZHL-16C N2+He, golden fixtures e hardening gas: scope iOS-only, verdict, file ispezionati, finding P1–P3 (**risolti** @ `69e69b2`); complementa [`DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md) e [`DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md) |
 | [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md) | Audit UX/UI readiness planner Bühlmann iOS (Docs): verdict *Partially ready*; gap UI su repetitive planning, ledger per cilindro, copy ambiente — **non** coperti dal fix algoritmico @ `69e69b2` |
 
@@ -627,6 +712,8 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) | Checklist release |
 | [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md) | Hardening algoritmico finale Watch MAIN |
 | [`DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md) | Hardening algoritmico iOS MAIN |
+| [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md) | **Audit comprehensive planner** 2026-06-04 — OTU blocker, risk matrix P0–P4 |
+| [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md) | Audit comprehensive 2026-05-30 (baseline) |
 | [`DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md) | Motore Buhlmann ZHL-16C N2+He multigas iOS |
 | [`DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md) | Verifica matematica e statica del motore Buhlmann iOS |
 | [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md) | Fixture e test iOS Buhlmann |
@@ -760,6 +847,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md) | Audit algoritmi/math Watch MAIN (Docs) |
 | [`DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md) | Audit algoritmi/math iOS Companion MAIN (Docs) |
 | [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md) | Audit UX/UI readiness planner Bühlmann iOS (Docs) |
+| [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md) | Audit comprehensive planner iOS @ `63ee0b4` (2026-06-04) |
 
 ---
 
@@ -778,6 +866,8 @@ Audit storici ora consolidati in `Docs/`: vedi anche **§13** — [`DIR_DIVING_W
 | [`BUILD_VALIDATION.md`](BUILD_VALIDATION.md) | §6, §12 |
 | [`CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md) | §3 |
 | [`DEPTH_LIMIT_SAFETY_TEST_CHECKLIST.md`](DEPTH_LIMIT_SAFETY_TEST_CHECKLIST.md) | §3 |
+| [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md) | §6, agg. 2026-05-30 |
+| [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md) | §6, agg. 2026-06-04 |
 | [`DIR_DIVING_IOS_BUHLMANN_FIXTURE_SOURCES.md`](DIR_DIVING_IOS_BUHLMANN_FIXTURE_SOURCES.md) | §6 |
 | [`DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) | §1, §4, §6 |
 | [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md) | §1, §4, §6, §13 |

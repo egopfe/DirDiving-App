@@ -52,6 +52,20 @@ Document any exceedance as **investigation required**, not automatic failure, un
 
 ---
 
+## Frozen fixture profiles (2026-06-04)
+
+| ID | Profile | Gas | GF | Metrics to compare | Reference source | Tolerance | Campaign |
+|---|---|---|---|---|---|---|
+| F1 | 30 m / 20 min | Air 21% | 30/70 | NDL, TTS, first stop, total stop time, controlling compartment | R1 or R2 | § Tolerances | ☐ Pending |
+| F2 | 30 m / 20 min | EAN32 | 30/70 | Same | R1 or R2 | § Tolerances | ☐ Pending |
+| F3 | 40 m / 15 min | Trimix bottom + travel | 30/70 | TTS, gas switches, stop list | R2 | § Tolerances | ☐ Pending |
+| F4 | 40 m / 15 min | Trimix + EAN50 deco | 30/70 | TTS, switch behaviour, stop times | R2 | § Tolerances | ☐ Pending |
+| F5 | 40 m / 15 min | Trimix + O₂ deco | 30/70 | TTS, switch behaviour, stop times | R2 | § Tolerances | ☐ Pending |
+| F6 | 30 m air NDL | Air 21% | 30/70 vs 50/80 | NDL, first stop depth | R1/R3 | NDL ±1 min | ☐ Pending |
+| F7 | 30 m air NDL | Air 21% | 50/80 | Same as F6 for GF comparison | R1/R3 | NDL ±1 min | ☐ Pending |
+
+**Status:** External validation is **not complete**. Do not claim certified equivalence or public release-hard Bühlmann parity until F1–F7 are executed and logged.
+
 ## Test Matrix (manual campaign)
 
 | Profile | Gas | GF | Environment | NDL/TTS ref | DIR iOS | Pass? |

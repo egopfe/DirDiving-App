@@ -258,10 +258,11 @@ enum BuhlmannPlanner {
         // Bailout cylinders remain schedule-only; BuhlmannPlanRequest has no bailoutGases slot.
         let planningDepth = working.buhlmannPlanningDepthMeters
         let bottomEntry = working.plannerCylinders.first(where: { $0.role == .bottom })
+        let bottomSwitchDepth = PlannerGasSchedule.bottomGasSwitchDepthMeters(from: working)
         let bottomGas = BuhlmannGas(
             gas: bottomEntry?.gas ?? working.bottomGas,
             role: .bottom,
-            switchDepthMeters: planningDepth,
+            switchDepthMeters: bottomSwitchDepth,
             cylinderId: bottomEntry?.id
         )
         let travelGases = working.plannerCylinders
