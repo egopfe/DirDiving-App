@@ -92,15 +92,15 @@ struct DiveLiveView: View {
             Image(systemName: watchSync.failedTransferCount > 0 ? "exclamationmark.triangle.fill" : "arrow.triangle.2.circlepath")
             Text(watchSync.lastSyncStatus)
                 .lineLimit(2)
-                .minimumScaleFactor(0.7)
+                .minimumScaleFactor(0.9)
             Spacer(minLength: 0)
             if watchSync.pendingTransferCount > 0 {
                 Text("\(watchSync.pendingTransferCount)")
-                    .font(.caption2.bold())
+                    .font(DiveUI.Typography.statusValue)
                     .foregroundStyle(DiveUI.cyan)
             }
         }
-        .font(.caption2.bold())
+        .font(DiveUI.Typography.secondaryLabel)
         .foregroundStyle(watchSync.failedTransferCount > 0 ? DiveUI.yellow : DiveUI.cyan)
         .padding(.horizontal, 8)
         .padding(.vertical, 5)
@@ -121,11 +121,11 @@ struct DiveLiveView: View {
                 .font(.system(size: 14, weight: .black))
             VStack(alignment: .leading, spacing: 1) {
                 Text(gpsConfirmationTitle(confirmation))
-                    .font(.system(size: 10, weight: .black, design: .rounded))
+                    .font(DiveUI.Typography.warningTitle)
                 Text(gpsConfirmationDetail(confirmation))
-                    .font(.system(size: 9, weight: .semibold, design: .rounded))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.66)
+                    .font(DiveUI.Typography.warningBody)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.9)
             }
             Spacer(minLength: 0)
         }
@@ -213,6 +213,9 @@ struct DiveLiveView: View {
                 if !hapticsEnabled {
                     hapticsOffBadge
                 }
+                if dive.isSimulationDepthActive {
+                    simulationDepthBadge
+                }
                 ttvRuntimePanel
                     .layoutPriority(2)
                 if showAscentAlarmBanner {
@@ -278,6 +281,10 @@ struct DiveLiveView: View {
 
             if !hapticsEnabled {
                 hapticsOffBadge
+                    .padding(.top, 6)
+            }
+            if dive.isSimulationDepthActive {
+                simulationDepthBadge
                     .padding(.top, 6)
             }
 
@@ -468,15 +475,35 @@ struct DiveLiveView: View {
         .foregroundStyle(DiveUI.green)
     }
 
+    private var simulationDepthBadge: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 12, weight: .black))
+            Text(String(localized: "live.simulation_depth.badge"))
+                .font(DiveUI.Typography.warningTitle)
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(DiveUI.red)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(DiveUI.red.opacity(0.12))
+                .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(DiveUI.red.opacity(0.72), lineWidth: 1))
+        )
+        .accessibilityLabel(String(localized: "live.simulation_depth.a11y"))
+    }
+
     private var hapticsOffBadge: some View {
         HStack(spacing: 6) {
             Image(systemName: "bell.slash.fill")
                 .font(.system(size: 12, weight: .black))
             Text(String(localized: "live.haptics.off"))
-                .font(.system(size: 10, weight: .black, design: .rounded))
+                .font(DiveUI.Typography.warningTitle)
             Spacer(minLength: 0)
             Text(String(localized: "live.haptics.visual_only"))
-                .font(.system(size: 9, weight: .black, design: .rounded))
+                .font(DiveUI.Typography.warningBody)
         }
         .foregroundStyle(DiveUI.yellow)
         .padding(.horizontal, 8)
@@ -587,7 +614,7 @@ struct DiveLiveView: View {
             Text(dive.isDepthDataStale ? String(localized: "live.depth.stale.label") : String(localized: "live.depth.current.label"))
                 .font(DiveUI.Typography.depthCaption)
                 .lineLimit(1)
-                .minimumScaleFactor(0.68)
+                .minimumScaleFactor(0.9)
                 .foregroundStyle(dive.isDepthDataStale ? DiveUI.yellow : style.labelColor)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -620,19 +647,19 @@ struct DiveLiveView: View {
         let depthDisplay = WatchDepthFormatting.display(meters: value, units: unitPreference)
         return VStack(spacing: 2) {
             Text(title)
-                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .font(DiveUI.Typography.metricLabel)
                 .foregroundStyle(emphasize ? DiveUI.yellow : DiveUI.secondaryText)
-                .lineLimit(1)
-                .minimumScaleFactor(0.62)
+                .lineLimit(2)
+                .minimumScaleFactor(0.9)
             HStack(alignment: .lastTextBaseline, spacing: 3) {
                 Text(depthDisplay.valueText)
                     .font(.system(size: 25, weight: .black, design: .rounded))
                     .foregroundStyle(emphasize ? DiveUI.yellow : DiveUI.blue)
                     .monospacedDigit()
                     .lineLimit(1)
-                    .minimumScaleFactor(0.62)
+                    .minimumScaleFactor(0.85)
                 Text(depthDisplay.unitLabel)
-                    .font(.system(size: 12, weight: .black, design: .rounded))
+                    .font(DiveUI.Typography.dashboardUnit)
                     .foregroundStyle(DiveUI.blue)
                     .padding(.bottom, 2)
             }
@@ -756,20 +783,21 @@ struct DiveLiveView: View {
         HStack(spacing: 6) {
             Image(systemName: "exclamationmark.triangle.fill")
             Text(message)
+                .font(DiveUI.Typography.warningBody)
                 .lineLimit(2)
-                .minimumScaleFactor(0.72)
+                .minimumScaleFactor(0.9)
             if showAcknowledge {
                 Button(String(localized: "alarm.acknowledge"), action: acknowledge)
-                    .font(.caption2.bold())
+                    .font(DiveUI.Typography.secondaryLabel)
                     .foregroundStyle(DiveUI.cyan)
             }
         }
-        .font(.caption2.bold())
+        .font(DiveUI.Typography.warningTitle)
         .foregroundStyle(DiveUI.yellow)
         .multilineTextAlignment(.center)
         .padding(.horizontal, 8)
-        .padding(.vertical, 6)
-        .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
+        .frame(maxWidth: .infinity, minHeight: 44)
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(DiveUI.yellow.opacity(0.12))

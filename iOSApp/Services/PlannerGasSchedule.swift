@@ -14,6 +14,18 @@ enum PlannerGasSchedule {
         return working.bottomGas
     }
 
+    /// Bottom-gas switch depth (m). Uses bottom-cylinder switch when set between surface and max depth; otherwise max depth.
+    static func bottomGasSwitchDepthMeters(from input: GasPlanInput) -> Double {
+        let maxDepth = input.plannedDepthMeters
+        guard maxDepth.isFinite, maxDepth > 0 else { return maxDepth }
+        if let bottom = input.plannerCylinders.first(where: { $0.role == .bottom }),
+           bottom.switchDepthMeters > 0.5,
+           bottom.switchDepthMeters < maxDepth - 0.5 {
+            return bottom.switchDepthMeters
+        }
+        return maxDepth
+    }
+
     static func sortedDecoCylinders(from input: GasPlanInput) -> [PlannerCylinderEntry] {
         input.plannerCylinders
             .filter { $0.role == .deco }
@@ -41,7 +53,13 @@ enum PlannerGasSchedule {
             points.append(SwitchPoint(depthMeters: depth, gas: travel.gas, role: .travel))
         }
 
-        points.append(SwitchPoint(depthMeters: maxDepth, gas: bottomGas(from: input), role: .bottom))
+        points.append(
+            SwitchPoint(
+                depthMeters: bottomGasSwitchDepthMeters(from: input),
+                gas: bottomGas(from: input),
+                role: .bottom
+            )
+        )
         return points.sorted { $0.depthMeters < $1.depthMeters }
     }
 
@@ -84,7 +102,14 @@ enum PlannerGasSchedule {
             let travelSummary = travels.map { "\($0.gas.label) @ \(Int($0.switchDepthMeters))m" }.joined(separator: ", ")
             lines.append(String(format: String(localized: "planner.schedule.travel"), travelSummary))
         }
-        lines.append(String(format: String(localized: "planner.schedule.back_gas"), bottomGas(from: input).label, Int(input.plannedDepthMeters)))
+        let bottomSwitch = Int(bottomGasSwitchDepthMeters(from: input))
+        lines.append(
+            String(
+                format: String(localized: "planner.schedule.back_gas"),
+                bottomGas(from: input).label,
+                bottomSwitch
+            )
+        )
         let decos = sortedDecoCylinders(from: input)
         if !decos.isEmpty {
             let decoSummary = decos.map { "\($0.gas.label) @ \(Int($0.switchDepthMeters))m" }.joined(separator: ", ")
@@ -100,6 +125,32 @@ enum PlannerGasSchedule {
             )
         }
         return lines
+    }
+
+    /// Warn when travel gas is present but bottom gas still switches only at max depth (default bottom switch depth).
+    static func travelToBottomSwitchLimitationWarnings(
+        input: GasPlanInput,
+        environment: PlannerEnvironment? = nil
+    ) -> [String] {
+        var working = input
+        working.syncLegacyGasesFromPlannerCylinders()
+        let resolvedEnvironment = environment ?? working.plannerEnvironment
+        guard !sortedTravelCylinders(from: working).isEmpty else { return [] }
+        let bottomSwitch = bottomGasSwitchDepthMeters(from: working)
+        guard abs(bottomSwitch - working.plannedDepthMeters) < 0.5 else { return [] }
+        let bottom = working.bottomGas
+        let ppO2AtMax = GasPlanningService.ppO2(
+            gas: bottom,
+            depthMeters: working.plannedDepthMeters,
+            environment: resolvedEnvironment
+        )
+        let isTrimixWithTravel = bottom.helium > 0.001
+        let isLowOxygenFraction = bottom.oxygen <= 0.18 + 1e-6
+        let isHypoxicAtMaxDepth = ppO2AtMax < BuhlmannConstants.minBreathablePPO2Bar + 0.02
+        if isTrimixWithTravel && (isLowOxygenFraction || isHypoxicAtMaxDepth) {
+            return [String(localized: "planner.limitation.travel_bottom_switch_simplified")]
+        }
+        return []
     }
 
     /// Bailout cylinders are schedule-only in this reference planner — not passed to `BuhlmannEngine`.

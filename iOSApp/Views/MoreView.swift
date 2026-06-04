@@ -10,6 +10,7 @@ struct MoreView: View {
     @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
     @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
     @AppStorage(PlannerCNSDescentBottomCheckSettings.storageKey) private var cnsDescentBottomCheckEnabled = PlannerCNSDescentBottomCheckSettings.defaultEnabled
+    @AppStorage(CloudBackupSettings.enabledKey) private var cloudBackupEnabled = false
     @State private var showResetPairingConfirm = false
     @State private var versionTapCount = 0
     @State private var developerUnlockedNotice = false
@@ -106,7 +107,24 @@ struct MoreView: View {
                             cloudMergeConflictsCard
                         }
                         DIRCard(String(localized: "more.section.cloud_backup"), icon: "icloud", accent: DIRTheme.green) {
-                            row(String(localized: "more.icloud.sync_title"), cloudSync.isICloudAvailable ? String(localized: "more.icloud.active") : String(localized: "more.icloud.unavailable"))
+                            Toggle(isOn: $cloudBackupEnabled) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(String(localized: "more.icloud.backup_toggle"))
+                                        .foregroundStyle(.white)
+                                    Text(String(localized: "more.icloud.backup_privacy"))
+                                        .font(.caption2)
+                                        .foregroundStyle(DIRTheme.muted)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                            }
+                            .tint(DIRTheme.cyan)
+                            .onChange(of: cloudBackupEnabled) { _, enabled in
+                                CloudBackupSettings.setEnabled(enabled)
+                                if enabled {
+                                    logStore.synchronizeCloud()
+                                }
+                            }
+                            row(String(localized: "more.icloud.sync_title"), cloudBackupStatusTitle)
                             row(String(localized: "more.icloud.backup_scope"), String(localized: "more.icloud.backup_scope_value"))
                             row(String(localized: "more.icloud.last_event"), cloudSync.lastSyncStatus)
                             row(String(localized: "more.icloud.last_success"), formattedCloudLastSuccess)
@@ -190,6 +208,16 @@ struct MoreView: View {
             return String(localized: "more.sync.last_success.none")
         }
         return date.formatted(date: .abbreviated, time: .shortened)
+    }
+
+    private var cloudBackupStatusTitle: String {
+        if !cloudSync.isICloudAvailable {
+            return String(localized: "more.icloud.unavailable")
+        }
+        if cloudBackupEnabled {
+            return String(localized: "more.icloud.backup_on")
+        }
+        return String(localized: "more.icloud.backup_off")
     }
 
     private var formattedCloudLastSuccess: String {

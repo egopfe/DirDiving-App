@@ -32,7 +32,7 @@ struct AlarmSettingsView: View {
                         .frame(maxWidth: .infinity)
 
                     Text(String(localized: "alarms.local_scope.note"))
-                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                        .font(DiveUI.Typography.rowSubtitle)
                         .foregroundStyle(DiveUI.secondaryText)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
@@ -104,14 +104,14 @@ struct AlarmSettingsView: View {
         HStack(spacing: 8) {
             VStack(alignment: .leading, spacing: 1) {
                 Text(title)
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .font(DiveUI.Typography.rowTitle)
                     .foregroundStyle(.white)
-                    .lineLimit(1)
+                    .lineLimit(2)
                 Text(threshold)
-                    .font(.system(size: 10, weight: .regular, design: .rounded))
+                    .font(DiveUI.Typography.rowSubtitle)
                     .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.9)
             }
 
             Spacer(minLength: 0)
@@ -122,7 +122,7 @@ struct AlarmSettingsView: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
-        .frame(minHeight: 39)
+        .frame(minHeight: DiveUI.Layout.settingsRowInteractiveMinHeight)
         .background(
             RoundedRectangle(cornerRadius: 7, style: .continuous)
                 .fill(Color.black.opacity(0.52))
@@ -137,9 +137,9 @@ struct AlarmSettingsView: View {
         HStack(spacing: 7) {
             VStack(alignment: .leading, spacing: 1) {
                 Text(title)
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .font(DiveUI.Typography.rowTitle)
                     .foregroundStyle(.white)
-                    .lineLimit(1)
+                    .lineLimit(2)
                 Text(display)
                     .font(.system(size: 12, weight: .black, design: .rounded))
                     .foregroundStyle(color)
@@ -151,7 +151,7 @@ struct AlarmSettingsView: View {
             Button(action: decrease) {
                 Image(systemName: "minus")
                     .font(.system(size: 13, weight: .black))
-                    .frame(width: 40, height: 34)
+                    .frame(width: 40, height: DiveUI.Layout.alarmStepperMinHeight)
                     .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(color.opacity(0.18)))
             }
             .buttonStyle(.plain)
@@ -160,7 +160,7 @@ struct AlarmSettingsView: View {
             Button(action: increase) {
                 Image(systemName: "plus")
                     .font(.system(size: 13, weight: .black))
-                    .frame(width: 40, height: 34)
+                    .frame(width: 40, height: DiveUI.Layout.alarmStepperMinHeight)
                     .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(color.opacity(0.18)))
             }
             .buttonStyle(.plain)

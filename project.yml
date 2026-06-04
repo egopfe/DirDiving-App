@@ -117,6 +117,9 @@ targets:
       - Services/DiveManager.swift
       - Utils/SensorSourceMode.swift
       - Utils/DeveloperSettings.swift
+      - Utils/LegalAcceptanceGate.swift
+      - App/LegalAcceptanceStore.swift
+      - Utils/WatchCompanionPhotoValidator.swift
       - Services/DepthSensorProvider.swift
       - Services/SensorProviderFactory.swift
       - Services/AppleDepthSensorProvider.swift
@@ -154,6 +157,7 @@ targets:
       - Utils/MonotonicElapsedClock.swift
       - Utils/GPSConfirmationPresentation.swift
       - Utils/DiveSessionPersistenceClass.swift
+      - Utils/DiveAlgorithmSelfCheck.swift
       - Models/DiveGPSConfirmation.swift
       - Services/SubsurfaceExportService.swift
       - Services/UserImageStore.swift
@@ -187,6 +191,8 @@ targets:
       - iOSApp/Algorithms/Buhlmann/BuhlmannPlanPreflightValidator.swift
       - iOSApp/Services/BuhlmannPlanner.swift
       - iOSApp/Services/CloudSyncStore.swift
+      - iOSApp/Utils/CloudBackupSettings.swift
+      - iOSApp/Services/WatchSyncAuth.swift
       - iOSApp/Services/DiveImportService.swift
       - iOSApp/Services/GasPlanningService.swift
       - iOSApp/Services/OxygenExposureModels.swift

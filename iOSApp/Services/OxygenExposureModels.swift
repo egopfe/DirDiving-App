@@ -155,9 +155,12 @@ enum OTUModel {
 
     static func otuIncrementConstant(ppO2: Double, minutes: Double) -> Double? {
         guard ppO2.isFinite, minutes.isFinite, minutes >= 0 else { return nil }
+        guard minutes > 0 else { return 0 }
         guard ppO2 > 0.5 else { return 0 }
-        let value = minutes * pow((0.5 / (ppO2 - 0.5)), otuExponent)
-        return value.isFinite ? value : nil
+        let relative = (ppO2 - 0.5) / 0.5
+        guard relative.isFinite, relative > 0 else { return 0 }
+        let value = minutes * pow(relative, otuExponent)
+        return value.isFinite && value >= 0 ? value : nil
     }
 
     static func otuIncrementLinearRamp(ppO2Initial: Double, ppO2Final: Double, minutes: Double) -> Double? {

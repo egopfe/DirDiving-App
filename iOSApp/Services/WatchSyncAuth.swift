@@ -9,6 +9,12 @@ enum WatchSyncAuthError: Error, Equatable {
     case missingLocalSecret
 }
 
+enum WatchSyncPeerSecretIngestResult: Equatable {
+    case acceptedFirstTrust
+    case unchanged
+    case rejectedMismatch
+}
+
 enum WatchSyncAuth {
     static let contextKey = "dirdiving_watch_sync_secret"
 
@@ -24,35 +30,77 @@ enum WatchSyncAuth {
         loadPeerSecret() != nil
     }
 
-    static func publishSharedSecretIfNeeded() {
-        guard WCSession.isSupported(),
-              WCSession.default.activationState == .activated else { return }
+    /// Whether `updateApplicationContext` is allowed without `WCErrorCodeWatchAppNotInstalled`.
+    static func isApplicationContextDeliveryReady(
+        activationState: WCSessionActivationState,
+        isPaired: Bool,
+        isWatchAppInstalled: Bool
+    ) -> Bool {
+        activationState == .activated && isPaired && isWatchAppInstalled
+    }
+
+    static func canPublishApplicationContext(session: WCSession = .default) -> Bool {
+        guard WCSession.isSupported() else { return false }
+        return isApplicationContextDeliveryReady(
+            activationState: session.activationState,
+            isPaired: session.isPaired,
+            isWatchAppInstalled: session.isWatchAppInstalled
+        )
+    }
+
+    static func publishSharedSecretIfNeeded(session: WCSession = .default) {
+        guard canPublishApplicationContext(session: session) else { return }
         guard let secret = loadOrCreateLocalSecret() else {
             logger.error("Local Watch sync secret unavailable: SecRandomCopyBytes failed; refusing to publish a deterministic fallback.")
             return
         }
-        mergeApplicationContext([contextKey: secret.base64EncodedString()])
+        mergeApplicationContext([contextKey: secret.base64EncodedString()], session: session)
     }
 
-    static func mergeApplicationContext(_ updates: [String: Any]) {
-        guard WCSession.isSupported(),
-              WCSession.default.activationState == .activated else { return }
-        var context = WCSession.default.applicationContext
+    @discardableResult
+    static func mergeApplicationContext(_ updates: [String: Any], session: WCSession = .default) -> Bool {
+        guard canPublishApplicationContext(session: session) else { return false }
+        var context = session.applicationContext
         for (key, value) in updates {
             context[key] = value
         }
         if context[contextKey] == nil, let secret = loadOrCreateLocalSecret() {
             context[contextKey] = secret.base64EncodedString()
         }
-        try? WCSession.default.updateApplicationContext(context)
+        do {
+            try session.updateApplicationContext(context)
+            return true
+        } catch {
+            logger.error("updateApplicationContext failed: \(error.localizedDescription, privacy: .public)")
+            return false
+        }
     }
 
-    static func ingestSharedSecretFromContext(_ context: [String: Any]) {
+    private static let peerSecretMismatchKey = "dirdiving_watch_sync_peer_secret_mismatch"
+
+    static var peerSecretMismatchDetected: Bool {
+        UserDefaults.standard.bool(forKey: peerSecretMismatchKey)
+    }
+
+    @discardableResult
+    static func ingestSharedSecretFromContext(_ context: [String: Any]) -> WatchSyncPeerSecretIngestResult {
         guard let encoded = context[contextKey] as? String,
               let secret = Data(base64Encoded: encoded),
-              secret.count >= 32 else { return }
+              secret.count >= 32 else { return .unchanged }
+        if let existing = loadPeerSecret() {
+            if existing.constantTimeEquals(secret) {
+                clearPeerSecretMismatch()
+                return .unchanged
+            }
+            logger.warning("Rejected iOS sync peer secret replacement (TOFU pinning).")
+            setPeerSecretMismatch(true)
+            NotificationCenter.default.post(name: .watchSyncPeerSecretMismatch, object: nil)
+            return .rejectedMismatch
+        }
         savePeerSecret(secret)
+        clearPeerSecretMismatch()
         NotificationCenter.default.post(name: .watchSyncPeerSecretDidUpdate, object: nil)
+        return .acceptedFirstTrust
     }
 
     // MARK: - Sync key derivation
@@ -86,7 +134,16 @@ enum WatchSyncAuth {
     static func resetPeerTrust() {
         deleteKeychain(account: "\(keychainAccount)-peer", service: keychainService)
         deleteKeychain(account: "\(keychainAccount)-peer", service: legacyKeychainService)
+        clearPeerSecretMismatch()
         NotificationCenter.default.post(name: .watchSyncPeerSecretDidUpdate, object: nil)
+    }
+
+    private static func setPeerSecretMismatch(_ value: Bool) {
+        UserDefaults.standard.set(value, forKey: peerSecretMismatchKey)
+    }
+
+    private static func clearPeerSecretMismatch() {
+        UserDefaults.standard.set(false, forKey: peerSecretMismatchKey)
     }
 
     private static func loadOrCreateLocalSecret() -> Data? {
@@ -162,5 +219,12 @@ enum WatchSyncAuth {
 
     private enum KeychainError: Error {
         case unhandledStatus(OSStatus)
+    }
+}
+
+private extension Data {
+    func constantTimeEquals(_ other: Data) -> Bool {
+        guard count == other.count else { return false }
+        return zip(self, other).reduce(UInt8(0)) { $0 | ($1.0 ^ $1.1) } == 0
     }
 }

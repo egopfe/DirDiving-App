@@ -205,8 +205,16 @@ struct ManualDiveEditorView: View {
         exitLatitude = existing.exitGPS.map { String($0.latitude) } ?? ""
         exitLongitude = existing.exitGPS.map { String($0.longitude) } ?? ""
         equipmentUsed = existing.equipmentUsed ?? ""
-        entryPressureText = existing.entryPressureText ?? ""
-        exitPressureText = existing.exitPressureText ?? ""
+        if let entryBar = existing.entryPressureBar {
+            entryPressureText = PressureDisplayMath.formatPressureValue(entryBar, units: unitPreference)
+        } else {
+            entryPressureText = existing.entryPressureText ?? ""
+        }
+        if let exitBar = existing.exitPressureBar {
+            exitPressureText = PressureDisplayMath.formatPressureValue(exitBar, units: unitPreference)
+        } else {
+            exitPressureText = existing.exitPressureText ?? ""
+        }
         decompressionNotes = existing.decompressionNotes ?? ""
         notes = existing.notes ?? ""
         gasLabel = existing.gasLabel
@@ -226,6 +234,7 @@ struct ManualDiveEditorView: View {
         let endDate = startDate.addingTimeInterval(duration)
         let entryGPS = makeGPS(lat: entryLatitude, lon: entryLongitude, timestamp: startDate)
         let exitGPS = makeGPS(lat: exitLatitude, lon: exitLongitude, timestamp: endDate)
+        let pressures = parsedManualPressures()
         let session = DiveSession(
             id: existing.id,
             startDate: startDate,
@@ -250,8 +259,10 @@ struct ManualDiveEditorView: View {
             isManual: true,
             hasDepthProfile: false,
             equipmentUsed: equipmentUsed.isEmpty ? nil : equipmentUsed,
-            entryPressureText: entryPressureText.isEmpty ? nil : entryPressureText,
-            exitPressureText: exitPressureText.isEmpty ? nil : exitPressureText,
+            entryPressureText: pressures.entryText,
+            exitPressureText: pressures.exitText,
+            entryPressureBar: pressures.entryBar,
+            exitPressureBar: pressures.exitBar,
             decompressionNotes: decompressionNotes.isEmpty ? nil : decompressionNotes
         )
         guard logStore.add(session) else {
@@ -280,6 +291,7 @@ struct ManualDiveEditorView: View {
         )
         let summary = DiveProfileMath.summary(samples: samples, startDate: startDate, endDate: endDate)
         let ttv = DiveProfileMath.ttvIndex(averageDepthMeters: summary.averageDepthMeters, durationSeconds: duration)
+        let pressures = parsedManualPressures()
         let session = DiveSession(
             id: existing?.id ?? UUID(),
             startDate: startDate,
@@ -298,8 +310,10 @@ struct ManualDiveEditorView: View {
             gasLabel: gasLabel,
             isManual: true,
             equipmentUsed: equipmentUsed.isEmpty ? nil : equipmentUsed,
-            entryPressureText: entryPressureText.isEmpty ? nil : entryPressureText,
-            exitPressureText: exitPressureText.isEmpty ? nil : exitPressureText,
+            entryPressureText: pressures.entryText,
+            exitPressureText: pressures.exitText,
+            entryPressureBar: pressures.entryBar,
+            exitPressureBar: pressures.exitBar,
             decompressionNotes: decompressionNotes.isEmpty ? nil : decompressionNotes
         )
         guard logStore.add(session) else {
@@ -307,6 +321,15 @@ struct ManualDiveEditorView: View {
             return
         }
         dismiss()
+    }
+
+    private func parsedManualPressures() -> (entryText: String?, exitText: String?, entryBar: Double?, exitBar: Double?) {
+        let unit = PressureDisplayMath.pressureUnit(for: unitPreference)
+        let entryBar = PressureDisplayMath.parsePressureBar(from: entryPressureText, inputUnit: unit)
+        let exitBar = PressureDisplayMath.parsePressureBar(from: exitPressureText, inputUnit: unit)
+        let entryText = entryPressureText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : entryPressureText
+        let exitText = exitPressureText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : exitPressureText
+        return (entryText, exitText, entryBar, exitBar)
     }
 
     private func makeGPS(lat: String, lon: String, timestamp: Date) -> GPSPoint? {

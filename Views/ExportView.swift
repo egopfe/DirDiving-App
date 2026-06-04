@@ -38,13 +38,14 @@ struct ExportView: View {
                     .font(.system(size: 12, weight: .regular, design: .rounded))
                     .foregroundStyle(.white)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.78)
+                    .minimumScaleFactor(0.9)
+                    .lineLimit(2)
 
                 Text(String(localized: "export.complete.subsurface"))
-                    .font(.system(size: 12, weight: .regular, design: .rounded))
+                    .font(DiveUI.Typography.rowSubtitle)
                     .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.78)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.9)
 
                 Spacer(minLength: 12)
 
@@ -54,9 +55,9 @@ struct ExportView: View {
                             Text(String(localized: "CONDIVIDI CSV"))
                             Image(systemName: "square.and.arrow.up")
                         }
-                        .font(.system(size: 10, weight: .black, design: .rounded))
+                        .font(DiveUI.Typography.secondaryLabel)
                         .foregroundStyle(DiveUI.blue)
-                        .frame(maxWidth: .infinity)
+                        .frame(maxWidth: .infinity, minHeight: 40)
                         .padding(.vertical, 7)
                         .background(
                             RoundedRectangle(cornerRadius: 8, style: .continuous)

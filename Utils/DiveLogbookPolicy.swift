@@ -38,5 +38,20 @@ enum DiveLogbookPolicy {
                 .prefix(maxSessions)
         )
     }
+
+    /// Filters decoded sessions to exportable/manual-no-depth entries; invalid legacy rows are quarantined.
+    static func filterValidLoadedSessions(_ source: [DiveSession]) -> (sessions: [DiveSession], quarantinedCount: Int) {
+        var quarantined = 0
+        let sessions = source.map { DiveSessionMerge.preferred($0, $0) }.filter { session in
+            switch DiveSessionPersistenceClass.classify(session) {
+            case .invalid:
+                quarantined += 1
+                return false
+            case .profileExportable, .manualNoDepth:
+                return true
+            }
+        }
+        return (sessions, quarantined)
+    }
 }
 

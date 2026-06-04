@@ -55,7 +55,7 @@ struct PlannerView: View {
                 PlanResultView()
                     .environmentObject(store)
             }
-            .onAppear {
+            .task {
                 if store.mode != .advanced {
                     store.mode = .advanced
                 }
@@ -864,7 +864,30 @@ struct PlanResultView: View {
         var lines = [String(localized: "planner.export.header")]
         lines.append("TTR: \(store.plan.ttrMinutes) min")
         lines.append("NDL: \(Formatters.one(store.plan.ndlMinutes)) min")
-        lines.append("CNS: \(Formatters.zero(store.plan.cnsPercent))% · OTU: \(Formatters.zero(store.plan.otu))")
+        lines.append(
+            String(
+                format: String(localized: "planner.export.cns_full_plan_line"),
+                Formatters.zero(store.plan.cnsPercent)
+            )
+        )
+        lines.append(
+            String(
+                format: String(localized: "planner.export.cns_descent_bottom_line"),
+                Formatters.zero(store.plan.gasAnalysis.cnsDescentBottomPercent)
+            )
+        )
+        lines.append(
+            String(
+                format: String(localized: "planner.export.cns_ascent_deco_line"),
+                Formatters.zero(store.plan.gasAnalysis.cnsAscentDecoEstimatePercent)
+            )
+        )
+        lines.append(
+            String(
+                format: String(localized: "planner.export.otu_line"),
+                Formatters.zero(store.plan.otu)
+            )
+        )
         if store.plan.decoStops.isEmpty {
             lines.append(String(localized: "planner.export.no_deco_stops"))
         } else {
@@ -1033,10 +1056,14 @@ struct PlanResultView: View {
 
     @ViewBuilder
     private var bailoutScheduleHint: some View {
-        if !PlannerGasSchedule.bailoutCylinders(from: store.input).isEmpty {
+        let travelLimitationWarnings = PlannerGasSchedule.travelToBottomSwitchLimitationWarnings(input: store.input)
+        let bailoutWarnings = PlannerGasSchedule.bailoutAvailabilityWarnings(input: store.input)
+        if !travelLimitationWarnings.isEmpty || !PlannerGasSchedule.bailoutCylinders(from: store.input).isEmpty {
             VStack(alignment: .leading, spacing: 8) {
-                DIRWarningBox(text: String(localized: "planner.bailout.schedule_hint"))
-                ForEach(PlannerGasSchedule.bailoutAvailabilityWarnings(input: store.input), id: \.self) { warning in
+                if !PlannerGasSchedule.bailoutCylinders(from: store.input).isEmpty {
+                    DIRWarningBox(text: String(localized: "planner.bailout.schedule_hint"))
+                }
+                ForEach(travelLimitationWarnings + bailoutWarnings, id: \.self) { warning in
                     Text(warning)
                         .font(.caption2)
                         .foregroundStyle(DIRTheme.yellow)

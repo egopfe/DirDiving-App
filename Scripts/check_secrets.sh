@@ -11,6 +11,7 @@ from pathlib import Path
 
 root = Path(".")
 skip_dirs = {".git", ".worktrees", "DIRDiving.xcodeproj", ".cursor"}
+# .zip branch snapshots must not live in source (SEC-P2-003); see .gitignore
 skip_suffixes = {".png", ".jpg", ".jpeg", ".pdf", ".zip", ".pptx"}
 pattern = re.compile(
     r"(AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{20,}|-----BEGIN (RSA|EC|OPENSSH|PRIVATE) KEY-----|xox[baprs]-[A-Za-z0-9-]{10,}|AIza[0-9A-Za-z\-_]{35}|sk_(live|test)_[0-9A-Za-z]{16,}|(api[_-]?key|secret|token|password)\s*[:=]\s*[\"'][^\"']{12,}[\"'])",

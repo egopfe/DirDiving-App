@@ -7,8 +7,10 @@ enum SubsurfaceExportService {
 
         var errorDescription: String? {
             switch self {
-            case .emptySamples: return "Nessun campione da esportare."
-            case .writeFailed(let reason): return "Export CSV non riuscito: \(reason)"
+            case .emptySamples:
+                return String(localized: "export.subsurface.error.empty_samples")
+            case .writeFailed(let reason):
+                return String(format: String(localized: "export.subsurface.error.write_failed"), reason)
             }
         }
     }

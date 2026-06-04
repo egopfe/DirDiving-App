@@ -283,7 +283,7 @@ final class DiveLogStore: ObservableObject {
 
     /// Merges per session ID before writing iCloud backup so blob LWW cannot drop unrelated dives.
     private func syncCloudSessionsBackup() {
-        guard let cloudSync else { return }
+        guard CloudBackupSettings.isEnabled, let cloudSync else { return }
         let cloud = loadRawCloudSessions() ?? []
         updateMergeConflictState(local: sessions, cloud: cloud)
         let merged = mergedSessions(local: sessions, cloud: cloud)

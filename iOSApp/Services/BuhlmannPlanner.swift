@@ -77,10 +77,12 @@ enum BuhlmannPlanner {
             )
         }
 
+        let initialTissueState = BuhlmannTissueState.airSaturated(surfacePressureBar: environment.surfacePressureBar)
         let ndlValue = BuhlmannEngine.noDecompressionLimit(
             depthMeters: depthMeters,
             gas: gas,
             gfHigh: gfHigh,
+            initialTissueState: initialTissueState,
             plannerEnvironment: environment
         ) ?? 0
         return BuhlmannPlanResult(
@@ -256,10 +258,11 @@ enum BuhlmannPlanner {
         // Bailout cylinders remain schedule-only; BuhlmannPlanRequest has no bailoutGases slot.
         let planningDepth = working.buhlmannPlanningDepthMeters
         let bottomEntry = working.plannerCylinders.first(where: { $0.role == .bottom })
+        let bottomSwitchDepth = PlannerGasSchedule.bottomGasSwitchDepthMeters(from: working)
         let bottomGas = BuhlmannGas(
             gas: bottomEntry?.gas ?? working.bottomGas,
             role: .bottom,
-            switchDepthMeters: planningDepth,
+            switchDepthMeters: bottomSwitchDepth,
             cylinderId: bottomEntry?.id
         )
         let travelGases = working.plannerCylinders
@@ -284,11 +287,13 @@ enum BuhlmannPlanner {
     }
 
     private static func ndlCurve(for gas: BuhlmannGas, environment: PlannerEnvironment, gfHigh: Double) -> [NDLPoint] {
-        stride(from: 6.0, through: 60.0, by: 3.0).map { depth in
+        let initialTissueState = BuhlmannTissueState.airSaturated(surfacePressureBar: environment.surfacePressureBar)
+        return stride(from: 6.0, through: 60.0, by: 3.0).map { depth in
             let ndlValue = BuhlmannEngine.noDecompressionLimit(
                 depthMeters: depth,
                 gas: gas,
                 gfHigh: gfHigh,
+                initialTissueState: initialTissueState,
                 plannerEnvironment: environment
             ) ?? 0
             let group: String

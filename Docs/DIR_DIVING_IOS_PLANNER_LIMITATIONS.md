@@ -44,7 +44,7 @@ The iOS planner now includes a ZHL-16C N2+He multigas reference engine:
 - **CNS single exposure:** NOAA 1991 piecewise-linear time limits (Baker / NOAA Diving Manual). Constant-depth segments use `minutes / Tlimit(PPO2) × 100`. Descent/ascent ramps integrate in 0.05-minute steps along the linear PPO2 path.
 - **CNS daily (24 h):** NOAA daily limit table with linear interpolation between canonical knots (1.0–1.6 bar). Daily CNS accumulates in parallel with single-exposure CNS using the daily limit function.
 - **CNS recovery:** 90-minute half-time decay during surface intervals and in-water segments where inspired PPO₂ ≤ 0.5 bar (air-break recovery).
-- **OTU dive:** Lambertsen UPTD with constant-depth `(0.5 / (PPO2 − 0.5))^(5/6) × minutes` and Baker Eq. 2 ramp integration on linear PPO₂ changes.
+- **OTU dive:** Lambertsen UPTD with constant-depth `((PPO2 − 0.5) / 0.5)^(5/6) × minutes` when PPO2 > 0.5 bar; Baker Eq. 2 ramp integration on linear PPO₂ changes.
 - **OTU daily / weekly:** REPEX-style reference thresholds — elevated dive OTU ≥ 300, daily 24 h OTU ≥ 850, weekly OTU ≥ 1 800. Daily OTU resets after 24 h surface interval; weekly after 7 days.
 - **Repetitive carryover:** Tissue snapshot schema v2 stores `oxygenCarryover` from the prior calculated profile; surface interval applies CNS decay and OTU window resets before the next plan.
 - Schedule segments reconstruct start/end depth from runtime order so exposure reflects descent and ascent, not just target depth.
@@ -75,6 +75,13 @@ The iOS planner now includes a ZHL-16C N2+He multigas reference engine:
 - Stops are rounded to 3 m intervals.
 - Default descent rate is 18 m/min; ascent 9 m/min; switch dwell 0.5 min.
 - Gas density, CNS, OTU, END, and EAD remain reference estimates.
+
+## Travel / bottom gas switch depth (2026-06-04)
+
+- Bottom-cylinder **switch depth** (m) on the planner gas table sets when bottom gas replaces travel gas on descent (when > 0.5 m and shallower than max depth).
+- If unset (0), bottom gas switches at **maximum depth** (legacy behaviour).
+- After the bottom-gas switch, descent may continue on bottom gas to max depth when max depth is deeper than the switch.
+- Hypoxic trimix with travel gas and default max-depth bottom switch shows a localized limitation warning — verify with certified tools.
 
 ## Known Limitations
 

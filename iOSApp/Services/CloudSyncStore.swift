@@ -22,8 +22,11 @@ final class CloudSyncStore: ObservableObject {
             queue: .main
         ) { [weak self] notification in
             Task { @MainActor in
-                self?.isICloudAvailable = FileManager.default.ubiquityIdentityToken != nil
-                self?.lastSyncStatus = String(localized: "cloud.status.external_update")
+                guard let self else { return }
+                self.publishDeferred { [self] in
+                    self.isICloudAvailable = FileManager.default.ubiquityIdentityToken != nil
+                    self.lastSyncStatus = String(localized: "cloud.status.external_update")
+                }
                 NotificationCenter.default.post(
                     name: .cloudSyncDidChangeExternally,
                     object: self,
@@ -35,7 +38,7 @@ final class CloudSyncStore: ObservableObject {
     }
 
     func clearDecodeError() {
-        lastDecodeError = nil
+        publishDeferred { [self] in lastDecodeError = nil }
     }
 
     func loadRawLocalData(forKey key: String) -> Data? {
@@ -73,7 +76,9 @@ final class CloudSyncStore: ObservableObject {
                 if let decoded = decode(type, from: cloudData, key: key, source: String(localized: "cloud.source.icloud")) {
                     defaults.set(cloudData, forKey: key)
                     defaults.set(cloudModifiedAt, forKey: modifiedAtKey(for: key))
-                    lastSyncStatus = String(localized: "cloud.status.loaded_from_icloud")
+                    publishDeferred { [self] in
+                        lastSyncStatus = String(localized: "cloud.status.loaded_from_icloud")
+                    }
                     return decoded
                 }
                 recordDecodeFailure(key: key, source: String(localized: "cloud.source.icloud"))
@@ -84,9 +89,13 @@ final class CloudSyncStore: ObservableObject {
                     cloudStore.set(localData, forKey: key)
                     cloudStore.set(localModifiedAt, forKey: modifiedAtKey(for: key))
                     synchronize()
-                    lastSyncStatus = String(localized: "cloud.status.local_newer_pending_icloud")
+                    publishDeferred { [self] in
+                        lastSyncStatus = String(localized: "cloud.status.local_newer_pending_icloud")
+                    }
                 } else if lastDecodeError != nil {
-                    lastSyncStatus = String(localized: "cloud.status.using_local_after_icloud_error")
+                    publishDeferred { [self] in
+                        lastSyncStatus = String(localized: "cloud.status.using_local_after_icloud_error")
+                    }
                 }
                 return decoded
             }
@@ -97,7 +106,9 @@ final class CloudSyncStore: ObservableObject {
             if let decoded = decode(type, from: cloudData, key: key, source: String(localized: "cloud.source.icloud")) {
                 defaults.set(cloudData, forKey: key)
                 defaults.set(cloudModifiedAt, forKey: modifiedAtKey(for: key))
-                lastSyncStatus = String(localized: "cloud.status.loaded_from_icloud")
+                publishDeferred { [self] in
+                    lastSyncStatus = String(localized: "cloud.status.loaded_from_icloud")
+                }
                 return decoded
             }
             recordDecodeFailure(key: key, source: String(localized: "cloud.source.icloud"))
@@ -108,7 +119,9 @@ final class CloudSyncStore: ObservableObject {
                 cloudStore.set(localData, forKey: key)
                 cloudStore.set(localModifiedAt, forKey: modifiedAtKey(for: key))
                 synchronize()
-                lastSyncStatus = String(localized: "cloud.status.local_pending_icloud")
+                publishDeferred { [self] in
+                    lastSyncStatus = String(localized: "cloud.status.local_pending_icloud")
+                }
                 return decoded
             }
             recordDecodeFailure(key: key, source: String(localized: "cloud.source.local"))
@@ -129,7 +142,9 @@ final class CloudSyncStore: ObservableObject {
 
     func save<T: Encodable>(_ value: T, forKey key: String) {
         guard let data = encode(value) else {
-            lastSyncStatus = String(localized: "cloud.status.encode_failed")
+            publishDeferred { [self] in
+                lastSyncStatus = String(localized: "cloud.status.encode_failed")
+            }
             return
         }
 
@@ -139,24 +154,30 @@ final class CloudSyncStore: ObservableObject {
         cloudStore.set(data, forKey: key)
         cloudStore.set(modifiedAt, forKey: modifiedAtKey(for: key))
         synchronize()
-        lastDecodeError = nil
-        lastSyncStatus = isICloudAvailable
-            ? String(localized: "cloud.status.saved_local_and_icloud")
-            : String(localized: "cloud.status.saved_local_only")
-        if isICloudAvailable {
-            lastSuccessfulSyncDate = Date()
+        let available = FileManager.default.ubiquityIdentityToken != nil
+        publishDeferred { [self] in
+            lastDecodeError = nil
+            lastSyncStatus = available
+                ? String(localized: "cloud.status.saved_local_and_icloud")
+                : String(localized: "cloud.status.saved_local_only")
+            if available {
+                lastSuccessfulSyncDate = Date()
+            }
         }
     }
 
     func synchronize() {
-        isSynchronizing = true
         cloudStore.synchronize()
-        isICloudAvailable = FileManager.default.ubiquityIdentityToken != nil
-        if isICloudAvailable {
-            lastSyncStatus = String(localized: "cloud.status.sync_requested")
-            lastSuccessfulSyncDate = Date()
-        } else {
-            lastSyncStatus = String(localized: "cloud.status.icloud_unavailable")
+        let available = FileManager.default.ubiquityIdentityToken != nil
+        publishDeferred { [self] in
+            isSynchronizing = true
+            isICloudAvailable = available
+            if available {
+                lastSyncStatus = String(localized: "cloud.status.sync_requested")
+                lastSuccessfulSyncDate = Date()
+            } else {
+                lastSyncStatus = String(localized: "cloud.status.icloud_unavailable")
+            }
         }
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 900_000_000)
@@ -170,7 +191,9 @@ final class CloudSyncStore: ObservableObject {
         do {
             return try encoder.encode(value)
         } catch {
-            lastSyncStatus = String(localized: "cloud.status.encode_failed")
+            publishDeferred { [self] in
+                lastSyncStatus = String(localized: "cloud.status.encode_failed")
+            }
             Self.logger.error("iCloud encode failed: \(error.localizedDescription, privacy: .private)")
             return nil
         }
@@ -201,11 +224,16 @@ final class CloudSyncStore: ObservableObject {
             detail = String(format: String(localized: "cloud.decode.error_format"), name, source)
         }
         if let existing = lastDecodeError, existing != detail {
-            lastDecodeError = "\(existing)\n\(detail)"
+            publishDeferred { [self] in
+                lastDecodeError = "\(existing)\n\(detail)"
+                lastSyncStatus = String(localized: "cloud.status.decode_failed")
+            }
         } else {
-            lastDecodeError = detail
+            publishDeferred { [self] in
+                lastDecodeError = detail
+                lastSyncStatus = String(localized: "cloud.status.decode_failed")
+            }
         }
-        lastSyncStatus = String(localized: "cloud.status.decode_failed")
         Self.logger.error("iCloud decode failed key=\(key, privacy: .public) source=\(source, privacy: .public)")
     }
 
@@ -222,5 +250,12 @@ final class CloudSyncStore: ObservableObject {
 
     private func modifiedAtKey(for key: String) -> String {
         "\(key).__modifiedAt"
+    }
+
+    /// Avoid SwiftUI runtime fault: "Publishing changes from within view updates".
+    private func publishDeferred(_ update: @escaping () -> Void) {
+        Task { @MainActor in
+            update()
+        }
     }
 }

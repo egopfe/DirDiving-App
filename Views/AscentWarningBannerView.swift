@@ -22,7 +22,7 @@ struct AscentWarningBannerView: View {
                     .font(DiveUI.Typography.bannerTitle)
                     .foregroundStyle(DiveUI.alarmRed)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.72)
+                    .minimumScaleFactor(0.9)
 
                 HStack(spacing: 0) {
                     if rateMetersPerMinute > 0.05 {
@@ -31,7 +31,7 @@ struct AscentWarningBannerView: View {
                             .foregroundStyle(DiveUI.alarmText)
                             .monospacedDigit()
                             .lineLimit(1)
-                            .minimumScaleFactor(0.72)
+                            .minimumScaleFactor(0.9)
 
                         Rectangle()
                             .fill(DiveUI.alarmText.opacity(0.35))
@@ -42,8 +42,8 @@ struct AscentWarningBannerView: View {
                     Text("ascent_alarm_instruction", bundle: .main)
                         .font(DiveUI.Typography.bannerSubtitle)
                         .foregroundStyle(DiveUI.alarmText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.72)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.9)
                 }
             }
 
@@ -57,7 +57,7 @@ struct AscentWarningBannerView: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
-        .frame(maxWidth: .infinity, minHeight: 40)
+        .frame(maxWidth: .infinity, minHeight: 44)
         .background(
             RoundedRectangle(cornerRadius: 9, style: .continuous)
                 .fill(DiveUI.alarmFill.opacity(0.92))

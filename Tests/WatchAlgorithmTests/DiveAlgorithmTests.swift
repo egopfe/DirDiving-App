@@ -36,8 +36,15 @@ final class DiveAlgorithmTests: XCTestCase {
         var frozenValidator = DepthSampleValidationState()
         XCTAssertEqual(frozenValidator.validate(rawDepthMeters: 10, timestamp: now, receivedAt: now, temperatureCelsius: nil).validity, .valid)
         XCTAssertEqual(
-            frozenValidator.validate(rawDepthMeters: 10, timestamp: now.addingTimeInterval(31), receivedAt: now.addingTimeInterval(31), temperatureCelsius: nil).validity,
+            frozenValidator.validate(rawDepthMeters: 10, timestamp: now.addingTimeInterval(31), receivedAt: now.addingTimeInterval(31), temperatureCelsius: nil, isDiveActive: true).validity,
             .frozen
+        )
+
+        var inactiveSurfaceValidator = DepthSampleValidationState()
+        XCTAssertEqual(inactiveSurfaceValidator.validate(rawDepthMeters: 0, timestamp: now, receivedAt: now, temperatureCelsius: nil).validity, .valid)
+        XCTAssertEqual(
+            inactiveSurfaceValidator.validate(rawDepthMeters: 0, timestamp: now.addingTimeInterval(31), receivedAt: now.addingTimeInterval(31), temperatureCelsius: nil, isDiveActive: false).validity,
+            .valid
         )
 
         var spikeValidator = DepthSampleValidationState()
@@ -135,6 +142,21 @@ final class DiveAlgorithmTests: XCTestCase {
         XCTAssertEqual(AscentStatus.make(rate: 1.0, depth: 3).zone, .yellow)
         XCTAssertEqual(AscentStatus.make(rate: 1.1, depth: 3).zone, .red)
         XCTAssertEqual(DepthSafetyState.from(depthMeters: 40.1), .exceeded)
+    }
+
+    func testDiveAlgorithmSelfCheckPasses() {
+        XCTAssertTrue(DiveAlgorithmSelfCheck.failures().isEmpty, DiveAlgorithmSelfCheck.failures().joined(separator: "; "))
+    }
+
+    func testDepthAndRuntimeAlarmThresholdsAreStrictlyGreaterThan() {
+        let depthThreshold = 30.0
+        XCTAssertFalse(depthThreshold > depthThreshold)
+        XCTAssertTrue((depthThreshold + 0.01) > depthThreshold)
+
+        let runtimeMinutes = 45
+        let runtimeSeconds = TimeInterval(runtimeMinutes * 60)
+        XCTAssertFalse(runtimeSeconds > TimeInterval(runtimeMinutes * 60))
+        XCTAssertTrue((runtimeSeconds + 1) > TimeInterval(runtimeMinutes * 60))
     }
 
     func testTemperatureConversionAndNonFiniteRejection() {

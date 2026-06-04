@@ -232,15 +232,24 @@ enum WatchDiveSyncError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .missingPayload: return "Payload sync mancante."
-        case .payloadTooLarge: return "Payload sync troppo grande."
-        case .unsupportedVersion: return "Versione sync non supportata."
-        case .invalidSender: return "Mittente sync non valido."
-        case .stalePayload: return "Payload sync scaduto."
-        case .invalidSignature: return "Firma sync non valida."
-        case .invalidSession: return "Sessione immersione non valida."
-        case .sessionInactive: return "WatchConnectivity non attivo."
-        case .missingPeerSecret: return "Chiave sync Watch non ancora disponibile."
+        case .missingPayload:
+            return String(localized: "sync.codec.error.missing_payload")
+        case .payloadTooLarge:
+            return String(localized: "sync.codec.error.payload_too_large")
+        case .unsupportedVersion:
+            return String(localized: "sync.codec.error.unsupported_version")
+        case .invalidSender:
+            return String(localized: "sync.codec.error.invalid_sender")
+        case .stalePayload:
+            return String(localized: "sync.codec.error.stale_payload")
+        case .invalidSignature:
+            return String(localized: "sync.codec.error.invalid_signature")
+        case .invalidSession:
+            return String(localized: "sync.codec.error.invalid_session")
+        case .sessionInactive:
+            return String(localized: "sync.codec.error.session_inactive")
+        case .missingPeerSecret:
+            return String(localized: "sync.codec.error.missing_peer_secret")
         }
     }
 }

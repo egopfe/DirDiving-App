@@ -8,11 +8,13 @@ struct DeveloperVersionUnlockGesture: ViewModifier {
         content
             .contentShape(Rectangle())
             .onTapGesture {
+                #if DEBUG
                 tapCount += 1
                 guard tapCount >= 7 else { return }
                 tapCount = 0
                 DeveloperSettings.unlockDeveloperSection()
                 onUnlocked()
+                #endif
             }
     }
 }

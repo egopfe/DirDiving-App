@@ -21,4 +21,4 @@ Export continues to include `temperature_c` when sample data exists. Export beha
 
 ## Tests
 
-See `Tests/iOSAlgorithmTests/AuditRemediationTests.swift` and `CSVMetadataRoundTripTests.swift`.
+See `Tests/iOSAlgorithmTests/AuditRemediationTests.swift`, `IOSMainAlgorithmAuditRemediationTests.swift`, and `CSVMetadataRoundTripTests.swift`.

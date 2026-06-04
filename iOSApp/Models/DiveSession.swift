@@ -41,6 +41,9 @@ struct DiveSession: Identifiable, Codable, Hashable {
     var equipmentUsed: String?
     var entryPressureText: String?
     var exitPressureText: String?
+    /// Canonical bar storage for manual pressure entries; preferred over text for display math.
+    var entryPressureBar: Double?
+    var exitPressureBar: Double?
     var decompressionNotes: String?
 
     static let demoNotesLabel = "Demo dive"
@@ -52,7 +55,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
         case avgWaterTemperatureCelsius, ttv, entryGPS, exitGPS
         case entryGPSFixSource, exitGPSFixSource, samples
         case siteName, buddy, notes, gasLabel, sacLitersMinute, isDemo, exceededSupportedDepthRange
-        case isManual, hasDepthProfile, equipmentUsed, entryPressureText, exitPressureText, decompressionNotes
+        case isManual, hasDepthProfile, equipmentUsed, entryPressureText, exitPressureText, entryPressureBar, exitPressureBar, decompressionNotes
     }
 
     init(
@@ -81,6 +84,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         equipmentUsed: String? = nil,
         entryPressureText: String? = nil,
         exitPressureText: String? = nil,
+        entryPressureBar: Double? = nil,
+        exitPressureBar: Double? = nil,
         decompressionNotes: String? = nil
     ) {
         self.id = id
@@ -109,6 +114,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         self.equipmentUsed = equipmentUsed
         self.entryPressureText = entryPressureText
         self.exitPressureText = exitPressureText
+        self.entryPressureBar = entryPressureBar
+        self.exitPressureBar = exitPressureBar
         self.decompressionNotes = decompressionNotes
     }
 
@@ -141,6 +148,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         equipmentUsed = try container.decodeIfPresent(String.self, forKey: .equipmentUsed)
         entryPressureText = try container.decodeIfPresent(String.self, forKey: .entryPressureText)
         exitPressureText = try container.decodeIfPresent(String.self, forKey: .exitPressureText)
+        entryPressureBar = try container.decodeIfPresent(Double.self, forKey: .entryPressureBar)
+        exitPressureBar = try container.decodeIfPresent(Double.self, forKey: .exitPressureBar)
         decompressionNotes = try container.decodeIfPresent(String.self, forKey: .decompressionNotes)
     }
 
@@ -171,6 +180,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         try container.encodeIfPresent(equipmentUsed, forKey: .equipmentUsed)
         try container.encodeIfPresent(entryPressureText, forKey: .entryPressureText)
         try container.encodeIfPresent(exitPressureText, forKey: .exitPressureText)
+        try container.encodeIfPresent(entryPressureBar, forKey: .entryPressureBar)
+        try container.encodeIfPresent(exitPressureBar, forKey: .exitPressureBar)
         try container.encodeIfPresent(decompressionNotes, forKey: .decompressionNotes)
     }
 }
