@@ -95,18 +95,22 @@ struct CompassView: View {
     }
 
     private var compassDial: some View {
-        ZStack {
-            CompassTickRing()
-                .stroke(.white.opacity(0.72), style: StrokeStyle(lineWidth: 1, lineCap: .round))
-                .frame(width: 148, height: 148)
-                .rotationEffect(.degrees(-compass.headingDegrees))
+        let dialSize: CGFloat = 148
+        return ZStack {
+            ZStack {
+                CompassTickRing()
+                    .stroke(.white.opacity(0.72), style: StrokeStyle(lineWidth: 1, lineCap: .round))
+                    .frame(width: dialSize, height: dialSize)
 
-            ForEach(cardinalMarkers, id: \.label) { marker in
-                Text(marker.label)
-                    .font(.system(size: marker.isPrimary ? 18 : 13, weight: .black, design: .rounded))
-                    .foregroundStyle(marker.color)
-                    .position(marker.position(in: 148))
+                ForEach(cardinalMarkers, id: \.label) { marker in
+                    Text(marker.label)
+                        .font(.system(size: marker.isPrimary ? 18 : 13, weight: .black, design: .rounded))
+                        .foregroundStyle(marker.color)
+                        .position(marker.position(in: dialSize))
+                }
             }
+            .frame(width: dialSize, height: dialSize)
+            .rotationEffect(.degrees(-compass.headingDegrees))
 
             VStack(spacing: 1) {
                 Image(systemName: "diamond.fill")
