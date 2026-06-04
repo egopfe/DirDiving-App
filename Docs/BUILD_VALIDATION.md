@@ -1,15 +1,14 @@
 # Build validation — DIR DIVING (MAIN)
 
-**Branch:** latest fetched `origin/main` @ `1de70dd`; security remediation work is tracked on `codex/main-full-code-security-remediation-current` (2026-05-31).
-**Algorithm baseline:** iOS @ `dce89e7`; Watch WMATH-HIGH -> INFO-014 @ `f654bec`; UI/UX P0-P3 @ `c8f91f6`
-**Watch compile fix:** GPS fallback types in `Services/GPSManager.swift` @ `06e4c67`; explicit Watch target sources in `project.yml` @ `bfbc3e7`  
+**Branch:** `main` @ `63ee0b4` + Bühlmann OTU remediation (2026-06-04, local).
+**Algorithm baseline:** iOS planner OTU canonical fix + bottom-gas switch depth; Watch unchanged.
 **Generator:** [XcodeGen](https://github.com/yonaskolb/XcodeGen) (`project.yml` at repository root). **`DIRDiving.xcodeproj/` is gitignored — always run `xcodegen generate` after pull/checkout.**
 
-**Latest local validation (2026-05-31):**
+**Latest local validation (2026-06-04):**
 
 - `xcodegen generate` → **PASS**
-- `xcodebuild -scheme "DIRDiving iOS" -destination 'platform=iOS Simulator,name=iPhone 17' build` → **PASS**
-- `xcodebuild test -scheme "DIRDiving iOS Algorithm Tests" -destination 'platform=iOS Simulator,name=iPhone 17'` → **PASS** (154 executed, 1 skipped, 0 failures)
+- `xcodebuild -scheme "DIRDiving iOS" -destination 'generic/platform=iOS Simulator' build` → **PASS**
+- `xcodebuild test -scheme "DIRDiving iOS Algorithm Tests" -destination 'platform=iOS Simulator,name=iPhone 17 Pro'` → **PASS** (247 executed, 4 skipped, 0 failures)
 - `xcodebuild -scheme "DIRDiving Watch App" -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm)' build` → **PASS**
 - `xcodebuild test -scheme "DIRDiving Watch Algorithm Tests" -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm)'` → **PASS** (all tests incl. `WatchReadinessAlgorithmTests`)
 

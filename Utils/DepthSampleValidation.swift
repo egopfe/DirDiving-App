@@ -36,7 +36,8 @@ struct DepthSampleValidationState {
         rawDepthMeters: Double?,
         timestamp: Date,
         receivedAt: Date = Date(),
-        temperatureCelsius: Double?
+        temperatureCelsius: Double?,
+        isDiveActive: Bool = false
     ) -> ValidatedDepthSample {
         guard let rawDepthMeters else {
             return ValidatedDepthSample(validity: .missing, rawDepthMeters: nil, sample: nil)
@@ -68,7 +69,12 @@ struct DepthSampleValidationState {
         if let reference = frozenReferenceSample,
            abs(reference.depthMeters - sample.depthMeters) <= DiveAlgorithmConfiguration.frozenDepthToleranceMeters {
             if sample.timestamp.timeIntervalSince(reference.timestamp) >= DiveAlgorithmConfiguration.frozenDepthSampleSeconds {
-                return ValidatedDepthSample(validity: .frozen, rawDepthMeters: rawDepthMeters, sample: nil)
+                if isDiveActive {
+                    return ValidatedDepthSample(validity: .frozen, rawDepthMeters: rawDepthMeters, sample: nil)
+                }
+                frozenReferenceSample = sample
+                lastValidSample = sample
+                return ValidatedDepthSample(validity: .valid, rawDepthMeters: rawDepthMeters, sample: sample)
             }
         } else {
             frozenReferenceSample = sample

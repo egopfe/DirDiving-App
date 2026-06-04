@@ -173,7 +173,12 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     private func ingestCompanionContext(_ context: [String: Any]) {
-        WatchSyncAuth.ingestSharedSecretFromContext(context)
+        switch WatchSyncAuth.ingestSharedSecretFromContext(context) {
+        case .rejectedMismatch:
+            lastSyncStatus = String(localized: "sync.trust.mismatch")
+        case .acceptedFirstTrust, .unchanged:
+            break
+        }
         if let units = context[WatchSyncKeys.unitsPreferenceKey] as? String,
            DIRUnitPreference(rawValue: units) != nil {
             UserDefaults.standard.set(units, forKey: DIRUnitPreference.storageKey)

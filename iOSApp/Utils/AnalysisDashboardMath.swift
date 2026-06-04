@@ -1,6 +1,7 @@
 import Foundation
 
 /// Pure helpers for Analysis dashboard aggregates (unit-testable).
+/// SAC and temperature summaries use simple arithmetic means across sessions, not duration-weighted averages.
 enum AnalysisDashboardMath {
     struct Summary: Equatable {
         let diveCount: Int
@@ -22,12 +23,15 @@ enum AnalysisDashboardMath {
         }
         let sacValues = sessions.compactMap(\.sacLitersMinute)
         let tempValues = sessions.compactMap(\.avgWaterTemperatureCelsius)
+        // Intentional arithmetic mean per session (not weighted by dive duration).
+        let averageSAC = sacValues.isEmpty ? nil : sacValues.reduce(0, +) / Double(sacValues.count)
+        let averageTemp = tempValues.isEmpty ? nil : tempValues.reduce(0, +) / Double(tempValues.count)
         return Summary(
             diveCount: sessions.count,
             maxDepthMeters: sessions.map(\.maxDepthMeters).max() ?? 0,
             totalRuntimeMinutes: sessions.map(\.durationSeconds).reduce(0, +) / 60.0,
-            averageSACLitersPerMinute: sacValues.isEmpty ? nil : sacValues.reduce(0, +) / Double(sacValues.count),
-            averageWaterTemperatureCelsius: tempValues.isEmpty ? nil : tempValues.reduce(0, +) / Double(tempValues.count)
+            averageSACLitersPerMinute: averageSAC,
+            averageWaterTemperatureCelsius: averageTemp
         )
     }
 

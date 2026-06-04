@@ -36,6 +36,7 @@ The engine is informational and non-certified. It must never be presented as a l
 ## Gas Strategy
 
 - Bottom gas is used for descent and bottom loading unless travel gases are provided.
+- **Bottom-gas switch depth:** when the bottom cylinder switch depth is set (> 0.5 m and shallower than max depth), travel-to-bottom switching uses that depth; descent may continue on bottom gas to max depth afterward. Default switch depth 0 means bottom gas at max depth.
 - Multiple bottom segments can be passed to the pure engine for staged bottom gas/time/depth loading.
 - Travel gases are used during descent at configured switch depths.
 - Travel and deco gases are selected on ascent when the current segment/stop depth is at or shallower than their switch depth and PPO2 is within bounds, including no-stop returns and decompression ascents between stops (travel switch depths are honored as ascent waypoints).

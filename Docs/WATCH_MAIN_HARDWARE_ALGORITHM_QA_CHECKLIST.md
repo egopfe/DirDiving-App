@@ -16,7 +16,7 @@
 | A3 | Automatic start at **> 1.0 m** (not on first sample alone) | ☐ | ☐ | ☐ | |
 | A4 | Two-sample debounce before auto start | ☐ | ☐ | ☐ | |
 | A5 | Stale-depth banner after **8 s** without accepted callback during active dive | ☐ | ☐ | ☐ | |
-| A6 | Frozen-depth rejection (sensor stuck ~same depth ≥ 30 s) | ☐ | ☐ | ☐ | |
+| A6 | Frozen-depth rejection during **active** dive (sensor stuck ~same depth ≥ 30 s) | ☐ | ☐ | ☐ | Inactive surface / mock 0 m must **not** warn (code fixed) |
 | A7 | Spike rejection on implausible depth jump | ☐ | ☐ | ☐ | |
 
 ## B. Dive lifecycle
@@ -26,8 +26,9 @@
 | B1 | Automatic dive start in water | ☐ | ☐ | ☐ | |
 | B2 | Manual dive start (no duplicate session) | ☐ | ☐ | ☐ | |
 | B3 | Automatic end at **≤ 0.3 m** for **≥ 8 s** surface dwell | ☐ | ☐ | ☐ | |
-| B4 | Relaunch restores active draft without duplicate finalize | ☐ | ☐ | ☐ | |
-| B5 | No duplicate logbook entry on single dive | ☐ | ☐ | ☐ | |
+| B4 | Relaunch restores **active** draft only; **finalizing** draft completes to log (no active restore) | ☐ | ☐ | ☐ | Code: pending finalization on kill during 6 s exit GPS |
+| B5 | No duplicate logbook entry on single dive / idempotent finalize by session ID | ☐ | ☐ | ☐ | |
+| B6 | Force-quit during exit GPS window → next launch completes log with no-fix if needed | ☐ | ☐ | ☐ | Field kill test |
 
 ## C. GPS
 
@@ -46,7 +47,7 @@
 | D2 | Depth safety **35 / 38 / 40 m** states and haptics | ☐ | ☐ | ☐ | |
 | D3 | Runtime alarm (if enabled) | ☐ | ☐ | ☐ | |
 | D4 | Battery alarm (if enabled) | ☐ | ☐ | ☐ | |
-| D5 | Haptics disabled → no unwanted pulses | ☐ | ☐ | ☐ | |
+| D5 | Haptics disabled → no unwanted pulses (incl. delayed depth-limit secondary) | ☐ | ☐ | ☐ | Token-bound delayed haptics in code |
 | D6 | Re-enable haptics while still over limit → pulses resume | ☐ | ☐ | ☐ | |
 
 ## E. Export / sync
@@ -57,6 +58,7 @@
 | E2 | Manual no-depth session: sync allowed, export disabled | ☐ | ☐ | ☐ | |
 | E3 | Watch → iPhone signed sync | ☐ | ☐ | ☐ | |
 | E4 | Tombstone / delete propagation | ☐ | ☐ | ☐ | |
+| E5 | Invalid legacy JSON rows quarantined on load (not shown as normal log) | ☐ | ☐ | ☐ | Code: `filterValidLoadedSessions` |
 
 ## F. Mission Mode invariant
 

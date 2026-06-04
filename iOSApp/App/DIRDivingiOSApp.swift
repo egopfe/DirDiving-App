@@ -17,6 +17,7 @@ struct DIRDivingiOSApp: App {
         _logStore = StateObject(wrappedValue: DiveLogStore(cloudSync: cloudSync))
         _plannerStore = StateObject(wrappedValue: PlannerStore(cloudSync: cloudSync))
         _equipmentStore = StateObject(wrappedValue: EquipmentStore(cloudSync: cloudSync))
+        SensorSourceMode.applyReleaseSafeMigrationIfNeeded()
     }
 
     var body: some Scene {
@@ -39,7 +40,7 @@ struct DIRDivingiOSApp: App {
                 .environmentObject(legalAcceptance)
                 .environment(\.locale, DIRIOSAppLanguage.fromStorage(appLanguage).locale)
                 .preferredColorScheme(.dark)
-                .onAppear {
+                .task {
                     logStore.attachWatchSync(watchSync)
                     watchSync.activate(logStore: logStore)
                 }

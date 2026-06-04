@@ -57,6 +57,25 @@ enum PlannerService {
             request = baseRequest
         }
 
+        let preflightIssues = BuhlmannPlanPreflightValidator.validate(request)
+        let enginePlan: BuhlmannEngineResult
+        if !preflightIssues.isEmpty {
+            enginePlan = BuhlmannEngineResult(
+                ndlMinutes: nil,
+                ttsMinutes: 0,
+                totalRuntimeMinutes: 0,
+                descentMinutes: 0,
+                bottomMinutes: 0,
+                gasSwitchMinutes: 0,
+                finalTissueState: nil,
+                stops: [],
+                segments: [],
+                issues: preflightIssues,
+                modelState: .invalidInput
+            )
+        } else {
+            enginePlan = BuhlmannEngine.plan(request)
+        }
         let repetitiveContext = makeRepetitiveContext(
             enabled: repetitivePlanningEnabled,
             snapshot: repetitiveSnapshot,
@@ -65,7 +84,6 @@ enum PlannerService {
             snapshotIssue: repetitiveStates.first(where: { isSnapshotIssue($0) })
         )
 
-        let enginePlan = BuhlmannEngine.plan(request)
         let oxygenCarryover = resolvedOxygenCarryover(
             repetitivePlanningEnabled: repetitivePlanningEnabled,
             snapshot: repetitiveSnapshot,

@@ -7,15 +7,21 @@ enum DeveloperSettings {
         #if DEBUG
         return true
         #else
-        if UserDefaults.standard.bool(forKey: developerUnlockedKey) {
-            return true
-        }
+        return isTestFlightBuild
+        #endif
+    }
+
+    /// Simulation depth is DEBUG/TestFlight-only (SEC-P1-002).
+    static var allowsSimulationSensorSelection: Bool {
+        #if DEBUG
+        return true
+        #else
         return isTestFlightBuild
         #endif
     }
 
     static var sensorSourceMode: SensorSourceMode {
-        SensorSourceMode.persisted
+        SensorSourceMode.runtimeMode
     }
 
     static func persistSensorSource(_ mode: SensorSourceMode) {

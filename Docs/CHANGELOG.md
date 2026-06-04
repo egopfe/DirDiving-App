@@ -8,7 +8,7 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 - **Watch MAIN UI/UX:** Live Dive scroll + compact banner stacking; legal onboarding IT/EN; Crown first-run hint; underwater navigation toast; reset stopwatch intent guard; export ShareLink; compass/images a11y; tiered battery bar; alarm/ascent i18n + imperial bands; mode selection documented.
 - **iOS MAIN UI/UX:** Policy A no-depth metadata-only edit; DEMO badge + mixed-logbook banner; iCloud merge conflict UI; planner team preview-only; sync status clarity; tab/picker a11y; synthetic manual profile disclosure; logbook expanded search; swipe-to-delete + confirmation; Analysis CSV via shared `CSVImportPanel`.
-- **Documentazione:** [`Docs/MAIN_UI_UX_READINESS_AUDIT_CURRENT.md`](Docs/MAIN_UI_UX_READINESS_AUDIT_CURRENT.md), [`Docs/MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md`](Docs/MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md), [`Docs/MAIN_UI_UX_READINESS_QA_ANALYSIS.md`](Docs/MAIN_UI_UX_READINESS_QA_ANALYSIS.md), INDEX/CSV/README/ROADMAP alignment @ `c8f91f6`.
+- **Documentazione:** [`Docs/MAIN_UI_UX_READINESS_AUDIT_CURRENT.md`](MAIN_UI_UX_READINESS_AUDIT_CURRENT.md), [`Docs/MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md`](MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md), [`Docs/MAIN_UI_UX_READINESS_QA_ANALYSIS.md`](MAIN_UI_UX_READINESS_QA_ANALYSIS.md), INDEX/CSV/README/ROADMAP alignment @ `c8f91f6`.
 - **Verdict (codice):** Watch/iOS/cross-app UI/UX **100%**; Internal TestFlight UI/UX **YES**; external TestFlight/App Store dopo QA fisica.
 
 ### Added (2026-05-31, Watch MAIN algorithmic readiness 100%)
@@ -16,13 +16,13 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 - **Algoritmo Watch:** remediation WMATH-HIGH-001 → INFO-014 — depth callback silence watchdog, GPS fix/fallback/no-fix banners, manual/no-depth sync (Policy A), auto-start sample retention, persistence class, CSV time origin, `MonotonicElapsedClock`, independent blink/haptic sources, gauge/zone alignment, imperial ascent banner, temperature freshness.
 - **iOS companion:** `hasDepthProfile`, sync validation manual no-depth, logbook/detail UI `RUNTIME/GPS`.
 - **Test:** `WatchReadinessAlgorithmTests` + `WatchManualNoDepthSyncTests`; Watch + iOS algorithm suites **PASS** (Ultra 3 / iPhone 17 sim).
-- **Documentazione:** [`Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md), [`Docs/WATCH_MANUAL_NODEPTH_SYNC_POLICY.md`](Docs/WATCH_MANUAL_NODEPTH_SYNC_POLICY.md).
+- **Documentazione:** [`Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md), [`Docs/WATCH_MANUAL_NODEPTH_SYNC_POLICY.md`](WATCH_MANUAL_NODEPTH_SYNC_POLICY.md).
 
 ### Added (2026-05-31, iOS MAIN algorithmic readiness 100% — `dce89e7`)
 
 - **Algoritmo iOS:** audit remediation B2–B5 — `AmbientPressureModel` unificato MOD/PPO₂; toggle profondità max/media end-to-end; merge iCloud per sessione; CSV `# session_meta` round-trip; incomplete calc guard; contingencies engine-driven; demo isolation in Analysis; time-weighted temperature.
 - **Test:** 11 nuove suite + **154/154** `DIRDiving iOS Algorithm Tests` (1 skipped) su iPhone 17 sim.
-- **Documentazione:** [`Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md), [`Docs/SUBSURFACE_CSV_ROUNDTRIP.md`](Docs/SUBSURFACE_CSV_ROUNDTRIP.md), branch alignment + PR status 2026-05-31.
+- **Documentazione:** [`Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md), [`Docs/SUBSURFACE_CSV_ROUNDTRIP.md`](SUBSURFACE_CSV_ROUNDTRIP.md), branch alignment + PR status 2026-05-31.
 
 ### Added (2026-05-31, CI runner — `1d69d88`)
 
@@ -33,7 +33,7 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 - **Algoritmo iOS:** modello CNS/OTU comprehensive — limiti NOAA singolo e giornaliero, recupero superficie/pausa aria 90 min, soglie REPEX OTU (300 / 850 / 1800), carryover ossigeno su snapshot v2, integrazione su profilo completo.
 - **Test:** `OxygenExposureDeepModelTests` (14 test); suite **119/119** `DIRDiving iOS Algorithm Tests` su iPhone 17 sim.
 - **Documentazione:** README, INDEX, ROADMAP, CSV, PRODUCT_FEATURES_IT, GLOSSARY, completion report, engine design, hardening, improvement plan, changelog allineati @ `dae29b8`.
-- **Report:** [`Docs/DOCUMENTATION_UPDATE_REPORT_20260531.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260531.md).
+- **Report:** [`Docs/DOCUMENTATION_UPDATE_REPORT_20260531.md`](DOCUMENTATION_UPDATE_REPORT_20260531.md).
 
 ### Added (2026-05-30, Phase 15 documentation alignment)
 
@@ -41,23 +41,23 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ### Fixed (2026-05-30, iOS Bühlmann UX/UI — `3237262`)
 
-- UX P1–P3 planner presentation fix; verification [`DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md); re-audit **Ready** [`Docs/DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](Docs/DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md).
+- UX P1–P3 planner presentation fix; verification [`DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md); re-audit **Ready** [`Docs/DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md).
 
 ### Fixed (2026-05-29, iOS Buhlmann reaudit — `69e69b2`)
 
-- **Algoritmo iOS:** fix P1–P3 da [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) — environment-aware ceiling/NDL, canonical engine result, stable cylinder IDs, fixture/tests; `DIRDiving iOS Algorithm Tests` verde su macOS.
+- **Algoritmo iOS:** fix P1–P3 da [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) — environment-aware ceiling/NDL, canonical engine result, stable cylinder IDs, fixture/tests; `DIRDiving iOS Algorithm Tests` verde su macOS.
 
 ### Added (2026-05-29, documentation indexing — `69e69b2`)
 
-- **Indice:** [`Docs/INDEX.md`](Docs/INDEX.md) aggiornato @ `69e69b2`; sezione dedicata reaudit fix + **UX readiness audit**.
+- **Indice:** [`Docs/INDEX.md`](INDEX.md) aggiornato @ `69e69b2`; sezione dedicata reaudit fix + **UX readiness audit**.
 - **Audit root UX/UI:** [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md) indicizzato in §1, §4, §6, §13, §14; relazione reaudit math → fix algoritmico → gap UI residui.
 - **Docs:** aggiornati README, ROADMAP, CONTRIBUTING e hardening docs post-fix.
 
 ### Added (2026-05-29, documentation indexing — `570964e`)
 
-- **Indice:** [`Docs/INDEX.md`](Docs/INDEX.md) aggiornato con audit root Watch/iOS, reaudit Buhlmann e UX readiness planner iOS.
+- **Indice:** [`Docs/INDEX.md`](INDEX.md) aggiornato con audit root Watch/iOS, reaudit Buhlmann e UX readiness planner iOS.
 - **Audit root:** [`DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md), [`DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md), [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md).
-- **Docs:** [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) indicizzato in §1, §4, §6, §12, §13, §14 e pass 2026-05-28; aggiornati README e ROADMAP.
+- **Docs:** [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) indicizzato in §1, §4, §6, §12, §13, §14 e pass 2026-05-28; aggiornati README e ROADMAP.
 
 ### Added (2026-05-27, documentation / branch alignment refresh)
 
@@ -70,8 +70,8 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 ### Added (2026-05-19, documentation / branch alignment — baseline `92e639a`)
 
 - **Baseline commit:** README, INDEX, ROADMAP, PRODUCT_FEATURES_IT, SAFETY_DISCLAIMER, BUILD_VALIDATION e matrice CSV riallineati a `main` @ `92e639a`.
-- **Algorithm hardening documentato:** pass `ddaf2d7` → `92e639a` indicizzato con [`Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md) e audit [`Docs/CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](Docs/CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md).
-- **Nuovi report:** [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260519.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260519.md), [`Docs/PR_STATUS_20260519.md`](Docs/PR_STATUS_20260519.md).
+- **Algorithm hardening documentato:** pass `ddaf2d7` → `92e639a` indicizzato con [`Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md) e audit [`Docs/CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md).
+- **Nuovi report:** [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260519.md`](DOCUMENTATION_UPDATE_REPORT_20260519.md), [`Docs/PR_STATUS_20260519.md`](PR_STATUS_20260519.md).
 - **Feature matrix:** righe additivi per algorithm validation pipeline, XCTest target, stale backlog rows riallineate a Implemented dove già presenti su `main`.
 - **Branch strategy:** `main` = baseline stabile; `main-iOS` = worktree storico divergente; `codex/*` = experimental-only.
 - **Vincoli:** solo documentazione/repository consistency; nessuna modifica runtime in questo pass.
@@ -80,12 +80,12 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 - **Watch MAIN:** depth sample validation pipeline, automatic dive lifecycle algorithm, time-weighted average depth, centralized ascent/T compass math, `AscentSafetyHapticCoordinator`, timestamp-derived runtime/stopwatch.
 - **Tests:** target `DIRDiving Watch Algorithm Tests` + `Tests/WatchAlgorithmTests/DiveAlgorithmTests.swift`.
-- **Report:** [`Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md).
+- **Report:** [`Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md).
 
 ### Added (2026-05-26, Watch algorithm audit — `ddaf2d7`)
 
 - **Watch MAIN:** audit matematico/algoritmico completo; hardening iniziale su DiveManager, merge, sync codec, export.
-- **Report:** [`Docs/CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](Docs/CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md).
+- **Report:** [`Docs/CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md).
 
 ### Added (2026-05-26, documentation / branch alignment refresh)
 
@@ -112,7 +112,7 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ### Added (2026-05-20, documentation post v9 — `d962117`)
 
-- **Documentazione:** [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md) panoramica funzioni IT; README, INDEX, ROADMAP, matrice CSV (righe v8/v9); report [`DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md), [`DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md), [`PR_STATUS_20260520_POST_V9.md`](Docs/PR_STATUS_20260520_POST_V9.md).
+- **Documentazione:** [`Docs/PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md) panoramica funzioni IT; README, INDEX, ROADMAP, matrice CSV (righe v8/v9); report [`DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md`](DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md), [`DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md), [`PR_STATUS_20260520_POST_V9.md`](PR_STATUS_20260520_POST_V9.md).
 - **Baseline codice documentata:** v9 Watch surface User Images + Planner/Bühlmann input sync; v8 planner gas/equipment/MOD.
 - **Vincoli:** solo documentazione; nessuna modifica runtime in questo pass.
 
@@ -120,12 +120,12 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 - **Watch:** tab User Images sempre disponibile fuori immersione attiva; empty state localizzato; dettaglio immagine `scaledToFit`.
 - **iOS:** `PlannerStore.applyInputToPlanningOutputs()` aggiorna plan + Bühlmann su cambio input gas; refresh su `plannerCylinders`.
-- **Report:** [`Docs/DIR_DIVING_v9_IMPLEMENTATION_REPORT.md`](Docs/DIR_DIVING_v9_IMPLEMENTATION_REPORT.md).
+- **Report:** [`Docs/DIR_DIVING_v9_IMPLEMENTATION_REPORT.md`](DIR_DIVING_v9_IMPLEMENTATION_REPORT.md).
 
 ### Added (2026-05-20, v8 planner gas — `a36dc23`)
 
 - **iOS:** cilindri multipli, ruoli gas, Air/EAN/Trimix, PPO₂ 0.1, MOD Dalton, equipment template GAS, foto→Watch con preprocess.
-- **Report:** [`Docs/DIR_DIVING_v8_IMPLEMENTATION_REPORT.md`](Docs/DIR_DIVING_v8_IMPLEMENTATION_REPORT.md).
+- **Report:** [`Docs/DIR_DIVING_v8_IMPLEMENTATION_REPORT.md`](DIR_DIVING_v8_IMPLEMENTATION_REPORT.md).
 
 ### Added (2026-05-24, MAIN readiness pass — build, i18n, copy, QA docs)
 
@@ -133,7 +133,7 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 - **i18n (solo copy):** Equipment e Planner iOS localizzati EN/IT; disclaimer lingua in More; settings Watch sync/underwater/shortcuts; empty state User Images.
 - **Planner:** avviso metrico onesto (`planner.units.metric_notice`); nessuna modifica calcoli/algoritmi gas/deco.
 - **Watch copy:** unità sync vs locale; toni audio non implementati (haptics); RESET cronometro immediato; impostazioni disabilitate in immersione (sicurezza).
-- **Documentazione:** [`Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md`](Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md), [`Docs/APP_INTENTS_DEVICE_QA_CHECKLIST.md`](Docs/APP_INTENTS_DEVICE_QA_CHECKLIST.md), [`Docs/WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md`](Docs/WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md); aggiornati playbook TestFlight e `Docs/INDEX.md`.
+- **Documentazione:** [`Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md`](MAIN_BRANCH_FINAL_READINESS_REPORT.md), [`Docs/APP_INTENTS_DEVICE_QA_CHECKLIST.md`](APP_INTENTS_DEVICE_QA_CHECKLIST.md), [`Docs/WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md`](WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md); aggiornati playbook TestFlight e `Docs/INDEX.md`.
 - **Vincoli:** nessuna modifica experimental, algoritmi immersione, TTV, planner math, sync logic, UI graphics.
 
 ### Added (2026-05-24, Watch control strategy — `72fa15b`)

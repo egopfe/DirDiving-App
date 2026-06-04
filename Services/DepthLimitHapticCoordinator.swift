@@ -6,8 +6,17 @@ import WatchKit
 final class DepthLimitHapticCoordinator {
     private var lastState: DepthSafetyState = .normal
     private var lastHapticDate: Date?
+    private var transitionGeneration: UInt64 = 0
+
+    enum DelayedHapticDecision: Equatable {
+        case played
+        case suppressed
+    }
+
+    var testHook_onDelayedHapticDecision: ((DelayedHapticDecision) -> Void)?
 
     func reset() {
+        transitionGeneration &+= 1
         lastState = .normal
         lastHapticDate = nil
     }
@@ -15,6 +24,9 @@ final class DepthLimitHapticCoordinator {
     func handle(depthMeters: Double, hapticsEnabled: Bool) {
         let state = DepthSafetyState.from(depthMeters: depthMeters)
         guard hapticsEnabled else {
+            if state != lastState {
+                transitionGeneration &+= 1
+            }
             lastState = state
             return
         }
@@ -23,6 +35,7 @@ final class DepthLimitHapticCoordinator {
         let interval = throttleInterval(for: state)
         let stateChanged = state != lastState
         if stateChanged {
+            transitionGeneration &+= 1
             lastState = state
             if state != .normal {
                 lastHapticDate = nil
@@ -36,7 +49,8 @@ final class DepthLimitHapticCoordinator {
         }
 
         lastHapticDate = now
-        playHaptic(for: state, isInitialTransition: stateChanged)
+        let token = transitionGeneration
+        playHaptic(for: state, isInitialTransition: stateChanged, token: token)
     }
 
     private func throttleInterval(for state: DepthSafetyState) -> TimeInterval {
@@ -54,7 +68,7 @@ final class DepthLimitHapticCoordinator {
             : UserDefaults.standard.bool(forKey: HapticService.hapticsEnabledKey)
     }
 
-    private func playHaptic(for state: DepthSafetyState, isInitialTransition: Bool) {
+    private func playHaptic(for state: DepthSafetyState, isInitialTransition: Bool, token: UInt64) {
         let device = WKInterfaceDevice.current()
         switch state {
         case .normal:
@@ -65,20 +79,33 @@ final class DepthLimitHapticCoordinator {
             device.play(.failure)
             if isInitialTransition {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { [weak self] in
-                    guard self?.hapticsEnabledNow == true else { return }
-                    WKInterfaceDevice.current().play(.retry)
+                    self?.playDelayedSecondaryPulse(expectedState: .critical, token: token, haptic: .retry)
                 }
             }
         case .exceeded:
             device.play(.failure)
             if isInitialTransition {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in
-                    guard self?.hapticsEnabledNow == true else { return }
-                    WKInterfaceDevice.current().play(.failure)
+                    self?.playDelayedSecondaryPulse(expectedState: .exceeded, token: token, haptic: .failure)
                 }
             } else {
                 device.play(.retry)
             }
         }
     }
+
+    private func playDelayedSecondaryPulse(expectedState: DepthSafetyState, token: UInt64, haptic: WKHapticType) {
+        guard transitionGeneration == token,
+              lastState == expectedState,
+              hapticsEnabledNow else {
+            testHook_onDelayedHapticDecision?(.suppressed)
+            return
+        }
+        WKInterfaceDevice.current().play(haptic)
+        testHook_onDelayedHapticDecision?(.played)
+    }
+
+    var testHook_transitionGeneration: UInt64 { transitionGeneration }
+
+    var testHook_lastState: DepthSafetyState { lastState }
 }

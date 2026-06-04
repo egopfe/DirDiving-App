@@ -11,6 +11,7 @@ final class UserImageStore: ObservableObject {
     enum ImportError: LocalizedError, Equatable {
         case invalidFileName
         case invalidFileSize
+        case invalidImageContent
 
         var errorDescription: String? {
             switch self {
@@ -18,6 +19,8 @@ final class UserImageStore: ObservableObject {
                 return String(localized: "Nome file immagine non valido")
             case .invalidFileSize:
                 return String(localized: "Dimensione immagine non valida")
+            case .invalidImageContent:
+                return String(localized: "user_images.error.not_image")
             }
         }
     }
@@ -67,18 +70,21 @@ final class UserImageStore: ObservableObject {
         if let resourceSize, !isAllowedCompanionPhotoByteCount(resourceSize) {
             throw ImportError.invalidFileSize
         }
-        let data = try Data(contentsOf: sourceURL)
-        guard isAllowedCompanionPhotoByteCount(data.count) else {
-            throw ImportError.invalidFileSize
+        let rawData = try Data(contentsOf: sourceURL)
+        let normalized: (data: Data, fileName: String)
+        do {
+            normalized = try WatchCompanionPhotoValidator.validateAndNormalize(data: rawData, suggestedFileName: sanitized)
+        } catch is WatchCompanionPhotoValidationError {
+            throw ImportError.invalidImageContent
         }
         let directory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("UserImages", isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        let destination = directory.appendingPathComponent(sanitized)
+        let destination = directory.appendingPathComponent(normalized.fileName)
         if FileManager.default.fileExists(atPath: destination.path) {
             try FileManager.default.removeItem(at: destination)
         }
-        try data.write(to: destination, options: [.atomic, .completeFileProtection])
+        try normalized.data.write(to: destination, options: [.atomic, .completeFileProtection])
         NotificationCenter.default.post(name: .companionPhotoDidArrive, object: nil)
     }
 

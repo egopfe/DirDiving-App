@@ -463,6 +463,13 @@
 "user_images.a11y.detail" = "Immagine completa %d, %@";
 "shortcut.error.app_unavailable" = "DIR DIVING non e pronto: apri l'app sul Watch e riprova.";
 "shortcut.error.stopwatch_reset_blocked" = "Reset cronometro bloccato: usa la conferma a schermo se il tempo e in corso.";
+"shortcut.error.legal_acceptance_required" = "Apri DIR DIVING e accetta l'onboarding legale e di sicurezza prima di usare le scorciatoie del tasto Azione.";
+"sync.trust.mismatch" = "La fiducia di sincronizzazione è cambiata. Reimposta la fiducia di abbinamento per riconnettere Apple Watch/iPhone.";
+"live.simulation_depth.badge" = "SIMULAZIONE";
+"live.simulation_depth.a11y" = "Profondità simulata attiva. Non è profondità da sensore reale.";
+"user_images.error.not_image" = "Il file non è un'immagine valida.";
+"user_images.error.dimensions" = "Dimensioni immagine troppo grandi.";
+"user_images.error.encode_failed" = "Impossibile salvare l'immagine.";
 "ascent.band.depth_range" = "%@-%@ %@";
 "ascent.band.other" = "ALTRO";
 "alarm.threshold.depth_format" = "> %@";
@@ -483,6 +490,16 @@
 /* MAIN UI remediation — semantic keys */
 
 "settings.header.title" = "IMPOSTAZIONI";
+"settings.section.safety" = "Sicurezza";
+"settings.section.units_language" = "Unità e lingua";
+"settings.section.sync" = "Sincronizzazione";
+"settings.section.hardware" = "Hardware";
+"settings.section.mission" = "Modalità missione";
+"settings.section.advanced" = "Avanzate";
+"dive.detail.gps.start_available" = "GPS inizio disponibile";
+"dive.detail.gps.end_available" = "GPS fine disponibile";
+"dive.detail.gps.coordinates_saved" = "Coordinate salvate";
+"dive.detail.gps.export_for_full" = "Esporta per coordinate complete";
 "settings.row.ascent_rate.title" = "Velocità risalita";
 "settings.row.ascent_rate.subtitle" = "Limiti m/min persistenti";
 "settings.row.alarms.title" = "Allarmi";

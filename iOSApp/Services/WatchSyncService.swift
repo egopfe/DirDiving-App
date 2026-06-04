@@ -54,10 +54,28 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     var userVisibleState: String {
         if !isSupported { return String(localized: "Non supportato") }
+        if WatchSyncAuth.peerSecretMismatchDetected { return String(localized: "sync.trust.mismatch") }
         if failedImportCount > 0 { return String(localized: "Errore import: retry disponibile") }
+        if activationState == .activated, !WCSession.default.isPaired {
+            return String(localized: "sync.watch_not_paired.status")
+        }
+        if activationState == .activated, !WCSession.default.isWatchAppInstalled {
+            return String(localized: "sync.watch_app_not_installed.status")
+        }
         if activationState == .activated, !WatchSyncAuth.hasPeerSecret() { return String(localized: "Associazione Watch non verificata") }
         if activationState == .activated { return String(localized: "Attivo") }
         return String(localized: "In attesa attivazione")
+    }
+
+    private func refreshCompanionSyncAvailabilityMessage(session: WCSession = .default) {
+        guard activationState == .activated else { return }
+        if !session.isPaired {
+            lastMessage = String(localized: "sync.watch_not_paired")
+        } else if !session.isWatchAppInstalled {
+            lastMessage = String(localized: "sync.watch_app_not_installed")
+        } else {
+            lastMessage = String(localized: "Sessione Watch attiva")
+        }
     }
 
     func activate(logStore: DiveLogStore) {
@@ -112,21 +130,36 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     func publishDeletedSessionIDs(_ ids: Set<UUID>) {
-        guard WCSession.isSupported(), WCSession.default.activationState == .activated, !ids.isEmpty else { return }
+        guard WCSession.isSupported(), !ids.isEmpty else { return }
+        guard WatchSyncAuth.canPublishApplicationContext() else {
+            refreshCompanionSyncAvailabilityMessage()
+            return
+        }
         var existing = Set((WCSession.default.applicationContext[WatchSyncKeys.deletedSessionBroadcastKey] as? [String]) ?? [])
         existing.formUnion(ids.map(\.uuidString))
-        WatchSyncAuth.mergeApplicationContext([WatchSyncKeys.deletedSessionBroadcastKey: Array(existing)])
+        guard WatchSyncAuth.mergeApplicationContext([WatchSyncKeys.deletedSessionBroadcastKey: Array(existing)]) else {
+            refreshCompanionSyncAvailabilityMessage()
+            return
+        }
         lastMessage = String(format: String(localized: "Tombstone inviata al Watch (%lld)"), ids.count)
     }
 
     func pushUnitsPreference(_ value: String) {
         let preference = IOSUnitPreference.fromStorage(value)
         guard WCSession.isSupported() else { return }
-        WatchSyncAuth.mergeApplicationContext([WatchSyncKeys.unitsPreferenceKey: preference.syncCode])
+        guard WatchSyncAuth.mergeApplicationContext([WatchSyncKeys.unitsPreferenceKey: preference.syncCode]) else {
+            refreshCompanionSyncAvailabilityMessage()
+            return
+        }
     }
 
     func sendPhotoToWatch(_ imageData: Data, fileName: String) {
         guard WCSession.isSupported(), !imageData.isEmpty else { return }
+        guard WCSession.default.isPaired, WCSession.default.isWatchAppInstalled else {
+            refreshCompanionSyncAvailabilityMessage()
+            lastMessage = String(localized: "sync.watch_app_not_installed")
+            return
+        }
         guard imageData.count <= Self.maxPhotoTransferBytes,
               let sanitized = Self.sanitizedPhotoFileName(fileName) else {
             failedImportCount += 1
@@ -163,7 +196,12 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     private func ingestCompanionContext(_ context: [String: Any]) {
-        WatchSyncAuth.ingestSharedSecretFromContext(context)
+        switch WatchSyncAuth.ingestSharedSecretFromContext(context) {
+        case .rejectedMismatch:
+            lastMessage = String(localized: "sync.trust.mismatch")
+        case .acceptedFirstTrust, .unchanged:
+            break
+        }
         if let units = context[WatchSyncKeys.unitsPreferenceKey] as? String {
             let preference = IOSUnitPreference.fromSyncCode(units)
             UserDefaults.standard.set(preference.rawValue, forKey: IOSUnitPreference.storageKey)
@@ -453,7 +491,12 @@ final class WatchSyncService: NSObject, ObservableObject {
     private func sessionSummary(_ session: DiveSession) -> String {
         let started = Self.activityDateFormatter.string(from: session.startDate)
         let minutes = Int((session.durationSeconds / 60).rounded())
-        return "\(started) · \(Formatters.one(session.maxDepthMeters)) m · \(minutes) min"
+        return String(
+            format: String(localized: "sync.activity.session_summary"),
+            started,
+            Formatters.one(session.maxDepthMeters),
+            minutes
+        )
     }
 
     private func recordActivity(title: String, detail: String, marksSuccess: Bool = false) {
@@ -475,11 +518,19 @@ extension WatchSyncService: WCSessionDelegate {
         let context = session.receivedApplicationContext
         Task { @MainActor in
             self.activationState = activationState
-            self.lastMessage = error?.localizedDescription ?? String(localized: "Sessione Watch attiva")
+            if let error {
+                self.lastMessage = error.localizedDescription
+            } else if activationState == .activated {
+                self.refreshCompanionSyncAvailabilityMessage(session: session)
+            } else {
+                self.lastMessage = String(localized: "In attesa attivazione")
+            }
             if activationState == .activated {
                 self.ingestCompanionContext(context)
-                WatchSyncAuth.publishSharedSecretIfNeeded()
-                self.flushOutboundTransfers()
+                if WatchSyncAuth.canPublishApplicationContext(session: session) {
+                    WatchSyncAuth.publishSharedSecretIfNeeded(session: session)
+                    self.flushOutboundTransfers()
+                }
             }
         }
     }

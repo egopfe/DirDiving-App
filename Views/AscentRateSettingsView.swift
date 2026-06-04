@@ -67,15 +67,16 @@ struct AscentRateSettingsView: View {
             HStack(spacing: 8) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.system(size: 11, weight: .black, design: .rounded))
+                        .font(DiveUI.Typography.sectionHeading)
                         .foregroundStyle(.white)
+                        .lineLimit(2)
                     HStack(alignment: .lastTextBaseline, spacing: 3) {
                         Text(Formatters.one(display.value))
                             .font(.system(size: 32, weight: .black, design: .rounded))
                             .monospacedDigit()
                             .foregroundStyle(accent)
                         Text(display.unit)
-                            .font(.caption2.bold())
+                            .font(DiveUI.Typography.unitLabel)
                             .foregroundStyle(.white)
                     }
                 }

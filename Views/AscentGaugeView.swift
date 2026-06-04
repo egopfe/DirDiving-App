@@ -9,10 +9,10 @@ struct AscentGaugeView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text(String(localized: "ascent.gauge.title"))
-                .font(.system(size: 9, weight: .black, design: .rounded))
+                .font(DiveUI.Typography.metricLabel)
                 .foregroundStyle(.white)
                 .lineLimit(2)
-                .minimumScaleFactor(0.65)
+                .minimumScaleFactor(0.9)
                 .multilineTextAlignment(.leading)
                 .frame(width: 64, alignment: .leading)
 
@@ -25,10 +25,10 @@ struct AscentGaugeView: View {
             }
 
             Text(rateUnitLabel)
-                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .font(DiveUI.Typography.unitLabel)
                 .foregroundStyle(.white)
                 .lineLimit(1)
-                .minimumScaleFactor(0.7)
+                .minimumScaleFactor(0.9)
                 .frame(width: 64, alignment: .trailing)
         }
         .padding(.vertical, 6)

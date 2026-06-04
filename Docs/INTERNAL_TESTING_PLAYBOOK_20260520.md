@@ -1,7 +1,7 @@
 # Internal testing playbook — DIR DIVING MAIN
 
-**For:** developers and testers on branch `main`  
-**Updated:** 2026-05-23  
+**For:** developers and testers on branch `main`
+**Updated:** 2026-05-23
 **Goal:** reach confident **internal test** → **TestFlight** without surprises
 
 Use this as the single day-by-day guide. Detailed checklists live in linked docs.
@@ -51,8 +51,8 @@ Record: `git rev-parse --short HEAD` → write in your test log.
 
 Xcode → **Settings → Platforms** (or Components):
 
-- Install **iOS 26.5** simulator support  
-- Install **watchOS 26.5** simulator support  
+- Install **iOS 26.5** simulator support
+- Install **watchOS 26.5** simulator support
 
 Verify:
 
@@ -74,13 +74,13 @@ xcodebuild -scheme "DIRDiving iOS" \
   build
 ```
 
-Both must end with **BUILD SUCCEEDED**.  
+Both must end with **BUILD SUCCEEDED**.
 Details: [`BUILD_VALIDATION.md`](BUILD_VALIDATION.md).
 
 ### 0.4 Run from Xcode (simulator)
 
-1. Open `DIRDiving.xcodeproj`.  
-2. Scheme **DIRDiving iOS** → Run on iPhone simulator (installs Watch app to paired Watch sim if configured).  
+1. Open `DIRDiving.xcodeproj`.
+2. Scheme **DIRDiving iOS** → Run on iPhone simulator (installs Watch app to paired Watch sim if configured).
 3. Or scheme **DIRDiving Watch App** → Run on Watch simulator only.
 
 **Simulator limits:** no real GPS, no real depth, WatchConnectivity between sims is limited. Use Phase 3 for sync.
@@ -149,9 +149,9 @@ Install via Xcode **Run** on your iPhone and Watch (same Apple ID, development s
 
 ### 3.1 First launch / pairing
 
-1. Install **iOS app** on iPhone, **Watch app** on Watch.  
-2. Open **both** at least once.  
-3. iPhone **Altro** → check **SYNC WATCH** rows (Supportato, Stato, Ultimo evento).  
+1. Install **iOS app** on iPhone, **Watch app** on Watch.
+2. Open **both** at least once.
+3. iPhone **Altro** → check **SYNC WATCH** rows (Supportato, Stato, Ultimo evento).
 4. Watch **Impostazioni** → **Sync companion** / pending counts.
 
 **Known behavior:** first sync may show *pending* until peer secret is exchanged. Open both apps, wait ~30 s, tap **Riprova sync** on Watch if needed.
@@ -192,7 +192,7 @@ If you can force two different versions of same dive ID (advanced): Watch sends 
 
 **Skip until Apple water submersion entitlement is on App ID + profile.**
 
-Follow [`README.md`](../README.md) “Depth Entitlement And Signing Checklist” and [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) depth section.
+Follow [`README.md`](README.md) “Depth Entitlement And Signing Checklist” and [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) depth section.
 
 | # | Test | Pass? |
 |---|------|-------|
@@ -208,9 +208,9 @@ Pool or controlled shallow test is enough for **internal** validation.
 
 ### 5.1 Prepare build
 
-1. Archive **DIRDiving iOS** (embeds Watch).  
-2. Upload to App Store Connect.  
-3. Add **internal** or **external** testers.  
+1. Archive **DIRDiving iOS** (embeds Watch).
+2. Upload to App Store Connect.
+3. Add **internal** or **external** testers.
 4. Paste notes from [`TESTFLIGHT_REVIEW_NOTES.md`](TESTFLIGHT_REVIEW_NOTES.md) into TestFlight “What to test”.
 
 ### 5.2 Tester instructions (copy/paste)
@@ -226,10 +226,10 @@ Pool or controlled shallow test is enough for **internal** validation.
 
 ### 5.3 What blocks TestFlight sign-off
 
-- [ ] Phase 3 E/F pass on real devices  
-- [ ] No CRITICAL crashes in 30 min mixed use  
-- [ ] Depth Phase 4 done **or** documented as “manual dive only” for this build  
-- [ ] [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) signed off for your build SHA  
+- [ ] Phase 3 E/F pass on real devices
+- [ ] No CRITICAL crashes in 30 min mixed use
+- [ ] Depth Phase 4 done **or** documented as “manual dive only” for this build
+- [ ] [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) signed off for your build SHA
 
 ---
 
@@ -251,7 +251,7 @@ Pool or controlled shallow test is enough for **internal** validation.
 | ... | | | |
 
 ### Blockers for next gate
-- 
+-
 ```
 
 ---

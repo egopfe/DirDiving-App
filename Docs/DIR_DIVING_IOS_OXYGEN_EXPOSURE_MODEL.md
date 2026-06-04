@@ -13,6 +13,16 @@ The planner integrates CNS and OTU over the **complete Bühlmann runtime schedul
 - 90-minute surface / in-water air-break recovery (PPO₂ ≤ 0.5 bar)
 - Lambertsen REPEX OTU thresholds (300 / 850 / 1800)
 
+### OTU constant-depth (canonical direction)
+
+When inspired PPO₂ > 0.5 bar:
+
+`OTU = minutes × ((PPO₂ − 0.5) / 0.5)^(5/6)`
+
+PPO₂ ≤ 0.5 bar contributes **0** OTU. OTU increases monotonically with PPO₂ for fixed duration. This is a **reference estimate only** — not certified pulmonary oxygen toxicity guidance; does not replace training, agency standards, REPEX tables, or certified dive computers.
+
+Ramp segments use Baker Eq. 2 integration consistent with the corrected constant-depth rate.
+
 Repetitive planning may apply `OxygenExposureCarryover` from a prior dive snapshot.
 
 ---
@@ -91,7 +101,9 @@ This does **not** change decompression stops, gas selection, or Bühlmann math.
 
 ## Tests
 
-`Tests/iOSAlgorithmTests/CNSDescentBottomTests.swift` — segment filtering, 15% boundary, trimix/nitrox profiles, NaN/infinity guards.
+- `Tests/iOSAlgorithmTests/CNSDescentBottomTests.swift` — segment filtering, 15% boundary, trimix/nitrox profiles, NaN/infinity guards.
+- `Tests/iOSAlgorithmTests/OTUCanonicalFixtureTests.swift` — independent Lambertsen OTU fixtures, monotonicity, ramp/segment integration.
+- `Tests/iOSAlgorithmTests/OxygenExposureDeepModelTests.swift` — NOAA CNS tables, schedule integration, carryover.
 
 ---
 

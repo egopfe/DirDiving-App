@@ -27,7 +27,7 @@ enum BuhlmannPlanner {
                 nitrogenFraction: 0,
                 ndlMinutes: 0,
                 curve: [],
-                warning: "Buhlmann non disponibile per input non validi.",
+                warning: String(localized: "planner.buhlmann.invalid_input"),
                 modelState: .invalidInput
             )
         }
@@ -48,7 +48,7 @@ enum BuhlmannPlanner {
                 nitrogenFraction: 0,
                 ndlMinutes: 0,
                 curve: [],
-                warning: "Miscela non valida: Buhlmann non disponibile.",
+                warning: String(localized: "planner.buhlmann.invalid_gas"),
                 modelState: .invalidInput
             )
         }
@@ -72,15 +72,17 @@ enum BuhlmannPlanner {
                 nitrogenFraction: max(0, gas.nitrogenFraction),
                 ndlMinutes: 0,
                 curve: [],
-                warning: "Buhlmann non disponibile: profilo o miscela fuori dai limiti validati.",
+                warning: String(localized: "planner.buhlmann.invalid_profile"),
                 modelState: .invalidInput
             )
         }
 
+        let initialTissueState = BuhlmannTissueState.airSaturated(surfacePressureBar: environment.surfacePressureBar)
         let ndlValue = BuhlmannEngine.noDecompressionLimit(
             depthMeters: depthMeters,
             gas: gas,
             gfHigh: gfHigh,
+            initialTissueState: initialTissueState,
             plannerEnvironment: environment
         ) ?? 0
         return BuhlmannPlanResult(
@@ -90,7 +92,7 @@ enum BuhlmannPlanner {
             nitrogenFraction: max(0, gas.nitrogenFraction),
             ndlMinutes: ndlValue,
             curve: ndlCurve(for: gas, environment: environment, gfHigh: gfHigh),
-            warning: "Buhlmann ZHL-16C N2+He multigas reference-only: non e un piano decompressivo certificato.",
+            warning: String(localized: "planner.buhlmann.reference_disclaimer"),
             modelState: .validReference
         )
     }
@@ -160,7 +162,9 @@ enum BuhlmannPlanner {
             copy.gfLow = low
             copy.gfHigh = high
             let result = BuhlmannEngine.plan(copy)
-            let note = high <= 70 ? "Conservativo" : "Piu aggressivo"
+            let note = high <= 70
+                ? String(localized: "planner.gf.conservative")
+                : String(localized: "planner.gf.aggressive")
             return GFComparison(
                 label: label,
                 gfLow: low,
@@ -254,10 +258,11 @@ enum BuhlmannPlanner {
         // Bailout cylinders remain schedule-only; BuhlmannPlanRequest has no bailoutGases slot.
         let planningDepth = working.buhlmannPlanningDepthMeters
         let bottomEntry = working.plannerCylinders.first(where: { $0.role == .bottom })
+        let bottomSwitchDepth = PlannerGasSchedule.bottomGasSwitchDepthMeters(from: working)
         let bottomGas = BuhlmannGas(
             gas: bottomEntry?.gas ?? working.bottomGas,
             role: .bottom,
-            switchDepthMeters: planningDepth,
+            switchDepthMeters: bottomSwitchDepth,
             cylinderId: bottomEntry?.id
         )
         let travelGases = working.plannerCylinders
@@ -282,11 +287,13 @@ enum BuhlmannPlanner {
     }
 
     private static func ndlCurve(for gas: BuhlmannGas, environment: PlannerEnvironment, gfHigh: Double) -> [NDLPoint] {
-        stride(from: 6.0, through: 60.0, by: 3.0).map { depth in
+        let initialTissueState = BuhlmannTissueState.airSaturated(surfacePressureBar: environment.surfacePressureBar)
+        return stride(from: 6.0, through: 60.0, by: 3.0).map { depth in
             let ndlValue = BuhlmannEngine.noDecompressionLimit(
                 depthMeters: depth,
                 gas: gas,
                 gfHigh: gfHigh,
+                initialTissueState: initialTissueState,
                 plannerEnvironment: environment
             ) ?? 0
             let group: String

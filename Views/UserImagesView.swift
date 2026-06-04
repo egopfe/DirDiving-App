@@ -77,21 +77,20 @@ struct UserImagesView: View {
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(String(format: String(localized: "user_images.item.label"), index + 1))
-                    .font(.system(size: 11, weight: .black, design: .rounded))
+                    .font(DiveUI.Typography.rowTitle)
                     .foregroundStyle(.white)
                     .lineLimit(1)
-                Text(imageCaption(for: name))
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                Text(shortImageCaption(for: name))
+                    .font(DiveUI.Typography.rowSubtitle)
                     .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.65)
+                    .lineLimit(2)
             }
 
             Spacer(minLength: 0)
         }
         .padding(.horizontal, 6)
         .padding(.vertical, 4)
-        .frame(minHeight: 35)
+        .frame(minHeight: 44)
         .background(
             RoundedRectangle(cornerRadius: 7, style: .continuous)
                 .fill(Color.black.opacity(0.5))
@@ -191,11 +190,11 @@ struct UserImagesView: View {
                 .padding(.horizontal, 13)
                 .accessibilityLabel(String(format: String(localized: "user_images.a11y.detail"), index + 1, imageCaption(for: name)))
 
-            Text(imageCaption(for: name))
-                .font(.system(size: 10, weight: .semibold, design: .rounded))
+            Text(shortImageCaption(for: name))
+                .font(DiveUI.Typography.rowSubtitle)
                 .foregroundStyle(.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
 
             pageDots(currentIndex: index)
 
@@ -205,10 +204,11 @@ struct UserImagesView: View {
                 selectedName = nil
             } label: {
                 Text(String(localized: "user_images.list.title"))
-                    .font(.system(size: 9, weight: .black, design: .rounded))
+                    .font(DiveUI.Typography.secondaryLabel)
                     .foregroundStyle(DiveUI.yellow)
-                    .padding(.horizontal, 9)
-                    .padding(.vertical, 5)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                    .frame(minHeight: 40)
                     .background(
                         Capsule()
                             .stroke(DiveUI.yellow.opacity(0.85), lineWidth: 1)
@@ -244,6 +244,12 @@ struct UserImagesView: View {
             .replacingOccurrences(of: "_", with: " ")
             .replacingOccurrences(of: "-", with: " ")
             .capitalized
+    }
+
+    private func shortImageCaption(for name: String) -> String {
+        let caption = imageCaption(for: name)
+        guard caption.count > 22 else { return caption }
+        return String(caption.prefix(20)) + "…"
     }
 
     private func storedImage(resourceName: String) -> some View {
