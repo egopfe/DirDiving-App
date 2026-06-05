@@ -445,7 +445,7 @@
 "watch_photo.staged.ready" = "Ready to send";
 "watch_photo.staged.clear" = "Clear";
 "watch_photo.convert.warning" = "Large image resized for Apple Watch.";
-"watch_photo.manage.open" = "Manage photos on Apple Watch";
+"watch_photo.manage.open" = "Manage Apple Watch Images";
 "watch_photo.manage.title" = "Photos on Apple Watch";
 "watch_photo.manage.subtitle" = "Uploaded reference images stored on your Apple Watch.";
 "watch_photo.manage.close" = "Close";
