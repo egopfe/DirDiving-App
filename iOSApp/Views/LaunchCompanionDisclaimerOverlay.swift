@@ -6,8 +6,7 @@ struct LaunchCompanionDisclaimerOverlay: ViewModifier {
     func body(content: Content) -> some View {
         content
             .fullScreenCover(isPresented: $isPresented) {
-                ZStack {
-                    DIRBackground()
+                DIRScreenContainer {
                     VStack(spacing: 18) {
                         DIRBrandMark()
                             .frame(width: 44, height: 44)

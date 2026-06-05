@@ -10,8 +10,7 @@ struct EquipmentView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                DIRBackground()
+            DIRScreenContainer {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         VStack(alignment: .leading, spacing: 7) {
@@ -121,6 +120,7 @@ struct EquipmentView: View {
                     .environmentObject(equipment)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var equipmentHero: some View {

@@ -41,8 +41,7 @@ struct ManualDiveEditorView: View {
     }
 
     var body: some View {
-        ZStack {
-            DIRBackground()
+        DIRScreenContainer {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
                     if isMetadataOnlyEditMode {
