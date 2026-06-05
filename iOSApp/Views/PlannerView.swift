@@ -73,6 +73,7 @@ struct PlannerView: View {
                 Text(calculateErrorMessage)
             }
         }
+        .dirCompanionTabRoot()
     }
 
     private var modePicker: some View {
