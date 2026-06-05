@@ -1,9 +1,106 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-06  
-**Branch consigliato:** `main` = `origin/main` @ `25e12d9`  
+**Aggiornato:** 2026-06-05  
+**Branch consigliato:** `main` = `origin/main` @ `e47c860`  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-06-05 — UI/UX readiness 100% plan (Watch + iOS)
+
+Piano operativo per portare **Apple Watch MAIN** e **iOS Companion MAIN** da readiness stimata ~90% / ~84% a **100%** UI/UX (codice + QA manuale ripetibile). Complementa l’audit statico [`DIR_DIVING_FULL_UI_UX_AUDIT_CURRENT.md`](DIR_DIVING_FULL_UI_UX_AUDIT_CURRENT.md) @ `bdd3a43` con roadmap per fase, backlog prioritizzato e matrice QA screenshot/device.
+
+| Campo | Valore |
+|-------|--------|
+| **Piano** | [`DIR_DIVING_UI_UX_READINESS_100_PLAN_CURRENT.md`](DIR_DIVING_UI_UX_READINESS_100_PLAN_CURRENT.md) |
+| **Percorso** | `Docs/DIR_DIVING_UI_UX_READINESS_100_PLAN_CURRENT.md` |
+| **Commit** | `e47c860` (`Create DIR_DIVING_UI_UX_READINESS_100_PLAN_CURRENT.md`) |
+| **Data piano** | 2026-06-05 |
+| **Branch** | `main` |
+| **Scope** | Watch app + iOS Companion (MAIN only) |
+| **Target** | 100% UI/UX readiness |
+| **Audit correlato** | [`DIR_DIVING_FULL_UI_UX_AUDIT_CURRENT.md`](DIR_DIVING_FULL_UI_UX_AUDIT_CURRENT.md) — Watch 79% / iOS 76% @ `bdd3a43` (report-only) |
+
+### Readiness stimata (executive summary §1)
+
+| App | Attuale | Target | Blocker principale |
+|-----|--------:|-------:|--------------------|
+| Apple Watch | 90% | 100% | QA dispositivo reale, densità Settings, Compass, accessibilità |
+| iOS Companion | 84% | 100% | Layout fullscreen/adaptive, polish Planner result, chart/table |
+| Design system condiviso | 86% | 100% | Allineamento token, documentazione componenti, screenshot QA |
+
+### Top 5 priorità (§1)
+
+1. Fix layout fullscreen/adaptive iOS (iPhone 14+ — bande nere).
+2. Polish schermata risultato Planner (dashboard, tabella risalita, curva Bühlmann).
+3. Validazione Watch Settings, Compass, warning e Mission Mode su dispositivo reale.
+4. Allineamento `DiveUI` (Watch) ↔ `DIRTheme` (iOS).
+5. Matrice QA ripetibile (screenshot, device, Dynamic Type).
+
+### Mappa sezioni piano
+
+| § | Titolo | Contenuto chiave |
+|---|--------|------------------|
+| 1 | Executive summary | Readiness attuale, blocker, top 5 |
+| 2 | Watch — current state | Punti di forza + gap W-P1/P2 |
+| 3 | iOS — current state | Punti di forza + gap I-P0/P1/P2 |
+| 4 | Watch plan → 100% | Fasi W1–W4 (94% → 97% → 99% → 100%) |
+| 5 | iOS plan → 100% | Fasi I1–I4 (90% → 95% → 98% → 100%) |
+| 6 | Shared design system | S1 token, S2 componenti, S3 screenshot QA |
+| 7 | Backlog Watch | W-01…W-07 (P1–P3) |
+| 8 | Backlog iOS | I-01…I-08 (P0–P2) |
+| 9 | Validation commands | `xcodebuild` Watch Ultra 2 + iPhone 14/15/17 Pro |
+| 10 | Manual QA matrix | Scenari Watch + iOS (fullscreen, Planner tabs, VoiceOver) |
+| 11 | Final verdict | Percorso più rapido verso 100% |
+
+### Fasi implementative — Apple Watch (§4)
+
+| Fase | Target | Focus |
+|------|--------|--------|
+| **W1** | 94% | Compass cardinals, Settings readability, warning stress |
+| **W2** | 97% | Settings density, Crown hint, bearing flow |
+| **W3** | 99% | Images captions, logbook hierarchy, export states |
+| **W4** | 100% | VoiceOver, Dynamic Type, l10n, Reduced Motion |
+
+**File principali Watch:** `CompassView.swift`, `SettingsView.swift`, `DiveLiveView.swift`, `AscentWarningBannerView.swift`, `DepthSafetyLiveViews.swift`, `DiveUIComponents.swift`.
+
+### Fasi implementative — iOS Companion (§5)
+
+| Fase | Target | Focus |
+|------|--------|--------|
+| **I1** | 90% | Edge-to-edge root (`ContentView`, `DIRScreenContainer`, adaptive layout) |
+| **I2** | 95% | `PlanResultView`, ascent table, Bühlmann `tissueHistory.groupedPoints` |
+| **I3** | 98% | Logbook, Analysis, Equipment GAS/BAR/PSI, More |
+| **I4** | 100% | VoiceOver chart/table, Dynamic Type, contrasto, l10n |
+
+**File principali iOS:** `PlannerView.swift`, `BuhlmannTissueHistory.swift`, `PlannerAscentTableBuilder.swift`, `IOSCompanionAdaptiveLayout.swift`, `IOSWindowChromeConfigurator.swift`.
+
+### Backlog prioritizzato (estratto §7–§8)
+
+| ID | P | App | Area | Azione |
+|----|---|-----|------|--------|
+| I-01 | P0 | iOS | Root layout | Eliminare bande nere top/bottom |
+| W-01 | P1 | Watch | Compass | Validare/fix rotazione cardinali N/E/S/W |
+| W-02 | P1 | Watch | Settings | Ridurre densità; diagnostics in subpage |
+| I-02 | P1 | iOS | Planner result | Gerarchia dashboard |
+| I-03 | P1 | iOS | Bühlmann chart | Tab/legend/assi leggibili |
+| I-04 | P1 | iOS | Ascent table | Layout premium colonne Prof/Tempo/Gas/PPO₂ |
+| W-06 / I-08 | P2 | Both | Accessibility | VoiceOver + Dynamic Type |
+
+### Documenti correlati
+
+| Documento | Relazione |
+|-----------|-----------|
+| [`DIR_DIVING_FULL_UI_UX_AUDIT_CURRENT.md`](DIR_DIVING_FULL_UI_UX_AUDIT_CURRENT.md) | Audit read-only pre-piano @ `bdd3a43` |
+| [`DIR_DIVING_WATCH_UI_TEXT_VISIBILITY_AUDIT_CURRENT.md`](DIR_DIVING_WATCH_UI_TEXT_VISIBILITY_AUDIT_CURRENT.md) | Audit testo Watch @ 78% (2026-06-04) |
+| [`DIR_DIVING_WATCH_COMPASS_CARDINAL_ROTATION_BUG_REPORT_CURRENT.md`](DIR_DIVING_WATCH_COMPASS_CARDINAL_ROTATION_BUG_REPORT_CURRENT.md) | Bug report Compass → fase W1 |
+| [`MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md`](MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md) | Remediation UX storica (baseline pre-audit corrente) |
+| [`WATCH_MAIN_UX_CONVENTIONS.md`](WATCH_MAIN_UX_CONVENTIONS.md) | Convenzioni UX Watch MAIN |
+| [`UI_UX_VISUAL_GUIDELINES.md`](UI_UX_VISUAL_GUIDELINES.md) | Linee guida visive condivise |
+| [`DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_FIX_REPORT.md`](DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_FIX_REPORT.md) | Fix algoritmo/UI Planner @ `bea4f74` (input per fase I2) |
+
+**Percorso consigliato:** audit → piano → **implementazione** [`DIR_DIVING_UI_UX_READINESS_100_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_UI_UX_READINESS_100_IMPLEMENTATION_REPORT_CURRENT.md) → design system [`DIR_DIVING_UI_DESIGN_SYSTEM_CURRENT.md`](DIR_DIVING_UI_DESIGN_SYSTEM_CURRENT.md) → §10 QA matrix fisica.
 
 ---
 
@@ -986,7 +1083,8 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 8. [`WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md`](WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md) — se lavori su Watch
 9. [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) + [`DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md) — audit math Watch MAIN (corrente + post-hardening root)
 10. [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) + [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) + [`DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md) — se lavori su planner/iOS
-11. [`TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md) — se lavori su TestFlight / R1
+11. [`DIR_DIVING_FULL_UI_UX_AUDIT_CURRENT.md`](DIR_DIVING_FULL_UI_UX_AUDIT_CURRENT.md) + [`DIR_DIVING_UI_UX_READINESS_100_PLAN_CURRENT.md`](DIR_DIVING_UI_UX_READINESS_100_PLAN_CURRENT.md) — se lavori su UI/UX Watch+iOS
+12. [`TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md) — se lavori su TestFlight / R1
 
 ---
 
@@ -1004,6 +1102,8 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md) | Audit algoritmi/math iOS Companion MAIN (Docs) |
 | [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md) | Audit UX/UI readiness planner Bühlmann iOS (Docs) |
 | [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md) | Audit comprehensive planner iOS @ `63ee0b4` (2026-06-04) |
+| [`DIR_DIVING_FULL_UI_UX_AUDIT_CURRENT.md`](DIR_DIVING_FULL_UI_UX_AUDIT_CURRENT.md) | Audit UI/UX cross-app Watch+iOS @ `bdd3a43` (2026-06-05) |
+| [`DIR_DIVING_UI_UX_READINESS_100_PLAN_CURRENT.md`](DIR_DIVING_UI_UX_READINESS_100_PLAN_CURRENT.md) | **Piano operativo UI/UX 100%** Watch+iOS @ `e47c860` |
 
 ---
 
@@ -1047,6 +1147,8 @@ Audit storici ora consolidati in `Docs/`: vedi anche **§13** — [`DIR_DIVING_W
 | [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md) | §6 |
 | [`DIR_Diving_Planner_Tabs_Implementation_Plan.md`](DIR_Diving_Planner_Tabs_Implementation_Plan.md) | §6, agg. 2026-06-06 |
 | [`DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_AUDIT_CURRENT.md`](DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_AUDIT_CURRENT.md) | §6, agg. 2026-06-06 |
+| [`DIR_DIVING_FULL_UI_UX_AUDIT_CURRENT.md`](DIR_DIVING_FULL_UI_UX_AUDIT_CURRENT.md) | agg. 2026-06-05 — audit Watch+iOS @ `bdd3a43` |
+| [`DIR_DIVING_UI_UX_READINESS_100_PLAN_CURRENT.md`](DIR_DIVING_UI_UX_READINESS_100_PLAN_CURRENT.md) | **agg. 2026-06-05** — piano UI/UX 100% Watch+iOS @ `e47c860` |
 | `DOCUMENTATION_BRANCH_ALIGNMENT_20260517.md` … `20260525.md` | §2, §9 |
 | [`DOCUMENTATION_SYNC_REPORT_20260519.md`](DOCUMENTATION_SYNC_REPORT_20260519.md) | §2 |
 | `DOCUMENTATION_UPDATE_REPORT_20260519.md` … `20260525.md` | §9 |
@@ -1090,4 +1192,4 @@ Altri asset in `Docs/`: `.docx`, `.csv`, `.xlsx`, `.py` (generatori §11), `Refe
 
 ---
 
-*Indice per ripresa lavoro su `main` @ `origin/main`. Baseline documentale: audit Watch/iOS consolidati in `Docs/`, photo transfer + image delete plan 2026-06-05, reaudit/UX Bühlmann 2026-05-28, hardening + motore Buhlmann in `Docs/` §6.*
+*Indice per ripresa lavoro su `main` @ `origin/main` @ `e47c860`. Baseline documentale: piano UI/UX readiness 100% 2026-06-05, audit full UI/UX @ `bdd3a43`, photo transfer + image delete plan 2026-06-05, reaudit/UX Bühlmann 2026-05-28, hardening + motore Buhlmann in `Docs/` §6.*

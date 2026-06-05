@@ -28,8 +28,6 @@ struct MoreView: View {
                             languagePreferencePicker
                             unitsPreferenceSection
                             row(String(localized: "more.settings.sync_scope_title"), String(localized: "more.settings.sync_scope_value"))
-                            row(String(localized: "units.title"), String(localized: "more.settings.units_synced"))
-                            row(String(localized: "more.settings.local_only_title"), String(localized: "more.settings.local_only_value"))
                             row(String(localized: "more.planner_safety.title"), String(localized: "more.disclaimer.required"))
                             cnsDescentBottomCheckToggle
                             if DeveloperSettings.isDeveloperSectionVisible {
