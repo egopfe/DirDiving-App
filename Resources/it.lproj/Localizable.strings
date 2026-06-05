@@ -445,7 +445,7 @@
 "watch_photo.staged.ready" = "Pronta per l'invio";
 "watch_photo.staged.clear" = "Rimuovi";
 "watch_photo.convert.warning" = "Immagine ridimensionata per Apple Watch.";
-"watch_photo.manage.open" = "Gestisci foto su Apple Watch";
+"watch_photo.manage.open" = "Gestisci foto sull'Apple Watch";
 "watch_photo.manage.title" = "Foto su Apple Watch";
 "watch_photo.manage.subtitle" = "Immagini di riferimento caricate sul tuo Apple Watch.";
 "watch_photo.manage.close" = "Chiudi";
