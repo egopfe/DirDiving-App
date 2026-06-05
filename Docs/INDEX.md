@@ -1,9 +1,27 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-05
-**Branch consigliato:** `main` = `origin/main`
+**Aggiornato:** 2026-06-06
+**Branch consigliato:** `main` = `origin/main` @ `90dc3f5`
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-06-06 — allineamento documentazione MAIN
+
+Pass **solo documentazione** (nessuna modifica runtime). Backup: `backup/docs-alignment-20260606`.
+
+| Campo | Valore |
+|-------|--------|
+| **Report principale** | [`DOCUMENTATION_BRANCH_ALIGNMENT_20260606.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260606.md) |
+| **Changelog doc** | [`DOCUMENTATION_UPDATE_REPORT_20260606.md`](DOCUMENTATION_UPDATE_REPORT_20260606.md) |
+| **PR snapshot** | [`PR_STATUS_20260606.md`](PR_STATUS_20260606.md) |
+| **Baseline runtime** | `main` @ `90dc3f5` |
+| **Root README** | [`../README.md`](../README.md) → punta a [`README.md`](README.md) |
+
+**Architettura MAIN documentata:** Diving Watch + iOS Companion, onboarding legale, depth discouragement 35/38/40 m, banner risalita inline, GPS overlay compatto, **BUSSOLA**, sync/tombstone, App Intents / Action Button via Shortcuts, foto iPhone→Watch con ACK e gestione da iOS, Bühlmann indicative (iOS planner).
+
+**Experimental isolato:** Snorkeling, Apnea, Buddy Assist su `codex/experimental-features` e `codex/ios-experimental-features` — non target MAIN (`project.yml`).
 
 ---
 
@@ -18,7 +36,7 @@ Audit statico sul percorso **invio foto iPhone → Apple Watch** (`PhotosPicker`
 | **Data audit** | 2026-06-05 |
 | **Branch / commit auditato** | `main` @ `ca76a19` |
 | **Modalità** | Static audit, report-only |
-| **Verdetto** | Architettura core **corretta**; gap UX su conferma ricezione/import su Watch |
+| **Verdetto** | Architettura core **corretta**; gap UX remediation **implementata** @ `fc311be`/`90dc3f5` — QA device pair ancora richiesta |
 | **File chiave** | `WatchPhotoTransferPanel.swift`, `WatchPhotoPreprocessor.swift`, `WatchSyncService.swift` (iOS), `UserImageStore.swift`, `UserImagesView.swift`, `WatchCompanionPhotoValidator.swift` |
 
 ### Issues (Executive Summary)
@@ -51,7 +69,7 @@ Audit statico sul percorso **invio foto iPhone → Apple Watch** (`PhotosPicker`
 |-------|--------|
 | **Documento** | [`DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md) |
 | **Percorso** | `Docs/DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md` |
-| **Stato** | Implementato su `main` — ACK Watch→iOS, lifecycle transfer iOS, UUID filename, status localizzati, dedup import, page dots, tap-to-fullscreen in `UserImagesView`, test |
+| **Stato** | Implementato su `main` @ `fc311be`/`90dc3f5` — ACK Watch→iOS, lifecycle transfer iOS, UUID filename, status localizzati, dedup import, page dots, tap-to-fullscreen in `UserImagesView`, **manual send**, **iOS manage/delete sheet**, Watch **staging sync** fix; test |
 | **Build/test** | iOS + Watch build ✅; `CompanionPhotoTransferPipelineTests` 7/7; `CompanionPhotoImportSupportTests` 7/7 |
 | **QA residua** | Coppia fisica iPhone/Watch; connettività disabilitata/ripristinata; 41 / 45 / 49 mm |
 
