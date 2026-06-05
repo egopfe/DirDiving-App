@@ -14,7 +14,8 @@ The engine is informational and non-certified. It must never be presented as a l
 - `BuhlmannConstants.swift`: ZHL-16C N2/He constants, water vapor pressure, stop interval, ascent/descent assumptions.
 - `BuhlmannGas.swift`: validated gas model, PPO2, MOD, minimum operating depth, gas labels, plan issues.
 - `BuhlmannTissueModel.swift`: tissue compartments, Schreiner loading, mixed coefficient ceiling calculation.
-- `BuhlmannEngine.swift`: request/result model, validation, NDL search, GF interpolation, multigas stop schedule, runtime/TTS accounting, residual tissue seed.
+- `BuhlmannEngine.swift`: request/result model, validation, NDL search, GF interpolation, multigas stop schedule, runtime/TTS accounting, residual tissue seed, **visualization-only tissue history sampling**.
+- `BuhlmannTissueHistory.swift`: post-plan segment replay sampler, compartment display metrics, grouped chart series (max load per group).
 - `BuhlmannPlanner.swift`: iOS planner adapter from `GasPlanInput` to the pure engine.
 
 ## Mathematical Model
@@ -30,6 +31,7 @@ The engine is informational and non-certified. It must never be presented as a l
 - Optional multiple bottom segments: each segment carries its own depth, duration, and gas.
 - Gas-switch dwell: `0.5 min` at switch depth, included in tissue loading and runtime accounting.
 - Runtime semantics: `ttsMinutes` is time-to-surface from the end of bottom loading; `totalRuntimeMinutes` includes descent, bottom, gas switches, ascent and stops.
+- **Tissue history (2026-06-02):** after a valid plan, `BuhlmannTissueHistorySampler` replays runtime segments through the existing tissue loaders at 1-minute cadence. Output is attached to `BuhlmannEngineResult.tissueHistory` for charting only; stop schedule math is unchanged.
 - Initial tissue state: air-saturated by default; `BuhlmannPlanRequest.initialTissueState` can seed repetitive/reference planning.
 - Repetitive planning reference: optional `TissueSnapshot` + `SurfaceIntervalModel` off-gassing seed for subsequent plans.
 

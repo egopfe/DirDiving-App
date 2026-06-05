@@ -21,6 +21,7 @@ final class PlanCalculationCompletenessTests: XCTestCase {
             finalTissueState: nil,
             stops: [stop],
             segments: [],
+            tissueHistory: .empty,
             issues: [.calculationLimitReached],
             modelState: .modelIncomplete
         )
