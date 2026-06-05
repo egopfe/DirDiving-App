@@ -444,13 +444,20 @@ final class WatchSyncService: NSObject, ObservableObject {
         }
     }
 
-    private func importCompanionPhoto(_ file: WCSessionFile) {
-        let metadata = file.metadata ?? [:]
+    private func importCompanionPhoto(from sourceURL: URL, metadata: [String: Any]) {
         let photoID = metadata[WatchSyncKeys.companionPhotoIDKey] as? String
         let fileName = (metadata[WatchSyncKeys.companionPhotoFileNameKey] as? String)
-            ?? file.fileURL.lastPathComponent
+            ?? sourceURL.lastPathComponent
+        guard FileManager.default.fileExists(atPath: sourceURL.path) else {
+            deliverCompanionPhotoAck(
+                photoID: photoID,
+                status: CompanionPhotoImportSupport.ackStatusRejected,
+                errorCode: "missingFile"
+            )
+            return
+        }
         do {
-            let storedFileName = try UserImageStore.importCompanionPhoto(from: file.fileURL, fileName: fileName)
+            let storedFileName = try UserImageStore.importCompanionPhoto(from: sourceURL, fileName: fileName)
             lastSyncStatus = String(localized: "Foto iPhone ricevuta")
             recordActivity(title: String(localized: "sync.activity.photo_from_iphone"), detail: storedFileName)
             deliverCompanionPhotoAck(
@@ -469,6 +476,35 @@ final class WatchSyncService: NSObject, ObservableObject {
         }
     }
 
+    private func rejectCompanionPhoto(metadata: [String: Any], errorCode: String) {
+        let photoID = metadata[WatchSyncKeys.companionPhotoIDKey] as? String
+        lastSyncStatus = String(localized: "Errore foto iPhone")
+        deliverCompanionPhotoAck(
+            photoID: photoID,
+            status: CompanionPhotoImportSupport.ackStatusRejected,
+            errorCode: errorCode
+        )
+    }
+
+    /// Copies the incoming WCSession file before the delegate returns — the system deletes `file.fileURL` afterward.
+    nonisolated private static func stageIncomingCompanionPhoto(_ file: WCSessionFile) -> (url: URL, metadata: [String: Any])? {
+        let metadata = file.metadata ?? [:]
+        let sourceURL = file.fileURL
+        guard FileManager.default.fileExists(atPath: sourceURL.path) else { return nil }
+
+        let stagingURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("DIRDivingIncomingPhoto_\(UUID().uuidString)_\(sourceURL.lastPathComponent)")
+        do {
+            if FileManager.default.fileExists(atPath: stagingURL.path) {
+                try FileManager.default.removeItem(at: stagingURL)
+            }
+            try FileManager.default.copyItem(at: sourceURL, to: stagingURL)
+            return (stagingURL, metadata)
+        } catch {
+            return nil
+        }
+    }
+
     private func deliverCompanionPhotoAck(
         photoID: String?,
         status: String,
@@ -476,7 +512,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         errorCode: String? = nil
     ) {
         guard let photoID, !photoID.isEmpty else { return }
-        guard WCSession.isSupported(), activationState == .activated else { return }
+        guard WCSession.isSupported() else { return }
 
         let payload = CompanionPhotoImportSupport.makeAckPayload(
             photoID: photoID,
@@ -485,7 +521,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             errorCode: errorCode
         )
         let session = WCSession.default
-        if session.isReachable {
+        if activationState == .activated, session.isReachable {
             session.sendMessage(payload, replyHandler: nil) { [weak self] _ in
                 Task { @MainActor in
                     session.transferUserInfo(payload)
@@ -628,8 +664,14 @@ extension WatchSyncService: WCSessionDelegate {
     }
 
     nonisolated func session(_ session: WCSession, didReceive file: WCSessionFile) {
+        let staged = Self.stageIncomingCompanionPhoto(file)
         Task { @MainActor in
-            self.importCompanionPhoto(file)
+            guard let staged else {
+                self.rejectCompanionPhoto(metadata: file.metadata ?? [:], errorCode: "missingFile")
+                return
+            }
+            defer { try? FileManager.default.removeItem(at: staged.url) }
+            self.importCompanionPhoto(from: staged.url, metadata: staged.metadata)
         }
     }
 }
