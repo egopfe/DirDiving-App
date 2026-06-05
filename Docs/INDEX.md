@@ -1,9 +1,26 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-05  
-**Branch consigliato:** `main` = `origin/main` @ `e47c860`  
+**Branch consigliato:** `main` = `origin/main` @ `ecad0d9`
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-06-05 - sync rami experimental
+
+Aggiornamento **solo documentazione** per registrare che i rami experimental sono stati verificati sui rispettivi ultimi remote e fast-forwardati prima delle modifiche docs.
+
+| Campo | Valore |
+|-------|--------|
+| **Report** | [`EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md`](EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md) |
+| **MAIN verificato** | `origin/main` @ `ecad0d9` |
+| **Watch/iOS experimental** | `origin/codex/experimental-features` @ `227bcaa` |
+| **iOS-named experimental** | `origin/codex/ios-experimental-features` @ `441fb77` |
+| **Scope** | Apnea + Snorkeling experimental; Buddy/BLE resta lab-only |
+| **Tipo modifica** | Docs-only; nessuna modifica runtime |
+
+Nota: `codex/experimental-features` resta il ramo experimental combinato canonico; `codex/ios-experimental-features` resta allineato per i path app/progetto ma conserva i documenti specifici iOS.
 
 ---
 
