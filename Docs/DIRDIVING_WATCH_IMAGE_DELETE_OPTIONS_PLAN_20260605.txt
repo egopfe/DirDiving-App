@@ -1,0 +1,321 @@
+DIR DIVING - Apple Watch Uploaded Image Deletion Plan
+Date: 2026-06-05
+
+Repository reviewed:
+C:\Users\egopf\Documents\GitHub\DirDiving-App
+
+Latest main baseline used for this plan:
+aa5a5c3 - feat(watch): add tap-to-fullscreen viewing in User Images gallery.
+
+Current state:
+- iOS Companion can pick and send an image to Apple Watch.
+- Apple Watch imports, validates, stores, lists, displays, and opens uploaded images fullscreen.
+- Apple Watch sends imported/rejected ACK back to iOS.
+- There is no current function to delete one uploaded image.
+- There is no current function to clear all uploaded images.
+- There is no current iOS Companion command to remove images from Apple Watch.
+- Uploaded images are stored on Watch in the app Documents/UserImages directory.
+- Bundled app images can also appear in User Images and must not be deleted by user actions.
+
+Recommendation:
+Implement Option 1 first. It is simpler, safer, and matches data ownership because the Apple Watch is the device that stores and displays the images. Implement Option 2 later only if users need iPhone-based bulk management.
+
+
+OPTION 1 - Delete Uploaded Images Directly From Apple Watch
+===========================================================
+
+Goal:
+Let the user delete a specific uploaded image directly from the Watch User Images screen.
+
+User experience:
+1. User opens IMAGES on Apple Watch.
+2. User taps an image row to open the detail view.
+3. The detail view keeps the existing back button, image preview, caption, page dots, list button, and tap-to-fullscreen behavior.
+4. Add a small trash button on the detail screen.
+5. Tapping trash opens a confirmation dialog.
+6. Confirmation deletes only the selected uploaded image.
+7. After deletion, the UI returns to the image list or selects the next available image.
+8. If no images remain, the existing empty state appears.
+9. Fullscreen view should close automatically if the selected image is deleted.
+
+Files likely touched:
+- Services/UserImageStore.swift
+- Views/UserImagesView.swift
+- Resources/en.lproj/Localizable.strings
+- Resources/it.lproj/Localizable.strings
+- Tests/WatchAlgorithmTests/CompanionPhotoImportSupportTests.swift
+- Tests/WatchAlgorithmTests/UserImageStorePolicyTests.swift
+
+Core implementation steps:
+1. Add Watch-side deletion API in UserImageStore:
+   - func canDeleteImage(named fileName: String) -> Bool
+   - func deleteImage(named fileName: String) throws
+   - optionally func deleteAllUploadedImages() throws if clear-all is desired later.
+
+2. Restrict deletion to uploaded document images:
+   - Sanitize fileName with existing sanitizedCompanionPhotoFileName.
+   - Build the URL only inside Documents/UserImages.
+   - Confirm FileManager path stays inside Documents/UserImages.
+   - If the same filename exists in the app bundle, do not remove bundle assets.
+   - Do not delete files from Bundle.main.
+
+3. After successful delete:
+   - Remove the file with FileManager.removeItem(at:).
+   - Call reload().
+   - Post or rely on published imageNames update.
+   - Clear selectedName if it no longer exists.
+   - Dismiss fullscreen if active.
+
+4. Update UserImagesView:
+   - Add @State private var pendingDeleteName: String?
+   - Add @State private var showDeleteConfirmation = false
+   - Add trash icon button in imageDetail.
+   - Use role .destructive confirmation.
+   - Keep button size watch-friendly.
+   - Hide or disable trash when canDeleteImage(named:) is false.
+   - Do not put delete in fullscreen as the first implementation; fullscreen should remain focused on viewing.
+
+5. Add localized strings:
+   - user_images.delete.button
+   - user_images.delete.confirm.title
+   - user_images.delete.confirm.message
+   - user_images.delete.confirm.action
+   - user_images.delete.cancel
+   - user_images.delete.a11y
+   - user_images.delete.error
+
+6. Add tests:
+   - Imported document image can be deleted.
+   - Deleting refreshes imageNames.
+   - Deleting invalid/path traversal filename fails.
+   - Bundled resource path is not deleted.
+   - Duplicate companion filenames delete only the selected stored filename.
+   - Delete does not affect other uploaded images.
+
+Risks:
+- Accidentally deleting bundled image resources if document/bundle lookup is mixed.
+- UI overlap on small Watch screens if trash button is too large or placed poorly.
+- Deleting a selected image while fullscreen is open could leave selectedName pointing at a missing file unless state is cleared.
+
+Mitigations:
+- Document-directory-only deletion.
+- Confirmation dialog before removal.
+- Dismiss fullscreen and reset selectedName after delete.
+- Test with multiple images and one image.
+- Check small Watch sizes for button layout.
+
+Acceptance criteria:
+- A user can remove an uploaded image from Apple Watch.
+- The image disappears immediately from the Watch list.
+- The empty state appears when the last uploaded image is removed.
+- Bundled images cannot be deleted.
+- No iOS Companion connectivity is required.
+- Existing iOS -> Watch photo send and ACK flow still works.
+- Existing fullscreen image viewing still works.
+
+Suggested commit scope:
+fix(watch): allow deleting uploaded user images
+
+
+OPTION 2 - Delete Watch Images From The iOS Companion App
+=========================================================
+
+Goal:
+Let the user manage and request deletion of Watch-stored images from the iOS Companion app.
+
+Important design decision:
+The Apple Watch should remain the source of truth for stored images. The iOS app should request deletion, but it should show final success only after the Watch confirms deletion.
+
+Why this is more complex:
+- iOS currently sends photos but does not maintain a complete Watch image inventory.
+- WatchConnectivity delivery can be delayed.
+- The iPhone may be reachable while the Watch app is inactive, or not reachable at all.
+- A robust feature needs request IDs, ACKs, and clear pending/failed states.
+
+Recommended UX:
+1. In iOS Companion, add a "Manage Watch Images" panel under the existing Watch photo transfer area.
+2. Show either:
+   - the last known uploaded image from ACK data, for a minimal first version; or
+   - a Watch image inventory synchronized from Watch, for a complete version.
+3. User taps Delete on an image.
+4. iOS sends a delete request to Watch.
+5. Watch validates and deletes the local document image.
+6. Watch sends delete ACK to iOS.
+7. iOS updates state to Deleted only after ACK.
+8. If Watch is not reachable, iOS shows Pending deletion or Watch unavailable.
+
+Files likely touched:
+- Utils/WatchSyncKeys.swift
+- iOSApp/Utils/CompanionPhotoTransferSupport.swift
+- Utils/CompanionPhotoImportSupport.swift or a new shared support file
+- iOSApp/Services/WatchSyncService.swift
+- Services/WatchSyncService.swift
+- Services/UserImageStore.swift
+- iOSApp/Views/WatchPhotoTransferPanel.swift
+- iOSApp/Resources/en.lproj/Localizable.strings
+- iOSApp/Resources/it.lproj/Localizable.strings
+- Resources/en.lproj/Localizable.strings
+- Resources/it.lproj/Localizable.strings
+- Tests/iOSAlgorithmTests/CompanionPhotoTransferPipelineTests.swift
+- Tests/WatchAlgorithmTests/CompanionPhotoImportSupportTests.swift
+
+Protocol additions:
+Add new WatchConnectivity payload types.
+
+Suggested keys:
+- companionPhotoDeleteRequestType = "companionPhotoDeleteRequest"
+- companionPhotoDeleteAckType = "companionPhotoDeleteAck"
+- companionPhotoDeleteRequestIDKey = "requestID"
+- companionPhotoDeleteFileNameKey = "storedFileName"
+- companionPhotoDeleteStatusKey = "status"
+- companionPhotoDeleteErrorCodeKey = "errorCode"
+
+Suggested statuses:
+- deleted
+- notFound
+- rejected
+- failed
+
+Core implementation steps:
+1. Add Watch delete API from Option 1 first.
+   - Option 2 should call the same UserImageStore deletion function.
+   - Do not duplicate deletion logic in WatchSyncService.
+
+2. Add iOS delete request model:
+   - requestID
+   - storedFileName
+   - state: queued, sending, deliveredToConnectivity, deletedOnWatch, rejectedByWatch, failed
+   - errorMessage
+   - timestamp
+
+3. Add iOS send delete request method:
+   - func requestDeletePhotoOnWatch(storedFileName: String)
+   - Use sendMessage when reachable.
+   - Use transferUserInfo fallback for durable delivery if appropriate.
+   - Track requestID so ACK can update the correct request.
+
+4. Add Watch receive handler:
+   - Detect companionPhotoDeleteRequest payload before dive-session import handling.
+   - Sanitize storedFileName.
+   - Call UserImageStore.deleteImage(named:).
+   - Return ACK with status deleted, notFound, rejected, or failed.
+
+5. Add iOS ACK handler:
+   - Detect companionPhotoDeleteAck in didReceiveMessage and didReceiveUserInfo.
+   - Match requestID.
+   - Update UI state.
+   - Do not claim deletion until ACK is received.
+
+6. Add optional inventory sync:
+   Minimal version:
+   - iOS can delete only the last imported storedFileName returned by the existing photo ACK.
+
+   Complete version:
+   - Watch publishes a compact inventory list:
+     fileName, displayName, importedAt if available.
+   - iOS displays all Watch uploaded images.
+   - This requires metadata persistence because current Watch image storage is filename-only.
+
+7. Update iOS UI:
+   - Add a "Manage Watch Images" section.
+   - For minimal version, show the last imported Watch filename with a Delete button.
+   - For complete version, show a list of Watch images with status badges.
+   - Confirm destructive actions.
+   - Show pending/offline states honestly.
+
+8. Add localized strings:
+   - watch_photo.manage.title
+   - watch_photo.delete.button
+   - watch_photo.delete.confirm.title
+   - watch_photo.delete.confirm.message
+   - watch_photo.delete.status.pending
+   - watch_photo.delete.status.deleted
+   - watch_photo.delete.status.failed
+   - watch_photo.delete.status.watch_unavailable
+
+9. Add tests:
+   - Delete request payload uses shared keys.
+   - iOS delete ACK maps to deletedOnWatch.
+   - Rejected ACK maps to rejectedByWatch.
+   - Watch rejects unsafe filenames.
+   - Watch reports notFound for missing uploaded file.
+   - Watch delete request removes only document UserImages file.
+   - Existing photo imported/rejected ACK tests still pass.
+
+Risks:
+- iOS could show stale images if Watch inventory is not synced.
+- Delete request could be delivered after the image was already deleted.
+- A request could target a filename that collides with a bundled resource.
+- WatchConnectivity timing could confuse status messages.
+- Adding too much inventory sync at once could disturb the currently stable photo send/ACK flow.
+
+Mitigations:
+- Keep Watch as source of truth.
+- Use request IDs and ACKs.
+- Treat missing image as notFound, not fatal.
+- Restrict deletion to Documents/UserImages.
+- Add protocol tests before UI expansion.
+- Do not replace existing WatchSyncService code wholesale.
+
+Acceptance criteria:
+- User can request image deletion from iOS Companion.
+- Watch performs the deletion locally.
+- iOS shows success only after Watch ACK.
+- Offline/unreachable Watch state is clear.
+- Existing iOS photo upload still works.
+- Existing Watch User Images viewing and fullscreen mode still work.
+- No Buddy, BLE, or messaging features are introduced.
+
+Suggested commit scope:
+feat(sync): add companion-requested Watch image deletion
+
+
+Suggested Implementation Order
+==============================
+
+Phase 1:
+Implement Option 1 only.
+
+Phase 2:
+Add tests and QA for Watch-local deletion.
+
+Phase 3:
+Add minimal Option 2 using last imported storedFileName from existing ACK.
+
+Phase 4:
+If needed, add full Watch image inventory sync for richer iOS management.
+
+
+Manual QA Checklist
+===================
+
+Watch-local delete:
+- Upload one photo from iOS.
+- Confirm it appears in Watch IMAGES.
+- Open detail.
+- Open fullscreen and close it.
+- Delete the image from detail.
+- Confirm empty state appears.
+- Upload two photos.
+- Delete first photo.
+- Confirm second photo remains.
+- Delete second photo.
+- Confirm empty state appears.
+- Confirm bundled images, if present, do not expose destructive delete.
+
+iOS remote delete:
+- Upload photo from iOS.
+- Wait for imported-on-Watch status.
+- Delete from iOS.
+- Confirm Watch image disappears.
+- Confirm iOS shows deleted only after ACK.
+- Repeat with Watch unreachable.
+- Repeat with stale/missing storedFileName.
+
+
+Final Recommendation
+====================
+
+Build Option 1 first. It gives users the needed removal capability with the smallest risk and no dependency on WatchConnectivity state.
+
+Build Option 2 later if the product wants iPhone-based management or bulk deletion. Option 2 should reuse the Watch deletion API from Option 1 and should treat the Watch as the source of truth.

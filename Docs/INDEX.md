@@ -1,9 +1,87 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-04
+**Aggiornato:** 2026-06-05
 **Branch consigliato:** `main` = `origin/main`
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-06-05 — Watch photo transfer audit (iOS → Watch)
+
+Audit statico sul percorso **invio foto iPhone → Apple Watch** (`PhotosPicker` → `WatchPhotoPreprocessor` → `WCSession.transferFile` → `UserImageStore` → `UserImagesView`). Nessuna modifica codice nel report; QA runtime richiede macOS + coppia iPhone/Watch o simulatori.
+
+| Campo | Valore |
+|-------|--------|
+| **Documento** | [`DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md) |
+| **Percorso** | `Docs/DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md` |
+| **Data audit** | 2026-06-05 |
+| **Branch / commit auditato** | `main` @ `ca76a19` |
+| **Modalità** | Static audit, report-only |
+| **Verdetto** | Architettura core **corretta**; gap UX su conferma ricezione/import su Watch |
+| **File chiave** | `WatchPhotoTransferPanel.swift`, `WatchPhotoPreprocessor.swift`, `WatchSyncService.swift` (iOS), `UserImageStore.swift`, `UserImagesView.swift`, `WatchCompanionPhotoValidator.swift` |
+
+### Issues (Executive Summary)
+
+| ID | Sev | Titolo |
+|----|-----|--------|
+| 1 | Medium | iOS segnala successo prima della prova di ricezione Watch |
+| 2 | Medium | Nessun acknowledgement Watch → iOS post-import foto |
+| 3 | Medium | `WCSessionFileTransfer` completion non tracciata su iOS |
+| 4 | Low | Possibile collisione filename `companion_<timestamp>.jpg` |
+| 5 | Low | Layout galleria Watch da verificare su 41 / 45 / 49 mm |
+
+### Piano remediation (fasi report)
+
+| Fase | Obiettivo |
+|------|-----------|
+| 1 | Acknowledgement import foto Watch → iOS |
+| 2 | Stati transfer file su iOS (queued / delivered / failed) |
+| 3 | Filename UUID al posto del timestamp |
+| 4 | Messaggi iOS distinti (queued vs received) |
+| 5 | Polish UX galleria Watch (`UserImagesView`, page dots, highlight nuova foto) |
+| 6 | Test mirati preprocessor / validator / import |
+| 7 | QA macOS/device (JPEG, PNG, HEIC, panorama, connettività) |
+
+**Release recommendation:** feature **directionally correct**; non dichiarare fully verified senza QA device/simulator.
+
+### Implementazione remediation (2026-06-05)
+
+| Campo | Valore |
+|-------|--------|
+| **Documento** | [`DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md) |
+| **Percorso** | `Docs/DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md` |
+| **Stato** | Implementato su `main` — ACK Watch→iOS, lifecycle transfer iOS, UUID filename, status localizzati, dedup import, page dots, tap-to-fullscreen in `UserImagesView`, test |
+| **Build/test** | iOS + Watch build ✅; `CompanionPhotoTransferPipelineTests` 7/7; `CompanionPhotoImportSupportTests` 7/7 |
+| **QA residua** | Coppia fisica iPhone/Watch; connettività disabilitata/ripristinata; 41 / 45 / 49 mm |
+
+### Piano opzioni cancellazione immagini Watch (2026-06-05)
+
+Piano **plan-only** per eliminare le immagini caricate su Apple Watch (nessuna modifica codice nel documento). Baseline: `main` @ `aa5a5c3` (fullscreen `UserImagesView`).
+
+| Campo | Valore |
+|-------|--------|
+| **Documento** | [`DIRDIVING_WATCH_IMAGE_DELETE_OPTIONS_PLAN_20260605.txt`](DIRDIVING_WATCH_IMAGE_DELETE_OPTIONS_PLAN_20260605.txt) |
+| **Percorso** | `Docs/DIRDIVING_WATCH_IMAGE_DELETE_OPTIONS_PLAN_20260605.txt` |
+| **Data** | 2026-06-05 |
+| **Modalità** | Plan-only (Opzione 1 consigliata prima; Opzione 2 iOS companion dopo) |
+| **Gap attuale** | Nessuna delete singola / clear-all; bundle `UserImages` non cancellabile |
+| **File chiave** | `UserImageStore.swift`, `UserImagesView.swift`, `WatchSyncService.swift` (se Opzione 2), `WatchSyncKeys.swift` |
+
+| Opzione | Obiettivo | Priorità |
+|---------|-----------|----------|
+| **1** | Delete su Watch (trash + conferma in detail; solo `Documents/UserImages`) | **Implementare per prima** |
+| **2** | Delete richiesta da iOS Companion con ACK Watch (`companionPhotoDeleteRequest` / `companionPhotoDeleteAck`) | Dopo Opzione 1, se serve gestione bulk da iPhone |
+
+**Acceptance (Opzione 1):** immagine upload sparisce subito dalla lista; empty state se ultima; asset bundle intatti; send foto + ACK + fullscreen invariati.
+
+### Implementazione full management (2026-06-05)
+
+| Campo | Valore |
+|-------|--------|
+| **Documento** | [`DIRDIVING_WATCH_IMAGE_FULL_MANAGEMENT_IMPLEMENTATION_REPORT_20260605.md`](DIRDIVING_WATCH_IMAGE_FULL_MANAGEMENT_IMPLEMENTATION_REPORT_20260605.md) |
+| **Stato** | Implementato — delete Watch locale, inventario Watch→iOS, delete remoto iOS con ACK |
+| **Build/test** | Watch + iOS build ✅; management tests Watch 16/16, iOS 11/11 (subset) |
 
 ---
 
@@ -26,6 +104,9 @@ Tutti i file Markdown che erano nella root del repository sono stati spostati in
 | [`MAIN_BRANCH_FULL_CODE_SECURITY_AUDIT_CURRENT.md`](MAIN_BRANCH_FULL_CODE_SECURITY_AUDIT_CURRENT.md) | `Docs/` | Audit security current |
 | [`MAIN_BRANCH_FULL_CODE_SECURITY_REMEDIATION_REPORT.md`](MAIN_BRANCH_FULL_CODE_SECURITY_REMEDIATION_REPORT.md) | `Docs/` | Report remediation security |
 | [`DIR_DIVING_SECURITY_EXPLOIT_AUDIT_AND_REMEDIATION_PLAN_20260604.md`](DIR_DIVING_SECURITY_EXPLOIT_AUDIT_AND_REMEDIATION_PLAN_20260604.md) | `Docs/` | Audit security/exploit 2026-06-04 — piano remediation P1–P3 (vedi sezione dedicata sotto) |
+| [`DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md) | `Docs/` | Audit transfer foto iOS → Watch 2026-06-05 — vedi sezione indice 2026-06-05 sopra |
+| [`DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md) | `Docs/` | Implementazione remediation transfer foto iOS → Watch 2026-06-05 — vedi sezione indice 2026-06-05 sopra |
+| [`DIRDIVING_WATCH_IMAGE_DELETE_OPTIONS_PLAN_20260605.txt`](DIRDIVING_WATCH_IMAGE_DELETE_OPTIONS_PLAN_20260605.txt) | `Docs/` | Piano opzioni delete immagini Watch 2026-06-05 — vedi sezione indice 2026-06-05 sopra |
 
 ---
 
@@ -228,7 +309,7 @@ Audit read-only su **Apple Watch MAIN** (`DIRDiving Watch App` only). Nessuna mo
 | Warning banners / safety | **P1** (testo) / P2 (layout) | `AscentWarningBannerView.swift`, `DepthSafetyLiveViews.swift`, `DiveLiveView.swift` |
 | Live Dive | P2 | `DiveLiveView.swift`, `AscentGaugeView.swift`, … |
 | Compass | P2 | `CompassView.swift` |
-| User Images | P2 | `UserImagesView.swift` |
+| User Images | P2 | `UserImageStore.swift`, `UserImagesView.swift`, `WatchPhotoTransferPanel.swift` — delete Watch, inventario iOS, delete remoto ACK; vedi [`DIRDIVING_WATCH_IMAGE_FULL_MANAGEMENT_IMPLEMENTATION_REPORT_20260605.md`](DIRDIVING_WATCH_IMAGE_FULL_MANAGEMENT_IMPLEMENTATION_REPORT_20260605.md) |
 | Logs / Dive Detail / Export | P2 | `DiveLogListView.swift`, `DiveDetailView.swift`, `ExportView.swift` |
 | Info / diagnostics | P2 | `InfoView.swift` |
 | Legal onboarding | P2 | `WatchLegalOnboardingView.swift` |
@@ -632,6 +713,9 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 
 | Documento | Contenuto |
 |-----------|-----------|
+| [`DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md) | **Audit** transfer foto iOS → Watch @ `ca76a19` (2026-06-05) — gap ack delivery, UX galleria |
+| [`DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md) | **Implementazione** remediation transfer foto iOS → Watch (2026-06-05) — lifecycle, ACK, UUID, test |
+| [`DIRDIVING_WATCH_IMAGE_DELETE_OPTIONS_PLAN_20260605.txt`](DIRDIVING_WATCH_IMAGE_DELETE_OPTIONS_PLAN_20260605.txt) | **Piano** delete immagini Watch (2026-06-05) — Opzione 1 Watch-first; Opzione 2 iOS+ACK |
 | [`WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md`](WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md) | Crown, Settings, App Intents, haptics (`72fa15b`) |
 | [`WATCH_MAIN_UX_CONVENTIONS.md`](WATCH_MAIN_UX_CONVENTIONS.md) | Banner risalita inline, layout Live, BUSSOLA |
 | [`MISSION_MODE_MAIN_WATCH.md`](MISSION_MODE_MAIN_WATCH.md) | Mission Mode MAIN: persistenza, attivazione/disattivazione, scope runtime e safety exclusions |
@@ -932,4 +1016,4 @@ Altri asset in `Docs/`: `.docx`, `.csv`, `.xlsx`, `.py` (generatori §11), `Refe
 
 ---
 
-*Indice per ripresa lavoro su `main` @ `570964e`. Baseline documentale: audit Watch/iOS consolidati in Docs, reaudit/UX Bühlmann 2026-05-28, hardening + motore Buhlmann in `Docs/` §6.*
+*Indice per ripresa lavoro su `main` @ `origin/main`. Baseline documentale: audit Watch/iOS consolidati in `Docs/`, photo transfer + image delete plan 2026-06-05, reaudit/UX Bühlmann 2026-05-28, hardening + motore Buhlmann in `Docs/` §6.*

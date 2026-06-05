@@ -9,6 +9,7 @@ final class WatchCompanionPhotoValidatorTests: XCTestCase {
         let result = try WatchCompanionPhotoValidator.validateAndNormalize(data: data, suggestedFileName: "test.jpg")
         XCTAssertTrue(result.fileName.hasSuffix(".jpg"))
         XCTAssertFalse(result.data.isEmpty)
+        XCTAssertEqual(result.data.prefix(2), Data([0xFF, 0xD8]))
     }
 
     func testTextBytesWithJpgExtensionRejected() {
