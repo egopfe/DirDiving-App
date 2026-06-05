@@ -4,11 +4,10 @@ struct DiveDetailView: View {
     let session: DiveSession
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var log: DiveLogStore
+    @EnvironmentObject private var navigation: AppNavigationStore
     @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
     @State private var exportURL: URL?
     @State private var exportMessage: String?
-    @State private var exportCompletionFileName: String?
-    @State private var showExportCompletion = false
     @State private var showDeleteConfirmation = false
 
     var body: some View {
@@ -34,9 +33,6 @@ struct DiveDetailView: View {
                 .padding(.top, 9)
                 .padding(.bottom, 8)
             }
-        }
-        .navigationDestination(isPresented: $showExportCompletion) {
-            ExportView(fileName: exportCompletionFileName ?? "export.csv", exportURL: exportURL)
         }
         .confirmationDialog(String(localized: "log.delete.confirm.title"), isPresented: $showDeleteConfirmation, titleVisibility: .visible) {
             Button(String(localized: "log.delete.confirm.action"), role: .destructive) {
@@ -251,8 +247,10 @@ struct DiveDetailView: View {
                 exportURL = SubsurfaceExportService.writeCSV(for: session)
                 exportMessage = exportURL == nil ? String(localized: "logbook.export.failed") : nil
                 if let exportURL {
-                    exportCompletionFileName = exportURL.lastPathComponent
-                    showExportCompletion = true
+                    navigation.presentExportCompletion(
+                        fileName: exportURL.lastPathComponent,
+                        exportURL: exportURL
+                    )
                     HapticService.shared.confirm()
                 } else {
                     HapticService.shared.notify()

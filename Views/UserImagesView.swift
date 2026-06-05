@@ -254,12 +254,15 @@ struct UserImagesView: View {
 
     private func storedImage(resourceName: String) -> some View {
         Group {
-            if resourceName.hasPrefix("/"), let uiImage = UIImage(contentsOfFile: resourceName) {
+            if let uiImage = WatchCompanionPhotoValidator.imageForDisplay(resourceName: resourceName) {
                 Image(uiImage: uiImage)
                     .resizable()
             } else {
-                Image(resourceName, bundle: .main)
-                    .resizable()
+                Image(systemName: "photo")
+                    .font(.system(size: 20, weight: .black))
+                    .foregroundStyle(.white.opacity(0.35))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.black.opacity(0.35))
             }
         }
     }

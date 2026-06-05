@@ -41,6 +41,12 @@ struct DIRDivingApp: App {
                     ContentView()
                 }
             }
+            .navigationDestination(isPresented: $navigationStore.exportCompletionPresented) {
+                ExportView(
+                    fileName: navigationStore.exportCompletionFileName,
+                    exportURL: navigationStore.exportCompletionURL
+                )
+            }
                 .environmentObject(logStore)
                 .environmentObject(gpsManager)
                 .environmentObject(compassManager)

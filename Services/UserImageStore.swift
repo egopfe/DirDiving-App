@@ -42,6 +42,7 @@ final class UserImageStore: ObservableObject {
 
     func reload() {
         try? FileManager.default.createDirectory(at: documentsImagesDirectory, withIntermediateDirectories: true)
+        migrateLegacyHEICFilesIfNeeded()
         let extensions = ["png", "jpg", "jpeg", "heic"]
         var names: Set<String> = []
         for ext in extensions {
@@ -51,6 +52,13 @@ final class UserImageStore: ObservableObject {
             names.formUnion(documentURLs.filter { $0.pathExtension.lowercased() == ext }.map(\.lastPathComponent))
         }
         imageNames = names.sorted()
+    }
+
+    private func migrateLegacyHEICFilesIfNeeded() {
+        let documentURLs = (try? FileManager.default.contentsOfDirectory(at: documentsImagesDirectory, includingPropertiesForKeys: nil)) ?? []
+        for url in documentURLs where url.pathExtension.lowercased() == "heic" {
+            WatchCompanionPhotoValidator.migrateLegacyHEICFileIfNeeded(at: url)
+        }
     }
 
     func imageResourceName(for fileName: String) -> String? {
