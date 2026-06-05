@@ -924,6 +924,14 @@
 "more.settings.cns_descent_bottom_check_hint" = "Shows a warning when descent + bottom CNS exceeds 15% of the maximum CNS budget.";
 "more.settings.cns_descent_bottom_check.a11y" = "Toggles the planner CNS descent and bottom fifteen percent warning.";
 "planner.result.warnings.title" = "PLAN WARNINGS";
+"planner.result.warnings.blocking.title" = "BLOCKING ISSUES";
+"planner.result.warnings.caution.title" = "CAUTIONS";
+"planner.result.dashboard.a11y" = "Plan summary dashboard with time to surface, runtime, decompression stops, depth, bottom time, and CNS.";
+"planner.result.secondary_metrics.title" = "Analysis details";
+"planner.result.ascent_plan.subtitle" = "Reference ascent schedule from bottom through decompression to surface.";
+"planner.result.ascent_table.a11y" = "Ascent and decompression table with depth, time, gas, and partial pressure of oxygen.";
+"planner.buhlmann.tissue_curve_empty.detail" = "Tissue loading history is generated after a valid decompression reference is calculated.";
+"planner.buhlmann.tissue_chart.a11y.summary" = "Bühlmann tissue loading chart. Peak compartment load about %@ percent.";
 "planner.header.reference_only.hint" = "Bühlmann-based planning reference only — not certified decompression advice or real-time dive-computer behavior.";
 "planner.header.no_deco.title" = "No-deco reference";
 "planner.header.no_deco.message" = "No decompression stops in this reference output.";

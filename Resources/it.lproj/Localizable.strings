@@ -574,6 +574,10 @@
 "settings.row.haptics.title" = "Vibrazione";
 "settings.row.info.title" = "Info";
 "settings.row.info.subtitle" = "Info, sync, device";
+"settings.diagnostics.sync.title" = "DIAGNOSTICA SYNC";
+"settings.row.sync_diagnostics.title" = "Diagnostica sync";
+"settings.row.sync_diagnostics.subtitle" = "Coda, retry e info di riferimento";
+"settings.section.reference" = "RIFERIMENTO";
 "settings.row.language.title" = "Lingua";
 "settings.row.units.title" = "Unità di misura";
 "settings.row.units.metric" = "Metrico (m)";

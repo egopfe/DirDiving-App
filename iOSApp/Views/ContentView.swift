@@ -46,6 +46,11 @@ struct ContentView: View {
             }
             .tabItem { Label("tab.more", systemImage: "gearshape.fill") }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background {
+            DIRBackground()
+                .ignoresSafeArea()
+        }
         .dirCompanionTabSlot()
         .tint(DIRTheme.cyan)
         .toolbarBackground(DIRTheme.background, for: .tabBar)
@@ -68,8 +73,14 @@ struct ContentView: View {
                 content()
             } else {
                 Color.clear
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background {
+                        DIRBackground()
+                            .ignoresSafeArea()
+                    }
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .dirCompanionTabRoot()
         .tag(tab)
     }
