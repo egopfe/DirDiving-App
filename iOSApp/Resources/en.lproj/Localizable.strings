@@ -483,6 +483,15 @@
 "watch_photo.title" = "Send photo to Watch";
 "watch_photo.pick" = "Choose photo";
 "watch_photo.error.load" = "Could not load the selected photo.";
+"watch_photo.manual_hint" = "Choose a photo, then tap Send to Apple Watch. Transfer is not automatic.";
+"watch_photo.preparing" = "Preparing photo…";
+"watch_photo.send_to_watch" = "Send to Apple Watch";
+"watch_photo.staged.ready" = "Ready to send";
+"watch_photo.staged.clear" = "Clear";
+"watch_photo.manage.open" = "Manage Apple Watch Images";
+"watch_photo.manage.close" = "Close";
+"watch_photo_status_delivered_pending" = "Photo delivered. Waiting for Apple Watch import…";
+"watch_photo_status_rejected_detail" = "Apple Watch rejected the photo (%@).";
 
 /* R3 — iCloud decode surfacing */
 "cloud.status.external_update" = "Update received from iCloud";
