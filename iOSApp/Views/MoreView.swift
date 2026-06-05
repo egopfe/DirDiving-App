@@ -184,6 +184,7 @@ struct MoreView: View {
                     }
                     .padding(16)
                 }
+                .dirCompanionScrollSurface()
             }
             .toolbar(.hidden, for: .navigationBar)
             .alert(String(localized: "developer.section.title"), isPresented: $developerUnlockedNotice) {

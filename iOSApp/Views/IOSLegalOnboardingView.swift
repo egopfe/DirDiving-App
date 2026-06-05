@@ -50,6 +50,7 @@ struct IOSLegalOnboardingView: View {
                 .padding(.top, 18)
                 .padding(.bottom, 28)
             }
+            .dirCompanionScrollSurface()
         }
         .alert(String(localized: "ios.legal.exit_alert.title"), isPresented: $showExitGuidance) {
             Button(String(localized: "ios.legal.exit_alert.confirm"), role: .cancel) {}
@@ -298,6 +299,7 @@ struct IOSLegalSafetyView: View {
                 }
                 .padding(16)
             }
+            .dirCompanionScrollSurface()
         }
         .navigationTitle(Text(String(localized: "Legal & Safety")))
         .navigationBarTitleDisplayMode(.inline)

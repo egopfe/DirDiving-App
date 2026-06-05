@@ -91,6 +91,7 @@ struct ManualDiveEditorView: View {
                 }
                 .padding(16)
             }
+            .dirCompanionScrollSurface()
         }
         .navigationTitle(existing == nil ? String(localized: "manual_dive.add.title") : String(localized: "manual_dive.edit.title"))
         .navigationBarTitleDisplayMode(.inline)

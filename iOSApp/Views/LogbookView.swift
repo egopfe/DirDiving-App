@@ -100,6 +100,7 @@ struct LogbookView: View {
                     .padding(.top, 12)
                     .padding(.bottom, 20)
                 }
+                .dirCompanionScrollSurface()
             }
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(isPresented: $showManualDiveEditor) {

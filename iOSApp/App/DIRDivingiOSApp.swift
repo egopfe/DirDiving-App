@@ -18,12 +18,12 @@ struct DIRDivingiOSApp: App {
         _plannerStore = StateObject(wrappedValue: PlannerStore(cloudSync: cloudSync))
         _equipmentStore = StateObject(wrappedValue: EquipmentStore(cloudSync: cloudSync))
         SensorSourceMode.applyReleaseSafeMigrationIfNeeded()
+        IOSWindowChromeConfigurator.applyGlobalAppearance()
     }
 
     var body: some Scene {
         WindowGroup {
-            ZStack {
-                DIRBackground()
+            IOSRootShell {
                 Group {
                     if legalAcceptance.requiresAcceptance {
                         IOSLegalOnboardingView(
@@ -35,7 +35,6 @@ struct DIRDivingiOSApp: App {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .environmentObject(logStore)
             .environmentObject(watchSync)
             .environmentObject(plannerStore)
