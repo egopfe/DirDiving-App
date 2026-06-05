@@ -121,7 +121,7 @@ struct EquipmentView: View {
                     .environmentObject(equipment)
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .dirCompanionTabRoot()
     }
 
     private var equipmentHero: some View {
