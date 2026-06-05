@@ -51,7 +51,7 @@ Audit statico sul percorso **invio foto iPhone → Apple Watch** (`PhotosPicker`
 |-------|--------|
 | **Documento** | [`DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md) |
 | **Percorso** | `Docs/DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md` |
-| **Stato** | Implementato su `main` — ACK Watch→iOS, lifecycle transfer iOS, UUID filename, status localizzati, dedup import, page dots, test |
+| **Stato** | Implementato su `main` — ACK Watch→iOS, lifecycle transfer iOS, UUID filename, status localizzati, dedup import, page dots, tap-to-fullscreen in `UserImagesView`, test |
 | **Build/test** | iOS + Watch build ✅; `CompanionPhotoTransferPipelineTests` 7/7; `CompanionPhotoImportSupportTests` 7/7 |
 | **QA residua** | Coppia fisica iPhone/Watch; connettività disabilitata/ripristinata; 41 / 45 / 49 mm |
 
@@ -280,7 +280,7 @@ Audit read-only su **Apple Watch MAIN** (`DIRDiving Watch App` only). Nessuna mo
 | Warning banners / safety | **P1** (testo) / P2 (layout) | `AscentWarningBannerView.swift`, `DepthSafetyLiveViews.swift`, `DiveLiveView.swift` |
 | Live Dive | P2 | `DiveLiveView.swift`, `AscentGaugeView.swift`, … |
 | Compass | P2 | `CompassView.swift` |
-| User Images | P2 | `UserImagesView.swift`, `UserImageStore.swift` — vedi [`DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md) e [`DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md) |
+| User Images | P2 | `UserImagesView.swift`, `UserImageStore.swift` — tap immagine → fullscreen; vedi [`DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md) e [`DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md) |
 | Logs / Dive Detail / Export | P2 | `DiveLogListView.swift`, `DiveDetailView.swift`, `ExportView.swift` |
 | Info / diagnostics | P2 | `InfoView.swift` |
 | Legal onboarding | P2 | `WatchLegalOnboardingView.swift` |

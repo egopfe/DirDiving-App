@@ -4,6 +4,7 @@ import UIKit
 struct UserImagesView: View {
     @EnvironmentObject private var imageStore: UserImageStore
     @State private var selectedName: String?
+    @State private var isFullscreenPresented = false
 
     var body: some View {
         ZStack {
@@ -15,6 +16,11 @@ struct UserImagesView: View {
                 imageList
             }
         }
+        .fullScreenCover(isPresented: $isFullscreenPresented) {
+            if let selectedName, let resourceName = imageStore.imageResourceName(for: selectedName) {
+                fullscreenImage(name: selectedName, resourceName: resourceName)
+            }
+        }
         .onAppear {
             imageStore.reload()
             syncDefaultSelection()
@@ -24,6 +30,9 @@ struct UserImagesView: View {
                 self.selectedName = nil
             }
             syncDefaultSelection()
+        }
+        .onChange(of: selectedName) { _, _ in
+            isFullscreenPresented = false
         }
         .onReceive(NotificationCenter.default.publisher(for: .companionPhotoDidArrive)) { notification in
             imageStore.reload()
@@ -208,7 +217,12 @@ struct UserImagesView: View {
                             .stroke(.white.opacity(0.18), lineWidth: 1)
                     )
                     .padding(.horizontal, horizontalInset)
+                    .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .onTapGesture {
+                        isFullscreenPresented = true
+                    }
                     .accessibilityLabel(String(format: String(localized: "user_images.a11y.detail"), index + 1, imageCaption(for: name)))
+                    .accessibilityHint(String(localized: "user_images.a11y.detail.hint"))
 
                 Text(shortImageCaption(for: name))
                     .font(DiveUI.Typography.secondaryLabel)
@@ -240,6 +254,36 @@ struct UserImagesView: View {
                 .padding(.bottom, 4)
             }
             .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
+        }
+    }
+
+    private func fullscreenImage(name: String, resourceName: String) -> some View {
+        let index = imageIndex(for: name)
+        return ZStack {
+            Color.black.ignoresSafeArea()
+
+            storedImage(resourceName: resourceName)
+                .scaledToFit()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(4)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    isFullscreenPresented = false
+                }
+                .accessibilityLabel(String(format: String(localized: "user_images.a11y.detail"), index + 1, imageCaption(for: name)))
+                .accessibilityHint(String(localized: "user_images.a11y.fullscreen.hint"))
+
+            VStack {
+                HStack {
+                    WatchDetailBackButton {
+                        isFullscreenPresented = false
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal, DiveUI.screenPadding)
+                .padding(.top, 6)
+                Spacer()
+            }
         }
     }
 

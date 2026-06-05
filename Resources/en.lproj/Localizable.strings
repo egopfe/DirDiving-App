@@ -461,6 +461,8 @@
 "user_images.a11y.row" = "Image %d, %@";
 "user_images.a11y.row.hint" = "Double tap to view full image";
 "user_images.a11y.detail" = "Full image %d, %@";
+"user_images.a11y.detail.hint" = "Double tap for full screen";
+"user_images.a11y.fullscreen.hint" = "Double tap to close";
 "shortcut.error.app_unavailable" = "DIR DIVING is not ready: open the app on your Watch and try again.";
 "shortcut.error.stopwatch_reset_blocked" = "Stopwatch reset blocked: use on-screen confirmation when time is running.";
 "shortcut.error.legal_acceptance_required" = "Open DIR DIVING and accept the legal and safety onboarding before using Action Button shortcuts.";

@@ -461,6 +461,8 @@
 "user_images.a11y.row" = "Immagine %d, %@";
 "user_images.a11y.row.hint" = "Tocca due volte per aprire l'immagine";
 "user_images.a11y.detail" = "Immagine completa %d, %@";
+"user_images.a11y.detail.hint" = "Tocca due volte per schermo intero";
+"user_images.a11y.fullscreen.hint" = "Tocca due volte per chiudere";
 "shortcut.error.app_unavailable" = "DIR DIVING non e pronto: apri l'app sul Watch e riprova.";
 "shortcut.error.stopwatch_reset_blocked" = "Reset cronometro bloccato: usa la conferma a schermo se il tempo e in corso.";
 "shortcut.error.legal_acceptance_required" = "Apri DIR DIVING e accetta l'onboarding legale e di sicurezza prima di usare le scorciatoie del tasto Azione.";
