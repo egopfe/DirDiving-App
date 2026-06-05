@@ -33,30 +33,32 @@ struct DIRDivingApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                if legalAcceptance.requiresAcceptance {
-                    WatchLegalOnboardingView(
-                        languageCode: DIRAppLanguage.fromStorage(appLanguage).resolvedLanguageCode
+                Group {
+                    if legalAcceptance.requiresAcceptance {
+                        WatchLegalOnboardingView(
+                            languageCode: DIRAppLanguage.fromStorage(appLanguage).resolvedLanguageCode
+                        )
+                    } else {
+                        ContentView()
+                    }
+                }
+                .navigationDestination(isPresented: $navigationStore.exportCompletionPresented) {
+                    ExportView(
+                        fileName: navigationStore.exportCompletionFileName,
+                        exportURL: navigationStore.exportCompletionURL
                     )
-                } else {
-                    ContentView()
                 }
             }
-            .navigationDestination(isPresented: $navigationStore.exportCompletionPresented) {
-                ExportView(
-                    fileName: navigationStore.exportCompletionFileName,
-                    exportURL: navigationStore.exportCompletionURL
-                )
-            }
-                .environmentObject(logStore)
-                .environmentObject(gpsManager)
-                .environmentObject(compassManager)
-                .environmentObject(diveManager)
-                .environmentObject(imageStore)
-                .environmentObject(ascentSettings)
-                .environmentObject(navigationStore)
-                .environmentObject(watchSync)
-                .environmentObject(legalAcceptance)
-                .environment(\.locale, DIRAppLanguage.fromStorage(appLanguage).locale)
+            .environmentObject(logStore)
+            .environmentObject(gpsManager)
+            .environmentObject(compassManager)
+            .environmentObject(diveManager)
+            .environmentObject(imageStore)
+            .environmentObject(ascentSettings)
+            .environmentObject(navigationStore)
+            .environmentObject(watchSync)
+            .environmentObject(legalAcceptance)
+            .environment(\.locale, DIRAppLanguage.fromStorage(appLanguage).locale)
         }
     }
 }
