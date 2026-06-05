@@ -28,8 +28,15 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published private(set) var recentActivity: [SyncActivityItem] = []
     @Published private(set) var lastSuccessfulSyncDate: Date?
     @Published private(set) var companionPhotoTransfer: CompanionPhotoTransferStatus?
+    @Published private(set) var watchImageInventory: [WatchUserImageInventoryItem] = []
+    @Published private(set) var watchImageInventoryStatus: WatchImageInventoryStatus = .unknown
+    @Published private(set) var lastInventoryRefreshDate: Date?
+    @Published private(set) var inventoryErrorMessage: String?
+    @Published private(set) var pendingDeleteRequests: [String: WatchPhotoDeleteRequestState] = [:]
     private weak var logStore: DiveLogStore?
     private var photoIDByTransferFilePath: [String: String] = [:]
+    private var pendingInventoryRequestID: String?
+    private var handledDeleteAckRequestIDs: Set<String> = []
 
     var pendingWatchQueueCount: Int { pendingOutboundSessions.count }
     private var importedSessionIDs: Set<UUID> = []
@@ -232,6 +239,123 @@ final class WatchSyncService: NSObject, ObservableObject {
         }
     }
 
+    func requestWatchImageInventory() {
+        guard WCSession.isSupported() else {
+            watchImageInventoryStatus = .failed
+            inventoryErrorMessage = String(localized: "watch_photo.inventory.failed")
+            return
+        }
+        guard WCSession.default.isPaired, WCSession.default.isWatchAppInstalled, activationState == .activated else {
+            watchImageInventoryStatus = .watchUnavailable
+            inventoryErrorMessage = String(localized: "watch_photo.inventory.watch_unavailable")
+            return
+        }
+        let requestID = UUID().uuidString
+        pendingInventoryRequestID = requestID
+        watchImageInventoryStatus = .loading
+        inventoryErrorMessage = nil
+        let payload = CompanionPhotoManagementSupport.makeInventoryRequestPayload(requestID: requestID)
+        let session = WCSession.default
+        if session.isReachable {
+            session.sendMessage(payload, replyHandler: { [weak self] reply in
+                Task { @MainActor in
+                    self?.handleWatchImageInventoryResponse(reply)
+                }
+            }, errorHandler: { [weak self] _ in
+                Task { @MainActor in
+                    session.transferUserInfo(payload)
+                    self?.watchImageInventoryStatus = .stale
+                    self?.inventoryErrorMessage = String(localized: "watch_photo.inventory.stale")
+                }
+            })
+        } else {
+            session.transferUserInfo(payload)
+            watchImageInventoryStatus = .stale
+            inventoryErrorMessage = String(localized: "watch_photo.inventory.stale")
+        }
+    }
+
+    func requestDeletePhotoOnWatch(storedFileName: String) {
+        guard let sanitized = Self.sanitizedPhotoFileName(storedFileName) else {
+            inventoryErrorMessage = String(localized: "watch_photo.delete.status.failed")
+            return
+        }
+        guard WCSession.isSupported(), WCSession.default.isPaired, WCSession.default.isWatchAppInstalled, activationState == .activated else {
+            inventoryErrorMessage = String(localized: "watch_photo.delete.status.watch_unavailable")
+            return
+        }
+        let requestID = UUID().uuidString
+        let request = WatchPhotoDeleteRequestState(
+            id: requestID,
+            storedFileName: sanitized,
+            state: .sending,
+            errorCode: nil,
+            createdAt: Date()
+        )
+        pendingDeleteRequests[requestID] = request
+        let payload = CompanionPhotoManagementSupport.makeDeleteRequestPayload(
+            requestID: requestID,
+            storedFileName: sanitized
+        )
+        let session = WCSession.default
+        if session.isReachable {
+            session.sendMessage(payload, replyHandler: nil) { [weak self] _ in
+                Task { @MainActor in
+                    session.transferUserInfo(payload)
+                    self?.updateDeleteRequest(requestID: requestID, state: .deliveredToConnectivity)
+                }
+            }
+            updateDeleteRequest(requestID: requestID, state: .sending)
+        } else {
+            session.transferUserInfo(payload)
+            updateDeleteRequest(requestID: requestID, state: .deliveredToConnectivity)
+            watchImageInventoryStatus = .stale
+            inventoryErrorMessage = String(localized: "watch_photo.inventory.stale")
+        }
+    }
+
+    private func updateDeleteRequest(requestID: String, state: WatchPhotoDeleteRequestState.State, errorCode: String? = nil) {
+        guard var request = pendingDeleteRequests[requestID] else { return }
+        request.state = state
+        request.errorCode = errorCode
+        pendingDeleteRequests[requestID] = request
+    }
+
+    private func handleWatchImageInventoryResponse(_ payload: [String: Any]) {
+        guard let response = CompanionPhotoManagementSupport.parseInventoryResponse(payload) else {
+            watchImageInventoryStatus = .failed
+            inventoryErrorMessage = String(localized: "watch_photo.inventory.failed")
+            return
+        }
+        if let requestID = response.requestID, requestID == pendingInventoryRequestID {
+            pendingInventoryRequestID = nil
+        }
+        if response.status == CompanionPhotoManagementSupport.inventoryStatusOK {
+            watchImageInventory = response.items.filter(\.isDeletable)
+            watchImageInventoryStatus = .loaded
+            lastInventoryRefreshDate = response.generatedAt ?? Date()
+            inventoryErrorMessage = nil
+        } else {
+            watchImageInventoryStatus = .failed
+            inventoryErrorMessage = String(localized: "watch_photo.inventory.failed")
+        }
+    }
+
+    private func handleWatchPhotoDeleteAck(_ payload: [String: Any]) {
+        guard let ack = CompanionPhotoManagementSupport.parseDeleteAck(payload) else { return }
+        guard !handledDeleteAckRequestIDs.contains(ack.requestID) else { return }
+        guard var request = pendingDeleteRequests[ack.requestID] else { return }
+        guard let mappedState = CompanionPhotoManagementSupport.deleteStatus(for: ack.status) else { return }
+        request.state = mappedState
+        request.errorCode = ack.errorCode
+        pendingDeleteRequests[ack.requestID] = request
+        handledDeleteAckRequestIDs.insert(ack.requestID)
+        if mappedState == .deletedOnWatch || mappedState == .notFound {
+            watchImageInventory.removeAll { $0.storedFileName == ack.storedFileName }
+            requestWatchImageInventory()
+        }
+    }
+
     func reportCompanionPhotoFailure(message: String, fileName: String = "companion.jpg") {
         updateCompanionPhotoTransfer(
             photoID: UUID().uuidString,
@@ -257,6 +381,7 @@ final class WatchSyncService: NSObject, ObservableObject {
                 detail: transfer.storedFileNameOnWatch ?? transfer.fileName,
                 marksSuccess: true
             )
+            requestWatchImageInventory()
         case .rejectedByWatch:
             lastMessage = String(localized: "watch_photo_status_rejected")
             recordActivity(
@@ -636,6 +761,14 @@ extension WatchSyncService: WCSessionDelegate {
 
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
         Task { @MainActor in
+            if CompanionPhotoManagementSupport.isInventoryResponse(message) {
+                self.handleWatchImageInventoryResponse(message)
+                return
+            }
+            if CompanionPhotoManagementSupport.isDeleteAck(message) {
+                self.handleWatchPhotoDeleteAck(message)
+                return
+            }
             if CompanionPhotoTransferSupport.isCompanionPhotoAck(message) {
                 self.handleCompanionPhotoAck(message)
                 return
@@ -646,6 +779,16 @@ extension WatchSyncService: WCSessionDelegate {
 
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
         Task { @MainActor in
+            if CompanionPhotoManagementSupport.isInventoryResponse(message) {
+                self.handleWatchImageInventoryResponse(message)
+                replyHandler(["status": "acknowledged"])
+                return
+            }
+            if CompanionPhotoManagementSupport.isDeleteAck(message) {
+                self.handleWatchPhotoDeleteAck(message)
+                replyHandler(["status": "acknowledged"])
+                return
+            }
             if CompanionPhotoTransferSupport.isCompanionPhotoAck(message) {
                 self.handleCompanionPhotoAck(message)
                 replyHandler(["status": "acknowledged"])
@@ -669,6 +812,14 @@ extension WatchSyncService: WCSessionDelegate {
 
     nonisolated func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
         Task { @MainActor in
+            if CompanionPhotoManagementSupport.isInventoryResponse(userInfo) {
+                self.handleWatchImageInventoryResponse(userInfo)
+                return
+            }
+            if CompanionPhotoManagementSupport.isDeleteAck(userInfo) {
+                self.handleWatchPhotoDeleteAck(userInfo)
+                return
+            }
             if CompanionPhotoTransferSupport.isCompanionPhotoAck(userInfo) {
                 self.handleCompanionPhotoAck(userInfo)
                 return

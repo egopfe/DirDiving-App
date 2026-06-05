@@ -75,6 +75,14 @@ Piano **plan-only** per eliminare le immagini caricate su Apple Watch (nessuna m
 
 **Acceptance (Opzione 1):** immagine upload sparisce subito dalla lista; empty state se ultima; asset bundle intatti; send foto + ACK + fullscreen invariati.
 
+### Implementazione full management (2026-06-05)
+
+| Campo | Valore |
+|-------|--------|
+| **Documento** | [`DIRDIVING_WATCH_IMAGE_FULL_MANAGEMENT_IMPLEMENTATION_REPORT_20260605.md`](DIRDIVING_WATCH_IMAGE_FULL_MANAGEMENT_IMPLEMENTATION_REPORT_20260605.md) |
+| **Stato** | Implementato — delete Watch locale, inventario Watch→iOS, delete remoto iOS con ACK |
+| **Build/test** | Watch + iOS build ✅; management tests Watch 16/16, iOS 11/11 (subset) |
+
 ---
 
 ## Aggiornamento indice 2026-06-04 - consolidamento `.md` in `Docs/`
@@ -301,7 +309,7 @@ Audit read-only su **Apple Watch MAIN** (`DIRDiving Watch App` only). Nessuna mo
 | Warning banners / safety | **P1** (testo) / P2 (layout) | `AscentWarningBannerView.swift`, `DepthSafetyLiveViews.swift`, `DiveLiveView.swift` |
 | Live Dive | P2 | `DiveLiveView.swift`, `AscentGaugeView.swift`, … |
 | Compass | P2 | `CompassView.swift` |
-| User Images | P2 | `UserImagesView.swift`, `UserImageStore.swift` — tap immagine → fullscreen; delete pianificata in [`DIRDIVING_WATCH_IMAGE_DELETE_OPTIONS_PLAN_20260605.txt`](DIRDIVING_WATCH_IMAGE_DELETE_OPTIONS_PLAN_20260605.txt); vedi anche photo transfer audit/implementation 2026-06-05 |
+| User Images | P2 | `UserImageStore.swift`, `UserImagesView.swift`, `WatchPhotoTransferPanel.swift` — delete Watch, inventario iOS, delete remoto ACK; vedi [`DIRDIVING_WATCH_IMAGE_FULL_MANAGEMENT_IMPLEMENTATION_REPORT_20260605.md`](DIRDIVING_WATCH_IMAGE_FULL_MANAGEMENT_IMPLEMENTATION_REPORT_20260605.md) |
 | Logs / Dive Detail / Export | P2 | `DiveLogListView.swift`, `DiveDetailView.swift`, `ExportView.swift` |
 | Info / diagnostics | P2 | `InfoView.swift` |
 | Legal onboarding | P2 | `WatchLegalOnboardingView.swift` |

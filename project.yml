@@ -162,6 +162,7 @@ targets:
       - Services/SubsurfaceExportService.swift
       - Services/UserImageStore.swift
       - Utils/CompanionPhotoImportSupport.swift
+      - Utils/CompanionPhotoManagementSupport.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.watch.algorithmtests
@@ -228,6 +229,7 @@ targets:
       - iOSApp/Utils/WatchSyncNotifications.swift
       - iOSApp/Utils/WatchSyncKeys.swift
       - iOSApp/Utils/CompanionPhotoTransferSupport.swift
+      - iOSApp/Utils/CompanionPhotoManagementSupport.swift
       - iOSApp/Services/WatchPhotoPreprocessor.swift
       - iOSApp/Utils/AnalysisDashboardMath.swift
       - iOSApp/Utils/ManualDiveEditorDefaults.swift

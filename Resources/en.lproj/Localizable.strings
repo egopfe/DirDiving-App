@@ -463,6 +463,14 @@
 "user_images.a11y.detail" = "Full image %d, %@";
 "user_images.a11y.detail.hint" = "Double tap for full screen";
 "user_images.a11y.fullscreen.hint" = "Double tap to close";
+"user_images.delete.button" = "Delete";
+"user_images.delete.confirm.title" = "Delete image?";
+"user_images.delete.confirm.message" = "This removes the uploaded image from Apple Watch.";
+"user_images.delete.confirm.action" = "Delete";
+"user_images.delete.cancel" = "Cancel";
+"user_images.delete.a11y" = "Delete image";
+"user_images.delete.hint" = "Double tap to delete this uploaded image";
+"user_images.delete.error" = "Could not delete image.";
 "shortcut.error.app_unavailable" = "DIR DIVING is not ready: open the app on your Watch and try again.";
 "shortcut.error.stopwatch_reset_blocked" = "Stopwatch reset blocked: use on-screen confirmation when time is running.";
 "shortcut.error.legal_acceptance_required" = "Open DIR DIVING and accept the legal and safety onboarding before using Action Button shortcuts.";

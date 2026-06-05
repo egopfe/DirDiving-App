@@ -3,8 +3,11 @@ import UIKit
 
 struct UserImagesView: View {
     @EnvironmentObject private var imageStore: UserImageStore
+    @EnvironmentObject private var watchSync: WatchSyncService
     @State private var selectedName: String?
     @State private var isFullscreenPresented = false
+    @State private var pendingDeleteName: String?
+    @State private var deleteErrorMessage: String?
 
     var body: some View {
         ZStack {
@@ -40,6 +43,32 @@ struct UserImagesView: View {
                imageStore.imageNames.contains(fileName) {
                 selectedName = fileName
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .companionPhotoDidDelete)) { _ in
+            isFullscreenPresented = false
+            if let selectedName, !imageStore.imageNames.contains(selectedName) {
+                self.selectedName = imageStore.imageNames.first
+            }
+        }
+        .confirmationDialog(
+            String(localized: "user_images.delete.confirm.title"),
+            isPresented: Binding(
+                get: { pendingDeleteName != nil },
+                set: { if !$0 { pendingDeleteName = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "user_images.delete.confirm.action"), role: .destructive) {
+                if let pendingDeleteName {
+                    performDelete(name: pendingDeleteName)
+                }
+                pendingDeleteName = nil
+            }
+            Button(String(localized: "user_images.delete.cancel"), role: .cancel) {
+                pendingDeleteName = nil
+            }
+        } message: {
+            Text(String(localized: "user_images.delete.confirm.message"))
         }
     }
 
@@ -194,10 +223,32 @@ struct UserImagesView: View {
                         selectedName = nil
                     }
                     Spacer()
+                    if imageStore.canDeleteImage(named: name) {
+                        Button {
+                            pendingDeleteName = name
+                        } label: {
+                            Image(systemName: "trash")
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundStyle(DiveUI.red)
+                                .frame(width: 28, height: 28)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(String(localized: "user_images.delete.a11y"))
+                        .accessibilityHint(String(localized: "user_images.delete.hint"))
+                    }
                     DiveClockText(size: 14)
                 }
                 .padding(.horizontal, horizontalInset)
                 .padding(.top, 6)
+
+                if let deleteErrorMessage {
+                    Text(deleteErrorMessage)
+                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                        .foregroundStyle(DiveUI.red)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, horizontalInset)
+                }
 
                 Text(String(format: String(localized: "user_images.item.label"), index + 1))
                     .font(.system(size: 11, weight: .black, design: .rounded))
@@ -284,6 +335,22 @@ struct UserImagesView: View {
                 .padding(.top, 6)
                 Spacer()
             }
+        }
+    }
+
+    private func performDelete(name: String) {
+        deleteErrorMessage = nil
+        do {
+            try imageStore.deleteImage(named: name)
+            isFullscreenPresented = false
+            watchSync.publishUploadedImageInventory()
+            if imageStore.imageNames.isEmpty {
+                selectedName = nil
+            } else if selectedName == name || selectedName == nil {
+                selectedName = imageStore.imageNames.first
+            }
+        } catch {
+            deleteErrorMessage = String(localized: "user_images.delete.error")
         }
     }
 
