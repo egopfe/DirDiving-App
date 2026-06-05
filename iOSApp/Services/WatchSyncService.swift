@@ -35,6 +35,8 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published private(set) var pendingDeleteRequests: [String: WatchPhotoDeleteRequestState] = [:]
     private weak var logStore: DiveLogStore?
     private var photoIDByTransferFilePath: [String: String] = [:]
+    private var companionPhotoTransfersByID: [String: CompanionPhotoTransferStatus] = [:]
+    private var pendingPhotoImportVerificationTasks: [String: Task<Void, Never>] = [:]
     private var pendingInventoryRequestID: String?
     private var handledDeleteAckRequestIDs: Set<String> = []
 
@@ -189,7 +191,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         updateCompanionPhotoTransfer(photoID: photoID, fileName: sanitized, state: .sending)
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("DIRDivingPhoto_\(photoID)_\(sanitized)")
         do {
-            try imageData.write(to: url, options: [.atomic, .completeFileProtection])
+            try imageData.write(to: url, options: .atomic)
             _ = WCSession.default.transferFile(
                 url,
                 metadata: CompanionPhotoTransferSupport.makeTransferMetadata(photoID: photoID, fileName: sanitized)
@@ -217,7 +219,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         storedFileNameOnWatch: String? = nil,
         rejectionErrorCode: String? = nil
     ) {
-        if var current = companionPhotoTransfer, current.photoID == photoID {
+        if var current = companionPhotoTransfersByID[photoID] {
             current.state = state
             current.errorMessage = errorMessage
             if let storedFileNameOnWatch {
@@ -226,9 +228,9 @@ final class WatchSyncService: NSObject, ObservableObject {
             if let rejectionErrorCode {
                 current.rejectionErrorCode = rejectionErrorCode
             }
-            companionPhotoTransfer = current
+            companionPhotoTransfersByID[photoID] = current
         } else {
-            companionPhotoTransfer = CompanionPhotoTransferStatus(
+            companionPhotoTransfersByID[photoID] = CompanionPhotoTransferStatus(
                 photoID: photoID,
                 fileName: fileName,
                 state: state,
@@ -237,6 +239,50 @@ final class WatchSyncService: NSObject, ObservableObject {
                 rejectionErrorCode: rejectionErrorCode
             )
         }
+        companionPhotoTransfer = companionPhotoTransfersByID[photoID]
+    }
+
+    private func markPhotoImportedOnWatch(photoID: String, storedFileName: String?) {
+        cancelPhotoImportVerification(for: photoID)
+        guard var transfer = companionPhotoTransfersByID[photoID] else { return }
+        transfer.state = .importedOnWatch
+        transfer.storedFileNameOnWatch = storedFileName ?? transfer.storedFileNameOnWatch
+        transfer.errorMessage = nil
+        transfer.rejectionErrorCode = nil
+        companionPhotoTransfersByID[photoID] = transfer
+        companionPhotoTransfer = transfer
+        lastMessage = String(localized: "watch_photo_status_imported")
+        recordActivity(
+            title: String(localized: "sync.activity.photo_to_watch"),
+            detail: transfer.storedFileNameOnWatch ?? transfer.fileName,
+            marksSuccess: true
+        )
+        requestWatchImageInventory()
+    }
+
+    private func schedulePhotoImportVerification(photoID: String, expectedFileName: String) {
+        cancelPhotoImportVerification(for: photoID)
+        pendingPhotoImportVerificationTasks[photoID] = Task { @MainActor [weak self] in
+            guard let self else { return }
+            for delay in [2.0, 5.0, 10.0] {
+                try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                guard !Task.isCancelled else { return }
+                guard let transfer = self.companionPhotoTransfersByID[photoID] else { return }
+                if transfer.state == .importedOnWatch || transfer.state == .rejectedByWatch || transfer.state == .failed {
+                    return
+                }
+                self.requestWatchImageInventory()
+            }
+        }
+    }
+
+    private func cancelPhotoImportVerification(for photoID: String) {
+        pendingPhotoImportVerificationTasks[photoID]?.cancel()
+        pendingPhotoImportVerificationTasks[photoID] = nil
+    }
+
+    private func removeStagingFile(at path: String) {
+        try? FileManager.default.removeItem(atPath: path)
     }
 
     func requestWatchImageInventory() {
@@ -335,6 +381,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             watchImageInventoryStatus = .loaded
             lastInventoryRefreshDate = response.generatedAt ?? Date()
             inventoryErrorMessage = nil
+            reconcilePhotoTransfers(with: watchImageInventory)
         } else {
             watchImageInventoryStatus = .failed
             inventoryErrorMessage = String(localized: "watch_photo.inventory.failed")
@@ -356,6 +403,27 @@ final class WatchSyncService: NSObject, ObservableObject {
         }
     }
 
+    private func reconcilePhotoTransfers(with inventory: [WatchUserImageInventoryItem]) {
+        let storedNames = Set(inventory.map(\.storedFileName))
+        for (photoID, transfer) in companionPhotoTransfersByID {
+            guard transfer.state == .deliveredToConnectivity || transfer.state == .queued || transfer.state == .sending else {
+                continue
+            }
+            if let matched = matchingInventoryName(for: transfer, in: storedNames) {
+                markPhotoImportedOnWatch(photoID: photoID, storedFileName: matched)
+            }
+        }
+    }
+
+    private func matchingInventoryName(for transfer: CompanionPhotoTransferStatus, in storedNames: Set<String>) -> String? {
+        let candidates = [transfer.storedFileNameOnWatch, transfer.fileName].compactMap { $0 }
+        for candidate in candidates where storedNames.contains(candidate) {
+            return candidate
+        }
+        let stem = URL(fileURLWithPath: transfer.fileName).deletingPathExtension().lastPathComponent
+        return storedNames.first { $0.hasPrefix(stem) }
+    }
+
     func reportCompanionPhotoFailure(message: String, fileName: String = "companion.jpg") {
         updateCompanionPhotoTransfer(
             photoID: UUID().uuidString,
@@ -368,25 +436,32 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     private func handleCompanionPhotoAck(_ payload: [String: Any]) {
         guard let ack = CompanionPhotoTransferSupport.parseCompanionPhotoAck(payload) else { return }
-        guard companionPhotoTransfer?.photoID == ack.photoID else { return }
-        var transfer = companionPhotoTransfer
-        CompanionPhotoTransferSupport.applyAck(ack, to: &transfer)
-        companionPhotoTransfer = transfer
-        guard let transfer else { return }
-        switch transfer.state {
+        var transfer = companionPhotoTransfersByID[ack.photoID]
+        if transfer == nil, companionPhotoTransfer?.photoID == ack.photoID {
+            transfer = companionPhotoTransfer
+        }
+        guard transfer != nil else { return }
+        var optionalTransfer: CompanionPhotoTransferStatus? = transfer
+        CompanionPhotoTransferSupport.applyAck(ack, to: &optionalTransfer)
+        guard let updated = optionalTransfer else { return }
+        companionPhotoTransfersByID[ack.photoID] = updated
+        companionPhotoTransfer = updated
+        switch updated.state {
         case .importedOnWatch:
+            cancelPhotoImportVerification(for: ack.photoID)
             lastMessage = String(localized: "watch_photo_status_imported")
             recordActivity(
                 title: String(localized: "sync.activity.photo_to_watch"),
-                detail: transfer.storedFileNameOnWatch ?? transfer.fileName,
+                detail: updated.storedFileNameOnWatch ?? updated.fileName,
                 marksSuccess: true
             )
             requestWatchImageInventory()
         case .rejectedByWatch:
+            cancelPhotoImportVerification(for: ack.photoID)
             lastMessage = String(localized: "watch_photo_status_rejected")
             recordActivity(
                 title: String(localized: "sync.activity.photo_to_watch"),
-                detail: transfer.rejectionErrorCode ?? transfer.fileName
+                detail: updated.rejectionErrorCode ?? updated.fileName
             )
         default:
             break
@@ -830,12 +905,16 @@ extension WatchSyncService: WCSessionDelegate {
 
     nonisolated func session(_ session: WCSession, didFinish fileTransfer: WCSessionFileTransfer, error: Error?) {
         let filePath = fileTransfer.file.fileURL.path
+        let fileName = (fileTransfer.file.metadata?[WatchSyncKeys.companionPhotoFileNameKey] as? String)
+            ?? fileTransfer.file.fileURL.lastPathComponent
         Task { @MainActor in
+            self.removeStagingFile(at: filePath)
             guard let photoID = self.photoIDByTransferFilePath.removeValue(forKey: filePath) else { return }
             if let error {
+                self.cancelPhotoImportVerification(for: photoID)
                 self.updateCompanionPhotoTransfer(
                     photoID: photoID,
-                    fileName: self.companionPhotoTransfer?.fileName ?? photoID,
+                    fileName: fileName,
                     state: .failed,
                     errorMessage: error.localizedDescription
                 )
@@ -844,10 +923,11 @@ extension WatchSyncService: WCSessionDelegate {
             }
             self.updateCompanionPhotoTransfer(
                 photoID: photoID,
-                fileName: self.companionPhotoTransfer?.fileName ?? photoID,
+                fileName: fileName,
                 state: .deliveredToConnectivity
             )
-            self.lastMessage = String(localized: "watch_photo_status_delivered")
+            self.lastMessage = String(localized: "watch_photo_status_delivered_pending")
+            self.schedulePhotoImportVerification(photoID: photoID, expectedFileName: fileName)
         }
     }
 

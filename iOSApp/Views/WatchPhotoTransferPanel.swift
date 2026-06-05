@@ -5,41 +5,34 @@ import UIKit
 struct WatchPhotoTransferPanel: View {
     @EnvironmentObject private var watchSync: WatchSyncService
     @State private var selectedItem: PhotosPickerItem?
-    @State private var conversionNotice: String?
-    @State private var pendingDeleteFileName: String?
+    @State private var stagedPhoto: StagedWatchPhoto?
+    @State private var showManageSheet = false
+    @State private var isPreparingPhoto = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             uploadSection
-            manageSection
+            manageButton
         }
         .padding(.vertical, 4)
-        .onAppear {
-            watchSync.requestWatchImageInventory()
-        }
         .onChange(of: selectedItem) { _, item in
-            guard let item else { return }
-            Task { await send(item) }
+            guard let item else {
+                stagedPhoto = nil
+                return
+            }
+            Task { await stagePhoto(from: item) }
         }
-        .confirmationDialog(
-            String(localized: "watch_photo.delete.confirm.title"),
-            isPresented: Binding(
-                get: { pendingDeleteFileName != nil },
-                set: { if !$0 { pendingDeleteFileName = nil } }
-            ),
-            titleVisibility: .visible
-        ) {
-            Button(String(localized: "watch_photo.delete.confirm.action"), role: .destructive) {
-                if let pendingDeleteFileName {
-                    watchSync.requestDeletePhotoOnWatch(storedFileName: pendingDeleteFileName)
-                }
-                pendingDeleteFileName = nil
+        .sheet(isPresented: $showManageSheet) {
+            WatchPhotoManagementSheet()
+                .environmentObject(watchSync)
+        }
+        .onChange(of: watchSync.companionPhotoTransfer?.state) { _, state in
+            guard state == .importedOnWatch,
+                  let stagedPhoto,
+                  watchSync.companionPhotoTransfer?.photoID == stagedPhoto.photoID.uuidString else {
+                return
             }
-            Button(String(localized: "watch_photo.delete.cancel"), role: .cancel) {
-                pendingDeleteFileName = nil
-            }
-        } message: {
-            Text(String(localized: "watch_photo.delete.confirm.message"))
+            clearStagedPhoto()
         }
     }
 
@@ -48,12 +41,11 @@ struct WatchPhotoTransferPanel: View {
             Text(String(localized: "watch_photo.title"))
                 .font(.callout.weight(.semibold))
                 .foregroundStyle(.white)
-            if let conversionNotice {
-                Text(conversionNotice)
-                    .font(.caption2)
-                    .foregroundStyle(DIRTheme.yellow)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+            Text(String(localized: "watch_photo.manual_hint"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+
             PhotosPicker(selection: $selectedItem, matching: .images) {
                 Label(String(localized: "watch_photo.pick"), systemImage: "photo.on.rectangle.angled")
                     .font(.callout.weight(.semibold))
@@ -63,6 +55,33 @@ struct WatchPhotoTransferPanel: View {
                     .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
             }
             .buttonStyle(.plain)
+
+            if isPreparingPhoto {
+                Text(String(localized: "watch_photo.preparing"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+            }
+
+            if let stagedPhoto {
+                stagedPhotoPreview(stagedPhoto)
+            }
+
+            Button {
+                sendStagedPhoto()
+            } label: {
+                Label(String(localized: "watch_photo.send_to_watch"), systemImage: "applewatch.and.arrow.forward")
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(canSendStagedPhoto ? DIRTheme.cyan : DIRTheme.muted)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(canSendStagedPhoto ? DIRTheme.cyan : DIRTheme.hairline, lineWidth: 1)
+                    )
+            }
+            .buttonStyle(.plain)
+            .disabled(!canSendStagedPhoto)
+
             if let statusMessage = photoStatusMessage {
                 Text(statusMessage)
                     .font(.caption2)
@@ -72,111 +91,70 @@ struct WatchPhotoTransferPanel: View {
         }
     }
 
-    private var manageSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(String(localized: "watch_photo.manage.title"))
-                        .font(.callout.weight(.semibold))
-                        .foregroundStyle(.white)
-                    Text(String(localized: "watch_photo.manage.subtitle"))
+    private var manageButton: some View {
+        Button {
+            showManageSheet = true
+        } label: {
+            Label(String(localized: "watch_photo.manage.open"), systemImage: "trash.circle")
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(DIRTheme.cyan)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var canSendStagedPhoto: Bool {
+        stagedPhoto != nil && !isPreparingPhoto && !isTransferInFlight
+    }
+
+    private var isTransferInFlight: Bool {
+        guard let transfer = watchSync.companionPhotoTransfer else { return false }
+        switch transfer.state {
+        case .queued, .sending, .deliveredToConnectivity:
+            return true
+        case .importedOnWatch, .rejectedByWatch, .failed:
+            return false
+        }
+    }
+
+    @ViewBuilder
+    private func stagedPhotoPreview(_ staged: StagedWatchPhoto) -> some View {
+        HStack(spacing: 10) {
+            Image(uiImage: staged.preview)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 56, height: 56)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+            VStack(alignment: .leading, spacing: 4) {
+                Text(String(localized: "watch_photo.staged.ready"))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.white)
+                Text(staged.fileName)
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .lineLimit(1)
+                if let notice = staged.conversionNotice {
+                    Text(notice)
                         .font(.caption2)
-                        .foregroundStyle(DIRTheme.muted)
+                        .foregroundStyle(DIRTheme.yellow)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                Spacer()
-                Button(String(localized: "watch_photo.inventory.refresh")) {
-                    watchSync.requestWatchImageInventory()
-                }
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(DIRTheme.cyan)
-                .buttonStyle(.plain)
             }
-
-            Text(inventoryStatusText)
-                .font(.caption2)
-                .foregroundStyle(DIRTheme.muted)
-                .fixedSize(horizontal: false, vertical: true)
-
-            if watchSync.watchImageInventory.isEmpty {
-                Text(String(localized: "watch_photo.inventory.empty"))
-                    .font(.caption2)
-                    .foregroundStyle(DIRTheme.muted)
-            } else {
-                ForEach(watchSync.watchImageInventory) { item in
-                    inventoryRow(item)
-                }
+            Spacer(minLength: 0)
+            Button(String(localized: "watch_photo.staged.clear")) {
+                clearStagedPhoto()
             }
-
-            Text(String(localized: "watch_photo.inventory.keep_note"))
-                .font(.caption2)
-                .foregroundStyle(DIRTheme.muted)
-                .fixedSize(horizontal: false, vertical: true)
+            .font(.caption2.weight(.semibold))
+            .foregroundStyle(DIRTheme.orange)
+            .buttonStyle(.plain)
         }
-        .padding(10)
+        .padding(8)
         .background(
             RoundedRectangle(cornerRadius: 8)
-                .stroke(DIRTheme.cyan.opacity(0.35), lineWidth: 1)
+                .stroke(DIRTheme.hairline, lineWidth: 1)
         )
-    }
-
-    private func inventoryRow(_ item: WatchUserImageInventoryItem) -> some View {
-        let deleteState = deleteState(for: item.storedFileName)
-        return VStack(alignment: .leading, spacing: 4) {
-            Text(item.displayName)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.white)
-                .lineLimit(1)
-            Text(item.storedFileName)
-                .font(.caption2)
-                .foregroundStyle(DIRTheme.muted)
-                .lineLimit(1)
-            if let importedAt = item.importedAt {
-                Text(importedAt, style: .date)
-                    .font(.caption2)
-                    .foregroundStyle(DIRTheme.muted)
-            }
-            if let byteCount = item.byteCount {
-                Text(ByteCountFormatter.string(fromByteCount: Int64(byteCount), countStyle: .file))
-                    .font(.caption2)
-                    .foregroundStyle(DIRTheme.muted)
-            }
-            if let deleteState {
-                Text(deleteStatusText(deleteState))
-                    .font(.caption2)
-                    .foregroundStyle(DIRTheme.yellow)
-            }
-            if item.isDeletable {
-                Button(String(localized: "watch_photo.delete.button")) {
-                    pendingDeleteFileName = item.storedFileName
-                }
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(DIRTheme.red)
-                .buttonStyle(.plain)
-                .disabled(deleteState == .pending || deleteState == .sending || deleteState == .deliveredToConnectivity)
-            }
-        }
-        .padding(.vertical, 4)
-    }
-
-    private var inventoryStatusText: String {
-        switch watchSync.watchImageInventoryStatus {
-        case .unknown:
-            return String(localized: "watch_photo.inventory.loading")
-        case .loading:
-            return String(localized: "watch_photo.inventory.loading")
-        case .loaded:
-            if let date = watchSync.lastInventoryRefreshDate {
-                return String(format: String(localized: "watch_photo.inventory.last_updated"), date.formatted(date: .abbreviated, time: .shortened))
-            }
-            return String(localized: "watch_photo.inventory.last_updated")
-        case .watchUnavailable:
-            return String(localized: "watch_photo.inventory.watch_unavailable")
-        case .failed:
-            return watchSync.inventoryErrorMessage ?? String(localized: "watch_photo.inventory.failed")
-        case .stale:
-            return watchSync.inventoryErrorMessage ?? String(localized: "watch_photo.inventory.stale")
-        }
     }
 
     private var photoStatusMessage: String? {
@@ -189,60 +167,69 @@ struct WatchPhotoTransferPanel: View {
         case .sending:
             return String(localized: "watch_photo_status_sending")
         case .deliveredToConnectivity:
-            return String(localized: "watch_photo_status_delivered")
+            return String(localized: "watch_photo_status_delivered_pending")
         case .importedOnWatch:
             return String(localized: "watch_photo_status_imported")
         case .rejectedByWatch:
+            if let code = transfer.rejectionErrorCode {
+                return String(format: String(localized: "watch_photo_status_rejected_detail"), code)
+            }
             return String(localized: "watch_photo_status_rejected")
         case .failed:
             return transfer.errorMessage ?? String(localized: "watch_photo_status_failed")
         }
     }
 
-    private func deleteState(for storedFileName: String) -> WatchPhotoDeleteRequestState.State? {
-        watchSync.pendingDeleteRequests.values
-            .filter { $0.storedFileName == storedFileName }
-            .sorted { $0.createdAt > $1.createdAt }
-            .first?
-            .state
-    }
-
-    private func deleteStatusText(_ state: WatchPhotoDeleteRequestState.State) -> String {
-        switch state {
-        case .pending:
-            return String(localized: "watch_photo.delete.status.pending")
-        case .sending:
-            return String(localized: "watch_photo.delete.status.sending")
-        case .deliveredToConnectivity:
-            return String(localized: "watch_photo.delete.status.delivered")
-        case .deletedOnWatch:
-            return String(localized: "watch_photo.delete.status.deleted")
-        case .notFound:
-            return String(localized: "watch_photo.delete.status.not_found")
-        case .rejectedByWatch:
-            return String(localized: "watch_photo.delete.status.rejected")
-        case .failed:
-            return String(localized: "watch_photo.delete.status.failed")
-        }
-    }
-
     @MainActor
-    private func send(_ item: PhotosPickerItem) async {
-        conversionNotice = nil
+    private func stagePhoto(from item: PhotosPickerItem) async {
+        isPreparingPhoto = true
+        defer { isPreparingPhoto = false }
         guard let data = try? await item.loadTransferable(type: Data.self) else {
             watchSync.reportCompanionPhotoFailure(message: String(localized: "watch_photo.error.load"))
+            stagedPhoto = nil
             return
         }
         do {
             let prepared = try WatchPhotoPreprocessor.prepareForWatch(from: data)
-            if prepared.conversionWarning {
-                conversionNotice = String(localized: "watch_photo.convert.warning")
-            }
             let photoID = UUID()
             let fileName = CompanionPhotoTransferSupport.makeFileName(photoID: photoID)
-            watchSync.sendPhotoToWatch(prepared.data, fileName: fileName, photoID: photoID.uuidString)
+            guard let preview = UIImage(data: prepared.data) else {
+                throw WatchPhotoPreprocessor.Failure.unreadableImage
+            }
+            stagedPhoto = StagedWatchPhoto(
+                photoID: photoID,
+                fileName: fileName,
+                data: prepared.data,
+                preview: preview,
+                conversionNotice: prepared.conversionWarning
+                    ? String(localized: "watch_photo.convert.warning")
+                    : nil
+            )
         } catch {
+            stagedPhoto = nil
             watchSync.reportCompanionPhotoFailure(message: error.localizedDescription)
         }
+    }
+
+    private func sendStagedPhoto() {
+        guard let stagedPhoto else { return }
+        watchSync.sendPhotoToWatch(stagedPhoto.data, fileName: stagedPhoto.fileName, photoID: stagedPhoto.photoID.uuidString)
+    }
+
+    private func clearStagedPhoto() {
+        stagedPhoto = nil
+        selectedItem = nil
+    }
+}
+
+private struct StagedWatchPhoto: Equatable {
+    let photoID: UUID
+    let fileName: String
+    let data: Data
+    let preview: UIImage
+    let conversionNotice: String?
+
+    static func == (lhs: StagedWatchPhoto, rhs: StagedWatchPhoto) -> Bool {
+        lhs.photoID == rhs.photoID && lhs.fileName == rhs.fileName && lhs.data == rhs.data
     }
 }
