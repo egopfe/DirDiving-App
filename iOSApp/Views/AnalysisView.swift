@@ -86,7 +86,7 @@ struct AnalysisView: View {
             }
             .toolbar(.hidden, for: .navigationBar)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .dirCompanionTabRoot()
     }
 
     private var analysisHero: some View {

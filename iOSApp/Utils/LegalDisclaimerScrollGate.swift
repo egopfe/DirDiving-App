@@ -25,7 +25,7 @@ private struct DisclaimerBottomMaxYKey: PreferenceKey {
 struct LegalDisclaimerScrollGate<Content: View>: View {
     @Binding var reachedBottom: Bool
     var maxHeight: CGFloat?
-    var heightFraction: CGFloat = 0.54
+    var heightFraction: CGFloat = IOSCompanionAdaptiveLayout.disclaimerScrollFraction
     @ViewBuilder let content: () -> Content
 
     @State private var contentHeight: CGFloat = 0
@@ -35,7 +35,7 @@ struct LegalDisclaimerScrollGate<Content: View>: View {
     init(
         reachedBottom: Binding<Bool>,
         maxHeight: CGFloat? = nil,
-        heightFraction: CGFloat = 0.54,
+        heightFraction: CGFloat = IOSCompanionAdaptiveLayout.disclaimerScrollFraction,
         @ViewBuilder content: @escaping () -> Content
     ) {
         _reachedBottom = reachedBottom
@@ -45,40 +45,54 @@ struct LegalDisclaimerScrollGate<Content: View>: View {
     }
 
     var body: some View {
-        GeometryReader { outer in
-            let resolvedMaxHeight = maxHeight ?? max(200, outer.size.height * heightFraction)
-            ScrollView(showsIndicators: true) {
-                VStack(alignment: .leading, spacing: 0) {
-                    content()
-                    Color.clear
-                        .frame(height: 1)
-                        .background(
-                            GeometryReader { geo in
-                                Color.clear.preference(
-                                    key: DisclaimerBottomMaxYKey.self,
-                                    value: geo.frame(in: .named("legalDisclaimerScroll")).maxY
-                                )
-                            }
-                        )
-                }
-                .background(
-                    GeometryReader { geo in
-                        Color.clear.preference(key: DisclaimerContentHeightKey.self, value: geo.size.height)
-                    }
-                )
+        Group {
+            if let maxHeight {
+                scrollGate(maxHeight: maxHeight)
+            } else {
+                scrollGate(maxHeight: nil)
+                    .containerRelativeFrame(
+                        .vertical,
+                        count: 100,
+                        span: max(28, Int(heightFraction * 100)),
+                        spacing: 0,
+                        alignment: .top
+                    )
             }
-            .coordinateSpace(name: "legalDisclaimerScroll")
-            .frame(maxHeight: resolvedMaxHeight)
+        }
+    }
+
+    @ViewBuilder
+    private func scrollGate(maxHeight: CGFloat?) -> some View {
+        ScrollView(showsIndicators: true) {
+            VStack(alignment: .leading, spacing: 0) {
+                content()
+                Color.clear
+                    .frame(height: 1)
+                    .background(
+                        GeometryReader { geo in
+                            Color.clear.preference(
+                                key: DisclaimerBottomMaxYKey.self,
+                                value: geo.frame(in: .named("legalDisclaimerScroll")).maxY
+                            )
+                        }
+                    )
+            }
             .background(
                 GeometryReader { geo in
-                    Color.clear.preference(key: DisclaimerViewportHeightKey.self, value: geo.size.height)
+                    Color.clear.preference(key: DisclaimerContentHeightKey.self, value: geo.size.height)
                 }
             )
-            .onPreferenceChange(DisclaimerContentHeightKey.self) { contentHeight = $0; evaluate() }
-            .onPreferenceChange(DisclaimerViewportHeightKey.self) { viewportHeight = $0; evaluate() }
-            .onPreferenceChange(DisclaimerBottomMaxYKey.self) { bottomMaxY = $0; evaluate() }
         }
-        .frame(minHeight: 180)
+        .coordinateSpace(name: "legalDisclaimerScroll")
+        .applyDisclaimerMaxHeight(maxHeight)
+        .background(
+            GeometryReader { geo in
+                Color.clear.preference(key: DisclaimerViewportHeightKey.self, value: geo.size.height)
+            }
+        )
+        .onPreferenceChange(DisclaimerContentHeightKey.self) { contentHeight = $0; evaluate() }
+        .onPreferenceChange(DisclaimerViewportHeightKey.self) { viewportHeight = $0; evaluate() }
+        .onPreferenceChange(DisclaimerBottomMaxYKey.self) { bottomMaxY = $0; evaluate() }
     }
 
     private func evaluate() {
@@ -89,6 +103,17 @@ struct LegalDisclaimerScrollGate<Content: View>: View {
         }
         if bottomMaxY <= viewportHeight + 8 {
             reachedBottom = true
+        }
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func applyDisclaimerMaxHeight(_ maxHeight: CGFloat?) -> some View {
+        if let maxHeight {
+            frame(maxHeight: maxHeight)
+        } else {
+            self
         }
     }
 }
