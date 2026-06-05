@@ -3,11 +3,10 @@ import UIKit
 
 /// Configures UIKit chrome so unpainted window/scroll/tab areas use DIR chrome instead of system black.
 enum IOSWindowChromeConfigurator {
-    private static let chromeUIColor = UIColor(red: 0.005, green: 0.018, blue: 0.030, alpha: 1)
+    private static let chromeUIColor = UIColor.black
 
-    static func applyGlobalAppearance() {
-        paintConnectedWindows()
-
+    /// Safe during `App.init()` — only touches `UIAppearance`, not `UIApplication` / LaunchServices.
+    static func applyUIKitAppearance() {
         UIScrollView.appearance().backgroundColor = .clear
         UITableView.appearance().backgroundColor = .clear
         UICollectionView.appearance().backgroundColor = .clear
@@ -27,9 +26,18 @@ enum IOSWindowChromeConfigurator {
         UINavigationBar.appearance().compactAppearance = navigationBar
     }
 
+    /// Call only after the first scene is connected (e.g. root `onAppear`).
+    static func applyGlobalAppearance() {
+        applyUIKitAppearance()
+        paintConnectedWindows()
+    }
+
     static func paintConnectedWindows() {
-        for scene in UIApplication.shared.connectedScenes {
-            guard let windowScene = scene as? UIWindowScene else { continue }
+        guard UIApplication.shared.applicationState != .background else { return }
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        guard !scenes.isEmpty else { return }
+
+        for windowScene in scenes {
             for window in windowScene.windows {
                 window.backgroundColor = chromeUIColor
             }
@@ -47,21 +55,51 @@ struct IOSRootShell<Content: View>: View {
     }
 
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                DIRBackground()
-                content()
-            }
-            .frame(width: geometry.size.width, height: geometry.size.height)
+        ZStack {
+            DIRBackground()
+            content()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background {
+            DIRBackground()
         }
         .ignoresSafeArea()
         .onAppear {
-            IOSWindowChromeConfigurator.applyGlobalAppearance()
+            // Defer UIApplication / window access until after LaunchServices client context is ready.
+            Task { @MainActor in
+                IOSWindowChromeConfigurator.applyGlobalAppearance()
+            }
         }
         .onChange(of: scenePhase) { _, phase in
             guard phase == .active else { return }
-            IOSWindowChromeConfigurator.paintConnectedWindows()
+            Task { @MainActor in
+                IOSWindowChromeConfigurator.paintConnectedWindows()
+            }
         }
+    }
+}
+
+/// Full-screen onboarding / disclaimer layout: edge-to-edge background, scrollable body, safe-area-aware controls.
+struct DIRDisclaimerScreen<Content: View>: View {
+    @ViewBuilder private var content: () -> Content
+
+    init(@ViewBuilder content: @escaping () -> Content) {
+        self.content = content
+    }
+
+    var body: some View {
+        DIRScreenContainer {
+            ScrollView(showsIndicators: false) {
+                content()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, DIRTheme.screenPadding)
+                    .padding(.bottom, DIRTheme.spaceXL)
+            }
+            .dirCompanionScrollSurface()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .safeAreaPadding(.top)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

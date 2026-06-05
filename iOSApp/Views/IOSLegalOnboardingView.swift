@@ -26,31 +26,25 @@ struct IOSLegalOnboardingView: View {
     }
 
     var body: some View {
-        DIRScreenContainer {
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 18) {
-                    hero
+        DIRDisclaimerScreen {
+            VStack(alignment: .leading, spacing: 18) {
+                hero
 
-                    Group {
-                        switch step {
-                        case 0:
-                            welcomeScreen
-                        case 1:
-                            safetyScreen
-                        case 2:
-                            disclaimerScreen
-                        default:
-                            acceptanceScreen
-                        }
+                Group {
+                    switch step {
+                    case 0:
+                        welcomeScreen
+                    case 1:
+                        safetyScreen
+                    case 2:
+                        disclaimerScreen
+                    default:
+                        acceptanceScreen
                     }
-                    .transition(.opacity.combined(with: .move(edge: .trailing)))
-                    .accessibilityLabel(String(format: String(localized: "ios.legal.step.format"), step + 1, 4))
                 }
-                .padding(20)
-                .padding(.top, 18)
-                .padding(.bottom, 28)
+                .transition(.opacity.combined(with: .move(edge: .trailing)))
+                .accessibilityLabel(String(format: String(localized: "ios.legal.step.format"), step + 1, 4))
             }
-            .dirCompanionScrollSurface()
         }
         .alert(String(localized: "ios.legal.exit_alert.title"), isPresented: $showExitGuidance) {
             Button(String(localized: "ios.legal.exit_alert.confirm"), role: .cancel) {}
@@ -128,7 +122,7 @@ struct IOSLegalOnboardingView: View {
         VStack(spacing: 16) {
             DIRCard(String(localized: "Legal Disclaimer"), icon: "doc.text.magnifyingglass", accent: DIRTheme.yellow) {
                 VStack(alignment: .leading, spacing: 14) {
-                    LegalDisclaimerScrollGate(reachedBottom: $disclaimerReachedBottom, maxHeight: 280) {
+                    LegalDisclaimerScrollGate(reachedBottom: $disclaimerReachedBottom) {
                         Text(legalAcceptance.disclaimerText(languageCode: languageCode))
                             .dirLegalBodyStyle()
                     }
