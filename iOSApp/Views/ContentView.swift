@@ -48,6 +48,8 @@ struct ContentView: View {
         }
         .dirCompanionTabSlot()
         .tint(DIRTheme.cyan)
+        .toolbarBackground(DIRTheme.background, for: .tabBar)
+        .toolbarBackground(.visible, for: .tabBar)
         .toolbarColorScheme(.dark, for: .tabBar)
         .launchCompanionDisclaimer(isPresented: $showLaunchDisclaimer)
         .onAppear {
