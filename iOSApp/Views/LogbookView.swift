@@ -125,7 +125,6 @@ struct LogbookView: View {
                 Text(String(localized: "logbook.delete.confirm.message"))
             }
         }
-        .dirCompanionTabRoot()
     }
 
     private var csvImportSection: some View {
