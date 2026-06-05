@@ -7,15 +7,20 @@ enum DeveloperSettings {
         #if DEBUG
         return true
         #else
-        if UserDefaults.standard.bool(forKey: developerUnlockedKey) {
-            return true
-        }
+        return isTestFlightBuild
+        #endif
+    }
+
+    static var allowsSimulationSensorSelection: Bool {
+        #if DEBUG
+        return true
+        #else
         return isTestFlightBuild
         #endif
     }
 
     static var sensorSourceMode: SensorSourceMode {
-        SensorSourceMode.persisted
+        SensorSourceMode.runtimeMode
     }
 
     static func persistSensorSource(_ mode: SensorSourceMode) {

@@ -10,6 +10,13 @@
 **Reference audits:**  
 - `Docs/WATCH_LOW_POWER_MISSION_MODE_IMPLEMENTATION_REPORT.md` (baseline ~75%)  
 - `Docs/WATCH_LOW_POWER_MISSION_MODE_READINESS_100_REPORT.md` (implementation claim)
+- `Docs/WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md` (2026-06-03 — WATCHMATH-INFO-007 re-verified; no algorithm branches added)
+
+---
+
+## 2026-06-03 audit remediation note
+
+Watch MAIN algorithm/math audit remediation (WATCHMATH-INFO-007) re-confirmed: Mission Mode does **not** alter depth sampling, validation, runtime, TTV, ascent-rate formula, depth safety thresholds, GPS, export, or sync. Only UI/runtime decorative flags differ (`MissionModeRuntimeProfile`).
 
 ---
 

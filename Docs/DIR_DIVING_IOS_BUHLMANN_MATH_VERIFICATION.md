@@ -157,7 +157,7 @@ Assumptions:
 - **CNS single:** NOAA 1991 piecewise-linear `Tlimit(PPO2)` segments. Constant depth uses `minutes / Tlimit × 100`. Descent/ascent ramps integrate in 0.05-minute steps along linear PPO2 change.
 - **CNS daily (24 h):** NOAA daily limit table with linear interpolation between knots 1.0–1.6 bar; parallel accumulation using daily limits.
 - **CNS recovery:** 90-minute half-time decay when inspired PPO₂ ≤ 0.5 bar (surface interval and in-water air breaks).
-- **OTU dive:** Lambertsen UPTD — constant depth `(0.5 / (PPO2 − 0.5))^(5/6) × minutes`; linear ramps use Baker Eq. 2 with PPO2 clipped at 0.5 bar when crossing the toxicity threshold.
+- **OTU dive:** Lambertsen UPTD — constant depth `((PPO2 − 0.5) / 0.5)^(5/6) × minutes` when PPO2 > 0.5 bar (0 otherwise); linear ramps use Baker Eq. 2 with PPO2 clipped at 0.5 bar when crossing the toxicity threshold. Independent fixtures: `OTUCanonicalFixtureTests.swift`.
 - **OTU daily / weekly:** REPEX reference thresholds — dive OTU ≥ 300, daily 24 h ≥ 850, weekly ≥ 1 800; daily resets after 24 h SI, weekly after 7 d.
 - **Repetitive carryover:** `TissueSnapshot` schema v2 stores `oxygenCarryover`; `PlannerService` applies surface-interval decay/resets before the next plan.
 - Invalid segment depth/duration or non-finite results fail closed via `OxygenExposureWarningState.invalidExposureInput`.

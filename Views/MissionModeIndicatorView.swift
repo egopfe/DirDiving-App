@@ -5,7 +5,7 @@ struct MissionModeIndicatorView: View {
 
     var body: some View {
         Image(systemName: isActive ? "bolt.fill" : "bolt")
-            .font(.system(size: 8, weight: .black))
+            .font(.system(size: 10, weight: .black, design: .rounded))
             .foregroundStyle(isActive ? DiveUI.cyan.opacity(0.88) : DiveUI.secondaryText.opacity(0.72))
             .symbolRenderingMode(.hierarchical)
             .accessibilityLabel(

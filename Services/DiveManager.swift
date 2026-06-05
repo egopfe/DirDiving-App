@@ -6,16 +6,80 @@ import WatchKit
 final class DiveManager: ObservableObject {
     static private(set) weak var shared: DiveManager?
 
+    private enum ActiveDiveDraftPhase: String, Codable {
+        case active
+        case finalizing
+    }
+
     private struct ActiveDiveDraft: Codable {
+        let phase: ActiveDiveDraftPhase
+        let sessionID: UUID
         let startDate: Date
+        let endDate: Date?
         let samples: [DiveSample]
         let entryGPS: GPSPoint?
+        let exitGPS: GPSPoint?
         let entryGPSFixSource: GPSFixSource
+        let exitGPSFixSource: GPSFixSource
         let isManualLifecycleActive: Bool
+        let sessionStartedManually: Bool
         let activeDiveExceededSupportedDepth: Bool
         let hasObservedSubmersionDuringCurrentDive: Bool
         let createdAt: Date
         let updatedAt: Date
+
+        init(
+            phase: ActiveDiveDraftPhase,
+            sessionID: UUID,
+            startDate: Date,
+            endDate: Date? = nil,
+            samples: [DiveSample],
+            entryGPS: GPSPoint?,
+            exitGPS: GPSPoint? = nil,
+            entryGPSFixSource: GPSFixSource,
+            exitGPSFixSource: GPSFixSource = .noFix,
+            isManualLifecycleActive: Bool,
+            sessionStartedManually: Bool,
+            activeDiveExceededSupportedDepth: Bool,
+            hasObservedSubmersionDuringCurrentDive: Bool,
+            createdAt: Date,
+            updatedAt: Date
+        ) {
+            self.phase = phase
+            self.sessionID = sessionID
+            self.startDate = startDate
+            self.endDate = endDate
+            self.samples = samples
+            self.entryGPS = entryGPS
+            self.exitGPS = exitGPS
+            self.entryGPSFixSource = entryGPSFixSource
+            self.exitGPSFixSource = exitGPSFixSource
+            self.isManualLifecycleActive = isManualLifecycleActive
+            self.sessionStartedManually = sessionStartedManually
+            self.activeDiveExceededSupportedDepth = activeDiveExceededSupportedDepth
+            self.hasObservedSubmersionDuringCurrentDive = hasObservedSubmersionDuringCurrentDive
+            self.createdAt = createdAt
+            self.updatedAt = updatedAt
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            phase = try container.decodeIfPresent(ActiveDiveDraftPhase.self, forKey: .phase) ?? .active
+            sessionID = try container.decodeIfPresent(UUID.self, forKey: .sessionID) ?? UUID()
+            startDate = try container.decode(Date.self, forKey: .startDate)
+            endDate = try container.decodeIfPresent(Date.self, forKey: .endDate)
+            samples = try container.decode([DiveSample].self, forKey: .samples)
+            entryGPS = try container.decodeIfPresent(GPSPoint.self, forKey: .entryGPS)
+            exitGPS = try container.decodeIfPresent(GPSPoint.self, forKey: .exitGPS)
+            entryGPSFixSource = try container.decode(GPSFixSource.self, forKey: .entryGPSFixSource)
+            exitGPSFixSource = try container.decodeIfPresent(GPSFixSource.self, forKey: .exitGPSFixSource) ?? .noFix
+            isManualLifecycleActive = try container.decode(Bool.self, forKey: .isManualLifecycleActive)
+            sessionStartedManually = try container.decodeIfPresent(Bool.self, forKey: .sessionStartedManually) ?? isManualLifecycleActive
+            activeDiveExceededSupportedDepth = try container.decode(Bool.self, forKey: .activeDiveExceededSupportedDepth)
+            hasObservedSubmersionDuringCurrentDive = try container.decode(Bool.self, forKey: .hasObservedSubmersionDuringCurrentDive)
+            createdAt = try container.decode(Date.self, forKey: .createdAt)
+            updatedAt = try container.decode(Date.self, forKey: .updatedAt)
+        }
     }
 
     @Published var currentDepthMeters: Double = 0
@@ -34,6 +98,7 @@ final class DiveManager: ObservableObject {
     @Published var gpsConfirmation: DiveGPSConfirmation?
     @Published var isDepthAutomationAvailable = false
     @Published var developerSensorSourceWarning: String?
+    @Published private(set) var isSimulationDepthActive = false
     /// Experimental Apnea/Snorkeling surfaces use this legacy name for sensor availability.
     var isDepthSensorAvailable: Bool { isDepthAutomationAvailable }
     @Published var isManualLifecycleActive = false
@@ -95,6 +160,7 @@ final class DiveManager: ObservableObject {
     private var entryGPSFixSource: GPSFixSource = .noFix
     private var exitGPSFixSource: GPSFixSource = .noFix
     private var previousDepthSample: DiveSample?
+    private var activeDiveSessionID: UUID?
     private var isFinalizingDive = false
     private var lastDepthAlarmDate: Date?
     private var lastRuntimeAlarmDate: Date?
@@ -164,12 +230,14 @@ final class DiveManager: ObservableObject {
 
         var mode = DeveloperSettings.sensorSourceMode
         if mode == .appleSensor, !AppleDepthSensorProvider.isAvailable {
-            DeveloperSettings.persistSensorSource(.simulation)
-            mode = .simulation
+            let fallback: SensorSourceMode = DeveloperSettings.allowsSimulationSensorSelection ? .simulation : .automatic
+            DeveloperSettings.persistSensorSource(fallback)
+            mode = fallback
             developerSensorSourceWarning = String(localized: "developer.sensor_source.apple_fallback")
         }
 
         let provider = SensorProviderFactory.makeProvider(mode: mode)
+        isSimulationDepthActive = provider is MockDepthSensorProvider
         provider.onDepthMeasurement = { [weak self] depth, timestamp, temperature in
             self?.processDepthMeasurement(
                 rawDepthMeters: depth,
@@ -226,8 +294,9 @@ final class DiveManager: ObservableObject {
     }
 
     private func activeDiveDraftURL() -> URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent(activeDiveDraftFileName)
+        let base = Self.testHook_draftDirectoryURL
+            ?? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        return base.appendingPathComponent(activeDiveDraftFileName)
     }
 
     private func sanitizedSamples(_ source: [DiveSample]) -> [DiveSample] {
@@ -236,18 +305,60 @@ final class DiveManager: ObservableObject {
 
     private func persistActiveDiveDraft() {
         guard isDiveActive, let start = sessionStart else { return }
+        let sessionID = activeDiveSessionID ?? UUID()
+        activeDiveSessionID = sessionID
         let now = Date()
         let draft = ActiveDiveDraft(
+            phase: .active,
+            sessionID: sessionID,
             startDate: start,
             samples: sanitizedSamples(samples),
             entryGPS: entryGPS,
             entryGPSFixSource: entryGPSFixSource,
             isManualLifecycleActive: isManualLifecycleActive,
+            sessionStartedManually: sessionStartedManually,
             activeDiveExceededSupportedDepth: activeDiveExceededSupportedDepth,
             hasObservedSubmersionDuringCurrentDive: hasObservedSubmersionDuringCurrentDive,
             createdAt: start,
             updatedAt: now
         )
+        writeActiveDiveDraft(draft)
+    }
+
+    private func persistPendingFinalizationDraft(
+        sessionID: UUID,
+        start: Date,
+        end: Date,
+        samples: [DiveSample],
+        entryGPS: GPSPoint?,
+        exitGPS: GPSPoint?,
+        entryGPSFixSource: GPSFixSource,
+        exitGPSFixSource: GPSFixSource,
+        sessionStartedManually: Bool,
+        activeDiveExceededSupportedDepth: Bool
+    ) {
+        let now = Date()
+        let draft = ActiveDiveDraft(
+            phase: .finalizing,
+            sessionID: sessionID,
+            startDate: start,
+            endDate: end,
+            samples: sanitizedSamples(samples),
+            entryGPS: entryGPS,
+            exitGPS: exitGPS,
+            entryGPSFixSource: entryGPSFixSource,
+            exitGPSFixSource: exitGPSFixSource,
+            isManualLifecycleActive: false,
+            sessionStartedManually: sessionStartedManually,
+            activeDiveExceededSupportedDepth: activeDiveExceededSupportedDepth,
+            hasObservedSubmersionDuringCurrentDive: false,
+            createdAt: start,
+            updatedAt: now
+        )
+        writeActiveDiveDraft(draft)
+    }
+
+    private func writeActiveDiveDraft(_ draft: ActiveDiveDraft) {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         guard let data = try? encoder.encode(draft) else { return }
@@ -272,6 +383,12 @@ final class DiveManager: ObservableObject {
             return
         }
 
+        if draft.phase == .finalizing {
+            completePendingFinalization(from: draft)
+            return
+        }
+
+        activeDiveSessionID = draft.sessionID
         let restoredSamples = sanitizedSamples(draft.samples)
         sessionStart = draft.startDate
         samples = restoredSamples
@@ -281,7 +398,7 @@ final class DiveManager: ObservableObject {
         entryGPSFixSource = draft.entryGPSFixSource
         isDiveActive = true
         isManualLifecycleActive = draft.isManualLifecycleActive
-        sessionStartedManually = draft.isManualLifecycleActive
+        sessionStartedManually = draft.sessionStartedManually
         activeDiveExceededSupportedDepth = draft.activeDiveExceededSupportedDepth
         exceededSupportedDepthRange = draft.activeDiveExceededSupportedDepth
         hasObservedSubmersionDuringCurrentDive = draft.hasObservedSubmersionDuringCurrentDive
@@ -310,6 +427,29 @@ final class DiveManager: ObservableObject {
         gpsManager.start()
         startRuntimeTimer()
         applyMissionModeIfNeededOnDiveStart(restored: true)
+    }
+
+    private func completePendingFinalization(from draft: ActiveDiveDraft) {
+        guard let endDate = draft.endDate else {
+            clearActiveDiveDraft()
+            return
+        }
+        if logStore.sessions.contains(where: { $0.id == draft.sessionID }) {
+            clearActiveDiveDraft()
+            return
+        }
+        finalizeDive(
+            sessionID: draft.sessionID,
+            start: draft.startDate,
+            end: endDate,
+            entryGPS: draft.entryGPS,
+            exitGPS: draft.exitGPS,
+            entryGPSFixSource: draft.entryGPSFixSource,
+            exitGPSFixSource: draft.exitGPSFixSource,
+            samples: draft.samples,
+            activeDiveExceededSupportedDepth: draft.activeDiveExceededSupportedDepth,
+            sessionStartedManually: draft.sessionStartedManually
+        )
     }
 
     private func resetAutomaticLifecycleCandidates() {
@@ -533,6 +673,7 @@ final class DiveManager: ObservableObject {
         HapticService.shared.criticalConfirm()
         alarmWarningMessage = nil
         let start = sessionStart ?? Date()
+        activeDiveSessionID = UUID()
         self.sessionStart = start
         runtimeClock.reset(anchorDate: start)
         lastAcceptedDepthSampleAt = nil
@@ -567,11 +708,14 @@ final class DiveManager: ObservableObject {
         guard isDiveActive, let start = sessionStart, !isFinalizingDive else { return }
         cancelAutomaticSurfaceEnd()
         updateRuntimeFromClock(evaluateAlarms: false)
+        let sessionID = activeDiveSessionID ?? UUID()
         let capturedEntryGPS = entryGPS
         let capturedEntryGPSFixSource = entryGPSFixSource
+        let capturedSessionStartedManually = sessionStartedManually
+        let capturedExceededSupportedDepth = activeDiveExceededSupportedDepth
         exitGPS = gpsManager.currentBestPoint()
         let capturedExitGPS = exitGPS
-        exitGPSFixSource = capturedExitGPS == nil ? .noFix : .fallback
+        let capturedExitGPSFixSource: GPSFixSource = capturedExitGPS == nil ? .noFix : .fallback
         isDiveActive = false
         isFinalizingDive = true
         isManualLifecycleActive = false
@@ -587,7 +731,20 @@ final class DiveManager: ObservableObject {
         depthDataUsesLastKnownReading = false
         let end = Date()
         let finishedSamples = sanitizedSamples(samples)
+        persistPendingFinalizationDraft(
+            sessionID: sessionID,
+            start: start,
+            end: end,
+            samples: finishedSamples,
+            entryGPS: capturedEntryGPS,
+            exitGPS: capturedExitGPS,
+            entryGPSFixSource: capturedEntryGPSFixSource,
+            exitGPSFixSource: capturedExitGPSFixSource,
+            sessionStartedManually: capturedSessionStartedManually,
+            activeDiveExceededSupportedDepth: capturedExceededSupportedDepth
+        )
         sessionStart = nil
+        activeDiveSessionID = nil
         samples = []
         previousDepthSample = nil
         entryGPS = nil
@@ -599,12 +756,40 @@ final class DiveManager: ObservableObject {
             self.exitGPS = finalExitGPS
             self.exitGPSFixSource = point != nil ? .fix : (capturedExitGPS == nil ? .noFix : .fallback)
             self.showGPSConfirmation(.end(point: finalExitGPS, fallback: point == nil && capturedExitGPS != nil))
-            self.finalizeDive(start: start, end: end, entryGPS: capturedEntryGPS, exitGPS: finalExitGPS, entryGPSFixSource: capturedEntryGPSFixSource, exitGPSFixSource: self.exitGPSFixSource, samples: finishedSamples)
+            self.finalizeDive(
+                sessionID: sessionID,
+                start: start,
+                end: end,
+                entryGPS: capturedEntryGPS,
+                exitGPS: finalExitGPS,
+                entryGPSFixSource: capturedEntryGPSFixSource,
+                exitGPSFixSource: self.exitGPSFixSource,
+                samples: finishedSamples,
+                activeDiveExceededSupportedDepth: capturedExceededSupportedDepth,
+                sessionStartedManually: capturedSessionStartedManually
+            )
             self.gpsManager.stop()
         }
     }
 
-    private func finalizeDive(start: Date, end: Date, entryGPS: GPSPoint?, exitGPS: GPSPoint?, entryGPSFixSource: GPSFixSource, exitGPSFixSource: GPSFixSource, samples: [DiveSample]) {
+    private func finalizeDive(
+        sessionID: UUID,
+        start: Date,
+        end: Date,
+        entryGPS: GPSPoint?,
+        exitGPS: GPSPoint?,
+        entryGPSFixSource: GPSFixSource,
+        exitGPSFixSource: GPSFixSource,
+        samples: [DiveSample],
+        activeDiveExceededSupportedDepth: Bool,
+        sessionStartedManually: Bool
+    ) {
+        if logStore.sessions.contains(where: { $0.id == sessionID }) {
+            clearActiveDiveDraft()
+            self.activeDiveExceededSupportedDepth = false
+            self.sessionStartedManually = false
+            return
+        }
         let validSamples = sanitizedSamples(samples)
         let depths = validSamples.map(\.depthMeters)
         let temps = validSamples.compactMap { DiveAlgorithm.sanitizedTemperatureCelsius($0.temperatureCelsius) }
@@ -615,6 +800,7 @@ final class DiveManager: ObservableObject {
         let exceeded = activeDiveExceededSupportedDepth || maxDepth >= DepthSafetyConfiguration.maximumSupportedDepthMeters
         let hasDepthProfile = !validSamples.isEmpty
         let session = DiveSession(
+            id: sessionID,
             startDate: start,
             endDate: end,
             durationSeconds: duration,
@@ -633,8 +819,8 @@ final class DiveManager: ObservableObject {
             isManual: sessionStartedManually,
             hasDepthProfile: hasDepthProfile
         )
-        activeDiveExceededSupportedDepth = false
-        sessionStartedManually = false
+        self.activeDiveExceededSupportedDepth = false
+        self.sessionStartedManually = false
         logStore.add(session)
         clearActiveDiveDraft()
     }
@@ -649,7 +835,8 @@ final class DiveManager: ObservableObject {
             rawDepthMeters: rawDepthMeters,
             timestamp: timestamp,
             receivedAt: receivedAt ?? Date(),
-            temperatureCelsius: temperatureCelsius
+            temperatureCelsius: temperatureCelsius,
+            isDiveActive: isDiveActive
         )
         guard let sample = validated.sample else {
             lastErrorMessage = depthValidationMessage(validated.validity)
@@ -924,13 +1111,39 @@ final class DiveManager: ObservableObject {
 // MARK: - Algorithm test hooks (Watch algorithm test target, @testable)
 
 extension DiveManager {
+    static var testHook_draftDirectoryURL: URL?
+
     var testHook_sampleCount: Int { samples.count }
+
+    var testHook_sessions: [DiveSession] { logStore.sessions }
+
+    var testHook_isFinalizingDive: Bool { isFinalizingDive }
+
+    var testHook_hasActiveDiveDraftOnDisk: Bool {
+        FileManager.default.fileExists(atPath: activeDiveDraftURL().path)
+    }
+
+    func testHook_clearActiveDiveDraft() {
+        clearActiveDiveDraft()
+    }
+
+    func testHook_restoreActiveDiveDraftIfAvailable() {
+        restoreActiveDiveDraftIfAvailable()
+    }
+
+    func testHook_completePendingFinalizationIfNeeded() {
+        restoreActiveDiveDraftIfAvailable()
+    }
 
     var testHook_samples: [DiveSample] { samples }
 
     var testHook_lastErrorMessage: String? { lastErrorMessage }
 
     var testHook_isDepthDataStale: Bool { isDepthDataStale }
+
+    func testHook_endDiveForTests() {
+        endDiveIfNeeded()
+    }
 
     func testHook_processDepthMeasurement(
         rawDepthMeters: Double?,

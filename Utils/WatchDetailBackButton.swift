@@ -16,7 +16,7 @@ struct WatchDetailBackButton: View {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 11, weight: .bold))
                 Text(String(localized: "watch.nav.back"))
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .font(DiveUI.Typography.secondaryLabel)
             }
             .foregroundStyle(DiveUI.cyan)
         }

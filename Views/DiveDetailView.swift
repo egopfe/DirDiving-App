@@ -4,11 +4,10 @@ struct DiveDetailView: View {
     let session: DiveSession
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var log: DiveLogStore
+    @EnvironmentObject private var navigation: AppNavigationStore
     @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
     @State private var exportURL: URL?
     @State private var exportMessage: String?
-    @State private var exportCompletionFileName: String?
-    @State private var showExportCompletion = false
     @State private var showDeleteConfirmation = false
 
     var body: some View {
@@ -34,9 +33,6 @@ struct DiveDetailView: View {
                 .padding(.top, 9)
                 .padding(.bottom, 8)
             }
-        }
-        .navigationDestination(isPresented: $showExportCompletion) {
-            ExportView(fileName: exportCompletionFileName ?? "export.csv", exportURL: exportURL)
         }
         .confirmationDialog(String(localized: "log.delete.confirm.title"), isPresented: $showDeleteConfirmation, titleVisibility: .visible) {
             Button(String(localized: "log.delete.confirm.action"), role: .destructive) {
@@ -73,11 +69,11 @@ struct DiveDetailView: View {
 
     private var dateLine: some View {
         Text("\(Self.dateFormatter.string(from: session.startDate))   \(Self.timeFormatter.string(from: session.startDate))")
-            .font(.system(size: 10, weight: .semibold, design: .rounded))
+            .font(DiveUI.Typography.secondaryLabel)
             .foregroundStyle(DiveUI.blue)
             .monospacedDigit()
             .lineLimit(1)
-            .minimumScaleFactor(0.78)
+            .minimumScaleFactor(0.9)
     }
 
     private var summaryCards: some View {
@@ -98,9 +94,9 @@ struct DiveDetailView: View {
             Image(systemName: "exclamationmark.octagon.fill")
                 .font(.system(size: 12, weight: .black))
             Text(String(localized: "depth.safety.log.outside_range"))
-                .font(.system(size: 10, weight: .black, design: .rounded))
+                .font(DiveUI.Typography.warningBody)
                 .lineLimit(2)
-                .minimumScaleFactor(0.72)
+                .minimumScaleFactor(0.9)
         }
         .foregroundStyle(DiveUI.red)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -116,10 +112,10 @@ struct DiveDetailView: View {
     private func detailMetricCard(title: String, value: String, unit: String, color: Color) -> some View {
         VStack(spacing: 1) {
             Text(title)
-                .font(.system(size: 7, weight: .black, design: .rounded))
+                .font(DiveUI.Typography.metricLabel)
                 .foregroundStyle(.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
+                .lineLimit(2)
+                .minimumScaleFactor(0.9)
 
             HStack(alignment: .lastTextBaseline, spacing: 3) {
                 Text(value)
@@ -127,14 +123,14 @@ struct DiveDetailView: View {
                     .foregroundStyle(color)
                     .monospacedDigit()
                     .lineLimit(1)
-                    .minimumScaleFactor(0.68)
+                    .minimumScaleFactor(0.85)
                 Text(unit)
-                    .font(.system(size: 10, weight: .black, design: .rounded))
+                    .font(DiveUI.Typography.unitLabel)
                     .foregroundStyle(color)
                     .padding(.bottom, 1)
             }
         }
-        .frame(maxWidth: .infinity, minHeight: 36)
+        .frame(maxWidth: .infinity, minHeight: 44)
         .background(
             RoundedRectangle(cornerRadius: 6, style: .continuous)
                 .fill(Color.black.opacity(0.45))
@@ -149,48 +145,57 @@ struct DiveDetailView: View {
         VStack(spacing: 3) {
             gpsRow(
                 title: "PUNTO INIZIO",
-                coordinate: coordinateLine(for: session.entryGPS, fallback: "GPS non disponibile"),
+                point: session.entryGPS,
+                isEntry: true,
                 status: fixSourceText(session.entryGPSFixSource),
                 color: DiveUI.green
             )
             gpsRow(
                 title: "PUNTO FINE",
-                coordinate: coordinateLine(for: session.exitGPS, fallback: "GPS non disponibile"),
+                point: session.exitGPS,
+                isEntry: false,
                 status: fixSourceText(session.exitGPSFixSource),
                 color: DiveUI.red
             )
+            Text(String(localized: "dive.detail.gps.export_for_full"))
+                .font(DiveUI.Typography.rowSubtitle)
+                .foregroundStyle(DiveUI.secondaryText)
+                .lineLimit(2)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
-    private func gpsRow(title: String, coordinate: String, status: String, color: Color) -> some View {
-        HStack(spacing: 6) {
-            VStack(alignment: .leading, spacing: 2) {
+    private func gpsRow(title: String, point: GPSPoint?, isEntry: Bool, status: String, color: Color) -> some View {
+        let summary = coordinateSummary(for: point, isEntry: isEntry)
+        let fullCoordinate = coordinateLine(for: point, fallback: String(localized: "GPS non disponibile"))
+        return HStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 3) {
                 Text(title)
-                    .font(.system(size: 9, weight: .black, design: .rounded))
+                    .font(DiveUI.Typography.secondaryLabel)
                     .foregroundStyle(color)
                     .lineLimit(1)
-                Text(coordinate)
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                Text(summary)
+                    .font(DiveUI.Typography.rowTitle)
                     .foregroundStyle(.white)
-                    .monospacedDigit()
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.58)
+                    .lineLimit(2)
                 Text(status)
-                    .font(.system(size: 8, weight: .black, design: .rounded))
+                    .font(DiveUI.Typography.rowSubtitle)
                     .foregroundStyle(color)
-                    .lineLimit(1)
+                    .lineLimit(2)
             }
 
             Spacer(minLength: 0)
 
             Image(systemName: "mappin.circle.fill")
-                .font(.system(size: 21, weight: .black))
+                .font(.system(size: 22, weight: .black))
                 .foregroundStyle(color)
                 .symbolRenderingMode(.hierarchical)
         }
-        .padding(.horizontal, 7)
-        .padding(.vertical, 5)
-        .frame(minHeight: 39)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 8)
+        .frame(minHeight: 44)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title). \(summary). \(status). \(fullCoordinate)")
         .background(
             RoundedRectangle(cornerRadius: 6, style: .continuous)
                 .fill(Color.black.opacity(0.48))
@@ -242,8 +247,10 @@ struct DiveDetailView: View {
                 exportURL = SubsurfaceExportService.writeCSV(for: session)
                 exportMessage = exportURL == nil ? String(localized: "logbook.export.failed") : nil
                 if let exportURL {
-                    exportCompletionFileName = exportURL.lastPathComponent
-                    showExportCompletion = true
+                    navigation.presentExportCompletion(
+                        fileName: exportURL.lastPathComponent,
+                        exportURL: exportURL
+                    )
                     HapticService.shared.confirm()
                 } else {
                     HapticService.shared.notify()
@@ -253,8 +260,8 @@ struct DiveDetailView: View {
                     .font(.system(size: 12, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.green)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.76)
-                    .frame(maxWidth: .infinity, minHeight: 32)
+                    .minimumScaleFactor(0.9)
+                    .frame(maxWidth: .infinity, minHeight: 40)
             }
             .buttonStyle(.plain)
             .background(
@@ -273,9 +280,9 @@ struct DiveDetailView: View {
                         Text("CONDIVIDI CSV")
                         Image(systemName: "square.and.arrow.up")
                     }
-                    .font(.system(size: 10, weight: .black, design: .rounded))
+                    .font(DiveUI.Typography.secondaryLabel)
                     .foregroundStyle(DiveUI.blue)
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: .infinity, minHeight: 40)
                     .padding(.vertical, 6)
                     .background(
                         RoundedRectangle(cornerRadius: 8, style: .continuous)
@@ -303,7 +310,7 @@ struct DiveDetailView: View {
                     .font(.system(size: 11, weight: .black, design: .rounded))
                 Spacer(minLength: 0)
                 Text("CONFERMA")
-                    .font(.system(size: 9, weight: .black, design: .rounded))
+                    .font(DiveUI.Typography.secondaryLabel)
             }
             .foregroundStyle(DiveUI.red)
             .padding(.horizontal, 9)
@@ -320,6 +327,15 @@ struct DiveDetailView: View {
 
     private var durationMinutesText: String {
         "\(max(0, Int((session.durationSeconds / 60).rounded())))"
+    }
+
+    private func coordinateSummary(for point: GPSPoint?, isEntry: Bool) -> String {
+        guard point != nil else {
+            return String(localized: "GPS non disponibile")
+        }
+        return isEntry
+            ? String(localized: "dive.detail.gps.start_available")
+            : String(localized: "dive.detail.gps.end_available")
     }
 
     private func coordinateLine(for point: GPSPoint?, fallback: String) -> String {

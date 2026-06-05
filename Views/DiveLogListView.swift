@@ -2,12 +2,11 @@ import SwiftUI
 
 struct DiveLogListView: View {
     @EnvironmentObject private var log: DiveLogStore
+    @EnvironmentObject private var navigation: AppNavigationStore
     @EnvironmentObject private var watchSync: WatchSyncService
     @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
     @State private var listExportURL: URL?
     @State private var listExportMessage: String?
-    @State private var exportCompletionFileName: String?
-    @State private var showExportCompletion = false
     @State private var pendingDelete: DiveSession?
 
     var body: some View {
@@ -28,9 +27,6 @@ struct DiveLogListView: View {
                 .padding(.top, 9)
                 .padding(.bottom, 8)
             }
-        }
-        .navigationDestination(isPresented: $showExportCompletion) {
-            ExportView(fileName: exportCompletionFileName ?? "export.csv", exportURL: listExportURL)
         }
         .confirmationDialog(
             String(localized: "log.delete.confirm.title"),
@@ -93,7 +89,7 @@ struct DiveLogListView: View {
                         .foregroundStyle(DiveUI.secondaryText)
                         .multilineTextAlignment(.center)
                     Text(String(localized: "log.export.unavailable"))
-                        .font(.system(size: 9, weight: .black, design: .rounded))
+                        .font(DiveUI.Typography.secondaryLabel)
                         .foregroundStyle(DiveUI.cyan)
                 }
                 .padding(8)
@@ -160,8 +156,10 @@ struct DiveLogListView: View {
                 if listExportURL == nil {
                     HapticService.shared.notify()
                 } else {
-                    exportCompletionFileName = listExportURL?.lastPathComponent
-                    showExportCompletion = true
+                    navigation.presentExportCompletion(
+                        fileName: listExportURL?.lastPathComponent ?? "export.csv",
+                        exportURL: listExportURL
+                    )
                     HapticService.shared.confirm()
                 }
             } label: {
@@ -169,8 +167,8 @@ struct DiveLogListView: View {
                     .font(.system(size: 12, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.green)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.76)
-                    .frame(maxWidth: .infinity, minHeight: 32)
+                    .minimumScaleFactor(0.9)
+                    .frame(maxWidth: .infinity, minHeight: 40)
             }
             .buttonStyle(.plain)
             .background(
@@ -218,12 +216,12 @@ struct DiveLogListView: View {
                     VStack(alignment: .leading, spacing: 2) {
                         HStack(alignment: .firstTextBaseline) {
                             Text(logDate(session.startDate))
-                                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                                .font(DiveUI.Typography.secondaryLabel)
                                 .foregroundStyle(.white)
                                 .monospacedDigit()
                             Spacer(minLength: 5)
                             Text(logTime(session.startDate))
-                                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                                .font(DiveUI.Typography.secondaryLabel)
                                 .foregroundStyle(.white)
                                 .monospacedDigit()
                         }
@@ -234,21 +232,21 @@ struct DiveLogListView: View {
                                     .font(.system(size: 11, weight: .black, design: .rounded))
                                     .foregroundStyle(DiveUI.cyan)
                                     .lineLimit(1)
-                                    .minimumScaleFactor(0.72)
+                                    .minimumScaleFactor(0.9)
                             } else {
                                 Text("\(depthDisplay.valueText) \(depthDisplay.unitLabel)")
                                     .font(.system(size: 14, weight: .black, design: .rounded))
                                     .foregroundStyle(.white)
                                     .monospacedDigit()
                                     .lineLimit(1)
-                                    .minimumScaleFactor(0.72)
+                                    .minimumScaleFactor(0.85)
                             }
                             Text("\(durationMinutes(session.durationSeconds)) min")
                                 .font(.system(size: 13, weight: .semibold, design: .rounded))
                                 .foregroundStyle(.white)
                                 .monospacedDigit()
                                 .lineLimit(1)
-                                .minimumScaleFactor(0.72)
+                                .minimumScaleFactor(0.9)
                         }
                     }
 

@@ -1,6 +1,6 @@
 # Note per TestFlight / App Review - DIR DIVING
 
-**Aggiornato:** 2026-06-02 — branch `main` (readiness 100% code/static/docs; physical QA gates tracked separately)
+**Aggiornato:** 2026-06-03 — branch `main` (iOS MAIN algorithm audit remediation; physical QA gates tracked separately)
 
 ## Panoramica per il revisore
 
@@ -10,6 +10,7 @@ L'app **non** e presentata come computer subacqueo certificato.
 
 Lo stato algoritmico MAIN e documentato in:
 
+- [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) — remediation Watch MAIN 2026-06-03 (pending finalization, load filter, frozen surface, haptics token).
 - [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) per Watch MAIN (codice 100%; QA fisica § L).
 - [`WATCH_MANUAL_NODEPTH_SYNC_POLICY.md`](WATCH_MANUAL_NODEPTH_SYNC_POLICY.md) per sessioni manuali senza profilo profondità.
 - [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) per iOS MAIN.
@@ -18,6 +19,9 @@ Lo stato algoritmico MAIN e documentato in:
 - [`DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md) e [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md) per il motore Buhlmann ZHL-16C N2+He multigas reference.
 - [`DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md) per UX/UI readiness post-fix @ `3237262` (verdict **READY**).
 - [`DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md`](DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md) per CNS/OTU comprehensive NOAA e readiness P1–P4 @ `dae29b8`. La release MAIN corrente non deve essere descritta come decompression planner certificato.
+- [`IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) — audit IOS-AUDIT-001…012 remediation @ 2026-06-03.
+- [`IOS_PLANNER_LIMITATIONS.md`](IOS_PLANNER_LIMITATIONS.md) — reference-only planner semantics (ledger, analysis averages, pressure units).
+- [`SUBSURFACE_EXPORT_COMPATIBILITY_QA.md`](SUBSURFACE_EXPORT_COMPATIBILITY_QA.md) — external Subsurface import QA (manual, not yet executed in CI).
 - [`MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md`](MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md) per UI/UX readiness MAIN @ `c8f91f6` (verdict **Internal TestFlight UI/UX YES**; QA fisica § I ancora richiesta).
 
 ## Account e dati demo

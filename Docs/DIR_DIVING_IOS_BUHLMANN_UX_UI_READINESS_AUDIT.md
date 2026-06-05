@@ -1,16 +1,16 @@
 # DIR Diving iOS Bühlmann UX/UI Readiness Audit
 
-Date: 2026-05-28  
-**Superseded by:** [`Docs/DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](Docs/DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md) (2026-05-30, verdict **READY** after fix @ `3237262`)  
-Branch audited: `main` (iOS Companion only) @ `570964e` (pre-algorithm fix); algorithm P1–P3 resolved @ `69e69b2` — see [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md)  
-Indexed in: [`Docs/INDEX.md`](Docs/INDEX.md) §1, §4, §6, §13  
+Date: 2026-05-28
+**Superseded by:** [`Docs/DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md) (2026-05-30, verdict **READY** after fix @ `3237262`)
+Branch audited: `main` (iOS Companion only) @ `570964e` (pre-algorithm fix); algorithm P1–P3 resolved @ `69e69b2` — see [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md)
+Indexed in: [`Docs/INDEX.md`](INDEX.md) §1, §4, §6, §13
 Audit type: read-only UX/UI readiness audit after latest Bühlmann multigas planner work
 
 ## Executive Verdict
 
 **Partially ready**
 
-The iOS planner flow is discoverable, premium-style coherent, and safety-gated before calculation. Core reference warnings and MOD/PPO2 visibility exist.  
+The iOS planner flow is discoverable, premium-style coherent, and safety-gated before calculation. Core reference warnings and MOD/PPO2 visibility exist.
 However, there are blocking UX gaps for safe interpretation of the latest hardening features (especially repetitive planning, schedule gas allocation visibility, and environment messaging consistency).
 
 ## Scope Confirmed
@@ -121,11 +121,11 @@ However, there are blocking UX gaps for safe interpretation of the latest harden
 - **None confirmed** from static inspection.
 
 ### P1
-- **P1-1: Repetitive planning not user-visible while logic exists**  
+- **P1-1: Repetitive planning not user-visible while logic exists**
   Users cannot verify whether residual tissue state is applied, or why it failed, yet output may differ.
-- **P1-2: Environment messaging contradiction**  
+- **P1-2: Environment messaging contradiction**
   UI/validation text indicates altitude/salinity are non-operative while implementation now tries to apply environment models.
-- **P1-3: Schedule gas allocation not transparently shown per cylinder**  
+- **P1-3: Schedule gas allocation not transparently shown per cylinder**
   New schedule-based gas hardening can be mistaken for legacy bottom-only aggregate values.
 
 ## UI Consistency Issues

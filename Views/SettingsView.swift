@@ -16,11 +16,11 @@ struct SettingsView: View {
             DiveScreenBackground()
 
             ScrollView {
-                VStack(spacing: 7) {
+                VStack(spacing: 10) {
                     header
 
                     Text(String(localized: "settings.header.title"))
-                        .font(DiveUI.Typography.settingsSection)
+                        .font(DiveUI.Typography.screenTitle)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
 
@@ -33,6 +33,8 @@ struct SettingsView: View {
                             informational: true
                         )
                     }
+
+                    WatchSettingsSectionHeader(title: String(localized: "settings.section.safety"))
 
                     NavigationLink {
                         AscentRateSettingsView()
@@ -62,6 +64,8 @@ struct SettingsView: View {
                     .buttonStyle(.plain)
                     .disabled(dive.isDiveActive)
 
+                    WatchSettingsSectionHeader(title: String(localized: "settings.section.units_language"))
+
                     unitPreferenceControl
                         .disabled(dive.isDiveActive)
                     languagePreferenceControl
@@ -74,10 +78,14 @@ struct SettingsView: View {
                             iconColor: DiveUI.red,
                             title: String(localized: "Legal & Safety"),
                             subtitle: String(localized: "NOT A DIVE COMPUTER"),
-                            showsChevron: true
+                            showsChevron: true,
+                            legal: true
                         )
                     }
                     .buttonStyle(.plain)
+
+                    WatchSettingsSectionHeader(title: String(localized: "settings.section.sync"))
+
                     settingsRow(
                         icon: "iphone.slash",
                         iconColor: DiveUI.yellow,
@@ -85,6 +93,9 @@ struct SettingsView: View {
                         subtitle: String(localized: "settings.sync.settings_scope"),
                         informational: true
                     )
+
+                    WatchSettingsSectionHeader(title: String(localized: "settings.section.hardware"))
+
                     statusRow(
                         icon: "location.fill",
                         iconColor: gps.authorizationStatus == .denied ? DiveUI.red : DiveUI.green,
@@ -147,6 +158,7 @@ struct SettingsView: View {
                     .disabled(dive.isDiveActive)
                     .accessibilityLabel(String(localized: "settings.a11y.export_logbook"))
                     .accessibilityHint(String(localized: "settings.row.export_logbook.subtitle"))
+
                     settingsRow(
                         icon: "function",
                         iconColor: DiveUI.green,
@@ -223,7 +235,12 @@ struct SettingsView: View {
                         subtitle: dive.isDepthAutomationAvailable ? String(localized: "settings.manual.fallback") : String(localized: "settings.manual.live"),
                         informational: true
                     )
+                    WatchSettingsSectionHeader(title: String(localized: "settings.section.mission"))
+
                     missionModeControl
+
+                    WatchSettingsSectionHeader(title: String(localized: "settings.section.advanced"))
+
                     Toggle(isOn: $hapticsEnabled) {
                         settingsRow(
                             icon: "iphone.radiowaves.left.and.right",
@@ -315,11 +332,11 @@ struct SettingsView: View {
             .pickerStyle(.wheel)
             .tint(DiveUI.cyan)
             Text(selectedLanguage.watchDetail)
-                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .font(DiveUI.Typography.statusValue)
                 .foregroundStyle(DiveUI.yellow)
                 .fixedSize(horizontal: false, vertical: true)
             Text(String(localized: "settings.language.scope_note"))
-                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .font(DiveUI.Typography.rowSubtitle)
                 .foregroundStyle(DiveUI.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -352,7 +369,7 @@ struct SettingsView: View {
             .pickerStyle(.wheel)
             .tint(DiveUI.cyan)
             Text(String(localized: "settings.units.sync_note"))
-                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .font(DiveUI.Typography.rowSubtitle)
                 .foregroundStyle(DiveUI.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -382,15 +399,15 @@ struct SettingsView: View {
     private var syncActivityPanel: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(String(localized: "sync.activity.section_title"))
-                .font(.system(size: 9, weight: .semibold, design: .rounded))
-                .foregroundStyle(DiveUI.secondaryText)
+                .font(DiveUI.Typography.sectionHeading)
+                .foregroundStyle(DiveUI.cyan)
             ForEach(Array(watchSync.recentActivity.prefix(4))) { activity in
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: 3) {
                     Text(activity.title)
-                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .font(DiveUI.Typography.rowTitle)
                         .foregroundStyle(.white)
                     Text(activity.detail)
-                        .font(.system(size: 9, weight: .medium, design: .rounded))
+                        .font(DiveUI.Typography.rowSubtitle)
                         .foregroundStyle(DiveUI.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -422,23 +439,22 @@ struct SettingsView: View {
     }
 
     private var missionModeControl: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 9) {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 10) {
                 Image(systemName: "bolt.fill")
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(DiveUI.yellow)
-                    .frame(width: 24)
+                    .frame(width: 26)
 
-                VStack(alignment: .leading, spacing: 1) {
+                VStack(alignment: .leading, spacing: 3) {
                     Text(String(localized: "settings.mission_mode.title"))
-                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                        .font(DiveUI.Typography.rowTitle)
                         .foregroundStyle(.white)
-                        .lineLimit(1)
+                        .lineLimit(2)
                     Text(String(localized: "settings.mission_mode.toggle"))
-                        .font(.system(size: 10, weight: .medium, design: .rounded))
+                        .font(DiveUI.Typography.rowSubtitle)
                         .foregroundStyle(DiveUI.secondaryText)
                         .lineLimit(2)
-                        .minimumScaleFactor(0.72)
                 }
 
                 Spacer(minLength: 0)
@@ -449,18 +465,20 @@ struct SettingsView: View {
                     .disabled(dive.isDiveActive)
                     .accessibilityLabel(String(localized: "settings.a11y.mission_mode"))
             }
+            .frame(minHeight: DiveUI.Layout.settingsRowInteractiveMinHeight)
 
             settingsRow(
                 icon: "circle.fill",
                 iconColor: dive.isMissionModeActive ? DiveUI.green : DiveUI.secondaryText,
                 title: String(localized: "settings.mission_mode.status.title"),
                 subtitle: missionModeStatusText,
-                informational: true
+                informational: true,
+                statusEmphasis: true
             )
 
             if dive.isDiveActive {
                 Text(String(localized: "settings.mission_mode.live_hint"))
-                    .font(.system(size: 9, weight: .semibold, design: .rounded))
+                    .font(DiveUI.Typography.rowSubtitle)
                     .foregroundStyle(DiveUI.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
             } else {
@@ -484,27 +502,30 @@ struct SettingsView: View {
             }
 
             Text(String(localized: "settings.mission_mode.effects"))
-                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .font(DiveUI.Typography.rowSubtitle)
                 .foregroundStyle(DiveUI.secondaryText)
+                .lineLimit(3)
                 .fixedSize(horizontal: false, vertical: true)
 
             Text(String(localized: "settings.mission_mode.safety_note"))
-                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .font(DiveUI.Typography.rowSubtitle)
                 .foregroundStyle(DiveUI.secondaryText)
+                .lineLimit(3)
                 .fixedSize(horizontal: false, vertical: true)
 
             Text(String(localized: "settings.mission_mode.apple_lpm_disclaimer"))
-                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .font(DiveUI.Typography.rowSubtitle)
                 .foregroundStyle(DiveUI.secondaryText)
+                .lineLimit(4)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(.horizontal, 9)
-        .padding(.vertical, 7)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 10)
         .background(
-            RoundedRectangle(cornerRadius: 7, style: .continuous)
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .fill(Color.black.opacity(0.52))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
                         .stroke(.white.opacity(0.24), lineWidth: 1)
                 )
         )
@@ -513,10 +534,11 @@ struct SettingsView: View {
     private func missionModeActionButton(title: String, tint: Color, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 10, weight: .bold, design: .rounded))
+                .font(DiveUI.Typography.secondaryLabel)
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 6)
+                .frame(minHeight: DiveUI.Layout.commandButtonMinHeight)
+                .padding(.vertical, 4)
                 .background(
                     RoundedRectangle(cornerRadius: 6, style: .continuous)
                         .fill(tint.opacity(0.35))
@@ -547,71 +569,31 @@ struct SettingsView: View {
         }
     }
 
-    private func settingsRow(icon: String, iconColor: Color, title: String, subtitle: String, showsChevron: Bool = false, informational: Bool = false) -> some View {
-        HStack(spacing: 9) {
-            Image(systemName: icon)
-                .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(iconColor)
-                .frame(width: 24)
-
-            VStack(alignment: .leading, spacing: 1) {
-                HStack(spacing: 4) {
-                    Text(title)
-                        .font(.system(size: 11, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .lineLimit(informational ? 2 : 1)
-                        .minimumScaleFactor(0.72)
-                    if informational {
-                        Text(String(localized: "settings.informational.badge"))
-                            .font(.system(size: 8, weight: .black, design: .rounded))
-                            .foregroundStyle(DiveUI.secondaryText)
-                            .padding(.horizontal, 4)
-                            .padding(.vertical, 2)
-                            .background(
-                                Capsule()
-                                    .stroke(DiveUI.secondaryText.opacity(0.5), lineWidth: 0.5)
-                            )
-                    }
-                }
-                Text(subtitle)
-                    .font(.system(size: 10, weight: informational ? .medium : .regular, design: .rounded))
-                    .foregroundStyle(informational ? DiveUI.secondaryText : .white)
-                    .lineLimit(informational ? 4 : 2)
-                    .minimumScaleFactor(0.68)
-                    .fixedSize(horizontal: false, vertical: informational)
-            }
-
-            Spacer(minLength: 0)
-
-            if showsChevron {
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundStyle(.white.opacity(0.42))
-            } else if informational {
-                Image(systemName: "info.circle")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(DiveUI.secondaryText.opacity(0.85))
-            }
-        }
-        .padding(.horizontal, 9)
-        .padding(.vertical, 5)
-        .frame(minHeight: informational ? 38 : 35)
-        .opacity(informational ? 0.88 : 1)
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(informational ? [] : (showsChevron ? .isButton : []))
-        .accessibilityHint(informational ? String(localized: "settings.informational.a11y.hint") : "")
-        .background(
-            RoundedRectangle(cornerRadius: 7, style: .continuous)
-                .fill(Color.black.opacity(informational ? 0.38 : 0.52))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 7, style: .continuous)
-                        .stroke(.white.opacity(informational ? 0.14 : 0.24), lineWidth: 1)
-                )
+    private func settingsRow(
+        icon: String,
+        iconColor: Color,
+        title: String,
+        subtitle: String,
+        showsChevron: Bool = false,
+        informational: Bool = false,
+        legal: Bool = false,
+        statusEmphasis: Bool = false
+    ) -> some View {
+        WatchSettingsRow(
+            icon: icon,
+            iconColor: iconColor,
+            title: title,
+            subtitle: subtitle,
+            showsChevron: showsChevron,
+            informational: informational,
+            legal: legal,
+            statusEmphasis: statusEmphasis
         )
+        .accessibilityHint(informational ? String(localized: "settings.informational.a11y.hint") : "")
     }
 
     private func statusRow(icon: String, iconColor: Color, title: String, subtitle: String) -> some View {
-        settingsRow(icon: icon, iconColor: iconColor, title: title, subtitle: subtitle, informational: true)
+        settingsRow(icon: icon, iconColor: iconColor, title: title, subtitle: subtitle, informational: true, statusEmphasis: true)
     }
 }
 
@@ -711,7 +693,7 @@ private struct WatchShortcutHelpView: View {
                     .font(.system(size: 12, weight: .black, design: .rounded))
                     .foregroundStyle(.white)
                 Text(body)
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .font(DiveUI.Typography.rowSubtitle)
                     .foregroundStyle(DiveUI.secondaryText)
                     .fixedSize(horizontal: false, vertical: true)
             }

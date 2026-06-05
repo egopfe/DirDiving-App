@@ -351,7 +351,7 @@
 "settings.language.scope_note" = "Language is local to this Watch. Units sync when paired; alarms and haptics do not.";
 "settings.shortcuts.action_title" = "Action / Commands";
 "settings.shortcuts.action_subtitle" = "Map DIR DIVING intents in watchOS Shortcuts or Action Button; the app cannot intercept the Side Button.";
-"user_images.list.title" = "SCREENS";
+"user_images.list.title" = "IMAGES";
 "user_images.item.label" = "IMG %d";
 "user_images.empty.title" = "NO IMAGES";
 "user_images.empty.body" = "Send photos from the iPhone app to view them here before and during surface navigation.";
@@ -461,8 +461,25 @@
 "user_images.a11y.row" = "Image %d, %@";
 "user_images.a11y.row.hint" = "Double tap to view full image";
 "user_images.a11y.detail" = "Full image %d, %@";
+"user_images.a11y.detail.hint" = "Double tap for full screen";
+"user_images.a11y.fullscreen.hint" = "Double tap to close";
+"user_images.delete.button" = "Delete";
+"user_images.delete.confirm.title" = "Delete image?";
+"user_images.delete.confirm.message" = "This removes the uploaded image from Apple Watch.";
+"user_images.delete.confirm.action" = "Delete";
+"user_images.delete.cancel" = "Cancel";
+"user_images.delete.a11y" = "Delete image";
+"user_images.delete.hint" = "Double tap to delete this uploaded image";
+"user_images.delete.error" = "Could not delete image.";
 "shortcut.error.app_unavailable" = "DIR DIVING is not ready: open the app on your Watch and try again.";
 "shortcut.error.stopwatch_reset_blocked" = "Stopwatch reset blocked: use on-screen confirmation when time is running.";
+"shortcut.error.legal_acceptance_required" = "Open DIR DIVING and accept the legal and safety onboarding before using Action Button shortcuts.";
+"sync.trust.mismatch" = "Sync trust changed. Reset pairing trust to reconnect this Watch/iPhone.";
+"live.simulation_depth.badge" = "SIMULATION";
+"live.simulation_depth.a11y" = "Simulated depth data active. Not real sensor depth.";
+"user_images.error.not_image" = "File is not a valid image.";
+"user_images.error.dimensions" = "Image dimensions are too large.";
+"user_images.error.encode_failed" = "Could not save image.";
 "ascent.band.depth_range" = "%@-%@ %@";
 "ascent.band.other" = "OTHER";
 "alarm.threshold.depth_format" = "> %@";
@@ -483,6 +500,16 @@
 /* MAIN UI remediation — semantic keys (merged into Localizable.strings) */
 
 "settings.header.title" = "SETTINGS";
+"settings.section.safety" = "Safety";
+"settings.section.units_language" = "Units & Language";
+"settings.section.sync" = "Sync";
+"settings.section.hardware" = "Hardware";
+"settings.section.mission" = "Mission Mode";
+"settings.section.advanced" = "Advanced";
+"dive.detail.gps.start_available" = "GPS start available";
+"dive.detail.gps.end_available" = "GPS end available";
+"dive.detail.gps.coordinates_saved" = "Coordinates saved";
+"dive.detail.gps.export_for_full" = "Export for full coordinates";
 "settings.row.ascent_rate.title" = "Ascent rate";
 "settings.row.ascent_rate.subtitle" = "Persistent m/min limits";
 "settings.row.alarms.title" = "Alerts";

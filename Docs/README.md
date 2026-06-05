@@ -4,11 +4,11 @@ Copyright Federico Lombardo di Monte Iato 2026
 
 DIR DIVING is a SwiftUI **watchOS + iOS companion** project (XcodeGen) for Apple Watch Ultra-class devices and iPhone. The stable **`main`** branch delivers **Diving mode** on Watch (depth, ascent awareness, **BUSSOLA**, log, GPS surface entry/exit, Subsurface CSV) plus the iOS companion (logbook, planner, equipment, analysis, sync). Snorkeling, Apnea, and Buddy Assist live on **experimental** branches only.
 
-**Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](Docs/INDEX.md) · **Baseline:** latest fetched `origin/main` @ `1de70dd`; current remediation branch fixes `MAIN_BRANCH_FULL_CODE_SECURITY_AUDIT_CURRENT.md` and records validation in [`MAIN_BRANCH_FULL_CODE_SECURITY_REMEDIATION_REPORT.md`](MAIN_BRANCH_FULL_CODE_SECURITY_REMEDIATION_REPORT.md). Run `xcodegen generate` before Xcode.
+**Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](INDEX.md) · **Baseline:** latest fetched `origin/main` @ `1de70dd`; current remediation branch fixes `MAIN_BRANCH_FULL_CODE_SECURITY_AUDIT_CURRENT.md` and records validation in [`MAIN_BRANCH_FULL_CODE_SECURITY_REMEDIATION_REPORT.md`](MAIN_BRANCH_FULL_CODE_SECURITY_REMEDIATION_REPORT.md). Run `xcodegen generate` before Xcode.
 
 ## Safety and limitations (MAIN)
 
-Disclaimer completo: [`Docs/SAFETY_DISCLAIMER.md`](Docs/SAFETY_DISCLAIMER.md) · TestFlight: [`Docs/TESTFLIGHT_REVIEW_NOTES.md`](Docs/TESTFLIGHT_REVIEW_NOTES.md) · Roadmap: [`Docs/ROADMAP.md`](Docs/ROADMAP.md)
+Disclaimer completo: [`Docs/SAFETY_DISCLAIMER.md`](SAFETY_DISCLAIMER.md) · TestFlight: [`Docs/TESTFLIGHT_REVIEW_NOTES.md`](TESTFLIGHT_REVIEW_NOTES.md) · Roadmap: [`Docs/ROADMAP.md`](ROADMAP.md)
 
 DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent awareness, and syncs to the iPhone companion for review and **indicative** planning. It is **not** a certified dive computer unless a future release explicitly documents certification. It does **not** replace training, dive-center rules, certified equipment, or human judgment. Planner and Bühlmann-style presentations are **indicative** — verify with certified tools. GPS is meaningful **at the surface**; underwater or poor-sky conditions mean fixes can be missing — missing data must not be read as “dive success.”
 
@@ -18,40 +18,40 @@ DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent 
 - Do not manually edit generated `.xcodeproj` contents.
 - Regenerate after every `project.yml` change.
 - Run `./Scripts/validate_main_release_readiness.sh` before release.
-- Full workflow: [`Docs/BUILD_AND_XCODEGEN_WORKFLOW.md`](Docs/BUILD_AND_XCODEGEN_WORKFLOW.md).
+- Full workflow: [`Docs/BUILD_AND_XCODEGEN_WORKFLOW.md`](BUILD_AND_XCODEGEN_WORKFLOW.md).
 
 ### Stato corrente (`main` = `origin/main`, 2026-05-31)
 
 | Pass | Commit | Contenuto |
 |------|--------|-----------|
-| **MAIN UI/UX readiness 100%** | `c8f91f6` | Audit W-UX/I-UX/X-UX P0–P3: Live scroll, legal i18n, Policy A edit, DEMO badge, iCloud conflicts, Crown hint — [`Docs/MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md`](Docs/MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md) |
-| Watch MAIN algorithmic readiness 100% | `f654bec` | Audit WMATH-HIGH → INFO-014 — [`Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) |
-| iOS MAIN algorithmic readiness 100% | `dce89e7` | Audit B2–B5: pressure/MOD unificato, toggle max/avg depth, cloud merge per sessione, CSV metadata, demo Analysis isolation — [`Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) |
-| iOS comprehensive CNS/OTU + Bühlmann readiness | `dae29b8` | NOAA single/daily CNS, surface/air-break recovery, REPEX OTU, snapshot v2 oxygen carryover, P1–P4 readiness — [`Docs/DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md`](Docs/DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md) |
+| **MAIN UI/UX readiness 100%** | `c8f91f6` | Audit W-UX/I-UX/X-UX P0–P3: Live scroll, legal i18n, Policy A edit, DEMO badge, iCloud conflicts, Crown hint — [`Docs/MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md`](MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md) |
+| Watch MAIN algorithmic readiness 100% | `f654bec` | Audit WMATH-HIGH → INFO-014 — [`Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) |
+| iOS MAIN algorithmic readiness 100% | `dce89e7` | Audit B2–B5: pressure/MOD unificato, toggle max/avg depth, cloud merge per sessione, CSV metadata, demo Analysis isolation — [`Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) |
+| iOS comprehensive CNS/OTU + Bühlmann readiness | `dae29b8` | NOAA single/daily CNS, surface/air-break recovery, REPEX OTU, snapshot v2 oxygen carryover, P1–P4 readiness — [`Docs/DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md`](DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md) |
 | iOS Bühlmann UX/UI readiness | `3237262` | Fix P1–P3 UX planner; verdict **Ready** — [`DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md) |
-| iOS Bühlmann reaudit algorithm | `69e69b2` | Fix P1–P3 algoritmo — [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) |
-| iOS Bühlmann ZHL-16C engine | corrente | Reference N2+He multigas — [`Docs/DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](Docs/DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md) |
+| iOS Bühlmann reaudit algorithm | `69e69b2` | Fix P1–P3 algoritmo — [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) |
+| iOS Bühlmann ZHL-16C engine | corrente | Reference N2+He multigas — [`Docs/DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md) |
 | Audit/docs alignment | `ab398eb` | Report readiness aggiornato, riferimenti audit coerenti, documentazione MAIN/experimental riallineata |
 | v10 | `2322145` | Watch: pulsante **Start Dive** in superficie senza disattivare l'avvio automatico; iOS: riferimento pianificazione max/media e refresh input planner/Bühlmann allineati |
 | Mission Mode | `9d8baa1` | Profilo runtime/UI immersione attiva + indicatore minimale; nessuna regressione safety-critical |
-| Algorithm hardening | `ddaf2d7` → `92e639a` | Pipeline depth validata, lifecycle automatico, TTV/time-weighted avg, haptic coordinator, XCTest `DIRDiving Watch Algorithm Tests`; vedi [`Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md) |
-| Watch algorithm final hardening | corrente | Cap logbook 40 sessioni su load/reload, temperature bounds, export vuoto bloccato, policy GPS fallback, conversioni centralizzate; vedi [`Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md`](Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md) |
-| iOS algorithm hardening | corrente | Validatori iOS centralizzati, planner/gas/NDL safe states, import/export/sync/logbook hardening, test `DIRDiving iOS Algorithm Tests`; vedi [`Docs/DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`](Docs/DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md) |
-| iOS Buhlmann multigas assessment | `37e4464` | Assessment MAIN iOS pre-implementazione: identificava supporto Buhlmann multigas/helium incompleto e piano per motore ZHL-16C+GF+He; vedi [`Docs/DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md`](Docs/DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md) |
-| iOS Buhlmann ZHL-16C multigas engine | corrente | Motore iOS-only ZHL-16C N2+He con Air/Nitrox/Trimix/Heliox, GF Low/High, NDL tissue-state, gas switch e stop da ceiling; reference-only/non certificato. Vedi [`Docs/DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](Docs/DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md), [`Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md). |
-| Docs alignment | pass 2026-05-19 | README, INDEX, matrice CSV, branch strategy, audit delta; vedi [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md) |
+| Algorithm hardening | `ddaf2d7` → `92e639a` | Pipeline depth validata, lifecycle automatico, TTV/time-weighted avg, haptic coordinator, XCTest `DIRDiving Watch Algorithm Tests`; vedi [`Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md) |
+| Watch algorithm final hardening | corrente | Cap logbook 40 sessioni su load/reload, temperature bounds, export vuoto bloccato, policy GPS fallback, conversioni centralizzate; vedi [`Docs/DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING_FINAL.md) |
+| iOS algorithm hardening | corrente | Validatori iOS centralizzati, planner/gas/NDL safe states, import/export/sync/logbook hardening, test `DIRDiving iOS Algorithm Tests`; vedi [`Docs/DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md) |
+| iOS Buhlmann multigas assessment | `37e4464` | Assessment MAIN iOS pre-implementazione: identificava supporto Buhlmann multigas/helium incompleto e piano per motore ZHL-16C+GF+He; vedi [`Docs/DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md`](DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md) |
+| iOS Buhlmann ZHL-16C multigas engine | corrente | Motore iOS-only ZHL-16C N2+He con Air/Nitrox/Trimix/Heliox, GF Low/High, NDL tissue-state, gas switch e stop da ceiling; reference-only/non certificato. Vedi [`Docs/DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md), [`Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md). |
+| Docs alignment | pass 2026-05-19 | README, INDEX, matrice CSV, branch strategy, audit delta; vedi [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md) |
 
-**Pass documentale (2026-05-31):** Watch + iOS **algorithmic** readiness 100% + **MAIN UI/UX** readiness 100% (codice) @ `c8f91f6` — [`Docs/MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md`](Docs/MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md), [`Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260531.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260531.md). **QA fisica** Ultra + App Store assets ancora richiesti.
+**Pass documentale (2026-05-31):** Watch + iOS **algorithmic** readiness 100% + **MAIN UI/UX** readiness 100% (codice) @ `c8f91f6` — [`Docs/MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md`](MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md), [`Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260531.md`](DOCUMENTATION_UPDATE_REPORT_20260531.md). **QA fisica** Ultra + App Store assets ancora richiesti.
 
-**Recent Watch algorithm pass (2026-05-31):** WMATH-HIGH-001 → INFO-014; Watch + iOS sync XCTest verde su simulatori; vedi [`Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md).
+**Recent Watch algorithm pass (2026-05-31):** WMATH-HIGH-001 → INFO-014; Watch + iOS sync XCTest verde su simulatori; vedi [`Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md).
 
-**Recent iOS algorithm pass (`dce89e7`):** risoluzione audit B2–B5; **154/154** algorithm tests (1 skipped) on iPhone 17 sim; vedi [`Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md).
+**Recent iOS algorithm pass (`dce89e7`):** risoluzione audit B2–B5; **154/154** algorithm tests (1 skipped) on iPhone 17 sim; vedi [`Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md).
 
 **Prior pass (`dae29b8`):** comprehensive NOAA CNS/OTU; Bühlmann readiness P1–P4; 119 XCTest baseline before expanded suite.
 
 **Recent MAIN UI/UX pass (`3237262`):** repetitive planning visibility, schedule gas ledger, environment copy, result headers, CNS/OTU disclaimers — presentation layer; algorithm expanded @ `dae29b8`.
 
-**Watch UX baseline (2026-05-20):** ascent over-limit shows a **red inline banner** on the live dive screen (non-blocking); depth, gauge, TTV, and controls stay visible. Details: [`Docs/WATCH_MAIN_UX_CONVENTIONS.md`](Docs/WATCH_MAIN_UX_CONVENTIONS.md).
+**Watch UX baseline (2026-05-20):** ascent over-limit shows a **red inline banner** on the live dive screen (non-blocking); depth, gauge, TTV, and controls stay visible. Details: [`Docs/WATCH_MAIN_UX_CONVENTIONS.md`](WATCH_MAIN_UX_CONVENTIONS.md).
 
 > Status note: the app is prepared for Apple water submersion APIs, but the depth/submersion entitlement is still pending. Until the entitlement is granted and the app is signed with it, `CMWaterSubmersionManager` may report entitlement-related errors and will not deliver production depth data.
 
@@ -82,7 +82,7 @@ Miglioramenti **senza** modificare algoritmi immersione, GPS, bussola, TTV, plan
 
 - Stati UI **35 / 38 / 40 m** con banner, haptic throttled e flag log `exceededSupportedDepthRange`.
 - Onboarding: checkbox obbligatoria sui limiti operativi documentati Apple; revisione legale **`2026-05-23`**.
-- Checklist QA: [`Docs/DEPTH_LIMIT_SAFETY_TEST_CHECKLIST.md`](Docs/DEPTH_LIMIT_SAFETY_TEST_CHECKLIST.md).
+- Checklist QA: [`Docs/DEPTH_LIMIT_SAFETY_TEST_CHECKLIST.md`](DEPTH_LIMIT_SAFETY_TEST_CHECKLIST.md).
 
 ### Pass MAIN readiness 100% (2026-05-23, UX — solo UI/i18n)
 
@@ -95,7 +95,7 @@ Senza modifiche a GPS, BUSSOLA, calcoli profondità/risalita, TTV, planner/Bühl
 - **Onboarding legale**: scroll obbligatorio sul disclaimer prima di Continue.
 - **Log Watch**: elimina con icona cestino + conferma (no `contextMenu` deprecato).
 
-Report: [`Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md`](Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md) · Audit UX: [`Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523.md`](Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523.md) · TestFlight esterno: [`Docs/TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](Docs/TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md).
+Report: [`Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md`](MAIN_BRANCH_FINAL_READINESS_REPORT.md) · Audit UX: [`Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523.md`](MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260523.md) · TestFlight esterno: [`Docs/TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md).
 
 ### Pass MAIN readiness ~94% (2026-05-24, build + i18n + copy)
 
@@ -104,11 +104,11 @@ Senza modifiche ad algoritmi, sync logic o UI graphics:
 - **Build:** fix compile Watch (`AscentRateSettingsView`, `DiveLogListView`); simulator Watch + iOS green.
 - **Copy/i18n:** planner metric notice; Equipment/Planner EN/IT; settings Watch sync scope; device QA checklists App Intents e sync.
 
-Indice: [`Docs/INDEX.md`](Docs/INDEX.md) · Report: [`Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md`](Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md) · QA device: [`Docs/APP_INTENTS_DEVICE_QA_CHECKLIST.md`](Docs/APP_INTENTS_DEVICE_QA_CHECKLIST.md), [`Docs/WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md`](Docs/WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md).
+Indice: [`Docs/INDEX.md`](INDEX.md) · Report: [`Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md`](MAIN_BRANCH_FINAL_READINESS_REPORT.md) · QA device: [`Docs/APP_INTENTS_DEVICE_QA_CHECKLIST.md`](APP_INTENTS_DEVICE_QA_CHECKLIST.md), [`Docs/WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md`](WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md).
 
 ### Pass note sviluppo branch MAIN (`f851b61`, 2026-05-24)
 
-Implementazione di [`Docs/DIR_Diving_Main_Branch_Development_Notes.md`](Docs/DIR_Diving_Main_Branch_Development_Notes.md) — wiring UI e sync; **nessuna** modifica ad algoritmi GPS, **BUSSOLA**, profondità/risalita, decompressione o TTV business. Lo storage canonico resta metrico; le unità imperiali sono di **presentazione** e export CSV Subsurface resta in metri.
+Implementazione di [`Docs/DIR_Diving_Main_Branch_Development_Notes.md`](DIR_Diving_Main_Branch_Development_Notes.md) — wiring UI e sync; **nessuna** modifica ad algoritmi GPS, **BUSSOLA**, profondità/risalita, decompressione o TTV business. Lo storage canonico resta metrico; le unità imperiali sono di **presentazione** e export CSV Subsurface resta in metri.
 
 | Area | Contenuto |
 |------|-----------|
@@ -118,7 +118,7 @@ Implementazione di [`Docs/DIR_Diving_Main_Branch_Development_Notes.md`](Docs/DIR
 | Brand | `altosinistra.png` in header (`DiveOctopusLogo` / `DIRBrandMark`) |
 | iOS | Tab **Planner** prima; immersioni **manuali**; checklist attrezzatura editabile; **foto → Watch**; planner con consenso in cima e campi disabilitati se OFF |
 
-Report implementazione: [`Docs/DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md`](Docs/DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md).
+Report implementazione: [`Docs/DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md`](DIR_DIVING_MAIN_BRANCH_DEVELOPMENT_IMPLEMENTATION_REPORT.md).
 
 ### Pass audit UX e readiness (2026-05-24, `876bcd2` → `bd129ca`)
 
@@ -130,9 +130,9 @@ Serie di commit **solo UI/copy/sync surface/i18n** (nessuna modifica GPS, BUSSOL
 | `db72dce` | Gauge risalita etichette imperiali (ft/min), catalogo **7 App Shortcuts**, help tasto laterale in Settings, refresh dettaglio dopo edit manuale |
 | `62e25d5` | **R2** ack planner persistito (`PlannerSafetyAcknowledgment` + `@AppStorage`); **R3** errori decode iCloud visibili in Altro; **R4** localizzazione Logbook/Dettaglio/Analisi; audit complete readiness 20260520/20260524 |
 
-Report: [`Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260520.md`](Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260520.md) · [`Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524.md`](Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524.md).
+Report: [`Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260520.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260520.md) · [`Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524.md`](MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524.md).
 
-**QA esterno ancora aperto (R1):** entitlement water submersion + profondità automatica su Apple Watch Ultra reale — [`Docs/TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](Docs/TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md).
+**QA esterno ancora aperto (R1):** entitlement water submersion + profondità automatica su Apple Watch Ultra reale — [`Docs/TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md).
 
 ### Strategia controlli Apple Watch (2026-05-24, `72fa15b`)
 
@@ -146,7 +146,7 @@ DIR DIVING su Apple Watch usa una strategia controlli coerente e review-safe, se
 | Tasto laterale | Controllato dal sistema; DIR DIVING non lo sovrascrive direttamente |
 | Immersione attiva | Live resta primaria; BUSSOLA resta raggiungibile; Settings pensate per modifica in superficie |
 
-Dettagli: [`Docs/WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md`](Docs/WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md) e convenzioni in [`Docs/WATCH_MAIN_UX_CONVENTIONS.md`](Docs/WATCH_MAIN_UX_CONVENTIONS.md).
+Dettagli: [`Docs/WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md`](WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md) e convenzioni in [`Docs/WATCH_MAIN_UX_CONVENTIONS.md`](WATCH_MAIN_UX_CONVENTIONS.md).
 
 ## Depth Entitlement And Signing Checklist
 
@@ -185,7 +185,7 @@ External validation is still required before release:
 - Settings / Legal & Safety screen with accepted version, timestamp, language and full disclaimer
 - Mission Mode auto-enable option for active dives only; runtime/UI optimization profile that reduces non-essential visual activity without altering safety-critical monitoring, dive calculations, sensor accuracy, ascent-rate logic, or GPS entry/exit logging, with a minimal active-state icon near the Watch header logo during the dive
 
-Experimental branch documentation is available in [`Docs/EXPERIMENTAL_FEATURES.md`](Docs/EXPERIMENTAL_FEATURES.md).
+Experimental branch documentation is available in [`Docs/EXPERIMENTAL_FEATURES.md`](EXPERIMENTAL_FEATURES.md).
 
 ## Supported Platforms
 
@@ -194,7 +194,7 @@ DIR DIVING e organizzato come progetto XcodeGen multi-target:
 - Apple Watch Ultra / watchOS 10+: app principale per Diving mode, bussola, log, GPS entry/exit, export e funzioni sperimentali isolate sui rami dedicati.
 - iPhone / iOS 17+: companion app per logbook, dettaglio immersione, planner, risultato piano, analisi, export e sync WatchConnectivity.
 
-Le istruzioni di build sono in [`Docs/BUILD_VALIDATION.md`](Docs/BUILD_VALIDATION.md) e in [`Docs/iOS/BUILD_AND_RUN.md`](Docs/iOS/BUILD_AND_RUN.md).
+Le istruzioni di build sono in [`Docs/BUILD_VALIDATION.md`](BUILD_VALIDATION.md) e in [`Docs/iOS/BUILD_AND_RUN.md`](iOS/BUILD_AND_RUN.md).
 
 ## Strategia dei rami (Branch Strategy)
 
@@ -202,7 +202,7 @@ Le istruzioni di build sono in [`Docs/BUILD_VALIDATION.md`](Docs/BUILD_VALIDATIO
 - **`main-iOS`**: worktree/ramo storico divergente per allineamenti iOS. Non e la fonte di verita per la release candidate MAIN unificata; usare solo per review manuali o port selettivi.
 - **`codex/experimental-features`**: Watch sperimentale (Snorkeling Live, mappe waypoint/ritorno, Apnea workflow esteso, Buddy Assist, ecc.). Non importare questi file nel target MAIN senza revisione esplicita.
 - **`codex/ios-experimental-features`**: iOS sperimentale (surface Snorkeling/Apnea/Buddy/exploration concepts). Isolato da App Store candidate su `main`.
-- **Allineamenti UI-only** su `main`: possono toccare layout, copy, accessibilità e documentazione **senza** modificare algoritmi di decompressione, modello gas, calcoli TTV/TTR/SAC/CNS/OTU, sampling sensori o regole di sync — vedi [`Docs/MAIN_UX_COMPLETION_REPORT.md`](Docs/MAIN_UX_COMPLETION_REPORT.md).
+- **Allineamenti UI-only** su `main`: possono toccare layout, copy, accessibilità e documentazione **senza** modificare algoritmi di decompressione, modello gas, calcoli TTV/TTR/SAC/CNS/OTU, sampling sensori o regole di sync — vedi [`Docs/MAIN_UX_COMPLETION_REPORT.md`](MAIN_UX_COMPLETION_REPORT.md).
 - **HEAD `main` consigliato** per release candidate Watch+iOS unificato: il commit corrente remoto. Baseline funzionale: v8 planner gas (`a36dc23`), v9 sync/input refresh (`d962117`), control strategy (`72fa15b`), readiness refresh 2026-05-25, `Start Dive` Watch (`2322145`), Mission Mode (`9d8baa1`), Watch algorithm release-hard pass (`92e639a`) + final hardening docs, iOS algorithm hardening, assessment Buhlmann multigas (`37e4464`) e motore iOS-only ZHL-16C N2+He corrente. `main-iOS` resta worktree storico divergente: non riallineare codice senza review dedicata.
 - **UI-only / documentazione**: non alterare Diving mode, GPS surface-only, **BUSSOLA** (mai COMPASSO), export Subsurface, sync HMAC, onboarding legale.
 
@@ -210,13 +210,13 @@ Le istruzioni di build sono in [`Docs/BUILD_VALIDATION.md`](Docs/BUILD_VALIDATIO
 
 La tabella aggiornata con colonne Area / Branch / App / Mode / Feature / Status / Reachable / UX Complete / Safety Complete / Description / UI Reference / Localization / Notes:
 
-[`Docs/DIR_DIVING_Feature_Comparison.csv`](Docs/DIR_DIVING_Feature_Comparison.csv)
+[`Docs/DIR_DIVING_Feature_Comparison.csv`](DIR_DIVING_Feature_Comparison.csv)
 
-**Indice completo documentazione:** [`Docs/INDEX.md`](Docs/INDEX.md) — ingresso consigliato, con scheda dedicata a [`Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md`](Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md) (sezioni A–O).
+**Indice completo documentazione:** [`Docs/INDEX.md`](INDEX.md) — ingresso consigliato, con scheda dedicata a [`Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md) (sezioni A–O).
 
 ## Sicurezza e sync (security baseline 2026-05-19)
 
-Audit statico in [`Docs/SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md`](Docs/SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md) (18 finding: 2 HIGH / 4 MEDIUM / 6 LOW / 6 INFO). Remediation F1–F12 applicate in commit `4136ec0`:
+Audit statico in [`Docs/SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md`](SECURITY_AUDIT_MAIN_AND_MAIN_IOS_20260519.md) (18 finding: 2 HIGH / 4 MEDIUM / 6 LOW / 6 INFO). Remediation F1–F12 applicate in commit `4136ec0`:
 
 - **Auth pairing**: `WatchSyncAuth.resetPeerTrust()` ripristinato su iOS MAIN; UI di reset associazione Watch ora funzionante.
 - **Sync key autoritativa**: algoritmo HMAC `v2 ordered-secrets` documentato con commento `MARK` su entrambi i `WatchSyncAuth.swift` (Watch + iOS). Cambi futuri richiedono bump di `WatchDiveSyncCodec.schemaVersion` + release coordinata.
@@ -238,12 +238,12 @@ Pass UX/Interaction/Feature Accessibility seguito dall'esecuzione MAIN PRE-RELEA
 
 Nuovi documenti pubblicati su `main` e `main-iOS`:
 
-- [`Docs/MAIN_PRE_RELEASE_OPEN_ITEMS_20260519.md`](Docs/MAIN_PRE_RELEASE_OPEN_ITEMS_20260519.md) — backlog rimanente / item rinviati con motivazione (imperial Watch, GPX/UDDF exporter, per-field cloud merge, side-button capture watchOS, convergenza branch).
-- [`Docs/MAIN_PRE_RELEASE_SIMULATOR_QA_20260519.md`](Docs/MAIN_PRE_RELEASE_SIMULATOR_QA_20260519.md) — checklist QA eseguibile su Watch Ultra, Watch piccolo, iPhone SE, iPhone Pro Max (HEAD presence, ascent gauge co-visible, GPS banner compatto, alarm acknowledge cooldown, SAF-3/SAF-4, App Intents, haptics matrix, a11y, Dynamic Type).
+- [`Docs/MAIN_PRE_RELEASE_OPEN_ITEMS_20260519.md`](MAIN_PRE_RELEASE_OPEN_ITEMS_20260519.md) — backlog rimanente / item rinviati con motivazione (imperial Watch, GPX/UDDF exporter, per-field cloud merge, side-button capture watchOS, convergenza branch).
+- [`Docs/MAIN_PRE_RELEASE_SIMULATOR_QA_20260519.md`](MAIN_PRE_RELEASE_SIMULATOR_QA_20260519.md) — checklist QA eseguibile su Watch Ultra, Watch piccolo, iPhone SE, iPhone Pro Max (HEAD presence, ascent gauge co-visible, GPS banner compatto, alarm acknowledge cooldown, SAF-3/SAF-4, App Intents, haptics matrix, a11y, Dynamic Type).
 
 Backlog Watch (`cbcabf7`, `c685155`, `efa53e4`) **reintegrato su `main`** in commit **`a75a6c3`** (2026-05-20) tramite port manuale — non cherry-pick letterale — preservando security F1–F12 in `WatchSyncService` / `WatchDiveSyncCodec`. Il branch di riferimento **`backup/main-watch-backlog-20260519`** resta per audit storico.
 
-Report implementazione: [`Docs/MAIN_ISSUES_IMPLEMENTATION_REPORT_20260520.md`](Docs/MAIN_ISSUES_IMPLEMENTATION_REPORT_20260520.md). Checklist issue: [`Docs/MAIN_BRANCH_ISSUES_AND_PRIORITIES_20260520.md`](Docs/MAIN_BRANCH_ISSUES_AND_PRIORITIES_20260520.md).
+Report implementazione: [`Docs/MAIN_ISSUES_IMPLEMENTATION_REPORT_20260520.md`](MAIN_ISSUES_IMPLEMENTATION_REPORT_20260520.md). Checklist issue: [`Docs/MAIN_BRANCH_ISSUES_AND_PRIORITIES_20260520.md`](MAIN_BRANCH_ISSUES_AND_PRIORITIES_20260520.md).
 
 Lato `main-iOS`, le due rimanenze (SAF-3 visual + SAF-4 bound CSV più aggressivi) sono già sul ramo come commit `bf4718d`:
 
@@ -285,7 +285,7 @@ Da `fadd8a6` + `4cca72e` su `main`:
 - **Vincoli**: la modifica della lingua **non** cambia unità di misura, calcoli, persistenza o dati salvati.
 - **Pass secondario 2026-05-20**: ~130+ chiavi Watch e ~90+ iOS in `Localizable.strings`; servizi sync/bussola/allarmi localizzati con `String(localized:)`; schermate Settings, log, export, planner header, Analysis empty state coperte. Stato messaggi sync: si aggiorna al prossimo evento dopo cambio lingua.
 - **Debito residuo**: alcune righe planner risultato, dettaglio GPS (`Start:`/`Accuratezza:`), warning dinamici del planner store, import CSV runtime (`DiveImportService` ancora IT hardcoded). Migrazione progressiva verso String Catalog `.xcstrings` opzionale.
-- **TestFlight / sicurezza**: [`Docs/TESTFLIGHT_REVIEW_NOTES.md`](Docs/TESTFLIGHT_REVIEW_NOTES.md), [`Docs/SAFETY_DISCLAIMER.md`](Docs/SAFETY_DISCLAIMER.md), [`Docs/ROADMAP.md`](Docs/ROADMAP.md).
+- **TestFlight / sicurezza**: [`Docs/TESTFLIGHT_REVIEW_NOTES.md`](TESTFLIGHT_REVIEW_NOTES.md), [`Docs/SAFETY_DISCLAIMER.md`](SAFETY_DISCLAIMER.md), [`Docs/ROADMAP.md`](ROADMAP.md).
 
 ## Visual Design Standard
 
@@ -765,7 +765,7 @@ Questa configurazione non equivale a validazione release: prima di TestFlight/Ap
 
 ## Branch Strategy
 
-Panoramica italiana estesa: [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md).
+Panoramica italiana estesa: [`Docs/PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md).
 
 La strategia branch corrente e:
 
@@ -931,17 +931,17 @@ Restano obbligatori: build `xcodegen generate` / Xcode su macOS, test Apple Watc
 
 ## Aggiornamento documentazione 2026-05-19
 
-- Aggiunti: [`Docs/BUILD_VALIDATION.md`](Docs/BUILD_VALIDATION.md), [`Docs/GLOSSARY.md`](Docs/GLOSSARY.md), [`Docs/RELEASE_CHECKLIST.md`](Docs/RELEASE_CHECKLIST.md), [`Docs/UI_UX_VISUAL_GUIDELINES.md`](Docs/UI_UX_VISUAL_GUIDELINES.md), [`CHANGELOG.md`](CHANGELOG.md), [`CONTRIBUTING.md`](CONTRIBUTING.md), report di sync [`Docs/DOCUMENTATION_SYNC_REPORT_20260519.md`](Docs/DOCUMENTATION_SYNC_REPORT_20260519.md), allineamento [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md).
+- Aggiunti: [`Docs/BUILD_VALIDATION.md`](BUILD_VALIDATION.md), [`Docs/GLOSSARY.md`](GLOSSARY.md), [`Docs/RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md), [`Docs/UI_UX_VISUAL_GUIDELINES.md`](UI_UX_VISUAL_GUIDELINES.md), [`CHANGELOG.md`](CHANGELOG.md), [`CONTRIBUTING.md`](CONTRIBUTING.md), report di sync [`Docs/DOCUMENTATION_SYNC_REPORT_20260519.md`](DOCUMENTATION_SYNC_REPORT_20260519.md), allineamento [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md).
 - Riferimenti visivi consolidati in `Docs/ReferenceUI/` (Watch live + iOS companion).
 - Matrice CSV aggiornata in coda (righe additive) per tab iOS a cinque voci e documentazione build.
-- PR **#8** e **#9**: al fetch risultano ancora **`mergeable: CONFLICTING`** — **non** mergeate automaticamente; vedi [`Docs/PR_STATUS_20260524.md`](Docs/PR_STATUS_20260524.md) e [`Docs/DOCUMENTATION_UPDATE_REPORT_20260524.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260524.md).
+- PR **#8** e **#9**: al fetch risultano ancora **`mergeable: CONFLICTING`** — **non** mergeate automaticamente; vedi [`Docs/PR_STATUS_20260524.md`](PR_STATUS_20260524.md) e [`Docs/DOCUMENTATION_UPDATE_REPORT_20260524.md`](DOCUMENTATION_UPDATE_REPORT_20260524.md).
 
 ## Aggiornamento documentazione 2026-05-24 (post-readiness `bd129ca`)
 
 - Baseline `main` @ **`bd129ca`**: merge documentale + commit `62e25d5` (R2–R4), `db72dce`, `876bcd2`.
-- README, [`CHANGELOG.md`](CHANGELOG.md), [`Docs/ROADMAP.md`](Docs/ROADMAP.md), matrice [`Docs/DIR_DIVING_Feature_Comparison.csv`](Docs/DIR_DIVING_Feature_Comparison.csv), [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260524.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260524.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260524.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260524.md).
+- README, [`CHANGELOG.md`](CHANGELOG.md), [`Docs/ROADMAP.md`](ROADMAP.md), matrice [`Docs/DIR_DIVING_Feature_Comparison.csv`](DIR_DIVING_Feature_Comparison.csv), [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260524.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260524.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260524.md`](DOCUMENTATION_UPDATE_REPORT_20260524.md).
 - **Onboarding:** flusso legale + disclaimer companion revisionato (`CompanionDisclaimerAcceptance` `2026-05-24`) + checkbox limiti profondità `2026-05-23`.
-- **Modalità:** Diving su `main`; Snorkeling (Live, Mappa Waypoint, Mappa Ritorno, ritorno ingresso, POI) e Apnea su `codex/experimental-features` — vedi [`Docs/SNORKELING_EXPERIMENTAL_SPEC.md`](Docs/SNORKELING_EXPERIMENTAL_SPEC.md), [`Docs/APNEA_EXPERIMENTAL_SPEC.md`](Docs/APNEA_EXPERIMENTAL_SPEC.md).
+- **Modalità:** Diving su `main`; Snorkeling (Live, Mappa Waypoint, Mappa Ritorno, ritorno ingresso, POI) e Apnea su `codex/experimental-features` — vedi [`Docs/SNORKELING_EXPERIMENTAL_SPEC.md`](SNORKELING_EXPERIMENTAL_SPEC.md), [`Docs/APNEA_EXPERIMENTAL_SPEC.md`](APNEA_EXPERIMENTAL_SPEC.md).
 - **i18n:** pass R4 su Logbook/Dettaglio/Analisi; debito Planner/Equipment/alcuni messaggi runtime — vedi sezione Lingue sopra.
 - **Nota Watch post-`3b7358b`:** lista log mostra profondità max in `m` fisso (regressione display unità rispetto a `db72dce`); storage e export restano metrici — TODO QA se ripristinare `WatchDepthFormatting` in lista.
 
@@ -950,53 +950,53 @@ Restano obbligatori: build `xcodegen generate` / Xcode su macOS, test Apple Watc
 - `main` confermato come baseline stabile Watch+iOS; `main-iOS` documentato come worktree storico divergente e non come branch release canonico.
 - Documenti correnti allineati: README, INDEX, ROADMAP, safety/release/TestFlight notes, UX conventions, audit correnti e matrice feature CSV.
 - Audit/readiness correnti aggiornati per riflettere i fix repo-side gia chiusi: legal links dedicati, wording entitlement onesto, localizzazione BUSSOLA/planner, recent sync activity, safeguard reset cronometro.
-- Nuovi report di processo: [`Docs/DOCUMENTATION_UPDATE_REPORT_20260525.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260525.md), [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md), [`Docs/PR_STATUS_20260525.md`](Docs/PR_STATUS_20260525.md).
+- Nuovi report di processo: [`Docs/DOCUMENTATION_UPDATE_REPORT_20260525.md`](DOCUMENTATION_UPDATE_REPORT_20260525.md), [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260525.md), [`Docs/PR_STATUS_20260525.md`](PR_STATUS_20260525.md).
 
 ## Aggiornamento documentazione 2026-05-26
 
 - Baseline commit corrente verificata: `main` @ `2322145`; working tree locale con ulteriori aggiornamenti documentali e Mission Mode Watch.
 - README, indice documentazione, roadmap, note safety/release/TestFlight e audit correnti riallineati al MAIN attuale: `Start Dive` visibile in superficie, immagini visibili fuori immersione attiva, Mission Mode e relativo indicatore minimale.
-- Nuovi report di processo: [`Docs/DOCUMENTATION_UPDATE_REPORT_20260526.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260526.md), [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260526.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260526.md), [`Docs/PR_STATUS_20260526.md`](Docs/PR_STATUS_20260526.md).
+- Nuovi report di processo: [`Docs/DOCUMENTATION_UPDATE_REPORT_20260526.md`](DOCUMENTATION_UPDATE_REPORT_20260526.md), [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260526.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260526.md), [`Docs/PR_STATUS_20260526.md`](PR_STATUS_20260526.md).
 
 ## Aggiornamento documentazione 2026-05-27
 
 - Baseline verificata prima del pass: `main` @ `37e4464`; branch locali tracciati allineati ai rispettivi remoti (`main`, `main-iOS`, `codex/experimental-features`, `codex/ios-experimental-features`).
 - Documentazione MAIN riallineata a legal onboarding, warning profondita 35/38/40 m, banner risalita inline, overlay GPS compatti, App Intents/Action Button via Shortcuts, Side Button system-controlled, sync Watch <-> iPhone, push iPhone -> Watch, tombstone, edit manuale, planner safety acknowledgement, User Images conditional visibility e mode auto-skip.
 - Stato algoritmico documentato al 2026-05-27: Watch MAIN release-hard/final hardening, iOS MAIN algorithm hardening, e assessment iOS Buhlmann multigas/helium pre-implementazione.
-- Nuovi report di processo: [`Docs/DOCUMENTATION_UPDATE_REPORT_20260527.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260527.md), [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md), [`Docs/PR_STATUS_20260527.md`](Docs/PR_STATUS_20260527.md).
+- Nuovi report di processo: [`Docs/DOCUMENTATION_UPDATE_REPORT_20260527.md`](DOCUMENTATION_UPDATE_REPORT_20260527.md), [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md), [`Docs/PR_STATUS_20260527.md`](PR_STATUS_20260527.md).
 - PR #8 e #9 controllate con `gh`: entrambe aperte, experimental e non safe-to-merge automaticamente; #8 alterna `UNKNOWN` / `CONFLICTING`, #9 risulta `CONFLICTING`.
 
 ## Aggiornamento documentazione 2026-05-29 (`69e69b2`)
 
 - Baseline: `main` @ `69e69b2`, allineato a `origin/main` — fix reaudit Bühlmann P1–P3; XCTest iOS verde su macOS.
-- **Audit UX/UI planner iOS:** [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md) — verdict *Partially ready*; gap UI (repetitive planning, ledger per cilindro, copy ambiente) indicizzato in [`Docs/INDEX.md`](Docs/INDEX.md) §1, §4, §6, §13.
-- Re-audit math risolto: [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) + [`Docs/DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`](Docs/DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md).
+- **Audit UX/UI planner iOS:** [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md) — verdict *Partially ready*; gap UI (repetitive planning, ledger per cilindro, copy ambiente) indicizzato in [`Docs/INDEX.md`](INDEX.md) §1, §4, §6, §13.
+- Re-audit math risolto: [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) + [`Docs/DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md).
 
 ## Aggiornamento documentazione 2026-05-29 (`570964e`)
 
 - Baseline: `main` @ `570964e`, allineato a `origin/main` dopo sync remoto (hardening Watch/iOS, motore Buhlmann, golden fixtures, reaudit).
 - Indicizzati audit in root: [`DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md), [`DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md), [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md).
-- Indicizzati in `Docs/`: [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md); aggiornato [`Docs/INDEX.md`](Docs/INDEX.md).
+- Indicizzati in `Docs/`: [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md); aggiornato [`Docs/INDEX.md`](INDEX.md).
 
 ## Aggiornamento iOS Buhlmann 2026-05-28
 
 - Implementato motore iOS-only Buhlmann ZHL-16C N2+He sotto `iOSApp/Algorithms/Buhlmann/`, integrato nel planner companion senza modificare Watch, watchOS, UI premium o branch sperimentali.
 - Supporto reference-only per Air, Nitrox, Trimix, Heliox, travel/bottom/deco gas, GF Low/High, NDL tissue-state, gas switch e stop generati da ceiling.
-- Aggiunta verifica matematica dedicata: [`Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md).
-- Hardening successivo: validazione gas sull'intero segmento respirato, separazione TTS/runtime, gas-switch dwell modellato nei tessuti, seed di stato tessutale per profili ripetitivi/reference e cross-check esterno a tolleranza larga in [`Docs/DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md).
-- Re-audit statico post-implementazione: [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) — motore non più placeholder-only; P1/P2 residui prima di claim release-hard.
+- Aggiunta verifica matematica dedicata: [`Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md).
+- Hardening successivo: validazione gas sull'intero segmento respirato, separazione TTS/runtime, gas-switch dwell modellato nei tessuti, seed di stato tessutale per profili ripetitivi/reference e cross-check esterno a tolleranza larga in [`Docs/DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md`](DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md).
+- Re-audit statico post-implementazione: [`Docs/DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) — motore non più placeholder-only; P1/P2 residui prima di claim release-hard.
 - Validazione locale eseguita in modalita Windows static analysis; build `xcodegen`/`xcodebuild` e XCTest completi restano da eseguire su macOS.
 
 ## Aggiornamento documentazione 2026-05-20 (post v9 `d962117`)
 
 - Baseline codice: v8 planner gas (`a36dc23`), v9 Watch surface images + planner sync (`d962117`).
-- Aggiunti/aggiornati: [`Docs/PRODUCT_FEATURES_IT.md`](Docs/PRODUCT_FEATURES_IT.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md), [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md`](Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md), [`Docs/PR_STATUS_20260520_POST_V9.md`](Docs/PR_STATUS_20260520_POST_V9.md), matrice CSV (righe v8/v9), README, INDEX, CHANGELOG, ROADMAP.
+- Aggiunti/aggiornati: [`Docs/PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md`](DOCUMENTATION_UPDATE_REPORT_20260520_POST_V9.md), [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260520_POST_V9.md), [`Docs/PR_STATUS_20260520_POST_V9.md`](PR_STATUS_20260520_POST_V9.md), matrice CSV (righe v8/v9), README, INDEX, CHANGELOG, ROADMAP.
 - PR #8/#9: non merge automatico; vedi report PR post-v9.
 
 ## Aggiornamento documentazione 2026-05-24 (control strategy `72fa15b`)
 
 - Aggiunta documentazione strategia controlli Watch: Crown, touch, App Intents / Action Button, tasto laterale system-controlled, haptics e navigazione sott'acqua.
-- Aggiornati README, CHANGELOG, ROADMAP, matrice feature CSV/XLSX e report [`Docs/DOCUMENTATION_UPDATE_REPORT_20260524_CONTROL_STRATEGY.md`](Docs/DOCUMENTATION_UPDATE_REPORT_20260524_CONTROL_STRATEGY.md).
+- Aggiornati README, CHANGELOG, ROADMAP, matrice feature CSV/XLSX e report [`Docs/DOCUMENTATION_UPDATE_REPORT_20260524_CONTROL_STRATEGY.md`](DOCUMENTATION_UPDATE_REPORT_20260524_CONTROL_STRATEGY.md).
 - PR #8 e #9 restano non safe-to-merge senza review manuale, build macOS e QA Diving/BUSSOLA/GPS surface-only.
 
 ## Aggiornamento documentazione e audit post-fix 2026-05-18

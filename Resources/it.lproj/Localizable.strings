@@ -351,7 +351,7 @@
 "settings.language.scope_note" = "La lingua e locale su questo Watch. Le unita si sincronizzano se accoppiati; allarmi e vibrazione no.";
 "settings.shortcuts.action_title" = "Azione / Comandi";
 "settings.shortcuts.action_subtitle" = "Mappa intent DIR DIVING in Comandi watchOS o Action Button; l'app non intercetta il tasto laterale.";
-"user_images.list.title" = "SCHERMI";
+"user_images.list.title" = "IMMAGINI";
 "user_images.item.label" = "IMG %d";
 "user_images.empty.title" = "NESSUNA IMMAGINE";
 "user_images.empty.body" = "Invia le foto dall'app iPhone per visualizzarle qui prima della discesa e durante la navigazione in superficie.";
@@ -461,8 +461,25 @@
 "user_images.a11y.row" = "Immagine %d, %@";
 "user_images.a11y.row.hint" = "Tocca due volte per aprire l'immagine";
 "user_images.a11y.detail" = "Immagine completa %d, %@";
+"user_images.a11y.detail.hint" = "Tocca due volte per schermo intero";
+"user_images.a11y.fullscreen.hint" = "Tocca due volte per chiudere";
+"user_images.delete.button" = "Elimina";
+"user_images.delete.confirm.title" = "Eliminare l'immagine?";
+"user_images.delete.confirm.message" = "Rimuove l'immagine caricata da Apple Watch.";
+"user_images.delete.confirm.action" = "Elimina";
+"user_images.delete.cancel" = "Annulla";
+"user_images.delete.a11y" = "Elimina immagine";
+"user_images.delete.hint" = "Tocca due volte per eliminare questa immagine caricata";
+"user_images.delete.error" = "Impossibile eliminare l'immagine.";
 "shortcut.error.app_unavailable" = "DIR DIVING non e pronto: apri l'app sul Watch e riprova.";
 "shortcut.error.stopwatch_reset_blocked" = "Reset cronometro bloccato: usa la conferma a schermo se il tempo e in corso.";
+"shortcut.error.legal_acceptance_required" = "Apri DIR DIVING e accetta l'onboarding legale e di sicurezza prima di usare le scorciatoie del tasto Azione.";
+"sync.trust.mismatch" = "La fiducia di sincronizzazione è cambiata. Reimposta la fiducia di abbinamento per riconnettere Apple Watch/iPhone.";
+"live.simulation_depth.badge" = "SIMULAZIONE";
+"live.simulation_depth.a11y" = "Profondità simulata attiva. Non è profondità da sensore reale.";
+"user_images.error.not_image" = "Il file non è un'immagine valida.";
+"user_images.error.dimensions" = "Dimensioni immagine troppo grandi.";
+"user_images.error.encode_failed" = "Impossibile salvare l'immagine.";
 "ascent.band.depth_range" = "%@-%@ %@";
 "ascent.band.other" = "ALTRO";
 "alarm.threshold.depth_format" = "> %@";
@@ -483,6 +500,16 @@
 /* MAIN UI remediation — semantic keys */
 
 "settings.header.title" = "IMPOSTAZIONI";
+"settings.section.safety" = "Sicurezza";
+"settings.section.units_language" = "Unità e lingua";
+"settings.section.sync" = "Sincronizzazione";
+"settings.section.hardware" = "Hardware";
+"settings.section.mission" = "Modalità missione";
+"settings.section.advanced" = "Avanzate";
+"dive.detail.gps.start_available" = "GPS inizio disponibile";
+"dive.detail.gps.end_available" = "GPS fine disponibile";
+"dive.detail.gps.coordinates_saved" = "Coordinate salvate";
+"dive.detail.gps.export_for_full" = "Esporta per coordinate complete";
 "settings.row.ascent_rate.title" = "Velocità risalita";
 "settings.row.ascent_rate.subtitle" = "Limiti m/min persistenti";
 "settings.row.alarms.title" = "Allarmi";

@@ -40,20 +40,21 @@ struct DepthSafetyBannerView: View {
                 Text(title)
                     .font(DiveUI.Typography.bannerTitle)
                     .lineLimit(3)
-                    .minimumScaleFactor(0.72)
+                    .minimumScaleFactor(0.9)
                     .fixedSize(horizontal: false, vertical: true)
             }
             if let subtitle {
                 Text(subtitle)
                     .font(DiveUI.Typography.bannerSubtitle)
                     .lineLimit(2)
-                    .minimumScaleFactor(0.72)
+                    .minimumScaleFactor(0.9)
             }
         }
         .foregroundStyle(stroke)
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 8)
-        .padding(.vertical, 6)
+        .padding(.vertical, 8)
+        .frame(minHeight: 44)
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .fill(stroke.opacity(fillOpacity))
