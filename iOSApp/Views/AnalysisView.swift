@@ -86,7 +86,6 @@ struct AnalysisView: View {
             }
             .toolbar(.hidden, for: .navigationBar)
         }
-        .dirCompanionTabRoot()
     }
 
     private var analysisHero: some View {
