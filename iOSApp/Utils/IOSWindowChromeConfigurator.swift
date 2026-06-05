@@ -9,6 +9,7 @@ enum IOSWindowChromeConfigurator {
         UITableView.appearance().backgroundColor = .clear
         UICollectionView.appearance().backgroundColor = .clear
         UIView.appearance(whenContainedInInstancesOf: [UINavigationController.self]).backgroundColor = .clear
+        UIView.appearance(whenContainedInInstancesOf: [UITabBarController.self]).backgroundColor = DIRTheme.uiKitBackground
 
         let tabBar = UITabBarAppearance()
         tabBar.configureWithOpaqueBackground()
@@ -59,13 +60,14 @@ struct IOSRootShell<Content: View>: View {
     var body: some View {
         ZStack {
             DIRBackground()
+                .ignoresSafeArea()
             content()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
             DIRBackground()
+                .ignoresSafeArea()
         }
-        .ignoresSafeArea()
         .onAppear {
             Task { @MainActor in
                 IOSWindowChromeConfigurator.applyGlobalAppearance()
@@ -136,13 +138,24 @@ extension View {
     func dirCompanionTabSlot() -> some View {
         frame(maxWidth: .infinity, maxHeight: .infinity)
             .background {
+                DIRTheme.background
+                    .ignoresSafeArea()
+            }
+            .background {
                 DIRBackground()
-                    .ignoresSafeArea(edges: [.top, .bottom])
+                    .ignoresSafeArea()
             }
     }
 
     /// Root wrapper for tab `NavigationStack` screens — fills slot and keeps scroll content top-aligned.
     func dirCompanionTabRoot() -> some View {
-        dirCompanionTabSlot()
+        ZStack(alignment: .top) {
+            DIRBackground()
+                .ignoresSafeArea()
+            self
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(DIRTheme.background.ignoresSafeArea())
     }
 }
