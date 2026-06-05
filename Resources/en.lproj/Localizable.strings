@@ -574,6 +574,10 @@
 "settings.row.haptics.title" = "Haptics";
 "settings.row.info.title" = "Info";
 "settings.row.info.subtitle" = "App, sync, device";
+"settings.diagnostics.sync.title" = "SYNC DIAGNOSTICS";
+"settings.row.sync_diagnostics.title" = "Sync diagnostics";
+"settings.row.sync_diagnostics.subtitle" = "Queue, retries, and reference info";
+"settings.section.reference" = "REFERENCE";
 "settings.row.language.title" = "Language";
 "settings.row.units.title" = "Units";
 "settings.row.units.metric" = "Metric (m)";

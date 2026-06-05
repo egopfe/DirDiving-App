@@ -922,6 +922,14 @@
 "more.settings.cns_descent_bottom_check_hint" = "Mostra un avviso quando il CNS di discesa + fondo supera il 15% del budget massimo CNS.";
 "more.settings.cns_descent_bottom_check.a11y" = "Attiva o disattiva l'avviso CNS discesa e fondo al quindici per cento nel planner.";
 "planner.result.warnings.title" = "AVVISI PIANO";
+"planner.result.warnings.blocking.title" = "PROBLEMI BLOCCANTI";
+"planner.result.warnings.caution.title" = "ATTENZIONI";
+"planner.result.dashboard.a11y" = "Dashboard riepilogo piano con TTS, runtime, stop deco, profondità, tempo fondo e CNS.";
+"planner.result.secondary_metrics.title" = "Dettagli analisi";
+"planner.result.ascent_plan.subtitle" = "Programma di risalita di riferimento dal fondo alla superficie.";
+"planner.result.ascent_table.a11y" = "Tabella risalita e decompressione con profondità, tempo, gas e PPO₂.";
+"planner.buhlmann.tissue_curve_empty.detail" = "La storia di carico tessuti viene generata dopo un calcolo deco valido.";
+"planner.buhlmann.tissue_chart.a11y.summary" = "Grafico carico tessuti Bühlmann. Picco compartimenti circa %@ percento.";
 "planner.header.reference_only.hint" = "Riferimento Bühlmann — non consiglio decompressivo certificato né comportamento di computer subacqueo in tempo reale.";
 "planner.header.no_deco.title" = "Riferimento no-deco";
 "planner.header.no_deco.message" = "Nessuna sosta decompressione in questo output di riferimento.";

@@ -59,13 +59,11 @@ struct IOSRootShell<Content: View>: View {
     var body: some View {
         ZStack {
             DIRBackground()
+                .ignoresSafeArea()
             content()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background {
-            DIRBackground()
-        }
-        .ignoresSafeArea()
         .onAppear {
             Task { @MainActor in
                 IOSWindowChromeConfigurator.applyGlobalAppearance()
@@ -134,15 +132,19 @@ extension View {
 
     /// Paints DIR chrome across the full tab slot above the tab bar on any iPhone size.
     func dirCompanionTabSlot() -> some View {
-        frame(maxWidth: .infinity, maxHeight: .infinity)
+        frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background {
                 DIRBackground()
-                    .ignoresSafeArea(edges: [.top, .bottom])
+                    .ignoresSafeArea()
             }
     }
 
     /// Root wrapper for tab `NavigationStack` screens — fills slot and keeps scroll content top-aligned.
     func dirCompanionTabRoot() -> some View {
-        dirCompanionTabSlot()
+        frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .background {
+                DIRBackground()
+                    .ignoresSafeArea()
+            }
     }
 }

@@ -85,7 +85,7 @@ struct DiveLogListView: View {
                         .font(.system(size: 12, weight: .black, design: .rounded))
                         .foregroundStyle(DiveUI.yellow)
                     Text(String(localized: "log.empty.hint"))
-                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .font(DiveUI.Typography.rowSubtitle)
                         .foregroundStyle(DiveUI.secondaryText)
                         .multilineTextAlignment(.center)
                     Text(String(localized: "log.export.unavailable"))
@@ -130,12 +130,12 @@ struct DiveLogListView: View {
             .fill(DiveUI.red.opacity(0.12))
             .overlay(
                 Text(message)
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .font(DiveUI.Typography.warningBody.weight(.bold))
                     .foregroundStyle(DiveUI.red)
                     .multilineTextAlignment(.center)
                     .padding(7)
             )
-            .frame(minHeight: 34)
+            .frame(minHeight: 44)
             .overlay(
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .stroke(DiveUI.red.opacity(0.72), lineWidth: 1)
@@ -184,19 +184,19 @@ struct DiveLogListView: View {
             if let listExportURL {
                 ShareLink(item: listExportURL) {
                     Text(String(localized: "CONDIVIDI CSV"))
-                        .font(.system(size: 10, weight: .black, design: .rounded))
+                        .font(DiveUI.Typography.commandButton)
                         .foregroundStyle(DiveUI.blue)
-                        .frame(maxWidth: .infinity, minHeight: 26)
+                        .frame(maxWidth: .infinity, minHeight: 40)
                         .background(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(DiveUI.blue.opacity(0.82), lineWidth: 1))
                 }
             } else if let listExportMessage {
                 Text(listExportMessage)
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .font(DiveUI.Typography.rowSubtitle)
                     .foregroundStyle(DiveUI.yellow)
                     .multilineTextAlignment(.center)
             } else if log.sessions.isEmpty {
                 Text(String(localized: "log.export.after_first"))
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .font(DiveUI.Typography.rowSubtitle)
                     .foregroundStyle(DiveUI.secondaryText)
                     .multilineTextAlignment(.center)
             }
@@ -259,7 +259,7 @@ struct DiveLogListView: View {
                 }
                 .padding(.horizontal, 7)
                 .padding(.vertical, 4)
-                .frame(minHeight: 36)
+                .frame(minHeight: 44)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
