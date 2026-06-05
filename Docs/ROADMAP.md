@@ -1,6 +1,6 @@
 # Roadmap DIR DIVING
 
-**Aggiornato:** 2026-05-31 (`main` = `origin/main` @ `c8f91f6`)
+**Aggiornato:** 2026-06-06 (`main` = `origin/main` @ `90dc3f5`)
 
 ## Rilasciati su `main` (Watch MAIN + iOS nel workspace)
 
@@ -65,6 +65,9 @@
 | Docs / audit alignment 2026-05-25 | ✅ | README, INDEX, safety/release docs e matrix riallineati al MAIN corrente |
 | Docs / branch / PR alignment 2026-05-26 | ✅ | README, INDEX, roadmap, current audits, branch/PR reports riallineati alla baseline MAIN attuale |
 | Docs / branch / PR alignment 2026-05-27 | ✅ | README, INDEX, roadmap, release/TestFlight notes, matrix e PR reports riallineati a `37e4464` + docs algorithm/Buhlmann |
+| Watch photo transfer ACK + lifecycle | ✅ | `fc311be` — ACK, UUID filename, transfer states, Watch staging import fix |
+| iOS Watch photo manual send + manage sheet | ✅ | `fc311be`/`90dc3f5` — non auto on pick; delete from iPhone; EN/IT labels |
+| Docs alignment 2026-06-06 | ✅ | [`DOCUMENTATION_BRANCH_ALIGNMENT_20260606.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260606.md) |
 
 ## Prossimo (MAIN, pre–App Store)
 

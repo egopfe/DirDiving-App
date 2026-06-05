@@ -5,13 +5,14 @@ struct GasMixCard: View {
     let accent: Color
     var unitPreference: IOSUnitPreference = .metric
     var plannerEnvironment: PlannerEnvironment = .seaLevelSaltWater
+    var allowedMixKinds: [GasMixKind] = GasMixKind.allCases
     var onMixChanged: (() -> Void)? = nil
 
     var body: some View {
         DIRCard(accent: accent) {
             VStack(alignment: .leading, spacing: 14) {
                 Picker("", selection: mixKindBinding) {
-                    ForEach(GasMixKind.allCases) { kind in
+                    ForEach(allowedMixKinds) { kind in
                         Text(kind.localizedTitle)
                             .tag(kind)
                             .lineLimit(1)

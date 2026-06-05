@@ -242,3 +242,18 @@ Before release claims are broadened:
 | Nil-environment Bühlmann gas pressure | Legacy `IOSUnitConversions.ambientPressureBar(depthMeters:)` | ISA sea-level saltwater constants in `BuhlmannGas` |
 
 Verified by `BuhlmannComprehensiveReadinessFixTests` and `BuhlmannConstantsTests.testSeaLevelSurfacePressureMatchesPlannerEnvironment`.
+
+## 12. Tissue History Display Metrics (2026-06-02)
+
+Visualization-only sampling in `BuhlmannTissueHistorySampler` (does not feed back into stop calculation):
+
+```text
+totalInert = PN2 + PHe (compartment)
+M = a + b * ambientPressureBar
+loadPercent_display = clamp(0, 100, (totalInert / M) * 100)
+supersaturationPercent_display = clamp(0, 100, ((totalInert - inspiredInert) / (M - inspiredInert)) * 100)
+```
+
+Grouped chart value at time `t`: **max** `loadPercent_display` among compartments in each group {1–4, 5–8, 9–12, 13–16}.
+
+Verified by `BuhlmannTissueHistoryTests` (finite values, 16 compartments, golden fixture TTS/stop stability).

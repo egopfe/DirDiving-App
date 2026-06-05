@@ -4,6 +4,19 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-06-06, documentation alignment — docs-only)
+
+- **Documentazione:** README root stub, [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260606.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260606.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260606.md`](DOCUMENTATION_UPDATE_REPORT_20260606.md), [`Docs/PR_STATUS_20260606.md`](PR_STATUS_20260606.md).
+- **Allineamento:** `Docs/README.md`, `INDEX.md`, `ROADMAP.md`, `BRANCH_AND_TARGET_ISOLATION_POLICY.md`, `ReferenceUI/README.md`, append `DIR_DIVING_Feature_Comparison.csv`.
+- **Baseline:** `main` @ `90dc3f5`; experimental isolation reaffirmed; BUSSOLA terminology preserved.
+
+### Added (2026-06-05 → 2026-06-06, Watch photo transfer + management — `fc311be`, `90dc3f5`)
+
+- **iOS:** Manual **Send to Apple Watch** (no auto-transfer on pick); **Manage Apple Watch Images** sheet with refresh/delete; localized `watch_photo.send_to_watch`, `watch_photo.manage.open`.
+- **Watch:** Synchronous staging of incoming companion photos before WCSession delegate returns (fixes deleted transfer file); ACK to iOS post-import.
+- **Sync:** Transfer lifecycle tracking, inventory poll, distinct queued vs delivered status.
+- **Documentazione:** Implementation reports 2026-06-05; INDEX remediation status updated; device QA still required on physical pair.
+
 ### Added (2026-05-31, MAIN UI/UX readiness 100% — `c8f91f6`)
 
 - **Watch MAIN UI/UX:** Live Dive scroll + compact banner stacking; legal onboarding IT/EN; Crown first-run hint; underwater navigation toast; reset stopwatch intent guard; export ShareLink; compass/images a11y; tiered battery bar; alarm/ascent i18n + imperial bands; mode selection documented.

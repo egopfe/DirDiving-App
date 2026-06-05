@@ -11,6 +11,7 @@ struct PlannerView: View {
     @State private var calculateErrorMessage = ""
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
+    private var modePresentation: PlannerResultPresentation { PlannerResultPresentation.presentation(for: store.mode) }
 
     private var plannerSafetyAcknowledged: Bool {
         plannerSafetyAckRevision == PlannerSafetyAcknowledgment.currentRevision
@@ -28,15 +29,24 @@ struct PlannerView: View {
                                 .dirScreenSubtitleStyle()
                         }
                         plannerSafetyAcknowledgment
+                        DIRWarningBox(text: String(localized: "planner.reference_only.warning"))
                         DIRWarningBox(text: String(localized: "planner.units.metric_notice"))
                         Group {
                             modePicker
                             profileCard
-                            repetitivePlanningCard
+                            if modePresentation.showsRepetitivePlanning {
+                                repetitivePlanningCard
+                            }
                             plannerCylindersCard
-                            technicalAnalysisCard
-                            reserveCard
-                            teamPreviewCard
+                            if modePresentation.showsExtendedAnalysisTiles {
+                                technicalAnalysisCard
+                            }
+                            if modePresentation.showsReserveCard {
+                                reserveCard
+                            }
+                            if modePresentation.showsTeamPreview {
+                                teamPreviewCard
+                            }
                             plannerMODInputWarnings
                             plannerWarnings
                             calculateButton
@@ -56,9 +66,6 @@ struct PlannerView: View {
                     .environmentObject(store)
             }
             .task {
-                if store.mode != .advanced {
-                    store.mode = .advanced
-                }
                 store.input.ensurePlannerCylindersFromLegacy()
                 store.refreshDerivedPlanningPreview()
             }
@@ -77,20 +84,20 @@ struct PlannerView: View {
     }
 
     private var modePicker: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 8) {
-                Image(systemName: "slider.horizontal.3")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(DIRTheme.cyan)
-                Text(String(localized: "planner.mode.advanced_only"))
-                    .font(.callout.weight(.semibold))
-                    .foregroundStyle(.white)
+        VStack(alignment: .leading, spacing: 8) {
+            Picker(String(localized: "planner.mode.header"), selection: $store.mode) {
+                ForEach(PlannerMode.allCases) { mode in
+                    Text(mode.localizedTabTitle).tag(mode)
+                }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 10)
-            .padding(.horizontal, 12)
-            .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface2.opacity(0.82)))
-            .accessibilityLabel(String(localized: "planner.mode.advanced_only"))
+            .pickerStyle(.segmented)
+            .tint(DIRTheme.cyan)
+            .accessibilityLabel(String(localized: "planner.mode.header"))
+
+            Text(store.mode.localizedDescription)
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -101,80 +108,111 @@ struct PlannerView: View {
         }
     }
 
-    /// Display-only labels for the segmented control. `PlannerMode` raw values stay unchanged for Codable persistence.
+    /// Display-only labels for legacy call sites.
     private func plannerModeTabLabel(_ mode: PlannerMode) -> String {
-        switch mode {
-        case .recreational: return String(localized: "Semplice")
-        case .advanced: return String(localized: "Avanzato")
-        case .technical: return String(localized: "Tecnico")
-        case .overhead: return String(localized: "Overhead")
-        }
+        mode.localizedTabTitle
     }
 
     private var profileCard: some View {
         DIRCard(String(localized: "planner.profile.title"), icon: nil, accent: DIRTheme.cyan) {
             VStack(spacing: 0) {
                 plannerDepthField(String(localized: "planner.field.max_depth"), meters: $store.input.plannedDepthMeters)
-                Divider().overlay(DIRTheme.hairline)
-                plannerDepthField(String(localized: "planner.field.avg_depth"), meters: $store.input.plannedAverageDepthMeters)
-                Divider().overlay(DIRTheme.hairline)
-                HStack(spacing: 8) {
-                    Text(String(localized: "planner.field.planning_reference"))
-                        .font(.callout)
-                        .foregroundStyle(.white)
-                    Button {
-                        showPlanningReferenceInfo = true
-                    } label: {
-                        Image(systemName: "info.circle")
+                if store.mode != .base {
+                    Divider().overlay(DIRTheme.hairline)
+                    plannerDepthField(String(localized: "planner.field.avg_depth"), meters: $store.input.plannedAverageDepthMeters)
+                    Divider().overlay(DIRTheme.hairline)
+                    HStack(spacing: 8) {
+                        Text(String(localized: "planner.field.planning_reference"))
                             .font(.callout)
-                            .foregroundStyle(DIRTheme.cyan)
+                            .foregroundStyle(.white)
+                        Button {
+                            showPlanningReferenceInfo = true
+                        } label: {
+                            Image(systemName: "info.circle")
+                                .font(.callout)
+                                .foregroundStyle(DIRTheme.cyan)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(String(localized: "planner.reference.info.title"))
+                        Spacer()
+                        Picker(String(localized: "planner.field.planning_reference"), selection: $store.input.planningDepthReference) {
+                            Text(String(localized: "planner.reference.max_depth")).tag(PlanningDepthReference.maximumDepth)
+                            Text(String(localized: "planner.reference.avg_depth")).tag(PlanningDepthReference.averageDepth)
+                        }
+                        .labelsHidden()
+                        .tint(DIRTheme.cyan)
+                        .onChange(of: store.input.planningDepthReference) { _, _ in
+                            store.refreshDerivedPlanningPreview()
+                        }
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(String(localized: "planner.reference.info.title"))
-                    Spacer()
-                    Picker(String(localized: "planner.field.planning_reference"), selection: $store.input.planningDepthReference) {
-                        Text(String(localized: "planner.reference.max_depth")).tag(PlanningDepthReference.maximumDepth)
-                        Text(String(localized: "planner.reference.avg_depth")).tag(PlanningDepthReference.averageDepth)
-                    }
-                    .labelsHidden()
-                    .tint(DIRTheme.cyan)
-                    .onChange(of: store.input.planningDepthReference) { _, _ in
-                        store.refreshDerivedPlanningPreview()
-                    }
+                    Text(String(localized: "planner.reference.helper"))
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+                    .padding(.vertical, 10)
                 }
-                Text(String(localized: "planner.reference.helper"))
-                    .font(.caption2)
-                    .foregroundStyle(DIRTheme.muted)
-                    .fixedSize(horizontal: false, vertical: true)
-                .padding(.vertical, 10)
                 Divider().overlay(DIRTheme.hairline)
                 plannerField(String(localized: "planner.field.bottom_time"), value: $store.input.plannedBottomMinutes, unit: "min", step: 1)
                 Divider().overlay(DIRTheme.hairline)
                 plannerTemperatureField(String(localized: "planner.field.temperature"), celsius: $store.input.waterTemperatureCelsius)
-                Divider().overlay(DIRTheme.hairline)
-                plannerDepthField(String(localized: "planner.field.altitude"), meters: $store.input.altitudeMeters, step: unitPreference == .metric ? 100 : 300)
-                Divider().overlay(DIRTheme.hairline)
-                plannerField(String(localized: "planner.field.gf_low"), value: $store.input.gfLow, unit: "%", step: 5)
-                Divider().overlay(DIRTheme.hairline)
-                plannerField(String(localized: "planner.field.gf_high"), value: $store.input.gfHigh, unit: "%", step: 5)
-                Divider().overlay(DIRTheme.hairline)
-                HStack {
-                    Text(String(localized: "planner.field.salinity"))
-                        .font(.callout)
-                        .foregroundStyle(.white)
-                    Spacer()
-                    Picker(String(localized: "planner.field.salinity"), selection: $store.input.salinity) {
-                        ForEach(SalinityMode.allCases) { mode in
-                            Text(salinityLabel(mode)).tag(mode)
+                if store.mode == .technical {
+                    Divider().overlay(DIRTheme.hairline)
+                    plannerDepthField(String(localized: "planner.field.altitude"), meters: $store.input.altitudeMeters, step: unitPreference == .metric ? 100 : 300)
+                    Divider().overlay(DIRTheme.hairline)
+                    HStack {
+                        Text(String(localized: "planner.field.salinity"))
+                            .font(.callout)
+                            .foregroundStyle(.white)
+                        Spacer()
+                        Picker(String(localized: "planner.field.salinity"), selection: $store.input.salinity) {
+                            ForEach(SalinityMode.allCases) { mode in
+                                Text(salinityLabel(mode)).tag(mode)
+                            }
                         }
+                        .labelsHidden()
+                        .tint(DIRTheme.cyan)
                     }
-                    .labelsHidden()
-                    .tint(DIRTheme.cyan)
+                    .padding(.vertical, 10)
+                    environmentStatusRow
                 }
-                .padding(.vertical, 10)
-                environmentStatusRow
+                if modePresentation.showsManualGFControls {
+                    Divider().overlay(DIRTheme.hairline)
+                    plannerField(String(localized: "planner.field.gf_low"), value: $store.input.gfLow, unit: "%", step: 5)
+                    Divider().overlay(DIRTheme.hairline)
+                    plannerField(String(localized: "planner.field.gf_high"), value: $store.input.gfHigh, unit: "%", step: 5)
+                }
+                if modePresentation.showsGFPresets {
+                    Divider().overlay(DIRTheme.hairline)
+                    gfPresetRow
+                }
             }
         }
+    }
+
+    private var gfPresetRow: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(String(localized: "planner.field.gf_preset"))
+                .font(.callout)
+                .foregroundStyle(.white)
+            Picker(String(localized: "planner.field.gf_preset"), selection: gfPresetBinding) {
+                ForEach(PlannerGFPreset.allCases) { preset in
+                    Text(preset.localizedTitle).tag(preset)
+                }
+            }
+            .pickerStyle(.segmented)
+            .tint(DIRTheme.cyan)
+        }
+        .padding(.vertical, 10)
+    }
+
+    private var gfPresetBinding: Binding<PlannerGFPreset> {
+        Binding(
+            get: { PlannerModePolicy.matchingGFPreset(for: store.input) ?? .standard },
+            set: { preset in
+                PlannerModePolicy.applyGFPreset(preset, to: &store.input)
+                store.refreshDerivedPlanningPreview()
+            }
+        )
     }
 
     private var environmentStatusRow: some View {
@@ -342,120 +380,176 @@ struct PlannerView: View {
             .joined(separator: ". ")
     }
 
+    private var visiblePlannerCylinders: [PlannerCylinderEntry] {
+        switch store.mode {
+        case .base:
+            return store.input.plannerCylinders.filter { $0.role == .bottom }
+        case .deco:
+            let bottom = store.input.plannerCylinders.filter { $0.role == .bottom }
+            let deco = store.input.plannerCylinders.filter { $0.role == .deco }.sorted { $0.switchDepthMeters > $1.switchDepthMeters }
+            return bottom + Array(deco.prefix(1))
+        case .technical:
+            return store.input.plannerCylinders
+        }
+    }
+
     private var plannerCylindersCard: some View {
         DIRCard(String(localized: "planner.card.cylinders"), icon: "fuelpump", accent: DIRTheme.cyan) {
             VStack(spacing: 12) {
-                ForEach($store.input.plannerCylinders) { $entry in
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text(String(localized: "planner.cylinder.title"))
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(DIRTheme.muted)
-                            Spacer()
-                            if store.input.plannerCylinders.count > 1 {
-                                Button(role: .destructive) {
-                                    store.input.plannerCylinders.removeAll { $0.id == entry.id }
-                                    store.input.syncLegacyGasesFromPlannerCylinders()
-                                } label: {
-                                    Text(String(localized: "planner.cylinder.remove"))
-                                        .font(.caption2.weight(.semibold))
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-                        HStack {
-                            Text(String(localized: "planner.cylinder.role"))
-                                .foregroundStyle(DIRTheme.muted)
-                            Spacer()
-                            Picker("", selection: $entry.role) {
-                                ForEach(GasRole.allCases) { role in
-                                    Text(role.localizedTitle).tag(role)
-                                }
-                            }
-                            .labelsHidden()
-                            .tint(DIRTheme.cyan)
-                        }
-                        .font(.callout)
-                        HStack {
-                            Text(String(localized: "planner.cylinder.tank_size"))
-                                .foregroundStyle(DIRTheme.muted)
-                            Spacer()
-                            Picker("", selection: $entry.tankSize) {
-                                ForEach(TankSize.allCases) { size in
-                                    Text(size.rawValue).tag(size)
-                                }
-                            }
-                            .labelsHidden()
-                            .tint(DIRTheme.cyan)
-                        }
-                        .font(.callout)
-                        Text(
-                            String(
-                                format: String(localized: "planner.mod.value_format"),
-                                Formatters.depth(entry.modMeters(environment: store.input.plannerEnvironment), units: unitPreference).text
+                ForEach(visiblePlannerCylinders) { entry in
+                    if let index = store.input.plannerCylinders.firstIndex(where: { $0.id == entry.id }) {
+                        plannerCylinderEditor(at: index)
+                    }
+                }
+                if store.mode == .deco,
+                   store.input.plannerCylinders.filter({ $0.role == .deco }).isEmpty {
+                    Button {
+                        store.input.plannerCylinders.append(
+                            PlannerCylinderEntry(
+                                role: .deco,
+                                tankSize: .liters12,
+                                gas: GasMix(name: "Deco", role: .deco, oxygen: 0.50, helium: 0, maxPPO2: 1.6)
                             )
                         )
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(DIRTheme.cyan)
-                        if entry.role != .bottom {
-                            plannerDepthField(
-                                String(localized: "planner.field.switch_depth"),
-                                meters: $entry.switchDepthMeters,
-                                step: 1
-                            )
-                        }
-                        GasMixCard(
-                            mix: $entry.gas,
-                            accent: entry.role == .bottom ? DIRTheme.green : DIRTheme.yellow,
-                            unitPreference: unitPreference,
-                            plannerEnvironment: store.input.plannerEnvironment
-                        ) {
-                            store.input.syncLegacyGasesFromPlannerCylinders()
-                            store.refreshDerivedPlanningPreview()
-                        }
-                        .onChange(of: entry.role) { _, newRole in
-                            entry.gas.role = newRole
-                            store.input.syncLegacyGasesFromPlannerCylinders()
-                            store.refreshDerivedPlanningPreview()
-                        }
-                        .onChange(of: entry.switchDepthMeters) { _, _ in
-                            store.refreshDerivedPlanningPreview()
-                        }
-                        if entry.isSwitchDepthBeyondMOD(environment: store.input.plannerEnvironment) {
-                            Text(String(localized: "planner.mod.exceeds_allowed"))
-                                .font(.caption2.weight(.semibold))
-                                .foregroundStyle(DIRTheme.red)
-                        }
+                    } label: {
+                        Text(String(localized: "planner.cylinder.add_deco"))
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(DIRTheme.cyan)
                     }
+                    .buttonStyle(.plain)
                     Divider().overlay(DIRTheme.hairline)
                 }
-                Button {
-                    store.input.plannerCylinders.append(
-                        PlannerCylinderEntry(
-                            role: .deco,
-                            tankSize: .liters12,
-                            gas: GasMix(name: "Deco", role: .deco, oxygen: 0.50, helium: 0, maxPPO2: 1.6)
-                        )
-                    )
-                } label: {
-                    Text(String(localized: "planner.cylinder.add"))
-                        .font(.callout.weight(.semibold))
-                        .foregroundStyle(DIRTheme.cyan)
+                if store.mode == .technical {
+                    addTechnicalCylinderButtons
                 }
-                .buttonStyle(.plain)
-                Divider().overlay(DIRTheme.hairline)
-                Text(String(localized: "planner.section.consumption"))
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(DIRTheme.muted)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                plannerField(String(localized: "planner.field.sac_rmv"), value: $store.input.sacLitersPerMinute, unit: "L/min", step: 1)
-                Divider().overlay(DIRTheme.hairline)
-                plannerField(String(localized: "planner.field.sac_emergency"), value: $store.input.emergencySacLitersPerMinute, unit: "L/min", step: 1)
+                if modePresentation.showsExtendedAnalysisTiles {
+                    Divider().overlay(DIRTheme.hairline)
+                    Text(String(localized: "planner.section.consumption"))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(DIRTheme.muted)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    plannerField(String(localized: "planner.field.sac_rmv"), value: $store.input.sacLitersPerMinute, unit: "L/min", step: 1)
+                    Divider().overlay(DIRTheme.hairline)
+                    plannerField(String(localized: "planner.field.sac_emergency"), value: $store.input.emergencySacLitersPerMinute, unit: "L/min", step: 1)
+                }
             }
         }
         .onChange(of: store.input.plannerCylinders) { _, _ in
             store.input.syncLegacyGasesFromPlannerCylinders()
             store.refreshDerivedPlanningPreview()
+        }
+    }
+
+    @ViewBuilder
+    private var addTechnicalCylinderButtons: some View {
+        Button {
+            store.input.plannerCylinders.append(
+                PlannerCylinderEntry(
+                    role: .deco,
+                    tankSize: .liters12,
+                    gas: GasMix(name: "Deco", role: .deco, oxygen: 0.50, helium: 0, maxPPO2: 1.6)
+                )
+            )
+        } label: {
+            Text(String(localized: "planner.cylinder.add"))
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(DIRTheme.cyan)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func plannerCylinderEditor(at index: Int) -> some View {
+        let entry = store.input.plannerCylinders[index]
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(String(localized: "planner.cylinder.title"))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.muted)
+                Spacer()
+                if store.mode == .technical, store.input.plannerCylinders.count > 1 {
+                    Button(role: .destructive) {
+                        store.input.plannerCylinders.removeAll { $0.id == entry.id }
+                        store.input.syncLegacyGasesFromPlannerCylinders()
+                    } label: {
+                        Text(String(localized: "planner.cylinder.remove"))
+                            .font(.caption2.weight(.semibold))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            if store.mode == .technical {
+                HStack {
+                    Text(String(localized: "planner.cylinder.role"))
+                        .foregroundStyle(DIRTheme.muted)
+                    Spacer()
+                    Picker("", selection: $store.input.plannerCylinders[index].role) {
+                        ForEach(GasRole.allCases) { role in
+                            Text(role.localizedTitle).tag(role)
+                        }
+                    }
+                    .labelsHidden()
+                    .tint(DIRTheme.cyan)
+                }
+                .font(.callout)
+            } else {
+                Text(entry.role.localizedTitle)
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(.white)
+            }
+            if store.mode == .technical {
+                HStack {
+                    Text(String(localized: "planner.cylinder.tank_size"))
+                        .foregroundStyle(DIRTheme.muted)
+                    Spacer()
+                    Picker("", selection: $store.input.plannerCylinders[index].tankSize) {
+                        ForEach(TankSize.allCases) { size in
+                            Text(size.rawValue).tag(size)
+                        }
+                    }
+                    .labelsHidden()
+                    .tint(DIRTheme.cyan)
+                }
+                .font(.callout)
+            }
+            Text(
+                String(
+                    format: String(localized: "planner.mod.value_format"),
+                    Formatters.depth(entry.modMeters(environment: store.input.plannerEnvironment), units: unitPreference).text
+                )
+            )
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(DIRTheme.cyan)
+            if entry.role != .bottom {
+                plannerDepthField(
+                    String(localized: "planner.field.switch_depth"),
+                    meters: $store.input.plannerCylinders[index].switchDepthMeters,
+                    step: 1
+                )
+            }
+            GasMixCard(
+                mix: $store.input.plannerCylinders[index].gas,
+                accent: entry.role == .bottom ? DIRTheme.green : DIRTheme.yellow,
+                unitPreference: unitPreference,
+                plannerEnvironment: store.input.plannerEnvironment,
+                allowedMixKinds: PlannerModePolicy.allowedMixKinds(for: store.mode)
+            ) {
+                store.input.syncLegacyGasesFromPlannerCylinders()
+                store.refreshDerivedPlanningPreview()
+            }
+            .onChange(of: store.input.plannerCylinders[index].role) { _, newRole in
+                store.input.plannerCylinders[index].gas.role = newRole
+                store.input.syncLegacyGasesFromPlannerCylinders()
+                store.refreshDerivedPlanningPreview()
+            }
+            .onChange(of: store.input.plannerCylinders[index].switchDepthMeters) { _, _ in
+                store.refreshDerivedPlanningPreview()
+            }
+            if entry.isSwitchDepthBeyondMOD(environment: store.input.plannerEnvironment) {
+                Text(String(localized: "planner.mod.exceeds_allowed"))
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(DIRTheme.red)
+            }
+            Divider().overlay(DIRTheme.hairline)
         }
     }
 
@@ -540,7 +634,7 @@ struct PlannerView: View {
     }
 
     private var liveValidation: PlannerValidationResult {
-        PlannerInputValidator.validate(store.input)
+        PlannerModePolicy.validate(draft: store.input, mode: store.mode)
     }
 
     private var canCalculatePlan: Bool {
@@ -651,7 +745,7 @@ struct PlannerView: View {
 
     private var calculateButton: some View {
         Button {
-            let validation = PlannerInputValidator.validate(store.input)
+            let validation = PlannerModePolicy.validate(draft: store.input, mode: store.mode)
             if !validation.isValid {
                 calculateErrorMessage = validation.messages.first ?? String(localized: "planner.gas.mix_invalid")
                 showCalculateError = true
@@ -811,6 +905,7 @@ struct PlanResultView: View {
     @AppStorage(PlannerCNSDescentBottomCheckSettings.storageKey) private var cnsDescentBottomCheckEnabled = PlannerCNSDescentBottomCheckSettings.defaultEnabled
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
+    private var modePresentation: PlannerResultPresentation { PlannerResultPresentation.presentation(for: store.mode) }
 
     private var cnsDescentBottomWarningActive: Bool {
         store.plan.gasAnalysis.cnsDescentBottomExceedsPlannerThreshold(checkEnabled: cnsDescentBottomCheckEnabled)
@@ -861,9 +956,17 @@ struct PlanResultView: View {
     }
     @State private var tab: PlanTab = .plan
 
+    private var availableResultTabs: [PlanTab] {
+        var tabs: [PlanTab] = [.plan]
+        if modePresentation.showsNDLCurveTab { tabs.append(.curve) }
+        if modePresentation.showsChartsTab { tabs.append(.charts) }
+        return tabs
+    }
+
     private var planShareText: String {
         var lines = [String(localized: "planner.export.header")]
-        lines.append("TTR: \(store.plan.ttrMinutes) min")
+        lines.append(String(format: String(localized: "planner.export.tts_line"), store.plan.ttsMinutes))
+        lines.append(String(format: String(localized: "planner.export.runtime_line"), store.plan.totalRuntimeMinutes))
         lines.append("NDL: \(Formatters.one(store.plan.ndlMinutes)) min")
         lines.append(
             String(
@@ -913,16 +1016,35 @@ struct PlanResultView: View {
                     switch tab {
                     case .plan:
                         resultGrid
-                        gasLedgerCard
-                        ascentTable
-                        contingencyCard
-                        teamMatchCard
-                        briefingCard
+                        if modePresentation.showsGasLedger {
+                            gasLedgerCard
+                        }
+                        if modePresentation.showsFullAscentTable || modePresentation.showsSimplifiedAscentTable {
+                            ascentTable
+                        }
+                        if let guidance = store.plan.modeGuidanceMessage {
+                            modeGuidanceCard(guidance)
+                        }
+                        if modePresentation.showsContingency {
+                            contingencyCard
+                        }
+                        if modePresentation.showsTeamMatch {
+                            teamMatchCard
+                        }
+                        if modePresentation.showsBriefing {
+                            briefingCard
+                        }
+                        if store.mode == .base {
+                            baseCompatibilitySummary
+                        }
                     case .curve:
-                        buhlmannChart
+                        buhlmannSection
                     case .charts:
+                        depthProfileChart
                         segmentTimeline
-                        gfComparisonCard
+                        if modePresentation.showsGFComparison {
+                            gfComparisonCard
+                        }
                     }
                 }
                 .padding(.horizontal, 16)
@@ -930,7 +1052,12 @@ struct PlanResultView: View {
             }
             .dirCompanionScrollSurface()
         }
-        .navigationTitle(String(localized: "planner.result.title"))
+        .onAppear {
+            if !availableResultTabs.contains(tab) {
+                tab = .plan
+            }
+        }
+        .navigationTitle(store.mode.localizedResultTitle)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -1273,7 +1400,7 @@ struct PlanResultView: View {
 
     private var resultTabs: some View {
         HStack(spacing: 0) {
-            ForEach(PlanTab.allCases) { item in
+            ForEach(availableResultTabs) { item in
                 Button {
                     tab = item
                 } label: {
@@ -1306,14 +1433,16 @@ struct PlanResultView: View {
         let endMeasurement = Formatters.depth(store.analysis.endMeters, units: unitPreference)
         return VStack(spacing: 0) {
             HStack(spacing: 0) {
-                    DIRMetricTile(title: "TTR", value: "\(store.plan.ttrMinutes)", unit: "min")
+                    DIRMetricTile(title: String(localized: "planner.metric.tts"), value: "\(store.plan.ttsMinutes)", unit: "min")
+                    Divider().overlay(DIRTheme.hairline)
+                    DIRMetricTile(title: String(localized: "planner.metric.runtime"), value: "\(store.plan.totalRuntimeMinutes)", unit: "min")
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: String(localized: "planner.result.deco_stops"), value: "\(store.plan.decoStops.count)")
-                    Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: "OTU", value: Formatters.zero(store.plan.otu))
             }
             Divider().overlay(DIRTheme.hairline)
             HStack(spacing: 0) {
+                DIRMetricTile(title: "OTU", value: Formatters.zero(store.plan.otu))
+                Divider().overlay(DIRTheme.hairline)
                 DIRMetricTile(
                     title: String(localized: "planner.result.max_depth"),
                     value: Formatters.depth(store.input.plannedDepthMeters, units: unitPreference).value,
@@ -1321,7 +1450,9 @@ struct PlanResultView: View {
                 )
                 Divider().overlay(DIRTheme.hairline)
                 DIRMetricTile(title: String(localized: "planner.result.bottom_time"), value: Formatters.zero(store.input.plannedBottomMinutes), unit: "min")
-                Divider().overlay(DIRTheme.hairline)
+            }
+            Divider().overlay(DIRTheme.hairline)
+            HStack(spacing: 0) {
                 DIRMetricTile(
                     title: String(localized: "planner.metric.cns_full_plan"),
                     value: store.plan.gasAnalysis.cnsPercentDisplay,
@@ -1412,6 +1543,15 @@ struct PlanResultView: View {
         DIRCard(String(localized: "planner.result.ascent_plan"), icon: nil, accent: DIRTheme.cyan) {
             if store.plan.calculationCompleteness == .incompletePartialStops {
                 incompleteCalculationBanner
+            } else if store.mode == .base {
+                Text(String(localized: "planner.buhlmann.hidden_in_base"))
+                    .font(.caption)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else if store.plan.ascentTableRows.isEmpty {
+                Text(String(localized: "planner.export.no_deco_stops"))
+                    .font(.caption)
+                    .foregroundStyle(DIRTheme.muted)
             } else {
                 VStack(spacing: 9) {
                     tableRow([
@@ -1420,16 +1560,53 @@ struct PlanResultView: View {
                         String(localized: "planner.table.gas"),
                         "PPO2"
                     ], isHeader: true)
-                    ForEach(store.plan.decoStops) { stop in
+                    ForEach(store.plan.ascentTableRows) { row in
                         tableRow([
-                            depthText(stop.depthMeters),
-                            "\(stop.minutes) min",
-                            stop.gas,
-                            Formatters.one(stop.ppO2)
+                            rowLabel(for: row),
+                            row.timeLabel,
+                            row.gas,
+                            row.ppO2Label
                         ])
                     }
-                    tableRow([depthText(0), "-", String(localized: "planner.table.surface"), "-"])
                 }
+            }
+        }
+    }
+
+    private func rowLabel(for row: PlannerAscentTableRow) -> String {
+        switch row.kind {
+        case .bottom:
+            return "\(row.depthLabel) · \(String(localized: "planner.ascent.row.bottom"))"
+        case .travel:
+            return "\(row.depthLabel) · \(String(localized: "planner.ascent.row.travel"))"
+        case .decoStop, .surface:
+            return row.depthLabel
+        }
+    }
+
+    private func modeGuidanceCard(_ guidance: PlannerUserFacingMessage) -> some View {
+        DIRCard(guidance.title, icon: "exclamationmark.triangle.fill", accent: DIRTheme.yellow) {
+            Text(guidance.message)
+                .font(.caption)
+                .foregroundStyle(.white)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private var baseCompatibilitySummary: some View {
+        DIRCard(String(localized: "planner.result.base.summary"), icon: "checkmark.seal", accent: DIRTheme.cyan) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 0) {
+                    DIRMetricTile(title: "MOD", value: Formatters.depth(store.analysis.endMeters, units: unitPreference).value, unit: Formatters.depth(store.analysis.endMeters, units: unitPreference).unit)
+                    Divider().overlay(DIRTheme.hairline)
+                    DIRMetricTile(title: "PPO2", value: Formatters.one(store.analysis.ppO2AtDepth), color: store.analysis.ppO2AtDepth > store.input.bottomGas.maxPPO2 ? DIRTheme.red : DIRTheme.green)
+                    Divider().overlay(DIRTheme.hairline)
+                    DIRMetricTile(title: "NDL", value: Formatters.one(store.plan.ndlMinutes), unit: "min")
+                }
+                Text(String(localized: "planner.buhlmann.hidden_in_base"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
@@ -1556,36 +1733,164 @@ struct PlanResultView: View {
         }
     }
 
-    private var buhlmannChart: some View {
+    @ViewBuilder
+    private var buhlmannSection: some View {
+        switch modePresentation.buhlmannPresentation {
+        case .hidden:
+            EmptyView()
+        case .simplifiedSummary, .fullCurve:
+            tissueLoadingChartSection(showNDLReference: modePresentation.buhlmannPresentation == .fullCurve)
+        }
+    }
+
+    private func tissueGroupLabel(_ group: String) -> String {
+        switch group {
+        case "1-4": return String(localized: "planner.buhlmann.group_1_4")
+        case "5-8": return String(localized: "planner.buhlmann.group_5_8")
+        case "9-12": return String(localized: "planner.buhlmann.group_9_12")
+        default: return String(localized: "planner.buhlmann.group_13_16")
+        }
+    }
+
+    private func tissueGroupColor(_ group: String) -> Color {
+        switch group {
+        case "1-4": return DIRTheme.cyan
+        case "5-8": return DIRTheme.green
+        case "9-12": return DIRTheme.yellow
+        default: return DIRTheme.red
+        }
+    }
+
+    @ViewBuilder
+    private func tissueLoadingChartSection(showNDLReference: Bool) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             if store.input.buhlmannUsesTrimixBackGas {
                 DIRWarningBox(text: String(localized: "planner.gas.trimix_buhlmann_disclaimer"))
             }
-            DIRCard(String(localized: "planner.buhlmann.curve_title"), icon: nil, accent: DIRTheme.cyan) {
-                Text(String(localized: "planner.buhlmann.curve_disclaimer"))
+            DIRCard(String(localized: "planner.buhlmann.tissue_curve_title"), icon: nil, accent: DIRTheme.cyan) {
+                Text(String(localized: "planner.buhlmann.tissue_curve_disclaimer"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
-                Chart(store.buhlmann.curve) { point in
+
+                if store.plan.tissueHistory.isEmpty {
+                    Text(String(localized: "planner.buhlmann.tissue_curve_empty"))
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    tissueLoadingLegend
+                    Chart(store.plan.tissueHistory.groupedPoints) { point in
+                        LineMark(
+                            x: .value(String(localized: "planner.buhlmann.axis.time"), point.elapsedMinutes),
+                            y: .value(String(localized: "planner.buhlmann.axis.load"), point.loadPercent),
+                            series: .value("Group", tissueGroupLabel(point.compartmentGroup))
+                        )
+                        .foregroundStyle(by: .value("Group", tissueGroupLabel(point.compartmentGroup)))
+                        .lineStyle(StrokeStyle(lineWidth: 2))
+                    }
+                    .chartForegroundStyleScale([
+                        tissueGroupLabel("1-4"): DIRTheme.cyan,
+                        tissueGroupLabel("5-8"): DIRTheme.green,
+                        tissueGroupLabel("9-12"): DIRTheme.yellow,
+                        tissueGroupLabel("13-16"): DIRTheme.red
+                    ])
+                    .chartXAxis {
+                        AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
+                    }
+                    .chartXAxisLabel(String(localized: "planner.buhlmann.axis.time"))
+                    .chartYAxis {
+                        AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
+                    }
+                    .chartYScale(domain: 0...100)
+                    .chartYAxisLabel(String(localized: "planner.buhlmann.axis.load"))
+                    .frame(height: 220)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(String(localized: "planner.buhlmann.tissue_chart.a11y.label"))
+                    .accessibilityHint(String(localized: "planner.buhlmann.tissue_chart.a11y.hint"))
+                }
+            }
+
+            if showNDLReference, !store.buhlmann.curve.isEmpty {
+                ndlReferenceChart
+            }
+        }
+    }
+
+    private var tissueLoadingLegend: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            ForEach(["1-4", "5-8", "9-12", "13-16"], id: \.self) { group in
+                HStack(spacing: 8) {
+                    Circle()
+                        .fill(tissueGroupColor(group))
+                        .frame(width: 8, height: 8)
+                    Text(tissueGroupLabel(group))
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.muted)
+                }
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    private var ndlReferenceChart: some View {
+        DIRCard(String(localized: "planner.buhlmann.ndl_reference_title"), icon: nil, accent: DIRTheme.cyan) {
+            Text(String(localized: "planner.buhlmann.curve_disclaimer"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+            Chart(store.buhlmann.curve) { point in
+                LineMark(
+                    x: .value(String(localized: "planner.buhlmann.axis.depth"), point.depthMeters),
+                    y: .value(String(localized: "planner.buhlmann.axis.ndl"), point.ndlMinutes)
+                )
+                .lineStyle(StrokeStyle(lineWidth: 1.5))
+                .foregroundStyle(DIRTheme.muted)
+            }
+            .chartXAxis {
+                AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
+            }
+            .chartXAxisLabel(String(localized: "planner.buhlmann.axis.depth"))
+            .chartYAxis {
+                AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
+            }
+            .chartYAxisLabel(String(localized: "planner.buhlmann.axis.ndl"))
+            .frame(height: 180)
+        }
+    }
+
+    private var depthProfileChart: some View {
+        DIRCard(String(localized: "planner.charts.depth_profile"), icon: "chart.xyaxis.line", accent: DIRTheme.cyan) {
+            if store.plan.depthProfilePoints.isEmpty {
+                Text(String(localized: "planner.charts.depth_profile_empty"))
+                    .font(.caption)
+                    .foregroundStyle(DIRTheme.muted)
+            } else {
+                Chart(store.plan.depthProfilePoints) { point in
                     LineMark(
-                        x: .value(String(localized: "planner.buhlmann.axis.depth"), point.depthMeters),
-                        y: .value(String(localized: "planner.buhlmann.axis.ndl"), point.ndlMinutes),
-                        series: .value("Compartimenti", point.compartmentGroup)
+                        x: .value(String(localized: "planner.buhlmann.axis.time"), point.elapsedMinutes),
+                        y: .value(String(localized: "planner.charts.depth_axis"), -point.depthMeters)
                     )
                     .lineStyle(StrokeStyle(lineWidth: 2))
+                    .foregroundStyle(DIRTheme.cyan)
                 }
                 .chartXAxis {
                     AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
                 }
-                .chartXAxisLabel(String(localized: "planner.buhlmann.axis.depth"))
+                .chartXAxisLabel(String(localized: "planner.buhlmann.axis.time"))
                 .chartYAxis {
-                    AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
+                    AxisMarks { value in
+                        AxisGridLine().foregroundStyle(DIRTheme.faint)
+                        AxisValueLabel {
+                            if let depth = value.as(Double.self) {
+                                Text(Formatters.one(abs(depth)))
+                            }
+                        }
+                        .foregroundStyle(DIRTheme.muted)
+                    }
                 }
-                .chartYAxisLabel(String(localized: "planner.buhlmann.axis.ndl"))
+                .chartYAxisLabel(String(localized: "planner.charts.depth_axis"))
                 .frame(height: 220)
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(String(localized: "planner.buhlmann.chart.a11y.label"))
-                .accessibilityHint(String(localized: "planner.buhlmann.chart.a11y.hint"))
             }
         }
     }

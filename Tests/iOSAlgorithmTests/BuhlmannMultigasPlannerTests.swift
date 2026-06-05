@@ -25,7 +25,7 @@ final class BuhlmannMultigasPlannerTests: XCTestCase {
         XCTAssertTrue(plan.states.contains(.nonCertifiedReference))
         XCTAssertEqual(plan.buhlmannState, .validReference)
         XCTAssertFalse(plan.decoStops.isEmpty)
-        XCTAssertGreaterThan(plan.ttrMinutes, 30)
+        XCTAssertGreaterThan(plan.ttsMinutes, 30)
     }
 
     func testPlannerMODBlockingUsesEngineGeneratedStops() {
