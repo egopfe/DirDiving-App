@@ -693,6 +693,12 @@
 "equipment.template.items_count" = "%lld items";
 "watch_photo.convert.warning" = "The image is not in the optimal format for Apple Watch. It will be automatically converted, but the conversion may make it less readable on the watch screen.";
 "watch_photo.error.convert" = "Could not convert the image for Apple Watch.";
+"watch_photo_status_queued" = "Queued for Watch";
+"watch_photo_status_sending" = "Sending to Watch";
+"watch_photo_status_delivered" = "Delivered to WatchConnectivity";
+"watch_photo_status_imported" = "Imported on Watch";
+"watch_photo_status_rejected" = "Rejected by Watch";
+"watch_photo_status_failed" = "Photo transfer failed";
 "gas.role.travel" = "Travel";
 "gas.role.bottom" = "Back Gas";
 "gas.mix.air" = "Air";

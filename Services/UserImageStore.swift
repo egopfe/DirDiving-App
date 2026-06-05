@@ -4,6 +4,10 @@ extension Notification.Name {
     static let companionPhotoDidArrive = Notification.Name("dirdiving_companion_photo_did_arrive")
 }
 
+enum UserImageStoreNotificationKeys {
+    static let fileName = "fileName"
+}
+
 @MainActor
 final class UserImageStore: ObservableObject {
     @Published private(set) var imageNames: [String] = []
@@ -70,7 +74,8 @@ final class UserImageStore: ObservableObject {
         return FileManager.default.fileExists(atPath: documentURL.path) ? documentURL.path : nil
     }
 
-    static func importCompanionPhoto(from sourceURL: URL, fileName: String) throws {
+    @discardableResult
+    static func importCompanionPhoto(from sourceURL: URL, fileName: String) throws -> String {
         guard let sanitized = sanitizedCompanionPhotoFileName(fileName) else {
             throw ImportError.invalidFileName
         }
@@ -82,18 +87,26 @@ final class UserImageStore: ObservableObject {
         let normalized: (data: Data, fileName: String)
         do {
             normalized = try WatchCompanionPhotoValidator.validateAndNormalize(data: rawData, suggestedFileName: sanitized)
-        } catch is WatchCompanionPhotoValidationError {
+        } catch let validationError as WatchCompanionPhotoValidationError {
+            throw validationError
+        } catch {
             throw ImportError.invalidImageContent
         }
         let directory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("UserImages", isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        let destination = directory.appendingPathComponent(normalized.fileName)
-        if FileManager.default.fileExists(atPath: destination.path) {
-            try FileManager.default.removeItem(at: destination)
-        }
+        let destination = CompanionPhotoImportSupport.uniqueDestinationURL(
+            in: directory,
+            preferredFileName: normalized.fileName
+        )
         try normalized.data.write(to: destination, options: [.atomic, .completeFileProtection])
-        NotificationCenter.default.post(name: .companionPhotoDidArrive, object: nil)
+        let storedFileName = destination.lastPathComponent
+        NotificationCenter.default.post(
+            name: .companionPhotoDidArrive,
+            object: nil,
+            userInfo: [UserImageStoreNotificationKeys.fileName: storedFileName]
+        )
+        return storedFileName
     }
 
     static func sanitizedCompanionPhotoFileName(_ fileName: String) -> String? {

@@ -25,6 +25,13 @@ struct UserImagesView: View {
             }
             syncDefaultSelection()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .companionPhotoDidArrive)) { notification in
+            imageStore.reload()
+            if let fileName = notification.userInfo?[UserImageStoreNotificationKeys.fileName] as? String,
+               imageStore.imageNames.contains(fileName) {
+                selectedName = fileName
+            }
+        }
     }
 
     private var imageList: some View {
@@ -241,13 +248,16 @@ struct UserImagesView: View {
         selectedName = imageStore.imageNames.first
     }
 
+    @ViewBuilder
     private func pageDots(currentIndex: Int) -> some View {
-        let count = max(imageStore.imageNames.count, 4)
-        return HStack(spacing: 5) {
-            ForEach(0..<count, id: \.self) { index in
-                Circle()
-                    .fill(index == currentIndex ? .white : .white.opacity(0.35))
-                    .frame(width: 5, height: 5)
+        let count = imageStore.imageNames.count
+        if count > 1 {
+            HStack(spacing: 5) {
+                ForEach(0..<count, id: \.self) { index in
+                    Circle()
+                        .fill(index == currentIndex ? .white : .white.opacity(0.35))
+                        .frame(width: 5, height: 5)
+                }
             }
         }
     }

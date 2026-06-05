@@ -27,7 +27,9 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published private(set) var conflicts: [SyncConflict] = []
     @Published private(set) var recentActivity: [SyncActivityItem] = []
     @Published private(set) var lastSuccessfulSyncDate: Date?
+    @Published private(set) var companionPhotoTransfer: CompanionPhotoTransferStatus?
     private weak var logStore: DiveLogStore?
+    private var photoIDByTransferFilePath: [String: String] = [:]
 
     var pendingWatchQueueCount: Int { pendingOutboundSessions.count }
     private var importedSessionIDs: Set<UUID> = []
@@ -153,27 +155,116 @@ final class WatchSyncService: NSObject, ObservableObject {
         }
     }
 
-    func sendPhotoToWatch(_ imageData: Data, fileName: String) {
+    func sendPhotoToWatch(_ imageData: Data, fileName: String, photoID: String) {
         guard WCSession.isSupported(), !imageData.isEmpty else { return }
         guard WCSession.default.isPaired, WCSession.default.isWatchAppInstalled else {
             refreshCompanionSyncAvailabilityMessage()
-            lastMessage = String(localized: "sync.watch_app_not_installed")
+            updateCompanionPhotoTransfer(
+                photoID: photoID,
+                fileName: fileName,
+                state: .failed,
+                errorMessage: String(localized: "sync.watch_app_not_installed")
+            )
             return
         }
         guard imageData.count <= Self.maxPhotoTransferBytes,
               let sanitized = Self.sanitizedPhotoFileName(fileName) else {
             failedImportCount += 1
-            lastMessage = String(localized: "Errore invio foto Watch: file non valido")
+            updateCompanionPhotoTransfer(
+                photoID: photoID,
+                fileName: fileName,
+                state: .failed,
+                errorMessage: String(localized: "Errore invio foto Watch: file non valido")
+            )
             return
         }
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent("DIRDivingPhoto_\(UUID().uuidString)_\(sanitized)")
+
+        updateCompanionPhotoTransfer(photoID: photoID, fileName: sanitized, state: .sending)
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("DIRDivingPhoto_\(photoID)_\(sanitized)")
         do {
             try imageData.write(to: url, options: [.atomic, .completeFileProtection])
-            WCSession.default.transferFile(url, metadata: [WatchSyncKeys.companionPhotoFileNameKey: sanitized])
-            lastMessage = String(localized: "Foto inviata al Watch")
+            _ = WCSession.default.transferFile(
+                url,
+                metadata: CompanionPhotoTransferSupport.makeTransferMetadata(photoID: photoID, fileName: sanitized)
+            )
+            photoIDByTransferFilePath[url.path] = photoID
+            updateCompanionPhotoTransfer(photoID: photoID, fileName: sanitized, state: .queued)
+            lastMessage = String(localized: "watch_photo_status_queued")
             recordActivity(title: String(localized: "sync.activity.photo_to_watch"), detail: sanitized)
         } catch {
-            lastMessage = String(format: String(localized: "Errore invio foto Watch: %@"), error.localizedDescription)
+            updateCompanionPhotoTransfer(
+                photoID: photoID,
+                fileName: sanitized,
+                state: .failed,
+                errorMessage: error.localizedDescription
+            )
+            lastMessage = String(localized: "watch_photo_status_failed")
+        }
+    }
+
+    private func updateCompanionPhotoTransfer(
+        photoID: String,
+        fileName: String,
+        state: CompanionPhotoTransferStatus.State,
+        errorMessage: String? = nil,
+        storedFileNameOnWatch: String? = nil,
+        rejectionErrorCode: String? = nil
+    ) {
+        if var current = companionPhotoTransfer, current.photoID == photoID {
+            current.state = state
+            current.errorMessage = errorMessage
+            if let storedFileNameOnWatch {
+                current.storedFileNameOnWatch = storedFileNameOnWatch
+            }
+            if let rejectionErrorCode {
+                current.rejectionErrorCode = rejectionErrorCode
+            }
+            companionPhotoTransfer = current
+        } else {
+            companionPhotoTransfer = CompanionPhotoTransferStatus(
+                photoID: photoID,
+                fileName: fileName,
+                state: state,
+                errorMessage: errorMessage,
+                storedFileNameOnWatch: storedFileNameOnWatch,
+                rejectionErrorCode: rejectionErrorCode
+            )
+        }
+    }
+
+    func reportCompanionPhotoFailure(message: String, fileName: String = "companion.jpg") {
+        updateCompanionPhotoTransfer(
+            photoID: UUID().uuidString,
+            fileName: fileName,
+            state: .failed,
+            errorMessage: message
+        )
+        lastMessage = String(localized: "watch_photo_status_failed")
+    }
+
+    private func handleCompanionPhotoAck(_ payload: [String: Any]) {
+        guard let ack = CompanionPhotoTransferSupport.parseCompanionPhotoAck(payload) else { return }
+        guard companionPhotoTransfer?.photoID == ack.photoID else { return }
+        var transfer = companionPhotoTransfer
+        CompanionPhotoTransferSupport.applyAck(ack, to: &transfer)
+        companionPhotoTransfer = transfer
+        guard let transfer else { return }
+        switch transfer.state {
+        case .importedOnWatch:
+            lastMessage = String(localized: "watch_photo_status_imported")
+            recordActivity(
+                title: String(localized: "sync.activity.photo_to_watch"),
+                detail: transfer.storedFileNameOnWatch ?? transfer.fileName,
+                marksSuccess: true
+            )
+        case .rejectedByWatch:
+            lastMessage = String(localized: "watch_photo_status_rejected")
+            recordActivity(
+                title: String(localized: "sync.activity.photo_to_watch"),
+                detail: transfer.rejectionErrorCode ?? transfer.fileName
+            )
+        default:
+            break
         }
     }
 
@@ -545,12 +636,21 @@ extension WatchSyncService: WCSessionDelegate {
 
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
         Task { @MainActor in
+            if CompanionPhotoTransferSupport.isCompanionPhotoAck(message) {
+                self.handleCompanionPhotoAck(message)
+                return
+            }
             _ = self.importSessionPayload(message)
         }
     }
 
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
         Task { @MainActor in
+            if CompanionPhotoTransferSupport.isCompanionPhotoAck(message) {
+                self.handleCompanionPhotoAck(message)
+                replyHandler(["status": "acknowledged"])
+                return
+            }
             let beforeFailures = self.failedImportCount
             let ackContext = self.importSessionPayload(message)
             let acknowledged = self.failedImportCount == beforeFailures
@@ -569,7 +669,34 @@ extension WatchSyncService: WCSessionDelegate {
 
     nonisolated func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
         Task { @MainActor in
+            if CompanionPhotoTransferSupport.isCompanionPhotoAck(userInfo) {
+                self.handleCompanionPhotoAck(userInfo)
+                return
+            }
             _ = self.importSessionPayload(userInfo)
+        }
+    }
+
+    nonisolated func session(_ session: WCSession, didFinish fileTransfer: WCSessionFileTransfer, error: Error?) {
+        let filePath = fileTransfer.file.fileURL.path
+        Task { @MainActor in
+            guard let photoID = self.photoIDByTransferFilePath.removeValue(forKey: filePath) else { return }
+            if let error {
+                self.updateCompanionPhotoTransfer(
+                    photoID: photoID,
+                    fileName: self.companionPhotoTransfer?.fileName ?? photoID,
+                    state: .failed,
+                    errorMessage: error.localizedDescription
+                )
+                self.lastMessage = String(localized: "watch_photo_status_failed")
+                return
+            }
+            self.updateCompanionPhotoTransfer(
+                photoID: photoID,
+                fileName: self.companionPhotoTransfer?.fileName ?? photoID,
+                state: .deliveredToConnectivity
+            )
+            self.lastMessage = String(localized: "watch_photo_status_delivered")
         }
     }
 

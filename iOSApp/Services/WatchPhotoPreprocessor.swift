@@ -42,7 +42,10 @@ enum WatchPhotoPreprocessor {
         if needsResize {
             let scale = optimalMaxDimension / maxSide
             let newSize = CGSize(width: size.width * scale, height: size.height * scale)
-            let renderer = UIGraphicsImageRenderer(size: newSize)
+            let format = UIGraphicsImageRendererFormat()
+            format.scale = 1
+            format.opaque = true
+            let renderer = UIGraphicsImageRenderer(size: newSize, format: format)
             outputImage = renderer.image { _ in
                 source.draw(in: CGRect(origin: .zero, size: newSize))
             }

@@ -313,14 +313,57 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     private func importCompanionPhoto(_ file: WCSessionFile) {
-        let fileName = (file.metadata?[WatchSyncKeys.companionPhotoFileNameKey] as? String)
+        let metadata = file.metadata ?? [:]
+        let photoID = metadata[WatchSyncKeys.companionPhotoIDKey] as? String
+        let fileName = (metadata[WatchSyncKeys.companionPhotoFileNameKey] as? String)
             ?? file.fileURL.lastPathComponent
         do {
-            try UserImageStore.importCompanionPhoto(from: file.fileURL, fileName: fileName)
+            let storedFileName = try UserImageStore.importCompanionPhoto(from: file.fileURL, fileName: fileName)
             lastSyncStatus = String(localized: "Foto iPhone ricevuta")
-            recordActivity(title: String(localized: "sync.activity.photo_from_iphone"), detail: fileName)
+            recordActivity(title: String(localized: "sync.activity.photo_from_iphone"), detail: storedFileName)
+            deliverCompanionPhotoAck(
+                photoID: photoID,
+                status: CompanionPhotoImportSupport.ackStatusImported,
+                storedFileName: storedFileName
+            )
         } catch {
-            lastSyncStatus = String(format: String(localized: "Errore foto iPhone: %@"), error.localizedDescription)
+            lastSyncStatus = String(localized: "Errore foto iPhone")
+            deliverCompanionPhotoAck(
+                photoID: photoID,
+                status: CompanionPhotoImportSupport.ackStatusRejected,
+                errorCode: CompanionPhotoImportSupport.errorCode(for: error)
+            )
+        }
+    }
+
+    private func deliverCompanionPhotoAck(
+        photoID: String?,
+        status: String,
+        storedFileName: String? = nil,
+        errorCode: String? = nil
+    ) {
+        guard let photoID, !photoID.isEmpty else { return }
+        guard WCSession.isSupported(), activationState == .activated else { return }
+
+        let payload = CompanionPhotoImportSupport.makeAckPayload(
+            photoID: photoID,
+            status: status,
+            storedFileName: storedFileName,
+            errorCode: errorCode
+        )
+        let session = WCSession.default
+        if session.isReachable {
+            session.sendMessage(payload, replyHandler: nil) { [weak self] _ in
+                Task { @MainActor in
+                    session.transferUserInfo(payload)
+                    self?.recordActivity(
+                        title: String(localized: "sync.activity.photo_from_iphone"),
+                        detail: "ack:\(status)"
+                    )
+                }
+            }
+        } else {
+            session.transferUserInfo(payload)
         }
     }
 

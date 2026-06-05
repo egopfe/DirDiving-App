@@ -45,6 +45,16 @@ Audit statico sul percorso **invio foto iPhone → Apple Watch** (`PhotosPicker`
 
 **Release recommendation:** feature **directionally correct**; non dichiarare fully verified senza QA device/simulator.
 
+### Implementazione remediation (2026-06-05)
+
+| Campo | Valore |
+|-------|--------|
+| **Documento** | [`DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md) |
+| **Percorso** | `Docs/DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md` |
+| **Stato** | Implementato su `main` — ACK Watch→iOS, lifecycle transfer iOS, UUID filename, status localizzati, dedup import, page dots, test |
+| **Build/test** | iOS + Watch build ✅; `CompanionPhotoTransferPipelineTests` 7/7; `CompanionPhotoImportSupportTests` 7/7 |
+| **QA residua** | Coppia fisica iPhone/Watch; connettività disabilitata/ripristinata; 41 / 45 / 49 mm |
+
 ---
 
 ## Aggiornamento indice 2026-06-04 - consolidamento `.md` in `Docs/`
@@ -67,6 +77,7 @@ Tutti i file Markdown che erano nella root del repository sono stati spostati in
 | [`MAIN_BRANCH_FULL_CODE_SECURITY_REMEDIATION_REPORT.md`](MAIN_BRANCH_FULL_CODE_SECURITY_REMEDIATION_REPORT.md) | `Docs/` | Report remediation security |
 | [`DIR_DIVING_SECURITY_EXPLOIT_AUDIT_AND_REMEDIATION_PLAN_20260604.md`](DIR_DIVING_SECURITY_EXPLOIT_AUDIT_AND_REMEDIATION_PLAN_20260604.md) | `Docs/` | Audit security/exploit 2026-06-04 — piano remediation P1–P3 (vedi sezione dedicata sotto) |
 | [`DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md) | `Docs/` | Audit transfer foto iOS → Watch 2026-06-05 — vedi sezione indice 2026-06-05 sopra |
+| [`DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md) | `Docs/` | Implementazione remediation transfer foto iOS → Watch 2026-06-05 — vedi sezione indice 2026-06-05 sopra |
 
 ---
 
@@ -269,7 +280,7 @@ Audit read-only su **Apple Watch MAIN** (`DIRDiving Watch App` only). Nessuna mo
 | Warning banners / safety | **P1** (testo) / P2 (layout) | `AscentWarningBannerView.swift`, `DepthSafetyLiveViews.swift`, `DiveLiveView.swift` |
 | Live Dive | P2 | `DiveLiveView.swift`, `AscentGaugeView.swift`, … |
 | Compass | P2 | `CompassView.swift` |
-| User Images | P2 | `UserImagesView.swift`, `UserImageStore.swift` — vedi anche [`DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md) |
+| User Images | P2 | `UserImagesView.swift`, `UserImageStore.swift` — vedi [`DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md) e [`DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md) |
 | Logs / Dive Detail / Export | P2 | `DiveLogListView.swift`, `DiveDetailView.swift`, `ExportView.swift` |
 | Info / diagnostics | P2 | `InfoView.swift` |
 | Legal onboarding | P2 | `WatchLegalOnboardingView.swift` |
@@ -673,7 +684,8 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 
 | Documento | Contenuto |
 |-----------|-----------|
-| [`DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md) | **Audit corrente** transfer foto iOS → Watch @ `ca76a19` (2026-06-05) — ack delivery, UX galleria |
+| [`DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_AUDIT_REPORT_20260605.md) | **Audit** transfer foto iOS → Watch @ `ca76a19` (2026-06-05) — gap ack delivery, UX galleria |
+| [`DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md) | **Implementazione** remediation transfer foto iOS → Watch (2026-06-05) — lifecycle, ACK, UUID, test |
 | [`WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md`](WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md) | Crown, Settings, App Intents, haptics (`72fa15b`) |
 | [`WATCH_MAIN_UX_CONVENTIONS.md`](WATCH_MAIN_UX_CONVENTIONS.md) | Banner risalita inline, layout Live, BUSSOLA |
 | [`MISSION_MODE_MAIN_WATCH.md`](MISSION_MODE_MAIN_WATCH.md) | Mission Mode MAIN: persistenza, attivazione/disattivazione, scope runtime e safety exclusions |
