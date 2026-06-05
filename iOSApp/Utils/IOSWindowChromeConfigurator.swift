@@ -100,12 +100,16 @@ struct DIRDisclaimerScreen<Content: View>: View {
 
     var body: some View {
         GeometryReader { geometry in
+            let metrics = IOSCompanionViewportMetrics(
+                size: geometry.size,
+                safeAreaInsets: geometry.safeAreaInsets
+            )
             DIRScreenContainer {
                 ScrollView(showsIndicators: false) {
                     content()
                         .frame(
                             maxWidth: .infinity,
-                            minHeight: geometry.size.height,
+                            minHeight: metrics.contentAreaHeight,
                             alignment: verticalLayout == .center ? .center : .top
                         )
                         .padding(.horizontal, DIRTheme.screenPadding)
@@ -114,6 +118,7 @@ struct DIRDisclaimerScreen<Content: View>: View {
                 .dirCompanionScrollSurface()
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
+            .environment(\.iosCompanionViewportMetrics, metrics)
         }
         .ignoresSafeArea()
     }
@@ -127,12 +132,17 @@ extension View {
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
-    /// Paints DIR chrome across the full tab slot above the tab bar.
+    /// Paints DIR chrome across the full tab slot above the tab bar on any iPhone size.
     func dirCompanionTabSlot() -> some View {
         frame(maxWidth: .infinity, maxHeight: .infinity)
             .background {
                 DIRBackground()
-                    .ignoresSafeArea()
+                    .ignoresSafeArea(edges: [.top, .bottom])
             }
+    }
+
+    /// Root wrapper for tab `NavigationStack` screens — fills slot and keeps scroll content top-aligned.
+    func dirCompanionTabRoot() -> some View {
+        dirCompanionTabSlot()
     }
 }

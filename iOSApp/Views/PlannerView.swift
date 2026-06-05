@@ -73,7 +73,7 @@ struct PlannerView: View {
                 Text(calculateErrorMessage)
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .dirCompanionTabRoot()
     }
 
     private var modePicker: some View {
