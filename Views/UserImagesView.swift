@@ -15,11 +15,15 @@ struct UserImagesView: View {
                 imageList
             }
         }
-        .onAppear { imageStore.reload() }
+        .onAppear {
+            imageStore.reload()
+            syncDefaultSelection()
+        }
         .onChange(of: imageStore.imageNames) { _, names in
             if let selectedName, !names.contains(selectedName) {
                 self.selectedName = nil
             }
+            syncDefaultSelection()
         }
     }
 
@@ -73,7 +77,7 @@ struct UserImagesView: View {
         let isSelected = selectedName == name || (selectedName == nil && index == 0)
         return HStack(spacing: 8) {
             thumbnail(resourceName: resourceName, index: index)
-                .frame(width: 45, height: 26)
+                .frame(width: 72, height: 42)
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(String(format: String(localized: "user_images.item.label"), index + 1))
@@ -163,60 +167,78 @@ struct UserImagesView: View {
 
     private func imageDetail(name: String, resourceName: String) -> some View {
         let index = imageIndex(for: name)
-        return VStack(spacing: 8) {
-            HStack {
-                WatchDetailBackButton {
-                    selectedName = nil
+        return GeometryReader { proxy in
+            let horizontalInset = DiveUI.screenPadding
+            let chromeHeight: CGFloat = 84
+            let imageHeight = max(150, proxy.size.height - chromeHeight)
+
+            VStack(spacing: 4) {
+                HStack {
+                    WatchDetailBackButton {
+                        selectedName = nil
+                    }
+                    Spacer()
+                    DiveClockText(size: 14)
                 }
-                Spacer()
-                DiveClockText(size: 14)
-            }
-            .padding(.horizontal, 12)
-            .padding(.top, 9)
+                .padding(.horizontal, horizontalInset)
+                .padding(.top, 6)
 
-            Text(String(format: String(localized: "user_images.item.label"), index + 1))
-                .font(.system(size: 12, weight: .black, design: .rounded))
-                .foregroundStyle(.white)
-                .lineLimit(1)
+                Text(String(format: String(localized: "user_images.item.label"), index + 1))
+                    .font(.system(size: 11, weight: .black, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
 
-            storedImage(resourceName: resourceName)
-                .scaledToFit()
-                .frame(maxWidth: .infinity, maxHeight: 168)
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .stroke(.white.opacity(0.18), lineWidth: 1)
-                )
-                .padding(.horizontal, 13)
-                .accessibilityLabel(String(format: String(localized: "user_images.a11y.detail"), index + 1, imageCaption(for: name)))
-
-            Text(shortImageCaption(for: name))
-                .font(DiveUI.Typography.rowSubtitle)
-                .foregroundStyle(.white)
-                .lineLimit(2)
-                .multilineTextAlignment(.center)
-
-            pageDots(currentIndex: index)
-
-            Spacer(minLength: 0)
-
-            Button {
-                selectedName = nil
-            } label: {
-                Text(String(localized: "user_images.list.title"))
-                    .font(DiveUI.Typography.secondaryLabel)
-                    .foregroundStyle(DiveUI.yellow)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 8)
-                    .frame(minHeight: 40)
-                    .background(
-                        Capsule()
-                            .stroke(DiveUI.yellow.opacity(0.85), lineWidth: 1)
+                storedImage(resourceName: resourceName)
+                    .scaledToFit()
+                    .frame(
+                        width: proxy.size.width - (horizontalInset * 2),
+                        height: imageHeight
                     )
+                    .layoutPriority(1)
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(.white.opacity(0.18), lineWidth: 1)
+                    )
+                    .padding(.horizontal, horizontalInset)
+                    .accessibilityLabel(String(format: String(localized: "user_images.a11y.detail"), index + 1, imageCaption(for: name)))
+
+                Text(shortImageCaption(for: name))
+                    .font(DiveUI.Typography.secondaryLabel)
+                    .foregroundStyle(DiveUI.secondaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, horizontalInset)
+
+                if imageStore.imageNames.count > 1 {
+                    pageDots(currentIndex: index)
+                }
+
+                Button {
+                    selectedName = nil
+                } label: {
+                    Text(String(localized: "user_images.list.title"))
+                        .font(DiveUI.Typography.secondaryLabel)
+                        .foregroundStyle(DiveUI.yellow)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .frame(minHeight: 34)
+                        .background(
+                            Capsule()
+                                .stroke(DiveUI.yellow.opacity(0.85), lineWidth: 1)
+                        )
+                }
+                .buttonStyle(.plain)
+                .padding(.bottom, 4)
             }
-            .buttonStyle(.plain)
-            .padding(.bottom, 6)
+            .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
         }
+    }
+
+    private func syncDefaultSelection() {
+        guard selectedName == nil, imageStore.imageNames.count == 1 else { return }
+        selectedName = imageStore.imageNames.first
     }
 
     private func pageDots(currentIndex: Int) -> some View {

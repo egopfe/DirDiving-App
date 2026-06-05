@@ -351,7 +351,7 @@
 "settings.language.scope_note" = "La lingua e locale su questo Watch. Le unita si sincronizzano se accoppiati; allarmi e vibrazione no.";
 "settings.shortcuts.action_title" = "Azione / Comandi";
 "settings.shortcuts.action_subtitle" = "Mappa intent DIR DIVING in Comandi watchOS o Action Button; l'app non intercetta il tasto laterale.";
-"user_images.list.title" = "SCHERMI";
+"user_images.list.title" = "IMMAGINI";
 "user_images.item.label" = "IMG %d";
 "user_images.empty.title" = "NESSUNA IMMAGINE";
 "user_images.empty.body" = "Invia le foto dall'app iPhone per visualizzarle qui prima della discesa e durante la navigazione in superficie.";
