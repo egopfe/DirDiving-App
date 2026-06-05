@@ -2,6 +2,18 @@
 
 This document describes the work currently living on the `codex/experimental-features` branch. These features are intentionally isolated from `main` because they are exploratory, may require hardware validation, and should not be treated as production-ready dive safety systems.
 
+## Current Branch Sync Status
+
+Latest verification before this documentation update:
+
+- `origin/main` @ `ecad0d9`
+- `origin/codex/experimental-features` @ `227bcaa`
+- `origin/codex/ios-experimental-features` @ `441fb77`
+
+`codex/experimental-features` is the canonical combined experimental branch. `codex/ios-experimental-features` is aligned for app/project code paths and keeps branch-specific iOS documentation. Apnea and Snorkeling remain experimental-only. Buddy Assist, BLE relay, peer pairing, and messaging remain lab-only and must not be promoted with an Apnea/Snorkeling-only merge.
+
+Detailed sync report: [`Docs/EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md`](EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md).
+
 ## Branch Scope
 
 The experimental branch currently contains:

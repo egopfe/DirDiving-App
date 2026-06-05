@@ -4,6 +4,12 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-06-05, experimental branch sync docs-only)
+
+- **Documentazione:** aggiunto [`Docs/EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md`](EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md) per registrare i latest remote refs verificati prima delle modifiche docs.
+- **Branch experimental:** confermati `codex/experimental-features` @ `227bcaa` e `codex/ios-experimental-features` @ `441fb77`, entrambi fast-forwardati dai rispettivi upstream.
+- **Scope:** Apnea e Snorkeling restano feature experimental; Buddy Assist / BLE messaging rimangono lab-only e fuori da MAIN.
+
 ### Added (2026-06-06, documentation alignment — docs-only)
 
 - **Documentazione:** README root stub, [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260606.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260606.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260606.md`](DOCUMENTATION_UPDATE_REPORT_20260606.md), [`Docs/PR_STATUS_20260606.md`](PR_STATUS_20260606.md).
