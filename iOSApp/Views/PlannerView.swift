@@ -48,6 +48,7 @@ struct PlannerView: View {
                     .padding(.top, 10)
                     .padding(.bottom, 18)
                 }
+                .dirCompanionScrollSurface()
             }
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(isPresented: $showPlan) {
@@ -927,6 +928,7 @@ struct PlanResultView: View {
                 .padding(.horizontal, 16)
                 .padding(.bottom, 18)
             }
+            .dirCompanionScrollSurface()
         }
         .navigationTitle(String(localized: "planner.result.title"))
         .navigationBarTitleDisplayMode(.inline)

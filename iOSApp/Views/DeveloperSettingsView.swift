@@ -34,6 +34,7 @@ struct DeveloperSettingsView: View {
                 }
                 .padding(16)
             }
+            .dirCompanionScrollSurface()
         }
         .toolbar(.hidden, for: .navigationBar)
         .alert(String(localized: "developer.sensor_source.title"), isPresented: $showAppleFallbackAlert) {
