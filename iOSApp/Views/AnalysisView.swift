@@ -82,6 +82,7 @@ struct AnalysisView: View {
                     }
                     .padding(16)
                 }
+                .dirCompanionScrollSurface()
             }
             .toolbar(.hidden, for: .navigationBar)
         }
