@@ -1,4 +1,6 @@
+import ImageIO
 import UIKit
+import UniformTypeIdentifiers
 
 enum WatchPhotoPreprocessor {
     /// Target max dimension for Watch companion reference images.
@@ -26,7 +28,7 @@ enum WatchPhotoPreprocessor {
     }
 
     static func prepareForWatch(from data: Data) throws -> Result {
-        guard let source = UIImage(data: data) else {
+        guard let source = decodeImage(data: data) else {
             throw Failure.unreadableImage
         }
         let size = source.size
@@ -40,7 +42,10 @@ enum WatchPhotoPreprocessor {
         if needsResize {
             let scale = optimalMaxDimension / maxSide
             let newSize = CGSize(width: size.width * scale, height: size.height * scale)
-            let renderer = UIGraphicsImageRenderer(size: newSize)
+            let format = UIGraphicsImageRendererFormat()
+            format.scale = 1
+            format.opaque = true
+            let renderer = UIGraphicsImageRenderer(size: newSize, format: format)
             outputImage = renderer.image { _ in
                 source.draw(in: CGRect(origin: .zero, size: newSize))
             }
@@ -48,9 +53,53 @@ enum WatchPhotoPreprocessor {
             outputImage = source
         }
 
-        guard let jpeg = outputImage.jpegData(compressionQuality: needsConversion ? 0.78 : 0.88) else {
+        let bitmap = rasterizedBitmap(outputImage)
+        guard let jpeg = jpegRepresentation(from: bitmap, quality: needsConversion ? 0.78 : 0.88) else {
             throw Failure.conversionFailed
         }
         return Result(data: jpeg, didConvert: needsConversion, conversionWarning: needsConversion)
+    }
+
+    private static func decodeImage(data: Data) -> UIImage? {
+        if let image = UIImage(data: data) {
+            return image
+        }
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let cgImage = CGImageSourceCreateImageAtIndex(source, 0, nil) else {
+            return nil
+        }
+        return UIImage(cgImage: cgImage)
+    }
+
+    private static func rasterizedBitmap(_ image: UIImage) -> UIImage {
+        let size = image.size
+        guard size.width > 0, size.height > 0 else { return image }
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = image.scale
+        format.opaque = true
+        let renderer = UIGraphicsImageRenderer(size: size, format: format)
+        return renderer.image { _ in
+            image.draw(in: CGRect(origin: .zero, size: size))
+        }
+    }
+
+    private static func jpegRepresentation(from image: UIImage, quality: CGFloat) -> Data? {
+        if let data = image.jpegData(compressionQuality: quality) {
+            return data
+        }
+        guard let cgImage = image.cgImage else { return nil }
+        let data = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(
+            data,
+            UTType.jpeg.identifier as CFString,
+            1,
+            nil
+        ) else {
+            return nil
+        }
+        let options = [kCGImageDestinationLossyCompressionQuality: quality] as CFDictionary
+        CGImageDestinationAddImage(destination, cgImage, options)
+        guard CGImageDestinationFinalize(destination) else { return nil }
+        return data as Data
     }
 }

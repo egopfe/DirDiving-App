@@ -2,12 +2,11 @@ import SwiftUI
 
 struct DiveLogListView: View {
     @EnvironmentObject private var log: DiveLogStore
+    @EnvironmentObject private var navigation: AppNavigationStore
     @EnvironmentObject private var watchSync: WatchSyncService
     @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
     @State private var listExportURL: URL?
     @State private var listExportMessage: String?
-    @State private var exportCompletionFileName: String?
-    @State private var showExportCompletion = false
     @State private var pendingDelete: DiveSession?
 
     var body: some View {
@@ -28,9 +27,6 @@ struct DiveLogListView: View {
                 .padding(.top, 9)
                 .padding(.bottom, 8)
             }
-        }
-        .navigationDestination(isPresented: $showExportCompletion) {
-            ExportView(fileName: exportCompletionFileName ?? "export.csv", exportURL: listExportURL)
         }
         .confirmationDialog(
             String(localized: "log.delete.confirm.title"),
@@ -160,8 +156,10 @@ struct DiveLogListView: View {
                 if listExportURL == nil {
                     HapticService.shared.notify()
                 } else {
-                    exportCompletionFileName = listExportURL?.lastPathComponent
-                    showExportCompletion = true
+                    navigation.presentExportCompletion(
+                        fileName: listExportURL?.lastPathComponent ?? "export.csv",
+                        exportURL: listExportURL
+                    )
                     HapticService.shared.confirm()
                 }
             } label: {
