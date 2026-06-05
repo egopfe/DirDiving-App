@@ -120,7 +120,7 @@ final class AuditRemediationTests: XCTestCase {
         let issues = BuhlmannPlanPreflightValidator.validate(request)
         XCTAssertFalse(issues.isEmpty)
         let plan = PlannerService.makePlan(input: makeGasPlanInput(from: request))
-        XCTAssertTrue(plan.buhlmannState == .invalidInput || !plan.decoStops.isEmpty || plan.ttrMinutes >= 0)
+        XCTAssertTrue(plan.buhlmannState == .invalidInput || !plan.decoStops.isEmpty || plan.ttsMinutes >= 0)
     }
 
     func testEAN50SwitchedTooDeepRejected() {

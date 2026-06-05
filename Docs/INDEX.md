@@ -1,9 +1,79 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-05
-**Branch consigliato:** `main` = `origin/main`
-**Uso:** punto di ingresso per ripartire a lavorare sul progetto.
+**Aggiornato:** 2026-06-06  
+**Branch consigliato:** `main` = `origin/main` @ `25e12d9`  
+**Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-06-06 — iOS Planner tabs (Base / Deco / Tecnico) + audit deco/Bühlmann
+
+Piano implementativo per i **tre tab modalità** del Planner iOS (non i tab risultato PIANO / CURVA BÜHLMANN / GRAFICI) e audit statico tabella risalita + curva Bühlmann vs screenshot di riferimento.
+
+| Campo | Valore |
+|-------|--------|
+| **Piano implementazione** | [`DIR_Diving_Planner_Tabs_Implementation_Plan.md`](DIR_Diving_Planner_Tabs_Implementation_Plan.md) |
+| **Percorso** | `Docs/DIR_Diving_Planner_Tabs_Implementation_Plan.md` |
+| **Commit** | `25e12d9` (`Create DIR_Diving_Planner_Tabs_Implementation_Plan.md`) |
+| **Baseline** | `main` @ `c3d1164` (audit) → `25e12d9` (piano) |
+| **Scope** | iOS Companion MAIN — `PlannerView`, `PlanResultView`, `PlannerMode`, gas/Bühlmann, export, test |
+| **Modalità piano** | Plan-only — un motore, tre livelli di esposizione UI (Base monogas / Deco fondo+1 deco / Tecnico multigas) |
+| **Audit correlato** | [`DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_AUDIT_CURRENT.md`](DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_AUDIT_CURRENT.md) @ `c3d1164` |
+
+### Obiettivo piano (executive)
+
+| Modalità | Ruolo |
+|----------|--------|
+| **Base** | Planner ricreativo monogas; output semplice; curva Bühlmann nascosta o minimale |
+| **Deco** | Fondo + max 1 deco gas; validazioni MOD/PPO₂; Bühlmann semplificato |
+| **Tecnico** | Multigas completo (travel, deco multipli, bailout, GF); curva compartimenti; colloca il Planner attuale |
+
+**Principio:** un solo `BuhlmannEngine` + `PlannerService`; tre preset via `PlannerMode` reducer — **non** tre algoritmi separati.
+
+### Mappa sezioni piano
+
+| § | Titolo | Contenuto chiave |
+|---|--------|------------------|
+| 1–3 | Obiettivo, architettura, nomenclatura | Base/Deco/Tecnico vs Semplice/Avanzato/Tecnico legacy |
+| 4 | Planner Base | Input, gas, validazioni, output, grafici |
+| 5 | Planner Deco | GF, 1 deco gas, curva semplificata |
+| 6 | Planner Tecnico | Multigas, bailout, curva compartimenti completa |
+| 7–8 | Modello dati + UI | `PlannerInput`, mode reducer, `PlannerView` |
+| 9 | `PlanResultView` | Result differenziati per modalità |
+| 10 | Curva Bühlmann | Visibilità/complessità per modalità; requisito non decorativo |
+| 11–12 | Safety copy + export | Disclaimer per modalità; share mode-aware |
+| 13–14 | Test + priorità | Fasi 1–6 implementative |
+| 15–17 | File coinvolti, acceptance, raccomandazione | `PlannerView.swift`, `PlannerStore`, l10n, XCTest |
+
+### Audit deco table / curva Bühlmann (stato attuale @ `c3d1164`)
+
+| Elemento | Verdetto audit |
+|----------|----------------|
+| Tab risultato PIANO / CURVA BÜHLMANN / GRAFICI | **Presenti** (IT localized) |
+| Tabella PIANO DI RISALITA (Prof / Tempo / Gas / PPO₂) | **Sì** — dati reali `decoStops`; manca riga fondo come nel mock |
+| Curva ZHL-L16C % vs tempo (compartimenti 1–4 … 13–16) | **No** — chart attuale = NDL vs profondità; serve estensione output algoritmo |
+| Match screenshot reference | **Partial** |
+
+**Implementazione consigliata:** seguire piano §10.4 (tissue history) + fasi 4–5 del piano tab modalità.
+
+---
+
+## Aggiornamento indice 2026-06-06 — allineamento documentazione MAIN
+
+Pass **solo documentazione** (nessuna modifica runtime). Backup: `backup/docs-alignment-20260606`.
+
+| Campo | Valore |
+|-------|--------|
+| **Report principale** | [`DOCUMENTATION_BRANCH_ALIGNMENT_20260606.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260606.md) |
+| **Changelog doc** | [`DOCUMENTATION_UPDATE_REPORT_20260606.md`](DOCUMENTATION_UPDATE_REPORT_20260606.md) |
+| **PR snapshot** | [`PR_STATUS_20260606.md`](PR_STATUS_20260606.md) |
+| **Baseline runtime** | `main` @ `90dc3f5` |
+| **Root README** | [`../README.md`](../README.md) → punta a [`README.md`](README.md) |
+
+**Architettura MAIN documentata:** Diving Watch + iOS Companion, onboarding legale, depth discouragement 35/38/40 m, banner risalita inline, GPS overlay compatto, **BUSSOLA**, sync/tombstone, App Intents / Action Button via Shortcuts, foto iPhone→Watch con ACK e gestione da iOS, Bühlmann indicative (iOS planner).
+
+**Experimental isolato:** Snorkeling, Apnea, Buddy Assist su `codex/experimental-features` e `codex/ios-experimental-features` — non target MAIN (`project.yml`).
 
 ---
 
@@ -18,7 +88,7 @@ Audit statico sul percorso **invio foto iPhone → Apple Watch** (`PhotosPicker`
 | **Data audit** | 2026-06-05 |
 | **Branch / commit auditato** | `main` @ `ca76a19` |
 | **Modalità** | Static audit, report-only |
-| **Verdetto** | Architettura core **corretta**; gap UX su conferma ricezione/import su Watch |
+| **Verdetto** | Architettura core **corretta**; gap UX remediation **implementata** @ `fc311be`/`90dc3f5` — QA device pair ancora richiesta |
 | **File chiave** | `WatchPhotoTransferPanel.swift`, `WatchPhotoPreprocessor.swift`, `WatchSyncService.swift` (iOS), `UserImageStore.swift`, `UserImagesView.swift`, `WatchCompanionPhotoValidator.swift` |
 
 ### Issues (Executive Summary)
@@ -51,7 +121,7 @@ Audit statico sul percorso **invio foto iPhone → Apple Watch** (`PhotosPicker`
 |-------|--------|
 | **Documento** | [`DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md`](DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md) |
 | **Percorso** | `Docs/DIRDIVING_WATCH_PHOTO_TRANSFER_IMPLEMENTATION_REPORT_20260605.md` |
-| **Stato** | Implementato su `main` — ACK Watch→iOS, lifecycle transfer iOS, UUID filename, status localizzati, dedup import, page dots, tap-to-fullscreen in `UserImagesView`, test |
+| **Stato** | Implementato su `main` @ `fc311be`/`90dc3f5` — ACK Watch→iOS, lifecycle transfer iOS, UUID filename, status localizzati, dedup import, page dots, tap-to-fullscreen in `UserImagesView`, **manual send**, **iOS manage/delete sheet**, Watch **staging sync** fix; test |
 | **Build/test** | iOS + Watch build ✅; `CompanionPhotoTransferPipelineTests` 7/7; `CompanionPhotoImportSupportTests` 7/7 |
 | **QA residua** | Coppia fisica iPhone/Watch; connettività disabilitata/ripristinata; 41 / 45 / 49 mm |
 
@@ -804,6 +874,8 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`DIR_DIVING_IOS_BUHLMANN_FIXTURE_SOURCES.md`](DIR_DIVING_IOS_BUHLMANN_FIXTURE_SOURCES.md) | Origine fixture golden/regression e tolleranze dichiarate |
 | [`DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md`](DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md) | Envelope di riferimento esterno per Air, Nitrox e Trimix multigas |
 | [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md) | Limiti planner reference-only |
+| [`DIR_Diving_Planner_Tabs_Implementation_Plan.md`](DIR_Diving_Planner_Tabs_Implementation_Plan.md) | **Piano implementazione** tab modalità Planner iOS Base / Deco / Tecnico @ `25e12d9` |
+| [`DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_AUDIT_CURRENT.md`](DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_AUDIT_CURRENT.md) | Audit statico tab risalita + curva Bühlmann vs reference @ `c3d1164` |
 | [`DIR_DIVING_IOS_GAS_BUHLMANN_PLANNER_IMPROVEMENT_PLAN.md`](DIR_DIVING_IOS_GAS_BUHLMANN_PLANNER_IMPROVEMENT_PLAN.md) | Piano migliorativo planner gas+Buhlmann iOS (scope, roadmap, QA) |
 | [`DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md`](DIR_DIVING_IOS_BUHLMANN_MULTIGAS_ASSESSMENT.md) | Assessment pre-implementazione ora superseded da design/fixture |
 | [`DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md`](DIR_DIVING_IOS_BUHLMANN_REAUDIT_2026-05-28.md) | Re-audit Buhlmann post golden fixtures e hardening (P1–P3 fix @ `69e69b2`) |
@@ -973,6 +1045,8 @@ Audit storici ora consolidati in `Docs/`: vedi anche **§13** — [`DIR_DIVING_W
 | [`DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md`](DIR_DIVING_IOS_BUHLMANN_REFERENCE_CROSSCHECK.md) | §6 |
 | [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md) | §6 |
 | [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md) | §6 |
+| [`DIR_Diving_Planner_Tabs_Implementation_Plan.md`](DIR_Diving_Planner_Tabs_Implementation_Plan.md) | §6, agg. 2026-06-06 |
+| [`DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_AUDIT_CURRENT.md`](DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_AUDIT_CURRENT.md) | §6, agg. 2026-06-06 |
 | `DOCUMENTATION_BRANCH_ALIGNMENT_20260517.md` … `20260525.md` | §2, §9 |
 | [`DOCUMENTATION_SYNC_REPORT_20260519.md`](DOCUMENTATION_SYNC_REPORT_20260519.md) | §2 |
 | `DOCUMENTATION_UPDATE_REPORT_20260519.md` … `20260525.md` | §9 |

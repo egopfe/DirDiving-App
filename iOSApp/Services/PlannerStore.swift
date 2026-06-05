@@ -3,7 +3,7 @@ import Combine
 
 @MainActor
 final class PlannerStore: ObservableObject {
-    @Published var mode: PlannerMode = .advanced {
+    @Published var mode: PlannerMode = .base {
         didSet { saveIfReady() }
     }
     @Published var input = GasPlanInput() {
@@ -13,7 +13,7 @@ final class PlannerStore: ObservableObject {
             applyInputToPlanningOutputs()
         }
     }
-    @Published var plan = PlannerService.makePlan(input: GasPlanInput())
+    @Published var plan = PlannerService.makePlan(input: GasPlanInput(), mode: .base)
     @Published var buhlmann = BuhlmannPlanner.plan(
         depthMeters: 40,
         bottomGas: GasMix(name: "Gas di Fondo", oxygen: 0.18, helium: 0.45, maxPPO2: 1.40)
@@ -76,6 +76,7 @@ final class PlannerStore: ObservableObject {
         }
         plan = PlannerService.makePlan(
             input: input,
+            mode: mode,
             repetitivePlanningEnabled: repetitivePlanningEnabled,
             repetitiveSnapshot: repetitivePlanningEnabled ? lastTissueSnapshot : nil,
             surfaceIntervalMinutes: surfaceIntervalMinutes

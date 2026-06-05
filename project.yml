@@ -192,7 +192,9 @@ targets:
       - iOSApp/Algorithms/Buhlmann/BuhlmannGas.swift
       - iOSApp/Algorithms/Buhlmann/BuhlmannTissueModel.swift
       - iOSApp/Algorithms/Buhlmann/BuhlmannEngine.swift
+      - iOSApp/Algorithms/Buhlmann/BuhlmannTissueHistory.swift
       - iOSApp/Algorithms/Buhlmann/BuhlmannPlanPreflightValidator.swift
+      - iOSApp/Services/PlannerAscentTableBuilder.swift
       - iOSApp/Services/BuhlmannPlanner.swift
       - iOSApp/Services/CloudSyncStore.swift
       - iOSApp/Utils/CloudBackupSettings.swift
@@ -221,6 +223,7 @@ targets:
       - iOSApp/Utils/IOSUnitConversions.swift
       - iOSApp/Utils/Formatters.swift
       - iOSApp/Utils/PlannerInputValidator.swift
+      - iOSApp/Utils/PlannerModePolicy.swift
       - iOSApp/Utils/SensorSourceMode.swift
       - iOSApp/Utils/DeveloperSettings.swift
       - iOSApp/Utils/PlannerCNSDescentBottomCheckSettings.swift

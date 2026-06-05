@@ -7,11 +7,51 @@ enum PressureUnit: String, CaseIterable, Identifiable, Codable {
 }
 
 enum PlannerMode: String, CaseIterable, Identifiable, Codable {
-    case recreational = "Ricreativa"
-    case advanced = "Avanzata"
-    case technical = "Tecnica"
-    case overhead = "Cave/Wreck"
+    case base
+    case deco
+    case technical
+
     var id: String { rawValue }
+
+    /// Persisted raw values for Codable; legacy values decode to the new three-mode model.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let raw = try container.decode(String.self)
+        switch raw {
+        case PlannerMode.base.rawValue, "Ricreativa", "recreational":
+            self = .base
+        case PlannerMode.deco.rawValue, "Avanzata", "advanced":
+            self = .deco
+        case PlannerMode.technical.rawValue, "Tecnica", "technical", "Cave/Wreck", "overhead":
+            self = .technical
+        default:
+            self = .base
+        }
+    }
+
+    var localizedTabTitle: String {
+        switch self {
+        case .base: return String(localized: "planner.mode.base")
+        case .deco: return String(localized: "planner.mode.deco")
+        case .technical: return String(localized: "planner.mode.technical")
+        }
+    }
+
+    var localizedDescription: String {
+        switch self {
+        case .base: return String(localized: "planner.mode.base.description")
+        case .deco: return String(localized: "planner.mode.deco.description")
+        case .technical: return String(localized: "planner.mode.technical.description")
+        }
+    }
+
+    var localizedResultTitle: String {
+        switch self {
+        case .base: return String(localized: "planner.result.base.title")
+        case .deco: return String(localized: "planner.result.deco.title")
+        case .technical: return String(localized: "planner.result.technical.title")
+        }
+    }
 }
 
 enum SalinityMode: String, CaseIterable, Identifiable, Codable {
