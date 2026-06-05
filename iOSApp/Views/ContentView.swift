@@ -46,15 +46,11 @@ struct ContentView: View {
             }
             .tabItem { Label("tab.more", systemImage: "gearshape.fill") }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background {
-            DIRBackground()
-        }
+        .dirCompanionTabSlot()
         .tint(DIRTheme.cyan)
         .toolbarBackground(DIRTheme.background, for: .tabBar)
         .toolbarBackground(.visible, for: .tabBar)
         .toolbarColorScheme(.dark, for: .tabBar)
-        .modifier(IOSTabScreenBackground())
         .launchCompanionDisclaimer(isPresented: $showLaunchDisclaimer)
         .onAppear {
             mountedTabs.insert(navigation.selectedTab)
@@ -74,18 +70,7 @@ struct ContentView: View {
                 Color.clear
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .dirCompanionTabSlot()
         .tag(tab)
-    }
-}
-
-/// Extends DIR chrome under the tab bar and home-indicator inset on all iPhone sizes.
-private struct IOSTabScreenBackground: ViewModifier {
-    func body(content: Content) -> some View {
-        content
-            .background {
-                DIRBackground()
-                    .ignoresSafeArea(edges: [.top, .bottom])
-            }
     }
 }

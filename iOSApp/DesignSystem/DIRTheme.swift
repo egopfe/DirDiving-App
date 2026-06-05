@@ -1,7 +1,9 @@
 import SwiftUI
+import UIKit
 
 enum DIRTheme {
     static let background = Color(red: 0.005, green: 0.018, blue: 0.030)
+    static let uiKitBackground = UIColor(red: 0.005, green: 0.018, blue: 0.030, alpha: 1)
     static let surface = Color(red: 0.020, green: 0.045, blue: 0.060)
     static let surface2 = Color(red: 0.045, green: 0.075, blue: 0.095)
     static let cyan = Color(red: 0.04, green: 0.88, blue: 0.94)
