@@ -31,10 +31,11 @@ struct DIRScreenContainer<Content: View>: View {
     }
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             DIRBackground()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             content()
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
