@@ -7,6 +7,9 @@ final class AppNavigationStore: ObservableObject {
 
     @Published var selectedPage: AppPage = .modeSelection
     @Published var underwaterNavigationToast: String?
+    @Published var exportCompletionPresented = false
+    @Published var exportCompletionFileName = "export.csv"
+    @Published var exportCompletionURL: URL?
 
     private var underwaterToastTask: Task<Void, Never>?
 
@@ -25,6 +28,12 @@ final class AppNavigationStore: ObservableObject {
            !WatchModeSelectionPreferences.hasMultipleStableModes {
             selectedPage = .live
         }
+    }
+
+    func presentExportCompletion(fileName: String, exportURL: URL?) {
+        exportCompletionFileName = fileName
+        exportCompletionURL = exportURL
+        exportCompletionPresented = true
     }
 
     func reportUnderwaterNavigationBlocked() {

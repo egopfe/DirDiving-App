@@ -351,7 +351,7 @@
 "settings.language.scope_note" = "Language is local to this Watch. Units sync when paired; alarms and haptics do not.";
 "settings.shortcuts.action_title" = "Action / Commands";
 "settings.shortcuts.action_subtitle" = "Map DIR DIVING intents in watchOS Shortcuts or Action Button; the app cannot intercept the Side Button.";
-"user_images.list.title" = "SCREENS";
+"user_images.list.title" = "IMAGES";
 "user_images.item.label" = "IMG %d";
 "user_images.empty.title" = "NO IMAGES";
 "user_images.empty.body" = "Send photos from the iPhone app to view them here before and during surface navigation.";
@@ -461,6 +461,16 @@
 "user_images.a11y.row" = "Image %d, %@";
 "user_images.a11y.row.hint" = "Double tap to view full image";
 "user_images.a11y.detail" = "Full image %d, %@";
+"user_images.a11y.detail.hint" = "Double tap for full screen";
+"user_images.a11y.fullscreen.hint" = "Double tap to close";
+"user_images.delete.button" = "Delete";
+"user_images.delete.confirm.title" = "Delete image?";
+"user_images.delete.confirm.message" = "This removes the uploaded image from Apple Watch.";
+"user_images.delete.confirm.action" = "Delete";
+"user_images.delete.cancel" = "Cancel";
+"user_images.delete.a11y" = "Delete image";
+"user_images.delete.hint" = "Double tap to delete this uploaded image";
+"user_images.delete.error" = "Could not delete image.";
 "shortcut.error.app_unavailable" = "DIR DIVING is not ready: open the app on your Watch and try again.";
 "shortcut.error.stopwatch_reset_blocked" = "Stopwatch reset blocked: use on-screen confirmation when time is running.";
 "shortcut.error.legal_acceptance_required" = "Open DIR DIVING and accept the legal and safety onboarding before using Action Button shortcuts.";

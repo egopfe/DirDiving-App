@@ -3,7 +3,11 @@ import UIKit
 
 struct UserImagesView: View {
     @EnvironmentObject private var imageStore: UserImageStore
+    @EnvironmentObject private var watchSync: WatchSyncService
     @State private var selectedName: String?
+    @State private var isFullscreenPresented = false
+    @State private var pendingDeleteName: String?
+    @State private var deleteErrorMessage: String?
 
     var body: some View {
         ZStack {
@@ -15,11 +19,56 @@ struct UserImagesView: View {
                 imageList
             }
         }
-        .onAppear { imageStore.reload() }
+        .fullScreenCover(isPresented: $isFullscreenPresented) {
+            if let selectedName, let resourceName = imageStore.imageResourceName(for: selectedName) {
+                fullscreenImage(name: selectedName, resourceName: resourceName)
+            }
+        }
+        .onAppear {
+            imageStore.reload()
+            syncDefaultSelection()
+        }
         .onChange(of: imageStore.imageNames) { _, names in
             if let selectedName, !names.contains(selectedName) {
                 self.selectedName = nil
             }
+            syncDefaultSelection()
+        }
+        .onChange(of: selectedName) { _, _ in
+            isFullscreenPresented = false
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .companionPhotoDidArrive)) { notification in
+            imageStore.reload()
+            if let fileName = notification.userInfo?[UserImageStoreNotificationKeys.fileName] as? String,
+               imageStore.imageNames.contains(fileName) {
+                selectedName = fileName
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .companionPhotoDidDelete)) { _ in
+            isFullscreenPresented = false
+            if let selectedName, !imageStore.imageNames.contains(selectedName) {
+                self.selectedName = imageStore.imageNames.first
+            }
+        }
+        .confirmationDialog(
+            String(localized: "user_images.delete.confirm.title"),
+            isPresented: Binding(
+                get: { pendingDeleteName != nil },
+                set: { if !$0 { pendingDeleteName = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "user_images.delete.confirm.action"), role: .destructive) {
+                if let pendingDeleteName {
+                    performDelete(name: pendingDeleteName)
+                }
+                pendingDeleteName = nil
+            }
+            Button(String(localized: "user_images.delete.cancel"), role: .cancel) {
+                pendingDeleteName = nil
+            }
+        } message: {
+            Text(String(localized: "user_images.delete.confirm.message"))
         }
     }
 
@@ -73,7 +122,7 @@ struct UserImagesView: View {
         let isSelected = selectedName == name || (selectedName == nil && index == 0)
         return HStack(spacing: 8) {
             thumbnail(resourceName: resourceName, index: index)
-                .frame(width: 45, height: 26)
+                .frame(width: 72, height: 42)
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(String(format: String(localized: "user_images.item.label"), index + 1))
@@ -163,69 +212,163 @@ struct UserImagesView: View {
 
     private func imageDetail(name: String, resourceName: String) -> some View {
         let index = imageIndex(for: name)
-        return VStack(spacing: 8) {
-            HStack {
-                WatchDetailBackButton {
-                    selectedName = nil
+        return GeometryReader { proxy in
+            let horizontalInset = DiveUI.screenPadding
+            let chromeHeight: CGFloat = 84
+            let imageHeight = max(150, proxy.size.height - chromeHeight)
+
+            VStack(spacing: 4) {
+                HStack {
+                    WatchDetailBackButton {
+                        selectedName = nil
+                    }
+                    Spacer()
+                    if imageStore.canDeleteImage(named: name) {
+                        Button {
+                            pendingDeleteName = name
+                        } label: {
+                            Image(systemName: "trash")
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundStyle(DiveUI.red)
+                                .frame(width: 28, height: 28)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(String(localized: "user_images.delete.a11y"))
+                        .accessibilityHint(String(localized: "user_images.delete.hint"))
+                    }
+                    DiveClockText(size: 14)
                 }
-                Spacer()
-                DiveClockText(size: 14)
-            }
-            .padding(.horizontal, 12)
-            .padding(.top, 9)
+                .padding(.horizontal, horizontalInset)
+                .padding(.top, 6)
 
-            Text(String(format: String(localized: "user_images.item.label"), index + 1))
-                .font(.system(size: 12, weight: .black, design: .rounded))
-                .foregroundStyle(.white)
-                .lineLimit(1)
+                if let deleteErrorMessage {
+                    Text(deleteErrorMessage)
+                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                        .foregroundStyle(DiveUI.red)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, horizontalInset)
+                }
 
-            storedImage(resourceName: resourceName)
-                .scaledToFit()
-                .frame(maxWidth: .infinity, maxHeight: 168)
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .stroke(.white.opacity(0.18), lineWidth: 1)
-                )
-                .padding(.horizontal, 13)
-                .accessibilityLabel(String(format: String(localized: "user_images.a11y.detail"), index + 1, imageCaption(for: name)))
+                Text(String(format: String(localized: "user_images.item.label"), index + 1))
+                    .font(.system(size: 11, weight: .black, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
 
-            Text(shortImageCaption(for: name))
-                .font(DiveUI.Typography.rowSubtitle)
-                .foregroundStyle(.white)
-                .lineLimit(2)
-                .multilineTextAlignment(.center)
-
-            pageDots(currentIndex: index)
-
-            Spacer(minLength: 0)
-
-            Button {
-                selectedName = nil
-            } label: {
-                Text(String(localized: "user_images.list.title"))
-                    .font(DiveUI.Typography.secondaryLabel)
-                    .foregroundStyle(DiveUI.yellow)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 8)
-                    .frame(minHeight: 40)
-                    .background(
-                        Capsule()
-                            .stroke(DiveUI.yellow.opacity(0.85), lineWidth: 1)
+                storedImage(resourceName: resourceName)
+                    .scaledToFit()
+                    .frame(
+                        width: proxy.size.width - (horizontalInset * 2),
+                        height: imageHeight
                     )
+                    .layoutPriority(1)
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .stroke(.white.opacity(0.18), lineWidth: 1)
+                    )
+                    .padding(.horizontal, horizontalInset)
+                    .contentShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .onTapGesture {
+                        isFullscreenPresented = true
+                    }
+                    .accessibilityLabel(String(format: String(localized: "user_images.a11y.detail"), index + 1, imageCaption(for: name)))
+                    .accessibilityHint(String(localized: "user_images.a11y.detail.hint"))
+
+                Text(shortImageCaption(for: name))
+                    .font(DiveUI.Typography.secondaryLabel)
+                    .foregroundStyle(DiveUI.secondaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, horizontalInset)
+
+                if imageStore.imageNames.count > 1 {
+                    pageDots(currentIndex: index)
+                }
+
+                Button {
+                    selectedName = nil
+                } label: {
+                    Text(String(localized: "user_images.list.title"))
+                        .font(DiveUI.Typography.secondaryLabel)
+                        .foregroundStyle(DiveUI.yellow)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .frame(minHeight: 34)
+                        .background(
+                            Capsule()
+                                .stroke(DiveUI.yellow.opacity(0.85), lineWidth: 1)
+                        )
+                }
+                .buttonStyle(.plain)
+                .padding(.bottom, 4)
             }
-            .buttonStyle(.plain)
-            .padding(.bottom, 6)
+            .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
         }
     }
 
+    private func fullscreenImage(name: String, resourceName: String) -> some View {
+        let index = imageIndex(for: name)
+        return ZStack {
+            Color.black.ignoresSafeArea()
+
+            storedImage(resourceName: resourceName)
+                .scaledToFit()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(4)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    isFullscreenPresented = false
+                }
+                .accessibilityLabel(String(format: String(localized: "user_images.a11y.detail"), index + 1, imageCaption(for: name)))
+                .accessibilityHint(String(localized: "user_images.a11y.fullscreen.hint"))
+
+            VStack {
+                HStack {
+                    WatchDetailBackButton {
+                        isFullscreenPresented = false
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal, DiveUI.screenPadding)
+                .padding(.top, 6)
+                Spacer()
+            }
+        }
+    }
+
+    private func performDelete(name: String) {
+        deleteErrorMessage = nil
+        do {
+            try imageStore.deleteImage(named: name)
+            isFullscreenPresented = false
+            watchSync.publishUploadedImageInventory()
+            if imageStore.imageNames.isEmpty {
+                selectedName = nil
+            } else if selectedName == name || selectedName == nil {
+                selectedName = imageStore.imageNames.first
+            }
+        } catch {
+            deleteErrorMessage = String(localized: "user_images.delete.error")
+        }
+    }
+
+    private func syncDefaultSelection() {
+        guard selectedName == nil, imageStore.imageNames.count == 1 else { return }
+        selectedName = imageStore.imageNames.first
+    }
+
+    @ViewBuilder
     private func pageDots(currentIndex: Int) -> some View {
-        let count = max(imageStore.imageNames.count, 4)
-        return HStack(spacing: 5) {
-            ForEach(0..<count, id: \.self) { index in
-                Circle()
-                    .fill(index == currentIndex ? .white : .white.opacity(0.35))
-                    .frame(width: 5, height: 5)
+        let count = imageStore.imageNames.count
+        if count > 1 {
+            HStack(spacing: 5) {
+                ForEach(0..<count, id: \.self) { index in
+                    Circle()
+                        .fill(index == currentIndex ? .white : .white.opacity(0.35))
+                        .frame(width: 5, height: 5)
+                }
             }
         }
     }
@@ -254,12 +397,15 @@ struct UserImagesView: View {
 
     private func storedImage(resourceName: String) -> some View {
         Group {
-            if resourceName.hasPrefix("/"), let uiImage = UIImage(contentsOfFile: resourceName) {
+            if let uiImage = WatchCompanionPhotoValidator.imageForDisplay(resourceName: resourceName) {
                 Image(uiImage: uiImage)
                     .resizable()
             } else {
-                Image(resourceName, bundle: .main)
-                    .resizable()
+                Image(systemName: "photo")
+                    .font(.system(size: 20, weight: .black))
+                    .foregroundStyle(.white.opacity(0.35))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.black.opacity(0.35))
             }
         }
     }
