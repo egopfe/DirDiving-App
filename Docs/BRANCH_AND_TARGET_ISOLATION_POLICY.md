@@ -20,6 +20,16 @@
 
 Experimental features **never** auto-merge into MAIN. UI alignment must not change Diving business logic.
 
+## Latest experimental verification (2026-06-05)
+
+| Ref | Commit | Status |
+|-----|--------|--------|
+| `origin/main` | `ecad0d9` | Latest MAIN baseline fetched before docs update |
+| `origin/codex/experimental-features` | `227bcaa` | Local worktree fast-forwarded before docs update |
+| `origin/codex/ios-experimental-features` | `441fb77` | Local worktree fast-forwarded before docs update |
+
+Apnea and Snorkeling remain isolated to experimental branches. Buddy Assist, peer pairing, BLE relay, and messaging remain lab-only experimental surfaces and must not ride along with an Apnea/Snorkeling-only promotion.
+
 ## MAIN target set
 
 - `DIRDiving Watch App`
@@ -72,3 +82,4 @@ Never overwrite: **BUSSOLA** terminology, inline warning strategy, depth-limit p
 
 - [`Docs/README.md`](README.md) — Branch Strategy
 - [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260606.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260606.md)
+- [`Docs/EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md`](EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md)
