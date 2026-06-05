@@ -63,6 +63,12 @@ final class ExplorationStore: ObservableObject {
             : "LAST FIX"
     }
 
+    var hasSnorkelingPosition: Bool { currentPosition != nil }
+    var hasSnorkelingEntryPoint: Bool { snorkelingEntryPoint != nil }
+    var isSnorkelingSessionActive: Bool {
+        snorkelingState == .active || snorkelingState == .navigation || snorkelingState == .returnMode
+    }
+
     init() {
         if let state = cloudSync.load(ExplorationState.self, forKey: cloudKey) {
             selectedMode = state.selectedMode
@@ -90,7 +96,7 @@ final class ExplorationStore: ObservableObject {
 
     func startSnorkeling(entryPoint: GPSPoint?) {
         snorkelingState = .active
-        snorkelingWarning = nil
+        snorkelingWarning = entryPoint == nil ? "GPS NON DISPONIBILE - ENTRY PENDING" : nil
         snorkelingStartedAt = Date()
         snorkelingLastSampleAt = snorkelingStartedAt
         snorkelingDistanceMeters = 0
@@ -100,6 +106,21 @@ final class ExplorationStore: ObservableObject {
         entryDistanceMeters = 0
         refreshNavigationMetrics()
         saveIfReady()
+    }
+
+    func startSnorkelingIfNeeded(entryPoint: GPSPoint?) {
+        guard !isSnorkelingSessionActive else {
+            if let entryPoint, currentPosition == nil {
+                currentPosition = entryPoint
+                if snorkelingEntryPoint == nil {
+                    snorkelingEntryPoint = entryPoint
+                }
+                refreshNavigationMetrics()
+                saveIfReady()
+            }
+            return
+        }
+        startSnorkeling(entryPoint: entryPoint)
     }
 
     func updateSnorkelingProgress(speedMetersPerSecond: Double, currentPoint: GPSPoint?) {
@@ -158,12 +179,18 @@ final class ExplorationStore: ObservableObject {
 
     func endSnorkeling() {
         snorkelingState = .ended
+        snorkelingWarning = nil
         snorkelingStartedAt = nil
         snorkelingLastSampleAt = nil
         snorkelingLastSpeedMetersPerSecond = 0
         snorkelingEntryPoint = nil
         currentPosition = nil
         entryDistanceMeters = 0
+        saveIfReady()
+    }
+
+    func updateSnorkelingWarning(_ warning: String?) {
+        snorkelingWarning = warning
         saveIfReady()
     }
 
@@ -181,16 +208,29 @@ final class ExplorationStore: ObservableObject {
         saveIfReady()
     }
 
-    func saveMarker(gpsPoint: GPSPoint?, depthMeters: Double, bearingDegrees: Double) {
+    @discardableResult
+    func saveMarker(gpsPoint: GPSPoint?, depthMeters: Double, temperatureCelsius: Double?, bearingDegrees: Double) -> GPSInterestMarker {
+        let sessionID = snorkelingStartedAt.map { "snorkeling-\(Int($0.timeIntervalSince1970))" }
         let marker = GPSInterestMarker(
             category: currentMarkerCategory,
             latitude: gpsPoint?.latitude,
             longitude: gpsPoint?.longitude,
             depthMeters: depthMeters,
+            temperatureCelsius: temperatureCelsius,
             distanceFromEntryMeters: entryDistanceMeters,
-            bearingDegrees: bearingDegrees
+            bearingDegrees: bearingDegrees,
+            activeWaypointName: activeWaypoint.name,
+            sessionID: sessionID,
+            isEnriched: false
         )
         markers.insert(marker, at: 0)
+        snorkelingWarning = gpsPoint == nil ? "GPS NON DISPONIBILE" : nil
+        saveIfReady()
+        return marker
+    }
+
+    func deleteMarker(id: UUID) {
+        markers.removeAll { $0.id == id }
         saveIfReady()
     }
 
@@ -225,18 +265,17 @@ final class ExplorationStore: ObservableObject {
         saveIfReady()
     }
 
-    func surfaceFromApnea(maxDepthMeters: Double) {
+    @discardableResult
+    func surfaceFromApnea(maxDepthMeters: Double) -> ApneaDiveRecord {
         stopApneaTimers()
         let diveDuration = currentApneaSeconds
         let requiredRecovery = max(diveDuration * 2, 30)
-        apneaDives.insert(
-            ApneaDiveRecord(
-                durationSeconds: diveDuration,
-                maxDepthMeters: maxDepthMeters,
-                recoverySeconds: requiredRecovery
-            ),
-            at: 0
+        let record = ApneaDiveRecord(
+            durationSeconds: diveDuration,
+            maxDepthMeters: maxDepthMeters,
+            recoverySeconds: requiredRecovery
         )
+        apneaDives.insert(record, at: 0)
         recoverySeconds = requiredRecovery
         apneaState = .surface
         apneaWarning = nil
@@ -254,6 +293,7 @@ final class ExplorationStore: ObservableObject {
             }
         }
         saveIfReady()
+        return record
     }
 
     private func stopApneaTimers() {

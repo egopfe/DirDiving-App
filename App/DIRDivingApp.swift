@@ -10,6 +10,8 @@ struct DIRDivingApp: App {
     @StateObject private var ascentSettings: AscentRateSettingsStore
     @StateObject private var navigationStore: AppNavigationStore
     @StateObject private var watchSync: WatchSyncService
+    @StateObject private var explorationStore: ExplorationStore
+    @StateObject private var buddyAssist: BuddyAssistService
     @StateObject private var legalAcceptance = LegalAcceptanceStore()
     @AppStorage(DIRAppLanguage.storageKey) private var appLanguage = DIRAppLanguage.system.rawValue
 
@@ -26,6 +28,8 @@ struct DIRDivingApp: App {
         _ascentSettings = StateObject(wrappedValue: ascentSettings)
         _navigationStore = StateObject(wrappedValue: navigationStore)
         _watchSync = StateObject(wrappedValue: WatchSyncService.shared)
+        _explorationStore = StateObject(wrappedValue: ExplorationStore())
+        _buddyAssist = StateObject(wrappedValue: BuddyAssistService())
         WatchSyncService.shared.attachLogStore(logStore)
         SensorSourceMode.applyReleaseSafeMigrationIfNeeded()
     }
@@ -57,6 +61,8 @@ struct DIRDivingApp: App {
             .environmentObject(ascentSettings)
             .environmentObject(navigationStore)
             .environmentObject(watchSync)
+            .environmentObject(explorationStore)
+            .environmentObject(buddyAssist)
             .environmentObject(legalAcceptance)
             .environment(\.locale, DIRAppLanguage.fromStorage(appLanguage).locale)
         }
