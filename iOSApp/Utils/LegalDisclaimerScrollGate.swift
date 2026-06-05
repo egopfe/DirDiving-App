@@ -24,44 +24,61 @@ private struct DisclaimerBottomMaxYKey: PreferenceKey {
 /// Enables accept when disclaimer fits the viewport or the user scrolls to the end.
 struct LegalDisclaimerScrollGate<Content: View>: View {
     @Binding var reachedBottom: Bool
-    let maxHeight: CGFloat
+    var maxHeight: CGFloat?
+    var heightFraction: CGFloat = 0.46
     @ViewBuilder let content: () -> Content
 
     @State private var contentHeight: CGFloat = 0
     @State private var viewportHeight: CGFloat = 0
     @State private var bottomMaxY: CGFloat = .greatestFiniteMagnitude
 
+    init(
+        reachedBottom: Binding<Bool>,
+        maxHeight: CGFloat? = nil,
+        heightFraction: CGFloat = 0.46,
+        @ViewBuilder content: @escaping () -> Content
+    ) {
+        _reachedBottom = reachedBottom
+        self.maxHeight = maxHeight
+        self.heightFraction = heightFraction
+        self.content = content
+    }
+
     var body: some View {
-        ScrollView(showsIndicators: true) {
-            VStack(alignment: .leading, spacing: 0) {
-                content()
-                Color.clear
-                    .frame(height: 1)
-                    .background(
-                        GeometryReader { geo in
-                            Color.clear.preference(
-                                key: DisclaimerBottomMaxYKey.self,
-                                value: geo.frame(in: .named("legalDisclaimerScroll")).maxY
-                            )
-                        }
-                    )
+        GeometryReader { outer in
+            let resolvedMaxHeight = maxHeight ?? max(200, outer.size.height * heightFraction)
+            ScrollView(showsIndicators: true) {
+                VStack(alignment: .leading, spacing: 0) {
+                    content()
+                    Color.clear
+                        .frame(height: 1)
+                        .background(
+                            GeometryReader { geo in
+                                Color.clear.preference(
+                                    key: DisclaimerBottomMaxYKey.self,
+                                    value: geo.frame(in: .named("legalDisclaimerScroll")).maxY
+                                )
+                            }
+                        )
+                }
+                .background(
+                    GeometryReader { geo in
+                        Color.clear.preference(key: DisclaimerContentHeightKey.self, value: geo.size.height)
+                    }
+                )
             }
+            .coordinateSpace(name: "legalDisclaimerScroll")
+            .frame(maxHeight: resolvedMaxHeight)
             .background(
                 GeometryReader { geo in
-                    Color.clear.preference(key: DisclaimerContentHeightKey.self, value: geo.size.height)
+                    Color.clear.preference(key: DisclaimerViewportHeightKey.self, value: geo.size.height)
                 }
             )
+            .onPreferenceChange(DisclaimerContentHeightKey.self) { contentHeight = $0; evaluate() }
+            .onPreferenceChange(DisclaimerViewportHeightKey.self) { viewportHeight = $0; evaluate() }
+            .onPreferenceChange(DisclaimerBottomMaxYKey.self) { bottomMaxY = $0; evaluate() }
         }
-        .coordinateSpace(name: "legalDisclaimerScroll")
-        .frame(maxHeight: maxHeight)
-        .background(
-            GeometryReader { geo in
-                Color.clear.preference(key: DisclaimerViewportHeightKey.self, value: geo.size.height)
-            }
-        )
-        .onPreferenceChange(DisclaimerContentHeightKey.self) { contentHeight = $0; evaluate() }
-        .onPreferenceChange(DisclaimerViewportHeightKey.self) { viewportHeight = $0; evaluate() }
-        .onPreferenceChange(DisclaimerBottomMaxYKey.self) { bottomMaxY = $0; evaluate() }
+        .frame(minHeight: 180)
     }
 
     private func evaluate() {
