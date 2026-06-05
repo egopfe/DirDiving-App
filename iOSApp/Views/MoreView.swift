@@ -196,7 +196,6 @@ struct MoreView: View {
                 Text(String(localized: "more.sync.reset_pairing_message"))
             }
         }
-        .dirCompanionTabRoot()
     }
 
     private var formattedWatchLastSuccess: String {
