@@ -24,6 +24,7 @@ struct ExplorationCenterView: View {
                     .padding(.top, 10)
                     .padding(.bottom, 22)
                 }
+                .dirCompanionScrollSurface()
             }
             .toolbar(.hidden, for: .navigationBar)
         }
