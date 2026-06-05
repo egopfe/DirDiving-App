@@ -18,8 +18,7 @@ struct PlannerView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                DIRBackground()
+            DIRScreenContainer {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         VStack(alignment: .leading, spacing: 7) {
@@ -73,6 +72,7 @@ struct PlannerView: View {
                 Text(calculateErrorMessage)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var modePicker: some View {
@@ -901,8 +901,7 @@ struct PlanResultView: View {
     }
 
     var body: some View {
-        ZStack {
-            DIRBackground()
+        DIRScreenContainer {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
                     resultHeaderBadge

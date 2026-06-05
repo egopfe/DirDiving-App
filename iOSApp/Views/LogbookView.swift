@@ -61,8 +61,7 @@ struct LogbookView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                Color.black.ignoresSafeArea()
+            DIRScreenContainer {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 12) {
                         header
@@ -127,6 +126,7 @@ struct LogbookView: View {
                 Text(String(localized: "logbook.delete.confirm.message"))
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var csvImportSection: some View {

@@ -22,28 +22,33 @@ struct DIRDivingiOSApp: App {
 
     var body: some Scene {
         WindowGroup {
-            Group {
-                if legalAcceptance.requiresAcceptance {
-                    IOSLegalOnboardingView(
-                        languageCode: DIRIOSAppLanguage.fromStorage(appLanguage).resolvedLanguageCode
-                    )
-                } else {
-                    ContentView()
+            ZStack {
+                DIRBackground()
+                Group {
+                    if legalAcceptance.requiresAcceptance {
+                        IOSLegalOnboardingView(
+                            languageCode: DIRIOSAppLanguage.fromStorage(appLanguage).resolvedLanguageCode
+                        )
+                    } else {
+                        ContentView()
+                    }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-                .environmentObject(logStore)
-                .environmentObject(watchSync)
-                .environmentObject(plannerStore)
-                .environmentObject(equipmentStore)
-                .environmentObject(cloudSync)
-                .environmentObject(navigationStore)
-                .environmentObject(legalAcceptance)
-                .environment(\.locale, DIRIOSAppLanguage.fromStorage(appLanguage).locale)
-                .preferredColorScheme(.dark)
-                .task {
-                    logStore.attachWatchSync(watchSync)
-                    watchSync.activate(logStore: logStore)
-                }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .environmentObject(logStore)
+            .environmentObject(watchSync)
+            .environmentObject(plannerStore)
+            .environmentObject(equipmentStore)
+            .environmentObject(cloudSync)
+            .environmentObject(navigationStore)
+            .environmentObject(legalAcceptance)
+            .environment(\.locale, DIRIOSAppLanguage.fromStorage(appLanguage).locale)
+            .preferredColorScheme(.dark)
+            .task {
+                logStore.attachWatchSync(watchSync)
+                watchSync.activate(logStore: logStore)
+            }
         }
     }
 }
