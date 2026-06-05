@@ -16,8 +16,7 @@ struct EquipmentTemplateEditorView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                DIRBackground()
+            DIRScreenContainer {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 14) {
                         DIRCard(String(localized: "equipment.template.edit"), icon: "pencil", accent: DIRTheme.cyan) {
@@ -67,6 +66,7 @@ struct EquipmentTemplateEditorView: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func save() {

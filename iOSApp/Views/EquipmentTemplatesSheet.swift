@@ -8,8 +8,7 @@ struct EquipmentTemplatesSheet: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                DIRBackground()
+            DIRScreenContainer {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 14) {
                         ForEach(equipment.templates) { template in
@@ -71,5 +70,6 @@ struct EquipmentTemplatesSheet: View {
                     .environmentObject(equipment)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

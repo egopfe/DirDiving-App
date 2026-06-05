@@ -26,9 +26,7 @@ struct IOSLegalOnboardingView: View {
     }
 
     var body: some View {
-        ZStack {
-            DIRBackground()
-
+        DIRScreenContainer {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 18) {
                     hero
@@ -265,9 +263,7 @@ struct IOSLegalSafetyView: View {
     }
 
     var body: some View {
-        ZStack {
-            DIRBackground()
-
+        DIRScreenContainer {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading, spacing: 6) {

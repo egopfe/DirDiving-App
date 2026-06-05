@@ -6,8 +6,7 @@ struct ExplorationCenterView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                DIRBackground()
+            DIRScreenContainer {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         header
@@ -28,6 +27,7 @@ struct ExplorationCenterView: View {
             }
             .toolbar(.hidden, for: .navigationBar)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var header: some View {
