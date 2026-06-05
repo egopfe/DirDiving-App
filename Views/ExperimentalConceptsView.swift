@@ -66,9 +66,9 @@ private struct ExperimentalExplorationOverview: View {
 private struct ExperimentalUnderwaterCompassConcept: View {
     var body: some View {
         VStack(spacing: 8) {
-            // TODO: Connect this underwater compass concept only after sensor and bearing scope is approved.
+            // TODO Watch experimental: connect this underwater BUSSOLA concept only after sensor and bearing scope is approved.
             conceptScreen(
-                title: "UNDERWATER COMPASS",
+                title: "BUSSOLA SUB",
                 subtitle: "High-contrast visual heading concept",
                 symbol: "safari.fill",
                 color: DiveUI.cyan

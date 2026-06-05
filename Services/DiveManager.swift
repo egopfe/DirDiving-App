@@ -99,6 +99,8 @@ final class DiveManager: ObservableObject {
     @Published var isDepthAutomationAvailable = false
     @Published var developerSensorSourceWarning: String?
     @Published private(set) var isSimulationDepthActive = false
+    /// Experimental Apnea/Snorkeling surfaces use this legacy name for sensor availability.
+    var isDepthSensorAvailable: Bool { isDepthAutomationAvailable }
     @Published var isManualLifecycleActive = false
     @Published private(set) var isMissionModeActive = false
     @Published private(set) var missionModeActivationSource: MissionModeActivationSource?

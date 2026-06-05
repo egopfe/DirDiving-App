@@ -11,27 +11,10 @@ targets:
     platform: watchOS
     sources:
       - App
-      - path: Models
-        excludes:
-          - ExplorationModels.swift
-          - BuddyAssistMessage.swift
-          - BuddyPairingHandshake.swift
-      - path: Services
-        excludes:
-          - ExplorationStore.swift
-          - BuddyAssistService.swift
-          - BuddyAssistPeripheralService.swift
-          - BuddyPairingKeyAgreement.swift
-          - SecureBuddyStore.swift
-      - path: Views
-        excludes:
-          - ApneaView.swift
-          - SnorkelingView.swift
-          - BuddyAssistView.swift
-          - ExperimentalConceptsView.swift
-      - path: Utils
-        excludes:
-          - ExperimentalFeatures.swift
+      - Models
+      - Services
+      - Views
+      - Utils
       # Explicit membership for algorithm/runtime core (prevents stale-xcodeproj "not in scope" errors).
       - Utils/MissionModeRuntimeProfile.swift
       - Utils/DiveDepthMeasurementIngestion.swift
@@ -70,6 +53,7 @@ targets:
     dependencies:
       - sdk: CoreMotion.framework
       - sdk: CoreLocation.framework
+      - sdk: CoreBluetooth.framework
       - sdk: Security.framework
       - sdk: WatchConnectivity.framework
       - sdk: WatchKit.framework
@@ -91,7 +75,7 @@ targets:
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         TARGETED_DEVICE_FAMILY: "1"
         CODE_SIGN_ENTITLEMENTS: iOSApp/Config/DIRDivingiOS.entitlements
-        PRODUCT_NAME: DIR DIVING
+        PRODUCT_NAME: DIRDivingiOSApp
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     dependencies:
       - target: DIRDiving Watch App
@@ -188,7 +172,6 @@ targets:
       - iOSApp/Services/BuhlmannPlanner.swift
       - iOSApp/Services/CloudSyncStore.swift
       - iOSApp/Utils/CloudBackupSettings.swift
-      - iOSApp/Services/WatchSyncAuth.swift
       - iOSApp/Services/DiveImportService.swift
       - iOSApp/Services/GasPlanningService.swift
       - iOSApp/Services/OxygenExposureModels.swift
