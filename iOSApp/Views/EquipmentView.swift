@@ -121,6 +121,7 @@ struct EquipmentView: View {
                     .environmentObject(equipment)
             }
         }
+        .dirCompanionTabRoot()
     }
 
     private var equipmentHero: some View {
