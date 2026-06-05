@@ -25,7 +25,7 @@ private struct DisclaimerBottomMaxYKey: PreferenceKey {
 struct LegalDisclaimerScrollGate<Content: View>: View {
     @Binding var reachedBottom: Bool
     var maxHeight: CGFloat?
-    var heightFraction: CGFloat = 0.46
+    var heightFraction: CGFloat = 0.54
     @ViewBuilder let content: () -> Content
 
     @State private var contentHeight: CGFloat = 0
