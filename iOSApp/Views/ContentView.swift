@@ -3,9 +3,11 @@ import SwiftUI
 /// Main iOS tab bar: Planner first, then logbook, analysis, equipment, settings.
 enum IOSTab: Hashable {
     case planner
+    case explore
     case logbook
     case analysis
     case gear
+    case buddy
     case settings
 }
 
@@ -26,6 +28,11 @@ struct ContentView: View {
             }
             .tabItem { Label("tab.planner", systemImage: "point.topleft.down.curvedto.point.bottomright.up") }
 
+            mountedTab(.explore) {
+                ExplorationCenterView()
+            }
+            .tabItem { Label("Explore", systemImage: "map.fill") }
+
             mountedTab(.logbook) {
                 LogbookView()
             }
@@ -40,6 +47,11 @@ struct ContentView: View {
                 EquipmentView()
             }
             .tabItem { Label("tab.gear", systemImage: "shippingbox.fill") }
+
+            mountedTab(.buddy) {
+                BuddyExperimentalView()
+            }
+            .tabItem { Label("Buddy", systemImage: "person.2.wave.2.fill") }
 
             mountedTab(.settings) {
                 MoreView()

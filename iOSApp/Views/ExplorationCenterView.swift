@@ -11,6 +11,7 @@ struct ExplorationCenterView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         header
                         dashboardHero
+                        routeReviewEntry
                         mapCard
                         conceptStatusStrip
                         ExperimentalFutureConceptsView()
@@ -60,6 +61,31 @@ struct ExplorationCenterView: View {
                 heroMetric("Readiness", "--%", DIRTheme.green, "bolt.heart")
             }
         }
+    }
+
+    private var routeReviewEntry: some View {
+        NavigationLink {
+            ExploreView()
+        } label: {
+            DIRCard("ROUTE REVIEW", icon: "point.topleft.down.curvedto.point.bottomright.up", accent: DIRTheme.green) {
+                HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("GPS log routes")
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(.white)
+                        Text("Entry and exit route review from real synced or imported log GPS points.")
+                            .font(.caption)
+                            .foregroundStyle(DIRTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(DIRTheme.green)
+                }
+            }
+        }
+        .buttonStyle(.plain)
     }
 
     private var mapCard: some View {
