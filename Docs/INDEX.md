@@ -572,6 +572,18 @@ Implementazione runtime (non Watch experimental): pressure `AmbientPressureModel
 
 ---
 
+## Aggiornamento indice 2026-06-05 — iOS MAIN algorithm audit (three-tab Planner) @ `ecad0d9`
+
+Audit read-only post-implementazione Planner **Base / Deco / Technical** + UI readiness @ `ecad0d9`:
+
+| Documento | Posizione | Contenuto |
+|-----------|-----------|-----------|
+| [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | `Docs/` | **Audit corrente** — ~91% math robustness; three-mode **88%**; 287/287 XCTest pass; 0 CRITICAL, 2 HIGH (cloud profile merge, NDL preview projection) |
+
+Scope: `DIRDiving iOS` only; experimental files esclusi in `project.yml`. Nessuna modifica codice.
+
+---
+
 ## Aggiornamento indice 2026-05-31 — Watch MAIN algorithm audit (current)
 
 Audit read-only su **Apple Watch MAIN** (`DIRDiving Watch App` only), parallelo a [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md):
@@ -921,7 +933,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 
 | Documento | Contenuto |
 |-----------|-----------|
-| [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | **Audit corrente** iOS Companion MAIN — 76% @ audit → 100% @ `dce89e7` |
+| [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | **Audit corrente** iOS Companion MAIN — three-tab Planner @ `ecad0d9` (~91%); remediation storica @ `dce89e7` |
 | [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) | Report remediation iOS MAIN @ `dce89e7` |
 | [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | Audit corrente Watch MAIN — remediation **100%** codice |
 | [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) | Report finale Watch MAIN readiness |
