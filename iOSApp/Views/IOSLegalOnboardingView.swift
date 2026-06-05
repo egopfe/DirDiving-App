@@ -9,6 +9,7 @@ private enum IOSLegalLinks {
 
 struct IOSLegalOnboardingView: View {
     @EnvironmentObject private var legalAcceptance: LegalAcceptanceStore
+    @Environment(\.iosCompanionViewportMetrics) private var viewportMetrics
     let languageCode: String
 
     @State private var step = 0
@@ -122,7 +123,10 @@ struct IOSLegalOnboardingView: View {
         VStack(spacing: 16) {
             DIRCard(String(localized: "Legal Disclaimer"), icon: "doc.text.magnifyingglass", accent: DIRTheme.yellow) {
                 VStack(alignment: .leading, spacing: 14) {
-                    LegalDisclaimerScrollGate(reachedBottom: $disclaimerReachedBottom) {
+                    LegalDisclaimerScrollGate(
+                        reachedBottom: $disclaimerReachedBottom,
+                        maxHeight: viewportMetrics.disclaimerScrollHeight()
+                    ) {
                         Text(legalAcceptance.disclaimerText(languageCode: languageCode))
                             .dirLegalBodyStyle()
                     }

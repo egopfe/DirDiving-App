@@ -201,7 +201,7 @@ struct MoreView: View {
                 Text(String(localized: "more.sync.reset_pairing_message"))
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .dirCompanionTabRoot()
     }
 
     private var formattedWatchLastSuccess: String {
