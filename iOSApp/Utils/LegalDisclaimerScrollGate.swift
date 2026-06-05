@@ -35,7 +35,7 @@ struct LegalDisclaimerScrollGate<Content: View>: View {
     init(
         reachedBottom: Binding<Bool>,
         maxHeight: CGFloat? = nil,
-        heightFraction: CGFloat = 0.46,
+        heightFraction: CGFloat = 0.54,
         @ViewBuilder content: @escaping () -> Content
     ) {
         _reachedBottom = reachedBottom
