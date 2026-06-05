@@ -15,20 +15,16 @@ struct DepthSafetyBannerView: View {
                 fillOpacity: state == .critical ? 0.16 : 0.10
             )
         case .exceeded:
-            VStack(spacing: 6) {
-                depthBanner(
-                    title: String(localized: "depth.safety.exceeded.title"),
-                    subtitle: String(localized: "depth.safety.exceeded.ascend"),
-                    stroke: DiveUI.red,
-                    fillOpacity: 0.18
-                )
-                depthBanner(
-                    title: String(localized: "depth.safety.exceeded.readings"),
-                    subtitle: nil,
-                    stroke: DiveUI.red.opacity(0.85),
-                    fillOpacity: 0.12
-                )
-            }
+            depthBanner(
+                title: String(localized: "depth.safety.exceeded.title"),
+                subtitle: String(
+                    format: "%@\n%@",
+                    String(localized: "depth.safety.exceeded.ascend"),
+                    String(localized: "depth.safety.exceeded.readings")
+                ),
+                stroke: DiveUI.red,
+                fillOpacity: 0.18
+            )
         }
     }
 

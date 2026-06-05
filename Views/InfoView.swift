@@ -21,7 +21,7 @@ struct InfoView: View {
                     header
 
                     Text(String(localized: "info.title"))
-                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .font(DiveUI.Typography.screenTitle)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
 
@@ -90,7 +90,7 @@ struct InfoView: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 7)
-        .frame(minHeight: 34)
+        .frame(minHeight: 44)
         .background(rowBackground)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(String(format: String(localized: "info.row.a11y.format"), title, value))
