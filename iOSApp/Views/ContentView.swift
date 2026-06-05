@@ -70,7 +70,7 @@ struct ContentView: View {
                 Color.clear
             }
         }
-        .dirCompanionTabSlot()
+        .dirCompanionTabRoot()
         .tag(tab)
     }
 }
