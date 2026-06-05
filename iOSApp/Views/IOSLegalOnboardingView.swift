@@ -26,7 +26,7 @@ struct IOSLegalOnboardingView: View {
     }
 
     var body: some View {
-        DIRDisclaimerScreen {
+        DIRDisclaimerScreen(verticalLayout: .top) {
             VStack(alignment: .leading, spacing: 18) {
                 hero
 

@@ -3,20 +3,22 @@ import UIKit
 
 /// Configures UIKit chrome so unpainted window/scroll/tab areas use DIR chrome instead of system black.
 enum IOSWindowChromeConfigurator {
-    private static let chromeUIColor = UIColor.black
-
     /// Safe during `App.init()` — only touches `UIAppearance`, not `UIApplication` / LaunchServices.
     static func applyUIKitAppearance() {
         UIScrollView.appearance().backgroundColor = .clear
         UITableView.appearance().backgroundColor = .clear
         UICollectionView.appearance().backgroundColor = .clear
+        UIView.appearance(whenContainedInInstancesOf: [UINavigationController.self]).backgroundColor = .clear
 
         let tabBar = UITabBarAppearance()
         tabBar.configureWithOpaqueBackground()
-        tabBar.backgroundColor = chromeUIColor
+        tabBar.backgroundColor = DIRTheme.uiKitBackground
+        tabBar.shadowColor = .clear
         UITabBar.appearance().standardAppearance = tabBar
         UITabBar.appearance().scrollEdgeAppearance = tabBar
         UITabBar.appearance().isTranslucent = false
+        UITabBar.appearance().barTintColor = DIRTheme.uiKitBackground
+        UITabBar.appearance().backgroundColor = DIRTheme.uiKitBackground
 
         let navigationBar = UINavigationBarAppearance()
         navigationBar.configureWithTransparentBackground()
@@ -39,7 +41,7 @@ enum IOSWindowChromeConfigurator {
 
         for windowScene in scenes {
             for window in windowScene.windows {
-                window.backgroundColor = chromeUIColor
+                window.backgroundColor = DIRTheme.uiKitBackground
             }
         }
     }
@@ -65,7 +67,6 @@ struct IOSRootShell<Content: View>: View {
         }
         .ignoresSafeArea()
         .onAppear {
-            // Defer UIApplication / window access until after LaunchServices client context is ready.
             Task { @MainActor in
                 IOSWindowChromeConfigurator.applyGlobalAppearance()
             }
@@ -79,27 +80,42 @@ struct IOSRootShell<Content: View>: View {
     }
 }
 
-/// Full-screen onboarding / disclaimer layout: edge-to-edge background, scrollable body, safe-area-aware controls.
+/// Full-screen onboarding / disclaimer layout: edge-to-edge background, viewport-filling scroll body.
 struct DIRDisclaimerScreen<Content: View>: View {
+    enum VerticalLayout {
+        case top
+        case center
+    }
+
+    private let verticalLayout: VerticalLayout
     @ViewBuilder private var content: () -> Content
 
-    init(@ViewBuilder content: @escaping () -> Content) {
+    init(
+        verticalLayout: VerticalLayout = .top,
+        @ViewBuilder content: @escaping () -> Content
+    ) {
+        self.verticalLayout = verticalLayout
         self.content = content
     }
 
     var body: some View {
-        DIRScreenContainer {
-            ScrollView(showsIndicators: false) {
-                content()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, DIRTheme.screenPadding)
-                    .padding(.bottom, DIRTheme.spaceXL)
+        GeometryReader { geometry in
+            DIRScreenContainer {
+                ScrollView(showsIndicators: false) {
+                    content()
+                        .frame(
+                            maxWidth: .infinity,
+                            minHeight: geometry.size.height,
+                            alignment: verticalLayout == .center ? .center : .top
+                        )
+                        .padding(.horizontal, DIRTheme.screenPadding)
+                        .safeAreaPadding(.vertical)
+                }
+                .dirCompanionScrollSurface()
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
-            .dirCompanionScrollSurface()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .safeAreaPadding(.top)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .ignoresSafeArea()
     }
 }
 
@@ -108,5 +124,15 @@ extension View {
     @ViewBuilder
     func dirCompanionScrollSurface() -> some View {
         scrollContentBackground(.hidden)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    }
+
+    /// Paints DIR chrome across the full tab slot above the tab bar.
+    func dirCompanionTabSlot() -> some View {
+        frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background {
+                DIRBackground()
+                    .ignoresSafeArea()
+            }
     }
 }
