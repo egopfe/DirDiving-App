@@ -481,6 +481,15 @@
 "watch_photo.title" = "Invia foto al Watch";
 "watch_photo.pick" = "Scegli foto";
 "watch_photo.error.load" = "Impossibile caricare la foto selezionata.";
+"watch_photo.manual_hint" = "Scegli una foto, poi tocca Invia ad Apple Watch. L'invio non è automatico.";
+"watch_photo.preparing" = "Preparazione foto…";
+"watch_photo.send_to_watch" = "Invia ad Apple Watch";
+"watch_photo.staged.ready" = "Pronta per l'invio";
+"watch_photo.staged.clear" = "Rimuovi";
+"watch_photo.manage.open" = "Gestisci foto sull'Apple Watch";
+"watch_photo.manage.close" = "Chiudi";
+"watch_photo_status_delivered_pending" = "Foto consegnata. In attesa dell'importazione su Apple Watch…";
+"watch_photo_status_rejected_detail" = "Apple Watch ha rifiutato la foto (%@).";
 
 /* R3 — iCloud decode surfacing */
 "cloud.status.external_update" = "Aggiornamento ricevuto da iCloud";
