@@ -19,8 +19,7 @@ struct AnalysisView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                DIRBackground()
+            DIRScreenContainer {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         header
@@ -86,6 +85,7 @@ struct AnalysisView: View {
             }
             .toolbar(.hidden, for: .navigationBar)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var analysisHero: some View {

@@ -20,3 +20,21 @@ struct DIRBackground: View {
         .ignoresSafeArea()
     }
 }
+
+/// Edge-to-edge decorative background with scrollable or interactive content layered above.
+/// Interactive content respects safe areas; only the background ignores them.
+struct DIRScreenContainer<Content: View>: View {
+    @ViewBuilder private var content: () -> Content
+
+    init(@ViewBuilder content: @escaping () -> Content) {
+        self.content = content
+    }
+
+    var body: some View {
+        ZStack {
+            DIRBackground()
+            content()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
