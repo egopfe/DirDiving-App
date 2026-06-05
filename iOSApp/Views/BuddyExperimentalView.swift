@@ -25,6 +25,7 @@ struct BuddyExperimentalView: View {
                     .padding(.top, 10)
                     .padding(.bottom, 18)
                 }
+                .dirCompanionScrollSurface()
             }
             .toolbar(.hidden, for: .navigationBar)
         }

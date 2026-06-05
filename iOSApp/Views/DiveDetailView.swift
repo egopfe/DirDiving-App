@@ -76,6 +76,7 @@ struct DiveDetailView: View {
                 .padding(.top, 10)
                 .padding(.bottom, 22)
             }
+            .dirCompanionScrollSurface()
         }
         .navigationTitle(Formatters.detailTitle(session.startDate))
         .navigationBarTitleDisplayMode(.inline)

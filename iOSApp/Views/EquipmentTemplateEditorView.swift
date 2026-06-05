@@ -52,6 +52,7 @@ struct EquipmentTemplateEditorView: View {
                     }
                     .padding(16)
                 }
+                .dirCompanionScrollSurface()
             }
             .navigationTitle(String(localized: "equipment.template.edit"))
             .navigationBarTitleDisplayMode(.inline)

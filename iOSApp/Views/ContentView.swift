@@ -37,6 +37,9 @@ struct ContentView: View {
                 .tag(IOSTab.settings)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background {
+            DIRBackground()
+        }
         .tint(DIRTheme.cyan)
         .toolbarBackground(DIRTheme.background, for: .tabBar)
         .toolbarBackground(.visible, for: .tabBar)

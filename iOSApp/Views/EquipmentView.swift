@@ -93,6 +93,7 @@ struct EquipmentView: View {
                     }
                     .padding(16)
                 }
+                .dirCompanionScrollSurface()
             }
             .toolbar(.hidden, for: .navigationBar)
             .confirmationDialog(String(localized: "equipment.reset.confirm.title"), isPresented: $showResetConfirmation, titleVisibility: .visible) {
