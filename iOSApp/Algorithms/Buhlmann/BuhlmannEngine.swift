@@ -49,6 +49,7 @@ struct BuhlmannEngineResult: Hashable {
     let finalTissueState: BuhlmannTissueState?
     let stops: [BuhlmannDecompressionStop]
     let segments: [BuhlmannRuntimeSegment]
+    let tissueHistory: BuhlmannTissueHistory
     let issues: [BuhlmannPlanIssue]
     let modelState: BuhlmannModelState
 
@@ -71,6 +72,7 @@ enum BuhlmannEngine {
                 finalTissueState: nil,
                 stops: [],
                 segments: [],
+                tissueHistory: .empty,
                 issues: validationIssues,
                 modelState: .invalidInput
             )
@@ -101,7 +103,7 @@ enum BuhlmannEngine {
             segments: &runtimeSegments
         )
 
-        return BuhlmannEngineResult(
+        let engineResult = BuhlmannEngineResult(
             ndlMinutes: ndl,
             ttsMinutes: Int(ceil(schedule.elapsedMinutes)),
             totalRuntimeMinutes: Int(ceil(descent.elapsedMinutes + bottom.elapsedMinutes + schedule.elapsedMinutes)),
@@ -111,8 +113,24 @@ enum BuhlmannEngine {
             finalTissueState: schedule.state,
             stops: schedule.stops,
             segments: runtimeSegments,
+            tissueHistory: .empty,
             issues: schedule.issues,
             modelState: schedule.issues.isEmpty ? .validReference : .modelIncomplete
+        )
+        let tissueHistory = BuhlmannTissueHistorySampler.sample(request: request, engineResult: engineResult)
+        return BuhlmannEngineResult(
+            ndlMinutes: engineResult.ndlMinutes,
+            ttsMinutes: engineResult.ttsMinutes,
+            totalRuntimeMinutes: engineResult.totalRuntimeMinutes,
+            descentMinutes: engineResult.descentMinutes,
+            bottomMinutes: engineResult.bottomMinutes,
+            gasSwitchMinutes: engineResult.gasSwitchMinutes,
+            finalTissueState: engineResult.finalTissueState,
+            stops: engineResult.stops,
+            segments: engineResult.segments,
+            tissueHistory: tissueHistory,
+            issues: engineResult.issues,
+            modelState: engineResult.modelState
         )
     }
 

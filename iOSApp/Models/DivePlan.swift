@@ -76,9 +76,13 @@ struct TeamGasMatch: Identifiable, Hashable {
 
 struct DivePlanResult: Hashable {
     let ndlMinutes: Double
-    let ttrMinutes: Int
+    let ttsMinutes: Int
+    let totalRuntimeMinutes: Int
     let calculationCompleteness: PlanCalculationCompleteness
     let decoStops: [DecoStop]
+    let ascentTableRows: [PlannerAscentTableRow]
+    let tissueHistory: BuhlmannTissueHistory
+    let depthProfilePoints: [DepthProfilePoint]
     let cnsPercent: Double
     let otu: Double
     let gasAnalysis: TechnicalGasAnalysis
@@ -96,6 +100,8 @@ struct DivePlanResult: Hashable {
     let gasLedger: GasConsumptionLedger?
     let gasLedgerFailure: GasLedgerFailureReason?
     let userFacingWarnings: [PlannerUserFacingMessage]
+    let plannerMode: PlannerMode
+    let modeGuidanceMessage: PlannerUserFacingMessage?
 }
 
 struct NDLPoint: Identifiable, Hashable {

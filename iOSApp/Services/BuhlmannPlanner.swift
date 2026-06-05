@@ -109,6 +109,7 @@ enum BuhlmannPlanner {
                 finalTissueState: nil,
                 stops: [],
                 segments: [],
+                tissueHistory: .empty,
                 issues: [.invalidProfile("Invalid planner environment.")],
                 modelState: .invalidInput
             )
@@ -130,7 +131,7 @@ enum BuhlmannPlanner {
                 kind: segment.kind,
                 depthMeters: segment.depthMeters,
                 minutes: segment.minutes,
-                gas: segment.gas.label,
+                gas: segment.gas.displayLabel,
                 note: segment.note
             )
         }
@@ -312,7 +313,7 @@ enum BuhlmannPlanner {
         return DecoStop(
             depthMeters: stop.depthMeters,
             minutes: stop.minutes,
-            gas: stop.gas.label,
+            gas: stop.gas.displayLabel,
             ppO2: stop.ppO2,
             maxPPO2: stop.maxPPO2,
             states: states
