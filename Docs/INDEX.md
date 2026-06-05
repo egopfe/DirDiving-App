@@ -555,6 +555,16 @@ Implementazione runtime (non Watch experimental): pressure `AmbientPressureModel
 
 ---
 
+## Aggiornamento indice 2026-06-05 — Watch MAIN algorithm audit @ `5415213`
+
+Audit read-only Apple Watch MAIN (`DIRDiving Watch App` only):
+
+| Documento | Posizione | Contenuto |
+|-----------|-----------|-----------|
+| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | `Docs/` | **Audit corrente** — ~93% readiness; HIGH-001 remediated; 0 CRITICAL/0 HIGH; 113 XCTest (21 integration isolation failures) |
+
+---
+
 ## Aggiornamento indice 2026-06-05 — iOS MAIN algorithm audit (three-tab Planner) @ `ecad0d9`
 
 Audit read-only post-implementazione Planner **Base / Deco / Technical** + UI readiness @ `ecad0d9`:
@@ -573,7 +583,7 @@ Audit read-only su **Apple Watch MAIN** (`DIRDiving Watch App` only), parallelo 
 
 | Documento | Posizione | Contenuto |
 |-----------|-----------|-----------|
-| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | `Docs/` | **Audit corrente Watch MAIN** — pre-remediation ~82%; remediation **100%** codice → [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) |
+| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | `Docs/` | **Audit corrente Watch MAIN** @ `5415213` (~93%); remediation storica → [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) |
 | [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) | `Docs/` | Report finale readiness 100% (codice) + QA fisica § L |
 | [`WATCH_MANUAL_NODEPTH_SYNC_POLICY.md`](WATCH_MANUAL_NODEPTH_SYNC_POLICY.md) | `Docs/` | Policy sync sessioni manuali senza profilo |
 | [`CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](CODEX_DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md) | `Docs/` | Audit pre-hardening @ `ddaf2d7` (storico) |
