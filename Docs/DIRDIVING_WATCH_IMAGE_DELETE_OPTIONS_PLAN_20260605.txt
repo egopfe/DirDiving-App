@@ -5,6 +5,9 @@ Repository reviewed:
 C:\Users\egopf\Documents\GitHub\DirDiving-App
 
 Latest main baseline used for this plan:
+4e5b33c - fix(ios): make layout primitives adapt to every iPhone viewport.
+
+Relevant image-gallery baseline:
 aa5a5c3 - feat(watch): add tap-to-fullscreen viewing in User Images gallery.
 
 Current state:
@@ -35,7 +38,7 @@ User experience:
 5. Tapping trash opens a confirmation dialog.
 6. Confirmation deletes only the selected uploaded image.
 7. After deletion, the UI returns to the image list or selects the next available image.
-8. If no images remain, the existing empty state appears.
+8. If no uploaded images remain, the existing empty state appears.
 9. Fullscreen view should close automatically if the selected image is deleted.
 
 Files likely touched:
@@ -62,18 +65,17 @@ Core implementation steps:
 3. After successful delete:
    - Remove the file with FileManager.removeItem(at:).
    - Call reload().
-   - Post or rely on published imageNames update.
    - Clear selectedName if it no longer exists.
    - Dismiss fullscreen if active.
 
 4. Update UserImagesView:
    - Add @State private var pendingDeleteName: String?
    - Add @State private var showDeleteConfirmation = false
-   - Add trash icon button in imageDetail.
+   - Add a trash icon button in imageDetail.
    - Use role .destructive confirmation.
    - Keep button size watch-friendly.
    - Hide or disable trash when canDeleteImage(named:) is false.
-   - Do not put delete in fullscreen as the first implementation; fullscreen should remain focused on viewing.
+   - Do not put delete in fullscreen in the first implementation; fullscreen should remain focused on viewing.
 
 5. Add localized strings:
    - user_images.delete.button
@@ -94,7 +96,7 @@ Core implementation steps:
 
 Risks:
 - Accidentally deleting bundled image resources if document/bundle lookup is mixed.
-- UI overlap on small Watch screens if trash button is too large or placed poorly.
+- UI overlap on small Watch screens if the trash button is too large or placed poorly.
 - Deleting a selected image while fullscreen is open could leave selectedName pointing at a missing file unless state is cleared.
 
 Mitigations:
@@ -110,7 +112,7 @@ Acceptance criteria:
 - The empty state appears when the last uploaded image is removed.
 - Bundled images cannot be deleted.
 - No iOS Companion connectivity is required.
-- Existing iOS -> Watch photo send and ACK flow still works.
+- Existing iOS-to-Watch photo send and ACK flow still works.
 - Existing fullscreen image viewing still works.
 
 Suggested commit scope:
@@ -133,10 +135,8 @@ Why this is more complex:
 - A robust feature needs request IDs, ACKs, and clear pending/failed states.
 
 Recommended UX:
-1. In iOS Companion, add a "Manage Watch Images" panel under the existing Watch photo transfer area.
-2. Show either:
-   - the last known uploaded image from ACK data, for a minimal first version; or
-   - a Watch image inventory synchronized from Watch, for a complete version.
+1. In iOS Companion, add a Manage Watch Images panel under the existing Watch photo transfer area.
+2. Show either the last known uploaded image from ACK data for a minimal first version, or a Watch image inventory synchronized from Watch for a complete version.
 3. User taps Delete on an image.
 4. iOS sends a delete request to Watch.
 5. Watch validates and deletes the local document image.
@@ -211,13 +211,12 @@ Core implementation steps:
    - iOS can delete only the last imported storedFileName returned by the existing photo ACK.
 
    Complete version:
-   - Watch publishes a compact inventory list:
-     fileName, displayName, importedAt if available.
+   - Watch publishes a compact inventory list: fileName, displayName, importedAt if available.
    - iOS displays all Watch uploaded images.
    - This requires metadata persistence because current Watch image storage is filename-only.
 
 7. Update iOS UI:
-   - Add a "Manage Watch Images" section.
+   - Add a Manage Watch Images section.
    - For minimal version, show the last imported Watch filename with a Delete button.
    - For complete version, show a list of Watch images with status badges.
    - Confirm destructive actions.
