@@ -18,7 +18,7 @@ struct DIRDivingiOSApp: App {
         _plannerStore = StateObject(wrappedValue: PlannerStore(cloudSync: cloudSync))
         _equipmentStore = StateObject(wrappedValue: EquipmentStore(cloudSync: cloudSync))
         SensorSourceMode.applyReleaseSafeMigrationIfNeeded()
-        IOSWindowChromeConfigurator.applyGlobalAppearance()
+        IOSWindowChromeConfigurator.applyUIKitAppearance()
     }
 
     var body: some Scene {

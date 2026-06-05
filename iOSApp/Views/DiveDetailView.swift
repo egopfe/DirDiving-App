@@ -557,7 +557,13 @@ struct DiveDetailView: View {
             .accessibilityHint("Crea un file CSV condivisibile per questa immersione.")
             Spacer()
             if let csvURL {
-                ShareLink(item: csvURL) {
+                ShareLink(
+                    item: csvURL,
+                    preview: SharePreview(
+                        String(localized: "detail.export.share_csv"),
+                        icon: Image(systemName: "tablecells")
+                    )
+                ) {
                     Text(String(localized: "detail.export.share_csv"))
                         .font(.callout.weight(.semibold))
                         .foregroundStyle(DIRTheme.cyan)
