@@ -2,7 +2,11 @@ import Foundation
 
 enum PlannerService {
     static func makePlan(input: GasPlanInput) -> DivePlanResult {
-        makePlan(input: input, repetitivePlanningEnabled: false, repetitiveSnapshot: nil, surfaceIntervalMinutes: 0)
+        makePlan(input: input, mode: .technical, repetitivePlanningEnabled: false, repetitiveSnapshot: nil, surfaceIntervalMinutes: 0)
+    }
+
+    static func makePlan(input: GasPlanInput, mode: PlannerMode) -> DivePlanResult {
+        makePlan(input: input, mode: mode, repetitivePlanningEnabled: false, repetitiveSnapshot: nil, surfaceIntervalMinutes: 0)
     }
 
     static func makePlan(
@@ -11,21 +15,40 @@ enum PlannerService {
         repetitiveSnapshot: TissueSnapshot?,
         surfaceIntervalMinutes: Double
     ) -> DivePlanResult {
-        let validation = PlannerInputValidator.validate(input)
+        makePlan(
+            input: input,
+            mode: .technical,
+            repetitivePlanningEnabled: repetitivePlanningEnabled,
+            repetitiveSnapshot: repetitiveSnapshot,
+            surfaceIntervalMinutes: surfaceIntervalMinutes
+        )
+    }
+
+    static func makePlan(
+        input: GasPlanInput,
+        mode: PlannerMode,
+        repetitivePlanningEnabled: Bool,
+        repetitiveSnapshot: TissueSnapshot?,
+        surfaceIntervalMinutes: Double
+    ) -> DivePlanResult {
+        let activeInput = PlannerModePolicy.activePlanInput(from: input, mode: mode)
+        let validation = PlannerModePolicy.validate(draft: input, mode: mode)
         guard validation.isValid else {
             return unavailablePlan(
-                input: input,
+                input: activeInput,
+                mode: mode,
                 validation: validation,
                 repetitivePlanningEnabled: repetitivePlanningEnabled,
                 repetitiveSnapshot: repetitiveSnapshot,
                 surfaceIntervalMinutes: surfaceIntervalMinutes
             )
         }
-        guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) else {
+        guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: activeInput.altitudeMeters, salinity: activeInput.salinity) else {
             var invalidValidation = validation
             invalidValidation.add(.invalidEnvironment)
             return unavailablePlan(
-                input: input,
+                input: activeInput,
+                mode: mode,
                 validation: invalidValidation,
                 repetitivePlanningEnabled: repetitivePlanningEnabled,
                 repetitiveSnapshot: repetitiveSnapshot,
@@ -33,7 +56,7 @@ enum PlannerService {
             )
         }
 
-        var working = input
+        var working = activeInput
         working.syncLegacyGasesFromPlannerCylinders()
         let baseRequest = BuhlmannPlanner.makeRequest(input: working, environment: environment)
 
@@ -70,6 +93,7 @@ enum PlannerService {
                 finalTissueState: nil,
                 stops: [],
                 segments: [],
+                tissueHistory: .empty,
                 issues: preflightIssues,
                 modelState: .invalidInput
             )
@@ -123,17 +147,25 @@ enum PlannerService {
             states = mergedStates(states, [missingCylinderState])
         }
 
-        let ttr = enginePlan.ttsMinutes
+        let tts = enginePlan.ttsMinutes
         let segments = BuhlmannPlanner.runtimeSegments(from: enginePlan)
+        let ascentTableRows = PlannerAscentTableBuilder.rows(
+            from: enginePlan,
+            decoStops: stops,
+            environment: environment,
+            depthFormatter: { Formatters.depth($0, units: .metric).text },
+            ppO2Formatter: { Formatters.one($0) }
+        )
+        let depthProfilePoints = PlannerDepthProfileBuilder.points(from: segments)
         let scheduleLines = PlannerGasSchedule.roleScheduleLines(input: working)
         let gfComparisons = BuhlmannPlanner.gfComparisons(baseRequest: {
             var seededBase = baseRequest
             seededBase.initialTissueState = request.initialTissueState
             return seededBase
         }())
-        let contingencies = GasPlanningService.contingencyPlans(input: working, baseAnalysis: analysis, baseTTS: ttr, environment: environment)
+        let contingencies = GasPlanningService.contingencyPlans(input: working, baseAnalysis: analysis, baseTTS: tts, environment: environment)
         let teamMatches = GasPlanningService.teamGasMatches(input: working, minimumGasLiters: analysis.rockBottomLiters)
-        var briefing = GasPlanningService.briefingLines(input: working, analysis: analysis, tts: ttr, stops: stops)
+        var briefing = GasPlanningService.briefingLines(input: working, analysis: analysis, tts: tts, stops: stops)
         briefing.insert(contentsOf: scheduleLines, at: min(1, briefing.count))
 
         let environmentSummary = PlannerUserFacingCopy.environmentSummary(for: environment)
@@ -153,11 +185,19 @@ enum PlannerService {
             }
         }
 
+        if let guidance = PlannerModePolicy.modeGuidance(mode: mode, enginePlan: enginePlan, stops: stops) {
+            userFacingWarnings.append(guidance)
+        }
+
         return DivePlanResult(
             ndlMinutes: enginePlan.ndlMinutes ?? 0,
-            ttrMinutes: ttr,
+            ttsMinutes: tts,
+            totalRuntimeMinutes: enginePlan.totalRuntimeMinutes,
             calculationCompleteness: completenessResolution.completeness,
             decoStops: stops,
+            ascentTableRows: ascentTableRows,
+            tissueHistory: enginePlan.tissueHistory,
+            depthProfilePoints: depthProfilePoints,
             cnsPercent: analysis.cnsPercent,
             otu: analysis.otu,
             gasAnalysis: analysis,
@@ -174,12 +214,15 @@ enum PlannerService {
             environmentSummary: environmentSummary,
             gasLedger: try? ledgerResult.get(),
             gasLedgerFailure: gasLedgerFailure,
-            userFacingWarnings: uniqueWarnings(userFacingWarnings)
+            userFacingWarnings: uniqueWarnings(userFacingWarnings),
+            plannerMode: mode,
+            modeGuidanceMessage: PlannerModePolicy.modeGuidance(mode: mode, enginePlan: enginePlan, stops: stops)
         )
     }
 
     private static func unavailablePlan(
         input: GasPlanInput,
+        mode: PlannerMode,
         validation: PlannerValidationResult,
         repetitivePlanningEnabled: Bool,
         repetitiveSnapshot: TissueSnapshot?,
@@ -210,9 +253,13 @@ enum PlannerService {
         )
         return DivePlanResult(
             ndlMinutes: 0,
-            ttrMinutes: 0,
+            ttsMinutes: 0,
+            totalRuntimeMinutes: 0,
             calculationCompleteness: .noDecompressionSolution,
             decoStops: [],
+            ascentTableRows: [],
+            tissueHistory: .empty,
+            depthProfilePoints: [],
             cnsPercent: 0,
             otu: 0,
             gasAnalysis: analysis,
@@ -229,7 +276,9 @@ enum PlannerService {
             environmentSummary: environmentSummary,
             gasLedger: nil,
             gasLedgerFailure: nil,
-            userFacingWarnings: PlannerUserFacingCopy.userFacingWarnings(from: states)
+            userFacingWarnings: PlannerUserFacingCopy.userFacingWarnings(from: states),
+            plannerMode: mode,
+            modeGuidanceMessage: nil
         )
     }
 

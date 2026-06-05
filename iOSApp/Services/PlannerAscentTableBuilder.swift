@@ -1,0 +1,162 @@
+import Foundation
+
+enum PlannerAscentRowKind: String, Hashable, Codable {
+    case bottom
+    case travel
+    case decoStop
+    case surface
+}
+
+struct PlannerAscentTableRow: Identifiable, Hashable {
+    let id = UUID()
+    let kind: PlannerAscentRowKind
+    let depthMeters: Double
+    let depthLabel: String
+    let minutes: Double
+    let timeLabel: String
+    let gas: String
+    let ppO2: Double
+    let ppO2Label: String
+}
+
+enum PlannerAscentTableBuilder {
+    static func rows(
+        from enginePlan: BuhlmannEngineResult,
+        decoStops: [DecoStop],
+        environment: PlannerEnvironment,
+        depthFormatter: (Double) -> String = { Formatters.depth($0, units: .metric).text },
+        ppO2Formatter: (Double) -> String = { Formatters.one($0) }
+    ) -> [PlannerAscentTableRow] {
+        guard !enginePlan.segments.isEmpty else {
+            return surfaceRow(depthFormatter: depthFormatter)
+        }
+
+        var rows: [PlannerAscentTableRow] = []
+
+        if let bottomRow = makeBottomRow(from: enginePlan, environment: environment, depthFormatter: depthFormatter, ppO2Formatter: ppO2Formatter) {
+            rows.append(bottomRow)
+        }
+
+        rows.append(contentsOf: travelRows(from: enginePlan, environment: environment, depthFormatter: depthFormatter, ppO2Formatter: ppO2Formatter))
+
+        for stop in decoStops {
+            rows.append(
+                PlannerAscentTableRow(
+                    kind: .decoStop,
+                    depthMeters: stop.depthMeters,
+                    depthLabel: depthFormatter(stop.depthMeters),
+                    minutes: Double(stop.minutes),
+                    timeLabel: "\(stop.minutes) min",
+                    gas: stop.gas,
+                    ppO2: stop.ppO2,
+                    ppO2Label: ppO2Formatter(stop.ppO2)
+                )
+            )
+        }
+
+        rows.append(contentsOf: surfaceRow(depthFormatter: depthFormatter))
+        return rows
+    }
+
+    private static func makeBottomRow(
+        from enginePlan: BuhlmannEngineResult,
+        environment: PlannerEnvironment,
+        depthFormatter: (Double) -> String,
+        ppO2Formatter: (Double) -> String
+    ) -> PlannerAscentTableRow? {
+        let bottomSegments = enginePlan.segments.filter { $0.kind == .bottom }
+        guard !bottomSegments.isEmpty else { return nil }
+        let maxDepth = bottomSegments.map(\.depthMeters).max() ?? 0
+        let bottomMinutes = bottomSegments
+            .filter { abs($0.depthMeters - maxDepth) < 0.05 }
+            .reduce(0) { $0 + $1.minutes }
+        guard let reference = bottomSegments.first(where: { abs($0.depthMeters - maxDepth) < 0.05 }) else { return nil }
+        let ppO2 = reference.gas.ppO2(depthMeters: maxDepth, environment: environment)
+        return PlannerAscentTableRow(
+            kind: .bottom,
+            depthMeters: maxDepth,
+            depthLabel: depthFormatter(maxDepth),
+            minutes: bottomMinutes,
+            timeLabel: "\(Int(bottomMinutes.rounded())) min",
+            gas: reference.gas.displayLabel,
+            ppO2: ppO2,
+            ppO2Label: ppO2Formatter(ppO2)
+        )
+    }
+
+    private static func travelRows(
+        from enginePlan: BuhlmannEngineResult,
+        environment: PlannerEnvironment,
+        depthFormatter: (Double) -> String,
+        ppO2Formatter: (Double) -> String
+    ) -> [PlannerAscentTableRow] {
+        enginePlan.segments
+            .filter { $0.kind == .descent || $0.kind == .ascent }
+            .map { segment in
+                let ppO2 = segment.gas.ppO2(depthMeters: segment.depthMeters, environment: environment)
+                return PlannerAscentTableRow(
+                    kind: .travel,
+                    depthMeters: segment.depthMeters,
+                    depthLabel: depthFormatter(segment.depthMeters),
+                    minutes: segment.minutes,
+                    timeLabel: "\(Formatters.one(segment.minutes)) min",
+                    gas: segment.gas.displayLabel,
+                    ppO2: ppO2,
+                    ppO2Label: ppO2Formatter(ppO2)
+                )
+            }
+    }
+
+    private static func surfaceRow(depthFormatter: (Double) -> String) -> [PlannerAscentTableRow] {
+        [
+            PlannerAscentTableRow(
+                kind: .surface,
+                depthMeters: 0,
+                depthLabel: depthFormatter(0),
+                minutes: 0,
+                timeLabel: "-",
+                gas: String(localized: "planner.table.surface"),
+                ppO2: 0,
+                ppO2Label: "-"
+            )
+        ]
+    }
+}
+
+enum PlannerDepthProfileBuilder {
+    static func points(from segments: [DivePlanSegment]) -> [DepthProfilePoint] {
+        guard !segments.isEmpty else { return [] }
+        var elapsed = 0.0
+        var currentDepth = 0.0
+        var points: [DepthProfilePoint] = [DepthProfilePoint(elapsedMinutes: 0, depthMeters: 0)]
+
+        for segment in segments {
+            let startDepth = currentDepth
+            let endDepth = segment.depthMeters
+            points.append(DepthProfilePoint(elapsedMinutes: elapsed, depthMeters: startDepth))
+            elapsed += segment.minutes
+            points.append(DepthProfilePoint(elapsedMinutes: elapsed, depthMeters: endDepth))
+            currentDepth = endDepth
+        }
+
+        if points.last?.depthMeters != 0 {
+            points.append(DepthProfilePoint(elapsedMinutes: elapsed, depthMeters: 0))
+        }
+        return points
+    }
+}
+
+struct DepthProfilePoint: Identifiable, Hashable, Codable {
+    var id: String { "\(elapsedMinutes)-\(depthMeters)" }
+    let elapsedMinutes: Double
+    let depthMeters: Double
+}
+
+extension BuhlmannGas {
+    var displayLabel: String {
+        if heliumFraction > 0.000_1 {
+            return "TRIMIX \(Int((oxygenFraction * 100).rounded()))/\(Int((heliumFraction * 100).rounded()))"
+        }
+        return label
+    }
+}

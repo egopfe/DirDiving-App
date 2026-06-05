@@ -200,3 +200,20 @@ iOS MAIN can now be described as having a Buhlmann ZHL-16C N2+He multigas planni
 | P4-2 | Team gas matching | Existing polish; no algorithm change |
 
 New test file: `BuhlmannComprehensiveReadinessFixTests.swift`.
+
+## 2026-06-02 Planner Chart & Ascent Table Hardening
+
+Audit reference: `DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_AUDIT_CURRENT.md`
+
+| Item | Implementation |
+|------|----------------|
+| P1 tissue time-series | `BuhlmannTissueHistorySampler` post-plan replay |
+| P1 CURVA BÜHLMANN chart | Grouped ZH-L16C load % vs time |
+| P2 ascent bottom/travel rows | `PlannerAscentTableBuilder` |
+| P2 TTS/Runtime labels | Replaced misleading TTR tile |
+| P2 GRAFICI depth profile | `PlannerDepthProfileBuilder` |
+| P3 TRIMIX display label | `BuhlmannGas.displayLabel` |
+
+macOS validation (2026-06-02, iPhone 17 simulator): `DIRDiving iOS` **BUILD SUCCEEDED**; `DIRDiving iOS Algorithm Tests` **TEST SUCCEEDED** (287 tests).
+
+Report: `Docs/DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_FIX_REPORT.md`

@@ -17,6 +17,7 @@ The iOS planner now includes a ZHL-16C N2+He multigas reference engine:
 - GF Low / GF High based ceiling and stop propagation.
 - Tissue-state NDL.
 - Runtime/TTS schedule generation from profile segments, with TTS separated from total runtime.
+- **Sampled ZH-L16C tissue history** for CURVA BÜHLMANN visualization (does not drive stop math).
 - Optional non-air-saturated initial tissue state for repetitive/reference planning workflows.
 
 ## Environment Baseline (2026-05-29)
