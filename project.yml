@@ -218,6 +218,7 @@ targets:
       - iOSApp/Utils/DiveSessionAlgorithmValidator.swift
       - iOSApp/Utils/DiveSessionMerge.swift
       - iOSApp/Utils/DiveSessionMergeConflict.swift
+      - iOSApp/Utils/DiveSessionProfileDivergence.swift
       - iOSApp/Utils/DiveSessionCollectionIntegrity.swift
       - iOSApp/Utils/GasMixValidator.swift
       - iOSApp/Utils/IOSAlgorithmConfiguration.swift

@@ -36,6 +36,11 @@ enum IOSAlgorithmConfiguration {
 
     static let maxProfileSampleCount = 20_000
     static let maxSyncPayloadBytes = 512 * 1024
+
+    /// Strict runtime/segment PPO₂ validation tolerance (bar).
+    static let ppo2HardValidationToleranceBar = 0.000_1
+    /// Switch-depth rounding tolerance for deco gas changes (bar). Slightly broader for recreational switch depths.
+    static let ppo2DecoGasSwitchDepthToleranceBar = 0.02
     static let maxImportBytes = 10 * 1024 * 1024
     static let maxImportCSVColumns = 64
     static let maxImportCSVFieldCharacters = 4_096

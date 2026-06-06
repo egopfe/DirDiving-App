@@ -61,6 +61,22 @@ Subsurface ignores `#` comment lines; DIR DIVING uses them for round-trip fideli
 4. Legacy CSV (no `# session_meta`) → import succeeds with fallback dates.
 5. External Subsurface export → import succeeds; DIR-specific fields absent as expected.
 
+## External Subsurface manual regression (LOW-004 — pending)
+
+**Status:** Not automated; must be executed on a real Subsurface install before external TestFlight sign-off.
+
+| Step | Action | Pass |
+|---:|---|---|
+| 1 | Export Watch-originated dive from iOS Logbook → CSV | ☐ |
+| 2 | Export manual iOS dive (no profile) — export blocked or empty profile rejected | ☐ |
+| 3 | Export imported dive with GPS/temperature metadata | ☐ |
+| 4 | Import CSV into Subsurface desktop app | ☐ |
+| 5 | Verify `time_seconds` monotonic from first sample; depth in meters | ☐ |
+| 6 | Verify GPS columns and `# session_meta` dates unchanged | ☐ |
+| 7 | Verify no duplicate/shifted timebase after re-export from Subsurface | ☐ |
+
+Record build, commit, device, and Subsurface version in release notes when executed.
+
 ## Limitations
 
 - Export uses **integer seconds** from the first profile sample (Subsurface compatibility); sub-second sample timing is not preserved on export.

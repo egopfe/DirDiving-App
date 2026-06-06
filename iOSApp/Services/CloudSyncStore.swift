@@ -141,6 +141,14 @@ final class CloudSyncStore: ObservableObject {
         let modifiedAt = Date().timeIntervalSince1970
         defaults.set(data, forKey: key)
         defaults.set(modifiedAt, forKey: modifiedAtKey(for: key))
+
+        if data.count > IOSAlgorithmConfiguration.maxSyncPayloadBytes {
+            publishDeferred { [self] in
+                lastSyncStatus = String(localized: "cloud.status.payload_too_large")
+            }
+            return
+        }
+
         cloudStore.set(data, forKey: key)
         cloudStore.set(modifiedAt, forKey: modifiedAtKey(for: key))
         synchronize()

@@ -10,6 +10,12 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 | Commit `HEAD` | __________ |
 | Esecutore | __________ |
 
+## Audit remediation (2026-06-06 — iOS MAIN algorithm @ ecad0d9)
+
+- [ ] Review [`IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) — HIGH-001/002, MED-001…006, cloud profile conflicts, NDL projection, KVS 512 KB cap
+- [ ] Review [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) — audit baseline
+- [ ] External Subsurface CSV regression (manual — see [`SUBSURFACE_CSV_ROUNDTRIP.md`](SUBSURFACE_CSV_ROUNDTRIP.md))
+
 ## Audit remediation (2026-06-06 — Watch MAIN)
 
 - [ ] Review [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) — integration test isolation, mock fallback UX, draft schema, GPS auth guard, CSV alignment

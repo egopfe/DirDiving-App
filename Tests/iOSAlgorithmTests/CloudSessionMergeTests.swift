@@ -54,6 +54,79 @@ final class CloudSessionMergeTests: XCTestCase {
         XCTAssertTrue(conflicts.contains { $0.fieldName == "siteName" })
     }
 
+    func testMergeConflictDetectedForDivergentDepthProfiles() {
+        let id = UUID()
+        let start = Date(timeIntervalSince1970: 1_000)
+        let end = start.addingTimeInterval(120)
+        var local = makeSession(id: id, start: start, endOffset: 120)
+        var cloud = makeSession(id: id, start: start, endOffset: 120)
+        cloud = DiveSession(
+            id: id,
+            startDate: start,
+            endDate: end,
+            durationSeconds: local.durationSeconds,
+            maxDepthMeters: 25,
+            avgDepthMeters: local.avgDepthMeters,
+            avgWaterTemperatureCelsius: local.avgWaterTemperatureCelsius,
+            ttv: local.ttv,
+            entryGPS: nil,
+            exitGPS: nil,
+            samples: [
+                DiveSample(timestamp: start, depthMeters: 0, temperatureCelsius: 20),
+                DiveSample(timestamp: end, depthMeters: 25, temperatureCelsius: 20)
+            ]
+        )
+        let conflicts = DiveSessionMergeConflictDetector.detect(local: [local], cloud: [cloud])
+        XCTAssertTrue(conflicts.contains { $0.fieldName == String(localized: "cloud.merge.field.depth_profile") })
+    }
+
+    func testDivergentProfilesUseWholeProfileWinnerNotHybrid() {
+        let id = UUID()
+        let start = Date(timeIntervalSince1970: 1_000)
+        let localEnd = start.addingTimeInterval(120)
+        let cloudEnd = start.addingTimeInterval(180)
+        let local = makeSession(id: id, start: start, endOffset: 120)
+        let cloud = DiveSession(
+            id: id,
+            startDate: start,
+            endDate: cloudEnd,
+            durationSeconds: 180,
+            maxDepthMeters: 25,
+            avgDepthMeters: 12,
+            avgWaterTemperatureCelsius: 20,
+            ttv: 1,
+            entryGPS: nil,
+            exitGPS: nil,
+            samples: [
+                DiveSample(timestamp: start, depthMeters: 0, temperatureCelsius: 20),
+                DiveSample(timestamp: cloudEnd, depthMeters: 25, temperatureCelsius: 20)
+            ]
+        )
+        let merged = DiveSessionMerge.preferred(local, cloud)
+        XCTAssertEqual(merged.maxDepthMeters, 25, accuracy: 0.01)
+        XCTAssertEqual(merged.samples.count, 2)
+        XCTAssertEqual(merged.samples.last?.depthMeters ?? 0, 25, accuracy: 0.01)
+        XCTAssertEqual(merged.endDate, cloudEnd)
+    }
+
+    func testIdenticalProfilesDoNotConflict() {
+        let id = UUID()
+        let start = Date(timeIntervalSince1970: 1_000)
+        let session = makeSession(id: id, start: start, endOffset: 120)
+        let conflicts = DiveSessionMergeConflictDetector.detect(local: [session], cloud: [session])
+        XCTAssertFalse(conflicts.contains { $0.fieldName == String(localized: "cloud.merge.field.depth_profile") })
+    }
+
+    func testCloudPayloadTooLargeSkipsICloudWrite() {
+        struct LargePayload: Codable { let blob: String }
+        let key = "cloud.payload.test"
+        let payload = LargePayload(blob: String(repeating: "x", count: IOSAlgorithmConfiguration.maxSyncPayloadBytes))
+        let cloudSync = CloudSyncStore(defaults: defaults)
+        cloudSync.save(payload, forKey: key)
+        XCTAssertNotNil(defaults.data(forKey: key))
+        XCTAssertNil(cloudSync.loadRawCloudData(forKey: key))
+    }
+
     func testTombstonesWinDuringSessionFilter() throws {
         let deletedID = UUID()
         let kept = makeSession(siteName: "Kept")

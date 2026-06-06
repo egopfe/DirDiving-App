@@ -964,7 +964,22 @@ struct PlanResultView: View {
     }
 
     private var planShareText: String {
-        var lines = [String(localized: "planner.export.header")]
+        var lines: [String] = []
+        lines.append(
+            String(
+                format: String(localized: "planner.export.mode_line"),
+                store.mode.localizedTabTitle
+            )
+        )
+        switch store.mode {
+        case .base:
+            lines.append(String(localized: "planner.export.mode_disclaimer.base"))
+        case .deco:
+            lines.append(String(localized: "planner.export.mode_disclaimer.deco"))
+        case .technical:
+            lines.append(String(localized: "planner.export.mode_disclaimer.technical"))
+        }
+        lines.append(String(localized: "planner.export.header"))
         lines.append(String(format: String(localized: "planner.export.tts_line"), store.plan.ttsMinutes))
         lines.append(String(format: String(localized: "planner.export.runtime_line"), store.plan.totalRuntimeMinutes))
         lines.append("NDL: \(Formatters.one(store.plan.ndlMinutes)) min")

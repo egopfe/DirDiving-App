@@ -22,7 +22,12 @@ enum DiveSessionMerge {
         let decompressionNotes = mergedString(winner.decompressionNotes, loser.decompressionNotes)
         let startDate = min(winner.startDate, loser.startDate)
         let endDate = max(winner.endDate, loser.endDate)
-        let samples = mergedSamples(winner.samples, loser.samples, startDate: startDate, endDate: endDate)
+        let samples = resolvedSamples(
+            winner: winner,
+            loser: loser,
+            startDate: startDate,
+            endDate: endDate
+        )
         let summary = DiveProfileMath.summary(samples: samples, startDate: startDate, endDate: endDate)
 
         return DiveSession(
@@ -56,6 +61,20 @@ enum DiveSessionMerge {
             exitPressureBar: exitPressureBar,
             decompressionNotes: decompressionNotes
         )
+    }
+
+    /// Uses whole-profile winner when both sides have divergent samples; otherwise unions compatible profiles.
+    private static func resolvedSamples(
+        winner: DiveSession,
+        loser: DiveSession,
+        startDate: Date,
+        endDate: Date
+    ) -> [DiveSample] {
+        if DiveSessionProfileDivergence.profilesDiverge(winner, loser) {
+            return DiveProfileMath.sanitizedSamples(winner.samples)
+                .filter { $0.timestamp >= startDate && $0.timestamp <= endDate }
+        }
+        return mergedSamples(winner.samples, loser.samples, startDate: startDate, endDate: endDate)
     }
 
     private static func mergedSamples(_ first: [DiveSample], _ second: [DiveSample], startDate: Date, endDate: Date) -> [DiveSample] {

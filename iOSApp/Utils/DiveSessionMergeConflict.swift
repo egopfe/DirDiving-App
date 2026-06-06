@@ -163,6 +163,16 @@ enum DiveSessionMergeConflictDetector {
                 )
             )
         }
+        if DiveSessionProfileDivergence.profilesDiverge(local, cloud) {
+            conflicts.append(
+                DiveSessionMergeConflict(
+                    sessionID: local.id,
+                    fieldName: String(localized: "cloud.merge.field.depth_profile"),
+                    localValue: DiveSessionProfileDivergence.profileSummary(local),
+                    cloudValue: DiveSessionProfileDivergence.profileSummary(cloud)
+                )
+            )
+        }
         return conflicts
     }
 
