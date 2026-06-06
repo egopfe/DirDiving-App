@@ -1,20 +1,24 @@
-# Subsurface CSV round-trip (iOS Companion MAIN)
+# Subsurface CSV round-trip (iOS Companion + Watch MAIN)
 
-**Updated:** 2026-05-31  
-**Baseline:** `main` @ `dce89e7`  
-**Scope:** `SubsurfaceExportService` + `DiveImportService` on iOS Companion MAIN only
+**Updated:** 2026-06-06  
+**Baseline:** `main` @ post Watch remediation  
+**Scope:** `SubsurfaceExportService` on iOS Companion MAIN and Watch MAIN; `DiveImportService` on iOS Companion MAIN only
 
 ## Overview
 
 DIR DIVING exports Subsurface-compatible dive profile CSV with optional `# session_meta` comment lines. Re-import restores supported session metadata when the block is present. External Subsurface CSV without metadata still imports using legacy fallbacks.
+
+**Watch alignment (2026-06-06):** Watch export uses the same profile column set and **first-sample-relative** monotonic `time_seconds` as iOS. See [`WATCH_CSV_EXPORT_POLICY.md`](WATCH_CSV_EXPORT_POLICY.md) for Watch-specific metadata differences.
 
 ## Export format
 
 ### Profile columns (required)
 
 ```csv
-time_seconds,depth_m,temperature_c,entry_lat,entry_lon,exit_lat,exit_lon
+time_seconds,depth_m,temperature_c,entry_lat,entry_lon,exit_lat,exit_lon,is_manual,equipment,entry_pressure,exit_pressure,deco_notes
 ```
+
+`time_seconds` is **elapsed integer seconds from the first exported sample timestamp** (monotonic). Session wall-clock times remain in `# dirdiving_start_date` / `# dirdiving_end_date`.
 
 ### Metadata block (DIR DIVING export)
 
@@ -59,11 +63,14 @@ Subsurface ignores `#` comment lines; DIR DIVING uses them for round-trip fideli
 
 ## Limitations
 
-- Export uses **integer seconds** from dive start (Subsurface compatibility); sub-second sample timing is not preserved on export.
+- Export uses **integer seconds** from the first profile sample (Subsurface compatibility); sub-second sample timing is not preserved on export.
+- Watch exports omit iOS-only metadata fields (equipment, pressures, site, buddy); importers must tolerate empty columns.
 - Depth validation uses centralized limits in `IOSAlgorithmConfiguration` (see planner/sync docs for operating vs import ranges).
 
 ## References
 
+- [`WATCH_CSV_EXPORT_POLICY.md`](WATCH_CSV_EXPORT_POLICY.md) — Watch export policy
 - [`iOS/SUBSURFACE_EXPORT.md`](iOS/SUBSURFACE_EXPORT.md) — user workflow
 - [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) — B5 resolution
-- Tests: `Tests/iOSAlgorithmTests/CSVMetadataRoundTripTests.swift`
+- [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) — WATCH-EXP-001
+- Tests: `Tests/iOSAlgorithmTests/CSVMetadataRoundTripTests.swift`, `Tests/WatchAlgorithmTests/WatchSyncCodecAlgorithmTests.swift`
