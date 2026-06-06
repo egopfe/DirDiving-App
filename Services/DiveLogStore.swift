@@ -5,6 +5,7 @@ import os
 @MainActor
 final class DiveLogStore: ObservableObject {
     private static let logger = Logger(subsystem: "com.egopfe.dirdiving", category: "DiveLogStore")
+    static var testHook_storageDirectoryURL: URL?
 
     @Published private(set) var sessions: [DiveSession] = []
     @Published private(set) var loadErrorMessage: String?
@@ -238,6 +239,8 @@ final class DiveLogStore: ObservableObject {
     }
 
     private func fileURL() -> URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent(fileName)
+        let base = Self.testHook_storageDirectoryURL
+            ?? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        return base.appendingPathComponent(fileName)
     }
 }

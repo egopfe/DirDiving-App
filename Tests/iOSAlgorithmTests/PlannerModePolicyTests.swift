@@ -99,5 +99,74 @@ final class PlannerModePolicyTests: XCTestCase {
         XCTAssertFalse(String(localized: "planner.mode.technical").isEmpty)
         XCTAssertFalse(String(localized: "planner.base.exceeds_mode.message").isEmpty)
         XCTAssertFalse(String(localized: "planner.reference_only.warning").isEmpty)
+        XCTAssertFalse(String(localized: "planner.export.mode_line").isEmpty)
+        XCTAssertFalse(String(localized: "planner.export.mode_disclaimer.base").isEmpty)
+        XCTAssertFalse(String(localized: "planner.export.mode_disclaimer.deco").isEmpty)
+        XCTAssertFalse(String(localized: "planner.export.mode_disclaimer.technical").isEmpty)
+    }
+
+    func testBaseInvalidAltitudeRejectedInAllModes() {
+        var input = GasPlanInput()
+        input.plannedDepthMeters = 30
+        input.plannedBottomMinutes = 20
+        input.altitudeMeters = 5_000
+        for mode in PlannerMode.allCases {
+            let result = PlannerInputValidator.validate(input, mode: mode)
+            XCTAssertTrue(result.states.contains(.invalidEnvironment), "Expected invalid environment for \(mode)")
+        }
+    }
+
+    func testBaseModeAnalysisIgnoresHiddenBailoutCylinder() {
+        var input = GasPlanInput()
+        input.ensurePlannerCylindersFromLegacy()
+        input.plannerCylinders.append(
+            PlannerCylinderEntry(role: .bailout, gas: GasMix(name: "Bailout", oxygen: 0.21, helium: 0, maxPPO2: 1.4), switchDepthMeters: 6)
+        )
+        let activeBase = PlannerModePolicy.activePlanInput(from: input, mode: .base)
+        let activeTechnical = PlannerModePolicy.activePlanInput(from: input, mode: .technical)
+        XCTAssertEqual(activeBase.plannerCylinders.count, 1)
+        XCTAssertGreaterThan(activeTechnical.plannerCylinders.count, 1)
+        let baseAnalysis = GasPlanningService.analyze(input: input, mode: .base)
+        XCTAssertEqual(baseAnalysis.gas.name, activeBase.bottomGas.name)
+        XCTAssertFalse(activeBase.plannerCylinders.contains { $0.role == .bailout })
+    }
+
+    func testNDLPreviewInputUsesModeProjectedGFNotDraft() {
+        var input = GasPlanInput()
+        input.plannedDepthMeters = 30
+        input.gfHigh = 50
+        input.gfLow = 40
+        input.ensurePlannerCylindersFromLegacy()
+        let active = PlannerModePolicy.activePlanInput(from: input, mode: .base)
+        guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: active.altitudeMeters, salinity: active.salinity) else {
+            return XCTFail("Expected environment")
+        }
+        let draftPreview = BuhlmannPlanner.plan(
+            depthMeters: input.buhlmannPlanningDepthMeters,
+            bottomGas: input.buhlmannBackGas,
+            environment: environment,
+            gfHigh: input.gfHigh
+        )
+        let projectedPreview = BuhlmannPlanner.plan(
+            depthMeters: active.buhlmannPlanningDepthMeters,
+            bottomGas: active.buhlmannBackGas,
+            environment: environment,
+            gfHigh: active.gfHigh
+        )
+        XCTAssertEqual(active.gfHigh, PlannerGFPreset.standard.gfHigh)
+        XCTAssertNotEqual(draftPreview.ndlMinutes, projectedPreview.ndlMinutes)
+    }
+
+    func testDecoPresentationShowsNDLReferenceNotFullChart() {
+        let presentation = PlannerResultPresentation.presentation(for: .deco)
+        XCTAssertTrue(presentation.showsNDLCurveTab)
+        XCTAssertEqual(presentation.buhlmannPresentation, .simplifiedSummary)
+        XCTAssertFalse(presentation.showsChartsTab)
+    }
+
+    func testPPO2ToleranceConstantsAreCentralized() {
+        XCTAssertEqual(IOSAlgorithmConfiguration.ppo2HardValidationToleranceBar, 0.000_1, accuracy: 0.000_000_1)
+        XCTAssertEqual(IOSAlgorithmConfiguration.ppo2DecoGasSwitchDepthToleranceBar, 0.02, accuracy: 0.001)
+        XCTAssertEqual(BuhlmannConstants.decoGasSwitchPPO2ToleranceBar, IOSAlgorithmConfiguration.ppo2DecoGasSwitchDepthToleranceBar)
     }
 }

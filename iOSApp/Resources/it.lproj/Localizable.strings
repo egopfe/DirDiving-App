@@ -482,6 +482,10 @@
 "detail.gas.pressures_unavailable" = "Pressioni iniziale/finale non presenti nel record sincronizzato.";
 "detail.gas.consumed_format" = "Consumo indicativo: %@ (valori inseriti, non SAC calcolato).";
 "planner.export.header" = "DIR Diving — riepilogo piano indicativo";
+"planner.export.mode_line" = "Modalità planner: %@";
+"planner.export.mode_disclaimer.base" = "La modalità Base è una vista indicativa a gas singolo. Non mostra una pianificazione tecnica decompressiva completa.";
+"planner.export.mode_disclaimer.deco" = "La modalità Deco supporta gas di fondo più un gas decompressivo con output Bühlmann semplificato.";
+"planner.export.mode_disclaimer.technical" = "La modalità Tecnica mostra l'output multigas completo di riferimento, inclusi i dettagli Bühlmann dove disponibili.";
 "planner.export.no_deco_stops" = "Soste deco: nessuna in questo risultato.";
 "planner.export.deco_stops" = "Soste deco:";
 "planner.export.indicative_footer" = "Solo indicativo — verificare con strumenti certificati prima di immergersi.";
@@ -1135,6 +1139,10 @@
 /* Audit remediation 2026-06-03 */
 "cloud.merge.duplicate_session.local" = "ID sessione duplicato rilevato nel logbook locale";
 "cloud.merge.duplicate_session.cloud" = "ID sessione duplicato rilevato nel payload iCloud";
+"cloud.merge.field.depth_profile" = "profilo di profondità";
+"cloud.merge.profile_summary.format" = "%lld campioni, max %.1f m";
+"cloud.status.payload_too_large" = "Il backup cloud è troppo grande per essere sincronizzato in sicurezza. Le immersioni restano salvate localmente.";
+"sync.watch.pending_ack" = "In attesa di conferma dal Watch — sessione conservata in coda";
 "planner.validation.invalid_environment" = "Ambiente planner non valido.";
 "planner.validation.invalid_oxygen_exposure" = "Esposizione ossigeno non valida.";
 "planner.briefing.mode" = "Modalità: pianificato a %.0f m / %d min, %@.";

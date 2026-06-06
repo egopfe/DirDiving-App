@@ -4,7 +4,11 @@ import Combine
 @MainActor
 final class PlannerStore: ObservableObject {
     @Published var mode: PlannerMode = .base {
-        didSet { saveIfReady() }
+        didSet {
+            guard isReady else { return }
+            saveIfReady()
+            applyInputToPlanningOutputs()
+        }
     }
     @Published var input = GasPlanInput() {
         didSet {
@@ -18,7 +22,7 @@ final class PlannerStore: ObservableObject {
         depthMeters: 40,
         bottomGas: GasMix(name: "Gas di Fondo", oxygen: 0.18, helium: 0.45, maxPPO2: 1.40)
     )
-    var analysis: TechnicalGasAnalysis { GasPlanningService.analyze(input: input) }
+    var analysis: TechnicalGasAnalysis { GasPlanningService.analyze(input: input, mode: mode) }
     var briefingText: String { plan.briefingLines.joined(separator: "\n") }
     @Published var repetitivePlanningEnabled: Bool = false {
         didSet { saveIfReady() }
@@ -61,17 +65,18 @@ final class PlannerStore: ObservableObject {
         saveIfReady()
     }
 
-    /// Keeps plan, Bühlmann NDL, and analysis in sync with current gas UI (algorithm unchanged; inputs only).
+    /// Keeps plan, Bühlmann NDL, and analysis in sync with mode-projected planner input.
     private func applyInputToPlanningOutputs(persistSnapshot: Bool = false) {
         guard isReady else { return }
         isApplyingInputSideEffects = true
         input.syncLegacyGasesFromPlannerCylinders()
-        if case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) {
+        let active = PlannerModePolicy.activePlanInput(from: input, mode: mode)
+        if case .success(let environment) = PlannerEnvironment.make(altitudeMeters: active.altitudeMeters, salinity: active.salinity) {
             buhlmann = BuhlmannPlanner.plan(
-                depthMeters: input.buhlmannPlanningDepthMeters,
-                bottomGas: input.buhlmannBackGas,
+                depthMeters: active.buhlmannPlanningDepthMeters,
+                bottomGas: active.buhlmannBackGas,
                 environment: environment,
-                gfHigh: input.gfHigh
+                gfHigh: active.gfHigh
             )
         }
         plan = PlannerService.makePlan(
@@ -82,8 +87,8 @@ final class PlannerStore: ObservableObject {
             surfaceIntervalMinutes: surfaceIntervalMinutes
         )
         if persistSnapshot,
-           let environment = try? makeEnvironment(),
-           let snapshot = RepetitiveDivePlannerService.makeSnapshot(from: BuhlmannPlanner.enginePlan(input: input), environment: environment) {
+           let environment = try? makeEnvironment(from: active),
+           let snapshot = RepetitiveDivePlannerService.makeSnapshot(from: BuhlmannPlanner.enginePlan(input: active), environment: environment) {
             lastTissueSnapshot = snapshot
         }
         isApplyingInputSideEffects = false
@@ -108,7 +113,7 @@ final class PlannerStore: ObservableObject {
         )
     }
 
-    private func makeEnvironment() throws -> PlannerEnvironment {
+    private func makeEnvironment(from input: GasPlanInput) throws -> PlannerEnvironment {
         switch PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) {
         case .success(let environment):
             return environment

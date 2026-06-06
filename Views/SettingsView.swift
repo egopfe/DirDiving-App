@@ -118,7 +118,7 @@ struct SettingsView: View {
                         icon: "drop.fill",
                         iconColor: dive.lastErrorMessage == nil ? DiveUI.green : DiveUI.yellow,
                         title: String(localized: "settings.row.depth_sensor.title"),
-                        subtitle: dive.lastErrorMessage ?? String(localized: "settings.depth.ready")
+                        subtitle: diveDepthSensorStatusText
                     )
                     statusRow(
                         icon: "applewatch.radiowaves.left.and.right",
@@ -221,6 +221,16 @@ struct SettingsView: View {
         @unknown default:
             return String(localized: "Stato permesso sconosciuto")
         }
+    }
+
+    private var diveDepthSensorStatusText: String {
+        if dive.isDepthAutomationMockFallbackActive {
+            return String(localized: "live.depth_mock_fallback.badge")
+        }
+        if dive.lastErrorMessage != nil {
+            return dive.lastErrorMessage ?? String(localized: "settings.depth.ready")
+        }
+        return dive.depthSensorSourceResolution.localizedLabel
     }
 
     private var languagePreferenceControl: some View {

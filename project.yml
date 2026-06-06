@@ -45,6 +45,7 @@ targets:
       - Utils/DiveAlgorithmConfiguration.swift
       - Utils/DiveSessionAlgorithmValidator.swift
       - Utils/SensorSourceMode.swift
+      - Utils/DepthSensorSourceResolution.swift
       - Utils/DeveloperSettings.swift
       - Utils/DeveloperVersionUnlock.swift
       - Services/DepthSensorProvider.swift
@@ -118,6 +119,7 @@ targets:
       - Utils/GPSFallbackPolicy.swift
       - Services/DiveManager.swift
       - Utils/SensorSourceMode.swift
+      - Utils/DepthSensorSourceResolution.swift
       - Utils/DeveloperSettings.swift
       - Utils/LegalAcceptanceGate.swift
       - App/LegalAcceptanceStore.swift
@@ -216,6 +218,7 @@ targets:
       - iOSApp/Utils/DiveSessionAlgorithmValidator.swift
       - iOSApp/Utils/DiveSessionMerge.swift
       - iOSApp/Utils/DiveSessionMergeConflict.swift
+      - iOSApp/Utils/DiveSessionProfileDivergence.swift
       - iOSApp/Utils/DiveSessionCollectionIntegrity.swift
       - iOSApp/Utils/GasMixValidator.swift
       - iOSApp/Utils/IOSAlgorithmConfiguration.swift
