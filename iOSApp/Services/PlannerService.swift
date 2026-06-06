@@ -31,20 +31,9 @@ enum PlannerService {
         repetitiveSnapshot: TissueSnapshot?,
         surfaceIntervalMinutes: Double
     ) -> DivePlanResult {
-        let activeInput = PlannerModePolicy.activePlanInput(from: input, mode: mode)
-        let validation = PlannerModePolicy.validate(draft: input, mode: mode)
-        guard validation.isValid else {
-            return unavailablePlan(
-                input: activeInput,
-                mode: mode,
-                validation: validation,
-                repetitivePlanningEnabled: repetitivePlanningEnabled,
-                repetitiveSnapshot: repetitiveSnapshot,
-                surfaceIntervalMinutes: surfaceIntervalMinutes
-            )
-        }
-        guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: activeInput.altitudeMeters, salinity: activeInput.salinity) else {
-            var invalidValidation = validation
+        guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) else {
+            let activeInput = PlannerModePolicy.activePlanInput(from: input, mode: mode)
+            var invalidValidation = PlannerModePolicy.validate(draft: input, mode: mode)
             invalidValidation.add(.invalidEnvironment)
             return unavailablePlan(
                 input: activeInput,
@@ -56,8 +45,26 @@ enum PlannerService {
             )
         }
 
+        var normalizedDraft = input
+        normalizedDraft.ensurePlannerCylindersFromLegacy()
+        normalizedDraft.normalizeSwitchDepthsToMOD(environment: environment)
+
+        let validation = PlannerModePolicy.validate(draft: normalizedDraft, mode: mode)
+        let activeInput = PlannerModePolicy.activePlanInput(from: normalizedDraft, mode: mode)
+        guard validation.isValid else {
+            return unavailablePlan(
+                input: activeInput,
+                mode: mode,
+                validation: validation,
+                repetitivePlanningEnabled: repetitivePlanningEnabled,
+                repetitiveSnapshot: repetitiveSnapshot,
+                surfaceIntervalMinutes: surfaceIntervalMinutes
+            )
+        }
+
         var working = activeInput
         working.syncLegacyGasesFromPlannerCylinders()
+        working.normalizeSwitchDepthsToMOD(environment: environment)
         let baseRequest = BuhlmannPlanner.makeRequest(input: working, environment: environment)
 
         let request: BuhlmannPlanRequest
