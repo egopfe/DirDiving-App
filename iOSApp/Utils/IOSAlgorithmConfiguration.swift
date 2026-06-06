@@ -27,7 +27,7 @@ enum IOSAlgorithmConfiguration {
     static let minOxygenFraction = 0.000_001
     static let maxGasFraction = 1.0
     static let minPPO2Bar = 1.0
-    static let maxPPO2Bar = 1.6
+    static let maxPPO2Bar = 1.7
     static let minGradientFactor = 0.0
     static let maxGradientFactor = 100.0
 

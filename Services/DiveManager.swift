@@ -126,6 +126,7 @@ final class DiveManager: ObservableObject {
     @Published private(set) var exceededSupportedDepthRange = false
     @Published private(set) var isDepthDataStale = false
     @Published private(set) var depthDataUsesLastKnownReading = false
+    @Published private(set) var diveReminderOverlay: DiveReminderOverlayContent?
 
     private enum AlarmBlinkSource: Hashable {
         case ascent
@@ -181,6 +182,8 @@ final class DiveManager: ObservableObject {
     private var isFinalizingDive = false
     private var lastDepthAlarmDate: Date?
     private var lastRuntimeAlarmDate: Date?
+    private var diveReminderRuntimeState = DiveReminderRuntimeState()
+    private var diveReminderDismissTask: Task<Void, Never>?
     private var lastBatteryAlarmDate: Date?
     private var lastAlarmDismissDate: Date?
     private var activeDiveExceededSupportedDepth = false
@@ -585,6 +588,7 @@ final class DiveManager: ObservableObject {
         ttv = DiveAlgorithm.ttvIndex(averageDepthMeters: averageDepthMeters, durationSeconds: runtime)
         if evaluateAlarms {
             evaluateRuntimeAlarms()
+            evaluateDiveReminders()
         }
     }
 
@@ -738,6 +742,7 @@ final class DiveManager: ObservableObject {
         applyMissionModeIfNeededOnDiveStart()
         HapticService.shared.criticalConfirm()
         alarmWarningMessage = nil
+        resetDiveReminderRuntime()
         let start = sessionStart ?? Date()
         activeDiveSessionID = UUID()
         self.sessionStart = start
@@ -790,6 +795,7 @@ final class DiveManager: ObservableObject {
         HapticService.shared.criticalConfirm()
         runtimeTimer?.invalidate()
         runtimeTimer = nil
+        resetDiveReminderRuntime()
         stopAllBlinking()
         ascentHaptics.clear()
         runtimeClock.clear()
@@ -1054,6 +1060,49 @@ final class DiveManager: ObservableObject {
         }
     }
 
+    private var shouldSuppressDiveReminders: Bool {
+        if alarmWarningMessage != nil { return true }
+        if depthSafetyState == .exceeded { return true }
+        if ascentAlarmEnabled, ascentStatus.isOverLimit { return true }
+        return false
+    }
+
+    private func evaluateDiveReminders() {
+        guard isDiveActive, diveReminderOverlay == nil, !shouldSuppressDiveReminders else { return }
+        let settings = DiveReminderSettingsStore.load()
+        let runtimeMinute = Int(runtime / 60)
+        let triggered = DiveReminderEngine.evaluate(
+            runtimeSeconds: runtime,
+            runtimeMinute: runtimeMinute,
+            settings: settings,
+            state: &diveReminderRuntimeState
+        )
+        guard !triggered.isEmpty else { return }
+        presentDiveReminderOverlay(
+            DiveReminderEngine.makeOverlay(for: triggered, runtimeMinute: runtimeMinute)
+        )
+    }
+
+    private func presentDiveReminderOverlay(_ content: DiveReminderOverlayContent) {
+        diveReminderDismissTask?.cancel()
+        diveReminderOverlay = content
+        if content.shouldHaptic {
+            HapticService.shared.reminderPulseIfNeeded()
+        }
+        diveReminderDismissTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+            guard !Task.isCancelled else { return }
+            self?.diveReminderOverlay = nil
+        }
+    }
+
+    private func resetDiveReminderRuntime() {
+        diveReminderDismissTask?.cancel()
+        diveReminderDismissTask = nil
+        diveReminderOverlay = nil
+        diveReminderRuntimeState.reset()
+    }
+
     private func stopStopwatch(playHaptic: Bool) {
         guard isStopwatchRunning || stopwatchTimer != nil else { return }
         updateStopwatchFromClock()
@@ -1254,5 +1303,20 @@ extension DiveManager {
         blinkTimer = nil
         automaticSurfaceEndTask?.cancel()
         automaticSurfaceEndTask = nil
+        diveReminderDismissTask?.cancel()
+        diveReminderDismissTask = nil
+    }
+
+    func testHook_setRuntimeForTests(_ seconds: TimeInterval) {
+        runtime = seconds
+        lastReportedRuntime = seconds
+    }
+
+    func testHook_evaluateDiveRemindersForTests() {
+        evaluateDiveReminders()
+    }
+
+    var testHook_diveReminderRuntimeState: DiveReminderRuntimeState {
+        diveReminderRuntimeState
     }
 }

@@ -130,6 +130,11 @@ targets:
       - Services/MockDepthSensorProvider.swift
       - Services/DiveLogStore.swift
       - Services/AscentRateSettingsStore.swift
+      - Services/DiveReminderSettingsStore.swift
+      - Models/DiveReminder.swift
+      - Utils/DiveReminderEngine.swift
+      - Tests/WatchAlgorithmTests/DiveReminderEngineTests.swift
+      - Tests/WatchAlgorithmTests/DiveReminderIntegrationTests.swift
       - Services/GPSManager.swift
       - Services/HapticService.swift
       - Services/AscentSafetyHapticCoordinator.swift
@@ -188,6 +193,7 @@ targets:
       - iOSApp/Models/DiveSample.swift
       - iOSApp/Models/DiveSession.swift
       - iOSApp/Models/GasPlan.swift
+      - iOSApp/Models/EquipmentProfile.swift
       - iOSApp/Models/GPSPoint.swift
       - iOSApp/Models/TankSize.swift
       - iOSApp/Algorithms/Buhlmann/BuhlmannConstants.swift
@@ -227,6 +233,9 @@ targets:
       - iOSApp/Utils/Formatters.swift
       - iOSApp/Utils/PlannerInputValidator.swift
       - iOSApp/Utils/PlannerModePolicy.swift
+      - iOSApp/Utils/ChecklistPlannerSyncMapper.swift
+      - iOSApp/Utils/PlannerGasEditingSupport.swift
+      - iOSApp/Utils/PlannerModeLimits.swift
       - iOSApp/Utils/SensorSourceMode.swift
       - iOSApp/Utils/DeveloperSettings.swift
       - iOSApp/Utils/PlannerCNSDescentBottomCheckSettings.swift
@@ -243,6 +252,13 @@ targets:
       - iOSApp/Utils/ManualDiveEditorDefaults.swift
       - iOSApp/Utils/RouteSummaryAggregation.swift
       - iOSApp/Utils/PressureDisplayMath.swift
+      - iOSApp/Services/PDF/PDFDocumentBuilder.swift
+      - iOSApp/Services/PDF/PDFExportService.swift
+      - iOSApp/Services/PDF/PlannerPDFBuilder.swift
+      - iOSApp/Services/PDF/BriefingPDFBuilder.swift
+      - iOSApp/Services/PDF/ChecklistPDFBuilder.swift
+      - iOSApp/Services/PDF/DivePackPDFBuilder.swift
+      - Tests/iOSAlgorithmTests/PDFExportServiceTests.swift
     resources:
       - path: Tests/iOSAlgorithmTests/Fixtures
         type: folder
