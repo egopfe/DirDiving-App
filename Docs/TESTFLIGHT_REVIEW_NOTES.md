@@ -21,7 +21,8 @@ Lo stato algoritmico MAIN e documentato in:
 - [`DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md) e [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md) per il motore Buhlmann ZHL-16C N2+He multigas reference.
 - [`DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_REAUDIT.md) per UX/UI readiness post-fix @ `3237262` (verdict **READY**).
 - [`DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md`](DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md) per CNS/OTU comprehensive NOAA e readiness P1–P4 @ `dae29b8`. La release MAIN corrente non deve essere descritta come decompression planner certificato.
-- [`IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) — audit IOS-AUDIT-001…012 remediation @ 2026-06-03.
+- [`IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) — remediation iOS MAIN @ 2026-06-06 (HIGH-001/002, cloud profile, NDL projection, KVS cap).
+- [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) — read-only audit baseline iOS three-tab Planner @ `ecad0d9`.
 - [`IOS_PLANNER_LIMITATIONS.md`](IOS_PLANNER_LIMITATIONS.md) — reference-only planner semantics (ledger, analysis averages, pressure units).
 - [`SUBSURFACE_EXPORT_COMPATIBILITY_QA.md`](SUBSURFACE_EXPORT_COMPATIBILITY_QA.md) — external Subsurface import QA (manual, not yet executed in CI).
 - [`MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md`](MAIN_UI_UX_READINESS_AUDIT_POST_FIX.md) per UI/UX readiness MAIN @ `c8f91f6` (verdict **Internal TestFlight UI/UX YES**; QA fisica § I ancora richiesta).

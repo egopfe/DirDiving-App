@@ -2,8 +2,17 @@ import Foundation
 
 enum GasPlanningService {
     static func analyze(input: GasPlanInput) -> TechnicalGasAnalysis {
+        analyze(input: input, mode: .technical)
+    }
+
+    static func analyze(input: GasPlanInput, mode: PlannerMode) -> TechnicalGasAnalysis {
+        let active = PlannerModePolicy.activePlanInput(from: input, mode: mode)
+        return analyzeProjectedInput(active, mode: mode)
+    }
+
+    private static func analyzeProjectedInput(_ input: GasPlanInput, mode: PlannerMode) -> TechnicalGasAnalysis {
         let gas = input.bottomGas
-        let validation = PlannerInputValidator.validate(input)
+        let validation = PlannerInputValidator.validate(input, mode: mode)
         guard validation.isValid else {
             return unavailableAnalysis(input: input, gas: gas, validation: validation)
         }
@@ -71,8 +80,8 @@ enum GasPlanningService {
         }
     }
 
-    static func analyze(input: GasPlanInput, enginePlan: BuhlmannEngineResult, oxygenCarryover: OxygenExposureCarryover = .zero) -> TechnicalGasAnalysis {
-        let base = analyze(input: input)
+    static func analyze(input: GasPlanInput, enginePlan: BuhlmannEngineResult, oxygenCarryover: OxygenExposureCarryover = .zero, mode: PlannerMode = .technical) -> TechnicalGasAnalysis {
+        let base = analyze(input: input, mode: mode)
         guard !enginePlan.segments.isEmpty, enginePlan.modelState == .validReference else {
             return base
         }
@@ -699,7 +708,7 @@ enum GasPlanningService {
     private static func segmentsExceedGasPPO2Limit(_ segments: [BuhlmannRuntimeSegment], environment: PlannerEnvironment) -> Bool {
         segments.contains { segment in
             let ppO2 = segment.gas.ppO2(depthMeters: segment.depthMeters, environment: environment)
-            return ppO2 > segment.gas.maxPPO2Bar + 0.000_1
+            return ppO2 > segment.gas.maxPPO2Bar + IOSAlgorithmConfiguration.ppo2HardValidationToleranceBar
         }
     }
 

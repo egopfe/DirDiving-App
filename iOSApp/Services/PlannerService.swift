@@ -114,7 +114,7 @@ enum PlannerService {
             surfaceIntervalMinutes: surfaceIntervalMinutes
         )
         let ledgerResult = ScheduleGasConsumptionService.analyze(input: working, enginePlan: enginePlan, environment: environment)
-        let analysis = GasPlanningService.analyze(input: working, enginePlan: enginePlan, oxygenCarryover: oxygenCarryover)
+        let analysis = GasPlanningService.analyze(input: working, enginePlan: enginePlan, oxygenCarryover: oxygenCarryover, mode: mode)
         let rawStops = BuhlmannPlanner.decoStops(from: enginePlan)
         let completenessResolution = PlanCalculationCompletenessResolver.resolve(
             enginePlan: enginePlan,
@@ -228,7 +228,7 @@ enum PlannerService {
         repetitiveSnapshot: TissueSnapshot?,
         surfaceIntervalMinutes: Double
     ) -> DivePlanResult {
-        let analysis = GasPlanningService.analyze(input: input)
+        let analysis = GasPlanningService.analyze(input: input, mode: mode)
         let states = validation.states.isEmpty ? [.invalidInput] : validation.states
         let environmentSummary: PlannerEnvironmentSummary?
         if case .failure(let error) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) {
