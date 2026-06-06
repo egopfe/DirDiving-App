@@ -63,6 +63,20 @@ struct SettingsView: View {
                     .buttonStyle(.plain)
                     .disabled(dive.isDiveActive)
 
+                    NavigationLink {
+                        DiveReminderSettingsView()
+                    } label: {
+                        settingsRow(
+                            icon: "bell.badge",
+                            iconColor: DiveUI.orange,
+                            title: String(localized: "dive_reminder.nav.title"),
+                            subtitle: String(localized: "dive_reminder.settings.subtitle"),
+                            showsChevron: true
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(dive.isDiveActive)
+
                     WatchSettingsSectionHeader(title: String(localized: "settings.section.units_language"))
 
                     unitPreferenceControl
