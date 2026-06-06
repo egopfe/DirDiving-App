@@ -97,12 +97,11 @@ final class PlannerModePolicyTests: XCTestCase {
         XCTAssertFalse(String(localized: "planner.mode.base").isEmpty)
         XCTAssertFalse(String(localized: "planner.mode.deco").isEmpty)
         XCTAssertFalse(String(localized: "planner.mode.technical").isEmpty)
-        XCTAssertFalse(String(localized: "planner.base.exceeds_mode.message").isEmpty)
+        XCTAssertFalse(String(localized: "planner.mode.base.description").isEmpty)
+        XCTAssertFalse(String(localized: "planner.mode.basic.no_deco.message").isEmpty)
+        XCTAssertFalse(String(localized: "planner.mode.deco.depth_limit.message").isEmpty)
+        XCTAssertFalse(String(localized: "planner.mode.technical.notice.message").isEmpty)
         XCTAssertFalse(String(localized: "planner.reference_only.warning").isEmpty)
-        XCTAssertFalse(String(localized: "planner.export.mode_line").isEmpty)
-        XCTAssertFalse(String(localized: "planner.export.mode_disclaimer.base").isEmpty)
-        XCTAssertFalse(String(localized: "planner.export.mode_disclaimer.deco").isEmpty)
-        XCTAssertFalse(String(localized: "planner.export.mode_disclaimer.technical").isEmpty)
     }
 
     func testBaseInvalidAltitudeRejectedInAllModes() {

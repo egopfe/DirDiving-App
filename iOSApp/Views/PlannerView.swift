@@ -18,6 +18,25 @@ struct PlannerView: View {
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
     private var modePresentation: PlannerResultPresentation { PlannerResultPresentation.presentation(for: store.mode) }
 
+    private var profileMaxDepthLimitMeters: Double? {
+        switch store.mode {
+        case .base:
+            return PlannerModeLimits.basicMaximumDepthMeters(for: store.input)
+        case .deco:
+            return PlannerModeLimits.decoMaximumDepthMeters(for: store.input)
+        case .technical:
+            return nil
+        }
+    }
+
+    private var profileMaxAverageDepthLimitMeters: Double? {
+        store.mode == .deco ? PlannerModeLimits.decoMaximumDepthMeters(for: store.input) : nil
+    }
+
+    private var profileMaxBottomMinutes: Double? {
+        store.mode == .base ? PlannerModeLimits.basicMaximumBottomMinutes(for: store.input) : nil
+    }
+
     private var plannerSafetyAcknowledged: Bool {
         plannerSafetyAckRevision == PlannerSafetyAcknowledgment.currentRevision
     }
@@ -53,6 +72,7 @@ struct PlannerView: View {
                                 teamPreviewCard
                             }
                             plannerMODInputWarnings
+                            plannerModeLimitWarnings
                             plannerWarnings
                             calculateButton
                         }
@@ -144,10 +164,18 @@ struct PlannerView: View {
     private var profileCard: some View {
         DIRCard(String(localized: "planner.profile.title"), icon: nil, accent: DIRTheme.cyan) {
             VStack(spacing: 0) {
-                plannerDepthField(String(localized: "planner.field.max_depth"), meters: $store.input.plannedDepthMeters)
+                plannerDepthField(
+                    String(localized: "planner.field.max_depth"),
+                    meters: $store.input.plannedDepthMeters,
+                    maxMeters: profileMaxDepthLimitMeters
+                )
                 if store.mode != .base {
                     Divider().overlay(DIRTheme.hairline)
-                    plannerDepthField(String(localized: "planner.field.avg_depth"), meters: $store.input.plannedAverageDepthMeters)
+                    plannerDepthField(
+                        String(localized: "planner.field.avg_depth"),
+                        meters: $store.input.plannedAverageDepthMeters,
+                        maxMeters: profileMaxAverageDepthLimitMeters
+                    )
                     Divider().overlay(DIRTheme.hairline)
                     HStack(spacing: 8) {
                         Text(String(localized: "planner.field.planning_reference"))
@@ -180,7 +208,13 @@ struct PlannerView: View {
                     .padding(.vertical, 10)
                 }
                 Divider().overlay(DIRTheme.hairline)
-                plannerField(String(localized: "planner.field.bottom_time"), value: $store.input.plannedBottomMinutes, unit: "min", step: 1)
+                plannerField(
+                    String(localized: "planner.field.bottom_time"),
+                    value: $store.input.plannedBottomMinutes,
+                    unit: "min",
+                    step: 1,
+                    maxValue: profileMaxBottomMinutes
+                )
                 Divider().overlay(DIRTheme.hairline)
                 plannerTemperatureField(String(localized: "planner.field.temperature"), celsius: $store.input.waterTemperatureCelsius)
                 if store.mode == .technical {
@@ -506,9 +540,6 @@ struct PlannerView: View {
         let entry = store.input.plannerCylinders[index]
         return VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(String(localized: "planner.cylinder.title"))
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(DIRTheme.muted)
                 Spacer()
                 if store.mode == .technical, store.input.plannerCylinders.count > 1 {
                     Button(role: .destructive) {
@@ -520,76 +551,37 @@ struct PlannerView: View {
                     .buttonStyle(.plain)
                 }
             }
-            if store.mode == .technical {
-                HStack {
-                    Text(String(localized: "planner.cylinder.role"))
-                        .foregroundStyle(DIRTheme.muted)
-                    Spacer()
-                    Picker("", selection: $store.input.plannerCylinders[index].role) {
-                        ForEach(GasRole.allCases) { role in
-                            Text(role.localizedTitle).tag(role)
-                        }
-                    }
-                    .labelsHidden()
-                    .tint(DIRTheme.cyan)
-                    .onChange(of: store.input.plannerCylinders[index].role) { _, _ in
-                        store.clampAllSwitchDepthsToMOD()
-                    }
-                }
-                .font(.callout)
-            } else {
-                Text(entry.role.localizedTitle)
-                    .font(.callout.weight(.semibold))
-                    .foregroundStyle(.white)
-            }
-            if store.mode == .technical {
-                HStack {
-                    Text(String(localized: "planner.cylinder.tank_size"))
-                        .foregroundStyle(DIRTheme.muted)
-                    Spacer()
-                    Picker("", selection: $store.input.plannerCylinders[index].tankSize) {
-                        ForEach(TankSize.allCases) { size in
-                            Text(size.rawValue).tag(size)
-                        }
-                    }
-                    .labelsHidden()
-                    .tint(DIRTheme.cyan)
-                }
-                .font(.callout)
-            }
-            Text(
-                String(
-                    format: String(localized: "planner.mod.value_format"),
-                    Formatters.depth(entry.modMeters(environment: store.input.plannerEnvironment), units: unitPreference).text
-                )
-            )
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(DIRTheme.cyan)
-            if entry.role != .bottom {
-                plannerDepthField(
-                    String(localized: "planner.field.switch_depth"),
-                    meters: clampedSwitchDepthBinding(for: index),
-                    step: 1,
-                    maxMeters: entry.usableSwitchDepthMeters(environment: store.input.plannerEnvironment)
-                )
-            }
-            GasMixCard(
-                mix: $store.input.plannerCylinders[index].gas,
-                accent: entry.role == .bottom ? DIRTheme.green : DIRTheme.yellow,
+            PlannerCylinderGasEditorView(
+                entry: $store.input.plannerCylinders[index],
+                cylinderNumber: cylinderDisplayNumber(for: entry),
+                plannerMode: store.mode,
+                allowedMixKinds: PlannerModePolicy.allowedMixKinds(for: store.mode),
                 unitPreference: unitPreference,
                 plannerEnvironment: store.input.plannerEnvironment,
-                allowedMixKinds: PlannerModePolicy.allowedMixKinds(for: store.mode),
-                onMixChanged: {
+                plannedDepthMeters: store.input.plannedDepthMeters,
+                showsRoleEditor: store.mode == .technical,
+                showsTankEditor: store.mode == .technical,
+                switchDepthMeters: entry.role != .bottom ? clampedSwitchDepthBinding(for: index) : nil,
+                maxSwitchDepthMeters: entry.role != .bottom
+                    ? entry.usableSwitchDepthMeters(environment: store.input.plannerEnvironment)
+                    : nil,
+                onGasOrPressureChanged: {
                     store.normalizeSwitchDepthAfterGasOrPPO2Change(cylinderID: entry.id)
                 }
             )
-            if entry.isSwitchDepthBeyondMOD(environment: store.input.plannerEnvironment) {
-                Text(String(localized: "planner.mod.exceeds_allowed"))
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(DIRTheme.red)
+            if entry.gas.mixKind == .trimix {
+                Text(String(localized: "planner.gas.trimix_buhlmann_disclaimer"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             Divider().overlay(DIRTheme.hairline)
         }
+    }
+
+    private func cylinderDisplayNumber(for entry: PlannerCylinderEntry) -> Int {
+        let visible = visiblePlannerCylinders
+        return (visible.firstIndex(where: { $0.id == entry.id }) ?? 0) + 1
     }
 
     private var technicalAnalysisCard: some View {
@@ -678,6 +670,33 @@ struct PlannerView: View {
 
     private var canCalculatePlan: Bool {
         plannerSafetyAcknowledged && liveValidation.isValid && liveMODIssues.isEmpty
+    }
+
+    @ViewBuilder
+    private var plannerModeLimitWarnings: some View {
+        if liveValidation.states.contains(.basicNoDecoLimitExceeded) {
+            let message = PlannerUserFacingCopy.message(for: .basicNoDecoLimitExceeded)
+            DIRWarningBox(
+                text: [message.title, message.message, message.correctiveHint].compactMap { $0 }.joined(separator: "\n"),
+                severity: .critical
+            )
+        }
+        if liveValidation.states.contains(.decoDepthLimitExceeded) {
+            let message = PlannerUserFacingCopy.message(for: .decoDepthLimitExceeded)
+            DIRWarningBox(
+                text: [message.title, message.message, message.correctiveHint].compactMap { $0 }.joined(separator: "\n"),
+                severity: .critical
+            )
+        }
+        if store.mode == .technical {
+            DIRWarningBox(
+                text: [
+                    String(localized: "planner.mode.technical.notice.title"),
+                    String(localized: "planner.mode.technical.notice.message")
+                ].joined(separator: "\n"),
+                severity: .info
+            )
+        }
     }
 
     @ViewBuilder

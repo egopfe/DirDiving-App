@@ -91,6 +91,7 @@ enum GasMixKind: String, CaseIterable, Identifiable, Codable {
     case air
     case ean
     case trimix
+    case oxygen
     var id: String { rawValue }
 
     var localizedTitle: String {
@@ -98,6 +99,17 @@ enum GasMixKind: String, CaseIterable, Identifiable, Codable {
         case .air: return String(localized: "gas.mix.air")
         case .ean: return String(localized: "gas.mix.ean")
         case .trimix: return String(localized: "gas.mix.trimix")
+        case .oxygen: return String(localized: "gas.mix.oxygen")
+        }
+    }
+
+    /// Short label for compact planner rows (e.g. TX, O₂).
+    var plannerPickerTitle: String {
+        switch self {
+        case .air: return String(localized: "gas.mix.air")
+        case .ean: return String(localized: "gas.mix.ean")
+        case .trimix: return String(localized: "gas.mix.trimix.short")
+        case .oxygen: return String(localized: "gas.mix.oxygen.short")
         }
     }
 }
@@ -235,11 +247,12 @@ struct GasMix: Identifiable, Codable, Hashable {
             .filter { [.invalidInput, .unsupportedGas].contains($0) }
             .isEmpty
     }
-    var canEditOxygen: Bool { mixKind != .air }
+    var canEditOxygen: Bool { mixKind == .ean || mixKind == .trimix }
     var canEditHelium: Bool { mixKind == .trimix }
 
     static func inferredKind(oxygen: Double, helium: Double) -> GasMixKind {
         if helium > 0.001 { return .trimix }
+        if oxygen > 0.985 { return .oxygen }
         if abs(oxygen - 0.21) < 0.005 { return .air }
         return .ean
     }
@@ -258,46 +271,59 @@ struct GasMix: Identifiable, Codable, Hashable {
             helium = 0
         case .trimix:
             break
+        case .oxygen:
+            oxygen = 1.0
+            helium = 0
         }
         normalizeMixAndPPO2()
     }
 
     mutating func normalizeMixAndPPO2() {
-        maxPPO2 = (maxPPO2 * 10).rounded() / 10
-        maxPPO2 = min(max(1.0, maxPPO2), 1.6)
+        maxPPO2 = PlannerGasEditingSupport.normalizePPO2(maxPPO2)
         switch mixKind {
         case .air:
             oxygen = 0.21
             helium = 0
         case .ean:
             helium = 0
-            oxygen = min(max(oxygen, 0.10), 1.0)
+            oxygen = PlannerGasEditingSupport.clampOxygenFraction(oxygen, heliumFraction: 0)
         case .trimix:
-            helium = min(max(helium, 0), 1.0)
-            oxygen = min(max(oxygen, 0.10), max(0.10, 1.0 - helium))
+            helium = PlannerGasEditingSupport.clampHeliumFraction(helium, oxygenFraction: oxygen)
+            oxygen = PlannerGasEditingSupport.clampOxygenFraction(oxygen, heliumFraction: helium)
+        case .oxygen:
+            oxygen = 1.0
+            helium = 0
         }
     }
 
     mutating func setOxygenFraction(_ value: Double) {
         guard canEditOxygen else { return }
         switch mixKind {
-        case .air:
+        case .air, .oxygen:
             break
         case .ean:
-            oxygen = min(max(value, 0.10), 1.0)
+            oxygen = PlannerGasEditingSupport.clampOxygenFraction(value, heliumFraction: 0)
         case .trimix:
-            let capped = min(max(value, 0.10), 1.0 - helium)
-            oxygen = capped
+            oxygen = PlannerGasEditingSupport.clampOxygenFraction(value, heliumFraction: helium)
         }
+    }
+
+    mutating func setOxygenPercent(_ percent: Int) {
+        setOxygenFraction(Double(percent) / 100.0)
     }
 
     mutating func setHeliumFraction(_ value: Double) {
         guard canEditHelium else { return }
-        helium = min(max(value, 0), 1.0 - oxygen)
+        helium = PlannerGasEditingSupport.clampHeliumFraction(value, oxygenFraction: oxygen)
+        oxygen = PlannerGasEditingSupport.clampOxygenFraction(oxygen, heliumFraction: helium)
+    }
+
+    mutating func setHeliumPercent(_ percent: Int) {
+        setHeliumFraction(Double(percent) / 100.0)
     }
 
     mutating func setMaxPPO2(_ value: Double) {
-        maxPPO2 = min(max(1.0, (value * 10).rounded() / 10), 1.6)
+        maxPPO2 = PlannerGasEditingSupport.normalizePPO2(value)
     }
 
     enum CodingKeys: String, CodingKey {
