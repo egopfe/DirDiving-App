@@ -434,10 +434,6 @@ struct PlannerView: View {
                 }
             }
         }
-        .onChange(of: store.input.plannerCylinders) { _, _ in
-            store.input.syncLegacyGasesFromPlannerCylinders()
-            store.refreshDerivedPlanningPreview()
-        }
     }
 
     @ViewBuilder
@@ -469,7 +465,6 @@ struct PlannerView: View {
                 if store.mode == .technical, store.input.plannerCylinders.count > 1 {
                     Button(role: .destructive) {
                         store.input.plannerCylinders.removeAll { $0.id == entry.id }
-                        store.input.syncLegacyGasesFromPlannerCylinders()
                     } label: {
                         Text(String(localized: "planner.cylinder.remove"))
                             .font(.caption2.weight(.semibold))
@@ -532,18 +527,7 @@ struct PlannerView: View {
                 unitPreference: unitPreference,
                 plannerEnvironment: store.input.plannerEnvironment,
                 allowedMixKinds: PlannerModePolicy.allowedMixKinds(for: store.mode)
-            ) {
-                store.input.syncLegacyGasesFromPlannerCylinders()
-                store.refreshDerivedPlanningPreview()
-            }
-            .onChange(of: store.input.plannerCylinders[index].role) { _, newRole in
-                store.input.plannerCylinders[index].gas.role = newRole
-                store.input.syncLegacyGasesFromPlannerCylinders()
-                store.refreshDerivedPlanningPreview()
-            }
-            .onChange(of: store.input.plannerCylinders[index].switchDepthMeters) { _, _ in
-                store.refreshDerivedPlanningPreview()
-            }
+            )
             if entry.isSwitchDepthBeyondMOD(environment: store.input.plannerEnvironment) {
                 Text(String(localized: "planner.mod.exceeds_allowed"))
                     .font(.caption2.weight(.semibold))
