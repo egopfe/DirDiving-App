@@ -1,9 +1,85 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-05  
-**Branch consigliato:** `main` = `origin/main` @ `e47c860`  
+**Aggiornato:** 2026-06-06  
+**Branch consigliato:** `main` = `origin/main` @ `36a4d9f`  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-06-06 — iOS MAIN algorithm audit (`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`)
+
+Audit read-only **iOS Companion MAIN** (`DIRDiving iOS` only), post-implementazione Planner **Base / Deco / Technical** + UI readiness @ `ecad0d9`. Documento indicizzato su `main` @ commit `5415213`.
+
+| Campo | Valore |
+|-------|--------|
+| **Documento** | [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) |
+| **Percorso** | `Docs/IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md` |
+| **Commit indicizzazione** | `5415213` (`docs(ios): update MAIN algorithm audit for three-tab Planner @ ecad0d9`) |
+| **Baseline codice auditata** | `ecad0d9` |
+| **Data audit** | 2026-06-05 |
+| **Target** | `DIRDiving iOS` (MAIN only) |
+| **Modalità** | Read-only statico + XCTest locali |
+| **XCTest** | 287 passed, 4 skipped, 0 failures (iPhone 17 Pro sim) |
+
+### Readiness (executive summary §A)
+
+| Area | Stima | Note |
+|------|------:|------|
+| Mathematical robustness | **91%** | Engine e validatori solidi |
+| Planner three-mode | **88%** | Architettura reale; gap preview/export |
+| Bühlmann ZHL-16C | **93%** | Modello tissue reale |
+| Automated tests | **93%** | 287 XCTest pass |
+
+### Severity (§A)
+
+| Severity | Count | Blocker principale |
+|----------|------:|-------------------|
+| CRITICAL | 0 | — |
+| HIGH | 2 | Cloud profile silent merge; NDL preview vs projected input |
+| MEDIUM | 6 | PPO₂ tolerance, export label, env validation, … |
+| LOW | 4 | Deco NDL tab, bailout ledger, l10n, Subsurface regression |
+
+### Mappa sezioni report
+
+| § | Titolo | Contenuto chiave |
+|---|--------|------------------|
+| A | Executive Summary | Readiness, severity, blockers TestFlight/App Store |
+| B | Algorithm Inventory | Bühlmann, gas, CNS/OTU, logbook, sync, CSV |
+| C | Planner Mode Audit | Base / Deco / Technical — projection, validation, UI gating |
+| D | Findings by Family | Issue IDs per famiglia algoritmica |
+| E | Edge Case Matrix | Bound, NaN, empty, mode switch |
+| F–K | Test plans | Unit, mode regression, Watch pair, CSV, cloud, boundaries |
+| L | Prioritized Roadmap | HIGH → LOW remediation order |
+| M | Final Verdict | Internal TestFlight sì con caveat; external no fino HIGH-001 |
+| Appendix | Build evidence | `DIRDiving iOS Algorithm Tests` @ `ecad0d9` |
+
+### Documenti correlati
+
+| Documento | Relazione |
+|-----------|-----------|
+| [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | **Audit corrente** (questo file) |
+| [`IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) | Remediation IOS-AUDIT-001…012 @ 2026-06-03 |
+| [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) | Remediation storica pre three-tab @ `dce89e7` |
+| [`IOS_MAIN_ALGORITHM_READINESS_100_FINAL_QA.md`](IOS_MAIN_ALGORITHM_READINESS_100_FINAL_QA.md) | QA matrix post-remediation |
+| [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md) | Limitazioni reference-only |
+| [`DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_AUDIT_CURRENT.md`](DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_AUDIT_CURRENT.md) | Audit UI deco table / curva Bühlmann @ 2026-06-06 |
+| [`DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md) | Audit post-hardening storico |
+| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | Audit parallelo Watch MAIN |
+
+**Esclusi da scope audit iOS:** file experimental in `project.yml` (`Exploration*`, `BuddyExperimental*`, …). Apple Watch runtime fuori scope salvo modelli/codec condivisi.
+
+---
+
+## Aggiornamento indice 2026-06-06 — Watch MAIN algorithm remediation @ `36a4d9f`
+
+Remediation codice/test Watch MAIN da audit @ `5415213` (120 XCTest pass, 0 failures):
+
+| Documento | Posizione | Contenuto |
+|-----------|-----------|-----------|
+| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) | `Docs/` | **Report remediation** — WATCH-TEST-001…SYNC-001; ~97–98% readiness escl. QA fisica |
+| [`WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md`](WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md) | `Docs/` | Checklist QA hardware Watch Ultra |
+| [`WATCH_CSV_EXPORT_POLICY.md`](WATCH_CSV_EXPORT_POLICY.md) | `Docs/` | Policy export CSV allineata iOS |
 
 ---
 
@@ -567,13 +643,13 @@ Audit read-only Apple Watch MAIN (`DIRDiving Watch App` only):
 
 ## Aggiornamento indice 2026-06-05 — iOS MAIN algorithm audit (three-tab Planner) @ `ecad0d9`
 
-Audit read-only post-implementazione Planner **Base / Deco / Technical** + UI readiness @ `ecad0d9`:
+> **Indice completo:** vedi sezione **2026-06-06 — iOS MAIN algorithm audit** in cima a questo file.
 
 | Documento | Posizione | Contenuto |
 |-----------|-----------|-----------|
 | [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | `Docs/` | **Audit corrente** — ~91% math robustness; three-mode **88%**; 287/287 XCTest pass; 0 CRITICAL, 2 HIGH (cloud profile merge, NDL preview projection) |
 
-Scope: `DIRDiving iOS` only; experimental files esclusi in `project.yml`. Nessuna modifica codice.
+Scope: `DIRDiving iOS` only; experimental files esclusi in `project.yml`. Indicizzato su `main` @ `5415213`.
 
 ---
 
@@ -1169,6 +1245,10 @@ Audit storici ora consolidati in `Docs/`: vedi anche **§13** — [`DIR_DIVING_W
 | [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md) | §6 |
 | [`DIR_Diving_Planner_Tabs_Implementation_Plan.md`](DIR_Diving_Planner_Tabs_Implementation_Plan.md) | §6, agg. 2026-06-06 |
 | [`DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_AUDIT_CURRENT.md`](DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_AUDIT_CURRENT.md) | §6, agg. 2026-06-06 |
+| [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | **§4**, agg. 2026-06-06 @ `5415213` — audit iOS MAIN three-tab Planner @ `ecad0d9` |
+| [`IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) | §4, §6 — remediation IOS-AUDIT-001…012 |
+| [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) | §4, §6 — remediation storica @ `dce89e7` |
+| [`IOS_MAIN_ALGORITHM_READINESS_100_FINAL_QA.md`](IOS_MAIN_ALGORITHM_READINESS_100_FINAL_QA.md) | §4, §6 — QA matrix iOS MAIN |
 | [`DIR_DIVING_FULL_UI_UX_AUDIT_CURRENT.md`](DIR_DIVING_FULL_UI_UX_AUDIT_CURRENT.md) | agg. 2026-06-05 — audit Watch+iOS @ `bdd3a43` |
 | [`DIR_DIVING_UI_UX_READINESS_100_PLAN_CURRENT.md`](DIR_DIVING_UI_UX_READINESS_100_PLAN_CURRENT.md) | **agg. 2026-06-05** — piano UI/UX 100% Watch+iOS @ `e47c860` |
 | `DOCUMENTATION_BRANCH_ALIGNMENT_20260517.md` … `20260525.md` | §2, §9 |
@@ -1208,6 +1288,10 @@ Audit storici ora consolidati in `Docs/`: vedi anche **§13** — [`DIR_DIVING_W
 | [`WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md`](WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md) | §3, §12 |
 | [`WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md`](WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md) | §4, §6 |
 | [`WATCH_MAIN_UX_CONVENTIONS.md`](WATCH_MAIN_UX_CONVENTIONS.md) | §3 |
+| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | §3, agg. 2026-06-05 @ `5415213` |
+| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) | §3, agg. 2026-06-06 @ `36a4d9f` |
+| [`WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md`](WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md) | §3, §6 |
+| [`WATCH_CSV_EXPORT_POLICY.md`](WATCH_CSV_EXPORT_POLICY.md) | §3, §6 |
 | [`iOS/*.md`](iOS/BUILD_AND_RUN.md) | §4 |
 
 Altri asset in `Docs/`: `.docx`, `.csv`, `.xlsx`, `.py` (generatori §11), `ReferenceUI/`, `ReferenceIcon/`, immagini §10.
