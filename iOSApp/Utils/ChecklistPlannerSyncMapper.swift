@@ -219,13 +219,18 @@ enum ChecklistPlannerSyncMapper {
                     oxygen = 0.18
                     helium = 0.45
                 }
+            case .oxygen:
+                oxygen = 1.0
+                helium = 0
             }
         }
+        var resolvedKind = item.gasMixKind
+        if resolvedKind == .ean, oxygen > 0.985 { resolvedKind = .oxygen }
         let name = item.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Gas" : item.title
         var mix = GasMix(
             name: name,
             role: role,
-            mixKind: item.gasMixKind,
+            mixKind: resolvedKind,
             oxygen: oxygen,
             helium: helium,
             maxPPO2: defaultMaxPPO2(for: role)

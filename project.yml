@@ -229,6 +229,7 @@ targets:
       - iOSApp/Utils/PlannerInputValidator.swift
       - iOSApp/Utils/PlannerModePolicy.swift
       - iOSApp/Utils/ChecklistPlannerSyncMapper.swift
+      - iOSApp/Utils/PlannerGasEditingSupport.swift
       - iOSApp/Utils/SensorSourceMode.swift
       - iOSApp/Utils/DeveloperSettings.swift
       - iOSApp/Utils/PlannerCNSDescentBottomCheckSettings.swift

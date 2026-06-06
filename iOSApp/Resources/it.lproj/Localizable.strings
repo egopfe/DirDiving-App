@@ -784,6 +784,9 @@
 "gas.mix.air" = "Aria";
 "gas.mix.ean" = "EAN";
 "gas.mix.trimix" = "Trimix";
+"gas.mix.trimix.short" = "TX";
+"gas.mix.oxygen" = "Ossigeno";
+"gas.mix.oxygen.short" = "O₂";
 "gas.role.deco" = "Decompressione";
 "gas.role.bailout" = "Bailout";
 "planner.field.avg_depth" = "Profondità media";
@@ -1194,3 +1197,19 @@
 "checklist_planner.sync.replace" = "Sostituisci";
 "checklist_planner.sync.skip" = "Salta";
 "checklist_planner.sync.confirm" = "Conferma";
+
+"planner.gas.editor.planning_title" = "Pianificazione";
+"planner.gas.editor.save" = "Salva";
+"planner.gas.editor.cylinder_section" = "BOMBOLA %lld";
+"planner.gas.editor.mix_type" = "Tipo miscela";
+"planner.gas.editor.cylinder" = "Bombola";
+"planner.gas.editor.role" = "Ruolo";
+"planner.gas.editor.mod" = "MOD";
+"planner.gas.editor.working_pressure_section" = "PRESSIONE DI LAVORO";
+"planner.gas.editor.confirm" = "Conferma";
+"planner.gas.editor.cancel" = "Annulla";
+"planner.gas.editor.mod_valid_title" = "MOD e PPO₂ entro i limiti";
+"planner.gas.editor.mod_valid_message" = "La pianificazione è valida.";
+"planner.gas.editor.mod_switch_exceeds_title" = "Cambio gas oltre la MOD consentita";
+"planner.gas.editor.mod_switch_exceeds_message" = "La profondità di cambio gas non è compatibile con il gas selezionato.";
+"planner.gas.editor.switch_depth_max" = "Max %@";

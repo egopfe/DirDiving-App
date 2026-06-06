@@ -506,9 +506,6 @@ struct PlannerView: View {
         let entry = store.input.plannerCylinders[index]
         return VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(String(localized: "planner.cylinder.title"))
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(DIRTheme.muted)
                 Spacer()
                 if store.mode == .technical, store.input.plannerCylinders.count > 1 {
                     Button(role: .destructive) {
@@ -520,76 +517,37 @@ struct PlannerView: View {
                     .buttonStyle(.plain)
                 }
             }
-            if store.mode == .technical {
-                HStack {
-                    Text(String(localized: "planner.cylinder.role"))
-                        .foregroundStyle(DIRTheme.muted)
-                    Spacer()
-                    Picker("", selection: $store.input.plannerCylinders[index].role) {
-                        ForEach(GasRole.allCases) { role in
-                            Text(role.localizedTitle).tag(role)
-                        }
-                    }
-                    .labelsHidden()
-                    .tint(DIRTheme.cyan)
-                    .onChange(of: store.input.plannerCylinders[index].role) { _, _ in
-                        store.clampAllSwitchDepthsToMOD()
-                    }
-                }
-                .font(.callout)
-            } else {
-                Text(entry.role.localizedTitle)
-                    .font(.callout.weight(.semibold))
-                    .foregroundStyle(.white)
-            }
-            if store.mode == .technical {
-                HStack {
-                    Text(String(localized: "planner.cylinder.tank_size"))
-                        .foregroundStyle(DIRTheme.muted)
-                    Spacer()
-                    Picker("", selection: $store.input.plannerCylinders[index].tankSize) {
-                        ForEach(TankSize.allCases) { size in
-                            Text(size.rawValue).tag(size)
-                        }
-                    }
-                    .labelsHidden()
-                    .tint(DIRTheme.cyan)
-                }
-                .font(.callout)
-            }
-            Text(
-                String(
-                    format: String(localized: "planner.mod.value_format"),
-                    Formatters.depth(entry.modMeters(environment: store.input.plannerEnvironment), units: unitPreference).text
-                )
-            )
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(DIRTheme.cyan)
-            if entry.role != .bottom {
-                plannerDepthField(
-                    String(localized: "planner.field.switch_depth"),
-                    meters: clampedSwitchDepthBinding(for: index),
-                    step: 1,
-                    maxMeters: entry.usableSwitchDepthMeters(environment: store.input.plannerEnvironment)
-                )
-            }
-            GasMixCard(
-                mix: $store.input.plannerCylinders[index].gas,
-                accent: entry.role == .bottom ? DIRTheme.green : DIRTheme.yellow,
+            PlannerCylinderGasEditorView(
+                entry: $store.input.plannerCylinders[index],
+                cylinderNumber: cylinderDisplayNumber(for: entry),
+                plannerMode: store.mode,
+                allowedMixKinds: PlannerModePolicy.allowedMixKinds(for: store.mode),
                 unitPreference: unitPreference,
                 plannerEnvironment: store.input.plannerEnvironment,
-                allowedMixKinds: PlannerModePolicy.allowedMixKinds(for: store.mode),
-                onMixChanged: {
+                plannedDepthMeters: store.input.plannedDepthMeters,
+                showsRoleEditor: store.mode == .technical,
+                showsTankEditor: store.mode == .technical,
+                switchDepthMeters: entry.role != .bottom ? clampedSwitchDepthBinding(for: index) : nil,
+                maxSwitchDepthMeters: entry.role != .bottom
+                    ? entry.usableSwitchDepthMeters(environment: store.input.plannerEnvironment)
+                    : nil,
+                onGasOrPressureChanged: {
                     store.normalizeSwitchDepthAfterGasOrPPO2Change(cylinderID: entry.id)
                 }
             )
-            if entry.isSwitchDepthBeyondMOD(environment: store.input.plannerEnvironment) {
-                Text(String(localized: "planner.mod.exceeds_allowed"))
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(DIRTheme.red)
+            if entry.gas.mixKind == .trimix {
+                Text(String(localized: "planner.gas.trimix_buhlmann_disclaimer"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             Divider().overlay(DIRTheme.hairline)
         }
+    }
+
+    private func cylinderDisplayNumber(for entry: PlannerCylinderEntry) -> Int {
+        let visible = visiblePlannerCylinders
+        return (visible.firstIndex(where: { $0.id == entry.id }) ?? 0) + 1
     }
 
     private var technicalAnalysisCard: some View {
