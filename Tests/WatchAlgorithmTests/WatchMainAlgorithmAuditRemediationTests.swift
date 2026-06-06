@@ -10,10 +10,14 @@ final class WatchMainAlgorithmAuditRemediationTests: XCTestCase {
             .appendingPathComponent("WatchAuditRemediation-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: tempDraftDirectory, withIntermediateDirectories: true)
         DiveManager.testHook_draftDirectoryURL = tempDraftDirectory
+        DiveLogStore.testHook_storageDirectoryURL = tempDraftDirectory.appendingPathComponent("logs", isDirectory: true)
+        DiveManager.testHook_suppressDepthSensorProvider = true
     }
 
     override func tearDown() async throws {
+        DiveManager.testHook_suppressDepthSensorProvider = false
         DiveManager.testHook_draftDirectoryURL = nil
+        DiveLogStore.testHook_storageDirectoryURL = nil
         try? FileManager.default.removeItem(at: tempDraftDirectory)
         try await super.tearDown()
     }
@@ -219,6 +223,8 @@ final class WatchMainAlgorithmAuditRemediationTests: XCTestCase {
     // MARK: - WATCHMATH-LOW-004
 
     func testCriticalToNormalWithinDelaySuppressesSecondaryPulse() {
+        UserDefaults.standard.set(true, forKey: HapticService.hapticsEnabledKey)
+        defer { UserDefaults.standard.removeObject(forKey: HapticService.hapticsEnabledKey) }
         let coordinator = DepthLimitHapticCoordinator()
         let expectation = expectation(description: "secondary suppressed")
         coordinator.testHook_onDelayedHapticDecision = { decision in
@@ -231,6 +237,8 @@ final class WatchMainAlgorithmAuditRemediationTests: XCTestCase {
     }
 
     func testExceededToNormalWithinDelaySuppressesSecondaryPulse() {
+        UserDefaults.standard.set(true, forKey: HapticService.hapticsEnabledKey)
+        defer { UserDefaults.standard.removeObject(forKey: HapticService.hapticsEnabledKey) }
         let coordinator = DepthLimitHapticCoordinator()
         let expectation = expectation(description: "secondary suppressed")
         coordinator.testHook_onDelayedHapticDecision = { decision in
@@ -243,6 +251,8 @@ final class WatchMainAlgorithmAuditRemediationTests: XCTestCase {
     }
 
     func testCriticalRemainsCriticalAllowsSecondaryPulse() {
+        UserDefaults.standard.set(true, forKey: HapticService.hapticsEnabledKey)
+        defer { UserDefaults.standard.removeObject(forKey: HapticService.hapticsEnabledKey) }
         let coordinator = DepthLimitHapticCoordinator()
         let expectation = expectation(description: "secondary played")
         coordinator.testHook_onDelayedHapticDecision = { decision in
@@ -343,6 +353,7 @@ final class WatchMainAlgorithmAuditRemediationTests: XCTestCase {
         exitGPSFixSource: GPSFixSource = .noFix
     ) {
         struct Draft: Codable {
+            let schemaVersion: Int
             let phase: String
             let sessionID: UUID
             let startDate: Date
@@ -360,6 +371,7 @@ final class WatchMainAlgorithmAuditRemediationTests: XCTestCase {
             let updatedAt: Date
         }
         let draft = Draft(
+            schemaVersion: 1,
             phase: "finalizing",
             sessionID: sessionID,
             startDate: start,

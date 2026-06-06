@@ -1,6 +1,6 @@
 # Note per TestFlight / App Review - DIR DIVING
 
-**Aggiornato:** 2026-06-03 — branch `main` (iOS MAIN algorithm audit remediation; physical QA gates tracked separately)
+**Aggiornato:** 2026-06-06 — branch `main` (Watch MAIN algorithm audit remediation @ 2026-06-06; physical QA gates tracked separately)
 
 ## Panoramica per il revisore
 
@@ -10,7 +10,8 @@ L'app **non** e presentata come computer subacqueo certificato.
 
 Lo stato algoritmico MAIN e documentato in:
 
-- [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) — remediation Watch MAIN 2026-06-03 (pending finalization, load filter, frozen surface, haptics token).
+- [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) — remediation Watch MAIN @ 2026-06-06 (test isolation, mock fallback badge, draft schema v1, corrupt finalizing diagnostic, GPS auth guard, CSV iOS alignment, haptic preference resync).
+- [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) — read-only audit baseline @ `5415213`.
 - [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) per Watch MAIN (codice 100%; QA fisica § L).
 - [`WATCH_MANUAL_NODEPTH_SYNC_POLICY.md`](WATCH_MANUAL_NODEPTH_SYNC_POLICY.md) per sessioni manuali senza profilo profondità.
 - [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) per iOS MAIN.
@@ -65,6 +66,8 @@ Lo stato algoritmico MAIN e documentato in:
 - [ ] Banner risalita rosso: gauge e profondita restano visibili
 - [ ] Allarme: pulsante OK + cooldown
 - [ ] Surface state Watch: **Start Dive** visibile e avvio manuale disponibile senza rimuovere l'avvio automatico da profondita
+- [ ] Non-Ultra Watch or missing depth entitlement → **fallback profondità** badge visible (real depth unavailable)
+- [ ] Explicit simulation mode → simulation badge distinct from automatic fallback
 - [ ] Watch @ 2026-05-31: banner **depth data not updating** se callbacks profondità cessano in immersione
 - [ ] Watch @ 2026-05-31: GPS entry/exit — fix verde / fallback giallo / no-fix rosso (non verde su nil)
 - [ ] Watch @ 2026-05-31: sessione manuale senza profilo → sync iPhone badge **RUNTIME/GPS**; export CSV non disponibile

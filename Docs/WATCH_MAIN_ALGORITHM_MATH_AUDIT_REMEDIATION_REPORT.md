@@ -1,148 +1,242 @@
-# Watch MAIN Algorithm Math Audit — Remediation Report
+# Apple Watch MAIN Algorithm / Safety / Runtime Remediation Report
 
-**Date:** 2026-06-03  
+**Remediation date:** 2026-06-06  
+**Repository:** DIR DIVING (`DirDiving-App`)  
 **Branch:** `main`  
-**Base commit (pre-remediation):** `3f93914`  
-**Target:** `DIRDiving Watch App` (Watch MAIN only)  
-**Source audit:** [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md)
+**Audit baseline commit:** `5415213` (source: [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md))  
+**Remediation applied on commit:** `c2f5068` + working-tree changes (uncommitted at report time)  
+**Target:** `DIRDiving Watch App` only  
+**Scope:** Code, tests, and static documentation — **excluding physical QA**
 
 ---
 
 ## A. Branch confirmed
 
-`main` — verified via `git branch --show-current`.
+`main`
 
 ## B. Commit confirmed
 
-Remediation implemented on top of `3f93914` (`docs: update Watch main algorithm audit report`). Working-tree changes pending commit.
+- Audit read baseline: `5415213`
+- Watch audit doc committed: `c2f5068`
+- Remediation edits: working tree on `main` (post-`c2f5068`)
 
 ## C. Target confirmed
 
-`DIRDiving Watch App` per `project.yml` — Watch MAIN application target only.
+- **DIRDiving Watch App** (Watch MAIN)
+- Watch algorithm test scheme: **DIRDiving Watch Algorithm Tests**
+- iOS code touched only where shared export column policy required no model change
 
 ## D. Experimental exclusions confirmed
 
-Watch MAIN `project.yml` exclusions unchanged:
+`project.yml` continues to exclude from Watch MAIN:
 
-- `Models/ExplorationModels.swift`, `BuddyAssistMessage.swift`, `BuddyPairingHandshake.swift`
-- `Services/ExplorationStore.swift`, `BuddyAssistService.swift`, `BuddyAssistPeripheralService.swift`, `BuddyPairingKeyAgreement.swift`, `SecureBuddyStore.swift`
 - `Views/ApneaView.swift`, `SnorkelingView.swift`, `BuddyAssistView.swift`, `ExperimentalConceptsView.swift`
 - `Utils/ExperimentalFeatures.swift`
+- Buddy / Exploration models and services (`BuddyAssist*`, `Exploration*`, `SecureBuddyStore`, etc.)
 
-No experimental files modified.
+No experimental files were modified during remediation.
 
 ## E. Files modified
 
-| File | Purpose |
-|------|---------|
-| `Services/DiveManager.swift` | Pending finalization draft (HIGH-001); frozen-depth context (MED-002); test hooks |
-| `Services/DiveLogStore.swift` | Load-time validation filter + resilient decode (MED-003) |
-| `Utils/DiveLogbookPolicy.swift` | `filterValidLoadedSessions` helper |
-| `Utils/DepthSampleValidation.swift` | Suppress frozen classification when inactive (MED-002) |
-| `Services/DepthLimitHapticCoordinator.swift` | Transition-generation token for delayed haptics (LOW-004) |
-| `Utils/DiveAlgorithmSelfCheck.swift` | Ascent limit 45 m → 1 m/min (LOW-005) |
-| `Services/GPSManager.swift` | Test hooks for held GPS capture |
-| `Tests/WatchAlgorithmTests/WatchMainAlgorithmAuditRemediationTests.swift` | New audit remediation test suite |
-| `Tests/WatchAlgorithmTests/DiveAlgorithmTests.swift` | Frozen inactive surface, self-check, alarm `>` tests |
-| `project.yml` | Include `DiveAlgorithmSelfCheck.swift` in Watch Algorithm Tests |
+| Area | Files |
+|---|---|
+| Core runtime | `Services/DiveManager.swift`, `Services/DiveLogStore.swift`, `Services/GPSManager.swift`, `Services/AppleDepthSensorProvider.swift`, `Services/DepthLimitHapticCoordinator.swift`, `Services/SubsurfaceExportService.swift`, `Services/WatchDiveSyncCodec.swift` |
+| Validation / utils | `Utils/DepthSampleValidation.swift`, `Utils/DepthSensorSourceResolution.swift` (new) |
+| UI | `Views/DiveLiveView.swift`, `Views/SettingsView.swift`, `Views/InfoView.swift` |
+| Localization | `Resources/en.lproj/Localizable.strings`, `Resources/it.lproj/Localizable.strings` |
+| Project | `project.yml` |
+| Tests | `Tests/WatchAlgorithmTests/DiveManagerAlgorithmIntegrationTests.swift`, `WatchMainAlgorithmAuditRemediationTests.swift`, `WatchMainAlgorithmRemediationPhaseTests.swift` (new), `DiveAlgorithmTests.swift`, `WatchReadinessAlgorithmTests.swift`, `WatchSyncCodecAlgorithmTests.swift` |
+| Docs | This report, [`WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md`](WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md), [`WATCH_CSV_EXPORT_POLICY.md`](WATCH_CSV_EXPORT_POLICY.md), updates to [`SUBSURFACE_CSV_ROUNDTRIP.md`](SUBSURFACE_CSV_ROUNDTRIP.md), [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md), [`TESTFLIGHT_REVIEW_NOTES.md`](TESTFLIGHT_REVIEW_NOTES.md) |
 
 ## F. Issues fixed by ID
 
-### WATCHMATH-HIGH-001 — Active dive draft survives exit GPS finalization window
+### WATCH-TEST-001 — DiveManager integration test isolation
 
-**Fix:** `ActiveDiveDraft` now carries `phase` (`.active` / `.finalizing`), stable `sessionID`, and end metadata. `endDiveIfNeeded` persists a **finalizing** draft immediately before the 6 s exit GPS capture. On launch, `restoreActiveDiveDraftIfAvailable` completes pending finalization instead of restoring an ended dive as active. Finalization is idempotent by `sessionID`; exit GPS uses best available data or `.noFix`.
+**Status:** Fixed  
+Per-test temp directory for drafts and log storage; `DiveManager.testHook_suppressDepthSensorProvider` stops Mock 1 Hz 0 m timer contamination; tearDown clears hooks and temp dirs.
 
-### WATCHMATH-MED-002 — Frozen-depth false warnings for stable surface / simulator
+### WATCH-S2-001 — Mock/simulator frozen-depth false warning at stable 0 m
 
-**Fix:** `DepthSampleValidationState.validate(..., isDiveActive:)` only returns `.frozen` during an **active** dive. Inactive pre-dive streams (mock 0 m, stable surface) continue accepting samples without user-facing frozen errors. Active-dive frozen/stale protection unchanged.
+**Status:** Fixed  
+`DepthSampleValidation` accepts `exemptMockSurfaceFrozenSamples`; `DiveManager` passes `isSimulationDepthActive`. Mock/simulation stable surface band during active simulation no longer surfaces user-facing frozen-depth warning. Real active dive frozen detection unchanged.
 
-### WATCHMATH-MED-003 — Invalid legacy sessions visible after load
+### WATCH-S2-002 — Automatic Mock fallback visibility
 
-**Fix:** `DiveLogbookPolicy.filterValidLoadedSessions` applied during `DiveLogStore` load/reload (after merge). Invalid sessions are quarantined; `loadErrorMessage` reports count. Resilient per-entry JSON decode prevents one corrupt row from blocking valid sessions. Valid manual/no-depth sessions still load per policy.
+**Status:** Fixed  
+`DepthSensorSourceResolution` + `@Published isDepthAutomationMockFallbackActive` on `DiveManager`. Persistent badge in `DiveLiveView`; resolved source in Settings/Info. Localized EN/IT copy per audit spec.
 
-### WATCHMATH-LOW-004 — Delayed depth-limit haptics after state changes
+### WATCH-LC-001 — Legacy active draft without phase restores ambiguously
 
-**Fix:** `DepthLimitHapticCoordinator` increments `transitionGeneration` on state changes and reset. Delayed secondary pulses capture the token and verify `transitionGeneration`, `lastState`, and global haptics preference before playing.
+**Status:** Fixed  
+`supportedDraftSchemaVersion = 1`; decode requires `schemaVersion`; legacy drafts without version/phase discarded and quarantined — no ambiguous active restore.
 
-### WATCHMATH-LOW-005 — DiveAlgorithmSelfCheck stale ascent-limit expectation
+### WATCH-LC-002 — Finalizing draft missing endDate discarded silently
 
-**Fix:** Self-check cases updated: 45 m and 40.01 m → **1 m/min**, aligned with `AscentRateLimits.standard` and `DiveAlgorithmTests.testAscentLimitBandsAndZoneBoundaries`.
+**Status:** Fixed  
+Finalizing draft without `endDate` quarantined; `@Published draftRecoveryDiagnostic` surfaced in Info; localized diagnostic string. No fake session, no active restore.
 
-### WATCHMATH-INFO-006 — Alarm exact-boundary strict `>` behavior
+### WATCH-GPS-001 — GPS authorization callback restarts updates after dive end
 
-**Fix:** Preserved strict `>` semantics (`maxDepthMeters > threshold`, `runtime > threshold * 60`). Tests document boundary: at threshold does not fire; just above fires. UI copy already uses “>” wording.
+**Status:** Fixed  
+`GPSManager.maintainsLocationUpdates`; authorization callback starts updates only when capture or dive-managed GPS is active.
 
-### WATCHMATH-INFO-007 — Mission Mode remains non-mathematical
+### WATCH-EXP-001 — Watch CSV export parity / policy
 
-**Fix:** Verified unchanged — Mission Mode affects only UI/runtime decorative profile. Regression tests retained/extended in `MissionModeAlgorithmInvariantTests` and remediation suite.
+**Status:** Fixed (aligned + documented)  
+Watch export aligned to iOS hardened column set and first-sample-relative monotonic `time_seconds`. Watch-specific metadata marker `# dirdiving_watch_export: 1`. Policy locked in [`WATCH_CSV_EXPORT_POLICY.md`](WATCH_CSV_EXPORT_POLICY.md).
+
+### WATCH-S2-003 — Depth sample timestamp source
+
+**Status:** Documented + test-locked  
+Receipt-time policy documented in `AppleDepthSensorProvider`; staleness relies on callback-silence watchdog. No unsafe CoreMotion timestamp adoption without hardware validation.
+
+### WATCH-UX-001 — Manual end hidden after submersion handoff
+
+**Status:** Fixed (copy)  
+`manualStartHandedOffToAutomatic` + localized handoff note in `DiveLiveView`. Auto surface-end semantics preserved; no unconfirmed underwater stop button.
+
+### WATCH-S15-002 — Depth-limit haptic resync on preference toggle
+
+**Status:** Fixed  
+`DepthLimitHapticCoordinator.refreshAfterPreferenceChange`; `DiveManager.resyncHapticsAfterPreferenceChange()` calls depth-limit coordinator symmetrically with ascent haptics.
+
+### WATCH-SYNC-001 — Imported companion ID dedup cap
+
+**Status:** Fixed  
+Cap raised from 128 → **512** (`WatchDiveSyncCodec.importedCompanionIDRetentionLimit`); deterministic tail retention; test-locked.
+
+### WATCH-S7-001 — 40 m safety/ascent band split (INFO)
+
+**Status:** Protected  
+Intentional split preserved. Existing tests in `WatchMainAlgorithmAuditRemediationTests` / `DiveAlgorithmTests` lock 40.0 m exceeded + ascent band policy.
+
+### WATCH-TTV-001 — TTV acronym clarity (INFO)
+
+**Status:** Protected  
+Copy remains explicit: TTV = time-weighted average depth × runtime minutes; not NDL/TTS/decompression. No semantic change.
 
 ## G. Tests added
 
-New file `Tests/WatchAlgorithmTests/WatchMainAlgorithmAuditRemediationTests.swift`:
-
-- Pending finalization: normal end, termination during GPS, active restore, idempotency, no-fix fallback
-- Frozen depth: inactive 0 m stream, active dive frozen
-- Load filter: invalid quarantine, depth cap, manual no-depth, 40-log cap
-- Delayed haptics: critical/exceeded suppress on rapid clear; allow when state holds; global haptics off
-- Self-check + alarm `>` boundaries + Mission Mode invariant
-
-Updates in `DiveAlgorithmTests.swift`: inactive surface frozen acceptance, self-check pass, alarm strict `>`.
+| Test file | New / updated coverage |
+|---|---|
+| `WatchMainAlgorithmRemediationPhaseTests.swift` | Legacy draft discard, finalizing missing endDate diagnostic, mock frozen exemption, GPS flag, dedup 512 cap, haptic preference refresh |
+| `DiveManagerAlgorithmIntegrationTests.swift` | Full rewrite with per-test isolation |
+| `WatchMainAlgorithmAuditRemediationTests.swift` | Isolated log storage; haptic UserDefaults hygiene |
+| `WatchReadinessAlgorithmTests.swift` | First-sample CSV time origin |
+| `WatchSyncCodecAlgorithmTests.swift` | First-sample CSV time origin |
+| `DiveAlgorithmTests.swift` | Updated export header assertions |
 
 ## H. Tests run
 
-```text
-xcodegen generate                          — PASS
-xcodebuild -scheme "DIRDiving Watch App"   — PASS (watchOS Simulator, Apple Watch Ultra 3 49mm)
-xcodebuild test -scheme "DIRDiving Watch Algorithm Tests" — PASS (88 tests, 0 failures)
+```
+xcodegen generate                                    → PASS
+xcodebuild -scheme "DIRDiving Watch App" \
+  -destination 'generic/platform=watchOS Simulator' \
+  CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build → PASS
+
+xcodebuild -scheme "DIRDiving Watch Algorithm Tests" \
+  -destination 'platform=watchOS Simulator,name=Apple Watch Series 11 (46mm)' test
 ```
 
-iOS build/tests **not run** — no shared model/sync files required changes beyond Watch-local `DiveLogStore` (Watch target only).
+| Metric | Before remediation | After remediation |
+|---|---:|---:|
+| Executed | 113 | **120** |
+| Skipped | 3 | 3 |
+| Failures | **21** (all `DiveManagerAlgorithmIntegrationTests`) | **0** |
+| Result | TEST FAILED | **TEST SUCCEEDED** |
+
+Targeted suites verified green as part of full run:
+
+- `DiveManagerAlgorithmIntegrationTests`
+- `WatchMainAlgorithmAuditRemediationTests`
+- `WatchMainAlgorithmRemediationPhaseTests`
+- `MissionModeAlgorithmInvariantTests`
+- `GPSLifecycleTests`
 
 ## I. Build results
 
 | Command | Result |
-|---------|--------|
+|---|---|
 | `xcodegen generate` | PASS |
-| Watch App build | PASS |
-| Watch Algorithm Tests (88) | PASS |
+| `DIRDiving Watch App` build (watchOS Simulator, unsigned) | **BUILD SUCCEEDED** |
+| `DIRDiving Watch Algorithm Tests` | **TEST SUCCEEDED** (120 executed, 0 failures) |
 
 ## J. Remaining physical QA
 
-Cannot be closed by code alone — see [`WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md`](WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md):
+Cannot be completed in code. Required before external TestFlight / App Store:
 
-- Depth entitlement + real CoreMotion submersion API on Apple Watch Ultra
-- Live depth sensor, stable-depth hold, real haptics
-- GPS fix / fallback / no-fix in field
-- Pending-finalization recovery on **forced app kill** during 6 s exit window (field confirmation)
-- WatchConnectivity sync + tombstones
-- App Intents / Action Button
-- Underwater / paired-device scenarios
+| Gate | Item |
+|---|---|
+| Depth entitlement | Real Apple Watch Ultra water-submersion entitlement + provisioning |
+| Underwater depth | Live depth stream, auto start @ 1 m, auto stop @ 0.3 m / 8 s surface dwell |
+| Frozen / stale sensor | Real sensor stuck vs callback silence on hardware |
+| Mock fallback UX | Non-Ultra device shows fallback badge; simulation badge distinct |
+| GPS | Entry/exit capture, late permission grant after dive end (no restart) |
+| Haptics | Depth-limit + ascent pulses on wrist; disable/enable during delayed pulse |
+| Sync | Paired Watch ↔ iPhone tombstone, pending queue, signed ACK |
+| Action Button / App Intents | Hardware shortcut execution after legal gate |
+| VoiceOver / Dynamic Type | Watch Live readability |
+
+See [`WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md`](WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md) and [`WATCH_ULTRA_PHYSICAL_QA_MATRIX.md`](WATCH_ULTRA_PHYSICAL_QA_MATRIX.md).
 
 ## K. Remaining risks
 
 | Risk | Mitigation |
-|------|------------|
-| Physical kill during GPS window not exercised in CI | Field test B4/B5 in hardware checklist |
-| Quarantined invalid sessions not shown in UI list | `loadErrorMessage` set; no silent corruption |
-| Simulator mock 0 m ≠ real sensor jitter at surface | Ultra field validation for A6 |
-| iOS `DiveLogStore` is separate codebase path | Watch-only load filter; iOS has its own policy |
+|---|---|
+| Receipt-time depth timestamps vs sensor time | Documented; stale callback watchdog is primary guard |
+| Legacy users with pre-schema drafts | Discarded safely; quarantine under Diagnostics |
+| CSV round-trip iOS ↔ Watch | Column-aligned; Watch omits iOS-only metadata fields (equipment/pressure) — documented |
+| Simulator cannot validate real haptics / submersion | Physical QA matrix required |
+| 512 companion ID cap still bounded | Older IDs may re-import after cap overflow — documented policy |
 
 ## L. Final readiness estimate
 
-**Algorithmic / code-fixable readiness: 100%** for Watch MAIN excluding physical QA.
+| Dimension | Pre-audit | Post-remediation (excl. physical QA) |
+|---:|---:|---:|
+| Watch MAIN algorithm readiness | 93% | **~98%** |
+| Mathematical robustness | 94% | **~96%** |
+| Safety algorithm confidence | 90% | **~93%** (physical haptics/depth still open) |
+| Runtime / lifecycle confidence | 93% | **~98%** |
+| Sync / data confidence | 91% | **~94%** |
+| Mission Mode safety | 96% | **96%** |
+| App Intents safety | 95% | **95%** |
+| Test coverage confidence | 87% | **~97%** |
 
-All audit IDs WATCHMATH-HIGH-001 through WATCHMATH-INFO-007 addressed with tests or verification. Physical Watch Ultra QA remains the external gate before App Store.
+**Overall Watch MAIN readiness excluding physical QA: ~97–98%**
 
 ## M. Confirmation
 
-- [x] MAIN only (`main` branch)
-- [x] Watch MAIN only (no iOS algorithm changes)
-- [x] Experimental targets untouched
-- [x] No UI redesign or graphics changes
-- [x] Watch TTV unchanged (`timeWeightedAverageDepthMeters + runtimeMinutes`)
-- [x] No NDL / TTS / decompression on Watch
-- [x] Mission Mode remains non-mathematical
-- [x] No certified dive-computer claim introduced
-- [x] Safety / legal disclaimers preserved
-- [x] Depth safety thresholds 35 / 38 / 40 m unchanged
-- [x] Ascent-rate band policy unchanged
+| Constraint | Status |
+|---|---|
+| MAIN branch only | ✓ |
+| Watch MAIN target only (shared codec unchanged at model level) | ✓ |
+| Experimental branches / features untouched | ✓ |
+| No UI redesign / Watch visual identity change | ✓ |
+| TTV semantics unchanged | ✓ |
+| No NDL / TTS / decompression on Watch | ✓ |
+| Mission Mode remains non-mathematical | ✓ |
+| App Intents remain legal-gated | ✓ |
+| Sensor simulation policy preserved | ✓ |
+| No certified dive-computer claim introduced | ✓ |
+| Safety / legal disclaimers preserved | ✓ |
+| Physical QA not falsely marked complete | ✓ |
+
+---
+
+## Policy summaries (quick reference)
+
+| Topic | Policy |
+|---|---|
+| Integration tests | Isolated temp dirs; mock provider suppressed in tests |
+| Mock frozen 0 m | Exempt user-facing frozen warning when simulation active + surface band |
+| Mock fallback | Persistent badge when `.automatic` resolves to mock |
+| Draft schema | Version 1 required; legacy without version discarded |
+| Corrupt finalizing draft | Quarantine + Info diagnostic; no silent loss |
+| GPS auth callback | Start updates only if capture/dive GPS still active |
+| CSV export | First-sample-relative monotonic seconds; iOS column parity |
+| Timestamp | Receipt time; stale via callback silence |
+| Manual end UX | Handoff copy after submersion; auto surface-end unchanged |
+| Depth-limit haptics | Preference toggle cancels/resyncs delayed pulses |
+| Sync dedup | 512 most recent companion import IDs retained |
+| 40 m split | Intentional safety exceeded + ascent band boundary |
+| TTV | Informational index only |

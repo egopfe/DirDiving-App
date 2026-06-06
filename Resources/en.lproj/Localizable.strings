@@ -517,6 +517,13 @@
 "sync.trust.mismatch" = "Sync trust changed. Reset pairing trust to reconnect this Watch/iPhone.";
 "live.simulation_depth.badge" = "SIMULATION";
 "live.simulation_depth.a11y" = "Simulated depth data active. Not real sensor depth.";
+"live.depth_mock_fallback.badge" = "Depth fallback active — real underwater depth is not available on this device/build.";
+"live.depth_mock_fallback.a11y" = "Depth sensor fallback active. Real underwater depth is not available.";
+"live.manual_lifecycle.handoff.note" = "Manual start now follows automatic depth lifecycle. The dive ends after surface dwell.";
+"watch.depth_source.apple_sensor" = "Apple depth sensor";
+"watch.depth_source.mock_fallback" = "Mock fallback (no real depth)";
+"watch.depth_source.unavailable" = "Unavailable";
+"watch.draft.finalizing_missing_enddate" = "A previous dive could not be finalized because its saved draft was incomplete.";
 "user_images.error.not_image" = "File is not a valid image.";
 "user_images.error.dimensions" = "Image dimensions are too large.";
 "user_images.error.encode_failed" = "Could not save image.";
