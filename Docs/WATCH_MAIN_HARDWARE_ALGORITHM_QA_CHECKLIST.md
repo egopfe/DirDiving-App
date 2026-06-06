@@ -1,91 +1,102 @@
 # Apple Watch MAIN — Hardware Algorithm QA Checklist
 
-**Purpose:** Physical validation of dive algorithms and sensors on real Apple Watch Ultra hardware.  
-**Status:** Template — **not completed** until signed rows exist below.  
-**Target:** `DIRDiving Watch App` (Watch MAIN) only  
-**Note:** watchOS Simulator does **not** prove underwater CoreMotion depth, entitlement behavior, or real GPS fixes.
+**Updated:** 2026-06-06  
+**Target:** `DIRDiving Watch App` (MAIN only)  
+**Baseline:** Post-remediation per [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md)  
+**Purpose:** Physical gates that cannot be satisfied by simulator, unit tests, or static analysis alone.
 
 ---
 
-## A. Depth sensor / CoreMotion
+## Prerequisites
 
-| # | Check | Pass | Fail | N/A | Notes |
-|---|--------|:----:|:----:|:---:|-------|
-| A1 | Submersion entitlement active on device build | ☐ | ☐ | ☐ | |
-| A2 | Depth callback delivers readings in water | ☐ | ☐ | ☐ | |
-| A3 | Automatic start at **> 1.0 m** (not on first sample alone) | ☐ | ☐ | ☐ | |
-| A4 | Two-sample debounce before auto start | ☐ | ☐ | ☐ | |
-| A5 | Stale-depth banner after **8 s** without accepted callback during active dive | ☐ | ☐ | ☐ | |
-| A6 | Frozen-depth rejection during **active** dive (sensor stuck ~same depth ≥ 30 s) | ☐ | ☐ | ☐ | Inactive surface / mock 0 m must **not** warn (code fixed) |
-| A7 | Spike rejection on implausible depth jump | ☐ | ☐ | ☐ | |
-
-## B. Dive lifecycle
-
-| # | Check | Pass | Fail | N/A | Notes |
-|---|--------|:----:|:----:|:---:|-------|
-| B1 | Automatic dive start in water | ☐ | ☐ | ☐ | |
-| B2 | Manual dive start (no duplicate session) | ☐ | ☐ | ☐ | |
-| B3 | Automatic end at **≤ 0.3 m** for **≥ 8 s** surface dwell | ☐ | ☐ | ☐ | |
-| B4 | Relaunch restores **active** draft only; **finalizing** draft completes to log (no active restore) | ☐ | ☐ | ☐ | Code: pending finalization on kill during 6 s exit GPS |
-| B5 | No duplicate logbook entry on single dive / idempotent finalize by session ID | ☐ | ☐ | ☐ | |
-| B6 | Force-quit during exit GPS window → next launch completes log with no-fix if needed | ☐ | ☐ | ☐ | Field kill test |
-
-## C. GPS
-
-| # | Check | Pass | Fail | N/A | Notes |
-|---|--------|:----:|:----:|:---:|-------|
-| C1 | Entry fix captured at dive start (or documented fallback) | ☐ | ☐ | ☐ | |
-| C2 | Exit fix captured at dive end | ☐ | ☐ | ☐ | |
-| C3 | Last-known fallback when fresh fix unavailable | ☐ | ☐ | ☐ | |
-| C4 | No-fix warning presentation (red/warning) | ☐ | ☐ | ☐ | |
-
-## D. Alarms / haptics
-
-| # | Check | Pass | Fail | N/A | Notes |
-|---|--------|:----:|:----:|:---:|-------|
-| D1 | Ascent over-limit alarm + haptic (if enabled) | ☐ | ☐ | ☐ | |
-| D2 | Depth safety **35 / 38 / 40 m** states and haptics | ☐ | ☐ | ☐ | |
-| D3 | Runtime alarm (if enabled) | ☐ | ☐ | ☐ | |
-| D4 | Battery alarm (if enabled) | ☐ | ☐ | ☐ | |
-| D5 | Haptics disabled → no unwanted pulses (incl. delayed depth-limit secondary) | ☐ | ☐ | ☐ | Token-bound delayed haptics in code |
-| D6 | Re-enable haptics while still over limit → pulses resume | ☐ | ☐ | ☐ | |
-
-## E. Export / sync
-
-| # | Check | Pass | Fail | N/A | Notes |
-|---|--------|:----:|:----:|:---:|-------|
-| E1 | Normal profile Subsurface CSV export | ☐ | ☐ | ☐ | |
-| E2 | Manual no-depth session: sync allowed, export disabled | ☐ | ☐ | ☐ | |
-| E3 | Watch → iPhone signed sync | ☐ | ☐ | ☐ | |
-| E4 | Tombstone / delete propagation | ☐ | ☐ | ☐ | |
-| E5 | Invalid legacy JSON rows quarantined on load (not shown as normal log) | ☐ | ☐ | ☐ | Code: `filterValidLoadedSessions` |
-
-## F. Mission Mode invariant
-
-| # | Check | Pass | Fail | N/A | Notes |
-|---|--------|:----:|:----:|:---:|-------|
-| F1 | Mission Mode **ON** vs **OFF**: same depth samples / TTV / ascent / alarms | ☐ | ☐ | ☐ | |
-| F2 | Only UI / decorative / animation profile changes | ☐ | ☐ | ☐ | |
-
-## G. Evidence capture (per test session)
-
-| Field | Value |
-|-------|--------|
-| Date | |
-| Tester | |
-| Device model | e.g. Apple Watch Ultra 2 |
-| watchOS version | |
-| App build (CFBundleVersion) | |
-| Entitlement / depth API | Available / unavailable |
-| Water type | Pool / open water |
-| Overall result | Pass / Fail / Partial |
-| Notes | |
+- [ ] Apple Watch **Ultra** with approved **water submersion** entitlement on App ID `com.egopfe.dirdiving.ios.watch`
+- [ ] Paired iPhone with matching TestFlight / debug build
+- [ ] Legal acceptance completed on Watch (App Intents gate)
+- [ ] Haptics enabled in Watch Settings unless testing disabled path
 
 ---
 
-**Product reminders (do not change during QA):**
+## 1. Depth entitlement and automation
 
-- DIR DIVING is a **non-certified informational** diving companion, **not** a certified dive computer.
-- No NDL / TTS / decompression claims.
-- TTV = informational index (`average depth + runtime minutes`).
-- Mission Mode must **not** affect depth, GPS, alarm, haptic, or math behavior.
+| # | Check | Pass | Notes |
+|---:|---|:---:|---|
+| 1.1 | Automatic depth on Ultra: submerge past 1 m → dive starts after 2-sample debounce | ☐ | |
+| 1.2 | Surface dwell 0.3 m / 8 s → dive ends automatically | ☐ | |
+| 1.3 | Manual Start Dive on surface → session begins; submersion handoff note visible | ☐ | WATCH-UX-001 copy |
+| 1.4 | Manual end control hidden after handoff; auto surface-end completes session | ☐ | |
+| 1.5 | Non-Ultra or missing entitlement → **fallback badge** visible (not silent mock) | ☐ | WATCH-S2-002 |
+| 1.6 | Explicit simulation mode → simulation badge distinct from fallback | ☐ | |
+| 1.7 | Mock/sim stable 0 m during simulation → **no** false frozen-depth scare | ☐ | WATCH-S2-001 |
+| 1.8 | Real dive: unchanged depth > 30 s at depth → frozen/stale warning as designed | ☐ | |
+| 1.9 | Callback silence beyond stale threshold → depth-not-updating banner | ☐ | |
+
+---
+
+## 2. Safety thresholds (35 / 38 / 40 m)
+
+| # | Check | Pass | Notes |
+|---:|---|:---:|---|
+| 2.1 | Exactly **40.0 m** → safety exceeded; ascent band per current policy | ☐ | WATCH-S7-001 intentional |
+| 2.2 | **40.01 m** → exceeded + deeper fallback ascent if applicable | ☐ | |
+| 2.3 | 38 m critical haptic + delayed secondary pulse | ☐ | WATCH-S15-002 |
+| 2.4 | Disable haptics mid-delay → no secondary pulse | ☐ | |
+| 2.5 | Re-enable haptics → no stale replay; new warnings per throttle | ☐ | |
+
+---
+
+## 3. GPS lifecycle
+
+| # | Check | Pass | Notes |
+|---:|---|:---:|---|
+| 3.1 | Entry GPS captured on dive start (green / yellow / red semantics) | ☐ | |
+| 3.2 | Exit GPS on dive end | ☐ | |
+| 3.3 | Grant location permission **after** dive ended → GPS does **not** restart | ☐ | WATCH-GPS-001 |
+| 3.4 | Grant permission during active capture → updates continue | ☐ | |
+
+---
+
+## 4. Lifecycle / draft recovery
+
+| # | Check | Pass | Notes |
+|---:|---|:---:|---|
+| 4.1 | Kill app during active dive → restore on relaunch | ☐ | |
+| 4.2 | Kill during GPS finalization → session completes, no active restore | ☐ | |
+| 4.3 | Info shows diagnostic if corrupt finalizing draft detected | ☐ | WATCH-LC-002 |
+
+---
+
+## 5. TTV and Mission Mode
+
+| # | Check | Pass | Notes |
+|---:|---|:---:|---|
+| 5.1 | TTV displayed as informational (not NDL/TTS/deco) | ☐ | WATCH-TTV-001 |
+| 5.2 | Mission Mode: reduced animation only; depth/TTV math identical | ☐ | |
+| 5.3 | No OTU/CNS on Watch UI | ☐ | |
+
+---
+
+## 6. Sync and export
+
+| # | Check | Pass | Notes |
+|---:|---|:---:|---|
+| 6.1 | Watch dive → sync to iPhone | ☐ | |
+| 6.2 | Delete on iPhone → no resurrection on Watch | ☐ | |
+| 6.3 | CSV export from Watch → Subsurface-compatible columns | ☐ | [`WATCH_CSV_EXPORT_POLICY.md`](WATCH_CSV_EXPORT_POLICY.md) |
+| 6.4 | Manual no-depth session: sync badge; export blocked | ☐ | |
+
+---
+
+## 7. App Intents / Action Button
+
+| # | Check | Pass | Notes |
+|---:|---|:---:|---|
+| 7.1 | Shortcuts blocked until legal acceptance | ☐ | |
+| 7.2 | Post-acceptance: Start Dive / Compass intents execute | ☐ | |
+
+---
+
+## Evidence
+
+Record device model, watchOS version, build number, date, and pass/fail per row. Attach screenshots or screen recordings for fallback badge, frozen-warning absence in simulation, and GPS color semantics.
+
+**Related matrices:** [`WATCH_ULTRA_PHYSICAL_QA_MATRIX.md`](WATCH_ULTRA_PHYSICAL_QA_MATRIX.md), [`WATCH_IOS_SYNC_QA_MATRIX.md`](WATCH_IOS_SYNC_QA_MATRIX.md)

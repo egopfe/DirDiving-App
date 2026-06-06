@@ -180,8 +180,14 @@ struct InfoView: View {
             diagnosticRow(String(localized: "Entitlement profondità"), String(localized: "info.depth.entitlement.review_required"))
             diagnosticRow(
                 String(localized: "developer.sensor_source.title"),
-                sensorSourceLabel
+                dive.depthSensorSourceResolution.localizedLabel
             )
+            if let draftDiagnostic = dive.draftRecoveryDiagnostic {
+                Text(draftDiagnostic)
+                    .font(DiveUI.Typography.rowSubtitle)
+                    .foregroundStyle(DiveUI.yellow)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             diagnosticRow(
                 String(localized: "settings.row.depth_sensor.title"),
                 dive.isDepthAutomationAvailable

@@ -517,6 +517,13 @@
 "sync.trust.mismatch" = "La fiducia di sincronizzazione è cambiata. Reimposta la fiducia di abbinamento per riconnettere Apple Watch/iPhone.";
 "live.simulation_depth.badge" = "SIMULAZIONE";
 "live.simulation_depth.a11y" = "Profondità simulata attiva. Non è profondità da sensore reale.";
+"live.depth_mock_fallback.badge" = "Fallback profondità attivo — la profondità reale subacquea non è disponibile su questo dispositivo/build.";
+"live.depth_mock_fallback.a11y" = "Fallback sensore profondità attivo. Profondità reale subacquea non disponibile.";
+"live.manual_lifecycle.handoff.note" = "L'avvio manuale segue ora il ciclo automatico di profondità. L'immersione termina dopo il dwell in superficie.";
+"watch.depth_source.apple_sensor" = "Sensore profondità Apple";
+"watch.depth_source.mock_fallback" = "Fallback mock (nessuna profondità reale)";
+"watch.depth_source.unavailable" = "Non disponibile";
+"watch.draft.finalizing_missing_enddate" = "Una immersione precedente non è stata finalizzata perché il salvataggio temporaneo era incompleto.";
 "user_images.error.not_image" = "Il file non è un'immagine valida.";
 "user_images.error.dimensions" = "Dimensioni immagine troppo grandi.";
 "user_images.error.encode_failed" = "Impossibile salvare l'immagine.";

@@ -217,7 +217,8 @@ final class DiveAlgorithmTests: XCTestCase {
         let csv = SubsurfaceExportService.makeCSV(for: session)!
         XCTAssertTrue(csv.contains("\n0,10.00"))
         XCTAssertTrue(csv.contains("\n60,20.00"))
-        XCTAssertTrue(csv.contains("time_seconds,depth_m,temperature_c,entry_lat,entry_lon,exit_lat,exit_lon"))
+        XCTAssertTrue(csv.contains("time_seconds,depth_m,temperature_c,entry_lat,entry_lon,exit_lat,exit_lon,is_manual"))
+        XCTAssertTrue(csv.contains("# dirdiving_session_id:"))
         XCTAssertFalse(csv.contains("\n-"))
     }
 
