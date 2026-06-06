@@ -130,6 +130,11 @@ targets:
       - Services/MockDepthSensorProvider.swift
       - Services/DiveLogStore.swift
       - Services/AscentRateSettingsStore.swift
+      - Services/DiveReminderSettingsStore.swift
+      - Models/DiveReminder.swift
+      - Utils/DiveReminderEngine.swift
+      - Tests/WatchAlgorithmTests/DiveReminderEngineTests.swift
+      - Tests/WatchAlgorithmTests/DiveReminderIntegrationTests.swift
       - Services/GPSManager.swift
       - Services/HapticService.swift
       - Services/AscentSafetyHapticCoordinator.swift

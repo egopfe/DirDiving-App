@@ -72,6 +72,10 @@ struct DiveLiveView: View {
                 .padding(.bottom, 7)
                 .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
             }
+
+            if dive.isDiveActive, let overlay = dive.diveReminderOverlay {
+                DiveReminderOverlayView(content: overlay)
+            }
         }
         .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.18) : nil, value: dive.redWarningBlink)
         .onChange(of: hapticsEnabled) { _, _ in

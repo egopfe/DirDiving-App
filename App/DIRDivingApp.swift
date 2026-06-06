@@ -8,6 +8,7 @@ struct DIRDivingApp: App {
     @StateObject private var diveManager: DiveManager
     @StateObject private var imageStore: UserImageStore
     @StateObject private var ascentSettings: AscentRateSettingsStore
+    @StateObject private var diveReminderSettings: DiveReminderSettingsStore
     @StateObject private var navigationStore: AppNavigationStore
     @StateObject private var watchSync: WatchSyncService
     @StateObject private var legalAcceptance = LegalAcceptanceStore()
@@ -17,6 +18,7 @@ struct DIRDivingApp: App {
         let logStore = DiveLogStore()
         let gpsManager = GPSManager()
         let ascentSettings = AscentRateSettingsStore()
+        let diveReminderSettings = DiveReminderSettingsStore()
         let navigationStore = AppNavigationStore()
         _logStore = StateObject(wrappedValue: logStore)
         _gpsManager = StateObject(wrappedValue: gpsManager)
@@ -24,6 +26,7 @@ struct DIRDivingApp: App {
         _diveManager = StateObject(wrappedValue: DiveManager(logStore: logStore, gpsManager: gpsManager, ascentSettings: ascentSettings))
         _imageStore = StateObject(wrappedValue: UserImageStore())
         _ascentSettings = StateObject(wrappedValue: ascentSettings)
+        _diveReminderSettings = StateObject(wrappedValue: diveReminderSettings)
         _navigationStore = StateObject(wrappedValue: navigationStore)
         _watchSync = StateObject(wrappedValue: WatchSyncService.shared)
         WatchSyncService.shared.attachLogStore(logStore)
@@ -55,6 +58,7 @@ struct DIRDivingApp: App {
             .environmentObject(diveManager)
             .environmentObject(imageStore)
             .environmentObject(ascentSettings)
+            .environmentObject(diveReminderSettings)
             .environmentObject(navigationStore)
             .environmentObject(watchSync)
             .environmentObject(legalAcceptance)
