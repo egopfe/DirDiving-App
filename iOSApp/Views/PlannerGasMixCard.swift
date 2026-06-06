@@ -100,7 +100,6 @@ struct GasMixCard: View {
     }
 
     private func notifyChange() {
-        mix.normalizeMixAndPPO2()
         onMixChanged?()
     }
 
