@@ -83,6 +83,10 @@ enum PlanningDepthReference: String, CaseIterable, Identifiable, Codable {
     var id: String { rawValue }
 }
 
+enum PlannerSwitchDepthRoundingPolicy {
+    case floorToMeter
+}
+
 enum GasMixKind: String, CaseIterable, Identifiable, Codable {
     case air
     case ean
@@ -135,6 +139,44 @@ struct PlannerCylinderEntry: Identifiable, Codable, Hashable {
         case .travel: return 30
         case .deco: return 21
         case .bailout: return 6
+        }
+    }
+
+    /// Maximum safe switch depth derived from environment-aware MOD (whole meters, floored).
+    func usableSwitchDepthMeters(
+        environment: PlannerEnvironment,
+        rounding: PlannerSwitchDepthRoundingPolicy = .floorToMeter
+    ) -> Double {
+        let mod = modMeters(environment: environment)
+        guard mod.isFinite, mod > 0 else { return 0 }
+        switch rounding {
+        case .floorToMeter:
+            return max(0, floor(mod))
+        }
+    }
+
+    mutating func clampSwitchDepthToMOD(
+        environment: PlannerEnvironment,
+        rounding: PlannerSwitchDepthRoundingPolicy = .floorToMeter
+    ) {
+        guard role != .bottom else { return }
+        let maxAllowed = usableSwitchDepthMeters(environment: environment, rounding: rounding)
+        if switchDepthMeters > maxAllowed + 0.05 {
+            switchDepthMeters = maxAllowed
+        }
+    }
+
+    mutating func updateSwitchDepthAfterGasOrPPO2Change(
+        environment: PlannerEnvironment,
+        shouldInitializeToMOD: Bool = true,
+        rounding: PlannerSwitchDepthRoundingPolicy = .floorToMeter
+    ) {
+        guard role != .bottom else { return }
+        let maxAllowed = usableSwitchDepthMeters(environment: environment, rounding: rounding)
+        if shouldInitializeToMOD {
+            switchDepthMeters = maxAllowed
+        } else {
+            clampSwitchDepthToMOD(environment: environment, rounding: rounding)
         }
     }
 
@@ -504,6 +546,29 @@ struct GasPlanInput: Codable, Hashable {
         bottomGas.normalizeMixAndPPO2()
         decoGas1.normalizeMixAndPPO2()
         decoGas2.normalizeMixAndPPO2()
+    }
+
+    /// Clamps non-bottom switch depths to environment-aware MOD; optionally sets changed gas to MOD after O2/PPO2 edit.
+    mutating func normalizeSwitchDepthsToMOD(
+        environment: PlannerEnvironment? = nil,
+        changedCylinderID: UUID? = nil,
+        updateChangedGasToMOD: Bool = false
+    ) {
+        ensurePlannerCylindersFromLegacy()
+        let resolvedEnvironment = environment ?? plannerEnvironment
+        for index in plannerCylinders.indices {
+            if let changedCylinderID, plannerCylinders[index].id != changedCylinderID {
+                continue
+            }
+            if updateChangedGasToMOD {
+                plannerCylinders[index].updateSwitchDepthAfterGasOrPPO2Change(
+                    environment: resolvedEnvironment,
+                    shouldInitializeToMOD: true
+                )
+            } else {
+                plannerCylinders[index].clampSwitchDepthToMOD(environment: resolvedEnvironment)
+            }
+        }
     }
 
     var hasInvalidGasMix: Bool {
