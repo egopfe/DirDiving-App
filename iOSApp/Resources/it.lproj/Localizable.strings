@@ -1177,3 +1177,20 @@
 "sync.codec.error.missing_peer_secret" = "Chiave sync Watch non ancora disponibile.";
 "sync.activity.session_summary" = "%1$@ · %2$@ m · %3$lld min";
 "analysis.metric.arithmetic_mean.note" = "SAC e temperatura media sono medie aritmetiche tra immersioni, non medie ponderate per durata.";
+
+/* Checklist ↔ Planner guided sync */
+"checklist_planner.sync.use_checklist" = "Usa attrezzatura dalla checklist";
+"checklist_planner.sync.import_prompt" = "Sono state trovate bombole/gas nella checklist. Vuoi importarle nella pianificazione?";
+"checklist_planner.sync.import_all" = "Importa tutte";
+"checklist_planner.sync.choose_import" = "Scegli quali importare";
+"checklist_planner.sync.cancel" = "Annulla";
+"checklist_planner.sync.export_prompt" = "La pianificazione usa bombole/gas non presenti nella checklist. Vuoi aggiungerli alla checklist?";
+"checklist_planner.sync.add_all" = "Aggiungi tutte";
+"checklist_planner.sync.choose_add" = "Scegli quali aggiungere";
+"checklist_planner.sync.do_not_add" = "Non aggiungere";
+"checklist_planner.sync.missing_gas_role" = "Ruolo gas mancante";
+"checklist_planner.sync.select_gas_role" = "Seleziona ruolo gas";
+"checklist_planner.sync.item_exists" = "Elemento già presente";
+"checklist_planner.sync.replace" = "Sostituisci";
+"checklist_planner.sync.skip" = "Salta";
+"checklist_planner.sync.confirm" = "Conferma";

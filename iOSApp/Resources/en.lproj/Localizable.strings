@@ -1179,3 +1179,20 @@
 "sync.codec.error.missing_peer_secret" = "Watch sync key is not available yet.";
 "sync.activity.session_summary" = "%1$@ · %2$@ m · %3$lld min";
 "analysis.metric.arithmetic_mean.note" = "SAC and temperature averages are simple arithmetic means across dives, not duration-weighted.";
+
+/* Checklist ↔ Planner guided sync */
+"checklist_planner.sync.use_checklist" = "Use equipment from checklist";
+"checklist_planner.sync.import_prompt" = "Gas/cylinder items were found in your checklist. Do you want to import them into the plan?";
+"checklist_planner.sync.import_all" = "Import all";
+"checklist_planner.sync.choose_import" = "Choose which to import";
+"checklist_planner.sync.cancel" = "Cancel";
+"checklist_planner.sync.export_prompt" = "The plan uses gas/cylinders that are not in your checklist. Do you want to add them to the checklist?";
+"checklist_planner.sync.add_all" = "Add all";
+"checklist_planner.sync.choose_add" = "Choose which to add";
+"checklist_planner.sync.do_not_add" = "Do not add";
+"checklist_planner.sync.missing_gas_role" = "Missing gas role";
+"checklist_planner.sync.select_gas_role" = "Select gas role";
+"checklist_planner.sync.item_exists" = "Item already exists";
+"checklist_planner.sync.replace" = "Replace";
+"checklist_planner.sync.skip" = "Skip";
+"checklist_planner.sync.confirm" = "Confirm";
