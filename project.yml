@@ -247,6 +247,13 @@ targets:
       - iOSApp/Utils/ManualDiveEditorDefaults.swift
       - iOSApp/Utils/RouteSummaryAggregation.swift
       - iOSApp/Utils/PressureDisplayMath.swift
+      - iOSApp/Services/PDF/PDFDocumentBuilder.swift
+      - iOSApp/Services/PDF/PDFExportService.swift
+      - iOSApp/Services/PDF/PlannerPDFBuilder.swift
+      - iOSApp/Services/PDF/BriefingPDFBuilder.swift
+      - iOSApp/Services/PDF/ChecklistPDFBuilder.swift
+      - iOSApp/Services/PDF/DivePackPDFBuilder.swift
+      - Tests/iOSAlgorithmTests/PDFExportServiceTests.swift
     resources:
       - path: Tests/iOSAlgorithmTests/Fixtures
         type: folder

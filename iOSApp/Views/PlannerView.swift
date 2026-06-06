@@ -14,6 +14,9 @@ struct PlannerView: View {
     @State private var showChecklistImportSheet = false
     @State private var checklistImportCandidates: [ChecklistPlannerImportCandidate] = []
     @State private var pendingChecklistExportAfterCalculate = false
+    @State private var showPlannerPDFMenu = false
+    @State private var shareablePDF: ShareablePDFItem?
+    @State private var pdfExportAlertMessage: String?
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
     private var modePresentation: PlannerResultPresentation { PlannerResultPresentation.presentation(for: store.mode) }
@@ -85,7 +88,45 @@ struct PlannerView: View {
                 }
                 .dirCompanionScrollSurface()
             }
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showPlannerPDFMenu = true
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                            .foregroundStyle(DIRTheme.cyan)
+                    }
+                    .accessibilityLabel(Text(String(localized: "pdf.export.share.a11y")))
+                }
+            }
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .confirmationDialog(
+                String(localized: "pdf.export.share.a11y"),
+                isPresented: $showPlannerPDFMenu,
+                titleVisibility: .visible
+            ) {
+                Button(String(localized: "pdf.export.share.plan")) {
+                    sharePlannerPDF(kind: .plan)
+                }
+                Button(String(localized: "pdf.export.share.briefing")) {
+                    sharePlannerPDF(kind: .briefing)
+                }
+                Button(String(localized: "pdf.export.share.dive_pack")) {
+                    sharePlannerPDF(kind: .divePack)
+                }
+                Button(String(localized: "pdf.export.cancel"), role: .cancel) {}
+            }
+            .sheet(item: $shareablePDF) { item in
+                ShareSheetView(activityItems: [item.url])
+            }
+            .alert(String(localized: "pdf.export.error.title"), isPresented: Binding(
+                get: { pdfExportAlertMessage != nil },
+                set: { if !$0 { pdfExportAlertMessage = nil } }
+            )) {
+                Button(String(localized: "OK"), role: .cancel) {}
+            } message: {
+                Text(pdfExportAlertMessage ?? "")
+            }
             .navigationDestination(isPresented: $showPlan) {
                 PlanResultView(pendingChecklistExportPrompt: pendingChecklistExportAfterCalculate)
                     .environmentObject(store)
@@ -1032,6 +1073,44 @@ struct PlannerView: View {
         store.refreshDerivedPlanningPreview()
         showChecklistImportSheet = false
     }
+
+    private enum PlannerPDFShareKind {
+        case plan, briefing, divePack
+    }
+
+    private func plannerPDFContext() -> PDFExportPlannerContext {
+        PDFShareActions.plannerContext(
+            store: store,
+            safetyAcknowledged: plannerSafetyAcknowledged,
+            unitPreference: unitPreference,
+            modIssues: liveMODIssues
+        )
+    }
+
+    private func sharePlannerPDF(kind: PlannerPDFShareKind) {
+        let context = plannerPDFContext()
+        guard PDFExportService.canExportPlan(context) else {
+            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage()
+            return
+        }
+        do {
+            let url: URL
+            switch kind {
+            case .plan:
+                url = try PDFExportService.exportPlan(context: context)
+            case .briefing:
+                url = try PDFExportService.exportBriefing(context: context)
+            case .divePack:
+                url = try PDFExportService.exportDivePack(
+                    plannerContext: context,
+                    checklistProfile: equipment.profile
+                )
+            }
+            shareablePDF = ShareablePDFItem(url: url)
+        } catch {
+            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage()
+        }
+    }
 }
 
 struct PlanResultView: View {
@@ -1040,6 +1119,22 @@ struct PlanResultView: View {
     var pendingChecklistExportPrompt: Bool = false
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @AppStorage(PlannerCNSDescentBottomCheckSettings.storageKey) private var cnsDescentBottomCheckEnabled = PlannerCNSDescentBottomCheckSettings.defaultEnabled
+    @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
+    @State private var showResultPDFMenu = false
+    @State private var shareablePDF: ShareablePDFItem?
+    @State private var pdfExportAlertMessage: String?
+
+    private var plannerSafetyAcknowledged: Bool {
+        plannerSafetyAckRevision == PlannerSafetyAcknowledgment.currentRevision
+    }
+
+    private var liveMODIssues: [MODValidationIssue] {
+        PlannerMODValidator.liveInputIssues(input: store.input, environment: store.input.plannerEnvironment)
+    }
+
+    private var canExportPlanPDF: Bool {
+        PDFExportService.canExportPlan(resultPDFContext())
+    }
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
     private var modePresentation: PlannerResultPresentation { PlannerResultPresentation.presentation(for: store.mode) }
@@ -1195,6 +1290,9 @@ struct PlanResultView: View {
                             baseCompatibilitySummary
                         }
                         plannerLegalFootnotes
+                        if canExportPlanPDF {
+                            shareDivePackButton
+                        }
                     case .curve:
                         buhlmannSection
                     case .charts:
@@ -1243,12 +1341,93 @@ struct PlanResultView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                ShareLink(item: planShareText) {
+                Button {
+                    showResultPDFMenu = true
+                } label: {
                     Image(systemName: "square.and.arrow.up")
                         .foregroundStyle(DIRTheme.cyan)
                 }
-                .accessibilityLabel(Text(String(localized: "planner.export.share.a11y")))
+                .accessibilityLabel(Text(String(localized: "pdf.export.share.a11y")))
             }
+        }
+        .confirmationDialog(
+            String(localized: "pdf.export.share.a11y"),
+            isPresented: $showResultPDFMenu,
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "pdf.export.share.plan")) {
+                shareResultPDF(kind: .plan)
+            }
+            Button(String(localized: "pdf.export.share.briefing")) {
+                shareResultPDF(kind: .briefing)
+            }
+            Button(String(localized: "pdf.export.share.dive_pack")) {
+                shareResultPDF(kind: .divePack)
+            }
+            Button(String(localized: "pdf.export.cancel"), role: .cancel) {}
+        }
+        .sheet(item: $shareablePDF) { item in
+            ShareSheetView(activityItems: [item.url])
+        }
+        .alert(String(localized: "pdf.export.error.title"), isPresented: Binding(
+            get: { pdfExportAlertMessage != nil },
+            set: { if !$0 { pdfExportAlertMessage = nil } }
+        )) {
+            Button(String(localized: "OK"), role: .cancel) {}
+        } message: {
+            Text(pdfExportAlertMessage ?? "")
+        }
+    }
+
+    private var shareDivePackButton: some View {
+        Button {
+            shareResultPDF(kind: .divePack)
+        } label: {
+            Text(String(localized: "pdf.export.share.dive_pack_button"))
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(DIRTheme.cyan)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 11)
+                .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private enum ResultPDFShareKind {
+        case plan, briefing, divePack
+    }
+
+    private func resultPDFContext() -> PDFExportPlannerContext {
+        PDFShareActions.plannerContext(
+            store: store,
+            safetyAcknowledged: plannerSafetyAcknowledged,
+            unitPreference: unitPreference,
+            modIssues: liveMODIssues
+        )
+    }
+
+    private func shareResultPDF(kind: ResultPDFShareKind) {
+        let context = resultPDFContext()
+        guard PDFExportService.canExportPlan(context) else {
+            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage()
+            return
+        }
+        do {
+            let url: URL
+            switch kind {
+            case .plan:
+                url = try PDFExportService.exportPlan(context: context)
+            case .briefing:
+                url = try PDFExportService.exportBriefing(context: context)
+            case .divePack:
+                url = try PDFExportService.exportDivePack(
+                    plannerContext: context,
+                    checklistProfile: equipment.profile
+                )
+            }
+            shareablePDF = ShareablePDFItem(url: url)
+        } catch {
+            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage()
         }
     }
 
