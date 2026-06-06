@@ -3,12 +3,17 @@ import Charts
 
 struct PlannerView: View {
     @EnvironmentObject private var store: PlannerStore
+    @EnvironmentObject private var equipment: EquipmentStore
     @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @State private var showPlan = false
     @State private var showPlanningReferenceInfo = false
     @State private var showCalculateError = false
     @State private var calculateErrorMessage = ""
+    @State private var showChecklistImportPrompt = false
+    @State private var showChecklistImportSheet = false
+    @State private var checklistImportCandidates: [ChecklistPlannerImportCandidate] = []
+    @State private var pendingChecklistExportAfterCalculate = false
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
     private var modePresentation: PlannerResultPresentation { PlannerResultPresentation.presentation(for: store.mode) }
@@ -62,8 +67,9 @@ struct PlannerView: View {
             }
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(isPresented: $showPlan) {
-                PlanResultView()
+                PlanResultView(pendingChecklistExportPrompt: pendingChecklistExportAfterCalculate)
                     .environmentObject(store)
+                    .environmentObject(equipment)
             }
             .task {
                 store.input.ensurePlannerCylindersFromLegacy()
@@ -78,6 +84,28 @@ struct PlannerView: View {
                 Button(String(localized: "OK"), role: .cancel) {}
             } message: {
                 Text(calculateErrorMessage)
+            }
+            .confirmationDialog(
+                String(localized: "checklist_planner.sync.import_prompt"),
+                isPresented: $showChecklistImportPrompt,
+                titleVisibility: .visible
+            ) {
+                Button(String(localized: "checklist_planner.sync.import_all")) {
+                    importAllFromChecklist()
+                }
+                Button(String(localized: "checklist_planner.sync.choose_import")) {
+                    openChecklistImportSheet()
+                }
+                Button(String(localized: "checklist_planner.sync.cancel"), role: .cancel) {}
+            }
+            .sheet(isPresented: $showChecklistImportSheet) {
+                ChecklistPlannerSyncSheet(
+                    flow: .importFromChecklist,
+                    importCandidates: $checklistImportCandidates,
+                    exportCandidates: .constant([]),
+                    onConfirm: { confirmChecklistImport() },
+                    onCancel: { showChecklistImportSheet = false }
+                )
             }
         }
         .dirCompanionTabRoot()
@@ -402,6 +430,20 @@ struct PlannerView: View {
     private var plannerCylindersCard: some View {
         DIRCard(String(localized: "planner.card.cylinders"), icon: "fuelpump", accent: DIRTheme.cyan) {
             VStack(spacing: 12) {
+                if !checklistGasItems.isEmpty {
+                    Button {
+                        showChecklistImportPrompt = true
+                    } label: {
+                        Text(String(localized: "checklist_planner.sync.use_checklist"))
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(DIRTheme.cyan)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 8)
+                            .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.7), lineWidth: 1))
+                    }
+                    .buttonStyle(.plain)
+                    Divider().overlay(DIRTheme.hairline)
+                }
                 ForEach(visiblePlannerCylinders) { entry in
                     if let index = store.input.plannerCylinders.firstIndex(where: { $0.id == entry.id }) {
                         plannerCylinderEditor(at: index)
@@ -754,6 +796,10 @@ struct PlannerView: View {
                 return
             }
             store.calculate()
+            pendingChecklistExportAfterCalculate = !ChecklistPlannerSyncMapper.cylindersMissingFromChecklist(
+                plannerCylinders: store.input.plannerCylinders,
+                checklist: equipment.profile.checklistItems
+            ).isEmpty
             showPlan = true
         } label: {
             HStack(spacing: 8) {
@@ -913,10 +959,66 @@ struct PlannerView: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel(message.accessibilityLabel)
     }
+
+    private var checklistGasItems: [EquipmentChecklistItem] {
+        ChecklistPlannerSyncMapper.checklistGasItems(from: equipment.profile.checklistItems)
+    }
+
+    private func openChecklistImportSheet() {
+        checklistImportCandidates = ChecklistPlannerSyncMapper.importCandidates(
+            checklist: equipment.profile.checklistItems,
+            plannerCylinders: store.input.plannerCylinders
+        )
+        showChecklistImportSheet = true
+    }
+
+    private func importAllFromChecklist() {
+        var candidates = ChecklistPlannerSyncMapper.importCandidates(
+            checklist: equipment.profile.checklistItems,
+            plannerCylinders: store.input.plannerCylinders
+        )
+        let needsRoleSelection = candidates.contains { ($0.assignedRole ?? ChecklistPlannerSyncMapper.resolvedRole(for: $0.checklistItem)) == nil }
+        if needsRoleSelection {
+            openChecklistImportSheet()
+            return
+        }
+        for index in candidates.indices {
+            candidates[index].isSelected = true
+            if candidates[index].duplicatePlannerIndex != nil {
+                candidates[index].duplicateAction = .replace
+            }
+        }
+        checklistImportCandidates = candidates
+        confirmChecklistImport()
+    }
+
+    private func confirmChecklistImport() {
+        store.input.ensurePlannerCylindersFromLegacy()
+        ChecklistPlannerSyncMapper.applyImport(
+            candidates: checklistImportCandidates,
+            to: &store.input.plannerCylinders,
+            environment: store.input.plannerEnvironment
+        )
+        for candidate in checklistImportCandidates where candidate.isSelected {
+            if let index = store.input.plannerCylinders.firstIndex(where: {
+                ChecklistPlannerSyncMapper.fingerprint(for: $0) == ChecklistPlannerSyncMapper.fingerprint(
+                    for: candidate.checklistItem,
+                    role: candidate.assignedRole ?? ChecklistPlannerSyncMapper.resolvedRole(for: candidate.checklistItem) ?? .deco
+                )
+            }) {
+                store.normalizeNewCylinderSwitchDepth(cylinderID: store.input.plannerCylinders[index].id)
+            }
+        }
+        store.input.syncLegacyGasesFromPlannerCylinders()
+        store.refreshDerivedPlanningPreview()
+        showChecklistImportSheet = false
+    }
 }
 
 struct PlanResultView: View {
     @EnvironmentObject private var store: PlannerStore
+    @EnvironmentObject private var equipment: EquipmentStore
+    var pendingChecklistExportPrompt: Bool = false
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @AppStorage(PlannerCNSDescentBottomCheckSettings.storageKey) private var cnsDescentBottomCheckEnabled = PlannerCNSDescentBottomCheckSettings.defaultEnabled
 
@@ -971,6 +1073,10 @@ struct PlanResultView: View {
         Formatters.depth(meters, units: unitPreference).text
     }
     @State private var tab: PlanTab = .plan
+    @State private var showChecklistExportPrompt = false
+    @State private var showChecklistExportSheet = false
+    @State private var checklistExportCandidates: [ChecklistPlannerExportCandidate] = []
+    @State private var didPresentChecklistExportPrompt = false
 
     private var availableResultTabs: [PlanTab] {
         var tabs: [PlanTab] = [.plan]
@@ -1090,6 +1196,29 @@ struct PlanResultView: View {
             if !availableResultTabs.contains(tab) {
                 tab = .plan
             }
+            presentChecklistExportPromptIfNeeded()
+        }
+        .confirmationDialog(
+            String(localized: "checklist_planner.sync.export_prompt"),
+            isPresented: $showChecklistExportPrompt,
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "checklist_planner.sync.add_all")) {
+                addAllPlannerGasesToChecklist()
+            }
+            Button(String(localized: "checklist_planner.sync.choose_add")) {
+                openChecklistExportSheet()
+            }
+            Button(String(localized: "checklist_planner.sync.do_not_add"), role: .cancel) {}
+        }
+        .sheet(isPresented: $showChecklistExportSheet) {
+            ChecklistPlannerSyncSheet(
+                flow: .exportToChecklist,
+                importCandidates: .constant([]),
+                exportCandidates: $checklistExportCandidates,
+                onConfirm: { confirmChecklistExport() },
+                onCancel: { showChecklistExportSheet = false }
+            )
         }
         .navigationTitle(store.mode.localizedResultTitle)
         .navigationBarTitleDisplayMode(.inline)
@@ -1102,6 +1231,47 @@ struct PlanResultView: View {
                 .accessibilityLabel(Text(String(localized: "planner.export.share.a11y")))
             }
         }
+    }
+
+    private func presentChecklistExportPromptIfNeeded() {
+        guard pendingChecklistExportPrompt, !didPresentChecklistExportPrompt else { return }
+        let missing = ChecklistPlannerSyncMapper.cylindersMissingFromChecklist(
+            plannerCylinders: store.input.plannerCylinders,
+            checklist: equipment.profile.checklistItems
+        )
+        guard !missing.isEmpty else { return }
+        didPresentChecklistExportPrompt = true
+        showChecklistExportPrompt = true
+    }
+
+    private func openChecklistExportSheet() {
+        checklistExportCandidates = ChecklistPlannerSyncMapper.exportCandidates(
+            plannerCylinders: ChecklistPlannerSyncMapper.cylindersMissingFromChecklist(
+                plannerCylinders: store.input.plannerCylinders,
+                checklist: equipment.profile.checklistItems
+            ),
+            checklist: equipment.profile.checklistItems
+        )
+        showChecklistExportSheet = true
+    }
+
+    private func addAllPlannerGasesToChecklist() {
+        checklistExportCandidates = ChecklistPlannerSyncMapper.exportCandidates(
+            plannerCylinders: ChecklistPlannerSyncMapper.cylindersMissingFromChecklist(
+                plannerCylinders: store.input.plannerCylinders,
+                checklist: equipment.profile.checklistItems
+            ),
+            checklist: equipment.profile.checklistItems
+        )
+        confirmChecklistExport()
+    }
+
+    private func confirmChecklistExport() {
+        ChecklistPlannerSyncMapper.applyExport(
+            candidates: checklistExportCandidates,
+            to: &equipment.profile.checklistItems
+        )
+        showChecklistExportSheet = false
     }
 
     private var referenceDepthSummary: String {

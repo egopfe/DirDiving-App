@@ -21,6 +21,22 @@ struct EquipmentChecklistGasSection: View {
             }
             .font(.callout)
             HStack {
+                Text(String(localized: "checklist_planner.sync.select_gas_role"))
+                    .foregroundStyle(DIRTheme.muted)
+                Spacer()
+                Picker("", selection: Binding(
+                    get: { item.gasRole ?? .bottom },
+                    set: { item.gasRole = $0 }
+                )) {
+                    ForEach(GasRole.allCases) { role in
+                        Text(role.localizedTitle).tag(role)
+                    }
+                }
+                .labelsHidden()
+                .tint(DIRTheme.cyan)
+            }
+            .font(.callout)
+            HStack {
                 Text(String(localized: "equipment.checklist.pressure_unit"))
                     .foregroundStyle(DIRTheme.muted)
                 Spacer()
