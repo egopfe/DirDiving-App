@@ -414,10 +414,12 @@ struct DiveDetailView: View {
 
     @ViewBuilder
     private var sacMetric: some View {
-        if let sac = session.sacLitersMinute {
-            detailMetric(String(localized: "detail.metric.sac"), measurement: Formatters.sac(sac, units: unitPreference))
-        } else {
-            detailMetric(String(localized: "detail.metric.sac"), value: "—", valueColor: DIRTheme.yellow)
+        Group {
+            if let sac = session.sacLitersMinute {
+                detailMetric(String(localized: "detail.metric.sac"), measurement: Formatters.sac(sac, units: unitPreference))
+            } else {
+                detailMetric(String(localized: "detail.metric.sac"), value: "—", valueColor: DIRTheme.yellow)
+            }
         }
         .padding(12)
         .background(

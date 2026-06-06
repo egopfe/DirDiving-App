@@ -14,6 +14,8 @@ struct MoreView: View {
     @State private var showResetPairingConfirm = false
     @State private var versionTapCount = 0
     @State private var developerUnlockedNotice = false
+    @State private var showOnboarding = false
+    @State private var notificationStatus = "Not determined"
 
     var body: some View {
         NavigationStack {

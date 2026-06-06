@@ -132,12 +132,12 @@ final class CloudSyncStore: ObservableObject {
 
     func loadLocal<T: Decodable>(_ type: T.Type, forKey key: String) -> T? {
         guard let localData = defaults.data(forKey: key) else { return nil }
-        return decode(type, from: localData)
+        return decode(type, from: localData, key: key, source: String(localized: "cloud.source.local"))
     }
 
     func loadCloud<T: Decodable>(_ type: T.Type, forKey key: String) -> T? {
         guard let cloudData = cloudStore.data(forKey: key) else { return nil }
-        return decode(type, from: cloudData)
+        return decode(type, from: cloudData, key: key, source: String(localized: "cloud.source.icloud"))
     }
 
     func save<T: Encodable>(_ value: T, forKey key: String) {

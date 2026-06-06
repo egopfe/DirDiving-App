@@ -65,6 +65,7 @@ enum SubsurfaceExportService {
             ].map(csvField)
             rows.append(fields.joined(separator: ","))
         }
+        return rows.joined(separator: "\n")
     }
 
     private static func metadataLines(for session: DiveSession) -> [String] {

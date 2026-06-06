@@ -71,7 +71,7 @@ struct ExploreView: View {
     private var routeStatusStrip: some View {
         let routes = routeSummaries
         let distance = Formatters.distance(totalDistance, units: unitPreference, prefersLargeUnit: true)
-        HStack(spacing: 12) {
+        return HStack(spacing: 12) {
             routeStatus("ROUTES", "\(routes.count)", DIRTheme.cyan, "point.topleft.down.curvedto.point.bottomright.up")
             routeStatus("DIST", distance.text, DIRTheme.green, "ruler")
             routeStatus("LATEST", latestBearingText, DIRTheme.yellow, "location.north")
@@ -293,9 +293,6 @@ struct ExploreView: View {
         case .success(let summary):
             let alreadyImported = logStore.session(id: summary.session.id) != nil
             logStore.add(summary.session)
-            if !alreadyImported {
-                watchSync.pushSession(summary.session)
-            }
             importMessage = summary.message(alreadyImported: alreadyImported)
             HapticFeedback.success()
         case .failure(let error):

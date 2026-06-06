@@ -328,13 +328,6 @@ struct DiveLogCard: View {
     }()
 }
 
-private struct LogbookMonthSection: Identifiable {
-    let monthStart: Date
-    let sessions: [DiveSession]
-
-    var id: Date { monthStart }
-}
-
 struct DiveThumbnail: View {
     let index: Int
 
