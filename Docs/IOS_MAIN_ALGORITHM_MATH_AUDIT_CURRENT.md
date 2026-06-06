@@ -4,8 +4,10 @@
 **Repository:** DIR DIVING (`DirDiving-App`)  
 **Branch audited:** `main`  
 **Code baseline:** `ecad0d9`  
+**Document indexed on `main`:** `5415213`  
 **Target audited:** `DIRDiving iOS` only  
-**Mode:** Read-only static audit. No code, UI, Watch runtime, or experimental targets were modified.
+**Mode:** Read-only static audit. No code, UI, Watch runtime, or experimental targets were modified.  
+**Indexed in:** [`Docs/INDEX.md`](INDEX.md) — §4 (iOS MAIN), agg. 2026-06-06, §14 (elenco alfabetico), §12 (percorso rapido #10).
 
 ---
 
@@ -653,3 +655,17 @@ Key mode tests: `PlannerModePolicyTests` (projection, trimix rejection, presenta
 ---
 
 *Previous audit baseline `6a5054f` (2026-06-03) predated the three-tab Planner architecture and UI readiness work @ `ecad0d9`. This document supersedes that revision for planner mode scope.*
+
+---
+
+## Related documents
+
+| Document | Role |
+|---|---|
+| [`INDEX.md`](INDEX.md) | Indice documentazione — ingresso §4 iOS MAIN |
+| [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) | Remediation storica @ `dce89e7` (pre three-tab Planner) |
+| [`IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) | Remediation IOS-AUDIT-001…012 @ 2026-06-03 |
+| [`IOS_MAIN_ALGORITHM_READINESS_100_FINAL_QA.md`](IOS_MAIN_ALGORITHM_READINESS_100_FINAL_QA.md) | QA matrix post-remediation |
+| [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md) | Limitazioni planner reference-only |
+| [`DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_AUDIT_CURRENT.md`](DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_AUDIT_CURRENT.md) | Audit UI deco table / curva Bühlmann |
+| [`DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md) | Audit algoritmi iOS post-hardening (storico) |

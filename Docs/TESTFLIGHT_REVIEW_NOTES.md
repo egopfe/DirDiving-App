@@ -11,7 +11,8 @@ L'app **non** e presentata come computer subacqueo certificato.
 Lo stato algoritmico MAIN e documentato in:
 
 - [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) — remediation Watch MAIN @ 2026-06-06 (test isolation, mock fallback badge, draft schema v1, corrupt finalizing diagnostic, GPS auth guard, CSV iOS alignment, haptic preference resync).
-- [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) — read-only audit baseline @ `5415213`.
+- [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) — read-only audit baseline Watch @ `5415213`.
+- [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) — read-only audit baseline iOS three-tab Planner @ `ecad0d9` (indicizzato @ `5415213`).
 - [`WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md) per Watch MAIN (codice 100%; QA fisica § L).
 - [`WATCH_MANUAL_NODEPTH_SYNC_POLICY.md`](WATCH_MANUAL_NODEPTH_SYNC_POLICY.md) per sessioni manuali senza profilo profondità.
 - [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) per iOS MAIN.
