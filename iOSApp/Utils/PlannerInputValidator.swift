@@ -76,6 +76,12 @@ enum PlannerInputValidator {
             }
         }
 
+        let environment = input.plannerEnvironment
+        for issue in PlannerMODValidator.validatePlannerCylinders(input: input, environment: environment) {
+            guard issue.cylinderRole != .bottom else { continue }
+            result.add(.MODExceeded, message: String(localized: "planner.mod.exceeds_allowed"))
+        }
+
         for entry in input.plannerCylinders {
             result.merge(validate(cylinder: entry.cylinder))
         }

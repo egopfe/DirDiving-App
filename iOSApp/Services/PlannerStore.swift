@@ -57,6 +57,41 @@ final class PlannerStore: ObservableObject {
         applyInputToPlanningOutputs()
     }
 
+    func normalizeSwitchDepthAfterGasOrPPO2Change(cylinderID: UUID) {
+        guard isReady else { return }
+        isApplyingInputSideEffects = true
+        input.normalizeSwitchDepthsToMOD(changedCylinderID: cylinderID, updateChangedGasToMOD: true)
+        isApplyingInputSideEffects = false
+        applyInputToPlanningOutputs()
+        saveIfReady()
+    }
+
+    func clampAllSwitchDepthsToMOD() {
+        guard isReady else { return }
+        isApplyingInputSideEffects = true
+        input.normalizeSwitchDepthsToMOD()
+        isApplyingInputSideEffects = false
+        applyInputToPlanningOutputs()
+        saveIfReady()
+    }
+
+    func clampSwitchDepth(forCylinderAt index: Int, proposedMeters: Double) {
+        guard isReady, input.plannerCylinders.indices.contains(index) else { return }
+        let environment = input.plannerEnvironment
+        let maxAllowed = input.plannerCylinders[index].usableSwitchDepthMeters(environment: environment)
+        let clamped = min(max(0, proposedMeters), maxAllowed)
+        guard abs(input.plannerCylinders[index].switchDepthMeters - clamped) > 0.001 else { return }
+        isApplyingInputSideEffects = true
+        input.plannerCylinders[index].switchDepthMeters = clamped
+        isApplyingInputSideEffects = false
+        applyInputToPlanningOutputs()
+        saveIfReady()
+    }
+
+    func normalizeNewCylinderSwitchDepth(cylinderID: UUID) {
+        normalizeSwitchDepthAfterGasOrPPO2Change(cylinderID: cylinderID)
+    }
+
     func calculate() {
         guard isReady else { return }
         isCalculating = true

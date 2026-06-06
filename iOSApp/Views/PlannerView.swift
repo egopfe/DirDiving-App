@@ -158,6 +158,9 @@ struct PlannerView: View {
                 if store.mode == .technical {
                     Divider().overlay(DIRTheme.hairline)
                     plannerDepthField(String(localized: "planner.field.altitude"), meters: $store.input.altitudeMeters, step: unitPreference == .metric ? 100 : 300)
+                        .onChange(of: store.input.altitudeMeters) { _, _ in
+                            store.clampAllSwitchDepthsToMOD()
+                        }
                     Divider().overlay(DIRTheme.hairline)
                     HStack {
                         Text(String(localized: "planner.field.salinity"))
@@ -171,6 +174,9 @@ struct PlannerView: View {
                         }
                         .labelsHidden()
                         .tint(DIRTheme.cyan)
+                        .onChange(of: store.input.salinity) { _, _ in
+                            store.clampAllSwitchDepthsToMOD()
+                        }
                     }
                     .padding(.vertical, 10)
                     environmentStatusRow
@@ -404,13 +410,13 @@ struct PlannerView: View {
                 if store.mode == .deco,
                    store.input.plannerCylinders.filter({ $0.role == .deco }).isEmpty {
                     Button {
-                        store.input.plannerCylinders.append(
-                            PlannerCylinderEntry(
-                                role: .deco,
-                                tankSize: .liters12,
-                                gas: GasMix(name: "Deco", role: .deco, oxygen: 0.50, helium: 0, maxPPO2: 1.6)
-                            )
+                        let entry = PlannerCylinderEntry(
+                            role: .deco,
+                            tankSize: .liters12,
+                            gas: GasMix(name: "Deco", role: .deco, oxygen: 0.50, helium: 0, maxPPO2: 1.6)
                         )
+                        store.input.plannerCylinders.append(entry)
+                        store.normalizeNewCylinderSwitchDepth(cylinderID: entry.id)
                     } label: {
                         Text(String(localized: "planner.cylinder.add_deco"))
                             .font(.callout.weight(.semibold))
@@ -439,13 +445,13 @@ struct PlannerView: View {
     @ViewBuilder
     private var addTechnicalCylinderButtons: some View {
         Button {
-            store.input.plannerCylinders.append(
-                PlannerCylinderEntry(
-                    role: .deco,
-                    tankSize: .liters12,
-                    gas: GasMix(name: "Deco", role: .deco, oxygen: 0.50, helium: 0, maxPPO2: 1.6)
-                )
+            let entry = PlannerCylinderEntry(
+                role: .deco,
+                tankSize: .liters12,
+                gas: GasMix(name: "Deco", role: .deco, oxygen: 0.50, helium: 0, maxPPO2: 1.6)
             )
+            store.input.plannerCylinders.append(entry)
+            store.normalizeNewCylinderSwitchDepth(cylinderID: entry.id)
         } label: {
             Text(String(localized: "planner.cylinder.add"))
                 .font(.callout.weight(.semibold))
@@ -484,6 +490,9 @@ struct PlannerView: View {
                     }
                     .labelsHidden()
                     .tint(DIRTheme.cyan)
+                    .onChange(of: store.input.plannerCylinders[index].role) { _, _ in
+                        store.clampAllSwitchDepthsToMOD()
+                    }
                 }
                 .font(.callout)
             } else {
@@ -517,8 +526,9 @@ struct PlannerView: View {
             if entry.role != .bottom {
                 plannerDepthField(
                     String(localized: "planner.field.switch_depth"),
-                    meters: $store.input.plannerCylinders[index].switchDepthMeters,
-                    step: 1
+                    meters: clampedSwitchDepthBinding(for: index),
+                    step: 1,
+                    maxMeters: entry.usableSwitchDepthMeters(environment: store.input.plannerEnvironment)
                 )
             }
             GasMixCard(
@@ -526,7 +536,10 @@ struct PlannerView: View {
                 accent: entry.role == .bottom ? DIRTheme.green : DIRTheme.yellow,
                 unitPreference: unitPreference,
                 plannerEnvironment: store.input.plannerEnvironment,
-                allowedMixKinds: PlannerModePolicy.allowedMixKinds(for: store.mode)
+                allowedMixKinds: PlannerModePolicy.allowedMixKinds(for: store.mode),
+                onMixChanged: {
+                    store.normalizeSwitchDepthAfterGasOrPPO2Change(cylinderID: entry.id)
+                }
             )
             if entry.isSwitchDepthBeyondMOD(environment: store.input.plannerEnvironment) {
                 Text(String(localized: "planner.mod.exceeds_allowed"))
@@ -790,13 +803,27 @@ struct PlannerView: View {
         )
     }
 
-    private func plannerDepthField(_ title: String, meters: Binding<Double>, step: Double = 1) -> some View {
+    private func plannerDepthField(_ title: String, meters: Binding<Double>, step: Double = 1, maxMeters: Double? = nil) -> some View {
         let displayStep = unitPreference == .metric ? step : max(1, IOSUnitConversions.feet(fromMeters: step))
+        let displayMax = maxMeters.map { unitPreference == .metric ? $0 : IOSUnitConversions.feet(fromMeters: $0) }
         return plannerField(
             title,
             value: depthDisplayBinding(meters),
             unit: Formatters.depthUnitLabel(unitPreference),
-            step: displayStep
+            step: displayStep,
+            maxValue: displayMax
+        )
+    }
+
+    private func clampedSwitchDepthBinding(for index: Int) -> Binding<Double> {
+        Binding(
+            get: {
+                guard store.input.plannerCylinders.indices.contains(index) else { return 0 }
+                return store.input.plannerCylinders[index].switchDepthMeters
+            },
+            set: { proposed in
+                store.clampSwitchDepth(forCylinderAt: index, proposedMeters: proposed)
+            }
         )
     }
 
@@ -809,7 +836,7 @@ struct PlannerView: View {
         )
     }
 
-    private func plannerField(_ title: String, value: Binding<Double>, unit: String, step: Double) -> some View {
+    private func plannerField(_ title: String, value: Binding<Double>, unit: String, step: Double, maxValue: Double? = nil) -> some View {
         HStack {
             Text(title)
                 .font(.callout)
@@ -827,11 +854,16 @@ struct PlannerView: View {
                         .frame(width: 28, height: 24)
                 }
                 Button {
-                    value.wrappedValue += step
+                    if let maxValue {
+                        value.wrappedValue = min(maxValue, value.wrappedValue + step)
+                    } else {
+                        value.wrappedValue += step
+                    }
                 } label: {
                     Image(systemName: "plus")
                         .frame(width: 28, height: 24)
                 }
+                .disabled(maxValue.map { value.wrappedValue >= $0 - 0.001 } ?? false)
             }
             .font(.caption.weight(.bold))
             .foregroundStyle(DIRTheme.cyan)
