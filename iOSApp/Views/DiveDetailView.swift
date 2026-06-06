@@ -48,6 +48,7 @@ struct DiveDetailView: View {
                             watchManualNoDepthBanner
                         }
                         ttvSafetyNote
+                        tissueAnalyticsEntry
                         depthProfileSection
                         gasBlock
                     case .charts:
@@ -565,5 +566,44 @@ struct DiveDetailView: View {
             }
         }
         .padding(.top, 4)
+    }
+
+    @ViewBuilder
+    private var tissueAnalyticsEntry: some View {
+        if session.hasDepthProfile, !session.samples.isEmpty {
+            NavigationLink {
+                if let presentation = TissueAnalyticsService.presentationForSession(session) {
+                    TissueNarcosisAnalyticsView(presentation: presentation, initialTab: .tissues)
+                } else {
+                    TissueAnalyticsUnavailableView()
+                }
+            } label: {
+                HStack(alignment: .top, spacing: 12) {
+                    Image(systemName: "waveform.path.ecg")
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(TissueAnalyticsTheme.accentBlue)
+                        .frame(width: 28)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(String(localized: "tissue_analytics.logbook.entry.title"))
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(.white)
+                        Text(String(localized: "tissue_analytics.entry.subtitle"))
+                            .font(.caption)
+                            .foregroundStyle(TissueAnalyticsTheme.labelSecondary)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(TissueAnalyticsTheme.labelMuted)
+                }
+                .padding(14)
+                .background(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(TissueAnalyticsTheme.cardBackground)
+                        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(TissueAnalyticsTheme.cardBorder, lineWidth: 1))
+                )
+            }
+            .buttonStyle(.plain)
+        }
     }
 }

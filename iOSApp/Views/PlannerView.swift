@@ -1260,8 +1260,9 @@ struct PlanResultView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
                     resultHeaderBadge
-                    dashboardHeroGrid
-                    resultTabs
+                        dashboardHeroGrid
+                        tissueAnalyticsEntry
+                        resultTabs
                     modValidationSection
                     resultWarningsSection
                     bailoutScheduleHint
@@ -1646,6 +1647,26 @@ struct PlanResultView: View {
         )
         .accessibilityElement(children: .contain)
         .accessibilityLabel(String(localized: "planner.result.dashboard.a11y"))
+    }
+
+    @ViewBuilder
+    private var tissueAnalyticsEntry: some View {
+        if showsTissueAnalyticsEntry, let presentation = tissueAnalyticsPresentation {
+            NavigationLink {
+                TissueNarcosisAnalyticsView(presentation: presentation, initialTab: .tissues)
+            } label: {
+                TissueAnalyticsEntryCard()
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var showsTissueAnalyticsEntry: Bool {
+        store.mode != .base && !store.plan.tissueHistory.isEmpty && store.plan.buhlmannState != .invalidInput
+    }
+
+    private var tissueAnalyticsPresentation: TissueAnalyticsPresentation? {
+        TissueAnalyticsService.presentationForPlanner(plan: store.plan, input: store.input, mode: store.mode)
     }
 
     private var secondaryMetricsSection: some View {
