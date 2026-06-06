@@ -149,8 +149,10 @@ enum PlannerModePolicy {
         switch mode {
         case .base:
             result.merge(validateBaseDraft(draft))
+            result.merge(PlannerModeLimits.validateBasicLimits(for: draft))
         case .deco:
             result.merge(validateDecoDraft(draft))
+            result.merge(PlannerModeLimits.validateDecoDepthLimits(for: draft))
         case .technical:
             break
         }
@@ -172,9 +174,9 @@ enum PlannerModePolicy {
         guard requiresDeco else { return nil }
         return PlannerUserFacingCopy.localized(
             id: "planner.base.exceeds_mode",
-            titleKey: "planner.base.exceeds_mode.title",
-            messageKey: "planner.base.exceeds_mode.message",
-            hintKey: nil,
+            titleKey: "planner.mode.basic.no_deco.title",
+            messageKey: "planner.mode.basic.no_deco.message",
+            hintKey: "planner.mode.basic.no_deco.hint",
             severity: .warning
         )
     }

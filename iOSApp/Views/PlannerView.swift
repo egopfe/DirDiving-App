@@ -18,6 +18,25 @@ struct PlannerView: View {
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
     private var modePresentation: PlannerResultPresentation { PlannerResultPresentation.presentation(for: store.mode) }
 
+    private var profileMaxDepthLimitMeters: Double? {
+        switch store.mode {
+        case .base:
+            return PlannerModeLimits.basicMaximumDepthMeters(for: store.input)
+        case .deco:
+            return PlannerModeLimits.decoMaximumDepthMeters(for: store.input)
+        case .technical:
+            return nil
+        }
+    }
+
+    private var profileMaxAverageDepthLimitMeters: Double? {
+        store.mode == .deco ? PlannerModeLimits.decoMaximumDepthMeters(for: store.input) : nil
+    }
+
+    private var profileMaxBottomMinutes: Double? {
+        store.mode == .base ? PlannerModeLimits.basicMaximumBottomMinutes(for: store.input) : nil
+    }
+
     private var plannerSafetyAcknowledged: Bool {
         plannerSafetyAckRevision == PlannerSafetyAcknowledgment.currentRevision
     }
@@ -53,6 +72,7 @@ struct PlannerView: View {
                                 teamPreviewCard
                             }
                             plannerMODInputWarnings
+                            plannerModeLimitWarnings
                             plannerWarnings
                             calculateButton
                         }
@@ -144,10 +164,18 @@ struct PlannerView: View {
     private var profileCard: some View {
         DIRCard(String(localized: "planner.profile.title"), icon: nil, accent: DIRTheme.cyan) {
             VStack(spacing: 0) {
-                plannerDepthField(String(localized: "planner.field.max_depth"), meters: $store.input.plannedDepthMeters)
+                plannerDepthField(
+                    String(localized: "planner.field.max_depth"),
+                    meters: $store.input.plannedDepthMeters,
+                    maxMeters: profileMaxDepthLimitMeters
+                )
                 if store.mode != .base {
                     Divider().overlay(DIRTheme.hairline)
-                    plannerDepthField(String(localized: "planner.field.avg_depth"), meters: $store.input.plannedAverageDepthMeters)
+                    plannerDepthField(
+                        String(localized: "planner.field.avg_depth"),
+                        meters: $store.input.plannedAverageDepthMeters,
+                        maxMeters: profileMaxAverageDepthLimitMeters
+                    )
                     Divider().overlay(DIRTheme.hairline)
                     HStack(spacing: 8) {
                         Text(String(localized: "planner.field.planning_reference"))
@@ -180,7 +208,13 @@ struct PlannerView: View {
                     .padding(.vertical, 10)
                 }
                 Divider().overlay(DIRTheme.hairline)
-                plannerField(String(localized: "planner.field.bottom_time"), value: $store.input.plannedBottomMinutes, unit: "min", step: 1)
+                plannerField(
+                    String(localized: "planner.field.bottom_time"),
+                    value: $store.input.plannedBottomMinutes,
+                    unit: "min",
+                    step: 1,
+                    maxValue: profileMaxBottomMinutes
+                )
                 Divider().overlay(DIRTheme.hairline)
                 plannerTemperatureField(String(localized: "planner.field.temperature"), celsius: $store.input.waterTemperatureCelsius)
                 if store.mode == .technical {
@@ -636,6 +670,33 @@ struct PlannerView: View {
 
     private var canCalculatePlan: Bool {
         plannerSafetyAcknowledged && liveValidation.isValid && liveMODIssues.isEmpty
+    }
+
+    @ViewBuilder
+    private var plannerModeLimitWarnings: some View {
+        if liveValidation.states.contains(.basicNoDecoLimitExceeded) {
+            let message = PlannerUserFacingCopy.message(for: .basicNoDecoLimitExceeded)
+            DIRWarningBox(
+                text: [message.title, message.message, message.correctiveHint].compactMap { $0 }.joined(separator: "\n"),
+                severity: .critical
+            )
+        }
+        if liveValidation.states.contains(.decoDepthLimitExceeded) {
+            let message = PlannerUserFacingCopy.message(for: .decoDepthLimitExceeded)
+            DIRWarningBox(
+                text: [message.title, message.message, message.correctiveHint].compactMap { $0 }.joined(separator: "\n"),
+                severity: .critical
+            )
+        }
+        if store.mode == .technical {
+            DIRWarningBox(
+                text: [
+                    String(localized: "planner.mode.technical.notice.title"),
+                    String(localized: "planner.mode.technical.notice.message")
+                ].joined(separator: "\n"),
+                severity: .info
+            )
+        }
     }
 
     @ViewBuilder

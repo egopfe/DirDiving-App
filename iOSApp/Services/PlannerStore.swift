@@ -6,6 +6,9 @@ final class PlannerStore: ObservableObject {
     @Published var mode: PlannerMode = .base {
         didSet {
             guard isReady else { return }
+            isApplyingInputSideEffects = true
+            PlannerModeLimits.enforceInputLimits(&input, mode: mode)
+            isApplyingInputSideEffects = false
             saveIfReady()
             applyInputToPlanningOutputs()
         }
@@ -13,6 +16,9 @@ final class PlannerStore: ObservableObject {
     @Published var input = GasPlanInput() {
         didSet {
             guard !isApplyingInputSideEffects else { return }
+            isApplyingInputSideEffects = true
+            PlannerModeLimits.enforceInputLimits(&input, mode: mode)
+            isApplyingInputSideEffects = false
             saveIfReady()
             applyInputToPlanningOutputs()
         }
