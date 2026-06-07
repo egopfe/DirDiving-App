@@ -10,6 +10,7 @@ struct PlannerView: View {
     @State private var showPlanningReferenceInfo = false
     @State private var showCalculateError = false
     @State private var calculateErrorMessage = ""
+    @State private var showPlannerReferenceDetails = false
     @State private var showChecklistImportPrompt = false
     @State private var showChecklistImportSheet = false
     @State private var checklistImportCandidates: [ChecklistPlannerImportCandidate] = []
@@ -57,7 +58,7 @@ struct PlannerView: View {
                         }
                         plannerSafetyAcknowledgment
                         DIRWarningBox(text: String(localized: "planner.reference_only.warning"))
-                        DIRWarningBox(text: String(localized: "planner.units.metric_notice"))
+                        plannerReferenceDetailsSection
                         Group {
                             modePicker
                             profileCard
@@ -842,6 +843,36 @@ struct PlannerView: View {
         .accessibilityHint(String(localized: "planner.safety_ack.hint"))
     }
 
+    private var plannerReferenceDetailsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    showPlannerReferenceDetails.toggle()
+                }
+            } label: {
+                HStack(spacing: 6) {
+                    Text(
+                        showPlannerReferenceDetails
+                            ? String(localized: "planner.reference.details.hide")
+                            : String(localized: "planner.reference.details.read_more")
+                    )
+                    .font(DIRTypography.captionSemibold)
+                    .foregroundStyle(DIRTheme.cyan)
+                    Spacer(minLength: 0)
+                    Image(systemName: showPlannerReferenceDetails ? "chevron.up" : "chevron.down")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(DIRTheme.muted)
+                }
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint(String(localized: "planner.reference.details.summary"))
+
+            if showPlannerReferenceDetails {
+                DIRWarningBox(text: String(localized: "planner.units.metric_notice"))
+            }
+        }
+    }
+
     private var calculateButton: some View {
         Button {
             let validation = PlannerModePolicy.validate(draft: store.input, mode: store.mode)
@@ -1208,6 +1239,36 @@ struct PlanResultView: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel(String(localized: "planner.accessibility.cns_descent_bottom.warning.label"))
         .accessibilityHint(String(localized: "planner.accessibility.cns_descent_bottom.warning.hint"))
+    }
+
+    private var fullPlanCNSTileAccessibilityLabel: String {
+        let value = store.plan.gasAnalysis.cnsPercentDisplay
+        let base = "\(String(localized: "planner.metric.cns_full_plan")), \(value) percent"
+        guard fullPlanCNSWarningActive else { return base }
+        return "\(String(localized: "planner.accessibility.cns_full_plan.warning.label")) \(base)"
+    }
+
+    private var fullPlanCNSWarningBanner: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .top, spacing: 8) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(DIRTheme.yellow)
+                Text(String(localized: "planner.cns_full_plan.warning"))
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(DIRTheme.yellow)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Text(String(localized: "planner.cns_full_plan.warning.hint"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(localized: "planner.accessibility.cns_full_plan.warning.label"))
+        .accessibilityHint(String(localized: "planner.accessibility.cns_full_plan.warning.hint"))
     }
 
     private func plannerResultMutedFootnote(_ text: String) -> some View {
@@ -1676,6 +1737,10 @@ struct PlanResultView: View {
                     color: fullPlanCNSWarningActive ? DIRTheme.yellow : DIRTheme.green,
                     icon: fullPlanCNSWarningActive ? "exclamationmark.triangle.fill" : nil
                 )
+                .accessibilityLabel(fullPlanCNSTileAccessibilityLabel)
+            }
+            if fullPlanCNSWarningActive {
+                fullPlanCNSWarningBanner
             }
         }
         .background(
@@ -2117,12 +2182,21 @@ struct PlanResultView: View {
                         "PPO₂"
                     ], isHeader: true)
                     ForEach(store.plan.ascentTableRows) { row in
-                        tableRow([
-                            rowLabel(for: row),
-                            row.timeLabel,
-                            row.gas,
-                            row.ppO2Label
-                        ], isSurface: row.kind == .surface)
+                        tableRow(
+                            [
+                                rowLabel(for: row),
+                                row.timeLabel,
+                                row.gas,
+                                row.ppO2Label
+                            ],
+                            isSurface: row.kind == .surface,
+                            columnHeaders: [
+                                String(localized: "planner.table.depth"),
+                                String(localized: "planner.table.time"),
+                                String(localized: "planner.table.gas"),
+                                "PPO₂"
+                            ]
+                        )
                         if row.id != store.plan.ascentTableRows.last?.id {
                             Divider().overlay(DIRTheme.hairline)
                         }
@@ -2186,12 +2260,20 @@ struct PlanResultView: View {
                     String(localized: "planner.table.gas")
                 ], isHeader: true)
                 ForEach(store.plan.segments) { segment in
-                    tableRow([
-                        segment.kind.rawValue,
-                        depthText(segment.depthMeters),
-                        Formatters.one(segment.minutes),
-                        segment.gas
-                    ])
+                    tableRow(
+                        [
+                            segment.kind.rawValue,
+                            depthText(segment.depthMeters),
+                            Formatters.one(segment.minutes),
+                            segment.gas
+                        ],
+                        columnHeaders: [
+                            String(localized: "planner.table.type"),
+                            String(localized: "planner.table.depth_short"),
+                            String(localized: "planner.table.min"),
+                            String(localized: "planner.table.gas")
+                        ]
+                    )
                 }
             }
         }
@@ -2207,14 +2289,24 @@ struct PlanResultView: View {
                     String(localized: "planner.table.note")
                 ], isHeader: true)
                 ForEach(store.plan.gfComparisons) { comparison in
-                    tableRow([
-                        comparison.label,
-                        "\(comparison.ttsMinutes) min",
-                        "\(comparison.stopCount)",
-                        comparison.conservatismNote
-                    ])
+                    tableRow(
+                        [
+                            comparison.label,
+                            "\(comparison.ttsMinutes) min",
+                            "\(comparison.stopCount)",
+                            comparison.conservatismNote
+                        ],
+                        columnHeaders: [
+                            "GF",
+                            "TTS",
+                            String(localized: "planner.table.stops"),
+                            String(localized: "planner.table.note")
+                        ]
+                    )
                 }
             }
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel(String(localized: "planner.result.gf_compare.a11y"))
         }
     }
 
@@ -2253,12 +2345,20 @@ struct PlanResultView: View {
                     String(localized: "planner.table.status")
                 ], isHeader: true)
                 ForEach(store.plan.teamMatches) { match in
-                    tableRow([
-                        match.diverName,
-                        "\(Formatters.zero(match.sacLitersMinute))",
-                        String(format: String(localized: "planner.team.available_gas_format"), Formatters.zero(match.availableLiters)),
-                        match.status
-                    ])
+                    tableRow(
+                        [
+                            match.diverName,
+                            "\(Formatters.zero(match.sacLitersMinute))",
+                            String(format: String(localized: "planner.team.available_gas_format"), Formatters.zero(match.availableLiters)),
+                            match.status
+                        ],
+                        columnHeaders: [
+                            String(localized: "planner.table.diver"),
+                            String(localized: "planner.table.sac"),
+                            String(localized: "planner.table.gas"),
+                            String(localized: "planner.table.status")
+                        ]
+                    )
                 }
             }
         }
@@ -2287,7 +2387,25 @@ struct PlanResultView: View {
         }
     }
 
-    private func tableRow(_ values: [String], isHeader: Bool = false, isSurface: Bool = false) -> some View {
+    private func tableRowSummary(_ values: [String]) -> String {
+        switch values.count {
+        case 2:
+            return String(format: String(localized: "planner.table.row.a11y.two"), values[0], values[1])
+        case 3:
+            return String(format: String(localized: "planner.table.row.a11y.three"), values[0], values[1], values[2])
+        case 4:
+            return String(format: String(localized: "planner.table.row.a11y"), values[0], values[1], values[2], values[3])
+        default:
+            return values.joined(separator: ", ")
+        }
+    }
+
+    private func tableRow(
+        _ values: [String],
+        isHeader: Bool = false,
+        isSurface: Bool = false,
+        columnHeaders: [String]? = nil
+    ) -> some View {
         HStack(spacing: 6) {
             ForEach(Array(values.enumerated()), id: \.offset) { index, value in
                 Text(value)
@@ -2296,12 +2414,19 @@ struct PlanResultView: View {
                     .frame(maxWidth: .infinity, alignment: index == 0 ? .leading : (index == values.count - 1 ? .trailing : .center))
                     .lineLimit(2)
                     .minimumScaleFactor(0.82)
+                    .accessibilityLabel(
+                        isHeader || columnHeaders == nil
+                            ? value
+                            : "\(columnHeaders![index]): \(value)"
+                    )
             }
         }
         .padding(.horizontal, 10)
         .padding(.vertical, isHeader ? 8 : 10)
         .background(isHeader ? DIRTheme.surface2.opacity(0.65) : (isSurface ? DIRTheme.green.opacity(0.08) : Color.clear))
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: isHeader ? .combine : .contain)
+        .accessibilityAddTraits(isHeader ? .isHeader : [])
+        .accessibilityHint(isHeader ? "" : tableRowSummary(values))
     }
 
     @ViewBuilder
@@ -2399,7 +2524,7 @@ struct PlanResultView: View {
                     }
                     .chartYScale(domain: 0...100)
                     .chartYAxisLabel(String(localized: "planner.buhlmann.axis.load"))
-                    .frame(minHeight: 240)
+                    .frame(minHeight: 180, maxHeight: 320)
                     .padding(.vertical, 4)
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel(buhlmannChartAccessibilitySummary)
@@ -2455,8 +2580,21 @@ struct PlanResultView: View {
                 AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
             }
             .chartYAxisLabel(String(localized: "planner.buhlmann.axis.ndl"))
-            .frame(height: 180)
+            .frame(minHeight: 140, maxHeight: 260)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(String(localized: "planner.buhlmann.ndl_reference.a11y"))
+            .accessibilityHint(String(localized: "planner.buhlmann.ndl_reference.a11y.hint"))
         }
+    }
+
+    private var depthProfileYAxisLabel: String {
+        unitPreference == .metric
+            ? String(localized: "planner.charts.depth_axis_unit_metric")
+            : String(localized: "planner.charts.depth_axis_unit_imperial")
+    }
+
+    private func depthProfileDisplayDepth(meters: Double) -> Double {
+        -Formatters.depthValue(meters, units: unitPreference)
     }
 
     private var depthProfileChart: some View {
@@ -2469,7 +2607,7 @@ struct PlanResultView: View {
                 Chart(store.plan.depthProfilePoints) { point in
                     LineMark(
                         x: .value(String(localized: "planner.buhlmann.axis.time"), point.elapsedMinutes),
-                        y: .value(String(localized: "planner.charts.depth_axis"), -point.depthMeters)
+                        y: .value(depthProfileYAxisLabel, depthProfileDisplayDepth(meters: point.depthMeters))
                     )
                     .lineStyle(StrokeStyle(lineWidth: 2))
                     .foregroundStyle(DIRTheme.cyan)
@@ -2489,8 +2627,11 @@ struct PlanResultView: View {
                         .foregroundStyle(DIRTheme.muted)
                     }
                 }
-                .chartYAxisLabel(String(localized: "planner.charts.depth_axis"))
-                .frame(height: 220)
+                .chartYAxisLabel(depthProfileYAxisLabel)
+                .frame(minHeight: 160, maxHeight: 280)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(String(localized: "planner.charts.depth_profile.a11y"))
+                .accessibilityHint(String(localized: "planner.charts.depth_profile.a11y.hint"))
             }
         }
     }

@@ -37,9 +37,8 @@ struct ExportView: View {
                 Text(fileName)
                     .font(.system(size: 12, weight: .regular, design: .rounded))
                     .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.9)
                     .lineLimit(2)
+                    .minimumScaleFactor(0.9)
 
                 Text(String(localized: "export.complete.subsurface"))
                     .font(DiveUI.Typography.rowSubtitle)
@@ -52,7 +51,7 @@ struct ExportView: View {
                 if let exportURL {
                     ShareLink(item: exportURL) {
                         HStack(spacing: 5) {
-                            Text(String(localized: "CONDIVIDI CSV"))
+                            Text(String(localized: "log.share.csv.button"))
                             Image(systemName: "square.and.arrow.up")
                         }
                         .font(DiveUI.Typography.secondaryLabel)
@@ -73,7 +72,7 @@ struct ExportView: View {
                     dismiss()
                 } label: {
                     Text(String(localized: "export.back_to_logs"))
-                        .font(.system(size: 10, weight: .black, design: .rounded))
+                        .font(DiveUI.Typography.hintCaptionBold)
                         .foregroundStyle(DiveUI.yellow)
                         .padding(.horizontal, 11)
                         .padding(.vertical, 7)

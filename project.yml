@@ -158,6 +158,7 @@ targets:
       - Utils/DIRUnitPreference.swift
       - Utils/DIRUnitConversions.swift
       - Utils/DepthSafetyConfiguration.swift
+      - Utils/LiveDiveBannerPresentationPolicy.swift
       - Utils/DiveAlgorithmConfiguration.swift
       - Utils/DiveLogbookPolicy.swift
       - Utils/DepthSampleValidation.swift
