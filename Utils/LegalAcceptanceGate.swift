@@ -38,3 +38,10 @@ enum LegalAcceptanceGate {
         return version.split(separator: ".").first.map(String.init) ?? version
     }
 }
+
+/// Testable adapter used by App Intents safety gates (fail-closed before legal acceptance).
+enum ActionButtonSafetyGate {
+    static func requireLegalAcceptance(defaults: UserDefaults = .standard) throws {
+        try LegalAcceptanceGate.requireAccepted(defaults: defaults)
+    }
+}

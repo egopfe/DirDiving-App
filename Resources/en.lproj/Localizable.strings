@@ -522,8 +522,13 @@
 "live.manual_lifecycle.handoff.note" = "Manual start now follows automatic depth lifecycle. The dive ends after surface dwell.";
 "watch.depth_source.apple_sensor" = "Apple depth sensor";
 "watch.depth_source.mock_fallback" = "Mock fallback (no real depth)";
-"watch.depth_source.unavailable" = "Unavailable";
+"watch.depth_source.unavailable" = "Depth sensor unavailable";
+"watch.depth_source.simulation_active" = "Simulation depth source";
 "watch.draft.finalizing_missing_enddate" = "A previous dive could not be finalized because its saved draft was incomplete.";
+"watch.draft.expired_discarded" = "An expired active dive draft was discarded safely.";
+"watch.draft.encode_failed" = "Active dive draft could not be saved.";
+"sync.pending.encode_failed" = "Pending sync queue could not be saved.";
+"sync.pending.retention_warning" = "Pending sync item is old; awaiting signed iPhone acknowledgment.";
 "user_images.error.not_image" = "File is not a valid image.";
 "user_images.error.dimensions" = "Image dimensions are too large.";
 "user_images.error.encode_failed" = "Could not save image.";

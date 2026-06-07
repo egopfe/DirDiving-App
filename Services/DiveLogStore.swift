@@ -9,6 +9,7 @@ final class DiveLogStore: ObservableObject {
 
     @Published private(set) var sessions: [DiveSession] = []
     @Published private(set) var loadErrorMessage: String?
+    @Published private(set) var lastPersistenceError: String?
     private let fileName = "dirdiving_sessions.json"
     private let cloudKey = "dirdiving_watch_dive_sessions"
     private let deletedCloudKey = WatchSyncKeys.deletedSessionIDsKey
@@ -58,14 +59,10 @@ final class DiveLogStore: ObservableObject {
             loadErrorMessage = reason
             return
         case .profileExportable, .manualNoDepth:
-            break
-        }
-
-        sessions.removeAll { $0.id == normalizedSession.id }
-        sessions.insert(normalizedSession, at: 0)
-        sessions = DiveLogbookPolicy.normalizedAndCapped(sessions, deletedIDs: deletedSessionIDs)
-        save()
-        if DiveSessionPersistenceClass.classify(normalizedSession).allowsSync {
+            sessions.removeAll { $0.id == normalizedSession.id }
+            sessions.insert(normalizedSession, at: 0)
+            sessions = DiveLogbookPolicy.normalizedAndCapped(sessions, deletedIDs: deletedSessionIDs)
+            guard save() else { return }
             WatchSyncService.shared.transfer(normalizedSession)
         }
     }
@@ -224,7 +221,8 @@ final class DiveLogStore: ObservableObject {
         cloudSync.save(values, forKey: deletedCloudKey)
     }
 
-    private func save() {
+    @discardableResult
+    private func save() -> Bool {
         do {
             let encoder = JSONEncoder()
             encoder.dateEncodingStrategy = .iso8601
@@ -233,8 +231,12 @@ final class DiveLogStore: ObservableObject {
             try data.write(to: fileURL(), options: [.atomic, .completeFileProtection])
             cloudSync.removeValue(forKey: cloudKey)
             saveDeletedSessionIDs(deletedSessionIDs)
+            lastPersistenceError = nil
+            return true
         } catch {
+            lastPersistenceError = error.localizedDescription
             Self.logger.error("DiveLogStore save failed: \(error.localizedDescription, privacy: .private)")
+            return false
         }
     }
 

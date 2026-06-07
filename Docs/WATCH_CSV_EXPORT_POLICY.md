@@ -70,3 +70,9 @@ Locked in:
 ## Historical note
 
 Prior Watch-only policy used `session.startDate` as `time_seconds` origin. Remediation @ 2026-06-06 switched to **first-sample origin** for iOS parity. Subsurface import treats relative seconds; session wall times remain in `# dirdiving_start_date` / `# dirdiving_end_date`.
+
+---
+
+## P3 — Direct `makeCSV()` header-only call (WATCH-P3-008)
+
+`SubsurfaceExportService.makeCSV()` is intended to be invoked only through the public export path that validates non-empty samples first. Calling it directly with an empty sample array produces a header/metadata-only artifact — not a supported user export. Export entry points reject empty sessions (`testExportRejectsEmptyAndSortsSamples`).

@@ -15,27 +15,39 @@ final class HapticService {
     /// Minimum interval between repeated ascent-alarm haptics while the banner is active.
     static let ascentAlarmRepeatInterval: TimeInterval = 1.75
 
+    var testHook_now: () -> Date = { Date() }
+    var testHook_playHandler: ((WKHapticType) -> Void)?
+
     private init() {
         if UserDefaults.standard.object(forKey: Self.hapticsEnabledKey) == nil {
             UserDefaults.standard.set(true, forKey: Self.hapticsEnabledKey)
         }
     }
 
+    func resetThrottleStateForTests() {
+        lastWarningDate = nil
+        lastAscentAlarmRepeatDate = nil
+        ascentAlarmSessionActive = false
+        lastBuddyNearDate = nil
+        lastBuddyDistantDate = nil
+        lastReminderPulseDate = nil
+    }
+
     func warnIfNeeded() {
         guard hapticsEnabled else { return }
-        let now = Date()
+        let now = testHook_now()
         if let lastWarningDate, now.timeIntervalSince(lastWarningDate) < 2 { return }
         lastWarningDate = now
-        WKInterfaceDevice.current().play(.failure)
+        play(.failure)
     }
 
     /// Strong warning when ascent speed first exceeds the configured limit.
     func ascentAlarmTriggered() {
         ascentAlarmSessionActive = true
-        lastAscentAlarmRepeatDate = Date()
+        lastAscentAlarmRepeatDate = testHook_now()
         guard hapticsEnabled else { return }
-        lastWarningDate = Date()
-        WKInterfaceDevice.current().play(.failure)
+        lastWarningDate = testHook_now()
+        play(.failure)
     }
 
     var isAscentAlarmSessionActive: Bool { ascentAlarmSessionActive }
@@ -43,14 +55,14 @@ final class HapticService {
     /// Repeating ascent warning while the inline alarm banner stays visible.
     func ascentAlarmRepeatIfNeeded() {
         guard hapticsEnabled, ascentAlarmSessionActive else { return }
-        let now = Date()
+        let now = testHook_now()
         if let lastAscentAlarmRepeatDate,
            now.timeIntervalSince(lastAscentAlarmRepeatDate) < Self.ascentAlarmRepeatInterval {
             return
         }
         lastAscentAlarmRepeatDate = now
         lastWarningDate = now
-        WKInterfaceDevice.current().play(.failure)
+        play(.failure)
     }
 
     func ascentAlarmCleared() {
@@ -60,25 +72,25 @@ final class HapticService {
 
     func confirm() {
         guard hapticsEnabled else { return }
-        WKInterfaceDevice.current().play(.success)
+        play(.success)
     }
 
     func criticalConfirm() {
         guard hapticsEnabled else { return }
-        WKInterfaceDevice.current().play(.notification)
+        play(.notification)
     }
 
     func notify() {
         guard hapticsEnabled else { return }
-        WKInterfaceDevice.current().play(.notification)
+        play(.notification)
     }
 
     func reminderPulseIfNeeded() {
         guard hapticsEnabled else { return }
-        let now = Date()
+        let now = testHook_now()
         if let lastReminderPulseDate, now.timeIntervalSince(lastReminderPulseDate) < 2 { return }
         lastReminderPulseDate = now
-        WKInterfaceDevice.current().play(.notification)
+        play(.notification)
     }
 
     func nonCriticalFailure() {
@@ -87,23 +99,31 @@ final class HapticService {
 
     func buddyMessageReceived(isCritical: Bool) {
         guard hapticsEnabled else { return }
-        WKInterfaceDevice.current().play(isCritical ? .failure : .notification)
+        play(isCritical ? .failure : .notification)
     }
 
     func buddyNearPulseIfNeeded() {
         guard hapticsEnabled else { return }
-        let now = Date()
+        let now = testHook_now()
         if let lastBuddyNearDate, now.timeIntervalSince(lastBuddyNearDate) < 8 { return }
         lastBuddyNearDate = now
-        WKInterfaceDevice.current().play(.directionUp)
+        play(.directionUp)
     }
 
     func buddyDistantPulseIfNeeded() {
         guard hapticsEnabled else { return }
-        let now = Date()
+        let now = testHook_now()
         if let lastBuddyDistantDate, now.timeIntervalSince(lastBuddyDistantDate) < 12 { return }
         lastBuddyDistantDate = now
-        WKInterfaceDevice.current().play(.retry)
+        play(.retry)
+    }
+
+    private func play(_ type: WKHapticType) {
+        if let testHook_playHandler {
+            testHook_playHandler(type)
+            return
+        }
+        WKInterfaceDevice.current().play(type)
     }
 
     private var hapticsEnabled: Bool {
