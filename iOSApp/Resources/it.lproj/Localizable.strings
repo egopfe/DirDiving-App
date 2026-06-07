@@ -602,6 +602,7 @@
 "more.settings.local_only_value" = "Non sincronizzate con Watch";
 "manual_dive.default_site" = "Immersione manuale";
 "manual_dive.validation.depth_order" = "La profondità massima deve essere maggiore o uguale alla media.";
+"manual_dive.validation.invalid_depth" = "Inserisci profondità massima e media valide prima di salvare.";
 "equipment.checklist.gas" = "Gas";
 "equipment.checklist.pressure" = "BAR / PSI";
 "equipment.checklist.remove" = "Rimuovi elemento";
@@ -1365,6 +1366,7 @@
 "tissue_analytics.entry.title" = "Saturazione tessuti e narcosi";
 "tissue_analytics.entry.subtitle" = "Visualizza analisi Bühlmann, compartimenti e carico narcotico";
 "tissue_analytics.logbook.entry.title" = "Tessuti & Narcosi";
+"tissue_analytics.logbook.entry.subtitle" = "Stima informativa — non replay Bühlmann completo del profilo registrato";
 "tissue_analytics.nav.title" = "Profilo immersione";
 "tissue_analytics.tab.summary" = "RIEPILOGO";
 "tissue_analytics.tab.profile" = "PROFILO";

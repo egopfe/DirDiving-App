@@ -232,9 +232,13 @@ struct ManualDiveEditorView: View {
         guard let existing else { return }
         let duration = durationMinutes * 60
         let endDate = startDate.addingTimeInterval(duration)
-        let entryGPS = makeGPS(lat: entryLatitude, lon: entryLongitude, timestamp: startDate)
-        let exitGPS = makeGPS(lat: exitLatitude, lon: exitLongitude, timestamp: endDate)
-        let pressures = parsedManualPressures()
+        let entryGPS = ManualDiveEditorValidation.makeGPSPoint(lat: entryLatitude, lon: entryLongitude, timestamp: startDate)
+        let exitGPS = ManualDiveEditorValidation.makeGPSPoint(lat: exitLatitude, lon: exitLongitude, timestamp: endDate)
+        let pressures = ManualDiveEditorValidation.parsedManualPressures(
+            entryPressureText: entryPressureText,
+            exitPressureText: exitPressureText,
+            unitPreference: unitPreference
+        )
         let session = DiveSession(
             id: existing.id,
             startDate: startDate,
@@ -275,82 +279,33 @@ struct ManualDiveEditorView: View {
     private func saveWithSyntheticProfile() {
         let maxMeters = ManualDiveEditorDefaults.depthMeters(fromInput: maxDepthInput, units: unitPreference)
         let avgMeters = ManualDiveEditorDefaults.depthMeters(fromInput: avgDepthInput, units: unitPreference)
-        guard maxMeters >= avgMeters else {
-            validationMessage = String(localized: "manual_dive.validation.depth_order")
-            return
-        }
-        let duration = durationMinutes * 60
-        let endDate = startDate.addingTimeInterval(duration)
-        let entryGPS = makeGPS(lat: entryLatitude, lon: entryLongitude, timestamp: startDate)
-        let exitGPS = makeGPS(lat: exitLatitude, lon: exitLongitude, timestamp: endDate)
-        let samples = ManualDiveSampleBuilder.makeSamples(
+        switch ManualDiveEditorValidation.makeSyntheticSession(
+            existing: existing,
             startDate: startDate,
-            endDate: endDate,
-            maxDepthMeters: maxMeters,
-            avgDepthMeters: avgMeters
-        )
-        let summary = DiveProfileMath.summary(samples: samples, startDate: startDate, endDate: endDate)
-        let ttv = DiveProfileMath.ttvIndex(averageDepthMeters: summary.averageDepthMeters, durationSeconds: duration)
-        let pressures = parsedManualPressures()
-        let session = DiveSession(
-            id: existing?.id ?? UUID(),
-            startDate: startDate,
-            endDate: endDate,
-            durationSeconds: duration,
-            maxDepthMeters: summary.maxDepthMeters,
-            avgDepthMeters: summary.averageDepthMeters,
-            avgWaterTemperatureCelsius: existing?.avgWaterTemperatureCelsius,
-            ttv: ttv,
-            entryGPS: entryGPS,
-            exitGPS: exitGPS,
-            samples: samples,
-            siteName: siteName.isEmpty ? String(localized: "manual_dive.default_site") : siteName,
-            buddy: existing?.buddy,
-            notes: notes.isEmpty ? nil : notes,
+            durationMinutes: durationMinutes,
+            maxMeters: maxMeters,
+            avgMeters: avgMeters,
+            siteName: siteName,
+            entryLatitude: entryLatitude,
+            entryLongitude: entryLongitude,
+            exitLatitude: exitLatitude,
+            exitLongitude: exitLongitude,
+            equipmentUsed: equipmentUsed,
+            entryPressureText: entryPressureText,
+            exitPressureText: exitPressureText,
+            decompressionNotes: decompressionNotes,
+            notes: notes,
             gasLabel: gasLabel,
-            isManual: true,
-            equipmentUsed: equipmentUsed.isEmpty ? nil : equipmentUsed,
-            entryPressureText: pressures.entryText,
-            exitPressureText: pressures.exitText,
-            entryPressureBar: pressures.entryBar,
-            exitPressureBar: pressures.exitBar,
-            decompressionNotes: decompressionNotes.isEmpty ? nil : decompressionNotes
-        )
-        guard logStore.add(session) else {
-            showSaveFailureAlert = true
-            return
+            unitPreference: unitPreference
+        ) {
+        case .failure(let error):
+            validationMessage = error.errorDescription
+        case .success(let session):
+            guard logStore.add(session) else {
+                showSaveFailureAlert = true
+                return
+            }
+            dismiss()
         }
-        dismiss()
-    }
-
-    private func parsedManualPressures() -> (entryText: String?, exitText: String?, entryBar: Double?, exitBar: Double?) {
-        let unit = PressureDisplayMath.pressureUnit(for: unitPreference)
-        let entryBar = PressureDisplayMath.parsePressureBar(from: entryPressureText, inputUnit: unit)
-        let exitBar = PressureDisplayMath.parsePressureBar(from: exitPressureText, inputUnit: unit)
-        let entryText = entryPressureText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : entryPressureText
-        let exitText = exitPressureText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : exitPressureText
-        return (entryText, exitText, entryBar, exitBar)
-    }
-
-    private func makeGPS(lat: String, lon: String, timestamp: Date) -> GPSPoint? {
-        guard let latitude = Double(lat.replacingOccurrences(of: ",", with: ".")),
-              let longitude = Double(lon.replacingOccurrences(of: ",", with: ".")) else { return nil }
-        let point = GPSPoint(latitude: latitude, longitude: longitude, horizontalAccuracy: 10, timestamp: timestamp)
-        return DiveProfileMath.isValidGPS(point) ? point : nil
-    }
-}
-
-enum ManualDiveSampleBuilder {
-    static func makeSamples(startDate: Date, endDate: Date, maxDepthMeters: Double, avgDepthMeters: Double) -> [DiveSample] {
-        let duration = max(1, endDate.timeIntervalSince(startDate))
-        let ratio = maxDepthMeters > 0 ? min(1, max(0, avgDepthMeters / maxDepthMeters)) : 0
-        let descentEnd = startDate.addingTimeInterval(min(1, duration * 0.05))
-        let holdEnd = startDate.addingTimeInterval(max(1, duration * ratio))
-        return [
-            DiveSample(timestamp: startDate, depthMeters: 0, temperatureCelsius: nil),
-            DiveSample(timestamp: descentEnd, depthMeters: maxDepthMeters, temperatureCelsius: nil),
-            DiveSample(timestamp: holdEnd, depthMeters: maxDepthMeters, temperatureCelsius: nil),
-            DiveSample(timestamp: endDate, depthMeters: 0, temperatureCelsius: nil)
-        ]
     }
 }
