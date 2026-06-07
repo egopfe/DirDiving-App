@@ -83,6 +83,21 @@ enum BriefingPDFBuilder {
             page.drawSpacer()
             page.drawParagraph(String(localized: "planner.briefing.share_note"))
 
+            if let ratioDeco = context.plan.ratioDeco, ratioDeco.method != .buhlmann {
+                page.drawSpacer()
+                page.drawSectionTitle(String(localized: "pdf.export.ratio_deco.section"))
+                page.drawParagraph(String(localized: "pdf.export.ratio_deco.disclaimer"))
+                page.drawLine(
+                    String(localized: "pdf.export.ratio_deco.validation"),
+                    value: ratioDeco.validation.localizedStatusTitle
+                )
+                for stop in ratioDeco.schedule.stops {
+                    page.drawParagraph(
+                        "\(Formatters.depth(stop.depthMeters, units: context.unitPreference).text) / \(Int(stop.durationMinutes.rounded())) min · \(stop.gasLabel)"
+                    )
+                }
+            }
+
             page.finish(disclaimer: disclaimer)
         }
     }
