@@ -705,7 +705,8 @@ enum GasPlanningService {
         segments: [BuhlmannRuntimeSegment] = [],
         environment: PlannerEnvironment = .seaLevelSaltWater,
         cnsDescentBottomPercent: Double = 0,
-        cnsDescentBottomCheckEnabled: Bool = PlannerCNSDescentBottomCheckSettings.defaultEnabled
+        cnsDescentBottomCheckEnabled: Bool = PlannerCNSDescentBottomCheckSettings.isEnabled,
+        cnsDescentBottomThresholdPercent: Double = PlannerCNSDescentBottomCheckSettings.thresholdPercentDouble
     ) -> [PlannerResultState] {
         var states: [PlannerResultState] = []
         if segmentsExceedGasPPO2Limit(segments, environment: environment) {
@@ -728,7 +729,10 @@ enum GasPlanningService {
             }
         }
         if cnsDescentBottomCheckEnabled,
-           CNSDescentBottomPlannerRule.exceedsPlannerThreshold(percent: cnsDescentBottomPercent) {
+           CNSDescentBottomPlannerRule.exceedsPlannerThreshold(
+            percent: cnsDescentBottomPercent,
+            thresholdPercent: cnsDescentBottomThresholdPercent
+           ) {
             states.append(.cnsDescentBottomThresholdExceeded)
         }
         if !exposure.warningStates.isEmpty {
