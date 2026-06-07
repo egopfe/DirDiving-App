@@ -1,6 +1,6 @@
 # Mission Mode — Watch MAIN
 
-**Aggiornato:** 2026-05-29
+**Aggiornato:** 2026-06-07 (audit remediation — invariants unchanged)
 **Ambito:** solo Apple Watch `main` (nessun file experimental, nessun cambiamento companion iOS richiesto)
 
 ---

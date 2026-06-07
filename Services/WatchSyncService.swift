@@ -24,12 +24,10 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published private(set) var lastRetryDate: Date?
     @Published private(set) var importedFromCompanionCount = 0
     @Published private(set) var recentActivity: [SyncActivityItem] = []
-    @Published private(set) var experimentalQueueCount = 0
-    @Published private(set) var experimentalLastKind = "--"
-    @Published private(set) var experimentalDeliveryState = "Nessun payload experimental"
+    @Published private(set) var lastQueuePersistenceError: String?
 
-    private var pendingSessions: [DiveSession] = []
-    private var pendingExperimentalEnvelopes: [ExperimentalSyncEnvelope] = []
+    private var pendingTransfers: [WatchSyncPendingTransfer] = []
+    private var pendingUserInfoTransferSessionIDs: [ObjectIdentifier: UUID] = [:]
     private let legacyPendingSessionsKey = "dirdiving_watch_pending_sync_sessions"
     private let pendingFileName = "dirdiving_watch_pending_sync_sessions.json"
     private weak var logStore: DiveLogStore?
@@ -45,8 +43,8 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     private override init() {
         super.init()
-        pendingSessions = loadPendingSessions()
-        pendingTransferCount = pendingSessions.count
+        pendingTransfers = loadPendingTransfers()
+        pendingTransferCount = pendingTransfers.count
         importedFromCompanionIDs = WatchDiveSyncCodec.loadImportedFromCompanionIDs()
         importedFromCompanionCount = importedFromCompanionIDs.count
         peerSecretObserver = NotificationCenter.default.addObserver(
@@ -92,34 +90,6 @@ final class WatchSyncService: NSObject, ObservableObject {
         }
     }
 
-    func transferExperimentalPOI(_ marker: GPSInterestMarker) {
-        var payload: [String: String] = [
-            "id": marker.id.uuidString,
-            "category": marker.category.rawValue,
-            "timestamp": Self.isoFormatter.string(from: marker.timestamp),
-            "depthMeters": String(marker.depthMeters),
-            "distanceFromEntryMeters": String(marker.distanceFromEntryMeters),
-            "bearingDegrees": String(marker.bearingDegrees),
-            "isEnriched": String(marker.isEnriched)
-        ]
-        if let latitude = marker.latitude { payload["latitude"] = String(latitude) }
-        if let longitude = marker.longitude { payload["longitude"] = String(longitude) }
-        if let temperature = marker.temperatureCelsius { payload["temperatureCelsius"] = String(temperature) }
-        if let waypoint = marker.activeWaypointName { payload["activeWaypointName"] = waypoint }
-        if let sessionID = marker.sessionID { payload["sessionID"] = sessionID }
-        transferExperimentalEnvelope(ExperimentalSyncEnvelope(kind: .watchPOI, payload: payload))
-    }
-
-    func transferExperimentalApneaRecord(_ record: ApneaDiveRecord) {
-        let payload = [
-            "id": record.id.uuidString,
-            "durationSeconds": String(record.durationSeconds),
-            "maxDepthMeters": String(record.maxDepthMeters),
-            "recoverySeconds": String(record.recoverySeconds)
-        ]
-        transferExperimentalEnvelope(ExperimentalSyncEnvelope(kind: .watchApneaRecord, payload: payload))
-    }
-
     /// Broadcast tombstone UUIDs to iPhone via applicationContext (merge-safe).
     func publishDeletedSessionIDs(_ ids: Set<UUID>) {
         guard WCSession.isSupported(), !ids.isEmpty else { return }
@@ -152,16 +122,13 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     func clearFailedQueue() {
-        pendingSessions.removeAll()
+        pendingTransfers.removeAll()
+        pendingUserInfoTransferSessionIDs.removeAll()
         pendingTransferCount = 0
         sentTransferCount = 0
         acknowledgedTransferCount = 0
         failedTransferCount = 0
-        pendingExperimentalEnvelopes.removeAll()
-        experimentalQueueCount = 0
-        experimentalLastKind = "--"
-        experimentalDeliveryState = "Nessun payload experimental"
-        savePendingSessions()
+        savePendingTransfers()
         lastSyncStatus = String(localized: "Coda sync cancellata su richiesta")
     }
 
@@ -325,33 +292,48 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     private func flushPendingTransfers() {
-        guard WatchSyncAuth.hasPeerSecret(), !pendingSessions.isEmpty else { return }
-        let queue = pendingSessions
+        guard WatchSyncAuth.hasPeerSecret(), !pendingTransfers.isEmpty else { return }
+        let queue = pendingTransfers
         Self.logger.info("Flushing \(queue.count, privacy: .public) pending Watch→iPhone session(s)")
-        for session in queue.reversed() {
-            sendQueued(session)
+        for entry in queue.reversed() {
+            sendQueued(entry.session)
         }
+    }
+
+    /// Removes a pending transfer after a verified signed companion ACK (direct message path).
+    func confirmSignedAck(sessionID: UUID, issuedAt: Date, signature: String) {
+        guard WatchDiveSyncCodec.verifyAckSignature(signature, sessionID: sessionID, issuedAt: issuedAt) else {
+            failedTransferCount += 1
+            lastSyncStatus = String(localized: "Failed: ack firmato non valido; pending conservato")
+            return
+        }
+        guard pendingTransfers.contains(where: { $0.session.id == sessionID }) else { return }
+        removePendingTransfer(sessionID: sessionID)
+        acknowledgedTransferCount += 1
+        lastSyncStatus = String(localized: "Delivered/acknowledged: ack firmato dal companion")
+        recordActivity(title: String(localized: "sync.activity.delivered_to_iphone"), detail: sessionID.uuidString)
     }
 
     private func sendQueued(_ session: DiveSession) {
         do {
             let envelope = try WatchDiveSyncCodec.makePayload(session: session)
+            recordPendingAttempt(sessionID: session.id, issuedAt: envelope.issuedAt)
 
             if WCSession.default.isReachable {
                 WCSession.default.sendMessage(envelope.message) { [weak self] reply in
                     Task { @MainActor in
                         guard let self else { return }
                         let providedSignature = reply["ackSignature"] as? String
-                        let signedOK = WatchDiveSyncCodec.verifyAckSignature(
+                        if WatchDiveSyncCodec.verifyAckSignature(
                             providedSignature,
                             sessionID: envelope.sessionID,
                             issuedAt: envelope.issuedAt
-                        )
-                        if signedOK {
-                            self.removePendingSession(id: session.id)
-                            self.acknowledgedTransferCount += 1
-                            self.lastSyncStatus = String(localized: "Delivered/acknowledged: ack firmato dal companion")
-                            self.recordActivity(title: String(localized: "sync.activity.delivered_to_iphone"), detail: self.sessionSummary(session))
+                        ) {
+                            self.confirmSignedAck(
+                                sessionID: envelope.sessionID,
+                                issuedAt: envelope.issuedAt,
+                                signature: providedSignature ?? ""
+                            )
                         } else {
                             self.failedTransferCount += 1
                             self.lastSyncStatus = String(localized: "Failed: iPhone non ha confermato con ack firmato; pending conservato")
@@ -363,7 +345,7 @@ final class WatchSyncService: NSObject, ObservableObject {
                         self.failedTransferCount += 1
                         self.lastSyncStatus = String(format: String(localized: "Failed: diretto non riuscito; sent via coda, ack pending: %@"), error.localizedDescription)
                         self.sentTransferCount += 1
-                        WCSession.default.transferUserInfo(envelope.message)
+                        self.queueViaUserInfo(envelope: envelope, sessionID: session.id)
                         self.recordActivity(title: String(localized: "sync.activity.queued_to_iphone"), detail: self.sessionSummary(session))
                     }
                 }
@@ -371,7 +353,7 @@ final class WatchSyncService: NSObject, ObservableObject {
                 lastSyncStatus = String(localized: "Sent: messaggio diretto inviato, attendo ack")
                 recordActivity(title: String(localized: "sync.activity.sent_to_iphone"), detail: sessionSummary(session))
             } else {
-                WCSession.default.transferUserInfo(envelope.message)
+                queueViaUserInfo(envelope: envelope, sessionID: session.id)
                 sentTransferCount += 1
                 lastSyncStatus = String(localized: "Sent: coda WatchConnectivity, ack pending")
                 recordActivity(title: String(localized: "sync.activity.queued_to_iphone"), detail: sessionSummary(session))
@@ -387,19 +369,57 @@ final class WatchSyncService: NSObject, ObservableObject {
         }
     }
 
-    private func enqueuePendingSession(_ session: DiveSession) {
-        let normalizedSession = DiveSessionMerge.preferred(session, session)
-        pendingSessions.removeAll { $0.id == normalizedSession.id }
-        pendingSessions.append(normalizedSession)
-        pendingSessions = pendingSessions.sorted { $0.startDate > $1.startDate }
-        pendingTransferCount = pendingSessions.count
-        savePendingSessions()
+    private func queueViaUserInfo(envelope: WatchDiveSyncCodec.PayloadEnvelope, sessionID: UUID) {
+        let transfer = WCSession.default.transferUserInfo(envelope.message)
+        pendingUserInfoTransferSessionIDs[ObjectIdentifier(transfer)] = sessionID
+        markUserInfoQueued(sessionID: sessionID)
     }
 
-    private func removePendingSession(id: UUID) {
-        pendingSessions.removeAll { $0.id == id }
-        pendingTransferCount = pendingSessions.count
-        savePendingSessions()
+    private func recordPendingAttempt(sessionID: UUID, issuedAt: Date) {
+        guard let index = pendingTransfers.firstIndex(where: { $0.session.id == sessionID }) else { return }
+        pendingTransfers[index].lastIssuedAt = issuedAt
+        pendingTransfers[index].lastAttemptAt = Date()
+        pendingTransfers[index].attemptCount += 1
+        if pendingTransfers[index].isRetentionExpired || pendingTransfers[index].exceededAttemptBudget {
+            lastSyncStatus = String(localized: "sync.pending.retention_warning")
+        }
+        savePendingTransfers()
+    }
+
+    private func markUserInfoQueued(sessionID: UUID) {
+        guard let index = pendingTransfers.firstIndex(where: { $0.session.id == sessionID }) else { return }
+        pendingTransfers[index].lastAttemptAt = Date()
+        savePendingTransfers()
+    }
+
+    private func markUserInfoDelivered(sessionID: UUID, error: Error?) {
+        guard let index = pendingTransfers.firstIndex(where: { $0.session.id == sessionID }) else { return }
+        if let error {
+            failedTransferCount += 1
+            lastSyncStatus = String(format: String(localized: "Failed: transferUserInfo non completato: %@"), error.localizedDescription)
+            return
+        }
+        pendingTransfers[index].userInfoDeliveredAt = Date()
+        lastSyncStatus = String(localized: "Sent: transferUserInfo completato, attendo ack firmato companion")
+        savePendingTransfers()
+    }
+
+    private func enqueuePendingSession(_ session: DiveSession) {
+        let normalizedSession = DiveSessionMerge.preferred(session, session)
+        pendingTransfers.removeAll { $0.session.id == normalizedSession.id }
+        pendingTransfers.append(WatchSyncPendingTransfer(session: normalizedSession))
+        pendingTransfers = WatchSyncPendingQueuePolicy.normalizedTransfers(pendingTransfers)
+        pendingTransferCount = pendingTransfers.count
+        savePendingTransfers()
+    }
+
+    private func removePendingTransfer(sessionID: UUID) {
+        pendingTransfers = WatchSyncPendingQueuePolicy.dequeueAfterSignedAck(
+            transfers: pendingTransfers,
+            sessionID: sessionID
+        )
+        pendingTransferCount = pendingTransfers.count
+        savePendingTransfers()
     }
 
     private func pendingFileURL() -> URL {
@@ -407,39 +427,50 @@ final class WatchSyncService: NSObject, ObservableObject {
             .appendingPathComponent(pendingFileName)
     }
 
-    private func loadPendingSessions() -> [DiveSession] {
+    private func loadPendingTransfers() -> [WatchSyncPendingTransfer] {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
 
         let url = pendingFileURL()
         if FileManager.default.fileExists(atPath: url.path),
-           let data = try? Data(contentsOf: url),
-           let decoded = try? decoder.decode([DiveSession].self, from: data) {
-            return decoded.map { DiveSessionMerge.preferred($0, $0) }
+           let data = try? Data(contentsOf: url) {
+            if let decoded = try? decoder.decode([WatchSyncPendingTransfer].self, from: data) {
+                return WatchSyncPendingQueuePolicy.normalizedTransfers(decoded)
+            }
+            if let legacySessions = try? decoder.decode([DiveSession].self, from: data) {
+                return WatchSyncPendingQueuePolicy.normalizedTransfers(
+                    legacySessions.map { WatchSyncPendingTransfer(session: $0) }
+                )
+            }
         }
 
         guard let legacyData = UserDefaults.standard.data(forKey: legacyPendingSessionsKey) else { return [] }
         let migrated = ((try? decoder.decode([DiveSession].self, from: legacyData)) ?? [])
-            .map { DiveSessionMerge.preferred($0, $0) }
+            .map { WatchSyncPendingTransfer(session: $0) }
         if !migrated.isEmpty {
-            persistPendingSessions(migrated)
+            persistPendingTransfers(WatchSyncPendingQueuePolicy.normalizedTransfers(migrated))
         }
         UserDefaults.standard.removeObject(forKey: legacyPendingSessionsKey)
         return migrated
     }
 
-    private func savePendingSessions() {
-        persistPendingSessions(pendingSessions)
+    private func savePendingTransfers() {
+        persistPendingTransfers(pendingTransfers)
     }
 
-    private func persistPendingSessions(_ value: [DiveSession]) {
+    private func persistPendingTransfers(_ value: [WatchSyncPendingTransfer]) {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
-        let normalizedValue = value.map { DiveSessionMerge.preferred($0, $0) }
-        guard let data = try? encoder.encode(normalizedValue) else { return }
+        let normalizedValue = WatchSyncPendingQueuePolicy.normalizedTransfers(value)
+        guard let data = try? encoder.encode(normalizedValue) else {
+            lastQueuePersistenceError = String(localized: "sync.pending.encode_failed")
+            return
+        }
         do {
             try data.write(to: pendingFileURL(), options: [.atomic, .completeFileProtection])
+            lastQueuePersistenceError = nil
         } catch {
+            lastQueuePersistenceError = error.localizedDescription
             Self.logger.error("Persist watch-sync pending sessions failed: \(error.localizedDescription, privacy: .private)")
         }
     }
@@ -550,53 +581,41 @@ final class WatchSyncService: NSObject, ObservableObject {
         )
         recentActivity = Array(recentActivity.prefix(6))
     }
+}
 
-    private func transferExperimentalEnvelope(_ envelope: ExperimentalSyncEnvelope) {
-        experimentalLastKind = envelope.kind.rawValue
-        guard WCSession.isSupported() else {
-            lastSyncStatus = "Sync sperimentale non supportato"
-            experimentalDeliveryState = "WatchConnectivity non supportato"
-            return
-        }
-        do {
-            let payload = try envelope.userInfo()
-            if WCSession.default.isReachable {
-                WCSession.default.sendMessage(payload, replyHandler: { [weak self] _ in
-                    Task { @MainActor in
-                        self?.experimentalDeliveryState = "ACK companion ricevuto"
-                    }
-                }) { [weak self] error in
-                    Task { @MainActor in
-                        self?.queueExperimentalEnvelope(envelope, reason: error.localizedDescription)
-                        WCSession.default.transferUserInfo(payload)
-                    }
-                }
-                lastSyncStatus = "Sync sperimentale inviato: \(envelope.kind.rawValue)"
-                experimentalDeliveryState = "Invio diretto tentato"
-            } else {
-                queueExperimentalEnvelope(envelope, reason: "Companion non raggiungibile")
-                WCSession.default.transferUserInfo(payload)
-                lastSyncStatus = "Sync sperimentale in coda: \(envelope.kind.rawValue)"
-            }
-        } catch {
-            lastSyncStatus = "Errore contratto sync sperimentale: \(error.localizedDescription)"
-            experimentalDeliveryState = "Errore codifica payload"
-        }
+// MARK: - Algorithm test hooks
+
+extension WatchSyncService {
+    func testHook_resetPendingQueueForTests() {
+        pendingTransfers = []
+        pendingUserInfoTransferSessionIDs = [:]
+        pendingTransferCount = 0
+        acknowledgedTransferCount = 0
+        failedTransferCount = 0
+        sentTransferCount = 0
+        lastQueuePersistenceError = nil
+        savePendingTransfers()
     }
 
-    private func queueExperimentalEnvelope(_ envelope: ExperimentalSyncEnvelope, reason: String) {
-        pendingExperimentalEnvelopes.insert(envelope, at: 0)
-        pendingExperimentalEnvelopes = Array(pendingExperimentalEnvelopes.prefix(20))
-        experimentalQueueCount = pendingExperimentalEnvelopes.count
-        experimentalLastKind = envelope.kind.rawValue
-        experimentalDeliveryState = "In coda: \(reason)"
+    var testHook_pendingSessionIDs: [UUID] {
+        pendingTransfers.map(\.session.id)
     }
 
-    private static let isoFormatter: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return formatter
-    }()
+    var testHook_pendingTransfers: [WatchSyncPendingTransfer] {
+        pendingTransfers
+    }
+
+    func testHook_enqueueSession(_ session: DiveSession) {
+        enqueuePendingSession(session)
+    }
+
+    func testHook_confirmSignedAck(sessionID: UUID, issuedAt: Date, signature: String) {
+        confirmSignedAck(sessionID: sessionID, issuedAt: issuedAt, signature: signature)
+    }
+
+    func testHook_markUserInfoDelivered(sessionID: UUID, error: Error?) {
+        markUserInfoDelivered(sessionID: sessionID, error: error)
+    }
 }
 
 
@@ -654,11 +673,14 @@ extension WatchSyncService: WCSessionDelegate {
 
     nonisolated func session(_ session: WCSession, didFinish userInfoTransfer: WCSessionUserInfoTransfer, error: Error?) {
         Task { @MainActor in
-            if let error {
+            let sessionID = self.pendingUserInfoTransferSessionIDs.removeValue(forKey: ObjectIdentifier(userInfoTransfer))
+            if let sessionID {
+                self.markUserInfoDelivered(sessionID: sessionID, error: error)
+            } else if let error {
                 self.failedTransferCount += 1
                 self.lastSyncStatus = String(format: String(localized: "Failed: transferUserInfo non completato: %@"), error.localizedDescription)
             } else {
-                self.lastSyncStatus = String(localized: "Sent: transferUserInfo completato, ack companion non confermato")
+                self.lastSyncStatus = String(localized: "Sent: transferUserInfo completato, attendo ack firmato companion")
             }
         }
     }
