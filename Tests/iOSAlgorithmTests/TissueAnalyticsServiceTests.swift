@@ -48,6 +48,7 @@ final class TissueAnalyticsServiceTests: XCTestCase {
             exitGPS: nil,
             samples: samples,
             gasLabel: .nitrox,
+            isManual: false,
             hasDepthProfile: true
         )
     }
@@ -98,12 +99,20 @@ final class TissueAnalyticsServiceTests: XCTestCase {
         XCTAssertNotEqual(first?.cacheKey, second?.cacheKey)
     }
 
-    func testLogbookUsesSimulatedSourceWhenProfileAvailable() {
+    func testLogbookRecordedSessionUsesRecordedBuhlmannReplay() {
         TissueAnalyticsService.invalidateCache()
         let presentation = TissueAnalyticsService.presentationForSession(sampleSession())
         XCTAssertNotNil(presentation)
-        XCTAssertEqual(presentation?.trace.source, .simulated)
+        XCTAssertEqual(presentation?.trace.source, .recorded)
         XCTAssertFalse(presentation?.trace.samples.isEmpty ?? true)
+    }
+
+    func testManualLogbookSessionUsesSimulatedEstimate() {
+        TissueAnalyticsService.invalidateCache()
+        var session = sampleSession()
+        session.isManual = true
+        let presentation = TissueAnalyticsService.presentationForSession(session)
+        XCTAssertEqual(presentation?.trace.source, .simulated)
     }
 
     func testInsufficientSessionDataReturnsNil() {

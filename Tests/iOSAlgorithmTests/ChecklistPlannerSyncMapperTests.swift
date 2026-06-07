@@ -11,8 +11,8 @@ final class ChecklistPlannerSyncMapperTests: XCTestCase {
             gasRole: .deco
         )
         XCTAssertEqual(item.switchDepthMeters ?? 0, 21, accuracy: 0.01)
-        let line = ChecklistPDFBuilder.exportLine(for: item)
-        XCTAssertTrue(line.contains("switch"), "line was: \(line)")
+        let line = ChecklistPDFBuilder.exportLine(for: item, unitPreference: .metric)
+        XCTAssertTrue(line.contains("switch @"), "line was: \(line)")
         XCTAssertTrue(line.contains("21"), "line was: \(line)")
     }
 

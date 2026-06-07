@@ -28,7 +28,7 @@ final class PDFExportServiceTests: XCTestCase {
     private func sampleChecklistProfile() -> EquipmentProfile {
         var profile = EquipmentProfile()
         profile.checklistItems = [
-            EquipmentChecklistItem(title: "Analyze EAN50", usesGas: true, gasMixKind: .ean, gasText: "O₂ 50%", pressureText: "200", gasRole: .deco),
+            EquipmentChecklistItem(title: "Analyze EAN50", usesGas: true, gasMixKind: .ean, gasText: "O₂ 50%", switchDepthMeters: 21, pressureText: "200", gasRole: .deco),
             EquipmentChecklistItem(title: "Backup mask")
         ]
         return profile
@@ -129,5 +129,38 @@ final class PDFExportServiceTests: XCTestCase {
         XCTAssertFalse(String(localized: "pdf.export.error.invalid_plan").isEmpty)
         XCTAssertFalse(String(localized: "pdf.export.error.empty_checklist").isEmpty)
         XCTAssertFalse(String(localized: "pdf.export.disclaimer").isEmpty)
+    }
+
+    func testBriefingPDFShareItemIsValidAndProtected() throws {
+        let context = validPlannerContext()
+        let url = try PDFExportService.exportBriefing(context: context, siteName: "Test Site")
+        XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
+        XCTAssertTrue(url.pathExtension.lowercased() == "pdf")
+        let data = try Data(contentsOf: url)
+        XCTAssertGreaterThan(data.count, 100)
+        XCTAssertTrue(String(data: data.prefix(5), encoding: .ascii)?.hasPrefix("%PDF") == true)
+        let directory = try PDFExportFilename.protectedExportDirectory()
+        XCTAssertTrue(url.path.hasPrefix(directory.path))
+    }
+
+    func testChecklistPDFShareItemIsValid() throws {
+        let profile = sampleChecklistProfile()
+        let item = profile.checklistItems[0]
+        let line = ChecklistPDFBuilder.exportLine(for: item, unitPreference: .imperial)
+        XCTAssertTrue(line.contains(Formatters.depth(21, units: .imperial).text))
+        let url = try PDFExportService.exportChecklist(profile: profile, unitPreference: .imperial)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
+        let data = try Data(contentsOf: url)
+        XCTAssertFalse(data.isEmpty)
+        XCTAssertTrue(String(data: data.prefix(5), encoding: .ascii)?.hasPrefix("%PDF") == true)
+    }
+
+    func testDivePackPDFShareItemIsReadable() throws {
+        let context = validPlannerContext()
+        let profile = sampleChecklistProfile()
+        let url = try PDFExportService.exportDivePack(plannerContext: context, checklistProfile: profile, siteName: nil)
+        let data = try Data(contentsOf: url)
+        XCTAssertGreaterThan(data.count, 200)
+        XCTAssertNotNil(PDFDocument(data: data))
     }
 }

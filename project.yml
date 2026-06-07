@@ -275,8 +275,10 @@ targets:
       - Tests/iOSAlgorithmTests/PDFExportServiceTests.swift
       - iOSApp/Models/TissueAnalyticsTrace.swift
       - iOSApp/Utils/TissueAnalyticsSupport.swift
+      - iOSApp/Utils/TissueAnalyticsLogbookReplay.swift
       - iOSApp/Services/TissueAnalyticsService.swift
       - Tests/iOSAlgorithmTests/TissueAnalyticsServiceTests.swift
+      - Tests/iOSAlgorithmTests/BuhlmannComprehensiveReadinessV3RemediationTests.swift
     resources:
       - path: Tests/iOSAlgorithmTests/Fixtures
         type: folder
