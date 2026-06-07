@@ -150,13 +150,23 @@ struct EquipmentView: View {
 
     private var equipmentHero: some View {
         HStack(spacing: 12) {
-            equipmentBadge("DIR", DIRTheme.cyan)
-            equipmentBadge("\(equipment.profile.checklistReadyCount)/\(max(1, equipment.profile.migratedChecklistItems.count)) READY", equipment.profile.checklistReadyCount == equipment.profile.migratedChecklistItems.count ? DIRTheme.green : DIRTheme.yellow)
-            equipmentBadge(String(localized: "equipment.badge.field"), DIRTheme.yellow)
+            equipmentBadge(
+                "DIR",
+                equipment.profile.isDIRConfigurationComplete ? DIRTheme.green : DIRTheme.red,
+                accessibilityLabel: String(
+                    localized: equipment.profile.isDIRConfigurationComplete
+                        ? "equipment.badge.dir.complete.a11y"
+                        : "equipment.badge.dir.incomplete.a11y"
+                )
+            )
+            equipmentBadge(
+                "\(equipment.profile.checklistReadyCount)/\(max(1, equipment.profile.migratedChecklistItems.count)) READY",
+                equipment.profile.checklistReadyCount == equipment.profile.migratedChecklistItems.count ? DIRTheme.green : DIRTheme.yellow
+            )
         }
     }
 
-    private func equipmentBadge(_ text: String, _ color: Color) -> some View {
+    private func equipmentBadge(_ text: String, _ color: Color, accessibilityLabel: String? = nil) -> some View {
         Text(text)
             .font(.caption.weight(.bold))
             .foregroundStyle(color)
@@ -167,6 +177,7 @@ struct EquipmentView: View {
                     .fill(color.opacity(0.10))
                     .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(color.opacity(0.34), lineWidth: 1))
             )
+            .accessibilityLabel(accessibilityLabel ?? text)
     }
 
     private func equipmentRow(_ title: String, _ value: String) -> some View {

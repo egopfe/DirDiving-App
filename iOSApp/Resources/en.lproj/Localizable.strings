@@ -787,6 +787,8 @@
 "equipment.reset.cancel" = "Cancel";
 "equipment.reset.confirm.message" = "Cylinders, gases, SAC, and checklist will return to locally saved standard values.";
 "equipment.badge.field" = "FIELD";
+"equipment.badge.dir.complete.a11y" = "DIR configuration complete";
+"equipment.badge.dir.incomplete.a11y" = "DIR configuration incomplete";
 "equipment.sac_default" = "Default SAC";
 "equipment.my_equipment.button" = "My equipment";
 "equipment.my_equipment.title" = "My equipment";
