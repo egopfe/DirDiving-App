@@ -66,13 +66,20 @@ The iOS planner now includes a ZHL-16C N2+He multigas reference engine:
 
 **Remaining limitation:** No separate certified breakdown of CNS contribution per decompression gas cylinder — only schedule PPO₂ in the ascent table.
 
-## Logbook tissue & narcosis analytics (simulated replay)
+## Logbook tissue & narcosis analytics (2026-06-07 V3 remediation)
 
 - **Not** a certified post-dive decompression reconstruction.
-- Logbook path replays recorded depth + `gasLabel` with a **fixed GF 0.85** simulation assumption (`TissueAnalyticsService`).
-- Recorded gas timeline per sample is **not** available from dive log samples today.
-- Planner path uses real `tissueHistory` from the calculated reference plan.
-- UI copy and docs label this as **simulated / reference-only**.
+- **Planner path:** real Bühlmann `tissueHistory` from calculated plan (`source: planned`).
+- **Logbook recorded path (watch/non-manual, single gas):** Schreiner Bühlmann replay between depth samples with default GF 30/85 (`source: recorded`) — **reference only**, no gas-switch history.
+- **Logbook simulated path:** manual dives, trimix without switch history, or incomplete gas data (`source: simulated`).
+- **Insufficient samples:** &lt;2 depth samples → no analytics (`insufficientData`).
+- UI copy and dynamic logbook subtitles label the source explicitly (EN/IT).
+- Multigas switch replay remains **future work** — see [`LOGBOOK_TISSUE_REPLAY_FUTURE_WORK.md`](LOGBOOK_TISSUE_REPLAY_FUTURE_WORK.md).
+
+## Gradient factor policy (2026-06-07)
+
+- **GF Low must be strictly lower than GF High** — conservative DIR DIVING product policy (fail-closed validation message documents this; not a Bühlmann mathematical requirement).
+- **GF Low == GF High** is rejected with `planner.validation.gradient_factors_invalid`.
 
 ## Current Assumptions
 

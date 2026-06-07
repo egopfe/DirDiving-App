@@ -37,7 +37,7 @@ enum DivePackPDFBuilder {
                     page.drawChecklistRow(
                         yesLabel: yesLabel,
                         noLabel: noLabel,
-                        itemText: ChecklistPDFBuilder.exportLine(for: item)
+                        itemText: ChecklistPDFBuilder.exportLine(for: item, unitPreference: plannerContext.unitPreference)
                     )
                 }
             } else {
