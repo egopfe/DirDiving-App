@@ -1,9 +1,32 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-07  
-**Branch consigliato:** `main` = `origin/main` @ `74035fd`  
+**Branch consigliato:** `main` = `origin/main` @ `c314b93` (baseline audit Watch; doc su commit successivo)  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-06-07 — Watch MAIN algorithm audit refresh (`DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`)
+
+Audit read-only completo **Apple Watch MAIN** (`DIRDiving Watch App` only) @ baseline `c314b93`. Supersedes audit root 2026-05-27 e snapshot parallelo [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) @ `5415213`.
+
+| Campo | Valore |
+|-------|--------|
+| **Documento** | [`DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md) |
+| **Baseline codice** | `c314b93` |
+| **Target** | `DIRDiving Watch App` (MAIN only) |
+| **XCTest** | **135** passed, 3 skipped, 0 failures (Apple Watch Ultra 3 sim) |
+| **P0** | 0 |
+| **Verdict** | **READY FOR INTERNAL WATCH MAIN ALGORITHM VALIDATION**; external TestFlight/App Store blocked on physical QA + P1 sync/haptic gaps |
+
+| Area readiness | Stima |
+|---|---:|
+| Algorithm | 94% |
+| Math robustness | 95% |
+| Safety algorithms | 91% |
+| Runtime / lifecycle | 93% |
+| Sync / data | 90% |
 
 ---
 
@@ -360,7 +383,7 @@ Tutti i file Markdown che erano nella root del repository sono stati spostati in
 | [`CHANGELOG.md`](CHANGELOG.md) | `Docs/` | Cronologia modifiche |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | `Docs/` | Regole contribuzione |
 | [`DIR_DIVING_WATCH_UI_TEXT_VISIBILITY_AUDIT_CURRENT.md`](DIR_DIVING_WATCH_UI_TEXT_VISIBILITY_AUDIT_CURRENT.md) | `Docs/` | Audit Watch UI/UX/testo 2026-06-04 |
-| [`DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md) | `Docs/` | Audit matematico Watch post-hardening |
+| [`DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md) | `Docs/` | **Audit Watch MAIN corrente** @ `c314b93` (2026-06-07): 135 XCTest; P0=0; internal validation ready |
 | [`DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md) | `Docs/` | Audit matematico iOS Companion |
 | [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md) | `Docs/` | Audit UX/UI planner Buhlmann |
 | [`DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_FIX_VERIFICATION.md) | `Docs/` | Verifica fix UX/UI Buhlmann |
