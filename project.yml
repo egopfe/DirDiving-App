@@ -171,6 +171,7 @@ targets:
       - Tests/iOSAlgorithmTests
       - iOSApp/Models/DemoDiveCatalog.swift
       - iOSApp/Models/DivePlan.swift
+      - iOSApp/Models/RatioDecoModels.swift
       - iOSApp/Models/DiveSample.swift
       - iOSApp/Models/DiveSession.swift
       - iOSApp/Models/GasPlan.swift
@@ -194,6 +195,8 @@ targets:
       - iOSApp/Services/PlannerMODValidator.swift
       - iOSApp/Services/PlannerEnvironment.swift
       - iOSApp/Services/PlannerService.swift
+      - iOSApp/Services/RatioDecoPlanner.swift
+      - iOSApp/Services/RatioDecoValidator.swift
       - iOSApp/Services/RepetitiveDivePlannerService.swift
       - iOSApp/Services/RouteSummaryService.swift
       - iOSApp/Services/ScheduleGasConsumptionService.swift
