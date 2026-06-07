@@ -208,20 +208,25 @@ enum BuhlmannTissueHistorySampler {
         firstStopDepthMeters: Double,
         into samples: inout [BuhlmannTissueHistorySample]
     ) {
+        guard IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters, environment: request.plannerEnvironment) != nil else {
+            return
+        }
         let gf = gradientFactor(
             depthMeters: depthMeters,
             firstStopDepthMeters: firstStopDepthMeters,
             request: request
         )
         for index in 0..<BuhlmannConstants.compartmentCount {
-            let metrics = compartmentMetrics(
+            guard let metrics = compartmentMetrics(
                 compartmentIndex: index,
                 state: state,
                 depthMeters: depthMeters,
                 gas: gas,
                 gf: gf,
                 environment: request.plannerEnvironment
-            )
+            ) else {
+                return
+            }
             let sample = BuhlmannTissueHistorySample(
                 elapsedMinutes: roundElapsed(elapsedMinutes),
                 compartmentIndex: index,
@@ -268,15 +273,15 @@ enum BuhlmannTissueHistorySampler {
         toleratedAmbientPressureBar: Double,
         loadPercent: Double,
         supersaturationPercent: Double
-    ) {
+    )? {
         let compartment = state.compartments[compartmentIndex]
         let pn2 = sanitize(compartment.nitrogenPressure)
         let phe = sanitize(compartment.heliumPressure)
         let total = sanitize(pn2 + phe)
-        let ambient = sanitize(
-            IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters, environment: environment)
-                ?? BuhlmannConstants.seaLevelSurfacePressureBar
-        )
+        guard let ambientRaw = IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters, environment: environment) else {
+            return nil
+        }
+        let ambient = sanitize(ambientRaw)
         let a = BuhlmannConstants.coefficientA(index: compartmentIndex, pn2: pn2, phe: phe)
         let b = BuhlmannConstants.coefficientB(index: compartmentIndex, pn2: pn2, phe: phe)
         let fraction = max(0, min(1, gf))

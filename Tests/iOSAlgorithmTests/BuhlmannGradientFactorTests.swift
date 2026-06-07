@@ -37,5 +37,14 @@ final class BuhlmannGradientFactorTests: XCTestCase {
         XCTAssertFalse(aggressivePlan.hasBlockingIssues)
         XCTAssertGreaterThanOrEqual(conservativePlan.ttsMinutes, aggressivePlan.ttsMinutes)
     }
+
+    func testEqualGradientFactorsAreRejectedByPlannerValidator() {
+        var input = BuhlmannTestSupport.gasPlanInput(depth: 30, bottomMinutes: 20)
+        input.gfLow = 50
+        input.gfHigh = 50
+        let validation = PlannerInputValidator.validate(input, mode: .technical)
+        XCTAssertFalse(validation.isValid)
+        XCTAssertTrue(validation.states.contains(.invalidInput))
+    }
 }
 

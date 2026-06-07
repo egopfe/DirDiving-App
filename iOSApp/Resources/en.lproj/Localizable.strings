@@ -636,7 +636,7 @@
 "planner.validation.sac_invalid" = "Invalid SAC/RMV.";
 "planner.validation.team_size_invalid" = "Invalid team size.";
 "planner.validation.temperature_invalid" = "Invalid temperature.";
-"planner.validation.gradient_factors_invalid" = "Invalid gradient factors.";
+"planner.validation.gradient_factors_invalid" = "GF Low must be lower than GF High.";
 "planner.validation.density_limits_invalid" = "Invalid gas density limits.";
 "planner.validation.team_sac_invalid" = "Invalid team member SAC.";
 "planner.validation.cylinder_volume_invalid" = "Invalid cylinder volume.";
@@ -1162,7 +1162,7 @@
 "planner.validation.invalid_environment" = "Invalid planner environment.";
 "planner.validation.invalid_oxygen_exposure" = "Invalid oxygen exposure calculation.";
 "planner.briefing.mode" = "Mode: planned as %.0fm / %d min, %@.";
-"planner.briefing.gf_tts" = "GF: %d/%d; TTS/TTR estimate %d min.";
+"planner.briefing.gf_tts" = "GF: %d/%d; TTS estimate %d min.";
 "planner.briefing.gas_pressure" = "Gas: turn %d bar, minimum gas %d bar.";
 "planner.briefing.respirability" = "Respirability: density %.1f g/L, END %d m.";
 "planner.briefing.oxygen" = "Oxygen: PPO2 %.1f, CNS %d%% (daily %d%%), OTU dive %d, OTU 24h %d.";
