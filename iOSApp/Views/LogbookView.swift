@@ -79,16 +79,30 @@ struct LogbookView: View {
                                     .foregroundStyle(DIRTheme.cyan)
                                     .padding(.top, 8)
                                 ForEach(Array(section.sessions.enumerated()), id: \.element.id) { index, session in
-                                    NavigationLink { DiveDetailView(session: session) } label: {
-                                        DiveLogCard(session: session, index: index)
+                                    HStack(spacing: 8) {
+                                        NavigationLink { DiveDetailView(session: session) } label: {
+                                            DiveLogCard(session: session, index: index)
+                                        }
+                                        .buttonStyle(.plain)
+                                        if !session.isDemoDive {
+                                            Button {
+                                                pendingDeleteID = session.id
+                                            } label: {
+                                                Image(systemName: "trash")
+                                                    .font(.body.weight(.semibold))
+                                                    .foregroundStyle(DIRTheme.red)
+                                                    .frame(width: 36, height: 36)
+                                            }
+                                            .buttonStyle(.plain)
+                                            .accessibilityLabel(String(localized: "logbook.delete.button.a11y"))
+                                        }
                                     }
-                                    .buttonStyle(.plain)
-                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                    .contextMenu {
                                         if !session.isDemoDive {
                                             Button(role: .destructive) {
                                                 pendingDeleteID = session.id
                                             } label: {
-                                                Label(String(localized: "logbook.delete.a11y"), systemImage: "trash")
+                                                Label(String(localized: "logbook.delete.button.a11y"), systemImage: "trash")
                                             }
                                         }
                                     }
@@ -210,12 +224,12 @@ struct DiveLogCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
                     Text(session.siteName ?? String(localized: "detail.default_site"))
-                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .font(.callout.weight(.semibold))
                         .foregroundStyle(.white)
                         .lineLimit(1)
                     if session.isDemoDive {
                         Text(String(localized: "logbook.badge.demo"))
-                            .font(.system(size: 8, weight: .bold, design: .rounded))
+                            .font(DIRTypography.microBadge)
                             .foregroundStyle(DIRTheme.green)
                             .padding(.horizontal, 4)
                             .padding(.vertical, 1)
@@ -223,14 +237,14 @@ struct DiveLogCard: View {
                             .accessibilityLabel(String(localized: "logbook.badge.demo.a11y"))
                     } else if session.isManual, !session.hasDepthProfile {
                         Text(String(localized: "logbook.badge.manual.nodepth"))
-                            .font(.system(size: 8, weight: .bold, design: .rounded))
+                            .font(DIRTypography.microBadge)
                             .foregroundStyle(DIRTheme.cyan)
                             .padding(.horizontal, 4)
                             .padding(.vertical, 1)
                             .overlay(RoundedRectangle(cornerRadius: 3).stroke(DIRTheme.cyan, lineWidth: 1))
                     } else if session.isManual {
                         Text(String(localized: "logbook.badge.manual"))
-                            .font(.system(size: 8, weight: .bold, design: .rounded))
+                            .font(DIRTypography.microBadge)
                             .foregroundStyle(DIRTheme.orange)
                             .padding(.horizontal, 4)
                             .padding(.vertical, 1)
@@ -238,7 +252,7 @@ struct DiveLogCard: View {
                     }
                     if session.buddy != nil {
                         Text(String(localized: "detail.buddy.badge"))
-                            .font(.system(size: 8, weight: .bold, design: .rounded))
+                            .font(DIRTypography.microBadge)
                             .foregroundStyle(DIRTheme.yellow)
                             .padding(.horizontal, 4)
                             .padding(.vertical, 1)
@@ -305,8 +319,7 @@ struct DiveLogCard: View {
     private var dateBlock: some View {
         VStack(spacing: 1) {
             Text(session.startDate.formatted(.dateTime.day()))
-                .font(.system(size: 23, weight: .bold, design: .rounded))
-                .monospacedDigit()
+                .font(DIRTypography.metricValue)
                 .foregroundStyle(.white)
             Text(session.startDate.formatted(.dateTime.month(.abbreviated).locale(locale)).uppercased())
                 .font(.caption2.weight(.medium))

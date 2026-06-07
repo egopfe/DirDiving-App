@@ -192,10 +192,39 @@ enum PDFExportFilename {
     }
 
     static func write(data: Data, filename: String) throws -> URL {
-        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("DIRDivingPDF", isDirectory: true)
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let directory = try protectedExportDirectory()
         let url = directory.appendingPathComponent(filename)
-        try data.write(to: url, options: .atomic)
+        try data.write(to: url, options: [.atomic, .completeFileProtection])
         return url
+    }
+
+    private static let exportDirectoryName = "DIRDivingPDFExports"
+    private static let exportRetentionSeconds: TimeInterval = 24 * 60 * 60
+
+    static func protectedExportDirectory() throws -> URL {
+        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        let directory = base.appendingPathComponent(exportDirectoryName, isDirectory: true)
+        try FileManager.default.createDirectory(
+            at: directory,
+            withIntermediateDirectories: true,
+            attributes: [.protectionKey: FileProtectionType.complete]
+        )
+        cleanupStaleExports(in: directory, olderThan: exportRetentionSeconds)
+        return directory
+    }
+
+    static func cleanupStaleExports(in directory: URL, olderThan retentionSeconds: TimeInterval) {
+        let cutoff = Date().addingTimeInterval(-retentionSeconds)
+        guard let files = try? FileManager.default.contentsOfDirectory(
+            at: directory,
+            includingPropertiesForKeys: [.contentModificationDateKey],
+            options: [.skipsHiddenFiles]
+        ) else { return }
+        for file in files where file.pathExtension.lowercased() == "pdf" {
+            let modified = (try? file.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? .distantPast
+            if modified < cutoff {
+                try? FileManager.default.removeItem(at: file)
+            }
+        }
     }
 }

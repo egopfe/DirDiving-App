@@ -144,6 +144,8 @@ targets:
       - Services/WatchSyncPendingTransfer.swift
       - Services/WatchSyncAuth.swift
       - Services/WatchDiveSyncCodec.swift
+      - Utils/SyncNonceReplayCache.swift
+      - Utils/CompanionPhotoManagementAuth.swift
       - Utils/CloudSyncNotifications.swift
       - Utils/WatchSyncKeys.swift
       - Utils/WatchSyncNotifications.swift
@@ -158,6 +160,7 @@ targets:
       - Utils/DIRUnitPreference.swift
       - Utils/DIRUnitConversions.swift
       - Utils/DepthSafetyConfiguration.swift
+      - Utils/LiveDiveBannerPresentationPolicy.swift
       - Utils/DiveAlgorithmConfiguration.swift
       - Utils/DiveLogbookPolicy.swift
       - Utils/DepthSampleValidation.swift
@@ -222,6 +225,10 @@ targets:
       - iOSApp/Services/SubsurfaceExportService.swift
       - iOSApp/Services/WatchDiveSyncCodec.swift
       - iOSApp/Services/WatchSyncAuth.swift
+      - iOSApp/Services/IOSWatchSyncPendingTransfer.swift
+      - iOSApp/Services/PlannerStore.swift
+      - iOSApp/Utils/SyncNonceReplayCache.swift
+      - iOSApp/Utils/CompanionPhotoManagementAuth.swift
       - iOSApp/Utils/DiveProfileMath.swift
       - iOSApp/Utils/DiveSessionAlgorithmValidator.swift
       - iOSApp/Utils/DiveSessionMerge.swift

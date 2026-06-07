@@ -6,11 +6,11 @@
 - Experimental branches remain isolated and are **not** release sources.
 - **`main-iOS`** is a historical divergent worktree — compare manually before any port; not canonical for unified release.
 
-## Branch inventory (2026-06-06)
+## Branch inventory (2026-06-07)
 
 | Branch | Role | Merge to MAIN |
 |--------|------|---------------|
-| `main` | Stable Diving + iOS Companion | N/A (canonical) |
+| `main` | Stable Diving + iOS Companion @ `a69bc4b` | N/A (canonical) |
 | `main-iOS` | Historical iOS worktree | Manual review only |
 | `codex/experimental-features` | Watch Snorkeling / Apnea / Buddy | ❌ Without explicit review |
 | `codex/ios-experimental-features` | iOS experimental surfaces | ❌ Without explicit review |

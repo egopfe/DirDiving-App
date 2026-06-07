@@ -55,8 +55,8 @@ struct DiveDetailView: View {
                 DiveOctopusLogo(accent: DiveUI.yellow)
                     .frame(width: 23, height: 22, alignment: .leading)
                     .scaleEffect(0.68)
-                Text("DIR DIVING")
-                    .font(.system(size: 11, weight: .black, design: .rounded))
+                Text(String(localized: "DIR DIVING"))
+                    .font(DiveUI.Typography.brandTitleCompact)
                     .foregroundStyle(DiveUI.yellow)
                     .lineLimit(1)
             }
@@ -80,12 +80,17 @@ struct DiveDetailView: View {
         let depthDisplay = WatchDepthFormatting.display(meters: session.maxDepthMeters, units: DIRUnitPreference.fromStorage(watchUnits))
         return HStack(spacing: 4) {
             detailMetricCard(
-                title: "PROF. MASSIMA",
+                title: String(localized: "dive.detail.max_depth"),
                 value: depthDisplay.valueText,
                 unit: depthDisplay.unitLabel,
                 color: session.exceededSupportedDepthRange ? DiveUI.red : DiveUI.blue
             )
-            detailMetricCard(title: "DURATA", value: durationMinutesText, unit: "min", color: .white)
+            detailMetricCard(
+                title: String(localized: "dive.detail.duration"),
+                value: durationMinutesText,
+                unit: "min",
+                color: .white
+            )
         }
     }
 
@@ -144,14 +149,14 @@ struct DiveDetailView: View {
     private var gpsRows: some View {
         VStack(spacing: 3) {
             gpsRow(
-                title: "PUNTO INIZIO",
+                title: String(localized: "dive.detail.gps.start"),
                 point: session.entryGPS,
                 isEntry: true,
                 status: fixSourceText(session.entryGPSFixSource),
                 color: DiveUI.green
             )
             gpsRow(
-                title: "PUNTO FINE",
+                title: String(localized: "dive.detail.gps.end"),
                 point: session.exitGPS,
                 isEntry: false,
                 status: fixSourceText(session.exitGPSFixSource),
@@ -167,7 +172,7 @@ struct DiveDetailView: View {
 
     private func gpsRow(title: String, point: GPSPoint?, isEntry: Bool, status: String, color: Color) -> some View {
         let summary = coordinateSummary(for: point, isEntry: isEntry)
-        let fullCoordinate = coordinateLine(for: point, fallback: String(localized: "GPS non disponibile"))
+        let fullCoordinate = coordinateLine(for: point, fallback: String(localized: "gps.banner.unavailable"))
         return HStack(spacing: 8) {
             VStack(alignment: .leading, spacing: 3) {
                 Text(title)
@@ -212,7 +217,7 @@ struct DiveDetailView: View {
 
     private var manualNoDepthLogBanner: some View {
         Text(String(localized: "log.manual.nodepth.banner"))
-            .font(.system(size: 10, weight: .bold, design: .rounded))
+            .font(DiveUI.Typography.hintCaptionBold)
             .foregroundStyle(DiveUI.cyan)
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -231,7 +236,7 @@ struct DiveDetailView: View {
                 Text(session.isManual && !session.hasDepthProfile
                      ? String(localized: "log.export.manual.nodepth.unavailable")
                      : String(localized: "log.export.unavailable"))
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .font(DiveUI.Typography.hintCaption)
                     .foregroundStyle(DiveUI.yellow)
                     .multilineTextAlignment(.center)
             }
@@ -256,8 +261,8 @@ struct DiveDetailView: View {
                     HapticService.shared.notify()
                 }
             } label: {
-                Text("ESPORTA (SUBSURFACE)")
-                    .font(.system(size: 12, weight: .black, design: .rounded))
+                Text(String(localized: "log.export.subsurface.button"))
+                    .font(DiveUI.Typography.commandButton)
                     .foregroundStyle(DiveUI.green)
                     .lineLimit(1)
                     .minimumScaleFactor(0.9)
@@ -277,7 +282,7 @@ struct DiveDetailView: View {
             if let exportURL {
                 ShareLink(item: exportURL) {
                     HStack(spacing: 5) {
-                        Text("CONDIVIDI CSV")
+                        Text(String(localized: "log.share.csv.button"))
                         Image(systemName: "square.and.arrow.up")
                     }
                     .font(DiveUI.Typography.secondaryLabel)
@@ -291,7 +296,7 @@ struct DiveDetailView: View {
                 }
             } else if let exportMessage {
                 Text(exportMessage)
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
+                    .font(DiveUI.Typography.hintCaption)
                     .foregroundStyle(DiveUI.yellow)
                     .multilineTextAlignment(.center)
             }
@@ -306,10 +311,10 @@ struct DiveDetailView: View {
             HStack(spacing: 7) {
                 Image(systemName: "trash.fill")
                     .font(.system(size: 12, weight: .black))
-                Text("ELIMINA LOG")
-                    .font(.system(size: 11, weight: .black, design: .rounded))
+                Text(String(localized: "log.delete.button"))
+                    .font(DiveUI.Typography.destructiveAction)
                 Spacer(minLength: 0)
-                Text("CONFERMA")
+                Text(String(localized: "log.delete.confirm_inline"))
                     .font(DiveUI.Typography.secondaryLabel)
             }
             .foregroundStyle(DiveUI.red)
@@ -331,7 +336,7 @@ struct DiveDetailView: View {
 
     private func coordinateSummary(for point: GPSPoint?, isEntry: Bool) -> String {
         guard point != nil else {
-            return String(localized: "GPS non disponibile")
+            return String(localized: "gps.banner.unavailable")
         }
         return isEntry
             ? String(localized: "dive.detail.gps.start_available")

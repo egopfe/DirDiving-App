@@ -7,12 +7,23 @@ struct DepthSafetyBannerView: View {
         switch state {
         case .normal:
             EmptyView()
-        case .caution, .critical:
+        case .caution:
             depthBanner(
-                title: String(localized: "depth.safety.approaching.title"),
+                title: String(localized: "depth.safety.caution.title"),
                 subtitle: nil,
-                stroke: state == .critical ? DiveUI.orange : DiveUI.yellow,
-                fillOpacity: state == .critical ? 0.16 : 0.10
+                stroke: DiveUI.yellow,
+                fillOpacity: 0.10,
+                accessibilityLabel: String(localized: "depth.safety.a11y.caution"),
+                accessibilityHint: nil
+            )
+        case .critical:
+            depthBanner(
+                title: String(localized: "depth.safety.critical.title"),
+                subtitle: nil,
+                stroke: DiveUI.orange,
+                fillOpacity: 0.16,
+                accessibilityLabel: String(localized: "depth.safety.a11y.critical"),
+                accessibilityHint: nil
             )
         case .exceeded:
             depthBanner(
@@ -23,12 +34,21 @@ struct DepthSafetyBannerView: View {
                     String(localized: "depth.safety.exceeded.readings")
                 ),
                 stroke: DiveUI.red,
-                fillOpacity: 0.18
+                fillOpacity: 0.18,
+                accessibilityLabel: String(localized: "depth.safety.a11y.exceeded"),
+                accessibilityHint: String(localized: "depth.safety.exceeded.readings")
             )
         }
     }
 
-    private func depthBanner(title: String, subtitle: String?, stroke: Color, fillOpacity: Double) -> some View {
+    private func depthBanner(
+        title: String,
+        subtitle: String?,
+        stroke: Color,
+        fillOpacity: Double,
+        accessibilityLabel: String,
+        accessibilityHint: String?
+    ) -> some View {
         VStack(alignment: .leading, spacing: 3) {
             HStack(spacing: 6) {
                 Image(systemName: "exclamationmark.triangle.fill")
@@ -60,6 +80,8 @@ struct DepthSafetyBannerView: View {
                 )
         )
         .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityHint(accessibilityHint ?? "")
     }
 }
 

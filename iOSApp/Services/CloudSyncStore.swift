@@ -148,16 +148,16 @@ final class CloudSyncStore: ObservableObject {
             return
         }
 
-        let modifiedAt = Date().timeIntervalSince1970
-        defaults.set(data, forKey: key)
-        defaults.set(modifiedAt, forKey: modifiedAtKey(for: key))
-
         if data.count > IOSAlgorithmConfiguration.maxSyncPayloadBytes {
             publishDeferred { [self] in
                 lastSyncStatus = String(localized: "cloud.status.payload_too_large")
             }
             return
         }
+
+        let modifiedAt = Date().timeIntervalSince1970
+        defaults.set(data, forKey: key)
+        defaults.set(modifiedAt, forKey: modifiedAtKey(for: key))
 
         cloudStore.set(data, forKey: key)
         cloudStore.set(modifiedAt, forKey: modifiedAtKey(for: key))
@@ -174,8 +174,12 @@ final class CloudSyncStore: ObservableObject {
         }
     }
 
+    private var syncGeneration: UInt = 0
+
     func synchronize() {
         cloudStore.synchronize()
+        syncGeneration &+= 1
+        let generation = syncGeneration
         let available = FileManager.default.ubiquityIdentityToken != nil
         publishDeferred { [self] in
             isSynchronizing = true
@@ -189,6 +193,7 @@ final class CloudSyncStore: ObservableObject {
         }
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 900_000_000)
+            guard generation == syncGeneration else { return }
             isSynchronizing = false
         }
     }

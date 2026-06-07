@@ -117,13 +117,15 @@ final class CloudSessionMergeTests: XCTestCase {
         XCTAssertFalse(conflicts.contains { $0.fieldName == String(localized: "cloud.merge.field.depth_profile") })
     }
 
-    func testCloudPayloadTooLargeSkipsICloudWrite() {
+    func testCloudPayloadTooLargeSkipsLocalAndCloudWrite() {
         struct LargePayload: Codable { let blob: String }
         let key = "cloud.payload.test"
-        let payload = LargePayload(blob: String(repeating: "x", count: IOSAlgorithmConfiguration.maxSyncPayloadBytes))
+        let previous = Data("valid-local".utf8)
+        defaults.set(previous, forKey: key)
+        let payload = LargePayload(blob: String(repeating: "x", count: IOSAlgorithmConfiguration.maxSyncPayloadBytes + 1))
         let cloudSync = CloudSyncStore(defaults: defaults)
         cloudSync.save(payload, forKey: key)
-        XCTAssertNotNil(defaults.data(forKey: key))
+        XCTAssertEqual(defaults.data(forKey: key), previous)
         XCTAssertNil(cloudSync.loadRawCloudData(forKey: key))
     }
 

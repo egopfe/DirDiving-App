@@ -190,7 +190,9 @@ struct WatchPhotoTransferPanel: View {
             return
         }
         do {
-            let prepared = try WatchPhotoPreprocessor.prepareForWatch(from: data)
+            let prepared = try await Task.detached(priority: .userInitiated) {
+                try WatchPhotoPreprocessor.prepareForWatch(from: data)
+            }.value
             let photoID = UUID()
             let fileName = CompanionPhotoTransferSupport.makeFileName(photoID: photoID)
             guard let preview = UIImage(data: prepared.data) else {

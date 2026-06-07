@@ -17,6 +17,9 @@ enum DIRTypography {
     static let footnote = Font.footnote
     static let legalBody = Font.callout.weight(.medium)
     static let warning = Font.subheadline.weight(.semibold)
+    static let microBadge = Font.system(size: 8, weight: .bold, design: .rounded)
+    static let cardHeading = Font.system(size: 17, weight: .semibold, design: .rounded)
+    static let metadata = Font.system(size: 12, weight: .medium, design: .rounded)
 
     static let sectionTracking: CGFloat = 0.8
     static let bodyLineSpacing: CGFloat = 4

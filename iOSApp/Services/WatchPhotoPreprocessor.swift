@@ -6,6 +6,8 @@ enum WatchPhotoPreprocessor {
     /// Target max dimension for Watch companion reference images.
     static let optimalMaxDimension: CGFloat = 400
     static let optimalMaxBytes = 350_000
+    static let maxInputBytes = 10 * 1_024 * 1_024
+    static let maxInputDimension = 8_192
 
     struct Result {
         let data: Data
@@ -13,9 +15,16 @@ enum WatchPhotoPreprocessor {
         let conversionWarning: Bool
     }
 
+    struct ImageDimensions {
+        let width: Int
+        let height: Int
+    }
+
     enum Failure: LocalizedError {
         case unreadableImage
         case conversionFailed
+        case oversizedBytes
+        case oversizedDimensions
 
         var errorDescription: String? {
             switch self {
@@ -23,11 +32,39 @@ enum WatchPhotoPreprocessor {
                 return String(localized: "watch_photo.error.load")
             case .conversionFailed:
                 return String(localized: "watch_photo.error.convert")
+            case .oversizedBytes:
+                return String(localized: "watch_photo.error.load")
+            case .oversizedDimensions:
+                return String(localized: "watch_photo.error.load")
             }
         }
     }
 
+    static func preflightImageData(_ data: Data) throws {
+        guard !data.isEmpty, data.count <= maxInputBytes else {
+            throw Failure.oversizedBytes
+        }
+        guard let dimensions = imageDimensionsWithoutFullDecode(data) else {
+            throw Failure.unreadableImage
+        }
+        guard dimensions.width <= maxInputDimension, dimensions.height <= maxInputDimension else {
+            throw Failure.oversizedDimensions
+        }
+    }
+
+    static func imageDimensionsWithoutFullDecode(_ data: Data) -> ImageDimensions? {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
+              let width = properties[kCGImagePropertyPixelWidth] as? Int,
+              let height = properties[kCGImagePropertyPixelHeight] as? Int,
+              width > 0, height > 0 else {
+            return nil
+        }
+        return ImageDimensions(width: width, height: height)
+    }
+
     static func prepareForWatch(from data: Data) throws -> Result {
+        try preflightImageData(data)
         guard let source = decodeImage(data: data) else {
             throw Failure.unreadableImage
         }
@@ -61,9 +98,6 @@ enum WatchPhotoPreprocessor {
     }
 
     private static func decodeImage(data: Data) -> UIImage? {
-        if let image = UIImage(data: data) {
-            return image
-        }
         guard let source = CGImageSourceCreateWithData(data as CFData, nil),
               let cgImage = CGImageSourceCreateImageAtIndex(source, 0, nil) else {
             return nil

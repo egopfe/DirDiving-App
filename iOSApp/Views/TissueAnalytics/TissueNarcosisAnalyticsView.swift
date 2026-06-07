@@ -254,7 +254,7 @@ struct TissueNarcosisAnalyticsView: View {
                 decoStops: trace.decoStops,
                 unitPreference: unitPreference
             )
-            .frame(height: 300)
+            .frame(minHeight: 220, maxHeight: 360)
         }
     }
 
@@ -270,7 +270,7 @@ struct TissueNarcosisAnalyticsView: View {
                 compartments: trace.finalCompartments,
                 controllingCompartment: trace.controllingCompartment
             )
-            .frame(height: 280)
+            .frame(minHeight: 200, maxHeight: 340)
         }
     }
 
@@ -285,7 +285,7 @@ struct TissueNarcosisAnalyticsView: View {
                 selectedRuntimeSeconds: $selectedRuntimeSeconds,
                 unitPreference: unitPreference
             )
-            .frame(height: 340)
+            .frame(minHeight: 240, maxHeight: 400)
         }
     }
 
@@ -297,7 +297,7 @@ struct TissueNarcosisAnalyticsView: View {
                 endEquivalentMeters: trace.endEquivalentMeters,
                 unitPreference: unitPreference
             )
-            .frame(height: 280)
+            .frame(minHeight: 200, maxHeight: 340)
         }
     }
 
