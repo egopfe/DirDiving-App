@@ -109,7 +109,8 @@ struct NDLPoint: Identifiable, Hashable {
     let id = UUID()
     let depthMeters: Double
     let ndlMinutes: Double
-    let compartmentGroup: String
+    /// Depth-band label for chart UX only — not the controlling ZH-L16C compartment.
+    let depthBand: String
 }
 
 struct BuhlmannPlanResult: Hashable {

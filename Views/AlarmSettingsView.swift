@@ -40,6 +40,16 @@ struct AlarmSettingsView: View {
                     VStack(spacing: 5) {
                         alarmRow(title: String(localized: "alarms.row.ascent_rate.title"), threshold: String(localized: "alarms.row.ascent_rate.threshold"), isOn: $ascentAlarmEnabled)
                         alarmRow(title: String(localized: "alarms.row.max_depth.title"), threshold: String(format: String(localized: "alarm.threshold.depth_format"), depthThresholdLabel), isOn: $depthAlarmEnabled)
+                        Text(String(localized: "alarms.depth.default_off_hint"))
+                            .font(DiveUI.Typography.hintCaption)
+                            .foregroundStyle(DiveUI.secondaryText)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Button(String(localized: "alarms.depth.preset_30m")) {
+                            depthThresholdMeters = 30
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(DiveUI.blue)
                         crownThresholdStepper(title: String(localized: "alarms.row.depth_threshold.title"), value: $depthThresholdMeters, display: depthThresholdLabel, range: 10...100, step: 1, color: DiveUI.blue) {
                             depthThresholdMeters = max(10, depthThresholdMeters - 1)
                         } increase: {

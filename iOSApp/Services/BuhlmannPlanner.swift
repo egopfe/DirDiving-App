@@ -304,7 +304,7 @@ enum BuhlmannPlanner {
             case ..<45: group = "9-12"
             default: group = "13-16"
             }
-            return NDLPoint(depthMeters: depth, ndlMinutes: ndlValue, compartmentGroup: group)
+            return NDLPoint(depthMeters: depth, ndlMinutes: ndlValue, depthBand: group)
         }
     }
 

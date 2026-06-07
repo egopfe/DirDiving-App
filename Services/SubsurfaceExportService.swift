@@ -1,5 +1,10 @@
 import Foundation
 
+// MARK: - Watch Subsurface CSV export
+// Intentionally separate from `iOSApp/Services/SubsurfaceExportService.swift` (iOS target).
+// Watch skips iOS-only normalization but keeps identical CSV headers/rows for compatibility.
+// See iOS file header for rationale; do not merge without verifying both target memberships.
+
 enum SubsurfaceExportService {
     static func makeCSV(for session: DiveSession) -> String? {
         guard !session.samples.isEmpty else { return nil }

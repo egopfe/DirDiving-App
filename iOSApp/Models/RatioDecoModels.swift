@@ -182,7 +182,10 @@ struct RatioDecoValidationResult: Hashable {
         }) {
             return String(localized: "planner.ratio_deco.validation.ceiling_violation")
         }
-        if warnings.isEmpty && isBuhlmannCompatible {
+        if !isBuhlmannCompatible {
+            return String(localized: "planner.ratio_deco.validation.not_validated_plan")
+        }
+        if warnings.isEmpty {
             return String(localized: "planner.ratio_deco.validation.validated")
         }
         return String(localized: "planner.ratio_deco.validation.warning")
