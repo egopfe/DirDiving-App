@@ -235,7 +235,16 @@ struct RatioDecoComparisonSection: View {
                 RatioDecoOverlayProfileChart(
                     buhlmannPoints: store.plan.depthProfilePoints,
                     ratioDecoPoints: bundle.schedule.depthProfilePoints,
-                    unitPreference: unitPreference
+                    unitPreference: unitPreference,
+                    accessibilitySummary: UIUXAccessibilitySummaries.ratioDecoOverlayChart(
+                        buhlmannTTS: store.plan.ttsMinutes,
+                        ratioTTS: bundle.schedule.ttsMinutes,
+                        maxDepthMeters: UIUXAccessibilitySummaries.maxDepth(
+                            from: store.plan.depthProfilePoints + bundle.schedule.depthProfilePoints
+                        ),
+                        validation: bundle.validation,
+                        unitPreference: unitPreference
+                    )
                 )
             } else {
                 ratioDecoScheduleCard(bundle.schedule)
@@ -447,6 +456,7 @@ struct RatioDecoOverlayProfileChart: View {
     let buhlmannPoints: [DepthProfilePoint]
     let ratioDecoPoints: [DepthProfilePoint]
     let unitPreference: IOSUnitPreference
+    var accessibilitySummary: String?
 
     private var yAxisLabel: String {
         unitPreference == .metric
@@ -495,6 +505,9 @@ struct RatioDecoOverlayProfileChart: View {
                 .font(.caption2)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilitySummary ?? String(localized: "planner.ratio_deco.overlay.title"))
+        .accessibilityHint(String(localized: "planner.ratio_deco.overlay.a11y.hint"))
     }
 
     private func displayDepth(_ meters: Double) -> Double {

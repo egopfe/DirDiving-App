@@ -105,6 +105,12 @@ struct TissueNarcosisAnalyticsView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(
+            [trace.source.localizedTitle, trace.source.localizedFootnote]
+                .compactMap { $0 }
+                .joined(separator: ". ")
+        )
     }
 
     private var tabSelector: some View {
@@ -279,6 +285,8 @@ struct TissueNarcosisAnalyticsView: View {
                 controllingCompartment: trace.controllingCompartment
             )
             .frame(minHeight: 200, maxHeight: 340)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(UIUXAccessibilitySummaries.tissueCompartments(trace: trace))
         }
     }
 
@@ -294,6 +302,8 @@ struct TissueNarcosisAnalyticsView: View {
                 unitPreference: unitPreference
             )
             .frame(minHeight: 240, maxHeight: 400)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(UIUXAccessibilitySummaries.tissueTrend(trace: trace, unitPreference: unitPreference))
         }
     }
 
@@ -306,6 +316,8 @@ struct TissueNarcosisAnalyticsView: View {
                 unitPreference: unitPreference
             )
             .frame(minHeight: 200, maxHeight: 340)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(UIUXAccessibilitySummaries.tissueNarcosis(trace: trace, unitPreference: unitPreference))
         }
     }
 

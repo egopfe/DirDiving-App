@@ -276,6 +276,7 @@ targets:
       - iOSApp/Models/TissueAnalyticsTrace.swift
       - iOSApp/Utils/TissueAnalyticsSupport.swift
       - iOSApp/Utils/TissueAnalyticsLogbookReplay.swift
+      - iOSApp/Utils/UIUXAccessibilitySummaries.swift
       - iOSApp/Services/TissueAnalyticsService.swift
       - Tests/iOSAlgorithmTests/TissueAnalyticsServiceTests.swift
       - Tests/iOSAlgorithmTests/BuhlmannComprehensiveReadinessV3RemediationTests.swift

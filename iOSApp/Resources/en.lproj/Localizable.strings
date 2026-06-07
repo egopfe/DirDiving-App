@@ -412,7 +412,7 @@
 "salinity.salt" = "Salt";
 "planner.header.subtitle" = "Gas, deco profile and Bühlmann presentation. Indicative output — always verify with certified tools.";
 "planner.mode.header" = "Planner mode (display)";
-"planner.mode.footer" = "Base, Deco and Technical modes are active. Each mode limits visible fields and calculation inputs according to its safety policy.";
+"planner.mode.footer" = "Base, Deco and Technical modes are active. Base is no-deco only. Deco and Technical support Bühlmann planning with mode-specific depth limits. Ratio Deco is a comparative heuristic only in Deco and Technical — not a decompression algorithm.";
 "planner.reference.details.toggle" = "Additional reference notes";
 "planner.reference.details.summary" = "Metric units and supplementary reference copy";
 "planner.reference.details.read_more" = "Read more";
@@ -517,6 +517,9 @@
 "planner.ratio_deco.summary.ratio_tts" = "Ratio Deco TTS";
 "planner.ratio_deco.summary.tts_difference" = "TTS difference";
 "planner.ratio_deco.overlay.title" = "Overlay profile";
+"planner.ratio_deco.overlay.a11y.compatible" = "Ratio Deco overlay comparison. Bühlmann time to surface %lld minutes. Ratio Deco time to surface %lld minutes. Maximum depth %@. Ratio Deco schedule is Bühlmann-compatible.";
+"planner.ratio_deco.overlay.a11y.incompatible" = "Ratio Deco overlay comparison. Bühlmann time to surface %lld minutes. Ratio Deco time to surface %lld minutes. Maximum depth %@. Warning: %@. Ratio Deco is a comparative heuristic only.";
+"planner.ratio_deco.overlay.a11y.hint" = "Reference-only depth profile comparison between Bühlmann and Ratio Deco.";
 "planner.ratio_deco.save_preset" = "Save preset";
 "planner.ratio_deco.edit_preset" = "Edit preset";
 "planner.ratio_deco.delete_preset" = "Delete preset";
@@ -1391,6 +1394,9 @@
 "tissue_analytics.source.planned_footnote" = "Calculated from the planned Bühlmann profile in the planner (reference only).";
 "tissue_analytics.source.recorded_footnote" = "Bühlmann tissue replay from logged depth samples and a single back-gas assumption — no gas-switch history. Reference only, not certified.";
 "tissue_analytics.source.insufficient_footnote" = "Not enough depth samples or gas data to build tissue analytics.";
+"tissue_analytics.a11y.trend" = "Tissue loading timeline. Source: %@. Controlling compartment %@. Peak load %lld percent.";
+"tissue_analytics.a11y.compartment_bars" = "Sixteen compartment tissue loading bars. Source: %@. Controlling compartment %@. Peak load %lld percent.";
+"tissue_analytics.a11y.narcotic_chart" = "Narcosis chart. Source: %@. Peak partial pressure of nitrogen %@ bar. Equivalent narcosis depth %@.";
 "tissue_analytics.card.dive_profile" = "DIVE PROFILE";
 "tissue_analytics.card.tissue_loading" = "TISSUE LOADING (BÜHLMANN ZH-L16C)";
 "tissue_analytics.card.tissue_trend" = "TISSUE TREND";
