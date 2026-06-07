@@ -3,6 +3,7 @@
 **Audit date:** 2026-06-07  
 **Repository:** DIR DIVING (`DirDiving-App`)  
 **Branch:** `main` @ `c5d48b4`  
+**Superseded for v2 extensions:** See **`Docs/DIR_DIVING_UI_UX_AUDIT_COMMAND_COMPLETE_v2.md`** @ `515746c` (Ratio Deco, Tissue, Checklist, PDF/Share, Image Transfer, Watch Reminders, Manual Dive + updated test counts).  
 **Mode:** Read-only static audit + macOS build/test validation  
 **Scope:** Apple Watch MAIN (`DIRDiving Watch App`) + iOS Companion MAIN (`DIRDiving iOS`)  
 **No source changes:** Only this report file was created/updated.
