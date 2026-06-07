@@ -439,8 +439,14 @@ struct TechnicalGasAnalysis: Hashable {
         OxygenExposureDisplay.formatCNSPercent(cnsDailyPercent)
     }
 
-    func cnsDescentBottomExceedsPlannerThreshold(checkEnabled: Bool) -> Bool {
-        checkEnabled && CNSDescentBottomPlannerRule.exceedsPlannerThreshold(percent: cnsDescentBottomPercent)
+    func cnsDescentBottomExceedsPlannerThreshold(
+        checkEnabled: Bool,
+        thresholdPercent: Double = PlannerCNSDescentBottomCheckSettings.thresholdPercentDouble
+    ) -> Bool {
+        checkEnabled && CNSDescentBottomPlannerRule.exceedsPlannerThreshold(
+            percent: cnsDescentBottomPercent,
+            thresholdPercent: thresholdPercent
+        )
     }
 
     var showsFullPlanOxygenExposureWarning: Bool {
