@@ -1,9 +1,34 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-07  
-**Branch consigliato:** `main` = `origin/main` @ `2726a9d`  
+**Branch consigliato:** `main` = `origin/main` @ `a4cb04c`  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-06-07 — Watch MAIN audit remediation (P1–P3)
+
+Implementazione completa issue aperte da [`DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md) su **Apple Watch MAIN** only.
+
+| Campo | Valore |
+|-------|--------|
+| **Report** | [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_FIX_COMPLETION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_FIX_COMPLETION_REPORT.md) |
+| **Baseline pre-fix** | `4b73954` |
+| **Target** | `DIRDiving Watch App` |
+| **XCTest** | **161** passed, 8 skipped, 0 failures (Apple Watch Ultra 3 sim) |
+| **Verdict** | **READY FOR INTERNAL TESTFLIGHT** (physical QA still required for external gate) |
+
+**P1:** sync pending queue signed-ACK dequeue; mock/simulation sensor visibility; TestFlight simulation safeguards; ascent haptic coordinator tests.  
+**P2:** persistence errors, draft avg-depth tail cap, auto-end/sync/App Intent/haptic/GPS tests, photo trust doc, deterministic ID retention.  
+**P3:** 40 m band docs, double classify removed, expired draft quarantine, DepthSafetySelfCheck in CI, CSV call-path doc.
+
+| Documento | Ruolo |
+|---|---|
+| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_FIX_COMPLETION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_FIX_COMPLETION_REPORT.md) | Report finale remediation |
+| [`WATCH_TESTFLIGHT_SENSOR_SOURCE_QA.md`](WATCH_TESTFLIGHT_SENSOR_SOURCE_QA.md) | QA TestFlight simulation |
+| [`WATCH_SENSOR_SOURCE_RELEASE_POLICY.md`](WATCH_SENSOR_SOURCE_RELEASE_POLICY.md) | Policy release/simulation |
+| [`WATCH_IOS_SYNC_QA_MATRIX.md`](WATCH_IOS_SYNC_QA_MATRIX.md) | Matrice sync pending queue |
 
 ---
 
@@ -1333,8 +1358,9 @@ Audit storici ora consolidati in `Docs/`: vedi anche **§13** — [`DIR_DIVING_W
 | [`WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md`](WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md) | §3, §12 |
 | [`WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md`](WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md) | §4, §6 |
 | [`WATCH_MAIN_UX_CONVENTIONS.md`](WATCH_MAIN_UX_CONVENTIONS.md) | §3 |
+| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_FIX_COMPLETION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_FIX_COMPLETION_REPORT.md) | §3, agg. 2026-06-07 — remediation P1–P3 |
 | [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | §3, agg. 2026-06-05 @ `5415213` |
-| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) | §3, agg. 2026-06-06 @ `36a4d9f` |
+| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) | §3, agg. 2026-06-07 remediation pass |
 | [`WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md`](WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md) | §3, §6 |
 | [`WATCH_CSV_EXPORT_POLICY.md`](WATCH_CSV_EXPORT_POLICY.md) | §3, §6 |
 | [`iOS/*.md`](iOS/BUILD_AND_RUN.md) | §4 |
