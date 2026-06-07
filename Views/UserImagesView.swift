@@ -243,11 +243,13 @@ struct UserImagesView: View {
 
                 if let deleteErrorMessage {
                     Text(deleteErrorMessage)
-                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                        .font(DiveUI.Typography.warningBody)
                         .foregroundStyle(DiveUI.red)
-                        .lineLimit(2)
+                        .lineLimit(3)
+                        .minimumScaleFactor(0.85)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, horizontalInset)
+                        .accessibilityLabel(deleteErrorMessage)
                 }
 
                 Text(String(format: String(localized: "user_images.item.label"), index + 1))

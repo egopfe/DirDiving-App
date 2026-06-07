@@ -51,6 +51,24 @@ struct DiveReminderOverlayView: View {
             .padding(.horizontal, 14)
         }
         .allowsHitTesting(false)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(overlayAccessibilityLabel)
+        .accessibilityHint(String(localized: "dive_reminder.overlay.a11y.hint"))
         .transition(.opacity)
+    }
+
+    private var overlayAccessibilityLabel: String {
+        var parts = [content.title]
+        parts.append(contentsOf: content.messages)
+        if content.hiddenCount > 0 {
+            parts.append(String(format: String(localized: "dive_reminder.overlay.more_format"), content.hiddenCount))
+        }
+        parts.append(
+            String(
+                format: String(localized: "dive_reminder.overlay.runtime_a11y"),
+                Formatters.time(TimeInterval(content.runtimeMinute * 60))
+            )
+        )
+        return parts.joined(separator: ". ")
     }
 }

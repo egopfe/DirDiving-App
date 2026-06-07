@@ -27,7 +27,10 @@ Verify iOS Companion MAIN root chrome on cold launch, tab switches, modals, onbo
 - [ ] Legal onboarding pages fill safe area
 - [ ] Share sheet / PDF export sheet do not expose broken root layout underneath
 
-## Notes
+## Evidence folder
 
-- Fullscreen chrome fix remains **code-complete**; this matrix documents **visual verification gap**.
-- Do **not** claim device-specific black-band resolution without hardware or matching simulator evidence.
+Save screenshots/recordings under:
+
+- `Docs/QA_EVIDENCE/IOS_FULLSCREEN/<device>_<scenario>_YYYYMMDD.png`
+
+Do **not** mark device rows complete without files in that folder.

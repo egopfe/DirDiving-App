@@ -6,6 +6,10 @@ final class WatchMainUILocalizationTests: XCTestCase {
         "live.metric.runtime",
         "live.metric.max_depth",
         "live.metric.avg_depth",
+        "live.a11y.ttv_runtime",
+        "live.a11y.ttv_hint",
+        "dive_reminder.overlay.runtime_a11y",
+        "dive_reminder.overlay.a11y.hint",
         "log.export.subsurface.button",
         "log.delete.button",
         "log.share.csv.button",
@@ -110,11 +114,12 @@ final class WatchMainUILocalizationTests: XCTestCase {
         }
     }
 
-    func testDepthSafetyCopyDiffersBetweenCautionAndCritical() throws {
+    func testDepthSafetyCopyDiffersBetweenCautionCriticalAndExceeded() throws {
         let en = try loadWatchStrings(named: "en")
         let it = try loadWatchStrings(named: "it")
         XCTAssertNotEqual(en["depth.safety.caution.title"], en["depth.safety.critical.title"])
         XCTAssertNotEqual(it["depth.safety.caution.title"], it["depth.safety.critical.title"])
+        XCTAssertNotEqual(en["depth.safety.critical.title"], en["depth.safety.exceeded.title"])
         XCTAssertEqual(en["depth.safety.caution.title"], "Approaching supported depth range")
         XCTAssertEqual(en["depth.safety.critical.title"], "Near maximum supported depth")
     }
