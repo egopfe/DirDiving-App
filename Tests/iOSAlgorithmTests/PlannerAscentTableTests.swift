@@ -148,4 +148,32 @@ final class PlannerAscentTableTests: XCTestCase {
         }
         XCTAssertTrue(plan.decoStops.isEmpty)
     }
+
+    func testBriefingOrderFootnoteLocalizationExists() throws {
+        let en = try loadStrings(named: "en")
+        let it = try loadStrings(named: "it")
+        XCTAssertTrue(en["planner.table.briefing_order.footnote"]?.contains("briefing order") == true)
+        XCTAssertFalse(it["planner.table.briefing_order.footnote", default: ""].isEmpty)
+    }
+
+    private func loadStrings(named language: String) throws -> [String: String] {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let url = root
+            .appendingPathComponent("iOSApp/Resources/\(language).lproj/Localizable.strings")
+        let contents = try String(contentsOf: url, encoding: .utf8)
+        var map: [String: String] = [:]
+        let pattern = #""([^"]+)"\s*=\s*"((?:\\.|[^"\\])*)";"#
+        let regex = try NSRegularExpression(pattern: pattern)
+        let range = NSRange(contents.startIndex..<contents.endIndex, in: contents)
+        regex.enumerateMatches(in: contents, range: range) { match, _, _ in
+            guard let match, match.numberOfRanges == 3,
+                  let keyRange = Range(match.range(at: 1), in: contents),
+                  let valueRange = Range(match.range(at: 2), in: contents) else { return }
+            map[String(contents[keyRange])] = String(contents[valueRange])
+        }
+        return map
+    }
 }

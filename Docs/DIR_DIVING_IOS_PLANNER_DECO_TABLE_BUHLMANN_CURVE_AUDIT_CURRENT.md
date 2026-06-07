@@ -1,5 +1,9 @@
 # DIR DIVING iOS Planner — Decompression Table & Bühlmann Curve Audit (CURRENT)
 
+> **SUPERSEDED for tissue-history chart and ascent briefing order** @ `f8820b7` and later.  
+> Current behavior: primary CURVA = ZH-L16C tissue history; ascent table briefing order documented in [`IOS_PLANNER_CHART_TRUTHFULNESS.md`](IOS_PLANNER_CHART_TRUTHFULNESS.md).  
+> Retained for historical gap analysis only.
+
 **Date:** 2026-06-06  
 **Scope:** iOS Companion MAIN — Planner result UI and Bühlmann algorithm output only (no Watch)  
 **Branch / baseline:** `main` @ `b2ddc4e`  

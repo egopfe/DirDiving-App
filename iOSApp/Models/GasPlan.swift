@@ -445,6 +445,18 @@ struct TechnicalGasAnalysis: Hashable {
 
     var showsFullPlanOxygenExposureWarning: Bool {
         states.contains(.oxygenExposureElevated)
+            || states.contains(.cnsSingleElevated)
+            || states.contains(.cnsDailyElevated)
+            || states.contains(.otuDiveElevated)
+            || states.contains(.otuDailyElevated)
+    }
+
+    var showsWeeklyOTUElevatedWarning: Bool {
+        states.contains(.otuWeeklyElevated)
+    }
+
+    var showsWeeklyOTUMetric: Bool {
+        otuWeekly.isFinite && otuWeekly >= 0
     }
 
     /// Derived presentation-only difference (full-plan CNS minus descent+bottom); not a separate gas-by-gas model.
