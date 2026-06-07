@@ -443,6 +443,10 @@ struct TechnicalGasAnalysis: Hashable {
         checkEnabled && CNSDescentBottomPlannerRule.exceedsPlannerThreshold(percent: cnsDescentBottomPercent)
     }
 
+    var showsFullPlanOxygenExposureWarning: Bool {
+        states.contains(.oxygenExposureElevated)
+    }
+
     /// Derived presentation-only difference (full-plan CNS minus descent+bottom); not a separate gas-by-gas model.
     var cnsAscentDecoEstimatePercent: Double {
         let delta = cnsPercent - cnsDescentBottomPercent

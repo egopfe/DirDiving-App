@@ -71,6 +71,19 @@ final class BuhlmannTissueHistoryTests: XCTestCase {
         )
     }
 
+    func testCompartmentMetricsFailsExplicitlyForInvalidDisplayDepth() {
+        let state = BuhlmannTissueState.airSaturated(surfacePressureBar: PlannerEnvironment.seaLevelSaltWater.surfacePressureBar)
+        let metrics = BuhlmannTissueHistorySampler.compartmentMetrics(
+            compartmentIndex: 0,
+            state: state,
+            depthMeters: -1,
+            gas: BuhlmannTestSupport.nitrox32(),
+            gf: 0.85,
+            environment: .seaLevelSaltWater
+        )
+        XCTAssertNil(metrics)
+    }
+
     func testDecompressionOutputsUnchangedAfterAddingTissueSampling() throws {
         let fixtures = try FixtureLoader.loadAll()
         for fixture in fixtures where fixture.isValid {
