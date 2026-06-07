@@ -1,5 +1,7 @@
 # DIR DIVING — Documentation / Branch Alignment Report (2026-06-06)
 
+> **Superseded for HEAD baseline:** use [`DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md) @ `a69bc4b` (2026-06-07). This file is retained as historical record.
+
 **Scope:** Documentation-only alignment pass. No runtime, algorithm, sync architecture, or persistence changes.
 
 **Baseline audited:** `main` @ `90dc3f5` (`fix(ios): localize Watch photo send and manage button labels`)

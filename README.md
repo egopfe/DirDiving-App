@@ -15,4 +15,4 @@ Quick links:
 | Feature matrix (CSV) | [`Docs/DIR_DIVING_Feature_Comparison.csv`](Docs/DIR_DIVING_Feature_Comparison.csv) |
 | Release / TestFlight | [`Docs/RELEASE_CHECKLIST.md`](Docs/RELEASE_CHECKLIST.md) |
 
-**Release baseline (`main`):** see [`Docs/INDEX.md`](Docs/INDEX.md) for current `origin/main` HEAD — run `xcodegen generate` before opening `DIRDiving.xcodeproj`.
+**Release baseline (`main`):** `origin/main` @ **`a69bc4b`** — deep-code remediation + UI/UX @ `8c7d6e6`. See [`Docs/INDEX.md`](Docs/INDEX.md) and [`Docs/DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](Docs/DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md). Run `xcodegen generate` before opening `DIRDiving.xcodeproj`.

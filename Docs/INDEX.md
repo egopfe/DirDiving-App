@@ -1,33 +1,39 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-07  
-**Branch consigliato:** `main` = `origin/main` @ `4a80c54`  
+**Branch consigliato:** `main` = `origin/main` @ **`a69bc4b`**  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
 
 ---
 
-## Aggiornamento indice 2026-06-07 — Deep code / bug / performance / security audit (`MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`)
+## Aggiornamento indice 2026-06-07 — Documentazione allineata (`DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`)
 
-Audit read-only **MAIN branch only** @ baseline `8c7d6e6` (report commit `4a80c54`). Nessuna modifica a codice sorgente, UI, algoritmi, sync model, o file experimental.
+Pass **docs-only** su `main` @ `a69bc4b`: README, INDEX, matrice CSV, branch strategy, audit cross-links, release/TestFlight notes. Nessun cambiamento a runtime MAIN o file experimental.
 
 | Campo | Valore |
 |-------|--------|
-| **Documento** | [`MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md) |
-| **Overall static readiness** | 78% |
-| **Watch MAIN** | 84% |
-| **iOS MAIN** | 74% |
-| **Security / privacy / sync** | 79% / 73% / 68% |
-| **P0 critical (source)** | 0 |
-| **Top blocker** | `MAIN-AUD-001` — iOS queued Watch sync drops pending without signed import ACK (HIGH) |
-| **Verdict** | **Not ready** for internal/external TestFlight or App Store until `MAIN-AUD-001`, build/test evidence (`MAIN-AUD-013`), and physical QA (`MAIN-AUD-014`) |
+| **Report** | [`DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md) |
+| **Baseline codice** | `a69bc4b` — deep-code remediation + UI/UX @ `8c7d6e6` |
+| **XCTest (sim)** | Watch **171** / iOS **415** passed @ `a69bc4b` |
+| **Verdict docs** | Architettura MAIN allineata; **physical QA ancora PENDING** |
+
+---
+
+## Aggiornamento indice 2026-06-07 — Deep code remediation (`MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_CURRENT.md`)
+
+Remediation **MAIN-AUD-001 … MAIN-AUD-016** (codice) @ `a69bc4b`. Audit originale: [`MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md) @ `4a80c54` (**storico** — issue list pre-fix).
+
+| Campo | Valore |
+|-------|--------|
+| **Report fix** | [`MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_CURRENT.md) |
+| **Physical QA** | [`MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md`](MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md) — tutti **PENDING** |
+| **Verdict release** | Sim/build/test verdi; **non** TestFlight/App Store senza QA fisica ed evidenza esterna Bühlmann |
 
 | Documento correlato | Ruolo |
 |---|---|
-| [`MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md) | Audit completo: architettura, issue matrix `MAIN-AUD-*`, piani 7/14 giorni, checklist TestFlight/App Store |
-| [`DIR_DIVING_UI_UX_READINESS_CODE_100_COMPLETION_REPORT.md`](DIR_DIVING_UI_UX_READINESS_CODE_100_COMPLETION_REPORT.md) | UI/UX code 100% (scope separato da questo audit) |
-
-**Fix first:** `MAIN-AUD-001` → macOS build/test evidence → physical QA matrices.
+| [`MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md) | Audit pre-remediation (riferimento storico) |
+| [`DIR_DIVING_UI_UX_READINESS_CODE_100_COMPLETION_REPORT.md`](DIR_DIVING_UI_UX_READINESS_CODE_100_COMPLETION_REPORT.md) | UI/UX code 100% @ `8c7d6e6` |
 
 ---
 
@@ -355,6 +361,8 @@ Piano implementativo per i **tre tab modalità** del Planner iOS (non i tab risu
 ---
 
 ## Aggiornamento indice 2026-06-06 — allineamento documentazione MAIN
+
+> **Superseded for HEAD:** [`DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md) @ `a69bc4b` (2026-06-07).
 
 Pass **solo documentazione** (nessuna modifica runtime). Backup: `backup/docs-alignment-20260606`.
 
