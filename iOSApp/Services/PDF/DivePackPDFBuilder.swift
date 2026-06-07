@@ -20,6 +20,10 @@ enum DivePackPDFBuilder {
             page.drawParagraph(String(localized: "pdf.export.dive_pack.plan_intro"))
             appendPlanSummary(page: page, context: plannerContext)
 
+            if let ratioDeco = plannerContext.plan.ratioDeco, ratioDeco.method != .buhlmann {
+                appendRatioDecoSection(page: page, context: plannerContext, bundle: ratioDeco)
+            }
+
             page.drawSpacer(16)
             page.drawSectionTitle(String(localized: "pdf.export.section.briefing"))
             plannerContext.plan.briefingLines.forEach { page.drawParagraph($0) }
@@ -29,7 +33,7 @@ enum DivePackPDFBuilder {
             if includeChecklist {
                 let yesLabel = String(localized: "pdf.export.checklist.yes")
                 let noLabel = String(localized: "pdf.export.checklist.no")
-                for item in checklistProfile.checklistItems {
+                for item in checklistProfile.migratedChecklistItems {
                     page.drawChecklistRow(
                         yesLabel: yesLabel,
                         noLabel: noLabel,
@@ -62,6 +66,57 @@ enum DivePackPDFBuilder {
                 page.drawParagraph(
                     "\(Formatters.depth(stop.depthMeters, units: context.unitPreference).text) · \(stop.minutes) min · \(stop.gas)"
                 )
+            }
+        }
+        if !PlannerGasSchedule.bailoutCylinders(from: context.input).isEmpty {
+            page.drawParagraph(String(localized: "planner.bailout.schedule_hint"))
+        }
+    }
+
+    private static func appendRatioDecoSection(
+        page: PDFPageContext,
+        context: PDFExportPlannerContext,
+        bundle: RatioDecoPlanningBundle
+    ) {
+        page.drawSpacer()
+        page.drawSectionTitle(String(localized: "pdf.export.ratio_deco.section"))
+        page.drawParagraph(String(localized: "pdf.export.ratio_deco.disclaimer"))
+        if !bundle.validation.isBuhlmannCompatible {
+            page.drawParagraph(String(localized: "planner.ratio_deco.validation.not_validated_plan"))
+        }
+        page.drawLine(
+            String(localized: "planner.ratio_deco.profile.header"),
+            value: bundle.preset.name
+        )
+        page.drawLine("TTS", value: "\(bundle.schedule.ttsMinutes) min")
+        page.drawLine(
+            String(localized: "pdf.export.ratio_deco.validation"),
+            value: bundle.validation.localizedStatusTitle
+        )
+        page.drawLine(
+            String(localized: "planner.ratio_deco.summary.tts_difference"),
+            value: "\(bundle.schedule.ttsMinutes - context.plan.ttsMinutes) min"
+        )
+        if bundle.schedule.stops.isEmpty {
+            page.drawParagraph(String(localized: "planner.export.no_deco_stops"))
+        } else {
+            for stop in bundle.schedule.stops {
+                page.drawLine(
+                    Formatters.depth(stop.depthMeters, units: context.unitPreference).text,
+                    value: "\(Int(stop.durationMinutes.rounded())) min · \(stop.gasLabel)"
+                )
+            }
+        }
+        for warning in bundle.validation.warnings {
+            switch warning {
+            case .unavailableInBaseMode:
+                page.drawParagraph(String(localized: "planner.ratio_deco.validation.unavailable_base"))
+            case .ceilingViolation:
+                page.drawParagraph(String(localized: "planner.ratio_deco.validation.ceiling"))
+            case .modExceeded:
+                page.drawParagraph(String(localized: "planner.ratio_deco.validation.mod"))
+            case .decoDepthLimitExceeded:
+                page.drawParagraph(String(localized: "planner.mode.deco.depth_limit.message"))
             }
         }
     }

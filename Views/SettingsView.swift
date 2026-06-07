@@ -296,7 +296,7 @@ struct SettingsView: View {
                     : String(localized: "settings.row.units.imperial"),
                 informational: true
             )
-            Picker("Unità", selection: $watchUnits) {
+            Picker(String(localized: "settings.row.units.picker.a11y"), selection: $watchUnits) {
                 Text(String(localized: "settings.row.units.metric")).tag(DIRUnitPreference.metric.rawValue)
                 Text(String(localized: "settings.row.units.imperial")).tag(DIRUnitPreference.imperial.rawValue)
             }

@@ -10,6 +10,15 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 | Commit `HEAD` | __________ |
 | Esecutore | __________ |
 
+## Audit remediation (2026-06-07 — iOS MAIN algorithm math @ `a6ccd8d`)
+
+- [ ] Review [`IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md) — P1–P4 non-physical fixes
+- [ ] Review [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) — source audit
+- [ ] Review [`RATIO_DECO_COMPARATIVE_HEURISTIC.md`](RATIO_DECO_COMPARATIVE_HEURISTIC.md) — Ratio Deco is **heuristic/comparative only**; Bühlmann remains primary
+- [ ] Confirm **no App Store / certification overclaims** in release notes
+- [ ] Physical QA still **PENDING** — [`MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md`](MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md)
+- [ ] External Bühlmann validation still **PENDING** — [`DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md`](DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md)
+
 ## Audit remediation (2026-06-06 — iOS MAIN algorithm @ ecad0d9)
 
 - [ ] Review [`IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) — HIGH-001/002, MED-001…006, cloud profile conflicts, NDL projection, KVS 512 KB cap

@@ -510,6 +510,7 @@
 "planner.ratio_deco.validation.warning" = "Bühlmann warning";
 "planner.ratio_deco.validation.ceiling_violation" = "Ceiling violation";
 "planner.ratio_deco.validation.ceiling" = "The Ratio Deco profile does not respect the Bühlmann ceiling. Increase decompression time or use the Bühlmann profile.";
+"planner.ratio_deco.validation.not_validated_plan" = "NOT a validated decompression plan — Ratio Deco is a comparative heuristic only. Bühlmann remains the primary schedule.";
 "planner.ratio_deco.validation.mod" = "Gas switch exceeds allowed MOD.";
 "planner.ratio_deco.validation.unavailable_base" = "Ratio Deco is not available in Basic Calculation because Basic is no-decompression only.";
 "planner.ratio_deco.summary.buhlmann_tts" = "Bühlmann TTS";
@@ -767,6 +768,7 @@
 "planner.buhlmann.group_9_12" = "Compartments 9–12";
 "planner.buhlmann.group_13_16" = "Compartments 13–16";
 "planner.buhlmann.ndl_reference_title" = "NDL reference curve";
+"planner.buhlmann.ndl_depth_band_note" = "NDL reference curve grouped by depth band for chart readability — not the controlling ZH-L16C tissue compartment.";
 "planner.buhlmann.tissue_chart.a11y.label" = "ZH-L16C tissue loading chart";
 "planner.buhlmann.tissue_chart.a11y.hint" = "Grouped compartment loading over planned runtime.";
 "planner.charts.depth_profile" = "Depth profile";
@@ -821,6 +823,7 @@
 "equipment.title" = "Equipment";
 "equipment.subtitle" = "Configuration, checklist, and field equipment overview.";
 "equipment.card.planning" = "FULL PLANNING";
+"equipment.card.planning.informational" = "Informational equipment notes only — does not run planner calculations or change Bühlmann schedules.";
 "equipment.row.cylinders" = "Cylinders";
 "equipment.row.configuration" = "Configuration";
 "equipment.row.bottom_gas" = "Bottom gas";
@@ -833,7 +836,6 @@
 "equipment.reset.confirm.action" = "Reset profile";
 "equipment.reset.cancel" = "Cancel";
 "equipment.reset.confirm.message" = "Cylinders, gases, SAC, and checklist will return to locally saved standard values.";
-"equipment.badge.field" = "FIELD";
 "equipment.badge.dir.complete.a11y" = "DIR configuration complete";
 "equipment.badge.dir.incomplete.a11y" = "DIR configuration incomplete";
 "equipment.sac_default" = "Default SAC";
@@ -926,6 +928,12 @@
 "planner.segment.switch_travel" = "Switch to travel gas";
 "planner.segment.switch_back_gas" = "Switch to back gas";
 "equipment.checklist.gas_type" = "Gas type";
+"equipment.checklist.gas_composition" = "Gas mix";
+"equipment.checklist.gas_composition_placeholder" = "EAN50 / 18/45 / O₂";
+"equipment.checklist.switch_depth" = "Switch depth";
+"equipment.checklist.switch_depth_placeholder" = "21";
+"equipment.checklist.switch_depth_unit" = "m";
+"equipment.checklist.switch_depth_format" = "switch @ %d m";
 "equipment.checklist.pressure_unit" = "BAR / PSI";
 "equipment.checklist.bar" = "BAR";
 "equipment.checklist.psi" = "PSI";
@@ -1371,6 +1379,8 @@
 "tissue_analytics.source.planned" = "Planned data";
 "tissue_analytics.source.recorded" = "Recorded data";
 "tissue_analytics.source.simulated" = "Simulated data";
+"tissue_analytics.source.simulated_footnote" = "Informational estimate from recorded depth and gas labels with a fixed GF assumption — not a full Bühlmann replay of the logged profile.";
+"tissue_analytics.source.planned_footnote" = "Calculated from the planned Bühlmann profile in the planner.";
 "tissue_analytics.card.dive_profile" = "DIVE PROFILE";
 "tissue_analytics.card.tissue_loading" = "TISSUE LOADING (BÜHLMANN ZH-L16C)";
 "tissue_analytics.card.tissue_trend" = "TISSUE TREND";

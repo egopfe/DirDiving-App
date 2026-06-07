@@ -1,5 +1,11 @@
 import Foundation
 
+// MARK: - iOS Subsurface CSV export
+// Intentionally separate from `Services/SubsurfaceExportService.swift` (Watch target).
+// iOS applies `DiveSessionAlgorithmValidator.normalizedForStorage` and unified depth caps;
+// Watch uses lighter sample filtering for on-device export. Both emit the same CSV column
+// schema so imports remain compatible. Consolidation deferred — shared target membership risk.
+
 enum SubsurfaceExportService {
     enum ExportError: LocalizedError, Equatable {
         case emptySamples

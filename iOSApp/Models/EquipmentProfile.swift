@@ -7,10 +7,53 @@ struct EquipmentChecklistItem: Identifiable, Codable, Hashable {
     var usesGas: Bool = false
     var gasMixKind: GasMixKind = .air
     var gasText: String = ""
+    /// Optional gas-switch depth (meters) for deco/travel checklist items synced from the planner.
+    var switchDepthMeters: Double? = nil
     var pressureText: String = ""
     var pressureUnit: PressureUnit = .bar
     var tankSize: TankSize = .liters12
     var gasRole: GasRole? = nil
+
+    init(
+        id: UUID = UUID(),
+        title: String,
+        isReady: Bool = false,
+        usesGas: Bool = false,
+        gasMixKind: GasMixKind = .air,
+        gasText: String = "",
+        switchDepthMeters: Double? = nil,
+        pressureText: String = "",
+        pressureUnit: PressureUnit = .bar,
+        tankSize: TankSize = .liters12,
+        gasRole: GasRole? = nil
+    ) {
+        self.id = id
+        self.title = title
+        self.isReady = isReady
+        self.usesGas = usesGas
+        self.gasMixKind = gasMixKind
+        self.gasText = gasText
+        self.switchDepthMeters = switchDepthMeters
+        self.pressureText = pressureText
+        self.pressureUnit = pressureUnit
+        self.tankSize = tankSize
+        self.gasRole = gasRole
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        title = try container.decode(String.self, forKey: .title)
+        isReady = try container.decodeIfPresent(Bool.self, forKey: .isReady) ?? false
+        usesGas = try container.decodeIfPresent(Bool.self, forKey: .usesGas) ?? false
+        gasMixKind = try container.decodeIfPresent(GasMixKind.self, forKey: .gasMixKind) ?? .air
+        gasText = try container.decodeIfPresent(String.self, forKey: .gasText) ?? ""
+        switchDepthMeters = try container.decodeIfPresent(Double.self, forKey: .switchDepthMeters)
+        pressureText = try container.decodeIfPresent(String.self, forKey: .pressureText) ?? ""
+        pressureUnit = try container.decodeIfPresent(PressureUnit.self, forKey: .pressureUnit) ?? .bar
+        tankSize = try container.decodeIfPresent(TankSize.self, forKey: .tankSize) ?? .liters12
+        gasRole = try container.decodeIfPresent(GasRole.self, forKey: .gasRole)
+    }
 }
 
 struct EquipmentTemplate: Identifiable, Codable, Hashable {

@@ -84,18 +84,31 @@ struct TissueNarcosisAnalyticsView: View {
     }
 
     private var sourceCapsule: some View {
-        HStack {
-            Text(trace.source.localizedTitle)
-                .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(TissueAnalyticsTheme.labelSecondary)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
-                .background(
-                    Capsule(style: .continuous)
-                        .fill(Color(red: 0.11, green: 0.11, blue: 0.12))
-                        .overlay(Capsule(style: .continuous).stroke(TissueAnalyticsTheme.cardBorder, lineWidth: 1))
-                )
-            Spacer()
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(trace.source.localizedTitle)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(TissueAnalyticsTheme.labelSecondary)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(
+                        Capsule(style: .continuous)
+                            .fill(Color(red: 0.11, green: 0.11, blue: 0.12))
+                            .overlay(Capsule(style: .continuous).stroke(TissueAnalyticsTheme.cardBorder, lineWidth: 1))
+                    )
+                Spacer()
+            }
+            if trace.source == .simulated {
+                Text(String(localized: "tissue_analytics.source.simulated_footnote"))
+                    .font(.system(size: 11))
+                    .foregroundStyle(TissueAnalyticsTheme.labelMuted)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else if trace.source == .planned {
+                Text(String(localized: "tissue_analytics.source.planned_footnote"))
+                    .font(.system(size: 11))
+                    .foregroundStyle(TissueAnalyticsTheme.labelMuted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 
