@@ -607,8 +607,11 @@ struct PlannerView: View {
                 maxSwitchDepthMeters: entry.role != .bottom
                     ? entry.usableSwitchDepthMeters(environment: store.input.plannerEnvironment)
                     : nil,
-                onGasOrPressureChanged: {
+                onGasOrPPO2Changed: {
                     store.normalizeSwitchDepthAfterGasOrPPO2Change(cylinderID: entry.id)
+                },
+                onPressureChanged: {
+                    store.refreshDerivedPlanningPreview()
                 }
             )
             if entry.gas.mixKind == .trimix {
@@ -2387,6 +2390,11 @@ struct PlanResultView: View {
         }
     }
 
+    private func tableColumnAccessibilityLabel(index: Int, value: String, headers: [String]?) -> String {
+        guard let headers, index < headers.count else { return value }
+        return "\(headers[index]): \(value)"
+    }
+
     private func tableRowSummary(_ values: [String]) -> String {
         switch values.count {
         case 2:
@@ -2417,7 +2425,7 @@ struct PlanResultView: View {
                     .accessibilityLabel(
                         isHeader || columnHeaders == nil
                             ? value
-                            : "\(columnHeaders![index]): \(value)"
+                            : tableColumnAccessibilityLabel(index: index, value: value, headers: columnHeaders)
                     )
             }
         }

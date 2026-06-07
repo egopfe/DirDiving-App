@@ -152,6 +152,11 @@ final class WatchSyncService: NSObject, ObservableObject {
         replyHandler: (([String: Any]) -> Void)? = nil
     ) -> Bool {
         if CompanionPhotoManagementSupport.isInventoryRequest(payload) {
+            guard CompanionPhotoManagementSupport.verifySignedRequest(payload) else {
+                lastSyncStatus = String(localized: "sync.trust.mismatch")
+                replyHandler?(["status": "rejected"])
+                return true
+            }
             let requestID = payload[WatchSyncKeys.companionPhotoInventoryRequestIDKey] as? String
             let response = CompanionPhotoManagementSupport.makeInventoryResponsePayload(
                 requestID: requestID,
@@ -165,6 +170,11 @@ final class WatchSyncService: NSObject, ObservableObject {
             return true
         }
         if CompanionPhotoManagementSupport.isDeleteRequest(payload) {
+            guard CompanionPhotoManagementSupport.verifySignedRequest(payload) else {
+                lastSyncStatus = String(localized: "sync.trust.mismatch")
+                replyHandler?(["status": "rejected"])
+                return true
+            }
             handleDeleteRequest(payload)
             replyHandler?(["status": "acknowledged"])
             return true
@@ -216,6 +226,12 @@ final class WatchSyncService: NSObject, ObservableObject {
             status: status,
             errorCode: errorCode
         )
+        deliverCompanionManagementPayload(payload)
+    }
+
+    private func deliverImportAck(sessionID: UUID, issuedAt: Date) {
+        guard WCSession.isSupported(), activationState == .activated else { return }
+        let payload = WatchDiveSyncCodec.makeImportAckPayload(sessionID: sessionID, issuedAt: issuedAt)
         deliverCompanionManagementPayload(payload)
     }
 
@@ -667,7 +683,9 @@ extension WatchSyncService: WCSessionDelegate {
 
     nonisolated func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
         Task { @MainActor in
-            self.ingestIncomingPayload(userInfo)
+            if let ackContext = self.ingestIncomingPayload(userInfo) {
+                self.deliverImportAck(sessionID: ackContext.sessionID, issuedAt: ackContext.issuedAt)
+            }
         }
     }
 

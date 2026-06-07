@@ -1,9 +1,45 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-07  
-**Branch consigliato:** `main` = `origin/main` @ `bc01f04`  
+**Branch consigliato:** `main` = `origin/main` @ `4a80c54`  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-06-07 — Deep code / bug / performance / security audit (`MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`)
+
+Audit read-only **MAIN branch only** @ baseline `8c7d6e6` (report commit `4a80c54`). Nessuna modifica a codice sorgente, UI, algoritmi, sync model, o file experimental.
+
+| Campo | Valore |
+|-------|--------|
+| **Documento** | [`MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md) |
+| **Overall static readiness** | 78% |
+| **Watch MAIN** | 84% |
+| **iOS MAIN** | 74% |
+| **Security / privacy / sync** | 79% / 73% / 68% |
+| **P0 critical (source)** | 0 |
+| **Top blocker** | `MAIN-AUD-001` — iOS queued Watch sync drops pending without signed import ACK (HIGH) |
+| **Verdict** | **Not ready** for internal/external TestFlight or App Store until `MAIN-AUD-001`, build/test evidence (`MAIN-AUD-013`), and physical QA (`MAIN-AUD-014`) |
+
+| Documento correlato | Ruolo |
+|---|---|
+| [`MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md) | Audit completo: architettura, issue matrix `MAIN-AUD-*`, piani 7/14 giorni, checklist TestFlight/App Store |
+| [`DIR_DIVING_UI_UX_READINESS_CODE_100_COMPLETION_REPORT.md`](DIR_DIVING_UI_UX_READINESS_CODE_100_COMPLETION_REPORT.md) | UI/UX code 100% (scope separato da questo audit) |
+
+**Fix first:** `MAIN-AUD-001` → macOS build/test evidence → physical QA matrices.
+
+---
+
+## Aggiornamento indice 2026-06-07 — UI/UX code 100% (`DIR_DIVING_UI_UX_READINESS_CODE_100_COMPLETION_REPORT.md`)
+
+Implementazione UI/UX MAIN @ `8c7d6e6` (localization, a11y, typography, banner policy, planner/logbook fixes). **Codice UI/UX: 100%** nel scope audit UI; QA device matrices ancora pending.
+
+| Campo | Valore |
+|-------|--------|
+| **Documento** | [`DIR_DIVING_UI_UX_READINESS_CODE_100_COMPLETION_REPORT.md`](DIR_DIVING_UI_UX_READINESS_CODE_100_COMPLETION_REPORT.md) |
+| **Commit** | `8c7d6e6` |
+| **Verdict** | Code complete; device QA matrices open |
 
 ---
 

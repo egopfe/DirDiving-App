@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Legacy alias retained for tests; planner uses `PlannerCylinderGasEditorView`.
+/// Legacy alias retained only for unit-test and preview compilation targets.
+/// Active planner UI uses `PlannerCylinderGasEditorView`; this view intentionally renders `EmptyView()`.
 struct GasMixCard: View {
     @Binding var mix: GasMix
     let accent: Color
