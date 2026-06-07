@@ -10,6 +10,7 @@ struct EquipmentChecklistItem: Identifiable, Codable, Hashable {
     var pressureText: String = ""
     var pressureUnit: PressureUnit = .bar
     var tankSize: TankSize = .liters12
+    var gasRole: GasRole? = nil
 }
 
 struct EquipmentTemplate: Identifiable, Codable, Hashable {

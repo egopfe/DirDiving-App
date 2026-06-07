@@ -6,6 +6,8 @@ enum PlannerResultState: String, Codable, Hashable, CaseIterable {
     case unsupportedDepth
     case unsupportedGas
     case unsupportedTrimix
+    case basicNoDecoLimitExceeded
+    case decoDepthLimitExceeded
     case unsupportedProfile
     case modelIncomplete
     case simplifiedReferenceOnly
@@ -152,6 +154,9 @@ struct PlannerValidationResult: Hashable {
         !states.contains(.invalidInput)
             && !states.contains(.unsupportedDepth)
             && !states.contains(.unsupportedGas)
+            && !states.contains(.unsupportedTrimix)
+            && !states.contains(.basicNoDecoLimitExceeded)
+            && !states.contains(.decoDepthLimitExceeded)
             && !states.contains(.unavailable)
             && !states.contains(.invalidEnvironment)
     }
@@ -219,6 +224,22 @@ enum PlannerUserFacingCopy {
                 messageKey: "planner.state.unsupported_trimix.message",
                 hintKey: "planner.state.unsupported_trimix.hint",
                 severity: .warning
+            )
+        case .basicNoDecoLimitExceeded:
+            return localized(
+                id: state.rawValue,
+                titleKey: "planner.mode.basic.no_deco.title",
+                messageKey: "planner.mode.basic.no_deco.message",
+                hintKey: "planner.mode.basic.no_deco.hint",
+                severity: .blocking
+            )
+        case .decoDepthLimitExceeded:
+            return localized(
+                id: state.rawValue,
+                titleKey: "planner.mode.deco.depth_limit.title",
+                messageKey: "planner.mode.deco.depth_limit.message",
+                hintKey: "planner.mode.deco.depth_limit.hint",
+                severity: .blocking
             )
         case .unsupportedProfile:
             return localized(

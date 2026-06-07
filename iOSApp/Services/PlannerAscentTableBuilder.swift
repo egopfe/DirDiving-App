@@ -37,7 +37,12 @@ enum PlannerAscentTableBuilder {
             rows.append(bottomRow)
         }
 
-        rows.append(contentsOf: travelRows(from: enginePlan, environment: environment, depthFormatter: depthFormatter, ppO2Formatter: ppO2Formatter))
+        rows.append(contentsOf: ascentBriefingTravelRows(
+            from: enginePlan,
+            environment: environment,
+            depthFormatter: depthFormatter,
+            ppO2Formatter: ppO2Formatter
+        ))
 
         for stop in decoStops {
             rows.append(
@@ -84,14 +89,16 @@ enum PlannerAscentTableBuilder {
         )
     }
 
-    private static func travelRows(
+    /// Post-bottom ascent briefing rows in engine elapsed order (ascent and gas switches only).
+    private static func ascentBriefingTravelRows(
         from enginePlan: BuhlmannEngineResult,
         environment: PlannerEnvironment,
         depthFormatter: (Double) -> String,
         ppO2Formatter: (Double) -> String
     ) -> [PlannerAscentTableRow] {
-        enginePlan.segments
-            .filter { $0.kind == .descent || $0.kind == .ascent }
+        let postBottomSegments = postBottomSegments(from: enginePlan.segments)
+        return postBottomSegments
+            .filter { $0.kind == .ascent || $0.kind == .gasSwitch }
             .map { segment in
                 let ppO2 = segment.gas.ppO2(depthMeters: segment.depthMeters, environment: environment)
                 return PlannerAscentTableRow(
@@ -105,6 +112,14 @@ enum PlannerAscentTableBuilder {
                     ppO2Label: ppO2Formatter(ppO2)
                 )
             }
+    }
+
+    private static func postBottomSegments(from segments: [BuhlmannRuntimeSegment]) -> [BuhlmannRuntimeSegment] {
+        guard !segments.isEmpty else { return [] }
+        if let lastBottomIndex = segments.lastIndex(where: { $0.kind == .bottom }) {
+            return Array(segments[(lastBottomIndex + 1)...])
+        }
+        return segments.filter { $0.kind != .descent && $0.kind != .bottom }
     }
 
     private static func surfaceRow(depthFormatter: (Double) -> String) -> [PlannerAscentTableRow] {

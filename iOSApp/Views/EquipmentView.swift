@@ -6,6 +6,8 @@ struct EquipmentView: View {
     @State private var savedFeedback: String?
     @State private var newChecklistTitle = ""
     @State private var showTemplatesSheet = false
+    @State private var shareablePDF: ShareablePDFItem?
+    @State private var pdfExportAlertMessage: String?
     @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
 
     var body: some View {
@@ -95,7 +97,29 @@ struct EquipmentView: View {
                 }
                 .dirCompanionScrollSurface()
             }
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        shareChecklistPDF()
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                            .foregroundStyle(DIRTheme.cyan)
+                    }
+                    .accessibilityLabel(Text(String(localized: "pdf.export.share.a11y")))
+                }
+            }
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .sheet(item: $shareablePDF) { item in
+                ShareSheetView(activityItems: [item.url])
+            }
+            .alert(String(localized: "pdf.export.error.title"), isPresented: Binding(
+                get: { pdfExportAlertMessage != nil },
+                set: { if !$0 { pdfExportAlertMessage = nil } }
+            )) {
+                Button(String(localized: "OK"), role: .cancel) {}
+            } message: {
+                Text(pdfExportAlertMessage ?? "")
+            }
             .confirmationDialog(String(localized: "equipment.reset.confirm.title"), isPresented: $showResetConfirmation, titleVisibility: .visible) {
                 Button(String(localized: "equipment.reset.confirm.action"), role: .destructive) {
                     equipment.reset()
@@ -195,6 +219,21 @@ struct EquipmentView: View {
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 1_800_000_000)
             savedFeedback = nil
+        }
+    }
+
+    private func shareChecklistPDF() {
+        guard PDFExportService.hasExportableChecklist(equipment.profile) else {
+            pdfExportAlertMessage = PDFShareActions.emptyChecklistMessage()
+            return
+        }
+        do {
+            let url = try PDFExportService.exportChecklist(profile: equipment.profile)
+            shareablePDF = ShareablePDFItem(url: url)
+        } catch PDFExportError.emptyChecklist {
+            pdfExportAlertMessage = PDFShareActions.emptyChecklistMessage()
+        } catch {
+            pdfExportAlertMessage = String(localized: "pdf.export.error.generation")
         }
     }
 }

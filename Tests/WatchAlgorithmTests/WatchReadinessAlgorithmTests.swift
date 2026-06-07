@@ -82,7 +82,7 @@ final class WatchReadinessAlgorithmTests: XCTestCase {
         XCTAssertEqual(merged.maxDepthMeters, 1.2, accuracy: 0.001)
     }
 
-    func testExportCSVUsesSessionStartAsTimeOrigin() {
+    func testExportCSVUsesFirstSampleAsTimeOrigin() {
         let start = Date(timeIntervalSince1970: 0)
         let session = DiveSession(
             startDate: start,
@@ -100,8 +100,8 @@ final class WatchReadinessAlgorithmTests: XCTestCase {
         )
 
         let csv = SubsurfaceExportService.makeCSV(for: session)!
-        XCTAssertTrue(csv.contains("\n5,10.00"))
-        XCTAssertFalse(csv.contains("\n0,10.00"))
+        XCTAssertTrue(csv.contains("\n0,10.00"))
+        XCTAssertFalse(csv.contains("\n5,10.00"))
     }
 
     func testMonotonicElapsedClockDoesNotDecreaseOnBackwardWallClock() {

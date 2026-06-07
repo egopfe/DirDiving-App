@@ -4,16 +4,45 @@ import XCTest
 final class DiveManagerAlgorithmIntegrationTests: XCTestCase {
     private var diveManager: DiveManager!
     private var logStore: DiveLogStore!
+    private var tempDirectory: URL!
+    private var userDefaultsSuite: UserDefaults!
 
     override func setUp() async throws {
         try await super.setUp()
+        tempDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("DiveManagerAlgorithmIntegration-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: tempDirectory, withIntermediateDirectories: true)
+
+        DiveManager.testHook_draftDirectoryURL = tempDirectory
+        DiveLogStore.testHook_storageDirectoryURL = tempDirectory
+        DiveManager.testHook_suppressDepthSensorProvider = true
+
+        let suiteName = "DiveManagerAlgorithmIntegration-\(UUID().uuidString)"
+        userDefaultsSuite = UserDefaults(suiteName: suiteName)!
+        userDefaultsSuite.removePersistentDomain(forName: suiteName)
+
         logStore = DiveLogStore()
         diveManager = DiveManager(
             logStore: logStore,
             gpsManager: GPSManager(),
-            ascentSettings: AscentRateSettingsStore(defaults: UserDefaults(suiteName: "DiveManagerAlgorithmIntegrationTests")!)
+            ascentSettings: AscentRateSettingsStore(defaults: userDefaultsSuite)
         )
         diveManager.testHook_setDepthAutomationAvailableForTests(true)
+    }
+
+    override func tearDown() async throws {
+        diveManager?.testHook_shutdownTimersForTests()
+        diveManager?.testHook_stopDepthSensorForTests()
+        diveManager?.testHook_clearActiveDiveDraft()
+        DiveManager.testHook_suppressDepthSensorProvider = false
+        DiveManager.testHook_draftDirectoryURL = nil
+        DiveLogStore.testHook_storageDirectoryURL = nil
+        if let tempDirectory {
+            try? FileManager.default.removeItem(at: tempDirectory)
+        }
+        diveManager = nil
+        logStore = nil
+        try await super.tearDown()
     }
 
     func testAutoStartAddsTriggeringSampleOnce() {

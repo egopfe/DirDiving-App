@@ -46,6 +46,8 @@ extension AppleDepthSensorProvider: CMWaterSubmersionManagerDelegate {
 
     nonisolated func manager(_ manager: CMWaterSubmersionManager, didUpdate measurement: CMWaterSubmersionMeasurement) {
         Task { @MainActor in
+            // CoreMotion does not expose a stable sample timestamp on all watchOS builds;
+            // receipt time is used for ordering while callback-silence handles stale delivery.
             onDepthMeasurement?(
                 measurement.depth?.converted(to: .meters).value,
                 Date(),

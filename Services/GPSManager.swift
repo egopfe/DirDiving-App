@@ -11,6 +11,8 @@ final class GPSManager: NSObject, ObservableObject {
     private let locationManager = CLLocationManager()
     private var previousSpeedSample: (point: GPSPoint, date: Date)?
     private var bestEffortCapture: BestEffortCapture?
+    /// True while dive runtime or an explicit capture owns location updates.
+    private(set) var maintainsLocationUpdates = false
     var testHook_holdBestEffortCapture = false
     private var heldBestEffortCompletion: (@MainActor (GPSPoint?) -> Void)?
 
@@ -28,8 +30,15 @@ final class GPSManager: NSObject, ObservableObject {
     }
 
     func requestAuthorization() { locationManager.requestWhenInUseAuthorization() }
-    func start() { requestAuthorization(); locationManager.startUpdatingLocation() }
-    func stop() { locationManager.stopUpdatingLocation() }
+    func start() {
+        requestAuthorization()
+        maintainsLocationUpdates = true
+        locationManager.startUpdatingLocation()
+    }
+    func stop() {
+        maintainsLocationUpdates = false
+        locationManager.stopUpdatingLocation()
+    }
     func currentBestPoint() -> GPSPoint? {
         let assessment = GPSFallbackPolicy.assess(lastPoint)
         fallbackQuality = assessment.quality
@@ -84,7 +93,9 @@ extension GPSManager: CLLocationManagerDelegate {
     nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         Task { @MainActor in
             authorizationStatus = manager.authorizationStatus
-            if authorizationStatus == .authorizedAlways || authorizationStatus == .authorizedWhenInUse { manager.startUpdatingLocation() }
+            guard authorizationStatus == .authorizedAlways || authorizationStatus == .authorizedWhenInUse else { return }
+            guard maintainsLocationUpdates || bestEffortCapture != nil else { return }
+            manager.startUpdatingLocation()
         }
     }
 

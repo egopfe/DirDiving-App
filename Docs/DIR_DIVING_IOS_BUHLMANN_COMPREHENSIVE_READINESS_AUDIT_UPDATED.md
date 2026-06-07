@@ -1,713 +1,425 @@
-# DIR Diving iOS Buhlmann Comprehensive Readiness Audit - Updated
+# DIR Diving iOS Bühlmann Comprehensive Readiness Audit — Updated
 
-Date: 2026-06-04  
-Repository: `https://github.com/egopfe/DirDiving-App.git`  
-Branch audited: `main`  
-Latest local/remote HEAD before report creation: `40bf110` - `docs: add security exploit remediation plan`  
-Scope: iOS Companion MAIN branch, Planner only  
-Execution mode: Windows static analysis only
+Date: 2026-06-07
+Repository: `https://github.com/egopfe/DirDiving-App.git`
+Audited branch: `main`
+Audited HEAD: `93d632450c0579f9215c3f3e2eb78c06332c4847` (`93d6324`)
+HEAD subject: `feat(ios): add tissue loading and narcosis analytics for planner and logbook`
+Scope: iOS Companion MAIN branch, Planner only
+Execution mode: Windows static analysis only; no `xcodegen` / `xcodebuild` execution on this host
 
 ## Executive Verdict
 
-Status: **Partially ready**
+Status: **Almost ready**
 
-The iOS Companion Planner now contains a substantial iOS-only Buhlmann ZHL-16C multigas reference engine with nitrogen, helium, trimix, gradient factors, decompression stops, gas switching, validation layers, schedule gas consumption, CNS reporting, and localized planner copy.
+The current iOS Companion Planner contains a coherent non-certified Bühlmann ZH-L16C reference engine with 16 nitrogen compartments, 16 helium compartments, trimix/helium support, gradient factors, tissue-state NDL, environment-aware pressure modeling, multigas runtime segments, decompression stops, tissue-history sampling, oxygen exposure estimates, localized CNS copy, and a large iOS algorithm test suite.
 
-The Buhlmann decompression core appears broadly coherent from static inspection and is much stronger than the earlier simplified/reference-only planner. However, the planner should **not** yet be treated as fully release-hard for internal validation because one oxygen-exposure issue remains safety-significant:
+No fresh P0/P1 planner math blocker was found in this static pass. The earlier audit's OTU "inverted formula" concern should not be carried forward against current HEAD: `OxygenExposureModels.swift` now uses the monotonic Lambertsen-style `((PPO2 - 0.5) / 0.5)^(5/6)` form, and the repo has independent OTU fixture tests for that direction.
 
-- **P0/P1: OTU constant-depth calculation appears inverted** in `OxygenExposureModels.swift`, and current tests/documentation encode the same formula. This can materially understate OTU exposure at elevated PPO2.
+The planner is **not fully Ready** because current HEAD still needs macOS build/test validation, external decompression-planner comparison, simulator UI QA, and a few product-readiness fixes. The most important code-facing gap is presentational: the ascent/deco table uses real engine data but is not built in strict chronological order. The most important UI clarity gap is that the full-plan CNS dashboard tile stays green even when oxygen-exposure warnings exist elsewhere.
 
-The CNS model and the specific **CNS Descent + Bottom 15% warning** are implemented, localized, visible, and test-covered. The remaining blockers are primarily oxygen toxicity correctness, external validation, macOS build/test execution on current HEAD, and a few planner realism/documentation refinements.
+Recommended release posture:
+
+- **Internal algorithm validation:** conditional yes after macOS `xcodegen` + iOS build + iOS algorithm tests pass on `93d6324` or newer.
+- **Internal TestFlight planning:** almost ready after the P2 presentation/UI gaps are fixed or explicitly deferred in release notes.
+- **Release candidate / App Store claim:** not ready until external mathematical validation, simulator/device QA, and documentation baselines are updated.
 
 ## Scope Confirmation
 
-This audit inspected only the iOS Companion MAIN planner-related code and documentation.
+This audit intentionally inspected the iOS Companion Planner on MAIN only.
 
-Confirmed constraints:
+Included:
 
-- No Apple Watch code was modified.
-- No watchOS targets were modified.
-- No experimental branch/files were modified.
-- No UI, graphics, colors, navigation, layout, icons, animations, or business logic were changed.
-- No fixes were implemented.
+- iOS planner Swift code under `iOSApp/Algorithms/Buhlmann`, planner services, planner models, planner utilities, planner UI, planner localization, iOS algorithm tests, `project.yml`, and planner documentation.
+
+Excluded:
+
+- Apple Watch runtime algorithms, Watch UI, Watch targets, Watch-only tests, experimental branches, experimental files, generated Xcode project contents, and unrelated app features.
+
+Actions taken:
+
+- Created this updated report only.
+- No Swift code was modified.
+- No UI, algorithm, localization, or test files were modified.
 - No commit or push was performed.
-- On Windows, `xcodegen` and `xcodebuild` were not run.
-
-The audit used static inspection of Swift, localization files, tests, `project.yml`, and documentation.
 
 ## Repository State
 
-Preflight findings:
+Preflight state:
 
 - Current branch: `main`
 - Upstream: `origin/main`
-- Divergence before report creation: `0 ahead / 0 behind`
+- Divergence: `0 ahead / 0 behind`
 - Remote: `https://github.com/egopfe/DirDiving-App.git`
-- Latest commit before report creation: `40bf11025f0254166435e7ac0e7e3622e8e0f20b`
-- Operating system: Windows 10
+- Latest audited commit: `93d632450c0579f9215c3f3e2eb78c06332c4847`
+- Commit date: `2026-06-06 22:34:33 +0200`
+- Working environment: Windows 10 / PowerShell
 - `xcodegen`: unavailable on this host
 - `xcodebuild`: unavailable on this host
 
-`project.yml` confirms:
-
-- iOS target: `DIRDiving iOS`
-- iOS bundle ID: `com.egopfe.dirdiving.ios`
-- iOS sources: `iOSApp`
-- iOS algorithm test target: `DIRDiving iOS Algorithm Tests`
-- Experimental iOS files are explicitly excluded from the main iOS target.
-- Watch targets exist, but were outside this audit scope.
+`project.yml` confirms the main iOS target `DIRDiving iOS`, the iOS algorithm test target `DIRDiving iOS Algorithm Tests`, and explicit exclusions for experimental iOS files. Watch targets exist in the repo, but were outside this audit scope.
 
 ## Files Inspected
 
-Core Buhlmann engine:
+Core Bühlmann engine:
 
 - `iOSApp/Algorithms/Buhlmann/BuhlmannConstants.swift`
 - `iOSApp/Algorithms/Buhlmann/BuhlmannGas.swift`
 - `iOSApp/Algorithms/Buhlmann/BuhlmannTissueModel.swift`
 - `iOSApp/Algorithms/Buhlmann/BuhlmannEngine.swift`
+- `iOSApp/Algorithms/Buhlmann/BuhlmannTissueHistory.swift`
 - `iOSApp/Algorithms/Buhlmann/BuhlmannPlanPreflightValidator.swift`
-- `iOSApp/Algorithms/Buhlmann/BuhlmannTypes.swift`
 
-Planner services and models:
+Planner services, models, utilities:
 
+- `iOSApp/Services/BuhlmannPlanner.swift`
 - `iOSApp/Services/PlannerService.swift`
-- `iOSApp/Services/PlannerStore.swift`
 - `iOSApp/Services/GasPlanningService.swift`
 - `iOSApp/Services/PlannerGasSchedule.swift`
 - `iOSApp/Services/ScheduleGasConsumptionService.swift`
+- `iOSApp/Services/PlannerEnvironment.swift`
 - `iOSApp/Services/RepetitiveDivePlannerService.swift`
-- `iOSApp/Models/GasPlan.swift`
+- `iOSApp/Services/OxygenExposureModels.swift`
+- `iOSApp/Services/TissueAnalyticsService.swift`
+- `iOSApp/Services/PlannerAscentTableBuilder.swift`
 - `iOSApp/Models/DivePlan.swift`
-- `iOSApp/Models/OxygenExposureModels.swift`
-- `iOSApp/Models/PlannerEnvironment.swift`
+- `iOSApp/Models/GasPlan.swift`
 - `iOSApp/Utils/PlannerInputValidator.swift`
-- `iOSApp/Utils/GasMixValidator.swift`
-- `iOSApp/Utils/PlannerResultState.swift`
-- `iOSApp/Utils/PlanCalculationCompleteness.swift`
+- `iOSApp/Utils/IOSUnitConversions.swift`
+- `iOSApp/Utils/IOSAlgorithmConfiguration.swift`
+- `iOSApp/Utils/PlannerSafetyAcknowledgment.swift`
+- `iOSApp/Utils/PlannerCNSDescentBottomCheckSettings.swift`
+- `iOSApp/Utils/PlannerGasEditingSupport.swift`
 
 Planner UI and localization:
 
 - `iOSApp/Views/PlannerView.swift`
+- `iOSApp/Views/PlannerGasMixCard.swift`
+- `iOSApp/Views/PlannerCylinderGasEditorView.swift`
 - `iOSApp/Views/MoreView.swift`
 - `iOSApp/Resources/en.lproj/Localizable.strings`
 - `iOSApp/Resources/it.lproj/Localizable.strings`
 
-Tests:
+Tests and fixtures:
 
-- `Tests/iOSAlgorithmTests/*`
-- `Tests/iOSAlgorithmTests/Fixtures/*`
+- Static enumeration found **355** `func test` definitions under `Tests/iOSAlgorithmTests`.
+- Key audited test files include `BuhlmannConstantsTests.swift`, `BuhlmannPressureModelTests.swift`, `BuhlmannTissueLoadingTests.swift`, `BuhlmannSchreinerEquationTests.swift`, `BuhlmannGradientFactorTests.swift`, `BuhlmannNDLTests.swift`, `BuhlmannTrimixHeliumTests.swift`, `BuhlmannMultigasPlannerTests.swift`, `BuhlmannReleaseHardeningTests.swift`, `BuhlmannReauditFixTests.swift`, `BuhlmannTissueHistoryTests.swift`, `PlannerCurveChartTests.swift`, `PlannerAscentTableTests.swift`, `PlannerDepthProfileTests.swift`, `CNSDescentBottomTests.swift`, `PlannerCNSCopyTests.swift`, `OxygenExposureDeepModelTests.swift`, `OTUCanonicalFixtureTests.swift`, `OTUIntegrationRefinementTests.swift`, `BuhlmannGoldenFixtureTests.swift`, and `Tests/iOSAlgorithmTests/Fixtures/*.json`.
 
 Documentation:
 
+- `Docs/IOS_PLANNER_CHART_TRUTHFULNESS.md`
+- `Docs/DIR_DIVING_IOS_OXYGEN_EXPOSURE_MODEL.md`
 - `Docs/DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`
 - `Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`
 - `Docs/DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`
-- `Docs/DIR_DIVING_IOS_OXYGEN_EXPOSURE_MODEL.md`
-- `Docs/DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md`
-- `Docs/BUILD_VALIDATION.md`
-- `Docs/IOS_PLANNER_CNS_UI_UX_FIX_VERIFICATION.md`
+- `Docs/DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`
+- `Docs/README.md`
+- `README.md`
 
-## Buhlmann Mathematical Model Assessment
+## Bühlmann Mathematical Model Assessment
 
-### ZHL-16C Constants
+| Area | Assessment | Evidence | Readiness |
+| --- | --- | --- | --- |
+| ZH-L16C compartments | 16 N2 and 16 He half-time tables are present. | `BuhlmannConstants.swift:3-50` | Good |
+| Mixed inert coefficients | A/B coefficients are pressure-weighted by N2/He tissue pressures. | `BuhlmannConstants.swift:52-60`, `BuhlmannNumericalRobustnessTests.swift` | Good |
+| Water vapor | Inspired inert pressure subtracts water vapor. | `BuhlmannGas.swift:65-79` | Good |
+| Surface pressure | Planner environment uses barometric surface pressure; sea-level baseline is `1.01325 bar`. | `PlannerEnvironment.swift`, `BuhlmannConstants.swift` | Good |
+| Tissue loading | Constant-depth and linear-depth loading use the shared tissue loaders. | `BuhlmannTissueModel.swift:38-68` | Good |
+| Ceiling | Ceiling converts tolerated ambient pressure through the active `PlannerEnvironment`. | `BuhlmannTissueModel.swift:70-92` | Good |
+| Gradient factors | GF Low/High interpolate by stop depth. | `BuhlmannEngine.swift:192-200` | Good, with policy note |
+| NDL | Tissue-state NDL binary search returns finite values; tests reject fake `999`. | `BuhlmannEngine.swift:137-190`, `BuhlmannNDLTests.swift` | Good |
+| Stops | First stop derives from GF Low ceiling; stop propagation checks next-depth ceiling. | `BuhlmannEngine.swift:294-407` | Good |
+| Gas switching | Travel/deco switch points and PPO2 bounds are validated; higher O2 deco gas is preferred when valid. | `BuhlmannEngine.swift:554-679`, `BuhlmannEngine.swift:765-774` | Good |
+| Gas identities | `gasMixId`, `cylinderId`, and `allocationKey` reduce duplicate-label ledger ambiguity. | `BuhlmannGas.swift:3-15`, `ScheduleGasConsumptionService.swift` | Good |
+| Bailout | Bailout is intentionally schedule/ledger messaging only, not part of the primary Bühlmann schedule. | `BuhlmannPlanner.swift:257-287`, `PlannerGasSchedule.swift:157-163` | Acceptable if documented |
 
-Assessment: **Mostly ready**
+Policy note: code currently requires `gfLow < gfHigh` in both `PlannerInputValidator.swift:53-58` and `BuhlmannEngine.swift:210-216`. If the product requirement is truly "GF Low <= GF High", equality is rejected today. This is conservative fail-closed behavior, but it should be documented or adjusted.
 
-Evidence:
+## Tissue History / CURVA BÜHLMANN Assessment
 
-- 16 nitrogen half-times are present.
-- 16 helium half-times are present.
-- 16 nitrogen `a/b` coefficients are present.
-- 16 helium `a/b` coefficients are present.
-- `BuhlmannConstants.compartmentCount` is set to 16.
-- Water vapor pressure is centralized as `0.0627 bar`.
-- Surface pressure is centralized as `1.01325 bar`.
-- Saltwater/freshwater density is centralized through planner environment handling.
+The current CURVA BÜHLMANN implementation is materially stronger than an NDL-only chart.
 
-The constants are isolated in `BuhlmannConstants.swift`, which is the correct architecture for release-hard validation.
-
-Remaining requirement:
-
-- Keep an external reference table in documentation and test fixtures to prove exact constant provenance and tolerance.
-
-### Ambient Pressure / Inspired Gas Pressure
-
-Assessment: **Ready for internal validation**
-
-Evidence:
-
-- `PlannerEnvironment` models salinity and altitude.
-- `AmbientPressureModel` converts depth to ambient pressure using environment.
-- Inspired inert gas pressure subtracts water vapor pressure.
-- Oxygen is not loaded as inert gas.
-- N2 and He inspired pressures are independent.
-
-The previous mismatch between air saturation at `1.0 bar` and sea-level `1.01325 bar` appears fixed: `BuhlmannTissueModel.airSaturated()` now uses `BuhlmannConstants.seaLevelSurfacePressureBar`.
-
-### Tissue Loading
-
-Assessment: **Ready for internal validation**
+| Question | Answer |
+| --- | --- |
+| Is the old NDL curve replacing tissue loading? | **No.** The primary chart uses `DivePlanResult.tissueHistory.groupedPoints`; the NDL curve is a secondary reference chart only when enabled. |
+| Are all 16 compartments modeled? | **Yes.** The sampler emits 16 compartment samples per timestamp and tests assert the full `0..<16` set. |
+| Are compartments grouped clearly? | **Yes.** Groups are `1-4`, `5-8`, `9-12`, and `13-16`, using max load per group. |
+| Is tissue history derived from the actual plan? | **Yes.** `BuhlmannTissueHistorySampler` replays `BuhlmannEngineResult.segments` from the engine result. |
+| Does chart sampling mutate decompression math? | **No evidence of mutation.** The engine builds an `engineResult` with empty history, samples afterward, then returns a copy with the same plan outputs. Tests compare fixture TTS/stops after adding sampling. |
+| Does the chart fail safely? | **Mostly yes.** Invalid/blocking plans return empty history and the UI shows an empty state instead of substituting a misleading NDL-only primary chart. |
 
 Evidence:
 
-- Independent nitrogen and helium compartment pressures exist.
-- Constant-depth exponential loading is implemented.
-- Linear ascent/descent loading uses Schreiner-style segment loading.
-- Gas switches preserve tissue state and change inspired gas pressure for subsequent segments.
-- Zero/negative durations are guarded by planner/engine validation paths.
+- Sampling is attached after plan construction: `BuhlmannEngine.swift:106-131`.
+- Segment replay and grouped output: `BuhlmannTissueHistory.swift:36-122`.
+- Group mapping: `BuhlmannTissueHistory.swift:247-254`.
+- UI chart data source: `PlannerView.swift:2299-2341`.
+- Tests: `BuhlmannTissueHistoryTests.swift` and `PlannerCurveChartTests.swift`.
 
-Static inspection did not find obvious NaN/infinity propagation in the core tissue update paths for valid input.
+Remaining concern: display metrics in `BuhlmannTissueHistory.swift:276-279` fall back to sea-level surface pressure if an ambient conversion unexpectedly returns nil. Since planner environment validation normally prevents that path, this is low risk, but a chart should preferably fail empty rather than silently use sea-level display math.
 
-### Mixed N2 / He Coefficients
+## Decompression Table / PIANO DI RISALITA Assessment
 
-Assessment: **Ready for internal validation**
+| Row type | Current source | Assessment |
+| --- | --- | --- |
+| Bottom | Real bottom segments at max bottom depth. | Good source. |
+| Travel | Real `.descent` and `.ascent` runtime segments. | Real data, but row semantics/order are weak. |
+| Deco stops | Real `DecoStop` values from the engine result. | Good source. |
+| Surface | Static terminal row. | Acceptable. |
+| PPO2 | Calculated from row gas and row depth; stops carry engine PPO2. | Good. |
+| TTS | `DivePlanResult.ttsMinutes` comes from `BuhlmannEngineResult.ttsMinutes`. | Good. |
+| Runtime/TTR wording | Dashboard shows separate `TTS` and `Runtime`; briefing copy says `TTS/TTR estimate` while receiving only `tts`. | Copy ambiguity; fix wording or data. |
 
-Evidence:
+P2 finding: `PlannerAscentTableBuilder.rows` appends bottom first, then every descent/ascent travel segment, then decompression stops, then surface (`PlannerAscentTableBuilder.swift:36-57`). Because `travelRows` filters both `.descent` and `.ascent` segments (`PlannerAscentTableBuilder.swift:87-108`), the table is based on real data but is not a clean chronological ascent/decompression briefing. Existing tests assert bottom/deco/surface presence and TTS mapping, but do not assert chronological row order.
 
-- Mixed coefficients are weighted by N2 and He tissue pressure contribution.
-- Near-zero inert pressure is protected by epsilon logic.
-- Ceiling calculation uses mixed coefficients rather than nitrogen-only coefficients.
+Recommended future fix:
 
-Remaining requirement:
+- Build table rows from engine segments in elapsed-time order, or explicitly split "descent/bottom" from "ascent/deco" so the PIANO DI RISALITA table reads as an ascent plan.
+- Add tests for travel row order, ascent rows, PPO2 labels, and mixed travel/deco gas schedules.
 
-- Continue validating mixed N2/He ceilings against external fixtures, especially low-inert-pressure edge cases.
+## GRAFICI / Depth Profile Assessment
 
-### Ceiling / Gradient Factors / Decompression Stops
+The depth profile chart is truthful in source and shape.
 
-Assessment: **Ready for internal validation, not yet externally validated**
+- `PlannerDepthProfileBuilder.points` walks `DivePlanSegment` values in order, starts at surface, appends start/end depth points, and ends at surface if needed.
+- The chart in `PlannerView.swift` uses `store.plan.depthProfilePoints`.
+- `PlannerDepthProfileTests.swift` checks that points derive from real plan segments and end at surface.
 
-Evidence:
-
-- Ceiling calculation is compartment-based.
-- GF Low and GF High are validated.
-- Decompression schedule is generated from tissue ceilings, not static stop templates.
-- GF affects ceilings and stop generation rather than only labels.
-- `GF 30/70` vs `GF 50/80` comparisons are tested.
-- `PlanCalculationCompleteness` prevents partial schedules from being shown as complete when calculation limits are reached.
-
-Remaining requirement:
-
-- External reference validation is still pending before public release claims.
-
-### NDL Calculation
-
-Assessment: **Ready for internal validation**
-
-Evidence:
-
-- NDL is tissue-state based.
-- No fake `999 min` NDL fallback was found in the current engine path.
-- NDL search is bounded by a maximum bottom time.
-- Invalid or incomplete states use typed result states rather than authoritative-looking outputs.
-
-Remaining requirement:
-
-- Compare NDL values against known reference planners across air, nitrox, and trimix profiles.
-
-### Multigas / Trimix / Helium
-
-Assessment: **Substantially implemented**
-
-Evidence:
-
-- Air, nitrox, trimix, oxygen-rich deco gas, and helium-bearing gases are represented.
-- Helium tissue loading is supported.
-- Trimix no longer has to fall back to `unsupportedTrimix` when mathematically valid.
-- Multiple cylinders and gases are modeled.
-- Deco gas switch validation exists.
-- Gas switch depth, MOD, hypoxic minimum operating depth, and duplicate gas composition checks exist.
-
-Remaining limitation:
-
-- Travel gas to bottom gas switch modeling appears simplified. The schedule can model travel gases on descent until the maximum depth before switching to bottom gas. There is no explicit bottom-gas switch depth separate from maximum depth. This can distort tissue loading and gas consumption for some hypoxic trimix/travel-gas protocols.
+Readiness: **Good**, pending simulator visual QA to confirm chart framing, labels, and small-screen layout.
 
 ## CNS / OTU / 15% Rule Assessment
 
-### Is Total CNS Calculated?
+| Area | Assessment | Evidence |
+| --- | --- | --- |
+| Full-plan CNS | Integrated over the complete engine segment schedule. | `GasPlanningService.swift:131-132`, `OxygenExposureModels.swift:245-323` |
+| Descent+bottom CNS | Separate planner-only metric filters `.descent` and `.bottom` only. | `OxygenExposureModels.swift:235-243` |
+| Deco/ascent contribution | Displayed as derived `max(0, fullPlanCNS - descentBottomCNS)`. | `GasPlan.swift:446-451`, `PlannerCNSCopyTests.swift` |
+| 15% threshold | Uses strict `> 15%`; exactly 15% is acceptable. | `OxygenExposureModels.swift:12-20`, `CNSDescentBottomTests.swift` |
+| Toggle | Default-on setting in More. | `PlannerCNSDescentBottomCheckSettings.swift`, `MoreView.swift:254-267` |
+| UI warning | Red tile/icon and red warning banner when enabled and threshold exceeded. | `PlannerView.swift:1142-1174`, `PlannerView.swift:1683-1699` |
+| Localization | EN/IT keys exist for labels, footnotes, warning, hint, accessibility. | `PlannerCNSCopyTests.swift`, `Localizable.strings` |
+| OTU direction | Current implementation is monotonic with PPO2 for fixed duration. | `OxygenExposureModels.swift:147-184`, `OTUCanonicalFixtureTests.swift` |
+| O2 deco contribution | Full-profile tests include EAN50 and O2 stop segments increasing CNS/OTU over bottom-only. | `OxygenExposureDeepModelTests.swift:75-85` |
 
-Assessment: **Yes**
-
-Evidence:
-
-- `OxygenExposureModel.from(segments:carryover:)` integrates oxygen exposure over the planner schedule.
-- `GasPlanningService.analyze(input:enginePlan:)` computes oxygen exposure from `enginePlan.segments`.
-- `TechnicalGasAnalysis.cnsPercent` stores the full schedule CNS estimate.
-
-### Does Total CNS Include Decompression?
-
-Assessment: **Yes**
-
-Evidence:
-
-- The full oxygen exposure model receives `enginePlan.segments`, which include descent, bottom, ascent, gas switch, and stop phases.
-- Deco stop and ascent exposure therefore contribute to `cnsPercent`.
-- Planner UI labels this value as `planner.metric.cns_full_plan`.
-
-### Is CNS Descent + Bottom Calculated Separately?
-
-Assessment: **Yes**
-
-Evidence:
-
-- `OxygenExposureModel.cnsPercentDescentAndBottom(segments:)` filters only `.descent` and `.bottom` segments.
-- `GasPlanningService.resolvedCNSDescentBottomPercent(...)` exposes this value.
-- `TechnicalGasAnalysis.cnsDescentBottomPercent` stores it.
-
-### Is Decompression Excluded From CNS Descent + Bottom?
-
-Assessment: **Yes**
-
-Evidence:
-
-- The filter includes only `.descent` and `.bottom`.
-- Test coverage explicitly checks that ascent/deco/gas switch segments do not increase descent+bottom CNS.
-
-### Does the 15% Rule Exist?
-
-Assessment: **Yes**
-
-Evidence:
-
-- `CNSDescentBottomPlannerRule.warningThresholdPercent = 15.0`
-- `exceedsPlannerThreshold` returns true only when the value is greater than 15%.
-- Tests verify that exactly 15% is acceptable and 15.01% exceeds the threshold.
-
-### Is the Warning Red / Visible?
-
-Assessment: **Yes, from static UI inspection**
-
-Evidence:
-
-- `PlannerView` renders a red warning tile/banner when `cnsDescentBottomWarningActive` is true.
-- The warning includes localized title, hint, red styling, and accessibility label/hint.
-
-### Is the CNS / OTU UI Clear?
-
-Assessment: **Mostly yes**
-
-The UI distinguishes:
-
-- CNS Preview
-- CNS Full Plan
-- CNS Descent + Bottom
-- CNS Ascent / Deco estimate
-- OTU
-- Daily CNS / OTU context
-- Air-break note
-- Reference-only oxygen exposure disclaimer
-
-This is a strong UX improvement. The main copy gap is that exported/share text still uses a generic `CNS` label and should mirror the UI by saying `CNS full plan` or equivalent.
-
-### OTU Correctness
-
-Assessment: **Not ready**
-
-Finding:
-
-`OTUModel.otuIncrementConstant(ppO2:minutes:)` appears to implement:
-
-```swift
-minutes * pow((0.5 / (ppO2 - 0.5)), 5.0 / 6.0)
-```
-
-For PPO2 greater than 1.0, this decreases exposure as PPO2 rises, which is opposite to the common Lambertsen UPTD/OTU relationship. The expected constant-depth form is generally:
-
-```swift
-minutes * pow(((ppO2 - 0.5) / 0.5), 5.0 / 6.0)
-```
-
-Impact:
-
-- OTU can be materially understated for high PPO2.
-- Daily/weekly OTU warnings may be delayed.
-- Documentation currently repeats the same inverted formula.
-- Existing tests compare against the implemented formula, so they do not catch the issue.
-
-Priority: **P0/P1**
+P2 UI clarity gap: the full-plan CNS dashboard tile is always green (`PlannerView.swift:1635-1640`) even when `GasPlanningService` has appended `.oxygenExposureElevated` (`GasPlanningService.swift:702-703`) and warning cards are shown elsewhere. The data is not lost, but the dashboard color can imply "safe" when the full-plan CNS is elevated.
 
 ## Algorithmic Consistency Assessment
 
-### Planner Input Validation
+Strong points:
 
-Assessment: **Strong**
+- `PlannerService.makePlan` builds a single canonical `BuhlmannEngineResult` and derives stops, TTS, runtime, depth profile, ascent table, gas analysis, CNS/OTU, and tissue history from that result.
+- Repetitive planning seeds `initialTissueState` before the canonical run rather than recomputing deco metrics from a clean-dive assumption.
+- GF comparison helper plans are explicitly comparison outputs and use the seeded base request.
+- Gas planning uses the same environment for ambient pressure, consumption, MOD, and oxygen exposure.
+- Bailout exclusion is explicit and surfaced in UI hints rather than silently folded into decompression math.
 
-Evidence:
+Gaps:
 
-- `PlannerInputValidator` validates depth, average depth, bottom time, SAC/RMV, emergency SAC, team size, temperature, gradient factors, environment, gas density, cylinders, team member SAC/cylinders, and gas mixes.
-- `GasMixValidator` validates O2, He, O2+He, max PPO2, MOD, density, and hypoxic minimum operating depth.
-- `PlannerService` fails closed when validation fails.
-
-Remaining issue:
-
-- Some validator messages remain hardcoded in Italian and may surface in user-facing states or generated briefings.
-
-### Gas Planning
-
-Assessment: **Strong, with known modeling limitations**
-
-Evidence:
-
-- Gas consumption is schedule-aware through `ScheduleGasConsumptionService`.
-- Per-cylinder ledgers are stable and role-aware.
-- Negative or insufficient gas states are represented as warnings/result states.
-- PPO2 is exposed as actual PPO2, not clipped.
-- END, EAD, PPN2, gas density, CNS, OTU, and reserve logic exist.
-
-Remaining limitations:
-
-- Bailout cylinders are schedule-only and not part of decompression tissue optimization.
-- Travel-to-bottom switch depth modeling is simplified.
-
-### Planner Result States
-
-Assessment: **Strong**
-
-Evidence:
-
-- Typed states such as invalid input, simplified reference, unavailable, PPO2 exceeded, MOD exceeded, insufficient gas, below reserve, gas density warnings, and calculation limits are present.
-- The planner avoids presenting invalid states as authoritative decompression plans.
-
-### Logbook / Import / Export / Sync
-
-Assessment: **Previously hardened, not the main focus of this planner audit**
-
-The current iOS algorithm hardening appears to include central validation and time-weighted math. No obvious planner regression was found from static inspection, but this audit focused on planner/Buhlmann readiness rather than full import/export revalidation.
+- Ascent table presentation order is not canonical even though its data is real.
+- The lightweight `BuhlmannPlanner.plan(...)` preview path builds an early validation request with `gfHigh: 85` before computing NDL with the supplied `gfHigh`; low risk, but confusing for auditability.
+- GF equality policy should be decided and documented.
 
 ## Numerical Robustness Assessment
 
-Strong points:
+Positive evidence:
 
-- Buhlmann constants and pressure conversion are centralized.
-- Gas fractions are validated before use.
-- Invalid gas compositions fail closed.
-- PPO2, MOD, hypoxic minimum depth, gas density, and GF values are validated.
-- No fake 999-minute NDL was found.
-- Schedule completion flags prevent partial results from looking complete.
+- Invalid depth/time/GF values fail closed.
+- Max planner depth is capped at `120 m`.
+- Gas fractions and PPO2 ranges are clamped/validated.
+- NDL tests reject fake `999` fallbacks.
+- Coefficient weighting handles zero inert gas without division by zero.
+- Oxygen exposure rejects invalid segments and caps display values.
+- Tissue chart values are finite and clamped to display range.
 
-Remaining risks:
+Residual risks:
 
-- OTU constant-depth formula appears inverted.
-- External fixture validation is still pending.
-- Travel gas scheduling may be too simplified for some trimix descent protocols.
-- Current Windows environment could not run XCTest or Swift compiler checks.
+- No current macOS XCTest execution was possible in this Windows session.
+- No current independent external table/computer comparison was executed in this session.
+- Chart display fallback to sea-level surface pressure should be made fail-explicit if it ever occurs.
 
 ## UX/UI Readiness Assessment
 
-Assessment: **Mostly ready**
+Ready aspects:
 
-The Planner UI remains aligned with the premium dark marine DIR Diving design language. The audit did not identify visual redesign regressions from static inspection.
+- Planner keeps reference-only/non-certified wording in UI and docs.
+- Safety acknowledgment is versioned (`PlannerSafetyAcknowledgment.currentRevision = "2026-05-24"`).
+- Tabs separate plan, Bühlmann/tissue curve, and charts.
+- Italian and English planner labels exist for CNS, chart, ascent table, and Calculate Plan.
+- More contains the CNS Descent + Bottom 15% toggle and explanatory copy.
+- The legacy `GasMixCard` is an empty compatibility alias; the active editor is `PlannerCylinderGasEditorView`.
 
-Positive findings:
+Not ready / needs validation:
 
-- Full CNS and CNS Descent + Bottom labels are distinct.
-- CNS warning is red, visible, and localized.
-- Technical metrics are grouped coherently.
-- The planner uses reference-only disclaimer language.
-- The More/settings section contains a CNS Descent + Bottom check toggle.
-- Accessibility labels and hints exist for the CNS warning.
-
-UX gaps:
-
-- Share/export text should distinguish full-plan CNS from preview or descent+bottom CNS.
-- Validation strings should be localized consistently.
-- Physical-device QA is still required for Dynamic Type, VoiceOver, and visual clipping.
+- PIANO DI RISALITA order and row semantics should be corrected before relying on it as a briefing table.
+- Full-plan CNS tile color should reflect elevated oxygen-exposure state.
+- The briefing string `planner.briefing.gf_tts` says "TTS/TTR estimate" but receives only the TTS integer.
+- Simulator screenshots and accessibility checks were not run on current HEAD.
+- Dynamic Type, localization truncation, and small-screen table/chart behavior still require macOS simulator verification.
 
 ## CNS UI/UX Visibility Matrix
 
-| Requirement | Status | Evidence | Priority |
-|---|---:|---|---:|
-| Total CNS calculated | Implemented | `OxygenExposureModel.from`, `GasPlanningService.analyze(input:enginePlan:)` | OK |
-| Total CNS includes deco | Implemented | Full engine segments include stops/ascent/deco gases | OK |
-| CNS Descent + Bottom calculated | Implemented | `cnsPercentDescentAndBottom` | OK |
-| Deco excluded from Descent + Bottom | Implemented | Segment filter and tests | OK |
-| 15% threshold | Implemented | `CNSDescentBottomPlannerRule` | OK |
-| 15 exactly accepted | Implemented | Existing tests | OK |
-| Warning visible/red | Implemented | `PlannerView` red banner/tile | OK |
-| EN/IT localization | Implemented | EN/IT string keys and tests | OK |
-| Accessibility copy | Implemented | A11y keys and hints | OK |
-| Share/export wording clarity | Partial | Generic CNS label remains | P3 |
-| OTU correctness | Blocking | Formula appears inverted | P0/P1 |
+| Surface | What user sees | Status | Finding |
+| --- | --- | --- | --- |
+| Pre-calculation card | CNS bottom preview + footnote that full-plan CNS appears after Calculate Plan. | Good | Clear distinction. |
+| Result dashboard | CNS full plan value. | Partial | Always green; should reflect elevated exposure. |
+| Secondary metrics | CNS Descent + Bottom. | Good | Turns red with warning icon when >15% and toggle enabled. |
+| Warning banner | Red warning and action hint. | Good | Localized and accessible. |
+| Ascent/deco estimate | Derived difference from full-plan CNS. | Good | Footnote says reference estimate. |
+| More settings | Toggle for 15% descent+bottom warning. | Good | Default on. |
+| Export text | Full-plan, descent+bottom, and ascent/deco CNS lines. | Good from inspected code | Needs full export QA on macOS. |
+
+## Chart Truthfulness Matrix
+
+| Chart/table | Claimed meaning | Actual source | Truthfulness | Action |
+| --- | --- | --- | --- | --- |
+| CURVA BÜHLMANN primary | Sampled ZH-L16C tissue loading. | `BuhlmannEngineResult.tissueHistory.groupedPoints`. | Good | Keep; validate visually. |
+| NDL reference curve | NDL minutes by depth. | `BuhlmannPlanner.ndlCurve`. | Good as secondary reference. | Keep secondary; do not promote as tissue loading. |
+| Depth profile | Planned depth over elapsed runtime. | `DivePlanSegment` sequence. | Good | Simulator QA. |
+| Ascent/deco table | Bottom/travel/deco/surface with PPO2. | Real engine rows and stops. | Partial | Reorder/label chronologically. |
+| GF comparison | Alternative GF TTS/stops. | Separate seeded engine plans. | Good as comparison. | Ensure copy says comparison/reference. |
 
 ## Test Coverage Assessment
 
-Assessment: **Broad but not complete**
+Static test inventory is strong for a project-level iOS planner reference engine:
 
-Static source count found approximately 229 iOS algorithm test functions.
+- 355 iOS algorithm test functions were found under `Tests/iOSAlgorithmTests`.
+- Fixtures cover air, nitrox, trimix, GF variants, altitude/fresh/salt differences, repetitive planning, duplicate labels, invalid gas, MOD violation, gas switch too deep, oxygen exposure deco, and lost deco gas.
+- Tissue history tests cover non-empty history, 16 compartments per timestamp, four groups, finite values, plan-change sensitivity, fixture stability, and invalid-plan empty history.
+- CNS tests cover segment filtering, ascent/deco exclusion for the 15% metric, exactly-15% boundary, disabled toggle behavior, nitrox/trimix profiles, invalid segments, and gas-switch exclusion.
+- OTU tests cover canonical constant-depth direction, monotonicity, ramp behavior, daily/weekly carryover decay/reset, and O2 deco contribution.
+- Ascent table tests cover bottom/deco/surface presence and TTS mapping, but not chronological order or travel-row semantics.
 
-Strong coverage areas:
+Not executed:
 
-- Buhlmann constants
-- Gas validation
-- Pressure model
-- Tissue loading
-- Schreiner equation
-- Ceiling calculation
-- Gradient factors
-- NDL
-- Multigas planner
-- Trimix/helium
-- Reference/golden fixtures
-- CNS Descent + Bottom rule
-- Localization copy for CNS labels
-- Schedule gas consumption
-- Planner regression fixtures
+- No XCTest suite was run in this Windows session because Xcode is unavailable.
+- No simulator visual/snapshot test was run.
+- No external certified-tool comparison was run.
 
-Critical test gap:
+Recommended added tests:
 
-- OTU constant-depth tests currently validate the implemented formula instead of validating against an external/canonical OTU reference.
-
-Validation gap:
-
-- `Docs/BUILD_VALIDATION.md` and other historical docs mention older test counts. Current source has more tests than the latest documented macOS validation runs. A fresh macOS run is required.
-
-Required macOS commands:
-
-```bash
-xcodegen generate
-xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving iOS" -destination 'platform=iOS Simulator,name=iPhone 15' build
-xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving iOS Algorithm Tests" -destination 'platform=iOS Simulator,name=iPhone 15' test
-```
+- Chronological ascent-table order for descent, bottom, ascent travel, gas switches, deco stops, surface.
+- PPO2 row values for travel/deco gases at switch/stop depths.
+- Dashboard CNS color for elevated full-plan CNS.
+- GF Low == GF High acceptance/rejection policy test.
+- Tissue-history nil-environment/fallback behavior test.
 
 ## Documentation Assessment
 
-Assessment: **Good, but one mathematical correction required**
+Aligned:
 
-Strong documentation:
+- `Docs/IOS_PLANNER_CHART_TRUTHFULNESS.md` correctly describes tissue history as the primary CURVA BÜHLMANN source and NDL as secondary.
+- `Docs/DIR_DIVING_IOS_OXYGEN_EXPOSURE_MODEL.md` describes full-profile CNS/OTU, descent+bottom CNS, 15% warning behavior, and EN/IT UI labels.
+- `Docs/DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md` documents non-certified positioning, canonical planner result derivation, gas identities, and bailout exclusion.
+- `Docs/DIR_DIVING_IOS_PLANNER_LIMITATIONS.md` preserves reference-only limitations and CNS UI semantics.
 
-- Buhlmann engine design exists.
-- Math verification exists.
-- Planner limitations exist.
-- Oxygen exposure model documentation exists.
-- External validation plan exists.
+Stale or missing:
 
-Documentation issue:
-
-- OTU formula documentation appears to repeat the same inverted formula found in code. This should be corrected alongside code/tests.
-
-Documentation/process gap:
-
-- Build validation docs should be refreshed after the next macOS build/test pass.
+- `Docs/README.md` and root `README.md` still cite baseline `90dc3f5`, while audited HEAD is `93d6324`.
+- `Docs/DIR_DIVING_IOS_OXYGEN_EXPOSURE_MODEL.md` footer says aligned with `caa55d2`.
+- `Docs/DIR_DIVING_IOS_CNS_PLANNER_IMPLEMENTATION_AUDIT.md` is not present, although related verification docs exist.
+- Some docs cite prior macOS validation runs; current HEAD still needs a fresh macOS pass.
 
 ## Risk Matrix
 
-### P0 - Blocking / Safety-Critical
+### P0 — Safety-critical blockers
 
-1. **OTU constant-depth formula appears inverted**
-   - Area: oxygen exposure
-   - Impact: can understate pulmonary oxygen exposure at elevated PPO2.
-   - Files: `iOSApp/Models/OxygenExposureModels.swift`, oxygen exposure docs, OTU tests.
-   - Fix: correct formula, update ramp consistency if needed, add external reference tests, update docs.
+None found in this static pass.
 
-### P1 - Critical
+### P1 — Major algorithm correctness blockers
 
-1. **External Buhlmann validation campaign still pending**
-   - Area: decompression planning reference
-   - Impact: internal validation can proceed, but public release claims should not exceed reference-only status.
-   - Fix: execute documented validation campaign against trusted external reference planners.
+None found in this static pass.
 
-2. **OTU tests validate implementation instead of independent reference**
-   - Area: tests
-   - Impact: regression suite cannot catch the current OTU issue.
-   - Fix: add canonical OTU fixtures at PPO2 0.6, 1.0, 1.3, 1.4, 1.6 and multi-segment schedules.
+### P2 — Must fix or explicitly defer before stronger TestFlight/readiness claims
 
-### P2 - Important
+| ID | Finding | Evidence | Impact | Recommendation |
+| --- | --- | --- | --- | --- |
+| IOS-BUH-P2-001 | PIANO DI RISALITA row order is not chronological. | `PlannerAscentTableBuilder.swift:36-57`, `:87-108` | A real-data table can still mislead as a briefing table. | Build rows in elapsed/ascent order; add order tests. |
+| IOS-BUH-P2-002 | Full-plan CNS dashboard tile is always green. | `PlannerView.swift:1635-1640` | Elevated full-plan CNS may look safe at dashboard level. | Color/icon from oxygen warning state or threshold; add UI/unit test. |
 
-1. **Travel gas to bottom gas switch depth is simplified**
-   - Area: multigas planning
-   - Impact: may distort tissue and gas consumption for some hypoxic trimix protocols.
-   - Fix: add explicit bottom gas switch depth / travel gas switch schedule model.
+### P3 — Should fix before release candidate
 
-2. **Fresh macOS build/test validation missing for current HEAD**
-   - Area: release process
-   - Impact: Windows static audit cannot prove compile/test pass.
-   - Fix: run `xcodegen`, iOS build, iOS algorithm tests on macOS.
+| ID | Finding | Evidence | Impact | Recommendation |
+| --- | --- | --- | --- | --- |
+| IOS-BUH-P3-001 | GF equality policy mismatch. | `PlannerInputValidator.swift:53-58`, `BuhlmannEngine.swift:210-216` | Requirement may say `<=`; code rejects equality. | Decide policy; update validation/tests or docs. |
+| IOS-BUH-P3-002 | Briefing copy says `TTS/TTR` but receives only TTS. | `GasPlanningService.swift:509-518`, `Localizable.strings:1165` | Copy ambiguity. | Rename to TTS or pass true runtime/TTR value. |
+| IOS-BUH-P3-003 | Tissue chart ambient fallback is silent. | `BuhlmannTissueHistory.swift:276-279` | Rare display-only fallback could hide invalid conversion. | Fail empty or surface a chart unavailable state. |
+| IOS-BUH-P3-004 | Documentation baselines are stale. | `README.md`, `Docs/README.md`, oxygen model footer | Reviewers may audit the wrong baseline. | Update docs after macOS validation. |
+| IOS-BUH-P3-005 | Missing CNS implementation audit doc. | `Docs/DIR_DIVING_IOS_CNS_PLANNER_IMPLEMENTATION_AUDIT.md` absent | Documentation traceability gap. | Create or remove references/expectation. |
 
-3. **Build validation documentation is stale**
-   - Area: documentation
-   - Impact: docs show older test counts and may not represent current code.
-   - Fix: refresh after current macOS validation.
+### P4 — Polish / future hardening
 
-### P3 - Maintainability / UX Copy
-
-1. **Planner validation messages include hardcoded Italian**
-   - Area: localization
-   - Impact: possible mixed-language states if those messages surface.
-   - Fix: route user-facing validation through localization keys.
-
-2. **Planner persistence key still includes `experimental`**
-   - Area: maintainability
-   - Impact: confusing naming in MAIN branch.
-   - Fix: migrate or alias persistence key carefully without losing stored planner settings.
-
-3. **Share/export planner text uses generic CNS label**
-   - Area: UX copy
-   - Impact: less clear than on-screen labels.
-   - Fix: label exported value as CNS full plan and optionally include descent+bottom separately.
-
-4. **Bailout cylinders remain schedule-only**
-   - Area: technical planning model
-   - Impact: acceptable if clearly documented, but not full bailout planning.
-   - Fix: keep documented or add explicit bailout scenario planner later.
-
-### P4 - Process / QA
-
-1. **Physical-device UI/accessibility QA pending**
-   - Area: UX validation
-   - Impact: static inspection cannot prove no clipping under all Dynamic Type or VoiceOver cases.
-   - Fix: run physical-device QA.
-
-2. **Reference planner exact equivalence not claimed**
-   - Area: documentation/legal
-   - Impact: acceptable due reference-only positioning.
-   - Fix: keep limitations explicit.
+| ID | Finding | Recommendation |
+| --- | --- | --- |
+| IOS-BUH-P4-001 | Constants file has values but not inline source citations. | Keep docs as authority or add concise references in code comments. |
+| IOS-BUH-P4-002 | Heliox is compositionally supported but not a named UI mix kind. | Document as trimix/zero-N2 composition or add explicit UI support later. |
+| IOS-BUH-P4-003 | Current report is static-only. | Attach macOS test/build logs once run. |
 
 ## Release Readiness Verdict
 
-| Category | Verdict | Notes |
-|---|---:|---|
-| iOS Planner compile readiness | Unknown on this host | Requires macOS build |
-| Buhlmann core readiness | Almost ready | Static inspection strong, external validation pending |
-| Helium / trimix readiness | Almost ready | Implemented; travel gas switch modeling needs refinement |
-| CNS readiness | Ready for internal validation | Full plan and descent+bottom are implemented and localized |
-| OTU readiness | Not ready | Formula appears inverted |
-| UX/UI readiness | Mostly ready | No visual blockers found statically |
-| Localization readiness | Mostly ready | Planner CNS copy localized; some validator strings remain |
-| Documentation readiness | Partial | OTU docs need correction; build validation stale |
-| TestFlight planning readiness | Not yet | OTU fix and macOS validation required |
-| App Store readiness | Not yet | External validation/legal review/physical QA required |
-
-Final readiness statement:
-
-The iOS Companion Planner is **not yet fully ready** for release-hard internal validation because OTU exposure math must be corrected and re-tested. The Buhlmann decompression core, CNS full-plan model, CNS descent+bottom 15% warning, localization, and UI copy are substantially implemented and appear coherent from static inspection.
+| Gate | Verdict | Rationale |
+| --- | --- | --- |
+| Internal algorithm review | **Almost ready** | Static code is coherent; macOS tests still required. |
+| Internal TestFlight planning | **Almost ready / conditional** | Fix or document P2 UI/table gaps; run simulator QA. |
+| External TestFlight | **Not yet** | Needs physical/simulator QA, current build validation, and doc baseline updates. |
+| Release candidate | **Not ready** | Requires external mathematical comparison and complete release checklist evidence. |
+| Certified decompression claim | **Never claimed / not ready** | App must remain non-certified reference-only unless a future certification process exists. |
 
 ## Implementation Plan
 
-### Phase 1 - Fix OTU Formula
+### Phase 0 — Validation first
 
-Files likely affected:
+1. On macOS, run `git pull --ff-only`.
+2. Run `xcodegen generate`.
+3. Build `DIRDiving iOS`.
+4. Test `DIRDiving iOS Algorithm Tests`.
+5. Save exact command logs and commit hash.
 
-- `iOSApp/Models/OxygenExposureModels.swift`
-- `Tests/iOSAlgorithmTests/OxygenExposureDeepModelTests.swift`
-- `Docs/DIR_DIVING_IOS_OXYGEN_EXPOSURE_MODEL.md`
-- `Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`
-- `Docs/DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`
+### Phase 1 — P2 readiness fixes
 
-Actions:
+1. Rebuild PIANO DI RISALITA rows in chronological/ascent-briefing order.
+2. Add tests for row order, travel/ascent semantics, gas labels, and PPO2 values.
+3. Color/icon the full-plan CNS dashboard tile according to elevated oxygen exposure.
+4. Add a test for full-plan CNS visibility state.
 
-1. Replace the constant-depth OTU formula with canonical Lambertsen/UPTD direction:
-   `minutes * pow(((ppO2 - 0.5) / 0.5), 5.0 / 6.0)`.
-2. Verify ramp integration and constant-depth integration are directionally consistent.
-3. Add independent test vectors for PPO2 0.6, 1.0, 1.3, 1.4, 1.6.
-4. Verify OTU increases monotonically with PPO2.
-5. Update docs and warnings.
+### Phase 2 — P3 consistency and docs
 
-### Phase 2 - External Validation Campaign
+1. Decide GF equality policy and update validation/tests/docs.
+2. Fix `TTS/TTR` briefing copy or pass an actual runtime/TTR value.
+3. Replace tissue-history display fallback with explicit empty/error behavior.
+4. Update `README.md`, `Docs/README.md`, oxygen model footer, and release docs to current HEAD.
+5. Create `Docs/DIR_DIVING_IOS_CNS_PLANNER_IMPLEMENTATION_AUDIT.md` if that audit is expected in the doc set.
 
-Actions:
+### Phase 3 — Release evidence
 
-1. Select reference engines/tools.
-2. Freeze fixture profiles:
-   - Air 21% at 30 m
-   - Nitrox 32 at 30 m
-   - Trimix bottom gas
-   - Trimix + EAN50 deco gas
-   - Trimix + oxygen deco gas
-   - GF 30/70 vs GF 50/80
-3. Compare NDL, first stop, total stop time, TTS, controlling compartments, and gas switch behavior.
-4. Document tolerances and results.
-
-### Phase 3 - Travel Gas Switch Model
-
-Actions:
-
-1. Add explicit travel-to-bottom gas switch depth model.
-2. Validate hypoxic bottom gas switch depth.
-3. Ensure Buhlmann loading and gas ledger use the same switch schedule.
-4. Add tests for hypoxic trimix with travel gas.
-
-### Phase 4 - Localization / Copy Cleanup
-
-Actions:
-
-1. Move user-facing planner validator strings to localization.
-2. Update share/export text:
-   - CNS full plan
-   - CNS descent+bottom
-   - CNS ascent/deco estimate
-   - OTU
-3. Keep reference-only wording.
-
-### Phase 5 - macOS Build and Test Validation
-
-Actions:
-
-1. Run `xcodegen generate`.
-2. Build iOS target.
-3. Run iOS Algorithm Tests.
-4. Update build validation docs with actual test count and results.
+1. Add external Bühlmann comparison fixtures with documented tolerances.
+2. Run simulator UI QA for compact/large devices, EN/IT, Dynamic Type, and accessibility.
+3. Run TestFlight/device checks according to existing release checklists.
+4. Keep all claims as non-certified reference-only.
 
 ## Protected Files / Areas
 
-These areas must remain untouched for this iOS-only planner work:
+Do not change these areas during the next implementation pass unless explicitly requested:
 
-- `DIRDiving Watch App/*`
-- Watch views, managers, models, services, tests, entitlements
-- Root-level Watch-specific `App/*`, `Models/*`, `Services/*`, `Views/*`, `Utils/*`, `Resources/*` if they are watch runtime paths
-- `Config/DIRDiving.entitlements`
-- Experimental iOS files:
-  - `iOSApp/Models/ExplorationModels.swift`
-  - `iOSApp/Models/BuddyExperimentalModels.swift`
-  - `iOSApp/Services/ExplorationPlanningStore.swift`
-  - `iOSApp/Services/BuddyExperimentalStore.swift`
-  - `iOSApp/Views/ExplorationCenterView.swift`
-  - `iOSApp/Views/ExperimentalFutureConceptsView.swift`
-  - `iOSApp/Views/BuddyExperimentalView.swift`
-- Experimental branches
-
-## Recommended Next Cursor / Codex Command
-
-Do not run this automatically during this audit. Use it only after accepting the report findings.
-
-```text
-Fix the iOS Companion MAIN planner oxygen exposure and validation issues identified in Docs/DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md.
-
-Scope:
-- iOS Companion MAIN only.
-- Do not modify Apple Watch code.
-- Do not modify experimental files or branches.
-- Do not redesign UI.
-- Preserve legal/reference-only positioning.
-
-Mandatory fixes:
-1. Correct OTU constant-depth formula and align ramp/constant behavior.
-2. Add independent OTU fixtures and monotonicity tests.
-3. Update oxygen exposure documentation.
-4. Add explicit travel-to-bottom gas switch depth plan or document as a limitation.
-5. Localize remaining planner validation messages.
-6. Clarify share/export CNS labels.
-7. Run macOS xcodegen/build/tests if available; otherwise perform Windows static validation.
-
-Acceptance:
-- No P0/P1 oxygen exposure issues remain.
-- iOS Algorithm Tests pass on macOS.
-- No Watch or experimental files modified.
-```
+- Watch app code, Watch targets, Watch algorithm tests, Watch sync/auth code.
+- Experimental files and experimental branches.
+- Generated `.xcodeproj` contents; regenerate with `xcodegen`.
+- Legal/safety disclaimer positioning.
+- Decompression constants or tissue equations without fixture-backed algorithm tests.
+- Planner UI look/feel outside the specific P2/P3 fixes.
 
 ## Final Recommendations
 
-1. Fix OTU formula before calling the planner release-hard.
-2. Run the full iOS algorithm test suite on macOS after the OTU fix.
-3. Refresh build validation documentation with current test counts.
-4. Execute the external Buhlmann validation plan before TestFlight claims beyond internal reference validation.
-5. Keep the product wording as non-certified and reference-only.
+Next Cursor/Codex command strategy:
 
-## Audit Certification
+1. First command should be a macOS validation request, not a code edit: run `xcodegen generate`, iOS build, and iOS algorithm tests on current `main`.
+2. Second command should fix only the two P2 issues: ascent table order and full-plan CNS dashboard color.
+3. Third command should update stale docs and attach validation evidence.
+4. Keep each commit narrow: one docs audit commit, one P2 code/tests commit, one documentation/baseline update commit after validation.
 
-This report was produced by static inspection only.
+Suggested commit strategy:
 
-No code fix was implemented.  
-No UI was changed.  
-No Apple Watch file was modified.  
-No experimental file was modified.  
-No commit or push was performed.  
-macOS build/test validation remains required.
+- Commit this report separately as `docs: update iOS Bühlmann readiness audit at 93d6324`.
+- Do not bundle future Swift fixes with this audit report.
+- After code fixes, run the full iOS algorithm test target on macOS before merging/pushing.
+
+Final readiness statement: current MAIN iOS Planner is a strong non-certified Bühlmann reference implementation and is **almost ready** for internal validation, but it is not yet a release candidate until P2 UI/table issues, macOS validation, external comparison, and stale documentation are closed.

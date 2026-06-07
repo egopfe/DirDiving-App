@@ -1,0 +1,35 @@
+---
+description: Full git sync — primary repo, all worktrees, and remote without asking
+alwaysApply: true
+---
+
+# Full git sync (local + remote)
+
+When the user asks to **update local repo**, **local git**, **remote git**, or similar sync wording, execute a **full sync without asking for confirmation**.
+
+## Required steps
+
+1. **Primary repository** (`DirDiving-App` root on `main`):
+   - `git fetch --all --prune`
+   - `git pull --ff-only origin main`
+   - Push if ahead: `git push origin main`
+
+2. **All git worktrees** under `.worktrees/`:
+   - For each worktree: `git pull --ff-only origin <tracking-branch>`
+   - Merge latest main: `git merge origin/main` (fast-forward or merge commit)
+   - Push tracking branch if ahead: `git push origin <branch>`
+
+3. **Documentation index** (if audit/docs on `main` changed but `Docs/INDEX.md` is stale):
+   - Update `Docs/INDEX.md` commit/baseline/XCTest references to match current `main`
+   - Commit on `main` and push
+
+4. **Verify** and report briefly:
+   - Primary `HEAD` vs `origin/main`
+   - Each worktree branch + short SHA
+   - Confirm key docs exist at expected paths
+
+## Do not
+
+- Ask whether to sync worktrees or remote — always sync everything
+- Force-push unless the user explicitly requests it
+- Skip worktrees because they are on feature branches — merge `origin/main` into them

@@ -1,6 +1,63 @@
 import XCTest
 
 final class IOSMainAlgorithmAuditRemediationTests: XCTestCase {
+    // MARK: - HIGH-002 / MED-002 / HIGH-001 remediation @ ecad0d9 audit
+
+    func testBaseInvalidAltitudeFailsValidation() {
+        var input = GasPlanInput()
+        input.plannedDepthMeters = 30
+        input.plannedBottomMinutes = 20
+        input.altitudeMeters = 5_000
+        let result = PlannerInputValidator.validate(input, mode: .base)
+        XCTAssertTrue(result.states.contains(.invalidEnvironment))
+    }
+
+    func testDecoInvalidAltitudeFailsValidation() {
+        var input = GasPlanInput()
+        input.plannedDepthMeters = 30
+        input.plannedBottomMinutes = 20
+        input.altitudeMeters = 5_000
+        let result = PlannerInputValidator.validate(input, mode: .deco)
+        XCTAssertTrue(result.states.contains(.invalidEnvironment))
+    }
+
+    func testProfileDivergenceDetectedForDifferentDepthAtSameTimestamp() {
+        let start = Date(timeIntervalSince1970: 1_000)
+        let end = start.addingTimeInterval(120)
+        let local = DiveSession(
+            startDate: start,
+            endDate: end,
+            durationSeconds: 120,
+            maxDepthMeters: 18,
+            avgDepthMeters: 10,
+            avgWaterTemperatureCelsius: nil,
+            ttv: 1,
+            entryGPS: nil,
+            exitGPS: nil,
+            samples: [
+                DiveSample(timestamp: start, depthMeters: 0, temperatureCelsius: nil),
+                DiveSample(timestamp: end, depthMeters: 18, temperatureCelsius: nil)
+            ]
+        )
+        let cloud = DiveSession(
+            id: local.id,
+            startDate: start,
+            endDate: end,
+            durationSeconds: 120,
+            maxDepthMeters: 22,
+            avgDepthMeters: 11,
+            avgWaterTemperatureCelsius: nil,
+            ttv: 1,
+            entryGPS: nil,
+            exitGPS: nil,
+            samples: [
+                DiveSample(timestamp: start, depthMeters: 0, temperatureCelsius: nil),
+                DiveSample(timestamp: end, depthMeters: 22, temperatureCelsius: nil)
+            ]
+        )
+        XCTAssertTrue(DiveSessionProfileDivergence.profilesDiverge(local, cloud))
+    }
+
     // MARK: - IOS-AUDIT-003 NDL environment tissue seeding
 
     func testPreviewNDLUsesEnvironmentSaturatedTissueAtAltitude() {

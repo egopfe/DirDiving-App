@@ -21,6 +21,15 @@ final class DepthLimitHapticCoordinator {
         lastHapticDate = nil
     }
 
+    /// Cancels pending delayed pulses and syncs state after the global haptics preference changes.
+    func refreshAfterPreferenceChange(currentDepthMeters: Double) {
+        transitionGeneration &+= 1
+        lastHapticDate = nil
+        let state = DepthSafetyState.from(depthMeters: currentDepthMeters)
+        lastState = state
+        guard hapticsEnabledNow, state != .normal else { return }
+    }
+
     func handle(depthMeters: Double, hapticsEnabled: Bool) {
         let state = DepthSafetyState.from(depthMeters: depthMeters)
         guard hapticsEnabled else {

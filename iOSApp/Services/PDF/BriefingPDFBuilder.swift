@@ -1,0 +1,89 @@
+import UIKit
+
+enum BriefingPDFBuilder {
+    static func build(context: PDFExportPlannerContext, siteName: String?) -> Data {
+        let pageRect = CGRect(x: 0, y: 0, width: 612, height: 792)
+        let renderer = UIGraphicsPDFRenderer(bounds: pageRect)
+        let disclaimer = String(localized: "pdf.export.disclaimer")
+        let title = String(localized: "pdf.export.section.briefing")
+        let analysis = context.plan.gasAnalysis
+
+        return renderer.pdfData { pdf in
+            let page = PDFPageContext()
+            page.attach(pdf, title: title, generatedAt: Date())
+
+            page.drawSectionTitle(String(localized: "pdf.export.briefing.overview"))
+            if let siteName, !siteName.isEmpty {
+                page.drawLine(String(localized: "pdf.export.briefing.site"), value: siteName)
+            }
+            page.drawLine(String(localized: "pdf.export.briefing.objective"), value: context.mode.localizedTabTitle)
+            page.drawLine(
+                String(localized: "planner.field.max_depth"),
+                value: Formatters.depth(context.input.plannedDepthMeters, units: context.unitPreference).text
+            )
+            page.drawLine(
+                String(localized: "planner.field.avg_depth"),
+                value: Formatters.depth(context.input.plannedAverageDepthMeters, units: context.unitPreference).text
+            )
+            page.drawLine(
+                String(localized: "planner.field.bottom_time"),
+                value: "\(Formatters.zero(context.input.plannedBottomMinutes)) min"
+            )
+
+            page.drawSpacer()
+            page.drawSectionTitle(String(localized: "pdf.export.briefing.gas_plan"))
+            for line in context.plan.briefingLines {
+                page.drawParagraph(line)
+            }
+
+            page.drawSpacer()
+            page.drawSectionTitle(String(localized: "pdf.export.briefing.ascent"))
+            page.drawLine("TTS", value: "\(context.plan.ttsMinutes) min")
+            if context.plan.decoStops.isEmpty {
+                page.drawParagraph(String(localized: "planner.export.no_deco_stops"))
+            } else {
+                for stop in context.plan.decoStops {
+                    page.drawParagraph(
+                        "\(Formatters.depth(stop.depthMeters, units: context.unitPreference).text) / \(stop.minutes) min · \(stop.gas)"
+                    )
+                }
+            }
+
+            page.drawSpacer()
+            page.drawSectionTitle(String(localized: "pdf.export.briefing.gas_management"))
+            page.drawLine(
+                String(localized: "planner.metric.turn_pressure"),
+                value: "\(Formatters.zero(analysis.turnPressureBar)) bar"
+            )
+            page.drawLine(
+                String(localized: "planner.metric.rock_bottom"),
+                value: "\(Formatters.zero(analysis.minimumGasBar)) bar"
+            )
+            page.drawLine(
+                String(localized: "planner.metric.remaining"),
+                value: "\(Formatters.zero(analysis.remainingBar)) bar"
+            )
+
+            if !context.plan.contingencyPlans.isEmpty {
+                page.drawSpacer()
+                page.drawSectionTitle(String(localized: "pdf.export.briefing.contingency"))
+                for plan in context.plan.contingencyPlans {
+                    page.drawParagraph("\(plan.scenario.rawValue): \(plan.action)")
+                }
+            }
+
+            if !context.plan.teamMatches.isEmpty {
+                page.drawSpacer()
+                page.drawSectionTitle(String(localized: "pdf.export.briefing.team"))
+                for match in context.plan.teamMatches {
+                    page.drawParagraph("\(match.diverName) · SAC \(Formatters.zero(match.sacLitersMinute)) L/min · \(match.status)")
+                }
+            }
+
+            page.drawSpacer()
+            page.drawParagraph(String(localized: "planner.briefing.share_note"))
+
+            page.finish(disclaimer: disclaimer)
+        }
+    }
+}
