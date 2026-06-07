@@ -119,6 +119,7 @@ final class DiveManager: ObservableObject {
     @Published private(set) var isDepthAutomationMockFallbackActive = false
     @Published private(set) var depthSensorSourceResolution: DepthSensorSourceResolution = .unavailable
     @Published private(set) var draftRecoveryDiagnostic: String?
+    @Published private(set) var lastDraftPersistenceError: String?
     @Published var isManualLifecycleActive = false
     @Published private(set) var manualStartHandedOffToAutomatic = false
     @Published private(set) var isMissionModeActive = false
@@ -407,8 +408,16 @@ final class DiveManager: ObservableObject {
     private func writeActiveDiveDraft(_ draft: ActiveDiveDraft) {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
-        guard let data = try? encoder.encode(draft) else { return }
-        try? data.write(to: activeDiveDraftURL(), options: [.atomic, .completeFileProtection])
+        guard let data = try? encoder.encode(draft) else {
+            lastDraftPersistenceError = String(localized: "watch.draft.encode_failed")
+            return
+        }
+        do {
+            try data.write(to: activeDiveDraftURL(), options: [.atomic, .completeFileProtection])
+            lastDraftPersistenceError = nil
+        } catch {
+            lastDraftPersistenceError = error.localizedDescription
+        }
     }
 
     private func quarantineActiveDraftPayload(_ data: Data, reason: String) {
@@ -444,6 +453,8 @@ final class DiveManager: ObservableObject {
             return
         }
         guard Date().timeIntervalSince(draft.updatedAt) <= DiveAlgorithmConfiguration.activeDiveDraftExpirationSeconds else {
+            quarantineActiveDraftPayload(data, reason: "expired_ttl")
+            draftRecoveryDiagnostic = String(localized: "watch.draft.expired_discarded")
             clearActiveDiveDraft()
             return
         }
@@ -472,7 +483,14 @@ final class DiveManager: ObservableObject {
             currentDepthMeters = lastSample.depthMeters
             currentTemperatureCelsius = lastSample.temperatureCelsius
             maxDepthMeters = restoredSamples.map(\.depthMeters).max() ?? 0
-            averageDepthMeters = DiveAlgorithm.timeWeightedAverageDepth(samples: restoredSamples, endDate: Date())
+            let restoreTailEnd = min(
+                Date(),
+                lastSample.timestamp.addingTimeInterval(DiveAlgorithmConfiguration.draftRestoreAverageDepthMaxTailSeconds)
+            )
+            averageDepthMeters = DiveAlgorithm.timeWeightedAverageDepth(
+                samples: restoredSamples,
+                endDate: restoreTailEnd
+            )
             depthSafetyState = DepthSafetyState.from(depthMeters: lastSample.depthMeters)
             if depthSafetyState == .exceeded {
                 activeDiveExceededSupportedDepth = true
@@ -552,14 +570,22 @@ final class DiveManager: ObservableObject {
     private func scheduleAutomaticSurfaceEnd() {
         guard automaticSurfaceEndTask == nil else { return }
         automaticSurfaceEndTask = Task { [weak self] in
-            let nanoseconds = UInt64(DiveAlgorithmConfiguration.automaticStopDwellSeconds * 1_000_000_000)
+            let dwellSeconds = Self.testHook_automaticStopDwellSeconds
+                ?? DiveAlgorithmConfiguration.automaticStopDwellSeconds
+            let nanoseconds = UInt64(dwellSeconds * 1_000_000_000)
             try? await Task.sleep(nanoseconds: nanoseconds)
             guard !Task.isCancelled else { return }
             await MainActor.run {
                 guard let self else { return }
                 self.automaticSurfaceEndTask = nil
                 guard self.isDiveActive, !self.isFinalizingDive else { return }
-                if self.lifecycleAlgorithm.shouldEndAtSurface(currentDepthMeters: self.currentDepthMeters, timestamp: Date()) {
+                let dwellSeconds = Self.testHook_automaticStopDwellSeconds
+                    ?? DiveAlgorithmConfiguration.automaticStopDwellSeconds
+                if self.lifecycleAlgorithm.shouldEndAtSurface(
+                    currentDepthMeters: self.currentDepthMeters,
+                    timestamp: Date(),
+                    dwellSeconds: dwellSeconds
+                ) {
                     self.endDiveIfNeeded()
                 }
             }
@@ -1232,6 +1258,7 @@ final class DiveManager: ObservableObject {
 extension DiveManager {
     static var testHook_draftDirectoryURL: URL?
     static var testHook_suppressDepthSensorProvider = false
+    static var testHook_automaticStopDwellSeconds: TimeInterval?
 
     var testHook_sampleCount: Int { samples.count }
 

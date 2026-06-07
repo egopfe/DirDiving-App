@@ -13,4 +13,16 @@
 
 ## Tests
 
-See `Tests/WatchAlgorithmTests/GPSLifecycleTests.swift`.
+See `Tests/WatchAlgorithmTests/GPSLifecycleTests.swift` (2026-06-07 audit remediation — placeholder removed).
+
+| Case | Coverage |
+|---|---|
+| One-shot capture start | Unit test |
+| Valid fix completion | Unit test |
+| No-fix path — no false success | Unit test |
+| Timeout graceful completion | Unit test |
+| Denied permission safe path | Unit test |
+| Finalization resumes after pending draft | Integration via DiveManager tests |
+| Invalid coordinate rejected | Unit test |
+
+Physical GPS accuracy and underwater antenna behavior require Ultra field QA.

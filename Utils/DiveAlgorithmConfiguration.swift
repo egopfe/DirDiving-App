@@ -17,6 +17,11 @@ enum DiveAlgorithmConfiguration {
     static let maximumPlausibleDepthMeters = 350.0
     static let maximumPlausibleDepthChangeMetersPerMinute = 90.0
     static let activeDiveDraftExpirationSeconds: TimeInterval = 12 * 60 * 60
+    /// Cap offline tail when recomputing average depth after active-draft restore (avoids wall-clock skew).
+    static let draftRestoreAverageDepthMaxTailSeconds: TimeInterval = 30
+    /// Pending Watch→iPhone transfers are retained up to this age awaiting signed ACK.
+    static let pendingSyncMaxRetentionSeconds: TimeInterval = 7 * 24 * 60 * 60
+    static let pendingSyncMaxAttemptCount = 64
     static let minimumPlausibleWaterTemperatureCelsius = -2.0
     static let maximumPlausibleWaterTemperatureCelsius = 40.0
     static let maximumGPSFallbackAgeSeconds: TimeInterval = 300

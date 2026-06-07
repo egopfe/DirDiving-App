@@ -522,8 +522,13 @@
 "live.manual_lifecycle.handoff.note" = "L'avvio manuale segue ora il ciclo automatico di profondità. L'immersione termina dopo il dwell in superficie.";
 "watch.depth_source.apple_sensor" = "Sensore profondità Apple";
 "watch.depth_source.mock_fallback" = "Fallback mock (nessuna profondità reale)";
-"watch.depth_source.unavailable" = "Non disponibile";
+"watch.depth_source.unavailable" = "Sensore profondità non disponibile";
+"watch.depth_source.simulation_active" = "Sorgente profondità simulata";
 "watch.draft.finalizing_missing_enddate" = "Una immersione precedente non è stata finalizzata perché il salvataggio temporaneo era incompleto.";
+"watch.draft.expired_discarded" = "Una bozza attiva scaduta è stata scartata in modo sicuro.";
+"watch.draft.encode_failed" = "Impossibile salvare la bozza immersione attiva.";
+"sync.pending.encode_failed" = "Impossibile salvare la coda sync in attesa.";
+"sync.pending.retention_warning" = "Elemento sync in attesa datato; in attesa di ack firmato iPhone.";
 "user_images.error.not_image" = "Il file non è un'immagine valida.";
 "user_images.error.dimensions" = "Dimensioni immagine troppo grandi.";
 "user_images.error.encode_failed" = "Impossibile salvare l'immagine.";

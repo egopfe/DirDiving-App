@@ -37,10 +37,14 @@ struct DiveLifecycleAlgorithm {
         return evaluateStop(depthMeters: sample.depthMeters, timestamp: sample.timestamp)
     }
 
-    mutating func shouldEndAtSurface(currentDepthMeters: Double, timestamp: Date) -> Bool {
+    mutating func shouldEndAtSurface(
+        currentDepthMeters: Double,
+        timestamp: Date,
+        dwellSeconds: TimeInterval = DiveAlgorithmConfiguration.automaticStopDwellSeconds
+    ) -> Bool {
         guard let surfaceCandidateDate else { return false }
         guard currentDepthMeters <= DiveAlgorithmConfiguration.automaticStopDepthMeters else { return false }
-        return timestamp.timeIntervalSince(surfaceCandidateDate) >= DiveAlgorithmConfiguration.automaticStopDwellSeconds
+        return timestamp.timeIntervalSince(surfaceCandidateDate) >= dwellSeconds
     }
 
     private mutating func evaluateStart(depthMeters: Double, timestamp: Date) -> DiveLifecycleAction {
