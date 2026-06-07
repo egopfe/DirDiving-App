@@ -627,7 +627,7 @@ struct DiveLiveView: View {
         .accessibilityLabel(
             String(format: String(localized: "live.a11y.ttv_runtime"), ttvText, runtimeMinutes)
         )
-        .accessibilityHint(String(localized: "TTV informativo derivato da profondita media e durata; non e un valore decompressivo o time to surface."))
+        .accessibilityHint(String(localized: "live.a11y.ttv_hint"))
     }
 
     private func dashboardValue(title: String, value: String, unit: String?, color: Color) -> some View {
