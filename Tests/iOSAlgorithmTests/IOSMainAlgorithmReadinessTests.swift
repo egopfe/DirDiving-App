@@ -2,7 +2,7 @@ import XCTest
 
 final class IOSMainAlgorithmReadinessTests: XCTestCase {
     func testNDLCurveUsesDepthAndNDLAxes() {
-        let point = NDLPoint(depthMeters: 30, ndlMinutes: 25, compartmentGroup: "5-8")
+        let point = NDLPoint(depthMeters: 30, ndlMinutes: 25, depthBand: "5-8")
         XCTAssertEqual(point.depthMeters, 30)
         XCTAssertEqual(point.ndlMinutes, 25)
         XCTAssertFalse(point.ndlMinutes == max(0, 100 - point.depthMeters * 1.5))

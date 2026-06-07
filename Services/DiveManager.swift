@@ -980,17 +980,17 @@ final class DiveManager: ObservableObject {
         case .valid:
             return ""
         case .missing:
-            return String(localized: "Campione profondita mancante: misurazione ignorata.")
+            return String(localized: "watch.depth_validation.missing_sample")
         case .stale:
-            return String(localized: "Campione profondita obsoleto: misurazione ignorata.")
+            return String(localized: "watch.depth_validation.stale_sample")
         case .frozen:
-            return String(localized: "Sensore profondita fermo: misurazione ignorata.")
+            return String(localized: "watch.depth_validation.stuck_sensor")
         case .spikeRejected:
-            return String(localized: "Variazione profondita non plausibile: campione ignorato.")
+            return String(localized: "watch.depth_validation.implausible_change")
         case .nonFinite:
-            return String(localized: "Campione profondita non finito: misurazione ignorata.")
+            return String(localized: "watch.depth_validation.non_finite")
         case .outOfRange:
-            return String(localized: "Campione profondita fuori range: misurazione ignorata.")
+            return String(localized: "watch.depth_validation.out_of_range")
         }
     }
 
@@ -998,7 +998,7 @@ final class DiveManager: ObservableObject {
         guard isDiveActive else { return }
         let sample = DiveSample(timestamp: timestamp, depthMeters: depthMeters, temperatureCelsius: temperatureCelsius)
         guard DiveAlgorithm.isPlausibleDepthTransition(from: previousDepthSample, to: sample) else {
-            lastErrorMessage = String(localized: "Variazione profondita non plausibile: campione ignorato.")
+            lastErrorMessage = String(localized: "watch.depth_validation.implausible_change")
             return
         }
 

@@ -16,7 +16,7 @@ enum ChecklistPDFBuilder {
             page.drawSectionTitle(String(localized: "equipment.card.checklist"))
             page.drawParagraph(String(localized: "pdf.export.checklist.instructions"))
 
-            for item in profile.checklistItems {
+            for item in profile.migratedChecklistItems {
                 let line = checklistLine(for: item)
                 page.drawChecklistRow(yesLabel: yesLabel, noLabel: noLabel, itemText: line)
             }
@@ -43,6 +43,19 @@ enum ChecklistPDFBuilder {
         }
         if let role = item.gasRole ?? ChecklistPlannerSyncMapper.resolvedRole(for: item) {
             parts.append(role.localizedTitle)
+        }
+        if let switchDepth = item.switchDepthMeters, switchDepth.isFinite, switchDepth > 0,
+           let role = item.gasRole ?? ChecklistPlannerSyncMapper.resolvedRole(for: item),
+           role == .deco || role == .travel {
+            parts.append(
+                String(
+                    format: String(
+                        localized: "equipment.checklist.switch_depth_format",
+                        defaultValue: "switch @ %d m"
+                    ),
+                    Int(switchDepth.rounded())
+                )
+            )
         }
         if !item.pressureText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             parts.append("\(item.pressureText) \(item.pressureUnit.rawValue)")

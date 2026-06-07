@@ -253,6 +253,12 @@ struct RatioDecoComparisonSection: View {
                 Text(validation.localizedStatusTitle)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(color)
+                if !validation.isBuhlmannCompatible {
+                    Text(String(localized: "planner.ratio_deco.validation.not_validated_plan"))
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(RatioDecoPresentationColors.violation)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 ForEach(Array(validation.warnings.enumerated()), id: \.offset) { _, warning in
                     Text(localizedValidationWarning(warning))
                         .font(.caption2)
@@ -263,6 +269,8 @@ struct RatioDecoComparisonSection: View {
         .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(RoundedRectangle(cornerRadius: 8).fill(color.opacity(0.12)))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(validation.localizedStatusTitle)
     }
 
     private func summaryCards(bundle: RatioDecoPlanningBundle) -> some View {
@@ -342,16 +350,21 @@ struct RatioDecoComparisonSection: View {
     }
 
     private var buhlmannComparisonRows: [RatioDecoComparisonRow] {
-        var runtime = 0.0
-        return store.plan.decoStops.map { stop in
-            runtime += Double(stop.minutes)
-            return RatioDecoComparisonRow(
-                depthLabel: Formatters.depth(stop.depthMeters, units: unitPreference).text,
-                timeLabel: "\(stop.minutes) min",
-                gasLabel: stop.gas,
-                runtimeLabel: Formatters.one(runtime)
+        var cumulative = 0.0
+        var rows: [RatioDecoComparisonRow] = []
+        for row in store.plan.ascentTableRows {
+            cumulative += row.minutes
+            guard row.kind == .decoStop else { continue }
+            rows.append(
+                RatioDecoComparisonRow(
+                    depthLabel: row.depthLabel,
+                    timeLabel: row.timeLabel,
+                    gasLabel: row.gas,
+                    runtimeLabel: Formatters.one(cumulative)
+                )
             )
         }
+        return rows
     }
 
     private func stopTable(rows: [RatioDecoComparisonRow], accent: Color) -> some View {

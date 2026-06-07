@@ -548,6 +548,17 @@
 "watch.draft.finalizing_missing_enddate" = "Una immersione precedente non è stata finalizzata perché il salvataggio temporaneo era incompleto.";
 "watch.draft.expired_discarded" = "Una bozza attiva scaduta è stata scartata in modo sicuro.";
 "watch.draft.encode_failed" = "Impossibile salvare la bozza immersione attiva.";
+"watch.depth_validation.missing_sample" = "Campione profondità mancante: misurazione ignorata.";
+"watch.depth_validation.stale_sample" = "Campione profondità obsoleto: misurazione ignorata.";
+"watch.depth_validation.stuck_sensor" = "Sensore profondità fermo: misurazione ignorata.";
+"watch.depth_validation.implausible_change" = "Variazione profondità non plausibile: campione ignorato.";
+"watch.depth_validation.non_finite" = "Campione profondità non finito: misurazione ignorata.";
+"watch.depth_validation.out_of_range" = "Campione profondità fuori range: misurazione ignorata.";
+"watch.sync.photo.received" = "Foto iPhone ricevuta";
+"watch.sync.photo.error" = "Errore foto iPhone";
+"settings.row.units.picker.a11y" = "Unità";
+"alarms.depth.default_off_hint" = "L'allarme profondità massima è disattivato di default. Attivalo e imposta una soglia prima di immergerti.";
+"alarms.depth.preset_30m" = "Imposta soglia 30 m";
 "sync.pending.encode_failed" = "Impossibile salvare la coda sync in attesa.";
 "sync.pending.retention_warning" = "Elemento sync in attesa datato; in attesa di ack firmato iPhone.";
 "user_images.error.not_image" = "Il file non è un'immagine valida.";

@@ -1,6 +1,21 @@
 import XCTest
 
 final class ChecklistPlannerSyncMapperTests: XCTestCase {
+    func testExportLineIncludesSwitchDepthForDecoGas() {
+        let item = EquipmentChecklistItem(
+            title: "Deco stage",
+            usesGas: true,
+            gasMixKind: .ean,
+            gasText: "EAN50",
+            switchDepthMeters: 21,
+            gasRole: .deco
+        )
+        XCTAssertEqual(item.switchDepthMeters ?? 0, 21, accuracy: 0.01)
+        let line = ChecklistPDFBuilder.exportLine(for: item)
+        XCTAssertTrue(line.contains("switch"), "line was: \(line)")
+        XCTAssertTrue(line.contains("21"), "line was: \(line)")
+    }
+
     func testChecklistToPlannerMapsTankPressureAndMix() {
         let item = EquipmentChecklistItem(
             title: "Deco stage",
