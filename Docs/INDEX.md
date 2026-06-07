@@ -1,9 +1,31 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-07  
-**Branch consigliato:** `main` = `origin/main` @ `5fd821b`  
+**Branch consigliato:** `main` = `origin/main` @ `74035fd`  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-06-07 — Bühlmann hardening + canonical consistency @ `74035fd`
+
+Pass di verifica iOS Companion MAIN (solo test + docs; **nessuna modifica math Bühlmann**):
+
+| Campo | Valore |
+|-------|--------|
+| **Commit** | `74035fd` (`test(ios): harden Bühlmann canonical consistency and refresh docs`) |
+| **Baseline precedente** | `829babe` (audit P1–P3 remediation) |
+| **Target** | `DIRDiving iOS` (MAIN only) |
+| **XCTest** | **387** passed, 5 skipped, 0 failures (iPhone 17 sim) |
+| **Nuovo suite** | `BuhlmannEngineCanonicalConsistencyTests.swift` (5 test) |
+| **Verdict** | **READY FOR INTERNAL VALIDATION** |
+
+| Documento | Aggiornamento |
+|-----------|---------------|
+| [`DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md`](DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md) | Report completo + build/test evidence |
+| [`DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md) | §13 canonical engine consistency |
+| [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md) | Riga suite canonical consistency |
+| [`IOS_MAIN_ALGORITHM_MATH_AUDIT_FIX_COMPLETION_REPORT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_FIX_COMPLETION_REPORT.md) | Remediation P1–P3 @ `829babe` |
 
 ---
 
@@ -450,7 +472,7 @@ Audit statico read-only su **iOS Companion MAIN — Planner only** (`DIRDiving i
 | Documento | Relazione |
 |-----------|-----------|
 | [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT.md) | Audit comprehensive @ `e1370f7` (2026-05-30) — verdict *Almost Ready*; **baseline storica** |
-| [`DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md`](DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md) | Implementazione P1–P4 + CNS/OTU @ `dae29b8` — da ri-validare dopo fix OTU |
+| [`DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md`](DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md) | Implementazione + hardening @ `74035fd` — **387 XCTest**; verdict **READY FOR INTERNAL VALIDATION** |
 | [`DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md) | §11 oxygen exposure — allineare formula OTU dopo fix |
 | [`DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md`](DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md) | Campagna validazione esterna (P1 pending) |
 | [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md) | Limiti reference-only planner |
@@ -647,7 +669,7 @@ Audit read-only Apple Watch MAIN (`DIRDiving Watch App` only):
 
 | Documento | Posizione | Contenuto |
 |-----------|-----------|-----------|
-| [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | `Docs/` | **Audit corrente** — ~92% math robustness; three-mode **90%**; 363 XCTest pass; 0 P0; vedi @ `c723295` |
+| [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | `Docs/` | **Audit corrente** — ~92% math robustness; three-mode **90%**; 363 XCTest @ baseline `81f2d7f`; **387** post-remediation @ `74035fd`; 0 P0; vedi @ `c723295` |
 
 Scope: `DIRDiving iOS` only; experimental files esclusi in `project.yml`. Indicizzato su `main` @ `c723295` (supersedes `5415213` / `ecad0d9`).
 
