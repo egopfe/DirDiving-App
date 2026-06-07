@@ -312,14 +312,18 @@ final class IOSMainAlgorithmMathRemediationTests: XCTestCase {
 
     // MARK: - P2-006 Tissue analytics labels
 
-    func testLogbookTissueAnalyticsSourceIsSimulated() {
-        let session = makeSession(maxDepth: 30, avgDepth: 18)
+    func testLogbookTissueAnalyticsManualSessionUsesSimulatedEstimate() {
+        var session = makeSession(maxDepth: 30, avgDepth: 18)
+        session.isManual = true
         let presentation = TissueAnalyticsService.presentationForSession(session)
         XCTAssertEqual(presentation?.trace.source, .simulated)
-        XCTAssertEqual(
-            presentation?.trace.source.localizedTitle,
-            String(localized: "tissue_analytics.source.simulated")
-        )
+    }
+
+    func testLogbookTissueAnalyticsRecordedSessionUsesRecordedReplay() {
+        let session = makeSession(maxDepth: 30, avgDepth: 18)
+        XCTAssertFalse(session.isManual)
+        let presentation = TissueAnalyticsService.presentationForSession(session)
+        XCTAssertEqual(presentation?.trace.source, .recorded)
     }
 
     func testPlannerTissueAnalyticsSourceIsPlanned() {

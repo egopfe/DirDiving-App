@@ -45,11 +45,11 @@ enum PDFExportService {
         return try PDFExportFilename.write(data: data, filename: filename)
     }
 
-    static func exportChecklist(profile: EquipmentProfile) throws -> URL {
+    static func exportChecklist(profile: EquipmentProfile, unitPreference: IOSUnitPreference = .metric) throws -> URL {
         var migrated = profile
         migrated.syncLegacyChecklistFlags()
         guard hasExportableChecklist(migrated) else { throw PDFExportError.emptyChecklist }
-        let data = ChecklistPDFBuilder.build(profile: migrated)
+        let data = ChecklistPDFBuilder.build(profile: migrated, unitPreference: unitPreference)
         guard !data.isEmpty else { throw PDFExportError.generationFailed }
         let filename = PDFExportFilename.make(prefix: "DIRDiving_Checklist")
         return try PDFExportFilename.write(data: data, filename: filename)
