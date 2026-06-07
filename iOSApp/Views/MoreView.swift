@@ -6,7 +6,6 @@ struct MoreView: View {
     @EnvironmentObject private var logStore: DiveLogStore
     @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
     @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
-    @AppStorage(PlannerCNSDescentBottomCheckSettings.storageKey) private var cnsDescentBottomCheckEnabled = PlannerCNSDescentBottomCheckSettings.defaultEnabled
     @AppStorage(CloudBackupSettings.enabledKey) private var cloudBackupEnabled = false
     @State private var showResetPairingConfirm = false
     @State private var versionTapCount = 0
@@ -29,7 +28,7 @@ struct MoreView: View {
                             unitsPreferenceSection
                             row(String(localized: "more.settings.sync_scope_title"), String(localized: "more.settings.sync_scope_value"))
                             row(String(localized: "more.planner_safety.title"), String(localized: "more.disclaimer.required"))
-                            cnsDescentBottomCheckToggle
+                            cnsDescentBottomSettingsSummary
                             if DeveloperSettings.isDeveloperSectionVisible {
                                 NavigationLink {
                                     DeveloperSettingsView()
@@ -251,20 +250,16 @@ struct MoreView: View {
         }
     }
 
-    private var cnsDescentBottomCheckToggle: some View {
-        Toggle(isOn: $cnsDescentBottomCheckEnabled) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(String(localized: "more.settings.cns_descent_bottom_check"))
-                    .foregroundStyle(.white)
-                Text(String(localized: "planner.settings.cns_descent_bottom_15_check.description"))
-                    .font(.caption2)
-                    .foregroundStyle(DIRTheme.muted)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-        .tint(DIRTheme.cyan)
-        .padding(.vertical, 4)
-        .accessibilityHint(Text(String(localized: "more.settings.cns_descent_bottom_check.a11y")))
+    private var cnsDescentBottomSettingsSummary: some View {
+        row(
+            String(localized: "more.settings.cns_descent_bottom_summary_title"),
+            PlannerCNSDescentBottomCheckSettings.isEnabled
+                ? String(
+                    format: String(localized: "more.settings.cns_descent_bottom_summary_on"),
+                    Formatters.zero(Double(PlannerCNSDescentBottomCheckSettings.thresholdPercent))
+                )
+                : String(localized: "more.settings.cns_descent_bottom_summary_off")
+        )
     }
 
     private var languagePreferencePicker: some View {

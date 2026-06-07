@@ -12,11 +12,14 @@ enum OxygenExposureWarningState: Hashable, Error {
 /// Planner-only informational rule: CNS accumulated on descent + bottom vs daily budget reference.
 enum CNSDescentBottomPlannerRule {
     static let maximumDailyCNSBudgetPercent = 100.0
-    static let warningThresholdPercent = 15.0
+    static let warningThresholdPercent = Double(PlannerCNSDescentBottomCheckSettings.defaultThresholdPercent)
 
-    static func exceedsPlannerThreshold(percent: Double) -> Bool {
+    static func exceedsPlannerThreshold(
+        percent: Double,
+        thresholdPercent: Double = PlannerCNSDescentBottomCheckSettings.thresholdPercentDouble
+    ) -> Bool {
         guard percent.isFinite else { return false }
-        return percent > warningThresholdPercent
+        return percent > thresholdPercent
     }
 }
 

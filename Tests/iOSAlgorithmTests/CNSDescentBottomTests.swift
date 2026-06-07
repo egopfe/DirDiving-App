@@ -158,7 +158,47 @@ final class CNSDescentBottomTests: XCTestCase {
         XCTAssertFalse(analysis.cnsDescentBottomExceedsPlannerThreshold(checkEnabled: false))
     }
 
-    func testFifteenPointZeroOnePercentExceedsPlannerThreshold() throws {
+    func testCustomThresholdTwentyPercent() {
+        let analysis = TechnicalGasAnalysis(
+            gas: GasMix(name: "EAN32", role: .bottom, oxygen: 0.32, helium: 0, maxPPO2: 1.4),
+            ppO2AtDepth: 1.2,
+            densityAtDepth: 0,
+            densityRating: .green,
+            endMeters: 30,
+            eadMeters: nil,
+            consumptionLiters: 0,
+            remainingLiters: 0,
+            remainingBar: 0,
+            rockBottomLiters: 0,
+            minimumGasBar: 0,
+            turnPressureBar: 0,
+            cnsPercent: 22,
+            cnsDescentBottomPercent: 18,
+            otu: 0,
+            cnsDailyPercent: 0,
+            otuDaily24h: 0,
+            otuWeekly: 0,
+            airBreakRecoveryApplied: false,
+            warnings: [],
+            states: [],
+            usesBottomPhaseConsumptionEstimate: false
+        )
+        XCTAssertFalse(
+            analysis.cnsDescentBottomExceedsPlannerThreshold(checkEnabled: true, thresholdPercent: 20)
+        )
+        XCTAssertTrue(
+            analysis.cnsDescentBottomExceedsPlannerThreshold(checkEnabled: true, thresholdPercent: 15)
+        )
+    }
+
+    func testThresholdSettingsClamp() {
+        XCTAssertEqual(PlannerCNSDescentBottomCheckSettings.clamp(3), 5)
+        XCTAssertEqual(PlannerCNSDescentBottomCheckSettings.clamp(20), 20)
+        XCTAssertEqual(PlannerCNSDescentBottomCheckSettings.clamp(99), 50)
+        XCTAssertEqual(PlannerCNSDescentBottomCheckSettings.defaultThresholdPercent, 15)
+    }
+
+    func testFifteenPointZeroOnePercentExceedsDefaultPlannerThreshold() throws {
         let gas = BuhlmannTestSupport.nitrox32()
         let depth = 30.0
         guard let ppO2 = inspiredPPO2(depthMeters: depth, gas: gas),
