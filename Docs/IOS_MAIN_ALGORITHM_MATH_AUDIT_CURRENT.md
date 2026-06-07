@@ -1,13 +1,13 @@
 # iOS Companion MAIN Algorithm and Mathematical Functions Audit — Current
 
-**Audit date:** 2026-06-05  
+**Audit date:** 2026-06-07  
 **Repository:** DIR DIVING (`DirDiving-App`)  
 **Branch audited:** `main`  
-**Code baseline:** `ecad0d9`  
-**Document indexed on `main`:** `5415213`  
+**Code baseline:** `81f2d7f` (`docs(ios): update Bühlmann planner implementation completion report`)  
 **Target audited:** `DIRDiving iOS` only  
-**Mode:** Read-only static audit. No code, UI, Watch runtime, or experimental targets were modified.  
-**Indexed in:** [`Docs/INDEX.md`](INDEX.md) — §4 (iOS MAIN), agg. 2026-06-06, §14 (elenco alfabetico), §12 (percorso rapido #10).
+**Mode:** Read-only audit. No code, UI, Watch runtime, or experimental targets were modified. No commit. No push.
+
+**Supersedes:** prior revision @ `ecad0d9` (2026-06-05).
 
 ---
 
@@ -18,27 +18,28 @@
 | Check | Result |
 |---|---|
 | Branch | `main` |
-| Commit | `ecad0d9` |
+| Commit | `81f2d7f` |
+| Remote | `origin/main` — aligned |
 | Working tree | Clean at audit time |
+| OS | macOS (Darwin) — build/test executed |
 | Experimental exclusions in `project.yml` | Confirmed for `DIRDiving iOS` |
 | Apple Watch runtime | Out of scope except shared models/codec consumed by iOS |
-| Build/test executed | `DIRDiving iOS Algorithm Tests` — **287 passed**, 4 skipped, 0 failures (iPhone 17 Pro sim) |
+| Build | `DIRDiving iOS` — **BUILD SUCCEEDED** (iPhone 17 simulator) |
+| Tests | `DIRDiving iOS Algorithm Tests` — **363 passed**, 5 skipped, 0 failures |
 
 ### iOS MAIN target exclusions (`project.yml`)
 
-These files are **not** in the `DIRDiving iOS` build and were not audited:
+Not in `DIRDiving iOS` build (not audited):
 
-- `iOSApp/Models/ExplorationModels.swift`
-- `iOSApp/Models/BuddyExperimentalModels.swift`
-- `iOSApp/Services/ExplorationPlanningStore.swift`
-- `iOSApp/Services/BuddyExperimentalStore.swift`
-- `iOSApp/Views/ExplorationCenterView.swift`
-- `iOSApp/Views/ExperimentalFutureConceptsView.swift`
-- `iOSApp/Views/BuddyExperimentalView.swift`
+- `iOSApp/Models/ExplorationModels.swift`, `BuddyExperimentalModels.swift`
+- `iOSApp/Services/ExplorationPlanningStore.swift`, `BuddyExperimentalStore.swift`
+- `iOSApp/Views/ExplorationCenterView.swift`, `ExperimentalFutureConceptsView.swift`, `BuddyExperimentalView.swift`
 
-### Primary files inspected
+### Primary references
 
-Planner / three-mode architecture, Bühlmann, gas, logbook, sync, import/export, formatters, analysis, manual dive, equipment, and the full `Tests/iOSAlgorithmTests/*` suite (52 files).
+- [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md) @ `21a5858`
+- [`DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md`](DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md) @ `81f2d7f`
+- [`IOS_PLANNER_CHART_TRUTHFULNESS.md`](IOS_PLANNER_CHART_TRUTHFULNESS.md)
 
 ---
 
@@ -46,626 +47,452 @@ Planner / three-mode architecture, Bühlmann, gas, logbook, sync, import/export,
 
 ### Overall verdict
 
-The iOS Companion MAIN target contains a **substantive, non-placeholder algorithm layer**: ZHL-16C N2/He Bühlmann reference engine, mode-aware planner projection (`PlannerModePolicy`), gas validation and consumption ledger, oxygen exposure (CNS/OTU), time-weighted dive profile math, CSV import/export guards, Watch sync codec validation, and cloud merge with conflict detection.
+The iOS Companion MAIN target at `81f2d7f` is a **coherent non-certified Bühlmann ZHL-16C reference planner** with real three-mode architecture (Base / Deco / Technical), post-plan tissue-history charting, schedule-aware gas ledger, NOAA/Lambertsen oxygen exposure, logbook analytics, CSV import/export, Watch sync codec validation, and iCloud KVS merge. Recent P2/P3 fixes (ascent table briefing order, full-plan CNS warning tile, GF/TTS copy, tissue chart fail-explicit) are present and tested.
 
-The **three-tab Planner architecture (Base / Deco / Technical) is materially functional**, not decorative. Mode selection affects visible inputs, active gas projection, validation rules, calculation inputs, result section gating, Bühlmann display level, warning scope, localization, and accessibility summaries. Automated coverage exists in `PlannerModePolicyTests.swift` and related planner tests.
-
-Remaining gaps are primarily **integration consistency** (preview widgets vs projected plan input, cloud profile merge semantics, PPO₂ tolerance fragmentation) and **physical/external QA**, not missing core math.
+**No P0 safety-critical algorithm blocker** was found in this pass. **Internal validation readiness is achieved** on macOS build/test evidence. External decompression comparison, simulator/device QA, and documentation baseline refresh remain before stronger TestFlight or App Store claims.
 
 ### Readiness estimates
 
 | Area | Readiness | Notes |
 |---:|---:|---|
-| **Overall mathematical robustness** | **91%** | Core engine and validators are sound; integration edge cases remain |
-| **Planner confidence (calculation path)** | **92%** | `PlannerService.makePlan` uses projected active input correctly |
-| **Planner three-mode readiness** | **88%** | Real architecture; preview/export/copy gaps |
-| **Bühlmann ZHL-16C engine** | **93%** | Real tissue model; display gating by mode is correct |
-| **Gas planning / consumption** | **90%** | Ledger excludes unused/bailout by design; mode projection respected in plan path |
-| **Logbook derived math** | **92%** | Centralized `DiveProfileMath`; demo isolation present |
-| **CSV import/export** | **89%** | Guards present; external Subsurface regression still manual |
-| **Watch sync validation on iOS** | **90%** | HMAC + math validation; unsigned ack path for some deliveries |
-| **Cloud merge / iCloud KVS** | **86%** | Metadata conflicts detected; profile sample merge is silent |
-| **Unit conversion consistency** | **89%** | Central helpers; manual pressure unit semantics ambiguous |
-| **Automated algorithm tests** | **93%** | 287 XCTest pass; mode-specific preview tests still thin |
+| **Overall mathematical robustness** | **92%** | Core Bühlmann + exposure models sound; integration edge cases remain |
+| **Planner confidence (calculation path)** | **93%** | `PlannerService.makePlan` uses mode-projected active input |
+| **Planner three-mode readiness** | **90%** | Real policy projection; Base still runs full engine internally (UI gated) |
+| **Bühlmann ZHL-16C engine** | **94%** | Real tissue model; external reference campaign pending |
+| **Bühlmann curve / tissue history** | **93%** | Primary chart truthful; NDL secondary only |
+| **PIANO DI RISALITA table** | **91%** | Post-P2 briefing order; travel/deco not interleaved per stop |
+| **GRAFICI depth profile** | **92%** | Real segment-derived profile (Technical Charts tab) |
+| **CNS / OTU** | **91%** | Full plan + descent/bottom + 15% rule; weekly OTU not shown in UI |
+| **Gas planning / consumption** | **90%** | Ledger + MOD/PPO₂; bailout schedule-only by design |
+| **Logbook derived math** | **92%** | Centralized profile math; no post-dive CNS/OTU |
+| **CSV import/export** | **90%** | Bounded guards; DIR CSV not Subsurface XML |
+| **Watch sync validation on iOS** | **89%** | Strong codec/auth; service integration undertested |
+| **Cloud merge / iCloud KVS** | **87%** | LWW merge; profile merge semantics need QA |
+| **Documentation accuracy** | **78%** | Several README baselines still cite `90dc3f5` |
+| **Automated algorithm tests** | **94%** | 363 XCTest pass @ `81f2d7f` |
 
-### Severity summary
+### Critical blockers
 
-| Severity | Count | Summary |
-|---:|---:|---|
-| CRITICAL | 0 | No immediate certified-decompression authority blocker |
-| HIGH | 2 | Silent cloud profile merge; NDL preview uses draft not projected input |
-| MEDIUM | 6 | PPO₂ tolerance fragmentation, export mode label, Base/Deco env validation gap, analysis preview path, share copy scope, Watch delivery ack |
-| LOW | 4 | Deco NDL tab scope, bailout ledger clarity, localized service strings, Subsurface external regression |
-| INFO | 3 | Base runs full engine internally (UI gated); arithmetic analysis averages; OTU extrapolation positioning |
-
-### Blockers
-
-| Gate | Blockers |
+| Gate | Status |
 |---|---|
-| **Compile / use** | None identified |
-| **Internal TestFlight** | HIGH-002 (misleading NDL preview in Deco when draft GF/gases differ from projection) — recommend fix or copy disclaimer before wide internal use |
-| **External TestFlight** | HIGH-001 (cloud profile merge without conflict UX) + physical Watch round-trip QA |
-| **App Store** | External TestFlight blockers + documented Subsurface CSV regression + paired-device sync matrix |
+| **Internal algorithm validation** | **Ready** — macOS build + 363 tests pass |
+| **Internal TestFlight planning** | **Almost ready** — P2 doc/QA items below |
+| **External TestFlight** | **Not yet** — device QA + external Bühlmann comparison |
+| **App Store** | **Not yet** — legal/external QA + stale doc baselines |
+| **Certified decompression claim** | **Never claimed / not supported** |
 
 ---
 
 ## B. Algorithm Inventory
 
-Grouped by audit families. **Mode column:** Base / Deco / Technical / shared.
+Grouped inventory of iOS Companion MAIN mathematical/algorithmic components. Internal storage is metric unless noted.
 
 ### 1. Planner mode architecture
 
-| Component | File | Inputs → outputs | Mode | Safety |
+| Component | File | Input → Output | Modes | Safety |
 |---|---|---|---|---|
-| `PlannerMode` enum + legacy decode | `iOSApp/Models/GasPlan.swift` | persisted raw → `.base`/`.deco`/`.technical` | shared | Low |
-| `PlannerModePolicy.activePlanInput` | `iOSApp/Utils/PlannerModePolicy.swift` | draft `GasPlanInput` → projected input | Base: bottom only + std GF; Deco: bottom + ≤1 deco; Technical: full draft | **High** |
-| `PlannerModePolicy.validate` | same | draft + mode → `PlannerValidationResult` | Mode-specific trimix rules | High |
-| `PlannerModePolicy.modeGuidance` | same | engine plan + stops → Base-only “exceeds mode” warning | Base | High |
-| `PlannerResultPresentation` | same | mode → UI section flags | Per-mode gating matrix | High |
-| `visiblePlannerCylinders` | `iOSApp/Views/PlannerView.swift` | draft cylinders → visible subset | Mirrors projection in UI | Medium |
-| Mode picker + localized descriptions | `PlannerView.swift`, `Resources/*.lproj` | user tab → `store.mode` | shared | Medium |
+| Mode enum | `GasPlan.swift` | — | Base, Deco, Technical | Policy |
+| Active input projection | `PlannerModePolicy.activePlanInput` | Draft `GasPlanInput` → projected copy | Per mode | **Critical** |
+| Mode validation merge | `PlannerModePolicy.validate` | Draft + mode → `PlannerValidationResult` | Per mode | **Critical** |
+| Mode limits (NDL clamp, 40 m deco cap) | `PlannerModeLimits` | Input clamp/validate | Base, Deco | **Critical** |
+| Result presentation flags | `PlannerResultPresentation` | Mode → UI/chart gates | All | UX/safety copy |
+| Mode guidance (Base deco exceedance) | `PlannerModePolicy.modeGuidance` | Engine result → warning string | Base | Informational |
 
-### 2. Planner / dive planning algorithms
-
-| Component | File | Notes | Mode |
-|---|---|---|---|
-| `PlannerService.makePlan` | `iOSApp/Services/PlannerService.swift` | Projects input, validates, runs Bühlmann, builds result | Uses active projection per mode |
-| `BuhlmannPlanner.makeRequest` | `iOSApp/Services/BuhlmannPlanner.swift` | Builds multigas request from projected cylinders | shared engine |
-| `PlanCalculationCompletenessResolver` | `iOSApp/Utils/PlanCalculationCompleteness.swift` | Incomplete calc states | shared |
-| `PlannerAscentTableBuilder` | `iOSApp/Services/PlannerAscentTableBuilder.swift` | Ascent table rows | Full (Technical), simplified (Deco), hidden (Base) |
-| `PlannerDepthProfileBuilder` | `iOSApp/Services/PlannerDepthProfileBuilder.swift` | Depth/time profile points | shared |
-| `PlannerGasSchedule` | `iOSApp/Services/PlannerGasSchedule.swift` | Role schedule lines, PPO₂ at switch | Technical multigas; Deco limited |
-| `PlannerStore.applyInputToPlanningOutputs` | `iOSApp/Services/PlannerStore.swift` | Keeps plan + preview in sync | **Preview path does not project mode** |
-
-### 3. Bühlmann / decompression display
-
-| Component | File | Implementation | Display by mode |
-|---|---|---|---|
-| `BuhlmannEngine` | `iOSApp/Algorithms/Buhlmann/BuhlmannEngine.swift` | ZHL-16C N2/He, GF, multigas schedule | Engine always runs on projected input |
-| `BuhlmannTissueHistory` | `iOSApp/Algorithms/Buhlmann/BuhlmannTissueHistory.swift` | Compartment load samples | Hidden Base; simplified Deco; full Technical |
-| `BuhlmannPlanPreflightValidator` | `iOSApp/Algorithms/Buhlmann/BuhlmannPlanPreflightValidator.swift` | Pre-schedule gas envelope | shared |
-| `BuhlmannPlanner.plan` (NDL curve) | `iOSApp/Services/BuhlmannPlanner.swift` | Depth vs NDL reference curve | Deco + Technical tabs only |
-| Tissue chart UI | `iOSApp/Views/PlannerView.swift` (`PlanResultView`) | Swift Charts, disclaimers | `.hidden` / `.simplifiedSummary` / `.fullCurve` |
-
-### 4. Gas planning algorithms
-
-| Component | File | Role | Mode |
-|---|---|---|---|
-| `GasPlanningService.analyze` | `iOSApp/Services/GasPlanningService.swift` | PPO₂, END, EAD, density, rock bottom, CNS/OTU | Plan path uses projected input; preview property uses draft |
-| `GasPlanningService.contingencyPlans` | same | Lost-gas scenarios | Technical only (UI gated) |
-| `GasPlanningService.teamGasMatches` | same | Team gas matching | Technical only |
-| `ScheduleGasConsumptionService` | `iOSApp/Services/ScheduleGasConsumptionService.swift` | Consumption ledger from engine segments | Deco/Technical result; unused/bailout separate |
-
-### 5. PPO₂ / MOD / gas safety
-
-| Component | File | Thresholds |
-|---|---|---|
-| `GasMixValidator` | `iOSApp/Utils/GasMixValidator.swift` | O₂/He fractions, max PPO₂ |
-| `PlannerMODValidator` | `iOSApp/Services/PlannerMODValidator.swift` | Cylinder MOD vs planned depth |
-| `BuhlmannGas.isOperationalBetween` | `iOSApp/Algorithms/Buhlmann/BuhlmannGas.swift` | +0.0001 bar tolerance (strict) |
-| Preflight deco switch | `BuhlmannPlanPreflightValidator` | +0.02 bar (`decoGasSwitchPPO2ToleranceBar`) |
-| `IOSAlgorithmConfiguration` | `iOSApp/Utils/IOSAlgorithmConfiguration.swift` | min PPO₂ 1.0 bar surface legacy display path |
-
-### 6. SAC / gas consumption
-
-| Component | File | Formula semantics |
-|---|---|---|
-| Bottom consumption estimate | `GasPlan.swift` | `SAC × ambientPressure × bottomMinutes` (L) |
-| Rock bottom | `GasPlanningService.rockBottomLiters` | 9 m/min ascent assumption (shared constant) |
-| Schedule ledger | `ScheduleGasConsumptionService` | Segment ATA × SAC; excludes unscheduled cylinders |
-
-### 7. CNS / OTU / oxygen exposure
+### 2. Planner / dive planning
 
 | Component | File | Notes |
 |---|---|---|
-| `OxygenExposureModel` | `iOSApp/Services/OxygenExposureModels.swift` | NOAA-style tables; extrapolation above limits |
-| Descent+bottom vs full plan CNS | `GasPlanningService` + result | Separate labels in UI and export |
-| Monotonicity tests | `Tests/iOSAlgorithmTests/OTU*` | OTU increases with PPO₂ |
+| Plan orchestration | `PlannerService.makePlan` | Single canonical `BuhlmannEngineResult` → all derived outputs |
+| Plan store / recalc | `PlannerStore` | Draft vs projected preview; mode switch preserves hidden cylinders |
+| Input validation | `PlannerInputValidator` | Depth, time, SAC, GF (Technical), environment, cylinders |
+| Completeness resolver | `PlanCalculationCompletenessResolver` | Suppresses partial stop presentation |
+| Result states | `PlannerResultState` | Typed fail-closed states incl. `oxygenExposureElevated` |
+| Briefing text | `GasPlanningService.makeBriefing` | TTS-only wording post-P3 fix |
+| Contingency / team match | `PlannerService` | Technical-only sections |
+| GF comparisons | `BuhlmannPlanner.gfComparisons` | Technical Charts tab |
 
-### 8–21. Remaining families (summary)
+### 3. Bühlmann / decompression
 
-| # | Family | Primary files | Assessment |
-|---|---|---|---|
-| 8 | Dive log statistics | `DiveLogStore`, `DiveProfileMath`, `IOSDiveLogbookPolicy` | Sound; demo dives flagged |
-| 9 | Depth profile / charts | `DiveDetailView`, `PlannerDepthProfileBuilder` | Negative depth convention consistent |
-| 10 | Analysis dashboard | `AnalysisDashboardMath`, `AnalysisView` | Arithmetic session averages (documented INFO) |
-| 11 | Manual dive edit | `ManualDiveEditorView`, `ManualDiveSampleBuilder` | Validation + sample synthesis |
-| 12 | CSV import | `DiveImportService` | Size cap, row validation, optional temperature |
-| 13 | CSV / Subsurface export | `SubsurfaceExportService` | Metric export; empty profile rejected |
-| 14 | Subsurface compatibility | import + export pair | Needs external tool regression |
-| 15 | Watch sync | `WatchSyncService`, `WatchDiveSyncCodec` | HMAC, numeric validation, tombstones |
-| 16 | Cloud merge / KVS | `CloudSyncStore`, `DiveSessionMerge`, `DiveSessionMergeConflict` | Metadata conflicts; silent profile merge |
-| 17 | Unit conversion / formatters | `IOSUnitConversions`, `Formatters` | Internal metric storage |
-| 18 | GPS / route | `RouteMath` (if referenced by analysis) | Haversine, bearing normalization |
-| 19 | Equipment / checklist | `EquipmentStore`, `EquipmentView` | Completion counts; cloud merge |
-| 20 | Demo isolation | `DemoDiveCatalog`, `AnalysisDemoIsolationTests` | Demo excluded when real dives exist |
-| 21 | Edge / empty paths | validators + `unavailablePlan` | Finite-safe fallbacks |
+| Component | File | Notes |
+|---|---|---|
+| Constants ZHL-16C | `BuhlmannConstants.swift` | 16 N₂ + 16 He compartments |
+| Tissue loaders | `BuhlmannTissueModel.swift` | Schreiner + constant depth |
+| Engine | `BuhlmannEngine.swift` | NDL search, GF ceiling, stop schedule, multigas |
+| Preflight | `BuhlmannPlanPreflightValidator.swift` | Fail-closed before plan |
+| Planner adapter | `BuhlmannPlanner.swift` | `GasPlanInput` → `BuhlmannPlanRequest` |
+| Tissue history sampler | `BuhlmannTissueHistory.swift` | Post-plan visualization only; fail-explicit @ invalid ambient |
+
+### 4. Gas / environment / exposure
+
+| Component | File | Notes |
+|---|---|---|
+| Gas analysis | `GasPlanningService.swift` | PPO₂, density, END, CNS/OTU, states |
+| Oxygen exposure | `OxygenExposureModels.swift` | NOAA CNS + Lambertsen OTU |
+| Schedule consumption | `ScheduleGasConsumptionService.swift` | Per-cylinder ledger |
+| MOD validation | `PlannerMODValidator.swift` | Switch depth vs MOD |
+| Environment | `PlannerEnvironment.swift`, `AmbientPressureModel` | Altitude, salinity, no silent fallback in validated paths |
+| Gas mix validation | `GasMixValidator.swift` | O₂+He fractions, hypoxic MOD |
+
+### 5. Charts / profiles
+
+| Component | File | Notes |
+|---|---|---|
+| Ascent table | `PlannerAscentTableBuilder.swift` | Bottom → post-bottom travel → deco → surface |
+| Depth profile | `PlannerDepthProfileBuilder` | Segment staircase + surface terminus |
+| Tissue analytics (logbook) | `TissueAnalyticsService.swift` | Simulated replay; GF 0.85 assumption |
+
+### 6. Logbook / analysis / import / export / sync
+
+| Component | File | Notes |
+|---|---|---|
+| Profile math | `DiveProfileMath.swift` | Time-weighted avg depth/temp |
+| CSV import | `DiveImportService.swift` | Bounded parser, metadata, validation |
+| CSV export | `SubsurfaceExportService.swift` | DIR CSV + metadata round-trip |
+| Watch sync codec | `WatchDiveSyncCodec.swift`, `WatchSyncService.swift` | Signed payloads, conflict diff |
+| Cloud merge | `CloudSyncStore.swift`, `DiveSessionMerge.swift` | LWW KVS, conflict detection |
+| Analysis dashboard | `AnalysisDashboardMath.swift` | Arithmetic means (documented) |
+
+### 7. Units / formatters
+
+| Component | File | Notes |
+|---|---|---|
+| Conversions | `IOSUnitConversions.swift` | m/ft, bar/psi, °C/°F, L/cu ft |
+| Display | `Formatters.swift`, `IOSUnitPreference` | UI/export formatting |
 
 ---
 
 ## C. Planner Mode Audit
 
-### Architecture verdict
+### Mode semantics matrix
 
-**Base, Deco, and Technical are real modes.** Policy is centralized in `PlannerModePolicy.swift`, enforced in `PlannerService.makePlan`, mirrored in `PlannerView` UI gating, and covered by unit tests.
-
-### A. UI inputs matrix
-
-| Field / control | Base | Deco | Technical |
+| Dimension | Base | Deco | Technical |
 |---|---|---|---|
-| Bottom gas card | ✓ visible (1) | ✓ visible | ✓ visible |
-| Deco gas card(s) | ✗ hidden | ✓ ≤1 visible (+ add deco button) | ✓ multiple |
-| Travel gas | ✗ hidden | ✗ hidden | ✓ |
-| Bailout gas | ✗ hidden | ✗ hidden | ✓ |
-| Role / tank size pickers | ✗ fixed bottom | ✗ fixed roles | ✓ editable |
-| GF manual controls | ✗ hidden (forced std on calc) | ✗ presets only | ✓ manual |
-| SAC emergency / team | ✗ hidden | ✓ reserve card tiles | ✓ full |
-| Repetitive planning | ✗ | ✗ | ✓ |
-| Environment (altitude/salinity) | stored, **not validated** | stored, **not validated** | ✓ validated |
-| Trimix mix kind in gas card | ✗ disallowed | ✗ disallowed | ✓ allowed |
+| **Intent** | No-deco recreational | Deco to 40 m | Full multigas technical |
+| **Active cylinders** | Bottom only | Bottom + max 1 deco | All roles (travel, deco×n, bailout) |
+| **Mix kinds (UI)** | Air, EAN | All (trimix blocked in validation) | All incl. trimix |
+| **Travel / bailout** | Hidden/disabled | Hidden/disabled | Allowed |
+| **GF** | Fixed 30/80 (projected) | Presets only | Manual sliders |
+| **GF validation** | Not validated (fixed) | Not validated (presets) | Strict `gfLow < gfHigh` |
+| **Depth limit** | NDL-compatible clamp | 40 m hard cap | Global max (120 m) |
+| **Bottom time limit** | NDL clamp | Global max | Global max |
+| **Avg depth / planning ref** | Hidden | Shown | Shown |
+| **Altitude / salinity** | Hidden | Hidden | Shown |
+| **Repetitive planning** | Hidden | Hidden | Shown |
+| **Engine path** | Full Bühlmann on projected input | Same | Same (+ repetitive seed) |
 
-Hidden Technical cylinders **remain in draft** when switching to Base/Deco; UI filters via `visiblePlannerCylinders`.
-
-### B. Active calculation input
-
-| Mode | `activePlanInput` behavior | Verified |
-|---|---|---|
-| Base | Single bottom cylinder; GF 30/80 preset | ✓ tests |
-| Deco | Bottom + max one deco (deepest switch first) | ✓ tests |
-| Technical | Full `plannerCylinders` draft | ✓ tests |
-
-`PlannerService.makePlan` always plans from **projected** `activeInput`. Hidden travel/bailout/extra deco gases are **not** passed to Bühlmann in Base/Deco.
-
-**Gap:** `PlannerStore` NDL preview (`store.buhlmann`) uses **draft** `input.gfHigh` and `input.buhlmannBackGas`, not projected active input (see HIGH-002).
-
-### C. Validation rules
-
-| Rule | Base | Deco | Technical |
-|---|---|---|---|
-| Trimix bottom | Rejected | Rejected | Allowed |
-| Air/EAN bottom | Allowed | Allowed | Allowed |
-| Multiple deco | N/A (0) | ≤1 active | Unlimited |
-| Travel/bailout in draft | Ignored for calc | Ignored | Used |
-| Average depth required | No | Yes | Yes |
-| Environment bounds | Skipped | Skipped | Validated |
-| PPO₂/MOD / hypoxic | On active gases | On active gases | Full multigas |
-
-### D. Result sections matrix
+### Result section matrix
 
 | Section | Base | Deco | Technical |
 |---|---|---|---|
-| Full ascent table | ✗ | ✗ | ✓ |
-| Simplified ascent table | ✗ | ✓ | ✗ |
+| Result tabs: PIANO | ✓ | ✓ | ✓ |
+| Result tabs: CURVA | ✗ | ✓ (simplified tissue) | ✓ (full + NDL ref) |
+| Result tabs: GRAFICI | ✗ | ✗ | ✓ |
+| Ascent table | Hidden | Simplified table | Full table |
 | Gas ledger | ✗ | ✓ | ✓ |
-| Contingency / team match | ✗ | ✗ | ✓ |
-| GF comparison | ✗ | ✗ | ✓ |
-| Segment timeline | ✗ | ✓ | ✓ |
-| Bühlmann tissue chart | hidden | simplifiedSummary | fullCurve |
-| NDL reference curve tab | ✗ | ✓ | ✓ |
-| Charts tab (extra) | ✗ | ✗ | ✓ |
-| Mode guidance (deco obligation) | ✓ when stops/NDL exceeded | ✗ | ✗ |
+| Briefing | ✗ | ✓ | ✓ |
+| Contingency / team | ✗ | ✗ | ✓ |
+| Tissue analytics entry | ✗ | ✓ | ✓ |
+| Base compatibility card | ✓ | ✗ | ✗ |
 
-### E. Mode switching data policy
+### Mode switching policy
 
-| Policy | Status |
+- Draft `GasPlanInput` retains hidden Technical cylinders when switching to Base/Deco (`PlannerModePolicyTests`).
+- Calculations always use **projected** active input, not raw draft (`PlannerService.makePlan` L4–5 flow).
+- **Mismatch (P2):** Base mode still executes full Bühlmann engine internally when bottom time exceeds NDL; UI shows guidance via `modeGuidanceMessage` but user may not expect engine deco output in Base tab. Documented as informational, not algorithm bug.
+
+---
+
+## D. Bühlmann Mathematical Assessment
+
+| Area | Verdict | Evidence |
+|---|---|---|
+| ZH-L16C constants | **Pass** | `BuhlmannConstants.swift`; `BuhlmannConstantsTests` |
+| N₂/He tissue loading | **Pass** | Schreiner + constant depth; `BuhlmannSchreinerEquationTests` |
+| Mixed a/b coefficients | **Pass** | Pressure-weighted; `BuhlmannNumericalRobustnessTests` |
+| Environment / inspired gas | **Pass** | `PlannerEnvironment`, water vapor subtraction |
+| GF interpolation | **Pass** | `BuhlmannEngine.gfAtDepth`; strict `<` enforced |
+| Ceiling / stops | **Pass** | Compartment-based; not static templates |
+| NDL | **Pass** | Tissue-state search; no fake 999 |
+| Multigas / trimix | **Pass** | He loading; `BuhlmannTrimixHeliumTests`, golden fixtures |
+| Repetitive seeding | **Pass** | `initialTissueState` before canonical plan |
+| External validation | **Pending** | No certified third-party equivalence campaign |
+
+**GF policy:** `gfLow < gfHigh` strictly (Technical validator + engine). Equality rejected — `BuhlmannGradientFactorTests.testEqualGradientFactorsAreRejectedByPlannerValidator`.
+
+---
+
+## E. Tissue History / CURVA BÜHLMANN Assessment
+
+| Check | Result |
 |---|---|
-| Technical config preserved in draft on Base/Deco switch | ✓ verified in tests |
-| Base calc ignores inactive Technical data | ✓ projection |
-| Switch Technical → Base → Technical restores cylinders | ✓ draft untouched |
-| GF reset on Base projection | ✓ forced standard preset |
+| Sampled from engine segments post-plan | **Yes** — `BuhlmannTissueHistorySampler` |
+| Sampling mutates stop math | **No** — fixture regression tests |
+| 16 compartments per timestamp | **Yes** — `BuhlmannTissueHistoryTests` |
+| Groups 1–4 / 5–8 / 9–12 / 13–16 max load | **Yes** — `aggregationMethod = max_load_percent_per_group` |
+| Primary chart source | `tissueHistory.groupedPoints` — not NDL |
+| NDL chart | Secondary, Technical only, with disclaimer |
+| Invalid plan | Empty history + UI empty state |
+| Invalid ambient (display) | `compartmentMetrics` returns nil; no sea-level fallback |
+| Base mode curve | Hidden (`.buhlmannPresentation = .hidden`) |
+| Deco mode curve | Simplified (no NDL reference overlay) |
+| Technical mode curve | Full curve + optional NDL reference |
 
-### F. Localization and accessibility
+---
 
-| Item | Status |
+## F. Decompression Table / PIANO DI RISALITA Assessment
+
+| Check | Result |
 |---|---|
-| Tab titles + mode descriptions | Localized keys present (`planner.mode.*`) |
-| Base exceeds-mode warning | Localized (`planner.base.exceeds_mode.*`) |
-| Reference-only disclaimers | Present on planner input and Bühlmann charts |
-| Bühlmann chart a11y summaries | `planner.buhlmann.tissue_chart.a11y.*` |
-| Export share a11y | `planner.export.share.a11y` |
-| **Export text includes active mode label** | **Missing** (MED-003) |
+| Columns depth / time / gas / PPO₂ | **Yes** |
+| Bottom row from real bottom segments | **Yes** |
+| Travel rows | Post-bottom **ascent + gasSwitch** only (descent excluded) — post-P2 fix |
+| Deco rows from engine stops | **Yes**, engine order |
+| Surface row last | **Yes** — tested |
+| PPO₂ from gas + depth + environment | **Yes** |
+| Incomplete plan | `presentationStops = []` + UI banner |
+| TTS label | Maps to `enginePlan.ttsMinutes` |
+| TTR wording | Removed from briefing (TTS-only post-P3) |
+| Row interleaving | All travel rows before all deco rows (briefing style, not stop-interleaved) |
 
-### Gas availability matrix
+---
 
-| Gas role | Base | Deco | Technical |
-|---|---|---|---|
-| Bottom | 1 | 1 | 1+ |
-| Deco | 0 | ≤1 | many |
-| Travel | 0 | 0 | optional |
-| Bailout | 0 | 0 | optional |
+## G. GRAFICI / Depth Profile Assessment
 
-### Output matrix (calculation vs display)
+| Check | Result |
+|---|---|
+| Depth-vs-time chart | **Yes** — Technical Charts tab |
+| Data source | `PlannerDepthProfileBuilder.points(from: segments)` |
+| Ends at surface | **Yes** — `PlannerDepthProfileTests` |
+| Segment timeline | Technical Charts tab |
+| GF comparison | Technical Charts tab |
+| Base/Deco visibility | Charts tab hidden (mode policy) |
 
-| Output | Base calc | Base display | Deco calc | Technical |
+---
+
+## H. CNS / OTU / 15% Rule Assessment
+
+| Check | Result |
+|---|---|
+| Full-plan CNS includes deco/ascent | **Yes** — full engine segments |
+| CNS descent+bottom separate | **Yes** — `.descent` + `.bottom` filter only |
+| 15% threshold strict `> 15%` | **Yes** — `CNSDescentBottomTests` |
+| Toggle in More | **Yes**, default on |
+| Red warning banner | **Yes** when threshold exceeded |
+| Full-plan CNS hero tile warning | **Yes** when `oxygenExposureElevated` — post-P2 fix |
+| OTU Lambertsen direction | **Yes** — `OTUCanonicalFixtureTests` |
+| OTU monotonicity with PPO₂ | **Yes** |
+| Weekly OTU computed | **Yes** in model |
+| Weekly OTU displayed | **No** — P2 UX gap |
+| Logbook/analysis CNS/OTU | **N/A** — not stored post-dive |
+| Reference-only disclaimers | **Present** in UI strings |
+
+---
+
+## I. Gas Planning / MOD / PPO₂ / SAC Assessment
+
+| Area | Verdict |
+|---|---|
+| Schedule gas ledger | **Pass** — role-aware, excludes bailout from Bühlmann optimization |
+| MOD / PPO₂ validation | **Pass** — `PlannerMODValidator`, segment PPO₂ checks |
+| SAC / RMV consumption | **Pass** — schedule-aware when segments available |
+| Reserve / rock bottom | **Pass** — typed warning states |
+| END / EAD / density | **Pass** — environment-aware |
+| Hypoxic gas rules | **Pass** — minimum operating depth validation |
+| Duplicate gas label disambiguation | **Pass** — `gasMixId`, `cylinderId` |
+| Mode inactive gas exclusion | **Pass** — projection strips unused cylinders |
+
+---
+
+## J. Logbook / Analysis / Import / Export / Sync Assessment
+
+| Area | Verdict | Notes |
+|---|---|---|
+| Logbook stats | **Pass** | Time-weighted depth; demo isolation |
+| Manual dive editor | **Pass** | Validated via `DiveSessionAlgorithmValidator` |
+| Analysis dashboard | **Pass** | No CNS/OTU; arithmetic averages documented |
+| CSV import | **Pass** | Size/row limits, metadata, fail-closed |
+| CSV export | **Pass** | Round-trip metadata tests |
+| Watch sync | **Pass** | Codec + conflict diff + auth pinning |
+| Cloud KVS merge | **Partial** | LWW works; profile merge can silently prefer cloud samples (P2) |
+| Tissue analytics (logbook) | **Informational** | Simulated GF 0.85; labelled simulated |
+
+---
+
+## K. Unit Conversion / Formatter Assessment
+
+| Check | Result |
+|---|---|
+| Central conversion helpers | **Yes** — `IOSUnitConversions` |
+| Internal metric storage | **Preserved** |
+| Display preference | `IOSUnitPreference` |
+| Nil/NaN guards in formatters | Present in algorithm validators |
+| Planner under imperial | Uses formatters consistently in audited paths |
+
+---
+
+## L. Findings by Family
+
+### P0 — Safety-critical
+
+**None identified @ `81f2d7f`.**
+
+### P1 — Major algorithm / release-hard
+
+| ID | Title | Family | File | Mode | Priority | Impact |
+|---|---|---|---|---|---|---|
+| IOS-MAIN-P1-001 | External Bühlmann validation campaign not executed | Bühlmann | Docs + fixtures | Shared | P1 | Cannot claim equivalence to reference planners |
+| IOS-MAIN-P1-002 | No certified third-party stop/TTS regression suite | Bühlmann | `Fixtures/*.json` | Shared | P1 | Internal tests pass; external tolerance undocumented |
+
+### P2 — UX / validation / data integrity
+
+| ID | Title | Family | File | Mode | Proposed fix | Code impact |
+|---|---|---|---|---|---|---|
+| IOS-MAIN-P2-001 | Cloud profile merge may silently overwrite local samples | Sync | `DiveSessionMerge.swift`, `CloudSyncStore` | Shared | Document policy or surface conflict UI | Small functional |
+| IOS-MAIN-P2-002 | Weekly OTU warning not shown in planner UI | CNS/OTU | `PlannerView.swift`, `GasPlan.swift` | Shared | Display `otuWeekly` + warning when elevated | UI-only |
+| IOS-MAIN-P2-003 | Oxygen warnings collapsed to single state | CNS/OTU | `GasPlanningService.exposurePlannerStates` | Shared | Optional granular states or copy | Small functional |
+| IOS-MAIN-P2-004 | Logbook tissue analytics uses fixed GF 0.85 simulation | Analytics | `TissueAnalyticsService.swift` | Shared | Document limitation; future recorded gas timeline | Docs / medium |
+| IOS-MAIN-P2-005 | Ascent table travel rows precede all deco rows (not interleaved) | Table | `PlannerAscentTableBuilder.swift` | Deco/Tech | Accept as briefing style or interleave at stop boundaries | Small functional |
+| IOS-MAIN-P2-006 | `CloudSyncStore.load()` merge branches undertested | Sync | `CloudSyncStore.swift` | Shared | Add integration tests | Test-only |
+| IOS-MAIN-P2-007 | `WatchSyncService` service layer undertested | Sync | `WatchSyncService.swift` | Shared | Add integration tests | Test-only |
+
+### P3 — Documentation / polish
+
+| ID | Title | Family | File | Proposed fix |
 |---|---|---|---|---|
-| Bühlmann schedule | full engine on projected input | minimal hero + warnings | simplified tables + ledger | full |
-| Deco stops in result | computed | not shown as actionable table | shown (simplified) | full table |
-| CNS/OTU | computed | secondary metrics gated | shown | full + export |
-| Gas consumption detail | bottom estimate only in input | reserve hidden | ledger | ledger + contingency |
+| IOS-MAIN-P3-001 | README/Docs README baseline still `90dc3f5` | Docs | `README.md`, `Docs/README.md` | Update to `81f2d7f` + test count 363 |
+| IOS-MAIN-P3-002 | `IOS_PLANNER_CHART_TRUTHFULNESS.md` travel row wording stale | Docs | Chart truthfulness doc | Update post-P2 ascent table semantics |
+| IOS-MAIN-P3-003 | Missing `DIR_DIVING_IOS_CNS_PLANNER_IMPLEMENTATION_AUDIT.md` | Docs | Docs/ | Create or remove references |
+| IOS-MAIN-P3-004 | Duplicate root `Services/` tree may drift from `iOSApp/Services/` | Maintainability | Repo layout | Confirm canonical path in docs |
+| IOS-MAIN-P3-005 | `DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_AUDIT_CURRENT.md` predates tissue history | Docs | Docs/ | Mark superseded @ `81f2d7f` |
+
+### P4 — Post-release / external QA
+
+| ID | Title | Proposed action |
+|---|---|---|
+| IOS-MAIN-P4-001 | External Bühlmann comparison with reference tools | Execute validation plan |
+| IOS-MAIN-P4-002 | Physical Dynamic Type / VoiceOver / paired-device QA | Run QA matrices |
+| IOS-MAIN-P4-003 | Subsurface third-party CSV regression | Manual fixture pass |
+| IOS-MAIN-P4-004 | Simulator screenshot evidence for Charts tab | TestFlight gate |
 
 ---
 
-## D. Findings by Family
+## M. Edge Case Matrix
 
-### HIGH-001 — Cloud merge silently fuses divergent dive profiles
-
-| Field | Value |
-|---|---|
-| **ID** | HIGH-001 |
-| **Title** | Profile samples merged without conflict detection |
-| **Family** | Cloud merge / iCloud KVS |
-| **File/function** | `iOSApp/Utils/DiveSessionMerge.swift` — `preferred`, `mergedSamples` |
-| **Severity** | HIGH |
-| **Planner mode** | shared |
-| **User impact** | Two devices editing the same dive can produce a hybrid depth profile not matching either edit |
-| **Safety impact** | Max/average depth and TTV recomputed from merged samples may misrepresent the dive |
-| **Mathematical explanation** | `DiveSessionMergeConflictDetector` compares metadata (site, notes, pressure text, dates) but **not** `samples`. `DiveSessionMerge.preferred` unions samples by timestamp, keeping deeper sample at each key, then recomputes summary statistics |
-| **Proposed solution** | Detect sample-array divergence as conflict, or LWW on entire session including profile; document merge policy |
-| **Priority** | Before external TestFlight |
-| **Code impact** | small functional |
-
-### HIGH-002 — NDL preview widget uses draft input, not mode-projected input
-
-| Field | Value |
-|---|---|
-| **ID** | HIGH-002 |
-| **Title** | Bühlmann NDL curve preview bypasses `activePlanInput` |
-| **Family** | Planner mode architecture |
-| **File/function** | `iOSApp/Services/PlannerStore.swift` — `applyInputToPlanningOutputs`; `BuhlmannPlanner.plan` |
-| **Severity** | HIGH |
-| **Planner mode** | Deco, Technical (NDL tab visible) |
-| **User impact** | NDL reference curve can reflect draft GF or stale configuration not used by the computed plan |
-| **Safety impact** | User may compare NDL chart against a plan computed with different GF/gases |
-| **Mathematical explanation** | Plan path: `PlannerModePolicy.activePlanInput` + projected GF. Preview path: `input.buhlmannBackGas`, `input.gfHigh` from full draft |
-| **Proposed solution** | Run preview through `activePlanInput(from:mode:)` or label curve as draft/discrepancy |
-| **Priority** | Before wide internal TestFlight |
-| **Code impact** | small functional |
-
-### MED-001 — PPO₂ tolerance fragmentation across layers
-
-| Field | Value |
-|---|---|
-| **ID** | MED-001 |
-| **Title** | Inconsistent PPO₂ epsilon (0.02 vs 0.0001 bar) |
-| **Family** | PPO₂ / MOD / gas safety |
-| **File/function** | `BuhlmannPlanPreflightValidator`, `BuhlmannGas`, `GasPlanningService.segmentsExceedGasPPO2Limit` |
-| **Severity** | MEDIUM |
-| **Planner mode** | shared (Technical multigas most affected) |
-| **User impact** | Gas may pass preflight at switch depth but flag strict over-limit in runtime segments (or vice versa near boundary) |
-| **Safety impact** | Boundary ambiguity at 1.4 vs 1.42 bar effective |
-| **Mathematical explanation** | Deco switch tolerance `decoGasSwitchPPO2ToleranceBar = 0.02`; runtime segment check uses `+ 0.0001` |
-| **Proposed solution** | Centralize tolerance policy with documented rationale per phase (preflight vs display vs runtime) |
-| **Priority** | Before App Store |
-| **Code impact** | small functional |
-
-### MED-002 — Base and Deco skip planner environment validation
-
-| Field | Value |
-|---|---|
-| **ID** | MED-002 |
-| **Title** | Altitude/salinity validated only in Technical mode |
-| **Family** | Planner / environment |
-| **File/function** | `iOSApp/Utils/PlannerInputValidator.swift` lines 61–70 |
-| **Severity** | MEDIUM |
-| **Planner mode** | Base, Deco |
-| **User impact** | Invalid altitude stored but plan may still run with fallback `.seaLevelSaltWater` in some paths |
-| **Safety impact** | MOD/PPO₂ at altitude may be wrong if invalid env silently falls back |
-| **Mathematical explanation** | `PlannerInputValidator` gates `PlannerEnvironment.make` failure handling on `mode == .technical` |
-| **Proposed solution** | Validate environment for all modes or block calculate with explicit error |
-| **Priority** | Before external TestFlight |
-| **Code impact** | small functional |
-
-### MED-003 — Planner share/export omits active mode label
-
-| Field | Value |
-|---|---|
-| **ID** | MED-003 |
-| **Title** | Export text does not state Base/Deco/Technical |
-| **Family** | Planner output / localization |
-| **File/function** | `iOSApp/Views/PlannerView.swift` — `planShareText` |
-| **Severity** | MEDIUM |
-| **Planner mode** | shared |
-| **User impact** | Shared plan text lacks mode context; CNS labels may be misread outside app |
-| **Safety impact** | Indirect — reference-only footer exists but mode scope unclear |
-| **Proposed solution** | Prefix export with `store.mode.localizedTabTitle` and mode-specific disclaimer |
-| **Priority** | Before external TestFlight |
-| **Code impact** | copy-only |
-
-### MED-004 — `GasPlanningService.analyze(input:)` always validates as Technical
-
-| Field | Value |
-|---|---|
-| **ID** | MED-004 |
-| **Title** | Input-screen analysis uses `.technical` validator default |
-| **Family** | Gas planning |
-| **File/function** | `GasPlanningService.analyze(input:)` → `PlannerInputValidator.validate(input)` |
-| **Severity** | MEDIUM |
-| **Planner mode** | Deco (reserve card uses `store.analysis`) |
-| **User impact** | Reserve/consumption tiles may reflect validation paths that differ from mode-scoped plan validation |
-| **Safety impact** | Low if tiles hidden in Base; possible inconsistency in Deco reserve card |
-| **Proposed solution** | Thread `PlannerMode` into preview analysis or use projected input |
-| **Priority** | Post-internal TestFlight |
-| **Code impact** | small functional |
-
-### MED-005 — Watch session delivery without signed ack (fallback path)
-
-| Field | Value |
-|---|---|
-| **ID** | MED-005 |
-| **Title** | Some Watch deliveries lack signed ack confirmation |
-| **Family** | Watch sync |
-| **File/function** | `iOSApp/Services/WatchSyncService.swift` (~line 671) |
-| **Severity** | MEDIUM |
-| **Planner mode** | shared |
-| **User impact** | Session may remain queued if Watch does not return `ackSignature` |
-| **Safety impact** | Data consistency, not dive math |
-| **Proposed solution** | Physical paired QA; clarify queue UX |
-| **Priority** | Before external TestFlight |
-| **Code impact** | external QA/process |
-
-### MED-006 — iCloud KVS payload size vs Watch 512 KB cap asymmetry
-
-| Field | Value |
-|---|---|
-| **ID** | MED-006 |
-| **Title** | iOS cloud backup lacks explicit size guard matching Watch codec |
-| **Family** | Cloud merge |
-| **File/function** | `CloudSyncStore`, `WatchDiveSyncCodec` |
-| **Severity** | MEDIUM |
-| **Planner mode** | shared |
-| **User impact** | Very large logbooks may fail sync opaquely on one side |
-| **Safety impact** | Data loss risk, not calculation error |
-| **Proposed solution** | Align caps and surface user-visible errors |
-| **Priority** | Before App Store |
-| **Code impact** | small functional |
-
-### LOW-001 — Deco mode shows NDL reference tab (expected simplified scope)
-
-| Field | Value |
-|---|---|
-| **ID** | LOW-001 |
-| **Title** | Deco NDL tab visible while full compartment chart remains simplified |
-| **Family** | Bühlmann display |
-| **Severity** | LOW |
-| **Planner mode** | Deco |
-| **Notes** | Aligns with audit spec “simplified Bühlmann”; disclaimers present. Not a bug — document expected behavior |
-
-### LOW-002 — Bailout cylinders excluded from consumption ledger totals
-
-| Field | Value |
-|---|---|
-| **ID** | LOW-002 |
-| **Title** | Unused/bailout in `unusedPlannedEntries` only |
-| **Family** | Gas consumption |
-| **File/function** | `ScheduleGasConsumptionService` / `GasConsumptionLedger` |
-| **Severity** | LOW |
-| **Planner mode** | Technical |
-| **Notes** | Intentional; UI should keep bailout labelled separately |
-
-### LOW-003 — Residual hardcoded service strings
-
-| Field | Value |
-|---|---|
-| **ID** | LOW-003 |
-| **Title** | Mixed IT/EN in some service statuses |
-| **Severity** | LOW |
-| **Planner mode** | shared |
-
-### LOW-004 — Subsurface external regression not automated
-
-| Field | Value |
-|---|---|
-| **ID** | LOW-004 |
-| **Title** | Export/import fidelity vs Subsurface app |
-| **Severity** | LOW |
-| **Planner mode** | shared |
-
-### INFO-001 — Base mode runs full Bühlmann engine internally
-
-| Field | Value |
-|---|---|
-| **ID** | INFO-001 |
-| **Notes** | Engine computes deco obligation; UI hides technical sections and shows `modeGuidance` recommending Deco/Technical. Correct product semantics |
-
-### INFO-002 — Analysis dashboard uses arithmetic session averages
-
-| Field | Value |
-|---|---|
-| **ID** | INFO-002 |
-| **File** | `AnalysisDashboardMath.swift` |
-| **Notes** | Documented intentional semantics |
-
-### INFO-003 — OTU extrapolation above NOAA table limits
-
-| Field | Value |
-|---|---|
-| **ID** | INFO-003 |
-| **File** | `OxygenExposureModels.swift` |
-| **Notes** | Finite values + `PPO2Exceeded` warnings should dominate UI |
+| Scenario | Expected behavior | Observed @ 81f2d7f |
+|---|---|---|
+| Invalid gas fractions | Fail closed `.invalidInput` | **Pass** |
+| GF Low == GF High | Rejected (Technical) | **Pass** |
+| Bottom time > NDL in Base | Validation error + guidance | **Pass** |
+| Deco depth > 40 m | `.decoDepthLimitExceeded` | **Pass** |
+| Calculation limit reached | Empty stops + incomplete banner | **Pass** |
+| Empty tissue history | Chart empty state, not NDL substitute | **Pass** |
+| Invalid ambient for chart sample | Skip sample / nil metrics | **Pass** |
+| CNS exactly 15% descent+bottom | Acceptable | **Pass** |
+| CSV > 10 MB | Rejected | **Pass** |
+| Duplicate session ID sync | Conflict detection | **Pass** |
+| Demo dive isolation | Excluded from sync push patterns | **Pass** |
 
 ---
 
-## E. Edge Case Matrix
+## N. Unit / Integration Test Plan (summary)
 
-| Edge case | Expected | Observed (code) | Test status |
+| Priority | Test | Input | Pass criteria |
 |---|---|---|---|
-| Base, one air gas | Single-gas NDL/rec plan | Projected bottom only | Tested |
-| Base with Nitrox | Allowed EAN | Allowed | Tested |
-| Base with deco obligation | Warning to switch mode | `modeGuidance` warning | Tested (policy) |
-| Base with hidden Technical gases | Ignored in calc | Projection strips extras | Tested |
-| Deco, no deco gas | Bottom-only plan | Valid | Partial |
-| Deco, two deco in draft | One used | `prefix(1)` | Tested |
-| Deco with hidden bailout from Technical | Ignored | Projection strips | Static ✓ |
-| Technical full multigas | Full schedule + ledger | Engine multigas | Tested |
-| Technical hypoxic bottom | MOD/MOD warnings | Validators + engine | Tested |
-| Technical → Base → Technical | Draft preserved | Draft unchanged | Tested |
-| Depth = 0 | Rejected | `minPlannerDepthMeters` | Tested |
-| Very long bottom time | Capped/rejected | `maxBottomTimeMinutes` | Tested |
-| Imperial display | Formatted ft/psi | `Formatters` + metric storage | Tested |
-| Empty logbook stats | Zero/empty state | Analysis guards | Tested |
-| Demo on/off | Demo isolated | Policy + tests | Tested |
-| Cloud divergent profiles | User should choose | **Silent merge** | **Untested UX** |
-| CSV no temperature column | Import OK | Supported | Tested |
-| NDL preview after GF change in Deco | Match plan | **May diverge** | **Gap** |
-| Invalid altitude in Base | Block or warn | **May fallback** | Gap |
+| P1 | External fixture TTS/stops | Golden JSON profiles | Within documented tolerance |
+| P1 | GF 30/70 vs 50/80 TTS ordering | Trimix deco plan | Conservative ≥ aggressive TTS |
+| P2 | Cloud load cloud-newer-wins | Mock KVS payloads | Correct merge + no data loss |
+| P2 | Watch sync round-trip | Sample session | Depth profile preserved ±ε |
+| P2 | Weekly OTU UI | Plan with elevated weekly OTU | Warning visible |
+| P3 | Imperial display round-trip | Unit preference toggle | Consistent labels |
+
+**Current automated coverage:** 363 `func test` definitions across 58 files in `Tests/iOSAlgorithmTests/`.
 
 ---
 
-## F. Unit / Integration Test Plan
+## O. Planner Mode Regression Test Plan
 
-| Feature | Input | Expected | Priority |
+| Test | Base | Deco | Technical |
 |---|---|---|---|
-| Mode projection | Technical draft → Base | 1 bottom cylinder in engine request | P0 |
-| Mode projection | 2 deco draft → Deco | 1 deco in engine request | P0 |
-| Base exceeds mode | Profile with stops | `modeGuidance` warning state | P0 |
-| NDL preview parity | Deco + custom GF | Preview GF = projected GF | P0 |
-| PPO₂ boundary | 1.40 max @ switch | Consistent preflight/runtime flag | P1 |
-| Environment Base | Invalid altitude | Validation error before plan | P1 |
-| Gas ledger | Technical + bailout | Bailout in unused, not consumed total | P1 |
-| Cloud profile conflict | Divergent samples same ID | Conflict surfaced | P0 |
-| Export mode label | Share from Base | Text includes "Base" | P2 |
-| OTU monotonicity | Rising PPO₂ segments | OTU non-decreasing | P1 (exists) |
-| CSV round-trip | Subsurface fixture | Depth/time preserved | P1 |
-| Manual pressure units | Save bar, switch to PSI display | Correct label | P1 |
+| `PlannerModePolicyTests` projection | ✓ | ✓ | ✓ |
+| `PlannerModeLimitsTests` NDL/40 m | ✓ | ✓ | — |
+| `PlannerAscentTableTests` table order | — | ✓ | ✓ |
+| `PlannerCurveChartTests` tissue vs NDL | — | ✓ | ✓ |
+| `PlannerDepthProfileTests` | — | — | ✓ |
+| `CNSDescentBottomTests` | — | ✓ | ✓ |
+| `BuhlmannMultigasPlannerTests` | — | — | ✓ |
 
 ---
 
-## G. Planner Mode Regression Test Plan
+## P. Paired Watch/iPhone Test Plan
 
-| Test | Mode | Pass criteria |
-|---|---|---|
-| UI cylinder count | Base / Deco / Technical | Visible cards match policy |
-| Result section flags | each | Match `PlannerResultPresentation` |
-| Bühlmann visibility | Base hidden, Deco simplified, Technical full | UI + a11y labels |
-| Calculate with hidden bailout | Base | Bailout not in engine gases |
-| Switch mode preserve draft | Technical → Base → Technical | Cylinder count restored |
-| Share export | each | Mode label + disclaimer (after fix) |
-| GF preset Base | any draft GF | Plan uses 30/80 |
-| Trimix rejection | Base / Deco | `.unsupportedTrimix` |
+1. Record dive on Watch → sync to iOS → verify depth samples, duration, max depth match.
+2. Edit metadata on iOS → verify no spurious profile overwrite from cloud.
+3. Delete dive on one device → tombstone propagates.
+4. Manual iOS dive → verify Watch exclusion rules unchanged.
+5. Photo transfer ACK path (out of algorithm scope but sync-adjacent).
 
 ---
 
-## H. Paired Watch/iPhone Test Plan
+## Q. CSV Import/Export Regression Plan
 
-| Scenario | Expected | Priority |
-|---|---|---|
-| Watch dive → iOS | Samples, depth, GPS, duration match codec | P0 |
-| iOS manual → Watch | Round-trip fields preserved | P0 |
-| Edited manual sync | Pressure text + bar values consistent | P1 |
-| Delete tombstone | Dive stays deleted on both sides | P0 |
-| Duplicate session ID | No crash; conflict or dedup | P0 |
-| Large profile near 512 KB | Graceful error | P1 |
-| Unsigned ack path | Queue message visible | P1 |
+1. Export session → re-import → UUID/metadata preserved (`CSVMetadataRoundTripTests` baseline).
+2. Malformed rows → bounded errors, no partial corrupt session.
+3. Large file rejection > 10 MB.
+4. Legacy `# session_meta` header compatibility.
+5. Manual pressure bar fields round-trip.
 
 ---
 
-## I. CSV Import/Export Regression Plan
+## R. Cloud Merge Validation Plan
 
-| Case | Pass criteria |
-|---|---|
-| Valid Subsurface CSV | Sessions imported, dates preserved |
-| No temperature column | Import succeeds |
-| Invalid depth row | Row skipped/reported, no crash |
-| Duplicate file import | No duplicate sessions |
-| Export manual dive | Metric depths, monotonic times |
-| Export with special chars in notes | Escaped correctly |
-| Empty profile export | Rejected |
+1. Local newer `modifiedAt` → push to iCloud.
+2. Cloud newer → merge into local logbook.
+3. Decode failure → retain local with `lastDecodeError`.
+4. Duplicate session IDs → conflict detector fires.
+5. Profile sample divergence → verify documented merge policy (P2-001).
 
 ---
 
-## J. Cloud Merge Validation Plan
+## S. Planner Boundary Validation Plan
 
-| Case | Pass criteria |
-|---|---|
-| Metadata conflict (notes) | Shown in `sessionMergeConflicts` |
-| Profile sample divergence | **Should flag conflict (currently fails)** |
-| Keep local resolution | Local profile intact |
-| Use cloud resolution | Cloud profile intact |
-| Tombstone + live cloud copy | Deleted stays deleted |
-| Malformed JSON | Decode error logged / visible |
+1. Base at NDL boundary ± 1 min.
+2. Deco at 40.0 m vs 40.1 m.
+3. Technical 120 m cap.
+4. Hypoxic trimix MOD violation.
+5. Gas switch deeper than MOD.
+6. Incomplete calculation limit profile (120 m / 120 min air).
 
 ---
 
-## K. Planner Boundary Validation Plan
+## T. Prioritized Roadmap
 
-| Boundary | Input | Expected |
-|---|---|---|
-| Min depth | 0 m | Invalid |
-| Max depth | > cap | `.unsupportedDepth` |
-| Max bottom time | > cap | Invalid |
-| O₂ fraction | 0, 1.2 | Rejected |
-| Hypoxic at surface | FO₂ < 16% shallow | Warning/error |
-| EAN50 switch | Too deep | `.gasSwitchTooDeep` / PPO₂ |
-| GF invalid | low ≥ high | Invalid (Technical); reset (Deco projection) |
+1. **Before compile/use:** None blocking @ `81f2d7f`.
+2. **Before internal TestFlight:** Refresh README baselines; optional weekly OTU UI; cloud merge QA.
+3. **Before external TestFlight:** External Bühlmann comparison; simulator EN/IT screenshots; paired-device sync QA.
+4. **Before App Store:** Full release checklist; physical accessibility QA; legal review unchanged.
+5. **Post-release:** Heliox UI mix kind; travel-gas switch depth model; granular oxygen warning states.
 
 ---
 
-## L. Prioritized Roadmap
-
-### 1. Must fix before compile/use
-- None
-
-### 2. Must fix before internal TestFlight
-- HIGH-002 — NDL preview / projected input parity (or prominent disclaimer)
-
-### 3. Must fix before external TestFlight
-- HIGH-001 — Cloud profile merge conflict detection
-- MED-002 — Environment validation for Base/Deco
-- MED-003 — Export mode label
-- MED-005 — Watch sync paired QA sign-off
-
-### 4. Must fix before App Store
-- MED-001 — PPO₂ tolerance unification
-- MED-006 — Cloud payload size policy
-- LOW-004 — Subsurface external regression documented
-- Full physical QA matrices (Watch, iCloud two-device)
-
-### 5. Post-release improvements
-- MED-004 — Mode-aware preview analysis
-- LOW-003 — Service string localization
-- INFO-002 — Optional duration-weighted analysis averages
-
----
-
-## M. Final Verdict
+## U. Final Verdict
 
 | Question | Answer |
 |---|---|
-| **Mathematically ready?** | **Yes for internal reference use**, at ~91% static readiness. Core Bühlmann, gas, exposure, and logbook math are sound and well-tested. |
-| **Are Base / Deco / Technical real and correct?** | **Yes.** Modes materially change inputs, projection, validation, results, and Bühlmann display. Minor preview/export inconsistencies remain. |
-| **Planner safe enough for internal test?** | **Yes**, with reference-only disclaimers and Base mode guidance when deco is required. Fix or disclaim NDL preview drift (HIGH-002) before broad internal distribution. |
-| **Sync/data ready?** | **Mostly.** Codec and tombstones are strong; **cloud profile silent merge (HIGH-001)** blocks external confidence. |
-| **Ready for TestFlight?** | **Internal: yes with caveats.** **External: no** until HIGH-001 and paired Watch QA complete. |
-| **Ready for App Store?** | **No** — external TestFlight blockers plus Subsurface regression and tolerance hardening remain. |
-| **What blocks 100% algorithmic readiness?** | (1) Cloud profile merge conflict gap, (2) planner preview vs projected input parity, (3) PPO₂ tolerance unification, (4) Base/Deco environment validation, (5) physical paired-device QA evidence, (6) external CSV compatibility proof. |
+| **Mathematically ready?** | **Yes for internal reference validation** — core models coherent; external comparison still required for public claims. |
+| **Are Base/Deco/Technical modes real?** | **Yes** — projection, validation, and UI gating are mode-aware; engine is shared with projected inputs. |
+| **Is tissue-history Bühlmann curve truthful?** | **Yes** — primary chart uses real sampled tissue history; NDL is secondary only. |
+| **Is decompression table complete and real?** | **Yes** — real engine data; post-P2 briefing order; incomplete plans suppressed safely. |
+| **Are CNS/OTU and 15% rule correct?** | **Yes** — tested NOAA/Lambertsen integration; UI labelling and warnings present; weekly OTU display gap remains. |
+| **Planner safe enough for internal test?** | **Yes** — with reference-only disclaimers intact. |
+| **Sync/data ready?** | **Mostly** — strong codecs; cloud profile merge needs explicit QA (P2-001). |
+| **Ready for TestFlight?** | **Internal: almost ready.** External: not yet. |
+| **Ready for App Store?** | **No.** |
+| **What blocks 100% algorithmic readiness?** | External Bühlmann validation, cloud merge integration tests, device QA, documentation baseline refresh. |
+
+### Certification statement
+
+This audit was performed by static inspection and macOS build/test execution on `main` @ `81f2d7f`. **No code was modified. No commit. No push.** Apple Watch runtime code was not modified. Experimental targets were not audited. The product remains a **non-certified Bühlmann-based planning reference**, not a dive computer substitute.
 
 ---
 
-## Appendix — Build and test evidence
-
-```
-Branch: main @ ecad0d9
-xcodebuild -scheme "DIRDiving iOS Algorithm Tests" \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test
-Result: 287 tests passed, 4 skipped, 0 failures — TEST SUCCEEDED
-```
-
-Key mode tests: `PlannerModePolicyTests` (projection, trimix rejection, presentation flags, localization keys).
-
----
-
-*Previous audit baseline `6a5054f` (2026-06-03) predated the three-tab Planner architecture and UI readiness work @ `ecad0d9`. This document supersedes that revision for planner mode scope.*
-
----
-
-## Related documents
-
-| Document | Role |
-|---|---|
-| [`INDEX.md`](INDEX.md) | Indice documentazione — ingresso §4 iOS MAIN |
-| [`IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md`](IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md) | Remediation storica @ `dce89e7` (pre three-tab Planner) |
-| [`IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) | Remediation IOS-AUDIT-001…012 @ 2026-06-03 |
-| [`IOS_MAIN_ALGORITHM_READINESS_100_FINAL_QA.md`](IOS_MAIN_ALGORITHM_READINESS_100_FINAL_QA.md) | QA matrix post-remediation |
-| [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md) | Limitazioni planner reference-only |
-| [`DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_AUDIT_CURRENT.md`](DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_AUDIT_CURRENT.md) | Audit UI deco table / curva Bühlmann |
-| [`DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_IOS_ALGORITHM_MATH_AUDIT.md) | Audit algoritmi iOS post-hardening (storico) |
+*End of audit — `IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md` @ baseline `81f2d7f`.*
