@@ -4,16 +4,15 @@ import WatchConnectivity
 
 enum WatchDiveSyncCodec {
     static let payloadKey = "dirdiving_dive_session"
-    static let schemaVersion = 1
+    static let legacySchemaVersion = 1
+    static let schemaVersion = 2
     static let maxPayloadBytes = IOSAlgorithmConfiguration.maxSyncPayloadBytes
     static let maxSamples = IOSAlgorithmConfiguration.maxProfileSampleCount
     static let maxDepthMeters = IOSAlgorithmConfiguration.maxSyncDepthMeters
     // F6: tightened from 86_400 (24 h) to 3_600 (1 h) to shrink the replay window.
-    // WatchConnectivity is pairing-locked at the OS level, but a 1 h skew is more than
-    // enough for the usual Watch/iPhone clock drift while removing the day-long replay
-    // surface that the legacy value implied.
     static let maxIssuedAtSkew: TimeInterval = IOSAlgorithmConfiguration.syncIssuedAtSkewSeconds
     static let importedSessionIDsKey = "dirdiving_ios_imported_session_ids"
+    static var replayCache = SyncNonceReplayCache()
 
     private static let expectedWatchBundleID = "com.egopfe.dirdiving.ios.watch"
 
@@ -21,6 +20,7 @@ enum WatchDiveSyncCodec {
         let version: Int
         let bundleID: String
         let issuedAt: Date
+        let nonce: String?
         let body: Data
         let signature: String
     }
@@ -50,10 +50,12 @@ enum WatchDiveSyncCodec {
 
         let issuedAt = Date()
         let bundleID = Bundle.main.bundleIdentifier ?? "com.egopfe.dirdiving.ios"
+        let nonce = UUID().uuidString
         let transport = Transport(
             version: schemaVersion,
             bundleID: bundleID,
             issuedAt: issuedAt,
+            nonce: nonce,
             body: body,
             signature: ""
         )
@@ -91,7 +93,7 @@ enum WatchDiveSyncCodec {
         }
 
         let transport = try JSONDecoder().decode(Transport.self, from: data)
-        guard transport.version == schemaVersion else {
+        guard transport.version == legacySchemaVersion || transport.version == schemaVersion else {
             throw WatchDiveSyncError.unsupportedVersion
         }
         guard transport.bundleID == expectedWatchBundleID else {
@@ -105,6 +107,17 @@ enum WatchDiveSyncCodec {
         }
         guard verify(transport) else {
             throw WatchDiveSyncError.invalidSignature
+        }
+        if transport.version == schemaVersion {
+            guard let nonce = transport.nonce, !nonce.isEmpty else {
+                throw WatchDiveSyncError.invalidSignature
+            }
+            if replayCache.isReplay(nonce) {
+                throw WatchDiveSyncError.replayedPayload
+            }
+            guard replayCache.register(nonce) else {
+                throw WatchDiveSyncError.replayedPayload
+            }
         }
 
         let decoder = JSONDecoder()
@@ -135,11 +148,37 @@ enum WatchDiveSyncCodec {
         return providedData.constantTimeEquals(expectedData)
     }
 
+    static func isImportAck(_ payload: [String: Any]) -> Bool {
+        payload["type"] as? String == WatchSyncKeys.diveImportAckType
+    }
+
+    static func parseImportAck(from payload: [String: Any]) -> (sessionID: UUID, issuedAt: Date, signature: String)? {
+        guard isImportAck(payload),
+              let sessionIDString = payload[WatchSyncKeys.diveImportAckSessionIDKey] as? String,
+              let sessionID = UUID(uuidString: sessionIDString),
+              let issuedAtInterval = payload[WatchSyncKeys.diveImportAckIssuedAtKey] as? TimeInterval,
+              let signature = payload[WatchSyncKeys.diveImportAckSignatureKey] as? String else {
+            return nil
+        }
+        let issuedAt = Date(timeIntervalSince1970: issuedAtInterval)
+        guard abs(issuedAt.timeIntervalSinceNow) <= maxIssuedAtSkew else { return nil }
+        return (sessionID, issuedAt, signature)
+    }
+
+    static func makeImportAckPayload(sessionID: UUID, issuedAt: Date) -> [String: Any] {
+        [
+            "type": WatchSyncKeys.diveImportAckType,
+            WatchSyncKeys.diveImportAckSessionIDKey: sessionID.uuidString,
+            WatchSyncKeys.diveImportAckIssuedAtKey: issuedAt.timeIntervalSince1970,
+            WatchSyncKeys.diveImportAckSignatureKey: ackSignature(sessionID: sessionID, issuedAt: issuedAt),
+        ]
+    }
+
     static func sessionID(fromOutboundPayload payload: [String: Any]) -> UUID? {
         guard let data = payload[payloadKey] as? Data,
               data.count <= maxPayloadBytes,
               let transport = try? JSONDecoder().decode(Transport.self, from: data),
-              transport.version == schemaVersion,
+              transport.version == legacySchemaVersion || transport.version == schemaVersion,
               transport.body.count <= maxPayloadBytes else {
             return nil
         }
@@ -178,26 +217,29 @@ enum WatchDiveSyncCodec {
     }
 
     private static func sign(_ transport: Transport, issuedAt: Date, body: Data) -> Transport {
-        let mac = hmac(version: transport.version, bundleID: transport.bundleID, issuedAt: issuedAt, body: body)
+        let mac = hmac(transport: transport, issuedAt: issuedAt, body: body)
         return Transport(
             version: transport.version,
             bundleID: transport.bundleID,
             issuedAt: issuedAt,
+            nonce: transport.nonce,
             body: body,
             signature: mac
         )
     }
 
-    private static func hmac(version: Int, bundleID: String, issuedAt: Date, body: Data) -> String {
+    private static func hmac(transport: Transport, issuedAt: Date, body: Data) -> String {
         guard let key = try? syncKey() else { return "" }
-        let canonical = "\(version)|\(bundleID)|\(issuedAt.timeIntervalSince1970)|\(body.base64EncodedString())"
+        let nonceComponent = transport.version >= schemaVersion ? (transport.nonce ?? "") : ""
+        let canonical = "\(transport.version)|\(transport.bundleID)|\(issuedAt.timeIntervalSince1970)|\(nonceComponent)|\(body.base64EncodedString())"
         let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: key)
         return Data(code).base64EncodedString()
     }
 
     private static func verify(_ transport: Transport) -> Bool {
         guard let key = try? syncKey() else { return false }
-        let canonical = "\(transport.version)|\(transport.bundleID)|\(transport.issuedAt.timeIntervalSince1970)|\(transport.body.base64EncodedString())"
+        let nonceComponent = transport.version >= schemaVersion ? (transport.nonce ?? "") : ""
+        let canonical = "\(transport.version)|\(transport.bundleID)|\(transport.issuedAt.timeIntervalSince1970)|\(nonceComponent)|\(transport.body.base64EncodedString())"
         let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: key)
         let expected = Data(code).base64EncodedString()
         guard let received = Data(base64Encoded: transport.signature) else { return false }
@@ -229,6 +271,7 @@ enum WatchDiveSyncError: LocalizedError {
     case invalidSession
     case sessionInactive
     case missingPeerSecret
+    case replayedPayload
 
     var errorDescription: String? {
         switch self {
@@ -250,6 +293,8 @@ enum WatchDiveSyncError: LocalizedError {
             return String(localized: "sync.codec.error.session_inactive")
         case .missingPeerSecret:
             return String(localized: "sync.codec.error.missing_peer_secret")
+        case .replayedPayload:
+            return String(localized: "sync.codec.error.replayed_payload")
         }
     }
 }

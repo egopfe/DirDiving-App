@@ -9,8 +9,9 @@ final class PlannerStore: ObservableObject {
             isApplyingInputSideEffects = true
             PlannerModeLimits.enforceInputLimits(&input, mode: mode)
             isApplyingInputSideEffects = false
-            saveIfReady()
-            applyInputToPlanningOutputs()
+            invalidateAnalysisCache()
+            scheduleSave()
+            schedulePlanningUpdate()
         }
     }
     @Published var input = GasPlanInput() {
@@ -19,8 +20,9 @@ final class PlannerStore: ObservableObject {
             isApplyingInputSideEffects = true
             PlannerModeLimits.enforceInputLimits(&input, mode: mode)
             isApplyingInputSideEffects = false
-            saveIfReady()
-            applyInputToPlanningOutputs()
+            invalidateAnalysisCache()
+            scheduleSave()
+            schedulePlanningUpdate()
         }
     }
     @Published var plan = PlannerService.makePlan(input: GasPlanInput(), mode: .base)
@@ -28,13 +30,13 @@ final class PlannerStore: ObservableObject {
         depthMeters: 40,
         bottomGas: GasMix(name: "Gas di Fondo", oxygen: 0.18, helium: 0.45, maxPPO2: 1.40)
     )
-    var analysis: TechnicalGasAnalysis { GasPlanningService.analyze(input: input, mode: mode) }
+    @Published private(set) var analysis: TechnicalGasAnalysis = GasPlanningService.analyze(input: GasPlanInput(), mode: .base)
     var briefingText: String { plan.briefingLines.joined(separator: "\n") }
     @Published var repetitivePlanningEnabled: Bool = false {
-        didSet { saveIfReady() }
+        didSet { scheduleSave() }
     }
     @Published var surfaceIntervalMinutes: Double = 60 {
-        didSet { saveIfReady() }
+        didSet { scheduleSave() }
     }
     @Published private(set) var isCalculating = false
     @Published private(set) var lastTissueSnapshot: TissueSnapshot?
@@ -43,6 +45,11 @@ final class PlannerStore: ObservableObject {
     private let key = "dirdiving_ios_experimental_planner_state"
     private var isReady = false
     private var isApplyingInputSideEffects = false
+    private var planningUpdateTask: Task<Void, Never>?
+    private var saveTask: Task<Void, Never>?
+    private var planningGeneration: UInt = 0
+    private var cachedAnalysis: TechnicalGasAnalysis?
+    private var analysisCacheKey: AnalysisCacheKey?
 
     init(cloudSync: CloudSyncStore? = nil) {
         self.cloudSync = cloudSync
@@ -60,7 +67,7 @@ final class PlannerStore: ObservableObject {
     }
 
     func refreshDerivedPlanningPreview() {
-        applyInputToPlanningOutputs()
+        schedulePlanningUpdate()
     }
 
     func normalizeSwitchDepthAfterGasOrPPO2Change(cylinderID: UUID) {
@@ -68,8 +75,9 @@ final class PlannerStore: ObservableObject {
         isApplyingInputSideEffects = true
         input.normalizeSwitchDepthsToMOD(changedCylinderID: cylinderID, updateChangedGasToMOD: true)
         isApplyingInputSideEffects = false
-        applyInputToPlanningOutputs()
-        saveIfReady()
+        invalidateAnalysisCache()
+        schedulePlanningUpdate()
+        scheduleSave()
     }
 
     func clampAllSwitchDepthsToMOD() {
@@ -77,8 +85,9 @@ final class PlannerStore: ObservableObject {
         isApplyingInputSideEffects = true
         input.normalizeSwitchDepthsToMOD()
         isApplyingInputSideEffects = false
-        applyInputToPlanningOutputs()
-        saveIfReady()
+        invalidateAnalysisCache()
+        schedulePlanningUpdate()
+        scheduleSave()
     }
 
     func clampSwitchDepth(forCylinderAt index: Int, proposedMeters: Double) {
@@ -90,8 +99,9 @@ final class PlannerStore: ObservableObject {
         isApplyingInputSideEffects = true
         input.plannerCylinders[index].switchDepthMeters = clamped
         isApplyingInputSideEffects = false
-        applyInputToPlanningOutputs()
-        saveIfReady()
+        invalidateAnalysisCache()
+        schedulePlanningUpdate()
+        scheduleSave()
     }
 
     func normalizeNewCylinderSwitchDepth(cylinderID: UUID) {
@@ -100,8 +110,11 @@ final class PlannerStore: ObservableObject {
 
     func calculate() {
         guard isReady else { return }
+        planningUpdateTask?.cancel()
+        saveTask?.cancel()
         isCalculating = true
         defer { isCalculating = false }
+        refreshAnalysis(force: true)
         applyInputToPlanningOutputs(persistSnapshot: true)
         saveIfReady()
     }
@@ -111,6 +124,7 @@ final class PlannerStore: ObservableObject {
         guard isReady else { return }
         isApplyingInputSideEffects = true
         input.syncLegacyGasesFromPlannerCylinders()
+        refreshAnalysis(force: false)
         let active = PlannerModePolicy.activePlanInput(from: input, mode: mode)
         if case .success(let environment) = PlannerEnvironment.make(altitudeMeters: active.altitudeMeters, salinity: active.salinity) {
             buhlmann = BuhlmannPlanner.plan(
@@ -140,6 +154,30 @@ final class PlannerStore: ObservableObject {
         input.teamMembers[index] = member
     }
 
+    private func schedulePlanningUpdate(persistSnapshot: Bool = false) {
+        guard isReady else { return }
+        planningUpdateTask?.cancel()
+        planningGeneration &+= 1
+        let generation = planningGeneration
+        isCalculating = true
+        planningUpdateTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 200_000_000)
+            guard !Task.isCancelled, generation == planningGeneration else { return }
+            applyInputToPlanningOutputs(persistSnapshot: persistSnapshot)
+            isCalculating = false
+        }
+    }
+
+    private func scheduleSave() {
+        guard isReady else { return }
+        saveTask?.cancel()
+        saveTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 350_000_000)
+            guard !Task.isCancelled else { return }
+            saveIfReady()
+        }
+    }
+
     private func saveIfReady() {
         guard isReady else { return }
         cloudSync?.save(
@@ -152,6 +190,23 @@ final class PlannerStore: ObservableObject {
             ),
             forKey: key
         )
+    }
+
+    private func invalidateAnalysisCache() {
+        cachedAnalysis = nil
+        analysisCacheKey = nil
+    }
+
+    private func refreshAnalysis(force: Bool) {
+        let key = AnalysisCacheKey(input: input, mode: mode)
+        if !force, key == analysisCacheKey, let cachedAnalysis {
+            analysis = cachedAnalysis
+            return
+        }
+        let computed = GasPlanningService.analyze(input: input, mode: mode)
+        cachedAnalysis = computed
+        analysisCacheKey = key
+        analysis = computed
     }
 
     private func makeEnvironment(from input: GasPlanInput) throws -> PlannerEnvironment {
@@ -171,3 +226,41 @@ private struct PlannerState: Codable {
     var surfaceIntervalMinutes: Double = 60
     var lastTissueSnapshot: TissueSnapshot?
 }
+
+private struct AnalysisCacheKey: Equatable {
+    let mode: PlannerMode
+    let plannedDepthMeters: Double
+    let bottomTimeMinutes: Double
+    let altitudeMeters: Double
+    let salinity: SalinityMode
+    let bottomGasSignature: String
+    let cylinderSignature: String
+    let environmentSignature: String
+
+    init(input: GasPlanInput, mode: PlannerMode) {
+        self.mode = mode
+        plannedDepthMeters = input.plannedDepthMeters
+        bottomTimeMinutes = input.plannedBottomMinutes
+        altitudeMeters = input.altitudeMeters
+        salinity = input.salinity
+        bottomGasSignature = "\(input.bottomGas.oxygen)-\(input.bottomGas.helium)-\(input.bottomGas.maxPPO2)"
+        cylinderSignature = input.plannerCylinders.map {
+            "\($0.id.uuidString)|\($0.role.rawValue)|\($0.gas.oxygen)|\($0.gas.helium)|\($0.gas.maxPPO2)|\($0.switchDepthMeters)|\($0.startPressure)|\($0.pressureUnit.rawValue)"
+        }.joined(separator: ";")
+        environmentSignature = "\(input.altitudeMeters)-\(input.salinity.rawValue)-\(input.gfLow)-\(input.gfHigh)"
+    }
+}
+
+#if DEBUG
+extension PlannerStore {
+    var testHook_planningGeneration: UInt { planningGeneration }
+
+    func testHook_flushDebouncedWork() async {
+        planningUpdateTask?.cancel()
+        saveTask?.cancel()
+        isCalculating = false
+        applyInputToPlanningOutputs()
+        saveIfReady()
+    }
+}
+#endif

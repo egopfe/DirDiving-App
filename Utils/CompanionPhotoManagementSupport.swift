@@ -34,10 +34,10 @@ struct WatchUserImageInventoryItem: Codable, Equatable, Identifiable, Sendable {
 }
 
 enum CompanionPhotoManagementSupport {
-    /// Companion photo inventory/delete messages use paired WatchConnectivity trust (not HMAC v2 dive payloads).
-    /// Filename sanitization + bundled-image rejection provide defense-in-depth on Watch MAIN.
+    /// Signed inventory/delete requests and ACKs use the paired WatchConnectivity HMAC trust model.
     static let inventoryStatusOK = "ok"
     static let inventoryStatusFailed = "failed"
+    private static let expectedIOSBundleID = "com.egopfe.dirdiving.ios"
 
     static let deleteStatusDeleted = "deleted"
     static let deleteStatusNotFound = "notFound"
@@ -69,6 +69,33 @@ enum CompanionPhotoManagementSupport {
         payload["type"] as? String == WatchSyncKeys.companionPhotoDeleteAckType
     }
 
+    static func verifySignedRequest(_ payload: [String: Any]) -> Bool {
+        if isInventoryRequest(payload),
+           let requestID = payload[WatchSyncKeys.companionPhotoInventoryRequestIDKey] as? String {
+            return CompanionPhotoManagementAuth.verify(
+                payload: payload,
+                type: WatchSyncKeys.companionPhotoInventoryRequestType,
+                requestID: requestID,
+                extra: "",
+                peerBundleID: expectedIOSBundleID,
+                replayCache: CompanionPhotoManagementAuth.requestReplayCache
+            )
+        }
+        if isDeleteRequest(payload),
+           let requestID = payload[WatchSyncKeys.companionPhotoDeleteRequestIDKey] as? String,
+           let storedFileName = payload[WatchSyncKeys.companionPhotoDeleteFileNameKey] as? String {
+            return CompanionPhotoManagementAuth.verify(
+                payload: payload,
+                type: WatchSyncKeys.companionPhotoDeleteRequestType,
+                requestID: requestID,
+                extra: storedFileName,
+                peerBundleID: expectedIOSBundleID,
+                replayCache: CompanionPhotoManagementAuth.requestReplayCache
+            )
+        }
+        return false
+    }
+
     static func makeInventoryRequestPayload(requestID: String) -> [String: Any] {
         [
             "type": WatchSyncKeys.companionPhotoInventoryRequestType,
@@ -82,18 +109,26 @@ enum CompanionPhotoManagementSupport {
         status: String = inventoryStatusOK,
         errorCode: String? = nil
     ) -> [String: Any] {
+        let issuedAt = Date()
+        let resolvedRequestID = requestID ?? UUID().uuidString
         var payload: [String: Any] = [
             "type": WatchSyncKeys.companionPhotoInventoryResponseType,
             WatchSyncKeys.companionPhotoInventoryItemsKey: items.map(itemDictionary),
-            WatchSyncKeys.companionPhotoInventoryGeneratedAtKey: Date().timeIntervalSince1970,
+            WatchSyncKeys.companionPhotoInventoryGeneratedAtKey: issuedAt.timeIntervalSince1970,
             WatchSyncKeys.companionPhotoInventoryStatusKey: status,
+            WatchSyncKeys.companionPhotoInventoryRequestIDKey: resolvedRequestID,
+            WatchSyncKeys.companionPhotoManagementIssuedAtKey: issuedAt.timeIntervalSince1970,
         ]
-        if let requestID {
-            payload[WatchSyncKeys.companionPhotoInventoryRequestIDKey] = requestID
-        }
         if let errorCode {
             payload[WatchSyncKeys.companionPhotoInventoryErrorCodeKey] = errorCode
         }
+        payload[WatchSyncKeys.companionPhotoManagementSignatureKey] = CompanionPhotoManagementAuth.sign(
+            type: WatchSyncKeys.companionPhotoInventoryResponseType,
+            requestID: resolvedRequestID,
+            issuedAt: issuedAt,
+            extra: "\(status)|\(items.count)",
+            peerBundleID: expectedIOSBundleID
+        ) ?? ""
         return payload
     }
 
@@ -111,15 +146,24 @@ enum CompanionPhotoManagementSupport {
         status: String,
         errorCode: String? = nil
     ) -> [String: Any] {
+        let issuedAt = Date()
         var payload: [String: Any] = [
             "type": WatchSyncKeys.companionPhotoDeleteAckType,
             WatchSyncKeys.companionPhotoDeleteRequestIDKey: requestID,
             WatchSyncKeys.companionPhotoDeleteFileNameKey: storedFileName,
             WatchSyncKeys.companionPhotoDeleteStatusKey: status,
+            WatchSyncKeys.companionPhotoManagementIssuedAtKey: issuedAt.timeIntervalSince1970,
         ]
         if let errorCode {
             payload[WatchSyncKeys.companionPhotoDeleteErrorCodeKey] = errorCode
         }
+        payload[WatchSyncKeys.companionPhotoManagementSignatureKey] = CompanionPhotoManagementAuth.sign(
+            type: WatchSyncKeys.companionPhotoDeleteAckType,
+            requestID: requestID,
+            issuedAt: issuedAt,
+            extra: "\(storedFileName)|\(status)",
+            peerBundleID: expectedIOSBundleID
+        ) ?? ""
         return payload
     }
 

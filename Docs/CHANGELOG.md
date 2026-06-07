@@ -4,6 +4,20 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-06-07, documentation alignment — docs-only @ `a69bc4b`)
+
+- **Documentazione:** [`Docs/DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md), [`Docs/PR_STATUS_20260607.md`](PR_STATUS_20260607.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260607.md`](DOCUMENTATION_UPDATE_REPORT_20260607.md).
+- **Allineamento:** `Docs/INDEX.md`, `Docs/README.md`, root `README.md`, `ROADMAP.md`, `BRANCH_AND_TARGET_ISOLATION_POLICY.md`, `DIR_DIVING_Feature_Comparison.csv` (header + rows for deep-code remediation, safety, release gates).
+- **Baseline:** `main` @ `a69bc4b`; deep-code remediation documented; physical QA still **PENDING**; experimental isolation reaffirmed; BUSSOLA terminology preserved.
+- **Superseded (narrative baseline only):** [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260606.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260606.md) for HEAD — file retained as historical record.
+
+### Added (2026-06-06, deep code remediation — `a69bc4b`, runtime)
+
+- **Sync/security:** iOS outbound pending until signed Watch import ACK (`MAIN-AUD-001`); HMAC-signed photo inventory/delete (`MAIN-AUD-002`); sync nonce replay cache v2 (`MAIN-AUD-012`).
+- **iOS:** Cloud oversize guard before local write; PDF to protected Application Support; photo preflight; planner debounce/cache; DiveLogStore delete guard; safe planner table a11y; cloud sync generation token; CSV quote hardening.
+- **Test:** `MainDeepCodeAuditRemediationTests`; Watch **171** + iOS **415** algorithm tests PASS (sim).
+- **Documentazione:** [`Docs/MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_CURRENT.md), [`Docs/MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md`](MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md).
+
 ### Added (2026-06-05, experimental branch sync docs-only)
 
 - **Documentazione:** aggiunto [`Docs/EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md`](EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md) per registrare i latest remote refs verificati prima delle modifiche docs.

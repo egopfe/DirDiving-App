@@ -130,13 +130,13 @@ struct DiveDetailView: View {
             VStack(alignment: .leading, spacing: 7) {
                 HStack(spacing: 6) {
                     Text(session.siteName ?? String(localized: "detail.default_site"))
-                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        .font(DIRTypography.cardHeading)
                         .foregroundStyle(.white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.78)
                     if session.buddy != nil {
                         Text(String(localized: "detail.buddy.badge"))
-                            .font(.system(size: 8, weight: .bold, design: .rounded))
+                            .font(DIRTypography.microBadge)
                             .foregroundStyle(DIRTheme.yellow)
                             .padding(.horizontal, 4)
                             .padding(.vertical, 1)
@@ -148,13 +148,13 @@ struct DiveDetailView: View {
                         .font(.system(size: 7, weight: .bold))
                     Text(session.gasLabel.rawValue)
                 }
-                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .font(DIRTypography.metadata)
                 .foregroundStyle(DIRTheme.muted)
                 HStack(spacing: 14) {
                     Label(salinityText, systemImage: "drop")
                     Label(temperatureText, systemImage: "thermometer")
                 }
-                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .font(DIRTypography.metadata)
                 .foregroundStyle(DIRTheme.muted)
             }
             Spacer()
@@ -194,7 +194,7 @@ struct DiveDetailView: View {
         HStack(spacing: 8) {
             Image(systemName: "exclamationmark.octagon.fill")
             Text(String(localized: "depth.safety.log.outside_range"))
-                .font(.system(size: 13, weight: .bold, design: .rounded))
+                .font(DIRTypography.warning)
         }
         .foregroundStyle(DIRTheme.red)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -292,7 +292,7 @@ struct DiveDetailView: View {
                     AxisValueLabel().foregroundStyle(DIRTheme.muted)
                 }
             }
-            .frame(height: 210)
+            .frame(minHeight: 180, maxHeight: 280)
         }
         .padding(12)
         .background(

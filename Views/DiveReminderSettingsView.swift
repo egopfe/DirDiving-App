@@ -12,7 +12,7 @@ struct DiveReminderSettingsView: View {
                     header
 
                     Text(String(localized: "dive_reminder.header.title"))
-                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .font(DiveUI.Typography.hintCaption)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
 
