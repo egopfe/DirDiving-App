@@ -37,6 +37,7 @@ On Windows, Xcode tooling is unavailable; validation is limited to static code i
 | `BuhlmannReauditFixTests.swift` | 2026-05-28 reaudit fixes: environment NDL/ceiling, repetitive canonical result, duplicate labels, rock-bottom, surface interval, oxygen exposure, GF seeded tissue |
 | `BuhlmannReleaseHardeningTests.swift` | external reference envelopes, TTS/runtime split, residual tissue seed, full segment gas-operability checks, travel-gas ascent waypoints |
 | `BuhlmannExternalValidationMetadataTests.swift` | fixture validationStatus/referenceSource/tolerance metadata; no certified-equivalence claims |
+| `BuhlmannEngineCanonicalConsistencyTests.swift` | single canonical engine path; environment-aware preview NDL; mode projection; ascent table ↔ stops |
 
 ## Validation metadata (2026-06-07)
 
