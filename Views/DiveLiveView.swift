@@ -72,6 +72,10 @@ struct DiveLiveView: View {
                 .padding(.bottom, 7)
                 .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
             }
+
+            if dive.isDiveActive, let overlay = dive.diveReminderOverlay {
+                DiveReminderOverlayView(content: overlay)
+            }
         }
         .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.18) : nil, value: dive.redWarningBlink)
         .onChange(of: hapticsEnabled) { _, _ in
@@ -213,8 +217,19 @@ struct DiveLiveView: View {
                 if !hapticsEnabled {
                     hapticsOffBadge
                 }
-                if dive.isSimulationDepthActive {
-                    simulationDepthBadge
+                if dive.isDepthAutomationMockFallbackActive {
+                    depthMockFallbackBadge
+                } else             if dive.isDepthAutomationMockFallbackActive {
+                depthMockFallbackBadge
+            } else if dive.isSimulationDepthActive {
+                simulationDepthBadge
+            }
+                if dive.manualStartHandedOffToAutomatic {
+                    Text(String(localized: "live.manual_lifecycle.handoff.note"))
+                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .foregroundStyle(DiveUI.secondaryText)
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 ttvRuntimePanel
                     .layoutPriority(2)
@@ -493,6 +508,26 @@ struct DiveLiveView: View {
                 .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(DiveUI.red.opacity(0.72), lineWidth: 1))
         )
         .accessibilityLabel(String(localized: "live.simulation_depth.a11y"))
+    }
+
+    private var depthMockFallbackBadge: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 12, weight: .black))
+            Text(String(localized: "live.depth_mock_fallback.badge"))
+                .font(DiveUI.Typography.warningTitle)
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(DiveUI.orange)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(DiveUI.orange.opacity(0.12))
+                .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(DiveUI.orange.opacity(0.72), lineWidth: 1))
+        )
+        .accessibilityLabel(String(localized: "live.depth_mock_fallback.a11y"))
     }
 
     private var hapticsOffBadge: some View {

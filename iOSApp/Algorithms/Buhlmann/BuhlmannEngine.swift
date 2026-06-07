@@ -229,7 +229,7 @@ enum BuhlmannEngine {
                 issues.append(.invalidGas(gas.name))
                 continue
             }
-            if gas.ppO2(depthMeters: request.maxDepthMeters, environment: request.plannerEnvironment) > gas.maxPPO2Bar + 0.000_1, gas.role == .bottom {
+            if gas.ppO2(depthMeters: request.maxDepthMeters, environment: request.plannerEnvironment) > gas.maxPPO2Bar + IOSAlgorithmConfiguration.ppo2HardValidationToleranceBar, gas.role == .bottom {
                 issues.append(.ppo2Exceeded(gas.name))
             }
             if gas.role != .bottom {
@@ -753,7 +753,7 @@ enum BuhlmannEngine {
         if gas.ppO2(depthMeters: shallow, environment: environment) < BuhlmannConstants.minBreathablePPO2Bar {
             issues.append(.hypoxicGasTooShallow(gas.name))
         }
-        if gas.ppO2(depthMeters: deep, environment: environment) > gas.maxPPO2Bar + 0.000_1 {
+        if gas.ppO2(depthMeters: deep, environment: environment) > gas.maxPPO2Bar + IOSAlgorithmConfiguration.ppo2HardValidationToleranceBar {
             issues.append(.ppo2Exceeded(gas.name))
         }
         if issues.isEmpty, !gas.isOperational(fromDepthMeters: fromDepth, toDepthMeters: toDepth, environment: environment) {

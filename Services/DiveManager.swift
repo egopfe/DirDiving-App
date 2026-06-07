@@ -11,7 +11,11 @@ final class DiveManager: ObservableObject {
         case finalizing
     }
 
+    private static let supportedDraftSchemaVersion = 1
+    private static let quarantineDirectoryName = "Diagnostics/Quarantine"
+
     private struct ActiveDiveDraft: Codable {
+        let schemaVersion: Int
         let phase: ActiveDiveDraftPhase
         let sessionID: UUID
         let startDate: Date
@@ -29,6 +33,7 @@ final class DiveManager: ObservableObject {
         let updatedAt: Date
 
         init(
+            schemaVersion: Int = DiveManager.supportedDraftSchemaVersion,
             phase: ActiveDiveDraftPhase,
             sessionID: UUID,
             startDate: Date,
@@ -45,6 +50,7 @@ final class DiveManager: ObservableObject {
             createdAt: Date,
             updatedAt: Date
         ) {
+            self.schemaVersion = schemaVersion
             self.phase = phase
             self.sessionID = sessionID
             self.startDate = startDate
@@ -64,8 +70,17 @@ final class DiveManager: ObservableObject {
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
-            phase = try container.decodeIfPresent(ActiveDiveDraftPhase.self, forKey: .phase) ?? .active
-            sessionID = try container.decodeIfPresent(UUID.self, forKey: .sessionID) ?? UUID()
+            guard let schemaVersion = try container.decodeIfPresent(Int.self, forKey: .schemaVersion),
+                  schemaVersion >= DiveManager.supportedDraftSchemaVersion else {
+                throw DecodingError.dataCorruptedError(
+                    forKey: .schemaVersion,
+                    in: container,
+                    debugDescription: "Unsupported or legacy active dive draft schema"
+                )
+            }
+            self.schemaVersion = schemaVersion
+            phase = try container.decode(ActiveDiveDraftPhase.self, forKey: .phase)
+            sessionID = try container.decode(UUID.self, forKey: .sessionID)
             startDate = try container.decode(Date.self, forKey: .startDate)
             endDate = try container.decodeIfPresent(Date.self, forKey: .endDate)
             samples = try container.decode([DiveSample].self, forKey: .samples)
@@ -101,7 +116,11 @@ final class DiveManager: ObservableObject {
     @Published private(set) var isSimulationDepthActive = false
     /// Experimental Apnea/Snorkeling surfaces use this legacy name for sensor availability.
     var isDepthSensorAvailable: Bool { isDepthAutomationAvailable }
+    @Published private(set) var isDepthAutomationMockFallbackActive = false
+    @Published private(set) var depthSensorSourceResolution: DepthSensorSourceResolution = .unavailable
+    @Published private(set) var draftRecoveryDiagnostic: String?
     @Published var isManualLifecycleActive = false
+    @Published private(set) var manualStartHandedOffToAutomatic = false
     @Published private(set) var isMissionModeActive = false
     @Published private(set) var missionModeActivationSource: MissionModeActivationSource?
     @Published private(set) var missionModeManualPendingForSession = false
@@ -109,6 +128,7 @@ final class DiveManager: ObservableObject {
     @Published private(set) var exceededSupportedDepthRange = false
     @Published private(set) var isDepthDataStale = false
     @Published private(set) var depthDataUsesLastKnownReading = false
+    @Published private(set) var diveReminderOverlay: DiveReminderOverlayContent?
 
     private enum AlarmBlinkSource: Hashable {
         case ascent
@@ -164,6 +184,8 @@ final class DiveManager: ObservableObject {
     private var isFinalizingDive = false
     private var lastDepthAlarmDate: Date?
     private var lastRuntimeAlarmDate: Date?
+    private var diveReminderRuntimeState = DiveReminderRuntimeState()
+    private var diveReminderDismissTask: Task<Void, Never>?
     private var lastBatteryAlarmDate: Date?
     private var lastAlarmDismissDate: Date?
     private var activeDiveExceededSupportedDepth = false
@@ -227,6 +249,15 @@ final class DiveManager: ObservableObject {
         depthSensorProvider?.stop()
         depthSensorProvider = nil
         developerSensorSourceWarning = nil
+        isSimulationDepthActive = false
+        isDepthAutomationMockFallbackActive = false
+        depthSensorSourceResolution = .unavailable
+
+        if Self.testHook_suppressDepthSensorProvider {
+            isDepthAutomationAvailable = true
+            depthSensorSourceResolution = .unavailable
+            return
+        }
 
         var mode = DeveloperSettings.sensorSourceMode
         if mode == .appleSensor, !AppleDepthSensorProvider.isAvailable {
@@ -237,7 +268,21 @@ final class DiveManager: ObservableObject {
         }
 
         let provider = SensorProviderFactory.makeProvider(mode: mode)
-        isSimulationDepthActive = provider is MockDepthSensorProvider
+        let usesMockProvider = provider is MockDepthSensorProvider
+        isSimulationDepthActive = usesMockProvider
+        switch mode {
+        case .simulation:
+            depthSensorSourceResolution = .simulation
+            isDepthAutomationMockFallbackActive = false
+        case .automatic, .appleSensor:
+            if usesMockProvider {
+                depthSensorSourceResolution = .mockFallback
+                isDepthAutomationMockFallbackActive = true
+            } else {
+                depthSensorSourceResolution = .appleSensor
+                isDepthAutomationMockFallbackActive = false
+            }
+        }
         provider.onDepthMeasurement = { [weak self] depth, timestamp, temperature in
             self?.processDepthMeasurement(
                 rawDepthMeters: depth,
@@ -273,6 +318,7 @@ final class DiveManager: ObservableObject {
             if isDiveActive {
                 hasObservedSubmersionDuringCurrentDive = true
                 if isManualLifecycleActive {
+                    manualStartHandedOffToAutomatic = true
                     isManualLifecycleActive = false
                 }
                 cancelAutomaticSurfaceEnd()
@@ -365,6 +411,24 @@ final class DiveManager: ObservableObject {
         try? data.write(to: activeDiveDraftURL(), options: [.atomic, .completeFileProtection])
     }
 
+    private func quarantineActiveDraftPayload(_ data: Data, reason: String) {
+        let base = Self.testHook_draftDirectoryURL
+            ?? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let directory = base.appendingPathComponent(Self.quarantineDirectoryName, isDirectory: true)
+        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        let stamp = Int(Date().timeIntervalSince1970)
+        let payloadURL = directory.appendingPathComponent("active_dive_draft_\(stamp).json")
+        let metaURL = directory.appendingPathComponent("active_dive_draft_\(stamp).meta.json")
+        try? data.write(to: payloadURL, options: [.atomic, .completeFileProtection])
+        let meta: [String: String] = [
+            "reason": reason,
+            "quarantinedAt": ISO8601DateFormatter().string(from: Date())
+        ]
+        if let metaData = try? JSONSerialization.data(withJSONObject: meta, options: [.sortedKeys]) {
+            try? metaData.write(to: metaURL, options: [.atomic, .completeFileProtection])
+        }
+    }
+
     private func clearActiveDiveDraft() {
         try? FileManager.default.removeItem(at: activeDiveDraftURL())
     }
@@ -375,6 +439,7 @@ final class DiveManager: ObservableObject {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         guard let draft = try? decoder.decode(ActiveDiveDraft.self, from: data) else {
+            quarantineActiveDraftPayload(data, reason: "unsupported_or_corrupt_schema")
             clearActiveDiveDraft()
             return
         }
@@ -431,6 +496,10 @@ final class DiveManager: ObservableObject {
 
     private func completePendingFinalization(from draft: ActiveDiveDraft) {
         guard let endDate = draft.endDate else {
+            if let data = try? Data(contentsOf: activeDiveDraftURL()) {
+                quarantineActiveDraftPayload(data, reason: "finalizing_missing_end_date")
+            }
+            draftRecoveryDiagnostic = String(localized: "watch.draft.finalizing_missing_enddate")
             clearActiveDiveDraft()
             return
         }
@@ -521,6 +590,7 @@ final class DiveManager: ObservableObject {
         ttv = DiveAlgorithm.ttvIndex(averageDepthMeters: averageDepthMeters, durationSeconds: runtime)
         if evaluateAlarms {
             evaluateRuntimeAlarms()
+            evaluateDiveReminders()
         }
     }
 
@@ -656,6 +726,7 @@ final class DiveManager: ObservableObject {
 
     func resyncHapticsAfterPreferenceChange() {
         ascentHaptics.refreshHapticsAfterPreferenceChange()
+        depthLimitHaptics.refreshAfterPreferenceChange(currentDepthMeters: currentDepthMeters)
     }
 
     private func beginDiveIfNeeded(isManual: Bool = false, sessionStart: Date? = nil) {
@@ -668,10 +739,12 @@ final class DiveManager: ObservableObject {
         isDiveActive = true
         isManualLifecycleActive = isManual
         sessionStartedManually = isManual
+        manualStartHandedOffToAutomatic = false
         hasObservedSubmersionDuringCurrentDive = !isManual
         applyMissionModeIfNeededOnDiveStart()
         HapticService.shared.criticalConfirm()
         alarmWarningMessage = nil
+        resetDiveReminderRuntime()
         let start = sessionStart ?? Date()
         activeDiveSessionID = UUID()
         self.sessionStart = start
@@ -724,6 +797,7 @@ final class DiveManager: ObservableObject {
         HapticService.shared.criticalConfirm()
         runtimeTimer?.invalidate()
         runtimeTimer = nil
+        resetDiveReminderRuntime()
         stopAllBlinking()
         ascentHaptics.clear()
         runtimeClock.clear()
@@ -836,7 +910,8 @@ final class DiveManager: ObservableObject {
             timestamp: timestamp,
             receivedAt: receivedAt ?? Date(),
             temperatureCelsius: temperatureCelsius,
-            isDiveActive: isDiveActive
+            isDiveActive: isDiveActive,
+            exemptMockSurfaceFrozenSamples: isSimulationDepthActive
         )
         guard let sample = validated.sample else {
             lastErrorMessage = depthValidationMessage(validated.validity)
@@ -859,6 +934,7 @@ final class DiveManager: ObservableObject {
         } else if isManualLifecycleActive,
                   sample.depthMeters > DiveAlgorithmConfiguration.automaticStartDepthMeters {
             hasObservedSubmersionDuringCurrentDive = true
+            manualStartHandedOffToAutomatic = true
             isManualLifecycleActive = false
         }
 
@@ -984,6 +1060,49 @@ final class DiveManager: ObservableObject {
                 )
             }
         }
+    }
+
+    private var shouldSuppressDiveReminders: Bool {
+        if alarmWarningMessage != nil { return true }
+        if depthSafetyState == .exceeded { return true }
+        if ascentAlarmEnabled, ascentStatus.isOverLimit { return true }
+        return false
+    }
+
+    private func evaluateDiveReminders() {
+        guard isDiveActive, diveReminderOverlay == nil, !shouldSuppressDiveReminders else { return }
+        let settings = DiveReminderSettingsStore.load()
+        let runtimeMinute = Int(runtime / 60)
+        let triggered = DiveReminderEngine.evaluate(
+            runtimeSeconds: runtime,
+            runtimeMinute: runtimeMinute,
+            settings: settings,
+            state: &diveReminderRuntimeState
+        )
+        guard !triggered.isEmpty else { return }
+        presentDiveReminderOverlay(
+            DiveReminderEngine.makeOverlay(for: triggered, runtimeMinute: runtimeMinute)
+        )
+    }
+
+    private func presentDiveReminderOverlay(_ content: DiveReminderOverlayContent) {
+        diveReminderDismissTask?.cancel()
+        diveReminderOverlay = content
+        if content.shouldHaptic {
+            HapticService.shared.reminderPulseIfNeeded()
+        }
+        diveReminderDismissTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+            guard !Task.isCancelled else { return }
+            self?.diveReminderOverlay = nil
+        }
+    }
+
+    private func resetDiveReminderRuntime() {
+        diveReminderDismissTask?.cancel()
+        diveReminderDismissTask = nil
+        diveReminderOverlay = nil
+        diveReminderRuntimeState.reset()
     }
 
     private func stopStopwatch(playHaptic: Bool) {
@@ -1112,6 +1231,7 @@ final class DiveManager: ObservableObject {
 
 extension DiveManager {
     static var testHook_draftDirectoryURL: URL?
+    static var testHook_suppressDepthSensorProvider = false
 
     var testHook_sampleCount: Int { samples.count }
 
@@ -1169,5 +1289,36 @@ extension DiveManager {
 
     func testHook_evaluateDepthCallbackFreshness(at date: Date) {
         evaluateDepthCallbackFreshness(now: date)
+    }
+
+    func testHook_stopDepthSensorForTests() {
+        depthSensorProvider?.stop()
+        depthSensorProvider = nil
+    }
+
+    func testHook_shutdownTimersForTests() {
+        runtimeTimer?.invalidate()
+        runtimeTimer = nil
+        stopwatchTimer?.invalidate()
+        stopwatchTimer = nil
+        blinkTimer?.invalidate()
+        blinkTimer = nil
+        automaticSurfaceEndTask?.cancel()
+        automaticSurfaceEndTask = nil
+        diveReminderDismissTask?.cancel()
+        diveReminderDismissTask = nil
+    }
+
+    func testHook_setRuntimeForTests(_ seconds: TimeInterval) {
+        runtime = seconds
+        lastReportedRuntime = seconds
+    }
+
+    func testHook_evaluateDiveRemindersForTests() {
+        evaluateDiveReminders()
+    }
+
+    var testHook_diveReminderRuntimeState: DiveReminderRuntimeState {
+        diveReminderRuntimeState
     }
 }

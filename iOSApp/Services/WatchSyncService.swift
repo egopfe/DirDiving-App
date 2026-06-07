@@ -668,7 +668,7 @@ final class WatchSyncService: NSObject, ObservableObject {
                         )
                         guard signedOK else {
                             self.failedImportCount += 1
-                            self.lastMessage = String(localized: "Watch non ha confermato con ack firmato; sessione conservata in coda")
+                            self.lastMessage = String(localized: "sync.watch.pending_ack")
                             self.recordActivity(title: String(localized: "sync.activity.pending_to_watch"), detail: self.sessionSummary(session))
                             return
                         }

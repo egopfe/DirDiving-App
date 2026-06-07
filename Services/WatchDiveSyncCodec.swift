@@ -8,6 +8,8 @@ enum WatchDiveSyncCodec {
     static let maxPayloadBytes = 512_000
     static let maxSamples = 20_000
     static let maxDepthMeters = 350.0
+    /// Retains the most recent companion-import session IDs to suppress re-transfer echo.
+    static let importedCompanionIDRetentionLimit = 512
     static let maxIssuedAtSkew: TimeInterval = 3_600
     static let importedFromCompanionIDsKey = "dirdiving_watch_imported_from_companion_ids"
 
@@ -133,7 +135,7 @@ enum WatchDiveSyncCodec {
     }
 
     static func saveImportedFromCompanionIDs(_ ids: Set<UUID>) {
-        let trimmed = Array(ids.suffix(128))
+        let trimmed = Array(ids.suffix(importedCompanionIDRetentionLimit))
         UserDefaults.standard.set(trimmed.map(\.uuidString), forKey: importedFromCompanionIDsKey)
     }
 

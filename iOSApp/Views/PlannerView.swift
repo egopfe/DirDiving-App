@@ -3,15 +3,42 @@ import Charts
 
 struct PlannerView: View {
     @EnvironmentObject private var store: PlannerStore
+    @EnvironmentObject private var equipment: EquipmentStore
     @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @State private var showPlan = false
     @State private var showPlanningReferenceInfo = false
     @State private var showCalculateError = false
     @State private var calculateErrorMessage = ""
+    @State private var showChecklistImportPrompt = false
+    @State private var showChecklistImportSheet = false
+    @State private var checklistImportCandidates: [ChecklistPlannerImportCandidate] = []
+    @State private var pendingChecklistExportAfterCalculate = false
+    @State private var showPlannerPDFMenu = false
+    @State private var shareablePDF: ShareablePDFItem?
+    @State private var pdfExportAlertMessage: String?
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
     private var modePresentation: PlannerResultPresentation { PlannerResultPresentation.presentation(for: store.mode) }
+
+    private var profileMaxDepthLimitMeters: Double? {
+        switch store.mode {
+        case .base:
+            return PlannerModeLimits.basicMaximumDepthMeters(for: store.input)
+        case .deco:
+            return PlannerModeLimits.decoMaximumDepthMeters(for: store.input)
+        case .technical:
+            return nil
+        }
+    }
+
+    private var profileMaxAverageDepthLimitMeters: Double? {
+        store.mode == .deco ? PlannerModeLimits.decoMaximumDepthMeters(for: store.input) : nil
+    }
+
+    private var profileMaxBottomMinutes: Double? {
+        store.mode == .base ? PlannerModeLimits.basicMaximumBottomMinutes(for: store.input) : nil
+    }
 
     private var plannerSafetyAcknowledged: Bool {
         plannerSafetyAckRevision == PlannerSafetyAcknowledgment.currentRevision
@@ -48,6 +75,7 @@ struct PlannerView: View {
                                 teamPreviewCard
                             }
                             plannerMODInputWarnings
+                            plannerModeLimitWarnings
                             plannerWarnings
                             calculateButton
                         }
@@ -60,10 +88,49 @@ struct PlannerView: View {
                 }
                 .dirCompanionScrollSurface()
             }
-            .toolbar(.hidden, for: .navigationBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showPlannerPDFMenu = true
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                            .foregroundStyle(DIRTheme.cyan)
+                    }
+                    .accessibilityLabel(Text(String(localized: "pdf.export.share.a11y")))
+                }
+            }
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .confirmationDialog(
+                String(localized: "pdf.export.share.a11y"),
+                isPresented: $showPlannerPDFMenu,
+                titleVisibility: .visible
+            ) {
+                Button(String(localized: "pdf.export.share.plan")) {
+                    sharePlannerPDF(kind: .plan)
+                }
+                Button(String(localized: "pdf.export.share.briefing")) {
+                    sharePlannerPDF(kind: .briefing)
+                }
+                Button(String(localized: "pdf.export.share.dive_pack")) {
+                    sharePlannerPDF(kind: .divePack)
+                }
+                Button(String(localized: "pdf.export.cancel"), role: .cancel) {}
+            }
+            .sheet(item: $shareablePDF) { item in
+                ShareSheetView(activityItems: [item.url])
+            }
+            .alert(String(localized: "pdf.export.error.title"), isPresented: Binding(
+                get: { pdfExportAlertMessage != nil },
+                set: { if !$0 { pdfExportAlertMessage = nil } }
+            )) {
+                Button(String(localized: "OK"), role: .cancel) {}
+            } message: {
+                Text(pdfExportAlertMessage ?? "")
+            }
             .navigationDestination(isPresented: $showPlan) {
-                PlanResultView()
+                PlanResultView(pendingChecklistExportPrompt: pendingChecklistExportAfterCalculate)
                     .environmentObject(store)
+                    .environmentObject(equipment)
             }
             .task {
                 store.input.ensurePlannerCylindersFromLegacy()
@@ -78,6 +145,28 @@ struct PlannerView: View {
                 Button(String(localized: "OK"), role: .cancel) {}
             } message: {
                 Text(calculateErrorMessage)
+            }
+            .confirmationDialog(
+                String(localized: "checklist_planner.sync.import_prompt"),
+                isPresented: $showChecklistImportPrompt,
+                titleVisibility: .visible
+            ) {
+                Button(String(localized: "checklist_planner.sync.import_all")) {
+                    importAllFromChecklist()
+                }
+                Button(String(localized: "checklist_planner.sync.choose_import")) {
+                    openChecklistImportSheet()
+                }
+                Button(String(localized: "checklist_planner.sync.cancel"), role: .cancel) {}
+            }
+            .sheet(isPresented: $showChecklistImportSheet) {
+                ChecklistPlannerSyncSheet(
+                    flow: .importFromChecklist,
+                    importCandidates: $checklistImportCandidates,
+                    exportCandidates: .constant([]),
+                    onConfirm: { confirmChecklistImport() },
+                    onCancel: { showChecklistImportSheet = false }
+                )
             }
         }
         .dirCompanionTabRoot()
@@ -116,10 +205,18 @@ struct PlannerView: View {
     private var profileCard: some View {
         DIRCard(String(localized: "planner.profile.title"), icon: nil, accent: DIRTheme.cyan) {
             VStack(spacing: 0) {
-                plannerDepthField(String(localized: "planner.field.max_depth"), meters: $store.input.plannedDepthMeters)
+                plannerDepthField(
+                    String(localized: "planner.field.max_depth"),
+                    meters: $store.input.plannedDepthMeters,
+                    maxMeters: profileMaxDepthLimitMeters
+                )
                 if store.mode != .base {
                     Divider().overlay(DIRTheme.hairline)
-                    plannerDepthField(String(localized: "planner.field.avg_depth"), meters: $store.input.plannedAverageDepthMeters)
+                    plannerDepthField(
+                        String(localized: "planner.field.avg_depth"),
+                        meters: $store.input.plannedAverageDepthMeters,
+                        maxMeters: profileMaxAverageDepthLimitMeters
+                    )
                     Divider().overlay(DIRTheme.hairline)
                     HStack(spacing: 8) {
                         Text(String(localized: "planner.field.planning_reference"))
@@ -152,12 +249,21 @@ struct PlannerView: View {
                     .padding(.vertical, 10)
                 }
                 Divider().overlay(DIRTheme.hairline)
-                plannerField(String(localized: "planner.field.bottom_time"), value: $store.input.plannedBottomMinutes, unit: "min", step: 1)
+                plannerField(
+                    String(localized: "planner.field.bottom_time"),
+                    value: $store.input.plannedBottomMinutes,
+                    unit: "min",
+                    step: 1,
+                    maxValue: profileMaxBottomMinutes
+                )
                 Divider().overlay(DIRTheme.hairline)
                 plannerTemperatureField(String(localized: "planner.field.temperature"), celsius: $store.input.waterTemperatureCelsius)
                 if store.mode == .technical {
                     Divider().overlay(DIRTheme.hairline)
                     plannerDepthField(String(localized: "planner.field.altitude"), meters: $store.input.altitudeMeters, step: unitPreference == .metric ? 100 : 300)
+                        .onChange(of: store.input.altitudeMeters) { _, _ in
+                            store.clampAllSwitchDepthsToMOD()
+                        }
                     Divider().overlay(DIRTheme.hairline)
                     HStack {
                         Text(String(localized: "planner.field.salinity"))
@@ -171,6 +277,9 @@ struct PlannerView: View {
                         }
                         .labelsHidden()
                         .tint(DIRTheme.cyan)
+                        .onChange(of: store.input.salinity) { _, _ in
+                            store.clampAllSwitchDepthsToMOD()
+                        }
                     }
                     .padding(.vertical, 10)
                     environmentStatusRow
@@ -396,6 +505,20 @@ struct PlannerView: View {
     private var plannerCylindersCard: some View {
         DIRCard(String(localized: "planner.card.cylinders"), icon: "fuelpump", accent: DIRTheme.cyan) {
             VStack(spacing: 12) {
+                if !checklistGasItems.isEmpty {
+                    Button {
+                        showChecklistImportPrompt = true
+                    } label: {
+                        Text(String(localized: "checklist_planner.sync.use_checklist"))
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(DIRTheme.cyan)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 8)
+                            .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.7), lineWidth: 1))
+                    }
+                    .buttonStyle(.plain)
+                    Divider().overlay(DIRTheme.hairline)
+                }
                 ForEach(visiblePlannerCylinders) { entry in
                     if let index = store.input.plannerCylinders.firstIndex(where: { $0.id == entry.id }) {
                         plannerCylinderEditor(at: index)
@@ -404,13 +527,13 @@ struct PlannerView: View {
                 if store.mode == .deco,
                    store.input.plannerCylinders.filter({ $0.role == .deco }).isEmpty {
                     Button {
-                        store.input.plannerCylinders.append(
-                            PlannerCylinderEntry(
-                                role: .deco,
-                                tankSize: .liters12,
-                                gas: GasMix(name: "Deco", role: .deco, oxygen: 0.50, helium: 0, maxPPO2: 1.6)
-                            )
+                        let entry = PlannerCylinderEntry(
+                            role: .deco,
+                            tankSize: .liters12,
+                            gas: GasMix(name: "Deco", role: .deco, oxygen: 0.50, helium: 0, maxPPO2: 1.6)
                         )
+                        store.input.plannerCylinders.append(entry)
+                        store.normalizeNewCylinderSwitchDepth(cylinderID: entry.id)
                     } label: {
                         Text(String(localized: "planner.cylinder.add_deco"))
                             .font(.callout.weight(.semibold))
@@ -434,22 +557,18 @@ struct PlannerView: View {
                 }
             }
         }
-        .onChange(of: store.input.plannerCylinders) { _, _ in
-            store.input.syncLegacyGasesFromPlannerCylinders()
-            store.refreshDerivedPlanningPreview()
-        }
     }
 
     @ViewBuilder
     private var addTechnicalCylinderButtons: some View {
         Button {
-            store.input.plannerCylinders.append(
-                PlannerCylinderEntry(
-                    role: .deco,
-                    tankSize: .liters12,
-                    gas: GasMix(name: "Deco", role: .deco, oxygen: 0.50, helium: 0, maxPPO2: 1.6)
-                )
+            let entry = PlannerCylinderEntry(
+                role: .deco,
+                tankSize: .liters12,
+                gas: GasMix(name: "Deco", role: .deco, oxygen: 0.50, helium: 0, maxPPO2: 1.6)
             )
+            store.input.plannerCylinders.append(entry)
+            store.normalizeNewCylinderSwitchDepth(cylinderID: entry.id)
         } label: {
             Text(String(localized: "planner.cylinder.add"))
                 .font(.callout.weight(.semibold))
@@ -462,14 +581,10 @@ struct PlannerView: View {
         let entry = store.input.plannerCylinders[index]
         return VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(String(localized: "planner.cylinder.title"))
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(DIRTheme.muted)
                 Spacer()
                 if store.mode == .technical, store.input.plannerCylinders.count > 1 {
                     Button(role: .destructive) {
                         store.input.plannerCylinders.removeAll { $0.id == entry.id }
-                        store.input.syncLegacyGasesFromPlannerCylinders()
                     } label: {
                         Text(String(localized: "planner.cylinder.remove"))
                             .font(.caption2.weight(.semibold))
@@ -477,80 +592,37 @@ struct PlannerView: View {
                     .buttonStyle(.plain)
                 }
             }
-            if store.mode == .technical {
-                HStack {
-                    Text(String(localized: "planner.cylinder.role"))
-                        .foregroundStyle(DIRTheme.muted)
-                    Spacer()
-                    Picker("", selection: $store.input.plannerCylinders[index].role) {
-                        ForEach(GasRole.allCases) { role in
-                            Text(role.localizedTitle).tag(role)
-                        }
-                    }
-                    .labelsHidden()
-                    .tint(DIRTheme.cyan)
-                }
-                .font(.callout)
-            } else {
-                Text(entry.role.localizedTitle)
-                    .font(.callout.weight(.semibold))
-                    .foregroundStyle(.white)
-            }
-            if store.mode == .technical {
-                HStack {
-                    Text(String(localized: "planner.cylinder.tank_size"))
-                        .foregroundStyle(DIRTheme.muted)
-                    Spacer()
-                    Picker("", selection: $store.input.plannerCylinders[index].tankSize) {
-                        ForEach(TankSize.allCases) { size in
-                            Text(size.rawValue).tag(size)
-                        }
-                    }
-                    .labelsHidden()
-                    .tint(DIRTheme.cyan)
-                }
-                .font(.callout)
-            }
-            Text(
-                String(
-                    format: String(localized: "planner.mod.value_format"),
-                    Formatters.depth(entry.modMeters(environment: store.input.plannerEnvironment), units: unitPreference).text
-                )
-            )
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(DIRTheme.cyan)
-            if entry.role != .bottom {
-                plannerDepthField(
-                    String(localized: "planner.field.switch_depth"),
-                    meters: $store.input.plannerCylinders[index].switchDepthMeters,
-                    step: 1
-                )
-            }
-            GasMixCard(
-                mix: $store.input.plannerCylinders[index].gas,
-                accent: entry.role == .bottom ? DIRTheme.green : DIRTheme.yellow,
+            PlannerCylinderGasEditorView(
+                entry: $store.input.plannerCylinders[index],
+                cylinderNumber: cylinderDisplayNumber(for: entry),
+                plannerMode: store.mode,
+                allowedMixKinds: PlannerModePolicy.allowedMixKinds(for: store.mode),
                 unitPreference: unitPreference,
                 plannerEnvironment: store.input.plannerEnvironment,
-                allowedMixKinds: PlannerModePolicy.allowedMixKinds(for: store.mode)
-            ) {
-                store.input.syncLegacyGasesFromPlannerCylinders()
-                store.refreshDerivedPlanningPreview()
-            }
-            .onChange(of: store.input.plannerCylinders[index].role) { _, newRole in
-                store.input.plannerCylinders[index].gas.role = newRole
-                store.input.syncLegacyGasesFromPlannerCylinders()
-                store.refreshDerivedPlanningPreview()
-            }
-            .onChange(of: store.input.plannerCylinders[index].switchDepthMeters) { _, _ in
-                store.refreshDerivedPlanningPreview()
-            }
-            if entry.isSwitchDepthBeyondMOD(environment: store.input.plannerEnvironment) {
-                Text(String(localized: "planner.mod.exceeds_allowed"))
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(DIRTheme.red)
+                plannedDepthMeters: store.input.plannedDepthMeters,
+                showsRoleEditor: store.mode == .technical,
+                showsTankEditor: store.mode == .technical,
+                switchDepthMeters: entry.role != .bottom ? clampedSwitchDepthBinding(for: index) : nil,
+                maxSwitchDepthMeters: entry.role != .bottom
+                    ? entry.usableSwitchDepthMeters(environment: store.input.plannerEnvironment)
+                    : nil,
+                onGasOrPressureChanged: {
+                    store.normalizeSwitchDepthAfterGasOrPPO2Change(cylinderID: entry.id)
+                }
+            )
+            if entry.gas.mixKind == .trimix {
+                Text(String(localized: "planner.gas.trimix_buhlmann_disclaimer"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             Divider().overlay(DIRTheme.hairline)
         }
+    }
+
+    private func cylinderDisplayNumber(for entry: PlannerCylinderEntry) -> Int {
+        let visible = visiblePlannerCylinders
+        return (visible.firstIndex(where: { $0.id == entry.id }) ?? 0) + 1
     }
 
     private var technicalAnalysisCard: some View {
@@ -639,6 +711,33 @@ struct PlannerView: View {
 
     private var canCalculatePlan: Bool {
         plannerSafetyAcknowledged && liveValidation.isValid && liveMODIssues.isEmpty
+    }
+
+    @ViewBuilder
+    private var plannerModeLimitWarnings: some View {
+        if liveValidation.states.contains(.basicNoDecoLimitExceeded) {
+            let message = PlannerUserFacingCopy.message(for: .basicNoDecoLimitExceeded)
+            DIRWarningBox(
+                text: [message.title, message.message, message.correctiveHint].compactMap { $0 }.joined(separator: "\n"),
+                severity: .critical
+            )
+        }
+        if liveValidation.states.contains(.decoDepthLimitExceeded) {
+            let message = PlannerUserFacingCopy.message(for: .decoDepthLimitExceeded)
+            DIRWarningBox(
+                text: [message.title, message.message, message.correctiveHint].compactMap { $0 }.joined(separator: "\n"),
+                severity: .critical
+            )
+        }
+        if store.mode == .technical {
+            DIRWarningBox(
+                text: [
+                    String(localized: "planner.mode.technical.notice.title"),
+                    String(localized: "planner.mode.technical.notice.message")
+                ].joined(separator: "\n"),
+                severity: .info
+            )
+        }
     }
 
     @ViewBuilder
@@ -757,6 +856,10 @@ struct PlannerView: View {
                 return
             }
             store.calculate()
+            pendingChecklistExportAfterCalculate = !ChecklistPlannerSyncMapper.cylindersMissingFromChecklist(
+                plannerCylinders: store.input.plannerCylinders,
+                checklist: equipment.profile.checklistItems
+            ).isEmpty
             showPlan = true
         } label: {
             HStack(spacing: 8) {
@@ -806,13 +909,27 @@ struct PlannerView: View {
         )
     }
 
-    private func plannerDepthField(_ title: String, meters: Binding<Double>, step: Double = 1) -> some View {
+    private func plannerDepthField(_ title: String, meters: Binding<Double>, step: Double = 1, maxMeters: Double? = nil) -> some View {
         let displayStep = unitPreference == .metric ? step : max(1, IOSUnitConversions.feet(fromMeters: step))
+        let displayMax = maxMeters.map { unitPreference == .metric ? $0 : IOSUnitConversions.feet(fromMeters: $0) }
         return plannerField(
             title,
             value: depthDisplayBinding(meters),
             unit: Formatters.depthUnitLabel(unitPreference),
-            step: displayStep
+            step: displayStep,
+            maxValue: displayMax
+        )
+    }
+
+    private func clampedSwitchDepthBinding(for index: Int) -> Binding<Double> {
+        Binding(
+            get: {
+                guard store.input.plannerCylinders.indices.contains(index) else { return 0 }
+                return store.input.plannerCylinders[index].switchDepthMeters
+            },
+            set: { proposed in
+                store.clampSwitchDepth(forCylinderAt: index, proposedMeters: proposed)
+            }
         )
     }
 
@@ -825,7 +942,7 @@ struct PlannerView: View {
         )
     }
 
-    private func plannerField(_ title: String, value: Binding<Double>, unit: String, step: Double) -> some View {
+    private func plannerField(_ title: String, value: Binding<Double>, unit: String, step: Double, maxValue: Double? = nil) -> some View {
         HStack {
             Text(title)
                 .font(.callout)
@@ -843,11 +960,16 @@ struct PlannerView: View {
                         .frame(width: 28, height: 24)
                 }
                 Button {
-                    value.wrappedValue += step
+                    if let maxValue {
+                        value.wrappedValue = min(maxValue, value.wrappedValue + step)
+                    } else {
+                        value.wrappedValue += step
+                    }
                 } label: {
                     Image(systemName: "plus")
                         .frame(width: 28, height: 24)
                 }
+                .disabled(maxValue.map { value.wrappedValue >= $0 - 0.001 } ?? false)
             }
             .font(.caption.weight(.bold))
             .foregroundStyle(DIRTheme.cyan)
@@ -897,18 +1019,133 @@ struct PlannerView: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel(message.accessibilityLabel)
     }
+
+    private var checklistGasItems: [EquipmentChecklistItem] {
+        ChecklistPlannerSyncMapper.checklistGasItems(from: equipment.profile.checklistItems)
+    }
+
+    private func openChecklistImportSheet() {
+        checklistImportCandidates = ChecklistPlannerSyncMapper.importCandidates(
+            checklist: equipment.profile.checklistItems,
+            plannerCylinders: store.input.plannerCylinders
+        )
+        showChecklistImportSheet = true
+    }
+
+    private func importAllFromChecklist() {
+        var candidates = ChecklistPlannerSyncMapper.importCandidates(
+            checklist: equipment.profile.checklistItems,
+            plannerCylinders: store.input.plannerCylinders
+        )
+        let needsRoleSelection = candidates.contains { ($0.assignedRole ?? ChecklistPlannerSyncMapper.resolvedRole(for: $0.checklistItem)) == nil }
+        if needsRoleSelection {
+            openChecklistImportSheet()
+            return
+        }
+        for index in candidates.indices {
+            candidates[index].isSelected = true
+            if candidates[index].duplicatePlannerIndex != nil {
+                candidates[index].duplicateAction = .replace
+            }
+        }
+        checklistImportCandidates = candidates
+        confirmChecklistImport()
+    }
+
+    private func confirmChecklistImport() {
+        store.input.ensurePlannerCylindersFromLegacy()
+        ChecklistPlannerSyncMapper.applyImport(
+            candidates: checklistImportCandidates,
+            to: &store.input.plannerCylinders,
+            environment: store.input.plannerEnvironment
+        )
+        for candidate in checklistImportCandidates where candidate.isSelected {
+            if let index = store.input.plannerCylinders.firstIndex(where: {
+                ChecklistPlannerSyncMapper.fingerprint(for: $0) == ChecklistPlannerSyncMapper.fingerprint(
+                    for: candidate.checklistItem,
+                    role: candidate.assignedRole ?? ChecklistPlannerSyncMapper.resolvedRole(for: candidate.checklistItem) ?? .deco
+                )
+            }) {
+                store.normalizeNewCylinderSwitchDepth(cylinderID: store.input.plannerCylinders[index].id)
+            }
+        }
+        store.input.syncLegacyGasesFromPlannerCylinders()
+        store.refreshDerivedPlanningPreview()
+        showChecklistImportSheet = false
+    }
+
+    private enum PlannerPDFShareKind {
+        case plan, briefing, divePack
+    }
+
+    private func plannerPDFContext() -> PDFExportPlannerContext {
+        PDFShareActions.plannerContext(
+            store: store,
+            safetyAcknowledged: plannerSafetyAcknowledged,
+            unitPreference: unitPreference,
+            modIssues: liveMODIssues
+        )
+    }
+
+    private func sharePlannerPDF(kind: PlannerPDFShareKind) {
+        let context = plannerPDFContext()
+        guard PDFExportService.canExportPlan(context) else {
+            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage()
+            return
+        }
+        do {
+            let url: URL
+            switch kind {
+            case .plan:
+                url = try PDFExportService.exportPlan(context: context)
+            case .briefing:
+                url = try PDFExportService.exportBriefing(context: context)
+            case .divePack:
+                url = try PDFExportService.exportDivePack(
+                    plannerContext: context,
+                    checklistProfile: equipment.profile
+                )
+            }
+            shareablePDF = ShareablePDFItem(url: url)
+        } catch {
+            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage()
+        }
+    }
 }
 
 struct PlanResultView: View {
     @EnvironmentObject private var store: PlannerStore
+    @EnvironmentObject private var equipment: EquipmentStore
+    var pendingChecklistExportPrompt: Bool = false
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @AppStorage(PlannerCNSDescentBottomCheckSettings.storageKey) private var cnsDescentBottomCheckEnabled = PlannerCNSDescentBottomCheckSettings.defaultEnabled
+    @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
+    @State private var showResultPDFMenu = false
+    @State private var shareablePDF: ShareablePDFItem?
+    @State private var pdfExportAlertMessage: String?
+
+    private var plannerSafetyAcknowledged: Bool {
+        plannerSafetyAckRevision == PlannerSafetyAcknowledgment.currentRevision
+    }
+
+    private var liveMODIssues: [MODValidationIssue] {
+        PlannerMODValidator.liveInputIssues(input: store.input, environment: store.input.plannerEnvironment)
+    }
+
+    private var canExportPlanPDF: Bool {
+        PDFExportService.canExportPlan(resultPDFContext())
+    }
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
     private var modePresentation: PlannerResultPresentation { PlannerResultPresentation.presentation(for: store.mode) }
 
     private var cnsDescentBottomWarningActive: Bool {
         store.plan.gasAnalysis.cnsDescentBottomExceedsPlannerThreshold(checkEnabled: cnsDescentBottomCheckEnabled)
+    }
+
+    private var fullPlanCNSWarningActive: Bool {
+        store.plan.gasAnalysis.showsFullPlanOxygenExposureWarning
+            || store.plan.states.contains(.oxygenExposureElevated)
     }
 
     private var cnsDescentBottomTileAccessibilityLabel: String {
@@ -955,6 +1192,10 @@ struct PlanResultView: View {
         Formatters.depth(meters, units: unitPreference).text
     }
     @State private var tab: PlanTab = .plan
+    @State private var showChecklistExportPrompt = false
+    @State private var showChecklistExportSheet = false
+    @State private var checklistExportCandidates: [ChecklistPlannerExportCandidate] = []
+    @State private var didPresentChecklistExportPrompt = false
 
     private var availableResultTabs: [PlanTab] {
         var tabs: [PlanTab] = [.plan]
@@ -964,7 +1205,22 @@ struct PlanResultView: View {
     }
 
     private var planShareText: String {
-        var lines = [String(localized: "planner.export.header")]
+        var lines: [String] = []
+        lines.append(
+            String(
+                format: String(localized: "planner.export.mode_line"),
+                store.mode.localizedTabTitle
+            )
+        )
+        switch store.mode {
+        case .base:
+            lines.append(String(localized: "planner.export.mode_disclaimer.base"))
+        case .deco:
+            lines.append(String(localized: "planner.export.mode_disclaimer.deco"))
+        case .technical:
+            lines.append(String(localized: "planner.export.mode_disclaimer.technical"))
+        }
+        lines.append(String(localized: "planner.export.header"))
         lines.append(String(format: String(localized: "planner.export.tts_line"), store.plan.ttsMinutes))
         lines.append(String(format: String(localized: "planner.export.runtime_line"), store.plan.totalRuntimeMinutes))
         lines.append("NDL: \(Formatters.one(store.plan.ndlMinutes)) min")
@@ -1009,8 +1265,9 @@ struct PlanResultView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
                     resultHeaderBadge
-                    dashboardHeroGrid
-                    resultTabs
+                        dashboardHeroGrid
+                        tissueAnalyticsEntry
+                        resultTabs
                     modValidationSection
                     resultWarningsSection
                     bailoutScheduleHint
@@ -1039,6 +1296,9 @@ struct PlanResultView: View {
                             baseCompatibilitySummary
                         }
                         plannerLegalFootnotes
+                        if canExportPlanPDF {
+                            shareDivePackButton
+                        }
                     case .curve:
                         buhlmannSection
                     case .charts:
@@ -1059,18 +1319,163 @@ struct PlanResultView: View {
             if !availableResultTabs.contains(tab) {
                 tab = .plan
             }
+            presentChecklistExportPromptIfNeeded()
+        }
+        .confirmationDialog(
+            String(localized: "checklist_planner.sync.export_prompt"),
+            isPresented: $showChecklistExportPrompt,
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "checklist_planner.sync.add_all")) {
+                addAllPlannerGasesToChecklist()
+            }
+            Button(String(localized: "checklist_planner.sync.choose_add")) {
+                openChecklistExportSheet()
+            }
+            Button(String(localized: "checklist_planner.sync.do_not_add"), role: .cancel) {}
+        }
+        .sheet(isPresented: $showChecklistExportSheet) {
+            ChecklistPlannerSyncSheet(
+                flow: .exportToChecklist,
+                importCandidates: .constant([]),
+                exportCandidates: $checklistExportCandidates,
+                onConfirm: { confirmChecklistExport() },
+                onCancel: { showChecklistExportSheet = false }
+            )
         }
         .navigationTitle(store.mode.localizedResultTitle)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                ShareLink(item: planShareText) {
+                Button {
+                    showResultPDFMenu = true
+                } label: {
                     Image(systemName: "square.and.arrow.up")
                         .foregroundStyle(DIRTheme.cyan)
                 }
-                .accessibilityLabel(Text(String(localized: "planner.export.share.a11y")))
+                .accessibilityLabel(Text(String(localized: "pdf.export.share.a11y")))
             }
         }
+        .confirmationDialog(
+            String(localized: "pdf.export.share.a11y"),
+            isPresented: $showResultPDFMenu,
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "pdf.export.share.plan")) {
+                shareResultPDF(kind: .plan)
+            }
+            Button(String(localized: "pdf.export.share.briefing")) {
+                shareResultPDF(kind: .briefing)
+            }
+            Button(String(localized: "pdf.export.share.dive_pack")) {
+                shareResultPDF(kind: .divePack)
+            }
+            Button(String(localized: "pdf.export.cancel"), role: .cancel) {}
+        }
+        .sheet(item: $shareablePDF) { item in
+            ShareSheetView(activityItems: [item.url])
+        }
+        .alert(String(localized: "pdf.export.error.title"), isPresented: Binding(
+            get: { pdfExportAlertMessage != nil },
+            set: { if !$0 { pdfExportAlertMessage = nil } }
+        )) {
+            Button(String(localized: "OK"), role: .cancel) {}
+        } message: {
+            Text(pdfExportAlertMessage ?? "")
+        }
+    }
+
+    private var shareDivePackButton: some View {
+        Button {
+            shareResultPDF(kind: .divePack)
+        } label: {
+            Text(String(localized: "pdf.export.share.dive_pack_button"))
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(DIRTheme.cyan)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 11)
+                .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private enum ResultPDFShareKind {
+        case plan, briefing, divePack
+    }
+
+    private func resultPDFContext() -> PDFExportPlannerContext {
+        PDFShareActions.plannerContext(
+            store: store,
+            safetyAcknowledged: plannerSafetyAcknowledged,
+            unitPreference: unitPreference,
+            modIssues: liveMODIssues
+        )
+    }
+
+    private func shareResultPDF(kind: ResultPDFShareKind) {
+        let context = resultPDFContext()
+        guard PDFExportService.canExportPlan(context) else {
+            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage()
+            return
+        }
+        do {
+            let url: URL
+            switch kind {
+            case .plan:
+                url = try PDFExportService.exportPlan(context: context)
+            case .briefing:
+                url = try PDFExportService.exportBriefing(context: context)
+            case .divePack:
+                url = try PDFExportService.exportDivePack(
+                    plannerContext: context,
+                    checklistProfile: equipment.profile
+                )
+            }
+            shareablePDF = ShareablePDFItem(url: url)
+        } catch {
+            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage()
+        }
+    }
+
+    private func presentChecklistExportPromptIfNeeded() {
+        guard pendingChecklistExportPrompt, !didPresentChecklistExportPrompt else { return }
+        let missing = ChecklistPlannerSyncMapper.cylindersMissingFromChecklist(
+            plannerCylinders: store.input.plannerCylinders,
+            checklist: equipment.profile.checklistItems
+        )
+        guard !missing.isEmpty else { return }
+        didPresentChecklistExportPrompt = true
+        showChecklistExportPrompt = true
+    }
+
+    private func openChecklistExportSheet() {
+        checklistExportCandidates = ChecklistPlannerSyncMapper.exportCandidates(
+            plannerCylinders: ChecklistPlannerSyncMapper.cylindersMissingFromChecklist(
+                plannerCylinders: store.input.plannerCylinders,
+                checklist: equipment.profile.checklistItems
+            ),
+            checklist: equipment.profile.checklistItems
+        )
+        showChecklistExportSheet = true
+    }
+
+    private func addAllPlannerGasesToChecklist() {
+        checklistExportCandidates = ChecklistPlannerSyncMapper.exportCandidates(
+            plannerCylinders: ChecklistPlannerSyncMapper.cylindersMissingFromChecklist(
+                plannerCylinders: store.input.plannerCylinders,
+                checklist: equipment.profile.checklistItems
+            ),
+            checklist: equipment.profile.checklistItems
+        )
+        confirmChecklistExport()
+    }
+
+    private func confirmChecklistExport() {
+        ChecklistPlannerSyncMapper.applyExport(
+            candidates: checklistExportCandidates,
+            to: &equipment.profile.checklistItems
+        )
+        showChecklistExportSheet = false
     }
 
     private var referenceDepthSummary: String {
@@ -1236,7 +1641,8 @@ struct PlanResultView: View {
                     title: String(localized: "planner.metric.cns_full_plan"),
                     value: store.plan.gasAnalysis.cnsPercentDisplay,
                     unit: "%",
-                    color: DIRTheme.green
+                    color: fullPlanCNSWarningActive ? DIRTheme.yellow : DIRTheme.green,
+                    icon: fullPlanCNSWarningActive ? "exclamationmark.triangle.fill" : nil
                 )
             }
         }
@@ -1247,6 +1653,26 @@ struct PlanResultView: View {
         )
         .accessibilityElement(children: .contain)
         .accessibilityLabel(String(localized: "planner.result.dashboard.a11y"))
+    }
+
+    @ViewBuilder
+    private var tissueAnalyticsEntry: some View {
+        if showsTissueAnalyticsEntry, let presentation = tissueAnalyticsPresentation {
+            NavigationLink {
+                TissueNarcosisAnalyticsView(presentation: presentation, initialTab: .tissues)
+            } label: {
+                TissueAnalyticsEntryCard()
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var showsTissueAnalyticsEntry: Bool {
+        store.mode != .base && !store.plan.tissueHistory.isEmpty && store.plan.buhlmannState != .invalidInput
+    }
+
+    private var tissueAnalyticsPresentation: TissueAnalyticsPresentation? {
+        TissueAnalyticsService.presentationForPlanner(plan: store.plan, input: store.input, mode: store.mode)
     }
 
     private var secondaryMetricsSection: some View {

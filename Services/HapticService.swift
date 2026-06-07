@@ -11,6 +11,7 @@ final class HapticService {
     private var ascentAlarmSessionActive = false
     private var lastBuddyNearDate: Date?
     private var lastBuddyDistantDate: Date?
+    private var lastReminderPulseDate: Date?
 
     /// Minimum interval between repeated ascent-alarm haptics while the banner is active.
     static let ascentAlarmRepeatInterval: TimeInterval = 1.75
@@ -70,6 +71,14 @@ final class HapticService {
 
     func notify() {
         guard hapticsEnabled else { return }
+        WKInterfaceDevice.current().play(.notification)
+    }
+
+    func reminderPulseIfNeeded() {
+        guard hapticsEnabled else { return }
+        let now = Date()
+        if let lastReminderPulseDate, now.timeIntervalSince(lastReminderPulseDate) < 2 { return }
+        lastReminderPulseDate = now
         WKInterfaceDevice.current().play(.notification)
     }
 

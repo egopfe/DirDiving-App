@@ -59,23 +59,27 @@ enum PlannerInputValidator {
             }
         }
         if mode == .technical {
-            if case .failure(let error) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) {
-                switch error {
-                case .invalidAltitude:
-                    result.add(.invalidEnvironment, message: String(localized: "planner.environment.invalid_altitude.message"))
-                case .invalidSalinity:
-                    result.add(.invalidEnvironment, message: String(localized: "planner.environment.invalid_salinity.message"))
-                }
-            }
-        }
-
-        if mode == .technical {
             if !input.densityWarningLimit.isFinite
                 || !input.densityDangerLimit.isFinite
                 || input.densityWarningLimit <= 0
                 || input.densityDangerLimit <= input.densityWarningLimit {
                 result.add(.invalidInput, message: String(localized: "planner.validation.density_limits_invalid"))
             }
+        }
+
+        if case .failure(let error) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) {
+            switch error {
+            case .invalidAltitude:
+                result.add(.invalidEnvironment, message: String(localized: "planner.environment.invalid_altitude.message"))
+            case .invalidSalinity:
+                result.add(.invalidEnvironment, message: String(localized: "planner.environment.invalid_salinity.message"))
+            }
+        }
+
+        let environment = input.plannerEnvironment
+        for issue in PlannerMODValidator.validatePlannerCylinders(input: input, environment: environment) {
+            guard issue.cylinderRole != .bottom else { continue }
+            result.add(.MODExceeded, message: String(localized: "planner.mod.exceeds_allowed"))
         }
 
         for entry in input.plannerCylinders {

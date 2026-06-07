@@ -63,7 +63,7 @@ final class WatchSyncCodecAlgorithmTests: XCTestCase {
             ]
         )
         let csv = SubsurfaceExportService.makeCSV(for: session)!
-        XCTAssertTrue(csv.contains("\n5,10.00"))
-        XCTAssertTrue(csv.contains("\n60,20.00"))
+        XCTAssertTrue(csv.contains("\n0,10.00"))
+        XCTAssertTrue(csv.contains("\n55,20.00"))
     }
 }
