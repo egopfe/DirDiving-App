@@ -180,4 +180,61 @@ final class DiveManagerAlgorithmIntegrationTests: XCTestCase {
         try? await Task.sleep(nanoseconds: 100_000_000)
         XCTAssertEqual(logStore.sessions.count, 1)
     }
+
+    func testCustomDepthAlarmDoesNotFireWhenDisabledByDefault() {
+        let enabledKey = "dirdiving_watch_alarm_depth_enabled"
+        let thresholdKey = "dirdiving_watch_alarm_depth_threshold_m"
+        let priorEnabled = UserDefaults.standard.object(forKey: enabledKey)
+        let priorThreshold = UserDefaults.standard.object(forKey: thresholdKey)
+        defer {
+            if let priorEnabled { UserDefaults.standard.set(priorEnabled, forKey: enabledKey) }
+            else { UserDefaults.standard.removeObject(forKey: enabledKey) }
+            if let priorThreshold { UserDefaults.standard.set(priorThreshold, forKey: thresholdKey) }
+            else { UserDefaults.standard.removeObject(forKey: thresholdKey) }
+        }
+        UserDefaults.standard.set(false, forKey: enabledKey)
+        UserDefaults.standard.set(30.0, forKey: thresholdKey)
+
+        diveManager.startManualDive()
+        diveManager.testHook_processDepthMeasurement(rawDepthMeters: 35, timestamp: Date())
+        diveManager.testHook_evaluateDepthAlarmForTests()
+        XCTAssertNil(diveManager.testHook_alarmWarningMessage)
+    }
+
+    func testCustomDepthAlarmFiresWhenEnabledAndThresholdExceeded() {
+        let enabledKey = "dirdiving_watch_alarm_depth_enabled"
+        let thresholdKey = "dirdiving_watch_alarm_depth_threshold_m"
+        let priorEnabled = UserDefaults.standard.object(forKey: enabledKey)
+        let priorThreshold = UserDefaults.standard.object(forKey: thresholdKey)
+        defer {
+            if let priorEnabled { UserDefaults.standard.set(priorEnabled, forKey: enabledKey) }
+            else { UserDefaults.standard.removeObject(forKey: enabledKey) }
+            if let priorThreshold { UserDefaults.standard.set(priorThreshold, forKey: thresholdKey) }
+            else { UserDefaults.standard.removeObject(forKey: thresholdKey) }
+        }
+        UserDefaults.standard.set(true, forKey: enabledKey)
+        UserDefaults.standard.set(30.0, forKey: thresholdKey)
+
+        diveManager.testHook_shutdownTimersForTests()
+        diveManager = DiveManager(
+            logStore: logStore,
+            gpsManager: GPSManager(),
+            ascentSettings: AscentRateSettingsStore(defaults: userDefaultsSuite)
+        )
+        diveManager.testHook_setDepthAutomationAvailableForTests(true)
+
+        diveManager.startManualDive()
+        let start = Date()
+        diveManager.testHook_processDepthMeasurement(rawDepthMeters: 35, timestamp: start)
+        XCTAssertNotNil(diveManager.testHook_alarmWarningMessage)
+    }
+
+    func testDepthSafetyHapticsUnchangedAtSupportedLimits() {
+        diveManager.startManualDive()
+        let start = Date()
+        diveManager.testHook_processDepthMeasurement(rawDepthMeters: 35, timestamp: start)
+        XCTAssertEqual(diveManager.depthSafetyState, .caution)
+        diveManager.testHook_processDepthMeasurement(rawDepthMeters: 38, timestamp: start.addingTimeInterval(2))
+        XCTAssertEqual(diveManager.depthSafetyState, .critical)
+    }
 }

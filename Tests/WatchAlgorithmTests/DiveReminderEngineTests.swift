@@ -70,6 +70,27 @@ final class DiveReminderEngineTests: XCTestCase {
         XCTAssertEqual(overlay.messages.count, 2)
         XCTAssertFalse(overlay.title.isEmpty)
     }
+
+    func testThreeSimultaneousRemindersExposeHiddenCount() {
+        let reminders = [
+            makeReminder(type: .single, minute: 10, message: "Check gas"),
+            makeReminder(type: .single, minute: 10, message: "Check buddy"),
+            makeReminder(type: .single, minute: 10, message: "Check SMB")
+        ]
+        var state = DiveReminderRuntimeState()
+        let settings = DiveReminderSettings(remindersEnabled: true, reminders: reminders)
+        let triggered = DiveReminderEngine.evaluate(
+            runtimeSeconds: 600,
+            runtimeMinute: 10,
+            settings: settings,
+            state: &state
+        )
+        XCTAssertEqual(triggered.count, 3)
+        let overlay = DiveReminderEngine.makeOverlay(for: triggered, runtimeMinute: 10)
+        XCTAssertEqual(overlay.messages.count, 2)
+        XCTAssertEqual(overlay.hiddenCount, 1)
+        XCTAssertTrue(overlay.shouldHaptic)
+    }
 }
 
 final class DiveReminderValidationTests: XCTestCase {

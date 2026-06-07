@@ -5,7 +5,7 @@
 **Audit source:** `Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524_CURRENT_PRE_MODIFICATION.md`  
 **Scope:** DIRDiving Watch App + DIRDiving iOS (MAIN targets only)
 
-> Historical report retained for traceability. **Current non-physical readiness (2026-06-07):** [`IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md) @ `a6ccd8d`. **Bühlmann remains primary; Ratio Deco is comparative heuristic only; DIR DIVING is non-certified/reference-only.** Physical/external/App Store gates **PENDING** — [`MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md`](MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md).
+> Historical report retained for traceability. **Current non-physical readiness (2026-06-07):** [`IOS_MAIN_ALGORITHM_MATH_POST_AUDIT_FIX_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_POST_AUDIT_FIX_REPORT_CURRENT.md) (post-audit pass) and [`IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md) @ `32f8d3e`. **Bühlmann remains primary; Ratio Deco is comparative heuristic only; DIR DIVING is non-certified/reference-only.** Physical/external/App Store gates **PENDING** — [`MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md`](MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md).
 
 ---
 

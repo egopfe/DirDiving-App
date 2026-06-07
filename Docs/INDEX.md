@@ -1,9 +1,22 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-07  
-**Branch consigliato:** `main` = `origin/main` @ **`a6ccd8d`**  
+**Branch consigliato:** `main` = `origin/main` @ **`af31937`** (audit re-run; see post-audit fix report for current HEAD after fixes)  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-06-07 — iOS MAIN post-audit non-physical fixes
+
+Residual gaps from [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) @ audit baseline `32f8d3e`, audit re-run @ `af31937`.
+
+| Campo | Valore |
+|-------|--------|
+| **Report** | [`IOS_MAIN_ALGORITHM_MATH_POST_AUDIT_FIX_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_POST_AUDIT_FIX_REPORT_CURRENT.md) |
+| **Audit baseline** | `32f8d3e` |
+| **Tests added** | Briefing PDF, manual dive logic, Ratio Deco MOD, Watch depth alarm, reminder hiddenCount, photo pipeline, localization sweep |
+| **Physical / external QA** | **PENDING** |
 
 ---
 
