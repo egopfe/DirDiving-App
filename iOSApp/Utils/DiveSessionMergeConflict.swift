@@ -26,12 +26,20 @@ enum DiveSessionMergeConflictDetector {
             localDuplicates: dedupedLocal.duplicateSessionIDs,
             cloudDuplicates: dedupedCloud.duplicateSessionIDs
         )
-        let cloudByID = Dictionary(uniqueKeysWithValues: dedupedCloud.sessions.map { ($0.id, $0) })
+        let cloudByID = safeSessionDictionary(from: dedupedCloud.sessions)
         for localSession in dedupedLocal.sessions {
             guard let cloudSession = cloudByID[localSession.id] else { continue }
             conflicts.append(contentsOf: detect(local: localSession, cloud: cloudSession))
         }
         return conflicts
+    }
+
+    private static func safeSessionDictionary(from sessions: [DiveSession]) -> [UUID: DiveSession] {
+        var byID: [UUID: DiveSession] = [:]
+        for session in sessions {
+            byID[session.id] = session
+        }
+        return byID
     }
 
     private static func duplicateSessionIDConflicts(

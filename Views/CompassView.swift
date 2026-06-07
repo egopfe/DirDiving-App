@@ -19,20 +19,23 @@ struct CompassView: View {
         ZStack {
             DiveScreenBackground()
 
-            VStack(spacing: 9) {
-                header
-                statusBanner
-                if let bearingToast {
-                    bearingFeedbackBanner(bearingToast)
-                        .transition(compassTransition)
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 9) {
+                    header
+                    statusBanner
+                        .accessibilityLabel(compass.statusMessage)
+                    if let bearingToast {
+                        bearingFeedbackBanner(bearingToast)
+                            .transition(compassTransition)
+                    }
+                    compassDial
+                    diveMetricsPanel
+                    controls
                 }
-                compassDial
-                diveMetricsPanel
-                controls
+                .padding(.horizontal, 12)
+                .padding(.top, 9)
+                .padding(.bottom, 8)
             }
-            .padding(.horizontal, 12)
-            .padding(.top, 9)
-            .padding(.bottom, 8)
         }
         .onAppear { compass.start() }
         .onDisappear { compass.stop() }
@@ -208,7 +211,7 @@ struct CompassView: View {
         VStack(spacing: 6) {
             if compass.bearingDegrees != nil {
                 Text(String(format: String(localized: "compass.bearing.delta_format"), bearingText, deltaText))
-                    .font(.system(size: 10, weight: .black, design: .rounded))
+                    .font(DiveUI.Typography.hintCaptionBold)
                     .foregroundStyle(DiveUI.yellow)
                     .lineLimit(1)
                     .minimumScaleFactor(0.9)

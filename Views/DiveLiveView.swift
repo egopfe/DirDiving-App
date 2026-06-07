@@ -203,37 +203,38 @@ struct DiveLiveView: View {
         )
     }
 
+    private var bannerPresentation: LiveDiveBannerPresentationPolicy.Output {
+        LiveDiveBannerPresentationPolicy.evaluate(
+            LiveDiveBannerPresentationPolicy.Input(
+                showAscentAlarmBanner: showAscentAlarmBanner,
+                depthSafetyState: depthSafetyState,
+                exceededSupportedDepthRange: dive.exceededSupportedDepthRange,
+                isDepthDataStale: dive.isDepthDataStale,
+                isManualNoDepthSession: dive.isManualNoDepthSession,
+                hapticsEnabled: hapticsEnabled,
+                isDepthAutomationMockFallbackActive: dive.isDepthAutomationMockFallbackActive,
+                isSimulationDepthActive: dive.isSimulationDepthActive,
+                showsAutoDiveHint: dive.isDepthAutomationAvailable && !dive.isManualLifecycleActive,
+                showsManualHandoffNote: dive.manualStartHandedOffToAutomatic
+            )
+        )
+    }
+
+    @ViewBuilder
     private func activeDiveContent(leftWidth: CGFloat, gaugeWidth: CGFloat) -> some View {
+        let presentation = bannerPresentation
         ScrollView {
-            VStack(spacing: activeDiveSpacing) {
+            VStack(spacing: activeDiveSpacing(for: presentation)) {
                 topBar
                 immersionStatus
-                if dive.isDepthAutomationAvailable && !dive.isManualLifecycleActive {
-                    Text(String(localized: "live.auto_dive.active.hint"))
-                        .font(.system(size: 10, weight: .semibold, design: .rounded))
-                        .foregroundStyle(DiveUI.secondaryText)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                if !hapticsEnabled {
-                    hapticsOffBadge
-                }
-                if dive.isDepthAutomationMockFallbackActive {
-                    depthMockFallbackBadge
-                } else             if dive.isDepthAutomationMockFallbackActive {
-                depthMockFallbackBadge
-            } else if dive.isSimulationDepthActive {
-                simulationDepthBadge
-            }
-                if dive.manualStartHandedOffToAutomatic {
-                    Text(String(localized: "live.manual_lifecycle.handoff.note"))
-                        .font(.system(size: 10, weight: .semibold, design: .rounded))
-                        .foregroundStyle(DiveUI.secondaryText)
-                        .multilineTextAlignment(.leading)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                if presentation.compactSecondaryNotices {
+                    collapsedSecondaryNoticesChip(titles: presentation.secondaryNoticeTitles)
+                } else {
+                    secondaryNoticeViews(presentation: presentation)
                 }
                 ttvRuntimePanel
                     .layoutPriority(2)
-                if showAscentAlarmBanner {
+                if presentation.showAscentBanner {
                     AscentWarningBannerView(
                         rateMetersPerMinute: dive.ascentStatus.currentRateMetersPerMinute,
                         isActive: true,
@@ -241,20 +242,22 @@ struct DiveLiveView: View {
                     )
                     .transition(activeDiveTransition)
                 }
-                if dive.isDepthDataStale {
-                    depthStaleBanner
-                        .transition(activeDiveTransition)
-                } else if dive.isManualNoDepthSession {
-                    manualNoDepthBanner
-                        .transition(activeDiveTransition)
+                if presentation.showSensorBanner {
+                    if dive.isDepthDataStale {
+                        depthStaleBanner
+                            .transition(activeDiveTransition)
+                    } else if dive.isManualNoDepthSession {
+                        manualNoDepthBanner
+                            .transition(activeDiveTransition)
+                    }
                 }
-                if depthSafetyState != .normal {
+                if presentation.showDepthSafetyBanner {
                     DepthSafetyBannerView(state: depthSafetyState)
                         .transition(activeDiveTransition)
                 }
-                if dive.exceededSupportedDepthRange {
+                if presentation.showExceededSupplementalText {
                     Text(String(localized: "depth.safety.exceeded.readings"))
-                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .font(DiveUI.Typography.hintCaptionBold)
                         .foregroundStyle(DiveUI.red)
                         .multilineTextAlignment(.leading)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -271,19 +274,66 @@ struct DiveLiveView: View {
         .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.22) : nil, value: depthSafetyState)
     }
 
-    private var activeBannerCount: Int {
-        var count = 0
-        if showAscentAlarmBanner { count += 1 }
-        if dive.isDepthDataStale || dive.isManualNoDepthSession { count += 1 }
-        if depthSafetyState != .normal { count += 1 }
-        if dive.exceededSupportedDepthRange { count += 1 }
-        if !hapticsEnabled { count += 1 }
-        if dive.isDepthAutomationAvailable && !dive.isManualLifecycleActive { count += 1 }
-        return count
+    @ViewBuilder
+    private func secondaryNoticeViews(presentation: LiveDiveBannerPresentationPolicy.Output) -> some View {
+        if presentation.showsAutoDiveHint {
+            Text(String(localized: "live.auto_dive.active.hint"))
+                .font(DiveUI.Typography.hintCaption)
+                .foregroundStyle(DiveUI.secondaryText)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        if !hapticsEnabled {
+            hapticsOffBadge
+        }
+        if dive.isDepthAutomationMockFallbackActive {
+            depthMockFallbackBadge
+        } else if dive.isSimulationDepthActive {
+            simulationDepthBadge
+        }
+        if presentation.showsManualHandoffNote {
+            Text(String(localized: "live.manual_lifecycle.handoff.note"))
+                .font(DiveUI.Typography.hintCaption)
+                .foregroundStyle(DiveUI.secondaryText)
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 
-    private var activeDiveSpacing: CGFloat {
-        switch activeBannerCount {
+    private func collapsedSecondaryNoticesChip(titles: [String]) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: "info.circle.fill")
+                .font(.system(size: 11, weight: .black))
+            Text(String(format: String(localized: "live.banner.collapsed.summary"), titles.count))
+                .font(DiveUI.Typography.warningBody)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(DiveUI.cyan)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(DiveUI.cyan.opacity(0.10))
+                .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(DiveUI.cyan.opacity(0.55), lineWidth: 1))
+        )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(
+            String(format: String(localized: "live.banner.collapsed.a11y"), titles.joined(separator: ", "))
+        )
+    }
+
+    private func activeDiveSpacing(for presentation: LiveDiveBannerPresentationPolicy.Output) -> CGFloat {
+        let criticalCount = [
+            presentation.showAscentBanner,
+            presentation.showDepthSafetyBanner,
+            presentation.showSensorBanner,
+            presentation.showExceededSupplementalText
+        ].filter { $0 }.count
+        if criticalCount >= 2 || presentation.compactSecondaryNotices {
+            return 3
+        }
+        switch criticalCount + (presentation.compactSecondaryNotices ? 1 : 0) {
         case 0...1: return 7
         case 2...3: return 4
         default: return 3
@@ -454,7 +504,7 @@ struct DiveLiveView: View {
     private var surfaceManualStartPanel: some View {
         VStack(spacing: 8) {
             Text(String(localized: "live.manual_start.title"))
-                .font(.system(size: 10, weight: .black, design: .rounded))
+                .font(DiveUI.Typography.hintCaptionBold)
                 .foregroundStyle(DiveUI.yellow)
                 .multilineTextAlignment(.center)
             Text(String(localized: "live.manual_start.body"))
@@ -552,11 +602,11 @@ struct DiveLiveView: View {
 
     private var ttvRuntimePanel: some View {
         HStack(spacing: 0) {
-            dashboardValue(title: "TTV", value: ttvText, unit: nil, color: DiveUI.green)
+            dashboardValue(title: String(localized: "live.metric.ttv"), value: ttvText, unit: nil, color: DiveUI.green)
             Rectangle()
                 .fill(.white.opacity(0.34))
                 .frame(width: 1, height: 54)
-            dashboardValue(title: "RunTime", value: runtimeMinutes, unit: "min", color: .white)
+            dashboardValue(title: String(localized: "live.metric.runtime"), value: runtimeMinutes, unit: "min", color: .white)
         }
         .frame(maxWidth: .infinity, minHeight: 70)
         .background(
@@ -574,7 +624,9 @@ struct DiveLiveView: View {
                 )
         )
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("TTV sessione \(ttvText), runtime \(runtimeMinutes)")
+        .accessibilityLabel(
+            String(format: String(localized: "live.a11y.ttv_runtime"), ttvText, runtimeMinutes)
+        )
         .accessibilityHint(String(localized: "TTV informativo derivato da profondita media e durata; non e un valore decompressivo o time to surface."))
     }
 
@@ -671,8 +723,8 @@ struct DiveLiveView: View {
                 EmptyView()
             } else {
                 HStack(spacing: 7) {
-                    depthCard(title: "PROF. MASSIMA", value: dive.maxDepthMeters, emphasize: false)
-                    depthCard(title: "PROF. MEDIA", value: dive.averageDepthMeters, emphasize: false)
+                    depthCard(title: String(localized: "live.metric.max_depth"), value: dive.maxDepthMeters, emphasize: false)
+                    depthCard(title: String(localized: "live.metric.avg_depth"), value: dive.averageDepthMeters, emphasize: false)
                 }
             }
         }
@@ -786,7 +838,7 @@ struct DiveLiveView: View {
     private var manualFallbackPanel: some View {
         VStack(spacing: 8) {
             Text(String(localized: "live.depth.automation.unavailable.title"))
-                .font(.system(size: 10, weight: .black, design: .rounded))
+                .font(DiveUI.Typography.hintCaptionBold)
                 .foregroundStyle(DiveUI.yellow)
                 .multilineTextAlignment(.center)
             Text(String(localized: "live.depth.automation.unavailable.body"))
@@ -795,7 +847,7 @@ struct DiveLiveView: View {
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
             Text(String(localized: "live.depth.automation.limited"))
-                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .font(DiveUI.Typography.hintCaption)
                 .foregroundStyle(DiveUI.secondaryText)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)

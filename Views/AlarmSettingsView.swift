@@ -27,7 +27,7 @@ struct AlarmSettingsView: View {
                     header
 
                     Text(String(localized: "alarms.header.title"))
-                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .font(DiveUI.Typography.hintCaption)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
 

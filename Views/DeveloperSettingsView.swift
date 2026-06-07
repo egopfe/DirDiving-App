@@ -36,7 +36,7 @@ struct DeveloperSettingsView: View {
                         }
 
                         Text(String(localized: "developer.sensor_source.footer"))
-                            .font(.system(size: 9, weight: .medium, design: .rounded))
+                            .font(DiveUI.Typography.hintCaption)
                             .foregroundStyle(DiveUI.secondaryText)
                             .fixedSize(horizontal: false, vertical: true)
                     }

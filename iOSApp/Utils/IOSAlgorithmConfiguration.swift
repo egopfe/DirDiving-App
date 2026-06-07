@@ -54,6 +54,8 @@ enum IOSAlgorithmConfiguration {
     static let importedGPSHorizontalAccuracyMeters = 100.0
     static let routeEarthRadiusMeters = 6_371_000.0
     static let syncIssuedAtSkewSeconds: TimeInterval = 60 * 60
+    static let pendingSyncMaxRetentionSeconds: TimeInterval = 7 * 24 * 60 * 60
+    static let pendingSyncMaxAttemptCount = 64
 
     static func isFinite(_ value: Double) -> Bool {
         value.isFinite && !value.isNaN

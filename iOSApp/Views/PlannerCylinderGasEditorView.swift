@@ -116,7 +116,8 @@ struct PlannerCylinderGasEditorView: View {
     var showsTankEditor: Bool
     var switchDepthMeters: Binding<Double>?
     var maxSwitchDepthMeters: Double?
-    let onGasOrPressureChanged: () -> Void
+    let onGasOrPPO2Changed: () -> Void
+    let onPressureChanged: () -> Void
 
     @State private var activePicker: PlannerGasPickerField?
 
@@ -255,7 +256,7 @@ struct PlannerCylinderGasEditorView: View {
             get: { entry.pressureUnit },
             set: { newUnit in
                 PlannerGasEditingSupport.convertPressureUnit(on: &entry, to: newUnit)
-                onGasOrPressureChanged()
+                onPressureChanged()
             }
         )
     }
@@ -353,7 +354,7 @@ struct PlannerCylinderGasEditorView: View {
                 valueLabel: { $0.plannerPickerTitle },
                 onConfirm: {
                     activePicker = nil
-                    onGasOrPressureChanged()
+                    onGasOrPPO2Changed()
                 },
                 onCancel: { activePicker = nil }
             )
@@ -374,7 +375,7 @@ struct PlannerCylinderGasEditorView: View {
                 valueLabel: { $0.localizedTitle },
                 onConfirm: {
                     activePicker = nil
-                    onGasOrPressureChanged()
+                    onGasOrPPO2Changed()
                 },
                 onCancel: { activePicker = nil }
             )
@@ -386,7 +387,7 @@ struct PlannerCylinderGasEditorView: View {
                 valueLabel: { "\($0) %" },
                 onConfirm: {
                     activePicker = nil
-                    onGasOrPressureChanged()
+                    onGasOrPPO2Changed()
                 },
                 onCancel: { activePicker = nil }
             )
@@ -400,7 +401,7 @@ struct PlannerCylinderGasEditorView: View {
                 valueLabel: { "\($0) %" },
                 onConfirm: {
                     activePicker = nil
-                    onGasOrPressureChanged()
+                    onGasOrPPO2Changed()
                 },
                 onCancel: { activePicker = nil }
             )
@@ -412,7 +413,7 @@ struct PlannerCylinderGasEditorView: View {
                 valueLabel: { Formatters.one($0) },
                 onConfirm: {
                     activePicker = nil
-                    onGasOrPressureChanged()
+                    onGasOrPPO2Changed()
                 },
                 onCancel: { activePicker = nil }
             )
@@ -424,7 +425,7 @@ struct PlannerCylinderGasEditorView: View {
                 valueLabel: { "\($0) \(entry.pressureUnit.rawValue.lowercased())" },
                 onConfirm: {
                     activePicker = nil
-                    onGasOrPressureChanged()
+                    onPressureChanged()
                 },
                 onCancel: { activePicker = nil }
             )
@@ -594,7 +595,8 @@ struct PlannerCylinderGasEditorSheet: View {
                         showsTankEditor: showsTankEditor,
                         switchDepthMeters: switchDepthBinding,
                         maxSwitchDepthMeters: maxSwitchDepthMeters,
-                        onGasOrPressureChanged: {}
+                        onGasOrPPO2Changed: {},
+                        onPressureChanged: {}
                     )
                     .padding(16)
                 }

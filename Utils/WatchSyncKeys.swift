@@ -24,4 +24,10 @@ enum WatchSyncKeys {
     static let companionPhotoDeleteFileNameKey = "storedFileName"
     static let companionPhotoDeleteStatusKey = "status"
     static let companionPhotoDeleteErrorCodeKey = "errorCode"
+    static let diveImportAckType = "diveImportAck"
+    static let diveImportAckSessionIDKey = "sessionID"
+    static let diveImportAckIssuedAtKey = "issuedAt"
+    static let diveImportAckSignatureKey = "ackSignature"
+    static let companionPhotoManagementIssuedAtKey = "issuedAt"
+    static let companionPhotoManagementSignatureKey = "signature"
 }

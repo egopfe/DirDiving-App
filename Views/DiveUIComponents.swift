@@ -67,6 +67,9 @@ enum DiveUI {
         static let settingsSection: Font = sectionHeading
         static let commandButton: Font = .system(size: 12, weight: .bold, design: .rounded)
         static let readyTitle: Font = .system(size: 18, weight: .black, design: .rounded)
+        static let hintCaption: Font = .system(size: 10, weight: .semibold, design: .rounded)
+        static let hintCaptionBold: Font = .system(size: 10, weight: .bold, design: .rounded)
+        static let destructiveAction: Font = .system(size: 11, weight: .black, design: .rounded)
     }
 
     /// Ascent alarm palette — high contrast, aligned with `DiveUI.red` family.
@@ -486,6 +489,9 @@ struct DiveOctopusLogo: View {
     }
 }
 
+/// Legacy dive-widget compass ring used outside MAIN Compass tab (e.g. experimental concepts).
+/// MAIN `CompassView` uses the dedicated BUSSOLA dial — do not route new UI through this component.
+@available(*, deprecated, message: "Use CompassView for MAIN BUSSOLA. Retained for legacy widget layouts only.")
 struct DiveBearingRing: View {
     let headingDegrees: Double
     let bearingDelta: Double?
