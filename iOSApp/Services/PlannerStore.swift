@@ -41,6 +41,26 @@ final class PlannerStore: ObservableObject {
     @Published private(set) var isCalculating = false
     @Published private(set) var lastTissueSnapshot: TissueSnapshot?
     @Published var scrollToCNSThresholdSettings = false
+    @Published var decompressionMethod: PlannerDecompressionMethod = .buhlmann {
+        didSet {
+            guard isReady else { return }
+            scheduleSave()
+            schedulePlanningUpdate()
+        }
+    }
+    @Published var ratioDecoPreset: RatioDecoPreset = .preset1to1 {
+        didSet {
+            guard isReady else { return }
+            scheduleSave()
+            schedulePlanningUpdate()
+        }
+    }
+    @Published var savedRatioDecoPresets: [RatioDecoPreset] = [] {
+        didSet {
+            guard isReady else { return }
+            scheduleSave()
+        }
+    }
 
     private let cloudSync: CloudSyncStore?
     private let key = "dirdiving_ios_experimental_planner_state"
@@ -60,6 +80,9 @@ final class PlannerStore: ObservableObject {
             repetitivePlanningEnabled = saved.repetitivePlanningEnabled
             surfaceIntervalMinutes = saved.surfaceIntervalMinutes
             lastTissueSnapshot = saved.lastTissueSnapshot
+            decompressionMethod = saved.decompressionMethod
+            ratioDecoPreset = saved.ratioDecoPreset
+            savedRatioDecoPresets = saved.savedRatioDecoPresets
         }
         input.ensurePlannerCylindersFromLegacy()
         calculate()
@@ -117,6 +140,24 @@ final class PlannerStore: ObservableObject {
         normalizeSwitchDepthAfterGasOrPPO2Change(cylinderID: cylinderID)
     }
 
+    func saveRatioDecoPreset(_ preset: RatioDecoPreset) {
+        guard isReady, !preset.isBuiltIn else { return }
+        if let index = savedRatioDecoPresets.firstIndex(where: { $0.id == preset.id }) {
+            savedRatioDecoPresets[index] = preset
+        } else {
+            savedRatioDecoPresets.append(preset)
+        }
+        ratioDecoPreset = preset
+    }
+
+    func deleteRatioDecoPreset(id: UUID) {
+        guard isReady else { return }
+        savedRatioDecoPresets.removeAll { $0.id == id && !$0.isBuiltIn }
+        if ratioDecoPreset.id == id {
+            ratioDecoPreset = .customDefault
+        }
+    }
+
     func calculate() {
         guard isReady else { return }
         planningUpdateTask?.cancel()
@@ -148,7 +189,10 @@ final class PlannerStore: ObservableObject {
             mode: mode,
             repetitivePlanningEnabled: repetitivePlanningEnabled,
             repetitiveSnapshot: repetitivePlanningEnabled ? lastTissueSnapshot : nil,
-            surfaceIntervalMinutes: surfaceIntervalMinutes
+            surfaceIntervalMinutes: surfaceIntervalMinutes,
+            decompressionMethod: decompressionMethod,
+            ratioDecoPreset: ratioDecoPreset,
+            unitPreference: .metric
         )
         if persistSnapshot,
            let environment = try? makeEnvironment(from: active),
@@ -195,7 +239,10 @@ final class PlannerStore: ObservableObject {
                 input: input,
                 repetitivePlanningEnabled: repetitivePlanningEnabled,
                 surfaceIntervalMinutes: surfaceIntervalMinutes,
-                lastTissueSnapshot: lastTissueSnapshot
+                lastTissueSnapshot: lastTissueSnapshot,
+                decompressionMethod: decompressionMethod,
+                ratioDecoPreset: ratioDecoPreset,
+                savedRatioDecoPresets: savedRatioDecoPresets
             ),
             forKey: key
         )
@@ -234,6 +281,41 @@ private struct PlannerState: Codable {
     var repetitivePlanningEnabled: Bool = false
     var surfaceIntervalMinutes: Double = 60
     var lastTissueSnapshot: TissueSnapshot?
+    var decompressionMethod: PlannerDecompressionMethod = .buhlmann
+    var ratioDecoPreset: RatioDecoPreset = .preset1to1
+    var savedRatioDecoPresets: [RatioDecoPreset] = []
+
+    init(
+        mode: PlannerMode,
+        input: GasPlanInput,
+        repetitivePlanningEnabled: Bool = false,
+        surfaceIntervalMinutes: Double = 60,
+        lastTissueSnapshot: TissueSnapshot? = nil,
+        decompressionMethod: PlannerDecompressionMethod = .buhlmann,
+        ratioDecoPreset: RatioDecoPreset = .preset1to1,
+        savedRatioDecoPresets: [RatioDecoPreset] = []
+    ) {
+        self.mode = mode
+        self.input = input
+        self.repetitivePlanningEnabled = repetitivePlanningEnabled
+        self.surfaceIntervalMinutes = surfaceIntervalMinutes
+        self.lastTissueSnapshot = lastTissueSnapshot
+        self.decompressionMethod = decompressionMethod
+        self.ratioDecoPreset = ratioDecoPreset
+        self.savedRatioDecoPresets = savedRatioDecoPresets
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        mode = try container.decode(PlannerMode.self, forKey: .mode)
+        input = try container.decode(GasPlanInput.self, forKey: .input)
+        repetitivePlanningEnabled = try container.decodeIfPresent(Bool.self, forKey: .repetitivePlanningEnabled) ?? false
+        surfaceIntervalMinutes = try container.decodeIfPresent(Double.self, forKey: .surfaceIntervalMinutes) ?? 60
+        lastTissueSnapshot = try container.decodeIfPresent(TissueSnapshot.self, forKey: .lastTissueSnapshot)
+        decompressionMethod = try container.decodeIfPresent(PlannerDecompressionMethod.self, forKey: .decompressionMethod) ?? .buhlmann
+        ratioDecoPreset = try container.decodeIfPresent(RatioDecoPreset.self, forKey: .ratioDecoPreset) ?? .preset1to1
+        savedRatioDecoPresets = try container.decodeIfPresent([RatioDecoPreset].self, forKey: .savedRatioDecoPresets) ?? []
+    }
 }
 
 private struct AnalysisCacheKey: Equatable {
