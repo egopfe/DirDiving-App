@@ -1,7 +1,7 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-07  
-**Branch consigliato:** `main` = `origin/main` @ `c314b93` (baseline audit Watch; doc su commit successivo)  
+**Branch consigliato:** `main` = `origin/main` @ `2726a9d`  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
 
