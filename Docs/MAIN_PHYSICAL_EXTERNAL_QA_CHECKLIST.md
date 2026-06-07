@@ -1,6 +1,14 @@
 # MAIN Physical & External QA Checklist
 
-Baseline: `main` @ `a6ccd8d` + iOS MAIN algorithm math remediation ([`IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md)). **Simulator/build/test gates for non-physical fixes are complete; this checklist is unchanged.** Every item below remains **PENDING** until executed on hardware with recorded evidence. **App Store readiness must not be claimed until this checklist and external Bühlmann validation are complete.**
+Baseline: `main` @ `af31937` (audit re-run) + post-audit non-physical fixes ([`IOS_MAIN_ALGORITHM_MATH_POST_AUDIT_FIX_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_POST_AUDIT_FIX_REPORT_CURRENT.md)). **Simulator/build/test gates for non-physical fixes are complete when the post-audit report records green builds/tests; this physical checklist remains unchanged.** Every item below remains **PENDING** until executed on hardware with recorded evidence. **App Store readiness must not be claimed until this checklist and external Bühlmann validation are complete.**
+
+## Non-physical readiness (simulator / automated)
+
+| Gate | Status |
+|---|---|
+| Code + unit tests (post-audit pass) | Complete when [`IOS_MAIN_ALGORITHM_MATH_POST_AUDIT_FIX_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_POST_AUDIT_FIX_REPORT_CURRENT.md) records PASS |
+| Documentation baseline | Updated — audit `32f8d3e`, re-run `af31937` |
+| App Store / certification claims | **Not claimed** |
 
 ## Watch Ultra underwater / sensor QA
 

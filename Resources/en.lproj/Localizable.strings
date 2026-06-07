@@ -559,6 +559,9 @@
 "settings.row.units.picker.a11y" = "Units";
 "alarms.depth.default_off_hint" = "Max-depth alarm is off by default. Enable it and set a threshold before diving.";
 "alarms.depth.preset_30m" = "Set 30 m threshold";
+"watch.alarm.depth_exceeded_format" = "DEPTH ALARM > %@";
+"watch.alarm.runtime_exceeded_format" = "RUNTIME ALARM > %lld min";
+"watch.alarm.battery_low_format" = "BATTERY ALARM < %lld%%";
 "sync.pending.encode_failed" = "Pending sync queue could not be saved.";
 "sync.pending.retention_warning" = "Pending sync item is old; awaiting signed iPhone acknowledgment.";
 "user_images.error.not_image" = "File is not a valid image.";

@@ -26,7 +26,10 @@ final class WatchMainUILocalizationTests: XCTestCase {
         "watch.sync.photo.error",
         "settings.row.units.picker.a11y",
         "alarms.depth.default_off_hint",
-        "alarms.depth.preset_30m"
+        "alarms.depth.preset_30m",
+        "watch.alarm.depth_exceeded_format",
+        "watch.alarm.runtime_exceeded_format",
+        "watch.alarm.battery_low_format"
     ]
 
     private let forbiddenVisibleStrings = [
