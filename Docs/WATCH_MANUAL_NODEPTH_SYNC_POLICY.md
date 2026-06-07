@@ -23,7 +23,9 @@ Manual Watch sessions **without a depth profile** are valid logs. They sync to i
 
 Sessions with depth samples use `hasDepthProfile: true` and normal export/sync rules.
 
-## Validation alignment
+## Sync queue cross-reference
+
+Manual/no-depth sessions enqueue to the same signed outbound queue as depth sessions. Pending transfers dequeue only on verified signed companion ACK; see [`WATCH_IOS_SYNC_QA_MATRIX.md`](WATCH_IOS_SYNC_QA_MATRIX.md) and [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_FIX_COMPLETION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_FIX_COMPLETION_REPORT.md).
 
 - **Watch:** `DiveSessionPersistenceClass.manualNoDepth` → save + sync.
 - **Watch:** `DiveSessionAlgorithmValidator` allows empty samples when `isManual && !hasDepthProfile`.

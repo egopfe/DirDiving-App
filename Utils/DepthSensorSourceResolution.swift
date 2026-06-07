@@ -14,7 +14,7 @@ enum DepthSensorSourceResolution: String, Equatable, Codable {
         case .mockFallback:
             return String(localized: "watch.depth_source.mock_fallback")
         case .simulation:
-            return String(localized: "developer.sensor_source.simulation")
+            return String(localized: "watch.depth_source.simulation_active")
         case .unavailable:
             return String(localized: "watch.depth_source.unavailable")
         }

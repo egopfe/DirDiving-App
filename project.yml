@@ -141,6 +141,7 @@ targets:
       - Services/DepthLimitHapticCoordinator.swift
       - Services/CloudSyncStore.swift
       - Services/WatchSyncService.swift
+      - Services/WatchSyncPendingTransfer.swift
       - Services/WatchSyncAuth.swift
       - Services/WatchDiveSyncCodec.swift
       - Utils/CloudSyncNotifications.swift
@@ -167,6 +168,7 @@ targets:
       - Utils/GPSConfirmationPresentation.swift
       - Utils/DiveSessionPersistenceClass.swift
       - Utils/DiveAlgorithmSelfCheck.swift
+      - Utils/DepthSafetySelfCheck.swift
       - Models/DiveGPSConfirmation.swift
       - Services/SubsurfaceExportService.swift
       - Services/UserImageStore.swift

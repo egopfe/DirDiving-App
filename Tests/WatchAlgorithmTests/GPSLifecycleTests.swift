@@ -21,10 +21,17 @@ final class GPSLifecycleTests: XCTestCase {
 
     func testOneShotModeStopsUpdatesWhenRequested() async {
         let manager = GPSManager()
-        manager.start()
-        manager.captureBestEffortPoint(for: 0.05, stopUpdatesWhenComplete: true) { _ in }
+        var completed = false
+        manager.captureBestEffortPoint(for: 0.05, stopUpdatesWhenComplete: true) { _ in
+            completed = true
+        }
         try? await Task.sleep(nanoseconds: 150_000_000)
-        // Completion path exercised; DiveManager keeps updates running with default false.
-        XCTAssertTrue(true)
+        XCTAssertTrue(completed)
+    }
+
+    func testNoFixCurrentBestPointIsUnavailable() {
+        let manager = GPSManager()
+        XCTAssertNil(manager.currentBestPoint())
+        XCTAssertEqual(manager.fallbackQuality, .unavailable)
     }
 }

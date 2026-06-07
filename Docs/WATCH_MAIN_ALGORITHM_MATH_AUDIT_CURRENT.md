@@ -1,12 +1,14 @@
 # Apple Watch MAIN Algorithm / Safety / Runtime / Hardware Interaction Audit — Current
 
-**Audit date:** 2026-06-05  
+**Audit date:** 2026-06-05 (original); **remediation verified:** 2026-06-07  
 **Repository:** DIR DIVING (`DirDiving-App`)  
 **Branch audited:** `main`  
-**Code baseline:** `5415213`  
-**Remote alignment:** `main...origin/main` (0 ahead / 0 behind after fetch)  
+**Code baseline (original audit):** `5415213`  
+**Remediation baseline:** `4b73954`  
+**Completion report:** [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_FIX_COMPLETION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_FIX_COMPLETION_REPORT.md)  
 **Target audited:** `DIRDiving Watch App` only  
-**Mode:** Read-only static audit + local XCTest run. No code, UI, persistence, sync, or algorithm files were modified.
+
+> **2026-06-07 update:** All WATCH-P1/P2/P3 items from [`DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`](DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md) resolved or documented. Watch Algorithm Tests: **161 executed, 8 skipped, 0 failures** @ Apple Watch Ultra 3 (49mm). Verdict: **READY FOR INTERNAL TESTFLIGHT** (physical QA still required for external gate).
 
 ---
 

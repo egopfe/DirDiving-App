@@ -155,4 +155,29 @@ final class DiveManagerAlgorithmIntegrationTests: XCTestCase {
         XCTAssertEqual(diveManager.testHook_sampleCount, 2)
         XCTAssertEqual(diveManager.maxDepthMeters, 1.4, accuracy: 0.001)
     }
+
+    func testAutomaticSurfaceEndFinalizesDiveOnce() async {
+        DiveManager.testHook_automaticStopDwellSeconds = 0.05
+        defer { DiveManager.testHook_automaticStopDwellSeconds = nil }
+        let gps = GPSManager()
+        gps.testHook_holdBestEffortCapture = true
+        diveManager.testHook_shutdownTimersForTests()
+        diveManager = DiveManager(
+            logStore: logStore,
+            gpsManager: gps,
+            ascentSettings: AscentRateSettingsStore(defaults: userDefaultsSuite)
+        )
+        diveManager.testHook_setDepthAutomationAvailableForTests(true)
+
+        let start = Date().addingTimeInterval(-10)
+        diveManager.testHook_processDepthMeasurement(rawDepthMeters: 1.1, timestamp: start)
+        diveManager.testHook_processDepthMeasurement(rawDepthMeters: 1.2, timestamp: start.addingTimeInterval(1))
+        XCTAssertTrue(diveManager.isDiveActive)
+        diveManager.testHook_processDepthMeasurement(rawDepthMeters: 0.2, timestamp: start.addingTimeInterval(2))
+        try? await Task.sleep(nanoseconds: 300_000_000)
+        XCTAssertFalse(diveManager.isDiveActive)
+        gps.testHook_completeHeldBestEffortCapture(with: nil)
+        try? await Task.sleep(nanoseconds: 100_000_000)
+        XCTAssertEqual(logStore.sessions.count, 1)
+    }
 }
