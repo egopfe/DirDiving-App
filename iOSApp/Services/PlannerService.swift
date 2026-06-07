@@ -29,7 +29,10 @@ enum PlannerService {
         mode: PlannerMode,
         repetitivePlanningEnabled: Bool,
         repetitiveSnapshot: TissueSnapshot?,
-        surfaceIntervalMinutes: Double
+        surfaceIntervalMinutes: Double,
+        decompressionMethod: PlannerDecompressionMethod = .buhlmann,
+        ratioDecoPreset: RatioDecoPreset = .preset1to1,
+        unitPreference: IOSUnitPreference = .metric
     ) -> DivePlanResult {
         guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) else {
             let activeInput = PlannerModePolicy.activePlanInput(from: input, mode: mode)
@@ -196,6 +199,17 @@ enum PlannerService {
             userFacingWarnings.append(guidance)
         }
 
+        let ratioDeco = makeRatioDecoBundle(
+            method: decompressionMethod,
+            preset: ratioDecoPreset,
+            input: working,
+            mode: mode,
+            request: request,
+            enginePlan: enginePlan,
+            environment: environment,
+            unitPreference: unitPreference
+        )
+
         return DivePlanResult(
             ndlMinutes: enginePlan.ndlMinutes ?? 0,
             ttsMinutes: tts,
@@ -223,7 +237,52 @@ enum PlannerService {
             gasLedgerFailure: gasLedgerFailure,
             userFacingWarnings: uniqueWarnings(userFacingWarnings),
             plannerMode: mode,
-            modeGuidanceMessage: PlannerModePolicy.modeGuidance(mode: mode, enginePlan: enginePlan, stops: stops)
+            modeGuidanceMessage: PlannerModePolicy.modeGuidance(mode: mode, enginePlan: enginePlan, stops: stops),
+            ratioDeco: ratioDeco
+        )
+    }
+
+    private static func makeRatioDecoBundle(
+        method: PlannerDecompressionMethod,
+        preset: RatioDecoPreset,
+        input: GasPlanInput,
+        mode: PlannerMode,
+        request: BuhlmannPlanRequest,
+        enginePlan: BuhlmannEngineResult,
+        environment: PlannerEnvironment,
+        unitPreference: IOSUnitPreference
+    ) -> RatioDecoPlanningBundle? {
+        guard method != .buhlmann else { return nil }
+        let schedule = RatioDecoPlanner.makeSchedule(
+            input: input,
+            mode: mode,
+            preset: preset,
+            environment: environment,
+            descentMinutes: enginePlan.descentMinutes,
+            unitPreference: unitPreference
+        ) ?? RatioDecoSchedule(
+            stops: [],
+            totalDecoMinutes: 0,
+            totalRuntimeMinutes: enginePlan.descentMinutes + enginePlan.bottomMinutes,
+            firstStopDepthMeters: preset.firstStopDepthMeters,
+            presetName: preset.name,
+            warnings: mode == .base ? [.unavailableInBaseMode] : [],
+            depthProfilePoints: [],
+            ascentTableRows: []
+        )
+        let validation = RatioDecoValidator.validate(
+            schedule: schedule,
+            input: input,
+            mode: mode,
+            enginePlan: enginePlan,
+            request: request,
+            environment: environment
+        )
+        return RatioDecoPlanningBundle(
+            schedule: schedule,
+            validation: validation,
+            method: method,
+            preset: preset
         )
     }
 
@@ -285,7 +344,8 @@ enum PlannerService {
             gasLedgerFailure: nil,
             userFacingWarnings: PlannerUserFacingCopy.userFacingWarnings(from: states),
             plannerMode: mode,
-            modeGuidanceMessage: nil
+            modeGuidanceMessage: nil,
+            ratioDeco: nil
         )
     }
 

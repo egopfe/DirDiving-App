@@ -102,6 +102,7 @@ struct DivePlanResult: Hashable {
     let userFacingWarnings: [PlannerUserFacingMessage]
     let plannerMode: PlannerMode
     let modeGuidanceMessage: PlannerUserFacingMessage?
+    let ratioDeco: RatioDecoPlanningBundle?
 }
 
 struct NDLPoint: Identifiable, Hashable {
