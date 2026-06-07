@@ -98,13 +98,8 @@ struct TissueNarcosisAnalyticsView: View {
                     )
                 Spacer()
             }
-            if trace.source == .simulated {
-                Text(String(localized: "tissue_analytics.source.simulated_footnote"))
-                    .font(.system(size: 11))
-                    .foregroundStyle(TissueAnalyticsTheme.labelMuted)
-                    .fixedSize(horizontal: false, vertical: true)
-            } else if trace.source == .planned {
-                Text(String(localized: "tissue_analytics.source.planned_footnote"))
+            if let footnote = trace.source.localizedFootnote {
+                Text(footnote)
                     .font(.system(size: 11))
                     .foregroundStyle(TissueAnalyticsTheme.labelMuted)
                     .fixedSize(horizontal: false, vertical: true)

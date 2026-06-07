@@ -243,7 +243,10 @@ struct EquipmentView: View {
             return
         }
         do {
-            let url = try PDFExportService.exportChecklist(profile: equipment.profile)
+            let url = try PDFExportService.exportChecklist(
+                profile: equipment.profile,
+                unitPreference: IOSUnitPreference.fromStorage(units)
+            )
             shareablePDF = ShareablePDFItem(url: url)
         } catch PDFExportError.emptyChecklist {
             pdfExportAlertMessage = PDFShareActions.emptyChecklistMessage()

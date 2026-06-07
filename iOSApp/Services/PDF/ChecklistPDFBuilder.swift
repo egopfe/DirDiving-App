@@ -1,7 +1,7 @@
 import UIKit
 
 enum ChecklistPDFBuilder {
-    static func build(profile: EquipmentProfile) -> Data {
+    static func build(profile: EquipmentProfile, unitPreference: IOSUnitPreference = .metric) -> Data {
         let pageRect = CGRect(x: 0, y: 0, width: 612, height: 792)
         let renderer = UIGraphicsPDFRenderer(bounds: pageRect)
         let disclaimer = String(localized: "pdf.export.disclaimer")
@@ -17,7 +17,7 @@ enum ChecklistPDFBuilder {
             page.drawParagraph(String(localized: "pdf.export.checklist.instructions"))
 
             for item in profile.migratedChecklistItems {
-                let line = checklistLine(for: item)
+                let line = checklistLine(for: item, unitPreference: unitPreference)
                 page.drawChecklistRow(yesLabel: yesLabel, noLabel: noLabel, itemText: line)
             }
 
@@ -25,11 +25,11 @@ enum ChecklistPDFBuilder {
         }
     }
 
-    static func exportLine(for item: EquipmentChecklistItem) -> String {
-        checklistLine(for: item)
+    static func exportLine(for item: EquipmentChecklistItem, unitPreference: IOSUnitPreference = .metric) -> String {
+        checklistLine(for: item, unitPreference: unitPreference)
     }
 
-    private static func checklistLine(for item: EquipmentChecklistItem) -> String {
+    private static func checklistLine(for item: EquipmentChecklistItem, unitPreference: IOSUnitPreference) -> String {
         if !item.usesGas {
             return item.title
         }
@@ -47,13 +47,14 @@ enum ChecklistPDFBuilder {
         if let switchDepth = item.switchDepthMeters, switchDepth.isFinite, switchDepth > 0,
            let role = item.gasRole ?? ChecklistPlannerSyncMapper.resolvedRole(for: item),
            role == .deco || role == .travel {
+            let depthText = Formatters.depth(switchDepth, units: unitPreference).text
             parts.append(
                 String(
                     format: String(
                         localized: "equipment.checklist.switch_depth_format",
-                        defaultValue: "switch @ %d m"
+                        defaultValue: "switch @ %@"
                     ),
-                    Int(switchDepth.rounded())
+                    depthText
                 )
             )
         }

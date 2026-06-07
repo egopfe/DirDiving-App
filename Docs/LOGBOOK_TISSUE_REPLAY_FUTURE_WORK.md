@@ -1,33 +1,26 @@
-# Logbook tissue analytics — future Bühlmann replay (not implemented)
+# Logbook tissue analytics — Bühlmann replay (partial implementation)
 
-**Status:** Future work · **Current behavior:** simulated estimate (`TissueAnalyticsService.buildFromSession`, `source: .simulated`)
+**Status:** Partial · **Planner:** full planned Bühlmann replay · **Logbook:** recorded single-gas replay or simulated fallback
 
-DIR DIVING logbook tissue/narcosis analytics today uses a **fixed-GF informational estimate** from recorded/manual depth samples and gas labels. It is **not** a full Bühlmann ZHL-16C replay of the logged profile.
+## Implemented @ post-V3 remediation
 
-## What full replay would require
+| Source | When | Behavior |
+|--------|------|----------|
+| `planned` | Planner tissue tab | Real `tissueHistory` from Bühlmann engine |
+| `recorded` | Watch/logbook session with ≥2 samples, not manual, non-trimix | Schreiner Bühlmann replay between depth samples, single gas from `gasLabel`, default GF 30/85 |
+| `simulated` | Manual dives, trimix without switch history, or incomplete gas data | Minute-step estimate; trapezoidal depth for manual |
+| `insufficientData` | &lt;2 depth samples | No presentation (empty state) |
 
-1. **Recorded profile fidelity**
-   - High-resolution depth/time samples (not only max/avg)
-   - Accurate gas switches with depths and mix fractions
-   - Surface interval before the dive when modeling repetitive state
+UI labels and footnotes distinguish all sources (EN/IT). Logbook entry subtitle is dynamic per session.
 
-2. **Engine inputs**
-   - GF Low / GF High configuration matching user expectation or logged metadata
-   - Bühlmann gas schedule reconstruction (bottom, travel, deco roles)
-   - Initial tissue state from prior dive snapshot when applicable
+## Still future work (multigas / repetitive)
 
-3. **Validation**
-   - Golden fixtures for logged-profile replay vs planner replay on identical synthetic profiles
-   - Edge cases: manual dives, imported CSV with partial metadata, missing gas switches
+1. **Gas switch history** on logged dives — required for trimix/deco replay
+2. **Surface interval / repetitive state** before dive
+3. **User GF settings** persisted per logbook replay (today: default 30/85)
+4. **Golden fixtures** — logged profile vs planner on identical synthetic traces
+5. **Imported CSV** partial metadata edge cases
 
-4. **UX / safety**
-   - Clear labeling that replay remains **reference-only / non-certified**
-   - No implication of decompression validation for logged dives
+See [`BUHLMANN_EXTERNAL_VALIDATION_FIXTURES_TEMPLATE.md`](BUHLMANN_EXTERNAL_VALIDATION_FIXTURES_TEMPLATE.md) for external validation evidence (campaign **PENDING**).
 
-## Current mitigation (implemented)
-
-- UI footnote on simulated traces (`tissue_analytics.source.simulated_footnote`)
-- Logbook entry subtitle distinguishes estimate vs planner replay
-- Planner path remains real Bühlmann tissue history replay
-
-Implement replay only when the above can be tested without weakening existing logbook behavior.
+Implement full multigas replay only with fixture-backed tests and without weakening reference-only disclaimers.

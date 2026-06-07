@@ -4,6 +4,7 @@ enum TissueAnalyticsSource: String, Codable, Hashable {
     case planned
     case recorded
     case simulated
+    case insufficientData
 
     var localizedTitle: String {
         switch self {
@@ -13,6 +14,21 @@ enum TissueAnalyticsSource: String, Codable, Hashable {
             return String(localized: "tissue_analytics.source.recorded")
         case .simulated:
             return String(localized: "tissue_analytics.source.simulated")
+        case .insufficientData:
+            return String(localized: "tissue_analytics.source.insufficient")
+        }
+    }
+
+    var localizedFootnote: String? {
+        switch self {
+        case .planned:
+            return String(localized: "tissue_analytics.source.planned_footnote")
+        case .recorded:
+            return String(localized: "tissue_analytics.source.recorded_footnote")
+        case .simulated:
+            return String(localized: "tissue_analytics.source.simulated_footnote")
+        case .insufficientData:
+            return String(localized: "tissue_analytics.source.insufficient_footnote")
         }
     }
 }
