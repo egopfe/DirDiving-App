@@ -2,70 +2,201 @@
 
 **Date:** 2026-06-07  
 **Branch:** `main`  
-**Scope:** iOS Companion MAIN — Bühlmann planner only (no Watch / experimental)
+**Baseline commit:** `829babe` (hardening pass adds tests + docs only)  
+**Scope:** iOS Companion MAIN — Bühlmann ZHL-16C multigas planning reference only  
+**Simulator:** iPhone 17 (macOS)
 
-## Summary
+---
 
-P2 and P3 items from [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md) were implemented. Bühlmann decompression math, CNS/OTU integration, and legal disclaimers were not changed.
+## Executive summary
 
-## P2 fixes completed
+The iOS Companion MAIN Bühlmann planner is a **mature, non-certified reference implementation**. Core engine, multigas planning, three-mode architecture, tissue-history charting, CNS/OTU exposure, gas ledger, and result presentation are implemented and tested. This pass **verified completeness**, added canonical-consistency tests, and refreshed documentation. **No Bühlmann decompression math was changed.**
 
-| ID | Fix |
+**Verdict: READY FOR INTERNAL VALIDATION**
+
+---
+
+## What was already implemented
+
+| Area | Status |
 |---|---|
-| IOS-BUH-P2-001 | `PlannerAscentTableBuilder` now orders PIANO DI RISALITA as bottom → post-bottom ascent/gas-switch travel rows (elapsed order) → deco stops → surface. Descent segments are excluded from the ascent briefing table. |
-| IOS-BUH-P2-002 | Full-plan CNS dashboard tile uses warning color/icon when `oxygenExposureElevated` is present on plan or gas analysis state. |
+| ZHL-16C N2 + He constants | Complete |
+| Independent N2/He tissue loading (Schreiner + constant depth) | Complete |
+| Trimix / multigas / gas switches | Complete |
+| GF Low/High interpolation | Complete |
+| Tissue-derived NDL | Complete |
+| Environment-aware pressure model | Complete |
+| Schedule-based gas ledger | Complete |
+| CNS full plan + descent/bottom + 15% rule | Complete |
+| Weekly OTU display + granular oxygen warnings | Complete (audit remediation) |
+| Tissue history / CURVA BÜHLMANN grouped chart | Complete |
+| PIANO briefing-order ascent table | Complete |
+| GRAFICI depth profile | Complete (Technical) |
+| Base / Deco / Technical modes | Complete |
+| Repetitive planning + tissue snapshot | Complete |
+| Reference-only disclaimers | Intact |
 
-## P3 fixes completed
+---
 
-| ID | Fix |
+## What was completed in this hardening pass
+
+| Item | Action |
 |---|---|
-| IOS-BUH-P3-001 | GF policy documented in validation copy: GF Low must be strictly lower than GF High; equality rejected (Technical mode). Test added. |
-| IOS-BUH-P3-002 | Briefing copy uses TTS-only wording (`planner.briefing.gf_tts`) in EN/IT; export already used TTS-only. |
-| IOS-BUH-P3-003 | Tissue chart display path no longer silently falls back to sea-level ambient pressure; invalid conversion skips chart samples / returns nil metrics. |
+| Canonical engine consistency | Added `BuhlmannEngineCanonicalConsistencyTests.swift` |
+| Completion report | Rewrote this document for full implementation state |
+| Documentation cross-links | Updated math verification + engine design references |
+
+---
+
+## Algorithm architecture summary
+
+```
+GasPlanInput → PlannerModePolicy.activePlanInput (mode projection)
+            → PlannerService.makePlan
+            → BuhlmannPlanner.enginePlan → BuhlmannEngine.plan (single canonical result)
+            → derived: stops, TTS, segments, tissueHistory, NDL, GF comparisons
+            → GasPlanningService (CNS/OTU, ledger) on same engine segments
+            → PlannerAscentTableBuilder / DepthProfileBuilder / UI bindings
+```
+
+Preview NDL in `PlannerStore` uses `input.plannerEnvironment`, not silent sea-level fallback.
+
+---
+
+## Bühlmann model verification summary
+
+- 16 N₂ + 16 He compartments with documented a/b coefficients (`BuhlmannConstants.swift`)
+- Mixed N2/He ceiling weighting; GF-interpolated tolerated ambient
+- Stops from ceiling iteration, 3 m rounding — not static templates
+- NDL tissue-state search; no fake 999-minute NDL
+- Tissue history sampled post-plan only; does not alter stop math (`BuhlmannTissueHistoryTests`)
+
+---
+
+## CNS / OTU validation summary
+
+- NOAA CNS + Lambertsen OTU on full engine segments
+- Full plan includes deco gases; descent+bottom excludes ascent/deco
+- 15% rule: strict `> 15%`; EN/IT warnings; red tile + banner
+- Granular `PlannerResultState` cases + umbrella `oxygenExposureElevated`
+- Weekly OTU tile when computed; reference-only footnotes
+
+---
+
+## Tissue history / chart validation summary
+
+- Primary CURVA = `tissueHistory.groupedPoints` (max load per group 1–4 / 5–8 / 9–12 / 13–16)
+- NDL chart secondary in Technical only, with disclaimer
+- Invalid plan → empty history (fail-explicit)
+
+---
+
+## Gas ledger validation summary
+
+- `ScheduleGasConsumptionService` on engine segments
+- Stable `gasMixId` / `cylinderId`; duplicate labels supported
+- Bailout schedule-only (not Bühlmann optimization gas)
+
+---
+
+## Base / Deco / Technical mode status
+
+| Mode | Gas roles | Curve / charts | GF |
+|---|---|---|---|
+| Base | Bottom only | Hidden / simplified | Fixed 30/80 |
+| Deco | Bottom + 1 deco | Simplified curve | Presets |
+| Technical | Full multigas | Full curve + GRAFICI | Manual |
+
+Hidden Technical data excluded from Base/Deco calculations via `PlannerModePolicy`.
+
+---
+
+## Localization summary
+
+EN/IT strings for CNS full plan, descent+bottom, 15% warning, weekly OTU, granular oxygen states, tissue curve disclaimers, ascent briefing footnote, TTS-only briefing.
+
+Tests: `PlannerCNSCopyTests`, `PlannerLocalizationTests`, `PlannerOxygenWarningGranularityTests`.
+
+---
+
+## Test coverage summary
+
+| Metric | Value |
+|---|---|
+| XCTest methods executed | **387** (5 skipped) |
+| Failures | **0** |
+| Fixture JSON profiles | 19 |
+| External metadata tests | `BuhlmannExternalValidationMetadataTests` |
+| Canonical consistency | `BuhlmannEngineCanonicalConsistencyTests` (5 tests) |
+
+---
+
+## Docs updated
+
+- This report
+- [`DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md)
+- [`DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md)
+- [`DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md`](DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md)
+- [`DIR_DIVING_IOS_PLANNER_LIMITATIONS.md`](DIR_DIVING_IOS_PLANNER_LIMITATIONS.md)
+- [`DIR_DIVING_IOS_OXYGEN_EXPOSURE_MODEL.md`](DIR_DIVING_IOS_OXYGEN_EXPOSURE_MODEL.md)
+- [`IOS_PLANNER_CHART_TRUTHFULNESS.md`](IOS_PLANNER_CHART_TRUTHFULNESS.md)
+- [`DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_IOS_ALGORITHM_RELEASE_HARDENING.md)
+- [`DIR_DIVING_IOS_CNS_PLANNER_IMPLEMENTATION_AUDIT.md`](DIR_DIVING_IOS_CNS_PLANNER_IMPLEMENTATION_AUDIT.md)
+- [`IOS_MAIN_ALGORITHM_MATH_AUDIT_FIX_COMPLETION_REPORT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_FIX_COMPLETION_REPORT.md)
+
+---
+
+## macOS build / test
+
+| Step | Result |
+|---|---|
+| `xcodegen generate` | OK |
+| `DIRDiving iOS` build (iPhone 17 Simulator) | **BUILD SUCCEEDED** |
+| `DIRDiving iOS Algorithm Tests` | **387 executed, 5 skipped, 0 failures** (~28.6 s) |
+
+Executed 2026-06-07 on macOS with Xcode iPhone 17 Simulator destination.
+
+---
+
+## Files created
+
+| File | Purpose |
+|---|---|
+| `Tests/iOSAlgorithmTests/BuhlmannEngineCanonicalConsistencyTests.swift` | Canonical engine path, environment NDL, mode projection, ascent table consistency |
 
 ## Files modified
 
-- `iOSApp/Services/PlannerAscentTableBuilder.swift`
-- `iOSApp/Views/PlannerView.swift`
-- `iOSApp/Models/GasPlan.swift`
-- `iOSApp/Algorithms/Buhlmann/BuhlmannTissueHistory.swift`
-- `iOSApp/Services/TissueAnalyticsService.swift`
-- `iOSApp/Resources/en.lproj/Localizable.strings`
-- `iOSApp/Resources/it.lproj/Localizable.strings`
-- `Tests/iOSAlgorithmTests/PlannerAscentTableTests.swift`
-- `Tests/iOSAlgorithmTests/PlannerCNSCopyTests.swift`
-- `Tests/iOSAlgorithmTests/BuhlmannGradientFactorTests.swift`
-- `Tests/iOSAlgorithmTests/BuhlmannTissueHistoryTests.swift`
+| File | Change |
+|---|---|
+| `Docs/DIR_DIVING_IOS_BUHLMANN_IMPLEMENTATION_COMPLETION_REPORT.md` | Full completion report + build/test evidence |
+| `Docs/DIR_DIVING_IOS_BUHLMANN_VALIDATION_FIXTURES.md` | Added canonical consistency test suite row |
+| `Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md` | Section 13 canonical consistency checks |
 
-## macOS validation
-
-Commands (iPhone 17 simulator):
-
-```bash
-xcodegen generate
-xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving iOS" -destination 'platform=iOS Simulator,name=iPhone 17' build
-xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving iOS Algorithm Tests" -destination 'platform=iOS Simulator,name=iPhone 17' test
-```
-
-Result: **BUILD SUCCEEDED**, **TEST SUCCEEDED** (363 tests, 5 skipped).
+---
 
 ## Confirmations
 
-- No Apple Watch files modified.
-- No experimental files modified.
-- Bühlmann constants and tissue equations unchanged.
-- CNS/OTU math unchanged.
-- Reference-only / non-certified disclaimers intact.
+| Check | Result |
+|---|---|
+| Apple Watch files modified | **No** |
+| Experimental files modified | **No** |
+| Bühlmann constants / tissue equations changed | **No** |
+| CNS/OTU formulas changed | **No** |
+| Legal / safety disclaimers weakened | **No** |
 
-## P4 deferred
+---
 
-- External Bühlmann reference comparison campaign.
-- Physical-device Dynamic Type / VoiceOver QA.
-- Inline constant source citations in `BuhlmannConstants.swift`.
-- Heliox named UI mix kind.
+## Remaining limitations
+
+- External Bühlmann third-party comparison campaign not executed (planned in [`DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md`](DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md))
+- Physical Dynamic Type / VoiceOver / paired-device QA pending
+- Logbook tissue analytics uses simulated GF 0.85 replay (not post-dive certified reconstruction)
+- App Store release requires full QA gate + legal review unchanged
+
+---
 
 ## Final readiness verdict
 
 **READY FOR INTERNAL VALIDATION**
 
-Remaining before release candidate: external decompression comparison, simulator/device QA, stale README baseline strings (`90dc3f5` in some docs), and optional `Docs/DIR_DIVING_IOS_CNS_PLANNER_IMPLEMENTATION_AUDIT.md`.
+External TestFlight and App Store remain blocked on external validation and device QA evidence.
