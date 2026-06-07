@@ -217,3 +217,14 @@ Audit reference: `DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_AUDIT_CURRENT
 macOS validation (2026-06-02, iPhone 17 simulator): `DIRDiving iOS` **BUILD SUCCEEDED**; `DIRDiving iOS Algorithm Tests` **TEST SUCCEEDED** (287 tests).
 
 Report: `Docs/DIR_DIVING_IOS_PLANNER_DECO_TABLE_BUHLMANN_CURVE_FIX_REPORT.md`
+
+## 2026-06-07 Cloud profile merge policy (audit remediation)
+
+| Policy | Behavior |
+|---|---|
+| Metadata LWW | `DiveSessionMerge.newer()` by `endDate`, sample count, duration |
+| Compatible profiles | Timestamp union with max depth per second |
+| Divergent profiles | Whole profile from newer session — **no hybrid samples** (`DiveSessionMergePolicy.divergentProfileUsesNewerWholeProfile`) |
+| Conflict detection | `DiveSessionMergeConflictDetector` + `DiveSessionProfileDivergence` |
+
+Tests: `CloudSessionMergeTests`, `CloudSyncStoreLoadTests`. Canonical iOS services path: `iOSApp/Services/` and `iOSApp/Utils/` (root `Services/` is Watch/shared codec only).

@@ -22,6 +22,12 @@ enum PlannerResultState: String, Codable, Hashable, CaseIterable {
     case invalidEnvironment
     case gasAllocationIncomplete
     case oxygenExposureElevated
+    case cnsSingleElevated
+    case cnsDailyElevated
+    case cnsDescentBottomThresholdExceeded
+    case otuDiveElevated
+    case otuDailyElevated
+    case otuWeeklyElevated
     case noValidDecompressionSolution
     case calculationIncomplete
     case repetitivePlanningActive
@@ -351,6 +357,54 @@ enum PlannerUserFacingCopy {
                 titleKey: "planner.state.oxygen_exposure.title",
                 messageKey: "planner.state.oxygen_exposure.message",
                 hintKey: "planner.state.oxygen_exposure.hint",
+                severity: .warning
+            )
+        case .cnsSingleElevated:
+            return localized(
+                id: state.rawValue,
+                titleKey: "planner.state.cns_single_elevated.title",
+                messageKey: "planner.state.cns_single_elevated.message",
+                hintKey: "planner.state.cns_single_elevated.hint",
+                severity: .warning
+            )
+        case .cnsDailyElevated:
+            return localized(
+                id: state.rawValue,
+                titleKey: "planner.state.cns_daily_elevated.title",
+                messageKey: "planner.state.cns_daily_elevated.message",
+                hintKey: "planner.state.cns_daily_elevated.hint",
+                severity: .warning
+            )
+        case .cnsDescentBottomThresholdExceeded:
+            return localized(
+                id: state.rawValue,
+                titleKey: "planner.cns_descent_bottom.warning",
+                messageKey: "planner.cns_descent_bottom.warning",
+                hintKey: "planner.cns_descent_bottom.warning.hint",
+                severity: .warning
+            )
+        case .otuDiveElevated:
+            return localized(
+                id: state.rawValue,
+                titleKey: "planner.state.otu_dive_elevated.title",
+                messageKey: "planner.state.otu_dive_elevated.message",
+                hintKey: "planner.state.otu_dive_elevated.hint",
+                severity: .warning
+            )
+        case .otuDailyElevated:
+            return localized(
+                id: state.rawValue,
+                titleKey: "planner.state.otu_daily_elevated.title",
+                messageKey: "planner.state.otu_daily_elevated.message",
+                hintKey: "planner.state.otu_daily_elevated.hint",
+                severity: .warning
+            )
+        case .otuWeeklyElevated:
+            return localized(
+                id: state.rawValue,
+                titleKey: "planner.warning.otu_weekly_elevated",
+                messageKey: "planner.warning.otu_weekly_elevated",
+                hintKey: "planner.metric.otu_weekly.footnote",
                 severity: .warning
             )
         case .noValidDecompressionSolution:

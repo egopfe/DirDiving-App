@@ -152,6 +152,42 @@ final class CloudSessionMergeTests: XCTestCase {
         XCTAssertEqual(decodedCloud.first?.siteName, "Cloud Only")
     }
 
+    func testLocalNewerWithDivergentProfileKeepsNewerWholeProfile() {
+        let id = UUID()
+        let start = Date(timeIntervalSince1970: 5_000)
+        let localEnd = start.addingTimeInterval(120)
+        let cloudEnd = start.addingTimeInterval(180)
+        let local = makeSession(id: id, start: start, siteName: "Local", endOffset: 120)
+        let cloud = DiveSession(
+            id: id,
+            startDate: start,
+            endDate: cloudEnd,
+            durationSeconds: 180,
+            maxDepthMeters: 30,
+            avgDepthMeters: 12,
+            avgWaterTemperatureCelsius: 20,
+            ttv: 1,
+            entryGPS: nil,
+            exitGPS: nil,
+            samples: [
+                DiveSample(timestamp: start, depthMeters: 0, temperatureCelsius: 20),
+                DiveSample(timestamp: cloudEnd, depthMeters: 30, temperatureCelsius: 20)
+            ]
+        )
+        let merged = DiveSessionMerge.preferred(local, cloud)
+        XCTAssertEqual(merged.maxDepthMeters, 30, accuracy: 0.01)
+        XCTAssertEqual(merged.samples.last?.depthMeters ?? 0, 30, accuracy: 0.01)
+        XCTAssertEqual(merged.endDate, cloudEnd)
+        XCTAssertTrue(DiveSessionProfileDivergence.profilesDiverge(local, cloud))
+    }
+
+    func testMergePolicyEnumDocumentsDivergentProfileBehavior() {
+        XCTAssertEqual(
+            DiveSessionMergePolicy.divergentProfileUsesNewerWholeProfile.rawValue,
+            "divergentProfileUsesNewerWholeProfile"
+        )
+    }
+
     func testCloudSyncStoreCanRemoveLegacyFullSessionPayload() throws {
         let key = "dirdiving_ios_dive_sessions"
         let session = makeSession(siteName: "Legacy Defaults")

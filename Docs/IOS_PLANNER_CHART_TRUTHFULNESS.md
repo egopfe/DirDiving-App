@@ -58,16 +58,22 @@ When NDL preview data exists, Technical mode shows a **secondary** chart below t
 - **Y-axis:** depth (m), inverted visually (negative Y values)
 - Source: `PlannerDepthProfileBuilder.points(from: plan.segments)`
 
-## Ascent table rows
+## Ascent table rows (PIANO DI RISALITA — briefing order)
 
-`PlannerAscentTableBuilder` maps engine segments + deco stops into PIANO DI RISALITA rows:
+**Policy (Option A):** Briefing table, **not** stop-interleaved chronological schedule.
+
+Order: **bottom → post-bottom travel/ascent/gas-switch rows → decompression stops → surface**
 
 | Row kind | Source |
 |----------|--------|
 | Bottom | Bottom segments at max depth |
-| Travel | Descent/ascent runtime segments |
-| Deco stop | `DecoStop` from engine |
+| Travel | Post-bottom `.ascent` and `.gasSwitch` segments only (descent excluded) |
+| Deco stop | `DecoStop` from engine (engine order) |
 | Surface | Static surface row |
+
+UI footnote: `planner.table.briefing_order.footnote` (EN/IT)
+
+Tests: `PlannerAscentTableTests.testAscentTableFollowsBriefingOrderWithoutDescentRows`
 
 ## Summary metrics
 
