@@ -548,6 +548,17 @@
 "watch.draft.finalizing_missing_enddate" = "A previous dive could not be finalized because its saved draft was incomplete.";
 "watch.draft.expired_discarded" = "An expired active dive draft was discarded safely.";
 "watch.draft.encode_failed" = "Active dive draft could not be saved.";
+"watch.depth_validation.missing_sample" = "Missing depth sample: measurement ignored.";
+"watch.depth_validation.stale_sample" = "Stale depth sample: measurement ignored.";
+"watch.depth_validation.stuck_sensor" = "Depth sensor stuck: measurement ignored.";
+"watch.depth_validation.implausible_change" = "Implausible depth change: sample rejected.";
+"watch.depth_validation.non_finite" = "Non-finite depth sample: measurement ignored.";
+"watch.depth_validation.out_of_range" = "Depth sample out of range: measurement ignored.";
+"watch.sync.photo.received" = "Photo received from iPhone";
+"watch.sync.photo.error" = "iPhone photo sync error";
+"settings.row.units.picker.a11y" = "Units";
+"alarms.depth.default_off_hint" = "Max-depth alarm is off by default. Enable it and set a threshold before diving.";
+"alarms.depth.preset_30m" = "Set 30 m threshold";
 "sync.pending.encode_failed" = "Pending sync queue could not be saved.";
 "sync.pending.retention_warning" = "Pending sync item is old; awaiting signed iPhone acknowledgment.";
 "user_images.error.not_image" = "File is not a valid image.";

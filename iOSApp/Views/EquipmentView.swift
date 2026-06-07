@@ -31,6 +31,10 @@ struct EquipmentView: View {
                                 .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.green.opacity(0.10)))
                         }
                         DIRCard(String(localized: "equipment.card.planning"), icon: "shippingbox.fill", accent: DIRTheme.cyan) {
+                            Text(String(localized: "equipment.card.planning.informational"))
+                                .font(.caption2)
+                                .foregroundStyle(DIRTheme.muted)
+                                .fixedSize(horizontal: false, vertical: true)
                             editableRow(String(localized: "equipment.row.cylinders"), text: $equipment.profile.cylinders)
                             editableRow(String(localized: "equipment.row.configuration"), text: $equipment.profile.configuration)
                             editableRow(String(localized: "equipment.row.bottom_gas"), text: $equipment.profile.bottomGas)

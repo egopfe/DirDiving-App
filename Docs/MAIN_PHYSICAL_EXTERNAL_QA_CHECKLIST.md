@@ -1,6 +1,6 @@
 # MAIN Physical & External QA Checklist
 
-Baseline: deep-code audit remediation on `main`. Every item below remains **PENDING** until executed on hardware with recorded evidence.
+Baseline: `main` @ `a6ccd8d` + iOS MAIN algorithm math remediation ([`IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md)). **Simulator/build/test gates for non-physical fixes are complete; this checklist is unchanged.** Every item below remains **PENDING** until executed on hardware with recorded evidence. **App Store readiness must not be claimed until this checklist and external Bühlmann validation are complete.**
 
 ## Watch Ultra underwater / sensor QA
 

@@ -26,7 +26,7 @@ enum PDFExportService {
     }
 
     static func hasExportableChecklist(_ profile: EquipmentProfile) -> Bool {
-        !profile.checklistItems.isEmpty
+        !profile.migratedChecklistItems.isEmpty
     }
 
     static func exportPlan(context: PDFExportPlannerContext, siteName: String? = nil) throws -> URL {
@@ -46,8 +46,10 @@ enum PDFExportService {
     }
 
     static func exportChecklist(profile: EquipmentProfile) throws -> URL {
-        guard hasExportableChecklist(profile) else { throw PDFExportError.emptyChecklist }
-        let data = ChecklistPDFBuilder.build(profile: profile)
+        var migrated = profile
+        migrated.syncLegacyChecklistFlags()
+        guard hasExportableChecklist(migrated) else { throw PDFExportError.emptyChecklist }
+        let data = ChecklistPDFBuilder.build(profile: migrated)
         guard !data.isEmpty else { throw PDFExportError.generationFailed }
         let filename = PDFExportFilename.make(prefix: "DIRDiving_Checklist")
         return try PDFExportFilename.write(data: data, filename: filename)
@@ -59,10 +61,12 @@ enum PDFExportService {
         siteName: String? = nil
     ) throws -> URL {
         guard canExportPlan(plannerContext) else { throw PDFExportError.invalidPlan }
-        let includeChecklist = hasExportableChecklist(checklistProfile)
+        var migratedChecklist = checklistProfile
+        migratedChecklist.syncLegacyChecklistFlags()
+        let includeChecklist = hasExportableChecklist(migratedChecklist)
         let data = DivePackPDFBuilder.build(
             plannerContext: plannerContext,
-            checklistProfile: checklistProfile,
+            checklistProfile: migratedChecklist,
             includeChecklist: includeChecklist,
             siteName: siteName
         )

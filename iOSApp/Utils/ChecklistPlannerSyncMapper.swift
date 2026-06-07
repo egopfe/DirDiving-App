@@ -58,6 +58,9 @@ enum ChecklistPlannerSyncMapper {
         }
     }
 
+    /// Default duplicate handling: import replaces planner cylinders; export replaces checklist rows.
+    /// `.skip` leaves the existing row/cylinder unchanged when the user keeps the default.
+
     static func exportCandidates(
         plannerCylinders: [PlannerCylinderEntry],
         checklist: [EquipmentChecklistItem]
@@ -69,7 +72,7 @@ enum ChecklistPlannerSyncMapper {
                 cylinder: cylinder,
                 isSelected: true,
                 duplicateChecklistIndex: duplicateIndex,
-                duplicateAction: duplicateIndex == nil ? .skip : .skip
+                duplicateAction: duplicateIndex == nil ? .skip : .replace
             )
         }
     }
@@ -185,6 +188,9 @@ enum ChecklistPlannerSyncMapper {
         )
         if role != .bottom {
             entry.updateSwitchDepthAfterGasOrPPO2Change(environment: environment, shouldInitializeToMOD: true)
+            if let switchDepth = item.switchDepthMeters, switchDepth.isFinite, switchDepth > 0 {
+                entry.switchDepthMeters = switchDepth
+            }
         }
         return entry
     }
@@ -196,6 +202,7 @@ enum ChecklistPlannerSyncMapper {
             usesGas: true,
             gasMixKind: entry.gas.mixKind,
             gasText: entry.gas.label,
+            switchDepthMeters: entry.role == .bottom ? nil : entry.switchDepthMeters,
             pressureText: pressureText(from: entry),
             pressureUnit: entry.pressureUnit,
             tankSize: entry.tankSize,

@@ -5,7 +5,7 @@
 **Audit source:** `Docs/MAIN_BRANCH_UX_INTERACTION_ACCESSIBILITY_AUDIT_20260524_CURRENT_PRE_MODIFICATION.md`  
 **Scope:** DIRDiving Watch App + DIRDiving iOS (MAIN targets only)
 
-> Historical report retained for traceability. The current authoritative readiness status is tracked in [`Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md`](MAIN_BRANCH_COMPLETE_READINESS_AUDIT_2026-05-25.md) and the 2026-05-25 documentation alignment reports.
+> Historical report retained for traceability. **Current non-physical readiness (2026-06-07):** [`IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md) @ `a6ccd8d`. **Bühlmann remains primary; Ratio Deco is comparative heuristic only; DIR DIVING is non-certified/reference-only.** Physical/external/App Store gates **PENDING** — [`MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md`](MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md).
 
 ---
 
@@ -61,7 +61,7 @@ No threshold, store, or layout logic changed.
 
 ## 4. i18n fixes
 
-- **EquipmentView:** title, subtitle, cards, rows, reset dialog, save notice, SAC label, FIELD badge.
+- **EquipmentView:** title, subtitle, cards, rows, reset dialog, save notice, SAC label; planning card **informational only** (no planner execution).
 - **PlannerView:** gas cards, cylinder card, density/reserve metrics, disclaimers, result tables, briefing note.
 - **MoreView:** language/units disclaimer key.
 - **Watch Settings:** sync scope, language scope, shortcuts action row, underwater disabled explanation.

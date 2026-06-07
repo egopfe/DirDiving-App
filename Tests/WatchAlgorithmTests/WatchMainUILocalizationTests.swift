@@ -15,7 +15,18 @@ final class WatchMainUILocalizationTests: XCTestCase {
         "depth.safety.a11y.critical",
         "depth.safety.a11y.exceeded",
         "live.banner.collapsed.a11y",
-        "watch.nav.back.a11y"
+        "watch.nav.back.a11y",
+        "watch.depth_validation.missing_sample",
+        "watch.depth_validation.stale_sample",
+        "watch.depth_validation.stuck_sensor",
+        "watch.depth_validation.implausible_change",
+        "watch.depth_validation.non_finite",
+        "watch.depth_validation.out_of_range",
+        "watch.sync.photo.received",
+        "watch.sync.photo.error",
+        "settings.row.units.picker.a11y",
+        "alarms.depth.default_off_hint",
+        "alarms.depth.preset_30m"
     ]
 
     private let forbiddenVisibleStrings = [
@@ -34,6 +45,24 @@ final class WatchMainUILocalizationTests: XCTestCase {
         "Views/DepthSafetyLiveViews.swift",
         "Views/CompassView.swift"
     ]
+
+    func testWatchDepthValidationMessagesUseSemanticKeys() throws {
+        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("Services/DiveManager.swift"))
+        XCTAssertFalse(source.contains("Campione profondita"))
+        XCTAssertTrue(source.contains("watch.depth_validation.missing_sample"))
+    }
+
+    func testWatchSettingsUnitsPickerUsesLocalizedLabel() throws {
+        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("Views/SettingsView.swift"))
+        XCTAssertFalse(source.contains("Picker(\"Unità\""))
+        XCTAssertTrue(source.contains("settings.row.units.picker.a11y"))
+    }
+
+    func testWatchAlarmDefaultsDocumented() throws {
+        let en = try loadWatchStrings(named: "en")
+        XCTAssertTrue(en["alarms.depth.default_off_hint", default: ""].contains("off by default"))
+        XCTAssertFalse(en["alarms.depth.preset_30m", default: ""].isEmpty)
+    }
 
     func testWatchMainLocalizationKeysExistInEnglishAndItalian() throws {
         let en = try loadWatchStrings(named: "en")
