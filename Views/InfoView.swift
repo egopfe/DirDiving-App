@@ -122,7 +122,7 @@ struct InfoView: View {
                     ? String(localized: "info.apple_lpm.on")
                     : String(localized: "info.apple_lpm.off")
             )
-            .font(.system(size: 10, weight: .semibold, design: .rounded))
+            .font(DiveUI.Typography.hintCaption)
             .foregroundStyle(DiveUI.blue)
             .fixedSize(horizontal: false, vertical: true)
             Text(String(localized: "info.apple_lpm.cannot_enable"))

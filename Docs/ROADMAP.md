@@ -1,6 +1,6 @@
 # Roadmap DIR DIVING
 
-**Aggiornato:** 2026-06-06 (`main` = `origin/main` @ `90dc3f5`)
+**Aggiornato:** 2026-06-07 (`main` = `origin/main` @ `a69bc4b`)
 
 ## Rilasciati su `main` (Watch MAIN + iOS nel workspace)
 
@@ -68,11 +68,15 @@
 | Watch photo transfer ACK + lifecycle | ✅ | `fc311be` — ACK, UUID filename, transfer states, Watch staging import fix |
 | iOS Watch photo manual send + manage sheet | ✅ | `fc311be`/`90dc3f5` — non auto on pick; delete from iPhone; EN/IT labels |
 | Docs alignment 2026-06-06 | ✅ | [`DOCUMENTATION_BRANCH_ALIGNMENT_20260606.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260606.md) |
+| Deep code audit remediation MAIN-AUD-001…016 | ✅ | `a69bc4b` — signed sync ACK, HMAC photo auth, cloud/PDF guards, planner debounce — [`MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_CURRENT.md) |
+| macOS build + XCTest evidence (sim) | ✅ | Watch **171** + iOS **415** passed @ `a69bc4b` |
+| Docs alignment 2026-06-07 | ✅ | [`DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md) |
 
 ## Prossimo (MAIN, pre–App Store)
 
 | Priorità | Item | Tipo |
 |----------|------|------|
+| P0 | Physical QA checklist — paired sync, signed photo auth, underwater UX, Bühlmann external | Hardware / external — [`MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md`](MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md) — **all PENDING** |
 | P0 | Approvazione entitlement water-submersion + provisioning aggiornato | Apple Developer / Signing — [`TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md) |
 | P0 | Build generici firmati Watch + iOS con target embedded | Release / QA |
 | P1 | Esecuzione XCTest `DIRDiving Watch Algorithm Tests` su macOS/Xcode | ✅ Pass locale Ultra 3 sim (2026-05-31 readiness pass) |

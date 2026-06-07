@@ -37,8 +37,9 @@ final class DiveLogStore: ObservableObject {
     private var isReady = false
     private weak var watchSync: WatchSyncService?
 
-    init(cloudSync: CloudSyncStore? = nil) {
+    init(cloudSync: CloudSyncStore? = nil, watchSync: WatchSyncService? = nil) {
         self.cloudSync = cloudSync
+        self.watchSync = watchSync
         includeDemoLogbook = UserDefaults.standard.bool(forKey: Self.includeDemoLogbookKey)
         deletedSessionIDs = loadDeletedSessionIDs()
         let localSessions = loadLocalSessions()
@@ -119,6 +120,7 @@ final class DiveLogStore: ObservableObject {
     func delete(at offsets: IndexSet) {
         var removed: Set<UUID> = []
         for index in offsets.sorted(by: >) {
+            guard sessions.indices.contains(index) else { continue }
             removed.insert(sessions[index].id)
             deletedSessionIDs.insert(sessions[index].id)
             sessions.remove(at: index)

@@ -40,10 +40,11 @@ final class WatchSyncService: NSObject, ObservableObject {
     private var pendingInventoryRequestID: String?
     private var handledDeleteAckRequestIDs: Set<String> = []
 
-    var pendingWatchQueueCount: Int { pendingOutboundSessions.count }
+    var pendingWatchQueueCount: Int { pendingOutboundTransfers.count }
     private var importedSessionIDs: Set<UUID> = []
     private var pushedToWatchSessionIDs: Set<UUID> = []
-    private var pendingOutboundSessions: [DiveSession] = []
+    private var pendingOutboundTransfers: [IOSWatchSyncPendingTransfer] = []
+    private var pendingUserInfoTransferSessionIDs: [ObjectIdentifier: UUID] = [:]
     private let pushedToWatchIDsKey = "dirdiving_ios_pushed_to_watch_session_ids"
     private let pendingOutboundFileName = "dirdiving_ios_pending_watch_sync_sessions.json"
     private static let maxPhotoTransferBytes = 10 * 1_024 * 1_024
@@ -94,7 +95,9 @@ final class WatchSyncService: NSObject, ObservableObject {
         importedSessionIDs = WatchDiveSyncCodec.loadImportedSessionIDs()
         importedSessionCount = importedSessionIDs.count
         pushedToWatchSessionIDs = loadPushedToWatchSessionIDs()
-        pendingOutboundSessions = mergedPendingOutbound(pendingOutboundSessions + loadPendingOutboundSessions())
+        pendingOutboundTransfers = mergedPendingOutboundTransfers(
+            pendingOutboundTransfers + loadPendingOutboundTransfers()
+        )
         conflicts = loadConflicts()
         guard WCSession.isSupported() else {
             lastMessage = String(localized: "WatchConnectivity non supportato")
@@ -128,7 +131,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             flushOutboundTransfers()
         } else {
             WatchSyncAuth.publishSharedSecretIfNeeded()
-            lastMessage = String(format: String(localized: "In coda verso Watch (%lld) — attendi associazione"), pendingOutboundSessions.count)
+            lastMessage = String(format: String(localized: "In coda verso Watch (%lld) — attendi associazione"), pendingOutboundTransfers.count)
         }
     }
 
@@ -634,29 +637,83 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     private func enqueueOutboundSession(_ session: DiveSession) {
-        pendingOutboundSessions.removeAll { $0.id == session.id }
-        pendingOutboundSessions.append(session)
-        pendingOutboundSessions.sort { $0.startDate > $1.startDate }
-        savePendingOutboundSessions()
-        recordActivity(title: String(localized: "sync.activity.pending_to_watch"), detail: sessionSummary(session))
+        let normalizedSession = DiveSessionMerge.preferred(session, session)
+        pendingOutboundTransfers.removeAll { $0.session.id == normalizedSession.id }
+        pendingOutboundTransfers.append(IOSWatchSyncPendingTransfer(session: normalizedSession))
+        pendingOutboundTransfers = IOSWatchSyncPendingQueuePolicy.normalizedTransfers(pendingOutboundTransfers)
+        savePendingOutboundTransfers()
+        recordActivity(title: String(localized: "sync.activity.pending_to_watch"), detail: sessionSummary(normalizedSession))
     }
 
-    private func removeOutboundSession(id: UUID) {
-        pendingOutboundSessions.removeAll { $0.id == id }
-        savePendingOutboundSessions()
+    private func removeOutboundTransfer(sessionID: UUID) {
+        pendingOutboundTransfers = IOSWatchSyncPendingQueuePolicy.dequeueAfterSignedAck(
+            transfers: pendingOutboundTransfers,
+            sessionID: sessionID
+        )
+        savePendingOutboundTransfers()
+    }
+
+    /// Removes a pending outbound transfer after a verified signed Watch import ACK.
+    func confirmSignedAck(sessionID: UUID, issuedAt: Date, signature: String) {
+        guard WatchDiveSyncCodec.verifyAckSignature(signature, sessionID: sessionID, issuedAt: issuedAt) else {
+            failedImportCount += 1
+            lastMessage = String(localized: "sync.watch.pending_ack")
+            return
+        }
+        guard pendingOutboundTransfers.contains(where: { $0.session.id == sessionID }) else { return }
+        markPushedToWatch(sessionID)
+        removeOutboundTransfer(sessionID: sessionID)
+        lastMessage = String(localized: "Immersione inviata al Watch")
+        recordActivity(title: String(localized: "sync.activity.sent_to_watch"), detail: sessionID.uuidString, marksSuccess: true)
+    }
+
+    private func recordPendingAttempt(sessionID: UUID, issuedAt: Date) {
+        guard let index = pendingOutboundTransfers.firstIndex(where: { $0.session.id == sessionID }) else { return }
+        pendingOutboundTransfers[index].lastIssuedAt = issuedAt
+        pendingOutboundTransfers[index].lastAttemptAt = Date()
+        pendingOutboundTransfers[index].attemptCount += 1
+        savePendingOutboundTransfers()
+    }
+
+    private func markUserInfoDelivered(sessionID: UUID, error: Error?) {
+        guard let index = pendingOutboundTransfers.firstIndex(where: { $0.session.id == sessionID }) else { return }
+        if let error {
+            failedImportCount += 1
+            lastMessage = String(format: String(localized: "Invio Watch in coda non completato: %@"), error.localizedDescription)
+            return
+        }
+        pendingOutboundTransfers[index].userInfoDeliveredAt = Date()
+        lastMessage = String(localized: "sync.watch.pending_ack")
+        savePendingOutboundTransfers()
+    }
+
+    private func queueViaUserInfo(envelope: WatchDiveSyncCodec.PayloadEnvelope, sessionID: UUID) {
+        let transfer = WCSession.default.transferUserInfo(envelope.message)
+        pendingUserInfoTransferSessionIDs[ObjectIdentifier(transfer)] = sessionID
+        lastMessage = String(localized: "Invio Watch in coda (transferUserInfo)")
+    }
+
+    private func handleWatchImportAck(_ payload: [String: Any]) {
+        guard let parsed = WatchDiveSyncCodec.parseImportAck(from: payload) else {
+            failedImportCount += 1
+            lastMessage = String(localized: "sync.watch.pending_ack")
+            return
+        }
+        confirmSignedAck(sessionID: parsed.sessionID, issuedAt: parsed.issuedAt, signature: parsed.signature)
     }
 
     private func flushOutboundTransfers() {
-        guard WatchSyncAuth.hasPeerSecret(), !pendingOutboundSessions.isEmpty else { return }
-        let queue = pendingOutboundSessions
-        for session in queue.reversed() {
-            sendOutbound(session)
+        guard WatchSyncAuth.hasPeerSecret(), !pendingOutboundTransfers.isEmpty else { return }
+        let queue = pendingOutboundTransfers
+        for entry in queue.reversed() {
+            sendOutbound(entry.session)
         }
     }
 
     private func sendOutbound(_ session: DiveSession) {
         do {
             let envelope = try WatchDiveSyncCodec.makePayload(session: session)
+            recordPendingAttempt(sessionID: session.id, issuedAt: envelope.issuedAt)
             if WCSession.default.isReachable {
                 WCSession.default.sendMessage(envelope.message) { [weak self] reply in
                     Task { @MainActor in
@@ -672,21 +729,21 @@ final class WatchSyncService: NSObject, ObservableObject {
                             self.recordActivity(title: String(localized: "sync.activity.pending_to_watch"), detail: self.sessionSummary(session))
                             return
                         }
-                        self.markPushedToWatch(session.id)
-                        self.removeOutboundSession(id: session.id)
-                        self.lastMessage = String(localized: "Immersione inviata al Watch")
-                        self.recordActivity(title: String(localized: "sync.activity.sent_to_watch"), detail: self.sessionSummary(session), marksSuccess: true)
+                        self.confirmSignedAck(
+                            sessionID: envelope.sessionID,
+                            issuedAt: envelope.issuedAt,
+                            signature: reply["ackSignature"] as? String ?? ""
+                        )
                     }
                 } errorHandler: { [weak self] _ in
                     Task { @MainActor in
-                        WCSession.default.transferUserInfo(envelope.message)
-                        self?.lastMessage = String(localized: "Invio Watch in coda (transferUserInfo)")
-                        self?.recordActivity(title: String(localized: "sync.activity.queued_to_watch"), detail: self?.sessionSummary(session) ?? "")
+                        guard let self else { return }
+                        self.queueViaUserInfo(envelope: envelope, sessionID: session.id)
+                        self.recordActivity(title: String(localized: "sync.activity.queued_to_watch"), detail: self.sessionSummary(session))
                     }
                 }
             } else {
-                WCSession.default.transferUserInfo(envelope.message)
-                lastMessage = String(localized: "Invio Watch in coda (Watch non raggiungibile)")
+                queueViaUserInfo(envelope: envelope, sessionID: session.id)
                 recordActivity(title: String(localized: "sync.activity.queued_to_watch"), detail: sessionSummary(session))
             }
             Self.logger.info("Outbound session push queued id=\(session.id.uuidString, privacy: .public)")
@@ -732,22 +789,29 @@ final class WatchSyncService: NSObject, ObservableObject {
             .appendingPathComponent(pendingOutboundFileName)
     }
 
-    private func loadPendingOutboundSessions() -> [DiveSession] {
+    private func loadPendingOutboundTransfers() -> [IOSWatchSyncPendingTransfer] {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         let url = pendingOutboundFileURL()
         guard FileManager.default.fileExists(atPath: url.path),
-              let data = try? Data(contentsOf: url),
-              let decoded = try? decoder.decode([DiveSession].self, from: data) else {
+              let data = try? Data(contentsOf: url) else {
             return []
         }
-        return mergedPendingOutbound(decoded)
+        if let decoded = try? decoder.decode([IOSWatchSyncPendingTransfer].self, from: data) {
+            return IOSWatchSyncPendingQueuePolicy.normalizedTransfers(decoded)
+        }
+        if let legacySessions = try? decoder.decode([DiveSession].self, from: data) {
+            return IOSWatchSyncPendingQueuePolicy.normalizedTransfers(
+                legacySessions.map { IOSWatchSyncPendingTransfer(session: $0) }
+            )
+        }
+        return []
     }
 
-    private func savePendingOutboundSessions() {
+    private func savePendingOutboundTransfers() {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
-        let value = mergedPendingOutbound(pendingOutboundSessions)
+        let value = IOSWatchSyncPendingQueuePolicy.normalizedTransfers(pendingOutboundTransfers)
         guard let data = try? encoder.encode(value) else { return }
         do {
             try data.write(to: pendingOutboundFileURL(), options: [.atomic, .completeFileProtection])
@@ -756,16 +820,18 @@ final class WatchSyncService: NSObject, ObservableObject {
         }
     }
 
-    private func mergedPendingOutbound(_ sessions: [DiveSession]) -> [DiveSession] {
-        var byID: [UUID: DiveSession] = [:]
-        for session in sessions {
-            if let existing = byID[session.id] {
-                byID[session.id] = DiveSessionMerge.preferred(existing, session)
+    private func mergedPendingOutboundTransfers(_ transfers: [IOSWatchSyncPendingTransfer]) -> [IOSWatchSyncPendingTransfer] {
+        var byID: [UUID: IOSWatchSyncPendingTransfer] = [:]
+        for transfer in transfers {
+            if let existing = byID[transfer.session.id] {
+                var merged = transfer
+                merged.session = DiveSessionMerge.preferred(existing.session, transfer.session)
+                byID[transfer.session.id] = merged
             } else {
-                byID[session.id] = session
+                byID[transfer.session.id] = transfer
             }
         }
-        return byID.values.sorted { $0.startDate > $1.startDate }
+        return byID.values.sorted { $0.session.startDate > $1.session.startDate }
     }
 
     private func persistConflicts(_ value: [SyncConflict]) {
@@ -836,6 +902,10 @@ extension WatchSyncService: WCSessionDelegate {
 
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
         Task { @MainActor in
+            if WatchDiveSyncCodec.isImportAck(message) {
+                self.handleWatchImportAck(message)
+                return
+            }
             if CompanionPhotoManagementSupport.isInventoryResponse(message) {
                 self.handleWatchImageInventoryResponse(message)
                 return
@@ -854,6 +924,11 @@ extension WatchSyncService: WCSessionDelegate {
 
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any], replyHandler: @escaping ([String: Any]) -> Void) {
         Task { @MainActor in
+            if WatchDiveSyncCodec.isImportAck(message) {
+                self.handleWatchImportAck(message)
+                replyHandler(["status": "acknowledged"])
+                return
+            }
             if CompanionPhotoManagementSupport.isInventoryResponse(message) {
                 self.handleWatchImageInventoryResponse(message)
                 replyHandler(["status": "acknowledged"])
@@ -887,6 +962,10 @@ extension WatchSyncService: WCSessionDelegate {
 
     nonisolated func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
         Task { @MainActor in
+            if WatchDiveSyncCodec.isImportAck(userInfo) {
+                self.handleWatchImportAck(userInfo)
+                return
+            }
             if CompanionPhotoManagementSupport.isInventoryResponse(userInfo) {
                 self.handleWatchImageInventoryResponse(userInfo)
                 return
@@ -933,23 +1012,45 @@ extension WatchSyncService: WCSessionDelegate {
 
     nonisolated func session(_ session: WCSession, didFinish userInfoTransfer: WCSessionUserInfoTransfer, error: Error?) {
         Task { @MainActor in
-            if let error {
+            let sessionID = self.pendingUserInfoTransferSessionIDs.removeValue(forKey: ObjectIdentifier(userInfoTransfer))
+            if let sessionID {
+                self.markUserInfoDelivered(sessionID: sessionID, error: error)
+            } else if let error {
                 self.failedImportCount += 1
                 self.lastMessage = String(format: String(localized: "Invio Watch in coda non completato: %@"), error.localizedDescription)
-                return
-            }
-            guard let id = WatchDiveSyncCodec.sessionID(fromOutboundPayload: userInfoTransfer.userInfo) else {
+            } else if let id = WatchDiveSyncCodec.sessionID(fromOutboundPayload: userInfoTransfer.userInfo) {
+                self.markUserInfoDelivered(sessionID: id, error: nil)
+            } else {
                 self.failedImportCount += 1
                 self.lastMessage = String(localized: "Invio Watch completato ma sessione non identificabile")
-                return
             }
-            self.markPushedToWatch(id)
-            self.removeOutboundSession(id: id)
-            self.lastMessage = String(localized: "Immersione consegnata al Watch via coda")
-            self.recordActivity(title: String(localized: "sync.activity.sent_to_watch"), detail: id.uuidString, marksSuccess: true)
         }
     }
 
     nonisolated func sessionDidBecomeInactive(_ session: WCSession) {}
     nonisolated func sessionDidDeactivate(_ session: WCSession) { WCSession.default.activate() }
 }
+
+#if DEBUG
+extension WatchSyncService {
+    var testHook_pendingSessionIDs: [UUID] {
+        pendingOutboundTransfers.map(\.session.id)
+    }
+
+    var testHook_pendingTransfers: [IOSWatchSyncPendingTransfer] {
+        pendingOutboundTransfers
+    }
+
+    func testHook_enqueueSession(_ session: DiveSession) {
+        enqueueOutboundSession(session)
+    }
+
+    func testHook_confirmSignedAck(sessionID: UUID, issuedAt: Date, signature: String) {
+        confirmSignedAck(sessionID: sessionID, issuedAt: issuedAt, signature: signature)
+    }
+
+    func testHook_markUserInfoDelivered(sessionID: UUID, error: Error?) {
+        markUserInfoDelivered(sessionID: sessionID, error: error)
+    }
+}
+#endif

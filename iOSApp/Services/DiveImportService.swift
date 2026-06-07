@@ -418,6 +418,9 @@ enum DiveImportService {
         if row.contains(where: { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) {
             rows.append(row)
         }
+        if inQuotes {
+            return nil
+        }
         return rows
     }
 
@@ -478,3 +481,11 @@ enum DiveImportService {
         )
     }
 }
+
+#if DEBUG
+extension DiveImportService {
+    static func testHook_parseCSV(_ contents: String) -> [[String]]? {
+        parseCSV(contents)
+    }
+}
+#endif

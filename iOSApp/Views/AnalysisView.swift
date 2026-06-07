@@ -65,7 +65,7 @@ struct AnalysisView: View {
                                         .clipShape(RoundedRectangle(cornerRadius: DIRTheme.compactRadius))
                                         .overlay(RoundedRectangle(cornerRadius: DIRTheme.compactRadius).stroke(DIRTheme.hairline, lineWidth: 1))
                                 }
-                                .frame(height: 240)
+                                .frame(minHeight: 180, maxHeight: 320)
                                 .accessibilityElement(children: .ignore)
                                 .accessibilityLabel(String(localized: "analysis.chart.max_depth_a11y"))
                                 .accessibilityValue(

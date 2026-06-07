@@ -65,7 +65,7 @@ struct ContentView: View {
 
     private func navigationToast(_ message: String) -> some View {
         Text(message)
-            .font(.system(size: 10, weight: .black, design: .rounded))
+            .font(DiveUI.Typography.hintCaptionBold)
             .foregroundStyle(DiveUI.yellow)
             .multilineTextAlignment(.center)
             .padding(.horizontal, 10)
@@ -91,10 +91,10 @@ struct ContentView: View {
                     .foregroundStyle(DiveUI.cyan)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(String(localized: "nav.crown.hint.title"))
-                        .font(.system(size: 10, weight: .black, design: .rounded))
+                        .font(DiveUI.Typography.hintCaptionBold)
                         .foregroundStyle(.white)
                     Text(String(localized: "nav.crown.hint.body"))
-                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                        .font(DiveUI.Typography.hintCaption)
                         .foregroundStyle(DiveUI.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -106,7 +106,7 @@ struct ContentView: View {
                 HapticService.shared.confirm()
             } label: {
                 Text(String(localized: "nav.crown.hint.dismiss"))
-                    .font(.system(size: 9, weight: .black, design: .rounded))
+                    .font(DiveUI.Typography.hintCaptionBold)
                     .foregroundStyle(DiveUI.cyan)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 5)

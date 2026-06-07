@@ -16,6 +16,17 @@ final class PlannerCNSCopyTests: XCTestCase {
         "planner.settings.cns_descent_bottom_15_check.description",
         "planner.accessibility.cns_descent_bottom.warning.label",
         "planner.accessibility.cns_descent_bottom.warning.hint",
+        "planner.cns_full_plan.warning",
+        "planner.cns_full_plan.warning.hint",
+        "planner.accessibility.cns_full_plan.warning.label",
+        "planner.accessibility.cns_full_plan.warning.hint",
+        "planner.mode.footer",
+        "logbook.delete.button.a11y",
+        "planner.charts.depth_profile.a11y",
+        "planner.charts.depth_profile.a11y.hint",
+        "planner.result.gf_compare.a11y",
+        "planner.buhlmann.ndl_reference.a11y",
+        "planner.reference.details.read_more",
         "planner.metric.otu_weekly",
         "planner.metric.otu_weekly.footnote",
         "planner.warning.otu_weekly_elevated"
@@ -28,6 +39,17 @@ final class PlannerCNSCopyTests: XCTestCase {
             XCTAssertFalse(en[key, default: ""].isEmpty, "Missing EN key: \(key)")
             XCTAssertFalse(it[key, default: ""].isEmpty, "Missing IT key: \(key)")
         }
+    }
+
+    func testPlannerModeFooterMentionsAllModes() throws {
+        let en = try loadStrings(named: "en")
+        let it = try loadStrings(named: "it")
+        XCTAssertTrue(en["planner.mode.footer"]?.contains("Base") == true)
+        XCTAssertTrue(en["planner.mode.footer"]?.contains("Deco") == true)
+        XCTAssertTrue(en["planner.mode.footer"]?.contains("Technical") == true)
+        XCTAssertTrue(it["planner.mode.footer"]?.contains("Base") == true)
+        XCTAssertTrue(it["planner.mode.footer"]?.contains("Deco") == true)
+        XCTAssertTrue(it["planner.mode.footer"]?.contains("Tecnica") == true)
     }
 
     func testEnglishCNSLabelsUseFullPlanAndPreviewWording() throws {
