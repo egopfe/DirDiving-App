@@ -6,6 +6,8 @@ struct PlannerView: View {
     @EnvironmentObject private var equipment: EquipmentStore
     @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
+    @AppStorage(PlannerCNSDescentBottomCheckSettings.storageKey) private var cnsDescentBottomCheckEnabled = PlannerCNSDescentBottomCheckSettings.defaultEnabled
+    @AppStorage(PlannerCNSDescentBottomCheckSettings.thresholdStorageKey) private var cnsThresholdPercent = PlannerCNSDescentBottomCheckSettings.defaultThresholdPercent
     @State private var showPlan = false
     @State private var showPlanningReferenceInfo = false
     @State private var showCalculateError = false
@@ -48,46 +50,58 @@ struct PlannerView: View {
     var body: some View {
         NavigationStack {
             DIRScreenContainer {
-                ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 16) {
-                        VStack(alignment: .leading, spacing: 7) {
-                            Text(String(localized: "Planner"))
-                                .dirScreenTitleStyle()
-                            Text(String(localized: "planner.header.subtitle"))
-                                .dirScreenSubtitleStyle()
+                ScrollViewReader { scrollProxy in
+                    ScrollView(showsIndicators: false) {
+                        VStack(alignment: .leading, spacing: 16) {
+                            VStack(alignment: .leading, spacing: 7) {
+                                Text(String(localized: "Planner"))
+                                    .dirScreenTitleStyle()
+                                Text(String(localized: "planner.header.subtitle"))
+                                    .dirScreenSubtitleStyle()
+                            }
+                            plannerSafetyAcknowledgment
+                            DIRWarningBox(text: String(localized: "planner.reference_only.warning"))
+                            plannerReferenceDetailsSection
+                            Group {
+                                modePicker
+                                profileCard
+                                if modePresentation.showsRepetitivePlanning {
+                                    repetitivePlanningCard
+                                }
+                                cnsDescentBottomWarningCard
+                                    .id(PlannerCNSDescentBottomCheckSettings.scrollTargetID)
+                                plannerCylindersCard
+                                if modePresentation.showsExtendedAnalysisTiles {
+                                    technicalAnalysisCard
+                                }
+                                if modePresentation.showsReserveCard {
+                                    reserveCard
+                                }
+                                if modePresentation.showsTeamPreview {
+                                    teamPreviewCard
+                                }
+                                plannerMODInputWarnings
+                                plannerModeLimitWarnings
+                                plannerWarnings
+                                calculateButton
+                            }
+                            .disabled(!plannerSafetyAcknowledged)
+                            .opacity(plannerSafetyAcknowledged ? 1 : 0.45)
                         }
-                        plannerSafetyAcknowledgment
-                        DIRWarningBox(text: String(localized: "planner.reference_only.warning"))
-                        plannerReferenceDetailsSection
-                        Group {
-                            modePicker
-                            profileCard
-                            if modePresentation.showsRepetitivePlanning {
-                                repetitivePlanningCard
-                            }
-                            plannerCylindersCard
-                            if modePresentation.showsExtendedAnalysisTiles {
-                                technicalAnalysisCard
-                            }
-                            if modePresentation.showsReserveCard {
-                                reserveCard
-                            }
-                            if modePresentation.showsTeamPreview {
-                                teamPreviewCard
-                            }
-                            plannerMODInputWarnings
-                            plannerModeLimitWarnings
-                            plannerWarnings
-                            calculateButton
-                        }
-                        .disabled(!plannerSafetyAcknowledged)
-                        .opacity(plannerSafetyAcknowledged ? 1 : 0.45)
+                        .padding(.horizontal, 16)
+                        .padding(.top, 10)
+                        .padding(.bottom, 18)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 10)
-                    .padding(.bottom, 18)
+                    .dirCompanionScrollSurface()
+                    .onChange(of: store.scrollToCNSThresholdSettings) { _, shouldScroll in
+                        guard shouldScroll else { return }
+                        scrollToCNSThresholdSettings(using: scrollProxy)
+                    }
+                    .onChange(of: showPlan) { _, isShowing in
+                        guard !isShowing, store.scrollToCNSThresholdSettings else { return }
+                        scrollToCNSThresholdSettings(using: scrollProxy)
+                    }
                 }
-                .dirCompanionScrollSurface()
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -424,6 +438,92 @@ struct PlannerView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
+        }
+    }
+
+    private var cnsThresholdPercentBinding: Binding<Int> {
+        Binding(
+            get: { PlannerCNSDescentBottomCheckSettings.clamp(cnsThresholdPercent) },
+            set: { cnsThresholdPercent = PlannerCNSDescentBottomCheckSettings.clamp($0) }
+        )
+    }
+
+    private var cnsDescentBottomWarningCard: some View {
+        DIRCard(String(localized: "planner.settings.cns_descent_bottom.title"), icon: "lungs.fill", accent: DIRTheme.cyan) {
+            VStack(alignment: .leading, spacing: 10) {
+                Toggle(isOn: $cnsDescentBottomCheckEnabled) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(String(localized: "planner.settings.cns_descent_bottom.toggle"))
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(.white)
+                        Text(String(localized: "planner.settings.cns_descent_bottom.toggle_hint"))
+                            .font(.caption2)
+                            .foregroundStyle(DIRTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .tint(DIRTheme.cyan)
+                .accessibilityHint(String(localized: "planner.settings.cns_descent_bottom.toggle.a11y"))
+
+                if cnsDescentBottomCheckEnabled {
+                    Divider().overlay(DIRTheme.hairline)
+                    cnsThresholdStepper
+                }
+
+                Text(String(localized: "planner.settings.cns_descent_bottom.reference_only"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.yellow)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    private var cnsThresholdStepper: some View {
+        HStack {
+            Text(String(localized: "planner.settings.cns_descent_bottom.threshold"))
+                .font(.callout)
+                .foregroundStyle(.white)
+            Spacer()
+            Text("\(cnsThresholdPercentBinding.wrappedValue) %")
+                .font(.callout.monospacedDigit())
+                .foregroundStyle(.white)
+                .frame(width: 56, alignment: .trailing)
+            HStack(spacing: 1) {
+                Button {
+                    cnsThresholdPercentBinding.wrappedValue -= 1
+                } label: {
+                    Image(systemName: "minus")
+                        .frame(width: 28, height: 24)
+                }
+                .disabled(cnsThresholdPercentBinding.wrappedValue <= PlannerCNSDescentBottomCheckSettings.minimumThresholdPercent)
+                Button {
+                    cnsThresholdPercentBinding.wrappedValue += 1
+                } label: {
+                    Image(systemName: "plus")
+                        .frame(width: 28, height: 24)
+                }
+                .disabled(cnsThresholdPercentBinding.wrappedValue >= PlannerCNSDescentBottomCheckSettings.maximumThresholdPercent)
+            }
+            .font(.caption.weight(.bold))
+            .foregroundStyle(DIRTheme.cyan)
+            .background(RoundedRectangle(cornerRadius: 5).fill(DIRTheme.surface2))
+        }
+        .padding(.vertical, 6)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(
+            String(
+                format: String(localized: "planner.settings.cns_descent_bottom.threshold.a11y"),
+                cnsThresholdPercentBinding.wrappedValue
+            )
+        )
+    }
+
+    private func scrollToCNSThresholdSettings(using scrollProxy: ScrollViewProxy) {
+        DispatchQueue.main.async {
+            withAnimation(.easeInOut(duration: 0.35)) {
+                scrollProxy.scrollTo(PlannerCNSDescentBottomCheckSettings.scrollTargetID, anchor: .center)
+            }
+            store.acknowledgeCNSThresholdSettingsFocus()
         }
     }
 
@@ -1148,11 +1248,13 @@ struct PlannerView: View {
 }
 
 struct PlanResultView: View {
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var store: PlannerStore
     @EnvironmentObject private var equipment: EquipmentStore
     var pendingChecklistExportPrompt: Bool = false
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @AppStorage(PlannerCNSDescentBottomCheckSettings.storageKey) private var cnsDescentBottomCheckEnabled = PlannerCNSDescentBottomCheckSettings.defaultEnabled
+    @AppStorage(PlannerCNSDescentBottomCheckSettings.thresholdStorageKey) private var cnsThresholdPercent = PlannerCNSDescentBottomCheckSettings.defaultThresholdPercent
     @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
     @State private var showResultPDFMenu = false
     @State private var shareablePDF: ShareablePDFItem?
@@ -1173,8 +1275,15 @@ struct PlanResultView: View {
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
     private var modePresentation: PlannerResultPresentation { PlannerResultPresentation.presentation(for: store.mode) }
 
+    private var cnsDescentBottomThresholdPercent: Double {
+        Double(PlannerCNSDescentBottomCheckSettings.clamp(cnsThresholdPercent))
+    }
+
     private var cnsDescentBottomWarningActive: Bool {
-        store.plan.gasAnalysis.cnsDescentBottomExceedsPlannerThreshold(checkEnabled: cnsDescentBottomCheckEnabled)
+        store.plan.gasAnalysis.cnsDescentBottomExceedsPlannerThreshold(
+            checkEnabled: cnsDescentBottomCheckEnabled,
+            thresholdPercent: cnsDescentBottomThresholdPercent
+        )
     }
 
     private var fullPlanCNSWarningActive: Bool {
@@ -1218,7 +1327,17 @@ struct PlanResultView: View {
         let value = Formatters.zero(store.plan.gasAnalysis.cnsDescentBottomPercent)
         let base = "\(String(localized: "planner.metric.cns_descent_bottom")), \(value) percent"
         guard cnsDescentBottomWarningActive else { return base }
-        return "\(String(localized: "planner.accessibility.cns_descent_bottom.warning.label")) \(base)"
+        return String(
+            format: String(localized: "planner.accessibility.cns_descent_bottom.warning.label"),
+            Formatters.zero(cnsDescentBottomThresholdPercent)
+        ) + " \(base)"
+    }
+
+    private var cnsDescentBottomWarningMessage: String {
+        String(
+            format: String(localized: "planner.cns_descent_bottom.warning"),
+            Formatters.zero(cnsDescentBottomThresholdPercent)
+        )
     }
 
     private var cnsDescentBottomWarningBanner: some View {
@@ -1227,7 +1346,7 @@ struct PlanResultView: View {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.caption.weight(.bold))
                     .foregroundStyle(DIRTheme.red)
-                Text(String(localized: "planner.cns_descent_bottom.warning"))
+                Text(cnsDescentBottomWarningMessage)
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(DIRTheme.red)
                     .fixedSize(horizontal: false, vertical: true)
@@ -1236,12 +1355,55 @@ struct PlanResultView: View {
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
+            cnsThresholdEditLink
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 4)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(String(localized: "planner.accessibility.cns_descent_bottom.warning.label"))
+        .accessibilityLabel(
+            String(
+                format: String(localized: "planner.accessibility.cns_descent_bottom.warning.label"),
+                Formatters.zero(cnsDescentBottomThresholdPercent)
+            )
+        )
         .accessibilityHint(String(localized: "planner.accessibility.cns_descent_bottom.warning.hint"))
+    }
+
+    private var cnsThresholdEditLink: some View {
+        Button {
+            store.requestCNSThresholdSettingsFocus()
+            dismiss()
+        } label: {
+            Text(
+                String(
+                    format: String(localized: "planner.result.cns_threshold_edit"),
+                    Formatters.zero(cnsDescentBottomThresholdPercent)
+                )
+            )
+            .font(.caption2.weight(.semibold))
+            .foregroundStyle(DIRTheme.cyan)
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint(String(localized: "planner.result.cns_threshold_edit.a11y"))
+    }
+
+    private var cnsThresholdResultFootnote: some View {
+        Group {
+            if cnsDescentBottomCheckEnabled {
+                HStack {
+                    Text(
+                        String(
+                            format: String(localized: "planner.result.cns_threshold_summary"),
+                            Formatters.zero(cnsDescentBottomThresholdPercent)
+                        )
+                    )
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    Spacer(minLength: 8)
+                    cnsThresholdEditLink
+                }
+            }
+        }
     }
 
     private var fullPlanCNSTileAccessibilityLabel: String {
@@ -1819,6 +1981,8 @@ struct PlanResultView: View {
                 }
                 if cnsDescentBottomWarningActive {
                     cnsDescentBottomWarningBanner
+                } else {
+                    cnsThresholdResultFootnote
                 }
                 Divider().overlay(DIRTheme.hairline)
                 let endMeasurement = Formatters.depth(store.analysis.endMeters, units: unitPreference)

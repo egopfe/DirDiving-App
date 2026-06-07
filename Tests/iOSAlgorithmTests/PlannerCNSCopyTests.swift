@@ -13,9 +13,17 @@ final class PlannerCNSCopyTests: XCTestCase {
         "planner.cns_descent_bottom.warning.hint",
         "planner.metric.cns_ascent_deco_estimate",
         "planner.metric.cns_ascent_deco_estimate.footnote",
+        "planner.settings.cns_descent_bottom.title",
+        "planner.settings.cns_descent_bottom.toggle",
+        "planner.settings.cns_descent_bottom.threshold",
+        "planner.settings.cns_descent_bottom.reference_only",
         "planner.settings.cns_descent_bottom_15_check.description",
         "planner.accessibility.cns_descent_bottom.warning.label",
         "planner.accessibility.cns_descent_bottom.warning.hint",
+        "planner.result.cns_threshold_edit",
+        "more.settings.cns_descent_bottom_summary_title",
+        "more.settings.cns_descent_bottom_summary_on",
+        "more.settings.cns_descent_bottom_summary_off",
         "planner.cns_full_plan.warning",
         "planner.cns_full_plan.warning.hint",
         "planner.accessibility.cns_full_plan.warning.label",
@@ -59,6 +67,7 @@ final class PlannerCNSCopyTests: XCTestCase {
         XCTAssertTrue(en["planner.metric.cns_full_plan.footnote"]?.contains("decompression") == true)
         XCTAssertTrue(en["planner.metric.cns_descent_bottom.footnote"]?.contains("excludes") == true)
         XCTAssertTrue(en["planner.cns_descent_bottom.warning.hint"]?.contains("Reference only") == true)
+        XCTAssertTrue(en["planner.cns_descent_bottom.warning"]?.contains("%@") == true)
     }
 
     func testItalianCNSLabelsUseFullPlanAndPreviewWording() throws {

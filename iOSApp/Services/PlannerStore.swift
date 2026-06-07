@@ -40,6 +40,7 @@ final class PlannerStore: ObservableObject {
     }
     @Published private(set) var isCalculating = false
     @Published private(set) var lastTissueSnapshot: TissueSnapshot?
+    @Published var scrollToCNSThresholdSettings = false
 
     private let cloudSync: CloudSyncStore?
     private let key = "dirdiving_ios_experimental_planner_state"
@@ -68,6 +69,14 @@ final class PlannerStore: ObservableObject {
 
     func refreshDerivedPlanningPreview() {
         schedulePlanningUpdate()
+    }
+
+    func requestCNSThresholdSettingsFocus() {
+        scrollToCNSThresholdSettings = true
+    }
+
+    func acknowledgeCNSThresholdSettingsFocus() {
+        scrollToCNSThresholdSettings = false
     }
 
     func normalizeSwitchDepthAfterGasOrPPO2Change(cylinderID: UUID) {
