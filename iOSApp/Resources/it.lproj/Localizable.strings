@@ -724,7 +724,7 @@
 "planner.validation.sac_invalid" = "SAC/RMV non valido.";
 "planner.validation.team_size_invalid" = "Team size non valido.";
 "planner.validation.temperature_invalid" = "Temperatura non valida.";
-"planner.validation.gradient_factors_invalid" = "Il GF Low deve essere inferiore al GF High.";
+"planner.validation.gradient_factors_invalid" = "Il GF Low deve essere inferiore al GF High (politica conservativa DIR DIVING — non una limitazione matematica Bühlmann).";
 "planner.validation.density_limits_invalid" = "Limiti densità gas non validi.";
 "planner.validation.team_sac_invalid" = "SAC team non valido.";
 "planner.validation.cylinder_volume_invalid" = "Volume bombola non valido.";
@@ -932,7 +932,7 @@
 "equipment.checklist.switch_depth" = "Profondità switch";
 "equipment.checklist.switch_depth_placeholder" = "21";
 "equipment.checklist.switch_depth_unit" = "m";
-"equipment.checklist.switch_depth_format" = "switch @ %d m";
+"equipment.checklist.switch_depth_format" = "switch @ %@";
 "equipment.checklist.pressure_unit" = "BAR / PSI";
 "equipment.checklist.bar" = "BAR";
 "equipment.checklist.psi" = "PSI";
@@ -1185,7 +1185,7 @@
 
 /* iOS MAIN UI/UX readiness fixes (2026-05-31) */
 "manual_dive.edit.nodepth.banner" = "Sessione solo runtime/GPS: modifica solo i metadati. Nessun profilo profondità verrà creato o esportato.";
-"manual_dive.synthetic_profile.disclosure" = "Profilo stimato generato dai dati manuali";
+"manual_dive.synthetic_profile.disclosure" = "Profilo trapezoidale stimato da max/media manuali — non traccia registrata del computer. Analisi tessuti/narcosi restano stime informative.";
 "manual_dive.stepper.decrease.a11y" = "Diminuisci %@";
 "manual_dive.stepper.increase.a11y" = "Aumenta %@";
 "manual_dive.stepper.value.a11y" = "%@, %@ %@";
@@ -1367,6 +1367,11 @@
 "tissue_analytics.entry.subtitle" = "Visualizza analisi Bühlmann, compartimenti e carico narcotico";
 "tissue_analytics.logbook.entry.title" = "Tessuti & Narcosi";
 "tissue_analytics.logbook.entry.subtitle" = "Stima informativa — non replay Bühlmann completo del profilo registrato";
+"tissue_analytics.logbook.entry.subtitle.planned" = "Dal profilo Bühlmann pianificato nel planner";
+"tissue_analytics.logbook.entry.subtitle.recorded" = "Replay Bühlmann da profilo registrato (gas unico, solo riferimento)";
+"tissue_analytics.logbook.entry.subtitle.simulated" = "Stima informativa — non replay decompressione validato";
+"tissue_analytics.logbook.entry.subtitle.manual_synthetic" = "Profilo manuale sintetico — solo stima informativa";
+"tissue_analytics.logbook.entry.subtitle.insufficient" = "Dati profondità/gas insufficienti per analisi tessuti";
 "tissue_analytics.nav.title" = "Profilo immersione";
 "tissue_analytics.tab.summary" = "RIEPILOGO";
 "tissue_analytics.tab.profile" = "PROFILO";
@@ -1376,11 +1381,14 @@
 "tissue_analytics.summary.max_depth" = "Profondità max";
 "tissue_analytics.summary.bottom_time" = "Tempo di fondo";
 "tissue_analytics.summary.mode" = "Modalità";
-"tissue_analytics.source.planned" = "Dati pianificati";
-"tissue_analytics.source.recorded" = "Dati registrati";
-"tissue_analytics.source.simulated" = "Dati simulati";
-"tissue_analytics.source.simulated_footnote" = "Stima informativa da profondità registrata ed etichette gas con GF fisso — non è un replay Bühlmann completo del profilo registrato.";
-"tissue_analytics.source.planned_footnote" = "Calcolato dal profilo Bühlmann pianificato nel planner.";
+"tissue_analytics.source.planned" = "Replay Bühlmann pianificato";
+"tissue_analytics.source.recorded" = "Replay Bühlmann registrato";
+"tissue_analytics.source.simulated" = "Stima simulata";
+"tissue_analytics.source.insufficient" = "Dati insufficienti";
+"tissue_analytics.source.simulated_footnote" = "Stima informativa da campioni di profondità ed etichetta gas con GF predefinito — non replay decompressione validato. Le immersioni manuali usano un profilo trapezoidale sintetico.";
+"tissue_analytics.source.planned_footnote" = "Calcolato dal profilo Bühlmann pianificato nel planner (solo riferimento).";
+"tissue_analytics.source.recorded_footnote" = "Replay tessuti Bühlmann da campioni registrati e gas unico — senza storico gas switch. Solo riferimento, non certificato.";
+"tissue_analytics.source.insufficient_footnote" = "Campioni di profondità o dati gas insufficienti per l'analisi tessuti.";
 "tissue_analytics.card.dive_profile" = "PROFILO IMMERSIONE";
 "tissue_analytics.card.tissue_loading" = "CARICO TESSUTI (BÜHLMANN ZH-L16C)";
 "tissue_analytics.card.tissue_trend" = "ANDAMENTO TESSUTI";

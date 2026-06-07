@@ -587,7 +587,7 @@ struct DiveDetailView: View {
                         Text(String(localized: "tissue_analytics.logbook.entry.title"))
                             .font(.callout.weight(.semibold))
                             .foregroundStyle(.white)
-                        Text(String(localized: "tissue_analytics.logbook.entry.subtitle"))
+                        Text(TissueAnalyticsService.logbookEntrySubtitle(for: session))
                             .font(.caption)
                             .foregroundStyle(TissueAnalyticsTheme.labelSecondary)
                     }

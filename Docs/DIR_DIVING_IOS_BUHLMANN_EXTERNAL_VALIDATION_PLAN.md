@@ -19,7 +19,7 @@ Establish a repeatable, documented path to compare DIR Diving iOS planner output
 | 1 Internal regression | **Active** | JSON fixtures + XCTest ranges (`Tests/iOSAlgorithmTests/Fixtures/`) |
 | 2 Metadata hardening | **Active** | `validationStatus`, `referenceSource`, `toleranceMinutes`, notes |
 | 3 External reference capture | **Pending** | Fixture rows with `pending_external_validation` until values recorded |
-| 4 Comparison campaign | **Pending** | Spreadsheet/tool diff with documented tolerance |
+| 4 Comparison campaign | **Pending** | Spreadsheet/tool diff — use [`BUHLMANN_EXTERNAL_VALIDATION_FIXTURES_TEMPLATE.md`](BUHLMANN_EXTERNAL_VALIDATION_FIXTURES_TEMPLATE.md) |
 | 5 Release gate | **Pending** | Sign-off checklist in `DIR_DIVING_IOS_TESTFLIGHT_READINESS_CHECKLIST.md` |
 
 ---

@@ -28,6 +28,7 @@ enum TissueAnalyticsService {
         guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) else {
             return nil
         }
+        guard environment.surfacePressureBar.isFinite, environment.surfacePressureBar > 0 else { return nil }
 
         let firstStopDepth = plan.decoStops.first?.depthMeters ?? 0
         let samples = buildSamples(
@@ -71,112 +72,22 @@ enum TissueAnalyticsService {
         )
     }
 
+    static func logbookEntrySubtitle(for session: DiveSession) -> String {
+        TissueAnalyticsLogbookReplay.logbookEntrySubtitle(for: session)
+    }
+
     static func buildFromSession(_ session: DiveSession) -> TissueAnalyticsTrace? {
-        guard session.hasDepthProfile, !session.samples.isEmpty else { return nil }
+        guard let source = TissueAnalyticsLogbookReplay.resolvedSource(for: session) else { return nil }
         let environment = PlannerEnvironment.seaLevelSaltWater
-        let gas = assumedGas(for: session.gasLabel)
-        let sortedSamples = session.samples.sorted { $0.timestamp < $1.timestamp }
-        guard let firstTimestamp = sortedSamples.first?.timestamp else { return nil }
 
-        let durationSeconds = max(1, Int(session.durationSeconds.rounded()))
-        let totalMinutes = max(1, Int(ceil(Double(durationSeconds) / 60.0)))
-        let firstStopDepth = 0.0
-        var state = BuhlmannTissueState.airSaturated(surfacePressureBar: environment.surfacePressureBar)
-        var analyticsSamples: [TissueAnalyticsSample] = []
-        var depthPoints: [DepthProfilePoint] = []
-
-        for minute in 0...totalMinutes {
-            let runtimeSeconds = minute * 60
-            let targetDate = firstTimestamp.addingTimeInterval(TimeInterval(runtimeSeconds))
-            let depth = interpolatedDepth(at: targetDate, samples: sortedSamples, fallback: session.maxDepthMeters)
-            depthPoints.append(DepthProfilePoint(elapsedMinutes: Double(minute), depthMeters: depth))
-
-            if minute > 0 {
-                state = state.loadedConstantDepth(depthMeters: depth, minutes: 1, gas: gas, environment: environment)
-            }
-
-            let gf = 0.85
-            var loadings = [Double](repeating: 0, count: BuhlmannConstants.compartmentCount)
-            var controlling = 0
-            var maxLoad = -1.0
-            var controllingMetrics = (
-                n2: 0.0, he: 0.0, total: 0.0, tolerated: 0.0, load: 0.0
-            )
-
-            for index in 0..<BuhlmannConstants.compartmentCount {
-                guard let metrics = BuhlmannTissueHistorySampler.compartmentMetrics(
-                    compartmentIndex: index,
-                    state: state,
-                    depthMeters: depth,
-                    gas: gas,
-                    gf: gf,
-                    environment: environment
-                ) else {
-                    continue
-                }
-                loadings[index] = metrics.loadPercent
-                if metrics.loadPercent > maxLoad {
-                    maxLoad = metrics.loadPercent
-                    controlling = index
-                    controllingMetrics = (metrics.nitrogenPressureBar, metrics.heliumPressureBar, metrics.totalInertPressureBar, metrics.toleratedAmbientPressureBar, metrics.loadPercent)
-                }
-            }
-
-            let ppN2 = NarcosisAnalyticsSupport.ppN2Bar(depthMeters: depth, gas: gas, environment: environment)
-            let ppO2 = NarcosisAnalyticsSupport.ppO2Bar(depthMeters: depth, gas: gas, environment: environment)
-            let ceiling = NarcosisAnalyticsSupport.ceilingMeters(from: controllingMetrics.tolerated, environment: environment)
-
-            analyticsSamples.append(
-                TissueAnalyticsSample(
-                    runtimeSeconds: runtimeSeconds,
-                    depthMeters: depth,
-                    activeGasName: gas.label,
-                    compartmentLoadingsPercent: loadings,
-                    controllingCompartment: controlling,
-                    ceilingMeters: ceiling,
-                    ppN2Bar: ppN2,
-                    ppO2Bar: ppO2
-                )
-            )
+        switch source {
+        case .recorded:
+            return TissueAnalyticsLogbookReplay.buildRecordedReplay(from: session, environment: environment)
+        case .simulated:
+            return TissueAnalyticsLogbookReplay.buildSimulatedEstimate(from: session, environment: environment)
+        case .planned, .insufficientData:
+            return nil
         }
-
-        let finalCompartments = analyticsSamples.last.map { sample in
-            sample.compartmentLoadingsPercent.enumerated().map { index, loading in
-                TissueCompartmentLoading(
-                    compartmentIndex: index,
-                    loadingPercent: loading,
-                    n2Pressure: 0,
-                    hePressure: 0,
-                    totalInertPressure: 0
-                )
-            }
-        } ?? []
-
-        let controlling = finalCompartments.max(by: { $0.loadingPercent < $1.loadingPercent })?.compartmentIndex ?? 0
-        let maxPPN2 = analyticsSamples.map(\.ppN2Bar).max() ?? 0
-
-        let summary = TissueAnalyticsSummary(
-            maxDepthMeters: session.maxDepthMeters,
-            bottomTimeMinutes: max(1, totalMinutes),
-            ttsMinutes: totalMinutes,
-            gfLow: 30,
-            gfHigh: 85,
-            modeTitle: String(localized: "tissue_analytics.mode.logbook"),
-            totalRuntimeMinutes: totalMinutes
-        )
-
-        return TissueAnalyticsTrace(
-            samples: analyticsSamples,
-            finalCompartments: finalCompartments,
-            controllingCompartment: controlling,
-            maxPPN2Bar: maxPPN2,
-            endEquivalentMeters: NarcosisAnalyticsSupport.endMeters(fromPPN2Bar: maxPPN2, environment: environment),
-            source: .simulated,
-            summary: summary,
-            depthProfilePoints: depthPoints,
-            segments: [],
-            decoStops: []
-        )
     }
 
     private static func buildSamples(
@@ -287,34 +198,6 @@ enum TissueAnalyticsService {
             }
         }
         return points.last?.depthMeters ?? 0
-    }
-
-    private static func interpolatedDepth(at date: Date, samples: [DiveSample], fallback: Double) -> Double {
-        guard !samples.isEmpty else { return fallback }
-        if date <= samples[0].timestamp { return samples[0].depthMeters }
-        if date >= samples.last!.timestamp { return samples.last!.depthMeters }
-        for index in 1..<samples.count {
-            let previous = samples[index - 1]
-            let next = samples[index]
-            if date <= next.timestamp {
-                let span = next.timestamp.timeIntervalSince(previous.timestamp)
-                guard span > 0 else { return next.depthMeters }
-                let progress = date.timeIntervalSince(previous.timestamp) / span
-                return previous.depthMeters + (next.depthMeters - previous.depthMeters) * progress
-            }
-        }
-        return fallback
-    }
-
-    private static func assumedGas(for label: DiveGasLabel) -> BuhlmannGas {
-        switch label {
-        case .oc:
-            return BuhlmannGas(name: "Air", role: .bottom, oxygenFraction: 0.21, heliumFraction: 0, maxPPO2Bar: 1.4, switchDepthMeters: 0)
-        case .nitrox:
-            return BuhlmannGas(name: "EAN32", role: .bottom, oxygenFraction: 0.32, heliumFraction: 0, maxPPO2Bar: 1.4, switchDepthMeters: 0)
-        case .trimix:
-            return BuhlmannGas(name: "TX18/45", role: .bottom, oxygenFraction: 0.18, heliumFraction: 0.45, maxPPO2Bar: 1.4, switchDepthMeters: 0)
-        }
     }
 
     private static func plannerCacheKey(plan: DivePlanResult, input: GasPlanInput, mode: PlannerMode) -> String {
