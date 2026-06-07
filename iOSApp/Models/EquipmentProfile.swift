@@ -44,6 +44,10 @@ struct EquipmentProfile: Codable, Hashable {
         ]
     }
 
+    var isDIRConfigurationComplete: Bool {
+        DIRChecklistConfigurationEvaluator.isComplete(self)
+    }
+
     mutating func syncLegacyChecklistFlags() {
         guard checklistItems.isEmpty else { return }
         checklistItems = migratedChecklistItems
