@@ -1,9 +1,25 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-07  
-**Branch consigliato:** `main` = `origin/main` @ `a4cb04c`  
+**Branch consigliato:** `main` = `origin/main` @ `bc01f04`  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-06-07 — UI/UX readiness audit (`DIR_DIVING_UI_UX_READINESS_AUDIT_CURRENT.md`)
+
+Audit read-only post-implementazione **Apple Watch MAIN + iOS Companion MAIN** @ `c5d48b4`.
+
+| Campo | Valore |
+|-------|--------|
+| **Documento** | [`DIR_DIVING_UI_UX_READINESS_AUDIT_CURRENT.md`](DIR_DIVING_UI_UX_READINESS_AUDIT_CURRENT.md) |
+| **Watch readiness** | 82% |
+| **iOS readiness** | 84% |
+| **Overall UI/UX** | 83% |
+| **Verdict** | Ready for broader internal testing; P1 localization/a11y/device fullscreen QA open |
+
+Top blockers: iOS legal onboarding EN-only; Watch hardcoded IT log strings; iOS fullscreen not device-verified; logbook swipe-delete pattern.
 
 ---
 
@@ -1271,6 +1287,7 @@ Audit completo **MAIN** (Watch + iOS companion), struttura A–O. Versione Word:
 | [`DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md`](DIR_DIVING_IOS_BUHLMANN_UX_UI_READINESS_AUDIT.md) | Audit UX/UI readiness planner Bühlmann iOS (Docs) |
 | [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_UPDATED.md) | Audit comprehensive planner iOS @ `63ee0b4` (2026-06-04) |
 | [`DIR_DIVING_FULL_UI_UX_AUDIT_CURRENT.md`](DIR_DIVING_FULL_UI_UX_AUDIT_CURRENT.md) | Audit UI/UX cross-app Watch+iOS @ `bdd3a43` (2026-06-05) |
+| [`DIR_DIVING_UI_UX_READINESS_AUDIT_CURRENT.md`](DIR_DIVING_UI_UX_READINESS_AUDIT_CURRENT.md) | **Audit UI/UX post-implementazione** Watch 82% / iOS 84% @ `bc01f04` (2026-06-07) |
 | [`DIR_DIVING_UI_UX_READINESS_100_PLAN_CURRENT.md`](DIR_DIVING_UI_UX_READINESS_100_PLAN_CURRENT.md) | **Piano operativo UI/UX 100%** Watch+iOS @ `e47c860` |
 
 ---
