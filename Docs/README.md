@@ -4,7 +4,7 @@ Copyright Federico Lombardo di Monte Iato 2026
 
 DIR DIVING is a SwiftUI **watchOS + iOS companion** project (XcodeGen) for Apple Watch Ultra-class devices and iPhone. The stable **`main`** branch delivers **Diving mode** on Watch (depth, ascent awareness, **BUSSOLA**, log, GPS surface entry/exit, Subsurface CSV) plus the iOS companion (logbook, planner, equipment, analysis, sync). Snorkeling, Apnea, and Buddy Assist live on **experimental** branches only.
 
-**Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](INDEX.md) · **Baseline:** `main` = `origin/main` @ **`a6ccd8d`** (+ math remediation working tree). Run `xcodegen generate` before Xcode.
+**Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](INDEX.md) · **Baseline:** `main` = `origin/main` @ **`af31937`** (audit re-run) · post-audit fixes in progress on `main`. Run `xcodegen generate` before Xcode.
 
 ## Safety and limitations (MAIN)
 
@@ -24,7 +24,8 @@ DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent 
 
 | Pass | Commit | Contenuto |
 |------|--------|-----------|
-| **iOS MAIN algorithm math remediation** | `a6ccd8d` + WT | P1–P4 from [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) — Ratio Deco UX/PDF, checklist migration, Watch EN i18n, docs — [`IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md) · Ratio Deco doc: [`RATIO_DECO_COMPARATIVE_HEURISTIC.md`](RATIO_DECO_COMPARATIVE_HEURISTIC.md) |
+| **iOS MAIN algorithm math audit (re-run)** | `af31937` | Post-remediation audit @ `32f8d3e` — [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) |
+| **iOS MAIN algorithm math remediation** | `32f8d3e` | P1–P4 — [`IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md) · Ratio Deco doc: [`RATIO_DECO_COMPARATIVE_HEURISTIC.md`](RATIO_DECO_COMPARATIVE_HEURISTIC.md) |
 | **Ratio Deco (comparative heuristic)** | `e88c499` | iOS Planner method **alongside** Bühlmann — **not** a decompression algorithm; Bühlmann remains primary |
 | **Deep code audit remediation** | `a69bc4b` | MAIN-AUD-001…016 — signed sync ACK, HMAC photo management, cloud oversize guard, PDF protection, planner debounce, replay cache — [`Docs/MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_CURRENT.md) |
 | **Docs / branch alignment** | docs pass | INDEX, README, CSV, ROADMAP, branch policy @ `a69bc4b` — [`Docs/DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md) |
@@ -47,7 +48,7 @@ DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent 
 | iOS Buhlmann ZHL-16C multigas engine | corrente | Motore iOS-only ZHL-16C N2+He con Air/Nitrox/Trimix/Heliox, GF Low/High, NDL tissue-state, gas switch e stop da ceiling; reference-only/non certificato. Vedi [`Docs/DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md`](DIR_DIVING_IOS_BUHLMANN_ENGINE_DESIGN.md), [`Docs/DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md`](DIR_DIVING_IOS_BUHLMANN_MATH_VERIFICATION.md). |
 | Docs alignment | pass 2026-05-19 | README, INDEX, matrice CSV, branch strategy, audit delta; vedi [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260519.md) |
 
-**Pass documentale (2026-06-07):** iOS MAIN math audit remediation (code+tests+docs) @ `a6ccd8d` — [`IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md). **Bühlmann = primary engine; Ratio Deco = comparative heuristic only; non-certified/reference-only.** **QA fisica**, external Bühlmann validation, App Store **PENDING** — [`Docs/MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md`](MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md). **Do not claim App Store readiness.**
+**Pass documentale (2026-06-07):** iOS MAIN math audit @ `32f8d3e` / re-run @ `af31937`; post-audit non-physical fixes — [`IOS_MAIN_ALGORITHM_MATH_POST_AUDIT_FIX_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_POST_AUDIT_FIX_REPORT_CURRENT.md). **Bühlmann = primary engine; Ratio Deco = comparative heuristic only; non-certified/reference-only.** **QA fisica**, external Bühlmann validation, App Store **PENDING** — [`Docs/MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md`](MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md). **Do not claim App Store readiness.**
 
 **Recent Watch algorithm pass (2026-05-31):** WMATH-HIGH-001 → INFO-014; Watch + iOS sync XCTest verde su simulatori; vedi [`Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md`](WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md).
 

@@ -10,7 +10,32 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 | Commit `HEAD` | __________ |
 | Esecutore | __________ |
 
-## Audit remediation (2026-06-07 — iOS MAIN algorithm math @ `a6ccd8d`)
+## Audit remediation (2026-06-07 — iOS MAIN post-audit non-physical @ `af31937`)
+
+- [ ] Review [`IOS_MAIN_ALGORITHM_MATH_POST_AUDIT_FIX_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_POST_AUDIT_FIX_REPORT_CURRENT.md)
+- [ ] Confirm builds/tests green after post-audit pass
+- [ ] Physical QA still **PENDING** — [`MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md`](MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md)
+- [ ] External Bühlmann validation still **PENDING** — [`DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md`](DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md)
+- [ ] **No App Store readiness claim**
+
+## Non-physical readiness (conditional on green builds/tests)
+
+- [ ] Documentation baseline aligned (`af31937` audit re-run; current HEAD in post-audit report)
+- [ ] Briefing PDF, manual dive, Ratio Deco MOD, Watch alarm/reminder/photo tests added
+- [ ] Watch localization static sweep tests pass
+- [ ] Logbook tissue simulation labeling verified
+
+## Still pending before External TestFlight / App Store
+
+- [ ] Physical Watch Ultra QA — [`WATCH_ULTRA_PHYSICAL_QA_MATRIX.md`](WATCH_ULTRA_PHYSICAL_QA_MATRIX.md)
+- [ ] Paired iPhone + Watch QA
+- [ ] iCloud two-device QA — [`ICLOUD_TWO_DEVICE_QA_MATRIX.md`](ICLOUD_TWO_DEVICE_QA_MATRIX.md)
+- [ ] External Bühlmann validation — [`DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md`](DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md)
+- [ ] Subsurface external validation
+- [ ] Accessibility Dynamic Type / VoiceOver matrix — [`IOS_DYNAMIC_TYPE_VOICEOVER_QA_MATRIX.md`](IOS_DYNAMIC_TYPE_VOICEOVER_QA_MATRIX.md)
+- [ ] Legal review
+
+## Audit remediation (2026-06-07 — iOS MAIN algorithm math @ `32f8d3e`)
 
 - [ ] Review [`IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md) — P1–P4 non-physical fixes
 - [ ] Review [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) — source audit

@@ -84,6 +84,7 @@ enum BriefingPDFBuilder {
             page.drawParagraph(String(localized: "planner.briefing.share_note"))
 
             if let ratioDeco = context.plan.ratioDeco, ratioDeco.method != .buhlmann {
+                page.ensureSpace(160)
                 page.drawSpacer()
                 page.drawSectionTitle(String(localized: "pdf.export.ratio_deco.section"))
                 page.drawParagraph(String(localized: "pdf.export.ratio_deco.disclaimer"))

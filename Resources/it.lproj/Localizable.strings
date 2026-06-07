@@ -559,6 +559,9 @@
 "settings.row.units.picker.a11y" = "Unità";
 "alarms.depth.default_off_hint" = "L'allarme profondità massima è disattivato di default. Attivalo e imposta una soglia prima di immergerti.";
 "alarms.depth.preset_30m" = "Imposta soglia 30 m";
+"watch.alarm.depth_exceeded_format" = "ALLARME PROFONDITÀ > %@";
+"watch.alarm.runtime_exceeded_format" = "ALLARME TEMPO > %lld min";
+"watch.alarm.battery_low_format" = "ALLARME BATTERIA < %lld%%";
 "sync.pending.encode_failed" = "Impossibile salvare la coda sync in attesa.";
 "sync.pending.retention_warning" = "Elemento sync in attesa datato; in attesa di ack firmato iPhone.";
 "user_images.error.not_image" = "Il file non è un'immagine valida.";

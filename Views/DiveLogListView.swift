@@ -183,7 +183,7 @@ struct DiveLogListView: View {
 
             if let listExportURL {
                 ShareLink(item: listExportURL) {
-                    Text(String(localized: "CONDIVIDI CSV"))
+                    Text(String(localized: "log.share.csv.button"))
                         .font(DiveUI.Typography.commandButton)
                         .foregroundStyle(DiveUI.blue)
                         .frame(maxWidth: .infinity, minHeight: 40)
