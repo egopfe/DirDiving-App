@@ -257,3 +257,17 @@ supersaturationPercent_display = clamp(0, 100, ((totalInert - inspiredInert) / (
 Grouped chart value at time `t`: **max** `loadPercent_display` among compartments in each group {1–4, 5–8, 9–12, 13–16}.
 
 Verified by `BuhlmannTissueHistoryTests` (finite values, 16 compartments, golden fixture TTS/stop stability).
+
+## 13. Canonical Engine Consistency (2026-06-07)
+
+Hardening pass verifies one canonical `BuhlmannEngine.plan` result feeds all derived outputs:
+
+| Check | Test |
+|---|---|
+| `PlannerService` TTS matches `BuhlmannPlanner.enginePlan` | `testPlannerServiceTTSMatchesEnginePlan` |
+| Preview NDL uses `PlannerEnvironment` (not silent sea-level) | `testPreviewNDLUsesPlannerEnvironment` |
+| Full-plan CNS ≥ descent+bottom on deco profile | `testFullPlanCNSIncludesDecoAndExceedsDescentBottom` |
+| Base mode excludes inactive deco cylinders from projection | `testBaseModeStripsDecoCylindersFromProjection` |
+| Ascent table deco rows match `plan.decoStops` | `testAscentTableDecoRowsMatchEngineStops` |
+
+Suite: `BuhlmannEngineCanonicalConsistencyTests.swift`.
