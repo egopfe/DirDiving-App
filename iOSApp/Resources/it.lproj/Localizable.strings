@@ -785,6 +785,8 @@
 "equipment.reset.cancel" = "Annulla";
 "equipment.reset.confirm.message" = "Bombole, gas, SAC e checklist torneranno ai valori standard salvati localmente.";
 "equipment.badge.field" = "FIELD";
+"equipment.badge.dir.complete.a11y" = "Configurazione DIR completa";
+"equipment.badge.dir.incomplete.a11y" = "Configurazione DIR incompleta";
 "equipment.sac_default" = "SAC default";
 "equipment.my_equipment.button" = "La mia attrezzatura";
 "equipment.my_equipment.title" = "La mia attrezzatura";
