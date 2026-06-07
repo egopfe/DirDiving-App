@@ -1143,6 +1143,11 @@ struct PlanResultView: View {
         store.plan.gasAnalysis.cnsDescentBottomExceedsPlannerThreshold(checkEnabled: cnsDescentBottomCheckEnabled)
     }
 
+    private var fullPlanCNSWarningActive: Bool {
+        store.plan.gasAnalysis.showsFullPlanOxygenExposureWarning
+            || store.plan.states.contains(.oxygenExposureElevated)
+    }
+
     private var cnsDescentBottomTileAccessibilityLabel: String {
         let value = Formatters.zero(store.plan.gasAnalysis.cnsDescentBottomPercent)
         let base = "\(String(localized: "planner.metric.cns_descent_bottom")), \(value) percent"
@@ -1636,7 +1641,8 @@ struct PlanResultView: View {
                     title: String(localized: "planner.metric.cns_full_plan"),
                     value: store.plan.gasAnalysis.cnsPercentDisplay,
                     unit: "%",
-                    color: DIRTheme.green
+                    color: fullPlanCNSWarningActive ? DIRTheme.yellow : DIRTheme.green,
+                    icon: fullPlanCNSWarningActive ? "exclamationmark.triangle.fill" : nil
                 )
             }
         }

@@ -104,14 +104,16 @@ enum TissueAnalyticsService {
             )
 
             for index in 0..<BuhlmannConstants.compartmentCount {
-                let metrics = BuhlmannTissueHistorySampler.compartmentMetrics(
+                guard let metrics = BuhlmannTissueHistorySampler.compartmentMetrics(
                     compartmentIndex: index,
                     state: state,
                     depthMeters: depth,
                     gas: gas,
                     gf: gf,
                     environment: environment
-                )
+                ) else {
+                    continue
+                }
                 loadings[index] = metrics.loadPercent
                 if metrics.loadPercent > maxLoad {
                     maxLoad = metrics.loadPercent

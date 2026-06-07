@@ -71,4 +71,81 @@ final class PlannerAscentTableTests: XCTestCase {
         let rows = PlannerAscentTableBuilder.rows(from: engine, decoStops: BuhlmannPlanner.decoStops(from: engine), environment: environment())
         XCTAssertTrue(rows.contains(where: { $0.gas.contains("TRIMIX") }))
     }
+
+    func testAscentTableSurfaceRowIsLast() throws {
+        var input = BuhlmannTestSupport.gasPlanInput(depth: 40, bottomMinutes: 20)
+        input.bottomGas = GasMix(name: "TX 18/45", role: .bottom, oxygen: 0.18, helium: 0.45, maxPPO2: 1.4)
+        input.plannerCylinders = [
+            PlannerCylinderEntry(role: .bottom, gas: input.bottomGas, switchDepthMeters: 40),
+            PlannerCylinderEntry(role: .deco, gas: GasMix(name: "EAN50", role: .deco, oxygen: 0.5, helium: 0, maxPPO2: 1.6), switchDepthMeters: 21)
+        ]
+        let plan = PlannerService.makePlan(input: input)
+        if plan.decoStops.isEmpty {
+            throw XCTSkip("No deco stops for profile")
+        }
+        XCTAssertEqual(plan.ascentTableRows.last?.kind, .surface)
+    }
+
+    func testAscentTableFollowsBriefingOrderWithoutDescentRows() throws {
+        var input = BuhlmannTestSupport.gasPlanInput(depth: 40, bottomMinutes: 20)
+        input.bottomGas = GasMix(name: "TX 18/45", role: .bottom, oxygen: 0.18, helium: 0.45, maxPPO2: 1.4)
+        input.plannerCylinders = [
+            PlannerCylinderEntry(role: .bottom, gas: input.bottomGas, switchDepthMeters: 40),
+            PlannerCylinderEntry(role: .deco, gas: GasMix(name: "EAN50", role: .deco, oxygen: 0.5, helium: 0, maxPPO2: 1.6), switchDepthMeters: 21)
+        ]
+        let engine = BuhlmannPlanner.enginePlan(input: input)
+        let stops = BuhlmannPlanner.decoStops(from: engine)
+        if stops.isEmpty {
+            throw XCTSkip("No deco stops for profile")
+        }
+        let rows = PlannerAscentTableBuilder.rows(from: engine, decoStops: stops, environment: environment())
+
+        XCTAssertEqual(rows.first?.kind, .bottom)
+        XCTAssertEqual(rows.last?.kind, .surface)
+
+        let descentSegmentCount = engine.segments.filter { $0.kind == .descent }.count
+        XCTAssertGreaterThan(descentSegmentCount, 0, "Expected descent segments in engine plan")
+
+        if let firstTravel = rows.firstIndex(where: { $0.kind == .travel }),
+           let firstDeco = rows.firstIndex(where: { $0.kind == .decoStop }) {
+            XCTAssertLessThan(firstTravel, firstDeco)
+        }
+
+        let decoDepths = rows.filter { $0.kind == .decoStop }.map(\.depthMeters)
+        XCTAssertEqual(decoDepths, stops.map(\.depthMeters))
+
+        let lastBottomIndex = engine.segments.lastIndex(where: { $0.kind == .bottom }) ?? -1
+        let expectedTravelCount = engine.segments[(lastBottomIndex + 1)...]
+            .filter { $0.kind == .ascent || $0.kind == .gasSwitch }
+            .count
+        XCTAssertEqual(rows.filter { $0.kind == .travel }.count, expectedTravelCount)
+    }
+
+    func testAscentTablePPO2ValuesAreFiniteForRealRows() throws {
+        var input = BuhlmannTestSupport.gasPlanInput(depth: 40, bottomMinutes: 20)
+        input.bottomGas = GasMix(name: "TX 18/45", role: .bottom, oxygen: 0.18, helium: 0.45, maxPPO2: 1.4)
+        input.plannerCylinders = [
+            PlannerCylinderEntry(role: .bottom, gas: input.bottomGas, switchDepthMeters: 40),
+            PlannerCylinderEntry(role: .deco, gas: GasMix(name: "EAN50", role: .deco, oxygen: 0.5, helium: 0, maxPPO2: 1.6), switchDepthMeters: 21)
+        ]
+        let plan = PlannerService.makePlan(input: input)
+        if plan.decoStops.isEmpty {
+            throw XCTSkip("No deco stops for profile")
+        }
+        for row in plan.ascentTableRows where row.kind != .surface {
+            XCTAssertTrue(row.ppO2.isFinite)
+            XCTAssertFalse(row.ppO2.isNaN)
+            XCTAssertGreaterThanOrEqual(row.ppO2, 0)
+        }
+    }
+
+    func testIncompletePlanSuppressesDecompressionTableRows() throws {
+        var input = BuhlmannTestSupport.gasPlanInput(depth: 120, bottomMinutes: 120)
+        input.bottomGas = GasMix(name: "Air", role: .bottom, oxygen: 0.21, helium: 0, maxPPO2: 1.4)
+        let plan = PlannerService.makePlan(input: input)
+        if plan.calculationCompleteness != .incompletePartialStops {
+            throw XCTSkip("Profile did not hit calculation limit")
+        }
+        XCTAssertTrue(plan.decoStops.isEmpty)
+    }
 }

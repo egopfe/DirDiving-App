@@ -100,6 +100,68 @@ final class PlannerCNSCopyTests: XCTestCase {
         XCTAssertEqual(analysis.cnsAscentDecoEstimatePercent, 0, accuracy: 0.001)
     }
 
+    func testFullPlanOxygenExposureWarningUsesExistingPlannerState() {
+        let elevated = TechnicalGasAnalysis(
+            gas: GasMix(name: "Air", oxygen: 0.21, helium: 0, maxPPO2: 1.4),
+            ppO2AtDepth: 1.2,
+            densityAtDepth: 5,
+            densityRating: .green,
+            endMeters: 20,
+            eadMeters: 20,
+            consumptionLiters: 100,
+            remainingLiters: 500,
+            remainingBar: 150,
+            rockBottomLiters: 50,
+            minimumGasBar: 50,
+            turnPressureBar: 120,
+            cnsPercent: 95,
+            cnsDescentBottomPercent: 18,
+            otu: 40,
+            cnsDailyPercent: 95,
+            otuDaily24h: 40,
+            otuWeekly: 40,
+            airBreakRecoveryApplied: false,
+            warnings: [],
+            states: [.oxygenExposureElevated],
+            usesBottomPhaseConsumptionEstimate: false
+        )
+        let normal = TechnicalGasAnalysis(
+            gas: GasMix(name: "Air", oxygen: 0.21, helium: 0, maxPPO2: 1.4),
+            ppO2AtDepth: 1.2,
+            densityAtDepth: 5,
+            densityRating: .green,
+            endMeters: 20,
+            eadMeters: 20,
+            consumptionLiters: 100,
+            remainingLiters: 500,
+            remainingBar: 150,
+            rockBottomLiters: 50,
+            minimumGasBar: 50,
+            turnPressureBar: 120,
+            cnsPercent: 20,
+            cnsDescentBottomPercent: 18,
+            otu: 10,
+            cnsDailyPercent: 20,
+            otuDaily24h: 10,
+            otuWeekly: 10,
+            airBreakRecoveryApplied: false,
+            warnings: [],
+            states: [],
+            usesBottomPhaseConsumptionEstimate: false
+        )
+        XCTAssertTrue(elevated.showsFullPlanOxygenExposureWarning)
+        XCTAssertFalse(normal.showsFullPlanOxygenExposureWarning)
+    }
+
+    func testBriefingUsesTTSTerminologyOnly() throws {
+        let en = try loadStrings(named: "en")
+        let it = try loadStrings(named: "it")
+        XCTAssertTrue(en["planner.briefing.gf_tts"]?.contains("TTS estimate") == true)
+        XCTAssertFalse(en["planner.briefing.gf_tts"]?.contains("TTR") == true)
+        XCTAssertTrue(it["planner.briefing.gf_tts"]?.contains("stima TTS") == true)
+        XCTAssertFalse(it["planner.briefing.gf_tts"]?.contains("TTR") == true)
+    }
+
     private func loadStrings(named language: String) throws -> [String: String] {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
