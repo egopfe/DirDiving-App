@@ -1057,7 +1057,7 @@ final class DiveManager: ObservableObject {
         let units = DIRUnitPreference.fromStorage(UserDefaults.standard.string(forKey: DIRUnitPreference.storageKey) ?? DIRUnitPreference.metric.rawValue)
         let display = WatchDepthFormatting.display(meters: threshold, units: units)
         triggerAlarm(
-            String(format: String(localized: "ALLARME PROFONDITÀ > %@"), "\(display.valueText) \(display.unitLabel)"),
+            String(format: String(localized: "watch.alarm.depth_exceeded_format"), "\(display.valueText) \(display.unitLabel)"),
             lastDate: &lastDepthAlarmDate,
             blinkSource: .depth
         )
@@ -1067,7 +1067,7 @@ final class DiveManager: ObservableObject {
         let runtimeThreshold = runtimeAlarmThresholdMinutes
         if runtimeAlarmEnabled, runtime > TimeInterval(runtimeThreshold * 60) {
             triggerAlarm(
-                String(format: String(localized: "ALLARME TEMPO > %lld min"), runtimeThreshold),
+                String(format: String(localized: "watch.alarm.runtime_exceeded_format"), runtimeThreshold),
                 lastDate: &lastRuntimeAlarmDate,
                 blinkSource: .runtime
             )
@@ -1078,7 +1078,7 @@ final class DiveManager: ObservableObject {
             let batteryThreshold = Float(batteryAlarmThresholdPercent) / 100
             if device.batteryLevel >= 0, device.batteryLevel < batteryThreshold {
                 triggerAlarm(
-                    String(format: String(localized: "ALLARME BATTERIA < %lld%%"), batteryAlarmThresholdPercent),
+                    String(format: String(localized: "watch.alarm.battery_low_format"), batteryAlarmThresholdPercent),
                     lastDate: &lastBatteryAlarmDate,
                     blinkSource: .battery
                 )
@@ -1342,6 +1342,12 @@ extension DiveManager {
     func testHook_evaluateDiveRemindersForTests() {
         evaluateDiveReminders()
     }
+
+    func testHook_evaluateDepthAlarmForTests() {
+        evaluateDepthAlarm()
+    }
+
+    var testHook_alarmWarningMessage: String? { alarmWarningMessage }
 
     var testHook_diveReminderRuntimeState: DiveReminderRuntimeState {
         diveReminderRuntimeState

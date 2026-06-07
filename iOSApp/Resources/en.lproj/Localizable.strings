@@ -604,6 +604,7 @@
 "more.settings.local_only_value" = "Not synced to Watch";
 "manual_dive.default_site" = "Manual dive";
 "manual_dive.validation.depth_order" = "Max depth must be greater than or equal to average depth.";
+"manual_dive.validation.invalid_depth" = "Enter valid max and average depths before saving.";
 "equipment.checklist.gas" = "Gas";
 "equipment.checklist.pressure" = "BAR / PSI";
 "equipment.checklist.remove" = "Remove item";
@@ -1367,6 +1368,7 @@
 "tissue_analytics.entry.title" = "Tissue loading and narcosis";
 "tissue_analytics.entry.subtitle" = "View Bühlmann analysis, compartments and narcotic loading";
 "tissue_analytics.logbook.entry.title" = "Tissue & Narcosis";
+"tissue_analytics.logbook.entry.subtitle" = "Informational estimate — not full Bühlmann replay of the logged profile";
 "tissue_analytics.nav.title" = "Dive profile";
 "tissue_analytics.tab.summary" = "SUMMARY";
 "tissue_analytics.tab.profile" = "PROFILE";

@@ -263,6 +263,7 @@ targets:
       - iOSApp/Services/WatchPhotoPreprocessor.swift
       - iOSApp/Utils/AnalysisDashboardMath.swift
       - iOSApp/Utils/ManualDiveEditorDefaults.swift
+      - iOSApp/Utils/ManualDiveEditorValidation.swift
       - iOSApp/Utils/RouteSummaryAggregation.swift
       - iOSApp/Utils/PressureDisplayMath.swift
       - iOSApp/Services/PDF/PDFDocumentBuilder.swift
@@ -279,6 +280,7 @@ targets:
     resources:
       - path: Tests/iOSAlgorithmTests/Fixtures
         type: folder
+      - path: iOSApp/Resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios.algorithmtests
