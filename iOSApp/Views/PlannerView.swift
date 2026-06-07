@@ -64,6 +64,12 @@ struct PlannerView: View {
                             plannerReferenceDetailsSection
                             Group {
                                 modePicker
+                                if store.mode != .base {
+                                    decompressionMethodCard
+                                }
+                                if store.mode != .base, store.decompressionMethod != .buhlmann {
+                                    RatioDecoPresetCard()
+                                }
                                 profileCard
                                 if modePresentation.showsRepetitivePlanning {
                                     repetitivePlanningCard
@@ -202,6 +208,12 @@ struct PlannerView: View {
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private var decompressionMethodCard: some View {
+        DIRCard(String(localized: "planner.deco_method.header"), icon: "arrow.triangle.branch", accent: DIRTheme.cyan) {
+            PlannerDecompressionMethodPicker(method: $store.decompressionMethod, mode: store.mode)
         }
     }
 
@@ -1531,6 +1543,9 @@ struct PlanResultView: View {
                     bailoutScheduleHint
                     switch tab {
                     case .plan:
+                        if store.decompressionMethod != .buhlmann, store.mode != .base {
+                            RatioDecoComparisonSection(unitPreference: unitPreference)
+                        }
                         if modePresentation.showsGasLedger {
                             gasLedgerCard
                         }
