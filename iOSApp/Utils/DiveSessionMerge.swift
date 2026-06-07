@@ -1,9 +1,27 @@
 import Foundation
+import os
+
+/// Documented merge policy for iCloud / sync session reconciliation.
+enum DiveSessionMergePolicy: String {
+    /// Metadata follows last-write-wins (`endDate`, then sample count, then duration).
+    case metadataLastWriteWins
+    /// Compatible depth profiles are union-merged by timestamp with max depth per second.
+    case compatibleProfileUnion
+    /// Divergent depth profiles keep the newer session's whole profile (no hybrid samples).
+    case divergentProfileUsesNewerWholeProfile
+}
 
 enum DiveSessionMerge {
+    private static let logger = Logger(subsystem: "com.egopfe.dirdiving.ios", category: "DiveSessionMerge")
+
     static func preferred(_ local: DiveSession, _ remote: DiveSession) -> DiveSession {
         let winner = newer(local, remote)
         let loser = winner.id == local.id ? remote : local
+        if DiveSessionProfileDivergence.profilesDiverge(winner, loser) {
+            logger.notice(
+                "Profile merge policy \(DiveSessionMergePolicy.divergentProfileUsesNewerWholeProfile.rawValue, privacy: .public): session \(winner.id.uuidString, privacy: .public) keeps newer whole profile; divergent samples from loser discarded."
+            )
+        }
         let entryGPS = winner.entryGPS ?? loser.entryGPS
         let exitGPS = winner.exitGPS ?? loser.exitGPS
         let entryGPSFixSource = winner.entryGPS == nil && loser.entryGPS != nil ? loser.entryGPSFixSource : winner.entryGPSFixSource

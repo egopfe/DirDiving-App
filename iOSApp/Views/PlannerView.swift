@@ -1148,6 +1148,38 @@ struct PlanResultView: View {
             || store.plan.states.contains(.oxygenExposureElevated)
     }
 
+    private var weeklyOTUWarningActive: Bool {
+        store.plan.gasAnalysis.showsWeeklyOTUElevatedWarning
+    }
+
+    private var weeklyOTUTileAccessibilityLabel: String {
+        let value = Formatters.zero(store.plan.gasAnalysis.otuWeekly)
+        let base = "\(String(localized: "planner.metric.otu_weekly")), \(value)"
+        guard weeklyOTUWarningActive else { return base }
+        return "\(String(localized: "planner.warning.otu_weekly_elevated")) \(base)"
+    }
+
+    private var weeklyOTUWarningBanner: some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(DIRTheme.yellow)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(String(localized: "planner.warning.otu_weekly_elevated"))
+                    .font(.caption)
+                    .foregroundStyle(DIRTheme.yellow)
+                Text(String(localized: "planner.metric.otu_weekly.footnote"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+            }
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.yellow.opacity(0.12)))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(localized: "planner.warning.otu_weekly_elevated"))
+        .accessibilityHint(String(localized: "planner.metric.otu_weekly.footnote"))
+    }
+
     private var cnsDescentBottomTileAccessibilityLabel: String {
         let value = Formatters.zero(store.plan.gasAnalysis.cnsDescentBottomPercent)
         let base = "\(String(localized: "planner.metric.cns_descent_bottom")), \(value) percent"
@@ -1683,6 +1715,22 @@ struct PlanResultView: View {
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: "NDL", value: Formatters.one(store.plan.ndlMinutes), unit: "min", color: DIRTheme.cyan)
                 }
+                if store.plan.gasAnalysis.showsWeeklyOTUMetric {
+                    Divider().overlay(DIRTheme.hairline)
+                    HStack(spacing: 0) {
+                        DIRMetricTile(
+                            title: String(localized: "planner.metric.otu_weekly"),
+                            value: Formatters.zero(store.plan.gasAnalysis.otuWeekly),
+                            color: weeklyOTUWarningActive ? DIRTheme.yellow : DIRTheme.cyan,
+                            icon: weeklyOTUWarningActive ? "exclamationmark.triangle.fill" : nil
+                        )
+                        .accessibilityLabel(weeklyOTUTileAccessibilityLabel)
+                    }
+                    if weeklyOTUWarningActive {
+                        weeklyOTUWarningBanner
+                    }
+                    plannerResultMutedFootnote(String(localized: "planner.metric.otu_weekly.footnote"))
+                }
                 Divider().overlay(DIRTheme.hairline)
                 HStack(spacing: 0) {
                     DIRMetricTile(
@@ -2039,6 +2087,11 @@ struct PlanResultView: View {
     private var ascentTable: some View {
         DIRCard(String(localized: "planner.result.ascent_plan"), icon: "arrow.up.circle.fill", accent: DIRTheme.cyan) {
             Text(String(localized: "planner.result.ascent_plan.subtitle"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Text(String(localized: "planner.table.briefing_order.footnote"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)

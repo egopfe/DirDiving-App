@@ -15,7 +15,10 @@ final class PlannerCNSCopyTests: XCTestCase {
         "planner.metric.cns_ascent_deco_estimate.footnote",
         "planner.settings.cns_descent_bottom_15_check.description",
         "planner.accessibility.cns_descent_bottom.warning.label",
-        "planner.accessibility.cns_descent_bottom.warning.hint"
+        "planner.accessibility.cns_descent_bottom.warning.hint",
+        "planner.metric.otu_weekly",
+        "planner.metric.otu_weekly.footnote",
+        "planner.warning.otu_weekly_elevated"
     ]
 
     func testPlannerCNSLocalizationKeysExistInEnglishAndItalian() throws {

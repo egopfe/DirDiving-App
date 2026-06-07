@@ -175,7 +175,12 @@ enum GasPlanningService {
                 rockBottomLiters: base.rockBottomLiters,
                 environment: environment
             ),
-            exposurePlannerStates(from: exposure, segments: enginePlan.segments, environment: environment)
+            exposurePlannerStates(
+                from: exposure,
+                segments: enginePlan.segments,
+                environment: environment,
+                cnsDescentBottomPercent: cnsDescentBottomPercent
+            )
         )
         if maxDensity >= input.densityDangerLimit {
             states = mergeStates(states, [.gasDensityDanger])
@@ -662,7 +667,12 @@ enum GasPlanningService {
                 rockBottomLiters: rockBottom,
                 environment: input.plannerEnvironment
             ),
-            exposurePlannerStates(from: exposure, segments: exposureSegments, environment: input.plannerEnvironment)
+            exposurePlannerStates(
+                from: exposure,
+                segments: exposureSegments,
+                environment: input.plannerEnvironment,
+                cnsDescentBottomPercent: cnsDescentBottomPercent
+            )
         )
         return TechnicalGasAnalysis(
             gas: gas,
@@ -693,11 +703,33 @@ enum GasPlanningService {
     private static func exposurePlannerStates(
         from exposure: OxygenExposureResult,
         segments: [BuhlmannRuntimeSegment] = [],
-        environment: PlannerEnvironment = .seaLevelSaltWater
+        environment: PlannerEnvironment = .seaLevelSaltWater,
+        cnsDescentBottomPercent: Double = 0,
+        cnsDescentBottomCheckEnabled: Bool = PlannerCNSDescentBottomCheckSettings.defaultEnabled
     ) -> [PlannerResultState] {
         var states: [PlannerResultState] = []
         if segmentsExceedGasPPO2Limit(segments, environment: environment) {
             states.append(.PPO2Exceeded)
+        }
+        for warning in exposure.warningStates {
+            switch warning {
+            case .elevatedCNS:
+                states.append(.cnsSingleElevated)
+            case .elevatedDailyCNS:
+                states.append(.cnsDailyElevated)
+            case .elevatedOTU:
+                states.append(.otuDiveElevated)
+            case .elevatedDailyOTU:
+                states.append(.otuDailyElevated)
+            case .elevatedWeeklyOTU:
+                states.append(.otuWeeklyElevated)
+            case .invalidExposureInput:
+                break
+            }
+        }
+        if cnsDescentBottomCheckEnabled,
+           CNSDescentBottomPlannerRule.exceedsPlannerThreshold(percent: cnsDescentBottomPercent) {
+            states.append(.cnsDescentBottomThresholdExceeded)
         }
         if !exposure.warningStates.isEmpty {
             states.append(.oxygenExposureElevated)

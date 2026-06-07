@@ -15,4 +15,4 @@ Quick links:
 | Feature matrix (CSV) | [`Docs/DIR_DIVING_Feature_Comparison.csv`](Docs/DIR_DIVING_Feature_Comparison.csv) |
 | Release / TestFlight | [`Docs/RELEASE_CHECKLIST.md`](Docs/RELEASE_CHECKLIST.md) |
 
-**Release baseline (`main`):** `90dc3f5` — run `xcodegen generate` before opening `DIRDiving.xcodeproj`.
+**Release baseline (`main`):** see [`Docs/INDEX.md`](Docs/INDEX.md) for current `origin/main` HEAD — run `xcodegen generate` before opening `DIRDiving.xcodeproj`.
