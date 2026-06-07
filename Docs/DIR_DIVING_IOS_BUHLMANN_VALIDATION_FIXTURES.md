@@ -36,6 +36,26 @@ On Windows, Xcode tooling is unavailable; validation is limited to static code i
 | `BuhlmannNumericalRobustnessTests.swift` | invalid profile values, zero depth/time, invalid segments, finite outputs, unit round trips |
 | `BuhlmannReauditFixTests.swift` | 2026-05-28 reaudit fixes: environment NDL/ceiling, repetitive canonical result, duplicate labels, rock-bottom, surface interval, oxygen exposure, GF seeded tissue |
 | `BuhlmannReleaseHardeningTests.swift` | external reference envelopes, TTS/runtime split, residual tissue seed, full segment gas-operability checks, travel-gas ascent waypoints |
+| `BuhlmannExternalValidationMetadataTests.swift` | fixture validationStatus/referenceSource/tolerance metadata; no certified-equivalence claims |
+
+## Validation metadata (2026-06-07)
+
+JSON fixtures may omit metadata fields; `PlannerFixture` decoder applies defaults:
+
+| Field | Default when omitted |
+|---|---|
+| `validationStatus` | `internal_regression` |
+| `referenceSource` | `internal-ios-buhlmann-suite` |
+| `validationNotes` | Internal regression envelope; not third-party certified |
+| `ascentDescentAssumptions` | Schreiner segments; sea-level salt unless `environment` set |
+
+Allowed `validationStatus` values:
+
+- `internal_regression` — XCTest range envelopes (current)
+- `pending_external_validation` — placeholder until external reference captured
+- `external_reference_validated` — **future only**; requires signed external campaign
+
+See [`DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md`](DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md).
 
 ## Extended Golden Fixture Schema (2026-05-29)
 

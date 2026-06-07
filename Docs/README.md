@@ -4,7 +4,7 @@ Copyright Federico Lombardo di Monte Iato 2026
 
 DIR DIVING is a SwiftUI **watchOS + iOS companion** project (XcodeGen) for Apple Watch Ultra-class devices and iPhone. The stable **`main`** branch delivers **Diving mode** on Watch (depth, ascent awareness, **BUSSOLA**, log, GPS surface entry/exit, Subsurface CSV) plus the iOS companion (logbook, planner, equipment, analysis, sync). Snorkeling, Apnea, and Buddy Assist live on **experimental** branches only.
 
-**Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](INDEX.md) · **Baseline:** `main` = `origin/main` @ **`ecad0d9`** (UI/UX readiness 100% pass for Watch and iOS MAIN). Alignment report: [`Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260606.md`](DOCUMENTATION_BRANCH_ALIGNMENT_20260606.md). Experimental sync report: [`Docs/EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md`](EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md). Run `xcodegen generate` before Xcode.
+**Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](INDEX.md) · **Baseline:** `main` = `origin/main` — see [`Docs/INDEX.md`](INDEX.md) for current HEAD. Run `xcodegen generate` before Xcode.
 
 ## Safety and limitations (MAIN)
 
