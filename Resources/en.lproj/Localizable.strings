@@ -305,6 +305,7 @@
 "live.metric.max_depth" = "Max depth";
 "live.metric.avg_depth" = "Avg depth";
 "live.a11y.ttv_runtime" = "TTV session %@, runtime %@ minutes";
+"live.a11y.ttv_hint" = "Informative TTV from average depth and duration; not a decompression value or time to surface.";
 "log.share.csv.button" = "SHARE CSV";
 "log.export.subsurface.button" = "EXPORT (SUBSURFACE)";
 "log.delete.button" = "DELETE LOG";
@@ -772,6 +773,8 @@
 "dive_reminder.overlay.single_title" = "REMINDER";
 "dive_reminder.overlay.multiple_title_format" = "%lld REMINDERS";
 "dive_reminder.overlay.more_format" = "+%lld";
+"dive_reminder.overlay.runtime_a11y" = "Runtime at trigger %@";
+"dive_reminder.overlay.a11y.hint" = "Non-interactive reminder overlay during the dive.";
 "dive_reminder.preset.check_gas" = "Check gas";
 "dive_reminder.preset.check_buddy" = "Check buddy";
 "dive_reminder.preset.check_runtime" = "Check runtime";

@@ -63,4 +63,29 @@ final class DiveLogStoreTests: XCTestCase {
         XCTAssertEqual(store.sessions.count, 1)
         XCTAssertNil(store.lastPersistenceError)
     }
+
+    func testDeleteRemovesSessionAndRecordsTombstone() {
+        let store = DiveLogStore()
+        let start = Date()
+        let valid = DiveSession(
+            startDate: start,
+            endDate: start.addingTimeInterval(60),
+            durationSeconds: 60,
+            maxDepthMeters: 12,
+            avgDepthMeters: 10,
+            avgWaterTemperatureCelsius: nil,
+            minWaterTemperatureCelsius: nil,
+            maxWaterTemperatureCelsius: nil,
+            ttv: 11,
+            entryGPS: nil,
+            exitGPS: nil,
+            samples: [DiveSample(timestamp: start, depthMeters: 12, temperatureCelsius: nil)],
+            isManual: true,
+            hasDepthProfile: false
+        )
+        store.add(valid)
+        store.delete(id: valid.id)
+        XCTAssertTrue(store.sessions.isEmpty)
+        XCTAssertTrue(store.isDeleted(id: valid.id))
+    }
 }
