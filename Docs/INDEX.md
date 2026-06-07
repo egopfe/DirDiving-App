@@ -1,9 +1,24 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-07  
-**Branch consigliato:** `main` = `origin/main` @ **`a69bc4b`**  
+**Branch consigliato:** `main` = `origin/main` @ **`a6ccd8d`**  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-06-07 — iOS MAIN algorithm math remediation
+
+Remediation **P1–P4** from [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md). **455** iOS algorithm XCTest passed @ iPhone 17 Pro sim; Watch algorithm tests green @ Ultra 3 sim.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit** | [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) |
+| **Remediation report** | [`IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md) |
+| **Ratio Deco user doc** | [`RATIO_DECO_COMPARATIVE_HEURISTIC.md`](RATIO_DECO_COMPARATIVE_HEURISTIC.md) |
+| **Bühlmann** | Primary decompression engine (unchanged math) |
+| **Ratio Deco** | Comparative heuristic only |
+| **Physical / external QA** | **PENDING** — [`MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md`](MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md) |
 
 ---
 

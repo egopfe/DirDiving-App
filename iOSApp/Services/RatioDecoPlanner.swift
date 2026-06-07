@@ -41,6 +41,9 @@ enum RatioDecoPlanner {
         }
 
         var warnings: [RatioDecoWarning] = []
+        if !working.plannerCylinders.contains(where: { $0.role == .deco }) {
+            warnings.append(.noDecoGases)
+        }
         let firstStop = resolvedFirstStopDepth(preset: preset, input: working)
         var stopDepths = stopDepths(from: firstStop, step: preset.stopStepMeters)
 
@@ -179,8 +182,11 @@ enum RatioDecoPlanner {
         let target = max(totalMinutes, minimumTotal)
         var weights: [Double]
         switch mode {
-        case .balanced, .linear:
+        case .balanced:
             weights = Array(repeating: 1, count: stopCount).map(Double.init)
+        case .linear:
+            // Linear ramp: shallow stops receive progressively more time.
+            weights = (0..<stopCount).map { Double($0 + 1) }
         case .shallowWeighted:
             weights = (0..<stopCount).map { index in
                 Double(index + 1)

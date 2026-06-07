@@ -2751,6 +2751,10 @@ struct PlanResultView: View {
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
+            Text(String(localized: "planner.buhlmann.ndl_depth_band_note"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
             Chart(store.buhlmann.curve) { point in
                 LineMark(
                     x: .value(String(localized: "planner.buhlmann.axis.depth"), point.depthMeters),

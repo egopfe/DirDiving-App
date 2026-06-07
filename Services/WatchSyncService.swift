@@ -505,7 +505,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         }
         do {
             let storedFileName = try UserImageStore.importCompanionPhoto(from: sourceURL, fileName: fileName)
-            lastSyncStatus = String(localized: "Foto iPhone ricevuta")
+            lastSyncStatus = String(localized: "watch.sync.photo.received")
             recordActivity(title: String(localized: "sync.activity.photo_from_iphone"), detail: storedFileName)
             deliverCompanionPhotoAck(
                 photoID: photoID,
@@ -514,7 +514,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             )
             publishUploadedImageInventory()
         } catch {
-            lastSyncStatus = String(localized: "Errore foto iPhone")
+            lastSyncStatus = String(localized: "watch.sync.photo.error")
             deliverCompanionPhotoAck(
                 photoID: photoID,
                 status: CompanionPhotoImportSupport.ackStatusRejected,
@@ -525,7 +525,7 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     private func rejectCompanionPhoto(metadata: [String: Any], errorCode: String) {
         let photoID = metadata[WatchSyncKeys.companionPhotoIDKey] as? String
-        lastSyncStatus = String(localized: "Errore foto iPhone")
+        lastSyncStatus = String(localized: "watch.sync.photo.error")
         deliverCompanionPhotoAck(
             photoID: photoID,
             status: CompanionPhotoImportSupport.ackStatusRejected,

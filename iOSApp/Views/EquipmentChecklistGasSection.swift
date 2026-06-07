@@ -3,6 +3,14 @@ import SwiftUI
 struct EquipmentChecklistGasSection: View {
     @Binding var item: EquipmentChecklistItem
 
+    private var resolvedRole: GasRole {
+        item.gasRole ?? ChecklistPlannerSyncMapper.resolvedRole(for: item) ?? .bottom
+    }
+
+    private var showsSwitchDepth: Bool {
+        item.usesGas && (resolvedRole == .deco || resolvedRole == .travel)
+    }
+
     var body: some View {
         if item.usesGas {
             VStack(alignment: .leading, spacing: DIRTheme.spaceS) {
@@ -36,6 +44,18 @@ struct EquipmentChecklistGasSection: View {
                 .tint(DIRTheme.cyan)
             }
             .font(.callout)
+            HStack {
+                Text(String(localized: "equipment.checklist.gas_composition"))
+                    .foregroundStyle(DIRTheme.muted)
+                TextField(String(localized: "equipment.checklist.gas_composition_placeholder"), text: $item.gasText)
+                    .multilineTextAlignment(.trailing)
+                    .foregroundStyle(.white)
+                    .tint(DIRTheme.cyan)
+            }
+            .font(DIRTypography.body)
+            if showsSwitchDepth {
+                switchDepthRow
+            }
             HStack {
                 Text(String(localized: "equipment.checklist.pressure_unit"))
                     .foregroundStyle(DIRTheme.muted)
@@ -86,5 +106,36 @@ struct EquipmentChecklistGasSection: View {
             )
             .transition(.opacity.combined(with: .move(edge: .top)))
         }
+    }
+
+    private var switchDepthRow: some View {
+        HStack {
+            Text(String(localized: "equipment.checklist.switch_depth"))
+                .foregroundStyle(DIRTheme.muted)
+            TextField(
+                String(localized: "equipment.checklist.switch_depth_placeholder"),
+                text: Binding(
+                    get: {
+                        guard let meters = item.switchDepthMeters else { return "" }
+                        return Formatters.zero(meters)
+                    },
+                    set: { newValue in
+                        let trimmed = newValue.trimmingCharacters(in: .whitespacesAndNewlines).replacingOccurrences(of: ",", with: ".")
+                        if trimmed.isEmpty {
+                            item.switchDepthMeters = nil
+                        } else if let value = Double(trimmed), value.isFinite, value > 0 {
+                            item.switchDepthMeters = value
+                        }
+                    }
+                )
+            )
+            .multilineTextAlignment(.trailing)
+            .keyboardType(.decimalPad)
+            .foregroundStyle(.white)
+            .tint(DIRTheme.cyan)
+            Text(String(localized: "equipment.checklist.switch_depth_unit"))
+                .foregroundStyle(DIRTheme.muted)
+        }
+        .font(DIRTypography.body)
     }
 }

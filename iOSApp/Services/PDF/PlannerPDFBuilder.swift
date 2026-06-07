@@ -109,6 +109,9 @@ enum PlannerPDFBuilder {
         page.drawSpacer()
         page.drawSectionTitle(String(localized: "pdf.export.ratio_deco.section"))
         page.drawParagraph(String(localized: "pdf.export.ratio_deco.disclaimer"))
+        if !bundle.validation.isBuhlmannCompatible {
+            page.drawParagraph(String(localized: "planner.ratio_deco.validation.not_validated_plan"))
+        }
         page.drawLine(
             String(localized: "planner.ratio_deco.profile.header"),
             value: bundle.preset.name
