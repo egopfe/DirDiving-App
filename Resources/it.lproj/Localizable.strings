@@ -305,6 +305,7 @@
 "live.metric.max_depth" = "Prof. max";
 "live.metric.avg_depth" = "Prof. media";
 "live.a11y.ttv_runtime" = "TTV sessione %@, durata %@ minuti";
+"live.a11y.ttv_hint" = "TTV informativo derivato da profondità media e durata; non è un valore decompressivo o time to surface.";
 "log.share.csv.button" = "CONDIVIDI CSV";
 "log.export.subsurface.button" = "ESPORTA (SUBSURFACE)";
 "log.delete.button" = "ELIMINA LOG";
@@ -772,6 +773,8 @@
 "dive_reminder.overlay.single_title" = "PROMEMORIA";
 "dive_reminder.overlay.multiple_title_format" = "%lld PROMEMORIA";
 "dive_reminder.overlay.more_format" = "+%lld";
+"dive_reminder.overlay.runtime_a11y" = "Durata al trigger %@";
+"dive_reminder.overlay.a11y.hint" = "Overlay promemoria non interattivo durante l'immersione.";
 "dive_reminder.preset.check_gas" = "Controlla aria";
 "dive_reminder.preset.check_buddy" = "Controlla buddy";
 "dive_reminder.preset.check_runtime" = "Verifica runtime";

@@ -131,6 +131,18 @@ final class PDFExportServiceTests: XCTestCase {
         XCTAssertFalse(String(localized: "pdf.export.disclaimer").isEmpty)
     }
 
+    func testPlanPDFShareItemIsValidAndProtected() throws {
+        let context = validPlannerContext()
+        let url = try PDFExportService.exportPlan(context: context)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
+        let data = try Data(contentsOf: url)
+        XCTAssertGreaterThan(data.count, 200)
+        XCTAssertTrue(String(data: data.prefix(5), encoding: .ascii)?.hasPrefix("%PDF") == true)
+        XCTAssertNotNil(PDFDocument(data: data))
+        let directory = try PDFExportFilename.protectedExportDirectory()
+        XCTAssertTrue(url.path.hasPrefix(directory.path))
+    }
+
     func testBriefingPDFShareItemIsValidAndProtected() throws {
         let context = validPlannerContext()
         let url = try PDFExportService.exportBriefing(context: context, siteName: "Test Site")

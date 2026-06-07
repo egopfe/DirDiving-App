@@ -410,7 +410,7 @@
 "salinity.salt" = "Salata";
 "planner.header.subtitle" = "Gas, profilo deco e presentazione Bühlmann. Output indicativo — verifica sempre con strumenti certificati.";
 "planner.mode.header" = "Modalita planner (display)";
-"planner.mode.footer" = "Le modalità Base, Deco e Tecnica sono attive. Ogni modalità limita i campi visibili e gli input di calcolo secondo la propria policy di sicurezza.";
+"planner.mode.footer" = "Le modalità Base, Deco e Tecnica sono attive. Base è solo no-deco. Deco e Tecnica supportano la pianificazione Bühlmann con limiti di profondità specifici. Ratio Deco è solo un'euristica comparativa in Deco e Tecnica — non un algoritmo decompressione.";
 "planner.reference.details.toggle" = "Note di riferimento aggiuntive";
 "planner.reference.details.summary" = "Unità metriche e testo di riferimento supplementare";
 "planner.reference.details.read_more" = "Mostra dettagli";
@@ -515,6 +515,9 @@
 "planner.ratio_deco.summary.ratio_tts" = "TTS Ratio Deco";
 "planner.ratio_deco.summary.tts_difference" = "Differenza TTS";
 "planner.ratio_deco.overlay.title" = "Profilo sovrapposto";
+"planner.ratio_deco.overlay.a11y.compatible" = "Confronto overlay Ratio Deco. Tempo a superficie Bühlmann %lld minuti. Tempo a superficie Ratio Deco %lld minuti. Profondità massima %@. La pianificazione Ratio Deco è compatibile con Bühlmann.";
+"planner.ratio_deco.overlay.a11y.incompatible" = "Confronto overlay Ratio Deco. Tempo a superficie Bühlmann %lld minuti. Tempo a superficie Ratio Deco %lld minuti. Profondità massima %@. Avviso: %@. Ratio Deco è solo un'euristica comparativa.";
+"planner.ratio_deco.overlay.a11y.hint" = "Confronto profilo di profondità di riferimento tra Bühlmann e Ratio Deco.";
 "planner.ratio_deco.save_preset" = "Salva preset";
 "planner.ratio_deco.edit_preset" = "Modifica preset";
 "planner.ratio_deco.delete_preset" = "Elimina preset";
@@ -1389,6 +1392,9 @@
 "tissue_analytics.source.planned_footnote" = "Calcolato dal profilo Bühlmann pianificato nel planner (solo riferimento).";
 "tissue_analytics.source.recorded_footnote" = "Replay tessuti Bühlmann da campioni registrati e gas unico — senza storico gas switch. Solo riferimento, non certificato.";
 "tissue_analytics.source.insufficient_footnote" = "Campioni di profondità o dati gas insufficienti per l'analisi tessuti.";
+"tissue_analytics.a11y.trend" = "Timeline carico tessuti. Fonte: %@. Compartimento guida %@. Carico di picco %lld percento.";
+"tissue_analytics.a11y.compartment_bars" = "Barre carico sedici compartimenti. Fonte: %@. Compartimento guida %@. Carico di picco %lld percento.";
+"tissue_analytics.a11y.narcotic_chart" = "Grafico narcosi. Fonte: %@. Pressione parziale azoto di picco %@ bar. Profondità equivalente narcosi %@.";
 "tissue_analytics.card.dive_profile" = "PROFILO IMMERSIONE";
 "tissue_analytics.card.tissue_loading" = "CARICO TESSUTI (BÜHLMANN ZH-L16C)";
 "tissue_analytics.card.tissue_trend" = "ANDAMENTO TESSUTI";
