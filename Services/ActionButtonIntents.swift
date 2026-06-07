@@ -4,7 +4,7 @@ import Foundation
 @MainActor
 private func requireLegalAcceptanceForSafetyIntent() throws {
     do {
-        try LegalAcceptanceGate.requireAccepted()
+        try ActionButtonSafetyGate.requireLegalAcceptance()
     } catch LegalAcceptanceGateError.notAccepted {
         throw DIRDivingShortcutError.legalAcceptanceRequired
     }

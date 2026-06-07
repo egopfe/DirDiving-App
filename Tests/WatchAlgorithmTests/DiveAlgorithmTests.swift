@@ -397,6 +397,53 @@ final class DiveAlgorithmTests: XCTestCase {
         XCTAssertEqual(merged.ttv, 17, accuracy: 0.001)
     }
 
+    func testDepthSafetySelfCheckHasNoMappingFailures() {
+        XCTAssertTrue(DepthSafetySelfCheck.mappingFailures().isEmpty)
+    }
+
+    func testDraftRestoreAverageDepthTailCapReducesOfflineSkew() {
+        let start = Date().addingTimeInterval(-3600)
+        let samples = [
+            sample(10, at: start),
+            sample(30, at: start.addingTimeInterval(600))
+        ]
+        let offlineTail = DiveAlgorithm.timeWeightedAverageDepth(samples: samples, endDate: Date())
+        let cappedTailEnd = min(
+            Date(),
+            start.addingTimeInterval(600 + DiveAlgorithmConfiguration.draftRestoreAverageDepthMaxTailSeconds)
+        )
+        let capped = DiveAlgorithm.timeWeightedAverageDepth(samples: samples, endDate: cappedTailEnd)
+        XCTAssertLessThan(capped, offlineTail)
+    }
+
+    func testAscentLimitAt40mRemainsTenAndAbove40UsesFallback() {
+        let limits = AscentRateLimits.standard
+        XCTAssertEqual(limits.limit(for: 40), 10, accuracy: 0.001)
+        XCTAssertEqual(limits.limit(for: 40.01), 1, accuracy: 0.001)
+        XCTAssertEqual(DepthSafetyState.from(depthMeters: 40), .exceeded)
+    }
+
+    func testLifecycleClearsSurfaceCandidateWhenDepthRises() {
+        var algorithm = DiveLifecycleAlgorithm()
+        let start = Date()
+        let shallow = validDepth(0.2, at: start)
+        let deep = validDepth(1.0, at: start.addingTimeInterval(1))
+        _ = algorithm.evaluate(
+            validatedSample: shallow,
+            isDiveActive: true,
+            isManualLifecycleActive: false,
+            hasObservedSubmersion: true
+        )
+        XCTAssertNotNil(algorithm.surfaceCandidateDate)
+        _ = algorithm.evaluate(
+            validatedSample: deep,
+            isDiveActive: true,
+            isManualLifecycleActive: false,
+            hasObservedSubmersion: true
+        )
+        XCTAssertNil(algorithm.surfaceCandidateDate)
+    }
+
     private func validDepth(_ depth: Double, at date: Date) -> ValidatedDepthSample {
         ValidatedDepthSample(validity: .valid, rawDepthMeters: depth, sample: sample(depth, at: date))
     }

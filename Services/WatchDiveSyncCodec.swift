@@ -135,8 +135,9 @@ enum WatchDiveSyncCodec {
     }
 
     static func saveImportedFromCompanionIDs(_ ids: Set<UUID>) {
-        let trimmed = Array(ids.suffix(importedCompanionIDRetentionLimit))
-        UserDefaults.standard.set(trimmed.map(\.uuidString), forKey: importedFromCompanionIDsKey)
+        let sorted = ids.map(\.uuidString).sorted()
+        let trimmed = Array(sorted.suffix(importedCompanionIDRetentionLimit))
+        UserDefaults.standard.set(trimmed, forKey: importedFromCompanionIDsKey)
     }
 
     private static func syncKey() throws -> SymmetricKey {

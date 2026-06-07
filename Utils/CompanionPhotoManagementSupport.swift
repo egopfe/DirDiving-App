@@ -34,6 +34,8 @@ struct WatchUserImageInventoryItem: Codable, Equatable, Identifiable, Sendable {
 }
 
 enum CompanionPhotoManagementSupport {
+    /// Companion photo inventory/delete messages use paired WatchConnectivity trust (not HMAC v2 dive payloads).
+    /// Filename sanitization + bundled-image rejection provide defense-in-depth on Watch MAIN.
     static let inventoryStatusOK = "ok"
     static let inventoryStatusFailed = "failed"
 

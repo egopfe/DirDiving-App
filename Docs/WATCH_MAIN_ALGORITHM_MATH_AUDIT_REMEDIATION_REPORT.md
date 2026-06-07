@@ -240,3 +240,42 @@ See [`WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md`](WATCH_MAIN_HARDWARE_ALGORI
 | Sync dedup | 512 most recent companion import IDs retained |
 | 40 m split | Intentional safety exceeded + ascent band boundary |
 | TTV | Informational index only |
+
+---
+
+## Audit remediation pass — 2026-06-07 (`DIR_DIVING_WATCH_ALGORITHM_MATH_AUDIT.md`)
+
+**Baseline:** `4b73954`  
+**Completion report:** [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_FIX_COMPLETION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_FIX_COMPLETION_REPORT.md)
+
+### WATCH-P1-001 — Pending sync dequeue
+
+**Status:** Fixed  
+`WatchSyncPendingTransfer` queue; dequeue only on `confirmSignedAck`; `transferUserInfo` marks delivery without dequeue; 7-day retention / 64-attempt budget.
+
+### WATCH-P1-002 — Mock fallback visibility
+
+**Status:** Fixed  
+Localized EN/IT unavailable/simulation strings; `DepthSensorSourceResolution` status labels.
+
+### WATCH-P1-003 — TestFlight simulation safeguards
+
+**Status:** Fixed  
+Release sanitization; [`WATCH_TESTFLIGHT_SENSOR_SOURCE_QA.md`](WATCH_TESTFLIGHT_SENSOR_SOURCE_QA.md); expanded [`WATCH_SENSOR_SOURCE_RELEASE_POLICY.md`](WATCH_SENSOR_SOURCE_RELEASE_POLICY.md).
+
+### WATCH-P1-004 — Ascent haptic coordinator tests
+
+**Status:** Fixed  
+`AscentSafetyHapticCoordinatorTests`.
+
+### WATCH-P2-001 through WATCH-P2-009
+
+**Status:** Fixed — see completion report for per-ID detail (persistence errors, draft tail cap, auto-end integration, sync integration tests, App Intent gate, haptic throttle, photo trust doc, deterministic ID retention, GPS tests).
+
+### WATCH-P3-001 through WATCH-P3-008
+
+**Status:** Fixed or documented — 40 m band tested; double classify removed; expired draft quarantine; temperature bounds tested; DepthSafetySelfCheck in CI; CSV call path documented.
+
+### Test evidence
+
+161 Watch Algorithm Tests executed, 8 skipped (keychain), 0 failures @ Apple Watch Ultra 3 (49mm).
