@@ -72,7 +72,7 @@ final class CloudSyncStore: ObservableObject {
         let localModifiedAt = defaults.double(forKey: modifiedAtKey(for: key))
 
         if let cloudData, let localData {
-            if cloudModifiedAt > localModifiedAt {
+            if Self.prefersCloudPayload(localModifiedAt: localModifiedAt, cloudModifiedAt: cloudModifiedAt) {
                 if let decoded = decode(type, from: cloudData, key: key, source: String(localized: "cloud.source.icloud")) {
                     defaults.set(cloudData, forKey: key)
                     defaults.set(cloudModifiedAt, forKey: modifiedAtKey(for: key))
@@ -258,6 +258,11 @@ final class CloudSyncStore: ObservableObject {
 
     private func modifiedAtKey(for key: String) -> String {
         "\(key).__modifiedAt"
+    }
+
+    /// Testable LWW decision used by `load(_:forKey:)`.
+    static func prefersCloudPayload(localModifiedAt: Double, cloudModifiedAt: Double) -> Bool {
+        cloudModifiedAt > localModifiedAt
     }
 
     /// Avoid SwiftUI runtime fault: "Publishing changes from within view updates".

@@ -78,6 +78,47 @@ struct PlannerFixture: Codable {
     let expectedNDLRangeMinutes: FixtureTTSRange?
     let expectedFirstStopDepthMeters: Double?
     let toleranceMinutes: Double
+    let validationStatus: String
+    let referenceSource: String
+    let validationNotes: String
+    let ascentDescentAssumptions: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id, isValid, depthMeters, bottomMinutes, gfLow, gfHigh, gases, environment, priorDive
+        case expectedTTSRangeMinutes, expectedNDLRangeMinutes, expectedFirstStopDepthMeters, toleranceMinutes
+        case validationStatus, referenceSource, validationNotes, ascentDescentAssumptions
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        isValid = try container.decode(Bool.self, forKey: .isValid)
+        depthMeters = try container.decode(Double.self, forKey: .depthMeters)
+        bottomMinutes = try container.decode(Double.self, forKey: .bottomMinutes)
+        gfLow = try container.decode(Double.self, forKey: .gfLow)
+        gfHigh = try container.decode(Double.self, forKey: .gfHigh)
+        gases = try container.decode([FixtureGas].self, forKey: .gases)
+        environment = try container.decodeIfPresent(FixtureEnvironment.self, forKey: .environment)
+        priorDive = try container.decodeIfPresent(FixturePriorDive.self, forKey: .priorDive)
+        expectedTTSRangeMinutes = try container.decodeIfPresent(FixtureTTSRange.self, forKey: .expectedTTSRangeMinutes)
+        expectedNDLRangeMinutes = try container.decodeIfPresent(FixtureTTSRange.self, forKey: .expectedNDLRangeMinutes)
+        expectedFirstStopDepthMeters = try container.decodeIfPresent(Double.self, forKey: .expectedFirstStopDepthMeters)
+        toleranceMinutes = try container.decode(Double.self, forKey: .toleranceMinutes)
+        validationStatus = try container.decodeIfPresent(String.self, forKey: .validationStatus) ?? "internal_regression"
+        referenceSource = try container.decodeIfPresent(String.self, forKey: .referenceSource) ?? "internal-ios-buhlmann-suite"
+        validationNotes = try container.decodeIfPresent(String.self, forKey: .validationNotes)
+            ?? "Internal regression envelope from DIR Diving iOS engine self-consistency. Not third-party certified."
+        ascentDescentAssumptions = try container.decodeIfPresent(String.self, forKey: .ascentDescentAssumptions)
+            ?? "Schreiner segments; environment from fixture or sea-level salt water."
+    }
+
+    var isPendingExternalValidation: Bool {
+        validationStatus == "pending_external_validation"
+    }
+
+    var claimsExternalReference: Bool {
+        validationStatus == "external_reference_validated"
+    }
 
     func makeRequest() throws -> BuhlmannPlanRequest {
         guard !gases.isEmpty else {

@@ -66,6 +66,14 @@ The iOS planner now includes a ZHL-16C N2+He multigas reference engine:
 
 **Remaining limitation:** No separate certified breakdown of CNS contribution per decompression gas cylinder — only schedule PPO₂ in the ascent table.
 
+## Logbook tissue & narcosis analytics (simulated replay)
+
+- **Not** a certified post-dive decompression reconstruction.
+- Logbook path replays recorded depth + `gasLabel` with a **fixed GF 0.85** simulation assumption (`TissueAnalyticsService`).
+- Recorded gas timeline per sample is **not** available from dive log samples today.
+- Planner path uses real `tissueHistory` from the calculated reference plan.
+- UI copy and docs label this as **simulated / reference-only**.
+
 ## Current Assumptions
 
 - Planner environment supports altitude-aware surface pressure and salinity-aware water density via `PlannerEnvironment`; invalid altitude/salinity fail closed with `.invalidEnvironment`.
