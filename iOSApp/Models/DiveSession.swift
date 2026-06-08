@@ -4,7 +4,17 @@ enum DiveGasLabel: String, Codable, CaseIterable, Identifiable {
     case oc = "OC"
     case nitrox = "NITROX"
     case trimix = "TRIMIX"
+    case ccr = "CCR"
     var id: String { rawValue }
+
+    var localizedTitle: String {
+        switch self {
+        case .oc: return String(localized: "logbook.gas.oc")
+        case .nitrox: return String(localized: "logbook.gas.nitrox")
+        case .trimix: return String(localized: "logbook.gas.trimix")
+        case .ccr: return String(localized: "logbook.gas.ccr")
+        }
+    }
 }
 
 enum GPSFixSource: String, Codable, Hashable {
@@ -43,6 +53,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
     var entryPressureBar: Double?
     var exitPressureBar: Double?
     var decompressionNotes: String?
+    var ccrLogbookMetadata: CCRLogbookMetadata?
 
     static let demoNotesLabel = "Demo dive"
 
@@ -53,7 +64,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
         case avgWaterTemperatureCelsius, ttv, entryGPS, exitGPS
         case entryGPSFixSource, exitGPSFixSource, samples
         case siteName, buddy, notes, gasLabel, sacLitersMinute, isDemo, exceededSupportedDepthRange
-        case isManual, hasDepthProfile, equipmentUsed, entryPressureText, exitPressureText, entryPressureBar, exitPressureBar, decompressionNotes
+        case isManual, hasDepthProfile, equipmentUsed, entryPressureText, exitPressureText, entryPressureBar, exitPressureBar, decompressionNotes, ccrLogbookMetadata
     }
 
     init(
@@ -84,7 +95,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         exitPressureText: String? = nil,
         entryPressureBar: Double? = nil,
         exitPressureBar: Double? = nil,
-        decompressionNotes: String? = nil
+        decompressionNotes: String? = nil,
+        ccrLogbookMetadata: CCRLogbookMetadata? = nil
     ) {
         self.id = id
         self.startDate = startDate
@@ -115,6 +127,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
         self.entryPressureBar = entryPressureBar
         self.exitPressureBar = exitPressureBar
         self.decompressionNotes = decompressionNotes
+        self.ccrLogbookMetadata = ccrLogbookMetadata
     }
 
     init(from decoder: Decoder) throws {
@@ -149,6 +162,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
         entryPressureBar = try container.decodeIfPresent(Double.self, forKey: .entryPressureBar)
         exitPressureBar = try container.decodeIfPresent(Double.self, forKey: .exitPressureBar)
         decompressionNotes = try container.decodeIfPresent(String.self, forKey: .decompressionNotes)
+        ccrLogbookMetadata = try container.decodeIfPresent(CCRLogbookMetadata.self, forKey: .ccrLogbookMetadata)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -181,5 +195,6 @@ struct DiveSession: Identifiable, Codable, Hashable {
         try container.encodeIfPresent(entryPressureBar, forKey: .entryPressureBar)
         try container.encodeIfPresent(exitPressureBar, forKey: .exitPressureBar)
         try container.encodeIfPresent(decompressionNotes, forKey: .decompressionNotes)
+        try container.encodeIfPresent(ccrLogbookMetadata, forKey: .ccrLogbookMetadata)
     }
 }

@@ -43,6 +43,7 @@ enum ManualDiveEditorValidation {
         decompressionNotes: String,
         notes: String,
         gasLabel: DiveGasLabel,
+        ccrLogbookMetadata: CCRLogbookMetadata? = nil,
         unitPreference: IOSUnitPreference
     ) -> Result<DiveSession, ManualDiveEditorSaveError> {
         if let error = depthOrderError(maxMeters: maxMeters, avgMeters: avgMeters) {
@@ -87,7 +88,8 @@ enum ManualDiveEditorValidation {
             exitPressureText: pressures.exitText,
             entryPressureBar: pressures.entryBar,
             exitPressureBar: pressures.exitBar,
-            decompressionNotes: decompressionNotes.isEmpty ? nil : decompressionNotes
+            decompressionNotes: decompressionNotes.isEmpty ? nil : decompressionNotes,
+            ccrLogbookMetadata: gasLabel == .ccr ? ccrLogbookMetadata : nil
         )
         return .success(session)
     }

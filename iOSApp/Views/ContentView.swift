@@ -24,7 +24,7 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $navigation.selectedTab) {
             mountedTab(.planner) {
-                PlannerView()
+                PlannerRootView()
             }
             .tabItem { Label("tab.planner", systemImage: "point.topleft.down.curvedto.point.bottomright.up") }
 

@@ -217,7 +217,8 @@ enum DiveImportService {
             equipmentUsed: metadata.equipmentUsed,
             entryPressureText: metadata.entryPressureText,
             exitPressureText: metadata.exitPressureText,
-            decompressionNotes: metadata.decompressionNotes
+            decompressionNotes: metadata.decompressionNotes,
+            ccrLogbookMetadata: metadata.ccrLogbookMetadata
         )
         guard let session = try? DiveSessionAlgorithmValidator.normalizedForStorage(
             importedSession,
@@ -242,6 +243,7 @@ enum DiveImportService {
         var buddy: String?
         var gasLabel: DiveGasLabel?
         var sacLitersMinute: Double?
+        var ccrLogbookMetadata: CCRLogbookMetadata?
     }
 
     private static func isMetadataOrCommentRow(_ row: [String]) -> Bool {
@@ -311,9 +313,49 @@ enum DiveImportService {
             metadata.gasLabel = DiveGasLabel(rawValue: value)
         case "dirdiving_sac":
             metadata.sacLitersMinute = Double(value)
+        case "dirdiving_ccr_rebreather_model":
+            applyCCRMetadata(&metadata, mutate: { $0.rebreatherModel = value })
+        case "dirdiving_ccr_low_setpoint":
+            if let parsed = Double(value) {
+                applyCCRMetadata(&metadata, mutate: { $0.lowSetpoint = parsed })
+            }
+        case "dirdiving_ccr_high_setpoint":
+            if let parsed = Double(value) {
+                applyCCRMetadata(&metadata, mutate: { $0.highSetpoint = parsed })
+            }
+        case "dirdiving_ccr_setpoint_switch_depth":
+            if let parsed = Double(value) {
+                applyCCRMetadata(&metadata, mutate: { $0.setpointSwitchDepthMeters = parsed })
+            }
+        case "dirdiving_ccr_diluent_label":
+            applyCCRMetadata(&metadata, mutate: { $0.diluentLabel = value })
+        case "dirdiving_ccr_bailout_labels":
+            applyCCRMetadata(&metadata, mutate: {
+                $0.bailoutLabels = value
+                    .split(separator: "|")
+                    .map { String($0).trimmingCharacters(in: .whitespacesAndNewlines) }
+                    .filter { !$0.isEmpty }
+            })
+        case "dirdiving_ccr_scrubber_notes":
+            applyCCRMetadata(&metadata, mutate: { $0.scrubberNotes = value })
+        case "dirdiving_ccr_o2_sensor_notes":
+            applyCCRMetadata(&metadata, mutate: { $0.oxygenSensorNotes = value })
+        case "dirdiving_ccr_loop_notes":
+            applyCCRMetadata(&metadata, mutate: { $0.loopNotes = value })
+        case "dirdiving_ccr_bailout_scenario_notes":
+            applyCCRMetadata(&metadata, mutate: { $0.bailoutScenarioNotes = value })
         default:
             break
         }
+    }
+
+    private static func applyCCRMetadata(
+        _ metadata: inout CSVSessionMetadata,
+        mutate: (inout CCRLogbookMetadata) -> Void
+    ) {
+        var ccr = metadata.ccrLogbookMetadata ?? CCRLogbookMetadata()
+        mutate(&ccr)
+        metadata.ccrLogbookMetadata = ccr
     }
 
     private static func nonEmpty(_ value: String?) -> String? {

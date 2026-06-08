@@ -12,7 +12,7 @@ enum PlannerModeLimits {
             enforceBasicInputLimits(&input)
         case .deco:
             enforceDecoInputLimits(&input)
-        case .technical:
+        case .technical, .ccr:
             break
         }
     }

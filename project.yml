@@ -175,6 +175,14 @@ targets:
       - iOSApp/Models/DiveSample.swift
       - iOSApp/Models/DiveSession.swift
       - iOSApp/Models/GasPlan.swift
+      - iOSApp/Models/CCR/CCRModels.swift
+      - iOSApp/Services/CCR/CCRInspiredGasModel.swift
+      - iOSApp/Services/CCR/CCRPlanValidator.swift
+      - iOSApp/Services/CCR/CCRPlannerEngine.swift
+      - iOSApp/Services/CCR/CCRPlannerService.swift
+      - iOSApp/Services/CCR/CCRBailoutScenarioCalculator.swift
+      - iOSApp/Services/CCR/CCRGasDensityEstimator.swift
+      - iOSApp/Utils/CCRPlannerSettings.swift
       - iOSApp/Models/EquipmentProfile.swift
       - iOSApp/Models/GPSPoint.swift
       - iOSApp/Models/TankSize.swift
@@ -247,6 +255,7 @@ targets:
       - iOSApp/Services/PDF/BriefingPDFBuilder.swift
       - iOSApp/Services/PDF/ChecklistPDFBuilder.swift
       - iOSApp/Services/PDF/DivePackPDFBuilder.swift
+      - iOSApp/Services/PDF/CCRPlannerPDFBuilder.swift
       - Tests/iOSAlgorithmTests/PDFExportServiceTests.swift
       - iOSApp/Models/TissueAnalyticsTrace.swift
       - iOSApp/Utils/TissueAnalyticsSupport.swift
