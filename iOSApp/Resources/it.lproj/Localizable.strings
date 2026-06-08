@@ -1513,6 +1513,7 @@
 "ccr.ppn2.timeline" = "Timeline PPN2";
 "ccr.gas_density.timeline" = "Timeline densità gas";
 "ccr.gas_density.approximation" = "Approssimazione di riferimento — non densità misurata del loop.";
+"ccr.narcosis.estimator_footnote" = "La densità del loop CCR e l'END sono stime indicative basate su diluente e setpoint — non dati misurati del loop in tempo reale.";
 "ccr.cns.timeline" = "Timeline CNS";
 "ccr.pdf.disclaimer" = "Piano CCR di riferimento — solo informativo. Non consiglio decompressionale certificato.";
 "ccr.pdf.profile" = "Profilo immersione CCR";

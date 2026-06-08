@@ -10,6 +10,21 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 | Commit `HEAD` | __________ |
 | Esecutore | __________ |
 
+## Audit remediation (2026-06-08 — Bühlmann comprehensive readiness @ `cc4d783` / remediation pass)
+
+- [ ] Review [`1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_CURRENT.md`](1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_CURRENT.md)
+- [ ] Review [`DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_REMEDIATION_REPORT.md`](DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_REMEDIATION_REPORT.md)
+- [ ] External Bühlmann validation **PENDING** — [`DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_EVIDENCE.md`](DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_EVIDENCE.md)
+- [ ] External CCR validation **PENDING** — [`CCR_REBREATHER_VALIDATION_EVIDENCE.md`](CCR_REBREATHER_VALIDATION_EVIDENCE.md)
+- [ ] iCloud two-device QA **PENDING** — [`ICLOUD_TWO_DEVICE_QA_MATRIX.md`](ICLOUD_TWO_DEVICE_QA_MATRIX.md)
+- [ ] Watch/iPhone physical sync **PENDING** — [`WATCH_IOS_SYNC_QA_MATRIX.md`](WATCH_IOS_SYNC_QA_MATRIX.md)
+- [ ] Subsurface external CSV **PENDING** — [`SUBSURFACE_CSV_ROUNDTRIP.md`](SUBSURFACE_CSV_ROUNDTRIP.md)
+- [ ] Visual QA matrices **PENDING** — [`IOS_PLANNER_VISUAL_QA_MATRIX.md`](IOS_PLANNER_VISUAL_QA_MATRIX.md), [`IOS_MOD_SWITCH_DEPTH_VISUAL_QA.md`](IOS_MOD_SWITCH_DEPTH_VISUAL_QA.md), [`IOS_RATIO_DECO_VISUAL_QA.md`](IOS_RATIO_DECO_VISUAL_QA.md)
+- [ ] CCR bailout heuristic disclosed — [`CCR_REBREATHER_LIMITATIONS.md`](CCR_REBREATHER_LIMITATIONS.md)
+- [ ] **Internal TestFlight:** conditional yes (526+ iOS tests green)
+- [ ] **External TestFlight / App Store:** **BLOCKED** until external validation + physical QA
+- [ ] **No certified decompression / CCR controller claims**
+
 ## Audit remediation (2026-06-07 — iOS MAIN post-audit non-physical @ `af31937`)
 
 - [ ] Review [`IOS_MAIN_ALGORITHM_MATH_POST_AUDIT_FIX_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_POST_AUDIT_FIX_REPORT_CURRENT.md)

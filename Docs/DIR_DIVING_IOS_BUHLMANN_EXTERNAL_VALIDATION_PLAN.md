@@ -2,7 +2,8 @@
 
 **Scope:** `DIRDiving iOS` (Companion MAIN) only  
 **Positioning:** Non-certified Bühlmann ZHL-16C **reference** planner — not dive-computer equivalence. **Ratio Deco is out of scope** for external Bühlmann validation (comparative heuristic only — see [`RATIO_DECO_COMPARATIVE_HEURISTIC.md`](RATIO_DECO_COMPARATIVE_HEURISTIC.md)).
-**Status:** Internal regression **active**; external reference campaign **pending**
+**Status:** Internal regression **active**; external reference campaign **pending**  
+**Evidence matrix:** [`DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_EVIDENCE.md`](DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_EVIDENCE.md)
 
 ---
 

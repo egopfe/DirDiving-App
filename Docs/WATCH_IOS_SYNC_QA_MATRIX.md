@@ -24,3 +24,17 @@ Owner: ________  Date: ________  Build: ________  Commit: ________
 | Trust reset flow |  |  |  |
 | Offline -> online recovery |  |  |  |
 | importedFromCompanionIDs deterministic trim |  |  | Lexicographic UUID order |
+| **CCR reference data not live monitoring** |  |  | Watch has **no** CCR loop; synced CCR metadata must not display as live PPO₂ |
+| **No CCR planner on Watch** |  |  | CCR planning iOS-only |
+| Image inventory request/response (if enabled) |  |  |  |
+| Image delete ACK (if enabled) |  |  |  |
+
+---
+
+## Physical paired-device gate
+
+**Status:** **PENDING** until Pass/Fail filled on real Watch + iPhone.
+
+**Evidence:** `Docs/QA_EVIDENCE/WATCH_IOS_SYNC/`
+
+**Release gate:** External TestFlight requires WS-01…WS-05 minimum PASS (see [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md)).
