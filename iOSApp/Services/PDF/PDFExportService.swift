@@ -16,6 +16,13 @@ struct PDFExportPlannerContext {
     let unitPreference: IOSUnitPreference
 }
 
+struct PDFExportCCRPlannerContext {
+    let input: CCRPlanInput
+    let plan: CCRPlanResult
+    let safetyAcknowledged: Bool
+    let unitPreference: IOSUnitPreference
+}
+
 enum PDFExportService {
     static func canExportPlan(_ context: PDFExportPlannerContext) -> Bool {
         context.safetyAcknowledged
@@ -25,8 +32,22 @@ enum PDFExportService {
             && context.plan.buhlmannState != .unavailable
     }
 
+    static func canExportCCRPlan(_ context: PDFExportCCRPlannerContext) -> Bool {
+        context.safetyAcknowledged
+            && context.plan.validationResult.isValid
+            && context.plan.buhlmannState != .invalidInput
+    }
+
     static func hasExportableChecklist(_ profile: EquipmentProfile) -> Bool {
         !profile.migratedChecklistItems.isEmpty
+    }
+
+    static func exportCCRPlan(context: PDFExportCCRPlannerContext, siteName: String? = nil) throws -> URL {
+        guard canExportCCRPlan(context) else { throw PDFExportError.invalidPlan }
+        let data = CCRPlannerPDFBuilder.build(context: context)
+        guard !data.isEmpty else { throw PDFExportError.generationFailed }
+        let filename = PDFExportFilename.make(prefix: "DIRDiving_CCR_Plan", siteName: siteName)
+        return try PDFExportFilename.write(data: data, filename: filename)
     }
 
     static func exportPlan(context: PDFExportPlannerContext, siteName: String? = nil) throws -> URL {

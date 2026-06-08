@@ -150,4 +150,17 @@ final class TissueAnalyticsServiceTests: XCTestCase {
         XCTAssertGreaterThan(end, 0)
         XCTAssertLessThan(end, depth + 1)
     }
+
+    func testCCRPlannerTraceGeneratesPresentation() {
+        var input = CCRPlanInput.default
+        input.bailoutGases = [CCRBailoutGas(mixKind: .ean, oxygenPercent: 32, switchDepthMeters: 0)]
+        let plan = CCRPlannerService.makePlan(input: input)
+        XCTAssertTrue(plan.validationResult.isValid)
+        guard let presentation = TissueAnalyticsService.presentationForCCRPlan(plan: plan, input: input) else {
+            return XCTFail("Expected CCR tissue analytics presentation")
+        }
+        XCTAssertEqual(presentation.trace.source, .ccrPlanned)
+        XCTAssertEqual(presentation.trace.finalCompartments.count, 16)
+        XCTAssertFalse(presentation.trace.samples.isEmpty)
+    }
 }

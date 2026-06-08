@@ -90,6 +90,22 @@ enum SubsurfaceExportService {
             "# dirdiving_buddy: \(csvField(session.buddy ?? ""))",
             "# dirdiving_gas_label: \(session.gasLabel.rawValue)",
             "# dirdiving_sac: \(session.sacLitersMinute.map { String(format: "%.2f", $0) } ?? "")"
+        ] + ccrMetadataLines(for: session)
+    }
+
+    private static func ccrMetadataLines(for session: DiveSession) -> [String] {
+        guard let ccr = session.ccrLogbookMetadata else { return [] }
+        return [
+            "# dirdiving_ccr_rebreather_model: \(csvField(ccr.rebreatherModel))",
+            "# dirdiving_ccr_low_setpoint: \(Formatters.one(ccr.lowSetpoint))",
+            "# dirdiving_ccr_high_setpoint: \(Formatters.one(ccr.highSetpoint))",
+            "# dirdiving_ccr_setpoint_switch_depth: \(Formatters.one(ccr.setpointSwitchDepthMeters))",
+            "# dirdiving_ccr_diluent_label: \(csvField(ccr.diluentLabel))",
+            "# dirdiving_ccr_bailout_labels: \(csvField(ccr.bailoutLabels.joined(separator: "|")))",
+            "# dirdiving_ccr_scrubber_notes: \(csvField(ccr.scrubberNotes))",
+            "# dirdiving_ccr_o2_sensor_notes: \(csvField(ccr.oxygenSensorNotes))",
+            "# dirdiving_ccr_loop_notes: \(csvField(ccr.loopNotes))",
+            "# dirdiving_ccr_bailout_scenario_notes: \(csvField(ccr.bailoutScenarioNotes))"
         ]
     }
 

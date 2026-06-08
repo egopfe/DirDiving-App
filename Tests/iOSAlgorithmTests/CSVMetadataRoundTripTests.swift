@@ -56,6 +56,61 @@ final class CSVMetadataRoundTripTests: XCTestCase {
         XCTAssertTrue(summary.sourceDatePreserved)
     }
 
+    func testCCRMetadataRoundTrip() throws {
+        let start = Date(timeIntervalSince1970: 1_700_100_000)
+        let end = start.addingTimeInterval(2_700)
+        let ccrMetadata = CCRLogbookMetadata(
+            rebreatherModel: "rEvo III",
+            lowSetpoint: 0.7,
+            highSetpoint: 1.3,
+            setpointSwitchDepthMeters: 20,
+            diluentLabel: "TMX21/35",
+            bailoutLabels: ["EAN32", "O2"],
+            scrubberNotes: "Fresh sofnolime",
+            oxygenSensorNotes: "Calibrated pre-dive",
+            loopNotes: "Loop volume 5L",
+            bailoutScenarioNotes: "Lost loop at 35m"
+        )
+        let session = DiveSession(
+            id: UUID(),
+            startDate: start,
+            endDate: end,
+            durationSeconds: 2_700,
+            maxDepthMeters: 45,
+            avgDepthMeters: 32,
+            avgWaterTemperatureCelsius: 16,
+            ttv: 60,
+            entryGPS: nil,
+            exitGPS: nil,
+            samples: [
+                DiveSample(timestamp: start, depthMeters: 0, temperatureCelsius: 16),
+                DiveSample(timestamp: end, depthMeters: 45, temperatureCelsius: 15)
+            ],
+            siteName: "CCR Site",
+            gasLabel: .ccr,
+            isManual: true,
+            ccrLogbookMetadata: ccrMetadata
+        )
+
+        let csv = try XCTUnwrap(SubsurfaceExportService.makeCSV(for: session))
+        XCTAssertTrue(csv.contains("# dirdiving_ccr_rebreather_model: rEvo III"))
+        XCTAssertTrue(csv.contains("# dirdiving_ccr_bailout_labels: EAN32|O2"))
+
+        let url = try temporaryCSV(csv)
+        let result = DiveImportService.importCSV(from: url)
+        guard case .success(let summary) = result else {
+            return XCTFail("Expected successful CCR import")
+        }
+        let imported = try XCTUnwrap(summary.session.ccrLogbookMetadata)
+        XCTAssertEqual(imported.rebreatherModel, "rEvo III")
+        XCTAssertEqual(imported.lowSetpoint, 0.7, accuracy: 0.01)
+        XCTAssertEqual(imported.highSetpoint, 1.3, accuracy: 0.01)
+        XCTAssertEqual(imported.diluentLabel, "TMX21/35")
+        XCTAssertEqual(imported.bailoutLabels, ["EAN32", "O2"])
+        XCTAssertEqual(imported.scrubberNotes, "Fresh sofnolime")
+        XCTAssertEqual(summary.session.gasLabel, .ccr)
+    }
+
     func testExportRowsMatchHeaderColumnCount() throws {
         let start = Date(timeIntervalSince1970: 1_700_000_000)
         let session = DiveSession(
