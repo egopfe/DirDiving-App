@@ -1,6 +1,14 @@
 # Note per TestFlight / App Review - DIR DIVING
 
-**Aggiornato:** 2026-06-06 — branch `main` (Watch MAIN algorithm audit remediation @ 2026-06-06; physical QA gates tracked separately)
+**Aggiornato:** 2026-06-08 — branch `main` (Bühlmann comprehensive readiness remediation @ audit `cc4d783`)
+
+## CCR / Rebreather planner (iOS reference-only)
+
+- Il planner **CCR / Rebreather** su iPhone e **solo riferimento** — non e un controller CCR certificato.
+- **Nessun monitoraggio PPO₂ del loop in tempo reale.**
+- Gli scenari **bailout** sono **stime euristiche di riserva SAC**, non schedule decompressione OC Bühlmann simulate.
+- Validazione esterna CCR: **PENDING** — [`CCR_REBREATHER_VALIDATION_EVIDENCE.md`](CCR_REBREATHER_VALIDATION_EVIDENCE.md)
+- Export Dive Pack: **solo planner OC**; CCR usa export PDF piano CCR dedicato — [`CCR_REBREATHER_EXPORT_POLICY.md`](CCR_REBREATHER_EXPORT_POLICY.md)
 
 ## Panoramica per il revisore
 
