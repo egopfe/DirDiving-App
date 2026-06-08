@@ -82,6 +82,30 @@ final class EquipmentStore: ObservableObject {
                     EquipmentChecklistItem(title: "Back gas", isReady: false, usesGas: true, tankSize: .liters12),
                     EquipmentChecklistItem(title: "Deco stage", isReady: false, usesGas: true, tankSize: .liters12)
                 ]
+            ),
+            EquipmentTemplate(
+                name: String(localized: "equipment.template.ccr"),
+                checklistItems: [
+                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.rebreather"), isReady: false),
+                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.loop"), isReady: false),
+                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.counterlungs"), isReady: false),
+                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.adv"), isReady: false),
+                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.mav_o2"), isReady: false),
+                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.mav_diluent"), isReady: false),
+                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.o2_cylinder"), isReady: false, usesGas: true, tankSize: .s40),
+                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.diluent_cylinder"), isReady: false, usesGas: true, tankSize: .liters12),
+                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.o2_sensors"), isReady: false),
+                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.hud"), isReady: false),
+                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.controller"), isReady: false),
+                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.bov"), isReady: false),
+                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.scrubber"), isReady: false),
+                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.wet_notes"), isReady: false),
+                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.smb"), isReady: false),
+                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.spool"), isReady: false),
+                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.bailout_1"), isReady: false, usesGas: true, tankSize: .liters12),
+                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.bailout_2"), isReady: false, usesGas: true, tankSize: .liters12),
+                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.bailout_3"), isReady: false, usesGas: true, tankSize: .liters12)
+                ]
             )
         ]
     }

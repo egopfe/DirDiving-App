@@ -175,4 +175,41 @@ final class PDFExportServiceTests: XCTestCase {
         XCTAssertGreaterThan(data.count, 200)
         XCTAssertNotNil(PDFDocument(data: data))
     }
+
+    private func validCCRContext() -> PDFExportCCRPlannerContext {
+        var input = CCRPlanInput.default
+        input.bailoutGases = [CCRBailoutGas(mixKind: .ean, oxygenPercent: 32, switchDepthMeters: 0)]
+        let plan = CCRPlannerService.makePlan(input: input)
+        return PDFExportCCRPlannerContext(
+            input: input,
+            plan: plan,
+            safetyAcknowledged: true,
+            unitPreference: .metric
+        )
+    }
+
+    func testCCRPlanPDFGeneratedForValidPlan() throws {
+        let context = validCCRContext()
+        XCTAssertTrue(PDFExportService.canExportCCRPlan(context))
+        let data = CCRPlannerPDFBuilder.build(context: context)
+        XCTAssertFalse(data.isEmpty)
+        XCTAssertTrue(String(data: data.prefix(5), encoding: .ascii)?.hasPrefix("%PDF") == true)
+        let url = try PDFExportService.exportCCRPlan(context: context)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: url.path))
+        XCTAssertTrue(url.lastPathComponent.hasPrefix("DIRDiving_CCR_Plan_"))
+    }
+
+    func testInvalidCCRPlanBlocksPDFExport() {
+        var context = validCCRContext()
+        context = PDFExportCCRPlannerContext(
+            input: context.input,
+            plan: context.plan,
+            safetyAcknowledged: false,
+            unitPreference: context.unitPreference
+        )
+        XCTAssertFalse(PDFExportService.canExportCCRPlan(context))
+        XCTAssertThrowsError(try PDFExportService.exportCCRPlan(context: context)) { error in
+            XCTAssertEqual(error as? PDFExportError, .invalidPlan)
+        }
+    }
 }

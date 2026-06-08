@@ -119,6 +119,26 @@ struct PlannerResultPresentation: Equatable {
                 showsManualGFControls: true,
                 showsGFPresets: false
             )
+        case .ccr:
+            return PlannerResultPresentation(
+                showsFullAscentTable: true,
+                showsSimplifiedAscentTable: false,
+                showsGasLedger: false,
+                showsContingency: false,
+                showsTeamMatch: false,
+                showsBriefing: true,
+                showsGFComparison: false,
+                showsSegmentTimeline: true,
+                showsNDLCurveTab: false,
+                showsChartsTab: true,
+                buhlmannPresentation: .fullCurve,
+                showsExtendedAnalysisTiles: true,
+                showsReserveCard: false,
+                showsRepetitivePlanning: false,
+                showsTeamPreview: false,
+                showsManualGFControls: true,
+                showsGFPresets: false
+            )
         }
     }
 }
@@ -134,7 +154,7 @@ enum PlannerModePolicy {
             projected = projectBaseInput(projected)
         case .deco:
             projected = projectDecoInput(projected)
-        case .technical:
+        case .technical, .ccr:
             break
         }
 
@@ -143,6 +163,11 @@ enum PlannerModePolicy {
     }
 
     static func validate(draft: GasPlanInput, mode: PlannerMode) -> PlannerValidationResult {
+        guard mode.isOpenCircuit else {
+            var result = PlannerValidationResult()
+            result.add(.validReference)
+            return result
+        }
         let active = activePlanInput(from: draft, mode: mode)
         var result = PlannerInputValidator.validate(active, mode: mode)
 
@@ -153,7 +178,7 @@ enum PlannerModePolicy {
         case .deco:
             result.merge(validateDecoDraft(draft))
             result.merge(PlannerModeLimits.validateDecoDepthLimits(for: draft))
-        case .technical:
+        case .technical, .ccr:
             break
         }
 
@@ -187,6 +212,8 @@ enum PlannerModePolicy {
             return [.air, .ean]
         case .deco, .technical:
             return GasMixKind.allCases
+        case .ccr:
+            return [.air, .ean, .trimix]
         }
     }
 
@@ -195,6 +222,7 @@ enum PlannerModePolicy {
         case .base: return 0
         case .deco: return 1
         case .technical: return Int.max
+        case .ccr: return 0
         }
     }
 
@@ -207,7 +235,7 @@ enum PlannerModePolicy {
     }
 
     static func allowsTrimix(for mode: PlannerMode) -> Bool {
-        mode == .technical
+        mode == .technical || mode == .ccr
     }
 
     static func applyGFPreset(_ preset: PlannerGFPreset, to input: inout GasPlanInput) {

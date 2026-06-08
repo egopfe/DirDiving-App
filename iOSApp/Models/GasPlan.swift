@@ -10,8 +10,12 @@ enum PlannerMode: String, CaseIterable, Identifiable, Codable {
     case base
     case deco
     case technical
+    case ccr
 
     var id: String { rawValue }
+
+    /// Open-circuit modes only (Base / Deco / Technical).
+    static var openCircuitModes: [PlannerMode] { [.base, .deco, .technical] }
 
     /// Persisted raw values for Codable; legacy values decode to the new three-mode model.
     init(from decoder: Decoder) throws {
@@ -24,6 +28,8 @@ enum PlannerMode: String, CaseIterable, Identifiable, Codable {
             self = .deco
         case PlannerMode.technical.rawValue, "Tecnica", "technical", "Cave/Wreck", "overhead":
             self = .technical
+        case PlannerMode.ccr.rawValue, "CCR", "ccr":
+            self = .ccr
         default:
             self = .base
         }
@@ -34,6 +40,7 @@ enum PlannerMode: String, CaseIterable, Identifiable, Codable {
         case .base: return String(localized: "planner.mode.base")
         case .deco: return String(localized: "planner.mode.deco")
         case .technical: return String(localized: "planner.mode.technical")
+        case .ccr: return String(localized: "planner.mode.ccr")
         }
     }
 
@@ -42,6 +49,7 @@ enum PlannerMode: String, CaseIterable, Identifiable, Codable {
         case .base: return String(localized: "planner.mode.base.description")
         case .deco: return String(localized: "planner.mode.deco.description")
         case .technical: return String(localized: "planner.mode.technical.description")
+        case .ccr: return String(localized: "planner.mode.ccr.description")
         }
     }
 
@@ -50,8 +58,12 @@ enum PlannerMode: String, CaseIterable, Identifiable, Codable {
         case .base: return String(localized: "planner.result.base.title")
         case .deco: return String(localized: "planner.result.deco.title")
         case .technical: return String(localized: "planner.result.technical.title")
+        case .ccr: return String(localized: "planner.result.ccr.title")
         }
     }
+
+    var isCCR: Bool { self == .ccr }
+    var isOpenCircuit: Bool { !isCCR }
 }
 
 enum SalinityMode: String, CaseIterable, Identifiable, Codable {

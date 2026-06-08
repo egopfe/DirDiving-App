@@ -30,7 +30,7 @@ struct PlannerView: View {
             return PlannerModeLimits.basicMaximumDepthMeters(for: store.input)
         case .deco:
             return PlannerModeLimits.decoMaximumDepthMeters(for: store.input)
-        case .technical:
+        case .technical, .ccr:
             return nil
         }
     }
@@ -63,7 +63,7 @@ struct PlannerView: View {
                             DIRWarningBox(text: String(localized: "planner.reference_only.warning"))
                             plannerReferenceDetailsSection
                             Group {
-                                modePicker
+                                currentModeBanner
                                 if store.mode != .base {
                                     decompressionMethodCard
                                 }
@@ -110,6 +110,14 @@ struct PlannerView: View {
                 }
             }
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        store.returnToPlannerModeSelection()
+                    } label: {
+                        Label(String(localized: "planner.mode_selection.back"), systemImage: "chevron.left")
+                            .foregroundStyle(DIRTheme.cyan)
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         showPlannerPDFMenu = true
@@ -193,19 +201,10 @@ struct PlannerView: View {
         .dirCompanionTabRoot()
     }
 
-    private var modePicker: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Picker(String(localized: "planner.mode.header"), selection: $store.mode) {
-                ForEach(PlannerMode.allCases) { mode in
-                    Text(mode.localizedTabTitle).tag(mode)
-                }
-            }
-            .pickerStyle(.segmented)
-            .tint(DIRTheme.cyan)
-            .accessibilityLabel(String(localized: "planner.mode.header"))
-
+    private var currentModeBanner: some View {
+        DIRCard(store.mode.localizedTabTitle, icon: "point.topleft.down.curvedto.point.bottomright.up", accent: DIRTheme.cyan) {
             Text(store.mode.localizedDescription)
-                .font(.caption2)
+                .font(.caption)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -610,7 +609,7 @@ struct PlannerView: View {
             let bottom = store.input.plannerCylinders.filter { $0.role == .bottom }
             let deco = store.input.plannerCylinders.filter { $0.role == .deco }.sorted { $0.switchDepthMeters > $1.switchDepthMeters }
             return bottom + Array(deco.prefix(1))
-        case .technical:
+        case .technical, .ccr:
             return store.input.plannerCylinders
         }
     }
@@ -1489,6 +1488,8 @@ struct PlanResultView: View {
             lines.append(String(localized: "planner.export.mode_disclaimer.deco"))
         case .technical:
             lines.append(String(localized: "planner.export.mode_disclaimer.technical"))
+        case .ccr:
+            lines.append(String(localized: "ccr.safety.disclaimer"))
         }
         lines.append(String(localized: "planner.export.header"))
         lines.append(String(format: String(localized: "planner.export.tts_line"), store.plan.ttsMinutes))
