@@ -97,6 +97,7 @@ enum CCRPlannerPDFBuilder {
                         value: Formatters.depth(maxEND, units: context.unitPreference).text
                     )
                 }
+                page.drawParagraph(String(localized: "ccr.narcosis.estimator_footnote"))
             }
 
             if !plan.bailoutScenarios.isEmpty {

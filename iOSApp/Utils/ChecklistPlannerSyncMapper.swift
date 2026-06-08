@@ -164,10 +164,30 @@ enum ChecklistPlannerSyncMapper {
     }
 
     static func applyCCRExport(input: CCRPlanInput, to checklist: inout [EquipmentChecklistItem]) {
-        for item in ccrChecklistItems(from: input) {
+        let proposed = ccrChecklistItems(from: input)
+        let bailoutIndices = checklist.indices.filter { checklist[$0].usesGas && checklist[$0].gasRole == .ccrBailout }
+        var bailoutCursor = 0
+
+        for item in proposed {
             guard let role = item.gasRole else { continue }
-            if let index = checklist.firstIndex(where: { $0.usesGas && $0.gasRole == role }) {
+            let matchIndex: Int?
+            switch role {
+            case .ccrDiluent:
+                matchIndex = checklist.firstIndex(where: { $0.usesGas && $0.gasRole == .ccrDiluent })
+            case .ccrBailout:
+                if bailoutCursor < bailoutIndices.count {
+                    matchIndex = bailoutIndices[bailoutCursor]
+                    bailoutCursor += 1
+                } else {
+                    matchIndex = nil
+                }
+            default:
+                matchIndex = checklist.firstIndex(where: { $0.usesGas && $0.gasRole == role })
+            }
+
+            if let index = matchIndex {
                 var replacement = item
+                replacement.id = checklist[index].id
                 replacement.isReady = checklist[index].isReady
                 checklist[index] = replacement
             } else {
@@ -323,15 +343,19 @@ enum ChecklistPlannerSyncMapper {
 
     private static func inferRole(from title: String) -> GasRole? {
         let lower = title.lowercased()
-        if lower.contains("diluent") && (lower.contains("ccr") || lower.contains("mav diluent") || lower.contains("bombola diluente")) {
-            return .ccrDiluent
+        if lower.contains("diluent") || lower.contains("diluente") || lower.contains("mav diluent") || lower.contains("bombola diluente") {
+            if lower.contains("ccr") || lower.contains("rebreather") || lower.contains("rebreat") || lower.contains("mav") {
+                return .ccrDiluent
+            }
         }
-        if lower.contains("bailout") || lower.contains("emerg") {
-            if lower.contains("ccr") || lower.hasPrefix("bailout ") { return .ccrBailout }
+        if lower.contains("bailout") || lower.contains("emerg") || lower.contains("emergenza") {
+            if lower.contains("ccr") || lower.contains("rebreather") || lower.hasPrefix("bailout ") || lower.contains("offboard") {
+                return .ccrBailout
+            }
             return .bailout
         }
-        if lower.contains("travel") { return .travel }
-        if lower.contains("deco") || lower.contains("stage") { return .deco }
+        if lower.contains("travel") || lower.contains("viaggio") { return .travel }
+        if lower.contains("deco") || lower.contains("stage") || lower.contains("decompression") { return .deco }
         if lower.contains("back") || lower.contains("bottom") || lower.contains("fondo") { return .bottom }
         return nil
     }
