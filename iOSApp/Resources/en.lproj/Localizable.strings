@@ -1042,7 +1042,7 @@
 "planner.settings.cns_descent_bottom.toggle_hint" = "Highlights when descent + bottom CNS exceeds your warning threshold.";
 "planner.settings.cns_descent_bottom.toggle.a11y" = "Toggles the planner CNS descent and bottom warning.";
 "planner.settings.cns_descent_bottom.threshold" = "Warning threshold";
-"planner.settings.cns_descent_bottom.threshold.a11y" = "CNS descent and bottom warning threshold, %@ percent";
+"planner.settings.cns_descent_bottom.threshold.a11y" = "CNS descent and bottom warning threshold, %lld percent";
 "planner.settings.cns_descent_bottom.reference_only" = "Reference estimate only — not certified oxygen exposure guidance.";
 "planner.settings.cns_descent_bottom_15_check.description" = "Shows a warning when descent + bottom CNS exceeds your warning threshold.";
 "planner.accessibility.cns_descent_bottom.warning.label" = "CNS descent and bottom warning. Value exceeds %@%% of the maximum CNS budget.";
