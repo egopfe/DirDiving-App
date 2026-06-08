@@ -222,6 +222,8 @@ private extension GasRole {
         case .travel: return 1
         case .deco: return 2
         case .bailout: return 3
+        case .ccrDiluent: return 4
+        case .ccrBailout: return 5
         }
     }
 }

@@ -93,10 +93,10 @@ enum PlannerGasEditingSupport {
         environment: PlannerEnvironment
     ) -> Bool {
         switch entry.role {
-        case .bottom:
+        case .bottom, .ccrDiluent:
             let mod = modMeters(for: entry.gas, environment: environment)
             return plannedDepthMeters > mod + 0.05
-        case .travel, .deco, .bailout:
+        case .travel, .deco, .bailout, .ccrBailout:
             return entry.isSwitchDepthBeyondMOD(environment: environment)
         }
     }

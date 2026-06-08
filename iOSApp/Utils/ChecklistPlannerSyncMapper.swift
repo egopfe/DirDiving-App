@@ -125,6 +125,57 @@ enum ChecklistPlannerSyncMapper {
         }
     }
 
+    static func ccrChecklistItems(from input: CCRPlanInput) -> [EquipmentChecklistItem] {
+        var items: [EquipmentChecklistItem] = [
+            EquipmentChecklistItem(
+                title: String(localized: "equipment.ccr.diluent_cylinder"),
+                isReady: false,
+                usesGas: true,
+                gasMixKind: input.diluent.mixKind,
+                gasText: input.diluent.label,
+                gasRole: .ccrDiluent
+            )
+        ]
+        for (index, bailout) in input.bailoutGases.enumerated() {
+            items.append(
+                EquipmentChecklistItem(
+                    title: String(format: String(localized: "equipment.ccr.bailout_number"), index + 1),
+                    isReady: false,
+                    usesGas: true,
+                    gasMixKind: bailout.mixKind,
+                    gasText: bailout.label,
+                    switchDepthMeters: bailout.switchDepthMeters,
+                    tankSize: bailout.tankSize,
+                    gasRole: .ccrBailout
+                )
+            )
+        }
+        return items
+    }
+
+    static func ccrItemsMissingFromChecklist(input: CCRPlanInput, checklist: [EquipmentChecklistItem]) -> [EquipmentChecklistItem] {
+        ccrChecklistItems(from: input).filter { proposed in
+            guard let role = proposed.gasRole else { return true }
+            return !checklist.contains { existing in
+                existing.usesGas && existing.gasRole == role
+                    && existing.gasText.caseInsensitiveCompare(proposed.gasText) == .orderedSame
+            }
+        }
+    }
+
+    static func applyCCRExport(input: CCRPlanInput, to checklist: inout [EquipmentChecklistItem]) {
+        for item in ccrChecklistItems(from: input) {
+            guard let role = item.gasRole else { continue }
+            if let index = checklist.firstIndex(where: { $0.usesGas && $0.gasRole == role }) {
+                var replacement = item
+                replacement.isReady = checklist[index].isReady
+                checklist[index] = replacement
+            } else {
+                checklist.append(item)
+            }
+        }
+    }
+
     static func resolvedRole(for item: EquipmentChecklistItem) -> GasRole? {
         if let role = item.gasRole { return role }
         return inferRole(from: item.title)
@@ -265,14 +316,20 @@ enum ChecklistPlannerSyncMapper {
 
     private static func defaultMaxPPO2(for role: GasRole) -> Double {
         switch role {
-        case .bottom, .travel: return 1.4
-        case .deco, .bailout: return 1.6
+        case .bottom, .travel, .ccrDiluent: return 1.4
+        case .deco, .bailout, .ccrBailout: return 1.6
         }
     }
 
     private static func inferRole(from title: String) -> GasRole? {
         let lower = title.lowercased()
-        if lower.contains("bailout") || lower.contains("emerg") { return .bailout }
+        if lower.contains("diluent") && (lower.contains("ccr") || lower.contains("mav diluent") || lower.contains("bombola diluente")) {
+            return .ccrDiluent
+        }
+        if lower.contains("bailout") || lower.contains("emerg") {
+            if lower.contains("ccr") || lower.hasPrefix("bailout ") { return .ccrBailout }
+            return .bailout
+        }
         if lower.contains("travel") { return .travel }
         if lower.contains("deco") || lower.contains("stage") { return .deco }
         if lower.contains("back") || lower.contains("bottom") || lower.contains("fondo") { return .bottom }

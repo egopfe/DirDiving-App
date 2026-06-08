@@ -457,6 +457,26 @@ struct DiveDetailView: View {
 
     private var details: some View {
         VStack(spacing: 12) {
+            if let ccr = session.ccrLogbookMetadata {
+                darkPanel(title: String(localized: "manual_dive.ccr.header"), icon: "lungs.fill") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(String(localized: "manual_dive.ccr.logbook_disclosure"))
+                            .font(.caption2)
+                            .foregroundStyle(DIRTheme.muted)
+                        if !ccr.rebreatherModel.isEmpty {
+                            Text("\(String(localized: "ccr.rebreather_model")): \(ccr.rebreatherModel)")
+                        }
+                        Text("\(String(localized: "ccr.setpoint.low")) / \(String(localized: "ccr.setpoint.high")): \(Formatters.one(ccr.lowSetpoint)) / \(Formatters.one(ccr.highSetpoint)) bar")
+                        Text("\(String(localized: "ccr.setpoint.switch_depth")): \(Formatters.depth(ccr.setpointSwitchDepthMeters, units: IOSUnitPreference.fromStorage(units)).text)")
+                        Text("\(String(localized: "ccr.diluent")): \(ccr.diluentLabel)")
+                        if !ccr.bailoutLabels.isEmpty {
+                            Text("\(String(localized: "ccr.bailout")): \(ccr.bailoutLabels.joined(separator: ", "))")
+                        }
+                    }
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white)
+                }
+            }
             darkPanel(title: String(localized: "detail.panel.gps"), icon: "location.fill") {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("\(String(localized: "detail.gps.start")): \(session.entryGPS?.coordinateText ?? String(localized: "detail.not_available")) · \(fixSourceText(session.entryGPSFixSource))")

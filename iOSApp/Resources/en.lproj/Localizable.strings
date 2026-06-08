@@ -898,6 +898,8 @@
 "gas.mix.oxygen.short" = "O₂";
 "gas.role.deco" = "Decompression";
 "gas.role.bailout" = "Bailout";
+"gas.role.ccr_diluent" = "CCR Diluent";
+"gas.role.ccr_bailout" = "CCR Bailout";
 "planner.field.avg_depth" = "Average depth";
 "planner.field.planning_reference" = "Planning reference";
 "planner.reference.max_depth" = "Maximum depth";
@@ -1434,6 +1436,10 @@
 "ccr.safety.title" = "CCR reference planning";
 "ccr.safety.disclaimer" = "CCR planning is provided for informational purposes only. It does not replace CCR training, operational procedures, validated bailout planning, or a certified dive computer.";
 "ccr.reference_estimate_only" = "Reference estimate only.";
+"ccr.avg_depth.reference_only" = "Reference only — not used by the current CCR engine.";
+"ccr.bailout.heuristic_disclaimer" = "Heuristic bailout reserve estimate only — not a Bühlmann-simulated OC bailout schedule.";
+"ccr.bailout.heuristic_analysis" = "Heuristic bailout reserve analysis";
+"planner.ratio_deco.unavailable_ccr" = "Ratio Deco is available only for open-circuit reference plans.";
 "ccr.setpoint.header" = "Setpoint profile";
 "ccr.setpoint.low" = "Low setpoint";
 "ccr.setpoint.high" = "High setpoint";
@@ -1502,6 +1508,7 @@
 "equipment.ccr.bailout_1" = "Bailout 1";
 "equipment.ccr.bailout_2" = "Bailout 2";
 "equipment.ccr.bailout_3" = "Bailout 3";
+"equipment.ccr.bailout_number" = "Bailout %d";
 "ccr.setpoint.mode" = "Setpoint mode";
 "ccr.setpoint.shallow_ascent" = "Shallow ascent low setpoint depth";
 "ccr.setpoint.shallow_ascent.toggle" = "Use low setpoint on shallow ascent";
@@ -1520,6 +1527,11 @@
 "tissue_analytics.source.ccr_planned" = "CCR planned dive";
 "tissue_analytics.source.ccr_planned_footnote" = "Tissue loading from CCR reference planner (setpoint-based inspired gas).";
 "manual_dive.ccr.header" = "CCR logbook details";
+"manual_dive.ccr.logbook_disclosure" = "Manual logbook metadata only — not live loop or sensor data.";
+"manual_dive.ccr.validation.invalid_setpoint" = "Enter valid low and high setpoints.";
+"manual_dive.ccr.validation.low_ge_high" = "Low setpoint must be below high setpoint.";
+"manual_dive.ccr.validation.invalid_switch_depth" = "Enter a valid setpoint switch depth.";
+"manual_dive.ccr.validation.switch_deeper_than_max" = "Setpoint switch depth cannot exceed max depth.";
 "manual_dive.ccr.diluent_label" = "Diluent label";
 "manual_dive.ccr.bailout_labels" = "Bailout gases (separate with |)";
 "manual_dive.ccr.scrubber_notes" = "Scrubber notes";

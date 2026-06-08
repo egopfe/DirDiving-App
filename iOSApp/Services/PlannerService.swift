@@ -50,6 +50,7 @@ enum PlannerService {
 
         var normalizedDraft = input
         normalizedDraft.ensurePlannerCylindersFromLegacy()
+        PlannerModeLimits.enforceInputLimits(&normalizedDraft, mode: mode)
         normalizedDraft.normalizeSwitchDepthsToMOD(environment: environment)
 
         let validation = PlannerModePolicy.validate(draft: normalizedDraft, mode: mode)
@@ -253,6 +254,7 @@ enum PlannerService {
         unitPreference: IOSUnitPreference
     ) -> RatioDecoPlanningBundle? {
         guard method != .buhlmann else { return nil }
+        guard mode != .ccr else { return nil }
         let schedule = RatioDecoPlanner.makeSchedule(
             input: input,
             mode: mode,

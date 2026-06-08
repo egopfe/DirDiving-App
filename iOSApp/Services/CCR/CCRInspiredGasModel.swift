@@ -15,10 +15,11 @@ enum CCRInspiredGasModel {
         guard depthMeters.isFinite, setpointBar.isFinite, setpointBar > 0 else { return nil }
         let ambient = ambientPressureBar(depthMeters: depthMeters, environment: environment)
         guard ambient.isFinite else { return nil }
-        if ambient <= setpointBar + 0.000_1 {
+        let dryAmbient = max(0, ambient - BuhlmannConstants.waterVaporPressureBar)
+        if dryAmbient <= setpointBar + 0.000_1 {
             return (setpointBar, 0, 0, 0)
         }
-        let availableInert = max(0, ambient - setpointBar)
+        let availableInert = max(0, dryAmbient - setpointBar)
         let ppN2 = availableInert * diluent.nitrogenFraction
         let ppHe = availableInert * diluent.heliumFraction
         return (setpointBar, ppN2, ppHe, availableInert)
