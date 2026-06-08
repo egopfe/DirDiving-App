@@ -16,6 +16,7 @@ final class CloudSyncStore: ObservableObject {
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
+        refreshICloudAvailability(postStatus: false)
         NotificationCenter.default.addObserver(
             forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
             object: cloudStore,
@@ -24,7 +25,7 @@ final class CloudSyncStore: ObservableObject {
             Task { @MainActor in
                 guard let self else { return }
                 self.publishDeferred { [self] in
-                    self.isICloudAvailable = FileManager.default.ubiquityIdentityToken != nil
+                    self.refreshICloudAvailability(postStatus: false)
                     self.lastSyncStatus = String(localized: "cloud.status.external_update")
                 }
                 NotificationCenter.default.post(
@@ -34,7 +35,27 @@ final class CloudSyncStore: ObservableObject {
                 )
             }
         }
-        synchronize()
+        NotificationCenter.default.addObserver(
+            forName: NSNotification.Name.NSUbiquityIdentityDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                guard let self else { return }
+                let wasAvailable = self.isICloudAvailable
+                self.refreshICloudAvailability(postStatus: true)
+                if !wasAvailable, self.isICloudAvailable {
+                    self.synchronize()
+                }
+            }
+        }
+        if isICloudAvailable {
+            synchronize()
+        } else {
+            publishDeferred { [self] in
+                lastSyncStatus = String(localized: "cloud.status.icloud_unavailable")
+            }
+        }
     }
 
     func clearDecodeError() {
@@ -46,12 +67,19 @@ final class CloudSyncStore: ObservableObject {
     }
 
     func loadRawCloudData(forKey key: String) -> Data? {
-        cloudStore.data(forKey: key)
+        guard isICloudAvailable else { return nil }
+        return cloudStore.data(forKey: key)
     }
 
     func removeValue(forKey key: String) {
         defaults.removeObject(forKey: key)
         defaults.removeObject(forKey: modifiedAtKey(for: key))
+        guard isICloudAvailable else {
+            publishDeferred { [self] in
+                lastSyncStatus = String(localized: "cloud.status.icloud_unavailable")
+            }
+            return
+        }
         cloudStore.removeObject(forKey: key)
         cloudStore.removeObject(forKey: modifiedAtKey(for: key))
         synchronize()
@@ -66,9 +94,9 @@ final class CloudSyncStore: ObservableObject {
     }
 
     func load<T: Decodable>(_ type: T.Type, forKey key: String) -> T? {
-        let cloudData = cloudStore.data(forKey: key)
+        let cloudData = isICloudAvailable ? cloudStore.data(forKey: key) : nil
         let localData = defaults.data(forKey: key)
-        let cloudModifiedAt = cloudStore.double(forKey: modifiedAtKey(for: key))
+        let cloudModifiedAt = isICloudAvailable ? cloudStore.double(forKey: modifiedAtKey(for: key)) : 0
         let localModifiedAt = defaults.double(forKey: modifiedAtKey(for: key))
 
         if let cloudData, let localData {
@@ -85,7 +113,7 @@ final class CloudSyncStore: ObservableObject {
             }
 
             if let decoded = decode(type, from: localData, key: key, source: String(localized: "cloud.source.local")) {
-                if localModifiedAt > cloudModifiedAt {
+                if isICloudAvailable, localModifiedAt > cloudModifiedAt {
                     cloudStore.set(localData, forKey: key)
                     cloudStore.set(localModifiedAt, forKey: modifiedAtKey(for: key))
                     synchronize()
@@ -116,11 +144,17 @@ final class CloudSyncStore: ObservableObject {
 
         if let localData {
             if let decoded = decode(type, from: localData, key: key, source: String(localized: "cloud.source.local")) {
-                cloudStore.set(localData, forKey: key)
-                cloudStore.set(localModifiedAt, forKey: modifiedAtKey(for: key))
-                synchronize()
-                publishDeferred { [self] in
-                    lastSyncStatus = String(localized: "cloud.status.local_pending_icloud")
+                if isICloudAvailable {
+                    cloudStore.set(localData, forKey: key)
+                    cloudStore.set(localModifiedAt, forKey: modifiedAtKey(for: key))
+                    synchronize()
+                    publishDeferred { [self] in
+                        lastSyncStatus = String(localized: "cloud.status.local_pending_icloud")
+                    }
+                } else {
+                    publishDeferred { [self] in
+                        lastSyncStatus = String(localized: "cloud.status.saved_local_only")
+                    }
                 }
                 return decoded
             }
@@ -149,16 +183,17 @@ final class CloudSyncStore: ObservableObject {
         defaults.set(data, forKey: key)
         defaults.set(modifiedAt, forKey: modifiedAtKey(for: key))
 
-        cloudStore.set(data, forKey: key)
-        cloudStore.set(modifiedAt, forKey: modifiedAtKey(for: key))
-        synchronize()
-        let available = FileManager.default.ubiquityIdentityToken != nil
+        if isICloudAvailable {
+            cloudStore.set(data, forKey: key)
+            cloudStore.set(modifiedAt, forKey: modifiedAtKey(for: key))
+            synchronize()
+        }
         publishDeferred { [self] in
             lastDecodeError = nil
-            lastSyncStatus = available
+            lastSyncStatus = isICloudAvailable
                 ? String(localized: "cloud.status.saved_local_and_icloud")
                 : String(localized: "cloud.status.saved_local_only")
-            if available {
+            if isICloudAvailable {
                 lastSuccessfulSyncDate = Date()
             }
         }
@@ -167,24 +202,34 @@ final class CloudSyncStore: ObservableObject {
     private var syncGeneration: UInt = 0
 
     func synchronize() {
-        cloudStore.synchronize()
+        refreshICloudAvailability(postStatus: false)
         syncGeneration &+= 1
         let generation = syncGeneration
-        let available = FileManager.default.ubiquityIdentityToken != nil
-        publishDeferred { [self] in
-            isSynchronizing = true
-            isICloudAvailable = available
-            if available {
-                lastSyncStatus = String(localized: "cloud.status.sync_requested")
-                lastSuccessfulSyncDate = Date()
-            } else {
+        guard isICloudAvailable else {
+            publishDeferred { [self] in
+                isSynchronizing = false
                 lastSyncStatus = String(localized: "cloud.status.icloud_unavailable")
             }
+            return
+        }
+        cloudStore.synchronize()
+        publishDeferred { [self] in
+            isSynchronizing = true
+            lastSyncStatus = String(localized: "cloud.status.sync_requested")
+            lastSuccessfulSyncDate = Date()
         }
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 900_000_000)
             guard generation == syncGeneration else { return }
             isSynchronizing = false
+        }
+    }
+
+    private func refreshICloudAvailability(postStatus: Bool) {
+        let available = FileManager.default.ubiquityIdentityToken != nil
+        isICloudAvailable = available
+        if postStatus, !available {
+            lastSyncStatus = String(localized: "cloud.status.icloud_unavailable")
         }
     }
 
