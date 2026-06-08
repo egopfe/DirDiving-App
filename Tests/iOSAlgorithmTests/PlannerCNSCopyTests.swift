@@ -16,6 +16,7 @@ final class PlannerCNSCopyTests: XCTestCase {
         "planner.settings.cns_descent_bottom.title",
         "planner.settings.cns_descent_bottom.toggle",
         "planner.settings.cns_descent_bottom.threshold",
+        "planner.settings.cns_descent_bottom.threshold.a11y",
         "planner.settings.cns_descent_bottom.reference_only",
         "planner.settings.cns_descent_bottom_15_check.description",
         "planner.accessibility.cns_descent_bottom.warning.label",
@@ -76,6 +77,18 @@ final class PlannerCNSCopyTests: XCTestCase {
         XCTAssertTrue(it["planner.metric.cns_preview"]?.contains("anteprima") == true)
         XCTAssertTrue(it["planner.metric.cns_full_plan.footnote"]?.contains("decompressione") == true)
         XCTAssertTrue(it["planner.metric.cns_descent_bottom.footnote"]?.contains("esclude") == true)
+    }
+
+    func testCNSThresholdAccessibilityFormatAcceptsIntegerArgument() throws {
+        let en = try loadStrings(named: "en")
+        let it = try loadStrings(named: "it")
+        for format in [en["planner.settings.cns_descent_bottom.threshold.a11y", default: ""],
+                       it["planner.settings.cns_descent_bottom.threshold.a11y", default: ""]] {
+            XCTAssertFalse(format.isEmpty)
+            XCTAssertTrue(format.contains("%lld"))
+            let label = String(format: format, 15)
+            XCTAssertTrue(label.contains("15"))
+        }
     }
 
     func testCNSAscentDecoEstimateEqualsDerivedDifference() {
