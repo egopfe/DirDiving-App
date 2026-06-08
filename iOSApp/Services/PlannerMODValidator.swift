@@ -52,16 +52,16 @@ enum PlannerMODValidator {
 
         for entry in working.plannerCylinders {
             switch entry.role {
-            case .bottom:
+            case .bottom, .ccrDiluent:
                 if let issue = validateGasSwitch(
                     depthMeters: working.plannedDepthMeters,
                     gas: entry.gas,
-                    role: .bottom,
+                    role: entry.role,
                     environment: environment
                 ) {
                     issues.append(issue)
                 }
-            case .travel, .deco, .bailout:
+            case .travel, .deco, .bailout, .ccrBailout:
                 if let issue = validateGasSwitch(
                     depthMeters: entry.switchDepthMeters,
                     gas: entry.gas,

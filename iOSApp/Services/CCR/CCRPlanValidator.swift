@@ -21,7 +21,7 @@ enum CCRPlanValidator {
         }
 
         if !input.gfLow.isFinite || !input.gfHigh.isFinite || input.gfLow >= input.gfHigh {
-            issues.append(.invalidSetpoint(String(localized: "ccr.validation.invalid_gf")))
+            issues.append(.invalidGradientFactor(String(localized: "ccr.validation.invalid_gf")))
         }
 
         for (label, value) in [("low", profile.lowSetpoint), ("high", profile.highSetpoint)] {

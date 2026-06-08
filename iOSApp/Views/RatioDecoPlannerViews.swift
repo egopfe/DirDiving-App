@@ -435,6 +435,8 @@ struct RatioDecoComparisonSection: View {
         switch warning {
         case .unavailableInBaseMode:
             return String(localized: "planner.ratio_deco.validation.unavailable_base")
+        case .unavailableInCCRMode:
+            return String(localized: "planner.ratio_deco.unavailable_ccr")
         case .ceilingViolation:
             return String(localized: "planner.ratio_deco.validation.ceiling")
         case .modExceeded:

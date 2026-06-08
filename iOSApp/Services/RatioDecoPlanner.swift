@@ -20,6 +20,17 @@ enum RatioDecoPlanner {
             )
         }
 
+        guard mode != .ccr else {
+            return unavailableSchedule(
+                preset: preset,
+                warnings: [.unavailableInCCRMode],
+                input: input,
+                descentMinutes: descentMinutes,
+                environment: environment,
+                unitPreference: unitPreference
+            )
+        }
+
         var working = input
         working.ensurePlannerCylindersFromLegacy()
 
