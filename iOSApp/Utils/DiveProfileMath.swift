@@ -210,7 +210,8 @@ enum DiveProfileMath {
             exitPressureText: session.exitPressureText,
             entryPressureBar: session.entryPressureBar,
             exitPressureBar: session.exitPressureBar,
-            decompressionNotes: session.decompressionNotes
+            decompressionNotes: session.decompressionNotes,
+            ccrLogbookMetadata: session.ccrLogbookMetadata
         )
     }
 }

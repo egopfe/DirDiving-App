@@ -3,6 +3,14 @@ import Foundation
 enum TissueAnalyticsService {
     private static var cache: [String: TissueAnalyticsTrace] = [:]
 
+    static func presentationForCCRPlan(plan: CCRPlanResult, input: CCRPlanInput) -> TissueAnalyticsPresentation? {
+        let key = ccrPlannerCacheKey(plan: plan, input: input)
+        if let cached = cache[key] { return TissueAnalyticsPresentation(trace: cached, cacheKey: key) }
+        guard let trace = buildFromCCRPlan(plan: plan, input: input) else { return nil }
+        cache[key] = trace
+        return TissueAnalyticsPresentation(trace: trace, cacheKey: key)
+    }
+
     static func presentationForPlanner(plan: DivePlanResult, input: GasPlanInput, mode: PlannerMode) -> TissueAnalyticsPresentation? {
         let key = plannerCacheKey(plan: plan, input: input, mode: mode)
         if let cached = cache[key] { return TissueAnalyticsPresentation(trace: cached, cacheKey: key) }
@@ -21,6 +29,57 @@ enum TissueAnalyticsService {
 
     static func invalidateCache() {
         cache.removeAll()
+    }
+
+    static func buildFromCCRPlan(plan: CCRPlanResult, input: CCRPlanInput) -> TissueAnalyticsTrace? {
+        guard !plan.tissueTrace.isEmpty else { return nil }
+        guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) else {
+            return nil
+        }
+        let firstStopDepth = plan.decoStops.first?.depthMeters ?? 0
+        let segments = plan.engineSegments.map {
+            DivePlanSegment(kind: $0.kind, depthMeters: $0.depthMeters, minutes: $0.minutes, gas: $0.gas.label, note: $0.note)
+        }
+        let samples = buildCCRSamples(
+            tissueHistory: plan.tissueTrace,
+            depthProfilePoints: plan.depthProfilePoints,
+            ppO2Timeline: plan.ppO2Timeline,
+            ppN2Timeline: plan.ppN2Timeline,
+            environment: environment,
+            gfLow: input.gfLow,
+            gfHigh: input.gfHigh,
+            firstStopDepthMeters: firstStopDepth,
+            diluentLabel: input.diluent.label
+        )
+        guard !samples.isEmpty else { return nil }
+
+        let finalCompartments = finalLoadings(from: plan.tissueTrace)
+        let controlling = finalCompartments.max(by: { $0.loadingPercent < $1.loadingPercent })?.compartmentIndex ?? 0
+        let maxPPN2 = plan.ppN2Timeline.map(\.ppN2Bar).max() ?? 0
+        let endMeters = NarcosisAnalyticsSupport.endMeters(fromPPN2Bar: maxPPN2, environment: environment)
+
+        let summary = TissueAnalyticsSummary(
+            maxDepthMeters: input.maxDepthMeters,
+            bottomTimeMinutes: Int(input.bottomTimeMinutes.rounded()),
+            ttsMinutes: plan.ttsMinutes,
+            gfLow: Int(input.gfLow.rounded()),
+            gfHigh: Int(input.gfHigh.rounded()),
+            modeTitle: String(localized: "planner.mode.ccr"),
+            totalRuntimeMinutes: plan.totalRuntimeMinutes
+        )
+
+        return TissueAnalyticsTrace(
+            samples: samples,
+            finalCompartments: finalCompartments,
+            controllingCompartment: controlling,
+            maxPPN2Bar: maxPPN2,
+            endEquivalentMeters: endMeters,
+            source: .ccrPlanned,
+            summary: summary,
+            depthProfilePoints: plan.depthProfilePoints,
+            segments: segments,
+            decoStops: plan.decoStops.map { TissueAnalyticsTrace.DecoStopSnapshot(depthMeters: $0.depthMeters, minutes: $0.minutes, gas: $0.gas) }
+        )
     }
 
     static func buildFromPlanner(plan: DivePlanResult, input: GasPlanInput, mode: PlannerMode) -> TissueAnalyticsTrace? {
@@ -85,7 +144,7 @@ enum TissueAnalyticsService {
             return TissueAnalyticsLogbookReplay.buildRecordedReplay(from: session, environment: environment)
         case .simulated:
             return TissueAnalyticsLogbookReplay.buildSimulatedEstimate(from: session, environment: environment)
-        case .planned, .insufficientData:
+        case .planned, .ccrPlanned, .insufficientData:
             return nil
         }
     }
@@ -198,6 +257,67 @@ enum TissueAnalyticsService {
             }
         }
         return points.last?.depthMeters ?? 0
+    }
+
+    private static func buildCCRSamples(
+        tissueHistory: BuhlmannTissueHistory,
+        depthProfilePoints: [DepthProfilePoint],
+        ppO2Timeline: [CCRTimelineSample],
+        ppN2Timeline: [CCRTimelineSample],
+        environment: PlannerEnvironment,
+        gfLow: Double,
+        gfHigh: Double,
+        firstStopDepthMeters: Double,
+        diluentLabel: String
+    ) -> [TissueAnalyticsSample] {
+        let timestamps = Set(tissueHistory.samples.map(\.elapsedMinutes)).sorted()
+        return timestamps.compactMap { minute in
+            let bucket = tissueHistory.samples.filter { $0.elapsedMinutes == minute }
+            guard bucket.count == BuhlmannConstants.compartmentCount else { return nil }
+            let loadings = (0..<BuhlmannConstants.compartmentCount).map { index in
+                bucket.first(where: { $0.compartmentIndex == index })?.loadPercent ?? 0
+            }
+            let controlling = loadings.enumerated().max(by: { $0.element < $1.element })?.offset ?? 0
+            let controllingSample = bucket.first(where: { $0.compartmentIndex == controlling }) ?? bucket[0]
+            let elapsed = Double(minute)
+            let depth = interpolatedDepth(minutes: elapsed, points: depthProfilePoints)
+            let ppO2Sample = ppO2Timeline.min(by: { abs($0.runtimeMinutes - elapsed) < abs($1.runtimeMinutes - elapsed) })
+            let ppN2Sample = ppN2Timeline.min(by: { abs($0.runtimeMinutes - elapsed) < abs($1.runtimeMinutes - elapsed) })
+            let ppN2 = ppN2Sample?.ppN2Bar ?? 0
+            let ppO2 = ppO2Sample?.ppO2Bar ?? 0
+            let gf = BuhlmannEngine.gfAtDepth(
+                depthMeters: depth,
+                firstStopDepthMeters: firstStopDepthMeters,
+                gfLow: gfLow,
+                gfHigh: gfHigh
+            )
+            let ceiling = NarcosisAnalyticsSupport.ceilingMeters(
+                from: controllingSample.toleratedAmbientPressureBar,
+                environment: environment
+            )
+            return TissueAnalyticsSample(
+                runtimeSeconds: Int(minute.rounded()) * 60,
+                depthMeters: depth,
+                activeGasName: "CCR \(diluentLabel)",
+                compartmentLoadingsPercent: loadings,
+                controllingCompartment: controlling,
+                ceilingMeters: ceiling,
+                ppN2Bar: ppN2,
+                ppO2Bar: ppO2
+            )
+        }
+    }
+
+    private static func ccrPlannerCacheKey(plan: CCRPlanResult, input: CCRPlanInput) -> String {
+        [
+            "ccr-planner",
+            String(format: "%.1f", input.maxDepthMeters),
+            String(format: "%.1f", input.bottomTimeMinutes),
+            String(format: "%.0f", input.gfLow),
+            String(format: "%.0f", input.gfHigh),
+            String(plan.totalRuntimeMinutes),
+            String(plan.tissueTrace.samples.count)
+        ].joined(separator: "-")
     }
 
     private static func plannerCacheKey(plan: DivePlanResult, input: GasPlanInput, mode: PlannerMode) -> String {

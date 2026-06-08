@@ -61,6 +61,15 @@ final class PlannerStore: ObservableObject {
             scheduleSave()
         }
     }
+    @Published var ccrInput = CCRPlanInput.default {
+        didSet {
+            guard !isApplyingInputSideEffects, isReady else { return }
+            scheduleSave()
+            scheduleCCRPlanningUpdate()
+        }
+    }
+    @Published private(set) var ccrPlan = CCRPlanResult.empty
+    @Published var plannerShowsModeSelection = false
 
     private let cloudSync: CloudSyncStore?
     private let key = "dirdiving_ios_experimental_planner_state"
@@ -83,11 +92,30 @@ final class PlannerStore: ObservableObject {
             decompressionMethod = saved.decompressionMethod
             ratioDecoPreset = saved.ratioDecoPreset
             savedRatioDecoPresets = saved.savedRatioDecoPresets
+            ccrInput = saved.ccrInput ?? .default
+            plannerShowsModeSelection = saved.plannerShowsModeSelection ?? false
+        } else {
+            plannerShowsModeSelection = true
         }
         input.ensurePlannerCylindersFromLegacy()
         calculate()
+        refreshCCRPlan()
         isReady = true
         saveIfReady()
+    }
+
+    func selectPlannerMode(_ selected: PlannerMode) {
+        mode = selected
+        plannerShowsModeSelection = false
+        if selected.isCCR {
+            refreshCCRPlan()
+        } else {
+            schedulePlanningUpdate()
+        }
+    }
+
+    func returnToPlannerModeSelection() {
+        plannerShowsModeSelection = true
     }
 
     func refreshDerivedPlanningPreview() {
@@ -164,14 +192,22 @@ final class PlannerStore: ObservableObject {
         saveTask?.cancel()
         isCalculating = true
         defer { isCalculating = false }
-        refreshAnalysis(force: true)
-        applyInputToPlanningOutputs(persistSnapshot: true)
+        if mode.isCCR {
+            refreshCCRPlan()
+        } else {
+            refreshAnalysis(force: true)
+            applyInputToPlanningOutputs(persistSnapshot: true)
+        }
         saveIfReady()
     }
 
     /// Keeps plan, Bühlmann NDL, and analysis in sync with mode-projected planner input.
     private func applyInputToPlanningOutputs(persistSnapshot: Bool = false) {
         guard isReady else { return }
+        guard mode.isOpenCircuit else {
+            refreshCCRPlan()
+            return
+        }
         isApplyingInputSideEffects = true
         input.syncLegacyGasesFromPlannerCylinders()
         refreshAnalysis(force: false)
@@ -207,8 +243,27 @@ final class PlannerStore: ObservableObject {
         input.teamMembers[index] = member
     }
 
+    private func scheduleCCRPlanningUpdate() {
+        guard isReady, mode.isCCR else { return }
+        planningUpdateTask?.cancel()
+        planningGeneration &+= 1
+        let generation = planningGeneration
+        isCalculating = true
+        planningUpdateTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 200_000_000)
+            guard !Task.isCancelled, generation == planningGeneration else { return }
+            refreshCCRPlan()
+            isCalculating = false
+        }
+    }
+
+    func refreshCCRPlan() {
+        guard isReady, mode.isCCR else { return }
+        ccrPlan = CCRPlannerService.makePlan(input: ccrInput)
+    }
+
     private func schedulePlanningUpdate(persistSnapshot: Bool = false) {
-        guard isReady else { return }
+        guard isReady, mode.isOpenCircuit else { return }
         planningUpdateTask?.cancel()
         planningGeneration &+= 1
         let generation = planningGeneration
@@ -242,7 +297,9 @@ final class PlannerStore: ObservableObject {
                 lastTissueSnapshot: lastTissueSnapshot,
                 decompressionMethod: decompressionMethod,
                 ratioDecoPreset: ratioDecoPreset,
-                savedRatioDecoPresets: savedRatioDecoPresets
+                savedRatioDecoPresets: savedRatioDecoPresets,
+                ccrInput: ccrInput,
+                plannerShowsModeSelection: plannerShowsModeSelection
             ),
             forKey: key
         )
@@ -284,6 +341,8 @@ private struct PlannerState: Codable {
     var decompressionMethod: PlannerDecompressionMethod = .buhlmann
     var ratioDecoPreset: RatioDecoPreset = .preset1to1
     var savedRatioDecoPresets: [RatioDecoPreset] = []
+    var ccrInput: CCRPlanInput?
+    var plannerShowsModeSelection: Bool?
 
     init(
         mode: PlannerMode,
@@ -293,7 +352,9 @@ private struct PlannerState: Codable {
         lastTissueSnapshot: TissueSnapshot? = nil,
         decompressionMethod: PlannerDecompressionMethod = .buhlmann,
         ratioDecoPreset: RatioDecoPreset = .preset1to1,
-        savedRatioDecoPresets: [RatioDecoPreset] = []
+        savedRatioDecoPresets: [RatioDecoPreset] = [],
+        ccrInput: CCRPlanInput? = nil,
+        plannerShowsModeSelection: Bool? = nil
     ) {
         self.mode = mode
         self.input = input
@@ -303,6 +364,8 @@ private struct PlannerState: Codable {
         self.decompressionMethod = decompressionMethod
         self.ratioDecoPreset = ratioDecoPreset
         self.savedRatioDecoPresets = savedRatioDecoPresets
+        self.ccrInput = ccrInput
+        self.plannerShowsModeSelection = plannerShowsModeSelection
     }
 
     init(from decoder: Decoder) throws {
@@ -315,6 +378,8 @@ private struct PlannerState: Codable {
         decompressionMethod = try container.decodeIfPresent(PlannerDecompressionMethod.self, forKey: .decompressionMethod) ?? .buhlmann
         ratioDecoPreset = try container.decodeIfPresent(RatioDecoPreset.self, forKey: .ratioDecoPreset) ?? .preset1to1
         savedRatioDecoPresets = try container.decodeIfPresent([RatioDecoPreset].self, forKey: .savedRatioDecoPresets) ?? []
+        ccrInput = try container.decodeIfPresent(CCRPlanInput.self, forKey: .ccrInput)
+        plannerShowsModeSelection = try container.decodeIfPresent(Bool.self, forKey: .plannerShowsModeSelection)
     }
 }
 
