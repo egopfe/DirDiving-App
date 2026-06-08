@@ -1,6 +1,7 @@
 # CCR / Rebreather External Validation Plan
 
 **Status:** Pending — not executed in code remediation pass (2026-06-08)  
+**Evidence matrix:** [`CCR_REBREATHER_VALIDATION_EVIDENCE.md`](CCR_REBREATHER_VALIDATION_EVIDENCE.md)  
 **Product stance:** DIR DIVING CCR planner is a **reference-only** companion tool, not a certified CCR controller.
 
 ## Objectives

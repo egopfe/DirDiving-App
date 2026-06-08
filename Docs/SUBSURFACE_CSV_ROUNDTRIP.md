@@ -65,17 +65,28 @@ Subsurface ignores `#` comment lines; DIR DIVING uses them for round-trip fideli
 
 **Status:** Not automated; must be executed on a real Subsurface install before external TestFlight sign-off.
 
+**Evidence folder:** `Docs/QA_EVIDENCE/SUBSURFACE_CSV/`
+
 | Step | Action | Pass |
 |---:|---|---|
-| 1 | Export Watch-originated dive from iOS Logbook → CSV | ☐ |
-| 2 | Export manual iOS dive (no profile) — export blocked or empty profile rejected | ☐ |
-| 3 | Export imported dive with GPS/temperature metadata | ☐ |
-| 4 | Import CSV into Subsurface desktop app | ☐ |
-| 5 | Verify `time_seconds` monotonic from first sample; depth in meters | ☐ |
-| 6 | Verify GPS columns and `# session_meta` dates unchanged | ☐ |
-| 7 | Verify no duplicate/shifted timebase after re-export from Subsurface | ☐ |
+| 1 | Export Watch-originated dive from iOS Logbook → CSV | ☐ **PENDING** |
+| 2 | Export manual iOS dive (no profile) — export blocked or empty profile rejected | ☐ **PENDING** |
+| 3 | Export imported dive with GPS/temperature metadata | ☐ **PENDING** |
+| 4 | Export manual **CCR** dive with `# dirdiving_ccr_*` metadata | ☐ **PENDING** |
+| 5 | Import CSV into Subsurface desktop app | ☐ **PENDING** |
+| 6 | Verify `time_seconds` monotonic from first sample; depth in meters | ☐ **PENDING** |
+| 7 | Verify GPS columns and `# session_meta` dates unchanged | ☐ **PENDING** |
+| 8 | Re-import DIR DIVING export — CCR metadata round-trip if present | ☐ **PENDING** |
+| 9 | Malformed row / unknown `# dirdiving_*` key — no crash | ☐ **PENDING** (automated partial) |
+| 10 | Duplicate import — no duplicate session | ☐ **PENDING** |
 
 Record build, commit, device, and Subsurface version in release notes when executed.
+
+## Internal automated coverage (2026-06-08)
+
+- `CSVMetadataRoundTripTests` — session meta + CCR fields
+- `DiveImportServiceTests` — malformed / legacy CSV
+- `SubsurfaceExportServiceTests` — export column policy
 
 ## Limitations
 

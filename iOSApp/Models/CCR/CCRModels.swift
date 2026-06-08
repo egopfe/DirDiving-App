@@ -213,6 +213,8 @@ struct CCRBailoutScenarioResult: Identifiable, Hashable {
     let warnings: [String]
     let gasSwitchSequence: [String]
     let referenceNotes: String
+    /// SAC-based reserve estimate — not a Bühlmann OC bailout decompression schedule.
+    var isHeuristic: Bool { true }
 }
 
 enum CCRBailoutScenarioStatus: String, Hashable {
