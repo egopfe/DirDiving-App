@@ -2,6 +2,7 @@ import Foundation
 
 enum TissueAnalyticsSource: String, Codable, Hashable {
     case planned
+    case ccrPlanned
     case recorded
     case simulated
     case insufficientData
@@ -10,6 +11,8 @@ enum TissueAnalyticsSource: String, Codable, Hashable {
         switch self {
         case .planned:
             return String(localized: "tissue_analytics.source.planned")
+        case .ccrPlanned:
+            return String(localized: "tissue_analytics.source.ccr_planned")
         case .recorded:
             return String(localized: "tissue_analytics.source.recorded")
         case .simulated:
@@ -23,6 +26,8 @@ enum TissueAnalyticsSource: String, Codable, Hashable {
         switch self {
         case .planned:
             return String(localized: "tissue_analytics.source.planned_footnote")
+        case .ccrPlanned:
+            return String(localized: "tissue_analytics.source.ccr_planned_footnote")
         case .recorded:
             return String(localized: "tissue_analytics.source.recorded_footnote")
         case .simulated:

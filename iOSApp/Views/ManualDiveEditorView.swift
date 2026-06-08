@@ -22,6 +22,16 @@ struct ManualDiveEditorView: View {
     @State private var decompressionNotes = ""
     @State private var notes = ""
     @State private var gasLabel: DiveGasLabel = .oc
+    @State private var ccrRebreatherModel = ""
+    @State private var ccrLowSetpoint = 0.7
+    @State private var ccrHighSetpoint = 1.3
+    @State private var ccrSetpointSwitchDepth = 20.0
+    @State private var ccrDiluentLabel = "AIR"
+    @State private var ccrBailoutLabels = ""
+    @State private var ccrScrubberNotes = ""
+    @State private var ccrOxygenSensorNotes = ""
+    @State private var ccrLoopNotes = ""
+    @State private var ccrBailoutScenarioNotes = ""
     @State private var validationMessage: String?
     @State private var showSaveFailureAlert = false
 
@@ -72,6 +82,9 @@ struct ManualDiveEditorView: View {
                         }
                     }
                     .pickerStyle(.segmented)
+                    if gasLabel == .ccr {
+                        ccrMetadataSection
+                    }
                     if let validationMessage {
                         Text(validationMessage)
                             .font(.caption.weight(.semibold))
@@ -136,6 +149,49 @@ struct ManualDiveEditorView: View {
                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.55), lineWidth: 1))
             )
             .accessibilityLabel(String(localized: "manual_dive.edit.nodepth.banner"))
+    }
+
+    private var ccrMetadataSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(String(localized: "manual_dive.ccr.header"))
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(DIRTheme.orange)
+            field(String(localized: "ccr.rebreather_model"), text: $ccrRebreatherModel)
+            stepperField(String(localized: "ccr.setpoint.low"), value: $ccrLowSetpoint, suffix: "bar", step: 0.1, range: 0.4...1.6)
+            stepperField(String(localized: "ccr.setpoint.high"), value: $ccrHighSetpoint, suffix: "bar", step: 0.1, range: 0.4...1.6)
+            stepperField(String(localized: "ccr.setpoint.switch_depth"), value: $ccrSetpointSwitchDepth, suffix: unitPreference == .metric ? "m" : "ft", step: 1, range: 0...120)
+            field(String(localized: "manual_dive.ccr.diluent_label"), text: $ccrDiluentLabel)
+            field(String(localized: "manual_dive.ccr.bailout_labels"), text: $ccrBailoutLabels)
+            field(String(localized: "manual_dive.ccr.scrubber_notes"), text: $ccrScrubberNotes)
+            field(String(localized: "manual_dive.ccr.o2_sensor_notes"), text: $ccrOxygenSensorNotes)
+            field(String(localized: "manual_dive.ccr.loop_notes"), text: $ccrLoopNotes)
+            field(String(localized: "manual_dive.ccr.bailout_scenario_notes"), text: $ccrBailoutScenarioNotes)
+        }
+        .padding(10)
+        .background(
+            RoundedRectangle(cornerRadius: 8)
+                .fill(DIRTheme.orange.opacity(0.08))
+                .overlay(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.orange.opacity(0.35), lineWidth: 1))
+        )
+    }
+
+    private var currentCCRMetadata: CCRLogbookMetadata? {
+        guard gasLabel == .ccr else { return nil }
+        return CCRLogbookMetadata(
+            rebreatherModel: ccrRebreatherModel,
+            lowSetpoint: ccrLowSetpoint,
+            highSetpoint: ccrHighSetpoint,
+            setpointSwitchDepthMeters: ccrSetpointSwitchDepth,
+            diluentLabel: ccrDiluentLabel,
+            bailoutLabels: ccrBailoutLabels
+                .split(separator: "|")
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty },
+            scrubberNotes: ccrScrubberNotes,
+            oxygenSensorNotes: ccrOxygenSensorNotes,
+            loopNotes: ccrLoopNotes,
+            bailoutScenarioNotes: ccrBailoutScenarioNotes
+        )
     }
 
     private var syntheticProfileDisclosure: some View {
@@ -218,6 +274,18 @@ struct ManualDiveEditorView: View {
         decompressionNotes = existing.decompressionNotes ?? ""
         notes = existing.notes ?? ""
         gasLabel = existing.gasLabel
+        if let ccr = existing.ccrLogbookMetadata {
+            ccrRebreatherModel = ccr.rebreatherModel
+            ccrLowSetpoint = ccr.lowSetpoint
+            ccrHighSetpoint = ccr.highSetpoint
+            ccrSetpointSwitchDepth = ccr.setpointSwitchDepthMeters
+            ccrDiluentLabel = ccr.diluentLabel
+            ccrBailoutLabels = ccr.bailoutLabels.joined(separator: " | ")
+            ccrScrubberNotes = ccr.scrubberNotes
+            ccrOxygenSensorNotes = ccr.oxygenSensorNotes
+            ccrLoopNotes = ccr.loopNotes
+            ccrBailoutScenarioNotes = ccr.bailoutScenarioNotes
+        }
     }
 
     private func save() {
@@ -267,7 +335,8 @@ struct ManualDiveEditorView: View {
             exitPressureText: pressures.exitText,
             entryPressureBar: pressures.entryBar,
             exitPressureBar: pressures.exitBar,
-            decompressionNotes: decompressionNotes.isEmpty ? nil : decompressionNotes
+            decompressionNotes: decompressionNotes.isEmpty ? nil : decompressionNotes,
+            ccrLogbookMetadata: currentCCRMetadata
         )
         guard logStore.add(session) else {
             showSaveFailureAlert = true
@@ -296,6 +365,7 @@ struct ManualDiveEditorView: View {
             decompressionNotes: decompressionNotes,
             notes: notes,
             gasLabel: gasLabel,
+            ccrLogbookMetadata: currentCCRMetadata,
             unitPreference: unitPreference
         ) {
         case .failure(let error):

@@ -31,6 +31,8 @@ enum TissueAnalyticsLogbookReplay {
             return String(localized: "tissue_analytics.logbook.entry.subtitle.simulated")
         case .insufficientData:
             return String(localized: "tissue_analytics.logbook.entry.subtitle.insufficient")
+        case .ccrPlanned:
+            return String(localized: "tissue_analytics.source.ccr_planned")
         }
     }
 
@@ -283,6 +285,8 @@ enum TissueAnalyticsLogbookReplay {
             return BuhlmannGas(name: "EAN32", role: .bottom, oxygenFraction: 0.32, heliumFraction: 0, maxPPO2Bar: 1.4, switchDepthMeters: 0)
         case .trimix:
             return BuhlmannGas(name: "TX18/45", role: .bottom, oxygenFraction: 0.18, heliumFraction: 0.45, maxPPO2Bar: 1.4, switchDepthMeters: 0)
+        case .ccr:
+            return BuhlmannGas(name: "CCR diluent", role: .bottom, oxygenFraction: 0.21, heliumFraction: 0, maxPPO2Bar: 1.3, switchDepthMeters: 0)
         }
     }
 }

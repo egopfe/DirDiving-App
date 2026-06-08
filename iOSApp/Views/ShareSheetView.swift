@@ -35,6 +35,19 @@ enum PDFShareActions {
         )
     }
 
+    static func ccrContext(
+        store: PlannerStore,
+        safetyAcknowledged: Bool,
+        unitPreference: IOSUnitPreference
+    ) -> PDFExportCCRPlannerContext {
+        PDFExportCCRPlannerContext(
+            input: store.ccrInput,
+            plan: store.ccrPlan,
+            safetyAcknowledged: safetyAcknowledged,
+            unitPreference: unitPreference
+        )
+    }
+
     static func invalidPlanMessage() -> String {
         String(localized: "pdf.export.error.invalid_plan")
     }
