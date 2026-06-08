@@ -111,6 +111,8 @@ enum DivePackPDFBuilder {
             switch warning {
             case .unavailableInBaseMode:
                 page.drawParagraph(String(localized: "planner.ratio_deco.validation.unavailable_base"))
+            case .unavailableInCCRMode:
+                page.drawParagraph(String(localized: "planner.ratio_deco.unavailable_ccr"))
             case .ceilingViolation:
                 page.drawParagraph(String(localized: "planner.ratio_deco.validation.ceiling"))
             case .modExceeded:

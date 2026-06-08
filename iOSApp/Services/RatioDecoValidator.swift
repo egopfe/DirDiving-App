@@ -19,6 +19,16 @@ enum RatioDecoValidator {
             )
         }
 
+        if mode == .ccr {
+            return RatioDecoValidationResult(
+                isBuhlmannCompatible: false,
+                warnings: [.unavailableInCCRMode],
+                firstViolationRuntime: nil,
+                firstViolationDepthMeters: nil,
+                requiredCeilingMeters: nil
+            )
+        }
+
         if mode == .deco, input.plannedDepthMeters > PlannerModeLimits.decoMaximumDepthMeters(for: input) + 0.01 {
             return RatioDecoValidationResult(
                 isBuhlmannCompatible: false,

@@ -101,9 +101,10 @@ enum CCRPlannerPDFBuilder {
 
             if !plan.bailoutScenarios.isEmpty {
                 page.drawSpacer()
-                page.drawSectionTitle(String(localized: "ccr.bailout.analysis"))
+                page.drawSectionTitle(String(localized: "ccr.bailout.heuristic_analysis"))
+                page.drawParagraph(String(localized: "ccr.bailout.heuristic_disclaimer"))
                 for scenario in plan.bailoutScenarios {
-                    page.drawParagraph("\(scenario.kind.localizedTitle): \(scenario.status.rawValue)")
+                    page.drawParagraph("\(scenario.kind.localizedTitle): \(scenario.status.localizedTitle)")
                     for warning in scenario.warnings {
                         page.drawParagraph(warning)
                     }

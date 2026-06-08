@@ -544,6 +544,8 @@ enum GasPlanningService {
         case .bottom: return String(localized: "planner.segment.switch_back_gas")
         case .deco: return String(localized: "planner.segment.deco_switch")
         case .bailout: return String(localized: "planner.segment.bailout_emergency")
+        case .ccrDiluent: return String(localized: "gas.role.ccr_diluent")
+        case .ccrBailout: return String(localized: "gas.role.ccr_bailout")
         }
     }
 

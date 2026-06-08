@@ -203,6 +203,7 @@ targets:
       - iOSApp/Services/CCR/CCRInspiredGasModel.swift
       - iOSApp/Services/CCR/CCRPlanValidator.swift
       - iOSApp/Services/CCR/CCRPlannerEngine.swift
+      - iOSApp/Services/CCR/CCRTissueHistorySampler.swift
       - iOSApp/Services/CCR/CCRPlannerService.swift
       - iOSApp/Services/CCR/CCRBailoutScenarioCalculator.swift
       - iOSApp/Services/CCR/CCRGasDensityEstimator.swift

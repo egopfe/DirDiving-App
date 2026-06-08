@@ -32,7 +32,7 @@ enum CCRBailoutScenarioCalculator {
                 status: .fail,
                 warnings: [String(localized: "ccr.bailout.no_gases")],
                 gasSwitchSequence: [],
-                referenceNotes: String(localized: "ccr.reference_estimate_only")
+                referenceNotes: String(localized: "ccr.bailout.heuristic_disclaimer")
             )
         }
 
@@ -82,7 +82,7 @@ enum CCRBailoutScenarioCalculator {
             status: status,
             warnings: warnings,
             gasSwitchSequence: sequence,
-            referenceNotes: String(localized: "ccr.reference_estimate_only")
+            referenceNotes: String(localized: "ccr.bailout.heuristic_disclaimer")
         )
     }
 }

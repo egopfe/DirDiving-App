@@ -77,6 +77,8 @@ enum GasRole: String, CaseIterable, Identifiable, Codable {
     case travel = "Travel"
     case deco = "Deco"
     case bailout = "Bailout"
+    case ccrDiluent = "CCR Diluent"
+    case ccrBailout = "CCR Bailout"
     var id: String { rawValue }
 
     var localizedTitle: String {
@@ -85,6 +87,15 @@ enum GasRole: String, CaseIterable, Identifiable, Codable {
         case .bottom: return String(localized: "gas.role.bottom")
         case .deco: return String(localized: "gas.role.deco")
         case .bailout: return String(localized: "gas.role.bailout")
+        case .ccrDiluent: return String(localized: "gas.role.ccr_diluent")
+        case .ccrBailout: return String(localized: "gas.role.ccr_bailout")
+        }
+    }
+
+    var isOpenCircuitRole: Bool {
+        switch self {
+        case .bottom, .travel, .deco, .bailout: return true
+        case .ccrDiluent, .ccrBailout: return false
         }
     }
 }
@@ -163,6 +174,8 @@ struct PlannerCylinderEntry: Identifiable, Codable, Hashable {
         case .travel: return 30
         case .deco: return 21
         case .bailout: return 6
+        case .ccrDiluent: return 0
+        case .ccrBailout: return 6
         }
     }
 
@@ -219,9 +232,9 @@ struct PlannerCylinderEntry: Identifiable, Codable, Hashable {
 
     func isSwitchDepthBeyondMOD(environment: PlannerEnvironment) -> Bool {
         switch role {
-        case .bottom:
+        case .bottom, .ccrDiluent:
             return false
-        case .travel, .deco, .bailout:
+        case .travel, .deco, .bailout, .ccrBailout:
             return switchDepthMeters > modMeters(environment: environment) + 0.05
         }
     }
