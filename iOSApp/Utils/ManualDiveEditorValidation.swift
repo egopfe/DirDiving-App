@@ -22,6 +22,26 @@ enum ManualDiveEditorValidation {
         return nil
     }
 
+    static func ccrMetadataError(metadata: CCRLogbookMetadata, maxDepthMeters: Double) -> String? {
+        guard metadata.lowSetpoint.isFinite, metadata.highSetpoint.isFinite else {
+            return String(localized: "manual_dive.ccr.validation.invalid_setpoint")
+        }
+        guard metadata.lowSetpoint > 0, metadata.highSetpoint > 0 else {
+            return String(localized: "manual_dive.ccr.validation.invalid_setpoint")
+        }
+        guard metadata.lowSetpoint < metadata.highSetpoint else {
+            return String(localized: "manual_dive.ccr.validation.low_ge_high")
+        }
+        guard metadata.setpointSwitchDepthMeters.isFinite, metadata.setpointSwitchDepthMeters >= 0 else {
+            return String(localized: "manual_dive.ccr.validation.invalid_switch_depth")
+        }
+        if maxDepthMeters.isFinite, maxDepthMeters > 0,
+           metadata.setpointSwitchDepthMeters > maxDepthMeters + 0.01 {
+            return String(localized: "manual_dive.ccr.validation.switch_deeper_than_max")
+        }
+        return nil
+    }
+
     static func clampedDurationMinutes(_ value: Double) -> Double {
         min(300, max(5, value))
     }
@@ -47,6 +67,10 @@ enum ManualDiveEditorValidation {
         unitPreference: IOSUnitPreference
     ) -> Result<DiveSession, ManualDiveEditorSaveError> {
         if let error = depthOrderError(maxMeters: maxMeters, avgMeters: avgMeters) {
+            return .failure(.validation(error))
+        }
+        if gasLabel == .ccr, let metadata = ccrLogbookMetadata,
+           let error = ccrMetadataError(metadata: metadata, maxDepthMeters: maxMeters) {
             return .failure(.validation(error))
         }
         let duration = clampedDurationMinutes(durationMinutes) * 60

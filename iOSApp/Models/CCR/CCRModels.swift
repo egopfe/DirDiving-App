@@ -123,6 +123,7 @@ struct CCRSetpointProfile: Codable, Hashable {
     var highSetpoint: Double = 1.3
     var switchDepthMeters: Double = 20
     var mode: CCRSetpointMode = .automatic
+    /// Reserved for a future manual setpoint timeline. Ignored by the CCR engine in this release.
     var runtimeSegments: [CCRSetpointSegment] = []
     /// Manual mode: revert to low setpoint during shallow ascent (reference profile only).
     var useLowSetpointOnShallowAscent: Bool = false
@@ -218,6 +219,14 @@ enum CCRBailoutScenarioStatus: String, Hashable {
     case pass
     case warning
     case fail
+
+    var localizedTitle: String {
+        switch self {
+        case .pass: return String(localized: "ccr.bailout.status.pass")
+        case .warning: return String(localized: "ccr.bailout.status.warning")
+        case .fail: return String(localized: "ccr.bailout.status.fail")
+        }
+    }
 }
 
 struct CCRPlanValidationResult: Hashable {
@@ -228,6 +237,7 @@ struct CCRPlanValidationResult: Hashable {
 enum CCRPlanIssue: Hashable {
     case invalidDepth(String)
     case invalidSetpoint(String)
+    case invalidGradientFactor(String)
     case invalidDiluent(String)
     case hypoxicDiluent(String)
     case hyperoxicSetpoint(String)
@@ -240,7 +250,7 @@ enum CCRPlanIssue: Hashable {
 
     var localizedMessage: String {
         switch self {
-        case .invalidDepth(let m), .invalidSetpoint(let m), .invalidDiluent(let m),
+        case .invalidDepth(let m), .invalidSetpoint(let m), .invalidGradientFactor(let m), .invalidDiluent(let m),
              .hypoxicDiluent(let m), .hyperoxicSetpoint(let m), .ambientBelowSetpoint(let m),
              .invalidBailout(let m), .bailoutMODExceeded(let m), .missingBailout(let m):
             return m

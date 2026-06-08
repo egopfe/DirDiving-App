@@ -77,6 +77,10 @@ struct CCRPlannerView: View {
             VStack(spacing: 10) {
                 depthRow(title: String(localized: "planner.max_depth"), value: $store.ccrInput.maxDepthMeters, range: 5...120)
                 depthRow(title: String(localized: "planner.avg_depth"), value: $store.ccrInput.averageDepthMeters, range: 5...120)
+                Text(String(localized: "ccr.avg_depth.reference_only"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
                 minutesRow(title: String(localized: "planner.bottom_time"), value: $store.ccrInput.bottomTimeMinutes, range: 1...180)
                 TextField(String(localized: "ccr.rebreather_model"), text: $store.ccrInput.rebreatherModel)
                     .textFieldStyle(.roundedBorder)

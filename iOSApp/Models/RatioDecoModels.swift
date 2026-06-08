@@ -140,6 +140,7 @@ struct RatioDecoStop: Identifiable, Hashable {
 
 enum RatioDecoWarning: Hashable {
     case unavailableInBaseMode
+    case unavailableInCCRMode
     case noDecoGases
     case modViolation(depthMeters: Double, gasLabel: String)
     case gasAssignmentFallback(depthMeters: Double)
@@ -163,6 +164,7 @@ struct RatioDecoSchedule: Hashable {
 
 enum RatioDecoValidationWarning: Hashable {
     case unavailableInBaseMode
+    case unavailableInCCRMode
     case ceilingViolation(requiredCeilingMeters: Double, stopDepthMeters: Double, runtimeMinute: Double)
     case modExceeded(depthMeters: Double, gasLabel: String)
     case decoDepthLimitExceeded
