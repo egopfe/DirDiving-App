@@ -25,7 +25,7 @@ struct ManualDiveEditorView: View {
     @State private var ccrRebreatherModel = ""
     @State private var ccrLowSetpoint = 0.7
     @State private var ccrHighSetpoint = 1.3
-    @State private var ccrSetpointSwitchDepth = 20.0
+    @State private var ccrSetpointSwitchDepthInput = ManualDiveEditorDefaults.defaultCCRSetpointSwitchDepthInput(units: .metric)
     @State private var ccrDiluentLabel = "AIR"
     @State private var ccrBailoutLabels = ""
     @State private var ccrScrubberNotes = ""
@@ -125,9 +125,14 @@ struct ManualDiveEditorView: View {
                 loadExisting()
             }
         }
-        .onChange(of: units) { _, _ in
-            guard existing == nil else { return }
-            applyDefaultDepthInputs()
+        .onChange(of: units) { _, newUnits in
+            let preference = IOSUnitPreference.fromStorage(newUnits)
+            if existing == nil {
+                applyDefaultDepthInputs()
+            } else if gasLabel == .ccr {
+                let meters = ManualDiveEditorDefaults.depthMeters(fromInput: ccrSetpointSwitchDepthInput, units: unitPreference)
+                ccrSetpointSwitchDepthInput = Formatters.depthValue(meters, units: preference)
+            }
         }
         .alert(String(localized: "manual_dive.save_failed.title"), isPresented: $showSaveFailureAlert) {
             Button(String(localized: "manual_dive.save_failed.dismiss"), role: .cancel) {}
@@ -159,7 +164,7 @@ struct ManualDiveEditorView: View {
             field(String(localized: "ccr.rebreather_model"), text: $ccrRebreatherModel)
             stepperField(String(localized: "ccr.setpoint.low"), value: $ccrLowSetpoint, suffix: "bar", step: 0.1, range: 0.4...1.6)
             stepperField(String(localized: "ccr.setpoint.high"), value: $ccrHighSetpoint, suffix: "bar", step: 0.1, range: 0.4...1.6)
-            stepperField(String(localized: "ccr.setpoint.switch_depth"), value: $ccrSetpointSwitchDepth, suffix: unitPreference == .metric ? "m" : "ft", step: 1, range: 0...120)
+            stepperField(String(localized: "ccr.setpoint.switch_depth"), value: $ccrSetpointSwitchDepthInput, suffix: unitPreference == .metric ? "m" : "ft", step: 1, range: 0...120)
             field(String(localized: "manual_dive.ccr.diluent_label"), text: $ccrDiluentLabel)
             field(String(localized: "manual_dive.ccr.bailout_labels"), text: $ccrBailoutLabels)
             field(String(localized: "manual_dive.ccr.scrubber_notes"), text: $ccrScrubberNotes)
@@ -181,7 +186,7 @@ struct ManualDiveEditorView: View {
             rebreatherModel: ccrRebreatherModel,
             lowSetpoint: ccrLowSetpoint,
             highSetpoint: ccrHighSetpoint,
-            setpointSwitchDepthMeters: ccrSetpointSwitchDepth,
+            setpointSwitchDepthMeters: ManualDiveEditorDefaults.depthMeters(fromInput: ccrSetpointSwitchDepthInput, units: unitPreference),
             diluentLabel: ccrDiluentLabel,
             bailoutLabels: ccrBailoutLabels
                 .split(separator: "|")
@@ -247,6 +252,7 @@ struct ManualDiveEditorView: View {
     private func applyDefaultDepthInputs() {
         maxDepthInput = ManualDiveEditorDefaults.defaultMaxDepthInput(units: unitPreference)
         avgDepthInput = ManualDiveEditorDefaults.defaultAverageDepthInput(units: unitPreference)
+        ccrSetpointSwitchDepthInput = ManualDiveEditorDefaults.defaultCCRSetpointSwitchDepthInput(units: unitPreference)
     }
 
     private func loadExisting() {
@@ -278,7 +284,7 @@ struct ManualDiveEditorView: View {
             ccrRebreatherModel = ccr.rebreatherModel
             ccrLowSetpoint = ccr.lowSetpoint
             ccrHighSetpoint = ccr.highSetpoint
-            ccrSetpointSwitchDepth = ccr.setpointSwitchDepthMeters
+            ccrSetpointSwitchDepthInput = Formatters.depthValue(ccr.setpointSwitchDepthMeters, units: unitPreference)
             ccrDiluentLabel = ccr.diluentLabel
             ccrBailoutLabels = ccr.bailoutLabels.joined(separator: " | ")
             ccrScrubberNotes = ccr.scrubberNotes
@@ -298,6 +304,11 @@ struct ManualDiveEditorView: View {
 
     private func saveMetadataOnly() {
         guard let existing else { return }
+        if gasLabel == .ccr, let metadata = currentCCRMetadata,
+           let error = ManualDiveEditorValidation.ccrMetadataError(metadata: metadata, maxDepthMeters: existing.maxDepthMeters) {
+            validationMessage = error
+            return
+        }
         let duration = durationMinutes * 60
         let endDate = startDate.addingTimeInterval(duration)
         let entryGPS = ManualDiveEditorValidation.makeGPSPoint(lat: entryLatitude, lon: entryLongitude, timestamp: startDate)

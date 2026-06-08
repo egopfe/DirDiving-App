@@ -12,6 +12,7 @@ enum CCRPlannerEngine {
         let timeline: [CCRTimelineSample]
         let exposureSegments: [(kind: DiveSegmentKind, fromDepth: Double, toDepth: Double, minutes: Double, setpointBar: Double)]
         let modelState: BuhlmannModelState
+        let finalTissueState: BuhlmannTissueState
     }
 
     static func plan(input: CCRPlanInput, environment: PlannerEnvironment) -> EngineOutput {
@@ -167,31 +168,14 @@ enum CCRPlannerEngine {
             timeline: &timeline
         )
 
-        let request = BuhlmannPlanRequest(
-            maxDepthMeters: input.maxDepthMeters,
-            bottomMinutes: input.bottomTimeMinutes,
-            bottomGas: CCRInspiredGasModel.labelGas(diluent: diluent, setpointBar: bottomSetpoint, depthMeters: currentDepth, environment: environment),
-            travelGases: [],
-            decoGases: [],
-            gfLow: input.gfLow,
-            gfHigh: input.gfHigh,
-            plannerEnvironment: environment
+        let firstStopDepth = deco.stops.first?.depthMeters ?? 0
+        let tissueHistory = CCRTissueHistorySampler.sample(
+            input: input,
+            environment: environment,
+            segments: exposureSegments,
+            finalState: deco.state,
+            firstStopDepthMeters: firstStopDepth
         )
-        let engineResult = BuhlmannEngineResult(
-            ndlMinutes: nil,
-            ttsMinutes: Int(ceil(deco.elapsedMinutes)),
-            totalRuntimeMinutes: Int(ceil(runtimeMinutes)),
-            descentMinutes: 0,
-            bottomMinutes: input.bottomTimeMinutes,
-            gasSwitchMinutes: 0,
-            finalTissueState: deco.state,
-            stops: deco.stops,
-            segments: runtimeSegments,
-            tissueHistory: .empty,
-            issues: [],
-            modelState: .validReference
-        )
-        let tissueHistory = BuhlmannTissueHistorySampler.sample(request: request, engineResult: engineResult)
 
         let decoStops = deco.stops.map {
             DecoStop(
@@ -213,7 +197,8 @@ enum CCRPlannerEngine {
             totalRuntimeMinutes: Int(ceil(runtimeMinutes)),
             timeline: timeline,
             exposureSegments: exposureSegments,
-            modelState: .validReference
+            modelState: .validReference,
+            finalTissueState: deco.state
         )
     }
 

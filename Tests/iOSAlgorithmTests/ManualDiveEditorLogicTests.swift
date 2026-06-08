@@ -100,4 +100,11 @@ final class ManualDiveEditorLogicTests: XCTestCase {
         let meters = ManualDiveEditorDefaults.depthMeters(fromInput: 98.4, units: .imperial)
         XCTAssertEqual(meters, 30, accuracy: 0.5)
     }
+
+    func testImperialCCRSwitchDepthConversionRoundTrip() {
+        let meters = ManualDiveEditorDefaults.depthMeters(fromInput: 66, units: .imperial)
+        XCTAssertEqual(meters, 20.1168, accuracy: 0.1)
+        let redisplay = Formatters.depthValue(meters, units: .imperial)
+        XCTAssertEqual(redisplay, 66, accuracy: 1)
+    }
 }

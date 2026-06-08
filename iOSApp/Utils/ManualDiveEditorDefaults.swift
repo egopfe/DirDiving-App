@@ -3,6 +3,16 @@ import Foundation
 enum ManualDiveEditorDefaults {
     static let defaultMaxDepthMeters = 30.0
     static let defaultAverageDepthMeters = 18.0
+    static let defaultCCRSetpointSwitchDepthMeters = 20.0
+
+    static func defaultCCRSetpointSwitchDepthInput(units: IOSUnitPreference) -> Double {
+        switch units {
+        case .metric:
+            return defaultCCRSetpointSwitchDepthMeters
+        case .imperial:
+            return Formatters.depthValue(defaultCCRSetpointSwitchDepthMeters, units: .imperial)
+        }
+    }
 
     static func defaultMaxDepthInput(units: IOSUnitPreference) -> Double {
         switch units {

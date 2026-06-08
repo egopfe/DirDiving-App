@@ -105,6 +105,7 @@ final class CSVMetadataRoundTripTests: XCTestCase {
         XCTAssertEqual(imported.rebreatherModel, "rEvo III")
         XCTAssertEqual(imported.lowSetpoint, 0.7, accuracy: 0.01)
         XCTAssertEqual(imported.highSetpoint, 1.3, accuracy: 0.01)
+        XCTAssertEqual(imported.setpointSwitchDepthMeters, 20, accuracy: 0.01)
         XCTAssertEqual(imported.diluentLabel, "TMX21/35")
         XCTAssertEqual(imported.bailoutLabels, ["EAN32", "O2"])
         XCTAssertEqual(imported.scrubberNotes, "Fresh sofnolime")
