@@ -195,6 +195,9 @@ struct CCRPlanResultView: View {
                 .foregroundStyle(DIRTheme.yellow)
             }
             .frame(height: 160)
+            Text(String(localized: "ccr.narcosis.estimator_footnote"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
         }
     }
 

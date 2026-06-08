@@ -150,4 +150,28 @@ final class ChecklistPlannerSyncMapperTests: XCTestCase {
         XCTAssertTrue(checklist[0].usesGas)
         XCTAssertEqual(checklist[0].gasRole, .deco)
     }
+
+    func testCCRMultipleBailoutExportPreservesRowOrder() {
+        var input = CCRPlanInput.default
+        input.bailoutGases = [
+            CCRBailoutGas(mixKind: .ean, oxygenPercent: 32, switchDepthMeters: 0),
+            CCRBailoutGas(mixKind: .oxygen, switchDepthMeters: 6)
+        ]
+        var checklist: [EquipmentChecklistItem] = [
+            EquipmentChecklistItem(title: "D", isReady: true, usesGas: true, gasText: "X", gasRole: .ccrDiluent),
+            EquipmentChecklistItem(title: "B1", isReady: false, usesGas: true, gasText: "OLD1", gasRole: .ccrBailout),
+            EquipmentChecklistItem(title: "B2", isReady: true, usesGas: true, gasText: "OLD2", gasRole: .ccrBailout)
+        ]
+        ChecklistPlannerSyncMapper.applyCCRExport(input: input, to: &checklist)
+        let bailouts = checklist.filter { $0.gasRole == .ccrBailout }
+        XCTAssertEqual(bailouts.count, 2)
+        XCTAssertFalse(bailouts[0].isReady)
+        XCTAssertTrue(bailouts[1].isReady)
+        XCTAssertFalse(bailouts.contains { $0.gasText == "OLD1" || $0.gasText == "OLD2" })
+    }
+
+    func testInferRoleItalianDiluentTitle() {
+        let item = EquipmentChecklistItem(title: "Bombola diluente CCR", usesGas: true)
+        XCTAssertEqual(ChecklistPlannerSyncMapper.resolvedRole(for: item), .ccrDiluent)
+    }
 }
