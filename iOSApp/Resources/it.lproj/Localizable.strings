@@ -1040,7 +1040,7 @@
 "planner.settings.cns_descent_bottom.toggle_hint" = "Evidenzia quando il CNS di discesa + fondo supera la soglia impostata.";
 "planner.settings.cns_descent_bottom.toggle.a11y" = "Attiva o disattiva l'avviso CNS discesa e fondo nel planner.";
 "planner.settings.cns_descent_bottom.threshold" = "Soglia di avviso";
-"planner.settings.cns_descent_bottom.threshold.a11y" = "Soglia avviso CNS discesa e fondo, %@ percento";
+"planner.settings.cns_descent_bottom.threshold.a11y" = "Soglia avviso CNS discesa e fondo, %lld percento";
 "planner.settings.cns_descent_bottom.reference_only" = "Solo stima di riferimento — non è una guida certificata all'esposizione all'ossigeno.";
 "planner.settings.cns_descent_bottom_15_check.description" = "Mostra un avviso quando il CNS di discesa + fondo supera la soglia impostata.";
 "planner.accessibility.cns_descent_bottom.warning.label" = "Avviso CNS discesa e fondo. Il valore supera il %@%% del budget massimo CNS.";
