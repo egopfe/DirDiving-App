@@ -440,6 +440,7 @@ final class DiveManager: ObservableObject {
         try? FileManager.default.removeItem(at: activeDiveDraftURL())
     }
 
+    /// Restores `.active` drafts or completes `.finalizing` drafts. Corrupt/legacy payloads are quarantined — never crashes launch.
     private func restoreActiveDiveDraftIfAvailable() {
         let url = activeDiveDraftURL()
         guard let data = try? Data(contentsOf: url) else { return }

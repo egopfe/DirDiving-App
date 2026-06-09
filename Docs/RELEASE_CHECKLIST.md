@@ -65,11 +65,19 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 - [ ] Review [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) — audit baseline
 - [ ] External Subsurface CSV regression (manual — see [`SUBSURFACE_CSV_ROUNDTRIP.md`](SUBSURFACE_CSV_ROUNDTRIP.md))
 
+## Audit remediation (2026-06-02 — Watch complete algorithm @ `WATCH_COMPLETE_ALGORITHM_AUDIT_CURRENT.md`)
+
+- [ ] Review [`WATCH_COMPLETE_ALGORITHM_AUDIT_REMEDIATION_REPORT.md`](WATCH_COMPLETE_ALGORITHM_AUDIT_REMEDIATION_REPORT.md) — CSV divergence, GPS battery policy, draft hardening, timestamp docs, evidence scaffolding
+- [ ] Watch code readiness: **high / internal-reference ready** (non-certified companion logger; no CCR/Bühlmann/Ratio Deco runtime)
+- [ ] **External TestFlight blocked** until: Ultra physical QA evidence ([`QA_EVIDENCE/WATCH_ULTRA/`](QA_EVIDENCE/WATCH_ULTRA/README.md)), paired sync evidence ([`QA_EVIDENCE/WATCH_IOS_SYNC/`](QA_EVIDENCE/WATCH_IOS_SYNC/README.md)), mock fallback banner screenshot attached
+- [ ] Review [`WATCH_CSV_EXPORT_POLICY.md`](WATCH_CSV_EXPORT_POLICY.md) — intentional Watch/iOS metadata divergence (no CCR on Watch)
+- [ ] Review [`WATCH_DEPTH_SAMPLE_TIMESTAMP_POLICY.md`](WATCH_DEPTH_SAMPLE_TIMESTAMP_POLICY.md)
+- [ ] Review [`WATCH_GPS_LIFECYCLE_POLICY.md`](WATCH_GPS_LIFECYCLE_POLICY.md) — no continuous GPS outside active dive
+
 ## Audit remediation (2026-06-06 — Watch MAIN)
 
 - [ ] Review [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) — integration test isolation, mock fallback UX, draft schema, GPS auth guard, CSV alignment
 - [ ] Review [`WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md`](WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md) — physical QA not complete until executed
-- [ ] Review [`WATCH_CSV_EXPORT_POLICY.md`](WATCH_CSV_EXPORT_POLICY.md)
 
 ## Audit remediation (2026-06-03)
 

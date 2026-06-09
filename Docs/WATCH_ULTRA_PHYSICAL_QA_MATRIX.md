@@ -6,6 +6,7 @@ Owner: ________  Date: ________  Build: ________  Commit: ________
 
 | Scenario | Pass/Fail | Evidence | Notes |
 |---|---|---|---|
+| **Mock fallback banner (no entitlement)** | **PENDING** | Screenshot in [`QA_EVIDENCE/WATCH_ULTRA/`](QA_EVIDENCE/WATCH_ULTRA/README.md) | Must show `watch.depth_source.mock_fallback` or badge copy; do not mark PASS without file |
 | Auto-depth lifecycle (start/stop) |  |  | Mock fallback must show unavailable copy if no entitlement |
 | Underwater callback availability |  |  |  |
 | Stale-depth behavior and warning |  |  |  |

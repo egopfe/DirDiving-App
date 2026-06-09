@@ -1,14 +1,33 @@
 # Apple Watch MAIN — CSV Export Policy
 
-**Updated:** 2026-06-06  
+**Updated:** 2026-06-02 (WATCH-EXP-001 remediation)  
 **Target:** `SubsurfaceExportService` on Watch MAIN  
-**Related:** [`SUBSURFACE_CSV_ROUNDTRIP.md`](SUBSURFACE_CSV_ROUNDTRIP.md), [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md)
+**Related:** [`SUBSURFACE_CSV_ROUNDTRIP.md`](SUBSURFACE_CSV_ROUNDTRIP.md), [`WATCH_COMPLETE_ALGORITHM_AUDIT_CURRENT.md`](WATCH_COMPLETE_ALGORITHM_AUDIT_CURRENT.md)
 
 ---
 
-## Alignment decision (WATCH-EXP-001)
+## Scope and safety posture
 
-Watch CSV export is **aligned with iOS hardened export** for profile columns and time-base policy. Intentional Watch differences are limited to metadata richness (Watch `DiveSession` lacks iOS-only fields).
+Watch CSV export is a **runtime / logging export only**. It records depth, temperature, GPS metadata, and session timing from a completed Watch dive session.
+
+Watch CSV export is **not** a decompression plan, CCR log, or Bühlmann tissue-state export. Watch must never imply CCR, Bühlmann, Ratio Deco, setpoint, diluent, bailout, or decompression-authoritative metadata in CSV output.
+
+---
+
+## Intentional divergence from iOS CSV (WATCH-EXP-001)
+
+Watch and iOS share **profile column headers** for Subsurface compatibility, but metadata blocks **intentionally differ**:
+
+| Aspect | Watch MAIN | iOS |
+|---|---|---|
+| Export role | Companion dive logger | Full logbook + planner context |
+| Depth units | Metric (`depth_m`) by policy | Metric (`depth_m`) |
+| Metadata marker | `# dirdiving_watch_export: 1` | iOS-specific `# dirdiving_*` lines |
+| CCR planner metadata | **Absent** — by design | May include `# dirdiving_ccr_*` when applicable |
+| Bühlmann / Ratio Deco fields | **Absent** — Watch has no runtime | iOS planner-only |
+| Equipment, gas, SAC, site, buddy | Omitted (no Watch model fields) | Present when available |
+
+This divergence is **intentional and safe**. Importers and reviewers must not treat Watch CSV as carrying iOS CCR or decompression authority.
 
 ---
 
@@ -20,16 +39,16 @@ time_seconds,depth_m,temperature_c,entry_lat,entry_lon,exit_lat,exit_lon,is_manu
 
 | Column | Policy |
 |---|---|
-| `time_seconds` | Non-negative, monotonic; **elapsed seconds from first exported sample timestamp** (matches iOS) |
+| `time_seconds` | Non-negative, monotonic; **elapsed seconds from first exported sample timestamp** |
 | `depth_m` | Metric, two decimal places |
 | `temperature_c` | Celsius one decimal; empty if missing |
 | GPS columns | Session entry/exit metadata repeated per row |
 | `is_manual` | `1` or `0` |
-| `equipment`, pressures, `deco_notes` | Empty on Watch (no model fields) |
+| `equipment`, pressures, `deco_notes` | Empty on Watch (no model fields; `deco_notes` is not a decompression schedule) |
 
 ---
 
-## Metadata block
+## Metadata block (Watch only)
 
 ```csv
 # session_meta
@@ -41,7 +60,13 @@ time_seconds,depth_m,temperature_c,entry_lat,entry_lon,exit_lat,exit_lon,is_manu
 # session_meta,<is_manual>,,,,
 ```
 
-iOS exports additional `# dirdiving_*` lines (equipment, pressures, site, buddy, gas, SAC). Watch exports omit these; importers must tolerate absence.
+**Must not appear in Watch CSV:**
+
+- `dirdiving_ccr`
+- `buhlmann` / Bühlmann tissue or plan fields
+- `ratio_deco` / Ratio Deco planner fields
+- `setpoint`, `diluent`, `bailout` (CCR live-control semantics)
+- Any decompression-authoritative metadata implying NDL, TTS, stops, or tissue loading
 
 ---
 
@@ -64,12 +89,13 @@ Locked in:
 - `DiveAlgorithmTests.testExportRejectsEmptyAndSortsSamples`
 - `WatchReadinessAlgorithmTests.testExportCSVUsesFirstSampleAsTimeOrigin`
 - `WatchSyncCodecAlgorithmTests.testExportTimeSecondsRelativeToSessionStart`
+- `WatchCompleteAlgorithmAuditRemediationTests.testWatchCSVExportExcludesDecompressionAndCCRMetadata`
 
 ---
 
 ## Historical note
 
-Prior Watch-only policy used `session.startDate` as `time_seconds` origin. Remediation @ 2026-06-06 switched to **first-sample origin** for iOS parity. Subsurface import treats relative seconds; session wall times remain in `# dirdiving_start_date` / `# dirdiving_end_date`.
+Prior Watch-only policy used `session.startDate` as `time_seconds` origin. Remediation @ 2026-06-06 switched to **first-sample origin** for profile time-base parity with iOS. Subsurface import treats relative seconds; session wall times remain in `# dirdiving_start_date` / `# dirdiving_end_date`.
 
 ---
 
