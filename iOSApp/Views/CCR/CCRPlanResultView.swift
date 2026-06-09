@@ -3,10 +3,16 @@ import Charts
 
 struct CCRPlanResultView: View {
     @EnvironmentObject private var store: PlannerStore
+    @EnvironmentObject private var equipment: EquipmentStore
+    var pendingChecklistExportPrompt: Bool = false
     @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @State private var shareablePDF: ShareablePDFItem?
     @State private var pdfExportAlertMessage: String?
+    @State private var showChecklistExportPrompt = false
+    @State private var showChecklistExportSheet = false
+    @State private var didPresentChecklistExportPrompt = false
+    @State private var ccrChecklistExportCandidates: [CCRChecklistExportCandidate] = []
 
     private var plan: CCRPlanResult { store.ccrPlan }
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
@@ -62,6 +68,29 @@ struct CCRPlanResultView: View {
             }
         }
         .toolbarBackground(.hidden, for: .navigationBar)
+        .onAppear {
+            presentCCRChecklistExportPromptIfNeeded()
+        }
+        .confirmationDialog(
+            String(localized: "checklist_planner.sync.export_prompt"),
+            isPresented: $showChecklistExportPrompt,
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "checklist_planner.sync.add_all")) {
+                addAllCCRChecklistItems()
+            }
+            Button(String(localized: "checklist_planner.sync.choose_add")) {
+                openCCRChecklistExportSheet()
+            }
+            Button(String(localized: "checklist_planner.sync.do_not_add"), role: .cancel) {}
+        }
+        .sheet(isPresented: $showChecklistExportSheet) {
+            CCRChecklistExportSheet(
+                candidates: $ccrChecklistExportCandidates,
+                onConfirm: { confirmCCRChecklistExport() },
+                onCancel: { showChecklistExportSheet = false }
+            )
+        }
         .sheet(item: $shareablePDF) { item in
             ShareSheetView(activityItems: [item.url])
         }
@@ -119,6 +148,40 @@ struct CCRPlanResultView: View {
         } catch {
             pdfExportAlertMessage = PDFShareActions.invalidPlanMessage()
         }
+    }
+
+    private func presentCCRChecklistExportPromptIfNeeded() {
+        guard pendingChecklistExportPrompt, !didPresentChecklistExportPrompt else { return }
+        guard CCRChecklistExportCoordinator.shouldPromptExport(
+            input: store.ccrInput,
+            checklist: equipment.profile.checklistItems,
+            planIsValid: plan.validationResult.isValid
+        ) else { return }
+        didPresentChecklistExportPrompt = true
+        showChecklistExportPrompt = true
+    }
+
+    private func openCCRChecklistExportSheet() {
+        ccrChecklistExportCandidates = ChecklistPlannerSyncMapper.ccrExportCandidates(
+            input: store.ccrInput,
+            checklist: equipment.profile.checklistItems
+        )
+        showChecklistExportSheet = true
+    }
+
+    private func addAllCCRChecklistItems() {
+        CCRChecklistExportCoordinator.exportAll(
+            input: store.ccrInput,
+            to: &equipment.profile.checklistItems
+        )
+    }
+
+    private func confirmCCRChecklistExport() {
+        CCRChecklistExportCoordinator.exportSelected(
+            candidates: ccrChecklistExportCandidates,
+            to: &equipment.profile.checklistItems
+        )
+        showChecklistExportSheet = false
     }
 
     private var summaryCard: some View {

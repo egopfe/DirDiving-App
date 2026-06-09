@@ -3,9 +3,11 @@ import Charts
 
 struct CCRPlannerView: View {
     @EnvironmentObject private var store: PlannerStore
+    @EnvironmentObject private var equipment: EquipmentStore
     @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @State private var showPlan = false
+    @State private var pendingChecklistExportAfterCalculate = false
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
     private var plannerSafetyAcknowledged: Bool {
@@ -48,8 +50,9 @@ struct CCRPlannerView: View {
             }
             .toolbarBackground(.hidden, for: .navigationBar)
             .navigationDestination(isPresented: $showPlan) {
-                CCRPlanResultView()
+                CCRPlanResultView(pendingChecklistExportPrompt: pendingChecklistExportAfterCalculate)
                     .environmentObject(store)
+                    .environmentObject(equipment)
             }
         }
         .dirCompanionTabRoot()
@@ -158,7 +161,13 @@ struct CCRPlannerView: View {
     private var calculateButton: some View {
         Button {
             store.calculate()
-            showPlan = store.ccrPlan.validationResult.isValid
+            let planIsValid = store.ccrPlan.validationResult.isValid
+            pendingChecklistExportAfterCalculate = CCRChecklistExportCoordinator.shouldPromptExport(
+                input: store.ccrInput,
+                checklist: equipment.profile.checklistItems,
+                planIsValid: planIsValid
+            )
+            showPlan = planIsValid
         } label: {
             Text(String(localized: "planner.calculate"))
                 .font(.callout.weight(.semibold))

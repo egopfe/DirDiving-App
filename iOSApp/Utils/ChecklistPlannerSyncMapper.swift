@@ -35,6 +35,12 @@ struct ChecklistPlannerExportCandidate: Identifiable {
     var duplicateAction: ChecklistPlannerDuplicateAction
 }
 
+struct CCRChecklistExportCandidate: Identifiable {
+    let id: UUID
+    var item: EquipmentChecklistItem
+    var isSelected: Bool
+}
+
 enum ChecklistPlannerSyncMapper {
     static func checklistGasItems(from checklist: [EquipmentChecklistItem]) -> [EquipmentChecklistItem] {
         checklist.filter(\.usesGas)
@@ -163,8 +169,27 @@ enum ChecklistPlannerSyncMapper {
         }
     }
 
+    static func hasCCRChecklistItemsMissing(input: CCRPlanInput, checklist: [EquipmentChecklistItem]) -> Bool {
+        !ccrItemsMissingFromChecklist(input: input, checklist: checklist).isEmpty
+    }
+
+    static func ccrExportCandidates(input: CCRPlanInput, checklist: [EquipmentChecklistItem]) -> [CCRChecklistExportCandidate] {
+        ccrChecklistItems(from: input).map {
+            CCRChecklistExportCandidate(id: $0.id, item: $0, isSelected: true)
+        }
+    }
+
     static func applyCCRExport(input: CCRPlanInput, to checklist: inout [EquipmentChecklistItem]) {
-        let proposed = ccrChecklistItems(from: input)
+        applyCCRChecklistItems(ccrChecklistItems(from: input), to: &checklist)
+    }
+
+    static func applyCCRExport(candidates: [CCRChecklistExportCandidate], to checklist: inout [EquipmentChecklistItem]) {
+        let selected = candidates.filter(\.isSelected).map(\.item)
+        guard !selected.isEmpty else { return }
+        applyCCRChecklistItems(selected, to: &checklist)
+    }
+
+    private static func applyCCRChecklistItems(_ proposed: [EquipmentChecklistItem], to checklist: inout [EquipmentChecklistItem]) {
         let bailoutIndices = checklist.indices.filter { checklist[$0].usesGas && checklist[$0].gasRole == .ccrBailout }
         var bailoutCursor = 0
 

@@ -10,6 +10,14 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 | Commit `HEAD` | __________ |
 | Esecutore | __________ |
 
+## Audit remediation (2026-06-09 — iOS complete algorithm @ `IOS_MAIN_COMPLETE_ALGORITHM_AUDIT_CURRENT.md`)
+
+- [ ] Review [`IOS_MAIN_COMPLETE_ALGORITHM_AUDIT_REMEDIATION_REPORT.md`](IOS_MAIN_COMPLETE_ALGORITHM_AUDIT_REMEDIATION_REPORT.md)
+- [ ] CCR checklist export wired in `CCRPlanResultView` (IOS-CHK-CCR-001)
+- [ ] Evidence folders **PENDING**: [`QA_EVIDENCE/BUHLMANN_EXTERNAL/`](QA_EVIDENCE/BUHLMANN_EXTERNAL/README.md), [`CCR_EXTERNAL/`](QA_EVIDENCE/CCR_EXTERNAL/README.md), [`ICLOUD_TWO_DEVICE/`](QA_EVIDENCE/ICLOUD_TWO_DEVICE/README.md), [`SUBSURFACE_CSV/`](QA_EVIDENCE/SUBSURFACE_CSV/README.md), [`IOS_ACCESSIBILITY/`](QA_EVIDENCE/IOS_ACCESSIBILITY/README.md)
+- [ ] App Store marketing checklist: [`IOS_APP_STORE_ALGORITHM_MARKETING_REVIEW_CHECKLIST.md`](IOS_APP_STORE_ALGORITHM_MARKETING_REVIEW_CHECKLIST.md)
+- [ ] iOS remains non-certified reference planner; CCR reference-only; external TestFlight blocked until evidence gates
+
 ## Audit remediation (2026-06-08 — Bühlmann comprehensive readiness @ `cc4d783` / remediation pass)
 
 - [ ] Review [`1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_CURRENT.md`](1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_CURRENT.md)
