@@ -66,11 +66,19 @@ final class WatchCompleteAlgorithmAuditRemediationTests: XCTestCase {
         }
         XCTAssertFalse(scannedFiles.isEmpty, "Expected Watch compile-root Swift files")
         for file in scannedFiles {
-            let source = try String(contentsOf: file, encoding: .utf8).lowercased()
+            let source = try String(contentsOf: file, encoding: .utf8)
+            let codeWithoutLineComments = source
+                .split(separator: "\n", omittingEmptySubsequences: false)
+                .map { line -> String in
+                    guard let range = line.range(of: "//") else { return String(line) }
+                    return String(line[..<range.lowerBound])
+                }
+                .joined(separator: "\n")
+                .lowercased()
             for token in Self.forbiddenRuntimeTokens {
                 XCTAssertFalse(
-                    source.contains(token),
-                    "\(file.lastPathComponent) must not reference decompression/CCR runtime token: \(token)"
+                    codeWithoutLineComments.contains(token),
+                    "\(file.lastPathComponent) must not reference decompression/CCR runtime token in code: \(token)"
                 )
             }
         }

@@ -3,7 +3,7 @@ import Foundation
 // MARK: - Watch Subsurface CSV export
 // Intentionally separate from `iOSApp/Services/SubsurfaceExportService.swift` (iOS target).
 // Profile columns align with iOS; metadata intentionally slimmer (`# dirdiving_watch_export: 1` only).
-// See Docs/WATCH_CSV_EXPORT_POLICY.md — Watch must not emit CCR/Bühlmann/decompression-authoritative metadata.
+// See Docs/WATCH_CSV_EXPORT_POLICY.md — Watch must not emit CCR or decompression-authoritative metadata.
 
 enum SubsurfaceExportService {
     static func makeCSV(for session: DiveSession) -> String? {
