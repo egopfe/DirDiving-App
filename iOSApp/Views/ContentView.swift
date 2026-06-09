@@ -1,11 +1,12 @@
 import SwiftUI
 
-/// Main iOS tab bar: Planner first, then logbook, analysis, equipment, settings.
+/// Main iOS tab bar: Planner, Logbook, Analisi, Attrezzatura, Checklist, Settings.
 enum IOSTab: Hashable {
     case planner
     case logbook
     case analysis
     case gear
+    case checklist
     case settings
 }
 
@@ -45,11 +46,16 @@ struct ContentView: View {
             }
             .tabItem { Label("tab.gear", systemImage: "shippingbox.fill") }
 
+            mountedTab(.checklist) {
+                ChecklistView()
+            }
+            .tabItem { Label("tab.checklist", systemImage: "checklist") }
+
             mountedTab(.settings) {
                 MoreView()
             }
-            .tabItem { Label("tab.more", systemImage: "gearshape.fill") }
-            .badge(moreTabBadge)
+            .tabItem { Label("tab.settings", systemImage: "gearshape.fill") }
+            .badge(settingsTabBadge)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
@@ -80,7 +86,7 @@ struct ContentView: View {
         }
     }
 
-    private var moreTabBadge: String? {
+    private var settingsTabBadge: String? {
         let conflictCount = watchSync.conflicts.count + logStore.sessionMergeConflicts.count
         if conflictCount > 0 {
             return conflictCount > 99 ? "99+" : "\(conflictCount)"

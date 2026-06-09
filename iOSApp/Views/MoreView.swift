@@ -69,7 +69,6 @@ struct MoreView: View {
                             row(String(localized: "more.sync.queue_count"), "\(watchSync.pendingWatchQueueCount)")
                             row(String(localized: "more.sync.last_success"), formattedWatchLastSuccess)
                             syncActivitySection
-                            WatchPhotoTransferPanel()
                             Button {
                                 watchSync.syncUnpushedSessionsToWatch()
                             } label: {

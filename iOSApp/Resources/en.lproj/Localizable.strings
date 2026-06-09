@@ -62,6 +62,8 @@
 "tab.analysis" = "Analysis";
 "tab.planner" = "Planner";
 "tab.gear" = "Equipment";
+"tab.checklist" = "Checklist";
+"tab.settings" = "Settings";
 "tab.more" = "More";
 "logbook.delete.a11y" = "Delete dive from logbook";
 
@@ -825,7 +827,25 @@
 "planner.briefing.share_note" = "Summary ready for iOS sharing.";
 "more.language.units_disclaimer" = "Changing language does not change units, calculations or saved data.";
 "equipment.title" = "Equipment";
-"equipment.subtitle" = "Configuration, checklist, and field equipment overview.";
+"equipment.subtitle" = "Inventory, saved setups, and equipment images.";
+"equipment.card.saved_setups" = "SAVED SETUPS";
+"equipment.saved_setups.hint" = "Save and manage named equipment setups used by the Checklist tab.";
+"equipment.images.section" = "Equipment images";
+"equipment.images.hint" = "Transfer and manage setup images on Apple Watch.";
+"checklist.title" = "Checklist";
+"checklist.subtitle" = "Prepare the dive from a saved equipment setup.";
+"checklist.setup.title" = "Equipment setup";
+"checklist.setup.current_profile" = "Current profile";
+"checklist.setup.change" = "Change setup";
+"checklist.setup.change.a11y" = "Choose a different saved equipment setup";
+"checklist.setup.select_template" = "Use this setup";
+"checklist.setup.use_current_profile" = "Use current profile";
+"checklist.setup.summary.template" = "%lld checklist items · %lld gas-linked";
+"checklist.setup.summary.profile" = "%@ · %@ · %lld checklist items";
+"checklist.empty.title" = "No setup selected";
+"checklist.empty.message" = "Select or create an equipment setup in Gear to generate the checklist.";
+"checklist.empty.open_gear" = "Open Gear";
+"checklist.progress.a11y" = "Checklist progress: %lld of %lld items ready";
 "equipment.card.planning" = "FULL PLANNING";
 "equipment.card.planning.informational" = "Informational equipment notes only — does not run planner calculations or change Bühlmann schedules.";
 "equipment.row.cylinders" = "Cylinders";

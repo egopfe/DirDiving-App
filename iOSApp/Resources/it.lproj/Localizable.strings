@@ -62,6 +62,8 @@
 "tab.analysis" = "Analisi";
 "tab.planner" = "Planner";
 "tab.gear" = "Attrezzatura";
+"tab.checklist" = "Checklist";
+"tab.settings" = "Impostazioni";
 "tab.more" = "Altro";
 "logbook.delete.a11y" = "Elimina immersione dal logbook";
 
@@ -823,7 +825,25 @@
 "planner.briefing.share_note" = "Riepilogo pronto per la condivisione iOS.";
 "more.language.units_disclaimer" = "La modifica della lingua non cambia unita, calcoli o dati salvati.";
 "equipment.title" = "Attrezzatura";
-"equipment.subtitle" = "Configurazione, checklist e panoramica attrezzatura sul campo.";
+"equipment.subtitle" = "Inventario, setup salvati e immagini attrezzatura.";
+"equipment.card.saved_setups" = "SETUP SALVATI";
+"equipment.saved_setups.hint" = "Salva e gestisci setup attrezzatura usati dalla tab Checklist.";
+"equipment.images.section" = "Immagini attrezzatura";
+"equipment.images.hint" = "Trasferisci e gestisci immagini setup su Apple Watch.";
+"checklist.title" = "Checklist";
+"checklist.subtitle" = "Prepara l'immersione partendo da un setup salvato.";
+"checklist.setup.title" = "Setup attrezzatura";
+"checklist.setup.current_profile" = "Profilo corrente";
+"checklist.setup.change" = "Cambia setup";
+"checklist.setup.change.a11y" = "Scegli un altro setup attrezzatura salvato";
+"checklist.setup.select_template" = "Usa questo setup";
+"checklist.setup.use_current_profile" = "Usa profilo corrente";
+"checklist.setup.summary.template" = "%lld voci checklist · %lld con gas";
+"checklist.setup.summary.profile" = "%@ · %@ · %lld voci checklist";
+"checklist.empty.title" = "Nessun setup selezionato";
+"checklist.empty.message" = "Seleziona o crea un setup in Attrezzatura per generare la checklist.";
+"checklist.empty.open_gear" = "Apri Attrezzatura";
+"checklist.progress.a11y" = "Avanzamento checklist: %lld di %lld voci pronte";
 "equipment.card.planning" = "PIANIFICAZIONE COMPLETA";
 "equipment.card.planning.informational" = "Solo note informative sull'attrezzatura — non esegue calcoli del planner né modifica schedule Bühlmann.";
 "equipment.row.cylinders" = "Bombole";

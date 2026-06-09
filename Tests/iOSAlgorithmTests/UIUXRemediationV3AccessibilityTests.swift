@@ -17,8 +17,8 @@ final class UIUXRemediationV3AccessibilityTests: XCTestCase {
         XCTAssertTrue(source.contains("UIUXAccessibilitySummaries.ccrGasDensityTimeline"))
     }
 
-    func testEquipmentViewChecklistTogglesExposeAccessibilityLabels() throws {
-        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/EquipmentView.swift"))
+    func testChecklistViewTogglesExposeAccessibilityLabels() throws {
+        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/ChecklistView.swift"))
         XCTAssertTrue(source.contains("checklistReadyAccessibilityLabel"))
         XCTAssertTrue(source.contains("a11y.checklist.item.toggle.hint"))
     }
@@ -28,9 +28,9 @@ final class UIUXRemediationV3AccessibilityTests: XCTestCase {
         XCTAssertTrue(source.contains("accessibilityAddTraits(tab == item ? [.isSelected] : [])"))
     }
 
-    func testIOSContentViewExposesMoreTabBadge() throws {
+    func testIOSContentViewExposesSettingsTabBadge() throws {
         let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/ContentView.swift"))
-        XCTAssertTrue(source.contains("moreTabBadge"))
+        XCTAssertTrue(source.contains("settingsTabBadge"))
         XCTAssertTrue(source.contains("watchSync.conflicts"))
     }
 
