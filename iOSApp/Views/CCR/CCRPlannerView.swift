@@ -285,17 +285,25 @@ struct CCRPlannerView: View {
 struct CCRDiluentEditorView: View {
     @Binding var diluent: CCRDiluent
 
+    private var diluentMixKindBinding: Binding<GasMixKind> {
+        Binding(
+            get: { diluent.mixKind },
+            set: { newKind in
+                Task { @MainActor in
+                    diluent.applyMixKind(newKind)
+                }
+            }
+        )
+    }
+
     var body: some View {
         VStack(spacing: 10) {
-            Picker(String(localized: "gas.mix.header"), selection: $diluent.mixKind) {
+            Picker(String(localized: "gas.mix.header"), selection: diluentMixKindBinding) {
                 ForEach([GasMixKind.air, .ean, .trimix], id: \.self) { kind in
                     Text(kind.localizedTitle).tag(kind)
                 }
             }
             .pickerStyle(.segmented)
-            .onChange(of: diluent.mixKind) { _, newKind in
-                diluent.applyMixKind(newKind)
-            }
 
             if diluent.mixKind == .ean || diluent.mixKind == .trimix {
                 Stepper(

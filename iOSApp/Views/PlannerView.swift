@@ -264,9 +264,6 @@ struct PlannerView: View {
                         }
                         .labelsHidden()
                         .tint(DIRTheme.cyan)
-                        .onChange(of: store.input.planningDepthReference) { _, _ in
-                            store.refreshDerivedPlanningPreview()
-                        }
                     }
                     Text(String(localized: "planner.reference.helper"))
                         .font(.caption2)
@@ -344,8 +341,9 @@ struct PlannerView: View {
         Binding(
             get: { PlannerModePolicy.matchingGFPreset(for: store.input) ?? .standard },
             set: { preset in
-                PlannerModePolicy.applyGFPreset(preset, to: &store.input)
-                store.refreshDerivedPlanningPreview()
+                Task { @MainActor in
+                    PlannerModePolicy.applyGFPreset(preset, to: &store.input)
+                }
             }
         )
     }
