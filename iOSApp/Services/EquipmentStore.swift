@@ -9,19 +9,66 @@ final class EquipmentStore: ObservableObject {
     @Published var templates: [EquipmentTemplate] {
         didSet { saveTemplatesIfReady() }
     }
+    @Published var selectedChecklistTemplateID: UUID? {
+        didSet { saveSelectionIfReady() }
+    }
 
     private let cloudSync: CloudSyncStore?
     private let profileKey = "dirdiving_ios_equipment_profile"
     private let templatesKey = "dirdiving_ios_equipment_templates"
+    private let checklistSelectionKey = "dirdiving_ios_equipment_checklist_selection"
     private var isReady = false
 
     init(cloudSync: CloudSyncStore? = nil) {
         self.cloudSync = cloudSync
         profile = cloudSync?.load(EquipmentProfile.self, forKey: profileKey) ?? EquipmentProfile()
         templates = cloudSync?.load([EquipmentTemplate].self, forKey: templatesKey) ?? Self.defaultTemplates()
+        selectedChecklistTemplateID = cloudSync?.load(UUID.self, forKey: checklistSelectionKey)
         isReady = true
         saveIfReady()
         saveTemplatesIfReady()
+        saveSelectionIfReady()
+    }
+
+    var selectedChecklistSetupDisplayName: String {
+        if let id = selectedChecklistTemplateID,
+           let template = templates.first(where: { $0.id == id }) {
+            return template.name
+        }
+        return String(localized: "checklist.setup.current_profile")
+    }
+
+    var selectedChecklistSetupSummary: String {
+        if let id = selectedChecklistTemplateID,
+           let template = templates.first(where: { $0.id == id }) {
+            let gasCount = template.checklistItems.filter(\.usesGas).count
+            return String(
+                format: String(localized: "checklist.setup.summary.template"),
+                template.checklistItems.count,
+                gasCount
+            )
+        }
+        return String(
+            format: String(localized: "checklist.setup.summary.profile"),
+            profile.cylinders,
+            profile.configuration,
+            profile.migratedChecklistItems.count
+        )
+    }
+
+    var needsChecklistSetupSelection: Bool {
+        selectedChecklistTemplateID == nil
+            && profile.checklistItems.isEmpty
+            && !profile.isDIRConfigurationComplete
+    }
+
+    func selectChecklistSetup(template: EquipmentTemplate) {
+        selectedChecklistTemplateID = template.id
+        applyTemplate(template)
+    }
+
+    func clearChecklistSetupSelection() {
+        selectedChecklistTemplateID = nil
     }
 
     func reset() {
@@ -62,6 +109,11 @@ final class EquipmentStore: ObservableObject {
     private func saveTemplatesIfReady() {
         guard isReady else { return }
         cloudSync?.save(templates, forKey: templatesKey)
+    }
+
+    private func saveSelectionIfReady() {
+        guard isReady else { return }
+        cloudSync?.save(selectedChecklistTemplateID, forKey: checklistSelectionKey)
     }
 
     private static func defaultTemplates() -> [EquipmentTemplate] {

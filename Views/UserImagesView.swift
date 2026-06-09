@@ -307,7 +307,27 @@ struct UserImagesView: View {
                 .padding(.bottom, 4)
             }
             .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
+            .gesture(imageSwipeGesture(currentName: name))
         }
+    }
+
+    private func imageSwipeGesture(currentName: String) -> some Gesture {
+        DragGesture(minimumDistance: 24)
+            .onEnded { value in
+                guard imageStore.imageNames.count > 1 else { return }
+                if value.translation.width < -30 {
+                    selectAdjacentImage(from: currentName, direction: 1)
+                } else if value.translation.width > 30 {
+                    selectAdjacentImage(from: currentName, direction: -1)
+                }
+            }
+    }
+
+    private func selectAdjacentImage(from name: String, direction: Int) {
+        let names = imageStore.imageNames
+        guard let index = names.firstIndex(of: name) else { return }
+        let nextIndex = (index + direction + names.count) % names.count
+        selectedName = names[nextIndex]
     }
 
     private func fullscreenImage(name: String, resourceName: String) -> some View {

@@ -1,11 +1,12 @@
 import SwiftUI
 
-/// Main iOS tab bar: Planner first, then logbook, analysis, equipment, settings.
+/// Main iOS tab bar: Planner, Logbook, Analisi, Attrezzatura, Checklist, Settings.
 enum IOSTab: Hashable {
     case planner
     case logbook
     case analysis
     case gear
+    case checklist
     case settings
 }
 
@@ -16,6 +17,10 @@ final class IOSNavigationStore: ObservableObject {
 
 struct ContentView: View {
     @EnvironmentObject private var navigation: IOSNavigationStore
+    @EnvironmentObject private var plannerStore: PlannerStore
+    @EnvironmentObject private var watchSync: WatchSyncService
+    @EnvironmentObject private var cloudSync: CloudSyncStore
+    @EnvironmentObject private var logStore: DiveLogStore
     @State private var showLaunchDisclaimer = CompanionDisclaimerAcceptance.requiresDisplay
     @State private var mountedTabs: Set<IOSTab> = [.planner]
 
@@ -41,10 +46,16 @@ struct ContentView: View {
             }
             .tabItem { Label("tab.gear", systemImage: "shippingbox.fill") }
 
+            mountedTab(.checklist) {
+                ChecklistView()
+            }
+            .tabItem { Label("tab.checklist", systemImage: "checklist") }
+
             mountedTab(.settings) {
                 MoreView()
             }
-            .tabItem { Label("tab.more", systemImage: "gearshape.fill") }
+            .tabItem { Label("tab.settings", systemImage: "gearshape.fill") }
+            .badge(settingsTabBadge)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
@@ -58,11 +69,32 @@ struct ContentView: View {
         .toolbarColorScheme(.dark, for: .tabBar)
         .launchCompanionDisclaimer(isPresented: $showLaunchDisclaimer)
         .onAppear {
+            applyPostLegalPlannerLandingIfNeeded()
             mountedTabs.insert(navigation.selectedTab)
         }
         .onChange(of: navigation.selectedTab) { _, tab in
             mountedTabs.insert(tab)
         }
+    }
+
+    private func applyPostLegalPlannerLandingIfNeeded() {
+        guard IOSCompanionPostLegalEntry.consumePendingPlannerLanding() else { return }
+        navigation.selectedTab = .planner
+        mountedTabs.insert(.planner)
+        Task { @MainActor in
+            plannerStore.preparePostLegalOnboardingEntry()
+        }
+    }
+
+    private var settingsTabBadge: String? {
+        let conflictCount = watchSync.conflicts.count + logStore.sessionMergeConflicts.count
+        if conflictCount > 0 {
+            return conflictCount > 99 ? "99+" : "\(conflictCount)"
+        }
+        if watchSync.pendingWatchQueueCount > 0 || cloudSync.lastDecodeError != nil {
+            return "!"
+        }
+        return nil
     }
 
     /// Mount tab roots lazily so PhotosPicker / fileImporter / ShareLink are not created at cold launch.

@@ -74,7 +74,6 @@ struct MoreView: View {
                             row(String(localized: "more.sync.queue_count"), "\(watchSync.pendingWatchQueueCount)")
                             row(String(localized: "more.sync.last_success"), formattedWatchLastSuccess)
                             syncActivitySection
-                            WatchPhotoTransferPanel()
                             Button {
                                 watchSync.syncUnpushedSessionsToWatch()
                             } label: {
@@ -119,7 +118,9 @@ struct MoreView: View {
                             .onChange(of: cloudBackupEnabled) { _, enabled in
                                 CloudBackupSettings.setEnabled(enabled)
                                 if enabled {
-                                    logStore.synchronizeCloud()
+                                    Task { @MainActor in
+                                        logStore.synchronizeCloud()
+                                    }
                                 }
                             }
                             row(String(localized: "more.icloud.sync_title"), cloudBackupStatusTitle)

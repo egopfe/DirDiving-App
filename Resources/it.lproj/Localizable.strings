@@ -783,3 +783,24 @@
 "dive_reminder.error.max_reached" = "Massimo 10 promemoria";
 "dive_reminder.error.message_required" = "Il messaggio è obbligatorio";
 "dive_reminder.error.message_too_long" = "Massimo 24 caratteri";
+
+/* UI/UX remediation 2026-06-09 */
+"ascent.settings.title" = "VELOCITA RISALITA";
+"ascent.settings.custom_limits.title" = "LIMITI PERSONALIZZATI";
+"ascent.settings.reset_standard.button" = "RESET STD";
+"settings.shortcut.title" = "SCORCIATOIA";
+"nav.underwater.blocked.a11y.label" = "Navigazione bloccata durante immersione attiva";
+"dive_reminder.overlay.a11y.dismiss_hint" = "Tocca due volte per chiudere il promemoria";
+"a11y.watch.haptics_off_badge.label" = "Feedback aptico disattivato";
+"a11y.watch.haptics_off_badge.hint" = "Gli avvisi di sicurezza restano visibili sullo schermo, ma la vibrazione è disattivata.";
+"legal.acceptance.a11y.checked" = "Accettato";
+"legal.acceptance.a11y.unchecked" = "Non accettato";
+"legal.acceptance.a11y.toggle_hint" = "Tocca due volte per cambiare accettazione";
+"sync.settings.title" = "Sync impostazioni";
+"sync.storage.free_space" = "Spazio libero";
+"info.storage.managed_by_watchos" = "Gestito da watchOS";
+"settings.gps.authorized_pending_fix" = "Autorizzato, in attesa fix";
+"sync.status.companion_not_synced" = "Companion non sincronizzato";
+"sync.queue.pending_sync_key" = "In attesa chiave sync (%lld in coda)";
+"sync.queue.pending_companion_key" = "Retry richiesto: in attesa chiave companion (%lld in coda)";
+"sync.queue.pending_companion_sync_key" = "In attesa chiave sync companion";

@@ -16,7 +16,7 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     @Published private(set) var isSupported = WCSession.isSupported()
     @Published private(set) var activationState: WCSessionActivationState = .notActivated
-    @Published private(set) var lastSyncStatus = String(localized: "Companion non sincronizzato")
+    @Published private(set) var lastSyncStatus = String(localized: "sync.status.companion_not_synced")
     @Published private(set) var pendingTransferCount = 0
     @Published private(set) var sentTransferCount = 0
     @Published private(set) var acknowledgedTransferCount = 0
@@ -43,6 +43,7 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     private override init() {
         super.init()
+        WatchDiveSyncCodec.bootstrapReplayCacheIfNeeded()
         pendingTransfers = loadPendingTransfers()
         pendingTransferCount = pendingTransfers.count
         importedFromCompanionIDs = WatchDiveSyncCodec.loadImportedFromCompanionIDs()
@@ -86,7 +87,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             flushPendingTransfers()
         } else {
             WatchSyncAuth.publishSharedSecretIfNeeded()
-            lastSyncStatus = String(format: String(localized: "Pending: in attesa chiave sync (%lld in coda)"), pendingTransferCount)
+            lastSyncStatus = String(format: String(localized: "sync.queue.pending_sync_key"), pendingTransferCount)
         }
     }
 
@@ -117,7 +118,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         if WatchSyncAuth.hasPeerSecret() {
             flushPendingTransfers()
         } else {
-            lastSyncStatus = String(format: String(localized: "Retry richiesto: in attesa chiave companion (%lld in coda)"), pendingTransferCount)
+            lastSyncStatus = String(format: String(localized: "sync.queue.pending_companion_key"), pendingTransferCount)
         }
     }
 
@@ -377,7 +378,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         } catch WatchDiveSyncError.missingPeerSecret {
             enqueuePendingSession(session)
             WatchSyncAuth.publishSharedSecretIfNeeded()
-            lastSyncStatus = String(localized: "Pending: in attesa chiave sync companion")
+            lastSyncStatus = String(localized: "sync.queue.pending_companion_sync_key")
         } catch {
             failedTransferCount += 1
             lastSyncStatus = String(format: String(localized: "Failed: errore codifica sync: %@"), error.localizedDescription)
@@ -546,6 +547,10 @@ final class WatchSyncService: NSObject, ObservableObject {
                 try FileManager.default.removeItem(at: stagingURL)
             }
             try FileManager.default.copyItem(at: sourceURL, to: stagingURL)
+            try? FileManager.default.setAttributes(
+                [.protectionKey: FileProtectionType.complete],
+                ofItemAtPath: stagingURL.path
+            )
             return (stagingURL, metadata)
         } catch {
             return nil
@@ -683,10 +688,23 @@ extension WatchSyncService: WCSessionDelegate {
 
     nonisolated func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
         Task { @MainActor in
+            if WatchDiveSyncCodec.isImportAck(userInfo) {
+                self.handleCompanionImportAck(userInfo)
+                return
+            }
             if let ackContext = self.ingestIncomingPayload(userInfo) {
                 self.deliverImportAck(sessionID: ackContext.sessionID, issuedAt: ackContext.issuedAt)
             }
         }
+    }
+
+    private func handleCompanionImportAck(_ payload: [String: Any]) {
+        guard let parsed = WatchDiveSyncCodec.parseImportAck(from: payload) else {
+            failedTransferCount += 1
+            lastSyncStatus = String(localized: "Failed: ack firmato non valido; pending conservato")
+            return
+        }
+        confirmSignedAck(sessionID: parsed.sessionID, issuedAt: parsed.issuedAt, signature: parsed.signature)
     }
 
     nonisolated func session(_ session: WCSession, didFinish userInfoTransfer: WCSessionUserInfoTransfer, error: Error?) {

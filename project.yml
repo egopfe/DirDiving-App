@@ -239,6 +239,7 @@ targets:
       - iOSApp/Services/WatchSyncAuth.swift
       - iOSApp/Services/IOSWatchSyncPendingTransfer.swift
       - iOSApp/Services/PlannerStore.swift
+      - iOSApp/Services/EquipmentStore.swift
       - iOSApp/Utils/SyncNonceReplayCache.swift
       - iOSApp/Utils/CompanionPhotoManagementAuth.swift
       - iOSApp/Utils/DiveProfileMath.swift
@@ -255,6 +256,8 @@ targets:
       - iOSApp/Utils/PlannerInputValidator.swift
       - iOSApp/Utils/PlannerModePolicy.swift
       - iOSApp/Utils/ChecklistPlannerSyncMapper.swift
+      - iOSApp/Utils/CCRChecklistExportCoordinator.swift
+      - iOSApp/Utils/CCRChecklistImportCoordinator.swift
       - iOSApp/Utils/DIRChecklistConfigurationEvaluator.swift
       - iOSApp/Utils/PlannerGasEditingSupport.swift
       - iOSApp/Utils/PlannerModeLimits.swift

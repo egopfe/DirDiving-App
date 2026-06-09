@@ -3,9 +3,14 @@ import Charts
 
 struct CCRPlannerView: View {
     @EnvironmentObject private var store: PlannerStore
+    @EnvironmentObject private var equipment: EquipmentStore
     @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @State private var showPlan = false
+    @State private var pendingChecklistExportAfterCalculate = false
+    @State private var showChecklistImportPrompt = false
+    @State private var showChecklistImportSheet = false
+    @State private var ccrChecklistImportCandidates: [CCRChecklistImportCandidate] = []
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
     private var plannerSafetyAcknowledged: Bool {
@@ -48,11 +53,55 @@ struct CCRPlannerView: View {
             }
             .toolbarBackground(.hidden, for: .navigationBar)
             .navigationDestination(isPresented: $showPlan) {
-                CCRPlanResultView()
+                CCRPlanResultView(pendingChecklistExportPrompt: pendingChecklistExportAfterCalculate)
                     .environmentObject(store)
+                    .environmentObject(equipment)
+            }
+            .confirmationDialog(
+                String(localized: "checklist_planner.sync.import_prompt"),
+                isPresented: $showChecklistImportPrompt,
+                titleVisibility: .visible
+            ) {
+                Button(String(localized: "checklist_planner.sync.import_all")) {
+                    CCRChecklistImportCoordinator.importAll(
+                        checklist: equipment.profile.checklistItems,
+                        to: &store.ccrInput
+                    )
+                }
+                Button(String(localized: "checklist_planner.sync.choose_import")) {
+                    openCCRChecklistImportSheet()
+                }
+                Button(String(localized: "checklist_planner.sync.cancel"), role: .cancel) {}
+            }
+            .sheet(isPresented: $showChecklistImportSheet) {
+                CCRChecklistImportSheet(
+                    candidates: $ccrChecklistImportCandidates,
+                    onConfirm: { confirmCCRChecklistImport() },
+                    onCancel: { showChecklistImportSheet = false }
+                )
             }
         }
         .dirCompanionTabRoot()
+    }
+
+    private var ccrChecklistGasItems: [EquipmentChecklistItem] {
+        ChecklistPlannerSyncMapper.ccrChecklistGasItems(from: equipment.profile.checklistItems)
+    }
+
+    private func openCCRChecklistImportSheet() {
+        ccrChecklistImportCandidates = ChecklistPlannerSyncMapper.ccrImportCandidates(
+            checklist: equipment.profile.checklistItems,
+            input: store.ccrInput
+        )
+        showChecklistImportSheet = true
+    }
+
+    private func confirmCCRChecklistImport() {
+        CCRChecklistImportCoordinator.importSelected(
+            candidates: ccrChecklistImportCandidates,
+            to: &store.ccrInput
+        )
+        showChecklistImportSheet = false
     }
 
     private var header: some View {
@@ -122,7 +171,27 @@ struct CCRPlannerView: View {
 
     private var diluentCard: some View {
         DIRCard(String(localized: "ccr.diluent"), icon: "wind", accent: DIRTheme.cyan) {
-            CCRDiluentEditorView(diluent: $store.ccrInput.diluent)
+            VStack(spacing: 10) {
+                if !ccrChecklistGasItems.isEmpty {
+                    Button {
+                        showChecklistImportPrompt = true
+                    } label: {
+                        Text(String(localized: "checklist_planner.sync.use_checklist"))
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(DIRTheme.cyan)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 8)
+                            .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.7), lineWidth: 1))
+                    }
+                    .buttonStyle(.plain)
+                    Text(String(localized: "ccr.checklist.import.disclaimer"))
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Divider().overlay(DIRTheme.hairline)
+                }
+                CCRDiluentEditorView(diluent: $store.ccrInput.diluent)
+            }
         }
     }
 
@@ -135,8 +204,8 @@ struct CCRPlannerView: View {
     private var gfCard: some View {
         DIRCard(String(localized: "planner.gf.header"), icon: "slider.horizontal.3", accent: DIRTheme.yellow) {
             HStack {
-                gfField(title: "GF Lo", value: $store.ccrInput.gfLow)
-                gfField(title: "GF Hi", value: $store.ccrInput.gfHigh)
+                gfField(title: String(localized: "ccr.gf.low.label"), value: $store.ccrInput.gfLow)
+                gfField(title: String(localized: "ccr.gf.high.label"), value: $store.ccrInput.gfHigh)
             }
         }
     }
@@ -158,7 +227,13 @@ struct CCRPlannerView: View {
     private var calculateButton: some View {
         Button {
             store.calculate()
-            showPlan = store.ccrPlan.validationResult.isValid
+            let planIsValid = store.ccrPlan.validationResult.isValid
+            pendingChecklistExportAfterCalculate = CCRChecklistExportCoordinator.shouldPromptExport(
+                input: store.ccrInput,
+                checklist: equipment.profile.checklistItems,
+                planIsValid: planIsValid
+            )
+            showPlan = planIsValid
         } label: {
             Text(String(localized: "planner.calculate"))
                 .font(.callout.weight(.semibold))
@@ -210,23 +285,41 @@ struct CCRPlannerView: View {
 struct CCRDiluentEditorView: View {
     @Binding var diluent: CCRDiluent
 
+    private var diluentMixKindBinding: Binding<GasMixKind> {
+        Binding(
+            get: { diluent.mixKind },
+            set: { newKind in
+                Task { @MainActor in
+                    diluent.applyMixKind(newKind)
+                }
+            }
+        )
+    }
+
     var body: some View {
         VStack(spacing: 10) {
-            Picker(String(localized: "gas.mix.header"), selection: $diluent.mixKind) {
+            Picker(String(localized: "gas.mix.header"), selection: diluentMixKindBinding) {
                 ForEach([GasMixKind.air, .ean, .trimix], id: \.self) { kind in
                     Text(kind.localizedTitle).tag(kind)
                 }
             }
             .pickerStyle(.segmented)
-            .onChange(of: diluent.mixKind) { _, newKind in
-                diluent.applyMixKind(newKind)
-            }
 
             if diluent.mixKind == .ean || diluent.mixKind == .trimix {
-                Stepper("O₂ \(diluent.oxygenPercent)%", value: $diluent.oxygenPercent, in: 10...100, step: 1)
+                Stepper(
+                    String(format: String(localized: "gas.oxygen.percent_stepper"), diluent.oxygenPercent),
+                    value: $diluent.oxygenPercent,
+                    in: 10...100,
+                    step: 1
+                )
             }
             if diluent.mixKind == .trimix {
-                Stepper("He \(diluent.heliumPercent)%", value: $diluent.heliumPercent, in: 0...90, step: 1)
+                Stepper(
+                    String(format: String(localized: "gas.helium.percent_stepper"), diluent.heliumPercent),
+                    value: $diluent.heliumPercent,
+                    in: 0...90,
+                    step: 1
+                )
             }
             Text(diluent.label)
                 .font(.caption)
@@ -249,10 +342,20 @@ struct CCRBailoutListEditorView: View {
                     }
                     .pickerStyle(.menu)
                     if gas.mixKind != .air {
-                        Stepper("O₂ \(gas.oxygenPercent)%", value: $gas.oxygenPercent, in: 16...100, step: 1)
+                        Stepper(
+                            String(format: String(localized: "gas.oxygen.percent_stepper"), gas.oxygenPercent),
+                            value: $gas.oxygenPercent,
+                            in: 16...100,
+                            step: 1
+                        )
                     }
                     if gas.mixKind == .trimix {
-                        Stepper("He \(gas.heliumPercent)%", value: $gas.heliumPercent, in: 0...90, step: 1)
+                        Stepper(
+                            String(format: String(localized: "gas.helium.percent_stepper"), gas.heliumPercent),
+                            value: $gas.heliumPercent,
+                            in: 0...90,
+                            step: 1
+                        )
                     }
                     Picker(String(localized: "equipment.tank_size"), selection: $gas.tankSize) {
                         ForEach(TankSize.allCases) { size in

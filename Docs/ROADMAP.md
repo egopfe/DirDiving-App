@@ -1,6 +1,6 @@
 # Roadmap DIR DIVING
 
-**Aggiornato:** 2026-06-07 (`main` = `origin/main` @ `a69bc4b`)
+**Aggiornato:** 2026-06-09 (`main` = `origin/main` @ `0569903`)
 
 ## Rilasciati su `main` (Watch MAIN + iOS nel workspace)
 

@@ -10,6 +10,24 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 | Commit `HEAD` | __________ |
 | Esecutore | __________ |
 
+## Audit remediation (2026-06-09 — UI/UX @ `UI_UX_MAIN_AUDIT_CURRENT.md`)
+
+- [ ] Review [`UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md`](UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md)
+- [ ] P1 localization/a11y fixes (ascent settings, sync keys, CCR GF/gas, watch photo panel, CCR chart summaries)
+- [ ] P2 UX (CCR checklist import, reminder dismiss, live depth-first layout, More tab sync badge)
+- [ ] P3 polish (image swipe, locale logbook dates, reference UI scaffolding)
+- [ ] Evidence folders **PENDING**: [`QA_EVIDENCE/REFERENCE_UI/`](QA_EVIDENCE/REFERENCE_UI/README.md), [`DYNAMIC_TYPE_VOICEOVER/`](QA_EVIDENCE/DYNAMIC_TYPE_VOICEOVER/README.md), [`APP_STORE_MARKETING/`](QA_EVIDENCE/APP_STORE_MARKETING/README.md)
+- [ ] **Code-level UI/UX readiness:** green builds + 567 iOS / 201 Watch tests
+- [ ] **External TestFlight / App Store:** **BLOCKED** until physical QA + screenshots + marketing evidence
+
+## Audit remediation (2026-06-09 — iOS complete algorithm @ `IOS_MAIN_COMPLETE_ALGORITHM_AUDIT_CURRENT.md`)
+
+- [ ] Review [`IOS_MAIN_COMPLETE_ALGORITHM_AUDIT_REMEDIATION_REPORT.md`](IOS_MAIN_COMPLETE_ALGORITHM_AUDIT_REMEDIATION_REPORT.md)
+- [ ] CCR checklist export wired in `CCRPlanResultView` (IOS-CHK-CCR-001)
+- [ ] Evidence folders **PENDING**: [`QA_EVIDENCE/BUHLMANN_EXTERNAL/`](QA_EVIDENCE/BUHLMANN_EXTERNAL/README.md), [`CCR_EXTERNAL/`](QA_EVIDENCE/CCR_EXTERNAL/README.md), [`ICLOUD_TWO_DEVICE/`](QA_EVIDENCE/ICLOUD_TWO_DEVICE/README.md), [`SUBSURFACE_CSV/`](QA_EVIDENCE/SUBSURFACE_CSV/README.md), [`IOS_ACCESSIBILITY/`](QA_EVIDENCE/IOS_ACCESSIBILITY/README.md)
+- [ ] App Store marketing checklist: [`IOS_APP_STORE_ALGORITHM_MARKETING_REVIEW_CHECKLIST.md`](IOS_APP_STORE_ALGORITHM_MARKETING_REVIEW_CHECKLIST.md)
+- [ ] iOS remains non-certified reference planner; CCR reference-only; external TestFlight blocked until evidence gates
+
 ## Audit remediation (2026-06-08 — Bühlmann comprehensive readiness @ `cc4d783` / remediation pass)
 
 - [ ] Review [`1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_CURRENT.md`](1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_CURRENT.md)
@@ -65,11 +83,19 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 - [ ] Review [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) — audit baseline
 - [ ] External Subsurface CSV regression (manual — see [`SUBSURFACE_CSV_ROUNDTRIP.md`](SUBSURFACE_CSV_ROUNDTRIP.md))
 
+## Audit remediation (2026-06-02 — Watch complete algorithm @ `WATCH_COMPLETE_ALGORITHM_AUDIT_CURRENT.md`)
+
+- [ ] Review [`WATCH_COMPLETE_ALGORITHM_AUDIT_REMEDIATION_REPORT.md`](WATCH_COMPLETE_ALGORITHM_AUDIT_REMEDIATION_REPORT.md) — CSV divergence, GPS battery policy, draft hardening, timestamp docs, evidence scaffolding
+- [ ] Watch code readiness: **high / internal-reference ready** (non-certified companion logger; no CCR/Bühlmann/Ratio Deco runtime)
+- [ ] **External TestFlight blocked** until: Ultra physical QA evidence ([`QA_EVIDENCE/WATCH_ULTRA/`](QA_EVIDENCE/WATCH_ULTRA/README.md)), paired sync evidence ([`QA_EVIDENCE/WATCH_IOS_SYNC/`](QA_EVIDENCE/WATCH_IOS_SYNC/README.md)), mock fallback banner screenshot attached
+- [ ] Review [`WATCH_CSV_EXPORT_POLICY.md`](WATCH_CSV_EXPORT_POLICY.md) — intentional Watch/iOS metadata divergence (no CCR on Watch)
+- [ ] Review [`WATCH_DEPTH_SAMPLE_TIMESTAMP_POLICY.md`](WATCH_DEPTH_SAMPLE_TIMESTAMP_POLICY.md)
+- [ ] Review [`WATCH_GPS_LIFECYCLE_POLICY.md`](WATCH_GPS_LIFECYCLE_POLICY.md) — no continuous GPS outside active dive
+
 ## Audit remediation (2026-06-06 — Watch MAIN)
 
 - [ ] Review [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT.md) — integration test isolation, mock fallback UX, draft schema, GPS auth guard, CSV alignment
 - [ ] Review [`WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md`](WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md) — physical QA not complete until executed
-- [ ] Review [`WATCH_CSV_EXPORT_POLICY.md`](WATCH_CSV_EXPORT_POLICY.md)
 
 ## Audit remediation (2026-06-03)
 

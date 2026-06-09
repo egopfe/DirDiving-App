@@ -1,5 +1,10 @@
 import Foundation
 
+// MARK: - Timestamp policy (WATCH-S2-003)
+// `timestamp` — sensor/event time from DepthSensorProvider (or injected test clock).
+// `receivedAt` — wall-clock ingestion time; stale validation compares both (see DiveAlgorithmConfiguration).
+// Dive runtime elapsed uses MonotonicElapsedClock, not sample timestamps — see Docs/WATCH_DEPTH_SAMPLE_TIMESTAMP_POLICY.md.
+
 enum DepthSampleValidity: String, Codable, Equatable {
     case valid
     case missing

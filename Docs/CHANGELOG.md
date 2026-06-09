@@ -4,6 +4,35 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-06-09, documentation alignment — docs-only @ `0569903`)
+
+- **Documentazione:** [`Docs/DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md), [`Docs/PR_STATUS_20260609.md`](PR_STATUS_20260609.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260609.md`](DOCUMENTATION_UPDATE_REPORT_20260609.md).
+- **CCR reference docs:** [`CCR_REBREATHER_PLANNER.md`](CCR_REBREATHER_PLANNER.md), [`CCR_REBREATHER_SAFETY_DISCLAIMER.md`](CCR_REBREATHER_SAFETY_DISCLAIMER.md), [`CCR_REBREATHER_CHECKLIST_SYNC.md`](CCR_REBREATHER_CHECKLIST_SYNC.md).
+- **Allineamento:** `Docs/INDEX.md`, `Docs/README.md`, root `README.md`, `ROADMAP.md`, `BRANCH_AND_TARGET_ISOLATION_POLICY.md`, `DIR_DIVING_Feature_Comparison.csv` (additive rows for MAIN-DCA, UI/UX remediation, CCR).
+- **Baseline:** `main` @ `0569903`; deep-code remediation MAIN-DCA documented; physical QA still **PENDING**; experimental isolation reaffirmed; BUSSOLA terminology preserved.
+- **Superseded (narrative baseline only):** prior `DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md` @ `a69bc4b` for HEAD — file updated in place; `DOCUMENTATION_BRANCH_ALIGNMENT_20260607` narrative superseded.
+
+### Added (2026-06-09, deep code analysis remediation — `0569903`, runtime)
+
+- **Planner:** mode-projected MOD gating, analysis cache key, MOD/END label fix, reclamp on mode change (MAIN-DCA-004/005/010/011).
+- **Watch sync:** userInfo import ACK dequeue, replay cache persistence, peer-secret publish gating (MAIN-DCA-001/013/014).
+- **DiveManager:** end manual after handoff, throttled draft persistence, mission pending in draft v2 (MAIN-DCA-007/008/009).
+- **Cloud/merge:** KVS 512KB cap, union merge policy (MAIN-DCA-002/003/006).
+- **Misc:** blink timer 1.0s, CCR bailout switch-depth reconcile, photo `.completeFileProtection` (MAIN-DCA-012/015/016).
+- **Test:** `MainDeepCodeRemediationDCATests`; Watch **192** + iOS **561** algorithm tests PASS (sim).
+- **Documentazione:** [`Docs/MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT.md), [`Docs/WATCH_SYNC_SECURITY_THREAT_MODEL.md`](WATCH_SYNC_SECURITY_THREAT_MODEL.md).
+
+### Added (2026-06-09, UI/UX audit remediation — `dba1a22`, runtime)
+
+- **Localization/a11y:** ascent settings, sync status semantics, CCR GF steppers, Watch shortcut help, checklist/tissue/haptics/legal/toast VoiceOver.
+- **UX:** CCR checklist import flow, sync status badge, locale-aware date formatting.
+- **Test:** `UIUXRemediationV3AccessibilityTests`, `UIUXLocalizationRemediationTests`.
+- **Documentazione:** [`Docs/UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md`](UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md); audit baseline [`UI_UX_MAIN_AUDIT_CURRENT.md`](UI_UX_MAIN_AUDIT_CURRENT.md) @ `b7b6e93`.
+
+### Added (2026-06-09, deep code analysis audit — `a2733d2`, docs-only)
+
+- **Documentazione:** [`Docs/MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md) — MAIN-DCA-001…018 @ baseline `dba1a22`.
+
 ### Added (2026-06-07, documentation alignment — docs-only @ `a69bc4b`)
 
 - **Documentazione:** [`Docs/DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md), [`Docs/PR_STATUS_20260607.md`](PR_STATUS_20260607.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260607.md`](DOCUMENTATION_UPDATE_REPORT_20260607.md).

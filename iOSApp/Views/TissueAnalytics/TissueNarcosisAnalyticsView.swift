@@ -131,6 +131,7 @@ struct TissueNarcosisAnalyticsView: View {
                             )
                     }
                     .buttonStyle(.plain)
+                    .accessibilityAddTraits(tab == item ? [.isSelected] : [])
                 }
             }
             .padding(6)

@@ -41,6 +41,16 @@ final class WatchSyncServiceIntegrationTests: XCTestCase {
         XCTAssertEqual(sync.testHook_pendingSessionIDs, [session.id])
     }
 
+    func testSignedImportAckPayloadParsesOnWatch() throws {
+        try installPeerSecret()
+        let sessionID = UUID()
+        let issuedAt = Date()
+        let payload = WatchDiveSyncCodec.makeImportAckPayload(sessionID: sessionID, issuedAt: issuedAt)
+        let parsed = try XCTUnwrap(WatchDiveSyncCodec.parseImportAck(from: payload))
+        XCTAssertEqual(parsed.sessionID, sessionID)
+        XCTAssertTrue(WatchDiveSyncCodec.verifyAckSignature(parsed.signature, sessionID: sessionID, issuedAt: issuedAt))
+    }
+
     func testUserInfoDeliveryDoesNotDequeueWithoutSignedAck() throws {
         try installPeerSecret()
         let sync = WatchSyncService.shared
