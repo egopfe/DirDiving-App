@@ -72,6 +72,16 @@ final class DiveManagerAlgorithmIntegrationTests: XCTestCase {
         XCTAssertEqual(diveManager.testHook_sampleCount, 2)
     }
 
+    func testEndManualDiveWorksAfterManualToAutomaticHandoff() {
+        diveManager.startManualDive()
+        let start = Date()
+        diveManager.testHook_processDepthMeasurement(rawDepthMeters: 3, timestamp: start)
+        diveManager.testHook_simulateManualToAutomaticHandoffForTests()
+        XCTAssertFalse(diveManager.isManualLifecycleActive)
+        diveManager.endManualDive()
+        XCTAssertFalse(diveManager.isDiveActive)
+    }
+
     func testFreshTemperatureAttachedToDepthSample() {
         let start = Date()
         diveManager.testHook_setCurrentTemperatureForTests(19.5, receivedAt: start)

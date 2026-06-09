@@ -62,7 +62,7 @@ final class CloudSyncStore: ObservableObject {
 
         if let cloudData, let localData {
             if cloudModifiedAt > localModifiedAt,
-               let decoded = decode(type, from: cloudData) {
+               let decoded = decodeIfWithinPayloadCap(cloudData, type: type) {
                 defaults.set(cloudData, forKey: key)
                 defaults.set(cloudModifiedAt, forKey: modifiedAtKey(for: key))
                 lastSyncStatus = "Dati caricati da iCloud"
@@ -71,29 +71,27 @@ final class CloudSyncStore: ObservableObject {
 
             if let decoded = decode(type, from: localData) {
                 if localModifiedAt > cloudModifiedAt {
-                    cloudStore.set(localData, forKey: key)
-                    cloudStore.set(localModifiedAt, forKey: modifiedAtKey(for: key))
-                    synchronize()
-                    lastSyncStatus = "Dati locali piu recenti pronti per iCloud"
+                    persistToCloudIfWithinCap(localData, key: key, modifiedAt: localModifiedAt)
                 }
                 return decoded
             }
         }
 
         if let cloudData,
-           let decoded = decode(type, from: cloudData) {
+           let decoded = decodeIfWithinPayloadCap(cloudData, type: type) {
             defaults.set(cloudData, forKey: key)
             defaults.set(cloudModifiedAt, forKey: modifiedAtKey(for: key))
             lastSyncStatus = "Dati caricati da iCloud"
             return decoded
         }
 
+        if let cloudData, cloudData.count > DiveAlgorithmConfiguration.maxSyncPayloadBytes {
+            lastSyncStatus = "Payload iCloud troppo grande ignorato"
+        }
+
         if let localData,
            let decoded = decode(type, from: localData) {
-            cloudStore.set(localData, forKey: key)
-            cloudStore.set(localModifiedAt, forKey: modifiedAtKey(for: key))
-            synchronize()
-            lastSyncStatus = "Dati locali pronti per iCloud"
+            persistToCloudIfWithinCap(localData, key: key, modifiedAt: localModifiedAt)
             return decoded
         }
 
@@ -106,12 +104,15 @@ final class CloudSyncStore: ObservableObject {
             return
         }
 
+        if data.count > DiveAlgorithmConfiguration.maxSyncPayloadBytes {
+            lastSyncStatus = "Payload troppo grande per iCloud KVS"
+            return
+        }
+
         let modifiedAt = Date().timeIntervalSince1970
         defaults.set(data, forKey: key)
         defaults.set(modifiedAt, forKey: modifiedAtKey(for: key))
-        cloudStore.set(data, forKey: key)
-        cloudStore.set(modifiedAt, forKey: modifiedAtKey(for: key))
-        synchronize()
+        persistToCloudIfWithinCap(data, key: key, modifiedAt: modifiedAt)
         lastSyncStatus = isICloudAvailable ? "Salvato localmente e su iCloud" : "Salvato localmente, iCloud non disponibile"
     }
 
@@ -130,6 +131,24 @@ final class CloudSyncStore: ObservableObject {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         return try? decoder.decode(type, from: data)
+    }
+
+    private func decodeIfWithinPayloadCap<T: Decodable>(_ data: Data, type: T.Type) -> T? {
+        guard data.count <= DiveAlgorithmConfiguration.maxSyncPayloadBytes else {
+            lastSyncStatus = "Payload iCloud troppo grande ignorato"
+            return nil
+        }
+        return decode(type, from: data)
+    }
+
+    private func persistToCloudIfWithinCap(_ data: Data, key: String, modifiedAt: TimeInterval) {
+        guard data.count <= DiveAlgorithmConfiguration.maxSyncPayloadBytes else {
+            lastSyncStatus = "Payload troppo grande per iCloud KVS"
+            return
+        }
+        cloudStore.set(data, forKey: key)
+        cloudStore.set(modifiedAt, forKey: modifiedAtKey(for: key))
+        synchronize()
     }
 
     private func modifiedAtKey(for key: String) -> String {

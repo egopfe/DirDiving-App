@@ -817,7 +817,9 @@ struct PlannerView: View {
     }
 
     private var liveMODIssues: [MODValidationIssue] {
-        PlannerMODValidator.liveInputIssues(input: store.input, environment: store.input.plannerEnvironment)
+        guard store.mode.isOpenCircuit else { return [] }
+        let active = PlannerModePolicy.activePlanInput(from: store.input, mode: store.mode)
+        return PlannerMODValidator.liveInputIssues(input: active, environment: active.plannerEnvironment)
     }
 
     private var liveValidation: PlannerValidationResult {
@@ -1276,7 +1278,9 @@ struct PlanResultView: View {
     }
 
     private var liveMODIssues: [MODValidationIssue] {
-        PlannerMODValidator.liveInputIssues(input: store.input, environment: store.input.plannerEnvironment)
+        guard store.mode.isOpenCircuit else { return [] }
+        let active = PlannerModePolicy.activePlanInput(from: store.input, mode: store.mode)
+        return PlannerMODValidator.liveInputIssues(input: active, environment: active.plannerEnvironment)
     }
 
     private var canExportPlanPDF: Bool {
@@ -2419,7 +2423,13 @@ struct PlanResultView: View {
         DIRCard(String(localized: "planner.result.base.summary"), icon: "checkmark.seal", accent: DIRTheme.cyan) {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 0) {
-                    DIRMetricTile(title: "MOD", value: Formatters.depth(store.analysis.endMeters, units: unitPreference).value, unit: Formatters.depth(store.analysis.endMeters, units: unitPreference).unit)
+                    Group {
+                        let modMeasurement = Formatters.depth(
+                            store.input.bottomGas.modMeters(environment: store.input.plannerEnvironment),
+                            units: unitPreference
+                        )
+                        DIRMetricTile(title: "MOD", value: modMeasurement.value, unit: modMeasurement.unit)
+                    }
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: "PPO2", value: Formatters.one(store.analysis.ppO2AtDepth), color: store.analysis.ppO2AtDepth > store.input.bottomGas.maxPPO2 ? DIRTheme.red : DIRTheme.green)
                     Divider().overlay(DIRTheme.hairline)

@@ -13,8 +13,22 @@ enum WatchDiveSyncCodec {
     static let maxIssuedAtSkew: TimeInterval = IOSAlgorithmConfiguration.syncIssuedAtSkewSeconds
     static let importedSessionIDsKey = "dirdiving_ios_imported_session_ids"
     static var replayCache = SyncNonceReplayCache()
+    private static let replayCacheFileName = "dirdiving_ios_sync_replay_cache.json"
 
     private static let expectedWatchBundleID = "com.egopfe.dirdiving.ios.watch"
+
+    static func bootstrapReplayCacheIfNeeded() {
+        replayCache.loadProtected(from: replayCacheFileURL())
+    }
+
+    private static func replayCacheFileURL() -> URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent(replayCacheFileName)
+    }
+
+    private static func persistReplayCache() {
+        replayCache.persistProtected(to: replayCacheFileURL())
+    }
 
     struct Transport: Codable {
         let version: Int
@@ -118,6 +132,7 @@ enum WatchDiveSyncCodec {
             guard replayCache.register(nonce) else {
                 throw WatchDiveSyncError.replayedPayload
             }
+            persistReplayCache()
         }
 
         let decoder = JSONDecoder()

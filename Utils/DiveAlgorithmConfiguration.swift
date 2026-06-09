@@ -17,6 +17,10 @@ enum DiveAlgorithmConfiguration {
     static let maximumPlausibleDepthMeters = 350.0
     static let maximumPlausibleDepthChangeMetersPerMinute = 90.0
     static let activeDiveDraftExpirationSeconds: TimeInterval = 12 * 60 * 60
+    /// Minimum interval between coalesced active-dive draft writes during sampling.
+    static let activeDiveDraftPersistenceIntervalSeconds: TimeInterval = 8
+    /// Mirrors iOS KVS cap — Watch CloudSyncStore rejects larger payloads before KVS write.
+    static let maxSyncPayloadBytes = 512 * 1024
     /// Cap offline tail when recomputing average depth after active-draft restore (avoids wall-clock skew).
     static let draftRestoreAverageDepthMaxTailSeconds: TimeInterval = 30
     /// Pending Watch→iPhone transfers are retained up to this age awaiting signed ACK.

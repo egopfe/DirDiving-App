@@ -92,6 +92,7 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     func activate(logStore: DiveLogStore) {
         self.logStore = logStore
+        WatchDiveSyncCodec.bootstrapReplayCacheIfNeeded()
         importedSessionIDs = WatchDiveSyncCodec.loadImportedSessionIDs()
         importedSessionCount = importedSessionIDs.count
         pushedToWatchSessionIDs = loadPushedToWatchSessionIDs()
@@ -194,7 +195,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         updateCompanionPhotoTransfer(photoID: photoID, fileName: sanitized, state: .sending)
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("DIRDivingPhoto_\(photoID)_\(sanitized)")
         do {
-            try imageData.write(to: url, options: .atomic)
+            try imageData.write(to: url, options: [.atomic, .completeFileProtection])
             _ = WCSession.default.transferFile(
                 url,
                 metadata: CompanionPhotoTransferSupport.makeTransferMetadata(photoID: photoID, fileName: sanitized)

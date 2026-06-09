@@ -8,6 +8,7 @@ final class PlannerStore: ObservableObject {
             guard isReady else { return }
             isApplyingInputSideEffects = true
             PlannerModeLimits.enforceInputLimits(&input, mode: mode)
+            input.normalizeSwitchDepthsToMOD()
             isApplyingInputSideEffects = false
             invalidateAnalysisCache()
             scheduleSave()
@@ -386,17 +387,24 @@ private struct PlannerState: Codable {
 private struct AnalysisCacheKey: Equatable {
     let mode: PlannerMode
     let plannedDepthMeters: Double
+    let plannedAverageDepthMeters: Double
+    let planningDepthReference: PlanningDepthReference
     let bottomTimeMinutes: Double
+    let sacLitersPerMinute: Double
     let altitudeMeters: Double
     let salinity: SalinityMode
     let bottomGasSignature: String
     let cylinderSignature: String
     let environmentSignature: String
+    let projectedCylinderSignature: String
 
     init(input: GasPlanInput, mode: PlannerMode) {
         self.mode = mode
         plannedDepthMeters = input.plannedDepthMeters
+        plannedAverageDepthMeters = input.plannedAverageDepthMeters
+        planningDepthReference = input.planningDepthReference
         bottomTimeMinutes = input.plannedBottomMinutes
+        sacLitersPerMinute = input.sacLitersPerMinute
         altitudeMeters = input.altitudeMeters
         salinity = input.salinity
         bottomGasSignature = "\(input.bottomGas.oxygen)-\(input.bottomGas.helium)-\(input.bottomGas.maxPPO2)"
@@ -404,6 +412,10 @@ private struct AnalysisCacheKey: Equatable {
             "\($0.id.uuidString)|\($0.role.rawValue)|\($0.gas.oxygen)|\($0.gas.helium)|\($0.gas.maxPPO2)|\($0.switchDepthMeters)|\($0.startPressure)|\($0.pressureUnit.rawValue)"
         }.joined(separator: ";")
         environmentSignature = "\(input.altitudeMeters)-\(input.salinity.rawValue)-\(input.gfLow)-\(input.gfHigh)"
+        let projected = PlannerModePolicy.activePlanInput(from: input, mode: mode)
+        projectedCylinderSignature = projected.plannerCylinders.map {
+            "\($0.id.uuidString)|\($0.role.rawValue)|\($0.gas.oxygen)|\($0.gas.helium)|\($0.gas.maxPPO2)|\($0.switchDepthMeters)"
+        }.joined(separator: ";")
     }
 }
 

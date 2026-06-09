@@ -391,10 +391,10 @@ final class DiveAlgorithmTests: XCTestCase {
         )
 
         let merged = DiveSessionMerge.preferred(local, remote)
-        XCTAssertEqual(merged.samples.count, 2)
-        XCTAssertEqual(merged.maxDepthMeters, 20, accuracy: 0.001)
-        XCTAssertEqual(merged.avgDepthMeters, 15, accuracy: 0.001)
-        XCTAssertEqual(merged.ttv, 17, accuracy: 0.001)
+        XCTAssertEqual(merged.samples.count, 3)
+        XCTAssertEqual(merged.maxDepthMeters, 30, accuracy: 0.001)
+        XCTAssertGreaterThan(merged.avgDepthMeters, 15)
+        XCTAssertGreaterThan(merged.ttv, 17)
     }
 
     func testDepthSafetySelfCheckHasNoMappingFailures() {

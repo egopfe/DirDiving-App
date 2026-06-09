@@ -233,6 +233,13 @@ enum ChecklistPlannerSyncMapper {
         candidates: [CCRChecklistImportCandidate],
         to input: inout CCRPlanInput
     ) {
+        let environment: PlannerEnvironment
+        switch PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) {
+        case .success(let value):
+            environment = value
+        case .failure:
+            environment = .seaLevelSaltWater
+        }
         for candidate in candidates where candidate.isSelected {
             guard let role = candidate.assignedRole ?? resolvedRole(for: candidate.checklistItem) else { continue }
             switch role {
@@ -240,7 +247,8 @@ enum ChecklistPlannerSyncMapper {
                 guard candidate.duplicateAction == .replace || !diluentMatches(candidate.checklistItem, diluent: input.diluent) else { continue }
                 input.diluent = ccrDiluent(from: candidate.checklistItem)
             case .ccrBailout:
-                let imported = ccrBailoutGas(from: candidate.checklistItem)
+                var imported = ccrBailoutGas(from: candidate.checklistItem)
+                reconcileBailoutSwitchDepth(&imported, environment: environment)
                 if let index = candidate.matchesExistingBailoutIndex,
                    input.bailoutGases.indices.contains(index),
                    candidate.duplicateAction == .replace {
@@ -253,6 +261,21 @@ enum ChecklistPlannerSyncMapper {
             default:
                 continue
             }
+        }
+    }
+
+    private static func reconcileBailoutSwitchDepth(_ gas: inout CCRBailoutGas, environment: PlannerEnvironment) {
+        if gas.mixKind == .oxygen {
+            gas.switchDepthMeters = min(max(0, gas.switchDepthMeters), 6)
+            return
+        }
+        let mod = GasMixValidator.modMeters(
+            oxygenFraction: gas.oxygenFraction,
+            maxPPO2: gas.gasMix.maxPPO2,
+            environment: environment
+        ) ?? 0
+        if gas.switchDepthMeters > mod + 0.5 {
+            gas.switchDepthMeters = max(0, mod)
         }
     }
 

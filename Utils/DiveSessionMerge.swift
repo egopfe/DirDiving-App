@@ -1,5 +1,8 @@
 import Foundation
 
+/// Watch-side merge policy. Watch `DiveSession` intentionally stores a subset of iOS logbook fields
+/// (no site/buddy/notes/equipment). This merge never fabricates iOS-only metadata and uses union
+/// sample merging when profiles are compatible so richer depth data is preserved.
 enum DiveSessionMerge {
     static func preferred(_ local: DiveSession, _ remote: DiveSession) -> DiveSession {
         let winner = newer(local, remote)
@@ -24,13 +27,12 @@ enum DiveSessionMerge {
         }
         let startDate = min(winner.startDate, loser.startDate)
         let endDate = max(max(winner.endDate, loser.endDate), startDate)
-        let selectedSamples = sanitizeSamples(winner.samples.count >= loser.samples.count ? winner.samples : loser.samples)
-            .filter { $0.timestamp >= startDate && $0.timestamp <= endDate }
+        let selectedSamples = mergedSamples(winner.samples, loser.samples, startDate: startDate, endDate: endDate)
         let duration = max(0, endDate.timeIntervalSince(startDate))
         let sampleDepths = selectedSamples.map(\.depthMeters)
         let maxDepth = sampleDepths.max() ?? maxValid(winner.maxDepthMeters, loser.maxDepthMeters)
         let avgDepth = selectedSamples.isEmpty
-            ? maxValid(winner.avgDepthMeters, loser.avgDepthMeters)
+            ? mergedManualAverageDepthMeters(winner: winner, loser: loser)
             : DiveAlgorithm.timeWeightedAverageDepth(samples: selectedSamples, endDate: endDate)
         let sampleTemperatures = selectedSamples.compactMap { DiveAlgorithm.sanitizedTemperatureCelsius($0.temperatureCelsius) }
         return DiveSession(
@@ -53,6 +55,30 @@ enum DiveSessionMerge {
             isManual: winner.isManual || loser.isManual,
             hasDepthProfile: !selectedSamples.isEmpty || winner.hasDepthProfile || loser.hasDepthProfile
         )
+    }
+
+    private static func mergedSamples(_ first: [DiveSample], _ second: [DiveSample], startDate: Date, endDate: Date) -> [DiveSample] {
+        let candidates = DiveAlgorithm.sanitizedSamples(first + second)
+            .filter { $0.timestamp >= startDate && $0.timestamp <= endDate }
+        var byTimestamp: [TimeInterval: DiveSample] = [:]
+        for sample in candidates {
+            let key = sample.timestamp.timeIntervalSinceReferenceDate.rounded(.toNearestOrAwayFromZero)
+            if let existing = byTimestamp[key] {
+                byTimestamp[key] = sample.depthMeters >= existing.depthMeters ? sample : existing
+            } else {
+                byTimestamp[key] = sample
+            }
+        }
+        return byTimestamp.values.sorted { $0.timestamp < $1.timestamp }
+    }
+
+    private static func mergedManualAverageDepthMeters(winner: DiveSession, loser: DiveSession) -> Double {
+        let winnerAvg = winner.avgDepthMeters
+        let loserAvg = loser.avgDepthMeters
+        if winnerAvg > 0, loserAvg > 0 { return max(winnerAvg, loserAvg) }
+        if winnerAvg > 0 { return winnerAvg }
+        if loserAvg > 0 { return loserAvg }
+        return 0
     }
 
     private static func newer(_ lhs: DiveSession, _ rhs: DiveSession) -> DiveSession {
@@ -84,10 +110,6 @@ enum DiveSessionMerge {
         case (let left?, nil): return left
         case (nil, nil): return nil
         }
-    }
-
-    private static func sanitizeSamples(_ samples: [DiveSample]) -> [DiveSample] {
-        DiveAlgorithm.sanitizedSamples(samples)
     }
 
     private static func maxValid(_ lhs: Double, _ rhs: Double) -> Double {
