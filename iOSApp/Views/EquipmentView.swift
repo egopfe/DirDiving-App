@@ -56,8 +56,14 @@ struct EquipmentView: View {
                             .buttonStyle(.plain)
                             ForEach($equipment.profile.checklistItems) { $item in
                                 VStack(alignment: .leading, spacing: 6) {
-                                    Toggle(item.title, isOn: $item.isReady).tint(DIRTheme.cyan)
-                                    Toggle(String(localized: "equipment.checklist.gas_flag"), isOn: $item.usesGas).tint(DIRTheme.yellow)
+                                    Toggle(item.title, isOn: $item.isReady)
+                                        .tint(DIRTheme.cyan)
+                                        .accessibilityLabel(checklistReadyAccessibilityLabel(for: item))
+                                        .accessibilityHint(String(localized: "a11y.checklist.item.toggle.hint"))
+                                    Toggle(String(localized: "equipment.checklist.gas_flag"), isOn: $item.usesGas)
+                                        .tint(DIRTheme.yellow)
+                                        .accessibilityLabel(checklistGasFlagAccessibilityLabel(for: item))
+                                        .accessibilityHint(String(localized: "a11y.checklist.item.toggle.hint"))
                                     EquipmentChecklistGasSection(item: $item)
                                         .animation(.easeInOut(duration: 0.2), value: item.usesGas)
                                     Button(role: .destructive) {
@@ -253,5 +259,25 @@ struct EquipmentView: View {
         } catch {
             pdfExportAlertMessage = String(localized: "pdf.export.error.generation")
         }
+    }
+
+    private func checklistReadyAccessibilityLabel(for item: EquipmentChecklistItem) -> String {
+        let state = item.isReady
+            ? String(localized: "a11y.checklist.item.checked")
+            : String(localized: "a11y.checklist.item.unchecked")
+        return "\(item.title). \(state)"
+    }
+
+    private func checklistGasFlagAccessibilityLabel(for item: EquipmentChecklistItem) -> String {
+        var parts = [item.title]
+        parts.append(
+            item.usesGas
+                ? String(localized: "a11y.checklist.item.gas_linked")
+                : String(localized: "a11y.checklist.item.gas_not_linked")
+        )
+        if item.usesGas, let role = item.gasRole ?? ChecklistPlannerSyncMapper.resolvedRole(for: item) {
+            parts.append(role.localizedTitle)
+        }
+        return parts.joined(separator: ". ")
     }
 }

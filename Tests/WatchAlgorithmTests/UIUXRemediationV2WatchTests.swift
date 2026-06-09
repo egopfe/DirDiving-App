@@ -3,8 +3,9 @@ import XCTest
 final class UIUXRemediationV2WatchTests: XCTestCase {
     private let reminderAccessibilityKeys = [
         "dive_reminder.overlay.runtime_a11y",
-        "dive_reminder.overlay.a11y.hint",
-        "live.a11y.ttv_hint"
+        "dive_reminder.overlay.a11y.dismiss_hint",
+        "live.a11y.ttv_hint",
+        "a11y.watch.haptics_off_badge.label"
     ]
 
     func testReminderOverlayAccessibilityKeysExist() throws {
@@ -19,7 +20,8 @@ final class UIUXRemediationV2WatchTests: XCTestCase {
     func testDiveReminderOverlayViewProvidesAccessibilityLabel() throws {
         let source = try String(contentsOf: repositoryRoot().appendingPathComponent("Views/DiveReminderOverlayView.swift"))
         XCTAssertTrue(source.contains("overlayAccessibilityLabel"))
-        XCTAssertTrue(source.contains("dive_reminder.overlay.a11y.hint"))
+        XCTAssertTrue(source.contains("dive_reminder.overlay.a11y.dismiss_hint"))
+        XCTAssertTrue(source.contains("onDismiss"))
         XCTAssertTrue(source.contains("dive_reminder.overlay.runtime_a11y"))
     }
 
@@ -27,6 +29,18 @@ final class UIUXRemediationV2WatchTests: XCTestCase {
         let source = try String(contentsOf: repositoryRoot().appendingPathComponent("Views/DiveLiveView.swift"))
         XCTAssertTrue(source.contains("live.a11y.ttv_hint"))
         XCTAssertFalse(source.contains("TTV informativo derivato da profondita media"))
+    }
+
+    func testHapticsOffBadgeHasAccessibilityLabel() throws {
+        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("Views/DiveLiveView.swift"))
+        XCTAssertTrue(source.contains("a11y.watch.haptics_off_badge.label"))
+        XCTAssertTrue(source.contains("a11y.watch.haptics_off_badge.hint"))
+    }
+
+    func testUserImagesViewSupportsSwipePaging() throws {
+        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("Views/UserImagesView.swift"))
+        XCTAssertTrue(source.contains("imageSwipeGesture"))
+        XCTAssertTrue(source.contains("selectAdjacentImage"))
     }
 
     func testUserImagesDeleteErrorUsesReadableTypography() throws {

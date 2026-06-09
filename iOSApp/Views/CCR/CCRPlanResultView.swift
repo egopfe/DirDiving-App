@@ -232,6 +232,14 @@ struct CCRPlanResultView: View {
                 .foregroundStyle(DIRTheme.orange)
             }
             .frame(height: 160)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(
+                UIUXAccessibilitySummaries.ccrPPO2Timeline(
+                    samples: plan.ppO2Timeline,
+                    setpointHigh: store.ccrInput.setpointProfile.highSetpoint
+                )
+            )
+            .accessibilityHint(String(localized: "ccr.a11y.chart.hint"))
         }
     }
 
@@ -245,6 +253,9 @@ struct CCRPlanResultView: View {
                 .foregroundStyle(DIRTheme.green)
             }
             .frame(height: 160)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(UIUXAccessibilitySummaries.ccrPPN2Timeline(samples: plan.ppN2Timeline))
+            .accessibilityHint(String(localized: "ccr.a11y.chart.hint"))
         }
     }
 
@@ -258,6 +269,14 @@ struct CCRPlanResultView: View {
                 .foregroundStyle(DIRTheme.yellow)
             }
             .frame(height: 160)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(
+                UIUXAccessibilitySummaries.ccrENDTimeline(
+                    samples: plan.endTimeline,
+                    unitPreference: unitPreference
+                )
+            )
+            .accessibilityHint(String(localized: "ccr.a11y.chart.hint"))
             Text(String(localized: "ccr.narcosis.estimator_footnote"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
@@ -280,6 +299,13 @@ struct CCRPlanResultView: View {
                     .foregroundStyle(DIRTheme.muted)
                 }
                 .frame(height: 140)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(
+                    UIUXAccessibilitySummaries.ccrGasDensityTimeline(
+                        samples: densitySamples.map { (runtimeMinutes: $0.0, density: $0.1) }
+                    )
+                )
+                .accessibilityHint(String(localized: "ccr.a11y.chart.hint"))
                 Text(String(localized: "ccr.gas_density.approximation"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)

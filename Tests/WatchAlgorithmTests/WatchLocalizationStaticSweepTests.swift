@@ -15,7 +15,9 @@ final class WatchLocalizationStaticSweepTests: XCTestCase {
         "PROF. MASSIMA",
         "PROF. MEDIA",
         "ALLARME PROFONDITÀ",
-        "Picker(\"Unità\""
+        "Picker(\"Unità\"",
+        "LIMITI PERSONALIZZATI",
+        "\"SHORTCUT\""
     ]
     private let semanticKeysRequiringEnglish = [
         "watch.alarm.depth_exceeded_format",

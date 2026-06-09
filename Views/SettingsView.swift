@@ -102,7 +102,7 @@ struct SettingsView: View {
                     settingsRow(
                         icon: "iphone.slash",
                         iconColor: DiveUI.yellow,
-                        title: String(localized: "Sync impostazioni"),
+                        title: String(localized: "sync.settings.title"),
                         subtitle: String(localized: "settings.sync.settings_scope"),
                         informational: true
                     )
@@ -226,7 +226,7 @@ struct SettingsView: View {
         switch gps.authorizationStatus {
         case .authorizedAlways, .authorizedWhenInUse:
             return gps.lastPoint == nil
-                ? String(localized: "Autorizzato, in attesa fix")
+                ? String(localized: "settings.gps.authorized_pending_fix")
                 : String(localized: "Fix disponibile")
         case .denied, .restricted:
             return String(localized: "Permesso negato: abilita da iPhone")
@@ -497,7 +497,7 @@ private struct WatchShortcutHelpView: View {
             ScrollView {
                 VStack(spacing: 8) {
                     header
-                    Text("SHORTCUT")
+                    Text(String(localized: "settings.shortcut.title"))
                         .font(.system(size: 11, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
                     helpPanel(

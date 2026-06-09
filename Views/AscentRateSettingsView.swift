@@ -30,7 +30,7 @@ struct AscentRateSettingsView: View {
                     limitControl(depthBandLabel(fromMeters: 6, toMeters: 0), value: $settings.limits.surfaceMetersPerMinute, accent: DiveUI.green)
                     limitControl(String(localized: "ascent.band.other"), value: $settings.limits.fallbackMetersPerMinute, accent: DiveUI.blue)
 
-                    DiveCommandButton("RESET STD", systemImage: "arrow.clockwise", color: .white.opacity(0.78)) {
+                    DiveCommandButton(String(localized: "ascent.settings.reset_standard.button"), systemImage: "arrow.clockwise", color: .white.opacity(0.78)) {
                         settings.resetToStandard()
                     }
                 }
@@ -43,8 +43,8 @@ struct AscentRateSettingsView: View {
 
     private var header: some View {
         DiveScreenHeader(
-            "VELOCITA RISALITA",
-            subtitle: "LIMITI PERSONALIZZATI",
+            String(localized: "ascent.settings.title"),
+            subtitle: String(localized: "ascent.settings.custom_limits.title"),
             accent: DiveUI.green,
             systemImage: "gauge"
         )

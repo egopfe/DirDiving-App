@@ -228,6 +228,13 @@ struct IOSLegalOnboardingView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityAddTraits(isOn.wrappedValue ? [.isSelected] : [])
+        .accessibilityValue(
+            isOn.wrappedValue
+                ? String(localized: "legal.acceptance.a11y.checked")
+                : String(localized: "legal.acceptance.a11y.unchecked")
+        )
+        .accessibilityHint(String(localized: "legal.acceptance.a11y.toggle_hint"))
     }
 
     private func primaryButton(_ title: String, systemImage: String, color: Color, action: @escaping () -> Void) -> some View {

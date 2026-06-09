@@ -2,6 +2,15 @@
 
 Owner: ________  Date: ________  Build: ________  Commit: ________
 
+## UI/UX remediation gates (2026-06-09 — `UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md`)
+
+- [x] P1 localization (ascent settings, sync keys, CCR GF/gas, shortcut title) — code complete
+- [x] P1 accessibility (watch photo panel, CCR charts, checklist toggles, legal toggles) — code complete
+- [x] P2 UX (CCR checklist import, reminder dismiss, live depth-first, More tab badge) — code complete
+- [x] 567 iOS + 201 Watch algorithm tests PASS
+- [ ] Dynamic Type / VoiceOver evidence — `Docs/QA_EVIDENCE/DYNAMIC_TYPE_VOICEOVER/` (**PENDING**)
+- [ ] Reference UI PNGs — `Docs/QA_EVIDENCE/REFERENCE_UI/` (**PENDING**)
+
 ## Code/doc/static gates (must be complete)
 
 - [ ] `./Scripts/validate_main_release_readiness.sh` PASS

@@ -4,6 +4,7 @@ struct DiveLogListView: View {
     @EnvironmentObject private var log: DiveLogStore
     @EnvironmentObject private var navigation: AppNavigationStore
     @EnvironmentObject private var watchSync: WatchSyncService
+    @Environment(\.locale) private var locale
     @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
     @State private var listExportURL: URL?
     @State private var listExportMessage: String?
@@ -288,26 +289,23 @@ struct DiveLogListView: View {
     }
 
     private func logDate(_ date: Date) -> String {
-        Self.dateFormatter.string(from: date)
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.dateStyle = .short
+        formatter.timeStyle = .none
+        return formatter.string(from: date)
     }
 
     private func logTime(_ date: Date) -> String {
-        Self.timeFormatter.string(from: date)
+        let formatter = DateFormatter()
+        formatter.locale = locale
+        formatter.dateStyle = .none
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
     }
 
     private func durationMinutes(_ interval: TimeInterval) -> String {
         "\(max(0, Int((interval / 60).rounded())))"
     }
 
-    private static let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM/yyyy"
-        return formatter
-    }()
-
-    private static let timeFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        return formatter
-    }()
 }

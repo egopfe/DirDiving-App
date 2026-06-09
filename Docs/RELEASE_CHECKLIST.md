@@ -10,6 +10,16 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 | Commit `HEAD` | __________ |
 | Esecutore | __________ |
 
+## Audit remediation (2026-06-09 — UI/UX @ `UI_UX_MAIN_AUDIT_CURRENT.md`)
+
+- [ ] Review [`UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md`](UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md)
+- [ ] P1 localization/a11y fixes (ascent settings, sync keys, CCR GF/gas, watch photo panel, CCR chart summaries)
+- [ ] P2 UX (CCR checklist import, reminder dismiss, live depth-first layout, More tab sync badge)
+- [ ] P3 polish (image swipe, locale logbook dates, reference UI scaffolding)
+- [ ] Evidence folders **PENDING**: [`QA_EVIDENCE/REFERENCE_UI/`](QA_EVIDENCE/REFERENCE_UI/README.md), [`DYNAMIC_TYPE_VOICEOVER/`](QA_EVIDENCE/DYNAMIC_TYPE_VOICEOVER/README.md), [`APP_STORE_MARKETING/`](QA_EVIDENCE/APP_STORE_MARKETING/README.md)
+- [ ] **Code-level UI/UX readiness:** green builds + 567 iOS / 201 Watch tests
+- [ ] **External TestFlight / App Store:** **BLOCKED** until physical QA + screenshots + marketing evidence
+
 ## Audit remediation (2026-06-09 — iOS complete algorithm @ `IOS_MAIN_COMPLETE_ALGORITHM_AUDIT_CURRENT.md`)
 
 - [ ] Review [`IOS_MAIN_COMPLETE_ALGORITHM_AUDIT_REMEDIATION_REPORT.md`](IOS_MAIN_COMPLETE_ALGORITHM_AUDIT_REMEDIATION_REPORT.md)

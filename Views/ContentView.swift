@@ -81,6 +81,10 @@ struct ContentView: View {
             )
             .padding(.horizontal, 10)
             .padding(.bottom, 6)
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isStaticText)
+            .accessibilityLabel(String(localized: "nav.underwater.blocked.a11y.label"))
+            .accessibilityValue(message)
     }
 
     private var crownNavigationHint: some View {

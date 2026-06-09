@@ -16,6 +16,9 @@ final class IOSNavigationStore: ObservableObject {
 
 struct ContentView: View {
     @EnvironmentObject private var navigation: IOSNavigationStore
+    @EnvironmentObject private var watchSync: WatchSyncService
+    @EnvironmentObject private var cloudSync: CloudSyncStore
+    @EnvironmentObject private var logStore: DiveLogStore
     @State private var showLaunchDisclaimer = CompanionDisclaimerAcceptance.requiresDisplay
     @State private var mountedTabs: Set<IOSTab> = [.planner]
 
@@ -45,6 +48,7 @@ struct ContentView: View {
                 MoreView()
             }
             .tabItem { Label("tab.more", systemImage: "gearshape.fill") }
+            .badge(moreTabBadge)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
@@ -63,6 +67,17 @@ struct ContentView: View {
         .onChange(of: navigation.selectedTab) { _, tab in
             mountedTabs.insert(tab)
         }
+    }
+
+    private var moreTabBadge: String? {
+        let conflictCount = watchSync.conflicts.count + logStore.sessionMergeConflicts.count
+        if conflictCount > 0 {
+            return conflictCount > 99 ? "99+" : "\(conflictCount)"
+        }
+        if watchSync.pendingWatchQueueCount > 0 || cloudSync.lastDecodeError != nil {
+            return "!"
+        }
+        return nil
     }
 
     /// Mount tab roots lazily so PhotosPicker / fileImporter / ShareLink are not created at cold launch.

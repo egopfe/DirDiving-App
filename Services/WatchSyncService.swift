@@ -16,7 +16,7 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     @Published private(set) var isSupported = WCSession.isSupported()
     @Published private(set) var activationState: WCSessionActivationState = .notActivated
-    @Published private(set) var lastSyncStatus = String(localized: "Companion non sincronizzato")
+    @Published private(set) var lastSyncStatus = String(localized: "sync.status.companion_not_synced")
     @Published private(set) var pendingTransferCount = 0
     @Published private(set) var sentTransferCount = 0
     @Published private(set) var acknowledgedTransferCount = 0
@@ -86,7 +86,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             flushPendingTransfers()
         } else {
             WatchSyncAuth.publishSharedSecretIfNeeded()
-            lastSyncStatus = String(format: String(localized: "Pending: in attesa chiave sync (%lld in coda)"), pendingTransferCount)
+            lastSyncStatus = String(format: String(localized: "sync.queue.pending_sync_key"), pendingTransferCount)
         }
     }
 
@@ -117,7 +117,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         if WatchSyncAuth.hasPeerSecret() {
             flushPendingTransfers()
         } else {
-            lastSyncStatus = String(format: String(localized: "Retry richiesto: in attesa chiave companion (%lld in coda)"), pendingTransferCount)
+            lastSyncStatus = String(format: String(localized: "sync.queue.pending_companion_key"), pendingTransferCount)
         }
     }
 
@@ -377,7 +377,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         } catch WatchDiveSyncError.missingPeerSecret {
             enqueuePendingSession(session)
             WatchSyncAuth.publishSharedSecretIfNeeded()
-            lastSyncStatus = String(localized: "Pending: in attesa chiave sync companion")
+            lastSyncStatus = String(localized: "sync.queue.pending_companion_sync_key")
         } catch {
             failedTransferCount += 1
             lastSyncStatus = String(format: String(localized: "Failed: errore codifica sync: %@"), error.localizedDescription)

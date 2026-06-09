@@ -2,27 +2,27 @@
 
 **Status: PENDING** — Do not mark PASS without attached files.
 
-**Matrix:** [`Docs/WATCH_ULTRA_PHYSICAL_QA_MATRIX.md`](../../WATCH_ULTRA_PHYSICAL_QA_MATRIX.md)
-
-Place screenshots, videos, sysdiagnose excerpts, and notes here after executing the physical matrix on a real Apple Watch Ultra (or supported Watch hardware per matrix).
+**Matrix:** [`Docs/WATCH_ULTRA_PHYSICAL_QA_MATRIX.md`](../../WATCH_ULTRA_PHYSICAL_QA_MATRIX.md)  
+**Hardware checklist:** [`Docs/WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md`](../../WATCH_MAIN_HARDWARE_ALGORITHM_QA_CHECKLIST.md)
 
 ---
 
-## Evidence checklist (copy per test session)
+## Scope
 
-| Field | Value |
-|---|---|
-| Device model | e.g. Apple Watch Ultra 2 |
-| watchOS version | |
-| iOS companion version (if paired) | |
-| Build number | |
-| Commit SHA | |
-| Entitlement status | water submersion approved / mock fallback |
-| Tester | |
-| Date | |
-| Pass/Fail | **leave blank until evidence attached** |
+Physical Apple Watch Ultra (or supported Watch hardware per matrix) validation: submersion depth entitlement, auto-depth lifecycle, stale-depth behavior, GPS surface policy, ascent/depth-limit haptics, Mission Mode UI-only verification, and mock-fallback banner when entitlement is absent. Unit tests do not substitute for wrist evidence.
 
-### Required attachments
+---
+
+## Required device / simulator matrix
+
+| Device | watchOS | Pairing | Entitlement |
+|--------|---------|---------|-------------|
+| Apple Watch Ultra 2 (preferred) | Release target | Paired iPhone with companion build | Water submersion approved **or** mock fallback documented |
+| 41 / 45 / 49 mm readability | As applicable | — | Clipping pass with live badges |
+
+---
+
+## Required evidence files
 
 - [ ] Auto-depth lifecycle (start/stop) — screenshot or screen recording
 - [ ] Underwater callback / stale-depth behavior
@@ -30,13 +30,26 @@ Place screenshots, videos, sysdiagnose excerpts, and notes here after executing 
 - [ ] Ascent / depth-limit haptics on wrist
 - [ ] Mission Mode UI-only verification (no algorithm change)
 - [ ] Watch face size readability (41/45/49 mm as applicable)
-- [ ] **Mock fallback banner screenshot** — device/build **without** depth entitlement showing `watch.depth_source.mock_fallback` or `live.depth_mock_fallback.badge` copy (see matrix row)
-- [ ] Logs (optional): relevant Console filter, no PII beyond test dive
+- [ ] **Mock fallback banner** — build without depth entitlement showing `watch.depth_source.mock_fallback` or badge copy
+- [ ] Logs (optional): Console filter, no PII beyond test dive
 
-### Notes
+---
 
-- Automated unit tests do **not** substitute for this folder.
-- Mark matrix rows PASS only when corresponding files exist in this directory or are linked below.
+## Sign-off
+
+| Field | Value |
+|-------|-------|
+| Device model | e.g. Apple Watch Ultra 2 |
+| watchOS version | |
+| iOS companion version (if paired) | |
+| Build number | |
+| Commit SHA | |
+| Entitlement status | submersion approved / mock fallback |
+| Tester | |
+| Date | |
+| Pass/Fail | **PENDING** |
+
+Mark matrix rows PASS only when corresponding files exist in this directory.
 
 **Session notes:**
 

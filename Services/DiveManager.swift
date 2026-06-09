@@ -1110,6 +1110,12 @@ final class DiveManager: ObservableObject {
         )
     }
 
+    func dismissDiveReminderOverlay() {
+        diveReminderDismissTask?.cancel()
+        diveReminderDismissTask = nil
+        diveReminderOverlay = nil
+    }
+
     private func presentDiveReminderOverlay(_ content: DiveReminderOverlayContent) {
         diveReminderDismissTask?.cancel()
         diveReminderOverlay = content

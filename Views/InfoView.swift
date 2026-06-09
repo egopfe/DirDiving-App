@@ -32,7 +32,7 @@ struct InfoView: View {
                         appleLowPowerModeRow
                         depthDiagnostics
                         infoRow(title: String(localized: "info.sync"), value: watchSync.lastSyncStatus)
-                        infoRow(title: String(localized: "Spazio libero"), value: String(localized: "Gestito da watchOS"))
+                        infoRow(title: String(localized: "sync.storage.free_space"), value: String(localized: "info.storage.managed_by_watchos"))
                     }
                 }
                 .padding(.horizontal, 11)
