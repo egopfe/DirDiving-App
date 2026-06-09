@@ -1432,6 +1432,8 @@
 "planner.result.ccr.title" = "CCR Plan";
 "planner.mode_selection.subtitle" = "Select a planning mode before configuring your dive.";
 "planner.mode_selection.back" = "Planning modes";
+"planner.mode_selection.card.a11y.hint" = "Opens %@ planner configuration";
+"planner.mode_selection.safety.a11y" = "Reference-only planner safety notice. Not certified decompression advice.";
 "ccr.planner.subtitle" = "Closed-circuit reference planner — informational only.";
 "ccr.safety.title" = "CCR reference planning";
 "ccr.safety.disclaimer" = "CCR planning is provided for informational purposes only. It does not replace CCR training, operational procedures, validated bailout planning, or a certified dive computer.";

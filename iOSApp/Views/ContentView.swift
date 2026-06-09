@@ -16,6 +16,7 @@ final class IOSNavigationStore: ObservableObject {
 
 struct ContentView: View {
     @EnvironmentObject private var navigation: IOSNavigationStore
+    @EnvironmentObject private var plannerStore: PlannerStore
     @EnvironmentObject private var watchSync: WatchSyncService
     @EnvironmentObject private var cloudSync: CloudSyncStore
     @EnvironmentObject private var logStore: DiveLogStore
@@ -62,10 +63,20 @@ struct ContentView: View {
         .toolbarColorScheme(.dark, for: .tabBar)
         .launchCompanionDisclaimer(isPresented: $showLaunchDisclaimer)
         .onAppear {
+            applyPostLegalPlannerLandingIfNeeded()
             mountedTabs.insert(navigation.selectedTab)
         }
         .onChange(of: navigation.selectedTab) { _, tab in
             mountedTabs.insert(tab)
+        }
+    }
+
+    private func applyPostLegalPlannerLandingIfNeeded() {
+        guard IOSCompanionPostLegalEntry.consumePendingPlannerLanding() else { return }
+        navigation.selectedTab = .planner
+        mountedTabs.insert(.planner)
+        Task { @MainActor in
+            plannerStore.preparePostLegalOnboardingEntry()
         }
     }
 

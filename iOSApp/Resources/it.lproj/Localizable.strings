@@ -1430,6 +1430,8 @@
 "planner.result.ccr.title" = "Piano CCR";
 "planner.mode_selection.subtitle" = "Seleziona una modalità di pianificazione prima di configurare l'immersione.";
 "planner.mode_selection.back" = "Modalità pianificazione";
+"planner.mode_selection.card.a11y.hint" = "Apre la configurazione planner %@";
+"planner.mode_selection.safety.a11y" = "Avviso sicurezza planner di riferimento. Non è consulenza decompressione certificata.";
 "ccr.planner.subtitle" = "Planner CCR di riferimento — solo informativo.";
 "ccr.safety.title" = "Pianificazione CCR di riferimento";
 "ccr.safety.disclaimer" = "Pianificazione CCR a scopo informativo. Non sostituisce addestramento CCR, procedure operative, bailout planning validato o un computer subacqueo certificato.";

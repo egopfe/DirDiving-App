@@ -107,6 +107,13 @@ final class PlannerStore: ObservableObject {
         plannerShowsModeSelection = true
     }
 
+    /// Called once after legal onboarding so Planner tab opens on the mode selection screen.
+    func preparePostLegalOnboardingEntry() {
+        guard isReady else { return }
+        plannerShowsModeSelection = true
+        saveIfReady()
+    }
+
     func refreshDerivedPlanningPreview() {
         schedulePlanningUpdate()
     }
