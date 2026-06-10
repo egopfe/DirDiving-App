@@ -30,10 +30,10 @@ struct ChecklistPlannerSyncSheet: View {
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(String(localized: "checklist_planner.sync.cancel")) { onCancel() }
+                    Button(DIRIOSLocalizer.string("checklist_planner.sync.cancel")) { onCancel() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(String(localized: "checklist_planner.sync.confirm")) { onConfirm() }
+                    Button(DIRIOSLocalizer.string("checklist_planner.sync.confirm")) { onConfirm() }
                         .disabled(!canConfirm)
                 }
             }
@@ -45,9 +45,9 @@ struct ChecklistPlannerSyncSheet: View {
     private var navigationTitle: String {
         switch flow {
         case .importFromChecklist:
-            return String(localized: "checklist_planner.sync.choose_import")
+            return DIRIOSLocalizer.string("checklist_planner.sync.choose_import")
         case .exportToChecklist:
-            return String(localized: "checklist_planner.sync.choose_add")
+            return DIRIOSLocalizer.string("checklist_planner.sync.choose_add")
         }
     }
 
@@ -117,10 +117,14 @@ struct ChecklistPlannerSyncSheet: View {
     private func rolePicker(assignedRole: Binding<GasRole?>, item: EquipmentChecklistItem) -> some View {
         let needsExplicitRole = item.gasRole == nil && ChecklistPlannerSyncMapper.resolvedRole(for: item) == nil
         return VStack(alignment: .leading, spacing: 6) {
-            Text(String(localized: needsExplicitRole ? "checklist_planner.sync.missing_gas_role" : "checklist_planner.sync.select_gas_role"))
+            Text(
+                needsExplicitRole
+                    ? DIRIOSLocalizer.string("checklist_planner.sync.missing_gas_role")
+                    : DIRIOSLocalizer.string("checklist_planner.sync.select_gas_role")
+            )
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(needsExplicitRole ? DIRTheme.yellow : DIRTheme.muted)
-            Picker(String(localized: "checklist_planner.sync.select_gas_role"), selection: Binding(
+            Picker(DIRIOSLocalizer.string("checklist_planner.sync.select_gas_role"), selection: Binding(
                 get: { assignedRole.wrappedValue ?? ChecklistPlannerSyncMapper.resolvedRole(for: item) ?? .deco },
                 set: { assignedRole.wrappedValue = $0 }
             )) {
@@ -135,12 +139,12 @@ struct ChecklistPlannerSyncSheet: View {
 
     private func duplicatePicker(action: Binding<ChecklistPlannerDuplicateAction>) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(String(localized: "checklist_planner.sync.item_exists"))
+            Text(DIRIOSLocalizer.string("checklist_planner.sync.item_exists"))
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(DIRTheme.yellow)
             Picker("", selection: action) {
-                Text(String(localized: "checklist_planner.sync.replace")).tag(ChecklistPlannerDuplicateAction.replace)
-                Text(String(localized: "checklist_planner.sync.skip")).tag(ChecklistPlannerDuplicateAction.skip)
+                Text(DIRIOSLocalizer.string("checklist_planner.sync.replace")).tag(ChecklistPlannerDuplicateAction.replace)
+                Text(DIRIOSLocalizer.string("checklist_planner.sync.skip")).tag(ChecklistPlannerDuplicateAction.skip)
             }
             .pickerStyle(.segmented)
             .labelsHidden()

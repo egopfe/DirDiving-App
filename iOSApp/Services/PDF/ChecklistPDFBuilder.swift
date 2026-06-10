@@ -4,17 +4,17 @@ enum ChecklistPDFBuilder {
     static func build(profile: EquipmentProfile, unitPreference: IOSUnitPreference = .metric) -> Data {
         let pageRect = CGRect(x: 0, y: 0, width: 612, height: 792)
         let renderer = UIGraphicsPDFRenderer(bounds: pageRect)
-        let disclaimer = String(localized: "pdf.export.disclaimer")
-        let title = String(localized: "pdf.export.section.checklist")
-        let yesLabel = String(localized: "pdf.export.checklist.yes")
-        let noLabel = String(localized: "pdf.export.checklist.no")
+        let disclaimer = DIRIOSLocalizer.string("pdf.export.disclaimer")
+        let title = DIRIOSLocalizer.string("pdf.export.section.checklist")
+        let yesLabel = DIRIOSLocalizer.string("pdf.export.checklist.yes")
+        let noLabel = DIRIOSLocalizer.string("pdf.export.checklist.no")
 
         return renderer.pdfData { pdf in
             let page = PDFPageContext()
             page.attach(pdf, title: title, generatedAt: Date())
 
-            page.drawSectionTitle(String(localized: "equipment.card.checklist"))
-            page.drawParagraph(String(localized: "pdf.export.checklist.instructions"))
+            page.drawSectionTitle(DIRIOSLocalizer.string("equipment.card.checklist"))
+            page.drawParagraph(DIRIOSLocalizer.string("pdf.export.checklist.instructions"))
 
             for item in profile.migratedChecklistItems {
                 let line = checklistLine(for: item, unitPreference: unitPreference)

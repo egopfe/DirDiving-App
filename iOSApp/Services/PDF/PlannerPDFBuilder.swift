@@ -4,32 +4,32 @@ enum PlannerPDFBuilder {
     static func build(context: PDFExportPlannerContext) -> Data {
         let pageRect = CGRect(x: 0, y: 0, width: 612, height: 792)
         let renderer = UIGraphicsPDFRenderer(bounds: pageRect)
-        let disclaimer = String(localized: "pdf.export.disclaimer")
-        let title = String(localized: "pdf.export.section.plan")
+        let disclaimer = DIRIOSLocalizer.string("pdf.export.disclaimer")
+        let title = DIRIOSLocalizer.string("pdf.export.section.plan")
         let environment = context.input.plannerEnvironment
 
         return renderer.pdfData { pdf in
             let page = PDFPageContext()
             page.attach(pdf, title: title, generatedAt: Date())
 
-            page.drawSectionTitle(String(localized: "pdf.export.plan.profile"))
-            page.drawLine(String(localized: "pdf.export.plan.mode"), value: context.mode.localizedTabTitle)
+            page.drawSectionTitle(DIRIOSLocalizer.string("pdf.export.plan.profile"))
+            page.drawLine(DIRIOSLocalizer.string("pdf.export.plan.mode"), value: context.mode.localizedTabTitle)
             page.drawLine(
-                String(localized: "planner.field.max_depth"),
+                DIRIOSLocalizer.string("planner.field.max_depth"),
                 value: Formatters.depth(context.input.plannedDepthMeters, units: context.unitPreference).text
             )
             if context.mode != .base {
                 page.drawLine(
-                    String(localized: "planner.field.avg_depth"),
+                    DIRIOSLocalizer.string("planner.field.avg_depth"),
                     value: Formatters.depth(context.input.plannedAverageDepthMeters, units: context.unitPreference).text
                 )
                 let reference = context.input.planningDepthReference == .maximumDepth
-                    ? String(localized: "planner.reference.max_depth")
-                    : String(localized: "planner.reference.avg_depth")
-                page.drawLine(String(localized: "planner.field.planning_reference"), value: reference)
+                    ? DIRIOSLocalizer.string("planner.reference.max_depth")
+                    : DIRIOSLocalizer.string("planner.reference.avg_depth")
+                page.drawLine(DIRIOSLocalizer.string("planner.field.planning_reference"), value: reference)
             }
             page.drawLine(
-                String(localized: "planner.field.bottom_time"),
+                DIRIOSLocalizer.string("planner.field.bottom_time"),
                 value: "\(Formatters.zero(context.input.plannedBottomMinutes)) min"
             )
             if context.mode == .technical || context.mode == .deco {
@@ -38,46 +38,46 @@ enum PlannerPDFBuilder {
             }
 
             page.drawSpacer()
-            page.drawSectionTitle(String(localized: "pdf.export.plan.gases"))
+            page.drawSectionTitle(DIRIOSLocalizer.string("pdf.export.plan.gases"))
             var input = context.input
             if input.plannerCylinders.isEmpty {
                 input.ensurePlannerCylindersFromLegacy()
             }
             let active = PlannerModePolicy.activePlanInput(from: input, mode: context.mode)
             for (index, entry) in active.plannerCylinders.enumerated() {
-                page.drawParagraph("\(String(localized: "pdf.export.plan.cylinder")) \(index + 1): \(entry.role.localizedTitle)")
-                page.drawLine(String(localized: "planner.gas.editor.cylinder"), value: entry.tankSize.rawValue)
-                page.drawLine(String(localized: "planner.gas.editor.mix_type"), value: entry.gas.mixKind.plannerPickerTitle)
+                page.drawParagraph("\(DIRIOSLocalizer.string("pdf.export.plan.cylinder")) \(index + 1): \(entry.role.localizedTitle)")
+                page.drawLine(DIRIOSLocalizer.string("planner.gas.editor.cylinder"), value: entry.tankSize.rawValue)
+                page.drawLine(DIRIOSLocalizer.string("planner.gas.editor.mix_type"), value: entry.gas.mixKind.plannerPickerTitle)
                 page.drawLine("O₂", value: "\(PlannerGasEditingSupport.oxygenPercent(from: entry.gas))%")
                 page.drawLine("He", value: "\(PlannerGasEditingSupport.heliumPercent(from: entry.gas))%")
                 page.drawLine("N₂", value: "\(PlannerGasEditingSupport.nitrogenPercent(from: entry.gas))%")
-                page.drawLine(String(localized: "planner.gas.ppo2_max"), value: Formatters.one(entry.gas.maxPPO2))
+                page.drawLine(DIRIOSLocalizer.string("planner.gas.ppo2_max"), value: Formatters.one(entry.gas.maxPPO2))
                 page.drawLine(
-                    String(localized: "planner.gas.editor.mod"),
+                    DIRIOSLocalizer.string("planner.gas.editor.mod"),
                     value: Formatters.depth(entry.modMeters(environment: environment), units: context.unitPreference).text
                 )
                 page.drawLine(
-                    String(localized: "planner.gas.editor.working_pressure_section"),
+                    DIRIOSLocalizer.string("planner.gas.editor.working_pressure_section"),
                     value: "\(Formatters.zero(entry.startPressure)) \(entry.pressureUnit.rawValue)"
                 )
                 if entry.role != .bottom {
                     page.drawLine(
-                        String(localized: "planner.field.switch_depth"),
+                        DIRIOSLocalizer.string("planner.field.switch_depth"),
                         value: Formatters.depth(entry.switchDepthMeters, units: context.unitPreference).text
                     )
                 }
                 page.drawSpacer(6)
             }
 
-            page.drawSectionTitle(String(localized: "pdf.export.plan.schedule"))
+            page.drawSectionTitle(DIRIOSLocalizer.string("pdf.export.plan.schedule"))
             page.drawLine("NDL", value: "\(Formatters.one(context.plan.ndlMinutes)) min")
             page.drawLine("TTS", value: "\(context.plan.ttsMinutes) min")
-            page.drawLine(String(localized: "planner.export.runtime_line"), value: "\(context.plan.totalRuntimeMinutes) min")
+            page.drawLine(DIRIOSLocalizer.string("planner.export.runtime_line"), value: "\(context.plan.totalRuntimeMinutes) min")
 
             if context.plan.decoStops.isEmpty {
-                page.drawParagraph(String(localized: "planner.export.no_deco_stops"))
+                page.drawParagraph(DIRIOSLocalizer.string("planner.export.no_deco_stops"))
             } else {
-                page.drawParagraph(String(localized: "planner.export.deco_stops"))
+                page.drawParagraph(DIRIOSLocalizer.string("planner.export.deco_stops"))
                 for stop in context.plan.decoStops {
                     page.drawLine(
                         Formatters.depth(stop.depthMeters, units: context.unitPreference).text,
@@ -89,7 +89,7 @@ enum PlannerPDFBuilder {
             let warnings = warningLines(context: context)
             if !warnings.isEmpty {
                 page.drawSpacer()
-                page.drawSectionTitle(String(localized: "pdf.export.plan.warnings"))
+                page.drawSectionTitle(DIRIOSLocalizer.string("pdf.export.plan.warnings"))
                 warnings.forEach { page.drawParagraph($0) }
             }
 
@@ -107,26 +107,26 @@ enum PlannerPDFBuilder {
         bundle: RatioDecoPlanningBundle
     ) {
         page.drawSpacer()
-        page.drawSectionTitle(String(localized: "pdf.export.ratio_deco.section"))
-        page.drawParagraph(String(localized: "pdf.export.ratio_deco.disclaimer"))
+        page.drawSectionTitle(DIRIOSLocalizer.string("pdf.export.ratio_deco.section"))
+        page.drawParagraph(DIRIOSLocalizer.string("pdf.export.ratio_deco.disclaimer"))
         if !bundle.validation.isBuhlmannCompatible {
-            page.drawParagraph(String(localized: "planner.ratio_deco.validation.not_validated_plan"))
+            page.drawParagraph(DIRIOSLocalizer.string("planner.ratio_deco.validation.not_validated_plan"))
         }
         page.drawLine(
-            String(localized: "planner.ratio_deco.profile.header"),
+            DIRIOSLocalizer.string("planner.ratio_deco.profile.header"),
             value: bundle.preset.name
         )
         page.drawLine("TTS", value: "\(bundle.schedule.ttsMinutes) min")
         page.drawLine(
-            String(localized: "pdf.export.ratio_deco.validation"),
+            DIRIOSLocalizer.string("pdf.export.ratio_deco.validation"),
             value: bundle.validation.localizedStatusTitle
         )
         page.drawLine(
-            String(localized: "planner.ratio_deco.summary.tts_difference"),
+            DIRIOSLocalizer.string("planner.ratio_deco.summary.tts_difference"),
             value: "\(bundle.schedule.ttsMinutes - context.plan.ttsMinutes) min"
         )
         if bundle.schedule.stops.isEmpty {
-            page.drawParagraph(String(localized: "planner.export.no_deco_stops"))
+            page.drawParagraph(DIRIOSLocalizer.string("planner.export.no_deco_stops"))
         } else {
             for stop in bundle.schedule.stops {
                 page.drawLine(
@@ -138,15 +138,15 @@ enum PlannerPDFBuilder {
         for warning in bundle.validation.warnings {
             switch warning {
             case .unavailableInBaseMode:
-                page.drawParagraph(String(localized: "planner.ratio_deco.validation.unavailable_base"))
+                page.drawParagraph(DIRIOSLocalizer.string("planner.ratio_deco.validation.unavailable_base"))
             case .unavailableInCCRMode:
-                page.drawParagraph(String(localized: "planner.ratio_deco.unavailable_ccr"))
+                page.drawParagraph(DIRIOSLocalizer.string("planner.ratio_deco.unavailable_ccr"))
             case .ceilingViolation:
-                page.drawParagraph(String(localized: "planner.ratio_deco.validation.ceiling"))
+                page.drawParagraph(DIRIOSLocalizer.string("planner.ratio_deco.validation.ceiling"))
             case .modExceeded:
-                page.drawParagraph(String(localized: "planner.ratio_deco.validation.mod"))
+                page.drawParagraph(DIRIOSLocalizer.string("planner.ratio_deco.validation.mod"))
             case .decoDepthLimitExceeded:
-                page.drawParagraph(String(localized: "planner.mode.deco.depth_limit.message"))
+                page.drawParagraph(DIRIOSLocalizer.string("planner.mode.deco.depth_limit.message"))
             }
         }
     }
@@ -156,7 +156,7 @@ enum PlannerPDFBuilder {
         for issue in context.modIssues {
             lines.append(
                 String(
-                    format: String(localized: "planner.mod.detail_format"),
+                    format: DIRIOSLocalizer.string("planner.mod.detail_format"),
                     issue.gasLabel,
                     Formatters.depth(issue.switchDepthMeters, units: context.unitPreference).text,
                     Formatters.depth(issue.modMeters, units: context.unitPreference).text

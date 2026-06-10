@@ -64,7 +64,7 @@ enum TissueAnalyticsService {
             ttsMinutes: plan.ttsMinutes,
             gfLow: Int(input.gfLow.rounded()),
             gfHigh: Int(input.gfHigh.rounded()),
-            modeTitle: String(localized: "planner.mode.ccr"),
+            modeTitle: DIRIOSLocalizer.string("planner.mode.ccr"),
             totalRuntimeMinutes: plan.totalRuntimeMinutes
         )
 

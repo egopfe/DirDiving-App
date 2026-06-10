@@ -44,7 +44,7 @@ struct ChecklistView: View {
                         Image(systemName: "square.and.arrow.up")
                             .foregroundStyle(DIRTheme.cyan)
                     }
-                    .accessibilityLabel(Text(String(localized: "pdf.export.share.a11y")))
+                    .accessibilityLabel(Text(DIRIOSLocalizer.string("pdf.export.share.a11y")))
                     .disabled(equipment.needsChecklistSetupSelection)
                 }
             }
@@ -52,11 +52,11 @@ struct ChecklistView: View {
             .sheet(item: $shareablePDF) { item in
                 ShareSheetView(activityItems: [item.url])
             }
-            .alert(String(localized: "pdf.export.error.title"), isPresented: Binding(
+            .alert(DIRIOSLocalizer.string("pdf.export.error.title"), isPresented: Binding(
                 get: { pdfExportAlertMessage != nil },
                 set: { if !$0 { pdfExportAlertMessage = nil } }
             )) {
-                Button(String(localized: "common.ok"), role: .cancel) {}
+                Button(DIRIOSLocalizer.string("common.ok"), role: .cancel) {}
             } message: {
                 Text(pdfExportAlertMessage ?? "")
             }
@@ -81,16 +81,16 @@ struct ChecklistView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 7) {
-            Text(String(localized: "checklist.title"))
+            Text(DIRIOSLocalizer.string("checklist.title"))
                 .dirScreenTitleStyle()
-            Text(String(localized: "checklist.subtitle"))
+            Text(DIRIOSLocalizer.string("checklist.subtitle"))
                 .dirScreenSubtitleStyle()
         }
         .accessibilityElement(children: .combine)
     }
 
     private var setupSelectionCard: some View {
-        DIRCard(String(localized: "checklist.setup.title"), icon: "shippingbox.fill", accent: DIRTheme.cyan) {
+        DIRCard(DIRIOSLocalizer.string("checklist.setup.title"), icon: "shippingbox.fill", accent: DIRTheme.cyan) {
             VStack(alignment: .leading, spacing: 8) {
                 Text(equipment.selectedChecklistSetupDisplayName)
                     .font(.callout.weight(.semibold))
@@ -102,7 +102,7 @@ struct ChecklistView: View {
                 Button {
                     showSetupPicker = true
                 } label: {
-                    Text(String(localized: "checklist.setup.change"))
+                    Text(DIRIOSLocalizer.string("checklist.setup.change"))
                         .font(.callout.weight(.semibold))
                         .foregroundStyle(DIRTheme.cyan)
                         .frame(maxWidth: .infinity)
@@ -110,24 +110,24 @@ struct ChecklistView: View {
                         .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.7), lineWidth: 1))
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(String(localized: "checklist.setup.change"))
-                .accessibilityHint(String(localized: "checklist.setup.change.a11y"))
+                .accessibilityLabel(DIRIOSLocalizer.string("checklist.setup.change"))
+                .accessibilityHint(DIRIOSLocalizer.string("checklist.setup.change.a11y"))
             }
         }
         .accessibilityElement(children: .contain)
     }
 
     private var emptySetupState: some View {
-        DIRCard(String(localized: "checklist.empty.title"), icon: "exclamationmark.circle", accent: DIRTheme.yellow) {
+        DIRCard(DIRIOSLocalizer.string("checklist.empty.title"), icon: "exclamationmark.circle", accent: DIRTheme.yellow) {
             VStack(alignment: .leading, spacing: 12) {
-                Text(String(localized: "checklist.empty.message"))
+                Text(DIRIOSLocalizer.string("checklist.empty.message"))
                     .font(.callout)
                     .foregroundStyle(.white.opacity(0.92))
                     .fixedSize(horizontal: false, vertical: true)
                 Button {
                     navigation.selectedTab = .gear
                 } label: {
-                    Text(String(localized: "checklist.empty.open_gear"))
+                    Text(DIRIOSLocalizer.string("checklist.empty.open_gear"))
                         .font(.callout.weight(.semibold))
                         .foregroundStyle(DIRTheme.cyan)
                         .frame(maxWidth: .infinity)
@@ -135,7 +135,7 @@ struct ChecklistView: View {
                         .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(String(localized: "checklist.empty.open_gear"))
+                .accessibilityLabel(DIRIOSLocalizer.string("checklist.empty.open_gear"))
             }
         }
     }
@@ -144,7 +144,7 @@ struct ChecklistView: View {
         HStack(spacing: 12) {
             checklistBadge(
                 String(
-                    format: String(localized: "checklist.status.ready_badge_format"),
+                    format: DIRIOSLocalizer.string("checklist.status.ready_badge_format"),
                     equipment.profile.checklistReadyCount,
                     max(1, equipment.profile.migratedChecklistItems.count)
                 ),
@@ -153,7 +153,7 @@ struct ChecklistView: View {
         }
         .accessibilityLabel(
             String(
-                format: String(localized: "checklist.progress.a11y"),
+                format: DIRIOSLocalizer.string("checklist.progress.a11y"),
                 equipment.profile.checklistReadyCount,
                 equipment.profile.migratedChecklistItems.count
             )
@@ -161,23 +161,23 @@ struct ChecklistView: View {
     }
 
     private var checklistCard: some View {
-        DIRCard(String(localized: "equipment.card.checklist"), icon: "checklist", accent: DIRTheme.green) {
+        DIRCard(DIRIOSLocalizer.string("equipment.card.checklist"), icon: "checklist", accent: DIRTheme.green) {
             ForEach($equipment.profile.checklistItems) { $item in
                 VStack(alignment: .leading, spacing: 6) {
                     Toggle(item.title, isOn: $item.isReady)
                         .tint(DIRTheme.cyan)
                         .accessibilityLabel(checklistReadyAccessibilityLabel(for: item))
-                        .accessibilityHint(String(localized: "a11y.checklist.item.toggle.hint"))
-                    Toggle(String(localized: "equipment.checklist.gas_flag"), isOn: $item.usesGas)
+                        .accessibilityHint(DIRIOSLocalizer.string("a11y.checklist.item.toggle.hint"))
+                    Toggle(DIRIOSLocalizer.string("equipment.checklist.gas_flag"), isOn: $item.usesGas)
                         .tint(DIRTheme.yellow)
                         .accessibilityLabel(checklistGasFlagAccessibilityLabel(for: item))
-                        .accessibilityHint(String(localized: "a11y.checklist.item.toggle.hint"))
+                        .accessibilityHint(DIRIOSLocalizer.string("a11y.checklist.item.toggle.hint"))
                     EquipmentChecklistGasSection(item: $item)
                         .animation(.easeInOut(duration: 0.2), value: item.usesGas)
                     Button(role: .destructive) {
                         equipment.profile.checklistItems.removeAll { $0.id == item.id }
                     } label: {
-                        Text(String(localized: "equipment.checklist.remove"))
+                        Text(DIRIOSLocalizer.string("equipment.checklist.remove"))
                             .font(.caption.weight(.semibold))
                     }
                     .buttonStyle(.plain)
@@ -185,9 +185,9 @@ struct ChecklistView: View {
                 .padding(.vertical, 4)
             }
             HStack(spacing: 8) {
-                TextField(String(localized: "equipment.checklist.new_item"), text: $newChecklistTitle)
+                TextField(DIRIOSLocalizer.string("equipment.checklist.new_item"), text: $newChecklistTitle)
                     .foregroundStyle(.white)
-                Button(String(localized: "equipment.checklist.add")) {
+                Button(DIRIOSLocalizer.string("equipment.checklist.add")) {
                     let title = newChecklistTitle.trimmingCharacters(in: .whitespacesAndNewlines)
                     guard !title.isEmpty else { return }
                     equipment.profile.checklistItems.append(EquipmentChecklistItem(title: title))
@@ -214,7 +214,7 @@ struct ChecklistView: View {
     }
 
     private func showSavedFeedback() {
-        savedFeedback = String(localized: "equipment.profile.saved_notice")
+        savedFeedback = DIRIOSLocalizer.string("equipment.profile.saved_notice")
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 1_800_000_000)
             savedFeedback = nil
@@ -235,14 +235,14 @@ struct ChecklistView: View {
         } catch PDFExportError.emptyChecklist {
             pdfExportAlertMessage = PDFShareActions.emptyChecklistMessage()
         } catch {
-            pdfExportAlertMessage = String(localized: "pdf.export.error.generation")
+            pdfExportAlertMessage = DIRIOSLocalizer.string("pdf.export.error.generation")
         }
     }
 
     private func checklistReadyAccessibilityLabel(for item: EquipmentChecklistItem) -> String {
         let state = item.isReady
-            ? String(localized: "a11y.checklist.item.checked")
-            : String(localized: "a11y.checklist.item.unchecked")
+            ? DIRIOSLocalizer.string("a11y.checklist.item.checked")
+            : DIRIOSLocalizer.string("a11y.checklist.item.unchecked")
         return "\(item.title). \(state)"
     }
 
@@ -250,8 +250,8 @@ struct ChecklistView: View {
         var parts = [item.title]
         parts.append(
             item.usesGas
-                ? String(localized: "a11y.checklist.item.gas_linked")
-                : String(localized: "a11y.checklist.item.gas_not_linked")
+                ? DIRIOSLocalizer.string("a11y.checklist.item.gas_linked")
+                : DIRIOSLocalizer.string("a11y.checklist.item.gas_not_linked")
         )
         if item.usesGas, let role = item.gasRole ?? ChecklistPlannerSyncMapper.resolvedRole(for: item) {
             parts.append(role.localizedTitle)
@@ -272,10 +272,10 @@ struct ChecklistSetupPickerSheet: View {
                         ForEach(equipment.templates) { template in
                             DIRCard(template.name, icon: "shippingbox", accent: DIRTheme.cyan) {
                                 VStack(alignment: .leading, spacing: 8) {
-                                    Text(String(format: String(localized: "equipment.template.items_count"), template.checklistItems.count))
+                                    Text(DIRIOSLocalizer.formatted("equipment.template.items_count", template.checklistItems.count))
                                         .font(.caption)
                                         .foregroundStyle(DIRTheme.muted)
-                                    Button(String(localized: "checklist.setup.select_template")) {
+                                    Button(DIRIOSLocalizer.string("checklist.setup.select_template")) {
                                         equipment.selectChecklistSetup(template: template)
                                         dismiss()
                                     }
@@ -285,11 +285,11 @@ struct ChecklistSetupPickerSheet: View {
                                 }
                             }
                         }
-                        DIRCard(String(localized: "checklist.setup.current_profile"), icon: "person.crop.circle", accent: DIRTheme.green) {
+                        DIRCard(DIRIOSLocalizer.string("checklist.setup.current_profile"), icon: "person.crop.circle", accent: DIRTheme.green) {
                             Text(equipment.selectedChecklistSetupSummary)
                                 .font(.caption)
                                 .foregroundStyle(DIRTheme.muted)
-                            Button(String(localized: "checklist.setup.use_current_profile")) {
+                            Button(DIRIOSLocalizer.string("checklist.setup.use_current_profile")) {
                                 equipment.clearChecklistSetupSelection()
                                 dismiss()
                             }
@@ -302,11 +302,11 @@ struct ChecklistSetupPickerSheet: View {
                 }
                 .dirCompanionScrollSurface()
             }
-            .navigationTitle(String(localized: "checklist.setup.change"))
+            .navigationTitle(DIRIOSLocalizer.string("checklist.setup.change"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(String(localized: "equipment.template.done")) { dismiss() }
+                    Button(DIRIOSLocalizer.string("equipment.template.done")) { dismiss() }
                         .foregroundStyle(DIRTheme.cyan)
                 }
             }

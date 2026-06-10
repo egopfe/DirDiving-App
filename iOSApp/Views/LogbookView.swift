@@ -94,7 +94,7 @@ struct LogbookView: View {
                                                     .frame(width: 36, height: 36)
                                             }
                                             .buttonStyle(.plain)
-                                            .accessibilityLabel(String(localized: "logbook.delete.button.a11y"))
+                                            .accessibilityLabel(DIRIOSLocalizer.string("logbook.delete.button.a11y"))
                                         }
                                     }
                                     .contextMenu {
@@ -102,7 +102,7 @@ struct LogbookView: View {
                                             Button(role: .destructive) {
                                                 pendingDeleteID = session.id
                                             } label: {
-                                                Label(String(localized: "logbook.delete.button.a11y"), systemImage: "trash")
+                                                Label(DIRIOSLocalizer.string("logbook.delete.button.a11y"), systemImage: "trash")
                                             }
                                         }
                                     }
@@ -121,24 +121,24 @@ struct LogbookView: View {
                 ManualDiveEditorView()
             }
             .confirmationDialog(
-                String(localized: "logbook.delete.confirm.title"),
+                DIRIOSLocalizer.string("logbook.delete.confirm.title"),
                 isPresented: Binding(
                     get: { pendingDeleteID != nil },
                     set: { if !$0 { pendingDeleteID = nil } }
                 ),
                 titleVisibility: .visible
             ) {
-                Button(String(localized: "logbook.delete.confirm.action"), role: .destructive) {
+                Button(DIRIOSLocalizer.string("logbook.delete.confirm.action"), role: .destructive) {
                     if let id = pendingDeleteID {
                         logStore.delete(id: id)
                     }
                     pendingDeleteID = nil
                 }
-                Button(String(localized: "logbook.delete.cancel"), role: .cancel) {
+                Button(DIRIOSLocalizer.string("logbook.delete.cancel"), role: .cancel) {
                     pendingDeleteID = nil
                 }
             } message: {
-                Text(String(localized: "logbook.delete.confirm.message"))
+                Text(DIRIOSLocalizer.string("logbook.delete.confirm.message"))
             }
         }
         .dirCompanionTabRoot()
@@ -151,7 +151,7 @@ struct LogbookView: View {
     private var header: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
-                Text(String(localized: "logbook.title"))
+                Text(DIRIOSLocalizer.string("logbook.title"))
                     .dirScreenTitleStyle()
                 Spacer()
                 Button {
@@ -162,9 +162,9 @@ struct LogbookView: View {
                         .foregroundStyle(DIRTheme.cyan)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(Text(String(localized: "manual_dive.add.title")))
+                .accessibilityLabel(Text(DIRIOSLocalizer.string("manual_dive.add.title")))
             }
-            Text(String(localized: "logbook.header.subtitle"))
+            Text(DIRIOSLocalizer.string("logbook.header.subtitle"))
                 .font(.callout)
                 .foregroundStyle(DIRTheme.muted)
         }
@@ -172,10 +172,10 @@ struct LogbookView: View {
 
     private var emptyLogbook: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(String(localized: "logbook.empty.title"))
+            Text(DIRIOSLocalizer.string("logbook.empty.title"))
                 .font(.headline.weight(.semibold))
                 .foregroundStyle(.white)
-            Text(String(localized: "logbook.empty.hint"))
+            Text(DIRIOSLocalizer.string("logbook.empty.hint"))
                 .font(.caption)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
@@ -191,7 +191,7 @@ struct LogbookView: View {
     }
 
     private var mixedDemoBanner: some View {
-        Text(String(localized: "logbook.demo.mixed.banner"))
+        Text(DIRIOSLocalizer.string("logbook.demo.mixed.banner"))
             .font(.caption.weight(.semibold))
             .foregroundStyle(DIRTheme.yellow)
             .fixedSize(horizontal: false, vertical: true)
@@ -202,7 +202,7 @@ struct LogbookView: View {
                     .fill(DIRTheme.yellow.opacity(0.10))
                     .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.yellow.opacity(0.45), lineWidth: 1))
             )
-            .accessibilityLabel(String(localized: "logbook.demo.mixed.banner"))
+            .accessibilityLabel(DIRIOSLocalizer.string("logbook.demo.mixed.banner"))
     }
 }
 
@@ -223,27 +223,27 @@ struct DiveLogCard: View {
                 .frame(width: 58, height: 58)
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
-                    Text(session.siteName ?? String(localized: "detail.default_site"))
+                    Text(session.siteName ?? DIRIOSLocalizer.string("detail.default_site"))
                         .font(.callout.weight(.semibold))
                         .foregroundStyle(.white)
                         .lineLimit(1)
                     if session.isDemoDive {
-                        Text(String(localized: "logbook.badge.demo"))
+                        Text(DIRIOSLocalizer.string("logbook.badge.demo"))
                             .font(DIRTypography.microBadge)
                             .foregroundStyle(DIRTheme.green)
                             .padding(.horizontal, 4)
                             .padding(.vertical, 1)
                             .overlay(RoundedRectangle(cornerRadius: 3).stroke(DIRTheme.green, lineWidth: 1))
-                            .accessibilityLabel(String(localized: "logbook.badge.demo.a11y"))
+                            .accessibilityLabel(DIRIOSLocalizer.string("logbook.badge.demo.a11y"))
                     } else if session.isManual, !session.hasDepthProfile {
-                        Text(String(localized: "logbook.badge.manual.nodepth"))
+                        Text(DIRIOSLocalizer.string("logbook.badge.manual.nodepth"))
                             .font(DIRTypography.microBadge)
                             .foregroundStyle(DIRTheme.cyan)
                             .padding(.horizontal, 4)
                             .padding(.vertical, 1)
                             .overlay(RoundedRectangle(cornerRadius: 3).stroke(DIRTheme.cyan, lineWidth: 1))
                     } else if session.isManual {
-                        Text(String(localized: "logbook.badge.manual"))
+                        Text(DIRIOSLocalizer.string("logbook.badge.manual"))
                             .font(DIRTypography.microBadge)
                             .foregroundStyle(DIRTheme.orange)
                             .padding(.horizontal, 4)
@@ -251,7 +251,7 @@ struct DiveLogCard: View {
                             .overlay(RoundedRectangle(cornerRadius: 3).stroke(DIRTheme.orange, lineWidth: 1))
                     }
                     if session.buddy != nil {
-                        Text(String(localized: "detail.buddy.badge"))
+                        Text(DIRIOSLocalizer.string("detail.buddy.badge"))
                             .font(DIRTypography.microBadge)
                             .foregroundStyle(DIRTheme.yellow)
                             .padding(.horizontal, 4)
@@ -263,7 +263,7 @@ struct DiveLogCard: View {
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.86))
                 HStack {
-                    Text(String(format: String(localized: "logbook.card.duration"), Formatters.time(session.durationSeconds)))
+                    Text(DIRIOSLocalizer.formatted("logbook.card.duration", Formatters.time(session.durationSeconds)))
                     Spacer()
                     Text(session.gasLabel.rawValue)
                         .padding(.leading, 8)
@@ -292,28 +292,28 @@ struct DiveLogCard: View {
     }
 
     private var consolidatedAccessibilityLabel: String {
-        let site = session.siteName ?? String(localized: "detail.default_site")
+        let site = session.siteName ?? DIRIOSLocalizer.string("detail.default_site")
         let date = session.startDate.formatted(date: .abbreviated, time: .shortened)
-        let duration = String(format: String(localized: "logbook.card.duration"), Formatters.time(session.durationSeconds))
+        let duration = DIRIOSLocalizer.formatted("logbook.card.duration", Formatters.time(session.durationSeconds))
         var parts = [site, date, maxDepthLine, duration, session.gasLabel.rawValue]
         if session.isDemoDive {
-            parts.append(String(localized: "logbook.badge.demo.a11y"))
+            parts.append(DIRIOSLocalizer.string("logbook.badge.demo.a11y"))
         } else if session.isManual, !session.hasDepthProfile {
-            parts.append(String(localized: "logbook.badge.manual.nodepth"))
+            parts.append(DIRIOSLocalizer.string("logbook.badge.manual.nodepth"))
         } else if session.isManual {
-            parts.append(String(localized: "logbook.badge.manual"))
+            parts.append(DIRIOSLocalizer.string("logbook.badge.manual"))
         }
         if session.buddy != nil {
-            parts.append(String(localized: "detail.buddy.badge"))
+            parts.append(DIRIOSLocalizer.string("detail.buddy.badge"))
         }
         return parts.joined(separator: ", ")
     }
 
     private var maxDepthLine: String {
         if session.isManual, !session.hasDepthProfile {
-            return String(localized: "logbook.card.runtime_gps_only")
+            return DIRIOSLocalizer.string("logbook.card.runtime_gps_only")
         }
-        return String(format: String(localized: "logbook.card.max_depth"), Formatters.depth(session.maxDepthMeters, units: unitPreference).text)
+        return DIRIOSLocalizer.formatted("logbook.card.max_depth", Formatters.depth(session.maxDepthMeters, units: unitPreference).text)
     }
 
     private var dateBlock: some View {

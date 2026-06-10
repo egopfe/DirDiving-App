@@ -35,7 +35,7 @@ final class EquipmentStore: ObservableObject {
            let template = templates.first(where: { $0.id == id }) {
             return template.name
         }
-        return String(localized: "checklist.setup.current_profile")
+        return DIRIOSLocalizer.string("checklist.setup.current_profile")
     }
 
     var selectedChecklistSetupSummary: String {
@@ -43,13 +43,13 @@ final class EquipmentStore: ObservableObject {
            let template = templates.first(where: { $0.id == id }) {
             let gasCount = template.checklistItems.filter(\.usesGas).count
             return String(
-                format: String(localized: "checklist.setup.summary.template"),
+                format: DIRIOSLocalizer.string("checklist.setup.summary.template"),
                 template.checklistItems.count,
                 gasCount
             )
         }
         return String(
-            format: String(localized: "checklist.setup.summary.profile"),
+            format: DIRIOSLocalizer.string("checklist.setup.summary.profile"),
             profile.cylinders,
             profile.configuration,
             profile.migratedChecklistItems.count
@@ -119,7 +119,7 @@ final class EquipmentStore: ObservableObject {
     private static func defaultTemplates() -> [EquipmentTemplate] {
         [
             EquipmentTemplate(
-                name: String(localized: "equipment.template.rec"),
+                name: DIRIOSLocalizer.string("equipment.template.rec"),
                 checklistItems: [
                     EquipmentChecklistItem(title: "Mask", isReady: false),
                     EquipmentChecklistItem(title: "Fins", isReady: false),
@@ -127,7 +127,7 @@ final class EquipmentStore: ObservableObject {
                 ]
             ),
             EquipmentTemplate(
-                name: String(localized: "equipment.template.tec"),
+                name: DIRIOSLocalizer.string("equipment.template.tec"),
                 checklistItems: [
                     EquipmentChecklistItem(title: "Backup mask", isReady: false),
                     EquipmentChecklistItem(title: "Spool", isReady: false),
@@ -136,27 +136,27 @@ final class EquipmentStore: ObservableObject {
                 ]
             ),
             EquipmentTemplate(
-                name: String(localized: "equipment.template.ccr"),
+                name: DIRIOSLocalizer.string("equipment.template.ccr"),
                 checklistItems: [
-                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.rebreather"), isReady: false),
-                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.loop"), isReady: false),
-                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.counterlungs"), isReady: false),
-                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.adv"), isReady: false),
-                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.mav_o2"), isReady: false),
-                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.mav_diluent"), isReady: false),
-                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.o2_cylinder"), isReady: false, usesGas: true, tankSize: .s40),
-                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.diluent_cylinder"), isReady: false, usesGas: true, tankSize: .liters12, gasRole: .ccrDiluent),
-                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.o2_sensors"), isReady: false),
-                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.hud"), isReady: false),
-                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.controller"), isReady: false),
-                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.bov"), isReady: false),
-                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.scrubber"), isReady: false),
-                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.wet_notes"), isReady: false),
-                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.smb"), isReady: false),
-                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.spool"), isReady: false),
-                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.bailout_1"), isReady: false, usesGas: true, tankSize: .liters12, gasRole: .ccrBailout),
-                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.bailout_2"), isReady: false, usesGas: true, tankSize: .liters12, gasRole: .ccrBailout),
-                    EquipmentChecklistItem(title: String(localized: "equipment.ccr.bailout_3"), isReady: false, usesGas: true, tankSize: .liters12, gasRole: .ccrBailout)
+                    EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.ccr.rebreather"), isReady: false),
+                    EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.ccr.loop"), isReady: false),
+                    EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.ccr.counterlungs"), isReady: false),
+                    EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.ccr.adv"), isReady: false),
+                    EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.ccr.mav_o2"), isReady: false),
+                    EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.ccr.mav_diluent"), isReady: false),
+                    EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.ccr.o2_cylinder"), isReady: false, usesGas: true, tankSize: .s40),
+                    EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.ccr.diluent_cylinder"), isReady: false, usesGas: true, tankSize: .liters12, gasRole: .ccrDiluent),
+                    EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.ccr.o2_sensors"), isReady: false),
+                    EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.ccr.hud"), isReady: false),
+                    EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.ccr.controller"), isReady: false),
+                    EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.ccr.bov"), isReady: false),
+                    EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.ccr.scrubber"), isReady: false),
+                    EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.ccr.wet_notes"), isReady: false),
+                    EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.ccr.smb"), isReady: false),
+                    EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.ccr.spool"), isReady: false),
+                    EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.ccr.bailout_1"), isReady: false, usesGas: true, tankSize: .liters12, gasRole: .ccrBailout),
+                    EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.ccr.bailout_2"), isReady: false, usesGas: true, tankSize: .liters12, gasRole: .ccrBailout),
+                    EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.ccr.bailout_3"), isReady: false, usesGas: true, tankSize: .liters12, gasRole: .ccrBailout)
                 ]
             )
         ]

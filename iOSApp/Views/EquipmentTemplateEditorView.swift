@@ -19,21 +19,21 @@ struct EquipmentTemplateEditorView: View {
             DIRScreenContainer {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 14) {
-                        DIRCard(String(localized: "equipment.template.edit"), icon: "pencil", accent: DIRTheme.cyan) {
-                            TextField(String(localized: "equipment.template.name_placeholder"), text: $name)
+                        DIRCard(DIRIOSLocalizer.string("equipment.template.edit"), icon: "pencil", accent: DIRTheme.cyan) {
+                            TextField(DIRIOSLocalizer.string("equipment.template.name_placeholder"), text: $name)
                                 .foregroundStyle(.white)
                         }
-                        DIRCard(String(localized: "equipment.card.checklist"), icon: "checklist", accent: DIRTheme.green) {
+                        DIRCard(DIRIOSLocalizer.string("equipment.card.checklist"), icon: "checklist", accent: DIRTheme.green) {
                             ForEach($items) { $item in
                                 VStack(alignment: .leading, spacing: 6) {
-                                    TextField(String(localized: "equipment.checklist.new_item"), text: $item.title)
+                                    TextField(DIRIOSLocalizer.string("equipment.checklist.new_item"), text: $item.title)
                                         .foregroundStyle(.white)
-                                    Toggle(String(localized: "equipment.checklist.gas_flag"), isOn: $item.usesGas).tint(DIRTheme.yellow)
+                                    Toggle(DIRIOSLocalizer.string("equipment.checklist.gas_flag"), isOn: $item.usesGas).tint(DIRTheme.yellow)
                                     EquipmentChecklistGasSection(item: $item)
                                     Button(role: .destructive) {
                                         items.removeAll { $0.id == item.id }
                                     } label: {
-                                        Text(String(localized: "equipment.checklist.remove"))
+                                        Text(DIRIOSLocalizer.string("equipment.checklist.remove"))
                                             .font(.caption.weight(.semibold))
                                     }
                                     .buttonStyle(.plain)
@@ -41,9 +41,9 @@ struct EquipmentTemplateEditorView: View {
                                 Divider().overlay(DIRTheme.hairline)
                             }
                             Button {
-                                items.append(EquipmentChecklistItem(title: String(localized: "equipment.checklist.new_item")))
+                                items.append(EquipmentChecklistItem(title: DIRIOSLocalizer.string("equipment.checklist.new_item")))
                             } label: {
-                                Text(String(localized: "equipment.checklist.add"))
+                                Text(DIRIOSLocalizer.string("equipment.checklist.add"))
                                     .font(.callout.weight(.semibold))
                                     .foregroundStyle(DIRTheme.cyan)
                             }
@@ -54,15 +54,15 @@ struct EquipmentTemplateEditorView: View {
                 }
                 .dirCompanionScrollSurface()
             }
-            .navigationTitle(String(localized: "equipment.template.edit"))
+            .navigationTitle(DIRIOSLocalizer.string("equipment.template.edit"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button(String(localized: "equipment.template.cancel")) { dismiss() }
+                    Button(DIRIOSLocalizer.string("equipment.template.cancel")) { dismiss() }
                         .foregroundStyle(DIRTheme.muted)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(String(localized: "equipment.template.save")) { save() }
+                    Button(DIRIOSLocalizer.string("equipment.template.save")) { save() }
                         .foregroundStyle(DIRTheme.cyan)
                 }
             }

@@ -130,7 +130,7 @@ enum PlannerAscentTableBuilder {
                 depthLabel: depthFormatter(0),
                 minutes: 0,
                 timeLabel: "-",
-                gas: String(localized: "planner.table.surface"),
+                gas: DIRIOSLocalizer.string("planner.table.surface"),
                 ppO2: 0,
                 ppO2Label: "-"
             )

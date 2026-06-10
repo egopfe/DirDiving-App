@@ -9,10 +9,10 @@ struct TissueAnalyticsEntryCard: View {
                 .frame(width: 28)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(String(localized: "tissue_analytics.entry.title"))
+                Text(DIRIOSLocalizer.string("tissue_analytics.entry.title"))
                     .font(.callout.weight(.semibold))
                     .foregroundStyle(.white)
-                Text(String(localized: "tissue_analytics.entry.subtitle"))
+                Text(DIRIOSLocalizer.string("tissue_analytics.entry.subtitle"))
                     .font(.caption)
                     .foregroundStyle(TissueAnalyticsTheme.labelSecondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -67,7 +67,7 @@ struct TissueNarcosisAnalyticsView: View {
                 .padding(.bottom, 24)
             }
         }
-        .navigationTitle(String(localized: "tissue_analytics.nav.title"))
+        .navigationTitle(DIRIOSLocalizer.string("tissue_analytics.nav.title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(TissueAnalyticsTheme.screenBackground, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
@@ -76,10 +76,10 @@ struct TissueNarcosisAnalyticsView: View {
                 selectedRuntimeSeconds = trace.samples.last?.runtimeSeconds
             }
         }
-        .alert(String(localized: "tissue_analytics.disclaimer.title"), isPresented: $showDisclaimer) {
-            Button(String(localized: "common.ok"), role: .cancel) {}
+        .alert(DIRIOSLocalizer.string("tissue_analytics.disclaimer.title"), isPresented: $showDisclaimer) {
+            Button(DIRIOSLocalizer.string("common.ok"), role: .cancel) {}
         } message: {
-            Text(String(localized: "tissue_analytics.disclaimer.body"))
+            Text(DIRIOSLocalizer.string("tissue_analytics.disclaimer.body"))
         }
     }
 
@@ -146,12 +146,12 @@ struct TissueNarcosisAnalyticsView: View {
     private var summaryStrip: some View {
         HStack(spacing: 0) {
             summaryColumn(
-                title: String(localized: "tissue_analytics.summary.max_depth"),
+                title: DIRIOSLocalizer.string("tissue_analytics.summary.max_depth"),
                 value: Formatters.depth(trace.summary.maxDepthMeters, units: unitPreference).text
             )
             divider
             summaryColumn(
-                title: String(localized: "tissue_analytics.summary.bottom_time"),
+                title: DIRIOSLocalizer.string("tissue_analytics.summary.bottom_time"),
                 value: "\(trace.summary.bottomTimeMinutes)’"
             )
             divider
@@ -160,7 +160,7 @@ struct TissueNarcosisAnalyticsView: View {
             summaryColumn(title: "GF", value: "\(trace.summary.gfLow)/\(trace.summary.gfHigh)")
             divider
             summaryColumn(
-                title: String(localized: "tissue_analytics.summary.mode"),
+                title: DIRIOSLocalizer.string("tissue_analytics.summary.mode"),
                 value: trace.summary.modeTitle
             )
         }
@@ -220,7 +220,7 @@ struct TissueNarcosisAnalyticsView: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "info.circle")
-                Text(String(localized: "tissue_analytics.disclaimer.link"))
+                Text(DIRIOSLocalizer.string("tissue_analytics.disclaimer.link"))
                     .font(.caption)
             }
             .foregroundStyle(TissueAnalyticsTheme.labelMuted)
@@ -262,7 +262,7 @@ struct TissueNarcosisAnalyticsView: View {
     }
 
     private var diveProfileCard: some View {
-        analyticsCard(title: String(localized: "tissue_analytics.card.dive_profile")) {
+        analyticsCard(title: DIRIOSLocalizer.string("tissue_analytics.card.dive_profile")) {
             TissueDiveProfileChart(
                 points: trace.depthProfilePoints,
                 segments: trace.segments,
@@ -275,9 +275,9 @@ struct TissueNarcosisAnalyticsView: View {
 
     private var tissueLoadingCard: some View {
         analyticsCard(
-            title: String(localized: "tissue_analytics.card.tissue_loading"),
+            title: DIRIOSLocalizer.string("tissue_analytics.card.tissue_loading"),
             headerTrailing: String(
-                format: String(localized: "tissue_analytics.controlling_compartment_format"),
+                format: DIRIOSLocalizer.string("tissue_analytics.controlling_compartment_format"),
                 TissueAnalyticsTheme.controllingCompartmentLabel(index: trace.controllingCompartment)
             )
         ) {
@@ -293,8 +293,8 @@ struct TissueNarcosisAnalyticsView: View {
 
     private var tissueTrendCard: some View {
         analyticsCard(
-            title: String(localized: "tissue_analytics.card.tissue_trend"),
-            headerTrailing: String(localized: "tissue_analytics.show.controlling")
+            title: DIRIOSLocalizer.string("tissue_analytics.card.tissue_trend"),
+            headerTrailing: DIRIOSLocalizer.string("tissue_analytics.show.controlling")
         ) {
             TissueTrendChart(
                 samples: trace.samples,
@@ -309,7 +309,7 @@ struct TissueNarcosisAnalyticsView: View {
     }
 
     private var narcoticLoadCard: some View {
-        analyticsCard(title: String(localized: "tissue_analytics.card.narcotic_load")) {
+        analyticsCard(title: DIRIOSLocalizer.string("tissue_analytics.card.narcotic_load")) {
             TissueNarcoticLoadChart(
                 samples: trace.samples,
                 maxPPN2Bar: trace.maxPPN2Bar,
@@ -323,9 +323,9 @@ struct TissueNarcosisAnalyticsView: View {
     }
 
     private var gasSegmentsCard: some View {
-        analyticsCard(title: String(localized: "tissue_analytics.tab.gas")) {
+        analyticsCard(title: DIRIOSLocalizer.string("tissue_analytics.tab.gas")) {
             if trace.segments.isEmpty {
-                Text(String(localized: "tissue_analytics.gas.unavailable"))
+                Text(DIRIOSLocalizer.string("tissue_analytics.gas.unavailable"))
                     .font(.caption)
                     .foregroundStyle(TissueAnalyticsTheme.labelMuted)
             } else {
@@ -348,9 +348,9 @@ struct TissueNarcosisAnalyticsView: View {
     }
 
     private var decoStopsCard: some View {
-        analyticsCard(title: String(localized: "tissue_analytics.tab.deco")) {
+        analyticsCard(title: DIRIOSLocalizer.string("tissue_analytics.tab.deco")) {
             if trace.decoStops.isEmpty {
-                Text(String(localized: "tissue_analytics.deco.no_stops"))
+                Text(DIRIOSLocalizer.string("tissue_analytics.deco.no_stops"))
                     .font(.caption)
                     .foregroundStyle(TissueAnalyticsTheme.labelMuted)
             } else {
@@ -379,7 +379,7 @@ struct TissueAnalyticsUnavailableView: View {
             Image(systemName: "chart.xyaxis.line")
                 .font(.largeTitle)
                 .foregroundStyle(TissueAnalyticsTheme.labelMuted)
-            Text(String(localized: "tissue_analytics.insufficient_data"))
+            Text(DIRIOSLocalizer.string("tissue_analytics.insufficient_data"))
                 .font(.callout)
                 .foregroundStyle(TissueAnalyticsTheme.labelSecondary)
                 .multilineTextAlignment(.center)
@@ -387,7 +387,7 @@ struct TissueAnalyticsUnavailableView: View {
         .padding(24)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(TissueAnalyticsTheme.screenBackground)
-        .navigationTitle(String(localized: "tissue_analytics.nav.title"))
+        .navigationTitle(DIRIOSLocalizer.string("tissue_analytics.nav.title"))
         .navigationBarTitleDisplayMode(.inline)
     }
 }

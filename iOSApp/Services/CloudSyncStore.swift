@@ -4,7 +4,7 @@ import os
 
 @MainActor
 final class CloudSyncStore: ObservableObject {
-    @Published private(set) var lastSyncStatus = String(localized: "cloud.status.not_yet_synced")
+    @Published private(set) var lastSyncStatus = DIRIOSLocalizer.string("cloud.status.not_yet_synced")
     @Published private(set) var isICloudAvailable = FileManager.default.ubiquityIdentityToken != nil
     @Published private(set) var lastDecodeError: String?
     @Published private(set) var isSynchronizing = false
@@ -26,7 +26,7 @@ final class CloudSyncStore: ObservableObject {
                 guard let self else { return }
                 self.publishDeferred { [self] in
                     self.refreshICloudAvailability(postStatus: false)
-                    self.lastSyncStatus = String(localized: "cloud.status.external_update")
+                    self.lastSyncStatus = DIRIOSLocalizer.string("cloud.status.external_update")
                 }
                 NotificationCenter.default.post(
                     name: .cloudSyncDidChangeExternally,
@@ -53,7 +53,7 @@ final class CloudSyncStore: ObservableObject {
             synchronize()
         } else {
             publishDeferred { [self] in
-                lastSyncStatus = String(localized: "cloud.status.icloud_unavailable")
+                lastSyncStatus = DIRIOSLocalizer.string("cloud.status.icloud_unavailable")
             }
         }
     }
@@ -76,7 +76,7 @@ final class CloudSyncStore: ObservableObject {
         defaults.removeObject(forKey: modifiedAtKey(for: key))
         guard isICloudAvailable else {
             publishDeferred { [self] in
-                lastSyncStatus = String(localized: "cloud.status.icloud_unavailable")
+                lastSyncStatus = DIRIOSLocalizer.string("cloud.status.icloud_unavailable")
             }
             return
         }
@@ -86,11 +86,11 @@ final class CloudSyncStore: ObservableObject {
     }
 
     func decodeLocal<T: Decodable>(_ type: T.Type, from data: Data) -> T? {
-        decode(type, from: data, key: "local", source: String(localized: "cloud.source.local"))
+        decode(type, from: data, key: "local", source: DIRIOSLocalizer.string("cloud.source.local"))
     }
 
     func decodeCloud<T: Decodable>(_ type: T.Type, from data: Data) -> T? {
-        decode(type, from: data, key: "cloud", source: String(localized: "cloud.source.icloud"))
+        decode(type, from: data, key: "cloud", source: DIRIOSLocalizer.string("cloud.source.icloud"))
     }
 
     func load<T: Decodable>(_ type: T.Type, forKey key: String) -> T? {
@@ -101,64 +101,64 @@ final class CloudSyncStore: ObservableObject {
 
         if let cloudData, let localData {
             if Self.prefersCloudPayload(localModifiedAt: localModifiedAt, cloudModifiedAt: cloudModifiedAt) {
-                if let decoded = decode(type, from: cloudData, key: key, source: String(localized: "cloud.source.icloud")) {
+                if let decoded = decode(type, from: cloudData, key: key, source: DIRIOSLocalizer.string("cloud.source.icloud")) {
                     defaults.set(cloudData, forKey: key)
                     defaults.set(cloudModifiedAt, forKey: modifiedAtKey(for: key))
                     publishDeferred { [self] in
-                        lastSyncStatus = String(localized: "cloud.status.loaded_from_icloud")
+                        lastSyncStatus = DIRIOSLocalizer.string("cloud.status.loaded_from_icloud")
                     }
                     return decoded
                 }
-                recordDecodeFailure(key: key, source: String(localized: "cloud.source.icloud"))
+                recordDecodeFailure(key: key, source: DIRIOSLocalizer.string("cloud.source.icloud"))
             }
 
-            if let decoded = decode(type, from: localData, key: key, source: String(localized: "cloud.source.local")) {
+            if let decoded = decode(type, from: localData, key: key, source: DIRIOSLocalizer.string("cloud.source.local")) {
                 if isICloudAvailable, localModifiedAt > cloudModifiedAt {
                     cloudStore.set(localData, forKey: key)
                     cloudStore.set(localModifiedAt, forKey: modifiedAtKey(for: key))
                     synchronize()
                     publishDeferred { [self] in
-                        lastSyncStatus = String(localized: "cloud.status.local_newer_pending_icloud")
+                        lastSyncStatus = DIRIOSLocalizer.string("cloud.status.local_newer_pending_icloud")
                     }
                 } else if lastDecodeError != nil {
                     publishDeferred { [self] in
-                        lastSyncStatus = String(localized: "cloud.status.using_local_after_icloud_error")
+                        lastSyncStatus = DIRIOSLocalizer.string("cloud.status.using_local_after_icloud_error")
                     }
                 }
                 return decoded
             }
-            recordDecodeFailure(key: key, source: String(localized: "cloud.source.local"))
+            recordDecodeFailure(key: key, source: DIRIOSLocalizer.string("cloud.source.local"))
         }
 
         if let cloudData {
-            if let decoded = decode(type, from: cloudData, key: key, source: String(localized: "cloud.source.icloud")) {
+            if let decoded = decode(type, from: cloudData, key: key, source: DIRIOSLocalizer.string("cloud.source.icloud")) {
                 defaults.set(cloudData, forKey: key)
                 defaults.set(cloudModifiedAt, forKey: modifiedAtKey(for: key))
                 publishDeferred { [self] in
-                    lastSyncStatus = String(localized: "cloud.status.loaded_from_icloud")
+                    lastSyncStatus = DIRIOSLocalizer.string("cloud.status.loaded_from_icloud")
                 }
                 return decoded
             }
-            recordDecodeFailure(key: key, source: String(localized: "cloud.source.icloud"))
+            recordDecodeFailure(key: key, source: DIRIOSLocalizer.string("cloud.source.icloud"))
         }
 
         if let localData {
-            if let decoded = decode(type, from: localData, key: key, source: String(localized: "cloud.source.local")) {
+            if let decoded = decode(type, from: localData, key: key, source: DIRIOSLocalizer.string("cloud.source.local")) {
                 if isICloudAvailable {
                     cloudStore.set(localData, forKey: key)
                     cloudStore.set(localModifiedAt, forKey: modifiedAtKey(for: key))
                     synchronize()
                     publishDeferred { [self] in
-                        lastSyncStatus = String(localized: "cloud.status.local_pending_icloud")
+                        lastSyncStatus = DIRIOSLocalizer.string("cloud.status.local_pending_icloud")
                     }
                 } else {
                     publishDeferred { [self] in
-                        lastSyncStatus = String(localized: "cloud.status.saved_local_only")
+                        lastSyncStatus = DIRIOSLocalizer.string("cloud.status.saved_local_only")
                     }
                 }
                 return decoded
             }
-            recordDecodeFailure(key: key, source: String(localized: "cloud.source.local"))
+            recordDecodeFailure(key: key, source: DIRIOSLocalizer.string("cloud.source.local"))
         }
 
         return nil
@@ -177,14 +177,14 @@ final class CloudSyncStore: ObservableObject {
     func save<T: Encodable>(_ value: T, forKey key: String) {
         guard let data = encode(value) else {
             publishDeferred { [self] in
-                lastSyncStatus = String(localized: "cloud.status.encode_failed")
+                lastSyncStatus = DIRIOSLocalizer.string("cloud.status.encode_failed")
             }
             return
         }
 
         if data.count > IOSAlgorithmConfiguration.maxSyncPayloadBytes {
             publishDeferred { [self] in
-                lastSyncStatus = String(localized: "cloud.status.payload_too_large")
+                lastSyncStatus = DIRIOSLocalizer.string("cloud.status.payload_too_large")
             }
             return
         }
@@ -201,8 +201,8 @@ final class CloudSyncStore: ObservableObject {
         publishDeferred { [self] in
             lastDecodeError = nil
             lastSyncStatus = isICloudAvailable
-                ? String(localized: "cloud.status.saved_local_and_icloud")
-                : String(localized: "cloud.status.saved_local_only")
+                ? DIRIOSLocalizer.string("cloud.status.saved_local_and_icloud")
+                : DIRIOSLocalizer.string("cloud.status.saved_local_only")
             if isICloudAvailable {
                 lastSuccessfulSyncDate = Date()
             }
@@ -218,14 +218,14 @@ final class CloudSyncStore: ObservableObject {
         guard isICloudAvailable else {
             publishDeferred { [self] in
                 isSynchronizing = false
-                lastSyncStatus = String(localized: "cloud.status.icloud_unavailable")
+                lastSyncStatus = DIRIOSLocalizer.string("cloud.status.icloud_unavailable")
             }
             return
         }
         cloudStore.synchronize()
         publishDeferred { [self] in
             isSynchronizing = true
-            lastSyncStatus = String(localized: "cloud.status.sync_requested")
+            lastSyncStatus = DIRIOSLocalizer.string("cloud.status.sync_requested")
             lastSuccessfulSyncDate = Date()
         }
         Task { @MainActor in
@@ -239,7 +239,7 @@ final class CloudSyncStore: ObservableObject {
         let available = FileManager.default.ubiquityIdentityToken != nil
         isICloudAvailable = available
         if postStatus, !available {
-            lastSyncStatus = String(localized: "cloud.status.icloud_unavailable")
+            lastSyncStatus = DIRIOSLocalizer.string("cloud.status.icloud_unavailable")
         }
     }
 
@@ -250,7 +250,7 @@ final class CloudSyncStore: ObservableObject {
             return try encoder.encode(value)
         } catch {
             publishDeferred { [self] in
-                lastSyncStatus = String(localized: "cloud.status.encode_failed")
+                lastSyncStatus = DIRIOSLocalizer.string("cloud.status.encode_failed")
             }
             Self.logger.error("iCloud encode failed: \(error.localizedDescription, privacy: .private)")
             return nil
@@ -273,23 +273,23 @@ final class CloudSyncStore: ObservableObject {
         let detail: String
         if let underlying {
             detail = String(
-                format: String(localized: "cloud.decode.error_with_reason"),
+                format: DIRIOSLocalizer.string("cloud.decode.error_with_reason"),
                 name,
                 source,
                 underlying.localizedDescription
             )
         } else {
-            detail = String(format: String(localized: "cloud.decode.error_format"), name, source)
+            detail = DIRIOSLocalizer.formatted("cloud.decode.error_format", name, source)
         }
         if let existing = lastDecodeError, existing != detail {
             publishDeferred { [self] in
                 lastDecodeError = "\(existing)\n\(detail)"
-                lastSyncStatus = String(localized: "cloud.status.decode_failed")
+                lastSyncStatus = DIRIOSLocalizer.string("cloud.status.decode_failed")
             }
         } else {
             publishDeferred { [self] in
                 lastDecodeError = detail
-                lastSyncStatus = String(localized: "cloud.status.decode_failed")
+                lastSyncStatus = DIRIOSLocalizer.string("cloud.status.decode_failed")
             }
         }
         Self.logger.error("iCloud decode failed key=\(key, privacy: .public) source=\(source, privacy: .public)")
@@ -298,9 +298,9 @@ final class CloudSyncStore: ObservableObject {
     private static func friendlyKeyName(_ key: String) -> String {
         switch key {
         case "dirdiving_ios_dive_sessions":
-            return String(localized: "cloud.key.dive_sessions")
+            return DIRIOSLocalizer.string("cloud.key.dive_sessions")
         case WatchSyncKeys.deletedSessionIDsKey:
-            return String(localized: "cloud.key.deleted_sessions")
+            return DIRIOSLocalizer.string("cloud.key.deleted_sessions")
         default:
             return key
         }

@@ -13,9 +13,9 @@ struct EquipmentView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         VStack(alignment: .leading, spacing: 7) {
-                            Text(String(localized: "equipment.title"))
+                            Text(DIRIOSLocalizer.string("equipment.title"))
                                 .dirScreenTitleStyle()
-                            Text(String(localized: "equipment.subtitle"))
+                            Text(DIRIOSLocalizer.string("equipment.subtitle"))
                                 .dirScreenSubtitleStyle()
                         }
                         equipmentHero
@@ -27,27 +27,27 @@ struct EquipmentView: View {
                                 .padding(.vertical, 7)
                                 .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.green.opacity(0.10)))
                         }
-                        DIRCard(String(localized: "equipment.card.planning"), icon: "shippingbox.fill", accent: DIRTheme.cyan) {
-                            Text(String(localized: "equipment.card.planning.informational"))
+                        DIRCard(DIRIOSLocalizer.string("equipment.card.planning"), icon: "shippingbox.fill", accent: DIRTheme.cyan) {
+                            Text(DIRIOSLocalizer.string("equipment.card.planning.informational"))
                                 .font(.caption2)
                                 .foregroundStyle(DIRTheme.muted)
                                 .fixedSize(horizontal: false, vertical: true)
-                            editableRow(String(localized: "equipment.row.cylinders"), text: $equipment.profile.cylinders)
-                            editableRow(String(localized: "equipment.row.configuration"), text: $equipment.profile.configuration)
-                            editableRow(String(localized: "equipment.row.bottom_gas"), text: $equipment.profile.bottomGas)
-                            editableRow(String(localized: "equipment.row.deco1"), text: $equipment.profile.decoGas1)
-                            editableRow(String(localized: "equipment.row.deco2"), text: $equipment.profile.decoGas2)
+                            editableRow(DIRIOSLocalizer.string("equipment.row.cylinders"), text: $equipment.profile.cylinders)
+                            editableRow(DIRIOSLocalizer.string("equipment.row.configuration"), text: $equipment.profile.configuration)
+                            editableRow(DIRIOSLocalizer.string("equipment.row.bottom_gas"), text: $equipment.profile.bottomGas)
+                            editableRow(DIRIOSLocalizer.string("equipment.row.deco1"), text: $equipment.profile.decoGas1)
+                            editableRow(DIRIOSLocalizer.string("equipment.row.deco2"), text: $equipment.profile.decoGas2)
                             sacRow
                         }
-                        DIRCard(String(localized: "equipment.card.saved_setups"), icon: "square.stack.3d.up.fill", accent: DIRTheme.green) {
-                            Text(String(localized: "equipment.saved_setups.hint"))
+                        DIRCard(DIRIOSLocalizer.string("equipment.card.saved_setups"), icon: "square.stack.3d.up.fill", accent: DIRTheme.green) {
+                            Text(DIRIOSLocalizer.string("equipment.saved_setups.hint"))
                                 .font(.caption2)
                                 .foregroundStyle(DIRTheme.muted)
                                 .fixedSize(horizontal: false, vertical: true)
                             Button {
                                 showTemplatesSheet = true
                             } label: {
-                                Text(String(localized: "equipment.my_equipment.button"))
+                                Text(DIRIOSLocalizer.string("equipment.my_equipment.button"))
                                     .font(.callout.weight(.semibold))
                                     .foregroundStyle(DIRTheme.cyan)
                                     .frame(maxWidth: .infinity)
@@ -55,10 +55,10 @@ struct EquipmentView: View {
                                     .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.7), lineWidth: 1))
                             }
                             .buttonStyle(.plain)
-                            .accessibilityLabel(String(localized: "equipment.my_equipment.button"))
+                            .accessibilityLabel(DIRIOSLocalizer.string("equipment.my_equipment.button"))
                         }
-                        DIRCard(String(localized: "equipment.images.section"), icon: "photo.on.rectangle.angled", accent: DIRTheme.cyan) {
-                            Text(String(localized: "equipment.images.hint"))
+                        DIRCard(DIRIOSLocalizer.string("equipment.images.section"), icon: "photo.on.rectangle.angled", accent: DIRTheme.cyan) {
+                            Text(DIRIOSLocalizer.string("equipment.images.hint"))
                                 .font(.caption2)
                                 .foregroundStyle(DIRTheme.muted)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -68,7 +68,7 @@ struct EquipmentView: View {
                         Button {
                             showResetConfirmation = true
                         } label: {
-                            Text(String(localized: "equipment.reset_profile"))
+                            Text(DIRIOSLocalizer.string("equipment.reset_profile"))
                                 .font(.callout.weight(.semibold))
                                 .foregroundStyle(DIRTheme.cyan)
                                 .frame(maxWidth: .infinity)
@@ -76,21 +76,21 @@ struct EquipmentView: View {
                                 .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
                         }
                         .buttonStyle(.plain)
-                        DIRWarningBox(text: String(localized: "equipment.save_notice"))
+                        DIRWarningBox(text: DIRIOSLocalizer.string("equipment.save_notice"))
                     }
                     .padding(16)
                 }
                 .dirCompanionScrollSurface()
             }
             .toolbarBackground(.hidden, for: .navigationBar)
-            .confirmationDialog(String(localized: "equipment.reset.confirm.title"), isPresented: $showResetConfirmation, titleVisibility: .visible) {
-                Button(String(localized: "equipment.reset.confirm.action"), role: .destructive) {
+            .confirmationDialog(DIRIOSLocalizer.string("equipment.reset.confirm.title"), isPresented: $showResetConfirmation, titleVisibility: .visible) {
+                Button(DIRIOSLocalizer.string("equipment.reset.confirm.action"), role: .destructive) {
                     equipment.reset()
                     showSavedFeedback()
                 }
-                Button(String(localized: "equipment.reset.cancel"), role: .cancel) {}
+                Button(DIRIOSLocalizer.string("equipment.reset.cancel"), role: .cancel) {}
             } message: {
-                Text(String(localized: "equipment.reset.confirm.message"))
+                Text(DIRIOSLocalizer.string("equipment.reset.confirm.message"))
             }
             .onChange(of: equipment.profile) { _, _ in
                 showSavedFeedback()
@@ -145,7 +145,7 @@ struct EquipmentView: View {
 
     private var sacRow: some View {
         HStack {
-            Text(String(localized: "equipment.sac_default")).foregroundStyle(DIRTheme.muted)
+            Text(DIRIOSLocalizer.string("equipment.sac_default")).foregroundStyle(DIRTheme.muted)
             Spacer()
             Button { equipment.profile.sacLitersMinute = max(5, equipment.profile.sacLitersMinute - 0.5) } label: {
                 Image(systemName: "minus").frame(width: 28, height: 26)
@@ -167,7 +167,7 @@ struct EquipmentView: View {
     }
 
     private func showSavedFeedback() {
-        savedFeedback = String(localized: "equipment.profile.saved_notice")
+        savedFeedback = DIRIOSLocalizer.string("equipment.profile.saved_notice")
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 1_800_000_000)
             savedFeedback = nil

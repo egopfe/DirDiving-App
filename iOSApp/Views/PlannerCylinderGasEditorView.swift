@@ -55,7 +55,7 @@ struct PlannerGasWheelPickerSheet<Value: Hashable>: View {
                 selection = draft
                 onConfirm()
             } label: {
-                Text(String(localized: "planner.gas.editor.confirm"))
+                Text(DIRIOSLocalizer.string("planner.gas.editor.confirm"))
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
@@ -66,7 +66,7 @@ struct PlannerGasWheelPickerSheet<Value: Hashable>: View {
             .padding(.horizontal, 16)
             .padding(.top, 8)
 
-            Button(String(localized: "planner.gas.editor.cancel"), role: .cancel) {
+            Button(DIRIOSLocalizer.string("planner.gas.editor.cancel"), role: .cancel) {
                 onCancel()
             }
             .font(.callout.weight(.semibold))
@@ -123,14 +123,14 @@ struct PlannerCylinderGasEditorView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(String(format: String(localized: "planner.gas.editor.cylinder_section"), cylinderNumber))
+            Text(DIRIOSLocalizer.formatted("planner.gas.editor.cylinder_section", cylinderNumber))
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(DIRTheme.muted)
                 .textCase(.uppercase)
 
             groupedCard {
                 editorRow(
-                    label: String(localized: "planner.gas.editor.mix_type"),
+                    label: DIRIOSLocalizer.string("planner.gas.editor.mix_type"),
                     value: entry.gas.mixKind.plannerPickerTitle,
                     editable: true
                 ) { activePicker = .mixKind }
@@ -139,7 +139,7 @@ struct PlannerCylinderGasEditorView: View {
 
                 if showsTankEditor {
                     editorRow(
-                        label: String(localized: "planner.gas.editor.cylinder"),
+                        label: DIRIOSLocalizer.string("planner.gas.editor.cylinder"),
                         value: entry.tankSize.rawValue,
                         editable: true
                     ) { activePicker = .tankSize }
@@ -148,13 +148,13 @@ struct PlannerCylinderGasEditorView: View {
 
                 if showsRoleEditor {
                     editorRow(
-                        label: String(localized: "planner.gas.editor.role"),
+                        label: DIRIOSLocalizer.string("planner.gas.editor.role"),
                         value: entry.role.localizedTitle,
                         editable: true
                     ) { activePicker = .role }
                 } else {
                     editorRow(
-                        label: String(localized: "planner.gas.editor.role"),
+                        label: DIRIOSLocalizer.string("planner.gas.editor.role"),
                         value: entry.role.localizedTitle,
                         editable: false
                     ) {}
@@ -163,7 +163,7 @@ struct PlannerCylinderGasEditorView: View {
 
             groupedCard {
                 editorRow(
-                    label: String(localized: "planner.gas.oxygen"),
+                    label: DIRIOSLocalizer.string("planner.gas.oxygen"),
                     value: "\(PlannerGasEditingSupport.oxygenPercent(from: entry.gas)) %",
                     editable: entry.gas.canEditOxygen
                 ) {
@@ -173,7 +173,7 @@ struct PlannerCylinderGasEditorView: View {
                 rowDivider()
 
                 editorRow(
-                    label: String(localized: "planner.gas.helium"),
+                    label: DIRIOSLocalizer.string("planner.gas.helium"),
                     value: "\(PlannerGasEditingSupport.heliumPercent(from: entry.gas)) %",
                     editable: entry.gas.canEditHelium
                 ) {
@@ -183,7 +183,7 @@ struct PlannerCylinderGasEditorView: View {
                 rowDivider()
 
                 editorRow(
-                    label: String(localized: "planner.gas.nitrogen"),
+                    label: DIRIOSLocalizer.string("planner.gas.nitrogen"),
                     value: "\(PlannerGasEditingSupport.nitrogenPercent(from: entry.gas)) %",
                     editable: false
                 ) {}
@@ -191,7 +191,7 @@ struct PlannerCylinderGasEditorView: View {
                 rowDivider()
 
                 editorRow(
-                    label: String(localized: "planner.gas.ppo2_max"),
+                    label: DIRIOSLocalizer.string("planner.gas.ppo2_max"),
                     value: Formatters.one(entry.gas.maxPPO2),
                     editable: true
                 ) { activePicker = .maxPPO2 }
@@ -199,14 +199,14 @@ struct PlannerCylinderGasEditorView: View {
                 rowDivider()
 
                 editorRow(
-                    label: String(localized: "planner.gas.editor.mod"),
+                    label: DIRIOSLocalizer.string("planner.gas.editor.mod"),
                     value: modDisplayText,
                     editable: false
                 ) {}
             }
 
             VStack(alignment: .leading, spacing: 8) {
-                Text(String(localized: "planner.gas.editor.working_pressure_section"))
+                Text(DIRIOSLocalizer.string("planner.gas.editor.working_pressure_section"))
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(DIRTheme.muted)
                     .textCase(.uppercase)
@@ -270,10 +270,10 @@ struct PlannerCylinderGasEditorView: View {
         return Group {
             if hasConflict {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(String(localized: "planner.gas.editor.mod_switch_exceeds_title"))
+                    Text(DIRIOSLocalizer.string("planner.gas.editor.mod_switch_exceeds_title"))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(DIRTheme.red)
-                    Text(String(localized: "planner.gas.editor.mod_switch_exceeds_message"))
+                    Text(DIRIOSLocalizer.string("planner.gas.editor.mod_switch_exceeds_message"))
                         .font(.caption2)
                         .foregroundStyle(.white.opacity(0.9))
                         .fixedSize(horizontal: false, vertical: true)
@@ -290,10 +290,10 @@ struct PlannerCylinderGasEditorView: View {
                 )
             } else if entry.gas.isValidMix {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(String(localized: "planner.gas.editor.mod_valid_title"))
+                    Text(DIRIOSLocalizer.string("planner.gas.editor.mod_valid_title"))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(DIRTheme.green)
-                    Text(String(localized: "planner.gas.editor.mod_valid_message"))
+                    Text(DIRIOSLocalizer.string("planner.gas.editor.mod_valid_message"))
                         .font(.caption2)
                         .foregroundStyle(.white.opacity(0.9))
                         .fixedSize(horizontal: false, vertical: true)
@@ -315,7 +315,7 @@ struct PlannerCylinderGasEditorView: View {
     @ViewBuilder
     private func switchDepthEditor(binding: Binding<Double>) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(String(localized: "planner.field.switch_depth"))
+            Text(DIRIOSLocalizer.string("planner.field.switch_depth"))
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(DIRTheme.muted)
             HStack {
@@ -326,7 +326,7 @@ struct PlannerCylinderGasEditorView: View {
                 if let maxSwitchDepthMeters {
                     Text(
                         String(
-                            format: String(localized: "planner.gas.editor.switch_depth_max"),
+                            format: DIRIOSLocalizer.string("planner.gas.editor.switch_depth_max"),
                             Formatters.depth(maxSwitchDepthMeters, units: unitPreference).text
                         )
                     )
@@ -348,7 +348,7 @@ struct PlannerCylinderGasEditorView: View {
         switch field {
         case .mixKind:
             PlannerGasWheelPickerSheet(
-                title: String(localized: "planner.gas.editor.mix_type"),
+                title: DIRIOSLocalizer.string("planner.gas.editor.mix_type"),
                 values: allowedMixKinds,
                 selection: mixKindSelection,
                 valueLabel: { $0.plannerPickerTitle },
@@ -360,7 +360,7 @@ struct PlannerCylinderGasEditorView: View {
             )
         case .tankSize:
             PlannerGasWheelPickerSheet(
-                title: String(localized: "planner.gas.editor.cylinder"),
+                title: DIRIOSLocalizer.string("planner.gas.editor.cylinder"),
                 values: TankSize.allCases,
                 selection: tankSizeSelection,
                 valueLabel: { $0.rawValue },
@@ -369,7 +369,7 @@ struct PlannerCylinderGasEditorView: View {
             )
         case .role:
             PlannerGasWheelPickerSheet(
-                title: String(localized: "planner.gas.editor.role"),
+                title: DIRIOSLocalizer.string("planner.gas.editor.role"),
                 values: GasRole.allCases,
                 selection: roleSelection,
                 valueLabel: { $0.localizedTitle },
@@ -381,7 +381,7 @@ struct PlannerCylinderGasEditorView: View {
             )
         case .oxygen:
             PlannerGasWheelPickerSheet(
-                title: String(localized: "planner.gas.oxygen"),
+                title: DIRIOSLocalizer.string("planner.gas.oxygen"),
                 values: PlannerGasEditingSupport.oxygenPercentValues,
                 selection: oxygenSelection,
                 valueLabel: { "\($0) %" },
@@ -393,7 +393,7 @@ struct PlannerCylinderGasEditorView: View {
             )
         case .helium:
             PlannerGasWheelPickerSheet(
-                title: String(localized: "planner.gas.helium"),
+                title: DIRIOSLocalizer.string("planner.gas.helium"),
                 values: PlannerGasEditingSupport.heliumPercentValues(
                     oxygenPercent: PlannerGasEditingSupport.oxygenPercent(from: entry.gas)
                 ),
@@ -407,7 +407,7 @@ struct PlannerCylinderGasEditorView: View {
             )
         case .maxPPO2:
             PlannerGasWheelPickerSheet(
-                title: String(localized: "planner.gas.ppo2_max"),
+                title: DIRIOSLocalizer.string("planner.gas.ppo2_max"),
                 values: PlannerGasEditingSupport.ppo2PickerValues,
                 selection: maxPPO2Selection,
                 valueLabel: { Formatters.one($0) },
@@ -419,7 +419,7 @@ struct PlannerCylinderGasEditorView: View {
             )
         case .workingPressure:
             PlannerGasWheelPickerSheet(
-                title: String(localized: "planner.gas.editor.working_pressure_section"),
+                title: DIRIOSLocalizer.string("planner.gas.editor.working_pressure_section"),
                 values: PlannerGasEditingSupport.workingPressureValues(for: entry.pressureUnit),
                 selection: workingPressureSelection,
                 valueLabel: { "\($0) \(entry.pressureUnit.rawValue.lowercased())" },
@@ -610,14 +610,14 @@ struct PlannerCylinderGasEditorSheet: View {
                         Image(systemName: "chevron.left")
                             .font(.body.weight(.semibold))
                     }
-                    .accessibilityLabel(String(localized: "planner.gas.editor.cancel"))
+                    .accessibilityLabel(DIRIOSLocalizer.string("planner.gas.editor.cancel"))
                 }
                 ToolbarItem(placement: .principal) {
-                    Text(String(localized: "planner.gas.editor.planning_title"))
+                    Text(DIRIOSLocalizer.string("planner.gas.editor.planning_title"))
                         .font(.headline.weight(.semibold))
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(String(localized: "planner.gas.editor.save")) {
+                    Button(DIRIOSLocalizer.string("planner.gas.editor.save")) {
                         entry = draft
                         onSave()
                         dismiss()

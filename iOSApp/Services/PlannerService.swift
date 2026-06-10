@@ -364,7 +364,7 @@ enum PlannerService {
             surfaceIntervalMinutes: surfaceIntervalMinutes,
             snapshotAvailable: snapshot != nil,
             snapshotCreatedAt: snapshot?.createdAt,
-            snapshotSource: snapshot == nil ? nil : String(localized: "planner.repetitive.snapshot.source"),
+            snapshotSource: snapshot == nil ? nil : DIRIOSLocalizer.string("planner.repetitive.snapshot.source"),
             tissueStateApplied: tissueStateApplied,
             snapshotIssue: tissueStateApplied ? nil : snapshotIssue
         )
