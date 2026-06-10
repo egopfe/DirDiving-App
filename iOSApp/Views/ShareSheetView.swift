@@ -26,7 +26,7 @@ enum PDFShareActions {
         modIssues: [MODValidationIssue]
     ) -> PDFExportPlannerContext {
         PDFExportPlannerContext(
-            input: store.input,
+            input: PlannerModePolicy.activePlanInput(from: store.input, mode: store.mode),
             plan: store.plan,
             mode: store.mode,
             validation: PlannerModePolicy.validate(draft: store.input, mode: store.mode),

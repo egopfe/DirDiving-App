@@ -13,7 +13,7 @@ enum PlannerInputValidator {
         } else if input.plannedDepthMeters > IOSAlgorithmConfiguration.maxPlannerDepthMeters {
             result.add(.unsupportedDepth)
         }
-        if mode != .base {
+        if presentation.showsAverageDepthInput {
             if !input.plannedAverageDepthMeters.isFinite
                 || input.plannedAverageDepthMeters < 0
                 || input.plannedAverageDepthMeters > input.plannedDepthMeters {

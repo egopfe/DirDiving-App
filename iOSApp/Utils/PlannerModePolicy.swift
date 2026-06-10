@@ -85,6 +85,8 @@ struct PlannerResultPresentation: Equatable {
     let showsGFPresets: Bool
     /// Configurable CNS descent+bottom input card in the main planner form (not result-level CNS/OTU display).
     let showsCNSDescentBottomSettings: Bool
+    /// Average depth + planning reference controls in the OC profile card.
+    let showsAverageDepthInput: Bool
 
     static func presentation(for mode: PlannerMode) -> PlannerResultPresentation {
         switch mode {
@@ -107,7 +109,8 @@ struct PlannerResultPresentation: Equatable {
                 showsTeamPreview: false,
                 showsManualGFControls: false,
                 showsGFPresets: false,
-                showsCNSDescentBottomSettings: false
+                showsCNSDescentBottomSettings: false,
+                showsAverageDepthInput: false
             )
         case .deco:
             return PlannerResultPresentation(
@@ -128,7 +131,8 @@ struct PlannerResultPresentation: Equatable {
                 showsTeamPreview: false,
                 showsManualGFControls: false,
                 showsGFPresets: true,
-                showsCNSDescentBottomSettings: false
+                showsCNSDescentBottomSettings: false,
+                showsAverageDepthInput: false
             )
         case .technical:
             return PlannerResultPresentation(
@@ -149,7 +153,8 @@ struct PlannerResultPresentation: Equatable {
                 showsTeamPreview: true,
                 showsManualGFControls: true,
                 showsGFPresets: false,
-                showsCNSDescentBottomSettings: true
+                showsCNSDescentBottomSettings: true,
+                showsAverageDepthInput: true
             )
         case .ccr:
             return PlannerResultPresentation(
@@ -170,7 +175,8 @@ struct PlannerResultPresentation: Equatable {
                 showsTeamPreview: false,
                 showsManualGFControls: true,
                 showsGFPresets: false,
-                showsCNSDescentBottomSettings: true
+                showsCNSDescentBottomSettings: true,
+                showsAverageDepthInput: false
             )
         }
     }
@@ -359,6 +365,8 @@ enum PlannerModePolicy {
         if projected.gfLow >= projected.gfHigh {
             applyGFPreset(.standard, to: &projected)
         }
+        projected.plannedAverageDepthMeters = projected.plannedDepthMeters
+        projected.planningDepthReference = .maximumDepth
         projected.syncLegacyGasesFromPlannerCylinders()
         return projected
     }

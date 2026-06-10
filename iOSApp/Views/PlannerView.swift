@@ -36,7 +36,7 @@ struct PlannerView: View {
     }
 
     private var profileMaxAverageDepthLimitMeters: Double? {
-        store.mode == .deco ? PlannerModeLimits.decoMaximumDepthMeters(for: store.input) : nil
+        modePresentation.showsAverageDepthInput ? store.input.plannedDepthMeters : nil
     }
 
     private var profileMaxBottomMinutes: Double? {
@@ -238,7 +238,14 @@ struct PlannerView: View {
                     meters: $store.input.plannedDepthMeters,
                     maxMeters: profileMaxDepthLimitMeters
                 )
-                if store.mode != .base {
+                if store.mode == .deco {
+                    Text(DIRIOSLocalizer.string("planner.deco.gas_consumption.conservative_depth_note"))
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.vertical, 8)
+                }
+                if modePresentation.showsAverageDepthInput {
                     Divider().overlay(DIRTheme.hairline)
                     plannerDepthField(
                         DIRIOSLocalizer.string("planner.field.avg_depth"),
@@ -1861,8 +1868,9 @@ struct PlanResultView: View {
     }
 
     private var referenceDepthSummary: String {
+        let active = PlannerModePolicy.activePlanInput(from: store.input, mode: store.mode)
         let label: String
-        switch store.input.planningDepthReference {
+        switch active.planningDepthReference {
         case .maximumDepth:
             label = DIRIOSLocalizer.string("planner.result.reference_depth.max")
         case .averageDepth:

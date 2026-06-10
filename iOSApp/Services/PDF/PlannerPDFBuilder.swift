@@ -18,7 +18,7 @@ enum PlannerPDFBuilder {
                 DIRIOSLocalizer.string("planner.field.max_depth"),
                 value: Formatters.depth(context.input.plannedDepthMeters, units: context.unitPreference).text
             )
-            if context.mode != .base {
+            if PlannerResultPresentation.presentation(for: context.mode).showsAverageDepthInput {
                 page.drawLine(
                     DIRIOSLocalizer.string("planner.field.avg_depth"),
                     value: Formatters.depth(context.input.plannedAverageDepthMeters, units: context.unitPreference).text

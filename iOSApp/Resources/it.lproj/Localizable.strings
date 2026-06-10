@@ -552,6 +552,7 @@
 "planner.deco.decompression_gas.toggle" = "Usa gas decompressivo";
 "planner.deco.decompression_gas.description" = "Aggiungi un gas e una bombola dedicati alle tappe di decompressione.";
 "planner.deco.decompression_gas.off_note" = "La pianificazione userà solo il Back Gas.";
+"planner.deco.gas_consumption.conservative_depth_note" = "Il consumo gas è stimato in modo conservativo alla profondità massima pianificata.";
 "planner.cylinder.add_deco" = "Aggiungi gas deco";
 "planner.profile.title" = "Profilo Immersione";
 "planner.field.max_depth" = "Profondità Massima";
