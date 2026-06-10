@@ -34,4 +34,22 @@ final class IOSEquipmentChecklistTabSplitTests: XCTestCase {
             XCTAssertFalse(String(localized: String.LocalizationValue(key)).isEmpty, "Missing localization for \(key)")
         }
     }
+
+    func testContentViewExposesSixMainTabs() throws {
+        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/ContentView.swift"))
+        for tab in ["planner", "logbook", "analysis", "gear", "checklist", "settings"] {
+            XCTAssertTrue(source.contains(".\(tab)"), "Missing IOSTab.\(tab)")
+        }
+        XCTAssertTrue(source.contains("ChecklistView()"))
+        XCTAssertTrue(source.contains("MoreView()"))
+        XCTAssertFalse(source.contains(".more)"))
+        XCTAssertFalse(source.contains("Label(\"tab.more\""))
+    }
+
+    private func repositoryRoot() -> URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+    }
 }
