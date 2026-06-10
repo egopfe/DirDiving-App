@@ -328,11 +328,20 @@ struct PlannerView: View {
                 .foregroundStyle(.white)
             Picker(DIRIOSLocalizer.string("planner.field.gf_preset"), selection: gfPresetBinding) {
                 ForEach(PlannerGFPreset.allCases) { preset in
-                    Text(preset.localizedTitle).tag(preset)
+                    Text(preset.localizedCompactTitleWithValues).tag(preset)
                 }
             }
             .pickerStyle(.segmented)
             .tint(DIRTheme.cyan)
+            Text(
+                DIRIOSLocalizer.formatted(
+                    "planner.gf.preset.explanation_format",
+                    gfPresetBinding.wrappedValue.displayPair
+                )
+            )
+            .font(.caption2)
+            .foregroundStyle(DIRTheme.muted)
+            .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.vertical, 10)
     }
