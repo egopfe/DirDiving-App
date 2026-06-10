@@ -513,6 +513,8 @@ struct GasPlanInput: Codable, Hashable {
     var plannedAverageDepthMeters: Double = 20
     var planningDepthReference: PlanningDepthReference = .maximumDepth
     var plannerCylinders: [PlannerCylinderEntry] = []
+    /// Deco mode only: when nil/false, active planning uses Back Gas only (draft deco gas may remain stored).
+    var isDecoGasEnabled: Bool? = nil
     var plannedBottomMinutes: Double = 20
     var waterTemperatureCelsius: Double = 24
     var salinity: SalinityMode = .salt
@@ -577,6 +579,20 @@ struct GasPlanInput: Codable, Hashable {
             return [bottomGas, decoGas1, decoGas2]
         }
         return plannerCylinders.map(\.gas)
+    }
+
+    mutating func ensureDefaultDecoGasIfNeeded() {
+        ensurePlannerCylindersFromLegacy()
+        guard !plannerCylinders.contains(where: { $0.role == .deco }) else { return }
+        let gas = decoGas1
+        plannerCylinders.append(
+            PlannerCylinderEntry(
+                role: .deco,
+                tankSize: .liters12,
+                gas: gas,
+                switchDepthMeters: 21
+            )
+        )
     }
 
     mutating func ensurePlannerCylindersFromLegacy() {
@@ -664,5 +680,9 @@ struct GasPlanInput: Codable, Hashable {
 
     var buhlmannUsesTrimixBackGas: Bool {
         buhlmannBackGas.mixKind == .trimix
+    }
+
+    var decoGasPlanningEnabled: Bool {
+        isDecoGasEnabled ?? false
     }
 }

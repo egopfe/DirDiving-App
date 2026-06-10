@@ -107,6 +107,7 @@ enum PlannerGasPickerField: Identifiable {
 struct PlannerCylinderGasEditorView: View {
     @Binding var entry: PlannerCylinderEntry
     let cylinderNumber: Int
+    var sectionTitle: String?
     let plannerMode: PlannerMode
     let allowedMixKinds: [GasMixKind]
     let unitPreference: IOSUnitPreference
@@ -137,12 +138,16 @@ struct PlannerCylinderGasEditorView: View {
         !isBaseMode
     }
 
+    private var resolvedSectionTitle: String {
+        sectionTitle ?? DIRIOSLocalizer.formatted("planner.gas.editor.cylinder_section", cylinderNumber)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(DIRIOSLocalizer.formatted("planner.gas.editor.cylinder_section", cylinderNumber))
+            Text(resolvedSectionTitle)
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(DIRTheme.muted)
-                .textCase(.uppercase)
+                .textCase(sectionTitle == nil ? .uppercase : nil)
 
             groupedCard {
                 editorRow(

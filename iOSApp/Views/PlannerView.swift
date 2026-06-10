@@ -576,14 +576,24 @@ struct PlannerView: View {
             .joined(separator: ". ")
     }
 
+    private var visibleBackGasCylinders: [PlannerCylinderEntry] {
+        store.input.plannerCylinders.filter { $0.role == .bottom }
+    }
+
+    private var visibleDecoGasCylinders: [PlannerCylinderEntry] {
+        guard store.mode == .deco, store.input.decoGasPlanningEnabled else { return [] }
+        let deco = store.input.plannerCylinders
+            .filter { $0.role == .deco }
+            .sorted { $0.switchDepthMeters > $1.switchDepthMeters }
+        return Array(deco.prefix(1))
+    }
+
     private var visiblePlannerCylinders: [PlannerCylinderEntry] {
         switch store.mode {
         case .base:
-            return store.input.plannerCylinders.filter { $0.role == .bottom }
+            return visibleBackGasCylinders
         case .deco:
-            let bottom = store.input.plannerCylinders.filter { $0.role == .bottom }
-            let deco = store.input.plannerCylinders.filter { $0.role == .deco }.sorted { $0.switchDepthMeters > $1.switchDepthMeters }
-            return bottom + Array(deco.prefix(1))
+            return visibleBackGasCylinders + visibleDecoGasCylinders
         case .technical, .ccr:
             return store.input.plannerCylinders
         }
@@ -606,28 +616,35 @@ struct PlannerView: View {
                     .buttonStyle(.plain)
                     Divider().overlay(DIRTheme.hairline)
                 }
-                ForEach(visiblePlannerCylinders) { entry in
-                    if let index = store.input.plannerCylinders.firstIndex(where: { $0.id == entry.id }) {
-                        plannerCylinderEditor(at: index)
+                if store.mode == .deco {
+                    ForEach(visibleBackGasCylinders) { entry in
+                        if let index = store.input.plannerCylinders.firstIndex(where: { $0.id == entry.id }) {
+                            plannerCylinderEditor(at: index)
+                        }
                     }
-                }
-                if store.mode == .deco,
-                   store.input.plannerCylinders.filter({ $0.role == .deco }).isEmpty {
-                    Button {
-                        let entry = PlannerCylinderEntry(
-                            role: .deco,
-                            tankSize: .liters12,
-                            gas: GasMix(name: "Deco", role: .deco, oxygen: 0.50, helium: 0, maxPPO2: 1.6)
-                        )
-                        store.input.plannerCylinders.append(entry)
-                        store.normalizeNewCylinderSwitchDepth(cylinderID: entry.id)
-                    } label: {
-                        Text(DIRIOSLocalizer.string("planner.cylinder.add_deco"))
-                            .font(.callout.weight(.semibold))
-                            .foregroundStyle(DIRTheme.cyan)
+                    decoDecompressionGasToggleSection
+                    if store.input.decoGasPlanningEnabled {
+                        Text(DIRIOSLocalizer.string("planner.deco.decompression_gas.description"))
+                            .font(.caption2)
+                            .foregroundStyle(DIRTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                        ForEach(visibleDecoGasCylinders) { entry in
+                            if let index = store.input.plannerCylinders.firstIndex(where: { $0.id == entry.id }) {
+                                plannerCylinderEditor(at: index)
+                            }
+                        }
+                    } else {
+                        Text(DIRIOSLocalizer.string("planner.deco.decompression_gas.off_note"))
+                            .font(.caption2)
+                            .foregroundStyle(DIRTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    .buttonStyle(.plain)
-                    Divider().overlay(DIRTheme.hairline)
+                } else {
+                    ForEach(visiblePlannerCylinders) { entry in
+                        if let index = store.input.plannerCylinders.firstIndex(where: { $0.id == entry.id }) {
+                            plannerCylinderEditor(at: index)
+                        }
+                    }
                 }
                 if store.mode == .technical {
                     addTechnicalCylinderButtons
@@ -644,6 +661,40 @@ struct PlannerView: View {
                 }
             }
         }
+    }
+
+    private var decoDecompressionGasToggleSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Divider().overlay(DIRTheme.hairline)
+            Toggle(isOn: decoGasEnabledBinding) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(DIRIOSLocalizer.string("planner.deco.decompression_gas.toggle"))
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(.white)
+                    Text(DIRIOSLocalizer.string("planner.deco.decompression_gas.title"))
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.muted)
+                }
+            }
+            .tint(DIRTheme.cyan)
+        }
+        .padding(.vertical, 4)
+    }
+
+    private var decoGasEnabledBinding: Binding<Bool> {
+        Binding(
+            get: { store.input.decoGasPlanningEnabled },
+            set: { enabled in
+                store.input.isDecoGasEnabled = enabled
+                if enabled {
+                    store.input.ensureDefaultDecoGasIfNeeded()
+                    if let deco = store.input.plannerCylinders.first(where: { $0.role == .deco }) {
+                        store.normalizeNewCylinderSwitchDepth(cylinderID: deco.id)
+                    }
+                }
+                store.refreshDerivedPlanningPreview()
+            }
+        )
     }
 
     @ViewBuilder
@@ -682,6 +733,7 @@ struct PlannerView: View {
             PlannerCylinderGasEditorView(
                 entry: $store.input.plannerCylinders[index],
                 cylinderNumber: cylinderDisplayNumber(for: entry),
+                sectionTitle: cylinderSectionTitle(for: entry),
                 plannerMode: store.mode,
                 allowedMixKinds: PlannerModePolicy.allowedMixKinds(for: store.mode),
                 unitPreference: unitPreference,
@@ -713,6 +765,18 @@ struct PlannerView: View {
     private func cylinderDisplayNumber(for entry: PlannerCylinderEntry) -> Int {
         let visible = visiblePlannerCylinders
         return (visible.firstIndex(where: { $0.id == entry.id }) ?? 0) + 1
+    }
+
+    private func cylinderSectionTitle(for entry: PlannerCylinderEntry) -> String? {
+        guard store.mode == .deco else { return nil }
+        switch entry.role {
+        case .bottom:
+            return DIRIOSLocalizer.string("planner.deco.back_gas.title")
+        case .deco:
+            return DIRIOSLocalizer.string("planner.deco.decompression_gas.title")
+        default:
+            return nil
+        }
     }
 
     private var technicalAnalysisCard: some View {

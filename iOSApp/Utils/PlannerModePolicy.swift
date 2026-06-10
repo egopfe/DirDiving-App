@@ -325,11 +325,37 @@ enum PlannerModePolicy {
 
     private static func projectDecoInput(_ input: GasPlanInput) -> GasPlanInput {
         var projected = input
-        let bottom = projected.plannerCylinders.filter { $0.role == .bottom }
-        let deco = projected.plannerCylinders
-            .filter { $0.role == .deco }
-            .sorted { $0.switchDepthMeters > $1.switchDepthMeters }
-        projected.plannerCylinders = bottom + Array(deco.prefix(1))
+        projected.ensurePlannerCylindersFromLegacy()
+
+        var bottomEntry = projected.plannerCylinders.first(where: { $0.role == .bottom })
+            ?? PlannerCylinderEntry(role: .bottom, gas: projected.bottomGas)
+        bottomEntry.role = .bottom
+        bottomEntry.gas.role = .bottom
+
+        var activeCylinders = [bottomEntry]
+
+        if projected.decoGasPlanningEnabled {
+            let decoCandidates = projected.plannerCylinders
+                .filter { $0.role == .deco }
+                .sorted { $0.switchDepthMeters > $1.switchDepthMeters }
+            if let decoEntry = decoCandidates.first {
+                var normalized = decoEntry
+                normalized.role = .deco
+                normalized.gas.role = .deco
+                activeCylinders.append(normalized)
+            } else {
+                activeCylinders.append(
+                    PlannerCylinderEntry(
+                        role: .deco,
+                        tankSize: .liters12,
+                        gas: projected.decoGas1,
+                        switchDepthMeters: 21
+                    )
+                )
+            }
+        }
+
+        projected.plannerCylinders = activeCylinders
         if projected.gfLow >= projected.gfHigh {
             applyGFPreset(.standard, to: &projected)
         }
@@ -361,15 +387,14 @@ enum PlannerModePolicy {
 
     private static func validateDecoDraft(_ draft: GasPlanInput) -> PlannerValidationResult {
         var result = PlannerValidationResult()
-        var working = draft
-        working.ensurePlannerCylindersFromLegacy()
+        let active = activePlanInput(from: draft, mode: .deco)
 
-        let bottomGas = working.plannerCylinders.first(where: { $0.role == .bottom })?.gas ?? working.bottomGas
+        let bottomGas = active.plannerCylinders.first(where: { $0.role == .bottom })?.gas ?? active.bottomGas
         if bottomGas.mixKind == .trimix || bottomGas.helium > 0.001 {
             result.add(.unsupportedTrimix, message: DIRIOSLocalizer.string("planner.deco.trimix_technical_only"))
         }
 
-        for gas in working.plannerCylinders.filter({ $0.role == .bottom || $0.role == .deco }).map(\.gas) where gas.mixKind == .trimix {
+        for gas in active.plannerCylinders.map(\.gas) where gas.mixKind == .trimix {
             result.add(.unsupportedTrimix, message: DIRIOSLocalizer.string("planner.deco.trimix_technical_only"))
         }
 

@@ -547,6 +547,11 @@
 "planner.gf.preset.aggressive.compact_format" = "Aggr. GF %@";
 "planner.gf.preset.explanation_format" = "GF più bassi sono più conservativi; GF più alti sono più aggressivi. Preset attuale: GF %@.";
 "planner.gf.preset.accessibility_format" = "%@, Gradient Factor %@";
+"planner.deco.back_gas.title" = "Back Gas";
+"planner.deco.decompression_gas.title" = "Gas Decompressivo";
+"planner.deco.decompression_gas.toggle" = "Usa gas decompressivo";
+"planner.deco.decompression_gas.description" = "Aggiungi un gas e una bombola dedicati alle tappe di decompressione.";
+"planner.deco.decompression_gas.off_note" = "La pianificazione userà solo il Back Gas.";
 "planner.cylinder.add_deco" = "Aggiungi gas deco";
 "planner.profile.title" = "Profilo Immersione";
 "planner.field.max_depth" = "Profondità Massima";
