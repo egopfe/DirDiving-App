@@ -10,7 +10,7 @@ struct CCRChecklistImportSheet: View {
             DIRScreenContainer {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text(String(localized: "ccr.checklist.import.disclaimer"))
+                        Text(DIRIOSLocalizer.string("ccr.checklist.import.disclaimer"))
                             .font(.caption2)
                             .foregroundStyle(DIRTheme.yellow)
                             .fixedSize(horizontal: false, vertical: true)
@@ -49,14 +49,14 @@ struct CCRChecklistImportSheet: View {
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(String(localized: "checklist_planner.sync.cancel")) { onCancel() }
+                    Button(DIRIOSLocalizer.string("checklist_planner.sync.cancel")) { onCancel() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(String(localized: "checklist_planner.sync.confirm")) { onConfirm() }
+                    Button(DIRIOSLocalizer.string("checklist_planner.sync.confirm")) { onConfirm() }
                         .disabled(!canConfirm)
                 }
             }
-            .navigationTitle(String(localized: "checklist_planner.sync.choose_import"))
+            .navigationTitle(DIRIOSLocalizer.string("checklist_planner.sync.choose_import"))
             .navigationBarTitleDisplayMode(.inline)
         }
     }
@@ -70,12 +70,12 @@ struct CCRChecklistImportSheet: View {
 
     private func duplicatePicker(action: Binding<ChecklistPlannerDuplicateAction>) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(String(localized: "checklist_planner.sync.item_exists"))
+            Text(DIRIOSLocalizer.string("checklist_planner.sync.item_exists"))
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(DIRTheme.yellow)
             Picker("", selection: action) {
-                Text(String(localized: "checklist_planner.sync.replace")).tag(ChecklistPlannerDuplicateAction.replace)
-                Text(String(localized: "checklist_planner.sync.skip")).tag(ChecklistPlannerDuplicateAction.skip)
+                Text(DIRIOSLocalizer.string("checklist_planner.sync.replace")).tag(ChecklistPlannerDuplicateAction.replace)
+                Text(DIRIOSLocalizer.string("checklist_planner.sync.skip")).tag(ChecklistPlannerDuplicateAction.skip)
             }
             .pickerStyle(.segmented)
             .labelsHidden()

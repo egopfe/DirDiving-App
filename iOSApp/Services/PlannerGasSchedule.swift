@@ -100,12 +100,12 @@ enum PlannerGasSchedule {
         let travels = sortedTravelCylinders(from: input)
         if !travels.isEmpty {
             let travelSummary = travels.map { "\($0.gas.label) @ \(Int($0.switchDepthMeters))m" }.joined(separator: ", ")
-            lines.append(String(format: String(localized: "planner.schedule.travel"), travelSummary))
+            lines.append(DIRIOSLocalizer.formatted("planner.schedule.travel", travelSummary))
         }
         let bottomSwitch = Int(bottomGasSwitchDepthMeters(from: input))
         lines.append(
             String(
-                format: String(localized: "planner.schedule.back_gas"),
+                format: DIRIOSLocalizer.string("planner.schedule.back_gas"),
                 bottomGas(from: input).label,
                 bottomSwitch
             )
@@ -113,12 +113,12 @@ enum PlannerGasSchedule {
         let decos = sortedDecoCylinders(from: input)
         if !decos.isEmpty {
             let decoSummary = decos.map { "\($0.gas.label) @ \(Int($0.switchDepthMeters))m" }.joined(separator: ", ")
-            lines.append(String(format: String(localized: "planner.schedule.deco"), decoSummary))
+            lines.append(DIRIOSLocalizer.formatted("planner.schedule.deco", decoSummary))
         }
         for bailout in bailoutCylinders(from: input) {
             lines.append(
                 String(
-                    format: String(localized: "planner.schedule.bailout"),
+                    format: DIRIOSLocalizer.string("planner.schedule.bailout"),
                     bailout.gas.label,
                     Int(min(bailout.switchDepthMeters, bailout.modMeters(environment: resolvedEnvironment)))
                 )
@@ -148,7 +148,7 @@ enum PlannerGasSchedule {
         let isLowOxygenFraction = bottom.oxygen <= 0.18 + 1e-6
         let isHypoxicAtMaxDepth = ppO2AtMax < BuhlmannConstants.minBreathablePPO2Bar + 0.02
         if isTrimixWithTravel && (isLowOxygenFraction || isHypoxicAtMaxDepth) {
-            return [String(localized: "planner.limitation.travel_bottom_switch_simplified")]
+            return [DIRIOSLocalizer.string("planner.limitation.travel_bottom_switch_simplified")]
         }
         return []
     }
@@ -158,7 +158,7 @@ enum PlannerGasSchedule {
         let resolvedEnvironment = environment ?? input.plannerEnvironment
         return bailoutCylinders(from: input).map { bailout in
             String(
-                format: String(localized: "planner.bailout.engine_excluded"),
+                format: DIRIOSLocalizer.string("planner.bailout.engine_excluded"),
                 bailout.gas.label,
                 Int(min(bailout.switchDepthMeters, bailout.modMeters(environment: resolvedEnvironment)))
             )

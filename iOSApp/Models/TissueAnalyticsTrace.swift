@@ -10,30 +10,30 @@ enum TissueAnalyticsSource: String, Codable, Hashable {
     var localizedTitle: String {
         switch self {
         case .planned:
-            return String(localized: "tissue_analytics.source.planned")
+            return DIRIOSLocalizer.string("tissue_analytics.source.planned")
         case .ccrPlanned:
-            return String(localized: "tissue_analytics.source.ccr_planned")
+            return DIRIOSLocalizer.string("tissue_analytics.source.ccr_planned")
         case .recorded:
-            return String(localized: "tissue_analytics.source.recorded")
+            return DIRIOSLocalizer.string("tissue_analytics.source.recorded")
         case .simulated:
-            return String(localized: "tissue_analytics.source.simulated")
+            return DIRIOSLocalizer.string("tissue_analytics.source.simulated")
         case .insufficientData:
-            return String(localized: "tissue_analytics.source.insufficient")
+            return DIRIOSLocalizer.string("tissue_analytics.source.insufficient")
         }
     }
 
     var localizedFootnote: String? {
         switch self {
         case .planned:
-            return String(localized: "tissue_analytics.source.planned_footnote")
+            return DIRIOSLocalizer.string("tissue_analytics.source.planned_footnote")
         case .ccrPlanned:
-            return String(localized: "tissue_analytics.source.ccr_planned_footnote")
+            return DIRIOSLocalizer.string("tissue_analytics.source.ccr_planned_footnote")
         case .recorded:
-            return String(localized: "tissue_analytics.source.recorded_footnote")
+            return DIRIOSLocalizer.string("tissue_analytics.source.recorded_footnote")
         case .simulated:
-            return String(localized: "tissue_analytics.source.simulated_footnote")
+            return DIRIOSLocalizer.string("tissue_analytics.source.simulated_footnote")
         case .insufficientData:
-            return String(localized: "tissue_analytics.source.insufficient_footnote")
+            return DIRIOSLocalizer.string("tissue_analytics.source.insufficient_footnote")
         }
     }
 }
@@ -107,11 +107,11 @@ enum TissueProfileTab: String, CaseIterable, Identifiable {
 
     var localizedTitle: String {
         switch self {
-        case .summary: return String(localized: "tissue_analytics.tab.summary")
-        case .profile: return String(localized: "tissue_analytics.tab.profile")
-        case .tissues: return String(localized: "tissue_analytics.tab.tissues")
-        case .gas: return String(localized: "tissue_analytics.tab.gas")
-        case .deco: return String(localized: "tissue_analytics.tab.deco")
+        case .summary: return DIRIOSLocalizer.string("tissue_analytics.tab.summary")
+        case .profile: return DIRIOSLocalizer.string("tissue_analytics.tab.profile")
+        case .tissues: return DIRIOSLocalizer.string("tissue_analytics.tab.tissues")
+        case .gas: return DIRIOSLocalizer.string("tissue_analytics.tab.gas")
+        case .deco: return DIRIOSLocalizer.string("tissue_analytics.tab.deco")
         }
     }
 }

@@ -37,28 +37,28 @@ enum PlannerMode: String, CaseIterable, Identifiable, Codable {
 
     var localizedTabTitle: String {
         switch self {
-        case .base: return String(localized: "planner.mode.base")
-        case .deco: return String(localized: "planner.mode.deco")
-        case .technical: return String(localized: "planner.mode.technical")
-        case .ccr: return String(localized: "planner.mode.ccr")
+        case .base: return DIRIOSLocalizer.string("planner.mode.base")
+        case .deco: return DIRIOSLocalizer.string("planner.mode.deco")
+        case .technical: return DIRIOSLocalizer.string("planner.mode.technical")
+        case .ccr: return DIRIOSLocalizer.string("planner.mode.ccr")
         }
     }
 
     var localizedDescription: String {
         switch self {
-        case .base: return String(localized: "planner.mode.base.description")
-        case .deco: return String(localized: "planner.mode.deco.description")
-        case .technical: return String(localized: "planner.mode.technical.description")
-        case .ccr: return String(localized: "planner.mode.ccr.description")
+        case .base: return DIRIOSLocalizer.string("planner.mode.base.description")
+        case .deco: return DIRIOSLocalizer.string("planner.mode.deco.description")
+        case .technical: return DIRIOSLocalizer.string("planner.mode.technical.description")
+        case .ccr: return DIRIOSLocalizer.string("planner.mode.ccr.description")
         }
     }
 
     var localizedResultTitle: String {
         switch self {
-        case .base: return String(localized: "planner.result.base.title")
-        case .deco: return String(localized: "planner.result.deco.title")
-        case .technical: return String(localized: "planner.result.technical.title")
-        case .ccr: return String(localized: "planner.result.ccr.title")
+        case .base: return DIRIOSLocalizer.string("planner.result.base.title")
+        case .deco: return DIRIOSLocalizer.string("planner.result.deco.title")
+        case .technical: return DIRIOSLocalizer.string("planner.result.technical.title")
+        case .ccr: return DIRIOSLocalizer.string("planner.result.ccr.title")
         }
     }
 
@@ -83,12 +83,12 @@ enum GasRole: String, CaseIterable, Identifiable, Codable {
 
     var localizedTitle: String {
         switch self {
-        case .travel: return String(localized: "gas.role.travel")
-        case .bottom: return String(localized: "gas.role.bottom")
-        case .deco: return String(localized: "gas.role.deco")
-        case .bailout: return String(localized: "gas.role.bailout")
-        case .ccrDiluent: return String(localized: "gas.role.ccr_diluent")
-        case .ccrBailout: return String(localized: "gas.role.ccr_bailout")
+        case .travel: return DIRIOSLocalizer.string("gas.role.travel")
+        case .bottom: return DIRIOSLocalizer.string("gas.role.bottom")
+        case .deco: return DIRIOSLocalizer.string("gas.role.deco")
+        case .bailout: return DIRIOSLocalizer.string("gas.role.bailout")
+        case .ccrDiluent: return DIRIOSLocalizer.string("gas.role.ccr_diluent")
+        case .ccrBailout: return DIRIOSLocalizer.string("gas.role.ccr_bailout")
         }
     }
 
@@ -119,20 +119,20 @@ enum GasMixKind: String, CaseIterable, Identifiable, Codable {
 
     var localizedTitle: String {
         switch self {
-        case .air: return String(localized: "gas.mix.air")
-        case .ean: return String(localized: "gas.mix.ean")
-        case .trimix: return String(localized: "gas.mix.trimix")
-        case .oxygen: return String(localized: "gas.mix.oxygen")
+        case .air: return DIRIOSLocalizer.string("gas.mix.air")
+        case .ean: return DIRIOSLocalizer.string("gas.mix.ean")
+        case .trimix: return DIRIOSLocalizer.string("gas.mix.trimix")
+        case .oxygen: return DIRIOSLocalizer.string("gas.mix.oxygen")
         }
     }
 
     /// Short label for compact planner rows (e.g. TX, O₂).
     var plannerPickerTitle: String {
         switch self {
-        case .air: return String(localized: "gas.mix.air")
-        case .ean: return String(localized: "gas.mix.ean")
-        case .trimix: return String(localized: "gas.mix.trimix.short")
-        case .oxygen: return String(localized: "gas.mix.oxygen.short")
+        case .air: return DIRIOSLocalizer.string("gas.mix.air")
+        case .ean: return DIRIOSLocalizer.string("gas.mix.ean")
+        case .trimix: return DIRIOSLocalizer.string("gas.mix.trimix.short")
+        case .oxygen: return DIRIOSLocalizer.string("gas.mix.oxygen.short")
         }
     }
 }

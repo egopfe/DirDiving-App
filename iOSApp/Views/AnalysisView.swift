@@ -31,21 +31,21 @@ struct AnalysisView: View {
                         } else {
                             analysisHero
                             demoAnalysisToggle
-                            DIRCard(String(localized: "analysis.card.advanced"), icon: "chart.line.uptrend.xyaxis", accent: DIRTheme.cyan) {
+                            DIRCard(DIRIOSLocalizer.string("analysis.card.advanced"), icon: "chart.line.uptrend.xyaxis", accent: DIRTheme.cyan) {
                                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 0) {
-                                    DIRMetricTile(title: String(localized: "analysis.metric.dives"), value: "\(analysisSummary.diveCount)", color: DIRTheme.cyan)
-                                    DIRMetricTile(title: String(localized: "analysis.metric.max_depth"), measurement: Formatters.depth(analysisSummary.maxDepthMeters, units: unitPreference), color: DIRTheme.yellow)
-                                    DIRMetricTile(title: String(localized: "analysis.metric.total_runtime"), value: Formatters.zero(analysisSummary.totalRuntimeMinutes), unit: String(localized: "common.unit.min"))
+                                    DIRMetricTile(title: DIRIOSLocalizer.string("analysis.metric.dives"), value: "\(analysisSummary.diveCount)", color: DIRTheme.cyan)
+                                    DIRMetricTile(title: DIRIOSLocalizer.string("analysis.metric.max_depth"), measurement: Formatters.depth(analysisSummary.maxDepthMeters, units: unitPreference), color: DIRTheme.yellow)
+                                    DIRMetricTile(title: DIRIOSLocalizer.string("analysis.metric.total_runtime"), value: Formatters.zero(analysisSummary.totalRuntimeMinutes), unit: DIRIOSLocalizer.string("common.unit.min"))
                                     avgTemperatureTile
                                     avgSACTile
-                                    DIRMetricTile(title: String(localized: "analysis.metric.gps_routes"), value: "\(RouteSummaryService.summaries(from: analysisSessions).count)", color: DIRTheme.cyan)
+                                    DIRMetricTile(title: DIRIOSLocalizer.string("analysis.metric.gps_routes"), value: "\(RouteSummaryService.summaries(from: analysisSessions).count)", color: DIRTheme.cyan)
                                 }
                             }
-                            DIRCard(String(localized: "analysis.card.max_depth"), icon: "chart.xyaxis.line", accent: DIRTheme.cyan) {
+                            DIRCard(DIRIOSLocalizer.string("analysis.card.max_depth"), icon: "chart.xyaxis.line", accent: DIRTheme.cyan) {
                                 Chart(analysisSessions) { session in
                                     BarMark(
-                                        x: .value(String(localized: "chart.axis.date"), session.startDate, unit: .day),
-                                        y: .value(String(localized: "chart.axis.max"), Formatters.depthValue(session.maxDepthMeters, units: unitPreference))
+                                        x: .value(DIRIOSLocalizer.string("chart.axis.date"), session.startDate, unit: .day),
+                                        y: .value(DIRIOSLocalizer.string("chart.axis.max"), Formatters.depthValue(session.maxDepthMeters, units: unitPreference))
                                     )
                                     .foregroundStyle(
                                         LinearGradient(colors: [DIRTheme.cyan, DIRTheme.green], startPoint: .top, endPoint: .bottom)
@@ -67,10 +67,10 @@ struct AnalysisView: View {
                                 }
                                 .frame(minHeight: 180, maxHeight: 320)
                                 .accessibilityElement(children: .ignore)
-                                .accessibilityLabel(String(localized: "analysis.chart.max_depth_a11y"))
+                                .accessibilityLabel(DIRIOSLocalizer.string("analysis.chart.max_depth_a11y"))
                                 .accessibilityValue(
                                     String(
-                                        format: String(localized: "analysis.chart.max_depth_a11y_value"),
+                                        format: DIRIOSLocalizer.string("analysis.chart.max_depth_a11y_value"),
                                         analysisSessions.count,
                                         Formatters.depth(analysisSessions.map(\.maxDepthMeters).max() ?? 0, units: unitPreference).text
                                     )
@@ -92,10 +92,10 @@ struct AnalysisView: View {
     private var analysisHero: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 6) {
-                Text(String(localized: "analysis.hero.title"))
+                Text(DIRIOSLocalizer.string("analysis.hero.title"))
                     .font(.headline.weight(.semibold))
                     .foregroundStyle(.white)
-                Text(String(localized: "analysis.hero.subtitle"))
+                Text(DIRIOSLocalizer.string("analysis.hero.subtitle"))
                     .font(.footnote)
                     .foregroundStyle(DIRTheme.muted)
             }
@@ -123,25 +123,25 @@ struct AnalysisView: View {
                     .frame(width: 46, height: 46)
                     .background(RoundedRectangle(cornerRadius: 12).fill(DIRTheme.cyan.opacity(0.12)))
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(String(localized: "analysis.empty.title"))
+                    Text(DIRIOSLocalizer.string("analysis.empty.title"))
                         .font(.headline.weight(.bold))
                         .foregroundStyle(.white)
-                    Text(String(localized: "analysis.empty.body"))
+                    Text(DIRIOSLocalizer.string("analysis.empty.body"))
                         .font(.caption)
                         .foregroundStyle(DIRTheme.muted)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            Text(String(localized: "analysis.empty.next_action"))
+            Text(DIRIOSLocalizer.string("analysis.empty.next_action"))
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(DIRTheme.cyan)
             CSVImportPanel()
             HStack(spacing: 10) {
-                emptyAction(String(localized: "analysis.empty.sync_watch"), "applewatch") {
+                emptyAction(DIRIOSLocalizer.string("analysis.empty.sync_watch"), "applewatch") {
                     watchSync.retryActivation(logStore: logStore)
-                    syncStatusMessage = String(localized: "analysis.empty.sync_requested")
+                    syncStatusMessage = DIRIOSLocalizer.string("analysis.empty.sync_requested")
                 }
-                emptyAction(String(localized: "analysis.empty.open_logbook"), "list.bullet.rectangle.portrait.fill") {
+                emptyAction(DIRIOSLocalizer.string("analysis.empty.open_logbook"), "list.bullet.rectangle.portrait.fill") {
                     navigation.selectedTab = .logbook
                 }
             }
@@ -177,18 +177,18 @@ struct AnalysisView: View {
     @ViewBuilder
     private var avgTemperatureTile: some View {
         if let avg = analysisSummary.averageWaterTemperatureCelsius {
-            DIRMetricTile(title: String(localized: "analysis.metric.avg_temp"), measurement: Formatters.temperature(avg, units: unitPreference))
+            DIRMetricTile(title: DIRIOSLocalizer.string("analysis.metric.avg_temp"), measurement: Formatters.temperature(avg, units: unitPreference))
         } else {
-            DIRMetricTile(title: String(localized: "analysis.metric.avg_temp"), value: "—", color: DIRTheme.yellow)
+            DIRMetricTile(title: DIRIOSLocalizer.string("analysis.metric.avg_temp"), value: "—", color: DIRTheme.yellow)
         }
     }
 
     @ViewBuilder
     private var avgSACTile: some View {
         if let avg = analysisSummary.averageSACLitersPerMinute {
-            DIRMetricTile(title: String(localized: "analysis.metric.avg_sac"), measurement: Formatters.sac(avg, units: unitPreference), color: DIRTheme.green)
+            DIRMetricTile(title: DIRIOSLocalizer.string("analysis.metric.avg_sac"), measurement: Formatters.sac(avg, units: unitPreference), color: DIRTheme.green)
         } else {
-            DIRMetricTile(title: String(localized: "analysis.metric.avg_sac"), value: "—", color: DIRTheme.yellow)
+            DIRMetricTile(title: DIRIOSLocalizer.string("analysis.metric.avg_sac"), value: "—", color: DIRTheme.yellow)
         }
     }
 
@@ -199,10 +199,10 @@ struct AnalysisView: View {
     private var demoAnalysisToggle: some View {
         Toggle(isOn: $includeDemoInAnalysis) {
             VStack(alignment: .leading, spacing: 4) {
-                Text(String(localized: "analysis.demo.include_toggle"))
+                Text(DIRIOSLocalizer.string("analysis.demo.include_toggle"))
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.white)
-                Text(String(localized: "analysis.demo.include_hint"))
+                Text(DIRIOSLocalizer.string("analysis.demo.include_hint"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)
             }
@@ -218,15 +218,15 @@ struct AnalysisView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 7) {
-            Text(String(localized: "analysis.title"))
+            Text(DIRIOSLocalizer.string("analysis.title"))
                 .dirScreenTitleStyle()
-            Text(String(localized: "analysis.subtitle"))
+            Text(DIRIOSLocalizer.string("analysis.subtitle"))
                 .dirScreenSubtitleStyle()
         }
     }
 
     private var gasMixSummary: some View {
-        DIRCard(String(localized: "analysis.card.gas_summary"), icon: "circle.hexagongrid", accent: DIRTheme.green) {
+        DIRCard(DIRIOSLocalizer.string("analysis.card.gas_summary"), icon: "circle.hexagongrid", accent: DIRTheme.green) {
             VStack(spacing: 8) {
                 ForEach(DiveGasLabel.allCases) { gas in
                     let count = analysisSessions.filter { $0.gasLabel == gas }.count
@@ -246,18 +246,18 @@ struct AnalysisView: View {
         let bearingTitle: String = {
             switch aggregate.bearingScope {
             case .none:
-                return String(localized: "analysis.metric.bearing")
+                return DIRIOSLocalizer.string("analysis.metric.bearing")
             case .singleRoute:
-                return String(localized: "analysis.metric.bearing")
+                return DIRIOSLocalizer.string("analysis.metric.bearing")
             case .firstOfMany(let count):
-                return String(format: String(localized: "analysis.metric.bearing_first_of_many"), count)
+                return DIRIOSLocalizer.formatted("analysis.metric.bearing_first_of_many", count)
             }
         }()
-        return DIRCard(String(localized: "analysis.card.route_summary"), icon: "map", accent: DIRTheme.cyan) {
+        return DIRCard(DIRIOSLocalizer.string("analysis.card.route_summary"), icon: "map", accent: DIRTheme.cyan) {
             HStack(spacing: 0) {
-                DIRMetricTile(title: String(localized: "analysis.metric.routes"), value: "\(aggregate.routeCount)", color: DIRTheme.cyan)
+                DIRMetricTile(title: DIRIOSLocalizer.string("analysis.metric.routes"), value: "\(aggregate.routeCount)", color: DIRTheme.cyan)
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: String(localized: "analysis.metric.distance"), measurement: Formatters.distance(aggregate.totalDistanceMeters, units: unitPreference, prefersLargeUnit: true), color: DIRTheme.green)
+                DIRMetricTile(title: DIRIOSLocalizer.string("analysis.metric.distance"), measurement: Formatters.distance(aggregate.totalDistanceMeters, units: unitPreference, prefersLargeUnit: true), color: DIRTheme.green)
                 Divider().overlay(DIRTheme.hairline)
                 DIRMetricTile(
                     title: bearingTitle,

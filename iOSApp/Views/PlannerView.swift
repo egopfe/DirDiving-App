@@ -54,13 +54,13 @@ struct PlannerView: View {
                     ScrollView(showsIndicators: false) {
                         VStack(alignment: .leading, spacing: 16) {
                             VStack(alignment: .leading, spacing: 7) {
-                                Text(String(localized: "Planner"))
+                                Text(DIRIOSLocalizer.string("Planner"))
                                     .dirScreenTitleStyle()
-                                Text(String(localized: "planner.header.subtitle"))
+                                Text(DIRIOSLocalizer.string("planner.header.subtitle"))
                                     .dirScreenSubtitleStyle()
                             }
                             plannerSafetyAcknowledgment
-                            DIRWarningBox(text: String(localized: "planner.reference_only.warning"))
+                            DIRWarningBox(text: DIRIOSLocalizer.string("planner.reference_only.warning"))
                             plannerReferenceDetailsSection
                             Group {
                                 currentModeBanner
@@ -114,7 +114,7 @@ struct PlannerView: View {
                     Button {
                         store.returnToPlannerModeSelection()
                     } label: {
-                        Label(String(localized: "planner.mode_selection.back"), systemImage: "chevron.left")
+                        Label(DIRIOSLocalizer.string("planner.mode_selection.back"), systemImage: "chevron.left")
                             .foregroundStyle(DIRTheme.cyan)
                     }
                 }
@@ -125,34 +125,34 @@ struct PlannerView: View {
                         Image(systemName: "square.and.arrow.up")
                             .foregroundStyle(DIRTheme.cyan)
                     }
-                    .accessibilityLabel(Text(String(localized: "pdf.export.share.a11y")))
+                    .accessibilityLabel(Text(DIRIOSLocalizer.string("pdf.export.share.a11y")))
                 }
             }
             .toolbarBackground(.hidden, for: .navigationBar)
             .confirmationDialog(
-                String(localized: "pdf.export.share.a11y"),
+                DIRIOSLocalizer.string("pdf.export.share.a11y"),
                 isPresented: $showPlannerPDFMenu,
                 titleVisibility: .visible
             ) {
-                Button(String(localized: "pdf.export.share.plan")) {
+                Button(DIRIOSLocalizer.string("pdf.export.share.plan")) {
                     sharePlannerPDF(kind: .plan)
                 }
-                Button(String(localized: "pdf.export.share.briefing")) {
+                Button(DIRIOSLocalizer.string("pdf.export.share.briefing")) {
                     sharePlannerPDF(kind: .briefing)
                 }
-                Button(String(localized: "pdf.export.share.dive_pack")) {
+                Button(DIRIOSLocalizer.string("pdf.export.share.dive_pack")) {
                     sharePlannerPDF(kind: .divePack)
                 }
-                Button(String(localized: "pdf.export.cancel"), role: .cancel) {}
+                Button(DIRIOSLocalizer.string("pdf.export.cancel"), role: .cancel) {}
             }
             .sheet(item: $shareablePDF) { item in
                 ShareSheetView(activityItems: [item.url])
             }
-            .alert(String(localized: "pdf.export.error.title"), isPresented: Binding(
+            .alert(DIRIOSLocalizer.string("pdf.export.error.title"), isPresented: Binding(
                 get: { pdfExportAlertMessage != nil },
                 set: { if !$0 { pdfExportAlertMessage = nil } }
             )) {
-                Button(String(localized: "common.ok"), role: .cancel) {}
+                Button(DIRIOSLocalizer.string("common.ok"), role: .cancel) {}
             } message: {
                 Text(pdfExportAlertMessage ?? "")
             }
@@ -165,28 +165,28 @@ struct PlannerView: View {
                 store.input.ensurePlannerCylindersFromLegacy()
                 store.refreshDerivedPlanningPreview()
             }
-            .alert(String(localized: "planner.reference.info.title"), isPresented: $showPlanningReferenceInfo) {
-                Button(String(localized: "common.ok"), role: .cancel) {}
+            .alert(DIRIOSLocalizer.string("planner.reference.info.title"), isPresented: $showPlanningReferenceInfo) {
+                Button(DIRIOSLocalizer.string("common.ok"), role: .cancel) {}
             } message: {
-                Text(String(localized: "planner.reference.info.message"))
+                Text(DIRIOSLocalizer.string("planner.reference.info.message"))
             }
-            .alert(String(localized: "planner.calculate.error.title"), isPresented: $showCalculateError) {
-                Button(String(localized: "common.ok"), role: .cancel) {}
+            .alert(DIRIOSLocalizer.string("planner.calculate.error.title"), isPresented: $showCalculateError) {
+                Button(DIRIOSLocalizer.string("common.ok"), role: .cancel) {}
             } message: {
                 Text(calculateErrorMessage)
             }
             .confirmationDialog(
-                String(localized: "checklist_planner.sync.import_prompt"),
+                DIRIOSLocalizer.string("checklist_planner.sync.import_prompt"),
                 isPresented: $showChecklistImportPrompt,
                 titleVisibility: .visible
             ) {
-                Button(String(localized: "checklist_planner.sync.import_all")) {
+                Button(DIRIOSLocalizer.string("checklist_planner.sync.import_all")) {
                     importAllFromChecklist()
                 }
-                Button(String(localized: "checklist_planner.sync.choose_import")) {
+                Button(DIRIOSLocalizer.string("checklist_planner.sync.choose_import")) {
                     openChecklistImportSheet()
                 }
-                Button(String(localized: "checklist_planner.sync.cancel"), role: .cancel) {}
+                Button(DIRIOSLocalizer.string("checklist_planner.sync.cancel"), role: .cancel) {}
             }
             .sheet(isPresented: $showChecklistImportSheet) {
                 ChecklistPlannerSyncSheet(
@@ -211,15 +211,15 @@ struct PlannerView: View {
     }
 
     private var decompressionMethodCard: some View {
-        DIRCard(String(localized: "planner.deco_method.header"), icon: "arrow.triangle.branch", accent: DIRTheme.cyan) {
+        DIRCard(DIRIOSLocalizer.string("planner.deco_method.header"), icon: "arrow.triangle.branch", accent: DIRTheme.cyan) {
             PlannerDecompressionMethodPicker(method: $store.decompressionMethod, mode: store.mode)
         }
     }
 
     private func salinityLabel(_ mode: SalinityMode) -> String {
         switch mode {
-        case .fresh: return String(localized: "salinity.fresh")
-        case .salt: return String(localized: "salinity.salt")
+        case .fresh: return DIRIOSLocalizer.string("salinity.fresh")
+        case .salt: return DIRIOSLocalizer.string("salinity.salt")
         }
     }
 
@@ -229,23 +229,23 @@ struct PlannerView: View {
     }
 
     private var profileCard: some View {
-        DIRCard(String(localized: "planner.profile.title"), icon: nil, accent: DIRTheme.cyan) {
+        DIRCard(DIRIOSLocalizer.string("planner.profile.title"), icon: nil, accent: DIRTheme.cyan) {
             VStack(spacing: 0) {
                 plannerDepthField(
-                    String(localized: "planner.field.max_depth"),
+                    DIRIOSLocalizer.string("planner.field.max_depth"),
                     meters: $store.input.plannedDepthMeters,
                     maxMeters: profileMaxDepthLimitMeters
                 )
                 if store.mode != .base {
                     Divider().overlay(DIRTheme.hairline)
                     plannerDepthField(
-                        String(localized: "planner.field.avg_depth"),
+                        DIRIOSLocalizer.string("planner.field.avg_depth"),
                         meters: $store.input.plannedAverageDepthMeters,
                         maxMeters: profileMaxAverageDepthLimitMeters
                     )
                     Divider().overlay(DIRTheme.hairline)
                     HStack(spacing: 8) {
-                        Text(String(localized: "planner.field.planning_reference"))
+                        Text(DIRIOSLocalizer.string("planner.field.planning_reference"))
                             .font(.callout)
                             .foregroundStyle(.white)
                         Button {
@@ -256,16 +256,16 @@ struct PlannerView: View {
                                 .foregroundStyle(DIRTheme.cyan)
                         }
                         .buttonStyle(.plain)
-                        .accessibilityLabel(String(localized: "planner.reference.info.title"))
+                        .accessibilityLabel(DIRIOSLocalizer.string("planner.reference.info.title"))
                         Spacer()
-                        Picker(String(localized: "planner.field.planning_reference"), selection: $store.input.planningDepthReference) {
-                            Text(String(localized: "planner.reference.max_depth")).tag(PlanningDepthReference.maximumDepth)
-                            Text(String(localized: "planner.reference.avg_depth")).tag(PlanningDepthReference.averageDepth)
+                        Picker(DIRIOSLocalizer.string("planner.field.planning_reference"), selection: $store.input.planningDepthReference) {
+                            Text(DIRIOSLocalizer.string("planner.reference.max_depth")).tag(PlanningDepthReference.maximumDepth)
+                            Text(DIRIOSLocalizer.string("planner.reference.avg_depth")).tag(PlanningDepthReference.averageDepth)
                         }
                         .labelsHidden()
                         .tint(DIRTheme.cyan)
                     }
-                    Text(String(localized: "planner.reference.helper"))
+                    Text(DIRIOSLocalizer.string("planner.reference.helper"))
                         .font(.caption2)
                         .foregroundStyle(DIRTheme.muted)
                         .fixedSize(horizontal: false, vertical: true)
@@ -273,27 +273,27 @@ struct PlannerView: View {
                 }
                 Divider().overlay(DIRTheme.hairline)
                 plannerField(
-                    String(localized: "planner.field.bottom_time"),
+                    DIRIOSLocalizer.string("planner.field.bottom_time"),
                     value: $store.input.plannedBottomMinutes,
                     unit: "min",
                     step: 1,
                     maxValue: profileMaxBottomMinutes
                 )
                 Divider().overlay(DIRTheme.hairline)
-                plannerTemperatureField(String(localized: "planner.field.temperature"), celsius: $store.input.waterTemperatureCelsius)
+                plannerTemperatureField(DIRIOSLocalizer.string("planner.field.temperature"), celsius: $store.input.waterTemperatureCelsius)
                 if store.mode == .technical {
                     Divider().overlay(DIRTheme.hairline)
-                    plannerDepthField(String(localized: "planner.field.altitude"), meters: $store.input.altitudeMeters, step: unitPreference == .metric ? 100 : 300)
+                    plannerDepthField(DIRIOSLocalizer.string("planner.field.altitude"), meters: $store.input.altitudeMeters, step: unitPreference == .metric ? 100 : 300)
                         .onChange(of: store.input.altitudeMeters) { _, _ in
                             store.clampAllSwitchDepthsToMOD()
                         }
                     Divider().overlay(DIRTheme.hairline)
                     HStack {
-                        Text(String(localized: "planner.field.salinity"))
+                        Text(DIRIOSLocalizer.string("planner.field.salinity"))
                             .font(.callout)
                             .foregroundStyle(.white)
                         Spacer()
-                        Picker(String(localized: "planner.field.salinity"), selection: $store.input.salinity) {
+                        Picker(DIRIOSLocalizer.string("planner.field.salinity"), selection: $store.input.salinity) {
                             ForEach(SalinityMode.allCases) { mode in
                                 Text(salinityLabel(mode)).tag(mode)
                             }
@@ -309,9 +309,9 @@ struct PlannerView: View {
                 }
                 if modePresentation.showsManualGFControls {
                     Divider().overlay(DIRTheme.hairline)
-                    plannerField(String(localized: "planner.field.gf_low"), value: $store.input.gfLow, unit: "%", step: 5)
+                    plannerField(DIRIOSLocalizer.string("planner.field.gf_low"), value: $store.input.gfLow, unit: "%", step: 5)
                     Divider().overlay(DIRTheme.hairline)
-                    plannerField(String(localized: "planner.field.gf_high"), value: $store.input.gfHigh, unit: "%", step: 5)
+                    plannerField(DIRIOSLocalizer.string("planner.field.gf_high"), value: $store.input.gfHigh, unit: "%", step: 5)
                 }
                 if modePresentation.showsGFPresets {
                     Divider().overlay(DIRTheme.hairline)
@@ -323,10 +323,10 @@ struct PlannerView: View {
 
     private var gfPresetRow: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(String(localized: "planner.field.gf_preset"))
+            Text(DIRIOSLocalizer.string("planner.field.gf_preset"))
                 .font(.callout)
                 .foregroundStyle(.white)
-            Picker(String(localized: "planner.field.gf_preset"), selection: gfPresetBinding) {
+            Picker(DIRIOSLocalizer.string("planner.field.gf_preset"), selection: gfPresetBinding) {
                 ForEach(PlannerGFPreset.allCases) { preset in
                     Text(preset.localizedTitle).tag(preset)
                 }
@@ -355,7 +355,7 @@ struct PlannerView: View {
                case .failure(let error) = PlannerEnvironment.make(altitudeMeters: store.input.altitudeMeters, salinity: store.input.salinity) {
                 let summary = PlannerUserFacingCopy.invalidEnvironmentSummary(for: store.input, error: error)
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(String(localized: "planner.environment.invalid.title"))
+                    Text(DIRIOSLocalizer.string("planner.environment.invalid.title"))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(DIRTheme.red)
                     Text(summary.statusMessage)
@@ -371,10 +371,10 @@ struct PlannerView: View {
                 }
                 .padding(.vertical, 10)
                 .accessibilityElement(children: .combine)
-                .accessibilityLabel(String(localized: "planner.environment.invalid.a11y"))
+                .accessibilityLabel(DIRIOSLocalizer.string("planner.environment.invalid.a11y"))
             } else if let summary = store.plan.environmentSummary {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(summary.isActive ? String(localized: "planner.environment.active.title") : String(localized: "planner.environment.default.title"))
+                    Text(summary.isActive ? DIRIOSLocalizer.string("planner.environment.active.title") : DIRIOSLocalizer.string("planner.environment.default.title"))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(summary.isActive ? DIRTheme.cyan : DIRTheme.muted)
                     Text(summary.statusMessage)
@@ -384,7 +384,7 @@ struct PlannerView: View {
                     if summary.isActive {
                         Text(
                             String(
-                                format: String(localized: "planner.environment.active.detail"),
+                                format: DIRIOSLocalizer.string("planner.environment.active.detail"),
                                 Formatters.one(summary.surfacePressureBar),
                                 Formatters.zero(summary.waterDensityKgPerM3)
                             )
@@ -402,46 +402,46 @@ struct PlannerView: View {
     }
 
     private var repetitivePlanningCard: some View {
-        DIRCard(String(localized: "planner.repetitive.title"), icon: "arrow.triangle.2.circlepath", accent: DIRTheme.yellow) {
+        DIRCard(DIRIOSLocalizer.string("planner.repetitive.title"), icon: "arrow.triangle.2.circlepath", accent: DIRTheme.yellow) {
             VStack(alignment: .leading, spacing: 10) {
                 Toggle(isOn: $store.repetitivePlanningEnabled) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(String(localized: "planner.repetitive.toggle"))
+                        Text(DIRIOSLocalizer.string("planner.repetitive.toggle"))
                             .font(.callout.weight(.semibold))
                             .foregroundStyle(.white)
-                        Text(String(localized: "planner.repetitive.toggle_hint"))
+                        Text(DIRIOSLocalizer.string("planner.repetitive.toggle_hint"))
                             .font(.caption2)
                             .foregroundStyle(DIRTheme.muted)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                 }
                 .tint(DIRTheme.cyan)
-                .accessibilityHint(String(localized: "planner.repetitive.toggle.a11y"))
+                .accessibilityHint(DIRIOSLocalizer.string("planner.repetitive.toggle.a11y"))
 
                 if store.repetitivePlanningEnabled {
                     Divider().overlay(DIRTheme.hairline)
                     plannerField(
-                        String(localized: "planner.repetitive.surface_interval"),
+                        DIRIOSLocalizer.string("planner.repetitive.surface_interval"),
                         value: $store.surfaceIntervalMinutes,
                         unit: "min",
                         step: 5
                     )
                     repetitiveSnapshotStatusView
                     if let context = store.plan.repetitiveContext, context.tissueStateApplied {
-                        DIRWarningBox(text: String(localized: "planner.repetitive.active_notice"))
+                        DIRWarningBox(text: DIRIOSLocalizer.string("planner.repetitive.active_notice"))
                     } else if let issue = store.plan.repetitiveContext?.snapshotIssue {
                         plannerStateWarning(issue.userFacingMessage)
                     }
-                    Text(String(localized: "planner.repetitive.reference_only"))
+                    Text(DIRIOSLocalizer.string("planner.repetitive.reference_only"))
                         .font(.caption2)
                         .foregroundStyle(DIRTheme.yellow)
                         .fixedSize(horizontal: false, vertical: true)
-                    Text(String(localized: "planner.repetitive.not_from_log"))
+                    Text(DIRIOSLocalizer.string("planner.repetitive.not_from_log"))
                         .font(.caption2)
                         .foregroundStyle(DIRTheme.muted)
                         .fixedSize(horizontal: false, vertical: true)
                 } else {
-                    Text(String(localized: "planner.repetitive.clean_dive"))
+                    Text(DIRIOSLocalizer.string("planner.repetitive.clean_dive"))
                         .font(.caption)
                         .foregroundStyle(DIRTheme.muted)
                         .fixedSize(horizontal: false, vertical: true)
@@ -458,28 +458,28 @@ struct PlannerView: View {
     }
 
     private var cnsDescentBottomWarningCard: some View {
-        DIRCard(String(localized: "planner.settings.cns_descent_bottom.title"), icon: "lungs.fill", accent: DIRTheme.cyan) {
+        DIRCard(DIRIOSLocalizer.string("planner.settings.cns_descent_bottom.title"), icon: "lungs.fill", accent: DIRTheme.cyan) {
             VStack(alignment: .leading, spacing: 10) {
                 Toggle(isOn: $cnsDescentBottomCheckEnabled) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(String(localized: "planner.settings.cns_descent_bottom.toggle"))
+                        Text(DIRIOSLocalizer.string("planner.settings.cns_descent_bottom.toggle"))
                             .font(.callout.weight(.semibold))
                             .foregroundStyle(.white)
-                        Text(String(localized: "planner.settings.cns_descent_bottom.toggle_hint"))
+                        Text(DIRIOSLocalizer.string("planner.settings.cns_descent_bottom.toggle_hint"))
                             .font(.caption2)
                             .foregroundStyle(DIRTheme.muted)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                 }
                 .tint(DIRTheme.cyan)
-                .accessibilityHint(String(localized: "planner.settings.cns_descent_bottom.toggle.a11y"))
+                .accessibilityHint(DIRIOSLocalizer.string("planner.settings.cns_descent_bottom.toggle.a11y"))
 
                 if cnsDescentBottomCheckEnabled {
                     Divider().overlay(DIRTheme.hairline)
                     cnsThresholdStepper
                 }
 
-                Text(String(localized: "planner.settings.cns_descent_bottom.reference_only"))
+                Text(DIRIOSLocalizer.string("planner.settings.cns_descent_bottom.reference_only"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.yellow)
                     .fixedSize(horizontal: false, vertical: true)
@@ -489,7 +489,7 @@ struct PlannerView: View {
 
     private var cnsThresholdStepper: some View {
         HStack {
-            Text(String(localized: "planner.settings.cns_descent_bottom.threshold"))
+            Text(DIRIOSLocalizer.string("planner.settings.cns_descent_bottom.threshold"))
                 .font(.callout)
                 .foregroundStyle(.white)
             Spacer()
@@ -521,7 +521,7 @@ struct PlannerView: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel(
             String(
-                format: String(localized: "planner.settings.cns_descent_bottom.threshold.a11y"),
+                format: DIRIOSLocalizer.string("planner.settings.cns_descent_bottom.threshold.a11y"),
                 cnsThresholdPercentBinding.wrappedValue
             )
         )
@@ -539,7 +539,7 @@ struct PlannerView: View {
     private var repetitiveSnapshotStatusView: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
-                Text(String(localized: "planner.repetitive.snapshot.status"))
+                Text(DIRIOSLocalizer.string("planner.repetitive.snapshot.status"))
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(DIRTheme.muted)
                 Spacer()
@@ -550,7 +550,7 @@ struct PlannerView: View {
             if let createdAt = store.lastTissueSnapshot?.createdAt {
                 Text(
                     String(
-                        format: String(localized: "planner.repetitive.snapshot.timestamp"),
+                        format: DIRIOSLocalizer.string("planner.repetitive.snapshot.timestamp"),
                         createdAt.formatted(date: .abbreviated, time: .shortened)
                     )
                 )
@@ -569,18 +569,18 @@ struct PlannerView: View {
 
     private var repetitiveSnapshotStatusLabel: String {
         guard store.repetitivePlanningEnabled else {
-            return String(localized: "planner.repetitive.snapshot.disabled")
+            return DIRIOSLocalizer.string("planner.repetitive.snapshot.disabled")
         }
         if store.plan.repetitiveContext?.tissueStateApplied == true {
-            return String(localized: "planner.repetitive.snapshot.loaded")
+            return DIRIOSLocalizer.string("planner.repetitive.snapshot.loaded")
         }
         if store.lastTissueSnapshot == nil {
-            return String(localized: "planner.repetitive.snapshot.missing")
+            return DIRIOSLocalizer.string("planner.repetitive.snapshot.missing")
         }
         if let issue = store.plan.repetitiveContext?.snapshotIssue {
             return issue.userFacingMessage.title
         }
-        return String(localized: "planner.repetitive.snapshot.unavailable")
+        return DIRIOSLocalizer.string("planner.repetitive.snapshot.unavailable")
     }
 
     private var repetitiveSnapshotStatusColor: Color {
@@ -613,13 +613,13 @@ struct PlannerView: View {
     }
 
     private var plannerCylindersCard: some View {
-        DIRCard(String(localized: "planner.card.cylinders"), icon: "fuelpump", accent: DIRTheme.cyan) {
+        DIRCard(DIRIOSLocalizer.string("planner.card.cylinders"), icon: "fuelpump", accent: DIRTheme.cyan) {
             VStack(spacing: 12) {
                 if !checklistGasItems.isEmpty {
                     Button {
                         showChecklistImportPrompt = true
                     } label: {
-                        Text(String(localized: "checklist_planner.sync.use_checklist"))
+                        Text(DIRIOSLocalizer.string("checklist_planner.sync.use_checklist"))
                             .font(.callout.weight(.semibold))
                             .foregroundStyle(DIRTheme.cyan)
                             .frame(maxWidth: .infinity)
@@ -645,7 +645,7 @@ struct PlannerView: View {
                         store.input.plannerCylinders.append(entry)
                         store.normalizeNewCylinderSwitchDepth(cylinderID: entry.id)
                     } label: {
-                        Text(String(localized: "planner.cylinder.add_deco"))
+                        Text(DIRIOSLocalizer.string("planner.cylinder.add_deco"))
                             .font(.callout.weight(.semibold))
                             .foregroundStyle(DIRTheme.cyan)
                     }
@@ -657,13 +657,13 @@ struct PlannerView: View {
                 }
                 if modePresentation.showsExtendedAnalysisTiles {
                     Divider().overlay(DIRTheme.hairline)
-                    Text(String(localized: "planner.section.consumption"))
+                    Text(DIRIOSLocalizer.string("planner.section.consumption"))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(DIRTheme.muted)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                    plannerField(String(localized: "planner.field.sac_rmv"), value: $store.input.sacLitersPerMinute, unit: "L/min", step: 1)
+                    plannerField(DIRIOSLocalizer.string("planner.field.sac_rmv"), value: $store.input.sacLitersPerMinute, unit: "L/min", step: 1)
                     Divider().overlay(DIRTheme.hairline)
-                    plannerField(String(localized: "planner.field.sac_emergency"), value: $store.input.emergencySacLitersPerMinute, unit: "L/min", step: 1)
+                    plannerField(DIRIOSLocalizer.string("planner.field.sac_emergency"), value: $store.input.emergencySacLitersPerMinute, unit: "L/min", step: 1)
                 }
             }
         }
@@ -680,7 +680,7 @@ struct PlannerView: View {
             store.input.plannerCylinders.append(entry)
             store.normalizeNewCylinderSwitchDepth(cylinderID: entry.id)
         } label: {
-            Text(String(localized: "planner.cylinder.add"))
+            Text(DIRIOSLocalizer.string("planner.cylinder.add"))
                 .font(.callout.weight(.semibold))
                 .foregroundStyle(DIRTheme.cyan)
         }
@@ -696,7 +696,7 @@ struct PlannerView: View {
                     Button(role: .destructive) {
                         store.input.plannerCylinders.removeAll { $0.id == entry.id }
                     } label: {
-                        Text(String(localized: "planner.cylinder.remove"))
+                        Text(DIRIOSLocalizer.string("planner.cylinder.remove"))
                             .font(.caption2.weight(.semibold))
                     }
                     .buttonStyle(.plain)
@@ -724,7 +724,7 @@ struct PlannerView: View {
                 }
             )
             if entry.gas.mixKind == .trimix {
-                Text(String(localized: "planner.gas.trimix_buhlmann_disclaimer"))
+                Text(DIRIOSLocalizer.string("planner.gas.trimix_buhlmann_disclaimer"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -739,14 +739,14 @@ struct PlannerView: View {
     }
 
     private var technicalAnalysisCard: some View {
-        DIRCard(String(localized: "planner.card.density_end"), icon: "gauge", accent: DIRTheme.yellow) {
+        DIRCard(DIRIOSLocalizer.string("planner.card.density_end"), icon: "gauge", accent: DIRTheme.yellow) {
             let endMeasurement = Formatters.depth(store.analysis.endMeters, units: unitPreference)
             let eadMeasurement = store.analysis.eadMeters.map { Formatters.depth($0, units: unitPreference) }
             VStack(spacing: 0) {
                 HStack(spacing: 0) {
                     DIRMetricTile(title: "PPO2", value: Formatters.one(store.analysis.ppO2AtDepth), color: warningColor(ppO2: store.analysis.ppO2AtDepth))
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: String(localized: "planner.metric.density"), value: Formatters.one(store.analysis.densityAtDepth), unit: "g/L", color: densityColor(store.analysis.densityRating))
+                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.density"), value: Formatters.one(store.analysis.densityAtDepth), unit: "g/L", color: densityColor(store.analysis.densityRating))
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: "END", value: endMeasurement.value, unit: endMeasurement.unit, color: store.analysis.endMeters > 30 ? DIRTheme.yellow : DIRTheme.green)
                 }
@@ -755,7 +755,7 @@ struct PlannerView: View {
                     DIRMetricTile(title: "EAD", value: eadMeasurement?.value ?? "-", unit: eadMeasurement?.unit, color: DIRTheme.cyan)
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(
-                        title: String(localized: "planner.metric.cns_preview"),
+                        title: DIRIOSLocalizer.string("planner.metric.cns_preview"),
                         value: store.analysis.cnsPercentDisplay,
                         unit: "%",
                         color: store.analysis.cnsPercent > 80 ? DIRTheme.red : DIRTheme.cyan
@@ -763,16 +763,16 @@ struct PlannerView: View {
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: "OTU", value: Formatters.zero(store.analysis.otu), color: DIRTheme.cyan)
                 }
-                plannerMutedFootnote(String(localized: "planner.metric.cns_preview.footnote"))
+                plannerMutedFootnote(DIRIOSLocalizer.string("planner.metric.cns_preview.footnote"))
                 Divider().overlay(DIRTheme.hairline)
-                Text(String(localized: "planner.oxygen_exposure.disclaimer"))
+                Text(DIRIOSLocalizer.string("planner.oxygen_exposure.disclaimer"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
-                    .accessibilityLabel(String(localized: "planner.oxygen_exposure.a11y"))
+                    .accessibilityLabel(DIRIOSLocalizer.string("planner.oxygen_exposure.a11y"))
                 Text(
                     String(
-                        format: String(localized: "planner.oxygen_exposure.daily_summary"),
+                        format: DIRIOSLocalizer.string("planner.oxygen_exposure.daily_summary"),
                         Formatters.zero(store.analysis.cnsDailyPercent),
                         Formatters.zero(store.analysis.otuDaily24h)
                     )
@@ -785,28 +785,28 @@ struct PlannerView: View {
     }
 
     private var reserveCard: some View {
-        DIRCard(String(localized: "planner.card.reserve"), icon: "gauge", accent: DIRTheme.green) {
+        DIRCard(DIRIOSLocalizer.string("planner.card.reserve"), icon: "gauge", accent: DIRTheme.green) {
             VStack(spacing: 0) {
                 HStack(spacing: 0) {
-                    DIRMetricTile(title: String(localized: "planner.metric.available"), value: Formatters.zero(store.input.availableGasLiters), unit: "L", color: DIRTheme.green)
+                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.available"), value: Formatters.zero(store.input.availableGasLiters), unit: "L", color: DIRTheme.green)
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: String(localized: "planner.metric.consumption"), value: Formatters.zero(store.analysis.consumptionLiters), unit: "L", color: DIRTheme.yellow)
+                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.consumption"), value: Formatters.zero(store.analysis.consumptionLiters), unit: "L", color: DIRTheme.yellow)
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: String(localized: "planner.metric.remaining"), value: Formatters.zero(store.analysis.remainingBar), unit: "bar", color: store.analysis.remainingLiters < store.analysis.rockBottomLiters ? DIRTheme.red : DIRTheme.green)
+                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.remaining"), value: Formatters.zero(store.analysis.remainingBar), unit: "bar", color: store.analysis.remainingLiters < store.analysis.rockBottomLiters ? DIRTheme.red : DIRTheme.green)
                 }
                 Divider().overlay(DIRTheme.hairline)
                 HStack(spacing: 0) {
-                    DIRMetricTile(title: String(localized: "planner.metric.rock_bottom"), value: Formatters.zero(store.analysis.minimumGasBar), unit: "bar", color: DIRTheme.orange)
+                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.rock_bottom"), value: Formatters.zero(store.analysis.minimumGasBar), unit: "bar", color: DIRTheme.orange)
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: String(localized: "planner.metric.turn_pressure"), value: Formatters.zero(store.analysis.turnPressureBar), unit: "bar", color: DIRTheme.cyan)
+                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.turn_pressure"), value: Formatters.zero(store.analysis.turnPressureBar), unit: "bar", color: DIRTheme.cyan)
                 }
                 if store.analysis.usesBottomPhaseConsumptionEstimate {
-                    Text(String(localized: "planner.gas.bottom_phase_estimate_footnote"))
+                    Text(DIRIOSLocalizer.string("planner.gas.bottom_phase_estimate_footnote"))
                         .font(.caption2)
                         .foregroundStyle(DIRTheme.muted)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                Text(String(localized: "planner.gas.turn_pressure_rule_footnote"))
+                Text(DIRIOSLocalizer.string("planner.gas.turn_pressure_rule_footnote"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -847,8 +847,8 @@ struct PlannerView: View {
         if store.mode == .technical {
             DIRWarningBox(
                 text: [
-                    String(localized: "planner.mode.technical.notice.title"),
-                    String(localized: "planner.mode.technical.notice.message")
+                    DIRIOSLocalizer.string("planner.mode.technical.notice.title"),
+                    DIRIOSLocalizer.string("planner.mode.technical.notice.message")
                 ].joined(separator: "\n"),
                 severity: .info
             )
@@ -858,16 +858,16 @@ struct PlannerView: View {
     @ViewBuilder
     private var plannerMODInputWarnings: some View {
         if !liveMODIssues.isEmpty {
-            DIRCard(String(localized: "planner.mod.validation.title"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
+            DIRCard(DIRIOSLocalizer.string("planner.mod.validation.title"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
                 VStack(alignment: .leading, spacing: 8) {
                     ForEach(liveMODIssues) { issue in
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(String(localized: "planner.mod.exceeds_allowed"))
+                            Text(DIRIOSLocalizer.string("planner.mod.exceeds_allowed"))
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(DIRTheme.red)
                             Text(
                                 String(
-                                    format: String(localized: "planner.mod.detail_format"),
+                                    format: DIRIOSLocalizer.string("planner.mod.detail_format"),
                                     issue.gasLabel,
                                     Formatters.depth(issue.switchDepthMeters, units: unitPreference).text,
                                     Formatters.depth(issue.modMeters, units: unitPreference).text
@@ -877,7 +877,7 @@ struct PlannerView: View {
                             .foregroundStyle(.white)
                         }
                     }
-                    Text(String(localized: "planner.mod.incompatible"))
+                    Text(DIRIOSLocalizer.string("planner.mod.incompatible"))
                         .font(.caption2)
                         .foregroundStyle(DIRTheme.muted)
                 }
@@ -888,9 +888,9 @@ struct PlannerView: View {
     @ViewBuilder
     private var plannerWarnings: some View {
         if store.analysis.warnings.isEmpty {
-            DIRWarningBox(text: String(localized: "planner.disclaimer.informative"))
+            DIRWarningBox(text: DIRIOSLocalizer.string("planner.disclaimer.informative"))
         } else {
-            DIRCard(String(localized: "planner.warning.title"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
+            DIRCard(DIRIOSLocalizer.string("planner.warning.title"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
                 VStack(alignment: .leading, spacing: 8) {
                     ForEach(store.analysis.warnings, id: \.self) { warning in
                         HStack(alignment: .top, spacing: 8) {
@@ -909,9 +909,9 @@ struct PlannerView: View {
     }
 
     private var teamPreviewCard: some View {
-        DIRCard(String(localized: "planner.team.matching_title"), icon: "person.2", accent: DIRTheme.cyan) {
+        DIRCard(DIRIOSLocalizer.string("planner.team.matching_title"), icon: "person.2", accent: DIRTheme.cyan) {
             VStack(spacing: 10) {
-                Text(String(localized: "planner.team.preview_only"))
+                Text(DIRIOSLocalizer.string("planner.team.preview_only"))
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(DIRTheme.yellow)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -921,18 +921,18 @@ struct PlannerView: View {
                             Text(member.name)
                                 .font(.callout.weight(.semibold))
                                 .foregroundStyle(.white)
-                            Text(String(format: String(localized: "planner.team.sac_format"), Formatters.zero(member.sacLitersPerMinute)))
+                            Text(DIRIOSLocalizer.formatted("planner.team.sac_format", Formatters.zero(member.sacLitersPerMinute)))
                                 .font(.caption)
                                 .foregroundStyle(DIRTheme.muted)
                         }
                         Spacer()
-                        Text(String(format: String(localized: "planner.team.available_gas_format"), Formatters.zero(member.cylinder.availableGasLiters)))
+                        Text(DIRIOSLocalizer.formatted("planner.team.available_gas_format", Formatters.zero(member.cylinder.availableGasLiters)))
                             .font(.callout.monospacedDigit().weight(.semibold))
                             .foregroundStyle(DIRTheme.cyan)
                     }
                     Divider().overlay(DIRTheme.hairline)
                 }
-                Text(String(localized: "planner.team.preview_only_notice"))
+                Text(DIRIOSLocalizer.string("planner.team.preview_only_notice"))
                     .font(.footnote)
                     .foregroundStyle(DIRTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -947,14 +947,14 @@ struct PlannerView: View {
                 set: { plannerSafetyAckRevision = $0 ? PlannerSafetyAcknowledgment.currentRevision : "" }
             )
         ) {
-            Text(String(localized: "planner.safety_ack.label"))
+            Text(DIRIOSLocalizer.string("planner.safety_ack.label"))
                 .font(.callout.weight(.semibold))
                 .foregroundStyle(.white)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .tint(DIRTheme.cyan)
         .padding(.vertical, 4)
-        .accessibilityHint(String(localized: "planner.safety_ack.hint"))
+        .accessibilityHint(DIRIOSLocalizer.string("planner.safety_ack.hint"))
     }
 
     private var plannerReferenceDetailsSection: some View {
@@ -967,8 +967,8 @@ struct PlannerView: View {
                 HStack(spacing: 6) {
                     Text(
                         showPlannerReferenceDetails
-                            ? String(localized: "planner.reference.details.hide")
-                            : String(localized: "planner.reference.details.read_more")
+                            ? DIRIOSLocalizer.string("planner.reference.details.hide")
+                            : DIRIOSLocalizer.string("planner.reference.details.read_more")
                     )
                     .font(DIRTypography.captionSemibold)
                     .foregroundStyle(DIRTheme.cyan)
@@ -979,10 +979,10 @@ struct PlannerView: View {
                 }
             }
             .buttonStyle(.plain)
-            .accessibilityHint(String(localized: "planner.reference.details.summary"))
+            .accessibilityHint(DIRIOSLocalizer.string("planner.reference.details.summary"))
 
             if showPlannerReferenceDetails {
-                DIRWarningBox(text: String(localized: "planner.units.metric_notice"))
+                DIRWarningBox(text: DIRIOSLocalizer.string("planner.units.metric_notice"))
             }
         }
     }
@@ -991,12 +991,12 @@ struct PlannerView: View {
         Button {
             let validation = PlannerModePolicy.validate(draft: store.input, mode: store.mode)
             if !validation.isValid {
-                calculateErrorMessage = validation.messages.first ?? String(localized: "planner.gas.mix_invalid")
+                calculateErrorMessage = validation.messages.first ?? DIRIOSLocalizer.string("planner.gas.mix_invalid")
                 showCalculateError = true
                 return
             }
             if PlannerGasSchedule.hasMODBlockingIssues(input: store.input) {
-                calculateErrorMessage = String(localized: "planner.mod.block_calculate")
+                calculateErrorMessage = DIRIOSLocalizer.string("planner.mod.block_calculate")
                 showCalculateError = true
                 return
             }
@@ -1012,7 +1012,11 @@ struct PlannerView: View {
                     ProgressView()
                         .tint(.black)
                 }
-                Text(String(localized: store.isCalculating ? "planner.calculate.in_progress" : "planner.calculate"))
+                Text(
+                    store.isCalculating
+                        ? DIRIOSLocalizer.string("planner.calculate.in_progress")
+                        : DIRIOSLocalizer.string("planner.calculate")
+                )
                     .font(.callout.weight(.semibold))
                     .foregroundStyle(canCalculatePlan ? .black : DIRTheme.muted)
             }
@@ -1027,11 +1031,15 @@ struct PlannerView: View {
         .buttonStyle(.plain)
         .disabled(!canCalculatePlan || store.isCalculating)
         .padding(.top, 4)
-        .accessibilityLabel(String(localized: store.isCalculating ? "planner.calculate.in_progress" : "planner.calculate"))
+        .accessibilityLabel(
+            store.isCalculating
+                ? DIRIOSLocalizer.string("planner.calculate.in_progress")
+                : DIRIOSLocalizer.string("planner.calculate")
+        )
         .accessibilityHint(
             liveMODIssues.isEmpty
-                ? String(localized: "planner.safety_ack.hint")
-                : String(localized: "planner.mod.block_calculate")
+                ? DIRIOSLocalizer.string("planner.safety_ack.hint")
+                : DIRIOSLocalizer.string("planner.mod.block_calculate")
         )
     }
 
@@ -1310,9 +1318,9 @@ struct PlanResultView: View {
 
     private var weeklyOTUTileAccessibilityLabel: String {
         let value = Formatters.zero(store.plan.gasAnalysis.otuWeekly)
-        let base = "\(String(localized: "planner.metric.otu_weekly")), \(value)"
+        let base = "\(DIRIOSLocalizer.string("planner.metric.otu_weekly")), \(value)"
         guard weeklyOTUWarningActive else { return base }
-        return "\(String(localized: "planner.warning.otu_weekly_elevated")) \(base)"
+        return "\(DIRIOSLocalizer.string("planner.warning.otu_weekly_elevated")) \(base)"
     }
 
     private var weeklyOTUWarningBanner: some View {
@@ -1320,10 +1328,10 @@ struct PlanResultView: View {
             Image(systemName: "exclamationmark.triangle.fill")
                 .foregroundStyle(DIRTheme.yellow)
             VStack(alignment: .leading, spacing: 4) {
-                Text(String(localized: "planner.warning.otu_weekly_elevated"))
+                Text(DIRIOSLocalizer.string("planner.warning.otu_weekly_elevated"))
                     .font(.caption)
                     .foregroundStyle(DIRTheme.yellow)
-                Text(String(localized: "planner.metric.otu_weekly.footnote"))
+                Text(DIRIOSLocalizer.string("planner.metric.otu_weekly.footnote"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)
             }
@@ -1332,23 +1340,23 @@ struct PlanResultView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.yellow.opacity(0.12)))
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(String(localized: "planner.warning.otu_weekly_elevated"))
-        .accessibilityHint(String(localized: "planner.metric.otu_weekly.footnote"))
+        .accessibilityLabel(DIRIOSLocalizer.string("planner.warning.otu_weekly_elevated"))
+        .accessibilityHint(DIRIOSLocalizer.string("planner.metric.otu_weekly.footnote"))
     }
 
     private var cnsDescentBottomTileAccessibilityLabel: String {
         let value = Formatters.zero(store.plan.gasAnalysis.cnsDescentBottomPercent)
-        let base = "\(String(localized: "planner.metric.cns_descent_bottom")), \(value) percent"
+        let base = "\(DIRIOSLocalizer.string("planner.metric.cns_descent_bottom")), \(value) percent"
         guard cnsDescentBottomWarningActive else { return base }
         return String(
-            format: String(localized: "planner.accessibility.cns_descent_bottom.warning.label"),
+            format: DIRIOSLocalizer.string("planner.accessibility.cns_descent_bottom.warning.label"),
             Formatters.zero(cnsDescentBottomThresholdPercent)
         ) + " \(base)"
     }
 
     private var cnsDescentBottomWarningMessage: String {
         String(
-            format: String(localized: "planner.cns_descent_bottom.warning"),
+            format: DIRIOSLocalizer.string("planner.cns_descent_bottom.warning"),
             Formatters.zero(cnsDescentBottomThresholdPercent)
         )
     }
@@ -1364,7 +1372,7 @@ struct PlanResultView: View {
                     .foregroundStyle(DIRTheme.red)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            Text(String(localized: "planner.cns_descent_bottom.warning.hint"))
+            Text(DIRIOSLocalizer.string("planner.cns_descent_bottom.warning.hint"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
@@ -1375,11 +1383,11 @@ struct PlanResultView: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel(
             String(
-                format: String(localized: "planner.accessibility.cns_descent_bottom.warning.label"),
+                format: DIRIOSLocalizer.string("planner.accessibility.cns_descent_bottom.warning.label"),
                 Formatters.zero(cnsDescentBottomThresholdPercent)
             )
         )
-        .accessibilityHint(String(localized: "planner.accessibility.cns_descent_bottom.warning.hint"))
+        .accessibilityHint(DIRIOSLocalizer.string("planner.accessibility.cns_descent_bottom.warning.hint"))
     }
 
     private var cnsThresholdEditLink: some View {
@@ -1389,7 +1397,7 @@ struct PlanResultView: View {
         } label: {
             Text(
                 String(
-                    format: String(localized: "planner.result.cns_threshold_edit"),
+                    format: DIRIOSLocalizer.string("planner.result.cns_threshold_edit"),
                     Formatters.zero(cnsDescentBottomThresholdPercent)
                 )
             )
@@ -1397,7 +1405,7 @@ struct PlanResultView: View {
             .foregroundStyle(DIRTheme.cyan)
         }
         .buttonStyle(.plain)
-        .accessibilityHint(String(localized: "planner.result.cns_threshold_edit.a11y"))
+        .accessibilityHint(DIRIOSLocalizer.string("planner.result.cns_threshold_edit.a11y"))
     }
 
     private var cnsThresholdResultFootnote: some View {
@@ -1406,7 +1414,7 @@ struct PlanResultView: View {
                 HStack {
                     Text(
                         String(
-                            format: String(localized: "planner.result.cns_threshold_summary"),
+                            format: DIRIOSLocalizer.string("planner.result.cns_threshold_summary"),
                             Formatters.zero(cnsDescentBottomThresholdPercent)
                         )
                     )
@@ -1421,9 +1429,9 @@ struct PlanResultView: View {
 
     private var fullPlanCNSTileAccessibilityLabel: String {
         let value = store.plan.gasAnalysis.cnsPercentDisplay
-        let base = "\(String(localized: "planner.metric.cns_full_plan")), \(value) percent"
+        let base = "\(DIRIOSLocalizer.string("planner.metric.cns_full_plan")), \(value) percent"
         guard fullPlanCNSWarningActive else { return base }
-        return "\(String(localized: "planner.accessibility.cns_full_plan.warning.label")) \(base)"
+        return "\(DIRIOSLocalizer.string("planner.accessibility.cns_full_plan.warning.label")) \(base)"
     }
 
     private var fullPlanCNSWarningBanner: some View {
@@ -1432,12 +1440,12 @@ struct PlanResultView: View {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .font(.caption.weight(.bold))
                     .foregroundStyle(DIRTheme.yellow)
-                Text(String(localized: "planner.cns_full_plan.warning"))
+                Text(DIRIOSLocalizer.string("planner.cns_full_plan.warning"))
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(DIRTheme.yellow)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            Text(String(localized: "planner.cns_full_plan.warning.hint"))
+            Text(DIRIOSLocalizer.string("planner.cns_full_plan.warning.hint"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
@@ -1445,8 +1453,8 @@ struct PlanResultView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 4)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(String(localized: "planner.accessibility.cns_full_plan.warning.label"))
-        .accessibilityHint(String(localized: "planner.accessibility.cns_full_plan.warning.hint"))
+        .accessibilityLabel(DIRIOSLocalizer.string("planner.accessibility.cns_full_plan.warning.label"))
+        .accessibilityHint(DIRIOSLocalizer.string("planner.accessibility.cns_full_plan.warning.hint"))
     }
 
     private func plannerResultMutedFootnote(_ text: String) -> some View {
@@ -1479,57 +1487,57 @@ struct PlanResultView: View {
         var lines: [String] = []
         lines.append(
             String(
-                format: String(localized: "planner.export.mode_line"),
+                format: DIRIOSLocalizer.string("planner.export.mode_line"),
                 store.mode.localizedTabTitle
             )
         )
         switch store.mode {
         case .base:
-            lines.append(String(localized: "planner.export.mode_disclaimer.base"))
+            lines.append(DIRIOSLocalizer.string("planner.export.mode_disclaimer.base"))
         case .deco:
-            lines.append(String(localized: "planner.export.mode_disclaimer.deco"))
+            lines.append(DIRIOSLocalizer.string("planner.export.mode_disclaimer.deco"))
         case .technical:
-            lines.append(String(localized: "planner.export.mode_disclaimer.technical"))
+            lines.append(DIRIOSLocalizer.string("planner.export.mode_disclaimer.technical"))
         case .ccr:
-            lines.append(String(localized: "ccr.safety.disclaimer"))
+            lines.append(DIRIOSLocalizer.string("ccr.safety.disclaimer"))
         }
-        lines.append(String(localized: "planner.export.header"))
-        lines.append(String(format: String(localized: "planner.export.tts_line"), store.plan.ttsMinutes))
-        lines.append(String(format: String(localized: "planner.export.runtime_line"), store.plan.totalRuntimeMinutes))
+        lines.append(DIRIOSLocalizer.string("planner.export.header"))
+        lines.append(DIRIOSLocalizer.formatted("planner.export.tts_line", store.plan.ttsMinutes))
+        lines.append(DIRIOSLocalizer.formatted("planner.export.runtime_line", store.plan.totalRuntimeMinutes))
         lines.append("NDL: \(Formatters.one(store.plan.ndlMinutes)) min")
         lines.append(
             String(
-                format: String(localized: "planner.export.cns_full_plan_line"),
+                format: DIRIOSLocalizer.string("planner.export.cns_full_plan_line"),
                 Formatters.zero(store.plan.cnsPercent)
             )
         )
         lines.append(
             String(
-                format: String(localized: "planner.export.cns_descent_bottom_line"),
+                format: DIRIOSLocalizer.string("planner.export.cns_descent_bottom_line"),
                 Formatters.zero(store.plan.gasAnalysis.cnsDescentBottomPercent)
             )
         )
         lines.append(
             String(
-                format: String(localized: "planner.export.cns_ascent_deco_line"),
+                format: DIRIOSLocalizer.string("planner.export.cns_ascent_deco_line"),
                 Formatters.zero(store.plan.gasAnalysis.cnsAscentDecoEstimatePercent)
             )
         )
         lines.append(
             String(
-                format: String(localized: "planner.export.otu_line"),
+                format: DIRIOSLocalizer.string("planner.export.otu_line"),
                 Formatters.zero(store.plan.otu)
             )
         )
         if store.plan.decoStops.isEmpty {
-            lines.append(String(localized: "planner.export.no_deco_stops"))
+            lines.append(DIRIOSLocalizer.string("planner.export.no_deco_stops"))
         } else {
-            lines.append(String(localized: "planner.export.deco_stops"))
+            lines.append(DIRIOSLocalizer.string("planner.export.deco_stops"))
             for stop in store.plan.decoStops {
-                lines.append(String(format: String(localized: "planner.export.deco_stop_line"), depthText(stop.depthMeters), stop.minutes, stop.gas, Formatters.one(stop.ppO2)))
+                lines.append(DIRIOSLocalizer.formatted("planner.export.deco_stop_line", depthText(stop.depthMeters), stop.minutes, stop.gas, Formatters.one(stop.ppO2)))
             }
         }
-        lines.append(String(localized: "planner.export.indicative_footer"))
+        lines.append(DIRIOSLocalizer.string("planner.export.indicative_footer"))
         return lines.joined(separator: "\n")
     }
 
@@ -1598,17 +1606,17 @@ struct PlanResultView: View {
             presentChecklistExportPromptIfNeeded()
         }
         .confirmationDialog(
-            String(localized: "checklist_planner.sync.export_prompt"),
+            DIRIOSLocalizer.string("checklist_planner.sync.export_prompt"),
             isPresented: $showChecklistExportPrompt,
             titleVisibility: .visible
         ) {
-            Button(String(localized: "checklist_planner.sync.add_all")) {
+            Button(DIRIOSLocalizer.string("checklist_planner.sync.add_all")) {
                 addAllPlannerGasesToChecklist()
             }
-            Button(String(localized: "checklist_planner.sync.choose_add")) {
+            Button(DIRIOSLocalizer.string("checklist_planner.sync.choose_add")) {
                 openChecklistExportSheet()
             }
-            Button(String(localized: "checklist_planner.sync.do_not_add"), role: .cancel) {}
+            Button(DIRIOSLocalizer.string("checklist_planner.sync.do_not_add"), role: .cancel) {}
         }
         .sheet(isPresented: $showChecklistExportSheet) {
             ChecklistPlannerSyncSheet(
@@ -1629,33 +1637,33 @@ struct PlanResultView: View {
                     Image(systemName: "square.and.arrow.up")
                         .foregroundStyle(DIRTheme.cyan)
                 }
-                .accessibilityLabel(Text(String(localized: "pdf.export.share.a11y")))
+                .accessibilityLabel(Text(DIRIOSLocalizer.string("pdf.export.share.a11y")))
             }
         }
         .confirmationDialog(
-            String(localized: "pdf.export.share.a11y"),
+            DIRIOSLocalizer.string("pdf.export.share.a11y"),
             isPresented: $showResultPDFMenu,
             titleVisibility: .visible
         ) {
-            Button(String(localized: "pdf.export.share.plan")) {
+            Button(DIRIOSLocalizer.string("pdf.export.share.plan")) {
                 shareResultPDF(kind: .plan)
             }
-            Button(String(localized: "pdf.export.share.briefing")) {
+            Button(DIRIOSLocalizer.string("pdf.export.share.briefing")) {
                 shareResultPDF(kind: .briefing)
             }
-            Button(String(localized: "pdf.export.share.dive_pack")) {
+            Button(DIRIOSLocalizer.string("pdf.export.share.dive_pack")) {
                 shareResultPDF(kind: .divePack)
             }
-            Button(String(localized: "pdf.export.cancel"), role: .cancel) {}
+            Button(DIRIOSLocalizer.string("pdf.export.cancel"), role: .cancel) {}
         }
         .sheet(item: $shareablePDF) { item in
             ShareSheetView(activityItems: [item.url])
         }
-        .alert(String(localized: "pdf.export.error.title"), isPresented: Binding(
+        .alert(DIRIOSLocalizer.string("pdf.export.error.title"), isPresented: Binding(
             get: { pdfExportAlertMessage != nil },
             set: { if !$0 { pdfExportAlertMessage = nil } }
         )) {
-            Button(String(localized: "common.ok"), role: .cancel) {}
+            Button(DIRIOSLocalizer.string("common.ok"), role: .cancel) {}
         } message: {
             Text(pdfExportAlertMessage ?? "")
         }
@@ -1665,7 +1673,7 @@ struct PlanResultView: View {
         Button {
             shareResultPDF(kind: .divePack)
         } label: {
-            Text(String(localized: "pdf.export.share.dive_pack_button"))
+            Text(DIRIOSLocalizer.string("pdf.export.share.dive_pack_button"))
                 .font(.callout.weight(.semibold))
                 .foregroundStyle(DIRTheme.cyan)
                 .frame(maxWidth: .infinity)
@@ -1758,11 +1766,11 @@ struct PlanResultView: View {
         let label: String
         switch store.input.planningDepthReference {
         case .maximumDepth:
-            label = String(localized: "planner.result.reference_depth.max")
+            label = DIRIOSLocalizer.string("planner.result.reference_depth.max")
         case .averageDepth:
-            label = String(localized: "planner.result.reference_depth.average")
+            label = DIRIOSLocalizer.string("planner.result.reference_depth.average")
         }
-        return String(format: String(localized: "planner.result.reference_depth"), label)
+        return DIRIOSLocalizer.formatted("planner.result.reference_depth", label)
     }
 
     private var resultHeaderBadge: some View {
@@ -1786,7 +1794,7 @@ struct PlanResultView: View {
                 incompleteCalculationBanner
             }
             if store.plan.repetitiveContext?.tissueStateApplied == true {
-                Text(String(localized: "planner.repetitive.result_badge"))
+                Text(DIRIOSLocalizer.string("planner.repetitive.result_badge"))
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(DIRTheme.yellow)
             }
@@ -1807,15 +1815,15 @@ struct PlanResultView: View {
 
     private var incompleteCalculationBanner: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(String(localized: "planner.result.calculation_incomplete"))
+            Text(DIRIOSLocalizer.string("planner.result.calculation_incomplete"))
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(DIRTheme.red)
                 .fixedSize(horizontal: false, vertical: true)
-            Text(String(localized: "planner.result.calculation_incomplete.detail"))
+            Text(DIRIOSLocalizer.string("planner.result.calculation_incomplete.detail"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
-            Text(String(localized: "planner.result.calculation_incomplete.recovery"))
+            Text(DIRIOSLocalizer.string("planner.result.calculation_incomplete.recovery"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
@@ -1828,7 +1836,7 @@ struct PlanResultView: View {
         )
         .accessibilityElement(children: .combine)
         .accessibilityLabel(
-            "\(String(localized: "planner.result.calculation_incomplete")) \(String(localized: "planner.result.calculation_incomplete.detail"))"
+            "\(DIRIOSLocalizer.string("planner.result.calculation_incomplete")) \(DIRIOSLocalizer.string("planner.result.calculation_incomplete.detail"))"
         )
     }
 
@@ -1838,7 +1846,7 @@ struct PlanResultView: View {
         let caution = store.plan.userFacingWarnings.filter { $0.severity == .warning }
 
         if !blocking.isEmpty {
-            DIRCard(String(localized: "planner.result.warnings.blocking.title"), icon: "exclamationmark.octagon.fill", accent: DIRTheme.red) {
+            DIRCard(DIRIOSLocalizer.string("planner.result.warnings.blocking.title"), icon: "exclamationmark.octagon.fill", accent: DIRTheme.red) {
                 VStack(alignment: .leading, spacing: 10) {
                     ForEach(blocking) { warning in
                         plannerWarningRow(warning, accent: DIRTheme.red)
@@ -1848,7 +1856,7 @@ struct PlanResultView: View {
         }
 
         if !caution.isEmpty {
-            DIRCard(String(localized: "planner.result.warnings.caution.title"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.yellow) {
+            DIRCard(DIRIOSLocalizer.string("planner.result.warnings.caution.title"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.yellow) {
                 VStack(alignment: .leading, spacing: 10) {
                     ForEach(caution) { warning in
                         plannerWarningRow(warning, accent: DIRTheme.yellow)
@@ -1887,12 +1895,12 @@ struct PlanResultView: View {
     private var dashboardHeroGrid: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
-                DIRMetricTile(title: String(localized: "planner.metric.tts"), value: "\(store.plan.ttsMinutes)", unit: "min", color: DIRTheme.cyan)
+                DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.tts"), value: "\(store.plan.ttsMinutes)", unit: "min", color: DIRTheme.cyan)
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: String(localized: "planner.metric.runtime"), value: "\(store.plan.totalRuntimeMinutes)", unit: "min", color: DIRTheme.cyan)
+                DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.runtime"), value: "\(store.plan.totalRuntimeMinutes)", unit: "min", color: DIRTheme.cyan)
                 Divider().overlay(DIRTheme.hairline)
                 DIRMetricTile(
-                    title: String(localized: "planner.result.deco_stops"),
+                    title: DIRIOSLocalizer.string("planner.result.deco_stops"),
                     value: "\(store.plan.decoStops.count)",
                     color: store.plan.decoStops.isEmpty ? DIRTheme.green : DIRTheme.yellow
                 )
@@ -1900,21 +1908,21 @@ struct PlanResultView: View {
             Divider().overlay(DIRTheme.hairline)
             HStack(spacing: 0) {
                 DIRMetricTile(
-                    title: String(localized: "planner.result.max_depth"),
+                    title: DIRIOSLocalizer.string("planner.result.max_depth"),
                     value: Formatters.depth(store.input.plannedDepthMeters, units: unitPreference).value,
                     unit: Formatters.depth(store.input.plannedDepthMeters, units: unitPreference).unit,
                     color: DIRTheme.cyan
                 )
                 Divider().overlay(DIRTheme.hairline)
                 DIRMetricTile(
-                    title: String(localized: "planner.result.bottom_time"),
+                    title: DIRIOSLocalizer.string("planner.result.bottom_time"),
                     value: Formatters.zero(store.input.plannedBottomMinutes),
                     unit: "min",
                     color: DIRTheme.cyan
                 )
                 Divider().overlay(DIRTheme.hairline)
                 DIRMetricTile(
-                    title: String(localized: "planner.metric.cns_full_plan"),
+                    title: DIRIOSLocalizer.string("planner.metric.cns_full_plan"),
                     value: store.plan.gasAnalysis.cnsPercentDisplay,
                     unit: "%",
                     color: fullPlanCNSWarningActive ? DIRTheme.yellow : DIRTheme.green,
@@ -1932,7 +1940,7 @@ struct PlanResultView: View {
                 .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(DIRTheme.cyan.opacity(0.35), lineWidth: 1))
         )
         .accessibilityElement(children: .contain)
-        .accessibilityLabel(String(localized: "planner.result.dashboard.a11y"))
+        .accessibilityLabel(DIRIOSLocalizer.string("planner.result.dashboard.a11y"))
     }
 
     @ViewBuilder
@@ -1967,7 +1975,7 @@ struct PlanResultView: View {
                     Divider().overlay(DIRTheme.hairline)
                     HStack(spacing: 0) {
                         DIRMetricTile(
-                            title: String(localized: "planner.metric.otu_weekly"),
+                            title: DIRIOSLocalizer.string("planner.metric.otu_weekly"),
                             value: Formatters.zero(store.plan.gasAnalysis.otuWeekly),
                             color: weeklyOTUWarningActive ? DIRTheme.yellow : DIRTheme.cyan,
                             icon: weeklyOTUWarningActive ? "exclamationmark.triangle.fill" : nil
@@ -1977,12 +1985,12 @@ struct PlanResultView: View {
                     if weeklyOTUWarningActive {
                         weeklyOTUWarningBanner
                     }
-                    plannerResultMutedFootnote(String(localized: "planner.metric.otu_weekly.footnote"))
+                    plannerResultMutedFootnote(DIRIOSLocalizer.string("planner.metric.otu_weekly.footnote"))
                 }
                 Divider().overlay(DIRTheme.hairline)
                 HStack(spacing: 0) {
                     DIRMetricTile(
-                        title: String(localized: "planner.metric.cns_descent_bottom"),
+                        title: DIRIOSLocalizer.string("planner.metric.cns_descent_bottom"),
                         value: Formatters.zero(store.plan.gasAnalysis.cnsDescentBottomPercent),
                         unit: "%",
                         color: cnsDescentBottomWarningActive ? DIRTheme.red : DIRTheme.cyan,
@@ -1991,7 +1999,7 @@ struct PlanResultView: View {
                     .accessibilityLabel(cnsDescentBottomTileAccessibilityLabel)
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(
-                        title: String(localized: "planner.metric.cns_ascent_deco_estimate"),
+                        title: DIRIOSLocalizer.string("planner.metric.cns_ascent_deco_estimate"),
                         value: Formatters.zero(store.plan.gasAnalysis.cnsAscentDecoEstimatePercent),
                         unit: "%",
                         color: DIRTheme.cyan
@@ -2006,7 +2014,7 @@ struct PlanResultView: View {
                 let endMeasurement = Formatters.depth(store.analysis.endMeters, units: unitPreference)
                 HStack(spacing: 0) {
                     DIRMetricTile(
-                        title: String(localized: "planner.metric.density"),
+                        title: DIRIOSLocalizer.string("planner.metric.density"),
                         value: Formatters.one(store.analysis.densityAtDepth),
                         unit: "g/L",
                         color: store.analysis.densityRating == .red ? DIRTheme.red : DIRTheme.cyan
@@ -2015,20 +2023,20 @@ struct PlanResultView: View {
                     DIRMetricTile(title: "END", value: endMeasurement.value, unit: endMeasurement.unit, color: DIRTheme.yellow)
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(
-                        title: String(localized: "planner.metric.turn_pressure"),
+                        title: DIRIOSLocalizer.string("planner.metric.turn_pressure"),
                         value: Formatters.zero(store.analysis.turnPressureBar),
                         unit: "bar",
                         color: DIRTheme.cyan
                     )
                 }
                 VStack(alignment: .leading, spacing: 4) {
-                    plannerResultMutedFootnote(String(localized: "planner.metric.cns_full_plan.footnote"))
-                    plannerResultMutedFootnote(String(localized: "planner.ndl.reference_ascent_footnote"))
-                    plannerResultMutedFootnote(String(localized: "planner.metric.cns_descent_bottom.footnote"))
-                    plannerResultMutedFootnote(String(localized: "planner.metric.cns_ascent_deco_estimate.footnote"))
+                    plannerResultMutedFootnote(DIRIOSLocalizer.string("planner.metric.cns_full_plan.footnote"))
+                    plannerResultMutedFootnote(DIRIOSLocalizer.string("planner.ndl.reference_ascent_footnote"))
+                    plannerResultMutedFootnote(DIRIOSLocalizer.string("planner.metric.cns_descent_bottom.footnote"))
+                    plannerResultMutedFootnote(DIRIOSLocalizer.string("planner.metric.cns_ascent_deco_estimate.footnote"))
                     Text(
                         String(
-                            format: String(localized: "planner.oxygen_exposure.daily_summary"),
+                            format: DIRIOSLocalizer.string("planner.oxygen_exposure.daily_summary"),
                             Formatters.zero(store.plan.gasAnalysis.cnsDailyPercent),
                             Formatters.zero(store.plan.gasAnalysis.otuDaily24h)
                         )
@@ -2037,7 +2045,7 @@ struct PlanResultView: View {
                     .foregroundStyle(DIRTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
                     if store.plan.gasAnalysis.airBreakRecoveryApplied {
-                        Text(String(localized: "planner.oxygen_exposure.air_break_applied"))
+                        Text(DIRIOSLocalizer.string("planner.oxygen_exposure.air_break_applied"))
                             .font(.caption2)
                             .foregroundStyle(DIRTheme.yellow)
                             .fixedSize(horizontal: false, vertical: true)
@@ -2049,7 +2057,7 @@ struct PlanResultView: View {
             HStack(spacing: 8) {
                 Image(systemName: "chart.bar.doc.horizontal")
                     .foregroundStyle(DIRTheme.cyan)
-                Text(String(localized: "planner.result.secondary_metrics.title"))
+                Text(DIRIOSLocalizer.string("planner.result.secondary_metrics.title"))
                     .font(.callout.weight(.semibold))
                     .foregroundStyle(.white)
             }
@@ -2065,11 +2073,11 @@ struct PlanResultView: View {
 
     private var plannerLegalFootnotes: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(String(localized: "planner.oxygen_exposure.disclaimer"))
+            Text(DIRIOSLocalizer.string("planner.oxygen_exposure.disclaimer"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted.opacity(0.88))
                 .fixedSize(horizontal: false, vertical: true)
-            Text(String(localized: "planner.header.reference_only.hint"))
+            Text(DIRIOSLocalizer.string("planner.header.reference_only.hint"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted.opacity(0.75))
                 .fixedSize(horizontal: false, vertical: true)
@@ -2085,7 +2093,7 @@ struct PlanResultView: View {
         if !travelLimitationWarnings.isEmpty || !PlannerGasSchedule.bailoutCylinders(from: store.input).isEmpty {
             VStack(alignment: .leading, spacing: 8) {
                 if !PlannerGasSchedule.bailoutCylinders(from: store.input).isEmpty {
-                    DIRWarningBox(text: String(localized: "planner.bailout.schedule_hint"))
+                    DIRWarningBox(text: DIRIOSLocalizer.string("planner.bailout.schedule_hint"))
                 }
                 ForEach(travelLimitationWarnings + bailoutWarnings, id: \.self) { warning in
                     Text(warning)
@@ -2100,7 +2108,7 @@ struct PlanResultView: View {
     @ViewBuilder
     private var gasLedgerCard: some View {
         if let failure = store.plan.gasLedgerFailure {
-            DIRCard(String(localized: "planner.gas_ledger.title"), icon: "fuelpump", accent: DIRTheme.red) {
+            DIRCard(DIRIOSLocalizer.string("planner.gas_ledger.title"), icon: "fuelpump", accent: DIRTheme.red) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(failure.userFacingMessage.title)
                         .font(.callout.weight(.semibold))
@@ -2118,9 +2126,9 @@ struct PlanResultView: View {
                 }
             }
         } else if let ledger = store.plan.gasLedger {
-            DIRCard(String(localized: "planner.gas_ledger.title"), icon: "fuelpump", accent: DIRTheme.cyan) {
+            DIRCard(DIRIOSLocalizer.string("planner.gas_ledger.title"), icon: "fuelpump", accent: DIRTheme.cyan) {
                 VStack(spacing: 10) {
-                    Text(String(localized: "planner.gas_ledger.subtitle"))
+                    Text(DIRIOSLocalizer.string("planner.gas_ledger.subtitle"))
                         .font(.caption2)
                         .foregroundStyle(DIRTheme.muted)
                         .fixedSize(horizontal: false, vertical: true)
@@ -2129,7 +2137,7 @@ struct PlanResultView: View {
                         Divider().overlay(DIRTheme.hairline)
                     }
                     if !ledger.unusedPlannedEntries.isEmpty {
-                        Text(String(localized: "planner.gas_ledger.unused_title"))
+                        Text(DIRIOSLocalizer.string("planner.gas_ledger.unused_title"))
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(DIRTheme.muted)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -2170,20 +2178,20 @@ struct PlanResultView: View {
                 }
                 Spacer()
                 if reserveBreached || minimumBreached || lostGasFailed {
-                    Text(String(localized: "planner.gas_ledger.reserve_flag"))
+                    Text(DIRIOSLocalizer.string("planner.gas_ledger.reserve_flag"))
                         .font(.caption2.weight(.bold))
                         .foregroundStyle(DIRTheme.red)
                 }
             }
             HStack(spacing: 0) {
-                DIRMetricTile(title: String(localized: "planner.metric.consumption"), value: Formatters.zero(entry.consumedLiters), unit: "L", color: DIRTheme.yellow)
+                DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.consumption"), value: Formatters.zero(entry.consumedLiters), unit: "L", color: DIRTheme.yellow)
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: String(localized: "planner.metric.remaining"), value: Formatters.zero(entry.remainingLiters), unit: "L", color: entry.remainingLiters < 0 ? DIRTheme.red : DIRTheme.green)
+                DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.remaining"), value: Formatters.zero(entry.remainingLiters), unit: "L", color: entry.remainingLiters < 0 ? DIRTheme.red : DIRTheme.green)
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: String(localized: "planner.gas_ledger.remaining_pressure"), value: Formatters.zero(entry.remainingBar), unit: "bar", color: reserveBreached ? DIRTheme.red : DIRTheme.cyan)
+                DIRMetricTile(title: DIRIOSLocalizer.string("planner.gas_ledger.remaining_pressure"), value: Formatters.zero(entry.remainingBar), unit: "bar", color: reserveBreached ? DIRTheme.red : DIRTheme.cyan)
             }
             if lostGasFailed {
-                Text(String(localized: "planner.gas_ledger.warning.lost_gas.message"))
+                Text(DIRIOSLocalizer.string("planner.gas_ledger.warning.lost_gas.message"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.yellow)
                     .fixedSize(horizontal: false, vertical: true)
@@ -2192,7 +2200,7 @@ struct PlanResultView: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel(
             String(
-                format: String(localized: "planner.gas_ledger.entry.a11y"),
+                format: DIRIOSLocalizer.string("planner.gas_ledger.entry.a11y"),
                 entry.gasLabel,
                 Formatters.zero(entry.consumedLiters),
                 Formatters.zero(entry.remainingBar)
@@ -2204,8 +2212,8 @@ struct PlanResultView: View {
         let cylinderLabel = store.input.plannerCylinders.first(where: { $0.id == entry.cylinderId })?.tankSize.rawValue
             ?? store.input.primaryCylinder.name
         let subtitle = entry.isStandbyOrBailout
-            ? String(localized: "planner.gas_ledger.unused_standby")
-            : String(localized: "planner.gas_ledger.unused_planned")
+            ? DIRIOSLocalizer.string("planner.gas_ledger.unused_standby")
+            : DIRIOSLocalizer.string("planner.gas_ledger.unused_planned")
         return VStack(alignment: .leading, spacing: 8) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
@@ -2223,20 +2231,20 @@ struct PlanResultView: View {
             }
             HStack(spacing: 0) {
                 DIRMetricTile(
-                    title: String(localized: "planner.gas_ledger.available_gas"),
+                    title: DIRIOSLocalizer.string("planner.gas_ledger.available_gas"),
                     value: Formatters.zero(entry.availableLiters),
                     unit: "L",
                     color: DIRTheme.cyan
                 )
                 Divider().overlay(DIRTheme.hairline)
                 DIRMetricTile(
-                    title: String(localized: "planner.gas_ledger.remaining_pressure"),
+                    title: DIRIOSLocalizer.string("planner.gas_ledger.remaining_pressure"),
                     value: Formatters.zero(entry.availableBar),
                     unit: "bar",
                     color: DIRTheme.cyan
                 )
             }
-            Text(String(localized: "planner.gas_ledger.not_consumed_note"))
+            Text(DIRIOSLocalizer.string("planner.gas_ledger.not_consumed_note"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
@@ -2264,16 +2272,16 @@ struct PlanResultView: View {
     @ViewBuilder
     private var modValidationSection: some View {
         if !store.plan.modValidationIssues.isEmpty {
-            DIRCard(String(localized: "planner.mod.validation.title"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
+            DIRCard(DIRIOSLocalizer.string("planner.mod.validation.title"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
                 VStack(alignment: .leading, spacing: 8) {
                     ForEach(store.plan.modValidationIssues) { issue in
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(String(localized: "planner.mod.exceeds_allowed"))
+                            Text(DIRIOSLocalizer.string("planner.mod.exceeds_allowed"))
                                 .font(.callout.weight(.semibold))
                                 .foregroundStyle(DIRTheme.red)
                             Text(
                                 String(
-                                    format: String(localized: "planner.mod.detail_format"),
+                                    format: DIRIOSLocalizer.string("planner.mod.detail_format"),
                                     issue.gasLabel,
                                     depthText(issue.switchDepthMeters),
                                     depthText(issue.modMeters)
@@ -2283,10 +2291,10 @@ struct PlanResultView: View {
                             .foregroundStyle(.white)
                         }
                     }
-                    Text(String(localized: "planner.mod.incompatible"))
+                    Text(DIRIOSLocalizer.string("planner.mod.incompatible"))
                         .font(.caption)
                         .foregroundStyle(DIRTheme.muted)
-                    Text(String(localized: "planner.mod.hint"))
+                    Text(DIRIOSLocalizer.string("planner.mod.hint"))
                         .font(.caption2)
                         .foregroundStyle(DIRTheme.muted)
                 }
@@ -2329,19 +2337,19 @@ struct PlanResultView: View {
 
     private func tabAccessibilityLabel(for item: PlanTab) -> String {
         if tab == item {
-            return String(format: String(localized: "planner.tab.a11y.selected"), item.title)
+            return DIRIOSLocalizer.formatted("planner.tab.a11y.selected", item.title)
         }
-        return String(format: String(localized: "planner.tab.a11y.unselected"), item.title)
+        return DIRIOSLocalizer.formatted("planner.tab.a11y.unselected", item.title)
     }
 
     private var ascentTable: some View {
-        DIRCard(String(localized: "planner.result.ascent_plan"), icon: "arrow.up.circle.fill", accent: DIRTheme.cyan) {
-            Text(String(localized: "planner.result.ascent_plan.subtitle"))
+        DIRCard(DIRIOSLocalizer.string("planner.result.ascent_plan"), icon: "arrow.up.circle.fill", accent: DIRTheme.cyan) {
+            Text(DIRIOSLocalizer.string("planner.result.ascent_plan.subtitle"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            Text(String(localized: "planner.table.briefing_order.footnote"))
+            Text(DIRIOSLocalizer.string("planner.table.briefing_order.footnote"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
@@ -2350,20 +2358,20 @@ struct PlanResultView: View {
             if store.plan.calculationCompleteness == .incompletePartialStops {
                 incompleteCalculationBanner
             } else if store.mode == .base {
-                Text(String(localized: "planner.buhlmann.hidden_in_base"))
+                Text(DIRIOSLocalizer.string("planner.buhlmann.hidden_in_base"))
                     .font(.caption)
                     .foregroundStyle(DIRTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
             } else if store.plan.ascentTableRows.isEmpty {
-                Text(String(localized: "planner.export.no_deco_stops"))
+                Text(DIRIOSLocalizer.string("planner.export.no_deco_stops"))
                     .font(.caption)
                     .foregroundStyle(DIRTheme.muted)
             } else {
                 VStack(spacing: 0) {
                     tableRow([
-                        String(localized: "planner.table.depth"),
-                        String(localized: "planner.table.time"),
-                        String(localized: "planner.table.gas"),
+                        DIRIOSLocalizer.string("planner.table.depth"),
+                        DIRIOSLocalizer.string("planner.table.time"),
+                        DIRIOSLocalizer.string("planner.table.gas"),
                         "PPO₂"
                     ], isHeader: true)
                     ForEach(store.plan.ascentTableRows) { row in
@@ -2376,9 +2384,9 @@ struct PlanResultView: View {
                             ],
                             isSurface: row.kind == .surface,
                             columnHeaders: [
-                                String(localized: "planner.table.depth"),
-                                String(localized: "planner.table.time"),
-                                String(localized: "planner.table.gas"),
+                                DIRIOSLocalizer.string("planner.table.depth"),
+                                DIRIOSLocalizer.string("planner.table.time"),
+                                DIRIOSLocalizer.string("planner.table.gas"),
                                 "PPO₂"
                             ]
                         )
@@ -2392,7 +2400,7 @@ struct PlanResultView: View {
                         .fill(DIRTheme.surface2.opacity(0.45))
                 )
                 .accessibilityElement(children: .contain)
-                .accessibilityLabel(String(localized: "planner.result.ascent_table.a11y"))
+                .accessibilityLabel(DIRIOSLocalizer.string("planner.result.ascent_table.a11y"))
             }
         }
     }
@@ -2400,9 +2408,9 @@ struct PlanResultView: View {
     private func rowLabel(for row: PlannerAscentTableRow) -> String {
         switch row.kind {
         case .bottom:
-            return "\(row.depthLabel) · \(String(localized: "planner.ascent.row.bottom"))"
+            return "\(row.depthLabel) · \(DIRIOSLocalizer.string("planner.ascent.row.bottom"))"
         case .travel:
-            return "\(row.depthLabel) · \(String(localized: "planner.ascent.row.travel"))"
+            return "\(row.depthLabel) · \(DIRIOSLocalizer.string("planner.ascent.row.travel"))"
         case .decoStop, .surface:
             return row.depthLabel
         }
@@ -2418,7 +2426,7 @@ struct PlanResultView: View {
     }
 
     private var baseCompatibilitySummary: some View {
-        DIRCard(String(localized: "planner.result.base.summary"), icon: "checkmark.seal", accent: DIRTheme.cyan) {
+        DIRCard(DIRIOSLocalizer.string("planner.result.base.summary"), icon: "checkmark.seal", accent: DIRTheme.cyan) {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 0) {
                     Group {
@@ -2433,7 +2441,7 @@ struct PlanResultView: View {
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: "NDL", value: Formatters.one(store.plan.ndlMinutes), unit: "min")
                 }
-                Text(String(localized: "planner.buhlmann.hidden_in_base"))
+                Text(DIRIOSLocalizer.string("planner.buhlmann.hidden_in_base"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -2442,13 +2450,13 @@ struct PlanResultView: View {
     }
 
     private var segmentTimeline: some View {
-        DIRCard(String(localized: "planner.result.timeline"), icon: "list.bullet.rectangle", accent: DIRTheme.cyan) {
+        DIRCard(DIRIOSLocalizer.string("planner.result.timeline"), icon: "list.bullet.rectangle", accent: DIRTheme.cyan) {
             VStack(spacing: 8) {
                 tableRow([
-                    String(localized: "planner.table.type"),
-                    String(localized: "planner.table.depth_short"),
-                    String(localized: "planner.table.min"),
-                    String(localized: "planner.table.gas")
+                    DIRIOSLocalizer.string("planner.table.type"),
+                    DIRIOSLocalizer.string("planner.table.depth_short"),
+                    DIRIOSLocalizer.string("planner.table.min"),
+                    DIRIOSLocalizer.string("planner.table.gas")
                 ], isHeader: true)
                 ForEach(store.plan.segments) { segment in
                     tableRow(
@@ -2459,10 +2467,10 @@ struct PlanResultView: View {
                             segment.gas
                         ],
                         columnHeaders: [
-                            String(localized: "planner.table.type"),
-                            String(localized: "planner.table.depth_short"),
-                            String(localized: "planner.table.min"),
-                            String(localized: "planner.table.gas")
+                            DIRIOSLocalizer.string("planner.table.type"),
+                            DIRIOSLocalizer.string("planner.table.depth_short"),
+                            DIRIOSLocalizer.string("planner.table.min"),
+                            DIRIOSLocalizer.string("planner.table.gas")
                         ]
                     )
                 }
@@ -2471,13 +2479,13 @@ struct PlanResultView: View {
     }
 
     private var gfComparisonCard: some View {
-        DIRCard(String(localized: "planner.result.gf_compare"), icon: "chart.line.uptrend.xyaxis", accent: DIRTheme.green) {
+        DIRCard(DIRIOSLocalizer.string("planner.result.gf_compare"), icon: "chart.line.uptrend.xyaxis", accent: DIRTheme.green) {
             VStack(spacing: 8) {
                 tableRow([
                     "GF",
                     "TTS",
-                    String(localized: "planner.table.stops"),
-                    String(localized: "planner.table.note")
+                    DIRIOSLocalizer.string("planner.table.stops"),
+                    DIRIOSLocalizer.string("planner.table.note")
                 ], isHeader: true)
                 ForEach(store.plan.gfComparisons) { comparison in
                     tableRow(
@@ -2490,19 +2498,19 @@ struct PlanResultView: View {
                         columnHeaders: [
                             "GF",
                             "TTS",
-                            String(localized: "planner.table.stops"),
-                            String(localized: "planner.table.note")
+                            DIRIOSLocalizer.string("planner.table.stops"),
+                            DIRIOSLocalizer.string("planner.table.note")
                         ]
                     )
                 }
             }
             .accessibilityElement(children: .contain)
-            .accessibilityLabel(String(localized: "planner.result.gf_compare.a11y"))
+            .accessibilityLabel(DIRIOSLocalizer.string("planner.result.gf_compare.a11y"))
         }
     }
 
     private var contingencyCard: some View {
-        DIRCard(String(localized: "planner.result.contingencies"), icon: "exclamationmark.triangle", accent: DIRTheme.yellow) {
+        DIRCard(DIRIOSLocalizer.string("planner.result.contingencies"), icon: "exclamationmark.triangle", accent: DIRTheme.yellow) {
             VStack(spacing: 10) {
                 ForEach(store.plan.contingencyPlans) { plan in
                     VStack(alignment: .leading, spacing: 5) {
@@ -2527,27 +2535,27 @@ struct PlanResultView: View {
     }
 
     private var teamMatchCard: some View {
-        DIRCard(String(localized: "planner.team.match_title"), icon: "person.2", accent: DIRTheme.cyan) {
+        DIRCard(DIRIOSLocalizer.string("planner.team.match_title"), icon: "person.2", accent: DIRTheme.cyan) {
             VStack(spacing: 8) {
                 tableRow([
-                    String(localized: "planner.table.diver"),
-                    String(localized: "planner.table.sac"),
-                    String(localized: "planner.table.gas"),
-                    String(localized: "planner.table.status")
+                    DIRIOSLocalizer.string("planner.table.diver"),
+                    DIRIOSLocalizer.string("planner.table.sac"),
+                    DIRIOSLocalizer.string("planner.table.gas"),
+                    DIRIOSLocalizer.string("planner.table.status")
                 ], isHeader: true)
                 ForEach(store.plan.teamMatches) { match in
                     tableRow(
                         [
                             match.diverName,
                             "\(Formatters.zero(match.sacLitersMinute))",
-                            String(format: String(localized: "planner.team.available_gas_format"), Formatters.zero(match.availableLiters)),
+                            DIRIOSLocalizer.formatted("planner.team.available_gas_format", Formatters.zero(match.availableLiters)),
                             match.status
                         ],
                         columnHeaders: [
-                            String(localized: "planner.table.diver"),
-                            String(localized: "planner.table.sac"),
-                            String(localized: "planner.table.gas"),
-                            String(localized: "planner.table.status")
+                            DIRIOSLocalizer.string("planner.table.diver"),
+                            DIRIOSLocalizer.string("planner.table.sac"),
+                            DIRIOSLocalizer.string("planner.table.gas"),
+                            DIRIOSLocalizer.string("planner.table.status")
                         ]
                     )
                 }
@@ -2556,7 +2564,7 @@ struct PlanResultView: View {
     }
 
     private var briefingCard: some View {
-        DIRCard(String(localized: "planner.briefing.title"), icon: "doc.text", accent: DIRTheme.green) {
+        DIRCard(DIRIOSLocalizer.string("planner.briefing.title"), icon: "doc.text", accent: DIRTheme.green) {
             VStack(alignment: .leading, spacing: 8) {
                 ForEach(store.plan.briefingLines, id: \.self) { line in
                     HStack(alignment: .top, spacing: 8) {
@@ -2571,7 +2579,7 @@ struct PlanResultView: View {
                     }
                 }
                 Divider().overlay(DIRTheme.hairline)
-                Text(String(localized: "planner.briefing.share_note"))
+                Text(DIRIOSLocalizer.string("planner.briefing.share_note"))
                     .font(.caption)
                     .foregroundStyle(DIRTheme.muted)
             }
@@ -2586,11 +2594,11 @@ struct PlanResultView: View {
     private func tableRowSummary(_ values: [String]) -> String {
         switch values.count {
         case 2:
-            return String(format: String(localized: "planner.table.row.a11y.two"), values[0], values[1])
+            return DIRIOSLocalizer.formatted("planner.table.row.a11y.two", values[0], values[1])
         case 3:
-            return String(format: String(localized: "planner.table.row.a11y.three"), values[0], values[1], values[2])
+            return DIRIOSLocalizer.formatted("planner.table.row.a11y.three", values[0], values[1], values[2])
         case 4:
-            return String(format: String(localized: "planner.table.row.a11y"), values[0], values[1], values[2], values[3])
+            return DIRIOSLocalizer.formatted("planner.table.row.a11y", values[0], values[1], values[2], values[3])
         default:
             return values.joined(separator: ", ")
         }
@@ -2637,10 +2645,10 @@ struct PlanResultView: View {
 
     private func tissueGroupLabel(_ group: String) -> String {
         switch group {
-        case "1-4": return String(localized: "planner.buhlmann.group_1_4")
-        case "5-8": return String(localized: "planner.buhlmann.group_5_8")
-        case "9-12": return String(localized: "planner.buhlmann.group_9_12")
-        default: return String(localized: "planner.buhlmann.group_13_16")
+        case "1-4": return DIRIOSLocalizer.string("planner.buhlmann.group_1_4")
+        case "5-8": return DIRIOSLocalizer.string("planner.buhlmann.group_5_8")
+        case "9-12": return DIRIOSLocalizer.string("planner.buhlmann.group_9_12")
+        default: return DIRIOSLocalizer.string("planner.buhlmann.group_13_16")
         }
     }
 
@@ -2655,11 +2663,11 @@ struct PlanResultView: View {
 
     private var buhlmannChartAccessibilitySummary: String {
         guard !store.plan.tissueHistory.isEmpty else {
-            return String(localized: "planner.buhlmann.tissue_curve_empty")
+            return DIRIOSLocalizer.string("planner.buhlmann.tissue_curve_empty")
         }
         let peak = store.plan.tissueHistory.groupedPoints.map(\.loadPercent).max() ?? 0
         return String(
-            format: String(localized: "planner.buhlmann.tissue_chart.a11y.summary"),
+            format: DIRIOSLocalizer.string("planner.buhlmann.tissue_chart.a11y.summary"),
             Formatters.zero(peak)
         )
     }
@@ -2668,10 +2676,10 @@ struct PlanResultView: View {
     private func tissueLoadingChartSection(showNDLReference: Bool) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             if store.input.buhlmannUsesTrimixBackGas {
-                DIRWarningBox(text: String(localized: "planner.gas.trimix_buhlmann_disclaimer"))
+                DIRWarningBox(text: DIRIOSLocalizer.string("planner.gas.trimix_buhlmann_disclaimer"))
             }
-            DIRCard(String(localized: "planner.buhlmann.tissue_curve_title"), icon: "waveform.path.ecg", accent: DIRTheme.cyan) {
-                Text(String(localized: "planner.buhlmann.tissue_curve_disclaimer"))
+            DIRCard(DIRIOSLocalizer.string("planner.buhlmann.tissue_curve_title"), icon: "waveform.path.ecg", accent: DIRTheme.cyan) {
+                Text(DIRIOSLocalizer.string("planner.buhlmann.tissue_curve_disclaimer"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -2681,11 +2689,11 @@ struct PlanResultView: View {
                         Image(systemName: "chart.line.uptrend.xyaxis")
                             .font(.title2)
                             .foregroundStyle(DIRTheme.muted)
-                        Text(String(localized: "planner.buhlmann.tissue_curve_empty"))
+                        Text(DIRIOSLocalizer.string("planner.buhlmann.tissue_curve_empty"))
                             .font(.callout.weight(.medium))
                             .foregroundStyle(.white.opacity(0.86))
                             .fixedSize(horizontal: false, vertical: true)
-                        Text(String(localized: "planner.buhlmann.tissue_curve_empty.detail"))
+                        Text(DIRIOSLocalizer.string("planner.buhlmann.tissue_curve_empty.detail"))
                             .font(.caption)
                             .foregroundStyle(DIRTheme.muted)
                             .fixedSize(horizontal: false, vertical: true)
@@ -2693,13 +2701,13 @@ struct PlanResultView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.vertical, 12)
                     .accessibilityElement(children: .combine)
-                    .accessibilityLabel(String(localized: "planner.buhlmann.tissue_curve_empty"))
+                    .accessibilityLabel(DIRIOSLocalizer.string("planner.buhlmann.tissue_curve_empty"))
                 } else {
                     tissueLoadingLegend
                     Chart(store.plan.tissueHistory.groupedPoints) { point in
                         LineMark(
-                            x: .value(String(localized: "planner.buhlmann.axis.time"), point.elapsedMinutes),
-                            y: .value(String(localized: "planner.buhlmann.axis.load"), point.loadPercent),
+                            x: .value(DIRIOSLocalizer.string("planner.buhlmann.axis.time"), point.elapsedMinutes),
+                            y: .value(DIRIOSLocalizer.string("planner.buhlmann.axis.load"), point.loadPercent),
                             series: .value("Group", tissueGroupLabel(point.compartmentGroup))
                         )
                         .foregroundStyle(by: .value("Group", tissueGroupLabel(point.compartmentGroup)))
@@ -2714,17 +2722,17 @@ struct PlanResultView: View {
                     .chartXAxis {
                         AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
                     }
-                    .chartXAxisLabel(String(localized: "planner.buhlmann.axis.time"))
+                    .chartXAxisLabel(DIRIOSLocalizer.string("planner.buhlmann.axis.time"))
                     .chartYAxis {
                         AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
                     }
                     .chartYScale(domain: 0...100)
-                    .chartYAxisLabel(String(localized: "planner.buhlmann.axis.load"))
+                    .chartYAxisLabel(DIRIOSLocalizer.string("planner.buhlmann.axis.load"))
                     .frame(minHeight: 180, maxHeight: 320)
                     .padding(.vertical, 4)
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel(buhlmannChartAccessibilitySummary)
-                    .accessibilityHint(String(localized: "planner.buhlmann.tissue_chart.a11y.hint"))
+                    .accessibilityHint(DIRIOSLocalizer.string("planner.buhlmann.tissue_chart.a11y.hint"))
                 }
             }
 
@@ -2755,19 +2763,19 @@ struct PlanResultView: View {
     }
 
     private var ndlReferenceChart: some View {
-        DIRCard(String(localized: "planner.buhlmann.ndl_reference_title"), icon: nil, accent: DIRTheme.cyan) {
-            Text(String(localized: "planner.buhlmann.curve_disclaimer"))
+        DIRCard(DIRIOSLocalizer.string("planner.buhlmann.ndl_reference_title"), icon: nil, accent: DIRTheme.cyan) {
+            Text(DIRIOSLocalizer.string("planner.buhlmann.curve_disclaimer"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
-            Text(String(localized: "planner.buhlmann.ndl_depth_band_note"))
+            Text(DIRIOSLocalizer.string("planner.buhlmann.ndl_depth_band_note"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
             Chart(store.buhlmann.curve) { point in
                 LineMark(
-                    x: .value(String(localized: "planner.buhlmann.axis.depth"), point.depthMeters),
-                    y: .value(String(localized: "planner.buhlmann.axis.ndl"), point.ndlMinutes)
+                    x: .value(DIRIOSLocalizer.string("planner.buhlmann.axis.depth"), point.depthMeters),
+                    y: .value(DIRIOSLocalizer.string("planner.buhlmann.axis.ndl"), point.ndlMinutes)
                 )
                 .lineStyle(StrokeStyle(lineWidth: 1.5))
                 .foregroundStyle(DIRTheme.muted)
@@ -2775,22 +2783,22 @@ struct PlanResultView: View {
             .chartXAxis {
                 AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
             }
-            .chartXAxisLabel(String(localized: "planner.buhlmann.axis.depth"))
+            .chartXAxisLabel(DIRIOSLocalizer.string("planner.buhlmann.axis.depth"))
             .chartYAxis {
                 AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
             }
-            .chartYAxisLabel(String(localized: "planner.buhlmann.axis.ndl"))
+            .chartYAxisLabel(DIRIOSLocalizer.string("planner.buhlmann.axis.ndl"))
             .frame(minHeight: 140, maxHeight: 260)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(String(localized: "planner.buhlmann.ndl_reference.a11y"))
-            .accessibilityHint(String(localized: "planner.buhlmann.ndl_reference.a11y.hint"))
+            .accessibilityLabel(DIRIOSLocalizer.string("planner.buhlmann.ndl_reference.a11y"))
+            .accessibilityHint(DIRIOSLocalizer.string("planner.buhlmann.ndl_reference.a11y.hint"))
         }
     }
 
     private var depthProfileYAxisLabel: String {
         unitPreference == .metric
-            ? String(localized: "planner.charts.depth_axis_unit_metric")
-            : String(localized: "planner.charts.depth_axis_unit_imperial")
+            ? DIRIOSLocalizer.string("planner.charts.depth_axis_unit_metric")
+            : DIRIOSLocalizer.string("planner.charts.depth_axis_unit_imperial")
     }
 
     private func depthProfileDisplayDepth(meters: Double) -> Double {
@@ -2798,15 +2806,15 @@ struct PlanResultView: View {
     }
 
     private var depthProfileChart: some View {
-        DIRCard(String(localized: "planner.charts.depth_profile"), icon: "chart.xyaxis.line", accent: DIRTheme.cyan) {
+        DIRCard(DIRIOSLocalizer.string("planner.charts.depth_profile"), icon: "chart.xyaxis.line", accent: DIRTheme.cyan) {
             if store.plan.depthProfilePoints.isEmpty {
-                Text(String(localized: "planner.charts.depth_profile_empty"))
+                Text(DIRIOSLocalizer.string("planner.charts.depth_profile_empty"))
                     .font(.caption)
                     .foregroundStyle(DIRTheme.muted)
             } else {
                 Chart(store.plan.depthProfilePoints) { point in
                     LineMark(
-                        x: .value(String(localized: "planner.buhlmann.axis.time"), point.elapsedMinutes),
+                        x: .value(DIRIOSLocalizer.string("planner.buhlmann.axis.time"), point.elapsedMinutes),
                         y: .value(depthProfileYAxisLabel, depthProfileDisplayDepth(meters: point.depthMeters))
                     )
                     .lineStyle(StrokeStyle(lineWidth: 2))
@@ -2815,7 +2823,7 @@ struct PlanResultView: View {
                 .chartXAxis {
                     AxisMarks { AxisGridLine().foregroundStyle(DIRTheme.faint); AxisValueLabel().foregroundStyle(DIRTheme.muted) }
                 }
-                .chartXAxisLabel(String(localized: "planner.buhlmann.axis.time"))
+                .chartXAxisLabel(DIRIOSLocalizer.string("planner.buhlmann.axis.time"))
                 .chartYAxis {
                     AxisMarks { value in
                         AxisGridLine().foregroundStyle(DIRTheme.faint)
@@ -2830,8 +2838,8 @@ struct PlanResultView: View {
                 .chartYAxisLabel(depthProfileYAxisLabel)
                 .frame(minHeight: 160, maxHeight: 280)
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel(String(localized: "planner.charts.depth_profile.a11y"))
-                .accessibilityHint(String(localized: "planner.charts.depth_profile.a11y.hint"))
+                .accessibilityLabel(DIRIOSLocalizer.string("planner.charts.depth_profile.a11y"))
+                .accessibilityHint(DIRIOSLocalizer.string("planner.charts.depth_profile.a11y.hint"))
             }
         }
     }
@@ -2846,9 +2854,9 @@ enum PlanTab: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .plan: return String(localized: "planner.tab.plan")
-        case .curve: return String(localized: "planner.tab.curve")
-        case .charts: return String(localized: "planner.tab.charts")
+        case .plan: return DIRIOSLocalizer.string("planner.tab.plan")
+        case .curve: return DIRIOSLocalizer.string("planner.tab.curve")
+        case .charts: return DIRIOSLocalizer.string("planner.tab.charts")
         }
     }
 }

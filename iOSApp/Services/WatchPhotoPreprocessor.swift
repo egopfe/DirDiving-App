@@ -29,13 +29,13 @@ enum WatchPhotoPreprocessor {
         var errorDescription: String? {
             switch self {
             case .unreadableImage:
-                return String(localized: "watch_photo.error.load")
+                return DIRIOSLocalizer.string("watch_photo.error.load")
             case .conversionFailed:
-                return String(localized: "watch_photo.error.convert")
+                return DIRIOSLocalizer.string("watch_photo.error.convert")
             case .oversizedBytes:
-                return String(localized: "watch_photo.error.load")
+                return DIRIOSLocalizer.string("watch_photo.error.load")
             case .oversizedDimensions:
-                return String(localized: "watch_photo.error.load")
+                return DIRIOSLocalizer.string("watch_photo.error.load")
             }
         }
     }

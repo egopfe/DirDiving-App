@@ -37,14 +37,14 @@ struct CCRChecklistExportSheet: View {
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(String(localized: "checklist_planner.sync.cancel")) { onCancel() }
+                    Button(DIRIOSLocalizer.string("checklist_planner.sync.cancel")) { onCancel() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(String(localized: "checklist_planner.sync.confirm")) { onConfirm() }
+                    Button(DIRIOSLocalizer.string("checklist_planner.sync.confirm")) { onConfirm() }
                         .disabled(!candidates.contains(where: \.isSelected))
                 }
             }
-            .navigationTitle(String(localized: "checklist_planner.sync.choose_add"))
+            .navigationTitle(DIRIOSLocalizer.string("checklist_planner.sync.choose_add"))
             .navigationBarTitleDisplayMode(.inline)
         }
     }
