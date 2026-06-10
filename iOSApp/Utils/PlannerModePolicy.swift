@@ -144,6 +144,18 @@ struct PlannerResultPresentation: Equatable {
 }
 
 enum PlannerModePolicy {
+    /// Fixed internal PPO₂ max for Base recreational gas/depth compatibility (not exposed as a user planning control).
+    /// MOD remains a derived safety limit via `PlannerMODValidator`.
+    static let baseBottomGasMaxPPO2: Double = 1.4
+
+    static func baseDerivedMODMeters(for gas: GasMix, environment: PlannerEnvironment) -> Double {
+        PlannerMODValidator.modMeters(
+            oxygenFraction: gas.oxygen,
+            maxPPO2: baseBottomGasMaxPPO2,
+            environment: environment
+        )
+    }
+
     static func activePlanInput(from draft: GasPlanInput, mode: PlannerMode) -> GasPlanInput {
         var projected = draft
         projected.ensurePlannerCylindersFromLegacy()
@@ -249,8 +261,26 @@ enum PlannerModePolicy {
 
     private static func projectBaseInput(_ input: GasPlanInput) -> GasPlanInput {
         var projected = input
-        let bottomEntry = projected.plannerCylinders.first(where: { $0.role == .bottom })
+        var bottomEntry = projected.plannerCylinders.first(where: { $0.role == .bottom })
             ?? PlannerCylinderEntry(role: .bottom, gas: projected.bottomGas)
+
+        bottomEntry.role = .bottom
+        bottomEntry.gas.role = .bottom
+
+        if !allowedMixKinds(for: .base).contains(bottomEntry.gas.mixKind) {
+            bottomEntry.gas.applyMixKind(.air)
+        }
+
+        if bottomEntry.gas.mixKind == .air {
+            bottomEntry.gas.applyMixKind(.air)
+        } else if bottomEntry.gas.mixKind == .ean {
+            bottomEntry.gas.helium = 0
+            bottomEntry.gas.normalizeMixAndPPO2()
+        }
+
+        bottomEntry.gas.maxPPO2 = baseBottomGasMaxPPO2
+        bottomEntry.gas.normalizeMixAndPPO2()
+
         projected.plannerCylinders = [bottomEntry]
         projected.gfLow = PlannerGFPreset.standard.gfLow
         projected.gfHigh = PlannerGFPreset.standard.gfHigh
