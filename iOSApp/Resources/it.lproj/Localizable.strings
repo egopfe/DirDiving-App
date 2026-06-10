@@ -967,6 +967,11 @@
 "planner.cylinder.tank_size" = "Dimensione bombola";
 "planner.cylinder.add" = "Aggiungi bombola";
 "planner.cylinder.remove" = "Rimuovi";
+"planner.base.gas_depth.title" = "Gas non compatibile con la profondità";
+"planner.base.gas_depth.message" = "Il gas selezionato raggiunge il limite di sicurezza dell'ossigeno prima della profondità massima pianificata.";
+"planner.base.gas_depth.hint" = "Riduci la profondità pianificata, abbassa la percentuale di O₂ oppure scegli Aria. Non superare il limite del gas.";
+"planner.base.gas_depth.detail_format" = "%@ a %@ supera il limite derivato di %@.";
+"planner.base.gas_depth.block_calculate" = "Risolvi l'incompatibilità gas/profondità prima di calcolare il piano.";
 "planner.mod.validation.title" = "Validazione MOD";
 "planner.mod.exceeds_allowed" = "Cambio gas oltre la MOD consentita";
 "planner.mod.hint" = "Verifica la percentuale di ossigeno e la PPO₂ massima.";

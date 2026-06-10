@@ -858,31 +858,78 @@ struct PlannerView: View {
     @ViewBuilder
     private var plannerMODInputWarnings: some View {
         if !liveMODIssues.isEmpty {
-            DIRCard(DIRIOSLocalizer.string("planner.mod.validation.title"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(liveMODIssues) { issue in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(DIRIOSLocalizer.string("planner.mod.exceeds_allowed"))
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(DIRTheme.red)
-                            Text(
-                                String(
-                                    format: DIRIOSLocalizer.string("planner.mod.detail_format"),
-                                    issue.gasLabel,
-                                    Formatters.depth(issue.switchDepthMeters, units: unitPreference).text,
-                                    Formatters.depth(issue.modMeters, units: unitPreference).text
-                                )
-                            )
-                            .font(.caption2)
-                            .foregroundStyle(.white)
-                        }
-                    }
-                    Text(DIRIOSLocalizer.string("planner.mod.incompatible"))
-                        .font(.caption2)
-                        .foregroundStyle(DIRTheme.muted)
-                }
+            switch store.mode {
+            case .base:
+                baseGasDepthCompatibilityWarning(issues: liveMODIssues)
+            case .deco, .technical:
+                genericMODInputWarnings(issues: liveMODIssues)
+            case .ccr:
+                EmptyView()
             }
         }
+    }
+
+    @ViewBuilder
+    private func baseGasDepthCompatibilityWarning(issues: [MODValidationIssue]) -> some View {
+        DIRCard(DIRIOSLocalizer.string("planner.base.gas_depth.title"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(DIRIOSLocalizer.string("planner.base.gas_depth.message"))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.red)
+                    .fixedSize(horizontal: false, vertical: true)
+                ForEach(issues) { issue in
+                    Text(
+                        DIRIOSLocalizer.formatted(
+                            "planner.base.gas_depth.detail_format",
+                            issue.gasLabel,
+                            Formatters.depth(issue.switchDepthMeters, units: unitPreference).text,
+                            Formatters.depth(issue.modMeters, units: unitPreference).text
+                        )
+                    )
+                    .font(.caption2)
+                    .foregroundStyle(.white)
+                    .fixedSize(horizontal: false, vertical: true)
+                }
+                Text(DIRIOSLocalizer.string("planner.base.gas_depth.hint"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func genericMODInputWarnings(issues: [MODValidationIssue]) -> some View {
+        DIRCard(DIRIOSLocalizer.string("planner.mod.validation.title"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(issues) { issue in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(DIRIOSLocalizer.string("planner.mod.exceeds_allowed"))
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(DIRTheme.red)
+                        Text(
+                            DIRIOSLocalizer.formatted(
+                                "planner.mod.detail_format",
+                                issue.gasLabel,
+                                Formatters.depth(issue.switchDepthMeters, units: unitPreference).text,
+                                Formatters.depth(issue.modMeters, units: unitPreference).text
+                            )
+                        )
+                        .font(.caption2)
+                        .foregroundStyle(.white)
+                    }
+                }
+                Text(DIRIOSLocalizer.string("planner.mod.incompatible"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+            }
+        }
+    }
+
+    private var modBlockCalculateMessage: String {
+        store.mode == .base
+            ? DIRIOSLocalizer.string("planner.base.gas_depth.block_calculate")
+            : DIRIOSLocalizer.string("planner.mod.block_calculate")
     }
 
     @ViewBuilder
@@ -996,7 +1043,7 @@ struct PlannerView: View {
                 return
             }
             if PlannerGasSchedule.hasMODBlockingIssues(input: store.input) {
-                calculateErrorMessage = DIRIOSLocalizer.string("planner.mod.block_calculate")
+                calculateErrorMessage = modBlockCalculateMessage
                 showCalculateError = true
                 return
             }
@@ -1039,7 +1086,7 @@ struct PlannerView: View {
         .accessibilityHint(
             liveMODIssues.isEmpty
                 ? DIRIOSLocalizer.string("planner.safety_ack.hint")
-                : DIRIOSLocalizer.string("planner.mod.block_calculate")
+                : modBlockCalculateMessage
         )
     }
 
@@ -2272,16 +2319,18 @@ struct PlanResultView: View {
     @ViewBuilder
     private var modValidationSection: some View {
         if !store.plan.modValidationIssues.isEmpty {
-            DIRCard(DIRIOSLocalizer.string("planner.mod.validation.title"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
-                VStack(alignment: .leading, spacing: 8) {
-                    ForEach(store.plan.modValidationIssues) { issue in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(DIRIOSLocalizer.string("planner.mod.exceeds_allowed"))
-                                .font(.callout.weight(.semibold))
-                                .foregroundStyle(DIRTheme.red)
+            switch store.mode {
+            case .base:
+                DIRCard(DIRIOSLocalizer.string("planner.base.gas_depth.title"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(DIRIOSLocalizer.string("planner.base.gas_depth.message"))
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(DIRTheme.red)
+                            .fixedSize(horizontal: false, vertical: true)
+                        ForEach(store.plan.modValidationIssues) { issue in
                             Text(
-                                String(
-                                    format: DIRIOSLocalizer.string("planner.mod.detail_format"),
+                                DIRIOSLocalizer.formatted(
+                                    "planner.base.gas_depth.detail_format",
                                     issue.gasLabel,
                                     depthText(issue.switchDepthMeters),
                                     depthText(issue.modMeters)
@@ -2289,15 +2338,44 @@ struct PlanResultView: View {
                             )
                             .font(.caption)
                             .foregroundStyle(.white)
+                            .fixedSize(horizontal: false, vertical: true)
                         }
+                        Text(DIRIOSLocalizer.string("planner.base.gas_depth.hint"))
+                            .font(.caption2)
+                            .foregroundStyle(DIRTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    Text(DIRIOSLocalizer.string("planner.mod.incompatible"))
-                        .font(.caption)
-                        .foregroundStyle(DIRTheme.muted)
-                    Text(DIRIOSLocalizer.string("planner.mod.hint"))
-                        .font(.caption2)
-                        .foregroundStyle(DIRTheme.muted)
                 }
+            case .deco, .technical:
+                DIRCard(DIRIOSLocalizer.string("planner.mod.validation.title"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(store.plan.modValidationIssues) { issue in
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(DIRIOSLocalizer.string("planner.mod.exceeds_allowed"))
+                                    .font(.callout.weight(.semibold))
+                                    .foregroundStyle(DIRTheme.red)
+                                Text(
+                                    DIRIOSLocalizer.formatted(
+                                        "planner.mod.detail_format",
+                                        issue.gasLabel,
+                                        depthText(issue.switchDepthMeters),
+                                        depthText(issue.modMeters)
+                                    )
+                                )
+                                .font(.caption)
+                                .foregroundStyle(.white)
+                            }
+                        }
+                        Text(DIRIOSLocalizer.string("planner.mod.incompatible"))
+                            .font(.caption)
+                            .foregroundStyle(DIRTheme.muted)
+                        Text(DIRIOSLocalizer.string("planner.mod.hint"))
+                            .font(.caption2)
+                            .foregroundStyle(DIRTheme.muted)
+                    }
+                }
+            case .ccr:
+                EmptyView()
             }
         }
     }
