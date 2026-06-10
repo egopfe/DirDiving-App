@@ -554,7 +554,7 @@
 "planner.result.title" = "Dive plan";
 "planner.tab.plan" = "PLAN";
 "planner.tab.curve" = "BUHLMANN";
-"planner.tab.charts" = "CHARTS";
+"planner.tab.charts" = "Dive Profile";
 
 "launch.companion_disclaimer.title" = "Companion notice";
 "launch.companion_disclaimer.body" = "DIR Diving must not be considered a dive computer or a dive planning instrument. It is only a Diving Companion intended to help you keep track of information related to your dives.";

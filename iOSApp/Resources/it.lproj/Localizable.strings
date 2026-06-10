@@ -552,7 +552,7 @@
 "planner.result.title" = "Piano Immersione";
 "planner.tab.plan" = "PIANO";
 "planner.tab.curve" = "CURVA BUHLMANN";
-"planner.tab.charts" = "GRAFICI";
+"planner.tab.charts" = "Profilo Immersione";
 
 "launch.companion_disclaimer.title" = "Avviso companion";
 "launch.companion_disclaimer.body" = "DIR Diving non è da considerarsi un computer subacqueo o uno strumento di pianificazione. È soltanto un Diving Companion per aiutarti a tenere a mente le informazioni relative alle tue immersioni.";
