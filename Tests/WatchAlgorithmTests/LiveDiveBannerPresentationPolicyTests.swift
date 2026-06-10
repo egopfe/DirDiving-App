@@ -66,6 +66,27 @@ final class LiveDiveBannerPresentationPolicyTests: XCTestCase {
         XCTAssertTrue(output.secondaryNoticeTitles.contains(String(localized: "live.depth.stale.title")))
     }
 
+    func testMockFallbackNoticeRemainsVisibleInNormalState() {
+        let input = LiveDiveBannerPresentationPolicy.Input(
+            showAscentAlarmBanner: false,
+            depthSafetyState: .normal,
+            exceededSupportedDepthRange: false,
+            isDepthDataStale: false,
+            isManualNoDepthSession: false,
+            hapticsEnabled: true,
+            isDepthAutomationMockFallbackActive: true,
+            isSimulationDepthActive: false,
+            showsAutoDiveHint: false,
+            showsManualHandoffNote: false
+        )
+        let output = LiveDiveBannerPresentationPolicy.evaluate(input)
+        XCTAssertFalse(output.compactSecondaryNotices)
+        XCTAssertTrue(
+            output.secondaryNoticeTitles.contains(String(localized: "watch.depth_source.mock_fallback")),
+            "Mock fallback warning must remain visible when no critical safety banners compact notices"
+        )
+    }
+
     func testCollapsedBannerAccessibilityKeyExists() throws {
         let en = try loadWatchStrings(named: "en")
         let it = try loadWatchStrings(named: "it")

@@ -15,6 +15,8 @@ struct WatchPhotoTransferPanel: View {
             manageButton
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(String(localized: "a11y.watch_photo_transfer.panel.label"))
         .onChange(of: selectedItem) { _, item in
             guard let item else {
                 stagedPhoto = nil
@@ -55,11 +57,14 @@ struct WatchPhotoTransferPanel: View {
                     .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(String(localized: "a11y.watch_photo_transfer.select_photo.label"))
+            .accessibilityHint(String(localized: "a11y.watch_photo_transfer.select_photo.hint"))
 
             if isPreparingPhoto {
                 Text(String(localized: "watch_photo.preparing"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)
+                    .accessibilityLabel(String(localized: "watch_photo.preparing"))
             }
 
             if let stagedPhoto {
@@ -81,12 +86,17 @@ struct WatchPhotoTransferPanel: View {
             }
             .buttonStyle(.plain)
             .disabled(!canSendStagedPhoto)
+            .accessibilityLabel(String(localized: "a11y.watch_photo_transfer.send.label"))
+            .accessibilityHint(String(localized: "a11y.watch_photo_transfer.send.hint"))
+            .accessibilityValue(canSendStagedPhoto ? String(localized: "a11y.watch_photo_transfer.send.enabled") : String(localized: "a11y.watch_photo_transfer.send.disabled"))
 
             if let statusMessage = photoStatusMessage {
                 Text(statusMessage)
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityLabel(String(localized: "a11y.watch_photo_transfer.status.label"))
+                    .accessibilityValue(statusMessage)
             }
         }
     }
@@ -103,6 +113,8 @@ struct WatchPhotoTransferPanel: View {
                 .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(String(localized: "a11y.watch_photo_transfer.manage.label"))
+        .accessibilityHint(String(localized: "a11y.watch_photo_transfer.manage.hint"))
     }
 
     private var canSendStagedPhoto: Bool {
@@ -127,6 +139,7 @@ struct WatchPhotoTransferPanel: View {
                 .scaledToFill()
                 .frame(width: 56, height: 56)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
+                .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 4) {
                 Text(String(localized: "watch_photo.staged.ready"))
                     .font(.caption.weight(.semibold))
@@ -149,12 +162,17 @@ struct WatchPhotoTransferPanel: View {
             .font(.caption2.weight(.semibold))
             .foregroundStyle(DIRTheme.orange)
             .buttonStyle(.plain)
+            .accessibilityLabel(String(localized: "a11y.watch_photo_transfer.delete.label"))
+            .accessibilityHint(String(localized: "a11y.watch_photo_transfer.delete.hint"))
         }
         .padding(8)
         .background(
             RoundedRectangle(cornerRadius: 8)
                 .stroke(DIRTheme.hairline, lineWidth: 1)
         )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(localized: "a11y.watch_photo_transfer.preview.label"))
+        .accessibilityValue(staged.fileName)
     }
 
     private var photoStatusMessage: String? {

@@ -74,7 +74,9 @@ struct DiveLiveView: View {
             }
 
             if dive.isDiveActive, let overlay = dive.diveReminderOverlay {
-                DiveReminderOverlayView(content: overlay)
+                DiveReminderOverlayView(content: overlay) {
+                    dive.dismissDiveReminderOverlay()
+                }
             }
         }
         .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.18) : nil, value: dive.redWarningBlink)
@@ -223,17 +225,15 @@ struct DiveLiveView: View {
     @ViewBuilder
     private func activeDiveContent(leftWidth: CGFloat, gaugeWidth: CGFloat) -> some View {
         let presentation = bannerPresentation
+        let prioritizeDepthHero = shouldPrioritizeDepthHero(for: presentation)
         ScrollView {
             VStack(spacing: activeDiveSpacing(for: presentation)) {
                 topBar
                 immersionStatus
-                if presentation.compactSecondaryNotices {
-                    collapsedSecondaryNoticesChip(titles: presentation.secondaryNoticeTitles)
-                } else {
-                    secondaryNoticeViews(presentation: presentation)
+                if prioritizeDepthHero {
+                    depthSection(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
+                        .layoutPriority(3)
                 }
-                ttvRuntimePanel
-                    .layoutPriority(2)
                 if presentation.showAscentBanner {
                     AscentWarningBannerView(
                         rateMetersPerMinute: dive.ascentStatus.currentRateMetersPerMinute,
@@ -241,6 +241,10 @@ struct DiveLiveView: View {
                         units: unitPreference
                     )
                     .transition(activeDiveTransition)
+                }
+                if presentation.showDepthSafetyBanner {
+                    DepthSafetyBannerView(state: depthSafetyState)
+                        .transition(activeDiveTransition)
                 }
                 if presentation.showSensorBanner {
                     if dive.isDepthDataStale {
@@ -251,10 +255,6 @@ struct DiveLiveView: View {
                             .transition(activeDiveTransition)
                     }
                 }
-                if presentation.showDepthSafetyBanner {
-                    DepthSafetyBannerView(state: depthSafetyState)
-                        .transition(activeDiveTransition)
-                }
                 if presentation.showExceededSupplementalText {
                     Text(String(localized: "depth.safety.exceeded.readings"))
                         .font(DiveUI.Typography.hintCaptionBold)
@@ -262,8 +262,17 @@ struct DiveLiveView: View {
                         .multilineTextAlignment(.leading)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                depthSection(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
+                if presentation.compactSecondaryNotices {
+                    collapsedSecondaryNoticesChip(titles: presentation.secondaryNoticeTitles)
+                } else if !prioritizeDepthHero {
+                    secondaryNoticeViews(presentation: presentation)
+                }
+                ttvRuntimePanel
                     .layoutPriority(2)
+                if !prioritizeDepthHero {
+                    depthSection(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
+                        .layoutPriority(2)
+                }
                 stopwatchPanel
                 controls
                     .layoutPriority(1)
@@ -272,6 +281,16 @@ struct DiveLiveView: View {
         .scrollIndicators(.hidden)
         .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.3) : nil, value: showAscentAlarmBanner)
         .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.22) : nil, value: depthSafetyState)
+    }
+
+    private func shouldPrioritizeDepthHero(for presentation: LiveDiveBannerPresentationPolicy.Output) -> Bool {
+        let criticalCount = [
+            presentation.showAscentBanner,
+            presentation.showDepthSafetyBanner,
+            presentation.showSensorBanner,
+            presentation.showExceededSupplementalText
+        ].filter { $0 }.count
+        return presentation.compactSecondaryNotices || criticalCount >= 2
     }
 
     @ViewBuilder
@@ -598,6 +617,9 @@ struct DiveLiveView: View {
                 .fill(DiveUI.yellow.opacity(0.10))
                 .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(DiveUI.yellow.opacity(0.55), lineWidth: 1))
         )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(localized: "a11y.watch.haptics_off_badge.label"))
+        .accessibilityHint(String(localized: "a11y.watch.haptics_off_badge.hint"))
     }
 
     private var ttvRuntimePanel: some View {

@@ -12,9 +12,9 @@ enum WatchCompanionPhotoValidationError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .invalidFileName:
-            return String(localized: "Nome file immagine non valido")
+            return String(localized: "image.error.invalid_filename")
         case .invalidFileSize:
-            return String(localized: "Dimensione immagine non valida")
+            return String(localized: "image.error.invalid_size")
         case .undecodableImage:
             return String(localized: "user_images.error.not_image")
         case .dimensionsTooLarge:

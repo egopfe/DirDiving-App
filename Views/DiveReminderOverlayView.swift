@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DiveReminderOverlayView: View {
     let content: DiveReminderOverlayContent
+    var onDismiss: () -> Void = {}
 
     var body: some View {
         ZStack {
@@ -50,10 +51,14 @@ struct DiveReminderOverlayView: View {
             )
             .padding(.horizontal, 14)
         }
-        .allowsHitTesting(false)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onDismiss()
+        }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(overlayAccessibilityLabel)
-        .accessibilityHint(String(localized: "dive_reminder.overlay.a11y.hint"))
+        .accessibilityHint(String(localized: "dive_reminder.overlay.a11y.dismiss_hint"))
+        .accessibilityAddTraits(.isButton)
         .transition(.opacity)
     }
 

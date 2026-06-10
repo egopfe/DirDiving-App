@@ -38,6 +38,21 @@ final class MissionModeAlgorithmInvariantTests: XCTestCase {
         XCTAssertFalse(MissionModeRuntimeProfile.mission.decorativeEffectsEnabled)
     }
 
+    func testMissionProfileDoesNotExposeGPSOrSyncOrSamplingFields() {
+        for profile in [MissionModeRuntimeProfile.standard, MissionModeRuntimeProfile.mission] {
+            let labels = Mirror(reflecting: profile).children.compactMap(\.label)
+            for label in labels {
+                let lower = label.lowercased()
+                XCTAssertFalse(lower.contains("gps"))
+                XCTAssertFalse(lower.contains("sync"))
+                XCTAssertFalse(lower.contains("export"))
+                XCTAssertFalse(lower.contains("sample"))
+                XCTAssertFalse(lower.contains("haptic"))
+                XCTAssertFalse(lower.contains("reminder"))
+            }
+        }
+    }
+
     private func sample(_ depth: Double, at date: Date) -> DiveSample {
         DiveSample(timestamp: date, depthMeters: depth, temperatureCelsius: nil)
     }

@@ -157,6 +157,7 @@ struct CCRPlanInput: Codable, Hashable {
     var diluent: CCRDiluent = .air
     var bailoutGases: [CCRBailoutGas] = []
     var rebreatherModel: String = ""
+    /// Metadata / persistence only — not used by CCR planner engine math in this release.
     var loopVolumeLiters: Double?
     var oxygenCylinderNotes: String = ""
     var notes: String = ""

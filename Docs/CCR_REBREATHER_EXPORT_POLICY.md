@@ -21,9 +21,15 @@
 
 Includes: setpoint low/high, switch depth, diluent, bailout cylinders, schedule, CNS/OTU, narcosis reference + **estimator footnote**, **heuristic bailout analysis** block.
 
-## Dive Pack limitation
+## Dive Pack / Briefing limitation (IOS-CCR-PDF-001)
 
-Dive Pack remains **open-circuit Bühlmann** packaging. UI must not offer CCR Dive Pack until a dedicated builder exists. Document this in TestFlight review notes.
+| Export | CCR mode |
+|---|---|
+| CCR Planner PDF | **Yes** — `exportCCRPlan` / `CCRPlannerPDFBuilder` |
+| Briefing PDF | **No** — OC Bühlmann briefing only |
+| Dive Pack PDF | **No** — combines OC plan + checklist; offering it in CCR mode would imply certified operational authority |
+
+`CCRPlanResultView` exposes **CCR plan PDF only** (no Dive Pack / Briefing menu). OC `PlanResultView` retains full OC export menu. This is intentional for the current product scope.
 
 ## CSV
 

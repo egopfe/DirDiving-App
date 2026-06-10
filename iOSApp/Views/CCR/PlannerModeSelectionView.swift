@@ -13,10 +13,15 @@ struct PlannerModeSelectionView: View {
                         Text(String(localized: "planner.mode_selection.subtitle"))
                             .dirScreenSubtitleStyle()
                     }
+                    .accessibilityElement(children: .combine)
+                    .accessibilitySortPriority(100)
+
                     DIRWarningBox(text: String(localized: "planner.reference_only.warning"))
+                        .accessibilityHint(String(localized: "planner.mode_selection.safety.a11y"))
 
                     ForEach(PlannerMode.allCases) { mode in
                         modeCard(mode)
+                            .accessibilitySortPriority(Double(90 - PlannerMode.allCases.firstIndex(of: mode)!))
                     }
                 }
                 .padding(.horizontal, 16)
@@ -29,7 +34,8 @@ struct PlannerModeSelectionView: View {
     }
 
     private func modeCard(_ mode: PlannerMode) -> some View {
-        Button {
+        let isCurrentMode = store.mode == mode
+        return Button {
             store.selectPlannerMode(mode)
         } label: {
             DIRCard(mode.localizedTabTitle, icon: modeIcon(mode), accent: modeAccent(mode)) {
@@ -46,10 +52,35 @@ struct PlannerModeSelectionView: View {
                     }
                 }
             }
+            .overlay {
+                if isCurrentMode {
+                    RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
+                        .stroke(DIRTheme.cyan, lineWidth: 2)
+                }
+            }
         }
         .buttonStyle(.plain)
         .accessibilityLabel(mode.localizedTabTitle)
-        .accessibilityHint(mode.localizedDescription)
+        .accessibilityHint(modeAccessibilityHint(mode))
+        .accessibilityAddTraits(.isButton)
+        .accessibilityValue(
+            isCurrentMode
+                ? String(format: String(localized: "planner.mode.a11y.active"), mode.localizedTabTitle)
+                : ""
+        )
+    }
+
+    private func modeAccessibilityHint(_ mode: PlannerMode) -> String {
+        if mode.isCCR {
+            return String(
+                format: String(localized: "planner.mode_selection.card.a11y.hint"),
+                mode.localizedTabTitle
+            ) + ". " + String(localized: "ccr.safety.disclaimer")
+        }
+        return String(
+            format: String(localized: "planner.mode_selection.card.a11y.hint"),
+            mode.localizedTabTitle
+        )
     }
 
     private func modeIcon(_ mode: PlannerMode) -> String {
@@ -65,8 +96,10 @@ struct PlannerModeSelectionView: View {
         switch mode {
         case .base: return DIRTheme.cyan
         case .deco: return DIRTheme.yellow
-        case .technical: return DIRTheme.yellow
+        case .technical: return Self.technicalAmber
         case .ccr: return DIRTheme.orange
         }
     }
+
+    private static let technicalAmber = Color(red: 1.00, green: 0.68, blue: 0.18)
 }

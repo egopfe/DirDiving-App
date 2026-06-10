@@ -2,6 +2,11 @@ import XCTest
 
 @MainActor
 final class GPSLifecycleTests: XCTestCase {
+    func testFreshManagerDoesNotMaintainLocationUpdates() {
+        let manager = GPSManager()
+        XCTAssertFalse(manager.maintainsLocationUpdates)
+    }
+
     func testCaptureCompletesPreviousPendingCaptureBeforeReplacing() async {
         let manager = GPSManager()
         var firstCompleted = false

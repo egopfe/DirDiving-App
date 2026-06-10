@@ -11,7 +11,8 @@ final class DiveManager: ObservableObject {
         case finalizing
     }
 
-    private static let supportedDraftSchemaVersion = 1
+    private static let supportedDraftSchemaVersion = 2
+    private static let minimumDraftSchemaVersion = 1
     private static let quarantineDirectoryName = "Diagnostics/Quarantine"
 
     private struct ActiveDiveDraft: Codable {
@@ -29,6 +30,7 @@ final class DiveManager: ObservableObject {
         let sessionStartedManually: Bool
         let activeDiveExceededSupportedDepth: Bool
         let hasObservedSubmersionDuringCurrentDive: Bool
+        let missionModeManualPendingForSession: Bool
         let createdAt: Date
         let updatedAt: Date
 
@@ -47,6 +49,7 @@ final class DiveManager: ObservableObject {
             sessionStartedManually: Bool,
             activeDiveExceededSupportedDepth: Bool,
             hasObservedSubmersionDuringCurrentDive: Bool,
+            missionModeManualPendingForSession: Bool = false,
             createdAt: Date,
             updatedAt: Date
         ) {
@@ -64,6 +67,7 @@ final class DiveManager: ObservableObject {
             self.sessionStartedManually = sessionStartedManually
             self.activeDiveExceededSupportedDepth = activeDiveExceededSupportedDepth
             self.hasObservedSubmersionDuringCurrentDive = hasObservedSubmersionDuringCurrentDive
+            self.missionModeManualPendingForSession = missionModeManualPendingForSession
             self.createdAt = createdAt
             self.updatedAt = updatedAt
         }
@@ -71,7 +75,7 @@ final class DiveManager: ObservableObject {
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             guard let schemaVersion = try container.decodeIfPresent(Int.self, forKey: .schemaVersion),
-                  schemaVersion >= DiveManager.supportedDraftSchemaVersion else {
+                  schemaVersion >= DiveManager.minimumDraftSchemaVersion else {
                 throw DecodingError.dataCorruptedError(
                     forKey: .schemaVersion,
                     in: container,
@@ -92,6 +96,7 @@ final class DiveManager: ObservableObject {
             sessionStartedManually = try container.decodeIfPresent(Bool.self, forKey: .sessionStartedManually) ?? isManualLifecycleActive
             activeDiveExceededSupportedDepth = try container.decode(Bool.self, forKey: .activeDiveExceededSupportedDepth)
             hasObservedSubmersionDuringCurrentDive = try container.decode(Bool.self, forKey: .hasObservedSubmersionDuringCurrentDive)
+            missionModeManualPendingForSession = try container.decodeIfPresent(Bool.self, forKey: .missionModeManualPendingForSession) ?? false
             createdAt = try container.decode(Date.self, forKey: .createdAt)
             updatedAt = try container.decode(Date.self, forKey: .updatedAt)
         }
@@ -348,11 +353,20 @@ final class DiveManager: ObservableObject {
         DiveAlgorithm.sanitizedSamples(source)
     }
 
-    private func persistActiveDiveDraft() {
+    private var lastActiveDraftPersistedAt: Date?
+    private var activeDraftPersistDeferred = false
+
+    private func persistActiveDiveDraft(immediate: Bool = false) {
         guard isDiveActive, let start = sessionStart else { return }
+        let now = Date()
+        if !immediate,
+           let lastActiveDraftPersistedAt,
+           now.timeIntervalSince(lastActiveDraftPersistedAt) < DiveAlgorithmConfiguration.activeDiveDraftPersistenceIntervalSeconds {
+            activeDraftPersistDeferred = true
+            return
+        }
         let sessionID = activeDiveSessionID ?? UUID()
         activeDiveSessionID = sessionID
-        let now = Date()
         let draft = ActiveDiveDraft(
             phase: .active,
             sessionID: sessionID,
@@ -364,10 +378,21 @@ final class DiveManager: ObservableObject {
             sessionStartedManually: sessionStartedManually,
             activeDiveExceededSupportedDepth: activeDiveExceededSupportedDepth,
             hasObservedSubmersionDuringCurrentDive: hasObservedSubmersionDuringCurrentDive,
+            missionModeManualPendingForSession: missionModeManualPendingForSession,
             createdAt: start,
             updatedAt: now
         )
         writeActiveDiveDraft(draft)
+        lastActiveDraftPersistedAt = now
+        activeDraftPersistDeferred = false
+        #if DEBUG
+        Self.testHook_activeDraftWriteCount += 1
+        #endif
+    }
+
+    private func flushDeferredActiveDiveDraftIfNeeded() {
+        guard activeDraftPersistDeferred, isDiveActive else { return }
+        persistActiveDiveDraft(immediate: true)
     }
 
     private func persistPendingFinalizationDraft(
@@ -397,10 +422,13 @@ final class DiveManager: ObservableObject {
             sessionStartedManually: sessionStartedManually,
             activeDiveExceededSupportedDepth: activeDiveExceededSupportedDepth,
             hasObservedSubmersionDuringCurrentDive: false,
+            missionModeManualPendingForSession: missionModeManualPendingForSession,
             createdAt: start,
             updatedAt: now
         )
         writeActiveDiveDraft(draft)
+        lastActiveDraftPersistedAt = now
+        activeDraftPersistDeferred = false
     }
 
     private func writeActiveDiveDraft(_ draft: ActiveDiveDraft) {
@@ -440,6 +468,7 @@ final class DiveManager: ObservableObject {
         try? FileManager.default.removeItem(at: activeDiveDraftURL())
     }
 
+    /// Restores `.active` drafts or completes `.finalizing` drafts. Corrupt/legacy payloads are quarantined — never crashes launch.
     private func restoreActiveDiveDraftIfAvailable() {
         let url = activeDiveDraftURL()
         guard let data = try? Data(contentsOf: url) else { return }
@@ -476,6 +505,7 @@ final class DiveManager: ObservableObject {
         activeDiveExceededSupportedDepth = draft.activeDiveExceededSupportedDepth
         exceededSupportedDepthRange = draft.activeDiveExceededSupportedDepth
         hasObservedSubmersionDuringCurrentDive = draft.hasObservedSubmersionDuringCurrentDive
+        missionModeManualPendingForSession = draft.missionModeManualPendingForSession
 
         if let lastSample = restoredSamples.last {
             currentDepthMeters = lastSample.depthMeters
@@ -734,7 +764,8 @@ final class DiveManager: ObservableObject {
     }
 
     func endManualDive() {
-        guard isManualLifecycleActive else { return }
+        guard isDiveActive else { return }
+        guard isManualLifecycleActive || sessionStartedManually else { return }
         endDiveIfNeeded(isManual: true)
     }
 
@@ -784,7 +815,7 @@ final class DiveManager: ObservableObject {
             self.entryGPS = point ?? capturedAtStart
             self.entryGPSFixSource = point != nil ? .fix : (capturedAtStart == nil ? .noFix : .fallback)
             self.showGPSConfirmation(.start(point: self.entryGPS, fallback: point == nil && capturedAtStart != nil))
-            self.persistActiveDiveDraft()
+            self.persistActiveDiveDraft(immediate: true)
         }
         samples = []
         previousDepthSample = nil
@@ -797,12 +828,13 @@ final class DiveManager: ObservableObject {
         runtime = 0
         ttv = 0
         lastReportedRuntime = 0
-        persistActiveDiveDraft()
+        persistActiveDiveDraft(immediate: true)
         startRuntimeTimer()
     }
 
     private func endDiveIfNeeded(isManual: Bool = false) {
         guard isDiveActive, let start = sessionStart, !isFinalizingDive else { return }
+        flushDeferredActiveDiveDraftIfNeeded()
         cancelAutomaticSurfaceEnd()
         updateRuntimeFromClock(evaluateAlarms: false)
         let sessionID = activeDiveSessionID ?? UUID()
@@ -1022,7 +1054,7 @@ final class DiveManager: ObservableObject {
         }
         updateAscentRate(with: storedSample)
         previousDepthSample = storedSample
-        persistActiveDiveDraft()
+        persistActiveDiveDraft(immediate: samples.count <= 1)
         evaluateAutomaticSurfaceCandidate(
             validatedSample: ValidatedDepthSample(validity: .valid, rawDepthMeters: depthMeters, sample: sample)
         )
@@ -1109,6 +1141,12 @@ final class DiveManager: ObservableObject {
         )
     }
 
+    func dismissDiveReminderOverlay() {
+        diveReminderDismissTask?.cancel()
+        diveReminderDismissTask = nil
+        diveReminderOverlay = nil
+    }
+
     private func presentDiveReminderOverlay(_ content: DiveReminderOverlayContent) {
         diveReminderDismissTask?.cancel()
         diveReminderOverlay = content
@@ -1173,7 +1211,7 @@ final class DiveManager: ObservableObject {
     private func startBlinking(source: AlarmBlinkSource) {
         activeBlinkSources.insert(source)
         guard blinkTimer == nil else { return }
-        blinkTimer = Timer.scheduledTimer(withTimeInterval: 0.45, repeats: true) { [weak self] _ in
+        blinkTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.redWarningBlink.toggle() }
         }
     }
@@ -1257,6 +1295,7 @@ extension DiveManager {
     static var testHook_draftDirectoryURL: URL?
     static var testHook_suppressDepthSensorProvider = false
     static var testHook_automaticStopDwellSeconds: TimeInterval?
+    static var testHook_activeDraftWriteCount = 0
 
     var testHook_sampleCount: Int { samples.count }
 
@@ -1288,6 +1327,15 @@ extension DiveManager {
 
     func testHook_endDiveForTests() {
         endDiveIfNeeded()
+    }
+
+    func testHook_simulateManualToAutomaticHandoffForTests() {
+        guard isDiveActive else { return }
+        hasObservedSubmersionDuringCurrentDive = true
+        if isManualLifecycleActive {
+            manualStartHandedOffToAutomatic = true
+            isManualLifecycleActive = false
+        }
     }
 
     func testHook_processDepthMeasurement(
