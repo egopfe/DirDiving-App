@@ -121,8 +121,20 @@ struct PlannerCylinderGasEditorView: View {
 
     @State private var activePicker: PlannerGasPickerField?
 
+    private var isBaseMode: Bool {
+        plannerMode == .base
+    }
+
     private var showsAdvancedMODControls: Bool {
-        plannerMode != .base
+        !isBaseMode
+    }
+
+    private var showsHeliumRow: Bool {
+        !isBaseMode && entry.gas.mixKind == .trimix
+    }
+
+    private var showsRoleRow: Bool {
+        !isBaseMode
     }
 
     var body: some View {
@@ -150,18 +162,20 @@ struct PlannerCylinderGasEditorView: View {
                     rowDivider()
                 }
 
-                if showsRoleEditor {
-                    editorRow(
-                        label: DIRIOSLocalizer.string("planner.gas.editor.role"),
-                        value: entry.role.localizedTitle,
-                        editable: true
-                    ) { activePicker = .role }
-                } else {
-                    editorRow(
-                        label: DIRIOSLocalizer.string("planner.gas.editor.role"),
-                        value: entry.role.localizedTitle,
-                        editable: false
-                    ) {}
+                if showsRoleRow {
+                    if showsRoleEditor {
+                        editorRow(
+                            label: DIRIOSLocalizer.string("planner.gas.editor.role"),
+                            value: entry.role.localizedTitle,
+                            editable: true
+                        ) { activePicker = .role }
+                    } else {
+                        editorRow(
+                            label: DIRIOSLocalizer.string("planner.gas.editor.role"),
+                            value: entry.role.localizedTitle,
+                            editable: false
+                        ) {}
+                    }
                 }
             }
 
@@ -174,14 +188,16 @@ struct PlannerCylinderGasEditorView: View {
                     if entry.gas.canEditOxygen { activePicker = .oxygen }
                 }
 
-                rowDivider()
+                if showsHeliumRow {
+                    rowDivider()
 
-                editorRow(
-                    label: DIRIOSLocalizer.string("planner.gas.helium"),
-                    value: "\(PlannerGasEditingSupport.heliumPercent(from: entry.gas)) %",
-                    editable: entry.gas.canEditHelium
-                ) {
-                    if entry.gas.canEditHelium { activePicker = .helium }
+                    editorRow(
+                        label: DIRIOSLocalizer.string("planner.gas.helium"),
+                        value: "\(PlannerGasEditingSupport.heliumPercent(from: entry.gas)) %",
+                        editable: entry.gas.canEditHelium
+                    ) {
+                        if entry.gas.canEditHelium { activePicker = .helium }
+                    }
                 }
 
                 rowDivider()
