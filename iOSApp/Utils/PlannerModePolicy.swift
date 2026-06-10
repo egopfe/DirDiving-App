@@ -56,6 +56,8 @@ struct PlannerResultPresentation: Equatable {
     let showsTeamPreview: Bool
     let showsManualGFControls: Bool
     let showsGFPresets: Bool
+    /// Configurable CNS descent+bottom input card in the main planner form (not result-level CNS/OTU display).
+    let showsCNSDescentBottomSettings: Bool
 
     static func presentation(for mode: PlannerMode) -> PlannerResultPresentation {
         switch mode {
@@ -77,7 +79,8 @@ struct PlannerResultPresentation: Equatable {
                 showsRepetitivePlanning: false,
                 showsTeamPreview: false,
                 showsManualGFControls: false,
-                showsGFPresets: false
+                showsGFPresets: false,
+                showsCNSDescentBottomSettings: false
             )
         case .deco:
             return PlannerResultPresentation(
@@ -97,7 +100,8 @@ struct PlannerResultPresentation: Equatable {
                 showsRepetitivePlanning: false,
                 showsTeamPreview: false,
                 showsManualGFControls: false,
-                showsGFPresets: true
+                showsGFPresets: true,
+                showsCNSDescentBottomSettings: false
             )
         case .technical:
             return PlannerResultPresentation(
@@ -117,7 +121,8 @@ struct PlannerResultPresentation: Equatable {
                 showsRepetitivePlanning: true,
                 showsTeamPreview: true,
                 showsManualGFControls: true,
-                showsGFPresets: false
+                showsGFPresets: false,
+                showsCNSDescentBottomSettings: true
             )
         case .ccr:
             return PlannerResultPresentation(
@@ -137,7 +142,8 @@ struct PlannerResultPresentation: Equatable {
                 showsRepetitivePlanning: false,
                 showsTeamPreview: false,
                 showsManualGFControls: true,
-                showsGFPresets: false
+                showsGFPresets: false,
+                showsCNSDescentBottomSettings: true
             )
         }
     }
