@@ -25,9 +25,9 @@ enum PlannerGFPreset: String, CaseIterable, Identifiable {
 
     var localizedTitle: String {
         switch self {
-        case .conservative: return String(localized: "planner.gf.preset.conservative")
-        case .standard: return String(localized: "planner.gf.preset.standard")
-        case .aggressive: return String(localized: "planner.gf.preset.aggressive")
+        case .conservative: return DIRIOSLocalizer.string("planner.gf.preset.conservative")
+        case .standard: return DIRIOSLocalizer.string("planner.gf.preset.standard")
+        case .aggressive: return DIRIOSLocalizer.string("planner.gf.preset.aggressive")
         }
     }
 }
@@ -283,7 +283,7 @@ enum PlannerModePolicy {
 
         let bottomGas = working.plannerCylinders.first(where: { $0.role == .bottom })?.gas ?? working.bottomGas
         if bottomGas.mixKind == .trimix || bottomGas.helium > 0.001 {
-            result.add(.unsupportedTrimix, message: String(localized: "planner.base.trimix_not_allowed"))
+            result.add(.unsupportedTrimix, message: DIRIOSLocalizer.string("planner.base.trimix_not_allowed"))
         }
         if bottomGas.mixKind == .air || bottomGas.mixKind == .ean {
             // allowed
@@ -301,11 +301,11 @@ enum PlannerModePolicy {
 
         let bottomGas = working.plannerCylinders.first(where: { $0.role == .bottom })?.gas ?? working.bottomGas
         if bottomGas.mixKind == .trimix || bottomGas.helium > 0.001 {
-            result.add(.unsupportedTrimix, message: String(localized: "planner.deco.trimix_technical_only"))
+            result.add(.unsupportedTrimix, message: DIRIOSLocalizer.string("planner.deco.trimix_technical_only"))
         }
 
         for gas in working.plannerCylinders.filter({ $0.role == .bottom || $0.role == .deco }).map(\.gas) where gas.mixKind == .trimix {
-            result.add(.unsupportedTrimix, message: String(localized: "planner.deco.trimix_technical_only"))
+            result.add(.unsupportedTrimix, message: DIRIOSLocalizer.string("planner.deco.trimix_technical_only"))
         }
 
         return result

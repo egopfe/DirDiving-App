@@ -12,7 +12,7 @@ struct CSVImportPanel: View {
             Button {
                 showImporter = true
             } label: {
-                Label(String(localized: "import.csv.action"), systemImage: "square.and.arrow.down")
+                Label(DIRIOSLocalizer.string("import.csv.action"), systemImage: "square.and.arrow.down")
                     .font(.callout.weight(.semibold))
                     .foregroundStyle(DIRTheme.cyan)
                     .frame(maxWidth: .infinity)
@@ -20,7 +20,7 @@ struct CSVImportPanel: View {
                     .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
             }
             .buttonStyle(.plain)
-            .accessibilityHint(String(localized: "import.csv.action.hint"))
+            .accessibilityHint(DIRIOSLocalizer.string("import.csv.action.hint"))
 
             if let importMessage {
                 Text(importMessage)

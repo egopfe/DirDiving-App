@@ -10,7 +10,7 @@ struct DiveSessionMergeConflict: Identifiable, Hashable {
 
     var userMessage: String {
         String(
-            format: String(localized: "cloud.merge.conflict.format"),
+            format: DIRIOSLocalizer.string("cloud.merge.conflict.format"),
             fieldName,
             localValue,
             cloudValue
@@ -52,7 +52,7 @@ enum DiveSessionMergeConflictDetector {
                 DiveSessionMergeConflict(
                     sessionID: sessionID,
                     fieldName: "duplicateSessionID",
-                    localValue: String(localized: "cloud.merge.duplicate_session.local"),
+                    localValue: DIRIOSLocalizer.string("cloud.merge.duplicate_session.local"),
                     cloudValue: "—"
                 )
             )
@@ -63,7 +63,7 @@ enum DiveSessionMergeConflictDetector {
                     sessionID: sessionID,
                     fieldName: "duplicateSessionID",
                     localValue: "—",
-                    cloudValue: String(localized: "cloud.merge.duplicate_session.cloud")
+                    cloudValue: DIRIOSLocalizer.string("cloud.merge.duplicate_session.cloud")
                 )
             )
         }
@@ -175,7 +175,7 @@ enum DiveSessionMergeConflictDetector {
             conflicts.append(
                 DiveSessionMergeConflict(
                     sessionID: local.id,
-                    fieldName: String(localized: "cloud.merge.field.depth_profile"),
+                    fieldName: DIRIOSLocalizer.string("cloud.merge.field.depth_profile"),
                     localValue: DiveSessionProfileDivergence.profileSummary(local),
                     cloudValue: DiveSessionProfileDivergence.profileSummary(cloud)
                 )

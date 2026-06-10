@@ -15,7 +15,7 @@ struct EquipmentChecklistGasSection: View {
         if item.usesGas {
             VStack(alignment: .leading, spacing: DIRTheme.spaceS) {
             HStack {
-                Text(String(localized: "equipment.checklist.gas_type"))
+                Text(DIRIOSLocalizer.string("equipment.checklist.gas_type"))
                     .foregroundStyle(DIRTheme.muted)
                 Spacer()
                 Picker("", selection: $item.gasMixKind) {
@@ -25,11 +25,11 @@ struct EquipmentChecklistGasSection: View {
                 }
                 .labelsHidden()
                 .tint(DIRTheme.cyan)
-                .accessibilityLabel(String(localized: "equipment.picker.gas_type.a11y"))
+                .accessibilityLabel(DIRIOSLocalizer.string("equipment.picker.gas_type.a11y"))
             }
             .font(.callout)
             HStack {
-                Text(String(localized: "checklist_planner.sync.select_gas_role"))
+                Text(DIRIOSLocalizer.string("checklist_planner.sync.select_gas_role"))
                     .foregroundStyle(DIRTheme.muted)
                 Spacer()
                 Picker("", selection: Binding(
@@ -45,9 +45,9 @@ struct EquipmentChecklistGasSection: View {
             }
             .font(.callout)
             HStack {
-                Text(String(localized: "equipment.checklist.gas_composition"))
+                Text(DIRIOSLocalizer.string("equipment.checklist.gas_composition"))
                     .foregroundStyle(DIRTheme.muted)
-                TextField(String(localized: "equipment.checklist.gas_composition_placeholder"), text: $item.gasText)
+                TextField(DIRIOSLocalizer.string("equipment.checklist.gas_composition_placeholder"), text: $item.gasText)
                     .multilineTextAlignment(.trailing)
                     .foregroundStyle(.white)
                     .tint(DIRTheme.cyan)
@@ -57,7 +57,7 @@ struct EquipmentChecklistGasSection: View {
                 switchDepthRow
             }
             HStack {
-                Text(String(localized: "equipment.checklist.pressure_unit"))
+                Text(DIRIOSLocalizer.string("equipment.checklist.pressure_unit"))
                     .foregroundStyle(DIRTheme.muted)
                 Spacer()
                 Picker("", selection: $item.pressureUnit) {
@@ -67,11 +67,11 @@ struct EquipmentChecklistGasSection: View {
                 }
                 .labelsHidden()
                 .tint(DIRTheme.cyan)
-                .accessibilityLabel(String(localized: "equipment.picker.pressure_unit.a11y"))
+                .accessibilityLabel(DIRIOSLocalizer.string("equipment.picker.pressure_unit.a11y"))
             }
             .font(.callout)
             HStack {
-                Text(String(localized: "equipment.checklist.tank_size"))
+                Text(DIRIOSLocalizer.string("equipment.checklist.tank_size"))
                     .foregroundStyle(DIRTheme.muted)
                 Spacer()
                 Picker("", selection: $item.tankSize) {
@@ -81,13 +81,13 @@ struct EquipmentChecklistGasSection: View {
                 }
                 .labelsHidden()
                 .tint(DIRTheme.cyan)
-                .accessibilityLabel(String(localized: "equipment.picker.tank_size.a11y"))
+                .accessibilityLabel(DIRIOSLocalizer.string("equipment.picker.tank_size.a11y"))
             }
             .font(.callout)
             HStack {
-                Text(item.pressureUnit == .bar ? String(localized: "equipment.checklist.bar") : String(localized: "equipment.checklist.psi"))
+                Text(item.pressureUnit == .bar ? DIRIOSLocalizer.string("equipment.checklist.bar") : DIRIOSLocalizer.string("equipment.checklist.psi"))
                     .foregroundStyle(DIRTheme.muted)
-                TextField(String(localized: "equipment.checklist.pressure"), text: $item.pressureText)
+                TextField(DIRIOSLocalizer.string("equipment.checklist.pressure"), text: $item.pressureText)
                     .multilineTextAlignment(.trailing)
                     .keyboardType(.decimalPad)
                     .foregroundStyle(.white)
@@ -110,10 +110,10 @@ struct EquipmentChecklistGasSection: View {
 
     private var switchDepthRow: some View {
         HStack {
-            Text(String(localized: "equipment.checklist.switch_depth"))
+            Text(DIRIOSLocalizer.string("equipment.checklist.switch_depth"))
                 .foregroundStyle(DIRTheme.muted)
             TextField(
-                String(localized: "equipment.checklist.switch_depth_placeholder"),
+                DIRIOSLocalizer.string("equipment.checklist.switch_depth_placeholder"),
                 text: Binding(
                     get: {
                         guard let meters = item.switchDepthMeters else { return "" }
@@ -133,7 +133,7 @@ struct EquipmentChecklistGasSection: View {
             .keyboardType(.decimalPad)
             .foregroundStyle(.white)
             .tint(DIRTheme.cyan)
-            Text(String(localized: "equipment.checklist.switch_depth_unit"))
+            Text(DIRIOSLocalizer.string("equipment.checklist.switch_depth_unit"))
                 .foregroundStyle(DIRTheme.muted)
         }
         .font(DIRTypography.body)

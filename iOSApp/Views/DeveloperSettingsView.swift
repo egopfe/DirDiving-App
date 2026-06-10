@@ -14,18 +14,18 @@ struct DeveloperSettingsView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading, spacing: 7) {
-                        Text(String(localized: "developer.section.title"))
+                        Text(DIRIOSLocalizer.string("developer.section.title"))
                             .dirScreenTitleStyle()
-                        Text(String(localized: "developer.section.subtitle"))
+                        Text(DIRIOSLocalizer.string("developer.section.subtitle"))
                             .font(.callout)
                             .foregroundStyle(DIRTheme.muted)
                     }
 
-                    DIRCard(String(localized: "developer.sensor_source.title"), icon: "waveform.path", accent: DIRTheme.yellow) {
+                    DIRCard(DIRIOSLocalizer.string("developer.sensor_source.title"), icon: "waveform.path", accent: DIRTheme.yellow) {
                         ForEach(SensorSourceMode.selectableModes) { mode in
                             sensorSourceRow(mode)
                         }
-                        Text(String(localized: "developer.sensor_source.footer"))
+                        Text(DIRIOSLocalizer.string("developer.sensor_source.footer"))
                             .font(.caption2)
                             .foregroundStyle(DIRTheme.muted)
                             .fixedSize(horizontal: false, vertical: true)
@@ -37,10 +37,10 @@ struct DeveloperSettingsView: View {
             .dirCompanionScrollSurface()
         }
         .toolbar(.hidden, for: .navigationBar)
-        .alert(String(localized: "developer.sensor_source.title"), isPresented: $showAppleFallbackAlert) {
-            Button(String(localized: "common.ok"), role: .cancel) {}
+        .alert(DIRIOSLocalizer.string("developer.sensor_source.title"), isPresented: $showAppleFallbackAlert) {
+            Button(DIRIOSLocalizer.string("common.ok"), role: .cancel) {}
         } message: {
-            Text(String(localized: "developer.sensor_source.apple_fallback"))
+            Text(DIRIOSLocalizer.string("developer.sensor_source.apple_fallback"))
         }
     }
 
@@ -78,11 +78,11 @@ private extension SensorSourceMode {
     var displayName: String {
         switch self {
         case .automatic:
-            return String(localized: "developer.sensor_source.automatic")
+            return DIRIOSLocalizer.string("developer.sensor_source.automatic")
         case .appleSensor:
-            return String(localized: "developer.sensor_source.apple_sensor")
+            return DIRIOSLocalizer.string("developer.sensor_source.apple_sensor")
         case .simulation:
-            return String(localized: "developer.sensor_source.simulation")
+            return DIRIOSLocalizer.string("developer.sensor_source.simulation")
         }
     }
 }

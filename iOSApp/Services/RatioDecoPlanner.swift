@@ -340,7 +340,7 @@ enum RatioDecoPlanner {
                 depthLabel: Formatters.depth(0, units: unitPreference).text,
                 minutes: 0,
                 timeLabel: "0 min",
-                gas: String(localized: "planner.table.surface"),
+                gas: DIRIOSLocalizer.string("planner.table.surface"),
                 ppO2: 0.21,
                 ppO2Label: Formatters.one(0.21)
             )

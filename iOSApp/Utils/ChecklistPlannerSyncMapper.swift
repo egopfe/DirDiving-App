@@ -144,7 +144,7 @@ enum ChecklistPlannerSyncMapper {
     static func ccrChecklistItems(from input: CCRPlanInput) -> [EquipmentChecklistItem] {
         var items: [EquipmentChecklistItem] = [
             EquipmentChecklistItem(
-                title: String(localized: "equipment.ccr.diluent_cylinder"),
+                title: DIRIOSLocalizer.string("equipment.ccr.diluent_cylinder"),
                 isReady: false,
                 usesGas: true,
                 gasMixKind: input.diluent.mixKind,
@@ -155,7 +155,7 @@ enum ChecklistPlannerSyncMapper {
         for (index, bailout) in input.bailoutGases.enumerated() {
             items.append(
                 EquipmentChecklistItem(
-                    title: String(format: String(localized: "equipment.ccr.bailout_number"), index + 1),
+                    title: DIRIOSLocalizer.formatted("equipment.ccr.bailout_number", index + 1),
                     isReady: false,
                     usesGas: true,
                     gasMixKind: bailout.mixKind,

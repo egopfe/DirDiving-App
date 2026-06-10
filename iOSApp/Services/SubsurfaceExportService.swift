@@ -14,9 +14,9 @@ enum SubsurfaceExportService {
         var errorDescription: String? {
             switch self {
             case .emptySamples:
-                return String(localized: "export.subsurface.error.empty_samples")
+                return DIRIOSLocalizer.string("export.subsurface.error.empty_samples")
             case .writeFailed(let reason):
-                return String(format: String(localized: "export.subsurface.error.write_failed"), reason)
+                return DIRIOSLocalizer.formatted("export.subsurface.error.write_failed", reason)
             }
         }
     }

@@ -16,7 +16,10 @@ final class IOSEquipmentChecklistTabSplitTests: XCTestCase {
         XCTAssertNotEqual(store.selectedChecklistSetupDisplayName, "")
         store.clearChecklistSetupSelection()
         XCTAssertNil(store.selectedChecklistTemplateID)
-        XCTAssertEqual(store.selectedChecklistSetupDisplayName, String(localized: "checklist.setup.current_profile"))
+        XCTAssertEqual(
+            store.selectedChecklistSetupDisplayName,
+            DIRIOSLocalizer.string("checklist.setup.current_profile")
+        )
         _ = originalCount
     }
 

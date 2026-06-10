@@ -17,22 +17,22 @@ enum TissueAnalyticsLogbookReplay {
 
     static func logbookEntrySubtitle(for session: DiveSession) -> String {
         guard let source = resolvedSource(for: session) else {
-            return String(localized: "tissue_analytics.logbook.entry.subtitle.insufficient")
+            return DIRIOSLocalizer.string("tissue_analytics.logbook.entry.subtitle.insufficient")
         }
         switch source {
         case .planned:
-            return String(localized: "tissue_analytics.logbook.entry.subtitle.planned")
+            return DIRIOSLocalizer.string("tissue_analytics.logbook.entry.subtitle.planned")
         case .recorded:
-            return String(localized: "tissue_analytics.logbook.entry.subtitle.recorded")
+            return DIRIOSLocalizer.string("tissue_analytics.logbook.entry.subtitle.recorded")
         case .simulated:
             if session.isManual {
-                return String(localized: "tissue_analytics.logbook.entry.subtitle.manual_synthetic")
+                return DIRIOSLocalizer.string("tissue_analytics.logbook.entry.subtitle.manual_synthetic")
             }
-            return String(localized: "tissue_analytics.logbook.entry.subtitle.simulated")
+            return DIRIOSLocalizer.string("tissue_analytics.logbook.entry.subtitle.simulated")
         case .insufficientData:
-            return String(localized: "tissue_analytics.logbook.entry.subtitle.insufficient")
+            return DIRIOSLocalizer.string("tissue_analytics.logbook.entry.subtitle.insufficient")
         case .ccrPlanned:
-            return String(localized: "tissue_analytics.source.ccr_planned")
+            return DIRIOSLocalizer.string("tissue_analytics.source.ccr_planned")
         }
     }
 
@@ -183,7 +183,7 @@ enum TissueAnalyticsLogbookReplay {
             ttsMinutes: totalMinutes,
             gfLow: gfLow,
             gfHigh: gfHigh,
-            modeTitle: String(localized: "tissue_analytics.mode.logbook"),
+            modeTitle: DIRIOSLocalizer.string("tissue_analytics.mode.logbook"),
             totalRuntimeMinutes: totalMinutes
         )
 

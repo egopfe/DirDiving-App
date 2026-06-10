@@ -14,24 +14,24 @@ struct EquipmentTemplatesSheet: View {
                         ForEach(equipment.templates) { template in
                             DIRCard(template.name, icon: "shippingbox", accent: DIRTheme.cyan) {
                                 VStack(alignment: .leading, spacing: 8) {
-                                    Text(String(format: String(localized: "equipment.template.items_count"), template.checklistItems.count))
+                                    Text(DIRIOSLocalizer.formatted("equipment.template.items_count", template.checklistItems.count))
                                         .font(.caption)
                                         .foregroundStyle(DIRTheme.muted)
                                     HStack(spacing: 8) {
-                                        Button(String(localized: "equipment.template.apply")) {
+                                        Button(DIRIOSLocalizer.string("equipment.template.apply")) {
                                             equipment.applyTemplate(template)
                                             dismiss()
                                         }
                                         .font(.caption.weight(.semibold))
                                         .foregroundStyle(DIRTheme.cyan)
                                         .buttonStyle(.plain)
-                                        Button(String(localized: "equipment.template.edit")) {
+                                        Button(DIRIOSLocalizer.string("equipment.template.edit")) {
                                             editingTemplate = template
                                         }
                                         .font(.caption.weight(.semibold))
                                         .foregroundStyle(.white)
                                         .buttonStyle(.plain)
-                                        Button(String(localized: "equipment.template.delete"), role: .destructive) {
+                                        Button(DIRIOSLocalizer.string("equipment.template.delete"), role: .destructive) {
                                             equipment.deleteTemplate(id: template.id)
                                         }
                                         .font(.caption.weight(.semibold))
@@ -40,11 +40,11 @@ struct EquipmentTemplatesSheet: View {
                                 }
                             }
                         }
-                        DIRCard(String(localized: "equipment.template.save_current"), icon: "square.and.arrow.down", accent: DIRTheme.green) {
+                        DIRCard(DIRIOSLocalizer.string("equipment.template.save_current"), icon: "square.and.arrow.down", accent: DIRTheme.green) {
                             VStack(spacing: 8) {
-                                TextField(String(localized: "equipment.template.name_placeholder"), text: $newTemplateName)
+                                TextField(DIRIOSLocalizer.string("equipment.template.name_placeholder"), text: $newTemplateName)
                                     .foregroundStyle(.white)
-                                Button(String(localized: "equipment.template.save")) {
+                                Button(DIRIOSLocalizer.string("equipment.template.save")) {
                                     equipment.saveTemplate(named: newTemplateName, fromCurrentChecklist: true)
                                     newTemplateName = ""
                                 }
@@ -58,11 +58,11 @@ struct EquipmentTemplatesSheet: View {
                 }
                 .dirCompanionScrollSurface()
             }
-            .navigationTitle(String(localized: "equipment.my_equipment.title"))
+            .navigationTitle(DIRIOSLocalizer.string("equipment.my_equipment.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(String(localized: "equipment.template.done")) { dismiss() }
+                    Button(DIRIOSLocalizer.string("equipment.template.done")) { dismiss() }
                         .foregroundStyle(DIRTheme.cyan)
                 }
             }

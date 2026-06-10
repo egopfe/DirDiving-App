@@ -35,6 +35,7 @@ struct DIRDivingiOSApp: App {
                         )
                     } else {
                         ContentView()
+                            .id(appLanguage)
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

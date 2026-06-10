@@ -33,24 +33,32 @@ enum DIRIOSAppLanguage: String, CaseIterable, Identifiable {
     }
 
     var title: LocalizedStringKey {
-        switch self {
-        case .system:
-            return "System Language"
-        case .italian:
-            return "Italiano"
-        case .english:
-            return "English"
-        }
+        LocalizedStringKey(localizedTitle)
     }
 
     var companionDetail: LocalizedStringKey {
+        LocalizedStringKey(localizedDetail)
+    }
+
+    var localizedTitle: String {
         switch self {
         case .system:
-            return "Follows iPhone language"
+            return DIRIOSLocalizer.string("language.option.system")
         case .italian:
-            return "Forza interfaccia italiana"
+            return DIRIOSLocalizer.string("language.option.italian")
         case .english:
-            return "Forces English interface"
+            return DIRIOSLocalizer.string("language.option.english")
+        }
+    }
+
+    var localizedDetail: String {
+        switch self {
+        case .system:
+            return DIRIOSLocalizer.string("language.option.system.detail")
+        case .italian:
+            return DIRIOSLocalizer.string("language.option.italian.detail")
+        case .english:
+            return DIRIOSLocalizer.string("language.option.english.detail")
         }
     }
 

@@ -5,9 +5,9 @@ struct DIRSearchBar: View {
     var body: some View {
         HStack {
             Image(systemName: "magnifyingglass").foregroundStyle(DIRTheme.muted)
-            TextField(String(localized: "logbook.search.placeholder"), text: $text)
+            TextField(DIRIOSLocalizer.string("logbook.search.placeholder"), text: $text)
                 .foregroundStyle(.white)
-                .accessibilityLabel(String(localized: "logbook.search.a11y"))
+                .accessibilityLabel(DIRIOSLocalizer.string("logbook.search.a11y"))
         }
         .font(.callout)
         .padding(.horizontal, 12)
