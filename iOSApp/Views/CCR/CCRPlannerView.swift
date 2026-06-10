@@ -20,26 +20,40 @@ struct CCRPlannerView: View {
     var body: some View {
         NavigationStack {
             DIRScreenContainer {
-                ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 16) {
-                        header
-                        plannerSafetySection
-                        DIRWarningBox(text: DIRIOSLocalizer.string("ccr.safety.disclaimer"))
-                        profileCard
-                        setpointCard
-                        diluentCard
-                        bailoutCard
-                        gfCard
-                        warningsCard
-                        calculateButton
+                ScrollViewReader { scrollProxy in
+                    ScrollView(showsIndicators: false) {
+                        VStack(alignment: .leading, spacing: 16) {
+                            header
+                            plannerSafetySection
+                            DIRWarningBox(text: DIRIOSLocalizer.string("ccr.safety.disclaimer"))
+                            profileCard
+                            if PlannerResultPresentation.presentation(for: .ccr).showsCNSDescentBottomSettings {
+                                PlannerCNSDescentBottomSettingsCard()
+                                    .id(PlannerCNSDescentBottomCheckSettings.scrollTargetID)
+                            }
+                            setpointCard
+                            diluentCard
+                            bailoutCard
+                            gfCard
+                            warningsCard
+                            calculateButton
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 10)
+                        .padding(.bottom, 18)
+                        .disabled(!plannerSafetyAcknowledged)
+                        .opacity(plannerSafetyAcknowledged ? 1 : 0.45)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 10)
-                    .padding(.bottom, 18)
-                    .disabled(!plannerSafetyAcknowledged)
-                    .opacity(plannerSafetyAcknowledged ? 1 : 0.45)
+                    .dirCompanionScrollSurface()
+                    .onChange(of: store.scrollToCNSThresholdSettings) { _, shouldScroll in
+                        guard shouldScroll else { return }
+                        scrollToCNSThresholdSettings(using: scrollProxy)
+                    }
+                    .onChange(of: showPlan) { _, isShowing in
+                        guard !isShowing, store.scrollToCNSThresholdSettings else { return }
+                        scrollToCNSThresholdSettings(using: scrollProxy)
+                    }
                 }
-                .dirCompanionScrollSurface()
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -221,6 +235,15 @@ struct CCRPlannerView: View {
                     }
                 }
             }
+        }
+    }
+
+    private func scrollToCNSThresholdSettings(using scrollProxy: ScrollViewProxy) {
+        DispatchQueue.main.async {
+            withAnimation(.easeInOut(duration: 0.35)) {
+                scrollProxy.scrollTo(PlannerCNSDescentBottomCheckSettings.scrollTargetID, anchor: .center)
+            }
+            store.acknowledgeCNSThresholdSettingsFocus()
         }
     }
 
