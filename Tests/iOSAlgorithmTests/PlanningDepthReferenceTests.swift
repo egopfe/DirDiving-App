@@ -63,12 +63,13 @@ final class PlanningDepthReferenceTests: XCTestCase {
         XCTAssertEqual(preview.depthMeters, request.maxDepthMeters, accuracy: 0.001)
     }
 
-    func testAverageDepthStillFeedsConsumptionEstimate() {
+    func testAverageDepthStillFeedsConsumptionEstimateWhenTechnicalToggleEnabled() {
         var input = BuhlmannTestSupport.gasPlanInput(depth: 50, bottomMinutes: 10)
-        input.planningDepthReference = .averageDepth
+        input.usesAverageDepthForGasConsumption = true
         input.plannedAverageDepthMeters = 25
 
-        XCTAssertEqual(input.effectivePlanningDepthMeters, 25, accuracy: 0.001)
+        let active = PlannerModePolicy.activePlanInput(from: input, mode: .technical)
+        XCTAssertEqual(active.gasConsumptionReferenceDepthMeters(for: .technical), 25, accuracy: 0.001)
         XCTAssertEqual(input.buhlmannPlanningDepthMeters, 50, accuracy: 0.001)
     }
 }

@@ -9,6 +9,7 @@ struct MoreView: View {
     @EnvironmentObject private var logStore: DiveLogStore
     @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
     @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
+    @AppStorage(IOSPressureUnitPreference.storageKey) private var pressureUnitRaw = IOSPressureUnitPreference.storageValue(for: .bar)
     @AppStorage(CloudBackupSettings.enabledKey) private var cloudBackupEnabled = false
     @State private var showResetPairingConfirm = false
     @State private var versionTapCount = 0
@@ -230,23 +231,46 @@ struct MoreView: View {
 
     private var unitsPreferenceSection: some View {
         let preference = IOSUnitPreference.fromStorage(units)
+        let pressurePreference = IOSPressureUnitPreference.fromStorage(pressureUnitRaw)
 
-        return VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(DIRIOSLocalizer.string("units.title"))
-                    .foregroundStyle(DIRTheme.muted)
-                Spacer()
-                Text(preference.shortLabel)
-                    .foregroundStyle(.white)
-                    .fontWeight(.semibold)
-            }
-            .font(.callout)
-            Picker(DIRIOSLocalizer.string("units.title"), selection: $units) {
-                ForEach(IOSUnitPreference.allCases) { option in
-                    Text(option.shortLabel).tag(option.rawValue)
+        return VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text(DIRIOSLocalizer.string("settings.units.depth.title"))
+                        .foregroundStyle(DIRTheme.muted)
+                    Spacer()
+                    Text(preference.shortLabel)
+                        .foregroundStyle(.white)
+                        .fontWeight(.semibold)
                 }
+                .font(.callout)
+                Picker(DIRIOSLocalizer.string("settings.units.depth.title"), selection: $units) {
+                    ForEach(IOSUnitPreference.allCases) { option in
+                        Text(option.shortLabel).tag(option.rawValue)
+                    }
+                }
+                .pickerStyle(.segmented)
             }
-            .pickerStyle(.segmented)
+
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text(DIRIOSLocalizer.string("settings.units.pressure.title"))
+                        .foregroundStyle(DIRTheme.muted)
+                    Spacer()
+                    Text(pressurePreference == .bar
+                        ? DIRIOSLocalizer.string("settings.units.pressure.bar")
+                        : DIRIOSLocalizer.string("settings.units.pressure.psi"))
+                        .foregroundStyle(.white)
+                        .fontWeight(.semibold)
+                }
+                .font(.callout)
+                Picker(DIRIOSLocalizer.string("settings.units.pressure.title"), selection: $pressureUnitRaw) {
+                    Text(DIRIOSLocalizer.string("settings.units.pressure.bar")).tag(IOSPressureUnitPreference.storageValue(for: .bar))
+                    Text(DIRIOSLocalizer.string("settings.units.pressure.psi")).tag(IOSPressureUnitPreference.storageValue(for: .psi))
+                }
+                .pickerStyle(.segmented)
+            }
+
             Text(DIRIOSLocalizer.string("settings.units.sync_note"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)

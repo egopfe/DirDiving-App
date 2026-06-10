@@ -13,14 +13,14 @@ enum PlannerInputValidator {
         } else if input.plannedDepthMeters > IOSAlgorithmConfiguration.maxPlannerDepthMeters {
             result.add(.unsupportedDepth)
         }
-        if mode != .base {
+        if presentation.showsAverageDepthGasConsumptionToggle, input.averageDepthGasConsumptionEnabled {
             if !input.plannedAverageDepthMeters.isFinite
                 || input.plannedAverageDepthMeters < 0
                 || input.plannedAverageDepthMeters > input.plannedDepthMeters {
                 result.add(.invalidInput, message: DIRIOSLocalizer.string("planner.validation.average_depth_invalid"))
             }
         }
-        let depth = input.effectivePlanningDepthMeters
+        let depth = input.gasConsumptionReferenceDepthMeters(for: mode)
         let bottomTime = input.plannedBottomMinutes
 
         if !depth.isFinite || depth < IOSAlgorithmConfiguration.minPlannerDepthMeters {

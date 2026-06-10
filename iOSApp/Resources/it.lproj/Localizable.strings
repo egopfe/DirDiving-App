@@ -547,6 +547,18 @@
 "planner.gf.preset.aggressive.compact_format" = "Aggr. GF %@";
 "planner.gf.preset.explanation_format" = "GF più bassi sono più conservativi; GF più alti sono più aggressivi. Preset attuale: GF %@.";
 "planner.gf.preset.accessibility_format" = "%@, Gradient Factor %@";
+"planner.deco.back_gas.title" = "Back Gas";
+"planner.deco.decompression_gas.title" = "Gas Decompressivo";
+"planner.deco.decompression_gas.toggle" = "Usa gas decompressivo";
+"planner.deco.decompression_gas.description" = "Aggiungi un gas e una bombola dedicati alle tappe di decompressione.";
+"planner.deco.decompression_gas.off_note" = "La pianificazione userà solo il Back Gas.";
+"planner.deco.gas_consumption.conservative_depth_note" = "Il consumo gas è stimato in modo conservativo alla profondità massima pianificata.";
+"planner.technical.average_depth.gas_toggle" = "Usa profondità media per consumi";
+"planner.technical.average_depth.gas_enabled_note" = "La profondità media viene usata solo per stimare i consumi gas. La decompressione resta calcolata sul profilo/profondità pianificata.";
+"planner.technical.average_depth.gas_disabled_note" = "I consumi gas sono stimati in modo conservativo alla profondità massima pianificata.";
+"planner.technical.gas_consumption.reference.max" = "profondità massima";
+"planner.technical.gas_consumption.reference.average" = "profondità media";
+"planner.result.gas_consumption_reference" = "Riferimento consumo gas: %@";
 "planner.cylinder.add_deco" = "Aggiungi gas deco";
 "planner.profile.title" = "Profilo Immersione";
 "planner.field.max_depth" = "Profondità Massima";
@@ -562,6 +574,10 @@
 "launch.companion_disclaimer.title" = "Avviso companion";
 "launch.companion_disclaimer.body" = "DIR Diving non è da considerarsi un computer subacqueo o uno strumento di pianificazione. È soltanto un Diving Companion per aiutarti a tenere a mente le informazioni relative alle tue immersioni.";
 "settings.units.sync_note" = "Le unità si sincronizzano tra iPhone e Watch se associati. L'export CSV resta metrico/Subsurface.";
+"settings.units.depth.title" = "Profondità";
+"settings.units.pressure.title" = "Pressione";
+"settings.units.pressure.bar" = "bar";
+"settings.units.pressure.psi" = "PSI";
 "manual_dive.add.title" = "Aggiungi immersione manuale";
 "manual_dive.edit.title" = "Modifica immersione manuale";
 "manual_dive.site" = "Sito";
@@ -713,7 +729,7 @@
 "analysis.metric.distance" = "Distanza";
 "analysis.metric.bearing" = "Rilevamento";
 
-"planner.units.metric_notice" = "I calcoli gas, volumi e pressioni restano metrici/bar. Profondità e temperatura seguono le unita selezionate in Altro.";
+"planner.units.metric_notice" = "Profondità e temperatura seguono le unità selezionate in Altro. La pressione segue l'impostazione globale bar/PSI.";
 "manual_dive.cancel" = "Annulla";
 "planner.gas.bottom" = "Gas di Fondo";
 "planner.gas.deco1" = "Gas di Decompressione 1";

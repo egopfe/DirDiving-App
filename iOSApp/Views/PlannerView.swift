@@ -6,6 +6,7 @@ struct PlannerView: View {
     @EnvironmentObject private var equipment: EquipmentStore
     @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
+    @AppStorage(IOSPressureUnitPreference.storageKey) private var pressureUnitRaw = IOSPressureUnitPreference.storageValue(for: .bar)
     @State private var showPlan = false
     @State private var showPlanningReferenceInfo = false
     @State private var showCalculateError = false
@@ -20,6 +21,7 @@ struct PlannerView: View {
     @State private var pdfExportAlertMessage: String?
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
+    private var pressureUnitPreference: PressureUnit { IOSPressureUnitPreference.fromStorage(pressureUnitRaw) }
     private var modePresentation: PlannerResultPresentation { PlannerResultPresentation.presentation(for: store.mode) }
 
     private var profileMaxDepthLimitMeters: Double? {
@@ -34,7 +36,7 @@ struct PlannerView: View {
     }
 
     private var profileMaxAverageDepthLimitMeters: Double? {
-        store.mode == .deco ? PlannerModeLimits.decoMaximumDepthMeters(for: store.input) : nil
+        modePresentation.showsAverageDepthInput ? store.input.plannedDepthMeters : nil
     }
 
     private var profileMaxBottomMinutes: Double? {
@@ -236,40 +238,50 @@ struct PlannerView: View {
                     meters: $store.input.plannedDepthMeters,
                     maxMeters: profileMaxDepthLimitMeters
                 )
-                if store.mode != .base {
-                    Divider().overlay(DIRTheme.hairline)
-                    plannerDepthField(
-                        DIRIOSLocalizer.string("planner.field.avg_depth"),
-                        meters: $store.input.plannedAverageDepthMeters,
-                        maxMeters: profileMaxAverageDepthLimitMeters
-                    )
-                    Divider().overlay(DIRTheme.hairline)
-                    HStack(spacing: 8) {
-                        Text(DIRIOSLocalizer.string("planner.field.planning_reference"))
-                            .font(.callout)
-                            .foregroundStyle(.white)
-                        Button {
-                            showPlanningReferenceInfo = true
-                        } label: {
-                            Image(systemName: "info.circle")
-                                .font(.callout)
-                                .foregroundStyle(DIRTheme.cyan)
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel(DIRIOSLocalizer.string("planner.reference.info.title"))
-                        Spacer()
-                        Picker(DIRIOSLocalizer.string("planner.field.planning_reference"), selection: $store.input.planningDepthReference) {
-                            Text(DIRIOSLocalizer.string("planner.reference.max_depth")).tag(PlanningDepthReference.maximumDepth)
-                            Text(DIRIOSLocalizer.string("planner.reference.avg_depth")).tag(PlanningDepthReference.averageDepth)
-                        }
-                        .labelsHidden()
-                        .tint(DIRTheme.cyan)
-                    }
-                    Text(DIRIOSLocalizer.string("planner.reference.helper"))
+                if store.mode == .deco {
+                    Text(DIRIOSLocalizer.string("planner.deco.gas_consumption.conservative_depth_note"))
                         .font(.caption2)
                         .foregroundStyle(DIRTheme.muted)
                         .fixedSize(horizontal: false, vertical: true)
-                    .padding(.vertical, 10)
+                        .padding(.vertical, 8)
+                }
+                if modePresentation.showsAverageDepthGasConsumptionToggle {
+                    Divider().overlay(DIRTheme.hairline)
+                    Toggle(isOn: Binding(
+                        get: { store.input.averageDepthGasConsumptionEnabled },
+                        set: { enabled in
+                            store.input.usesAverageDepthForGasConsumption = enabled
+                            if enabled {
+                                store.input.ensureDefaultAverageDepthIfNeeded()
+                            }
+                        }
+                    )) {
+                        Text(DIRIOSLocalizer.string("planner.technical.average_depth.gas_toggle"))
+                            .font(.callout)
+                            .foregroundStyle(.white)
+                    }
+                    .tint(DIRTheme.cyan)
+                    .padding(.vertical, 8)
+
+                    if store.input.averageDepthGasConsumptionEnabled {
+                        Divider().overlay(DIRTheme.hairline)
+                        plannerDepthField(
+                            DIRIOSLocalizer.string("planner.field.avg_depth"),
+                            meters: $store.input.plannedAverageDepthMeters,
+                            maxMeters: profileMaxAverageDepthLimitMeters
+                        )
+                        Text(DIRIOSLocalizer.string("planner.technical.average_depth.gas_enabled_note"))
+                            .font(.caption2)
+                            .foregroundStyle(DIRTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.vertical, 8)
+                    } else {
+                        Text(DIRIOSLocalizer.string("planner.technical.average_depth.gas_disabled_note"))
+                            .font(.caption2)
+                            .foregroundStyle(DIRTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.vertical, 8)
+                    }
                 }
                 Divider().overlay(DIRTheme.hairline)
                 plannerField(
@@ -576,14 +588,24 @@ struct PlannerView: View {
             .joined(separator: ". ")
     }
 
+    private var visibleBackGasCylinders: [PlannerCylinderEntry] {
+        store.input.plannerCylinders.filter { $0.role == .bottom }
+    }
+
+    private var visibleDecoGasCylinders: [PlannerCylinderEntry] {
+        guard store.mode == .deco, store.input.decoGasPlanningEnabled else { return [] }
+        let deco = store.input.plannerCylinders
+            .filter { $0.role == .deco }
+            .sorted { $0.switchDepthMeters > $1.switchDepthMeters }
+        return Array(deco.prefix(1))
+    }
+
     private var visiblePlannerCylinders: [PlannerCylinderEntry] {
         switch store.mode {
         case .base:
-            return store.input.plannerCylinders.filter { $0.role == .bottom }
+            return visibleBackGasCylinders
         case .deco:
-            let bottom = store.input.plannerCylinders.filter { $0.role == .bottom }
-            let deco = store.input.plannerCylinders.filter { $0.role == .deco }.sorted { $0.switchDepthMeters > $1.switchDepthMeters }
-            return bottom + Array(deco.prefix(1))
+            return visibleBackGasCylinders + visibleDecoGasCylinders
         case .technical, .ccr:
             return store.input.plannerCylinders
         }
@@ -606,28 +628,35 @@ struct PlannerView: View {
                     .buttonStyle(.plain)
                     Divider().overlay(DIRTheme.hairline)
                 }
-                ForEach(visiblePlannerCylinders) { entry in
-                    if let index = store.input.plannerCylinders.firstIndex(where: { $0.id == entry.id }) {
-                        plannerCylinderEditor(at: index)
+                if store.mode == .deco {
+                    ForEach(visibleBackGasCylinders) { entry in
+                        if let index = store.input.plannerCylinders.firstIndex(where: { $0.id == entry.id }) {
+                            plannerCylinderEditor(at: index)
+                        }
                     }
-                }
-                if store.mode == .deco,
-                   store.input.plannerCylinders.filter({ $0.role == .deco }).isEmpty {
-                    Button {
-                        let entry = PlannerCylinderEntry(
-                            role: .deco,
-                            tankSize: .liters12,
-                            gas: GasMix(name: "Deco", role: .deco, oxygen: 0.50, helium: 0, maxPPO2: 1.6)
-                        )
-                        store.input.plannerCylinders.append(entry)
-                        store.normalizeNewCylinderSwitchDepth(cylinderID: entry.id)
-                    } label: {
-                        Text(DIRIOSLocalizer.string("planner.cylinder.add_deco"))
-                            .font(.callout.weight(.semibold))
-                            .foregroundStyle(DIRTheme.cyan)
+                    decoDecompressionGasToggleSection
+                    if store.input.decoGasPlanningEnabled {
+                        Text(DIRIOSLocalizer.string("planner.deco.decompression_gas.description"))
+                            .font(.caption2)
+                            .foregroundStyle(DIRTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                        ForEach(visibleDecoGasCylinders) { entry in
+                            if let index = store.input.plannerCylinders.firstIndex(where: { $0.id == entry.id }) {
+                                plannerCylinderEditor(at: index)
+                            }
+                        }
+                    } else {
+                        Text(DIRIOSLocalizer.string("planner.deco.decompression_gas.off_note"))
+                            .font(.caption2)
+                            .foregroundStyle(DIRTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    .buttonStyle(.plain)
-                    Divider().overlay(DIRTheme.hairline)
+                } else {
+                    ForEach(visiblePlannerCylinders) { entry in
+                        if let index = store.input.plannerCylinders.firstIndex(where: { $0.id == entry.id }) {
+                            plannerCylinderEditor(at: index)
+                        }
+                    }
                 }
                 if store.mode == .technical {
                     addTechnicalCylinderButtons
@@ -644,6 +673,40 @@ struct PlannerView: View {
                 }
             }
         }
+    }
+
+    private var decoDecompressionGasToggleSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Divider().overlay(DIRTheme.hairline)
+            Toggle(isOn: decoGasEnabledBinding) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(DIRIOSLocalizer.string("planner.deco.decompression_gas.toggle"))
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(.white)
+                    Text(DIRIOSLocalizer.string("planner.deco.decompression_gas.title"))
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.muted)
+                }
+            }
+            .tint(DIRTheme.cyan)
+        }
+        .padding(.vertical, 4)
+    }
+
+    private var decoGasEnabledBinding: Binding<Bool> {
+        Binding(
+            get: { store.input.decoGasPlanningEnabled },
+            set: { enabled in
+                store.input.isDecoGasEnabled = enabled
+                if enabled {
+                    store.input.ensureDefaultDecoGasIfNeeded()
+                    if let deco = store.input.plannerCylinders.first(where: { $0.role == .deco }) {
+                        store.normalizeNewCylinderSwitchDepth(cylinderID: deco.id)
+                    }
+                }
+                store.refreshDerivedPlanningPreview()
+            }
+        )
     }
 
     @ViewBuilder
@@ -682,9 +745,11 @@ struct PlannerView: View {
             PlannerCylinderGasEditorView(
                 entry: $store.input.plannerCylinders[index],
                 cylinderNumber: cylinderDisplayNumber(for: entry),
+                sectionTitle: cylinderSectionTitle(for: entry),
                 plannerMode: store.mode,
                 allowedMixKinds: PlannerModePolicy.allowedMixKinds(for: store.mode),
                 unitPreference: unitPreference,
+                pressureUnitPreference: pressureUnitPreference,
                 plannerEnvironment: store.input.plannerEnvironment,
                 plannedDepthMeters: store.input.plannedDepthMeters,
                 showsRoleEditor: store.mode == .technical,
@@ -713,6 +778,18 @@ struct PlannerView: View {
     private func cylinderDisplayNumber(for entry: PlannerCylinderEntry) -> Int {
         let visible = visiblePlannerCylinders
         return (visible.firstIndex(where: { $0.id == entry.id }) ?? 0) + 1
+    }
+
+    private func cylinderSectionTitle(for entry: PlannerCylinderEntry) -> String? {
+        guard store.mode == .deco else { return nil }
+        switch entry.role {
+        case .bottom:
+            return DIRIOSLocalizer.string("planner.deco.back_gas.title")
+        case .deco:
+            return DIRIOSLocalizer.string("planner.deco.decompression_gas.title")
+        default:
+            return nil
+        }
     }
 
     private var technicalAnalysisCard: some View {
@@ -769,13 +846,16 @@ struct PlannerView: View {
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.consumption"), value: Formatters.zero(store.analysis.consumptionLiters), unit: "L", color: DIRTheme.yellow)
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.remaining"), value: Formatters.zero(store.analysis.remainingBar), unit: "bar", color: store.analysis.remainingLiters < store.analysis.rockBottomLiters ? DIRTheme.red : DIRTheme.green)
+                    let remainingPressure = Formatters.pressure(fromBar: store.analysis.remainingBar, unit: pressureUnitPreference)
+                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.remaining"), value: remainingPressure.value, unit: remainingPressure.unit, color: store.analysis.remainingLiters < store.analysis.rockBottomLiters ? DIRTheme.red : DIRTheme.green)
                 }
                 Divider().overlay(DIRTheme.hairline)
                 HStack(spacing: 0) {
-                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.rock_bottom"), value: Formatters.zero(store.analysis.minimumGasBar), unit: "bar", color: DIRTheme.orange)
+                    let rockBottomPressure = Formatters.pressure(fromBar: store.analysis.minimumGasBar, unit: pressureUnitPreference)
+                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.rock_bottom"), value: rockBottomPressure.value, unit: rockBottomPressure.unit, color: DIRTheme.orange)
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.turn_pressure"), value: Formatters.zero(store.analysis.turnPressureBar), unit: "bar", color: DIRTheme.cyan)
+                    let turnPressure = Formatters.pressure(fromBar: store.analysis.turnPressureBar, unit: pressureUnitPreference)
+                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.turn_pressure"), value: turnPressure.value, unit: turnPressure.unit, color: DIRTheme.cyan)
                 }
                 if store.analysis.usesBottomPhaseConsumptionEstimate {
                     Text(DIRIOSLocalizer.string("planner.gas.bottom_phase_estimate_footnote"))
@@ -1260,6 +1340,7 @@ struct PlannerView: View {
             store: store,
             safetyAcknowledged: plannerSafetyAcknowledged,
             unitPreference: unitPreference,
+            pressureUnitPreference: pressureUnitPreference,
             modIssues: liveMODIssues
         )
     }
@@ -1296,6 +1377,7 @@ struct PlanResultView: View {
     @EnvironmentObject private var equipment: EquipmentStore
     var pendingChecklistExportPrompt: Bool = false
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
+    @AppStorage(IOSPressureUnitPreference.storageKey) private var pressureUnitRaw = IOSPressureUnitPreference.storageValue(for: .bar)
     @AppStorage(PlannerCNSDescentBottomCheckSettings.storageKey) private var cnsDescentBottomCheckEnabled = PlannerCNSDescentBottomCheckSettings.defaultEnabled
     @AppStorage(PlannerCNSDescentBottomCheckSettings.thresholdStorageKey) private var cnsThresholdPercent = PlannerCNSDescentBottomCheckSettings.defaultThresholdPercent
     @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
@@ -1318,6 +1400,7 @@ struct PlanResultView: View {
     }
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
+    private var pressureUnitPreference: PressureUnit { IOSPressureUnitPreference.fromStorage(pressureUnitRaw) }
     private var modePresentation: PlannerResultPresentation { PlannerResultPresentation.presentation(for: store.mode) }
 
     private var cnsDescentBottomThresholdPercent: Double {
@@ -1716,6 +1799,7 @@ struct PlanResultView: View {
             store: store,
             safetyAcknowledged: plannerSafetyAcknowledged,
             unitPreference: unitPreference,
+            pressureUnitPreference: pressureUnitPreference,
             modIssues: liveMODIssues
         )
     }
@@ -1786,15 +1870,13 @@ struct PlanResultView: View {
         showChecklistExportSheet = false
     }
 
-    private var referenceDepthSummary: String {
-        let label: String
-        switch store.input.planningDepthReference {
-        case .maximumDepth:
-            label = DIRIOSLocalizer.string("planner.result.reference_depth.max")
-        case .averageDepth:
-            label = DIRIOSLocalizer.string("planner.result.reference_depth.average")
-        }
-        return DIRIOSLocalizer.formatted("planner.result.reference_depth", label)
+    private var referenceDepthSummary: String? {
+        guard store.mode == .technical else { return nil }
+        let active = PlannerModePolicy.activePlanInput(from: store.input, mode: store.mode)
+        let label = active.averageDepthGasConsumptionEnabled
+            ? DIRIOSLocalizer.string("planner.technical.gas_consumption.reference.average")
+            : DIRIOSLocalizer.string("planner.technical.gas_consumption.reference.max")
+        return DIRIOSLocalizer.formatted("planner.result.gas_consumption_reference", label)
     }
 
     private var resultHeaderBadge: some View {
@@ -1822,10 +1904,12 @@ struct PlanResultView: View {
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(DIRTheme.yellow)
             }
-            Text(referenceDepthSummary)
-                .font(.caption2)
-                .foregroundStyle(DIRTheme.muted)
-                .fixedSize(horizontal: false, vertical: true)
+            if let referenceDepthSummary {
+                Text(referenceDepthSummary)
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
         .padding(14)
         .background(
@@ -2046,10 +2130,11 @@ struct PlanResultView: View {
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: "END", value: endMeasurement.value, unit: endMeasurement.unit, color: DIRTheme.yellow)
                     Divider().overlay(DIRTheme.hairline)
+                    let turnPressure = Formatters.pressure(fromBar: store.analysis.turnPressureBar, unit: pressureUnitPreference)
                     DIRMetricTile(
                         title: DIRIOSLocalizer.string("planner.metric.turn_pressure"),
-                        value: Formatters.zero(store.analysis.turnPressureBar),
-                        unit: "bar",
+                        value: turnPressure.value,
+                        unit: turnPressure.unit,
                         color: DIRTheme.cyan
                     )
                 }
@@ -2212,7 +2297,8 @@ struct PlanResultView: View {
                 Divider().overlay(DIRTheme.hairline)
                 DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.remaining"), value: Formatters.zero(entry.remainingLiters), unit: "L", color: entry.remainingLiters < 0 ? DIRTheme.red : DIRTheme.green)
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: DIRIOSLocalizer.string("planner.gas_ledger.remaining_pressure"), value: Formatters.zero(entry.remainingBar), unit: "bar", color: reserveBreached ? DIRTheme.red : DIRTheme.cyan)
+                let remainingPressure = Formatters.pressure(fromBar: entry.remainingBar, unit: pressureUnitPreference)
+                DIRMetricTile(title: DIRIOSLocalizer.string("planner.gas_ledger.remaining_pressure"), value: remainingPressure.value, unit: remainingPressure.unit, color: reserveBreached ? DIRTheme.red : DIRTheme.cyan)
             }
             if lostGasFailed {
                 Text(DIRIOSLocalizer.string("planner.gas_ledger.warning.lost_gas.message"))
@@ -2261,10 +2347,11 @@ struct PlanResultView: View {
                     color: DIRTheme.cyan
                 )
                 Divider().overlay(DIRTheme.hairline)
+                let availablePressure = Formatters.pressure(fromBar: entry.availableBar, unit: pressureUnitPreference)
                 DIRMetricTile(
                     title: DIRIOSLocalizer.string("planner.gas_ledger.remaining_pressure"),
-                    value: Formatters.zero(entry.availableBar),
-                    unit: "bar",
+                    value: availablePressure.value,
+                    unit: availablePressure.unit,
                     color: DIRTheme.cyan
                 )
             }

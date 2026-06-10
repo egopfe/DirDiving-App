@@ -22,16 +22,18 @@ enum PDFShareActions {
         store: PlannerStore,
         safetyAcknowledged: Bool,
         unitPreference: IOSUnitPreference,
+        pressureUnitPreference: PressureUnit,
         modIssues: [MODValidationIssue]
     ) -> PDFExportPlannerContext {
         PDFExportPlannerContext(
-            input: store.input,
+            input: PlannerModePolicy.activePlanInput(from: store.input, mode: store.mode),
             plan: store.plan,
             mode: store.mode,
             validation: PlannerModePolicy.validate(draft: store.input, mode: store.mode),
             modIssues: modIssues,
             safetyAcknowledged: safetyAcknowledged,
-            unitPreference: unitPreference
+            unitPreference: unitPreference,
+            pressureUnitPreference: pressureUnitPreference
         )
     }
 

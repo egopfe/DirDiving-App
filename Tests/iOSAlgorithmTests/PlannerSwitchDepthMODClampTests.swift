@@ -79,6 +79,7 @@ final class PlannerSwitchDepthMODClampTests: XCTestCase {
 
     func testDecoModeProjectionClampsActiveDecoGas() {
         var input = GasPlanInput()
+        input.isDecoGasEnabled = true
         input.plannerCylinders = [
             PlannerCylinderEntry(role: .bottom, gas: GasMix(name: "Air", role: .bottom, mixKind: .air, oxygen: 0.21, helium: 0, maxPPO2: 1.4)),
             decoEntry(gas: oxygenDecoGas(), switchDepth: 21),
