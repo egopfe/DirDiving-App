@@ -32,11 +32,31 @@ final class PlannerGFPresetDisplayTests: XCTestCase {
         }
     }
 
-    func testPlannerViewGFPresetPickerShowsValues() throws {
+    func testDisplayPairDerivesFromGFPresetValues() {
+        for preset in PlannerGFPreset.allCases {
+            XCTAssertEqual(
+                preset.displayPair,
+                "\(Int(preset.gfLow))/\(Int(preset.gfHigh))"
+            )
+            XCTAssertEqual(preset.localizedGFValueLine, "GF \(preset.displayPair)")
+        }
+    }
+
+    func testGFPresetAccessibilityLabelIncludesNameAndValues() {
+        for preset in PlannerGFPreset.allCases {
+            XCTAssertTrue(preset.accessibilityLabel.contains(preset.localizedTitle))
+            XCTAssertTrue(preset.accessibilityLabel.contains(preset.displayPair))
+        }
+    }
+
+    func testPlannerViewUsesVerticalGFPresetCards() throws {
         let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/PlannerView.swift"))
-        XCTAssertTrue(source.contains("localizedCompactTitleWithValues"))
+        XCTAssertTrue(source.contains("gfPresetOptionCard"))
+        XCTAssertTrue(source.contains("preset.localizedTitle"))
+        XCTAssertTrue(source.contains("preset.localizedGFValueLine"))
         XCTAssertTrue(source.contains("planner.gf.preset.explanation_format"))
-        XCTAssertFalse(source.contains("Text(preset.localizedTitle).tag(preset)"))
+        XCTAssertFalse(source.contains("pickerStyle(.segmented)"))
+        XCTAssertFalse(source.contains("localizedCompactTitleWithValues"))
     }
 
     func testGFPresetExplanationLocalizationKeysExist() throws {
@@ -44,6 +64,7 @@ final class PlannerGFPresetDisplayTests: XCTestCase {
         let it = try loadIOSStrings(named: "it")
         let keys = [
             "planner.gf.preset.explanation_format",
+            "planner.gf.preset.accessibility_format",
             "planner.gf.preset.conservative.compact_format",
             "planner.gf.preset.standard.compact_format",
             "planner.gf.preset.aggressive.compact_format"

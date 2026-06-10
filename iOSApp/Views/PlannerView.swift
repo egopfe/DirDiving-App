@@ -326,13 +326,15 @@ struct PlannerView: View {
             Text(DIRIOSLocalizer.string("planner.field.gf_preset"))
                 .font(.callout)
                 .foregroundStyle(.white)
-            Picker(DIRIOSLocalizer.string("planner.field.gf_preset"), selection: gfPresetBinding) {
+            VStack(spacing: 8) {
                 ForEach(PlannerGFPreset.allCases) { preset in
-                    Text(preset.localizedCompactTitleWithValues).tag(preset)
+                    gfPresetOptionCard(
+                        preset: preset,
+                        isSelected: gfPresetBinding.wrappedValue == preset
+                    )
                 }
             }
-            .pickerStyle(.segmented)
-            .tint(DIRTheme.cyan)
+            .accessibilityElement(children: .contain)
             Text(
                 DIRIOSLocalizer.formatted(
                     "planner.gf.preset.explanation_format",
@@ -344,6 +346,45 @@ struct PlannerView: View {
             .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.vertical, 10)
+    }
+
+    private func gfPresetOptionCard(preset: PlannerGFPreset, isSelected: Bool) -> some View {
+        Button {
+            gfPresetBinding.wrappedValue = preset
+        } label: {
+            HStack(alignment: .center, spacing: 12) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(preset.localizedTitle)
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(.white)
+                    Text(preset.localizedGFValueLine)
+                        .font(.caption.monospacedDigit().weight(.medium))
+                        .foregroundStyle(isSelected ? DIRTheme.cyan : DIRTheme.muted)
+                }
+                Spacer(minLength: 0)
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(DIRTheme.cyan)
+                }
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isSelected ? DIRTheme.cyan.opacity(0.12) : DIRTheme.surface2)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(
+                        isSelected ? DIRTheme.cyan.opacity(0.85) : DIRTheme.hairline,
+                        lineWidth: isSelected ? 1.5 : 1
+                    )
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(preset.accessibilityLabel)
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
 
     private var gfPresetBinding: Binding<PlannerGFPreset> {
