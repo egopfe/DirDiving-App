@@ -42,8 +42,19 @@ final class IOSEquipmentChecklistTabSplitTests: XCTestCase {
         }
         XCTAssertTrue(source.contains("ChecklistView()"))
         XCTAssertTrue(source.contains("MoreView()"))
+        XCTAssertTrue(source.contains("DIRCompanionTabBar"))
+        XCTAssertFalse(source.contains("TabView(selection:"))
         XCTAssertFalse(source.contains(".more)"))
         XCTAssertFalse(source.contains("Label(\"tab.more\""))
+    }
+
+    func testCompanionTabBarListsAllSixTabsInOrder() throws {
+        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/Components/DIRCompanionTabBar.swift"))
+        let expected = ["planner", "logbook", "analysis", "gear", "checklist", "settings"]
+        for tab in expected {
+            XCTAssertTrue(source.contains(".\(tab)"), "Missing companion tab \(tab)")
+        }
+        XCTAssertTrue(source.contains("companionOrder"))
     }
 
     private func repositoryRoot() -> URL {
