@@ -544,6 +544,10 @@
 "planner.gf.preset.conservative" = "Conservative";
 "planner.gf.preset.standard" = "Standard";
 "planner.gf.preset.aggressive" = "Aggressive";
+"planner.gf.preset.conservative.compact_format" = "Cons. GF %@";
+"planner.gf.preset.standard.compact_format" = "Std. GF %@";
+"planner.gf.preset.aggressive.compact_format" = "Aggr. GF %@";
+"planner.gf.preset.explanation_format" = "Lower GF values are more conservative; higher GF values are more aggressive. Current preset: GF %@.";
 "planner.cylinder.add_deco" = "Add deco gas";
 "planner.profile.title" = "Dive profile";
 "planner.field.max_depth" = "Max depth";

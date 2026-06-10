@@ -542,6 +542,10 @@
 "planner.gf.preset.conservative" = "Conservativo";
 "planner.gf.preset.standard" = "Standard";
 "planner.gf.preset.aggressive" = "Aggressivo";
+"planner.gf.preset.conservative.compact_format" = "Cons. GF %@";
+"planner.gf.preset.standard.compact_format" = "Std. GF %@";
+"planner.gf.preset.aggressive.compact_format" = "Aggr. GF %@";
+"planner.gf.preset.explanation_format" = "GF più bassi sono più conservativi; GF più alti sono più aggressivi. Preset attuale: GF %@.";
 "planner.cylinder.add_deco" = "Aggiungi gas deco";
 "planner.profile.title" = "Profilo Immersione";
 "planner.field.max_depth" = "Profondità Massima";
