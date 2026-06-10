@@ -58,7 +58,10 @@ enum PlannerPDFBuilder {
                 )
                 page.drawLine(
                     DIRIOSLocalizer.string("planner.gas.editor.working_pressure_section"),
-                    value: "\(Formatters.zero(entry.startPressure)) \(entry.pressureUnit.rawValue)"
+                    value: Formatters.pressure(
+                        fromBar: PlannerGasEditingSupport.startPressureBar(for: entry),
+                        unit: context.pressureUnitPreference
+                    ).text
                 )
                 if entry.role != .bottom {
                     page.drawLine(

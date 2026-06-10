@@ -6,6 +6,7 @@ struct PlannerView: View {
     @EnvironmentObject private var equipment: EquipmentStore
     @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
+    @AppStorage(IOSPressureUnitPreference.storageKey) private var pressureUnitRaw = IOSPressureUnitPreference.storageValue(for: .bar)
     @State private var showPlan = false
     @State private var showPlanningReferenceInfo = false
     @State private var showCalculateError = false
@@ -20,6 +21,7 @@ struct PlannerView: View {
     @State private var pdfExportAlertMessage: String?
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
+    private var pressureUnitPreference: PressureUnit { IOSPressureUnitPreference.fromStorage(pressureUnitRaw) }
     private var modePresentation: PlannerResultPresentation { PlannerResultPresentation.presentation(for: store.mode) }
 
     private var profileMaxDepthLimitMeters: Double? {
@@ -737,6 +739,7 @@ struct PlannerView: View {
                 plannerMode: store.mode,
                 allowedMixKinds: PlannerModePolicy.allowedMixKinds(for: store.mode),
                 unitPreference: unitPreference,
+                pressureUnitPreference: pressureUnitPreference,
                 plannerEnvironment: store.input.plannerEnvironment,
                 plannedDepthMeters: store.input.plannedDepthMeters,
                 showsRoleEditor: store.mode == .technical,
@@ -833,13 +836,16 @@ struct PlannerView: View {
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.consumption"), value: Formatters.zero(store.analysis.consumptionLiters), unit: "L", color: DIRTheme.yellow)
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.remaining"), value: Formatters.zero(store.analysis.remainingBar), unit: "bar", color: store.analysis.remainingLiters < store.analysis.rockBottomLiters ? DIRTheme.red : DIRTheme.green)
+                    let remainingPressure = Formatters.pressure(fromBar: store.analysis.remainingBar, unit: pressureUnitPreference)
+                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.remaining"), value: remainingPressure.value, unit: remainingPressure.unit, color: store.analysis.remainingLiters < store.analysis.rockBottomLiters ? DIRTheme.red : DIRTheme.green)
                 }
                 Divider().overlay(DIRTheme.hairline)
                 HStack(spacing: 0) {
-                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.rock_bottom"), value: Formatters.zero(store.analysis.minimumGasBar), unit: "bar", color: DIRTheme.orange)
+                    let rockBottomPressure = Formatters.pressure(fromBar: store.analysis.minimumGasBar, unit: pressureUnitPreference)
+                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.rock_bottom"), value: rockBottomPressure.value, unit: rockBottomPressure.unit, color: DIRTheme.orange)
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.turn_pressure"), value: Formatters.zero(store.analysis.turnPressureBar), unit: "bar", color: DIRTheme.cyan)
+                    let turnPressure = Formatters.pressure(fromBar: store.analysis.turnPressureBar, unit: pressureUnitPreference)
+                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.turn_pressure"), value: turnPressure.value, unit: turnPressure.unit, color: DIRTheme.cyan)
                 }
                 if store.analysis.usesBottomPhaseConsumptionEstimate {
                     Text(DIRIOSLocalizer.string("planner.gas.bottom_phase_estimate_footnote"))
@@ -1324,6 +1330,7 @@ struct PlannerView: View {
             store: store,
             safetyAcknowledged: plannerSafetyAcknowledged,
             unitPreference: unitPreference,
+            pressureUnitPreference: pressureUnitPreference,
             modIssues: liveMODIssues
         )
     }
@@ -1360,6 +1367,7 @@ struct PlanResultView: View {
     @EnvironmentObject private var equipment: EquipmentStore
     var pendingChecklistExportPrompt: Bool = false
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
+    @AppStorage(IOSPressureUnitPreference.storageKey) private var pressureUnitRaw = IOSPressureUnitPreference.storageValue(for: .bar)
     @AppStorage(PlannerCNSDescentBottomCheckSettings.storageKey) private var cnsDescentBottomCheckEnabled = PlannerCNSDescentBottomCheckSettings.defaultEnabled
     @AppStorage(PlannerCNSDescentBottomCheckSettings.thresholdStorageKey) private var cnsThresholdPercent = PlannerCNSDescentBottomCheckSettings.defaultThresholdPercent
     @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
@@ -1382,6 +1390,7 @@ struct PlanResultView: View {
     }
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
+    private var pressureUnitPreference: PressureUnit { IOSPressureUnitPreference.fromStorage(pressureUnitRaw) }
     private var modePresentation: PlannerResultPresentation { PlannerResultPresentation.presentation(for: store.mode) }
 
     private var cnsDescentBottomThresholdPercent: Double {
@@ -1780,6 +1789,7 @@ struct PlanResultView: View {
             store: store,
             safetyAcknowledged: plannerSafetyAcknowledged,
             unitPreference: unitPreference,
+            pressureUnitPreference: pressureUnitPreference,
             modIssues: liveMODIssues
         )
     }
@@ -2110,10 +2120,11 @@ struct PlanResultView: View {
                     Divider().overlay(DIRTheme.hairline)
                     DIRMetricTile(title: "END", value: endMeasurement.value, unit: endMeasurement.unit, color: DIRTheme.yellow)
                     Divider().overlay(DIRTheme.hairline)
+                    let turnPressure = Formatters.pressure(fromBar: store.analysis.turnPressureBar, unit: pressureUnitPreference)
                     DIRMetricTile(
                         title: DIRIOSLocalizer.string("planner.metric.turn_pressure"),
-                        value: Formatters.zero(store.analysis.turnPressureBar),
-                        unit: "bar",
+                        value: turnPressure.value,
+                        unit: turnPressure.unit,
                         color: DIRTheme.cyan
                     )
                 }
@@ -2276,7 +2287,8 @@ struct PlanResultView: View {
                 Divider().overlay(DIRTheme.hairline)
                 DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.remaining"), value: Formatters.zero(entry.remainingLiters), unit: "L", color: entry.remainingLiters < 0 ? DIRTheme.red : DIRTheme.green)
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: DIRIOSLocalizer.string("planner.gas_ledger.remaining_pressure"), value: Formatters.zero(entry.remainingBar), unit: "bar", color: reserveBreached ? DIRTheme.red : DIRTheme.cyan)
+                let remainingPressure = Formatters.pressure(fromBar: entry.remainingBar, unit: pressureUnitPreference)
+                DIRMetricTile(title: DIRIOSLocalizer.string("planner.gas_ledger.remaining_pressure"), value: remainingPressure.value, unit: remainingPressure.unit, color: reserveBreached ? DIRTheme.red : DIRTheme.cyan)
             }
             if lostGasFailed {
                 Text(DIRIOSLocalizer.string("planner.gas_ledger.warning.lost_gas.message"))
@@ -2325,10 +2337,11 @@ struct PlanResultView: View {
                     color: DIRTheme.cyan
                 )
                 Divider().overlay(DIRTheme.hairline)
+                let availablePressure = Formatters.pressure(fromBar: entry.availableBar, unit: pressureUnitPreference)
                 DIRMetricTile(
                     title: DIRIOSLocalizer.string("planner.gas_ledger.remaining_pressure"),
-                    value: Formatters.zero(entry.availableBar),
-                    unit: "bar",
+                    value: availablePressure.value,
+                    unit: availablePressure.unit,
                     color: DIRTheme.cyan
                 )
             }

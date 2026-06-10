@@ -567,6 +567,10 @@
 "launch.companion_disclaimer.title" = "Avviso companion";
 "launch.companion_disclaimer.body" = "DIR Diving non è da considerarsi un computer subacqueo o uno strumento di pianificazione. È soltanto un Diving Companion per aiutarti a tenere a mente le informazioni relative alle tue immersioni.";
 "settings.units.sync_note" = "Le unità si sincronizzano tra iPhone e Watch se associati. L'export CSV resta metrico/Subsurface.";
+"settings.units.depth.title" = "Profondità";
+"settings.units.pressure.title" = "Pressione";
+"settings.units.pressure.bar" = "bar";
+"settings.units.pressure.psi" = "PSI";
 "manual_dive.add.title" = "Aggiungi immersione manuale";
 "manual_dive.edit.title" = "Modifica immersione manuale";
 "manual_dive.site" = "Sito";
@@ -718,7 +722,7 @@
 "analysis.metric.distance" = "Distanza";
 "analysis.metric.bearing" = "Rilevamento";
 
-"planner.units.metric_notice" = "I calcoli gas, volumi e pressioni restano metrici/bar. Profondità e temperatura seguono le unita selezionate in Altro.";
+"planner.units.metric_notice" = "Profondità e temperatura seguono le unità selezionate in Altro. La pressione segue l'impostazione globale bar/PSI.";
 "manual_dive.cancel" = "Annulla";
 "planner.gas.bottom" = "Gas di Fondo";
 "planner.gas.deco1" = "Gas di Decompressione 1";

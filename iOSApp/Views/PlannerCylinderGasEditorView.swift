@@ -111,6 +111,7 @@ struct PlannerCylinderGasEditorView: View {
     let plannerMode: PlannerMode
     let allowedMixKinds: [GasMixKind]
     let unitPreference: IOSUnitPreference
+    let pressureUnitPreference: PressureUnit
     let plannerEnvironment: PlannerEnvironment
     let plannedDepthMeters: Double
     var showsRoleEditor: Bool
@@ -238,17 +239,9 @@ struct PlannerCylinderGasEditorView: View {
                     .foregroundStyle(DIRTheme.muted)
                     .textCase(.uppercase)
 
-                Picker("", selection: pressureUnitBinding) {
-                    ForEach(PressureUnit.allCases) { unit in
-                        Text(unit.rawValue).tag(unit)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .tint(DIRTheme.cyan)
-
                 groupedCard {
                     editorRow(
-                        label: entry.pressureUnit.rawValue,
+                        label: Formatters.pressureUnitLabel(pressureUnitPreference),
                         value: workingPressureDisplay,
                         editable: true
                     ) { activePicker = .workingPressure }
@@ -276,18 +269,7 @@ struct PlannerCylinderGasEditorView: View {
     }
 
     private var workingPressureDisplay: String {
-        let value = PlannerGasEditingSupport.nearestWorkingPressure(entry.startPressure, unit: entry.pressureUnit)
-        return "\(value) \(entry.pressureUnit.rawValue.lowercased())"
-    }
-
-    private var pressureUnitBinding: Binding<PressureUnit> {
-        Binding(
-            get: { entry.pressureUnit },
-            set: { newUnit in
-                PlannerGasEditingSupport.convertPressureUnit(on: &entry, to: newUnit)
-                onPressureChanged()
-            }
-        )
+        PlannerGasEditingSupport.workingPressureLabel(for: entry, unit: pressureUnitPreference)
     }
 
     private var modStatusCard: some View {
@@ -449,9 +431,9 @@ struct PlannerCylinderGasEditorView: View {
         case .workingPressure:
             PlannerGasWheelPickerSheet(
                 title: DIRIOSLocalizer.string("planner.gas.editor.working_pressure_section"),
-                values: PlannerGasEditingSupport.workingPressureValues(for: entry.pressureUnit),
+                values: PlannerGasEditingSupport.workingPressureValues(for: pressureUnitPreference),
                 selection: workingPressureSelection,
-                valueLabel: { "\($0) \(entry.pressureUnit.rawValue.lowercased())" },
+                valueLabel: { "\($0) \(Formatters.pressureUnitLabel(pressureUnitPreference))" },
                 onConfirm: {
                     activePicker = nil
                     onPressureChanged()
@@ -505,8 +487,8 @@ struct PlannerCylinderGasEditorView: View {
 
     private var workingPressureSelection: Binding<Int> {
         Binding(
-            get: { PlannerGasEditingSupport.nearestWorkingPressure(entry.startPressure, unit: entry.pressureUnit) },
-            set: { entry.startPressure = Double($0) }
+            get: { PlannerGasEditingSupport.displayWorkingPressure(entry, unit: pressureUnitPreference) },
+            set: { PlannerGasEditingSupport.applyWorkingPressure($0, unit: pressureUnitPreference, to: &entry) }
         )
     }
 
@@ -569,6 +551,7 @@ struct PlannerCylinderGasEditorSheet: View {
     let plannerMode: PlannerMode
     let allowedMixKinds: [GasMixKind]
     let unitPreference: IOSUnitPreference
+    let pressureUnitPreference: PressureUnit
     let plannerEnvironment: PlannerEnvironment
     let plannedDepthMeters: Double
     var showsRoleEditor: Bool
@@ -585,6 +568,7 @@ struct PlannerCylinderGasEditorSheet: View {
         plannerMode: PlannerMode,
         allowedMixKinds: [GasMixKind],
         unitPreference: IOSUnitPreference,
+        pressureUnitPreference: PressureUnit,
         plannerEnvironment: PlannerEnvironment,
         plannedDepthMeters: Double,
         showsRoleEditor: Bool,
@@ -598,6 +582,7 @@ struct PlannerCylinderGasEditorSheet: View {
         self.plannerMode = plannerMode
         self.allowedMixKinds = allowedMixKinds
         self.unitPreference = unitPreference
+        self.pressureUnitPreference = pressureUnitPreference
         self.plannerEnvironment = plannerEnvironment
         self.plannedDepthMeters = plannedDepthMeters
         self.showsRoleEditor = showsRoleEditor
@@ -618,6 +603,7 @@ struct PlannerCylinderGasEditorSheet: View {
                         plannerMode: plannerMode,
                         allowedMixKinds: allowedMixKinds,
                         unitPreference: unitPreference,
+                        pressureUnitPreference: pressureUnitPreference,
                         plannerEnvironment: plannerEnvironment,
                         plannedDepthMeters: plannedDepthMeters,
                         showsRoleEditor: showsRoleEditor,

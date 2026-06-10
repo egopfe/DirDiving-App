@@ -21,7 +21,8 @@ final class PDFExportServiceTests: XCTestCase {
             validation: PlannerModePolicy.validate(draft: input, mode: mode),
             modIssues: [],
             safetyAcknowledged: true,
-            unitPreference: .metric
+            unitPreference: .metric,
+            pressureUnitPreference: .bar
         )
     }
 
@@ -61,7 +62,8 @@ final class PDFExportServiceTests: XCTestCase {
             validation: context.validation,
             modIssues: context.modIssues,
             safetyAcknowledged: false,
-            unitPreference: context.unitPreference
+            unitPreference: context.unitPreference,
+            pressureUnitPreference: context.pressureUnitPreference
         )
         XCTAssertFalse(PDFExportService.canExportPlan(context))
         XCTAssertThrowsError(try PDFExportService.exportPlan(context: context)) { error in
