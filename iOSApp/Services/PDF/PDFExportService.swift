@@ -14,6 +14,7 @@ struct PDFExportPlannerContext {
     let modIssues: [MODValidationIssue]
     let safetyAcknowledged: Bool
     let unitPreference: IOSUnitPreference
+    let pressureUnitPreference: PressureUnit
 }
 
 struct PDFExportCCRPlannerContext {

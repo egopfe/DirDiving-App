@@ -85,6 +85,10 @@ struct PlannerResultPresentation: Equatable {
     let showsGFPresets: Bool
     /// Configurable CNS descent+bottom input card in the main planner form (not result-level CNS/OTU display).
     let showsCNSDescentBottomSettings: Bool
+    /// Average depth + planning reference controls in the OC profile card.
+    let showsAverageDepthInput: Bool
+    /// Technical-only toggle for average depth gas consumption refinement.
+    let showsAverageDepthGasConsumptionToggle: Bool
 
     static func presentation(for mode: PlannerMode) -> PlannerResultPresentation {
         switch mode {
@@ -107,7 +111,9 @@ struct PlannerResultPresentation: Equatable {
                 showsTeamPreview: false,
                 showsManualGFControls: false,
                 showsGFPresets: false,
-                showsCNSDescentBottomSettings: false
+                showsCNSDescentBottomSettings: false,
+                showsAverageDepthInput: false,
+                showsAverageDepthGasConsumptionToggle: false
             )
         case .deco:
             return PlannerResultPresentation(
@@ -128,7 +134,9 @@ struct PlannerResultPresentation: Equatable {
                 showsTeamPreview: false,
                 showsManualGFControls: false,
                 showsGFPresets: true,
-                showsCNSDescentBottomSettings: false
+                showsCNSDescentBottomSettings: false,
+                showsAverageDepthInput: false,
+                showsAverageDepthGasConsumptionToggle: false
             )
         case .technical:
             return PlannerResultPresentation(
@@ -149,7 +157,9 @@ struct PlannerResultPresentation: Equatable {
                 showsTeamPreview: true,
                 showsManualGFControls: true,
                 showsGFPresets: false,
-                showsCNSDescentBottomSettings: true
+                showsCNSDescentBottomSettings: true,
+                showsAverageDepthInput: false,
+                showsAverageDepthGasConsumptionToggle: true
             )
         case .ccr:
             return PlannerResultPresentation(
@@ -170,7 +180,9 @@ struct PlannerResultPresentation: Equatable {
                 showsTeamPreview: false,
                 showsManualGFControls: true,
                 showsGFPresets: false,
-                showsCNSDescentBottomSettings: true
+                showsCNSDescentBottomSettings: true,
+                showsAverageDepthInput: false,
+                showsAverageDepthGasConsumptionToggle: false
             )
         }
     }
@@ -199,7 +211,9 @@ enum PlannerModePolicy {
             projected = projectBaseInput(projected)
         case .deco:
             projected = projectDecoInput(projected)
-        case .technical, .ccr:
+        case .technical:
+            projected = projectTechnicalInput(projected)
+        case .ccr:
             break
         }
 
@@ -325,15 +339,56 @@ enum PlannerModePolicy {
 
     private static func projectDecoInput(_ input: GasPlanInput) -> GasPlanInput {
         var projected = input
-        let bottom = projected.plannerCylinders.filter { $0.role == .bottom }
-        let deco = projected.plannerCylinders
-            .filter { $0.role == .deco }
-            .sorted { $0.switchDepthMeters > $1.switchDepthMeters }
-        projected.plannerCylinders = bottom + Array(deco.prefix(1))
+        projected.ensurePlannerCylindersFromLegacy()
+
+        var bottomEntry = projected.plannerCylinders.first(where: { $0.role == .bottom })
+            ?? PlannerCylinderEntry(role: .bottom, gas: projected.bottomGas)
+        bottomEntry.role = .bottom
+        bottomEntry.gas.role = .bottom
+
+        var activeCylinders = [bottomEntry]
+
+        if projected.decoGasPlanningEnabled {
+            let decoCandidates = projected.plannerCylinders
+                .filter { $0.role == .deco }
+                .sorted { $0.switchDepthMeters > $1.switchDepthMeters }
+            if let decoEntry = decoCandidates.first {
+                var normalized = decoEntry
+                normalized.role = .deco
+                normalized.gas.role = .deco
+                activeCylinders.append(normalized)
+            } else {
+                activeCylinders.append(
+                    PlannerCylinderEntry(
+                        role: .deco,
+                        tankSize: .liters12,
+                        gas: projected.decoGas1,
+                        switchDepthMeters: 21
+                    )
+                )
+            }
+        }
+
+        projected.plannerCylinders = activeCylinders
         if projected.gfLow >= projected.gfHigh {
             applyGFPreset(.standard, to: &projected)
         }
+        projected.plannedAverageDepthMeters = projected.plannedDepthMeters
+        projected.planningDepthReference = .maximumDepth
         projected.syncLegacyGasesFromPlannerCylinders()
+        return projected
+    }
+
+    private static func projectTechnicalInput(_ input: GasPlanInput) -> GasPlanInput {
+        var projected = input
+        if projected.averageDepthGasConsumptionEnabled {
+            projected.planningDepthReference = .averageDepth
+            if projected.plannedAverageDepthMeters > projected.plannedDepthMeters {
+                projected.plannedAverageDepthMeters = projected.plannedDepthMeters
+            }
+        } else {
+            projected.planningDepthReference = .maximumDepth
+        }
         return projected
     }
 
@@ -361,15 +416,14 @@ enum PlannerModePolicy {
 
     private static func validateDecoDraft(_ draft: GasPlanInput) -> PlannerValidationResult {
         var result = PlannerValidationResult()
-        var working = draft
-        working.ensurePlannerCylindersFromLegacy()
+        let active = activePlanInput(from: draft, mode: .deco)
 
-        let bottomGas = working.plannerCylinders.first(where: { $0.role == .bottom })?.gas ?? working.bottomGas
+        let bottomGas = active.plannerCylinders.first(where: { $0.role == .bottom })?.gas ?? active.bottomGas
         if bottomGas.mixKind == .trimix || bottomGas.helium > 0.001 {
             result.add(.unsupportedTrimix, message: DIRIOSLocalizer.string("planner.deco.trimix_technical_only"))
         }
 
-        for gas in working.plannerCylinders.filter({ $0.role == .bottom || $0.role == .deco }).map(\.gas) where gas.mixKind == .trimix {
+        for gas in active.plannerCylinders.map(\.gas) where gas.mixKind == .trimix {
             result.add(.unsupportedTrimix, message: DIRIOSLocalizer.string("planner.deco.trimix_technical_only"))
         }
 

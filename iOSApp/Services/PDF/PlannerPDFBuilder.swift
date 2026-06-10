@@ -18,15 +18,21 @@ enum PlannerPDFBuilder {
                 DIRIOSLocalizer.string("planner.field.max_depth"),
                 value: Formatters.depth(context.input.plannedDepthMeters, units: context.unitPreference).text
             )
-            if context.mode != .base {
+            if PlannerResultPresentation.presentation(for: context.mode).showsAverageDepthGasConsumptionToggle,
+               context.input.averageDepthGasConsumptionEnabled {
                 page.drawLine(
                     DIRIOSLocalizer.string("planner.field.avg_depth"),
                     value: Formatters.depth(context.input.plannedAverageDepthMeters, units: context.unitPreference).text
                 )
-                let reference = context.input.planningDepthReference == .maximumDepth
-                    ? DIRIOSLocalizer.string("planner.reference.max_depth")
-                    : DIRIOSLocalizer.string("planner.reference.avg_depth")
-                page.drawLine(DIRIOSLocalizer.string("planner.field.planning_reference"), value: reference)
+                page.drawLine(
+                    DIRIOSLocalizer.string("planner.field.planning_reference"),
+                    value: DIRIOSLocalizer.string("planner.technical.gas_consumption.reference.average")
+                )
+            } else if context.mode == .technical {
+                page.drawLine(
+                    DIRIOSLocalizer.string("planner.field.planning_reference"),
+                    value: DIRIOSLocalizer.string("planner.technical.gas_consumption.reference.max")
+                )
             }
             page.drawLine(
                 DIRIOSLocalizer.string("planner.field.bottom_time"),
@@ -58,7 +64,10 @@ enum PlannerPDFBuilder {
                 )
                 page.drawLine(
                     DIRIOSLocalizer.string("planner.gas.editor.working_pressure_section"),
-                    value: "\(Formatters.zero(entry.startPressure)) \(entry.pressureUnit.rawValue)"
+                    value: Formatters.pressure(
+                        fromBar: PlannerGasEditingSupport.startPressureBar(for: entry),
+                        unit: context.pressureUnitPreference
+                    ).text
                 )
                 if entry.role != .bottom {
                     page.drawLine(
