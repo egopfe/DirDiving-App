@@ -22,7 +22,7 @@ struct MoreView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         VStack(alignment: .leading, spacing: 7) {
-                            Text(String(localized: "more.title"))
+                            Text(String(localized: "settings.title"))
                                 .dirScreenTitleStyle()
                             Text(String(localized: "more.header.subtitle"))
                                 .font(.callout)
@@ -188,12 +188,12 @@ struct MoreView: View {
             }
             .toolbar(.hidden, for: .navigationBar)
             .alert(String(localized: "developer.section.title"), isPresented: $developerUnlockedNotice) {
-                Button(String(localized: "OK"), role: .cancel) {}
+                Button(String(localized: "common.ok"), role: .cancel) {}
             } message: {
                 Text(String(localized: "developer.unlock.confirmed"))
             }
             .alert(String(localized: "more.sync.reset_pairing"), isPresented: $showResetPairingConfirm) {
-                Button(String(localized: "Cancel"), role: .cancel) {}
+                Button(String(localized: "common.cancel"), role: .cancel) {}
                 Button(String(localized: "more.sync.reset_pairing_confirm"), role: .destructive) {
                     watchSync.resetPairingTrust(logStore: logStore)
                 }

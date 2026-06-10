@@ -9,7 +9,7 @@ enum DiveSessionPersistenceClass: Equatable {
         do {
             try DiveSessionAlgorithmValidator.validate(session)
         } catch {
-            return .invalid(reason: String(localized: "Sessione non valida: dati immersione incoerenti."))
+            return .invalid(reason: String(localized: "dive.session.invalid.incoherent_data"))
         }
 
         if session.hasDepthProfile {
@@ -18,7 +18,7 @@ enum DiveSessionPersistenceClass: Equatable {
         if session.isManual {
             return .manualNoDepth
         }
-        return .invalid(reason: String(localized: "Sessione senza profilo profondità non classificata."))
+        return .invalid(reason: String(localized: "dive.session.unclassified_no_profile"))
     }
 
     var allowsSync: Bool {

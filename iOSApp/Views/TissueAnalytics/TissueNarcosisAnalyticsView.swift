@@ -77,7 +77,7 @@ struct TissueNarcosisAnalyticsView: View {
             }
         }
         .alert(String(localized: "tissue_analytics.disclaimer.title"), isPresented: $showDisclaimer) {
-            Button(String(localized: "OK"), role: .cancel) {}
+            Button(String(localized: "common.ok"), role: .cancel) {}
         } message: {
             Text(String(localized: "tissue_analytics.disclaimer.body"))
         }

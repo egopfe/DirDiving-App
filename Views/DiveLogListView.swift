@@ -242,7 +242,7 @@ struct DiveLogListView: View {
                                     .lineLimit(1)
                                     .minimumScaleFactor(0.85)
                             }
-                            Text("\(durationMinutes(session.durationSeconds)) min")
+                            Text("\(durationMinutes(session.durationSeconds)) \(String(localized: "dive_reminder.unit.min"))")
                                 .font(.system(size: 13, weight: .semibold, design: .rounded))
                                 .foregroundStyle(.white)
                                 .monospacedDigit()

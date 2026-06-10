@@ -134,13 +134,13 @@ final class DiveLogStore: ObservableObject {
             let filtered = DiveLogbookPolicy.filterValidLoadedSessions(decoded)
             if filtered.quarantinedCount > 0 {
                 loadErrorMessage = String(
-                    format: String(localized: "%lld sessioni non valide escluse dal log locale."),
+                    format: String(localized: "log.validation.invalid_sessions_excluded_local_format"),
                     filtered.quarantinedCount
                 )
             }
             return filtered.sessions
         } catch {
-            loadErrorMessage = String(format: String(localized: "Log locale non leggibile: %@"), error.localizedDescription)
+            loadErrorMessage = String(format: String(localized: "log.load.error_format"), error.localizedDescription)
             return []
         }
     }
@@ -170,7 +170,7 @@ final class DiveLogStore: ObservableObject {
         let filtered = DiveLogbookPolicy.filterValidLoadedSessions(merged)
         if filtered.quarantinedCount > 0 {
             loadErrorMessage = String(
-                format: String(localized: "%lld sessioni non valide escluse dal log."),
+                format: String(localized: "log.validation.invalid_sessions_excluded_format"),
                 filtered.quarantinedCount
             )
         }

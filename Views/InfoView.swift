@@ -191,7 +191,7 @@ struct InfoView: View {
             diagnosticRow(
                 String(localized: "settings.row.depth_sensor.title"),
                 dive.isDepthAutomationAvailable
-                    ? String(localized: "Disponibile")
+                    ? String(localized: "info.status.available")
                     : String(localized: "Non disponibile")
             )
             diagnosticRow(
@@ -215,7 +215,7 @@ struct InfoView: View {
 
     private func diagnosticValueIsPositive(_ value: String) -> Bool {
         let positives = [
-            String(localized: "Disponibile"),
+            String(localized: "info.status.available"),
             String(localized: "Pronto")
         ]
         return positives.contains(value)

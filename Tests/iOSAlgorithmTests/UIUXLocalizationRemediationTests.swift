@@ -32,8 +32,11 @@ final class UIUXLocalizationRemediationTests: XCTestCase {
     func testIOSWatchSyncServiceUsesSemanticSyncStatusKeys() throws {
         let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Services/WatchSyncService.swift"))
         XCTAssertTrue(source.contains("sync.status.not_synced"))
+        XCTAssertTrue(source.contains("sync.dive.updated_from_watch"))
+        XCTAssertTrue(source.contains("sync.dive.sent_to_watch"))
         XCTAssertFalse(source.contains("String(localized: \"Non sincronizzato\")"))
         XCTAssertFalse(source.contains("String(localized: \"Attivo\")"))
+        XCTAssertFalse(source.contains("String(localized: \"Immersione aggiornata dal Watch\")"))
     }
 
     func testCCRChecklistImportCoordinatorExists() throws {

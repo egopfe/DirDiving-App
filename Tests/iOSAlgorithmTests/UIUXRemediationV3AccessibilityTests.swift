@@ -17,6 +17,12 @@ final class UIUXRemediationV3AccessibilityTests: XCTestCase {
         XCTAssertTrue(source.contains("UIUXAccessibilitySummaries.ccrGasDensityTimeline"))
     }
 
+    func testMoreViewUsesSettingsTitleKey() throws {
+        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/MoreView.swift"))
+        XCTAssertTrue(source.contains("settings.title"))
+        XCTAssertFalse(source.contains("more.title"))
+    }
+
     func testChecklistViewTogglesExposeAccessibilityLabels() throws {
         let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/ChecklistView.swift"))
         XCTAssertTrue(source.contains("checklistReadyAccessibilityLabel"))
