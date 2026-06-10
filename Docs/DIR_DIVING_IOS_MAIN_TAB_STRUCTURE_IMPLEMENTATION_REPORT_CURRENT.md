@@ -8,7 +8,7 @@
 
 ## 1. Executive summary
 
-The iOS Companion exposes six first-level tabs: **Pianifica | LogBook | Analisi | Attrezzatura | Checklist | Settings**. Checklist and Settings are no longer hidden behind “Altro”. All operational and settings features are preserved.
+The iOS Companion exposes six first-level tabs: **Pianifica | LogBook | Analisi | Attrezzatura | Checklist | Settings**. Checklist and Settings are no longer hidden behind “Altro”. A custom `DIRCompanionTabBar` replaces `TabView` because UIKit collapses the sixth tab into the system **More / Altro** overflow on iPhone.
 
 ---
 
@@ -44,7 +44,8 @@ Default tab: **Planner**. Lazy tab mounting via `mountedTab(_:)`.
 
 | File | Role |
 |------|------|
-| `iOSApp/Views/ContentView.swift` | `IOSTab` enum + six `TabView` items |
+| `iOSApp/Views/ContentView.swift` | `IOSTab` enum + six lazy-mounted roots + custom tab bar |
+| `iOSApp/Views/Components/DIRCompanionTabBar.swift` | Six visible tabs (avoids UIKit More overflow) |
 | `iOSApp/Views/ChecklistView.swift` | Checklist root |
 | `iOSApp/Views/MoreView.swift` | Settings root (`settings.title`) |
 | `iOSApp/Views/EquipmentView.swift` | Attrezzatura + images |
@@ -122,6 +123,7 @@ enum IOSTab {
 
 - `dirCompanionTabRoot`, `dirCompanionTabSlot`, `DIRBackground` — unchanged.
 - Six tabs use concise product labels to limit truncation.
+- **UIKit constraint:** `TabView` with six items on iPhone shows only four custom tabs plus system **More** (localized **Altro**), hiding overflow tabs inside a list. `DIRCompanionTabBar` is required for six visible tabs.
 
 ---
 
