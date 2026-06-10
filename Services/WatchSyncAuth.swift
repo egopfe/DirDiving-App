@@ -39,6 +39,7 @@ enum WatchSyncAuth {
 
     static func publishSharedSecretIfNeeded(session: WCSession = .default) {
         guard canPublishApplicationContext(session: session) else { return }
+        guard !hasPeerSecret() else { return }
         guard let secret = loadOrCreateLocalSecret() else {
             logger.error("Local Watch sync secret unavailable: SecRandomCopyBytes failed; refusing to publish a deterministic fallback.")
             return
@@ -53,9 +54,6 @@ enum WatchSyncAuth {
         var context = session.applicationContext
         for (key, value) in updates {
             context[key] = value
-        }
-        if context[contextKey] == nil, let secret = loadOrCreateLocalSecret() {
-            context[contextKey] = secret.base64EncodedString()
         }
         do {
             try session.updateApplicationContext(context)

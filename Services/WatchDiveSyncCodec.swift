@@ -14,8 +14,22 @@ enum WatchDiveSyncCodec {
     static let maxIssuedAtSkew: TimeInterval = 3_600
     static let importedFromCompanionIDsKey = "dirdiving_watch_imported_from_companion_ids"
     static var replayCache = SyncNonceReplayCache()
+    private static let replayCacheFileName = "dirdiving_watch_sync_replay_cache.json"
 
     private static let expectedCompanionBundleID = "com.egopfe.dirdiving.ios"
+
+    static func bootstrapReplayCacheIfNeeded() {
+        replayCache.loadProtected(from: replayCacheFileURL())
+    }
+
+    private static func replayCacheFileURL() -> URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent(replayCacheFileName)
+    }
+
+    private static func persistReplayCache() {
+        replayCache.persistProtected(to: replayCacheFileURL())
+    }
 
     struct Transport: Codable {
         let version: Int
@@ -116,6 +130,7 @@ enum WatchDiveSyncCodec {
             guard replayCache.register(nonce) else {
                 throw WatchDiveSyncError.replayedPayload
             }
+            persistReplayCache()
         }
 
         let decoder = JSONDecoder()
@@ -145,6 +160,19 @@ enum WatchDiveSyncCodec {
 
     static func isImportAck(_ payload: [String: Any]) -> Bool {
         payload["type"] as? String == WatchSyncKeys.diveImportAckType
+    }
+
+    static func parseImportAck(from payload: [String: Any]) -> (sessionID: UUID, issuedAt: Date, signature: String)? {
+        guard isImportAck(payload),
+              let sessionIDString = payload[WatchSyncKeys.diveImportAckSessionIDKey] as? String,
+              let sessionID = UUID(uuidString: sessionIDString),
+              let issuedAtInterval = payload[WatchSyncKeys.diveImportAckIssuedAtKey] as? TimeInterval,
+              let signature = payload[WatchSyncKeys.diveImportAckSignatureKey] as? String else {
+            return nil
+        }
+        let issuedAt = Date(timeIntervalSince1970: issuedAtInterval)
+        guard abs(issuedAt.timeIntervalSinceNow) <= maxIssuedAtSkew else { return nil }
+        return (sessionID, issuedAt, signature)
     }
 
     static func makeImportAckPayload(sessionID: UUID, issuedAt: Date) -> [String: Any] {

@@ -21,7 +21,7 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     @Published var isSupported = WCSession.isSupported()
     @Published var activationState: WCSessionActivationState = .notActivated
-    @Published var lastMessage = String(localized: "Non sincronizzato")
+    @Published var lastMessage = String(localized: "sync.status.not_synced")
     @Published private(set) var importedSessionCount = 0
     @Published private(set) var failedImportCount = 0
     @Published private(set) var conflicts: [SyncConflict] = []
@@ -65,18 +65,18 @@ final class WatchSyncService: NSObject, ObservableObject {
     }()
 
     var userVisibleState: String {
-        if !isSupported { return String(localized: "Non supportato") }
+        if !isSupported { return String(localized: "sync.status.unsupported") }
         if WatchSyncAuth.peerSecretMismatchDetected { return String(localized: "sync.trust.mismatch") }
-        if failedImportCount > 0 { return String(localized: "Errore import: retry disponibile") }
+        if failedImportCount > 0 { return String(localized: "sync.status.import_error_retry") }
         if activationState == .activated, !WCSession.default.isPaired {
             return String(localized: "sync.watch_not_paired.status")
         }
         if activationState == .activated, !WCSession.default.isWatchAppInstalled {
             return String(localized: "sync.watch_app_not_installed.status")
         }
-        if activationState == .activated, !WatchSyncAuth.hasPeerSecret() { return String(localized: "Associazione Watch non verificata") }
-        if activationState == .activated { return String(localized: "Attivo") }
-        return String(localized: "In attesa attivazione")
+        if activationState == .activated, !WatchSyncAuth.hasPeerSecret() { return String(localized: "sync.status.pairing_unverified") }
+        if activationState == .activated { return String(localized: "sync.status.active") }
+        return String(localized: "sync.status.pending_activation")
     }
 
     private func refreshCompanionSyncAvailabilityMessage(session: WCSession = .default) {
@@ -86,12 +86,13 @@ final class WatchSyncService: NSObject, ObservableObject {
         } else if !session.isWatchAppInstalled {
             lastMessage = String(localized: "sync.watch_app_not_installed")
         } else {
-            lastMessage = String(localized: "Sessione Watch attiva")
+            lastMessage = String(localized: "sync.status.watch_session_active")
         }
     }
 
     func activate(logStore: DiveLogStore) {
         self.logStore = logStore
+        WatchDiveSyncCodec.bootstrapReplayCacheIfNeeded()
         importedSessionIDs = WatchDiveSyncCodec.loadImportedSessionIDs()
         importedSessionCount = importedSessionIDs.count
         pushedToWatchSessionIDs = loadPushedToWatchSessionIDs()
@@ -100,7 +101,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         )
         conflicts = loadConflicts()
         guard WCSession.isSupported() else {
-            lastMessage = String(localized: "WatchConnectivity non supportato")
+            lastMessage = String(localized: "sync.status.watchconnectivity_unsupported")
             return
         }
         WCSession.default.delegate = self
@@ -109,14 +110,14 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     func retryActivation(logStore: DiveLogStore) {
         failedImportCount = 0
-        lastMessage = String(localized: "Retry Watch Sync richiesto")
+        lastMessage = String(localized: "sync.status.retry_requested")
         activate(logStore: logStore)
     }
 
     func resetPairingTrust(logStore: DiveLogStore) {
         WatchSyncAuth.resetPeerTrust()
         failedImportCount = 0
-        lastMessage = String(localized: "Trust Watch resettato: attendi una nuova associazione verificata.")
+        lastMessage = String(localized: "sync.status.trust_reset")
         activate(logStore: logStore)
     }
 
@@ -131,7 +132,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             flushOutboundTransfers()
         } else {
             WatchSyncAuth.publishSharedSecretIfNeeded()
-            lastMessage = String(format: String(localized: "In coda verso Watch (%lld) — attendi associazione"), pendingOutboundTransfers.count)
+            lastMessage = String(format: String(localized: "sync.status.queued_awaiting_pairing"), pendingOutboundTransfers.count)
         }
     }
 
@@ -155,7 +156,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             refreshCompanionSyncAvailabilityMessage()
             return
         }
-        lastMessage = String(format: String(localized: "Tombstone inviata al Watch (%lld)"), ids.count)
+        lastMessage = String(format: String(localized: "sync.tombstone.sent_to_watch"), ids.count)
     }
 
     func pushUnitsPreference(_ value: String) {
@@ -186,7 +187,7 @@ final class WatchSyncService: NSObject, ObservableObject {
                 photoID: photoID,
                 fileName: fileName,
                 state: .failed,
-                errorMessage: String(localized: "Errore invio foto Watch: file non valido")
+                errorMessage: String(localized: "sync.photo.transfer.invalid_file")
             )
             return
         }
@@ -194,7 +195,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         updateCompanionPhotoTransfer(photoID: photoID, fileName: sanitized, state: .sending)
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("DIRDivingPhoto_\(photoID)_\(sanitized)")
         do {
-            try imageData.write(to: url, options: .atomic)
+            try imageData.write(to: url, options: [.atomic, .completeFileProtection])
             _ = WCSession.default.transferFile(
                 url,
                 metadata: CompanionPhotoTransferSupport.makeTransferMetadata(photoID: photoID, fileName: sanitized)
@@ -504,7 +505,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             let ids = Set(strings.compactMap(UUID.init(uuidString:)))
             if !ids.isEmpty {
                 logStore?.applyRemoteDeletedSessionIDs(ids)
-                lastMessage = String(format: String(localized: "Tombstone Watch applicata (%lld)"), ids.count)
+                lastMessage = String(format: String(localized: "sync.dive.watch_tombstone_applied_format"), ids.count)
             }
         }
     }
@@ -522,7 +523,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             if let existing = logStore?.session(id: session.id) {
                 if WatchSyncSessionDiff.hasSignificantDifference(local: existing, incoming: session) {
                     storeConflict(local: existing, incoming: session)
-                    lastMessage = String(localized: "Conflitto sync salvato per revisione")
+                    lastMessage = String(localized: "sync.conflict.saved_for_review")
                     recordActivity(title: String(localized: "sync.activity.conflict"), detail: sessionSummary(session))
                     return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
                 }
@@ -534,12 +535,12 @@ final class WatchSyncService: NSObject, ObservableObject {
                 )
                 WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
                 importedSessionCount = importedSessionIDs.count
-                lastMessage = String(localized: "Immersione aggiornata dal Watch")
+                lastMessage = String(localized: "sync.dive.updated_from_watch")
                 recordActivity(title: String(localized: "sync.activity.received_from_watch"), detail: sessionSummary(session), marksSuccess: true)
                 return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
             }
             guard !importedSessionIDs.contains(session.id) else {
-                lastMessage = String(localized: "Immersione duplicata ignorata")
+                lastMessage = String(localized: "sync.dive.duplicate_ignored")
                 return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
             }
             logStore?.add(session, suppressWatchPush: true)
@@ -550,12 +551,12 @@ final class WatchSyncService: NSObject, ObservableObject {
             )
             WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
             importedSessionCount = importedSessionIDs.count
-            lastMessage = String(localized: "Immersione ricevuta dal Watch")
+            lastMessage = String(localized: "sync.dive.received_from_watch")
             recordActivity(title: String(localized: "sync.activity.received_from_watch"), detail: sessionSummary(session), marksSuccess: true)
             return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
         } catch {
             failedImportCount += 1
-            lastMessage = String(format: String(localized: "Errore sync Watch: %@"), error.localizedDescription)
+            lastMessage = String(format: String(localized: "sync.dive.watch_sync_error_format"), error.localizedDescription)
             Self.logger.error("Watch sync import failed: \(error.localizedDescription, privacy: .private)")
             return nil
         }
@@ -567,7 +568,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
         importedSessionCount = importedSessionIDs.count
         removeConflict(conflict)
-        lastMessage = String(localized: "Conflitto risolto: usata versione Watch")
+        lastMessage = String(localized: "sync.conflict.resolved_watch_version")
     }
 
     func resolveConflictKeepingLocal(_ conflict: SyncConflict) {
@@ -663,7 +664,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         guard pendingOutboundTransfers.contains(where: { $0.session.id == sessionID }) else { return }
         markPushedToWatch(sessionID)
         removeOutboundTransfer(sessionID: sessionID)
-        lastMessage = String(localized: "Immersione inviata al Watch")
+        lastMessage = String(localized: "sync.dive.sent_to_watch")
         recordActivity(title: String(localized: "sync.activity.sent_to_watch"), detail: sessionID.uuidString, marksSuccess: true)
     }
 
@@ -679,7 +680,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         guard let index = pendingOutboundTransfers.firstIndex(where: { $0.session.id == sessionID }) else { return }
         if let error {
             failedImportCount += 1
-            lastMessage = String(format: String(localized: "Invio Watch in coda non completato: %@"), error.localizedDescription)
+            lastMessage = String(format: String(localized: "sync.dive.queued_send_failed_format"), error.localizedDescription)
             return
         }
         pendingOutboundTransfers[index].userInfoDeliveredAt = Date()
@@ -690,7 +691,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     private func queueViaUserInfo(envelope: WatchDiveSyncCodec.PayloadEnvelope, sessionID: UUID) {
         let transfer = WCSession.default.transferUserInfo(envelope.message)
         pendingUserInfoTransferSessionIDs[ObjectIdentifier(transfer)] = sessionID
-        lastMessage = String(localized: "Invio Watch in coda (transferUserInfo)")
+        lastMessage = String(localized: "sync.dive.queued_transfer_user_info")
     }
 
     private func handleWatchImportAck(_ payload: [String: Any]) {
@@ -749,7 +750,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             Self.logger.info("Outbound session push queued id=\(session.id.uuidString, privacy: .public)")
         } catch {
             failedImportCount += 1
-            lastMessage = String(format: String(localized: "Errore invio Watch: %@"), error.localizedDescription)
+            lastMessage = String(format: String(localized: "sync.dive.send_error_format"), error.localizedDescription)
             Self.logger.error("Outbound Watch push failed: \(error.localizedDescription, privacy: .private)")
         }
     }
@@ -880,7 +881,7 @@ extension WatchSyncService: WCSessionDelegate {
             } else if activationState == .activated {
                 self.refreshCompanionSyncAvailabilityMessage(session: session)
             } else {
-                self.lastMessage = String(localized: "In attesa attivazione")
+                self.lastMessage = String(localized: "sync.status.pending_activation")
             }
             if activationState == .activated {
                 self.ingestCompanionContext(context)
@@ -1017,12 +1018,12 @@ extension WatchSyncService: WCSessionDelegate {
                 self.markUserInfoDelivered(sessionID: sessionID, error: error)
             } else if let error {
                 self.failedImportCount += 1
-                self.lastMessage = String(format: String(localized: "Invio Watch in coda non completato: %@"), error.localizedDescription)
+                self.lastMessage = String(format: String(localized: "sync.dive.queued_send_failed_format"), error.localizedDescription)
             } else if let id = WatchDiveSyncCodec.sessionID(fromOutboundPayload: userInfoTransfer.userInfo) {
                 self.markUserInfoDelivered(sessionID: id, error: nil)
             } else {
                 self.failedImportCount += 1
-                self.lastMessage = String(localized: "Invio Watch completato ma sessione non identificabile")
+                self.lastMessage = String(localized: "sync.dive.completed_unknown_session")
             }
         }
     }

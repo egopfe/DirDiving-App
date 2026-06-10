@@ -2,8 +2,9 @@
 
 Owner: ________  Date: ________  Build: ________  Commit: ________
 
-**Automated coverage (2026-06-07):** `WatchSyncPendingQueueTests`, `WatchSyncServiceIntegrationTests` (keychain-dependent cases skip in CI).  
-**Policy:** Pending queue dequeues **only** on verified signed ACK; `transferUserInfo` delivery alone does not dequeue.
+**Automated coverage (2026-06-09):** `WatchSyncPendingQueueTests`, `WatchSyncServiceIntegrationTests`, `MainDeepCodeRemediationDCATests` (keychain-dependent cases skip in CI).  
+**Policy:** Pending queue dequeues **only** on verified signed ACK; `transferUserInfo` delivery alone does not dequeue.  
+**Remediation (MAIN-DCA-001):** Watch now parses inbound `diveImportAck` on `didReceiveUserInfo` — automated dequeue test added; paired physical row still **PENDING**.
 
 | Scenario | Pass/Fail | Evidence | Notes |
 |---|---|---|---|

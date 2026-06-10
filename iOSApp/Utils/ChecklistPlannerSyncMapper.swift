@@ -35,6 +35,22 @@ struct ChecklistPlannerExportCandidate: Identifiable {
     var duplicateAction: ChecklistPlannerDuplicateAction
 }
 
+struct CCRChecklistExportCandidate: Identifiable {
+    let id: UUID
+    var item: EquipmentChecklistItem
+    var isSelected: Bool
+}
+
+struct CCRChecklistImportCandidate: Identifiable {
+    let id: UUID
+    let checklistItem: EquipmentChecklistItem
+    var assignedRole: GasRole?
+    var isSelected: Bool
+    var duplicateAction: ChecklistPlannerDuplicateAction
+    var matchesExistingDiluent: Bool
+    var matchesExistingBailoutIndex: Int?
+}
+
 enum ChecklistPlannerSyncMapper {
     static func checklistGasItems(from checklist: [EquipmentChecklistItem]) -> [EquipmentChecklistItem] {
         checklist.filter(\.usesGas)
@@ -163,8 +179,155 @@ enum ChecklistPlannerSyncMapper {
         }
     }
 
+    static func hasCCRChecklistItemsMissing(input: CCRPlanInput, checklist: [EquipmentChecklistItem]) -> Bool {
+        !ccrItemsMissingFromChecklist(input: input, checklist: checklist).isEmpty
+    }
+
+    static func ccrExportCandidates(input: CCRPlanInput, checklist: [EquipmentChecklistItem]) -> [CCRChecklistExportCandidate] {
+        ccrChecklistItems(from: input).map {
+            CCRChecklistExportCandidate(id: $0.id, item: $0, isSelected: true)
+        }
+    }
+
     static func applyCCRExport(input: CCRPlanInput, to checklist: inout [EquipmentChecklistItem]) {
-        let proposed = ccrChecklistItems(from: input)
+        applyCCRChecklistItems(ccrChecklistItems(from: input), to: &checklist)
+    }
+
+    static func applyCCRExport(candidates: [CCRChecklistExportCandidate], to checklist: inout [EquipmentChecklistItem]) {
+        let selected = candidates.filter(\.isSelected).map(\.item)
+        guard !selected.isEmpty else { return }
+        applyCCRChecklistItems(selected, to: &checklist)
+    }
+
+    static func ccrChecklistGasItems(from checklist: [EquipmentChecklistItem]) -> [EquipmentChecklistItem] {
+        checklist.filter { item in
+            guard item.usesGas else { return false }
+            let role = item.gasRole ?? resolvedRole(for: item)
+            return role == .ccrDiluent || role == .ccrBailout
+        }
+    }
+
+    static func ccrImportCandidates(
+        checklist: [EquipmentChecklistItem],
+        input: CCRPlanInput
+    ) -> [CCRChecklistImportCandidate] {
+        ccrChecklistGasItems(from: checklist).map { item in
+            let role = item.gasRole ?? resolvedRole(for: item)
+            let diluentMatch = role == .ccrDiluent && diluentMatches(item, diluent: input.diluent)
+            let bailoutIndex = role == .ccrBailout
+                ? findMatchingBailoutIndex(for: item, in: input.bailoutGases)
+                : nil
+            return CCRChecklistImportCandidate(
+                id: item.id,
+                checklistItem: item,
+                assignedRole: role,
+                isSelected: true,
+                duplicateAction: (diluentMatch || bailoutIndex != nil) ? .replace : .skip,
+                matchesExistingDiluent: diluentMatch,
+                matchesExistingBailoutIndex: bailoutIndex
+            )
+        }
+    }
+
+    static func applyCCRImport(
+        candidates: [CCRChecklistImportCandidate],
+        to input: inout CCRPlanInput
+    ) {
+        let environment: PlannerEnvironment
+        switch PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) {
+        case .success(let value):
+            environment = value
+        case .failure:
+            environment = .seaLevelSaltWater
+        }
+        for candidate in candidates where candidate.isSelected {
+            guard let role = candidate.assignedRole ?? resolvedRole(for: candidate.checklistItem) else { continue }
+            switch role {
+            case .ccrDiluent:
+                guard candidate.duplicateAction == .replace || !diluentMatches(candidate.checklistItem, diluent: input.diluent) else { continue }
+                input.diluent = ccrDiluent(from: candidate.checklistItem)
+            case .ccrBailout:
+                var imported = ccrBailoutGas(from: candidate.checklistItem)
+                reconcileBailoutSwitchDepth(&imported, environment: environment)
+                if let index = candidate.matchesExistingBailoutIndex,
+                   input.bailoutGases.indices.contains(index),
+                   candidate.duplicateAction == .replace {
+                    var replacement = imported
+                    replacement.id = input.bailoutGases[index].id
+                    input.bailoutGases[index] = replacement
+                } else if candidate.matchesExistingBailoutIndex == nil {
+                    input.bailoutGases.append(imported)
+                }
+            default:
+                continue
+            }
+        }
+    }
+
+    private static func reconcileBailoutSwitchDepth(_ gas: inout CCRBailoutGas, environment: PlannerEnvironment) {
+        if gas.mixKind == .oxygen {
+            gas.switchDepthMeters = min(max(0, gas.switchDepthMeters), 6)
+            return
+        }
+        let mod = GasMixValidator.modMeters(
+            oxygenFraction: gas.oxygenFraction,
+            maxPPO2: gas.gasMix.maxPPO2,
+            environment: environment
+        ) ?? 0
+        if gas.switchDepthMeters > mod + 0.5 {
+            gas.switchDepthMeters = max(0, mod)
+        }
+    }
+
+    private static func diluentMatches(_ item: EquipmentChecklistItem, diluent: CCRDiluent) -> Bool {
+        let imported = ccrDiluent(from: item)
+        return imported.mixKind == diluent.mixKind
+            && imported.oxygenPercent == diluent.oxygenPercent
+            && imported.heliumPercent == diluent.heliumPercent
+    }
+
+    private static func findMatchingBailoutIndex(
+        for item: EquipmentChecklistItem,
+        in bailoutGases: [CCRBailoutGas]
+    ) -> Int? {
+        let imported = ccrBailoutGas(from: item)
+        return bailoutGases.firstIndex { existing in
+            existing.mixKind == imported.mixKind
+                && existing.oxygenPercent == imported.oxygenPercent
+                && existing.heliumPercent == imported.heliumPercent
+                && existing.tankSize == imported.tankSize
+        }
+    }
+
+    static func ccrDiluent(from item: EquipmentChecklistItem) -> CCRDiluent {
+        let mix = gasMix(from: item, role: .ccrDiluent)
+        return CCRDiluent(
+            mixKind: item.gasMixKind,
+            oxygenPercent: max(10, Int((mix.oxygen * 100).rounded())),
+            heliumPercent: max(0, Int((mix.helium * 100).rounded()))
+        )
+    }
+
+    static func ccrBailoutGas(from item: EquipmentChecklistItem) -> CCRBailoutGas {
+        let mix = gasMix(from: item, role: .ccrBailout)
+        var gas = CCRBailoutGas(
+            mixKind: item.gasMixKind,
+            oxygenPercent: Int((mix.oxygen * 100).rounded()),
+            heliumPercent: Int((mix.helium * 100).rounded()),
+            tankSize: item.tankSize,
+            startPressure: startPressure(from: item),
+            reservePressure: 50,
+            pressureUnit: item.pressureUnit,
+            switchDepthMeters: item.switchDepthMeters ?? 0
+        )
+        if gas.mixKind == .air {
+            gas.oxygenPercent = 21
+            gas.heliumPercent = 0
+        }
+        return gas
+    }
+
+    private static func applyCCRChecklistItems(_ proposed: [EquipmentChecklistItem], to checklist: inout [EquipmentChecklistItem]) {
         let bailoutIndices = checklist.indices.filter { checklist[$0].usesGas && checklist[$0].gasRole == .ccrBailout }
         var bailoutCursor = 0
 

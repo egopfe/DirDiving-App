@@ -4,10 +4,7 @@ struct EquipmentView: View {
     @EnvironmentObject private var equipment: EquipmentStore
     @State private var showResetConfirmation = false
     @State private var savedFeedback: String?
-    @State private var newChecklistTitle = ""
     @State private var showTemplatesSheet = false
-    @State private var shareablePDF: ShareablePDFItem?
-    @State private var pdfExportAlertMessage: String?
     @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
 
     var body: some View {
@@ -42,7 +39,11 @@ struct EquipmentView: View {
                             editableRow(String(localized: "equipment.row.deco2"), text: $equipment.profile.decoGas2)
                             sacRow
                         }
-                        DIRCard(String(localized: "equipment.card.checklist"), icon: "checklist", accent: DIRTheme.green) {
+                        DIRCard(String(localized: "equipment.card.saved_setups"), icon: "square.stack.3d.up.fill", accent: DIRTheme.green) {
+                            Text(String(localized: "equipment.saved_setups.hint"))
+                                .font(.caption2)
+                                .foregroundStyle(DIRTheme.muted)
+                                .fixedSize(horizontal: false, vertical: true)
                             Button {
                                 showTemplatesSheet = true
                             } label: {
@@ -54,36 +55,16 @@ struct EquipmentView: View {
                                     .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.7), lineWidth: 1))
                             }
                             .buttonStyle(.plain)
-                            ForEach($equipment.profile.checklistItems) { $item in
-                                VStack(alignment: .leading, spacing: 6) {
-                                    Toggle(item.title, isOn: $item.isReady).tint(DIRTheme.cyan)
-                                    Toggle(String(localized: "equipment.checklist.gas_flag"), isOn: $item.usesGas).tint(DIRTheme.yellow)
-                                    EquipmentChecklistGasSection(item: $item)
-                                        .animation(.easeInOut(duration: 0.2), value: item.usesGas)
-                                    Button(role: .destructive) {
-                                        equipment.profile.checklistItems.removeAll { $0.id == item.id }
-                                    } label: {
-                                        Text(String(localized: "equipment.checklist.remove"))
-                                            .font(.caption.weight(.semibold))
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                                .padding(.vertical, 4)
-                            }
-                            HStack(spacing: 8) {
-                                TextField(String(localized: "equipment.checklist.new_item"), text: $newChecklistTitle)
-                                    .foregroundStyle(.white)
-                                Button(String(localized: "equipment.checklist.add")) {
-                                    let title = newChecklistTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-                                    guard !title.isEmpty else { return }
-                                    equipment.profile.checklistItems.append(EquipmentChecklistItem(title: title))
-                                    newChecklistTitle = ""
-                                }
-                                .font(.caption.weight(.bold))
-                                .foregroundStyle(DIRTheme.cyan)
-                                .buttonStyle(.plain)
-                            }
+                            .accessibilityLabel(String(localized: "equipment.my_equipment.button"))
                         }
+                        DIRCard(String(localized: "equipment.images.section"), icon: "photo.on.rectangle.angled", accent: DIRTheme.cyan) {
+                            Text(String(localized: "equipment.images.hint"))
+                                .font(.caption2)
+                                .foregroundStyle(DIRTheme.muted)
+                                .fixedSize(horizontal: false, vertical: true)
+                            WatchPhotoTransferPanel()
+                        }
+                        .accessibilityElement(children: .contain)
                         Button {
                             showResetConfirmation = true
                         } label: {
@@ -101,29 +82,7 @@ struct EquipmentView: View {
                 }
                 .dirCompanionScrollSurface()
             }
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        shareChecklistPDF()
-                    } label: {
-                        Image(systemName: "square.and.arrow.up")
-                            .foregroundStyle(DIRTheme.cyan)
-                    }
-                    .accessibilityLabel(Text(String(localized: "pdf.export.share.a11y")))
-                }
-            }
             .toolbarBackground(.hidden, for: .navigationBar)
-            .sheet(item: $shareablePDF) { item in
-                ShareSheetView(activityItems: [item.url])
-            }
-            .alert(String(localized: "pdf.export.error.title"), isPresented: Binding(
-                get: { pdfExportAlertMessage != nil },
-                set: { if !$0 { pdfExportAlertMessage = nil } }
-            )) {
-                Button(String(localized: "OK"), role: .cancel) {}
-            } message: {
-                Text(pdfExportAlertMessage ?? "")
-            }
             .confirmationDialog(String(localized: "equipment.reset.confirm.title"), isPresented: $showResetConfirmation, titleVisibility: .visible) {
                 Button(String(localized: "equipment.reset.confirm.action"), role: .destructive) {
                     equipment.reset()
@@ -132,14 +91,6 @@ struct EquipmentView: View {
                 Button(String(localized: "equipment.reset.cancel"), role: .cancel) {}
             } message: {
                 Text(String(localized: "equipment.reset.confirm.message"))
-            }
-            .task {
-                var profile = equipment.profile
-                let beforeCount = profile.checklistItems.count
-                profile.syncLegacyChecklistFlags()
-                if profile.checklistItems.count != beforeCount {
-                    equipment.profile = profile
-                }
             }
             .onChange(of: equipment.profile) { _, _ in
                 showSavedFeedback()
@@ -163,10 +114,6 @@ struct EquipmentView: View {
                         : "equipment.badge.dir.incomplete.a11y"
                 )
             )
-            equipmentBadge(
-                "\(equipment.profile.checklistReadyCount)/\(max(1, equipment.profile.migratedChecklistItems.count)) READY",
-                equipment.profile.checklistReadyCount == equipment.profile.migratedChecklistItems.count ? DIRTheme.green : DIRTheme.yellow
-            )
         }
     }
 
@@ -182,16 +129,6 @@ struct EquipmentView: View {
                     .overlay(RoundedRectangle(cornerRadius: DIRTheme.cardRadius).stroke(color.opacity(0.34), lineWidth: 1))
             )
             .accessibilityLabel(accessibilityLabel ?? text)
-    }
-
-    private func equipmentRow(_ title: String, _ value: String) -> some View {
-        HStack {
-            Text(title).foregroundStyle(DIRTheme.muted)
-            Spacer()
-            Text(value).foregroundStyle(.white).bold()
-        }
-        .font(.callout)
-        .padding(.vertical, 7)
     }
 
     private func editableRow(_ title: String, text: Binding<String>) -> some View {
@@ -230,28 +167,10 @@ struct EquipmentView: View {
     }
 
     private func showSavedFeedback() {
-        savedFeedback = String(localized: "Profilo attrezzatura salvato.")
+        savedFeedback = String(localized: "equipment.profile.saved_notice")
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 1_800_000_000)
             savedFeedback = nil
-        }
-    }
-
-    private func shareChecklistPDF() {
-        guard PDFExportService.hasExportableChecklist(equipment.profile) else {
-            pdfExportAlertMessage = PDFShareActions.emptyChecklistMessage()
-            return
-        }
-        do {
-            let url = try PDFExportService.exportChecklist(
-                profile: equipment.profile,
-                unitPreference: IOSUnitPreference.fromStorage(units)
-            )
-            shareablePDF = ShareablePDFItem(url: url)
-        } catch PDFExportError.emptyChecklist {
-            pdfExportAlertMessage = PDFShareActions.emptyChecklistMessage()
-        } catch {
-            pdfExportAlertMessage = String(localized: "pdf.export.error.generation")
         }
     }
 }

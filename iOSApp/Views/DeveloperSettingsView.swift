@@ -38,7 +38,7 @@ struct DeveloperSettingsView: View {
         }
         .toolbar(.hidden, for: .navigationBar)
         .alert(String(localized: "developer.sensor_source.title"), isPresented: $showAppleFallbackAlert) {
-            Button(String(localized: "OK"), role: .cancel) {}
+            Button(String(localized: "common.ok"), role: .cancel) {}
         } message: {
             Text(String(localized: "developer.sensor_source.apple_fallback"))
         }

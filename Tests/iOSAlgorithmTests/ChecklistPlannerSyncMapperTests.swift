@@ -174,4 +174,17 @@ final class ChecklistPlannerSyncMapperTests: XCTestCase {
         let item = EquipmentChecklistItem(title: "Bombola diluente CCR", usesGas: true)
         XCTAssertEqual(ChecklistPlannerSyncMapper.resolvedRole(for: item), .ccrDiluent)
     }
+
+    func testHasCCRChecklistItemsMissingDetectsAbsentDiluentAndBailout() {
+        var input = CCRPlanInput.default
+        input.bailoutGases = [CCRBailoutGas(mixKind: .oxygen, switchDepthMeters: 6)]
+        XCTAssertTrue(
+            ChecklistPlannerSyncMapper.hasCCRChecklistItemsMissing(input: input, checklist: [])
+        )
+        var checklist = ChecklistPlannerSyncMapper.ccrChecklistItems(from: input)
+        checklist[0].gasText = input.diluent.label
+        XCTAssertFalse(
+            ChecklistPlannerSyncMapper.hasCCRChecklistItemsMissing(input: input, checklist: checklist)
+        )
+    }
 }

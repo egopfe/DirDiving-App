@@ -6,23 +6,13 @@ final class PlannerStore: ObservableObject {
     @Published var mode: PlannerMode = .base {
         didSet {
             guard isReady else { return }
-            isApplyingInputSideEffects = true
-            PlannerModeLimits.enforceInputLimits(&input, mode: mode)
-            isApplyingInputSideEffects = false
-            invalidateAnalysisCache()
-            scheduleSave()
-            schedulePlanningUpdate()
+            deferModeMutationSideEffects()
         }
     }
     @Published var input = GasPlanInput() {
         didSet {
             guard !isApplyingInputSideEffects else { return }
-            isApplyingInputSideEffects = true
-            PlannerModeLimits.enforceInputLimits(&input, mode: mode)
-            isApplyingInputSideEffects = false
-            invalidateAnalysisCache()
-            scheduleSave()
-            schedulePlanningUpdate()
+            deferInputMutationSideEffects()
         }
     }
     @Published var plan = PlannerService.makePlan(input: GasPlanInput(), mode: .base)
@@ -64,8 +54,7 @@ final class PlannerStore: ObservableObject {
     @Published var ccrInput = CCRPlanInput.default {
         didSet {
             guard !isApplyingInputSideEffects, isReady else { return }
-            scheduleSave()
-            scheduleCCRPlanningUpdate()
+            deferCCRInputMutationSideEffects()
         }
     }
     @Published private(set) var ccrPlan = CCRPlanResult.empty
@@ -118,6 +107,13 @@ final class PlannerStore: ObservableObject {
         plannerShowsModeSelection = true
     }
 
+    /// Called once after legal onboarding so Planner tab opens on the mode selection screen.
+    func preparePostLegalOnboardingEntry() {
+        guard isReady else { return }
+        plannerShowsModeSelection = true
+        saveIfReady()
+    }
+
     func refreshDerivedPlanningPreview() {
         schedulePlanningUpdate()
     }
@@ -132,36 +128,45 @@ final class PlannerStore: ObservableObject {
 
     func normalizeSwitchDepthAfterGasOrPPO2Change(cylinderID: UUID) {
         guard isReady else { return }
-        isApplyingInputSideEffects = true
-        input.normalizeSwitchDepthsToMOD(changedCylinderID: cylinderID, updateChangedGasToMOD: true)
-        isApplyingInputSideEffects = false
-        invalidateAnalysisCache()
-        schedulePlanningUpdate()
-        scheduleSave()
+        deferPublishedMutation { [self] in
+            guard isReady else { return }
+            isApplyingInputSideEffects = true
+            input.normalizeSwitchDepthsToMOD(changedCylinderID: cylinderID, updateChangedGasToMOD: true)
+            isApplyingInputSideEffects = false
+            invalidateAnalysisCache()
+            schedulePlanningUpdate()
+            scheduleSave()
+        }
     }
 
     func clampAllSwitchDepthsToMOD() {
         guard isReady else { return }
-        isApplyingInputSideEffects = true
-        input.normalizeSwitchDepthsToMOD()
-        isApplyingInputSideEffects = false
-        invalidateAnalysisCache()
-        schedulePlanningUpdate()
-        scheduleSave()
+        deferPublishedMutation { [self] in
+            guard isReady else { return }
+            isApplyingInputSideEffects = true
+            input.normalizeSwitchDepthsToMOD()
+            isApplyingInputSideEffects = false
+            invalidateAnalysisCache()
+            schedulePlanningUpdate()
+            scheduleSave()
+        }
     }
 
     func clampSwitchDepth(forCylinderAt index: Int, proposedMeters: Double) {
         guard isReady, input.plannerCylinders.indices.contains(index) else { return }
-        let environment = input.plannerEnvironment
-        let maxAllowed = input.plannerCylinders[index].usableSwitchDepthMeters(environment: environment)
-        let clamped = min(max(0, proposedMeters), maxAllowed)
-        guard abs(input.plannerCylinders[index].switchDepthMeters - clamped) > 0.001 else { return }
-        isApplyingInputSideEffects = true
-        input.plannerCylinders[index].switchDepthMeters = clamped
-        isApplyingInputSideEffects = false
-        invalidateAnalysisCache()
-        schedulePlanningUpdate()
-        scheduleSave()
+        deferPublishedMutation { [self] in
+            guard isReady, input.plannerCylinders.indices.contains(index) else { return }
+            let environment = input.plannerEnvironment
+            let maxAllowed = input.plannerCylinders[index].usableSwitchDepthMeters(environment: environment)
+            let clamped = min(max(0, proposedMeters), maxAllowed)
+            guard abs(input.plannerCylinders[index].switchDepthMeters - clamped) > 0.001 else { return }
+            isApplyingInputSideEffects = true
+            input.plannerCylinders[index].switchDepthMeters = clamped
+            isApplyingInputSideEffects = false
+            invalidateAnalysisCache()
+            schedulePlanningUpdate()
+            scheduleSave()
+        }
     }
 
     func normalizeNewCylinderSwitchDepth(cylinderID: UUID) {
@@ -248,8 +253,8 @@ final class PlannerStore: ObservableObject {
         planningUpdateTask?.cancel()
         planningGeneration &+= 1
         let generation = planningGeneration
-        isCalculating = true
         planningUpdateTask = Task { @MainActor in
+            isCalculating = true
             try? await Task.sleep(nanoseconds: 200_000_000)
             guard !Task.isCancelled, generation == planningGeneration else { return }
             refreshCCRPlan()
@@ -267,12 +272,52 @@ final class PlannerStore: ObservableObject {
         planningUpdateTask?.cancel()
         planningGeneration &+= 1
         let generation = planningGeneration
-        isCalculating = true
         planningUpdateTask = Task { @MainActor in
+            isCalculating = true
             try? await Task.sleep(nanoseconds: 200_000_000)
             guard !Task.isCancelled, generation == planningGeneration else { return }
             applyInputToPlanningOutputs(persistSnapshot: persistSnapshot)
             isCalculating = false
+        }
+    }
+
+    /// Avoids SwiftUI "Publishing changes from within view updates" when bindings mutate @Published state.
+    private func deferPublishedMutation(_ operation: @MainActor @escaping () -> Void) {
+        Task { @MainActor in
+            operation()
+        }
+    }
+
+    private func deferModeMutationSideEffects() {
+        deferPublishedMutation { [self] in
+            guard isReady else { return }
+            isApplyingInputSideEffects = true
+            PlannerModeLimits.enforceInputLimits(&input, mode: mode)
+            input.normalizeSwitchDepthsToMOD()
+            isApplyingInputSideEffects = false
+            invalidateAnalysisCache()
+            scheduleSave()
+            schedulePlanningUpdate()
+        }
+    }
+
+    private func deferInputMutationSideEffects() {
+        deferPublishedMutation { [self] in
+            guard !isApplyingInputSideEffects else { return }
+            isApplyingInputSideEffects = true
+            PlannerModeLimits.enforceInputLimits(&input, mode: mode)
+            isApplyingInputSideEffects = false
+            invalidateAnalysisCache()
+            scheduleSave()
+            schedulePlanningUpdate()
+        }
+    }
+
+    private func deferCCRInputMutationSideEffects() {
+        deferPublishedMutation { [self] in
+            guard isReady else { return }
+            scheduleSave()
+            scheduleCCRPlanningUpdate()
         }
     }
 
@@ -386,17 +431,24 @@ private struct PlannerState: Codable {
 private struct AnalysisCacheKey: Equatable {
     let mode: PlannerMode
     let plannedDepthMeters: Double
+    let plannedAverageDepthMeters: Double
+    let planningDepthReference: PlanningDepthReference
     let bottomTimeMinutes: Double
+    let sacLitersPerMinute: Double
     let altitudeMeters: Double
     let salinity: SalinityMode
     let bottomGasSignature: String
     let cylinderSignature: String
     let environmentSignature: String
+    let projectedCylinderSignature: String
 
     init(input: GasPlanInput, mode: PlannerMode) {
         self.mode = mode
         plannedDepthMeters = input.plannedDepthMeters
+        plannedAverageDepthMeters = input.plannedAverageDepthMeters
+        planningDepthReference = input.planningDepthReference
         bottomTimeMinutes = input.plannedBottomMinutes
+        sacLitersPerMinute = input.sacLitersPerMinute
         altitudeMeters = input.altitudeMeters
         salinity = input.salinity
         bottomGasSignature = "\(input.bottomGas.oxygen)-\(input.bottomGas.helium)-\(input.bottomGas.maxPPO2)"
@@ -404,6 +456,10 @@ private struct AnalysisCacheKey: Equatable {
             "\($0.id.uuidString)|\($0.role.rawValue)|\($0.gas.oxygen)|\($0.gas.helium)|\($0.gas.maxPPO2)|\($0.switchDepthMeters)|\($0.startPressure)|\($0.pressureUnit.rawValue)"
         }.joined(separator: ";")
         environmentSignature = "\(input.altitudeMeters)-\(input.salinity.rawValue)-\(input.gfLow)-\(input.gfHigh)"
+        let projected = PlannerModePolicy.activePlanInput(from: input, mode: mode)
+        projectedCylinderSignature = projected.plannerCylinders.map {
+            "\($0.id.uuidString)|\($0.role.rawValue)|\($0.gas.oxygen)|\($0.gas.helium)|\($0.gas.maxPPO2)|\($0.switchDepthMeters)"
+        }.joined(separator: ";")
     }
 }
 

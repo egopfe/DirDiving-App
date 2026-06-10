@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Main iOS tab bar: Planner, Explore, Logbook, Analisi, Attrezzatura, Buddy, Checklist, Settings.
-enum IOSTab: Hashable {
+enum IOSTab: Hashable, CaseIterable {
     case planner
     case explore
     case logbook
@@ -27,58 +27,47 @@ struct ContentView: View {
     @State private var mountedTabs: Set<IOSTab> = [.planner]
 
     var body: some View {
-        TabView(selection: $navigation.selectedTab) {
-            mountedTab(.planner) {
-                PlannerRootView()
+        VStack(spacing: 0) {
+            ZStack {
+                mountedTab(.planner) {
+                    PlannerRootView()
+                }
+                mountedTab(.explore) {
+                    ExplorationCenterView()
+                }
+                mountedTab(.logbook) {
+                    LogbookView()
+                }
+                mountedTab(.analysis) {
+                    AnalysisView()
+                }
+                mountedTab(.gear) {
+                    EquipmentView()
+                }
+                mountedTab(.buddy) {
+                    BuddyExperimentalView()
+                }
+                mountedTab(.checklist) {
+                    ChecklistView()
+                }
+                mountedTab(.settings) {
+                    MoreView()
+                }
             }
-            .tabItem { Label("tab.planner", systemImage: "point.topleft.down.curvedto.point.bottomright.up") }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .dirCompanionTabSlot()
 
-            mountedTab(.explore) {
-                ExplorationCenterView()
-            }
-            .tabItem { Label("Explore", systemImage: "map.fill") }
-
-            mountedTab(.logbook) {
-                LogbookView()
-            }
-            .tabItem { Label("tab.logbook", systemImage: "list.bullet.rectangle.portrait.fill") }
-
-            mountedTab(.analysis) {
-                AnalysisView()
-            }
-            .tabItem { Label("tab.analysis", systemImage: "chart.xyaxis.line") }
-
-            mountedTab(.gear) {
-                EquipmentView()
-            }
-            .tabItem { Label("tab.gear", systemImage: "shippingbox.fill") }
-
-            mountedTab(.buddy) {
-                BuddyExperimentalView()
-            }
-            .tabItem { Label("Buddy", systemImage: "person.2.wave.2.fill") }
-
-            mountedTab(.checklist) {
-                ChecklistView()
-            }
-            .tabItem { Label("tab.checklist", systemImage: "checklist") }
-
-            mountedTab(.settings) {
-                MoreView()
-            }
-            .tabItem { Label("tab.settings", systemImage: "gearshape.fill") }
-            .badge(settingsTabBadge)
+            DIRCompanionTabBar(
+                selection: $navigation.selectedTab,
+                settingsBadge: settingsTabBadge
+            )
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
             DIRBackground()
                 .ignoresSafeArea()
         }
-        .dirCompanionTabSlot()
         .tint(DIRTheme.cyan)
-        .toolbarBackground(DIRTheme.background, for: .tabBar)
-        .toolbarBackground(.visible, for: .tabBar)
-        .toolbarColorScheme(.dark, for: .tabBar)
         .launchCompanionDisclaimer(isPresented: $showLaunchDisclaimer)
         .onAppear {
             applyPostLegalPlannerLandingIfNeeded()
@@ -109,7 +98,6 @@ struct ContentView: View {
         return nil
     }
 
-    /// Mount tab roots lazily so PhotosPicker / fileImporter / ShareLink are not created at cold launch.
     @ViewBuilder
     private func mountedTab<Content: View>(_ tab: IOSTab, @ViewBuilder content: () -> Content) -> some View {
         Group {
@@ -126,6 +114,8 @@ struct ContentView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .dirCompanionTabRoot()
-        .tag(tab)
+        .opacity(navigation.selectedTab == tab ? 1 : 0)
+        .allowsHitTesting(navigation.selectedTab == tab)
+        .accessibilityHidden(navigation.selectedTab != tab)
     }
 }

@@ -102,7 +102,7 @@ struct SettingsView: View {
                     settingsRow(
                         icon: "iphone.slash",
                         iconColor: DiveUI.yellow,
-                        title: String(localized: "Sync impostazioni"),
+                        title: String(localized: "sync.settings.title"),
                         subtitle: String(localized: "settings.sync.settings_scope"),
                         informational: true
                     )
@@ -186,6 +186,7 @@ struct SettingsView: View {
                     }
                     .toggleStyle(.switch)
                     .tint(DiveUI.green)
+                    .accessibilityLabel(String(localized: "settings.a11y.haptics"))
 
                     if DeveloperSettings.isDeveloperSectionVisible {
                         NavigationLink {
@@ -226,7 +227,7 @@ struct SettingsView: View {
         switch gps.authorizationStatus {
         case .authorizedAlways, .authorizedWhenInUse:
             return gps.lastPoint == nil
-                ? String(localized: "Autorizzato, in attesa fix")
+                ? String(localized: "settings.gps.authorized_pending_fix")
                 : String(localized: "Fix disponibile")
         case .denied, .restricted:
             return String(localized: "Permesso negato: abilita da iPhone")
@@ -258,13 +259,14 @@ struct SettingsView: View {
                 subtitle: String(localized: "settings.language.subtitle"),
                 informational: true
             )
-            Picker("Lingua", selection: $appLanguage) {
+            Picker(String(localized: "settings.a11y.language"), selection: $appLanguage) {
                 ForEach(DIRAppLanguage.allCases) { language in
                     Text(language.title).tag(language.rawValue)
                 }
             }
             .pickerStyle(.wheel)
             .tint(DiveUI.cyan)
+            .accessibilityLabel(String(localized: "settings.a11y.language"))
             Text(selectedLanguage.watchDetail)
                 .font(DiveUI.Typography.statusValue)
                 .foregroundStyle(DiveUI.yellow)
@@ -302,6 +304,7 @@ struct SettingsView: View {
             }
             .pickerStyle(.wheel)
             .tint(DiveUI.cyan)
+            .accessibilityLabel(String(localized: "settings.a11y.units"))
             Text(String(localized: "settings.units.sync_note"))
                 .font(DiveUI.Typography.rowSubtitle)
                 .foregroundStyle(DiveUI.secondaryText)
@@ -497,7 +500,7 @@ private struct WatchShortcutHelpView: View {
             ScrollView {
                 VStack(spacing: 8) {
                     header
-                    Text("SHORTCUT")
+                    Text(String(localized: "settings.shortcut.title"))
                         .font(.system(size: 11, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
                     helpPanel(
