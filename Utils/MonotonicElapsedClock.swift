@@ -1,7 +1,10 @@
 import Foundation
 
-/// Reconciles wall-clock elapsed time with `ProcessInfo.processInfo.systemUptime` so runtime
+/// Dive runtime / stopwatch elapsed time — **not** per-sample `DiveSample.timestamp`.
+/// Reconciles wall-clock elapsed with `ProcessInfo.processInfo.systemUptime` so runtime
 /// does not decrease when the system clock moves backward and does not jump forward on large skew.
+/// Depth samples keep sensor `timestamp` for profile math; this clock is for monotonic session elapsed only.
+/// See `Docs/WATCH_DEPTH_SAMPLE_TIMESTAMP_POLICY.md`.
 struct MonotonicElapsedClock: Equatable {
     private(set) var anchorDate: Date?
     private(set) var anchorUptime: TimeInterval?

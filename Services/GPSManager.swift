@@ -11,7 +11,8 @@ final class GPSManager: NSObject, ObservableObject {
     private let locationManager = CLLocationManager()
     private var previousSpeedSample: (point: GPSPoint, date: Date)?
     private var bestEffortCapture: BestEffortCapture?
-    /// True while dive runtime or an explicit capture owns location updates.
+    /// True while an active dive session owns continuous location updates (`DiveManager` calls `start()` / `stop()`).
+    /// Authorization callbacks must not restart updates when this is false and no capture is in flight (battery policy).
     private(set) var maintainsLocationUpdates = false
     var testHook_holdBestEffortCapture = false
     private var heldBestEffortCompletion: (@MainActor (GPSPoint?) -> Void)?
@@ -90,6 +91,8 @@ final class GPSManager: NSObject, ObservableObject {
 }
 
 extension GPSManager: CLLocationManagerDelegate {
+    /// Restarts updates after permission grant only when dive runtime or a bounded capture already owns GPS.
+    /// Does not start continuous GPS for idle app state (WATCH-GPS-001 battery policy).
     nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         Task { @MainActor in
             authorizationStatus = manager.authorizationStatus

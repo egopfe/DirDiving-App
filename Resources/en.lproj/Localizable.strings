@@ -783,3 +783,50 @@
 "dive_reminder.error.max_reached" = "Maximum 10 reminders";
 "dive_reminder.error.message_required" = "Message is required";
 "dive_reminder.error.message_too_long" = "Maximum 24 characters";
+
+/* UI/UX remediation 2026-06-09 */
+"ascent.settings.title" = "ASCENT RATE";
+"ascent.settings.custom_limits.title" = "CUSTOM LIMITS";
+"ascent.settings.reset_standard.button" = "RESET STD";
+"settings.shortcut.title" = "SHORTCUT";
+"nav.underwater.blocked.a11y.label" = "Navigation blocked during active dive";
+"dive_reminder.overlay.a11y.dismiss_hint" = "Double tap to dismiss reminder";
+"a11y.watch.haptics_off_badge.label" = "Haptics disabled";
+"a11y.watch.haptics_off_badge.hint" = "Safety alerts remain visible on screen, but vibration feedback is disabled.";
+"legal.acceptance.a11y.checked" = "Accepted";
+"legal.acceptance.a11y.unchecked" = "Not accepted";
+"legal.acceptance.a11y.toggle_hint" = "Double tap to toggle acceptance";
+"sync.settings.title" = "Settings sync";
+"sync.storage.free_space" = "Free space";
+"info.storage.managed_by_watchos" = "Managed by watchOS";
+"settings.gps.authorized_pending_fix" = "Authorized, awaiting fix";
+"sync.status.companion_not_synced" = "Companion not synced";
+"sync.queue.pending_sync_key" = "Pending: awaiting sync key (%lld queued)";
+"sync.queue.pending_companion_key" = "Retry requested: awaiting companion key (%lld queued)";
+"sync.queue.pending_companion_sync_key" = "Pending: awaiting companion sync key";
+
+/* i18n remediation 2026-06-10 */
+"compass.status.calibration_required" = "Calibrate compass";
+"info.status.available" = "Available";
+"image.error.invalid_filename" = "Invalid image filename";
+"image.error.invalid_size" = "Invalid image size";
+"log.validation.invalid_sessions_excluded_local_format" = "%lld invalid sessions excluded from local log.";
+"log.validation.invalid_sessions_excluded_format" = "%lld invalid sessions excluded from log.";
+"log.load.error_format" = "Local log unreadable: %@";
+"watchsync.import.error.log_store_unavailable" = "iPhone import error: log store unavailable";
+"dive.session.invalid.incoherent_data" = "Invalid session: inconsistent dive data.";
+"dive.session.unclassified_no_profile" = "Session without depth profile not classified.";
+"watchsync.diagnostic.failed_signed_ack" = "Failed: invalid signed ack; pending kept";
+"watchsync.diagnostic.failed_iphone_no_ack" = "Failed: iPhone did not confirm with signed ack; pending kept";
+"watchsync.diagnostic.failed_direct_sent_queue_format" = "Failed: direct send failed; sent via queue, ack pending: %@";
+"watchsync.diagnostic.sent_direct_awaiting_ack" = "Sent: direct message sent, awaiting ack";
+"watchsync.diagnostic.sent_queue_ack_pending" = "Sent: WatchConnectivity queue, ack pending";
+"watchsync.diagnostic.failed_encoding_format" = "Failed: sync encoding error: %@";
+"watchsync.diagnostic.failed_transfer_user_info_format" = "Failed: transferUserInfo not completed: %@";
+"watchsync.diagnostic.sent_transfer_user_info_awaiting_ack" = "Sent: transferUserInfo completed, awaiting signed ack from companion";
+"sync.dive.duplicate_ignored_iphone" = "Duplicate iPhone dive ignored";
+"sync.dive.received_from_iphone" = "Dive received from iPhone";
+"sync.dive.import_error_format" = "iPhone import error: %@";
+"alarms.a11y.row_format" = "%@, %@, %@";
+"alarms.a11y.stepper.decrease" = "Decrease";
+"alarms.a11y.stepper.increase" = "Increase";

@@ -129,6 +129,14 @@ struct AlarmSettingsView: View {
             Toggle("", isOn: isOn)
                 .labelsHidden()
                 .tint(DiveUI.green)
+                .accessibilityLabel(
+                    String(
+                        format: String(localized: "alarms.a11y.row_format"),
+                        title,
+                        threshold,
+                        isOn.wrappedValue ? String(localized: "legal.acceptance.a11y.checked") : String(localized: "legal.acceptance.a11y.unchecked")
+                    )
+                )
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
@@ -166,6 +174,7 @@ struct AlarmSettingsView: View {
             }
             .buttonStyle(.plain)
             .foregroundStyle(color)
+            .accessibilityLabel(String(localized: "alarms.a11y.stepper.decrease"))
 
             Button(action: increase) {
                 Image(systemName: "plus")
@@ -175,6 +184,7 @@ struct AlarmSettingsView: View {
             }
             .buttonStyle(.plain)
             .foregroundStyle(color)
+            .accessibilityLabel(String(localized: "alarms.a11y.stepper.increase"))
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)

@@ -1,5 +1,17 @@
 # Watch GPS lifecycle policy
 
+**Updated:** 2026-06-02 (WATCH-GPS-001 remediation)
+
+## Battery policy (no continuous GPS outside active dive)
+
+- **No continuous high-frequency GPS** when no dive session is active and no bounded capture is in flight.
+- `GPSManager.start()` / `stop()` are owned by **`DiveManager`** for the active dive window only.
+- `captureBestEffortPoint(for: 6)` performs **bounded** entry/exit capture (6 s windows); dive entry/exit leaves updates running because the broader session owns GPS until `stop()` on dive end.
+- `locationManagerDidChangeAuthorization` restarts updates **only** when `maintainsLocationUpdates == true` (active dive) **or** `bestEffortCapture != nil` (in-flight capture). Authorization grants outside those states do **not** start location updates.
+- One-shot callers may pass `stopUpdatesWhenComplete: true` to end updates after capture completes.
+
+See inline comments in `Services/GPSManager.swift` and `GPSLifecycleTests.testFreshManagerDoesNotMaintainLocationUpdates`.
+
 ## Ownership model
 
 - **`DiveManager`** owns continuous GPS updates during an active dive session (`GPSManager.start()` at session start; `stop()` on session end).

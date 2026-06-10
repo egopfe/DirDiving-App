@@ -69,4 +69,73 @@ enum UIUXAccessibilitySummaries {
             return sample.compartmentLoadingsPercent[trace.controllingCompartment]
         }.max() ?? 0
     }
+
+    static func ccrPPO2Timeline(samples: [CCRTimelineSample], setpointHigh: Double) -> String {
+        guard let first = samples.first, let last = samples.last, !samples.isEmpty else {
+            return String(localized: "ccr.a11y.ppo2.empty")
+        }
+        let values = samples.map(\.ppO2Bar)
+        let minValue = values.min() ?? 0
+        let maxValue = values.max() ?? 0
+        let average = values.reduce(0, +) / Double(values.count)
+        let warning = maxValue > setpointHigh + 0.05
+            ? String(localized: "ccr.a11y.ppo2.warning_high")
+            : String(localized: "ccr.a11y.ppo2.within_range")
+        return String(
+            format: String(localized: "ccr.a11y.ppo2.summary"),
+            Formatters.one(minValue),
+            Formatters.one(maxValue),
+            Formatters.one(average),
+            Int(first.runtimeMinutes.rounded()),
+            Int(last.runtimeMinutes.rounded()),
+            warning
+        )
+    }
+
+    static func ccrPPN2Timeline(samples: [CCRTimelineSample]) -> String {
+        guard let first = samples.first, let last = samples.last, !samples.isEmpty else {
+            return String(localized: "ccr.a11y.ppn2.empty")
+        }
+        let values = samples.map(\.ppN2Bar)
+        return String(
+            format: String(localized: "ccr.a11y.ppn2.summary"),
+            Formatters.one(values.min() ?? 0),
+            Formatters.one(values.max() ?? 0),
+            Formatters.one(values.reduce(0, +) / Double(values.count)),
+            Int(first.runtimeMinutes.rounded()),
+            Int(last.runtimeMinutes.rounded())
+        )
+    }
+
+    static func ccrENDTimeline(samples: [CCRTimelineSample], unitPreference: IOSUnitPreference) -> String {
+        guard let first = samples.first, let last = samples.last, !samples.isEmpty else {
+            return String(localized: "ccr.a11y.end.empty")
+        }
+        let values = samples.map(\.endMeters)
+        let maxEND = Formatters.depth(values.max() ?? 0, units: unitPreference).text
+        return String(
+            format: String(localized: "ccr.a11y.end.summary"),
+            maxEND,
+            Int(first.runtimeMinutes.rounded()),
+            Int(last.runtimeMinutes.rounded()),
+            String(localized: "ccr.a11y.reference_estimate_note")
+        )
+    }
+
+    static func ccrGasDensityTimeline(
+        samples: [(runtimeMinutes: Double, density: Double)]
+    ) -> String {
+        guard let first = samples.first, let last = samples.last, !samples.isEmpty else {
+            return String(localized: "ccr.a11y.density.empty")
+        }
+        let values = samples.map(\.density)
+        return String(
+            format: String(localized: "ccr.a11y.density.summary"),
+            Formatters.one(values.min() ?? 0),
+            Formatters.one(values.max() ?? 0),
+            Int(first.runtimeMinutes.rounded()),
+            Int(last.runtimeMinutes.rounded()),
+            String(localized: "ccr.a11y.reference_estimate_note")
+        )
+    }
 }

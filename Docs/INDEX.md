@@ -1,9 +1,72 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-07  
-**Branch consigliato:** `main` = `origin/main` @ **`af31937`** (audit re-run; see post-audit fix report for current HEAD after fixes)  
+**Aggiornato:** 2026-06-09  
+**Branch consigliato:** `main` = `origin/main` @ **`0569903`**  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-06-09 — Documentazione allineata (`DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`)
+
+Pass **docs-only** su `main` @ `0569903`: README, INDEX, matrice CSV, CCR reference docs, branch strategy, audit cross-links, release/TestFlight notes. Nessun cambiamento a runtime MAIN o file experimental.
+
+| Campo | Valore |
+|-------|--------|
+| **Report** | [`DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md) |
+| **Baseline codice** | `0569903` — deep-code remediation MAIN-DCA-001…018 |
+| **XCTest (sim)** | Watch **192** / iOS **561** passed @ `0569903` |
+| **Verdict docs** | Architettura MAIN allineata; **physical QA ancora PENDING** |
+
+---
+
+## Aggiornamento indice 2026-06-09 — Deep code analysis remediation (`MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT.md`)
+
+Remediation **MAIN-DCA-001 … MAIN-DCA-018** (codice) @ `0569903`. Audit originale: [`MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md) @ `a2733d2` (baseline `dba1a22`).
+
+| Campo | Valore |
+|-------|--------|
+| **Report fix** | [`MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT.md) |
+| **Threat model** | [`WATCH_SYNC_SECURITY_THREAT_MODEL.md`](WATCH_SYNC_SECURITY_THREAT_MODEL.md) |
+| **Physical QA** | [`MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md`](MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md) — tutti **PENDING** |
+| **Verdict release** | Sim/build/test verdi; **non** TestFlight/App Store senza QA fisica ed evidenza esterna |
+
+---
+
+## Aggiornamento indice 2026-06-09 — Deep code analysis audit (read-only)
+
+Audit read-only post UI/UX remediation @ `dba1a22`.
+
+| Campo | Valore |
+|-------|--------|
+| **Documento** | [`MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md) |
+| **Commit report** | `a2733d2` |
+| **Issue count** | MAIN-DCA-001…018 |
+| **Verdict** | Remediation required before external release claims |
+
+---
+
+## Aggiornamento indice 2026-06-09 — UI/UX audit remediation (`UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md`)
+
+Implementazione UI/UX MAIN @ `dba1a22` (localization, a11y, CCR checklist import, sync badge, locale dates). **Codice UI/UX: 100%** nel scope audit; QA device matrices ancora pending.
+
+| Campo | Valore |
+|-------|--------|
+| **Documento** | [`UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md`](UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md) |
+| **Audit baseline** | [`UI_UX_MAIN_AUDIT_CURRENT.md`](UI_UX_MAIN_AUDIT_CURRENT.md) @ `b7b6e93` |
+| **Verdict** | Code complete; device QA matrices open |
+
+---
+
+## Aggiornamento indice 2026-06-09 — UI/UX audit (read-only)
+
+Audit read-only MAIN UI/UX accessibility and release readiness @ `b7b6e93`.
+
+| Campo | Valore |
+|-------|--------|
+| **Documento** | [`UI_UX_MAIN_AUDIT_CURRENT.md`](UI_UX_MAIN_AUDIT_CURRENT.md) |
+| **Overall UX** | 88% pre-remediation |
+| **Verdict** | Remediation plan executed @ `dba1a22` |
 
 ---
 

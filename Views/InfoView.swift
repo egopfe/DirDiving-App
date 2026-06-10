@@ -32,7 +32,7 @@ struct InfoView: View {
                         appleLowPowerModeRow
                         depthDiagnostics
                         infoRow(title: String(localized: "info.sync"), value: watchSync.lastSyncStatus)
-                        infoRow(title: String(localized: "Spazio libero"), value: String(localized: "Gestito da watchOS"))
+                        infoRow(title: String(localized: "sync.storage.free_space"), value: String(localized: "info.storage.managed_by_watchos"))
                     }
                 }
                 .padding(.horizontal, 11)
@@ -191,7 +191,7 @@ struct InfoView: View {
             diagnosticRow(
                 String(localized: "settings.row.depth_sensor.title"),
                 dive.isDepthAutomationAvailable
-                    ? String(localized: "Disponibile")
+                    ? String(localized: "info.status.available")
                     : String(localized: "Non disponibile")
             )
             diagnosticRow(
@@ -215,7 +215,7 @@ struct InfoView: View {
 
     private func diagnosticValueIsPositive(_ value: String) -> Bool {
         let positives = [
-            String(localized: "Disponibile"),
+            String(localized: "info.status.available"),
             String(localized: "Pronto")
         ]
         return positives.contains(value)

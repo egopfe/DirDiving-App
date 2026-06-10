@@ -8,6 +8,13 @@ Owner: ________  Date: ________  Build: ________  Commit: ________
 - [ ] Safety and review notes updated
 - [ ] Privacy evidence package updated
 
+## UI/UX / marketing evidence (2026-06-09)
+
+- [ ] Review `Docs/UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md`
+- [ ] App Store marketing evidence — `Docs/QA_EVIDENCE/APP_STORE_MARKETING/` (**PENDING**)
+- [ ] Reference UI captures per `Docs/ReferenceUI/README.md` (**PENDING**)
+- [ ] CCR/disclaimer visible on store-facing CCR screenshots when captured
+
 ## App Store process items (external/process required)
 
 - [ ] Canonical screenshots captured (not generated/faked)
