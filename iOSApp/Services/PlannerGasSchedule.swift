@@ -73,12 +73,21 @@ enum PlannerGasSchedule {
         }.sorted { $0.depthMeters > $1.depthMeters }
     }
 
-    static func hasMODBlockingIssues(input: GasPlanInput) -> Bool {
+    static func hasMODBlockingIssues(input: GasPlanInput, mode: PlannerMode = .technical) -> Bool {
+        if mode == .base {
+            let active = PlannerModePolicy.activePlanInput(from: input, mode: mode)
+            guard PlannerInputValidator.validate(active, mode: mode).isValid else { return true }
+            if !PlannerMODValidator.liveInputIssues(input: active, environment: active.plannerEnvironment).isEmpty {
+                return true
+            }
+            var working = active
+            working.syncLegacyGasesFromPlannerCylinders()
+            return BuhlmannPlanner.enginePlan(input: working).hasBlockingIssues
+        }
         guard PlannerInputValidator.validate(input).isValid else { return true }
         var working = input
         working.syncLegacyGasesFromPlannerCylinders()
-        let enginePlan = BuhlmannPlanner.enginePlan(input: working)
-        return enginePlan.hasBlockingIssues
+        return BuhlmannPlanner.enginePlan(input: working).hasBlockingIssues
     }
 
     static func makeDecoStop(depthMeters: Double, minutes: Int, gas: GasMix, environment: PlannerEnvironment = .seaLevelSaltWater) -> DecoStop {
