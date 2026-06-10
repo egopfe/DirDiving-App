@@ -152,7 +152,7 @@ struct PlannerView: View {
                 get: { pdfExportAlertMessage != nil },
                 set: { if !$0 { pdfExportAlertMessage = nil } }
             )) {
-                Button(String(localized: "OK"), role: .cancel) {}
+                Button(String(localized: "common.ok"), role: .cancel) {}
             } message: {
                 Text(pdfExportAlertMessage ?? "")
             }
@@ -166,12 +166,12 @@ struct PlannerView: View {
                 store.refreshDerivedPlanningPreview()
             }
             .alert(String(localized: "planner.reference.info.title"), isPresented: $showPlanningReferenceInfo) {
-                Button(String(localized: "OK"), role: .cancel) {}
+                Button(String(localized: "common.ok"), role: .cancel) {}
             } message: {
                 Text(String(localized: "planner.reference.info.message"))
             }
             .alert(String(localized: "planner.calculate.error.title"), isPresented: $showCalculateError) {
-                Button(String(localized: "OK"), role: .cancel) {}
+                Button(String(localized: "common.ok"), role: .cancel) {}
             } message: {
                 Text(calculateErrorMessage)
             }
@@ -1012,7 +1012,7 @@ struct PlannerView: View {
                     ProgressView()
                         .tint(.black)
                 }
-                Text(String(localized: store.isCalculating ? "planner.calculate.in_progress" : "Calcola Piano"))
+                Text(String(localized: store.isCalculating ? "planner.calculate.in_progress" : "planner.calculate"))
                     .font(.callout.weight(.semibold))
                     .foregroundStyle(canCalculatePlan ? .black : DIRTheme.muted)
             }
@@ -1027,7 +1027,7 @@ struct PlannerView: View {
         .buttonStyle(.plain)
         .disabled(!canCalculatePlan || store.isCalculating)
         .padding(.top, 4)
-        .accessibilityLabel(String(localized: "Calcola Piano"))
+        .accessibilityLabel(String(localized: store.isCalculating ? "planner.calculate.in_progress" : "planner.calculate"))
         .accessibilityHint(
             liveMODIssues.isEmpty
                 ? String(localized: "planner.safety_ack.hint")
@@ -1655,7 +1655,7 @@ struct PlanResultView: View {
             get: { pdfExportAlertMessage != nil },
             set: { if !$0 { pdfExportAlertMessage = nil } }
         )) {
-            Button(String(localized: "OK"), role: .cancel) {}
+            Button(String(localized: "common.ok"), role: .cancel) {}
         } message: {
             Text(pdfExportAlertMessage ?? "")
         }

@@ -23,9 +23,9 @@ final class UserImageStore: ObservableObject {
         var errorDescription: String? {
             switch self {
             case .invalidFileName:
-                return String(localized: "Nome file immagine non valido")
+                return String(localized: "image.error.invalid_filename")
             case .invalidFileSize:
-                return String(localized: "Dimensione immagine non valida")
+                return String(localized: "image.error.invalid_size")
             case .invalidImageContent:
                 return String(localized: "user_images.error.not_image")
             }
@@ -44,7 +44,7 @@ final class UserImageStore: ObservableObject {
             case .notDeletable:
                 return String(localized: "user_images.delete.error")
             case .invalidFileName:
-                return String(localized: "Nome file immagine non valido")
+                return String(localized: "image.error.invalid_filename")
             case .notFound:
                 return String(localized: "user_images.delete.error")
             case .outsideUserImagesDirectory:

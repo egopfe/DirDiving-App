@@ -165,7 +165,7 @@ struct DiveDetailView: View {
     private var metricGrid: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
-                detailMetric(String(localized: "detail.metric.duration"), value: Formatters.time(session.durationSeconds), unit: "min")
+                detailMetric(String(localized: "detail.metric.duration"), value: Formatters.time(session.durationSeconds), unit: String(localized: "common.unit.min"))
                 Divider().overlay(DIRTheme.hairline)
                 detailMetric(String(localized: "detail.metric.max_depth"), measurement: Formatters.depth(session.maxDepthMeters, units: unitPreference))
                 Divider().overlay(DIRTheme.hairline)
@@ -272,8 +272,8 @@ struct DiveDetailView: View {
             }
             Chart(session.samples) { sample in
                 LineMark(
-                    x: .value("Tempo", sample.timestamp),
-                    y: .value("Profondita", Formatters.depthValue(sample.depthMeters, units: unitPreference))
+                    x: .value(String(localized: "chart.axis.time"), sample.timestamp),
+                    y: .value(String(localized: "chart.axis.depth"), Formatters.depthValue(sample.depthMeters, units: unitPreference))
                 )
                 .foregroundStyle(DIRTheme.cyan)
                 .lineStyle(StrokeStyle(lineWidth: 2.4, lineCap: .round, lineJoin: .round))

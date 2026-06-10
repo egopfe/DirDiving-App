@@ -261,22 +261,22 @@ final class WatchSyncService: NSObject, ObservableObject {
                 return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
             }
             if importedFromCompanionIDs.contains(session.id) {
-                lastSyncStatus = String(localized: "Immersione iPhone duplicata ignorata")
+                lastSyncStatus = String(localized: "sync.dive.duplicate_ignored_iphone")
                 return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
             }
             guard let logStore else {
                 failedTransferCount += 1
-                lastSyncStatus = String(localized: "Errore import iPhone: log store non disponibile")
+                lastSyncStatus = String(localized: "watchsync.import.error.log_store_unavailable")
                 return nil
             }
             rememberCompanionSession(id: session.id)
             logStore.addFromCompanion(session)
-            lastSyncStatus = String(localized: "Immersione ricevuta da iPhone")
+            lastSyncStatus = String(localized: "sync.dive.received_from_iphone")
             recordActivity(title: String(localized: "sync.activity.received_from_iphone"), detail: sessionSummary(session))
             return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
         } catch {
             failedTransferCount += 1
-            lastSyncStatus = String(format: String(localized: "Errore import iPhone: %@"), error.localizedDescription)
+            lastSyncStatus = String(format: String(localized: "sync.dive.import_error_format"), error.localizedDescription)
             Self.logger.error("Watch import from companion failed: \(error.localizedDescription, privacy: .private)")
             return nil
         }
@@ -321,7 +321,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     func confirmSignedAck(sessionID: UUID, issuedAt: Date, signature: String) {
         guard WatchDiveSyncCodec.verifyAckSignature(signature, sessionID: sessionID, issuedAt: issuedAt) else {
             failedTransferCount += 1
-            lastSyncStatus = String(localized: "Failed: ack firmato non valido; pending conservato")
+            lastSyncStatus = String(localized: "watchsync.diagnostic.failed_signed_ack")
             return
         }
         guard pendingTransfers.contains(where: { $0.session.id == sessionID }) else { return }
@@ -353,26 +353,26 @@ final class WatchSyncService: NSObject, ObservableObject {
                             )
                         } else {
                             self.failedTransferCount += 1
-                            self.lastSyncStatus = String(localized: "Failed: iPhone non ha confermato con ack firmato; pending conservato")
+                            self.lastSyncStatus = String(localized: "watchsync.diagnostic.failed_iphone_no_ack")
                         }
                     }
                 } errorHandler: { [weak self] error in
                     Task { @MainActor in
                         guard let self else { return }
                         self.failedTransferCount += 1
-                        self.lastSyncStatus = String(format: String(localized: "Failed: diretto non riuscito; sent via coda, ack pending: %@"), error.localizedDescription)
+                        self.lastSyncStatus = String(format: String(localized: "watchsync.diagnostic.failed_direct_sent_queue_format"), error.localizedDescription)
                         self.sentTransferCount += 1
                         self.queueViaUserInfo(envelope: envelope, sessionID: session.id)
                         self.recordActivity(title: String(localized: "sync.activity.queued_to_iphone"), detail: self.sessionSummary(session))
                     }
                 }
                 sentTransferCount += 1
-                lastSyncStatus = String(localized: "Sent: messaggio diretto inviato, attendo ack")
+                lastSyncStatus = String(localized: "watchsync.diagnostic.sent_direct_awaiting_ack")
                 recordActivity(title: String(localized: "sync.activity.sent_to_iphone"), detail: sessionSummary(session))
             } else {
                 queueViaUserInfo(envelope: envelope, sessionID: session.id)
                 sentTransferCount += 1
-                lastSyncStatus = String(localized: "Sent: coda WatchConnectivity, ack pending")
+                lastSyncStatus = String(localized: "watchsync.diagnostic.sent_queue_ack_pending")
                 recordActivity(title: String(localized: "sync.activity.queued_to_iphone"), detail: sessionSummary(session))
             }
         } catch WatchDiveSyncError.missingPeerSecret {
@@ -381,7 +381,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             lastSyncStatus = String(localized: "sync.queue.pending_companion_sync_key")
         } catch {
             failedTransferCount += 1
-            lastSyncStatus = String(format: String(localized: "Failed: errore codifica sync: %@"), error.localizedDescription)
+            lastSyncStatus = String(format: String(localized: "watchsync.diagnostic.failed_encoding_format"), error.localizedDescription)
             Self.logger.error("Watch sync encode failed: \(error.localizedDescription, privacy: .private)")
         }
     }
@@ -413,11 +413,11 @@ final class WatchSyncService: NSObject, ObservableObject {
         guard let index = pendingTransfers.firstIndex(where: { $0.session.id == sessionID }) else { return }
         if let error {
             failedTransferCount += 1
-            lastSyncStatus = String(format: String(localized: "Failed: transferUserInfo non completato: %@"), error.localizedDescription)
+            lastSyncStatus = String(format: String(localized: "watchsync.diagnostic.failed_transfer_user_info_format"), error.localizedDescription)
             return
         }
         pendingTransfers[index].userInfoDeliveredAt = Date()
-        lastSyncStatus = String(localized: "Sent: transferUserInfo completato, attendo ack firmato companion")
+        lastSyncStatus = String(localized: "watchsync.diagnostic.sent_transfer_user_info_awaiting_ack")
         savePendingTransfers()
     }
 
@@ -701,7 +701,7 @@ extension WatchSyncService: WCSessionDelegate {
     private func handleCompanionImportAck(_ payload: [String: Any]) {
         guard let parsed = WatchDiveSyncCodec.parseImportAck(from: payload) else {
             failedTransferCount += 1
-            lastSyncStatus = String(localized: "Failed: ack firmato non valido; pending conservato")
+            lastSyncStatus = String(localized: "watchsync.diagnostic.failed_signed_ack")
             return
         }
         confirmSignedAck(sessionID: parsed.sessionID, issuedAt: parsed.issuedAt, signature: parsed.signature)
@@ -714,9 +714,9 @@ extension WatchSyncService: WCSessionDelegate {
                 self.markUserInfoDelivered(sessionID: sessionID, error: error)
             } else if let error {
                 self.failedTransferCount += 1
-                self.lastSyncStatus = String(format: String(localized: "Failed: transferUserInfo non completato: %@"), error.localizedDescription)
+                self.lastSyncStatus = String(format: String(localized: "watchsync.diagnostic.failed_transfer_user_info_format"), error.localizedDescription)
             } else {
-                self.lastSyncStatus = String(localized: "Sent: transferUserInfo completato, attendo ack firmato companion")
+                self.lastSyncStatus = String(localized: "watchsync.diagnostic.sent_transfer_user_info_awaiting_ack")
             }
         }
     }

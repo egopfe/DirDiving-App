@@ -66,7 +66,7 @@ extension CompassManager: CLLocationManagerDelegate {
             }
             headingDegrees = DiveAlgorithm.normalizedDegrees(rawHeading)
             if newHeading.headingAccuracy < 0 {
-                statusMessage = String(localized: "Bussola da calibrare")
+                statusMessage = String(localized: "compass.status.calibration_required")
             } else {
                 statusMessage = String(localized: "Bussola attiva")
             }

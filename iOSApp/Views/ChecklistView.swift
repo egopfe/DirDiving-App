@@ -56,7 +56,7 @@ struct ChecklistView: View {
                 get: { pdfExportAlertMessage != nil },
                 set: { if !$0 { pdfExportAlertMessage = nil } }
             )) {
-                Button(String(localized: "OK"), role: .cancel) {}
+                Button(String(localized: "common.ok"), role: .cancel) {}
             } message: {
                 Text(pdfExportAlertMessage ?? "")
             }
@@ -143,7 +143,11 @@ struct ChecklistView: View {
     private var checklistHero: some View {
         HStack(spacing: 12) {
             checklistBadge(
-                "\(equipment.profile.checklistReadyCount)/\(max(1, equipment.profile.migratedChecklistItems.count)) READY",
+                String(
+                    format: String(localized: "checklist.status.ready_badge_format"),
+                    equipment.profile.checklistReadyCount,
+                    max(1, equipment.profile.migratedChecklistItems.count)
+                ),
                 equipment.profile.checklistReadyCount == equipment.profile.migratedChecklistItems.count ? DIRTheme.green : DIRTheme.yellow
             )
         }
@@ -210,7 +214,7 @@ struct ChecklistView: View {
     }
 
     private func showSavedFeedback() {
-        savedFeedback = String(localized: "Profilo attrezzatura salvato.")
+        savedFeedback = String(localized: "equipment.profile.saved_notice")
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 1_800_000_000)
             savedFeedback = nil

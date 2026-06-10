@@ -28,9 +28,9 @@
 "Comportamento GPS" = "Comportamento GPS";
 "Sensore profondità" = "Sensore profondità";
 "Sync companion" = "Sync companion";
-"Sync pending" = "Sync pending";
-"Sync sent" = "Sync sent";
-"Sync acknowledged" = "Sync acknowledged";
+"Sync pending" = "Sync in attesa";
+"Sync sent" = "Sync inviato";
+"Sync acknowledged" = "Sync confermato";
 "Export" = "Export";
 "EXPORT" = "EXPORT";
 "TTV live" = "TTV live";
@@ -73,7 +73,7 @@
 "ascent_alarm_title" = "RISALITA VELOCE";
 "ascent_alarm_instruction" = "RALLENTA";
 "ascent_alarm_speed_unit" = "m/min";
-"ascent_alarm_accessibility_hint" = "Rallenta la risalita. Profondita e gauge restano visibili.";
+"ascent_alarm_accessibility_hint" = "Rallenta la risalita. Profondità e gauge restano visibili.";
 
 "gps.banner.start.title" = "GPS INIZIO REGISTRATO";
 "gps.banner.end.title" = "GPS FINE REGISTRATO";
@@ -156,7 +156,7 @@
 "Configura START/STOP tramite Azione / Comandi Rapidi se watchOS espone l'intent." = "Configura START/STOP tramite Azione / Comandi Rapidi se watchOS espone l'intent.";
 "Reset cronometro e disponibile come intent separato quando supportato dal sistema." = "Reset cronometro e disponibile come intent separato quando supportato dal sistema.";
 "DIR DIVING non puo intercettare direttamente il tasto laterale o una pressione lunga arbitraria." = "DIR DIVING non puo intercettare direttamente il tasto laterale o una pressione lunga arbitraria.";
-"Se il rilevamento automatico profondita non e disponibile, usa AVVIO MANUALE nella schermata live." = "Se il rilevamento automatico profondita non e disponibile, usa AVVIO MANUALE nella schermata live.";
+"Se il rilevamento automatico profondita non e disponibile, usa AVVIO MANUALE nella schermata live." = "Se il rilevamento automatico profondità non e disponibile, usa AVVIO MANUALE nella schermata live.";
 "Setup shortcut se supportato" = "Setup shortcut se supportato";
 "Feedback via vibrazione" = "Feedback via vibrazione";
 "Non usati sott'acqua; feedback via vibrazione" = "Non usati sott'acqua; feedback via vibrazione";
@@ -215,7 +215,7 @@
 "Sessione limitata: runtime e GPS sì, profondità automatica no." = "Sessione limitata: runtime e GPS sì, profondità automatica no.";
 "AVVIO MANUALE" = "AVVIO MANUALE";
 "FINE MANUALE" = "FINE MANUALE";
-"TTV informativo derivato da profondita media e durata; non e un valore decompressivo o time to surface." = "TTV informativo derivato da profondita media e durata; non e un valore decompressivo o time to surface.";
+"TTV informativo derivato da profondita media e durata; non e un valore decompressivo o time to surface." = "TTV informativo derivato da profondità media e durata; non e un valore decompressivo o time to surface.";
 "TTV sessione %@, runtime %@" = "Session TTV %@, runtime %@";
 "Nessuna schermata o immagine di riferimento e inclusa in questa build." = "Nessuna schermata o immagine di riferimento e inclusa in questa build.";
 "Bussola pronta" = "Bussola pronta";
@@ -293,13 +293,13 @@
 "Not accepted" = "Non accettato";
 "Terms" = "Termini";
 "Privacy" = "Privacy";
-"depth.safety.approaching.title" = "Profondita massima supportata in avvicinamento";
+"depth.safety.approaching.title" = "Profondità massima supportata in avvicinamento";
 "depth.safety.caution.title" = "Avvicinamento al limite operativo";
 "depth.safety.critical.title" = "Vicino alla profondità massima supportata";
 "depth.safety.a11y.caution" = "Attenzione profondità. Avvicinamento al limite operativo.";
 "depth.safety.a11y.critical" = "Profondità critica. Vicino alla profondità massima supportata.";
 "depth.safety.a11y.exceeded" = "Profondità superata. Fuori intervallo operativo supportato. Risalire entro limiti sicuri.";
-"depth.safety.exceeded.title" = "Profondita fuori intervallo operativo supportato";
+"depth.safety.exceeded.title" = "Profondità fuori intervallo operativo supportato";
 "live.metric.ttv" = "TTV";
 "live.metric.runtime" = "Durata";
 "live.metric.max_depth" = "Prof. max";
@@ -353,8 +353,8 @@
 "settings.haptics.on" = "Attiva per warning e conferme";
 "settings.haptics.off" = "Disattivata";
 "settings.language.subtitle" = "System / Italiano / English";
-"settings.units.imperial_note" = "Profondita su Live e Log in piedi con unita imperiale. Export resta metrico/Subsurface.";
-"live.depth.a11y" = "Profondita attuale";
+"settings.units.imperial_note" = "Profondità su Live e Log in piedi con unita imperiale. Export resta metrico/Subsurface.";
+"live.depth.a11y" = "Profondità attuale";
 "live.stopwatch.a11y" = "Cronometro";
 "live.stopwatch.start.a11y" = "Avvia cronometro";
 "live.stopwatch.stop.a11y" = "Ferma cronometro";
@@ -397,16 +397,16 @@
 "shortcuts.help.bearing.title" = "Bussola";
 "shortcuts.help.bearing.body" = "Imposta o cancella il bearing salvato tramite Comandi Rapidi se supportato. Apri BUSSOLA per SET/CLEAR sullo schermo.";
 "shortcuts.help.alarm.title" = "Banner allarme";
-"shortcuts.help.alarm.body" = "Chiudi il banner profondita/tempo/batteria quando un allarme e visibile su Live.";
+"shortcuts.help.alarm.body" = "Chiudi il banner profondità/tempo/batteria quando un allarme e visibile su Live.";
 "shortcuts.help.side_button.title" = "Tasto laterale (by design)";
 "shortcuts.help.side_button.body" = "DIR DIVING non puo sovrascrivere direttamente il tasto laterale di Apple Watch. Le azioni supportate possono essere mappate tramite Comandi Rapidi o Action Button quando watchOS lo consente. I controlli a schermo restano i controlli primari affidabili.";
 "shortcuts.help.on_screen.title" = "Controlli a schermo";
-"shortcuts.help.on_screen.body" = "Usa START / STOP / RESET su Live per controllo affidabile. Usa AVVIO/FINE MANUALE solo se il rilevamento profondita automatico non e disponibile.";
+"shortcuts.help.on_screen.body" = "Usa START / STOP / RESET su Live per controllo affidabile. Usa AVVIO/FINE MANUALE solo se il rilevamento profondità automatico non e disponibile.";
 "compass.bearing.set.toast" = "Rotta impostata";
 "compass.bearing.clear.toast" = "Rotta cancellata";
 "compass.bearing.set" = "IMPOSTA ROTTA";
 "compass.bearing.delta_format" = "ROTTA %@ | DELTA %@";
-"compass.metric.depth" = "PROFONDITA";
+"compass.metric.depth" = "PROFONDITÀ";
 "compass.metric.runtime" = "RUNTIME";
 "log.delete.confirm.title" = "Eliminare immersione?";
 "log.delete.confirm.action" = "Elimina";
@@ -431,7 +431,7 @@
 "info.title" = "INFO";
 "info.sync" = "Sync";
 "info.depth.entitlement.review_required" = "Configurato nel target; profilo Apple da validare";
-"info.depth.validation_note" = "Richiede validazione reale su Apple Watch Ultra con entitlement approvato e provisioning corretto. Il simulatore/macOS non certifica profondita o pressione.";
+"info.depth.validation_note" = "Richiede validazione reale su Apple Watch Ultra con entitlement approvato e provisioning corretto. Il simulatore/macOS non certifica profondità o pressione.";
 "manual_dive.add.title" = "Aggiungi immersione manuale";
 "manual_dive.edit.title" = "Modifica immersione manuale";
 "manual_dive.site" = "Sito";
@@ -609,9 +609,9 @@
 "settings.row.gps_behavior.subtitle" = "Solo in superficie; in acqua il GPS non è attendibile. Coordinate mancanti = ultimo fix o non disponibile (etichettato).";
 "settings.row.depth_sensor.title" = "Sensore profondità";
 "settings.row.sync_companion.title" = "Sync companion";
-"settings.row.sync_pending.title" = "Sync pending";
-"settings.row.sync_sent.title" = "Sync sent";
-"settings.row.sync_ack.title" = "Sync acknowledged";
+"settings.row.sync_pending.title" = "Sync in attesa";
+"settings.row.sync_sent.title" = "Sync inviato";
+"settings.row.sync_ack.title" = "Sync confermato";
 "settings.row.ttv.title" = "TTV live";
 "settings.row.sync_errors.title" = "Errori sync";
 "settings.row.retry_sync.title" = "Riprova sync";
@@ -804,3 +804,29 @@
 "sync.queue.pending_sync_key" = "In attesa chiave sync (%lld in coda)";
 "sync.queue.pending_companion_key" = "Retry richiesto: in attesa chiave companion (%lld in coda)";
 "sync.queue.pending_companion_sync_key" = "In attesa chiave sync companion";
+
+/* i18n remediation 2026-06-10 */
+"compass.status.calibration_required" = "Bussola da calibrare";
+"info.status.available" = "Disponibile";
+"image.error.invalid_filename" = "Nome file immagine non valido";
+"image.error.invalid_size" = "Dimensione immagine non valida";
+"log.validation.invalid_sessions_excluded_local_format" = "%lld sessioni non valide escluse dal log locale.";
+"log.validation.invalid_sessions_excluded_format" = "%lld sessioni non valide escluse dal log.";
+"log.load.error_format" = "Log locale non leggibile: %@";
+"watchsync.import.error.log_store_unavailable" = "Errore import iPhone: log store non disponibile";
+"dive.session.invalid.incoherent_data" = "Sessione non valida: dati immersione incoerenti.";
+"dive.session.unclassified_no_profile" = "Sessione senza profilo profondità non classificata.";
+"watchsync.diagnostic.failed_signed_ack" = "Fallito: ack firmato non valido; pending conservato";
+"watchsync.diagnostic.failed_iphone_no_ack" = "Fallito: iPhone non ha confermato con ack firmato; pending conservato";
+"watchsync.diagnostic.failed_direct_sent_queue_format" = "Fallito: diretto non riuscito; inviato via coda, ack in attesa: %@";
+"watchsync.diagnostic.sent_direct_awaiting_ack" = "Inviato: messaggio diretto inviato, attendo ack";
+"watchsync.diagnostic.sent_queue_ack_pending" = "Inviato: coda WatchConnectivity, ack in attesa";
+"watchsync.diagnostic.failed_encoding_format" = "Fallito: errore codifica sync: %@";
+"watchsync.diagnostic.failed_transfer_user_info_format" = "Fallito: transferUserInfo non completato: %@";
+"watchsync.diagnostic.sent_transfer_user_info_awaiting_ack" = "Inviato: transferUserInfo completato, attendo ack firmato dal companion";
+"sync.dive.duplicate_ignored_iphone" = "Immersione iPhone duplicata ignorata";
+"sync.dive.received_from_iphone" = "Immersione ricevuta da iPhone";
+"sync.dive.import_error_format" = "Errore import iPhone: %@";
+"alarms.a11y.row_format" = "%@, %@, %@";
+"alarms.a11y.stepper.decrease" = "Diminuisci";
+"alarms.a11y.stepper.increase" = "Aumenta";

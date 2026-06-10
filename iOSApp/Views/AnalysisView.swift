@@ -35,7 +35,7 @@ struct AnalysisView: View {
                                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 0) {
                                     DIRMetricTile(title: String(localized: "analysis.metric.dives"), value: "\(analysisSummary.diveCount)", color: DIRTheme.cyan)
                                     DIRMetricTile(title: String(localized: "analysis.metric.max_depth"), measurement: Formatters.depth(analysisSummary.maxDepthMeters, units: unitPreference), color: DIRTheme.yellow)
-                                    DIRMetricTile(title: String(localized: "analysis.metric.total_runtime"), value: Formatters.zero(analysisSummary.totalRuntimeMinutes), unit: "min")
+                                    DIRMetricTile(title: String(localized: "analysis.metric.total_runtime"), value: Formatters.zero(analysisSummary.totalRuntimeMinutes), unit: String(localized: "common.unit.min"))
                                     avgTemperatureTile
                                     avgSACTile
                                     DIRMetricTile(title: String(localized: "analysis.metric.gps_routes"), value: "\(RouteSummaryService.summaries(from: analysisSessions).count)", color: DIRTheme.cyan)
@@ -44,8 +44,8 @@ struct AnalysisView: View {
                             DIRCard(String(localized: "analysis.card.max_depth"), icon: "chart.xyaxis.line", accent: DIRTheme.cyan) {
                                 Chart(analysisSessions) { session in
                                     BarMark(
-                                        x: .value("Data", session.startDate, unit: .day),
-                                        y: .value("Max", Formatters.depthValue(session.maxDepthMeters, units: unitPreference))
+                                        x: .value(String(localized: "chart.axis.date"), session.startDate, unit: .day),
+                                        y: .value(String(localized: "chart.axis.max"), Formatters.depthValue(session.maxDepthMeters, units: unitPreference))
                                     )
                                     .foregroundStyle(
                                         LinearGradient(colors: [DIRTheme.cyan, DIRTheme.green], startPoint: .top, endPoint: .bottom)

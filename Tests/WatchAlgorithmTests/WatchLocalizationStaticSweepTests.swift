@@ -72,6 +72,54 @@ final class WatchLocalizationStaticSweepTests: XCTestCase {
         XCTAssertFalse(source.contains("ALLARME PROFONDITÀ"))
     }
 
+    func testWatchRuntimeSemanticKeysExistInBothCatalogs() throws {
+        let en = try loadWatchStrings(named: "en")
+        let it = try loadWatchStrings(named: "it")
+        let keys = [
+            "compass.status.calibration_required",
+            "info.status.available",
+            "image.error.invalid_filename",
+            "image.error.invalid_size",
+            "log.validation.invalid_sessions_excluded_local_format",
+            "log.validation.invalid_sessions_excluded_format",
+            "watchsync.import.error.log_store_unavailable",
+            "dive.session.invalid.incoherent_data",
+            "dive.session.unclassified_no_profile",
+            "watchsync.diagnostic.failed_signed_ack",
+            "sync.dive.received_from_iphone"
+        ]
+        for key in keys {
+            XCTAssertFalse(en[key, default: ""].isEmpty, "Missing watch EN \(key)")
+            XCTAssertFalse(it[key, default: ""].isEmpty, "Missing watch IT \(key)")
+        }
+    }
+
+    func testWatchMainSourcesAvoidLegacyItalianSentenceKeys() throws {
+        let root = repositoryRoot()
+        let forbidden = [
+            "Bussola da calibrare",
+            "Nome file immagine non valido",
+            "Errore import iPhone: log store non disponibile",
+            "Failed: ack firmato non valido"
+        ]
+        for relativePath in try swiftFilesUnderWatchMain(root: root) {
+            let source = try String(contentsOf: root.appendingPathComponent(relativePath), encoding: .utf8)
+            for phrase in forbidden {
+                XCTAssertFalse(source.contains("String(localized: \"\(phrase)"), "\(relativePath) uses legacy key \(phrase)")
+            }
+        }
+    }
+
+    func testWatchStringsNeverUseCompassoTerminology() throws {
+        for locale in ["en", "it"] {
+            let strings = try loadWatchStrings(named: locale)
+            for (key, value) in strings {
+                XCTAssertFalse(value.localizedCaseInsensitiveContains("compasso"), "Watch \(locale) \(key) contains Compasso")
+                XCTAssertFalse(key.localizedCaseInsensitiveContains("compasso"), "Watch \(locale) key \(key) contains Compasso")
+            }
+        }
+    }
+
     private func swiftFilesUnderWatchMain(root: URL) throws -> [String] {
         var results: [String] = []
         for sourceRoot in watchSourceRoots {

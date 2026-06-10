@@ -212,8 +212,8 @@ struct CCRPlanResultView: View {
         DIRCard(String(localized: "planner.chart.depth_profile"), icon: "chart.xyaxis.line", accent: DIRTheme.cyan) {
             Chart(plan.depthProfilePoints) { point in
                 LineMark(
-                    x: .value("Time", point.elapsedMinutes),
-                    y: .value("Depth", point.depthMeters)
+                    x: .value(String(localized: "chart.axis.time"), point.elapsedMinutes),
+                    y: .value(String(localized: "chart.axis.depth"), point.depthMeters)
                 )
                 .foregroundStyle(DIRTheme.cyan)
             }

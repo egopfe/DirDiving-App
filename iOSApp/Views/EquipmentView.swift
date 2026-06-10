@@ -167,7 +167,7 @@ struct EquipmentView: View {
     }
 
     private func showSavedFeedback() {
-        savedFeedback = String(localized: "Profilo attrezzatura salvato.")
+        savedFeedback = String(localized: "equipment.profile.saved_notice")
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 1_800_000_000)
             savedFeedback = nil
