@@ -71,6 +71,28 @@ enum PlannerGasEditingSupport {
         return values.min(by: { abs($0 - rounded) < abs($1 - rounded) }) ?? values.first ?? 200
     }
 
+    static func startPressureBar(for entry: PlannerCylinderEntry) -> Double {
+        entry.cylinder.startPressureBar
+    }
+
+    static func displayWorkingPressure(_ entry: PlannerCylinderEntry, unit: PressureUnit) -> Int {
+        let bar = startPressureBar(for: entry)
+        let displayValue = unit == .bar ? bar : IOSUnitConversions.psi(fromBar: bar)
+        return nearestWorkingPressure(displayValue, unit: unit)
+    }
+
+    static func applyWorkingPressure(_ value: Int, unit: PressureUnit, to entry: inout PlannerCylinderEntry) {
+        if entry.pressureUnit != unit {
+            convertPressureUnit(on: &entry, to: unit)
+        }
+        entry.startPressure = Double(value)
+    }
+
+    static func workingPressureLabel(for entry: PlannerCylinderEntry, unit: PressureUnit) -> String {
+        let value = displayWorkingPressure(entry, unit: unit)
+        return "\(value) \(Formatters.pressureUnitLabel(unit))"
+    }
+
     static func convertPressureUnit(on entry: inout PlannerCylinderEntry, to unit: PressureUnit) {
         guard entry.pressureUnit != unit else { return }
         switch unit {

@@ -156,7 +156,8 @@ final class IOSMainAlgorithmMathRemediationTests: XCTestCase {
             validation: PlannerModePolicy.validate(draft: input, mode: .technical),
             modIssues: [],
             safetyAcknowledged: true,
-            unitPreference: .metric
+            unitPreference: .metric,
+            pressureUnitPreference: .bar
         )
         XCTAssertFalse(context.plan.ratioDeco?.validation.isBuhlmannCompatible ?? true)
         let data = PlannerPDFBuilder.build(context: context)
@@ -207,7 +208,8 @@ final class IOSMainAlgorithmMathRemediationTests: XCTestCase {
             validation: PlannerModePolicy.validate(draft: input, mode: .technical),
             modIssues: [],
             safetyAcknowledged: true,
-            unitPreference: .metric
+            unitPreference: .metric,
+            pressureUnitPreference: .bar
         )
         let withoutRatio = DivePackPDFBuilder.build(
             plannerContext: PDFExportPlannerContext(
@@ -224,7 +226,8 @@ final class IOSMainAlgorithmMathRemediationTests: XCTestCase {
                 validation: context.validation,
                 modIssues: [],
                 safetyAcknowledged: true,
-                unitPreference: .metric
+                unitPreference: .metric,
+                pressureUnitPreference: .bar
             ),
             checklistProfile: EquipmentProfile(),
             includeChecklist: false,
