@@ -84,6 +84,7 @@ final class PlannerModePolicyTests: XCTestCase {
         XCTAssertFalse(presentation.showsFullAscentTable)
         XCTAssertFalse(presentation.showsNDLCurveTab)
         XCTAssertEqual(presentation.buhlmannPresentation, .hidden)
+        XCTAssertFalse(presentation.showsCNSDescentBottomSettings)
     }
 
     func testDecoResultPresentationIsSimplified() {
@@ -91,6 +92,7 @@ final class PlannerModePolicyTests: XCTestCase {
         XCTAssertTrue(presentation.showsSimplifiedAscentTable)
         XCTAssertEqual(presentation.buhlmannPresentation, .simplifiedSummary)
         XCTAssertFalse(presentation.showsChartsTab)
+        XCTAssertFalse(presentation.showsCNSDescentBottomSettings)
     }
 
     func testLocalizationKeysExist() {
