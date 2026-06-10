@@ -18,15 +18,21 @@ enum PlannerPDFBuilder {
                 DIRIOSLocalizer.string("planner.field.max_depth"),
                 value: Formatters.depth(context.input.plannedDepthMeters, units: context.unitPreference).text
             )
-            if PlannerResultPresentation.presentation(for: context.mode).showsAverageDepthInput {
+            if PlannerResultPresentation.presentation(for: context.mode).showsAverageDepthGasConsumptionToggle,
+               context.input.averageDepthGasConsumptionEnabled {
                 page.drawLine(
                     DIRIOSLocalizer.string("planner.field.avg_depth"),
                     value: Formatters.depth(context.input.plannedAverageDepthMeters, units: context.unitPreference).text
                 )
-                let reference = context.input.planningDepthReference == .maximumDepth
-                    ? DIRIOSLocalizer.string("planner.reference.max_depth")
-                    : DIRIOSLocalizer.string("planner.reference.avg_depth")
-                page.drawLine(DIRIOSLocalizer.string("planner.field.planning_reference"), value: reference)
+                page.drawLine(
+                    DIRIOSLocalizer.string("planner.field.planning_reference"),
+                    value: DIRIOSLocalizer.string("planner.technical.gas_consumption.reference.average")
+                )
+            } else if context.mode == .technical {
+                page.drawLine(
+                    DIRIOSLocalizer.string("planner.field.planning_reference"),
+                    value: DIRIOSLocalizer.string("planner.technical.gas_consumption.reference.max")
+                )
             }
             page.drawLine(
                 DIRIOSLocalizer.string("planner.field.bottom_time"),

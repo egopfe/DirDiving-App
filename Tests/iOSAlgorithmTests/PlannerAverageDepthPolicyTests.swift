@@ -7,8 +7,9 @@ final class PlannerAverageDepthPolicyTests: XCTestCase {
     }
 
     func testPresentationPolicyShowsAverageDepthInTechnicalOnlyForOCProfileCard() {
-        XCTAssertTrue(PlannerResultPresentation.presentation(for: .technical).showsAverageDepthInput)
-        XCTAssertFalse(PlannerResultPresentation.presentation(for: .ccr).showsAverageDepthInput)
+        XCTAssertFalse(PlannerResultPresentation.presentation(for: .technical).showsAverageDepthInput)
+        XCTAssertTrue(PlannerResultPresentation.presentation(for: .technical).showsAverageDepthGasConsumptionToggle)
+        XCTAssertFalse(PlannerResultPresentation.presentation(for: .ccr).showsAverageDepthGasConsumptionToggle)
     }
 
     func testDecoActiveInputUsesMaxDepthForConsumptionReference() {
@@ -25,17 +26,32 @@ final class PlannerAverageDepthPolicyTests: XCTestCase {
         XCTAssertEqual(active.effectivePlanningDepthMeters, 40, accuracy: 0.01)
     }
 
-    func testTechnicalActiveInputPreservesAverageDepth() {
+    func testTechnicalActiveInputUsesAverageDepthOnlyWhenToggleEnabled() {
         var input = GasPlanInput()
         input.plannedDepthMeters = 60
         input.plannedAverageDepthMeters = 35
         input.planningDepthReference = .averageDepth
+        input.usesAverageDepthForGasConsumption = true
         input.ensurePlannerCylindersFromLegacy()
 
         let active = PlannerModePolicy.activePlanInput(from: input, mode: .technical)
 
-        XCTAssertEqual(active.plannedAverageDepthMeters, 35, accuracy: 0.01)
+        XCTAssertEqual(active.gasConsumptionReferenceDepthMeters(for: .technical), 35, accuracy: 0.01)
         XCTAssertEqual(active.effectivePlanningDepthMeters, 35, accuracy: 0.01)
+    }
+
+    func testTechnicalActiveInputUsesMaxDepthWhenToggleDisabled() {
+        var input = GasPlanInput()
+        input.plannedDepthMeters = 60
+        input.plannedAverageDepthMeters = 35
+        input.planningDepthReference = .averageDepth
+        input.usesAverageDepthForGasConsumption = false
+        input.ensurePlannerCylindersFromLegacy()
+
+        let active = PlannerModePolicy.activePlanInput(from: input, mode: .technical)
+
+        XCTAssertEqual(active.gasConsumptionReferenceDepthMeters(for: .technical), 60, accuracy: 0.01)
+        XCTAssertEqual(active.effectivePlanningDepthMeters, 60, accuracy: 0.01)
     }
 
     func testDecoGasConsumptionUsesConservativeMaxDepthDespiteStaleDraftAverage() {
@@ -88,10 +104,11 @@ final class PlannerAverageDepthPolicyTests: XCTestCase {
 
     func testPlannerViewUsesAverageDepthPolicyGuard() throws {
         let source = try String(contentsOfFile: plannerViewSourcePath(), encoding: .utf8)
-        XCTAssertTrue(source.contains("modePresentation.showsAverageDepthInput"))
-        guard let policyRange = source.range(of: "if modePresentation.showsAverageDepthInput"),
+        XCTAssertTrue(source.contains("showsAverageDepthGasConsumptionToggle"))
+        XCTAssertTrue(source.contains("planner.technical.average_depth.gas_toggle"))
+        guard let policyRange = source.range(of: "if modePresentation.showsAverageDepthGasConsumptionToggle"),
               let avgDepthRange = source.range(of: "planner.field.avg_depth") else {
-            return XCTFail("Expected average depth UI guarded by presentation policy")
+            return XCTFail("Expected average depth UI guarded by technical gas toggle")
         }
         XCTAssertLessThan(policyRange.lowerBound, avgDepthRange.lowerBound)
     }
@@ -99,7 +116,7 @@ final class PlannerAverageDepthPolicyTests: XCTestCase {
     func testPlannerViewStillShowsAverageDepthForTechnicalViaPolicy() throws {
         let source = try String(contentsOfFile: plannerViewSourcePath(), encoding: .utf8)
         XCTAssertTrue(source.contains("planner.field.avg_depth"))
-        XCTAssertTrue(source.contains("modePresentation.showsAverageDepthInput"))
+        XCTAssertTrue(source.contains("averageDepthGasConsumptionEnabled"))
     }
 
     private func plannerViewSourcePath() -> String {

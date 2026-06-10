@@ -245,40 +245,43 @@ struct PlannerView: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .padding(.vertical, 8)
                 }
-                if modePresentation.showsAverageDepthInput {
+                if modePresentation.showsAverageDepthGasConsumptionToggle {
                     Divider().overlay(DIRTheme.hairline)
-                    plannerDepthField(
-                        DIRIOSLocalizer.string("planner.field.avg_depth"),
-                        meters: $store.input.plannedAverageDepthMeters,
-                        maxMeters: profileMaxAverageDepthLimitMeters
-                    )
-                    Divider().overlay(DIRTheme.hairline)
-                    HStack(spacing: 8) {
-                        Text(DIRIOSLocalizer.string("planner.field.planning_reference"))
+                    Toggle(isOn: Binding(
+                        get: { store.input.averageDepthGasConsumptionEnabled },
+                        set: { enabled in
+                            store.input.usesAverageDepthForGasConsumption = enabled
+                            if enabled {
+                                store.input.ensureDefaultAverageDepthIfNeeded()
+                            }
+                        }
+                    )) {
+                        Text(DIRIOSLocalizer.string("planner.technical.average_depth.gas_toggle"))
                             .font(.callout)
                             .foregroundStyle(.white)
-                        Button {
-                            showPlanningReferenceInfo = true
-                        } label: {
-                            Image(systemName: "info.circle")
-                                .font(.callout)
-                                .foregroundStyle(DIRTheme.cyan)
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel(DIRIOSLocalizer.string("planner.reference.info.title"))
-                        Spacer()
-                        Picker(DIRIOSLocalizer.string("planner.field.planning_reference"), selection: $store.input.planningDepthReference) {
-                            Text(DIRIOSLocalizer.string("planner.reference.max_depth")).tag(PlanningDepthReference.maximumDepth)
-                            Text(DIRIOSLocalizer.string("planner.reference.avg_depth")).tag(PlanningDepthReference.averageDepth)
-                        }
-                        .labelsHidden()
-                        .tint(DIRTheme.cyan)
                     }
-                    Text(DIRIOSLocalizer.string("planner.reference.helper"))
-                        .font(.caption2)
-                        .foregroundStyle(DIRTheme.muted)
-                        .fixedSize(horizontal: false, vertical: true)
-                    .padding(.vertical, 10)
+                    .tint(DIRTheme.cyan)
+                    .padding(.vertical, 8)
+
+                    if store.input.averageDepthGasConsumptionEnabled {
+                        Divider().overlay(DIRTheme.hairline)
+                        plannerDepthField(
+                            DIRIOSLocalizer.string("planner.field.avg_depth"),
+                            meters: $store.input.plannedAverageDepthMeters,
+                            maxMeters: profileMaxAverageDepthLimitMeters
+                        )
+                        Text(DIRIOSLocalizer.string("planner.technical.average_depth.gas_enabled_note"))
+                            .font(.caption2)
+                            .foregroundStyle(DIRTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.vertical, 8)
+                    } else {
+                        Text(DIRIOSLocalizer.string("planner.technical.average_depth.gas_disabled_note"))
+                            .font(.caption2)
+                            .foregroundStyle(DIRTheme.muted)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.vertical, 8)
+                    }
                 }
                 Divider().overlay(DIRTheme.hairline)
                 plannerField(
@@ -1867,16 +1870,13 @@ struct PlanResultView: View {
         showChecklistExportSheet = false
     }
 
-    private var referenceDepthSummary: String {
+    private var referenceDepthSummary: String? {
+        guard store.mode == .technical else { return nil }
         let active = PlannerModePolicy.activePlanInput(from: store.input, mode: store.mode)
-        let label: String
-        switch active.planningDepthReference {
-        case .maximumDepth:
-            label = DIRIOSLocalizer.string("planner.result.reference_depth.max")
-        case .averageDepth:
-            label = DIRIOSLocalizer.string("planner.result.reference_depth.average")
-        }
-        return DIRIOSLocalizer.formatted("planner.result.reference_depth", label)
+        let label = active.averageDepthGasConsumptionEnabled
+            ? DIRIOSLocalizer.string("planner.technical.gas_consumption.reference.average")
+            : DIRIOSLocalizer.string("planner.technical.gas_consumption.reference.max")
+        return DIRIOSLocalizer.formatted("planner.result.gas_consumption_reference", label)
     }
 
     private var resultHeaderBadge: some View {
@@ -1904,10 +1904,12 @@ struct PlanResultView: View {
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(DIRTheme.yellow)
             }
-            Text(referenceDepthSummary)
-                .font(.caption2)
-                .foregroundStyle(DIRTheme.muted)
-                .fixedSize(horizontal: false, vertical: true)
+            if let referenceDepthSummary {
+                Text(referenceDepthSummary)
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
         .padding(14)
         .background(

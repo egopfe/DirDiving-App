@@ -512,6 +512,8 @@ struct GasPlanInput: Codable, Hashable {
     var plannedDepthMeters: Double = 40
     var plannedAverageDepthMeters: Double = 20
     var planningDepthReference: PlanningDepthReference = .maximumDepth
+    /// Technical mode only: when nil/false, gas consumption uses max planned depth.
+    var usesAverageDepthForGasConsumption: Bool? = nil
     var plannerCylinders: [PlannerCylinderEntry] = []
     /// Deco mode only: when nil/false, active planning uses Back Gas only (draft deco gas may remain stored).
     var isDecoGasEnabled: Bool? = nil
@@ -537,13 +539,22 @@ struct GasPlanInput: Codable, Hashable {
         plannerCylinders.first(where: { $0.role == .bottom })?.cylinder ?? cylinder
     }
 
-    /// Depth used for planning consumption / END / density (not emergency gas).
+    /// Depth used for gas consumption / END / density preview (not decompression or emergency gas).
     var effectivePlanningDepthMeters: Double {
         switch planningDepthReference {
         case .maximumDepth:
             return plannedDepthMeters
         case .averageDepth:
             return min(plannedAverageDepthMeters, plannedDepthMeters)
+        }
+    }
+
+    func gasConsumptionReferenceDepthMeters(for mode: PlannerMode) -> Double {
+        switch mode {
+        case .technical where averageDepthGasConsumptionEnabled:
+            return min(plannedAverageDepthMeters, plannedDepthMeters)
+        case .base, .deco, .technical, .ccr:
+            return plannedDepthMeters
         }
     }
 
@@ -684,5 +695,19 @@ struct GasPlanInput: Codable, Hashable {
 
     var decoGasPlanningEnabled: Bool {
         isDecoGasEnabled ?? false
+    }
+
+    var averageDepthGasConsumptionEnabled: Bool {
+        usesAverageDepthForGasConsumption ?? false
+    }
+
+    mutating func ensureDefaultAverageDepthIfNeeded() {
+        guard plannedAverageDepthMeters.isFinite, plannedAverageDepthMeters > 0 else {
+            plannedAverageDepthMeters = min(20, plannedDepthMeters)
+            return
+        }
+        if plannedAverageDepthMeters > plannedDepthMeters {
+            plannedAverageDepthMeters = plannedDepthMeters
+        }
     }
 }

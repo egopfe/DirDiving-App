@@ -555,6 +555,12 @@
 "planner.deco.decompression_gas.description" = "Add a dedicated gas and cylinder for decompression stops.";
 "planner.deco.decompression_gas.off_note" = "The plan will use Back Gas only.";
 "planner.deco.gas_consumption.conservative_depth_note" = "Gas consumption is estimated conservatively at maximum planned depth.";
+"planner.technical.average_depth.gas_toggle" = "Use average depth for gas consumption";
+"planner.technical.average_depth.gas_enabled_note" = "Average depth is used only to estimate gas consumption. Decompression remains calculated from the planned profile/depth.";
+"planner.technical.average_depth.gas_disabled_note" = "Gas consumption is estimated conservatively at maximum planned depth.";
+"planner.technical.gas_consumption.reference.max" = "maximum depth";
+"planner.technical.gas_consumption.reference.average" = "average depth";
+"planner.result.gas_consumption_reference" = "Gas consumption reference: %@";
 "planner.cylinder.add_deco" = "Add deco gas";
 "planner.profile.title" = "Dive profile";
 "planner.field.max_depth" = "Max depth";

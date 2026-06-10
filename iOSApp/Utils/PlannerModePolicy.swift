@@ -87,6 +87,8 @@ struct PlannerResultPresentation: Equatable {
     let showsCNSDescentBottomSettings: Bool
     /// Average depth + planning reference controls in the OC profile card.
     let showsAverageDepthInput: Bool
+    /// Technical-only toggle for average depth gas consumption refinement.
+    let showsAverageDepthGasConsumptionToggle: Bool
 
     static func presentation(for mode: PlannerMode) -> PlannerResultPresentation {
         switch mode {
@@ -110,7 +112,8 @@ struct PlannerResultPresentation: Equatable {
                 showsManualGFControls: false,
                 showsGFPresets: false,
                 showsCNSDescentBottomSettings: false,
-                showsAverageDepthInput: false
+                showsAverageDepthInput: false,
+                showsAverageDepthGasConsumptionToggle: false
             )
         case .deco:
             return PlannerResultPresentation(
@@ -132,7 +135,8 @@ struct PlannerResultPresentation: Equatable {
                 showsManualGFControls: false,
                 showsGFPresets: true,
                 showsCNSDescentBottomSettings: false,
-                showsAverageDepthInput: false
+                showsAverageDepthInput: false,
+                showsAverageDepthGasConsumptionToggle: false
             )
         case .technical:
             return PlannerResultPresentation(
@@ -154,7 +158,8 @@ struct PlannerResultPresentation: Equatable {
                 showsManualGFControls: true,
                 showsGFPresets: false,
                 showsCNSDescentBottomSettings: true,
-                showsAverageDepthInput: true
+                showsAverageDepthInput: false,
+                showsAverageDepthGasConsumptionToggle: true
             )
         case .ccr:
             return PlannerResultPresentation(
@@ -176,7 +181,8 @@ struct PlannerResultPresentation: Equatable {
                 showsManualGFControls: true,
                 showsGFPresets: false,
                 showsCNSDescentBottomSettings: true,
-                showsAverageDepthInput: false
+                showsAverageDepthInput: false,
+                showsAverageDepthGasConsumptionToggle: false
             )
         }
     }
@@ -205,7 +211,9 @@ enum PlannerModePolicy {
             projected = projectBaseInput(projected)
         case .deco:
             projected = projectDecoInput(projected)
-        case .technical, .ccr:
+        case .technical:
+            projected = projectTechnicalInput(projected)
+        case .ccr:
             break
         }
 
@@ -368,6 +376,19 @@ enum PlannerModePolicy {
         projected.plannedAverageDepthMeters = projected.plannedDepthMeters
         projected.planningDepthReference = .maximumDepth
         projected.syncLegacyGasesFromPlannerCylinders()
+        return projected
+    }
+
+    private static func projectTechnicalInput(_ input: GasPlanInput) -> GasPlanInput {
+        var projected = input
+        if projected.averageDepthGasConsumptionEnabled {
+            projected.planningDepthReference = .averageDepth
+            if projected.plannedAverageDepthMeters > projected.plannedDepthMeters {
+                projected.plannedAverageDepthMeters = projected.plannedDepthMeters
+            }
+        } else {
+            projected.planningDepthReference = .maximumDepth
+        }
         return projected
     }
 
