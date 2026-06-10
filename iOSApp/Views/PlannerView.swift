@@ -1042,7 +1042,7 @@ struct PlannerView: View {
                 showCalculateError = true
                 return
             }
-            if PlannerGasSchedule.hasMODBlockingIssues(input: store.input) {
+            if !liveMODIssues.isEmpty {
                 calculateErrorMessage = modBlockCalculateMessage
                 showCalculateError = true
                 return

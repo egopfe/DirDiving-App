@@ -70,6 +70,22 @@ final class PlannerBaseMODUXTests: XCTestCase {
         XCTAssertTrue(source.contains("planner.mod.exceeds_allowed"))
     }
 
+    func testPlannerViewLiveMODIssuesUsesActiveProjectedInput() throws {
+        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/PlannerView.swift"))
+        XCTAssertTrue(source.contains("PlannerModePolicy.activePlanInput(from: store.input, mode: store.mode)"))
+        XCTAssertTrue(source.contains("PlannerMODValidator.liveInputIssues(input: active, environment: active.plannerEnvironment)"))
+        XCTAssertFalse(source.contains("PlannerMODValidator.liveInputIssues(input: store.input"))
+        XCTAssertFalse(source.contains("if PlannerGasSchedule.hasMODBlockingIssues(input: store.input)"))
+    }
+
+    func testPlannerModePolicyDefinesBaseBottomGasMaxPPO2() throws {
+        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Utils/PlannerModePolicy.swift"))
+        XCTAssertTrue(source.contains("static let baseBottomGasMaxPPO2: Double = 1.4"))
+        XCTAssertTrue(source.contains("projected.plannerCylinders = [bottomEntry]"))
+        XCTAssertTrue(source.contains("bottomEntry.gas.maxPPO2 = baseBottomGasMaxPPO2"))
+        XCTAssertTrue(source.contains("bottomEntry.gas.helium = 0"))
+    }
+
     private func repositoryRoot() -> URL {
         URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()

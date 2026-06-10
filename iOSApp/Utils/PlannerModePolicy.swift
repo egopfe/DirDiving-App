@@ -261,30 +261,32 @@ enum PlannerModePolicy {
 
     private static func projectBaseInput(_ input: GasPlanInput) -> GasPlanInput {
         var projected = input
+        projected.ensurePlannerCylindersFromLegacy()
+
         var bottomEntry = projected.plannerCylinders.first(where: { $0.role == .bottom })
             ?? PlannerCylinderEntry(role: .bottom, gas: projected.bottomGas)
 
         bottomEntry.role = .bottom
         bottomEntry.gas.role = .bottom
 
-        if !allowedMixKinds(for: .base).contains(bottomEntry.gas.mixKind) {
+        switch bottomEntry.gas.mixKind {
+        case .air:
             bottomEntry.gas.applyMixKind(.air)
-        }
-
-        if bottomEntry.gas.mixKind == .air {
-            bottomEntry.gas.applyMixKind(.air)
-        } else if bottomEntry.gas.mixKind == .ean {
+        case .ean:
             bottomEntry.gas.helium = 0
             bottomEntry.gas.normalizeMixAndPPO2()
+        case .trimix, .oxygen:
+            bottomEntry.gas.applyMixKind(.air)
         }
 
+        bottomEntry.gas.helium = 0
         bottomEntry.gas.maxPPO2 = baseBottomGasMaxPPO2
         bottomEntry.gas.normalizeMixAndPPO2()
 
         projected.plannerCylinders = [bottomEntry]
+        projected.bottomGas = bottomEntry.gas
         projected.gfLow = PlannerGFPreset.standard.gfLow
         projected.gfHigh = PlannerGFPreset.standard.gfHigh
-        projected.syncLegacyGasesFromPlannerCylinders()
         return projected
     }
 
