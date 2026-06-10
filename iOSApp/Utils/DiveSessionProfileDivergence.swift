@@ -41,7 +41,7 @@ enum DiveSessionProfileDivergence {
         let samples = DiveProfileMath.sanitizedSamples(session.samples)
         guard !samples.isEmpty else { return "—" }
         return String(
-            format: String(localized: "cloud.merge.profile_summary.format"),
+            format: DIRIOSLocalizer.string("cloud.merge.profile_summary.format"),
             samples.count,
             session.maxDepthMeters
         )

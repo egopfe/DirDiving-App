@@ -11,10 +11,10 @@ enum DiveImportService {
             let imported = alreadyImported ? 0 : 1
             let duplicates = alreadyImported ? 1 : 0
             let dateStatus = sourceDatePreserved
-                ? String(localized: "import.summary.date_preserved")
-                : String(localized: "import.summary.date_fallback")
+                ? DIRIOSLocalizer.string("import.summary.date_preserved")
+                : DIRIOSLocalizer.string("import.summary.date_fallback")
             return String(
-                format: String(localized: "import.summary.format"),
+                format: DIRIOSLocalizer.string("import.summary.format"),
                 imported,
                 duplicates,
                 skippedMalformedCount,
@@ -32,16 +32,16 @@ enum DiveImportService {
 
         var errorDescription: String? {
             switch self {
-            case .unreadableFile: return String(localized: "import.error.unreadable")
-            case .missingColumns: return String(localized: "import.error.missing_columns")
-            case .emptyProfile: return String(localized: "import.error.empty_profile")
+            case .unreadableFile: return DIRIOSLocalizer.string("import.error.unreadable")
+            case .missingColumns: return DIRIOSLocalizer.string("import.error.missing_columns")
+            case .emptyProfile: return DIRIOSLocalizer.string("import.error.empty_profile")
             case .invalidRows(let count):
                 return String(
-                    format: String(localized: "import.error.invalid_rows"),
+                    format: DIRIOSLocalizer.string("import.error.invalid_rows"),
                     count,
                     Int(IOSAlgorithmConfiguration.maxImportExportDepthMeters)
                 )
-            case .fileTooLarge: return String(format: String(localized: "import.error.file_too_large"), Int(maxImportBytes / 1_048_576))
+            case .fileTooLarge: return DIRIOSLocalizer.formatted("import.error.file_too_large", Int(maxImportBytes / 1_048_576))
             }
         }
     }

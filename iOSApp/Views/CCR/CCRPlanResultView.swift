@@ -24,9 +24,9 @@ struct CCRPlanResultView: View {
         DIRScreenContainer {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text(String(localized: "planner.result.ccr.title"))
+                    Text(DIRIOSLocalizer.string("planner.result.ccr.title"))
                         .dirScreenTitleStyle()
-                    DIRWarningBox(text: String(localized: "ccr.reference_estimate_only"))
+                    DIRWarningBox(text: DIRIOSLocalizer.string("ccr.reference_estimate_only"))
 
                     summaryCard
                     tissueAnalyticsEntry
@@ -51,7 +51,7 @@ struct CCRPlanResultView: View {
                 Button {
                     store.returnToPlannerModeSelection()
                 } label: {
-                    Label(String(localized: "planner.mode_selection.back"), systemImage: "chevron.left")
+                    Label(DIRIOSLocalizer.string("planner.mode_selection.back"), systemImage: "chevron.left")
                         .foregroundStyle(DIRTheme.cyan)
                 }
             }
@@ -63,7 +63,7 @@ struct CCRPlanResultView: View {
                         Image(systemName: "square.and.arrow.up")
                             .foregroundStyle(DIRTheme.cyan)
                     }
-                    .accessibilityLabel(Text(String(localized: "pdf.export.share.ccr_plan")))
+                    .accessibilityLabel(Text(DIRIOSLocalizer.string("pdf.export.share.ccr_plan")))
                 }
             }
         }
@@ -72,17 +72,17 @@ struct CCRPlanResultView: View {
             presentCCRChecklistExportPromptIfNeeded()
         }
         .confirmationDialog(
-            String(localized: "checklist_planner.sync.export_prompt"),
+            DIRIOSLocalizer.string("checklist_planner.sync.export_prompt"),
             isPresented: $showChecklistExportPrompt,
             titleVisibility: .visible
         ) {
-            Button(String(localized: "checklist_planner.sync.add_all")) {
+            Button(DIRIOSLocalizer.string("checklist_planner.sync.add_all")) {
                 addAllCCRChecklistItems()
             }
-            Button(String(localized: "checklist_planner.sync.choose_add")) {
+            Button(DIRIOSLocalizer.string("checklist_planner.sync.choose_add")) {
                 openCCRChecklistExportSheet()
             }
-            Button(String(localized: "checklist_planner.sync.do_not_add"), role: .cancel) {}
+            Button(DIRIOSLocalizer.string("checklist_planner.sync.do_not_add"), role: .cancel) {}
         }
         .sheet(isPresented: $showChecklistExportSheet) {
             CCRChecklistExportSheet(
@@ -94,11 +94,11 @@ struct CCRPlanResultView: View {
         .sheet(item: $shareablePDF) { item in
             ShareSheetView(activityItems: [item.url])
         }
-        .alert(String(localized: "pdf.export.error.title"), isPresented: Binding(
+        .alert(DIRIOSLocalizer.string("pdf.export.error.title"), isPresented: Binding(
             get: { pdfExportAlertMessage != nil },
             set: { if !$0 { pdfExportAlertMessage = nil } }
         )) {
-            Button(String(localized: "pdf.export.cancel"), role: .cancel) {}
+            Button(DIRIOSLocalizer.string("pdf.export.cancel"), role: .cancel) {}
         } message: {
             Text(pdfExportAlertMessage ?? "")
         }
@@ -185,13 +185,13 @@ struct CCRPlanResultView: View {
     }
 
     private var summaryCard: some View {
-        DIRCard(String(localized: "ccr.plan.summary"), icon: "list.bullet.rectangle", accent: DIRTheme.cyan) {
+        DIRCard(DIRIOSLocalizer.string("ccr.plan.summary"), icon: "list.bullet.rectangle", accent: DIRTheme.cyan) {
             VStack(alignment: .leading, spacing: 6) {
-                metric(String(localized: "planner.tts"), "\(plan.ttsMinutes) min")
-                metric(String(localized: "planner.runtime"), "\(plan.totalRuntimeMinutes) min")
-                metric(String(localized: "ccr.diluent"), store.ccrInput.diluent.label)
+                metric(DIRIOSLocalizer.string("planner.tts"), "\(plan.ttsMinutes) min")
+                metric(DIRIOSLocalizer.string("planner.runtime"), "\(plan.totalRuntimeMinutes) min")
+                metric(DIRIOSLocalizer.string("ccr.diluent"), store.ccrInput.diluent.label)
                 metric(
-                    String(localized: "ccr.setpoint.strategy"),
+                    DIRIOSLocalizer.string("ccr.setpoint.strategy"),
                     "\(store.ccrInput.setpointProfile.lowSetpoint) / \(store.ccrInput.setpointProfile.highSetpoint) @ \(Int(store.ccrInput.setpointProfile.switchDepthMeters)) m"
                 )
             }
@@ -199,21 +199,21 @@ struct CCRPlanResultView: View {
     }
 
     private var cnsCard: some View {
-        DIRCard(String(localized: "ccr.cns.header"), icon: "heart.text.square", accent: DIRTheme.orange) {
+        DIRCard(DIRIOSLocalizer.string("ccr.cns.header"), icon: "heart.text.square", accent: DIRTheme.orange) {
             VStack(alignment: .leading, spacing: 6) {
-                metric(String(localized: "planner.metric.cns_full_plan"), "\(Formatters.one(plan.cnsFullPlanPercent))%")
-                metric(String(localized: "planner.metric.cns_descent_bottom"), "\(Formatters.one(plan.cnsDescentBottomPercent))%")
-                metric(String(localized: "planner.metric.otu"), Formatters.one(plan.otuFullPlan))
+                metric(DIRIOSLocalizer.string("planner.metric.cns_full_plan"), "\(Formatters.one(plan.cnsFullPlanPercent))%")
+                metric(DIRIOSLocalizer.string("planner.metric.cns_descent_bottom"), "\(Formatters.one(plan.cnsDescentBottomPercent))%")
+                metric(DIRIOSLocalizer.string("planner.metric.otu"), Formatters.one(plan.otuFullPlan))
             }
         }
     }
 
     private var depthChartCard: some View {
-        DIRCard(String(localized: "planner.chart.depth_profile"), icon: "chart.xyaxis.line", accent: DIRTheme.cyan) {
+        DIRCard(DIRIOSLocalizer.string("planner.chart.depth_profile"), icon: "chart.xyaxis.line", accent: DIRTheme.cyan) {
             Chart(plan.depthProfilePoints) { point in
                 LineMark(
-                    x: .value(String(localized: "chart.axis.time"), point.elapsedMinutes),
-                    y: .value(String(localized: "chart.axis.depth"), point.depthMeters)
+                    x: .value(DIRIOSLocalizer.string("chart.axis.time"), point.elapsedMinutes),
+                    y: .value(DIRIOSLocalizer.string("chart.axis.depth"), point.depthMeters)
                 )
                 .foregroundStyle(DIRTheme.cyan)
             }
@@ -223,7 +223,7 @@ struct CCRPlanResultView: View {
     }
 
     private var ppo2ChartCard: some View {
-        DIRCard(String(localized: "ccr.ppo2.timeline"), icon: "waveform.path.ecg", accent: DIRTheme.orange) {
+        DIRCard(DIRIOSLocalizer.string("ccr.ppo2.timeline"), icon: "waveform.path.ecg", accent: DIRTheme.orange) {
             Chart(plan.ppO2Timeline, id: \.runtimeMinutes) { sample in
                 LineMark(
                     x: .value("Time", sample.runtimeMinutes),
@@ -239,12 +239,12 @@ struct CCRPlanResultView: View {
                     setpointHigh: store.ccrInput.setpointProfile.highSetpoint
                 )
             )
-            .accessibilityHint(String(localized: "ccr.a11y.chart.hint"))
+            .accessibilityHint(DIRIOSLocalizer.string("ccr.a11y.chart.hint"))
         }
     }
 
     private var ppn2ChartCard: some View {
-        DIRCard(String(localized: "ccr.ppn2.timeline"), icon: "lungs", accent: DIRTheme.green) {
+        DIRCard(DIRIOSLocalizer.string("ccr.ppn2.timeline"), icon: "lungs", accent: DIRTheme.green) {
             Chart(plan.ppN2Timeline, id: \.runtimeMinutes) { sample in
                 LineMark(
                     x: .value("Time", sample.runtimeMinutes),
@@ -255,12 +255,12 @@ struct CCRPlanResultView: View {
             .frame(height: 160)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(UIUXAccessibilitySummaries.ccrPPN2Timeline(samples: plan.ppN2Timeline))
-            .accessibilityHint(String(localized: "ccr.a11y.chart.hint"))
+            .accessibilityHint(DIRIOSLocalizer.string("ccr.a11y.chart.hint"))
         }
     }
 
     private var endChartCard: some View {
-        DIRCard(String(localized: "ccr.end.timeline"), icon: "brain.head.profile", accent: DIRTheme.yellow) {
+        DIRCard(DIRIOSLocalizer.string("ccr.end.timeline"), icon: "brain.head.profile", accent: DIRTheme.yellow) {
             Chart(plan.endTimeline, id: \.runtimeMinutes) { sample in
                 LineMark(
                     x: .value("Time", sample.runtimeMinutes),
@@ -276,8 +276,8 @@ struct CCRPlanResultView: View {
                     unitPreference: unitPreference
                 )
             )
-            .accessibilityHint(String(localized: "ccr.a11y.chart.hint"))
-            Text(String(localized: "ccr.narcosis.estimator_footnote"))
+            .accessibilityHint(DIRIOSLocalizer.string("ccr.a11y.chart.hint"))
+            Text(DIRIOSLocalizer.string("ccr.narcosis.estimator_footnote"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
         }
@@ -290,7 +290,7 @@ struct CCRPlanResultView: View {
             return (sample.runtimeMinutes, density)
         }
         if !densitySamples.isEmpty {
-            DIRCard(String(localized: "ccr.gas_density.timeline"), icon: "scalemass", accent: DIRTheme.muted) {
+            DIRCard(DIRIOSLocalizer.string("ccr.gas_density.timeline"), icon: "scalemass", accent: DIRTheme.muted) {
                 Chart(densitySamples, id: \.0) { sample in
                     LineMark(
                         x: .value("Time", sample.0),
@@ -305,8 +305,8 @@ struct CCRPlanResultView: View {
                         samples: densitySamples.map { (runtimeMinutes: $0.0, density: $0.1) }
                     )
                 )
-                .accessibilityHint(String(localized: "ccr.a11y.chart.hint"))
-                Text(String(localized: "ccr.gas_density.approximation"))
+                .accessibilityHint(DIRIOSLocalizer.string("ccr.a11y.chart.hint"))
+                Text(DIRIOSLocalizer.string("ccr.gas_density.approximation"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)
             }
@@ -316,7 +316,7 @@ struct CCRPlanResultView: View {
     @ViewBuilder
     private var cnsTimelineCard: some View {
         if plan.cnsTimeline.count > 1 {
-            DIRCard(String(localized: "ccr.cns.timeline"), icon: "chart.line.uptrend.xyaxis", accent: DIRTheme.orange) {
+            DIRCard(DIRIOSLocalizer.string("ccr.cns.timeline"), icon: "chart.line.uptrend.xyaxis", accent: DIRTheme.orange) {
                 Chart(plan.cnsTimeline, id: \.runtimeMinutes) { sample in
                     LineMark(
                         x: .value("Time", sample.runtimeMinutes),
@@ -330,7 +330,7 @@ struct CCRPlanResultView: View {
     }
 
     private var scheduleCard: some View {
-        DIRCard(String(localized: "ccr.schedule.header"), icon: "tablecells", accent: DIRTheme.cyan) {
+        DIRCard(DIRIOSLocalizer.string("ccr.schedule.header"), icon: "tablecells", accent: DIRTheme.cyan) {
             ForEach(plan.schedule.prefix(20)) { row in
                 HStack {
                     Text("\(Int(row.runtimeMinutes))'")
@@ -348,7 +348,7 @@ struct CCRPlanResultView: View {
     }
 
     private var bailoutCard: some View {
-        DIRCard(String(localized: "ccr.bailout.analysis"), icon: "exclamationmark.shield", accent: DIRTheme.yellow) {
+        DIRCard(DIRIOSLocalizer.string("ccr.bailout.analysis"), icon: "exclamationmark.shield", accent: DIRTheme.yellow) {
             ForEach(plan.bailoutScenarios) { scenario in
                 VStack(alignment: .leading, spacing: 4) {
                     Text(scenario.kind.localizedTitle)
@@ -368,7 +368,7 @@ struct CCRPlanResultView: View {
     private var warningsCard: some View {
         Group {
             if !plan.warnings.isEmpty {
-                DIRCard(String(localized: "planner.warnings.header"), icon: "info.circle", accent: DIRTheme.yellow) {
+                DIRCard(DIRIOSLocalizer.string("planner.warnings.header"), icon: "info.circle", accent: DIRTheme.yellow) {
                     ForEach(plan.warnings) { warning in
                         Text(warning.message)
                             .font(.caption)
@@ -389,9 +389,9 @@ struct CCRPlanResultView: View {
 
     private func statusLabel(_ status: CCRBailoutScenarioStatus) -> String {
         switch status {
-        case .pass: return String(localized: "ccr.bailout.status.pass")
-        case .warning: return String(localized: "ccr.bailout.status.warning")
-        case .fail: return String(localized: "ccr.bailout.status.fail")
+        case .pass: return DIRIOSLocalizer.string("ccr.bailout.status.pass")
+        case .warning: return DIRIOSLocalizer.string("ccr.bailout.status.warning")
+        case .fail: return DIRIOSLocalizer.string("ccr.bailout.status.fail")
         }
     }
 

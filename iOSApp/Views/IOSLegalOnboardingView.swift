@@ -44,13 +44,13 @@ struct IOSLegalOnboardingView: View {
                     }
                 }
                 .transition(.opacity.combined(with: .move(edge: .trailing)))
-                .accessibilityLabel(String(format: String(localized: "ios.legal.step.format"), step + 1, 4))
+                .accessibilityLabel(DIRIOSLocalizer.formatted("ios.legal.step.format", step + 1, 4))
             }
         }
-        .alert(String(localized: "ios.legal.exit_alert.title"), isPresented: $showExitGuidance) {
-            Button(String(localized: "ios.legal.exit_alert.confirm"), role: .cancel) {}
+        .alert(DIRIOSLocalizer.string("ios.legal.exit_alert.title"), isPresented: $showExitGuidance) {
+            Button(DIRIOSLocalizer.string("ios.legal.exit_alert.confirm"), role: .cancel) {}
         } message: {
-            Text(String(localized: "ios.legal.exit_guidance.body"))
+            Text(DIRIOSLocalizer.string("ios.legal.exit_guidance.body"))
         }
     }
 
@@ -65,10 +65,10 @@ struct IOSLegalOnboardingView: View {
                     .foregroundStyle(.white)
                 Spacer()
             }
-            Text(String(localized: "ios.legal.hero.subtitle"))
+            Text(DIRIOSLocalizer.string("ios.legal.hero.subtitle"))
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(DIRTheme.muted)
-            Text(String(localized: "ios.legal.hero.onboarding_caption"))
+            Text(DIRIOSLocalizer.string("ios.legal.hero.onboarding_caption"))
                 .font(.caption.weight(.bold))
                 .foregroundStyle(DIRTheme.cyan)
                 .textCase(.uppercase)
@@ -77,19 +77,19 @@ struct IOSLegalOnboardingView: View {
 
     private var welcomeScreen: some View {
         VStack(spacing: 16) {
-            DIRCard(String(localized: "ios.legal.welcome.card"), icon: "checkmark.shield.fill", accent: DIRTheme.cyan) {
+            DIRCard(DIRIOSLocalizer.string("ios.legal.welcome.card"), icon: "checkmark.shield.fill", accent: DIRTheme.cyan) {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text(String(localized: "ios.legal.welcome.title"))
+                    Text(DIRIOSLocalizer.string("ios.legal.welcome.title"))
                         .font(.system(size: 26, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
-                    Text(String(localized: "ios.legal.welcome.body"))
+                    Text(DIRIOSLocalizer.string("ios.legal.welcome.body"))
                         .font(DIRTypography.body)
                         .foregroundStyle(DIRTheme.muted)
                         .lineSpacing(DIRTypography.bodyLineSpacing)
                     safetyBadge
                 }
             }
-            primaryButton(String(localized: "ios.legal.welcome.continue"), systemImage: "chevron.right", color: DIRTheme.cyan) {
+            primaryButton(DIRIOSLocalizer.string("ios.legal.welcome.continue"), systemImage: "chevron.right", color: DIRTheme.cyan) {
                 advance(to: 1)
             }
         }
@@ -97,22 +97,22 @@ struct IOSLegalOnboardingView: View {
 
     private var safetyScreen: some View {
         VStack(spacing: 16) {
-            DIRCard(String(localized: "ios.legal.safety.card"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
+            DIRCard(DIRIOSLocalizer.string("ios.legal.safety.card"), icon: "exclamationmark.triangle.fill", accent: DIRTheme.red) {
                 VStack(alignment: .leading, spacing: 12) {
-                    Text(String(localized: "ios.legal.safety.not_dive_computer"))
+                    Text(DIRIOSLocalizer.string("ios.legal.safety.not_dive_computer"))
                         .font(.system(size: 25, weight: .black, design: .rounded))
                         .foregroundStyle(DIRTheme.red)
-                    warningRow(String(localized: "ios.legal.safety.warning.deco"))
-                    warningRow(String(localized: "ios.legal.safety.warning.life_support"))
-                    warningRow(String(localized: "ios.legal.safety.warning.redundant"))
-                    warningRow(String(localized: "ios.legal.safety.warning.risk"))
+                    warningRow(DIRIOSLocalizer.string("ios.legal.safety.warning.deco"))
+                    warningRow(DIRIOSLocalizer.string("ios.legal.safety.warning.life_support"))
+                    warningRow(DIRIOSLocalizer.string("ios.legal.safety.warning.redundant"))
+                    warningRow(DIRIOSLocalizer.string("ios.legal.safety.warning.risk"))
                 }
             }
             HStack(spacing: 12) {
-                primaryButton(String(localized: "ios.legal.safety.exit"), systemImage: "xmark", color: DIRTheme.red) {
+                primaryButton(DIRIOSLocalizer.string("ios.legal.safety.exit"), systemImage: "xmark", color: DIRTheme.red) {
                     showExitGuidance = true
                 }
-                primaryButton(String(localized: "ios.legal.safety.understand"), systemImage: "checkmark", color: DIRTheme.green) {
+                primaryButton(DIRIOSLocalizer.string("ios.legal.safety.understand"), systemImage: "checkmark", color: DIRTheme.green) {
                     advance(to: 2)
                 }
             }
@@ -121,7 +121,7 @@ struct IOSLegalOnboardingView: View {
 
     private var disclaimerScreen: some View {
         VStack(spacing: 16) {
-            DIRCard(String(localized: "ios.legal.disclaimer.card"), icon: "doc.text.magnifyingglass", accent: DIRTheme.yellow) {
+            DIRCard(DIRIOSLocalizer.string("ios.legal.disclaimer.card"), icon: "doc.text.magnifyingglass", accent: DIRTheme.yellow) {
                 VStack(alignment: .leading, spacing: 14) {
                     LegalDisclaimerScrollGate(
                         reachedBottom: $disclaimerReachedBottom,
@@ -132,14 +132,14 @@ struct IOSLegalOnboardingView: View {
                     }
 
                     if !disclaimerReachedBottom {
-                        Text(String(localized: "legal.scroll.prompt"))
+                        Text(DIRIOSLocalizer.string("legal.scroll.prompt"))
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(DIRTheme.muted)
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
                     if disclaimerReachedBottom {
-                        primaryButton(String(localized: "ios.legal.disclaimer.continue"), systemImage: "chevron.right", color: DIRTheme.yellow) {
+                        primaryButton(DIRIOSLocalizer.string("ios.legal.disclaimer.continue"), systemImage: "chevron.right", color: DIRTheme.yellow) {
                             advance(to: 3)
                         }
                     }
@@ -150,14 +150,14 @@ struct IOSLegalOnboardingView: View {
 
     private var acceptanceScreen: some View {
         VStack(spacing: 16) {
-            DIRCard(String(localized: "ios.legal.acceptance.card"), icon: "signature", accent: DIRTheme.green) {
+            DIRCard(DIRIOSLocalizer.string("ios.legal.acceptance.card"), icon: "signature", accent: DIRTheme.green) {
                 VStack(alignment: .leading, spacing: 10) {
-                    acceptanceToggle(String(localized: "ios.legal.acceptance.certified"), isOn: $certifiedDiver)
-                    acceptanceToggle(String(localized: "ios.legal.acceptance.not_dive_computer"), isOn: $understandsNotDiveComputer)
-                    acceptanceToggle(String(localized: "ios.legal.acceptance.not_life_support"), isOn: $notPrimaryLifeSupport)
-                    acceptanceToggle(String(localized: "ios.legal.acceptance.terms"), isOn: $acceptedTerms)
+                    acceptanceToggle(DIRIOSLocalizer.string("ios.legal.acceptance.certified"), isOn: $certifiedDiver)
+                    acceptanceToggle(DIRIOSLocalizer.string("ios.legal.acceptance.not_dive_computer"), isOn: $understandsNotDiveComputer)
+                    acceptanceToggle(DIRIOSLocalizer.string("ios.legal.acceptance.not_life_support"), isOn: $notPrimaryLifeSupport)
+                    acceptanceToggle(DIRIOSLocalizer.string("ios.legal.acceptance.terms"), isOn: $acceptedTerms)
                     acceptanceToggle(
-                        String(localized: "ios.legal.acceptance.depth_limits"),
+                        DIRIOSLocalizer.string("ios.legal.acceptance.depth_limits"),
                         isOn: $acknowledgedDepthOperatingLimits
                     )
                 }
@@ -170,7 +170,7 @@ struct IOSLegalOnboardingView: View {
                     acknowledgedDepthOperatingLimits: acknowledgedDepthOperatingLimits
                 )
             } label: {
-                Label(String(localized: "ios.legal.acceptance.continue"), systemImage: "checkmark.seal.fill")
+                Label(DIRIOSLocalizer.string("ios.legal.acceptance.continue"), systemImage: "checkmark.seal.fill")
                     .font(.headline.weight(.bold))
                     .foregroundStyle(canAccept ? .black : DIRTheme.muted)
                     .frame(maxWidth: .infinity)
@@ -187,7 +187,7 @@ struct IOSLegalOnboardingView: View {
     }
 
     private var safetyBadge: some View {
-        Label(String(localized: "ios.legal.badge.not_dive_computer"), systemImage: "exclamationmark.triangle.fill")
+        Label(DIRIOSLocalizer.string("ios.legal.badge.not_dive_computer"), systemImage: "exclamationmark.triangle.fill")
             .font(.caption.weight(.black))
             .foregroundStyle(DIRTheme.red)
             .padding(.horizontal, 10)
@@ -231,10 +231,10 @@ struct IOSLegalOnboardingView: View {
         .accessibilityAddTraits(isOn.wrappedValue ? [.isSelected] : [])
         .accessibilityValue(
             isOn.wrappedValue
-                ? String(localized: "legal.acceptance.a11y.checked")
-                : String(localized: "legal.acceptance.a11y.unchecked")
+                ? DIRIOSLocalizer.string("legal.acceptance.a11y.checked")
+                : DIRIOSLocalizer.string("legal.acceptance.a11y.unchecked")
         )
-        .accessibilityHint(String(localized: "legal.acceptance.a11y.toggle_hint"))
+        .accessibilityHint(DIRIOSLocalizer.string("legal.acceptance.a11y.toggle_hint"))
     }
 
     private func primaryButton(_ title: String, systemImage: String, color: Color, action: @escaping () -> Void) -> some View {
@@ -273,31 +273,31 @@ struct IOSLegalSafetyView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading, spacing: 6) {
-                        Text(String(localized: "ios.legal.settings.title"))
+                        Text(DIRIOSLocalizer.string("ios.legal.settings.title"))
                             .dirScreenTitleStyle()
-                        Text(String(localized: "ios.legal.safety_view.not_dive_computer"))
+                        Text(DIRIOSLocalizer.string("ios.legal.safety_view.not_dive_computer"))
                             .font(.headline.weight(.bold))
                             .foregroundStyle(DIRTheme.red)
                     }
 
-                    DIRCard(String(localized: "ios.legal.settings.acceptance_log"), icon: "checkmark.seal.fill", accent: DIRTheme.green) {
-                        row(String(localized: "ios.legal.settings.version_accepted"), legalAcceptance.acceptedVersionText)
-                        row(String(localized: "ios.legal.settings.acceptance_timestamp"), legalAcceptance.acceptedTimestampText)
-                        row(String(localized: "ios.legal.settings.language"), legalAcceptance.acceptedLanguageText)
+                    DIRCard(DIRIOSLocalizer.string("ios.legal.settings.acceptance_log"), icon: "checkmark.seal.fill", accent: DIRTheme.green) {
+                        row(DIRIOSLocalizer.string("ios.legal.settings.version_accepted"), legalAcceptance.acceptedVersionText)
+                        row(DIRIOSLocalizer.string("ios.legal.settings.acceptance_timestamp"), legalAcceptance.acceptedTimestampText)
+                        row(DIRIOSLocalizer.string("ios.legal.settings.language"), legalAcceptance.acceptedLanguageText)
                     }
 
-                    DIRCard(String(localized: "ios.legal.settings.full_disclaimer"), icon: "doc.text.magnifyingglass", accent: DIRTheme.yellow) {
+                    DIRCard(DIRIOSLocalizer.string("ios.legal.settings.full_disclaimer"), icon: "doc.text.magnifyingglass", accent: DIRTheme.yellow) {
                         Text(legalAcceptance.disclaimerText(languageCode: languageCode))
                             .dirLegalBodyStyle()
                     }
 
-                    DIRCard(String(localized: "ios.legal.settings.terms_privacy"), icon: "link", accent: DIRTheme.cyan) {
+                    DIRCard(DIRIOSLocalizer.string("ios.legal.settings.terms_privacy"), icon: "link", accent: DIRTheme.cyan) {
                         Link(destination: IOSLegalLinks.termsURL) {
-                            Label(String(localized: "ios.legal.settings.terms"), systemImage: "doc.plaintext")
+                            Label(DIRIOSLocalizer.string("ios.legal.settings.terms"), systemImage: "doc.plaintext")
                                 .foregroundStyle(DIRTheme.cyan)
                         }
                         Link(destination: IOSLegalLinks.privacyURL) {
-                            Label(String(localized: "ios.legal.settings.privacy"), systemImage: "hand.raised")
+                            Label(DIRIOSLocalizer.string("ios.legal.settings.privacy"), systemImage: "hand.raised")
                                 .foregroundStyle(DIRTheme.cyan)
                         }
                     }
@@ -306,7 +306,7 @@ struct IOSLegalSafetyView: View {
             }
             .dirCompanionScrollSurface()
         }
-        .navigationTitle(Text(String(localized: "ios.legal.settings.title")))
+        .navigationTitle(Text(DIRIOSLocalizer.string("ios.legal.settings.title")))
         .navigationBarTitleDisplayMode(.inline)
     }
 

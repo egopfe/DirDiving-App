@@ -11,8 +11,8 @@ struct TissueDiveProfileChart: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Spacer()
-                legendItem(color: TissueAnalyticsTheme.accentBlue, label: String(localized: "tissue_analytics.legend.depth"))
-                legendItem(color: TissueAnalyticsTheme.green, label: String(localized: "tissue_analytics.legend.active_gas"))
+                legendItem(color: TissueAnalyticsTheme.accentBlue, label: DIRIOSLocalizer.string("tissue_analytics.legend.depth"))
+                legendItem(color: TissueAnalyticsTheme.green, label: DIRIOSLocalizer.string("tissue_analytics.legend.active_gas"))
             }
             .font(.system(size: 11))
             .foregroundStyle(TissueAnalyticsTheme.labelSecondary)
@@ -99,7 +99,7 @@ struct TissueDiveProfileChart: View {
 
     private var gasSpans: [(label: String, fraction: CGFloat, color: Color, textColor: Color)] {
         guard !segments.isEmpty else {
-            return [(String(localized: "tissue_analytics.gas.bottom"), 1, Color.gray.opacity(0.45), .white)]
+            return [(DIRIOSLocalizer.string("tissue_analytics.gas.bottom"), 1, Color.gray.opacity(0.45), .white)]
         }
         let total = segments.reduce(0) { $0 + $1.minutes }
         guard total > 0 else { return [] }
@@ -196,7 +196,7 @@ struct TissueCompartmentBarChart: View {
                 legendDot(TissueAnalyticsTheme.yellow, "70 - 90%")
                 legendDot(TissueAnalyticsTheme.orangeRed, "> 90%")
                 Spacer()
-                Text(String(localized: "tissue_analytics.legend.mvalue_gf"))
+                Text(DIRIOSLocalizer.string("tissue_analytics.legend.mvalue_gf"))
                     .font(.system(size: 11))
                     .foregroundStyle(TissueAnalyticsTheme.labelMuted)
             }
@@ -321,22 +321,22 @@ struct TissueTrendChart: View {
             Text(TissueAnalyticsTheme.runtimeLabel(seconds: sample.runtimeSeconds))
                 .font(.system(size: 13, weight: .bold))
                 .foregroundStyle(.white)
-            tooltipRow(String(localized: "tissue_analytics.tooltip.depth"), Formatters.depth(sample.depthMeters, units: unitPreference).text, TissueAnalyticsTheme.yellow)
-            tooltipRow(String(localized: "tissue_analytics.tooltip.active_gas"), sample.activeGasName, TissueAnalyticsTheme.yellow)
+            tooltipRow(DIRIOSLocalizer.string("tissue_analytics.tooltip.depth"), Formatters.depth(sample.depthMeters, units: unitPreference).text, TissueAnalyticsTheme.yellow)
+            tooltipRow(DIRIOSLocalizer.string("tissue_analytics.tooltip.active_gas"), sample.activeGasName, TissueAnalyticsTheme.yellow)
             tooltipRow(
-                String(localized: "tissue_analytics.tooltip.controlling"),
+                DIRIOSLocalizer.string("tissue_analytics.tooltip.controlling"),
                 TissueAnalyticsTheme.controllingCompartmentLabel(index: sample.controllingCompartment),
                 .white,
                 badge: true
             )
             tooltipRow(
-                String(localized: "tissue_analytics.tooltip.tissue_load"),
+                DIRIOSLocalizer.string("tissue_analytics.tooltip.tissue_load"),
                 "\(Int((sample.compartmentLoadingsPercent[safe: sample.controllingCompartment] ?? 0).rounded()))%",
                 TissueAnalyticsTheme.orange
             )
-            tooltipRow(String(localized: "tissue_analytics.tooltip.ceiling"), Formatters.depth(sample.ceilingMeters, units: unitPreference).text, TissueAnalyticsTheme.cyan)
-            tooltipRow(String(localized: "tissue_analytics.tooltip.ppn2"), Formatters.one(sample.ppN2Bar) + " bar", TissueAnalyticsTheme.green)
-            tooltipRow(String(localized: "tissue_analytics.tooltip.ppo2"), Formatters.one(sample.ppO2Bar) + " bar", TissueAnalyticsTheme.orange)
+            tooltipRow(DIRIOSLocalizer.string("tissue_analytics.tooltip.ceiling"), Formatters.depth(sample.ceilingMeters, units: unitPreference).text, TissueAnalyticsTheme.cyan)
+            tooltipRow(DIRIOSLocalizer.string("tissue_analytics.tooltip.ppn2"), Formatters.one(sample.ppN2Bar) + " bar", TissueAnalyticsTheme.green)
+            tooltipRow(DIRIOSLocalizer.string("tissue_analytics.tooltip.ppo2"), Formatters.one(sample.ppO2Bar) + " bar", TissueAnalyticsTheme.orange)
         }
         .font(.system(size: 12))
         .padding(10)
@@ -415,9 +415,9 @@ struct TissueNarcoticLoadChart: View {
             }
 
             VStack(spacing: 8) {
-                statBox(title: String(localized: "tissue_analytics.stat.ppn2_max"), value: "\(Formatters.one(maxPPN2Bar)) bar")
+                statBox(title: DIRIOSLocalizer.string("tissue_analytics.stat.ppn2_max"), value: "\(Formatters.one(maxPPN2Bar)) bar")
                 statBox(
-                    title: String(localized: "tissue_analytics.stat.end"),
+                    title: DIRIOSLocalizer.string("tissue_analytics.stat.end"),
                     value: Formatters.depth(endEquivalentMeters, units: unitPreference).text
                 )
             }

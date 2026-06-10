@@ -10,9 +10,9 @@ enum DiveDetailTab: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .summary: String(localized: "detail.tab.summary")
-        case .charts: String(localized: "detail.tab.charts")
-        case .details: String(localized: "detail.tab.details")
+        case .summary: DIRIOSLocalizer.string("detail.tab.summary")
+        case .charts: DIRIOSLocalizer.string("detail.tab.charts")
+        case .details: DIRIOSLocalizer.string("detail.tab.details")
         }
     }
 }
@@ -61,7 +61,7 @@ struct DiveDetailView: View {
                         Button {
                             showManualEditor = true
                         } label: {
-                            Text(String(localized: "manual_dive.edit.title"))
+                            Text(DIRIOSLocalizer.string("manual_dive.edit.title"))
                                 .font(.callout.weight(.semibold))
                                 .foregroundStyle(DIRTheme.cyan)
                                 .frame(maxWidth: .infinity)
@@ -69,7 +69,7 @@ struct DiveDetailView: View {
                                 .overlay(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
                         }
                         .buttonStyle(.plain)
-                        .accessibilityHint(Text(String(localized: "manual_dive.edit.a11y")))
+                        .accessibilityHint(Text(DIRIOSLocalizer.string("manual_dive.edit.a11y")))
                     }
                     exportBlock
                 }
@@ -118,9 +118,9 @@ struct DiveDetailView: View {
 
     private func detailTabAccessibilityLabel(for item: DiveDetailTab) -> String {
         if tab == item {
-            return String(format: String(localized: "detail.tab.a11y.selected"), item.title)
+            return DIRIOSLocalizer.formatted("detail.tab.a11y.selected", item.title)
         }
-        return String(format: String(localized: "detail.tab.a11y.unselected"), item.title)
+        return DIRIOSLocalizer.formatted("detail.tab.a11y.unselected", item.title)
     }
 
     private var header: some View {
@@ -129,13 +129,13 @@ struct DiveDetailView: View {
                 .frame(width: 82, height: 82)
             VStack(alignment: .leading, spacing: 7) {
                 HStack(spacing: 6) {
-                    Text(session.siteName ?? String(localized: "detail.default_site"))
+                    Text(session.siteName ?? DIRIOSLocalizer.string("detail.default_site"))
                         .font(DIRTypography.cardHeading)
                         .foregroundStyle(.white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.78)
                     if session.buddy != nil {
-                        Text(String(localized: "detail.buddy.badge"))
+                        Text(DIRIOSLocalizer.string("detail.buddy.badge"))
                             .font(DIRTypography.microBadge)
                             .foregroundStyle(DIRTheme.yellow)
                             .padding(.horizontal, 4)
@@ -165,11 +165,11 @@ struct DiveDetailView: View {
     private var metricGrid: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
-                detailMetric(String(localized: "detail.metric.duration"), value: Formatters.time(session.durationSeconds), unit: String(localized: "common.unit.min"))
+                detailMetric(DIRIOSLocalizer.string("detail.metric.duration"), value: Formatters.time(session.durationSeconds), unit: DIRIOSLocalizer.string("common.unit.min"))
                 Divider().overlay(DIRTheme.hairline)
-                detailMetric(String(localized: "detail.metric.max_depth"), measurement: Formatters.depth(session.maxDepthMeters, units: unitPreference))
+                detailMetric(DIRIOSLocalizer.string("detail.metric.max_depth"), measurement: Formatters.depth(session.maxDepthMeters, units: unitPreference))
                 Divider().overlay(DIRTheme.hairline)
-                detailMetric(String(localized: "detail.metric.avg_depth"), measurement: Formatters.depth(session.avgDepthMeters, units: unitPreference))
+                detailMetric(DIRIOSLocalizer.string("detail.metric.avg_depth"), measurement: Formatters.depth(session.avgDepthMeters, units: unitPreference))
             }
             Divider().overlay(DIRTheme.hairline)
             HStack(spacing: 0) {
@@ -193,7 +193,7 @@ struct DiveDetailView: View {
     private var exceededDepthLogBanner: some View {
         HStack(spacing: 8) {
             Image(systemName: "exclamationmark.octagon.fill")
-            Text(String(localized: "depth.safety.log.outside_range"))
+            Text(DIRIOSLocalizer.string("depth.safety.log.outside_range"))
                 .font(DIRTypography.warning)
         }
         .foregroundStyle(DIRTheme.red)
@@ -207,7 +207,7 @@ struct DiveDetailView: View {
     }
 
     private var ttvSafetyNote: some View {
-        Text(String(localized: "detail.ttv.note"))
+        Text(DIRIOSLocalizer.string("detail.ttv.note"))
             .font(.caption2.weight(.semibold))
             .foregroundStyle(DIRTheme.yellow)
             .fixedSize(horizontal: false, vertical: true)
@@ -226,7 +226,7 @@ struct DiveDetailView: View {
     }
 
     private var watchManualNoDepthBanner: some View {
-        Text(String(localized: "detail.manual.nodepth.banner"))
+        Text(DIRIOSLocalizer.string("detail.manual.nodepth.banner"))
             .font(.caption.weight(.semibold))
             .foregroundStyle(DIRTheme.cyan)
             .fixedSize(horizontal: false, vertical: true)
@@ -241,10 +241,10 @@ struct DiveDetailView: View {
 
     private var noDepthProfilePlaceholder: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(String(localized: "detail.chart.no_profile_title"))
+            Text(DIRIOSLocalizer.string("detail.chart.no_profile_title"))
                 .font(.system(size: 11, weight: .bold, design: .rounded))
                 .foregroundStyle(DIRTheme.cyan)
-            Text(String(localized: "detail.chart.no_profile_body"))
+            Text(DIRIOSLocalizer.string("detail.chart.no_profile_body"))
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
@@ -261,7 +261,7 @@ struct DiveDetailView: View {
     private var depthChart: some View {
         VStack(alignment: .leading, spacing: 9) {
             HStack {
-                Text(String(localized: "detail.chart.depth_title"))
+                Text(DIRIOSLocalizer.string("detail.chart.depth_title"))
                     .font(.system(size: 11, weight: .bold, design: .rounded))
                     .tracking(0.7)
                     .foregroundStyle(DIRTheme.cyan)
@@ -272,8 +272,8 @@ struct DiveDetailView: View {
             }
             Chart(session.samples) { sample in
                 LineMark(
-                    x: .value(String(localized: "chart.axis.time"), sample.timestamp),
-                    y: .value(String(localized: "chart.axis.depth"), Formatters.depthValue(sample.depthMeters, units: unitPreference))
+                    x: .value(DIRIOSLocalizer.string("chart.axis.time"), sample.timestamp),
+                    y: .value(DIRIOSLocalizer.string("chart.axis.depth"), Formatters.depthValue(sample.depthMeters, units: unitPreference))
                 )
                 .foregroundStyle(DIRTheme.cyan)
                 .lineStyle(StrokeStyle(lineWidth: 2.4, lineCap: .round, lineJoin: .round))
@@ -304,10 +304,10 @@ struct DiveDetailView: View {
                 )
         )
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(String(localized: "detail.chart.depth_a11y"))
+        .accessibilityLabel(DIRIOSLocalizer.string("detail.chart.depth_a11y"))
         .accessibilityValue(
             String(
-                format: String(localized: "detail.chart.depth_a11y_value"),
+                format: DIRIOSLocalizer.string("detail.chart.depth_a11y_value"),
                 Formatters.depth(session.maxDepthMeters, units: unitPreference).text,
                 Formatters.time(session.durationSeconds)
             )
@@ -316,14 +316,14 @@ struct DiveDetailView: View {
 
     private var gasBlock: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(String(localized: "detail.gas.title"))
+            Text(DIRIOSLocalizer.string("detail.gas.title"))
                 .font(.system(size: 11, weight: .bold, design: .rounded))
                 .tracking(0.7)
                 .foregroundStyle(DIRTheme.cyan)
             HStack(spacing: 10) {
-                gasMetric(String(localized: "detail.gas.mix"), session.gasLabel.rawValue, nil, color: .white)
+                gasMetric(DIRIOSLocalizer.string("detail.gas.mix"), session.gasLabel.rawValue, nil, color: .white)
                 if let pressureSummary {
-                    gasMetric(String(localized: "detail.gas.pressures"), pressureSummary.value, pressureSummary.unit, color: DIRTheme.yellow)
+                    gasMetric(DIRIOSLocalizer.string("detail.gas.pressures"), pressureSummary.value, pressureSummary.unit, color: DIRTheme.yellow)
                 }
             }
             if let pressureFootnote {
@@ -332,7 +332,7 @@ struct DiveDetailView: View {
                     .foregroundStyle(DIRTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
             } else if !session.isManual {
-                Text(String(localized: "detail.gas.pressures_unavailable"))
+                Text(DIRIOSLocalizer.string("detail.gas.pressures_unavailable"))
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(DIRTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
@@ -353,10 +353,10 @@ struct DiveDetailView: View {
         VStack(alignment: .leading, spacing: 5) {
             Text(title)
                 .font(.system(size: 10, weight: .medium, design: .rounded))
-                .foregroundStyle(title == String(localized: "detail.gas.pressures") ? DIRTheme.yellow : DIRTheme.muted)
+                .foregroundStyle(title == DIRIOSLocalizer.string("detail.gas.pressures") ? DIRTheme.yellow : DIRTheme.muted)
             HStack(alignment: .lastTextBaseline, spacing: 3) {
                 Text(value)
-                    .font(.system(size: title == String(localized: "detail.gas.pressures") ? 14 : 20, weight: .semibold, design: .rounded))
+                    .font(.system(size: title == DIRIOSLocalizer.string("detail.gas.pressures") ? 14 : 20, weight: .semibold, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(color)
                 if let unit {
@@ -399,7 +399,7 @@ struct DiveDetailView: View {
     }
 
     private var salinityText: String {
-        String(localized: "detail.salinity.not_recorded")
+        DIRIOSLocalizer.string("detail.salinity.not_recorded")
     }
 
     private var unitPreference: IOSUnitPreference {
@@ -409,18 +409,18 @@ struct DiveDetailView: View {
     @ViewBuilder
     private var sacMetric: some View {
         if let sac = session.sacLitersMinute {
-            detailMetric(String(localized: "detail.metric.sac"), measurement: Formatters.sac(sac, units: unitPreference))
+            detailMetric(DIRIOSLocalizer.string("detail.metric.sac"), measurement: Formatters.sac(sac, units: unitPreference))
         } else {
-            detailMetric(String(localized: "detail.metric.sac"), value: "—", valueColor: DIRTheme.yellow)
+            detailMetric(DIRIOSLocalizer.string("detail.metric.sac"), value: "—", valueColor: DIRTheme.yellow)
         }
     }
 
     @ViewBuilder
     private var temperatureMetric: some View {
         if let temperature = session.avgWaterTemperatureCelsius {
-            detailMetric(String(localized: "detail.metric.temperature"), measurement: Formatters.temperature(temperature, units: unitPreference))
+            detailMetric(DIRIOSLocalizer.string("detail.metric.temperature"), measurement: Formatters.temperature(temperature, units: unitPreference))
         } else {
-            detailMetric(String(localized: "detail.metric.temperature"), value: "—", valueColor: DIRTheme.yellow)
+            detailMetric(DIRIOSLocalizer.string("detail.metric.temperature"), value: "—", valueColor: DIRTheme.yellow)
         }
     }
 
@@ -458,37 +458,37 @@ struct DiveDetailView: View {
     private var details: some View {
         VStack(spacing: 12) {
             if let ccr = session.ccrLogbookMetadata {
-                darkPanel(title: String(localized: "manual_dive.ccr.header"), icon: "lungs.fill") {
+                darkPanel(title: DIRIOSLocalizer.string("manual_dive.ccr.header"), icon: "lungs.fill") {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text(String(localized: "manual_dive.ccr.logbook_disclosure"))
+                        Text(DIRIOSLocalizer.string("manual_dive.ccr.logbook_disclosure"))
                             .font(.caption2)
                             .foregroundStyle(DIRTheme.muted)
                         if !ccr.rebreatherModel.isEmpty {
-                            Text("\(String(localized: "ccr.rebreather_model")): \(ccr.rebreatherModel)")
+                            Text("\(DIRIOSLocalizer.string("ccr.rebreather_model")): \(ccr.rebreatherModel)")
                         }
-                        Text("\(String(localized: "ccr.setpoint.low")) / \(String(localized: "ccr.setpoint.high")): \(Formatters.one(ccr.lowSetpoint)) / \(Formatters.one(ccr.highSetpoint)) bar")
-                        Text("\(String(localized: "ccr.setpoint.switch_depth")): \(Formatters.depth(ccr.setpointSwitchDepthMeters, units: IOSUnitPreference.fromStorage(units)).text)")
-                        Text("\(String(localized: "ccr.diluent")): \(ccr.diluentLabel)")
+                        Text("\(DIRIOSLocalizer.string("ccr.setpoint.low")) / \(DIRIOSLocalizer.string("ccr.setpoint.high")): \(Formatters.one(ccr.lowSetpoint)) / \(Formatters.one(ccr.highSetpoint)) bar")
+                        Text("\(DIRIOSLocalizer.string("ccr.setpoint.switch_depth")): \(Formatters.depth(ccr.setpointSwitchDepthMeters, units: IOSUnitPreference.fromStorage(units)).text)")
+                        Text("\(DIRIOSLocalizer.string("ccr.diluent")): \(ccr.diluentLabel)")
                         if !ccr.bailoutLabels.isEmpty {
-                            Text("\(String(localized: "ccr.bailout")): \(ccr.bailoutLabels.joined(separator: ", "))")
+                            Text("\(DIRIOSLocalizer.string("ccr.bailout")): \(ccr.bailoutLabels.joined(separator: ", "))")
                         }
                     }
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundStyle(.white)
                 }
             }
-            darkPanel(title: String(localized: "detail.panel.gps"), icon: "location.fill") {
+            darkPanel(title: DIRIOSLocalizer.string("detail.panel.gps"), icon: "location.fill") {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("\(String(localized: "detail.gps.start")): \(session.entryGPS?.coordinateText ?? String(localized: "detail.not_available")) · \(fixSourceText(session.entryGPSFixSource))")
-                    Text("\(String(localized: "detail.gps.end")): \(session.exitGPS?.coordinateText ?? String(localized: "detail.not_available")) · \(fixSourceText(session.exitGPSFixSource))")
-                    Text("\(String(localized: "detail.gps.accuracy_start")): \(accuracyText(session.entryGPS))")
-                    Text("\(String(localized: "detail.gps.accuracy_end")): \(accuracyText(session.exitGPS))")
+                    Text("\(DIRIOSLocalizer.string("detail.gps.start")): \(session.entryGPS?.coordinateText ?? DIRIOSLocalizer.string("detail.not_available")) · \(fixSourceText(session.entryGPSFixSource))")
+                    Text("\(DIRIOSLocalizer.string("detail.gps.end")): \(session.exitGPS?.coordinateText ?? DIRIOSLocalizer.string("detail.not_available")) · \(fixSourceText(session.exitGPSFixSource))")
+                    Text("\(DIRIOSLocalizer.string("detail.gps.accuracy_start")): \(accuracyText(session.entryGPS))")
+                    Text("\(DIRIOSLocalizer.string("detail.gps.accuracy_end")): \(accuracyText(session.exitGPS))")
                 }
                 .font(.system(size: 13, weight: .medium, design: .rounded).monospacedDigit())
                 .foregroundStyle(.white)
             }
-            darkPanel(title: String(localized: "detail.panel.notes"), icon: "note.text") {
-                Text(session.notes ?? String(localized: "detail.notes.empty"))
+            darkPanel(title: DIRIOSLocalizer.string("detail.panel.notes"), icon: "note.text") {
+                Text(session.notes ?? DIRIOSLocalizer.string("detail.notes.empty"))
                     .foregroundStyle(DIRTheme.muted)
             }
         }
@@ -523,14 +523,14 @@ struct DiveDetailView: View {
 
     private func fixSourceText(_ source: GPSFixSource) -> String {
         switch source {
-        case .fix: return String(localized: "detail.gps.fix_surface")
-        case .fallback: return String(localized: "detail.gps.fix_fallback")
-        case .noFix: return String(localized: "detail.gps.fix_none")
+        case .fix: return DIRIOSLocalizer.string("detail.gps.fix_surface")
+        case .fallback: return DIRIOSLocalizer.string("detail.gps.fix_fallback")
+        case .noFix: return DIRIOSLocalizer.string("detail.gps.fix_none")
         }
     }
 
     private func accuracyText(_ point: GPSPoint?) -> String {
-        guard let point, point.horizontalAccuracy >= 0 else { return String(localized: "detail.not_available") }
+        guard let point, point.horizontalAccuracy >= 0 else { return DIRIOSLocalizer.string("detail.not_available") }
         return "\(Formatters.zero(point.horizontalAccuracy)) m"
     }
 
@@ -539,7 +539,7 @@ struct DiveDetailView: View {
             Button {
                 guard session.hasDepthProfile else {
                     csvURL = nil
-                    exportErrorMessage = String(localized: "detail.export.no_profile")
+                    exportErrorMessage = DIRIOSLocalizer.string("detail.export.no_profile")
                     return
                 }
                 switch SubsurfaceExportService.writeCSV(for: session) {
@@ -551,7 +551,7 @@ struct DiveDetailView: View {
                     exportErrorMessage = error.localizedDescription
                 }
             } label: {
-                Text(String(localized: "detail.export.generate_csv"))
+                Text(DIRIOSLocalizer.string("detail.export.generate_csv"))
                     .font(.callout.weight(.semibold))
                     .foregroundStyle(DIRTheme.cyan)
                     .padding(.horizontal, 14)
@@ -563,11 +563,11 @@ struct DiveDetailView: View {
                 ShareLink(
                     item: csvURL,
                     preview: SharePreview(
-                        String(localized: "detail.export.share_csv"),
+                        DIRIOSLocalizer.string("detail.export.share_csv"),
                         icon: Image(systemName: "tablecells")
                     )
                 ) {
-                    Text(String(localized: "detail.export.share_csv"))
+                    Text(DIRIOSLocalizer.string("detail.export.share_csv"))
                         .font(.callout.weight(.semibold))
                         .foregroundStyle(DIRTheme.cyan)
                         .padding(.horizontal, 18)
@@ -580,7 +580,7 @@ struct DiveDetailView: View {
                     .foregroundStyle(DIRTheme.orange)
                     .multilineTextAlignment(.trailing)
             } else {
-                Text(String(localized: "detail.export.csv_not_generated"))
+                Text(DIRIOSLocalizer.string("detail.export.csv_not_generated"))
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(DIRTheme.muted)
             }
@@ -604,7 +604,7 @@ struct DiveDetailView: View {
                         .foregroundStyle(TissueAnalyticsTheme.accentBlue)
                         .frame(width: 28)
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(String(localized: "tissue_analytics.logbook.entry.title"))
+                        Text(DIRIOSLocalizer.string("tissue_analytics.logbook.entry.title"))
                             .font(.callout.weight(.semibold))
                             .foregroundStyle(.white)
                         Text(TissueAnalyticsService.logbookEntrySubtitle(for: session))

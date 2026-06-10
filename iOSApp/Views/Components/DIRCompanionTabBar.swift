@@ -6,6 +6,7 @@ import SwiftUI
 struct DIRCompanionTabBar: View {
     @Binding var selection: IOSTab
     let settingsBadge: String?
+    @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
 
     var body: some View {
         VStack(spacing: 0) {
@@ -24,7 +25,8 @@ struct DIRCompanionTabBar: View {
         }
         .background(DIRTheme.background.ignoresSafeArea(edges: .bottom))
         .accessibilityElement(children: .contain)
-        .accessibilityLabel(String(localized: "a11y.companion.tab_bar"))
+        .accessibilityLabel(DIRIOSLocalizer.string("a11y.companion.tab_bar"))
+        .id(appLanguage)
     }
 
     private func tabButton(_ tab: IOSTab) -> some View {
@@ -52,7 +54,7 @@ struct DIRCompanionTabBar: View {
                 }
                 .frame(height: 22)
 
-                Text(String(localized: String.LocalizationValue(tab.labelKey)))
+                Text(DIRIOSLocalizer.string(tab.labelKey))
                     .font(.system(size: 10, weight: isSelected ? .semibold : .regular))
                     .lineLimit(1)
                     .minimumScaleFactor(0.65)
@@ -63,11 +65,11 @@ struct DIRCompanionTabBar: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(String(localized: String.LocalizationValue(tab.labelKey)))
+        .accessibilityLabel(DIRIOSLocalizer.string(tab.labelKey))
         .accessibilityAddTraits(isSelected ? [.isSelected, .isButton] : .isButton)
         .accessibilityHint(
             tab == .settings && settingsBadge != nil
-                ? String(localized: "a11y.companion.settings_tab_badge_hint")
+                ? DIRIOSLocalizer.string("a11y.companion.settings_tab_badge_hint")
                 : ""
         )
     }
