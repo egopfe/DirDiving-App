@@ -49,6 +49,14 @@ enum PlannerGFPreset: String, CaseIterable, Identifiable {
             return DIRIOSLocalizer.formatted("planner.gf.preset.aggressive.compact_format", displayPair)
         }
     }
+
+    var localizedGFValueLine: String {
+        "GF \(displayPair)"
+    }
+
+    var accessibilityLabel: String {
+        DIRIOSLocalizer.formatted("planner.gf.preset.accessibility_format", localizedTitle, displayPair)
+    }
 }
 
 enum BuhlmannResultPresentation: Equatable {
