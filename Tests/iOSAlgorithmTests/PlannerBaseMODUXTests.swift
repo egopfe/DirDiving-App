@@ -12,8 +12,11 @@ final class PlannerBaseMODUXTests: XCTestCase {
     func testPlannerCylinderGasEditorHidesAdvancedMODControlsInBase() throws {
         let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/PlannerCylinderGasEditorView.swift"))
         XCTAssertTrue(source.contains("showsAdvancedMODControls"))
-        XCTAssertTrue(source.contains("plannerMode != .base"))
+        XCTAssertTrue(source.contains("showsHeliumRow"))
+        XCTAssertTrue(source.contains("showsRoleRow"))
         XCTAssertTrue(source.contains("if showsAdvancedMODControls"))
+        XCTAssertTrue(source.contains("if showsHeliumRow"))
+        XCTAssertTrue(source.contains("if showsRoleRow"))
         XCTAssertTrue(source.contains("planner.gas.ppo2_max"))
         XCTAssertTrue(source.contains("planner.gas.editor.mod"))
     }
@@ -32,8 +35,9 @@ final class PlannerBaseMODUXTests: XCTestCase {
             XCTAssertFalse(en[key, default: ""].isEmpty, "Missing EN \(key)")
             XCTAssertFalse(it[key, default: ""].isEmpty, "Missing IT \(key)")
         }
-        XCTAssertFalse(en["planner.base.gas_depth.title"]!.localizedCaseInsensitiveContains("MOD"))
-        XCTAssertFalse(it["planner.base.gas_depth.hint"]!.localizedCaseInsensitiveContains("MOD"))
+        XCTAssertTrue(en["planner.base.gas_depth.message"]!.contains("PPO₂ 1.4"))
+        XCTAssertTrue(it["planner.base.gas_depth.message"]!.contains("PPO₂ 1.4"))
+        XCTAssertTrue(en["planner.base.gas_depth.detail_format"]!.contains("automatic maximum depth"))
     }
 
     func testBaseModeStillReportsUnsafeGasDepthCombination() {
