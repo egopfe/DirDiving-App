@@ -30,6 +30,25 @@ enum PlannerGFPreset: String, CaseIterable, Identifiable {
         case .aggressive: return DIRIOSLocalizer.string("planner.gf.preset.aggressive")
         }
     }
+
+    var displayPair: String {
+        "\(Int(gfLow))/\(Int(gfHigh))"
+    }
+
+    var localizedTitleWithValues: String {
+        "\(localizedTitle) GF \(displayPair)"
+    }
+
+    var localizedCompactTitleWithValues: String {
+        switch self {
+        case .conservative:
+            return DIRIOSLocalizer.formatted("planner.gf.preset.conservative.compact_format", displayPair)
+        case .standard:
+            return DIRIOSLocalizer.formatted("planner.gf.preset.standard.compact_format", displayPair)
+        case .aggressive:
+            return DIRIOSLocalizer.formatted("planner.gf.preset.aggressive.compact_format", displayPair)
+        }
+    }
 }
 
 enum BuhlmannResultPresentation: Equatable {
