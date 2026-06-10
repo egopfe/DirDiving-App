@@ -192,7 +192,8 @@ final class RatioDecoPlannerTests: XCTestCase {
             validation: PlannerModePolicy.validate(draft: input, mode: .technical),
             modIssues: [],
             safetyAcknowledged: true,
-            unitPreference: .metric
+            unitPreference: .metric,
+            pressureUnitPreference: .bar
         )
         let data = PlannerPDFBuilder.build(context: context)
         XCTAssertFalse(data.isEmpty)

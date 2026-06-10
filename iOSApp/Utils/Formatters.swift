@@ -1,5 +1,22 @@
 import Foundation
 
+enum IOSPressureUnitPreference {
+    static let storageKey = "dirdiving_ios_pressure_unit"
+
+    static func fromStorage(_ value: String) -> PressureUnit {
+        switch value.lowercased() {
+        case PressureUnit.psi.rawValue.lowercased(), "psi":
+            return .psi
+        default:
+            return .bar
+        }
+    }
+
+    static func storageValue(for unit: PressureUnit) -> String {
+        unit.rawValue.lowercased()
+    }
+}
+
 enum IOSUnitPreference: String, CaseIterable, Identifiable {
     case metric = "Metrico (m, °C)"
     case imperial = "Imperiale (ft, °F)"
@@ -162,5 +179,18 @@ enum Formatters {
         case .imperial:
             return DisplayMeasurement(value: one(IOSUnitConversions.cubicFeet(fromLiters: litersMinute)), unit: "cu ft/min")
         }
+    }
+
+    static func pressure(fromBar bar: Double, unit: PressureUnit) -> DisplayMeasurement {
+        switch unit {
+        case .bar:
+            return DisplayMeasurement(value: zero(bar), unit: "bar")
+        case .psi:
+            return DisplayMeasurement(value: zero(IOSUnitConversions.psi(fromBar: bar)), unit: "PSI")
+        }
+    }
+
+    static func pressureUnitLabel(_ unit: PressureUnit) -> String {
+        unit == .bar ? "bar" : "PSI"
     }
 }

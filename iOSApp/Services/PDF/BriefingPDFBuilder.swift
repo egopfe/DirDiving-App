@@ -21,10 +21,13 @@ enum BriefingPDFBuilder {
                 DIRIOSLocalizer.string("planner.field.max_depth"),
                 value: Formatters.depth(context.input.plannedDepthMeters, units: context.unitPreference).text
             )
-            page.drawLine(
-                DIRIOSLocalizer.string("planner.field.avg_depth"),
-                value: Formatters.depth(context.input.plannedAverageDepthMeters, units: context.unitPreference).text
-            )
+            if PlannerResultPresentation.presentation(for: context.mode).showsAverageDepthGasConsumptionToggle,
+               context.input.averageDepthGasConsumptionEnabled {
+                page.drawLine(
+                    DIRIOSLocalizer.string("planner.field.avg_depth"),
+                    value: Formatters.depth(context.input.plannedAverageDepthMeters, units: context.unitPreference).text
+                )
+            }
             page.drawLine(
                 DIRIOSLocalizer.string("planner.field.bottom_time"),
                 value: "\(Formatters.zero(context.input.plannedBottomMinutes)) min"

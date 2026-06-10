@@ -21,7 +21,7 @@ enum GasPlanningService {
             invalid.add(.invalidEnvironment, message: DIRIOSLocalizer.string("planner.validation.invalid_environment"))
             return unavailableAnalysis(input: input, gas: gas, validation: invalid)
         }
-        let planningDepth = input.effectivePlanningDepthMeters
+        let planningDepth = input.gasConsumptionReferenceDepthMeters(for: mode)
         let ata = AmbientPressureModel.ambientPressureBar(depthMeters: planningDepth, environment: environment) ?? environment.surfacePressureBar
         let ppO2 = boundedPPO2(gas: gas, depthMeters: planningDepth, environment: environment)
         let density = gas.surfaceDensityGramsLiter * ata

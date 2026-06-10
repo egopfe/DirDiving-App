@@ -21,7 +21,8 @@ final class BriefingPDFBuilderTests: XCTestCase {
             validation: PlannerModePolicy.validate(draft: input, mode: mode),
             modIssues: [],
             safetyAcknowledged: true,
-            unitPreference: .metric
+            unitPreference: .metric,
+            pressureUnitPreference: .bar
         )
     }
 
@@ -78,7 +79,8 @@ final class BriefingPDFBuilderTests: XCTestCase {
             validation: PlannerModePolicy.validate(draft: input, mode: .technical),
             modIssues: [],
             safetyAcknowledged: true,
-            unitPreference: .metric
+            unitPreference: .metric,
+            pressureUnitPreference: .bar
         )
         let ratioContext = PDFExportPlannerContext(
             input: input,
@@ -87,7 +89,8 @@ final class BriefingPDFBuilderTests: XCTestCase {
             validation: PlannerModePolicy.validate(draft: input, mode: .technical),
             modIssues: [],
             safetyAcknowledged: true,
-            unitPreference: .metric
+            unitPreference: .metric,
+            pressureUnitPreference: .bar
         )
         let buhlmannData = BriefingPDFBuilder.build(context: buhlmannContext, siteName: nil)
         let ratioData = BriefingPDFBuilder.build(context: ratioContext, siteName: nil)
