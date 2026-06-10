@@ -121,6 +121,10 @@ struct PlannerCylinderGasEditorView: View {
 
     @State private var activePicker: PlannerGasPickerField?
 
+    private var showsAdvancedMODControls: Bool {
+        plannerMode != .base
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(DIRIOSLocalizer.formatted("planner.gas.editor.cylinder_section", cylinderNumber))
@@ -188,21 +192,23 @@ struct PlannerCylinderGasEditorView: View {
                     editable: false
                 ) {}
 
-                rowDivider()
+                if showsAdvancedMODControls {
+                    rowDivider()
 
-                editorRow(
-                    label: DIRIOSLocalizer.string("planner.gas.ppo2_max"),
-                    value: Formatters.one(entry.gas.maxPPO2),
-                    editable: true
-                ) { activePicker = .maxPPO2 }
+                    editorRow(
+                        label: DIRIOSLocalizer.string("planner.gas.ppo2_max"),
+                        value: Formatters.one(entry.gas.maxPPO2),
+                        editable: true
+                    ) { activePicker = .maxPPO2 }
 
-                rowDivider()
+                    rowDivider()
 
-                editorRow(
-                    label: DIRIOSLocalizer.string("planner.gas.editor.mod"),
-                    value: modDisplayText,
-                    editable: false
-                ) {}
+                    editorRow(
+                        label: DIRIOSLocalizer.string("planner.gas.editor.mod"),
+                        value: modDisplayText,
+                        editable: false
+                    ) {}
+                }
             }
 
             VStack(alignment: .leading, spacing: 8) {
@@ -232,7 +238,9 @@ struct PlannerCylinderGasEditorView: View {
                 switchDepthEditor(binding: switchDepthMeters)
             }
 
-            modStatusCard
+            if showsAdvancedMODControls {
+                modStatusCard
+            }
         }
         .sheet(item: $activePicker) { field in
             pickerSheet(for: field)

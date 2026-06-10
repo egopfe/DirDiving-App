@@ -154,9 +154,12 @@ enum PlannerPDFBuilder {
     private static func warningLines(context: PDFExportPlannerContext) -> [String] {
         var lines: [String] = []
         for issue in context.modIssues {
+            let detailKey = context.mode == .base
+                ? "planner.base.gas_depth.detail_format"
+                : "planner.mod.detail_format"
             lines.append(
-                String(
-                    format: DIRIOSLocalizer.string("planner.mod.detail_format"),
+                DIRIOSLocalizer.formatted(
+                    detailKey,
                     issue.gasLabel,
                     Formatters.depth(issue.switchDepthMeters, units: context.unitPreference).text,
                     Formatters.depth(issue.modMeters, units: context.unitPreference).text
