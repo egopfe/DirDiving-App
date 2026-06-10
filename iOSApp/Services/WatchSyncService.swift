@@ -21,7 +21,7 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     @Published var isSupported = WCSession.isSupported()
     @Published var activationState: WCSessionActivationState = .notActivated
-    @Published var lastMessage = String(localized: "sync.status.not_synced")
+    @Published var lastMessage = DIRIOSLocalizer.string("sync.status.not_synced")
     @Published private(set) var importedSessionCount = 0
     @Published private(set) var failedImportCount = 0
     @Published private(set) var conflicts: [SyncConflict] = []
@@ -65,28 +65,28 @@ final class WatchSyncService: NSObject, ObservableObject {
     }()
 
     var userVisibleState: String {
-        if !isSupported { return String(localized: "sync.status.unsupported") }
-        if WatchSyncAuth.peerSecretMismatchDetected { return String(localized: "sync.trust.mismatch") }
-        if failedImportCount > 0 { return String(localized: "sync.status.import_error_retry") }
+        if !isSupported { return DIRIOSLocalizer.string("sync.status.unsupported") }
+        if WatchSyncAuth.peerSecretMismatchDetected { return DIRIOSLocalizer.string("sync.trust.mismatch") }
+        if failedImportCount > 0 { return DIRIOSLocalizer.string("sync.status.import_error_retry") }
         if activationState == .activated, !WCSession.default.isPaired {
-            return String(localized: "sync.watch_not_paired.status")
+            return DIRIOSLocalizer.string("sync.watch_not_paired.status")
         }
         if activationState == .activated, !WCSession.default.isWatchAppInstalled {
-            return String(localized: "sync.watch_app_not_installed.status")
+            return DIRIOSLocalizer.string("sync.watch_app_not_installed.status")
         }
-        if activationState == .activated, !WatchSyncAuth.hasPeerSecret() { return String(localized: "sync.status.pairing_unverified") }
-        if activationState == .activated { return String(localized: "sync.status.active") }
-        return String(localized: "sync.status.pending_activation")
+        if activationState == .activated, !WatchSyncAuth.hasPeerSecret() { return DIRIOSLocalizer.string("sync.status.pairing_unverified") }
+        if activationState == .activated { return DIRIOSLocalizer.string("sync.status.active") }
+        return DIRIOSLocalizer.string("sync.status.pending_activation")
     }
 
     private func refreshCompanionSyncAvailabilityMessage(session: WCSession = .default) {
         guard activationState == .activated else { return }
         if !session.isPaired {
-            lastMessage = String(localized: "sync.watch_not_paired")
+            lastMessage = DIRIOSLocalizer.string("sync.watch_not_paired")
         } else if !session.isWatchAppInstalled {
-            lastMessage = String(localized: "sync.watch_app_not_installed")
+            lastMessage = DIRIOSLocalizer.string("sync.watch_app_not_installed")
         } else {
-            lastMessage = String(localized: "sync.status.watch_session_active")
+            lastMessage = DIRIOSLocalizer.string("sync.status.watch_session_active")
         }
     }
 
@@ -101,7 +101,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         )
         conflicts = loadConflicts()
         guard WCSession.isSupported() else {
-            lastMessage = String(localized: "sync.status.watchconnectivity_unsupported")
+            lastMessage = DIRIOSLocalizer.string("sync.status.watchconnectivity_unsupported")
             return
         }
         WCSession.default.delegate = self
@@ -110,14 +110,14 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     func retryActivation(logStore: DiveLogStore) {
         failedImportCount = 0
-        lastMessage = String(localized: "sync.status.retry_requested")
+        lastMessage = DIRIOSLocalizer.string("sync.status.retry_requested")
         activate(logStore: logStore)
     }
 
     func resetPairingTrust(logStore: DiveLogStore) {
         WatchSyncAuth.resetPeerTrust()
         failedImportCount = 0
-        lastMessage = String(localized: "sync.status.trust_reset")
+        lastMessage = DIRIOSLocalizer.string("sync.status.trust_reset")
         activate(logStore: logStore)
     }
 
@@ -132,7 +132,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             flushOutboundTransfers()
         } else {
             WatchSyncAuth.publishSharedSecretIfNeeded()
-            lastMessage = String(format: String(localized: "sync.status.queued_awaiting_pairing"), pendingOutboundTransfers.count)
+            lastMessage = DIRIOSLocalizer.formatted("sync.status.queued_awaiting_pairing", pendingOutboundTransfers.count)
         }
     }
 
@@ -156,7 +156,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             refreshCompanionSyncAvailabilityMessage()
             return
         }
-        lastMessage = String(format: String(localized: "sync.tombstone.sent_to_watch"), ids.count)
+        lastMessage = DIRIOSLocalizer.formatted("sync.tombstone.sent_to_watch", ids.count)
     }
 
     func pushUnitsPreference(_ value: String) {
@@ -176,7 +176,7 @@ final class WatchSyncService: NSObject, ObservableObject {
                 photoID: photoID,
                 fileName: fileName,
                 state: .failed,
-                errorMessage: String(localized: "sync.watch_app_not_installed")
+                errorMessage: DIRIOSLocalizer.string("sync.watch_app_not_installed")
             )
             return
         }
@@ -187,7 +187,7 @@ final class WatchSyncService: NSObject, ObservableObject {
                 photoID: photoID,
                 fileName: fileName,
                 state: .failed,
-                errorMessage: String(localized: "sync.photo.transfer.invalid_file")
+                errorMessage: DIRIOSLocalizer.string("sync.photo.transfer.invalid_file")
             )
             return
         }
@@ -202,8 +202,8 @@ final class WatchSyncService: NSObject, ObservableObject {
             )
             photoIDByTransferFilePath[url.path] = photoID
             updateCompanionPhotoTransfer(photoID: photoID, fileName: sanitized, state: .queued)
-            lastMessage = String(localized: "watch_photo_status_queued")
-            recordActivity(title: String(localized: "sync.activity.photo_to_watch"), detail: sanitized)
+            lastMessage = DIRIOSLocalizer.string("watch_photo_status_queued")
+            recordActivity(title: DIRIOSLocalizer.string("sync.activity.photo_to_watch"), detail: sanitized)
         } catch {
             updateCompanionPhotoTransfer(
                 photoID: photoID,
@@ -211,7 +211,7 @@ final class WatchSyncService: NSObject, ObservableObject {
                 state: .failed,
                 errorMessage: error.localizedDescription
             )
-            lastMessage = String(localized: "watch_photo_status_failed")
+            lastMessage = DIRIOSLocalizer.string("watch_photo_status_failed")
         }
     }
 
@@ -255,9 +255,9 @@ final class WatchSyncService: NSObject, ObservableObject {
         transfer.rejectionErrorCode = nil
         companionPhotoTransfersByID[photoID] = transfer
         companionPhotoTransfer = transfer
-        lastMessage = String(localized: "watch_photo_status_imported")
+        lastMessage = DIRIOSLocalizer.string("watch_photo_status_imported")
         recordActivity(
-            title: String(localized: "sync.activity.photo_to_watch"),
+            title: DIRIOSLocalizer.string("sync.activity.photo_to_watch"),
             detail: transfer.storedFileNameOnWatch ?? transfer.fileName,
             marksSuccess: true
         )
@@ -292,12 +292,12 @@ final class WatchSyncService: NSObject, ObservableObject {
     func requestWatchImageInventory() {
         guard WCSession.isSupported() else {
             watchImageInventoryStatus = .failed
-            inventoryErrorMessage = String(localized: "watch_photo.inventory.failed")
+            inventoryErrorMessage = DIRIOSLocalizer.string("watch_photo.inventory.failed")
             return
         }
         guard WCSession.default.isPaired, WCSession.default.isWatchAppInstalled, activationState == .activated else {
             watchImageInventoryStatus = .watchUnavailable
-            inventoryErrorMessage = String(localized: "watch_photo.inventory.watch_unavailable")
+            inventoryErrorMessage = DIRIOSLocalizer.string("watch_photo.inventory.watch_unavailable")
             return
         }
         let requestID = UUID().uuidString
@@ -315,23 +315,23 @@ final class WatchSyncService: NSObject, ObservableObject {
                 Task { @MainActor in
                     session.transferUserInfo(payload)
                     self?.watchImageInventoryStatus = .stale
-                    self?.inventoryErrorMessage = String(localized: "watch_photo.inventory.stale")
+                    self?.inventoryErrorMessage = DIRIOSLocalizer.string("watch_photo.inventory.stale")
                 }
             })
         } else {
             session.transferUserInfo(payload)
             watchImageInventoryStatus = .stale
-            inventoryErrorMessage = String(localized: "watch_photo.inventory.stale")
+            inventoryErrorMessage = DIRIOSLocalizer.string("watch_photo.inventory.stale")
         }
     }
 
     func requestDeletePhotoOnWatch(storedFileName: String) {
         guard let sanitized = Self.sanitizedPhotoFileName(storedFileName) else {
-            inventoryErrorMessage = String(localized: "watch_photo.delete.status.failed")
+            inventoryErrorMessage = DIRIOSLocalizer.string("watch_photo.delete.status.failed")
             return
         }
         guard WCSession.isSupported(), WCSession.default.isPaired, WCSession.default.isWatchAppInstalled, activationState == .activated else {
-            inventoryErrorMessage = String(localized: "watch_photo.delete.status.watch_unavailable")
+            inventoryErrorMessage = DIRIOSLocalizer.string("watch_photo.delete.status.watch_unavailable")
             return
         }
         let requestID = UUID().uuidString
@@ -360,7 +360,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             session.transferUserInfo(payload)
             updateDeleteRequest(requestID: requestID, state: .deliveredToConnectivity)
             watchImageInventoryStatus = .stale
-            inventoryErrorMessage = String(localized: "watch_photo.inventory.stale")
+            inventoryErrorMessage = DIRIOSLocalizer.string("watch_photo.inventory.stale")
         }
     }
 
@@ -374,7 +374,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     private func handleWatchImageInventoryResponse(_ payload: [String: Any]) {
         guard let response = CompanionPhotoManagementSupport.parseInventoryResponse(payload) else {
             watchImageInventoryStatus = .failed
-            inventoryErrorMessage = String(localized: "watch_photo.inventory.failed")
+            inventoryErrorMessage = DIRIOSLocalizer.string("watch_photo.inventory.failed")
             return
         }
         if let requestID = response.requestID, requestID == pendingInventoryRequestID {
@@ -388,7 +388,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             reconcilePhotoTransfers(with: watchImageInventory)
         } else {
             watchImageInventoryStatus = .failed
-            inventoryErrorMessage = String(localized: "watch_photo.inventory.failed")
+            inventoryErrorMessage = DIRIOSLocalizer.string("watch_photo.inventory.failed")
         }
     }
 
@@ -435,7 +435,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             state: .failed,
             errorMessage: message
         )
-        lastMessage = String(localized: "watch_photo_status_failed")
+        lastMessage = DIRIOSLocalizer.string("watch_photo_status_failed")
     }
 
     private func handleCompanionPhotoAck(_ payload: [String: Any]) {
@@ -453,18 +453,18 @@ final class WatchSyncService: NSObject, ObservableObject {
         switch updated.state {
         case .importedOnWatch:
             cancelPhotoImportVerification(for: ack.photoID)
-            lastMessage = String(localized: "watch_photo_status_imported")
+            lastMessage = DIRIOSLocalizer.string("watch_photo_status_imported")
             recordActivity(
-                title: String(localized: "sync.activity.photo_to_watch"),
+                title: DIRIOSLocalizer.string("sync.activity.photo_to_watch"),
                 detail: updated.storedFileNameOnWatch ?? updated.fileName,
                 marksSuccess: true
             )
             requestWatchImageInventory()
         case .rejectedByWatch:
             cancelPhotoImportVerification(for: ack.photoID)
-            lastMessage = String(localized: "watch_photo_status_rejected")
+            lastMessage = DIRIOSLocalizer.string("watch_photo_status_rejected")
             recordActivity(
-                title: String(localized: "sync.activity.photo_to_watch"),
+                title: DIRIOSLocalizer.string("sync.activity.photo_to_watch"),
                 detail: updated.rejectionErrorCode ?? updated.fileName
             )
         default:
@@ -493,7 +493,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     private func ingestCompanionContext(_ context: [String: Any]) {
         switch WatchSyncAuth.ingestSharedSecretFromContext(context) {
         case .rejectedMismatch:
-            lastMessage = String(localized: "sync.trust.mismatch")
+            lastMessage = DIRIOSLocalizer.string("sync.trust.mismatch")
         case .acceptedFirstTrust, .unchanged:
             break
         }
@@ -505,7 +505,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             let ids = Set(strings.compactMap(UUID.init(uuidString:)))
             if !ids.isEmpty {
                 logStore?.applyRemoteDeletedSessionIDs(ids)
-                lastMessage = String(format: String(localized: "sync.dive.watch_tombstone_applied_format"), ids.count)
+                lastMessage = DIRIOSLocalizer.formatted("sync.dive.watch_tombstone_applied_format", ids.count)
             }
         }
     }
@@ -523,8 +523,8 @@ final class WatchSyncService: NSObject, ObservableObject {
             if let existing = logStore?.session(id: session.id) {
                 if WatchSyncSessionDiff.hasSignificantDifference(local: existing, incoming: session) {
                     storeConflict(local: existing, incoming: session)
-                    lastMessage = String(localized: "sync.conflict.saved_for_review")
-                    recordActivity(title: String(localized: "sync.activity.conflict"), detail: sessionSummary(session))
+                    lastMessage = DIRIOSLocalizer.string("sync.conflict.saved_for_review")
+                    recordActivity(title: DIRIOSLocalizer.string("sync.activity.conflict"), detail: sessionSummary(session))
                     return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
                 }
                 logStore?.add(session, suppressWatchPush: true)
@@ -535,12 +535,12 @@ final class WatchSyncService: NSObject, ObservableObject {
                 )
                 WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
                 importedSessionCount = importedSessionIDs.count
-                lastMessage = String(localized: "sync.dive.updated_from_watch")
-                recordActivity(title: String(localized: "sync.activity.received_from_watch"), detail: sessionSummary(session), marksSuccess: true)
+                lastMessage = DIRIOSLocalizer.string("sync.dive.updated_from_watch")
+                recordActivity(title: DIRIOSLocalizer.string("sync.activity.received_from_watch"), detail: sessionSummary(session), marksSuccess: true)
                 return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
             }
             guard !importedSessionIDs.contains(session.id) else {
-                lastMessage = String(localized: "sync.dive.duplicate_ignored")
+                lastMessage = DIRIOSLocalizer.string("sync.dive.duplicate_ignored")
                 return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
             }
             logStore?.add(session, suppressWatchPush: true)
@@ -551,12 +551,12 @@ final class WatchSyncService: NSObject, ObservableObject {
             )
             WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
             importedSessionCount = importedSessionIDs.count
-            lastMessage = String(localized: "sync.dive.received_from_watch")
-            recordActivity(title: String(localized: "sync.activity.received_from_watch"), detail: sessionSummary(session), marksSuccess: true)
+            lastMessage = DIRIOSLocalizer.string("sync.dive.received_from_watch")
+            recordActivity(title: DIRIOSLocalizer.string("sync.activity.received_from_watch"), detail: sessionSummary(session), marksSuccess: true)
             return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
         } catch {
             failedImportCount += 1
-            lastMessage = String(format: String(localized: "sync.dive.watch_sync_error_format"), error.localizedDescription)
+            lastMessage = DIRIOSLocalizer.formatted("sync.dive.watch_sync_error_format", error.localizedDescription)
             Self.logger.error("Watch sync import failed: \(error.localizedDescription, privacy: .private)")
             return nil
         }
@@ -568,7 +568,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         WatchDiveSyncCodec.saveImportedSessionIDs(importedSessionIDs)
         importedSessionCount = importedSessionIDs.count
         removeConflict(conflict)
-        lastMessage = String(localized: "sync.conflict.resolved_watch_version")
+        lastMessage = DIRIOSLocalizer.string("sync.conflict.resolved_watch_version")
     }
 
     func resolveConflictKeepingLocal(_ conflict: SyncConflict) {
@@ -580,9 +580,9 @@ final class WatchSyncService: NSObject, ObservableObject {
             pushedToWatchSessionIDs.remove(conflict.id)
             savePushedToWatchSessionIDs()
             transferToWatch(local)
-            lastMessage = String(localized: "more.sync.keep_local_repushed")
+            lastMessage = DIRIOSLocalizer.string("more.sync.keep_local_repushed")
         } else {
-            lastMessage = String(localized: "more.sync.keep_local_only")
+            lastMessage = DIRIOSLocalizer.string("more.sync.keep_local_only")
         }
     }
 
@@ -643,7 +643,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         pendingOutboundTransfers.append(IOSWatchSyncPendingTransfer(session: normalizedSession))
         pendingOutboundTransfers = IOSWatchSyncPendingQueuePolicy.normalizedTransfers(pendingOutboundTransfers)
         savePendingOutboundTransfers()
-        recordActivity(title: String(localized: "sync.activity.pending_to_watch"), detail: sessionSummary(normalizedSession))
+        recordActivity(title: DIRIOSLocalizer.string("sync.activity.pending_to_watch"), detail: sessionSummary(normalizedSession))
     }
 
     private func removeOutboundTransfer(sessionID: UUID) {
@@ -658,14 +658,14 @@ final class WatchSyncService: NSObject, ObservableObject {
     func confirmSignedAck(sessionID: UUID, issuedAt: Date, signature: String) {
         guard WatchDiveSyncCodec.verifyAckSignature(signature, sessionID: sessionID, issuedAt: issuedAt) else {
             failedImportCount += 1
-            lastMessage = String(localized: "sync.watch.pending_ack")
+            lastMessage = DIRIOSLocalizer.string("sync.watch.pending_ack")
             return
         }
         guard pendingOutboundTransfers.contains(where: { $0.session.id == sessionID }) else { return }
         markPushedToWatch(sessionID)
         removeOutboundTransfer(sessionID: sessionID)
-        lastMessage = String(localized: "sync.dive.sent_to_watch")
-        recordActivity(title: String(localized: "sync.activity.sent_to_watch"), detail: sessionID.uuidString, marksSuccess: true)
+        lastMessage = DIRIOSLocalizer.string("sync.dive.sent_to_watch")
+        recordActivity(title: DIRIOSLocalizer.string("sync.activity.sent_to_watch"), detail: sessionID.uuidString, marksSuccess: true)
     }
 
     private func recordPendingAttempt(sessionID: UUID, issuedAt: Date) {
@@ -680,24 +680,24 @@ final class WatchSyncService: NSObject, ObservableObject {
         guard let index = pendingOutboundTransfers.firstIndex(where: { $0.session.id == sessionID }) else { return }
         if let error {
             failedImportCount += 1
-            lastMessage = String(format: String(localized: "sync.dive.queued_send_failed_format"), error.localizedDescription)
+            lastMessage = DIRIOSLocalizer.formatted("sync.dive.queued_send_failed_format", error.localizedDescription)
             return
         }
         pendingOutboundTransfers[index].userInfoDeliveredAt = Date()
-        lastMessage = String(localized: "sync.watch.pending_ack")
+        lastMessage = DIRIOSLocalizer.string("sync.watch.pending_ack")
         savePendingOutboundTransfers()
     }
 
     private func queueViaUserInfo(envelope: WatchDiveSyncCodec.PayloadEnvelope, sessionID: UUID) {
         let transfer = WCSession.default.transferUserInfo(envelope.message)
         pendingUserInfoTransferSessionIDs[ObjectIdentifier(transfer)] = sessionID
-        lastMessage = String(localized: "sync.dive.queued_transfer_user_info")
+        lastMessage = DIRIOSLocalizer.string("sync.dive.queued_transfer_user_info")
     }
 
     private func handleWatchImportAck(_ payload: [String: Any]) {
         guard let parsed = WatchDiveSyncCodec.parseImportAck(from: payload) else {
             failedImportCount += 1
-            lastMessage = String(localized: "sync.watch.pending_ack")
+            lastMessage = DIRIOSLocalizer.string("sync.watch.pending_ack")
             return
         }
         confirmSignedAck(sessionID: parsed.sessionID, issuedAt: parsed.issuedAt, signature: parsed.signature)
@@ -726,8 +726,8 @@ final class WatchSyncService: NSObject, ObservableObject {
                         )
                         guard signedOK else {
                             self.failedImportCount += 1
-                            self.lastMessage = String(localized: "sync.watch.pending_ack")
-                            self.recordActivity(title: String(localized: "sync.activity.pending_to_watch"), detail: self.sessionSummary(session))
+                            self.lastMessage = DIRIOSLocalizer.string("sync.watch.pending_ack")
+                            self.recordActivity(title: DIRIOSLocalizer.string("sync.activity.pending_to_watch"), detail: self.sessionSummary(session))
                             return
                         }
                         self.confirmSignedAck(
@@ -740,17 +740,17 @@ final class WatchSyncService: NSObject, ObservableObject {
                     Task { @MainActor in
                         guard let self else { return }
                         self.queueViaUserInfo(envelope: envelope, sessionID: session.id)
-                        self.recordActivity(title: String(localized: "sync.activity.queued_to_watch"), detail: self.sessionSummary(session))
+                        self.recordActivity(title: DIRIOSLocalizer.string("sync.activity.queued_to_watch"), detail: self.sessionSummary(session))
                     }
                 }
             } else {
                 queueViaUserInfo(envelope: envelope, sessionID: session.id)
-                recordActivity(title: String(localized: "sync.activity.queued_to_watch"), detail: sessionSummary(session))
+                recordActivity(title: DIRIOSLocalizer.string("sync.activity.queued_to_watch"), detail: sessionSummary(session))
             }
             Self.logger.info("Outbound session push queued id=\(session.id.uuidString, privacy: .public)")
         } catch {
             failedImportCount += 1
-            lastMessage = String(format: String(localized: "sync.dive.send_error_format"), error.localizedDescription)
+            lastMessage = DIRIOSLocalizer.formatted("sync.dive.send_error_format", error.localizedDescription)
             Self.logger.error("Outbound Watch push failed: \(error.localizedDescription, privacy: .private)")
         }
     }
@@ -850,7 +850,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         let started = Self.activityDateFormatter.string(from: session.startDate)
         let minutes = Int((session.durationSeconds / 60).rounded())
         return String(
-            format: String(localized: "sync.activity.session_summary"),
+            format: DIRIOSLocalizer.string("sync.activity.session_summary"),
             started,
             Formatters.one(session.maxDepthMeters),
             minutes
@@ -881,7 +881,7 @@ extension WatchSyncService: WCSessionDelegate {
             } else if activationState == .activated {
                 self.refreshCompanionSyncAvailabilityMessage(session: session)
             } else {
-                self.lastMessage = String(localized: "sync.status.pending_activation")
+                self.lastMessage = DIRIOSLocalizer.string("sync.status.pending_activation")
             }
             if activationState == .activated {
                 self.ingestCompanionContext(context)
@@ -998,7 +998,7 @@ extension WatchSyncService: WCSessionDelegate {
                     state: .failed,
                     errorMessage: error.localizedDescription
                 )
-                self.lastMessage = String(localized: "watch_photo_status_failed")
+                self.lastMessage = DIRIOSLocalizer.string("watch_photo_status_failed")
                 return
             }
             self.updateCompanionPhotoTransfer(
@@ -1006,7 +1006,7 @@ extension WatchSyncService: WCSessionDelegate {
                 fileName: fileName,
                 state: .deliveredToConnectivity
             )
-            self.lastMessage = String(localized: "watch_photo_status_delivered_pending")
+            self.lastMessage = DIRIOSLocalizer.string("watch_photo_status_delivered_pending")
             self.schedulePhotoImportVerification(photoID: photoID, expectedFileName: fileName)
         }
     }
@@ -1018,12 +1018,12 @@ extension WatchSyncService: WCSessionDelegate {
                 self.markUserInfoDelivered(sessionID: sessionID, error: error)
             } else if let error {
                 self.failedImportCount += 1
-                self.lastMessage = String(format: String(localized: "sync.dive.queued_send_failed_format"), error.localizedDescription)
+                self.lastMessage = DIRIOSLocalizer.formatted("sync.dive.queued_send_failed_format", error.localizedDescription)
             } else if let id = WatchDiveSyncCodec.sessionID(fromOutboundPayload: userInfoTransfer.userInfo) {
                 self.markUserInfoDelivered(sessionID: id, error: nil)
             } else {
                 self.failedImportCount += 1
-                self.lastMessage = String(localized: "sync.dive.completed_unknown_session")
+                self.lastMessage = DIRIOSLocalizer.string("sync.dive.completed_unknown_session")
             }
         }
     }

@@ -14,30 +14,30 @@ enum ManualDiveEditorSaveError: LocalizedError, Equatable {
 enum ManualDiveEditorValidation {
     static func depthOrderError(maxMeters: Double, avgMeters: Double) -> String? {
         guard maxMeters.isFinite, avgMeters.isFinite, maxMeters > 0, avgMeters > 0 else {
-            return String(localized: "manual_dive.validation.invalid_depth")
+            return DIRIOSLocalizer.string("manual_dive.validation.invalid_depth")
         }
         guard maxMeters >= avgMeters else {
-            return String(localized: "manual_dive.validation.depth_order")
+            return DIRIOSLocalizer.string("manual_dive.validation.depth_order")
         }
         return nil
     }
 
     static func ccrMetadataError(metadata: CCRLogbookMetadata, maxDepthMeters: Double) -> String? {
         guard metadata.lowSetpoint.isFinite, metadata.highSetpoint.isFinite else {
-            return String(localized: "manual_dive.ccr.validation.invalid_setpoint")
+            return DIRIOSLocalizer.string("manual_dive.ccr.validation.invalid_setpoint")
         }
         guard metadata.lowSetpoint > 0, metadata.highSetpoint > 0 else {
-            return String(localized: "manual_dive.ccr.validation.invalid_setpoint")
+            return DIRIOSLocalizer.string("manual_dive.ccr.validation.invalid_setpoint")
         }
         guard metadata.lowSetpoint < metadata.highSetpoint else {
-            return String(localized: "manual_dive.ccr.validation.low_ge_high")
+            return DIRIOSLocalizer.string("manual_dive.ccr.validation.low_ge_high")
         }
         guard metadata.setpointSwitchDepthMeters.isFinite, metadata.setpointSwitchDepthMeters >= 0 else {
-            return String(localized: "manual_dive.ccr.validation.invalid_switch_depth")
+            return DIRIOSLocalizer.string("manual_dive.ccr.validation.invalid_switch_depth")
         }
         if maxDepthMeters.isFinite, maxDepthMeters > 0,
            metadata.setpointSwitchDepthMeters > maxDepthMeters + 0.01 {
-            return String(localized: "manual_dive.ccr.validation.switch_deeper_than_max")
+            return DIRIOSLocalizer.string("manual_dive.ccr.validation.switch_deeper_than_max")
         }
         return nil
     }
@@ -102,7 +102,7 @@ enum ManualDiveEditorValidation {
             entryGPS: entryGPS,
             exitGPS: exitGPS,
             samples: samples,
-            siteName: siteName.isEmpty ? String(localized: "manual_dive.default_site") : siteName,
+            siteName: siteName.isEmpty ? DIRIOSLocalizer.string("manual_dive.default_site") : siteName,
             buddy: existing?.buddy,
             notes: notes.isEmpty ? nil : notes,
             gasLabel: gasLabel,

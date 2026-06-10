@@ -13,7 +13,7 @@ struct RatioDecoDisclaimerBanner: View {
         HStack(alignment: .top, spacing: 8) {
             Image(systemName: "info.circle.fill")
                 .foregroundStyle(DIRTheme.cyan)
-            Text(String(localized: "planner.ratio_deco.disclaimer"))
+            Text(DIRIOSLocalizer.string("planner.ratio_deco.disclaimer"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
@@ -22,7 +22,7 @@ struct RatioDecoDisclaimerBanner: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface2.opacity(0.55)))
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(String(localized: "planner.ratio_deco.disclaimer"))
+        .accessibilityLabel(DIRIOSLocalizer.string("planner.ratio_deco.disclaimer"))
     }
 }
 
@@ -32,10 +32,10 @@ struct PlannerDecompressionMethodPicker: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(String(localized: "planner.deco_method.header"))
+            Text(DIRIOSLocalizer.string("planner.deco_method.header"))
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(DIRTheme.muted)
-            Picker(String(localized: "planner.deco_method.header"), selection: $method) {
+            Picker(DIRIOSLocalizer.string("planner.deco_method.header"), selection: $method) {
                 ForEach(PlannerDecompressionMethod.allCases) { item in
                     Text(item.localizedTitle).tag(item)
                 }
@@ -44,11 +44,11 @@ struct PlannerDecompressionMethodPicker: View {
             .tint(DIRTheme.cyan)
             .disabled(mode == .base)
             if mode == .base {
-                Text(String(localized: "planner.ratio_deco.validation.unavailable_base"))
+                Text(DIRIOSLocalizer.string("planner.ratio_deco.validation.unavailable_base"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.yellow)
             } else if method != .buhlmann {
-                Text(String(localized: "planner.ratio_deco.subtitle"))
+                Text(DIRIOSLocalizer.string("planner.ratio_deco.subtitle"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)
             }
@@ -69,8 +69,8 @@ struct RatioDecoPresetCard: View {
     }
 
     var body: some View {
-        DIRCard(String(localized: "planner.ratio_deco.profile.header"), icon: "slider.horizontal.3", accent: DIRTheme.orange) {
-            Picker(String(localized: "planner.ratio_deco.profile.header"), selection: presetIDBinding) {
+        DIRCard(DIRIOSLocalizer.string("planner.ratio_deco.profile.header"), icon: "slider.horizontal.3", accent: DIRTheme.orange) {
+            Picker(DIRIOSLocalizer.string("planner.ratio_deco.profile.header"), selection: presetIDBinding) {
                 ForEach(selectablePresets) { preset in
                     Text(preset.name).tag(preset.id)
                 }
@@ -84,12 +84,12 @@ struct RatioDecoPresetCard: View {
             }
 
             HStack(spacing: 8) {
-                Button(String(localized: "planner.ratio_deco.save_preset")) {
+                Button(DIRIOSLocalizer.string("planner.ratio_deco.save_preset")) {
                     presetDraft = store.ratioDecoPreset
                     if presetDraft.isBuiltIn {
                         presetDraft = RatioDecoPreset.customDefault
                         presetDraft.id = UUID()
-                        presetDraft.name = String(localized: "planner.ratio_deco.preset.custom")
+                        presetDraft.name = DIRIOSLocalizer.string("planner.ratio_deco.preset.custom")
                     }
                     showSaveSheet = true
                 }
@@ -98,7 +98,7 @@ struct RatioDecoPresetCard: View {
 
                 if !store.ratioDecoPreset.isBuiltIn,
                    store.savedRatioDecoPresets.contains(where: { $0.id == store.ratioDecoPreset.id }) {
-                    Button(String(localized: "planner.ratio_deco.delete_preset"), role: .destructive) {
+                    Button(DIRIOSLocalizer.string("planner.ratio_deco.delete_preset"), role: .destructive) {
                         store.deleteRatioDecoPreset(id: store.ratioDecoPreset.id)
                     }
                     .buttonStyle(.bordered)
@@ -108,20 +108,20 @@ struct RatioDecoPresetCard: View {
         .sheet(isPresented: $showSaveSheet) {
             NavigationStack {
                 Form {
-                    Section(String(localized: "planner.ratio_deco.save_preset")) {
-                        TextField(String(localized: "planner.ratio_deco.preset.name"), text: $presetDraft.name)
+                    Section(DIRIOSLocalizer.string("planner.ratio_deco.save_preset")) {
+                        TextField(DIRIOSLocalizer.string("planner.ratio_deco.preset.name"), text: $presetDraft.name)
                     }
                     Section {
-                        Button(String(localized: "planner.ratio_deco.save_preset")) {
+                        Button(DIRIOSLocalizer.string("planner.ratio_deco.save_preset")) {
                             store.saveRatioDecoPreset(presetDraft)
                             showSaveSheet = false
                         }
                     }
                 }
-                .navigationTitle(String(localized: "planner.ratio_deco.edit_preset"))
+                .navigationTitle(DIRIOSLocalizer.string("planner.ratio_deco.edit_preset"))
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
-                        Button(String(localized: "pdf.export.cancel")) { showSaveSheet = false }
+                        Button(DIRIOSLocalizer.string("pdf.export.cancel")) { showSaveSheet = false }
                     }
                 }
             }
@@ -153,7 +153,7 @@ struct RatioDecoPresetCard: View {
 
     private var customPresetFields: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Picker(String(localized: "planner.ratio_deco.ratio.header"), selection: presetBinding(\.ratioType)) {
+            Picker(DIRIOSLocalizer.string("planner.ratio_deco.ratio.header"), selection: presetBinding(\.ratioType)) {
                 ForEach(RatioDecoRatioType.allCases) { type in
                     Text(type.localizedTitle).tag(type)
                 }
@@ -168,7 +168,7 @@ struct RatioDecoPresetCard: View {
                 ) {
                     Text(
                         String(
-                            format: String(localized: "planner.ratio_deco.ratio.custom_value"),
+                            format: DIRIOSLocalizer.string("planner.ratio_deco.ratio.custom_value"),
                             Formatters.one(store.ratioDecoPreset.customRatioDenominator)
                         )
                     )
@@ -177,13 +177,13 @@ struct RatioDecoPresetCard: View {
             }
 
             depthStepper(
-                title: String(localized: "planner.ratio_deco.first_stop"),
+                title: DIRIOSLocalizer.string("planner.ratio_deco.first_stop"),
                 value: presetBinding(\.firstStopDepthMeters),
                 range: 3...60,
                 step: store.ratioDecoPreset.stopStepMeters
             )
             depthStepper(
-                title: String(localized: "planner.ratio_deco.stop_step"),
+                title: DIRIOSLocalizer.string("planner.ratio_deco.stop_step"),
                 value: presetBinding(\.stopStepMeters),
                 range: 3...9,
                 step: 3
@@ -195,18 +195,18 @@ struct RatioDecoPresetCard: View {
             ) {
                 Text(
                     String(
-                        format: String(localized: "planner.ratio_deco.minimum_stop_value"),
+                        format: DIRIOSLocalizer.string("planner.ratio_deco.minimum_stop_value"),
                         Int(store.ratioDecoPreset.minimumStopMinutes.rounded())
                     )
                 )
                 .font(.caption)
             }
-            Picker(String(localized: "planner.ratio_deco.distribution.header"), selection: presetBinding(\.distributionMode)) {
+            Picker(DIRIOSLocalizer.string("planner.ratio_deco.distribution.header"), selection: presetBinding(\.distributionMode)) {
                 ForEach(RatioDecoDistributionMode.allCases) { mode in
                     Text(mode.localizedTitle).tag(mode)
                 }
             }
-            Toggle(String(localized: "planner.ratio_deco.deep_stops"), isOn: presetBinding(\.deepStopsEnabled))
+            Toggle(DIRIOSLocalizer.string("planner.ratio_deco.deep_stops"), isOn: presetBinding(\.deepStopsEnabled))
                 .tint(DIRTheme.cyan)
         }
     }
@@ -263,7 +263,7 @@ struct RatioDecoComparisonSection: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(color)
                 if !validation.isBuhlmannCompatible {
-                    Text(String(localized: "planner.ratio_deco.validation.not_validated_plan"))
+                    Text(DIRIOSLocalizer.string("planner.ratio_deco.validation.not_validated_plan"))
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(RatioDecoPresentationColors.violation)
                         .fixedSize(horizontal: false, vertical: true)
@@ -285,19 +285,19 @@ struct RatioDecoComparisonSection: View {
     private func summaryCards(bundle: RatioDecoPlanningBundle) -> some View {
         HStack(spacing: 0) {
             DIRMetricTile(
-                title: String(localized: "planner.ratio_deco.summary.buhlmann_tts"),
+                title: DIRIOSLocalizer.string("planner.ratio_deco.summary.buhlmann_tts"),
                 value: "\(store.plan.ttsMinutes)",
                 unit: "min"
             )
             Divider().overlay(DIRTheme.hairline)
             DIRMetricTile(
-                title: String(localized: "planner.ratio_deco.summary.ratio_tts"),
+                title: DIRIOSLocalizer.string("planner.ratio_deco.summary.ratio_tts"),
                 value: "\(bundle.schedule.ttsMinutes)",
                 unit: "min"
             )
             Divider().overlay(DIRTheme.hairline)
             DIRMetricTile(
-                title: String(localized: "planner.ratio_deco.summary.tts_difference"),
+                title: DIRIOSLocalizer.string("planner.ratio_deco.summary.tts_difference"),
                 value: "\(bundle.schedule.ttsMinutes - store.plan.ttsMinutes)",
                 unit: "min",
                 color: bundle.schedule.ttsMinutes > store.plan.ttsMinutes ? DIRTheme.yellow : DIRTheme.green
@@ -308,12 +308,12 @@ struct RatioDecoComparisonSection: View {
     private func comparisonTables(bundle: RatioDecoPlanningBundle) -> some View {
         Group {
             if store.decompressionMethod == .comparison {
-                DIRCard(String(localized: "planner.ratio_deco.comparison.title"), icon: "arrow.left.arrow.right", accent: DIRTheme.cyan) {
-                    Text(String(localized: "planner.ratio_deco.comparison.buhlmann"))
+                DIRCard(DIRIOSLocalizer.string("planner.ratio_deco.comparison.title"), icon: "arrow.left.arrow.right", accent: DIRTheme.cyan) {
+                    Text(DIRIOSLocalizer.string("planner.ratio_deco.comparison.buhlmann"))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(RatioDecoPresentationColors.buhlmann)
                     buhlmannStopTable
-                    Text(String(localized: "planner.ratio_deco.comparison.ratio_deco"))
+                    Text(DIRIOSLocalizer.string("planner.ratio_deco.comparison.ratio_deco"))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(RatioDecoPresentationColors.ratioDeco)
                         .padding(.top, 8)
@@ -324,10 +324,10 @@ struct RatioDecoComparisonSection: View {
     }
 
     private func ratioDecoScheduleCard(_ schedule: RatioDecoSchedule) -> some View {
-        DIRCard(String(localized: "planner.ratio_deco.schedule.title"), icon: "timer", accent: DIRTheme.orange) {
+        DIRCard(DIRIOSLocalizer.string("planner.ratio_deco.schedule.title"), icon: "timer", accent: DIRTheme.orange) {
             Text(
                 String(
-                    format: String(localized: "planner.ratio_deco.preset_line"),
+                    format: DIRIOSLocalizer.string("planner.ratio_deco.preset_line"),
                     schedule.presetName
                 )
             )
@@ -380,7 +380,7 @@ struct RatioDecoComparisonSection: View {
         VStack(spacing: 0) {
             comparisonHeader
             if rows.isEmpty {
-                Text(String(localized: "planner.export.no_deco_stops"))
+                Text(DIRIOSLocalizer.string("planner.export.no_deco_stops"))
                     .font(.caption)
                     .foregroundStyle(DIRTheme.muted)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -408,10 +408,10 @@ struct RatioDecoComparisonSection: View {
 
     private var comparisonHeader: some View {
         HStack(spacing: 8) {
-            Text(String(localized: "planner.table.depth")).frame(maxWidth: .infinity, alignment: .leading)
-            Text(String(localized: "planner.table.time")).frame(width: 56, alignment: .trailing)
-            Text(String(localized: "planner.table.gas")).frame(maxWidth: .infinity, alignment: .leading)
-            Text(String(localized: "planner.table.runtime")).frame(width: 52, alignment: .trailing)
+            Text(DIRIOSLocalizer.string("planner.table.depth")).frame(maxWidth: .infinity, alignment: .leading)
+            Text(DIRIOSLocalizer.string("planner.table.time")).frame(width: 56, alignment: .trailing)
+            Text(DIRIOSLocalizer.string("planner.table.gas")).frame(maxWidth: .infinity, alignment: .leading)
+            Text(DIRIOSLocalizer.string("planner.table.runtime")).frame(width: 52, alignment: .trailing)
         }
         .font(.caption2.weight(.semibold))
         .foregroundStyle(DIRTheme.muted)
@@ -434,15 +434,15 @@ struct RatioDecoComparisonSection: View {
     private func localizedValidationWarning(_ warning: RatioDecoValidationWarning) -> String {
         switch warning {
         case .unavailableInBaseMode:
-            return String(localized: "planner.ratio_deco.validation.unavailable_base")
+            return DIRIOSLocalizer.string("planner.ratio_deco.validation.unavailable_base")
         case .unavailableInCCRMode:
-            return String(localized: "planner.ratio_deco.unavailable_ccr")
+            return DIRIOSLocalizer.string("planner.ratio_deco.unavailable_ccr")
         case .ceilingViolation:
-            return String(localized: "planner.ratio_deco.validation.ceiling")
+            return DIRIOSLocalizer.string("planner.ratio_deco.validation.ceiling")
         case .modExceeded:
-            return String(localized: "planner.ratio_deco.validation.mod")
+            return DIRIOSLocalizer.string("planner.ratio_deco.validation.mod")
         case .decoDepthLimitExceeded:
-            return String(localized: "planner.mode.deco.depth_limit.message")
+            return DIRIOSLocalizer.string("planner.mode.deco.depth_limit.message")
         }
     }
 }
@@ -462,21 +462,21 @@ struct RatioDecoOverlayProfileChart: View {
 
     private var yAxisLabel: String {
         unitPreference == .metric
-            ? String(localized: "planner.charts.depth_axis_unit_metric")
-            : String(localized: "planner.charts.depth_axis_unit_imperial")
+            ? DIRIOSLocalizer.string("planner.charts.depth_axis_unit_metric")
+            : DIRIOSLocalizer.string("planner.charts.depth_axis_unit_imperial")
     }
 
     var body: some View {
-        DIRCard(String(localized: "planner.ratio_deco.overlay.title"), icon: "chart.xyaxis.line", accent: DIRTheme.cyan) {
+        DIRCard(DIRIOSLocalizer.string("planner.ratio_deco.overlay.title"), icon: "chart.xyaxis.line", accent: DIRTheme.cyan) {
             if buhlmannPoints.isEmpty && ratioDecoPoints.isEmpty {
-                Text(String(localized: "planner.charts.depth_profile_empty"))
+                Text(DIRIOSLocalizer.string("planner.charts.depth_profile_empty"))
                     .font(.caption)
                     .foregroundStyle(DIRTheme.muted)
             } else {
                 Chart {
                     ForEach(buhlmannPoints) { point in
                         LineMark(
-                            x: .value(String(localized: "planner.buhlmann.axis.time"), point.elapsedMinutes),
+                            x: .value(DIRIOSLocalizer.string("planner.buhlmann.axis.time"), point.elapsedMinutes),
                             y: .value(yAxisLabel, displayDepth(point.depthMeters)),
                             series: .value("Series", "Bühlmann")
                         )
@@ -485,7 +485,7 @@ struct RatioDecoOverlayProfileChart: View {
                     }
                     ForEach(ratioDecoPoints) { point in
                         LineMark(
-                            x: .value(String(localized: "planner.buhlmann.axis.time"), point.elapsedMinutes),
+                            x: .value(DIRIOSLocalizer.string("planner.buhlmann.axis.time"), point.elapsedMinutes),
                             y: .value(yAxisLabel, displayDepth(point.depthMeters)),
                             series: .value("Series", "Ratio Deco")
                         )
@@ -497,19 +497,19 @@ struct RatioDecoOverlayProfileChart: View {
                     "Bühlmann": RatioDecoPresentationColors.buhlmann,
                     "Ratio Deco": RatioDecoPresentationColors.ratioDeco
                 ])
-                .chartXAxisLabel(String(localized: "planner.buhlmann.axis.time"))
+                .chartXAxisLabel(DIRIOSLocalizer.string("planner.buhlmann.axis.time"))
                 .chartYAxisLabel(yAxisLabel)
                 .frame(minHeight: 160, maxHeight: 280)
                 HStack(spacing: 12) {
-                    legendItem(color: RatioDecoPresentationColors.buhlmann, label: String(localized: "planner.deco_method.buhlmann"))
-                    legendItem(color: RatioDecoPresentationColors.ratioDeco, label: String(localized: "planner.deco_method.ratio_deco"))
+                    legendItem(color: RatioDecoPresentationColors.buhlmann, label: DIRIOSLocalizer.string("planner.deco_method.buhlmann"))
+                    legendItem(color: RatioDecoPresentationColors.ratioDeco, label: DIRIOSLocalizer.string("planner.deco_method.ratio_deco"))
                 }
                 .font(.caption2)
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(accessibilitySummary ?? String(localized: "planner.ratio_deco.overlay.title"))
-        .accessibilityHint(String(localized: "planner.ratio_deco.overlay.a11y.hint"))
+        .accessibilityLabel(accessibilitySummary ?? DIRIOSLocalizer.string("planner.ratio_deco.overlay.title"))
+        .accessibilityHint(DIRIOSLocalizer.string("planner.ratio_deco.overlay.a11y.hint"))
     }
 
     private func displayDepth(_ meters: Double) -> Double {

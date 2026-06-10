@@ -620,8 +620,8 @@ enum PlannerUserFacingCopy {
             surfacePressureBar: environment.surfacePressureBar,
             waterDensityKgPerM3: environment.waterDensityKgPerM3,
             statusMessage: isDefault
-                ? String(localized: "planner.environment.default.message")
-                : String(localized: "planner.environment.active.message"),
+                ? DIRIOSLocalizer.string("planner.environment.default.message")
+                : DIRIOSLocalizer.string("planner.environment.active.message"),
             correctiveHint: nil
         )
     }
@@ -631,11 +631,11 @@ enum PlannerUserFacingCopy {
         let hint: String
         switch error {
         case .invalidAltitude:
-            message = String(localized: "planner.environment.invalid_altitude.message")
-            hint = String(localized: "planner.environment.invalid_altitude.hint")
+            message = DIRIOSLocalizer.string("planner.environment.invalid_altitude.message")
+            hint = DIRIOSLocalizer.string("planner.environment.invalid_altitude.hint")
         case .invalidSalinity:
-            message = String(localized: "planner.environment.invalid_salinity.message")
-            hint = String(localized: "planner.environment.invalid_salinity.hint")
+            message = DIRIOSLocalizer.string("planner.environment.invalid_salinity.message")
+            hint = DIRIOSLocalizer.string("planner.environment.invalid_salinity.hint")
         }
         return PlannerEnvironmentSummary(
             isActive: false,
@@ -662,11 +662,11 @@ enum PlannerUserFacingCopy {
         severity: PlannerWarningSeverity,
         arguments: [CVarArg] = []
     ) -> PlannerUserFacingMessage {
-        let title = String(localized: String.LocalizationValue(titleKey))
+        let title = DIRIOSLocalizer.string(titleKey)
         let message = arguments.isEmpty
-            ? String(localized: String.LocalizationValue(messageKey))
-            : String(format: String(localized: String.LocalizationValue(messageKey)), arguments: arguments)
-        let hint = hintKey.map { String(localized: String.LocalizationValue($0)) }
+            ? DIRIOSLocalizer.string(messageKey)
+            : DIRIOSLocalizer.formatted(messageKey, arguments: arguments)
+        let hint = hintKey.map { DIRIOSLocalizer.string($0) }
         return PlannerUserFacingMessage(id: id, title: title, message: message, correctiveHint: hint, severity: severity)
     }
 }
@@ -702,9 +702,9 @@ enum PlannerPresentationSupport {
         presentation = PlannerUserFacingCopy.header(for: kind)
         var subtitle = presentation.message
         if kind == .repetitiveReferencePlan, !stops.isEmpty {
-            subtitle = String(localized: "planner.header.repetitive.deco_subtitle")
+            subtitle = DIRIOSLocalizer.string("planner.header.repetitive.deco_subtitle")
         } else if kind == .environmentAdjustedReferencePlan, !stops.isEmpty {
-            subtitle = String(localized: "planner.header.environment.deco_subtitle")
+            subtitle = DIRIOSLocalizer.string("planner.header.environment.deco_subtitle")
         } else if kind == .noDecoReference || kind == .decoRequiredReference {
             subtitle = presentation.message
         }

@@ -24,7 +24,7 @@ struct CCRPlannerView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         header
                         plannerSafetySection
-                        DIRWarningBox(text: String(localized: "ccr.safety.disclaimer"))
+                        DIRWarningBox(text: DIRIOSLocalizer.string("ccr.safety.disclaimer"))
                         profileCard
                         setpointCard
                         diluentCard
@@ -46,7 +46,7 @@ struct CCRPlannerView: View {
                     Button {
                         store.returnToPlannerModeSelection()
                     } label: {
-                        Label(String(localized: "planner.mode_selection.back"), systemImage: "chevron.left")
+                        Label(DIRIOSLocalizer.string("planner.mode_selection.back"), systemImage: "chevron.left")
                             .foregroundStyle(DIRTheme.cyan)
                     }
                 }
@@ -58,20 +58,20 @@ struct CCRPlannerView: View {
                     .environmentObject(equipment)
             }
             .confirmationDialog(
-                String(localized: "checklist_planner.sync.import_prompt"),
+                DIRIOSLocalizer.string("checklist_planner.sync.import_prompt"),
                 isPresented: $showChecklistImportPrompt,
                 titleVisibility: .visible
             ) {
-                Button(String(localized: "checklist_planner.sync.import_all")) {
+                Button(DIRIOSLocalizer.string("checklist_planner.sync.import_all")) {
                     CCRChecklistImportCoordinator.importAll(
                         checklist: equipment.profile.checklistItems,
                         to: &store.ccrInput
                     )
                 }
-                Button(String(localized: "checklist_planner.sync.choose_import")) {
+                Button(DIRIOSLocalizer.string("checklist_planner.sync.choose_import")) {
                     openCCRChecklistImportSheet()
                 }
-                Button(String(localized: "checklist_planner.sync.cancel"), role: .cancel) {}
+                Button(DIRIOSLocalizer.string("checklist_planner.sync.cancel"), role: .cancel) {}
             }
             .sheet(isPresented: $showChecklistImportSheet) {
                 CCRChecklistImportSheet(
@@ -106,9 +106,9 @@ struct CCRPlannerView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 7) {
-            Text(String(localized: "planner.mode.ccr"))
+            Text(DIRIOSLocalizer.string("planner.mode.ccr"))
                 .dirScreenTitleStyle()
-            Text(String(localized: "ccr.planner.subtitle"))
+            Text(DIRIOSLocalizer.string("ccr.planner.subtitle"))
                 .dirScreenSubtitleStyle()
         }
     }
@@ -116,50 +116,50 @@ struct CCRPlannerView: View {
     private var plannerSafetySection: some View {
         Group {
             if !plannerSafetyAcknowledged {
-                DIRWarningBox(text: String(localized: "planner.safety.ack.required"))
+                DIRWarningBox(text: DIRIOSLocalizer.string("planner.safety.ack.required"))
             }
         }
     }
 
     private var profileCard: some View {
-        DIRCard(String(localized: "planner.profile.header"), icon: "arrow.down.to.line", accent: DIRTheme.cyan) {
+        DIRCard(DIRIOSLocalizer.string("planner.profile.header"), icon: "arrow.down.to.line", accent: DIRTheme.cyan) {
             VStack(spacing: 10) {
-                depthRow(title: String(localized: "planner.field.max_depth"), value: $store.ccrInput.maxDepthMeters, range: 5...120)
-                depthRow(title: String(localized: "planner.field.avg_depth"), value: $store.ccrInput.averageDepthMeters, range: 5...120)
-                Text(String(localized: "ccr.avg_depth.reference_only"))
+                depthRow(title: DIRIOSLocalizer.string("planner.field.max_depth"), value: $store.ccrInput.maxDepthMeters, range: 5...120)
+                depthRow(title: DIRIOSLocalizer.string("planner.field.avg_depth"), value: $store.ccrInput.averageDepthMeters, range: 5...120)
+                Text(DIRIOSLocalizer.string("ccr.avg_depth.reference_only"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
-                minutesRow(title: String(localized: "planner.field.bottom_time"), value: $store.ccrInput.bottomTimeMinutes, range: 1...180)
-                TextField(String(localized: "ccr.rebreather_model"), text: $store.ccrInput.rebreatherModel)
+                minutesRow(title: DIRIOSLocalizer.string("planner.field.bottom_time"), value: $store.ccrInput.bottomTimeMinutes, range: 1...180)
+                TextField(DIRIOSLocalizer.string("ccr.rebreather_model"), text: $store.ccrInput.rebreatherModel)
                     .textFieldStyle(.roundedBorder)
             }
         }
     }
 
     private var setpointCard: some View {
-        DIRCard(String(localized: "ccr.setpoint.header"), icon: "lungs", accent: DIRTheme.orange) {
+        DIRCard(DIRIOSLocalizer.string("ccr.setpoint.header"), icon: "lungs", accent: DIRTheme.orange) {
             VStack(spacing: 10) {
-                setpointRow(title: String(localized: "ccr.setpoint.low"), value: $store.ccrInput.setpointProfile.lowSetpoint)
-                setpointRow(title: String(localized: "ccr.setpoint.high"), value: $store.ccrInput.setpointProfile.highSetpoint)
+                setpointRow(title: DIRIOSLocalizer.string("ccr.setpoint.low"), value: $store.ccrInput.setpointProfile.lowSetpoint)
+                setpointRow(title: DIRIOSLocalizer.string("ccr.setpoint.high"), value: $store.ccrInput.setpointProfile.highSetpoint)
                 depthRow(
-                    title: String(localized: "ccr.setpoint.switch_depth"),
+                    title: DIRIOSLocalizer.string("ccr.setpoint.switch_depth"),
                     value: $store.ccrInput.setpointProfile.switchDepthMeters,
                     range: 0...60
                 )
-                Picker(String(localized: "ccr.setpoint.mode"), selection: $store.ccrInput.setpointProfile.mode) {
+                Picker(DIRIOSLocalizer.string("ccr.setpoint.mode"), selection: $store.ccrInput.setpointProfile.mode) {
                     ForEach(CCRSetpointMode.allCases) { mode in
                         Text(mode.localizedTitle).tag(mode)
                     }
                 }
                 .pickerStyle(.segmented)
                 if store.ccrInput.setpointProfile.mode == .manual {
-                    Toggle(String(localized: "ccr.setpoint.shallow_ascent.toggle"), isOn: $store.ccrInput.setpointProfile.useLowSetpointOnShallowAscent)
+                    Toggle(DIRIOSLocalizer.string("ccr.setpoint.shallow_ascent.toggle"), isOn: $store.ccrInput.setpointProfile.useLowSetpointOnShallowAscent)
                         .font(.caption)
                         .tint(DIRTheme.orange)
                     if store.ccrInput.setpointProfile.useLowSetpointOnShallowAscent {
                         depthRow(
-                            title: String(localized: "ccr.setpoint.shallow_ascent"),
+                            title: DIRIOSLocalizer.string("ccr.setpoint.shallow_ascent"),
                             value: $store.ccrInput.setpointProfile.shallowAscentSetpointDepthMeters,
                             range: 0...30
                         )
@@ -170,13 +170,13 @@ struct CCRPlannerView: View {
     }
 
     private var diluentCard: some View {
-        DIRCard(String(localized: "ccr.diluent"), icon: "wind", accent: DIRTheme.cyan) {
+        DIRCard(DIRIOSLocalizer.string("ccr.diluent"), icon: "wind", accent: DIRTheme.cyan) {
             VStack(spacing: 10) {
                 if !ccrChecklistGasItems.isEmpty {
                     Button {
                         showChecklistImportPrompt = true
                     } label: {
-                        Text(String(localized: "checklist_planner.sync.use_checklist"))
+                        Text(DIRIOSLocalizer.string("checklist_planner.sync.use_checklist"))
                             .font(.callout.weight(.semibold))
                             .foregroundStyle(DIRTheme.cyan)
                             .frame(maxWidth: .infinity)
@@ -184,7 +184,7 @@ struct CCRPlannerView: View {
                             .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.7), lineWidth: 1))
                     }
                     .buttonStyle(.plain)
-                    Text(String(localized: "ccr.checklist.import.disclaimer"))
+                    Text(DIRIOSLocalizer.string("ccr.checklist.import.disclaimer"))
                         .font(.caption2)
                         .foregroundStyle(DIRTheme.muted)
                         .fixedSize(horizontal: false, vertical: true)
@@ -196,16 +196,16 @@ struct CCRPlannerView: View {
     }
 
     private var bailoutCard: some View {
-        DIRCard(String(localized: "ccr.bailout"), icon: "exclamationmark.triangle", accent: DIRTheme.yellow) {
+        DIRCard(DIRIOSLocalizer.string("ccr.bailout"), icon: "exclamationmark.triangle", accent: DIRTheme.yellow) {
             CCRBailoutListEditorView(bailoutGases: $store.ccrInput.bailoutGases)
         }
     }
 
     private var gfCard: some View {
-        DIRCard(String(localized: "planner.gf.header"), icon: "slider.horizontal.3", accent: DIRTheme.yellow) {
+        DIRCard(DIRIOSLocalizer.string("planner.gf.header"), icon: "slider.horizontal.3", accent: DIRTheme.yellow) {
             HStack {
-                gfField(title: String(localized: "ccr.gf.low.label"), value: $store.ccrInput.gfLow)
-                gfField(title: String(localized: "ccr.gf.high.label"), value: $store.ccrInput.gfHigh)
+                gfField(title: DIRIOSLocalizer.string("ccr.gf.low.label"), value: $store.ccrInput.gfLow)
+                gfField(title: DIRIOSLocalizer.string("ccr.gf.high.label"), value: $store.ccrInput.gfHigh)
             }
         }
     }
@@ -213,7 +213,7 @@ struct CCRPlannerView: View {
     private var warningsCard: some View {
         Group {
             if !store.ccrPlan.validationResult.isValid {
-                DIRCard(String(localized: "ccr.validation.header"), icon: "exclamationmark.circle", accent: DIRTheme.orange) {
+                DIRCard(DIRIOSLocalizer.string("ccr.validation.header"), icon: "exclamationmark.circle", accent: DIRTheme.orange) {
                     ForEach(Array(store.ccrPlan.validationResult.issues.enumerated()), id: \.offset) { _, issue in
                         Text(issue.localizedMessage)
                             .font(.caption)
@@ -235,7 +235,7 @@ struct CCRPlannerView: View {
             )
             showPlan = planIsValid
         } label: {
-            Text(String(localized: "planner.calculate"))
+            Text(DIRIOSLocalizer.string("planner.calculate"))
                 .font(.callout.weight(.semibold))
                 .foregroundStyle(.black)
                 .frame(maxWidth: .infinity)
@@ -243,7 +243,7 @@ struct CCRPlannerView: View {
                 .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.cyan))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(String(localized: "planner.calculate"))
+        .accessibilityLabel(DIRIOSLocalizer.string("planner.calculate"))
     }
 
     private func depthRow(title: String, value: Binding<Double>, range: ClosedRange<Double>) -> some View {
@@ -298,7 +298,7 @@ struct CCRDiluentEditorView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            Picker(String(localized: "gas.mix.header"), selection: diluentMixKindBinding) {
+            Picker(DIRIOSLocalizer.string("gas.mix.header"), selection: diluentMixKindBinding) {
                 ForEach([GasMixKind.air, .ean, .trimix], id: \.self) { kind in
                     Text(kind.localizedTitle).tag(kind)
                 }
@@ -307,7 +307,7 @@ struct CCRDiluentEditorView: View {
 
             if diluent.mixKind == .ean || diluent.mixKind == .trimix {
                 Stepper(
-                    String(format: String(localized: "gas.oxygen.percent_stepper"), diluent.oxygenPercent),
+                    DIRIOSLocalizer.formatted("gas.oxygen.percent_stepper", diluent.oxygenPercent),
                     value: $diluent.oxygenPercent,
                     in: 10...100,
                     step: 1
@@ -315,7 +315,7 @@ struct CCRDiluentEditorView: View {
             }
             if diluent.mixKind == .trimix {
                 Stepper(
-                    String(format: String(localized: "gas.helium.percent_stepper"), diluent.heliumPercent),
+                    DIRIOSLocalizer.formatted("gas.helium.percent_stepper", diluent.heliumPercent),
                     value: $diluent.heliumPercent,
                     in: 0...90,
                     step: 1
@@ -335,7 +335,7 @@ struct CCRBailoutListEditorView: View {
         VStack(spacing: 8) {
             ForEach($bailoutGases) { $gas in
                 VStack(alignment: .leading, spacing: 6) {
-                    Picker(String(localized: "gas.mix.header"), selection: $gas.mixKind) {
+                    Picker(DIRIOSLocalizer.string("gas.mix.header"), selection: $gas.mixKind) {
                         ForEach(GasMixKind.allCases, id: \.self) { kind in
                             Text(kind.plannerPickerTitle).tag(kind)
                         }
@@ -343,7 +343,7 @@ struct CCRBailoutListEditorView: View {
                     .pickerStyle(.menu)
                     if gas.mixKind != .air {
                         Stepper(
-                            String(format: String(localized: "gas.oxygen.percent_stepper"), gas.oxygenPercent),
+                            DIRIOSLocalizer.formatted("gas.oxygen.percent_stepper", gas.oxygenPercent),
                             value: $gas.oxygenPercent,
                             in: 16...100,
                             step: 1
@@ -351,19 +351,19 @@ struct CCRBailoutListEditorView: View {
                     }
                     if gas.mixKind == .trimix {
                         Stepper(
-                            String(format: String(localized: "gas.helium.percent_stepper"), gas.heliumPercent),
+                            DIRIOSLocalizer.formatted("gas.helium.percent_stepper", gas.heliumPercent),
                             value: $gas.heliumPercent,
                             in: 0...90,
                             step: 1
                         )
                     }
-                    Picker(String(localized: "equipment.tank_size"), selection: $gas.tankSize) {
+                    Picker(DIRIOSLocalizer.string("equipment.tank_size"), selection: $gas.tankSize) {
                         ForEach(TankSize.allCases) { size in
                             Text(size.rawValue).tag(size)
                         }
                     }
                     Stepper(
-                        String(format: String(localized: "ccr.bailout.switch_depth"), Int(gas.switchDepthMeters)),
+                        DIRIOSLocalizer.formatted("ccr.bailout.switch_depth", Int(gas.switchDepthMeters)),
                         value: $gas.switchDepthMeters,
                         in: 0...120,
                         step: 3
@@ -372,12 +372,12 @@ struct CCRBailoutListEditorView: View {
                 .padding(8)
                 .background(RoundedRectangle(cornerRadius: 8).fill(DIRTheme.surface2))
             }
-            Button(String(localized: "ccr.bailout.add")) {
+            Button(DIRIOSLocalizer.string("ccr.bailout.add")) {
                 bailoutGases.append(CCRBailoutGas())
             }
             .foregroundStyle(DIRTheme.cyan)
             if bailoutGases.count > 1 {
-                Button(String(localized: "ccr.bailout.remove_last"), role: .destructive) {
+                Button(DIRIOSLocalizer.string("ccr.bailout.remove_last"), role: .destructive) {
                     _ = bailoutGases.popLast()
                 }
             }

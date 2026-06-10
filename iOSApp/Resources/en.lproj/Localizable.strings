@@ -1249,6 +1249,12 @@
 "more.reviewer.demo_logbook" = "Demo logbook";
 "more.reviewer.demo_logbook_hint" = "Loads 5 demo dives for App Store review.";
 "more.language.title" = "Language";
+"language.option.system" = "System Language";
+"language.option.italian" = "Italian";
+"language.option.english" = "English";
+"language.option.system.detail" = "Follows iPhone language";
+"language.option.italian.detail" = "Forces Italian interface";
+"language.option.english.detail" = "Forces English interface";
 "more.sync.queue_count" = "Pending Watch queue";
 "more.sync.last_success" = "Last successful Watch sync";
 "more.sync.last_success.none" = "None yet";

@@ -67,7 +67,7 @@ enum PressureDisplayMath {
         } else {
             displayValue = "\(Formatters.one(consumed)) bar"
         }
-        return String(format: String(localized: "detail.gas.consumed_format"), displayValue)
+        return DIRIOSLocalizer.formatted("detail.gas.consumed_format", displayValue)
     }
 
     static func inferLegacyPressureUnit(entryText: String, exitText: String) -> PressureUnit? {

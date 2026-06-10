@@ -224,6 +224,8 @@ targets:
       - iOSApp/Utils/DiveSessionProfileDivergence.swift
       - iOSApp/Utils/DiveSessionCollectionIntegrity.swift
       - iOSApp/Utils/GasMixValidator.swift
+      - iOSApp/Utils/DIRIOSLocalizer.swift
+      - iOSApp/App/DIRIOSAppLanguage.swift
       - iOSApp/Utils/IOSAlgorithmConfiguration.swift
       - iOSApp/Utils/IOSDiveLogbookPolicy.swift
       - iOSApp/Utils/IOSUnitConversions.swift

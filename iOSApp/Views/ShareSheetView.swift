@@ -49,10 +49,10 @@ enum PDFShareActions {
     }
 
     static func invalidPlanMessage() -> String {
-        String(localized: "pdf.export.error.invalid_plan")
+        DIRIOSLocalizer.string("pdf.export.error.invalid_plan")
     }
 
     static func emptyChecklistMessage() -> String {
-        String(localized: "pdf.export.error.empty_checklist")
+        DIRIOSLocalizer.string("pdf.export.error.empty_checklist")
     }
 }

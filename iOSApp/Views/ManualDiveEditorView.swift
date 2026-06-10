@@ -59,24 +59,24 @@ struct ManualDiveEditorView: View {
                     } else if showsSyntheticProfileDisclosure {
                         syntheticProfileDisclosure
                     }
-                    field(String(localized: "manual_dive.site"), text: $siteName)
-                    DatePicker(String(localized: "manual_dive.start"), selection: $startDate, displayedComponents: [.date, .hourAndMinute])
+                    field(DIRIOSLocalizer.string("manual_dive.site"), text: $siteName)
+                    DatePicker(DIRIOSLocalizer.string("manual_dive.start"), selection: $startDate, displayedComponents: [.date, .hourAndMinute])
                         .tint(DIRTheme.cyan)
-                    stepperField(String(localized: "manual_dive.duration"), value: $durationMinutes, suffix: "min", step: 5, range: 5...300)
+                    stepperField(DIRIOSLocalizer.string("manual_dive.duration"), value: $durationMinutes, suffix: "min", step: 5, range: 5...300)
                     if !isMetadataOnlyEditMode {
-                        stepperField(String(localized: "manual_dive.max_depth"), value: $maxDepthInput, suffix: unitPreference == .metric ? "m" : "ft", step: 1, range: 1...120)
-                        stepperField(String(localized: "manual_dive.avg_depth"), value: $avgDepthInput, suffix: unitPreference == .metric ? "m" : "ft", step: 1, range: 1...120)
+                        stepperField(DIRIOSLocalizer.string("manual_dive.max_depth"), value: $maxDepthInput, suffix: unitPreference == .metric ? "m" : "ft", step: 1, range: 1...120)
+                        stepperField(DIRIOSLocalizer.string("manual_dive.avg_depth"), value: $avgDepthInput, suffix: unitPreference == .metric ? "m" : "ft", step: 1, range: 1...120)
                     }
-                    field(String(localized: "manual_dive.entry_lat"), text: $entryLatitude, keyboard: .decimalPad)
-                    field(String(localized: "manual_dive.entry_lon"), text: $entryLongitude, keyboard: .decimalPad)
-                    field(String(localized: "manual_dive.exit_lat"), text: $exitLatitude, keyboard: .decimalPad)
-                    field(String(localized: "manual_dive.exit_lon"), text: $exitLongitude, keyboard: .decimalPad)
-                    field(String(localized: "manual_dive.equipment"), text: $equipmentUsed)
-                    field(String(localized: "manual_dive.entry_pressure"), text: $entryPressureText)
-                    field(String(localized: "manual_dive.exit_pressure"), text: $exitPressureText)
-                    field(String(localized: "manual_dive.deco_notes"), text: $decompressionNotes)
-                    field(String(localized: "manual_dive.notes"), text: $notes)
-                    Picker(String(localized: "manual_dive.gas"), selection: $gasLabel) {
+                    field(DIRIOSLocalizer.string("manual_dive.entry_lat"), text: $entryLatitude, keyboard: .decimalPad)
+                    field(DIRIOSLocalizer.string("manual_dive.entry_lon"), text: $entryLongitude, keyboard: .decimalPad)
+                    field(DIRIOSLocalizer.string("manual_dive.exit_lat"), text: $exitLatitude, keyboard: .decimalPad)
+                    field(DIRIOSLocalizer.string("manual_dive.exit_lon"), text: $exitLongitude, keyboard: .decimalPad)
+                    field(DIRIOSLocalizer.string("manual_dive.equipment"), text: $equipmentUsed)
+                    field(DIRIOSLocalizer.string("manual_dive.entry_pressure"), text: $entryPressureText)
+                    field(DIRIOSLocalizer.string("manual_dive.exit_pressure"), text: $exitPressureText)
+                    field(DIRIOSLocalizer.string("manual_dive.deco_notes"), text: $decompressionNotes)
+                    field(DIRIOSLocalizer.string("manual_dive.notes"), text: $notes)
+                    Picker(DIRIOSLocalizer.string("manual_dive.gas"), selection: $gasLabel) {
                         ForEach(DiveGasLabel.allCases) { gas in
                             Text(gas.rawValue).tag(gas)
                         }
@@ -93,7 +93,7 @@ struct ManualDiveEditorView: View {
                     Button {
                         save()
                     } label: {
-                        Text(String(localized: "manual_dive.save"))
+                        Text(DIRIOSLocalizer.string("manual_dive.save"))
                             .font(.callout.weight(.semibold))
                             .foregroundStyle(.black)
                             .frame(maxWidth: .infinity)
@@ -106,15 +106,15 @@ struct ManualDiveEditorView: View {
             }
             .dirCompanionScrollSurface()
         }
-        .navigationTitle(existing == nil ? String(localized: "manual_dive.add.title") : String(localized: "manual_dive.edit.title"))
+        .navigationTitle(existing == nil ? DIRIOSLocalizer.string("manual_dive.add.title") : DIRIOSLocalizer.string("manual_dive.edit.title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Button(String(localized: "manual_dive.cancel")) { dismiss() }
+                Button(DIRIOSLocalizer.string("manual_dive.cancel")) { dismiss() }
                     .foregroundStyle(DIRTheme.muted)
             }
             ToolbarItem(placement: .topBarTrailing) {
-                Button(String(localized: "manual_dive.save")) { save() }
+                Button(DIRIOSLocalizer.string("manual_dive.save")) { save() }
                     .foregroundStyle(DIRTheme.cyan)
             }
         }
@@ -134,15 +134,15 @@ struct ManualDiveEditorView: View {
                 ccrSetpointSwitchDepthInput = Formatters.depthValue(meters, units: preference)
             }
         }
-        .alert(String(localized: "manual_dive.save_failed.title"), isPresented: $showSaveFailureAlert) {
-            Button(String(localized: "manual_dive.save_failed.dismiss"), role: .cancel) {}
+        .alert(DIRIOSLocalizer.string("manual_dive.save_failed.title"), isPresented: $showSaveFailureAlert) {
+            Button(DIRIOSLocalizer.string("manual_dive.save_failed.dismiss"), role: .cancel) {}
         } message: {
-            Text(String(localized: "manual_dive.save_failed.message"))
+            Text(DIRIOSLocalizer.string("manual_dive.save_failed.message"))
         }
     }
 
     private var metadataOnlyBanner: some View {
-        Text(String(localized: "manual_dive.edit.nodepth.banner"))
+        Text(DIRIOSLocalizer.string("manual_dive.edit.nodepth.banner"))
             .font(.caption.weight(.semibold))
             .foregroundStyle(DIRTheme.cyan)
             .fixedSize(horizontal: false, vertical: true)
@@ -153,24 +153,24 @@ struct ManualDiveEditorView: View {
                     .fill(DIRTheme.cyan.opacity(0.10))
                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.55), lineWidth: 1))
             )
-            .accessibilityLabel(String(localized: "manual_dive.edit.nodepth.banner"))
+            .accessibilityLabel(DIRIOSLocalizer.string("manual_dive.edit.nodepth.banner"))
     }
 
     private var ccrMetadataSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(String(localized: "manual_dive.ccr.header"))
+            Text(DIRIOSLocalizer.string("manual_dive.ccr.header"))
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(DIRTheme.orange)
-            field(String(localized: "ccr.rebreather_model"), text: $ccrRebreatherModel)
-            stepperField(String(localized: "ccr.setpoint.low"), value: $ccrLowSetpoint, suffix: "bar", step: 0.1, range: 0.4...1.6)
-            stepperField(String(localized: "ccr.setpoint.high"), value: $ccrHighSetpoint, suffix: "bar", step: 0.1, range: 0.4...1.6)
-            stepperField(String(localized: "ccr.setpoint.switch_depth"), value: $ccrSetpointSwitchDepthInput, suffix: unitPreference == .metric ? "m" : "ft", step: 1, range: 0...120)
-            field(String(localized: "manual_dive.ccr.diluent_label"), text: $ccrDiluentLabel)
-            field(String(localized: "manual_dive.ccr.bailout_labels"), text: $ccrBailoutLabels)
-            field(String(localized: "manual_dive.ccr.scrubber_notes"), text: $ccrScrubberNotes)
-            field(String(localized: "manual_dive.ccr.o2_sensor_notes"), text: $ccrOxygenSensorNotes)
-            field(String(localized: "manual_dive.ccr.loop_notes"), text: $ccrLoopNotes)
-            field(String(localized: "manual_dive.ccr.bailout_scenario_notes"), text: $ccrBailoutScenarioNotes)
+            field(DIRIOSLocalizer.string("ccr.rebreather_model"), text: $ccrRebreatherModel)
+            stepperField(DIRIOSLocalizer.string("ccr.setpoint.low"), value: $ccrLowSetpoint, suffix: "bar", step: 0.1, range: 0.4...1.6)
+            stepperField(DIRIOSLocalizer.string("ccr.setpoint.high"), value: $ccrHighSetpoint, suffix: "bar", step: 0.1, range: 0.4...1.6)
+            stepperField(DIRIOSLocalizer.string("ccr.setpoint.switch_depth"), value: $ccrSetpointSwitchDepthInput, suffix: unitPreference == .metric ? "m" : "ft", step: 1, range: 0...120)
+            field(DIRIOSLocalizer.string("manual_dive.ccr.diluent_label"), text: $ccrDiluentLabel)
+            field(DIRIOSLocalizer.string("manual_dive.ccr.bailout_labels"), text: $ccrBailoutLabels)
+            field(DIRIOSLocalizer.string("manual_dive.ccr.scrubber_notes"), text: $ccrScrubberNotes)
+            field(DIRIOSLocalizer.string("manual_dive.ccr.o2_sensor_notes"), text: $ccrOxygenSensorNotes)
+            field(DIRIOSLocalizer.string("manual_dive.ccr.loop_notes"), text: $ccrLoopNotes)
+            field(DIRIOSLocalizer.string("manual_dive.ccr.bailout_scenario_notes"), text: $ccrBailoutScenarioNotes)
         }
         .padding(10)
         .background(
@@ -200,7 +200,7 @@ struct ManualDiveEditorView: View {
     }
 
     private var syntheticProfileDisclosure: some View {
-        Text(String(localized: "manual_dive.synthetic_profile.disclosure"))
+        Text(DIRIOSLocalizer.string("manual_dive.synthetic_profile.disclosure"))
             .font(.caption.weight(.semibold))
             .foregroundStyle(DIRTheme.yellow)
             .fixedSize(horizontal: false, vertical: true)
@@ -211,7 +211,7 @@ struct ManualDiveEditorView: View {
                     .fill(DIRTheme.yellow.opacity(0.10))
                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.yellow.opacity(0.45), lineWidth: 1))
             )
-            .accessibilityLabel(String(localized: "manual_dive.synthetic_profile.disclosure"))
+            .accessibilityLabel(DIRIOSLocalizer.string("manual_dive.synthetic_profile.disclosure"))
     }
 
     private func field(_ title: String, text: Binding<String>, keyboard: UIKeyboardType = .default) -> some View {
@@ -231,15 +231,15 @@ struct ManualDiveEditorView: View {
             Text(title).font(.caption.weight(.semibold)).foregroundStyle(DIRTheme.muted)
             HStack {
                 Button("-") { value.wrappedValue = max(range.lowerBound, value.wrappedValue - step) }
-                    .accessibilityLabel(String(format: String(localized: "manual_dive.stepper.decrease.a11y"), title))
+                    .accessibilityLabel(DIRIOSLocalizer.formatted("manual_dive.stepper.decrease.a11y", title))
                 Spacer()
                 Text("\(Formatters.one(value.wrappedValue)) \(suffix)")
                     .foregroundStyle(.white)
                     .fontWeight(.semibold)
-                    .accessibilityLabel(String(format: String(localized: "manual_dive.stepper.value.a11y"), title, Formatters.one(value.wrappedValue), suffix))
+                    .accessibilityLabel(DIRIOSLocalizer.formatted("manual_dive.stepper.value.a11y", title, Formatters.one(value.wrappedValue), suffix))
                 Spacer()
                 Button("+") { value.wrappedValue = min(range.upperBound, value.wrappedValue + step) }
-                    .accessibilityLabel(String(format: String(localized: "manual_dive.stepper.increase.a11y"), title))
+                    .accessibilityLabel(DIRIOSLocalizer.formatted("manual_dive.stepper.increase.a11y", title))
             }
             .font(.callout.weight(.bold))
             .padding(10)
@@ -332,7 +332,7 @@ struct ManualDiveEditorView: View {
             entryGPSFixSource: existing.entryGPSFixSource,
             exitGPSFixSource: existing.exitGPSFixSource,
             samples: [],
-            siteName: siteName.isEmpty ? String(localized: "manual_dive.default_site") : siteName,
+            siteName: siteName.isEmpty ? DIRIOSLocalizer.string("manual_dive.default_site") : siteName,
             buddy: existing.buddy,
             notes: notes.isEmpty ? nil : notes,
             gasLabel: gasLabel,

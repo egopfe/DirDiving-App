@@ -16,7 +16,7 @@ struct WatchPhotoTransferPanel: View {
         }
         .padding(.vertical, 4)
         .accessibilityElement(children: .contain)
-        .accessibilityLabel(String(localized: "a11y.watch_photo_transfer.panel.label"))
+        .accessibilityLabel(DIRIOSLocalizer.string("a11y.watch_photo_transfer.panel.label"))
         .onChange(of: selectedItem) { _, item in
             guard let item else {
                 stagedPhoto = nil
@@ -40,16 +40,16 @@ struct WatchPhotoTransferPanel: View {
 
     private var uploadSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(String(localized: "watch_photo.title"))
+            Text(DIRIOSLocalizer.string("watch_photo.title"))
                 .font(.callout.weight(.semibold))
                 .foregroundStyle(.white)
-            Text(String(localized: "watch_photo.manual_hint"))
+            Text(DIRIOSLocalizer.string("watch_photo.manual_hint"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
 
             PhotosPicker(selection: $selectedItem, matching: .images) {
-                Label(String(localized: "watch_photo.pick"), systemImage: "photo.on.rectangle.angled")
+                Label(DIRIOSLocalizer.string("watch_photo.pick"), systemImage: "photo.on.rectangle.angled")
                     .font(.callout.weight(.semibold))
                     .foregroundStyle(DIRTheme.cyan)
                     .frame(maxWidth: .infinity)
@@ -57,14 +57,14 @@ struct WatchPhotoTransferPanel: View {
                     .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(String(localized: "a11y.watch_photo_transfer.select_photo.label"))
-            .accessibilityHint(String(localized: "a11y.watch_photo_transfer.select_photo.hint"))
+            .accessibilityLabel(DIRIOSLocalizer.string("a11y.watch_photo_transfer.select_photo.label"))
+            .accessibilityHint(DIRIOSLocalizer.string("a11y.watch_photo_transfer.select_photo.hint"))
 
             if isPreparingPhoto {
-                Text(String(localized: "watch_photo.preparing"))
+                Text(DIRIOSLocalizer.string("watch_photo.preparing"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)
-                    .accessibilityLabel(String(localized: "watch_photo.preparing"))
+                    .accessibilityLabel(DIRIOSLocalizer.string("watch_photo.preparing"))
             }
 
             if let stagedPhoto {
@@ -74,7 +74,7 @@ struct WatchPhotoTransferPanel: View {
             Button {
                 sendStagedPhoto()
             } label: {
-                Label(String(localized: "watch_photo.send_to_watch"), systemImage: "applewatch.and.arrow.forward")
+                Label(DIRIOSLocalizer.string("watch_photo.send_to_watch"), systemImage: "applewatch.and.arrow.forward")
                     .font(.callout.weight(.semibold))
                     .foregroundStyle(canSendStagedPhoto ? DIRTheme.cyan : DIRTheme.muted)
                     .frame(maxWidth: .infinity)
@@ -86,16 +86,16 @@ struct WatchPhotoTransferPanel: View {
             }
             .buttonStyle(.plain)
             .disabled(!canSendStagedPhoto)
-            .accessibilityLabel(String(localized: "a11y.watch_photo_transfer.send.label"))
-            .accessibilityHint(String(localized: "a11y.watch_photo_transfer.send.hint"))
-            .accessibilityValue(canSendStagedPhoto ? String(localized: "a11y.watch_photo_transfer.send.enabled") : String(localized: "a11y.watch_photo_transfer.send.disabled"))
+            .accessibilityLabel(DIRIOSLocalizer.string("a11y.watch_photo_transfer.send.label"))
+            .accessibilityHint(DIRIOSLocalizer.string("a11y.watch_photo_transfer.send.hint"))
+            .accessibilityValue(canSendStagedPhoto ? DIRIOSLocalizer.string("a11y.watch_photo_transfer.send.enabled") : DIRIOSLocalizer.string("a11y.watch_photo_transfer.send.disabled"))
 
             if let statusMessage = photoStatusMessage {
                 Text(statusMessage)
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
-                    .accessibilityLabel(String(localized: "a11y.watch_photo_transfer.status.label"))
+                    .accessibilityLabel(DIRIOSLocalizer.string("a11y.watch_photo_transfer.status.label"))
                     .accessibilityValue(statusMessage)
             }
         }
@@ -105,7 +105,7 @@ struct WatchPhotoTransferPanel: View {
         Button {
             showManageSheet = true
         } label: {
-            Label(String(localized: "watch_photo.manage.open"), systemImage: "trash.circle")
+            Label(DIRIOSLocalizer.string("watch_photo.manage.open"), systemImage: "trash.circle")
                 .font(.callout.weight(.semibold))
                 .foregroundStyle(DIRTheme.cyan)
                 .frame(maxWidth: .infinity)
@@ -113,8 +113,8 @@ struct WatchPhotoTransferPanel: View {
                 .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(String(localized: "a11y.watch_photo_transfer.manage.label"))
-        .accessibilityHint(String(localized: "a11y.watch_photo_transfer.manage.hint"))
+        .accessibilityLabel(DIRIOSLocalizer.string("a11y.watch_photo_transfer.manage.label"))
+        .accessibilityHint(DIRIOSLocalizer.string("a11y.watch_photo_transfer.manage.hint"))
     }
 
     private var canSendStagedPhoto: Bool {
@@ -141,7 +141,7 @@ struct WatchPhotoTransferPanel: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 4) {
-                Text(String(localized: "watch_photo.staged.ready"))
+                Text(DIRIOSLocalizer.string("watch_photo.staged.ready"))
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.white)
                 Text(staged.fileName)
@@ -156,14 +156,14 @@ struct WatchPhotoTransferPanel: View {
                 }
             }
             Spacer(minLength: 0)
-            Button(String(localized: "watch_photo.staged.clear")) {
+            Button(DIRIOSLocalizer.string("watch_photo.staged.clear")) {
                 clearStagedPhoto()
             }
             .font(.caption2.weight(.semibold))
             .foregroundStyle(DIRTheme.orange)
             .buttonStyle(.plain)
-            .accessibilityLabel(String(localized: "a11y.watch_photo_transfer.delete.label"))
-            .accessibilityHint(String(localized: "a11y.watch_photo_transfer.delete.hint"))
+            .accessibilityLabel(DIRIOSLocalizer.string("a11y.watch_photo_transfer.delete.label"))
+            .accessibilityHint(DIRIOSLocalizer.string("a11y.watch_photo_transfer.delete.hint"))
         }
         .padding(8)
         .background(
@@ -171,7 +171,7 @@ struct WatchPhotoTransferPanel: View {
                 .stroke(DIRTheme.hairline, lineWidth: 1)
         )
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(String(localized: "a11y.watch_photo_transfer.preview.label"))
+        .accessibilityLabel(DIRIOSLocalizer.string("a11y.watch_photo_transfer.preview.label"))
         .accessibilityValue(staged.fileName)
     }
 
@@ -181,20 +181,20 @@ struct WatchPhotoTransferPanel: View {
         }
         switch transfer.state {
         case .queued:
-            return String(localized: "watch_photo_status_queued")
+            return DIRIOSLocalizer.string("watch_photo_status_queued")
         case .sending:
-            return String(localized: "watch_photo_status_sending")
+            return DIRIOSLocalizer.string("watch_photo_status_sending")
         case .deliveredToConnectivity:
-            return String(localized: "watch_photo_status_delivered_pending")
+            return DIRIOSLocalizer.string("watch_photo_status_delivered_pending")
         case .importedOnWatch:
-            return String(localized: "watch_photo_status_imported")
+            return DIRIOSLocalizer.string("watch_photo_status_imported")
         case .rejectedByWatch:
             if let code = transfer.rejectionErrorCode {
-                return String(format: String(localized: "watch_photo_status_rejected_detail"), code)
+                return DIRIOSLocalizer.formatted("watch_photo_status_rejected_detail", code)
             }
-            return String(localized: "watch_photo_status_rejected")
+            return DIRIOSLocalizer.string("watch_photo_status_rejected")
         case .failed:
-            return transfer.errorMessage ?? String(localized: "watch_photo_status_failed")
+            return transfer.errorMessage ?? DIRIOSLocalizer.string("watch_photo_status_failed")
         }
     }
 
@@ -203,7 +203,7 @@ struct WatchPhotoTransferPanel: View {
         isPreparingPhoto = true
         defer { isPreparingPhoto = false }
         guard let data = try? await item.loadTransferable(type: Data.self) else {
-            watchSync.reportCompanionPhotoFailure(message: String(localized: "watch_photo.error.load"))
+            watchSync.reportCompanionPhotoFailure(message: DIRIOSLocalizer.string("watch_photo.error.load"))
             stagedPhoto = nil
             return
         }
@@ -222,7 +222,7 @@ struct WatchPhotoTransferPanel: View {
                 data: prepared.data,
                 preview: preview,
                 conversionNotice: prepared.conversionWarning
-                    ? String(localized: "watch_photo.convert.warning")
+                    ? DIRIOSLocalizer.string("watch_photo.convert.warning")
                     : nil
             )
         } catch {

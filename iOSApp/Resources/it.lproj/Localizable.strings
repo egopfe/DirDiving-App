@@ -1247,6 +1247,12 @@
 "more.reviewer.demo_logbook" = "Logbook dimostrativo";
 "more.reviewer.demo_logbook_hint" = "Carica 5 immersioni demo per revisione App Store.";
 "more.language.title" = "Lingua";
+"language.option.system" = "Lingua di sistema";
+"language.option.italian" = "Italiano";
+"language.option.english" = "English";
+"language.option.system.detail" = "Segue la lingua dell'iPhone";
+"language.option.italian.detail" = "Forza interfaccia italiana";
+"language.option.english.detail" = "Forza interfaccia in inglese";
 "more.sync.queue_count" = "Coda Watch in attesa";
 "more.sync.last_success" = "Ultima sync Watch riuscita";
 "more.sync.last_success.none" = "Nessuna ancora";

@@ -8,16 +8,16 @@ struct PlannerModeSelectionView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading, spacing: 7) {
-                        Text(String(localized: "Planner"))
+                        Text(DIRIOSLocalizer.string("Planner"))
                             .dirScreenTitleStyle()
-                        Text(String(localized: "planner.mode_selection.subtitle"))
+                        Text(DIRIOSLocalizer.string("planner.mode_selection.subtitle"))
                             .dirScreenSubtitleStyle()
                     }
                     .accessibilityElement(children: .combine)
                     .accessibilitySortPriority(100)
 
-                    DIRWarningBox(text: String(localized: "planner.reference_only.warning"))
-                        .accessibilityHint(String(localized: "planner.mode_selection.safety.a11y"))
+                    DIRWarningBox(text: DIRIOSLocalizer.string("planner.reference_only.warning"))
+                        .accessibilityHint(DIRIOSLocalizer.string("planner.mode_selection.safety.a11y"))
 
                     ForEach(PlannerMode.allCases) { mode in
                         modeCard(mode)
@@ -45,7 +45,7 @@ struct PlannerModeSelectionView: View {
                         .foregroundStyle(DIRTheme.muted)
                         .multilineTextAlignment(.leading)
                     if mode.isCCR {
-                        Text(String(localized: "ccr.safety.disclaimer"))
+                        Text(DIRIOSLocalizer.string("ccr.safety.disclaimer"))
                             .font(.caption2)
                             .foregroundStyle(DIRTheme.yellow)
                             .multilineTextAlignment(.leading)
@@ -65,7 +65,7 @@ struct PlannerModeSelectionView: View {
         .accessibilityAddTraits(.isButton)
         .accessibilityValue(
             isCurrentMode
-                ? String(format: String(localized: "planner.mode.a11y.active"), mode.localizedTabTitle)
+                ? DIRIOSLocalizer.formatted("planner.mode.a11y.active", mode.localizedTabTitle)
                 : ""
         )
     }
@@ -73,12 +73,12 @@ struct PlannerModeSelectionView: View {
     private func modeAccessibilityHint(_ mode: PlannerMode) -> String {
         if mode.isCCR {
             return String(
-                format: String(localized: "planner.mode_selection.card.a11y.hint"),
+                format: DIRIOSLocalizer.string("planner.mode_selection.card.a11y.hint"),
                 mode.localizedTabTitle
-            ) + ". " + String(localized: "ccr.safety.disclaimer")
+            ) + ". " + DIRIOSLocalizer.string("ccr.safety.disclaimer")
         }
         return String(
-            format: String(localized: "planner.mode_selection.card.a11y.hint"),
+            format: DIRIOSLocalizer.string("planner.mode_selection.card.a11y.hint"),
             mode.localizedTabTitle
         )
     }

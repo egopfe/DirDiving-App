@@ -18,7 +18,7 @@ enum GasPlanningService {
         }
         guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) else {
             var invalid = validation
-            invalid.add(.invalidEnvironment, message: String(localized: "planner.validation.invalid_environment"))
+            invalid.add(.invalidEnvironment, message: DIRIOSLocalizer.string("planner.validation.invalid_environment"))
             return unavailableAnalysis(input: input, gas: gas, validation: invalid)
         }
         let planningDepth = input.effectivePlanningDepthMeters
@@ -75,7 +75,7 @@ enum GasPlanningService {
             )
         case .failure:
             var invalid = validation
-            invalid.add(.invalidEnvironment, message: String(localized: "planner.validation.invalid_oxygen_exposure"))
+            invalid.add(.invalidEnvironment, message: DIRIOSLocalizer.string("planner.validation.invalid_oxygen_exposure"))
             return unavailableAnalysis(input: input, gas: gas, validation: invalid)
         }
     }
@@ -311,8 +311,8 @@ enum GasPlanningService {
             guard legDepth > 0 else { continue }
             let minutes = max(1, legDepth / 18.0)
             let note = point.role == .travel
-                ? String(localized: "planner.segment.travel_descent")
-                : String(localized: "planner.segment.back_gas_descent")
+                ? DIRIOSLocalizer.string("planner.segment.travel_descent")
+                : DIRIOSLocalizer.string("planner.segment.back_gas_descent")
             segments.append(
                 DivePlanSegment(
                     kind: .descent,
@@ -331,7 +331,7 @@ enum GasPlanningService {
                     depthMeters: maxDepth,
                     minutes: max(1, maxDepth / 18.0),
                     gas: bottom.label,
-                    note: String(localized: "planner.segment.back_gas_descent")
+                    note: DIRIOSLocalizer.string("planner.segment.back_gas_descent")
                 )
             )
         }
@@ -342,7 +342,7 @@ enum GasPlanningService {
                 depthMeters: maxDepth,
                 minutes: input.plannedBottomMinutes,
                 gas: bottom.label,
-                note: String(localized: "planner.segment.bottom_time")
+                note: DIRIOSLocalizer.string("planner.segment.bottom_time")
             )
         )
 
@@ -354,7 +354,7 @@ enum GasPlanningService {
                     depthMeters: travel.depthMeters,
                     minutes: 0.5,
                     gas: travel.gas.label,
-                    note: String(localized: "planner.segment.travel_ascent")
+                    note: DIRIOSLocalizer.string("planner.segment.travel_ascent")
                 )
             )
         }
@@ -366,7 +366,7 @@ enum GasPlanningService {
                     depthMeters: stop.depthMeters,
                     minutes: 0.5,
                     gas: stop.gas,
-                    note: String(localized: "planner.segment.deco_switch")
+                    note: DIRIOSLocalizer.string("planner.segment.deco_switch")
                 )
             )
             segments.append(
@@ -375,7 +375,7 @@ enum GasPlanningService {
                     depthMeters: stop.depthMeters,
                     minutes: Double(stop.minutes),
                     gas: stop.gas,
-                    note: String(localized: "planner.segment.deco_stop")
+                    note: DIRIOSLocalizer.string("planner.segment.deco_stop")
                 )
             )
         }
@@ -389,7 +389,7 @@ enum GasPlanningService {
                     depthMeters: depth,
                     minutes: 0,
                     gas: bailout.gas.label,
-                    note: String(localized: "planner.segment.bailout_emergency")
+                    note: DIRIOSLocalizer.string("planner.segment.bailout_emergency")
                 )
             )
         }
@@ -400,7 +400,7 @@ enum GasPlanningService {
                 depthMeters: 0,
                 minutes: max(1, maxDepth / 9.0),
                 gas: stops.last?.gas ?? bottom.label,
-                note: String(localized: "planner.segment.final_ascent")
+                note: DIRIOSLocalizer.string("planner.segment.final_ascent")
             )
         )
         return segments
@@ -462,30 +462,30 @@ enum GasPlanningService {
         let stressTTS = max(extendedTTS, deeperTTS)
         let stressLiters = extendedTTS >= deeperTTS ? extendedLiters : deeperLiters
         let stressAction = extendedTTS >= deeperTTS
-            ? String(localized: "planner.contingency.extended_bottom.action")
-            : String(format: String(localized: "planner.contingency.deeper_depth.action"), Int(deeper.maxDepthMeters))
+            ? DIRIOSLocalizer.string("planner.contingency.extended_bottom.action")
+            : DIRIOSLocalizer.formatted("planner.contingency.deeper_depth.action", Int(deeper.maxDepthMeters))
 
         return [
             ContingencyPlan(
                 scenario: .lostGas,
                 ttsMinutes: baseTTS,
                 gasRequiredLiters: lostGasLiters,
-                action: String(localized: "planner.contingency.lost_gas.action"),
-                warning: String(localized: "planner.contingency.lost_gas.warning")
+                action: DIRIOSLocalizer.string("planner.contingency.lost_gas.action"),
+                warning: DIRIOSLocalizer.string("planner.contingency.lost_gas.warning")
             ),
             ContingencyPlan(
                 scenario: .delayedAscent,
                 ttsMinutes: delayedTTS,
                 gasRequiredLiters: gasRequiredLiters(for: delayed),
-                action: String(localized: "planner.contingency.delayed_ascent.action"),
-                warning: String(localized: "planner.contingency.delayed_ascent.warning")
+                action: DIRIOSLocalizer.string("planner.contingency.delayed_ascent.action"),
+                warning: DIRIOSLocalizer.string("planner.contingency.delayed_ascent.warning")
             ),
             ContingencyPlan(
                 scenario: .extendedBottom,
                 ttsMinutes: stressTTS,
                 gasRequiredLiters: stressLiters,
                 action: stressAction,
-                warning: String(localized: "planner.contingency.extended_bottom.warning")
+                warning: DIRIOSLocalizer.string("planner.contingency.extended_bottom.warning")
             )
         ]
     }
@@ -502,29 +502,29 @@ enum GasPlanningService {
     static func briefingLines(input: GasPlanInput, analysis: TechnicalGasAnalysis, tts: Int, stops: [DecoStop]) -> [String] {
         [
             String(
-                format: String(localized: "planner.briefing.mode"),
+                format: DIRIOSLocalizer.string("planner.briefing.mode"),
                 input.plannedDepthMeters,
                 Int(input.plannedBottomMinutes),
                 input.bottomGas.label
             ),
             String(
-                format: String(localized: "planner.briefing.gf_tts"),
+                format: DIRIOSLocalizer.string("planner.briefing.gf_tts"),
                 Int(input.gfLow),
                 Int(input.gfHigh),
                 tts
             ),
             String(
-                format: String(localized: "planner.briefing.gas_pressure"),
+                format: DIRIOSLocalizer.string("planner.briefing.gas_pressure"),
                 Int(analysis.turnPressureBar),
                 Int(analysis.minimumGasBar)
             ),
             String(
-                format: String(localized: "planner.briefing.respirability"),
+                format: DIRIOSLocalizer.string("planner.briefing.respirability"),
                 analysis.densityAtDepth,
                 Int(analysis.endMeters)
             ),
             String(
-                format: String(localized: "planner.briefing.oxygen"),
+                format: DIRIOSLocalizer.string("planner.briefing.oxygen"),
                 analysis.ppO2AtDepth,
                 Int(analysis.cnsPercent),
                 Int(analysis.cnsDailyPercent),
@@ -532,7 +532,7 @@ enum GasPlanningService {
                 Int(analysis.otuDaily24h)
             ),
             String(
-                format: String(localized: "planner.briefing.stops"),
+                format: DIRIOSLocalizer.string("planner.briefing.stops"),
                 stops.map { "\(Int($0.depthMeters))m/\($0.minutes)min \($0.gas)" }.joined(separator: ", ")
             )
         ]
@@ -540,12 +540,12 @@ enum GasPlanningService {
 
     private static func gasSwitchNote(for role: GasRole) -> String {
         switch role {
-        case .travel: return String(localized: "planner.segment.switch_travel")
-        case .bottom: return String(localized: "planner.segment.switch_back_gas")
-        case .deco: return String(localized: "planner.segment.deco_switch")
-        case .bailout: return String(localized: "planner.segment.bailout_emergency")
-        case .ccrDiluent: return String(localized: "gas.role.ccr_diluent")
-        case .ccrBailout: return String(localized: "gas.role.ccr_bailout")
+        case .travel: return DIRIOSLocalizer.string("planner.segment.switch_travel")
+        case .bottom: return DIRIOSLocalizer.string("planner.segment.switch_back_gas")
+        case .deco: return DIRIOSLocalizer.string("planner.segment.deco_switch")
+        case .bailout: return DIRIOSLocalizer.string("planner.segment.bailout_emergency")
+        case .ccrDiluent: return DIRIOSLocalizer.string("gas.role.ccr_diluent")
+        case .ccrBailout: return DIRIOSLocalizer.string("gas.role.ccr_bailout")
         }
     }
 

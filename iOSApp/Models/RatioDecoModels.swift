@@ -9,9 +9,9 @@ enum PlannerDecompressionMethod: String, CaseIterable, Identifiable, Codable {
 
     var localizedTitle: String {
         switch self {
-        case .buhlmann: return String(localized: "planner.deco_method.buhlmann")
-        case .ratioDeco: return String(localized: "planner.deco_method.ratio_deco")
-        case .comparison: return String(localized: "planner.deco_method.comparison")
+        case .buhlmann: return DIRIOSLocalizer.string("planner.deco_method.buhlmann")
+        case .ratioDeco: return DIRIOSLocalizer.string("planner.deco_method.ratio_deco")
+        case .comparison: return DIRIOSLocalizer.string("planner.deco_method.comparison")
         }
     }
 }
@@ -25,9 +25,9 @@ enum RatioDecoRatioType: String, Codable, CaseIterable, Identifiable {
 
     var localizedTitle: String {
         switch self {
-        case .oneToOne: return String(localized: "planner.ratio_deco.ratio.1_1")
-        case .twoToOne: return String(localized: "planner.ratio_deco.ratio.2_1")
-        case .custom: return String(localized: "planner.ratio_deco.ratio.custom")
+        case .oneToOne: return DIRIOSLocalizer.string("planner.ratio_deco.ratio.1_1")
+        case .twoToOne: return DIRIOSLocalizer.string("planner.ratio_deco.ratio.2_1")
+        case .custom: return DIRIOSLocalizer.string("planner.ratio_deco.ratio.custom")
         }
     }
 }
@@ -41,9 +41,9 @@ enum RatioDecoDistributionMode: String, Codable, CaseIterable, Identifiable {
 
     var localizedTitle: String {
         switch self {
-        case .balanced: return String(localized: "planner.ratio_deco.distribution.balanced")
-        case .shallowWeighted: return String(localized: "planner.ratio_deco.distribution.shallow_weighted")
-        case .linear: return String(localized: "planner.ratio_deco.distribution.linear")
+        case .balanced: return DIRIOSLocalizer.string("planner.ratio_deco.distribution.balanced")
+        case .shallowWeighted: return DIRIOSLocalizer.string("planner.ratio_deco.distribution.shallow_weighted")
+        case .linear: return DIRIOSLocalizer.string("planner.ratio_deco.distribution.linear")
         }
     }
 }
@@ -67,7 +67,7 @@ struct RatioDecoPreset: Identifiable, Codable, Hashable {
     static var preset1to1: RatioDecoPreset {
         RatioDecoPreset(
             id: builtIn1to1ID,
-            name: String(localized: "planner.ratio_deco.preset.1_1"),
+            name: DIRIOSLocalizer.string("planner.ratio_deco.preset.1_1"),
             ratioType: .oneToOne,
             customRatioDenominator: 1,
             firstStopDepthMeters: 21,
@@ -82,7 +82,7 @@ struct RatioDecoPreset: Identifiable, Codable, Hashable {
     static var preset2to1: RatioDecoPreset {
         RatioDecoPreset(
             id: builtIn2to1ID,
-            name: String(localized: "planner.ratio_deco.preset.2_1"),
+            name: DIRIOSLocalizer.string("planner.ratio_deco.preset.2_1"),
             ratioType: .twoToOne,
             customRatioDenominator: 2,
             firstStopDepthMeters: 21,
@@ -97,7 +97,7 @@ struct RatioDecoPreset: Identifiable, Codable, Hashable {
     static var customDefault: RatioDecoPreset {
         RatioDecoPreset(
             id: customPresetID,
-            name: String(localized: "planner.ratio_deco.preset.custom"),
+            name: DIRIOSLocalizer.string("planner.ratio_deco.preset.custom"),
             ratioType: .custom,
             customRatioDenominator: 1.5,
             firstStopDepthMeters: 21,
@@ -182,15 +182,15 @@ struct RatioDecoValidationResult: Hashable {
             if case .ceilingViolation = $0 { return true }
             return false
         }) {
-            return String(localized: "planner.ratio_deco.validation.ceiling_violation")
+            return DIRIOSLocalizer.string("planner.ratio_deco.validation.ceiling_violation")
         }
         if !isBuhlmannCompatible {
-            return String(localized: "planner.ratio_deco.validation.not_validated_plan")
+            return DIRIOSLocalizer.string("planner.ratio_deco.validation.not_validated_plan")
         }
         if warnings.isEmpty {
-            return String(localized: "planner.ratio_deco.validation.validated")
+            return DIRIOSLocalizer.string("planner.ratio_deco.validation.validated")
         }
-        return String(localized: "planner.ratio_deco.validation.warning")
+        return DIRIOSLocalizer.string("planner.ratio_deco.validation.warning")
     }
 }
 

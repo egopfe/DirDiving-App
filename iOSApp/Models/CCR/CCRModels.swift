@@ -8,8 +8,8 @@ enum CCRSetpointMode: String, CaseIterable, Identifiable, Codable {
 
     var localizedTitle: String {
         switch self {
-        case .automatic: return String(localized: "ccr.setpoint.mode.automatic")
-        case .manual: return String(localized: "ccr.setpoint.mode.manual")
+        case .automatic: return DIRIOSLocalizer.string("ccr.setpoint.mode.automatic")
+        case .manual: return DIRIOSLocalizer.string("ccr.setpoint.mode.manual")
         }
     }
 }
@@ -25,11 +25,11 @@ enum CCRBailoutScenarioKind: String, CaseIterable, Identifiable, Codable {
 
     var localizedTitle: String {
         switch self {
-        case .lostLoop: return String(localized: "ccr.bailout.scenario.lost_loop")
-        case .floodedLoop: return String(localized: "ccr.bailout.scenario.flooded_loop")
-        case .hypoxia: return String(localized: "ccr.bailout.scenario.hypoxia")
-        case .hyperoxia: return String(localized: "ccr.bailout.scenario.hyperoxia")
-        case .manualBailoutAtMaxDepth: return String(localized: "ccr.bailout.scenario.manual_max_depth")
+        case .lostLoop: return DIRIOSLocalizer.string("ccr.bailout.scenario.lost_loop")
+        case .floodedLoop: return DIRIOSLocalizer.string("ccr.bailout.scenario.flooded_loop")
+        case .hypoxia: return DIRIOSLocalizer.string("ccr.bailout.scenario.hypoxia")
+        case .hyperoxia: return DIRIOSLocalizer.string("ccr.bailout.scenario.hyperoxia")
+        case .manualBailoutAtMaxDepth: return DIRIOSLocalizer.string("ccr.bailout.scenario.manual_max_depth")
         }
     }
 }
@@ -225,9 +225,9 @@ enum CCRBailoutScenarioStatus: String, Hashable {
 
     var localizedTitle: String {
         switch self {
-        case .pass: return String(localized: "ccr.bailout.status.pass")
-        case .warning: return String(localized: "ccr.bailout.status.warning")
-        case .fail: return String(localized: "ccr.bailout.status.fail")
+        case .pass: return DIRIOSLocalizer.string("ccr.bailout.status.pass")
+        case .warning: return DIRIOSLocalizer.string("ccr.bailout.status.warning")
+        case .fail: return DIRIOSLocalizer.string("ccr.bailout.status.fail")
         }
     }
 }

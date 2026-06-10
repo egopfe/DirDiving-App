@@ -3,7 +3,7 @@ import Foundation
 enum CCRPlannerService {
     static func makePlan(input: CCRPlanInput) -> CCRPlanResult {
         guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) else {
-            return invalidResult(message: String(localized: "ccr.validation.invalid_environment"))
+            return invalidResult(message: DIRIOSLocalizer.string("ccr.validation.invalid_environment"))
         }
 
         let validation = CCRPlanValidator.validate(input, environment: environment)
@@ -23,9 +23,9 @@ enum CCRPlannerService {
                 warnings: validation.issues.map { issue in
                     PlannerUserFacingMessage(
                         id: "ccr.issue.\(issue)",
-                        title: String(localized: "ccr.warning.title"),
+                        title: DIRIOSLocalizer.string("ccr.warning.title"),
                         message: issue.localizedMessage,
-                        correctiveHint: String(localized: "ccr.reference_estimate_only"),
+                        correctiveHint: DIRIOSLocalizer.string("ccr.reference_estimate_only"),
                         severity: .warning
                     )
                 },

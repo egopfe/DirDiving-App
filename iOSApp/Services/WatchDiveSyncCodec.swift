@@ -291,25 +291,25 @@ enum WatchDiveSyncError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .missingPayload:
-            return String(localized: "sync.codec.error.missing_payload")
+            return DIRIOSLocalizer.string("sync.codec.error.missing_payload")
         case .payloadTooLarge:
-            return String(localized: "sync.codec.error.payload_too_large")
+            return DIRIOSLocalizer.string("sync.codec.error.payload_too_large")
         case .unsupportedVersion:
-            return String(localized: "sync.codec.error.unsupported_version")
+            return DIRIOSLocalizer.string("sync.codec.error.unsupported_version")
         case .invalidSender:
-            return String(localized: "sync.codec.error.invalid_sender")
+            return DIRIOSLocalizer.string("sync.codec.error.invalid_sender")
         case .stalePayload:
-            return String(localized: "sync.codec.error.stale_payload")
+            return DIRIOSLocalizer.string("sync.codec.error.stale_payload")
         case .invalidSignature:
-            return String(localized: "sync.codec.error.invalid_signature")
+            return DIRIOSLocalizer.string("sync.codec.error.invalid_signature")
         case .invalidSession:
-            return String(localized: "sync.codec.error.invalid_session")
+            return DIRIOSLocalizer.string("sync.codec.error.invalid_session")
         case .sessionInactive:
-            return String(localized: "sync.codec.error.session_inactive")
+            return DIRIOSLocalizer.string("sync.codec.error.session_inactive")
         case .missingPeerSecret:
-            return String(localized: "sync.codec.error.missing_peer_secret")
+            return DIRIOSLocalizer.string("sync.codec.error.missing_peer_secret")
         case .replayedPayload:
-            return String(localized: "sync.codec.error.replayed_payload")
+            return DIRIOSLocalizer.string("sync.codec.error.replayed_payload")
         }
     }
 }

@@ -30,9 +30,9 @@ enum CCRBailoutScenarioCalculator {
                 requiredGasLitersByCylinder: [:],
                 availableGasLitersByCylinder: [:],
                 status: .fail,
-                warnings: [String(localized: "ccr.bailout.no_gases")],
+                warnings: [DIRIOSLocalizer.string("ccr.bailout.no_gases")],
                 gasSwitchSequence: [],
-                referenceNotes: String(localized: "ccr.bailout.heuristic_disclaimer")
+                referenceNotes: DIRIOSLocalizer.string("ccr.bailout.heuristic_disclaimer")
             )
         }
 
@@ -54,15 +54,15 @@ enum CCRBailoutScenarioCalculator {
             remaining = max(0, remaining - allocated)
             sequence.append("\(bailout.label) @ \(Int(bailout.switchDepthMeters)) m")
             if bailout.switchDepthMeters > startDepth {
-                warnings.append(String(format: String(localized: "ccr.bailout.switch_deeper_than_start"), bailout.label))
+                warnings.append(DIRIOSLocalizer.formatted("ccr.bailout.switch_deeper_than_start", bailout.label))
             }
             if let mod = bailout.gasMix.modMeters(environment: environment), startDepth > mod {
-                warnings.append(String(format: String(localized: "ccr.bailout.mod_breach"), bailout.label))
+                warnings.append(DIRIOSLocalizer.formatted("ccr.bailout.mod_breach", bailout.label))
             }
         }
 
         if remaining > 0.5 {
-            warnings.append(String(localized: "ccr.bailout.shortfall"))
+            warnings.append(DIRIOSLocalizer.string("ccr.bailout.shortfall"))
         }
 
         let status: CCRBailoutScenarioStatus
@@ -82,7 +82,7 @@ enum CCRBailoutScenarioCalculator {
             status: status,
             warnings: warnings,
             gasSwitchSequence: sequence,
-            referenceNotes: String(localized: "ccr.bailout.heuristic_disclaimer")
+            referenceNotes: DIRIOSLocalizer.string("ccr.bailout.heuristic_disclaimer")
         )
     }
 }

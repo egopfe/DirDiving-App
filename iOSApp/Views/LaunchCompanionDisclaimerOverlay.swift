@@ -10,11 +10,11 @@ struct LaunchCompanionDisclaimerOverlay: ViewModifier {
                     VStack(spacing: 18) {
                         DIRBrandMark()
                             .frame(width: 44, height: 44)
-                        Text(String(localized: "launch.companion_disclaimer.title"))
+                        Text(DIRIOSLocalizer.string("launch.companion_disclaimer.title"))
                             .font(.title3.weight(.bold))
                             .foregroundStyle(DIRTheme.yellow)
                             .multilineTextAlignment(.center)
-                        Text(String(localized: "launch.companion_disclaimer.body"))
+                        Text(DIRIOSLocalizer.string("launch.companion_disclaimer.body"))
                             .font(.body.weight(.medium))
                             .foregroundStyle(.white.opacity(0.92))
                             .multilineTextAlignment(.center)
@@ -23,7 +23,7 @@ struct LaunchCompanionDisclaimerOverlay: ViewModifier {
                             CompanionDisclaimerAcceptance.accept()
                             isPresented = false
                         } label: {
-                            Label(String(localized: "Continue"), systemImage: "checkmark")
+                            Label(DIRIOSLocalizer.string("Continue"), systemImage: "checkmark")
                                 .font(.headline.weight(.bold))
                                 .foregroundStyle(.black)
                                 .frame(maxWidth: .infinity)

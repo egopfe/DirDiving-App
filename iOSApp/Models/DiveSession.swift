@@ -9,10 +9,10 @@ enum DiveGasLabel: String, Codable, CaseIterable, Identifiable {
 
     var localizedTitle: String {
         switch self {
-        case .oc: return String(localized: "logbook.gas.oc")
-        case .nitrox: return String(localized: "logbook.gas.nitrox")
-        case .trimix: return String(localized: "logbook.gas.trimix")
-        case .ccr: return String(localized: "logbook.gas.ccr")
+        case .oc: return DIRIOSLocalizer.string("logbook.gas.oc")
+        case .nitrox: return DIRIOSLocalizer.string("logbook.gas.nitrox")
+        case .trimix: return DIRIOSLocalizer.string("logbook.gas.trimix")
+        case .ccr: return DIRIOSLocalizer.string("logbook.gas.ccr")
         }
     }
 }
