@@ -1599,6 +1599,8 @@
 "a11y.checklist.item.gas_linked" = "Gas linked";
 "a11y.checklist.item.gas_not_linked" = "Gas not linked";
 "a11y.checklist.item.toggle.hint" = "Double tap to toggle";
+"a11y.companion.tab_bar" = "Main navigation";
+"a11y.companion.settings_tab_badge_hint" = "Sync attention required";
 "ccr.a11y.chart.hint" = "Reference planning chart";
 "ccr.a11y.reference_estimate_note" = "Reference estimate only";
 "ccr.a11y.ppo2.empty" = "No PPO2 timeline data";
