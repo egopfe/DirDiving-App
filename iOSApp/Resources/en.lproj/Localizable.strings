@@ -969,6 +969,11 @@
 "planner.cylinder.tank_size" = "Tank size";
 "planner.cylinder.add" = "Add cylinder";
 "planner.cylinder.remove" = "Remove";
+"planner.base.gas_depth.title" = "Gas not compatible with planned depth";
+"planner.base.gas_depth.message" = "The selected gas reaches its oxygen safety limit before the planned maximum depth.";
+"planner.base.gas_depth.hint" = "Reduce the planned depth, lower the O₂ percentage, or choose Air. Do not exceed the gas limit.";
+"planner.base.gas_depth.detail_format" = "%@ at %@ exceeds its derived limit of %@.";
+"planner.base.gas_depth.block_calculate" = "Resolve gas/depth compatibility before calculating the plan.";
 "planner.mod.validation.title" = "MOD validation";
 "planner.mod.exceeds_allowed" = "Gas switch exceeds allowed MOD";
 "planner.mod.hint" = "Check oxygen percentage and maximum PPO₂.";
