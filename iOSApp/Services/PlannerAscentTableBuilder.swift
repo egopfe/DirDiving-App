@@ -64,27 +64,13 @@ enum PlannerAscentTableBuilder {
             rows.append(bottomRow)
         }
 
-        rows.append(contentsOf: ascentBriefingTravelRows(
+        rows.append(contentsOf: postBottomRuntimeRows(
             from: enginePlan,
+            decoStops: decoStops,
             environment: environment,
             depthFormatter: depthFormatter,
             ppO2Formatter: ppO2Formatter
         ))
-
-        for stop in decoStops {
-            rows.append(
-                PlannerAscentTableRow(
-                    kind: .decoStop,
-                    depthMeters: stop.depthMeters,
-                    depthLabel: depthFormatter(stop.depthMeters),
-                    minutes: Double(stop.minutes),
-                    timeLabel: "\(stop.minutes) min",
-                    gas: stop.gas,
-                    ppO2: stop.ppO2,
-                    ppO2Label: ppO2Formatter(stop.ppO2)
-                )
-            )
-        }
 
         rows.append(contentsOf: surfaceRow(depthFormatter: depthFormatter))
         return rows
@@ -141,29 +127,107 @@ enum PlannerAscentTableBuilder {
         )
     }
 
-    /// Post-bottom ascent briefing rows in engine elapsed order (ascent and gas switches only).
-    private static func ascentBriefingTravelRows(
+    /// Presentation-only sequential runtime rows after bottom.
+    /// Option A: `BuhlmannEngineResult.segments` already contains `.stop` segments in operational order.
+    private static func postBottomRuntimeRows(
         from enginePlan: BuhlmannEngineResult,
+        decoStops: [DecoStop],
         environment: PlannerEnvironment,
         depthFormatter: (Double) -> String,
         ppO2Formatter: (Double) -> String
     ) -> [PlannerAscentTableRow] {
-        let postBottomSegments = postBottomSegments(from: enginePlan.segments)
-        return postBottomSegments
-            .filter { $0.kind == .ascent || $0.kind == .gasSwitch }
-            .map { segment in
+        let segments = postBottomSegments(from: enginePlan.segments)
+        var rows: [PlannerAscentTableRow] = []
+        var consumedStopIndices = Set<Int>()
+
+        for segment in segments {
+            switch segment.kind {
+            case .ascent, .gasSwitch:
+                guard segment.minutes > 0.001 else { continue }
                 let ppO2 = segment.gas.ppO2(depthMeters: segment.depthMeters, environment: environment)
-                return PlannerAscentTableRow(
-                    kind: .travel,
-                    depthMeters: segment.depthMeters,
-                    depthLabel: depthFormatter(segment.depthMeters),
-                    minutes: segment.minutes,
-                    timeLabel: "\(Formatters.one(segment.minutes)) min",
-                    gas: segment.gas.displayLabel,
-                    ppO2: ppO2,
-                    ppO2Label: ppO2Formatter(ppO2)
+                rows.append(
+                    PlannerAscentTableRow(
+                        kind: .travel,
+                        depthMeters: segment.depthMeters,
+                        depthLabel: depthFormatter(segment.depthMeters),
+                        minutes: segment.minutes,
+                        timeLabel: "\(Formatters.one(segment.minutes)) min",
+                        gas: segment.gas.displayLabel,
+                        ppO2: ppO2,
+                        ppO2Label: ppO2Formatter(ppO2)
+                    )
                 )
+            case .stop:
+                if let stopIndex = matchingDecoStopIndex(
+                    depthMeters: segment.depthMeters,
+                    minutes: segment.minutes,
+                    in: decoStops,
+                    excluding: consumedStopIndices
+                ) {
+                    consumedStopIndices.insert(stopIndex)
+                    let stop = decoStops[stopIndex]
+                    rows.append(makeDecoStopRow(stop: stop, depthFormatter: depthFormatter, ppO2Formatter: ppO2Formatter))
+                } else {
+                    let ppO2 = segment.gas.ppO2(depthMeters: segment.depthMeters, environment: environment)
+                    rows.append(
+                        PlannerAscentTableRow(
+                            kind: .decoStop,
+                            depthMeters: segment.depthMeters,
+                            depthLabel: depthFormatter(segment.depthMeters),
+                            minutes: segment.minutes,
+                            timeLabel: "\(Int(segment.minutes.rounded())) min",
+                            gas: segment.gas.displayLabel,
+                            ppO2: ppO2,
+                            ppO2Label: ppO2Formatter(ppO2)
+                        )
+                    )
+                }
+            case .descent, .bottom:
+                continue
             }
+        }
+
+        for (index, stop) in decoStops.enumerated() where !consumedStopIndices.contains(index) {
+            rows.append(makeDecoStopRow(stop: stop, depthFormatter: depthFormatter, ppO2Formatter: ppO2Formatter))
+        }
+
+        return rows
+    }
+
+    private static func makeDecoStopRow(
+        stop: DecoStop,
+        depthFormatter: (Double) -> String,
+        ppO2Formatter: (Double) -> String
+    ) -> PlannerAscentTableRow {
+        PlannerAscentTableRow(
+            kind: .decoStop,
+            depthMeters: stop.depthMeters,
+            depthLabel: depthFormatter(stop.depthMeters),
+            minutes: Double(stop.minutes),
+            timeLabel: "\(stop.minutes) min",
+            gas: stop.gas,
+            ppO2: stop.ppO2,
+            ppO2Label: ppO2Formatter(stop.ppO2)
+        )
+    }
+
+    private static func matchingDecoStopIndex(
+        depthMeters: Double,
+        minutes: Double,
+        in decoStops: [DecoStop],
+        excluding consumed: Set<Int>
+    ) -> Int? {
+        let depthTolerance = 0.1
+        if let exact = decoStops.indices.first(where: { index in
+            !consumed.contains(index)
+                && abs(decoStops[index].depthMeters - depthMeters) <= depthTolerance
+                && abs(Double(decoStops[index].minutes) - minutes) <= 0.01
+        }) {
+            return exact
+        }
+        return decoStops.indices.first(where: { index in
+            !consumed.contains(index) && abs(decoStops[index].depthMeters - depthMeters) <= depthTolerance
+        })
     }
 
     private static func postBottomSegments(from segments: [BuhlmannRuntimeSegment]) -> [BuhlmannRuntimeSegment] {

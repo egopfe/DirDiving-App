@@ -1214,7 +1214,7 @@
 "planner.metric.otu_weekly" = "Weekly OTU";
 "planner.metric.otu_weekly.footnote" = "Estimated weekly oxygen exposure. Reference only.";
 "planner.warning.otu_weekly_elevated" = "Weekly OTU exposure is elevated. Review oxygen exposure before planning additional dives.";
-"planner.table.briefing_order.footnote" = "Dive runtime briefing order: descent, bottom, post-bottom travel/gas switches, deco stops, surface. Not stop-interleaved.";
+"planner.table.briefing_order.footnote" = "Dive runtime follows operational sequence: descent, bottom, then interleaved travel/gas switches and deco stops to surface.";
 "planner.state.no_deco_solution.title" = "No valid decompression solution";
 "planner.state.no_deco_solution.message" = "The engine hit a calculation limit before completing decompression.";
 "planner.state.no_deco_solution.hint" = "Reduce profile stress or use certified decompression software.";

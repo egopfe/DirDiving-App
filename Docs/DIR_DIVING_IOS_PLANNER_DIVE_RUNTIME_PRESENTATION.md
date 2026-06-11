@@ -23,6 +23,18 @@ It presents the full operational runtime sequence of a dive, not only ascent/dec
 - **CCR:** CCR schedule card uses the same runtime title; rows labeled via `DiveSegmentKind.runtimeRowTitle` from engine output.
 - **Base:** No forced runtime table in result policy; if rows exist, no “Sosta Deco” unless real deco stops are present.
 
+## Sequential runtime ordering
+
+Runtime rows after bottom follow the **operational sequence** from `BuhlmannEngineResult.segments`:
+
+- Ascent and gas-switch segments → **Trasporto / Travel**
+- Stop segments (`.stop`) → **Sosta Deco / Deco Stop**, enriched from Bühlmann `decoStops` for gas/PPO₂ labels
+- Rows are **interleaved** (travel → deco stop → travel → …) rather than grouped by kind
+
+The runtime table does **not** recalculate decompression. Stop depths, stop times, gas switches, and PPO₂ values come from the existing engine output.
+
+CCR schedule rows remain ordered by `CCRPlannerEngine` output where supported.
+
 ## Calculation boundaries
 
 - Adding **Discesa** is a presentation projection from existing `BuhlmannEngineResult.segments`.
