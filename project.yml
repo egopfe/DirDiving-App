@@ -219,6 +219,7 @@ targets:
       - iOSApp/Algorithms/Buhlmann/BuhlmannPlanPreflightValidator.swift
       - iOSApp/Services/PlannerAscentTableBuilder.swift
       - iOSApp/Services/DecoStopsPresentationBuilder.swift
+      - iOSApp/Services/GasLedgerDisplayFormatter.swift
       - iOSApp/Services/BuhlmannPlanner.swift
       - iOSApp/Services/CloudSyncStore.swift
       - iOSApp/Utils/CloudBackupSettings.swift

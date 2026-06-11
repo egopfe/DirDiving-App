@@ -773,6 +773,8 @@
 "planner.field.gf_low" = "GF Low";
 "planner.field.gf_high" = "GF High";
 "planner.card.reserve" = "GAS RESERVE";
+"planner.available_gas.title" = "Available Gas";
+"planner.gas_ledger.pressure_equivalent" = "≈ %@";
 "planner.metric.rock_bottom" = "Rock bottom";
 "planner.metric.turn_pressure" = "Turn";
 "planner.warning.title" = "WARNING";
@@ -1065,7 +1067,8 @@
 "planner.contingency.deeper_depth.action" = "Re-plan after +3 m deeper exposure (%d m).";
 "planner.contingency.deeper_depth.warning" = "Engine-derived TTS for deeper exposure scenario.";
 "planner.calculate.in_progress" = "Calculating…";
-"planner.gas_ledger.title" = "SCHEDULE GAS LEDGER";
+"planner.gas_ledger.title" = "Available Gas";
+"planner.gas_ledger.estimated_consumption" = "Estimated consumption";
 "planner.gas_ledger.subtitle" = "Per-cylinder consumption from the Bühlmann runtime schedule (not bottom-only estimates).";
 "planner.gas_ledger.remaining_pressure" = "Remaining";
 "planner.gas_ledger.reserve_flag" = "RESERVE";

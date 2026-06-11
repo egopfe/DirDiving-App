@@ -30,6 +30,16 @@ final class PlannerPresentationTests: XCTestCase {
         XCTAssertTrue(presentation.showsGasLedger)
     }
 
+    func testGasLedgerSectionTitleIsAvailableGas() throws {
+        let en = try loadStrings(named: "en")
+        let it = try loadStrings(named: "it")
+        XCTAssertEqual(en["planner.available_gas.title"], "Available Gas")
+        XCTAssertEqual(it["planner.available_gas.title"], "Gas disponibile")
+        let source = try String(contentsOfFile: plannerViewSourcePath(), encoding: .utf8)
+        XCTAssertTrue(source.contains("planner.available_gas.title"))
+        XCTAssertTrue(source.contains("GasQuantityMetricTile"))
+    }
+
     func testDecoStopsSectionShowsOnlyDecoStops() throws {
         let plan = try technicalDecoPlan()
         let rows = DecoStopsPresentationBuilder.rows(from: plan.decoStops)

@@ -835,23 +835,67 @@ struct PlannerView: View {
     }
 
     private var reserveCard: some View {
-        DIRCard(DIRIOSLocalizer.string("planner.card.reserve"), icon: "gauge", accent: DIRTheme.green) {
+        let cylinderVolume = store.input.primaryCylinder.volumeLiters
+        return DIRCard(DIRIOSLocalizer.string("planner.available_gas.title"), icon: "gauge", accent: DIRTheme.green) {
             VStack(spacing: 0) {
                 HStack(spacing: 0) {
-                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.available"), value: Formatters.zero(store.input.availableGasLiters), unit: "L", color: DIRTheme.green)
+                    GasQuantityMetricTile(
+                        title: DIRIOSLocalizer.string("planner.gas_ledger.available_gas"),
+                        display: GasLedgerDisplayFormatter.displayValue(
+                            liters: store.input.availableGasLiters,
+                            pressureBar: store.input.primaryCylinder.startPressureBar,
+                            cylinderVolumeLiters: cylinderVolume,
+                            pressureUnit: pressureUnitPreference
+                        ),
+                        color: DIRTheme.green
+                    )
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.consumption"), value: Formatters.zero(store.analysis.consumptionLiters), unit: "L", color: DIRTheme.yellow)
+                    GasQuantityMetricTile(
+                        title: DIRIOSLocalizer.string("planner.gas_ledger.estimated_consumption"),
+                        display: GasLedgerDisplayFormatter.displayValue(
+                            liters: store.analysis.consumptionLiters,
+                            pressureBar: cylinderVolume > 0 ? store.analysis.consumptionLiters / cylinderVolume : nil,
+                            cylinderVolumeLiters: cylinderVolume,
+                            pressureUnit: pressureUnitPreference
+                        ),
+                        color: DIRTheme.yellow
+                    )
                     Divider().overlay(DIRTheme.hairline)
-                    let remainingPressure = Formatters.pressure(fromBar: store.analysis.remainingBar, unit: pressureUnitPreference)
-                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.remaining"), value: remainingPressure.value, unit: remainingPressure.unit, color: store.analysis.remainingLiters < store.analysis.rockBottomLiters ? DIRTheme.red : DIRTheme.green)
+                    GasQuantityMetricTile(
+                        title: DIRIOSLocalizer.string("planner.metric.remaining"),
+                        display: GasLedgerDisplayFormatter.displayValue(
+                            liters: store.analysis.remainingLiters,
+                            pressureBar: store.analysis.remainingBar,
+                            cylinderVolumeLiters: cylinderVolume,
+                            pressureUnit: pressureUnitPreference
+                        ),
+                        color: store.analysis.remainingLiters < store.analysis.rockBottomLiters ? DIRTheme.red : DIRTheme.green
+                    )
                 }
                 Divider().overlay(DIRTheme.hairline)
                 HStack(spacing: 0) {
-                    let rockBottomPressure = Formatters.pressure(fromBar: store.analysis.minimumGasBar, unit: pressureUnitPreference)
-                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.rock_bottom"), value: rockBottomPressure.value, unit: rockBottomPressure.unit, color: DIRTheme.orange)
+                    GasQuantityMetricTile(
+                        title: DIRIOSLocalizer.string("planner.metric.rock_bottom"),
+                        display: GasLedgerDisplayFormatter.displayValue(
+                            liters: store.analysis.rockBottomLiters,
+                            pressureBar: store.analysis.minimumGasBar,
+                            cylinderVolumeLiters: cylinderVolume,
+                            pressureUnit: pressureUnitPreference
+                        ),
+                        color: DIRTheme.orange
+                    )
                     Divider().overlay(DIRTheme.hairline)
-                    let turnPressure = Formatters.pressure(fromBar: store.analysis.turnPressureBar, unit: pressureUnitPreference)
-                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.turn_pressure"), value: turnPressure.value, unit: turnPressure.unit, color: DIRTheme.cyan)
+                    let turnLiters = store.analysis.turnPressureBar * cylinderVolume
+                    GasQuantityMetricTile(
+                        title: DIRIOSLocalizer.string("planner.metric.turn_pressure"),
+                        display: GasLedgerDisplayFormatter.displayValue(
+                            liters: turnLiters,
+                            pressureBar: store.analysis.turnPressureBar,
+                            cylinderVolumeLiters: cylinderVolume,
+                            pressureUnit: pressureUnitPreference
+                        ),
+                        color: DIRTheme.cyan
+                    )
                 }
                 if store.analysis.usesBottomPhaseConsumptionEstimate {
                     Text(DIRIOSLocalizer.string("planner.gas.bottom_phase_estimate_footnote"))
@@ -2212,7 +2256,7 @@ struct PlanResultView: View {
     @ViewBuilder
     private var gasLedgerCard: some View {
         if let failure = store.plan.gasLedgerFailure {
-            DIRCard(DIRIOSLocalizer.string("planner.gas_ledger.title"), icon: "fuelpump", accent: DIRTheme.red) {
+            DIRCard(DIRIOSLocalizer.string("planner.available_gas.title"), icon: "fuelpump", accent: DIRTheme.red) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(failure.userFacingMessage.title)
                         .font(.callout.weight(.semibold))
@@ -2230,7 +2274,7 @@ struct PlanResultView: View {
                 }
             }
         } else if let ledger = store.plan.gasLedger {
-            DIRCard(DIRIOSLocalizer.string("planner.gas_ledger.title"), icon: "fuelpump", accent: DIRTheme.cyan) {
+            DIRCard(DIRIOSLocalizer.string("planner.available_gas.title"), icon: "fuelpump", accent: DIRTheme.cyan) {
                 VStack(spacing: 10) {
                     Text(DIRIOSLocalizer.string("planner.gas_ledger.subtitle"))
                         .font(.caption2)
@@ -2258,6 +2302,10 @@ struct PlanResultView: View {
     private func gasLedgerEntryRow(_ entry: GasConsumptionLedger.Entry, ledger: GasConsumptionLedger) -> some View {
         let cylinderLabel = store.input.plannerCylinders.first(where: { $0.id == entry.cylinderId })?.tankSize.rawValue
             ?? store.input.primaryCylinder.name
+        let cylinderVolume = GasLedgerDisplayFormatter.cylinderVolumeLiters(for: entry.cylinderId, input: store.input)
+        let availableLiters = entry.consumedLiters + entry.remainingLiters
+        let availableBar = cylinderVolume > 0 ? availableLiters / cylinderVolume : entry.remainingBar
+        let consumedBar = cylinderVolume > 0 ? entry.consumedLiters / cylinderVolume : nil
         let reserveBreached = ledger.warnings.contains {
             if case .reserveBreached(let gas) = $0 { return gas == entry.gasLabel }
             return false
@@ -2288,12 +2336,38 @@ struct PlanResultView: View {
                 }
             }
             HStack(spacing: 0) {
-                DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.consumption"), value: Formatters.zero(entry.consumedLiters), unit: "L", color: DIRTheme.yellow)
+                GasQuantityMetricTile(
+                    title: DIRIOSLocalizer.string("planner.gas_ledger.available_gas"),
+                    display: GasLedgerDisplayFormatter.displayValue(
+                        liters: availableLiters,
+                        pressureBar: availableBar,
+                        cylinderVolumeLiters: cylinderVolume,
+                        pressureUnit: pressureUnitPreference
+                    ),
+                    color: DIRTheme.cyan
+                )
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.remaining"), value: Formatters.zero(entry.remainingLiters), unit: "L", color: entry.remainingLiters < 0 ? DIRTheme.red : DIRTheme.green)
+                GasQuantityMetricTile(
+                    title: DIRIOSLocalizer.string("planner.gas_ledger.estimated_consumption"),
+                    display: GasLedgerDisplayFormatter.displayValue(
+                        liters: entry.consumedLiters,
+                        pressureBar: consumedBar,
+                        cylinderVolumeLiters: cylinderVolume,
+                        pressureUnit: pressureUnitPreference
+                    ),
+                    color: DIRTheme.yellow
+                )
                 Divider().overlay(DIRTheme.hairline)
-                let remainingPressure = Formatters.pressure(fromBar: entry.remainingBar, unit: pressureUnitPreference)
-                DIRMetricTile(title: DIRIOSLocalizer.string("planner.gas_ledger.remaining_pressure"), value: remainingPressure.value, unit: remainingPressure.unit, color: reserveBreached ? DIRTheme.red : DIRTheme.cyan)
+                GasQuantityMetricTile(
+                    title: DIRIOSLocalizer.string("planner.metric.remaining"),
+                    display: GasLedgerDisplayFormatter.displayValue(
+                        liters: entry.remainingLiters,
+                        pressureBar: entry.remainingBar,
+                        cylinderVolumeLiters: cylinderVolume,
+                        pressureUnit: pressureUnitPreference
+                    ),
+                    color: entry.remainingLiters < 0 || reserveBreached ? DIRTheme.red : DIRTheme.green
+                )
             }
             if lostGasFailed {
                 Text(DIRIOSLocalizer.string("planner.gas_ledger.warning.lost_gas.message"))
@@ -2316,6 +2390,7 @@ struct PlanResultView: View {
     private func unusedGasLedgerEntryRow(_ entry: GasConsumptionLedger.UnusedPlannedEntry) -> some View {
         let cylinderLabel = store.input.plannerCylinders.first(where: { $0.id == entry.cylinderId })?.tankSize.rawValue
             ?? store.input.primaryCylinder.name
+        let cylinderVolume = GasLedgerDisplayFormatter.cylinderVolumeLiters(for: entry.cylinderId, input: store.input)
         let subtitle = entry.isStandbyOrBailout
             ? DIRIOSLocalizer.string("planner.gas_ledger.unused_standby")
             : DIRIOSLocalizer.string("planner.gas_ledger.unused_planned")
@@ -2335,18 +2410,14 @@ struct PlanResultView: View {
                     .foregroundStyle(DIRTheme.yellow)
             }
             HStack(spacing: 0) {
-                DIRMetricTile(
+                GasQuantityMetricTile(
                     title: DIRIOSLocalizer.string("planner.gas_ledger.available_gas"),
-                    value: Formatters.zero(entry.availableLiters),
-                    unit: "L",
-                    color: DIRTheme.cyan
-                )
-                Divider().overlay(DIRTheme.hairline)
-                let availablePressure = Formatters.pressure(fromBar: entry.availableBar, unit: pressureUnitPreference)
-                DIRMetricTile(
-                    title: DIRIOSLocalizer.string("planner.gas_ledger.remaining_pressure"),
-                    value: availablePressure.value,
-                    unit: availablePressure.unit,
+                    display: GasLedgerDisplayFormatter.displayValue(
+                        liters: entry.availableLiters,
+                        pressureBar: entry.availableBar,
+                        cylinderVolumeLiters: cylinderVolume,
+                        pressureUnit: pressureUnitPreference
+                    ),
                     color: DIRTheme.cyan
                 )
             }
