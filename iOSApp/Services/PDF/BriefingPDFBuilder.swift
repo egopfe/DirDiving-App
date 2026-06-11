@@ -40,14 +40,20 @@ enum BriefingPDFBuilder {
             }
 
             page.drawSpacer()
-            page.drawSectionTitle(DIRIOSLocalizer.string("pdf.export.briefing.ascent"))
+            page.drawSectionTitle(DIRIOSLocalizer.string("planner.runtime.title"))
             page.drawLine("TTS", value: "\(context.plan.ttsMinutes) min")
-            if context.plan.decoStops.isEmpty {
+            if context.plan.ascentTableRows.isEmpty, context.plan.decoStops.isEmpty {
                 page.drawParagraph(DIRIOSLocalizer.string("planner.export.no_deco_stops"))
+            } else if !context.plan.ascentTableRows.isEmpty {
+                for row in context.plan.ascentTableRows {
+                    page.drawParagraph(
+                        "\(row.kind.localizedTitle) · \(row.depthLabel) / \(row.timeLabel) · \(row.gas) · PPO₂ \(row.ppO2Label)"
+                    )
+                }
             } else {
                 for stop in context.plan.decoStops {
                     page.drawParagraph(
-                        "\(Formatters.depth(stop.depthMeters, units: context.unitPreference).text) / \(stop.minutes) min · \(stop.gas)"
+                        "\(PlannerAscentRowKind.decoStop.localizedTitle) · \(Formatters.depth(stop.depthMeters, units: context.unitPreference).text) / \(stop.minutes) min · \(stop.gas)"
                     )
                 }
             }

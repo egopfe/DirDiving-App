@@ -109,4 +109,11 @@ final class CCRPlannerTests: XCTestCase {
             accuracy: 0.5
         )
     }
+
+    func testCCRScheduleIncludesDescentPhaseWithRuntimeLabels() {
+        let plan = CCRPlannerService.makePlan(input: .default)
+        XCTAssertTrue(plan.validationResult.isValid)
+        XCTAssertTrue(plan.schedule.contains(where: { $0.phase == .descent }))
+        XCTAssertEqual(DiveSegmentKind.stop.runtimeRowTitle, PlannerAscentRowKind.decoStop.localizedTitle)
+    }
 }
