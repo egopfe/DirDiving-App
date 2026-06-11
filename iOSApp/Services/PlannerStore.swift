@@ -87,10 +87,12 @@ final class PlannerStore: ObservableObject {
             plannerShowsModeSelection = true
         }
         input.ensurePlannerCylindersFromLegacy()
-        calculate()
-        refreshCCRPlan()
         isReady = true
-        saveIfReady()
+        deferPublishedMutation { [self] in
+            calculate()
+            refreshCCRPlan()
+            saveIfReady()
+        }
     }
 
     func selectPlannerMode(_ selected: PlannerMode) {
@@ -123,7 +125,19 @@ final class PlannerStore: ObservableObject {
     }
 
     func acknowledgeCNSThresholdSettingsFocus() {
-        scrollToCNSThresholdSettings = false
+        deferPublishedMutation { [self] in
+            scrollToCNSThresholdSettings = false
+        }
+    }
+
+    func bootstrapPlannerIfNeeded() {
+        deferPublishedMutation { [self] in
+            guard isReady else { return }
+            isApplyingInputSideEffects = true
+            input.ensurePlannerCylindersFromLegacy()
+            isApplyingInputSideEffects = false
+            refreshDerivedPlanningPreview()
+        }
     }
 
     func normalizeSwitchDepthAfterGasOrPPO2Change(cylinderID: UUID) {
@@ -254,6 +268,7 @@ final class PlannerStore: ObservableObject {
         planningGeneration &+= 1
         let generation = planningGeneration
         planningUpdateTask = Task { @MainActor in
+            await Task.yield()
             isCalculating = true
             try? await Task.sleep(nanoseconds: 200_000_000)
             guard !Task.isCancelled, generation == planningGeneration else { return }
@@ -273,6 +288,7 @@ final class PlannerStore: ObservableObject {
         planningGeneration &+= 1
         let generation = planningGeneration
         planningUpdateTask = Task { @MainActor in
+            await Task.yield()
             isCalculating = true
             try? await Task.sleep(nanoseconds: 200_000_000)
             guard !Task.isCancelled, generation == planningGeneration else { return }
@@ -284,6 +300,7 @@ final class PlannerStore: ObservableObject {
     /// Avoids SwiftUI "Publishing changes from within view updates" when bindings mutate @Published state.
     private func deferPublishedMutation(_ operation: @MainActor @escaping () -> Void) {
         Task { @MainActor in
+            await Task.yield()
             operation()
         }
     }

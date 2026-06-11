@@ -164,8 +164,7 @@ struct PlannerView: View {
                     .environmentObject(equipment)
             }
             .task {
-                store.input.ensurePlannerCylindersFromLegacy()
-                store.refreshDerivedPlanningPreview()
+                store.bootstrapPlannerIfNeeded()
             }
             .alert(DIRIOSLocalizer.string("planner.reference.info.title"), isPresented: $showPlanningReferenceInfo) {
                 Button(DIRIOSLocalizer.string("common.ok"), role: .cancel) {}
@@ -513,11 +512,11 @@ struct PlannerView: View {
     }
 
     private func scrollToCNSThresholdSettings(using scrollProxy: ScrollViewProxy) {
-        guard modePresentation.showsCNSDescentBottomSettings else {
-            store.acknowledgeCNSThresholdSettingsFocus()
-            return
-        }
         DispatchQueue.main.async {
+            guard modePresentation.showsCNSDescentBottomSettings else {
+                store.acknowledgeCNSThresholdSettingsFocus()
+                return
+            }
             withAnimation(.easeInOut(duration: 0.35)) {
                 scrollProxy.scrollTo(PlannerCNSDescentBottomCheckSettings.scrollTargetID, anchor: .center)
             }
