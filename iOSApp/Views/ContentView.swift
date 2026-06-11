@@ -70,8 +70,11 @@ struct ContentView: View {
         .tint(DIRTheme.cyan)
         .launchCompanionDisclaimer(isPresented: $showLaunchDisclaimer)
         .onAppear {
-            applyPostLegalPlannerLandingIfNeeded()
             mountedTabs.insert(navigation.selectedTab)
+            Task { @MainActor in
+                await Task.yield()
+                applyPostLegalPlannerLandingIfNeeded()
+            }
         }
         .onChange(of: navigation.selectedTab) { _, tab in
             mountedTabs.insert(tab)

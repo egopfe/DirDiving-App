@@ -25,9 +25,16 @@ final class EquipmentStore: ObservableObject {
         templates = cloudSync?.load([EquipmentTemplate].self, forKey: templatesKey) ?? Self.defaultTemplates()
         selectedChecklistTemplateID = cloudSync?.load(UUID.self, forKey: checklistSelectionKey)
         isReady = true
-        saveIfReady()
-        saveTemplatesIfReady()
-        saveSelectionIfReady()
+        deferInitialPersistence()
+    }
+
+    private func deferInitialPersistence() {
+        Task { @MainActor in
+            await Task.yield()
+            saveIfReady()
+            saveTemplatesIfReady()
+            saveSelectionIfReady()
+        }
     }
 
     var selectedChecklistSetupDisplayName: String {
