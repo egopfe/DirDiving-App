@@ -83,6 +83,9 @@ struct PlannerView: View {
                                     technicalAnalysisCard
                                 }
                                 if modePresentation.showsReserveCard {
+                                    emergencyCard
+                                }
+                                if modePresentation.showsReserveCard {
                                     reserveCard
                                 }
                                 plannerMODInputWarnings
@@ -664,8 +667,6 @@ struct PlannerView: View {
                         .foregroundStyle(DIRTheme.muted)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     plannerField(DIRIOSLocalizer.string("planner.field.sac_rmv"), value: $store.input.sacLitersPerMinute, unit: "L/min", step: 1)
-                    Divider().overlay(DIRTheme.hairline)
-                    plannerField(DIRIOSLocalizer.string("planner.field.sac_emergency"), value: $store.input.emergencySacLitersPerMinute, unit: "L/min", step: 1)
                 }
             }
         }
@@ -832,6 +833,96 @@ struct PlannerView: View {
                 .fixedSize(horizontal: false, vertical: true)
             }
         }
+    }
+
+    private var emergencyCard: some View {
+        let automaticAscentMinutes = ScheduleGasConsumptionService.automaticAscentMinutes(
+            plannedDepthMeters: store.input.plannedDepthMeters
+        )
+        let totalEmergencyMinutes = ScheduleGasConsumptionService.emergencyMinutesUsed(input: store.input)
+        let rockBottomLiters = ScheduleGasConsumptionService.rockBottomLiters(
+            input: store.input,
+            environment: store.input.plannerEnvironment
+        )
+        let cylinderVolume = store.input.primaryCylinder.volumeLiters
+        let minimumGasBar = cylinderVolume > 0 ? rockBottomLiters / cylinderVolume : nil
+        return DIRCard(DIRIOSLocalizer.string("planner.emergency.title"), icon: "cross.case.fill", accent: DIRTheme.orange) {
+            VStack(alignment: .leading, spacing: 0) {
+                Text(DIRIOSLocalizer.string("planner.emergency.subtitle"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.bottom, 8)
+                plannerField(
+                    DIRIOSLocalizer.string("planner.emergency.team_size"),
+                    value: teamSizeBinding,
+                    unit: "",
+                    step: 1,
+                    minValue: 1,
+                    maxValue: IOSAlgorithmConfiguration.maxPlannerEmergencyTeamSize
+                )
+                plannerMutedFootnote(DIRIOSLocalizer.string("planner.emergency.team_size.detail"))
+                Divider().overlay(DIRTheme.hairline)
+                plannerField(
+                    DIRIOSLocalizer.string("planner.emergency.sac"),
+                    value: $store.input.emergencySacLitersPerMinute,
+                    unit: "L/min",
+                    step: 1
+                )
+                plannerMutedFootnote(DIRIOSLocalizer.string("planner.emergency.sac.detail"))
+                Divider().overlay(DIRTheme.hairline)
+                plannerField(
+                    DIRIOSLocalizer.string("planner.emergency.extra_minutes"),
+                    value: emergencyExtraMinutesBinding,
+                    unit: "min",
+                    step: 1,
+                    maxValue: IOSAlgorithmConfiguration.maxEmergencyExtraMinutes
+                )
+                plannerMutedFootnote(DIRIOSLocalizer.string("planner.emergency.extra_minutes.detail"))
+                Divider().overlay(DIRTheme.hairline)
+                plannerReadOnlyRow(
+                    DIRIOSLocalizer.string("planner.emergency.automatic_ascent"),
+                    value: String(
+                        format: DIRIOSLocalizer.string("planner.emergency.minutes_format"),
+                        Formatters.one(automaticAscentMinutes)
+                    )
+                )
+                plannerReadOnlyRow(
+                    DIRIOSLocalizer.string("planner.emergency.total_time"),
+                    value: String(
+                        format: DIRIOSLocalizer.string("planner.emergency.total_time.format"),
+                        Formatters.one(totalEmergencyMinutes)
+                    )
+                )
+                Divider().overlay(DIRTheme.hairline)
+                GasQuantityMetricTile(
+                    title: DIRIOSLocalizer.string("planner.emergency.rock_bottom"),
+                    display: GasLedgerDisplayFormatter.displayValue(
+                        liters: rockBottomLiters,
+                        pressureBar: minimumGasBar,
+                        cylinderVolumeLiters: cylinderVolume,
+                        pressureUnit: pressureUnitPreference
+                    ),
+                    color: DIRTheme.orange
+                )
+                plannerMutedFootnote(DIRIOSLocalizer.string("planner.emergency.footnote"))
+            }
+        }
+    }
+
+    private var teamSizeBinding: Binding<Double> {
+        Binding(
+            get: { ScheduleGasConsumptionService.normalizedTeamSize(store.input.teamSize) },
+            set: { store.input.teamSize = ScheduleGasConsumptionService.normalizedTeamSize($0) }
+        )
+    }
+
+    private var emergencyExtraMinutesBinding: Binding<Double> {
+        Binding(
+            get: { store.input.emergencyExtraMinutes },
+            set: { store.input.emergencyExtraMinutes = ScheduleGasConsumptionService.normalizedEmergencyExtraMinutes($0) }
+        )
     }
 
     private var reserveCard: some View {
@@ -1207,19 +1298,46 @@ struct PlannerView: View {
         )
     }
 
-    private func plannerField(_ title: String, value: Binding<Double>, unit: String, step: Double, maxValue: Double? = nil) -> some View {
+    private func plannerReadOnlyRow(_ title: String, value: String) -> some View {
         HStack {
             Text(title)
                 .font(.callout)
                 .foregroundStyle(.white)
             Spacer()
-            Text("\(Formatters.zero(value.wrappedValue)) \(unit)")
+            Text(value)
                 .font(.callout.monospacedDigit())
+                .foregroundStyle(DIRTheme.cyan)
+                .multilineTextAlignment(.trailing)
+        }
+        .padding(.vertical, 10)
+    }
+
+    private func plannerField(
+        _ title: String,
+        value: Binding<Double>,
+        unit: String,
+        step: Double,
+        minValue: Double = 0,
+        maxValue: Double? = nil
+    ) -> some View {
+        HStack {
+            Text(title)
+                .font(.callout)
                 .foregroundStyle(.white)
-                .frame(width: 96, alignment: .trailing)
+            Spacer()
+            Group {
+                if unit.isEmpty {
+                    Text(Formatters.zero(value.wrappedValue))
+                } else {
+                    Text("\(Formatters.zero(value.wrappedValue)) \(unit)")
+                }
+            }
+            .font(.callout.monospacedDigit())
+            .foregroundStyle(.white)
+            .frame(width: 96, alignment: .trailing)
             HStack(spacing: 1) {
                 Button {
-                    value.wrappedValue = max(0, value.wrappedValue - step)
+                    value.wrappedValue = max(minValue, value.wrappedValue - step)
                 } label: {
                     Image(systemName: "minus")
                         .frame(width: 28, height: 24)

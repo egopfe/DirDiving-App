@@ -37,6 +37,29 @@ final class PlannerPresentationTests: XCTestCase {
         XCTAssertEqual(en["equipment.images.section"], "Equipment images")
     }
 
+    func testEmergencyWindowLocalizationKeysExist() throws {
+        let en = try loadStrings(named: "en")
+        let it = try loadStrings(named: "it")
+        XCTAssertEqual(en["planner.emergency.title"], "Emergency")
+        XCTAssertEqual(it["planner.emergency.title"], "Emergenza")
+        XCTAssertNotNil(en["planner.emergency.team_size"])
+        XCTAssertNotNil(it["planner.emergency.sac"])
+        XCTAssertNotNil(en["planner.emergency.extra_minutes"])
+        XCTAssertNotNil(it["planner.emergency.rock_bottom"])
+    }
+
+    func testPlannerPresentationShowsEmergencySection() throws {
+        let source = try String(contentsOfFile: plannerViewSourcePath(), encoding: .utf8)
+        XCTAssertTrue(source.contains("emergencyCard"))
+        XCTAssertTrue(source.contains("planner.emergency.title"))
+        XCTAssertTrue(source.contains("planner.emergency.team_size"))
+        XCTAssertTrue(source.contains("planner.emergency.sac"))
+        XCTAssertTrue(source.contains("planner.emergency.extra_minutes"))
+        XCTAssertTrue(source.contains("planner.emergency.rock_bottom"))
+        XCTAssertTrue(PlannerResultPresentation.presentation(for: .deco).showsReserveCard)
+        XCTAssertTrue(PlannerResultPresentation.presentation(for: .technical).showsReserveCard)
+    }
+
     func testGasLedgerSectionTitleIsAvailableGas() throws {
         let en = try loadStrings(named: "en")
         let it = try loadStrings(named: "it")

@@ -204,12 +204,40 @@ enum ScheduleGasConsumptionService {
         return result
     }
 
+    static func automaticAscentMinutes(plannedDepthMeters: Double) -> Double {
+        guard plannedDepthMeters.isFinite else { return 3 }
+        return max(3, plannedDepthMeters / 9.0)
+    }
+
+    static func normalizedEmergencyExtraMinutes(_ minutes: Double) -> Double {
+        guard minutes.isFinite else { return IOSAlgorithmConfiguration.defaultEmergencyExtraMinutes }
+        return min(
+            IOSAlgorithmConfiguration.maxEmergencyExtraMinutes,
+            max(0, minutes)
+        )
+    }
+
+    static func normalizedTeamSize(_ teamSize: Double) -> Double {
+        guard teamSize.isFinite else { return 2 }
+        return min(
+            IOSAlgorithmConfiguration.maxPlannerEmergencyTeamSize,
+            max(1, teamSize.rounded())
+        )
+    }
+
+    static func emergencyMinutesUsed(input: GasPlanInput) -> Double {
+        automaticAscentMinutes(plannedDepthMeters: input.plannedDepthMeters)
+            + normalizedEmergencyExtraMinutes(input.emergencyExtraMinutes)
+    }
+
     static func rockBottomLiters(input: GasPlanInput, environment: PlannerEnvironment) -> Double {
         let averageAscentDepth = input.plannedDepthMeters / 2.0
         let averageAscentATA = AmbientPressureModel.ambientPressureBar(depthMeters: averageAscentDepth, environment: environment) ?? environment.surfacePressureBar
-        let ascentMinutes = max(3, input.plannedDepthMeters / 9.0)
-        let emergencyMinutes = 1.0 + ascentMinutes + (input.plannedDepthMeters > 10 ? 3.0 : 0.0)
-        let value = input.emergencySacLitersPerMinute * max(1, input.teamSize) * averageAscentATA * emergencyMinutes
+        let emergencyMinutes = emergencyMinutesUsed(input: input)
+        let value = input.emergencySacLitersPerMinute
+            * normalizedTeamSize(input.teamSize)
+            * averageAscentATA
+            * emergencyMinutes
         guard value.isFinite, value >= 0 else { return 0 }
         return value
     }

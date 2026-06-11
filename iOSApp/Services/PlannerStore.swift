@@ -452,6 +452,9 @@ private struct AnalysisCacheKey: Equatable {
     let planningDepthReference: PlanningDepthReference
     let bottomTimeMinutes: Double
     let sacLitersPerMinute: Double
+    let emergencySacLitersPerMinute: Double
+    let teamSize: Double
+    let emergencyExtraMinutes: Double
     let altitudeMeters: Double
     let salinity: SalinityMode
     let bottomGasSignature: String
@@ -466,6 +469,9 @@ private struct AnalysisCacheKey: Equatable {
         planningDepthReference = input.planningDepthReference
         bottomTimeMinutes = input.plannedBottomMinutes
         sacLitersPerMinute = input.sacLitersPerMinute
+        emergencySacLitersPerMinute = input.emergencySacLitersPerMinute
+        teamSize = input.teamSize
+        emergencyExtraMinutes = input.emergencyExtraMinutes
         altitudeMeters = input.altitudeMeters
         salinity = input.salinity
         bottomGasSignature = "\(input.bottomGas.oxygen)-\(input.bottomGas.helium)-\(input.bottomGas.maxPPO2)"

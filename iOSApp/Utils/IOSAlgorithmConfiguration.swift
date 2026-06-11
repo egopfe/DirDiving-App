@@ -48,6 +48,9 @@ enum IOSAlgorithmConfiguration {
 
     static let gasDensityWarningGramsPerLiter = 5.2
     static let gasDensityDangerGramsPerLiter = 6.2
+    static let defaultEmergencyExtraMinutes = 3.0
+    static let maxEmergencyExtraMinutes = 30.0
+    static let maxPlannerEmergencyTeamSize = 6.0
     static let supportedWatchDepthLimitMeters = 40.0
 
     static let maxLogSessions = 40
