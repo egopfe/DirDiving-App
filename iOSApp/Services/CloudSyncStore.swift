@@ -16,7 +16,6 @@ final class CloudSyncStore: ObservableObject {
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        refreshICloudAvailability(postStatus: false)
         NotificationCenter.default.addObserver(
             forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
             object: cloudStore,
@@ -25,7 +24,8 @@ final class CloudSyncStore: ObservableObject {
             Task { @MainActor in
                 guard let self else { return }
                 self.publishDeferred { [self] in
-                    self.refreshICloudAvailability(postStatus: false)
+                    let available = Self.currentICloudAvailability()
+                    self.isICloudAvailable = available
                     self.lastSyncStatus = DIRIOSLocalizer.string("cloud.status.external_update")
                 }
                 NotificationCenter.default.post(
@@ -43,8 +43,9 @@ final class CloudSyncStore: ObservableObject {
             Task { @MainActor in
                 guard let self else { return }
                 let wasAvailable = self.isICloudAvailable
-                self.refreshICloudAvailability(postStatus: true)
-                if !wasAvailable, self.isICloudAvailable {
+                let nowAvailable = Self.currentICloudAvailability()
+                self.publishICloudAvailability(nowAvailable, postStatus: true)
+                if !wasAvailable, nowAvailable {
                     self.synchronize()
                 }
             }
@@ -212,10 +213,11 @@ final class CloudSyncStore: ObservableObject {
     private var syncGeneration: UInt = 0
 
     func synchronize() {
-        refreshICloudAvailability(postStatus: false)
+        let available = Self.currentICloudAvailability()
+        publishICloudAvailability(available, postStatus: false)
         syncGeneration &+= 1
         let generation = syncGeneration
-        guard isICloudAvailable else {
+        guard available else {
             publishDeferred { [self] in
                 isSynchronizing = false
                 lastSyncStatus = DIRIOSLocalizer.string("cloud.status.icloud_unavailable")
@@ -231,16 +233,27 @@ final class CloudSyncStore: ObservableObject {
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 900_000_000)
             guard generation == syncGeneration else { return }
-            isSynchronizing = false
+            publishDeferred { [self] in
+                isSynchronizing = false
+            }
+        }
+    }
+
+    private static func currentICloudAvailability() -> Bool {
+        FileManager.default.ubiquityIdentityToken != nil
+    }
+
+    private func publishICloudAvailability(_ available: Bool, postStatus: Bool) {
+        publishDeferred { [self] in
+            isICloudAvailable = available
+            if postStatus, !available {
+                lastSyncStatus = DIRIOSLocalizer.string("cloud.status.icloud_unavailable")
+            }
         }
     }
 
     private func refreshICloudAvailability(postStatus: Bool) {
-        let available = FileManager.default.ubiquityIdentityToken != nil
-        isICloudAvailable = available
-        if postStatus, !available {
-            lastSyncStatus = DIRIOSLocalizer.string("cloud.status.icloud_unavailable")
-        }
+        publishICloudAvailability(Self.currentICloudAvailability(), postStatus: postStatus)
     }
 
     private func encode<T: Encodable>(_ value: T) -> Data? {
@@ -318,6 +331,7 @@ final class CloudSyncStore: ObservableObject {
     /// Avoid SwiftUI runtime fault: "Publishing changes from within view updates".
     private func publishDeferred(_ update: @escaping () -> Void) {
         Task { @MainActor in
+            await Task.yield()
             update()
         }
     }
