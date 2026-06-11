@@ -13,7 +13,7 @@ It presents the full operational runtime sequence of a dive, not only ascent/dec
 |------------|------------|--------|
 | Discesa | Descent | Bühlmann engine descent segments |
 | Fondo | Bottom | Bühlmann bottom segment |
-| Trasporto | Travel | Post-bottom ascent / gas switch segments |
+| Risalita | Travel | Post-bottom ascent / gas switch segments |
 | Sosta Deco | Deco Stop | Bühlmann decompression stops |
 | Superficie | Surface | Terminal surface row |
 
@@ -27,7 +27,7 @@ It presents the full operational runtime sequence of a dive, not only ascent/dec
 
 Runtime rows after bottom follow the **operational sequence** from `BuhlmannEngineResult.segments`:
 
-- Ascent and gas-switch segments → **Trasporto / Travel**
+- Ascent and gas-switch segments → **Risalita / Travel** (internal row kind `.travel`)
 - Stop segments (`.stop`) → **Sosta Deco / Deco Stop**, enriched from Bühlmann `decoStops` for gas/PPO₂ labels
 - Rows are **interleaved** (travel → deco stop → travel → …) rather than grouped by kind
 

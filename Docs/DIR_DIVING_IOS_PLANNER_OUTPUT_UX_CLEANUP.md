@@ -5,7 +5,7 @@
 
 ## 1. Runtime immersione ordering
 
-The **Dive Runtime** table follows the Bühlmann engine operational timeline. Deco stops (**Sosta Deco** / **Deco Stop**) are interleaved with **Trasporto** / **Travel** rows at the correct depth/time. Values are not recalculated.
+The **Dive Runtime** table follows the Bühlmann engine operational timeline. Deco stops (**Sosta Deco** / **Deco Stop**) are interleaved with **Risalita** / **Travel** rows (internal `.travel`) at the correct depth/time. Values are not recalculated.
 
 ## 2. Tappe Decompressione
 

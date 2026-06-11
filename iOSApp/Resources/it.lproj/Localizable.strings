@@ -807,7 +807,7 @@
 "planner.runtime.subtitle" = "Sequenza operativa dell’immersione generata dal modello di pianificazione selezionato.";
 "planner.runtime.row.descent" = "Discesa";
 "planner.runtime.row.bottom" = "Fondo";
-"planner.runtime.row.travel" = "Trasporto";
+"planner.runtime.row.travel" = "Risalita";
 "planner.runtime.row.ascent" = "Risalita";
 "planner.runtime.row.deco_stop" = "Sosta Deco";
 "planner.runtime.row.surface" = "Superficie";
@@ -1225,7 +1225,7 @@
 "planner.metric.otu_weekly" = "OTU settimanale";
 "planner.metric.otu_weekly.footnote" = "Esposizione settimanale all'ossigeno stimata. Solo riferimento.";
 "planner.warning.otu_weekly_elevated" = "L'esposizione OTU settimanale è elevata. Rivedi l'esposizione all'ossigeno prima di pianificare altre immersioni.";
-"planner.table.briefing_order.footnote" = "Il runtime immersione segue la sequenza operativa: discesa, fondo, poi trasporto/cambi gas e soste deco intercalate fino alla superficie.";
+"planner.table.briefing_order.footnote" = "Il runtime immersione segue la sequenza operativa: discesa, fondo, poi risalita/cambi gas e soste deco intercalate fino alla superficie.";
 "planner.state.no_deco_solution.title" = "Nessuna soluzione decompressiva valida";
 "planner.state.no_deco_solution.message" = "Il motore ha raggiunto un limite di calcolo prima di completare la decompressione.";
 "planner.state.no_deco_solution.hint" = "Riduci stress del profilo o usa software decompressivo certificato.";

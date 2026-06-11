@@ -217,6 +217,14 @@ final class PlannerAscentTableTests: XCTestCase {
         XCTAssertFalse(PlannerAscentRowKind.decoStop.localizedTitle.localizedCaseInsensitiveContains("decoStop"))
     }
 
+    func testRuntimeTravelRowItalianLabelIsRisalita() throws {
+        let en = try loadStrings(named: "en")
+        let it = try loadStrings(named: "it")
+        XCTAssertEqual(en["planner.runtime.row.travel"], "Travel")
+        XCTAssertEqual(it["planner.runtime.row.travel"], "Risalita")
+        XCTAssertEqual(PlannerAscentRowKind.travel.localizedTitle, DIRIOSLocalizer.string("planner.runtime.row.travel"))
+    }
+
     func testRuntimeTitleLocalization() throws {
         let en = try loadStrings(named: "en")
         let it = try loadStrings(named: "it")
