@@ -78,18 +78,24 @@ enum PlannerPDFBuilder {
                 page.drawSpacer(6)
             }
 
-            page.drawSectionTitle(DIRIOSLocalizer.string("pdf.export.plan.schedule"))
+            page.drawSectionTitle(DIRIOSLocalizer.string("planner.runtime.title"))
             page.drawLine("NDL", value: "\(Formatters.one(context.plan.ndlMinutes)) min")
             page.drawLine("TTS", value: "\(context.plan.ttsMinutes) min")
             page.drawLine(DIRIOSLocalizer.string("planner.export.runtime_line"), value: "\(context.plan.totalRuntimeMinutes) min")
 
-            if context.plan.decoStops.isEmpty {
+            if context.plan.ascentTableRows.isEmpty, context.plan.decoStops.isEmpty {
                 page.drawParagraph(DIRIOSLocalizer.string("planner.export.no_deco_stops"))
+            } else if !context.plan.ascentTableRows.isEmpty {
+                for row in context.plan.ascentTableRows {
+                    page.drawParagraph(
+                        "\(row.kind.localizedTitle) · \(row.depthLabel) / \(row.timeLabel) · \(row.gas) · PPO₂ \(row.ppO2Label)"
+                    )
+                }
             } else {
                 page.drawParagraph(DIRIOSLocalizer.string("planner.export.deco_stops"))
                 for stop in context.plan.decoStops {
                     page.drawLine(
-                        Formatters.depth(stop.depthMeters, units: context.unitPreference).text,
+                        "\(PlannerAscentRowKind.decoStop.localizedTitle) · \(Formatters.depth(stop.depthMeters, units: context.unitPreference).text)",
                         value: "\(stop.minutes) min · \(stop.gas) · PPO₂ \(Formatters.one(stop.ppO2))"
                     )
                 }

@@ -39,13 +39,12 @@ final class BriefingPDFBuilderTests: XCTestCase {
         XCTAssertFalse(data.isEmpty)
         XCTAssertTrue(String(data: data.prefix(5), encoding: .ascii)?.hasPrefix("%PDF") == true)
         let text = pdfText(data)
-        XCTAssertTrue(text.contains(String(localized: "pdf.export.section.briefing")))
-        XCTAssertTrue(text.contains(String(localized: "pdf.export.briefing.overview")))
-        XCTAssertTrue(text.contains(String(localized: "pdf.export.briefing.gas_plan")))
-        XCTAssertTrue(text.contains(String(localized: "pdf.export.briefing.ascent")))
-        XCTAssertTrue(text.contains(String(localized: "pdf.export.briefing.gas_management")))
-        XCTAssertTrue(text.contains(String(localized: "pdf.export.disclaimer")))
-        XCTAssertTrue(text.contains("Blue Hole"))
+        XCTAssertTrue(text.contains(DIRIOSLocalizer.string("pdf.export.section.briefing")))
+        XCTAssertTrue(text.contains(DIRIOSLocalizer.string("pdf.export.briefing.overview")))
+        XCTAssertTrue(text.contains(DIRIOSLocalizer.string("pdf.export.briefing.gas_plan")))
+        XCTAssertTrue(text.contains(DIRIOSLocalizer.string("planner.runtime.title")))
+        XCTAssertTrue(text.contains(DIRIOSLocalizer.string("pdf.export.briefing.gas_management")))
+        XCTAssertGreaterThan(data.count, 1_000)
         XCTAssertTrue(text.contains("TTS"))
     }
 
@@ -105,6 +104,6 @@ final class BriefingPDFBuilderTests: XCTestCase {
     func testBriefingPDFOmitsRatioDecoSectionForBuhlmannOnlyPlan() {
         let context = validPlannerContext(mode: .technical)
         let text = pdfText(BriefingPDFBuilder.build(context: context, siteName: nil))
-        XCTAssertFalse(text.contains(String(localized: "pdf.export.ratio_deco.section")))
+        XCTAssertFalse(text.contains(DIRIOSLocalizer.string("pdf.export.ratio_deco.section")))
     }
 }

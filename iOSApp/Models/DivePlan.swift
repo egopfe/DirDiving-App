@@ -27,6 +27,22 @@ enum DiveSegmentKind: String, CaseIterable, Identifiable, Codable {
     case gasSwitch = "Gas switch"
 
     var id: String { rawValue }
+
+    /// User-facing runtime row label for planner/CCR schedule presentation.
+    var runtimeRowTitle: String {
+        switch self {
+        case .descent:
+            return DIRIOSLocalizer.string("planner.runtime.row.descent")
+        case .bottom:
+            return DIRIOSLocalizer.string("planner.runtime.row.bottom")
+        case .ascent:
+            return DIRIOSLocalizer.string("planner.runtime.row.ascent")
+        case .stop:
+            return DIRIOSLocalizer.string("planner.runtime.row.deco_stop")
+        case .gasSwitch:
+            return DIRIOSLocalizer.string("planner.runtime.row.travel")
+        }
+    }
 }
 
 struct DivePlanSegment: Identifiable, Codable, Hashable {

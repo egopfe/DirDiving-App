@@ -330,12 +330,22 @@ struct CCRPlanResultView: View {
     }
 
     private var scheduleCard: some View {
-        DIRCard(DIRIOSLocalizer.string("ccr.schedule.header"), icon: "tablecells", accent: DIRTheme.cyan) {
+        DIRCard(DIRIOSLocalizer.string("planner.runtime.title"), icon: "timer", accent: DIRTheme.cyan) {
+            Text(DIRIOSLocalizer.string("planner.runtime.subtitle"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
             ForEach(plan.schedule.prefix(20)) { row in
-                HStack {
+                HStack(spacing: 8) {
+                    Text(row.phase.runtimeRowTitle)
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(DIRTheme.cyan)
+                        .frame(width: 72, alignment: .leading)
                     Text("\(Int(row.runtimeMinutes))'")
                         .font(.caption2.monospacedDigit())
                         .foregroundStyle(DIRTheme.muted)
+                        .frame(width: 28, alignment: .trailing)
                     Text(Formatters.depth(row.depthMeters, units: unitPreference).text)
                         .font(.caption)
                     Spacer()
