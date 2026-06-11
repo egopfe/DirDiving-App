@@ -175,6 +175,7 @@ enum PlannerService {
             return seededBase
         }())
         let contingencies = GasPlanningService.contingencyPlans(input: working, baseAnalysis: analysis, baseTTS: tts, environment: environment)
+        // Reserved for future Team / Buddy Planning module. Not surfaced in main Planner until full compatibility model exists.
         let teamMatches = GasPlanningService.teamGasMatches(input: working, minimumGasLiters: analysis.rockBottomLiters)
         var briefing = GasPlanningService.briefingLines(input: working, analysis: analysis, tts: tts, stops: stops)
         briefing.insert(contentsOf: scheduleLines, at: min(1, briefing.count))

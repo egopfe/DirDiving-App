@@ -81,14 +81,6 @@ enum BriefingPDFBuilder {
                 }
             }
 
-            if !context.plan.teamMatches.isEmpty {
-                page.drawSpacer()
-                page.drawSectionTitle(DIRIOSLocalizer.string("pdf.export.briefing.team"))
-                for match in context.plan.teamMatches {
-                    page.drawParagraph("\(match.diverName) · SAC \(Formatters.zero(match.sacLitersMinute)) L/min · \(match.status)")
-                }
-            }
-
             page.drawSpacer()
             page.drawParagraph(DIRIOSLocalizer.string("planner.briefing.share_note"))
 

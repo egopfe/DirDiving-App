@@ -85,9 +85,6 @@ struct PlannerView: View {
                                 if modePresentation.showsReserveCard {
                                     reserveCard
                                 }
-                                if modePresentation.showsTeamPreview {
-                                    teamPreviewCard
-                                }
                                 plannerMODInputWarnings
                                 plannerModeLimitWarnings
                                 plannerWarnings
@@ -1011,38 +1008,6 @@ struct PlannerView: View {
         }
     }
 
-    private var teamPreviewCard: some View {
-        DIRCard(DIRIOSLocalizer.string("planner.team.matching_title"), icon: "person.2", accent: DIRTheme.cyan) {
-            VStack(spacing: 10) {
-                Text(DIRIOSLocalizer.string("planner.team.preview_only"))
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(DIRTheme.yellow)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                ForEach(store.input.teamMembers) { member in
-                    HStack {
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text(member.name)
-                                .font(.callout.weight(.semibold))
-                                .foregroundStyle(.white)
-                            Text(DIRIOSLocalizer.formatted("planner.team.sac_format", Formatters.zero(member.sacLitersPerMinute)))
-                                .font(.caption)
-                                .foregroundStyle(DIRTheme.muted)
-                        }
-                        Spacer()
-                        Text(DIRIOSLocalizer.formatted("planner.team.available_gas_format", Formatters.zero(member.cylinder.availableGasLiters)))
-                            .font(.callout.monospacedDigit().weight(.semibold))
-                            .foregroundStyle(DIRTheme.cyan)
-                    }
-                    Divider().overlay(DIRTheme.hairline)
-                }
-                Text(DIRIOSLocalizer.string("planner.team.preview_only_notice"))
-                    .font(.footnote)
-                    .foregroundStyle(DIRTheme.muted)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-    }
-
     private var plannerSafetyAcknowledgment: some View {
         Toggle(
             isOn: Binding(
@@ -1709,9 +1674,6 @@ struct PlanResultView: View {
                         }
                         if modePresentation.showsContingency {
                             contingencyCard
-                        }
-                        if modePresentation.showsTeamMatch {
-                            teamMatchCard
                         }
                         if modePresentation.showsBriefing {
                             briefingCard
@@ -2696,35 +2658,6 @@ struct PlanResultView: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     Divider().overlay(DIRTheme.hairline)
-                }
-            }
-        }
-    }
-
-    private var teamMatchCard: some View {
-        DIRCard(DIRIOSLocalizer.string("planner.team.match_title"), icon: "person.2", accent: DIRTheme.cyan) {
-            VStack(spacing: 8) {
-                tableRow([
-                    DIRIOSLocalizer.string("planner.table.diver"),
-                    DIRIOSLocalizer.string("planner.table.sac"),
-                    DIRIOSLocalizer.string("planner.table.gas"),
-                    DIRIOSLocalizer.string("planner.table.status")
-                ], isHeader: true)
-                ForEach(store.plan.teamMatches) { match in
-                    tableRow(
-                        [
-                            match.diverName,
-                            "\(Formatters.zero(match.sacLitersMinute))",
-                            DIRIOSLocalizer.formatted("planner.team.available_gas_format", Formatters.zero(match.availableLiters)),
-                            match.status
-                        ],
-                        columnHeaders: [
-                            DIRIOSLocalizer.string("planner.table.diver"),
-                            DIRIOSLocalizer.string("planner.table.sac"),
-                            DIRIOSLocalizer.string("planner.table.gas"),
-                            DIRIOSLocalizer.string("planner.table.status")
-                        ]
-                    )
                 }
             }
         }

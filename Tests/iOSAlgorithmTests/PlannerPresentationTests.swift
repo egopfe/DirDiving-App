@@ -13,6 +13,23 @@ final class PlannerPresentationTests: XCTestCase {
         XCTAssertTrue(source.contains("decoStopsPresentationRows"))
     }
 
+    /// Team/Buddy planning is intentionally not surfaced in the main Planner until a full compatibility model exists.
+    func testPlannerMainOutputDoesNotSurfaceTeamGasMatchSection() throws {
+        let source = try String(contentsOfFile: plannerViewSourcePath(), encoding: .utf8)
+        XCTAssertFalse(source.contains("teamMatchCard"))
+        XCTAssertFalse(source.contains("teamPreviewCard"))
+        XCTAssertFalse(source.contains("planner.team.match_title"))
+        XCTAssertFalse(source.contains("planner.team.matching_title"))
+        let technicalPresentation = PlannerResultPresentation.presentation(for: .technical)
+        XCTAssertFalse(technicalPresentation.showsTeamMatch)
+        XCTAssertFalse(technicalPresentation.showsTeamPreview)
+    }
+
+    func testTechnicalPlannerStillShowsGasLedgerPresentationFlag() {
+        let presentation = PlannerResultPresentation.presentation(for: .technical)
+        XCTAssertTrue(presentation.showsGasLedger)
+    }
+
     func testDecoStopsSectionShowsOnlyDecoStops() throws {
         let plan = try technicalDecoPlan()
         let rows = DecoStopsPresentationBuilder.rows(from: plan.decoStops)
