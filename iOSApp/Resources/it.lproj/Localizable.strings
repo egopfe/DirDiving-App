@@ -812,7 +812,7 @@
 "planner.runtime.row.deco_stop" = "Sosta Deco";
 "planner.runtime.row.surface" = "Superficie";
 "planner.runtime.table.a11y" = "Tabella runtime immersione con fase, profondità, tempo, gas e PPO₂.";
-"planner.deco_stops.title" = "Tappe decompressive";
+"planner.deco_stops.title" = "Tappe Decompressione";
 "planner.deco_stops.subtitle" = "Elenco sintetico delle soste generate dal modello di pianificazione.";
 "planner.deco_stops.column.index" = "#";
 "planner.deco_stops.column.depth" = "Quota";
@@ -821,7 +821,7 @@
 "planner.deco_stops.column.ppo2" = "PPO₂";
 "planner.deco_stops.none" = "Nessuna sosta decompressiva richiesta dal modello.";
 "planner.deco_stops.table.a11y" = "Tabella tappe decompressive con numero sosta, quota, tempo, gas e PPO₂.";
-"ccr.deco_stops.title" = "Tappe decompressive CCR";
+"ccr.deco_stops.title" = "Tappe Decompressione CCR";
 "planner.table.phase" = "Fase";
 "planner.metric.tts" = "TTS";
 "planner.metric.runtime" = "Runtime";
@@ -871,7 +871,7 @@
 "equipment.subtitle" = "Inventario, setup salvati e immagini attrezzatura.";
 "equipment.card.saved_setups" = "SETUP SALVATI";
 "equipment.saved_setups.hint" = "Salva e gestisci setup attrezzatura usati dalla tab Checklist.";
-"equipment.images.section" = "Immagini attrezzatura";
+"equipment.images.section" = "Gestione Immagini Su Apple Watch";
 "equipment.images.hint" = "Trasferisci e gestisci immagini setup su Apple Watch.";
 "checklist.title" = "Checklist";
 "checklist.subtitle" = "Prepara l'immersione partendo da un setup salvato.";

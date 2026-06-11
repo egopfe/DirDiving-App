@@ -39,7 +39,7 @@ CCR schedule rows remain ordered by `CCRPlannerEngine` output where supported.
 
 **Runtime immersione / Dive Runtime** is the complete operational sequence (descent, bottom, travel, interleaved deco stops, surface).
 
-**Tappe decompressive / Deco Stops** is a separate compact section listing only Bühlmann-generated decompression stops:
+**Tappe Decompressione / Deco Stops** is a separate compact section listing only Bühlmann-generated decompression stops:
 
 - Stop number, depth, time, gas, PPO₂
 - Sourced from `DivePlanResult.decoStops` (OC Deco/Technical) or `CCRPlanResult.decoStops` (CCR)

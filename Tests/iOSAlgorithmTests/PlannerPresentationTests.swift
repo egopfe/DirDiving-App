@@ -30,6 +30,13 @@ final class PlannerPresentationTests: XCTestCase {
         XCTAssertTrue(presentation.showsGasLedger)
     }
 
+    func testEquipmentImagesSectionItalianTitle() throws {
+        let it = try loadStrings(named: "it")
+        let en = try loadStrings(named: "en")
+        XCTAssertEqual(it["equipment.images.section"], "Gestione Immagini Su Apple Watch")
+        XCTAssertEqual(en["equipment.images.section"], "Equipment images")
+    }
+
     func testGasLedgerSectionTitleIsAvailableGas() throws {
         let en = try loadStrings(named: "en")
         let it = try loadStrings(named: "it")
@@ -92,14 +99,14 @@ final class PlannerPresentationTests: XCTestCase {
         let en = try loadStrings(named: "en")
         let it = try loadStrings(named: "it")
         XCTAssertEqual(en["planner.deco_stops.title"], "Deco Stops")
-        XCTAssertEqual(it["planner.deco_stops.title"], "Tappe decompressive")
+        XCTAssertEqual(it["planner.deco_stops.title"], "Tappe Decompressione")
     }
 
     func testRawDecoStopEnumNameIsNotPresentedInDecoStopsSection() throws {
         let en = try loadStrings(named: "en")
         let it = try loadStrings(named: "it")
         XCTAssertEqual(en["planner.deco_stops.title"], "Deco Stops")
-        XCTAssertEqual(it["planner.deco_stops.title"], "Tappe decompressive")
+        XCTAssertEqual(it["planner.deco_stops.title"], "Tappe Decompressione")
         XCTAssertFalse(en["planner.deco_stops.title", default: ""].localizedCaseInsensitiveContains("decoStop"))
     }
 

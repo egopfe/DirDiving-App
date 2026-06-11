@@ -7,7 +7,7 @@
 
 The **Dive Runtime** table follows the Bühlmann engine operational timeline. Deco stops (**Sosta Deco** / **Deco Stop**) are interleaved with **Trasporto** / **Travel** rows at the correct depth/time. Values are not recalculated.
 
-## 2. Tappe decompressive
+## 2. Tappe Decompressione
 
 A separate **Deco Stops** section lists only true decompression stops from `DivePlanResult.decoStops` (or CCR `decoStops`). Hidden for Base/no-deco plans.
 
