@@ -67,15 +67,21 @@ enum CCRPlannerPDFBuilder {
                 page.drawSpacer(6)
             }
 
-            page.drawSectionTitle(DIRIOSLocalizer.string("ccr.pdf.schedule"))
+            page.drawSectionTitle(DIRIOSLocalizer.string("planner.runtime.title"))
             page.drawLine("TTS", value: "\(plan.ttsMinutes) min")
             page.drawLine(DIRIOSLocalizer.string("planner.export.runtime_line"), value: "\(plan.totalRuntimeMinutes) min")
-            if plan.decoStops.isEmpty {
+            if plan.schedule.isEmpty, plan.decoStops.isEmpty {
                 page.drawParagraph(DIRIOSLocalizer.string("planner.export.no_deco_stops"))
+            } else if !plan.schedule.isEmpty {
+                for row in plan.schedule.prefix(24) {
+                    page.drawParagraph(
+                        "\(row.phase.runtimeRowTitle) · \(Formatters.depth(row.depthMeters, units: context.unitPreference).text) / \(Int(row.runtimeMinutes))' · SP \(Formatters.one(row.activeSetpointBar))"
+                    )
+                }
             } else {
                 for stop in plan.decoStops {
                     page.drawLine(
-                        Formatters.depth(stop.depthMeters, units: context.unitPreference).text,
+                        "\(DiveSegmentKind.stop.runtimeRowTitle) · \(Formatters.depth(stop.depthMeters, units: context.unitPreference).text)",
                         value: "\(stop.minutes) min · SP \(Formatters.one(stop.ppO2))"
                     )
                 }

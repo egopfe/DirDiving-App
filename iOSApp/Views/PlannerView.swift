@@ -1635,12 +1635,25 @@ struct PlanResultView: View {
                 Formatters.zero(store.plan.otu)
             )
         )
-        if store.plan.decoStops.isEmpty {
+        lines.append(DIRIOSLocalizer.string("planner.runtime.title"))
+        if store.plan.ascentTableRows.isEmpty, store.plan.decoStops.isEmpty {
             lines.append(DIRIOSLocalizer.string("planner.export.no_deco_stops"))
+        } else if !store.plan.ascentTableRows.isEmpty {
+            for row in store.plan.ascentTableRows {
+                lines.append("  \(row.kind.localizedTitle) · \(row.depthLabel) / \(row.timeLabel) · \(row.gas) · PPO₂ \(row.ppO2Label)")
+            }
         } else {
             lines.append(DIRIOSLocalizer.string("planner.export.deco_stops"))
             for stop in store.plan.decoStops {
-                lines.append(DIRIOSLocalizer.formatted("planner.export.deco_stop_line", depthText(stop.depthMeters), stop.minutes, stop.gas, Formatters.one(stop.ppO2)))
+                lines.append(
+                    DIRIOSLocalizer.formatted(
+                        "planner.export.deco_stop_line",
+                        "\(PlannerAscentRowKind.decoStop.localizedTitle) · \(depthText(stop.depthMeters))",
+                        stop.minutes,
+                        stop.gas,
+                        Formatters.one(stop.ppO2)
+                    )
+                )
             }
         }
         lines.append(DIRIOSLocalizer.string("planner.export.indicative_footer"))
@@ -2484,8 +2497,8 @@ struct PlanResultView: View {
     }
 
     private var ascentTable: some View {
-        DIRCard(DIRIOSLocalizer.string("planner.result.ascent_plan"), icon: "arrow.up.circle.fill", accent: DIRTheme.cyan) {
-            Text(DIRIOSLocalizer.string("planner.result.ascent_plan.subtitle"))
+        DIRCard(DIRIOSLocalizer.string("planner.runtime.title"), icon: "timer", accent: DIRTheme.cyan) {
+            Text(DIRIOSLocalizer.string("planner.runtime.subtitle"))
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
@@ -2510,6 +2523,7 @@ struct PlanResultView: View {
             } else {
                 VStack(spacing: 0) {
                     tableRow([
+                        DIRIOSLocalizer.string("planner.table.phase"),
                         DIRIOSLocalizer.string("planner.table.depth"),
                         DIRIOSLocalizer.string("planner.table.time"),
                         DIRIOSLocalizer.string("planner.table.gas"),
@@ -2518,13 +2532,15 @@ struct PlanResultView: View {
                     ForEach(store.plan.ascentTableRows) { row in
                         tableRow(
                             [
-                                rowLabel(for: row),
+                                row.kind.localizedTitle,
+                                row.depthLabel,
                                 row.timeLabel,
                                 row.gas,
                                 row.ppO2Label
                             ],
                             isSurface: row.kind == .surface,
                             columnHeaders: [
+                                DIRIOSLocalizer.string("planner.table.phase"),
                                 DIRIOSLocalizer.string("planner.table.depth"),
                                 DIRIOSLocalizer.string("planner.table.time"),
                                 DIRIOSLocalizer.string("planner.table.gas"),
@@ -2541,19 +2557,8 @@ struct PlanResultView: View {
                         .fill(DIRTheme.surface2.opacity(0.45))
                 )
                 .accessibilityElement(children: .contain)
-                .accessibilityLabel(DIRIOSLocalizer.string("planner.result.ascent_table.a11y"))
+                .accessibilityLabel(DIRIOSLocalizer.string("planner.runtime.table.a11y"))
             }
-        }
-    }
-
-    private func rowLabel(for row: PlannerAscentTableRow) -> String {
-        switch row.kind {
-        case .bottom:
-            return "\(row.depthLabel) · \(DIRIOSLocalizer.string("planner.ascent.row.bottom"))"
-        case .travel:
-            return "\(row.depthLabel) · \(DIRIOSLocalizer.string("planner.ascent.row.travel"))"
-        case .decoStop, .surface:
-            return row.depthLabel
         }
     }
 
