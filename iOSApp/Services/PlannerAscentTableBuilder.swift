@@ -1,10 +1,28 @@
 import Foundation
 
 enum PlannerAscentRowKind: String, Hashable, Codable {
+    case descent
     case bottom
     case travel
     case decoStop
     case surface
+}
+
+extension PlannerAscentRowKind {
+    var localizedTitle: String {
+        switch self {
+        case .descent:
+            return DIRIOSLocalizer.string("planner.runtime.row.descent")
+        case .bottom:
+            return DIRIOSLocalizer.string("planner.runtime.row.bottom")
+        case .travel:
+            return DIRIOSLocalizer.string("planner.runtime.row.travel")
+        case .decoStop:
+            return DIRIOSLocalizer.string("planner.runtime.row.deco_stop")
+        case .surface:
+            return DIRIOSLocalizer.string("planner.runtime.row.surface")
+        }
+    }
 }
 
 struct PlannerAscentTableRow: Identifiable, Hashable {
@@ -32,6 +50,15 @@ enum PlannerAscentTableBuilder {
         }
 
         var rows: [PlannerAscentTableRow] = []
+
+        if let descentRow = makeDescentRow(
+            from: enginePlan,
+            environment: environment,
+            depthFormatter: depthFormatter,
+            ppO2Formatter: ppO2Formatter
+        ) {
+            rows.append(descentRow)
+        }
 
         if let bottomRow = makeBottomRow(from: enginePlan, environment: environment, depthFormatter: depthFormatter, ppO2Formatter: ppO2Formatter) {
             rows.append(bottomRow)
@@ -61,6 +88,31 @@ enum PlannerAscentTableBuilder {
 
         rows.append(contentsOf: surfaceRow(depthFormatter: depthFormatter))
         return rows
+    }
+
+    private static func makeDescentRow(
+        from enginePlan: BuhlmannEngineResult,
+        environment: PlannerEnvironment,
+        depthFormatter: (Double) -> String,
+        ppO2Formatter: (Double) -> String
+    ) -> PlannerAscentTableRow? {
+        let descentSegments = enginePlan.segments.filter { $0.kind == .descent }
+        guard !descentSegments.isEmpty else { return nil }
+        let targetDepth = descentSegments.map(\.depthMeters).max() ?? 0
+        let descentMinutes = descentSegments.reduce(0) { $0 + $1.minutes }
+        let reference = descentSegments.last(where: { abs($0.depthMeters - targetDepth) < 0.05 }) ?? descentSegments.last
+        guard let reference else { return nil }
+        let ppO2 = reference.gas.ppO2(depthMeters: targetDepth, environment: environment)
+        return PlannerAscentTableRow(
+            kind: .descent,
+            depthMeters: targetDepth,
+            depthLabel: depthFormatter(targetDepth),
+            minutes: descentMinutes,
+            timeLabel: "\(Formatters.one(descentMinutes)) min",
+            gas: reference.gas.displayLabel,
+            ppO2: ppO2,
+            ppO2Label: ppO2Formatter(ppO2)
+        )
     }
 
     private static func makeBottomRow(
