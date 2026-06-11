@@ -803,6 +803,16 @@
 "planner.charts.depth_axis" = "Depth (m)";
 "planner.ascent.row.bottom" = "Bottom";
 "planner.ascent.row.travel" = "Travel";
+"planner.runtime.title" = "Dive Runtime";
+"planner.runtime.subtitle" = "Operational runtime sequence generated from the selected planning model.";
+"planner.runtime.row.descent" = "Descent";
+"planner.runtime.row.bottom" = "Bottom";
+"planner.runtime.row.travel" = "Travel";
+"planner.runtime.row.ascent" = "Ascent";
+"planner.runtime.row.deco_stop" = "Deco Stop";
+"planner.runtime.row.surface" = "Surface";
+"planner.runtime.table.a11y" = "Dive runtime table with phase, depth, time, gas, and partial pressure of oxygen.";
+"planner.table.phase" = "Phase";
 "planner.metric.tts" = "TTS";
 "planner.metric.runtime" = "Runtime";
 "planner.export.tts_line" = "TTS: %d min";
@@ -833,7 +843,7 @@
 "planner.gas.adjust_ppo2" = "Adjust PPO2";
 "planner.result.max_depth" = "Max depth";
 "planner.result.bottom_time" = "Bottom time";
-"planner.result.ascent_plan" = "ASCENT PLAN";
+"planner.result.ascent_plan" = "DIVE RUNTIME";
 "planner.result.timeline" = "MULTI-SEGMENT TIMELINE";
 "planner.result.gf_compare" = "GF COMPARISON";
 "planner.result.contingencies" = "CONTINGENCIES";
@@ -1106,8 +1116,8 @@
 "planner.result.warnings.caution.title" = "CAUTIONS";
 "planner.result.dashboard.a11y" = "Plan summary dashboard with time to surface, runtime, decompression stops, depth, bottom time, and CNS.";
 "planner.result.secondary_metrics.title" = "Analysis details";
-"planner.result.ascent_plan.subtitle" = "Reference ascent schedule from bottom through decompression to surface.";
-"planner.result.ascent_table.a11y" = "Ascent and decompression table with depth, time, gas, and partial pressure of oxygen.";
+"planner.result.ascent_plan.subtitle" = "Operational runtime sequence from descent through decompression to surface.";
+"planner.result.ascent_table.a11y" = "Dive runtime table with phase, depth, time, gas, and partial pressure of oxygen.";
 "planner.buhlmann.tissue_curve_empty.detail" = "Tissue loading history is generated after a valid decompression reference is calculated.";
 "planner.buhlmann.tissue_chart.a11y.summary" = "Bühlmann tissue loading chart. Peak compartment load about %@ percent.";
 "planner.header.reference_only.hint" = "Bühlmann-based planning reference only — not certified decompression advice or real-time dive-computer behavior.";
@@ -1204,7 +1214,7 @@
 "planner.metric.otu_weekly" = "Weekly OTU";
 "planner.metric.otu_weekly.footnote" = "Estimated weekly oxygen exposure. Reference only.";
 "planner.warning.otu_weekly_elevated" = "Weekly OTU exposure is elevated. Review oxygen exposure before planning additional dives.";
-"planner.table.briefing_order.footnote" = "Ascent table briefing order: bottom, post-bottom travel/gas switches, decompression stops, surface. Not stop-interleaved.";
+"planner.table.briefing_order.footnote" = "Dive runtime briefing order: descent, bottom, post-bottom travel/gas switches, deco stops, surface. Not stop-interleaved.";
 "planner.state.no_deco_solution.title" = "No valid decompression solution";
 "planner.state.no_deco_solution.message" = "The engine hit a calculation limit before completing decompression.";
 "planner.state.no_deco_solution.hint" = "Reduce profile stress or use certified decompression software.";
@@ -1680,7 +1690,7 @@
 "pdf.export.briefing.site" = "Site";
 "pdf.export.briefing.objective" = "Dive objective";
 "pdf.export.briefing.gas_plan" = "Gas plan";
-"pdf.export.briefing.ascent" = "Ascent plan";
+"pdf.export.briefing.ascent" = "Dive Runtime";
 "pdf.export.briefing.gas_management" = "Gas management";
 "pdf.export.briefing.contingency" = "Contingency";
 "pdf.export.briefing.team" = "Team";

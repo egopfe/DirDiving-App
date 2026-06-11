@@ -22,6 +22,12 @@ final class PlannerLocalizationTests: XCTestCase {
         "logbook.delete.button.a11y",
         "planner.ascent.row.bottom",
         "planner.ascent.row.travel",
+        "planner.runtime.title",
+        "planner.runtime.subtitle",
+        "planner.runtime.row.descent",
+        "planner.runtime.row.deco_stop",
+        "planner.runtime.row.surface",
+        "planner.table.phase",
         "planner.metric.tts",
         "planner.metric.runtime",
         "planner.table.depth"

@@ -801,6 +801,16 @@
 "planner.charts.depth_axis" = "Profondità (m)";
 "planner.ascent.row.bottom" = "Fondo";
 "planner.ascent.row.travel" = "Trasporto";
+"planner.runtime.title" = "Runtime immersione";
+"planner.runtime.subtitle" = "Sequenza operativa dell’immersione generata dal modello di pianificazione selezionato.";
+"planner.runtime.row.descent" = "Discesa";
+"planner.runtime.row.bottom" = "Fondo";
+"planner.runtime.row.travel" = "Trasporto";
+"planner.runtime.row.ascent" = "Risalita";
+"planner.runtime.row.deco_stop" = "Sosta Deco";
+"planner.runtime.row.surface" = "Superficie";
+"planner.runtime.table.a11y" = "Tabella runtime immersione con fase, profondità, tempo, gas e PPO₂.";
+"planner.table.phase" = "Fase";
 "planner.metric.tts" = "TTS";
 "planner.metric.runtime" = "Runtime";
 "planner.export.tts_line" = "TTS: %d min";
@@ -831,7 +841,7 @@
 "planner.gas.adjust_ppo2" = "Regola PPO2";
 "planner.result.max_depth" = "Prof. Max";
 "planner.result.bottom_time" = "Tempo Fondo";
-"planner.result.ascent_plan" = "PIANO DI RISALITA";
+"planner.result.ascent_plan" = "RUNTIME IMMERSIONE";
 "planner.result.timeline" = "TIMELINE MULTI-SEGMENTO";
 "planner.result.gf_compare" = "COMPARAZIONE GF";
 "planner.result.contingencies" = "CONTINGENZE";
@@ -1104,8 +1114,8 @@
 "planner.result.warnings.caution.title" = "ATTENZIONI";
 "planner.result.dashboard.a11y" = "Dashboard riepilogo piano con TTS, runtime, stop deco, profondità, tempo fondo e CNS.";
 "planner.result.secondary_metrics.title" = "Dettagli analisi";
-"planner.result.ascent_plan.subtitle" = "Programma di risalita di riferimento dal fondo alla superficie.";
-"planner.result.ascent_table.a11y" = "Tabella risalita e decompressione con profondità, tempo, gas e PPO₂.";
+"planner.result.ascent_plan.subtitle" = "Sequenza operativa di riferimento da discesa a superficie.";
+"planner.result.ascent_table.a11y" = "Tabella runtime immersione con fase, profondità, tempo, gas e PPO₂.";
 "planner.buhlmann.tissue_curve_empty.detail" = "La storia di carico tessuti viene generata dopo un calcolo deco valido.";
 "planner.buhlmann.tissue_chart.a11y.summary" = "Grafico carico tessuti Bühlmann. Picco compartimenti circa %@ percento.";
 "planner.header.reference_only.hint" = "Riferimento Bühlmann — non consiglio decompressivo certificato né comportamento di computer subacqueo in tempo reale.";
@@ -1202,7 +1212,7 @@
 "planner.metric.otu_weekly" = "OTU settimanale";
 "planner.metric.otu_weekly.footnote" = "Esposizione settimanale all'ossigeno stimata. Solo riferimento.";
 "planner.warning.otu_weekly_elevated" = "L'esposizione OTU settimanale è elevata. Rivedi l'esposizione all'ossigeno prima di pianificare altre immersioni.";
-"planner.table.briefing_order.footnote" = "Ordine briefing tabella risalita: fondo, viaggio/cambio gas post-fondo, stop decompressione, superficie. Non interleaved per stop.";
+"planner.table.briefing_order.footnote" = "Ordine briefing runtime immersione: discesa, fondo, viaggio/cambio gas post-fondo, soste deco, superficie. Non interleaved per stop.";
 "planner.state.no_deco_solution.title" = "Nessuna soluzione decompressiva valida";
 "planner.state.no_deco_solution.message" = "Il motore ha raggiunto un limite di calcolo prima di completare la decompressione.";
 "planner.state.no_deco_solution.hint" = "Riduci stress del profilo o usa software decompressivo certificato.";
@@ -1678,7 +1688,7 @@
 "pdf.export.briefing.site" = "Sito";
 "pdf.export.briefing.objective" = "Obiettivo immersione";
 "pdf.export.briefing.gas_plan" = "Piano gas";
-"pdf.export.briefing.ascent" = "Piano di risalita";
+"pdf.export.briefing.ascent" = "Runtime immersione";
 "pdf.export.briefing.gas_management" = "Gestione gas";
 "pdf.export.briefing.contingency" = "Contingenza";
 "pdf.export.briefing.team" = "Team";
