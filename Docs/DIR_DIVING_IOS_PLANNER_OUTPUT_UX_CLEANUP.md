@@ -15,9 +15,9 @@ A separate **Deco Stops** section lists only true decompression stops from `Dive
 
 Partial gas-only team/buddy comparison was removed from the main Planner UI and briefing PDF. Internal `teamGasMatches` computation is preserved for future **Team / Buddy Planning**.
 
-## 4. Gas disponibile
+## 4. Pianificazione Gas
 
-Sections that showed loaded/available gas were renamed from misleading **Riserva gas** / **GAS RESERVE** to **Gas disponibile** / **Available Gas**. True reserve/minimum gas warnings keep their reserve naming.
+Sections that showed loaded/available gas were renamed from misleading **Riserva gas** / **GAS RESERVE** to **Pianificazione Gas** (IT) / **Available Gas** (EN). True reserve/minimum gas warnings keep their reserve naming.
 
 ## 5. Gas display format
 

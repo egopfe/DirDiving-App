@@ -771,7 +771,7 @@
 "planner.field.gf_low" = "GF Low";
 "planner.field.gf_high" = "GF High";
 "planner.card.reserve" = "RISERVA GAS";
-"planner.available_gas.title" = "Gas disponibile";
+"planner.available_gas.title" = "Pianificazione Gas";
 "planner.gas_ledger.pressure_equivalent" = "≈ %@";
 "planner.metric.rock_bottom" = "Rock bottom";
 "planner.metric.turn_pressure" = "Turn";
@@ -1065,7 +1065,7 @@
 "planner.contingency.deeper_depth.action" = "Ricalcola dopo +3 m di profondità (%d m).";
 "planner.contingency.deeper_depth.warning" = "TTS derivato dal motore per esposizione più profonda.";
 "planner.calculate.in_progress" = "Calcolo in corso…";
-"planner.gas_ledger.title" = "Gas disponibile";
+"planner.gas_ledger.title" = "Pianificazione Gas";
 "planner.gas_ledger.estimated_consumption" = "Consumo stimato";
 "planner.gas_ledger.subtitle" = "Consumo per bombola dal runtime schedule Bühlmann (non stime solo-fondo).";
 "planner.gas_ledger.remaining_pressure" = "Residuo";

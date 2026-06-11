@@ -41,7 +41,7 @@ final class PlannerPresentationTests: XCTestCase {
         let en = try loadStrings(named: "en")
         let it = try loadStrings(named: "it")
         XCTAssertEqual(en["planner.available_gas.title"], "Available Gas")
-        XCTAssertEqual(it["planner.available_gas.title"], "Gas disponibile")
+        XCTAssertEqual(it["planner.available_gas.title"], "Pianificazione Gas")
         let source = try String(contentsOfFile: plannerViewSourcePath(), encoding: .utf8)
         XCTAssertTrue(source.contains("planner.available_gas.title"))
         XCTAssertTrue(source.contains("GasQuantityMetricTile"))

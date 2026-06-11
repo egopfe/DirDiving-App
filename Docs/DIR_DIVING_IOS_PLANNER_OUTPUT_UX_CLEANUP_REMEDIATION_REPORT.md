@@ -28,7 +28,7 @@
 
 ### Gas section rename
 
-- `planner.available_gas.title` → **Gas disponibile** / **Available Gas**
+- `planner.available_gas.title` → **Pianificazione Gas** (IT) / **Available Gas** (EN)
 - Reserve card and gas ledger card use this title
 - `planner.card.reserve` / reserve warning keys unchanged for true reserve concepts
 
