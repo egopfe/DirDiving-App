@@ -91,21 +91,31 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     func activate(logStore: DiveLogStore) {
-        self.logStore = logStore
-        WatchDiveSyncCodec.bootstrapReplayCacheIfNeeded()
-        importedSessionIDs = WatchDiveSyncCodec.loadImportedSessionIDs()
-        importedSessionCount = importedSessionIDs.count
-        pushedToWatchSessionIDs = loadPushedToWatchSessionIDs()
-        pendingOutboundTransfers = mergedPendingOutboundTransfers(
-            pendingOutboundTransfers + loadPendingOutboundTransfers()
-        )
-        conflicts = loadConflicts()
-        guard WCSession.isSupported() else {
-            lastMessage = DIRIOSLocalizer.string("sync.status.watchconnectivity_unsupported")
-            return
+        deferPublishedMutation { [self] in
+            self.logStore = logStore
+            WatchDiveSyncCodec.bootstrapReplayCacheIfNeeded()
+            importedSessionIDs = WatchDiveSyncCodec.loadImportedSessionIDs()
+            importedSessionCount = importedSessionIDs.count
+            pushedToWatchSessionIDs = loadPushedToWatchSessionIDs()
+            pendingOutboundTransfers = mergedPendingOutboundTransfers(
+                pendingOutboundTransfers + loadPendingOutboundTransfers()
+            )
+            conflicts = loadConflicts()
+            guard WCSession.isSupported() else {
+                lastMessage = DIRIOSLocalizer.string("sync.status.watchconnectivity_unsupported")
+                return
+            }
+            WCSession.default.delegate = self
+            WCSession.default.activate()
         }
-        WCSession.default.delegate = self
-        WCSession.default.activate()
+    }
+
+    /// Avoid SwiftUI runtime fault: "Publishing changes from within view updates".
+    private func deferPublishedMutation(_ operation: @MainActor @escaping () -> Void) {
+        Task { @MainActor in
+            await Task.yield()
+            operation()
+        }
     }
 
     func retryActivation(logStore: DiveLogStore) {
