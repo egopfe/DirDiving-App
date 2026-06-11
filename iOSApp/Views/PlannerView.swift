@@ -1576,6 +1576,22 @@ struct PlanResultView: View {
     private func depthText(_ meters: Double) -> String {
         Formatters.depth(meters, units: unitPreference).text
     }
+
+    private var decoStopsPresentationRows: [DecoStopPresentationRow] {
+        DecoStopsPresentationBuilder.rows(
+            from: store.plan.decoStops,
+            depthFormatter: { depthText($0) },
+            ppO2Formatter: { Formatters.one($0) }
+        )
+    }
+
+    private var showsDecoStopsSection: Bool {
+        DecoStopsPresentationBuilder.shouldShowSection(mode: store.mode, decoStops: store.plan.decoStops)
+    }
+
+    private var showsNoDecoStopsNote: Bool {
+        DecoStopsPresentationBuilder.shouldShowNoStopsNote(mode: store.mode, decoStops: store.plan.decoStops)
+    }
     @State private var tab: PlanTab = .plan
     @State private var showChecklistExportPrompt = false
     @State private var showChecklistExportSheet = false
@@ -1678,6 +1694,11 @@ struct PlanResultView: View {
                         }
                         if modePresentation.showsGasLedger {
                             gasLedgerCard
+                        }
+                        if showsDecoStopsSection {
+                            DecoStopsSectionView(rows: decoStopsPresentationRows)
+                        } else if showsNoDecoStopsNote {
+                            plannerResultMutedFootnote(DIRIOSLocalizer.string("planner.deco_stops.none"))
                         }
                         if modePresentation.showsFullAscentTable || modePresentation.showsSimplifiedAscentTable {
                             ascentTable

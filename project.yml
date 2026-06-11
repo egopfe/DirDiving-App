@@ -218,6 +218,7 @@ targets:
       - iOSApp/Algorithms/Buhlmann/BuhlmannTissueHistory.swift
       - iOSApp/Algorithms/Buhlmann/BuhlmannPlanPreflightValidator.swift
       - iOSApp/Services/PlannerAscentTableBuilder.swift
+      - iOSApp/Services/DecoStopsPresentationBuilder.swift
       - iOSApp/Services/BuhlmannPlanner.swift
       - iOSApp/Services/CloudSyncStore.swift
       - iOSApp/Utils/CloudBackupSettings.swift

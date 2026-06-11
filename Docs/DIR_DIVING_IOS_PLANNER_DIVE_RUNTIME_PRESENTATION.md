@@ -35,6 +35,19 @@ The runtime table does **not** recalculate decompression. Stop depths, stop time
 
 CCR schedule rows remain ordered by `CCRPlannerEngine` output where supported.
 
+## Dedicated deco stops summary
+
+**Runtime immersione / Dive Runtime** is the complete operational sequence (descent, bottom, travel, interleaved deco stops, surface).
+
+**Tappe decompressive / Deco Stops** is a separate compact section listing only Bühlmann-generated decompression stops:
+
+- Stop number, depth, time, gas, PPO₂
+- Sourced from `DivePlanResult.decoStops` (OC Deco/Technical) or `CCRPlanResult.decoStops` (CCR)
+- Hidden for Base/no-deco plans
+- Bailout heuristic rows are not deco stops
+
+No calculations are changed. The planner remains reference-only and non-certified.
+
 ## Calculation boundaries
 
 - Adding **Discesa** is a presentation projection from existing `BuhlmannEngineResult.segments`.

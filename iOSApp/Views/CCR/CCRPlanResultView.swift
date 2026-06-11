@@ -37,6 +37,7 @@ struct CCRPlanResultView: View {
                     endChartCard
                     gasDensityChartCard
                     cnsTimelineCard
+                    ccrDecoStopsSection
                     scheduleCard
                     bailoutCard
                     warningsCard
@@ -326,6 +327,22 @@ struct CCRPlanResultView: View {
                 }
                 .frame(height: 140)
             }
+        }
+    }
+
+    @ViewBuilder
+    private var ccrDecoStopsSection: some View {
+        if DecoStopsPresentationBuilder.shouldShowSection(mode: .ccr, decoStops: plan.decoStops) {
+            DecoStopsSectionView(
+                rows: DecoStopsPresentationBuilder.rows(
+                    from: plan.decoStops,
+                    depthFormatter: { Formatters.depth($0, units: unitPreference).text },
+                    ppO2Formatter: { Formatters.one($0) }
+                ),
+                titleKey: "ccr.deco_stops.title",
+                subtitleKey: "planner.deco_stops.subtitle",
+                accessibilityKey: "planner.deco_stops.table.a11y"
+            )
         }
     }
 

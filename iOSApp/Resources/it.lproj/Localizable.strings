@@ -810,6 +810,16 @@
 "planner.runtime.row.deco_stop" = "Sosta Deco";
 "planner.runtime.row.surface" = "Superficie";
 "planner.runtime.table.a11y" = "Tabella runtime immersione con fase, profondità, tempo, gas e PPO₂.";
+"planner.deco_stops.title" = "Tappe decompressive";
+"planner.deco_stops.subtitle" = "Elenco sintetico delle soste generate dal modello di pianificazione.";
+"planner.deco_stops.column.index" = "#";
+"planner.deco_stops.column.depth" = "Quota";
+"planner.deco_stops.column.time" = "Tempo";
+"planner.deco_stops.column.gas" = "Gas";
+"planner.deco_stops.column.ppo2" = "PPO₂";
+"planner.deco_stops.none" = "Nessuna sosta decompressiva richiesta dal modello.";
+"planner.deco_stops.table.a11y" = "Tabella tappe decompressive con numero sosta, quota, tempo, gas e PPO₂.";
+"ccr.deco_stops.title" = "Tappe decompressive CCR";
 "planner.table.phase" = "Fase";
 "planner.metric.tts" = "TTS";
 "planner.metric.runtime" = "Runtime";
