@@ -80,6 +80,7 @@ targets:
     type: application
     platform: iOS
     sources:
+      - Models/PlannerBriefingCard.swift
       - path: iOSApp
         excludes:
           - Models/ExplorationModels.swift
@@ -177,6 +178,9 @@ targets:
       - Services/UserImageStore.swift
       - Utils/CompanionPhotoImportSupport.swift
       - Utils/CompanionPhotoManagementSupport.swift
+      - Models/PlannerBriefingCard.swift
+      - Services/PlannerBriefingCardStore.swift
+      - Services/PlannerBriefingWatchReceiver.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.watch.algorithmtests
@@ -193,6 +197,7 @@ targets:
     platform: iOS
     sources:
       - Tests/iOSAlgorithmTests
+      - Models/PlannerBriefingCard.swift
       - iOSApp/Models/DemoDiveCatalog.swift
       - iOSApp/Models/DivePlan.swift
       - iOSApp/Models/RatioDecoModels.swift
@@ -290,6 +295,10 @@ targets:
       - iOSApp/Services/PDF/ChecklistPDFBuilder.swift
       - iOSApp/Services/PDF/DivePackPDFBuilder.swift
       - iOSApp/Services/PDF/CCRPlannerPDFBuilder.swift
+      - iOSApp/Services/PlannerBriefingImageExportService.swift
+      - iOSApp/Services/PlannerBriefingWatchTransferService.swift
+      - iOSApp/Services/DecoStopsPresentationBuilder.swift
+      - iOSApp/Services/PlannerAscentTableBuilder.swift
       - Tests/iOSAlgorithmTests/PDFExportServiceTests.swift
       - iOSApp/Models/TissueAnalyticsTrace.swift
       - iOSApp/Utils/TissueAnalyticsSupport.swift

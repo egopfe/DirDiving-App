@@ -1501,6 +1501,7 @@ struct PlanResultView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var store: PlannerStore
     @EnvironmentObject private var equipment: EquipmentStore
+    @EnvironmentObject private var plannerBriefingTransfer: PlannerBriefingWatchTransferService
     var pendingChecklistExportPrompt: Bool = false
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @AppStorage(IOSPressureUnitPreference.storageKey) private var pressureUnitRaw = IOSPressureUnitPreference.storageValue(for: .bar)
@@ -1719,6 +1720,49 @@ struct PlanResultView: View {
     private var showsNoDecoStopsNote: Bool {
         DecoStopsPresentationBuilder.shouldShowNoStopsNote(mode: store.mode, decoStops: store.plan.decoStops)
     }
+
+    private var canSendWatchBriefing: Bool {
+        !store.plan.ascentTableRows.isEmpty || !decoStopsPresentationRows.isEmpty
+    }
+
+    private var runtimeIncludesDecoStops: Bool {
+        !store.plan.decoStops.isEmpty
+            || store.plan.ascentTableRows.contains { $0.kind == .decoStop }
+    }
+
+    private var watchBriefingStatusMessage: String? {
+        switch plannerBriefingTransfer.state {
+        case .idle:
+            return nil
+        case .generating:
+            return DIRIOSLocalizer.string("planner.watch_briefing.generating")
+        case .sending:
+            return DIRIOSLocalizer.string("planner.watch_briefing.sending")
+        case .queued:
+            return DIRIOSLocalizer.string("planner.watch_briefing.queued")
+        case .sent:
+            return DIRIOSLocalizer.string("planner.watch_briefing.sent")
+        case .failed:
+            return DIRIOSLocalizer.string("planner.watch_briefing.failed")
+        }
+    }
+
+    private var isWatchBriefingActionDisabled: Bool {
+        switch plannerBriefingTransfer.state {
+        case .generating, .sending:
+            return true
+        default:
+            return false
+        }
+    }
+
+    private var watchBriefingStatusColor: Color {
+        if case .failed = plannerBriefingTransfer.state {
+            return DIRTheme.red
+        }
+        return DIRTheme.cyan
+    }
+
     @State private var tab: PlanTab = .plan
     @State private var showChecklistExportPrompt = false
     @State private var showChecklistExportSheet = false
@@ -1844,6 +1888,9 @@ struct PlanResultView: View {
                             baseCompatibilitySummary
                         }
                         plannerLegalFootnotes
+                        if canSendWatchBriefing {
+                            sendWatchBriefingSection
+                        }
                         if canExportPlanPDF {
                             shareDivePackButton
                         }
@@ -1931,6 +1978,47 @@ struct PlanResultView: View {
         } message: {
             Text(pdfExportAlertMessage ?? "")
         }
+    }
+
+    private var sendWatchBriefingSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Button {
+                sendPlannerBriefingToWatch()
+            } label: {
+                Text(DIRIOSLocalizer.string("planner.watch_briefing.send"))
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(DIRTheme.cyan)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 11)
+                    .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .disabled(isWatchBriefingActionDisabled)
+
+            Text(DIRIOSLocalizer.string("planner.watch_briefing.ref_only"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if let watchBriefingStatusMessage {
+                Text(watchBriefingStatusMessage)
+                    .font(.caption)
+                    .foregroundStyle(watchBriefingStatusColor)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    private func sendPlannerBriefingToWatch() {
+        guard canSendWatchBriefing else { return }
+        let input = PlannerBriefingImageExportInput(
+            modeLabel: store.mode.localizedTabTitle,
+            plannerSessionId: nil,
+            decoStopRows: PlannerBriefingImageExportService.decoRows(from: decoStopsPresentationRows),
+            runtimeRows: PlannerBriefingImageExportService.runtimeRows(from: store.plan.ascentTableRows),
+            includesDecoStopsInRuntime: runtimeIncludesDecoStops
+        )
+        plannerBriefingTransfer.exportAndSend(input: input)
     }
 
     private var shareDivePackButton: some View {

@@ -157,6 +157,30 @@ final class PlannerPresentationTests: XCTestCase {
         XCTAssertTrue(DecoStopsPresentationBuilder.shouldShowSection(mode: .ccr, decoStops: plan.decoStops) || plan.decoStops.isEmpty)
     }
 
+    func testPlanResultViewExposesSendWatchBriefingAction() throws {
+        let source = try String(contentsOfFile: plannerViewSourcePath(), encoding: .utf8)
+        XCTAssertTrue(source.contains("planner.watch_briefing.send"))
+        XCTAssertTrue(source.contains("sendWatchBriefingSection"))
+        XCTAssertTrue(source.contains("PlannerBriefingImageExportService"))
+        XCTAssertTrue(source.contains("PlannerBriefingWatchTransferService"))
+    }
+
+    func testWatchBriefingLocalizationKeysExist() throws {
+        let en = try loadStrings(named: "en")
+        let it = try loadStrings(named: "it")
+        XCTAssertEqual(en["planner.watch_briefing.send"], "Send Briefing to Watch")
+        XCTAssertEqual(it["planner.watch_briefing.send"], "Invia briefing al Watch")
+        XCTAssertEqual(en["planner.watch_briefing.queued"], "Watch not reachable: briefing queued.")
+        XCTAssertEqual(it["planner.watch_briefing.queued"], "Watch non raggiungibile: briefing in coda.")
+
+        let watchEN = try loadWatchStrings(named: "en")
+        let watchIT = try loadWatchStrings(named: "it")
+        XCTAssertEqual(watchEN["watch.planner_briefing.title"], "Planner Briefing")
+        XCTAssertEqual(watchIT["watch.planner_briefing.title"], "Briefing Planner")
+        XCTAssertEqual(watchEN["watch.planner_briefing.ref_only"], "REF ONLY")
+        XCTAssertEqual(watchIT["watch.planner_briefing.ref_only"], "SOLO RIFERIMENTO")
+    }
+
     func testBriefingPDFUsesRuntimeTitleAndDecoStopLabel() throws {
         var input = GasPlanInput()
         input.ensurePlannerCylindersFromLegacy()
@@ -249,6 +273,16 @@ final class PlannerPresentationTests: XCTestCase {
         return plan
     }
 
+    private func loadWatchStrings(named language: String) throws -> [String: String] {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let url = root
+            .appendingPathComponent("Resources/\(language).lproj/Localizable.strings")
+        return try parseStringsFile(at: url)
+    }
+
     private func loadStrings(named language: String) throws -> [String: String] {
         let root = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent()
@@ -256,6 +290,10 @@ final class PlannerPresentationTests: XCTestCase {
             .deletingLastPathComponent()
         let url = root
             .appendingPathComponent("iOSApp/Resources/\(language).lproj/Localizable.strings")
+        return try parseStringsFile(at: url)
+    }
+
+    private func parseStringsFile(at url: URL) throws -> [String: String] {
         let contents = try String(contentsOf: url, encoding: .utf8)
         var map: [String: String] = [:]
         let pattern = #""([^"]+)"\s*=\s*"((?:\\.|[^"\\])*)";"#
