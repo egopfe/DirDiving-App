@@ -13,6 +13,10 @@ struct EquipmentChecklistItem: Identifiable, Codable, Hashable {
     var pressureUnit: PressureUnit = .bar
     var tankSize: TankSize = .liters12
     var gasRole: GasRole? = nil
+    var kind: ChecklistItemKind = .equipment
+    var isRequired: Bool = true
+    var completedAt: Date? = nil
+    var note: String = ""
 
     init(
         id: UUID = UUID(),
@@ -25,7 +29,11 @@ struct EquipmentChecklistItem: Identifiable, Codable, Hashable {
         pressureText: String = "",
         pressureUnit: PressureUnit = .bar,
         tankSize: TankSize = .liters12,
-        gasRole: GasRole? = nil
+        gasRole: GasRole? = nil,
+        kind: ChecklistItemKind = .equipment,
+        isRequired: Bool = true,
+        completedAt: Date? = nil,
+        note: String = ""
     ) {
         self.id = id
         self.title = title
@@ -38,6 +46,10 @@ struct EquipmentChecklistItem: Identifiable, Codable, Hashable {
         self.pressureUnit = pressureUnit
         self.tankSize = tankSize
         self.gasRole = gasRole
+        self.kind = kind
+        self.isRequired = isRequired
+        self.completedAt = completedAt
+        self.note = note
     }
 
     init(from decoder: Decoder) throws {
@@ -53,6 +65,10 @@ struct EquipmentChecklistItem: Identifiable, Codable, Hashable {
         pressureUnit = try container.decodeIfPresent(PressureUnit.self, forKey: .pressureUnit) ?? .bar
         tankSize = try container.decodeIfPresent(TankSize.self, forKey: .tankSize) ?? .liters12
         gasRole = try container.decodeIfPresent(GasRole.self, forKey: .gasRole)
+        kind = try container.decodeIfPresent(ChecklistItemKind.self, forKey: .kind) ?? .equipment
+        isRequired = try container.decodeIfPresent(Bool.self, forKey: .isRequired) ?? true
+        completedAt = try container.decodeIfPresent(Date.self, forKey: .completedAt)
+        note = try container.decodeIfPresent(String.self, forKey: .note) ?? ""
     }
 }
 
@@ -76,6 +92,28 @@ struct EquipmentProfile: Codable, Hashable {
 
     var checklistReadyCount: Int {
         migratedChecklistItems.filter(\.isReady).count
+    }
+
+    var requiredChecklistItems: [EquipmentChecklistItem] {
+        migratedChecklistItems.filter(\.isRequired)
+    }
+
+    var optionalChecklistItems: [EquipmentChecklistItem] {
+        migratedChecklistItems.filter { !$0.isRequired }
+    }
+
+    var requiredReadyCount: Int {
+        requiredChecklistItems.filter(\.isReady).count
+    }
+
+    var optionalReadyCount: Int {
+        optionalChecklistItems.filter(\.isReady).count
+    }
+
+    var isRequiredChecklistComplete: Bool {
+        let required = requiredChecklistItems
+        guard !required.isEmpty else { return checklistReadyCount == migratedChecklistItems.count }
+        return required.allSatisfy(\.isReady)
     }
 
     var migratedChecklistItems: [EquipmentChecklistItem] {

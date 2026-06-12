@@ -75,8 +75,8 @@ final class PDFExportServiceTests: XCTestCase {
         let profile = sampleChecklistProfile()
         let data = ChecklistPDFBuilder.build(profile: profile)
         XCTAssertFalse(data.isEmpty)
-        let yesLabel = String(localized: "pdf.export.checklist.yes")
-        let noLabel = String(localized: "pdf.export.checklist.no")
+        let yesLabel = DIRIOSLocalizer.string("pdf.export.checklist.yes")
+        let noLabel = DIRIOSLocalizer.string("pdf.export.checklist.no")
         let text = pdfText(data)
         XCTAssertTrue(text.contains(yesLabel))
         XCTAssertTrue(text.contains(noLabel))
@@ -105,9 +105,9 @@ final class PDFExportServiceTests: XCTestCase {
         )
         XCTAssertFalse(data.isEmpty)
         let text = pdfText(data)
-        XCTAssertTrue(text.contains(String(localized: "pdf.export.section.plan")))
-        XCTAssertTrue(text.contains(String(localized: "pdf.export.section.briefing")))
-        XCTAssertTrue(text.contains(String(localized: "pdf.export.section.checklist")))
+        XCTAssertTrue(text.contains(DIRIOSLocalizer.string("pdf.export.section.plan")))
+        XCTAssertTrue(text.contains(DIRIOSLocalizer.string("pdf.export.section.briefing")))
+        XCTAssertTrue(text.contains(DIRIOSLocalizer.string("pdf.export.section.checklist")))
         XCTAssertTrue(text.contains("Analyze EAN50"))
         let url = try PDFExportService.exportDivePack(
             plannerContext: context,
