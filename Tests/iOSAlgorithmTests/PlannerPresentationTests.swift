@@ -37,6 +37,19 @@ final class PlannerPresentationTests: XCTestCase {
         XCTAssertEqual(en["equipment.images.section"], "Equipment images")
     }
 
+    func testPlannerAscentSpeedSettingsPresentation() throws {
+        let moreSource = try String(
+            contentsOf: URL(fileURLWithPath: #filePath)
+                .deletingLastPathComponent()
+                .deletingLastPathComponent()
+                .deletingLastPathComponent()
+                .appendingPathComponent("iOSApp/Views/MoreView.swift"),
+            encoding: .utf8
+        )
+        XCTAssertTrue(moreSource.contains("settings.planner_ascent_speeds.title"))
+        XCTAssertTrue(moreSource.contains("PlannerAscentSpeedSettingsView"))
+    }
+
     func testEmergencyWindowLocalizationKeysExist() throws {
         let en = try loadStrings(named: "en")
         let it = try loadStrings(named: "it")

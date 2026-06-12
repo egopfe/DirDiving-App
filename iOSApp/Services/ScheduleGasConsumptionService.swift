@@ -69,7 +69,8 @@ enum ScheduleGasConsumptionService {
     static func analyze(
         input: GasPlanInput,
         enginePlan: BuhlmannEngineResult,
-        environment: PlannerEnvironment
+        environment: PlannerEnvironment,
+        ascentSpeedSettings: PlannerAscentSpeedSettings = PlannerAscentSpeedSettings.load()
     ) -> Result<GasConsumptionLedger, Error> {
         guard !enginePlan.segments.isEmpty else {
             return .failure(.invalidSegment)
@@ -100,7 +101,11 @@ enum ScheduleGasConsumptionService {
         var warnings: [GasUsageWarningState] = []
         var totalConsumed = 0.0
         var totalRemaining = 0.0
-        let rockBottom = rockBottomLiters(input: input, environment: environment)
+        let rockBottom = rockBottomLiters(
+            input: input,
+            environment: environment,
+            ascentSpeedSettings: ascentSpeedSettings
+        )
 
         for (cylinderId, consumed) in consumedByCylinder {
             guard let allocation = allocations[cylinderId] else {
@@ -204,9 +209,12 @@ enum ScheduleGasConsumptionService {
         return result
     }
 
-    static func automaticAscentMinutes(plannedDepthMeters: Double) -> Double {
-        guard plannedDepthMeters.isFinite else { return 3 }
-        return max(3, plannedDepthMeters / 9.0)
+    static func automaticAscentMinutes(
+        plannedDepthMeters: Double,
+        ascentSpeedSettings: PlannerAscentSpeedSettings = PlannerAscentSpeedSettings.load()
+    ) -> Double {
+        guard plannedDepthMeters.isFinite, plannedDepthMeters > 0 else { return 0 }
+        return ascentSpeedSettings.ascentMinutes(from: plannedDepthMeters, to: 0)
     }
 
     static func normalizedEmergencyExtraMinutes(_ minutes: Double) -> Double {
@@ -225,15 +233,25 @@ enum ScheduleGasConsumptionService {
         )
     }
 
-    static func emergencyMinutesUsed(input: GasPlanInput) -> Double {
-        automaticAscentMinutes(plannedDepthMeters: input.plannedDepthMeters)
+    static func emergencyMinutesUsed(
+        input: GasPlanInput,
+        ascentSpeedSettings: PlannerAscentSpeedSettings = PlannerAscentSpeedSettings.load()
+    ) -> Double {
+        automaticAscentMinutes(
+            plannedDepthMeters: input.plannedDepthMeters,
+            ascentSpeedSettings: ascentSpeedSettings
+        )
             + normalizedEmergencyExtraMinutes(input.emergencyExtraMinutes)
     }
 
-    static func rockBottomLiters(input: GasPlanInput, environment: PlannerEnvironment) -> Double {
+    static func rockBottomLiters(
+        input: GasPlanInput,
+        environment: PlannerEnvironment,
+        ascentSpeedSettings: PlannerAscentSpeedSettings = PlannerAscentSpeedSettings.load()
+    ) -> Double {
         let averageAscentDepth = input.plannedDepthMeters / 2.0
         let averageAscentATA = AmbientPressureModel.ambientPressureBar(depthMeters: averageAscentDepth, environment: environment) ?? environment.surfacePressureBar
-        let emergencyMinutes = emergencyMinutesUsed(input: input)
+        let emergencyMinutes = emergencyMinutesUsed(input: input, ascentSpeedSettings: ascentSpeedSettings)
         let value = input.emergencySacLitersPerMinute
             * normalizedTeamSize(input.teamSize)
             * averageAscentATA

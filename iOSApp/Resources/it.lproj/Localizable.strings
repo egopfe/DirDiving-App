@@ -578,6 +578,15 @@
 "settings.units.pressure.title" = "Pressione";
 "settings.units.pressure.bar" = "bar";
 "settings.units.pressure.psi" = "PSI";
+"settings.planner_ascent_speeds.title" = "Velocità di risalita planner";
+"settings.planner_ascent_speeds.subtitle" = "Usate per stimare runtime, consumi gas e Rock Bottom. Non modificano le soste Bühlmann.";
+"settings.planner_ascent_speeds.deeper_than_40" = "Oltre 40 m";
+"settings.planner_ascent_speeds.40_to_30" = "40–30 m";
+"settings.planner_ascent_speeds.30_to_20" = "30–20 m";
+"settings.planner_ascent_speeds.20_to_6" = "20–6 m";
+"settings.planner_ascent_speeds.6_to_0" = "6–0 m";
+"settings.planner_ascent_speeds.reset" = "Ripristina default";
+"settings.planner_ascent_speeds.footnote" = "Queste velocità modificano solo i tempi di transito della pianificazione. Quote e durata delle soste decompressive restano generate dal modello Bühlmann.";
 "manual_dive.add.title" = "Aggiungi immersione manuale";
 "manual_dive.edit.title" = "Modifica immersione manuale";
 "manual_dive.site" = "Sito";

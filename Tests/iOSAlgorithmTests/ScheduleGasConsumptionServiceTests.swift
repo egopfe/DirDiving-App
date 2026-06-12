@@ -6,8 +6,12 @@ final class ScheduleGasConsumptionServiceTests: XCTestCase {
     func testRockBottomUsesExtraEmergencyMinutesDefaultThree() {
         var input = BuhlmannTestSupport.gasPlanInput(depth: 36)
         input.emergencyExtraMinutes = IOSAlgorithmConfiguration.defaultEmergencyExtraMinutes
-        let ascent = ScheduleGasConsumptionService.automaticAscentMinutes(plannedDepthMeters: 36)
-        XCTAssertEqual(ascent, 4, accuracy: 0.001)
+        let settings = PlannerAscentSpeedSettings.default
+        let ascent = ScheduleGasConsumptionService.automaticAscentMinutes(
+            plannedDepthMeters: 36,
+            ascentSpeedSettings: settings
+        )
+        XCTAssertEqual(ascent, settings.ascentMinutes(from: 36, to: 0), accuracy: 0.001)
         XCTAssertEqual(
             ScheduleGasConsumptionService.emergencyMinutesUsed(input: input),
             ascent + 3,
@@ -71,17 +75,32 @@ final class ScheduleGasConsumptionServiceTests: XCTestCase {
         XCTAssertEqual(three, one * 3, accuracy: 0.01)
     }
 
-    func testAutomaticAscentTimeStillDepthBased() {
-        XCTAssertEqual(ScheduleGasConsumptionService.automaticAscentMinutes(plannedDepthMeters: 9), 3, accuracy: 0.001)
-        XCTAssertEqual(ScheduleGasConsumptionService.automaticAscentMinutes(plannedDepthMeters: 18), 3, accuracy: 0.001)
-        XCTAssertEqual(ScheduleGasConsumptionService.automaticAscentMinutes(plannedDepthMeters: 36), 4, accuracy: 0.001)
-        XCTAssertEqual(ScheduleGasConsumptionService.automaticAscentMinutes(plannedDepthMeters: 81), 9, accuracy: 0.001)
+    func testAutomaticAscentTimeUsesPlannerAscentSpeedBands() {
+        let settings = PlannerAscentSpeedSettings.default
+        XCTAssertEqual(
+            ScheduleGasConsumptionService.automaticAscentMinutes(plannedDepthMeters: 9, ascentSpeedSettings: settings),
+            settings.ascentMinutes(from: 9, to: 0),
+            accuracy: 0.001
+        )
+        XCTAssertEqual(
+            ScheduleGasConsumptionService.automaticAscentMinutes(plannedDepthMeters: 36, ascentSpeedSettings: settings),
+            settings.ascentMinutes(from: 36, to: 0),
+            accuracy: 0.001
+        )
+        XCTAssertGreaterThan(
+            ScheduleGasConsumptionService.automaticAscentMinutes(plannedDepthMeters: 81, ascentSpeedSettings: settings),
+            ScheduleGasConsumptionService.automaticAscentMinutes(plannedDepthMeters: 36, ascentSpeedSettings: settings)
+        )
 
         var input = BuhlmannTestSupport.gasPlanInput(depth: 36)
         input.emergencyExtraMinutes = 12
+        let ascent = ScheduleGasConsumptionService.automaticAscentMinutes(
+            plannedDepthMeters: 36,
+            ascentSpeedSettings: settings
+        )
         XCTAssertEqual(
-            ScheduleGasConsumptionService.emergencyMinutesUsed(input: input),
-            4 + 12,
+            ScheduleGasConsumptionService.emergencyMinutesUsed(input: input, ascentSpeedSettings: settings),
+            ascent + 12,
             accuracy: 0.001
         )
     }

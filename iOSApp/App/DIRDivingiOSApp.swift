@@ -9,6 +9,7 @@ struct DIRDivingiOSApp: App {
     @StateObject private var equipmentStore: EquipmentStore
     @StateObject private var navigationStore = IOSNavigationStore()
     @StateObject private var legalAcceptance = LegalAcceptanceStore()
+    @StateObject private var plannerAscentSpeedSettingsStore = PlannerAscentSpeedSettingsStore()
     @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
 
     init() {
@@ -43,6 +44,7 @@ struct DIRDivingiOSApp: App {
             .environmentObject(cloudSync)
             .environmentObject(navigationStore)
             .environmentObject(legalAcceptance)
+            .environmentObject(plannerAscentSpeedSettingsStore)
             .environment(\.locale, DIRIOSAppLanguage.fromStorage(appLanguage).locale)
             .preferredColorScheme(.dark)
             .task {

@@ -30,6 +30,24 @@ struct MoreView: View {
                             row(DIRIOSLocalizer.string("more.settings.sync_scope_title"), DIRIOSLocalizer.string("more.settings.sync_scope_value"))
                             row(DIRIOSLocalizer.string("more.planner_safety.title"), DIRIOSLocalizer.string("more.disclaimer.required"))
                             cnsDescentBottomSettingsSummary
+                            NavigationLink {
+                                PlannerAscentSpeedSettingsView()
+                            } label: {
+                                HStack {
+                                    Label(
+                                        DIRIOSLocalizer.string("settings.planner_ascent_speeds.title"),
+                                        systemImage: "arrow.up.circle"
+                                    )
+                                    .foregroundStyle(DIRTheme.cyan)
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption.weight(.bold))
+                                        .foregroundStyle(DIRTheme.muted)
+                                }
+                                .font(.callout.weight(.semibold))
+                                .padding(.vertical, 6)
+                            }
+                            .buttonStyle(.plain)
                             if DeveloperSettings.isDeveloperSectionVisible {
                                 NavigationLink {
                                     DeveloperSettingsView()

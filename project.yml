@@ -199,6 +199,7 @@ targets:
       - iOSApp/Models/DiveSample.swift
       - iOSApp/Models/DiveSession.swift
       - iOSApp/Models/GasPlan.swift
+      - iOSApp/Models/PlannerAscentSpeedSettings.swift
       - iOSApp/Models/CCR/CCRModels.swift
       - iOSApp/Services/CCR/CCRInspiredGasModel.swift
       - iOSApp/Services/CCR/CCRPlanValidator.swift

@@ -5,8 +5,19 @@ enum PlannerService {
         makePlan(input: input, mode: .technical, repetitivePlanningEnabled: false, repetitiveSnapshot: nil, surfaceIntervalMinutes: 0)
     }
 
-    static func makePlan(input: GasPlanInput, mode: PlannerMode) -> DivePlanResult {
-        makePlan(input: input, mode: mode, repetitivePlanningEnabled: false, repetitiveSnapshot: nil, surfaceIntervalMinutes: 0)
+    static func makePlan(
+        input: GasPlanInput,
+        mode: PlannerMode,
+        ascentSpeedSettings: PlannerAscentSpeedSettings = PlannerAscentSpeedSettings.load()
+    ) -> DivePlanResult {
+        makePlan(
+            input: input,
+            mode: mode,
+            repetitivePlanningEnabled: false,
+            repetitiveSnapshot: nil,
+            surfaceIntervalMinutes: 0,
+            ascentSpeedSettings: ascentSpeedSettings
+        )
     }
 
     static func makePlan(
@@ -32,7 +43,8 @@ enum PlannerService {
         surfaceIntervalMinutes: Double,
         decompressionMethod: PlannerDecompressionMethod = .buhlmann,
         ratioDecoPreset: RatioDecoPreset = .preset1to1,
-        unitPreference: IOSUnitPreference = .metric
+        unitPreference: IOSUnitPreference = .metric,
+        ascentSpeedSettings: PlannerAscentSpeedSettings = PlannerAscentSpeedSettings.load()
     ) -> DivePlanResult {
         guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) else {
             let activeInput = PlannerModePolicy.activePlanInput(from: input, mode: mode)
@@ -124,8 +136,21 @@ enum PlannerService {
             snapshot: repetitiveSnapshot,
             surfaceIntervalMinutes: surfaceIntervalMinutes
         )
-        let ledgerResult = ScheduleGasConsumptionService.analyze(input: working, enginePlan: enginePlan, environment: environment)
-        let analysis = GasPlanningService.analyze(input: working, enginePlan: enginePlan, oxygenCarryover: oxygenCarryover, mode: mode)
+        let operationalEnginePlan = enginePlan.withPlannerTransitMinutes(using: ascentSpeedSettings)
+        let ledgerResult = ScheduleGasConsumptionService.analyze(
+            input: working,
+            enginePlan: operationalEnginePlan,
+            environment: environment,
+            ascentSpeedSettings: ascentSpeedSettings
+        )
+        let analysis = GasPlanningService.analyze(
+            input: working,
+            enginePlan: enginePlan,
+            oxygenCarryover: oxygenCarryover,
+            mode: mode,
+            ascentSpeedSettings: ascentSpeedSettings,
+            operationalEnginePlan: operationalEnginePlan
+        )
         let rawStops = BuhlmannPlanner.decoStops(from: enginePlan)
         let completenessResolution = PlanCalculationCompletenessResolver.resolve(
             enginePlan: enginePlan,
@@ -159,9 +184,9 @@ enum PlannerService {
         }
 
         let tts = enginePlan.ttsMinutes
-        let segments = BuhlmannPlanner.runtimeSegments(from: enginePlan)
+        let segments = BuhlmannPlanner.runtimeSegments(from: operationalEnginePlan)
         let ascentTableRows = PlannerAscentTableBuilder.rows(
-            from: enginePlan,
+            from: operationalEnginePlan,
             decoStops: stops,
             environment: environment,
             depthFormatter: { Formatters.depth($0, units: .metric).text },
@@ -215,7 +240,7 @@ enum PlannerService {
         return DivePlanResult(
             ndlMinutes: enginePlan.ndlMinutes ?? 0,
             ttsMinutes: tts,
-            totalRuntimeMinutes: enginePlan.totalRuntimeMinutes,
+            totalRuntimeMinutes: operationalEnginePlan.totalRuntimeMinutes,
             calculationCompleteness: completenessResolution.completeness,
             decoStops: stops,
             ascentTableRows: ascentTableRows,
