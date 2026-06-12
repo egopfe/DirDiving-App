@@ -69,6 +69,7 @@ final class PlannerStore: ObservableObject {
     private var planningGeneration: UInt = 0
     private var cachedAnalysis: TechnicalGasAnalysis?
     private var analysisCacheKey: AnalysisCacheKey?
+    private var ascentSpeedObserver: NSObjectProtocol?
 
     init(cloudSync: CloudSyncStore? = nil) {
         self.cloudSync = cloudSync
@@ -88,10 +89,26 @@ final class PlannerStore: ObservableObject {
         }
         input.ensurePlannerCylindersFromLegacy()
         isReady = true
+        ascentSpeedObserver = NotificationCenter.default.addObserver(
+            forName: .plannerAscentSpeedSettingsDidChange,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.invalidateAnalysisCache()
+                self?.refreshDerivedPlanningPreview()
+            }
+        }
         deferPublishedMutation { [self] in
             calculate()
             refreshCCRPlan()
             saveIfReady()
+        }
+    }
+
+    deinit {
+        if let ascentSpeedObserver {
+            NotificationCenter.default.removeObserver(ascentSpeedObserver)
         }
     }
 
@@ -247,7 +264,8 @@ final class PlannerStore: ObservableObject {
             surfaceIntervalMinutes: surfaceIntervalMinutes,
             decompressionMethod: decompressionMethod,
             ratioDecoPreset: ratioDecoPreset,
-            unitPreference: .metric
+            unitPreference: .metric,
+            ascentSpeedSettings: PlannerAscentSpeedSettings.load()
         )
         if persistSnapshot,
            let environment = try? makeEnvironment(from: active),
@@ -378,7 +396,11 @@ final class PlannerStore: ObservableObject {
             analysis = cachedAnalysis
             return
         }
-        let computed = GasPlanningService.analyze(input: input, mode: mode)
+        let computed = GasPlanningService.analyze(
+            input: input,
+            mode: mode,
+            ascentSpeedSettings: PlannerAscentSpeedSettings.load()
+        )
         cachedAnalysis = computed
         analysisCacheKey = key
         analysis = computed
@@ -452,12 +474,16 @@ private struct AnalysisCacheKey: Equatable {
     let planningDepthReference: PlanningDepthReference
     let bottomTimeMinutes: Double
     let sacLitersPerMinute: Double
+    let emergencySacLitersPerMinute: Double
+    let teamSize: Double
+    let emergencyExtraMinutes: Double
     let altitudeMeters: Double
     let salinity: SalinityMode
     let bottomGasSignature: String
     let cylinderSignature: String
     let environmentSignature: String
     let projectedCylinderSignature: String
+    let ascentSpeedSignature: String
 
     init(input: GasPlanInput, mode: PlannerMode) {
         self.mode = mode
@@ -466,6 +492,9 @@ private struct AnalysisCacheKey: Equatable {
         planningDepthReference = input.planningDepthReference
         bottomTimeMinutes = input.plannedBottomMinutes
         sacLitersPerMinute = input.sacLitersPerMinute
+        emergencySacLitersPerMinute = input.emergencySacLitersPerMinute
+        teamSize = input.teamSize
+        emergencyExtraMinutes = input.emergencyExtraMinutes
         altitudeMeters = input.altitudeMeters
         salinity = input.salinity
         bottomGasSignature = "\(input.bottomGas.oxygen)-\(input.bottomGas.helium)-\(input.bottomGas.maxPPO2)"
@@ -477,6 +506,7 @@ private struct AnalysisCacheKey: Equatable {
         projectedCylinderSignature = projected.plannerCylinders.map {
             "\($0.id.uuidString)|\($0.role.rawValue)|\($0.gas.oxygen)|\($0.gas.helium)|\($0.gas.maxPPO2)|\($0.switchDepthMeters)"
         }.joined(separator: ";")
+        ascentSpeedSignature = PlannerAscentSpeedSettings.load().signature
     }
 }
 

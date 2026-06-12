@@ -13,6 +13,7 @@ struct DIRDivingApp: App {
     @StateObject private var watchSync: WatchSyncService
     @StateObject private var explorationStore: ExplorationStore
     @StateObject private var buddyAssist: BuddyAssistService
+    @StateObject private var plannerBriefingStore: PlannerBriefingCardStore
     @StateObject private var legalAcceptance = LegalAcceptanceStore()
     @AppStorage(DIRAppLanguage.storageKey) private var appLanguage = DIRAppLanguage.system.rawValue
 
@@ -22,6 +23,7 @@ struct DIRDivingApp: App {
         let ascentSettings = AscentRateSettingsStore()
         let diveReminderSettings = DiveReminderSettingsStore()
         let navigationStore = AppNavigationStore()
+        let plannerBriefingStore = PlannerBriefingCardStore()
         _logStore = StateObject(wrappedValue: logStore)
         _gpsManager = StateObject(wrappedValue: gpsManager)
         _compassManager = StateObject(wrappedValue: CompassManager())
@@ -33,7 +35,9 @@ struct DIRDivingApp: App {
         _watchSync = StateObject(wrappedValue: WatchSyncService.shared)
         _explorationStore = StateObject(wrappedValue: ExplorationStore())
         _buddyAssist = StateObject(wrappedValue: BuddyAssistService())
+        _plannerBriefingStore = StateObject(wrappedValue: plannerBriefingStore)
         WatchSyncService.shared.attachLogStore(logStore)
+        WatchSyncService.shared.attachPlannerBriefingStore(plannerBriefingStore)
         SensorSourceMode.applyReleaseSafeMigrationIfNeeded()
     }
 
@@ -67,6 +71,7 @@ struct DIRDivingApp: App {
             .environmentObject(watchSync)
             .environmentObject(explorationStore)
             .environmentObject(buddyAssist)
+            .environmentObject(plannerBriefingStore)
             .environmentObject(legalAcceptance)
             .environment(\.locale, DIRAppLanguage.fromStorage(appLanguage).locale)
         }

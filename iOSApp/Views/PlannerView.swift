@@ -83,10 +83,10 @@ struct PlannerView: View {
                                     technicalAnalysisCard
                                 }
                                 if modePresentation.showsReserveCard {
-                                    reserveCard
+                                    emergencyCard
                                 }
-                                if modePresentation.showsTeamPreview {
-                                    teamPreviewCard
+                                if modePresentation.showsReserveCard {
+                                    reserveCard
                                 }
                                 plannerMODInputWarnings
                                 plannerModeLimitWarnings
@@ -667,8 +667,6 @@ struct PlannerView: View {
                         .foregroundStyle(DIRTheme.muted)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     plannerField(DIRIOSLocalizer.string("planner.field.sac_rmv"), value: $store.input.sacLitersPerMinute, unit: "L/min", step: 1)
-                    Divider().overlay(DIRTheme.hairline)
-                    plannerField(DIRIOSLocalizer.string("planner.field.sac_emergency"), value: $store.input.emergencySacLitersPerMinute, unit: "L/min", step: 1)
                 }
             }
         }
@@ -837,24 +835,158 @@ struct PlannerView: View {
         }
     }
 
+    private var emergencyCard: some View {
+        let automaticAscentMinutes = ScheduleGasConsumptionService.automaticAscentMinutes(
+            plannedDepthMeters: store.input.plannedDepthMeters
+        )
+        let totalEmergencyMinutes = ScheduleGasConsumptionService.emergencyMinutesUsed(input: store.input)
+        let rockBottomLiters = ScheduleGasConsumptionService.rockBottomLiters(
+            input: store.input,
+            environment: store.input.plannerEnvironment
+        )
+        let cylinderVolume = store.input.primaryCylinder.volumeLiters
+        let minimumGasBar = cylinderVolume > 0 ? rockBottomLiters / cylinderVolume : nil
+        return DIRCard(DIRIOSLocalizer.string("planner.emergency.title"), icon: "cross.case.fill", accent: DIRTheme.orange) {
+            VStack(alignment: .leading, spacing: 0) {
+                Text(DIRIOSLocalizer.string("planner.emergency.subtitle"))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.bottom, 8)
+                plannerField(
+                    DIRIOSLocalizer.string("planner.emergency.team_size"),
+                    value: teamSizeBinding,
+                    unit: "",
+                    step: 1,
+                    minValue: 1,
+                    maxValue: IOSAlgorithmConfiguration.maxPlannerEmergencyTeamSize
+                )
+                plannerMutedFootnote(DIRIOSLocalizer.string("planner.emergency.team_size.detail"))
+                Divider().overlay(DIRTheme.hairline)
+                plannerField(
+                    DIRIOSLocalizer.string("planner.emergency.sac"),
+                    value: $store.input.emergencySacLitersPerMinute,
+                    unit: "L/min",
+                    step: 1
+                )
+                plannerMutedFootnote(DIRIOSLocalizer.string("planner.emergency.sac.detail"))
+                Divider().overlay(DIRTheme.hairline)
+                plannerField(
+                    DIRIOSLocalizer.string("planner.emergency.extra_minutes"),
+                    value: emergencyExtraMinutesBinding,
+                    unit: "min",
+                    step: 1,
+                    maxValue: IOSAlgorithmConfiguration.maxEmergencyExtraMinutes
+                )
+                plannerMutedFootnote(DIRIOSLocalizer.string("planner.emergency.extra_minutes.detail"))
+                Divider().overlay(DIRTheme.hairline)
+                plannerReadOnlyRow(
+                    DIRIOSLocalizer.string("planner.emergency.automatic_ascent"),
+                    value: String(
+                        format: DIRIOSLocalizer.string("planner.emergency.minutes_format"),
+                        Formatters.one(automaticAscentMinutes)
+                    )
+                )
+                plannerReadOnlyRow(
+                    DIRIOSLocalizer.string("planner.emergency.total_time"),
+                    value: String(
+                        format: DIRIOSLocalizer.string("planner.emergency.total_time.format"),
+                        Formatters.one(totalEmergencyMinutes)
+                    )
+                )
+                Divider().overlay(DIRTheme.hairline)
+                GasQuantityMetricTile(
+                    title: DIRIOSLocalizer.string("planner.emergency.rock_bottom"),
+                    display: GasLedgerDisplayFormatter.displayValue(
+                        liters: rockBottomLiters,
+                        pressureBar: minimumGasBar,
+                        cylinderVolumeLiters: cylinderVolume,
+                        pressureUnit: pressureUnitPreference
+                    ),
+                    color: DIRTheme.orange
+                )
+                plannerMutedFootnote(DIRIOSLocalizer.string("planner.emergency.footnote"))
+            }
+        }
+    }
+
+    private var teamSizeBinding: Binding<Double> {
+        Binding(
+            get: { ScheduleGasConsumptionService.normalizedTeamSize(store.input.teamSize) },
+            set: { store.input.teamSize = ScheduleGasConsumptionService.normalizedTeamSize($0) }
+        )
+    }
+
+    private var emergencyExtraMinutesBinding: Binding<Double> {
+        Binding(
+            get: { store.input.emergencyExtraMinutes },
+            set: { store.input.emergencyExtraMinutes = ScheduleGasConsumptionService.normalizedEmergencyExtraMinutes($0) }
+        )
+    }
+
     private var reserveCard: some View {
-        DIRCard(DIRIOSLocalizer.string("planner.card.reserve"), icon: "gauge", accent: DIRTheme.green) {
+        let cylinderVolume = store.input.primaryCylinder.volumeLiters
+        return DIRCard(DIRIOSLocalizer.string("planner.available_gas.title"), icon: "gauge", accent: DIRTheme.green) {
             VStack(spacing: 0) {
                 HStack(spacing: 0) {
-                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.available"), value: Formatters.zero(store.input.availableGasLiters), unit: "L", color: DIRTheme.green)
+                    GasQuantityMetricTile(
+                        title: DIRIOSLocalizer.string("planner.gas_ledger.available_gas"),
+                        display: GasLedgerDisplayFormatter.displayValue(
+                            liters: store.input.availableGasLiters,
+                            pressureBar: store.input.primaryCylinder.startPressureBar,
+                            cylinderVolumeLiters: cylinderVolume,
+                            pressureUnit: pressureUnitPreference
+                        ),
+                        color: DIRTheme.green
+                    )
                     Divider().overlay(DIRTheme.hairline)
-                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.consumption"), value: Formatters.zero(store.analysis.consumptionLiters), unit: "L", color: DIRTheme.yellow)
+                    GasQuantityMetricTile(
+                        title: DIRIOSLocalizer.string("planner.gas_ledger.estimated_consumption"),
+                        display: GasLedgerDisplayFormatter.displayValue(
+                            liters: store.analysis.consumptionLiters,
+                            pressureBar: cylinderVolume > 0 ? store.analysis.consumptionLiters / cylinderVolume : nil,
+                            cylinderVolumeLiters: cylinderVolume,
+                            pressureUnit: pressureUnitPreference
+                        ),
+                        color: DIRTheme.yellow
+                    )
                     Divider().overlay(DIRTheme.hairline)
-                    let remainingPressure = Formatters.pressure(fromBar: store.analysis.remainingBar, unit: pressureUnitPreference)
-                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.remaining"), value: remainingPressure.value, unit: remainingPressure.unit, color: store.analysis.remainingLiters < store.analysis.rockBottomLiters ? DIRTheme.red : DIRTheme.green)
+                    GasQuantityMetricTile(
+                        title: DIRIOSLocalizer.string("planner.metric.remaining"),
+                        display: GasLedgerDisplayFormatter.displayValue(
+                            liters: store.analysis.remainingLiters,
+                            pressureBar: store.analysis.remainingBar,
+                            cylinderVolumeLiters: cylinderVolume,
+                            pressureUnit: pressureUnitPreference
+                        ),
+                        color: store.analysis.remainingLiters < store.analysis.rockBottomLiters ? DIRTheme.red : DIRTheme.green
+                    )
                 }
                 Divider().overlay(DIRTheme.hairline)
                 HStack(spacing: 0) {
-                    let rockBottomPressure = Formatters.pressure(fromBar: store.analysis.minimumGasBar, unit: pressureUnitPreference)
-                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.rock_bottom"), value: rockBottomPressure.value, unit: rockBottomPressure.unit, color: DIRTheme.orange)
+                    GasQuantityMetricTile(
+                        title: DIRIOSLocalizer.string("planner.metric.rock_bottom"),
+                        display: GasLedgerDisplayFormatter.displayValue(
+                            liters: store.analysis.rockBottomLiters,
+                            pressureBar: store.analysis.minimumGasBar,
+                            cylinderVolumeLiters: cylinderVolume,
+                            pressureUnit: pressureUnitPreference
+                        ),
+                        color: DIRTheme.orange
+                    )
                     Divider().overlay(DIRTheme.hairline)
-                    let turnPressure = Formatters.pressure(fromBar: store.analysis.turnPressureBar, unit: pressureUnitPreference)
-                    DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.turn_pressure"), value: turnPressure.value, unit: turnPressure.unit, color: DIRTheme.cyan)
+                    let turnLiters = store.analysis.turnPressureBar * cylinderVolume
+                    GasQuantityMetricTile(
+                        title: DIRIOSLocalizer.string("planner.metric.turn_pressure"),
+                        display: GasLedgerDisplayFormatter.displayValue(
+                            liters: turnLiters,
+                            pressureBar: store.analysis.turnPressureBar,
+                            cylinderVolumeLiters: cylinderVolume,
+                            pressureUnit: pressureUnitPreference
+                        ),
+                        color: DIRTheme.cyan
+                    )
                 }
                 if store.analysis.usesBottomPhaseConsumptionEstimate {
                     Text(DIRIOSLocalizer.string("planner.gas.bottom_phase_estimate_footnote"))
@@ -1007,38 +1139,6 @@ struct PlannerView: View {
                         }
                     }
                 }
-            }
-        }
-    }
-
-    private var teamPreviewCard: some View {
-        DIRCard(DIRIOSLocalizer.string("planner.team.matching_title"), icon: "person.2", accent: DIRTheme.cyan) {
-            VStack(spacing: 10) {
-                Text(DIRIOSLocalizer.string("planner.team.preview_only"))
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(DIRTheme.yellow)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                ForEach(store.input.teamMembers) { member in
-                    HStack {
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text(member.name)
-                                .font(.callout.weight(.semibold))
-                                .foregroundStyle(.white)
-                            Text(DIRIOSLocalizer.formatted("planner.team.sac_format", Formatters.zero(member.sacLitersPerMinute)))
-                                .font(.caption)
-                                .foregroundStyle(DIRTheme.muted)
-                        }
-                        Spacer()
-                        Text(DIRIOSLocalizer.formatted("planner.team.available_gas_format", Formatters.zero(member.cylinder.availableGasLiters)))
-                            .font(.callout.monospacedDigit().weight(.semibold))
-                            .foregroundStyle(DIRTheme.cyan)
-                    }
-                    Divider().overlay(DIRTheme.hairline)
-                }
-                Text(DIRIOSLocalizer.string("planner.team.preview_only_notice"))
-                    .font(.footnote)
-                    .foregroundStyle(DIRTheme.muted)
-                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }
@@ -1198,19 +1298,46 @@ struct PlannerView: View {
         )
     }
 
-    private func plannerField(_ title: String, value: Binding<Double>, unit: String, step: Double, maxValue: Double? = nil) -> some View {
+    private func plannerReadOnlyRow(_ title: String, value: String) -> some View {
         HStack {
             Text(title)
                 .font(.callout)
                 .foregroundStyle(.white)
             Spacer()
-            Text("\(Formatters.zero(value.wrappedValue)) \(unit)")
+            Text(value)
                 .font(.callout.monospacedDigit())
+                .foregroundStyle(DIRTheme.cyan)
+                .multilineTextAlignment(.trailing)
+        }
+        .padding(.vertical, 10)
+    }
+
+    private func plannerField(
+        _ title: String,
+        value: Binding<Double>,
+        unit: String,
+        step: Double,
+        minValue: Double = 0,
+        maxValue: Double? = nil
+    ) -> some View {
+        HStack {
+            Text(title)
+                .font(.callout)
                 .foregroundStyle(.white)
-                .frame(width: 96, alignment: .trailing)
+            Spacer()
+            Group {
+                if unit.isEmpty {
+                    Text(Formatters.zero(value.wrappedValue))
+                } else {
+                    Text("\(Formatters.zero(value.wrappedValue)) \(unit)")
+                }
+            }
+            .font(.callout.monospacedDigit())
+            .foregroundStyle(.white)
+            .frame(width: 96, alignment: .trailing)
             HStack(spacing: 1) {
                 Button {
-                    value.wrappedValue = max(0, value.wrappedValue - step)
+                    value.wrappedValue = max(minValue, value.wrappedValue - step)
                 } label: {
                     Image(systemName: "minus")
                         .frame(width: 28, height: 24)
@@ -1374,6 +1501,7 @@ struct PlanResultView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var store: PlannerStore
     @EnvironmentObject private var equipment: EquipmentStore
+    @EnvironmentObject private var plannerBriefingTransfer: PlannerBriefingWatchTransferService
     var pendingChecklistExportPrompt: Bool = false
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @AppStorage(IOSPressureUnitPreference.storageKey) private var pressureUnitRaw = IOSPressureUnitPreference.storageValue(for: .bar)
@@ -1576,6 +1704,65 @@ struct PlanResultView: View {
     private func depthText(_ meters: Double) -> String {
         Formatters.depth(meters, units: unitPreference).text
     }
+
+    private var decoStopsPresentationRows: [DecoStopPresentationRow] {
+        DecoStopsPresentationBuilder.rows(
+            from: store.plan.decoStops,
+            depthFormatter: { depthText($0) },
+            ppO2Formatter: { Formatters.one($0) }
+        )
+    }
+
+    private var showsDecoStopsSection: Bool {
+        DecoStopsPresentationBuilder.shouldShowSection(mode: store.mode, decoStops: store.plan.decoStops)
+    }
+
+    private var showsNoDecoStopsNote: Bool {
+        DecoStopsPresentationBuilder.shouldShowNoStopsNote(mode: store.mode, decoStops: store.plan.decoStops)
+    }
+
+    private var canSendWatchBriefing: Bool {
+        !store.plan.ascentTableRows.isEmpty || !decoStopsPresentationRows.isEmpty
+    }
+
+    private var runtimeIncludesDecoStops: Bool {
+        !store.plan.decoStops.isEmpty
+            || store.plan.ascentTableRows.contains { $0.kind == .decoStop }
+    }
+
+    private var watchBriefingStatusMessage: String? {
+        switch plannerBriefingTransfer.state {
+        case .idle:
+            return nil
+        case .generating:
+            return DIRIOSLocalizer.string("planner.watch_briefing.generating")
+        case .sending:
+            return DIRIOSLocalizer.string("planner.watch_briefing.sending")
+        case .queued:
+            return DIRIOSLocalizer.string("planner.watch_briefing.queued")
+        case .sent:
+            return DIRIOSLocalizer.string("planner.watch_briefing.sent")
+        case .failed:
+            return DIRIOSLocalizer.string("planner.watch_briefing.failed")
+        }
+    }
+
+    private var isWatchBriefingActionDisabled: Bool {
+        switch plannerBriefingTransfer.state {
+        case .generating, .sending:
+            return true
+        default:
+            return false
+        }
+    }
+
+    private var watchBriefingStatusColor: Color {
+        if case .failed = plannerBriefingTransfer.state {
+            return DIRTheme.red
+        }
+        return DIRTheme.cyan
+    }
+
     @State private var tab: PlanTab = .plan
     @State private var showChecklistExportPrompt = false
     @State private var showChecklistExportSheet = false
@@ -1679,6 +1866,11 @@ struct PlanResultView: View {
                         if modePresentation.showsGasLedger {
                             gasLedgerCard
                         }
+                        if showsDecoStopsSection {
+                            DecoStopsSectionView(rows: decoStopsPresentationRows)
+                        } else if showsNoDecoStopsNote {
+                            plannerResultMutedFootnote(DIRIOSLocalizer.string("planner.deco_stops.none"))
+                        }
                         if modePresentation.showsFullAscentTable || modePresentation.showsSimplifiedAscentTable {
                             ascentTable
                         }
@@ -1689,9 +1881,6 @@ struct PlanResultView: View {
                         if modePresentation.showsContingency {
                             contingencyCard
                         }
-                        if modePresentation.showsTeamMatch {
-                            teamMatchCard
-                        }
                         if modePresentation.showsBriefing {
                             briefingCard
                         }
@@ -1699,6 +1888,9 @@ struct PlanResultView: View {
                             baseCompatibilitySummary
                         }
                         plannerLegalFootnotes
+                        if canSendWatchBriefing {
+                            sendWatchBriefingSection
+                        }
                         if canExportPlanPDF {
                             shareDivePackButton
                         }
@@ -1786,6 +1978,47 @@ struct PlanResultView: View {
         } message: {
             Text(pdfExportAlertMessage ?? "")
         }
+    }
+
+    private var sendWatchBriefingSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Button {
+                sendPlannerBriefingToWatch()
+            } label: {
+                Text(DIRIOSLocalizer.string("planner.watch_briefing.send"))
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(DIRTheme.cyan)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 11)
+                    .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .disabled(isWatchBriefingActionDisabled)
+
+            Text(DIRIOSLocalizer.string("planner.watch_briefing.ref_only"))
+                .font(.caption2)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if let watchBriefingStatusMessage {
+                Text(watchBriefingStatusMessage)
+                    .font(.caption)
+                    .foregroundStyle(watchBriefingStatusColor)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    private func sendPlannerBriefingToWatch() {
+        guard canSendWatchBriefing else { return }
+        let input = PlannerBriefingImageExportInput(
+            modeLabel: store.mode.localizedTabTitle,
+            plannerSessionId: nil,
+            decoStopRows: PlannerBriefingImageExportService.decoRows(from: decoStopsPresentationRows),
+            runtimeRows: PlannerBriefingImageExportService.runtimeRows(from: store.plan.ascentTableRows),
+            includesDecoStopsInRuntime: runtimeIncludesDecoStops
+        )
+        plannerBriefingTransfer.exportAndSend(input: input)
     }
 
     private var shareDivePackButton: some View {
@@ -2229,7 +2462,7 @@ struct PlanResultView: View {
     @ViewBuilder
     private var gasLedgerCard: some View {
         if let failure = store.plan.gasLedgerFailure {
-            DIRCard(DIRIOSLocalizer.string("planner.gas_ledger.title"), icon: "fuelpump", accent: DIRTheme.red) {
+            DIRCard(DIRIOSLocalizer.string("planner.available_gas.title"), icon: "fuelpump", accent: DIRTheme.red) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(failure.userFacingMessage.title)
                         .font(.callout.weight(.semibold))
@@ -2247,7 +2480,7 @@ struct PlanResultView: View {
                 }
             }
         } else if let ledger = store.plan.gasLedger {
-            DIRCard(DIRIOSLocalizer.string("planner.gas_ledger.title"), icon: "fuelpump", accent: DIRTheme.cyan) {
+            DIRCard(DIRIOSLocalizer.string("planner.available_gas.title"), icon: "fuelpump", accent: DIRTheme.cyan) {
                 VStack(spacing: 10) {
                     Text(DIRIOSLocalizer.string("planner.gas_ledger.subtitle"))
                         .font(.caption2)
@@ -2275,6 +2508,10 @@ struct PlanResultView: View {
     private func gasLedgerEntryRow(_ entry: GasConsumptionLedger.Entry, ledger: GasConsumptionLedger) -> some View {
         let cylinderLabel = store.input.plannerCylinders.first(where: { $0.id == entry.cylinderId })?.tankSize.rawValue
             ?? store.input.primaryCylinder.name
+        let cylinderVolume = GasLedgerDisplayFormatter.cylinderVolumeLiters(for: entry.cylinderId, input: store.input)
+        let availableLiters = entry.consumedLiters + entry.remainingLiters
+        let availableBar = cylinderVolume > 0 ? availableLiters / cylinderVolume : entry.remainingBar
+        let consumedBar = cylinderVolume > 0 ? entry.consumedLiters / cylinderVolume : nil
         let reserveBreached = ledger.warnings.contains {
             if case .reserveBreached(let gas) = $0 { return gas == entry.gasLabel }
             return false
@@ -2305,12 +2542,38 @@ struct PlanResultView: View {
                 }
             }
             HStack(spacing: 0) {
-                DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.consumption"), value: Formatters.zero(entry.consumedLiters), unit: "L", color: DIRTheme.yellow)
+                GasQuantityMetricTile(
+                    title: DIRIOSLocalizer.string("planner.gas_ledger.available_gas"),
+                    display: GasLedgerDisplayFormatter.displayValue(
+                        liters: availableLiters,
+                        pressureBar: availableBar,
+                        cylinderVolumeLiters: cylinderVolume,
+                        pressureUnit: pressureUnitPreference
+                    ),
+                    color: DIRTheme.cyan
+                )
                 Divider().overlay(DIRTheme.hairline)
-                DIRMetricTile(title: DIRIOSLocalizer.string("planner.metric.remaining"), value: Formatters.zero(entry.remainingLiters), unit: "L", color: entry.remainingLiters < 0 ? DIRTheme.red : DIRTheme.green)
+                GasQuantityMetricTile(
+                    title: DIRIOSLocalizer.string("planner.gas_ledger.estimated_consumption"),
+                    display: GasLedgerDisplayFormatter.displayValue(
+                        liters: entry.consumedLiters,
+                        pressureBar: consumedBar,
+                        cylinderVolumeLiters: cylinderVolume,
+                        pressureUnit: pressureUnitPreference
+                    ),
+                    color: DIRTheme.yellow
+                )
                 Divider().overlay(DIRTheme.hairline)
-                let remainingPressure = Formatters.pressure(fromBar: entry.remainingBar, unit: pressureUnitPreference)
-                DIRMetricTile(title: DIRIOSLocalizer.string("planner.gas_ledger.remaining_pressure"), value: remainingPressure.value, unit: remainingPressure.unit, color: reserveBreached ? DIRTheme.red : DIRTheme.cyan)
+                GasQuantityMetricTile(
+                    title: DIRIOSLocalizer.string("planner.metric.remaining"),
+                    display: GasLedgerDisplayFormatter.displayValue(
+                        liters: entry.remainingLiters,
+                        pressureBar: entry.remainingBar,
+                        cylinderVolumeLiters: cylinderVolume,
+                        pressureUnit: pressureUnitPreference
+                    ),
+                    color: entry.remainingLiters < 0 || reserveBreached ? DIRTheme.red : DIRTheme.green
+                )
             }
             if lostGasFailed {
                 Text(DIRIOSLocalizer.string("planner.gas_ledger.warning.lost_gas.message"))
@@ -2333,6 +2596,7 @@ struct PlanResultView: View {
     private func unusedGasLedgerEntryRow(_ entry: GasConsumptionLedger.UnusedPlannedEntry) -> some View {
         let cylinderLabel = store.input.plannerCylinders.first(where: { $0.id == entry.cylinderId })?.tankSize.rawValue
             ?? store.input.primaryCylinder.name
+        let cylinderVolume = GasLedgerDisplayFormatter.cylinderVolumeLiters(for: entry.cylinderId, input: store.input)
         let subtitle = entry.isStandbyOrBailout
             ? DIRIOSLocalizer.string("planner.gas_ledger.unused_standby")
             : DIRIOSLocalizer.string("planner.gas_ledger.unused_planned")
@@ -2352,18 +2616,14 @@ struct PlanResultView: View {
                     .foregroundStyle(DIRTheme.yellow)
             }
             HStack(spacing: 0) {
-                DIRMetricTile(
+                GasQuantityMetricTile(
                     title: DIRIOSLocalizer.string("planner.gas_ledger.available_gas"),
-                    value: Formatters.zero(entry.availableLiters),
-                    unit: "L",
-                    color: DIRTheme.cyan
-                )
-                Divider().overlay(DIRTheme.hairline)
-                let availablePressure = Formatters.pressure(fromBar: entry.availableBar, unit: pressureUnitPreference)
-                DIRMetricTile(
-                    title: DIRIOSLocalizer.string("planner.gas_ledger.remaining_pressure"),
-                    value: availablePressure.value,
-                    unit: availablePressure.unit,
+                    display: GasLedgerDisplayFormatter.displayValue(
+                        liters: entry.availableLiters,
+                        pressureBar: entry.availableBar,
+                        cylinderVolumeLiters: cylinderVolume,
+                        pressureUnit: pressureUnitPreference
+                    ),
                     color: DIRTheme.cyan
                 )
             }
@@ -2675,35 +2935,6 @@ struct PlanResultView: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     Divider().overlay(DIRTheme.hairline)
-                }
-            }
-        }
-    }
-
-    private var teamMatchCard: some View {
-        DIRCard(DIRIOSLocalizer.string("planner.team.match_title"), icon: "person.2", accent: DIRTheme.cyan) {
-            VStack(spacing: 8) {
-                tableRow([
-                    DIRIOSLocalizer.string("planner.table.diver"),
-                    DIRIOSLocalizer.string("planner.table.sac"),
-                    DIRIOSLocalizer.string("planner.table.gas"),
-                    DIRIOSLocalizer.string("planner.table.status")
-                ], isHeader: true)
-                ForEach(store.plan.teamMatches) { match in
-                    tableRow(
-                        [
-                            match.diverName,
-                            "\(Formatters.zero(match.sacLitersMinute))",
-                            DIRIOSLocalizer.formatted("planner.team.available_gas_format", Formatters.zero(match.availableLiters)),
-                            match.status
-                        ],
-                        columnHeaders: [
-                            DIRIOSLocalizer.string("planner.table.diver"),
-                            DIRIOSLocalizer.string("planner.table.sac"),
-                            DIRIOSLocalizer.string("planner.table.gas"),
-                            DIRIOSLocalizer.string("planner.table.status")
-                        ]
-                    )
                 }
             }
         }

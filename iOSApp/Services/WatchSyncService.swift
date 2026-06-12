@@ -34,6 +34,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published private(set) var inventoryErrorMessage: String?
     @Published private(set) var pendingDeleteRequests: [String: WatchPhotoDeleteRequestState] = [:]
     private weak var logStore: DiveLogStore?
+    weak var plannerBriefingTransferService: PlannerBriefingWatchTransferService?
     private var photoIDByTransferFilePath: [String: String] = [:]
     private var companionPhotoTransfersByID: [String: CompanionPhotoTransferStatus] = [:]
     private var pendingPhotoImportVerificationTasks: [String: Task<Void, Never>] = [:]
@@ -446,6 +447,15 @@ final class WatchSyncService: NSObject, ObservableObject {
             errorMessage: message
         )
         lastMessage = DIRIOSLocalizer.string("watch_photo_status_failed")
+    }
+
+    private func handlePlannerBriefingAck(_ payload: [String: Any]) {
+        guard let packageRaw = payload[PlannerBriefingTransferSupport.packageIdKey] as? String,
+              let packageId = UUID(uuidString: packageRaw),
+              let status = payload[PlannerBriefingTransferSupport.ackStatusKey] as? String else {
+            return
+        }
+        plannerBriefingTransferService?.handleAck(packageId: packageId, status: status)
     }
 
     private func handleCompanionPhotoAck(_ payload: [String: Any]) {
@@ -987,6 +997,10 @@ extension WatchSyncService: WCSessionDelegate {
             }
             if CompanionPhotoTransferSupport.isCompanionPhotoAck(userInfo) {
                 self.handleCompanionPhotoAck(userInfo)
+                return
+            }
+            if (userInfo["type"] as? String) == PlannerBriefingTransferSupport.ackType {
+                self.handlePlannerBriefingAck(userInfo)
                 return
             }
             _ = self.importSessionPayload(userInfo)

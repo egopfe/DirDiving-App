@@ -626,6 +626,12 @@
 "settings.row.sync_diagnostics.title" = "Diagnostica sync";
 "settings.row.sync_diagnostics.subtitle" = "Coda, retry e info di riferimento";
 "settings.section.reference" = "RIFERIMENTO";
+"watch.planner_briefing.title" = "Briefing Planner";
+"watch.planner_briefing.empty.title" = "Nessun briefing ricevuto";
+"watch.planner_briefing.empty.message" = "Invia un briefing dal Planner iOS.";
+"watch.planner_briefing.delete" = "Elimina briefing";
+"watch.planner_briefing.ref_only" = "SOLO RIFERIMENTO";
+"watch.sync.planner_briefing.received" = "Briefing planner ricevuto";
 "settings.row.language.title" = "Lingua";
 "settings.row.units.title" = "Unità di misura";
 "settings.row.units.metric" = "Metrico (m)";

@@ -31,6 +31,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     private let legacyPendingSessionsKey = "dirdiving_watch_pending_sync_sessions"
     private let pendingFileName = "dirdiving_watch_pending_sync_sessions.json"
     private weak var logStore: DiveLogStore?
+    private weak var plannerBriefingStore: PlannerBriefingCardStore?
     private var importedFromCompanionIDs: Set<UUID> = []
     private var peerSecretObserver: NSObjectProtocol?
 
@@ -60,6 +61,10 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     func attachLogStore(_ store: DiveLogStore) {
         logStore = store
+    }
+
+    func attachPlannerBriefingStore(_ store: PlannerBriefingCardStore) {
+        plannerBriefingStore = store
     }
 
     deinit {
@@ -721,14 +726,48 @@ extension WatchSyncService: WCSessionDelegate {
         }
     }
 
+    private func deliverPlannerBriefingAck(payload: [String: Any]) {
+        guard WCSession.isSupported(), activationState == .activated else { return }
+        _ = WCSession.default.transferUserInfo(payload)
+    }
+
     nonisolated func session(_ session: WCSession, didReceive file: WCSessionFile) {
+        let metadata = file.metadata ?? [:]
         let staged = Self.stageIncomingCompanionPhoto(file)
         Task { @MainActor in
             guard let staged else {
-                self.rejectCompanionPhoto(metadata: file.metadata ?? [:], errorCode: "missingFile")
+                if PlannerBriefingWatchReceiver.isPlannerBriefingTransfer(metadata) {
+                    if let packageId = PlannerBriefingTransferSupport.packageId(from: metadata) {
+                        self.deliverPlannerBriefingAck(payload: [
+                            "type": PlannerBriefingTransferSupport.ackType,
+                            PlannerBriefingTransferSupport.packageIdKey: packageId.uuidString,
+                            PlannerBriefingTransferSupport.ackStatusKey: PlannerBriefingTransferSupport.ackStatusRejected,
+                            PlannerBriefingTransferSupport.ackErrorCodeKey: "missingFile",
+                        ])
+                    }
+                } else {
+                    self.rejectCompanionPhoto(metadata: metadata, errorCode: "missingFile")
+                }
                 return
             }
             defer { try? FileManager.default.removeItem(at: staged.url) }
+            if PlannerBriefingWatchReceiver.isPlannerBriefingTransfer(staged.metadata),
+               let store = self.plannerBriefingStore {
+                if let ack = PlannerBriefingWatchReceiver.importFile(
+                    from: staged.url,
+                    metadata: staged.metadata,
+                    store: store
+                ) {
+                    self.deliverPlannerBriefingAck(payload: ack)
+                    if ack[PlannerBriefingTransferSupport.ackStatusKey] as? String == PlannerBriefingTransferSupport.ackStatusImported {
+                        self.recordActivity(
+                            title: String(localized: "watch.sync.planner_briefing.received"),
+                            detail: staged.metadata[PlannerBriefingTransferSupport.fileNameKey] as? String ?? "briefing"
+                        )
+                    }
+                }
+                return
+            }
             self.importCompanionPhoto(from: staged.url, metadata: staged.metadata)
         }
     }

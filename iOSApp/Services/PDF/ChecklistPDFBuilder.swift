@@ -13,12 +13,17 @@ enum ChecklistPDFBuilder {
             let page = PDFPageContext()
             page.attach(pdf, title: title, generatedAt: Date())
 
-            page.drawSectionTitle(DIRIOSLocalizer.string("equipment.card.checklist"))
+            page.drawSectionTitle(DIRIOSLocalizer.string("checklist.title"))
             page.drawParagraph(DIRIOSLocalizer.string("pdf.export.checklist.instructions"))
 
-            for item in profile.migratedChecklistItems {
-                let line = checklistLine(for: item, unitPreference: unitPreference)
-                page.drawChecklistRow(yesLabel: yesLabel, noLabel: noLabel, itemText: line)
+            for kind in ChecklistItemKind.sectionOrder {
+                let items = profile.migratedChecklistItems.filter { $0.kind == kind }
+                guard !items.isEmpty else { continue }
+                page.drawSectionTitle(kind.localizedSectionTitle)
+                for item in items {
+                    let line = checklistLine(for: item, unitPreference: unitPreference)
+                    page.drawChecklistRow(yesLabel: yesLabel, noLabel: noLabel, itemText: line)
+                }
             }
 
             page.finish(disclaimer: disclaimer)
@@ -30,11 +35,32 @@ enum ChecklistPDFBuilder {
     }
 
     private static func checklistLine(for item: EquipmentChecklistItem, unitPreference: IOSUnitPreference) -> String {
-        if !item.usesGas {
-            return item.title
+        var parts: [String] = []
+        parts.append(item.title)
+        parts.append(
+            item.isRequired
+                ? DIRIOSLocalizer.string("checklist.item.required")
+                : DIRIOSLocalizer.string("checklist.item.optional")
+        )
+        parts.append(
+            item.isReady
+                ? DIRIOSLocalizer.string("pdf.export.checklist.completed")
+                : DIRIOSLocalizer.string("pdf.export.checklist.not_completed")
+        )
+        if let completedAt = item.completedAt, item.isReady {
+            parts.append(ChecklistItemSupport.completedAtLabel(for: completedAt))
         }
-        var parts = [item.title]
-        parts.append(item.tankSize.rawValue)
+        if !item.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            parts.append(item.note)
+        }
+        if item.usesGas {
+            parts.append(gasDetails(for: item, unitPreference: unitPreference))
+        }
+        return parts.joined(separator: " — ")
+    }
+
+    private static func gasDetails(for item: EquipmentChecklistItem, unitPreference: IOSUnitPreference) -> String {
+        var parts = [item.tankSize.rawValue]
         parts.append(item.gasMixKind.plannerPickerTitle)
         if !item.gasText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             parts.append(item.gasText)
@@ -61,6 +87,6 @@ enum ChecklistPDFBuilder {
         if !item.pressureText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             parts.append("\(item.pressureText) \(item.pressureUnit.rawValue)")
         }
-        return parts.joined(separator: " — ")
+        return parts.joined(separator: " / ")
     }
 }

@@ -68,6 +68,13 @@ enum PDFExportService {
         return try PDFExportFilename.write(data: data, filename: filename)
     }
 
+    static func exportEquipmentSetup(profile: EquipmentProfile, unitPreference: IOSUnitPreference = .metric) throws -> URL {
+        let data = EquipmentSetupPDFBuilder.build(profile: profile, unitPreference: unitPreference)
+        guard !data.isEmpty else { throw PDFExportError.generationFailed }
+        let filename = PDFExportFilename.make(prefix: "DIRDiving_Equipment")
+        return try PDFExportFilename.write(data: data, filename: filename)
+    }
+
     static func exportChecklist(profile: EquipmentProfile, unitPreference: IOSUnitPreference = .metric) throws -> URL {
         var migrated = profile
         migrated.syncLegacyChecklistFlags()
