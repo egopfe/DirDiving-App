@@ -89,6 +89,10 @@ struct EquipmentProfile: Codable, Hashable {
     var spoolReady: Bool = true
     var backupComputerReady: Bool = true
     var checklistItems: [EquipmentChecklistItem] = []
+    var activeSetupName: String = "Default Setup"
+    var setupMode: EquipmentSetupMode = .dirTwinset
+    var structuredCylinders: [EquipmentGasCylinder] = []
+    var maintenanceItems: [EquipmentMaintenanceItem] = []
 
     var checklistReadyCount: Int {
         migratedChecklistItems.filter(\.isReady).count
@@ -132,5 +136,79 @@ struct EquipmentProfile: Codable, Hashable {
     mutating func syncLegacyChecklistFlags() {
         guard checklistItems.isEmpty else { return }
         checklistItems = migratedChecklistItems
+    }
+
+    init(
+        cylinders: String = "2 x 12 L",
+        configuration: String = "Backmount DIR",
+        bottomGas: String = "TRIMIX 18/45",
+        decoGas1: String = "EAN50",
+        decoGas2: String = "EAN80",
+        sacLitersMinute: Double = 18,
+        backupMaskReady: Bool = true,
+        spoolReady: Bool = true,
+        backupComputerReady: Bool = true,
+        checklistItems: [EquipmentChecklistItem] = [],
+        activeSetupName: String = "Default Setup",
+        setupMode: EquipmentSetupMode = .dirTwinset,
+        structuredCylinders: [EquipmentGasCylinder] = [],
+        maintenanceItems: [EquipmentMaintenanceItem] = []
+    ) {
+        self.cylinders = cylinders
+        self.configuration = configuration
+        self.bottomGas = bottomGas
+        self.decoGas1 = decoGas1
+        self.decoGas2 = decoGas2
+        self.sacLitersMinute = sacLitersMinute
+        self.backupMaskReady = backupMaskReady
+        self.spoolReady = spoolReady
+        self.backupComputerReady = backupComputerReady
+        self.checklistItems = checklistItems
+        self.activeSetupName = activeSetupName
+        self.setupMode = setupMode
+        self.structuredCylinders = structuredCylinders
+        self.maintenanceItems = maintenanceItems
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        cylinders = try container.decodeIfPresent(String.self, forKey: .cylinders) ?? "2 x 12 L"
+        configuration = try container.decodeIfPresent(String.self, forKey: .configuration) ?? "Backmount DIR"
+        bottomGas = try container.decodeIfPresent(String.self, forKey: .bottomGas) ?? "TRIMIX 18/45"
+        decoGas1 = try container.decodeIfPresent(String.self, forKey: .decoGas1) ?? "EAN50"
+        decoGas2 = try container.decodeIfPresent(String.self, forKey: .decoGas2) ?? "EAN80"
+        sacLitersMinute = try container.decodeIfPresent(Double.self, forKey: .sacLitersMinute) ?? 18
+        backupMaskReady = try container.decodeIfPresent(Bool.self, forKey: .backupMaskReady) ?? true
+        spoolReady = try container.decodeIfPresent(Bool.self, forKey: .spoolReady) ?? true
+        backupComputerReady = try container.decodeIfPresent(Bool.self, forKey: .backupComputerReady) ?? true
+        checklistItems = try container.decodeIfPresent([EquipmentChecklistItem].self, forKey: .checklistItems) ?? []
+        activeSetupName = try container.decodeIfPresent(String.self, forKey: .activeSetupName) ?? "Default Setup"
+        setupMode = try container.decodeIfPresent(EquipmentSetupMode.self, forKey: .setupMode) ?? .dirTwinset
+        structuredCylinders = try container.decodeIfPresent([EquipmentGasCylinder].self, forKey: .structuredCylinders) ?? []
+        maintenanceItems = try container.decodeIfPresent([EquipmentMaintenanceItem].self, forKey: .maintenanceItems) ?? []
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(cylinders, forKey: .cylinders)
+        try container.encode(configuration, forKey: .configuration)
+        try container.encode(bottomGas, forKey: .bottomGas)
+        try container.encode(decoGas1, forKey: .decoGas1)
+        try container.encode(decoGas2, forKey: .decoGas2)
+        try container.encode(sacLitersMinute, forKey: .sacLitersMinute)
+        try container.encode(backupMaskReady, forKey: .backupMaskReady)
+        try container.encode(spoolReady, forKey: .spoolReady)
+        try container.encode(backupComputerReady, forKey: .backupComputerReady)
+        try container.encode(checklistItems, forKey: .checklistItems)
+        try container.encode(activeSetupName, forKey: .activeSetupName)
+        try container.encode(setupMode, forKey: .setupMode)
+        try container.encode(structuredCylinders, forKey: .structuredCylinders)
+        try container.encode(maintenanceItems, forKey: .maintenanceItems)
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case cylinders, configuration, bottomGas, decoGas1, decoGas2, sacLitersMinute
+        case backupMaskReady, spoolReady, backupComputerReady, checklistItems
+        case activeSetupName, setupMode, structuredCylinders, maintenanceItems
     }
 }

@@ -215,6 +215,11 @@ targets:
       - iOSApp/Services/CCR/CCRGasDensityEstimator.swift
       - iOSApp/Utils/CCRPlannerSettings.swift
       - iOSApp/Models/EquipmentProfile.swift
+      - iOSApp/Models/EquipmentStructuredModels.swift
+      - iOSApp/Utils/EquipmentStructuredSupport.swift
+      - iOSApp/Utils/EquipmentPlannerMapper.swift
+      - iOSApp/Utils/EquipmentChecklistGenerator.swift
+      - iOSApp/Services/PDF/EquipmentSetupPDFBuilder.swift
       - iOSApp/Models/GPSPoint.swift
       - iOSApp/Models/TankSize.swift
       - iOSApp/Algorithms/Buhlmann/BuhlmannConstants.swift

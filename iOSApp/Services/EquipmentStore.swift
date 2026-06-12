@@ -82,6 +82,86 @@ final class EquipmentStore: ObservableObject {
         profile = EquipmentProfile()
     }
 
+    func addCylinder(_ cylinder: EquipmentGasCylinder) {
+        profile.structuredCylinders.append(cylinder)
+        applyStructuredSetupToLegacySummaryIfNeeded()
+    }
+
+    func updateCylinder(_ cylinder: EquipmentGasCylinder) {
+        guard let index = profile.structuredCylinders.firstIndex(where: { $0.id == cylinder.id }) else { return }
+        profile.structuredCylinders[index] = cylinder
+        applyStructuredSetupToLegacySummaryIfNeeded()
+    }
+
+    func deleteCylinder(id: UUID) {
+        profile.structuredCylinders.removeAll { $0.id == id }
+        applyStructuredSetupToLegacySummaryIfNeeded()
+    }
+
+    func resetStructuredCylindersFromLegacy() {
+        profile.structuredCylinders = EquipmentStructuredSupport.legacyDerivedCylinders(from: profile)
+        applyStructuredSetupToLegacySummaryIfNeeded()
+    }
+
+    func applyStructuredSetupToLegacySummaryIfNeeded() {
+        EquipmentStructuredSupport.syncLegacySummary(from: &profile)
+    }
+
+    func addMaintenanceItem(_ item: EquipmentMaintenanceItem) {
+        profile.maintenanceItems.append(item)
+    }
+
+    func updateMaintenanceItem(_ item: EquipmentMaintenanceItem) {
+        guard let index = profile.maintenanceItems.firstIndex(where: { $0.id == item.id }) else { return }
+        profile.maintenanceItems[index] = item
+    }
+
+    func deleteMaintenanceItem(id: UUID) {
+        profile.maintenanceItems.removeAll { $0.id == id }
+    }
+
+    func markMaintenanceItem(id: UUID, completed: Bool) {
+        guard let index = profile.maintenanceItems.firstIndex(where: { $0.id == id }) else { return }
+        profile.maintenanceItems[index].isCompleted = completed
+        if completed {
+            profile.maintenanceItems[index].lastCheckedAt = Date()
+        }
+    }
+
+    @discardableResult
+    func generateChecklistFromCurrentSetup(mergeStrategy: ChecklistMergeStrategy = .appendMissing) -> Int {
+        let generated = EquipmentChecklistGenerator.generate(from: profile)
+        let before = profile.checklistItems.count
+        profile.checklistItems = EquipmentChecklistGenerator.merge(
+            generated: generated,
+            into: profile.checklistItems,
+            strategy: mergeStrategy
+        )
+        return profile.checklistItems.count - before
+    }
+
+    @discardableResult
+    func addDueMaintenanceToChecklist() -> Int {
+        let dueItems = profile.maintenanceItems.filter {
+            !$0.isCompleted && EquipmentStructuredSupport.maintenanceStatus(for: $0) != .ok
+        }
+        guard !dueItems.isEmpty else { return 0 }
+        var appended = 0
+        let existingKeys = Set(profile.checklistItems.map {
+            EquipmentStructuredSupport.normalizedChecklistKey(title: $0.title, kind: $0.kind)
+        })
+        for maintenance in dueItems {
+            let title = String(format: DIRIOSLocalizer.string("equipment.checklist.maintenance_task"), maintenance.title)
+            let key = EquipmentStructuredSupport.normalizedChecklistKey(title: title, kind: .task)
+            guard !existingKeys.contains(key) else { continue }
+            profile.checklistItems.append(
+                EquipmentChecklistItem(title: title, isReady: false, kind: .task, isRequired: true)
+            )
+            appended += 1
+        }
+        return appended
+    }
+
     func applyTemplate(_ template: EquipmentTemplate) {
         profile.checklistItems = template.checklistItems
     }
