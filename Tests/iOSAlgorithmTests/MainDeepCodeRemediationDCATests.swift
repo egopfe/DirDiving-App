@@ -58,15 +58,16 @@ final class MainDeepCodeRemediationDCATests: XCTestCase {
 
     func testPlanningReferenceChangeInvalidatesAnalysisCache() async {
         let store = PlannerStore()
+        store.mode = .technical
         var initial = store.input
-        initial.planningDepthReference = .maximumDepth
         initial.plannedDepthMeters = 40
         initial.plannedAverageDepthMeters = 20
+        initial.usesAverageDepthForGasConsumption = false
         store.input = initial
         store.calculate()
         let firstConsumption = store.analysis.consumptionLiters
         var updated = store.input
-        updated.planningDepthReference = .averageDepth
+        updated.usesAverageDepthForGasConsumption = true
         store.input = updated
         await store.testHook_flushDebouncedWork()
         XCTAssertNotEqual(firstConsumption, store.analysis.consumptionLiters)

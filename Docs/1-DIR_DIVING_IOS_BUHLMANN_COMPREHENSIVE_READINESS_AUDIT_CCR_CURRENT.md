@@ -11,6 +11,82 @@
 
 No Swift source, UI, business logic, algorithms, sync model, security model, Watch runtime, or experimental files were modified. This report is the only intended artifact.
 
+### Post-audit remediation status (2026-06-02)
+
+| Item | Audit baseline (`fedf4eb`) | Code after remediation (`8147b3f` → `b48f268`) |
+|---|---|---|
+| IOS-CCR-P1-001 gas density pressure scaling | Open | **Fixed** — partial-pressure formula in `CCRGasDensityEstimator` |
+| IOS-CCR-P1-002 CNS/OTU failure-to-zero | Open | **Fixed** — `CCROxygenExposureState` unavailable semantics |
+| IOS-MATH-P2-001 bailout heuristic metadata | Partial | **Fixed** — `CCRBailoutScenarioResult.method/limitations/assumptions` |
+| IOS-MATH-P3-001 synthetic `.air` diluent trace | Open | **Fixed** — actual `CCRDiluent` through exposure/trace |
+
+Internal code readiness for the above items is **100%** at `b48f268`. External Bühlmann/CCR/Subsurface validation and physical QA remain **PENDING**. See `Docs/1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_REMEDIATION_REPORT_V1.0.md`.
+
+---
+
+## Indice
+
+### Metadati e sintesi
+
+| Sezione | Contenuto |
+|---|---|
+| [A. Executive Summary](#a-executive-summary) | Verdetto, readiness, blocker TestFlight/App Store |
+| [B. Scope Confirmation](#b-scope-confirmation) | Preflight git, target, build/test, documenti sorgente |
+| [C. Architecture Inventory](#c-architecture-inventory) | Stack iOS, moduli CCR, quarantena, snapshot test |
+
+### Audit per area algoritmica
+
+| Sezione | Contenuto |
+|---|---|
+| [D. Bühlmann Core Audit](#d-buhlmann-core-audit) | Costanti, tissue, ceiling, NDL, GF |
+| [E. Planner Base / Deco / Technical](#e-planner-base--deco--technical-audit) | Modalità OC, proiezione mode |
+| [F. CCR / Rebreather Audit](#f-ccr--rebreather-audit) | Setpoint, density P1, CNS/OTU P1, bailout P2 |
+| [G. Ratio Deco Audit](#g-ratio-deco-audit) | Heuristic comparator, blocco CCR |
+| [H. Gas Role Audit](#h-gas-role-audit) | Ruoli OC e CCR |
+| [I. MOD / PPO2 / Dalton / Switch Depth](#i-mod--ppo2--dalton--switch-depth-audit) | Validazione MOD, clamp switch |
+| [J. Emergency / Rock Bottom](#j-emergency--rock-bottom-audit) | Minimum gas, assunzioni |
+| [K. Ascent Speed / Runtime / Deco Stops](#k-ascent-speed--dive-runtime--deco-stops-audit) | TTS, stop canonici |
+| [L. Schedule-Aware Gas Consumption](#l-schedule-aware-gas-consumption--gas-ledger-audit) | Ledger, consumo per segmento |
+| [M. Technical Average-Depth Toggle](#m-technical-average-depth-gas-toggle-audit) | Toggle profondità media |
+| [N. Repetitive Dive / Residual Tissue](#n-repetitive-dive--residual-tissue-audit) | Snapshot tessuti |
+| [O. Tissue Loading](#o-tissue-loading-audit) | Caricamento N2/He |
+| [P. Narcotic Loading](#p-narcotic-loading-audit) | END, PPN2, narcosi |
+| [Q. CNS / OTU Audit](#q-cns--otu-audit) | Esposizione ossigeno |
+| [R. Planner ↔ Checklist / Equipment](#r-planner-to-checklist--structured-equipment-audit) | Sync gas, equipment strutturato |
+| [S. Manual Dive / Logbook](#s-manual-dive--logbook-audit) | Immersioni manuali, logbook |
+| [T. PDF / Share / Briefing / CSV](#t-pdf--share--briefing-card--csv--subsurface-audit) | Export, briefing Watch, Subsurface |
+| [U. Unit Conversion](#u-unit-conversion-audit) | Metrico/imperiale, pressione |
+| [V. Cloud / Sync / Persistence](#v-cloud--sync--persistence-audit) | iCloud, persistenza |
+| [W. Test Coverage Audit](#w-test-coverage-audit) | Inventario test, gap |
+
+### Finding CCR prioritari (sezione F)
+
+| ID | Titolo |
+|---|---|
+| [P1 — Gas density estimator](#p1-issue-ccr-gas-density-estimator) | Densità gas non scalata per pressione |
+| [P1 — CNS/OTU failure fallback](#p1-issue-ccr-cnsotu-failure-fallback) | Fallback CNS/OTU a zero |
+| [P2 — Bailout scenario model](#p2-issue-ccr-bailout-scenario-model) | Bailout euristico |
+
+### Chiusura audit
+
+| Sezione | Contenuto |
+|---|---|
+| [X. Release Hard Matrix](#x-release-hard-matrix) | Matrice gate release |
+| [Y. Detailed Action Plan](#y-detailed-action-plan) | P0 / P1 / P2 / P3 / P4 |
+| [Z. 7-Day / 14-Day Readiness Plan](#z-7-day--14-day-readiness-plan) | Piano 7 e 14 giorni |
+| [AA. Recommended Cursor Remediation Commands](#aa-recommended-cursor-remediation-commands) | Bozze comandi Cursor |
+| [AB. Final Verdict](#ab-final-verdict) | Verdetto finale e domande gate |
+
+### Piano azioni per priorità (sezione Y)
+
+| Priorità | Focus |
+|---|---|
+| P0 | Blocker critici immediati |
+| P1 | Fix prima TestFlight interno (CCR visibile) |
+| P2 | Fix prima TestFlight esterno |
+| P3 | Fix prima App Store |
+| P4 | Ottimizzazioni post-release |
+
 ---
 
 ## A. Executive Summary
@@ -19,12 +95,9 @@ No Swift source, UI, business logic, algorithms, sync model, security model, Wat
 
 DIR DIVING iOS MAIN contains a mature, non-certified Buhlmann-based reference planner. The open-circuit Buhlmann ZHL-16C implementation is substantially complete for internal validation: 16 N2 and He compartments, mixed-gas tissue loading, GF Low/High, NDL search, multigas runtime/decompression stops, MOD/PPO2 checks, gas-role projection, schedule-aware gas consumption, tissue/narcosis analytics, PDF/share export, CSV round-trip metadata, structured equipment/checklist mapping, and Watch briefing card transfer support are all present.
 
-CCR / Rebreather support is implemented as an iOS-only reference planner with dedicated setpoint/diluent/bailout models, a CCR tissue engine, CCR validation, CCR checklist import/export, CCR PDF, and heuristic bailout scenarios. It remains reference-only and not a CCR controller. Two CCR math/readiness issues are still the first code-level priorities:
+CCR / Rebreather support is implemented as an iOS-only reference planner with dedicated setpoint/diluent/bailout models, a CCR tissue engine, CCR validation, CCR checklist import/export, CCR PDF, and heuristic bailout scenarios. It remains reference-only and not a CCR controller. **Post-audit remediation (`8147b3f`) closed the two former P1 code defects** (pressure-scaled gas density; CCR CNS/OTU unavailable semantics). See post-audit status table above and `Docs/1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_REMEDIATION_REPORT_V1.0.md`.
 
-1. `CCRGasDensityEstimator` appears to return composition-weighted reference density rather than pressure-scaled gas density at depth.
-2. `CCRPlannerService` converts CCR oxygen-exposure failures into `0` CNS/OTU values instead of an unavailable/warning state.
-
-Physical and external validation gates are still pending: macOS build/test on current HEAD, third-party Buhlmann profile comparison, CCR external profile evidence, Subsurface desktop import validation, iCloud two-device QA, paired Watch transfer QA, and App Store/legal copy review.
+Physical and external validation gates are still pending: third-party Bühlmann profile comparison, CCR external profile evidence, Subsurface desktop import validation, iCloud two-device QA, paired Watch transfer QA, and App Store/legal copy review.
 
 ### Readiness estimates
 

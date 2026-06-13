@@ -472,6 +472,7 @@ private struct AnalysisCacheKey: Equatable {
     let plannedDepthMeters: Double
     let plannedAverageDepthMeters: Double
     let planningDepthReference: PlanningDepthReference
+    let averageDepthGasConsumptionEnabled: Bool
     let bottomTimeMinutes: Double
     let sacLitersPerMinute: Double
     let emergencySacLitersPerMinute: Double
@@ -490,6 +491,7 @@ private struct AnalysisCacheKey: Equatable {
         plannedDepthMeters = input.plannedDepthMeters
         plannedAverageDepthMeters = input.plannedAverageDepthMeters
         planningDepthReference = input.planningDepthReference
+        averageDepthGasConsumptionEnabled = input.averageDepthGasConsumptionEnabled
         bottomTimeMinutes = input.plannedBottomMinutes
         sacLitersPerMinute = input.sacLitersPerMinute
         emergencySacLitersPerMinute = input.emergencySacLitersPerMinute
