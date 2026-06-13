@@ -4,7 +4,7 @@
 **Branch:** `main`  
 **Audit source:** `Docs/IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`  
 **Baseline HEAD:** `fedf4eb`  
-**Remediation commit:** _(see git log after push)_
+**Remediation commit:** `8147b3f`
 
 ## Verdict
 
