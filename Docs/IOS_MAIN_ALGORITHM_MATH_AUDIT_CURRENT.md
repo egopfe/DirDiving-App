@@ -12,6 +12,73 @@ This report is based on static repository inspection on Windows. Apple tooling i
 
 ---
 
+## Indice
+
+### Metadati e sintesi
+
+| Sezione | Contenuto |
+|---|---|
+| [A. Scope Confirmed](#a-scope-confirmed) | Ambito audit, esclusioni, preflight branch/repo |
+| [B. Executive Verdict](#b-executive-verdict) | Verdetto esecutivo e readiness complessiva |
+| [C. Readiness Matrix By Function](#c-readiness-matrix-by-function) | Matrice funzione × stato × readiness |
+| [D. Files Inspected](#d-files-inspected) | Inventario file ispezionati (planner, CCR, sync, test) |
+
+### Audit per area algoritmica
+
+| Sezione | Contenuto |
+|---|---|
+| [E. Buhlmann ZHL-16C Engine Audit](#e-buhlmann-zhl-16c-engine-audit) | Costanti, tissue loading, ceiling, NDL, GF |
+| [F. CCR / Rebreather Audit](#f-ccr--rebreather-audit) | Setpoint, density, CNS/OTU, bailout — finding P1/P2/P3 |
+| [G. Ratio Deco Audit](#g-ratio-deco-audit) | Heuristic comparator, limiti e labeling |
+| [H. Gas Planning / Gas Schedule Audit](#h-gas-planning--gas-schedule-audit) | Ruoli gas, schedule, ledger |
+| [I. Emergency Gas / Rock Bottom / Minimum Gas Audit](#i-emergency-gas--rock-bottom--minimum-gas-audit) | Rock bottom, minimum gas, assunzioni |
+| [J. Repetitive Dive / Residual Tissue Audit](#j-repetitive-dive--residual-tissue-audit) | Snapshot tessuti, off-gassing |
+| [K. Unit Conversion / Ambient Pressure / Salinity / Altitude Audit](#k-unit-conversion--ambient-pressure--salinity--altitude-audit) | Unità, pressione ambiente, salinità, quota |
+| [L. MOD / PPO2 / Dalton Law Audit](#l-mod--ppo2--dalton-law-audit) | Validazione MOD/PPO2, legge di Dalton |
+| [M. Tissue Analytics / Narcosis / END / EAD / PPN2 Audit](#m-tissue-analytics--narcosis--end--ead--ppn2-audit) | Analytics tessuti, narcosi, END/EAD |
+| [N. CNS / OTU Audit](#n-cns--otu-audit) | Esposizione ossigeno, hardening richiesto |
+| [O. Logbook / Manual Dive / Import / Export / Sync Math Audit](#o-logbook--manual-dive--import--export--sync-math-audit) | Logbook, import CSV, sync |
+| [P. PDF / Share / Planner Briefing Cards Audit](#p-pdf--share--planner-briefing-cards-audit) | Export PDF, briefing cards Watch |
+| [Q. Structured Equipment / Checklist Audit](#q-structured-equipment--checklist-audit) | Equipment strutturato, checklist |
+| [R. Watch Runtime / Watch Math Boundary Audit](#r-watch-runtime--watch-math-boundary-audit) | Confine iOS/Watch, nessuna autorità deco Watch |
+
+### Finding CCR (sezione F)
+
+| ID | Titolo |
+|---|---|
+| [CCR-P1-001](#finding-ccr-p1-001-gas-density-estimator-appears-not-pressure-scaled) | Gas density non scalata per pressione |
+| [CCR-P1-002](#finding-ccr-p1-002-oxygen-exposure-failures-fall-back-to-zero) | CNS/OTU fallback a zero |
+| [CCR-P3-001](#finding-ccr-p3-001-oxygen-exposure-synthetic-gas-labels-use-air-diluent) | Label gas diluent `.air` su trace CCR |
+| [CCR-P2-001](#finding-ccr-p2-001-bailout-scenario-calculator-is-heuristic) | Bailout euristico |
+
+### Chiusura audit
+
+| Sezione | Contenuto |
+|---|---|
+| [S. Test Coverage Audit](#s-test-coverage-audit) | Inventario test, gap di copertura |
+| [T. Findings And Priority Ranking](#t-findings-and-priority-ranking) | P0 / P1 / P2 / P3 — tabella finding ID |
+| [U. Implementation Plan For Remaining Issues](#u-implementation-plan-for-remaining-issues) | Fasi 1–5 remediation |
+| [V. Edge Cases To Keep Testing](#v-edge-cases-to-keep-testing) | Edge case da mantenere in test |
+| [W. Documentation Alignment](#w-documentation-alignment) | Allineamento con altri doc repo |
+| [X. Build / Test Execution Status](#x-build--test-execution-status) | Stato xcodegen/build/test |
+| [Y. Release Gate Status](#y-release-gate-status) | Gate TestFlight / App Store / claim certificati |
+| [Z. Final Verdict](#z-final-verdict) | Verdetto finale e prossimi passi |
+
+### Finding ID (sezione T)
+
+| Priorità | ID | Area |
+|---|---|---|
+| P1 | IOS-MATH-P1-001 | CCR gas density |
+| P1 | IOS-MATH-P1-002 | CCR CNS/OTU failure fallback |
+| P2 | IOS-MATH-P2-001 | CCR bailout heuristic |
+| P2 | IOS-MATH-P2-002 | External fixture evidence |
+| P2 | IOS-MATH-P2-003 | PDF/briefing render QA |
+| P3 | IOS-MATH-P3-001 | CCR oxygen exposure label |
+| P3 | IOS-MATH-P3-002 | Ratio Deco labeling |
+| P3 | IOS-MATH-P3-003 | macOS build/test gate |
+
+---
+
 ## A. Scope Confirmed
 
 ### In scope

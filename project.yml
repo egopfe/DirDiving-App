@@ -213,6 +213,8 @@ targets:
       - iOSApp/Services/CCR/CCRPlannerService.swift
       - iOSApp/Services/CCR/CCRBailoutScenarioCalculator.swift
       - iOSApp/Services/CCR/CCRGasDensityEstimator.swift
+      - iOSApp/Services/CCR/CCRGasDensityConstants.swift
+      - iOSApp/Services/CCR/CCROxygenExposureState.swift
       - iOSApp/Utils/CCRPlannerSettings.swift
       - iOSApp/Models/EquipmentProfile.swift
       - iOSApp/Models/EquipmentStructuredModels.swift

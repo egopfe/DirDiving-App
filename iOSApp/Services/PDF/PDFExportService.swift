@@ -38,6 +38,7 @@ enum PDFExportService {
             && context.plan.validationResult.isValid
             && context.plan.buhlmannState != .invalidInput
             && context.plan.buhlmannState != .unavailable
+            && context.plan.hasAvailableOxygenExposure
     }
 
     static func hasExportableChecklist(_ profile: EquipmentProfile) -> Bool {

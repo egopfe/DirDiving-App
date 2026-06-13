@@ -1,39 +1,25 @@
-# CCR External Validation — Evidence Folder
+# CCR External Validation Evidence
 
-**Status: PENDING** — Do not mark PASS without attached files.
+**Status:** PENDING  
+**Scope:** CCR planner reference path (setpoint, diluent, density, CNS/OTU, heuristic bailout)  
+**Rule:** No PASS without attached evidence files in this folder.
 
-**Plan:** [`Docs/CCR_REBREATHER_VALIDATION_PLAN.md`](../../CCR_REBREATHER_VALIDATION_PLAN.md)  
-**Tracker:** [`Docs/CCR_REBREATHER_VALIDATION_EVIDENCE.md`](../../CCR_REBREATHER_VALIDATION_EVIDENCE.md)  
-**Limitations:** [`Docs/CCR_REBREATHER_LIMITATIONS.md`](../../CCR_REBREATHER_LIMITATIONS.md)
+## Required profiles
 
-CCR planning is **reference-only**. DIR DIVING is **not** a CCR controller, life-support system, or certified decompression planner. Bailout scenarios are **heuristic SAC estimates**, not Bühlmann-simulated OC bailout schedules.
+| Profile ID | Description | External source | Tolerance |
+|---|---|---|---|
+| CCR-AIR-DIL-40M | Air diluent, SP 0.7/1.3 | CCR reference material | Density ±0.15 g/L |
+| CCR-TX-18-45-40M | Trimix diluent | CCR reference material | Density ±0.15 g/L |
+| CCR-SP-SWITCH | Setpoint switch @ 20 m | CCR reference material | Timeline continuity |
+| CCR-CNS-OTU | Full profile CNS/OTU | NOAA tables cross-check | ±5% CNS |
+| CCR-BAILOUT-HEUR | Heuristic bailout scenarios | Documented SAC policy | Qualitative only |
 
----
+## Evidence checklist
 
-## Slot placeholders (CCR-01 … CCR-07)
+- [ ] External CCR planning reference outputs
+- [ ] Tester name and date
+- [ ] Tool / worksheet version
+- [ ] Link to internal tests (`CCRMathAuditRemediationV1Tests`, `CCRPlannerTests`)
+- [ ] Result field: PENDING / PASS / FAIL
 
-Create subfolders or link files: `CCR-01/` … `CCR-07/`
-
-| Slot | Scenario | Attach |
-|---|---|---|
-| CCR-01 | Constant depth profile | inputs, schedule screenshot, comparison table |
-| CCR-02 | Setpoint switch low→high | setpoint timeline evidence |
-| CCR-03 | Trimix diluent | diluent label, MOD notes |
-| CCR-04 | Bailout configured | **heuristic** volume comparison only |
-| CCR-05 | CNS/OTU setpoint exposure | CNS/OTU table |
-| CCR-06 | Tissue / ppN₂ / END sanity | trace screenshots |
-| CCR-07 | Bailout heuristic disclosure | UI/PDF screenshot showing reference wording |
-
-## Per-session metadata
-
-| Field | Value |
-|---|---|
-| External reference tool | |
-| Diluent / setpoints / bailout gases | |
-| Expected vs actual | |
-| Tolerance | |
-| Build / commit | |
-| Reviewer / date | |
-| Pass/Fail | **PENDING** |
-
-**External TestFlight CCR marketing remains blocked until CCR-01…04 + CCR-07 are PASS or explicitly waived with written rationale.**
+Heuristic bailout remains **non-authoritative** even after PASS on gas volume checks.

@@ -202,11 +202,33 @@ struct CCRPlanResultView: View {
     private var cnsCard: some View {
         DIRCard(DIRIOSLocalizer.string("ccr.cns.header"), icon: "heart.text.square", accent: DIRTheme.orange) {
             VStack(alignment: .leading, spacing: 6) {
-                metric(DIRIOSLocalizer.string("planner.metric.cns_full_plan"), "\(Formatters.one(plan.cnsFullPlanPercent))%")
-                metric(DIRIOSLocalizer.string("planner.metric.cns_descent_bottom"), "\(Formatters.one(plan.cnsDescentBottomPercent))%")
-                metric(DIRIOSLocalizer.string("planner.metric.otu"), Formatters.one(plan.otuFullPlan))
+                exposureMetric(
+                    DIRIOSLocalizer.string("planner.metric.cns_full_plan"),
+                    plan.oxygenExposure.cnsPercent,
+                    suffix: "%"
+                )
+                exposureMetric(
+                    DIRIOSLocalizer.string("planner.metric.cns_descent_bottom"),
+                    plan.oxygenExposure.descentBottomCNSPercent,
+                    suffix: "%"
+                )
+                exposureMetric(
+                    DIRIOSLocalizer.string("planner.metric.otu"),
+                    plan.oxygenExposure.otu,
+                    suffix: nil
+                )
             }
         }
+    }
+
+    private func exposureMetric(_ title: String, _ value: Double?, suffix: String?) -> some View {
+        let display: String
+        if let value {
+            display = suffix.map { "\(Formatters.one(value))\($0)" } ?? Formatters.one(value)
+        } else {
+            display = DIRIOSLocalizer.string("ccr.exposure.unavailable.label")
+        }
+        return metric(title, display)
     }
 
     private var depthChartCard: some View {

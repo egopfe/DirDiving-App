@@ -89,9 +89,18 @@ enum CCRPlannerPDFBuilder {
 
             page.drawSpacer()
             page.drawSectionTitle(DIRIOSLocalizer.string("ccr.cns.header"))
-            page.drawLine(DIRIOSLocalizer.string("planner.metric.cns_full_plan"), value: "\(Formatters.one(plan.cnsFullPlanPercent))%")
-            page.drawLine(DIRIOSLocalizer.string("planner.metric.cns_descent_bottom"), value: "\(Formatters.one(plan.cnsDescentBottomPercent))%")
-            page.drawLine(DIRIOSLocalizer.string("planner.metric.otu"), value: Formatters.one(plan.otuFullPlan))
+            switch plan.oxygenExposure {
+            case .available(let cns, let otu, let descentBottom):
+                page.drawLine(DIRIOSLocalizer.string("planner.metric.cns_full_plan"), value: "\(Formatters.one(cns))%")
+                if let descentBottom {
+                    page.drawLine(DIRIOSLocalizer.string("planner.metric.cns_descent_bottom"), value: "\(Formatters.one(descentBottom))%")
+                }
+                page.drawLine(DIRIOSLocalizer.string("planner.metric.otu"), value: Formatters.one(otu))
+            case .unavailable(let reason):
+                page.drawLine(DIRIOSLocalizer.string("planner.metric.cns_full_plan"), value: DIRIOSLocalizer.string("ccr.exposure.unavailable.label"))
+                page.drawLine(DIRIOSLocalizer.string("planner.metric.otu"), value: DIRIOSLocalizer.string("ccr.exposure.unavailable.label"))
+                page.drawParagraph(DIRIOSLocalizer.string("ccr.exposure.unavailable.\(reason.rawValue)"))
+            }
 
             if let maxPPN2 = plan.ppN2Timeline.map(\.ppN2Bar).max(), maxPPN2.isFinite {
                 page.drawSpacer()
