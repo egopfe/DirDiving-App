@@ -17,6 +17,19 @@ struct PlannerBriefingCardsView: View {
                     .foregroundStyle(DiveUI.yellow)
                     .frame(maxWidth: .infinity)
 
+                if briefingStore.isPackageIncomplete {
+                    Text(String(format: String(localized: "watch.planner_briefing.incomplete_format"), briefingStore.missingCardCount, briefingStore.expectedCardCount))
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(DiveUI.yellow)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                if let sessionId = briefingStore.manifest?.plannerSessionId {
+                    Text(String(format: String(localized: "watch.planner_briefing.session_format"), String(sessionId.uuidString.prefix(8))))
+                        .font(.caption2)
+                        .foregroundStyle(.gray)
+                }
+
                 if let manifest = briefingStore.manifest, !briefingStore.sortedCards.isEmpty {
                     Text(manifest.modeLabel)
                         .font(.caption)

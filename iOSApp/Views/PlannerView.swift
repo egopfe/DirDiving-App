@@ -2013,7 +2013,7 @@ struct PlanResultView: View {
         guard canSendWatchBriefing else { return }
         let input = PlannerBriefingImageExportInput(
             modeLabel: store.mode.localizedTabTitle,
-            plannerSessionId: nil,
+            plannerSessionId: store.plannerBriefingSessionId,
             decoStopRows: PlannerBriefingImageExportService.decoRows(from: decoStopsPresentationRows),
             runtimeRows: PlannerBriefingImageExportService.runtimeRows(from: store.plan.ascentTableRows),
             includesDecoStopsInRuntime: runtimeIncludesDecoStops

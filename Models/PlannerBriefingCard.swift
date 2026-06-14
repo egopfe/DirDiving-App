@@ -5,6 +5,7 @@ enum PlannerBriefingCardKind: String, Codable, Hashable {
     case decoStops
     case runtime
     case gasEmergency
+    case ccrSummary
 }
 
 struct PlannerBriefingCardMetadata: Codable, Hashable, Identifiable {

@@ -631,6 +631,8 @@
 "watch.planner_briefing.empty.message" = "Invia un briefing dal Planner iOS.";
 "watch.planner_briefing.delete" = "Elimina briefing";
 "watch.planner_briefing.ref_only" = "SOLO RIFERIMENTO";
+"watch.planner_briefing.incomplete_format" = "Pacchetto incompleto: %lld di %lld card disponibili.";
+"watch.planner_briefing.session_format" = "Sessione piano %@";
 "watch.sync.planner_briefing.received" = "Briefing planner ricevuto";
 "settings.row.language.title" = "Lingua";
 "settings.row.units.title" = "Unità di misura";

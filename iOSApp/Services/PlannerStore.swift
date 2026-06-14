@@ -29,6 +29,7 @@ final class PlannerStore: ObservableObject {
         didSet { scheduleSave() }
     }
     @Published private(set) var isCalculating = false
+    @Published private(set) var plannerBriefingSessionId = UUID()
     @Published private(set) var lastTissueSnapshot: TissueSnapshot?
     @Published var scrollToCNSThresholdSettings = false
     @Published var decompressionMethod: PlannerDecompressionMethod = .buhlmann {
@@ -273,6 +274,7 @@ final class PlannerStore: ObservableObject {
             lastTissueSnapshot = snapshot
         }
         isApplyingInputSideEffects = false
+        plannerBriefingSessionId = UUID()
     }
 
     func updateTeamMember(_ member: TeamMember) {
@@ -298,6 +300,7 @@ final class PlannerStore: ObservableObject {
     func refreshCCRPlan() {
         guard isReady, mode.isCCR else { return }
         ccrPlan = CCRPlannerService.makePlan(input: ccrInput)
+        plannerBriefingSessionId = UUID()
     }
 
     private func schedulePlanningUpdate(persistSnapshot: Bool = false) {

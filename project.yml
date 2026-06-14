@@ -211,6 +211,7 @@ targets:
       - iOSApp/Services/CCR/CCRPlannerEngine.swift
       - iOSApp/Services/CCR/CCRTissueHistorySampler.swift
       - iOSApp/Services/CCR/CCRPlannerService.swift
+      - iOSApp/Services/CCR/CCRPlannerBriefingExportSupport.swift
       - iOSApp/Services/CCR/CCRBailoutScenarioCalculator.swift
       - iOSApp/Services/CCR/CCRGasDensityEstimator.swift
       - iOSApp/Services/CCR/CCRGasDensityConstants.swift

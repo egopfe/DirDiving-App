@@ -10,6 +10,18 @@ final class PlannerBriefingCardStore: ObservableObject {
     @Published private(set) var imagePaths: [UUID: String] = [:]
 
     private let fileManager = FileManager.default
+    static let stagingDirectoryPrefix = "planner_briefing_stage_"
+    static let orphanStagingMaxAge: TimeInterval = 86_400
+
+    var loadedCardCount: Int { imagePaths.count }
+    var expectedCardCount: Int { manifest?.cards.count ?? 0 }
+    var missingCardCount: Int {
+        max(0, expectedCardCount - loadedCardCount)
+    }
+    var isPackageIncomplete: Bool {
+        guard manifest != nil else { return false }
+        return missingCardCount > 0
+    }
 
     static func storageDirectory() -> URL {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
@@ -17,10 +29,12 @@ final class PlannerBriefingCardStore: ObservableObject {
     }
 
     init() {
+        Self.cleanupOrphanStagingDirectories()
         reload()
     }
 
     func reload() {
+        Self.cleanupOrphanStagingDirectories()
         let directory = Self.storageDirectory()
         let manifestURL = directory.appendingPathComponent(PlannerBriefingTransferSupport.manifestFileName)
         guard let data = try? Data(contentsOf: manifestURL),
@@ -129,7 +143,29 @@ final class PlannerBriefingCardStore: ObservableObject {
     }
 
     private static func stagingDirectory(packageId: UUID) -> URL {
-        FileManager.default.temporaryDirectory.appendingPathComponent("planner_briefing_stage_\(packageId.uuidString)", isDirectory: true)
+        FileManager.default.temporaryDirectory.appendingPathComponent("\(stagingDirectoryPrefix)\(packageId.uuidString)", isDirectory: true)
+    }
+
+    static func cleanupOrphanStagingDirectories(
+        maxAge: TimeInterval = orphanStagingMaxAge,
+        now: Date = Date(),
+        fileManager: FileManager = .default
+    ) {
+        let temporaryDirectory = fileManager.temporaryDirectory
+        guard let entries = try? fileManager.contentsOfDirectory(
+            at: temporaryDirectory,
+            includingPropertiesForKeys: [.contentModificationDateKey]
+        ) else {
+            return
+        }
+        for url in entries where url.lastPathComponent.hasPrefix(stagingDirectoryPrefix) {
+            guard let values = try? url.resourceValues(forKeys: [.contentModificationDateKey]),
+                  let modified = values.contentModificationDate else {
+                continue
+            }
+            guard now.timeIntervalSince(modified) > maxAge else { continue }
+            try? fileManager.removeItem(at: url)
+        }
     }
 
 }

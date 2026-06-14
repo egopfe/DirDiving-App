@@ -28,6 +28,18 @@
 - No Swift, UI, algorithm, sync, security, or test production code modified.
 - No commit or push performed by this audit command.
 
+### Post-audit remediation status (2026-06-14)
+
+| Item | Audit baseline (`c0b5cd9`) | Code after remediation |
+|---|---|---|
+| WATCH-BRIEF-001 CCR briefing export | Open | **Fixed** — `CCRPlannerBriefingExportSupport` + `CCRPlanResultView` |
+| WATCH-BRIEF-002 planner session ID | Open | **Fixed** — `PlannerStore.plannerBriefingSessionId` |
+| WATCH-BRIEF-003 incomplete package UX | Open | **Fixed** — Watch incomplete warning |
+| WATCH-BRIEF-004 orphan staging | Open | **Fixed** — 24h staging cleanup |
+| WATCH-PHY-001 / WATCH-PHY-002 | Open | **PENDING** — physical QA |
+
+See [`2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_REMEDIATION_REPORT_V1.0.md`](2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_REMEDIATION_REPORT_V1.0.md).
+
 ---
 
 ## Indice

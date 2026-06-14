@@ -859,6 +859,9 @@
 "planner.briefing_card.time" = "Time";
 "planner.briefing_card.gas" = "Gas";
 "planner.briefing_card.phase" = "Phase";
+"planner.briefing_card.summary" = "Plan Summary";
+"planner.briefing_card.metric" = "Metric";
+"planner.briefing_card.value" = "Value";
 "ccr.deco_stops.title" = "CCR Deco Stops";
 "planner.table.phase" = "Phase";
 "planner.metric.tts" = "TTS";
@@ -1775,6 +1778,7 @@
 "ccr.ppn2.timeline" = "PPN2 timeline";
 "ccr.gas_density.timeline" = "Gas density timeline";
 "ccr.gas_density.approximation" = "Reference approximation — not measured loop density.";
+"ccr.gas_density.unavailable.label" = "Unavailable";
 "ccr.narcosis.estimator_footnote" = "CCR loop density and END are reference estimates based on diluent/setpoint assumptions — not measured live loop data.";
 "ccr.cns.timeline" = "CNS timeline";
 "ccr.pdf.disclaimer" = "CCR reference plan — informational only. Not certified decompression advice.";

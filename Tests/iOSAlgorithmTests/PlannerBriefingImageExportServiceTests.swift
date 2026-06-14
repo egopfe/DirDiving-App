@@ -123,8 +123,10 @@ final class PlannerBriefingImageExportServiceTests: XCTestCase {
     }
 
     func testPackageManifestMatchesFiles() throws {
-        let package = try PlannerBriefingImageExportService.export(input: sampleInput())
+        let input = sampleInput()
+        let package = try PlannerBriefingImageExportService.export(input: input)
         XCTAssertEqual(package.manifest.cards.count, package.imageFiles.count)
+        XCTAssertEqual(package.manifest.plannerSessionId, input.plannerSessionId)
         let fileNames = Set(package.imageFiles.map(\.lastPathComponent))
         for card in package.manifest.cards {
             XCTAssertTrue(fileNames.contains(card.fileName))
@@ -132,6 +134,23 @@ final class PlannerBriefingImageExportServiceTests: XCTestCase {
             let data = try Data(contentsOf: XCTUnwrap(url))
             XCTAssertEqual(PlannerBriefingTransferSupport.sha256Hex(data: data), card.contentHashSHA256)
         }
+    }
+
+    func testSummaryCardExportUsesCCRKind() throws {
+        let package = try PlannerBriefingImageExportService.export(
+            input: PlannerBriefingImageExportInput(
+                modeLabel: "CCR",
+                plannerSessionId: UUID(),
+                decoStopRows: [],
+                runtimeRows: [],
+                summaryRows: [
+                    PlannerBriefingSummaryExportRow(label: "Diluent", value: "TX 18/45")
+                ],
+                includesDecoStopsInRuntime: true
+            )
+        )
+        XCTAssertEqual(package.manifest.cards.count, 1)
+        XCTAssertEqual(package.manifest.cards.first?.kind, .ccrSummary)
     }
 
     private func sampleInput() -> PlannerBriefingImageExportInput {

@@ -857,6 +857,9 @@
 "planner.briefing_card.time" = "Tempo";
 "planner.briefing_card.gas" = "Gas";
 "planner.briefing_card.phase" = "Fase";
+"planner.briefing_card.summary" = "Riepilogo piano";
+"planner.briefing_card.metric" = "Metrica";
+"planner.briefing_card.value" = "Valore";
 "ccr.deco_stops.title" = "Tappe Decompressione CCR";
 "planner.table.phase" = "Fase";
 "planner.metric.tts" = "TTS";
@@ -1772,7 +1775,8 @@
 "ccr.setpoint.shallow_ascent.toggle" = "Usa setpoint basso in risalita superficiale";
 "ccr.ppn2.timeline" = "Timeline PPN2";
 "ccr.gas_density.timeline" = "Timeline densità gas";
-"ccr.gas_density.approximation" = "Approssimazione di riferimento — non densità misurata del loop.";
+"ccr.gas_density.approximation" = "Approssimazione di riferimento — non è densità misurata del loop.";
+"ccr.gas_density.unavailable.label" = "Non disponibile";
 "ccr.narcosis.estimator_footnote" = "La densità del loop CCR e l'END sono stime indicative basate su diluente e setpoint — non dati misurati del loop in tempo reale.";
 "ccr.cns.timeline" = "Timeline CNS";
 "ccr.pdf.disclaimer" = "Piano CCR di riferimento — solo informativo. Non consiglio decompressionale certificato.";

@@ -4,6 +4,7 @@ import Charts
 struct CCRPlanResultView: View {
     @EnvironmentObject private var store: PlannerStore
     @EnvironmentObject private var equipment: EquipmentStore
+    @EnvironmentObject private var plannerBriefingTransfer: PlannerBriefingWatchTransferService
     var pendingChecklistExportPrompt: Bool = false
     @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
@@ -40,6 +41,7 @@ struct CCRPlanResultView: View {
                     ccrDecoStopsSection
                     scheduleCard
                     bailoutCard
+                    sendWatchBriefingSection
                     warningsCard
                 }
                 .padding(.horizontal, 16)
@@ -450,5 +452,92 @@ struct CCRPlanResultView: View {
         case .warning: return DIRTheme.yellow
         case .fail: return DIRTheme.red
         }
+    }
+
+    private var canSendWatchBriefing: Bool {
+        CCRPlannerBriefingExportSupport.makeExportInput(
+            plan: plan,
+            input: store.ccrInput,
+            unitPreference: unitPreference,
+            plannerSessionId: store.plannerBriefingSessionId
+        ) != nil
+    }
+
+    private var sendWatchBriefingSection: some View {
+        Group {
+            if canSendWatchBriefing {
+                VStack(alignment: .leading, spacing: 8) {
+                    Button {
+                        sendCCRPlannerBriefingToWatch()
+                    } label: {
+                        Text(DIRIOSLocalizer.string("planner.watch_briefing.send"))
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(DIRTheme.cyan)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 11)
+                            .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(isWatchBriefingActionDisabled)
+
+                    Text(DIRIOSLocalizer.string("planner.watch_briefing.ref_only"))
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    if let watchBriefingStatusMessage {
+                        Text(watchBriefingStatusMessage)
+                            .font(.caption)
+                            .foregroundStyle(watchBriefingStatusColor)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+        }
+    }
+
+    private var watchBriefingStatusMessage: String? {
+        switch plannerBriefingTransfer.state {
+        case .idle:
+            return nil
+        case .generating:
+            return DIRIOSLocalizer.string("planner.watch_briefing.generating")
+        case .sending:
+            return DIRIOSLocalizer.string("planner.watch_briefing.sending")
+        case .queued:
+            return DIRIOSLocalizer.string("planner.watch_briefing.queued")
+        case .sent:
+            return DIRIOSLocalizer.string("planner.watch_briefing.sent")
+        case .failed:
+            return DIRIOSLocalizer.string("planner.watch_briefing.failed")
+        }
+    }
+
+    private var isWatchBriefingActionDisabled: Bool {
+        switch plannerBriefingTransfer.state {
+        case .generating, .sending:
+            return true
+        default:
+            return false
+        }
+    }
+
+    private var watchBriefingStatusColor: Color {
+        if case .failed = plannerBriefingTransfer.state {
+            return DIRTheme.red
+        }
+        return DIRTheme.cyan
+    }
+
+    private func sendCCRPlannerBriefingToWatch() {
+        guard let input = CCRPlannerBriefingExportSupport.makeExportInput(
+            plan: plan,
+            input: store.ccrInput,
+            unitPreference: unitPreference,
+            plannerSessionId: store.plannerBriefingSessionId
+        ) else {
+            return
+        }
+        plannerBriefingTransfer.exportAndSend(input: input)
     }
 }
