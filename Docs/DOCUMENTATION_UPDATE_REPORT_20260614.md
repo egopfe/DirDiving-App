@@ -32,6 +32,11 @@
 
 `xcodegen generate` + Watch/iOS `xcodebuild` run in this pass — see alignment report sections Y–Z.
 
+## Push status
+
+- Commit: `dd3ed91` — `docs: align DIR DIVING architecture and release documentation @ 99ea74a`
+- Remote: **pushed** to `origin/main` (2026-06-14)
+
 ## Not claimed
 
 - Physical QA PASS

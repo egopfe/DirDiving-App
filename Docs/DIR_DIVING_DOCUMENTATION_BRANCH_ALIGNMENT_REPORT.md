@@ -162,15 +162,16 @@ Scaffolded under `Docs/QA_EVIDENCE/` — all **PENDING** execution. No fabricate
 | When | Branch | HEAD | Working tree |
 |------|--------|------|--------------|
 | Before | `main` | `99ea74a` | clean vs `origin/main` |
-| After (pending commit) | `main` | `99ea74a` | documentation edits only |
+| After (commit) | `main` | `dd3ed91` | documentation edits only |
+| After (push) | `main` | `dd3ed91` | clean; synced with `origin/main` |
 
 ## Z. Commits created
 
-1. `docs: align DIR DIVING architecture and release documentation @ 99ea74a` (this pass)
+1. `dd3ed91` — `docs: align DIR DIVING architecture and release documentation @ 99ea74a`
 
 ## AA. Push status
 
-**Not pushed** unless explicitly requested after commit.
+**Pushed** to `origin/main` @ `dd3ed91` (2026-06-14).
 
 ## AB. Risks / assumptions
 
