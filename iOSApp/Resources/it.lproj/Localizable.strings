@@ -1869,6 +1869,7 @@
 "pdf.export.error.title" = "Esportazione non disponibile";
 "pdf.export.error.invalid_plan" = "Genera prima una pianificazione valida.";
 "pdf.export.error.empty_checklist" = "La checklist è vuota.";
+"pdf.export.error.emptyChecklist" = "La checklist è vuota.";
 "pdf.export.error.generation" = "Impossibile generare il PDF. Riprova.";
 "pdf.export.disclaimer" = "Generato da DIR Diving — solo Diving Companion. Non è un computer subacqueo né uno strumento primario di pianificazione.";
 "pdf.export.section.plan" = "Pianificazione";
@@ -1926,3 +1927,33 @@
 "sync.dive.send_error_format" = "Errore invio Watch: %@";
 "sync.conflict.saved_for_review" = "Conflitto sync salvato per revisione";
 "sync.conflict.resolved_watch_version" = "Conflitto risolto: usata versione Watch";
+
+/* UI/UX audit remediation V1.0 2026-06-02 */
+"ccr.chart.axis.time" = "Tempo";
+"ccr.chart.axis.ppo2" = "PPO2";
+"ccr.chart.axis.ppn2" = "PPN2";
+"ccr.chart.axis.end" = "END";
+"ccr.chart.axis.density" = "Densità";
+"ccr.chart.axis.cns" = "CNS";
+"ccr.gas_density.unavailable.description" = "La timeline di densità gas di riferimento non può essere calcolata per questo piano.";
+"ccr.gas_density.unavailable.a11y" = "Densità gas non disponibile. %@";
+"ccr.gas_density.unavailable.invalidSetpoint" = "Setpoint non valido";
+"ccr.gas_density.unavailable.invalidDepth" = "Profondità non valida";
+"ccr.gas_density.unavailable.invalidEnvironment" = "Ambiente non valido";
+"ccr.gas_density.unavailable.setpointAboveDryAmbient" = "Setpoint sopra la pressione ambiente secca";
+"ccr.gas_density.unavailable.nonFiniteInput" = "Input di pianificazione non finito";
+"ccr.gas_density.unavailable.inspiredGasUnavailable" = "Gas inspirato non disponibile";
+"ccr.gas_density.unit" = "Intervallo densità";
+"briefing.reference_only.footer" = "DIR DIVING — SOLO RIFERIMENTO";
+"pdf.export.error.missingSafetyAcknowledgement" = "Accetta il disclaimer di sicurezza prima di esportare.";
+"pdf.export.error.invalidValidation" = "Correggi gli errori di validazione del planner prima di esportare.";
+"pdf.export.error.modViolation" = "Risolvi le violazioni MOD prima di esportare.";
+"pdf.export.error.invalidPlanState" = "Genera un piano valido prima di esportare.";
+"pdf.export.error.unavailablePlanState" = "Il risultato di pianificazione non è disponibile per l'esportazione.";
+"pdf.export.error.missingOxygenExposure" = "I dati di esposizione ossigeno non sono disponibili per questo piano CCR.";
+"pdf.export.error.missingCalculatedResult" = "Calcola il piano prima di esportare.";
+"pdf.export.error.unsupportedExportMode" = "Questa modalità di esportazione non è supportata per il piano corrente.";
+"sync.badge.conflict.singular" = "1 conflitto sync";
+"sync.badge.conflict.plural" = "%lld conflitti sync";
+"sync.badge.pending" = "Attenzione sync in sospeso";
+"sync.badge.warning" = "Avviso sync";

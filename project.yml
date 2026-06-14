@@ -181,6 +181,7 @@ targets:
       - Models/PlannerBriefingCard.swift
       - Services/PlannerBriefingCardStore.swift
       - Services/PlannerBriefingWatchReceiver.swift
+      - Utils/PlannerBriefingFreshnessPolicy.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.watch.algorithmtests
@@ -299,6 +300,8 @@ targets:
       - iOSApp/Utils/PressureDisplayMath.swift
       - iOSApp/Services/PDF/PDFDocumentBuilder.swift
       - iOSApp/Services/PDF/PDFExportService.swift
+      - iOSApp/Services/PDF/PDFExportGate.swift
+      - iOSApp/Utils/CCRGasDensityPresentation.swift
       - iOSApp/Services/PDF/PlannerPDFBuilder.swift
       - iOSApp/Services/PDF/BriefingPDFBuilder.swift
       - iOSApp/Services/PDF/ChecklistPDFBuilder.swift

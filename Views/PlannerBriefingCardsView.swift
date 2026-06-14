@@ -4,6 +4,13 @@ struct PlannerBriefingCardsView: View {
     @EnvironmentObject private var briefingStore: PlannerBriefingCardStore
     @EnvironmentObject private var dive: DiveManager
 
+    private var freshnessState: PlannerBriefingFreshnessState {
+        PlannerBriefingFreshnessPolicy.evaluate(
+            manifest: briefingStore.manifest,
+            isPackageIncomplete: briefingStore.isPackageIncomplete
+        )
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
@@ -24,6 +31,16 @@ struct PlannerBriefingCardsView: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
+                if let warning = PlannerBriefingFreshnessPolicy.localizedWarning(for: freshnessState) {
+                    Text(warning)
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(DiveUI.yellow)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityLabel(
+                            PlannerBriefingFreshnessPolicy.accessibilityLabel(for: freshnessState) ?? warning
+                        )
+                }
+
                 if let sessionId = briefingStore.manifest?.plannerSessionId {
                     Text(String(format: String(localized: "watch.planner_briefing.session_format"), String(sessionId.uuidString.prefix(8))))
                         .font(.caption2)
@@ -34,7 +51,7 @@ struct PlannerBriefingCardsView: View {
                     Text(manifest.modeLabel)
                         .font(.caption)
                         .foregroundStyle(.white.opacity(0.85))
-                    Text(Self.generatedAtLabel(manifest.generatedAt))
+                    Text(PlannerBriefingFreshnessPolicy.formattedGeneratedAt(manifest.generatedAt))
                         .font(.caption2)
                         .foregroundStyle(.gray)
 
@@ -79,13 +96,6 @@ struct PlannerBriefingCardsView: View {
         .onAppear {
             briefingStore.reload()
         }
-    }
-
-    private static func generatedAtLabel(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        formatter.timeStyle = .short
-        return formatter.string(from: date)
     }
 }
 

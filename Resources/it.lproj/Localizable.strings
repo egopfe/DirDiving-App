@@ -838,3 +838,34 @@
 "alarms.a11y.row_format" = "%@, %@, %@";
 "alarms.a11y.stepper.decrease" = "Diminuisci";
 "alarms.a11y.stepper.increase" = "Aumenta";
+
+/* UI/UX audit remediation V1.0 2026-06-02 */
+"watch.gps.status.available" = "Fix disponibile";
+"watch.gps.status.searching" = "Ricerca fix in corso";
+"watch.gps.status.permission_denied" = "Permesso GPS negato";
+"watch.gps.status.permission_pending" = "Permesso GPS in attesa";
+"watch.gps.status.unavailable" = "GPS non disponibile";
+"watch.gps.status.disabled" = "GPS disabilitato";
+"watch.compass.status.ready" = "BUSSOLA pronta";
+"watch.compass.status.active" = "BUSSOLA attiva";
+"watch.compass.status.calibrating" = "BUSSOLA in calibrazione";
+"watch.compass.status.calibration_required" = "Calibra BUSSOLA";
+"watch.compass.status.unavailable" = "BUSSOLA non disponibile";
+"watch.compass.status.permission_denied" = "Permesso BUSSOLA negato";
+"watch.compass.status.permission_pending" = "Permesso BUSSOLA in attesa";
+"watch.compass.status.interference" = "Interferenza BUSSOLA";
+"watch.compass.status.no_heading" = "Direzione non disponibile";
+"watch.compass.status.unknown" = "Stato BUSSOLA sconosciuto";
+"watch.planner_briefing.freshness.old" = "Briefing potenzialmente datato — verifica prima dell'immersione.";
+"watch.planner_briefing.freshness.session_mismatch" = "Il briefing potrebbe non corrispondere alla sessione pianificata corrente.";
+"watch.planner_briefing.freshness.incomplete" = "Pacchetto briefing incompleto.";
+"watch.planner_briefing.freshness.unsupported" = "Metadati briefing non supportati.";
+"watch.planner_briefing.freshness.a11y" = "Avviso briefing: %@";
+"briefing.reference_only.footer" = "DIR DIVING — SOLO RIFERIMENTO";
+"user_images.info.bundled_readonly" = "Le immagini incluse sono di sola lettura.";
+"user_images.info.uploaded_deletable" = "Le immagini caricate possono essere eliminate e si sincronizzano con iPhone.";
+"user_images.info.dive_active_note" = "Gestione immagini limitata durante immersione attiva.";
+"user_images.type.bundled" = "Inclusa";
+"user_images.type.uploaded" = "Caricata";
+"user_images.count.format" = "%lld immagini";
+"user_images.count.a11y" = "%lld immagini disponibili";

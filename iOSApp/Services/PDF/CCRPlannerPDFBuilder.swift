@@ -127,6 +127,27 @@ enum CCRPlannerPDFBuilder {
                 }
             }
 
+            page.drawSpacer()
+            page.drawSectionTitle(DIRIOSLocalizer.string("ccr.gas_density.timeline"))
+            if CCRGasDensityPresentation.hasAvailableTimeline(plan) {
+                let samples = CCRGasDensityPresentation.timelineSamples(from: plan)
+                if let minDensity = samples.map(\.density).min(),
+                   let maxDensity = samples.map(\.density).max() {
+                    page.drawLine(
+                        DIRIOSLocalizer.string("ccr.gas_density.unit"),
+                        value: "\(Formatters.one(minDensity)) – \(Formatters.one(maxDensity)) g/L"
+                    )
+                }
+                page.drawParagraph(DIRIOSLocalizer.string("ccr.gas_density.approximation"))
+            } else {
+                let reason = CCRGasDensityPresentation.unavailableReason(for: plan)
+                page.drawLine(
+                    DIRIOSLocalizer.string("ccr.gas_density.unavailable.label"),
+                    value: CCRGasDensityPresentation.unavailableLabel(for: reason)
+                )
+                page.drawParagraph(DIRIOSLocalizer.string("ccr.gas_density.unavailable.description"))
+            }
+
             if !plan.warnings.isEmpty {
                 page.drawSpacer()
                 page.drawSectionTitle(DIRIOSLocalizer.string("pdf.export.plan.warnings"))

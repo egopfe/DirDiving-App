@@ -1474,7 +1474,7 @@ struct PlannerView: View {
     private func sharePlannerPDF(kind: PlannerPDFShareKind) {
         let context = plannerPDFContext()
         guard PDFExportService.canExportPlan(context) else {
-            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage()
+            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage(for: context)
             return
         }
         do {
@@ -2052,7 +2052,7 @@ struct PlanResultView: View {
     private func shareResultPDF(kind: ResultPDFShareKind) {
         let context = resultPDFContext()
         guard PDFExportService.canExportPlan(context) else {
-            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage()
+            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage(for: context)
             return
         }
         do {

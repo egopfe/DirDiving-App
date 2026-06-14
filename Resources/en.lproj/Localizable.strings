@@ -838,3 +838,34 @@
 "alarms.a11y.row_format" = "%@, %@, %@";
 "alarms.a11y.stepper.decrease" = "Decrease";
 "alarms.a11y.stepper.increase" = "Increase";
+
+/* UI/UX audit remediation V1.0 2026-06-02 */
+"watch.gps.status.available" = "Fix available";
+"watch.gps.status.searching" = "Searching for fix";
+"watch.gps.status.permission_denied" = "GPS permission denied";
+"watch.gps.status.permission_pending" = "GPS permission pending";
+"watch.gps.status.unavailable" = "GPS unavailable";
+"watch.gps.status.disabled" = "GPS disabled";
+"watch.compass.status.ready" = "BUSSOLA ready";
+"watch.compass.status.active" = "BUSSOLA active";
+"watch.compass.status.calibrating" = "BUSSOLA calibrating";
+"watch.compass.status.calibration_required" = "Calibrate BUSSOLA";
+"watch.compass.status.unavailable" = "BUSSOLA unavailable";
+"watch.compass.status.permission_denied" = "BUSSOLA permission denied";
+"watch.compass.status.permission_pending" = "BUSSOLA permission pending";
+"watch.compass.status.interference" = "BUSSOLA interference";
+"watch.compass.status.no_heading" = "No heading available";
+"watch.compass.status.unknown" = "BUSSOLA status unknown";
+"watch.planner_briefing.freshness.old" = "Briefing may be outdated — verify before the dive.";
+"watch.planner_briefing.freshness.session_mismatch" = "Briefing may not match the current planned session.";
+"watch.planner_briefing.freshness.incomplete" = "Briefing package is incomplete.";
+"watch.planner_briefing.freshness.unsupported" = "Briefing metadata is unsupported.";
+"watch.planner_briefing.freshness.a11y" = "Briefing warning: %@";
+"briefing.reference_only.footer" = "DIR DIVING — REFERENCE ONLY";
+"user_images.info.bundled_readonly" = "Bundled images are read-only reference photos.";
+"user_images.info.uploaded_deletable" = "Uploaded images can be deleted and sync with iPhone.";
+"user_images.info.dive_active_note" = "Image management is limited during an active dive.";
+"user_images.type.bundled" = "Bundled";
+"user_images.type.uploaded" = "Uploaded";
+"user_images.count.format" = "%lld images";
+"user_images.count.a11y" = "%lld images available";

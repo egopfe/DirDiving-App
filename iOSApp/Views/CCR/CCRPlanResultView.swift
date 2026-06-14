@@ -142,14 +142,14 @@ struct CCRPlanResultView: View {
     private func shareCCRPlanPDF() {
         let context = ccrPDFContext()
         guard PDFExportService.canExportCCRPlan(context) else {
-            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage()
+            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage(for: context)
             return
         }
         do {
             let url = try PDFExportService.exportCCRPlan(context: context)
             shareablePDF = ShareablePDFItem(url: url)
         } catch {
-            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage()
+            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage(for: context)
         }
     }
 
@@ -247,12 +247,19 @@ struct CCRPlanResultView: View {
         }
     }
 
+    private var chartTimeAxisLabel: String { DIRIOSLocalizer.string("ccr.chart.axis.time") }
+    private var chartPPO2AxisLabel: String { DIRIOSLocalizer.string("ccr.chart.axis.ppo2") }
+    private var chartPPN2AxisLabel: String { DIRIOSLocalizer.string("ccr.chart.axis.ppn2") }
+    private var chartENDAxisLabel: String { DIRIOSLocalizer.string("ccr.chart.axis.end") }
+    private var chartDensityAxisLabel: String { DIRIOSLocalizer.string("ccr.chart.axis.density") }
+    private var chartCNSAxisLabel: String { DIRIOSLocalizer.string("ccr.chart.axis.cns") }
+
     private var ppo2ChartCard: some View {
         DIRCard(DIRIOSLocalizer.string("ccr.ppo2.timeline"), icon: "waveform.path.ecg", accent: DIRTheme.orange) {
             Chart(plan.ppO2Timeline, id: \.runtimeMinutes) { sample in
                 LineMark(
-                    x: .value("Time", sample.runtimeMinutes),
-                    y: .value("PPO2", sample.ppO2Bar)
+                    x: .value(chartTimeAxisLabel, sample.runtimeMinutes),
+                    y: .value(chartPPO2AxisLabel, sample.ppO2Bar)
                 )
                 .foregroundStyle(DIRTheme.orange)
             }
@@ -272,8 +279,8 @@ struct CCRPlanResultView: View {
         DIRCard(DIRIOSLocalizer.string("ccr.ppn2.timeline"), icon: "lungs", accent: DIRTheme.green) {
             Chart(plan.ppN2Timeline, id: \.runtimeMinutes) { sample in
                 LineMark(
-                    x: .value("Time", sample.runtimeMinutes),
-                    y: .value("PPN2", sample.ppN2Bar)
+                    x: .value(chartTimeAxisLabel, sample.runtimeMinutes),
+                    y: .value(chartPPN2AxisLabel, sample.ppN2Bar)
                 )
                 .foregroundStyle(DIRTheme.green)
             }
@@ -288,8 +295,8 @@ struct CCRPlanResultView: View {
         DIRCard(DIRIOSLocalizer.string("ccr.end.timeline"), icon: "brain.head.profile", accent: DIRTheme.yellow) {
             Chart(plan.endTimeline, id: \.runtimeMinutes) { sample in
                 LineMark(
-                    x: .value("Time", sample.runtimeMinutes),
-                    y: .value("END", sample.endMeters)
+                    x: .value(chartTimeAxisLabel, sample.runtimeMinutes),
+                    y: .value(chartENDAxisLabel, sample.endMeters)
                 )
                 .foregroundStyle(DIRTheme.yellow)
             }
@@ -308,34 +315,42 @@ struct CCRPlanResultView: View {
         }
     }
 
-    @ViewBuilder
     private var gasDensityChartCard: some View {
-        let densitySamples = plan.gasDensityTimeline.compactMap { sample -> (Double, Double)? in
-            guard let density = sample.gasDensityGramsPerLiter else { return nil }
-            return (sample.runtimeMinutes, density)
-        }
-        if !densitySamples.isEmpty {
-            DIRCard(DIRIOSLocalizer.string("ccr.gas_density.timeline"), icon: "scalemass", accent: DIRTheme.muted) {
-                Chart(densitySamples, id: \.0) { sample in
+        let densitySamples = CCRGasDensityPresentation.timelineSamples(from: plan)
+        return DIRCard(DIRIOSLocalizer.string("ccr.gas_density.timeline"), icon: "scalemass", accent: DIRTheme.muted) {
+            if densitySamples.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Label(
+                        CCRGasDensityPresentation.unavailableLabel(
+                            for: CCRGasDensityPresentation.unavailableReason(for: plan)
+                        ),
+                        systemImage: "exclamationmark.triangle.fill"
+                    )
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(DIRTheme.yellow)
+                    Text(DIRIOSLocalizer.string("ccr.gas_density.unavailable.description"))
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                Chart(densitySamples, id: \.runtimeMinutes) { sample in
                     LineMark(
-                        x: .value("Time", sample.0),
-                        y: .value("Density", sample.1)
+                        x: .value(chartTimeAxisLabel, sample.runtimeMinutes),
+                        y: .value(chartDensityAxisLabel, sample.density)
                     )
                     .foregroundStyle(DIRTheme.muted)
                 }
                 .frame(height: 140)
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(
-                    UIUXAccessibilitySummaries.ccrGasDensityTimeline(
-                        samples: densitySamples.map { (runtimeMinutes: $0.0, density: $0.1) }
-                    )
-                )
-                .accessibilityHint(DIRIOSLocalizer.string("ccr.a11y.chart.hint"))
                 Text(DIRIOSLocalizer.string("ccr.gas_density.approximation"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(CCRGasDensityPresentation.accessibilitySummary(for: plan))
+        .accessibilityHint(DIRIOSLocalizer.string("ccr.a11y.reference_estimate_note"))
     }
 
     @ViewBuilder
@@ -344,8 +359,8 @@ struct CCRPlanResultView: View {
             DIRCard(DIRIOSLocalizer.string("ccr.cns.timeline"), icon: "chart.line.uptrend.xyaxis", accent: DIRTheme.orange) {
                 Chart(plan.cnsTimeline, id: \.runtimeMinutes) { sample in
                     LineMark(
-                        x: .value("Time", sample.runtimeMinutes),
-                        y: .value("CNS", sample.cnsPercent)
+                        x: .value(chartTimeAxisLabel, sample.runtimeMinutes),
+                        y: .value(chartCNSAxisLabel, sample.cnsPercent)
                     )
                     .foregroundStyle(DIRTheme.orange)
                 }
