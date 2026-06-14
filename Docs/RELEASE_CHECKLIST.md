@@ -10,6 +10,15 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 | Commit `HEAD` | __________ |
 | Esecutore | __________ |
 
+## Audit remediation (2026-06-14 — deep code V1.0 @ `MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_V1.0.md`)
+
+- [ ] Review [`MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_V1.0.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_V1.0.md)
+- [ ] MAIN-DCA-011 metadata merge, MAIN-DCA-019 photo ACK queue, MAIN-DCA-025 aggregate KVS budget verified in code review
+- [ ] MAIN-DCA-012 alarm blink, MAIN-DCA-020/021 briefing sanitize/swap, MAIN-DCA-022 reminder suppression overlay-only
+- [ ] Evidence folders **PENDING**: [`QA_EVIDENCE/WATCH_IOS_SYNC/`](QA_EVIDENCE/WATCH_IOS_SYNC/README.md), [`QA_EVIDENCE/ICLOUD_TWO_DEVICE/`](QA_EVIDENCE/ICLOUD_TWO_DEVICE/README.md)
+- [ ] **Code-level readiness:** green builds + 832 iOS / 239 Watch tests (sim)
+- [ ] **External TestFlight / App Store:** **BLOCKED** until physical QA + signed evidence packs
+
 ## Audit remediation (2026-06-09 — UI/UX @ `UI_UX_MAIN_AUDIT_CURRENT.md`)
 
 - [ ] Review [`UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md`](UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md)
@@ -17,7 +26,7 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 - [ ] P2 UX (CCR checklist import, reminder dismiss, live depth-first layout, More tab sync badge)
 - [ ] P3 polish (image swipe, locale logbook dates, reference UI scaffolding)
 - [ ] Evidence folders **PENDING**: [`QA_EVIDENCE/REFERENCE_UI/`](QA_EVIDENCE/REFERENCE_UI/README.md), [`DYNAMIC_TYPE_VOICEOVER/`](QA_EVIDENCE/DYNAMIC_TYPE_VOICEOVER/README.md), [`APP_STORE_MARKETING/`](QA_EVIDENCE/APP_STORE_MARKETING/README.md)
-- [ ] **Code-level UI/UX readiness:** green builds + 567 iOS / 201 Watch tests
+- [ ] **Code-level UI/UX readiness:** green builds + 832 iOS / 239 Watch tests @ `99ea74a`
 - [ ] **External TestFlight / App Store:** **BLOCKED** until physical QA + screenshots + marketing evidence
 
 ## Audit remediation (2026-06-09 — iOS complete algorithm @ `IOS_MAIN_COMPLETE_ALGORITHM_AUDIT_CURRENT.md`)

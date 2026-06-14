@@ -4,6 +4,29 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-06-14, documentation alignment — docs-only @ `99ea74a`)
+
+- **Documentazione:** [`Docs/DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md) (updated in place), [`Docs/PR_STATUS_20260614.md`](PR_STATUS_20260614.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260614.md`](DOCUMENTATION_UPDATE_REPORT_20260614.md).
+- **Allineamento:** `Docs/INDEX.md`, `Docs/README.md`, root `README.md`, `ROADMAP.md`, `BRANCH_AND_TARGET_ISOLATION_POLICY.md`, `RELEASE_CHECKLIST.md`, `DIR_DIVING_Feature_Comparison.csv` (additive rows for V1.0 remediation, UI/UX V1.0, build/test evidence).
+- **Baseline:** `main` @ `99ea74a`; deep-code remediation V1.0 MAIN-DCA-011…031 documented; physical QA still **PENDING**; experimental isolation reaffirmed; BUSSOLA terminology preserved.
+- **Superseded (narrative baseline only):** prior alignment report narrative @ `0569903` for HEAD — file updated in place; `PR_STATUS_20260609` / `DOCUMENTATION_UPDATE_REPORT_20260609` superseded for HEAD baseline.
+
+### Added (2026-06-14, deep code analysis remediation V1.0 — `99ea74a`, runtime)
+
+- **Sync/cloud:** iOS Watch import metadata merge (`DiveSessionMerge.preferred`), aggregate + per-key KVS budget, iOS cloud success timestamp after completion window, gas label merge, pending flush policy + in-flight session IDs (MAIN-DCA-011/025/026/028/029).
+- **Watch:** Durable photo delete ACK/inventory queue flushed on activation; alarm blink via `alarmBlinkActive` + `TimelineView` (no 1 Hz `@Published` toggle); reminder overlay suppression policy; briefing filename sanitize + atomic package swap; tissue chart axis l10n; Watch `.strings` alias cleanup (MAIN-DCA-012/019/020/021/022/030/031).
+- **Policy:** `WatchSyncSchemaV1Policy`, `CCRMODTolerancePolicy` documented; threat model cross-links preserved.
+- **Test:** `MainDeepCodeAnalysisRemediationV1Tests`, `MainDeepCodeAnalysisRemediationV1WatchTests`; Watch **239** + iOS **832** algorithm tests PASS (sim).
+- **Documentazione:** [`Docs/MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_V1.0.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_V1.0.md).
+
+### Added (2026-06-14, deep code analysis audit — `009855e`, docs-only)
+
+- **Documentazione:** [`Docs/MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md) — MAIN-DCA-001…031 @ baseline `7c79105`.
+
+### Added (2026-06-14, UI/UX audit remediation V1.0 — `7c79105`, runtime)
+
+- **Documentazione:** [`Docs/UI_UX_MAIN_AUDIT_REMEDIATION_REPORT_V1.0.md`](UI_UX_MAIN_AUDIT_REMEDIATION_REPORT_V1.0.md); prior pass [`UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md`](UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md) @ `dba1a22`.
+
 ### Added (2026-06-09, documentation alignment — docs-only @ `0569903`)
 
 - **Documentazione:** [`Docs/DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md), [`Docs/PR_STATUS_20260609.md`](PR_STATUS_20260609.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260609.md`](DOCUMENTATION_UPDATE_REPORT_20260609.md).

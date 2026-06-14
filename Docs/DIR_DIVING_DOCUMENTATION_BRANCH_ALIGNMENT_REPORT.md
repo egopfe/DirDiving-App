@@ -1,82 +1,79 @@
-# DIR DIVING — Documentation Branch Alignment Report (2026-06-09)
+# DIR DIVING — Documentation Branch Alignment Report (2026-06-14)
+
+## A. Scope and commit
 
 **Scope:** Documentation-only alignment (Phases 0–12). No runtime, algorithm, sync architecture, persistence, or experimental target changes.
 
-**Baseline audited:** `main` @ **`0569903`** (`fix(main): complete deep code analysis remediation for MAIN-DCA-001–018`)
+**Baseline audited:** `main` @ **`99ea74a`** (`Complete MAIN deep code audit remediation to internal 100% readiness`)
 
-**Backup branch:** `backup/docs-alignment-20260609` (created before this pass)
+**Backup branch:** `backup/docs-alignment-20260614` (created before this pass)
 
-**Git status before:** clean working tree on `main`, synced with `origin/main` @ `0569903`
+**Git status before:** clean working tree on `main`, synced with `origin/main` @ `99ea74a`
+
+**Cumulative baseline chain:** UI/UX V1.0 (`7c79105`) → deep-code audit @ `7c79105` (`009855e`) → deep-code remediation V1.0 (`99ea74a`); prior MAIN-DCA-001…018 @ `0569903` retained in INDEX/history.
 
 ---
 
-## A. Files updated
+## B. Files updated
 
 | File | Change |
 |------|--------|
-| `README.md` (repo root) | Baseline → `0569903`; audit sequence links |
-| `Docs/README.md` | Stato corrente table, branch strategy HEAD, docs pass 2026-06-09 |
-| `Docs/INDEX.md` | Top sections: UI/UX audit/remediation, deep-code audit/remediation, docs alignment @ `0569903` |
-| `Docs/CHANGELOG.md` | Unreleased: remediation passes + docs alignment 2026-06-09 |
-| `Docs/ROADMAP.md` | HEAD `0569903` |
+| `README.md` (repo root) | Baseline → `99ea74a`; V1.0 audit/remediation sequence |
+| `Docs/README.md` | Stato corrente table, branch strategy HEAD @ `99ea74a` |
+| `Docs/INDEX.md` | Top sections: UI/UX V1.0, deep-code audit/remediation V1.0, docs alignment @ `99ea74a` |
+| `Docs/CHANGELOG.md` | Unreleased: V1.0 remediation + docs alignment 2026-06-14 |
+| `Docs/ROADMAP.md` | HEAD `99ea74a`; V1.0 rows + XCTest evidence |
 | `Docs/BRANCH_AND_TARGET_ISOLATION_POLICY.md` | Branch inventory date + `main` HEAD |
-| `Docs/DIR_DIVING_Feature_Comparison.csv` | Additive rows (MAIN-DCA, UI/UX remediation, CCR docs) |
+| `Docs/RELEASE_CHECKLIST.md` | Deep-code V1.0 section; test counts 832/239 |
+| `Docs/DIR_DIVING_Feature_Comparison.csv` | Additive rows (V1.0 remediation, UI/UX V1.0, docs pass) |
+| `Docs/CCR_REBREATHER_PLANNER.md` | Last updated header @ `99ea74a` |
+| `Docs/CCR_REBREATHER_CHECKLIST_SYNC.md` | Last updated header @ `99ea74a` |
 | `Docs/DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md` | This report (updated in place) |
 
-## B. Docs created
+## C. Docs created
 
 | File | Purpose |
 |------|---------|
-| `Docs/CCR_REBREATHER_PLANNER.md` | CCR planner scope, engine, UI surfaces |
-| `Docs/CCR_REBREATHER_SAFETY_DISCLAIMER.md` | CCR-specific safety disclaimer |
-| `Docs/CCR_REBREATHER_CHECKLIST_SYNC.md` | Checklist ↔ planner/CCR sync behavior |
-| `Docs/PR_STATUS_20260609.md` | Open PR inspection snapshot |
-| `Docs/DOCUMENTATION_UPDATE_REPORT_20260609.md` | Short changelog of doc edits |
+| `Docs/PR_STATUS_20260614.md` | Open PR inspection snapshot @ `99ea74a` |
+| `Docs/DOCUMENTATION_UPDATE_REPORT_20260614.md` | Short changelog of doc edits |
 
-## C. Docs marked superseded
+## D. Docs marked superseded
 
 | Document | Superseded by | Notes |
 |----------|---------------|-------|
-| Prior narrative in this report @ `a69bc4b` | This report @ `0569903` | File updated in place; historical commits retained in INDEX |
-| `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260607.md` narrative | This report | File retained; baseline was `a69bc4b` |
+| Prior narrative in this report @ `0569903` | This report @ `99ea74a` | File updated in place; historical commits retained in INDEX |
+| `Docs/PR_STATUS_20260609.md` | `Docs/PR_STATUS_20260614.md` | Prior snapshot retained |
+| `Docs/DOCUMENTATION_UPDATE_REPORT_20260609.md` | `Docs/DOCUMENTATION_UPDATE_REPORT_20260614.md` | Prior snapshot retained |
 
-## D. README changes
+## E. README changes
 
-- Root `README.md`: explicit baseline `0569903`, alignment report link.
-- `Docs/README.md`: Branch Strategy HEAD, stato corrente table (UI/UX + deep-code + docs pass), physical QA pointer.
+- Root `README.md`: explicit baseline `99ea74a`, V1.0 audit/remediation chain, alignment report link.
+- `Docs/README.md`: Branch Strategy HEAD, stato corrente table (V1.0 passes + docs alignment), physical QA pointer unchanged.
 
-## E. Feature matrix changes
+## F. Feature matrix changes
 
-- **Rows:** additive only — MAIN-DCA-001…018 fixes, UI/UX remediation @ `dba1a22`, CCR reference docs, build/test evidence @ `0569903`, documentation alignment 2026-06-09.
+- **Rows:** additive only — UI/UX V1.0 @ `7c79105`, deep-code audit @ `009855e`, deep-code remediation V1.0 MAIN-DCA-011…031 @ `99ea74a`, individual fix rows, build/test evidence, documentation alignment 2026-06-14.
 - **Legacy rows:** unchanged; no deletions.
 
-## F. Branches inspected
+## G. Branches inspected
 
 | Branch | vs `origin/main` | Role |
 |--------|------------------|------|
-| `main` | 0 \| 0 | Canonical release candidate @ `0569903` |
+| `main` | 0 \| 0 | Canonical release candidate @ `99ea74a` |
 | `main-iOS` | divergent | Historical worktree — not release source |
 | `codex/experimental-features` | divergent | Watch Snorkeling / Apnea / Buddy — isolated |
 | `codex/ios-experimental-features` | divergent | iOS experimental surfaces — isolated |
 | `codex/watch-main-algorithm-audit-current` | divergent | Docs-only audit; PR #10 |
-| `codex/main-full-code-security-audit-current` | synced @ `0569903` | Security audit worktree aligned to `main` |
-| `backup/*` | local | Safety snapshots; not auto-merged |
+| `backup/docs-alignment-20260614` | local | Safety snapshot before this pass |
+| `backup/docs-alignment-20260609` | local | Prior docs pass snapshot |
 
-## G. Branches updated
+## H. Conflicts found / resolved
 
-This pass modifies **`main` only** (documentation commits). No experimental runtime merged into MAIN.
+None during this documentation-only pass on `main`. N/A merge conflicts.
 
-## H. Conflicts found
+## I. PRs inspected
 
-None during this documentation-only pass on `main`.
-
-## I. Conflicts resolved
-
-N/A (no merge performed).
-
-## J. PRs inspected
-
-See [`Docs/PR_STATUS_20260609.md`](PR_STATUS_20260609.md).
+See [`Docs/PR_STATUS_20260614.md`](PR_STATUS_20260614.md).
 
 | PR | Branch | Summary |
 |----|--------|---------|
@@ -84,118 +81,103 @@ See [`Docs/PR_STATUS_20260609.md`](PR_STATUS_20260609.md).
 | #9 | `codex/ios-experimental-features` | Experimental Apnea companion review |
 | #8 | `codex/experimental-features` | Experimental Apnea workflow |
 
-## K. PRs safe to merge
-
-| PR | Recommendation |
-|----|----------------|
-| #10 | **Docs-only review OK** — merge after human review; no runtime on MAIN from this PR alone |
-
-## L. PRs requiring manual review
-
-| PR | Recommendation |
-|----|----------------|
-| #8 | **Do not auto-merge** — experimental Watch runtime (Apnea) |
-| #9 | **Do not auto-merge** — experimental iOS runtime (Apnea) |
-
-## M. Remaining documentation gaps
+## J. Remaining documentation gaps
 
 - `Docs/ReferenceUI/*.png` assets may not all be committed — verify before App Store submission.
 - CCR external validation evidence rows remain **PENDING** in [`CCR_REBREATHER_VALIDATION_EVIDENCE.md`](CCR_REBREATHER_VALIDATION_EVIDENCE.md).
-- Worktree branches may carry stale docs relative to `main` @ `0569903`.
+- Worktree branches may carry stale docs relative to `main` @ `99ea74a`.
 - Physical QA matrices require executed evidence packs — [`QA_EVIDENCE_PACK_TEMPLATE.md`](QA_EVIDENCE_PACK_TEMPLATE.md).
 
-## N. Remaining release blockers
+## K. Release / TestFlight / App Store blockers
 
-- All items in [`MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md`](MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md) — **PENDING**
-- External Bühlmann ZHL-16C validation
-- Apple Developer portal: water submersion entitlement on `com.egopfe.dirdiving.ios.watch`
-- Paired iPhone + Watch physical sync QA (userInfo ACK, replay cache, photo protection)
+**Release:** All items in [`MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md`](MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md) — **PENDING**; external Bühlmann validation; water submersion entitlement; paired sync QA.
 
-## O. Remaining TestFlight blockers
+**TestFlight:** Physical device QA not executed with evidence pack; cannot claim external readiness until [`TESTFLIGHT_RELEASE_GATE_CHECKLIST.md`](TESTFLIGHT_RELEASE_GATE_CHECKLIST.md) has signed evidence.
 
-- Physical device QA matrices not executed with evidence pack
-- Ultra depth entitlement not confirmed on real hardware
-- Cannot claim external TestFlight readiness until [`TESTFLIGHT_RELEASE_GATE_CHECKLIST.md`](TESTFLIGHT_RELEASE_GATE_CHECKLIST.md) has signed evidence
+**App Store:** Same as TestFlight plus legal/copy review; reference-only disclaimers must remain in [`APP_STORE_REVIEW_NOTES.md`](APP_STORE_REVIEW_NOTES.md).
 
-## P. Remaining App Store blockers
+## L. Experimental isolation confirmation
 
-- Same as TestFlight blockers plus legal/copy final review
-- App Store assets not fully verified in repo
-- Reference-only planner/Bühlmann/CCR disclaimers must remain in [`APP_STORE_REVIEW_NOTES.md`](APP_STORE_REVIEW_NOTES.md)
+- `project.yml` MAIN targets exclude experimental surfaces.
+- PRs #8/#9 flagged — no auto-merge to `main`.
 
-## Q. Suggested next commits
+## M. Watch documentation alignment
 
-1. `docs: align DIR DIVING architecture and release documentation @ 0569903`
-2. (Optional) Execute physical QA matrices and attach evidence under `Docs/QA_EVIDENCE/`
+- TTV informational; inline ascent warnings; GPS overlays; BUSSOLA terminology
+- Photo ACK queue; alarm blink via `TimelineView` (MAIN-DCA-012); reminder overlay suppression (MAIN-DCA-022)
+- Briefing sanitize + atomic swap; reference-only cards
 
-## R. Risks / assumptions
+## N. iOS Planner documentation alignment
 
-- Documentation reflects code @ `0569903` from static inspection and build/test evidence in remediation reports.
-- MAIN-DCA fixes documented as implemented; physical pairing behavior requires device QA.
-- CCR planner documented as reference-only; external validation not complete.
+- Bühlmann ZHL-16C reference-only; CCR MOD tolerance policy documented
+- Briefing cards to Watch — sanitize + atomic swap
 
-## S. Experimental isolation confirmation
+## O. Bühlmann / Ratio Deco / Tissue documentation alignment
 
-- `project.yml` MAIN targets exclude experimental Snorkeling, Apnea, Buddy Assist, exploration surfaces.
-- Feature matrix rows mark experimental branches separately.
-- PRs #8/#9 explicitly flagged — no auto-merge to `main`.
+- External validation plans open; tissue chart axis l10n (MAIN-DCA-030)
 
-## T. MAIN stability confirmation
-
-- Diving mode, GPS surface-only, BUSSOLA terminology, inline ascent warnings preserved in all updated docs.
-- No runtime files modified in this pass.
-- Sim evidence @ `0569903`: Watch **192** + iOS **561** algorithm tests PASS.
-
-## U. Watch documentation alignment confirmation
-
-- TTV informational index; inline ascent warnings; GPS overlays; depth discouragement 35/38/40 m
-- Mission Mode; App Intents; BUSSOLA terminology
-- Sync security: userInfo ACK, replay persistence, threat model @ [`WATCH_SYNC_SECURITY_THREAT_MODEL.md`](WATCH_SYNC_SECURITY_THREAT_MODEL.md)
-- Blink timer 1.0s documented (MAIN-DCA-012)
-
-## V. iOS Bühlmann planner documentation alignment confirmation
-
-- Three-mode planner: Base / Deco / Technical; Bühlmann ZHL-16C reference-only
-- Ratio Deco comparative heuristic only (not decompression algorithm)
-- Mode-projected MOD gating and analysis cache documented (MAIN-DCA-004/005)
-
-## W. CNS/OTU documentation alignment confirmation
-
-- CNS/OTU reference estimates only; 15% descent+bottom warning documented
-- Not medical or decompression authority
-
-## X. Chart truthfulness documentation confirmation
-
-- Planner and CCR charts labeled reference-only
-- External validation plans remain open
-
-## Y. CCR documentation alignment confirmation
+## P. CCR documentation alignment
 
 | Document | Status |
 |----------|--------|
-| [`CCR_REBREATHER_PLANNER.md`](CCR_REBREATHER_PLANNER.md) | Created |
-| [`CCR_REBREATHER_SAFETY_DISCLAIMER.md`](CCR_REBREATHER_SAFETY_DISCLAIMER.md) | Created |
-| [`CCR_REBREATHER_CHECKLIST_SYNC.md`](CCR_REBREATHER_CHECKLIST_SYNC.md) | Created |
-| [`CCR_REBREATHER_LIMITATIONS.md`](CCR_REBREATHER_LIMITATIONS.md) | Existing — cross-linked |
-| [`CCR_REBREATHER_EXPORT_POLICY.md`](CCR_REBREATHER_EXPORT_POLICY.md) | Existing — cross-linked |
-| [`CCR_REBREATHER_VALIDATION_PLAN.md`](CCR_REBREATHER_VALIDATION_PLAN.md) | Existing — evidence **PENDING** |
+| [`CCR_REBREATHER_PLANNER.md`](CCR_REBREATHER_PLANNER.md) | Updated header @ `99ea74a` |
+| [`CCR_REBREATHER_CHECKLIST_SYNC.md`](CCR_REBREATHER_CHECKLIST_SYNC.md) | Updated header @ `99ea74a` |
+| Other CCR docs | Existing — evidence **PENDING** |
 
-## Z. Git status before/after
+## Q. Structured Equipment / checklist documentation alignment
+
+- Prior passes unchanged; CCR checklist cross-linked
+
+## R. Ascent-speed / Dive Runtime / deco-stop alignment
+
+- Prior passes unchanged; reference-only positioning preserved
+
+## S. Emergency / Rock Bottom documentation alignment
+
+- Rock Bottom remains an estimate; no certification claims
+
+## T. Gas-ledger / schedule-consumption alignment
+
+- Prior passes unchanged
+
+## U. Repetitive-dive documentation alignment
+
+- Limitations documented; no new certification claims
+
+## V. Planner briefing-card / Watch-transfer alignment
+
+- MAIN-DCA-020/021 sanitize + atomic swap documented
+
+## W. Accessibility / localization documentation alignment
+
+- UI/UX V1.0 @ `7c79105`; Watch `.strings` cleanup (MAIN-DCA-031)
+- Dynamic Type / VoiceOver QA **PENDING**
+
+## X. QA evidence / ReferenceUI status
+
+Scaffolded under `Docs/QA_EVIDENCE/` — all **PENDING** execution. No fabricated PASS claims.
+
+## Y. Git status before/after
 
 | When | Branch | HEAD | Working tree |
 |------|--------|------|--------------|
-| Before | `main` | `0569903` | clean vs `origin/main` |
-| After (pending commit) | `main` | `0569903` | documentation edits only |
+| Before | `main` | `99ea74a` | clean vs `origin/main` |
+| After (pending commit) | `main` | `99ea74a` | documentation edits only |
 
-**Push status:** Not pushed unless explicitly requested after commit.
+## Z. Commits created
+
+1. `docs: align DIR DIVING architecture and release documentation @ 99ea74a` (this pass)
+
+## AA. Push status
+
+**Not pushed** unless explicitly requested after commit.
+
+## AB. Risks / assumptions
+
+- Documentation reflects code @ `99ea74a` from remediation report and build/test evidence.
+- Internal code readiness 100% does **not** imply TestFlight or App Store readiness.
+- Physical QA remains **PENDING**.
 
 ---
-
-**Mandatory UI references preserved** (see [`Docs/ReferenceUI/README.md`](ReferenceUI/README.md)):
-
-- `Watch_LIVE_reference.png`
-- `iOS_Companion_reference.png`
-- Ascent warning inline mockup references
-- Experimental screenshot paths (when present)
 
 **Terminology:** BUSSOLA only — COMPASSO must not appear as UI term.
