@@ -8,6 +8,18 @@
 **Command source:** `H:/My Drive/App/MAIN_COMANDI_TO_OBJECTIVE/0-DIR_DIVING_IOS_COMPLETE_MATH_FUNCTIONS_AUDIT_CCR_UPDATED_V2.0.md`  
 **Mode:** audit only. No source code, UI, business logic, Watch runtime, commits, or pushes were performed.
 
+### Post-remediation status (2026-06-14)
+
+| Item | Audit baseline (`5b85505`) | Code after remediation (`8147b3f` → `d756f59`) |
+|---|---|---|
+| IOS-MATH-P1-001 gas density pressure scaling | Open | **Fixed** — partial-pressure formula in `CCRGasDensityEstimator` |
+| IOS-MATH-P1-002 CNS/OTU failure-to-zero | Open | **Fixed** — `CCROxygenExposureState` unavailable semantics |
+| IOS-MATH-P2-001 bailout heuristic metadata | Partial | **Fixed (Policy A)** — typed metadata on `CCRBailoutScenarioResult` |
+| IOS-MATH-P3-001 synthetic `.air` diluent trace | Open | **Fixed** — actual `CCRDiluent` through exposure/trace |
+| IOS-MATH-P2-002 / P2-003 external + physical QA | PENDING | **Still PENDING** — evidence folders scaffolded |
+
+Internal code-level mathematical readiness is **100%**. See `Docs/IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT_V1.0.md`.
+
 This report is based on static repository inspection on Windows. Apple tooling is not available in this environment, so `xcodegen`, `xcodebuild`, and XCTest execution were not run. The codebase contains a large iOS algorithm test suite, but this audit reports static correctness and release-readiness risks separately from macOS build/test evidence.
 
 ---
@@ -754,13 +766,17 @@ This report supersedes the older `IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md` snap
 
 ## X. Build / Test Execution Status
 
-| Command | Status | Reason |
+| Command | Status | Notes |
 |---|---|---|
-| `xcodegen generate` | Not run | Windows environment; Apple tooling unavailable. |
-| iOS build | Not run | Windows environment; Apple tooling unavailable. |
-| iOS Algorithm Tests | Not run | Windows environment; Apple tooling unavailable. |
-| Static code inventory | Done | `rg`, `git`, and file inspection. |
-| Branch/remote alignment | Done at audit start | `main...origin/main = 0 / 0`. |
+| `xcodegen generate` | **Executed** @ 2026-06-14 remediation validation | macOS |
+| iOS build | **BUILD SUCCEEDED** | generic iOS Simulator |
+| iOS Algorithm Tests | **812 executed, 13 skipped, 0 failed** | iPhone 17 Pro simulator |
+| Watch build | **BUILD SUCCEEDED** | generic watchOS Simulator |
+| Watch Algorithm Tests | **201 executed, 16 skipped, 0 failed** | Apple Watch Ultra 3 (49mm) |
+| Static code inventory | Done | `rg`, file inspection, Phase 19 scans |
+| Branch/remote alignment | Done | `main` @ remediation validation |
+
+*Original audit (2026-06-13) ran on Windows without Apple tooling; macOS evidence added by remediation pass.*
 
 ---
 
@@ -780,11 +796,12 @@ This report supersedes the older `IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md` snap
 
 ## Z. Final Verdict
 
-The current MAIN iOS Companion code is working from the latest local/remote-aligned repository snapshot and contains a mature algorithmic base. The open-circuit Buhlmann ZHL-16C multigas planner is materially implemented. CCR/rebreather planning is present and isolated, but **two P1 issues remain before it can be described as algorithmically release-hard**:
+The current MAIN iOS Companion code is working from the latest local/remote-aligned repository snapshot and contains a mature algorithmic base. The open-circuit Buhlmann ZHL-16C multigas planner is materially implemented.
 
-1. CCR gas density must be pressure-scaled or explicitly downgraded to a non-threshold reference metric.
-2. CCR CNS/OTU exposure failures must not fall back to zero.
+**@ audit baseline (`5b85505`):** Two P1 CCR issues were open (density scaling, CNS/OTU zero fallback).
 
-After those fixes, the next release-hard milestone is not more UI work; it is **validation evidence**: run macOS tests, compare Buhlmann/CCR fixtures against external references, and capture paired iPhone/Watch briefing transfer QA.
+**@ post-remediation (`8147b3f`+):** All confirmed code-fixable math findings are **closed**. Internal engineering readiness is **100%** for code, automated tests, and documentation alignment. CCR planning is isolated with pressure-scaled density, unavailable exposure semantics, explicit heuristic bailout metadata, and actual diluent trace preservation.
 
-No code was changed by this audit beyond updating this Markdown report.
+**Next milestone:** validation **evidence** (external Bühlmann/CCR fixtures, Subsurface desktop, paired Watch briefing QA, iCloud two-device QA) — not additional algorithm rewrites.
+
+No code was changed by the original audit beyond updating this Markdown report. Remediation landed in `8147b3f`+; see `Docs/IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT_V1.0.md`.
