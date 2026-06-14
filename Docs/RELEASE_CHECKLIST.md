@@ -83,7 +83,7 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 - [ ] Review [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) — audit baseline
 - [ ] External Subsurface CSV regression (manual — see [`SUBSURFACE_CSV_ROUNDTRIP.md`](SUBSURFACE_CSV_ROUNDTRIP.md))
 
-## Audit remediation (2026-06-02 — Watch complete algorithm @ `WATCH_COMPLETE_ALGORITHM_AUDIT_CURRENT.md`)
+## Audit remediation (2026-06-14 — Watch complete algorithm @ `2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_CURRENT.md`)
 
 - [ ] Review [`WATCH_COMPLETE_ALGORITHM_AUDIT_REMEDIATION_REPORT.md`](WATCH_COMPLETE_ALGORITHM_AUDIT_REMEDIATION_REPORT.md) — CSV divergence, GPS battery policy, draft hardening, timestamp docs, evidence scaffolding
 - [ ] Watch code readiness: **high / internal-reference ready** (non-certified companion logger; no CCR/Bühlmann/Ratio Deco runtime)

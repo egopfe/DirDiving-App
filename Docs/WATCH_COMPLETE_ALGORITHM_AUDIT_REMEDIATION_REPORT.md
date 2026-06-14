@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-02  
 **Starting HEAD:** `de8ddb203e695d993f9ecae50fbb093b070bf5e0`  
-**Authoritative audit:** [`WATCH_COMPLETE_ALGORITHM_AUDIT_CURRENT.md`](WATCH_COMPLETE_ALGORITHM_AUDIT_CURRENT.md) (preserved; not deleted)  
+**Authoritative audit:** [`2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_CURRENT.md`](2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_CURRENT.md)  
 **Scope:** Apple Watch MAIN target and Watch algorithm tests only
 
 ---
