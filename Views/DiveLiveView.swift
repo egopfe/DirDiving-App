@@ -23,7 +23,7 @@ struct DiveLiveView: View {
     }
 
     private var depthReadoutStyle: DepthSafetyReadoutStyle {
-        DepthSafetyReadoutStyle.forState(depthSafetyState, redWarningBlink: dive.redWarningBlink)
+        DepthSafetyReadoutStyle.forState(depthSafetyState, alarmBlinkHighlight: false)
     }
 
     private var missionModeProfile: MissionModeRuntimeProfile {
@@ -82,7 +82,7 @@ struct DiveLiveView: View {
                 }
             }
         }
-        .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.18) : nil, value: dive.redWarningBlink)
+        .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.18) : nil, value: dive.alarmBlinkActive)
         .onChange(of: hapticsEnabled) { _, _ in
             dive.resyncHapticsAfterPreferenceChange()
         }
@@ -707,7 +707,21 @@ struct DiveLiveView: View {
     }
 
     private var depthReadout: some View {
-        let style = depthReadoutStyle
+        Group {
+            if dive.alarmBlinkActive {
+                TimelineView(.periodic(from: .now, by: 1.0)) { context in
+                    depthReadoutContent(
+                        alarmBlinkHighlight: Int(context.date.timeIntervalSinceReferenceDate) % 2 == 0
+                    )
+                }
+            } else {
+                depthReadoutContent(alarmBlinkHighlight: false)
+            }
+        }
+    }
+
+    private func depthReadoutContent(alarmBlinkHighlight: Bool) -> some View {
+        let style = DepthSafetyReadoutStyle.forState(depthSafetyState, alarmBlinkHighlight: alarmBlinkHighlight)
         let depthDisplay = WatchDepthFormatting.display(meters: dive.currentDepthMeters, units: unitPreference)
         let depthOpacity = dive.isDepthDataStale ? 0.72 : 1.0
         return VStack(spacing: 0) {

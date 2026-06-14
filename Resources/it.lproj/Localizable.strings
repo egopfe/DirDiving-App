@@ -181,7 +181,6 @@
 "Derivato prof. media + runtime; non safety/NDL" = "Derivato prof. media + runtime; non safety/NDL";
 "Imperiale non selezionabile finche la conversione Watch non e implementata. Export sempre metrico/Subsurface." = "Imperiale non selezionabile finche la conversione Watch non e implementata. Export sempre metrico/Subsurface.";
 "Autorizzato, in attesa fix" = "Autorizzato, in attesa fix";
-"Fix disponibile" = "Fix disponibile";
 "Permesso negato: abilita da iPhone" = "Permesso negato: abilita da iPhone";
 "Richiesto al primo uso" = "Richiesto al primo uso";
 "Stato permesso sconosciuto" = "Stato permesso sconosciuto";
@@ -218,7 +217,6 @@
 "TTV informativo derivato da profondita media e durata; non e un valore decompressivo o time to surface." = "TTV informativo derivato da profondità media e durata; non e un valore decompressivo o time to surface.";
 "TTV sessione %@, runtime %@" = "Session TTV %@, runtime %@";
 "Nessuna schermata o immagine di riferimento e inclusa in questa build." = "Nessuna schermata o immagine di riferimento e inclusa in questa build.";
-"Bussola pronta" = "Bussola pronta";
 "Bussola attiva" = "Bussola attiva";
 "Bussola non disponibile" = "Bussola non disponibile";
 "Permesso posizione negato" = "Permesso posizione negato";

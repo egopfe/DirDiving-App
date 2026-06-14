@@ -72,8 +72,17 @@ final class PlannerBriefingCardStore: ObservableObject {
         fileName: String,
         sourceURL: URL
     ) throws {
+        guard let sanitizedFileName = PlannerBriefingFilenameSanitizer.sanitizedFileName(fileName) else {
+            throw PlannerBriefingValidationError.invalidFileType
+        }
+        guard PlannerBriefingFilenameSanitizer.isConfinedToStorageDirectory(
+            sanitizedFileName,
+            storageDirectory: Self.stagingDirectory(packageId: packageId)
+        ) else {
+            throw PlannerBriefingValidationError.invalidFileType
+        }
         let data = try Data(contentsOf: sourceURL)
-        guard fileName.lowercased().hasSuffix(".png") else {
+        guard sanitizedFileName.lowercased().hasSuffix(".png") else {
             throw PlannerBriefingValidationError.invalidFileType
         }
         guard data.count <= PlannerBriefingTransferSupport.maxImageBytes else {
@@ -85,11 +94,11 @@ final class PlannerBriefingCardStore: ObservableObject {
 
         let directory = Self.stagingDirectory(packageId: packageId)
         try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
-        let destination = directory.appendingPathComponent(fileName)
+        let destination = directory.appendingPathComponent(sanitizedFileName)
         if fileManager.fileExists(atPath: destination.path) {
             try fileManager.removeItem(at: destination)
         }
-        try data.write(to: destination, options: [.atomic])
+        try data.write(to: destination, options: [.atomic, .completeFileProtection])
         _ = cardId
         _ = order
     }
@@ -103,11 +112,15 @@ final class PlannerBriefingCardStore: ObservableObject {
 
         let staging = Self.stagingDirectory(packageId: manifest.id)
         let finalDirectory = Self.storageDirectory()
-        try fileManager.createDirectory(at: finalDirectory, withIntermediateDirectories: true)
+        let incomingDirectory = Self.incomingDirectory(packageId: manifest.id)
 
         var totalBytes = data.count
+        var sanitizedCards: [(card: PlannerBriefingCardMetadata, stagedURL: URL, sanitizedName: String)] = []
         for card in decoded.cards {
-            let staged = staging.appendingPathComponent(card.fileName)
+            guard let sanitizedName = PlannerBriefingFilenameSanitizer.sanitizedFileName(card.fileName) else {
+                throw PlannerBriefingValidationError.invalidFileType
+            }
+            let staged = staging.appendingPathComponent(sanitizedName)
             guard fileManager.fileExists(atPath: staged.path) else {
                 throw PlannerBriefingValidationError.manifestCardMismatch
             }
@@ -116,26 +129,35 @@ final class PlannerBriefingCardStore: ObservableObject {
             guard PlannerBriefingTransferSupport.sha256Hex(data: cardData) == card.contentHashSHA256 else {
                 throw PlannerBriefingValidationError.hashMismatch
             }
+            sanitizedCards.append((card, staged, sanitizedName))
         }
         guard totalBytes <= PlannerBriefingTransferSupport.maxPackageBytes else {
             throw PlannerBriefingValidationError.oversizedPackage
         }
 
-        if fileManager.fileExists(atPath: finalDirectory.path) {
-            let existing = (try? fileManager.contentsOfDirectory(at: finalDirectory, includingPropertiesForKeys: nil)) ?? []
-            for url in existing {
-                try? fileManager.removeItem(at: url)
-            }
-        } else {
-            try fileManager.createDirectory(at: finalDirectory, withIntermediateDirectories: true)
+        if fileManager.fileExists(atPath: incomingDirectory.path) {
+            try fileManager.removeItem(at: incomingDirectory)
         }
+        try fileManager.createDirectory(at: incomingDirectory, withIntermediateDirectories: true)
 
-        for card in decoded.cards {
-            let staged = staging.appendingPathComponent(card.fileName)
-            let destination = finalDirectory.appendingPathComponent(card.fileName)
-            try fileManager.copyItem(at: staged, to: destination)
+        for entry in sanitizedCards {
+            let destination = incomingDirectory.appendingPathComponent(entry.sanitizedName)
+            try fileManager.copyItem(at: entry.stagedURL, to: destination)
         }
-        try data.write(to: finalDirectory.appendingPathComponent(PlannerBriefingTransferSupport.manifestFileName), options: [.atomic])
+        try data.write(
+            to: incomingDirectory.appendingPathComponent(PlannerBriefingTransferSupport.manifestFileName),
+            options: [.atomic, .completeFileProtection]
+        )
+
+        if fileManager.fileExists(atPath: finalDirectory.path) {
+            _ = try fileManager.replaceItemAt(finalDirectory, withItemAt: incomingDirectory)
+        } else {
+            try fileManager.createDirectory(
+                at: finalDirectory.deletingLastPathComponent(),
+                withIntermediateDirectories: true
+            )
+            try fileManager.moveItem(at: incomingDirectory, to: finalDirectory)
+        }
         try? fileManager.removeItem(at: staging)
 
         reload()
@@ -144,6 +166,11 @@ final class PlannerBriefingCardStore: ObservableObject {
 
     private static func stagingDirectory(packageId: UUID) -> URL {
         FileManager.default.temporaryDirectory.appendingPathComponent("\(stagingDirectoryPrefix)\(packageId.uuidString)", isDirectory: true)
+    }
+
+    private static func incomingDirectory(packageId: UUID) -> URL {
+        storageDirectory().deletingLastPathComponent()
+            .appendingPathComponent("PlannerBriefingIncoming_\(packageId.uuidString)", isDirectory: true)
     }
 
     static func cleanupOrphanStagingDirectories(

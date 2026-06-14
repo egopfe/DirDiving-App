@@ -173,9 +173,22 @@ final class CloudSyncStore: ObservableObject {
             return
         }
 
-        if data.count > IOSAlgorithmConfiguration.maxSyncPayloadBytes {
+        let decision = CloudSyncBudgetPolicy.evaluateWrite(
+            key: key,
+            newData: data,
+            existingFootprints: CloudSyncBudgetPolicy.footprints(from: cloudStore)
+        )
+        switch decision {
+        case .allowed:
+            break
+        case .perKeyExceeded:
             publishDeferred { [self] in
                 lastSyncStatus = DIRIOSLocalizer.string("cloud.status.payload_too_large")
+            }
+            return
+        case .aggregateExceeded:
+            publishDeferred { [self] in
+                lastSyncStatus = DIRIOSLocalizer.string("cloud.status.aggregate_budget_exceeded")
             }
             return
         }
@@ -187,26 +200,25 @@ final class CloudSyncStore: ObservableObject {
         if isICloudAvailable {
             cloudStore.set(data, forKey: key)
             cloudStore.set(modifiedAt, forKey: modifiedAtKey(for: key))
-            synchronize()
+            synchronize(requestedAt: Date())
         }
         publishDeferred { [self] in
             lastDecodeError = nil
             lastSyncStatus = isICloudAvailable
                 ? DIRIOSLocalizer.string("cloud.status.saved_local_and_icloud")
                 : DIRIOSLocalizer.string("cloud.status.saved_local_only")
-            if isICloudAvailable {
-                lastSuccessfulSyncDate = Date()
-            }
         }
     }
 
     private var syncGeneration: UInt = 0
+    private var lastSyncRequestedDate: Date?
 
-    func synchronize() {
+    func synchronize(requestedAt: Date = Date()) {
         let available = Self.currentICloudAvailability()
         publishICloudAvailability(available, postStatus: false)
         syncGeneration &+= 1
         let generation = syncGeneration
+        lastSyncRequestedDate = requestedAt
         guard available else {
             publishDeferred { [self] in
                 isSynchronizing = false
@@ -218,13 +230,14 @@ final class CloudSyncStore: ObservableObject {
         publishDeferred { [self] in
             isSynchronizing = true
             lastSyncStatus = DIRIOSLocalizer.string("cloud.status.sync_requested")
-            lastSuccessfulSyncDate = Date()
         }
         Task { @MainActor in
             try? await Task.sleep(nanoseconds: 900_000_000)
             guard generation == syncGeneration else { return }
             publishDeferred { [self] in
                 isSynchronizing = false
+                lastSuccessfulSyncDate = Date()
+                lastSyncStatus = DIRIOSLocalizer.string("cloud.status.sync_completed")
             }
         }
     }

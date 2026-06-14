@@ -1544,6 +1544,8 @@
 "cloud.merge.field.depth_profile" = "profilo di profondità";
 "cloud.merge.profile_summary.format" = "%lld campioni, max %.1f m";
 "cloud.status.payload_too_large" = "Il backup cloud è troppo grande per essere sincronizzato in sicurezza. Le immersioni restano salvate localmente.";
+"cloud.status.aggregate_budget_exceeded" = "Budget iCloud totale superato. I dati locali non sono stati sovrascritti.";
+"cloud.status.sync_completed" = "Sincronizzazione iCloud completata";
 "sync.watch.pending_ack" = "In attesa di conferma dal Watch — sessione conservata in coda";
 "planner.validation.invalid_environment" = "Ambiente planner non valido.";
 "planner.validation.invalid_oxygen_exposure" = "Esposizione ossigeno non valida.";
@@ -1650,6 +1652,7 @@
 "tissue_analytics.controlling_compartment_format" = "Compartimento controllante: %@";
 "tissue_analytics.show.controlling" = "Mostra: Compartimento controllante";
 "tissue_analytics.legend.depth" = "Profondità (m)";
+"tissue_analytics.axis.time" = "Tempo";
 "tissue_analytics.legend.active_gas" = "Gas attivo";
 "tissue_analytics.legend.mvalue_gf" = "% rispetto a M-value (GF attuali)";
 "tissue_analytics.gas.bottom" = "Gas di fondo";

@@ -112,7 +112,7 @@ final class DiveManager: ObservableObject {
     @Published var isStopwatchRunning = false
     @Published var isDiveActive = false
     @Published var ascentStatus = AscentStatus.make(rate: 0, depth: 0)
-    @Published var redWarningBlink = false
+    @Published private(set) var alarmBlinkActive = false
     @Published var lastErrorMessage: String?
     @Published var alarmWarningMessage: String?
     @Published var gpsConfirmation: DiveGPSConfirmation?
@@ -175,7 +175,6 @@ final class DiveManager: ObservableObject {
     private var depthSensorProvider: DepthSensorProvider?
     private var runtimeTimer: Timer?
     private var stopwatchTimer: Timer?
-    private var blinkTimer: Timer?
     private var settingsCancellable: AnyCancellable?
     private var sessionStart: Date?
     private var samples: [DiveSample] = []
@@ -1119,14 +1118,28 @@ final class DiveManager: ObservableObject {
     }
 
     private var shouldSuppressDiveReminders: Bool {
-        if alarmWarningMessage != nil { return true }
-        if depthSafetyState == .exceeded { return true }
-        if ascentAlarmEnabled, ascentStatus.isOverLimit { return true }
-        return false
+        LiveDiveReminderSuppressionPolicy.shouldSuppressReminders(
+            bannerInput: LiveDiveBannerPresentationPolicy.Input(
+                showAscentAlarmBanner: ascentAlarmEnabled && ascentStatus.isOverLimit,
+                depthSafetyState: depthSafetyState,
+                exceededSupportedDepthRange: exceededSupportedDepthRange,
+                isDepthDataStale: isDepthDataStale,
+                isManualNoDepthSession: isManualNoDepthSession,
+                hapticsEnabled: UserDefaults.standard.object(forKey: HapticService.hapticsEnabledKey) == nil
+                    || UserDefaults.standard.bool(forKey: HapticService.hapticsEnabledKey),
+                isDepthAutomationMockFallbackActive: isDepthAutomationMockFallbackActive,
+                isSimulationDepthActive: isSimulationDepthActive,
+                showsAutoDiveHint: false,
+                showsManualHandoffNote: false
+            ),
+            alarmWarningMessage: alarmWarningMessage,
+            ascentAlarmEnabled: ascentAlarmEnabled,
+            ascentIsOverLimit: ascentStatus.isOverLimit
+        )
     }
 
     private func evaluateDiveReminders() {
-        guard isDiveActive, diveReminderOverlay == nil, !shouldSuppressDiveReminders else { return }
+        guard isDiveActive, diveReminderOverlay == nil else { return }
         let settings = DiveReminderSettingsStore.load()
         let runtimeMinute = Int(runtime / 60)
         let triggered = DiveReminderEngine.evaluate(
@@ -1136,6 +1149,7 @@ final class DiveManager: ObservableObject {
             state: &diveReminderRuntimeState
         )
         guard !triggered.isEmpty else { return }
+        guard !shouldSuppressDiveReminders else { return }
         presentDiveReminderOverlay(
             DiveReminderEngine.makeOverlay(for: triggered, runtimeMinute: runtimeMinute)
         )
@@ -1210,9 +1224,8 @@ final class DiveManager: ObservableObject {
 
     private func startBlinking(source: AlarmBlinkSource) {
         activeBlinkSources.insert(source)
-        guard blinkTimer == nil else { return }
-        blinkTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            Task { @MainActor in self?.redWarningBlink.toggle() }
+        if !alarmBlinkActive {
+            alarmBlinkActive = true
         }
     }
 
@@ -1228,9 +1241,7 @@ final class DiveManager: ObservableObject {
 
     private func reconcileBlinkTimer() {
         guard activeBlinkSources.isEmpty else { return }
-        blinkTimer?.invalidate()
-        blinkTimer = nil
-        redWarningBlink = false
+        alarmBlinkActive = false
     }
 
     private func showGPSConfirmation(_ confirmation: DiveGPSConfirmation) {
@@ -1374,8 +1385,7 @@ extension DiveManager {
         runtimeTimer = nil
         stopwatchTimer?.invalidate()
         stopwatchTimer = nil
-        blinkTimer?.invalidate()
-        blinkTimer = nil
+        alarmBlinkActive = false
         automaticSurfaceEndTask?.cancel()
         automaticSurfaceEndTask = nil
         diveReminderDismissTask?.cancel()

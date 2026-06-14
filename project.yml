@@ -162,6 +162,12 @@ targets:
       - Utils/DIRUnitConversions.swift
       - Utils/DepthSafetyConfiguration.swift
       - Utils/LiveDiveBannerPresentationPolicy.swift
+      - Utils/LiveDiveReminderSuppressionPolicy.swift
+      - Utils/CloudSyncBudgetPolicy.swift
+      - Utils/PlannerBriefingFilenameSanitizer.swift
+      - Utils/WatchSyncSchemaV1Policy.swift
+      - Utils/WatchSyncPendingFlushPolicy.swift
+      - Utils/PendingPhotoManagementResponseQueue.swift
       - Utils/DiveAlgorithmConfiguration.swift
       - Utils/DiveLogbookPolicy.swift
       - Utils/DepthSampleValidation.swift
@@ -287,6 +293,9 @@ targets:
       - iOSApp/Utils/PlanCalculationCompleteness.swift
       - iOSApp/Utils/PlannerResultState.swift
       - iOSApp/Utils/WatchSyncSessionDiff.swift
+      - iOSApp/Utils/CloudSyncBudgetPolicy.swift
+      - iOSApp/Utils/CCRMODTolerancePolicy.swift
+      - iOSApp/Utils/WatchSyncSchemaV1Policy.swift
       - iOSApp/Utils/CloudSyncNotifications.swift
       - iOSApp/Utils/WatchSyncNotifications.swift
       - iOSApp/Utils/WatchSyncKeys.swift

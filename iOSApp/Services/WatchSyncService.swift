@@ -547,7 +547,8 @@ final class WatchSyncService: NSObject, ObservableObject {
                     recordActivity(title: DIRIOSLocalizer.string("sync.activity.conflict"), detail: sessionSummary(session))
                     return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
                 }
-                logStore?.add(session, suppressWatchPush: true)
+                let merged = DiveSessionMerge.preferred(existing, session)
+                logStore?.add(merged, suppressWatchPush: true)
                 importedSessionIDs = WatchSyncBoundedIDStore.merge(
                     session.id,
                     into: importedSessionIDs,

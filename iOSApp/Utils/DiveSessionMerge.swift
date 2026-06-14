@@ -67,7 +67,7 @@ enum DiveSessionMerge {
             siteName: siteName,
             buddy: buddy,
             notes: notes,
-            gasLabel: winner.gasLabel,
+            gasLabel: mergedGasLabel(winner: winner, loser: loser),
             sacLitersMinute: sacLitersMinute,
             isDemo: isDemo,
             exceededSupportedDepthRange: winner.exceededSupportedDepthRange || loser.exceededSupportedDepthRange || summary.exceededSupportedDepthRange,
@@ -108,6 +108,16 @@ enum DiveSessionMerge {
             }
         }
         return byTimestamp.values.sorted { $0.timestamp < $1.timestamp }
+    }
+
+    private static func mergedGasLabel(winner: DiveSession, loser: DiveSession) -> DiveGasLabel {
+        if winner.gasLabel == loser.gasLabel { return winner.gasLabel }
+        if winner.endDate > loser.endDate { return winner.gasLabel }
+        if loser.endDate > winner.endDate { return loser.gasLabel }
+        if winner.samples.count != loser.samples.count {
+            return winner.samples.count >= loser.samples.count ? winner.gasLabel : loser.gasLabel
+        }
+        return winner.gasLabel
     }
 
     private static func mergedString(_ primary: String?, _ secondary: String?) -> String? {

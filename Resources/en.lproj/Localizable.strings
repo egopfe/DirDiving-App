@@ -181,7 +181,6 @@
 "Derivato prof. media + runtime; non safety/NDL" = "From avg depth + runtime; not safety/NDL";
 "Imperiale non selezionabile finche la conversione Watch non e implementata. Export sempre metrico/Subsurface." = "Imperial not selectable until Watch conversion is implemented. Export always metric/Subsurface.";
 "Autorizzato, in attesa fix" = "Authorized, awaiting fix";
-"Fix disponibile" = "Fix available";
 "Permesso negato: abilita da iPhone" = "Permission denied: enable on iPhone";
 "Richiesto al primo uso" = "Requested on first use";
 "Stato permesso sconosciuto" = "Unknown permission state";
@@ -218,7 +217,6 @@
 "TTV informativo derivato da profondita media e durata; non e un valore decompressivo o time to surface." = "Informative TTV from average depth and duration; not a decompression value or time to surface.";
 "TTV sessione %@, runtime %@" = "Session TTV %@, runtime %@";
 "Nessuna schermata o immagine di riferimento e inclusa in questa build." = "No reference screen or image is included in this build.";
-"Bussola pronta" = "Compass ready";
 "Bussola attiva" = "Compass active";
 "Bussola non disponibile" = "Compass unavailable";
 "Permesso posizione negato" = "Location permission denied";
