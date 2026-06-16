@@ -1,7 +1,9 @@
 # DIR DIVING — Modes & Startup Flow Implementation Report (Command 01)
 
-**Branch:** `integration/full-computer`  
+**Branch:** `integration/full-computer` @ `f2663c6`  
 **Date:** 2026-06-16  
+**Remote:** pushed to `origin/integration/full-computer`  
+**Build:** `xcodegen generate` + iOS + Watch **BUILD SUCCEEDED**; `DIRModesAndStartupFlowTests` **11/11 PASS**
 **Scope:** Watch MAIN — global activity modes, Diving sub-modes (Gauge / Full Computer), startup flow, Settings, pre-dive FC confirmation shell. **No Bühlmann runtime.**
 
 ## Summary
