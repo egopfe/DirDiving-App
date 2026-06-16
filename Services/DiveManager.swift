@@ -133,6 +133,8 @@ final class DiveManager: ObservableObject {
     @Published private(set) var isDepthDataStale = false
     @Published private(set) var depthDataUsesLastKnownReading = false
     @Published private(set) var diveReminderOverlay: DiveReminderOverlayContent?
+    @Published private(set) var sessionActivityMode: DIRActivityMode = .diving
+    @Published private(set) var sessionDivingMode: DIRDivingMode = .gauge
 
     private enum AlarmBlinkSource: Hashable {
         case ascent
@@ -221,6 +223,11 @@ final class DiveManager: ObservableObject {
 
     var missionModeWillActivateOnNextDive: Bool {
         missionModeAutoEnableOnDiveStart || missionModeManualPendingForSession
+    }
+
+    func recordSessionModeSelection(activity: DIRActivityMode, divingMode: DIRDivingMode) {
+        sessionActivityMode = activity
+        sessionDivingMode = divingMode
     }
 
     init(logStore: DiveLogStore, gpsManager: GPSManager, ascentSettings: AscentRateSettingsStore) {
@@ -946,7 +953,9 @@ final class DiveManager: ObservableObject {
             samples: validSamples,
             exceededSupportedDepthRange: exceeded,
             isManual: sessionStartedManually,
-            hasDepthProfile: hasDepthProfile
+            hasDepthProfile: hasDepthProfile,
+            watchActivityMode: sessionActivityMode.rawValue,
+            watchDivingMode: sessionDivingMode.rawValue
         )
         self.activeDiveExceededSupportedDepth = false
         self.sessionStartedManually = false

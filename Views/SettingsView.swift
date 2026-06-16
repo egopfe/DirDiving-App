@@ -5,6 +5,7 @@ struct SettingsView: View {
     @EnvironmentObject private var gps: GPSManager
     @EnvironmentObject private var dive: DiveManager
     @EnvironmentObject private var watchSync: WatchSyncService
+    @EnvironmentObject private var activitySelection: DIRActivitySelectionStore
     @AppStorage(MissionModeSettings.autoEnableOnDiveStartKey) private var missionModeAutoEnableOnDiveStart = false
     @AppStorage("dirdiving_watch_haptics_enabled") private var hapticsEnabled = true
     @AppStorage("dirdiving_watch_units") private var watchUnits = "metric"
@@ -32,6 +33,9 @@ struct SettingsView: View {
                             informational: true
                         )
                     }
+
+                    startupSettingsSection
+                    divingSettingsSection
 
                     WatchSettingsSectionHeader(title: String(localized: "settings.section.safety"))
 
@@ -333,6 +337,135 @@ struct SettingsView: View {
         )
         .onChange(of: watchUnits) { _, newValue in
             watchSync.publishUnitsPreference(newValue)
+        }
+    }
+
+    private var startupSettingsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            WatchSettingsSectionHeader(title: String(localized: "settings.section.startup"))
+
+            Toggle(isOn: showActivitySelectionBinding) {
+                settingsRow(
+                    icon: "arrow.triangle.branch",
+                    iconColor: DiveUI.green,
+                    title: String(localized: "settings.startup.show_activity_selection"),
+                    subtitle: String(localized: "settings.startup.show_activity_selection.subtitle")
+                )
+            }
+            .toggleStyle(SwitchToggleStyle(tint: DiveUI.green))
+            .disabled(dive.isDiveActive)
+
+            NavigationLink {
+                WatchStartupDefaultActivityPickerView()
+            } label: {
+                settingsRow(
+                    icon: "figure.water.fitness",
+                    iconColor: DiveUI.cyan,
+                    title: String(localized: "settings.startup.default_activity"),
+                    subtitle: localizedActivityName(DIRStartupSelectionPolicy.defaultActivityMode),
+                    showsChevron: true
+                )
+            }
+            .buttonStyle(.plain)
+            .disabled(dive.isDiveActive)
+
+            NavigationLink {
+                WatchStartupDefaultDivingModePickerView()
+            } label: {
+                settingsRow(
+                    icon: "water.waves",
+                    iconColor: DiveUI.cyan,
+                    title: String(localized: "settings.startup.default_diving_mode"),
+                    subtitle: localizedDivingModeName(DIRStartupSelectionPolicy.defaultDivingMode),
+                    showsChevron: true
+                )
+            }
+            .buttonStyle(.plain)
+            .disabled(dive.isDiveActive)
+
+            Text(String(localized: "settings.startup.recommendation"))
+                .font(DiveUI.Typography.hintCaption)
+                .foregroundStyle(DiveUI.mutedText)
+                .multilineTextAlignment(.leading)
+        }
+    }
+
+    private var divingSettingsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            WatchSettingsSectionHeader(title: String(localized: "settings.section.diving"))
+
+            NavigationLink {
+                WatchStartupDefaultDivingModePickerView()
+            } label: {
+                settingsRow(
+                    icon: "lungs.fill",
+                    iconColor: DiveUI.green,
+                    title: String(localized: "settings.diving.default_mode"),
+                    subtitle: localizedDivingModeName(DIRStartupSelectionPolicy.defaultDivingMode),
+                    showsChevron: true
+                )
+            }
+            .buttonStyle(.plain)
+            .disabled(dive.isDiveActive)
+
+            Toggle(isOn: gaugeShowTTVBinding) {
+                settingsRow(
+                    icon: "gauge.with.dots.needle.67percent",
+                    iconColor: DiveUI.cyan,
+                    title: String(localized: "settings.diving.gauge_show_ttv"),
+                    subtitle: String(localized: "settings.diving.gauge_show_ttv.subtitle")
+                )
+            }
+            .toggleStyle(SwitchToggleStyle(tint: DiveUI.cyan))
+            .disabled(dive.isDiveActive)
+
+            Text(String(localized: "settings.diving.gauge_ttv.footer"))
+                .font(DiveUI.Typography.hintCaption)
+                .foregroundStyle(DiveUI.mutedText)
+                .multilineTextAlignment(.leading)
+
+            Button {
+                activitySelection.reopenStartupFlowFromSettings()
+            } label: {
+                settingsRow(
+                    icon: "arrow.counterclockwise",
+                    iconColor: DiveUI.cyan,
+                    title: String(localized: "settings.diving.reopen_startup"),
+                    subtitle: String(localized: "settings.diving.reopen_startup.subtitle"),
+                    showsChevron: false
+                )
+            }
+            .buttonStyle(.plain)
+            .disabled(dive.isDiveActive)
+        }
+    }
+
+    private var showActivitySelectionBinding: Binding<Bool> {
+        Binding(
+            get: { DIRStartupSelectionPolicy.showActivitySelectionAtLaunch },
+            set: { DIRStartupSelectionPolicy.showActivitySelectionAtLaunch = $0 }
+        )
+    }
+
+    private var gaugeShowTTVBinding: Binding<Bool> {
+        Binding(
+            get: { DIRStartupSelectionPolicy.gaugeShowsTTV },
+            set: { DIRStartupSelectionPolicy.gaugeShowsTTV = $0 }
+        )
+    }
+
+    private func localizedActivityName(_ mode: DIRActivityMode) -> String {
+        switch mode {
+        case .diving: return String(localized: "startup.activity.diving")
+        case .apnea: return String(localized: "startup.activity.apnea")
+        case .snorkeling: return String(localized: "startup.activity.snorkeling")
+        }
+    }
+
+    private func localizedDivingModeName(_ mode: DIRDivingMode) -> String {
+        switch mode {
+        case .gauge: return String(localized: "startup.diving_mode.gauge.title")
+        case .fullComputer: return String(localized: "startup.diving_mode.full_computer.title")
         }
     }
 

@@ -27,8 +27,12 @@ struct DiveSession: Identifiable, Codable, Hashable {
     let isManual: Bool
     /// False for manual surface/runtime logs without depth samples.
     let hasDepthProfile: Bool
+    /// Watch MAIN activity mode at session start (optional for legacy sessions).
+    let watchActivityMode: String?
+    /// Watch Diving sub-mode at session start (gauge / fullComputer).
+    let watchDivingMode: String?
 
-    init(id: UUID = UUID(), startDate: Date, endDate: Date, durationSeconds: TimeInterval, maxDepthMeters: Double, avgDepthMeters: Double, avgWaterTemperatureCelsius: Double?, minWaterTemperatureCelsius: Double?, maxWaterTemperatureCelsius: Double?, ttv: Double, entryGPS: GPSPoint?, exitGPS: GPSPoint?, entryGPSFixSource: GPSFixSource? = nil, exitGPSFixSource: GPSFixSource? = nil, samples: [DiveSample], exceededSupportedDepthRange: Bool = false, isManual: Bool = false, hasDepthProfile: Bool? = nil) {
+    init(id: UUID = UUID(), startDate: Date, endDate: Date, durationSeconds: TimeInterval, maxDepthMeters: Double, avgDepthMeters: Double, avgWaterTemperatureCelsius: Double?, minWaterTemperatureCelsius: Double?, maxWaterTemperatureCelsius: Double?, ttv: Double, entryGPS: GPSPoint?, exitGPS: GPSPoint?, entryGPSFixSource: GPSFixSource? = nil, exitGPSFixSource: GPSFixSource? = nil, samples: [DiveSample], exceededSupportedDepthRange: Bool = false, isManual: Bool = false, hasDepthProfile: Bool? = nil, watchActivityMode: String? = nil, watchDivingMode: String? = nil) {
         self.id = id
         self.startDate = startDate
         self.endDate = endDate
@@ -48,6 +52,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
             || maxDepthMeters >= DepthSafetyConfiguration.maximumSupportedDepthMeters
         self.isManual = isManual
         self.hasDepthProfile = hasDepthProfile ?? !samples.isEmpty
+        self.watchActivityMode = watchActivityMode
+        self.watchDivingMode = watchDivingMode
     }
 
     enum CodingKeys: String, CodingKey {
@@ -55,6 +61,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
         case avgWaterTemperatureCelsius, minWaterTemperatureCelsius, maxWaterTemperatureCelsius, ttv
         case entryGPS, exitGPS, entryGPSFixSource, exitGPSFixSource, samples
         case exceededSupportedDepthRange, isManual, hasDepthProfile
+        case watchActivityMode, watchDivingMode
     }
 
     init(from decoder: Decoder) throws {
@@ -79,6 +86,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
             || maxDepthMeters >= DepthSafetyConfiguration.maximumSupportedDepthMeters
         isManual = try container.decodeIfPresent(Bool.self, forKey: .isManual) ?? false
         hasDepthProfile = try container.decodeIfPresent(Bool.self, forKey: .hasDepthProfile) ?? !samples.isEmpty
+        watchActivityMode = try container.decodeIfPresent(String.self, forKey: .watchActivityMode)
+        watchDivingMode = try container.decodeIfPresent(String.self, forKey: .watchDivingMode)
     }
 
     func encode(to encoder: Encoder) throws {
@@ -101,5 +110,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
         try container.encode(exceededSupportedDepthRange, forKey: .exceededSupportedDepthRange)
         try container.encode(isManual, forKey: .isManual)
         try container.encode(hasDepthProfile, forKey: .hasDepthProfile)
+        try container.encodeIfPresent(watchActivityMode, forKey: .watchActivityMode)
+        try container.encodeIfPresent(watchDivingMode, forKey: .watchDivingMode)
     }
 }

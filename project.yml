@@ -188,6 +188,12 @@ targets:
       - Services/PlannerBriefingCardStore.swift
       - Services/PlannerBriefingWatchReceiver.swift
       - Utils/PlannerBriefingFreshnessPolicy.swift
+      - Models/DIRModesAndStartup.swift
+      - Utils/DIRStartupSelectionPolicy.swift
+      - Utils/WatchModeSelectionPreferences.swift
+      - Services/DIRActivitySelectionStore.swift
+      - Services/AppNavigationStore.swift
+      - Models/AppPage.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.watch.algorithmtests

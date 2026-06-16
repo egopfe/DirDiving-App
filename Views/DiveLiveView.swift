@@ -8,6 +8,7 @@ import WatchKit
 struct DiveLiveView: View {
     @EnvironmentObject private var dive: DiveManager
     @EnvironmentObject private var watchSync: WatchSyncService
+    @EnvironmentObject private var activitySelection: DIRActivitySelectionStore
     @AppStorage(HapticService.hapticsEnabledKey) private var hapticsEnabled = true
     @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
     @State private var showResetStopwatchConfirmation = false
@@ -28,6 +29,10 @@ struct DiveLiveView: View {
 
     private var missionModeProfile: MissionModeRuntimeProfile {
         dive.missionModeRuntimeProfile
+    }
+
+    private var showsGaugeTTV: Bool {
+        activitySelection.selectedDivingMode == .gauge && DIRStartupSelectionPolicy.gaugeShowsTTV
     }
 
     private var showsMissionModeControl: Bool {
@@ -279,8 +284,14 @@ struct DiveLiveView: View {
                 } else if !prioritizeDepthHero {
                     secondaryNoticeViews(presentation: presentation)
                 }
-                ttvRuntimePanel
-                    .layoutPriority(2)
+                if showsGaugeTTV {
+                    ttvRuntimePanel
+                        .layoutPriority(2)
+                } else if activitySelection.selectedDivingMode == .gauge
+                            || activitySelection.selectedDivingMode == .fullComputer {
+                    runtimeOnlyPanel
+                        .layoutPriority(2)
+                }
                 if !prioritizeDepthHero {
                     depthSection(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
                         .layoutPriority(2)
@@ -667,6 +678,23 @@ struct DiveLiveView: View {
             String(format: String(localized: "live.a11y.ttv_runtime"), ttvText, runtimeMinutes)
         )
         .accessibilityHint(String(localized: "live.a11y.ttv_hint"))
+    }
+
+    private var runtimeOnlyPanel: some View {
+        HStack(spacing: 0) {
+            dashboardValue(title: String(localized: "live.metric.runtime"), value: runtimeMinutes, unit: "min", color: .white)
+        }
+        .frame(maxWidth: .infinity, minHeight: 54)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.black.opacity(0.42))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .stroke(DiveUI.cyan.opacity(0.55), lineWidth: 1.2)
+                )
+        )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(format: String(localized: "live.a11y.runtime_only"), runtimeMinutes))
     }
 
     private func dashboardValue(title: String, value: String, unit: String?, color: Color) -> some View {

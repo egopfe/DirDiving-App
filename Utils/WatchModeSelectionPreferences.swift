@@ -14,8 +14,6 @@ enum WatchModeSelectionPreferences {
         set { UserDefaults.standard.set(newValue, forKey: skipWhenSingleModeKey) }
     }
 
-    /// Dormant until Snorkeling/Apnea ship in MAIN; Mode Selection stays hidden when false.
-    /// When false, `ContentView` omits `ModeSelectionView` and cold launch opens Live Dive (`AppNavigationStore`).
-    /// Experimental modes remain on `codex/experimental-features` only — never exposed here.
-    static let hasMultipleStableModes = false
+    /// Three stable activity modes are exposed in MAIN startup flow (Diving launchable; Apnea/Snorkeling coming soon).
+    static let hasMultipleStableModes = true
 }

@@ -583,6 +583,53 @@
 "mode.selection.diving.active" = "ACTIVE";
 "shortcuts.help.mode_selection.title" = "Mode selection";
 "shortcuts.help.mode_selection.body" = "When only Diving is available, the app opens Live Dive automatically. Mode Selection appears when multiple stable modes ship.";
+
+/* Full Computer — modes & startup flow (Command 01) */
+"startup.activity.title" = "CHOOSE ACTIVITY";
+"startup.activity.diving" = "DIVING";
+"startup.activity.apnea" = "APNEA";
+"startup.activity.snorkeling" = "SNORKELING";
+"startup.activity.diving.hint" = "Opens Diving mode selection";
+"startup.activity.apnea.hint" = "Apnea is not yet available in this release";
+"startup.activity.snorkeling.hint" = "Snorkeling is not yet available in this release";
+"startup.activity.footer" = "Also configurable in Settings. Cannot change during an active dive.";
+"startup.diving_mode.title" = "DIVING MODE";
+"startup.diving_mode.gauge.title" = "GAUGE";
+"startup.diving_mode.gauge.subtitle" = "Advanced depth gauge";
+"startup.diving_mode.full_computer.title" = "FULL COMPUTER";
+"startup.diving_mode.full_computer.subtitle" = "Bühlmann ZH-L16C + GF";
+"startup.diving_mode.footer" = "Choose before entering the water";
+"startup.fc_confirm.header" = "DIVING · FULL COMPUTER";
+"startup.fc_confirm.subheader" = "CONFIRM BEFORE THE DIVE";
+"startup.fc_confirm.row.gas" = "Gas";
+"startup.fc_confirm.row.gf" = "GF";
+"startup.fc_confirm.row.sensor" = "Sensor";
+"startup.fc_confirm.row.activity" = "Activity";
+"startup.fc_confirm.gas.air" = "Air";
+"startup.fc_confirm.sensor.automatic" = "Automatic";
+"startup.fc_confirm.sensor.manual" = "Manual";
+"startup.fc_confirm.back" = "BACK";
+"startup.fc_confirm.start" = "START";
+"startup.fc_confirm.error.sensor" = "Depth sensor unavailable. Check Settings or use Gauge.";
+"startup.coming_soon.subtitle" = "NOT YET AVAILABLE";
+"startup.coming_soon.body" = "This activity is not release-ready on MAIN. Use Diving for the stable experience.";
+"startup.coming_soon.back" = "BACK";
+"startup.mode_change.blocked" = "Cannot change mode during an active dive";
+"settings.section.startup" = "STARTUP";
+"settings.section.diving" = "DIVING";
+"settings.startup.show_activity_selection" = "Always show activity selection";
+"settings.startup.show_activity_selection.subtitle" = "Show on every cold launch";
+"settings.startup.default_activity" = "Default activity";
+"settings.startup.default_diving_mode" = "Default Diving mode";
+"settings.startup.recommendation" = "Recommended: ON to avoid mistakes";
+"settings.diving.default_mode" = "Default Diving mode";
+"settings.diving.gauge_show_ttv" = "Gauge · Show TTV";
+"settings.diving.gauge_show_ttv.subtitle" = "Optional TTV index on Live Dive";
+"settings.diving.gauge_ttv.footer" = "In Gauge, TTV is optional and hidden by default";
+"settings.diving.reopen_startup" = "Review activity & mode";
+"settings.diving.reopen_startup.subtitle" = "Re-open startup selection";
+"live.a11y.runtime_only" = "Runtime %@ minutes";
+
 /* MAIN UI remediation — semantic keys (merged into Localizable.strings) */
 
 "settings.header.title" = "SETTINGS";
