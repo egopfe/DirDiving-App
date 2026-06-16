@@ -12,6 +12,7 @@ if [[ "${BRANCH}" != "integration/full-computer" ]]; then
 fi
 
 ./Scripts/check_secrets.sh
+./Scripts/audit_localization.sh
 
 echo "[fc-readiness] running xcodegen"
 xcodegen generate

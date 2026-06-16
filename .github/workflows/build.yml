@@ -8,6 +8,7 @@ on:
     branches:
       - main
       - main-iOS
+      - integration/full-computer
       - codex/experimental-features
       - codex/ios-experimental-features
   pull_request:
@@ -77,6 +78,9 @@ jobs:
 
       - name: Secret scan
         run: ./Scripts/check_secrets.sh
+
+      - name: Localization audit
+        run: ./Scripts/audit_localization.sh
 
       - name: Build watchOS target
         run: |

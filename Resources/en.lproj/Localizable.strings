@@ -634,6 +634,8 @@
 "fc.imported_plan.activate" = "ACTIVATE PLAN";
 "fc.imported_plan.dismiss" = "Keep current settings";
 "fc.imported_plan.activate_failed" = "Unable to activate imported plan.";
+"fc.imported_plan.technical_header" = "ID %@ · rev %lld";
+"fc.imported_plan.runtime_minutes_format" = "%lld min";
 "fc.predive.settings.deco_none" = "None";
 "fc.predive.settings.deco_count" = "%d gases";
 "fc.predive.settings.footer" = "Configure before the dive";
@@ -1011,6 +1013,7 @@
 "sync.dive.duplicate_ignored_iphone" = "Duplicate iPhone dive ignored";
 "sync.dive.received_from_iphone" = "Dive received from iPhone";
 "sync.dive.import_error_format" = "iPhone import error: %@";
+"sync.legacy_schema.v1_warning" = "Legacy sync schema v1 is deprecated and will be removed after %@. Update the iPhone companion.";
 "alarms.a11y.row_format" = "%@, %@, %@";
 "alarms.a11y.stepper.decrease" = "Decrease";
 "alarms.a11y.stepper.increase" = "Increase";

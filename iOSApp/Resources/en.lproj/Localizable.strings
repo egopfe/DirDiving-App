@@ -888,6 +888,8 @@
 "planner.table.phase" = "Phase";
 "planner.metric.tts" = "TTS";
 "planner.metric.runtime" = "Runtime";
+"planner.metric.otu" = "OTU";
+"planner.metric.runtime" = "Runtime";
 "planner.export.tts_line" = "TTS: %d min";
 "planner.export.runtime_line" = "Runtime: %d min";
 "planner.result.calculation_incomplete" = "Incomplete calculation";
@@ -1584,6 +1586,7 @@
 "planner.buhlmann.invalid_profile" = "Bühlmann unavailable: profile or mix outside validated limits.";
 "planner.buhlmann.reference_disclaimer" = "Bühlmann ZHL-16C N2+He multigas reference-only: not a certified decompression plan.";
 "planner.gf.conservative" = "Conservative";
+"planner.gf.title" = "Gradient Factors";
 "planner.gf.aggressive" = "More aggressive";
 "planner.gas_ledger.unused_title" = "Unused planned gas";
 "planner.gas_ledger.unused_planned" = "Unused planned gas";
@@ -1603,6 +1606,7 @@
 "sync.codec.error.invalid_session" = "Invalid dive session.";
 "sync.codec.error.session_inactive" = "WatchConnectivity is not active.";
 "sync.codec.error.missing_peer_secret" = "Watch sync key is not available yet.";
+"sync.codec.error.replayed_payload" = "Replayed sync payload rejected.";
 "sync.activity.session_summary" = "%1$@ · %2$@ m · %3$lld min";
 "analysis.metric.arithmetic_mean.note" = "SAC and temperature averages are simple arithmetic means across dives, not duration-weighted.";
 
@@ -1776,6 +1780,9 @@
 "ccr.validation.missing_bailout" = "Configure at least one bailout gas.";
 "ccr.validation.invalid_environment" = "Invalid planning environment.";
 "logbook.gas.ccr" = "CCR";
+"logbook.gas.oc" = "Open circuit";
+"logbook.gas.nitrox" = "Nitrox";
+"logbook.gas.trimix" = "Trimix";
 "equipment.template.ccr" = "My Equipment — CCR";
 "equipment.ccr.rebreather" = "Rebreather unit";
 "equipment.ccr.loop" = "Loop";

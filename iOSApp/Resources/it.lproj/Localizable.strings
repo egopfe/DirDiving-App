@@ -886,6 +886,8 @@
 "planner.table.phase" = "Fase";
 "planner.metric.tts" = "TTS";
 "planner.metric.runtime" = "Runtime";
+"planner.metric.otu" = "OTU";
+"planner.metric.runtime" = "Runtime";
 "planner.export.tts_line" = "TTS: %d min";
 "planner.export.runtime_line" = "Runtime: %d min";
 "planner.result.calculation_incomplete" = "Calcolo incompleto";
@@ -1582,6 +1584,7 @@
 "planner.buhlmann.invalid_profile" = "Bühlmann non disponibile: profilo o miscela fuori dai limiti validati.";
 "planner.buhlmann.reference_disclaimer" = "Bühlmann ZHL-16C N2+He multigas reference-only: non è un piano decompressivo certificato.";
 "planner.gf.conservative" = "Conservativo";
+"planner.gf.title" = "Gradient factors";
 "planner.gf.aggressive" = "Più aggressivo";
 "planner.gas_ledger.unused_title" = "Gas pianificato non usato";
 "planner.gas_ledger.unused_planned" = "Gas pianificato non usato";
@@ -1601,6 +1604,7 @@
 "sync.codec.error.invalid_session" = "Sessione immersione non valida.";
 "sync.codec.error.session_inactive" = "WatchConnectivity non attivo.";
 "sync.codec.error.missing_peer_secret" = "Chiave sync Watch non ancora disponibile.";
+"sync.codec.error.replayed_payload" = "Payload sync rigettato perché già ricevuto.";
 "sync.activity.session_summary" = "%1$@ · %2$@ m · %3$lld min";
 "analysis.metric.arithmetic_mean.note" = "SAC e temperatura media sono medie aritmetiche tra immersioni, non medie ponderate per durata.";
 
@@ -1774,6 +1778,9 @@
 "ccr.validation.missing_bailout" = "Configura almeno un gas bailout.";
 "ccr.validation.invalid_environment" = "Ambiente di pianificazione non valido.";
 "logbook.gas.ccr" = "CCR";
+"logbook.gas.oc" = "Circuito aperto";
+"logbook.gas.nitrox" = "Nitrox";
+"logbook.gas.trimix" = "Trimix";
 "equipment.template.ccr" = "La mia attrezzatura — CCR";
 "equipment.ccr.rebreather" = "Rebreather";
 "equipment.ccr.loop" = "Loop";

@@ -13,6 +13,7 @@ fi
 
 ./Scripts/check_main_target_isolation.sh
 ./Scripts/check_secrets.sh
+./Scripts/audit_localization.sh
 
 echo "[readiness] running xcodegen"
 xcodegen generate

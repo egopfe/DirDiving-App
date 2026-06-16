@@ -44,7 +44,10 @@ struct FullComputerImportedPlanView: View {
                             divider
                             row(
                                 label: String(localized: "fc.imported_plan.runtime"),
-                                value: "\(package.body.plannerSummary.totalRuntimeMinutes) min"
+                                value: String(
+                                    format: String(localized: "fc.imported_plan.runtime_minutes_format"),
+                                    package.body.plannerSummary.totalRuntimeMinutes
+                                )
                             )
                         }
                     }
@@ -106,7 +109,13 @@ struct FullComputerImportedPlanView: View {
     }
 
     private func technicalHeader(_ package: DivePlanPackage) -> some View {
-        Text("ID \(package.body.planID.uuidString.prefix(8)) · rev \(package.body.revision)")
+        Text(
+            String(
+                format: String(localized: "fc.imported_plan.technical_header"),
+                String(package.body.planID.uuidString.prefix(8)),
+                package.body.revision
+            )
+        )
             .font(DiveUI.Typography.hintCaption)
             .foregroundStyle(DiveUI.mutedText)
             .frame(maxWidth: .infinity, alignment: .leading)
