@@ -11,20 +11,40 @@ struct FullComputerRuntimePlan: Hashable {
     var stopIntervalMeters: Double
 
     static var defaultAirGF3070: FullComputerRuntimePlan {
-        FullComputerRuntimePlan(
-            activeGas: BuhlmannGas(
-                name: "Air",
-                role: .bottom,
-                oxygenFraction: BuhlmannConstants.oxygenFractionAir,
-                heliumFraction: 0,
-                maxPPO2Bar: 1.4,
-                switchDepthMeters: 0
-            ),
-            gfLow: FullComputerRuntimeConfiguration.defaultGFLow,
-            gfHigh: FullComputerRuntimeConfiguration.defaultGFHigh,
-            plannerEnvironment: .seaLevelSaltWater,
-            travelGases: [],
-            decoGases: [],
+        FullComputerRuntimePlan(profile: .defaultAirGF3070)
+    }
+
+    init(
+        activeGas: BuhlmannGas,
+        gfLow: Double,
+        gfHigh: Double,
+        plannerEnvironment: PlannerEnvironment,
+        travelGases: [BuhlmannGas],
+        decoGases: [BuhlmannGas],
+        ascentRateMetersPerMinute: Double,
+        stopIntervalMeters: Double
+    ) {
+        self.activeGas = activeGas
+        self.gfLow = gfLow
+        self.gfHigh = gfHigh
+        self.plannerEnvironment = plannerEnvironment
+        self.travelGases = travelGases
+        self.decoGases = decoGases
+        self.ascentRateMetersPerMinute = ascentRateMetersPerMinute
+        self.stopIntervalMeters = stopIntervalMeters
+    }
+
+    init(profile: FullComputerGasProfile, plannerEnvironment: PlannerEnvironment = .seaLevelSaltWater) {
+        let bottom = profile.bottomGas.toBuhlmannGas()
+        let deco = profile.enabledDecoGases.map { $0.toBuhlmannGas() }
+        let travel = profile.enabledTravelGases.map { $0.toBuhlmannGas() }
+        self.init(
+            activeGas: bottom,
+            gfLow: profile.gfLow,
+            gfHigh: profile.gfHigh,
+            plannerEnvironment: plannerEnvironment,
+            travelGases: profile.futureGasTTSPolicy == .enabledSwitchGasesOnly ? travel : [],
+            decoGases: profile.futureGasTTSPolicy == .enabledSwitchGasesOnly ? deco : [],
             ascentRateMetersPerMinute: BuhlmannConstants.defaultAscentRateMetersPerMinute,
             stopIntervalMeters: BuhlmannConstants.stopIntervalMeters
         )

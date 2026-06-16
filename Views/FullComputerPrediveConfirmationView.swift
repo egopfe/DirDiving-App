@@ -3,9 +3,15 @@ import SwiftUI
 struct FullComputerPrediveConfirmationView: View {
     @EnvironmentObject private var activitySelection: DIRActivitySelectionStore
     @EnvironmentObject private var dive: DiveManager
+    @ObservedObject private var configuration = FullComputerPrediveConfigurationStore.shared
+
+    private var profile: FullComputerGasProfile { configuration.draftProfile }
 
     private var readiness: FullComputerPrediveReadiness {
-        FullComputerPrediveReadiness.evaluate(depthAutomationAvailable: dive.isDepthAutomationAvailable)
+        FullComputerPrediveReadiness.evaluate(
+            depthAutomationAvailable: dive.isDepthAutomationAvailable,
+            validationIssues: configuration.validationIssues
+        )
     }
 
     var body: some View {
@@ -26,12 +32,17 @@ struct FullComputerPrediveConfirmationView: View {
                     VStack(spacing: 0) {
                         confirmRow(
                             label: String(localized: "startup.fc_confirm.row.gas"),
-                            value: String(localized: "startup.fc_confirm.gas.air")
+                            value: profile.bottomGas.displayName
+                        )
+                        divider
+                        confirmRow(
+                            label: String(localized: "fc.predive.confirm.deco_gases"),
+                            value: decoSummary
                         )
                         divider
                         confirmRow(
                             label: String(localized: "startup.fc_confirm.row.gf"),
-                            value: "30/70"
+                            value: "\(Int(profile.gfLow))/\(Int(profile.gfHigh))"
                         )
                         divider
                         confirmRow(
@@ -93,6 +104,12 @@ struct FullComputerPrediveConfirmationView: View {
         .accessibilityElement(children: .contain)
     }
 
+    private var decoSummary: String {
+        let gases = profile.enabledDecoGases
+        if gases.isEmpty { return String(localized: "fc.predive.settings.deco_none") }
+        return gases.map(\.displayName).joined(separator: ", ")
+    }
+
     private var sensorLabel: String {
         if dive.isDepthAutomationAvailable {
             return String(localized: "startup.fc_confirm.sensor.automatic")
@@ -116,6 +133,8 @@ struct FullComputerPrediveConfirmationView: View {
                 .font(DiveUI.Typography.rowTitle)
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.trailing)
+                .lineLimit(2)
+                .minimumScaleFactor(0.75)
         }
         .padding(.vertical, 8)
         .accessibilityElement(children: .combine)
@@ -125,12 +144,11 @@ struct FullComputerPrediveConfirmationView: View {
 enum FullComputerPrediveReadiness: Equatable {
     case ready
     case sensorUnavailable
+    case invalidGasProfile(String)
 
     var isReady: Bool {
-        switch self {
-        case .ready: return true
-        case .sensorUnavailable: return false
-        }
+        if case .ready = self { return true }
+        return false
     }
 
     var errorMessage: String? {
@@ -138,15 +156,27 @@ enum FullComputerPrediveReadiness: Equatable {
         case .ready: return nil
         case .sensorUnavailable:
             return String(localized: "startup.fc_confirm.error.sensor")
+        case .invalidGasProfile(let message):
+            return message
         }
     }
 
-    static func evaluate(depthAutomationAvailable: Bool) -> FullComputerPrediveReadiness {
-        // Full Computer pre-dive requires depth input path (automatic or manual lifecycle).
-        // Manual lifecycle remains available on all supported watches.
-        if depthAutomationAvailable {
-            return .ready
+    static func evaluate(
+        depthAutomationAvailable: Bool,
+        validationIssues: [FullComputerGasValidationIssue]
+    ) -> FullComputerPrediveReadiness {
+        if !validationIssues.isEmpty {
+            let issue = validationIssues[0]
+            let key = issue.localizationKey
+            let message: String
+            if let arg = issue.argument {
+                message = String(format: String(localized: String.LocalizationValue(key)), arg)
+            } else {
+                message = String(localized: String.LocalizationValue(key))
+            }
+            return .invalidGasProfile(message)
         }
+        _ = depthAutomationAvailable
         return .ready
     }
 }

@@ -10,6 +10,8 @@ struct FullComputerRuntimeEngine: Equatable {
     private var lastComputedTimestamp: Date
     private var monotonicClock: MonotonicElapsedClock
     private var previousEngineState: FullComputerRuntimeEngineState
+    private var decoStopTracker: FullComputerDecoStopTracker
+    private var lastTickTimestamp: Date
 
     static func canStart(
         plan: FullComputerRuntimePlan = .defaultAirGF3070,
@@ -35,6 +37,9 @@ struct FullComputerRuntimeEngine: Equatable {
         monotonicClock = MonotonicElapsedClock()
         monotonicClock.reset(anchorDate: sessionStart)
         previousEngineState = .valid
+        decoStopTracker = .initial
+        lastTickTimestamp = sessionStart
+        var tracker = FullComputerDecoStopTracker.initial
         snapshot = Self.makeSnapshot(
             engineState: .valid,
             tissueState: tissueState,
@@ -42,8 +47,11 @@ struct FullComputerRuntimeEngine: Equatable {
             depthMeters: 0,
             monotonicElapsedSeconds: 0,
             lastSampleTimestamp: nil,
-            diagnostics: []
+            diagnostics: [],
+            decoStopTracker: &tracker,
+            deltaSeconds: 0
         )
+        decoStopTracker = tracker
     }
 
     mutating func ingestSample(depthMeters: Double, timestamp: Date) -> Bool {
@@ -188,6 +196,8 @@ struct FullComputerRuntimeEngine: Equatable {
         engineState: FullComputerRuntimeEngineState,
         diagnostics: [String]
     ) {
+        let delta = max(0, lastComputedTimestamp.timeIntervalSince(lastTickTimestamp))
+        lastTickTimestamp = lastComputedTimestamp
         snapshot = Self.makeSnapshot(
             engineState: engineState,
             tissueState: tissueState,
@@ -195,7 +205,9 @@ struct FullComputerRuntimeEngine: Equatable {
             depthMeters: lastDepthMeters,
             monotonicElapsedSeconds: monotonicClock.elapsed(),
             lastSampleTimestamp: lastSampleTimestamp,
-            diagnostics: diagnostics
+            diagnostics: diagnostics,
+            decoStopTracker: &decoStopTracker,
+            deltaSeconds: delta
         )
     }
 
@@ -216,7 +228,9 @@ struct FullComputerRuntimeEngine: Equatable {
         depthMeters: Double,
         monotonicElapsedSeconds: TimeInterval,
         lastSampleTimestamp: Date?,
-        diagnostics: [String]
+        diagnostics: [String],
+        decoStopTracker: inout FullComputerDecoStopTracker,
+        deltaSeconds: TimeInterval
     ) -> FullComputerRuntimeSnapshot {
         let projection = BuhlmannEngine.runtimeProjection(
             tissueState: tissueState,
@@ -235,7 +249,7 @@ struct FullComputerRuntimeEngine: Equatable {
             environment: plan.plannerEnvironment
         ) ?? plan.plannerEnvironment.surfacePressureBar
         let runtimeMinutes = max(0, Int(monotonicElapsedSeconds / 60.0))
-        let decoPresentation = FullComputerDecoSolver.solve(
+        let basePresentation = FullComputerDecoSolver.solve(
             input: FullComputerDecoSolverInput(
                 tissueState: tissueState,
                 depthMeters: depthMeters,
@@ -243,6 +257,22 @@ struct FullComputerRuntimeEngine: Equatable {
                 runtimeMinutes: runtimeMinutes
             )
         )
+        let decoRequired = basePresentation.mode == .decompression
+        let machine = FullComputerDecoStopStateMachine.evaluate(
+            input: FullComputerDecoStopMachineInput(
+                depthMeters: depthMeters,
+                stopDepthMeters: basePresentation.nextStopDepthMeters,
+                modelRemainingMinutes: basePresentation.nextStopMinutes,
+                remainingStopCount: basePresentation.remainingStopCount,
+                ceilingViolation: basePresentation.ceilingViolation,
+                ceilingMetersExact: basePresentation.ceilingMetersExact,
+                decoRequired: decoRequired,
+                deltaSeconds: deltaSeconds
+            ),
+            tracker: decoStopTracker
+        )
+        decoStopTracker = machine.tracker
+        let decoPresentation = FullComputerDecoSolver.applyingStopMachine(basePresentation, machine: machine)
         return FullComputerRuntimeSnapshot(
             engineState: engineState,
             tissueState: tissueState,

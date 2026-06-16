@@ -15,6 +15,8 @@ struct StartupFlowView: View {
                     ActivitySelectionView()
                 case .divingModeSelection:
                     DivingModeSelectionView()
+                case .fullComputerPrediveConfiguration:
+                    FullComputerPrediveSettingsView()
                 case .fullComputerConfirmation:
                     FullComputerPrediveConfirmationView()
                 case .comingSoon(let activity):

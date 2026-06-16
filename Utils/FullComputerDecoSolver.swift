@@ -120,7 +120,7 @@ enum FullComputerDecoSolver {
             let immersionAccent: FullComputerImmersionAccent = ceilingViolation ? .ceilingViolation : .decompression
             let statusKey = ceilingViolation
                 ? "live.fc.status.ceiling_violation"
-                : "live.fc.status.deco"
+                : "live.fc.status.in_deco"
             return FullComputerDecoPresentation(
                 mode: .decompression,
                 immersionAccent: immersionAccent,
@@ -139,7 +139,17 @@ enum FullComputerDecoSolver {
                 showDecoStopPanel: showDecoStopPanel,
                 showCeilingViolationBanner: ceilingViolation,
                 usedConservativeFallback: usedConservativeFallback,
-                diagnostics: diagnostics
+                diagnostics: diagnostics,
+                stopState: nil,
+                stopDirection: .none,
+                stopPanelAccent: .yellow,
+                stopPanelTitleKey: "",
+                stopInstructionKey: nil,
+                stopRemainingSeconds: nil,
+                activeGasLabel: input.plan.activeGas.name,
+                showDecoProgressPanel: false,
+                hideManualStopwatch: false,
+                timerAccruing: false
             )
         }
 
@@ -163,7 +173,17 @@ enum FullComputerDecoSolver {
             showDecoStopPanel: false,
             showCeilingViolationBanner: false,
             usedConservativeFallback: usedConservativeFallback,
-            diagnostics: diagnostics
+            diagnostics: diagnostics,
+            stopState: nil,
+            stopDirection: .none,
+            stopPanelAccent: .green,
+            stopPanelTitleKey: "",
+            stopInstructionKey: nil,
+            stopRemainingSeconds: nil,
+            activeGasLabel: input.plan.activeGas.name,
+            showDecoProgressPanel: false,
+            hideManualStopwatch: false,
+            timerAccruing: false
         )
     }
 
@@ -189,7 +209,17 @@ enum FullComputerDecoSolver {
             showDecoStopPanel: previous.showDecoStopPanel,
             showCeilingViolationBanner: previous.ceilingViolation,
             usedConservativeFallback: true,
-            diagnostics: diagnostics
+            diagnostics: diagnostics,
+            stopState: previous.stopState,
+            stopDirection: previous.stopDirection,
+            stopPanelAccent: previous.stopPanelAccent,
+            stopPanelTitleKey: previous.stopPanelTitleKey,
+            stopInstructionKey: previous.stopInstructionKey,
+            stopRemainingSeconds: previous.stopRemainingSeconds,
+            activeGasLabel: previous.activeGasLabel,
+            showDecoProgressPanel: previous.showDecoProgressPanel,
+            hideManualStopwatch: previous.hideManualStopwatch,
+            timerAccruing: false
         )
     }
 
@@ -213,5 +243,42 @@ enum FullComputerDecoSolver {
             hasher.combine(gas.switchDepthMeters)
         }
         return hasher.finalize()
+    }
+
+    static func applyingStopMachine(
+        _ presentation: FullComputerDecoPresentation,
+        machine: FullComputerDecoStopMachineOutput
+    ) -> FullComputerDecoPresentation {
+        guard presentation.mode == .decompression else { return presentation }
+        return FullComputerDecoPresentation(
+            mode: presentation.mode,
+            immersionAccent: presentation.immersionAccent,
+            immersionStatusKey: presentation.immersionStatusKey,
+            ndlDisplayMinutes: presentation.ndlDisplayMinutes,
+            ndlAccent: presentation.ndlAccent,
+            ttsMinutes: presentation.ttsMinutes,
+            runtimeMinutes: presentation.runtimeMinutes,
+            ceilingMetersExact: presentation.ceilingMetersExact,
+            ceilingMetersRounded: presentation.ceilingMetersRounded,
+            nextStopDepthMeters: presentation.nextStopDepthMeters,
+            nextStopMinutes: presentation.nextStopMinutes,
+            remainingStopCount: presentation.remainingStopCount,
+            ceilingViolation: presentation.ceilingViolation,
+            ascentAllowedBetweenStops: presentation.ascentAllowedBetweenStops,
+            showDecoStopPanel: machine.showProgressPanel,
+            showCeilingViolationBanner: presentation.showCeilingViolationBanner,
+            usedConservativeFallback: presentation.usedConservativeFallback,
+            diagnostics: presentation.diagnostics,
+            stopState: machine.state,
+            stopDirection: machine.direction,
+            stopPanelAccent: machine.panelAccent,
+            stopPanelTitleKey: machine.titleKey,
+            stopInstructionKey: machine.instructionKey,
+            stopRemainingSeconds: machine.stopRemainingSeconds,
+            activeGasLabel: presentation.activeGasLabel,
+            showDecoProgressPanel: machine.showProgressPanel,
+            hideManualStopwatch: machine.hideManualStopwatch,
+            timerAccruing: machine.timerAccruing
+        )
     }
 }

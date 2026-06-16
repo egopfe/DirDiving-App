@@ -38,6 +38,7 @@ struct DIRDivingApp: App {
         WatchSyncService.shared.attachLogStore(logStore)
         WatchSyncService.shared.attachPlannerBriefingStore(plannerBriefingStore)
         SensorSourceMode.applyReleaseSafeMigrationIfNeeded()
+        FullComputerPrediveConfigurationStore.migrateIfNeeded()
     }
 
     var body: some Scene {

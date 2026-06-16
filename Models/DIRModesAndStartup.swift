@@ -28,6 +28,7 @@ enum DIRDivingMode: String, Codable, CaseIterable, Identifiable, Hashable, Senda
 enum DIRStartupLaunchStep: Equatable, Hashable, Sendable {
     case activitySelection
     case divingModeSelection(activity: DIRActivityMode)
+    case fullComputerPrediveConfiguration
     case fullComputerConfirmation
     case comingSoon(activity: DIRActivityMode)
     case ready(activity: DIRActivityMode, divingMode: DIRDivingMode)

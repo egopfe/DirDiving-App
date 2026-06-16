@@ -38,6 +38,17 @@ struct FullComputerDecoPresentation: Hashable, Codable {
     let showCeilingViolationBanner: Bool
     let usedConservativeFallback: Bool
     let diagnostics: [String]
+
+    let stopState: FullComputerDecoStopState?
+    let stopDirection: FullComputerDecoStopDirection
+    let stopPanelAccent: FullComputerDecoStopPanelAccent
+    let stopPanelTitleKey: String
+    let stopInstructionKey: String?
+    let stopRemainingSeconds: Int?
+    let activeGasLabel: String?
+    let showDecoProgressPanel: Bool
+    let hideManualStopwatch: Bool
+    let timerAccruing: Bool
 }
 
 struct FullComputerDecoSolverInput: Hashable {

@@ -38,12 +38,12 @@ final class DIRModesAndStartupFlowTests: XCTestCase {
         )
     }
 
-    func testAutomaticFullComputerRequiresConfirmation() {
+    func testAutomaticFullComputerRequiresConfiguration() {
         DIRStartupSelectionPolicy.showActivitySelectionAtLaunch = false
         DIRStartupSelectionPolicy.defaultDivingMode = .fullComputer
         XCTAssertEqual(
             DIRStartupSelectionPolicy.resolveLaunchStep(),
-            .fullComputerConfirmation
+            .fullComputerPrediveConfiguration
         )
     }
 
@@ -81,16 +81,21 @@ final class DIRModesAndStartupFlowTests: XCTestCase {
     }
 
     func testFullComputerCompletionRequiresExplicitConfirm() {
+        FullComputerPrediveConfigurationStore.shared.resetForTests()
         let store = DIRActivitySelectionStore()
         store.selectActivity(.diving)
         store.selectDivingMode(.fullComputer)
-        XCTAssertEqual(store.startupStep, .fullComputerConfirmation)
+        XCTAssertEqual(store.startupStep, .fullComputerPrediveConfiguration)
         XCTAssertFalse(store.sessionConfigured)
+
+        store.proceedToFullComputerConfirmation()
+        XCTAssertEqual(store.startupStep, .fullComputerConfirmation)
 
         store.confirmFullComputerPredive()
         XCTAssertNil(store.startupStep)
         XCTAssertTrue(store.sessionConfigured)
         XCTAssertTrue(store.selection.fullComputerPrediveConfirmed)
+        XCTAssertNotNil(FullComputerPrediveConfigurationStore.shared.confirmedProfile)
     }
 
     func testGaugePathCompletesWithoutPrediveConfirm() {

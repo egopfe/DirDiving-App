@@ -58,11 +58,23 @@ final class DIRActivitySelectionStore: ObservableObject {
 
     func confirmFullComputerPredive() {
         guard selection.divingMode == .fullComputer else { return }
+        FullComputerPrediveConfigurationStore.shared.commitConfirmedProfile()
         selection.fullComputerPrediveConfirmed = true
         completeStartup(activity: selection.activity, divingMode: .fullComputer)
     }
 
+    func proceedToFullComputerConfirmation() {
+        guard selection.divingMode == .fullComputer else { return }
+        guard FullComputerPrediveConfigurationStore.shared.isDraftValid else { return }
+        startupStep = .fullComputerConfirmation
+    }
+
     func cancelFullComputerPredive() {
+        selection.fullComputerPrediveConfirmed = false
+        startupStep = .fullComputerPrediveConfiguration
+    }
+
+    func cancelFullComputerPrediveToModeSelection() {
         selection.fullComputerPrediveConfirmed = false
         startupStep = .divingModeSelection(activity: .diving)
     }

@@ -9,10 +9,19 @@ enum FullComputerLivePanelStyle {
         }
     }
 
+    static func stopPanelColor(_ accent: FullComputerDecoStopPanelAccent) -> Color {
+        switch accent {
+        case .green: return DiveUI.green
+        case .yellow: return DiveUI.yellow
+        case .orange: return DiveUI.orange
+        case .red: return DiveUI.red
+        }
+    }
+
     static func immersionColor(_ accent: FullComputerImmersionAccent) -> Color {
         switch accent {
         case .diving: return DiveUI.green
-        case .decompression: return DiveUI.orange
+        case .decompression: return DiveUI.green
         case .ceilingViolation: return DiveUI.red
         }
     }
@@ -22,8 +31,34 @@ enum FullComputerLivePanelStyle {
         case .noDecompression:
             return accentColor(presentation.ndlAccent)
         case .decompression:
-            return presentation.ceilingViolation ? DiveUI.red : DiveUI.orange
+            if presentation.ceilingViolation { return DiveUI.red }
+            if presentation.stopState == .decoCompleted { return DiveUI.green }
+            return stopPanelColor(presentation.stopPanelAccent)
         }
+    }
+}
+
+struct FullComputerActiveGasBadge: View {
+    let gasLabel: String
+
+    var body: some View {
+        HStack(spacing: 5) {
+            Image(systemName: "aqi.medium")
+                .font(.system(size: 11, weight: .black))
+            Text(gasLabel)
+                .font(DiveUI.Typography.secondaryLabel)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+        .foregroundStyle(DiveUI.cyan)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(
+            Capsule(style: .continuous)
+                .fill(DiveUI.cyan.opacity(0.12))
+                .overlay(Capsule(style: .continuous).stroke(DiveUI.cyan.opacity(0.55), lineWidth: 1))
+        )
+        .accessibilityLabel(String(format: String(localized: "live.fc.gas.a11y"), gasLabel))
     }
 }
 
@@ -79,8 +114,10 @@ struct FullComputerTopMetricsPanel: View {
                 title: String(localized: "live.fc.metric.ceiling"),
                 value: ceilingValueText,
                 unit: "m",
-                valueColor: DiveUI.blue,
-                footer: nil
+                valueColor: presentation.stopState == .decoCompleted ? DiveUI.green : DiveUI.blue,
+                footer: presentation.stopState == .decoCompleted
+                    ? String(localized: "live.fc.metric.ceiling.completed.footer")
+                    : nil
             )
             divider
             metricColumn(
@@ -176,71 +213,160 @@ struct FullComputerTopMetricsPanel: View {
     }
 }
 
-struct FullComputerDecoStopPanel: View {
+struct FullComputerDecoStopStatePanel: View {
     let presentation: FullComputerDecoPresentation
     let units: DIRUnitPreference
 
+    private var accent: Color {
+        FullComputerLivePanelStyle.stopPanelColor(presentation.stopPanelAccent)
+    }
+
     var body: some View {
         VStack(spacing: 8) {
-            Text(String(localized: "live.fc.deco_stop.title"))
-                .font(DiveUI.Typography.warningTitle)
-                .foregroundStyle(DiveUI.yellow)
-                .frame(maxWidth: .infinity, alignment: .center)
+            if !presentation.stopPanelTitleKey.isEmpty {
+                Text(String(localized: String.LocalizationValue(presentation.stopPanelTitleKey)))
+                    .font(DiveUI.Typography.warningTitle)
+                    .foregroundStyle(accent)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+                    .multilineTextAlignment(.center)
+            }
 
-            HStack(spacing: 8) {
-                Image(systemName: "arrow.down.to.line")
-                    .font(.system(size: 22, weight: .black))
-                    .foregroundStyle(DiveUI.yellow)
+            if presentation.stopState == .decoCompleted {
+                completedBody
+            } else {
+                activeStopBody
+            }
+
+            bottomStatusRow
+        }
+        .padding(10)
+        .background(panelBackground)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilitySummary)
+    }
+
+    private var completedBody: some View {
+        VStack(spacing: 8) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 28, weight: .bold))
+                .foregroundStyle(DiveUI.green)
+            if let instructionKey = presentation.stopInstructionKey {
+                Text(String(localized: String.LocalizationValue(instructionKey)))
+                    .font(DiveUI.Typography.warningBody)
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.85)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var activeStopBody: some View {
+        VStack(spacing: 6) {
+            HStack(alignment: .center, spacing: 8) {
+                directionalIndicator
+                    .frame(width: 34)
                 if let depth = presentation.nextStopDepthMeters {
                     stopMetric(
-                        title: String(localized: "live.fc.deco_stop.depth"),
+                        title: String(localized: "live.fc.deco.stop_depth"),
                         value: depthDisplay(depth),
                         unit: units.depthUnitLabel
                     )
                 }
-                if let minutes = presentation.nextStopMinutes {
+                if let seconds = presentation.stopRemainingSeconds {
                     stopMetric(
                         title: String(localized: "live.fc.deco_stop.time"),
-                        value: stopTimeText(minutes),
+                        value: stopTimeText(seconds),
                         unit: "min"
                     )
                 }
             }
+            if let instructionKey = presentation.stopInstructionKey {
+                instructionText(instructionKey)
+            }
+        }
+    }
 
-            HStack {
+    @ViewBuilder
+    private var directionalIndicator: some View {
+        switch presentation.stopDirection {
+        case .hold:
+            HStack(spacing: 0) {
+                Capsule()
+                    .fill(accent)
+                    .frame(width: 18, height: 4)
+                Image(systemName: "arrow.left")
+                    .font(.system(size: 16, weight: .black))
+                    .foregroundStyle(accent)
+            }
+        case .ascend:
+            Image(systemName: "arrow.up")
+                .font(.system(size: 22, weight: .black))
+                .foregroundStyle(accent)
+        case .descend:
+            Image(systemName: "arrow.down")
+                .font(.system(size: 22, weight: .black))
+                .foregroundStyle(accent)
+        case .none:
+            Color.clear.frame(width: 22, height: 22)
+        }
+    }
+
+    private func instructionText(_ key: String) -> some View {
+        Text(instructionFormatted(key))
+            .font(DiveUI.Typography.hintCaptionBold)
+            .foregroundStyle(accent)
+            .multilineTextAlignment(.center)
+            .lineLimit(2)
+            .minimumScaleFactor(0.8)
+            .frame(maxWidth: .infinity)
+    }
+
+    private func instructionFormatted(_ key: String) -> String {
+        guard let depth = presentation.nextStopDepthMeters else {
+            return String(localized: String.LocalizationValue(key))
+        }
+        let depthText = depthDisplay(depth) + " " + units.depthUnitLabel
+        return String(format: String(localized: String.LocalizationValue(key)), depthText)
+    }
+
+    private var bottomStatusRow: some View {
+        HStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(String(localized: "live.fc.deco_stop.remaining"))
-                    .font(DiveUI.Typography.secondaryLabel)
+                    .font(DiveUI.Typography.hintCaption)
                     .foregroundStyle(.white)
-                Spacer()
                 Text("\(presentation.remainingStopCount)")
                     .font(DiveUI.Typography.statusValue)
-                    .foregroundStyle(DiveUI.orange)
+                    .foregroundStyle(
+                        presentation.stopState == .decoCompleted ? DiveUI.green : accent
+                    )
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
-            HStack {
+            Rectangle()
+                .fill(.white.opacity(0.34))
+                .frame(width: 1, height: 34)
+
+            VStack(alignment: .trailing, spacing: 2) {
                 Text(String(localized: "live.fc.deco_stop.ascent_allowed"))
-                    .font(DiveUI.Typography.secondaryLabel)
+                    .font(DiveUI.Typography.hintCaption)
                     .foregroundStyle(.white)
+                    .multilineTextAlignment(.trailing)
                     .lineLimit(2)
-                    .minimumScaleFactor(0.8)
-                Spacer()
+                    .minimumScaleFactor(0.75)
                 Text(presentation.ascentAllowedBetweenStops
                     ? String(localized: "live.fc.deco_stop.yes")
                     : String(localized: "live.fc.deco_stop.no"))
                     .font(DiveUI.Typography.statusValue)
                     .foregroundStyle(presentation.ascentAllowedBetweenStops ? DiveUI.green : DiveUI.red)
             }
+            .frame(maxWidth: .infinity, alignment: .trailing)
         }
-        .padding(10)
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(Color.black.opacity(0.42))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(DiveUI.yellow.opacity(0.86), lineWidth: 1.2)
-                )
-        )
-        .accessibilityElement(children: .combine)
+        .padding(.top, 4)
     }
 
     private func stopMetric(title: String, value: String, unit: String) -> some View {
@@ -248,25 +374,75 @@ struct FullComputerDecoStopPanel: View {
             Text(title)
                 .font(DiveUI.Typography.secondaryLabel)
                 .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
             HStack(alignment: .lastTextBaseline, spacing: 2) {
                 Text(value)
                     .font(.system(size: 24, weight: .black, design: .rounded))
                     .monospacedDigit()
-                    .foregroundStyle(DiveUI.yellow)
+                    .foregroundStyle(accent)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
                 Text(unit)
                     .font(DiveUI.Typography.unitLabel)
-                    .foregroundStyle(DiveUI.yellow)
+                    .foregroundStyle(accent)
             }
         }
         .frame(maxWidth: .infinity)
+    }
+
+    private var panelBackground: some View {
+        RoundedRectangle(cornerRadius: 12, style: .continuous)
+            .fill(Color.black.opacity(0.42))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(accent.opacity(0.86), lineWidth: 1.2)
+            )
     }
 
     private func depthDisplay(_ meters: Double) -> String {
         WatchDepthFormatting.display(meters: meters, units: units).valueText
     }
 
-    private func stopTimeText(_ minutes: Int) -> String {
-        String(format: "%d:%02d", minutes, 0)
+    private func stopTimeText(_ seconds: Int) -> String {
+        let minutes = seconds / 60
+        let remainder = seconds % 60
+        return String(format: "%d:%02d", minutes, remainder)
+    }
+
+    private var accessibilitySummary: String {
+        var parts: [String] = []
+        if !presentation.stopPanelTitleKey.isEmpty {
+            parts.append(String(localized: String.LocalizationValue(presentation.stopPanelTitleKey)))
+        }
+        if let depth = presentation.nextStopDepthMeters {
+            parts.append(
+                String(
+                    format: String(localized: "live.fc.a11y.stop_depth"),
+                    depthDisplay(depth),
+                    units.depthUnitLabel
+                )
+            )
+        }
+        if let seconds = presentation.stopRemainingSeconds {
+            parts.append(
+                String(
+                    format: String(localized: "live.fc.a11y.stop_time"),
+                    stopTimeText(seconds)
+                )
+            )
+        }
+        switch presentation.stopDirection {
+        case .ascend:
+            parts.append(String(localized: "live.fc.a11y.direction.ascend"))
+        case .descend:
+            parts.append(String(localized: "live.fc.a11y.direction.descend"))
+        case .hold:
+            parts.append(String(localized: "live.fc.a11y.direction.hold"))
+        case .none:
+            break
+        }
+        return parts.joined(separator: ". ")
     }
 }
 

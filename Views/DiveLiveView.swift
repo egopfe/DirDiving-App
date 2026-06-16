@@ -39,6 +39,10 @@ struct DiveLiveView: View {
         dive.fullComputerSnapshot?.decoPresentation
     }
 
+    private var fullComputerHidesManualControls: Bool {
+        isFullComputerMode && (fullComputerPresentation?.hideManualStopwatch == true)
+    }
+
     private var showsGaugeTTV: Bool {
         DIRStartupSelectionPolicy.gaugeShowsTTV
     }
@@ -105,6 +109,9 @@ struct DiveLiveView: View {
         .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.18) : nil, value: dive.alarmBlinkActive)
         .onChange(of: hapticsEnabled) { _, _ in
             dive.resyncHapticsAfterPreferenceChange()
+        }
+        .onChange(of: dive.fullComputerSnapshot?.decoPresentation) { _, presentation in
+            FullComputerDecoHapticCoordinator.shared.handlePresentationChange(presentation)
         }
         .confirmationDialog(String(localized: "live.stopwatch.reset.confirm.title"), isPresented: $showResetStopwatchConfirmation, titleVisibility: .visible) {
             Button(String(localized: "live.stopwatch.reset.confirm.action"), role: .destructive) {
@@ -302,21 +309,24 @@ struct DiveLiveView: View {
                 gaugeTopMetricsPanel
                     .layoutPriority(2)
                 if isFullComputerMode, let presentation = fullComputerPresentation {
+                    if let gas = presentation.activeGasLabel, presentation.mode == .decompression {
+                        FullComputerActiveGasBadge(gasLabel: gas)
+                    }
                     if presentation.showCeilingViolationBanner {
                         FullComputerCeilingViolationBanner()
                     }
-                    if presentation.showDecoStopPanel {
-                        FullComputerDecoStopPanel(presentation: presentation, units: unitPreference)
+                    if presentation.showDecoProgressPanel {
+                        FullComputerDecoStopStatePanel(presentation: presentation, units: unitPreference)
                     }
                 }
                 if !prioritizeDepthHero {
                     depthSection(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
                         .layoutPriority(2)
                 }
-                if !presentation.deferStopwatchPanel {
+                if !presentation.deferStopwatchPanel, !fullComputerHidesManualControls {
                     stopwatchPanel
                 }
-                if !presentation.deferControlsPanel {
+                if !presentation.deferControlsPanel, !fullComputerHidesManualControls {
                     controls
                         .layoutPriority(1)
                 }
@@ -621,14 +631,7 @@ struct DiveLiveView: View {
             return String(localized: "live.status.manual_dive")
         }
         if isFullComputerMode, let presentation = fullComputerPresentation {
-            switch presentation.immersionAccent {
-            case .diving:
-                return String(localized: "live.status.in_dive")
-            case .decompression:
-                return String(localized: "live.fc.status.deco")
-            case .ceilingViolation:
-                return String(localized: "live.fc.status.ceiling_violation")
-            }
+            return String(localized: String.LocalizationValue(presentation.immersionStatusKey))
         }
         return String(localized: "live.status.in_dive")
     }

@@ -1353,14 +1353,15 @@ final class DiveManager: ObservableObject {
             stopFullComputerRuntime()
             return
         }
-        let readiness = FullComputerRuntimeEngine.canStart()
+        let readiness = FullComputerRuntimeEngine.canStart(plan: FullComputerPrediveConfigurationStore.shared.runtimePlan())
         guard readiness.ready else {
             fullComputerEngine = nil
             fullComputerSnapshot = unavailableFullComputerSnapshot(diagnostics: readiness.diagnostics)
             return
         }
         do {
-            var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
+            let plan = FullComputerPrediveConfigurationStore.shared.runtimePlan()
+            var engine = try FullComputerRuntimeEngine(plan: plan, sessionStart: sessionStart)
             engine.tick(now: sessionStart)
             fullComputerEngine = engine
             fullComputerSnapshot = engine.snapshot
@@ -1448,7 +1449,17 @@ final class DiveManager: ObservableObject {
                 showDecoStopPanel: false,
                 showCeilingViolationBanner: false,
                 usedConservativeFallback: true,
-                diagnostics: diagnostics
+                diagnostics: diagnostics,
+                stopState: nil,
+                stopDirection: .none,
+                stopPanelAccent: .green,
+                stopPanelTitleKey: "",
+                stopInstructionKey: nil,
+                stopRemainingSeconds: nil,
+                activeGasLabel: plan.activeGas.name,
+                showDecoProgressPanel: false,
+                hideManualStopwatch: false,
+                timerAccruing: false
             )
         )
     }

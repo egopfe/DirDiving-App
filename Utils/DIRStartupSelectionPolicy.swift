@@ -85,7 +85,7 @@ enum DIRStartupSelectionPolicy {
             return .comingSoon(activity: activity)
         }
         if divingMode == .fullComputer {
-            return .fullComputerConfirmation
+            return .fullComputerPrediveConfiguration
         }
         return .ready(activity: activity, divingMode: divingMode)
     }
@@ -105,9 +105,13 @@ enum DIRStartupSelectionPolicy {
         divingMode: DIRDivingMode
     ) -> DIRStartupLaunchStep {
         if divingMode == .fullComputer {
-            return .fullComputerConfirmation
+            return .fullComputerPrediveConfiguration
         }
         return .ready(activity: activity, divingMode: divingMode)
+    }
+
+    static func nextStepAfterFullComputerConfiguration() -> DIRStartupLaunchStep {
+        .fullComputerConfirmation
     }
 
     private static func migrateLegacyPreferencesIfNeeded() {
