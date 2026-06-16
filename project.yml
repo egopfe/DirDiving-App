@@ -43,6 +43,7 @@ targets:
       - Utils/MonotonicElapsedClock.swift
       - Utils/GPSConfirmationPresentation.swift
       - Utils/DiveAlgorithmConfiguration.swift
+      - Utils/DiveAlgorithmSelfCheck.swift
       - Utils/DiveSessionAlgorithmValidator.swift
       - Utils/SensorSourceMode.swift
       - Utils/DepthSensorSourceResolution.swift
@@ -55,6 +56,12 @@ targets:
       - Models/DiveGPSConfirmation.swift
       - Services/AscentSafetyHapticCoordinator.swift
       - Services/GPSManager.swift
+      - Services/FullComputerRuntimeEngine.swift
+      - Utils/FullComputerRuntimeConfiguration.swift
+      - Utils/FullComputerRuntimeModels.swift
+      - Utils/FullComputerRuntimePlan.swift
+      - Utils/FullComputerDecoSolverModels.swift
+      - Utils/FullComputerDecoSolver.swift
       - Resources
       - path: Shared
     settings:
@@ -194,6 +201,12 @@ targets:
       - Models/DIRModesAndStartup.swift
       - Utils/DIRStartupSelectionPolicy.swift
       - Utils/GaugeLivePresentationPolicy.swift
+      - Utils/FullComputerRuntimeConfiguration.swift
+      - Utils/FullComputerRuntimeModels.swift
+      - Utils/FullComputerRuntimePlan.swift
+      - Utils/FullComputerDecoSolverModels.swift
+      - Utils/FullComputerDecoSolver.swift
+      - Services/FullComputerRuntimeEngine.swift
       - Utils/WatchModeSelectionPreferences.swift
       - Services/DIRActivitySelectionStore.swift
       - Services/AppNavigationStore.swift

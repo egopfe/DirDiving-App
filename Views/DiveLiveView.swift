@@ -31,6 +31,14 @@ struct DiveLiveView: View {
         dive.missionModeRuntimeProfile
     }
 
+    private var isFullComputerMode: Bool {
+        activitySelection.selectedDivingMode == .fullComputer
+    }
+
+    private var fullComputerPresentation: FullComputerDecoPresentation? {
+        dive.fullComputerSnapshot?.decoPresentation
+    }
+
     private var showsGaugeTTV: Bool {
         DIRStartupSelectionPolicy.gaugeShowsTTV
     }
@@ -293,6 +301,14 @@ struct DiveLiveView: View {
                 }
                 gaugeTopMetricsPanel
                     .layoutPriority(2)
+                if isFullComputerMode, let presentation = fullComputerPresentation {
+                    if presentation.showCeilingViolationBanner {
+                        FullComputerCeilingViolationBanner()
+                    }
+                    if presentation.showDecoStopPanel {
+                        FullComputerDecoStopPanel(presentation: presentation, units: unitPreference)
+                    }
+                }
                 if !prioritizeDepthHero {
                     depthSection(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
                         .layoutPriority(2)
@@ -577,15 +593,51 @@ struct DiveLiveView: View {
 
     private var immersionStatus: some View {
         HStack(spacing: 8) {
-            Image(systemName: "water.waves")
+            Image(systemName: immersionStatusIcon)
                 .font(.system(size: 18, weight: .black))
-            Text(dive.isManualLifecycleActive ? String(localized: "live.status.manual_dive") : String(localized: "live.status.in_dive"))
+            Text(immersionStatusText)
                 .font(DiveUI.Typography.statusTitle)
-                .lineLimit(1)
+                .lineLimit(2)
                 .minimumScaleFactor(0.8)
             Spacer(minLength: 0)
         }
-        .foregroundStyle(DiveUI.green)
+        .foregroundStyle(immersionStatusColor)
+        .accessibilityLabel(immersionStatusText)
+    }
+
+    private var immersionStatusIcon: String {
+        if isFullComputerMode, let presentation = fullComputerPresentation {
+            switch presentation.immersionAccent {
+            case .ceilingViolation: return "exclamationmark.triangle.fill"
+            case .decompression: return "water.waves"
+            case .diving: return "water.waves"
+            }
+        }
+        return "water.waves"
+    }
+
+    private var immersionStatusText: String {
+        if dive.isManualLifecycleActive {
+            return String(localized: "live.status.manual_dive")
+        }
+        if isFullComputerMode, let presentation = fullComputerPresentation {
+            switch presentation.immersionAccent {
+            case .diving:
+                return String(localized: "live.status.in_dive")
+            case .decompression:
+                return String(localized: "live.fc.status.deco")
+            case .ceilingViolation:
+                return String(localized: "live.fc.status.ceiling_violation")
+            }
+        }
+        return String(localized: "live.status.in_dive")
+    }
+
+    private var immersionStatusColor: Color {
+        if isFullComputerMode, let presentation = fullComputerPresentation {
+            return FullComputerLivePanelStyle.immersionColor(presentation.immersionAccent)
+        }
+        return DiveUI.green
     }
 
     private var simulationDepthBadge: some View {
@@ -653,13 +705,17 @@ struct DiveLiveView: View {
 
     @ViewBuilder
     private var gaugeTopMetricsPanel: some View {
-        switch gaugePresentation.topPanel {
-        case .hidden:
-            EmptyView()
-        case .ttvAndRuntime:
-            ttvRuntimePanel
-        case .runtimeAndTemperature:
-            gaugeRuntimeTemperaturePanel
+        if isFullComputerMode, let presentation = fullComputerPresentation {
+            FullComputerTopMetricsPanel(presentation: presentation)
+        } else {
+            switch gaugePresentation.topPanel {
+            case .hidden:
+                EmptyView()
+            case .ttvAndRuntime:
+                ttvRuntimePanel
+            case .runtimeAndTemperature:
+                gaugeRuntimeTemperaturePanel
+            }
         }
     }
 

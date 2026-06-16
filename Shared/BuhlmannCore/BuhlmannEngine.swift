@@ -787,4 +787,83 @@ enum BuhlmannEngine {
         }
         return result
     }
+
+    /// Live/runtime decompression projection from an arbitrary loaded tissue state and depth.
+    static func runtimeProjection(
+        tissueState: BuhlmannTissueState,
+        depthMeters: Double,
+        gas: BuhlmannGas,
+        gfLow: Double,
+        gfHigh: Double,
+        plannerEnvironment: PlannerEnvironment = .seaLevelSaltWater,
+        travelGases: [BuhlmannGas] = [],
+        decoGases: [BuhlmannGas] = [],
+        ascentRateMetersPerMinute: Double = BuhlmannConstants.defaultAscentRateMetersPerMinute,
+        stopIntervalMeters: Double = BuhlmannConstants.stopIntervalMeters
+    ) -> BuhlmannRuntimeProjection {
+        let safeDepth = max(0, depthMeters.isFinite ? depthMeters : 0)
+        let gfLowFraction = max(0, min(1, gfLow / 100.0))
+        let rawCeiling = tissueState.ceiling(gf: gfLowFraction, environment: plannerEnvironment)
+        let firstStopDepth = rawCeiling.depthMeters > 0.01
+            ? min(safeDepth, ceilToStop(rawCeiling.depthMeters, interval: stopIntervalMeters))
+            : 0
+        let operationalGf = gfAtDepth(
+            depthMeters: safeDepth,
+            firstStopDepthMeters: firstStopDepth,
+            gfLow: gfLow,
+            gfHigh: gfHigh
+        )
+        let operationalCeiling = tissueState.ceiling(gf: operationalGf, environment: plannerEnvironment)
+
+        let ndl: Double?
+        if safeDepth >= BuhlmannCoreConfiguration.minPlannerDepthMeters {
+            ndl = noDecompressionLimit(
+                depthMeters: safeDepth,
+                gas: gas,
+                gfHigh: gfHigh,
+                initialTissueState: tissueState,
+                plannerEnvironment: plannerEnvironment
+            )
+        } else {
+            ndl = noDecompressionLimit(
+                depthMeters: BuhlmannCoreConfiguration.minPlannerDepthMeters,
+                gas: gas,
+                gfHigh: gfHigh,
+                initialTissueState: tissueState,
+                plannerEnvironment: plannerEnvironment
+            )
+        }
+
+        let request = BuhlmannPlanRequest(
+            maxDepthMeters: max(safeDepth, BuhlmannCoreConfiguration.minPlannerDepthMeters),
+            bottomMinutes: 0,
+            bottomGas: gas,
+            travelGases: travelGases,
+            decoGases: decoGases,
+            gfLow: gfLow,
+            gfHigh: gfHigh,
+            ascentRateMetersPerMinute: ascentRateMetersPerMinute,
+            stopIntervalMeters: stopIntervalMeters,
+            initialTissueState: tissueState,
+            plannerEnvironment: plannerEnvironment
+        )
+        var segments: [BuhlmannRuntimeSegment] = []
+        let schedule = decompressionSchedule(
+            request: request,
+            stateAtBottom: tissueState,
+            currentDepthMeters: safeDepth,
+            currentGas: gas,
+            segments: &segments
+        )
+        let modelState: BuhlmannModelState = schedule.issues.isEmpty ? .validReference : .modelIncomplete
+        return BuhlmannRuntimeProjection(
+            ndlMinutes: ndl,
+            rawCeiling: rawCeiling,
+            operationalCeiling: operationalCeiling,
+            ttsMinutes: Int(ceil(schedule.elapsedMinutes)),
+            stops: schedule.stops,
+            issues: schedule.issues,
+            modelState: modelState
+        )
+    }
 }

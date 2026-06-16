@@ -11,7 +11,7 @@ final class DiveManager: ObservableObject {
         case finalizing
     }
 
-    private static let supportedDraftSchemaVersion = 2
+    private static let supportedDraftSchemaVersion = 3
     private static let minimumDraftSchemaVersion = 1
     private static let quarantineDirectoryName = "Diagnostics/Quarantine"
 
@@ -31,6 +31,8 @@ final class DiveManager: ObservableObject {
         let activeDiveExceededSupportedDepth: Bool
         let hasObservedSubmersionDuringCurrentDive: Bool
         let missionModeManualPendingForSession: Bool
+        let watchActivityMode: String?
+        let watchDivingMode: String?
         let createdAt: Date
         let updatedAt: Date
 
@@ -50,6 +52,8 @@ final class DiveManager: ObservableObject {
             activeDiveExceededSupportedDepth: Bool,
             hasObservedSubmersionDuringCurrentDive: Bool,
             missionModeManualPendingForSession: Bool = false,
+            watchActivityMode: String? = nil,
+            watchDivingMode: String? = nil,
             createdAt: Date,
             updatedAt: Date
         ) {
@@ -68,8 +72,19 @@ final class DiveManager: ObservableObject {
             self.activeDiveExceededSupportedDepth = activeDiveExceededSupportedDepth
             self.hasObservedSubmersionDuringCurrentDive = hasObservedSubmersionDuringCurrentDive
             self.missionModeManualPendingForSession = missionModeManualPendingForSession
+            self.watchActivityMode = watchActivityMode
+            self.watchDivingMode = watchDivingMode
             self.createdAt = createdAt
             self.updatedAt = updatedAt
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case schemaVersion, phase, sessionID, startDate, endDate, samples
+            case entryGPS, exitGPS, entryGPSFixSource, exitGPSFixSource
+            case isManualLifecycleActive, sessionStartedManually
+            case activeDiveExceededSupportedDepth, hasObservedSubmersionDuringCurrentDive
+            case missionModeManualPendingForSession, watchActivityMode, watchDivingMode
+            case createdAt, updatedAt
         }
 
         init(from decoder: Decoder) throws {
@@ -97,6 +112,8 @@ final class DiveManager: ObservableObject {
             activeDiveExceededSupportedDepth = try container.decode(Bool.self, forKey: .activeDiveExceededSupportedDepth)
             hasObservedSubmersionDuringCurrentDive = try container.decode(Bool.self, forKey: .hasObservedSubmersionDuringCurrentDive)
             missionModeManualPendingForSession = try container.decodeIfPresent(Bool.self, forKey: .missionModeManualPendingForSession) ?? false
+            watchActivityMode = try container.decodeIfPresent(String.self, forKey: .watchActivityMode)
+            watchDivingMode = try container.decodeIfPresent(String.self, forKey: .watchDivingMode)
             createdAt = try container.decode(Date.self, forKey: .createdAt)
             updatedAt = try container.decode(Date.self, forKey: .updatedAt)
         }
@@ -135,6 +152,7 @@ final class DiveManager: ObservableObject {
     @Published private(set) var diveReminderOverlay: DiveReminderOverlayContent?
     @Published private(set) var sessionActivityMode: DIRActivityMode = .diving
     @Published private(set) var sessionDivingMode: DIRDivingMode = .gauge
+    @Published private(set) var fullComputerSnapshot: FullComputerRuntimeSnapshot?
 
     private enum AlarmBlinkSource: Hashable {
         case ascent
@@ -207,6 +225,7 @@ final class DiveManager: ObservableObject {
     private var sessionStartedManually = false
     private var activeBlinkSources: Set<AlarmBlinkSource> = []
     private var lastReportedRuntime: TimeInterval = 0
+    private var fullComputerEngine: FullComputerRuntimeEngine?
 
     private let activeDiveDraftFileName = "dirdiving_active_dive_draft.json"
     private let stopwatchAccumulatedKey = "dirdiving_watch_stopwatch_accumulated"
@@ -385,6 +404,8 @@ final class DiveManager: ObservableObject {
             activeDiveExceededSupportedDepth: activeDiveExceededSupportedDepth,
             hasObservedSubmersionDuringCurrentDive: hasObservedSubmersionDuringCurrentDive,
             missionModeManualPendingForSession: missionModeManualPendingForSession,
+            watchActivityMode: sessionActivityMode.rawValue,
+            watchDivingMode: sessionDivingMode.rawValue,
             createdAt: start,
             updatedAt: now
         )
@@ -429,6 +450,8 @@ final class DiveManager: ObservableObject {
             activeDiveExceededSupportedDepth: activeDiveExceededSupportedDepth,
             hasObservedSubmersionDuringCurrentDive: false,
             missionModeManualPendingForSession: missionModeManualPendingForSession,
+            watchActivityMode: sessionActivityMode.rawValue,
+            watchDivingMode: sessionDivingMode.rawValue,
             createdAt: start,
             updatedAt: now
         )
@@ -512,6 +535,12 @@ final class DiveManager: ObservableObject {
         exceededSupportedDepthRange = draft.activeDiveExceededSupportedDepth
         hasObservedSubmersionDuringCurrentDive = draft.hasObservedSubmersionDuringCurrentDive
         missionModeManualPendingForSession = draft.missionModeManualPendingForSession
+        if let rawActivity = draft.watchActivityMode, let activity = DIRActivityMode(rawValue: rawActivity) {
+            sessionActivityMode = activity
+        }
+        if let rawDiving = draft.watchDivingMode, let divingMode = DIRDivingMode(rawValue: rawDiving) {
+            sessionDivingMode = divingMode
+        }
 
         if let lastSample = restoredSamples.last {
             currentDepthMeters = lastSample.depthMeters
@@ -543,6 +572,7 @@ final class DiveManager: ObservableObject {
         updateRuntimeFromClock(evaluateAlarms: false)
         gpsManager.start()
         startRuntimeTimer()
+        restoreFullComputerRuntimeIfNeeded(samples: restoredSamples, sessionStart: draft.startDate)
         applyMissionModeIfNeededOnDiveStart(restored: true)
     }
 
@@ -648,6 +678,7 @@ final class DiveManager: ObservableObject {
         lastReportedRuntime = runtime
         evaluateDepthCallbackFreshness()
         ttv = DiveAlgorithm.ttvIndex(averageDepthMeters: averageDepthMeters, durationSeconds: runtime)
+        tickFullComputerRuntimeIfNeeded()
         if evaluateAlarms {
             evaluateRuntimeAlarms()
             evaluateDiveReminders()
@@ -834,6 +865,7 @@ final class DiveManager: ObservableObject {
         runtime = 0
         ttv = 0
         lastReportedRuntime = 0
+        startFullComputerRuntimeIfNeeded(sessionStart: start)
         persistActiveDiveDraft(immediate: true)
         startRuntimeTimer()
     }
@@ -863,6 +895,7 @@ final class DiveManager: ObservableObject {
         stopAllBlinking()
         ascentHaptics.clear()
         runtimeClock.clear()
+        stopFullComputerRuntime()
         isDepthDataStale = false
         depthDataUsesLastKnownReading = false
         let end = Date()
@@ -1061,6 +1094,7 @@ final class DiveManager: ObservableObject {
             evaluateDepthAlarm()
         }
         updateAscentRate(with: storedSample)
+        ingestFullComputerSample(storedSample)
         previousDepthSample = storedSample
         persistActiveDiveDraft(immediate: samples.count <= 1)
         evaluateAutomaticSurfaceCandidate(
@@ -1306,6 +1340,117 @@ final class DiveManager: ObservableObject {
         isMissionModeActive = false
         missionModeManualPendingForSession = false
         missionModeActivationSource = nil
+    }
+
+    // MARK: - Full Computer runtime
+
+    private var isFullComputerDiveActive: Bool {
+        isDiveActive && sessionDivingMode == .fullComputer
+    }
+
+    private func startFullComputerRuntimeIfNeeded(sessionStart: Date) {
+        guard sessionDivingMode == .fullComputer else {
+            stopFullComputerRuntime()
+            return
+        }
+        let readiness = FullComputerRuntimeEngine.canStart()
+        guard readiness.ready else {
+            fullComputerEngine = nil
+            fullComputerSnapshot = unavailableFullComputerSnapshot(diagnostics: readiness.diagnostics)
+            return
+        }
+        do {
+            var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
+            engine.tick(now: sessionStart)
+            fullComputerEngine = engine
+            fullComputerSnapshot = engine.snapshot
+        } catch FullComputerRuntimeStartupFailure.invalidPlan(let diagnostics) {
+            fullComputerEngine = nil
+            fullComputerSnapshot = unavailableFullComputerSnapshot(diagnostics: diagnostics)
+        } catch {
+            fullComputerEngine = nil
+            fullComputerSnapshot = unavailableFullComputerSnapshot(diagnostics: ["startup_failed"])
+        }
+    }
+
+    private func restoreFullComputerRuntimeIfNeeded(samples: [DiveSample], sessionStart: Date) {
+        guard sessionDivingMode == .fullComputer else {
+            stopFullComputerRuntime()
+            return
+        }
+        startFullComputerRuntimeIfNeeded(sessionStart: sessionStart)
+        guard var engine = fullComputerEngine else { return }
+        engine.replaySamples(samples)
+        engine.tick(now: Date())
+        fullComputerEngine = engine
+        fullComputerSnapshot = engine.snapshot
+    }
+
+    private func stopFullComputerRuntime() {
+        fullComputerEngine = nil
+        fullComputerSnapshot = nil
+    }
+
+    private func ingestFullComputerSample(_ sample: DiveSample) {
+        guard isFullComputerDiveActive else { return }
+        guard var engine = fullComputerEngine else { return }
+        if !engine.ingestSample(depthMeters: sample.depthMeters, timestamp: sample.timestamp) {
+            engine.tick(now: sample.timestamp)
+        }
+        fullComputerEngine = engine
+        fullComputerSnapshot = engine.snapshot
+    }
+
+    private func tickFullComputerRuntimeIfNeeded(now: Date = Date()) {
+        guard isFullComputerDiveActive, var engine = fullComputerEngine else { return }
+        engine.tick(now: now)
+        fullComputerEngine = engine
+        fullComputerSnapshot = engine.snapshot
+    }
+
+    private func unavailableFullComputerSnapshot(diagnostics: [String]) -> FullComputerRuntimeSnapshot {
+        let plan = FullComputerRuntimePlan.defaultAirGF3070
+        let tissue = BuhlmannTissueState.airSaturated(surfacePressureBar: plan.plannerEnvironment.surfacePressureBar)
+        return FullComputerRuntimeSnapshot(
+            engineState: .unavailable,
+            tissueState: tissue,
+            activeGas: plan.activeGas,
+            gfLow: plan.gfLow,
+            gfHigh: plan.gfHigh,
+            monotonicElapsedSeconds: 0,
+            lastSampleTimestamp: nil,
+            depthMeters: 0,
+            ambientPressureBar: plan.plannerEnvironment.surfacePressureBar,
+            ndlMinutes: nil,
+            rawCeilingMeters: 0,
+            operationalCeilingMeters: 0,
+            controllingCompartmentRaw: 0,
+            controllingCompartmentOperational: 0,
+            ttsMinutes: 0,
+            stops: [],
+            modelState: .unavailable,
+            diagnostics: diagnostics,
+            decoPresentation: FullComputerDecoPresentation(
+                mode: .noDecompression,
+                immersionAccent: .diving,
+                immersionStatusKey: "live.status.in_dive",
+                ndlDisplayMinutes: nil,
+                ndlAccent: nil,
+                ttsMinutes: 0,
+                runtimeMinutes: 0,
+                ceilingMetersExact: 0,
+                ceilingMetersRounded: 0,
+                nextStopDepthMeters: nil,
+                nextStopMinutes: nil,
+                remainingStopCount: 0,
+                ceilingViolation: false,
+                ascentAllowedBetweenStops: false,
+                showDecoStopPanel: false,
+                showCeilingViolationBanner: false,
+                usedConservativeFallback: true,
+                diagnostics: diagnostics
+            )
+        )
     }
 }
 
