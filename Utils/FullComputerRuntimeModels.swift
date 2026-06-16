@@ -27,6 +27,9 @@ struct FullComputerRuntimeSnapshot: Hashable {
     let modelState: BuhlmannModelState
     let diagnostics: [String]
     let decoPresentation: FullComputerDecoPresentation
+    let gasSwitchSurface: FullComputerGasSwitchSurface
+    let runtimeGasRows: [FullComputerRuntimeGasRow]
+    let gasSwitchAuditEvents: [FullComputerGasSwitchAuditEvent]
 }
 
 enum FullComputerRuntimeStartupFailure: Error, Equatable {

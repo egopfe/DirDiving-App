@@ -11,7 +11,7 @@ final class DiveManager: ObservableObject {
         case finalizing
     }
 
-    private static let supportedDraftSchemaVersion = 3
+    private static let supportedDraftSchemaVersion = 4
     private static let minimumDraftSchemaVersion = 1
     private static let quarantineDirectoryName = "Diagnostics/Quarantine"
 
@@ -33,6 +33,7 @@ final class DiveManager: ObservableObject {
         let missionModeManualPendingForSession: Bool
         let watchActivityMode: String?
         let watchDivingMode: String?
+        let fullComputerGasSwitchTracker: FullComputerGasSwitchTracker?
         let createdAt: Date
         let updatedAt: Date
 
@@ -54,6 +55,7 @@ final class DiveManager: ObservableObject {
             missionModeManualPendingForSession: Bool = false,
             watchActivityMode: String? = nil,
             watchDivingMode: String? = nil,
+            fullComputerGasSwitchTracker: FullComputerGasSwitchTracker? = nil,
             createdAt: Date,
             updatedAt: Date
         ) {
@@ -74,6 +76,7 @@ final class DiveManager: ObservableObject {
             self.missionModeManualPendingForSession = missionModeManualPendingForSession
             self.watchActivityMode = watchActivityMode
             self.watchDivingMode = watchDivingMode
+            self.fullComputerGasSwitchTracker = fullComputerGasSwitchTracker
             self.createdAt = createdAt
             self.updatedAt = updatedAt
         }
@@ -84,7 +87,7 @@ final class DiveManager: ObservableObject {
             case isManualLifecycleActive, sessionStartedManually
             case activeDiveExceededSupportedDepth, hasObservedSubmersionDuringCurrentDive
             case missionModeManualPendingForSession, watchActivityMode, watchDivingMode
-            case createdAt, updatedAt
+            case fullComputerGasSwitchTracker, createdAt, updatedAt
         }
 
         init(from decoder: Decoder) throws {
@@ -114,6 +117,10 @@ final class DiveManager: ObservableObject {
             missionModeManualPendingForSession = try container.decodeIfPresent(Bool.self, forKey: .missionModeManualPendingForSession) ?? false
             watchActivityMode = try container.decodeIfPresent(String.self, forKey: .watchActivityMode)
             watchDivingMode = try container.decodeIfPresent(String.self, forKey: .watchDivingMode)
+            fullComputerGasSwitchTracker = try container.decodeIfPresent(
+                FullComputerGasSwitchTracker.self,
+                forKey: .fullComputerGasSwitchTracker
+            )
             createdAt = try container.decode(Date.self, forKey: .createdAt)
             updatedAt = try container.decode(Date.self, forKey: .updatedAt)
         }
@@ -406,6 +413,9 @@ final class DiveManager: ObservableObject {
             missionModeManualPendingForSession: missionModeManualPendingForSession,
             watchActivityMode: sessionActivityMode.rawValue,
             watchDivingMode: sessionDivingMode.rawValue,
+            fullComputerGasSwitchTracker: sessionDivingMode == .fullComputer
+                ? fullComputerEngine?.persistedGasSwitchTracker
+                : nil,
             createdAt: start,
             updatedAt: now
         )
@@ -572,7 +582,11 @@ final class DiveManager: ObservableObject {
         updateRuntimeFromClock(evaluateAlarms: false)
         gpsManager.start()
         startRuntimeTimer()
-        restoreFullComputerRuntimeIfNeeded(samples: restoredSamples, sessionStart: draft.startDate)
+        restoreFullComputerRuntimeIfNeeded(
+            samples: restoredSamples,
+            sessionStart: draft.startDate,
+            gasSwitchTracker: draft.fullComputerGasSwitchTracker
+        )
         applyMissionModeIfNeededOnDiveStart(restored: true)
     }
 
@@ -1374,7 +1388,11 @@ final class DiveManager: ObservableObject {
         }
     }
 
-    private func restoreFullComputerRuntimeIfNeeded(samples: [DiveSample], sessionStart: Date) {
+    private func restoreFullComputerRuntimeIfNeeded(
+        samples: [DiveSample],
+        sessionStart: Date,
+        gasSwitchTracker: FullComputerGasSwitchTracker? = nil
+    ) {
         guard sessionDivingMode == .fullComputer else {
             stopFullComputerRuntime()
             return
@@ -1382,9 +1400,46 @@ final class DiveManager: ObservableObject {
         startFullComputerRuntimeIfNeeded(sessionStart: sessionStart)
         guard var engine = fullComputerEngine else { return }
         engine.replaySamples(samples)
+        if let gasSwitchTracker {
+            engine.restoreGasSwitchTracker(gasSwitchTracker)
+        }
         engine.tick(now: Date())
         fullComputerEngine = engine
         fullComputerSnapshot = engine.snapshot
+    }
+
+    func confirmFullComputerGasSwitch(gasMixId: UUID) {
+        guard var engine = fullComputerEngine else { return }
+        guard engine.confirmGasSwitch(to: gasMixId, at: Date()) else { return }
+        HapticService.shared.confirm()
+        fullComputerEngine = engine
+        fullComputerSnapshot = engine.snapshot
+        persistActiveDiveDraft()
+    }
+
+    func ignoreFullComputerGasSwitch(gasMixId: UUID) {
+        guard var engine = fullComputerEngine else { return }
+        engine.ignoreSuggestedGasSwitch(gasMixId: gasMixId, at: Date())
+        HapticService.shared.notify()
+        fullComputerEngine = engine
+        fullComputerSnapshot = engine.snapshot
+        persistActiveDiveDraft()
+    }
+
+    func dismissFullComputerMissedGasSwitch() {
+        guard var engine = fullComputerEngine else { return }
+        engine.dismissMissedGasSwitchPrompt()
+        fullComputerEngine = engine
+        fullComputerSnapshot = engine.snapshot
+    }
+
+    func markFullComputerGasUnavailable(gasMixId: UUID) {
+        guard var engine = fullComputerEngine else { return }
+        engine.markGasUnavailable(gasMixId: gasMixId, at: Date())
+        HapticService.shared.warnIfNeeded()
+        fullComputerEngine = engine
+        fullComputerSnapshot = engine.snapshot
+        persistActiveDiveDraft()
     }
 
     private func stopFullComputerRuntime() {
@@ -1460,7 +1515,10 @@ final class DiveManager: ObservableObject {
                 showDecoProgressPanel: false,
                 hideManualStopwatch: false,
                 timerAccruing: false
-            )
+            ),
+            gasSwitchSurface: .none,
+            runtimeGasRows: [],
+            gasSwitchAuditEvents: []
         )
     }
 }

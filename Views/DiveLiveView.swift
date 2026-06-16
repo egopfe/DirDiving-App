@@ -12,6 +12,7 @@ struct DiveLiveView: View {
     @AppStorage(HapticService.hapticsEnabledKey) private var hapticsEnabled = true
     @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
     @State private var showResetStopwatchConfirmation = false
+    @State private var showRuntimeGasList = false
 
     private var unitPreference: DIRUnitPreference { DIRUnitPreference.fromStorage(watchUnits) }
 
@@ -105,6 +106,22 @@ struct DiveLiveView: View {
                     dive.dismissDiveReminderOverlay()
                 }
             }
+
+            if isFullComputerMode,
+               dive.isDiveActive,
+               case .available(let prompt) = dive.fullComputerSnapshot?.gasSwitchSurface {
+                Color.black.opacity(0.94)
+                    .ignoresSafeArea()
+                FullComputerGasSwitchAvailableView(
+                    prompt: prompt,
+                    onIgnore: {
+                        dive.ignoreFullComputerGasSwitch(gasMixId: prompt.suggestedGasMixId)
+                    },
+                    onConfirm: {
+                        dive.confirmFullComputerGasSwitch(gasMixId: prompt.suggestedGasMixId)
+                    }
+                )
+            }
         }
         .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.18) : nil, value: dive.alarmBlinkActive)
         .onChange(of: hapticsEnabled) { _, _ in
@@ -112,6 +129,14 @@ struct DiveLiveView: View {
         }
         .onChange(of: dive.fullComputerSnapshot?.decoPresentation) { _, presentation in
             FullComputerDecoHapticCoordinator.shared.handlePresentationChange(presentation)
+        }
+        .onChange(of: dive.fullComputerSnapshot?.gasSwitchSurface) { _, surface in
+            if case .available = surface {
+                HapticService.shared.notify()
+            }
+        }
+        .sheet(isPresented: $showRuntimeGasList) {
+            FullComputerRuntimeDecoGasListView()
         }
         .confirmationDialog(String(localized: "live.stopwatch.reset.confirm.title"), isPresented: $showResetStopwatchConfirmation, titleVisibility: .visible) {
             Button(String(localized: "live.stopwatch.reset.confirm.action"), role: .destructive) {
@@ -310,7 +335,19 @@ struct DiveLiveView: View {
                     .layoutPriority(2)
                 if isFullComputerMode, let presentation = fullComputerPresentation {
                     if let gas = presentation.activeGasLabel, presentation.mode == .decompression {
-                        FullComputerActiveGasBadge(gasLabel: gas)
+                        Button {
+                            showRuntimeGasList = true
+                        } label: {
+                            FullComputerActiveGasBadge(gasLabel: gas)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    if case .missed(let missed) = dive.fullComputerSnapshot?.gasSwitchSurface {
+                        FullComputerGasSwitchMissedPanel(
+                            prompt: missed,
+                            onContinue: { dive.dismissFullComputerMissedGasSwitch() },
+                            onChangeGas: { showRuntimeGasList = true }
+                        )
                     }
                     if presentation.showCeilingViolationBanner {
                         FullComputerCeilingViolationBanner()

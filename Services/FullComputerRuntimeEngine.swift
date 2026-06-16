@@ -11,7 +11,16 @@ struct FullComputerRuntimeEngine: Equatable {
     private var monotonicClock: MonotonicElapsedClock
     private var previousEngineState: FullComputerRuntimeEngineState
     private var decoStopTracker: FullComputerDecoStopTracker
+    private var gasSwitchTracker: FullComputerGasSwitchTracker
     private var lastTickTimestamp: Date
+
+    var gasSwitchAuditTrail: [FullComputerGasSwitchAuditEvent] { gasSwitchTracker.events }
+    var persistedGasSwitchTracker: FullComputerGasSwitchTracker { gasSwitchTracker }
+
+    mutating func restoreGasSwitchTracker(_ tracker: FullComputerGasSwitchTracker) {
+        gasSwitchTracker = tracker
+        refreshSnapshot(engineState: snapshot.engineState, diagnostics: snapshot.diagnostics)
+    }
 
     static func canStart(
         plan: FullComputerRuntimePlan = .defaultAirGF3070,
@@ -38,6 +47,8 @@ struct FullComputerRuntimeEngine: Equatable {
         monotonicClock.reset(anchorDate: sessionStart)
         previousEngineState = .valid
         decoStopTracker = .initial
+        gasSwitchTracker = .initial
+        gasSwitchTracker.bootstrap(bottomGasMixId: plan.activeGas.gasMixId)
         lastTickTimestamp = sessionStart
         var tracker = FullComputerDecoStopTracker.initial
         snapshot = Self.makeSnapshot(
@@ -49,6 +60,7 @@ struct FullComputerRuntimeEngine: Equatable {
             lastSampleTimestamp: nil,
             diagnostics: [],
             decoStopTracker: &tracker,
+            gasSwitchTracker: &gasSwitchTracker,
             deltaSeconds: 0
         )
         decoStopTracker = tracker
@@ -140,8 +152,99 @@ struct FullComputerRuntimeEngine: Equatable {
             environment: plan.plannerEnvironment
         )
         lastComputedTimestamp = lastComputedTimestamp.addingTimeInterval(switchSeconds)
+        gasSwitchTracker.confirmedGasMixIds.insert(gas.gasMixId)
+        gasSwitchTracker.activeMissedGasMixId = nil
         refreshSnapshot(engineState: .valid, diagnostics: ["gas_switch:\(gas.name)"])
         previousEngineState = .valid
+    }
+
+    mutating func confirmGasSwitch(to gasMixId: UUID, at timestamp: Date = Date()) -> Bool {
+        guard let gas = plannedSwitchGases().first(where: { $0.gasMixId == gasMixId }) else { return false }
+        guard FullComputerGasSwitchPolicy.isBreathable(
+            gas,
+            depthMeters: lastDepthMeters,
+            environment: plan.plannerEnvironment
+        ) else { return false }
+        let fromID = plan.activeGas.gasMixId
+        changeGas(gas, at: timestamp)
+        gasSwitchTracker.events.append(
+            FullComputerGasSwitchAuditEvent(
+                timestamp: timestamp,
+                kind: .confirmed,
+                depthMeters: lastDepthMeters,
+                fromGasMixId: fromID,
+                toGasMixId: gasMixId
+            )
+        )
+        return true
+    }
+
+    mutating func confirmOffPlanGasSwitch(_ gas: BuhlmannGas, at timestamp: Date = Date()) -> Bool {
+        guard gas.isCompositionValid else { return false }
+        guard FullComputerGasSwitchPolicy.isBreathable(
+            gas,
+            depthMeters: lastDepthMeters,
+            environment: plan.plannerEnvironment
+        ) else { return false }
+        let fromID = plan.activeGas.gasMixId
+        changeGas(gas, at: timestamp)
+        gasSwitchTracker.events.append(
+            FullComputerGasSwitchAuditEvent(
+                timestamp: timestamp,
+                kind: .offPlan,
+                depthMeters: lastDepthMeters,
+                fromGasMixId: fromID,
+                toGasMixId: gas.gasMixId,
+                note: gas.name
+            )
+        )
+        return true
+    }
+
+    mutating func ignoreSuggestedGasSwitch(gasMixId: UUID, at timestamp: Date = Date()) {
+        guard let gas = plannedSwitchGases().first(where: { $0.gasMixId == gasMixId }) else { return }
+        let key = FullComputerGasSwitchTracker.opportunityKey(
+            gasMixId: gasMixId,
+            switchDepthMeters: gas.switchDepthMeters
+        )
+        gasSwitchTracker.ignoredOpportunityKeys.insert(key)
+        gasSwitchTracker.activeMissedGasMixId = gasMixId
+        gasSwitchTracker.events.append(
+            FullComputerGasSwitchAuditEvent(
+                timestamp: timestamp,
+                kind: .ignored,
+                depthMeters: lastDepthMeters,
+                fromGasMixId: plan.activeGas.gasMixId,
+                toGasMixId: gasMixId
+            )
+        )
+        refreshSnapshot(engineState: snapshot.engineState, diagnostics: snapshot.diagnostics)
+    }
+
+    mutating func dismissMissedGasSwitchPrompt() {
+        gasSwitchTracker.activeMissedGasMixId = nil
+        refreshSnapshot(engineState: snapshot.engineState, diagnostics: snapshot.diagnostics)
+    }
+
+    mutating func markGasUnavailable(gasMixId: UUID, at timestamp: Date = Date()) {
+        gasSwitchTracker.unavailableGasMixIds.insert(gasMixId)
+        gasSwitchTracker.events.append(
+            FullComputerGasSwitchAuditEvent(
+                timestamp: timestamp,
+                kind: .unavailable,
+                depthMeters: lastDepthMeters,
+                fromGasMixId: plan.activeGas.gasMixId,
+                toGasMixId: gasMixId
+            )
+        )
+        if gasSwitchTracker.activeMissedGasMixId == gasMixId {
+            gasSwitchTracker.activeMissedGasMixId = nil
+        }
+        refreshSnapshot(engineState: snapshot.engineState, diagnostics: snapshot.diagnostics)
+    }
+
+    private func plannedSwitchGases() -> [BuhlmannGas] {
+        plan.decoGases + plan.travelGases
     }
 
     mutating func replaySamples(_ samples: [DiveSample]) {
@@ -207,6 +310,7 @@ struct FullComputerRuntimeEngine: Equatable {
             lastSampleTimestamp: lastSampleTimestamp,
             diagnostics: diagnostics,
             decoStopTracker: &decoStopTracker,
+            gasSwitchTracker: &gasSwitchTracker,
             deltaSeconds: delta
         )
     }
@@ -230,8 +334,10 @@ struct FullComputerRuntimeEngine: Equatable {
         lastSampleTimestamp: Date?,
         diagnostics: [String],
         decoStopTracker: inout FullComputerDecoStopTracker,
+        gasSwitchTracker: inout FullComputerGasSwitchTracker,
         deltaSeconds: TimeInterval
     ) -> FullComputerRuntimeSnapshot {
+        let projectionGases = FullComputerGasSwitchPolicy.projectionGases(from: plan, tracker: gasSwitchTracker)
         let projection = BuhlmannEngine.runtimeProjection(
             tissueState: tissueState,
             depthMeters: depthMeters,
@@ -239,8 +345,8 @@ struct FullComputerRuntimeEngine: Equatable {
             gfLow: plan.gfLow,
             gfHigh: plan.gfHigh,
             plannerEnvironment: plan.plannerEnvironment,
-            travelGases: plan.travelGases,
-            decoGases: plan.decoGases,
+            travelGases: projectionGases.travel,
+            decoGases: projectionGases.deco,
             ascentRateMetersPerMinute: plan.ascentRateMetersPerMinute,
             stopIntervalMeters: plan.stopIntervalMeters
         )
@@ -249,11 +355,14 @@ struct FullComputerRuntimeEngine: Equatable {
             environment: plan.plannerEnvironment
         ) ?? plan.plannerEnvironment.surfacePressureBar
         let runtimeMinutes = max(0, Int(monotonicElapsedSeconds / 60.0))
+        var projectionPlan = plan
+        projectionPlan.travelGases = projectionGases.travel
+        projectionPlan.decoGases = projectionGases.deco
         let basePresentation = FullComputerDecoSolver.solve(
             input: FullComputerDecoSolverInput(
                 tissueState: tissueState,
                 depthMeters: depthMeters,
-                plan: plan,
+                plan: projectionPlan,
                 runtimeMinutes: runtimeMinutes
             )
         )
@@ -273,6 +382,21 @@ struct FullComputerRuntimeEngine: Equatable {
         )
         decoStopTracker = machine.tracker
         let decoPresentation = FullComputerDecoSolver.applyingStopMachine(basePresentation, machine: machine)
+        let planned = plan.decoGases + plan.travelGases
+        let gasSwitchSurface = FullComputerGasSwitchPolicy.evaluateSurface(
+            activeGas: plan.activeGas,
+            depthMeters: depthMeters,
+            plannedGases: planned,
+            tracker: gasSwitchTracker,
+            environment: plan.plannerEnvironment
+        )
+        let runtimeGasRows = FullComputerGasSwitchPolicy.runtimeGasRows(
+            activeGas: plan.activeGas,
+            depthMeters: depthMeters,
+            plannedGases: planned,
+            tracker: gasSwitchTracker,
+            environment: plan.plannerEnvironment
+        )
         return FullComputerRuntimeSnapshot(
             engineState: engineState,
             tissueState: tissueState,
@@ -292,7 +416,10 @@ struct FullComputerRuntimeEngine: Equatable {
             stops: projection.stops,
             modelState: projection.modelState,
             diagnostics: diagnostics,
-            decoPresentation: decoPresentation
+            decoPresentation: decoPresentation,
+            gasSwitchSurface: gasSwitchSurface,
+            runtimeGasRows: runtimeGasRows,
+            gasSwitchAuditEvents: gasSwitchTracker.events
         )
     }
 }

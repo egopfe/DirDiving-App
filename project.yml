@@ -64,6 +64,8 @@ targets:
       - Utils/FullComputerDecoSolver.swift
       - Utils/FullComputerDecoStopConfiguration.swift
       - Utils/FullComputerDecoStopStateMachine.swift
+      - Utils/FullComputerGasSwitchModels.swift
+      - Utils/FullComputerGasSwitchPolicy.swift
       - Utils/FullComputerGasProfileValidator.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
@@ -216,6 +218,8 @@ targets:
       - Utils/FullComputerDecoSolver.swift
       - Utils/FullComputerDecoStopConfiguration.swift
       - Utils/FullComputerDecoStopStateMachine.swift
+      - Utils/FullComputerGasSwitchModels.swift
+      - Utils/FullComputerGasSwitchPolicy.swift
       - Utils/FullComputerGasProfileValidator.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
