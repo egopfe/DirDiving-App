@@ -65,6 +65,9 @@ struct FullComputerActiveGasBadge: View {
 struct FullComputerTopMetricsPanel: View {
     let presentation: FullComputerDecoPresentation
 
+    private var minuteUnit: String { String(localized: "live.unit.min") }
+    private var depthUnit: String { String(localized: "live.unit.m") }
+
     var body: some View {
         Group {
             switch presentation.mode {
@@ -85,7 +88,7 @@ struct FullComputerTopMetricsPanel: View {
             metricColumn(
                 title: String(localized: "live.fc.metric.ndl"),
                 value: ndlValueText,
-                unit: "min",
+                unit: minuteUnit,
                 valueColor: FullComputerLivePanelStyle.accentColor(presentation.ndlAccent),
                 footer: String(localized: "live.fc.metric.ndl.footer")
             )
@@ -93,7 +96,7 @@ struct FullComputerTopMetricsPanel: View {
             metricColumn(
                 title: String(localized: "live.metric.runtime"),
                 value: "\(presentation.runtimeMinutes)",
-                unit: "min",
+                unit: minuteUnit,
                 valueColor: .white,
                 footer: nil
             )
@@ -105,7 +108,7 @@ struct FullComputerTopMetricsPanel: View {
             metricColumn(
                 title: String(localized: "live.fc.metric.tts"),
                 value: "\(presentation.ttsMinutes)",
-                unit: "min",
+                unit: minuteUnit,
                 valueColor: presentation.ceilingViolation ? DiveUI.red : .white,
                 footer: String(localized: "live.fc.metric.tts.footer")
             )
@@ -113,7 +116,7 @@ struct FullComputerTopMetricsPanel: View {
             metricColumn(
                 title: String(localized: "live.fc.metric.ceiling"),
                 value: ceilingValueText,
-                unit: "m",
+                unit: depthUnit,
                 valueColor: presentation.stopState == .decoCompleted ? DiveUI.green : DiveUI.blue,
                 footer: presentation.stopState == .decoCompleted
                     ? String(localized: "live.fc.metric.ceiling.completed.footer")
@@ -123,7 +126,7 @@ struct FullComputerTopMetricsPanel: View {
             metricColumn(
                 title: String(localized: "live.metric.runtime"),
                 value: "\(presentation.runtimeMinutes)",
-                unit: "min",
+                unit: minuteUnit,
                 valueColor: .white,
                 footer: nil
             )
@@ -155,7 +158,7 @@ struct FullComputerTopMetricsPanel: View {
         VStack(spacing: 3) {
             Text(title)
                 .font(DiveUI.Typography.dashboardLabel)
-                .foregroundStyle(.white)
+                .foregroundStyle(DiveUI.blue)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
             HStack(alignment: .lastTextBaseline, spacing: 3) {
@@ -168,7 +171,7 @@ struct FullComputerTopMetricsPanel: View {
                 if let unit {
                     Text(unit)
                         .font(DiveUI.Typography.dashboardUnit)
-                        .foregroundStyle(valueColor)
+                        .foregroundStyle(unitColor(for: valueColor))
                         .padding(.bottom, 4)
                 }
             }
@@ -185,12 +188,16 @@ struct FullComputerTopMetricsPanel: View {
         .padding(.vertical, 4)
     }
 
+    private func unitColor(for valueColor: Color) -> Color {
+        valueColor == .white ? DiveUI.blue : valueColor
+    }
+
     private var panelBackground: some View {
-        RoundedRectangle(cornerRadius: 12, style: .continuous)
-            .fill(Color.black.opacity(0.42))
+        RoundedRectangle(cornerRadius: DiveUI.panelRadius, style: .continuous)
+            .fill(DiveUI.panelFill)
             .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(FullComputerLivePanelStyle.panelStroke(presentation).opacity(0.86), lineWidth: 1.4)
+                RoundedRectangle(cornerRadius: DiveUI.panelRadius, style: .continuous)
+                    .stroke(FullComputerLivePanelStyle.panelStroke(presentation).opacity(0.86), lineWidth: 1)
             )
     }
 
@@ -280,7 +287,7 @@ struct FullComputerDecoStopStatePanel: View {
                     stopMetric(
                         title: String(localized: "live.fc.deco_stop.time"),
                         value: stopTimeText(seconds),
-                        unit: "min"
+                        unit: String(localized: "live.unit.min")
                     )
                 }
             }
@@ -338,7 +345,7 @@ struct FullComputerDecoStopStatePanel: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(String(localized: "live.fc.deco_stop.remaining"))
                     .font(DiveUI.Typography.hintCaption)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(DiveUI.blue)
                 Text("\(presentation.remainingStopCount)")
                     .font(DiveUI.Typography.statusValue)
                     .foregroundStyle(
@@ -354,7 +361,7 @@ struct FullComputerDecoStopStatePanel: View {
             VStack(alignment: .trailing, spacing: 2) {
                 Text(String(localized: "live.fc.deco_stop.ascent_allowed"))
                     .font(DiveUI.Typography.hintCaption)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(DiveUI.blue)
                     .multilineTextAlignment(.trailing)
                     .lineLimit(2)
                     .minimumScaleFactor(0.75)
@@ -373,7 +380,7 @@ struct FullComputerDecoStopStatePanel: View {
         VStack(spacing: 2) {
             Text(title)
                 .font(DiveUI.Typography.secondaryLabel)
-                .foregroundStyle(.white)
+                .foregroundStyle(DiveUI.blue)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
             HStack(alignment: .lastTextBaseline, spacing: 2) {
@@ -392,11 +399,11 @@ struct FullComputerDecoStopStatePanel: View {
     }
 
     private var panelBackground: some View {
-        RoundedRectangle(cornerRadius: 12, style: .continuous)
-            .fill(Color.black.opacity(0.42))
+        RoundedRectangle(cornerRadius: DiveUI.panelRadius, style: .continuous)
+            .fill(DiveUI.panelFill)
             .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(accent.opacity(0.86), lineWidth: 1.2)
+                RoundedRectangle(cornerRadius: DiveUI.panelRadius, style: .continuous)
+                    .stroke(accent.opacity(0.86), lineWidth: 1)
             )
     }
 
@@ -442,6 +449,21 @@ struct FullComputerDecoStopStatePanel: View {
         case .none:
             break
         }
+        let ascentText = presentation.ascentAllowedBetweenStops
+            ? String(localized: "live.fc.deco_stop.yes")
+            : String(localized: "live.fc.deco_stop.no")
+        parts.append(
+            String(
+                format: String(localized: "live.fc.a11y.stops_remaining"),
+                presentation.remainingStopCount
+            )
+        )
+        parts.append(
+            String(
+                format: String(localized: "live.fc.a11y.ascent_allowed"),
+                ascentText
+            )
+        )
         return parts.joined(separator: ". ")
     }
 }

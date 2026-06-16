@@ -27,6 +27,7 @@ final class FullComputerDecoStopStateMachineTests: XCTestCase {
         var tracker = engagedTracker()
         let output = evaluate(depth: stopDepth - 1.0, tracker: &tracker, remainingMinutes: 2, remainingStops: 2)
         XCTAssertEqual(output.state, .tooShallow)
+        XCTAssertEqual(output.titleKey, "live.fc.deco.too_shallow.title")
         XCTAssertEqual(output.direction, .descend)
         XCTAssertFalse(output.timerAccruing)
     }
@@ -35,6 +36,7 @@ final class FullComputerDecoStopStateMachineTests: XCTestCase {
         var tracker = engagedTracker()
         let output = evaluate(depth: stopDepth + 1.5, tracker: &tracker, remainingMinutes: 2, remainingStops: 2)
         XCTAssertEqual(output.state, .tooDeep)
+        XCTAssertEqual(output.titleKey, "live.fc.deco.too_deep.title")
         XCTAssertEqual(output.direction, .ascend)
         XCTAssertFalse(output.timerAccruing)
     }

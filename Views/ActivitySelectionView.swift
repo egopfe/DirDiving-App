@@ -41,7 +41,7 @@ struct ActivitySelectionView: View {
                         .frame(width: 44, height: 44)
 
                     Text(localizedTitle(for: mode))
-                        .font(.system(size: 15, weight: .black, design: .rounded))
+                        .font(DiveUI.Typography.rowTitle)
                         .foregroundStyle(.white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.75)

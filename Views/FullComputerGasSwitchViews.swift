@@ -5,6 +5,8 @@ struct FullComputerGasSwitchAvailableView: View {
     let onIgnore: () -> Void
     let onConfirm: () -> Void
 
+    private var depthUnit: String { String(localized: "live.unit.m") }
+
     var body: some View {
         VStack(spacing: DiveUI.spaceM) {
             HStack(spacing: 6) {
@@ -20,10 +22,18 @@ struct FullComputerGasSwitchAvailableView: View {
                 Text(Formatters.one(prompt.currentDepthMeters))
                     .font(DiveUI.Typography.metricValueHero)
                     .foregroundStyle(.white)
-                Text("m")
+                Text(depthUnit)
                     .font(DiveUI.Typography.metricUnitHero)
                     .foregroundStyle(DiveUI.blue)
             }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(
+                String(
+                    format: String(localized: "live.fc.a11y.gas_switch_depth"),
+                    Formatters.one(prompt.currentDepthMeters),
+                    depthUnit
+                )
+            )
 
             DivePanel(stroke: DiveUI.yellow) {
                 VStack(spacing: 0) {
@@ -41,12 +51,12 @@ struct FullComputerGasSwitchAvailableView: View {
                     divider
                     infoRow(
                         label: String(localized: "live.fc.gas_switch.switch_depth"),
-                        value: "\(Formatters.one(prompt.switchDepthMeters)) m",
+                        value: "\(Formatters.one(prompt.switchDepthMeters)) \(depthUnit)",
                         valueColor: DiveUI.yellow
                     )
                     divider
                     infoRow(
-                        label: "PPO2",
+                        label: String(localized: "live.fc.metric.ppo2"),
                         value: Formatters.one(prompt.currentPPO2),
                         valueColor: DiveUI.yellow
                     )
@@ -62,6 +72,17 @@ struct FullComputerGasSwitchAvailableView: View {
             .foregroundStyle(DiveUI.yellow)
             .multilineTextAlignment(.center)
 
+            if prompt.isOffPlan, !prompt.verifyCylinderNoteKey.isEmpty {
+                HStack(spacing: 6) {
+                    Image(systemName: "exclamationmark.circle.fill")
+                        .font(.system(size: 11, weight: .black))
+                    Text(String(localized: String.LocalizationValue(prompt.verifyCylinderNoteKey)))
+                        .font(DiveUI.Typography.hintCaption)
+                }
+                .foregroundStyle(DiveUI.orange)
+                .multilineTextAlignment(.center)
+            }
+
             HStack(spacing: 8) {
                 Button(action: onIgnore) {
                     Text(String(localized: "live.fc.gas_switch.ignore"))
@@ -74,6 +95,7 @@ struct FullComputerGasSwitchAvailableView: View {
                         )
                 }
                 .buttonStyle(.plain)
+                .accessibilityHint(String(localized: "live.fc.gas_switch.ignore.a11y"))
 
                 confirmButton
             }
@@ -81,6 +103,17 @@ struct FullComputerGasSwitchAvailableView: View {
         .padding(.horizontal, DiveUI.screenPadding)
         .padding(.vertical, 8)
         .accessibilityElement(children: .contain)
+        .accessibilityLabel(gasSwitchAccessibilitySummary)
+    }
+
+    private var gasSwitchAccessibilitySummary: String {
+        String(
+            format: String(localized: "live.fc.a11y.gas_switch_available"),
+            prompt.activeGasLabel,
+            prompt.suggestedGasLabel,
+            Formatters.one(prompt.switchDepthMeters),
+            depthUnit
+        )
     }
 
     private var confirmButton: some View {
@@ -198,6 +231,17 @@ struct FullComputerGasSwitchMissedPanel: View {
                 }
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(missedPanelAccessibilitySummary)
+    }
+
+    private var missedPanelAccessibilitySummary: String {
+        String(
+            format: String(localized: "live.fc.a11y.gas_switch_missed"),
+            prompt.suggestedGasLabel,
+            prompt.activeGasLabel,
+            Formatters.one(prompt.switchDepthMeters)
+        )
     }
 }
 
@@ -312,6 +356,9 @@ struct FullComputerRuntimeDecoGasListView: View {
         }
         .buttonStyle(.plain)
         .disabled(!row.isSelectable && row.status != .unavailable)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(gasRowAccessibilityLabel(row))
+        .accessibilityHint(row.isSelectable ? String(localized: "live.fc.gas_list.row.a11y") : "")
         .contextMenu {
             if row.status == .available || row.status == .unsafe {
                 Button(String(localized: "live.fc.gas_switch.mark_unavailable"), role: .destructive) {
@@ -319,6 +366,22 @@ struct FullComputerRuntimeDecoGasListView: View {
                 }
             }
         }
+    }
+
+    private func gasRowAccessibilityLabel(_ row: FullComputerRuntimeGasRow) -> String {
+        if let depth = row.switchDepthMeters {
+            return String(
+                format: String(localized: "live.fc.a11y.gas_list_row"),
+                row.label,
+                statusLabel(for: row.status),
+                Formatters.one(depth)
+            )
+        }
+        return String(
+            format: String(localized: "live.fc.a11y.gas_list_row_short"),
+            row.label,
+            statusLabel(for: row.status)
+        )
     }
 
     private func accentColor(for status: FullComputerRuntimeGasRow.Status) -> Color {

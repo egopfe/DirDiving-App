@@ -68,7 +68,7 @@ struct DivingModeSelectionView: View {
 
                     VStack(alignment: .leading, spacing: 3) {
                         Text(title)
-                            .font(.system(size: 15, weight: .black, design: .rounded))
+                            .font(DiveUI.Typography.rowTitle)
                             .foregroundStyle(.white)
                             .lineLimit(1)
                             .minimumScaleFactor(0.72)
@@ -91,5 +91,15 @@ struct DivingModeSelectionView: View {
         .buttonStyle(.plain)
         .accessibilityLabel(title)
         .accessibilityValue(subtitle)
+        .accessibilityHint(accessibilityHint(for: mode))
+    }
+
+    private func accessibilityHint(for mode: DIRDivingMode) -> String {
+        switch mode {
+        case .gauge:
+            return String(localized: "startup.diving_mode.gauge.a11y")
+        case .fullComputer:
+            return String(localized: "startup.diving_mode.full_computer.a11y")
+        }
     }
 }

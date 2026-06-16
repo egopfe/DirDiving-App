@@ -201,7 +201,16 @@ struct DiveLiveView: View {
                         .stroke(DiveUI.orange.opacity(0.65), lineWidth: 1)
                 )
         )
-        .accessibilityLabel(String(localized: "watch.full_computer.recovery_active"))
+        .accessibilityLabel(recoveryAccessibilityLabel)
+        .accessibilityHint(String(localized: "watch.full_computer.recovery_active.a11y"))
+    }
+
+    private var recoveryAccessibilityLabel: String {
+        if let diagnostic = dive.draftRecoveryDiagnostic,
+           !diagnostic.isEmpty {
+            return "\(String(localized: "watch.full_computer.recovery_active")). \(diagnostic)"
+        }
+        return String(localized: "watch.full_computer.recovery_active")
     }
 
     private func gpsConfirmationBanner(_ confirmation: DiveGPSConfirmation) -> some View {

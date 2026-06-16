@@ -548,6 +548,7 @@
 "watch.draft.expired_discarded" = "Una bozza attiva scaduta è stata scartata in modo sicuro.";
 "watch.draft.encode_failed" = "Impossibile salvare la bozza immersione attiva.";
 "watch.full_computer.recovery_active" = "RECOVERY ATTIVO";
+"watch.full_computer.recovery_active.a11y" = "Immersione ripristinata dallo stato salvato. Verifica profondità e decompressione prima di proseguire.";
 "watch.full_computer.recovery_checkpoint_quarantined" = "Checkpoint Full Computer non valido e scartato in sicurezza.";
 "watch.depth_validation.missing_sample" = "Campione profondità mancante: misurazione ignorata.";
 "watch.depth_validation.stale_sample" = "Campione profondità obsoleto: misurazione ignorata.";
@@ -600,6 +601,8 @@
 "startup.diving_mode.gauge.subtitle" = "Profondimetro evoluto";
 "startup.diving_mode.full_computer.title" = "FULL COMPUTER";
 "startup.diving_mode.full_computer.subtitle" = "Bühlmann ZH-L16C + GF";
+"startup.diving_mode.gauge.a11y" = "Profondità, runtime e TTV opzionale senza algoritmo decompressione.";
+"startup.diving_mode.full_computer.a11y" = "Decompressione Bühlmann con NDL, tappe e cambi gas.";
 "startup.diving_mode.footer" = "Scegli prima di entrare in acqua";
 "startup.fc_confirm.header" = "DIVING · FULL COMPUTER";
 "startup.fc_confirm.subheader" = "CONFERMA PRIMA DELL'IMMERSIONE";
@@ -763,6 +766,8 @@
 
 "live.stopwatch.title" = "CRONOMETRO";
 "live.depth.current.label" = "PROFONDITÀ ATTUALE";
+"live.unit.min" = "min";
+"live.unit.m" = "m";
 "live.status.in_dive" = "IN IMMERSIONE";
 "live.status.manual_dive" = "IMMERSIONE MANUALE";
 "live.fc.metric.ndl" = "NDL";
@@ -770,6 +775,7 @@
 "live.fc.metric.tts" = "TTS";
 "live.fc.metric.tts.footer" = "TIME TO SURFACE";
 "live.fc.metric.ceiling" = "CEILING";
+"live.fc.metric.ppo2" = "PPO2";
 "live.fc.status.deco" = "FUORI CURVA";
 "live.fc.status.in_deco" = "IN IMMERSIONE | DECOMPRESSIONE";
 "live.fc.status.ceiling_violation" = "VIOLAZIONE CEILING";
@@ -784,6 +790,8 @@
 "live.fc.gas_switch.ignore" = "IGNORA";
 "live.fc.gas_switch.confirm" = "CONFERMA";
 "live.fc.gas_switch.confirm.a11y" = "Tieni premuto per confermare il cambio gas";
+"live.fc.gas_switch.ignore.a11y" = "Ignora questo suggerimento di cambio gas";
+"live.fc.gas_switch.verify_cylinder" = "Verifica il contenuto della bombola prima di confermare";
 "live.fc.gas_switch.missed.title" = "CAMBIO GAS NON EFFETTUATO";
 "live.fc.gas_switch.still_available" = "Puoi ancora cambiare gas a %@ m";
 "live.fc.gas_switch.continue" = "CONTINUA";
@@ -798,6 +806,8 @@
 "live.fc.metric.ceiling.completed.footer" = "PROFONDITÀ MASSIMA RICHIESTA";
 "live.fc.deco.approach.title" = "PROSSIMA TAPPA DI DECOMPRESSIONE";
 "live.fc.deco.hold.title" = "DECOMPRESSIONE IN CORSO";
+"live.fc.deco.too_shallow.title" = "TROPPO SUPERFICIALE PER LA TAPPA";
+"live.fc.deco.too_deep.title" = "TROPPO PROFONDO PER LA TAPPA";
 "live.fc.deco.recalc.title" = "RICALCOLO DECOMPRESSIONE";
 "live.fc.deco.completed.title" = "DECOMPRESSIONE COMPLETATA";
 "live.fc.deco.completed.instruction" = "PUOI RISALIRE IN SUPERFICIE";
@@ -823,6 +833,14 @@
 "live.fc.ceiling_violation.a11y" = "Violazione ceiling. Scendere al ceiling operativo prima di risalire.";
 "live.fc.a11y.ndl_runtime" = "Limite senza decompressione %@ minuti. Durata %d minuti.";
 "live.fc.a11y.tts_ceiling_runtime" = "Tempo fino a superficie %d minuti. Ceiling %@ metri. Durata %d minuti.";
+"live.fc.a11y.stops_remaining" = "Tappe rimanenti %d";
+"live.fc.a11y.ascent_allowed" = "Risalita tra le tappe %@";
+"live.fc.a11y.gas_switch_depth" = "Profondità attuale %@ %@";
+"live.fc.a11y.gas_switch_available" = "Cambio gas disponibile. Gas attivo %@. Gas suggerito %@ a %@ %@";
+"live.fc.a11y.gas_switch_missed" = "Cambio gas non effettuato. Disponibile %@. Attivo %@. Quota di cambio %@ metri";
+"live.fc.a11y.gas_list_row" = "%@, %@, cambio a %@ metri";
+"live.fc.a11y.gas_list_row_short" = "%@, %@";
+"live.fc.gas_list.row.a11y" = "Apre la conferma cambio gas";
 "live.manual.start.button" = "AVVIO MANUALE";
 "live.manual.end.button" = "FINE MANUALE";
 "live.depth.automation.unavailable.title" = "AUTOMAZIONE PROFONDITÀ NON DISPONIBILE";
