@@ -1960,6 +1960,37 @@
 "sync.conflict.saved_for_review" = "Conflitto sync salvato per revisione";
 "sync.conflict.resolved_watch_version" = "Conflitto risolto: usata versione Watch";
 
+/* iOS Companion activity selection */
+"companion.activitySelection.title" = "SCEGLI LA TUA ATTIVITÀ";
+"companion.activitySelection.subtitle" = "Seleziona l'attività che vuoi praticare. Potrai cambiarla in qualsiasi momento dalle impostazioni.";
+"companion.activity.diving.title" = "DIVING";
+"companion.activity.diving.subtitle" = "Immersioni con autorespiratore";
+"companion.activity.diving.feature.decompression" = "Calcolo decompressione";
+"companion.activity.diving.feature.gas" = "Gestione gas";
+"companion.activity.diving.feature.logbook" = "Logbook dettagliato";
+"companion.activity.apnea.title" = "APNEA";
+"companion.activity.apnea.subtitle" = "Apnea in assetto costante";
+"companion.activity.apnea.feature.time" = "Tempo di immersione";
+"companion.activity.apnea.feature.recovery" = "Recupero configurabile";
+"companion.activity.apnea.feature.statistics" = "Statistiche avanzate";
+"companion.activity.snorkeling.title" = "SNORKELING";
+"companion.activity.snorkeling.subtitle" = "Esplorazione in superficie";
+"companion.activity.snorkeling.feature.navigation" = "Navigazione GPS";
+"companion.activity.snorkeling.feature.waypoints" = "Waypoint e marker";
+"companion.activity.snorkeling.feature.return" = "Ritorno all'ingresso";
+"companion.activitySelection.safety.title" = "SICUREZZA";
+"companion.activitySelection.safety.body" = "La tua sicurezza è la nostra priorità. Usa sempre l'attrezzatura adeguata e rispetta le procedure di sicurezza.";
+"companion.activitySelection.settingsReminder" = "Puoi cambiare attività in qualsiasi momento dalle Impostazioni dell'app.";
+"companion.activitySelection.unavailable" = "Questa attività non è ancora disponibile in questa release.";
+"companion.activitySelection.watch_active_note" = "Apple Watch ha una sessione immersione attiva. Preferenza iOS aggiornata localmente; la sync Watch riprenderà a sessione conclusa.";
+"companion.activity.card.a11y.summary" = "%@. %@. %@.";
+"companion.activity.card.a11y.hint" = "Apre %@.";
+"companion.settings.activity.title" = "Attività";
+"companion.settings.activity.current" = "Attività corrente";
+"companion.settings.activity.change" = "Cambia attività";
+"companion.settings.activity.showAtLaunch" = "Mostra scelta attività all'avvio";
+"companion.settings.activity.none" = "Non selezionata";
+
 /* UI/UX audit remediation V1.0 2026-06-02 */
 "ccr.chart.axis.time" = "Tempo";
 "ccr.chart.axis.ppo2" = "PPO2";

@@ -1962,6 +1962,37 @@
 "sync.conflict.saved_for_review" = "Sync conflict saved for review";
 "sync.conflict.resolved_watch_version" = "Conflict resolved: Watch version used";
 
+/* iOS Companion activity selection */
+"companion.activitySelection.title" = "CHOOSE YOUR ACTIVITY";
+"companion.activitySelection.subtitle" = "Select the activity you want to use. You can change it at any time in Settings.";
+"companion.activity.diving.title" = "DIVING";
+"companion.activity.diving.subtitle" = "Scuba diving";
+"companion.activity.diving.feature.decompression" = "Decompression planning";
+"companion.activity.diving.feature.gas" = "Gas management";
+"companion.activity.diving.feature.logbook" = "Detailed logbook";
+"companion.activity.apnea.title" = "APNEA";
+"companion.activity.apnea.subtitle" = "Freediving sessions";
+"companion.activity.apnea.feature.time" = "Dive time";
+"companion.activity.apnea.feature.recovery" = "Configurable recovery";
+"companion.activity.apnea.feature.statistics" = "Advanced statistics";
+"companion.activity.snorkeling.title" = "SNORKELING";
+"companion.activity.snorkeling.subtitle" = "Surface exploration";
+"companion.activity.snorkeling.feature.navigation" = "GPS navigation";
+"companion.activity.snorkeling.feature.waypoints" = "Waypoints and markers";
+"companion.activity.snorkeling.feature.return" = "Return to entry";
+"companion.activitySelection.safety.title" = "SAFETY";
+"companion.activitySelection.safety.body" = "Your safety is our priority. Always use appropriate equipment and follow safe diving practices.";
+"companion.activitySelection.settingsReminder" = "You can change activity at any time in the app Settings.";
+"companion.activitySelection.unavailable" = "This activity is not yet available in this release.";
+"companion.activitySelection.watch_active_note" = "Apple Watch has an active dive session. iOS activity preference updated locally; Watch sync will resume when idle.";
+"companion.activity.card.a11y.summary" = "%@. %@. %@.";
+"companion.activity.card.a11y.hint" = "Opens %@.";
+"companion.settings.activity.title" = "Activity";
+"companion.settings.activity.current" = "Current activity";
+"companion.settings.activity.change" = "Change activity";
+"companion.settings.activity.showAtLaunch" = "Show activity selection at launch";
+"companion.settings.activity.none" = "Not selected";
+
 /* UI/UX audit remediation V1.0 2026-06-02 */
 "ccr.chart.axis.time" = "Time";
 "ccr.chart.axis.ppo2" = "PPO2";

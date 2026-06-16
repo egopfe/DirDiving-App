@@ -12,6 +12,7 @@ struct DIRDivingiOSApp: App {
     @StateObject private var plannerAscentSpeedSettingsStore = PlannerAscentSpeedSettingsStore()
     @StateObject private var plannerBriefingTransfer = PlannerBriefingWatchTransferService()
     @StateObject private var divePlanPackageTransfer = DivePlanPackageWatchTransferService()
+    @StateObject private var companionActivity = CompanionActivityPreferenceStore()
     @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
 
     init() {
@@ -32,6 +33,8 @@ struct DIRDivingiOSApp: App {
                         IOSLegalOnboardingView(
                             languageCode: DIRIOSAppLanguage.fromStorage(appLanguage).resolvedLanguageCode
                         )
+                    } else if companionActivity.shouldPresentSelectionScreen {
+                        IOSCompanionActivitySelectionView()
                     } else {
                         ContentView()
                             .id(appLanguage)
@@ -49,6 +52,7 @@ struct DIRDivingiOSApp: App {
             .environmentObject(plannerAscentSpeedSettingsStore)
             .environmentObject(plannerBriefingTransfer)
             .environmentObject(divePlanPackageTransfer)
+            .environmentObject(companionActivity)
             .environment(\.locale, DIRIOSAppLanguage.fromStorage(appLanguage).locale)
             .preferredColorScheme(.dark)
             .task {

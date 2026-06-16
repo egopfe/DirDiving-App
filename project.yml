@@ -103,6 +103,7 @@ targets:
     platform: iOS
     sources:
       - Models/PlannerBriefingCard.swift
+      - Models/DIRModesAndStartup.swift
       - path: Shared
       - path: iOSApp
         excludes:
@@ -379,6 +380,11 @@ targets:
       - iOSApp/Utils/UIUXAccessibilitySummaries.swift
       - iOSApp/Services/TissueAnalyticsService.swift
       - Tests/iOSAlgorithmTests/TissueAnalyticsServiceTests.swift
+      - iOSApp/Utils/IOSCompanionPostLegalEntry.swift
+      - Models/DIRModesAndStartup.swift
+      - iOSApp/Models/CompanionActivityPreference.swift
+      - iOSApp/Services/CompanionActivityPreferenceStore.swift
+      - iOSApp/Utils/CompanionActivityCopy.swift
       - Tests/iOSAlgorithmTests/BuhlmannComprehensiveReadinessV3RemediationTests.swift
     resources:
       - path: Tests/iOSAlgorithmTests/Fixtures
