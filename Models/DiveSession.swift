@@ -31,8 +31,10 @@ struct DiveSession: Identifiable, Codable, Hashable {
     let watchActivityMode: String?
     /// Watch Diving sub-mode at session start (gauge / fullComputer).
     let watchDivingMode: String?
+    /// Full Computer logbook metadata when dive used decompression runtime.
+    let fullComputerLogbookMetadata: FullComputerDiveLogbookMetadata?
 
-    init(id: UUID = UUID(), startDate: Date, endDate: Date, durationSeconds: TimeInterval, maxDepthMeters: Double, avgDepthMeters: Double, avgWaterTemperatureCelsius: Double?, minWaterTemperatureCelsius: Double?, maxWaterTemperatureCelsius: Double?, ttv: Double, entryGPS: GPSPoint?, exitGPS: GPSPoint?, entryGPSFixSource: GPSFixSource? = nil, exitGPSFixSource: GPSFixSource? = nil, samples: [DiveSample], exceededSupportedDepthRange: Bool = false, isManual: Bool = false, hasDepthProfile: Bool? = nil, watchActivityMode: String? = nil, watchDivingMode: String? = nil) {
+    init(id: UUID = UUID(), startDate: Date, endDate: Date, durationSeconds: TimeInterval, maxDepthMeters: Double, avgDepthMeters: Double, avgWaterTemperatureCelsius: Double?, minWaterTemperatureCelsius: Double?, maxWaterTemperatureCelsius: Double?, ttv: Double, entryGPS: GPSPoint?, exitGPS: GPSPoint?, entryGPSFixSource: GPSFixSource? = nil, exitGPSFixSource: GPSFixSource? = nil, samples: [DiveSample], exceededSupportedDepthRange: Bool = false, isManual: Bool = false, hasDepthProfile: Bool? = nil, watchActivityMode: String? = nil, watchDivingMode: String? = nil, fullComputerLogbookMetadata: FullComputerDiveLogbookMetadata? = nil) {
         self.id = id
         self.startDate = startDate
         self.endDate = endDate
@@ -54,6 +56,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
         self.hasDepthProfile = hasDepthProfile ?? !samples.isEmpty
         self.watchActivityMode = watchActivityMode
         self.watchDivingMode = watchDivingMode
+        self.fullComputerLogbookMetadata = fullComputerLogbookMetadata
     }
 
     enum CodingKeys: String, CodingKey {
@@ -61,7 +64,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
         case avgWaterTemperatureCelsius, minWaterTemperatureCelsius, maxWaterTemperatureCelsius, ttv
         case entryGPS, exitGPS, entryGPSFixSource, exitGPSFixSource, samples
         case exceededSupportedDepthRange, isManual, hasDepthProfile
-        case watchActivityMode, watchDivingMode
+        case watchActivityMode, watchDivingMode, fullComputerLogbookMetadata
     }
 
     init(from decoder: Decoder) throws {
@@ -88,6 +91,10 @@ struct DiveSession: Identifiable, Codable, Hashable {
         hasDepthProfile = try container.decodeIfPresent(Bool.self, forKey: .hasDepthProfile) ?? !samples.isEmpty
         watchActivityMode = try container.decodeIfPresent(String.self, forKey: .watchActivityMode)
         watchDivingMode = try container.decodeIfPresent(String.self, forKey: .watchDivingMode)
+        fullComputerLogbookMetadata = try container.decodeIfPresent(
+            FullComputerDiveLogbookMetadata.self,
+            forKey: .fullComputerLogbookMetadata
+        )
     }
 
     func encode(to encoder: Encoder) throws {
@@ -112,5 +119,6 @@ struct DiveSession: Identifiable, Codable, Hashable {
         try container.encode(hasDepthProfile, forKey: .hasDepthProfile)
         try container.encodeIfPresent(watchActivityMode, forKey: .watchActivityMode)
         try container.encodeIfPresent(watchDivingMode, forKey: .watchDivingMode)
+        try container.encodeIfPresent(fullComputerLogbookMetadata, forKey: .fullComputerLogbookMetadata)
     }
 }

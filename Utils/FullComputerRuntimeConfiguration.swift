@@ -10,4 +10,5 @@ enum FullComputerRuntimeConfiguration {
     static let criticalDepthChangeMeters = 1.0
     static let defaultGFLow = 30.0
     static let defaultGFHigh = 70.0
+    static let algorithmVersion = DivePlanPackageCodec.algorithmVersion
 }

@@ -1,6 +1,6 @@
 import Foundation
 
-struct FullComputerRuntimePlan: Hashable {
+struct FullComputerRuntimePlan: Hashable, Codable {
     var activeGas: BuhlmannGas
     var gfLow: Double
     var gfHigh: Double

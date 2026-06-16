@@ -253,6 +253,109 @@ struct FullComputerRuntimeEngine: Equatable {
         }
     }
 
+    var runtimePlan: FullComputerRuntimePlan { plan }
+    var persistedDecoStopTracker: FullComputerDecoStopTracker { decoStopTracker }
+
+    mutating func exportCheckpointPayload(
+        sessionID: UUID,
+        watchDivingMode: String,
+        savedAt: Date = Date()
+    ) -> FullComputerRuntimeCheckpointPayload {
+        FullComputerRuntimeCheckpointPayload(
+            schemaVersion: FullComputerRuntimeCheckpointPayload.currentSchemaVersion,
+            sessionID: sessionID,
+            watchDivingMode: watchDivingMode,
+            plan: plan,
+            tissueState: tissueState,
+            gasSwitchTracker: gasSwitchTracker,
+            decoStopTracker: decoStopTracker,
+            lastDepthMeters: lastDepthMeters,
+            lastSampleTimestamp: lastSampleTimestamp,
+            lastComputedTimestamp: lastComputedTimestamp,
+            monotonicClock: monotonicClock.exportSnapshot(),
+            previousEngineState: previousEngineState,
+            snapshotNDLMinutes: snapshot.ndlMinutes,
+            snapshotCeilingMeters: snapshot.operationalCeilingMeters,
+            snapshotTTSMinutes: snapshot.ttsMinutes,
+            snapshotStopState: snapshot.decoPresentation.stopState,
+            snapshotEngagedStopDepthMeters: decoStopTracker.engagedStopDepthMeters,
+            wallClockSavedAt: savedAt
+        )
+    }
+
+    mutating func exportCheckpoint(sessionID: UUID, watchDivingMode: String) throws -> FullComputerRuntimeCheckpoint {
+        let payload = exportCheckpointPayload(sessionID: sessionID, watchDivingMode: watchDivingMode)
+        return try FullComputerRuntimeCheckpointCodec.make(from: payload)
+    }
+
+    static func restoreEngine(
+        from checkpoint: FullComputerRuntimeCheckpoint,
+        sessionStart: Date
+    ) throws -> FullComputerRuntimeEngine {
+        try FullComputerRuntimeCheckpointCodec.validate(checkpoint)
+        let readiness = canStart(plan: checkpoint.payload.plan)
+        guard readiness.ready else {
+            throw FullComputerRuntimeStartupFailure.invalidPlan(readiness.diagnostics)
+        }
+        return FullComputerRuntimeEngine(restoredFrom: checkpoint.payload, sessionStart: sessionStart)
+    }
+
+    mutating func applyConservativeCatchUp(now: Date = Date()) {
+        let elapsed = now.timeIntervalSince(lastComputedTimestamp)
+        guard elapsed > 0 else { return }
+        let capped = min(elapsed, FullComputerRuntimeConfiguration.maxMissedTickSeconds * 4)
+        advanceTissuesConstant(depthMeters: lastDepthMeters, durationSeconds: capped)
+        lastComputedTimestamp = lastComputedTimestamp.addingTimeInterval(capped)
+        tick(now: lastComputedTimestamp)
+    }
+
+    mutating func replaySamplesAfterCheckpoint(_ samples: [DiveSample], checkpointTimestamp: Date?) {
+        for sample in samples.sorted(by: { $0.timestamp < $1.timestamp }) {
+            if let checkpointTimestamp, sample.timestamp <= checkpointTimestamp { continue }
+            _ = ingestSample(depthMeters: sample.depthMeters, timestamp: sample.timestamp)
+        }
+    }
+
+    func recoverySelfCheckDiagnostics(lastKnownDepthMeters: Double) -> [String] {
+        var diagnostics = plan.validate()
+        if lastKnownDepthMeters > 1,
+           tissueState == BuhlmannTissueState.airSaturated(surfacePressureBar: plan.plannerEnvironment.surfacePressureBar) {
+            diagnostics.append("recovery_tissue_reset_detected")
+        }
+        return diagnostics
+    }
+
+    private init(restoredFrom payload: FullComputerRuntimeCheckpointPayload, sessionStart: Date) {
+        plan = payload.plan
+        tissueState = payload.tissueState
+        lastDepthMeters = payload.lastDepthMeters
+        lastSampleTimestamp = payload.lastSampleTimestamp
+        lastComputedTimestamp = payload.lastComputedTimestamp
+        monotonicClock = MonotonicElapsedClock()
+        monotonicClock.restore(from: payload.monotonicClock)
+        previousEngineState = payload.previousEngineState
+        decoStopTracker = payload.decoStopTracker
+        gasSwitchTracker = payload.gasSwitchTracker
+        lastTickTimestamp = payload.lastComputedTimestamp
+        var tracker = payload.decoStopTracker
+        var gasTracker = payload.gasSwitchTracker
+        snapshot = Self.makeSnapshot(
+            engineState: payload.previousEngineState,
+            tissueState: payload.tissueState,
+            plan: payload.plan,
+            depthMeters: payload.lastDepthMeters,
+            monotonicElapsedSeconds: payload.monotonicClock.lastElapsed,
+            lastSampleTimestamp: payload.lastSampleTimestamp,
+            diagnostics: [],
+            decoStopTracker: &tracker,
+            gasSwitchTracker: &gasTracker,
+            deltaSeconds: 0
+        )
+        decoStopTracker = tracker
+        gasSwitchTracker = gasTracker
+        _ = sessionStart
+    }
+
     // MARK: - Tissue integration
 
     private mutating func advanceTissuesLinear(

@@ -78,6 +78,9 @@ struct DiveLiveView: View {
                     if watchSync.pendingTransferCount > 0 || watchSync.failedTransferCount > 0 {
                         syncStatusStrip
                     }
+                    if dive.isFullComputerRecoveryActive, dive.isDiveActive {
+                        fullComputerRecoveryBanner
+                    }
                     if dive.isDiveActive {
                         activeDiveContent(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
                     } else {
@@ -174,6 +177,31 @@ struct DiveLiveView: View {
                         .stroke((watchSync.failedTransferCount > 0 ? DiveUI.yellow : DiveUI.cyan).opacity(0.65), lineWidth: 1)
                 )
         )
+    }
+
+    private var fullComputerRecoveryBanner: some View {
+        HStack(spacing: 7) {
+            Image(systemName: "arrow.counterclockwise.circle.fill")
+                .font(.system(size: 14, weight: .black))
+            Text(String(localized: "watch.full_computer.recovery_active"))
+                .font(DiveUI.Typography.warningTitle)
+                .lineLimit(2)
+                .minimumScaleFactor(0.85)
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(DiveUI.orange)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(DiveUI.orange.opacity(0.12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .stroke(DiveUI.orange.opacity(0.65), lineWidth: 1)
+                )
+        )
+        .accessibilityLabel(String(localized: "watch.full_computer.recovery_active"))
     }
 
     private func gpsConfirmationBanner(_ confirmation: DiveGPSConfirmation) -> some View {

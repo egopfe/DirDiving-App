@@ -547,6 +547,8 @@
 "watch.draft.finalizing_missing_enddate" = "Una immersione precedente non è stata finalizzata perché il salvataggio temporaneo era incompleto.";
 "watch.draft.expired_discarded" = "Una bozza attiva scaduta è stata scartata in modo sicuro.";
 "watch.draft.encode_failed" = "Impossibile salvare la bozza immersione attiva.";
+"watch.full_computer.recovery_active" = "RECOVERY ATTIVO";
+"watch.full_computer.recovery_checkpoint_quarantined" = "Checkpoint Full Computer non valido e scartato in sicurezza.";
 "watch.depth_validation.missing_sample" = "Campione profondità mancante: misurazione ignorata.";
 "watch.depth_validation.stale_sample" = "Campione profondità obsoleto: misurazione ignorata.";
 "watch.depth_validation.stuck_sensor" = "Sensore profondità fermo: misurazione ignorata.";

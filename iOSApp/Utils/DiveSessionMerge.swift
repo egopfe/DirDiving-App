@@ -38,6 +38,7 @@ enum DiveSessionMerge {
         let entryPressureBar = winner.entryPressureBar ?? loser.entryPressureBar
         let exitPressureBar = winner.exitPressureBar ?? loser.exitPressureBar
         let decompressionNotes = mergedString(winner.decompressionNotes, loser.decompressionNotes)
+        let fullComputerLogbookMetadata = mergedFullComputerLogbookMetadata(winner: winner, loser: loser)
         let startDate = min(winner.startDate, loser.startDate)
         let endDate = max(winner.endDate, loser.endDate)
         let samples = resolvedSamples(
@@ -77,8 +78,23 @@ enum DiveSessionMerge {
             exitPressureText: exitPressureText,
             entryPressureBar: entryPressureBar,
             exitPressureBar: exitPressureBar,
-            decompressionNotes: decompressionNotes
+            decompressionNotes: decompressionNotes,
+            ccrLogbookMetadata: winner.ccrLogbookMetadata ?? loser.ccrLogbookMetadata,
+            fullComputerLogbookMetadata: fullComputerLogbookMetadata
         )
+    }
+
+    private static func mergedFullComputerLogbookMetadata(
+        winner: DiveSession,
+        loser: DiveSession
+    ) -> FullComputerDiveLogbookMetadata? {
+        switch (winner.fullComputerLogbookMetadata, loser.fullComputerLogbookMetadata) {
+        case let (left?, right?):
+            return left.recoveryEventCount >= right.recoveryEventCount ? left : right
+        case (nil, let right?): return right
+        case (let left?, nil): return left
+        case (nil, nil): return nil
+        }
     }
 
     /// Uses whole-profile winner when both sides have divergent samples; otherwise unions compatible profiles.

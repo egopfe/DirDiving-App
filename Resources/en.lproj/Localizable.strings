@@ -547,6 +547,8 @@
 "watch.draft.finalizing_missing_enddate" = "A previous dive could not be finalized because its saved draft was incomplete.";
 "watch.draft.expired_discarded" = "An expired active dive draft was discarded safely.";
 "watch.draft.encode_failed" = "Active dive draft could not be saved.";
+"watch.full_computer.recovery_active" = "RECOVERY ACTIVE";
+"watch.full_computer.recovery_checkpoint_quarantined" = "Full Computer checkpoint was invalid and discarded safely.";
 "watch.depth_validation.missing_sample" = "Missing depth sample: measurement ignored.";
 "watch.depth_validation.stale_sample" = "Stale depth sample: measurement ignored.";
 "watch.depth_validation.stuck_sensor" = "Depth sensor stuck: measurement ignored.";

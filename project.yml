@@ -67,6 +67,8 @@ targets:
       - Utils/FullComputerGasSwitchModels.swift
       - Utils/FullComputerGasSwitchPolicy.swift
       - Utils/FullComputerGasProfileValidator.swift
+      - Utils/FullComputerRuntimeCheckpoint.swift
+      - Utils/FullComputerRuntimeLogbookAccumulator.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
       - Resources
@@ -221,6 +223,8 @@ targets:
       - Utils/FullComputerGasSwitchModels.swift
       - Utils/FullComputerGasSwitchPolicy.swift
       - Utils/FullComputerGasProfileValidator.swift
+      - Utils/FullComputerRuntimeCheckpoint.swift
+      - Utils/FullComputerRuntimeLogbookAccumulator.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
       - Services/FullComputerRuntimeEngine.swift

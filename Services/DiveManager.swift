@@ -11,7 +11,7 @@ final class DiveManager: ObservableObject {
         case finalizing
     }
 
-    private static let supportedDraftSchemaVersion = 4
+    private static let supportedDraftSchemaVersion = 5
     private static let minimumDraftSchemaVersion = 1
     private static let quarantineDirectoryName = "Diagnostics/Quarantine"
 
@@ -34,6 +34,8 @@ final class DiveManager: ObservableObject {
         let watchActivityMode: String?
         let watchDivingMode: String?
         let fullComputerGasSwitchTracker: FullComputerGasSwitchTracker?
+        let fullComputerCheckpoint: FullComputerRuntimeCheckpoint?
+        let fullComputerLogbookMetadata: FullComputerDiveLogbookMetadata?
         let createdAt: Date
         let updatedAt: Date
 
@@ -56,6 +58,8 @@ final class DiveManager: ObservableObject {
             watchActivityMode: String? = nil,
             watchDivingMode: String? = nil,
             fullComputerGasSwitchTracker: FullComputerGasSwitchTracker? = nil,
+            fullComputerCheckpoint: FullComputerRuntimeCheckpoint? = nil,
+            fullComputerLogbookMetadata: FullComputerDiveLogbookMetadata? = nil,
             createdAt: Date,
             updatedAt: Date
         ) {
@@ -77,6 +81,8 @@ final class DiveManager: ObservableObject {
             self.watchActivityMode = watchActivityMode
             self.watchDivingMode = watchDivingMode
             self.fullComputerGasSwitchTracker = fullComputerGasSwitchTracker
+            self.fullComputerCheckpoint = fullComputerCheckpoint
+            self.fullComputerLogbookMetadata = fullComputerLogbookMetadata
             self.createdAt = createdAt
             self.updatedAt = updatedAt
         }
@@ -87,7 +93,8 @@ final class DiveManager: ObservableObject {
             case isManualLifecycleActive, sessionStartedManually
             case activeDiveExceededSupportedDepth, hasObservedSubmersionDuringCurrentDive
             case missionModeManualPendingForSession, watchActivityMode, watchDivingMode
-            case fullComputerGasSwitchTracker, createdAt, updatedAt
+            case fullComputerGasSwitchTracker, fullComputerCheckpoint, fullComputerLogbookMetadata
+            case createdAt, updatedAt
         }
 
         init(from decoder: Decoder) throws {
@@ -120,6 +127,14 @@ final class DiveManager: ObservableObject {
             fullComputerGasSwitchTracker = try container.decodeIfPresent(
                 FullComputerGasSwitchTracker.self,
                 forKey: .fullComputerGasSwitchTracker
+            )
+            fullComputerCheckpoint = try container.decodeIfPresent(
+                FullComputerRuntimeCheckpoint.self,
+                forKey: .fullComputerCheckpoint
+            )
+            fullComputerLogbookMetadata = try container.decodeIfPresent(
+                FullComputerDiveLogbookMetadata.self,
+                forKey: .fullComputerLogbookMetadata
             )
             createdAt = try container.decode(Date.self, forKey: .createdAt)
             updatedAt = try container.decode(Date.self, forKey: .updatedAt)
@@ -160,6 +175,7 @@ final class DiveManager: ObservableObject {
     @Published private(set) var sessionActivityMode: DIRActivityMode = .diving
     @Published private(set) var sessionDivingMode: DIRDivingMode = .gauge
     @Published private(set) var fullComputerSnapshot: FullComputerRuntimeSnapshot?
+    @Published private(set) var isFullComputerRecoveryActive = false
 
     private enum AlarmBlinkSource: Hashable {
         case ascent
@@ -233,6 +249,7 @@ final class DiveManager: ObservableObject {
     private var activeBlinkSources: Set<AlarmBlinkSource> = []
     private var lastReportedRuntime: TimeInterval = 0
     private var fullComputerEngine: FullComputerRuntimeEngine?
+    private var fullComputerLogbookAccumulator: FullComputerRuntimeLogbookAccumulator?
 
     private let activeDiveDraftFileName = "dirdiving_active_dive_draft.json"
     private let stopwatchAccumulatedKey = "dirdiving_watch_stopwatch_accumulated"
@@ -399,6 +416,14 @@ final class DiveManager: ObservableObject {
         }
         let sessionID = activeDiveSessionID ?? UUID()
         activeDiveSessionID = sessionID
+        var checkpoint: FullComputerRuntimeCheckpoint?
+        if sessionDivingMode == .fullComputer, var engine = fullComputerEngine {
+            checkpoint = try? engine.exportCheckpoint(
+                sessionID: sessionID,
+                watchDivingMode: sessionDivingMode.rawValue
+            )
+            fullComputerEngine = engine
+        }
         let draft = ActiveDiveDraft(
             phase: .active,
             sessionID: sessionID,
@@ -416,6 +441,8 @@ final class DiveManager: ObservableObject {
             fullComputerGasSwitchTracker: sessionDivingMode == .fullComputer
                 ? fullComputerEngine?.persistedGasSwitchTracker
                 : nil,
+            fullComputerCheckpoint: checkpoint,
+            fullComputerLogbookMetadata: currentFullComputerLogbookMetadata(),
             createdAt: start,
             updatedAt: now
         )
@@ -442,7 +469,8 @@ final class DiveManager: ObservableObject {
         entryGPSFixSource: GPSFixSource,
         exitGPSFixSource: GPSFixSource,
         sessionStartedManually: Bool,
-        activeDiveExceededSupportedDepth: Bool
+        activeDiveExceededSupportedDepth: Bool,
+        fullComputerLogbookMetadata: FullComputerDiveLogbookMetadata?
     ) {
         let now = Date()
         let draft = ActiveDiveDraft(
@@ -462,6 +490,7 @@ final class DiveManager: ObservableObject {
             missionModeManualPendingForSession: missionModeManualPendingForSession,
             watchActivityMode: sessionActivityMode.rawValue,
             watchDivingMode: sessionDivingMode.rawValue,
+            fullComputerLogbookMetadata: fullComputerLogbookMetadata,
             createdAt: start,
             updatedAt: now
         )
@@ -585,8 +614,23 @@ final class DiveManager: ObservableObject {
         restoreFullComputerRuntimeIfNeeded(
             samples: restoredSamples,
             sessionStart: draft.startDate,
-            gasSwitchTracker: draft.fullComputerGasSwitchTracker
+            sessionID: draft.sessionID,
+            gasSwitchTracker: draft.fullComputerGasSwitchTracker,
+            checkpoint: draft.fullComputerCheckpoint
         )
+        if sessionDivingMode == .fullComputer {
+            isFullComputerRecoveryActive = true
+            fullComputerLogbookAccumulator = FullComputerRuntimeLogbookAccumulator()
+            if var accumulator = fullComputerLogbookAccumulator {
+                if let metadata = draft.fullComputerLogbookMetadata {
+                    for diagnostic in metadata.recoveryDiagnostics {
+                        accumulator.recordRecovery(diagnostic: diagnostic)
+                    }
+                }
+                accumulator.recordRecovery(diagnostic: "draft_restore")
+                fullComputerLogbookAccumulator = accumulator
+            }
+        }
         applyMissionModeIfNeededOnDiveStart(restored: true)
     }
 
@@ -613,7 +657,10 @@ final class DiveManager: ObservableObject {
             exitGPSFixSource: draft.exitGPSFixSource,
             samples: draft.samples,
             activeDiveExceededSupportedDepth: draft.activeDiveExceededSupportedDepth,
-            sessionStartedManually: draft.sessionStartedManually
+            sessionStartedManually: draft.sessionStartedManually,
+            watchActivityMode: draft.watchActivityMode,
+            watchDivingMode: draft.watchDivingMode,
+            fullComputerLogbookMetadata: draft.fullComputerLogbookMetadata
         )
     }
 
@@ -909,6 +956,7 @@ final class DiveManager: ObservableObject {
         stopAllBlinking()
         ascentHaptics.clear()
         runtimeClock.clear()
+        let capturedFullComputerLogbook = captureFullComputerLogbookMetadata()
         stopFullComputerRuntime()
         isDepthDataStale = false
         depthDataUsesLastKnownReading = false
@@ -924,7 +972,8 @@ final class DiveManager: ObservableObject {
             entryGPSFixSource: capturedEntryGPSFixSource,
             exitGPSFixSource: capturedExitGPSFixSource,
             sessionStartedManually: capturedSessionStartedManually,
-            activeDiveExceededSupportedDepth: capturedExceededSupportedDepth
+            activeDiveExceededSupportedDepth: capturedExceededSupportedDepth,
+            fullComputerLogbookMetadata: capturedFullComputerLogbook
         )
         sessionStart = nil
         activeDiveSessionID = nil
@@ -949,7 +998,10 @@ final class DiveManager: ObservableObject {
                 exitGPSFixSource: self.exitGPSFixSource,
                 samples: finishedSamples,
                 activeDiveExceededSupportedDepth: capturedExceededSupportedDepth,
-                sessionStartedManually: capturedSessionStartedManually
+                sessionStartedManually: capturedSessionStartedManually,
+                watchActivityMode: self.sessionActivityMode.rawValue,
+                watchDivingMode: self.sessionDivingMode.rawValue,
+                fullComputerLogbookMetadata: capturedFullComputerLogbook
             )
             self.gpsManager.stop()
         }
@@ -965,7 +1017,10 @@ final class DiveManager: ObservableObject {
         exitGPSFixSource: GPSFixSource,
         samples: [DiveSample],
         activeDiveExceededSupportedDepth: Bool,
-        sessionStartedManually: Bool
+        sessionStartedManually: Bool,
+        watchActivityMode: String? = nil,
+        watchDivingMode: String? = nil,
+        fullComputerLogbookMetadata: FullComputerDiveLogbookMetadata? = nil
     ) {
         if logStore.sessions.contains(where: { $0.id == sessionID }) {
             clearActiveDiveDraft()
@@ -1001,11 +1056,14 @@ final class DiveManager: ObservableObject {
             exceededSupportedDepthRange: exceeded,
             isManual: sessionStartedManually,
             hasDepthProfile: hasDepthProfile,
-            watchActivityMode: sessionActivityMode.rawValue,
-            watchDivingMode: sessionDivingMode.rawValue
+            watchActivityMode: watchActivityMode ?? sessionActivityMode.rawValue,
+            watchDivingMode: watchDivingMode ?? sessionDivingMode.rawValue,
+            fullComputerLogbookMetadata: fullComputerLogbookMetadata
         )
         self.activeDiveExceededSupportedDepth = false
         self.sessionStartedManually = false
+        isFullComputerRecoveryActive = false
+        fullComputerLogbookAccumulator = nil
         logStore.add(session)
         clearActiveDiveDraft()
     }
@@ -1379,6 +1437,9 @@ final class DiveManager: ObservableObject {
             engine.tick(now: sessionStart)
             fullComputerEngine = engine
             fullComputerSnapshot = engine.snapshot
+            fullComputerLogbookAccumulator = FullComputerRuntimeLogbookAccumulator()
+            isFullComputerRecoveryActive = false
+            updateFullComputerLogbookAccumulator(from: engine)
         } catch FullComputerRuntimeStartupFailure.invalidPlan(let diagnostics) {
             fullComputerEngine = nil
             fullComputerSnapshot = unavailableFullComputerSnapshot(diagnostics: diagnostics)
@@ -1391,21 +1452,100 @@ final class DiveManager: ObservableObject {
     private func restoreFullComputerRuntimeIfNeeded(
         samples: [DiveSample],
         sessionStart: Date,
-        gasSwitchTracker: FullComputerGasSwitchTracker? = nil
+        sessionID: UUID,
+        gasSwitchTracker: FullComputerGasSwitchTracker? = nil,
+        checkpoint: FullComputerRuntimeCheckpoint? = nil
     ) {
         guard sessionDivingMode == .fullComputer else {
             stopFullComputerRuntime()
             return
         }
+
+        let lastDepth = samples.last?.depthMeters ?? 0
+        if let checkpoint {
+            do {
+                try FullComputerRuntimeCheckpointCodec.validate(checkpoint)
+                guard checkpoint.payload.sessionID == sessionID else {
+                    throw FullComputerRuntimeCheckpointError.sessionMismatch
+                }
+                var engine = try FullComputerRuntimeEngine.restoreEngine(from: checkpoint, sessionStart: sessionStart)
+                let diagnostics = engine.recoverySelfCheckDiagnostics(lastKnownDepthMeters: lastDepth)
+                if diagnostics.isEmpty {
+                    engine.applyConservativeCatchUp(now: Date())
+                    engine.replaySamplesAfterCheckpoint(
+                        samples,
+                        checkpointTimestamp: checkpoint.payload.lastSampleTimestamp
+                    )
+                    engine.tick(now: Date())
+                    fullComputerEngine = engine
+                    fullComputerSnapshot = engine.snapshot
+                    updateFullComputerLogbookAccumulator(from: engine)
+                    return
+                }
+                quarantineCorruptCheckpoint(checkpoint, reason: "self_check_failed:\(diagnostics.joined(separator: ","))")
+            } catch {
+                quarantineCorruptCheckpoint(checkpoint, reason: "checkpoint_restore_failed:\(error)")
+            }
+        }
+
         startFullComputerRuntimeIfNeeded(sessionStart: sessionStart)
         guard var engine = fullComputerEngine else { return }
         engine.replaySamples(samples)
         if let gasSwitchTracker {
             engine.restoreGasSwitchTracker(gasSwitchTracker)
         }
+        engine.applyConservativeCatchUp(now: Date())
         engine.tick(now: Date())
         fullComputerEngine = engine
         fullComputerSnapshot = engine.snapshot
+        updateFullComputerLogbookAccumulator(from: engine)
+    }
+
+    private func quarantineCorruptCheckpoint(_ checkpoint: FullComputerRuntimeCheckpoint, reason: String) {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        guard let data = try? encoder.encode(checkpoint) else { return }
+        quarantineActiveDraftPayload(data, reason: reason)
+        draftRecoveryDiagnostic = String(localized: "watch.full_computer.recovery_checkpoint_quarantined")
+    }
+
+    private func captureFullComputerLogbookMetadata() -> FullComputerDiveLogbookMetadata? {
+        guard sessionDivingMode == .fullComputer, let engine = fullComputerEngine else { return nil }
+        return currentFullComputerLogbookMetadata(engine: engine)
+    }
+
+    private func currentFullComputerLogbookMetadata(engine: FullComputerRuntimeEngine? = nil) -> FullComputerDiveLogbookMetadata? {
+        guard sessionDivingMode == .fullComputer else { return nil }
+        let resolvedEngine = engine ?? fullComputerEngine
+        guard let resolvedEngine else { return nil }
+        updateFullComputerLogbookAccumulator(from: resolvedEngine)
+        let accumulator = fullComputerLogbookAccumulator ?? FullComputerRuntimeLogbookAccumulator()
+        return accumulator.export(
+            watchDivingMode: sessionDivingMode.rawValue,
+            gfLow: resolvedEngine.runtimePlan.gfLow,
+            gfHigh: resolvedEngine.runtimePlan.gfHigh,
+            gasSwitchEvents: resolvedEngine.gasSwitchAuditTrail.map(Self.logbookGasSwitchEvent(from:)),
+            unavailableGasMixIds: Array(resolvedEngine.persistedGasSwitchTracker.unavailableGasMixIds),
+            algorithmVersion: FullComputerRuntimeConfiguration.algorithmVersion
+        )
+    }
+
+    private static func logbookGasSwitchEvent(from event: FullComputerGasSwitchAuditEvent) -> FullComputerLogbookGasSwitchEvent {
+        FullComputerLogbookGasSwitchEvent(
+            id: event.id,
+            timestamp: event.timestamp,
+            kind: FullComputerLogbookGasSwitchKind(rawValue: event.kind.rawValue) ?? .offPlan,
+            depthMeters: event.depthMeters,
+            fromGasMixId: event.fromGasMixId,
+            toGasMixId: event.toGasMixId,
+            note: event.note
+        )
+    }
+
+    private func updateFullComputerLogbookAccumulator(from engine: FullComputerRuntimeEngine) {
+        var working = fullComputerLogbookAccumulator ?? FullComputerRuntimeLogbookAccumulator()
+        working.ingest(snapshot: engine.snapshot, gasSwitchTracker: engine.persistedGasSwitchTracker)
+        fullComputerLogbookAccumulator = working
     }
 
     func confirmFullComputerGasSwitch(gasMixId: UUID) {
@@ -1455,6 +1595,7 @@ final class DiveManager: ObservableObject {
         }
         fullComputerEngine = engine
         fullComputerSnapshot = engine.snapshot
+        updateFullComputerLogbookAccumulator(from: engine)
     }
 
     private func tickFullComputerRuntimeIfNeeded(now: Date = Date()) {
@@ -1462,6 +1603,7 @@ final class DiveManager: ObservableObject {
         engine.tick(now: now)
         fullComputerEngine = engine
         fullComputerSnapshot = engine.snapshot
+        updateFullComputerLogbookAccumulator(from: engine)
     }
 
     private func unavailableFullComputerSnapshot(diagnostics: [String]) -> FullComputerRuntimeSnapshot {

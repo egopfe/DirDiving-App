@@ -53,8 +53,24 @@ enum DiveSessionMerge {
             samples: selectedSamples,
             exceededSupportedDepthRange: winner.exceededSupportedDepthRange || loser.exceededSupportedDepthRange,
             isManual: winner.isManual || loser.isManual,
-            hasDepthProfile: !selectedSamples.isEmpty || winner.hasDepthProfile || loser.hasDepthProfile
+            hasDepthProfile: !selectedSamples.isEmpty || winner.hasDepthProfile || loser.hasDepthProfile,
+            watchActivityMode: winner.watchActivityMode ?? loser.watchActivityMode,
+            watchDivingMode: winner.watchDivingMode ?? loser.watchDivingMode,
+            fullComputerLogbookMetadata: mergedFullComputerLogbookMetadata(winner: winner, loser: loser)
         )
+    }
+
+    private static func mergedFullComputerLogbookMetadata(
+        winner: DiveSession,
+        loser: DiveSession
+    ) -> FullComputerDiveLogbookMetadata? {
+        switch (winner.fullComputerLogbookMetadata, loser.fullComputerLogbookMetadata) {
+        case let (left?, right?):
+            return left.recoveryEventCount >= right.recoveryEventCount ? left : right
+        case (nil, let right?): return right
+        case (let left?, nil): return left
+        case (nil, nil): return nil
+        }
     }
 
     private static func mergedSamples(_ first: [DiveSample], _ second: [DiveSample], startDate: Date, endDate: Date) -> [DiveSample] {

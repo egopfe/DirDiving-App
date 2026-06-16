@@ -1,6 +1,6 @@
 import Foundation
 
-struct BuhlmannGas: Hashable {
+struct BuhlmannGas: Hashable, Codable {
     let gasMixId: UUID
     let cylinderId: UUID?
     let name: String
