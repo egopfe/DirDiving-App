@@ -70,7 +70,9 @@ targets:
       - Utils/FullComputerRuntimeCheckpoint.swift
       - Utils/FullComputerRuntimeLogbookAccumulator.swift
       - Utils/FullComputerLivePanelFixtures.swift
+      - Utils/FullComputerMockupReferenceMatrix.swift
       - Utils/FullComputerPrediveReadiness.swift
+      - Utils/FullComputerReleaseHardTolerances.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
       - Resources
@@ -228,7 +230,9 @@ targets:
       - Utils/FullComputerRuntimeCheckpoint.swift
       - Utils/FullComputerRuntimeLogbookAccumulator.swift
       - Utils/FullComputerLivePanelFixtures.swift
+      - Utils/FullComputerMockupReferenceMatrix.swift
       - Utils/FullComputerPrediveReadiness.swift
+      - Utils/FullComputerReleaseHardTolerances.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
       - Services/FullComputerRuntimeEngine.swift
