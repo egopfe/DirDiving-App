@@ -11,6 +11,7 @@ struct DIRDivingiOSApp: App {
     @StateObject private var legalAcceptance = LegalAcceptanceStore()
     @StateObject private var plannerAscentSpeedSettingsStore = PlannerAscentSpeedSettingsStore()
     @StateObject private var plannerBriefingTransfer = PlannerBriefingWatchTransferService()
+    @StateObject private var divePlanPackageTransfer = DivePlanPackageWatchTransferService()
     @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
 
     init() {
@@ -47,12 +48,14 @@ struct DIRDivingiOSApp: App {
             .environmentObject(legalAcceptance)
             .environmentObject(plannerAscentSpeedSettingsStore)
             .environmentObject(plannerBriefingTransfer)
+            .environmentObject(divePlanPackageTransfer)
             .environment(\.locale, DIRIOSAppLanguage.fromStorage(appLanguage).locale)
             .preferredColorScheme(.dark)
             .task {
                 logStore.attachWatchSync(watchSync)
                 watchSync.activate(logStore: logStore)
                 watchSync.plannerBriefingTransferService = plannerBriefingTransfer
+                watchSync.divePlanPackageTransferService = divePlanPackageTransfer
             }
         }
     }

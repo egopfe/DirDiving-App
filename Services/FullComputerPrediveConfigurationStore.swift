@@ -59,6 +59,13 @@ final class FullComputerPrediveConfigurationStore: ObservableObject {
         persistConfirmed()
     }
 
+    func importProfile(_ profile: FullComputerGasProfile) {
+        guard canEdit else { return }
+        draftProfile = profile
+        confirmedProfile = profile
+        persistConfirmed()
+    }
+
     func reloadDraftFromConfirmed() {
         draftProfile = confirmedProfile ?? .defaultAirGF3070
         persistDraft()

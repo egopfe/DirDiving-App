@@ -1502,6 +1502,7 @@ struct PlanResultView: View {
     @EnvironmentObject private var store: PlannerStore
     @EnvironmentObject private var equipment: EquipmentStore
     @EnvironmentObject private var plannerBriefingTransfer: PlannerBriefingWatchTransferService
+    @EnvironmentObject private var divePlanPackageTransfer: DivePlanPackageWatchTransferService
     var pendingChecklistExportPrompt: Bool = false
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @AppStorage(IOSPressureUnitPreference.storageKey) private var pressureUnitRaw = IOSPressureUnitPreference.storageValue(for: .bar)
@@ -1725,6 +1726,10 @@ struct PlanResultView: View {
         !store.plan.ascentTableRows.isEmpty || !decoStopsPresentationRows.isEmpty
     }
 
+    private var canSendPlanPackage: Bool {
+        store.decompressionMethod == .buhlmann && (store.mode == .deco || store.mode == .technical)
+    }
+
     private var runtimeIncludesDecoStops: Bool {
         !store.plan.decoStops.isEmpty
             || store.plan.ascentTableRows.contains { $0.kind == .decoStop }
@@ -1891,6 +1896,9 @@ struct PlanResultView: View {
                         if canSendWatchBriefing {
                             sendWatchBriefingSection
                         }
+                        if canSendPlanPackage {
+                            sendPlanPackageSection
+                        }
                         if canExportPlanPDF {
                             shareDivePackButton
                         }
@@ -2007,6 +2015,20 @@ struct PlanResultView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
+    }
+
+    private var sendPlanPackageSection: some View {
+        NavigationLink {
+            DivePlanPackageTransferView()
+        } label: {
+            Text(DIRIOSLocalizer.string("fc.plan.transfer.open"))
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(DIRTheme.cyan)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 11)
+                .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
+        }
+        .buttonStyle(.plain)
     }
 
     private func sendPlannerBriefingToWatch() {

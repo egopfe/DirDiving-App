@@ -35,6 +35,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published private(set) var pendingDeleteRequests: [String: WatchPhotoDeleteRequestState] = [:]
     private weak var logStore: DiveLogStore?
     weak var plannerBriefingTransferService: PlannerBriefingWatchTransferService?
+    weak var divePlanPackageTransferService: DivePlanPackageWatchTransferService?
     private var photoIDByTransferFilePath: [String: String] = [:]
     private var companionPhotoTransfersByID: [String: CompanionPhotoTransferStatus] = [:]
     private var pendingPhotoImportVerificationTasks: [String: Task<Void, Never>] = [:]
@@ -456,6 +457,11 @@ final class WatchSyncService: NSObject, ObservableObject {
             return
         }
         plannerBriefingTransferService?.handleAck(packageId: packageId, status: status)
+    }
+
+    private func handleDivePlanPackageAck(_ payload: [String: Any]) {
+        guard let ack = DivePlanPackageTransferSupport.parseAck(payload) else { return }
+        divePlanPackageTransferService?.handleAck(ack)
     }
 
     private func handleCompanionPhotoAck(_ payload: [String: Any]) {
@@ -913,6 +919,7 @@ extension WatchSyncService: WCSessionDelegate {
                     WatchSyncAuth.publishSharedSecretIfNeeded(session: session)
                     self.flushOutboundTransfers()
                 }
+                self.divePlanPackageTransferService?.flushIfNeeded()
             }
         }
     }
@@ -941,6 +948,10 @@ extension WatchSyncService: WCSessionDelegate {
             }
             if CompanionPhotoTransferSupport.isCompanionPhotoAck(message) {
                 self.handleCompanionPhotoAck(message)
+                return
+            }
+            if DivePlanPackageTransferSupport.isPackageAck(message) {
+                self.handleDivePlanPackageAck(message)
                 return
             }
             _ = self.importSessionPayload(message)
@@ -1005,6 +1016,10 @@ extension WatchSyncService: WCSessionDelegate {
             }
             if (userInfo["type"] as? String) == PlannerBriefingTransferSupport.ackType {
                 self.handlePlannerBriefingAck(userInfo)
+                return
+            }
+            if DivePlanPackageTransferSupport.isPackageAck(userInfo) {
+                self.handleDivePlanPackageAck(userInfo)
                 return
             }
             _ = self.importSessionPayload(userInfo)

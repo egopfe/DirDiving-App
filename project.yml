@@ -202,6 +202,9 @@ targets:
       - Models/PlannerBriefingCard.swift
       - Services/PlannerBriefingCardStore.swift
       - Services/PlannerBriefingWatchReceiver.swift
+      - Services/DivePlanPackageWatchReceiver.swift
+      - Services/FullComputerImportedPlanStore.swift
+      - Services/DivePlanPackageAckSigner.swift
       - Utils/PlannerBriefingFreshnessPolicy.swift
       - Models/DIRModesAndStartup.swift
       - Utils/DIRStartupSelectionPolicy.swift
@@ -350,6 +353,7 @@ targets:
       - iOSApp/Services/PDF/CCRPlannerPDFBuilder.swift
       - iOSApp/Services/PlannerBriefingImageExportService.swift
       - iOSApp/Services/PlannerBriefingWatchTransferService.swift
+      - iOSApp/Services/DivePlanPackageBuilder.swift
       - iOSApp/Services/DecoStopsPresentationBuilder.swift
       - iOSApp/Services/PlannerAscentTableBuilder.swift
       - Tests/iOSAlgorithmTests/PDFExportServiceTests.swift

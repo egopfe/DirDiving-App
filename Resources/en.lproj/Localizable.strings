@@ -622,6 +622,13 @@
 "fc.predive.settings.ppo2_max" = "Max PPO2";
 "fc.predive.settings.mod" = "MOD";
 "fc.predive.settings.deco_gases" = "Deco gases";
+"fc.imported_plan.header" = "DIVING · FULL COMPUTER";
+"fc.imported_plan.subheader" = "CONFIRM BEFORE DIVE";
+"fc.imported_plan.runtime" = "Runtime";
+"fc.imported_plan.verify_gas" = "VERIFY GAS";
+"fc.imported_plan.activate" = "ACTIVATE PLAN";
+"fc.imported_plan.dismiss" = "Keep current settings";
+"fc.imported_plan.activate_failed" = "Unable to activate imported plan.";
 "fc.predive.settings.deco_none" = "None";
 "fc.predive.settings.deco_count" = "%d gases";
 "fc.predive.settings.footer" = "Configure before the dive";

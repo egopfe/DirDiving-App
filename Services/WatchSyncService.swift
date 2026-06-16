@@ -365,6 +365,7 @@ final class WatchSyncService: NSObject, ObservableObject {
                 lastSyncStatus = String(format: String(localized: "Tombstone iPhone applicata (%lld)"), ids.count)
             }
         }
+        DivePlanPackageWatchReceiver.importSnapshot(context, store: FullComputerImportedPlanStore.shared)
     }
 
     private func flushPendingTransfers() {
@@ -770,6 +771,15 @@ extension WatchSyncService: WCSessionDelegate {
         Task { @MainActor in
             if WatchDiveSyncCodec.isImportAck(userInfo) {
                 self.handleCompanionImportAck(userInfo)
+                return
+            }
+            if DivePlanPackageTransferSupport.isPackageTransfer(userInfo) {
+                if let ack = DivePlanPackageWatchReceiver.importPayload(
+                    userInfo,
+                    store: FullComputerImportedPlanStore.shared
+                ) {
+                    DivePlanPackageWatchReceiver.deliverAck(ack)
+                }
                 return
             }
             if let ackContext = self.ingestIncomingPayload(userInfo) {

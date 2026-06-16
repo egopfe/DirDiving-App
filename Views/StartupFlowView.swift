@@ -16,7 +16,11 @@ struct StartupFlowView: View {
                 case .divingModeSelection:
                     DivingModeSelectionView()
                 case .fullComputerPrediveConfiguration:
-                    FullComputerPrediveSettingsView()
+                    if FullComputerImportedPlanStore.shared.hasPendingActivation {
+                        FullComputerImportedPlanView()
+                    } else {
+                        FullComputerPrediveSettingsView()
+                    }
                 case .fullComputerConfirmation:
                     FullComputerPrediveConfirmationView()
                 case .comingSoon(let activity):
