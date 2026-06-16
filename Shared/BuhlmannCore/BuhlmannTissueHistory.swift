@@ -208,7 +208,7 @@ enum BuhlmannTissueHistorySampler {
         firstStopDepthMeters: Double,
         into samples: inout [BuhlmannTissueHistorySample]
     ) {
-        guard IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters, environment: request.plannerEnvironment) != nil else {
+        guard AmbientPressureModel.ambientPressureBar(depthMeters: depthMeters, environment: request.plannerEnvironment) != nil else {
             return
         }
         let gf = gradientFactor(
@@ -278,7 +278,7 @@ enum BuhlmannTissueHistorySampler {
         let pn2 = sanitize(compartment.nitrogenPressure)
         let phe = sanitize(compartment.heliumPressure)
         let total = sanitize(pn2 + phe)
-        guard let ambientRaw = IOSUnitConversions.ambientPressureBar(depthMeters: depthMeters, environment: environment) else {
+        guard let ambientRaw = AmbientPressureModel.ambientPressureBar(depthMeters: depthMeters, environment: environment) else {
             return nil
         }
         let ambient = sanitize(ambientRaw)

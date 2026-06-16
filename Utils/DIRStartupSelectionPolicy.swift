@@ -44,7 +44,7 @@ enum DIRStartupSelectionPolicy {
         set { UserDefaults.standard.set(newValue.rawValue, forKey: defaultDivingModeKey) }
     }
 
-    /// Gauge-only: TTV panel hidden by default (F-04).
+    /// Gauge-only: TTV panel hidden by default (F-04 / Command 02).
     static var gaugeShowsTTV: Bool {
         get {
             if UserDefaults.standard.object(forKey: gaugeShowTTVKey) == nil {
@@ -53,6 +53,10 @@ enum DIRStartupSelectionPolicy {
             return UserDefaults.standard.bool(forKey: gaugeShowTTVKey)
         }
         set { UserDefaults.standard.set(newValue, forKey: gaugeShowTTVKey) }
+    }
+
+    static func applySyncedGaugeShowsTTV(_ value: Bool) {
+        UserDefaults.standard.set(value, forKey: gaugeShowTTVKey)
     }
 
     /// Full Computer always requires an explicit pre-dive confirmation screen.

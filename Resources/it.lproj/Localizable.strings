@@ -628,7 +628,13 @@
 "settings.diving.gauge_ttv.footer" = "In Gauge il TTV è opzionale e nascosto di default";
 "settings.diving.reopen_startup" = "Rivedi attività e modalità";
 "settings.diving.reopen_startup.subtitle" = "Riapri la selezione di avvio";
-"live.a11y.runtime_only" = "Runtime %@ minuti";
+"settings.section.gauge" = "GAUGE";
+"settings.gauge.show_ttv" = "Mostra TTV";
+"settings.gauge.show_ttv.subtitle" = "Indice TTV opzionale";
+"settings.gauge.show_ttv.footer" = "Mostra una stima del tempo di risalita basata sulla profondità e sulla velocità configurata. Non considera saturazione dei tessuti, ceiling o obblighi decompressivi.";
+"live.metric.temperature" = "Temp";
+"live.a11y.runtime_temperature" = "Durata %@ minuti, temperatura %@";
+"live.a11y.gauge_non_deco_hint" = "Solo metriche informative Gauge; non NDL, ceiling o guida decompressiva.";
 
 /* MAIN UI remediation — semantic keys */
 

@@ -4,6 +4,7 @@ enum WatchSyncKeys {
     static let deletedSessionIDsKey = "dirdiving_shared_deleted_session_ids"
     static let deletedSessionBroadcastKey = "dirdiving_deleted_session_ids"
     static let unitsPreferenceKey = "units"
+    static let gaugeShowTTVKey = "dirdiving_watch_gauge_show_ttv"
     static let companionPhotoFileNameKey = "photoFileName"
     static let companionPhotoIDKey = "photoID"
     static let companionPhotoAckType = "companionPhotoAck"

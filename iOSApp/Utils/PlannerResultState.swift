@@ -143,15 +143,6 @@ enum GasLedgerFailureReason: Hashable {
     }
 }
 
-enum BuhlmannModelState: String, Codable, Hashable {
-    case validReference
-    case simplifiedReferenceOnly
-    case unsupportedTrimix
-    case modelIncomplete
-    case unavailable
-    case invalidInput
-}
-
 struct PlannerValidationResult: Hashable {
     var states: [PlannerResultState] = []
     var messages: [String] = []

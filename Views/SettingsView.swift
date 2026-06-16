@@ -408,18 +408,20 @@ struct SettingsView: View {
             .buttonStyle(.plain)
             .disabled(dive.isDiveActive)
 
+            WatchSettingsSectionHeader(title: String(localized: "settings.section.gauge"))
+
             Toggle(isOn: gaugeShowTTVBinding) {
                 settingsRow(
                     icon: "gauge.with.dots.needle.67percent",
                     iconColor: DiveUI.cyan,
-                    title: String(localized: "settings.diving.gauge_show_ttv"),
-                    subtitle: String(localized: "settings.diving.gauge_show_ttv.subtitle")
+                    title: String(localized: "settings.gauge.show_ttv"),
+                    subtitle: String(localized: "settings.gauge.show_ttv.subtitle")
                 )
             }
             .toggleStyle(SwitchToggleStyle(tint: DiveUI.cyan))
             .disabled(dive.isDiveActive)
 
-            Text(String(localized: "settings.diving.gauge_ttv.footer"))
+            Text(String(localized: "settings.gauge.show_ttv.footer"))
                 .font(DiveUI.Typography.hintCaption)
                 .foregroundStyle(DiveUI.mutedText)
                 .multilineTextAlignment(.leading)
@@ -450,7 +452,10 @@ struct SettingsView: View {
     private var gaugeShowTTVBinding: Binding<Bool> {
         Binding(
             get: { DIRStartupSelectionPolicy.gaugeShowsTTV },
-            set: { DIRStartupSelectionPolicy.gaugeShowsTTV = $0 }
+            set: { newValue in
+                DIRStartupSelectionPolicy.gaugeShowsTTV = newValue
+                watchSync.publishGaugeTTVPreference(newValue)
+            }
         )
     }
 

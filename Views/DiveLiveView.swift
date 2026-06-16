@@ -32,7 +32,14 @@ struct DiveLiveView: View {
     }
 
     private var showsGaugeTTV: Bool {
-        activitySelection.selectedDivingMode == .gauge && DIRStartupSelectionPolicy.gaugeShowsTTV
+        DIRStartupSelectionPolicy.gaugeShowsTTV
+    }
+
+    private var gaugePresentation: GaugeLivePresentationPolicy {
+        GaugeLivePresentationPolicy.evaluate(
+            isGaugeMode: activitySelection.selectedDivingMode == .gauge,
+            showsTTV: showsGaugeTTV
+        )
     }
 
     private var showsMissionModeControl: Bool {
@@ -284,14 +291,8 @@ struct DiveLiveView: View {
                 } else if !prioritizeDepthHero {
                     secondaryNoticeViews(presentation: presentation)
                 }
-                if showsGaugeTTV {
-                    ttvRuntimePanel
-                        .layoutPriority(2)
-                } else if activitySelection.selectedDivingMode == .gauge
-                            || activitySelection.selectedDivingMode == .fullComputer {
-                    runtimeOnlyPanel
-                        .layoutPriority(2)
-                }
+                gaugeTopMetricsPanel
+                    .layoutPriority(2)
                 if !prioritizeDepthHero {
                     depthSection(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
                         .layoutPriority(2)
@@ -650,6 +651,18 @@ struct DiveLiveView: View {
         .accessibilityHint(String(localized: "a11y.watch.haptics_off_badge.hint"))
     }
 
+    @ViewBuilder
+    private var gaugeTopMetricsPanel: some View {
+        switch gaugePresentation.topPanel {
+        case .hidden:
+            EmptyView()
+        case .ttvAndRuntime:
+            ttvRuntimePanel
+        case .runtimeAndTemperature:
+            gaugeRuntimeTemperaturePanel
+        }
+    }
+
     private var ttvRuntimePanel: some View {
         HStack(spacing: 0) {
             dashboardValue(title: String(localized: "live.metric.ttv"), value: ttvText, unit: nil, color: DiveUI.green)
@@ -680,11 +693,25 @@ struct DiveLiveView: View {
         .accessibilityHint(String(localized: "live.a11y.ttv_hint"))
     }
 
-    private var runtimeOnlyPanel: some View {
+    private var gaugeRuntimeTemperaturePanel: some View {
         HStack(spacing: 0) {
-            dashboardValue(title: String(localized: "live.metric.runtime"), value: runtimeMinutes, unit: "min", color: .white)
+            dashboardValue(
+                title: String(localized: "live.metric.runtime"),
+                value: runtimeMinutes,
+                unit: "min",
+                color: .white
+            )
+            Rectangle()
+                .fill(.white.opacity(0.34))
+                .frame(width: 1, height: 54)
+            dashboardValue(
+                title: String(localized: "live.metric.temperature"),
+                value: temperatureValueOnly,
+                unit: temperatureUnitOnly,
+                color: DiveUI.blue
+            )
         }
-        .frame(maxWidth: .infinity, minHeight: 54)
+        .frame(maxWidth: .infinity, minHeight: 70)
         .background(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .fill(Color.black.opacity(0.42))
@@ -694,7 +721,14 @@ struct DiveLiveView: View {
                 )
         )
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(String(format: String(localized: "live.a11y.runtime_only"), runtimeMinutes))
+        .accessibilityLabel(
+            String(
+                format: String(localized: "live.a11y.runtime_temperature"),
+                runtimeMinutes,
+                temperatureText
+            )
+        )
+        .accessibilityHint(String(localized: "live.a11y.gauge_non_deco_hint"))
     }
 
     private func dashboardValue(title: String, value: String, unit: String?, color: Color) -> some View {
@@ -974,6 +1008,17 @@ struct DiveLiveView: View {
                         .stroke(DiveUI.yellow.opacity(0.7), lineWidth: 1)
                 )
         )
+    }
+
+    private var temperatureValueOnly: String {
+        guard let temp = dive.currentTemperatureCelsius else { return "--.-" }
+        let display = unitPreference.temperatureDisplay(celsius: temp)
+        return Formatters.one(display.value)
+    }
+
+    private var temperatureUnitOnly: String {
+        guard dive.currentTemperatureCelsius != nil else { return "" }
+        return unitPreference.temperatureUnitLabel
     }
 
     private var temperatureText: String {

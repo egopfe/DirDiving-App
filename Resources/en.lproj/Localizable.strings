@@ -628,7 +628,13 @@
 "settings.diving.gauge_ttv.footer" = "In Gauge, TTV is optional and hidden by default";
 "settings.diving.reopen_startup" = "Review activity & mode";
 "settings.diving.reopen_startup.subtitle" = "Re-open startup selection";
-"live.a11y.runtime_only" = "Runtime %@ minutes";
+"settings.section.gauge" = "GAUGE";
+"settings.gauge.show_ttv" = "Show TTV";
+"settings.gauge.show_ttv.subtitle" = "Gauge optional index";
+"settings.gauge.show_ttv.footer" = "Shows an estimate of ascent time based on depth and configured ascent rate. Does not account for tissue saturation, ceiling or decompression obligations.";
+"live.metric.temperature" = "Temp";
+"live.a11y.runtime_temperature" = "Runtime %@ minutes, temperature %@";
+"live.a11y.gauge_non_deco_hint" = "Gauge informational metrics only; not NDL, ceiling or decompression guidance.";
 
 /* MAIN UI remediation — semantic keys (merged into Localizable.strings) */
 

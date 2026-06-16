@@ -114,6 +114,11 @@ final class WatchSyncService: NSObject, ObservableObject {
         WatchSyncAuth.mergeApplicationContext([WatchSyncKeys.unitsPreferenceKey: value])
     }
 
+    func publishGaugeTTVPreference(_ showsTTV: Bool) {
+        guard WCSession.isSupported() else { return }
+        WatchSyncAuth.mergeApplicationContext([WatchSyncKeys.gaugeShowTTVKey: showsTTV])
+    }
+
     func retryPendingTransfers() {
         lastRetryDate = Date()
         guard WCSession.isSupported() else {
@@ -349,6 +354,9 @@ final class WatchSyncService: NSObject, ObservableObject {
         if let units = context[WatchSyncKeys.unitsPreferenceKey] as? String,
            DIRUnitPreference(rawValue: units) != nil {
             UserDefaults.standard.set(units, forKey: DIRUnitPreference.storageKey)
+        }
+        if let showsTTV = context[WatchSyncKeys.gaugeShowTTVKey] as? Bool {
+            DIRStartupSelectionPolicy.applySyncedGaugeShowsTTV(showsTTV)
         }
         if let strings = context[WatchSyncKeys.deletedSessionBroadcastKey] as? [String] {
             let ids = Set(strings.compactMap(UUID.init(uuidString:)))

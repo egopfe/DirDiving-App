@@ -142,8 +142,8 @@ enum BuhlmannEngine {
         plannerEnvironment: PlannerEnvironment = .seaLevelSaltWater
     ) -> Double? {
         guard depthMeters.isFinite,
-              depthMeters >= IOSAlgorithmConfiguration.minPlannerDepthMeters,
-              depthMeters <= IOSAlgorithmConfiguration.maxPlannerDepthMeters,
+              depthMeters >= BuhlmannCoreConfiguration.minPlannerDepthMeters,
+              depthMeters <= BuhlmannCoreConfiguration.maxPlannerDepthMeters,
               gas.isCompositionValid else {
             return nil
         }
@@ -172,12 +172,12 @@ enum BuhlmannEngine {
         if !canSurface(afterBottomMinutes: 0) {
             return 0
         }
-        if canSurface(afterBottomMinutes: IOSAlgorithmConfiguration.maxBottomTimeMinutes) {
-            return IOSAlgorithmConfiguration.maxBottomTimeMinutes
+        if canSurface(afterBottomMinutes: BuhlmannCoreConfiguration.maxBottomTimeMinutes) {
+            return BuhlmannCoreConfiguration.maxBottomTimeMinutes
         }
 
         var low = 0.0
-        var high = IOSAlgorithmConfiguration.maxBottomTimeMinutes
+        var high = BuhlmannCoreConfiguration.maxBottomTimeMinutes
         for _ in 0..<32 {
             let mid = (low + high) / 2.0
             if canSurface(afterBottomMinutes: mid) {
@@ -202,17 +202,17 @@ enum BuhlmannEngine {
     static func validate(_ request: BuhlmannPlanRequest) -> [BuhlmannPlanIssue] {
         var issues: [BuhlmannPlanIssue] = []
         guard request.maxDepthMeters.isFinite,
-              request.maxDepthMeters >= IOSAlgorithmConfiguration.minPlannerDepthMeters,
-              request.maxDepthMeters <= IOSAlgorithmConfiguration.maxPlannerDepthMeters,
+              request.maxDepthMeters >= BuhlmannCoreConfiguration.minPlannerDepthMeters,
+              request.maxDepthMeters <= BuhlmannCoreConfiguration.maxPlannerDepthMeters,
               request.bottomMinutes.isFinite,
               request.bottomMinutes >= 0,
-              request.bottomMinutes <= IOSAlgorithmConfiguration.maxBottomTimeMinutes,
+              request.bottomMinutes <= BuhlmannCoreConfiguration.maxBottomTimeMinutes,
               request.gfLow.isFinite,
               request.gfHigh.isFinite,
-              request.gfLow >= IOSAlgorithmConfiguration.minGradientFactor,
-              request.gfLow <= IOSAlgorithmConfiguration.maxGradientFactor,
-              request.gfHigh >= IOSAlgorithmConfiguration.minGradientFactor,
-              request.gfHigh <= IOSAlgorithmConfiguration.maxGradientFactor,
+              request.gfLow >= BuhlmannCoreConfiguration.minGradientFactor,
+              request.gfLow <= BuhlmannCoreConfiguration.maxGradientFactor,
+              request.gfHigh >= BuhlmannCoreConfiguration.minGradientFactor,
+              request.gfHigh <= BuhlmannCoreConfiguration.maxGradientFactor,
               request.gfLow < request.gfHigh,
               request.descentRateMetersPerMinute.isFinite,
               request.descentRateMetersPerMinute > 0,
@@ -229,7 +229,7 @@ enum BuhlmannEngine {
                 issues.append(.invalidGas(gas.name))
                 continue
             }
-            if gas.ppO2(depthMeters: request.maxDepthMeters, environment: request.plannerEnvironment) > gas.maxPPO2Bar + IOSAlgorithmConfiguration.ppo2HardValidationToleranceBar, gas.role == .bottom {
+            if gas.ppO2(depthMeters: request.maxDepthMeters, environment: request.plannerEnvironment) > gas.maxPPO2Bar + BuhlmannCoreConfiguration.ppo2HardValidationToleranceBar, gas.role == .bottom {
                 issues.append(.ppo2Exceeded(gas.name))
             }
             if gas.role != .bottom {
@@ -275,7 +275,7 @@ enum BuhlmannEngine {
                 issues.append(.modExceeded(segment.gas.name))
             }
         }
-        if bottomSegmentMinutes > IOSAlgorithmConfiguration.maxBottomTimeMinutes {
+        if bottomSegmentMinutes > BuhlmannCoreConfiguration.maxBottomTimeMinutes {
             issues.append(.invalidProfile("Bottom segments exceed maximum bottom time."))
         }
         issues.append(contentsOf: validateGasUseRanges(request))
@@ -753,7 +753,7 @@ enum BuhlmannEngine {
         if gas.ppO2(depthMeters: shallow, environment: environment) < BuhlmannConstants.minBreathablePPO2Bar {
             issues.append(.hypoxicGasTooShallow(gas.name))
         }
-        if gas.ppO2(depthMeters: deep, environment: environment) > gas.maxPPO2Bar + IOSAlgorithmConfiguration.ppo2HardValidationToleranceBar {
+        if gas.ppO2(depthMeters: deep, environment: environment) > gas.maxPPO2Bar + BuhlmannCoreConfiguration.ppo2HardValidationToleranceBar {
             issues.append(.ppo2Exceeded(gas.name))
         }
         if issues.isEmpty, !gas.isOperational(fromDepthMeters: fromDepth, toDepthMeters: toDepth, environment: environment) {

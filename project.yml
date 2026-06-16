@@ -56,11 +56,13 @@ targets:
       - Services/AscentSafetyHapticCoordinator.swift
       - Services/GPSManager.swift
       - Resources
+      - path: Shared
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios.watch
         DEVELOPMENT_TEAM: C6FKKPB6A9
         CODE_SIGN_STYLE: Automatic
+        ENABLE_TESTABILITY: YES
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_FILE: App/Info.plist
         INFOPLIST_KEY_CFBundleIdentifier: com.egopfe.dirdiving.ios.watch
@@ -81,6 +83,7 @@ targets:
     platform: iOS
     sources:
       - Models/PlannerBriefingCard.swift
+      - path: Shared
       - path: iOSApp
         excludes:
           - Models/ExplorationModels.swift
@@ -190,16 +193,21 @@ targets:
       - Utils/PlannerBriefingFreshnessPolicy.swift
       - Models/DIRModesAndStartup.swift
       - Utils/DIRStartupSelectionPolicy.swift
+      - Utils/GaugeLivePresentationPolicy.swift
       - Utils/WatchModeSelectionPreferences.swift
       - Services/DIRActivitySelectionStore.swift
       - Services/AppNavigationStore.swift
       - Models/AppPage.swift
+      - path: Shared
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.watch.algorithmtests
         GENERATE_INFOPLIST_FILE: YES
         DEVELOPMENT_TEAM: C6FKKPB6A9
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/DIRDivingWatchApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DIRDivingWatchApp"
+        BUNDLE_LOADER: "$(TEST_HOST)"
     dependencies:
+      - target: DIRDiving Watch App
       - sdk: XCTest.framework
       - sdk: WatchKit.framework
       - sdk: WatchConnectivity.framework
@@ -238,12 +246,8 @@ targets:
       - iOSApp/Services/PDF/EquipmentSetupPDFBuilder.swift
       - iOSApp/Models/GPSPoint.swift
       - iOSApp/Models/TankSize.swift
-      - iOSApp/Algorithms/Buhlmann/BuhlmannConstants.swift
-      - iOSApp/Algorithms/Buhlmann/BuhlmannGas.swift
-      - iOSApp/Algorithms/Buhlmann/BuhlmannTissueModel.swift
-      - iOSApp/Algorithms/Buhlmann/BuhlmannEngine.swift
-      - iOSApp/Algorithms/Buhlmann/BuhlmannTissueHistory.swift
-      - iOSApp/Algorithms/Buhlmann/BuhlmannPlanPreflightValidator.swift
+      - path: Shared
+      - iOSApp/Algorithms/Buhlmann/BuhlmannGas+GasMix.swift
       - iOSApp/Services/PlannerAscentTableBuilder.swift
       - iOSApp/Services/DecoStopsPresentationBuilder.swift
       - iOSApp/Services/GasLedgerDisplayFormatter.swift
@@ -256,7 +260,6 @@ targets:
       - iOSApp/Services/OxygenExposureModels.swift
       - iOSApp/Services/PlannerGasSchedule.swift
       - iOSApp/Services/PlannerMODValidator.swift
-      - iOSApp/Services/PlannerEnvironment.swift
       - iOSApp/Services/PlannerService.swift
       - iOSApp/Services/RatioDecoPlanner.swift
       - iOSApp/Services/RatioDecoValidator.swift

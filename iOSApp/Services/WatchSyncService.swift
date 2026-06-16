@@ -521,6 +521,9 @@ final class WatchSyncService: NSObject, ObservableObject {
             let preference = IOSUnitPreference.fromSyncCode(units)
             UserDefaults.standard.set(preference.rawValue, forKey: IOSUnitPreference.storageKey)
         }
+        if let showsTTV = context[WatchSyncKeys.gaugeShowTTVKey] as? Bool {
+            UserDefaults.standard.set(showsTTV, forKey: WatchSyncKeys.gaugeShowTTVKey)
+        }
         if let strings = context[WatchSyncKeys.deletedSessionBroadcastKey] as? [String] {
             let ids = Set(strings.compactMap(UUID.init(uuidString:)))
             if !ids.isEmpty {
