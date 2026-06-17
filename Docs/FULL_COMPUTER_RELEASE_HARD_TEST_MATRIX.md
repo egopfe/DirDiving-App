@@ -1,6 +1,6 @@
 # Full Computer release-hard test matrix
 
-**Branch:** `integration/full-computer`  
+**Branch:** `main`  
 **Automation entry point:** `./Scripts/validate_full_computer_release_readiness.sh`
 
 ## Mathematical / algorithm
