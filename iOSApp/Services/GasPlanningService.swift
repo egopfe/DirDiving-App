@@ -5,12 +5,20 @@ enum GasPlanningService {
         analyze(input: input, mode: .technical)
     }
 
-    static func analyze(input: GasPlanInput, mode: PlannerMode) -> TechnicalGasAnalysis {
+    static func analyze(
+        input: GasPlanInput,
+        mode: PlannerMode,
+        ascentSpeedSettings: PlannerAscentSpeedSettings = PlannerAscentSpeedSettings.load()
+    ) -> TechnicalGasAnalysis {
         let active = PlannerModePolicy.activePlanInput(from: input, mode: mode)
-        return analyzeProjectedInput(active, mode: mode)
+        return analyzeProjectedInput(active, mode: mode, ascentSpeedSettings: ascentSpeedSettings)
     }
 
-    private static func analyzeProjectedInput(_ input: GasPlanInput, mode: PlannerMode) -> TechnicalGasAnalysis {
+    private static func analyzeProjectedInput(
+        _ input: GasPlanInput,
+        mode: PlannerMode,
+        ascentSpeedSettings: PlannerAscentSpeedSettings = PlannerAscentSpeedSettings.load()
+    ) -> TechnicalGasAnalysis {
         let gas = input.bottomGas
         let validation = PlannerInputValidator.validate(input, mode: mode)
         guard validation.isValid else {
@@ -31,7 +39,11 @@ enum GasPlanningService {
         let consumption = input.sacLitersPerMinute * ata * input.plannedBottomMinutes
         let remaining = input.availableGasLiters - consumption
         let remainingBar = remaining / input.primaryCylinder.volumeLiters
-        let rockBottom = rockBottomLiters(input: input, environment: environment)
+        let rockBottom = rockBottomLiters(
+            input: input,
+            environment: environment,
+            ascentSpeedSettings: ascentSpeedSettings
+        )
         let minimumGasBar = rockBottom / input.primaryCylinder.volumeLiters
         let usableBeforeMinimum = input.availableGasLiters - rockBottom
         let turnPressure = usableBeforeMinimum > 0
@@ -80,7 +92,14 @@ enum GasPlanningService {
         }
     }
 
-    static func analyze(input: GasPlanInput, enginePlan: BuhlmannEngineResult, oxygenCarryover: OxygenExposureCarryover = .zero, mode: PlannerMode = .technical) -> TechnicalGasAnalysis {
+    static func analyze(
+        input: GasPlanInput,
+        enginePlan: BuhlmannEngineResult,
+        oxygenCarryover: OxygenExposureCarryover = .zero,
+        mode: PlannerMode = .technical,
+        ascentSpeedSettings: PlannerAscentSpeedSettings = PlannerAscentSpeedSettings.load(),
+        operationalEnginePlan: BuhlmannEngineResult? = nil
+    ) -> TechnicalGasAnalysis {
         let base = analyze(input: input, mode: mode)
         guard !enginePlan.segments.isEmpty, enginePlan.modelState == .validReference else {
             return base
@@ -187,7 +206,13 @@ enum GasPlanningService {
         } else if maxDensity >= input.densityWarningLimit {
             states = mergeStates(states, [.gasDensityWarning])
         }
-        switch ScheduleGasConsumptionService.analyze(input: input, enginePlan: enginePlan, environment: environment) {
+        let ledgerEnginePlan = operationalEnginePlan ?? enginePlan.withPlannerTransitMinutes(using: ascentSpeedSettings)
+        switch ScheduleGasConsumptionService.analyze(
+            input: input,
+            enginePlan: ledgerEnginePlan,
+            environment: environment,
+            ascentSpeedSettings: ascentSpeedSettings
+        ) {
         case .success(let ledger):
             let bottomEntry = ledger.bottomGasEntry(from: input)
             let summaryRemainingBar = bottomEntry?.remainingBar ?? base.remainingBar
@@ -220,7 +245,11 @@ enum GasPlanningService {
                 consumptionLiters: ledger.totalConsumedLiters,
                 remainingLiters: summaryRemainingLiters,
                 remainingBar: summaryRemainingBar,
-                rockBottomLiters: rockBottomLiters(input: input, environment: environment),
+                rockBottomLiters: rockBottomLiters(
+                    input: input,
+                    environment: environment,
+                    ascentSpeedSettings: ascentSpeedSettings
+                ),
                 minimumGasBar: base.minimumGasBar,
                 turnPressureBar: base.turnPressureBar,
                 cnsPercent: min(300, exposure.cnsSinglePercent),
@@ -581,8 +610,16 @@ enum GasPlanningService {
         return max(0, eadMeters)
     }
 
-    private static func rockBottomLiters(input: GasPlanInput, environment: PlannerEnvironment) -> Double {
-        ScheduleGasConsumptionService.rockBottomLiters(input: input, environment: environment)
+    private static func rockBottomLiters(
+        input: GasPlanInput,
+        environment: PlannerEnvironment,
+        ascentSpeedSettings: PlannerAscentSpeedSettings = PlannerAscentSpeedSettings.load()
+    ) -> Double {
+        ScheduleGasConsumptionService.rockBottomLiters(
+            input: input,
+            environment: environment,
+            ascentSpeedSettings: ascentSpeedSettings
+        )
     }
 
     private static func surfaceDensityGramsPerLiter(gas: BuhlmannGas) -> Double {

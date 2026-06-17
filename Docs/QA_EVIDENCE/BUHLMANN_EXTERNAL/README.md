@@ -1,34 +1,25 @@
-# External Bühlmann Validation — Evidence Folder
+# Bühlmann External Validation Evidence
 
-**Status: PENDING** — Do not mark PASS without attached files.
+**Status:** PENDING  
+**Scope:** Open-circuit Bühlmann ZHL-16C planner (Base / Deco / Technical)  
+**Rule:** No PASS without attached evidence files in this folder.
 
-**Plan:** [`Docs/DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md`](../../DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md)
+## Required profiles
 
-Attach third-party Bühlmann ZHL-16C + GF profile comparison evidence here. DIR DIVING remains a **non-certified reference planner** — this folder documents external comparison only, not certification.
+| Profile ID | Description | External source | Tolerance |
+|---|---|---|---|
+| OC-AIR-NDL-18M | Air no-deco @ 18 m | Trusted external planner | ±2 min NDL |
+| OC-NX32-30M | EAN32 @ 30 m | Trusted external planner | ±3 min runtime |
+| OC-TX-18-45-40M | Trimix 18/45 @ 40 m | Trusted external planner | ±5 min TTS |
+| OC-MULTIGAS-DECO | Back + 2 deco stages | Trusted external planner | Stop depths ±3 m |
+| OC-ALT-FW | Altitude + freshwater | Trusted external planner | MOD/ceiling ±2 m |
 
----
+## Evidence checklist
 
-## Required artifacts (per comparison session)
+- [ ] Screenshots or export files from external tool
+- [ ] Tester name and date
+- [ ] Device / tool version
+- [ ] Internal fixture cross-reference (`Tests/iOSAlgorithmTests/BuhlmannReferenceFixtureTests.swift`)
+- [ ] Result field: PENDING / PASS / FAIL
 
-| Field | Value |
-|---|---|
-| Third-party tool / tables used | e.g. Subsurface, MultiDeco, VPlanner, etc. |
-| Profile inputs | depth, time, gases, GF low/high, environment |
-| DIR Diving build / commit | |
-| Simulator or device | |
-| Exported CSV/PDF from DIR Diving | attach file |
-| Exported reference profile | attach file |
-| Comparison table | expected vs actual stops, NDL, ceiling |
-| Tolerances documented | e.g. stop depth ±3 m, time ±1 min |
-| Reviewer | |
-| Date | |
-| Pass/Fail | **leave blank until reviewed** |
-
-## Attachments checklist
-
-- [ ] Screenshots of both planners with identical inputs
-- [ ] Comparison spreadsheet or markdown table
-- [ ] Notes on acceptable deltas and known model differences
-- [ ] Sign-off or explicit waiver rationale
-
-**No external Bühlmann validation was passed until files exist in this directory.**
+Internal fixtures do **not** replace external validation.

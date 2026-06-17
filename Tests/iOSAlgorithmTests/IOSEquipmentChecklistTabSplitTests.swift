@@ -29,6 +29,9 @@ final class IOSEquipmentChecklistTabSplitTests: XCTestCase {
             "tab.settings",
             "checklist.title",
             "checklist.subtitle",
+            "checklist.section.equipment",
+            "checklist.section.task",
+            "checklist.quick_add.title",
             "checklist.setup.title",
             "checklist.empty.open_gear",
             "equipment.images.section"
@@ -36,6 +39,14 @@ final class IOSEquipmentChecklistTabSplitTests: XCTestCase {
         for key in keys {
             XCTAssertFalse(String(localized: String.LocalizationValue(key)).isEmpty, "Missing localization for \(key)")
         }
+    }
+
+    func testChecklistViewUsesGroupedSections() throws {
+        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/ChecklistView.swift"))
+        XCTAssertTrue(source.contains("checklistSections"))
+        XCTAssertTrue(source.contains("ChecklistItemKind.sectionOrder"))
+        XCTAssertTrue(source.contains("ChecklistQuickPreset"))
+        XCTAssertTrue(source.contains("checklist.status.required_badge_format"))
     }
 
     func testContentViewExposesSixMainTabs() throws {

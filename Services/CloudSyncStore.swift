@@ -104,8 +104,19 @@ final class CloudSyncStore: ObservableObject {
             return
         }
 
-        if data.count > DiveAlgorithmConfiguration.maxSyncPayloadBytes {
+        let decision = CloudSyncBudgetPolicy.evaluateWrite(
+            key: key,
+            newData: data,
+            existingFootprints: CloudSyncBudgetPolicy.footprints(from: cloudStore)
+        )
+        switch decision {
+        case .allowed:
+            break
+        case .perKeyExceeded:
             lastSyncStatus = "Payload troppo grande per iCloud KVS"
+            return
+        case .aggregateExceeded:
+            lastSyncStatus = "Budget iCloud KVS aggregato superato"
             return
         }
 
@@ -142,8 +153,20 @@ final class CloudSyncStore: ObservableObject {
     }
 
     private func persistToCloudIfWithinCap(_ data: Data, key: String, modifiedAt: TimeInterval) {
-        guard data.count <= DiveAlgorithmConfiguration.maxSyncPayloadBytes else {
+        let decision = CloudSyncBudgetPolicy.evaluateWrite(
+            key: key,
+            newData: data,
+            existingFootprints: CloudSyncBudgetPolicy.footprints(from: cloudStore),
+            replacingKey: key
+        )
+        switch decision {
+        case .allowed:
+            break
+        case .perKeyExceeded:
             lastSyncStatus = "Payload troppo grande per iCloud KVS"
+            return
+        case .aggregateExceeded:
+            lastSyncStatus = "Budget iCloud KVS aggregato superato"
             return
         }
         cloudStore.set(data, forKey: key)

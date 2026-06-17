@@ -1,6 +1,6 @@
 # CCR / Rebreather Planner — DIR DIVING iOS MAIN
 
-**Last updated:** 2026-06-09 (`main` @ `0569903`)  
+**Last updated:** 2026-06-14 (`main` @ `99ea74a`)  
 **Product stance:** **Reference-only** companion planner — not a certified CCR controller.
 
 ## Scope

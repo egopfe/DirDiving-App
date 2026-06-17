@@ -196,12 +196,18 @@ struct CCRTimelineSample: Hashable {
     let ppO2Bar: Double
     let ppN2Bar: Double
     let endMeters: Double
-    let gasDensityGramsPerLiter: Double?
+    let gasDensityResult: CCRGasDensityResult
+
+    var gasDensityGramsPerLiter: Double? { gasDensityResult.gramsPerLiter }
 }
 
 struct CCRCNSTimelineSample: Hashable {
     let runtimeMinutes: Double
     let cnsPercent: Double
+}
+
+enum CCRBailoutCalculationMethod: String, Codable, Hashable {
+    case heuristic
 }
 
 struct CCRBailoutScenarioResult: Identifiable, Hashable {
@@ -214,8 +220,11 @@ struct CCRBailoutScenarioResult: Identifiable, Hashable {
     let warnings: [String]
     let gasSwitchSequence: [String]
     let referenceNotes: String
+    let method: CCRBailoutCalculationMethod
+    let limitations: [String]
+    let assumptions: [String]
     /// SAC-based reserve estimate — not a Bühlmann OC bailout decompression schedule.
-    var isHeuristic: Bool { true }
+    var isHeuristic: Bool { method == .heuristic }
 }
 
 enum CCRBailoutScenarioStatus: String, Hashable {
@@ -265,9 +274,7 @@ struct CCRPlanResult: Hashable {
     let schedule: [CCRScheduleRow]
     let bailoutScenarios: [CCRBailoutScenarioResult]
     let tissueTrace: BuhlmannTissueHistory
-    let cnsFullPlanPercent: Double
-    let cnsDescentBottomPercent: Double
-    let otuFullPlan: Double
+    let oxygenExposure: CCROxygenExposureState
     let ppO2Timeline: [CCRTimelineSample]
     let ppN2Timeline: [CCRTimelineSample]
     let endTimeline: [CCRTimelineSample]
@@ -282,13 +289,16 @@ struct CCRPlanResult: Hashable {
     let depthProfilePoints: [DepthProfilePoint]
     let buhlmannState: BuhlmannModelState
 
+    var cnsFullPlanPercent: Double { oxygenExposure.cnsPercent ?? 0 }
+    var cnsDescentBottomPercent: Double { oxygenExposure.descentBottomCNSPercent ?? 0 }
+    var otuFullPlan: Double { oxygenExposure.otu ?? 0 }
+    var hasAvailableOxygenExposure: Bool { oxygenExposure.isAvailable }
+
     static let empty = CCRPlanResult(
         schedule: [],
         bailoutScenarios: [],
         tissueTrace: .empty,
-        cnsFullPlanPercent: 0,
-        cnsDescentBottomPercent: 0,
-        otuFullPlan: 0,
+        oxygenExposure: .unavailable(reason: .invalidInput),
         ppO2Timeline: [],
         ppN2Timeline: [],
         endTimeline: [],

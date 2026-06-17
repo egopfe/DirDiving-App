@@ -1,6 +1,13 @@
-# CURSOR / CODEX COMMAND — 1-DIR DIVING iOS BÜHLMANN COMPREHENSIVE READINESS AUDIT UPDATED WITH CCR / REBREATHER
+# CURSOR / CODEX COMMAND — 1-DIR DIVING iOS BÜHLMANN COMPREHENSIVE READINESS AUDIT UPDATED WITH CCR / REBREATHER — V2.0
 
 You are working on the DIR DIVING repository.
+
+**Command version:** 2.0  
+**Updated for MAIN:** 2026-06-13  
+**Repository:** `egopfe/DirDiving-App`  
+**Required branch:** `main`  
+**Task type:** audit-only
+
 
 ## TARGET
 
@@ -16,9 +23,11 @@ ONLY iOS Companion MAIN target:
 
 This is the **first audit command** to run after every meaningful Planner / algorithm / gas / CCR / Ratio Deco / export / checklist / logbook change.
 
-The filename intentionally starts with `1-` because this audit is the first readiness gate before any follow-up remediation command:
+The filename intentionally starts with `1-` because this audit is the first readiness gate before any follow-up remediation command.
 
-`Docs/1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_UPDATED.md`
+The `1-` prefix must always be preserved. Future revisions must change only the version suffix, for example `_V2.1`, `_V3.0`, while keeping this command in the same audit-sequence position.
+
+`Docs/1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_UPDATED_V2.0.md`
 
 ## TASK TYPE
 
@@ -59,6 +68,16 @@ Use and integrate the latest project context and existing docs if present:
 - `Docs/SUBSURFACE_CSV_ROUNDTRIP.md`
 - `Docs/RELEASE_CHECKLIST.md`
 - `Docs/TESTFLIGHT_REVIEW_NOTES.md`
+- `Docs/UI_UX_MAIN_AUDIT_CURRENT.md`
+- `Docs/UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md`
+- documentation for Planner ascent-speed settings
+- documentation for Planner Emergency / Rock Bottom
+- documentation for full Dive Runtime and dedicated deco-stop presentation
+- documentation for gas ledger / reserve presentation
+- documentation for structured Equipment and operational checklist
+- documentation for CCR checklist import/export
+- documentation for repetitive-dive planning
+- documentation for Planner briefing cards exported to Apple Watch
 
 If any document is missing, note it in the final report. Do not invent evidence from missing files.
 
@@ -67,6 +86,25 @@ If any document is missing, note it in the final report. Do not invent evidence 
 # OBJECTIVE
 
 Perform a complete and deep **iOS Bühlmann algorithm completeness and functionality readiness audit** covering the Planner, decompression engine, gas model, CCR / rebreather extension readiness, Ratio Deco, tissue loading, narcotic loading, MOD/PPO2/Dalton validation, gas roles, checklist sync, manual dive integration, PDF/share export, CSV import/export, unit conversion and release-hard readiness matrix.
+
+The audit must include the latest MAIN implementations, especially:
+
+- structured Equipment setup and operational pre-dive checklist;
+- CCR checklist import and export;
+- Planner ascent-speed settings;
+- Planner Emergency / Rock Bottom parameters;
+- complete Dive Runtime presentation;
+- dedicated decompression-stop section;
+- gas ledger and reserve display in liters and cylinder-equivalent bar;
+- Technical-mode average-depth gas-consumption option;
+- schedule-aware gas consumption;
+- repetitive-dive planning and residual tissue handling;
+- route summary and plan-completeness/result-state gating;
+- CCR bailout scenario calculator;
+- CCR gas-density estimator;
+- Planner briefing card / PNG export to Apple Watch.
+
+The audit must distinguish canonical algorithm changes from presentation-only changes and must not treat display builders as independent decompression algorithms.
 
 The audit must answer:
 
@@ -79,7 +117,15 @@ The audit must answer:
 7. Are tissue loading and narcotic loading model-backed, chart-backed and export-backed without fake/static values?
 8. Are manual dives, logbook profiles, planner simulations and exports using consistent math?
 9. What blocks 100% Bühlmann / Planner readiness?
-10. What must be fixed first, without changing the product logic already implemented?
+10. Are Rock Bottom/emergency gas calculations conservative and isolated from normal planned consumption?
+11. Are ascent/descent speeds, runtime rows and decompression-stop rows mathematically consistent?
+12. Is schedule-aware gas consumption coherent across segments and gas roles?
+13. Is the Technical average-depth gas toggle limited to gas-consumption estimation only?
+14. Are repetitive-dive residual tissues handled explicitly and correctly?
+15. Do gas ledger liters/bar values match canonical gas calculations?
+16. Do structured Equipment and CCR checklist mappings preserve gas roles and numerical values?
+17. Are Planner briefing cards transferred to Apple Watch numerically faithful and clearly reference-only?
+18. What must be fixed first, without changing the product logic already implemented?
 
 ---
 
@@ -153,6 +199,51 @@ CCR / Rebreather audit scope includes:
 Do not implement CCR features during this audit. Report only.
 
 ---
+
+
+## E. Latest MAIN implementation context
+
+The current `main` branch includes or may include the following additional components that must be audited where present:
+
+- `PlannerAscentSpeedSettings`
+- `PlannerAscentTableBuilder`
+- `DecoStopsPresentationBuilder`
+- `GasLedgerDisplayFormatter`
+- `ScheduleGasConsumptionService`
+- `RepetitiveDivePlannerService`
+- `RouteSummaryService`
+- `RouteSummaryAggregation`
+- `PlanCalculationCompleteness`
+- `PlannerResultState`
+- `EquipmentStructuredModels`
+- `EquipmentStructuredSupport`
+- `EquipmentPlannerMapper`
+- `EquipmentChecklistGenerator`
+- `CCRChecklistImportCoordinator`
+- `CCRChecklistExportCoordinator`
+- `CCRBailoutScenarioCalculator`
+- `CCRGasDensityEstimator`
+- `PlannerBriefingCard`
+- `PlannerBriefingCardStore`
+- `PlannerBriefingWatchReceiver`
+
+Audit actual source paths and target membership instead of assuming names or implementation status.
+
+## F. Canonical math versus presentation-only logic
+
+The audit must classify every relevant component as one of:
+
+1. canonical calculation source;
+2. validation/preflight;
+3. projection/mapping;
+4. persistence/sync;
+5. presentation builder;
+6. numerical formatter;
+7. export/rendering;
+8. documentation/test only.
+
+Presentation-only components must be verified for fidelity to canonical results but must not be credited as separate mathematical engines.
+
 
 # ABSOLUTE RULES
 
@@ -302,6 +393,11 @@ Inspect at least:
 - `iOSApp/Utils/PlannerModePolicy.swift`
 - `iOSApp/Utils/PlannerResultState.swift`
 - `iOSApp/Utils/PlanCalculationCompleteness.swift`
+- `iOSApp/Models/PlannerAscentSpeedSettings.swift`
+- `iOSApp/Services/PlannerAscentTableBuilder.swift`
+- `iOSApp/Services/DecoStopsPresentationBuilder.swift`
+- `iOSApp/Services/RouteSummaryService.swift`
+- `iOSApp/Utils/RouteSummaryAggregation.swift`
 
 ## Bühlmann / gas / exposure
 
@@ -312,6 +408,8 @@ Inspect at least:
 - `iOSApp/Services/BuhlmannPlanner.swift`
 - `iOSApp/Services/GasPlanningService.swift`
 - `iOSApp/Services/ScheduleGasConsumptionService.swift`
+- `iOSApp/Services/GasLedgerDisplayFormatter.swift`
+- `iOSApp/Services/RepetitiveDivePlannerService.swift`
 - `iOSApp/Services/PlannerEnvironment.swift`
 - `iOSApp/Services/OxygenExposureModels.swift`
 - `iOSApp/Utils/GasMixValidator.swift`
@@ -349,6 +447,15 @@ Search for:
 - `iOSApp/Views/LogbookView.swift`
 - `iOSApp/Views/EquipmentView.swift`
 - `iOSApp/Views/MoreView.swift`
+- `iOSApp/Models/EquipmentStructuredModels.swift`
+- `iOSApp/Utils/EquipmentStructuredSupport.swift`
+- `iOSApp/Utils/EquipmentPlannerMapper.swift`
+- `iOSApp/Utils/EquipmentChecklistGenerator.swift`
+- `iOSApp/Utils/CCRChecklistImportCoordinator.swift`
+- `iOSApp/Utils/CCRChecklistExportCoordinator.swift`
+- `iOSApp/Services/PDF/EquipmentSetupPDFBuilder.swift`
+- `Models/PlannerBriefingCard.swift`
+- Watch-side briefing-card receiver/store files only to verify iOS export fidelity and reference-only semantics
 
 Search for:
 
@@ -379,7 +486,13 @@ Families:
 11. PDF / Share
 12. CSV / Subsurface
 13. Unit conversion
-14. Release-hard matrix
+14. Emergency / Rock Bottom
+15. Transit timing / Dive Runtime
+16. Gas ledger / reserve display
+17. Repetitive Dive
+18. Structured Equipment mapping
+19. Planner briefing card export
+20. Release-hard matrix
 
 ---
 
@@ -415,7 +528,10 @@ Verify:
 - manual GF low/high if supported;
 - full Bühlmann schedule;
 - full tissue/compartment charts where implemented;
-- full gas ledger and bailout separation.
+- full gas ledger and bailout separation;
+- Technical average-depth gas-consumption toggle is isolated to gas consumption;
+- Emergency/Rock Bottom remains conservative;
+- complete Dive Runtime and dedicated deco-stop sections match canonical results.
 
 Output:
 
@@ -617,6 +733,167 @@ Output:
 
 ---
 
+
+# PHASE 3E — EMERGENCY / ROCK BOTTOM READINESS AUDIT
+
+Inspect all models, services, views, persistence and tests related to:
+
+- Planner Emergency section;
+- Rock Bottom;
+- minimum gas;
+- reserve gas;
+- stressed RMV/SAC;
+- team size / affected diver count;
+- problem-solving time;
+- ascent and stop gas;
+- available gas;
+- liters required;
+- bar-equivalent display;
+- insufficiency warnings.
+
+Verify:
+
+- ambient pressure calculation;
+- maximum-depth reference;
+- ascent-speed dependency;
+- problem-solving time;
+- stressed diver multiplier;
+- stop/decompression inclusion policy;
+- reserve separation;
+- rounding direction;
+- cylinder-volume conversion;
+- liters-to-bar conversion;
+- metric/imperial round trip;
+- invalid/zero/negative/NaN/infinite guards;
+- Base/Deco/Technical/CCR eligibility;
+- export/PDF/briefing-card fidelity.
+
+Critical invariants:
+
+- Emergency/Rock Bottom gas is not merged into normal planned consumption.
+- Technical average-depth gas mode must not reduce Rock Bottom unless explicitly and safely documented.
+- Display-rounded bar values must never feed back into canonical liters.
+- CCR bailout emergency gas must not silently reuse normal OC bottom-gas assumptions.
+
+Output:
+
+- Rock Bottom readiness %;
+- emergency gas mathematical readiness %;
+- emergency unit conversion readiness %;
+- export consistency readiness %.
+
+# PHASE 3F — ASCENT SPEED / DIVE RUNTIME / DECO STOP AUDIT
+
+Inspect:
+
+- global Planner ascent-speed settings;
+- descent-speed assumptions;
+- persistence and migration;
+- `PlannerAscentTableBuilder`;
+- `DecoStopsPresentationBuilder`;
+- full Dive Runtime rows;
+- route summary;
+- total runtime / TTS / TTR consistency.
+
+Verify:
+
+- defaults and valid bounds;
+- no zero/negative speed;
+- transit time formula;
+- runtime accumulation;
+- correct phase ordering;
+- descent, bottom, travel, gas switch, decompression stop and final ascent ordering;
+- dedicated decompression-stop section exactly matches canonical Bühlmann/CCR schedule;
+- presentation builders do not mutate or recompute canonical decompression results;
+- ascent-speed changes propagate consistently to transit time and schedule-aware gas use;
+- localization and formatting do not alter numeric values.
+
+Output:
+
+- ascent/descent speed readiness %;
+- Dive Runtime readiness %;
+- decompression-stop presentation truthfulness %;
+- route-summary readiness %.
+
+# PHASE 3G — SCHEDULE-AWARE GAS CONSUMPTION / GAS LEDGER AUDIT
+
+Inspect:
+
+- `GasPlanningService`;
+- `PlannerGasSchedule`;
+- `ScheduleGasConsumptionService`;
+- `GasLedgerDisplayFormatter`;
+- segment-to-gas-role mapping;
+- liters and bar-equivalent presentation.
+
+Verify:
+
+- consumption integrates over correct depth/time segments;
+- travel/back/deco/bailout/diluent roles are respected;
+- switch depth and runtime are correct;
+- ascent-speed settings affect transit gas coherently;
+- bailout remains excluded from normal consumption unless an explicit bailout scenario is calculated;
+- CCR diluent is not consumed as OC breathing gas during setpoint phases;
+- liters remain canonical;
+- bar is a cylinder-specific display equivalent;
+- rounding is display-only;
+- duplicate cylinder/gas aggregation is deterministic;
+- insufficient-gas warnings compare compatible units.
+
+Output:
+
+- schedule-aware gas readiness %;
+- gas ledger readiness %;
+- reserve display readiness %;
+- liters/bar conversion readiness %.
+
+# PHASE 3H — TECHNICAL AVERAGE-DEPTH GAS TOGGLE AUDIT
+
+Verify the Technical-mode option that allows average depth for gas-consumption estimation.
+
+Mandatory rules:
+
+- default remains conservative max-depth gas consumption;
+- toggle affects gas consumption only;
+- Bühlmann, decompression, MOD, PPO2, switch depth and Rock Bottom remain based on intended conservative inputs;
+- average depth must be valid and <= max depth;
+- hidden/stale state cannot affect Base, Deco or CCR;
+- PDF/share/briefing cards disclose the chosen gas-consumption basis;
+- persistence does not leak the toggle across unsupported modes.
+
+Output:
+
+- Technical average-depth gas readiness %;
+- mode isolation readiness %;
+- disclosure/export readiness %.
+
+# PHASE 3I — REPETITIVE DIVE / RESIDUAL TISSUE AUDIT
+
+Inspect `RepetitiveDivePlannerService` and all related tissue-state inputs, persistence and tests.
+
+Verify:
+
+- previous tissue-state source;
+- chronology;
+- surface interval;
+- N2/He off-gassing;
+- GF compatibility;
+- fresh-tissue versus repetitive state;
+- invalid/future/stale prior dive handling;
+- deterministic repeated calculations;
+- CCR/OC compatibility;
+- export and UI disclosure;
+- no silent fallback to fresh tissues.
+
+Generate or inspect tests for short, medium and long surface intervals.
+
+Output:
+
+- repetitive-dive readiness %;
+- residual-tissue integrity readiness %;
+- disclosure/persistence readiness %.
+
+
 # PHASE 4 — CCR / REBREATHER READINESS AUDIT
 
 Search for CCR / Rebreather concepts:
@@ -673,6 +950,33 @@ If CCR is partially present, audit:
 - diluent END/PPN2;
 - bailout MOD;
 - oxygen toxicity under setpoint.
+
+## CCR Checklist Import / Export
+
+Verify:
+
+- checklist import maps diluent only to CCR diluent;
+- checklist import maps bailout only to CCR bailout;
+- cylinder size, pressure, mix and role survive round trip;
+- duplicate prevention;
+- validation of imported values;
+- stale-value replacement rules;
+- OC and CCR gas-role separation.
+
+## CCR Bailout Scenario / Gas Density
+
+Verify:
+
+- `CCRBailoutScenarioCalculator` inputs and outputs;
+- explicit CCR-to-OC bailout transition;
+- bailout schedule separation from normal CCR schedule;
+- required bailout gas in liters/bar;
+- `CCRGasDensityEstimator`;
+- gas composition and ambient-pressure assumptions;
+- temperature assumptions;
+- thresholds and warnings;
+- display rounding does not change threshold classification;
+- results are labelled estimates where environmental assumptions are incomplete.
 
 ## CCR Gas Consumption
 
@@ -848,7 +1152,12 @@ Verify:
 - sync with gas roles;
 - equipment/task generation;
 - no accidental deletion of user checklist data;
-- mode-aware behavior.
+- mode-aware behavior;
+- structured Equipment setup mapping;
+- operational checklist generation;
+- CCR checklist import/export round trip;
+- cylinder size, pressure, mix and role preservation;
+- Equipment Setup PDF numerical fidelity.
 
 Output:
 
@@ -907,7 +1216,29 @@ Verify:
 - tissue summary if claimed;
 - narcotic summary if claimed;
 - CCR setpoint/diluent/bailout if claimed;
-- reference-only disclaimer.
+- reference-only disclaimer;
+- Rock Bottom/emergency section if exposed;
+- ascent/descent assumptions;
+- full Dive Runtime;
+- dedicated decompression stops;
+- gas ledger liters/bar;
+- repetitive-dive status;
+- Technical average-depth gas basis if enabled.
+
+## Planner briefing card / PNG to Apple Watch
+
+Verify:
+
+- `PlannerBriefingCard` canonical values;
+- rendered PNG/card text;
+- structured metadata versus rendered content;
+- units and localization;
+- version/staleness handling;
+- transfer status and failure handling;
+- Watch-side reception/persistence;
+- explicit reference-only semantics;
+- no implication of live decompression guidance;
+- no stale card overwriting newer plan data.
 
 ## Checklist PDF
 
@@ -984,7 +1315,12 @@ Verify:
 - Logbook;
 - PDF;
 - CSV;
-- CCR setpoint remains PPO2 bar and is not converted as pressure tank units.
+- CCR setpoint remains PPO2 bar and is not converted as pressure tank units;
+- Rock Bottom liters ↔ bar equivalent;
+- cylinder-volume-dependent pressure display;
+- ascent/descent speeds;
+- gas ledger liters/bar;
+- briefing card values.
 
 Output:
 
@@ -1007,7 +1343,14 @@ Verify:
 - Planner export/import preservation;
 - CCR fields preserved if present;
 - Watch sync payloads do not corrupt iOS algorithm data;
-- no hybrid profile sample merge.
+- no hybrid profile sample merge;
+- ascent-speed settings persistence;
+- emergency/Rock Bottom settings persistence;
+- Technical average-depth toggle persistence;
+- repetitive-dive metadata and tissue-source persistence;
+- structured Equipment numerical values;
+- CCR checklist role persistence;
+- Planner briefing-card versioning and transfer integrity.
 
 Output:
 
@@ -1042,7 +1385,20 @@ Report missing tests for:
 - CSV/Subsurface;
 - cloud conflicts;
 - unit conversion;
-- performance boundaries.
+- performance boundaries;
+- Rock Bottom reference vectors;
+- ascent/descent transit timing;
+- runtime ordering;
+- deco-stop table equivalence;
+- schedule-aware gas consumption;
+- liters/bar conversion;
+- Technical average-depth toggle isolation;
+- repetitive-dive residual tissues;
+- structured Equipment mappings;
+- CCR checklist round trip;
+- CCR bailout scenario;
+- CCR gas density;
+- Planner briefing-card encode/render/transfer/receive.
 
 Output:
 
@@ -1063,14 +1419,26 @@ Provide readiness percentages:
 | CCR / Rebreather | XX% |
 | Ratio Deco | XX% |
 | Gas Roles | XX% |
+| Emergency / Rock Bottom | XX% |
+| Ascent / Descent Transit Timing | XX% |
+| Dive Runtime / Deco Stops | XX% |
+| Schedule-Aware Gas Consumption | XX% |
+| Gas Ledger / Reserve Display | XX% |
+| Technical Average-Depth Gas Toggle | XX% |
+| Repetitive Dive / Residual Tissues | XX% |
 | MOD/PPO2/Dalton | XX% |
 | Switch Depth Clamp | XX% |
 | Tissue Loading | XX% |
 | Narcosis / END / PPN2 | XX% |
 | CNS / OTU | XX% |
 | Checklist Sync | XX% |
+| Structured Equipment Mapping | XX% |
+| CCR Checklist Import / Export | XX% |
+| CCR Bailout Scenario | XX% |
+| CCR Gas Density | XX% |
 | Manual Dive | XX% |
 | PDF / Share Export | XX% |
+| Planner Briefing Card / Watch Transfer | XX% |
 | CSV / Subsurface | XX% |
 | Unit Conversion | XX% |
 | Cloud / Sync Integrity | XX% |
@@ -1113,6 +1481,20 @@ If tools are available, run or suggest:
   - `switchDepthMeters`
   - `PlannerMODValidator`
   - `modMeters`
+  - `RockBottom`
+  - `Emergency`
+  - `PlannerAscentSpeedSettings`
+  - `PlannerAscentTableBuilder`
+  - `DecoStopsPresentationBuilder`
+  - `GasLedgerDisplayFormatter`
+  - `ScheduleGasConsumptionService`
+  - `RepetitiveDivePlannerService`
+  - `RouteSummary`
+  - `PlanCalculationCompleteness`
+  - `CCRChecklistImportCoordinator`
+  - `CCRBailoutScenarioCalculator`
+  - `CCRGasDensityEstimator`
+  - `PlannerBriefingCard`
 
 Do not fix. Record findings.
 
@@ -1162,6 +1544,14 @@ For every issue, classify:
 - Tests
 - Docs
 - External QA
+- Emergency / Rock Bottom
+- Transit Timing
+- Dive Runtime / Deco Stops
+- Schedule-Aware Gas Consumption
+- Gas Ledger / Reserve
+- Repetitive Dive
+- Structured Equipment
+- Planner Briefing Card
 
 For each issue include:
 
@@ -1240,25 +1630,35 @@ The report must contain:
 
 ## I. MOD / PPO2 / Dalton / Switch Depth Audit
 
-## J. Tissue Loading Audit
+## J. Emergency / Rock Bottom Audit
 
-## K. Narcotic Loading Audit
+## K. Ascent Speed / Dive Runtime / Deco Stops Audit
 
-## L. CNS / OTU Audit
+## L. Schedule-Aware Gas Consumption / Gas Ledger Audit
 
-## M. Planner ↔ Checklist Audit
+## M. Technical Average-Depth Gas Toggle Audit
 
-## N. Manual Dive / Logbook Audit
+## N. Repetitive Dive / Residual Tissue Audit
 
-## O. PDF / Share / CSV / Subsurface Audit
+## O. Tissue Loading Audit
 
-## P. Unit Conversion Audit
+## P. Narcotic Loading Audit
 
-## Q. Cloud / Sync / Persistence Audit
+## Q. CNS / OTU Audit
 
-## R. Test Coverage Audit
+## R. Planner ↔ Checklist / Structured Equipment Audit
 
-## S. Release Hard Matrix
+## S. Manual Dive / Logbook Audit
+
+## T. PDF / Share / Briefing Card / CSV / Subsurface Audit
+
+## U. Unit Conversion Audit
+
+## V. Cloud / Sync / Persistence Audit
+
+## W. Test Coverage Audit
+
+## X. Release Hard Matrix
 
 Mandatory table:
 
@@ -1268,21 +1668,33 @@ Mandatory table:
 | Planner Base/Deco/Technical | XX% | ... | ... |
 | CCR / Rebreather | XX% | ... | ... |
 | Ratio Deco | XX% | ... | ... |
-| Gas Roles | XX% | ... | ... |
+| Gas Roles | XX% |
+| Emergency / Rock Bottom | XX% |
+| Ascent / Descent Transit Timing | XX% |
+| Dive Runtime / Deco Stops | XX% |
+| Schedule-Aware Gas Consumption | XX% |
+| Gas Ledger / Reserve Display | XX% |
+| Technical Average-Depth Gas Toggle | XX% |
+| Repetitive Dive / Residual Tissues | XX% | ... | ... |
 | MOD/PPO2/Dalton | XX% | ... | ... |
 | Switch Depth Clamp | XX% | ... | ... |
 | Tissue Loading | XX% | ... | ... |
 | Narcosis | XX% | ... | ... |
 | CNS/OTU | XX% | ... | ... |
-| Checklist Sync | XX% | ... | ... |
+| Checklist Sync | XX% |
+| Structured Equipment Mapping | XX% |
+| CCR Checklist Import / Export | XX% |
+| CCR Bailout Scenario | XX% |
+| CCR Gas Density | XX% | ... | ... |
 | Manual Dive | XX% | ... | ... |
 | PDF Export | XX% | ... | ... |
+| Planner Briefing Card / Watch Transfer | XX% | ... | ... |
 | CSV/Subsurface | XX% | ... | ... |
 | Unit Conversion | XX% | ... | ... |
 | Cloud/Sync | XX% | ... | ... |
 | Overall | XX% | ... | ... |
 
-## T. Detailed Action Plan
+## Y. Detailed Action Plan
 
 Grouped by:
 
@@ -1301,9 +1713,9 @@ For every action:
 - tests required;
 - acceptance criteria.
 
-## U. 7-Day / 14-Day Readiness Plan
+## Z. 7-Day / 14-Day Readiness Plan
 
-## V. Recommended Cursor Remediation Commands
+## AA. Recommended Cursor Remediation Commands
 
 Draft separate future commands:
 
@@ -1317,7 +1729,7 @@ Draft separate future commands:
 
 Do not execute them.
 
-## W. Final Verdict
+## AB. Final Verdict
 
 Answer clearly:
 
@@ -1334,6 +1746,17 @@ Answer clearly:
 - Is it safe for internal TestFlight?
 - Is it safe for external TestFlight?
 - Is it ready for App Store?
+- Are Rock Bottom/emergency gas calculations conservative and correct?
+- Are ascent/descent speeds and runtime totals coherent?
+- Does the dedicated deco-stop section match the canonical schedule?
+- Is schedule-aware gas consumption correct by segment and role?
+- Is the Technical average-depth toggle isolated to gas estimation?
+- Are repetitive-dive residual tissues coherent and explicit?
+- Are gas ledger liters/bar values truthful?
+- Are structured Equipment mappings safe?
+- Does CCR checklist import/export preserve roles?
+- Are CCR bailout and gas-density estimates traceable?
+- Are Planner briefing cards numerically faithful and reference-only?
 - What blocks 100% readiness?
 - What must be fixed first?
 
@@ -1393,10 +1816,52 @@ The task is complete only if:
   - future remediation command drafts.
 
 - all physical/external QA items are marked as pending, not passed;
-- final git status confirms only report/docs changed.
+- final git status confirms only report/docs changed;
+- latest MAIN implementations are explicitly audited;
+- canonical algorithms are distinguished from presentation builders;
+- Rock Bottom, transit timing, runtime/deco-stop presentation, gas ledger, repetitive dive and briefing-card transfer are covered;
+- structured Equipment and CCR checklist round-trip are covered;
+- no readiness score is assigned without file/function/test evidence.
 
 If anything cannot be fully analyzed:
 
 - document the limitation;
 - explain why;
 - propose the exact next inspection step.
+
+
+---
+
+# VERSION HISTORY
+
+## V2.0 — 2026-06-13
+
+Updated for the current `main` implementation state.
+
+Added explicit audit coverage for:
+
+- Planner Emergency / Rock Bottom;
+- Planner ascent-speed settings;
+- complete Dive Runtime presentation;
+- dedicated decompression-stop section;
+- schedule-aware gas consumption;
+- gas ledger and reserve display in liters/bar;
+- Technical average-depth gas-consumption toggle;
+- repetitive-dive planning and residual tissues;
+- route-summary and plan-completeness/result-state gating;
+- structured Equipment setup and operational checklist;
+- CCR checklist import/export;
+- CCR bailout scenario calculator;
+- CCR gas-density estimator;
+- Planner briefing card / PNG export to Apple Watch;
+- Watch-side briefing-card reception, persistence and reference-only semantics.
+
+Preserved:
+
+- `1-` prefix and audit-sequence position;
+- iOS MAIN-only scope;
+- audit-only behavior;
+- no code, UI, business-logic or algorithm modification;
+- current Base / Deco / Technical / CCR / Ratio Deco logic;
+- non-certified and reference-only product positioning;
+- external/physical validation gates as pending unless evidenced.

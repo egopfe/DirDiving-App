@@ -1,6 +1,12 @@
-# 5-DIR_DIVING_MAIN_DEEP_CODE_ANALYSIS_COMMAND_CCR_UPDATED
+# 5-DIR_DIVING_MAIN_DEEP_CODE_ANALYSIS_COMMAND_CCR_UPDATED_V2.0
 
-## CURSOR / CODEX COMMAND — DIR DIVING MAIN COMPLETE DEEP CODE ANALYSIS / BUG / PERFORMANCE / SECURITY AUDIT UPDATED WITH CCR / REBREATHER & CO.
+## CURSOR / CODEX COMMAND — DIR DIVING MAIN COMPLETE DEEP CODE ANALYSIS / BUG / PERFORMANCE / SECURITY AUDIT UPDATED WITH CCR / REBREATHER & LATEST MAIN IMPLEMENTATIONS
+
+**Command version:** 2.0  
+**Updated for MAIN:** 2026-06-13  
+**Repository:** `egopfe/DirDiving-App`  
+**Required branch:** `main`  
+**Task type:** audit-only
 
 You are working on the DIR DIVING repository.
 
@@ -22,12 +28,14 @@ FULL DEEP AUDIT ONLY.
 
 This is the **5th audit command** in the DIR DIVING recurring audit sequence.
 
+The filename must always retain the `5-` prefix. Future revisions must increment only the version suffix, for example `_V2.1`, `_V3.0`, while preserving this command's position in the recurring sequence.
+
 It must be executed after:
 
-1. `1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_UPDATED.md`
-2. `2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_UPDATED.md`
-3. `3-DIR_DIVING_IOS_COMPLETE_ALGORITHM_AUDIT_CCR_UPDATED.md`
-4. `4-DIR_DIVING_UI_UX_AUDIT_CCR_UPDATED.md`
+1. `1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_UPDATED_V2.0.md`
+2. `2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_UPDATED_V2.0.md`
+3. the current versioned `3-DIR_DIVING_IOS_COMPLETE_ALGORITHM_AUDIT_CCR_UPDATED` command
+4. `4-DIR_DIVING_UI_UX_AUDIT_CCR_UPDATED_V2.0.md`
 
 This audit is a **deep code analysis** across MAIN, focused on bugs, crashes, data-loss risks, performance, security, privacy, persistence, sync, cloud, import/export, release risks and cross-feature integration regressions.
 
@@ -84,6 +92,23 @@ Perform a complete and deep static + build/test-supported code analysis of the e
 33. CCR CNS / OTU / tissue / narcosis regressions
 34. CCR Ratio Deco / Buhlmann integration regressions
 35. CCR cloud / sync / export / PDF regressions
+36. Planner ascent-speed settings regressions
+37. Dive Runtime ordering and decompression-stop presentation regressions
+38. Emergency / Rock Bottom calculation and UI-state regressions
+39. Schedule-aware gas-consumption regressions
+40. Gas-ledger liters/bar conversion and presentation regressions
+41. Technical average-depth gas-consumption isolation regressions
+42. Repetitive-dive residual-tissue and chronology regressions
+43. Structured Equipment mapping regressions
+44. Operational checklist generation regressions
+45. CCR checklist import/export role-mapping regressions
+46. CCR bailout-scenario and gas-density regressions
+47. Planner briefing-card encode/render/transfer/persistence regressions
+48. Briefing-card stale-version and payload-routing regressions
+49. Small-Watch critical-layout regressions
+50. Reminder manual-dismiss/suppression regressions
+51. Watch image-paging regressions
+52. Localization/accessibility regressions introduced by recent UI changes
 
 ---
 
@@ -206,7 +231,16 @@ The Watch app must preserve these semantics:
 - Settings may show manual-start information but must not falsely imply direct start if not implemented there.
 - Automatic dive start is depth-triggered when the app is running and depth automation is available.
 - Simulation sensor mode must not be silently active in public/release paths.
-- App Intents must not bypass legal/safety onboarding.
+- App Intents
+- Transit / Runtime / Deco Presentation
+- Emergency / Rock Bottom
+- Schedule-Aware Gas
+- Gas Ledger / Reserve
+- Repetitive Dive
+- Structured Equipment
+- Operational Checklist
+- Planner Briefing Cards
+- Accessibility / Localization must not bypass legal/safety onboarding.
 - Watch remains source of truth for Watch-stored user images.
 
 ## E. Watch image management latest scope
@@ -285,6 +319,57 @@ These must remain external and must not be marked as passed unless actually exec
 
 ---
 
+
+## H. Latest MAIN implementation context
+
+The current `main` branch includes or may include the following cross-cutting additions that must be audited:
+
+- `PlannerAscentSpeedSettings`
+- `PlannerAscentTableBuilder`
+- `DecoStopsPresentationBuilder`
+- Planner Emergency / Rock Bottom inputs and outputs
+- `ScheduleGasConsumptionService`
+- `GasLedgerDisplayFormatter`
+- Technical average-depth gas-consumption option
+- `RepetitiveDivePlannerService`
+- `RouteSummaryService`
+- `RouteSummaryAggregation`
+- `PlanCalculationCompleteness`
+- `PlannerResultState`
+- structured Equipment models/support/mappers
+- operational pre-dive checklist generation
+- CCR checklist import/export coordinators
+- CCR bailout-scenario calculator
+- CCR gas-density estimator
+- shared `PlannerBriefingCard`
+- iOS briefing-card rendering/export
+- Watch briefing-card receiver/store/inventory
+- Watch reminder manual-dismiss behavior
+- Watch image horizontal paging
+- locale-adaptive Watch logbook dates
+- expanded accessibility summaries and labels
+- small-Watch live-layout density changes
+
+Audit actual files, target membership, code paths, tests and documentation. Do not assume a feature is complete merely because symbols or files exist.
+
+## I. Canonical-calculation / projection / presentation classification
+
+For every recent feature, classify code into:
+
+1. canonical algorithm/calculation;
+2. validation/preflight;
+3. planner-mode projection;
+4. schedule/route aggregation;
+5. persistence/sync;
+6. presentation builder;
+7. formatter/rounding;
+8. export/rendering;
+9. UI state;
+10. documentation/tests.
+
+A presentation builder must never be credited as a separate algorithm, but it must be audited for fidelity to canonical data.
+
+
 # ABSOLUTE RULES
 
 ## DO NOT
@@ -344,6 +429,13 @@ These must remain external and must not be marked as passed unless actually exec
 - signed ACK policy
 - tombstone/conflict policy
 - physical QA gates as external evidence requirements
+- Planner briefing cards as reference-only
+- live Watch measurements independent from synced planner data
+- canonical liters separate from bar-equivalent display
+- Rock Bottom/emergency gas separate from normal planned consumption
+- Technical average-depth option limited to gas estimation
+- repetitive-dive state explicit and never silently fresh-tissue
+- no stale/partial plan exported as complete
 
 ---
 
@@ -480,6 +572,10 @@ Check for:
 - build scripts that can drift from `project.yml`
 - planner docs contradicting Base/Deco/Technical behavior
 - Watch image-management docs contradicting actual Watch-source-of-truth behavior
+- recent planner/runtime/emergency docs contradicting source behavior
+- briefing-card docs contradicting payload/version behavior
+- structured Equipment docs contradicting mappings
+- CCR checklist docs contradicting implemented role round trip
 
 Output architecture findings grouped into:
 
@@ -513,6 +609,8 @@ Inspect at least:
 - `Services/DiveLogStore.swift`
 - `Services/SubsurfaceExportService.swift`
 - `Services/UserImageStore.swift`
+- `Services/PlannerBriefingCardStore.swift`
+- `Services/PlannerBriefingWatchReceiver.swift`
 - `Services/ActionButtonIntents.swift`
 
 ## Models / utils
@@ -539,6 +637,8 @@ Inspect at least:
 - `Utils/Formatters.swift`
 - `Utils/WatchSyncKeys.swift`
 - `Utils/CompanionPhotoImportSupport.swift`
+- `Models/PlannerBriefingCard.swift`
+- any briefing-card codec/validator/versioning helpers
 
 ## Views
 
@@ -556,6 +656,7 @@ Inspect at least:
 - `Views/UserImagesView.swift`
 - `Views/MissionModeIndicatorView.swift`
 - `Views/WatchShortcutHelpView.swift`
+- briefing-card list/detail/full-screen views if present
 
 Audit for:
 
@@ -587,6 +688,15 @@ Audit for:
 - bundled image deletion protection
 - CSV export consistency
 - crash risks in compact Watch UI state
+- briefing-card payload routing collisions
+- briefing-card stale/overwrite bugs
+- metadata/PNG mismatch
+- card data affecting live Watch state
+- reminder dismiss cancelling safety alerts
+- image paging selection/delete races
+- fixed-locale date bugs
+- accessibility regressions
+- small-display banner-stack regressions
 
 Performance focus:
 
@@ -612,6 +722,9 @@ Security focus:
 - arbitrary file write/delete
 - untrusted image bytes
 - bundled image protection
+- briefing-card file confinement
+- rendered PNG validation
+- unsafe briefing-card filename/path rejection
 - sensitive data in logs
 - cloud/sync trust assumptions
 - App Intent safety bypass
@@ -635,6 +748,11 @@ Inspect at least:
 - `iOSApp/Utils/PlannerModePolicy.swift`
 - `iOSApp/Utils/PlannerResultState.swift`
 - `iOSApp/Utils/PlanCalculationCompleteness.swift`
+- `iOSApp/Models/PlannerAscentSpeedSettings.swift`
+- `iOSApp/Services/PlannerAscentTableBuilder.swift`
+- `iOSApp/Services/DecoStopsPresentationBuilder.swift`
+- `iOSApp/Services/RouteSummaryService.swift`
+- `iOSApp/Utils/RouteSummaryAggregation.swift`
 
 ## Bühlmann / gas
 
@@ -645,6 +763,8 @@ Inspect at least:
 - `iOSApp/Services/BuhlmannPlanner.swift`
 - `iOSApp/Services/GasPlanningService.swift`
 - `iOSApp/Services/ScheduleGasConsumptionService.swift`
+- `iOSApp/Services/GasLedgerDisplayFormatter.swift`
+- `iOSApp/Services/RepetitiveDivePlannerService.swift`
 - `iOSApp/Services/PlannerEnvironment.swift`
 - `iOSApp/Services/OxygenExposureModels.swift`
 - `iOSApp/Utils/GasMixValidator.swift`
@@ -684,6 +804,10 @@ Likely files may include, if present:
 - `iOSApp/Services/CCROxygenExposureService.swift`
 - `iOSApp/Services/CCRTissueAnalyticsService.swift`
 - `iOSApp/Services/CCRPlannerValidator.swift`
+- `iOSApp/Services/CCR/CCRBailoutScenarioCalculator.swift`
+- `iOSApp/Services/CCR/CCRGasDensityEstimator.swift`
+- `iOSApp/Utils/CCRChecklistImportCoordinator.swift`
+- `iOSApp/Utils/CCRChecklistExportCoordinator.swift`
 - `iOSApp/Views/CCRPlannerView.swift`
 - `iOSApp/Views/PlannerView.swift`
 - `iOSApp/Views/PlannerGasMixCard.swift`
@@ -712,6 +836,13 @@ Likely files may include, if present:
 - `iOSApp/Views/EquipmentView.swift`
 - `iOSApp/Views/MoreView.swift`
 - `iOSApp/Views/WatchPhotoTransferPanel.swift`
+- `iOSApp/Models/EquipmentStructuredModels.swift`
+- `iOSApp/Utils/EquipmentStructuredSupport.swift`
+- `iOSApp/Utils/EquipmentPlannerMapper.swift`
+- `iOSApp/Utils/EquipmentChecklistGenerator.swift`
+- `iOSApp/Services/PDF/EquipmentSetupPDFBuilder.swift`
+- `Models/PlannerBriefingCard.swift`
+- iOS briefing-card rendering/export/transfer files
 
 Audit for:
 
@@ -745,6 +876,22 @@ Audit for:
 - memory/performance bottlenecks
 - privacy-sensitive iCloud behavior
 - localization/user-facing string issues
+- invalid/stale ascent-speed settings
+- runtime/deco row reordering bugs
+- partial plan exported as complete
+- Rock Bottom using display-rounded values
+- Rock Bottom incorrectly affected by Technical average-depth mode
+- gas-ledger liters/bar unit mixing
+- schedule-aware gas segment misallocation
+- repetitive-dive silent fresh-tissue fallback
+- prior-dive chronology errors
+- structured Equipment role/cylinder mapping loss
+- checklist generation duplication/loss
+- CCR checklist role contamination
+- briefing-card metadata/PNG divergence
+- briefing-card stale version overwrite
+- transfer success before ACK/completion
+- unsupported briefing-card schema handling
 
 Performance focus:
 
@@ -763,6 +910,12 @@ Performance focus:
 - image inventory update storms
 - SwiftUI `.onChange` recursion
 - non-debounced sliders/steppers causing recalculation storm
+- repeated route-summary/runtime rebuilding
+- repeated Rock Bottom recalculation
+- repeated gas-ledger formatting/allocation
+- repetitive-dive tissue recomputation
+- briefing-card rendering memory spikes
+- briefing-card Watch transfer retry storms
 
 Security focus:
 
@@ -780,6 +933,12 @@ Security focus:
 - sensitive data in logs
 - iCloud conflict poisoning
 - malformed cloud payload handling
+- malformed briefing-card payload handling
+- briefing-card file/path validation
+- untrusted PNG/metadata mismatch
+- stale briefing-card replay
+- structured Equipment payload poisoning
+- CCR checklist import poisoning
 
 ---
 
@@ -839,6 +998,192 @@ Report all findings as:
 - documentation gap
 
 ---
+
+
+# PHASE 4B — PLANNER TRANSIT / RUNTIME / DECO PRESENTATION DEEP AUDIT
+
+Inspect:
+
+- ascent/descent speed settings;
+- persistence/migration;
+- transit-time calculations;
+- `PlannerAscentTableBuilder`;
+- `DecoStopsPresentationBuilder`;
+- full Dive Runtime ordering;
+- route summaries;
+- total runtime / TTS / TTR consistency;
+- stale-result invalidation.
+
+Audit for:
+
+- zero/negative speed division;
+- non-finite runtime;
+- duplicated or missing rows;
+- stop rows grouped incorrectly;
+- gas-switch rows at wrong runtime;
+- presentation builder mutating canonical data;
+- route totals disagreeing with canonical segments;
+- stale previous result after invalid inputs;
+- export using incomplete result state;
+- locale formatting changing parse/rounding behavior.
+
+# PHASE 4C — EMERGENCY / ROCK BOTTOM DEEP AUDIT
+
+Inspect all Emergency / Rock Bottom code paths.
+
+Audit:
+
+- ambient pressure;
+- maximum-depth basis;
+- stressed RMV/SAC;
+- team/diver multiplier;
+- problem-solving time;
+- ascent/stop gas;
+- reserve separation;
+- liters required;
+- bar equivalent;
+- available-versus-required comparison;
+- validation bounds;
+- metric/imperial conversion;
+- persistence;
+- export/PDF/briefing-card output.
+
+Critical checks:
+
+- normal gas consumption and Rock Bottom remain separate;
+- Technical average-depth gas option cannot weaken Rock Bottom unintentionally;
+- display-rounded bar never feeds canonical liters;
+- CCR bailout does not silently reuse OC bottom assumptions;
+- no overflow/NaN/infinite result;
+- insufficient-gas state cannot be hidden by formatting.
+
+# PHASE 4D — SCHEDULE-AWARE GAS / GAS LEDGER DEEP AUDIT
+
+Inspect:
+
+- `GasPlanningService`;
+- `PlannerGasSchedule`;
+- `ScheduleGasConsumptionService`;
+- `GasLedgerDisplayFormatter`;
+- gas-role allocation;
+- liters/bar display;
+- reserve/available/remaining calculations.
+
+Audit for:
+
+- wrong segment depth/time;
+- wrong gas assignment;
+- travel/deco/bailout role contamination;
+- CCR diluent consumed as OC gas;
+- bailout consumed before bailout transition;
+- ascent-speed changes not reflected in gas use;
+- duplicate aggregation;
+- unit mixing;
+- rounding feedback;
+- cylinder mismatch;
+- stale ledger after input changes.
+
+# PHASE 4E — TECHNICAL AVERAGE-DEPTH GAS OPTION DEEP AUDIT
+
+Verify:
+
+- only Technical mode can activate it;
+- default remains max-depth conservative;
+- only gas consumption changes;
+- Bühlmann, deco, MOD, PPO2, switch depth and Rock Bottom remain unaffected;
+- average depth validation;
+- hidden-state isolation across modes;
+- persistence and migration;
+- disclosure in UI/PDF/briefing card;
+- no stale toggle leakage.
+
+# PHASE 4F — REPETITIVE DIVE / RESIDUAL TISSUE DEEP AUDIT
+
+Inspect:
+
+- `RepetitiveDivePlannerService`;
+- prior-dive selection;
+- chronology;
+- surface interval;
+- N2/He tissue state;
+- off-gassing;
+- GF compatibility;
+- CCR/OC compatibility;
+- persistence/sync;
+- UI/export disclosure.
+
+Audit for:
+
+- future or stale prior dive;
+- silent fresh-tissue fallback;
+- partial tissue state;
+- compartment-order mismatch;
+- non-deterministic results;
+- duplicate prior dive use;
+- wrong units/timestamps;
+- cloud conflict contamination.
+
+# PHASE 4G — STRUCTURED EQUIPMENT / OPERATIONAL CHECKLIST DEEP AUDIT
+
+Inspect:
+
+- structured Equipment models/support;
+- Equipment-to-Planner mapping;
+- Equipment-to-Checklist mapping;
+- operational task generation;
+- gas-linked items;
+- cylinder size/pressure/mix/role;
+- duplicate prevention;
+- stable IDs;
+- persistence/sync;
+- Equipment Setup PDF;
+- CCR checklist import/export.
+
+Audit for:
+
+- role loss;
+- duplicate items/tasks;
+- user-edit loss;
+- stale planner links;
+- wrong cylinder values;
+- CCR diluent/bailout contamination;
+- OC/CCR round-trip mismatch;
+- malformed import handling;
+- destructive merge behavior.
+
+# PHASE 4H — PLANNER BRIEFING CARD / WATCH TRANSFER DEEP AUDIT
+
+Inspect end to end:
+
+- shared `PlannerBriefingCard`;
+- iOS card generation;
+- rendered PNG;
+- structured metadata;
+- version/schema;
+- transfer;
+- ACK/status;
+- Watch receiver;
+- Watch store;
+- replacement/deletion;
+- inventory;
+- stale-card handling;
+- malformed payload rejection.
+
+Audit for:
+
+- PNG/metadata mismatch;
+- unit mismatch;
+- stale card overwrite;
+- unsupported schema accepted;
+- transfer marked complete too early;
+- payload routed as dive/image data;
+- card values mutating live Watch state;
+- path traversal/unsafe filenames;
+- excessive memory during render/decode;
+- retry storms;
+- missing reference-only labeling;
+- CCR/Rock Bottom/gas-ledger values shown as live authority.
+
 
 # PHASE 5 — WATCH IMAGE INVENTORY / DELETE DEEP AUDIT
 
@@ -921,6 +1266,13 @@ Look specifically for:
 - iOS delete shown as success before Watch ACK
 - lost tombstones
 - demo data mixed into real analysis
+- stale Dive Runtime rows
+- stale deco-stop table
+- stale Rock Bottom result
+- stale gas ledger
+- stale repetitive-dive tissue state
+- stale Equipment mapping
+- stale briefing-card status
 
 ## Boundary bugs
 
@@ -946,6 +1298,15 @@ Look specifically for:
 - missing temperature
 - unsafe image filenames
 - unknown Watch image inventory ACK/request IDs
+- zero/negative ascent speed
+- invalid average depth
+- invalid Rock Bottom team/RMV/problem time
+- missing cylinder for bar equivalent
+- future prior dive
+- malformed tissue state
+- duplicate Equipment IDs
+- malformed briefing-card schema/version
+- mismatched briefing-card PNG/metadata
 
 ## Concurrency bugs
 
@@ -961,6 +1322,10 @@ Look specifically for:
 - force quit during finalization
 - repeated rapid O2/PPO2/setpoint button presses
 - repeated rapid gas switch-depth increments
+- simultaneous plan recompute + briefing render
+- simultaneous card transfer + replacement/delete
+- repetitive-dive recompute during prior-dive sync update
+- Equipment edit during checklist regeneration
 
 ## Crash risks
 
@@ -974,6 +1339,11 @@ Look specifically for:
 - unsupported image data
 - missing localization keys if fatal
 - missing resource files
+- malformed briefing-card image
+- stale briefing-card file reference
+- missing route/runtime segment
+- zero-speed division
+- corrupted residual tissue array
 
 ---
 
@@ -994,6 +1364,11 @@ Analyze:
 - Swift Charts data generation
 - Watch live timer updates
 - haptic coordinator loops
+- runtime/deco presentation rebuilding
+- Rock Bottom recalculation
+- gas-ledger formatting
+- repetitive-dive tissue propagation
+- briefing-card rendering
 
 ## Memory
 
@@ -1006,6 +1381,10 @@ Analyze:
 - chart data arrays
 - retained timers/tasks
 - cached inventories/logbooks
+- briefing-card PNG buffers
+- briefing-card metadata inventory
+- residual tissue histories
+- structured Equipment snapshots
 
 ## Battery
 
@@ -1032,6 +1411,10 @@ Analyze:
 - gas card stepper updates triggering full planner recomputation
 - CCR setpoint updates triggering full planner recomputation
 - inventory UI refreshing too often
+- route summary rebuilding too often
+- briefing-card rendering on every minor state change
+- card-transfer retry storms
+- operational checklist regeneration storms
 
 For each finding include:
 
@@ -1059,6 +1442,9 @@ Analyze:
 - changed peer rejection
 - delete ACK trust
 - inventory response trust
+- briefing-card payload trust
+- briefing-card schema/version validation
+- briefing-card ACK trust
 
 ## Data integrity
 
@@ -1071,6 +1457,10 @@ Analyze:
 - import/export
 - iCloud KVS caps
 - Watch image inventory truthfulness
+- briefing-card numerical fidelity
+- structured Equipment integrity
+- CCR checklist round-trip integrity
+- repetitive-dive tissue-source integrity
 
 ## File security
 
@@ -1084,6 +1474,9 @@ Analyze:
 - unsafe filenames
 - arbitrary file write/delete
 - bundled image protection
+- briefing-card file confinement
+- rendered PNG validation
+- unsafe briefing-card filename/path rejection
 
 ## Privacy
 
@@ -1155,6 +1548,21 @@ Report:
 - missing App Intent legal-gate tests
 - missing Mission Mode invariant tests
 - missing physical QA
+- missing ascent-speed tests
+- missing runtime ordering tests
+- missing deco-stop equivalence tests
+- missing Rock Bottom reference vectors
+- missing gas-ledger liters/bar tests
+- missing schedule-aware gas tests
+- missing average-depth toggle isolation tests
+- missing repetitive-dive tests
+- missing structured Equipment mapping tests
+- missing CCR checklist round-trip tests
+- missing briefing-card fidelity/routing/version tests
+- missing small-Watch layout tests
+- missing reminder-dismiss tests
+- missing image-paging tests
+- missing date-localization/accessibility tests
 
 Create:
 
@@ -1206,6 +1614,21 @@ If tools are available, run or suggest:
 - grep for `companionPhotoInventory`
 - grep for `companionPhotoDelete`
 - grep for `ackSignature`
+- grep for `PlannerAscentSpeedSettings`
+- grep for `PlannerAscentTableBuilder`
+- grep for `DecoStopsPresentationBuilder`
+- grep for `RockBottom`
+- grep for `Emergency`
+- grep for `ScheduleGasConsumptionService`
+- grep for `GasLedgerDisplayFormatter`
+- grep for `RepetitiveDivePlannerService`
+- grep for `RouteSummary`
+- grep for `EquipmentStructured`
+- grep for `CCRChecklistImportCoordinator`
+- grep for `CCRBailoutScenarioCalculator`
+- grep for `CCRGasDensityEstimator`
+- grep for `PlannerBriefingCard`
+- grep for fixed `dd/MM/yyyy` date formats
 
 Do not fix. Record findings.
 
@@ -1256,6 +1679,15 @@ For every issue, classify:
 - Watch image management
 - Mission Mode
 - App Intents
+- Transit / Runtime / Deco Presentation
+- Emergency / Rock Bottom
+- Schedule-Aware Gas
+- Gas Ledger / Reserve
+- Repetitive Dive
+- Structured Equipment
+- Operational Checklist
+- Planner Briefing Cards
+- Accessibility / Localization
 
 ## Fix class
 
@@ -1348,6 +1780,15 @@ The report must contain:
 - persistence
 - sync
 - App Intents
+- Transit / Runtime / Deco Presentation
+- Emergency / Rock Bottom
+- Schedule-Aware Gas
+- Gas Ledger / Reserve
+- Repetitive Dive
+- Structured Equipment
+- Operational Checklist
+- Planner Briefing Cards
+- Accessibility / Localization
 - Mission Mode
 - manual/automatic start
 - depth lifecycle
@@ -1401,7 +1842,21 @@ The report must contain:
 - CCR documentation gaps
 - CCR external QA gates
 
-## H. Watch Image Inventory / Delete Analysis
+## H. Transit / Runtime / Deco Presentation Analysis
+
+## I. Emergency / Rock Bottom Analysis
+
+## J. Schedule-Aware Gas / Gas Ledger Analysis
+
+## K. Technical Average-Depth Gas Option Analysis
+
+## L. Repetitive Dive / Residual Tissue Analysis
+
+## M. Structured Equipment / Operational Checklist Analysis
+
+## N. Planner Briefing Card / Watch Transfer Analysis
+
+## O. Watch Image Inventory / Delete Analysis
 
 - Watch source-of-truth
 - inventory model
@@ -1409,10 +1864,13 @@ The report must contain:
 - delete request/ACK
 - path traversal
 - bundled image protection
+- briefing-card file confinement
+- rendered PNG validation
+- unsafe briefing-card filename/path rejection
 - sync routing
 - performance/security risks
 
-## I. Cross-App Sync / Data Integrity Analysis
+## P. Cross-App Sync / Data Integrity Analysis
 
 - Watch → iOS
 - iOS → Watch
@@ -1424,7 +1882,7 @@ The report must contain:
 - cloud conflict
 - manual/no-depth policy
 
-## J. Performance Analysis
+## Q. Performance Analysis
 
 - CPU
 - memory
@@ -1434,7 +1892,7 @@ The report must contain:
 - iOS planner/charts performance
 - image inventory performance
 
-## K. Security / Privacy Analysis
+## R. Security / Privacy Analysis
 
 - trust model
 - cloud privacy
@@ -1443,9 +1901,18 @@ The report must contain:
 - import/export
 - image handling
 - App Intents
+- Transit / Runtime / Deco Presentation
+- Emergency / Rock Bottom
+- Schedule-Aware Gas
+- Gas Ledger / Reserve
+- Repetitive Dive
+- Structured Equipment
+- Operational Checklist
+- Planner Briefing Cards
+- Accessibility / Localization
 - secret scanning
 
-## L. Test Coverage Analysis
+## S. Test Coverage Analysis
 
 - current tests
 - failing tests
@@ -1453,7 +1920,7 @@ The report must contain:
 - test isolation risks
 - physical QA gaps
 
-## M. Issue Matrix
+## T. Issue Matrix
 
 Table columns:
 
@@ -1469,7 +1936,7 @@ Table columns:
 - proposed fix
 - estimated effort
 
-## N. Detailed Action Plan
+## U. Detailed Action Plan
 
 Grouped by:
 
@@ -1488,25 +1955,25 @@ For every action:
 - tests required
 - acceptance criteria
 
-## O. 7-Day Remediation Plan
+## V. 7-Day Remediation Plan
 
 - day-by-day actions
 - expected output
 - verification
 
-## P. 14-Day Remediation Plan
+## W. 14-Day Remediation Plan
 
 - broader stabilization
 - performance/security work
 - QA evidence
 
-## Q. Pre-Internal-TestFlight Checklist
+## X. Pre-Internal-TestFlight Checklist
 
-## R. Pre-External-TestFlight Checklist
+## Y. Pre-External-TestFlight Checklist
 
-## S. Pre-App-Store Checklist
+## Z. Pre-App-Store Checklist
 
-## T. Recommended Cursor Remediation Commands
+## AA. Recommended Cursor Remediation Commands
 
 At the end of the report, draft separate future Cursor commands:
 
@@ -1519,10 +1986,16 @@ At the end of the report, draft separate future Cursor commands:
 7. Watch image inventory/delete hardening if needed
 8. Cloud merge / iCloud conflict remediation if needed
 9. App Intent / Action Button safety remediation if needed
+10. Transit/runtime/deco presentation remediation if needed
+11. Emergency / Rock Bottom remediation if needed
+12. Gas-ledger / schedule-aware gas remediation if needed
+13. Repetitive-dive remediation if needed
+14. Structured Equipment / checklist remediation if needed
+15. Planner briefing-card / Watch transfer remediation if needed
 
 Do not execute them.
 
-## U. Final Verdict
+## AB. Final Verdict
 
 Answer clearly:
 
@@ -1534,6 +2007,14 @@ Answer clearly:
 - What blocks 100% CCR readiness?
 - What blocks 100% security readiness?
 - What blocks 100% performance readiness?
+- Are transit/runtime/deco presentation layers faithful to canonical data?
+- Is Rock Bottom conservative and isolated?
+- Is schedule-aware gas allocation correct?
+- Are gas ledger liters/bar values trustworthy?
+- Is the Technical average-depth option isolated?
+- Are repetitive-dive residual tissues safe?
+- Are structured Equipment/checklist mappings lossless?
+- Are briefing cards numerically faithful, version-safe and reference-only?
 - What must be fixed first?
 
 ---
@@ -1582,9 +2063,25 @@ Docs/MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md
   - MOD/PPO2/switch-depth
 - CCR/Rebreather
 - Ratio Deco audit
+- Transit/runtime/deco presentation audit
+- Emergency / Rock Bottom audit
+- Schedule-aware gas / gas ledger audit
+- Technical average-depth gas audit
+- Repetitive-dive audit
+- Structured Equipment / operational checklist audit
+- Planner briefing-card / Watch transfer audit
   - Watch image inventory/delete audit if implemented
   - Mission Mode invariant audit
-  - App Intents legal-gate audit
+  - App Intents
+- Transit / Runtime / Deco Presentation
+- Emergency / Rock Bottom
+- Schedule-Aware Gas
+- Gas Ledger / Reserve
+- Repetitive Dive
+- Structured Equipment
+- Operational Checklist
+- Planner Briefing Cards
+- Accessibility / Localization legal-gate audit
   - issue matrix
   - severity/priority
   - detailed action plan
@@ -1600,3 +2097,44 @@ If anything cannot be fully analyzed:
 - document the limitation
 - explain why
 - propose the exact next inspection step
+
+
+---
+
+# VERSION HISTORY
+
+## V2.0 — 2026-06-13
+
+Updated against the current `main` implementation state.
+
+Added explicit deep-code audit coverage for:
+
+- Planner ascent-speed settings;
+- full Dive Runtime and decompression-stop presentation;
+- Planner Emergency / Rock Bottom;
+- schedule-aware gas consumption;
+- gas ledger / Available Gas liters-bar presentation;
+- Technical average-depth gas-consumption option;
+- repetitive-dive residual tissues;
+- route-summary and plan-completeness/result-state gating;
+- structured Equipment setup;
+- operational pre-dive checklist generation;
+- CCR checklist import/export;
+- CCR bailout scenario;
+- CCR gas-density estimation;
+- Planner briefing-card encode/render/transfer/persistence;
+- Watch briefing-card receiver/store/inventory;
+- stale-version and malformed-payload handling;
+- small-Watch layout regressions;
+- reminder manual-dismiss regressions;
+- image-paging regressions;
+- date localization and accessibility regressions.
+
+Preserved:
+
+- `5-` prefix and recurring-audit position;
+- audit-only behavior;
+- complete MAIN scope;
+- no production code, UI, business-logic, algorithm, security or sync modification;
+- non-certified/reference-only positioning;
+- external and physical QA gates as pending unless evidenced.

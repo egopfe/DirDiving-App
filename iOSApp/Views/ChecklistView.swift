@@ -5,6 +5,8 @@ struct ChecklistView: View {
     @EnvironmentObject private var navigation: IOSNavigationStore
     @State private var savedFeedback: String?
     @State private var newChecklistTitle = ""
+    @State private var newItemKind: ChecklistItemKind = .task
+    @State private var newItemRequired = true
     @State private var showSetupPicker = false
     @State private var shareablePDF: ShareablePDFItem?
     @State private var pdfExportAlertMessage: String?
@@ -29,7 +31,9 @@ struct ChecklistView: View {
                             emptySetupState
                         } else {
                             checklistHero
-                            checklistCard
+                            checklistSections
+                            addItemCard
+                            quickAddCard
                         }
                     }
                     .padding(16)
@@ -141,63 +145,198 @@ struct ChecklistView: View {
     }
 
     private var checklistHero: some View {
-        HStack(spacing: 12) {
+        let requiredTotal = max(1, equipment.profile.requiredChecklistItems.count)
+        let optionalTotal = equipment.profile.optionalChecklistItems.count
+        return HStack(spacing: 12) {
             checklistBadge(
                 String(
-                    format: DIRIOSLocalizer.string("checklist.status.ready_badge_format"),
-                    equipment.profile.checklistReadyCount,
-                    max(1, equipment.profile.migratedChecklistItems.count)
+                    format: DIRIOSLocalizer.string("checklist.status.required_badge_format"),
+                    equipment.profile.requiredReadyCount,
+                    requiredTotal
                 ),
-                equipment.profile.checklistReadyCount == equipment.profile.migratedChecklistItems.count ? DIRTheme.green : DIRTheme.yellow
+                equipment.profile.isRequiredChecklistComplete ? DIRTheme.green : DIRTheme.yellow
             )
+            if optionalTotal > 0 {
+                checklistBadge(
+                    String(
+                        format: DIRIOSLocalizer.string("checklist.status.optional_badge_format"),
+                        equipment.profile.optionalReadyCount,
+                        optionalTotal
+                    ),
+                    DIRTheme.cyan
+                )
+            }
         }
+        .accessibilityElement(children: .combine)
         .accessibilityLabel(
             String(
-                format: DIRIOSLocalizer.string("checklist.progress.a11y"),
-                equipment.profile.checklistReadyCount,
-                equipment.profile.migratedChecklistItems.count
+                format: DIRIOSLocalizer.string("checklist.progress.required.a11y"),
+                equipment.profile.requiredReadyCount,
+                requiredTotal
             )
         )
     }
 
-    private var checklistCard: some View {
-        DIRCard(DIRIOSLocalizer.string("equipment.card.checklist"), icon: "checklist", accent: DIRTheme.green) {
-            ForEach($equipment.profile.checklistItems) { $item in
-                VStack(alignment: .leading, spacing: 6) {
-                    Toggle(item.title, isOn: $item.isReady)
-                        .tint(DIRTheme.cyan)
-                        .accessibilityLabel(checklistReadyAccessibilityLabel(for: item))
-                        .accessibilityHint(DIRIOSLocalizer.string("a11y.checklist.item.toggle.hint"))
-                    Toggle(DIRIOSLocalizer.string("equipment.checklist.gas_flag"), isOn: $item.usesGas)
-                        .tint(DIRTheme.yellow)
-                        .accessibilityLabel(checklistGasFlagAccessibilityLabel(for: item))
-                        .accessibilityHint(DIRIOSLocalizer.string("a11y.checklist.item.toggle.hint"))
-                    EquipmentChecklistGasSection(item: $item)
-                        .animation(.easeInOut(duration: 0.2), value: item.usesGas)
-                    Button(role: .destructive) {
-                        equipment.profile.checklistItems.removeAll { $0.id == item.id }
-                    } label: {
-                        Text(DIRIOSLocalizer.string("equipment.checklist.remove"))
-                            .font(.caption.weight(.semibold))
-                    }
-                    .buttonStyle(.plain)
-                }
-                .padding(.vertical, 4)
-            }
-            HStack(spacing: 8) {
-                TextField(DIRIOSLocalizer.string("equipment.checklist.new_item"), text: $newChecklistTitle)
-                    .foregroundStyle(.white)
-                Button(DIRIOSLocalizer.string("equipment.checklist.add")) {
-                    let title = newChecklistTitle.trimmingCharacters(in: .whitespacesAndNewlines)
-                    guard !title.isEmpty else { return }
-                    equipment.profile.checklistItems.append(EquipmentChecklistItem(title: title))
-                    newChecklistTitle = ""
-                }
-                .font(.caption.weight(.bold))
-                .foregroundStyle(DIRTheme.cyan)
-                .buttonStyle(.plain)
+    private var checklistSections: some View {
+        let grouped = ChecklistItemSupport.groupedIndices(in: equipment.profile.checklistItems)
+        return ForEach(ChecklistItemKind.sectionOrder, id: \.self) { kind in
+            if let indices = grouped[kind], !indices.isEmpty {
+                checklistSectionCard(kind: kind, indices: indices)
             }
         }
+    }
+
+    private func checklistSectionCard(kind: ChecklistItemKind, indices: [Int]) -> some View {
+        DIRCard(kind.localizedSectionTitle, icon: kind.sectionIcon, accent: sectionAccent(for: kind)) {
+            ForEach(indices, id: \.self) { index in
+                checklistItemRow(binding: $equipment.profile.checklistItems[index])
+                if index != indices.last {
+                    Divider().overlay(DIRTheme.hairline)
+                }
+            }
+        }
+    }
+
+    private func sectionAccent(for kind: ChecklistItemKind) -> Color {
+        switch kind {
+        case .equipment, .task, .custom: return DIRTheme.cyan
+        case .gas: return DIRTheme.yellow
+        case .safety: return DIRTheme.green
+        case .document: return DIRTheme.muted
+        }
+    }
+
+    private func checklistItemRow(binding: Binding<EquipmentChecklistItem>) -> some View {
+        let item = binding.wrappedValue
+        return VStack(alignment: .leading, spacing: 6) {
+            Toggle(isOn: readyBinding(for: binding)) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(item.title)
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(.white)
+                    Text(
+                        item.isRequired
+                            ? DIRIOSLocalizer.string("checklist.item.required")
+                            : DIRIOSLocalizer.string("checklist.item.optional")
+                    )
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(item.isRequired ? DIRTheme.yellow : DIRTheme.muted)
+                }
+            }
+            .tint(DIRTheme.cyan)
+            .accessibilityLabel(checklistReadyAccessibilityLabel(for: item))
+            .accessibilityHint(DIRIOSLocalizer.string("a11y.checklist.item.toggle.hint"))
+
+            if let completedAt = item.completedAt, item.isReady {
+                Text(ChecklistItemSupport.completedAtLabel(for: completedAt))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+            }
+
+            if !item.note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                Text(item.note)
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Toggle(DIRIOSLocalizer.string("equipment.checklist.gas_flag"), isOn: binding.usesGas)
+                .tint(DIRTheme.yellow)
+                .accessibilityLabel(checklistGasFlagAccessibilityLabel(for: item))
+                .accessibilityHint(DIRIOSLocalizer.string("a11y.checklist.item.toggle.hint"))
+
+            EquipmentChecklistGasSection(item: binding)
+                .animation(.easeInOut(duration: 0.2), value: item.usesGas)
+
+            TextField(DIRIOSLocalizer.string("checklist.item.note_placeholder"), text: binding.note, axis: .vertical)
+                .lineLimit(1...3)
+                .font(.caption)
+                .foregroundStyle(.white)
+
+            Button(role: .destructive) {
+                equipment.profile.checklistItems.removeAll { $0.id == item.id }
+            } label: {
+                Text(DIRIOSLocalizer.string("equipment.checklist.remove"))
+                    .font(.caption.weight(.semibold))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.vertical, 4)
+    }
+
+    private func readyBinding(for binding: Binding<EquipmentChecklistItem>) -> Binding<Bool> {
+        Binding(
+            get: { binding.wrappedValue.isReady },
+            set: { newValue in
+                var item = binding.wrappedValue
+                ChecklistItemSupport.applyReadyChange(newValue, to: &item)
+                binding.wrappedValue = item
+            }
+        )
+    }
+
+    private var addItemCard: some View {
+        DIRCard(DIRIOSLocalizer.string("equipment.checklist.new_item"), icon: "plus.circle", accent: DIRTheme.cyan) {
+            VStack(alignment: .leading, spacing: 10) {
+                TextField(DIRIOSLocalizer.string("equipment.checklist.new_item"), text: $newChecklistTitle)
+                    .foregroundStyle(.white)
+
+                Picker(DIRIOSLocalizer.string("checklist.add.kind"), selection: $newItemKind) {
+                    ForEach(ChecklistItemKind.sectionOrder, id: \.self) { kind in
+                        Text(kind.localizedKindTitle).tag(kind)
+                    }
+                }
+                .pickerStyle(.menu)
+                .tint(DIRTheme.cyan)
+
+                Toggle(DIRIOSLocalizer.string("checklist.add.required"), isOn: $newItemRequired)
+                    .tint(DIRTheme.cyan)
+
+                Button(DIRIOSLocalizer.string("equipment.checklist.add")) {
+                    addManualItem()
+                }
+                .font(.callout.weight(.bold))
+                .foregroundStyle(DIRTheme.cyan)
+                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+        }
+    }
+
+    private var quickAddCard: some View {
+        DIRCard(DIRIOSLocalizer.string("checklist.quick_add.title"), icon: "bolt.fill", accent: DIRTheme.yellow) {
+            Menu {
+                ForEach(ChecklistQuickPreset.all) { preset in
+                    Button(preset.localizedTitle) {
+                        equipment.profile.checklistItems.append(preset.makeItem())
+                    }
+                }
+            } label: {
+                Text(DIRIOSLocalizer.string("checklist.quick_add.title"))
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(DIRTheme.cyan)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.7), lineWidth: 1))
+            }
+        }
+    }
+
+    private func addManualItem() {
+        let title = newChecklistTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !title.isEmpty else { return }
+        equipment.profile.checklistItems.append(
+            EquipmentChecklistItem(
+                title: title,
+                isReady: false,
+                usesGas: false,
+                kind: newItemKind,
+                isRequired: newItemRequired
+            )
+        )
+        newChecklistTitle = ""
+        newItemKind = .task
+        newItemRequired = true
     }
 
     private func checklistBadge(_ text: String, _ color: Color) -> some View {

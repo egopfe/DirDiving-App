@@ -12,9 +12,7 @@ enum CCRPlannerService {
                 schedule: [],
                 bailoutScenarios: [],
                 tissueTrace: .empty,
-                cnsFullPlanPercent: 0,
-                cnsDescentBottomPercent: 0,
-                otuFullPlan: 0,
+                oxygenExposure: .unavailable(reason: .invalidInput),
                 ppO2Timeline: [],
                 ppN2Timeline: [],
                 endTimeline: [],
@@ -40,31 +38,23 @@ enum CCRPlannerService {
         }
 
         let engine = CCRPlannerEngine.plan(input: input, environment: environment)
-        let exposure = CCROxygenExposureIntegration.exposure(
+        let fullExposureResult = CCROxygenExposureIntegration.exposure(
             segments: engine.exposureSegments,
+            diluent: input.diluent,
             environment: environment
         )
-
-        let cnsFull: Double
-        let otuFull: Double
-        switch exposure {
-        case .success(let result):
-            cnsFull = result.cnsSinglePercent
-            otuFull = result.otuDive
-        case .failure:
-            cnsFull = 0
-            otuFull = 0
-        }
-
-        let descentBottom = engine.exposureSegments
-            .filter { $0.kind == .descent || $0.kind == .bottom }
-        let cnsDB: Double
-        switch CCROxygenExposureIntegration.exposure(segments: descentBottom, environment: environment) {
-        case .success(let result):
-            cnsDB = result.cnsSinglePercent
-        case .failure:
-            cnsDB = 0
-        }
+        let descentBottom = engine.exposureSegments.filter { $0.kind == .descent || $0.kind == .bottom }
+        let descentBottomResult = descentBottom.isEmpty
+            ? nil
+            : CCROxygenExposureIntegration.exposure(
+                segments: descentBottom,
+                diluent: input.diluent,
+                environment: environment
+            )
+        let oxygenExposure = CCROxygenExposureState.fromExposureResult(
+            fullExposureResult,
+            descentBottomResult: descentBottomResult
+        )
 
         let bailoutScenarios = CCRBailoutScenarioCalculator.evaluateAll(input: input, environment: environment)
         let depthProfile = depthProfilePoints(from: engine.segments)
@@ -79,7 +69,8 @@ enum CCRPlannerService {
                 severity: .info
             )
         )
-        if cnsDB > Double(PlannerCNSDescentBottomCheckSettings.thresholdPercentDouble) {
+        if case .available(_, _, let descentBottomCNS?) = oxygenExposure,
+           descentBottomCNS > Double(PlannerCNSDescentBottomCheckSettings.thresholdPercentDouble) {
             warnings.append(
                 PlannerUserFacingCopy.localized(
                     id: "ccr.cns_descent_bottom",
@@ -90,19 +81,32 @@ enum CCRPlannerService {
                 )
             )
         }
+        if case .unavailable(let reason) = oxygenExposure {
+            warnings.append(
+                PlannerUserFacingMessage(
+                    id: "ccr.exposure.unavailable",
+                    title: DIRIOSLocalizer.string("ccr.exposure.unavailable.title"),
+                    message: DIRIOSLocalizer.string("ccr.exposure.unavailable.\(reason.rawValue)"),
+                    correctiveHint: DIRIOSLocalizer.string("ccr.reference_estimate_only"),
+                    severity: .warning
+                )
+            )
+        }
 
         let ppO2Timeline = engine.timeline
         let ppN2Timeline = engine.timeline
         let endTimeline = engine.timeline
-        let cnsTimeline = buildCNSTimeline(exposureSegments: engine.exposureSegments, environment: environment)
+        let cnsTimeline = buildCNSTimeline(
+            exposureSegments: engine.exposureSegments,
+            diluent: input.diluent,
+            environment: environment
+        )
 
         return CCRPlanResult(
             schedule: engine.scheduleRows,
             bailoutScenarios: bailoutScenarios,
             tissueTrace: engine.tissueHistory,
-            cnsFullPlanPercent: cnsFull,
-            cnsDescentBottomPercent: cnsDB,
-            otuFullPlan: otuFull,
+            oxygenExposure: oxygenExposure,
             ppO2Timeline: ppO2Timeline,
             ppN2Timeline: ppN2Timeline,
             endTimeline: endTimeline,
@@ -121,6 +125,7 @@ enum CCRPlannerService {
 
     private static func buildCNSTimeline(
         exposureSegments: [(kind: DiveSegmentKind, fromDepth: Double, toDepth: Double, minutes: Double, setpointBar: Double)],
+        diluent: CCRDiluent,
         environment: PlannerEnvironment
     ) -> [CCRCNSTimelineSample] {
         guard !exposureSegments.isEmpty else { return [] }
@@ -130,7 +135,7 @@ enum CCRPlannerService {
         for segment in exposureSegments {
             runtime += segment.minutes
             accumulated.append(segment)
-            switch CCROxygenExposureIntegration.exposure(segments: accumulated, environment: environment) {
+            switch CCROxygenExposureIntegration.exposure(segments: accumulated, diluent: diluent, environment: environment) {
             case .success(let result):
                 samples.append(CCRCNSTimelineSample(runtimeMinutes: runtime, cnsPercent: result.cnsSinglePercent))
             case .failure:
@@ -166,9 +171,7 @@ enum CCRPlannerService {
             schedule: [],
             bailoutScenarios: [],
             tissueTrace: .empty,
-            cnsFullPlanPercent: 0,
-            cnsDescentBottomPercent: 0,
-            otuFullPlan: 0,
+            oxygenExposure: .unavailable(reason: .invalidInput),
             ppO2Timeline: [],
             ppN2Timeline: [],
             endTimeline: [],

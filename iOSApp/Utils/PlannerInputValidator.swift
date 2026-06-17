@@ -36,12 +36,17 @@ enum PlannerInputValidator {
         if !input.sacLitersPerMinute.isFinite || input.sacLitersPerMinute <= 0 {
             result.add(.invalidInput, message: DIRIOSLocalizer.string("planner.validation.sac_invalid"))
         }
-        if presentation.showsExtendedAnalysisTiles {
+        if presentation.showsReserveCard || presentation.showsExtendedAnalysisTiles {
             if !input.emergencySacLitersPerMinute.isFinite || input.emergencySacLitersPerMinute <= 0 {
                 result.add(.invalidInput, message: DIRIOSLocalizer.string("planner.validation.sac_buddy_invalid"))
             }
             if input.teamSize < 1 {
                 result.add(.invalidInput, message: DIRIOSLocalizer.string("planner.validation.team_size_invalid"))
+            }
+            if !input.emergencyExtraMinutes.isFinite
+                || input.emergencyExtraMinutes < 0
+                || input.emergencyExtraMinutes > IOSAlgorithmConfiguration.maxEmergencyExtraMinutes {
+                result.add(.invalidInput, message: DIRIOSLocalizer.string("planner.validation.emergency_extra_minutes_invalid"))
             }
         }
         if !input.waterTemperatureCelsius.isFinite

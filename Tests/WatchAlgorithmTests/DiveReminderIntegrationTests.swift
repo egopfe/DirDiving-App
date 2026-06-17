@@ -114,4 +114,38 @@ final class DiveReminderIntegrationTests: XCTestCase {
         diveManager.startManualDive()
         XCTAssertTrue(diveManager.testHook_diveReminderRuntimeState.firedSingleReminderIDs.isEmpty)
     }
+
+    func testCriticalDepthAlarmSuppressesReminderOverlay() {
+        let enabledKey = "dirdiving_watch_alarm_depth_enabled"
+        let thresholdKey = "dirdiving_watch_alarm_depth_threshold_m"
+        let priorEnabled = UserDefaults.standard.object(forKey: enabledKey)
+        let priorThreshold = UserDefaults.standard.object(forKey: thresholdKey)
+        defer {
+            if let priorEnabled { UserDefaults.standard.set(priorEnabled, forKey: enabledKey) }
+            else { UserDefaults.standard.removeObject(forKey: enabledKey) }
+            if let priorThreshold { UserDefaults.standard.set(priorThreshold, forKey: thresholdKey) }
+            else { UserDefaults.standard.removeObject(forKey: thresholdKey) }
+        }
+        UserDefaults.standard.set(true, forKey: enabledKey)
+        UserDefaults.standard.set(30.0, forKey: thresholdKey)
+
+        saveSettings(DiveReminderSettings(
+            remindersEnabled: true,
+            reminders: [singleReminder(minute: 1, message: "Check gas")]
+        ))
+        diveManager.testHook_shutdownTimersForTests()
+        diveManager = DiveManager(
+            logStore: DiveLogStore(),
+            gpsManager: GPSManager(),
+            ascentSettings: AscentRateSettingsStore(defaults: userDefaultsSuite)
+        )
+        diveManager.testHook_setDepthAutomationAvailableForTests(true)
+        diveManager.startManualDive()
+        diveManager.testHook_processDepthMeasurement(rawDepthMeters: 35, timestamp: Date())
+        XCTAssertNotNil(diveManager.testHook_alarmWarningMessage)
+
+        diveManager.testHook_setRuntimeForTests(60)
+        diveManager.testHook_evaluateDiveRemindersForTests()
+        XCTAssertNil(diveManager.diveReminderOverlay, "Critical depth alarm must suppress reminder overlay")
+    }
 }
