@@ -73,6 +73,9 @@ targets:
       - Utils/FullComputerMockupReferenceMatrix.swift
       - Utils/FullComputerPrediveReadiness.swift
       - Utils/FullComputerReleaseHardTolerances.swift
+      - Utils/ApneaMockupReferenceMatrix.swift
+      - Utils/ApneaReleaseHardTolerances.swift
+      - Utils/ApneaReleaseSelfCheck.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
       - Resources
@@ -157,6 +160,11 @@ targets:
       - Services/MockDepthSensorProvider.swift
       - Services/DiveLogStore.swift
       - Services/ApneaLogbookStore.swift
+      - Services/ApneaImportedPlanStore.swift
+      - Services/ApneaSyncWatchReceiver.swift
+      - Services/ApneaSyncAckSigner.swift
+      - Services/ApneaSessionSyncCodec.swift
+      - Services/ApneaSyncPendingTransfer.swift
       - Services/AscentRateSettingsStore.swift
       - Services/DiveReminderSettingsStore.swift
       - Models/DiveReminder.swift
@@ -238,6 +246,9 @@ targets:
       - Utils/FullComputerMockupReferenceMatrix.swift
       - Utils/FullComputerPrediveReadiness.swift
       - Utils/FullComputerReleaseHardTolerances.swift
+      - Utils/ApneaMockupReferenceMatrix.swift
+      - Utils/ApneaReleaseHardTolerances.swift
+      - Utils/ApneaReleaseSelfCheck.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
       - Services/FullComputerRuntimeEngine.swift
@@ -395,6 +406,8 @@ targets:
       - iOSApp/Services/IOSApneaLogbookStore.swift
       - iOSApp/Services/IOSApneaSettingsStore.swift
       - iOSApp/Services/IOSApneaWatchTransferService.swift
+      - iOSApp/Services/ApneaSyncAckSigner.swift
+      - iOSApp/Services/ApneaSessionSyncCodec.swift
       - iOSApp/Services/IOSApneaEquipmentStore.swift
       - iOSApp/Services/IOSApneaBuddySafetyStore.swift
       - iOSApp/Services/IOSApneaSessionExportService.swift
@@ -408,6 +421,11 @@ targets:
       - Tests/iOSAlgorithmTests/IOSApneaCompanionTests.swift
       - Tests/iOSAlgorithmTests/IOSApneaLogbookAnalyticsTests.swift
       - Tests/iOSAlgorithmTests/IOSApneaMapEquipmentExportTests.swift
+      - Tests/iOSAlgorithmTests/ApneaSyncCodecTests.swift
+      - Tests/iOSAlgorithmTests/ApneaReleaseHardValidationTests.swift
+      - Utils/ApneaMockupReferenceMatrix.swift
+      - Utils/ApneaReleaseHardTolerances.swift
+      - Utils/ApneaReleaseSelfCheck.swift
       - Tests/iOSAlgorithmTests/IOSCompanionActivitySelectionTests.swift
       - Tests/iOSAlgorithmTests/BuhlmannComprehensiveReadinessV3RemediationTests.swift
     resources:

@@ -75,9 +75,10 @@ struct DIRDivingiOSApp: App {
             .preferredColorScheme(.dark)
             .task {
                 logStore.attachWatchSync(watchSync)
-                watchSync.activate(logStore: logStore)
+                watchSync.activate(logStore: logStore, apneaLogbookStore: apneaLogbookStore)
                 watchSync.plannerBriefingTransferService = plannerBriefingTransfer
                 watchSync.divePlanPackageTransferService = divePlanPackageTransfer
+                watchSync.apneaWatchTransferService = apneaWatchTransfer
             }
         }
     }

@@ -2243,3 +2243,16 @@
 "apnea.ios.watch.state.awaiting_ack" = "Awaiting Watch acknowledgment";
 "apnea.ios.watch.state.delivered" = "Watch acknowledged plan";
 "apnea.ios.watch.state.failed" = "Watch transfer failed";
+"apnea.ios.watch.state.awaiting_ack_revision" = "Awaiting Watch acknowledgment (rev %d · %@…)";
+"apnea.ios.watch.state.delivered_revision" = "Watch acknowledged plan (rev %d · %@…)";
+"apnea.ios.watch.ack_invalid" = "Watch acknowledgment signature invalid";
+"apnea.ios.watch.rejected" = "Watch rejected the plan package";
+"apnea.ios.watch.stale_revision" = "Watch kept a newer plan revision";
+"apnea.ios.planner.watch_transfer" = "Watch transfer";
+"apnea.sync.received_from_watch" = "Apnea session received from Watch";
+"apnea.sync.updated_from_watch" = "Apnea session updated from Watch";
+"apnea.sync.duplicate_ignored" = "Duplicate Apnea session ignored";
+"apnea.sync.import.logbook_unavailable" = "Apnea logbook unavailable for import";
+"apnea.sync.import_error_format" = "Apnea import failed: %@";
+"apnea.sync.activity.received" = "Apnea session from Watch";
+"apnea.sync.activity.updated" = "Apnea session merged from Watch";

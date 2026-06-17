@@ -1060,6 +1060,11 @@
 "apnea.ready.buddy" = "Buddy";
 "apnea.ready.start" = "AVVIA SESSIONE";
 "apnea.ready.sensor_unavailable" = "Sensore profondita non disponibile. Verifica il sensore prima di avviare.";
+"apnea.ready.revision" = "Revisione piano";
+"apnea.ready.pending_plan" = "Nuovo piano in attesa — si attiva a fine sessione.";
+"apnea.sync.activity.pending_to_iphone" = "Sessione apnea in coda per iPhone";
+"apnea.sync.activity.delivered_to_iphone" = "Sessione apnea consegnata a iPhone";
+"apnea.sync.queue.pending_key" = "In attesa chiave sync iPhone";
 "apnea.buddy.on" = "Promemoria attivo";
 "apnea.buddy.off" = "Promemoria disattivato";
 "apnea.stage.dive" = "Immersione in corso";

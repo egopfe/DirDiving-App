@@ -40,6 +40,7 @@ struct DIRDivingApp: App {
         _plannerBriefingStore = StateObject(wrappedValue: plannerBriefingStore)
         WatchSyncService.shared.attachLogStore(logStore)
         WatchSyncService.shared.attachPlannerBriefingStore(plannerBriefingStore)
+        WatchSyncService.shared.attachApneaLogbookStore(apneaLogbookStore)
         SensorSourceMode.applyReleaseSafeMigrationIfNeeded()
         FullComputerPrediveConfigurationStore.migrateIfNeeded()
     }

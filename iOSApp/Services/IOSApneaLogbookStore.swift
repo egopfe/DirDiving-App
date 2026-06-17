@@ -50,6 +50,42 @@ final class IOSApneaLogbookStore: ObservableObject {
         load()
     }
 
+    @discardableResult
+    func mergeImportedSession(_ incoming: ApneaSession) -> ApneaSessionSyncImportResult {
+        let outcome = ApneaSessionSyncImportPolicy.importSession(
+            incoming,
+            existingSessions: sessions,
+            importedIDs: importedSessionIDs
+        )
+        importedSessionIDs = outcome.updatedImportedIDs
+        ApneaSessionSyncCodec.saveImportedSessionIDs(importedSessionIDs)
+
+        guard let merged = outcome.session else {
+            if case .failed(let reason) = outcome.result {
+                loadErrorMessage = reason
+            }
+            return outcome.result
+        }
+
+        sessions.removeAll { $0.id == merged.id }
+        sessions.insert(merged, at: 0)
+        sessions = ApneaLogbookPolicy.normalizedAndCapped(sessions, deletedIDs: [])
+        persistAtomically()
+        return outcome.result
+    }
+
+    private var importedSessionIDs: Set<UUID> = ApneaSessionSyncCodec.loadImportedSessionIDs()
+
+    private func persistAtomically() {
+        do {
+            let envelope = try ApneaLogbookPersistence.makeEnvelope(sessions: sessions)
+            try ApneaLogbookPersistence.writeEnvelope(envelope, to: fileURL())
+            loadErrorMessage = nil
+        } catch {
+            loadErrorMessage = error.localizedDescription
+        }
+    }
+
     private func load() {
         let url = fileURL()
         guard FileManager.default.fileExists(atPath: url.path) else {
@@ -81,6 +117,11 @@ final class IOSApneaLogbookStore: ObservableObject {
         let envelope = try ApneaLogbookPersistence.makeEnvelope(sessions: sessions)
         try ApneaLogbookPersistence.writeEnvelope(envelope, to: fileURL())
         load()
+    }
+
+    func resetImportedIDsForTesting() {
+        importedSessionIDs = []
+        ApneaSessionSyncCodec.saveImportedSessionIDs([])
     }
     #endif
 }

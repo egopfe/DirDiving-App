@@ -60,6 +60,9 @@ final class ApneaLogbookStore: ObservableObject {
             sessions = ApneaLogbookPolicy.normalizedAndCapped(sessions, deletedIDs: deletedSessionIDs)
             guard save() else { return }
             lastSavedSessionID = normalized.id
+            if normalized.state == .completed || normalized.state == .aborted {
+                WatchSyncService.shared.transferApneaSession(normalized)
+            }
         }
     }
 

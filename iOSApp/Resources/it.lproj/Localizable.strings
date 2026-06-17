@@ -2241,3 +2241,16 @@
 "apnea.ios.watch.state.awaiting_ack" = "In attesa di conferma Watch";
 "apnea.ios.watch.state.delivered" = "Watch ha confermato il piano";
 "apnea.ios.watch.state.failed" = "Invio al Watch fallito";
+"apnea.ios.watch.state.awaiting_ack_revision" = "In attesa conferma Watch (rev %d · %@…)";
+"apnea.ios.watch.state.delivered_revision" = "Watch ha confermato il piano (rev %d · %@…)";
+"apnea.ios.watch.ack_invalid" = "Firma conferma Watch non valida";
+"apnea.ios.watch.rejected" = "Watch ha rifiutato il pacchetto piano";
+"apnea.ios.watch.stale_revision" = "Watch mantiene una revisione più recente";
+"apnea.ios.planner.watch_transfer" = "Invio al Watch";
+"apnea.sync.received_from_watch" = "Sessione apnea ricevuta dal Watch";
+"apnea.sync.updated_from_watch" = "Sessione apnea aggiornata dal Watch";
+"apnea.sync.duplicate_ignored" = "Sessione apnea duplicata ignorata";
+"apnea.sync.import.logbook_unavailable" = "Logbook apnea non disponibile per import";
+"apnea.sync.import_error_format" = "Import apnea fallito: %@";
+"apnea.sync.activity.received" = "Sessione apnea dal Watch";
+"apnea.sync.activity.updated" = "Sessione apnea unita dal Watch";

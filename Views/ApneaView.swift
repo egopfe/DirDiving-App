@@ -4,6 +4,8 @@ struct ApneaView: View {
     @EnvironmentObject private var exploration: ExplorationStore
     @EnvironmentObject private var dive: DiveManager
     @EnvironmentObject private var apneaLogbook: ApneaLogbookStore
+    @EnvironmentObject private var watchSync: WatchSyncService
+    @ObservedObject private var importedPlan = ApneaImportedPlanStore.shared
     @AppStorage(HapticService.hapticsEnabledKey) private var hapticsEnabled = true
 
     @State private var showSessionSummary = false
@@ -40,6 +42,8 @@ struct ApneaView: View {
             )
         }()
 
+        let planPresentation = importedPlan.readyPresentation
+
         return ApneaWatchPresentationInput(
             isSessionStarted: exploration.apneaState != .idle,
             showSessionSummary: showSessionSummary,
@@ -49,14 +53,14 @@ struct ApneaView: View {
             diveElapsedSeconds: exploration.currentApneaSeconds,
             diveCount: diveCount,
             verticalSpeedMetersPerSecond: dive.ascentStatus.currentRateMetersPerMinute / 60,
-            targetDepthMeters: 25,
-            recoveryPolicyLabel: "1:1",
-            activeAlarmCount: configuredAlarms.count,
-            configuredAlarmLabels: configuredAlarms,
+            targetDepthMeters: planPresentation.targetDepthMeters,
+            recoveryPolicyLabel: planPresentation.recoveryPolicyLabel,
+            activeAlarmCount: planPresentation.enabledAlarmLabels.count,
+            configuredAlarmLabels: planPresentation.enabledAlarmLabels,
             buddyReminderEnabled: true,
             sensorDegraded: dive.isDepthDataStale,
             hapticsEnabled: hapticsEnabled,
-            missionModeEnabled: dive.isMissionModeActive,
+            missionModeEnabled: planPresentation.missionModeEnabled || dive.isMissionModeActive,
             surfaceElapsedSeconds: surfaceElapsed,
             lastDiveDurationSeconds: lastDive?.durationSeconds ?? 0,
             lastDiveMaxDepthMeters: lastDive?.maxDepthMeters ?? 0,
@@ -73,10 +77,6 @@ struct ApneaView: View {
             dataQualityDegraded: dive.isDepthDataStale,
             activeOverlay: overlay
         )
-    }
-
-    private var configuredAlarms: [String] {
-        [String(localized: "apnea.alarms.sample.depth")]
     }
 
     private var ui: ApneaWatchPresentationOutput {
@@ -111,10 +111,19 @@ struct ApneaView: View {
             recoveryCompleteHapticFired = true
             HapticService.shared.confirm()
         }
+        .onChange(of: exploration.apneaState) { _, state in
+            watchSync.isApneaSessionInProgress = state != .idle
+            if state == .idle {
+                importedPlan.activatePendingIfNeeded(sessionInProgress: false)
+            }
+        }
         .onChange(of: ui.recoveryState) { _, state in
             if state != .completed {
                 recoveryCompleteHapticFired = false
             }
+        }
+        .onAppear {
+            watchSync.isApneaSessionInProgress = exploration.apneaState != .idle
         }
     }
 
@@ -154,6 +163,21 @@ struct ApneaView: View {
                 metricRow(label: String(localized: "apnea.ready.target"), value: "\(Int(input.targetDepthMeters)) m", valueColor: DiveUI.blue)
                 metricRow(label: String(localized: "apnea.ready.recovery"), value: input.recoveryPolicyLabel, valueColor: DiveUI.blue)
                 metricRow(label: String(localized: "apnea.ready.alarms"), value: ui.alarmLabel, valueColor: DiveUI.green)
+
+                if let revision = importedPlan.readyPresentation.packageRevision {
+                    metricRow(
+                        label: String(localized: "apnea.ready.revision"),
+                        value: "r\(revision)",
+                        valueColor: importedPlan.readyPresentation.isPendingWhileSessionActive ? DiveUI.yellow : DiveUI.cyan
+                    )
+                }
+
+                if importedPlan.readyPresentation.isPendingWhileSessionActive {
+                    Text(String(localized: "apnea.ready.pending_plan"))
+                        .font(DiveUI.Typography.hintCaption)
+                        .foregroundStyle(DiveUI.yellow)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
 
                 if !ui.configuredAlarms.isEmpty {
                     VStack(alignment: .leading, spacing: 4) {

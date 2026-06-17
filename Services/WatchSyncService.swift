@@ -32,7 +32,13 @@ final class WatchSyncService: NSObject, ObservableObject {
     private let pendingFileName = "dirdiving_watch_pending_sync_sessions.json"
     private weak var logStore: DiveLogStore?
     private weak var plannerBriefingStore: PlannerBriefingCardStore?
+    private weak var apneaLogbookStore: ApneaLogbookStore?
+    var isApneaSessionInProgress = false
     private var importedFromCompanionIDs: Set<UUID> = []
+    private var pendingApneaTransfers: [ApneaSyncPendingTransfer] = []
+    private var pendingApneaUserInfoSessionIDs: [ObjectIdentifier: UUID] = [:]
+    private var inFlightApneaSessionIDs: Set<UUID> = []
+    private let pendingApneaFileName = "dirdiving_watch_pending_apnea_sync_sessions.json"
     private var peerSecretObserver: NSObjectProtocol?
     private var pendingPhotoManagementResponses: [PendingPhotoManagementResponse] = []
     private var inFlightSessionIDs: Set<UUID> = []
@@ -47,7 +53,9 @@ final class WatchSyncService: NSObject, ObservableObject {
     private override init() {
         super.init()
         WatchDiveSyncCodec.bootstrapReplayCacheIfNeeded()
+        ApneaSessionSyncCodec.bootstrapReplayCacheIfNeeded()
         pendingTransfers = loadPendingTransfers()
+        pendingApneaTransfers = loadPendingApneaTransfers()
         pendingTransferCount = pendingTransfers.count
         importedFromCompanionIDs = WatchDiveSyncCodec.loadImportedFromCompanionIDs()
         importedFromCompanionCount = importedFromCompanionIDs.count
@@ -68,6 +76,10 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     func attachPlannerBriefingStore(_ store: PlannerBriefingCardStore) {
         plannerBriefingStore = store
+    }
+
+    func attachApneaLogbookStore(_ store: ApneaLogbookStore) {
+        apneaLogbookStore = store
     }
 
     deinit {
@@ -93,9 +105,22 @@ final class WatchSyncService: NSObject, ObservableObject {
 
         if WatchSyncAuth.hasPeerSecret() {
             flushPendingTransfers()
+            flushPendingApneaTransfers()
         } else {
             WatchSyncAuth.publishSharedSecretIfNeeded()
             lastSyncStatus = String(format: String(localized: "sync.queue.pending_sync_key"), pendingTransferCount)
+        }
+    }
+
+    func transferApneaSession(_ session: ApneaSession) {
+        guard WCSession.isSupported() else { return }
+        enqueuePendingApneaSession(session)
+        recordActivity(title: String(localized: "apnea.sync.activity.pending_to_iphone"), detail: apneaSessionSummary(session))
+        if WatchSyncAuth.hasPeerSecret() {
+            flushPendingApneaTransfers()
+        } else {
+            WatchSyncAuth.publishSharedSecretIfNeeded()
+            lastSyncStatus = String(localized: "apnea.sync.queue.pending_key")
         }
     }
 
@@ -130,6 +155,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         WatchSyncAuth.publishSharedSecretIfNeeded()
         if WatchSyncAuth.hasPeerSecret() {
             flushPendingTransfers()
+            flushPendingApneaTransfers()
         } else {
             lastSyncStatus = String(format: String(localized: "sync.queue.pending_companion_key"), pendingTransferCount)
         }
@@ -366,6 +392,11 @@ final class WatchSyncService: NSObject, ObservableObject {
             }
         }
         DivePlanPackageWatchReceiver.importSnapshot(context, store: FullComputerImportedPlanStore.shared)
+        ApneaSyncWatchReceiver.importSnapshot(
+            context,
+            store: ApneaImportedPlanStore.shared,
+            sessionInProgress: isApneaSessionInProgress
+        )
     }
 
     private func flushPendingTransfers() {
@@ -662,6 +693,125 @@ final class WatchSyncService: NSObject, ObservableObject {
         return "\(started) · \(Formatters.one(session.maxDepthMeters)) m · \(minutes) min"
     }
 
+    private func apneaSessionSummary(_ session: ApneaSession) -> String {
+        let dives = session.dives.count
+        let maxDepth = Formatters.one(session.statistics.sessionMaxDepthMeters)
+        return "\(dives) dives · \(maxDepth) m"
+    }
+
+    private func flushPendingApneaTransfers() {
+        guard WatchSyncAuth.hasPeerSecret(), !pendingApneaTransfers.isEmpty else { return }
+        for entry in pendingApneaTransfers.reversed() {
+            guard !inFlightApneaSessionIDs.contains(entry.session.id) else { continue }
+            inFlightApneaSessionIDs.insert(entry.session.id)
+            sendQueuedApnea(entry.session)
+        }
+    }
+
+    private func sendQueuedApnea(_ session: ApneaSession) {
+        do {
+            let envelope = try ApneaSessionSyncCodec.makePayload(session: session)
+            recordPendingApneaAttempt(sessionID: session.id, issuedAt: envelope.issuedAt)
+            if WCSession.default.isReachable {
+                WCSession.default.sendMessage(envelope.message) { [weak self] reply in
+                    Task { @MainActor in
+                        guard let self else { return }
+                        let providedSignature = reply["ackSignature"] as? String
+                        if ApneaSessionSyncCodec.verifyAckSignature(
+                            providedSignature,
+                            sessionID: envelope.sessionID,
+                            issuedAt: envelope.issuedAt
+                        ) {
+                            self.confirmApneaSignedAck(
+                                sessionID: envelope.sessionID,
+                                issuedAt: envelope.issuedAt,
+                                signature: providedSignature ?? ""
+                            )
+                        } else {
+                            self.inFlightApneaSessionIDs.remove(envelope.sessionID)
+                            self.failedTransferCount += 1
+                            self.queueApneaViaUserInfo(envelope: envelope, sessionID: session.id)
+                        }
+                    }
+                } errorHandler: { [weak self] _ in
+                    Task { @MainActor in
+                        guard let self else { return }
+                        self.inFlightApneaSessionIDs.remove(envelope.sessionID)
+                        self.queueApneaViaUserInfo(envelope: envelope, sessionID: session.id)
+                    }
+                }
+                sentTransferCount += 1
+            } else {
+                queueApneaViaUserInfo(envelope: envelope, sessionID: session.id)
+            }
+        } catch {
+            inFlightApneaSessionIDs.remove(session.id)
+            failedTransferCount += 1
+        }
+    }
+
+    private func queueApneaViaUserInfo(envelope: ApneaSessionSyncCodec.PayloadEnvelope, sessionID: UUID) {
+        let transfer = WCSession.default.transferUserInfo(envelope.message)
+        pendingApneaUserInfoSessionIDs[ObjectIdentifier(transfer)] = sessionID
+        sentTransferCount += 1
+        savePendingApneaTransfers()
+    }
+
+    func confirmApneaSignedAck(sessionID: UUID, issuedAt: Date, signature: String) {
+        guard ApneaSessionSyncCodec.verifyAckSignature(signature, sessionID: sessionID, issuedAt: issuedAt) else {
+            failedTransferCount += 1
+            return
+        }
+        inFlightApneaSessionIDs.remove(sessionID)
+        removePendingApneaTransfer(sessionID: sessionID)
+        acknowledgedTransferCount += 1
+        recordActivity(title: String(localized: "apnea.sync.activity.delivered_to_iphone"), detail: sessionID.uuidString)
+    }
+
+    private func handleApneaImportAck(_ payload: [String: Any]) {
+        guard let parsed = ApneaSessionSyncCodec.parseImportAck(from: payload) else { return }
+        confirmApneaSignedAck(sessionID: parsed.sessionID, issuedAt: parsed.issuedAt, signature: parsed.signature)
+    }
+
+    private func enqueuePendingApneaSession(_ session: ApneaSession) {
+        let normalized = ApneaLogbookPolicy.normalizedSession(session)
+        pendingApneaTransfers.removeAll { $0.session.id == normalized.id }
+        pendingApneaTransfers.append(ApneaSyncPendingTransfer(session: normalized))
+        savePendingApneaTransfers()
+    }
+
+    private func removePendingApneaTransfer(sessionID: UUID) {
+        pendingApneaTransfers.removeAll { $0.session.id == sessionID }
+        savePendingApneaTransfers()
+    }
+
+    private func recordPendingApneaAttempt(sessionID: UUID, issuedAt: Date) {
+        guard let index = pendingApneaTransfers.firstIndex(where: { $0.session.id == sessionID }) else { return }
+        pendingApneaTransfers[index].lastIssuedAt = issuedAt
+        pendingApneaTransfers[index].lastAttemptAt = Date()
+        pendingApneaTransfers[index].attemptCount += 1
+        savePendingApneaTransfers()
+    }
+
+    private func pendingApneaFileURL() -> URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent(pendingApneaFileName)
+    }
+
+    private func loadPendingApneaTransfers() -> [ApneaSyncPendingTransfer] {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        guard let data = try? Data(contentsOf: pendingApneaFileURL()) else { return [] }
+        return (try? decoder.decode([ApneaSyncPendingTransfer].self, from: data)) ?? []
+    }
+
+    private func savePendingApneaTransfers() {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        guard let data = try? encoder.encode(pendingApneaTransfers) else { return }
+        try? data.write(to: pendingApneaFileURL(), options: [.atomic, .completeFileProtection])
+    }
+
     private func recordActivity(title: String, detail: String) {
         let normalizedDetail = detail.isEmpty ? "—" : detail
         recentActivity.insert(
@@ -780,6 +930,20 @@ extension WatchSyncService: WCSessionDelegate {
                 ) {
                     DivePlanPackageWatchReceiver.deliverAck(ack)
                 }
+                return
+            }
+            if ApneaSyncTransferSupport.isPackageTransfer(userInfo) {
+                if let ack = ApneaSyncWatchReceiver.importPayload(
+                    userInfo,
+                    store: ApneaImportedPlanStore.shared,
+                    sessionInProgress: isApneaSessionInProgress
+                ) {
+                    ApneaSyncWatchReceiver.deliverAck(ack)
+                }
+                return
+            }
+            if ApneaSessionSyncCodec.isImportAck(userInfo) {
+                handleApneaImportAck(userInfo)
                 return
             }
             if let ackContext = self.ingestIncomingPayload(userInfo) {

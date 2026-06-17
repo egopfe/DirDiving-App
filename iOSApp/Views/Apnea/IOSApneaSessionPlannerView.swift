@@ -5,6 +5,7 @@ struct IOSApneaSessionPlannerView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var plannerStore: IOSApneaPlannerStore
     @EnvironmentObject private var profileStore: IOSApneaProfileStore
+    @EnvironmentObject private var settingsStore: IOSApneaSettingsStore
     @EnvironmentObject private var transferService: IOSApneaWatchTransferService
     @EnvironmentObject private var watchSync: WatchSyncService
 
@@ -79,9 +80,11 @@ struct IOSApneaSessionPlannerView: View {
                     }
                 }
 
-                if let transferMessage {
-                    Section {
-                        Text(transferMessage)
+                Section(DIRIOSLocalizer.string("apnea.ios.planner.watch_transfer")) {
+                    HStack(spacing: 10) {
+                        Image(systemName: transferStatusIcon)
+                            .foregroundStyle(transferStatusColor)
+                        Text(transferMessage ?? transferStatusText(transferService.state))
                             .foregroundStyle(DIRTheme.muted)
                             .font(.caption)
                     }
@@ -106,6 +109,10 @@ struct IOSApneaSessionPlannerView: View {
                let profile = profileStore.profile(id: profileID) {
                 plannerStore.applyProfile(profile)
             }
+            transferMessage = transferStatusText(transferService.state)
+        }
+        .onChange(of: transferService.state) { _, newState in
+            transferMessage = transferStatusText(newState)
         }
     }
 
@@ -134,22 +141,63 @@ struct IOSApneaSessionPlannerView: View {
 
     private func sendToWatch() {
         plannerStore.persist()
-        let ok = transferService.send(plan: plannerStore.draftPlan, connectivity: watchConnectivity)
+        let profile = plannerStore.draftPlan.profileID.flatMap { profileStore.profile(id: $0) }
+        let ok = transferService.send(
+            plan: plannerStore.draftPlan,
+            profile: profile,
+            settings: settingsStore.settings,
+            connectivity: watchConnectivity
+        )
         if ok {
-            transferMessage = transferStatusText(transferService.lastTransferState)
+            transferMessage = transferStatusText(transferService.state)
         } else if let error = transferService.lastErrorMessage {
             transferMessage = DIRIOSLocalizer.string(error)
         }
     }
 
-    private func transferStatusText(_ state: ApneaWatchPlanTransferState) -> String {
+    private var transferStatusIcon: String {
+        switch transferService.state {
+        case .draft, .validated: return "doc.text"
+        case .sending: return "arrow.up.circle"
+        case .queued: return "clock"
+        case .awaitingAck: return "hourglass"
+        case .acknowledged: return "checkmark.circle.fill"
+        case .failed: return "exclamationmark.triangle.fill"
+        }
+    }
+
+    private var transferStatusColor: Color {
+        switch transferService.state {
+        case .acknowledged: return DIRTheme.green
+        case .failed: return DIRTheme.red
+        case .awaitingAck, .sending: return DIRTheme.cyan
+        case .queued: return DIRTheme.yellow
+        default: return DIRTheme.muted
+        }
+    }
+
+    private func transferStatusText(_ state: IOSApneaWatchSyncState) -> String {
         switch state {
-        case .draft, .validated: return DIRIOSLocalizer.string("apnea.ios.watch.state.draft")
-        case .sending: return DIRIOSLocalizer.string("apnea.ios.watch.state.sending")
-        case .queued: return DIRIOSLocalizer.string("apnea.ios.watch.state.queued")
-        case .awaitingAck: return DIRIOSLocalizer.string("apnea.ios.watch.state.awaiting_ack")
-        case .delivered: return DIRIOSLocalizer.string("apnea.ios.watch.state.delivered")
-        case .failed: return DIRIOSLocalizer.string("apnea.ios.watch.state.failed")
+        case .draft, .validated:
+            return DIRIOSLocalizer.string("apnea.ios.watch.state.draft")
+        case .sending:
+            return DIRIOSLocalizer.string("apnea.ios.watch.state.sending")
+        case .queued:
+            return DIRIOSLocalizer.string("apnea.ios.watch.state.queued")
+        case .awaitingAck(let packageID, let revision, _):
+            return String(
+                format: DIRIOSLocalizer.string("apnea.ios.watch.state.awaiting_ack_revision"),
+                revision,
+                String(packageID.uuidString.prefix(8))
+            )
+        case .acknowledged(let packageID, let revision, _):
+            return String(
+                format: DIRIOSLocalizer.string("apnea.ios.watch.state.delivered_revision"),
+                revision,
+                String(packageID.uuidString.prefix(8))
+            )
+        case .failed(let messageKey):
+            return DIRIOSLocalizer.string(messageKey)
         }
     }
 
