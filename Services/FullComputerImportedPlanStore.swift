@@ -55,15 +55,18 @@ final class FullComputerImportedPlanStore: ObservableObject {
         }
 
         if let current = pendingPackage {
-            if package.body.planID == current.body.planID,
-               package.body.revision < current.body.revision {
-                return false
-            }
-            if package.body.planID == current.body.planID,
-               package.body.revision == current.body.revision,
-               package.payloadChecksumSHA256 == current.payloadChecksumSHA256 {
-                rememberChecksum(fingerprint)
-                return true
+            if package.body.planID == current.body.planID {
+                if package.body.revision < current.body.revision {
+                    return false
+                }
+                if package.body.revision == current.body.revision {
+                    if package.payloadChecksumSHA256 == current.payloadChecksumSHA256 {
+                        rememberChecksum(fingerprint)
+                        return true
+                    }
+                    lastImportError = .checksumMismatch
+                    return false
+                }
             }
         }
 
@@ -77,7 +80,10 @@ final class FullComputerImportedPlanStore: ObservableObject {
 
     func activatePendingPlan(configuration: FullComputerPrediveConfigurationStore = .shared) throws {
         guard let package = pendingPackage else { return }
-        let profile = try FullComputerGasProfile(importing: package)
+        var profile = try FullComputerGasProfile(importing: package)
+        let preserved = configuration.draftProfile
+        profile.travelGases = preserved.travelGases
+        profile.bailoutGases = preserved.bailoutGases
         configuration.importProfile(profile)
         activatedPlanID = package.body.planID
         activatedRevision = package.body.revision
