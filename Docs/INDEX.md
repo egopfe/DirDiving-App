@@ -1,9 +1,55 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-14  
-**Branch consigliato:** `main` = `origin/main` @ **`99ea74a`**  
+**Aggiornato:** 2026-06-17  
+**Branch consigliato:** `main` = `origin/main` @ **`a5392c5`** (pre–Audit 02 doc commit)  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-06-17 — Audit 02 Full Computer runtime / deco / UI
+
+Read-only audit su `main`: runtime Bühlmann Watch, solver prospettico, state machine tappe, UI live FC. Nessuna modifica al codice.
+
+| Campo | Valore |
+|-------|--------|
+| **Comando** | `02_AUDIT_FULL_COMPUTER_RUNTIME_DECO_UI.md` |
+| **Report** | [`AUDIT_FULL_COMPUTER_RUNTIME_DECO_UI_CURRENT.md`](AUDIT_FULL_COMPUTER_RUNTIME_DECO_UI_CURRENT.md) |
+| **Baseline** | `main` @ audit run |
+| **Verdict** | **PASS** (Watch MAIN); iOS = planner/logbook only |
+| **Remediation** | P2/P3 closed @ post-`efdcb3a` commit — see audit addendum |
+| **Prerequisite** | [`FULL_COMPUTER_FOUNDATIONS_REMEDIATION_REPORT_V1.1.md`](FULL_COMPUTER_FOUNDATIONS_REMEDIATION_REPORT_V1.1.md) |
+
+---
+
+## Aggiornamento indice 2026-06-17 — Apnea release-hard (Command 12)
+
+Pass release-hard su `integration/full-computer`: matrice 23 mockup `APNEA_*`, test automatizzati, script `validate_apnea_release_readiness.sh`, architettura e checklist.
+
+| Campo | Valore |
+|-------|--------|
+| **Architettura** | [`APNEA_ARCHITECTURE.md`](APNEA_ARCHITECTURE.md) |
+| **Test matrix** | [`APNEA_RELEASE_HARD_TEST_MATRIX.md`](APNEA_RELEASE_HARD_TEST_MATRIX.md) |
+| **Checklist** | [`APNEA_RELEASE_CHECKLIST.md`](APNEA_RELEASE_CHECKLIST.md) |
+| **Validation report** | [`DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md`](DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md) |
+| **Automation** | `./Scripts/validate_apnea_release_readiness.sh` |
+| **Verdict** | Sim/build/test verdi sul branch; **physical QA PENDING** — non certificato per immersione |
+
+### Report implementazione Apnea (Commands 05–11)
+
+| Command | Report |
+|---------|--------|
+| 05 Domain | [`DIR_DIVING_APNEA_DOMAIN_MODELS_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_APNEA_DOMAIN_MODELS_IMPLEMENTATION_REPORT_CURRENT.md) |
+| 06 Depth/lifecycle | [`DIR_DIVING_APNEA_DEPTH_FEED_LIFECYCLE_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_APNEA_DEPTH_FEED_LIFECYCLE_IMPLEMENTATION_REPORT_CURRENT.md) |
+| 07 Alarms/markers | [`DIR_DIVING_APNEA_ALARMS_TARGETS_MARKERS_HAPTICS_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_APNEA_ALARMS_TARGETS_MARKERS_HAPTICS_IMPLEMENTATION_REPORT_CURRENT.md) |
+| 08 Recovery/checkpoint | [`DIR_DIVING_APNEA_TIME_RECOVERY_CHECKPOINT_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_APNEA_TIME_RECOVERY_CHECKPOINT_IMPLEMENTATION_REPORT_CURRENT.md) |
+| 09 Watch UI | [`DIR_DIVING_APNEA_WATCH_READY_ACTIVE_UI_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_APNEA_WATCH_READY_ACTIVE_UI_IMPLEMENTATION_REPORT_CURRENT.md) |
+| 10 Watch logbook | [`DIR_DIVING_APNEA_WATCH_LOGBOOK_SESSION_STATISTICS_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_APNEA_WATCH_LOGBOOK_SESSION_STATISTICS_IMPLEMENTATION_REPORT_CURRENT.md) |
+| 10b Surface/summary | [`DIR_DIVING_APNEA_WATCH_SURFACE_RECOVERY_SUMMARY_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_APNEA_WATCH_SURFACE_RECOVERY_SUMMARY_IMPLEMENTATION_REPORT_CURRENT.md) |
+| 10c iOS profiles | [`DIR_DIVING_APNEA_IOS_PROFILES_PLANNER_DASHBOARD_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_APNEA_IOS_PROFILES_PLANNER_DASHBOARD_IMPLEMENTATION_REPORT_CURRENT.md) |
+| 10d iOS logbook | [`DIR_DIVING_APNEA_IOS_LOGBOOK_GRAPHS_STATS_RECORDS_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_APNEA_IOS_LOGBOOK_GRAPHS_STATS_RECORDS_IMPLEMENTATION_REPORT_CURRENT.md) |
+| 10e iOS map/export | [`DIR_DIVING_APNEA_IOS_MAP_EQUIPMENT_BUDDY_EXPORT_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_APNEA_IOS_MAP_EQUIPMENT_BUDDY_EXPORT_IMPLEMENTATION_REPORT_CURRENT.md) |
+| 11 iOS↔Watch sync | [`DIR_DIVING_APNEA_IOS_WATCH_SYNC_OFFLINE_AUTONOMY_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_APNEA_IOS_WATCH_SYNC_OFFLINE_AUTONOMY_IMPLEMENTATION_REPORT_CURRENT.md) |
 
 ---
 

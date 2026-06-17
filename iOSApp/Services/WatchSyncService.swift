@@ -35,6 +35,9 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published private(set) var pendingDeleteRequests: [String: WatchPhotoDeleteRequestState] = [:]
     private weak var logStore: DiveLogStore?
     weak var plannerBriefingTransferService: PlannerBriefingWatchTransferService?
+    weak var divePlanPackageTransferService: DivePlanPackageWatchTransferService?
+    weak var apneaWatchTransferService: IOSApneaWatchTransferService?
+    private weak var apneaLogbookStore: IOSApneaLogbookStore?
     private var photoIDByTransferFilePath: [String: String] = [:]
     private var companionPhotoTransfersByID: [String: CompanionPhotoTransferStatus] = [:]
     private var pendingPhotoImportVerificationTasks: [String: Task<Void, Never>] = [:]
@@ -91,10 +94,14 @@ final class WatchSyncService: NSObject, ObservableObject {
         }
     }
 
-    func activate(logStore: DiveLogStore) {
+    func activate(logStore: DiveLogStore, apneaLogbookStore: IOSApneaLogbookStore? = nil) {
+        if let apneaLogbookStore {
+            self.apneaLogbookStore = apneaLogbookStore
+        }
         deferPublishedMutation { [self] in
             self.logStore = logStore
             WatchDiveSyncCodec.bootstrapReplayCacheIfNeeded()
+            ApneaSessionSyncCodec.bootstrapReplayCacheIfNeeded()
             importedSessionIDs = WatchDiveSyncCodec.loadImportedSessionIDs()
             importedSessionCount = importedSessionIDs.count
             pushedToWatchSessionIDs = loadPushedToWatchSessionIDs()
@@ -109,6 +116,10 @@ final class WatchSyncService: NSObject, ObservableObject {
             WCSession.default.delegate = self
             WCSession.default.activate()
         }
+    }
+
+    func attachApneaLogbookStore(_ store: IOSApneaLogbookStore) {
+        apneaLogbookStore = store
     }
 
     /// Avoid SwiftUI runtime fault: "Publishing changes from within view updates".
@@ -458,6 +469,16 @@ final class WatchSyncService: NSObject, ObservableObject {
         plannerBriefingTransferService?.handleAck(packageId: packageId, status: status)
     }
 
+    private func handleDivePlanPackageAck(_ payload: [String: Any]) {
+        guard let ack = DivePlanPackageTransferSupport.parseAck(payload) else { return }
+        divePlanPackageTransferService?.handleAck(ack)
+    }
+
+    private func handleApneaSyncAck(_ payload: [String: Any]) {
+        guard let ack = ApneaSyncTransferSupport.parseAck(payload) else { return }
+        apneaWatchTransferService?.handleAck(ack)
+    }
+
     private func handleCompanionPhotoAck(_ payload: [String: Any]) {
         guard let ack = CompanionPhotoTransferSupport.parseCompanionPhotoAck(payload) else { return }
         var transfer = companionPhotoTransfersByID[ack.photoID]
@@ -521,6 +542,9 @@ final class WatchSyncService: NSObject, ObservableObject {
             let preference = IOSUnitPreference.fromSyncCode(units)
             UserDefaults.standard.set(preference.rawValue, forKey: IOSUnitPreference.storageKey)
         }
+        if let showsTTV = context[WatchSyncKeys.gaugeShowTTVKey] as? Bool {
+            UserDefaults.standard.set(showsTTV, forKey: WatchSyncKeys.gaugeShowTTVKey)
+        }
         if let strings = context[WatchSyncKeys.deletedSessionBroadcastKey] as? [String] {
             let ids = Set(strings.compactMap(UUID.init(uuidString:)))
             if !ids.isEmpty {
@@ -579,6 +603,40 @@ final class WatchSyncService: NSObject, ObservableObject {
             failedImportCount += 1
             lastMessage = DIRIOSLocalizer.formatted("sync.dive.watch_sync_error_format", error.localizedDescription)
             Self.logger.error("Watch sync import failed: \(error.localizedDescription, privacy: .private)")
+            return nil
+        }
+    }
+
+    @discardableResult
+    private func importApneaSessionPayload(_ payload: [String: Any]) -> AckContext? {
+        guard payload[ApneaSessionSyncCodec.payloadKey] != nil else { return nil }
+        guard let apneaLogbookStore else {
+            failedImportCount += 1
+            lastMessage = DIRIOSLocalizer.string("apnea.sync.import.logbook_unavailable")
+            return nil
+        }
+        do {
+            let parsed = try ApneaSessionSyncCodec.parsePayload(from: payload)
+            let result = apneaLogbookStore.mergeImportedSession(parsed.session)
+            switch result {
+            case .imported:
+                lastMessage = DIRIOSLocalizer.string("apnea.sync.received_from_watch")
+                recordActivity(title: DIRIOSLocalizer.string("apnea.sync.activity.received"), detail: parsed.session.id.uuidString, marksSuccess: true)
+            case .merged:
+                lastMessage = DIRIOSLocalizer.string("apnea.sync.updated_from_watch")
+                recordActivity(title: DIRIOSLocalizer.string("apnea.sync.activity.updated"), detail: parsed.session.id.uuidString, marksSuccess: true)
+            case .duplicateIgnored:
+                lastMessage = DIRIOSLocalizer.string("apnea.sync.duplicate_ignored")
+            case .failed(let reason):
+                failedImportCount += 1
+                lastMessage = reason
+                return nil
+            }
+            lastSuccessfulSyncDate = Date()
+            return AckContext(sessionID: parsed.session.id, issuedAt: parsed.issuedAt)
+        } catch {
+            failedImportCount += 1
+            lastMessage = DIRIOSLocalizer.formatted("apnea.sync.import_error_format", error.localizedDescription)
             return nil
         }
     }
@@ -910,6 +968,8 @@ extension WatchSyncService: WCSessionDelegate {
                     WatchSyncAuth.publishSharedSecretIfNeeded(session: session)
                     self.flushOutboundTransfers()
                 }
+                self.divePlanPackageTransferService?.flushIfNeeded()
+                self.apneaWatchTransferService?.flushIfNeeded()
             }
         }
     }
@@ -940,6 +1000,17 @@ extension WatchSyncService: WCSessionDelegate {
                 self.handleCompanionPhotoAck(message)
                 return
             }
+            if DivePlanPackageTransferSupport.isPackageAck(message) {
+                self.handleDivePlanPackageAck(message)
+                return
+            }
+            if ApneaSyncTransferSupport.isPackageAck(message) {
+                self.handleApneaSyncAck(message)
+                return
+            }
+            if let ackContext = self.importApneaSessionPayload(message) {
+                return
+            }
             _ = self.importSessionPayload(message)
         }
     }
@@ -964,6 +1035,25 @@ extension WatchSyncService: WCSessionDelegate {
             if CompanionPhotoTransferSupport.isCompanionPhotoAck(message) {
                 self.handleCompanionPhotoAck(message)
                 replyHandler(["status": "acknowledged"])
+                return
+            }
+            if DivePlanPackageTransferSupport.isPackageAck(message) {
+                self.handleDivePlanPackageAck(message)
+                replyHandler(["status": "acknowledged"])
+                return
+            }
+            if ApneaSyncTransferSupport.isPackageAck(message) {
+                self.handleApneaSyncAck(message)
+                replyHandler(["status": "acknowledged"])
+                return
+            }
+            if let apneaAck = self.importApneaSessionPayload(message) {
+                var reply: [String: Any] = ["status": "acknowledged"]
+                reply["ackSignature"] = ApneaSessionSyncCodec.ackSignature(
+                    sessionID: apneaAck.sessionID,
+                    issuedAt: apneaAck.issuedAt
+                )
+                replyHandler(reply)
                 return
             }
             let beforeFailures = self.failedImportCount
@@ -1002,6 +1092,20 @@ extension WatchSyncService: WCSessionDelegate {
             }
             if (userInfo["type"] as? String) == PlannerBriefingTransferSupport.ackType {
                 self.handlePlannerBriefingAck(userInfo)
+                return
+            }
+            if DivePlanPackageTransferSupport.isPackageAck(userInfo) {
+                self.handleDivePlanPackageAck(userInfo)
+                return
+            }
+            if ApneaSyncTransferSupport.isPackageAck(userInfo) {
+                self.handleApneaSyncAck(userInfo)
+                return
+            }
+            if ApneaSessionSyncCodec.isImportAck(userInfo) {
+                return
+            }
+            if self.importApneaSessionPayload(userInfo) != nil {
                 return
             }
             _ = self.importSessionPayload(userInfo)

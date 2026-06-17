@@ -54,6 +54,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
     var exitPressureBar: Double?
     var decompressionNotes: String?
     var ccrLogbookMetadata: CCRLogbookMetadata?
+    var fullComputerLogbookMetadata: FullComputerDiveLogbookMetadata?
 
     static let demoNotesLabel = "Demo dive"
 
@@ -64,7 +65,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
         case avgWaterTemperatureCelsius, ttv, entryGPS, exitGPS
         case entryGPSFixSource, exitGPSFixSource, samples
         case siteName, buddy, notes, gasLabel, sacLitersMinute, isDemo, exceededSupportedDepthRange
-        case isManual, hasDepthProfile, equipmentUsed, entryPressureText, exitPressureText, entryPressureBar, exitPressureBar, decompressionNotes, ccrLogbookMetadata
+        case isManual, hasDepthProfile, equipmentUsed, entryPressureText, exitPressureText, entryPressureBar, exitPressureBar, decompressionNotes, ccrLogbookMetadata, fullComputerLogbookMetadata
     }
 
     init(
@@ -96,7 +97,8 @@ struct DiveSession: Identifiable, Codable, Hashable {
         entryPressureBar: Double? = nil,
         exitPressureBar: Double? = nil,
         decompressionNotes: String? = nil,
-        ccrLogbookMetadata: CCRLogbookMetadata? = nil
+        ccrLogbookMetadata: CCRLogbookMetadata? = nil,
+        fullComputerLogbookMetadata: FullComputerDiveLogbookMetadata? = nil
     ) {
         self.id = id
         self.startDate = startDate
@@ -128,6 +130,7 @@ struct DiveSession: Identifiable, Codable, Hashable {
         self.exitPressureBar = exitPressureBar
         self.decompressionNotes = decompressionNotes
         self.ccrLogbookMetadata = ccrLogbookMetadata
+        self.fullComputerLogbookMetadata = fullComputerLogbookMetadata
     }
 
     init(from decoder: Decoder) throws {
@@ -163,6 +166,10 @@ struct DiveSession: Identifiable, Codable, Hashable {
         exitPressureBar = try container.decodeIfPresent(Double.self, forKey: .exitPressureBar)
         decompressionNotes = try container.decodeIfPresent(String.self, forKey: .decompressionNotes)
         ccrLogbookMetadata = try container.decodeIfPresent(CCRLogbookMetadata.self, forKey: .ccrLogbookMetadata)
+        fullComputerLogbookMetadata = try container.decodeIfPresent(
+            FullComputerDiveLogbookMetadata.self,
+            forKey: .fullComputerLogbookMetadata
+        )
     }
 
     func encode(to encoder: Encoder) throws {
@@ -196,5 +203,6 @@ struct DiveSession: Identifiable, Codable, Hashable {
         try container.encodeIfPresent(exitPressureBar, forKey: .exitPressureBar)
         try container.encodeIfPresent(decompressionNotes, forKey: .decompressionNotes)
         try container.encodeIfPresent(ccrLogbookMetadata, forKey: .ccrLogbookMetadata)
+        try container.encodeIfPresent(fullComputerLogbookMetadata, forKey: .fullComputerLogbookMetadata)
     }
 }

@@ -62,6 +62,7 @@ Capture from experimental branches only; do not merge experimental UI into MAIN 
 | `Snorkeling_Waypoint_Map_reference.png` | idem | Waypoint map |
 | `Snorkeling_Return_Map_reference.png` | idem | Return map |
 | `Apnea_Workflow_reference.png` | `codex/experimental-features` / `codex/ios-experimental-features` | Apnea workflow screens |
+| FC_UI_01 … FC_UI_25 (external PNGs) | `integration/full-computer` | Full Computer state matrix — indexed in [`FULL_COMPUTER_RELEASE_HARD_TEST_MATRIX.md`](../FULL_COMPUTER_RELEASE_HARD_TEST_MATRIX.md); **do not commit raster mockups into this repo** |
 
 Mark all experimental captures **Experimental / not production** in commit messages and CSV `Notes`.
 

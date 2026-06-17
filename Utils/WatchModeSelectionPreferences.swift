@@ -15,6 +15,6 @@ enum WatchModeSelectionPreferences {
     }
 
     /// Experimental branch exposes Diving, Apnea, Snorkeling, and Buddy Lab entry points.
-    /// MAIN keeps this false; do not copy this value into production without target-scope review.
+    /// Production `main` sets this to `false` (startup flow + Settings only).
     static let hasMultipleStableModes = true
 }

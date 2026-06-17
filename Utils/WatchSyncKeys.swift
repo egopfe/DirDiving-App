@@ -5,6 +5,8 @@ enum WatchSyncKeys {
     /// WatchConnectivity `applicationContext` broadcast of tombstone UUID strings.
     static let deletedSessionBroadcastKey = "dirdiving_deleted_session_ids"
     static let unitsPreferenceKey = "units"
+    /// Watch Gauge optional TTV index visibility (default OFF); synced via applicationContext.
+    static let gaugeShowTTVKey = "dirdiving_watch_gauge_show_ttv"
     static let companionPhotoFileNameKey = "photoFileName"
     static let companionPhotoIDKey = "photoID"
     static let companionPhotoAckType = "companionPhotoAck"

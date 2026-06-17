@@ -66,21 +66,7 @@ enum PlannerMode: String, CaseIterable, Identifiable, Codable {
     var isOpenCircuit: Bool { !isCCR }
 }
 
-enum SalinityMode: String, CaseIterable, Identifiable, Codable {
-    case fresh = "Dolce"
-    case salt = "Salata"
-    var id: String { rawValue }
-}
-
-enum GasRole: String, CaseIterable, Identifiable, Codable {
-    case bottom = "Fondo"
-    case travel = "Travel"
-    case deco = "Deco"
-    case bailout = "Bailout"
-    case ccrDiluent = "CCR Diluent"
-    case ccrBailout = "CCR Bailout"
-    var id: String { rawValue }
-
+extension GasRole {
     var localizedTitle: String {
         switch self {
         case .travel: return DIRIOSLocalizer.string("gas.role.travel")
