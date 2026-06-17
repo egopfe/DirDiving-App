@@ -66,7 +66,7 @@ final class LegalAcceptanceStore: ObservableObject {
         defaults.set(Self.legalRevision, forKey: Key.legalRevision)
         defaults.set(true, forKey: Key.depthLimitsAcknowledged)
         record = Self.loadRecord(from: defaults)
-        IOSCompanionPostLegalEntry.markPendingPlannerLanding()
+        IOSCompanionPostLegalEntry.markPendingActivitySelection()
     }
 
     func disclaimerText(languageCode: String) -> String {

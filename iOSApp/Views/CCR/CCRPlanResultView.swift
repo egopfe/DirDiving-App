@@ -190,8 +190,8 @@ struct CCRPlanResultView: View {
     private var summaryCard: some View {
         DIRCard(DIRIOSLocalizer.string("ccr.plan.summary"), icon: "list.bullet.rectangle", accent: DIRTheme.cyan) {
             VStack(alignment: .leading, spacing: 6) {
-                metric(DIRIOSLocalizer.string("planner.tts"), "\(plan.ttsMinutes) min")
-                metric(DIRIOSLocalizer.string("planner.runtime"), "\(plan.totalRuntimeMinutes) min")
+                metric(DIRIOSLocalizer.string("planner.metric.tts"), "\(plan.ttsMinutes) min")
+                metric(DIRIOSLocalizer.string("planner.metric.runtime"), "\(plan.totalRuntimeMinutes) min")
                 metric(DIRIOSLocalizer.string("ccr.diluent"), store.ccrInput.diluent.label)
                 metric(
                     DIRIOSLocalizer.string("ccr.setpoint.strategy"),
@@ -234,7 +234,7 @@ struct CCRPlanResultView: View {
     }
 
     private var depthChartCard: some View {
-        DIRCard(DIRIOSLocalizer.string("planner.chart.depth_profile"), icon: "chart.xyaxis.line", accent: DIRTheme.cyan) {
+        DIRCard(DIRIOSLocalizer.string("planner.charts.depth_profile"), icon: "chart.xyaxis.line", accent: DIRTheme.cyan) {
             Chart(plan.depthProfilePoints) { point in
                 LineMark(
                     x: .value(DIRIOSLocalizer.string("chart.axis.time"), point.elapsedMinutes),
@@ -434,7 +434,7 @@ struct CCRPlanResultView: View {
     private var warningsCard: some View {
         Group {
             if !plan.warnings.isEmpty {
-                DIRCard(DIRIOSLocalizer.string("planner.warnings.header"), icon: "info.circle", accent: DIRTheme.yellow) {
+                DIRCard(DIRIOSLocalizer.string("planner.result.warnings.title"), icon: "info.circle", accent: DIRTheme.yellow) {
                     ForEach(plan.warnings) { warning in
                         Text(warning.message)
                             .font(.caption)

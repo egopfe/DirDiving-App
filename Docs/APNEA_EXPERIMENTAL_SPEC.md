@@ -1,88 +1,59 @@
-# DIR DIVING - Specifica Apnea Experimental
+# DIR DIVING - Specifica Apnea (integration `integration/full-computer`)
 
-Questo documento descrive lo stato UI/UX e il comportamento sperimentale Apnea su Apple Watch, con il relativo punto di review sul companion iOS. Le funzioni sono isolate sui rami `codex/experimental-features` e `codex/ios-experimental-features`.
+**Aggiornato:** 2026-06-17  
+**Branch:** `integration/full-computer` (non `main`)  
+**Architettura:** [`APNEA_ARCHITECTURE.md`](APNEA_ARCHITECTURE.md)  
+**Release-hard:** [`DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md`](DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md)
 
-## Principi UI
+## Stato attuale
 
-- Sfondo nero pieno, pannelli minimi e numeri grandi ad alta leggibilita.
-- Accento blu `#0084FF` per navigazione e stato tecnico.
-- Ciano `#00D6EB` per superfici companion e profili.
-- Verde `#28E64B` per conferme e recupero completato.
-- Giallo `#FFD220` per attenzione, countdown, recovery e stato intermedio.
-- Rosso `#FF362D` solo per warning o risalita troppo veloce.
-- Nessuna card generica chiara o layout marketing nel Watch runtime.
+Apnea su `integration/full-computer` usa modelli condivisi (`Shared/Models/Apnea*`), motore lifecycle (`ApneaSessionEngine`), companion iOS (`iOSApp/Views/Apnea/`) e sync WatchConnectivity dedicato (`apneaSyncPlanPackage`, `dirdiving_apnea_session`).
 
-## Workflow Apple Watch
+- **Watch UI** (`Views/ApneaView.swift`): implementata ma **esclusa** dal target MAIN Watch in `project.yml` fino a review di promozione.
+- **Feature flag:** `ExperimentalFeatures.apneaIntegrationEnabled` (vedi `Utils/ExperimentalFeatures.swift`).
+- **Mockup:** 23 PNG `APNEA_*` indicizzati in `Utils/ApneaMockupReferenceMatrix.swift` — **non** incorporati nel bundle.
+- **Sicurezza:** nessun rilevamento blackout/movimento; buddy disclaimer su iOS; start bloccato con sensore degradato.
 
-Il flusso sperimentale Apnea e composto da:
+## Principi UI (mockup Commands 05–11)
 
-1. Home mode selection con `Apnea` evidenziabile dal selettore modalita.
-2. Menu Apnea con `Sessione`, `Tabelle`, `Statistiche` e `Logbook`.
-3. Selezione tipo sessione con `Acque Libere` attiva e `Dinamica`, `Statica`, `Personalizzata` come placeholder disabilitati.
-4. Configurazione `Acque Libere` con allarmi raggiungibili, intervallo superficie e profondita massima modificabili.
-5. Countdown `03`, `02`, `01 / VAI` con avanzamento automatico, tap manuale e haptic tick/start.
-6. Surface waiting: sessione attiva in superficie, timer immersione fermo, profondita a zero.
-7. Discesa: avvio automatico del timer Apnea quando la profondita supera la soglia UI di immersione.
-8. Fondo/profondita: visualizzazione grande della profondita e runtime.
-9. Risalita: stato visuale derivato da profondita e tempo quando non esiste ancora uno stato motore dedicato.
-10. Allarme risalita: usa `DiveManager.ascentStatus.isOverLimit` senza cambiare soglie o algoritmi.
-11. Surface end: chiusura immersione tramite `ExplorationStore.surfaceFromApnea(...)`.
-12. Recovery: timer superficie con logica esistente `max(durata * 2, 30)`.
-13. Riepilogo: durata e profondita massima dalla sessione salvata.
-14. Grafico profondita: profilo SwiftUI placeholder finche il record non espone campioni.
-15. Dettagli: metriche placeholder per velocita discesa, velocita risalita e frequenza cardiaca.
-16. Conferma salvataggio: UI di successo; la persistenza avviene gia nella chiusura sessione.
-17. Logbook: mostra il record Apnea piu recente e righe placeholder.
-18. Statistiche: usa record esistenti per profondita massima e conteggio; totale e media restano TODO.
+- Watch: sfondo nero, numeri grandi, verde/giallo/rosso per stato semantico (ready, dive, ascent, recovery, summary, allarmi).
+- iOS: companion chiaro con accenti teal/cyan, tab Dashboard / Sessioni / Statistiche / Profilo.
+- Localizzazione **EN + IT** obbligatoria per tutte le stringhe Apnea.
 
-## Stato e persistenza
+## Workflow Apple Watch (target integrazione)
 
-La UI Apnea usa `ExplorationStore` e non introduce nuovi modelli persistenti in questo pass.
-
-Persistito oggi:
-
-- modalita selezionata;
-- stato Apnea condiviso;
-- record Apnea con durata, profondita massima e recovery richiesta;
-- timer Apnea e recovery;
-- contatore immersioni;
-- warning Apnea.
-- configurazione locale sperimentale `Intervallo superficie` e `Profondita max allarme` tramite `AppStorage`.
-
-Non ancora persistito in un modello dedicato perche manca il contratto dati definitivo:
-
-- campioni profondita per grafico reale;
-- profondita media;
-- temperatura acqua Apnea;
-- frequenza cardiaca media/massima;
-- velocita discesa/risalita calcolate;
-- tipi sessione diversi da `Acque Libere`.
-
-Il pass corrente aggiunge boundary UI esplicite per `Watch -> iPhone Apnea`: durata, profondita massima e recovery sono disponibili come record locale, mentre profilo campioni reale, duplicate prevention production e merge iOS restano roadmap. Il Watch mostra stato payload, delivery e coda sperimentale per evitare sync silenziosi.
-
-## Sensori e limiti
-
-- La profondita viene letta dal flusso esistente `DiveManager`.
-- Il warning risalita riusa lo stato esistente `ascentStatus`; non modifica i calcoli di risalita.
-- Frequenza cardiaca, batteria e temperatura non usano valori finti: la UI mostra `HR OFF`, `BAT --` e `TEMP --` finche non esiste una sorgente dati Apnea dedicata.
-- Se il sensore profondita non e disponibile, la UI mostra `--` invece di una profondita zero apparentemente valida.
-- Il GPS non viene usato per tracking subacqueo Apnea; eventuali dati GPS restano surface-only come nel resto del progetto.
+1. Ready — piano importato da iOS o sessione autonoma; allarmi profondità; gate sensore.
+2. Dive / Ascent — profondità, velocità verticale, timer apnea, overlay marker/target.
+3. Surface recovery — countdown recupero con policy 1:1 / 2:1 / fissa.
+4. Session summary — statistiche sessione, salvataggio logbook, sync verso iOS.
+5. Depth alarms screen — elenco soglie con stato semantico (mockup WATCH_06).
 
 ## Companion iOS
 
-Il ramo `codex/ios-experimental-features` include una card `Apnea Review` in `ExplorationCenterView`.
+Schermate allineate ai mockup `APNEA_IOS_01` … `15`: dashboard, profili, pianificazione (invio al Watch), dettaglio immersione e grafici, statistiche, attrezzatura, buddy/sicurezza, mappa sessione, logbook, allarmi/marcatori, record personali, export, impostazioni apnea.
 
-La card mostra:
+## Sync
 
-- header `Apnea • MOCK`;
-- tab interattivi `Riepilogo`, `Grafico`, `Dettagli`;
-- profilo/percorso mock in stile dark-cyan;
-- metriche placeholder per profondita massima, tempo e temperatura acqua.
+- **iOS → Watch:** pacchetto piano firmato con `revision`, `packageID`, ACK firmato.
+- **Watch → iOS:** sessione completata/abortita via `dirdiving_apnea_session` con merge idempotente nel logbook iOS.
+- Namespace **isolato** da sync immersioni Gauge/Full Computer.
 
-La sincronizzazione dei record Apnea Watch verso iOS usa un contratto lightweight e stato import sperimentale; non e ancora una pipeline production con profilo campioni, retry persistente, merge e duplicate prevention. Il companion non cambia runtime Watch, BLE, GPS o persistenza Watch.
+## Limitazioni note
 
-Il companion iOS experimental mostra sempre etichette `Mock`, `TODO`, `Non sincronizzato` o equivalenti per evitare di presentare dati locali come sync production.
+- Frequenza cardiaca / batteria mostrati solo con sorgente reale (`--` altrimenti).
+- GPS solo superficie per mappa sessione.
+- QA fisica (Water Lock, guanti, profondità reale): **PENDING** — vedi matrici QA in `Docs/`.
 
-## Sicurezza
+---
 
-Apnea experimental e un training aid UI. Non sostituisce procedure buddy, addestramento, strumenti certificati, supervisione in acqua o valutazione conservativa del rischio.
+## Appendice — storico branch `codex/experimental-features`
+
+Il contenuto seguente descrive il prototipo precedente basato su `ExplorationStore` (branch experimental legacy). Non riflette il runtime su `integration/full-computer`.
+
+### Workflow legacy (ExplorationStore)
+
+Il flusso sperimentale Apnea legacy era composto da menu Apnea, countdown, `ExplorationStore.surfaceFromApnea(...)`, recovery `max(durata * 2, 30)`, grafici placeholder e card iOS `Apnea Review` con dati mock.
+
+Persistenza legacy: record Apnea in `ExplorationStore`, senza modelli `ApneaSession` dedicati né sync production.
+
+Per dettagli storici UI/UX del branch experimental, vedere commit su `codex/experimental-features` e [`EXPERIMENTAL_FEATURES.md`](EXPERIMENTAL_FEATURES.md).

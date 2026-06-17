@@ -26,6 +26,7 @@ targets:
       - Utils/MonotonicElapsedClock.swift
       - Utils/GPSConfirmationPresentation.swift
       - Utils/DiveAlgorithmConfiguration.swift
+      - Utils/DiveAlgorithmSelfCheck.swift
       - Utils/DiveSessionAlgorithmValidator.swift
       - Utils/SensorSourceMode.swift
       - Utils/DepthSensorSourceResolution.swift
@@ -38,12 +39,37 @@ targets:
       - Models/DiveGPSConfirmation.swift
       - Services/AscentSafetyHapticCoordinator.swift
       - Services/GPSManager.swift
+      - Services/FullComputerRuntimeEngine.swift
+      - Utils/FullComputerRuntimeConfiguration.swift
+      - Utils/FullComputerRuntimeModels.swift
+      - Utils/FullComputerRuntimePlan.swift
+      - Utils/FullComputerDecoSolverModels.swift
+      - Utils/FullComputerDecoSolver.swift
+      - Utils/FullComputerDecoStopConfiguration.swift
+      - Utils/FullComputerDecoStopStateMachine.swift
+      - Utils/FullComputerGasSwitchModels.swift
+      - Utils/FullComputerGasSwitchPolicy.swift
+      - Utils/FullComputerGasProfileValidator.swift
+      - Utils/FullComputerRuntimeCheckpoint.swift
+      - Utils/FullComputerRuntimeLogbookAccumulator.swift
+      - Utils/FullComputerLivePanelFixtures.swift
+      - Utils/FullComputerMockupReferenceMatrix.swift
+      - Utils/FullComputerPrediveReadiness.swift
+      - Utils/FullComputerReleaseHardTolerances.swift
+      - Utils/FullComputerWatchArchitectureGuard.swift
+      - Utils/ApneaMockupReferenceMatrix.swift
+      - Utils/ApneaReleaseHardTolerances.swift
+      - Utils/ApneaReleaseSelfCheck.swift
+      - Services/FullComputerDecoHapticCoordinator.swift
+      - Services/FullComputerPrediveConfigurationStore.swift
       - Resources
+      - path: Shared
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios.watch
         DEVELOPMENT_TEAM: C6FKKPB6A9
         CODE_SIGN_STYLE: Automatic
+        ENABLE_TESTABILITY: YES
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_FILE: App/Info.plist
         INFOPLIST_KEY_CFBundleIdentifier: com.egopfe.dirdiving.ios.watch
@@ -65,7 +91,11 @@ targets:
     platform: iOS
     sources:
       - Models/PlannerBriefingCard.swift
-      - iOSApp
+      - Models/DIRModesAndStartup.swift
+      - Utils/MonotonicElapsedClock.swift
+      - Utils/ApneaWatchPresentation.swift
+      - path: Shared
+      - path: iOSApp
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios
@@ -106,6 +136,12 @@ targets:
       - Services/AppleDepthSensorProvider.swift
       - Services/MockDepthSensorProvider.swift
       - Services/DiveLogStore.swift
+      - Services/ApneaLogbookStore.swift
+      - Services/ApneaImportedPlanStore.swift
+      - Services/ApneaSyncWatchReceiver.swift
+      - Services/ApneaSyncAckSigner.swift
+      - Services/ApneaSessionSyncCodec.swift
+      - Services/ApneaSyncPendingTransfer.swift
       - Services/AscentRateSettingsStore.swift
       - Services/DiveReminderSettingsStore.swift
       - Models/DiveReminder.swift
@@ -151,6 +187,7 @@ targets:
       - Utils/DiveSessionAlgorithmValidator.swift
       - Utils/DiveSessionMerge.swift
       - Utils/MonotonicElapsedClock.swift
+      - Utils/ApneaWatchPresentation.swift
       - Utils/GPSConfirmationPresentation.swift
       - Utils/DiveSessionPersistenceClass.swift
       - Utils/DiveAlgorithmSelfCheck.swift
@@ -163,13 +200,50 @@ targets:
       - Models/PlannerBriefingCard.swift
       - Services/PlannerBriefingCardStore.swift
       - Services/PlannerBriefingWatchReceiver.swift
+      - Services/DivePlanPackageWatchReceiver.swift
+      - Services/FullComputerImportedPlanStore.swift
+      - Services/DivePlanPackageAckSigner.swift
       - Utils/PlannerBriefingFreshnessPolicy.swift
+      - Models/DIRModesAndStartup.swift
+      - Utils/DIRStartupSelectionPolicy.swift
+      - Utils/GaugeLivePresentationPolicy.swift
+      - Utils/FullComputerRuntimeConfiguration.swift
+      - Utils/FullComputerRuntimeModels.swift
+      - Utils/FullComputerRuntimePlan.swift
+      - Utils/FullComputerDecoSolverModels.swift
+      - Utils/FullComputerDecoSolver.swift
+      - Utils/FullComputerDecoStopConfiguration.swift
+      - Utils/FullComputerDecoStopStateMachine.swift
+      - Utils/FullComputerGasSwitchModels.swift
+      - Utils/FullComputerGasSwitchPolicy.swift
+      - Utils/FullComputerGasProfileValidator.swift
+      - Utils/FullComputerRuntimeCheckpoint.swift
+      - Utils/FullComputerRuntimeLogbookAccumulator.swift
+      - Utils/FullComputerLivePanelFixtures.swift
+      - Utils/FullComputerMockupReferenceMatrix.swift
+      - Utils/FullComputerPrediveReadiness.swift
+      - Utils/FullComputerReleaseHardTolerances.swift
+      - Utils/FullComputerWatchArchitectureGuard.swift
+      - Utils/ApneaMockupReferenceMatrix.swift
+      - Utils/ApneaReleaseHardTolerances.swift
+      - Utils/ApneaReleaseSelfCheck.swift
+      - Services/FullComputerDecoHapticCoordinator.swift
+      - Services/FullComputerPrediveConfigurationStore.swift
+      - Services/FullComputerRuntimeEngine.swift
+      - Utils/WatchModeSelectionPreferences.swift
+      - Services/DIRActivitySelectionStore.swift
+      - Services/AppNavigationStore.swift
+      - Models/AppPage.swift
+      - path: Shared
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.watch.algorithmtests
         GENERATE_INFOPLIST_FILE: YES
         DEVELOPMENT_TEAM: C6FKKPB6A9
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/DIRDivingWatchApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DIRDivingWatchApp"
+        BUNDLE_LOADER: "$(TEST_HOST)"
     dependencies:
+      - target: DIRDiving Watch App
       - sdk: XCTest.framework
       - sdk: WatchKit.framework
       - sdk: WatchConnectivity.framework
@@ -208,12 +282,8 @@ targets:
       - iOSApp/Services/PDF/EquipmentSetupPDFBuilder.swift
       - iOSApp/Models/GPSPoint.swift
       - iOSApp/Models/TankSize.swift
-      - iOSApp/Algorithms/Buhlmann/BuhlmannConstants.swift
-      - iOSApp/Algorithms/Buhlmann/BuhlmannGas.swift
-      - iOSApp/Algorithms/Buhlmann/BuhlmannTissueModel.swift
-      - iOSApp/Algorithms/Buhlmann/BuhlmannEngine.swift
-      - iOSApp/Algorithms/Buhlmann/BuhlmannTissueHistory.swift
-      - iOSApp/Algorithms/Buhlmann/BuhlmannPlanPreflightValidator.swift
+      - path: Shared
+      - iOSApp/Algorithms/Buhlmann/BuhlmannGas+GasMix.swift
       - iOSApp/Services/PlannerAscentTableBuilder.swift
       - iOSApp/Services/DecoStopsPresentationBuilder.swift
       - iOSApp/Services/GasLedgerDisplayFormatter.swift
@@ -225,7 +295,6 @@ targets:
       - iOSApp/Services/OxygenExposureModels.swift
       - iOSApp/Services/PlannerGasSchedule.swift
       - iOSApp/Services/PlannerMODValidator.swift
-      - iOSApp/Services/PlannerEnvironment.swift
       - iOSApp/Services/PlannerService.swift
       - iOSApp/Services/RatioDecoPlanner.swift
       - iOSApp/Services/RatioDecoValidator.swift
@@ -293,6 +362,7 @@ targets:
       - iOSApp/Services/PDF/CCRPlannerPDFBuilder.swift
       - iOSApp/Services/PlannerBriefingImageExportService.swift
       - iOSApp/Services/PlannerBriefingWatchTransferService.swift
+      - iOSApp/Services/DivePlanPackageBuilder.swift
       - iOSApp/Services/DecoStopsPresentationBuilder.swift
       - iOSApp/Services/PlannerAscentTableBuilder.swift
       - Tests/iOSAlgorithmTests/PDFExportServiceTests.swift
@@ -302,6 +372,38 @@ targets:
       - iOSApp/Utils/UIUXAccessibilitySummaries.swift
       - iOSApp/Services/TissueAnalyticsService.swift
       - Tests/iOSAlgorithmTests/TissueAnalyticsServiceTests.swift
+      - iOSApp/Utils/IOSCompanionPostLegalEntry.swift
+      - Utils/MonotonicElapsedClock.swift
+      - Models/DIRModesAndStartup.swift
+      - iOSApp/Models/CompanionActivityPreference.swift
+      - iOSApp/Services/CompanionActivityPreferenceStore.swift
+      - iOSApp/Utils/CompanionActivityCopy.swift
+      - iOSApp/Services/IOSApneaProfileStore.swift
+      - iOSApp/Services/IOSApneaPlannerStore.swift
+      - iOSApp/Services/IOSApneaLogbookStore.swift
+      - iOSApp/Services/IOSApneaSettingsStore.swift
+      - iOSApp/Services/IOSApneaWatchTransferService.swift
+      - iOSApp/Services/ApneaSyncAckSigner.swift
+      - iOSApp/Services/ApneaSessionSyncCodec.swift
+      - iOSApp/Services/IOSApneaEquipmentStore.swift
+      - iOSApp/Services/IOSApneaBuddySafetyStore.swift
+      - iOSApp/Services/IOSApneaSessionExportService.swift
+      - iOSApp/Utils/IOSApneaDashboardPresentation.swift
+      - iOSApp/Utils/IOSApneaLogbookPresentation.swift
+      - iOSApp/Utils/IOSApneaLocationPermission.swift
+      - Tests/WatchAlgorithmTests/ApneaDomainModelTests.swift
+      - Tests/WatchAlgorithmTests/ApneaLifecycleEngineTests.swift
+      - Tests/WatchAlgorithmTests/ApneaOperationalEventEngineTests.swift
+      - Tests/WatchAlgorithmTests/ApneaTimeRecoveryCheckpointEngineTests.swift
+      - Tests/iOSAlgorithmTests/IOSApneaCompanionTests.swift
+      - Tests/iOSAlgorithmTests/IOSApneaLogbookAnalyticsTests.swift
+      - Tests/iOSAlgorithmTests/IOSApneaMapEquipmentExportTests.swift
+      - Tests/iOSAlgorithmTests/ApneaSyncCodecTests.swift
+      - Tests/iOSAlgorithmTests/ApneaReleaseHardValidationTests.swift
+      - Utils/ApneaMockupReferenceMatrix.swift
+      - Utils/ApneaReleaseHardTolerances.swift
+      - Utils/ApneaReleaseSelfCheck.swift
+      - Tests/iOSAlgorithmTests/IOSCompanionActivitySelectionTests.swift
       - Tests/iOSAlgorithmTests/BuhlmannComprehensiveReadinessV3RemediationTests.swift
     resources:
       - path: Tests/iOSAlgorithmTests/Fixtures

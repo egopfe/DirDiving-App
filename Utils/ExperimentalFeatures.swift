@@ -5,4 +5,8 @@ enum ExperimentalFeatures {
     /// Disabled until the watchOS peer relay is replaced by a reliable production architecture.
     static let buddyAssistEnabled = false
     static let buddyAssistDisabledReason = "LAB-ONLY: relay BLE Watch non disponibile. Pairing e invio messaggi sono disabilitati."
+
+    /// Apnea integration (Watch engine + iOS companion + WC sync) merged on `main`.
+    /// Watch UI (`ApneaView`) remains excluded from MAIN target until promotion review.
+    static let apneaIntegrationEnabled = true
 }

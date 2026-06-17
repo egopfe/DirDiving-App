@@ -1,22 +1,35 @@
 # DIR DIVING Experimental Features
 
-This document describes the work currently living on the `codex/experimental-features` branch. These features are intentionally isolated from `main` because they are exploratory, may require hardware validation, and should not be treated as production-ready dive safety systems.
+This document describes exploratory features. Production MAIN excludes these sources via `project.yml`.
 
 ## Current Branch Sync Status
 
 Latest verification before this documentation update:
 
-- `origin/main` @ `ecad0d9`
-- `origin/codex/experimental-features` @ `227bcaa`
-- `origin/codex/ios-experimental-features` @ `441fb77`
+- `origin/main` @ `9ff45ac`
+- `origin/codex/ios-experimental-features` (this branch)
 
-`codex/experimental-features` is the canonical combined experimental branch. `codex/ios-experimental-features` is aligned for app/project code paths and keeps branch-specific iOS documentation. Apnea and Snorkeling remain experimental-only. Buddy Assist, BLE relay, peer pairing, and messaging remain lab-only and must not be promoted with an Apnea/Snorkeling-only merge.
+`codex/ios-experimental-features` is aligned for app/project code paths and keeps branch-specific iOS documentation. Apnea and Snorkeling remain experimental-only on this branch. Buddy Assist, BLE relay, peer pairing, and messaging remain lab-only.
 
 Detailed sync report: [`Docs/EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md`](EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md).
 
 ## Branch Scope
 
-The experimental branch currently contains:
+## Apnea integration (`main`)
+
+As of Command 12 (2026-06-17), Apnea has a dedicated integration branch with:
+
+- Shared domain models and `ApneaSessionEngine` lifecycle on Watch.
+- iOS companion (`iOSApp/Views/Apnea/`) for planner, logbook, statistics, export.
+- Isolated WatchConnectivity namespaces (`apneaSyncPlanPackage`, `dirdiving_apnea_session`).
+- Release-hard validation: `./Scripts/validate_apnea_release_readiness.sh`.
+- Feature flag: `ExperimentalFeatures.apneaIntegrationEnabled`.
+
+`Views/ApneaView.swift` remains excluded from the MAIN Watch app target until promotion review. See [`APNEA_ARCHITECTURE.md`](APNEA_ARCHITECTURE.md).
+
+## Legacy branch `codex/experimental-features`
+
+The experimental branch historically contained:
 
 - Pre-water mode selector for Diving, Apnea, and Snorkeling.
 - Premium Snorkeling runtime with waypoint navigation, return-to-entry, categorized GPS markers, and compass bearing delta.

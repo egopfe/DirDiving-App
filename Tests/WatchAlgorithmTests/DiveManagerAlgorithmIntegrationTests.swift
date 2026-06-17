@@ -61,6 +61,24 @@ final class DiveManagerAlgorithmIntegrationTests: XCTestCase {
         XCTAssertNil(diveManager.testHook_lastErrorMessage)
     }
 
+    func testFullComputerRuntimeStartsOnManualDive() {
+        diveManager.recordSessionModeSelection(activity: .diving, divingMode: .fullComputer)
+        diveManager.startManualDive()
+        XCTAssertNotNil(diveManager.fullComputerSnapshot)
+        XCTAssertEqual(diveManager.fullComputerSnapshot?.engineState, .valid)
+
+        let start = Date()
+        diveManager.testHook_processDepthMeasurement(rawDepthMeters: 18, timestamp: start)
+        diveManager.testHook_processDepthMeasurement(rawDepthMeters: 20, timestamp: start.addingTimeInterval(5))
+        XCTAssertNotNil(diveManager.fullComputerSnapshot?.ndlMinutes)
+    }
+
+    func testGaugeModeDoesNotStartFullComputerRuntime() {
+        diveManager.recordSessionModeSelection(activity: .diving, divingMode: .gauge)
+        diveManager.startManualDive()
+        XCTAssertNil(diveManager.fullComputerSnapshot)
+    }
+
     func testManualStartThenSamplesAccumulate() {
         diveManager.startManualDive()
         XCTAssertTrue(diveManager.isDiveActive)

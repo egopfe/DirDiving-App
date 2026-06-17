@@ -53,7 +53,7 @@ enum CCRPlannerPDFBuilder {
             page.drawSectionTitle(DIRIOSLocalizer.string("ccr.bailout"))
             for (index, bailout) in input.bailoutGases.enumerated() {
                 page.drawParagraph("\(DIRIOSLocalizer.string("ccr.bailout")) \(index + 1): \(bailout.label)")
-                page.drawLine(DIRIOSLocalizer.string("equipment.tank_size"), value: bailout.tankSize.rawValue)
+                page.drawLine(DIRIOSLocalizer.string("planner.cylinder.tank_size"), value: bailout.tankSize.rawValue)
                 page.drawLine(
                     DIRIOSLocalizer.string("planner.field.switch_depth"),
                     value: Formatters.depth(bailout.switchDepthMeters, units: context.unitPreference).text

@@ -130,13 +130,13 @@ struct CCRPlannerView: View {
     private var plannerSafetySection: some View {
         Group {
             if !plannerSafetyAcknowledged {
-                DIRWarningBox(text: DIRIOSLocalizer.string("planner.safety.ack.required"))
+                DIRWarningBox(text: DIRIOSLocalizer.string("planner.safety_ack.label"))
             }
         }
     }
 
     private var profileCard: some View {
-        DIRCard(DIRIOSLocalizer.string("planner.profile.header"), icon: "arrow.down.to.line", accent: DIRTheme.cyan) {
+        DIRCard(DIRIOSLocalizer.string("planner.profile.title"), icon: "arrow.down.to.line", accent: DIRTheme.cyan) {
             VStack(spacing: 10) {
                 depthRow(title: DIRIOSLocalizer.string("planner.field.max_depth"), value: $store.ccrInput.maxDepthMeters, range: 5...120)
                 depthRow(title: DIRIOSLocalizer.string("planner.field.avg_depth"), value: $store.ccrInput.averageDepthMeters, range: 5...120)
@@ -216,7 +216,7 @@ struct CCRPlannerView: View {
     }
 
     private var gfCard: some View {
-        DIRCard(DIRIOSLocalizer.string("planner.gf.header"), icon: "slider.horizontal.3", accent: DIRTheme.yellow) {
+        DIRCard(DIRIOSLocalizer.string("planner.gf.title"), icon: "slider.horizontal.3", accent: DIRTheme.yellow) {
             HStack {
                 gfField(title: DIRIOSLocalizer.string("ccr.gf.low.label"), value: $store.ccrInput.gfLow)
                 gfField(title: DIRIOSLocalizer.string("ccr.gf.high.label"), value: $store.ccrInput.gfHigh)
@@ -321,7 +321,7 @@ struct CCRDiluentEditorView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            Picker(DIRIOSLocalizer.string("gas.mix.header"), selection: diluentMixKindBinding) {
+            Picker(DIRIOSLocalizer.string("planner.gas.mix_label"), selection: diluentMixKindBinding) {
                 ForEach([GasMixKind.air, .ean, .trimix], id: \.self) { kind in
                     Text(kind.localizedTitle).tag(kind)
                 }
@@ -358,7 +358,7 @@ struct CCRBailoutListEditorView: View {
         VStack(spacing: 8) {
             ForEach($bailoutGases) { $gas in
                 VStack(alignment: .leading, spacing: 6) {
-                    Picker(DIRIOSLocalizer.string("gas.mix.header"), selection: $gas.mixKind) {
+                    Picker(DIRIOSLocalizer.string("planner.gas.mix_label"), selection: $gas.mixKind) {
                         ForEach(GasMixKind.allCases, id: \.self) { kind in
                             Text(kind.plannerPickerTitle).tag(kind)
                         }
@@ -380,7 +380,7 @@ struct CCRBailoutListEditorView: View {
                             step: 1
                         )
                     }
-                    Picker(DIRIOSLocalizer.string("equipment.tank_size"), selection: $gas.tankSize) {
+                    Picker(DIRIOSLocalizer.string("planner.cylinder.tank_size"), selection: $gas.tankSize) {
                         ForEach(TankSize.allCases) { size in
                             Text(size.rawValue).tag(size)
                         }
