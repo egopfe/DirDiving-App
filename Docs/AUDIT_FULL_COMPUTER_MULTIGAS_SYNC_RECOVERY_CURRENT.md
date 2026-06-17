@@ -228,3 +228,20 @@ Related: `FullComputerRuntimeEngineTests` (gas switch, multilevel), `FullCompute
 ---
 
 *Audit 03 — read-only. No application code modified.*
+
+---
+
+## Remediation addendum (V1.0 — 2026-06-17)
+
+Post-audit hardening on `main` closes Audit 03 P2/P3 findings without schema changes.
+
+| Finding | Resolution |
+|---------|------------|
+| **P2** Bailout excluded from TTS / iOS import | **Policy A** — intentional; documented + `FullComputerTravelBailoutPolicyTests` |
+| **P2** Travel not in iOS package import | **Policy A** — bottom+deco only in `DivePlanPackage` v1; Watch-native travel preserved on activation |
+| **P3** No `FullComputerImportedPlanStore` tests | `FullComputerImportedPlanStoreTests` (21 cases) |
+| **P3** No crash-mid-switch integration test | `FullComputerGasSwitchRecoveryIntegrationTests` (7 cases) |
+
+**Code hardening:** `FullComputerImportedPlanStore` rejects equal revision + different checksum; activation preserves Watch-native travel/bailout; `confirmGasSwitch` rejects unavailable gas IDs.
+
+**Report:** `Docs/FULL_COMPUTER_MULTIGAS_SYNC_RECOVERY_REMEDIATION_REPORT_V1.0.md`

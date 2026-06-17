@@ -159,6 +159,7 @@ struct FullComputerRuntimeEngine: Equatable {
     }
 
     mutating func confirmGasSwitch(to gasMixId: UUID, at timestamp: Date = Date()) -> Bool {
+        guard !gasSwitchTracker.unavailableGasMixIds.contains(gasMixId) else { return false }
         guard let gas = plannedSwitchGases().first(where: { $0.gasMixId == gasMixId }) else { return false }
         guard FullComputerGasSwitchPolicy.isBreathable(
             gas,
