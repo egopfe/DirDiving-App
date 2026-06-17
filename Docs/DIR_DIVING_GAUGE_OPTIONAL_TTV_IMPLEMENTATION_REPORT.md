@@ -1,6 +1,6 @@
 # DIR DIVING — Gauge Optional TTV Implementation Report (Command 02)
 
-**Branch:** `integration/full-computer`  
+**Branch:** `main`  
 **Date:** 2026-06-16  
 **Scope:** Watch MAIN Gauge — optional TTV panel, adaptive top metrics, Settings copy, WC sync. **No TTV formula or lifecycle changes.**
 
@@ -38,4 +38,4 @@ Gauge mode now shows an optional TTV index (default **OFF**). When OFF, the TTV 
 
 ## Tests
 
-`GaugeOptionalTTVTests` — 9 cases covering defaults, persistence, presentation policy, sync apply, TTV formula regression, no TTS in Gauge metric label.
+`GaugeOptionalTTVTests` — **8** cases covering defaults, persistence, presentation policy, sync apply, TTV formula regression, no TTS in Gauge metric label.

@@ -78,10 +78,7 @@ enum DIRStartupSelectionPolicy {
         activity: DIRActivityMode,
         divingMode: DIRDivingMode
     ) -> DIRStartupLaunchStep {
-        guard activity.isLaunchableInMAIN else {
-            return .comingSoon(activity: activity)
-        }
-        guard activity == .diving else {
+        guard activity.isLaunchableOnWatchMAIN else {
             return .comingSoon(activity: activity)
         }
         if divingMode == .fullComputer {
@@ -91,13 +88,10 @@ enum DIRStartupSelectionPolicy {
     }
 
     static func nextStepAfterActivitySelection(_ activity: DIRActivityMode) -> DIRStartupLaunchStep {
-        guard activity.isLaunchableInMAIN else {
+        guard activity.isLaunchableOnWatchMAIN else {
             return .comingSoon(activity: activity)
         }
-        if activity == .diving {
-            return .divingModeSelection(activity: .diving)
-        }
-        return .comingSoon(activity: activity)
+        return .divingModeSelection(activity: .diving)
     }
 
     static func nextStepAfterDivingModeSelection(

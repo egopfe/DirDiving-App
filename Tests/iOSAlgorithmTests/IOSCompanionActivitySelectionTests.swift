@@ -54,6 +54,8 @@ final class IOSCompanionActivitySelectionTests: XCTestCase {
 
     func testApneaCanBeSelectedWhileSnorkelingRemainsUnavailable() {
         let store = CompanionActivityPreferenceStore(defaults: defaults)
+        XCTAssertTrue(DIRActivityMode.apnea.isLaunchableOnIOSCompanionMAIN)
+        XCTAssertFalse(DIRActivityMode.snorkeling.isLaunchableOnIOSCompanionMAIN)
         XCTAssertTrue(CompanionActivityAvailability.isAvailable(.apnea))
         XCTAssertFalse(CompanionActivityAvailability.isAvailable(.snorkeling))
         XCTAssertTrue(store.select(.apnea))

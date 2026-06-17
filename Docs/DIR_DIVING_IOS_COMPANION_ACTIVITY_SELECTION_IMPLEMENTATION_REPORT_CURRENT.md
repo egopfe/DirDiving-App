@@ -14,7 +14,7 @@
 | Legal gate | `LegalAcceptanceStore` in `iOSApp/App/LegalAcceptanceStore.swift` |
 | Root shell | `DIRDivingiOSApp` gates: legal → activity selection → `ContentView` |
 | Shared activity enum | `DIRActivityMode` in `Models/DIRModesAndStartup.swift` (Watch + iOS) |
-| Feature availability | `DIRActivityMode.isLaunchableInMAIN` — only Diving is launchable in MAIN |
+| Feature availability | `DIRActivityMode.isLaunchableOnIOSCompanionMAIN` — Diving and Apnea on iOS Companion; Snorkeling not launchable |
 | Post-legal planner landing | `IOSCompanionPostLegalEntry` + `ContentView.applyPostLegalPlannerLandingIfNeeded()` |
 | Design system | `DIRScreenContainer`, `DIRCard`, `DIRTheme`, `dirCompanionScrollSurface()` |
 
@@ -90,7 +90,7 @@ Settings → **Activity** → change activity reopens the selection screen witho
 
 ## Feature flags / availability
 
-`CompanionActivityAvailability.isAvailable` uses `DIRActivityMode.isLaunchableInMAIN`:
+`CompanionActivityAvailability.isAvailable` uses `DIRActivityMode.isLaunchableOnIOSCompanionMAIN`:
 
 | Mode | MAIN launchable | iOS Companion behaviour |
 |------|-----------------|-------------------------|

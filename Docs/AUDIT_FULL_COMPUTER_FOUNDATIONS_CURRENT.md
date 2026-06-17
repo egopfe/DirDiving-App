@@ -10,10 +10,29 @@
 
 | Baseline | SHA | Verdict |
 |----------|-----|---------|
-| `main` | `5e38e05` | **FAIL** — Commands 01–03 are **not merged** |
-| `integration/full-computer` | `a3eb574` | **CONDITIONAL PASS** — foundations implemented; fix test guard + enum semantics before merge / Command 04 promotion |
+| `main` (pre-remediation) | `8dbb896` | **CONDITIONAL PASS** — Commands 01–03 merged; P1–P3 open |
+| `main` (post-remediation V1.1) | see `Docs/FULL_COMPUTER_FOUNDATIONS_REMEDIATION_REPORT_V1.1.md` | **PASS** — ready for Command 04 |
 
-Commands **01–03** (modes/startup, Gauge optional TTV, shared Bühlmann core) exist only on `integration/full-computer` (+282 files vs `main`). Auditing the **implementation** below references that branch; auditing **`main` alone** cannot pass.
+Commands **01–03** (modes/startup, Gauge optional TTV, shared Bühlmann core) are **merged on `main`** as of `8dbb896`. Remediation V1.1 (2026-06-17) closed findings P1–P3 directly on `main`.
+
+---
+
+## Remediation addendum (2026-06-17, V1.1 on `main`)
+
+| Finding | Status |
+|---------|--------|
+| P1 stale `buhlmann` token guard | **CLOSED** — `FullComputerWatchArchitectureGuard` + focused tests |
+| P2 `isLaunchableInMAIN` ambiguity | **CLOSED** — `isLaunchableOnWatchMAIN` / `isLaunchableOnIOSCompanionMAIN` |
+| P2 dual Mode tab | **CLOSED** — `hasMultipleStableModes = false` |
+| P3 documentation drift | **CLOSED** — reports + remediation doc updated |
+
+Full evidence: `Docs/FULL_COMPUTER_FOUNDATIONS_REMEDIATION_REPORT_V1.1.md`.
+
+---
+
+## Historical context (pre-merge audit)
+
+The sections below record the **read-only audit** against `integration/full-computer` before merge. `main` @ `5e38e05` originally **failed** because Commands 01–03 were not present.
 
 ---
 
@@ -248,18 +267,20 @@ Watch routing sends `.apnea` to `.comingSoon` regardless (`DIRStartupSelectionPo
 
 | Scope | Decision |
 |-------|----------|
-| **`main` @ `5e38e05`** | **FAIL** — Commands 01–03 not present; iOS-local Bühlmann, no startup flow, no optional TTV policy |
-| **`integration/full-computer` @ `a3eb574`** | **CONDITIONAL PASS** — foundations meet spec; resolve P1 test guard + P2 enum semantics before promoting to `main` or treating as “done on main” |
+| **`main` @ `8dbb896` (post-merge, pre-remediation)** | **CONDITIONAL PASS** — foundations present; P1–P3 open |
+| **`main` (post-remediation V1.1, 2026-06-17)** | **PASS** — ready for Command 04 |
 
 ---
 
 ## Required fixes before Command 04
 
-1. **P1** — Update `WatchCompleteAlgorithmAuditRemediationTests` forbidden-token policy for post–Command 03 layout (allow shared core + FC runtime paths).
-2. **P2** — Align `DIRActivityMode.isLaunchableInMAIN` with Watch `comingSoon` routing (or document split Watch/iOS APIs).
-3. **P2 (optional)** — Decide whether `hasMultipleStableModes` should remain `true` alongside cold-launch cover; document UX intent.
-4. **Process** — Merge `integration/full-computer` → `main` (or re-audit after merge) so “audit on main” matches code reality.
-5. **P3** — Sync Command 01/02 implementation report test counts and apnea launchability wording.
+**All items addressed in remediation V1.1 on `main` (2026-06-17).** See `Docs/FULL_COMPUTER_FOUNDATIONS_REMEDIATION_REPORT_V1.1.md`.
+
+1. ~~**P1** — Update Watch architecture guard~~ **DONE**
+2. ~~**P2** — Split Watch vs iOS launchability APIs~~ **DONE**
+3. ~~**P2** — `hasMultipleStableModes` policy~~ **DONE** (`false`)
+4. ~~**Process** — Merge to `main`~~ **DONE** @ `8dbb896`
+5. ~~**P3** — Documentation sync~~ **DONE**
 
 ---
 

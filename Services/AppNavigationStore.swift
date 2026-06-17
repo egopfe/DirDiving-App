@@ -20,7 +20,7 @@ final class AppNavigationStore: ObservableObject {
 
     /// Keeps `TabView` selection valid when optional pages are removed from the hierarchy.
     func clampSelectedPage() {
-        // Mode selection tab remains available when `hasMultipleStableModes` is true.
+        // Mode selection tab is omitted when `hasMultipleStableModes` is false (startup flow + Settings handle mode changes).
     }
 
     func presentExportCompletion(fileName: String, exportURL: URL?) {
