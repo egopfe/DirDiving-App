@@ -1,12 +1,20 @@
-# 0-DIR_DIVING_IOS_COMPLETE_MATH_FUNCTIONS_AUDIT_CCR_UPDATED
+# 0-DIR_DIVING_IOS_COMPLETE_MATH_FUNCTIONS_AUDIT_CCR_UPDATED_V2.0
 
-## CURSOR / CODEX COMMAND — DIR DIVING COMPLETE MATHEMATICAL FUNCTIONS / ALGORITHM AUDIT UPDATED WITH CCR / REBREATHER & CO.
+## CURSOR / CODEX COMMAND — DIR DIVING COMPLETE MATHEMATICAL FUNCTIONS / ALGORITHM AUDIT UPDATED WITH CCR / REBREATHER & LATEST MAIN IMPLEMENTATIONS
+
+**Command version:** 2.0  
+**Updated for MAIN:** 2026-06-13  
+**Repository:** `egopfe/DirDiving-App`  
+**Required branch:** `main`  
+**Task type:** audit-only
 
 You are working on the DIR Diving repository.
 
 ## POSITION IN AUDIT SEQUENCE
 
 This is the **0- audit**, the first audit to run after every meaningful change.
+
+The filename must always retain the `0-` prefix. Future revisions of this command must increment only the version suffix, for example `_V2.1`, `_V3.0`, while preserving its position as the first audit in the sequence.
 
 It must run before the specialized numbered audits:
 
@@ -37,7 +45,25 @@ The audit must verify:
 - sync/persistence data integrity for mathematical values
 - release-hard mathematical readiness
 
-The audit must explicitly include the new **CCR / Rebreather & Co.** developments.
+The audit must explicitly include the current **CCR / Rebreather** developments and the latest MAIN implementations, including:
+
+- structured Equipment setup and operational pre-dive checklist
+- CCR checklist import/export coordination
+- configurable Planner ascent-speed settings
+- Planner Emergency / Rock Bottom parameters
+- complete operational Dive Runtime presentation
+- dedicated decompression-stop presentation
+- gas ledger presentation in liters and cylinder-equivalent bar
+- Technical-mode average-depth gas-consumption option
+- repetitive-dive planning
+- route-summary and runtime aggregation
+- schedule-aware gas consumption
+- plan-calculation completeness and result-state gating
+- planner briefing PNG/card export to Apple Watch
+- CCR bailout scenario and gas-density estimation
+- Watch reception, persistence and display of planner briefing cards
+
+These additions must be audited as real mathematical/data-bearing functionality where applicable, and as presentation-only functionality where they intentionally do not alter the underlying model.
 
 ---
 
@@ -103,6 +129,11 @@ It must include a readiness matrix and final verdict for:
 - CCR / Rebreather
 - Ratio Deco
 - Gas Planning
+- Emergency / Rock Bottom Gas
+- Gas Ledger / Reserve Display
+- Schedule-Aware Gas Consumption
+- Ascent / Descent Transit Timing
+- Repetitive Dive Planning
 - MOD / PPO2 / Dalton
 - Switch Depth
 - Tissue Loading
@@ -112,6 +143,7 @@ It must include a readiness matrix and final verdict for:
 - Checklist Sync where it affects gas/math
 - Manual Dive math fields
 - PDF / Share mathematical output
+- Planner Briefing Card / Watch Transfer Values
 - CSV / Subsurface import/export values
 - Unit Conversion
 - Watch companion math/runtime features
@@ -206,6 +238,9 @@ Inventory:
 - CCR Diluent / CCR Bailout if implemented
 - Deco Stage / Back Gas / Travel / Bailout cylinder role
 - Planner ↔ Checklist guided sync
+- structured Equipment setup ↔ Planner mapping
+- structured Equipment setup ↔ operational checklist mapping
+- CCR checklist import and export round trip
 - task items linked to equipment/gas
 - DIR / READY badge logic where gas readiness affects planning
 
@@ -268,6 +303,210 @@ Inventory:
 
 ---
 
+
+# PHASE 1B — LATEST MAIN IMPLEMENTATION INVENTORY
+
+Explicitly locate, inspect and classify the following current MAIN components and any adjacent tests/documentation:
+
+## Planner timing and runtime
+
+- `PlannerAscentSpeedSettings`
+- global ascent-speed settings persistence
+- descent-speed assumptions
+- ascent transit estimates
+- `PlannerAscentTableBuilder`
+- `DecoStopsPresentationBuilder`
+- full Dive Runtime ordering
+- interleaving of descent, bottom, travel, gas-switch, decompression-stop and final-ascent rows
+- consistency among segment time, runtime, TTS/TTR and total plan duration
+- presentation-only transformations versus engine-backed values
+
+Verify that presentation builders do not silently recalculate or mutate the Bühlmann/CCR schedule.
+
+## Emergency / Rock Bottom
+
+Inspect all models, services, views and tests associated with:
+
+- Emergency section
+- Rock Bottom
+- minimum gas
+- reserve gas
+- team size / stressed diver assumptions
+- stressed SAC/RMV
+- response or problem-solving time
+- ascent and stop gas requirements
+- cylinder volume and starting pressure
+- liters-to-bar conversion
+- available-gas comparison
+- insufficiency warnings
+
+Verify that:
+
+- Rock Bottom is calculated independently from normal planned consumption.
+- Emergency gas is based on conservative maximum depth unless explicitly and safely documented otherwise.
+- Technical average-depth gas-consumption mode does not weaken Rock Bottom.
+- CCR bailout calculations do not silently reuse OC Rock Bottom assumptions unless explicitly intended.
+- no emergency result is derived from display-rounded values.
+- all units and pressure-equivalent values are coherent.
+
+## Gas ledger and reserve presentation
+
+Inspect:
+
+- `GasLedgerDisplayFormatter`
+- gas ledger cards
+- available gas presentation
+- reserve presentation
+- liters as primary display
+- cylinder-specific bar equivalent
+- rounding and formatting
+- duplicate gas/cylinder aggregation
+
+Verify that display values remain traceable to canonical liters and that bar values are presentation equivalents only.
+
+## Schedule-aware gas consumption
+
+Inspect:
+
+- `GasPlanningService`
+- `PlannerGasSchedule`
+- `ScheduleGasConsumptionService`
+- all segment/gas-role allocation
+- normal consumption versus reserve/emergency consumption
+- CCR versus OC segment handling
+- travel, back gas, decompression, bailout and diluent roles
+
+Verify that:
+
+- consumption is integrated over the correct depth/time segments.
+- gas switches apply at the intended runtime/depth.
+- bailout is excluded from the normal schedule unless a bailout scenario is explicitly calculated.
+- CCR setpoint segments do not consume diluent as if they were OC breathing segments.
+- ascent-speed configuration consistently affects transit time and gas use.
+
+## Technical average-depth gas-consumption option
+
+Audit the Technical-mode option that allows average depth for gas-consumption calculations.
+
+Verify that:
+
+- default remains conservative max-depth planning.
+- the toggle affects gas-consumption estimation only.
+- Bühlmann, decompression, MOD, PPO2, switch-depth, Rock Bottom and emergency gas remain based on their intended conservative depth.
+- average depth is validated and cannot exceed max depth.
+- hidden/stale toggle state cannot affect Base, Deco or CCR.
+- UI, PDF, briefing card and persisted plan clearly disclose when average-depth gas consumption was selected.
+
+## Repetitive-dive planning
+
+Inspect:
+
+- `RepetitiveDivePlannerService`
+- surface interval handling
+- residual tissue state
+- initial tissue-state import
+- prior-dive chronology
+- units and timestamps
+- planner-mode compatibility
+- CCR/OC compatibility
+- persistence and export of repetitive-dive metadata
+
+Verify that:
+
+- residual loading is model-backed.
+- surface off-gassing is calculated correctly.
+- stale or future prior dives are rejected.
+- repetitive planning cannot silently fall back to fresh tissues.
+- the UI/output explicitly distinguishes fresh-tissue and repetitive-dive calculations.
+
+## Route summary and completeness gates
+
+Inspect:
+
+- `RouteSummaryService`
+- `RouteSummaryAggregation`
+- `PlanCalculationCompleteness`
+- `PlannerResultState`
+- any calculation/loading/error/partial state
+
+Verify that:
+
+- summary totals equal canonical plan segments.
+- partial plans cannot be exported as complete.
+- stale previous results are not displayed after invalid input.
+- missing CNS/OTU, tissue, gas or stop data is not silently represented as zero.
+- failure states remain explicit.
+
+## Structured Equipment and operational checklist
+
+Inspect:
+
+- `EquipmentStructuredModels`
+- `EquipmentStructuredSupport`
+- `EquipmentPlannerMapper`
+- `EquipmentChecklistGenerator`
+- structured setup/profile
+- planner links
+- checklist links
+- operational pre-dive tasks
+- gas-role mapping
+- CCR-specific equipment/tasks
+- Equipment Setup PDF
+
+Verify mathematical/data-bearing mappings, especially cylinder size, working pressure, gas mix, gas role and planner import/export.
+
+## CCR checklist import/export
+
+Inspect:
+
+- `CCRChecklistImportCoordinator`
+- `CCRChecklistExportCoordinator`
+- role mapping for diluent and bailout
+- duplicate prevention
+- validation on import
+- stale-value replacement rules
+- round-trip integrity
+
+Verify that CCR checklist import is now real if compiled into MAIN and that imported values cannot cross-contaminate OC gas roles.
+
+## CCR bailout and gas density
+
+Inspect:
+
+- `CCRBailoutScenarioCalculator`
+- `CCRGasDensityEstimator`
+- bailout scenario inputs and outputs
+- gas density thresholds
+- depth/pressure/temperature assumptions
+- setpoint versus diluent semantics
+- bailout schedule transition
+
+Verify that density results are mathematically traceable and clearly identified as estimates where environmental inputs are assumed.
+
+## Planner briefing cards to Apple Watch
+
+Inspect:
+
+- `PlannerBriefingCard`
+- iOS briefing-card generation
+- PNG/card rendering
+- Watch transfer payload
+- `PlannerBriefingCardStore`
+- `PlannerBriefingWatchReceiver`
+- persistence, replacement and deletion
+- units, localization and numerical formatting
+- stale-plan/version handling
+
+Verify that:
+
+- cards reproduce canonical plan values.
+- rendered PNG text and structured metadata agree.
+- no display-only rounding changes safety-critical values.
+- the Watch presents briefing data as reference-only, not live sensor or certified decompression guidance.
+- outdated cards are detectable and do not overwrite newer plans.
+- transfer failure does not imply successful synchronization.
+
+
 # PHASE 2 — CORE ALGORITHM AUDIT
 
 Audit:
@@ -300,6 +539,15 @@ Audit:
 - CCR setpoint calculation path if implemented
 - CCR diluent inert-gas path if implemented
 - CCR bailout path if implemented
+- planner ascent/descent speed assumptions
+- Rock Bottom / emergency gas calculations
+- gas-ledger liters/bar conversion
+- schedule-aware gas consumption
+- repetitive-dive residual tissue handling
+- route-summary totals
+- plan-completeness gating
+- CCR bailout scenario calculator
+- CCR gas-density estimator
 
 Verify:
 
@@ -385,6 +633,25 @@ Verify:
 - PPN2 and END are coherent across CCR segments.
 - bailout narcosis switches to bailout gas assumptions after bailout transition.
 
+## CCR bailout scenario and gas-density math
+
+- bailout scenario uses explicit transition depth/time and OC bailout gas.
+- normal CCR schedule and emergency bailout schedule remain separate.
+- bailout liters/bar requirements are not mixed with normal diluent usage.
+- gas-density calculations use explicit, documented assumptions.
+- gas density is calculated from current gas composition and ambient pressure.
+- warnings and thresholds are traceable to configured constants.
+- temperature assumptions and ideal/real-gas limitations are documented.
+- display rounding does not alter threshold classification.
+
+## CCR checklist round-trip
+
+- checklist import maps diluent only to CCR diluent.
+- checklist import maps bailout only to CCR bailout.
+- imported cylinder size/pressure/mix survive validation and persistence.
+- export then import preserves roles and numerical values.
+- invalid or duplicate entries are rejected or reconciled deterministically.
+
 ## CCR output truthfulness
 
 - CCR results do not imply live loop PPO2 monitoring.
@@ -449,6 +716,18 @@ Verify:
 - CCR and OC calculations are separated
 - switching CCR ↔ OC does not silently corrupt gas plan
 - hidden CCR values do not affect OC plans
+
+## Cross-mode transit, emergency and result-state rules
+
+Verify:
+
+- global ascent-speed settings are used consistently by all supported OC/CCR calculations.
+- mode-specific restrictions cannot be bypassed by stored ascent-speed settings.
+- full Dive Runtime rows preserve canonical segment ordering.
+- dedicated deco-stop table matches the actual engine schedule.
+- Rock Bottom/emergency calculations appear only where supported and use conservative inputs.
+- partial or failed calculations cannot leave stale successful output on screen.
+- briefing cards and PDFs cannot be generated from incomplete plan state.
 
 Output:
 
@@ -526,8 +805,109 @@ Output:
 
 - Gas logic readiness %
 - CCR gas logic readiness %
+- Rock Bottom readiness %
+- Schedule-aware gas consumption readiness %
+- Gas ledger / reserve display readiness %
+- Technical average-depth gas-consumption readiness %
 
 ---
+
+
+# PHASE 4B — EMERGENCY GAS / ROCK BOTTOM AUDIT
+
+Audit every Rock Bottom and emergency-gas formula and input source.
+
+At minimum verify:
+
+- ambient pressure calculation
+- max-depth reference
+- stressed diver count/team-size multiplier
+- stressed RMV/SAC combination
+- problem-solving time
+- ascent transit time
+- decompression/stop inclusion policy
+- gas-switch policy
+- reserve policy
+- liters required
+- cylinder bar equivalent
+- available versus required comparison
+- rounding direction
+- unit conversion
+- validation bounds
+- overflow/NaN/infinite handling
+- Base/Deco/Technical/CCR mode eligibility
+- PDF/share/briefing-card consistency
+
+Generate independent hand-calculated reference cases for:
+
+1. shallow no-deco OC dive
+2. 30–40 m Deco dive
+3. deep Technical trimix dive
+4. Technical plan with average-depth gas toggle enabled
+5. insufficient single-cylinder case
+6. multiple-cylinder case
+7. CCR bailout case, if integrated
+8. metric/imperial round trip
+
+Output:
+
+- Emergency / Rock Bottom readiness %
+- emergency unit-conversion readiness %
+- emergency export consistency %
+
+# PHASE 4C — TRANSIT SPEED / RUNTIME / STOP PRESENTATION AUDIT
+
+Audit configured descent/ascent speeds and all runtime builders.
+
+Verify:
+
+- valid bounds and defaults
+- persistence and migration
+- correct unit semantics
+- no zero/negative speed
+- no division-by-zero
+- transit duration calculation
+- correct runtime accumulation
+- correct ordering of descent, bottom, ascent, gas switches and stops
+- dedicated deco-stop section exactly matches decompression engine output
+- Dive Runtime and deco table remain mutually consistent
+- CCR setpoint-switch row placement
+- gas use integrates over transit duration
+- localization does not alter numeric parsing
+- presentation builders never mutate canonical results
+
+Output:
+
+- Transit timing readiness %
+- Dive Runtime readiness %
+- Deco-stop presentation truthfulness %
+
+# PHASE 4D — REPETITIVE DIVE / RESIDUAL TISSUE AUDIT
+
+Audit repetitive-dive planning end to end.
+
+Verify:
+
+- previous tissue state source
+- surface interval computation
+- tissue off-gassing
+- N2/He compartment preservation
+- GF compatibility
+- CCR/OC transition compatibility
+- chronology validation
+- fresh-tissue fallback prohibition
+- explicit source labelling
+- persistence/sync integrity
+- export disclosure
+- deterministic repeated calculations
+
+Generate test vectors for short, medium and long surface intervals and compare against independent reference calculations.
+
+Output:
+
+- Repetitive-dive readiness %
+- residual-tissue integrity readiness %
+
 
 # PHASE 5 — RATIO DECO AUDIT
 
@@ -650,6 +1030,12 @@ Audit:
 - CCR setpoint timeline if implemented
 - CCR diluent/bailout timeline if implemented
 - decompression stop labels
+- complete Dive Runtime rows
+- dedicated decompression-stop section
+- gas ledger in liters and bar equivalent
+- Rock Bottom / emergency gas cards
+- repetitive-dive/source indicators
+- route summary totals
 - runtime/TTS/TTR consistency
 - no static/fake rows
 - chart accessibility
@@ -685,6 +1071,9 @@ Verify:
   - Diluent if implemented
   - CCR Bailout if implemented
 - Planner ↔ Checklist guided sync
+- structured Equipment setup ↔ Planner mapping
+- structured Equipment setup ↔ operational checklist mapping
+- CCR checklist import and export round trip
 - duplicate prevention
 - PDF YES/NO checklist export
 - DIR badge:
@@ -736,6 +1125,9 @@ Audit mathematical correctness of:
 - tissue/narcosis inclusion if implemented
 - CCR setpoint/diluent/bailout section if implemented
 - CCR limitations/disclaimer if implemented
+- Equipment Setup PDF
+- planner briefing PNG/card generation
+- planner briefing card transfer to Apple Watch
 - Share Sheet works with WhatsApp/Mail/AirDrop/Files
 - file naming
 - empty/invalid state handling
@@ -754,6 +1146,12 @@ Verify exported values match internal model:
 - tissue/narcosis if exported
 - CCR setpoints/diluent/bailout if exported
 - units
+- Rock Bottom / emergency values
+- ascent-speed assumptions
+- full runtime and dedicated deco stops
+- gas ledger liters/bar equivalents
+- repetitive-dive status
+- planner briefing card values
 
 Output:
 
@@ -824,6 +1222,11 @@ Audit only Watch-specific mathematical/runtime features:
 - unit consistency
 - localization IT/EN
 - sync/export numerical values
+- Planner briefing card reception
+- briefing-card persistence and replacement
+- briefing-card numerical fidelity
+- briefing-card reference-only wording
+- stale/outdated briefing-card handling
 
 Watch CCR-specific:
 
@@ -853,6 +1256,13 @@ Audit:
 - manual dive persistence
 - CCR plan persistence if implemented
 - CCR manual dive/logbook persistence if implemented
+- Planner ascent-speed settings persistence
+- Rock Bottom/emergency settings persistence
+- Technical average-depth gas toggle persistence
+- repetitive-dive tissue/source persistence
+- structured Equipment setup persistence
+- CCR checklist import/export role persistence
+- Planner briefing card transfer/persistence/versioning
 - unit settings sync
 - duplicate IDs
 - tombstones
@@ -948,6 +1358,21 @@ Verify tests for:
 - Watch start dive
 - image transfer
 - localization
+- Planner ascent/descent speed settings
+- runtime ordering
+- dedicated deco-stop table equivalence
+- Rock Bottom/emergency gas
+- gas-ledger liters/bar conversion
+- schedule-aware gas consumption
+- Technical average-depth gas toggle isolation
+- repetitive-dive residual tissues
+- route-summary aggregation
+- plan-completeness/result-state gating
+- structured Equipment mappings
+- CCR checklist import/export round trip
+- CCR bailout scenario
+- CCR gas density
+- Planner briefing card encode/render/transfer/receive/persist
 
 Flag missing tests.
 
@@ -975,6 +1400,16 @@ Verify docs explain:
 - image transfer
 - manual dive
 - limitations
+- Planner ascent-speed assumptions
+- Rock Bottom/emergency gas assumptions
+- gas ledger liters/bar semantics
+- Technical average-depth gas toggle scope
+- repetitive-dive limitations
+- full Dive Runtime and dedicated deco stops
+- structured Equipment/checklist workflow
+- CCR checklist import/export
+- CCR bailout and gas-density assumptions
+- Planner briefing cards on Apple Watch
 - TestFlight readiness
 
 Flag stale or missing docs.
@@ -988,11 +1423,13 @@ On macOS run:
 ```bash
 xcodegen generate
 
-xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving iOS" -destination 'platform=iOS Simulator,name=iPhone 17' build
+xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving iOS" -destination 'generic/platform=iOS Simulator' build
 
-xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving iOS Algorithm Tests" -destination 'platform=iOS Simulator,name=iPhone 17' test
+xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving iOS Algorithm Tests" -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test
 
-xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving Watch App" -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 2 (49mm)' build
+xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving Watch App" -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm)' build
+
+xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving Watch Algorithm Tests" -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm)' test
 ```
 
 If simulators unavailable, use available equivalents and document.
@@ -1046,6 +1483,17 @@ For each issue include:
   - architectural
   - external QA/process
 
+Findings must also identify whether the defect is in:
+
+- canonical calculation
+- input validation
+- persistence/sync
+- role mapping
+- presentation builder
+- numerical formatting/rounding
+- export/rendering
+- documentation/test coverage
+
 ---
 
 # PHASE 19 — TEST PLAN GENERATION
@@ -1068,6 +1516,14 @@ Generate test plan for:
 - import/export tests
 - iCloud merge tests
 - localization/accessibility tests
+- Rock Bottom reference-vector tests
+- ascent/descent transit tests
+- runtime-ordering tests
+- gas-ledger conversion tests
+- schedule-aware gas-use tests
+- repetitive-dive tissue tests
+- CCR checklist round-trip tests
+- briefing-card fidelity and transfer tests
 
 For each test include:
 
@@ -1130,31 +1586,39 @@ Must include:
 
 ## G. Gas / MOD / PPO2 / SAC Assessment
 
-## H. Tissue & Narcosis Assessment
+## H. Emergency / Rock Bottom Assessment
 
-## I. CNS / OTU Assessment
+## I. Transit Speed / Dive Runtime / Deco Stops Assessment
 
-## J. Charts / Tables Assessment
+## J. Schedule-Aware Gas Consumption / Gas Ledger Assessment
 
-## K. Checklist / Equipment Assessment
+## K. Repetitive Dive / Residual Tissue Assessment
 
-## L. PDF / Share Assessment
+## L. Tissue & Narcosis Assessment
 
-## M. Logbook / Manual Dive / Import Export Assessment
+## M. CNS / OTU Assessment
 
-## N. Apple Watch Companion Assessment
+## N. Charts / Tables Assessment
 
-## O. Sync / Persistence Assessment
+## O. Checklist / Equipment Assessment
 
-## P. Localization / Accessibility Assessment
+## P. PDF / Share / Planner Briefing Card Assessment
 
-## Q. Findings by Priority
+## Q. Logbook / Manual Dive / Import Export Assessment
 
-## R. Edge Case Matrix
+## R. Apple Watch Companion Assessment
 
-## S. Test Plan
+## S. Sync / Persistence Assessment
 
-## T. Readiness Matrix
+## T. Localization / Accessibility Assessment
+
+## U. Findings by Priority
+
+## V. Edge Case Matrix
+
+## W. Test Plan
+
+## X. Readiness Matrix
 
 Mandatory table:
 
@@ -1167,6 +1631,12 @@ Mandatory table:
 | CCR Bailout | XX% |
 | Ratio Deco | XX% |
 | Gas Planning | XX% |
+| Emergency / Rock Bottom | XX% |
+| Schedule-Aware Gas Consumption | XX% |
+| Gas Ledger / Reserve Display | XX% |
+| Ascent / Descent Transit Timing | XX% |
+| Dive Runtime / Deco Stop Truthfulness | XX% |
+| Repetitive Dive / Residual Tissues | XX% |
 | MOD / PPO2 / Dalton | XX% |
 | Switch Depth Clamp | XX% |
 | Tissue Loading | XX% |
@@ -1175,13 +1645,18 @@ Mandatory table:
 | Checklist Gas Sync | XX% |
 | Manual Dive Math | XX% |
 | PDF / Share Math Output | XX% |
+| Planner Briefing Card / Watch Transfer | XX% |
+| Structured Equipment / Checklist Mapping | XX% |
+| CCR Checklist Import / Export | XX% |
+| CCR Bailout Scenario | XX% |
+| CCR Gas Density | XX% |
 | CSV / Subsurface Math Output | XX% |
 | Watch Math Runtime | XX% |
 | Sync / Persistence Math Integrity | XX% |
 | Unit Conversion | XX% |
 | Overall Math Readiness | XX% |
 
-## U. Prioritized Roadmap
+## Y. Prioritized Roadmap
 
 1. Must fix before compile/use
 2. Must fix before internal TestFlight
@@ -1189,7 +1664,7 @@ Mandatory table:
 4. Must fix before App Store
 5. Post-release improvements
 
-## V. Final Verdict
+## Z. Final Verdict
 
 Answer clearly:
 
@@ -1208,6 +1683,17 @@ Answer clearly:
 - ready for internal TestFlight?
 - ready for external TestFlight?
 - ready for App Store?
+- are Rock Bottom/emergency gas calculations conservative and coherent?
+- are ascent/descent speeds and runtime rows mathematically consistent?
+- does the dedicated deco-stop section exactly match the engine schedule?
+- is schedule-aware gas consumption correct by segment and gas role?
+- is the Technical average-depth gas toggle isolated to gas consumption?
+- are repetitive-dive residual tissues coherent and explicitly identified?
+- are gas ledger liters/bar values truthful?
+- are structured Equipment/checklist mappings numerically safe?
+- does CCR checklist import/export preserve gas roles?
+- are CCR bailout and gas-density results mathematically traceable?
+- do Planner briefing cards transferred to Watch match canonical plan values?
 - what blocks 100% mathematical readiness?
 
 STRICT FINAL RULE:
@@ -1232,3 +1718,45 @@ The task is complete only if:
 - report contains issue classification
 - report contains test plan
 - all external validation gaps are clearly marked as pending, not passed
+- latest MAIN features listed in Phase 1B are explicitly assessed
+- Rock Bottom, ascent-speed settings, runtime/deco presentation, gas ledger, repetitive-dive planning and briefing-card transfer are included
+- structured Equipment and CCR checklist import/export mappings are included
+- presentation-only components are not mistaken for independent algorithms
+- no readiness percentage is awarded without file/function/test evidence
+
+
+---
+
+# VERSION HISTORY
+
+## V2.0 — 2026-06-13
+
+Updated against the current `main` architecture and latest implementations.
+
+Added explicit audit coverage for:
+
+- structured Equipment setup and operational pre-dive checklist
+- CCR checklist import/export round-trip
+- global Planner ascent-speed settings
+- Planner Emergency / Rock Bottom
+- complete Dive Runtime ordering
+- dedicated deco-stop presentation
+- gas ledger in liters and cylinder-equivalent bar
+- schedule-aware gas consumption
+- Technical average-depth gas-consumption toggle
+- repetitive-dive planning and residual tissues
+- route-summary aggregation
+- plan completeness and result-state gating
+- CCR bailout scenario calculator
+- CCR gas-density estimator
+- Planner briefing card / PNG transfer to Apple Watch
+- Watch briefing-card reception, persistence and reference-only presentation
+
+Preserved:
+
+- `0-` audit sequence position
+- audit-only behavior
+- MAIN-only scope
+- safety and non-certified positioning
+- separation of OC, CCR and Ratio Deco logic
+- prohibition on code modification, commit and push

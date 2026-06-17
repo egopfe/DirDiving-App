@@ -1,22 +1,72 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-09  
-**Branch consigliato:** `main` = `origin/main` @ **`0569903`**  
+**Aggiornato:** 2026-06-14  
+**Branch consigliato:** `main` = `origin/main` @ **`99ea74a`**  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
 
 ---
 
-## Aggiornamento indice 2026-06-09 — Documentazione allineata (`DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`)
+## Aggiornamento indice 2026-06-14 — Documentazione allineata (`DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`)
 
-Pass **docs-only** su `main` @ `0569903`: README, INDEX, matrice CSV, CCR reference docs, branch strategy, audit cross-links, release/TestFlight notes. Nessun cambiamento a runtime MAIN o file experimental.
+Pass **docs-only** su `main` @ `99ea74a`: README, INDEX, matrice CSV, branch strategy, release/TestFlight notes, cross-links audit/remediation V1.0. Nessun cambiamento a runtime MAIN o file experimental.
 
 | Campo | Valore |
 |-------|--------|
 | **Report** | [`DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md) |
-| **Baseline codice** | `0569903` — deep-code remediation MAIN-DCA-001…018 |
-| **XCTest (sim)** | Watch **192** / iOS **561** passed @ `0569903` |
+| **Baseline codice** | `99ea74a` — deep-code remediation V1.0 MAIN-DCA-011…031 |
+| **XCTest (sim)** | Watch **239** / iOS **832** passed @ `99ea74a` |
 | **Verdict docs** | Architettura MAIN allineata; **physical QA ancora PENDING** |
+
+---
+
+## Aggiornamento indice 2026-06-14 — Deep code analysis remediation V1.0 (`MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_V1.0.md`)
+
+Remediation **MAIN-DCA-011 … MAIN-DCA-031** (codice) @ `99ea74a`. Audit originale: [`MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md) @ `7c79105` (report commit `009855e`).
+
+| Campo | Valore |
+|-------|--------|
+| **Report fix** | [`MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_V1.0.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_V1.0.md) |
+| **Prior pass** | [`MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT.md) @ `0569903` (MAIN-DCA-001…018) |
+| **Physical QA** | [`MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md`](MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md) — tutti **PENDING** |
+| **Verdict release** | Sim/build/test verdi; **non** TestFlight/App Store senza QA fisica ed evidenza esterna |
+
+---
+
+## Aggiornamento indice 2026-06-14 — Deep code analysis audit (read-only @ `7c79105`)
+
+Audit read-only post UI/UX remediation V1.0 @ `7c79105`; report commit `009855e`.
+
+| Campo | Valore |
+|-------|--------|
+| **Documento** | [`MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md) |
+| **Issue count** | MAIN-DCA-001…031 (018 closed @ `0569903`; 011…031 in V1.0 remediation) |
+| **Verdict** | V1.0 remediation @ `99ea74a` — internal code readiness 100%; external QA pending |
+
+---
+
+## Aggiornamento indice 2026-06-14 — UI/UX audit remediation V1.0 (`UI_UX_MAIN_AUDIT_REMEDIATION_REPORT_V1.0.md`)
+
+Implementazione UI/UX MAIN @ `7c79105`. **Codice UI/UX: 100%** nel scope audit; QA device matrices ancora pending.
+
+| Campo | Valore |
+|-------|--------|
+| **Documento** | [`UI_UX_MAIN_AUDIT_REMEDIATION_REPORT_V1.0.md`](UI_UX_MAIN_AUDIT_REMEDIATION_REPORT_V1.0.md) |
+| **Prior pass** | [`UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md`](UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md) @ `dba1a22` |
+| **Audit baseline** | [`UI_UX_MAIN_AUDIT_CURRENT.md`](UI_UX_MAIN_AUDIT_CURRENT.md) @ `b7b6e93` |
+| **Verdict** | Code complete; device QA matrices open |
+
+---
+
+## Aggiornamento indice 2026-06-09 — Documentazione allineata (prior pass @ `0569903`)
+
+Pass **docs-only** su `main` @ `0569903`: README, INDEX, matrice CSV, CCR reference docs, branch strategy. **Superseded for HEAD baseline** by 2026-06-14 report.
+
+| Campo | Valore |
+|-------|--------|
+| **Report** | [`DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md) (updated in place @ `99ea74a`) |
+| **Baseline codice (storico)** | `0569903` — deep-code remediation MAIN-DCA-001…018 |
+| **XCTest (sim)** | Watch **192** / iOS **561** passed @ `0569903` |
 
 ---
 

@@ -1,6 +1,6 @@
 # Roadmap DIR DIVING
 
-**Aggiornato:** 2026-06-09 (`main` = `origin/main` @ `0569903`)
+**Aggiornato:** 2026-06-14 (`main` = `origin/main` @ `99ea74a`)
 
 ## Rilasciati su `main` (Watch MAIN + iOS nel workspace)
 
@@ -71,6 +71,11 @@
 | Deep code audit remediation MAIN-AUD-001…016 | ✅ | `a69bc4b` — signed sync ACK, HMAC photo auth, cloud/PDF guards, planner debounce — [`MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_CURRENT.md) |
 | macOS build + XCTest evidence (sim) | ✅ | Watch **171** + iOS **415** passed @ `a69bc4b` |
 | Docs alignment 2026-06-07 | ✅ | [`DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md) |
+| UI/UX audit remediation V1.0 (codice) | ✅ | @ `7c79105` — [`UI_UX_MAIN_AUDIT_REMEDIATION_REPORT_V1.0.md`](UI_UX_MAIN_AUDIT_REMEDIATION_REPORT_V1.0.md) |
+| Deep code audit (read-only) post UI/UX V1.0 | ✅ | @ `7c79105` — report `009855e` — [`MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md) |
+| Deep code remediation V1.0 MAIN-DCA-011…031 | ✅ | @ `99ea74a` — metadata merge, photo ACK queue, aggregate KVS, alarm blink, briefing sanitize/swap, reminder suppression — [`MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_V1.0.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_V1.0.md) |
+| macOS build + XCTest evidence (sim) @ `99ea74a` | ✅ | Watch **239** + iOS **832** passed |
+| Docs alignment 2026-06-14 | ✅ | [`DOCUMENTATION_UPDATE_REPORT_20260614.md`](DOCUMENTATION_UPDATE_REPORT_20260614.md) |
 
 ## Prossimo (MAIN, pre–App Store)
 

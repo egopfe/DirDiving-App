@@ -64,6 +64,7 @@ targets:
     type: application
     platform: iOS
     sources:
+      - Models/PlannerBriefingCard.swift
       - iOSApp
     settings:
       base:
@@ -137,6 +138,12 @@ targets:
       - Utils/DIRUnitConversions.swift
       - Utils/DepthSafetyConfiguration.swift
       - Utils/LiveDiveBannerPresentationPolicy.swift
+      - Utils/LiveDiveReminderSuppressionPolicy.swift
+      - Utils/CloudSyncBudgetPolicy.swift
+      - Utils/PlannerBriefingFilenameSanitizer.swift
+      - Utils/WatchSyncSchemaV1Policy.swift
+      - Utils/WatchSyncPendingFlushPolicy.swift
+      - Utils/PendingPhotoManagementResponseQueue.swift
       - Utils/DiveAlgorithmConfiguration.swift
       - Utils/DiveLogbookPolicy.swift
       - Utils/DepthSampleValidation.swift
@@ -153,6 +160,10 @@ targets:
       - Services/UserImageStore.swift
       - Utils/CompanionPhotoImportSupport.swift
       - Utils/CompanionPhotoManagementSupport.swift
+      - Models/PlannerBriefingCard.swift
+      - Services/PlannerBriefingCardStore.swift
+      - Services/PlannerBriefingWatchReceiver.swift
+      - Utils/PlannerBriefingFreshnessPolicy.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.watch.algorithmtests
@@ -169,22 +180,32 @@ targets:
     platform: iOS
     sources:
       - Tests/iOSAlgorithmTests
+      - Models/PlannerBriefingCard.swift
       - iOSApp/Models/DemoDiveCatalog.swift
       - iOSApp/Models/DivePlan.swift
       - iOSApp/Models/RatioDecoModels.swift
       - iOSApp/Models/DiveSample.swift
       - iOSApp/Models/DiveSession.swift
       - iOSApp/Models/GasPlan.swift
+      - iOSApp/Models/PlannerAscentSpeedSettings.swift
       - iOSApp/Models/CCR/CCRModels.swift
       - iOSApp/Services/CCR/CCRInspiredGasModel.swift
       - iOSApp/Services/CCR/CCRPlanValidator.swift
       - iOSApp/Services/CCR/CCRPlannerEngine.swift
       - iOSApp/Services/CCR/CCRTissueHistorySampler.swift
       - iOSApp/Services/CCR/CCRPlannerService.swift
+      - iOSApp/Services/CCR/CCRPlannerBriefingExportSupport.swift
       - iOSApp/Services/CCR/CCRBailoutScenarioCalculator.swift
       - iOSApp/Services/CCR/CCRGasDensityEstimator.swift
+      - iOSApp/Services/CCR/CCRGasDensityConstants.swift
+      - iOSApp/Services/CCR/CCROxygenExposureState.swift
       - iOSApp/Utils/CCRPlannerSettings.swift
       - iOSApp/Models/EquipmentProfile.swift
+      - iOSApp/Models/EquipmentStructuredModels.swift
+      - iOSApp/Utils/EquipmentStructuredSupport.swift
+      - iOSApp/Utils/EquipmentPlannerMapper.swift
+      - iOSApp/Utils/EquipmentChecklistGenerator.swift
+      - iOSApp/Services/PDF/EquipmentSetupPDFBuilder.swift
       - iOSApp/Models/GPSPoint.swift
       - iOSApp/Models/TankSize.swift
       - iOSApp/Algorithms/Buhlmann/BuhlmannConstants.swift
@@ -194,6 +215,8 @@ targets:
       - iOSApp/Algorithms/Buhlmann/BuhlmannTissueHistory.swift
       - iOSApp/Algorithms/Buhlmann/BuhlmannPlanPreflightValidator.swift
       - iOSApp/Services/PlannerAscentTableBuilder.swift
+      - iOSApp/Services/DecoStopsPresentationBuilder.swift
+      - iOSApp/Services/GasLedgerDisplayFormatter.swift
       - iOSApp/Services/BuhlmannPlanner.swift
       - iOSApp/Services/CloudSyncStore.swift
       - iOSApp/Utils/CloudBackupSettings.swift
@@ -215,6 +238,7 @@ targets:
       - iOSApp/Services/IOSWatchSyncPendingTransfer.swift
       - iOSApp/Services/PlannerStore.swift
       - iOSApp/Services/EquipmentStore.swift
+      - iOSApp/Utils/ChecklistItemSupport.swift
       - iOSApp/Utils/SyncNonceReplayCache.swift
       - iOSApp/Utils/CompanionPhotoManagementAuth.swift
       - iOSApp/Utils/DiveProfileMath.swift
@@ -244,6 +268,9 @@ targets:
       - iOSApp/Utils/PlanCalculationCompleteness.swift
       - iOSApp/Utils/PlannerResultState.swift
       - iOSApp/Utils/WatchSyncSessionDiff.swift
+      - iOSApp/Utils/CloudSyncBudgetPolicy.swift
+      - iOSApp/Utils/CCRMODTolerancePolicy.swift
+      - iOSApp/Utils/WatchSyncSchemaV1Policy.swift
       - iOSApp/Utils/CloudSyncNotifications.swift
       - iOSApp/Utils/WatchSyncNotifications.swift
       - iOSApp/Utils/WatchSyncKeys.swift
@@ -257,11 +284,17 @@ targets:
       - iOSApp/Utils/PressureDisplayMath.swift
       - iOSApp/Services/PDF/PDFDocumentBuilder.swift
       - iOSApp/Services/PDF/PDFExportService.swift
+      - iOSApp/Services/PDF/PDFExportGate.swift
+      - iOSApp/Utils/CCRGasDensityPresentation.swift
       - iOSApp/Services/PDF/PlannerPDFBuilder.swift
       - iOSApp/Services/PDF/BriefingPDFBuilder.swift
       - iOSApp/Services/PDF/ChecklistPDFBuilder.swift
       - iOSApp/Services/PDF/DivePackPDFBuilder.swift
       - iOSApp/Services/PDF/CCRPlannerPDFBuilder.swift
+      - iOSApp/Services/PlannerBriefingImageExportService.swift
+      - iOSApp/Services/PlannerBriefingWatchTransferService.swift
+      - iOSApp/Services/DecoStopsPresentationBuilder.swift
+      - iOSApp/Services/PlannerAscentTableBuilder.swift
       - Tests/iOSAlgorithmTests/PDFExportServiceTests.swift
       - iOSApp/Models/TissueAnalyticsTrace.swift
       - iOSApp/Utils/TissueAnalyticsSupport.swift

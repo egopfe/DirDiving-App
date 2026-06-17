@@ -67,7 +67,7 @@ enum CCRPlanValidator {
                 continue
             }
             let mod = bailout.gasMix.modMeters(environment: environment) ?? 0
-            if bailout.switchDepthMeters > mod + 0.5 {
+            if bailout.switchDepthMeters > mod + CCRMODTolerancePolicy.ccrBailoutSwitchDepthSlackMeters {
                 issues.append(.bailoutMODExceeded(DIRIOSLocalizer.formatted("ccr.validation.bailout_mod", bailout.label)))
             }
         }

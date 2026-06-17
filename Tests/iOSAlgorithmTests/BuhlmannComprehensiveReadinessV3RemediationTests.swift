@@ -41,7 +41,7 @@ final class BühlmannComprehensiveReadinessV3RemediationTests: XCTestCase {
         let presentation = TissueAnalyticsService.presentationForSession(session)
         XCTAssertEqual(presentation?.trace.source, .simulated)
         let subtitle = TissueAnalyticsService.logbookEntrySubtitle(for: session)
-        XCTAssertEqual(subtitle, String(localized: "tissue_analytics.logbook.entry.subtitle.manual_synthetic"))
+        XCTAssertEqual(subtitle, DIRIOSLocalizer.string("tissue_analytics.logbook.entry.subtitle.manual_synthetic"))
     }
 
     func testTrimixLogbookFallsBackToSimulatedEstimate() {

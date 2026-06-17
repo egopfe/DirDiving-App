@@ -1,6 +1,20 @@
 import Foundation
 
 enum CCRBailoutScenarioCalculator {
+    private static var heuristicLimitations: [String] {
+        [
+            DIRIOSLocalizer.string("ccr.bailout.limitation.not_oc_deco"),
+            DIRIOSLocalizer.string("ccr.bailout.limitation.sac_estimate")
+        ]
+    }
+
+    private static var heuristicAssumptions: [String] {
+        [
+            DIRIOSLocalizer.string("ccr.bailout.assumption.stress_multiplier"),
+            DIRIOSLocalizer.string("ccr.bailout.assumption.stop_estimate")
+        ]
+    }
+
     static func evaluateAll(input: CCRPlanInput, environment: PlannerEnvironment) -> [CCRBailoutScenarioResult] {
         CCRBailoutScenarioKind.allCases.map { evaluate(kind: $0, input: input, environment: environment) }
     }
@@ -32,7 +46,10 @@ enum CCRBailoutScenarioCalculator {
                 status: .fail,
                 warnings: [DIRIOSLocalizer.string("ccr.bailout.no_gases")],
                 gasSwitchSequence: [],
-                referenceNotes: DIRIOSLocalizer.string("ccr.bailout.heuristic_disclaimer")
+                referenceNotes: DIRIOSLocalizer.string("ccr.bailout.heuristic_disclaimer"),
+                method: .heuristic,
+                limitations: heuristicLimitations,
+                assumptions: heuristicAssumptions
             )
         }
 
@@ -82,7 +99,10 @@ enum CCRBailoutScenarioCalculator {
             status: status,
             warnings: warnings,
             gasSwitchSequence: sequence,
-            referenceNotes: DIRIOSLocalizer.string("ccr.bailout.heuristic_disclaimer")
+            referenceNotes: DIRIOSLocalizer.string("ccr.bailout.heuristic_disclaimer"),
+            method: .heuristic,
+            limitations: heuristicLimitations,
+            assumptions: heuristicAssumptions
         )
     }
 }

@@ -51,7 +51,7 @@ final class PlannerCNSDescentBottomVisibilityTests: XCTestCase {
     func testCCRPlanResultPreservesCNSDescentBottomMetric() throws {
         let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/CCR/CCRPlanResultView.swift"))
         XCTAssertTrue(source.contains("planner.metric.cns_descent_bottom"))
-        XCTAssertTrue(source.contains("cnsDescentBottomPercent"))
+        XCTAssertTrue(source.contains("descentBottomCNSPercent"))
     }
 
     private func repositoryRoot() -> URL {

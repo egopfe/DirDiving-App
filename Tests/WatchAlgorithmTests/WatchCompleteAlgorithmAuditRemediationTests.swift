@@ -1,6 +1,6 @@
 import XCTest
 
-/// Regression guards from `Docs/WATCH_COMPLETE_ALGORITHM_AUDIT_CURRENT.md` remediation (2026-06-02).
+/// Regression guards from `Docs/2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_CURRENT.md` remediation.
 final class WatchCompleteAlgorithmAuditRemediationTests: XCTestCase {
     private static let watchCompileRoots = ["App", "Models", "Services", "Views", "Utils"]
     private static let forbiddenRuntimeTokens = [

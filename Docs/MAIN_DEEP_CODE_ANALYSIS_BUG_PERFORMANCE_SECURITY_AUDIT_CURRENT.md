@@ -1,17 +1,19 @@
 # DIR DIVING MAIN Deep Code Analysis, Bug, Performance, and Security Audit
 
-Date: 2026-06-09  
+Date: 2026-06-14  
 Scope: MAIN branch only  
 Target branch: `main`  
-Audited commit: `dba1a22` (`dba1a227aa96fcd22c257c7029aa8979b238d1e3`)  
+Audited commit: `7c79105` (`7c79105…` — UI/UX remediation V1.0)  
 Repository: DIR DIVING  
+Command: `5-DIR_DIVING_MAIN_DEEP_CODE_ANALYSIS_COMMAND_CCR_UPDATED_V2.0.md`  
+Prior audit: `dba1a22` (2026-06-09)  
 Output file: `Docs/MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`
 
 ---
 
 ## A. Executive Summary
 
-This audit was performed against branch `main` only at commit `dba1a22`, immediately after UI/UX remediation (`dba1a22`). The working tree was clean before the report was created; `git status -sb` reported `## main...origin/main`.
+This audit was performed against branch `main` only at commit **`7c79105`**, immediately after UI/UX internal-readiness remediation (`7c79105`). The working tree was clean before the report was created; `git status -sb` reported `## main...origin/main`.
 
 **No production source code, UI, business logic, algorithms, security model, sync model, planner mode logic, or experimental files were modified during this audit.**
 
@@ -19,50 +21,58 @@ This audit was performed against branch `main` only at commit `dba1a22`, immedia
 
 | Command | Result |
 |---|---|
-| `xcodegen generate` | **PASS** — project created at `DIRDiving.xcodeproj` |
+| `xcodegen generate` | **PASS** |
 | `xcodebuild -scheme "DIRDiving iOS" -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build` | **BUILD SUCCEEDED** |
-| `xcodebuild -scheme "DIRDiving Watch App" -destination 'generic/platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm)' CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build` | **BUILD SUCCEEDED** (preflight) |
-| `xcodebuild -scheme "DIRDiving iOS Algorithm Tests" -destination 'platform=iOS Simulator,name=iPhone 17 Pro' CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO test` | **TEST SUCCEEDED** — 554 passed, 13 skipped, 0 failed |
-| `xcodebuild -scheme "DIRDiving Watch Algorithm Tests" -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm)' CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO test` | **TEST SUCCEEDED** — 188 passed, 13 skipped, 0 failed |
+| `xcodebuild -scheme "DIRDiving Watch App" -destination 'generic/platform=watchOS Simulator' CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build` | **BUILD SUCCEEDED** |
+| `xcodebuild -scheme "DIRDiving iOS Algorithm Tests" -destination 'platform=iOS Simulator,name=iPhone 17 Pro' CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO test` | **TEST SUCCEEDED** — **821 passed**, 13 skipped, **0 failed** |
+| `xcodebuild -scheme "DIRDiving Watch Algorithm Tests" -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm)' CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO test` | **TEST SUCCEEDED** — **229 passed**, 16 skipped, **0 failed** |
 
 ### Readiness Percentages
 
-These percentages are static-audit + build/test readiness estimates. Physical and external QA remain **PENDING** and are not counted as passed.
+Static-audit + build/test estimates. Physical and external QA remain **PENDING** and are not counted as passed.
 
 | Readiness area | Estimate | Rationale |
 |---|---:|---|
-| Overall static code readiness | 82% | Builds and algorithm tests pass; several HIGH planner/sync/Watch-runtime issues remain. |
-| Watch MAIN readiness | 86% | Strong algorithm coverage, legal gate, HMAC sync, mission-mode tests; ACK-on-userInfo gap and per-sample draft I/O remain. |
-| iOS MAIN readiness | 78% | Broad planner/CCR coverage; mode-projected MOD gating and analysis cache staleness are user-visible bugs. |
-| Bug risk readiness | 80% | Confirmed logic bugs in planner gating and Watch manual-end intent; no CRITICAL crash found statically. |
-| Performance readiness | 74% | Per-sample active-dive draft persistence and planner SwiftUI churn need budgets. |
-| Security readiness | 84% | HMAC v2, TOFU pinning, signed ACKs, photo-management auth, replay cache; peer secret in `applicationContext` and Watch KVS cap gap remain. |
-| Privacy readiness | 81% | Protected persistence on iOS log/sync files; PDF export now uses complete file protection. |
-| Data integrity readiness | 76% | iOS outbound queue retains pending until signed ACK (fixed); Watch inbound ACK on `transferUserInfo` and merge-policy divergence remain. |
-| Sync/cloud readiness | 74% | Bidirectional dive sync mostly sound; Watch KVS lacks iOS-style payload preflight. |
-| CCR / Rebreather readiness | 83% | CCR planner, validator, checklist import present; Ratio Deco correctly blocked in CCR; external CCR QA pending. |
-| Internal TestFlight readiness | **Not ready** | Fix HIGH planner + Watch sync ACK issues; complete simulator paired-sync QA. |
-| External TestFlight readiness | **Not ready** | Physical Watch Ultra, paired-device, iCloud two-device, Subsurface QA all pending. |
-| App Store readiness | **Not ready** | External QA, privacy wording review, and HIGH issue remediation required. |
+| Overall static code readiness | **91%** | Both builds green; 1,050 automated tests pass; prior P1 DCA items largely remediated with regression tests. |
+| Watch MAIN readiness | **92%** | Strong algorithm + sync ACK + draft throttle coverage; remaining gaps are ACK delivery when inactive, briefing path hardening, reminder-suppression matrix. |
+| iOS MAIN readiness | **90%** | Mode-projected MOD gating fixed; typed PDF export gate; CCR density unavailable; metadata-only Watch import overwrite remains. |
+| Bug risk readiness | **90%** | No CRITICAL crash path confirmed; HIGH items reduced to sync metadata, aggregate KVS budget, inactive-session photo ACK. |
+| Performance readiness | **86%** | Active-dive draft throttled (8 s); alarm blink still toggles `@Published` every 1 s; briefing render/transfer bursts possible. |
+| Security readiness | **89%** | HMAC v2, signed ACKs, photo-management auth, replay persistence option; briefing `fileName` sanitization weaker than photos; TOFU peer secret remains. |
+| Privacy readiness | **88%** | Complete file protection on iOS log/sync/PDF paths; GPS local-only; iCloud opt-in on iOS. |
+| Data integrity readiness | **87%** | iOS cloud merge rich; Watch→iOS metadata-only updates replace whole session; aggregate KVS budget not tracked. |
+| Sync/cloud readiness | **88%** | Bidirectional signed dive sync + Watch userInfo ACK path fixed; photo delete ACK gap when session inactive. |
+| CCR / Rebreather readiness | **90%** | Engine, validator, checklist import clamp, density unavailable UI/PDF; 0.5 m bailout MOD slack vs OC; external CCR QA pending. |
+| UI/UX code readiness (post-remediation) | **100% code** | Semantic GPS/compass keys, compact Watch layout, sync badge, briefing freshness, typed PDF errors — external QA still PENDING. |
+| Internal TestFlight readiness | **Near ready** | Remaining P1: metadata merge on Watch import, aggregate KVS cap, photo delete ACK when inactive; paired sim QA recommended. |
+| External TestFlight readiness | **Not ready** | Physical Watch Ultra, paired-device, iCloud two-device, Subsurface external QA all **PENDING**. |
+| App Store readiness | **Not ready** | External QA + App Store assets + final privacy review required. |
 
-### Most Urgent Issues
+### Most Urgent Open Issues
 
-1. **MAIN-DCA-004** — Planner `liveMODIssues` validates full draft gases, not mode-projected input; can block Base/Deco calculate after Technical editing.
-2. **MAIN-DCA-001** — Watch does not parse inbound `diveImportAck` on `transferUserInfo`; Watch→iOS pending queue may not drain when iPhone replies via queued path.
-3. **MAIN-DCA-008** — `persistActiveDiveDraft()` runs on every accepted depth sample during an active dive (I/O and battery risk).
-4. **MAIN-DCA-007** — `EndManualDiveIntent` becomes a no-op after manual→automatic handoff on submersion.
-5. **MAIN-DCA-002** — Watch `CloudSyncStore` writes unbounded payloads to KVS without iOS-style size guard.
+1. **MAIN-DCA-011** — iOS Watch import replaces full session when metadata-only diff (notes/site/buddy not in `WatchSyncSessionDiff`).
+2. **MAIN-DCA-019** — Watch photo delete ACK/inventory publish skipped when `WCSession` not activated (file deleted locally, iPhone may never ACK).
+3. **MAIN-DCA-025** — Aggregate iCloud KVS budget not enforced across multiple keys (per-key 512 KB cap only).
+4. **MAIN-DCA-020** — Planner briefing `fileName` not path-sanitized on Watch (weaker than `UserImageStore`).
+5. **MAIN-DCA-022** — Reminder suppression incomplete vs depth caution/critical banners (documented deferral in UI/UX remediation).
 
-No **CRITICAL** (crash/data-loss-without-mitigation) issue was confirmed. Highest confirmed severity is **HIGH** across planner gating, sync ACK asymmetry, and Watch runtime I/O.
+No **CRITICAL** (unmitigated crash / silent data loss without recovery) issue was confirmed at `7c79105`.
 
-### Improvements Since Prior Audit (`8c7d6e6`)
+### Improvements Since Prior Audit (`dba1a22` → `7c79105`)
 
-| Prior ID | Status at `dba1a22` |
+| Prior ID | Status at `7c79105` |
 |---|---|
-| iOS outbound sync drops pending without signed ACK | **Fixed** — `IOSWatchSyncPendingQueuePolicy`, protected outbound queue, `confirmSignedAck` |
-| PDF temp without complete file protection | **Fixed** — `PDFDocumentBuilder.swift` uses `.completeFileProtection` |
-| Unsigned photo management (partial) | **Improved** — `CompanionPhotoManagementAuth` + replay caches |
-| UI/UX P1 localization/a11y gaps | **Remediated** in `dba1a22` UI/UX pass (separate report) |
+| MAIN-DCA-001 Watch inbound `diveImportAck` on userInfo | **Fixed** — `WatchSyncService.didReceiveUserInfo` + `parseImportAck`; tests in `MainDeepCodeRemediationDCATests` |
+| MAIN-DCA-002 Watch KVS per-key cap | **Fixed** — `Services/CloudSyncStore.swift` uses `maxSyncPayloadBytes`; tested |
+| MAIN-DCA-004 Planner MOD gate on full draft | **Fixed** — `liveMODIssues` uses `PlannerModePolicy.activePlanInput`; tested |
+| MAIN-DCA-005 Analysis cache staleness | **Fixed** — `AnalysisCacheKey` includes SAC, planning ref, avg-depth toggle, signatures; tested |
+| MAIN-DCA-007 End manual dive after handoff | **Fixed** — `endManualDive()` accepts `sessionStartedManually` |
+| MAIN-DCA-008 Per-sample draft I/O | **Fixed** — `activeDiveDraftPersistenceIntervalSeconds` (8 s) + deferred flush; tested |
+| MAIN-DCA-009 Mission pending not in draft | **Fixed** — `missionModeManualPendingForSession` in `ActiveDiveDraft` |
+| MAIN-DCA-010 Base END labeled MOD | **Fixed** — Base results use `END` tile (`PlannerView.swift`) |
+| MAIN-DCA-014 In-memory-only replay cache | **Improved** — `SyncNonceReplayCache.persistProtected`; tested |
+| MAIN-DCA-015 CCR import switch depth | **Fixed** — `CCRChecklistImportCoordinator` clamps bailout MOD; tested |
+| UI/UX P1–P3 (GPS keys, density unavailable, PDF errors, briefing freshness, 40 mm layout) | **Remediated** — see `Docs/UI_UX_MAIN_AUDIT_REMEDIATION_REPORT_V1.0.md` |
 
 ---
 
@@ -73,11 +83,10 @@ No **CRITICAL** (crash/data-loss-without-mitigation) issue was confirmed. Highes
 | Check | Result |
 |---|---|
 | Branch | `main` |
-| Commit | `dba1a22` |
+| Commit | `7c79105` |
 | Remote alignment | `## main...origin/main` |
 | Dirty files before report | None |
 | Experimental branches | Not touched |
-| Apnea/Snorkeling/Buddy Assist/Exploration Lab | Excluded from MAIN targets; not edited |
 
 ### Targets In `project.yml`
 
@@ -88,23 +97,23 @@ No **CRITICAL** (crash/data-loss-without-mitigation) issue was confirmed. Highes
 | `DIRDiving Watch Algorithm Tests` | watchOS tests | `com.egopfe.dirdiving.watch.algorithmtests` |
 | `DIRDiving iOS Algorithm Tests` | iOS tests | `com.egopfe.dirdiving.ios.algorithmtests` |
 
-### Entitlements
+### Experimental Exclusions Confirmed
 
-Both Watch and iOS declare iCloud container `iCloud.com.egopfe.dirdiving`, CloudKit, and ubiquity KVS `$(TeamIdentifierPrefix)com.egopfe.dirdiving`.
+**Watch:** `ApneaView`, `SnorkelingView`, `BuddyAssistView`, `ExperimentalConceptsView`, `ExperimentalFeatures`, Buddy/Exploration services excluded.
+
+**iOS:** `ExplorationModels`, `BuddyExperimentalModels`, `ExplorationPlanningStore`, `BuddyExperimentalStore`, exploration/buddy views excluded.
 
 ### Static Scan Summary
 
 | Scan | Result |
 |---|---|
-| Force unwrap / `try!` / `as!` | No production `try!`/`as!` blocker. `PlannerView.swift` retains guarded `columnHeaders!` in table helper (~2420). |
-| Hardcoded secrets | None found in MAIN production code. |
-| TODO/FIXME | No MAIN release blocker from scan. |
-| File protection | iOS log/sync/outbound queue use `.completeFileProtection`; PDF export protected. |
-| WatchConnectivity | HMAC v2 envelopes, signed ACKs, nonce replay cache on Watch codec; asymmetric ACK ingestion on Watch `didReceiveUserInfo`. |
-
-### Inspected Areas
-
-`App/`, `Models/`, `Services/`, `Utils/`, `Views/`, `iOSApp/**`, `Tests/WatchAlgorithmTests/`, `Tests/iOSAlgorithmTests/`, `Config/`, `Docs/` (release/QA context).
+| Production `try!` / `as!` | None in production paths; tests only |
+| `Dictionary(uniqueKeysWithValues:)` | None found |
+| TODO/FIXME in MAIN production | Only in excluded experimental views |
+| Hardcoded secrets | None in repo |
+| Legacy Italian-as-key in Swift | **None** — semantic `watch.gps.status.*` / `watch.compass.status.*` |
+| Legacy Italian-as-key in `.strings` catalogs | **Residual aliases** remain (`Fix disponibile`, `Bussola pronta`) — not referenced from Swift |
+| Tissue chart `"Time"` axis | Hardcoded in `TissueAnalyticsCharts.swift` (pre-existing; CCR charts now localized) |
 
 ---
 
@@ -112,503 +121,510 @@ Both Watch and iOS declare iCloud container `iCloud.com.egopfe.dirdiving`, Cloud
 
 ### Watch
 
-Watch MAIN excludes experimental features via `project.yml`. Runtime is centered on:
+Runtime centered on `DiveManager`, sensor providers, `WatchSyncService` (HMAC v2, signed ACKs, photo management, briefing routing), `CloudSyncStore` (capped), `UserImageStore`, `PlannerBriefingCardStore`.
 
-- **Dive lifecycle:** `DiveManager.swift`, `DiveLogStore.swift`
-- **Sensors:** `DepthSensorProvider`, `AppleDepthSensorProvider`, `MockDepthSensorProvider`, `SensorProviderFactory`
-- **Sync:** `WatchSyncService.swift`, `WatchDiveSyncCodec.swift`, `WatchSyncAuth.swift`
-- **Cloud:** `CloudSyncStore.swift` (Watch copy — simpler than iOS)
-- **Safety / mission mode:** `MissionModeLifecycle`, depth safety, legal gate on App Intents
-- **Photos:** companion photo import, inventory/delete via signed management payloads
+**Strengths:** Legal gate on all safety App Intents; mission mode invariant tests; draft throttle; compact live banner policy; briefing freshness warnings.
 
-Strengths: two-phase active dive draft, simulation release migration, mission mode invariant tests, legal acceptance gate on all safety intents.
+**Risks:** Briefing filename confinement; delete ACK when session inactive; reminder suppression vs banner policy mismatch.
 
 ### iOS Companion
 
-- **Planner:** three-mode OC architecture (Base / Deco / Technical) plus CCR mode via `PlannerModePolicy`, `PlannerStore`, `PlannerService`, `GasPlanningService`
-- **Bühlmann / deco:** `BuhlmannPlanner`, tissue snapshots, Ratio Deco (OC only)
-- **CCR:** `CCRPlannerService`, `CCRPlanValidator`, checklist import/export coordinators
-- **Logbook / sync:** `DiveLogStore`, `WatchSyncService` (iOS), cloud merge via rich `iOSApp/Utils/DiveSessionMerge.swift`
-- **Import/export:** Subsurface CSV, PDF builder, CCR PDF paths
+Three-mode OC planner + CCR mode; rich iOS `DiveSessionMerge`; capped iOS `CloudSyncStore`; `PDFExportGate` typed export blocks; CCR gas-density unavailable presentation.
 
-Strengths: mode-projected planning in `PlannerModePolicy.activePlanInput`, divergent profile merge policy on iOS, KVS payload cap on iOS `CloudSyncStore`.
+**Strengths:** Mode-projected planning and MOD gating; analysis cache completeness; equipment/checklist/CCR checklist coordinators; 821 algorithm tests.
+
+**Risks:** Watch import metadata overwrite; aggregate KVS budget; tissue chart localization leak.
 
 ### Cross-App Integration
 
 ```
-Watch dive complete → WatchSyncService (HMAC) → iOS import → signed ACK → Watch dequeue
-iOS dive export → iOS WatchSyncService (pending queue) → Watch import → signed ACK → iOS dequeue
-iCloud KVS ← CloudSyncStore (iOS capped, Watch uncapped) → DiveLogStore merge
+Watch dive → HMAC payload → iOS import → signed ACK → Watch dequeue (direct + userInfo)
+iOS dive → pending queue → Watch import → signed ACK → iOS dequeue
+iCloud KVS ← CloudSyncStore (per-key cap both platforms; aggregate budget gap)
+Planner briefing PNG → WC file transfer → Watch receiver → Application Support/PlannerBriefing
+Photos → signed management payloads → inventory/delete ACK
 ```
 
 ---
 
-## D. iOS Planner Three-Mode Architecture Audit
-
-| Check | Status | Evidence |
-|---|---|---|
-| Modes affect visible inputs | **PASS** | `PlannerModePresentation`, mode-specific sections in `PlannerView.swift` |
-| Modes affect calculation projection | **PASS** | `PlannerModePolicy.activePlanInput`, `PlannerService.makePlan(input:mode:)` |
-| Mode switching preserves draft technical gases | **PASS** | Draft retained; projection strips non-mode gases |
-| NDL / Bühlmann uses projected input | **PASS** | `PlannerStore.applyInputToPlanningOutputs` uses `activePlanInput` |
-| Gas preview analysis uses mode projection | **PASS** | `GasPlanningService.analyze(input:mode:)` projects first |
-| **MOD live gating uses projected input** | **FAIL** | `liveMODIssues` calls `PlannerMODValidator.liveInputIssues(input: store.input)` on full draft (`PlannerView.swift:819-820`) |
-| **Analysis cache invalidation completeness** | **PARTIAL** | `AnalysisCacheKey` omits SAC, planning depth reference, avg depth (`PlannerStore.swift:386-407`) |
-| CCR mode separate from OC three-mode | **PASS** | `mode.isCCR` branches in `PlannerStore` |
-| Ratio Deco blocked in CCR | **PASS** | `PlannerService.makePlan` returns `nil` ratio bundle when `mode == .ccr` |
-| Share/export includes planner mode | **PASS** | `PlannerState` persists `mode`; export paths tested |
-
-**Regression scenario (MAIN-DCA-004):** User edits Technical travel gas with MOD violation, switches to Base mode. `PlannerModePolicy.validate` passes (projected Base input), but `liveMODIssues` still flags hidden Technical cylinders → **Calculate** disabled incorrectly.
-
----
-
-## E. iOS Planner MOD / PPO2 / Switch-Depth Audit
-
-| Check | Status | Notes |
-|---|---|---|
-| O2 / max PPO2 recalculates MOD | **PASS** | `PlannerMODValidator`, `GasMix.modMeters(environment:)` |
-| Switch depth clamped to MOD | **PASS** | `clampAllSwitchDepthsToMOD`, cylinder bindings |
-| Environment-aware MOD | **PASS** | `PlannerEnvironment` used in validator |
-| Non-bottom gases normalized | **PASS** | `syncLegacyGasesFromPlannerCylinders` + validator |
-| **Altitude/salinity reclamp on env change** | **PARTIAL** | `clampAllSwitchDepthsToMOD` only wired in Technical UI block (`PlannerView.swift:287-308`) |
-| **Base results END labeled MOD** | **FAIL** | `PlannerView.swift:2422` — `DIRMetricTile(title: "MOD", value: … endMeters …)` |
-| Recursive `.onChange` loops | **PASS** | No confirmed infinite loop; debounced planner updates in `PlannerStore` |
-| CCR bailout MOD tolerance | **PASS** | `CCRPlanValidator` allows `switchDepthMeters > mod + 0.5` (OC uses tighter policy) |
-| CCR checklist import switch depth | **PARTIAL** | Import matches gases/setpoints; switch depth not reconciled (`MAIN-DCA-015`) |
-
----
-
-## F. CCR / Rebreather Audit
+## D. Apple Watch Deep Code Analysis
 
 | Area | Status | Notes |
 |---|---|---|
-| CCR planning engine | **PASS** | `CCRPlannerService`, tissue/CNS/OTU integration |
-| Setpoint / diluent / bailout validation | **PASS** | `CCRPlanValidator` |
-| Ratio Deco in CCR | **PASS** | Blocked at `PlannerService` |
-| CCR checklist import (UI/UX remediation) | **PASS** | `CCRChecklistImportCoordinator`, `CCRChecklistImportSheet` |
-| CCR cloud persistence | **PASS** | `CCRPlanInput` in `PlannerState` |
-| CCR PDF/export | **PASS** | Covered in iOS algorithm tests |
-| CCR external physical QA | **PENDING** | No in-water CCR validation executed |
+| Dive lifecycle / draft restore | **PASS** | Throttled persistence; mission pending in draft |
+| Manual/auto start + handoff | **PASS** | `sessionStartedManually` enables end after handoff |
+| Mission Mode invariants | **PASS** | Tests in `MissionModeAlgorithmInvariantTests` |
+| Sensor simulation release | **PASS** | Release migration tested |
+| App Intents legal gate | **PASS** | All safety intents gated |
+| Live banner density (40 mm) | **PASS** | `LiveDiveBannerPresentationPolicy` defer panels — UI/UX V1.0 |
+| Reminder manual dismiss | **PASS** | Tap-to-dismiss overlay |
+| Reminder vs safety suppression | **PARTIAL** | `shouldSuppressDiveReminders` misses `.critical`/`.caution` depth states |
+| Sync ACK userInfo | **PASS** | Fixed + tested |
+| Photo delete ACK | **PARTIAL** | Skipped when `activationState != .activated` |
+| Briefing transfer | **PARTIAL** | Hash validation good; `fileName` path not sanitized |
+| CSV export | **PASS** | Subsurface path tested |
 
----
+### Watch Performance Notes
 
-## G. Apple Watch MAIN Semantics Audit
-
-| Semantics | Status | Notes |
+| Risk | Severity | Location |
 |---|---|---|
-| Manual vs automatic dive start | **PASS** with gap | Handoff on submersion works; end-intent gap (`MAIN-DCA-007`) |
-| Mission Mode invariants | **PASS** | Tests in `WatchCompleteAlgorithmAuditRemediationTests` |
-| Mission pending lost on crash restore | **FAIL** | `missionModeManualPendingForSession` not in `ActiveDiveDraft` (`MAIN-DCA-009`) |
-| Sensor source / simulation release | **PASS** | Release migration tested |
-| App Intents legal gate | **PASS** | `requireLegalAcceptanceForSafetyIntent()` on all safety intents |
-| TTV / ascent / depth algorithms | **PASS** | 188 Watch algorithm tests pass |
-| End manual dive via Action Button | **PARTIAL** | No-op after handoff (`MAIN-DCA-007`) |
+| Alarm `@Published` blink toggle 1 Hz | MEDIUM | `DiveManager.blinkTimer` |
+| `flushPendingTransfers` may re-send queue | LOW | `WatchSyncService` |
+| Timer → `Task { @MainActor }` every tick | LOW | Runtime/stopwatch timers |
+| Briefing PNG decode memory | LOW | Staging + final storage |
+
+### Watch Security Notes
+
+| Area | Status |
+|---|---|
+| Dive sync HMAC + nonce (v2) | **PASS** |
+| Photo management HMAC + replay | **PASS** |
+| Photo path traversal | **PASS** — `UserImageStore.sanitizedCompanionPhotoFileName` |
+| Briefing path confinement | **FAIL** — no `..` rejection on `fileName` |
+| Bundled image delete protection | **PASS** |
+| Legal gate on intents | **PASS** |
 
 ---
 
-## H. Watch Image Inventory / Delete Analysis
+## E. iOS Companion Deep Code Analysis
 
-| Check | Status | Notes |
+| Area | Status | Notes |
 |---|---|---|
-| Watch source-of-truth for photos | **PASS** | Watch stores; iOS requests inventory |
-| Signed management payloads | **PASS** | `CompanionPhotoManagementAuth` |
-| Path traversal protection | **PASS** | `sanitizedPhotoFileName` on iOS |
-| Delete ACK flow | **PASS** | Request/ACK via WC message + userInfo fallback |
-| Replay protection | **PASS** | Separate request/response replay caches |
-| Paired physical QA | **PENDING** | Not executed in this audit |
+| Base / Deco / Technical modes | **PASS** | Real projection via `PlannerModePolicy` |
+| MOD / switch-depth clamp | **PASS** | Environment-aware; mode-projected live gate |
+| NDL / gas preview parity | **PASS** | Projected input + complete cache key |
+| CCR planner | **PASS** | Separate mode; Ratio Deco blocked |
+| CCR density unavailable | **PASS** | UI + PDF — UI/UX V1.0 |
+| PDF/share typed errors | **PASS** | `PDFExportGate` |
+| Cloud merge (iOS) | **PASS** | Divergent profile policy; conflict detector |
+| Watch import metadata | **FAIL** | Full replace without merge when diff not "significant" |
+| Aggregate KVS budget | **FAIL** | Multiple keys can exceed total quota |
+| Tissue chart localization | **PARTIAL** | `"Time"` hardcoded in analytics charts |
 
 ---
 
-## I. Cross-App Sync / Data Integrity Analysis
+## F. Planner-Specific Deep Analysis
 
-### Watch → iOS
-
-- HMAC v2 signed dive payloads with nonce replay cache (`WatchDiveSyncCodec`)
-- iOS imports via `importSessionPayload`, replies with signed `ackSignature` on direct message
-- iOS handles `diveImportAck` on both `didReceiveMessage` and `didReceiveUserInfo` (`WatchSyncService.swift:963-967`)
-
-### iOS → Watch
-
-- Outbound sessions queued in protected `dirdiving_ios_pending_watch_sync_sessions.json`
-- Dequeue **only** after `confirmSignedAck` — **fixed** since prior audit
-- Watch imports via `ingestIncomingPayload`, emits ACK via `deliverImportAck`
-
-### Gap: iOS ACK → Watch on `transferUserInfo`
-
-When iPhone imports Watch dive offline and sends ACK via `transferUserInfo`, Watch `didReceiveUserInfo` only calls `ingestIncomingPayload` (expects dive sessions, not ACKs). Watch codec has `isImportAck` but **no** `parseImportAck` (iOS-only in `iOSApp/Services/WatchDiveSyncCodec.swift`). Pending Watch→iOS transfers are not dequeued on this path.
-
-### Cloud Merge
-
-- **iOS:** Rich merge with divergent-profile policy, manual metadata, SAC, notes
-- **Watch:** Simpler `Utils/DiveSessionMerge.swift` — drops site/buddy/notes/equipment (`MAIN-DCA-006`)
-- Profile conflict: iOS uses `DiveSessionProfileDivergence` — **PASS** on iOS
-
-### Peer Trust
-
-- TOFU peer secret via `WatchSyncAuth`; mismatch flagged
-- Peer secret also published in `applicationContext` — convenience vs. exposure tradeoff (`MAIN-DCA-013`)
+| Check | Status |
+|---|---|
+| Modes affect inputs, gases, validation, results | **PASS** |
+| Hidden Technical gases excluded from Base/Deco calc | **PASS** |
+| `liveMODIssues` uses projected input | **PASS** (fixed) |
+| Environment reclamp on altitude/salinity | **PARTIAL** — strongest in Technical UI block |
+| PPO2 tolerance centralized | **PASS** — `GasMixValidator` / preflight |
+| Export includes mode + typed block reasons | **PASS** |
+| Deco-stop MOD `validateAll` dead path gas fallback | **INFO** — unused in production; documented in tests |
 
 ---
 
-## J. Performance Analysis
+## G. CCR / Rebreather Deep Analysis
 
-| Risk | Severity | Location | Impact |
+| Area | Status |
+|---|---|
+| Setpoint / diluent / bailout validation | **PASS** |
+| Inspired gas / tissue / CNS / OTU integration | **PASS** |
+| Bailout heuristic disclaimer | **PASS** |
+| Checklist import switch-depth clamp | **PASS** (fixed) |
+| Bailout MOD tolerance 0.5 m vs OC 0.05 m | **PARTIAL** — intentional slack? document or align |
+| CCR UI density unavailable | **PASS** |
+| CCR external physical QA | **PENDING** |
+
+---
+
+## H. Transit / Runtime / Deco Presentation
+
+| Check | Status |
+|---|---|
+| `PlannerAscentTableBuilder` / `DecoStopsPresentationBuilder` | **PASS** — presentation-only; tests in `PlannerAscentTableTests` |
+| Route summary / TTS consistency | **PASS** — `RouteSummaryService` tested |
+| Stale result invalidation | **PASS** — `PlanCalculationCompleteness` / export gates |
+| Presentation mutates canonical data | **PASS** — no mutation found |
+
+---
+
+## I. Emergency / Rock Bottom
+
+| Check | Status |
+|---|---|
+| Separate from normal consumption | **PASS** |
+| Technical avg-depth toggle isolation | **PASS** — tested in `PlannerTechnicalAverageDepthGasConsumptionTests` |
+| Display vs canonical liters | **PASS** — `GasLedgerDisplayFormatter` tests |
+| CCR bailout not reusing OC bottom assumptions silently | **PASS** |
+
+---
+
+## J. Schedule-Aware Gas / Gas Ledger
+
+| Check | Status |
+|---|---|
+| Segment allocation | **PASS** — `ScheduleGasConsumptionServiceTests` |
+| Liters/bar separation | **PASS** — `GasLedgerDisplayFormatterTests` |
+| CCR diluent as OC consumption | **PASS** — blocked in CCR paths |
+
+---
+
+## K. Repetitive Dive / Residual Tissue
+
+| Check | Status |
+|---|---|
+| Explicit prior-dive selection | **PASS** |
+| No silent fresh-tissue fallback | **PASS** — validated in readiness tests |
+| Chronology / surface interval | **PASS** |
+
+---
+
+## L. Structured Equipment / Operational Checklist
+
+| Check | Status |
+|---|---|
+| Role mapping | **PASS** — `EquipmentPlannerMapperTests` |
+| Checklist generation | **PASS** — `EquipmentChecklistGeneratorTests` |
+| CCR checklist import/export round trip | **PASS** — coordinators + UI/UX remediation |
+
+---
+
+## M. Planner Briefing Card / Watch Transfer
+
+| Check | Status |
+|---|---|
+| Reference-only labeling | **PASS** — localized footer |
+| Freshness warnings | **PASS** — `PlannerBriefingFreshnessPolicy` |
+| Hash / size validation | **PASS** |
+| PNG/metadata fidelity | **PASS** — export tests |
+| `fileName` path sanitization | **FAIL** — MAIN-DCA-020 |
+| Non-atomic manifest swap on partial failure | **PARTIAL** — MAIN-DCA-021 |
+| Payload routing collision with photos | **PASS** when store attached |
+
+---
+
+## N. Watch Image Inventory / Delete
+
+| Check | Status |
+|---|---|
+| Watch source-of-truth | **PASS** |
+| Signed payloads | **PASS** |
+| Path traversal (photos) | **PASS** |
+| Delete ACK when session inactive | **FAIL** — MAIN-DCA-019 |
+| Bundled read-only | **PASS** |
+| Paired physical QA | **PENDING** |
+
+---
+
+## O. Cross-App Sync / Data Integrity
+
+**Fixed:** Watch parses iOS signed import ACK on `transferUserInfo` path.
+
+**Open:** iOS `importSessionPayload` uses `logStore?.add(session)` for non-significant updates — drops iPhone-edited notes/site/buddy when Watch re-syncs profile-compatible session.
+
+**Open:** Aggregate KVS size across keys (sessions, equipment, planner state, tombstones).
+
+**Trust model:** TOFU peer secret via `applicationContext`; HMAC v2 with optional persisted replay cache.
+
+---
+
+## P. Performance Analysis
+
+| Risk | Severity | Symptom | Priority |
 |---|---|---|---|
-| Per-sample active dive draft write | **HIGH** | `DiveManager.addSample` → `persistActiveDiveDraft()` | Disk I/O every depth tick; battery/flash wear |
-| Planner debounced recalculation | **LOW** | `PlannerStore.schedulePlanningUpdate` 200ms debounce | Acceptable; cache staleness is correctness not perf |
-| `redWarningBlink` timer toggle | **MEDIUM** | `DiveManager` ~2.2 Hz `redWarningBlink.toggle()` | SwiftUI invalidation during alarms |
-| CSV import full-string parse | **LOW** | `DiveImportService` | Bounded by import caps in tests |
-| Cloud sync status churn | **LOW** | `CloudSyncStore.publishDeferred` | Minor UI updates |
-| CCR chart rendering | **LOW** | SwiftUI charts with accessibility summaries | Acceptable on simulator |
+| Alarm blink `@Published` 1 Hz | MEDIUM | Extra SwiftUI work during alarms | P2 |
+| Briefing PNG render + transfer | LOW | Memory spike on large packages | P3 |
+| Planner debounced recompute 200 ms | LOW | Acceptable | P4 |
+| Tissue analytics chart rebuild | LOW | Chart data regen on tab change | P4 |
+
+Draft persistence throttling (**was HIGH**) is **closed**.
 
 ---
 
-## K. Security / Privacy Analysis
+## Q. Security / Privacy Analysis
 
-| Area | Status | Notes |
-|---|---|---|
-| Dive sync HMAC + nonce replay | **PASS** | Watch codec; iOS codec mirrored |
-| Signed import ACKs | **PASS** | Both platforms verify before dequeue |
-| Photo management signing | **PASS** | `CompanionPhotoManagementAuth` |
-| iOS KVS payload cap | **PASS** | `IOSAlgorithmConfiguration.maxSyncPayloadBytes` |
-| Watch KVS payload cap | **FAIL** | `Services/CloudSyncStore.swift` — no preflight |
-| PDF export protection | **PASS** | `.completeFileProtection` |
-| GPS privacy | **PASS** | No network upload; local/logbook only |
-| Peer secret in `applicationContext` | **MEDIUM** | Encrypted WC channel but broad exposure surface |
-| Replay cache persistence | **MEDIUM** | In-memory only; replays possible after relaunch until window expires |
-| Secret scanning | **PASS** | No keys/tokens in repo |
-| App Intents safety gate | **PASS** | Legal acceptance required |
+| Area | Status |
+|---|---|
+| HMAC v2 + signed ACKs | **PASS** |
+| Photo management auth | **PASS** |
+| Replay cache persistence (optional) | **PASS** |
+| Legacy sync v1 without nonce | **MEDIUM** — backward compat window |
+| Peer secret in `applicationContext` | **MEDIUM** — documented tradeoff |
+| Briefing unsigned + weak filename rules | **MEDIUM** |
+| GPS privacy (local only) | **PASS** |
+| iCloud opt-in (iOS) | **PASS** |
+| PDF complete file protection | **PASS** |
 
 ---
 
-## L. Test Coverage Analysis
+## R. Test Coverage Analysis
 
 | Suite | Passed | Skipped | Failed |
 |---|---:|---:|---:|
-| iOS Algorithm Tests (iPhone 17 Pro sim) | 554 | 13 | 0 |
-| Watch Algorithm Tests (Ultra 3 49mm sim) | 188 | 13 | 0 |
+| iOS Algorithm Tests | 821 | 13 | 0 |
+| Watch Algorithm Tests | 229 | 16 | 0 |
+| **Total** | **1,050** | **29** | **0** |
 
-**Strengths:** Planner mode projection, MOD validator, sync ACK policy, mission mode, CCR validator, UI/UX remediation tests (`UIUXRemediationV3AccessibilityTests`, `UIUXLocalizationRemediationTests`), `MainDeepCodeAuditRemediationTests`.
+**Strengths:** `MainDeepCodeRemediationDCATests` (both platforms), UI/UX V1.0 tests, planner MOD/switch-depth suites, sync ACK policy, CCR math remediation, mission mode, briefing receiver tests.
 
-**Gaps (missing or weak):**
+**Gaps:**
 
-- Watch inbound `diveImportAck` via `transferUserInfo` end-to-end
-- `EndManualDiveIntent` after manual→auto handoff
-- `liveMODIssues` mode-projected gating regression
-- `AnalysisCacheKey` SAC / planning-reference staleness
-- Watch `CloudSyncStore` oversized payload rejection
-- Active dive draft write frequency budget
-- Physical/external QA matrices (all **PENDING**)
-
----
-
-## M. Issue Matrix
-
-| ID | Severity | Priority | App | Area | File / Function | Title | User Impact | Sec/Perf Impact | Proposed Fix | Effort |
-|---|---|---|---|---|---|---|---|---|---|---|
-| MAIN-DCA-001 | HIGH | P1 | Watch | Sync | `Services/WatchSyncService.swift` `didReceiveUserInfo`; `WatchDiveSyncCodec` | Watch ignores inbound `diveImportAck` on userInfo path | Duplicate dive exports; stale pending queue | Data integrity | Add `parseImportAck` on Watch; handle ACK in `didReceiveUserInfo` like iOS | M |
-| MAIN-DCA-002 | HIGH | P1 | Watch | Cloud | `Services/CloudSyncStore.swift` `save` | No KVS payload size cap | Sync failures / KVS rejection at runtime | Perf/privacy | Mirror iOS `maxSyncPayloadBytes` preflight before write | S |
-| MAIN-DCA-003 | HIGH | P1 | Watch | Cloud | `Services/CloudSyncStore.swift` `load`/`save` | Legacy full sessions may populate KVS | Slow sync, quota exhaustion | Privacy | Migration to cap-compliant snapshots; reject oversize on load | M |
-| MAIN-DCA-004 | HIGH | P1 | iOS | Planner | `PlannerView.swift` `liveMODIssues` | MOD gate uses full draft not mode-projected input | Base/Deco calculate blocked incorrectly | Safety UX | Use `PlannerModePolicy.activePlanInput` before `liveInputIssues` | S |
-| MAIN-DCA-005 | HIGH | P1 | iOS | Planner | `PlannerStore.swift` `AnalysisCacheKey` | Cache omits SAC, planning ref, avg depth | Stale gas preview after SAC/depth ref change | Correctness | Extend cache key fields | S |
-| MAIN-DCA-006 | HIGH | P1 | Both | Merge | `Utils/DiveSessionMerge.swift` vs `iOSApp/Utils/DiveSessionMerge.swift` | Divergent merge implementations | Metadata loss on Watch cloud path | Data integrity | Unify or document single policy; port iOS fields to Watch | L |
-| MAIN-DCA-007 | HIGH | P1 | Watch | Runtime | `ActionButtonIntents.swift` `EndManualDiveIntent`; `DiveManager.endManualDive` | End intent no-op after manual→auto handoff | User cannot end dive via Action Button | Safety UX | End dive when `sessionStartedManually` even if `isManualLifecycleActive` false | S |
-| MAIN-DCA-008 | HIGH | P1 | Watch | Performance | `DiveManager.addSample` → `persistActiveDiveDraft` | Draft persisted every depth sample | Battery drain; UI jank risk | Performance | Throttle/coalesce draft writes (e.g. every N seconds) | M |
-| MAIN-DCA-009 | MEDIUM | P2 | Watch | Mission | `DiveManager.ActiveDiveDraft` | `missionModeManualPendingForSession` not persisted | Mission mode intent lost on crash mid-dive | UX/safety | Add field to draft schema v2 | M |
-| MAIN-DCA-010 | MEDIUM | P2 | iOS | Planner UI | `PlannerView.swift` ~2422 | Base result shows END value under "MOD" label | Misleading gas metrics | Safety UX | Change title to "END" or bind MOD field | S |
-| MAIN-DCA-011 | MEDIUM | P2 | iOS | Planner | `PlannerView.swift` altitude/salinity onChange | Env reclamp only in Technical UI | Stale switch depths in Base/Deco if env edited elsewhere | Safety | Call `clampAllSwitchDepthsToMOD` on env change for all modes | S |
-| MAIN-DCA-012 | MEDIUM | P2 | Watch | UI perf | `DiveManager` red warning blink timer | ~2.2 Hz SwiftUI toggle | Extra CPU during alarms | Performance | Reduce frequency or use animation API | S |
-| MAIN-DCA-013 | MEDIUM | P2 | Both | Security | `WatchSyncAuth.publishSharedSecretIfNeeded` | Peer secret in `applicationContext` | Broader secret exposure if context leaked | Security | Document threat model; consider message-only secret bootstrap | M |
-| MAIN-DCA-014 | MEDIUM | P2 | Both | Security | `SyncNonceReplayCache` | Replay cache in-memory only | Replay after relaunch within TTL | Security | Optional persisted replay window or monotonic issuedAt ledger | M |
-| MAIN-DCA-015 | MEDIUM | P2 | iOS | CCR | `CCRChecklistImportCoordinator` | Import ignores bailout switch depth reconciliation | Manual fix after import | CCR safety | Map switch depths through MOD validator on import | S |
-| MAIN-DCA-016 | LOW | P3 | iOS | Privacy | Photo staging temp files | Staging paths may lack complete protection | Forensic exposure window | Privacy | Apply complete protection to staged imports | S |
-| MAIN-DCA-017 | LOW | P3 | iOS | Hardening | `PlannerView.swift` table helper | Reachable `columnHeaders!` force unwrap | Crash on malformed table config | Stability | Safe index or empty fallback | S |
-| MAIN-DCA-018 | INFO | P1 | Both | QA process | All physical QA matrices | External QA not executed | Unknown real-device behavior | Release | Execute matrices; mark PENDING only | L |
+- End-to-end photo delete ACK when WCSession inactive
+- Briefing path traversal / partial manifest failure
+- Reminder suppression matrix (depth caution + ascent alarm disabled)
+- Aggregate KVS budget simulation
+- Paired Watch/iPhone E2E (documented out of scope for unit tests)
+- All physical QA matrices — **PENDING**
 
 ---
 
-## N. Detailed Action Plan
+## S. Issue Matrix
+
+| ID | Sev | Pri | App | Area | File / Function | Title | Status |
+|---|---|---|---|---|---|---|---|
+| MAIN-DCA-001 | HIGH | P1 | Watch | Sync | `WatchSyncService` userInfo ACK | Watch ignored inbound ACK on userInfo | **FIXED** |
+| MAIN-DCA-002 | HIGH | P1 | Watch | Cloud | `CloudSyncStore.save` | No per-key KVS cap | **FIXED** |
+| MAIN-DCA-003 | MEDIUM | P2 | Both | Cloud | Multi-key KVS writes | Legacy oversized snapshots | **OPEN** |
+| MAIN-DCA-004 | HIGH | P1 | iOS | Planner | `PlannerView.liveMODIssues` | MOD gate used full draft | **FIXED** |
+| MAIN-DCA-005 | HIGH | P1 | iOS | Planner | `AnalysisCacheKey` | Cache omitted SAC/planning ref | **FIXED** |
+| MAIN-DCA-006 | HIGH | P1 | Watch | Merge | `DiveSessionMerge` | Watch merge subset documented | **MITIGATED** — intentional; union samples |
+| MAIN-DCA-007 | HIGH | P1 | Watch | Runtime | `endManualDive` | End intent no-op after handoff | **FIXED** |
+| MAIN-DCA-008 | HIGH | P1 | Watch | Perf | `persistActiveDiveDraft` | Every-sample draft I/O | **FIXED** |
+| MAIN-DCA-009 | MEDIUM | P2 | Watch | Mission | `ActiveDiveDraft` | Mission pending not persisted | **FIXED** |
+| MAIN-DCA-010 | MEDIUM | P2 | iOS | Planner UI | Base results | END labeled MOD | **FIXED** |
+| MAIN-DCA-011 | HIGH | P1 | iOS | Sync | `WatchSyncService.importSessionPayload` | Metadata-only Watch sync overwrites iPhone edits | **OPEN** |
+| MAIN-DCA-012 | MEDIUM | P2 | Watch | Perf | `blinkTimer` | 1 Hz `@Published` blink | **OPEN** |
+| MAIN-DCA-013 | MEDIUM | P2 | Both | Security | `WatchSyncAuth` | Peer secret in applicationContext | **OPEN** |
+| MAIN-DCA-014 | MEDIUM | P2 | Both | Security | `SyncNonceReplayCache` | Replay persistence optional | **IMPROVED** |
+| MAIN-DCA-015 | MEDIUM | P2 | iOS | CCR | `CCRChecklistImportCoordinator` | Import switch depth | **FIXED** |
+| MAIN-DCA-016 | LOW | P3 | iOS | Privacy | Photo staging temps | Staging file protection | **OPEN** — verify staging paths |
+| MAIN-DCA-017 | LOW | P3 | iOS | Stability | Planner table helper | Force unwrap headers | **FIXED** — no `columnHeaders!` at HEAD |
+| MAIN-DCA-018 | INFO | P1 | Both | QA | External matrices | Physical QA not executed | **PENDING** |
+| MAIN-DCA-019 | HIGH | P1 | Watch | Sync/Photos | `deliverDeleteAck` | ACK skipped when session inactive | **OPEN** |
+| MAIN-DCA-020 | MEDIUM | P2 | Watch | Security | `PlannerBriefingCardStore` | Briefing `fileName` not sanitized | **OPEN** |
+| MAIN-DCA-021 | MEDIUM | P2 | Watch | Briefing | `importManifest` | Non-atomic package swap | **OPEN** |
+| MAIN-DCA-022 | MEDIUM | P2 | Watch | Runtime | `shouldSuppressDiveReminders` | Incomplete vs depth banners | **OPEN** |
+| MAIN-DCA-023 | LOW | P3 | iOS | Planner | `PlannerMODValidator.validateAll` | Deco-stop gas fallback dead path | **INFO** |
+| MAIN-DCA-024 | LOW | P3 | iOS | CCR | `CCRPlanValidator` | 0.5 m bailout MOD slack | **OPEN** — document or tighten |
+| MAIN-DCA-025 | HIGH | P1 | iOS | Cloud | `CloudSyncStore` multi-key | Aggregate KVS budget | **OPEN** |
+| MAIN-DCA-026 | LOW | P3 | iOS | Cloud | `CloudSyncStore.synchronize` | Success date before sync completes | **OPEN** |
+| MAIN-DCA-027 | MEDIUM | P2 | Both | Security | `WatchDiveSyncCodec` v1 | Legacy schema without nonce replay | **OPEN** |
+| MAIN-DCA-028 | LOW | P3 | iOS | Merge | `DiveSessionMerge` | `gasLabel` LWW only | **OPEN** |
+| MAIN-DCA-029 | LOW | P3 | Watch | Sync | `flushPendingTransfers` | Duplicate queue sends | **OPEN** |
+| MAIN-DCA-030 | LOW | P3 | iOS | Localization | `TissueAnalyticsCharts` | Hardcoded `"Time"` axis | **OPEN** |
+| MAIN-DCA-031 | INFO | P4 | Both | Localization | `.strings` catalogs | Legacy Italian-as-key aliases unused | **OPEN** — cleanup |
+| MAIN-DCA-032 | INFO | P3 | Watch | UX | Reminder deferral | Suppression visibility deferred | **DOCUMENTED** — UI/UX V1.0 |
+
+---
+
+## T. Detailed Action Plan
 
 ### P0
 
-No P0 blocker confirmed. Builds and algorithm tests pass.
+No compile blocker. Builds and 1,050 tests pass.
 
-### P1
+### P1 (recommended before internal TestFlight)
 
-1. **MAIN-DCA-004** — Mode-projected MOD gating  
-   - Files: `PlannerView.swift`, `PlannerMODValidator.swift`, tests  
-   - Order: Fix gating → add regression test (Technical gas hidden in Base)  
-   - Risk: Low  
-   - Acceptance: Base calculate works with stored Technical cylinders that are out of MOD for hidden gases  
-
-2. **MAIN-DCA-001** — Watch ACK on userInfo  
-   - Files: `WatchDiveSyncCodec.swift`, `WatchSyncService.swift`, sync tests  
-   - Order: Port `parseImportAck` → wire delegate → paired sim test  
-   - Risk: Medium sync regression  
-   - Acceptance: Pending queue drains when iOS ACK arrives via `transferUserInfo`  
-
-3. **MAIN-DCA-008** — Throttle draft persistence  
-   - Files: `DiveManager.swift`, performance tests  
-   - Order: Add coalescing → verify crash restore still within TTL  
-   - Risk: Medium data-loss if throttle too aggressive  
-   - Acceptance: Draft restore within configured max staleness; fewer writes per dive  
-
-4. **MAIN-DCA-007** — End manual dive after handoff  
-   - Files: `DiveManager.swift`, `ActionButtonIntents.swift`, intent tests  
-   - Acceptance: `EndManualDiveIntent` ends active dive started manually after submersion handoff  
-
-5. **MAIN-DCA-002 / MAIN-DCA-003** — Watch cloud payload cap  
-   - Files: `Services/CloudSyncStore.swift`, `IOSAlgorithmConfiguration` shared constant  
-   - Acceptance: Oversize save rejected; status message shown  
-
-6. **MAIN-DCA-005** — Analysis cache key completeness  
-   - Files: `PlannerStore.swift`, planner tests  
-   - Acceptance: SAC / planning reference changes invalidate preview  
-
-7. **MAIN-DCA-006** — Merge policy alignment  
-   - Files: both `DiveSessionMerge.swift` copies  
-   - Acceptance: Watch cloud merge preserves manual metadata or documents intentional subset  
-
-8. **MAIN-DCA-018** — Execute external QA (process)  
-   - No code change; evidence folders under `Docs/QA_EVIDENCE/`  
+1. **MAIN-DCA-011** — Merge Watch imports with `DiveSessionMerge.preferred` when profile-compatible, or expand `WatchSyncSessionDiff` to metadata fields.
+2. **MAIN-DCA-019** — Queue photo delete ACK/inventory until `WCSession` activated; retry on activation.
+3. **MAIN-DCA-025** — Track aggregate KVS bytes or move large blobs off KVS.
 
 ### P2
 
-- MAIN-DCA-009 mission draft field  
-- MAIN-DCA-010 MOD/END label  
-- MAIN-DCA-011 env reclamp all modes  
-- MAIN-DCA-012 blink frequency  
-- MAIN-DCA-013 peer secret threat model / hardening  
-- MAIN-DCA-014 replay persistence  
-- MAIN-DCA-015 CCR import switch depths  
+- MAIN-DCA-020 briefing filename sanitization  
+- MAIN-DCA-021 atomic briefing package swap  
+- MAIN-DCA-022 reminder suppression matrix alignment  
+- MAIN-DCA-012 reduce alarm blink churn  
+- MAIN-DCA-013 peer-secret threat model update  
+- MAIN-DCA-027 v1 sync deprecation timeline  
 
-### P3
+### P3 / P4
 
-- MAIN-DCA-016 photo staging protection  
-- MAIN-DCA-017 safe table headers  
-
-### P4
-
-- Documentation-only threat-model updates for sync/cloud  
-- Legacy alias cleanup (`GasMixCard` shim) if still present  
+- MAIN-DCA-024 CCR MOD tolerance alignment  
+- MAIN-DCA-030 tissue chart axis localization  
+- MAIN-DCA-031 legacy string catalog cleanup  
+- MAIN-DCA-018 execute external QA matrices (**PENDING** until evidence)
 
 ---
 
-## O. 7-Day Remediation Plan
+## U. 7-Day Remediation Plan
 
-| Day | Actions | Expected output | Verification |
-|---|---|---|---|
-| 1 | Fix MAIN-DCA-004, MAIN-DCA-005; add planner regression tests | Mode-correct MOD gating and cache | iOS algorithm tests |
-| 2 | Fix MAIN-DCA-001; extend sync tests | Watch ACK on userInfo | Paired simulator sync script |
-| 3 | Fix MAIN-DCA-007, MAIN-DCA-009 | Manual end + mission draft | Watch algorithm + intent tests |
-| 4 | Fix MAIN-DCA-008 with throttling | Reduced draft I/O | Performance log / unit budget test |
-| 5 | Fix MAIN-DCA-002/003, MAIN-DCA-010/011 | Cloud cap + planner labels | Cloud + planner tests |
-| 6 | P2 security/perf (MAIN-DCA-012–015) | Hardening pass | Targeted tests |
-| 7 | Full build/test + internal TestFlight checklist draft | Readiness note | Both schemes green |
-
----
-
-## P. 14-Day Remediation Plan
-
-| Days | Focus | Output |
+| Day | Actions | Verification |
 |---|---|---|
-| 1–3 | P1 planner + sync fixes | Green regression suite |
-| 4–6 | Watch runtime + cloud | Draft I/O + KVS cap |
-| 7–8 | CCR import hardening + merge alignment | CCR + merge tests |
-| 9–10 | Paired Watch/iPhone simulator QA | `WATCH_IOS_SYNC_QA_MATRIX` evidence |
-| 11–12 | iCloud two-device QA | `ICLOUD_TWO_DEVICE_QA_MATRIX` evidence |
-| 13 | Physical Watch Ultra QA | `WATCH_ULTRA_PHYSICAL_QA_MATRIX` — **PENDING until executed** |
-| 14 | Release dossier update | TestFlight gate checklists |
+| 1 | MAIN-DCA-011 metadata merge on Watch import | `WatchSyncConflictTests` + new merge test |
+| 2 | MAIN-DCA-019 queued delete ACK | Watch sync integration test |
+| 3 | MAIN-DCA-025 aggregate KVS budget | Cloud sync tests |
+| 4 | MAIN-DCA-020/021 briefing hardening | Watch briefing tests |
+| 5 | MAIN-DCA-022 reminder suppression | `DiveReminderIntegrationTests` matrix |
+| 6 | Paired simulator sync smoke | `WATCH_IOS_SYNC` evidence folder |
+| 7 | Full build + both test schemes | 1,050+ tests green |
 
 ---
 
-## Q. Pre-Internal-TestFlight Checklist
+## V. 14-Day Remediation Plan
 
-- [x] `xcodegen generate` passes on macOS
-- [x] `DIRDiving Watch App` builds (Ultra 3 simulator)
-- [x] `DIRDiving iOS` builds (iOS Simulator)
-- [x] Watch algorithm tests pass (188/188 executed, 13 skipped)
-- [x] iOS algorithm tests pass (554/554 executed, 13 skipped)
-- [ ] MAIN-DCA-001 Watch ACK userInfo fixed
-- [ ] MAIN-DCA-004 planner MOD gating fixed
-- [ ] MAIN-DCA-008 draft I/O throttled
-- [ ] Legal/safety onboarding blocks safety shortcuts until accepted
-- [ ] No experimental views in MAIN targets
-- [ ] No physical QA claimed as passed
+| Days | Focus |
+|---|---|
+| 1–4 | P1 sync/cloud/briefing fixes |
+| 5–7 | P2 performance + security hardening |
+| 8–10 | Paired Watch/iPhone + iCloud two-device QA (**evidence only — mark PENDING until done**) |
+| 11–12 | Physical Watch Ultra QA (**PENDING**) |
+| 13–14 | TestFlight / App Store checklist update |
 
 ---
 
-## R. Pre-External-TestFlight Checklist
+## W. Pre-Internal-TestFlight Checklist
 
-- [ ] All internal TestFlight items complete
-- [ ] Paired Watch/iPhone direct + queued sync both directions
-- [ ] Signed ACK rejection scenarios pass
-- [ ] Companion photo inventory/delete with signed payloads
-- [ ] iCloud opt-in/off/tombstone/conflict on two devices
-- [ ] Planner rapid-edit performance acceptable
-- [ ] Physical Watch Ultra QA — **PENDING**
-- [ ] App copy remains non-certified and reference-only
-
----
-
-## S. Pre-App-Store Checklist
-
-- [ ] All external TestFlight items complete
-- [ ] Physical QA evidence archived with device/OS versions
-- [ ] Subsurface import/export external validation — **PENDING**
-- [ ] Privacy manifest matches GPS, iCloud, logbook, image behavior
-- [ ] No certified dive-computer claims
-- [ ] Legal/safety disclaimers intact and localized (en/it verified in remediation)
-- [ ] No DEBUG simulation sensor in App Store release
-- [ ] Crash/performance telemetry from TestFlight reviewed
-- [ ] Final target membership and entitlements reviewed
+- [x] `xcodegen generate` passes
+- [x] Watch + iOS build succeed
+- [x] iOS tests: 821 passed, 13 skipped
+- [x] Watch tests: 229 passed, 16 skipped
+- [x] Prior MAIN-DCA-001/004/007/008 remediated with tests
+- [ ] MAIN-DCA-011 metadata merge fixed
+- [ ] MAIN-DCA-019 delete ACK queue fixed
+- [ ] MAIN-DCA-025 aggregate KVS budget addressed
+- [ ] No physical QA marked PASS without evidence
 
 ---
 
-## T. Recommended Cursor Remediation Commands
+## X. Pre-External-TestFlight Checklist
+
+- [ ] All internal items complete
+- [ ] Paired sync both directions with signed ACK rejection cases
+- [ ] Photo inventory/delete on paired simulators
+- [ ] iCloud two-device conflict matrix — **PENDING**
+- [ ] Watch Ultra physical QA — **PENDING**
+
+---
+
+## Y. Pre-App-Store Checklist
+
+- [ ] External TestFlight complete
+- [ ] Subsurface external validation — **PENDING**
+- [ ] App Store assets — **PENDING** (`Docs/QA_EVIDENCE/APP_STORE_MARKETING/`)
+- [ ] Privacy manifest matches behavior
+- [ ] Non-certified / reference-only copy verified EN/IT
+- [ ] No DEBUG simulation in release build
+
+---
+
+## Z. Recommended Cursor Remediation Commands
 
 Do not execute during this audit.
 
-### 1. Bug / Data-Integrity Fixes
+### 1. Bug / Data-Integrity Fixes (P1)
 
 ```text
-CURSOR COMMAND — DIR DIVING MAIN BUG/DATA-INTEGRITY FIX PASS
+CURSOR COMMAND — DIR DIVING MAIN DCA P1 BUG/DATA-INTEGRITY PASS
 
-Work only on branch main. Fix MAIN-DCA-001, MAIN-DCA-004, MAIN-DCA-005, MAIN-DCA-006, MAIN-DCA-007 from Docs/MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md. Preserve Watch dive algorithms, iOS Bühlmann math, planner mode architecture, CCR semantics, HMAC sync trust model, and legal disclaimers. Add focused regression tests. Run xcodegen, both builds, both algorithm test schemes. Report exact results.
+Work only on branch main. Fix MAIN-DCA-011, MAIN-DCA-019, MAIN-DCA-025 from Docs/MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md. Preserve algorithms, sync trust model, planner modes, CCR semantics. Add regression tests. Run xcodegen, both builds, both test schemes. Report results.
 ```
 
-### 2. Performance Optimization Pass
+### 2. Watch Briefing / Photo Sync Hardening
 
 ```text
-CURSOR COMMAND — DIR DIVING MAIN PERFORMANCE OPTIMIZATION PASS
+CURSOR COMMAND — DIR DIVING WATCH BRIEFING AND PHOTO ACK HARDENING
 
-Work only on branch main. Address MAIN-DCA-008 and MAIN-DCA-012. Throttle active-dive draft persistence without breaking crash restore. Reduce alarm blink SwiftUI churn. Add performance budget tests. Do not alter decompression or depth algorithms.
+Fix MAIN-DCA-020, MAIN-DCA-021, MAIN-DCA-019. Sanitize briefing filenames; atomic manifest swap; queue delete ACK until session active. Add Watch tests. Do not weaken HMAC photo management.
 ```
 
-### 3. Security / Privacy Hardening Pass
+### 3. Performance Optimization Pass
 
 ```text
-CURSOR COMMAND — DIR DIVING MAIN SECURITY/PRIVACY HARDENING PASS
+CURSOR COMMAND — DIR DIVING MAIN PERFORMANCE PASS
 
-Work only on branch main. Address MAIN-DCA-002, MAIN-DCA-003, MAIN-DCA-013, MAIN-DCA-014, MAIN-DCA-016. Add Watch KVS payload cap, optional replay persistence, photo staging file protection. Document peer-secret threat model. Add negative security tests.
+Address MAIN-DCA-012 alarm blink churn. Reduce SwiftUI invalidation during alarms without changing alarm semantics. Add budget test.
 ```
 
-### 4. Test Coverage Pass
+### 4. Security Hardening Pass
 
 ```text
-CURSOR COMMAND — DIR DIVING MAIN TEST COVERAGE PASS
+CURSOR COMMAND — DIR DIVING MAIN SECURITY HARDENING
 
-Work only on branch main. Add tests for: Watch userInfo ACK dequeue, planner mode-projected MOD gating, analysis cache SAC invalidation, EndManualDiveIntent after handoff, mission draft restore, Watch cloud oversize rejection. Update QA evidence READMEs only — mark physical gates PENDING until executed.
+Address MAIN-DCA-013, MAIN-DCA-027, MAIN-DCA-020. Document peer-secret threat model; plan v1 sync deprecation; sanitize briefing paths. Negative tests required.
 ```
 
-### 5. Planner MOD / Switch-Depth Remediation
+### 5. Reminder / Safety UX Alignment
 
 ```text
-CURSOR COMMAND — DIR DIVING PLANNER MOD/SWITCH-DEPTH REMEDIATION
+CURSOR COMMAND — DIR DIVING WATCH REMINDER SUPPRESSION ALIGNMENT
 
-Work only on branch main. Fix MAIN-DCA-004, MAIN-DCA-010, MAIN-DCA-011. Use PlannerModePolicy.activePlanInput for live MOD validation. Correct Base END/MOD labels. Reclamp switch depths on environment changes in all modes. Add MOD regression tests including O2 100% at PPO2 1.6 ≈ 6 m case.
+Fix MAIN-DCA-022. Extend shouldSuppressDiveReminders to match LiveDiveBannerPresentationPolicy critical states without weakening alarms. Add integration tests. Optionally surface deferred reminder state if safe.
 ```
 
-### 6. CCR / Rebreather Hardening
+### 6. Localization Cleanup
 
 ```text
-CURSOR COMMAND — DIR DIVING CCR HARDENING PASS
+CURSOR COMMAND — DIR DIVING LOCALIZATION CATALOG CLEANUP
 
-Work only on branch main. Address MAIN-DCA-015 and audit CCR checklist import/export round-trip. Reconcile bailout switch depths on import. Add CCR MOD tolerance tests. Do not enable Ratio Deco in CCR.
+Remove unused Italian-as-key aliases (MAIN-DCA-031). Localize tissue analytics chart axes (MAIN-DCA-030). EN/IT parity tests.
 ```
 
-### 7. Watch Image Inventory / Delete Hardening
+### 7. External QA Evidence Execution
 
 ```text
-CURSOR COMMAND — DIR DIVING WATCH PHOTO SYNC HARDENING
+CURSOR COMMAND — DIR DIVING EXTERNAL QA EVIDENCE EXECUTION
 
-Work only on branch main. Verify signed inventory/delete end-to-end on paired simulators. Add stale offset and replay tests. Document paired QA steps in WATCH_IOS_SYNC_QA_MATRIX.md. Mark physical QA PENDING.
-```
-
-### 8. Cloud Merge / iCloud Conflict Remediation
-
-```text
-CURSOR COMMAND — DIR DIVING CLOUD MERGE REMEDIATION
-
-Work only on branch main. Align Watch and iOS DiveSessionMerge policies (MAIN-DCA-006). Add Watch KVS cap (MAIN-DCA-002/003). Add two-device conflict tests. Preserve divergent-profile-no-fusion policy on iOS.
-```
-
-### 9. App Intent / Action Button Safety Remediation
-
-```text
-CURSOR COMMAND — DIR DIVING WATCH APP INTENTS SAFETY PASS
-
-Work only on branch main. Fix MAIN-DCA-007. Ensure EndManualDiveIntent works after manual→auto handoff. Verify legal gate on all safety intents. Add intent tests. Do not bypass legal acceptance.
+Execute matrices in Docs/QA_EVIDENCE/ (Watch Ultra, paired sync, iCloud, Dynamic Type/VoiceOver, Subsurface, Reference UI). Mark PASS only with attached evidence. Do not fabricate screenshots.
 ```
 
 ---
 
-## U. Final Verdict
+## AA. Final Verdict
 
 ### Is the code ready to compile?
 
-**Yes.** Watch and iOS builds succeeded at `dba1a22` on macOS with Xcode.
+**Yes.** Watch and iOS builds succeeded at `7c79105`.
 
 ### Is it safe for internal TestFlight?
 
-**Not yet.** Fix P1 issues MAIN-DCA-001, MAIN-DCA-004, MAIN-DCA-007, and MAIN-DCA-008 first; complete paired simulator sync smoke.
+**Conditionally yes** after P1 fixes (MAIN-DCA-011, MAIN-DCA-019, MAIN-DCA-025) and paired simulator smoke. Code quality materially improved since `dba1a22`.
 
 ### Is it safe for external TestFlight?
 
-**No.** Requires physical Watch Ultra QA, iCloud two-device QA, and P1 fixes above.
+**No.** Physical QA and P1 data-integrity fixes remain.
 
 ### Is it ready for App Store?
 
-**No.** Blocked by external QA, remaining HIGH issues, and final privacy/safety App Store review.
+**No.** Blocked by external QA, assets, and remaining HIGH sync/metadata issues.
 
 ### What blocks 100% code readiness?
 
-- Planner mode-projected MOD gating bug (MAIN-DCA-004)
-- Watch inbound ACK on userInfo (MAIN-DCA-001)
-- Per-sample draft I/O (MAIN-DCA-008)
-- Merge policy divergence (MAIN-DCA-006)
-- Physical/external QA not executed (MAIN-DCA-018)
+- Watch→iOS metadata overwrite (MAIN-DCA-011)
+- Photo delete ACK when inactive (MAIN-DCA-019)
+- Aggregate KVS budget (MAIN-DCA-025)
+- External QA not executed (MAIN-DCA-018)
 
 ### What blocks 100% CCR readiness?
 
-- CCR checklist import switch-depth reconciliation (MAIN-DCA-015)
-- External in-water / operational CCR QA (**PENDING**)
+- External in-water / reference validation (**PENDING**)
+- Optional bailout MOD tolerance alignment (MAIN-DCA-024)
 
-### What blocks 100% security readiness?
+### Are presentation layers faithful to canonical data?
 
-- Watch KVS uncapped writes (MAIN-DCA-002/003)
-- Peer secret in applicationContext (MAIN-DCA-013)
-- In-memory-only replay cache (MAIN-DCA-014)
+**Yes** — ascent/runtime/deco builders are presentation-only; tests confirm ordering and export gating.
 
-### What blocks 100% performance readiness?
+### Is Rock Bottom conservative and isolated?
 
-- Per-sample active dive draft persistence (MAIN-DCA-008)
-- Alarm blink SwiftUI churn (MAIN-DCA-012)
+**Yes** — separate from normal consumption; avg-depth toggle isolated.
+
+### Are briefing cards numerically faithful and reference-only?
+
+**Yes** — with freshness warnings; filename sanitization still needed (MAIN-DCA-020).
 
 ### What must be fixed first?
 
-1. **MAIN-DCA-004** — incorrect Calculate blocking in Base/Deco (user-visible, safety-adjacent)  
-2. **MAIN-DCA-001** — Watch pending queue not draining on iOS ACK userInfo path  
-3. **MAIN-DCA-007** — Action Button cannot end dive after manual handoff  
+1. **MAIN-DCA-011** — preserve iPhone logbook metadata on Watch re-sync  
+2. **MAIN-DCA-019** — reliable photo delete ACK delivery  
+3. **MAIN-DCA-025** — aggregate iCloud KVS budget guard  
 
 ---
 
-## Validation Notes
-
-Post-report validation:
+## AB. Validation Notes
 
 | Check | Result |
 |---|---|
 | Report file exists | Yes |
-| Report non-empty | Yes |
-| Issue matrix exists | Yes (Section M) |
-| Detailed action plan exists | Yes (Section N) |
+| Issue matrix exists | Yes (Section S) |
+| Action plan + roadmaps | Yes |
 | No source code modified | Yes — docs only |
-| `git status` | Only this report file expected |
-| Experimental files untouched | Yes |
-| Build/test claims | Only PASS where commands succeeded |
+| Build/test claims | PASS only where commands succeeded |
 | Physical/external QA | **PENDING** — not passed |
 
 ---
 
-*End of audit report — `dba1a22` — 2026-06-09*
+*End of audit report — `7c79105` — 2026-06-14*

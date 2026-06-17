@@ -1,4 +1,7 @@
 import SwiftUI
+#if os(watchOS)
+import WatchKit
+#endif
 
 /// **Screen intent (Watch MAIN):** in-water dashboard — depth hero, TTV/RunTime summary, ascent gauge, stopwatch, lifecycle controls.
 /// Visual target: black canvas, neon accents, rounded panels (`Docs/ReferenceUI/Watch_LIVE_reference.png`).
@@ -20,7 +23,7 @@ struct DiveLiveView: View {
     }
 
     private var depthReadoutStyle: DepthSafetyReadoutStyle {
-        DepthSafetyReadoutStyle.forState(depthSafetyState, redWarningBlink: dive.redWarningBlink)
+        DepthSafetyReadoutStyle.forState(depthSafetyState, alarmBlinkHighlight: false)
     }
 
     private var missionModeProfile: MissionModeRuntimeProfile {
@@ -79,7 +82,7 @@ struct DiveLiveView: View {
                 }
             }
         }
-        .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.18) : nil, value: dive.redWarningBlink)
+        .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.18) : nil, value: dive.alarmBlinkActive)
         .onChange(of: hapticsEnabled) { _, _ in
             dive.resyncHapticsAfterPreferenceChange()
         }
@@ -217,9 +220,18 @@ struct DiveLiveView: View {
                 isDepthAutomationMockFallbackActive: dive.isDepthAutomationMockFallbackActive,
                 isSimulationDepthActive: dive.isSimulationDepthActive,
                 showsAutoDiveHint: dive.isDepthAutomationAvailable && !dive.isManualLifecycleActive,
-                showsManualHandoffNote: dive.manualStartHandedOffToAutomatic
+                showsManualHandoffNote: dive.manualStartHandedOffToAutomatic,
+                isCompactLayout: isCompactWatchLayout
             )
         )
+    }
+
+    private var isCompactWatchLayout: Bool {
+        #if os(watchOS)
+        WKInterfaceDevice.current().screenBounds.width <= 176
+        #else
+        false
+        #endif
     }
 
     @ViewBuilder
@@ -273,9 +285,13 @@ struct DiveLiveView: View {
                     depthSection(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
                         .layoutPriority(2)
                 }
-                stopwatchPanel
-                controls
-                    .layoutPriority(1)
+                if !presentation.deferStopwatchPanel {
+                    stopwatchPanel
+                }
+                if !presentation.deferControlsPanel {
+                    controls
+                        .layoutPriority(1)
+                }
             }
         }
         .scrollIndicators(.hidden)
@@ -284,6 +300,7 @@ struct DiveLiveView: View {
     }
 
     private func shouldPrioritizeDepthHero(for presentation: LiveDiveBannerPresentationPolicy.Output) -> Bool {
+        if presentation.prioritizeDepthAndRuntime { return true }
         let criticalCount = [
             presentation.showAscentBanner,
             presentation.showDepthSafetyBanner,
@@ -690,7 +707,21 @@ struct DiveLiveView: View {
     }
 
     private var depthReadout: some View {
-        let style = depthReadoutStyle
+        Group {
+            if dive.alarmBlinkActive {
+                TimelineView(.periodic(from: .now, by: 1.0)) { context in
+                    depthReadoutContent(
+                        alarmBlinkHighlight: Int(context.date.timeIntervalSinceReferenceDate) % 2 == 0
+                    )
+                }
+            } else {
+                depthReadoutContent(alarmBlinkHighlight: false)
+            }
+        }
+    }
+
+    private func depthReadoutContent(alarmBlinkHighlight: Bool) -> some View {
+        let style = DepthSafetyReadoutStyle.forState(depthSafetyState, alarmBlinkHighlight: alarmBlinkHighlight)
         let depthDisplay = WatchDepthFormatting.display(meters: dive.currentDepthMeters, units: unitPreference)
         let depthOpacity = dive.isDepthDataStale ? 0.72 : 1.0
         return VStack(spacing: 0) {
@@ -926,7 +957,12 @@ struct DiveLiveView: View {
     }
 
     private var ttvText: String {
-        Formatters.one(dive.ttv).replacingOccurrences(of: ".", with: ",")
+        let formatter = NumberFormatter()
+        formatter.locale = Locale.current
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = 1
+        formatter.maximumFractionDigits = 1
+        return formatter.string(from: NSNumber(value: dive.ttv)) ?? Formatters.one(dive.ttv)
     }
 
     private var runtimeMinutes: String {

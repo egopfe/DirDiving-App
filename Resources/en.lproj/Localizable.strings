@@ -181,7 +181,6 @@
 "Derivato prof. media + runtime; non safety/NDL" = "From avg depth + runtime; not safety/NDL";
 "Imperiale non selezionabile finche la conversione Watch non e implementata. Export sempre metrico/Subsurface." = "Imperial not selectable until Watch conversion is implemented. Export always metric/Subsurface.";
 "Autorizzato, in attesa fix" = "Authorized, awaiting fix";
-"Fix disponibile" = "Fix available";
 "Permesso negato: abilita da iPhone" = "Permission denied: enable on iPhone";
 "Richiesto al primo uso" = "Requested on first use";
 "Stato permesso sconosciuto" = "Unknown permission state";
@@ -218,7 +217,6 @@
 "TTV informativo derivato da profondita media e durata; non e un valore decompressivo o time to surface." = "Informative TTV from average depth and duration; not a decompression value or time to surface.";
 "TTV sessione %@, runtime %@" = "Session TTV %@, runtime %@";
 "Nessuna schermata o immagine di riferimento e inclusa in questa build." = "No reference screen or image is included in this build.";
-"Bussola pronta" = "Compass ready";
 "Bussola attiva" = "Compass active";
 "Bussola non disponibile" = "Compass unavailable";
 "Permesso posizione negato" = "Location permission denied";
@@ -626,6 +624,14 @@
 "settings.row.sync_diagnostics.title" = "Sync diagnostics";
 "settings.row.sync_diagnostics.subtitle" = "Queue, retries, and reference info";
 "settings.section.reference" = "REFERENCE";
+"watch.planner_briefing.title" = "Planner Briefing";
+"watch.planner_briefing.empty.title" = "No briefing received";
+"watch.planner_briefing.empty.message" = "Send a briefing from the iOS Planner.";
+"watch.planner_briefing.delete" = "Delete Briefing";
+"watch.planner_briefing.ref_only" = "REF ONLY";
+"watch.planner_briefing.incomplete_format" = "Incomplete package: %lld of %lld cards available.";
+"watch.planner_briefing.session_format" = "Plan session %@";
+"watch.sync.planner_briefing.received" = "Planner briefing received";
 "settings.row.language.title" = "Language";
 "settings.row.units.title" = "Units";
 "settings.row.units.metric" = "Metric (m)";
@@ -830,3 +836,34 @@
 "alarms.a11y.row_format" = "%@, %@, %@";
 "alarms.a11y.stepper.decrease" = "Decrease";
 "alarms.a11y.stepper.increase" = "Increase";
+
+/* UI/UX audit remediation V1.0 2026-06-02 */
+"watch.gps.status.available" = "Fix available";
+"watch.gps.status.searching" = "Searching for fix";
+"watch.gps.status.permission_denied" = "GPS permission denied";
+"watch.gps.status.permission_pending" = "GPS permission pending";
+"watch.gps.status.unavailable" = "GPS unavailable";
+"watch.gps.status.disabled" = "GPS disabled";
+"watch.compass.status.ready" = "BUSSOLA ready";
+"watch.compass.status.active" = "BUSSOLA active";
+"watch.compass.status.calibrating" = "BUSSOLA calibrating";
+"watch.compass.status.calibration_required" = "Calibrate BUSSOLA";
+"watch.compass.status.unavailable" = "BUSSOLA unavailable";
+"watch.compass.status.permission_denied" = "BUSSOLA permission denied";
+"watch.compass.status.permission_pending" = "BUSSOLA permission pending";
+"watch.compass.status.interference" = "BUSSOLA interference";
+"watch.compass.status.no_heading" = "No heading available";
+"watch.compass.status.unknown" = "BUSSOLA status unknown";
+"watch.planner_briefing.freshness.old" = "Briefing may be outdated — verify before the dive.";
+"watch.planner_briefing.freshness.session_mismatch" = "Briefing may not match the current planned session.";
+"watch.planner_briefing.freshness.incomplete" = "Briefing package is incomplete.";
+"watch.planner_briefing.freshness.unsupported" = "Briefing metadata is unsupported.";
+"watch.planner_briefing.freshness.a11y" = "Briefing warning: %@";
+"briefing.reference_only.footer" = "DIR DIVING — REFERENCE ONLY";
+"user_images.info.bundled_readonly" = "Bundled images are read-only reference photos.";
+"user_images.info.uploaded_deletable" = "Uploaded images can be deleted and sync with iPhone.";
+"user_images.info.dive_active_note" = "Image management is limited during an active dive.";
+"user_images.type.bundled" = "Bundled";
+"user_images.type.uploaded" = "Uploaded";
+"user_images.count.format" = "%lld images";
+"user_images.count.a11y" = "%lld images available";

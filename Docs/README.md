@@ -4,7 +4,7 @@ Copyright Federico Lombardo di Monte Iato 2026
 
 DIR DIVING is a SwiftUI **watchOS + iOS companion** project (XcodeGen) for Apple Watch Ultra-class devices and iPhone. The stable **`main`** branch delivers **Diving mode** on Watch (depth, ascent awareness, **BUSSOLA**, log, GPS surface entry/exit, Subsurface CSV) plus the iOS companion (logbook, planner, equipment, analysis, sync). Snorkeling, Apnea, and Buddy Assist live on **experimental** branches only.
 
-**Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](INDEX.md) · **Baseline:** `main` = `origin/main` @ **`0569903`** (deep-code remediation MAIN-DCA-001…018). Run `xcodegen generate` before Xcode.
+**Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](INDEX.md) · **Baseline:** `main` = `origin/main` @ **`99ea74a`** (deep-code remediation V1.0 MAIN-DCA-011…031). Run `xcodegen generate` before Xcode.
 
 ## Safety and limitations (MAIN)
 
@@ -20,11 +20,15 @@ DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent 
 - Run `./Scripts/validate_main_release_readiness.sh` before release.
 - Full workflow: [`Docs/BUILD_AND_XCODEGEN_WORKFLOW.md`](BUILD_AND_XCODEGEN_WORKFLOW.md).
 
-### Stato corrente (`main` = `origin/main`, 2026-06-09)
+### Stato corrente (`main` = `origin/main`, 2026-06-14)
 
 | Pass | Commit | Contenuto |
 |------|--------|-----------|
-| **Deep code analysis remediation (MAIN-DCA)** | `0569903` | MAIN-DCA-001…018 — planner MOD/cache, Watch sync ACK/replay, cloud cap, merge, DiveManager draft, CCR import, photo protection — [`MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT.md) |
+| **Docs / branch alignment** | docs pass | INDEX, README, CSV, branch policy @ `99ea74a` — [`DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md) |
+| **Deep code analysis remediation V1.0 (MAIN-DCA)** | `99ea74a` | MAIN-DCA-011…031 — metadata merge, photo ACK queue, aggregate KVS, alarm blink, briefing sanitize/swap, reminder suppression, sync flush, l10n — [`MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_V1.0.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_V1.0.md) |
+| **Deep code analysis audit (read-only)** | `009855e` | Audited @ `7c79105` — [`MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md) |
+| **UI/UX audit remediation V1.0** | `7c79105` | Internal code readiness 100% — [`UI_UX_MAIN_AUDIT_REMEDIATION_REPORT_V1.0.md`](UI_UX_MAIN_AUDIT_REMEDIATION_REPORT_V1.0.md) |
+| **Deep code analysis remediation (MAIN-DCA prior)** | `0569903` | MAIN-DCA-001…018 — planner MOD/cache, Watch sync ACK/replay, cloud cap, merge, DiveManager draft, CCR import, photo protection — [`MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT.md) |
 | **Deep code analysis audit (read-only)** | `a2733d2` | Post UI/UX remediation @ `dba1a22` — [`MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md) |
 | **UI/UX audit remediation** | `dba1a22` | P1–P3 localization, a11y, CCR checklist import, sync badge, locale dates — [`UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md`](UI_UX_MAIN_AUDIT_REMEDIATION_REPORT.md) |
 | **UI/UX audit (read-only)** | `b7b6e93` | MAIN UI/UX accessibility and release readiness — [`UI_UX_MAIN_AUDIT_CURRENT.md`](UI_UX_MAIN_AUDIT_CURRENT.md) |
@@ -215,7 +219,7 @@ Le istruzioni di build sono in [`Docs/BUILD_VALIDATION.md`](BUILD_VALIDATION.md)
 - **`codex/experimental-features`**: Watch sperimentale (Snorkeling Live, mappe waypoint/ritorno, Apnea workflow esteso, Buddy Assist, ecc.). Non importare questi file nel target MAIN senza revisione esplicita.
 - **`codex/ios-experimental-features`**: iOS sperimentale (surface Snorkeling/Apnea/Buddy/exploration concepts). Isolato da App Store candidate su `main`.
 - **Allineamenti UI-only** su `main`: possono toccare layout, copy, accessibilità e documentazione **senza** modificare algoritmi di decompressione, modello gas, calcoli TTV/TTR/SAC/CNS/OTU, sampling sensori o regole di sync — vedi [`Docs/MAIN_UX_COMPLETION_REPORT.md`](MAIN_UX_COMPLETION_REPORT.md).
-- **HEAD `main` consigliato** per release candidate Watch+iOS unificato: **`0569903`**. Baseline funzionale cumulativa: UI/UX remediation (`dba1a22`), deep-code analysis remediation MAIN-DCA (`0569903`), prior deep-code pass (`a69bc4b`), UI/UX code 100% (`8c7d6e6` / `c8f91f6`), planner gas (`a36dc23`), sync/input refresh (`d962117`), control strategy (`72fa15b`), Watch photo ACK + management (`fc311be`), iOS photo labels (`90dc3f5`). `main-iOS` resta worktree storico divergente: non riallineare codice senza review dedicata.
+- **HEAD `main` consigliato** per release candidate Watch+iOS unificato: **`99ea74a`**. Baseline funzionale cumulativa: UI/UX remediation V1.0 (`7c79105`), deep-code audit @ `7c79105` (`009855e`), deep-code remediation V1.0 MAIN-DCA-011…031 (`99ea74a`), prior MAIN-DCA-001…018 (`0569903`), UI/UX prior pass (`dba1a22`), deep-code pass (`a69bc4b`), planner gas (`a36dc23`), sync/input refresh (`d962117`), control strategy (`72fa15b`), Watch photo ACK + management (`fc311be`). `main-iOS` resta worktree storico divergente: non riallineare codice senza review dedicata.
 - **UI-only / documentazione**: non alterare Diving mode, GPS surface-only, **BUSSOLA** (mai COMPASSO), export Subsurface, sync HMAC, onboarding legale.
 
 ### Matrice funzionalità (CSV)
@@ -781,7 +785,7 @@ Panoramica italiana estesa: [`Docs/PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.
 
 La strategia branch corrente e:
 
-- `main`: codice stabile @ **`0569903`**, orientato alla produzione Apple Watch + companion iOS nello stesso workspace, con Diving mode preservato come funzione primaria.
+- `main`: codice stabile @ **`99ea74a`**, orientato alla produzione Apple Watch + companion iOS nello stesso workspace, con Diving mode preservato come funzione primaria.
 - `main-iOS`: ramo/worktree storico divergente, utile per review manuali ma non canonico per la candidata release MAIN.
 - `codex/experimental-features`: ramo Apple Watch per UI e funzioni sperimentali Snorkeling, Apnea, Buddy Assist e schermate future.
 - `codex/ios-experimental-features`: ramo iOS per companion UI, pianificazione, mappe, enrichment POI e superfici sperimentali.
