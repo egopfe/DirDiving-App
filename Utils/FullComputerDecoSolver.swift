@@ -85,7 +85,8 @@ enum FullComputerDecoSolver {
         projection: BuhlmannRuntimeProjection,
         depthMeters: Double
     ) -> Bool {
-        if let ndl = projection.ndlMinutes, ndl > decoCeilingEpsilonMeters {
+        _ = depthMeters
+        if let ndlMinutes = projection.ndlMinutes, ndlMinutes > 0 {
             return false
         }
         if !projection.stops.isEmpty { return true }

@@ -18,6 +18,8 @@ States: `approachingStop`, `holdingStop`, `tooShallow`, `tooDeep`, `ceilingViola
 
 Timer remaining time follows Bühlmann model minutes while `holdingStop`; frozen when suspended.
 
+**QA note (Audit 02):** the stop countdown is **projection-synchronized**, not a wall-clock stopwatch. During `holdingStop`, `stopRemainingSeconds` tracks `nextStopMinutes` from the solver refreshed each engine tick. Physical QA scripts must not expect independent chronometer behaviour.
+
 ## UI (mockup-aligned)
 
 - Deco mode hides manual stopwatch and Start/Stop/Reset.

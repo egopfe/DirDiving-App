@@ -64,6 +64,11 @@ struct FullComputerDecoStopMachineOutput: Hashable {
 }
 
 /// Operational stop state machine for Full Computer decompression UI.
+///
+/// Stop remaining time is **model-synchronized**: `stopRemainingSeconds` comes from the
+/// Bühlmann projection (`nextStopMinutes`) refreshed on each engine tick while `holdingStop`.
+/// It is **not** a separate wall-clock stopwatch. When the diver leaves the valid depth
+/// window (`tooShallow` / `tooDeep`), remaining time is frozen at the last model value.
 enum FullComputerDecoStopStateMachine {
     static func evaluate(
         input: FullComputerDecoStopMachineInput,
