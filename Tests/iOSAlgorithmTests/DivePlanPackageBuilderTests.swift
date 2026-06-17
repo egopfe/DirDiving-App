@@ -21,6 +21,24 @@ final class DivePlanPackageBuilderTests: XCTestCase {
         XCTAssertEqual(package.body.plannerSummary.planKind, "single")
     }
 
+    func testBuilderExcludesTravelAndBailoutRoles() throws {
+        var input = GasPlanInput()
+        input.ensurePlannerCylindersFromLegacy()
+        input.gfLow = 30
+        input.gfHigh = 70
+        input.plannedDepthMeters = 40
+        input.plannedBottomMinutes = 20
+        let package = try DivePlanPackageBuilder.build(
+            input: input,
+            plan: nil,
+            modeLabel: "Deco",
+            planID: UUID(),
+            revision: 1
+        )
+        XCTAssertFalse(package.body.gases.contains(where: { $0.role == .travel }))
+        XCTAssertFalse(package.body.gases.contains(where: { $0.role == .bailout }))
+    }
+
     func testTransferSupportRoundTripPayload() throws {
         let body = DivePlanPackageBody(
             schemaVersion: 1,

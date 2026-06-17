@@ -1,7 +1,20 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` = `origin/main` @ **`401198d`**
+**Branch consigliato:** `main` = `origin/main` @ **`401198d`** (post-remediation: aggiornare dopo commit)
+
+---
+
+## Aggiornamento indice 2026-06-17 — Remediation V1.0 Full Computer multigas / sync / recovery
+
+Chiusura finding P2/P3 Audit 03: Policy A travel/bailout, test suite store/recovery/namespace, hardening import store.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit** | [`AUDIT_FULL_COMPUTER_MULTIGAS_SYNC_RECOVERY_CURRENT.md`](AUDIT_FULL_COMPUTER_MULTIGAS_SYNC_RECOVERY_CURRENT.md) |
+| **Remediation** | [`FULL_COMPUTER_MULTIGAS_SYNC_RECOVERY_REMEDIATION_REPORT_V1.0.md`](FULL_COMPUTER_MULTIGAS_SYNC_RECOVERY_REMEDIATION_REPORT_V1.0.md) |
+| **Policy** | Travel/bailout **Policy A** — schema v1 invariato |
+| **Test** | Watch 508 (0 fail), iOS 933 (0 fail) |
 
 ---
 

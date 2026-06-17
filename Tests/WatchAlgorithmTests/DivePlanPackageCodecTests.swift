@@ -46,6 +46,33 @@ final class DivePlanPackageCodecTests: XCTestCase {
         XCTAssertEqual(profile.gfHigh, 70)
         XCTAssertEqual(profile.bottomGas.oxygenFraction, 0.18, accuracy: 0.001)
         XCTAssertEqual(profile.decoGases.count, 1)
+        XCTAssertTrue(profile.travelGases.isEmpty)
+        XCTAssertTrue(profile.bailoutGases.isEmpty)
+    }
+
+    func testCanonicalChecksumDeterministic() throws {
+        let body = sampleBody(revision: 6)
+        let first = try DivePlanPackageCodec.checksum(for: body)
+        let second = try DivePlanPackageCodec.checksum(for: body)
+        XCTAssertEqual(first, second)
+    }
+
+    func testChecksumChangesWhenCanonicalFieldChanges() throws {
+        let body = sampleBody(revision: 7)
+        let original = try DivePlanPackageCodec.checksum(for: body)
+        var changed = body
+        changed.gfHigh = 75
+        let updated = try DivePlanPackageCodec.checksum(for: changed)
+        XCTAssertNotEqual(original, updated)
+    }
+
+    func testExactExpiryBoundaryRejected() throws {
+        var body = sampleBody(revision: 8)
+        body.expiresAt = Date()
+        let package = try DivePlanPackageCodec.seal(body)
+        XCTAssertThrowsError(try DivePlanPackageCodec.validate(package, now: Date().addingTimeInterval(1))) { error in
+            XCTAssertEqual(error as? DivePlanPackageValidationError, .expired)
+        }
     }
 
     private func sampleBody(revision: Int, planID: UUID = UUID()) -> DivePlanPackageBody {
