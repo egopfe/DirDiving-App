@@ -5,7 +5,7 @@
 | Campo | Valore |
 |-------|--------|
 | Data | 2026-06-17 |
-| Commit `HEAD` | `da957f4` (Audit 04 baseline; aggiornare a ogni upload TestFlight) |
+| Commit `HEAD` | `50633bf` (aggiornare a ogni upload TestFlight) |
 | Esecutore | Automated release-hard + Audit 04 (`validate_full_computer_release_readiness.sh`) |
 | Audit gate | [`AUDIT_FULL_COMPUTER_RELEASE_GATE_CURRENT.md`](AUDIT_FULL_COMPUTER_RELEASE_GATE_CURRENT.md) — **GO WITH CONDITIONS** |
 
