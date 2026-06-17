@@ -1,7 +1,7 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` = `origin/main` @ **`3b50353`**
+**Branch consigliato:** `main` = `origin/main` @ **`b8b277d`**
 
 ---
 
@@ -13,7 +13,7 @@ Audit finale indipendente post-Commands 11–12. Nessuna modifica al codice.
 |-------|--------|
 | **Comando** | `04_AUDIT_FULL_COMPUTER_RELEASE_GATE.md` |
 | **Report** | [`AUDIT_FULL_COMPUTER_RELEASE_GATE_CURRENT.md`](AUDIT_FULL_COMPUTER_RELEASE_GATE_CURRENT.md) |
-| **Baseline** | `main` @ **`3b50353`** |
+| **Baseline** | `main` @ **`b8b277d`** |
 | **Readiness interna** | **96%** |
 | **Decisione** | **GO WITH CONDITIONS** — produzione esterna **NO-GO** (QA fisica PENDING) |
 | **Prerequisites** | Audit 01–03 + remediation V1.0 **PASS** |
