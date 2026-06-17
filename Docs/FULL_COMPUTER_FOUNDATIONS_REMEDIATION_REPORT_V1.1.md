@@ -3,7 +3,7 @@
 **Date:** 2026-06-17  
 **Authoritative audit:** `Docs/AUDIT_FULL_COMPUTER_FOUNDATIONS_CURRENT.md` (Audit 01, 2026-06-17)  
 **Starting `main` SHA:** `8dbb896`  
-**Branch:** `main` (direct remediation — no integration branch)
+**Ending `main` SHA:** `84ca0cf` (before doc SHA line update; commit includes this report)
 
 ---
 
@@ -195,7 +195,7 @@ Simulators: iPhone 17 Pro, Apple Watch Ultra 3 (49mm).
 | Field | Value |
 |-------|-------|
 | Commit message | `fix: complete Full Computer foundations remediation` |
-| Commit SHA | *(filled after commit)* |
+| Commit SHA | `84ca0cf` |
 | Push | `origin/main` |
 | Final alignment | local `HEAD` == `origin/main` |
 
