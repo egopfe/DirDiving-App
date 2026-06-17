@@ -1,8 +1,20 @@
 import Foundation
 
-/// One-shot flag: after legal onboarding acceptance, land on Planner mode selection.
+/// One-shot flags for post-legal Companion landing coordination.
 enum IOSCompanionPostLegalEntry {
     private static var pendingPlannerModeSelectionLanding = false
+    private static var pendingActivitySelectionLanding = false
+    private static var pendingApneaLanding = false
+
+    static func markPendingActivitySelection() {
+        pendingActivitySelectionLanding = true
+    }
+
+    static func consumePendingActivitySelection() -> Bool {
+        let pending = pendingActivitySelectionLanding
+        pendingActivitySelectionLanding = false
+        return pending
+    }
 
     static func markPendingPlannerLanding() {
         pendingPlannerModeSelectionLanding = true
@@ -14,9 +26,21 @@ enum IOSCompanionPostLegalEntry {
         return pending
     }
 
+    static func markPendingApneaLanding() {
+        pendingApneaLanding = true
+    }
+
+    static func consumePendingApneaLanding() -> Bool {
+        let pending = pendingApneaLanding
+        pendingApneaLanding = false
+        return pending
+    }
+
     #if DEBUG
     static func resetForTesting() {
         pendingPlannerModeSelectionLanding = false
+        pendingActivitySelectionLanding = false
+        pendingApneaLanding = false
     }
     #endif
 }

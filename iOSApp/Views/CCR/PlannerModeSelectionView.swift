@@ -8,7 +8,7 @@ struct PlannerModeSelectionView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
                     VStack(alignment: .leading, spacing: 7) {
-                        Text(DIRIOSLocalizer.string("Planner"))
+                        Text(DIRIOSLocalizer.string("tab.planner"))
                             .dirScreenTitleStyle()
                         Text(DIRIOSLocalizer.string("planner.mode_selection.subtitle"))
                             .dirScreenSubtitleStyle()

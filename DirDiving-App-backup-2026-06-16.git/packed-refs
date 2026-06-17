@@ -1,0 +1,24 @@
+# pack-refs with: peeled fully-peeled sorted 
+5e38e05efc8fc1e749b4107547873ea750ee3f06 refs/heads/backup/main-stable-2026-06-16
+d35e137b3f92dbcf90aaecaffa236140cf9b7ada refs/heads/codex/experimental-features
+bb9e88f750ccb1443275ea12da1c3d11b918fa09 refs/heads/codex/ios-experimental-features
+276c30000e0e5f8fbdb7dabc62a2186b18baa192 refs/heads/codex/main-full-code-security-audit-current
+b5167eec67f07409cc27085b2a2580fd0a9c14dd refs/heads/codex/watch-main-algorithm-audit-current
+5e38e05efc8fc1e749b4107547873ea750ee3f06 refs/heads/main
+e6593ce740a4de6598701f2aeef5cd802983ca0f refs/heads/main-iOS
+152723c891d4d87ab8b7fd1e1793e9fb05bac160 refs/pull/1/head
+b5167eec67f07409cc27085b2a2580fd0a9c14dd refs/pull/10/head
+c34665272cca32ecb737d12b6666abcc59975556 refs/pull/10/merge
+1f779e974b578c3b19837eb4b2331da6138f8f54 refs/pull/11/head
+885dd501bd00f7a8337a97127858c5451424fdd8 refs/pull/2/head
+52fb6fcc534864c34e5fb6b21b8ccde7c40bbcc7 refs/pull/3/head
+9c1f4a00db8bf8bd0294c29a06650129dcaf6c8e refs/pull/4/head
+476071acf69dbbff0b5d82e1b8f1660a7c97e980 refs/pull/5/head
+b31bcc7f788352d42875b05ae5a17c48fe0bd109 refs/pull/6/head
+81a454b27267f54752c984e133819ed475cd7714 refs/pull/7/head
+d35e137b3f92dbcf90aaecaffa236140cf9b7ada refs/pull/8/head
+31858e5f03b818a4abd4eaa8e576ac31f7ac479d refs/pull/8/merge
+bb9e88f750ccb1443275ea12da1c3d11b918fa09 refs/pull/9/head
+cd3fce0ce2d4eeb8caa82aebc37e6b51905ac8b5 refs/pull/9/merge
+eab43d3d1de5702cf9e56bfba2518fdf55fc6967 refs/tags/pre-macro-development-2026-06-16
+^5e38e05efc8fc1e749b4107547873ea750ee3f06

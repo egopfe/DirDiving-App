@@ -4,6 +4,7 @@ struct MoreView: View {
     @EnvironmentObject private var watchSync: WatchSyncService
     @EnvironmentObject private var cloudSync: CloudSyncStore
     @EnvironmentObject private var logStore: DiveLogStore
+    @EnvironmentObject private var companionActivity: CompanionActivityPreferenceStore
     @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
     @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
     @AppStorage(IOSPressureUnitPreference.storageKey) private var pressureUnitRaw = IOSPressureUnitPreference.storageValue(for: .bar)
@@ -81,6 +82,7 @@ struct MoreView: View {
                             }
                             .buttonStyle(.plain)
                         }
+                        companionActivitySection
                         DIRCard(DIRIOSLocalizer.string("more.section.sync_watch"), icon: "applewatch", accent: DIRTheme.cyan) {
                             row(DIRIOSLocalizer.string("more.sync.supported"), watchSync.isSupported ? DIRIOSLocalizer.string("more.yes") : DIRIOSLocalizer.string("more.no"))
                             row(DIRIOSLocalizer.string("more.sync.state"), watchSync.userVisibleState)
@@ -427,6 +429,43 @@ struct MoreView: View {
                     Divider().overlay(DIRTheme.hairline)
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private var companionActivitySection: some View {
+        DIRCard(DIRIOSLocalizer.string("companion.settings.activity.title"), icon: "figure.water.fitness", accent: DIRTheme.cyan) {
+            row(
+                DIRIOSLocalizer.string("companion.settings.activity.current"),
+                companionActivity.localizedCurrentActivityTitle()
+            )
+            if let note = companionActivity.watchActiveSessionNote {
+                Text(note)
+                    .font(.caption)
+                    .foregroundStyle(DIRTheme.yellow)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Button {
+                companionActivity.requestActivitySelectionFromSettings()
+            } label: {
+                Label(
+                    DIRIOSLocalizer.string("companion.settings.activity.change"),
+                    systemImage: "arrow.triangle.2.circlepath"
+                )
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(DIRTheme.cyan)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.vertical, 6)
+            }
+            .buttonStyle(.plain)
+            Toggle(
+                DIRIOSLocalizer.string("companion.settings.activity.showAtLaunch"),
+                isOn: Binding(
+                    get: { companionActivity.preference.showActivitySelectionAtLaunch },
+                    set: { companionActivity.setShowActivitySelectionAtLaunch($0) }
+                )
+            )
+            .tint(DIRTheme.cyan)
         }
     }
 
