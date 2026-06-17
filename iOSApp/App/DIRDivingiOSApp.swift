@@ -11,6 +11,16 @@ struct DIRDivingiOSApp: App {
     @StateObject private var legalAcceptance = LegalAcceptanceStore()
     @StateObject private var plannerAscentSpeedSettingsStore = PlannerAscentSpeedSettingsStore()
     @StateObject private var plannerBriefingTransfer = PlannerBriefingWatchTransferService()
+    @StateObject private var divePlanPackageTransfer = DivePlanPackageWatchTransferService()
+    @StateObject private var companionActivity = CompanionActivityPreferenceStore()
+    @StateObject private var apneaNavigation = IOSApneaNavigationStore()
+    @StateObject private var apneaProfileStore = IOSApneaProfileStore()
+    @StateObject private var apneaPlannerStore = IOSApneaPlannerStore()
+    @StateObject private var apneaLogbookStore = IOSApneaLogbookStore()
+    @StateObject private var apneaSettingsStore = IOSApneaSettingsStore()
+    @StateObject private var apneaWatchTransfer = IOSApneaWatchTransferService()
+    @StateObject private var apneaEquipmentStore = IOSApneaEquipmentStore()
+    @StateObject private var apneaBuddySafetyStore = IOSApneaBuddySafetyStore()
     @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
 
     init() {
@@ -31,6 +41,10 @@ struct DIRDivingiOSApp: App {
                         IOSLegalOnboardingView(
                             languageCode: DIRIOSAppLanguage.fromStorage(appLanguage).resolvedLanguageCode
                         )
+                    } else if companionActivity.shouldPresentSelectionScreen {
+                        IOSCompanionActivitySelectionView()
+                    } else if companionActivity.selectedMode == .apnea {
+                        IOSApneaRootView()
                     } else {
                         ContentView()
                             .id(appLanguage)
@@ -47,12 +61,24 @@ struct DIRDivingiOSApp: App {
             .environmentObject(legalAcceptance)
             .environmentObject(plannerAscentSpeedSettingsStore)
             .environmentObject(plannerBriefingTransfer)
+            .environmentObject(divePlanPackageTransfer)
+            .environmentObject(companionActivity)
+            .environmentObject(apneaNavigation)
+            .environmentObject(apneaProfileStore)
+            .environmentObject(apneaPlannerStore)
+            .environmentObject(apneaLogbookStore)
+            .environmentObject(apneaSettingsStore)
+            .environmentObject(apneaWatchTransfer)
+            .environmentObject(apneaEquipmentStore)
+            .environmentObject(apneaBuddySafetyStore)
             .environment(\.locale, DIRIOSAppLanguage.fromStorage(appLanguage).locale)
             .preferredColorScheme(.dark)
             .task {
                 logStore.attachWatchSync(watchSync)
-                watchSync.activate(logStore: logStore)
+                watchSync.activate(logStore: logStore, apneaLogbookStore: apneaLogbookStore)
                 watchSync.plannerBriefingTransferService = plannerBriefingTransfer
+                watchSync.divePlanPackageTransferService = divePlanPackageTransfer
+                watchSync.apneaWatchTransferService = apneaWatchTransfer
             }
         }
     }

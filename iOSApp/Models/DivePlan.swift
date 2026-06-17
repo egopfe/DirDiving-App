@@ -19,15 +19,7 @@ struct DecoStop: Identifiable, Hashable {
     }
 }
 
-enum DiveSegmentKind: String, CaseIterable, Identifiable, Codable {
-    case descent = "Discesa"
-    case bottom = "Fondo"
-    case ascent = "Risalita"
-    case stop = "Sosta"
-    case gasSwitch = "Gas switch"
-
-    var id: String { rawValue }
-
+extension DiveSegmentKind {
     /// User-facing runtime row label for planner/CCR schedule presentation.
     var runtimeRowTitle: String {
         switch self {

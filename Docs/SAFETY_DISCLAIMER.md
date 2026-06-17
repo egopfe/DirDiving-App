@@ -70,7 +70,17 @@ Il planner e la schermata risultato devono mantenere avvisi in-app visibili. Il 
 
 ## Rami sperimentali
 
-Apnea, Snorkeling (Live, Mappa Waypoint, Mappa Ritorno, POI), Buddy Assist e concept iOS **non** fanno parte del target MAIN (`project.yml` esclude i file). Non promuovere in release production senza review esplicita.
+Apnea (integrazione su `integration/full-computer`), Snorkeling (Live, Mappa Waypoint, Mappa Ritorno, POI), Buddy Assist e concept iOS **non** fanno parte del target MAIN (`project.yml` esclude i file). Non promuovere in release production senza review esplicita.
+
+### Apnea (`integration/full-computer`)
+
+- Training/logbook companion per apnea — **non** computer subacqueo certificato e **non** sistema di soccorso.
+- **Nessun** rilevamento blackout, ipossia o assenza di movimento: non promettere queste funzioni in marketing o UI.
+- Il promemoria buddy sul Watch e la checklist iOS **non** sostituiscono un buddy fisico in acqua; l'app **non** fornisce monitoraggio remoto di soccorso (`apnea.ios.buddy.disclaimer`).
+- Con sensore profondità degradato o non disponibile, l'avvio sessione Apnea sul Watch è **bloccato** (stato `sensorDegraded`).
+- Sessioni con qualità dati degradata sono escluse dai record personali per default.
+- Feature flag: `ExperimentalFeatures.apneaIntegrationEnabled`.
+- Vedi [`APNEA_ARCHITECTURE.md`](APNEA_ARCHITECTURE.md) e [`DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md`](DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md).
 
 ---
 

@@ -43,4 +43,20 @@ struct MonotonicElapsedClock: Equatable {
         lastElapsed = max(lastElapsed, resolved)
         return lastElapsed
     }
+
+    struct Snapshot: Codable, Equatable, Hashable {
+        let anchorDate: Date?
+        let anchorUptime: TimeInterval?
+        let lastElapsed: TimeInterval
+    }
+
+    func exportSnapshot() -> Snapshot {
+        Snapshot(anchorDate: anchorDate, anchorUptime: anchorUptime, lastElapsed: lastElapsed)
+    }
+
+    mutating func restore(from snapshot: Snapshot) {
+        anchorDate = snapshot.anchorDate
+        anchorUptime = snapshot.anchorUptime
+        lastElapsed = snapshot.lastElapsed
+    }
 }

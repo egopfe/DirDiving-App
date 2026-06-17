@@ -4,6 +4,7 @@ struct ContentView: View {
     @EnvironmentObject private var navigation: AppNavigationStore
     @EnvironmentObject private var dive: DiveManager
     @EnvironmentObject private var imageStore: UserImageStore
+    @EnvironmentObject private var activitySelection: DIRActivitySelectionStore
     @AppStorage(WatchNavigationHints.crownHintDismissedKey) private var crownHintDismissed = false
     @State private var showLaunchDisclaimer = CompanionDisclaimerAcceptance.requiresDisplay
 
@@ -61,6 +62,36 @@ struct ContentView: View {
         .animation(.easeInOut(duration: 0.22), value: navigation.underwaterNavigationToast)
         .animation(.easeInOut(duration: 0.22), value: crownHintDismissed)
         .launchCompanionDisclaimer(isPresented: $showLaunchDisclaimer)
+        .onAppear {
+            if !activitySelection.sessionConfigured, !activitySelection.isStartupFlowActive {
+                activitySelection.beginColdLaunch()
+            }
+        }
+        .fullScreenCover(isPresented: startupFlowPresented) {
+            StartupFlowView()
+                .environmentObject(navigation)
+                .environmentObject(dive)
+                .environmentObject(activitySelection)
+        }
+        .overlay(alignment: .bottom) {
+            if let toast = activitySelection.modeChangeBlockedToast {
+                navigationToast(toast)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .animation(.easeInOut(duration: 0.22), value: activitySelection.modeChangeBlockedToast)
+    }
+
+    private var startupFlowPresented: Binding<Bool> {
+        Binding(
+            get: { activitySelection.isStartupFlowActive },
+            set: { isPresented in
+                if !isPresented, activitySelection.isStartupFlowActive {
+                    // Startup flow dismisses only through explicit completion paths.
+                    return
+                }
+            }
+        )
     }
 
     private func navigationToast(_ message: String) -> some View {

@@ -61,11 +61,11 @@ enum CCRPlannerBriefingExportSupport {
                 value: "\(Formatters.one(input.setpointProfile.lowSetpoint)) / \(Formatters.one(input.setpointProfile.highSetpoint)) @ \(Formatters.depth(input.setpointProfile.switchDepthMeters, units: unitPreference).text)"
             ),
             PlannerBriefingSummaryExportRow(
-                label: DIRIOSLocalizer.string("planner.tts"),
+                label: DIRIOSLocalizer.string("planner.metric.tts"),
                 value: "\(plan.ttsMinutes) min"
             ),
             PlannerBriefingSummaryExportRow(
-                label: DIRIOSLocalizer.string("planner.runtime"),
+                label: DIRIOSLocalizer.string("planner.metric.runtime"),
                 value: "\(plan.totalRuntimeMinutes) min"
             ),
             PlannerBriefingSummaryExportRow(

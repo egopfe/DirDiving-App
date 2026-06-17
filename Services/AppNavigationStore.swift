@@ -15,19 +15,12 @@ final class AppNavigationStore: ObservableObject {
 
     init() {
         Self.shared = self
-        // Defensive clamp for MAIN: mode selection stays unreachable when only Diving is stable.
-        if WatchModeSelectionPreferences.skipWhenSingleMode, !WatchModeSelectionPreferences.hasMultipleStableModes {
-            selectedPage = .live
-        }
+        selectedPage = .live
     }
 
     /// Keeps `TabView` selection valid when optional pages are removed from the hierarchy.
     func clampSelectedPage() {
-        if selectedPage == .modeSelection,
-           WatchModeSelectionPreferences.skipWhenSingleMode,
-           !WatchModeSelectionPreferences.hasMultipleStableModes {
-            selectedPage = .live
-        }
+        // Mode selection tab remains available when `hasMultipleStableModes` is true.
     }
 
     func presentExportCompletion(fileName: String, exportURL: URL?) {

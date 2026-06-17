@@ -8,9 +8,11 @@ import WatchKit
 struct DiveLiveView: View {
     @EnvironmentObject private var dive: DiveManager
     @EnvironmentObject private var watchSync: WatchSyncService
+    @EnvironmentObject private var activitySelection: DIRActivitySelectionStore
     @AppStorage(HapticService.hapticsEnabledKey) private var hapticsEnabled = true
     @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
     @State private var showResetStopwatchConfirmation = false
+    @State private var showRuntimeGasList = false
 
     private var unitPreference: DIRUnitPreference { DIRUnitPreference.fromStorage(watchUnits) }
 
@@ -28,6 +30,29 @@ struct DiveLiveView: View {
 
     private var missionModeProfile: MissionModeRuntimeProfile {
         dive.missionModeRuntimeProfile
+    }
+
+    private var isFullComputerMode: Bool {
+        activitySelection.selectedDivingMode == .fullComputer
+    }
+
+    private var fullComputerPresentation: FullComputerDecoPresentation? {
+        dive.fullComputerSnapshot?.decoPresentation
+    }
+
+    private var fullComputerHidesManualControls: Bool {
+        isFullComputerMode && (fullComputerPresentation?.hideManualStopwatch == true)
+    }
+
+    private var showsGaugeTTV: Bool {
+        DIRStartupSelectionPolicy.gaugeShowsTTV
+    }
+
+    private var gaugePresentation: GaugeLivePresentationPolicy {
+        GaugeLivePresentationPolicy.evaluate(
+            isGaugeMode: activitySelection.selectedDivingMode == .gauge,
+            showsTTV: showsGaugeTTV
+        )
     }
 
     private var showsMissionModeControl: Bool {
@@ -52,6 +77,9 @@ struct DiveLiveView: View {
                 VStack(spacing: 7) {
                     if watchSync.pendingTransferCount > 0 || watchSync.failedTransferCount > 0 {
                         syncStatusStrip
+                    }
+                    if dive.isFullComputerRecoveryActive, dive.isDiveActive {
+                        fullComputerRecoveryBanner
                     }
                     if dive.isDiveActive {
                         activeDiveContent(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
@@ -81,10 +109,37 @@ struct DiveLiveView: View {
                     dive.dismissDiveReminderOverlay()
                 }
             }
+
+            if isFullComputerMode,
+               dive.isDiveActive,
+               case .available(let prompt) = dive.fullComputerSnapshot?.gasSwitchSurface {
+                Color.black.opacity(0.94)
+                    .ignoresSafeArea()
+                FullComputerGasSwitchAvailableView(
+                    prompt: prompt,
+                    onIgnore: {
+                        dive.ignoreFullComputerGasSwitch(gasMixId: prompt.suggestedGasMixId)
+                    },
+                    onConfirm: {
+                        dive.confirmFullComputerGasSwitch(gasMixId: prompt.suggestedGasMixId)
+                    }
+                )
+            }
         }
         .animation(missionModeProfile.animationsEnabled ? .easeInOut(duration: 0.18) : nil, value: dive.alarmBlinkActive)
         .onChange(of: hapticsEnabled) { _, _ in
             dive.resyncHapticsAfterPreferenceChange()
+        }
+        .onChange(of: dive.fullComputerSnapshot?.decoPresentation) { _, presentation in
+            FullComputerDecoHapticCoordinator.shared.handlePresentationChange(presentation)
+        }
+        .onChange(of: dive.fullComputerSnapshot?.gasSwitchSurface) { _, surface in
+            if case .available = surface {
+                HapticService.shared.notify()
+            }
+        }
+        .sheet(isPresented: $showRuntimeGasList) {
+            FullComputerRuntimeDecoGasListView()
         }
         .confirmationDialog(String(localized: "live.stopwatch.reset.confirm.title"), isPresented: $showResetStopwatchConfirmation, titleVisibility: .visible) {
             Button(String(localized: "live.stopwatch.reset.confirm.action"), role: .destructive) {
@@ -122,6 +177,40 @@ struct DiveLiveView: View {
                         .stroke((watchSync.failedTransferCount > 0 ? DiveUI.yellow : DiveUI.cyan).opacity(0.65), lineWidth: 1)
                 )
         )
+    }
+
+    private var fullComputerRecoveryBanner: some View {
+        HStack(spacing: 7) {
+            Image(systemName: "arrow.counterclockwise.circle.fill")
+                .font(.system(size: 14, weight: .black))
+            Text(String(localized: "watch.full_computer.recovery_active"))
+                .font(DiveUI.Typography.warningTitle)
+                .lineLimit(2)
+                .minimumScaleFactor(0.85)
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(DiveUI.orange)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(DiveUI.orange.opacity(0.12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .stroke(DiveUI.orange.opacity(0.65), lineWidth: 1)
+                )
+        )
+        .accessibilityLabel(recoveryAccessibilityLabel)
+        .accessibilityHint(String(localized: "watch.full_computer.recovery_active.a11y"))
+    }
+
+    private var recoveryAccessibilityLabel: String {
+        if let diagnostic = dive.draftRecoveryDiagnostic,
+           !diagnostic.isEmpty {
+            return "\(String(localized: "watch.full_computer.recovery_active")). \(diagnostic)"
+        }
+        return String(localized: "watch.full_computer.recovery_active")
     }
 
     private func gpsConfirmationBanner(_ confirmation: DiveGPSConfirmation) -> some View {
@@ -279,16 +368,39 @@ struct DiveLiveView: View {
                 } else if !prioritizeDepthHero {
                     secondaryNoticeViews(presentation: presentation)
                 }
-                ttvRuntimePanel
+                gaugeTopMetricsPanel
                     .layoutPriority(2)
+                if isFullComputerMode, let presentation = fullComputerPresentation {
+                    if let gas = presentation.activeGasLabel, presentation.mode == .decompression {
+                        Button {
+                            showRuntimeGasList = true
+                        } label: {
+                            FullComputerActiveGasBadge(gasLabel: gas)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    if case .missed(let missed) = dive.fullComputerSnapshot?.gasSwitchSurface {
+                        FullComputerGasSwitchMissedPanel(
+                            prompt: missed,
+                            onContinue: { dive.dismissFullComputerMissedGasSwitch() },
+                            onChangeGas: { showRuntimeGasList = true }
+                        )
+                    }
+                    if presentation.showCeilingViolationBanner {
+                        FullComputerCeilingViolationBanner()
+                    }
+                    if presentation.showDecoProgressPanel {
+                        FullComputerDecoStopStatePanel(presentation: presentation, units: unitPreference)
+                    }
+                }
                 if !prioritizeDepthHero {
                     depthSection(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
                         .layoutPriority(2)
                 }
-                if !presentation.deferStopwatchPanel {
+                if !presentation.deferStopwatchPanel, !fullComputerHidesManualControls {
                     stopwatchPanel
                 }
-                if !presentation.deferControlsPanel {
+                if !presentation.deferControlsPanel, !fullComputerHidesManualControls {
                     controls
                         .layoutPriority(1)
                 }
@@ -565,15 +677,44 @@ struct DiveLiveView: View {
 
     private var immersionStatus: some View {
         HStack(spacing: 8) {
-            Image(systemName: "water.waves")
+            Image(systemName: immersionStatusIcon)
                 .font(.system(size: 18, weight: .black))
-            Text(dive.isManualLifecycleActive ? String(localized: "live.status.manual_dive") : String(localized: "live.status.in_dive"))
+            Text(immersionStatusText)
                 .font(DiveUI.Typography.statusTitle)
-                .lineLimit(1)
+                .lineLimit(2)
                 .minimumScaleFactor(0.8)
             Spacer(minLength: 0)
         }
-        .foregroundStyle(DiveUI.green)
+        .foregroundStyle(immersionStatusColor)
+        .accessibilityLabel(immersionStatusText)
+    }
+
+    private var immersionStatusIcon: String {
+        if isFullComputerMode, let presentation = fullComputerPresentation {
+            switch presentation.immersionAccent {
+            case .ceilingViolation: return "exclamationmark.triangle.fill"
+            case .decompression: return "water.waves"
+            case .diving: return "water.waves"
+            }
+        }
+        return "water.waves"
+    }
+
+    private var immersionStatusText: String {
+        if dive.isManualLifecycleActive {
+            return String(localized: "live.status.manual_dive")
+        }
+        if isFullComputerMode, let presentation = fullComputerPresentation {
+            return String(localized: String.LocalizationValue(presentation.immersionStatusKey))
+        }
+        return String(localized: "live.status.in_dive")
+    }
+
+    private var immersionStatusColor: Color {
+        if isFullComputerMode, let presentation = fullComputerPresentation {
+            return FullComputerLivePanelStyle.immersionColor(presentation.immersionAccent)
+        }
+        return DiveUI.green
     }
 
     private var simulationDepthBadge: some View {
@@ -639,6 +780,22 @@ struct DiveLiveView: View {
         .accessibilityHint(String(localized: "a11y.watch.haptics_off_badge.hint"))
     }
 
+    @ViewBuilder
+    private var gaugeTopMetricsPanel: some View {
+        if isFullComputerMode, let presentation = fullComputerPresentation {
+            FullComputerTopMetricsPanel(presentation: presentation)
+        } else {
+            switch gaugePresentation.topPanel {
+            case .hidden:
+                EmptyView()
+            case .ttvAndRuntime:
+                ttvRuntimePanel
+            case .runtimeAndTemperature:
+                gaugeRuntimeTemperaturePanel
+            }
+        }
+    }
+
     private var ttvRuntimePanel: some View {
         HStack(spacing: 0) {
             dashboardValue(title: String(localized: "live.metric.ttv"), value: ttvText, unit: nil, color: DiveUI.green)
@@ -667,6 +824,44 @@ struct DiveLiveView: View {
             String(format: String(localized: "live.a11y.ttv_runtime"), ttvText, runtimeMinutes)
         )
         .accessibilityHint(String(localized: "live.a11y.ttv_hint"))
+    }
+
+    private var gaugeRuntimeTemperaturePanel: some View {
+        HStack(spacing: 0) {
+            dashboardValue(
+                title: String(localized: "live.metric.runtime"),
+                value: runtimeMinutes,
+                unit: "min",
+                color: .white
+            )
+            Rectangle()
+                .fill(.white.opacity(0.34))
+                .frame(width: 1, height: 54)
+            dashboardValue(
+                title: String(localized: "live.metric.temperature"),
+                value: temperatureValueOnly,
+                unit: temperatureUnitOnly,
+                color: DiveUI.blue
+            )
+        }
+        .frame(maxWidth: .infinity, minHeight: 70)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.black.opacity(0.42))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .stroke(DiveUI.cyan.opacity(0.55), lineWidth: 1.2)
+                )
+        )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(
+            String(
+                format: String(localized: "live.a11y.runtime_temperature"),
+                runtimeMinutes,
+                temperatureText
+            )
+        )
+        .accessibilityHint(String(localized: "live.a11y.gauge_non_deco_hint"))
     }
 
     private func dashboardValue(title: String, value: String, unit: String?, color: Color) -> some View {
@@ -946,6 +1141,17 @@ struct DiveLiveView: View {
                         .stroke(DiveUI.yellow.opacity(0.7), lineWidth: 1)
                 )
         )
+    }
+
+    private var temperatureValueOnly: String {
+        guard let temp = dive.currentTemperatureCelsius else { return "--.-" }
+        let display = unitPreference.temperatureDisplay(celsius: temp)
+        return Formatters.one(display.value)
+    }
+
+    private var temperatureUnitOnly: String {
+        guard dive.currentTemperatureCelsius != nil else { return "" }
+        return unitPreference.temperatureUnitLabel
     }
 
     private var temperatureText: String {
