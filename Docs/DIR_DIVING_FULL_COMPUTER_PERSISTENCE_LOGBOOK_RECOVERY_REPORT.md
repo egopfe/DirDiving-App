@@ -24,6 +24,7 @@
 
 ### Tests
 - `Tests/WatchAlgorithmTests/FullComputerRecoveryCheckpointTests.swift` — round-trip, checksum, merge, accumulator.
+- **V1.0 remediation:** `FullComputerGasSwitchRecoveryIntegrationTests` — crash-mid-switch, ignored/unavailable/off-plan restore paths.
 
 ## Files
 - `Utils/FullComputerRuntimeCheckpoint.swift`

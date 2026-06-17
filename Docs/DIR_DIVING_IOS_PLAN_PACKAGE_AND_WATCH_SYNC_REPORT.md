@@ -20,8 +20,9 @@ Structured Full Computer operational plan transfer from iOS planner to Watch, se
 ## Watch import
 
 - `DivePlanPackageWatchReceiver` validates checksum, schema, GF, gases, expiry.
-- `FullComputerImportedPlanStore` atomic local persistence, idempotent checksum tracking, revision ordering.
+- `FullComputerImportedPlanStore` atomic local persistence, idempotent checksum tracking, revision ordering; **equal revision + different checksum fails closed**.
 - `FullComputerImportedPlanView` — summary, **VERIFICA GAS**, **ATTIVA PIANO** (maps to `FullComputerPrediveConfigurationStore`).
+- **Policy A:** package import maps bottom+deco only; activation preserves Watch-native travel/bailout arrays.
 
 ## iOS UI
 
