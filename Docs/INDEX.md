@@ -1,7 +1,22 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` = `origin/main` @ **`a5392c5`** (pre–Audit 02 doc commit)  
+**Branch consigliato:** `main` = `origin/main` @ **`5b842e1`**
+
+---
+
+## Aggiornamento indice 2026-06-17 — Audit 03 Full Computer multigas / sync / recovery
+
+Read-only audit su `main`: modelli multigas, sync piano iOS→Watch, gas switch runtime, checkpoint recovery (Commands 07–10). Nessuna modifica al codice.
+
+| Campo | Valore |
+|-------|--------|
+| **Comando** | `03_AUDIT_FULL_COMPUTER_MULTIGAS_SYNC_RECOVERY.md` |
+| **Report** | [`AUDIT_FULL_COMPUTER_MULTIGAS_SYNC_RECOVERY_CURRENT.md`](AUDIT_FULL_COMPUTER_MULTIGAS_SYNC_RECOVERY_CURRENT.md) |
+| **Verdict** | **PASS** — gate Command 11 (FC scope) |
+| **Prerequisites** | Audit 01–02 **PASS** |
+
+---  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
 
