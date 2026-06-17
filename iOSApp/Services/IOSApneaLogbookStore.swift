@@ -20,6 +20,32 @@ final class IOSApneaLogbookStore: ObservableObject {
         ApneaLogbookStatistics.aggregate(from: sessions, range: range)
     }
 
+    func session(id: UUID) -> ApneaSession? {
+        sessions.first { $0.id == id }
+    }
+
+    func personalRecords(options: ApneaRecordEligibilityOptions = .default) -> ApneaPersonalRecordsSummary {
+        ApneaPersonalRecordsEngine.compute(from: sessions, options: options)
+    }
+
+    func charts(for session: ApneaSession) -> ApneaSessionChartsModel {
+        ApneaSessionChartBuilder.build(from: session)
+    }
+
+    func diveMetrics(for session: ApneaSession) -> [ApneaDiveMetrics] {
+        var offset = 0.0
+        return session.dives.enumerated().map { index, dive in
+            let before = dive.recoveryBefore?.completedSeconds ?? dive.recoveryBefore?.plannedSeconds ?? 0
+            offset += before
+            let diveStart = offset
+            let metrics = ApneaDiveAnalytics.metrics(for: dive, diveIndex: index, sessionOffsetSeconds: diveStart)
+            offset = diveStart + dive.durationSeconds
+            let after = dive.recoveryAfter?.completedSeconds ?? dive.recoveryAfter?.plannedSeconds ?? 0
+            offset += after
+            return metrics
+        }
+    }
+
     func reload() {
         load()
     }

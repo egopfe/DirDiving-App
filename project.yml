@@ -396,11 +396,13 @@ targets:
       - iOSApp/Services/IOSApneaSettingsStore.swift
       - iOSApp/Services/IOSApneaWatchTransferService.swift
       - iOSApp/Utils/IOSApneaDashboardPresentation.swift
+      - iOSApp/Utils/IOSApneaLogbookPresentation.swift
       - Tests/WatchAlgorithmTests/ApneaDomainModelTests.swift
       - Tests/WatchAlgorithmTests/ApneaLifecycleEngineTests.swift
       - Tests/WatchAlgorithmTests/ApneaOperationalEventEngineTests.swift
       - Tests/WatchAlgorithmTests/ApneaTimeRecoveryCheckpointEngineTests.swift
       - Tests/iOSAlgorithmTests/IOSApneaCompanionTests.swift
+      - Tests/iOSAlgorithmTests/IOSApneaLogbookAnalyticsTests.swift
       - Tests/iOSAlgorithmTests/IOSCompanionActivitySelectionTests.swift
       - Tests/iOSAlgorithmTests/BuhlmannComprehensiveReadinessV3RemediationTests.swift
     resources:

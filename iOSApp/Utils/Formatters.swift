@@ -147,6 +147,13 @@ enum Formatters {
         }
     }
 
+    static func temperatureValue(_ celsius: Double, units: IOSUnitPreference) -> Double {
+        switch units {
+        case .metric: return celsius
+        case .imperial: return IOSUnitConversions.fahrenheit(fromCelsius: celsius)
+        }
+    }
+
     static func optionalTemperature(_ celsius: Double?, units: IOSUnitPreference) -> String {
         guard let celsius else {
             switch units {
