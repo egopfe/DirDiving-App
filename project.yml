@@ -73,6 +73,7 @@ targets:
       - Utils/FullComputerMockupReferenceMatrix.swift
       - Utils/FullComputerPrediveReadiness.swift
       - Utils/FullComputerReleaseHardTolerances.swift
+      - Utils/FullComputerWatchArchitectureGuard.swift
       - Utils/ApneaMockupReferenceMatrix.swift
       - Utils/ApneaReleaseHardTolerances.swift
       - Utils/ApneaReleaseSelfCheck.swift
@@ -246,6 +247,7 @@ targets:
       - Utils/FullComputerMockupReferenceMatrix.swift
       - Utils/FullComputerPrediveReadiness.swift
       - Utils/FullComputerReleaseHardTolerances.swift
+      - Utils/FullComputerWatchArchitectureGuard.swift
       - Utils/ApneaMockupReferenceMatrix.swift
       - Utils/ApneaReleaseHardTolerances.swift
       - Utils/ApneaReleaseSelfCheck.swift

@@ -54,6 +54,23 @@ final class DIRModesAndStartupFlowTests: XCTestCase {
         )
     }
 
+    func testSnorkelingRoutesToComingSoon() {
+        XCTAssertEqual(
+            DIRStartupSelectionPolicy.nextStepAfterActivitySelection(.snorkeling),
+            .comingSoon(activity: .snorkeling)
+        )
+    }
+
+    func testWatchLaunchabilityPolicyBlocksApneaAndSnorkeling() {
+        XCTAssertTrue(DIRActivityMode.diving.isLaunchableOnWatchMAIN)
+        XCTAssertFalse(DIRActivityMode.apnea.isLaunchableOnWatchMAIN)
+        XCTAssertFalse(DIRActivityMode.snorkeling.isLaunchableOnWatchMAIN)
+    }
+
+    func testPermanentModeTabHiddenOnMAIN() {
+        XCTAssertFalse(WatchModeSelectionPreferences.hasMultipleStableModes)
+    }
+
     func testDivingRoutesToModeSelection() {
         XCTAssertEqual(
             DIRStartupSelectionPolicy.nextStepAfterActivitySelection(.diving),

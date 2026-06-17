@@ -28,7 +28,7 @@ struct CompanionActivityPreference: Codable, Equatable {
 
 enum CompanionActivityAvailability {
     static func isAvailable(_ mode: DIRActivityMode) -> Bool {
-        mode.isLaunchableInMAIN
+        mode.isLaunchableOnIOSCompanionMAIN
     }
 }
 

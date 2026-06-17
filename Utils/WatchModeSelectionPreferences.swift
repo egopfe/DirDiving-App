@@ -14,6 +14,6 @@ enum WatchModeSelectionPreferences {
         set { UserDefaults.standard.set(newValue, forKey: skipWhenSingleModeKey) }
     }
 
-    /// Three stable activity modes are exposed in MAIN startup flow (Diving launchable; Apnea/Snorkeling coming soon).
-    static let hasMultipleStableModes = true
+    /// Permanent Mode tab is hidden; mode changes use cold-launch startup flow and Settings while surfaced.
+    static let hasMultipleStableModes = false
 }

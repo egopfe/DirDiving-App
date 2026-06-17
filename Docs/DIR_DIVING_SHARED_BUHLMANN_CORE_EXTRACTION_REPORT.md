@@ -1,7 +1,7 @@
 # Command 03 — Shared Bühlmann Core Extraction Report
 
-**Branch:** `integration/full-computer`  
-**Scope:** Extract iOS-only Bühlmann planner math into a shared source group compilable by iOS and watchOS with zero intentional math changes.
+**Branch:** `main`  
+**Scope:** Extract iOS-only Bühlmann planner math into a shared source group compilable by iOS and watchOS with zero intentional math changes. Watch Full Computer runtime consumes the shared core via explicit allowlisted files (`FullComputerWatchArchitectureGuard`).
 
 ## Mathematical changes
 
@@ -44,5 +44,4 @@
 
 ## Out of scope (later commands)
 
-- Watch Full Computer runtime integration (no Bühlmann dive loop on Watch yet).
-- UI changes.
+- UI changes unrelated to FC runtime presentation.
