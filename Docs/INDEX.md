@@ -1,7 +1,7 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` = `origin/main` @ **`5b842e1`**
+**Branch consigliato:** `main` = `origin/main` @ **`8820de0`**
 
 ---
 
@@ -13,6 +13,7 @@ Read-only audit su `main`: modelli multigas, sync piano iOS→Watch, gas switch 
 |-------|--------|
 | **Comando** | `03_AUDIT_FULL_COMPUTER_MULTIGAS_SYNC_RECOVERY.md` |
 | **Report** | [`AUDIT_FULL_COMPUTER_MULTIGAS_SYNC_RECOVERY_CURRENT.md`](AUDIT_FULL_COMPUTER_MULTIGAS_SYNC_RECOVERY_CURRENT.md) |
+| **Baseline** | `main` @ **`8820de0`** |
 | **Verdict** | **PASS** — gate Command 11 (FC scope) |
 | **Prerequisites** | Audit 01–02 **PASS** |
 
