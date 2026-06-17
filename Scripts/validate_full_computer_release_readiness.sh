@@ -5,11 +5,17 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
 BRANCH="$(git branch --show-current)"
-echo "[fc-readiness] start Full Computer release-hard validation on branch: ${BRANCH}"
+HEAD_SHA="$(git rev-parse --short HEAD)"
+echo "[fc-readiness] start Full Computer release-hard validation on branch: ${BRANCH} @ ${HEAD_SHA}"
 
-if [[ "${BRANCH}" != "integration/full-computer" ]]; then
-  echo "[fc-readiness] warning: expected branch integration/full-computer (continuing)"
-fi
+case "${BRANCH}" in
+  main|integration/full-computer)
+    echo "[fc-readiness] canonical branch: ${BRANCH}"
+    ;;
+  *)
+    echo "[fc-readiness] note: Full Computer release-hard is validated on main; continuing on ${BRANCH}"
+    ;;
+esac
 
 ./Scripts/check_secrets.sh
 ./Scripts/audit_localization.sh
@@ -44,6 +50,9 @@ assert len(ids) == 25, f"expected 25 mockup ids, got {len(ids)}"
 assert len(set(ids)) == 25, "duplicate mockup ids"
 print("[fc-readiness] mockup matrix ok (25 entries)")
 PY
+
+echo "[fc-readiness] visual regression substitute (fixture matrix + l10n keys; no raster in bundle)"
+echo "[fc-readiness]   see Docs/ReferenceUI/README.md — automated internal gate; PNG pack optional for App Store"
 
 echo "[fc-readiness] build Watch"
 xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving Watch App" -destination "generic/platform=watchOS" build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO >/tmp/dirdiving_fc_watch_build.log

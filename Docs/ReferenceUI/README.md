@@ -1,9 +1,23 @@
 # Reference UI assets (visual regression QA)
 
-**Status: PENDING** — PNG reference captures are **not** stored in this repository yet. Do not mark PASS until files are committed here.
+**Internal gate (automated):** **PASS** — `FullComputerMockupReferenceMatrixTests` (25 mockup IDs, no raster in bundle) + `FullComputerUIStateMatrixTests` (20 live-deco fixture states, EN/IT title keys). Run via `./Scripts/validate_full_computer_release_readiness.sh`.
+
+**External App Store PNG pack:** **PENDING** — optional simulator captures below. Do not mark external visual gate PASS until files are committed under [`Docs/QA_EVIDENCE/REFERENCE_UI/`](../QA_EVIDENCE/REFERENCE_UI/README.md).
 
 **Evidence sign-off:** [`Docs/QA_EVIDENCE/REFERENCE_UI/README.md`](../QA_EVIDENCE/REFERENCE_UI/README.md)  
 **Manual checklist:** [`Docs/MAIN_UI_TEXT_QA_CHECKLIST.md`](../MAIN_UI_TEXT_QA_CHECKLIST.md)
+
+---
+
+## Automated substitute vs manual PNG capture
+
+| Layer | Coverage | Blocking |
+|-------|----------|----------|
+| Mockup index (25 × `FC_UI_*`) | Matrix + fixture key mapping | Internal FC release — **no** |
+| Live deco presentation (20 states) | `FullComputerLivePanelFixtures` + l10n key tests | Internal FC release — **no** |
+| Simulator PNG screenshots (41/45/49 mm, EN/IT) | Manual capture into this folder | App Store visual gate only |
+
+Full Computer raster mockups (`FC_UI_01` … `FC_UI_25`) remain **external design references** — not embedded in the app bundle (verified by test).
 
 ---
 

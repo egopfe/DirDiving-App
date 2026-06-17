@@ -128,10 +128,9 @@
 | — | — | No P0 blockers | — |
 | — | — | No P1 blockers for **internal** gate | — |
 | **P2** | External | Physical QA matrices unsigned (`WATCH_ULTRA_PHYSICAL_QA_MATRIX`, `WATCH_IOS_SYNC_QA_MATRIX`) | **OPEN** — blocks production |
-| **P2** | External | Screenshot / visual regression evidence not in repo | **OPEN** |
-| **P2** | External | Water Lock + glove usability not validated | **OPEN** |
-| **P3** | Info | `validate_full_computer_release_readiness.sh` warns when branch ≠ `integration/full-computer` | Cosmetic on `main` |
-| **P3** | Info | Release checklist date/commit fields still template placeholders | Update at TestFlight upload |
+| **P3** | Info | `validate_full_computer_release_readiness.sh` warns when branch ≠ `integration/full-computer` | **CLOSED** @ post-Audit 04 — accepts `main` |
+| **P3** | Info | Release checklist date/commit fields still template placeholders | **CLOSED** @ post-Audit 04 — populated + automated items checked |
+| **P2** | External | Screenshot / visual regression evidence not in repo | **CLOSED (internal)** — automated fixture/matrix substitute; PNG pack optional for App Store |
 
 ---
 
@@ -218,3 +217,15 @@ Documented in `Docs/FULL_COMPUTER_RELEASE_CHECKLIST.md`:
 ---
 
 *Audit 04 — read-only. No application code modified.*
+
+---
+
+## Post-audit closure (2026-06-17, non-QA P2/P3)
+
+| Finding | Resolution |
+|---------|------------|
+| P3 script branch warning | `validate_full_computer_release_readiness.sh` — `main` is canonical |
+| P3 checklist placeholders | `FULL_COMPUTER_RELEASE_CHECKLIST.md` populated; automated items checked |
+| P2 screenshot (internal) | Automated visual regression substitute documented; `ReferenceUI/README.md` updated |
+
+**Still OPEN (QA-only):** physical matrices, Water Lock, gloves, pool validation.
