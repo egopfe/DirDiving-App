@@ -1,7 +1,7 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` = `origin/main` @ **`b8b277d`**
+**Branch consigliato:** `main` = `origin/main` @ **`50633bf`**
 
 ---
 
