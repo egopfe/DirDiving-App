@@ -77,7 +77,7 @@ Perform a complete and deep audit of the Apple Watch MAIN app after the latest D
 
 The output must be a detailed Markdown report:
 
-`Docs/WATCH_COMPLETE_ALGORITHM_AUDIT_CURRENT.md`
+`Docs/2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_CURRENT.md`
 
 The report must include:
 - executive summary;
@@ -1296,7 +1296,7 @@ Overall readiness must include these categories.
 
 Create:
 
-`Docs/WATCH_COMPLETE_ALGORITHM_AUDIT_CURRENT.md`
+`Docs/2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_CURRENT.md`
 
 The report must contain:
 
@@ -1599,7 +1599,7 @@ The task is complete only if:
 - No security model is modified.
 - Report is created at:
 
-  `Docs/WATCH_COMPLETE_ALGORITHM_AUDIT_CURRENT.md`
+  `Docs/2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_CURRENT.md`
 
 - Report includes:
   - Dive Start readiness %;

@@ -36,7 +36,7 @@ enum CCRPlannerEngine {
                 environment: environment
             ) else { return }
             let end = CCRInspiredGasModel.endMeters(depthMeters: depth, setpointBar: setpoint, diluent: diluent, environment: environment)
-            let density = CCRGasDensityEstimator.estimateGramsPerLiter(
+            let density = CCRGasDensityEstimator.estimate(
                 setpointBar: setpoint,
                 diluent: diluent,
                 depthMeters: depth,
@@ -49,7 +49,7 @@ enum CCRPlannerEngine {
                     ppO2Bar: inspired.ppO2,
                     ppN2Bar: inspired.ppN2,
                     endMeters: end,
-                    gasDensityGramsPerLiter: density
+                    gasDensityResult: density
                 )
             )
         }

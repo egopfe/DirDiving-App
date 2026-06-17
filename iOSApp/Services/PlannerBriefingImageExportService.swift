@@ -14,12 +14,34 @@ struct PlannerBriefingRuntimeExportRow: Hashable {
     let gasLabel: String
 }
 
+struct PlannerBriefingSummaryExportRow: Hashable {
+    let label: String
+    let value: String
+}
+
 struct PlannerBriefingImageExportInput: Hashable {
     let modeLabel: String
     let plannerSessionId: UUID?
     let decoStopRows: [PlannerBriefingDecoStopExportRow]
     let runtimeRows: [PlannerBriefingRuntimeExportRow]
+    let summaryRows: [PlannerBriefingSummaryExportRow]
     let includesDecoStopsInRuntime: Bool
+
+    init(
+        modeLabel: String,
+        plannerSessionId: UUID?,
+        decoStopRows: [PlannerBriefingDecoStopExportRow],
+        runtimeRows: [PlannerBriefingRuntimeExportRow],
+        summaryRows: [PlannerBriefingSummaryExportRow] = [],
+        includesDecoStopsInRuntime: Bool
+    ) {
+        self.modeLabel = modeLabel
+        self.plannerSessionId = plannerSessionId
+        self.decoStopRows = decoStopRows
+        self.runtimeRows = runtimeRows
+        self.summaryRows = summaryRows
+        self.includesDecoStopsInRuntime = includesDecoStopsInRuntime
+    }
 }
 
 enum PlannerBriefingImageExportService {
@@ -29,6 +51,33 @@ enum PlannerBriefingImageExportService {
         var cardMetas: [PlannerBriefingCardMetadata] = []
         var files: [URL] = []
         var order = 0
+
+        if !input.summaryRows.isEmpty {
+            let chunks = chunked(input.summaryRows, size: PlannerBriefingTransferSupport.maxRowsPerCard)
+            for (index, chunk) in chunks.enumerated() {
+                let title = cardTitle(
+                    base: DIRIOSLocalizer.string("planner.briefing_card.summary"),
+                    index: index + 1,
+                    total: chunks.count
+                )
+                let png = try renderSummaryCard(
+                    title: title,
+                    modeLabel: input.modeLabel,
+                    generatedAt: generatedAt,
+                    rows: chunk
+                )
+                let url = try writePNG(png, name: "summary_\(index + 1).png", packageId: packageId)
+                order += 1
+                let meta = try PlannerBriefingTransferSupport.makeCardMetadata(
+                    fileURL: url,
+                    title: title,
+                    kind: .ccrSummary,
+                    order: order
+                )
+                cardMetas.append(meta)
+                files.append(url)
+            }
+        }
 
         if !input.decoStopRows.isEmpty {
             let chunks = chunked(input.decoStopRows, size: PlannerBriefingTransferSupport.maxRowsPerCard)
@@ -167,6 +216,25 @@ enum PlannerBriefingImageExportService {
         let url = directory.appendingPathComponent(name)
         try data.write(to: url, options: [.atomic])
         return url
+    }
+
+    private static func renderSummaryCard(
+        title: String,
+        modeLabel: String,
+        generatedAt: Date,
+        rows: [PlannerBriefingSummaryExportRow]
+    ) throws -> UIImage {
+        try renderCard(
+            title: title,
+            modeLabel: modeLabel,
+            generatedAt: generatedAt,
+            columnHeaders: [
+                DIRIOSLocalizer.string("planner.briefing_card.metric"),
+                DIRIOSLocalizer.string("planner.briefing_card.value"),
+            ],
+            rowTexts: rows.map { [$0.label, $0.value] },
+            includeNotCertifiedFooter: true
+        )
     }
 
     private static func renderDecoCard(

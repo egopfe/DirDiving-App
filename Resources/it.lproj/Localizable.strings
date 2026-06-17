@@ -181,7 +181,6 @@
 "Derivato prof. media + runtime; non safety/NDL" = "Derivato prof. media + runtime; non safety/NDL";
 "Imperiale non selezionabile finche la conversione Watch non e implementata. Export sempre metrico/Subsurface." = "Imperiale non selezionabile finche la conversione Watch non e implementata. Export sempre metrico/Subsurface.";
 "Autorizzato, in attesa fix" = "Autorizzato, in attesa fix";
-"Fix disponibile" = "Fix disponibile";
 "Permesso negato: abilita da iPhone" = "Permesso negato: abilita da iPhone";
 "Richiesto al primo uso" = "Richiesto al primo uso";
 "Stato permesso sconosciuto" = "Stato permesso sconosciuto";
@@ -218,7 +217,6 @@
 "TTV informativo derivato da profondita media e durata; non e un valore decompressivo o time to surface." = "TTV informativo derivato da profondità media e durata; non e un valore decompressivo o time to surface.";
 "TTV sessione %@, runtime %@" = "Session TTV %@, runtime %@";
 "Nessuna schermata o immagine di riferimento e inclusa in questa build." = "Nessuna schermata o immagine di riferimento e inclusa in questa build.";
-"Bussola pronta" = "Bussola pronta";
 "Bussola attiva" = "Bussola attiva";
 "Bussola non disponibile" = "Bussola non disponibile";
 "Permesso posizione negato" = "Permesso posizione negato";
@@ -631,6 +629,8 @@
 "watch.planner_briefing.empty.message" = "Invia un briefing dal Planner iOS.";
 "watch.planner_briefing.delete" = "Elimina briefing";
 "watch.planner_briefing.ref_only" = "SOLO RIFERIMENTO";
+"watch.planner_briefing.incomplete_format" = "Pacchetto incompleto: %lld di %lld card disponibili.";
+"watch.planner_briefing.session_format" = "Sessione piano %@";
 "watch.sync.planner_briefing.received" = "Briefing planner ricevuto";
 "settings.row.language.title" = "Lingua";
 "settings.row.units.title" = "Unità di misura";
@@ -836,3 +836,34 @@
 "alarms.a11y.row_format" = "%@, %@, %@";
 "alarms.a11y.stepper.decrease" = "Diminuisci";
 "alarms.a11y.stepper.increase" = "Aumenta";
+
+/* UI/UX audit remediation V1.0 2026-06-02 */
+"watch.gps.status.available" = "Fix disponibile";
+"watch.gps.status.searching" = "Ricerca fix in corso";
+"watch.gps.status.permission_denied" = "Permesso GPS negato";
+"watch.gps.status.permission_pending" = "Permesso GPS in attesa";
+"watch.gps.status.unavailable" = "GPS non disponibile";
+"watch.gps.status.disabled" = "GPS disabilitato";
+"watch.compass.status.ready" = "BUSSOLA pronta";
+"watch.compass.status.active" = "BUSSOLA attiva";
+"watch.compass.status.calibrating" = "BUSSOLA in calibrazione";
+"watch.compass.status.calibration_required" = "Calibra BUSSOLA";
+"watch.compass.status.unavailable" = "BUSSOLA non disponibile";
+"watch.compass.status.permission_denied" = "Permesso BUSSOLA negato";
+"watch.compass.status.permission_pending" = "Permesso BUSSOLA in attesa";
+"watch.compass.status.interference" = "Interferenza BUSSOLA";
+"watch.compass.status.no_heading" = "Direzione non disponibile";
+"watch.compass.status.unknown" = "Stato BUSSOLA sconosciuto";
+"watch.planner_briefing.freshness.old" = "Briefing potenzialmente datato — verifica prima dell'immersione.";
+"watch.planner_briefing.freshness.session_mismatch" = "Il briefing potrebbe non corrispondere alla sessione pianificata corrente.";
+"watch.planner_briefing.freshness.incomplete" = "Pacchetto briefing incompleto.";
+"watch.planner_briefing.freshness.unsupported" = "Metadati briefing non supportati.";
+"watch.planner_briefing.freshness.a11y" = "Avviso briefing: %@";
+"briefing.reference_only.footer" = "DIR DIVING — SOLO RIFERIMENTO";
+"user_images.info.bundled_readonly" = "Le immagini incluse sono di sola lettura.";
+"user_images.info.uploaded_deletable" = "Le immagini caricate possono essere eliminate e si sincronizzano con iPhone.";
+"user_images.info.dive_active_note" = "Gestione immagini limitata durante immersione attiva.";
+"user_images.type.bundled" = "Inclusa";
+"user_images.type.uploaded" = "Caricata";
+"user_images.count.format" = "%lld immagini";
+"user_images.count.a11y" = "%lld immagini disponibili";

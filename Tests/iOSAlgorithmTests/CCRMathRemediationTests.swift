@@ -127,7 +127,7 @@ final class CCRMathRemediationTests: XCTestCase {
             input: input,
             environment: .seaLevelSaltWater
         )
-        XCTAssertTrue(scenario.referenceNotes.contains(String(localized: "ccr.bailout.heuristic_disclaimer")))
+        XCTAssertTrue(scenario.referenceNotes.contains(DIRIOSLocalizer.string("ccr.bailout.heuristic_disclaimer")))
     }
 
     // MARK: - P1-004 Water vapor

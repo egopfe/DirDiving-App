@@ -5,6 +5,7 @@ enum PlannerBriefingCardKind: String, Codable, Hashable {
     case decoStops
     case runtime
     case gasEmergency
+    case ccrSummary
 }
 
 struct PlannerBriefingCardMetadata: Codable, Hashable, Identifiable {
@@ -59,7 +60,9 @@ enum PlannerBriefingTransferSupport {
     static let maxPackageBytes = 5 * 1_024 * 1_024
     static let manifestFileName = "planner_briefing_manifest.json"
 
-    static let referenceOnlyFooter = "DIR DIVING — REF ONLY"
+    static var referenceOnlyFooter: String {
+        String(localized: "briefing.reference_only.footer")
+    }
     static let notCertifiedFooter = "NOT A CERTIFIED DECO COMPUTER"
 
     static func sha256Hex(data: Data) -> String {

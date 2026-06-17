@@ -138,6 +138,12 @@ targets:
       - Utils/DIRUnitConversions.swift
       - Utils/DepthSafetyConfiguration.swift
       - Utils/LiveDiveBannerPresentationPolicy.swift
+      - Utils/LiveDiveReminderSuppressionPolicy.swift
+      - Utils/CloudSyncBudgetPolicy.swift
+      - Utils/PlannerBriefingFilenameSanitizer.swift
+      - Utils/WatchSyncSchemaV1Policy.swift
+      - Utils/WatchSyncPendingFlushPolicy.swift
+      - Utils/PendingPhotoManagementResponseQueue.swift
       - Utils/DiveAlgorithmConfiguration.swift
       - Utils/DiveLogbookPolicy.swift
       - Utils/DepthSampleValidation.swift
@@ -157,6 +163,7 @@ targets:
       - Models/PlannerBriefingCard.swift
       - Services/PlannerBriefingCardStore.swift
       - Services/PlannerBriefingWatchReceiver.swift
+      - Utils/PlannerBriefingFreshnessPolicy.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.watch.algorithmtests
@@ -187,8 +194,11 @@ targets:
       - iOSApp/Services/CCR/CCRPlannerEngine.swift
       - iOSApp/Services/CCR/CCRTissueHistorySampler.swift
       - iOSApp/Services/CCR/CCRPlannerService.swift
+      - iOSApp/Services/CCR/CCRPlannerBriefingExportSupport.swift
       - iOSApp/Services/CCR/CCRBailoutScenarioCalculator.swift
       - iOSApp/Services/CCR/CCRGasDensityEstimator.swift
+      - iOSApp/Services/CCR/CCRGasDensityConstants.swift
+      - iOSApp/Services/CCR/CCROxygenExposureState.swift
       - iOSApp/Utils/CCRPlannerSettings.swift
       - iOSApp/Models/EquipmentProfile.swift
       - iOSApp/Models/EquipmentStructuredModels.swift
@@ -258,6 +268,9 @@ targets:
       - iOSApp/Utils/PlanCalculationCompleteness.swift
       - iOSApp/Utils/PlannerResultState.swift
       - iOSApp/Utils/WatchSyncSessionDiff.swift
+      - iOSApp/Utils/CloudSyncBudgetPolicy.swift
+      - iOSApp/Utils/CCRMODTolerancePolicy.swift
+      - iOSApp/Utils/WatchSyncSchemaV1Policy.swift
       - iOSApp/Utils/CloudSyncNotifications.swift
       - iOSApp/Utils/WatchSyncNotifications.swift
       - iOSApp/Utils/WatchSyncKeys.swift
@@ -271,6 +284,8 @@ targets:
       - iOSApp/Utils/PressureDisplayMath.swift
       - iOSApp/Services/PDF/PDFDocumentBuilder.swift
       - iOSApp/Services/PDF/PDFExportService.swift
+      - iOSApp/Services/PDF/PDFExportGate.swift
+      - iOSApp/Utils/CCRGasDensityPresentation.swift
       - iOSApp/Services/PDF/PlannerPDFBuilder.swift
       - iOSApp/Services/PDF/BriefingPDFBuilder.swift
       - iOSApp/Services/PDF/ChecklistPDFBuilder.swift

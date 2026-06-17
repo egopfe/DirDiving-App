@@ -26,18 +26,19 @@ struct PDFExportCCRPlannerContext {
 
 enum PDFExportService {
     static func canExportPlan(_ context: PDFExportPlannerContext) -> Bool {
-        context.safetyAcknowledged
-            && context.validation.isValid
-            && context.modIssues.isEmpty
-            && context.plan.buhlmannState != .invalidInput
-            && context.plan.buhlmannState != .unavailable
+        PDFExportGate.canExportPlanner(context)
     }
 
     static func canExportCCRPlan(_ context: PDFExportCCRPlannerContext) -> Bool {
-        context.safetyAcknowledged
-            && context.plan.validationResult.isValid
-            && context.plan.buhlmannState != .invalidInput
-            && context.plan.buhlmannState != .unavailable
+        PDFExportGate.canExportCCR(context)
+    }
+
+    static func plannerExportBlockReasons(_ context: PDFExportPlannerContext) -> [PDFExportBlockReason] {
+        PDFExportGate.plannerBlockReasons(context)
+    }
+
+    static func ccrExportBlockReasons(_ context: PDFExportCCRPlannerContext) -> [PDFExportBlockReason] {
+        PDFExportGate.ccrBlockReasons(context)
     }
 
     static func hasExportableChecklist(_ profile: EquipmentProfile) -> Bool {

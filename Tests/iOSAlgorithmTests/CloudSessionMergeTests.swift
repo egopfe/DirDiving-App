@@ -77,7 +77,7 @@ final class CloudSessionMergeTests: XCTestCase {
             ]
         )
         let conflicts = DiveSessionMergeConflictDetector.detect(local: [local], cloud: [cloud])
-        XCTAssertTrue(conflicts.contains { $0.fieldName == String(localized: "cloud.merge.field.depth_profile") })
+        XCTAssertTrue(conflicts.contains { $0.fieldName == DIRIOSLocalizer.string("cloud.merge.field.depth_profile") })
     }
 
     func testDivergentProfilesUseWholeProfileWinnerNotHybrid() {
@@ -114,7 +114,7 @@ final class CloudSessionMergeTests: XCTestCase {
         let start = Date(timeIntervalSince1970: 1_000)
         let session = makeSession(id: id, start: start, endOffset: 120)
         let conflicts = DiveSessionMergeConflictDetector.detect(local: [session], cloud: [session])
-        XCTAssertFalse(conflicts.contains { $0.fieldName == String(localized: "cloud.merge.field.depth_profile") })
+        XCTAssertFalse(conflicts.contains { $0.fieldName == DIRIOSLocalizer.string("cloud.merge.field.depth_profile") })
     }
 
     func testCloudPayloadTooLargeSkipsLocalAndCloudWrite() {

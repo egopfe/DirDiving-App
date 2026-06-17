@@ -241,14 +241,14 @@ struct SettingsView: View {
         switch gps.authorizationStatus {
         case .authorizedAlways, .authorizedWhenInUse:
             return gps.lastPoint == nil
-                ? String(localized: "settings.gps.authorized_pending_fix")
-                : String(localized: "Fix disponibile")
+                ? String(localized: "watch.gps.status.searching")
+                : String(localized: "watch.gps.status.available")
         case .denied, .restricted:
-            return String(localized: "Permesso negato: abilita da iPhone")
+            return String(localized: "watch.gps.status.permission_denied")
         case .notDetermined:
-            return String(localized: "Richiesto al primo uso")
+            return String(localized: "watch.gps.status.permission_pending")
         @unknown default:
-            return String(localized: "Stato permesso sconosciuto")
+            return String(localized: "watch.gps.status.unavailable")
         }
     }
 

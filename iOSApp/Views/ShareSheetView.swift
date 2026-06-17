@@ -50,6 +50,14 @@ enum PDFShareActions {
         )
     }
 
+    static func invalidPlanMessage(for context: PDFExportPlannerContext) -> String {
+        PDFExportGate.detailMessage(for: PDFExportGate.plannerBlockReasons(context))
+    }
+
+    static func invalidPlanMessage(for context: PDFExportCCRPlannerContext) -> String {
+        PDFExportGate.detailMessage(for: PDFExportGate.ccrBlockReasons(context))
+    }
+
     static func invalidPlanMessage() -> String {
         DIRIOSLocalizer.string("pdf.export.error.invalid_plan")
     }
