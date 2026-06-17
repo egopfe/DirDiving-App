@@ -1048,3 +1048,30 @@
 "user_images.type.uploaded" = "Caricata";
 "user_images.count.format" = "%lld immagini";
 "user_images.count.a11y" = "%lld immagini disponibili";
+
+
+"apnea.ready.title" = "Pronto";
+"apnea.ready.target" = "Target";
+"apnea.ready.recovery" = "Recupero";
+"apnea.ready.alarms" = "Allarmi";
+"apnea.ready.alarms_count" = "%d attivi";
+"apnea.ready.alarms_off" = "Off";
+"apnea.ready.sensor" = "Sensore";
+"apnea.ready.buddy" = "Buddy";
+"apnea.ready.start" = "AVVIA SESSIONE";
+"apnea.ready.sensor_unavailable" = "Sensore profondita non disponibile. Verifica il sensore prima di avviare.";
+"apnea.buddy.on" = "Promemoria attivo";
+"apnea.buddy.off" = "Promemoria disattivato";
+"apnea.stage.dive" = "Immersione in corso";
+"apnea.stage.ascent" = "Risalita";
+"apnea.active.duration" = "Durata";
+"apnea.active.max" = "Prof. max";
+"apnea.vertical.ascent" = "In risalita";
+"apnea.vertical.descent" = "In discesa";
+"apnea.vertical.stable" = "Stabile";
+"apnea.sensor.ok" = "OK";
+"apnea.sensor.degraded" = "Degradato";
+"apnea.marker.indicator" = "Marker";
+"apnea.target.indicator" = "Target";
+"apnea.a11y.start_hint" = "Avvia la sessione Apnea quando i controlli sensore sono validi.";
+"apnea.a11y.vertical_speed" = "Velocita verticale";

@@ -15,7 +15,11 @@ struct ApneaTarget: Identifiable, Codable, Hashable, Sendable {
     var label: String
     var targetDepthMeters: Double?
     var targetDurationSeconds: TimeInterval?
+    var direction: ApneaEventDirection
+    var isEnabled: Bool
     var wasReached: Bool
+    var reachedMessage: String?
+    var hysteresisMeters: Double
 
     init(
         id: UUID = UUID(),
@@ -23,13 +27,21 @@ struct ApneaTarget: Identifiable, Codable, Hashable, Sendable {
         label: String,
         targetDepthMeters: Double? = nil,
         targetDurationSeconds: TimeInterval? = nil,
-        wasReached: Bool = false
+        direction: ApneaEventDirection = .descending,
+        isEnabled: Bool = true,
+        wasReached: Bool = false,
+        reachedMessage: String? = nil,
+        hysteresisMeters: Double = 0.4
     ) {
         self.id = id
         self.kind = kind
         self.label = label
         self.targetDepthMeters = targetDepthMeters
         self.targetDurationSeconds = targetDurationSeconds
+        self.direction = direction
+        self.isEnabled = isEnabled
         self.wasReached = wasReached
+        self.reachedMessage = reachedMessage
+        self.hysteresisMeters = hysteresisMeters
     }
 }

@@ -105,6 +105,7 @@ targets:
       - Models/PlannerBriefingCard.swift
       - Models/DIRModesAndStartup.swift
       - Utils/MonotonicElapsedClock.swift
+      - Utils/ApneaWatchPresentation.swift
       - path: Shared
       - path: iOSApp
         excludes:
@@ -200,6 +201,7 @@ targets:
       - Utils/DiveSessionAlgorithmValidator.swift
       - Utils/DiveSessionMerge.swift
       - Utils/MonotonicElapsedClock.swift
+      - Utils/ApneaWatchPresentation.swift
       - Utils/GPSConfirmationPresentation.swift
       - Utils/DiveSessionPersistenceClass.swift
       - Utils/DiveAlgorithmSelfCheck.swift
@@ -383,12 +385,17 @@ targets:
       - Tests/iOSAlgorithmTests/TissueAnalyticsServiceTests.swift
       - iOSApp/Utils/IOSCompanionPostLegalEntry.swift
       - Utils/MonotonicElapsedClock.swift
+      - Utils/ApneaWatchPresentation.swift
       - Models/DIRModesAndStartup.swift
       - iOSApp/Models/CompanionActivityPreference.swift
       - iOSApp/Services/CompanionActivityPreferenceStore.swift
       - iOSApp/Utils/CompanionActivityCopy.swift
       - Tests/WatchAlgorithmTests/ApneaDomainModelTests.swift
       - Tests/WatchAlgorithmTests/ApneaLifecycleEngineTests.swift
+      - Tests/WatchAlgorithmTests/ApneaOperationalEventEngineTests.swift
+      - Tests/WatchAlgorithmTests/ApneaWatchPresentationTests.swift
+      - Tests/WatchAlgorithmTests/ApneaWatchUIViewContractTests.swift
+      - Tests/WatchAlgorithmTests/ApneaTimeRecoveryCheckpointEngineTests.swift
       - Tests/iOSAlgorithmTests/BuhlmannComprehensiveReadinessV3RemediationTests.swift
     resources:
       - path: Tests/iOSAlgorithmTests/Fixtures

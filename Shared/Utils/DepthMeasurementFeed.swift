@@ -1,7 +1,7 @@
 import Foundation
 
 /// Shared depth measurement before Apnea/Diving-specific lifecycle handling.
-struct DepthMeasurementRaw: Equatable, Hashable, Sendable {
+struct DepthMeasurementRaw: Codable, Equatable, Hashable, Sendable {
     let depthMeters: Double?
     let sensorTimestamp: Date
     let receivedAt: Date
@@ -20,7 +20,7 @@ struct DepthMeasurementRaw: Equatable, Hashable, Sendable {
     }
 }
 
-struct DepthMeasurementAccepted: Equatable, Hashable, Sendable {
+struct DepthMeasurementAccepted: Codable, Equatable, Hashable, Sendable {
     let depthMeters: Double
     let sensorTimestamp: Date
     let receivedAt: Date
@@ -77,7 +77,7 @@ struct DepthMeasurementFeedConfiguration: Codable, Hashable, Sendable {
     )
 }
 
-struct DepthMeasurementFeedState: Hashable {
+struct DepthMeasurementFeedState: Codable, Hashable {
     var lastAccepted: DepthMeasurementAccepted?
     var lastSensorTimestamp: Date?
 

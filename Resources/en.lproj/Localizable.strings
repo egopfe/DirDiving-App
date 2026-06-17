@@ -1048,3 +1048,30 @@
 "user_images.type.uploaded" = "Uploaded";
 "user_images.count.format" = "%lld images";
 "user_images.count.a11y" = "%lld images available";
+
+
+"apnea.ready.title" = "Ready";
+"apnea.ready.target" = "Target";
+"apnea.ready.recovery" = "Recovery";
+"apnea.ready.alarms" = "Alarms";
+"apnea.ready.alarms_count" = "%d active";
+"apnea.ready.alarms_off" = "Off";
+"apnea.ready.sensor" = "Sensor";
+"apnea.ready.buddy" = "Buddy";
+"apnea.ready.start" = "START SESSION";
+"apnea.ready.sensor_unavailable" = "Depth sensor unavailable. Check sensor status before starting.";
+"apnea.buddy.on" = "Reminder on";
+"apnea.buddy.off" = "Reminder off";
+"apnea.stage.dive" = "Dive in progress";
+"apnea.stage.ascent" = "Ascent";
+"apnea.active.duration" = "Duration";
+"apnea.active.max" = "Max depth";
+"apnea.vertical.ascent" = "Ascending";
+"apnea.vertical.descent" = "Descending";
+"apnea.vertical.stable" = "Stable";
+"apnea.sensor.ok" = "OK";
+"apnea.sensor.degraded" = "Degraded";
+"apnea.marker.indicator" = "Marker";
+"apnea.target.indicator" = "Target";
+"apnea.a11y.start_hint" = "Starts Apnea session when sensor checks pass.";
+"apnea.a11y.vertical_speed" = "Vertical speed";
