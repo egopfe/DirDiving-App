@@ -1,6 +1,6 @@
 import Foundation
 
-/// Stable MAIN activity modes (Diving launchable; Apnea/Snorkeling routed to coming-soon until release-ready).
+/// Stable activity modes with explicit Watch MAIN vs iOS Companion launch policies.
 enum DIRActivityMode: String, Codable, CaseIterable, Identifiable, Hashable, Sendable {
     case diving
     case apnea
@@ -8,7 +8,13 @@ enum DIRActivityMode: String, Codable, CaseIterable, Identifiable, Hashable, Sen
 
     var id: String { rawValue }
 
-    var isLaunchableInMAIN: Bool {
+    /// Watch MAIN: only Diving may enter runtime; Apnea/Snorkeling route to `comingSoon`.
+    var isLaunchableOnWatchMAIN: Bool {
+        self == .diving
+    }
+
+    /// iOS Companion: Apnea preparatory flows are selectable; Snorkeling remains unavailable on MAIN.
+    var isLaunchableOnIOSCompanionMAIN: Bool {
         switch self {
         case .diving, .apnea: return true
         case .snorkeling: return false

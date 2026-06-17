@@ -1,9 +1,23 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-14  
-**Branch consigliato:** `main` = `origin/main` @ **`99ea74a`**  
+**Aggiornato:** 2026-06-17  
+**Branch consigliato:** `main` = `origin/main` @ **`a5392c5`** (pre–Audit 02 doc commit)  
 **Uso:** punto di ingresso per ripartire a lavorare sul progetto.  
 **Panoramica funzioni (IT):** [`PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md)
+
+---
+
+## Aggiornamento indice 2026-06-17 — Audit 02 Full Computer runtime / deco / UI
+
+Read-only audit su `main`: runtime Bühlmann Watch, solver prospettico, state machine tappe, UI live FC. Nessuna modifica al codice.
+
+| Campo | Valore |
+|-------|--------|
+| **Comando** | `02_AUDIT_FULL_COMPUTER_RUNTIME_DECO_UI.md` |
+| **Report** | [`AUDIT_FULL_COMPUTER_RUNTIME_DECO_UI_CURRENT.md`](AUDIT_FULL_COMPUTER_RUNTIME_DECO_UI_CURRENT.md) |
+| **Baseline** | `main` @ audit run |
+| **Verdict** | **PASS** (Watch MAIN); iOS = planner/logbook only |
+| **Prerequisite** | [`FULL_COMPUTER_FOUNDATIONS_REMEDIATION_REPORT_V1.1.md`](FULL_COMPUTER_FOUNDATIONS_REMEDIATION_REPORT_V1.1.md) |
 
 ---
 

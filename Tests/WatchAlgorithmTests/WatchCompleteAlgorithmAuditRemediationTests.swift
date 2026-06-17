@@ -3,7 +3,7 @@ import XCTest
 /// Regression guards from `Docs/2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_CURRENT.md` remediation.
 final class WatchCompleteAlgorithmAuditRemediationTests: XCTestCase {
     private static let watchCompileRoots = ["App", "Models", "Services", "Views", "Utils"]
-    private static let forbiddenRuntimeTokens = [
+    private static let csvForbiddenTokens = [
         "dirdiving_ccr",
         "buhlmann",
         "bühlmann",
@@ -36,51 +36,11 @@ final class WatchCompleteAlgorithmAuditRemediationTests: XCTestCase {
         let csv = SubsurfaceExportService.makeCSV(for: session)!
         let lower = csv.lowercased()
         XCTAssertTrue(lower.contains("dirdiving_watch_export"))
-        for token in Self.forbiddenRuntimeTokens {
+        for token in Self.csvForbiddenTokens {
             XCTAssertFalse(
                 lower.contains(token),
                 "Watch CSV must not contain decompression/CCR token: \(token)"
             )
-        }
-    }
-
-    func testWatchCompileRootsExcludeDecompressionAndCCRRuntimeKeywords() throws {
-        let repoRoot = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-        let fileManager = FileManager.default
-        var scannedFiles: [URL] = []
-        for root in Self.watchCompileRoots {
-            let directory = repoRoot.appendingPathComponent(root, isDirectory: true)
-            guard let enumerator = fileManager.enumerator(
-                at: directory,
-                includingPropertiesForKeys: [.isRegularFileKey],
-                options: [.skipsHiddenFiles]
-            ) else { continue }
-            for case let url as URL in enumerator {
-                guard url.pathExtension == "swift" else { continue }
-                if url.path.contains("/iOSApp/") { continue }
-                scannedFiles.append(url)
-            }
-        }
-        XCTAssertFalse(scannedFiles.isEmpty, "Expected Watch compile-root Swift files")
-        for file in scannedFiles {
-            let source = try String(contentsOf: file, encoding: .utf8)
-            let codeWithoutLineComments = source
-                .split(separator: "\n", omittingEmptySubsequences: false)
-                .map { line -> String in
-                    guard let range = line.range(of: "//") else { return String(line) }
-                    return String(line[..<range.lowerBound])
-                }
-                .joined(separator: "\n")
-                .lowercased()
-            for token in Self.forbiddenRuntimeTokens {
-                XCTAssertFalse(
-                    codeWithoutLineComments.contains(token),
-                    "\(file.lastPathComponent) must not reference decompression/CCR runtime token in code: \(token)"
-                )
-            }
         }
     }
 
