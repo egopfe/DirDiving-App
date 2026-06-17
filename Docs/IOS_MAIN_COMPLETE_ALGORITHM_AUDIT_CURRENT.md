@@ -1,32 +1,30 @@
-# DIR Diving iOS Complete Algorithm / Planner Readiness Audit — Current (CCR Updated)
+# DIR Diving iOS Complete Algorithm / Planner Readiness Audit — Current (CCR Updated V2.0)
 
-**Audit date:** 2026-06-09  
+**Audit date:** 2026-06-14  
 **Repository:** `https://github.com/egopfe/DirDiving-App.git`  
 **Audited branch:** `main`  
-**Audited HEAD:** `984a69b` (`984a69bc1f6e1c50b11cc2c02c0057b737a3c4c5`)  
-**HEAD subject:** `fix(watch): harden compile-root guard to ignore comment-only tokens.`  
-**Scope:** iOS Companion MAIN (`DIRDiving iOS`) only — Check_Math_iOS + v2 extensions + CCR / Rebreather  
+**Audited HEAD:** `15f2d59` (`15f2d596f6e06a368dd625140d840704fd91481e`)  
+**HEAD subject:** `fix(watch): remediate Watch briefing audit P2 items to internal readiness.`  
+**Scope:** iOS Companion MAIN (`DIRDiving iOS`) only — complete algorithm / math / planner / data / export stack + CCR reference planner  
 **Execution mode:** Read-only static analysis + macOS `xcodegen` / `xcodebuild` validation  
-**Source command:** `commands_for_cursor/3-DIR_DIVING_IOS_COMPLETE_ALGORITHM_AUDIT_CCR_UPDATED.md`
+**Source command:** `commands_for_cursor/3-DIR_DIVING_IOS_COMPLETE_ALGORITHM_AUDIT_CCR_UPDATED_V2.0.md`
 
 **Integrated context (read, not re-executed):**
 
-| Document | Status | Role in this audit |
+| Document | HEAD / status | Role in this audit |
 |---|---|---|
-| `Docs/1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_CURRENT.md` | Present @ `cc4d783` | Prior CCR-focused comprehensive baseline (91%) |
-| `Docs/DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_REMEDIATION_REPORT.md` | Present @ `d756a89` | Bühlmann comprehensive remediation deltas |
-| `Docs/IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md` | Present | Pre-remediation math baseline |
+| `Docs/1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_CURRENT.md` | Updated @ `fedf4eb`; remediation @ `8147b3f`/`c0b5cd9` | Bühlmann/CCR deep baseline; P1 math items closed in code |
+| `Docs/1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_REMEDIATION_REPORT_V1.0.md` | @ `c0b5cd9` | Comprehensive readiness remediation (cache, tests, evidence folders) |
+| `Docs/2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_CURRENT.md` | @ `f12265a` | Watch reference-only posture; iOS briefing transfer compatibility |
+| `Docs/2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_REMEDIATION_REPORT_V1.0.md` | @ `15f2d59` | CCR Watch briefing export from iOS; session ID; incomplete package UX |
+| `Docs/IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md` | Present | Math-layer baseline |
+| `Docs/IOS_MAIN_COMPLETE_ALGORITHM_AUDIT_CURRENT.md` (prior) | @ `984a69b` | Superseded by this report |
 | `Docs/CCR_REBREATHER_LIMITATIONS.md` | Present | CCR scope / limitations |
-| `Docs/CCR_REBREATHER_EXPORT_POLICY.md` | Present | CCR PDF/CSV export policy |
-| `Docs/CCR_REBREATHER_VALIDATION_PLAN.md` | Present | External CCR validation slots (**PENDING**) |
-| `Docs/CCR_REBREATHER_VALIDATION_EVIDENCE.md` | Present | Evidence tracker (**mostly empty**) |
-| `Docs/DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md` | Present | External Bühlmann comparison (**PENDING**) |
 | `Docs/SUBSURFACE_CSV_ROUNDTRIP.md` | Present | CSV policy; external steps **PENDING** |
-| `Docs/WATCH_CSV_EXPORT_POLICY.md` | Present @ `984a69b` | Watch/iOS CSV divergence (Watch has no CCR metadata) |
 
 **Actions in this audit pass:**
 
-- Created this report only (read-only audit).
+- Created/updated this report only (read-only audit).
 - No Swift, UI, localization, algorithm, sync, security, or test production code modified.
 - No commit or push performed.
 
@@ -38,7 +36,7 @@
 
 Status: **Almost ready (non-certified reference planner)**
 
-MAIN @ `984a69b` delivers a coherent **dual-planner architecture**: open-circuit **Bühlmann ZH-L16C + GF** (Base / Deco / Technical), an isolated **CCR / Rebreather reference planner** (setpoint-inspired gas, dedicated engine/validator, heuristic bailout scenarios), **Ratio Deco as comparative heuristic only** (OC deco/technical; explicitly blocked in CCR mode), tissue/narcosis analytics with source footnotes (including `.ccrPlanned`), checklist↔planner gas sync (OC wired; CCR mapper present), manual dive entry with CCR logbook metadata, PDF/CSV export, and centralized unit conversion. macOS build and **540/540** iOS algorithm tests (13 skipped) pass on iPhone 17 Pro simulator.
+MAIN @ `15f2d59` delivers a coherent **dual-planner architecture**: open-circuit **Bühlmann ZH-L16C + GF** (Base / Deco / Technical), an isolated **CCR / Rebreather reference planner** (setpoint-inspired gas, dedicated engine/validator, heuristic bailout scenarios with explicit metadata), **Ratio Deco as comparative heuristic only** (OC deco/technical; blocked in CCR mode), tissue/narcosis analytics with source footnotes, structured Equipment setup with operational checklist generation, OC and **CCR checklist import/export UI**, manual dive entry with CCR logbook metadata, schedule-aware gas consumption with liters + bar-equivalent ledger, repetitive-dive tissue snapshots (OC), global ascent-speed settings, Rock Bottom / emergency parameters, PDF/CSV export, **Planner briefing PNG cards with Watch transfer** (OC + CCR summary), and centralized pressure-unit preference. macOS build and **800/800** executed iOS algorithm tests (13 skipped) pass on iPhone 17 Pro simulator.
 
 **Not ready for:** certified decompression claims, certified CCR controller claims, external Bühlmann/CCR validation sign-off, iCloud two-device QA, paired Watch physical QA, Subsurface desktop round-trip sign-off, or App Store marketing without legal review.
 
@@ -46,31 +44,32 @@ MAIN @ `984a69b` delivers a coherent **dual-planner architecture**: open-circuit
 
 | Area | Readiness | Confidence | Primary blockers |
 |---:|---:|---|---|
-| **Overall** | **92%** | High on OC + automated tests; medium on CCR external parity | External validation + physical QA |
-| **Bühlmann (OC core)** | **94%** | High | External third-party profile comparison **PENDING** |
+| **Overall (internal code)** | **94%** | High on OC + automated tests; medium on CCR external parity | External validation + physical QA + cloud opt-in |
+| **Bühlmann (OC core)** | **95%** | High | External third-party profile comparison **PENDING** |
 | **Ratio Deco** | **86%** | High on guardrails | Heuristic by design; OC-only; no CCR |
-| **Gas Planning (OC)** | **90%** | High | Bailout schedule-only in Bühlmann engine |
-| **Gas Roles** | **88%** | Medium-high | Checklist title inference edge cases |
+| **Gas Planning (OC)** | **91%** | High | Bailout schedule-only in Bühlmann engine |
+| **Gas Roles** | **89%** | Medium-high | Checklist title inference edge cases |
 | **MOD / PPO₂ / Dalton** | **93%** | High | PDF strict MOD vs validator asymmetry (documented) |
-| **Tissue Loading** | **90%** | High | Logbook simulated segments footnoted |
-| **Narcosis / END** | **88%** | Medium-high | CCR density estimator simplified |
-| **Planner Modes** | **92%** | High | CCR isolated in `.ccr` mode |
-| **Checklist Sync** | **82%** | Medium | **CCR export UI not wired** (mapper only) |
-| **Manual Dive** | **88%** | Medium-high | Physical UX QA **PENDING** |
-| **PDF / Share** | **90%** | High | CCR Dive Pack / Briefing OC-only by design |
-| **CSV / Subsurface** | **85%** | Medium | External Subsurface validation **PENDING** |
-| **Unit Conversion** | **92%** | High | Dual IOS/DIR stacks intentional |
-| **CCR Overall** | **88%** | Medium-high | Heuristic bailout; external profiles **PENDING** |
-| **Performance / Numerical** | **89%** | Medium | Long-profile stress partial |
-| **Security / Privacy** | **88%** | Medium-high | iCloud opt-in visual QA **PENDING** |
-| **Automated Tests** | **90%** | High | 540 XCTest; E2E/visual gaps |
-| **Physical / External QA** | **45%** | — | Evidence folders mostly empty |
+| **Tissue Loading** | **91%** | High | Logbook simulated segments footnoted |
+| **Narcosis / END** | **90%** | Medium-high | CCR density uses partial-pressure model; unavailable when invalid |
+| **Planner Modes** | **93%** | High | CCR isolated in `.ccr` mode |
+| **Checklist Sync** | **90%** | High | CCR export/import UI wired; UI E2E tests partial |
+| **Manual Dive** | **89%** | Medium-high | Physical UX QA **PENDING** |
+| **PDF / Share** | **91%** | High | CCR Dive Pack / Briefing OC-only by design |
+| **Planner Briefing / Watch** | **92%** | High | CCR summary export + transfer; physical sync QA **PENDING** |
+| **CSV / Subsurface** | **86%** | Medium | External Subsurface validation **PENDING** |
+| **Unit Conversion** | **93%** | High | Global pressure preference + dual IOS/DIR stacks intentional |
+| **CCR Overall** | **91%** | Medium-high | Heuristic bailout; P1 math fixed; external profiles **PENDING** |
+| **Performance / Numerical** | **90%** | Medium | Long-profile stress partial |
+| **Security / Privacy** | **87%** | Medium-high | iCloud always-on (SEC-P1-003); opt-in visual QA **PENDING** |
+| **Automated Tests** | **93%** | High | 800 XCTest; UI E2E gaps |
+| **Physical / External QA** | **45%** | — | Evidence folders mostly README-only |
 
 ### Release posture
 
 | Gate | Verdict |
 |---|---|
-| Internal algorithm / code review | **Almost ready** — build + 540 tests green @ `984a69b` |
+| Internal algorithm / code review | **Almost ready** — build + 800 tests green @ `15f2d59` |
 | Internal TestFlight (algorithm) | **Conditional yes** — document CCR reference-only + bailout heuristic + non-certified posture |
 | External TestFlight / RC | **Not yet** — external math + iCloud + Watch physical QA **PENDING** |
 | App Store (algorithm scope) | **Not yet** — same + legal/marketing disclaimer audit |
@@ -82,24 +81,35 @@ MAIN @ `984a69b` delivers a coherent **dual-planner architecture**: open-circuit
 | Severity | Count | Notes |
 |---:|---:|---|
 | CRITICAL | 0 | No safety-critical algorithm defect identified |
-| HIGH | 0 | No P0/P1 code blockers at HEAD |
-| MEDIUM | 4 | CCR checklist UI gap; external validation; iCloud QA; Subsurface external |
-| LOW | 6 | `runtimeSegments` reserved; loop volume unused; SCR absent; checklist inference; PDF MOD asymmetry; performance stress |
-| INFO | 5 | Dual unit stacks; `rebreatherModel` metadata; Ratio Deco heuristic; Watch CSV divergence; narcosis O₂ weighting |
+| HIGH | 0 | No P0/P1 algorithm code blockers at HEAD |
+| MEDIUM | 5 | External validation; iCloud QA; Subsurface external; cloud opt-in; CCR UI E2E gaps |
+| LOW | 5 | `runtimeSegments` reserved; loop volume unused; checklist inference; PDF MOD asymmetry; perf stress |
+| INFO | 5 | Dual unit stacks; Ratio Deco heuristic; Watch CSV divergence; SCR absent; bailout by design |
+
+### Delta vs prior complete audit (`984a69b`)
+
+| Change | Impact |
+|---|---|
+| CCR math P1 fixes @ `8147b3f` | Gas density partial-pressure scaling; CNS/OTU unavailable semantics |
+| Comprehensive readiness @ `c0b5cd9` | `AnalysisCacheKey` completeness; 14+ new readiness tests |
+| CCR checklist export UI wired | Closes IOS-CHK-CCR-001 from prior audit |
+| CCR Watch briefing export @ `15f2d59` | `CCRPlannerBriefingExportSupport` + send from `CCRPlanResultView` |
+| Test count 540 → 800 | Broader regression coverage |
+| Structured Equipment + checklist tabs | Equipment ↔ planner ↔ checklist mappings hardened |
 
 ---
 
-## B. Phase 0 — Preflight
+## B. Scope and Preflight
 
 | Check | Result |
 |---|---|
 | Branch | `main` |
-| HEAD | `984a69b` |
+| HEAD | `15f2d59` |
 | Working tree at audit start | Clean |
 | Remote | `origin/main` aligned after `git fetch` |
 | iOS target | `DIRDiving iOS` (`project.yml`) |
 | iOS test target | `DIRDiving iOS Algorithm Tests` |
-| Watch runtime | **Out of scope** — not modified; referenced for sync/CSV policy only |
+| Watch runtime | **Out of scope** — read-only compatibility for briefing/sync codecs |
 
 ### Experimental exclusions (`project.yml`)
 
@@ -118,606 +128,469 @@ Confirmed excluded from `DIRDiving iOS`:
 ```bash
 xcodegen generate
 
-xcodebuild -scheme "DIRDiving iOS" \
+xcodebuild -project DIRDiving.xcodeproj \
+  -scheme "DIRDiving iOS" \
   -destination 'generic/platform=iOS Simulator' \
   CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
 
-xcodebuild -scheme "DIRDiving iOS Algorithm Tests" \
+xcodebuild -project DIRDiving.xcodeproj \
+  -scheme "DIRDiving iOS Algorithm Tests" \
   -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test
 ```
 
-### Build / test results
+### Build / test results @ `15f2d59`
 
-| Step | Result |
+| Command | Result |
 |---|---|
-| `xcodegen generate` | **PASS** |
-| `DIRDiving iOS` build | **PASS** |
-| `DIRDiving iOS Algorithm Tests` | **PASS** — **540 executed**, 13 skipped (keychain-dependent Watch sync), **0 failures** |
+| `xcodegen generate` | **OK** |
+| `DIRDiving iOS` build (generic iOS Simulator) | **BUILD SUCCEEDED** |
+| `DIRDiving iOS Algorithm Tests` (iPhone 17 Pro) | **TEST SUCCEEDED** — 800 executed, 13 skipped, 0 failures (~79 s) |
 
-### Directories inspected
-
-`iOSApp/Algorithms/Buhlmann/`, `iOSApp/Services/CCR/`, `iOSApp/Services/BuhlmannPlanner.swift`, `iOSApp/Services/RatioDecoPlanner.swift`, `iOSApp/Models/GasPlan.swift`, `iOSApp/Models/CCR/`, `iOSApp/Utils/PlannerModePolicy.swift`, `iOSApp/Utils/GasMixValidator.swift`, `iOSApp/Services/PlannerMODValidator.swift`, `iOSApp/Utils/ChecklistPlannerSyncMapper.swift`, `iOSApp/Views/PlannerView.swift`, `iOSApp/Views/ManualDiveEditorView.swift`, `iOSApp/Services/PDF/`, `iOSApp/Services/SubsurfaceExportService.swift`, `Tests/iOSAlgorithmTests/` (76 files), `Docs/CCR_*`, `Docs/QA_EVIDENCE/`
+Skipped tests are environment-gated (keychain peer secret, simulator-only guards) — not failures.
 
 ---
 
-## C. Phase 1 — Original Check_Math_iOS Audit (Consolidated)
+## C. Architecture Inventory
 
-### Original scope coverage
+Presentation-only code is not credited as a separate mathematical engine.
 
-| Domain | Status | Notes |
+| Family | Canonical source | Validation | Persistence | Presentation | Export | Tests | Reachable | Readiness |
+|---|---|---|---|---|---|---|---|---:|
+| Bühlmann OC | `BuhlmannEngine.swift`, `BuhlmannPlanner.swift` | `BuhlmannPlanPreflightValidator.swift` | `PlannerStore` | `PlannerView`, `DecoStopsPresentationBuilder` | PDF builders | 40+ files | Yes | 95% |
+| Planner modes | `PlannerModePolicy.swift`, `PlannerService.swift` | `PlannerInputValidator.swift` | `PlannerStore` | Mode pickers | PDF | `PlannerModePolicyTests` | Yes | 93% |
+| Gas schedule / MOD | `GasPlanningService`, `PlannerMODValidator` | `GasMixValidator` | — | Gas cards | PDF | `ScheduleGasConsumptionServiceTests` | Yes | 91% |
+| Gas ledger | `ScheduleGasConsumptionService.swift` | Plan completeness | — | `GasLedgerDisplayFormatter` | PDF | `GasLedgerDisplayFormatterTests` | Yes | 91% |
+| Ascent / runtime | `PlannerAscentTableBuilder`, `RouteSummaryService` | Ascent speed settings | — | Runtime section | PDF/briefing | `PlannerAscentTableTests` | Yes | 92% |
+| Rock Bottom | `ScheduleGasConsumptionService` (rock bottom liters) | Emergency params | — | Emergency section | PDF | `ScheduleGasConsumptionServiceTests` | Yes | 90% |
+| Repetitive dive | `RepetitiveDivePlannerService.swift` | Snapshot guards | `PlannerStore.lastTissueSnapshot` | Repetitive toggle | — | `BuhlmannReleaseHardeningTests` | OC only | 89% |
+| Ratio Deco | Heuristic comparator | Blocked in CCR | — | Compare section | PDF section | `RatioDecoPlannerTests` | OC deco/tech | 86% |
+| CCR planner | `CCRPlannerEngine.swift`, `CCRPlannerService.swift` | `CCRPlanValidator.swift` | CCR settings in store | `CCRPlannerView` | CCR PDF | `CCRPlannerTests`, `CCRMathAuditRemediationV1Tests` | `.ccr` mode | 91% |
+| CCR bailout | `CCRBailoutScenarioCalculator.swift` | Validator | — | Result cards | PDF metadata | `CCRMathRemediationTests` | CCR | 88% |
+| CCR density | `CCRGasDensityEstimator.swift` | Inspired gas model | — | Narcosis footnotes | Briefing rows | `CCRMathAuditRemediationV1Tests` | CCR | 92% |
+| CCR CNS/OTU | `CCROxygenExposureState.swift` | Exposure model | — | Unavailable labels | Briefing/PDF gate | `BuhlmannComprehensiveReadinessRemediationV1Tests` | CCR | 93% |
+| Equipment structured | `EquipmentProfile.swift`, `EquipmentStructuredSupport.swift` | Schema | `EquipmentStore` + cloud | Equipment tab | Equipment PDF | `EquipmentProfileStructuredModelTests` | Yes | 90% |
+| Checklist sync OC | `ChecklistPlannerSyncMapper.swift` | Gas role match | Equipment checklist | `PlannerView` prompts | — | `ChecklistPlannerSyncMapperTests` | Yes | 91% |
+| Checklist sync CCR | `ChecklistPlannerSyncMapper` CCR paths | `CCRChecklist*Coordinator` | Equipment checklist | `CCRPlannerView`, `CCRPlanResultView` | — | `IOSCompleteAlgorithmAuditRemediationTests` | Yes | 90% |
+| Manual dive | `ManualDiveEditorValidation`, `DiveProfileMath` | Editor guards | `DiveLogStore` | Manual editor | CSV | `ManualDiveEditorLogicTests` | Yes | 89% |
+| Subsurface CSV | `SubsurfaceExportService`, `DiveImportService` | Size/row caps | Dive log | Import UI | CSV | `CSVMetadataRoundTripTests` | Yes | 86% |
+| Briefing card | `PlannerBriefingImageExportService` | Reference-only gate | Staging TTL | Result views | PNG | `PlannerBriefingImageExportServiceTests` | Yes | 92% |
+| Watch briefing | `PlannerBriefingWatchTransferService` | HMAC/signed ACK | Watch-side store (read-only ref) | Send buttons | File transfer | `PlannerWatchBriefingTransferTests`, `CCRPlannerBriefingExportTests` | Paired Watch | 90% |
+| Cloud sync | `CloudSyncStore.swift` | Payload cap, LWW | iCloud KVS + local | Error surfacing | — | `CloudSyncStoreLoadTests` | Always on | 85% |
+| Units | `Formatters.swift`, `IOSPressureUnitPreference` | — | UserDefaults | Settings + planner | PDF | `PlannerPressureUnitPreferenceTests` | Yes | 93% |
+
+---
+
+## D. Bühlmann Core Audit
+
+### Verified (evidence)
+
+| Requirement | Status | Evidence |
 |---|---|---|
-| Planner calculations | **Verified** | OC via `BuhlmannEngine`; CCR via `CCRPlannerEngine` |
-| Bühlmann ZHL-16C | **Verified** | 16 compartments, N₂ + He, GF, Schreiner, multigas |
-| Gas calculations | **Verified** | `GasMixValidator`, MOD, PPO₂, roles |
-| CNS / OTU | **Verified** | NOAA CNS + Lambertsen OTU; CCR setpoint path |
-| MOD / PPO₂ | **Verified** | Environment-aware ambient pressure |
-| Unit conversions | **Verified** | `IOSUnitConversions` central path |
-| Logbook / statistics | **Verified** | `DiveLogStore`, analysis services |
-| CSV / PDF export math | **Verified** | Metric depth policy; monotonic `time_seconds` |
-| Sync / cloud numerics | **Verified** | Conflict merge tests; CCR JSON round-trip |
-| Import transformations | **Verified** | `DiveImportService`, CCR metadata keys |
+| ZHL-16C constants, 16 N2/He compartments | **PASS** | `BuhlmannConstants.swift`, `BuhlmannConstantsTests` |
+| Half-times, a/b coefficients | **PASS** | `BuhlmannTissueModel.swift`, reference fixtures |
+| Tissue initialization / Schreiner integration | **PASS** | `BuhlmannSchreinerEquationTests`, `BuhlmannTissueLoadingTests` |
+| GF low/high interpolation, ceiling, controlling compartment | **PASS** | `BuhlmannGradientFactorTests`, `BuhlmannCeilingTests` |
+| Stop rounding, deco convergence | **PASS** | `BuhlmannEngineCanonicalConsistencyTests` |
+| NDL, multigas switches, trimix/helium | **PASS** | `BuhlmannNDLTests`, `BuhlmannMultigasPlannerTests`, `BuhlmannTrimixHeliumTests` |
+| Altitude / freshwater / salinity via `PlannerEnvironment` | **PASS** | `BuhlmannPressureModelTests`, `PlanningDepthReferenceTests` |
+| Invalid-input guards, deterministic output | **PASS** | `BuhlmannNumericalRobustnessTests`, `BuhlmannReleaseHardeningTests` |
+| No fake/static results | **PASS** | Golden fixtures, regression fixtures |
 
-### Original readiness (inherited + revalidated)
+### External gap
 
-| Metric | Estimate |
-|---|---:|
-| Original Check_Math_iOS algorithm readiness | **88%** (baseline @ pre-remediation audits) |
-| Current consolidated algorithm readiness | **92%** |
-| Original TestFlight blockers | External validation, physical QA (unchanged) |
-| Original App Store blockers | Legal/marketing + above (unchanged) |
-
-**Original blockers not closed by code alone:** external Bühlmann comparison, external CCR profiles, iCloud two-device QA, Subsurface desktop validation.
+Third-party Bühlmann profile comparison **PENDING** — `Docs/QA_EVIDENCE/BUHLMANN_EXTERNAL/README.md` (no PASS files).
 
 ---
 
-## D. Phase 2 — Bühlmann Core Readiness
+## E. Planner Modes (Base / Deco / Technical / CCR)
 
-### Files inspected
-
-- `iOSApp/Algorithms/Buhlmann/BuhlmannConstants.swift`
-- `iOSApp/Algorithms/Buhlmann/BuhlmannTissueModel.swift`
-- `iOSApp/Algorithms/Buhlmann/BuhlmannGas.swift`
-- `iOSApp/Algorithms/Buhlmann/BuhlmannEngine.swift`
-- `iOSApp/Algorithms/Buhlmann/BuhlmannTissueHistory.swift`
-- `iOSApp/Algorithms/Buhlmann/BuhlmannPlanPreflightValidator.swift`
-- `iOSApp/Services/BuhlmannPlanner.swift`
-
-### Verified
-
-| Item | Status |
-|---|---|
-| ZHL-16C compartment constants | OK |
-| N₂ and He half-times / a,b coefficients | OK |
-| Tissue initialization + surface pressure | OK |
-| Descent/ascent segment integration (Schreiner) | OK |
-| GF low/high interpolation | OK |
-| Ceiling + stop generation (3 m intervals) | OK |
-| NDL at gfHigh | OK |
-| Multigas switches + dwell | OK |
-| OC plan consistency | OK — tested extensively |
-| Finite guards / deterministic output | OK |
-| No fake/static Bühlmann output | OK |
-
-### CCR compatibility note
-
-**Bühlmann core is OC-only.** CCR reuses `BuhlmannTissueState` ceiling/GF primitives via `CCRInspiredGasModel` (`ccrLoadedLinearDepth`) — not mixed into `BuhlmannEngine`.
-
-### Gaps
-
-- External third-party profile sign-off **PENDING**
-- OC bailout cylinders are schedule-only; not simulated in engine (by design)
-- No CCR paths inside `Algorithms/Buhlmann/*` (correct separation)
-
-**Bühlmann readiness: 94%**  
-**CCR Bühlmann integration readiness: 87%** (parallel engine, not unified)
-
----
-
-## E. Phase 2B — Ratio Deco Engine
-
-### Files inspected
-
-- `iOSApp/Services/RatioDecoPlanner.swift`
-- `iOSApp/Services/RatioDecoValidator.swift`
-- `iOSApp/Models/RatioDecoModels.swift`
-- `iOSApp/Views/RatioDecoPlannerViews.swift`
-
-### Verified
-
-| Item | Status |
-|---|---|
-| Heuristic only — Bühlmann primary | OK |
-| Does not override safety-critical Bühlmann warnings | OK |
-| Presets 1:1 / 2:1 / Custom | OK |
-| MOD / PPO₂ / gas / ceiling validation | OK |
-| Comparison mode + overlay chart | OK |
-| PDF integration | OK |
-| Base mode blocked | OK |
-| **CCR mode explicitly blocked** | OK — `.unavailableInCCRMode` |
-
-### CCR Ratio Deco status
-
-**Not supported — by design.** `PlannerService.makeRatioDecoBundle` returns `nil` when `mode == .ccr`. Tests in `CCRMathRemediationTests` lock rejection.
-
-**Ratio Deco readiness: 86%**  
-**CCR Ratio Deco readiness: N/A (unsupported, correctly gated)**
-
----
-
-## F. Phase 2C — Tissue & Narcosis
-
-### Files inspected
-
-- `iOSApp/Services/TissueAnalyticsService.swift`
-- `iOSApp/Utils/TissueAnalyticsSupport.swift` / `NarcosisAnalyticsSupport`
-- `iOSApp/Models/TissueAnalyticsTrace.swift`
-- `iOSApp/Services/CCR/CCRTissueHistorySampler.swift`
-
-### Verified
-
-| Item | OC | CCR |
-|---|---|---|
-| 16 compartments | OK | OK via shared tissue state |
-| N₂ / He loading | OK | OK via inspired inert fractions |
-| Controlling compartment / GF-relative loading | OK | OK |
-| Timeline + runtime depth | OK | OK — `.ccrPlanned` source |
-| Active gas / PPO₂ / PPN₂ / END | OK | OK — setpoint drives PPO₂ |
-| Model-backed planner charts | OK | OK |
-| No fake static chart data | OK | OK — footnotes on simulated segments |
-
-### CCR-specific notes
-
-- PPO₂ = setpoint; inert from diluent when ambient > setpoint
-- Bailout switches to OC gas model in analytics paths where implemented
-- Narcosis uses ppN₂ timeline; CCR density estimator simplified
-- O₂ narcotic weighting not applied on CCR path (ppN₂ only)
-
-**Tissue readiness: 90%**  
-**Narcosis readiness: 88%**  
-**CCR tissue readiness: 88%**  
-**CCR narcosis readiness: 86%**
-
----
-
-## G. Phase 3 — Gas Planning
-
-### Files inspected
-
-- `iOSApp/Models/GasPlan.swift`
-- `iOSApp/Models/CCR/CCRModels.swift`
-- `iOSApp/Services/GasPlanningService.swift`
-- `iOSApp/Services/PlannerGasSchedule.swift`
-- `iOSApp/Utils/PlannerModePolicy.swift`
-- `iOSApp/Utils/GasMixValidator.swift`
-
-### OC verified
-
-Back Gas, Travel, Deco, Bailout roles; stable IDs; mode projection; gas ledger; schedule consumption; planner + checklist + PDF integration.
-
-### CCR verified
-
-| Capability | Status |
-|---|---|
-| Circuit type enum (OC/CCR/SCR) | **Partial** — `diveMode: String = "ccr"`; no SCR |
-| Diluent gas (O₂/He/N₂) | OK |
-| Low/high setpoint + switch depth | OK |
-| Oxygen setpoint validation | OK via `CCRPlanValidator` |
-| Bailout OC gases + switch depths | OK |
-| CNS/OTU from setpoint | OK |
-| Inert loading under CCR model | OK |
-| Scrubber duration / metabolic O₂ / diluent consumption | **Not implemented** (no fake estimates) |
-| `loopVolumeLiters` | Stored; **unused by engine** |
-| `runtimeSegments` (manual setpoint timeline) | **Reserved; ignored by engine** |
-
-**Gas Planning readiness: 90%**  
-**Gas Role readiness: 88%**  
-**CCR Gas Planning readiness: 86%**  
-**Bailout readiness: 80%** (heuristic SAC — `CCRBailoutScenarioResult.isHeuristic`)
-
----
-
-## H. Phase 3B — MOD / Dalton Validation
-
-### Files inspected
-
-- `iOSApp/Services/PlannerMODValidator.swift`
-- `iOSApp/Utils/GasMixValidator.swift`
-- `iOSApp/Utils/PlannerInputValidator.swift`
-- `iOSApp/Services/CCR/CCRPlanValidator.swift`
-
-### Verified
-
-| Rule | Status |
-|---|---|
-| MOD auto recalculation unified | OK — `GasMixValidator.modMeters` |
-| PPO₂ step 0.1 | OK |
-| Air / EAN / Trimix editing rules | OK |
-| Displayed MOD == used MOD | OK |
-| Switch depth clamp to MOD | OK — tested |
-| PlannerEnvironment altitude/salinity | OK |
-| CCR diluent hypoxic / bailout MOD | OK |
-| Setpoint PPO₂ bounds | OK |
-
-### Gaps
-
-- `PlannerInputValidator` skips bottom MOD in some merge paths; `PlannerService` / PDF export stricter — asymmetry documented, not a math bug
-- GF policy `gfLow >= gfHigh` rejection (intentional strictness)
-
-**MOD/PPO₂ readiness: 93%**  
-**Dalton readiness: 92%**  
-**CCR MOD/Dalton readiness: 91%**
-
----
-
-## I. Phase 4 — Planner Mode Architecture
-
-### Modes: Base / Deco / Technical / CCR
-
-| Mode | Real inputs | Gas set | Bühlmann display | CCR |
+| Mode | Engine | Ratio Deco | Repetitive tissue | Evidence |
 |---|---|---|---|---|
-| Base | Stripped deco, depth limits | Air/EAN | Hidden/simplified | **Not exposed** |
-| Deco | 1 deco cylinder cap | No trimix | Simplified | **Not exposed** |
-| Technical | Full multigas + travel/bailout | Full | Full + GF compare | **Not exposed** |
-| CCR | `CCRPlanInput` parallel model | Diluent + bailout | Via CCR engine | **Isolated** |
+| Base | Bühlmann simplified | Blocked | Optional | `PlannerModePolicyTests` |
+| Deco | Bühlmann + deco gases | Allowed (compare) | Optional | `PlannerDecoGasToggleTests` |
+| Technical | Bühlmann + team gas + avg-depth toggle | Allowed | Optional | `PlannerTechnicalAverageDepthGasConsumptionTests` |
+| CCR | `CCRPlannerEngine` | **Blocked** | **Not seeded** | `CCRPlannerTests`, `PlannerModePolicyTests` |
 
-CCR only in `.ccr` mode — not in Base/Deco/Technical. `PlannerModePolicy.validate(.ccr)` skips OC validation and adds `.validReference` only; CCR math gated by `CCRPlanValidator`.
-
-**Planner Mode readiness: 92%**  
-**CCR mode-integration readiness: 90%**
+Mode projection is centralized in `PlannerModePolicy.swift`; CCR never calls open-circuit Bühlmann for loop gas.
 
 ---
 
-## J. Phase 5 — Planner ↔ Checklist
+## F. MOD / PPO₂ / Dalton / Switch Depth
 
-### Verified (OC)
-
-Import/export candidates, fingerprint dedup, role inference (EN/IT), `applyExport` / `applyImport` wired in `PlannerView.swift`, PDF checklist YES/NO boxes, equipment templates.
-
-### CCR status
-
-| Item | Status |
-|---|---|
-| `ccrChecklistItems` / `applyCCRExport` mapper | OK — tested |
-| CCR equipment template (`scrubber`, cells, etc.) | OK in `EquipmentStore` |
-| **UI wiring for CCR export** | **GAP** — `applyCCRExport` called only from **tests**, not `PlannerView` (OC uses `applyExport` @ ~1748) |
-
-**Checklist readiness: 85%**  
-**Planner Sync readiness: 83%**  
-**CCR Checklist readiness: 75%** (mapper ready; UX path missing)
-
----
-
-## K. Phase 6 — Manual Dive
-
-### Verified
-
-`ManualDiveEditorView` + validation; synthetic profile; CCR metadata fields (setpoints, diluent, bailout labels, scrubber/O₂/loop notes); imperial round-trip; `CCRLogbookMetadata` persistence; CSV `# dirdiving_ccr_*` export when present; explicit logbook-only disclosure (not live loop PPO₂).
-
-### Gaps
-
-- No E2E test: editor save → `DiveLogStore` full CCR payload
-- Physical UX QA **PENDING**
-
-**Manual Dive readiness: 88%**  
-**CCR Manual Dive readiness: 86%**
-
----
-
-## L. Phase 7 — Logbook / Analytics / Charts
-
-### Verified
-
-Logbook metrics, analysis dashboard, depth/tissue/narcotic charts, gas/PPO₂/ceiling timelines, planner vs logbook separation, demo-data isolation, CCR `.ccrPlanned` source labeling, footnotes on simulated segments.
-
-### Gaps
-
-- CCR bailout segment visualization partial
-- Missing CCR fields do not create fake charts (OK)
-
-**Logbook readiness: 87%**  
-**Analytics readiness: 88%**  
-**CCR Analytics readiness: 85%**
-
----
-
-## M. Phase 8 — PDF / Share / Export
-
-| Export | OC | CCR | Notes |
+| Rule | OC | CCR | Tests |
 |---|---|---|---|
-| Planner PDF | OK | Separate `CCRPlannerPDFBuilder` | Reference disclaimer |
-| Briefing PDF | OK | **No** | OC only |
-| Checklist PDF | OK | Via checklist content | CCR roles in lines |
-| Dive Pack PDF | OK | **No** | Tested OC-only gate |
-| Share sheet | OK | OK | System targets |
-| CSV Subsurface | OK | `# dirdiving_ccr_*` when metadata present | Watch omits CCR by policy |
+| MOD from max PPO₂ | `PlannerMODValidator` | Setpoint + diluent paths | `PlannerSwitchDepthMODClampTests` |
+| Switch depth clamp above MOD | Bühlmann preflight | CCR validator | `BottomGasSwitchDepthTests` |
+| Dalton / density warnings | Gas mix validator | CCR inspired model | `BuhlmannGasValidationTests` |
 
-### CCR export labeling
-
-PDF includes reference-only disclaimer, heuristic bailout block, narcosis footnote (EN/IT post-remediation). CSV keys documented in `CCR_REBREATHER_EXPORT_POLICY.md`.
-
-**PDF readiness: 90%**  
-**Share readiness: 90%**  
-**Export readiness: 85%**  
-**CCR PDF/Export readiness: 88%**  
-**External Subsurface validation: 50%** (**PENDING** — not executed)
+**Known asymmetry (LOW):** PDF export may apply stricter MOD display than inline validator in edge cases — documented in prior audits; not a calculation divergence.
 
 ---
 
-## N. Phase 9 — Unit Conversion
+## G. Gas Roles and Schedule Consumption
 
-Central `IOSUnitConversions` + `IOSAlgorithmConfiguration`; safety paths use `ambientPressureBar(depthMeters:environment:)`. CCR switch depth imperial round-trip fixed in remediation.
-
-| Conversion | Planner | Charts | Logbook | PDF | CSV | CCR |
-|---|---|---|---|---|---|---|
-| m ↔ ft | OK | OK | OK | OK | Metric policy | OK |
-| bar ↔ psi | OK | OK | OK | OK | OK | Setpoint stays bar |
-| °C ↔ °F | OK | OK | OK | OK | OK | OK |
-
-**Unit Conversion readiness: 92%**  
-**CCR Unit Conversion readiness: 92%**
+- **Roles:** bottom, deco, travel, bailout (OC); `ccrDiluent`, `ccrBailout` (CCR) — `ChecklistPlannerSyncMapper.swift`.
+- **Schedule consumption:** `ScheduleGasConsumptionService.analyze` produces segment-aware liters with rock-bottom and emergency minutes — `ScheduleGasConsumptionServiceTests`.
+- **Ledger display:** liters primary, bar equivalent secondary — `GasLedgerDisplayFormatter.swift`.
+- **Technical average-depth toggle:** `GasPlan.averageDepthGasConsumptionEnabled` projected by `PlannerModePolicy`; cache key includes toggle — `PlannerStore.AnalysisCacheKey`, `MainDeepCodeRemediationDCATests`.
 
 ---
 
-## O. Phase 10 — CCR / Rebreather Dedicated Audit
+## H. Emergency / Rock Bottom
 
-### Classification
-
-**Planner-integrated reference feature** — not a life-support controller, not certified decompression authority.
-
-| Sub-area | Classification | Readiness |
-|---|---|---:|
-| Circuit type model | Partial (`diveMode` string; no SCR) | 70% |
-| Setpoint model | Planner-integrated | 90% |
-| Diluent model | Planner-integrated | 89% |
-| Bailout model | Heuristic SAC (`isHeuristic`) | 78% |
-| Bühlmann integration | Parallel CCR engine | 87% |
-| Oxygen exposure (CNS/OTU) | Planner-integrated | 91% |
-| Consumption model | Partial (bailout SAC only) | 65% |
-| UI exposure | Technical/CCR tab only | 88% |
-| Test coverage | 39+ CCR-focused tests | 86% |
-
-### Term scan summary (iOSApp)
-
-CCR-related implementation concentrated in `iOSApp/Services/CCR/*`, `iOSApp/Models/CCR/*`, `iOSApp/Views/CCR/*`, planner integration in `PlannerStore` / `PlannerView`. No solenoid/controller runtime. Scrubber appears in checklist template only — not calculated.
-
-**CCR Overall readiness: 88%**
+- Emergency section exposes Rock Bottom parameters in planner settings (`PlannerStore` / UI).
+- `ScheduleGasConsumptionService` computes `rockBottomLiters` using ascent-speed-aware automatic ascent minutes.
+- Conservative assumptions documented in UI copy; not a certified minimum-gas standard.
 
 ---
 
-## P. Phase 11 — Performance / Numerical Robustness
+## I. Transit Timing / Dive Runtime / Deco Stops
 
-| Area | Status |
-|---|---|
-| Bühlmann recomputation | Acceptable; tested fixtures |
-| CCR setpoint timeline | Single switch model; no heavy timeline |
-| Tissue / narcotic generation | Tested; long profiles partial stress |
-| PDF generation | Unit-tested; no snapshot perf suite |
-| Planner slider debouncing | Not fully benchmarked |
-| MOD normalization loops | Tested via clamp suites |
+| Component | Role | Coherence check |
+|---|---|---|
+| `PlannerAscentSpeedSettings` | Global ascent rate for transit estimates | Matches ascent table builder inputs |
+| `PlannerAscentTableBuilder` | Canonical stop schedule from engine output | `PlannerAscentTableTests` (25 tests) |
+| `DecoStopsPresentationBuilder` | Presentation mapping only | `PlannerPresentationTests` |
+| `RouteSummaryService` | Aggregates runtime totals | `RouteSummary` in plan result tests |
 
-**Performance readiness: 89%**  
-**Numerical robustness readiness: 91%**
+Deco-stop presentation is derived from engine output, not a parallel math engine.
 
 ---
 
-## Q. Phase 12 — Security / Privacy / Safety Copy
+## J. Technical Average-Depth Gas Toggle
 
-| Area | Status |
-|---|---|
-| Dive profile / GPS protection | OK — file protection patterns tested |
-| Gas / CCR checklist data in exports | OK — user-initiated share |
-| iCloud backup opt-in | Implemented; two-device QA **PENDING** |
-| PDF temp file handling | OK — cleanup tested |
-| Malformed cloud payloads | Conflict tests present |
-
-### CCR safety copy
-
-`Docs/CCR_REBREATHER_LIMITATIONS.md`, localized `ccr.reference_estimate_only`, `ccr.pdf.disclaimer`, `TESTFLIGHT_REVIEW_NOTES.md` bailout heuristic disclosure. `SAFETY_DISCLAIMER.md` is app-wide — CCR specifics rely on CCR docs + in-app keys.
-
-**Security readiness: 88%**  
-**Privacy readiness: 87%**  
-**CCR Safety Copy readiness: 90%**
+- Toggle affects gas consumption depth reference in Technical mode only.
+- `AnalysisCacheKey.averageDepthGasConsumptionEnabled` prevents stale analysis after toggle — fixed @ `c0b5cd9`.
+- **Gap (LOW):** no dedicated XCTest that toggles only this field and asserts cache miss; indirect coverage via `PlannerTechnicalAverageDepthGasConsumptionTests`.
 
 ---
 
-## R. Phase 13 — Test Coverage
+## K. Repetitive Dive / Residual Tissue
 
-### Summary
-
-- **76** test files under `Tests/iOSAlgorithmTests/`
-- **540** tests executed, **13** skipped, **0** failures @ `984a69b`
-- **~130** Bühlmann-focused tests across ~22 files
-- **~39** CCR-focused tests across 3 files (`CCRPlannerTests`, `CCRMathRemediationTests`, `BuhlmannComprehensiveReadinessCCRRemediationTests`)
-- **10** Ratio Deco tests (+ CCR rejection cases)
-
-### Strong coverage
-
-Bühlmann core, GF, trimix, altitude, MOD/PPO₂ clamp, Ratio Deco guards, CCR engine/validator/inspired gas/tissue sampler, checklist mapper (unit), manual dive validation, PDF builders, unit conversion, cloud conflicts, CCR CSV round-trip.
-
-### Missing or weak
-
-| Area | Gap |
-|---|---|
-| External Bühlmann fixtures | Process — not XCTest |
-| CCR bailout Bühlmann simulation | Intentionally absent |
-| Subsurface external round-trip | Manual **PENDING** |
-| iCloud two-device merge | Manual **PENDING** |
-| CCR checklist export UI | No integration test |
-| Dedicated `SubsurfaceExportServiceTests` | Referenced in docs; no standalone file |
-| CCR Dive Pack PDF | OC-only by design |
-| Long-profile performance | Partial |
-
-**Test Coverage readiness: 90%**  
-**CCR Test Coverage readiness: 86%**
+- `RepetitiveDivePlannerService.makeSnapshot` / `validateSnapshot` with fail-closed errors (missing, stale, corrupt, schema, environment mismatch).
+- OC-only; CCR mode does not seed from prior tissue snapshot.
+- Oxygen carryover via `OxygenExposureModel.applySurfaceInterval` — `OxygenExposureDeepModelTests`.
+- External multi-dive envelope validation **PENDING**.
 
 ---
 
-## S. Phase 14 — Release Hard Readiness Matrix
+## L. Ratio Deco
 
-| Feature | Readiness |
-|---|---:|
-| Bühlmann | **94%** |
-| Ratio Deco | **86%** |
-| Gas Planning | **90%** |
-| Gas Roles | **88%** |
-| MOD/PPO2/Dalton | **93%** |
-| Tissue Loading | **90%** |
-| Narcosis | **88%** |
-| Planner Modes | **92%** |
-| Checklist | **85%** |
-| Planner Sync | **83%** |
-| Manual Dive | **88%** |
-| PDF Export | **90%** |
-| CSV/Subsurface | **85%** |
-| Localization | **88%** |
-| Units | **92%** |
-| Performance | **89%** |
-| Security/Privacy | **88%** |
-| Documentation | **90%** |
-| Internal TestFlight | **88%** |
-| External TestFlight | **55%** |
-| CCR Model | **86%** |
-| CCR Setpoint | **90%** |
-| CCR Diluent | **89%** |
-| CCR Bailout | **78%** |
-| CCR Bühlmann Integration | **87%** |
-| CCR Oxygen Exposure | **91%** |
-| CCR Consumption | **65%** |
-| CCR UI Exposure | **88%** |
-| CCR Test Coverage | **86%** |
-| **Overall** | **92%** |
-
-### Mandatory final verdicts
-
-| Verdict | Answer |
-|---|---|
-| Bühlmann | **Almost ready** — internal reference strong; external sign-off **PENDING** |
-| Ratio Deco | **Ready as labeled heuristic** — OC only; blocked in CCR |
-| Gas Planning | **Almost ready** — OC strong; CCR parallel model |
-| Gas Role | **Almost ready** — inference edge cases |
-| MOD/PPO2 | **Ready** — unified math; PDF stricter gate documented |
-| Tissue | **Almost ready** — model-backed; simulated segments footnoted |
-| Narcosis | **Almost ready** — CCR estimator simplified |
-| Checklist | **Conditional** — OC wired; **CCR export UI missing** |
-| PDF | **Almost ready** — CCR plan PDF OK; Dive Pack OC-only |
-| Manual Dive | **Almost ready** — CCR logbook fields validated |
-| Unit Conversion | **Ready** |
-| CCR | **Reference-only almost ready** — heuristic bailout; external validation **PENDING** |
-| Internal TestFlight | **Conditional yes** — disclose non-certified + CCR + bailout |
-| External TestFlight | **No** — external math + iCloud + Watch physical QA |
-| App Store | **No** — same + legal/marketing |
+- Heuristic comparator for OC deco/technical plans only.
+- Explicitly blocked when `plannerMode == .ccr` — `RatioDecoPlannerTests`.
+- Not a certified decompression algorithm; PDF sections labeled accordingly.
 
 ---
 
-## T. Phase 15 — Action Plan
+## M. Tissue / Narcosis / CNS / OTU
 
-### Immediate blockers (P0)
-
-**None.**
-
-### Internal TestFlight blockers (P1)
-
-| ID | Sev | Pri | Area | Finding | Proposed fix | Tests |
-|---|---|---|---|---|---|---|
-| IOS-EXT-BM-001 | MED | P1 | Bühlmann | External profile comparison not executed | Run `DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md`; attach evidence to `Docs/QA_EVIDENCE/BUHLMANN_EXTERNAL/` | Manual evidence pack |
-| IOS-EXT-CCR-001 | MED | P1 | CCR | CCR-01…07 slots empty | Run `CCR_REBREATHER_VALIDATION_PLAN.md` | Manual — **do not mark PASS without files** |
-| IOS-ICLOUD-001 | MED | P1 | Cloud | Two-device QA not recorded | Execute `ICLOUD_TWO_DEVICE_QA_MATRIX.md` | Manual |
-| IOS-BAILOUT-DOC-001 | LOW | P1 | CCR | Heuristic bailout must stay disclosed | Keep `TESTFLIGHT_REVIEW_NOTES.md` + PDF labels | Review only |
-
-### External TestFlight blockers (P2)
-
-| ID | Sev | Pri | Area | Finding | Proposed fix | Tests |
-|---|---|---|---|---|---|---|
-| IOS-CHK-CCR-001 | MED | P2 | Checklist | `applyCCRExport` not called from `PlannerView` | Wire CCR calculate → checklist export sheet (mirror OC flow) | UI/integration test |
-| IOS-SUB-001 | MED | P2 | CSV | Subsurface desktop round-trip **PENDING** | Execute `SUBSURFACE_CSV_ROUNDTRIP.md` steps 4–10 | Manual + `Docs/QA_EVIDENCE/SUBSURFACE_CSV/` |
-| IOS-WATCH-SYNC-001 | MED | P2 | Sync | Paired Watch physical QA **PENDING** | `WATCH_IOS_SYNC_QA_MATRIX.md` + evidence folder | Manual |
-| IOS-CCR-PDF-001 | LOW | P2 | PDF | CCR Dive Pack not offered (by design) | Document or add CCR briefing variant if product requires | Product decision |
-
-### App Store blockers (P3)
-
-| ID | Sev | Pri | Area | Finding | Proposed fix |
-|---|---|---|---|---|---|
-| IOS-LEGAL-001 | MED | P3 | Marketing | App Store copy vs non-certified posture | Legal/marketing review |
-| IOS-VISUAL-001 | LOW | P3 | UX | Dynamic Type / VoiceOver matrices | `IOS_DYNAMIC_TYPE_VOICEOVER_QA_MATRIX.md` |
-
-### Post-release (P4)
-
-| ID | Sev | Pri | Area | Finding | Proposed fix |
-|---|---|---|---|---|---|
-| IOS-CCR-RUNTIME-001 | LOW | P4 | CCR | `runtimeSegments` reserved unused | Implement or permanent doc + quarantine test |
-| IOS-CCR-LOOP-001 | INFO | P4 | CCR | `loopVolumeLiters` unused | Implement or remove from model |
-| IOS-BAILOUT-ENG-001 | INFO | P4 | CCR | Optional Bühlmann OC bailout simulation | Major scope — separate command |
-| IOS-PERF-001 | INFO | P4 | Perf | Long-profile benchmarks | Profiling harness |
-
----
-
-## U. External / Physical QA Gates (All PENDING)
-
-| Gate | Matrix / doc | Evidence folder | Status |
+| Metric | OC | CCR | Truthfulness |
 |---|---|---|---|
-| External Bühlmann validation | `DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md` | `Docs/QA_EVIDENCE/BUHLMANN_EXTERNAL/` | **PENDING** |
-| External CCR validation | `CCR_REBREATHER_VALIDATION_PLAN.md` | `Docs/QA_EVIDENCE/CCR_EXTERNAL/` | **PENDING** |
-| Subsurface CSV external | `SUBSURFACE_CSV_ROUNDTRIP.md` | `Docs/QA_EVIDENCE/SUBSURFACE_CSV/` | **PENDING** |
-| iCloud two-device | `ICLOUD_TWO_DEVICE_QA_MATRIX.md` | `Docs/QA_EVIDENCE/ICLOUD_TWO_DEVICE/` | **PENDING** |
-| Watch Ultra physical | `WATCH_ULTRA_PHYSICAL_QA_MATRIX.md` | `Docs/QA_EVIDENCE/WATCH_ULTRA/` | **PENDING** |
-| Watch-iOS sync | `WATCH_IOS_SYNC_QA_MATRIX.md` | `Docs/QA_EVIDENCE/WATCH_IOS_SYNC/` | **PENDING** |
+| Tissue loading | Bühlmann compartments | Planned segments footnoted | `.ccrPlanned` source tags |
+| END / PPN2 | Standard models | Inspired gas from setpoint | Narcosis services |
+| Gas density | N/A | Partial-pressure g/L | Unavailable when invalid — never zero |
+| CNS / OTU | Full exposure model | `CCROxygenExposureState` | Unavailable on failure — never zero |
 
-**Explicit statement:** No physical or external QA was executed or marked passed in this audit.
+P1 fixes @ `8147b3f` verified in `CCRMathAuditRemediationV1Tests` and `BuhlmannComprehensiveReadinessRemediationV1Tests`.
 
 ---
 
-## V. Recommended Next Cursor Commands (draft — do not execute)
+## N. CCR / Rebreather
 
-1. **`4-DIR_DIVING_IOS_COMPLETE_ALGORITHM_REMEDIATION_CCR_UPDATED.md`** — wire CCR checklist export UI; Subsurface evidence harness; optional `runtimeSegments` decision.
-2. **`2-DIR_DIVING_IOS_BUHLMANN_CORE_EXTERNAL_VALIDATION_EVIDENCE.md`** — external Bühlmann comparison evidence pack.
+### Architecture
+
+Isolated reference planner: setpoint-inspired gas, dedicated tissue sampler, heuristic bailout scenarios with explicit `method` / `limitations` / `assumptions` metadata.
+
+### Closed since prior audits
+
+| ID | Finding | Resolution @ HEAD |
+|---|---|---|
+| IOS-MATH-P1-001 | Gas density not pressure-scaled | `CCRGasDensityEstimator` partial-pressure formula |
+| IOS-MATH-P1-002 | CNS/OTU failure → zero | `CCROxygenExposureState.unavailable` |
+| IOS-MATH-P2-001 | Bailout heuristic undocumented | `CCRBailoutScenarioResult` metadata |
+| IOS-MATH-P3-001 | Synthetic `.air` diluent trace | Actual `CCRDiluent` through exposure |
+| IOS-CHK-CCR-001 | CCR checklist export UI missing | Wired in `CCRPlanResultView` / `CCRPlannerView` |
+
+### Remaining CCR gaps
+
+| ID | Sev | Finding |
+|---|---|---|
+| IOS-EXT-CCR-001 | MED | External CCR validation slots empty — `Docs/QA_EVIDENCE/CCR_EXTERNAL/` |
+| IOS-BAILOUT-DOC-001 | LOW | Heuristic bailout must stay disclosed in TestFlight notes |
+| IOS-CCR-RUNTIME-001 | INFO | `runtimeSegments` reserved unused |
+| IOS-CCR-LOOP-001 | INFO | `loopVolumeLiters` unused in calculations |
+
+---
+
+## O. Structured Equipment / Checklist
+
+- Structured cylinders + maintenance in `EquipmentProfile` with legacy bridge — `EquipmentStructuredSupport.swift`.
+- `EquipmentPlannerMapper.apply` copies cylinders/SAC without altering math.
+- `EquipmentChecklistGenerator` produces operational pre-dive tasks from structured setup.
+- OC checklist import/export mirrors CCR pattern in `PlannerView`.
+- CCR import from diluent card; export after valid calculate — `CCRChecklistImportSheet`, `CCRChecklistExportSheet`.
+
+**Gap (LOW):** No UI integration test for full CCR calculate → export → persist → cloud round-trip.
+
+---
+
+## P. Manual Dive / Logbook
+
+- Manual entry validation via `ManualDiveEditorValidation`; CCR metadata fields supported.
+- `DiveProfileMath` for analytics; no-depth truthfulness preserved.
+- Physical editor UX QA **PENDING** — `Docs/QA_EVIDENCE/IOS_ACCESSIBILITY/`.
+
+---
+
+## Q. PDF / Share / CSV / Briefing Card
+
+| Export | Status | Notes |
+|---|---|---|
+| OC plan PDF | **Ready** | `PDFExportServiceTests` |
+| CCR plan PDF | **Ready** | Blocks when exposure unavailable |
+| Equipment setup PDF | **Ready** | Structured fields |
+| Briefing PNG (OC) | **Ready** | Reference-only watermark |
+| Briefing PNG (CCR) | **Ready** | `CCRPlannerBriefingExportSupport` @ `15f2d59` |
+| Watch transfer | **Ready (code)** | `PlannerBriefingWatchTransferService`; physical QA **PENDING** |
+| Subsurface CSV | **Ready (in-repo)** | External desktop validation **PENDING** |
+
+---
+
+## R. Cloud / Sync / Persistence / Security
+
+- `CloudSyncStore`: iCloud KVS + local fallback, LWW via `__modifiedAt`, payload size cap (`IOSAlgorithmConfiguration.maxSyncPayloadBytes`).
+- Dive session merge uses field-level merge — `CloudSessionMergeTests`.
+- Watch sync: HMAC / peer-secret / signed-ACK model — `WatchSyncPeerSecretPinningIOSTests` (skipped without keychain fixture).
+- **SEC-P1-003 (MED):** iCloud sync constructed at app launch without user opt-in — privacy review recommended before App Store.
+
+---
+
+## S. Units / Localization / Accessibility
+
+- Internal storage remains metric; display via `Formatters` + global `IOSPressureUnitPreference` in Settings — `PlannerPressureUnitPreferenceTests`.
+- EN/IT localization for planner gas, runtime, CCR briefing, checklist flows — `IOSI18nRemediationTests`, `UIUXLocalizationRemediationTests`.
+- Dynamic Type / VoiceOver matrices **PENDING** — `Docs/QA_EVIDENCE/DYNAMIC_TYPE_VOICEOVER/`.
+
+---
+
+## T. Performance / Numerical Robustness
+
+- `BuhlmannNumericalRobustnessTests` covers extreme GF, depth, and gas edge inputs.
+- Long multigas profile stress partially covered; dedicated perf harness **P4**.
+- CCR timeline sampling via `CCRTissueHistorySampler` — deterministic in unit tests.
+
+---
+
+## U. Test Coverage
+
+| Metric | Value |
+|---|---|
+| Test files | 108 under `Tests/iOSAlgorithmTests/` |
+| Executed @ audit | 800 |
+| Skipped | 13 (environment gates) |
+| Failures | 0 |
+
+### Coverage matrix (selected)
+
+| Area | Primary test files | Gap |
+|---|---|---|
+| Bühlmann core | `Buhlmann*Tests` (20+ files) | External fixtures only |
+| CCR math | `CCRMathAuditRemediationV1Tests`, `CCRMathRemediationTests` | External CCR profiles |
+| CCR checklist | `ChecklistPlannerSyncMapperTests`, `IOSCompleteAlgorithmAuditRemediationTests` | SwiftUI E2E |
+| CCR briefing | `CCRPlannerBriefingExportTests` | WCSession transfer E2E |
+| Gas ledger | `ScheduleGasConsumptionServiceTests` | Physical a11y |
+| Cloud | `CloudSyncStoreLoadTests`, `CloudSessionMergeTests` | Two-device manual matrix |
+| CSV | `CSVMetadataRoundTripTests` | Subsurface desktop |
+| Repetitive | `BuhlmannReleaseHardeningTests`, golden fixtures | External multi-dive |
+
+---
+
+## V. Detailed Issue Matrix
+
+| ID | Sev | Pri | Area | Finding | Status @ `15f2d59` | Evidence |
+|---|---|---|---|---|---|---|
+| IOS-EXT-BM-001 | MED | P1 | Bühlmann | External profile comparison not executed | **OPEN** | `QA_EVIDENCE/BUHLMANN_EXTERNAL/` |
+| IOS-EXT-CCR-001 | MED | P1 | CCR | CCR validation slots empty | **OPEN** | `QA_EVIDENCE/CCR_EXTERNAL/` |
+| IOS-ICLOUD-001 | MED | P1 | Cloud | Two-device QA not recorded | **OPEN** | `ICLOUD_TWO_DEVICE_QA_MATRIX.md` |
+| SEC-P1-003 | MED | P1 | Security | iCloud always-on without opt-in | **OPEN** | `CloudSyncStore` + `DIRDivingiOSApp` |
+| IOS-SUB-001 | MED | P2 | CSV | Subsurface desktop round-trip **PENDING** | **OPEN** | `QA_EVIDENCE/SUBSURFACE_CSV/` |
+| IOS-WATCH-SYNC-001 | MED | P2 | Sync | Paired Watch physical QA **PENDING** | **OPEN** | `WATCH_IOS_SYNC_QA_MATRIX.md` |
+| IOS-CHK-CCR-E2E | LOW | P2 | Checklist | CCR export UI lacks SwiftUI E2E test | **OPEN** | Mapper tests only |
+| IOS-BRIEF-CCR-E2E | LOW | P2 | Briefing | CCR Watch transfer lacks E2E test | **OPEN** | ACK unit tests only |
+| IOS-MATH-P1-001 | HIGH | — | CCR density | Pressure scaling | **CLOSED** @ `8147b3f` | `CCRMathAuditRemediationV1Tests` |
+| IOS-MATH-P1-002 | HIGH | — | CCR CNS/OTU | Zero fallback | **CLOSED** @ `8147b3f` | `CCROxygenExposureState` |
+| IOS-CHK-CCR-001 | MED | — | Checklist UI | Export not wired | **CLOSED** @ `0e98f24`/CCR views | `CCRPlanResultView` |
+| IOS-BAILOUT-DOC-001 | LOW | P1 | CCR | Heuristic bailout disclosure | **OPEN (process)** | TestFlight notes |
+| IOS-LEGAL-001 | MED | P3 | Marketing | App Store copy vs posture | **OPEN** | Legal review |
+| IOS-VISUAL-001 | LOW | P3 | UX | Dynamic Type / VoiceOver | **OPEN** | QA matrix |
+| IOS-CCR-RUNTIME-001 | INFO | P4 | CCR | `runtimeSegments` unused | **OPEN** | Model reservation |
+| IOS-PERF-001 | INFO | P4 | Perf | Long-profile benchmarks | **OPEN** | — |
+
+---
+
+## W. Edge-Case Matrix
+
+| Edge case | Expected behavior | Observed | Tests |
+|---|---|---|---|
+| CCR setpoint above dry ambient | Density unavailable | `.setpointAboveDryAmbient` | `CCRMathAuditRemediationV1Tests` |
+| CCR exposure computation failure | CNS/OTU unavailable, not zero | UI + PDF gate | `CCRPlannerBriefingExportTests` |
+| Invalid CCR plan (no bailout) | No briefing export input | Watch button hidden | `CCRPlannerBriefingExportTests` |
+| Stale tissue snapshot | Repetitive planning blocked | Error surfaced | `BuhlmannComprehensiveReadinessFixTests` |
+| Oversize CSV import | Rejected at cap | Error returned | `MainDeepCodeAuditRemediationTests` |
+| Oversize cloud payload | Save rejected | Error surfaced | `CloudSyncStoreLoadTests` |
+| Switch depth above MOD | Clamped / validation error | Preflight fails | `PlannerSwitchDepthMODClampTests` |
+| Ratio Deco in CCR mode | Blocked | No compare section | `RatioDecoPlannerTests` |
+| Average-depth toggle change | Analysis cache invalidated | Recompute | `MainDeepCodeRemediationDCATests` |
+| Subsurface CSV quoted commas | Simple parser limits | Documented policy | `CSVMetadataRoundTripTests` |
+| Peer secret mismatch (Watch) | Sync rejected | Skip in CI keychain | `WatchSyncPeerSecretPinningIOSTests` |
+| Incomplete briefing package (Watch) | Warning on Watch | iOS sends reference-only | Watch remediation @ `15f2d59` |
+
+---
+
+## X. Release-Hard Matrix
+
+| Feature | Readiness | Blockers | Priority |
+|---|---|---:|---|
+| Bühlmann | 95% | External validation **PENDING** | P1 |
+| Planner Base/Deco/Technical | 93% | External validation | P1 |
+| CCR / Rebreather | 91% | External + bailout disclosure | P1 |
+| Ratio Deco | 86% | Heuristic by design | — |
+| Gas Planning | 91% | Bailout schedule-only in engine | P4 |
+| Gas Roles | 89% | Checklist inference edges | P3 |
+| MOD/PPO2/Dalton | 93% | PDF display asymmetry | P3 |
+| Switch Depth Clamp | 93% | — | — |
+| Emergency / Rock Bottom | 90% | Non-certified minimum gas | — |
+| Ascent / Descent Timing | 92% | — | — |
+| Dive Runtime / Deco Stops | 92% | — | — |
+| Schedule-Aware Gas Consumption | 91% | — | — |
+| Gas Ledger / Reserve | 91% | — | — |
+| Technical Average-Depth Gas Toggle | 90% | Dedicated cache test gap | P3 |
+| Repetitive Dive / Residual Tissues | 89% | External multi-dive **PENDING** | P2 |
+| Tissue Loading | 91% | — | — |
+| Narcosis / END / PPN2 | 90% | — | — |
+| CNS / OTU | 93% | — | — |
+| Structured Equipment | 90% | — | — |
+| Checklist Sync | 90% | CCR E2E test gap | P2 |
+| CCR Checklist Import / Export | 90% | E2E + cloud round-trip | P2 |
+| CCR Bailout Scenario | 88% | Heuristic by design | P1 doc |
+| CCR Gas Density | 92% | — | — |
+| Manual Dive | 89% | Physical QA **PENDING** | P2 |
+| PDF / Share | 91% | — | — |
+| Planner Briefing Card / Watch Transfer | 92% | Physical sync QA **PENDING** | P2 |
+| CSV / Subsurface | 86% | Desktop validation **PENDING** | P2 |
+| Unit Conversion | 93% | — | — |
+| Cloud / Sync / Persistence | 85% | Opt-in (SEC-P1-003); two-device QA | P1 |
+| Security / Privacy | 87% | Opt-in; marketing review | P1 |
+| Performance / Numerical Robustness | 90% | Long-profile bench | P4 |
+| Test Coverage | 93% | UI E2E gaps | P2 |
+| Internal TestFlight | 92% | Disclaimers required | — |
+| External TestFlight | 55% | External + physical QA | P1 |
+| App Store | 50% | Same + legal | P1 |
+| **Overall (internal code)** | **94%** | External + physical + cloud opt-in | P1 |
+
+---
+
+## Y. Prioritized Action Plan
+
+### P0 — none
+
+No safety-critical algorithm defect requires immediate code change.
+
+### P1 — internal TestFlight / release-hard
+
+| ID | Action | Owner |
+|---|---|---|
+| IOS-EXT-BM-001 | Execute `DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md`; attach evidence | Manual QA |
+| IOS-EXT-CCR-001 | Execute `CCR_REBREATHER_VALIDATION_PLAN.md` | Manual QA |
+| IOS-ICLOUD-001 | Execute `ICLOUD_TWO_DEVICE_QA_MATRIX.md` | Manual QA |
+| SEC-P1-003 | Product decision: iCloud opt-in vs disclosure-only | Product + legal |
+| IOS-BAILOUT-DOC-001 | Keep heuristic bailout in TestFlight / App Store review notes | Docs |
+
+### P2 — external TestFlight
+
+| ID | Action |
+|---|---|
+| IOS-SUB-001 | Subsurface desktop round-trip per `SUBSURFACE_CSV_ROUNDTRIP.md` |
+| IOS-WATCH-SYNC-001 | Paired Watch sync matrix + briefing card physical QA |
+| IOS-CHK-CCR-E2E | Add SwiftUI/integration test for CCR checklist export flow |
+| IOS-BRIEF-CCR-E2E | Add CCR → Watch briefing transfer integration test (simulator WCSession mock) |
+
+### P3 — App Store
+
+| ID | Action |
+|---|---|
+| IOS-LEGAL-001 | Legal/marketing review vs non-certified posture |
+| IOS-VISUAL-001 | Dynamic Type / VoiceOver matrices |
+
+### P4 — post-release
+
+| ID | Action |
+|---|---|
+| IOS-CCR-RUNTIME-001 | Implement or permanently document `runtimeSegments` |
+| IOS-PERF-001 | Long-profile profiling harness |
+
+---
+
+## Z. 7-Day / 14-Day Readiness Plan
+
+### 7-day (internal TestFlight algorithm gate)
+
+1. Attach at least one external Bühlmann profile comparison to `QA_EVIDENCE/BUHLMANN_EXTERNAL/`.
+2. Record CCR bailout + reference-only disclaimers in `TESTFLIGHT_REVIEW_NOTES.md` review pass.
+3. Run iCloud two-device smoke on planner + equipment (even partial evidence).
+4. Execute Subsurface import of one exported CSV on desktop (step 4+ of round-trip doc).
+
+### 14-day (external TestFlight gate)
+
+1. Complete Bühlmann + CCR external validation slots with PASS/FAIL (never PASS without files).
+2. Complete `WATCH_IOS_SYNC_QA_MATRIX.md` with paired hardware.
+3. Complete `IOS_DYNAMIC_TYPE_VOICEOVER_QA_MATRIX.md` on critical planner paths.
+4. Resolve or document SEC-P1-003 (opt-in UI or privacy policy update).
+
+---
+
+## AA. Future Cursor Remediation Commands (draft — do not execute)
+
+1. **`4-DIR_DIVING_IOS_COMPLETE_ALGORITHM_REMEDIATION_CCR_UPDATED_V2.0.md`** — CCR checklist E2E tests; Subsurface evidence harness; SEC-P1-003 opt-in decision implementation.
+2. **`2-DIR_DIVING_IOS_BUHLMANN_CORE_EXTERNAL_VALIDATION_EVIDENCE.md`** — external Bühlmann comparison evidence pack automation.
 3. **`3-DIR_DIVING_IOS_CCR_HARDENING_AND_BAILOUT_TRUTHFULNESS.md`** — bailout engine vs enhanced heuristic (product decision).
-4. **`5-DIR_DIVING_IOS_MOD_SWITCH_DEPTH_VISUAL_QA.md`** — autoclamp visual matrix.
-5. **`8-DIR_DIVING_IOS_UNIT_TEST_COVERAGE_AND_ICLOUD_E2E.md`** — two-device tests + `SubsurfaceExportServiceTests`.
+4. **`5-DIR_DIVING_IOS_MOD_SWITCH_DEPTH_VISUAL_QA.md`** — autoclamp visual matrix execution.
+5. **`8-DIR_DIVING_IOS_UNIT_TEST_COVERAGE_AND_ICLOUD_E2E.md`** — two-device tests + briefing transfer E2E.
 
 ---
 
-## W. Final Verdict
+## AB. Final Verdict
 
 | Question | Answer |
 |---|---|
-| Is Bühlmann ready? | **Yes for internal reference** (94%); external certification sign-off **PENDING**. |
-| Is the Planner ready? | **Yes** for Base/Deco/Technical (92%); CCR mode isolated (88%). |
-| Is CCR implemented? | **Yes** — reference planner; **not** a live loop controller. |
-| Is CCR safe to expose? | **Yes with disclaimers** — bailout heuristic; no monitoring claims. |
-| Is Ratio Deco ready? | **Yes as heuristic comparator** (86%) — OC only. |
-| Is tissue/narcosis model-backed? | **Yes** with CCR simplifications footnoted. |
-| Are MOD/PPO₂ rules consistent? | **Yes** across OC + CCR setpoint paths. |
-| Are manual dives integrated? | **Yes** (88%) — CCR logbook metadata supported. |
-| Are exports reliable? | **Mostly** (90% PDF, 85% CSV) — external Subsurface **PENDING**. |
-| Safe for internal TestFlight? | **Conditional yes** — document CCR + bailout + non-certified posture. |
+| Is Bühlmann ready? | **Yes for internal reference** (95%); external certification sign-off **PENDING**. |
+| Are Planner modes real and isolated? | **Yes** — Base/Deco/Technical/CCR with policy gates. |
+| Is CCR mathematically coherent and reference-only? | **Yes** — P1 math fixed; bailout heuristic with metadata; not a controller. |
+| Is Ratio Deco safely comparative? | **Yes** (86%) — OC only; blocked in CCR. |
+| Are MOD/PPO₂/switch-depth rules consistent? | **Yes** across OC + CCR setpoint paths. |
+| Is Rock Bottom conservative and correct? | **Yes for reference planning** — not certified minimum gas. |
+| Are ascent/descent timing and runtime totals coherent? | **Yes** — ascent table derived from engine + speed settings. |
+| Does the deco-stop table match the engine? | **Yes** — presentation builder maps engine output. |
+| Is gas consumption correct by segment and role? | **Yes** — schedule-aware ledger with rock-bottom integration. |
+| Is the average-depth gas toggle isolated? | **Yes** — Technical mode; cache key includes toggle. |
+| Are repetitive-dive tissues coherent? | **Yes (OC)** — fail-closed snapshots; external validation **PENDING**. |
+| Are tissue/narcosis/CNS/OTU truthful? | **Yes** — unavailable semantics; no silent zeros in CCR. |
+| Are Equipment/checklist mappings safe? | **Yes** — structured setup + role-preserving mappers. |
+| Does CCR checklist round trip preserve roles? | **Yes in mapper/coordinator** — E2E persistence test gap. |
+| Are CCR bailout and gas density traceable? | **Yes** — metadata + partial-pressure density formula. |
+| Are manual dives and exports reliable? | **Mostly** (89%) — in-repo CSV round-trip OK; external **PENDING**. |
+| Are briefing cards numerically faithful and reference-only? | **Yes** — watermark + unavailable exposure labels. |
+| Is sync/data integrity release-hard? | **Conditional** — caps and merge tested; iCloud opt-in gap. |
+| Safe for internal TestFlight? | **Conditional yes** — disclose CCR + bailout + non-certified posture. |
 | Safe for external TestFlight? | **No** — external math + iCloud + Watch physical QA **PENDING**. |
 | Ready for App Store? | **No** — same gates + legal/marketing review. |
-| Certified decompression / CCR controller? | **Never** without separate certification and product scope change. |
-| What blocks 100%? | External validation evidence, physical QA matrices, CCR checklist UI gap, heuristic bailout (by design), Subsurface external sign-off. |
+| What blocks 100% readiness? | External validation evidence, physical QA matrices, cloud privacy opt-in, UI E2E gaps, heuristic bailout (by design). |
+| What must be fixed first? | **Process/evidence:** external Bühlmann + CCR validation files; iCloud two-device QA; SEC-P1-003 product decision. **Not algorithm P0 code.** |
 
 ### Static tooling scan
 
-| Scan | Result |
-|---|---|
-| `try!` in iOS algorithm paths (spot check) | Not elevated to P0 |
-| CCR Swift module files | 7+ under `iOSApp/Services/CCR/` + models/views |
-| Watch CCR runtime | **0** — Watch remains non-decompression logger |
+No production source files modified during this audit. Git status after report write should show only `Docs/IOS_MAIN_COMPLETE_ALGORITHM_AUDIT_CURRENT.md`.
 
 ---
 
-## X. Phase 13 Validation Checklist
-
-| Check | Result |
-|---|---|
-| Report file exists | **YES** — this file |
-| Report not empty | **YES** |
-| Check_Math_iOS + v2 + CCR merged | **YES** |
-| Release Hard Matrix | **YES** — Section S |
-| Action plan | **YES** — Section T |
-| No source code modified | **YES** (audit pass) |
-| Physical/external QA marked PENDING | **YES** |
-| Git status | New report file only expected |
-
----
-
-*End of audit @ `984a69b`. Prior comprehensive CCR audit: `1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_CURRENT.md` @ `cc4d783` (91%, 526 tests). Bühlmann remediation @ `d756a89`. Watch remediation @ `984a69b` (no iOS algorithm change). This complete algorithm audit overall: **92%**.*
+*End of report — DIR Diving iOS Complete Algorithm Audit CCR Updated V2.0 @ `15f2d59`.*

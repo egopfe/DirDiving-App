@@ -14,7 +14,10 @@ final class UIUXRemediationV3AccessibilityTests: XCTestCase {
         XCTAssertTrue(source.contains("UIUXAccessibilitySummaries.ccrPPO2Timeline"))
         XCTAssertTrue(source.contains("UIUXAccessibilitySummaries.ccrPPN2Timeline"))
         XCTAssertTrue(source.contains("UIUXAccessibilitySummaries.ccrENDTimeline"))
-        XCTAssertTrue(source.contains("UIUXAccessibilitySummaries.ccrGasDensityTimeline"))
+        XCTAssertTrue(
+            source.contains("UIUXAccessibilitySummaries.ccrGasDensityTimeline")
+                || source.contains("CCRGasDensityPresentation.accessibilitySummary")
+        )
     }
 
     func testMoreViewUsesSettingsTitleKey() throws {

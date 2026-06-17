@@ -4,6 +4,7 @@ import UIKit
 struct UserImagesView: View {
     @EnvironmentObject private var imageStore: UserImageStore
     @EnvironmentObject private var watchSync: WatchSyncService
+    @EnvironmentObject private var dive: DiveManager
     @State private var selectedName: String?
     @State private var isFullscreenPresented = false
     @State private var pendingDeleteName: String?
@@ -81,6 +82,33 @@ struct UserImagesView: View {
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
 
+            Text(String(localized: "user_images.info.bundled_readonly"))
+                .font(DiveUI.Typography.secondaryLabel)
+                .foregroundStyle(DiveUI.secondaryText)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(String(localized: "user_images.info.uploaded_deletable"))
+                .font(DiveUI.Typography.secondaryLabel)
+                .foregroundStyle(DiveUI.secondaryText)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            if dive.isDiveActive {
+                Text(String(localized: "user_images.info.dive_active_note"))
+                    .font(DiveUI.Typography.warningBody)
+                    .foregroundStyle(DiveUI.yellow)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            if !imageStore.imageNames.isEmpty {
+                Text(String(format: String(localized: "user_images.count.format"), imageStore.imageNames.count))
+                    .font(DiveUI.Typography.secondaryLabel)
+                    .foregroundStyle(DiveUI.cyan)
+                    .accessibilityLabel(
+                        String(format: String(localized: "user_images.count.a11y"), imageStore.imageNames.count)
+                    )
+            }
+
             VStack(spacing: 4) {
                 if imageStore.imageNames.isEmpty {
                     imageEmptyState
@@ -133,6 +161,10 @@ struct UserImagesView: View {
                     .font(DiveUI.Typography.rowSubtitle)
                     .foregroundStyle(.white)
                     .lineLimit(2)
+                Text(imageTypeHint(for: name))
+                    .font(DiveUI.Typography.secondaryLabel)
+                    .foregroundStyle(DiveUI.secondaryText)
+                    .lineLimit(1)
             }
 
             Spacer(minLength: 0)
@@ -409,6 +441,12 @@ struct UserImagesView: View {
             .replacingOccurrences(of: "_", with: " ")
             .replacingOccurrences(of: "-", with: " ")
             .capitalized
+    }
+
+    private func imageTypeHint(for name: String) -> String {
+        imageStore.canDeleteImage(named: name)
+            ? String(localized: "user_images.type.uploaded")
+            : String(localized: "user_images.type.bundled")
     }
 
     private func shortImageCaption(for name: String) -> String {

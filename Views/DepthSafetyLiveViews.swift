@@ -91,8 +91,8 @@ struct DepthSafetyReadoutStyle {
     let labelColor: Color
     let panelStroke: Color
 
-    static func forState(_ state: DepthSafetyState, redWarningBlink: Bool) -> DepthSafetyReadoutStyle {
-        if redWarningBlink {
+    static func forState(_ state: DepthSafetyState, alarmBlinkHighlight: Bool) -> DepthSafetyReadoutStyle {
+        if alarmBlinkHighlight {
             return DepthSafetyReadoutStyle(
                 depthColor: DiveUI.red,
                 depthShadow: DiveUI.red.opacity(0.75),

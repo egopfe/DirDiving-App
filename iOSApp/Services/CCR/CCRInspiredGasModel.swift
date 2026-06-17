@@ -136,14 +136,21 @@ extension BuhlmannTissueState {
 enum CCROxygenExposureIntegration {
     static func exposure(
         segments: [(kind: DiveSegmentKind, fromDepth: Double, toDepth: Double, minutes: Double, setpointBar: Double)],
+        diluent: CCRDiluent,
         environment: PlannerEnvironment,
         carryover: OxygenExposureCarryover = .zero
     ) -> Result<OxygenExposureResult, OxygenExposureWarningState> {
+        guard !segments.isEmpty else {
+            return .failure(.invalidExposureInput)
+        }
         var runtimeSegments: [BuhlmannRuntimeSegment] = []
         for segment in segments {
+            guard segment.minutes.isFinite, segment.minutes >= 0 else {
+                return .failure(.invalidExposureInput)
+            }
             let midDepth = (segment.fromDepth + segment.toDepth) / 2
             let gas = CCRInspiredGasModel.labelGas(
-                diluent: .air,
+                diluent: diluent,
                 setpointBar: segment.setpointBar,
                 depthMeters: midDepth,
                 environment: environment
@@ -154,8 +161,14 @@ enum CCROxygenExposureIntegration {
                     kind: segment.kind,
                     depthMeters: depth,
                     minutes: segment.minutes,
-                    gas: overridePPO2Gas(gas, setpointBar: segment.setpointBar, depthMeters: midDepth, environment: environment),
-                    note: "CCR setpoint \(segment.setpointBar)"
+                    gas: overridePPO2Gas(
+                        gas,
+                        diluent: diluent,
+                        setpointBar: segment.setpointBar,
+                        depthMeters: midDepth,
+                        environment: environment
+                    ),
+                    note: "CCR \(diluent.label) SP \(segment.setpointBar)"
                 )
             )
         }
@@ -164,6 +177,7 @@ enum CCROxygenExposureIntegration {
 
     private static func overridePPO2Gas(
         _ base: BuhlmannGas,
+        diluent: CCRDiluent,
         setpointBar: Double,
         depthMeters: Double,
         environment: PlannerEnvironment
@@ -173,7 +187,7 @@ enum CCROxygenExposureIntegration {
             name: base.name,
             role: base.role,
             oxygenFraction: min(1, setpointBar / ambient),
-            heliumFraction: base.heliumFraction,
+            heliumFraction: diluent.heliumFraction,
             maxPPO2Bar: setpointBar + 0.2,
             switchDepthMeters: base.switchDepthMeters,
             gasMixId: base.gasMixId,

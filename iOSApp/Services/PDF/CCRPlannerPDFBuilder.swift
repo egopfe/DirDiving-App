@@ -89,9 +89,18 @@ enum CCRPlannerPDFBuilder {
 
             page.drawSpacer()
             page.drawSectionTitle(DIRIOSLocalizer.string("ccr.cns.header"))
-            page.drawLine(DIRIOSLocalizer.string("planner.metric.cns_full_plan"), value: "\(Formatters.one(plan.cnsFullPlanPercent))%")
-            page.drawLine(DIRIOSLocalizer.string("planner.metric.cns_descent_bottom"), value: "\(Formatters.one(plan.cnsDescentBottomPercent))%")
-            page.drawLine(DIRIOSLocalizer.string("planner.metric.otu"), value: Formatters.one(plan.otuFullPlan))
+            switch plan.oxygenExposure {
+            case .available(let cns, let otu, let descentBottom):
+                page.drawLine(DIRIOSLocalizer.string("planner.metric.cns_full_plan"), value: "\(Formatters.one(cns))%")
+                if let descentBottom {
+                    page.drawLine(DIRIOSLocalizer.string("planner.metric.cns_descent_bottom"), value: "\(Formatters.one(descentBottom))%")
+                }
+                page.drawLine(DIRIOSLocalizer.string("planner.metric.otu"), value: Formatters.one(otu))
+            case .unavailable(let reason):
+                page.drawLine(DIRIOSLocalizer.string("planner.metric.cns_full_plan"), value: DIRIOSLocalizer.string("ccr.exposure.unavailable.label"))
+                page.drawLine(DIRIOSLocalizer.string("planner.metric.otu"), value: DIRIOSLocalizer.string("ccr.exposure.unavailable.label"))
+                page.drawParagraph(DIRIOSLocalizer.string("ccr.exposure.unavailable.\(reason.rawValue)"))
+            }
 
             if let maxPPN2 = plan.ppN2Timeline.map(\.ppN2Bar).max(), maxPPN2.isFinite {
                 page.drawSpacer()
@@ -116,6 +125,27 @@ enum CCRPlannerPDFBuilder {
                         page.drawParagraph(warning)
                     }
                 }
+            }
+
+            page.drawSpacer()
+            page.drawSectionTitle(DIRIOSLocalizer.string("ccr.gas_density.timeline"))
+            if CCRGasDensityPresentation.hasAvailableTimeline(plan) {
+                let samples = CCRGasDensityPresentation.timelineSamples(from: plan)
+                if let minDensity = samples.map(\.density).min(),
+                   let maxDensity = samples.map(\.density).max() {
+                    page.drawLine(
+                        DIRIOSLocalizer.string("ccr.gas_density.unit"),
+                        value: "\(Formatters.one(minDensity)) – \(Formatters.one(maxDensity)) g/L"
+                    )
+                }
+                page.drawParagraph(DIRIOSLocalizer.string("ccr.gas_density.approximation"))
+            } else {
+                let reason = CCRGasDensityPresentation.unavailableReason(for: plan)
+                page.drawLine(
+                    DIRIOSLocalizer.string("ccr.gas_density.unavailable.label"),
+                    value: CCRGasDensityPresentation.unavailableLabel(for: reason)
+                )
+                page.drawParagraph(DIRIOSLocalizer.string("ccr.gas_density.unavailable.description"))
             }
 
             if !plan.warnings.isEmpty {

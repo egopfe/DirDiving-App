@@ -13,7 +13,7 @@ final class BuhlmannComprehensiveReadinessCCRRemediationTests: XCTestCase {
             environment: .seaLevelSaltWater
         )
         XCTAssertTrue(scenario.isHeuristic)
-        XCTAssertTrue(scenario.referenceNotes.contains(String(localized: "ccr.bailout.heuristic_disclaimer")))
+        XCTAssertTrue(scenario.referenceNotes.contains(DIRIOSLocalizer.string("ccr.bailout.heuristic_disclaimer")))
     }
 
     func testBailoutDisclaimerLocalizationKeysResolveENIT() {
@@ -66,7 +66,7 @@ final class BuhlmannComprehensiveReadinessCCRRemediationTests: XCTestCase {
         XCTAssertTrue(text.contains("0.7"))
         XCTAssertTrue(text.contains("1.3"))
         XCTAssertTrue(text.contains(input.diluent.label))
-        XCTAssertTrue(text.contains(String(localized: "ccr.pdf.disclaimer")))
+        XCTAssertTrue(text.contains(DIRIOSLocalizer.string("ccr.pdf.disclaimer")))
     }
 
     // MARK: - P2-RUNTIME segments quarantine

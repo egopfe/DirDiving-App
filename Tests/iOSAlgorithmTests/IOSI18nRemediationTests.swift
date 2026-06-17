@@ -55,7 +55,8 @@ final class IOSI18nRemediationTests: XCTestCase {
         let checklist = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/ChecklistView.swift"))
         let more = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/MoreView.swift"))
         XCTAssertFalse(checklist.contains(" READY\""))
-        XCTAssertTrue(checklist.contains("checklist.status.ready_badge_format"))
+        XCTAssertTrue(checklist.contains("checklist.status.required_badge_format"))
+        XCTAssertTrue(checklist.contains("checklist.status.optional_badge_format"))
         XCTAssertTrue(more.contains("settings.title"))
 
         let en = try loadIOSStrings(named: "en")

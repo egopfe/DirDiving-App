@@ -122,6 +122,9 @@ enum WatchDiveSyncCodec {
         guard verify(transport) else {
             throw WatchDiveSyncError.invalidSignature
         }
+        if transport.version == legacySchemaVersion {
+            WatchSyncSchemaV1Policy.recordLegacyUsage()
+        }
         if transport.version == schemaVersion {
             guard let nonce = transport.nonce, !nonce.isEmpty else {
                 throw WatchDiveSyncError.invalidSignature

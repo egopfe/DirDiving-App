@@ -106,4 +106,32 @@ final class BriefingPDFBuilderTests: XCTestCase {
         let text = pdfText(BriefingPDFBuilder.build(context: context, siteName: nil))
         XCTAssertFalse(text.contains(DIRIOSLocalizer.string("pdf.export.ratio_deco.section")))
     }
+
+    func testBriefingPDFOmitsPartialTeamGasMatchSection() {
+        var input = GasPlanInput()
+        input.ensurePlannerCylindersFromLegacy()
+        input.plannedDepthMeters = 45
+        input.plannedBottomMinutes = 25
+        input.bottomGas = GasMix(name: "TX 18/45", role: .bottom, oxygen: 0.18, helium: 0.45, maxPPO2: 1.4)
+        if let index = input.plannerCylinders.firstIndex(where: { $0.role == .bottom }) {
+            input.plannerCylinders[index].gas = input.bottomGas
+        }
+        let active = PlannerModePolicy.activePlanInput(from: input, mode: .technical)
+        let plan = PlannerService.makePlan(input: active, mode: .technical)
+        XCTAssertFalse(plan.teamMatches.isEmpty, "Fixture should still compute team matches internally")
+        let context = PDFExportPlannerContext(
+            input: input,
+            plan: plan,
+            mode: .technical,
+            validation: PlannerModePolicy.validate(draft: input, mode: .technical),
+            modIssues: [],
+            safetyAcknowledged: true,
+            unitPreference: .metric,
+            pressureUnitPreference: .bar
+        )
+        let text = pdfText(BriefingPDFBuilder.build(context: context, siteName: nil))
+        XCTAssertFalse(text.contains(DIRIOSLocalizer.string("pdf.export.briefing.team")))
+        XCTAssertFalse(text.contains(DIRIOSLocalizer.string("planner.team.match_title")))
+        XCTAssertTrue(text.contains(DIRIOSLocalizer.string("pdf.export.briefing.gas_management")))
+    }
 }

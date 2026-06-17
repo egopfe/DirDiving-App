@@ -31,8 +31,11 @@ final class WatchSyncService: NSObject, ObservableObject {
     private let legacyPendingSessionsKey = "dirdiving_watch_pending_sync_sessions"
     private let pendingFileName = "dirdiving_watch_pending_sync_sessions.json"
     private weak var logStore: DiveLogStore?
+    private weak var plannerBriefingStore: PlannerBriefingCardStore?
     private var importedFromCompanionIDs: Set<UUID> = []
     private var peerSecretObserver: NSObjectProtocol?
+    private var pendingPhotoManagementResponses: [PendingPhotoManagementResponse] = []
+    private var inFlightSessionIDs: Set<UUID> = []
 
     private static let logger = Logger(subsystem: "com.egopfe.dirdiving", category: "WatchSyncService")
     private static let activityDateFormatter: DateFormatter = {
@@ -48,6 +51,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         pendingTransferCount = pendingTransfers.count
         importedFromCompanionIDs = WatchDiveSyncCodec.loadImportedFromCompanionIDs()
         importedFromCompanionCount = importedFromCompanionIDs.count
+        pendingPhotoManagementResponses = PendingPhotoManagementResponseQueue.load()
         peerSecretObserver = NotificationCenter.default.addObserver(
             forName: .watchSyncPeerSecretDidUpdate,
             object: nil,
@@ -60,6 +64,10 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     func attachLogStore(_ store: DiveLogStore) {
         logStore = store
+    }
+
+    func attachPlannerBriefingStore(_ store: PlannerBriefingCardStore) {
+        plannerBriefingStore = store
     }
 
     deinit {
@@ -139,12 +147,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     func publishUploadedImageInventory(requestID: String? = nil) {
-        guard WCSession.isSupported(), activationState == .activated else { return }
-        let payload = CompanionPhotoManagementSupport.makeInventoryResponsePayload(
-            requestID: requestID,
-            items: UserImageStore.buildUploadedInventory()
-        )
-        deliverCompanionManagementPayload(payload)
+        queueInventoryPublish(requestID: requestID)
     }
 
     @discardableResult
@@ -220,14 +223,62 @@ final class WatchSyncService: NSObject, ObservableObject {
         status: String,
         errorCode: String? = nil
     ) {
-        guard WCSession.isSupported(), activationState == .activated else { return }
         let payload = CompanionPhotoManagementSupport.makeDeleteAckPayload(
             requestID: requestID,
             storedFileName: storedFileName,
             status: status,
             errorCode: errorCode
         )
+        guard WCSession.isSupported(), activationState == .activated else {
+            if let queued = PendingPhotoManagementResponse.deleteAck(
+                requestID: requestID,
+                storedFileName: storedFileName,
+                status: status,
+                errorCode: errorCode,
+                payload: payload
+            ) {
+                pendingPhotoManagementResponses = PendingPhotoManagementResponseQueue.enqueue(
+                    queued,
+                    existing: pendingPhotoManagementResponses
+                )
+                PendingPhotoManagementResponseQueue.save(pendingPhotoManagementResponses)
+            }
+            return
+        }
         deliverCompanionManagementPayload(payload)
+    }
+
+    private func queueInventoryPublish(requestID: String? = nil) {
+        let payload = CompanionPhotoManagementSupport.makeInventoryResponsePayload(
+            requestID: requestID,
+            items: UserImageStore.buildUploadedInventory()
+        )
+        guard WCSession.isSupported(), activationState == .activated else {
+            if let queued = PendingPhotoManagementResponse.inventoryPublish(requestID: requestID, payload: payload) {
+                pendingPhotoManagementResponses = PendingPhotoManagementResponseQueue.enqueue(
+                    queued,
+                    existing: pendingPhotoManagementResponses
+                )
+                PendingPhotoManagementResponseQueue.save(pendingPhotoManagementResponses)
+            }
+            return
+        }
+        deliverCompanionManagementPayload(payload)
+    }
+
+    func flushPendingPhotoManagementResponses() {
+        guard WCSession.isSupported(), activationState == .activated else { return }
+        var remaining = pendingPhotoManagementResponses
+        for entry in pendingPhotoManagementResponses {
+            guard PendingPhotoManagementResponseQueue.shouldRetry(entry) else {
+                remaining = PendingPhotoManagementResponseQueue.dequeue(id: entry.id, from: remaining)
+                continue
+            }
+            deliverCompanionManagementPayload(entry.wirePayload)
+            remaining = PendingPhotoManagementResponseQueue.dequeue(id: entry.id, from: remaining)
+        }
+        pendingPhotoManagementResponses = remaining
+        PendingPhotoManagementResponseQueue.save(pendingPhotoManagementResponses)
     }
 
     private func deliverImportAck(sessionID: UUID, issuedAt: Date) {
@@ -310,9 +361,15 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     private func flushPendingTransfers() {
         guard WatchSyncAuth.hasPeerSecret(), !pendingTransfers.isEmpty else { return }
-        let queue = pendingTransfers
-        Self.logger.info("Flushing \(queue.count, privacy: .public) pending Watch→iPhone session(s)")
-        for entry in queue.reversed() {
+        let eligible = WatchSyncPendingFlushPolicy.sessionsEligibleForSend(
+            transfers: pendingTransfers,
+            sessionID: { $0.session.id },
+            lastAttemptAt: { $0.lastAttemptAt },
+            inFlightSessionIDs: inFlightSessionIDs
+        )
+        Self.logger.info("Flushing \(eligible.count, privacy: .public) pending Watch→iPhone session(s)")
+        for entry in eligible.reversed() {
+            inFlightSessionIDs.insert(entry.session.id)
             sendQueued(entry.session)
         }
     }
@@ -325,6 +382,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             return
         }
         guard pendingTransfers.contains(where: { $0.session.id == sessionID }) else { return }
+        inFlightSessionIDs.remove(sessionID)
         removePendingTransfer(sessionID: sessionID)
         acknowledgedTransferCount += 1
         lastSyncStatus = String(localized: "Delivered/acknowledged: ack firmato dal companion")
@@ -352,6 +410,7 @@ final class WatchSyncService: NSObject, ObservableObject {
                                 signature: providedSignature ?? ""
                             )
                         } else {
+                            self.inFlightSessionIDs.remove(envelope.sessionID)
                             self.failedTransferCount += 1
                             self.lastSyncStatus = String(localized: "watchsync.diagnostic.failed_iphone_no_ack")
                         }
@@ -637,6 +696,18 @@ extension WatchSyncService {
     func testHook_markUserInfoDelivered(sessionID: UUID, error: Error?) {
         markUserInfoDelivered(sessionID: sessionID, error: error)
     }
+
+    var testHook_pendingPhotoManagementResponses: [PendingPhotoManagementResponse] {
+        pendingPhotoManagementResponses
+    }
+
+    func testHook_flushPendingPhotoManagementResponses() {
+        flushPendingPhotoManagementResponses()
+    }
+
+    func testHook_setActivationStateForTests(_ state: WCSessionActivationState) {
+        activationState = state
+    }
 }
 
 
@@ -649,6 +720,7 @@ extension WatchSyncService: WCSessionDelegate {
             if activationState == .activated {
                 self.ingestCompanionContext(context)
                 WatchSyncAuth.publishSharedSecretIfNeeded()
+                self.flushPendingPhotoManagementResponses()
                 self.flushPendingTransfers()
             }
         }
@@ -721,14 +793,48 @@ extension WatchSyncService: WCSessionDelegate {
         }
     }
 
+    private func deliverPlannerBriefingAck(payload: [String: Any]) {
+        guard WCSession.isSupported(), activationState == .activated else { return }
+        _ = WCSession.default.transferUserInfo(payload)
+    }
+
     nonisolated func session(_ session: WCSession, didReceive file: WCSessionFile) {
+        let metadata = file.metadata ?? [:]
         let staged = Self.stageIncomingCompanionPhoto(file)
         Task { @MainActor in
             guard let staged else {
-                self.rejectCompanionPhoto(metadata: file.metadata ?? [:], errorCode: "missingFile")
+                if PlannerBriefingWatchReceiver.isPlannerBriefingTransfer(metadata) {
+                    if let packageId = PlannerBriefingTransferSupport.packageId(from: metadata) {
+                        self.deliverPlannerBriefingAck(payload: [
+                            "type": PlannerBriefingTransferSupport.ackType,
+                            PlannerBriefingTransferSupport.packageIdKey: packageId.uuidString,
+                            PlannerBriefingTransferSupport.ackStatusKey: PlannerBriefingTransferSupport.ackStatusRejected,
+                            PlannerBriefingTransferSupport.ackErrorCodeKey: "missingFile",
+                        ])
+                    }
+                } else {
+                    self.rejectCompanionPhoto(metadata: metadata, errorCode: "missingFile")
+                }
                 return
             }
             defer { try? FileManager.default.removeItem(at: staged.url) }
+            if PlannerBriefingWatchReceiver.isPlannerBriefingTransfer(staged.metadata),
+               let store = self.plannerBriefingStore {
+                if let ack = PlannerBriefingWatchReceiver.importFile(
+                    from: staged.url,
+                    metadata: staged.metadata,
+                    store: store
+                ) {
+                    self.deliverPlannerBriefingAck(payload: ack)
+                    if ack[PlannerBriefingTransferSupport.ackStatusKey] as? String == PlannerBriefingTransferSupport.ackStatusImported {
+                        self.recordActivity(
+                            title: String(localized: "watch.sync.planner_briefing.received"),
+                            detail: staged.metadata[PlannerBriefingTransferSupport.fileNameKey] as? String ?? "briefing"
+                        )
+                    }
+                }
+                return
+            }
             self.importCompanionPhoto(from: staged.url, metadata: staged.metadata)
         }
     }

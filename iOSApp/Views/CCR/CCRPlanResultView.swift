@@ -4,6 +4,7 @@ import Charts
 struct CCRPlanResultView: View {
     @EnvironmentObject private var store: PlannerStore
     @EnvironmentObject private var equipment: EquipmentStore
+    @EnvironmentObject private var plannerBriefingTransfer: PlannerBriefingWatchTransferService
     var pendingChecklistExportPrompt: Bool = false
     @AppStorage(PlannerSafetyAcknowledgment.storageKey) private var plannerSafetyAckRevision = ""
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
@@ -37,8 +38,10 @@ struct CCRPlanResultView: View {
                     endChartCard
                     gasDensityChartCard
                     cnsTimelineCard
+                    ccrDecoStopsSection
                     scheduleCard
                     bailoutCard
+                    sendWatchBriefingSection
                     warningsCard
                 }
                 .padding(.horizontal, 16)
@@ -139,14 +142,14 @@ struct CCRPlanResultView: View {
     private func shareCCRPlanPDF() {
         let context = ccrPDFContext()
         guard PDFExportService.canExportCCRPlan(context) else {
-            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage()
+            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage(for: context)
             return
         }
         do {
             let url = try PDFExportService.exportCCRPlan(context: context)
             shareablePDF = ShareablePDFItem(url: url)
         } catch {
-            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage()
+            pdfExportAlertMessage = PDFShareActions.invalidPlanMessage(for: context)
         }
     }
 
@@ -201,11 +204,33 @@ struct CCRPlanResultView: View {
     private var cnsCard: some View {
         DIRCard(DIRIOSLocalizer.string("ccr.cns.header"), icon: "heart.text.square", accent: DIRTheme.orange) {
             VStack(alignment: .leading, spacing: 6) {
-                metric(DIRIOSLocalizer.string("planner.metric.cns_full_plan"), "\(Formatters.one(plan.cnsFullPlanPercent))%")
-                metric(DIRIOSLocalizer.string("planner.metric.cns_descent_bottom"), "\(Formatters.one(plan.cnsDescentBottomPercent))%")
-                metric(DIRIOSLocalizer.string("planner.metric.otu"), Formatters.one(plan.otuFullPlan))
+                exposureMetric(
+                    DIRIOSLocalizer.string("planner.metric.cns_full_plan"),
+                    plan.oxygenExposure.cnsPercent,
+                    suffix: "%"
+                )
+                exposureMetric(
+                    DIRIOSLocalizer.string("planner.metric.cns_descent_bottom"),
+                    plan.oxygenExposure.descentBottomCNSPercent,
+                    suffix: "%"
+                )
+                exposureMetric(
+                    DIRIOSLocalizer.string("planner.metric.otu"),
+                    plan.oxygenExposure.otu,
+                    suffix: nil
+                )
             }
         }
+    }
+
+    private func exposureMetric(_ title: String, _ value: Double?, suffix: String?) -> some View {
+        let display: String
+        if let value {
+            display = suffix.map { "\(Formatters.one(value))\($0)" } ?? Formatters.one(value)
+        } else {
+            display = DIRIOSLocalizer.string("ccr.exposure.unavailable.label")
+        }
+        return metric(title, display)
     }
 
     private var depthChartCard: some View {
@@ -222,12 +247,19 @@ struct CCRPlanResultView: View {
         }
     }
 
+    private var chartTimeAxisLabel: String { DIRIOSLocalizer.string("ccr.chart.axis.time") }
+    private var chartPPO2AxisLabel: String { DIRIOSLocalizer.string("ccr.chart.axis.ppo2") }
+    private var chartPPN2AxisLabel: String { DIRIOSLocalizer.string("ccr.chart.axis.ppn2") }
+    private var chartENDAxisLabel: String { DIRIOSLocalizer.string("ccr.chart.axis.end") }
+    private var chartDensityAxisLabel: String { DIRIOSLocalizer.string("ccr.chart.axis.density") }
+    private var chartCNSAxisLabel: String { DIRIOSLocalizer.string("ccr.chart.axis.cns") }
+
     private var ppo2ChartCard: some View {
         DIRCard(DIRIOSLocalizer.string("ccr.ppo2.timeline"), icon: "waveform.path.ecg", accent: DIRTheme.orange) {
             Chart(plan.ppO2Timeline, id: \.runtimeMinutes) { sample in
                 LineMark(
-                    x: .value("Time", sample.runtimeMinutes),
-                    y: .value("PPO2", sample.ppO2Bar)
+                    x: .value(chartTimeAxisLabel, sample.runtimeMinutes),
+                    y: .value(chartPPO2AxisLabel, sample.ppO2Bar)
                 )
                 .foregroundStyle(DIRTheme.orange)
             }
@@ -247,8 +279,8 @@ struct CCRPlanResultView: View {
         DIRCard(DIRIOSLocalizer.string("ccr.ppn2.timeline"), icon: "lungs", accent: DIRTheme.green) {
             Chart(plan.ppN2Timeline, id: \.runtimeMinutes) { sample in
                 LineMark(
-                    x: .value("Time", sample.runtimeMinutes),
-                    y: .value("PPN2", sample.ppN2Bar)
+                    x: .value(chartTimeAxisLabel, sample.runtimeMinutes),
+                    y: .value(chartPPN2AxisLabel, sample.ppN2Bar)
                 )
                 .foregroundStyle(DIRTheme.green)
             }
@@ -263,8 +295,8 @@ struct CCRPlanResultView: View {
         DIRCard(DIRIOSLocalizer.string("ccr.end.timeline"), icon: "brain.head.profile", accent: DIRTheme.yellow) {
             Chart(plan.endTimeline, id: \.runtimeMinutes) { sample in
                 LineMark(
-                    x: .value("Time", sample.runtimeMinutes),
-                    y: .value("END", sample.endMeters)
+                    x: .value(chartTimeAxisLabel, sample.runtimeMinutes),
+                    y: .value(chartENDAxisLabel, sample.endMeters)
                 )
                 .foregroundStyle(DIRTheme.yellow)
             }
@@ -283,34 +315,42 @@ struct CCRPlanResultView: View {
         }
     }
 
-    @ViewBuilder
     private var gasDensityChartCard: some View {
-        let densitySamples = plan.gasDensityTimeline.compactMap { sample -> (Double, Double)? in
-            guard let density = sample.gasDensityGramsPerLiter else { return nil }
-            return (sample.runtimeMinutes, density)
-        }
-        if !densitySamples.isEmpty {
-            DIRCard(DIRIOSLocalizer.string("ccr.gas_density.timeline"), icon: "scalemass", accent: DIRTheme.muted) {
-                Chart(densitySamples, id: \.0) { sample in
+        let densitySamples = CCRGasDensityPresentation.timelineSamples(from: plan)
+        return DIRCard(DIRIOSLocalizer.string("ccr.gas_density.timeline"), icon: "scalemass", accent: DIRTheme.muted) {
+            if densitySamples.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    Label(
+                        CCRGasDensityPresentation.unavailableLabel(
+                            for: CCRGasDensityPresentation.unavailableReason(for: plan)
+                        ),
+                        systemImage: "exclamationmark.triangle.fill"
+                    )
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(DIRTheme.yellow)
+                    Text(DIRIOSLocalizer.string("ccr.gas_density.unavailable.description"))
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                Chart(densitySamples, id: \.runtimeMinutes) { sample in
                     LineMark(
-                        x: .value("Time", sample.0),
-                        y: .value("Density", sample.1)
+                        x: .value(chartTimeAxisLabel, sample.runtimeMinutes),
+                        y: .value(chartDensityAxisLabel, sample.density)
                     )
                     .foregroundStyle(DIRTheme.muted)
                 }
                 .frame(height: 140)
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(
-                    UIUXAccessibilitySummaries.ccrGasDensityTimeline(
-                        samples: densitySamples.map { (runtimeMinutes: $0.0, density: $0.1) }
-                    )
-                )
-                .accessibilityHint(DIRIOSLocalizer.string("ccr.a11y.chart.hint"))
                 Text(DIRIOSLocalizer.string("ccr.gas_density.approximation"))
                     .font(.caption2)
                     .foregroundStyle(DIRTheme.muted)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(CCRGasDensityPresentation.accessibilitySummary(for: plan))
+        .accessibilityHint(DIRIOSLocalizer.string("ccr.a11y.reference_estimate_note"))
     }
 
     @ViewBuilder
@@ -319,13 +359,29 @@ struct CCRPlanResultView: View {
             DIRCard(DIRIOSLocalizer.string("ccr.cns.timeline"), icon: "chart.line.uptrend.xyaxis", accent: DIRTheme.orange) {
                 Chart(plan.cnsTimeline, id: \.runtimeMinutes) { sample in
                     LineMark(
-                        x: .value("Time", sample.runtimeMinutes),
-                        y: .value("CNS", sample.cnsPercent)
+                        x: .value(chartTimeAxisLabel, sample.runtimeMinutes),
+                        y: .value(chartCNSAxisLabel, sample.cnsPercent)
                     )
                     .foregroundStyle(DIRTheme.orange)
                 }
                 .frame(height: 140)
             }
+        }
+    }
+
+    @ViewBuilder
+    private var ccrDecoStopsSection: some View {
+        if DecoStopsPresentationBuilder.shouldShowSection(mode: .ccr, decoStops: plan.decoStops) {
+            DecoStopsSectionView(
+                rows: DecoStopsPresentationBuilder.rows(
+                    from: plan.decoStops,
+                    depthFormatter: { Formatters.depth($0, units: unitPreference).text },
+                    ppO2Formatter: { Formatters.one($0) }
+                ),
+                titleKey: "ccr.deco_stops.title",
+                subtitleKey: "planner.deco_stops.subtitle",
+                accessibilityKey: "planner.deco_stops.table.a11y"
+            )
         }
     }
 
@@ -411,5 +467,92 @@ struct CCRPlanResultView: View {
         case .warning: return DIRTheme.yellow
         case .fail: return DIRTheme.red
         }
+    }
+
+    private var canSendWatchBriefing: Bool {
+        CCRPlannerBriefingExportSupport.makeExportInput(
+            plan: plan,
+            input: store.ccrInput,
+            unitPreference: unitPreference,
+            plannerSessionId: store.plannerBriefingSessionId
+        ) != nil
+    }
+
+    private var sendWatchBriefingSection: some View {
+        Group {
+            if canSendWatchBriefing {
+                VStack(alignment: .leading, spacing: 8) {
+                    Button {
+                        sendCCRPlannerBriefingToWatch()
+                    } label: {
+                        Text(DIRIOSLocalizer.string("planner.watch_briefing.send"))
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(DIRTheme.cyan)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 11)
+                            .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan.opacity(0.75), lineWidth: 1))
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(isWatchBriefingActionDisabled)
+
+                    Text(DIRIOSLocalizer.string("planner.watch_briefing.ref_only"))
+                        .font(.caption2)
+                        .foregroundStyle(DIRTheme.muted)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    if let watchBriefingStatusMessage {
+                        Text(watchBriefingStatusMessage)
+                            .font(.caption)
+                            .foregroundStyle(watchBriefingStatusColor)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+        }
+    }
+
+    private var watchBriefingStatusMessage: String? {
+        switch plannerBriefingTransfer.state {
+        case .idle:
+            return nil
+        case .generating:
+            return DIRIOSLocalizer.string("planner.watch_briefing.generating")
+        case .sending:
+            return DIRIOSLocalizer.string("planner.watch_briefing.sending")
+        case .queued:
+            return DIRIOSLocalizer.string("planner.watch_briefing.queued")
+        case .sent:
+            return DIRIOSLocalizer.string("planner.watch_briefing.sent")
+        case .failed:
+            return DIRIOSLocalizer.string("planner.watch_briefing.failed")
+        }
+    }
+
+    private var isWatchBriefingActionDisabled: Bool {
+        switch plannerBriefingTransfer.state {
+        case .generating, .sending:
+            return true
+        default:
+            return false
+        }
+    }
+
+    private var watchBriefingStatusColor: Color {
+        if case .failed = plannerBriefingTransfer.state {
+            return DIRTheme.red
+        }
+        return DIRTheme.cyan
+    }
+
+    private func sendCCRPlannerBriefingToWatch() {
+        guard let input = CCRPlannerBriefingExportSupport.makeExportInput(
+            plan: plan,
+            input: store.ccrInput,
+            unitPreference: unitPreference,
+            plannerSessionId: store.plannerBriefingSessionId
+        ) else {
+            return
+        }
+        plannerBriefingTransfer.exportAndSend(input: input)
     }
 }

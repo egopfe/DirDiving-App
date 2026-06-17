@@ -13,6 +13,7 @@ enum LiveDiveBannerPresentationPolicy {
         var isSimulationDepthActive: Bool
         var showsAutoDiveHint: Bool
         var showsManualHandoffNote: Bool
+        var isCompactLayout: Bool = false
     }
 
     struct Output: Equatable {
@@ -24,6 +25,9 @@ enum LiveDiveBannerPresentationPolicy {
         var secondaryNoticeTitles: [String]
         var showsAutoDiveHint: Bool
         var showsManualHandoffNote: Bool
+        var deferStopwatchPanel: Bool
+        var deferControlsPanel: Bool
+        var prioritizeDepthAndRuntime: Bool
     }
 
     static func evaluate(_ input: Input) -> Output {
@@ -50,6 +54,7 @@ enum LiveDiveBannerPresentationPolicy {
         }
 
         let compactSecondary = hasCriticalSafety && secondaryTitles.count >= 2
+        let prioritizeDepthAndRuntime = hasCriticalSafety && (input.isCompactLayout || compactSecondary)
         return Output(
             showAscentBanner: input.showAscentAlarmBanner,
             showDepthSafetyBanner: input.depthSafetyState != .normal,
@@ -58,7 +63,10 @@ enum LiveDiveBannerPresentationPolicy {
             compactSecondaryNotices: compactSecondary,
             secondaryNoticeTitles: secondaryTitles,
             showsAutoDiveHint: !compactSecondary && input.showsAutoDiveHint,
-            showsManualHandoffNote: !compactSecondary && input.showsManualHandoffNote
+            showsManualHandoffNote: !compactSecondary && input.showsManualHandoffNote,
+            deferStopwatchPanel: prioritizeDepthAndRuntime,
+            deferControlsPanel: prioritizeDepthAndRuntime && input.isCompactLayout,
+            prioritizeDepthAndRuntime: prioritizeDepthAndRuntime
         )
     }
 }

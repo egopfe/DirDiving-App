@@ -87,6 +87,80 @@ final class LiveDiveBannerPresentationPolicyTests: XCTestCase {
         )
     }
 
+    func testCompactWatchLayoutDefersSecondaryPanelsWhenCriticalSafetyActive() {
+        let input = LiveDiveBannerPresentationPolicy.Input(
+            showAscentAlarmBanner: true,
+            depthSafetyState: .critical,
+            exceededSupportedDepthRange: false,
+            isDepthDataStale: false,
+            isManualNoDepthSession: false,
+            hapticsEnabled: true,
+            isDepthAutomationMockFallbackActive: false,
+            isSimulationDepthActive: false,
+            showsAutoDiveHint: false,
+            showsManualHandoffNote: false,
+            isCompactLayout: true
+        )
+        let output = LiveDiveBannerPresentationPolicy.evaluate(input)
+
+        XCTAssertTrue(output.prioritizeDepthAndRuntime)
+        XCTAssertTrue(output.deferStopwatchPanel)
+        XCTAssertTrue(output.deferControlsPanel)
+    }
+
+    func testLargeWatchLayoutKeepsSecondaryPanelsWhenOnlyOneCriticalBanner() {
+        let input = LiveDiveBannerPresentationPolicy.Input(
+            showAscentAlarmBanner: true,
+            depthSafetyState: .normal,
+            exceededSupportedDepthRange: false,
+            isDepthDataStale: false,
+            isManualNoDepthSession: false,
+            hapticsEnabled: true,
+            isDepthAutomationMockFallbackActive: false,
+            isSimulationDepthActive: false,
+            showsAutoDiveHint: false,
+            showsManualHandoffNote: false,
+            isCompactLayout: false
+        )
+        let output = LiveDiveBannerPresentationPolicy.evaluate(input)
+
+        XCTAssertFalse(output.deferStopwatchPanel)
+        XCTAssertFalse(output.deferControlsPanel)
+    }
+
+    func testGPSAndCompassSemanticKeysExistInBothCatalogs() throws {
+        let en = try loadWatchStrings(named: "en")
+        let it = try loadWatchStrings(named: "it")
+        let keys = [
+            "watch.gps.status.available",
+            "watch.gps.status.searching",
+            "watch.gps.status.permission_denied",
+            "watch.compass.status.ready",
+            "watch.compass.status.active",
+            "watch.compass.status.calibration_required"
+        ]
+        for key in keys {
+            XCTAssertFalse(en[key, default: ""].isEmpty, "Missing EN \(key)")
+            XCTAssertFalse(it[key, default: ""].isEmpty, "Missing IT \(key)")
+        }
+        XCTAssertTrue(it["watch.compass.status.ready", default: ""].contains("BUSSOLA"))
+        XCTAssertFalse(it["watch.compass.status.ready", default: ""].contains("COMPASSO"))
+    }
+
+    func testBriefingFreshnessKeysExistInBothCatalogs() throws {
+        let en = try loadWatchStrings(named: "en")
+        let it = try loadWatchStrings(named: "it")
+        for key in [
+            "watch.planner_briefing.freshness.old",
+            "watch.planner_briefing.freshness.session_mismatch",
+            "watch.planner_briefing.freshness.incomplete",
+            "briefing.reference_only.footer"
+        ] {
+            XCTAssertFalse(en[key, default: ""].isEmpty, "Missing EN \(key)")
+            XCTAssertFalse(it[key, default: ""].isEmpty, "Missing IT \(key)")
+        }
+    }
+
     func testCollapsedBannerAccessibilityKeyExists() throws {
         let en = try loadWatchStrings(named: "en")
         let it = try loadWatchStrings(named: "it")

@@ -1,6 +1,13 @@
-# CURSOR / CODEX COMMAND — DIR DIVING WATCH COMPLETE ALGORITHM / SAFETY / RUNTIME AUDIT UPDATED WITH CCR & CO.
+# CURSOR / CODEX COMMAND — DIR DIVING WATCH COMPLETE ALGORITHM / SAFETY / RUNTIME AUDIT UPDATED WITH CCR & LATEST MAIN IMPLEMENTATIONS — V2.0
 
 You are working on the DIR DIVING repository.
+
+**Command version:** 2.0  
+**Updated for MAIN:** 2026-06-13  
+**Repository:** `egopfe/DirDiving-App`  
+**Required branch:** `main`  
+**Task type:** audit-only
+
 
 ## TARGET
 
@@ -18,11 +25,13 @@ This is audit command number **2** in the DIR DIVING recurring audit sequence.
 
 Use this file name:
 
-`2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_UPDATED.md`
+`2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_UPDATED_V2.0.md`
+
+The `2-` prefix must always be preserved because it defines this command's position in the recurring audit sequence. Future revisions must change only the version suffix, for example `_V2.1`, `_V3.0`.
 
 This audit is intended to be launched after the primary iOS Bühlmann / CCR readiness audit:
 
-`1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_UPDATED.md`
+`1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_UPDATED_V2.0.md`
 
 ## TASK TYPE
 
@@ -57,10 +66,18 @@ Perform a complete and deep audit of the Apple Watch MAIN app after the latest D
 11. WatchConnectivity sync with iOS Companion.
 12. Security/privacy/data-integrity issues.
 13. CCR / Rebreather & advanced planner compatibility impacts on Watch.
+14. Planner briefing card / PNG reception from iOS.
+15. Planner briefing card persistence, replacement, deletion and stale-data handling.
+16. Full Dive Runtime / decompression-stop reference data fidelity when transferred from iOS.
+17. Emergency / Rock Bottom reference-data handling if present in synced planner cards.
+18. Gas ledger / liters-bar reference-data handling if present in synced planner cards.
+19. Reminder manual-dismiss behavior and suppression by higher-priority safety alarms.
+20. Small-screen live layout density and critical-metric visibility.
+21. Locale-adaptive logbook dates and expanded accessibility coverage.
 
 The output must be a detailed Markdown report:
 
-`Docs/WATCH_COMPLETE_ALGORITHM_AUDIT_CURRENT.md`
+`Docs/2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_CURRENT.md`
 
 The report must include:
 - executive summary;
@@ -83,6 +100,44 @@ The report must include:
 - TestFlight/App Store readiness verdict.
 
 ---
+
+
+# LATEST MAIN IMPLEMENTATION CONTEXT TO INCLUDE
+
+The current MAIN branch includes or may include the following Watch-relevant additions:
+
+- shared `PlannerBriefingCard` model;
+- iOS Planner briefing PNG/card export to Apple Watch;
+- `PlannerBriefingCardStore`;
+- `PlannerBriefingWatchReceiver`;
+- Watch-side briefing-card inventory/persistence;
+- dedicated full Dive Runtime and decompression-stop data generated on iOS;
+- Rock Bottom / Emergency reference values generated on iOS;
+- gas ledger values in liters and cylinder-equivalent bar generated on iOS;
+- structured Equipment / checklist data generated on iOS;
+- CCR setpoint, diluent, bailout, gas-density and bailout-scenario data generated on iOS;
+- Watch reminder overlay tap-to-dismiss if implemented;
+- Watch image horizontal paging if implemented;
+- localized Watch logbook date formatting;
+- improved accessibility labels for haptics-off and underwater navigation state;
+- small-watch live layout density improvements.
+
+Audit actual source files, target membership and reachable UI. Do not assume that all listed functionality is present merely because related files exist.
+
+# CANONICAL SOURCE / PRESENTATION-ONLY CLASSIFICATION
+
+For every synced planner/CCR/runtime value shown on Watch, classify the implementation as:
+
+1. canonical live Watch measurement;
+2. canonical iOS planner calculation;
+3. synced structured metadata;
+4. rendered briefing image;
+5. Watch-only presentation formatting;
+6. persistence/cache;
+7. unsupported/ignored payload.
+
+The Watch must never recalculate or reinterpret iOS planner/decompression values unless that behavior is explicitly implemented, tested and documented.
+
 
 # ABSOLUTE RULES
 
@@ -130,7 +185,11 @@ The report must include:
 - Watch as source of truth for Watch-stored images;
 - sync HMAC/peer-secret trust model;
 - signed ACK policy where implemented;
-- physical QA gates as external evidence requirements.
+- physical QA gates as external evidence requirements;
+- Planner briefing cards as reference-only information;
+- no live decompression authority from synced cards;
+- canonical Watch depth/runtime/ascent values remain independent from iOS planner cards;
+- no Rock Bottom, CCR, gas-ledger or decompression values from cards feed live Watch safety algorithms.
 
 ---
 
@@ -176,14 +235,22 @@ Unless explicitly implemented in MAIN, the Watch should generally remain:
 - not a CCR decompression controller;
 - not a Bühlmann decompression computer;
 - not a Ratio Deco computer;
-- not a primary life-support controller.
+- not a primary life-support controller;
+- a passive viewer of iOS Planner briefing cards if that feature is compiled into MAIN;
+- never a live executor of a stored decompression schedule;
+- never a live CCR PPO2/setpoint controller.
 
 If CCR / Rebreather data is synced to Watch, the audit must verify:
 - it is clearly labelled;
 - it does not alter depth/runtime/ascent/TTV calculations unless explicitly designed and tested;
 - it does not generate unsafe live deco authority;
 - bailout / diluent / setpoint data is not confused with OC gas consumption;
-- Watch export/sync preserves data without fabricating decompression advice.
+- Watch export/sync preserves data without fabricating decompression advice;
+- Planner briefing cards are explicitly identified as pre-dive/reference material;
+- briefing-card values cannot override live depth, runtime, average depth, max depth, ascent-rate, alarms or reminders;
+- stale or superseded briefing cards are detectable;
+- failed transfer cannot be presented as successful sync;
+- rendered PNG and structured metadata remain numerically consistent.
 
 ---
 
@@ -335,6 +402,8 @@ Inspect at least:
 - `Services/DiveLogStore.swift`
 - `Services/SubsurfaceExportService.swift`
 - `Services/UserImageStore.swift`
+- `Services/PlannerBriefingCardStore.swift`
+- `Services/PlannerBriefingWatchReceiver.swift`
 - `Services/ActionButtonIntents.swift`
 
 ## Models / utils
@@ -361,6 +430,8 @@ Inspect at least:
 - `Utils/Formatters.swift`
 - `Utils/WatchSyncKeys.swift`
 - `Utils/CompanionPhotoImportSupport.swift`
+- `Models/PlannerBriefingCard.swift`
+- any Watch-side briefing-card codec, validator, migration or presentation helpers
 
 ## Views using algorithmic/runtime state
 
@@ -378,6 +449,7 @@ Inspect at least:
 - `Views/UserImagesView.swift`
 - `Views/MissionModeIndicatorView.swift`
 - `Views/WatchShortcutHelpView.swift`
+- briefing-card list/detail/full-screen views if present
 
 Audit for:
 - dive lifecycle bugs;
@@ -401,7 +473,14 @@ Audit for:
 - local file persistence bugs;
 - UserImageStore path traversal;
 - CSV export consistency;
-- crash risks in compact Watch UI state.
+- crash risks in compact Watch UI state;
+- briefing-card payload routing bugs;
+- stale/superseded briefing-card bugs;
+- rendered PNG/metadata mismatch;
+- planner-card values accidentally affecting live calculations;
+- small-screen safety-metric visibility regressions;
+- locale-fixed date formatting;
+- reminder overlay dismiss/suppression regressions.
 
 ---
 
@@ -527,7 +606,11 @@ Verify:
 - Watch rejects unsafe filenames;
 - image import rejects corrupted non-image bytes if implemented;
 - inventory updates after import/local delete/remote delete;
-- no performance storm from repeated inventory updates.
+- no performance storm from repeated inventory updates;
+- horizontal image paging if implemented;
+- page indicator stays synchronized;
+- selected image deletion is deterministic;
+- accessibility exposes current index and total count.
 
 Output:
 - Image subsystem readiness %.
@@ -536,6 +619,127 @@ Output:
 - Security/privacy findings.
 
 ---
+
+
+# PHASE 5B — PLANNER BRIEFING CARD / PNG AUDIT
+
+Audit end to end:
+
+- iOS-originated briefing-card transfer as observed by Watch;
+- `PlannerBriefingCard` shared model;
+- `PlannerBriefingWatchReceiver`;
+- `PlannerBriefingCardStore`;
+- structured metadata;
+- rendered PNG;
+- file naming;
+- versioning;
+- replacement;
+- deletion;
+- inventory;
+- storage limits;
+- stale-card handling;
+- malformed-card rejection;
+- transfer ACK/state if implemented;
+- localization;
+- units;
+- accessibility.
+
+Verify numerical fidelity for any displayed:
+
+- planner mode;
+- max depth;
+- average depth;
+- runtime;
+- full Dive Runtime rows;
+- decompression stops;
+- gas mixes;
+- switch depths;
+- MOD/PPO2;
+- GF values;
+- CNS/OTU;
+- Rock Bottom / emergency gas;
+- available gas;
+- gas ledger liters;
+- cylinder-equivalent bar;
+- CCR setpoints;
+- diluent;
+- bailout gases;
+- bailout scenario;
+- gas density.
+
+Critical invariants:
+
+- briefing cards are reference-only;
+- no card value changes live Watch dive state;
+- no card starts/stops a dive;
+- no card changes alarms, reminders, Mission Mode or sensor source;
+- PNG and structured metadata agree;
+- values are not silently rounded into different safety classifications;
+- failed/partial transfer is not marked complete;
+- older cards cannot overwrite newer cards without deterministic policy;
+- malformed or unsupported planner mode fails safely;
+- unsupported CCR fields are not shown as zero;
+- Watch never converts briefing data into live decompression authority.
+
+Output:
+
+- Briefing Card readiness %;
+- numerical fidelity readiness %;
+- transfer/persistence readiness %;
+- stale-data safety readiness %;
+- reference-only safety verdict.
+
+# PHASE 5C — SMALL-SCREEN LIVE LAYOUT / SAFETY VISIBILITY AUDIT
+
+Audit Live screen behavior on the smallest supported Watch display and with multiple simultaneous banners.
+
+Verify:
+
+- depth hero remains visible;
+- runtime remains visible;
+- ascent warning remains visible;
+- 35/38/40 m safety state remains visible;
+- critical alerts take priority;
+- non-critical sync/GPS/photo/card states collapse or move below;
+- no banner stack hides critical controls;
+- Mission Mode does not hide safety metrics;
+- VoiceOver order remains logical;
+- scroll is not required to discover the primary depth value during a critical condition.
+
+Test combinations:
+
+- ascent warning + depth warning;
+- stale depth + GPS warning;
+- reminder + depth warning;
+- haptics-off badge + critical warning;
+- sync/card-transfer status + critical warning;
+- smallest Watch simulator/device size.
+
+Output:
+
+- small-screen safety visibility readiness %;
+- multi-banner readiness %;
+- VoiceOver order readiness %.
+
+# PHASE 5D — REMINDER DISMISS / SUPPRESSION AUDIT
+
+If manual reminder dismissal is implemented, verify:
+
+- tap-to-dismiss works;
+- 3-second auto-dismiss still works;
+- VoiceOver hint is present;
+- dismiss action cannot dismiss depth/ascent critical alerts;
+- reminder suppression by higher-priority alarms is deterministic;
+- simultaneous reminders aggregate correctly;
+- suppressed reminders are not re-fired indefinitely;
+- restored sessions do not duplicate old reminders.
+
+Output:
+
+- reminder dismiss readiness %;
+- reminder suppression readiness %;
+- safety-priority readiness %.
+
 
 # PHASE 6 — MISSION MODE AUDIT EXTENSION
 
@@ -555,7 +759,11 @@ Verify Mission Mode does NOT alter:
 - image visibility;
 - image inventory/delete logic;
 - CCR/Rebreather state if synced from iOS;
-- any safety-critical computation.
+- any safety-critical computation;
+- planner briefing-card persistence;
+- planner briefing-card rendering;
+- briefing-card numerical values;
+- Rock Bottom / CCR / gas-ledger reference data.
 
 Verify:
 - Mission Mode icon visibility;
@@ -638,7 +846,13 @@ Verify unit consistency for:
 - GPS if displayed;
 - image metadata if displayed;
 - CCR/Rebreather imported summary fields if displayed;
-- synced iOS planner/checklist metadata if displayed.
+- synced iOS planner/checklist metadata if displayed;
+- Planner briefing cards;
+- Rock Bottom liters/bar;
+- gas ledger liters/bar;
+- decompression-stop depths/times;
+- CCR setpoint/diluent/bailout fields;
+- gas-density fields.
 
 Metric ↔ Imperial consistency:
 
@@ -647,7 +861,9 @@ Metric ↔ Imperial consistency:
 - m/min ↔ ft/min;
 - bar ↔ psi if Watch displays pressure;
 - runtime formatting;
-- export metric policy if intentionally metric.
+- export metric policy if intentionally metric;
+- locale-adaptive Watch logbook dates;
+- rendered PNG units and structured metadata units agree.
 
 Output:
 - Unit consistency readiness %.
@@ -700,7 +916,7 @@ Verify:
 - Export does not fabricate CCR values.
 - User sees no misleading CCR/OC mixture.
 
-## If CCR/Rebreather metadata IS displayed on Watch
+## If CCR/Rebreather metadata IS displayed on Watch or included in Planner briefing cards
 
 Verify:
 - it is labelled as planner/checklist/reference data;
@@ -710,7 +926,11 @@ Verify:
 - no live deco obligation is generated from CCR data;
 - reminders/checklists related to CCR are informational;
 - export/sync preserve values without inventing missing data;
-- missing CCR fields are not displayed as zero.
+- missing CCR fields are not displayed as zero;
+- gas-density values remain reference estimates;
+- bailout scenario is not interpreted as active live schedule;
+- card rendering and structured metadata agree;
+- stale CCR cards cannot masquerade as current plan.
 
 ## If CCR/Rebreather logic affects Watch calculations
 
@@ -739,7 +959,8 @@ Audit:
 - bearing set/clear;
 - reminder acknowledge if present;
 - Mission Mode toggle if present;
-- image-related intents if present.
+- image-related intents if present;
+- briefing-card open/delete intents if present.
 
 Verify:
 - all safety-relevant intents fail closed before legal/safety onboarding acceptance;
@@ -749,7 +970,9 @@ Verify:
 - intent cannot bypass active dive state validation;
 - intent cannot delete images without safe Watch-side validation if image intents exist;
 - haptics respect global toggle;
-- error messages localized IT/EN.
+- error messages localized IT/EN;
+- intents cannot activate or execute a briefing card as a live dive plan;
+- intents cannot transform stored CCR/planner metadata into live guidance.
 
 Output:
 - App Intents readiness %.
@@ -775,7 +998,12 @@ Audit:
 - reset trust;
 - replay protection;
 - changed peer rejection;
-- unsupported CCR/Rebreather payload handling.
+- unsupported CCR/Rebreather payload handling;
+- Planner briefing-card transfer;
+- briefing-card ACK/status;
+- briefing-card replacement/deletion;
+- briefing-card version/staleness;
+- routing separation among dive, image and briefing-card payloads.
 
 Verify:
 - no unsigned payload can alter safety-critical state;
@@ -784,7 +1012,11 @@ Verify:
 - inventory payloads cannot be routed as dive payloads;
 - delete requests cannot delete outside UserImages;
 - CCR/Rebreather metadata from iOS cannot corrupt Watch dive logs;
-- malformed payloads fail safely.
+- malformed payloads fail safely;
+- briefing-card ACKs cannot be confused with dive/image ACKs;
+- failed card transfer is not marked successful;
+- unsupported card schema/version fails closed;
+- card metadata cannot mutate live dive state.
 
 Output:
 - Sync/security readiness %.
@@ -814,6 +1046,9 @@ Analyze:
 - dive samples;
 - retained timers/tasks;
 - export buffers;
+- briefing-card PNG decoding;
+- briefing-card metadata caches;
+- card inventory size;
 - sync queues.
 
 ## Battery
@@ -825,6 +1060,8 @@ Analyze:
 - reminders;
 - WatchConnectivity retries;
 - image inventory sync;
+- briefing-card transfer retries;
+- briefing-card image rendering/decoding;
 - Mission Mode invariant;
 - always-on display behavior if applicable.
 
@@ -866,7 +1103,15 @@ Report:
 - missing CCR/Rebreather compatibility tests;
 - missing WatchConnectivity payload routing tests;
 - missing unit conversion tests;
-- missing physical QA.
+- missing physical QA;
+- missing briefing-card fidelity tests;
+- missing briefing-card routing tests;
+- missing briefing-card stale-version tests;
+- missing briefing-card malformed-payload tests;
+- missing small-screen safety visibility tests;
+- missing reminder manual-dismiss tests;
+- missing locale-adaptive date tests;
+- missing image paging tests.
 
 Create:
 - automated Watch algorithm test plan;
@@ -876,7 +1121,10 @@ Create:
 - underwater validation plan;
 - security regression plan;
 - performance regression plan;
-- CCR/Rebreather compatibility QA plan.
+- CCR/Rebreather compatibility QA plan;
+- Planner briefing-card end-to-end QA plan;
+- small-screen safety-layout QA plan;
+- reminder dismiss/suppression QA plan.
 
 ---
 
@@ -913,7 +1161,15 @@ If tools are available, run or suggest:
 - grep for `reminder`;
 - grep for `companionPhotoInventory`;
 - grep for `companionPhotoDelete`;
-- grep for `ackSignature`.
+- grep for `ackSignature`;
+- grep for `PlannerBriefingCard`;
+- grep for `PlannerBriefingWatchReceiver`;
+- grep for `PlannerBriefingCardStore`;
+- grep for `RockBottom`;
+- grep for `GasLedger`;
+- grep for `DecoStops`;
+- grep for `accessibilityLabel`;
+- grep for fixed `dd/MM/yyyy` date formats.
 
 Do not fix. Record findings.
 
@@ -961,7 +1217,12 @@ Area:
 - Branding;
 - Units;
 - CCR/Rebreather compatibility;
-- App Intents.
+- App Intents;
+- Planner Briefing Cards;
+- Small-Screen Safety Layout;
+- Reminder Dismiss/Suppression;
+- Date Localization;
+- Accessibility.
 
 Fix class:
 - test-only;
@@ -1007,10 +1268,17 @@ Include these readiness categories:
 | Dive Start | XX% |
 | Reminders | XX% |
 | Images / Inventory / Delete | XX% |
+| Planner Briefing Cards | XX% |
+| Briefing Card Numerical Fidelity | XX% |
+| Briefing Card Transfer / Persistence | XX% |
+| Small-Screen Safety Visibility | XX% |
+| Reminder Dismiss / Suppression | XX% |
 | Mission Mode | XX% |
 | Sensor Source | XX% |
 | Branding | XX% |
 | Units | XX% |
+| Date Localization | XX% |
+| Accessibility of Safety/Reference Data | XX% |
 | App Intents / Action Button | XX% |
 | Sync / ACK / Trust | XX% |
 | CCR/Rebreather Compatibility | XX% |
@@ -1028,7 +1296,7 @@ Overall readiness must include these categories.
 
 Create:
 
-`Docs/WATCH_COMPLETE_ALGORITHM_AUDIT_CURRENT.md`
+`Docs/2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_CURRENT.md`
 
 The report must contain:
 
@@ -1103,7 +1371,34 @@ Must answer:
 - bundled images protected?
 - image subsystem has no effect on dive metrics?
 
-## H. Mission Mode Verdict
+## H. Planner Briefing Card Verdict
+
+Must answer:
+- card transfer works?
+- numerical values match iOS canonical plan?
+- PNG and metadata agree?
+- stale cards are handled safely?
+- cards are clearly reference-only?
+- cards cannot affect live Watch calculations?
+- unsupported CCR/planner fields fail safely?
+
+## I. Small-Screen Safety Visibility Verdict
+
+Must answer:
+- depth hero remains visible?
+- critical banners remain visible?
+- non-critical banners collapse appropriately?
+- VoiceOver order remains logical?
+
+## J. Reminder Dismiss / Suppression Verdict
+
+Must answer:
+- manual dismiss works?
+- auto-dismiss remains?
+- critical alarms cannot be dismissed?
+- suppression logic is deterministic?
+
+## K. Mission Mode Verdict
 
 Must answer:
 - does it affect depth sampling?
@@ -1115,7 +1410,7 @@ Must answer:
 - does it affect sync/export?
 - is Apple Low Power Mode wording truthful?
 
-## I. Sensor Source Verdict
+## L. Sensor Source Verdict
 
 Must answer:
 - developer unlock protected?
@@ -1123,7 +1418,7 @@ Must answer:
 - simulation clearly identified?
 - release path safe?
 
-## J. Branding Verdict
+## M. Branding Verdict
 
 Must answer:
 - icon updated?
@@ -1131,14 +1426,14 @@ Must answer:
 - consistent underwater?
 - no safety overlay conflicts?
 
-## K. Unit Consistency Verdict
+## N. Unit / Date Localization Verdict
 
 Must answer:
 - metric/imperial consistent?
 - export policy clear?
 - units correct in alarms/reminders/logbook?
 
-## L. CCR/Rebreather Compatibility Verdict
+## O. CCR/Rebreather Compatibility Verdict
 
 Must answer:
 - does Watch implement CCR/Rebreather logic?
@@ -1148,7 +1443,7 @@ Must answer:
 - are unsupported CCR payloads safe?
 - are bailout/diluent/setpoint fields handled truthfully?
 
-## M. App Intents / Action Button Verdict
+## P. App Intents / Action Button Verdict
 
 Must answer:
 - legal gate enforced?
@@ -1156,7 +1451,7 @@ Must answer:
 - intents localized?
 - hardware behavior safe?
 
-## N. Sync / Security / Payload Validation
+## Q. Sync / Security / Payload Validation
 
 - Watch → iOS;
 - iOS → Watch;
@@ -1169,7 +1464,7 @@ Must answer:
 - duplicate IDs;
 - malformed payloads.
 
-## O. Performance / Battery / Memory
+## R. Performance / Battery / Memory
 
 - CPU;
 - memory;
@@ -1177,7 +1472,7 @@ Must answer:
 - SwiftUI invalidation;
 - Watch-specific constraints.
 
-## P. Test Coverage Analysis
+## S. Test Coverage Analysis
 
 - current tests;
 - failing tests;
@@ -1185,7 +1480,7 @@ Must answer:
 - test isolation risks;
 - physical QA gaps.
 
-## Q. Issue Matrix
+## T. Issue Matrix
 
 Table columns:
 - ID;
@@ -1199,7 +1494,7 @@ Table columns:
 - proposed fix;
 - estimated effort.
 
-## R. Detailed Action Plan
+## U. Detailed Action Plan
 
 Grouped by:
 1. P0;
@@ -1216,7 +1511,7 @@ For every action:
 - tests required;
 - acceptance criteria.
 
-## S. Physical Watch Ultra QA Plan
+## V. Physical Watch Ultra QA Plan
 
 Must include:
 - real depth sensor;
@@ -1230,18 +1525,31 @@ Must include:
 - Mission Mode;
 - images;
 - paired iPhone sync;
-- App Intents / Action Button.
+- App Intents / Action Button;
+- Planner briefing-card transfer;
+- briefing-card open/read/delete;
+- stale-card replacement;
+- malformed-card rejection;
+- smallest-display banner density;
+- reminder tap-to-dismiss;
+- image paging;
+- locale-adaptive dates;
+- VoiceOver traversal.
 
-## T. CCR/Rebreather Compatibility QA Plan
+## W. CCR/Rebreather Compatibility QA Plan
 
 Must include:
 - iOS CCR plan synced to Watch if supported;
 - unsupported CCR payload ignored safely if not supported;
 - bailout/diluent/setpoint metadata truthfulness;
 - no live CCR/deco control claim;
-- export/log consistency.
+- export/log consistency;
+- CCR briefing-card rendering;
+- bailout scenario reference-only wording;
+- gas-density estimate wording;
+- no card-driven live setpoint/deco behavior.
 
-## U. Final Verdict
+## X. Final Verdict
 
 Answer clearly:
 - Is Watch algorithm/runtime ready?
@@ -1251,6 +1559,12 @@ Answer clearly:
 - What blocks 100% Watch readiness?
 - What blocks 100% Watch security readiness?
 - What blocks 100% Watch performance readiness?
+- Are Planner briefing cards numerically faithful?
+- Are briefing cards safely reference-only?
+- Can stale/malformed cards affect live Watch state?
+- Is small-screen critical-metric visibility preserved?
+- Is reminder dismiss/suppression safe?
+- Are date localization and accessibility complete?
 - What must be fixed first?
 
 ---
@@ -1285,7 +1599,7 @@ The task is complete only if:
 - No security model is modified.
 - Report is created at:
 
-  `Docs/WATCH_COMPLETE_ALGORITHM_AUDIT_CURRENT.md`
+  `Docs/2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_CURRENT.md`
 
 - Report includes:
   - Dive Start readiness %;
@@ -1299,15 +1613,64 @@ The task is complete only if:
   - Sync/Security readiness %;
   - CCR/Rebreather compatibility readiness %;
   - Performance/Battery readiness %;
+  - Planner Briefing Card readiness %;
+  - Briefing Card numerical fidelity readiness %;
+  - Briefing Card transfer/persistence readiness %;
+  - Small-screen safety visibility readiness %;
+  - Reminder dismiss/suppression readiness %;
   - full issue matrix;
   - detailed action plan;
   - physical QA plan;
-  - CCR/Rebreather compatibility QA plan.
+  - CCR/Rebreather compatibility QA plan;
+- Planner briefing-card end-to-end QA plan;
+- small-screen safety-layout QA plan;
+- reminder dismiss/suppression QA plan.
 
 - All physical/external QA items are marked as pending, not passed.
 - Final git status confirms only report/docs changed.
+- Planner briefing cards are audited end to end.
+- Canonical live Watch values are proven independent from synced planner cards.
+- Latest reminder, layout, image paging, date localization and accessibility changes are included where present.
+- No readiness percentage is assigned without code/test/evidence support.
 
 If anything cannot be fully analyzed:
 - document the limitation;
 - explain why;
 - propose the exact next inspection step.
+
+
+---
+
+# VERSION HISTORY
+
+## V2.0 — 2026-06-13
+
+Updated for the current `main` implementation state.
+
+Added explicit audit coverage for:
+
+- shared Planner briefing cards;
+- iOS-to-Watch briefing PNG/card transfer;
+- Watch briefing-card receiver/store;
+- briefing-card persistence, replacement, deletion and stale-data handling;
+- numerical fidelity between structured metadata and rendered PNG;
+- full Dive Runtime and decompression-stop reference values;
+- Rock Bottom / Emergency reference data;
+- gas ledger liters/bar reference data;
+- CCR setpoint/diluent/bailout/bailout-scenario/gas-density card data;
+- small-screen live safety visibility;
+- reminder manual dismiss and alarm-priority suppression;
+- image horizontal paging;
+- locale-adaptive Watch logbook dates;
+- expanded accessibility for safety/reference states.
+
+Preserved:
+
+- `2-` prefix and audit-sequence position;
+- Apple Watch MAIN-only scope;
+- audit-only behavior;
+- no production code, UI, business logic, algorithms, security or sync modifications;
+- non-certified Watch companion positioning;
+- Mission Mode, TTV and sensor-source semantics;
+- BUSSOLA terminology;
+- external physical QA gates as pending unless evidenced.

@@ -34,6 +34,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     @Published private(set) var inventoryErrorMessage: String?
     @Published private(set) var pendingDeleteRequests: [String: WatchPhotoDeleteRequestState] = [:]
     private weak var logStore: DiveLogStore?
+    weak var plannerBriefingTransferService: PlannerBriefingWatchTransferService?
     private var photoIDByTransferFilePath: [String: String] = [:]
     private var companionPhotoTransfersByID: [String: CompanionPhotoTransferStatus] = [:]
     private var pendingPhotoImportVerificationTasks: [String: Task<Void, Never>] = [:]
@@ -448,6 +449,15 @@ final class WatchSyncService: NSObject, ObservableObject {
         lastMessage = DIRIOSLocalizer.string("watch_photo_status_failed")
     }
 
+    private func handlePlannerBriefingAck(_ payload: [String: Any]) {
+        guard let packageRaw = payload[PlannerBriefingTransferSupport.packageIdKey] as? String,
+              let packageId = UUID(uuidString: packageRaw),
+              let status = payload[PlannerBriefingTransferSupport.ackStatusKey] as? String else {
+            return
+        }
+        plannerBriefingTransferService?.handleAck(packageId: packageId, status: status)
+    }
+
     private func handleCompanionPhotoAck(_ payload: [String: Any]) {
         guard let ack = CompanionPhotoTransferSupport.parseCompanionPhotoAck(payload) else { return }
         var transfer = companionPhotoTransfersByID[ack.photoID]
@@ -537,7 +547,8 @@ final class WatchSyncService: NSObject, ObservableObject {
                     recordActivity(title: DIRIOSLocalizer.string("sync.activity.conflict"), detail: sessionSummary(session))
                     return AckContext(sessionID: session.id, issuedAt: parsed.issuedAt)
                 }
-                logStore?.add(session, suppressWatchPush: true)
+                let merged = DiveSessionMerge.preferred(existing, session)
+                logStore?.add(merged, suppressWatchPush: true)
                 importedSessionIDs = WatchSyncBoundedIDStore.merge(
                     session.id,
                     into: importedSessionIDs,
@@ -987,6 +998,10 @@ extension WatchSyncService: WCSessionDelegate {
             }
             if CompanionPhotoTransferSupport.isCompanionPhotoAck(userInfo) {
                 self.handleCompanionPhotoAck(userInfo)
+                return
+            }
+            if (userInfo["type"] as? String) == PlannerBriefingTransferSupport.ackType {
+                self.handlePlannerBriefingAck(userInfo)
                 return
             }
             _ = self.importSessionPayload(userInfo)

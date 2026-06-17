@@ -20,12 +20,12 @@ struct TissueDiveProfileChart: View {
             Chart {
                 ForEach(points) { point in
                     AreaMark(
-                        x: .value("Time", point.elapsedMinutes),
+                        x: .value(DIRIOSLocalizer.string("tissue_analytics.axis.time"), point.elapsedMinutes),
                         y: .value("Depth", -displayDepth(point.depthMeters))
                     )
                     .foregroundStyle(TissueAnalyticsTheme.accentBlue.opacity(0.22))
                     LineMark(
-                        x: .value("Time", point.elapsedMinutes),
+                        x: .value(DIRIOSLocalizer.string("tissue_analytics.axis.time"), point.elapsedMinutes),
                         y: .value("Depth", -displayDepth(point.depthMeters))
                     )
                     .foregroundStyle(TissueAnalyticsTheme.accentBlue)
@@ -242,13 +242,13 @@ struct TissueTrendChart: View {
             Chart {
                 ForEach(Array(trendPoints.enumerated()), id: \.offset) { _, point in
                     LineMark(
-                        x: .value("Time", point.minutes),
+                        x: .value(DIRIOSLocalizer.string("tissue_analytics.axis.time"), point.minutes),
                         y: .value("Load", point.load)
                     )
                     .foregroundStyle(TissueAnalyticsTheme.orange)
                     .lineStyle(StrokeStyle(lineWidth: 2))
                     AreaMark(
-                        x: .value("Time", point.minutes),
+                        x: .value(DIRIOSLocalizer.string("tissue_analytics.axis.time"), point.minutes),
                         y: .value("Load", point.load)
                     )
                     .foregroundStyle(TissueAnalyticsTheme.orange.opacity(0.12))
@@ -377,13 +377,13 @@ struct TissueNarcoticLoadChart: View {
             Chart {
                 ForEach(samples) { sample in
                     LineMark(
-                        x: .value("Time", Double(sample.runtimeSeconds) / 60.0),
+                        x: .value(DIRIOSLocalizer.string("tissue_analytics.axis.time"), Double(sample.runtimeSeconds) / 60.0),
                         y: .value("PPN2", sample.ppN2Bar)
                     )
                     .foregroundStyle(TissueAnalyticsTheme.purple)
                     .lineStyle(StrokeStyle(lineWidth: 2))
                     AreaMark(
-                        x: .value("Time", Double(sample.runtimeSeconds) / 60.0),
+                        x: .value(DIRIOSLocalizer.string("tissue_analytics.axis.time"), Double(sample.runtimeSeconds) / 60.0),
                         y: .value("PPN2", sample.ppN2Bar)
                     )
                     .foregroundStyle(TissueAnalyticsTheme.purple.opacity(0.15))

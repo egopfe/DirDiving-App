@@ -509,6 +509,8 @@ struct GasPlanInput: Codable, Hashable {
     var sacLitersPerMinute: Double = 18
     var emergencySacLitersPerMinute: Double = 30
     var teamSize: Double = 2
+    /// Extra emergency margin minutes added to automatic ascent time for Rock Bottom estimate.
+    var emergencyExtraMinutes: Double = IOSAlgorithmConfiguration.defaultEmergencyExtraMinutes
     var plannedDepthMeters: Double = 40
     var plannedAverageDepthMeters: Double = 20
     var planningDepthReference: PlanningDepthReference = .maximumDepth
@@ -709,5 +711,67 @@ struct GasPlanInput: Codable, Hashable {
         if plannedAverageDepthMeters > plannedDepthMeters {
             plannedAverageDepthMeters = plannedDepthMeters
         }
+    }
+
+    init() {}
+
+    enum CodingKeys: String, CodingKey {
+        case cylinder
+        case sacLitersPerMinute
+        case emergencySacLitersPerMinute
+        case teamSize
+        case emergencyExtraMinutes
+        case plannedDepthMeters
+        case plannedAverageDepthMeters
+        case planningDepthReference
+        case usesAverageDepthForGasConsumption
+        case plannerCylinders
+        case isDecoGasEnabled
+        case plannedBottomMinutes
+        case waterTemperatureCelsius
+        case salinity
+        case altitudeMeters
+        case gfLow
+        case gfHigh
+        case densityWarningLimit
+        case densityDangerLimit
+        case bottomGas
+        case decoGas1
+        case decoGas2
+        case teamMembers
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        cylinder = try container.decodeIfPresent(Cylinder.self, forKey: .cylinder) ?? Cylinder()
+        sacLitersPerMinute = try container.decodeIfPresent(Double.self, forKey: .sacLitersPerMinute) ?? 18
+        emergencySacLitersPerMinute = try container.decodeIfPresent(Double.self, forKey: .emergencySacLitersPerMinute) ?? 30
+        teamSize = try container.decodeIfPresent(Double.self, forKey: .teamSize) ?? 2
+        emergencyExtraMinutes = try container.decodeIfPresent(Double.self, forKey: .emergencyExtraMinutes)
+            ?? IOSAlgorithmConfiguration.defaultEmergencyExtraMinutes
+        plannedDepthMeters = try container.decodeIfPresent(Double.self, forKey: .plannedDepthMeters) ?? 40
+        plannedAverageDepthMeters = try container.decodeIfPresent(Double.self, forKey: .plannedAverageDepthMeters) ?? 20
+        planningDepthReference = try container.decodeIfPresent(PlanningDepthReference.self, forKey: .planningDepthReference) ?? .maximumDepth
+        usesAverageDepthForGasConsumption = try container.decodeIfPresent(Bool.self, forKey: .usesAverageDepthForGasConsumption)
+        plannerCylinders = try container.decodeIfPresent([PlannerCylinderEntry].self, forKey: .plannerCylinders) ?? []
+        isDecoGasEnabled = try container.decodeIfPresent(Bool.self, forKey: .isDecoGasEnabled)
+        plannedBottomMinutes = try container.decodeIfPresent(Double.self, forKey: .plannedBottomMinutes) ?? 20
+        waterTemperatureCelsius = try container.decodeIfPresent(Double.self, forKey: .waterTemperatureCelsius) ?? 24
+        salinity = try container.decodeIfPresent(SalinityMode.self, forKey: .salinity) ?? .salt
+        altitudeMeters = try container.decodeIfPresent(Double.self, forKey: .altitudeMeters) ?? 0
+        gfLow = try container.decodeIfPresent(Double.self, forKey: .gfLow) ?? 30
+        gfHigh = try container.decodeIfPresent(Double.self, forKey: .gfHigh) ?? 70
+        densityWarningLimit = try container.decodeIfPresent(Double.self, forKey: .densityWarningLimit) ?? 5.2
+        densityDangerLimit = try container.decodeIfPresent(Double.self, forKey: .densityDangerLimit) ?? 6.2
+        bottomGas = try container.decodeIfPresent(GasMix.self, forKey: .bottomGas)
+            ?? GasMix(name: "Gas di Fondo", role: .bottom, oxygen: 0.18, helium: 0.45, maxPPO2: 1.40)
+        decoGas1 = try container.decodeIfPresent(GasMix.self, forKey: .decoGas1)
+            ?? GasMix(name: "Gas Deco 1", role: .deco, oxygen: 0.50, helium: 0.0, maxPPO2: 1.60)
+        decoGas2 = try container.decodeIfPresent(GasMix.self, forKey: .decoGas2)
+            ?? GasMix(name: "Gas Deco 2", role: .deco, oxygen: 0.80, helium: 0.0, maxPPO2: 1.60)
+        teamMembers = try container.decodeIfPresent([TeamMember].self, forKey: .teamMembers) ?? [
+            TeamMember(name: "Diver A", sacLitersPerMinute: 18, cylinder: Cylinder(name: "Back gas", volumeLiters: 12, startPressure: 200, reservePressure: 50, pressureUnit: .bar)),
+            TeamMember(name: "Diver B", sacLitersPerMinute: 20, cylinder: Cylinder(name: "Back gas", volumeLiters: 12, startPressure: 190, reservePressure: 50, pressureUnit: .bar))
+        ]
     }
 }

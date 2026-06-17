@@ -8,7 +8,7 @@ final class CompassManager: NSObject, ObservableObject {
 
     @Published private(set) var headingDegrees: Double = 0
     @Published var bearingDegrees: Double?
-    @Published private(set) var statusMessage = String(localized: "Bussola pronta")
+    @Published private(set) var statusMessage = String(localized: "watch.compass.status.ready")
     private let locationManager = CLLocationManager()
 
     override init() {
@@ -21,10 +21,10 @@ final class CompassManager: NSObject, ObservableObject {
     func start() {
         locationManager.requestWhenInUseAuthorization()
         if CLLocationManager.headingAvailable() {
-            statusMessage = String(localized: "Bussola attiva")
+            statusMessage = String(localized: "watch.compass.status.active")
             locationManager.startUpdatingHeading()
         } else {
-            statusMessage = String(localized: "Bussola non disponibile")
+            statusMessage = String(localized: "watch.compass.status.unavailable")
         }
     }
 
@@ -44,15 +44,15 @@ extension CompassManager: CLLocationManagerDelegate {
         Task { @MainActor in
             switch manager.authorizationStatus {
             case .denied, .restricted:
-                statusMessage = String(localized: "Permesso posizione negato")
+                statusMessage = String(localized: "watch.compass.status.permission_denied")
             case .authorizedAlways, .authorizedWhenInUse:
                 statusMessage = CLLocationManager.headingAvailable()
-                    ? String(localized: "Bussola attiva")
-                    : String(localized: "Bussola non disponibile")
+                    ? String(localized: "watch.compass.status.active")
+                    : String(localized: "watch.compass.status.unavailable")
             case .notDetermined:
-                statusMessage = String(localized: "In attesa permesso posizione")
+                statusMessage = String(localized: "watch.compass.status.permission_pending")
             @unknown default:
-                statusMessage = String(localized: "Stato bussola sconosciuto")
+                statusMessage = String(localized: "watch.compass.status.unknown")
             }
         }
     }
@@ -61,14 +61,14 @@ extension CompassManager: CLLocationManagerDelegate {
         Task { @MainActor in
             let rawHeading = newHeading.trueHeading >= 0 ? newHeading.trueHeading : newHeading.magneticHeading
             guard rawHeading.isFinite else {
-                statusMessage = String(localized: "Bussola non disponibile")
+                statusMessage = String(localized: "watch.compass.status.unavailable")
                 return
             }
             headingDegrees = DiveAlgorithm.normalizedDegrees(rawHeading)
             if newHeading.headingAccuracy < 0 {
-                statusMessage = String(localized: "compass.status.calibration_required")
+                statusMessage = String(localized: "watch.compass.status.calibration_required")
             } else {
-                statusMessage = String(localized: "Bussola attiva")
+                statusMessage = String(localized: "watch.compass.status.active")
             }
         }
     }
