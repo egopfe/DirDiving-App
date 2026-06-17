@@ -10,8 +10,8 @@ enum DIRActivityMode: String, Codable, CaseIterable, Identifiable, Hashable, Sen
 
     var isLaunchableInMAIN: Bool {
         switch self {
-        case .diving: return true
-        case .apnea, .snorkeling: return false
+        case .diving, .apnea: return true
+        case .snorkeling: return false
         }
     }
 }

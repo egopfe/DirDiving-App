@@ -7,6 +7,9 @@ final class ApneaWatchUIViewContractTests: XCTestCase {
         XCTAssertTrue(source.contains("accessibilityLabel"))
         XCTAssertTrue(source.contains("a11y.watch.haptics_off_badge.label"))
         XCTAssertTrue(source.contains("ui.missionLabel"))
+        XCTAssertTrue(source.contains("surfaceRecoveryPanel"))
+        XCTAssertTrue(source.contains("sessionSummaryPanel"))
+        XCTAssertTrue(source.contains("eventOverlay"))
     }
 
     func testApneaLocalizationKeysExistInEnAndIt() throws {
@@ -15,7 +18,17 @@ final class ApneaWatchUIViewContractTests: XCTestCase {
             "apnea.ready.start",
             "apnea.stage.dive",
             "apnea.stage.ascent",
-            "apnea.a11y.vertical_speed"
+            "apnea.a11y.vertical_speed",
+            "apnea.surface.title",
+            "apnea.surface.last_dive",
+            "apnea.recovery.state.completed",
+            "apnea.summary.title",
+            "apnea.summary.dives",
+            "apnea.summary.save_end",
+            "apnea.overlay.dismiss",
+            "apnea.overlay.a11y.marker",
+            "apnea.overlay.a11y.target",
+            "apnea.alarms.sample.depth"
         ]
         let en = try loadWatchStrings(named: "en")
         let it = try loadWatchStrings(named: "it")

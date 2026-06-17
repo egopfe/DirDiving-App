@@ -52,11 +52,17 @@ final class IOSCompanionActivitySelectionTests: XCTestCase {
         XCTAssertTrue(IOSCompanionPostLegalEntry.consumePendingPlannerLanding())
     }
 
-    func testUnavailableModesCannotBeSelected() {
+    func testApneaCanBeSelectedWhileSnorkelingRemainsUnavailable() {
         let store = CompanionActivityPreferenceStore(defaults: defaults)
-        XCTAssertFalse(CompanionActivityAvailability.isAvailable(.apnea))
+        XCTAssertTrue(CompanionActivityAvailability.isAvailable(.apnea))
         XCTAssertFalse(CompanionActivityAvailability.isAvailable(.snorkeling))
-        XCTAssertFalse(store.select(.apnea))
+        XCTAssertTrue(store.select(.apnea))
+        XCTAssertFalse(store.select(.snorkeling))
+        XCTAssertEqual(store.preference.selectedMode, .apnea)
+    }
+
+    func testUnavailableSnorkelingCannotBeSelected() {
+        let store = CompanionActivityPreferenceStore(defaults: defaults)
         XCTAssertFalse(store.select(.snorkeling))
         XCTAssertNil(store.preference.selectedMode)
         XCTAssertTrue(store.shouldPresentSelectionScreen)

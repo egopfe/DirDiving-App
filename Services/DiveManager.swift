@@ -157,6 +157,7 @@ final class DiveManager: ObservableObject {
     @Published var gpsConfirmation: DiveGPSConfirmation?
     @Published var isDepthAutomationAvailable = false
     @Published var developerSensorSourceWarning: String?
+    @Published var apneaOperationalOverlay: ApneaOperationalOverlay?
     @Published private(set) var isSimulationDepthActive = false
     @Published private(set) var isDepthAutomationMockFallbackActive = false
     @Published private(set) var depthSensorSourceResolution: DepthSensorSourceResolution = .unavailable

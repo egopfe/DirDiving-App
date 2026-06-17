@@ -29,32 +29,116 @@ struct ApneaSessionStatistics: Codable, Hashable, Sendable {
     var sessionMaxDepthMeters: Double
     var averageDiveDurationSeconds: TimeInterval
     var totalRecoverySeconds: TimeInterval
+    var bestDiveDurationSeconds: TimeInterval
+    var cumulativeDepthMeters: Double
+    var averageRecoverySeconds: TimeInterval
+    var apneaRecoveryRatio: Double
+    var eventCount: Int
+    var sessionDurationSeconds: TimeInterval
 
     static let empty = ApneaSessionStatistics(
         diveCount: 0,
         totalUnderwaterSeconds: 0,
         sessionMaxDepthMeters: 0,
         averageDiveDurationSeconds: 0,
-        totalRecoverySeconds: 0
+        totalRecoverySeconds: 0,
+        bestDiveDurationSeconds: 0,
+        cumulativeDepthMeters: 0,
+        averageRecoverySeconds: 0,
+        apneaRecoveryRatio: 0,
+        eventCount: 0,
+        sessionDurationSeconds: 0
     )
 
-    static func aggregate(from dives: [ApneaDive]) -> ApneaSessionStatistics {
+    enum CodingKeys: String, CodingKey {
+        case diveCount
+        case totalUnderwaterSeconds
+        case sessionMaxDepthMeters
+        case averageDiveDurationSeconds
+        case totalRecoverySeconds
+        case bestDiveDurationSeconds
+        case cumulativeDepthMeters
+        case averageRecoverySeconds
+        case apneaRecoveryRatio
+        case eventCount
+        case sessionDurationSeconds
+    }
+
+    init(
+        diveCount: Int,
+        totalUnderwaterSeconds: TimeInterval,
+        sessionMaxDepthMeters: Double,
+        averageDiveDurationSeconds: TimeInterval,
+        totalRecoverySeconds: TimeInterval,
+        bestDiveDurationSeconds: TimeInterval = 0,
+        cumulativeDepthMeters: Double = 0,
+        averageRecoverySeconds: TimeInterval = 0,
+        apneaRecoveryRatio: Double = 0,
+        eventCount: Int = 0,
+        sessionDurationSeconds: TimeInterval = 0
+    ) {
+        self.diveCount = diveCount
+        self.totalUnderwaterSeconds = totalUnderwaterSeconds
+        self.sessionMaxDepthMeters = sessionMaxDepthMeters
+        self.averageDiveDurationSeconds = averageDiveDurationSeconds
+        self.totalRecoverySeconds = totalRecoverySeconds
+        self.bestDiveDurationSeconds = bestDiveDurationSeconds
+        self.cumulativeDepthMeters = cumulativeDepthMeters
+        self.averageRecoverySeconds = averageRecoverySeconds
+        self.apneaRecoveryRatio = apneaRecoveryRatio
+        self.eventCount = eventCount
+        self.sessionDurationSeconds = sessionDurationSeconds
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        diveCount = try container.decode(Int.self, forKey: .diveCount)
+        totalUnderwaterSeconds = try container.decode(TimeInterval.self, forKey: .totalUnderwaterSeconds)
+        sessionMaxDepthMeters = try container.decode(Double.self, forKey: .sessionMaxDepthMeters)
+        averageDiveDurationSeconds = try container.decode(TimeInterval.self, forKey: .averageDiveDurationSeconds)
+        totalRecoverySeconds = try container.decode(TimeInterval.self, forKey: .totalRecoverySeconds)
+        bestDiveDurationSeconds = try container.decodeIfPresent(TimeInterval.self, forKey: .bestDiveDurationSeconds) ?? 0
+        cumulativeDepthMeters = try container.decodeIfPresent(Double.self, forKey: .cumulativeDepthMeters) ?? 0
+        averageRecoverySeconds = try container.decodeIfPresent(TimeInterval.self, forKey: .averageRecoverySeconds) ?? 0
+        apneaRecoveryRatio = try container.decodeIfPresent(Double.self, forKey: .apneaRecoveryRatio) ?? 0
+        eventCount = try container.decodeIfPresent(Int.self, forKey: .eventCount) ?? 0
+        sessionDurationSeconds = try container.decodeIfPresent(TimeInterval.self, forKey: .sessionDurationSeconds) ?? 0
+    }
+
+    static func aggregate(from dives: [ApneaDive], sessionDurationSeconds: TimeInterval = 0) -> ApneaSessionStatistics {
         guard !dives.isEmpty else { return .empty }
         let diveCount = dives.count
         let totalUnderwater = dives.reduce(0) { $0 + max(0, $1.durationSeconds) }
         let sessionMax = dives.map(\.maxDepthMeters).max() ?? 0
+        let bestDuration = dives.map(\.durationSeconds).max() ?? 0
         let averageDuration = totalUnderwater / Double(diveCount)
         let totalRecovery = dives.reduce(0) { partial, dive in
-            let before = dive.recoveryBefore?.completedSeconds ?? 0
-            let after = dive.recoveryAfter?.completedSeconds ?? 0
+            let before = dive.recoveryBefore?.completedSeconds ?? dive.recoveryBefore?.plannedSeconds ?? 0
+            let after = dive.recoveryAfter?.completedSeconds ?? dive.recoveryAfter?.plannedSeconds ?? 0
             return partial + before + after
         }
+        let averageRecovery = totalRecovery / Double(diveCount)
+        let cumulativeDepth = dives.reduce(0.0) { partial, dive in
+            let averageDepth = dive.averageDepthMeters > 0
+                ? dive.averageDepthMeters
+                : (dive.samples.isEmpty ? dive.maxDepthMeters * 0.5 : dive.recomputedDepthMetrics().averageDepthMeters)
+            return partial + averageDepth * max(0, dive.durationSeconds)
+        }
+        let eventCount = dives.reduce(0) { $0 + $1.events.count }
+        let ratio = totalRecovery > 0 ? totalUnderwater / totalRecovery : 0
+        let resolvedSessionDuration = sessionDurationSeconds > 0 ? sessionDurationSeconds : totalUnderwater + totalRecovery
         return ApneaSessionStatistics(
             diveCount: diveCount,
             totalUnderwaterSeconds: totalUnderwater,
             sessionMaxDepthMeters: sessionMax,
             averageDiveDurationSeconds: averageDuration,
-            totalRecoverySeconds: totalRecovery
+            totalRecoverySeconds: totalRecovery,
+            bestDiveDurationSeconds: bestDuration,
+            cumulativeDepthMeters: cumulativeDepth,
+            averageRecoverySeconds: averageRecovery,
+            apneaRecoveryRatio: ratio,
+            eventCount: eventCount,
+            sessionDurationSeconds: resolvedSessionDuration
         )
     }
 }
@@ -153,6 +237,12 @@ struct ApneaSession: Identifiable, Codable, Hashable, Sendable {
     }
 
     func refreshedStatistics() -> ApneaSessionStatistics {
-        ApneaSessionStatistics.aggregate(from: dives)
+        let duration: TimeInterval
+        if let start = startedAtMonotonicSeconds, let end = endedAtMonotonicSeconds, end >= start {
+            duration = end - start
+        } else {
+            duration = 0
+        }
+        return ApneaSessionStatistics.aggregate(from: dives, sessionDurationSeconds: duration)
     }
 }

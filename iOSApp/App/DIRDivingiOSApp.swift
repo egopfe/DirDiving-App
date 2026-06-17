@@ -13,6 +13,12 @@ struct DIRDivingiOSApp: App {
     @StateObject private var plannerBriefingTransfer = PlannerBriefingWatchTransferService()
     @StateObject private var divePlanPackageTransfer = DivePlanPackageWatchTransferService()
     @StateObject private var companionActivity = CompanionActivityPreferenceStore()
+    @StateObject private var apneaNavigation = IOSApneaNavigationStore()
+    @StateObject private var apneaProfileStore = IOSApneaProfileStore()
+    @StateObject private var apneaPlannerStore = IOSApneaPlannerStore()
+    @StateObject private var apneaLogbookStore = IOSApneaLogbookStore()
+    @StateObject private var apneaSettingsStore = IOSApneaSettingsStore()
+    @StateObject private var apneaWatchTransfer = IOSApneaWatchTransferService()
     @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
 
     init() {
@@ -35,6 +41,8 @@ struct DIRDivingiOSApp: App {
                         )
                     } else if companionActivity.shouldPresentSelectionScreen {
                         IOSCompanionActivitySelectionView()
+                    } else if companionActivity.selectedMode == .apnea {
+                        IOSApneaRootView()
                     } else {
                         ContentView()
                             .id(appLanguage)
@@ -53,6 +61,12 @@ struct DIRDivingiOSApp: App {
             .environmentObject(plannerBriefingTransfer)
             .environmentObject(divePlanPackageTransfer)
             .environmentObject(companionActivity)
+            .environmentObject(apneaNavigation)
+            .environmentObject(apneaProfileStore)
+            .environmentObject(apneaPlannerStore)
+            .environmentObject(apneaLogbookStore)
+            .environmentObject(apneaSettingsStore)
+            .environmentObject(apneaWatchTransfer)
             .environment(\.locale, DIRIOSAppLanguage.fromStorage(appLanguage).locale)
             .preferredColorScheme(.dark)
             .task {

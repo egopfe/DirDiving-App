@@ -153,6 +153,9 @@ final class ApneaDomainModelTests: XCTestCase {
         XCTAssertEqual(stats.totalUnderwaterSeconds, 100)
         XCTAssertEqual(stats.sessionMaxDepthMeters, 18)
         XCTAssertEqual(stats.averageDiveDurationSeconds, 50)
+        XCTAssertEqual(stats.bestDiveDurationSeconds, 60)
+        XCTAssertEqual(stats.cumulativeDepthMeters, 920, accuracy: 0.1)
+        XCTAssertEqual(stats.eventCount, 0)
     }
 
     func testDiveDepthMetricsRecomputedFromSamples() {
