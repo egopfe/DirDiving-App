@@ -25,12 +25,52 @@ struct ApneaSessionMapModel: Equatable, Hashable, Sendable {
     )
 }
 
+enum ApneaMapFixQuality: String, Codable, Hashable, Sendable {
+    case none
+    case poor
+    case fair
+    case good
+}
+
+enum ApneaMapPermissionState: String, Codable, Hashable, Sendable {
+    case authorized
+    case denied
+    case restricted
+    case notDetermined
+}
+
+extension ApneaSessionMapModel {
+    var fixQuality: ApneaMapFixQuality {
+        guard isAvailable else { return .none }
+        guard let accuracy = accuracyMeters else { return .fair }
+        if accuracy <= 10 { return .good }
+        if accuracy <= 30 { return .fair }
+        return .poor
+    }
+
+    var privacyNoticeKey: String {
+        "apnea.ios.map.privacy_notice"
+    }
+}
+
 enum ApneaSessionMapPresentation {
     static func make(
         from session: ApneaSession,
+        permission: ApneaMapPermissionState = .authorized,
         calendar: Calendar = .current,
         locale: Locale = .current
     ) -> ApneaSessionMapModel {
+        if permission == .denied || permission == .restricted {
+            return ApneaSessionMapModel(
+                coordinates: [],
+                sessionStartText: nil,
+                sessionEndText: nil,
+                accuracyMeters: nil,
+                isAvailable: false,
+                unavailableReasonKey: "apnea.ios.map.permission_denied"
+            )
+        }
+
         let points = session.surfaceGPSPoints.filter { $0.latitude.isFinite && $0.longitude.isFinite }
         guard points.count >= 2 else {
             if session.warnings.contains(.gpsUnavailable) {

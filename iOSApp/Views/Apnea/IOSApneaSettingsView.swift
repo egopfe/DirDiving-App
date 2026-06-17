@@ -29,6 +29,15 @@ struct IOSApneaSettingsView: View {
                     Toggle(DIRIOSLocalizer.string("apnea.ios.settings.metric"), isOn: $settingsStore.settings.useMetricUnits)
                 }
 
+                Section(DIRIOSLocalizer.string("apnea.ios.settings.companion")) {
+                    NavigationLink(DIRIOSLocalizer.string("apnea.ios.equipment.title")) {
+                        IOSApneaEquipmentView()
+                    }
+                    NavigationLink(DIRIOSLocalizer.string("apnea.ios.buddy.nav_title")) {
+                        IOSApneaBuddySafetyView()
+                    }
+                }
+
                 Section(DIRIOSLocalizer.string("apnea.ios.settings.feedback")) {
                     Toggle(DIRIOSLocalizer.string("apnea.ios.settings.haptics"), isOn: $settingsStore.settings.hapticsEnabled)
                     Toggle(DIRIOSLocalizer.string("apnea.ios.settings.sounds"), isOn: $settingsStore.settings.soundsEnabled)

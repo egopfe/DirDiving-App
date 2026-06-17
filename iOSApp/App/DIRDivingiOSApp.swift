@@ -19,6 +19,8 @@ struct DIRDivingiOSApp: App {
     @StateObject private var apneaLogbookStore = IOSApneaLogbookStore()
     @StateObject private var apneaSettingsStore = IOSApneaSettingsStore()
     @StateObject private var apneaWatchTransfer = IOSApneaWatchTransferService()
+    @StateObject private var apneaEquipmentStore = IOSApneaEquipmentStore()
+    @StateObject private var apneaBuddySafetyStore = IOSApneaBuddySafetyStore()
     @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
 
     init() {
@@ -67,6 +69,8 @@ struct DIRDivingiOSApp: App {
             .environmentObject(apneaLogbookStore)
             .environmentObject(apneaSettingsStore)
             .environmentObject(apneaWatchTransfer)
+            .environmentObject(apneaEquipmentStore)
+            .environmentObject(apneaBuddySafetyStore)
             .environment(\.locale, DIRIOSAppLanguage.fromStorage(appLanguage).locale)
             .preferredColorScheme(.dark)
             .task {

@@ -23,13 +23,16 @@ struct IOSApneaSessionDetailView: View {
     @EnvironmentObject private var logbook: IOSApneaLogbookStore
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @State private var tab: IOSApneaSessionDetailTab = .summary
+    @State private var mapPermission: ApneaMapPermissionState = .notDetermined
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
     private var summary: IOSApneaSessionSummaryPresentation {
         IOSApneaLogbookPresentationMapper.sessionSummary(session, units: unitPreference)
     }
     private var charts: ApneaSessionChartsModel { logbook.charts(for: session) }
-    private var mapModel: ApneaSessionMapModel { ApneaSessionMapPresentation.make(from: session) }
+    private var mapModel: ApneaSessionMapModel {
+        ApneaSessionMapPresentation.make(from: session, permission: mapPermission)
+    }
     private var diveMetrics: [ApneaDiveMetrics] { logbook.diveMetrics(for: session) }
 
     var body: some View {
@@ -55,6 +58,19 @@ struct IOSApneaSessionDetailView: View {
         }
         .navigationTitle(summary.title)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink {
+                    IOSApneaSessionExportView(session: session)
+                } label: {
+                    Image(systemName: "square.and.arrow.up")
+                }
+                .accessibilityLabel(DIRIOSLocalizer.string("apnea.ios.export.title"))
+            }
+        }
+        .onAppear {
+            mapPermission = IOSApneaLocationPermission.currentState()
+        }
     }
 
     private var header: some View {
@@ -362,6 +378,10 @@ struct IOSApneaSessionMapView: View {
                         .font(.caption)
                         .foregroundStyle(DIRTheme.muted)
                 }
+                Text(DIRIOSLocalizer.string(model.privacyNoticeKey))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                fixQualityBadge
             } else {
                 Text(DIRIOSLocalizer.string(model.unavailableReasonKey ?? "apnea.ios.map.unavailable"))
                     .font(.callout)
@@ -369,6 +389,18 @@ struct IOSApneaSessionMapView: View {
                     .frame(maxWidth: .infinity, minHeight: 160, alignment: .center)
             }
         }
+    }
+
+    private var fixQualityBadge: some View {
+        let (text, color): (String, Color) = switch model.fixQuality {
+        case .good: (DIRIOSLocalizer.string("apnea.ios.map.fix.good"), DIRTheme.green)
+        case .fair: (DIRIOSLocalizer.string("apnea.ios.map.fix.fair"), DIRTheme.cyan)
+        case .poor: (DIRIOSLocalizer.string("apnea.ios.map.fix.poor"), DIRTheme.orange)
+        case .none: (DIRIOSLocalizer.string("apnea.ios.map.fix.none"), DIRTheme.muted)
+        }
+        return Text(text)
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(color)
     }
 
     private var mapPosition: MapCameraPosition {
