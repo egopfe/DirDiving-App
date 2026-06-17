@@ -28,3 +28,13 @@
 ## Tests
 
 `FullComputerGasProfileTests`, updated `DIRModesAndStartupFlowTests`.
+
+## Travel and bailout policy (V1.0 remediation)
+
+**Policy A — intentional limitation**
+
+- iOS `DivePlanPackage` schema v1 carries **bottom gas**, **deco gases**, and **planned switches** only.
+- **Travel** and **bailout** are **not** transferred; diver configures them on Watch pre-dive.
+- On **ATTIVA PIANO**, imported bottom/deco replace the synced profile while **preserving** existing Watch-native `travelGases` and `bailoutGases`.
+- **Bailout** remains schedule/reference-only; excluded from `projectionGases` and normal TTS.
+- **Travel** enters TTS only when enabled **and** confirmed at runtime (manual switch).

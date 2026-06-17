@@ -24,3 +24,4 @@ Watch Full Computer runtime gas switching with conservative TTS projection, robu
 ## Tests
 
 - `FullComputerGasSwitchPolicyTests` — suggestion, missed surface, projection filtering.
+- **V1.0 remediation:** `FullComputerGasSwitchTimestampTests`, `FullComputerNoAutomaticGasSwitchTests`, `FullComputerFutureGasTTSPolicyTests`; `confirmGasSwitch` rejects unavailable gas IDs.
