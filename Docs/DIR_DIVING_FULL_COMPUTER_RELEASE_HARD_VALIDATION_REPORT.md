@@ -1,7 +1,7 @@
 # DIR Diving — Full Computer release-hard validation (Command 12)
 
-**Date:** 2026-06-02  
-**Branch:** `integration/full-computer`  
+**Date:** 2026-06-02 (updated 2026-06-17)  
+**Branch:** `main`  
 **Automation:** `./Scripts/validate_full_computer_release_readiness.sh`
 
 ---
