@@ -1,6 +1,6 @@
 # Full Computer release checklist
 
-**Branch:** `integration/full-computer` only — do **not** merge to `main` without explicit review.
+**Branch:** `main` (Full Computer on Watch MAIN — experimental, not certified)
 
 | Campo | Valore |
 |-------|--------|
@@ -8,9 +8,15 @@
 | Commit `HEAD` | __________ |
 | Esecutore | __________ |
 
+## Platform scope
+
+- [ ] **Watch MAIN** — live FC runtime, deco UI, stop machine (`DiveLiveView` + `FullComputerLivePanels`)
+- [ ] **iOS Companion** — planner + plan import + logbook only (**no** in-water FC NDL/TTS/ceiling UI)
+- [ ] Stop timer QA uses **model-synchronized** remaining time (`timerAccruing` / projection), not wall-clock stopwatch
+
 ## Pre-build
 
-- [ ] `git branch --show-current` → `integration/full-computer`
+- [ ] `git branch --show-current` → `main`
 - [ ] `xcodegen generate` (no drift in `DIRDiving.xcodeproj`)
 - [ ] `./Scripts/check_secrets.sh` PASS
 

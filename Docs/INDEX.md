@@ -17,6 +17,7 @@ Read-only audit su `main`: runtime Bühlmann Watch, solver prospettico, state ma
 | **Report** | [`AUDIT_FULL_COMPUTER_RUNTIME_DECO_UI_CURRENT.md`](AUDIT_FULL_COMPUTER_RUNTIME_DECO_UI_CURRENT.md) |
 | **Baseline** | `main` @ audit run |
 | **Verdict** | **PASS** (Watch MAIN); iOS = planner/logbook only |
+| **Remediation** | P2/P3 closed @ post-`efdcb3a` commit — see audit addendum |
 | **Prerequisite** | [`FULL_COMPUTER_FOUNDATIONS_REMEDIATION_REPORT_V1.1.md`](FULL_COMPUTER_FOUNDATIONS_REMEDIATION_REPORT_V1.1.md) |
 
 ---

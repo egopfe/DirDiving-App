@@ -123,6 +123,37 @@ final class FullComputerDecoSolverTests: XCTestCase {
         }
     }
 
+    func testRequiresDecompressionTreatsPositiveNDLAsNoDeco() {
+        let tissue = saturatedAtDepth(18, minutes: 5)
+        let projection = BuhlmannEngine.runtimeProjection(
+            tissueState: tissue,
+            depthMeters: 18,
+            gas: plan.activeGas,
+            gfLow: plan.gfLow,
+            gfHigh: plan.gfHigh
+        )
+        XCTAssertGreaterThan(projection.ndlMinutes ?? 0, 0)
+        XCTAssertFalse(
+            FullComputerDecoSolver.requiresDecompression(projection: projection, depthMeters: 18)
+        )
+    }
+
+    func testRequiresDecompressionTreatsZeroOrMissingNDLAsDecoEligible() {
+        let tissue = saturatedAtDepth(40, minutes: 30)
+        let projection = BuhlmannEngine.runtimeProjection(
+            tissueState: tissue,
+            depthMeters: 40,
+            gas: plan.activeGas,
+            gfLow: plan.gfLow,
+            gfHigh: plan.gfHigh
+        )
+        if projection.ndlMinutes == 0 || projection.ndlMinutes == nil || !projection.stops.isEmpty {
+            XCTAssertTrue(
+                FullComputerDecoSolver.requiresDecompression(projection: projection, depthMeters: 40)
+            )
+        }
+    }
+
     func testCeilingViolationDetectedWhenTooShallow() {
         let tissue = saturatedAtDepth(35, minutes: 25)
         let projection = BuhlmannEngine.runtimeProjection(

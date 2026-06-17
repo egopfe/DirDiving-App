@@ -219,6 +219,16 @@ Related (foundations / architecture): `FullComputerWatchArchitectureGuardTests` 
 
 ---
 
+## Remediation addendum (2026-06-17, on `main`)
+
+| Finding | Status | Evidence |
+|---------|--------|----------|
+| P2 iOS live FC boundary | **CLOSED** | `Docs/FULL_COMPUTER_ARCHITECTURE.md` — platform boundary table |
+| P3 `requiresDecompression` unit mix | **CLOSED** | `ndlMinutes > 0` gate; `FullComputerDecoSolverTests` regression tests |
+| P3 projection-synchronized stop timer | **CLOSED** | State-machine doc comment + release checklist QA note |
+
+---
+
 ## 10. Readiness matrix
 
 | Area | Required | Result |

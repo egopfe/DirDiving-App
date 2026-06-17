@@ -1,7 +1,16 @@
 # Full Computer architecture (Watch + iOS)
 
-**Branch:** `integration/full-computer`  
+**Branch:** `main`  
 **Status:** Experimental — **not certified** for diving. See [`SAFETY_DISCLAIMER.md`](SAFETY_DISCLAIMER.md).
+
+## Platform boundary (Audit 02)
+
+| Surface | Live FC runtime / deco UI | Role |
+|---------|---------------------------|------|
+| **Watch MAIN** (`DIRDivingMode.fullComputer`) | **Yes** | In-water NDL, TTS, ceiling, stop state machine, `DiveLiveView` panels |
+| **iOS Companion** | **No** | Pre-dive planner (`BuhlmannPlanner` → shared core), plan import, logbook merge for `FullComputerDiveLogbookMetadata` |
+
+A future iOS live mirror would be a **new Command** — not implied by current `main` scope.
 
 ## Overview
 
@@ -52,4 +61,4 @@ flowchart LR
 - Command reports: `Docs/DIR_DIVING_FULL_COMPUTER_*_REPORT.md`
 - Release-hard matrix: [`FULL_COMPUTER_RELEASE_HARD_TEST_MATRIX.md`](FULL_COMPUTER_RELEASE_HARD_TEST_MATRIX.md)
 - Validation report: [`DIR_DIVING_FULL_COMPUTER_RELEASE_HARD_VALIDATION_REPORT.md`](DIR_DIVING_FULL_COMPUTER_RELEASE_HARD_VALIDATION_REPORT.md)
-- Rollback: revert to `main` Gauge-only runtime; FC branch is isolated on `integration/full-computer`.
+- Rollback: revert to Gauge-only runtime on Watch; FC code paths remain behind `DIRDivingMode.fullComputer`.
