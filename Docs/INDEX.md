@@ -1,7 +1,7 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-18  
-**Branch consigliato:** `main` = `origin/main` @ **(post-commit)**
+**Branch consigliato:** `main` = `origin/main` @ **`2309320`**
 
 ---
 
@@ -13,7 +13,8 @@ Read-only audit su `main`: dashboard iOS, profili, planner, logbook, export, syn
 |-------|--------|
 | **Comando** | `07_AUDIT_APNEA_IOS_SYNC_END_TO_END.md` |
 | **Report** | [`AUDIT_APNEA_IOS_SYNC_END_TO_END_CURRENT.md`](AUDIT_APNEA_IOS_SYNC_END_TO_END_CURRENT.md) |
-| **Baseline** | `main` @ **`a1e0cab`** (+ remediation Audit 06 uncommitted al momento dell’audit) |
+| **Baseline** | `main` @ **`2309320`** |
+| **Commit remediation** | **`2309320`** |
 | **Readiness interna** | **96%** |
 | **Verdict** | **PASS** — gate Apnea Command 12 **PASS WITH CONDITIONS** |
 | **Prerequisites** | Audits 05–06 **PASS**; Commands 08–11 implementati |
@@ -29,6 +30,7 @@ Chiusura finding P2/P3 Audit 06: `ApneaWatchRuntimeStore`, promozione `ApneaView
 | **Audit** | [`AUDIT_APNEA_WATCH_FEATURES_UI_LOGBOOK_CURRENT.md`](AUDIT_APNEA_WATCH_FEATURES_UI_LOGBOOK_CURRENT.md) |
 | **Remediation** | [`APNEA_WATCH_FEATURES_UI_LOGBOOK_REMEDIATION_REPORT_V1.0.md`](APNEA_WATCH_FEATURES_UI_LOGBOOK_REMEDIATION_REPORT_V1.0.md) |
 | **Baseline audit** | `main` @ **`5baa97e`** |
+| **Commit remediation** | **`2309320`** |
 | **Readiness interna** | **100%** (codice/test/docs) |
 | **Watch MAIN promotion** | **PASS** |
 | **Command 08 gate** | **READY_FOR_APNEA_COMMAND_08** |
