@@ -1,7 +1,37 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-18  
-**Branch consigliato:** `main` = `origin/main` @ **`bfd4715`**
+**Branch consigliato:** `main` = `origin/main` @ **`5baa97e`**
+
+---
+
+## Aggiornamento indice 2026-06-18 — Audit 06 Apnea Watch features / UI / logbook
+
+Read-only audit su `main`: allarmi, target, marker, aptiche, Mission Mode, UI presentation, logbook Watch (Commands Apnea 04–07). Nessuna modifica al codice.
+
+| Campo | Valore |
+|-------|--------|
+| **Comando** | `06_AUDIT_APNEA_WATCH_FEATURES_UI_LOGBOOK.md` |
+| **Report** | [`AUDIT_APNEA_WATCH_FEATURES_UI_LOGBOOK_CURRENT.md`](AUDIT_APNEA_WATCH_FEATURES_UI_LOGBOOK_CURRENT.md) |
+| **Baseline** | `main` @ **`5baa97e`** |
+| **Readiness interna** | **94%** |
+| **Verdict** | **PASS** — gate Apnea Command 08 **PASS WITH CONDITIONS** |
+| **Prerequisites** | Audit 05 **PASS** |
+
+---
+
+## Aggiornamento indice 2026-06-18 — Remediation V1.0 Apnea domain / lifecycle / recovery
+
+Chiusura finding P2/P3 Audit 05: suspend/resume integration tests, checkpoint hardening, script/docs su `main`, QA evidence scaffolding.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit** | [`AUDIT_APNEA_DOMAIN_LIFECYCLE_RECOVERY_CURRENT.md`](AUDIT_APNEA_DOMAIN_LIFECYCLE_RECOVERY_CURRENT.md) |
+| **Remediation** | [`APNEA_DOMAIN_LIFECYCLE_RECOVERY_REMEDIATION_REPORT_V1.0.md`](APNEA_DOMAIN_LIFECYCLE_RECOVERY_REMEDIATION_REPORT_V1.0.md) |
+| **Baseline audit** | `main` @ **`bcb985b`** |
+| **Readiness interna** | **100%** |
+| **Command 04 gate** | **READY_FOR_COMMAND_04** (UI non promossa) |
+| **Test** | Watch 549 (0 fail), iOS 936 (0 fail) |
 
 ---
 
