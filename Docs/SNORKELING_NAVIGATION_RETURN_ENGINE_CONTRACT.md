@@ -1,8 +1,8 @@
 # Snorkeling Navigation & Return Engine Contract (Command 04)
 
-**Status:** Contract only — **not implemented**  
+**Status:** Implemented (engine) — UI not promoted  
 **Date:** 2026-06-18  
-**Foundation gate:** `READY_FOR_SNORKELING_COMMAND_04` when Commands 01–03 internal tests pass and this contract is approved.
+**Implementation report:** [`DIR_DIVING_SNORKELING_NAVIGATION_RETURN_ENGINE_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_NAVIGATION_RETURN_ENGINE_IMPLEMENTATION_REPORT_CURRENT.md)
 
 ---
 
@@ -88,10 +88,8 @@ Required disclosures:
 
 ## Gate output
 
-When foundation tests pass and no speculative navigation code exists in production sources:
-
 ```text
-READY_FOR_SNORKELING_COMMAND_04
+SNORKELING_COMMAND_04_ENGINE_COMPLETE
 ```
 
-Implementation of bearing, waypoint ordering, return advisor, route guidance UI, and physical Watch GPS validation remains **PENDING Command 04**.
+Watch navigation UI and physical GPS validation remain separate future work. `SnorkelingView` is not promoted to Watch MAIN.

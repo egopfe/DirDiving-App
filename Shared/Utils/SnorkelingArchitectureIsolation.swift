@@ -10,6 +10,15 @@ enum SnorkelingArchitectureIsolation {
         "Shared/Utils/SnorkelingDomainSupport.swift",
         "Shared/Utils/SnorkelingDomainValidator.swift",
         "Shared/Utils/SnorkelingSchemaMigration.swift",
+        "Shared/Utils/SnorkelingNavigationModels.swift",
+        "Shared/Utils/SnorkelingNavigationEngine.swift",
+        "Shared/Utils/SnorkelingReturnAdvisor.swift",
+        "Shared/Utils/SnorkelingOperationalModels.swift",
+        "Shared/Utils/SnorkelingOperationalEventEngine.swift",
+        "Shared/Utils/SnorkelingMarkerCaptureEngine.swift",
+        "Shared/Utils/SnorkelingSessionCheckpointPersistence.swift",
+        "Shared/Utils/SnorkelingLogbookPolicy.swift",
+        "Shared/Utils/SnorkelingLogbookPersistence.swift",
     ]
 
     static let forbiddenExecutableSymbols = [
