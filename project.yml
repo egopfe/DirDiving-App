@@ -413,6 +413,9 @@ targets:
       - iOSApp/Services/IOSApneaWatchTransferService.swift
       - iOSApp/Services/ApneaSyncAckSigner.swift
       - iOSApp/Services/ApneaSessionSyncCodec.swift
+      - Services/ApneaImportedPlanStore.swift
+      - Services/ApneaSyncWatchReceiver.swift
+      - Services/ApneaSyncPendingTransfer.swift
       - iOSApp/Services/IOSApneaEquipmentStore.swift
       - iOSApp/Services/IOSApneaBuddySafetyStore.swift
       - iOSApp/Services/IOSApneaSessionExportService.swift

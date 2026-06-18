@@ -56,6 +56,13 @@ final class ApneaArchitectureIsolationTests: XCTestCase {
         XCTAssertFalse(project.contains("- ApneaView.swift"))
     }
 
+    func testApneaRuntimeDoesNotWriteDiveLogStore() throws {
+        let path = repositoryRoot().appendingPathComponent("Services/ApneaWatchRuntimeStore.swift")
+        let text = try String(contentsOf: path, encoding: .utf8)
+        XCTAssertFalse(text.contains("DiveLogStore"))
+        XCTAssertFalse(text.contains("dirdiving_dive_session"))
+    }
+
     func testApneaProductionUIAndRuntimeDoNotReferenceDiveManager() throws {
         let paths = ["Views/ApneaView.swift", "Services/ApneaWatchRuntimeStore.swift"]
         let root = repositoryRoot()
