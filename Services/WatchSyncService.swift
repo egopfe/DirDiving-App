@@ -34,6 +34,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     private weak var plannerBriefingStore: PlannerBriefingCardStore?
     private weak var apneaLogbookStore: ApneaLogbookStore?
     var isApneaSessionInProgress = false
+    var isSnorkelingSessionInProgress = false
     private var importedFromCompanionIDs: Set<UUID> = []
     private var pendingApneaTransfers: [ApneaSyncPendingTransfer] = []
     private var pendingApneaUserInfoSessionIDs: [ObjectIdentifier: UUID] = [:]
@@ -396,6 +397,11 @@ final class WatchSyncService: NSObject, ObservableObject {
             context,
             store: ApneaImportedPlanStore.shared,
             sessionInProgress: isApneaSessionInProgress
+        )
+        SnorkelingRouteWatchReceiver.importSnapshot(
+            context,
+            store: SnorkelingImportedRouteStore.shared,
+            sessionInProgress: isSnorkelingSessionInProgress
         )
     }
 
@@ -939,6 +945,16 @@ extension WatchSyncService: WCSessionDelegate {
                     sessionInProgress: isApneaSessionInProgress
                 ) {
                     ApneaSyncWatchReceiver.deliverAck(ack)
+                }
+                return
+            }
+            if SnorkelingRouteSyncTransferSupport.isPackageTransfer(userInfo) {
+                if let ack = SnorkelingRouteWatchReceiver.importPayload(
+                    userInfo,
+                    store: SnorkelingImportedRouteStore.shared,
+                    sessionInProgress: isSnorkelingSessionInProgress
+                ) {
+                    SnorkelingRouteWatchReceiver.deliverAck(ack)
                 }
                 return
             }
