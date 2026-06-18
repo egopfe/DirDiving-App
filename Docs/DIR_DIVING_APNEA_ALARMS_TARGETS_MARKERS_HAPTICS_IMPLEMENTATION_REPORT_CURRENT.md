@@ -2,7 +2,7 @@
 
 **Command:** `04_APNEA_ALARMS_TARGETS_MARKERS_HAPTICS.md`  
 **Date:** 2026-06-17  
-**Branch:** `integration/full-computer`  
+**Branch:** `main`  
 **Result:** PASS
 
 ## Scope implemented
