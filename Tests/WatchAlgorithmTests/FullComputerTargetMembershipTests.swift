@@ -39,7 +39,7 @@ final class FullComputerTargetMembershipTests: XCTestCase {
 
         XCTAssertTrue(DIRActivityMode.diving.isLaunchableOnIOSCompanionMAIN)
         XCTAssertTrue(DIRActivityMode.apnea.isLaunchableOnIOSCompanionMAIN)
-        XCTAssertFalse(DIRActivityMode.snorkeling.isLaunchableOnIOSCompanionMAIN)
+        XCTAssertTrue(DIRActivityMode.snorkeling.isLaunchableOnIOSCompanionMAIN)
     }
 
     func testPermanentModeTabDisabled() {

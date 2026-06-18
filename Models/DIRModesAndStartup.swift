@@ -15,11 +15,10 @@ enum DIRActivityMode: String, Codable, CaseIterable, Identifiable, Hashable, Sen
         }
     }
 
-    /// iOS Companion: Apnea preparatory flows are selectable; Snorkeling remains unavailable on MAIN.
+    /// iOS Companion: Diving, Apnea, and Snorkeling preparatory flows are selectable.
     var isLaunchableOnIOSCompanionMAIN: Bool {
         switch self {
-        case .diving, .apnea: return true
-        case .snorkeling: return false
+        case .diving, .apnea, .snorkeling: return true
         }
     }
 }

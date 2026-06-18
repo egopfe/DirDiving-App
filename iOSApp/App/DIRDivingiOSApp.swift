@@ -23,6 +23,14 @@ struct DIRDivingiOSApp: App {
     @StateObject private var apneaWatchTransfer = IOSApneaWatchTransferService()
     @StateObject private var apneaEquipmentStore = IOSApneaEquipmentStore()
     @StateObject private var apneaBuddySafetyStore = IOSApneaBuddySafetyStore()
+    @StateObject private var snorkelingNavigation = IOSSnorkelingNavigationStore()
+    @StateObject private var snorkelingProfileStore = IOSSnorkelingProfileStore()
+    @StateObject private var snorkelingRoutePlannerStore = IOSSnorkelingRoutePlannerStore()
+    @StateObject private var snorkelingLogbookStore = IOSSnorkelingLogbookStore()
+    @StateObject private var snorkelingWatchTransfer = IOSSnorkelingWatchTransferService()
+    @StateObject private var snorkelingEquipmentStore = IOSSnorkelingEquipmentStore()
+    @StateObject private var snorkelingBuddySafetyStore = IOSSnorkelingBuddySafetyStore()
+    @StateObject private var snorkelingSessionPhotoStore = IOSSnorkelingSessionPhotoStore()
     @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
 
     init() {
@@ -49,6 +57,8 @@ struct DIRDivingiOSApp: App {
                         IOSCompanionActivitySelectionView()
                     } else if companionActivity.selectedMode == .apnea {
                         IOSApneaRootView()
+                    } else if companionActivity.selectedMode == .snorkeling {
+                        IOSSnorkelingRootView()
                     } else {
                         ContentView()
                             .id(appLanguage)
@@ -77,6 +87,14 @@ struct DIRDivingiOSApp: App {
             .environmentObject(apneaWatchTransfer)
             .environmentObject(apneaEquipmentStore)
             .environmentObject(apneaBuddySafetyStore)
+            .environmentObject(snorkelingNavigation)
+            .environmentObject(snorkelingProfileStore)
+            .environmentObject(snorkelingRoutePlannerStore)
+            .environmentObject(snorkelingLogbookStore)
+            .environmentObject(snorkelingWatchTransfer)
+            .environmentObject(snorkelingEquipmentStore)
+            .environmentObject(snorkelingBuddySafetyStore)
+            .environmentObject(snorkelingSessionPhotoStore)
             .environment(\.locale, DIRIOSAppLanguage.fromStorage(appLanguage).locale)
             .preferredColorScheme(.dark)
             .task {
@@ -85,6 +103,7 @@ struct DIRDivingiOSApp: App {
                 watchSync.plannerBriefingTransferService = plannerBriefingTransfer
                 watchSync.divePlanPackageTransferService = divePlanPackageTransfer
                 watchSync.apneaWatchTransferService = apneaWatchTransfer
+                watchSync.snorkelingWatchTransferService = snorkelingWatchTransfer
             }
         }
     }
