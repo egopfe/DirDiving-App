@@ -22,6 +22,23 @@ enum WatchSyncAuth {
 
     private static let logger = Logger(subsystem: "com.egopfe.dirdiving", category: "WatchSyncAuth")
 
+#if DEBUG
+    private static var testHook_localSecret: Data?
+    private static var testHook_peerSecret: Data?
+
+    /// Installs deterministic secrets for unit tests without weakening production Keychain policy.
+    static func installTestSecrets(local: Data, peer: Data) {
+        testHook_localSecret = local
+        testHook_peerSecret = peer
+        clearPeerSecretMismatch()
+    }
+
+    static func resetTestSecrets() {
+        testHook_localSecret = nil
+        testHook_peerSecret = nil
+    }
+#endif
+
     static func isApplicationContextDeliveryReady(
         activationState: WCSessionActivationState,
         isCompanionAppInstalled: Bool
@@ -132,6 +149,9 @@ enum WatchSyncAuth {
     }
 
     private static func loadOrCreateLocalSecret() -> Data? {
+#if DEBUG
+        if let testHook_localSecret { return testHook_localSecret }
+#endif
         if let existing = loadKeychain(account: keychainAccount) {
             return existing
         }
@@ -146,7 +166,10 @@ enum WatchSyncAuth {
     }
 
     private static func loadPeerSecret() -> Data? {
-        loadKeychain(account: "\(keychainAccount)-peer")
+#if DEBUG
+        if let testHook_peerSecret { return testHook_peerSecret }
+#endif
+        return loadKeychain(account: "\(keychainAccount)-peer")
     }
 
     private static func savePeerSecret(_ data: Data) {

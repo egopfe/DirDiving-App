@@ -1,8 +1,8 @@
 # DIR Diving — Apnea release-hard validation (Command 12)
 
-**Date:** 2026-06-17  
-**Branch:** `main`  
-**Automation:** `./Scripts/validate_apnea_release_readiness.sh`
+**Date:** 2026-06-18  
+**Branch:** `main` @ Audit 08 remediation  
+**Automation:** `./Scripts/validate_apnea_release_readiness.sh --internal`
 
 ---
 
@@ -38,7 +38,9 @@ Command 12 adds release-hard automated validation, documented tolerances, a 23-m
 | `IOSApneaCompanionTests` | iOS stores and navigation |
 | `IOSApneaLogbookAnalyticsTests` | records eligibility, charts |
 | `IOSApneaMapEquipmentExportTests` | map, equipment, export |
-| `ApneaSyncCodecTests` | plan package codec, logbook merge |
+| `ApneaSuspendResumeLifecycleIntegrationTests` | suspend/resume, active dive restore |
+| `ApneaMonotonicClockRestoreTests` | monotonic wall jump, checkpoint elapsed |
+| `ApneaSyncCryptographicLogicTests` | HMAC/ACK pure logic (no Keychain skip) |
 
 ### Builds
 
@@ -86,8 +88,8 @@ All external mockup files are indexed in `Utils/ApneaMockupReferenceMatrix.swift
 | No blackout / no-movement claims in Apnea sources | PASS (static scan) |
 | Degraded sessions excluded from records (default) | PASS (automated) |
 | Buddy disclaimer on iOS | PASS (l10n keys) |
-| Feature flag `apneaIntegrationEnabled` | DOCUMENTED |
-| ApneaView excluded from MAIN Watch target | DOCUMENTED (promotion pending) |
+| ApneaView on Watch MAIN | PASS (automated — `ApneaWatchMainPromotionTests`) |
+| `ApneaWatchRuntimeStore` (no DiveManager) | PASS (automated) |
 
 ---
 
@@ -95,9 +97,10 @@ All external mockup files are indexed in `Utils/ApneaMockupReferenceMatrix.swift
 
 | Gap | Risk | Mitigation path |
 |-----|------|-----------------|
-| `ApneaView` not in MAIN Watch target | UI not ship-ready on `main` | Promotion checklist in `APNEA_RELEASE_CHECKLIST.md` |
-| No pool / open-water depth validation | Wrong depth → wrong alarms | `WATCH_ULTRA_PHYSICAL_QA_MATRIX.md` |
-| Water Lock + glove UX not automated | Missed taps / unreadable UI | Manual on-device QA |
+| Physical QA matrices unsigned | TestFlight NO-GO | `Docs/QA_EVIDENCE/APNEA_*/README.md` |
+| No pool / open-water depth validation | Wrong depth → wrong alarms | `APNEA_WATCH_ULTRA`, `APNEA_SENSOR_RECOVERY` |
+| Water Lock + glove UX not automated | Missed taps / unreadable UI | `APNEA_WATER_LOCK`, `APNEA_WET_INTERACTION` |
+| Battery / thermal baseline | Unknown drain under Mission Mode | `APNEA_BATTERY_THERMAL` |
 | Screenshot regression not in repo | Visual drift | `ReferenceUI/README.md` |
 | Buddy reminder not wired to iOS buddy store on Watch | Display-only buddy state | Future sync of buddy profile |
 | Battery / thermal profiling not automated | Throttling under long sessions | Physical long-session QA |

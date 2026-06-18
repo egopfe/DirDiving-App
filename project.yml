@@ -395,6 +395,7 @@ targets:
       - iOSApp/Utils/IOSApneaLogbookPresentation.swift
       - iOSApp/Utils/IOSApneaLocationPermission.swift
       - Tests/WatchAlgorithmTests/ApneaDomainModelTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingDomainModelTests.swift
       - Tests/WatchAlgorithmTests/ApneaLifecycleEngineTests.swift
       - Tests/WatchAlgorithmTests/ApneaOperationalEventEngineTests.swift
       - Tests/WatchAlgorithmTests/ApneaTimeRecoveryCheckpointEngineTests.swift
