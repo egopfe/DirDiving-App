@@ -8,6 +8,7 @@ enum SnorkelingReleaseSelfCheck {
     }
 
     static let checkpointNamespace = "dirdiving_snorkeling_session"
+    static let sessionSyncPayloadKey = "dirdiving_snorkeling_session_sync"
     static let logbookNamespace = "dirdiving_snorkeling_sessions"
     static let diveSessionPayloadKey = "dirdiving_dive_session"
     static let apneaSessionPayloadKey = "dirdiving_apnea_session"
@@ -16,6 +17,12 @@ enum SnorkelingReleaseSelfCheck {
         var issues: [Issue] = []
         if checkpointNamespace == diveSessionPayloadKey || checkpointNamespace == apneaSessionPayloadKey {
             issues.append(.init(code: "checkpoint.namespace.collision", detail: "Snorkeling checkpoint namespace must be isolated"))
+        }
+        if sessionSyncPayloadKey == diveSessionPayloadKey || sessionSyncPayloadKey == apneaSessionPayloadKey {
+            issues.append(.init(code: "session_sync.namespace.collision", detail: "Snorkeling session sync namespace must be isolated"))
+        }
+        if sessionSyncPayloadKey == checkpointNamespace {
+            issues.append(.init(code: "session_sync.checkpoint.collision", detail: "Snorkeling session sync must not reuse checkpoint namespace"))
         }
         if logbookNamespace == "dirdiving_apnea_sessions" || logbookNamespace == "dirdiving_dive_sessions" {
             issues.append(.init(code: "logbook.namespace.collision", detail: "Snorkeling logbook namespace must be isolated"))

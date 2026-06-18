@@ -5,6 +5,33 @@
 
 ---
 
+## Aggiornamento indice 2026-06-18 — Audit 11 iOS maps/sync/export
+
+Audit indipendente read-only post Commands 08–11; gate condizionato verso Command 12.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `11_AUDIT_SNORKELING_IOS_MAPS_SYNC_EXPORT.md` |
+| **Report** | [`AUDIT_SNORKELING_IOS_MAPS_SYNC_EXPORT_CURRENT.md`](AUDIT_SNORKELING_IOS_MAPS_SYNC_EXPORT_CURRENT.md) |
+| **Verdict** | Internal GO ~88%; release script gaps |
+| **Gate** | `READY_FOR_SNORKELING_COMMAND_12_WITH_CONDITIONS` |
+
+---
+
+## Aggiornamento indice 2026-06-18 — Snorkeling iOS/Watch sync protocol (Command 11)
+
+Namespace WC dedicato snorkeling: iOS→Watch route (Command 08) + Watch→iOS session signed transport, ACK, retry, merge idempotente.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `11_SNORKELING_IOS_WATCH_SYNC_PROTOCOL.md` |
+| **Report** | [`DIR_DIVING_SNORKELING_IOS_WATCH_SYNC_PROTOCOL_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_IOS_WATCH_SYNC_PROTOCOL_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Tests focused** | 9 PASS + 5 XCTSkip (peer keychain) — Command 11 session sync suites |
+| **Build** | DIRDiving iOS — BUILD SUCCEEDED |
+| **Gate** | `READY_FOR_SNORKELING_COMMAND_12` |
+
+---
+
 ## Aggiornamento indice 2026-06-18 — Snorkeling iOS photos/gear/export (Command 10)
 
 Foto sessione/marker, profili attrezzatura, buddy/gruppo, export privacy-gated (PDF/CSV/JSON/GPX/chart).

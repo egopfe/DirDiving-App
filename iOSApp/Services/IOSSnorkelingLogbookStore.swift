@@ -50,19 +50,30 @@ final class IOSSnorkelingLogbookStore: ObservableObject {
     }
 
     @discardableResult
-    func mergeImportedSession(_ incoming: SnorkelingSession) -> Bool {
-        let normalized = SnorkelingLogbookPolicy.normalizedSession(incoming)
-        switch SnorkelingLogbookPolicy.classify(normalized) {
-        case .invalid:
-            return false
-        case .exportable:
-            sessions.removeAll { $0.id == normalized.id }
-            sessions.insert(normalized, at: 0)
-            sessions = SnorkelingLogbookPolicy.normalizedAndCapped(sessions)
-            persistAtomically()
-            return true
+    func mergeImportedSession(_ incoming: SnorkelingSession) -> SnorkelingSessionSyncImportResult {
+        let outcome = SnorkelingSessionSyncImportPolicy.importSession(
+            incoming,
+            existingSessions: sessions,
+            importedIDs: importedSessionIDs
+        )
+        importedSessionIDs = outcome.updatedImportedIDs
+        SnorkelingSessionSyncCodec.saveImportedSessionIDs(importedSessionIDs)
+
+        guard let merged = outcome.session else {
+            if case .failed(let reason) = outcome.result {
+                loadErrorMessage = reason
+            }
+            return outcome.result
         }
+
+        sessions.removeAll { $0.id == merged.id }
+        sessions.insert(merged, at: 0)
+        sessions = SnorkelingLogbookPolicy.normalizedAndCapped(sessions)
+        persistAtomically()
+        return outcome.result
     }
+
+    private var importedSessionIDs: Set<UUID> = SnorkelingSessionSyncCodec.loadImportedSessionIDs()
 
     private func persistAtomically() {
         do {
@@ -110,6 +121,11 @@ final class IOSSnorkelingLogbookStore: ObservableObject {
     func resetForTesting() {
         sessions = []
         try? FileManager.default.removeItem(at: fileURL())
+    }
+
+    func resetImportedIDsForTesting() {
+        importedSessionIDs = []
+        SnorkelingSessionSyncCodec.saveImportedSessionIDs([])
     }
     #endif
 }

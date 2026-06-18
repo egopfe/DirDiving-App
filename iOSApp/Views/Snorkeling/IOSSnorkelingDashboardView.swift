@@ -6,6 +6,7 @@ struct IOSSnorkelingDashboardView: View {
     @EnvironmentObject private var watchSync: WatchSyncService
     @EnvironmentObject private var snorkelingNavigation: IOSSnorkelingNavigationStore
     @EnvironmentObject private var transferService: IOSSnorkelingWatchTransferService
+    @EnvironmentObject private var sessionSyncService: IOSSnorkelingSessionSyncService
 
     private var presentation: IOSSnorkelingDashboardPresentation {
         IOSSnorkelingDashboardPresentationMapper.make(
@@ -143,10 +144,15 @@ struct IOSSnorkelingDashboardView: View {
 
     private var syncStatusCard: some View {
         DIRCard(DIRIOSLocalizer.string("snorkeling.ios.dashboard.sync_status"), icon: "arrow.triangle.2.circlepath", accent: presentation.syncStatusIsPositive ? DIRTheme.green : DIRTheme.orange) {
-            Text(presentation.syncStatusText)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(presentation.syncStatusIsPositive ? DIRTheme.green : DIRTheme.orange)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            VStack(alignment: .leading, spacing: 8) {
+                Text(presentation.syncStatusText)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(presentation.syncStatusIsPositive ? DIRTheme.green : DIRTheme.orange)
+                Text(sessionSyncStatusText)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(sessionSyncIsPositive ? DIRTheme.green : DIRTheme.orange)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
@@ -189,35 +195,50 @@ struct IOSSnorkelingDashboardView: View {
     }
 
     private var syncStatusText: String {
+        let routePrefix = DIRIOSLocalizer.string("snorkeling.ios.sync.route_label")
         switch transferService.state {
         case .acknowledged(_, _, let syncedAt):
             let formatter = DateFormatter()
             formatter.dateStyle = .short
             formatter.timeStyle = .short
-            return String(format: DIRIOSLocalizer.string("snorkeling.ios.sync.up_to_date_format"), formatter.string(from: syncedAt))
+            return "\(routePrefix) \(String(format: DIRIOSLocalizer.string("snorkeling.ios.sync.up_to_date_format"), formatter.string(from: syncedAt)))"
         case .awaitingAck, .sending, .queued:
-            return DIRIOSLocalizer.string("snorkeling.ios.sync.pending")
+            return "\(routePrefix) \(DIRIOSLocalizer.string("snorkeling.ios.sync.pending"))"
         case .failed:
-            return DIRIOSLocalizer.string(transferService.lastErrorMessage ?? "snorkeling.ios.sync.failed")
+            return "\(routePrefix) \(DIRIOSLocalizer.string(transferService.lastErrorMessage ?? "snorkeling.ios.sync.failed"))"
         case .draft, .validated:
             if let syncedAt = transferService.lastSuccessfulSyncAt {
                 let formatter = DateFormatter()
                 formatter.dateStyle = .short
                 formatter.timeStyle = .short
-                return String(format: DIRIOSLocalizer.string("snorkeling.ios.sync.up_to_date_format"), formatter.string(from: syncedAt))
+                return "\(routePrefix) \(String(format: DIRIOSLocalizer.string("snorkeling.ios.sync.up_to_date_format"), formatter.string(from: syncedAt)))"
             }
-            return DIRIOSLocalizer.string("snorkeling.ios.sync.none")
+            return "\(routePrefix) \(DIRIOSLocalizer.string("snorkeling.ios.sync.none"))"
         }
     }
 
+    private var sessionSyncStatusText: String {
+        let sessionPrefix = DIRIOSLocalizer.string("snorkeling.ios.sync.session_label")
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        return "\(sessionPrefix) \(sessionSyncService.statusText(dateFormatter: formatter))"
+    }
+
+    private var sessionSyncIsPositive: Bool {
+        sessionSyncService.isPositive
+    }
+
     private var syncStatusIsPositive: Bool {
+        let routePositive: Bool
         switch transferService.state {
         case .acknowledged:
-            return true
+            routePositive = true
         case .failed, .awaitingAck, .sending, .queued:
-            return false
+            routePositive = false
         case .draft, .validated:
-            return transferService.lastSuccessfulSyncAt != nil
+            routePositive = transferService.lastSuccessfulSyncAt != nil
         }
+        return routePositive && sessionSyncIsPositive
     }
 }
