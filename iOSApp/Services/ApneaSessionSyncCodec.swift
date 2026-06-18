@@ -17,6 +17,19 @@ enum ApneaSessionSyncCodec {
     static var replayCache = SyncNonceReplayCache()
     private static let replayCacheFileName = "dirdiving_ios_apnea_sync_replay_cache.json"
 
+#if DEBUG
+    /// Bypasses WatchConnectivity activation checks in unit tests.
+    static var testHook_bypassConnectivityChecks = false
+    static var testHook_replayCacheFileURL: URL?
+
+    static func resetTestHooks() {
+        testHook_bypassConnectivityChecks = false
+        testHook_replayCacheFileURL = nil
+        replayCache.reset()
+        UserDefaults.standard.removeObject(forKey: importedSessionIDsKey)
+    }
+#endif
+
     private static let expectedWatchBundleID = "com.egopfe.dirdiving.ios.watch"
 
     static func bootstrapReplayCacheIfNeeded() {
@@ -24,7 +37,10 @@ enum ApneaSessionSyncCodec {
     }
 
     private static func replayCacheFileURL() -> URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+#if DEBUG
+        if let override = testHook_replayCacheFileURL { return override }
+#endif
+        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
             .appendingPathComponent(replayCacheFileName)
     }
 
@@ -47,9 +63,17 @@ enum ApneaSessionSyncCodec {
     }
 
     static func parsePayload(from payload: [String: Any]) throws -> ParsedPayload {
+#if DEBUG
+        if !testHook_bypassConnectivityChecks {
+            guard WCSession.default.activationState == .activated else {
+                throw ApneaSessionSyncError.sessionInactive
+            }
+        }
+#else
         guard WCSession.default.activationState == .activated else {
             throw ApneaSessionSyncError.sessionInactive
         }
+#endif
         guard WatchSyncAuth.hasPeerSecret() else {
             throw ApneaSessionSyncError.missingPeerSecret
         }
@@ -166,6 +190,51 @@ enum ApneaSessionSyncCodec {
             throw ApneaSessionSyncError.invalidSession
         }
     }
+
+#if DEBUG
+    /// Builds a signed v2 transport envelope as if sent from the Watch companion (unit tests only).
+    static func makeTestWatchTransport(
+        session: ApneaSession,
+        version: Int = schemaVersion,
+        nonce: String = UUID().uuidString,
+        issuedAt: Date = Date(),
+        bundleID: String = "com.egopfe.dirdiving.ios.watch"
+    ) throws -> [String: Any] {
+        guard WatchSyncAuth.hasPeerSecret() else {
+            throw ApneaSessionSyncError.missingPeerSecret
+        }
+        let normalized = ApneaLogbookPolicy.normalizedSession(session)
+        try validate(normalized)
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let body = try encoder.encode(normalized)
+        guard body.count <= maxPayloadBytes else {
+            throw ApneaSessionSyncError.payloadTooLarge
+        }
+        var transport = Transport(
+            version: version,
+            bundleID: bundleID,
+            issuedAt: issuedAt,
+            nonce: version >= schemaVersion ? nonce : nil,
+            body: body,
+            signature: ""
+        )
+        let nonceComponent = transport.version >= schemaVersion ? (transport.nonce ?? "") : ""
+        let canonical = "\(transport.version)|\(transport.bundleID)|\(issuedAt.timeIntervalSince1970)|\(nonceComponent)|\(body.base64EncodedString())"
+        let key = try syncKey()
+        let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: key)
+        transport = Transport(
+            version: version,
+            bundleID: bundleID,
+            issuedAt: issuedAt,
+            nonce: transport.nonce,
+            body: body,
+            signature: Data(code).base64EncodedString()
+        )
+        let transportData = try JSONEncoder().encode(transport)
+        return [payloadKey: transportData]
+    }
+#endif
 }
 
 private extension Data {
