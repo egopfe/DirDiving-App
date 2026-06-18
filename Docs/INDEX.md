@@ -1,7 +1,22 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` = `origin/main` @ **`a2fa547`**
+**Aggiornato:** 2026-06-18  
+**Branch consigliato:** `main` = `origin/main` @ **`bfd4715`**
+
+---
+
+## Aggiornamento indice 2026-06-18 — Audit 05 Apnea domain / lifecycle / recovery
+
+Read-only audit su `main`: modelli dominio, depth feed, `ApneaSessionEngine`, recovery, checkpoint (Commands Apnea 01–03). Nessuna modifica al codice.
+
+| Campo | Valore |
+|-------|--------|
+| **Comando** | `05_AUDIT_APNEA_DOMAIN_LIFECYCLE_RECOVERY.md` |
+| **Report** | [`AUDIT_APNEA_DOMAIN_LIFECYCLE_RECOVERY_CURRENT.md`](AUDIT_APNEA_DOMAIN_LIFECYCLE_RECOVERY_CURRENT.md) |
+| **Baseline** | `main` @ **`bcb985b`** |
+| **Readiness interna** | **95%** |
+| **Verdict** | **PASS** — gate Apnea Command 04 **PASS WITH CONDITIONS** |
+| **Script** | `validate_apnea_release_readiness.sh` **PASS** |
 
 ---
 
