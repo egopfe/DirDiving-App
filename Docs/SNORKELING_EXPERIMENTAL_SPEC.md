@@ -152,3 +152,9 @@ La navigazione sperimentale Watch espone:
 ## Sicurezza
 
 Snorkeling, waypoint, ritorno al punto iniziale, POI e mappe sono funzioni sperimentali di situational awareness. Non sostituiscono addestramento, procedure buddy, strumenti certificati, pianificazione conservativa o valutazione reale dell'ambiente.
+
+GPS puo essere assente o impreciso; la traccia misurata e superficiale; i segmenti subacquei possono essere stimati o non disponibili; la navigazione e solo di riferimento; l'utente resta responsabile di rotta e condizioni.
+
+## Foundation boundary (Commands 01–03, 2026-06-18)
+
+Il runtime condiviso `Shared/` (domain, feed, `SnorkelingSessionEngine`) e validato senza UI MAIN. `SnorkelingView` resta esclusa da Watch MAIN. Bearing, waypoint advisor e persistenza su disco appartengono a Command 04 e Command 07 — vedi contratti in `Docs/SNORKELING_NAVIGATION_RETURN_ENGINE_CONTRACT.md` e `Docs/SNORKELING_PERSISTENCE_RECOVERY_CONTRACT.md`.
