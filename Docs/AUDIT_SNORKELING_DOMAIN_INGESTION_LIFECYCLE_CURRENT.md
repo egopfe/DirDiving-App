@@ -1,9 +1,9 @@
 # AUDIT 09 — Snorkeling Domain, Ingestion and Lifecycle (read-only)
 
-**Date:** 2026-06-18  
-**Auditor:** Independent automated + manual code review (no application code modified)  
-**Command:** `09_AUDIT_SNORKELING_DOMAIN_INGESTION_LIFECYCLE.md`  
-**Branch:** `main` @ `f38dbd4`  
+**Date:** 2026-06-18 (remediated 2026-06-18)  
+**Auditor:** Independent automated + manual code review  
+**Command:** `09_AUDIT_SNORKELING_DOMAIN_INGESTION_LIFECYCLE.md` + remediation V1.0  
+**Branch:** `main` @ `f38dbd4` (audit baseline); remediation validated on `main` post-`ccf7baf`  
 **Scope:** Snorkeling Commands **01–03** (domain models, shared sensor/GPS ingestion, session/dip lifecycle engine)  
 **Prerequisites:** Apnea / Gauge / Full Computer namespaces unchanged; `SnorkelingView` excluded from Watch MAIN
 
@@ -18,14 +18,17 @@
 | GPS ingestion & quality gating | **PASS** |
 | Geodetic distance (no blind speed integration) | **PASS** |
 | `SnorkelingSessionEngine` & dip lifecycle | **PASS** |
-| Isolation from Diving / Apnea / `ExplorationStore` | **PASS** (code); **PARTIAL** (static test) |
+| Isolation from Diving / Apnea / `ExplorationStore` | **PASS** |
+| Depth-only / no-GPS lifecycle | **PASS** |
 | No demo / seeded runtime data | **PASS** |
-| **Gate before Snorkeling Command 04** (navigation/return engine) | **PASS WITH CONDITIONS** |
+| **Gate before Snorkeling Command 04** | **READY** |
 
-**Overall:** **PASS WITH CONDITIONS** — Snorkeling domain, ingestion feeds, and lifecycle engine on `main` meet Audit 09 for Commands 01–03. **P0/P1 blockers: none.** One automated isolation test fails on a **documentation comment** false positive (see §6). Watch MAIN still excludes `SnorkelingView.swift`; production path is UI-free `Shared/` only.
+**Overall:** **PASS** — Snorkeling Commands 01–03 internal foundation readiness **100%** after remediation V1.0. **P0/P1 blockers: none.** Watch MAIN still excludes `SnorkelingView.swift`; production path remains UI-free `Shared/` only.
 
-**Internal readiness (engine/domain):** **94%**  
+**Internal readiness (engine/domain):** **100%**  
 **Physical device / Water Lock / battery:** **not in scope** (Commands 04+)
+
+**Remediation report:** [`SNORKELING_DOMAIN_INGESTION_LIFECYCLE_REMEDIATION_REPORT_V1.0.md`](SNORKELING_DOMAIN_INGESTION_LIFECYCLE_REMEDIATION_REPORT_V1.0.md)
 
 ---
 
@@ -140,37 +143,43 @@ Implementation reports: [`DIR_DIVING_SNORKELING_DOMAIN_MODELS_IMPLEMENTATION_REP
 | Surface oscillation | `testEngineSurfaceOscillationDoesNotPrematurelyCloseDip` | **PASS** |
 | App suspend (checkpoint) | `testEngineSuspendResumePreservesDipState` | **PASS** (in-memory) |
 | Re-entry after underwater | `testGPSResumesOnSurfaceAfterUnderwaterGap` | **PASS** |
-| Depth-only / no GPS session | Engine supports `gpsRaw: nil`; **no dedicated lifecycle test** | **PARTIAL** |
+| Depth-only / no GPS session | `SnorkelingDepthOnlyLifecycleTests` (6 tests) | **PASS** |
 | Invalid coordinates | Domain + GPS ingestion tests | **PASS** |
 | Regressive timestamps | Depth + GPS tests | **PASS** |
-| Architecture isolation scan | `testSnorkelingFeedSourcesDoNotReferenceForeignRuntime` | **FAIL** — false positive: comment in `SnorkelingLifecycleStateMachine.swift` contains string `ExplorationStore` (line 110 doc comment only) |
+| Architecture isolation scan | `SnorkelingArchitectureIsolation` + 9 scanner tests | **PASS** |
 
 ---
 
-## 7. Automated validation executed (2026-06-18)
+## 7. Automated validation executed (2026-06-18, post-remediation)
 
-**Target:** `DIRDiving iOS Algorithm Tests` — iPhone 17 Simulator
+**Target:** `DIRDiving iOS Algorithm Tests` — iPhone 17 Pro Simulator
 
 | Suite | Tests | Failures |
 |-------|------:|---------:|
 | `SnorkelingDomainModelTests` | 12 | 0 |
 | `SnorkelingSensorGPSIngestionTests` | 13 | 0 |
 | `SnorkelingLifecycleEngineTests` | 15 | 0 |
-| `SnorkelingArchitectureIsolationTests` | 2 | **1** |
-| **Total** | **42** | **1** |
+| `SnorkelingArchitectureIsolationTests` | 9 | 0 |
+| `SnorkelingDepthOnlyLifecycleTests` | 6 | 0 |
+| `SnorkelingCheckpointFoundationTests` | 7 | 0 |
+| `SnorkelingCommand04FoundationGateTests` | 5 | 0 |
+| `SnorkelingWatchMainIsolationTests` | 6 | 0 |
+| `SnorkelingCrossDomainIsolationTests` | 6 | 0 |
+| `SnorkelingBoundedDataTests` | 5 | 0 |
+| **Focused Snorkeling total** | **85** | **0** |
 
-Functional snorkeling coverage: **41/41 PASS**. Isolation string scan: **1 false positive** (non-blocking for architecture; fix recommended before release-hard promotion).
+Full iOS Algorithm Tests: **1070 executed**, 28 skipped, **0 failures**. Watch Algorithm Tests: **687 executed**, 19 skipped, **0 failures**.
 
 ---
 
 ## 8. Findings & recommendations
 
-| ID | Sev | Finding | Recommendation |
-|----|-----|---------|----------------|
-| AUDIT09-SNK-001 | **P2** | `SnorkelingArchitectureIsolationTests` fails because doc comment mentions `ExplorationStore` | Rephrase comment or teach scanner to ignore `///` lines (Command 04 prep) |
-| AUDIT09-SNK-002 | **P3** | No explicit lifecycle test for depth-only sessions without GPS fixes | Add `testEngineDepthOnlySessionWithoutGPS` when convenient |
-| AUDIT09-SNK-003 | **P3** | Checkpoint is in-memory export only; no atomic disk store / checksum | Command 07 persistence scope |
-| AUDIT09-SNK-004 | **P3** | Navigation/return phases exist but bearing, waypoint order, return advisor not implemented | Expected — Command 04 scope |
+| ID | Sev | Finding | Status |
+|----|-----|---------|--------|
+| AUDIT09-SNK-001 | **P2** | Isolation test false positive (`ExplorationStore` in doc comment) | **CLOSED** — `SnorkelingArchitectureIsolation` comment-aware scanner |
+| AUDIT09-SNK-002 | **P3** | No depth-only lifecycle test | **CLOSED** — `SnorkelingDepthOnlyLifecycleTests` |
+| AUDIT09-SNK-003 | **P3** | In-memory checkpoint only | **ACCEPTED** — Command 07 contract documented |
+| AUDIT09-SNK-004 | **P3** | Navigation not implemented | **ACCEPTED** — Command 04 contract documented |
 
 **P0/P1:** none.
 
@@ -179,21 +188,21 @@ Functional snorkeling coverage: **41/41 PASS**. Isolation string scan: **1 false
 ## 9. Gate decision — Command 04
 
 ```
-PASS WITH CONDITIONS
+SNORKELING_FOUNDATIONS_INTERNAL_GO
+READY_FOR_SNORKELING_COMMAND_04
 ```
 
 | Audience | Decision |
 |----------|----------|
-| **Proceed to Command 04** (`04_SNORKELING_NAVIGATION_AND_RETURN_ENGINE`) | **YES** — domain/ingestion/lifecycle foundation adequate |
-| **Watch MAIN UI promotion** | **NO** — `SnorkelingView` still excluded by design |
-| **Production release** | **NO-GO** — navigation engine, persistence, physical QA not done |
+| **Proceed to Command 04** | **YES** |
+| **Watch MAIN UI promotion** | **NO** — `SnorkelingView` still excluded |
+| **Production release** | **NO-GO** |
 
-### Conditions before treating snorkeling as release-hard
+### Remaining before production
 
-1. Resolve AUDIT09-SNK-001 (isolation test green without weakening scan).
-2. Implement Command 04 navigation/return engine with degraded-GPS safety policy.
-3. Command 07 persistence + recovery; extend suspend tests to disk round-trip.
-4. Physical QA on Watch (GPS underwater, Water Lock, battery) — future audit.
+1. Command 04 navigation/return engine + physical GPS validation.
+2. Command 07 disk persistence + relaunch recovery.
+3. Physical QA on Watch (GPS underwater, Water Lock, battery).
 
 ---
 
@@ -205,8 +214,11 @@ PASS WITH CONDITIONS
 | [`DIR_DIVING_SNORKELING_SENSOR_GPS_INGESTION_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_SENSOR_GPS_INGESTION_IMPLEMENTATION_REPORT_CURRENT.md) | Command 02 |
 | [`DIR_DIVING_SNORKELING_SESSION_LIFECYCLE_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_SESSION_LIFECYCLE_IMPLEMENTATION_REPORT_CURRENT.md) | Command 03 |
 | [`SNORKELING_EXPERIMENTAL_SPEC.md`](SNORKELING_EXPERIMENTAL_SPEC.md) | Experimental UI (not MAIN) |
+| [`SNORKELING_PERSISTENCE_RECOVERY_CONTRACT.md`](SNORKELING_PERSISTENCE_RECOVERY_CONTRACT.md) | Command 07 contract |
+| [`SNORKELING_NAVIGATION_RETURN_ENGINE_CONTRACT.md`](SNORKELING_NAVIGATION_RETURN_ENGINE_CONTRACT.md) | Command 04 contract |
+| [`SNORKELING_DOMAIN_INGESTION_LIFECYCLE_REMEDIATION_REPORT_V1.0.md`](SNORKELING_DOMAIN_INGESTION_LIFECYCLE_REMEDIATION_REPORT_V1.0.md) | Audit 09 remediation |
 | [`AUDIT_APNEA_DOMAIN_LIFECYCLE_RECOVERY_CURRENT.md`](AUDIT_APNEA_DOMAIN_LIFECYCLE_RECOVERY_CURRENT.md) | Parallel audit pattern (Apnea 01–03) |
 
 ---
 
-**Audit 09 completed read-only @ `f38dbd4`. No application code modified.**
+**Audit 09 baseline @ `f38dbd4`; remediation V1.0 validated 2026-06-18.**

@@ -79,3 +79,10 @@ Also in `DIRDiving iOS Algorithm Tests` target.
 
 - [`DIR_DIVING_SNORKELING_DOMAIN_MODELS_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_DOMAIN_MODELS_IMPLEMENTATION_REPORT_CURRENT.md)
 - [`SNORKELING_EXPERIMENTAL_SPEC.md`](SNORKELING_EXPERIMENTAL_SPEC.md)
+- [`SNORKELING_DOMAIN_INGESTION_LIFECYCLE_REMEDIATION_REPORT_V1.0.md`](SNORKELING_DOMAIN_INGESTION_LIFECYCLE_REMEDIATION_REPORT_V1.0.md)
+
+---
+
+## Remediation V1.0 (2026-06-18)
+
+`SnorkelingArchitectureIsolation` comment-aware scanner; bounded-data tests confirm 2048 raw audit cap. Ingestion suite 13 PASS + isolation moved to dedicated test target.
