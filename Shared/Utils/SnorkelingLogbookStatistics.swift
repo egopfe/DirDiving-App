@@ -49,15 +49,3 @@ struct SnorkelingLogbookStatistics: Equatable, Hashable, Sendable {
         )
     }
 }
-
-enum SnorkelingRecordEligibilityPolicy {
-    static func isEligibleForStatistics(_ session: SnorkelingSession) -> Bool {
-        switch SnorkelingLogbookPolicy.classify(session) {
-        case .exportable:
-            return session.statistics.sessionMaxDepthMeters.isFinite
-                && session.statistics.sessionMaxDepthMeters >= 0
-        case .invalid:
-            return false
-        }
-    }
-}

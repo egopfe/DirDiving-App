@@ -74,6 +74,9 @@ final class CompanionActivityPreferenceStore: ObservableObject {
         if mode == .apnea {
             IOSCompanionPostLegalEntry.markPendingApneaLanding()
         }
+        if mode == .snorkeling {
+            IOSCompanionPostLegalEntry.markPendingSnorkelingLanding()
+        }
         return true
     }
 

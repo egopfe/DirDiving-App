@@ -3,6 +3,8 @@ import SwiftUI
 struct SnorkelingView: View {
     @EnvironmentObject private var runtime: SnorkelingWatchRuntimeStore
     @EnvironmentObject private var snorkelingLogbook: SnorkelingLogbookStore
+    @EnvironmentObject private var watchSync: WatchSyncService
+    @ObservedObject private var importedRoute = SnorkelingImportedRouteStore.shared
     @EnvironmentObject private var gps: GPSManager
     @EnvironmentObject private var compass: CompassManager
     @AppStorage(HapticService.hapticsEnabledKey) private var hapticsEnabled = true
@@ -52,6 +54,13 @@ struct SnorkelingView: View {
                 missionModeEnabled: missionModeEnabled,
                 buddyReminderEnabled: input.buddyReminderEnabled
             )
+            watchSync.isSnorkelingSessionInProgress = runtime.isSessionActive
+        }
+        .onChange(of: runtime.isSessionActive) { _, active in
+            watchSync.isSnorkelingSessionInProgress = active
+            if !active {
+                importedRoute.activatePendingIfNeeded()
+            }
         }
         .onChange(of: hapticsEnabled) { _, enabled in
             runtime.configureRuntimePreferences(
