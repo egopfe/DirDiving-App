@@ -57,10 +57,19 @@ enum SnorkelingNavigationEngine {
             return (updated.lastWaypointNavigation, updated)
         }
 
-        let ordered = SnorkelingDomainSupport.orderedWaypoints(routePlan.waypoints)
-            .filter { SnorkelingDomainValidator.validate(waypoint: $0).isEmpty }
-        let orderedIDs = ordered.map(\.id)
-        updated.orderedWaypointIDs = orderedIDs
+        let signature = routePlanWaypointSignature(routePlan)
+        let ordered: [SnorkelingWaypoint]
+        if signature == updated.routePlanWaypointSignature,
+           !updated.orderedWaypointIDs.isEmpty {
+            let byID = Dictionary(uniqueKeysWithValues: routePlan.waypoints.map { ($0.id, $0) })
+            ordered = updated.orderedWaypointIDs.compactMap { byID[$0] }
+                .filter { SnorkelingDomainValidator.validate(waypoint: $0).isEmpty }
+        } else {
+            ordered = SnorkelingDomainSupport.orderedWaypoints(routePlan.waypoints)
+                .filter { SnorkelingDomainValidator.validate(waypoint: $0).isEmpty }
+            updated.orderedWaypointIDs = ordered.map(\.id)
+            updated.routePlanWaypointSignature = signature
+        }
         updated.activeRoutePlanID = routePlan.id
 
         let currentWaypoint = resolveCurrentWaypoint(
@@ -226,5 +235,10 @@ enum SnorkelingNavigationEngine {
         return remaining.first(where: { candidate in
             !state.skippedWaypointIDs.contains(candidate.id) && !state.completedWaypointIDs.contains(candidate.id)
         })?.id
+    }
+
+    private static func routePlanWaypointSignature(_ routePlan: SnorkelingRoutePlan) -> String {
+        let ordered = SnorkelingDomainSupport.orderedWaypoints(routePlan.waypoints)
+        return routePlan.id.uuidString + ":" + ordered.map { "\($0.id.uuidString)-\($0.routeOrder)" }.joined(separator: ",")
     }
 }

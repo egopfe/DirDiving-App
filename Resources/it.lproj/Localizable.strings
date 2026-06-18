@@ -1163,6 +1163,17 @@
 "snorkeling.nav.on_line" = "IN LINEA";
 "snorkeling.nav.gps_unavailable" = "GPS NON DISPONIBILE";
 "snorkeling.return.advised" = "RIENTRO CONSIGLIATO";
+"snorkeling.return.advisor.unavailable" = "Info rientro non disponibile";
+"snorkeling.return.advisor.distance" = "Riferimento: lontano dal punto di ingresso";
+"snorkeling.return.advisor.duration" = "Riferimento: sessione prolungata";
+"snorkeling.return.advisor.battery" = "Riferimento: batteria bassa";
+"snorkeling.return.advisor.manual" = "Info rientro attiva";
+"snorkeling.return.gps.unavailable" = "GPS non disponibile per riferimento";
+"snorkeling.return.gps.degraded" = "GPS degradato — verifica l'ambiente";
+"snorkeling.return.heading.stale" = "Bussola obsoleta — niente virate precise";
+"snorkeling.return.near.entry" = "Vicino al punto di ingresso (riferimento)";
+"snorkeling.alarm.title" = "AVVISO SNORKELING";
+"snorkeling.gps.lost" = "Segnale GPS perso";
 "snorkeling.marker.marine_life" = "FAUNA";
 "snorkeling.marker.reef" = "BARRIERA";
 "snorkeling.marker.wreck" = "RELITTO";
@@ -1211,6 +1222,12 @@
 "snorkeling.a11y.on_line" = "In linea con il target";
 "snorkeling.a11y.gps_status" = "Stato GPS";
 "snorkeling.a11y.vertical_speed" = "Velocita verticale";
+"snorkeling.a11y.recovered_session" = "Sessione recuperata da checkpoint";
+"snorkeling.a11y.recovery_warning" = "Avviso di recupero";
+"snorkeling.a11y.return_advisor" = "Informazione di riferimento sul rientro";
+"snorkeling.a11y.alarm_overlay" = "Avviso snorkeling attivo";
+"snorkeling.a11y.marker_save" = "Salva marker";
+"snorkeling.a11y.summary" = "Riepilogo sessione";
 
 /* Snorkeling persistence/recovery (Command 07) */
 "snorkeling.recovery.banner" = "SESSIONE RECUPERATA";

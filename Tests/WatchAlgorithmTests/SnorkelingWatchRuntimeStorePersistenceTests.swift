@@ -39,6 +39,35 @@ final class SnorkelingWatchRuntimeStorePersistenceTests: XCTestCase {
         XCTAssertEqual(restored.presentationInput.dipCount, first.presentationInput.dipCount)
     }
 
+    func testUnchangedStateDoesNotTriggerDuplicateCheckpointWrite() {
+        #if DEBUG
+        SnorkelingWatchRuntimeStore.testHook_checkpointWriteCount = 0
+        #endif
+        let runtime = SnorkelingWatchRuntimeStore()
+        runtime.armSession(at: start)
+        runtime.startSession(at: start)
+        runtime.persistCheckpointNowForTesting()
+        #if DEBUG
+        let firstCount = SnorkelingWatchRuntimeStore.testHook_checkpointWriteCount
+        runtime.persistCheckpointNowForTesting()
+        XCTAssertEqual(SnorkelingWatchRuntimeStore.testHook_checkpointWriteCount, firstCount)
+        #endif
+    }
+
+    func testCriticalStateTransitionTriggersCheckpointWrite() {
+        #if DEBUG
+        SnorkelingWatchRuntimeStore.testHook_checkpointWriteCount = 0
+        #endif
+        let runtime = SnorkelingWatchRuntimeStore()
+        runtime.armSession(at: start)
+        runtime.startSession(at: start)
+        runtime.ingestDepthForTesting(depthMeters: 1.4, at: start.addingTimeInterval(2))
+        runtime.persistCheckpointNowForTesting()
+        #if DEBUG
+        XCTAssertGreaterThanOrEqual(SnorkelingWatchRuntimeStore.testHook_checkpointWriteCount, 1)
+        #endif
+    }
+
     func testSaveCompletedSessionWritesLogbook() {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)

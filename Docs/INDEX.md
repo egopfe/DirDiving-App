@@ -5,6 +5,20 @@
 
 ---
 
+## Aggiornamento indice 2026-06-18 — Audit 10 remediation V1.0
+
+Remediation Audit 10 → internal readiness 100%.
+
+| Campo | Valore |
+|-------|--------|
+| **Remediation** | [`SNORKELING_NAV_UI_PERSISTENCE_REMEDIATION_REPORT_V1.0.md`](SNORKELING_NAV_UI_PERSISTENCE_REMEDIATION_REPORT_V1.0.md) |
+| **Audit (updated)** | [`AUDIT_SNORKELING_NAV_UI_PERSISTENCE_CURRENT.md`](AUDIT_SNORKELING_NAV_UI_PERSISTENCE_CURRENT.md) |
+| **Validation script** | `Scripts/validate_snorkeling_release_readiness.sh` |
+| **Tests Snorkeling focused** | 168/168 PASS |
+| **Gate** | `READY_FOR_SNORKELING_COMMAND_08` |
+
+---
+
 ## Aggiornamento indice 2026-06-18 — Audit 10 Snorkeling nav/UI/persistence (Commands 04–07)
 
 Audit indipendente read-only post-Commands 04–07.

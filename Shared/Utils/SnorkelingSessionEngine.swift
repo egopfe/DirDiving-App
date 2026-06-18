@@ -488,7 +488,10 @@ struct SnorkelingSessionEngine {
     }
 
     mutating func exportCheckpoint(now: Date = Date(), uptime: TimeInterval = ProcessInfo.processInfo.systemUptime) -> SnorkelingSessionCheckpoint {
-        SnorkelingSessionCheckpoint(
+        var elapsedClock = MonotonicElapsedClock()
+        elapsedClock.restore(from: sessionClock.exportSnapshot())
+        let savedMonotonic = elapsedClock.elapsed(now: now, uptime: uptime)
+        return SnorkelingSessionCheckpoint(
             session: session,
             lifecyclePhase: tracker.phase,
             tracker: tracker,
@@ -502,7 +505,7 @@ struct SnorkelingSessionEngine {
             manualFallbackActive: manualFallbackActive,
             sensorAvailable: sensorAvailable,
             savedAtWallClock: now,
-            savedAtMonotonicSeconds: sessionMonotonicElapsed(wallClock: now, uptime: uptime),
+            savedAtMonotonicSeconds: savedMonotonic,
             navigationRuntimeState: navigationRuntime,
             operationalEventState: operationalEventState
         )

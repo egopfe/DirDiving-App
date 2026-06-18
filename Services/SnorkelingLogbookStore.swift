@@ -36,6 +36,20 @@ final class SnorkelingLogbookStore: ObservableObject {
         }
     }
 
+    func update(_ session: SnorkelingSession) {
+        add(session)
+    }
+
+    func delete(id: UUID) {
+        guard sessions.contains(where: { $0.id == id }) else { return }
+        sessions.removeAll { $0.id == id }
+        _ = save()
+    }
+
+    func statistics() -> SnorkelingLogbookStatistics {
+        SnorkelingLogbookStatistics.aggregate(from: sessions)
+    }
+
     func exportData() throws -> Data {
         try SnorkelingLogbookPersistence.exportData(for: sessions)
     }

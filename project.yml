@@ -79,6 +79,8 @@ targets:
       - Utils/ApneaMockupReferenceMatrix.swift
       - Utils/ApneaReleaseHardTolerances.swift
       - Utils/ApneaReleaseSelfCheck.swift
+      - Utils/SnorkelingReleaseHardTolerances.swift
+      - Utils/SnorkelingReleaseSelfCheck.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
       - Resources
@@ -260,6 +262,8 @@ targets:
       - Utils/ApneaMockupReferenceMatrix.swift
       - Utils/ApneaReleaseHardTolerances.swift
       - Utils/ApneaReleaseSelfCheck.swift
+      - Utils/SnorkelingReleaseHardTolerances.swift
+      - Utils/SnorkelingReleaseSelfCheck.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
       - Services/FullComputerRuntimeEngine.swift
@@ -445,6 +449,11 @@ targets:
       - Tests/WatchAlgorithmTests/SnorkelingBoundedDataTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingNavigationReturnEngineTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingAlarmsMarkersHapticsMissionModeTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingLocalizationParityTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingLogbookStoreTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingReleaseHardValidationTests.swift
+      - Utils/SnorkelingReleaseHardTolerances.swift
+      - Utils/SnorkelingReleaseSelfCheck.swift
       - Tests/WatchAlgorithmTests/ApneaLifecycleEngineTests.swift
       - Tests/WatchAlgorithmTests/ApneaOperationalEventEngineTests.swift
       - Tests/WatchAlgorithmTests/ApneaTimeRecoveryCheckpointEngineTests.swift
@@ -456,6 +465,8 @@ targets:
       - Utils/ApneaMockupReferenceMatrix.swift
       - Utils/ApneaReleaseHardTolerances.swift
       - Utils/ApneaReleaseSelfCheck.swift
+      - Utils/SnorkelingReleaseHardTolerances.swift
+      - Utils/SnorkelingReleaseSelfCheck.swift
       - Tests/iOSAlgorithmTests/IOSCompanionActivitySelectionTests.swift
       - Tests/iOSAlgorithmTests/BuhlmannComprehensiveReadinessV3RemediationTests.swift
     resources:

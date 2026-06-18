@@ -37,7 +37,10 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
 
     #if DEBUG
     static var testHook_checkpointURL: URL?
+    static var testHook_checkpointWriteCount = 0
     #endif
+
+    private var lastCheckpointFingerprint: String?
 
     init() {
         Self.shared = self
@@ -461,7 +464,14 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
                 hapticsEnabled: hapticsEnabled
             )
             let envelope = try engine.exportCheckpointEnvelope(runtime: runtime)
+            let payload = try SnorkelingSessionCheckpointIntegrity.payload(from: envelope)
+            let fingerprint = try SnorkelingSessionCheckpointIntegrity.canonicalStateFingerprint(payload: payload)
+            if fingerprint == lastCheckpointFingerprint { return }
+            lastCheckpointFingerprint = fingerprint
             try SnorkelingSessionCheckpointStore.write(envelope, to: checkpointURL())
+            #if DEBUG
+            Self.testHook_checkpointWriteCount += 1
+            #endif
         } catch {
             // Checkpoint failures must not interrupt an active session.
         }
@@ -509,6 +519,7 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
     }
 
     private func clearCheckpoint() {
+        lastCheckpointFingerprint = nil
         SnorkelingSessionCheckpointStore.clearCheckpointFiles(
             currentURL: checkpointURL(),
             previousURL: checkpointPreviousURL()
@@ -540,7 +551,9 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
 
     private func refreshPresentation() {
         lifecyclePhase = engine.snapshot.phase
-        presentationInput = buildPresentationInput()
+        let next = buildPresentationInput()
+        guard next != presentationInput else { return }
+        presentationInput = next
     }
 
     private func buildPresentationInput() -> SnorkelingWatchPresentationInput {

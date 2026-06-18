@@ -122,6 +122,9 @@ struct SnorkelingWatchPresentationOutput: Equatable {
     var animationsEnabled: Bool
     var recoveredSessionBannerText: String?
     var recoveryWarningText: String?
+    var recoveredSessionAccessibilityLabel: String?
+    var returnAdvisorAccessibilityLabel: String?
+    var overlayAccessibilityLabel: String?
 }
 
 enum SnorkelingWatchColorToken: String, Equatable {
@@ -146,6 +149,7 @@ enum SnorkelingWatchPresentation {
         let navAccent: SnorkelingWatchColorToken = turn.instruction == .onLine ? .green : (turn.instruction == .unavailable ? .secondary : .yellow)
         let hero = heroPresentation(for: input, stage: stage)
         let overlay = resolveOverlay(input, stage: stage)
+        let advisorText = returnAdvisorText(input)
 
         return SnorkelingWatchPresentationOutput(
             stage: stage,
@@ -186,7 +190,7 @@ enum SnorkelingWatchPresentation {
             headingDegrees: navigationHeading(for: input, stage: stage),
             navigationAccentToken: navAccent,
             returnDistanceText: distanceText(input.returnNavigation.distanceToEntryMeters),
-            returnAdvisorText: returnAdvisorText(input),
+            returnAdvisorText: advisorText,
             returnBearingText: bearingText(input.returnNavigation.bearingToEntryDegrees),
             showReturnAdvisor: input.returnNavigation.advisorActive,
             markerCategoryLabels: SnorkelingMarkerCategory.allCases.map(markerCategoryLabel),
@@ -207,8 +211,28 @@ enum SnorkelingWatchPresentation {
             recoveredSessionBannerText: input.isRecoveredSession
                 ? String(localized: "snorkeling.recovery.banner")
                 : nil,
-            recoveryWarningText: input.recoveryWarning
+            recoveryWarningText: input.recoveryWarning,
+            recoveredSessionAccessibilityLabel: input.isRecoveredSession
+                ? String(localized: "snorkeling.a11y.recovered_session")
+                : nil,
+            returnAdvisorAccessibilityLabel: advisorText == nil
+                ? nil
+                : String(localized: "snorkeling.a11y.return_advisor"),
+            overlayAccessibilityLabel: overlayAccessibilityLabel(for: overlay)
         )
+    }
+
+    private static func overlayAccessibilityLabel(for overlay: SnorkelingWatchOverlayPresentation?) -> String? {
+        switch overlay {
+        case .sensorDegraded:
+            return String(localized: "snorkeling.overlay.sensor_degraded")
+        case .gpsDegradedUnderwater:
+            return String(localized: "snorkeling.overlay.gps_underwater")
+        case .operational(let operational):
+            return String(localized: String.LocalizationValue(operational.titleKey))
+        case nil:
+            return nil
+        }
     }
 
     // MARK: - Stage

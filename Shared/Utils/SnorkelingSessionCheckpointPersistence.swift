@@ -65,6 +65,13 @@ enum SnorkelingSessionCheckpointIntegrity {
         }
         return try decodePayload(envelope.payloadData)
     }
+
+    static func canonicalStateFingerprint(payload: SnorkelingSessionCheckpointPayload) throws -> String {
+        var normalized = payload
+        normalized.checkpoint.savedAtWallClock = Date(timeIntervalSince1970: 0)
+        normalized.checkpoint.savedAtMonotonicSeconds = 0
+        return checksum(for: try encodePayload(normalized))
+    }
 }
 
 enum SnorkelingCheckpointPersistenceError: Error, Equatable {

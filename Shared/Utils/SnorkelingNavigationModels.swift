@@ -181,6 +181,7 @@ struct SnorkelingNavigationRuntimeState: Codable, Hashable, Sendable {
     var entryPoint: SnorkelingEntryPoint?
     var alternateEntryTarget: SnorkelingEntryPoint?
     var manualReturnAdvisorActive: Bool
+    var routePlanWaypointSignature: String?
     var lastWaypointNavigation: SnorkelingWaypointNavigationSnapshot
     var lastReturnNavigation: SnorkelingReturnNavigationSnapshot
 
@@ -194,6 +195,7 @@ struct SnorkelingNavigationRuntimeState: Codable, Hashable, Sendable {
         entryPoint: nil,
         alternateEntryTarget: nil,
         manualReturnAdvisorActive: false,
+        routePlanWaypointSignature: nil,
         lastWaypointNavigation: .unavailable,
         lastReturnNavigation: .unavailable
     )

@@ -172,6 +172,95 @@ final class SnorkelingWatchPresentationTests: XCTestCase {
         }
     }
 
+    func testRecoveredSessionBannerIsPresentedAfterCheckpointRestore() {
+        var input = baseInput(isSessionStarted: true, phase: .surfaceActive)
+        input.isRecoveredSession = true
+        input.recoveryWarning = String(localized: "snorkeling.recovery.gps_degraded")
+        let output = SnorkelingWatchPresentation.make(input)
+        XCTAssertEqual(output.recoveredSessionBannerText, String(localized: "snorkeling.recovery.banner"))
+        XCTAssertNotNil(output.recoveredSessionAccessibilityLabel)
+        XCTAssertFalse(output.heroValue.isEmpty)
+    }
+
+    func testRecoveredBannerDoesNotAppearForFreshSession() {
+        let output = SnorkelingWatchPresentation.make(baseInput(isSessionStarted: true, phase: .surfaceActive))
+        XCTAssertNil(output.recoveredSessionBannerText)
+    }
+
+    func testRecoveredBannerDoesNotHideCriticalAlarm() {
+        var input = baseInput(isSessionStarted: true, phase: .surfaceActive)
+        input.isRecoveredSession = true
+        input.activeOverlays = [
+            SnorkelingOperationalOverlay(
+                kind: .alarm,
+                titleKey: "snorkeling.alarm.title",
+                subtitle: "Depth",
+                severity: .critical,
+                eventID: UUID()
+            )
+        ]
+        let output = SnorkelingWatchPresentation.make(input)
+        XCTAssertNotNil(output.recoveredSessionBannerText)
+        if case .operational(let overlay) = output.overlay {
+            XCTAssertEqual(overlay.severity, .critical)
+        } else {
+            XCTFail("Expected alarm overlay above recovered banner")
+        }
+    }
+
+    func testRecoveredBannerAccessibilityTextExists() {
+        var input = baseInput(isSessionStarted: true, phase: .surfaceActive)
+        input.isRecoveredSession = true
+        let output = SnorkelingWatchPresentation.make(input)
+        XCTAssertEqual(output.recoveredSessionAccessibilityLabel, String(localized: "snorkeling.a11y.recovered_session"))
+    }
+
+    func testNavigationPresentationHasAccessibilityText() {
+        var input = baseInput(isSessionStarted: true, phase: .navigation)
+        input.waypointNavigation.turnInstruction = .turnLeft
+        let output = SnorkelingWatchPresentation.make(input)
+        XCTAssertFalse(output.turnInstructionAccessibility.isEmpty)
+        XCTAssertFalse(output.heroAccessibilityLabel.isEmpty)
+    }
+
+    func testReturnAdvisorHasAccessibilityText() {
+        var input = baseInput(isSessionStarted: true, phase: .returnMode)
+        input.returnNavigation.advisorActive = true
+        input.returnNavigation.informationalMessageKey = "snorkeling.return.advisor.distance"
+        let output = SnorkelingWatchPresentation.make(input)
+        XCTAssertNotNil(output.returnAdvisorAccessibilityLabel)
+        XCTAssertNotEqual(output.returnAdvisorText, "snorkeling.return.advisor.distance")
+    }
+
+    func testAlarmOverlayHasAccessibilityText() {
+        var input = baseInput(isSessionStarted: true, phase: .surfaceActive)
+        input.activeOverlays = [
+            SnorkelingOperationalOverlay(
+                kind: .alarm,
+                titleKey: "snorkeling.alarm.title",
+                subtitle: "Depth",
+                severity: .warning,
+                eventID: UUID()
+            )
+        ]
+        let output = SnorkelingWatchPresentation.make(input)
+        XCTAssertEqual(output.overlayAccessibilityLabel, String(localized: "snorkeling.alarm.title"))
+    }
+
+    func testSummaryPresentationHasAccessibilityText() {
+        let output = SnorkelingWatchPresentation.make(
+            baseInput(isSessionStarted: true, phase: .ended, showSessionSummary: true)
+        )
+        XCTAssertFalse(output.summaryTotalTimeText.isEmpty)
+        XCTAssertFalse(output.summaryFooterText.isEmpty)
+    }
+
+    func testDeterministicReplayPreservesRecoveredBanner() {
+        var input = baseInput(isSessionStarted: true, phase: .surfaceActive)
+        input.isRecoveredSession = true
+        XCTAssertEqual(SnorkelingWatchPresentation.make(input), SnorkelingWatchPresentation.make(input))
+    }
+
     // MARK: - Fixtures
 
     private func baseInput(
