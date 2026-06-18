@@ -102,3 +102,10 @@ Also listed in `DIRDiving iOS Algorithm Tests` target (parity with Apnea domain 
 
 - [`SNORKELING_EXPERIMENTAL_SPEC.md`](SNORKELING_EXPERIMENTAL_SPEC.md)
 - [`DIRDIVING_APNEA_SNORKELING_MAIN_INTEGRATION_ANALYSIS_20260605.md`](DIRDIVING_APNEA_SNORKELING_MAIN_INTEGRATION_ANALYSIS_20260605.md)
+- [`SNORKELING_DOMAIN_INGESTION_LIFECYCLE_REMEDIATION_REPORT_V1.0.md`](SNORKELING_DOMAIN_INGESTION_LIFECYCLE_REMEDIATION_REPORT_V1.0.md)
+
+---
+
+## Remediation V1.0 (2026-06-18)
+
+Audit 09 hardening: domain regression tests unchanged (12 PASS). Cross-domain namespace collision tests added in `SnorkelingCrossDomainIsolationTests`. Internal foundation readiness **100%**.
