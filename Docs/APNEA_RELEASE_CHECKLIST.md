@@ -15,10 +15,12 @@
 - [ ] EN + IT localization audit passes (`audit_localization.sh`)
 - [ ] Implementation reports Commands 05–11 indexed in `Docs/INDEX.md`
 
-## Promotion to MAIN (explicit decision — not automatic)
+## Promotion to MAIN (Command 04 — completed on `main`)
 
-- [ ] Remove `ApneaView.swift` exclusion from `project.yml` Watch target
-- [ ] Wire `ExperimentalFeatures.apneaIntegrationEnabled` to mode selection / navigation
+- [x] `ApneaView.swift` included in Watch MAIN target (`project.yml`)
+- [x] `ApneaWatchRuntimeStore` wired — no `DiveManager` dependency
+- [x] Suspend/resume integration tests pass (`ApneaSuspendResumeLifecycleIntegrationTests`)
+- [x] Monotonic clock restore tests pass (`ApneaMonotonicClockRestoreTests`)
 - [ ] Physical depth validation on Watch Ultra (pool + open water)
 - [ ] End-to-end plan transfer + session import on paired devices
 - [ ] VoiceOver walkthrough of all Watch stages and iOS tabs
@@ -27,8 +29,8 @@
 
 ## Rollback
 
-1. Stay on `main` (Apnea sources not in MAIN target).
-2. Or revert `main` merge commit.
+1. Revert Apnea Watch UI route on `main` (exclude `ApneaView.swift` from MAIN target) while preserving data.
+2. Or revert the promotion merge commit on `main`.
 3. Apnea sync keys are namespaced — rollback does not affect Gauge/FC dive sync.
 
 ## Explicit non-goals

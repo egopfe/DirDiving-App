@@ -1,7 +1,7 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-18  
-**Branch consigliato:** `main` = `origin/main` @ **`7c8e8d3`**
+**Branch consigliato:** `main` = `origin/main` @ **`db06bcd`**
 
 ---
 
@@ -171,6 +171,34 @@ Read-only audit su `main`: runtime Bühlmann Watch, solver prospettico, state ma
 | **Verdict** | **PASS** (Watch MAIN); iOS = planner/logbook only |
 | **Remediation** | P2/P3 closed @ post-`efdcb3a` commit — see audit addendum |
 | **Prerequisite** | [`FULL_COMPUTER_FOUNDATIONS_REMEDIATION_REPORT_V1.1.md`](FULL_COMPUTER_FOUNDATIONS_REMEDIATION_REPORT_V1.1.md) |
+
+---
+
+## Aggiornamento indice 2026-06-18 — Snorkeling domain models (Command 01)
+
+Dominio puro Snorkeling su `Shared/Models/Snorkeling*` + validator/migration; UI non attivata.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `01_SNORKELING_DOMAIN_MODELS_AND_VERSIONED_SCHEMA.md` |
+| **Report** | [`DIR_DIVING_SNORKELING_DOMAIN_MODELS_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_DOMAIN_MODELS_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Commit** | **`db06bcd`** |
+| **Tests** | `SnorkelingDomainModelTests` (12) |
+| **MAIN promotion** | **not yet** — `SnorkelingView` excluded |
+
+---
+
+## Aggiornamento indice 2026-06-18 — Audit 08 release gate remediation
+
+Remediation Audit 08: suspend/resume + monotonic clock fix, release-hard script `--internal`/`--release`, pure HMAC tests, documentation alignment, `APNEA_BATTERY_THERMAL` QA scaffold.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit** | [`AUDIT_APNEA_RELEASE_GATE_CURRENT.md`](AUDIT_APNEA_RELEASE_GATE_CURRENT.md) |
+| **Remediation** | [`APNEA_RELEASE_GATE_REMEDIATION_REPORT_V1.0.md`](APNEA_RELEASE_GATE_REMEDIATION_REPORT_V1.0.md) |
+| **Baseline commit** | **`db06bcd`** |
+| **Internal gate** | **GO** (`validate_apnea_release_readiness.sh --internal`) |
+| **TestFlight / App Store** | **NO-GO** (physical QA PENDING) |
 
 ---
 
