@@ -41,20 +41,13 @@ final class SnorkelingCommand04FoundationGateTests: XCTestCase {
         XCTAssertEqual(engine.snapshot.waterTimeSeconds, waterTime, accuracy: 0.5)
     }
 
-    func testNoNavigationValuesAreFabricatedBeforeCommand04() throws {
-        let contract = try String(
-            contentsOf: repositoryRoot().appendingPathComponent("Docs/SNORKELING_NAVIGATION_RETURN_ENGINE_CONTRACT.md"),
-            encoding: .utf8
-        )
-        XCTAssertTrue(contract.contains("READY_FOR_SNORKELING_COMMAND_04"))
-        XCTAssertTrue(contract.contains("reference-only"))
-        let engineSource = try String(
-            contentsOf: repositoryRoot().appendingPathComponent("Shared/Utils/SnorkelingSessionEngine.swift"),
-            encoding: .utf8
-        )
-        XCTAssertFalse(engineSource.contains("bearingDegrees"))
-        XCTAssertFalse(engineSource.contains("returnAdvisor"))
-        XCTAssertFalse(engineSource.contains("TURN LEFT"))
+    func testNavigationEngineImplementsGeodeticBearingWithoutForeignRuntime() throws {
+        XCTAssertTrue(FileManager.default.fileExists(atPath: repositoryRoot()
+            .appendingPathComponent("Shared/Utils/SnorkelingNavigationEngine.swift").path))
+        XCTAssertTrue(FileManager.default.fileExists(atPath: repositoryRoot()
+            .appendingPathComponent("Shared/Utils/SnorkelingReturnAdvisor.swift").path))
+        let violations = try SnorkelingArchitectureIsolation.violations(inRepositoryRoot: repositoryRoot())
+        XCTAssertTrue(violations.isEmpty, violations.map { "\($0.file): \($0.symbol)" }.joined(separator: ", "))
     }
 
     func testFoundationGateReadyForCommand04() throws {

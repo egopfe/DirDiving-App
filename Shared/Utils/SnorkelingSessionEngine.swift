@@ -15,6 +15,8 @@ struct SnorkelingSessionCheckpoint: Codable, Hashable, Sendable {
     var sensorAvailable: Bool
     var savedAtWallClock: Date
     var savedAtMonotonicSeconds: TimeInterval
+    var navigationRuntimeState: SnorkelingNavigationRuntimeState = .initial
+    var operationalEventState: SnorkelingOperationalEventState = .initial
 }
 
 enum SnorkelingTrackQuality: String, Codable, CaseIterable, Hashable, Sendable {
@@ -51,6 +53,11 @@ struct SnorkelingSessionEngineSnapshot: Equatable, Hashable, Sendable {
     var trackQuality: SnorkelingTrackQuality
     var sensorHealth: SnorkelingSensorHealth
     var activeDipSampleCount: Int
+    var waypointNavigation: SnorkelingWaypointNavigationSnapshot
+    var returnNavigation: SnorkelingReturnNavigationSnapshot
+    var activeOverlays: [SnorkelingOperationalOverlay]
+    var pendingHapticCues: [SnorkelingHapticCue]
+    var missionModePresentationProfile: SnorkelingMissionModePresentationProfile
 }
 
 /// UI-independent snorkeling session engine with shared depth/GPS feeds and dip lifecycle.
@@ -84,6 +91,15 @@ struct SnorkelingSessionEngine {
     private var lastGPSPresentation: SnorkelingGPSPresentationState = .unavailable
     private var lastDepthPresentation: SnorkelingDepthPresentationState = .unavailable
     private var measuredTrackPointCount = 0
+    private var navigationRuntime = SnorkelingNavigationRuntimeState.initial
+    private var navigationConfiguration = SnorkelingNavigationConfiguration.default
+    private var returnAdvisorConfiguration = SnorkelingReturnAdvisorConfiguration.default
+    private var headingInput = SnorkelingNavigationHeadingInput(headingDegrees: nil, ageSeconds: nil)
+    private var batteryFraction: Double?
+    private var lastKnownUnderwater = false
+    private var operationalEventState = SnorkelingOperationalEventState.initial
+    private var missionModeEnabled = false
+    private var hapticsEnabled = true
 
     init(
         configuration: SnorkelingLifecycleConfiguration = .default,
@@ -129,6 +145,8 @@ struct SnorkelingSessionEngine {
         self.activeDipStartedAtMonotonic = checkpoint.activeDipStartedAtMonotonic
         self.manualFallbackActive = checkpoint.manualFallbackActive
         self.sensorAvailable = checkpoint.sensorAvailable
+        self.navigationRuntime = checkpoint.navigationRuntimeState
+        self.operationalEventState = checkpoint.operationalEventState
         self.sessionArmed = checkpoint.lifecyclePhase != .idle
         self.sessionStarted = checkpoint.lifecyclePhase != .idle && checkpoint.lifecyclePhase != .ready
         self.snapshot = SnorkelingSessionEngine.makePlaceholderSnapshot(session: checkpoint.session, phase: checkpoint.lifecyclePhase)
@@ -211,6 +229,7 @@ struct SnorkelingSessionEngine {
 
     mutating func enterReturnMode(at wallClock: Date = Date(), uptime: TimeInterval = ProcessInfo.processInfo.systemUptime) {
         pendingReturnMode = true
+        SnorkelingReturnAdvisor.activateManualAdvisor(state: &navigationRuntime)
         runMachine(feedAccepted: false, acceptedDepth: snapshot.currentDepthMeters, verticalSpeed: 0, wallClock: wallClock, uptime: uptime, tickOnly: true)
         session.state = .returnMode
         session.events.append(
@@ -230,6 +249,119 @@ struct SnorkelingSessionEngine {
         session.state = .active
         pendingExitNavigation = false
         refreshSnapshot(wallClock: wallClock, uptime: uptime)
+    }
+
+    mutating func setActiveRoutePlan(id: UUID?) {
+        session.activeRoutePlanID = id
+        if let id, let plan = session.routePlans.first(where: { $0.id == id }) {
+            SnorkelingNavigationEngine.reorderRoutePlan(plan, state: &navigationRuntime)
+        }
+        refreshSnapshot(wallClock: Date())
+    }
+
+    mutating func setRoutePlans(_ plans: [SnorkelingRoutePlan], activePlanID: UUID? = nil) {
+        session.routePlans = plans
+        session.activeRoutePlanID = activePlanID
+        if let activePlanID, let plan = plans.first(where: { $0.id == activePlanID }) {
+            SnorkelingNavigationEngine.reorderRoutePlan(plan, state: &navigationRuntime)
+        }
+        refreshSnapshot(wallClock: Date())
+    }
+
+    mutating func selectWaypoint(id: UUID) {
+        SnorkelingNavigationEngine.selectWaypoint(id: id, state: &navigationRuntime)
+        refreshSnapshot(wallClock: Date())
+    }
+
+    mutating func skipWaypoint(id: UUID) {
+        let plan = activeRoutePlan()
+        SnorkelingNavigationEngine.skipWaypoint(id: id, routePlan: plan, state: &navigationRuntime)
+        refreshSnapshot(wallClock: Date())
+    }
+
+    mutating func overrideEntryPoint(_ entry: SnorkelingEntryPoint) {
+        SnorkelingReturnAdvisor.overrideEntryPoint(entry, state: &navigationRuntime)
+        if SnorkelingDomainSupport.isValidCoordinate(latitude: entry.latitude, longitude: entry.longitude) {
+            session.entryPoint = SnorkelingTrackPoint(
+                monotonicRelativeTimestampSeconds: entry.monotonicRelativeTimestampSeconds,
+                wallClockTimestamp: entry.capturedAt,
+                latitude: entry.latitude,
+                longitude: entry.longitude,
+                horizontalAccuracyMeters: entry.horizontalAccuracyMeters,
+                gpsQuality: entry.gpsQuality,
+                isUnderwater: false
+            )
+        }
+        refreshSnapshot(wallClock: Date())
+    }
+
+    mutating func setAlternateReturnTarget(_ target: SnorkelingEntryPoint?) {
+        SnorkelingReturnAdvisor.setAlternateSafeTarget(target, state: &navigationRuntime)
+        refreshSnapshot(wallClock: Date())
+    }
+
+    mutating func updateHeading(degrees: Double?, ageSeconds: TimeInterval?) {
+        headingInput = SnorkelingNavigationHeadingInput(headingDegrees: degrees, ageSeconds: ageSeconds)
+        refreshSnapshot(wallClock: Date())
+    }
+
+    mutating func updateBatteryFraction(_ fraction: Double?) {
+        batteryFraction = fraction
+        refreshSnapshot(wallClock: Date())
+    }
+
+    mutating func setMissionModeEnabled(_ enabled: Bool) {
+        missionModeEnabled = enabled
+        refreshSnapshot(wallClock: Date())
+    }
+
+    mutating func setHapticsEnabled(_ enabled: Bool) {
+        hapticsEnabled = enabled
+        refreshSnapshot(wallClock: Date())
+    }
+
+    mutating func configureWatchDefaultsIfNeeded() {
+        guard session.alarms.isEmpty else { return }
+        session.alarms = [
+            SnorkelingAlarm(kind: .maxDepth, label: "Depth", thresholdDepthMeters: 10),
+            SnorkelingAlarm(kind: .maxDuration, label: "Duration", thresholdDurationSeconds: 7_200),
+            SnorkelingAlarm(kind: .maxDistance, label: "Distance", thresholdDistanceMeters: 1_500)
+        ]
+        if session.buddy == nil {
+            session.buddy = SnorkelingBuddyInfo(isBuddyPresent: false)
+        }
+        refreshSnapshot(wallClock: Date())
+    }
+
+    @discardableResult
+    mutating func saveMarker(
+        request: SnorkelingMarkerCaptureRequest,
+        at wallClock: Date = Date(),
+        uptime: TimeInterval = ProcessInfo.processInfo.systemUptime
+    ) -> SnorkelingMarkerCaptureResult {
+        let monotonic = sessionMonotonicElapsed(wallClock: wallClock, uptime: uptime)
+        let result = SnorkelingMarkerCaptureEngine.capture(
+            request: request,
+            monotonicNow: monotonic,
+            wallClockNow: wallClock,
+            sessionID: session.id,
+            depthMeters: depthFeedState.lastAcceptedDepthMeters,
+            temperatureCelsius: depthFeedState.lastTemperatureCelsius,
+            headingDegrees: headingInput.headingDegrees,
+            isUnderwater: lastKnownUnderwater,
+            gpsAcceptedFix: gpsFeedState.lastAcceptedFix,
+            gpsPresentationState: lastGPSPresentation,
+            entryPoint: navigationRuntime.entryPoint ?? session.entryPoint.flatMap(entryPoint(from:)),
+            hapticsEnabled: hapticsEnabled,
+            missionModeEnabled: missionModeEnabled
+        )
+        if let marker = result.marker, let event = result.event {
+            session.markers.append(marker)
+            session.events.append(event)
+            session.statistics = session.refreshedStatistics()
+        }
+        refreshSnapshot(wallClock: wallClock, uptime: uptime)
+        return result
     }
 
     mutating func enableManualFallback() {
@@ -289,6 +421,7 @@ struct SnorkelingSessionEngine {
             configuration: depthFeedConfiguration
         )
         lastDepthPresentation = depthResult.presentationState
+        lastKnownUnderwater = depthResult.isUnderwater
 
         var gpsResult: SnorkelingGPSIngestResult?
         if let gpsRaw {
@@ -355,7 +488,10 @@ struct SnorkelingSessionEngine {
     }
 
     mutating func exportCheckpoint(now: Date = Date(), uptime: TimeInterval = ProcessInfo.processInfo.systemUptime) -> SnorkelingSessionCheckpoint {
-        SnorkelingSessionCheckpoint(
+        var elapsedClock = MonotonicElapsedClock()
+        elapsedClock.restore(from: sessionClock.exportSnapshot())
+        let savedMonotonic = elapsedClock.elapsed(now: now, uptime: uptime)
+        return SnorkelingSessionCheckpoint(
             session: session,
             lifecyclePhase: tracker.phase,
             tracker: tracker,
@@ -369,7 +505,9 @@ struct SnorkelingSessionEngine {
             manualFallbackActive: manualFallbackActive,
             sensorAvailable: sensorAvailable,
             savedAtWallClock: now,
-            savedAtMonotonicSeconds: sessionMonotonicElapsed(wallClock: now, uptime: uptime)
+            savedAtMonotonicSeconds: savedMonotonic,
+            navigationRuntimeState: navigationRuntime,
+            operationalEventState: operationalEventState
         )
     }
 
@@ -549,6 +687,12 @@ struct SnorkelingSessionEngine {
                 depthQuality: depthResult.snorkelingQuality,
                 isUnderwater: false
             )
+            SnorkelingReturnAdvisor.captureEntryPointIfNeeded(
+                from: accepted,
+                capturedAt: wallClock,
+                isUnderwater: false,
+                state: &navigationRuntime
+            )
         }
         if gpsResult.rejectionReason == .underwater {
             session.warnings.append(.estimatedPositionUsed)
@@ -601,6 +745,16 @@ struct SnorkelingSessionEngine {
             health = .available
         }
 
+        updateNavigationRuntime(wallClock: wallClock, uptime: uptime)
+        let presentationProfile = missionModeEnabled ? SnorkelingMissionModePresentationProfile.mission : .standard
+        let operational = evaluateOperationalEvents(
+            wallClock: wallClock,
+            sessionElapsed: sessionElapsed,
+            dipElapsed: dipElapsed,
+            health: health
+        )
+        session.events.append(contentsOf: operational.events)
+
         snapshot = SnorkelingSessionEngineSnapshot(
             phase: tracker.phase,
             session: session,
@@ -621,7 +775,133 @@ struct SnorkelingSessionEngine {
             depthPresentationState: lastDepthPresentation,
             trackQuality: trackQuality(for: lastGPSPresentation),
             sensorHealth: health,
-            activeDipSampleCount: activeDipSamples.count
+            activeDipSampleCount: activeDipSamples.count,
+            waypointNavigation: navigationRuntime.lastWaypointNavigation,
+            returnNavigation: navigationRuntime.lastReturnNavigation,
+            activeOverlays: operational.overlays,
+            pendingHapticCues: operational.hapticCues,
+            missionModePresentationProfile: presentationProfile
+        )
+    }
+
+    private mutating func evaluateOperationalEvents(
+        wallClock: Date,
+        sessionElapsed: TimeInterval,
+        dipElapsed: TimeInterval,
+        health: SnorkelingSensorHealth
+    ) -> SnorkelingOperationalEventOutput {
+        let distanceFromEntry: Double?
+        if let entry = navigationRuntime.entryPoint ?? session.entryPoint.flatMap(entryPoint(from:)),
+           let fix = gpsFeedState.lastAcceptedFix {
+            distanceFromEntry = SnorkelingDomainSupport.distanceMeters(
+                from: (latitude: entry.latitude, longitude: entry.longitude),
+                to: (latitude: fix.latitude, longitude: fix.longitude)
+            )
+        } else {
+            distanceFromEntry = nil
+        }
+        let context = SnorkelingOperationalEventContext(
+            monotonicNow: sessionElapsed,
+            wallClockNow: wallClock,
+            sessionElapsedSeconds: sessionElapsed,
+            activeDipElapsedSeconds: dipElapsed,
+            distanceFromEntryMeters: distanceFromEntry,
+            batteryFraction: batteryFraction,
+            temperatureCelsius: depthFeedState.lastTemperatureCelsius,
+            gpsPresentationState: lastGPSPresentation,
+            sensorHealth: health,
+            missionModeEnabled: missionModeEnabled,
+            hapticsEnabled: hapticsEnabled
+        )
+        return SnorkelingOperationalEventEngine.evaluate(
+            alarms: session.alarms,
+            depthMeters: depthFeedState.lastAcceptedDepthMeters,
+            verticalSpeedMetersPerSecond: depthFeedState.depthFeedState.lastAccepted?.verticalSpeedMetersPerSecond ?? 0,
+            state: &operationalEventState,
+            context: context
+        )
+    }
+
+    private func entryPoint(from trackPoint: SnorkelingTrackPoint) -> SnorkelingEntryPoint? {
+        guard let latitude = trackPoint.latitude, let longitude = trackPoint.longitude else { return nil }
+        return SnorkelingEntryPoint(
+            latitude: latitude,
+            longitude: longitude,
+            capturedAt: trackPoint.wallClockTimestamp ?? Date(),
+            monotonicRelativeTimestampSeconds: trackPoint.monotonicRelativeTimestampSeconds,
+            gpsQuality: trackPoint.gpsQuality,
+            horizontalAccuracyMeters: trackPoint.horizontalAccuracyMeters
+        )
+    }
+
+    private mutating func updateNavigationRuntime(
+        wallClock: Date,
+        uptime: TimeInterval
+    ) {
+        syncEntryPointFromSessionIfNeeded()
+        let position = navigationPositionInput()
+        let routePlan = activeRoutePlan()
+        let sessionElapsed = sessionMonotonicElapsed(wallClock: wallClock, uptime: uptime)
+
+        switch tracker.phase {
+        case .navigation:
+            let (_, updated) = SnorkelingNavigationEngine.evaluateWaypointNavigation(
+                routePlan: routePlan,
+                state: navigationRuntime,
+                position: position,
+                heading: headingInput,
+                configuration: navigationConfiguration
+            )
+            navigationRuntime = updated
+        case .returnMode:
+            let (_, updated) = SnorkelingReturnAdvisor.evaluateReturnNavigation(
+                state: navigationRuntime,
+                position: position,
+                heading: headingInput,
+                sessionElapsedSeconds: sessionElapsed,
+                batteryFraction: batteryFraction,
+                now: wallClock,
+                configuration: returnAdvisorConfiguration,
+                navigationConfiguration: navigationConfiguration
+            )
+            navigationRuntime = updated
+        default:
+            break
+        }
+    }
+
+    private func activeRoutePlan() -> SnorkelingRoutePlan? {
+        guard let id = session.activeRoutePlanID else { return nil }
+        return session.routePlans.first(where: { $0.id == id })
+    }
+
+    private mutating func syncEntryPointFromSessionIfNeeded() {
+        guard navigationRuntime.entryPoint == nil,
+              let entry = session.entryPoint,
+              let latitude = entry.latitude,
+              let longitude = entry.longitude else {
+            return
+        }
+        navigationRuntime.entryPoint = SnorkelingEntryPoint(
+            latitude: latitude,
+            longitude: longitude,
+            capturedAt: entry.wallClockTimestamp ?? Date(),
+            monotonicRelativeTimestampSeconds: entry.monotonicRelativeTimestampSeconds,
+            gpsQuality: entry.gpsQuality,
+            horizontalAccuracyMeters: entry.horizontalAccuracyMeters
+        )
+    }
+
+    private func navigationPositionInput() -> SnorkelingNavigationPositionInput {
+        let accepted = gpsFeedState.lastAcceptedFix
+        return SnorkelingNavigationPositionInput(
+            latitude: accepted?.latitude,
+            longitude: accepted?.longitude,
+            gpsQuality: accepted?.gpsQuality ?? .unavailable,
+            gpsPresentationState: lastGPSPresentation,
+            isUnderwater: lastKnownUnderwater,
+            surfaceSpeedMetersPerSecond: accepted?.impliedSpeedMetersPerSecond,
+            fixAgeSeconds: accepted?.fixAgeSeconds
         )
     }
 
@@ -660,7 +940,12 @@ struct SnorkelingSessionEngine {
             depthPresentationState: .unavailable,
             trackQuality: .unavailable,
             sensorHealth: .available,
-            activeDipSampleCount: 0
+            activeDipSampleCount: 0,
+            waypointNavigation: .unavailable,
+            returnNavigation: .unavailable,
+            activeOverlays: [],
+            pendingHapticCues: [],
+            missionModePresentationProfile: .standard
         )
     }
 }

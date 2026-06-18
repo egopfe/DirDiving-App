@@ -4,6 +4,8 @@ struct ContentView: View {
     @EnvironmentObject private var navigation: AppNavigationStore
     @EnvironmentObject private var dive: DiveManager
     @EnvironmentObject private var apneaRuntime: ApneaWatchRuntimeStore
+    @EnvironmentObject private var snorkelingRuntime: SnorkelingWatchRuntimeStore
+    @EnvironmentObject private var snorkelingLogbook: SnorkelingLogbookStore
     @EnvironmentObject private var imageStore: UserImageStore
     @EnvironmentObject private var activitySelection: DIRActivitySelectionStore
     @AppStorage(WatchNavigationHints.crownHintDismissedKey) private var crownHintDismissed = false
@@ -45,8 +47,13 @@ struct ContentView: View {
                 navigation.selectedPage = .live
             }
         }
+        .onChange(of: snorkelingRuntime.isSessionActive) { _, isActive in
+            if isActive {
+                navigation.selectedPage = .live
+            }
+        }
         .onChange(of: navigation.selectedPage) { _, page in
-            guard dive.isDiveActive || apneaRuntime.isSessionActive else { return }
+            guard dive.isDiveActive || apneaRuntime.isSessionActive || snorkelingRuntime.isSessionActive else { return }
             // During an active dive, only Live and Compass remain reachable (v9: images/menus available on surface).
             if page != .live && page != .compass {
                 navigation.reportUnderwaterNavigationBlocked()
@@ -60,7 +67,7 @@ struct ContentView: View {
             }
         }
         .overlay(alignment: .bottom) {
-            if !crownHintDismissed, navigation.selectedPage == .live, !dive.isDiveActive, !apneaRuntime.isSessionActive {
+            if !crownHintDismissed, navigation.selectedPage == .live, !dive.isDiveActive, !apneaRuntime.isSessionActive, !snorkelingRuntime.isSessionActive {
                 crownNavigationHint
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
@@ -79,6 +86,8 @@ struct ContentView: View {
                 .environmentObject(dive)
                 .environmentObject(activitySelection)
                 .environmentObject(apneaRuntime)
+                .environmentObject(snorkelingRuntime)
+                .environmentObject(snorkelingLogbook)
         }
         .overlay(alignment: .bottom) {
             if let toast = activitySelection.modeChangeBlockedToast {
