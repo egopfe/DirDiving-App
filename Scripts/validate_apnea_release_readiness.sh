@@ -109,6 +109,10 @@ xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving Watch Algorithm Tests
   -only-testing:"DIRDiving Watch Algorithm Tests/ApneaWatchRuntimeStoreTests" \
   -only-testing:"DIRDiving Watch Algorithm Tests/ApneaWatchMainPromotionTests" \
   -only-testing:"DIRDiving Watch Algorithm Tests/ApneaWatchLayoutContractTests" \
+  -only-testing:"DIRDiving Watch Algorithm Tests/ApneaPlanPackageWatchNegativeTests" \
+  -only-testing:"DIRDiving Watch Algorithm Tests/ApneaPlanRevisionIdempotencyTests" \
+  -only-testing:"DIRDiving Watch Algorithm Tests/ApneaSessionSyncTransportNegativeWatchTests" \
+  -only-testing:"DIRDiving Watch Algorithm Tests/ApneaOfflineOnlineEndToEndIntegrationTests" \
   -only-testing:"DIRDiving Watch Algorithm Tests/ApneaDomainModelTests" >/tmp/dirdiving_apnea_watch_tests.log
 
 echo "[apnea-readiness] test iOS algorithms (Apnea companion + sync)"
@@ -117,7 +121,13 @@ xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving iOS Algorithm Tests" 
   -only-testing:"DIRDiving iOS Algorithm Tests/IOSApneaCompanionTests" \
   -only-testing:"DIRDiving iOS Algorithm Tests/IOSApneaLogbookAnalyticsTests" \
   -only-testing:"DIRDiving iOS Algorithm Tests/IOSApneaMapEquipmentExportTests" \
-  -only-testing:"DIRDiving iOS Algorithm Tests/ApneaSyncCodecTests" >/tmp/dirdiving_apnea_ios_tests.log
+  -only-testing:"DIRDiving iOS Algorithm Tests/ApneaSyncCodecTests" \
+  -only-testing:"DIRDiving iOS Algorithm Tests/ApneaSyncCodecNegativePathTests" \
+  -only-testing:"DIRDiving iOS Algorithm Tests/ApneaSessionSyncTransportNegativeTests" \
+  -only-testing:"DIRDiving iOS Algorithm Tests/ApneaSyncAckNegativeTests" \
+  -only-testing:"DIRDiving iOS Algorithm Tests/ApneaOfflineOnlineEndToEndIntegrationTests" \
+  -only-testing:"DIRDiving iOS Algorithm Tests/ApneaSessionMergeIntegrityTests" \
+  -only-testing:"DIRDiving iOS Algorithm Tests/ApneaCloudBackupStubTruthfulnessTests" >/tmp/dirdiving_apnea_ios_tests.log
 
 echo "[apnea-readiness] physical QA status: PENDING (no automated PASS for device evidence)"
 echo "[apnea-readiness] PASS"

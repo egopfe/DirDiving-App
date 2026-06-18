@@ -18,6 +18,18 @@ enum ApneaSessionSyncCodec {
     static var replayCache = SyncNonceReplayCache()
     private static let replayCacheFileName = "dirdiving_watch_apnea_sync_replay_cache.json"
 
+#if DEBUG
+    static var testHook_bypassConnectivityChecks = false
+    static var testHook_replayCacheFileURL: URL?
+
+    static func resetTestHooks() {
+        testHook_bypassConnectivityChecks = false
+        testHook_replayCacheFileURL = nil
+        replayCache.reset()
+        UserDefaults.standard.removeObject(forKey: importedToCompanionIDsKey)
+    }
+#endif
+
     private static let expectedCompanionBundleID = "com.egopfe.dirdiving.ios"
 
     static func bootstrapReplayCacheIfNeeded() {
@@ -25,7 +37,10 @@ enum ApneaSessionSyncCodec {
     }
 
     private static func replayCacheFileURL() -> URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+#if DEBUG
+        if let override = testHook_replayCacheFileURL { return override }
+#endif
+        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
             .appendingPathComponent(replayCacheFileName)
     }
 
@@ -89,9 +104,17 @@ enum ApneaSessionSyncCodec {
     }
 
     static func parsePayload(from payload: [String: Any]) throws -> ParsedPayload {
+#if DEBUG
+        if !testHook_bypassConnectivityChecks {
+            guard WCSession.default.activationState == .activated else {
+                throw ApneaSessionSyncError.sessionInactive
+            }
+        }
+#else
         guard WCSession.default.activationState == .activated else {
             throw ApneaSessionSyncError.sessionInactive
         }
+#endif
         guard WatchSyncAuth.hasPeerSecret() else {
             throw ApneaSessionSyncError.missingPeerSecret
         }
