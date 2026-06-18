@@ -426,6 +426,13 @@ targets:
       - Tests/WatchAlgorithmTests/SnorkelingDomainModelTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingSensorGPSIngestionTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingLifecycleEngineTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingArchitectureIsolationTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingDepthOnlyLifecycleTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingCheckpointFoundationTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingCommand04FoundationGateTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingWatchMainIsolationTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingCrossDomainIsolationTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingBoundedDataTests.swift
       - Tests/WatchAlgorithmTests/ApneaLifecycleEngineTests.swift
       - Tests/WatchAlgorithmTests/ApneaOperationalEventEngineTests.swift
       - Tests/WatchAlgorithmTests/ApneaTimeRecoveryCheckpointEngineTests.swift
