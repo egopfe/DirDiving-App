@@ -1,7 +1,7 @@
 # Apnea architecture (Watch + iOS)
 
-**Branch:** `integration/full-computer`  
-**Status:** Integration experimental — **not certified** for freediving safety. See [`SAFETY_DISCLAIMER.md`](SAFETY_DISCLAIMER.md).
+**Branch:** `main`  
+**Status:** Integration on `main` — **not certified** for freediving safety. See [`SAFETY_DISCLAIMER.md`](SAFETY_DISCLAIMER.md).
 
 ## Overview
 
@@ -13,7 +13,7 @@ Apnea mode adds breath-hold session tracking on Apple Watch with an iOS companio
 | Lifecycle engine | `Shared/Utils/ApneaSessionEngine.swift`, `ApneaLifecycleStateMachine.swift` | Idle → dive → ascent → surface recovery → summary |
 | Depth feed | `Utils/DiveDepthMeasurementIngestion.swift` | Spike rejection, monotonic timestamps |
 | Operational events | `Shared/Utils/ApneaOperationalEventEngine.swift` | Markers, targets, depth/time alarms |
-| Recovery | `Shared/Utils/ApneaRecoveryComputation.swift` | 1:1, 2:1, fixed, informational policies |
+| Recovery | `Shared/Models/ApneaRecoveryPolicy.swift` (`ApneaRecoveryComputation`) | 1:1, 2:1, fixed, informational policies |
 | Watch presentation | `Utils/ApneaWatchPresentation.swift`, `Views/ApneaView.swift` | Stage mapping, start gate, overlays |
 | Watch logbook | `Services/ApneaLogbookStore.swift` | Local persistence + outbound session sync |
 | iOS companion | `iOSApp/Views/Apnea/`, `iOSApp/Services/IOSApnea*.swift` | Dashboard, planner, logbook, export |
@@ -61,7 +61,7 @@ Namespaces are isolated by automated self-check (`ApneaReleaseSelfCheck`).
 
 ## Watch target note
 
-`Views/ApneaView.swift` remains **excluded** from the MAIN Watch app target in `project.yml` until an explicit promotion review. Algorithms, presentation helpers, and tests compile on `integration/full-computer`; UI promotion is a separate decision.
+`Views/ApneaView.swift` remains **excluded** from the MAIN Watch app target in `project.yml` until Command 04 promotion review. Engine, presentation helpers, and tests compile on `main`; UI promotion is a separate step (gate: **READY_FOR_COMMAND_04**).
 
 ## Related documents
 
@@ -69,4 +69,5 @@ Namespaces are isolated by automated self-check (`ApneaReleaseSelfCheck`).
 - Release-hard matrix: [`APNEA_RELEASE_HARD_TEST_MATRIX.md`](APNEA_RELEASE_HARD_TEST_MATRIX.md)
 - Validation report: [`DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md`](DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md)
 - Mockup index: `Utils/ApneaMockupReferenceMatrix.swift` (23 `APNEA_*` PNG references — not embedded in bundle)
-- Rollback: revert to `main` without Apnea integration sources; branch is isolated on `integration/full-computer`.
+- Suspend/resume simulation: `Tests/WatchAlgorithmTests/ApneaSuspendResumeLifecycleIntegrationTests.swift`
+- Physical QA evidence: `Docs/QA_EVIDENCE/APNEA_*/README.md` (all PENDING until executed)

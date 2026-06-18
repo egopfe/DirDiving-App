@@ -77,6 +77,16 @@ final class ApneaTimeRecoveryCheckpointEngineTests: XCTestCase {
         XCTAssertEqual(engine.snapshot.session.id, previousSessionID)
     }
 
+    func testSuspendResumeDuringRecoveryPreservesRequiredSeconds() throws {
+        var engine = makeEngine()
+        let endOffset = replayDive(&engine)
+        keepRecoveryAlive(&engine, from: endOffset, seconds: 2)
+        let required = engine.snapshot.requiredRecoverySeconds
+        let envelope = try engine.exportCheckpoint(now: startDate.addingTimeInterval(endOffset + 2))
+        let restored = try ApneaSessionEngine(checkpoint: envelope)
+        XCTAssertEqual(restored.snapshot.requiredRecoverySeconds, required)
+    }
+
     // MARK: helpers
 
     private func makeEngine() -> ApneaSessionEngine {

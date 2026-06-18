@@ -1,6 +1,6 @@
 # Apnea release-hard test matrix
 
-**Branch:** `integration/full-computer`  
+**Branch:** `main`  
 **Automation entry point:** `./Scripts/validate_apnea_release_readiness.sh`
 
 ## Engine / lifecycle
@@ -75,3 +75,16 @@ Executable Watch presentation fixtures: 5 lifecycle stages indexed in `ApneaMock
 | X-03 | VoiceOver / Dynamic Type (EN/IT) | [`IOS_DYNAMIC_TYPE_VOICEOVER_QA_MATRIX.md`](IOS_DYNAMIC_TYPE_VOICEOVER_QA_MATRIX.md) |
 | X-04 | Glove / wet interaction | Manual on-device |
 | X-05 | Screenshot regression (41/45/49 mm, iPhone sizes) | [`ReferenceUI/README.md`](ReferenceUI/README.md) |
+
+## Remediation V1.0 (Audit 05 closure)
+
+| ID | Area | Automated test | Notes |
+|----|------|----------------|-------|
+| R-01 | Suspend/resume integration | `ApneaSuspendResumeLifecycleIntegrationTests` | checkpoint destroy/restore simulation |
+| R-02 | Checkpoint failure injection | `ApneaCheckpointFailureInjectionTests` | checksum, truncate, corrupt JSON |
+| R-03 | Architecture isolation | `ApneaArchitectureIsolationTests` | no DiveManager/FC in engine sources |
+| R-04 | Command 04 gate | `ApneaCommand04PromotionGateTests` | READY_FOR_COMMAND_04; ApneaView excluded |
+| R-05 | Release script static | `Scripts/test_validate_apnea_release_readiness_static.sh` | main canonical; no stale branch warning |
+| R-06 | Physical QA evidence | `Docs/QA_EVIDENCE/APNEA_*/README.md` | all PENDING until device evidence |
+
+Physical matrices: [`QA_EVIDENCE/APNEA_WATCH_ULTRA/README.md`](QA_EVIDENCE/APNEA_WATCH_ULTRA/README.md), [`QA_EVIDENCE/APNEA_OS_LIFECYCLE/README.md`](QA_EVIDENCE/APNEA_OS_LIFECYCLE/README.md).

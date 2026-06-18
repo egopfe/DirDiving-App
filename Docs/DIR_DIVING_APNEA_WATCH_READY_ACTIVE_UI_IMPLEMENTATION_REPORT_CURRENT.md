@@ -2,7 +2,7 @@
 
 **Command:** `05_WATCH_APNEA_READY_AND_ACTIVE_UI.md`  
 **Date:** 2026-06-17  
-**Branch:** `integration/full-computer`  
+**Branch:** `main`  
 **Result:** PASS
 
 ## Implemented

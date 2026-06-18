@@ -4,7 +4,7 @@ Copyright Federico Lombardo di Monte Iato 2026
 
 DIR DIVING is a SwiftUI **watchOS + iOS companion** project (XcodeGen) for Apple Watch Ultra-class devices and iPhone. The stable **`main`** branch delivers **Diving mode** on Watch (depth, ascent awareness, **BUSSOLA**, log, GPS surface entry/exit, Subsurface CSV) plus the iOS companion (logbook, planner, equipment, analysis, sync). Snorkeling, Apnea, and Buddy Assist live on **experimental** branches only.
 
-**Apnea integration (`integration/full-computer`):** shared domain engine, iOS companion screens, and isolated WatchConnectivity sync are documented in [`APNEA_ARCHITECTURE.md`](APNEA_ARCHITECTURE.md). Release-hard validation: `./Scripts/validate_apnea_release_readiness.sh` · report: [`DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md`](DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md). **Not certified** for freediving; physical QA pending.
+**Apnea integration (`main`):** shared domain engine, iOS companion screens, and isolated WatchConnectivity sync are documented in [`APNEA_ARCHITECTURE.md`](APNEA_ARCHITECTURE.md). Release-hard validation: `./Scripts/validate_apnea_release_readiness.sh` · report: [`DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md`](DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md). **Not certified** for freediving; physical QA pending (`Docs/QA_EVIDENCE/APNEA_*/`).
 
 **Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](INDEX.md) · **Baseline:** `main` = `origin/main` @ **`99ea74a`** (deep-code remediation V1.0 MAIN-DCA-011…031). Run `xcodegen generate` before Xcode.
 
