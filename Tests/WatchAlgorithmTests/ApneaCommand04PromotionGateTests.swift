@@ -8,14 +8,14 @@ final class ApneaCommand04PromotionGateTests: XCTestCase {
         XCTAssertEqual(Self.gateDecision, "READY_FOR_COMMAND_04")
     }
 
-    func testApneaViewExcludedFromMainUntilExplicitPromotion() throws {
+    func testApneaViewIncludedInMainAfterPromotion() throws {
         let project = try String(
             contentsOf: repositoryRoot().appendingPathComponent("project.yml"),
             encoding: .utf8
         )
-        XCTAssertTrue(
+        XCTAssertFalse(
             project.contains("- ApneaView.swift"),
-            "ApneaView must stay excluded from MAIN Watch target until Command 04 promotion review"
+            "ApneaView should be promoted to MAIN Watch target"
         )
     }
 

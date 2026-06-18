@@ -94,6 +94,9 @@ final class DIRActivitySelectionStore: ObservableObject {
     }
 
     var canChangeModes: Bool {
+        if let apnea = ApneaWatchRuntimeStore.shared, apnea.isSessionActive {
+            return false
+        }
         guard let dive = DiveManager.shared else { return true }
         return !dive.isDiveActive
     }

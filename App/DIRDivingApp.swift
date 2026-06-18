@@ -12,6 +12,7 @@ struct DIRDivingApp: App {
     @StateObject private var diveReminderSettings: DiveReminderSettingsStore
     @StateObject private var navigationStore: AppNavigationStore
     @StateObject private var activitySelectionStore: DIRActivitySelectionStore
+    @StateObject private var apneaRuntimeStore: ApneaWatchRuntimeStore
     @StateObject private var watchSync: WatchSyncService
     @StateObject private var plannerBriefingStore: PlannerBriefingCardStore
     @StateObject private var legalAcceptance = LegalAcceptanceStore()
@@ -25,6 +26,7 @@ struct DIRDivingApp: App {
         let diveReminderSettings = DiveReminderSettingsStore()
         let navigationStore = AppNavigationStore()
         let activitySelectionStore = DIRActivitySelectionStore()
+        let apneaRuntimeStore = ApneaWatchRuntimeStore()
         let plannerBriefingStore = PlannerBriefingCardStore()
         _logStore = StateObject(wrappedValue: logStore)
         _apneaLogbookStore = StateObject(wrappedValue: apneaLogbookStore)
@@ -36,6 +38,7 @@ struct DIRDivingApp: App {
         _diveReminderSettings = StateObject(wrappedValue: diveReminderSettings)
         _navigationStore = StateObject(wrappedValue: navigationStore)
         _activitySelectionStore = StateObject(wrappedValue: activitySelectionStore)
+        _apneaRuntimeStore = StateObject(wrappedValue: apneaRuntimeStore)
         _watchSync = StateObject(wrappedValue: WatchSyncService.shared)
         _plannerBriefingStore = StateObject(wrappedValue: plannerBriefingStore)
         WatchSyncService.shared.attachLogStore(logStore)
@@ -74,6 +77,7 @@ struct DIRDivingApp: App {
             .environmentObject(diveReminderSettings)
             .environmentObject(navigationStore)
             .environmentObject(activitySelectionStore)
+            .environmentObject(apneaRuntimeStore)
             .environmentObject(watchSync)
             .environmentObject(plannerBriefingStore)
             .environmentObject(legalAcceptance)

@@ -1,83 +1,16 @@
 import SwiftUI
 
 struct ApneaView: View {
-    @EnvironmentObject private var exploration: ExplorationStore
-    @EnvironmentObject private var dive: DiveManager
+    @EnvironmentObject private var runtime: ApneaWatchRuntimeStore
     @EnvironmentObject private var apneaLogbook: ApneaLogbookStore
     @EnvironmentObject private var watchSync: WatchSyncService
     @ObservedObject private var importedPlan = ApneaImportedPlanStore.shared
     @AppStorage(HapticService.hapticsEnabledKey) private var hapticsEnabled = true
 
-    @State private var showSessionSummary = false
-    @State private var dismissedOverlayEventIDs: Set<UUID> = []
     @State private var recoveryCompleteHapticFired = false
     @State private var savedConfirmationVisible = false
 
-    private var input: ApneaWatchPresentationInput {
-        let dives = exploration.apneaDives
-        let lastDive = dives.first
-        let requiredRecovery = lastDive?.recoverySeconds ?? 0
-        let recoveryRemaining = exploration.recoverySeconds
-        let recoveryElapsed = max(0, requiredRecovery - recoveryRemaining)
-        let surfaceElapsed = recoveryRemaining > 0 ? recoveryElapsed : max(recoveryElapsed, requiredRecovery)
-        let totalUnderwater = dives.reduce(0) { $0 + $1.durationSeconds }
-        let diveCount = exploration.apneaCount
-        let sessionMax = dives.map(\.maxDepthMeters).max() ?? 0
-        let bestTime = dives.map(\.durationSeconds).max() ?? 0
-        let average = diveCount > 0 ? totalUnderwater / Double(diveCount) : 0
-        let sessionTotal = totalUnderwater + dives.reduce(0) { $0 + max(0, $1.recoverySeconds - exploration.recoverySeconds) }
-
-        let overlay: ApneaWatchOverlayPresentation? = {
-            guard let operational = dive.apneaOperationalOverlay,
-                  !dismissedOverlayEventIDs.contains(operational.eventID) else { return nil }
-            let dismissSafe = operational.kind != .alarm
-                && recoveryRemaining <= 0
-                && dive.currentDepthMeters < 0.5
-            return ApneaWatchOverlayPresentation(
-                kind: operational.kind,
-                title: operational.title,
-                subtitle: operational.subtitle,
-                depthMeters: operational.depthMeters,
-                dismissSafe: dismissSafe
-            )
-        }()
-
-        let planPresentation = importedPlan.readyPresentation
-
-        return ApneaWatchPresentationInput(
-            isSessionStarted: exploration.apneaState != .idle,
-            showSessionSummary: showSessionSummary,
-            currentDepthMeters: dive.currentDepthMeters,
-            maxDepthMeters: dive.maxDepthMeters,
-            temperatureCelsius: dive.currentTemperatureCelsius,
-            diveElapsedSeconds: exploration.currentApneaSeconds,
-            diveCount: diveCount,
-            verticalSpeedMetersPerSecond: dive.ascentStatus.currentRateMetersPerMinute / 60,
-            targetDepthMeters: planPresentation.targetDepthMeters,
-            recoveryPolicyLabel: planPresentation.recoveryPolicyLabel,
-            activeAlarmCount: planPresentation.enabledAlarmLabels.count,
-            configuredAlarmLabels: planPresentation.enabledAlarmLabels,
-            buddyReminderEnabled: true,
-            sensorDegraded: dive.isDepthDataStale,
-            hapticsEnabled: hapticsEnabled,
-            missionModeEnabled: planPresentation.missionModeEnabled || dive.isMissionModeActive,
-            surfaceElapsedSeconds: surfaceElapsed,
-            lastDiveDurationSeconds: lastDive?.durationSeconds ?? 0,
-            lastDiveMaxDepthMeters: lastDive?.maxDepthMeters ?? 0,
-            requiredRecoverySeconds: requiredRecovery,
-            recoveryElapsedSeconds: recoveryElapsed,
-            recoveryRemainingSeconds: recoveryRemaining,
-            recoveryInsufficient: exploration.apneaState == .warning && recoveryRemaining > 0,
-            sessionTotalSeconds: sessionTotal,
-            totalUnderwaterSeconds: totalUnderwater,
-            sessionMaxDepthMeters: sessionMax,
-            bestDiveDurationSeconds: bestTime,
-            averageDiveDurationSeconds: average,
-            sessionWarnings: exploration.apneaWarning.map { [$0] } ?? [],
-            dataQualityDegraded: dive.isDepthDataStale,
-            activeOverlay: overlay
-        )
-    }
+    private var input: ApneaWatchPresentationInput { runtime.presentationInput }
 
     private var ui: ApneaWatchPresentationOutput {
         ApneaWatchPresentation.make(input)
@@ -106,24 +39,34 @@ struct ApneaView: View {
             }
         }
         .dynamicTypeSize(.xSmall ... .accessibility2)
+        .onAppear {
+            runtime.configureRuntimePreferences(
+                hapticsEnabled: hapticsEnabled,
+                missionModeEnabled: importedPlan.readyPresentation.missionModeEnabled
+            )
+            watchSync.isApneaSessionInProgress = runtime.isSessionActive
+        }
+        .onChange(of: hapticsEnabled) { _, enabled in
+            runtime.configureRuntimePreferences(
+                hapticsEnabled: enabled,
+                missionModeEnabled: importedPlan.readyPresentation.missionModeEnabled
+            )
+        }
+        .onChange(of: runtime.isSessionActive) { _, active in
+            watchSync.isApneaSessionInProgress = active
+            if !active {
+                importedPlan.activatePendingIfNeeded(sessionInProgress: false)
+            }
+        }
         .onChange(of: ui.recoveryCompleteHapticEligible) { _, eligible in
             guard eligible, !recoveryCompleteHapticFired else { return }
             recoveryCompleteHapticFired = true
             HapticService.shared.confirm()
         }
-        .onChange(of: exploration.apneaState) { _, state in
-            watchSync.isApneaSessionInProgress = state != .idle
-            if state == .idle {
-                importedPlan.activatePendingIfNeeded(sessionInProgress: false)
-            }
-        }
         .onChange(of: ui.recoveryState) { _, state in
             if state != .completed {
                 recoveryCompleteHapticFired = false
             }
-        }
-        .onAppear {
-            watchSync.isApneaSessionInProgress = exploration.apneaState != .idle
         }
     }
 
@@ -193,9 +136,15 @@ struct ApneaView: View {
                 metricRow(label: String(localized: "apnea.ready.sensor"), value: ui.sensorLabel, valueColor: input.sensorDegraded ? DiveUI.red : DiveUI.green)
                 metricRow(label: String(localized: "apnea.ready.buddy"), value: input.buddyReminderEnabled ? String(localized: "apnea.buddy.on") : String(localized: "apnea.buddy.off"), valueColor: DiveUI.yellow)
 
+                if input.sensorDegraded {
+                    DiveCommandButton(String(localized: "apnea.manual.fallback"), systemImage: "hand.tap.fill", color: DiveUI.yellow) {
+                        runtime.startManualFallback()
+                    }
+                }
+
                 DiveCommandButton(String(localized: "apnea.ready.start"), systemImage: "play.fill", color: ui.startEnabled ? DiveUI.green : DiveUI.red) {
                     if ui.startEnabled {
-                        exploration.startApneaSession()
+                        runtime.armSession()
                     }
                 }
                 .disabled(!ui.startEnabled)
@@ -270,9 +219,9 @@ struct ApneaView: View {
                     .accessibilityLabel(String(localized: "apnea.surface.a11y.recovery_state"))
                     .accessibilityValue(ui.recoveryStateText)
 
-                if exploration.apneaState != .idle {
+                if runtime.isSessionActive {
                     DiveCommandButton(String(localized: "apnea.summary.open"), systemImage: "list.bullet", color: DiveUI.blue) {
-                        showSessionSummary = true
+                        runtime.requestSessionSummary()
                     }
                 }
             }
@@ -306,8 +255,8 @@ struct ApneaView: View {
                     saveCurrentSessionToLogbook()
                 }
                 DiveCommandButton(String(localized: "apnea.summary.return"), systemImage: "arrow.uturn.backward", color: .white.opacity(0.78)) {
-                    showSessionSummary = false
-                    exploration.apneaState = .idle
+                    runtime.showSessionSummary = false
+                    runtime.endSession()
                 }
             }
         }
@@ -338,21 +287,8 @@ struct ApneaView: View {
     }
 
     private func saveCurrentSessionToLogbook() {
-        let snapshot = ApneaExplorationSessionSnapshot(
-            dives: exploration.apneaDives.map {
-                ApneaLegacyDiveSnapshot(
-                    id: $0.id,
-                    durationSeconds: $0.durationSeconds,
-                    maxDepthMeters: $0.maxDepthMeters,
-                    recoverySeconds: $0.recoverySeconds
-                )
-            },
-            dataQualityDegraded: dive.isDepthDataStale,
-            sessionWarnings: exploration.apneaWarning == nil ? [] : [.incompleteRecovery]
-        )
-        apneaLogbook.add(ApneaExplorationSessionBridge.makeCompletedSession(from: snapshot))
-        exploration.apneaState = .ended
-        showSessionSummary = false
+        runtime.saveCompletedSession(to: apneaLogbook)
+        runtime.resetAfterSave()
         savedConfirmationVisible = true
         HapticService.shared.confirm()
     }
@@ -379,9 +315,7 @@ struct ApneaView: View {
 
                 if overlay.dismissSafe {
                     DiveCommandButton(String(localized: "apnea.overlay.dismiss"), systemImage: "xmark", color: .white.opacity(0.78)) {
-                        if let eventID = dive.apneaOperationalOverlay?.eventID {
-                            dismissedOverlayEventIDs.insert(eventID)
-                        }
+                        runtime.dismissOperationalOverlay(eventID: runtime.operationalOverlay?.eventID ?? UUID())
                     }
                     .accessibilityHint(String(localized: "apnea.overlay.a11y.dismiss_hint"))
                 }
@@ -449,9 +383,20 @@ struct ApneaView: View {
                     }
                 }
 
-                if exploration.apneaState != .idle && exploration.apneaState != .dive {
+                if runtime.isSessionActive && ui.stage != .dive {
                     DiveCommandButton(String(localized: "apnea.summary.open"), systemImage: "list.bullet", color: DiveUI.blue) {
-                        showSessionSummary = true
+                        runtime.requestSessionSummary()
+                    }
+                }
+
+                if runtime.lifecyclePhase == .sensorDegraded || input.sensorDegraded {
+                    HStack(spacing: 6) {
+                        DiveCommandButton(String(localized: "apnea.manual.descent"), systemImage: "arrow.down", color: DiveUI.cyan) {
+                            runtime.triggerManualDescent()
+                        }
+                        DiveCommandButton(String(localized: "apnea.manual.surface"), systemImage: "arrow.up", color: DiveUI.yellow) {
+                            runtime.triggerManualSurface()
+                        }
                     }
                 }
             }
@@ -465,7 +410,7 @@ struct ApneaView: View {
                     .accessibilityLabel(String(localized: "a11y.watch.haptics_off_badge.label"))
                     .accessibilityHint(String(localized: "a11y.watch.haptics_off_badge.hint"))
             }
-            badge(systemImage: "bolt.fill", text: ui.missionLabel, color: dive.isMissionModeActive ? DiveUI.cyan : DiveUI.secondaryText)
+            badge(systemImage: "bolt.fill", text: ui.missionLabel, color: input.missionModeEnabled ? DiveUI.cyan : DiveUI.secondaryText)
             Spacer(minLength: 0)
         }
     }

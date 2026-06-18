@@ -196,6 +196,94 @@ final class ApneaOperationalEventEngineTests: XCTestCase {
         XCTAssertEqual(replay(), replay())
     }
 
+    func testTargetNotReachedDoesNotEmitTargetEvent() {
+        var state = ApneaOperationalEventState.initial
+        let target = ApneaTarget(kind: .depth, label: "Target 25", targetDepthMeters: 25, direction: .descending)
+        let profile = [0.0, 6, 11, 16, 21, 24, 23, 18, 10, 0]
+        var previous: Double? = nil
+        var targetEvents = 0
+        for (index, depth) in profile.enumerated() {
+            let output = ApneaOperationalEventEngine.evaluate(
+                previousDepthMeters: previous,
+                currentDepthMeters: depth,
+                verticalSpeedMetersPerSecond: (previous.map { depth - $0 } ?? 0),
+                alarms: [],
+                targets: [target],
+                markers: [],
+                state: &state,
+                context: context(at: Double(index), diveElapsed: Double(index) * 4)
+            )
+            targetEvents += output.events.filter { $0.kind == .targetReached }.count
+            previous = depth
+        }
+        XCTAssertEqual(targetEvents, 0)
+    }
+
+    func testRejectedDepthSpikeCannotTriggerTargetEvent() {
+        var state = ApneaOperationalEventState.initial
+        let target = ApneaTarget(kind: .depth, label: "Target 20", targetDepthMeters: 20, direction: .descending)
+
+        let output = ApneaOperationalEventEngine.evaluate(
+            previousDepthMeters: 5,
+            currentDepthMeters: 22,
+            verticalSpeedMetersPerSecond: -2.5,
+            alarms: [],
+            targets: [target],
+            markers: [],
+            state: &state,
+            context: context(at: 8)
+        )
+
+        XCTAssertTrue(output.events.filter { $0.kind == .targetReached }.isEmpty)
+    }
+
+    func testTargetDisabledDoesNotEmitTargetEvent() {
+        var state = ApneaOperationalEventState.initial
+        let target = ApneaTarget(kind: .depth, label: "Target 20", targetDepthMeters: 20, direction: .descending, isEnabled: false)
+
+        let output = ApneaOperationalEventEngine.evaluate(
+            previousDepthMeters: 18,
+            currentDepthMeters: 21,
+            verticalSpeedMetersPerSecond: 1.2,
+            alarms: [],
+            targets: [target],
+            markers: [],
+            state: &state,
+            context: context(at: 3)
+        )
+
+        XCTAssertTrue(output.events.filter { $0.kind == .targetReached }.isEmpty)
+    }
+
+    func testTargetOscillationBelowThresholdDoesNotRefire() {
+        var state = ApneaOperationalEventState.initial
+        let target = ApneaTarget(kind: .depth, label: "Target 20", targetDepthMeters: 20, direction: .descending, hysteresisMeters: 0.5)
+
+        _ = ApneaOperationalEventEngine.evaluate(
+            previousDepthMeters: 18,
+            currentDepthMeters: 20.2,
+            verticalSpeedMetersPerSecond: 1.0,
+            alarms: [],
+            targets: [target],
+            markers: [],
+            state: &state,
+            context: context(at: 1)
+        )
+
+        let oscillation = ApneaOperationalEventEngine.evaluate(
+            previousDepthMeters: 19.9,
+            currentDepthMeters: 20.1,
+            verticalSpeedMetersPerSecond: 0.2,
+            alarms: [],
+            targets: [target],
+            markers: [],
+            state: &state,
+            context: context(at: 2)
+        )
+
+        XCTAssertEqual(oscillation.events.filter { $0.kind == .targetReached }.count, 0)
+    }
+
     private func context(
         at monotonic: TimeInterval,
         diveElapsed: TimeInterval = 20,
