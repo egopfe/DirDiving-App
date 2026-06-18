@@ -1,11 +1,24 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-18  
-**Branch consigliato:** `main` = `origin/main` @ **`f38dbd4`**
+**Branch consigliato:** `main` = `origin/main` (post Audit 09 remediation V1.0)
 
 ---
 
-## Aggiornamento indice 2026-06-18 — Audit 09 Snorkeling domain / ingestion / lifecycle
+## Aggiornamento indice 2026-06-18 — Audit 09 remediation Snorkeling (V1.0)
+
+Remediation Commands 01–03 a **100% internal foundation readiness**; gate Command 04 **READY**.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit baseline** | `f38dbd4` |
+| **Remediation** | [`SNORKELING_DOMAIN_INGESTION_LIFECYCLE_REMEDIATION_REPORT_V1.0.md`](SNORKELING_DOMAIN_INGESTION_LIFECYCLE_REMEDIATION_REPORT_V1.0.md) |
+| **Contracts** | [`SNORKELING_NAVIGATION_RETURN_ENGINE_CONTRACT.md`](SNORKELING_NAVIGATION_RETURN_ENGINE_CONTRACT.md), [`SNORKELING_PERSISTENCE_RECOVERY_CONTRACT.md`](SNORKELING_PERSISTENCE_RECOVERY_CONTRACT.md) |
+| **Focused tests** | 85 Snorkeling tests **PASS** (iOS Algorithm Tests) |
+| **Gate** | `SNORKELING_FOUNDATIONS_INTERNAL_GO`, `READY_FOR_SNORKELING_COMMAND_04` |
+| **Production** | **NO-GO** |
+
+---
 
 Audit read-only post-Commands 01–03; gate Command 04 **PASS WITH CONDITIONS**.
 
