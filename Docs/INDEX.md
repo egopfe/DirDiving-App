@@ -1,7 +1,71 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-18  
-**Branch consigliato:** `main` = `origin/main` (post Audit 09 remediation V1.0)
+**Branch consigliato:** `main` = `origin/main`
+
+---
+
+## Aggiornamento indice 2026-06-18 — Audit 10 Snorkeling nav/UI/persistence (Commands 04–07)
+
+Audit indipendente read-only post-Commands 04–07.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit** | [`AUDIT_SNORKELING_NAV_UI_PERSISTENCE_CURRENT.md`](AUDIT_SNORKELING_NAV_UI_PERSISTENCE_CURRENT.md) |
+| **Scope** | Navigation, return, alarms, markers, Watch UI, persistence, logbook |
+| **Tests 04–07** | 76/76 PASS (simulator) |
+| **Tests Snorkeling focused** | 150/150 PASS |
+| **Verdict** | **PASS WITH CONDITIONS** (P1: 11 localization keys missing) |
+| **Gate** | `READY_FOR_SNORKELING_COMMAND_08_WITH_CONDITIONS` |
+
+---
+
+## Aggiornamento indice 2026-06-18 — Snorkeling persistence/recovery/logbook (Command 07)
+
+Checkpoint atomico SHA-256, recovery con quarantena, logbook Watch dedicato.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `07_SNORKELING_PERSISTENCE_RECOVERY_AND_WATCH_LOGBOOK.md` |
+| **Report** | [`DIR_DIVING_SNORKELING_PERSISTENCE_RECOVERY_LOGBOOK_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_PERSISTENCE_RECOVERY_LOGBOOK_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Contract** | [`SNORKELING_PERSISTENCE_RECOVERY_CONTRACT.md`](SNORKELING_PERSISTENCE_RECOVERY_CONTRACT.md) |
+| **Tests** | `SnorkelingPersistenceRecoveryTests` (11), `SnorkelingWatchRuntimeStorePersistenceTests` (2) |
+| **Gate** | `READY_FOR_SNORKELING_COMMAND_08` |
+
+---
+
+UI Watch promossa su MAIN: presentation mapper, runtime store, 8 schermate approvate.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `06_WATCH_SNORKELING_UI_ALL_STATES.md` |
+| **Report** | [`DIR_DIVING_SNORKELING_WATCH_UI_ALL_STATES_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_WATCH_UI_ALL_STATES_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Tests** | `SnorkelingWatchPresentationTests` (15), `SnorkelingWatchLayoutContractTests` (5), `SnorkelingWatchMainPromotionTests` (8) |
+| **Gate** | `READY_FOR_SNORKELING_COMMAND_07` |
+
+---
+
+Motore eventi operativo: allarmi, marker con qualità posizione, aptiche, Mission Mode presentation profile.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `05_SNORKELING_ALARMS_MARKERS_HAPTICS_MISSION_MODE.md` |
+| **Report** | [`DIR_DIVING_SNORKELING_ALARMS_MARKERS_HAPTICS_MISSION_MODE_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_ALARMS_MARKERS_HAPTICS_MISSION_MODE_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Tests** | `SnorkelingAlarmsMarkersHapticsMissionModeTests` (12) |
+| **Gate** | `READY_FOR_SNORKELING_COMMAND_06` |
+
+---
+
+## Aggiornamento indice 2026-06-18 — Snorkeling navigation/return engine (Command 04)
+
+Engine navigazione waypoint + return advisor su `Shared/`; UI non promossa.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `04_SNORKELING_NAVIGATION_AND_RETURN_ENGINE.md` |
+| **Report** | [`DIR_DIVING_SNORKELING_NAVIGATION_RETURN_ENGINE_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_NAVIGATION_RETURN_ENGINE_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Tests** | `SnorkelingNavigationReturnEngineTests` (18) |
+| **Watch MAIN** | **not promoted** |
 
 ---
 

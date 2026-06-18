@@ -25,7 +25,6 @@ targets:
           - SecureBuddyStore.swift
       - path: Views
         excludes:
-          - SnorkelingView.swift
           - BuddyAssistView.swift
           - ExperimentalConceptsView.swift
       - path: Utils
@@ -54,6 +53,8 @@ targets:
       - Services/MockDepthSensorProvider.swift
       - Services/ApneaWatchRuntimeProviding.swift
       - Services/ApneaWatchRuntimeStore.swift
+      - Services/SnorkelingWatchRuntimeStore.swift
+      - Services/SnorkelingLogbookStore.swift
       - Models/DiveGPSConfirmation.swift
       - Services/AscentSafetyHapticCoordinator.swift
       - Services/GPSManager.swift
@@ -111,6 +112,7 @@ targets:
       - Models/DIRModesAndStartup.swift
       - Utils/MonotonicElapsedClock.swift
       - Utils/ApneaWatchPresentation.swift
+      - Utils/SnorkelingWatchPresentation.swift
       - path: Shared
       - path: iOSApp
         excludes:
@@ -165,6 +167,8 @@ targets:
       - Services/ApneaImportedPlanStore.swift
       - Services/ApneaWatchRuntimeProviding.swift
       - Services/ApneaWatchRuntimeStore.swift
+      - Services/SnorkelingWatchRuntimeStore.swift
+      - Services/SnorkelingLogbookStore.swift
       - Services/ApneaSyncWatchReceiver.swift
       - Services/ApneaSyncAckSigner.swift
       - Services/ApneaSessionSyncCodec.swift
@@ -176,6 +180,7 @@ targets:
       - Tests/WatchAlgorithmTests/DiveReminderEngineTests.swift
       - Tests/WatchAlgorithmTests/DiveReminderIntegrationTests.swift
       - Services/GPSManager.swift
+      - Services/CompassManager.swift
       - Services/HapticService.swift
       - Services/AscentSafetyHapticCoordinator.swift
       - Services/DepthLimitHapticCoordinator.swift
@@ -215,6 +220,7 @@ targets:
       - Utils/DiveSessionMerge.swift
       - Utils/MonotonicElapsedClock.swift
       - Utils/ApneaWatchPresentation.swift
+      - Utils/SnorkelingWatchPresentation.swift
       - Utils/GPSConfirmationPresentation.swift
       - Utils/DiveSessionPersistenceClass.swift
       - Utils/DiveAlgorithmSelfCheck.swift
@@ -430,9 +436,15 @@ targets:
       - Tests/WatchAlgorithmTests/SnorkelingDepthOnlyLifecycleTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingCheckpointFoundationTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingCommand04FoundationGateTests.swift
-      - Tests/WatchAlgorithmTests/SnorkelingWatchMainIsolationTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingWatchMainPromotionTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingWatchPresentationTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingWatchLayoutContractTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingPersistenceRecoveryTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingWatchRuntimeStorePersistenceTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingCrossDomainIsolationTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingBoundedDataTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingNavigationReturnEngineTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingAlarmsMarkersHapticsMissionModeTests.swift
       - Tests/WatchAlgorithmTests/ApneaLifecycleEngineTests.swift
       - Tests/WatchAlgorithmTests/ApneaOperationalEventEngineTests.swift
       - Tests/WatchAlgorithmTests/ApneaTimeRecoveryCheckpointEngineTests.swift

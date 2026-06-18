@@ -79,6 +79,7 @@ final class SnorkelingDomainModelTests: XCTestCase {
         let marker = SnorkelingMarker(
             category: .reef,
             monotonicRelativeTimestampSeconds: 0,
+            positionQuality: .measured,
             latitude: 120,
             longitude: 8
         )
