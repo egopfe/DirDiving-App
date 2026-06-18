@@ -174,6 +174,32 @@ Read-only audit su `main`: runtime Bühlmann Watch, solver prospettico, state ma
 
 ---
 
+## Aggiornamento indice 2026-06-18 — Snorkeling session lifecycle (Command 03)
+
+`SnorkelingSessionEngine` deterministico + state machine dip; separato da `ExplorationStore`.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `03_SNORKELING_SESSION_AND_DIP_LIFECYCLE_ENGINE.md` |
+| **Report** | [`DIR_DIVING_SNORKELING_SESSION_LIFECYCLE_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_SESSION_LIFECYCLE_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Tests** | `SnorkelingLifecycleEngineTests` (15) |
+| **MAIN promotion** | **not yet** |
+
+---
+
+## Aggiornamento indice 2026-06-18 — Snorkeling sensor/GPS ingestion (Command 02)
+
+Feed condivisi profondità + GPS su `Shared/Utils/Snorkeling*Feed`; UI non attivata.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `02_SNORKELING_SHARED_SENSOR_GPS_INGESTION.md` |
+| **Report** | [`DIR_DIVING_SNORKELING_SENSOR_GPS_INGESTION_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_SENSOR_GPS_INGESTION_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Tests** | `SnorkelingSensorGPSIngestionTests` (13) + isolation |
+| **MAIN promotion** | **not yet** |
+
+---
+
 ## Aggiornamento indice 2026-06-18 — Snorkeling domain models (Command 01)
 
 Dominio puro Snorkeling su `Shared/Models/Snorkeling*` + validator/migration; UI non attivata.

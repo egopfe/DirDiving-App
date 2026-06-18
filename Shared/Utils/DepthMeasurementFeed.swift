@@ -75,6 +75,14 @@ struct DepthMeasurementFeedConfiguration: Codable, Hashable, Sendable {
         regressiveTimestampToleranceSeconds: 0.001,
         staleSampleSeconds: 8
     )
+
+    static let snorkelingDefault = DepthMeasurementFeedConfiguration(
+        maximumPlausibleDepthMeters: 25,
+        maximumDescentRateMetersPerSecond: 2.5,
+        maximumAscentRateMetersPerSecond: 2.5,
+        regressiveTimestampToleranceSeconds: 0.001,
+        staleSampleSeconds: 10
+    )
 }
 
 struct DepthMeasurementFeedState: Codable, Hashable {
