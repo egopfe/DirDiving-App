@@ -26,6 +26,22 @@ enum WatchSyncAuth {
 
     private static let logger = Logger(subsystem: "com.egopfe.dirdiving.ios", category: "WatchSyncAuth")
 
+#if DEBUG
+    private static var testHook_localSecret: Data?
+    private static var testHook_peerSecret: Data?
+
+    static func installTestSecrets(local: Data, peer: Data) {
+        testHook_localSecret = local
+        testHook_peerSecret = peer
+        clearPeerSecretMismatch()
+    }
+
+    static func resetTestSecrets() {
+        testHook_localSecret = nil
+        testHook_peerSecret = nil
+    }
+#endif
+
     static func hasPeerSecret() -> Bool {
         loadPeerSecret() != nil
     }
@@ -145,6 +161,9 @@ enum WatchSyncAuth {
     }
 
     private static func loadOrCreateLocalSecret() -> Data? {
+#if DEBUG
+        if let testHook_localSecret { return testHook_localSecret }
+#endif
         if let existing = loadKeychain(account: keychainAccount, service: keychainService) {
             return existing
         }
@@ -163,6 +182,9 @@ enum WatchSyncAuth {
     }
 
     private static func loadPeerSecret() -> Data? {
+#if DEBUG
+        if let testHook_peerSecret { return testHook_peerSecret }
+#endif
         if let secret = loadKeychain(account: "\(keychainAccount)-peer", service: keychainService) {
             return secret
         }

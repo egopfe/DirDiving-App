@@ -105,6 +105,7 @@ struct ApneaSessionEngine {
         self.diveClock.restore(from: payload.diveClock)
         self.feedState = payload.feedState
         self.tracker = payload.tracker
+        self.tracker.lastMeasurementMonotonic = nil
         self.session = payload.session
         self.rawSamples = payload.rawSamples
         self.activeDiveAcceptedSamples = payload.acceptedSamples
@@ -112,7 +113,7 @@ struct ApneaSessionEngine {
         self.activeDiveStartedAtMonotonic = payload.currentDive?.startedAtMonotonicSeconds
         self.currentRecoveryInterval = payload.recoveryInterval
         self.lastDiveDurationSeconds = payload.currentDive?.durationSeconds ?? payload.session.dives.last?.durationSeconds ?? 0
-        self.manualFallbackActive = payload.lifecyclePhase == .sensorDegraded
+        self.manualFallbackActive = false
         self.sensorAvailable = payload.lifecyclePhase != .sensorDegraded
         self.sessionArmed = payload.lifecyclePhase != .idle
         self.pendingManualDescent = false
@@ -121,27 +122,34 @@ struct ApneaSessionEngine {
         self.snapshot = ApneaSessionEngineSnapshot(
             phase: payload.lifecyclePhase,
             session: payload.session,
-            currentDepthMeters: payload.feedState.lastAccepted?.depthMeters,
-            verticalSpeedMetersPerSecond: payload.feedState.lastAccepted?.verticalSpeedMetersPerSecond ?? 0,
+            currentDepthMeters: nil,
+            verticalSpeedMetersPerSecond: 0,
             diveElapsedSeconds: 0,
             surfaceElapsedSeconds: 0,
             sessionElapsedSeconds: 0,
             totalUnderwaterSeconds: payload.session.statistics.totalUnderwaterSeconds,
-            requiredRecoverySeconds: payload.recoveryInterval?.plannedSeconds ?? 0,
-            recoveryElapsedSeconds: payload.recoveryInterval?.completedSeconds ?? 0,
-            recoveryRemainingSeconds: payload.recoveryInterval.map { max(0, $0.plannedSeconds - ($0.completedSeconds ?? 0)) },
-            isRecoveryComplete: (payload.recoveryInterval?.plannedSeconds ?? 0) <= (payload.recoveryInterval?.completedSeconds ?? 0),
-            sensorHealth: payload.lifecyclePhase == .sensorDegraded ? .degraded : .available,
+            requiredRecoverySeconds: 0,
+            recoveryElapsedSeconds: 0,
+            recoveryRemainingSeconds: nil,
+            isRecoveryComplete: true,
+            sensorHealth: .available,
             rawSampleCount: payload.rawSamples.count,
-            acceptedSampleCount: payload.session.dives.reduce(0) { $0 + $1.samples.count } + payload.acceptedSamples.count,
+            acceptedSampleCount: 0,
             activeDiveSampleCount: payload.acceptedSamples.count
+        )
+        refreshSnapshot(
+            wallClock: payload.savedAtWallClock,
+            uptime: payload.sessionClock.anchorUptime ?? ProcessInfo.processInfo.systemUptime
         )
     }
 
-    mutating func armSession(at wallClock: Date = Date()) {
+    mutating func armSession(
+        at wallClock: Date = Date(),
+        uptime: TimeInterval = ProcessInfo.processInfo.systemUptime
+    ) {
         sessionArmed = true
-        runMachine(feedAccepted: false, acceptedDepth: nil, verticalSpeed: 0, wallClock: wallClock, tickOnly: true)
-        refreshSnapshot(wallClock: wallClock)
+        runMachine(feedAccepted: false, acceptedDepth: nil, verticalSpeed: 0, wallClock: wallClock, uptime: uptime, tickOnly: true)
+        refreshSnapshot(wallClock: wallClock, uptime: uptime)
     }
 
     mutating func endSession(at wallClock: Date = Date()) {
@@ -182,7 +190,27 @@ struct ApneaSessionEngine {
         pendingManualSurface = false
     }
 
-    mutating func exportCheckpoint(now wallClock: Date = Date()) throws -> ApneaSessionCheckpointEnvelope {
+    mutating func exportCheckpoint(
+        now wallClock: Date = Date(),
+        uptime: TimeInterval = ProcessInfo.processInfo.systemUptime
+    ) throws -> ApneaSessionCheckpointEnvelope {
+        let sessionMonotonic = sessionMonotonicElapsed(wallClock: wallClock, uptime: uptime)
+        let sessionClockSnapshot = MonotonicElapsedClock.Snapshot(
+            anchorDate: wallClock,
+            anchorUptime: uptime,
+            lastElapsed: sessionMonotonic
+        )
+        let diveElapsed = diveClock.elapsed(now: wallClock, uptime: uptime)
+        let diveClockSnapshot: MonotonicElapsedClock.Snapshot
+        if activeDiveStartedAtMonotonic != nil {
+            diveClockSnapshot = MonotonicElapsedClock.Snapshot(
+                anchorDate: wallClock,
+                anchorUptime: uptime,
+                lastElapsed: diveElapsed
+            )
+        } else {
+            diveClockSnapshot = diveClock.exportSnapshot()
+        }
         let payload = ApneaSessionCheckpointPayload(
             sessionID: session.id,
             sessionState: session.state,
@@ -191,7 +219,7 @@ struct ApneaSessionEngine {
             currentDive: activeDiveStartedAtMonotonic.map { start in
                 ApneaDive(
                     startedAtMonotonicSeconds: start,
-                    durationSeconds: diveClock.elapsed(now: wallClock),
+                    durationSeconds: diveElapsed,
                     samples: activeDiveAcceptedSamples,
                     events: activeDiveEvents,
                     recoveryBefore: currentRecoveryInterval
@@ -203,12 +231,12 @@ struct ApneaSessionEngine {
             recoveryInterval: currentRecoveryInterval,
             profileID: session.profile?.id,
             alarmState: .empty,
-            sessionClock: sessionClock.exportSnapshot(),
-            diveClock: diveClock.exportSnapshot(),
+            sessionClock: sessionClockSnapshot,
+            diveClock: diveClockSnapshot,
             tracker: tracker,
             feedState: feedState,
             savedAtWallClock: wallClock,
-            savedAtMonotonicSeconds: sessionMonotonicElapsed(wallClock: wallClock)
+            savedAtMonotonicSeconds: sessionMonotonic
         )
         return try ApneaSessionCheckpointIntegrity.makeEnvelope(payload: payload)
     }
@@ -220,7 +248,7 @@ struct ApneaSessionEngine {
         uptime: TimeInterval = ProcessInfo.processInfo.systemUptime
     ) -> DepthFeedIngestResult {
         let result = DepthMeasurementFeed.ingest(raw: raw, state: &feedState, configuration: feedConfiguration)
-        appendRawSample(from: result, wallClock: wallClock)
+        appendRawSample(from: result, wallClock: wallClock, uptime: uptime)
 
         if let accepted = result.accepted {
             sensorAvailable = true
@@ -231,7 +259,7 @@ struct ApneaSessionEngine {
                 wallClock: wallClock,
                 uptime: uptime
             )
-            appendAcceptedSample(from: accepted, wallClock: wallClock)
+            appendAcceptedSample(from: accepted, wallClock: wallClock, uptime: uptime)
         } else {
             runMachine(feedAccepted: false, acceptedDepth: nil, verticalSpeed: 0, wallClock: wallClock, uptime: uptime)
         }
@@ -285,10 +313,14 @@ struct ApneaSessionEngine {
         )
         let output = ApneaLifecycleStateMachine.evaluate(input: input, tracker: tracker)
         tracker = output.tracker
-        applyTransitionEvents(output.events, wallClock: wallClock)
+        applyTransitionEvents(output.events, wallClock: wallClock, uptime: uptime)
     }
 
-    private mutating func applyTransitionEvents(_ events: [ApneaLifecycleTransitionEvent], wallClock: Date) {
+    private mutating func applyTransitionEvents(
+        _ events: [ApneaLifecycleTransitionEvent],
+        wallClock: Date,
+        uptime: TimeInterval = ProcessInfo.processInfo.systemUptime
+    ) {
         for event in events {
             switch event {
             case .phaseChanged:
@@ -299,7 +331,7 @@ struct ApneaSessionEngine {
                     session.warnings.append(.incompleteRecovery)
                 }
                 activeDiveStartedAtMonotonic = atMonotonic
-                diveClock.reset(anchorDate: wallClock)
+                diveClock.reset(anchorDate: wallClock, uptime: uptime)
                 activeDiveAcceptedSamples = []
                 activeDiveEvents = [ApneaEvent(kind: .descentStart, monotonicRelativeTimestampSeconds: atMonotonic, wallClockTimestamp: wallClock)]
                 if session.state == .planned {
@@ -361,9 +393,14 @@ struct ApneaSessionEngine {
         diveClock.clear()
     }
 
-    private mutating func appendRawSample(from result: DepthFeedIngestResult, wallClock: Date) {
+    private mutating func appendRawSample(
+        from result: DepthFeedIngestResult,
+        wallClock: Date,
+        uptime: TimeInterval = ProcessInfo.processInfo.systemUptime
+    ) {
         let depth = result.raw.depthMeters ?? result.accepted?.depthMeters ?? 0
-        let monotonic = activeDiveStartedAtMonotonic.map { sessionMonotonicElapsed(wallClock: wallClock) - $0 } ?? sessionMonotonicElapsed(wallClock: wallClock)
+        let sessionElapsed = sessionMonotonicElapsed(wallClock: wallClock, uptime: uptime)
+        let monotonic = activeDiveStartedAtMonotonic.map { sessionElapsed - $0 } ?? sessionElapsed
         rawSamples.append(
             ApneaSample(
                 monotonicRelativeTimestampSeconds: max(0, monotonic),
@@ -376,9 +413,13 @@ struct ApneaSessionEngine {
         )
     }
 
-    private mutating func appendAcceptedSample(from accepted: DepthMeasurementAccepted, wallClock: Date) {
+    private mutating func appendAcceptedSample(
+        from accepted: DepthMeasurementAccepted,
+        wallClock: Date,
+        uptime: TimeInterval = ProcessInfo.processInfo.systemUptime
+    ) {
         guard activeDiveStartedAtMonotonic != nil else { return }
-        let diveElapsed = diveClock.elapsed(now: wallClock)
+        let diveElapsed = diveClock.elapsed(now: wallClock, uptime: uptime)
         activeDiveAcceptedSamples.append(
             ApneaSample(
                 monotonicRelativeTimestampSeconds: diveElapsed,
