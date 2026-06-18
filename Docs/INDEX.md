@@ -1,7 +1,7 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-18  
-**Branch consigliato:** `main` = `origin/main` @ **`7c8e8d3`**
+**Branch consigliato:** `main` = `origin/main` @ **`db06bcd`**
 
 ---
 
@@ -182,6 +182,7 @@ Dominio puro Snorkeling su `Shared/Models/Snorkeling*` + validator/migration; UI
 |-------|--------|
 | **Command** | `01_SNORKELING_DOMAIN_MODELS_AND_VERSIONED_SCHEMA.md` |
 | **Report** | [`DIR_DIVING_SNORKELING_DOMAIN_MODELS_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_DOMAIN_MODELS_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Commit** | **`db06bcd`** |
 | **Tests** | `SnorkelingDomainModelTests` (12) |
 | **MAIN promotion** | **not yet** — `SnorkelingView` excluded |
 
@@ -195,7 +196,7 @@ Remediation Audit 08: suspend/resume + monotonic clock fix, release-hard script 
 |-------|--------|
 | **Audit** | [`AUDIT_APNEA_RELEASE_GATE_CURRENT.md`](AUDIT_APNEA_RELEASE_GATE_CURRENT.md) |
 | **Remediation** | [`APNEA_RELEASE_GATE_REMEDIATION_REPORT_V1.0.md`](APNEA_RELEASE_GATE_REMEDIATION_REPORT_V1.0.md) |
-| **Baseline commit** | `51d3da0` (+ uncommitted Audit 08 fixes) |
+| **Baseline commit** | **`db06bcd`** |
 | **Internal gate** | **GO** (`validate_apnea_release_readiness.sh --internal`) |
 | **TestFlight / App Store** | **NO-GO** (physical QA PENDING) |
 
