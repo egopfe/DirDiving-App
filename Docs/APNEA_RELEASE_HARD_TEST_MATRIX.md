@@ -15,6 +15,7 @@
 | E-06 | Manual fallback | `testManualFallbackDescentDoesNotResetSessionState` | no silent session reset |
 | E-07 | Recovery policies | `testRecoveryPolicyModesComputeExpectedDurations` | 1:1, 2:1, fixed |
 | E-08 | Irregular wall clock | `testIrregularDeltaAdvancesSessionAndRecovery` | monotonic clock |
+| E-09 | Monotonic restore / wall jump | `ApneaMonotonicClockRestoreTests` | forward/backward wall; checkpoint elapsed |
 
 ## Alarms / markers / events
 
@@ -80,10 +81,12 @@ Executable Watch presentation fixtures: 5 lifecycle stages indexed in `ApneaMock
 
 | ID | Area | Automated test | Notes |
 |----|------|----------------|-------|
-| R-01 | Suspend/resume integration | `ApneaSuspendResumeLifecycleIntegrationTests` | checkpoint destroy/restore simulation |
+| R-01 | Suspend/resume integration | `ApneaSuspendResumeLifecycleIntegrationTests` | checkpoint destroy/restore; active dive preservation |
+| R-07 | Monotonic clock restore | `ApneaMonotonicClockRestoreTests` | wall jump; persisted elapsed |
+| R-08 | Pure sync crypto | `ApneaSyncCryptographicLogicTests` | HMAC/ACK without Keychain skip |
 | R-02 | Checkpoint failure injection | `ApneaCheckpointFailureInjectionTests` | checksum, truncate, corrupt JSON |
 | R-03 | Architecture isolation | `ApneaArchitectureIsolationTests` | no DiveManager/FC in engine sources |
-| R-04 | Command 04 gate | `ApneaCommand04PromotionGateTests` | READY_FOR_COMMAND_04; ApneaView excluded |
+| R-04 | Command 04 gate | `ApneaCommand04PromotionGateTests`, `ApneaWatchMainPromotionTests` | Apnea on Watch MAIN; `ApneaWatchRuntimeStore` |
 | R-05 | Release script static | `Scripts/test_validate_apnea_release_readiness_static.sh` | main canonical; no stale branch warning |
 | R-06 | Physical QA evidence | `Docs/QA_EVIDENCE/APNEA_*/README.md` | all PENDING until device evidence |
 
