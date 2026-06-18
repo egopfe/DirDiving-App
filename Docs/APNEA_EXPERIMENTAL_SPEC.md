@@ -1,8 +1,9 @@
-# DIR DIVING - Specifica Apnea
+# DIR DIVING - Specifica Apnea (integration `main`)
 
 **Aggiornato:** 2026-06-17  
 **Production:** `main` (Apnea merged)  
 **Experimental UI:** `codex/experimental-features` (legacy `ExplorationStore` prototype — see appendice)  
+**Branch:** `main`
 **Architettura:** [`APNEA_ARCHITECTURE.md`](APNEA_ARCHITECTURE.md)  
 **Release-hard:** [`DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md`](DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md)
 
@@ -49,7 +50,7 @@ Schermate allineate ai mockup `APNEA_IOS_01` … `15`: dashboard, profili, piani
 
 ## Appendice — storico branch `codex/experimental-features`
 
-Il contenuto seguente descrive il prototipo precedente basato su `ExplorationStore` (branch experimental legacy). Non riflette il runtime su `integration/full-computer`.
+Il contenuto seguente descrive il prototipo precedente basato su `ExplorationStore` (branch experimental legacy). Non riflette il runtime su `main`.
 
 ### Workflow legacy (ExplorationStore)
 

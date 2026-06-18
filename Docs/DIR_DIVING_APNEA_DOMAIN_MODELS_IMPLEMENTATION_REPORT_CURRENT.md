@@ -2,7 +2,7 @@
 
 **Command:** `01_APNEA_DOMAIN_MODELS_AND_SCHEMA.md`  
 **Date:** 2026-06-16  
-**Branch:** `integration/full-computer`  
+**Branch:** `main`  
 **Final result:** **PASS**
 
 ---

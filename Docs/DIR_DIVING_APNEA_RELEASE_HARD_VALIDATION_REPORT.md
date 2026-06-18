@@ -1,14 +1,14 @@
 # DIR Diving — Apnea release-hard validation (Command 12)
 
 **Date:** 2026-06-17  
-**Branch:** `integration/full-computer`  
+**Branch:** `main`  
 **Automation:** `./Scripts/validate_apnea_release_readiness.sh`
 
 ---
 
 ## Executive summary
 
-Command 12 adds release-hard automated validation, documented tolerances, a 23-mockup audit matrix, architecture/release documentation, and a repeatable readiness script for the Apnea integration on `integration/full-computer`.
+Command 12 adds release-hard automated validation, documented tolerances, a 23-mockup audit matrix, architecture/release documentation, and a repeatable readiness script for the Apnea integration on `main`.
 
 **This report does not certify the product for freediving.** Apnea remains an experimental training/logbook companion. Physical validation (depth sensor, Water Lock, gloves, open water) and any regulatory certification are **out of scope** for this command.
 
@@ -117,7 +117,7 @@ All external mockup files are indexed in `Utils/ApneaMockupReferenceMatrix.swift
 
 ## Rollback
 
-Revert to `main` or abandon `integration/full-computer` merge. Apnea sync uses dedicated keys (`apneaSyncPlanPackage`, `dirdiving_apnea_session`) and does not alter Gauge/Full Computer dive sync behaviour.
+Revert to `main` or abandon `main` merge. Apnea sync uses dedicated keys (`apneaSyncPlanPackage`, `dirdiving_apnea_session`) and does not alter Gauge/Full Computer dive sync behaviour.
 
 ---
 
