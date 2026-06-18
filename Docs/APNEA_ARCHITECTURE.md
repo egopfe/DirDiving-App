@@ -61,7 +61,19 @@ Namespaces are isolated by automated self-check (`ApneaReleaseSelfCheck`).
 
 ## Watch target note
 
-`Views/ApneaView.swift` remains **excluded** from the MAIN Watch app target in `project.yml` until Command 04 promotion review. Engine, presentation helpers, and tests compile on `main`; UI promotion is a separate step (gate: **READY_FOR_COMMAND_04**).
+`Views/ApneaView.swift` is **included** on Watch MAIN (`project.yml`) with `ApneaWatchRuntimeStore` runtime isolation (Audit 06 remediation, commit `2309320`). Apnea UI does not reference `DiveManager`.
+
+## Sync negative paths (Audit 07 remediation)
+
+| Area | Test suites |
+|------|-------------|
+| Plan future schema / corrupt packages | `ApneaSyncCodecNegativePathTests`, `ApneaPlanPackageWatchNegativeTests` |
+| Session unsupported version / replay | `ApneaSessionSyncTransportNegativeTests`, `ApneaSessionSyncTransportNegativeWatchTests` |
+| Signed ACK negative paths | `ApneaSyncAckNegativeTests` |
+| Offline → online automation | `ApneaOfflineOnlineEndToEndIntegrationTests` (iOS + Watch) |
+| Cloud backup stub | Opt-in only; `ApneaCloudBackupStubTruthfulnessTests` |
+
+Physical device sync QA remains **PENDING** — evidence folders under `Docs/QA_EVIDENCE/APNEA_*`.
 
 ## Related documents
 

@@ -187,5 +187,7 @@ final class IOSApneaWatchTransferService: ObservableObject {
         lastSuccessfulSyncAt = nil
         lastErrorMessage = nil
     }
+
+    func testing_pendingQueueCount() -> Int { pendingQueue.count }
     #endif
 }
