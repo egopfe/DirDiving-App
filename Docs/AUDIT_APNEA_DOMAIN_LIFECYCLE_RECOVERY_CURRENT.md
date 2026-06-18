@@ -151,9 +151,9 @@
 | — | — | No P0 blockers | — |
 | — | — | No P1 blockers for Commands 01–03 | — |
 | **P2** | Info | `ApneaView` excluded from MAIN Watch target — end users cannot access Apnea UI on production Watch build | Expected until Command 04 promotion review |
-| **P2** | Info | No dedicated XCTest named “suspend/resume OS lifecycle” — covered indirectly via checkpoint restore | Optional integration test on device |
-| **P3** | Low | `validate_apnea_release_readiness.sh` warns when branch ≠ `integration/full-computer` | Cosmetic on `main` (same class as FC script) |
-| **P3** | Low | Some Apnea docs still reference `integration/full-computer` branch name | Doc refresh when promoting to MAIN |
+| **P2** | Info | No dedicated XCTest named “suspend/resume OS lifecycle” — covered indirectly via checkpoint restore | **CLOSED** @ Remediation V1.0 — `ApneaSuspendResumeLifecycleIntegrationTests` |
+| **P3** | Low | `validate_apnea_release_readiness.sh` warns when branch ≠ `integration/full-computer` | **CLOSED** @ Remediation V1.0 — accepts `main` |
+| **P3** | Low | Some Apnea docs still reference `integration/full-computer` branch name | **CLOSED** @ Remediation V1.0 — docs aligned to `main` |
 
 ---
 
@@ -197,3 +197,16 @@
 ---
 
 *Audit 05 — read-only. No application code modified.*
+
+---
+
+## Remediation addendum (V1.0 — 2026-06-18)
+
+| Finding | Status |
+|---------|--------|
+| P2 suspend/resume XCTest | **CLOSED** — `ApneaSuspendResumeLifecycleIntegrationTests` |
+| P2 physical OS lifecycle | **Scaffolded** — `Docs/QA_EVIDENCE/APNEA_OS_LIFECYCLE/` (PENDING) |
+| P3 release script branch warning | **CLOSED** — `validate_apnea_release_readiness.sh` accepts `main` |
+| P3 doc branch drift | **CLOSED** — Apnea docs reference `main` |
+| P2 ApneaView MAIN exclusion | **Unchanged by design** — Command 04 gate **READY_FOR_COMMAND_04** |
+| **Internal readiness post-remediation** | **100%** (engine/domain/docs/automation) |

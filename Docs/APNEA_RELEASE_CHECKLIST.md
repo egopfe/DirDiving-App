@@ -1,6 +1,6 @@
 # Apnea release checklist
 
-**Branch:** `integration/full-computer`  
+**Branch:** `main`  
 **Automation:** `./Scripts/validate_apnea_release_readiness.sh`
 
 ## Pre-merge (integration branch)
@@ -28,7 +28,7 @@
 ## Rollback
 
 1. Stay on `main` (Apnea sources not in MAIN target).
-2. Or revert `integration/full-computer` merge commit.
+2. Or revert `main` merge commit.
 3. Apnea sync keys are namespaced — rollback does not affect Gauge/FC dive sync.
 
 ## Explicit non-goals

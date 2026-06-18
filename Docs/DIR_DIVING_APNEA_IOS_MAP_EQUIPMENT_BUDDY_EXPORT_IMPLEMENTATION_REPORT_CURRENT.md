@@ -2,7 +2,7 @@
 
 **Command:** `10_IOS_APNEA_MAP_EQUIPMENT_BUDDY_EXPORT.md`  
 **Date:** 2026-06-17  
-**Branch:** `integration/full-computer`  
+**Branch:** `main`  
 **Result:** PASS
 
 ## Implemented

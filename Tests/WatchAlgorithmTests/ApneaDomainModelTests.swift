@@ -171,6 +171,33 @@ final class ApneaDomainModelTests: XCTestCase {
         XCTAssertEqual(metrics.averageDepthMeters, 8.75, accuracy: 0.001)
     }
 
+    func testNegativeDepthRejectedByDepthFeed() {
+        var state = DepthMeasurementFeedState.initial
+        let t0 = Date(timeIntervalSince1970: 1_700_000_000)
+        _ = DepthMeasurementFeed.ingest(
+            raw: DepthMeasurementRaw(depthMeters: 0, sensorTimestamp: t0, receivedAt: t0),
+            state: &state
+        )
+        let negative = DepthMeasurementFeed.ingest(
+            raw: DepthMeasurementRaw(depthMeters: -1, sensorTimestamp: t0.addingTimeInterval(1), receivedAt: t0.addingTimeInterval(1)),
+            state: &state
+        )
+        XCTAssertEqual(negative.quality, .outOfRange)
+    }
+
+    func testMigrationPreservesSessionID() throws {
+        let session = makeSampleSession()
+        let sessionID = session.id
+        var legacy = session
+        legacy.schemaVersion = 0
+        let data = try JSONEncoder().encode(legacy)
+        var object = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        object.removeValue(forKey: "schemaVersion")
+        let stripped = try JSONSerialization.data(withJSONObject: object)
+        let decoded = try JSONDecoder().decode(ApneaSession.self, from: stripped)
+        XCTAssertEqual(decoded.id, sessionID)
+    }
+
     // MARK: - Fixtures
 
     private func makeDecoder() -> JSONDecoder {

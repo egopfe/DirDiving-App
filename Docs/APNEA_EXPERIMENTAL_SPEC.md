@@ -1,13 +1,13 @@
-# DIR DIVING - Specifica Apnea (integration `integration/full-computer`)
+# DIR DIVING - Specifica Apnea (integration `main`)
 
 **Aggiornato:** 2026-06-17  
-**Branch:** `integration/full-computer` (non `main`)  
+**Branch:** `main`  
 **Architettura:** [`APNEA_ARCHITECTURE.md`](APNEA_ARCHITECTURE.md)  
 **Release-hard:** [`DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md`](DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md)
 
 ## Stato attuale
 
-Apnea su `integration/full-computer` usa modelli condivisi (`Shared/Models/Apnea*`), motore lifecycle (`ApneaSessionEngine`), companion iOS (`iOSApp/Views/Apnea/`) e sync WatchConnectivity dedicato (`apneaSyncPlanPackage`, `dirdiving_apnea_session`).
+Apnea su `main` usa modelli condivisi (`Shared/Models/Apnea*`), motore lifecycle (`ApneaSessionEngine`), companion iOS (`iOSApp/Views/Apnea/`) e sync WatchConnectivity dedicato (`apneaSyncPlanPackage`, `dirdiving_apnea_session`).
 
 - **Watch UI** (`Views/ApneaView.swift`): implementata ma **esclusa** dal target MAIN Watch in `project.yml` fino a review di promozione.
 - **Feature flag:** `ExperimentalFeatures.apneaIntegrationEnabled` (vedi `Utils/ExperimentalFeatures.swift`).
@@ -48,7 +48,7 @@ Schermate allineate ai mockup `APNEA_IOS_01` … `15`: dashboard, profili, piani
 
 ## Appendice — storico branch `codex/experimental-features`
 
-Il contenuto seguente descrive il prototipo precedente basato su `ExplorationStore` (branch experimental legacy). Non riflette il runtime su `integration/full-computer`.
+Il contenuto seguente descrive il prototipo precedente basato su `ExplorationStore` (branch experimental legacy). Non riflette il runtime su `main`.
 
 ### Workflow legacy (ExplorationStore)
 

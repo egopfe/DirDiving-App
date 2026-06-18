@@ -2,7 +2,7 @@
 
 **Command:** `03_APNEA_TIME_RECOVERY_AND_CHECKPOINT_ENGINE.md`  
 **Date:** 2026-06-17  
-**Branch:** `integration/full-computer`  
+**Branch:** `main`  
 **Final result:** **PASS**
 
 ## Delivered

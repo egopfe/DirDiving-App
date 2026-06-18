@@ -2,7 +2,7 @@
 
 **Command:** 11 — APNEA IOS/WATCH SYNC AND OFFLINE AUTONOMY  
 **Status:** Implemented  
-**Branch baseline:** `integration/full-computer`
+**Branch baseline:** `main`
 
 ## Summary
 
