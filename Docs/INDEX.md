@@ -1,7 +1,7 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-18  
-**Branch consigliato:** `main` = `origin/main` @ **(post-commit)**
+**Branch consigliato:** `main` = `origin/main` @ **`7c8e8d3`**
 
 ---
 
@@ -13,7 +13,8 @@ Gate finale indipendente post-Command 12: lifecycle, sync, UI, privacy, rollback
 |-------|--------|
 | **Comando** | `08_AUDIT_APNEA_RELEASE_GATE.md` |
 | **Report** | [`AUDIT_APNEA_RELEASE_GATE_CURRENT.md`](AUDIT_APNEA_RELEASE_GATE_CURRENT.md) |
-| **Baseline** | `main` @ **`cbc485e`** (+ remediation Audit 07 uncommitted al momento dell’audit) |
+| **Baseline** | `main` @ **`7c8e8d3`** |
+| **Commit remediation** | **`7c8e8d3`** |
 | **Readiness interna** | **96%** |
 | **Decisione** | **GO WITH CONDITIONS** (interno) — TestFlight/App Store **NO-GO** |
 | **P1** | `ApneaSuspendResumeLifecycleIntegrationTests` (2 fail release-hard); QA fisica PENDING |
@@ -28,6 +29,7 @@ Chiusura P3 Audit 07: negative-path sync, E2E harness, ACK tests, QA evidence sy
 |-------|--------|
 | **Audit** | [`AUDIT_APNEA_IOS_SYNC_END_TO_END_CURRENT.md`](AUDIT_APNEA_IOS_SYNC_END_TO_END_CURRENT.md) |
 | **Remediation** | [`APNEA_IOS_SYNC_END_TO_END_REMEDIATION_REPORT_V1.0.md`](APNEA_IOS_SYNC_END_TO_END_REMEDIATION_REPORT_V1.0.md) |
+| **Commit remediation** | **`7c8e8d3`** |
 | **Readiness interna** | **100%** (codice/test/docs) |
 | **Command 12 gate** | **READY_FOR_APNEA_COMMAND_12** (automazione; QA fisica PENDING) |
 
