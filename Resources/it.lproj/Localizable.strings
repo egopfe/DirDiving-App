@@ -593,7 +593,7 @@
 "startup.activity.apnea" = "APNEA";
 "startup.activity.snorkeling" = "SNORKELING";
 "startup.activity.diving.hint" = "Apre la selezione modalità Diving";
-"startup.activity.apnea.hint" = "Apnea non ancora disponibile in questa release";
+"startup.activity.apnea.hint" = "Sessioni apnea guidate dalla profondità con recovery";
 "startup.activity.snorkeling.hint" = "Snorkeling non ancora disponibile in questa release";
 "startup.activity.footer" = "Configurabile anche in Impostazioni. Non modificabile durante un'immersione attiva.";
 "startup.diving_mode.title" = "MODALITÀ DIVING";
@@ -1110,3 +1110,6 @@
 "apnea.alarms.sample.depth" = "Allarme profondita a 20 m";
 "apnea.logbook.saved" = "Sessione salvata";
 "apnea.logbook.saved.a11y" = "Sessione apnea salvata nel logbook";
+"apnea.manual.fallback" = "FALLBACK MANUALE";
+"apnea.manual.descent" = "DISCESA";
+"apnea.manual.surface" = "SUPERFICIE";

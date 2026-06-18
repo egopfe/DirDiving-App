@@ -91,7 +91,14 @@ enum DIRStartupSelectionPolicy {
         guard activity.isLaunchableOnWatchMAIN else {
             return .comingSoon(activity: activity)
         }
-        return .divingModeSelection(activity: .diving)
+        switch activity {
+        case .apnea:
+            return .ready(activity: .apnea, divingMode: .gauge)
+        case .diving:
+            return .divingModeSelection(activity: .diving)
+        case .snorkeling:
+            return .comingSoon(activity: activity)
+        }
     }
 
     static func nextStepAfterDivingModeSelection(

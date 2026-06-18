@@ -10,7 +10,6 @@ if [[ ! -f "$PROJECT_YML" ]]; then
 fi
 
 required_exclusions=(
-  "ApneaView.swift"
   "SnorkelingView.swift"
   "BuddyAssistView.swift"
   "ExperimentalConceptsView.swift"

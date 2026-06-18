@@ -1,1752 +1,502 @@
 import SwiftUI
 
 struct ApneaView: View {
-    @EnvironmentObject private var exploration: ExplorationStore
-    @EnvironmentObject private var dive: DiveManager
-    @EnvironmentObject private var compass: CompassManager
-    @StateObject private var watchSync = WatchSyncService.shared
-    @State private var screen: ApneaScreen = .menu
-    @State private var didNotifyRecoveryComplete = false
-    @AppStorage("dirdiving_apnea_surface_interval_seconds") private var surfaceIntervalSeconds: Double = 90
-    @AppStorage("dirdiving_apnea_max_depth_alarm_meters") private var maxDepthAlarmMeters: Double = 30
+    @EnvironmentObject private var runtime: ApneaWatchRuntimeStore
+    @EnvironmentObject private var apneaLogbook: ApneaLogbookStore
+    @EnvironmentObject private var watchSync: WatchSyncService
+    @ObservedObject private var importedPlan = ApneaImportedPlanStore.shared
+    @AppStorage(HapticService.hapticsEnabledKey) private var hapticsEnabled = true
+
+    @State private var recoveryCompleteHapticFired = false
+    @State private var savedConfirmationVisible = false
+
+    private var input: ApneaWatchPresentationInput { runtime.presentationInput }
+
+    private var ui: ApneaWatchPresentationOutput {
+        ApneaWatchPresentation.make(input)
+    }
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
-
+            DiveScreenBackground()
             ScrollView {
-                Group {
-                    switch screen {
-                    case .menu:
-                        menuScreen
-                    case .session:
-                        sessionTypeScreen
-                    case .activeSession:
-                        sessionScreen
-                    case .surfaceEnd:
-                        surfaceEndScreen
-                    case .depthProfile:
-                        apneaDepthProfileScreen
-                    case .details:
-                        apneaDetailsScreen
-                    case .saveConfirmation:
-                        apneaSaveConfirmationScreen
-                    case .summary:
-                        apneaSummaryScreen
-                    case .openWaterConfig:
-                        openWaterConfigScreen
-                    case .apneaAlarms:
-                        apneaAlarmsScreen
-                    case .countdown03:
-                        countdownScreen(current: .countdown03, header: "Pronto?", number: "03", message: "Respira e rilassati", next: .countdown02)
-                    case .countdown02:
-                        countdownScreen(current: .countdown02, header: "Inizio tra", number: "02", message: "Respira e rilassati", next: .countdown01)
-                    case .countdown01:
-                        countdownScreen(current: .countdown01, header: "VAI", number: "01", message: "Buona apnea!", next: .activeSession)
-                    case .tables:
-                        placeholderScreen(
-                            title: "Tabelle",
-                            subtitle: "Allenamento",
-                            systemImage: "tablecells",
-                            message: "Tabelle apnea in preparazione"
-                        )
-                    case .statistics:
-                        apneaStatisticsScreen
-                    case .logbook:
-                        apneaLogbookScreen
-                    }
+                VStack(spacing: 8) {
+                    header
+                    content
+                    footerBadges
                 }
                 .padding(.horizontal, DiveUI.screenPadding)
-                .padding(.vertical, 10)
+                .padding(.vertical, 9)
+            }
+            .scrollIndicators(.hidden)
+
+            if let overlay = ui.activeOverlay {
+                eventOverlay(overlay)
+            }
+
+            if savedConfirmationVisible {
+                savedConfirmationBanner
             }
         }
-        .onAppear { compass.start() }
-        .onDisappear { compass.stop() }
-        .onChange(of: dive.currentDepthMeters) { _, depth in
-            handleApneaDepthChange(depth)
+        .dynamicTypeSize(.xSmall ... .accessibility2)
+        .onAppear {
+            runtime.configureRuntimePreferences(
+                hapticsEnabled: hapticsEnabled,
+                missionModeEnabled: importedPlan.readyPresentation.missionModeEnabled
+            )
+            watchSync.isApneaSessionInProgress = runtime.isSessionActive
         }
-        .onChange(of: isApneaAscentAlarmVisible) { _, visible in
-            if visible { HapticService.shared.warnIfNeeded() }
+        .onChange(of: hapticsEnabled) { _, enabled in
+            runtime.configureRuntimePreferences(
+                hapticsEnabled: enabled,
+                missionModeEnabled: importedPlan.readyPresentation.missionModeEnabled
+            )
         }
-        .onChange(of: exploration.recoverySeconds) { _, seconds in
-            if seconds <= 0 && !didNotifyRecoveryComplete && !exploration.apneaDives.isEmpty {
-                didNotifyRecoveryComplete = true
-                HapticService.shared.confirm()
-            } else if seconds > 0 {
-                didNotifyRecoveryComplete = false
+        .onChange(of: runtime.isSessionActive) { _, active in
+            watchSync.isApneaSessionInProgress = active
+            if !active {
+                importedPlan.activatePendingIfNeeded(sessionInProgress: false)
             }
         }
-        .animation(.easeInOut(duration: 0.18), value: exploration.currentApneaSeconds)
-        .animation(.easeInOut(duration: 0.18), value: exploration.recoverySeconds)
+        .onChange(of: ui.recoveryCompleteHapticEligible) { _, eligible in
+            guard eligible, !recoveryCompleteHapticFired else { return }
+            recoveryCompleteHapticFired = true
+            HapticService.shared.confirm()
+        }
+        .onChange(of: ui.recoveryState) { _, state in
+            if state != .completed {
+                recoveryCompleteHapticFired = false
+            }
+        }
     }
 
-    private var menuScreen: some View {
-        VStack(spacing: 10) {
-            menuHeader
-            menuRow(
-                title: "Sessione",
-                subtitle: "Inizia una sessione",
-                systemImage: "clock",
-                destination: .session
-            )
-            menuRow(
-                title: "Tabelle",
-                subtitle: "Allenamento",
-                systemImage: "tablecells",
-                destination: .tables
-            )
-            menuRow(
-                title: "Statistiche",
-                subtitle: nil,
-                systemImage: "chart.bar.fill",
-                destination: .statistics
-            )
-            menuRow(
-                title: "Logbook",
-                subtitle: nil,
-                systemImage: "list.bullet.rectangle",
-                destination: .logbook
-            )
+    private var header: some View {
+        HStack {
+            Text("Apnea")
+                .font(DiveUI.Typography.brandTitle)
+                .foregroundStyle(DiveUI.cyan)
+            Spacer()
+            DiveClockText(size: 14)
         }
     }
 
     @ViewBuilder
-    private var sessionScreen: some View {
-        if isApneaAscentAlarmVisible {
-            apneaDepthStatusScreen(
-                icon: "arrow.up",
-                depthText: apneaDepthText,
-                timeText: apneaElapsedText(defaultText: "1:46"),
-                stateText: "Risalita troppo veloce",
-                heartRateText: "HR OFF",
-                accent: DiveUI.red,
-                isAlarm: true
-            )
-        } else if isApneaRecoveryVisible {
-            recoveryCountdownScreen
-        } else if isApneaSummaryVisible {
-            apneaSummaryScreen
-        } else if isApneaSurfaceEndVisible {
-            apneaDepthStatusScreen(
-                icon: "drop.fill",
-                depthText: apneaDepthText,
-                timeText: apneaElapsedText(defaultText: "1:55"),
-                stateText: "Superficie",
-                heartRateText: "HR OFF"
-            )
-        } else if isApneaAscentVisible {
-            apneaDepthStatusScreen(
-                icon: "arrow.up",
-                depthText: apneaDepthText,
-                timeText: apneaElapsedText(defaultText: "1:28"),
-                stateText: "Risalita",
-                heartRateText: "HR OFF"
-            )
-        } else if isApneaBottomVisible {
-            apneaDepthStatusScreen(
-                icon: "drop.fill",
-                depthText: apneaDepthText,
-                timeText: apneaElapsedText(defaultText: "1:02"),
-                stateText: "Fondo"
-            )
-        } else if isApneaDescentVisible {
-            apneaDepthStatusScreen(
-                icon: "arrow.down",
-                depthText: apneaDepthText,
-                timeText: apneaElapsedText(defaultText: "0:15"),
-                stateText: "Discesa"
-            )
-        } else {
-            apneaDepthStatusScreen(
-                icon: "drop.fill",
-                depthText: apneaDepthText,
-                timeText: "0:00",
-                stateText: "Tempo immersione"
-            )
+    private var content: some View {
+        switch ui.stage {
+        case .ready:
+            readyPanel
+        case .dive:
+            activeDivePanel(title: String(localized: "apnea.stage.dive"), ascentAccent: false)
+        case .ascent:
+            activeDivePanel(title: String(localized: "apnea.stage.ascent"), ascentAccent: true)
+        case .surfaceRecovery:
+            surfaceRecoveryPanel
+        case .sessionSummary:
+            sessionSummaryPanel
         }
     }
 
-    private var surfaceEndScreen: some View {
-        apneaDepthStatusScreen(
-            icon: "drop.fill",
-            depthText: apneaDepthText,
-            timeText: apneaElapsedText(defaultText: "1:55"),
-            stateText: "Superficie",
-            heartRateText: "HR OFF"
-        )
-        .contentShape(Rectangle())
-        .onTapGesture {
-            screen = .activeSession
-        }
-    }
-
-    private var recoveryCountdownScreen: some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .center, spacing: 8) {
-                Text("Recupero")
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundStyle(DiveUI.blue)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-
-                Spacer(minLength: 0)
-
-                // TODO: Wire to a shared watch clock if one is introduced.
-                Text("10:10")
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(.white)
-            }
-            .padding(.horizontal, 4)
-            .padding(.bottom, 46)
-
-            Text(recoveryCountdownText)
-                .font(.system(size: 74, weight: .regular, design: .rounded))
-                .monospacedDigit()
-                .foregroundStyle(.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
-
-            Text("Intervallo Superficie")
-                .font(.system(size: 16, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .padding(.top, 20)
-
-            Text("Rimani in superficie")
-                .font(.system(size: 16, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .padding(.top, 14)
-        }
-        .frame(maxWidth: .infinity, minHeight: 260)
-    }
-
-    private var apneaSummaryScreen: some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .center, spacing: 8) {
-                Text("Riepilogo")
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundStyle(DiveUI.blue)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-
-                Spacer(minLength: 0)
-
-                // TODO: Wire to a shared watch clock if one is introduced.
-                Text("10:25")
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(.white)
-            }
-            .padding(.horizontal, 4)
-            .padding(.bottom, 22)
-
-            VStack(spacing: 0) {
-                summaryRow("Tempo immersione", value: lastApneaDurationText, showsDivider: true)
-                summaryRow("Profondità massima", value: lastApneaMaxDepthText, showsDivider: true)
-                summaryRow("Profondità media", value: "TODO", showsDivider: true)
-                summaryRow("Temp. acqua", value: "TODO", showsDivider: false)
-            }
-            .padding(.bottom, 12)
-            apneaDataNotice("Campioni Apnea non sincronizzati: media e temperatura restano disabilitate.")
-                .padding(.bottom, 8)
-
-            HStack(spacing: 8) {
-                apneaActionButton("GRAFICO", icon: "chart.xyaxis.line", color: DiveUI.blue) { screen = .depthProfile }
-                apneaActionButton("MENU", icon: "list.bullet", color: DiveUI.secondaryText) { screen = .menu }
-            }
-        }
-        .frame(maxWidth: .infinity, minHeight: 260)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            screen = .depthProfile
-        }
-    }
-
-    private var apneaDepthProfileScreen: some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .center, spacing: 8) {
-                Text("Grafico")
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundStyle(DiveUI.blue)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-
-                Spacer(minLength: 0)
-
-                // TODO: Wire to a shared watch clock if one is introduced.
-                Text("10:25")
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(.white)
-            }
-            .padding(.horizontal, 4)
-            .padding(.bottom, 20)
-
-            HStack(alignment: .top, spacing: 8) {
-                VStack(alignment: .trailing, spacing: 0) {
-                    Text("0 m")
-                    Spacer()
-                    Text("11 m")
-                    Spacer()
-                    Text("22 m")
-                }
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-                .frame(width: 42, height: 132)
-
-                VStack(spacing: 5) {
-                    ZStack {
-                        Rectangle()
-                            .fill(DiveUI.panelFill.opacity(0.7))
-                        VStack(spacing: 0) {
-                            Rectangle().fill(DiveUI.hairline).frame(height: 1)
-                            Spacer()
-                            Rectangle().fill(DiveUI.hairline).frame(height: 1)
-                            Spacer()
-                            Rectangle().fill(DiveUI.hairline).frame(height: 1)
-                        }
-
-                        ApneaDepthProfileArea(points: placeholderProfilePoints)
-                            .fill(DiveUI.blue.opacity(0.22))
-                        ApneaDepthProfileLine(points: placeholderProfilePoints)
-                            .stroke(DiveUI.blue, style: StrokeStyle(lineWidth: 2.4, lineCap: .round, lineJoin: .round))
-                            .shadow(color: DiveUI.blue.opacity(0.5), radius: 4, x: 0, y: 0)
-                    }
-                    .frame(height: 132)
-
-                    HStack {
-                        Text("0:00")
-                        Spacer()
-                        Text("0:57")
-                        Spacer()
-                        Text(lastApneaDurationText)
-                    }
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .monospacedDigit()
-                }
-            }
-            .padding(.bottom, 12)
-            apneaDataNotice("PROFILO SCHEMATICO: non usa campioni profondità reali.")
-                .padding(.bottom, 8)
-
-            HStack(spacing: 8) {
-                apneaActionButton("DETTAGLI", icon: "info.circle", color: DiveUI.blue) { screen = .details }
-                apneaActionButton("MENU", icon: "list.bullet", color: DiveUI.secondaryText) { screen = .menu }
-            }
-        }
-        .frame(maxWidth: .infinity, minHeight: 260)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            screen = .details
-        }
-    }
-
-    private var apneaDetailsScreen: some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .center, spacing: 8) {
-                Text("Dettagli")
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundStyle(DiveUI.blue)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-
-                Spacer(minLength: 0)
-
-                // TODO: Wire to a shared watch clock if one is introduced.
-                Text("10:25")
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(.white)
-            }
-            .padding(.horizontal, 4)
-            .padding(.bottom, 22)
-
-            VStack(spacing: 0) {
-                summaryRow("Vel. discesa", value: "TODO", showsDivider: true)
-                summaryRow("Vel. risalita", value: "TODO", showsDivider: true)
-                summaryRow("FC media", value: "TODO", showsDivider: true)
-                summaryRow("FC max", value: "TODO", showsDivider: false)
-            }
-            .padding(.bottom, 12)
-            apneaDataNotice("Dettagli non disponibili senza samples Apnea, HR e aggregati validati.")
-                .padding(.bottom, 8)
-
-            HStack(spacing: 8) {
-                apneaActionButton("SALVA", icon: "checkmark.circle", color: DiveUI.green) { screen = .saveConfirmation }
-                apneaActionButton("GRAFICO", icon: "chart.xyaxis.line", color: DiveUI.blue) { screen = .depthProfile }
-            }
-        }
-        .frame(maxWidth: .infinity, minHeight: 260)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            screen = .saveConfirmation
-        }
-    }
-
-    private var apneaSaveConfirmationScreen: some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .center, spacing: 8) {
-                Text("Salva")
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundStyle(DiveUI.blue)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-
-                Spacer(minLength: 0)
-
-                // TODO: Wire to a shared watch clock if one is introduced.
-                Text("10:25")
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(.white)
-            }
-            .padding(.horizontal, 4)
-            .padding(.bottom, 42)
-
-            ZStack {
-                Circle()
-                    .stroke(DiveUI.green.opacity(0.95), lineWidth: 4)
-                    .shadow(color: DiveUI.green.opacity(0.55), radius: 6, x: 0, y: 0)
-                Image(systemName: "checkmark")
-                    .font(.system(size: 48, weight: .semibold))
-                    .foregroundStyle(DiveUI.green)
-            }
-            .frame(width: 104, height: 104)
-
-            Text("Sessione salvata")
-                .font(.system(size: 21, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .padding(.top, 24)
-
-            apneaSyncBoundaryPanel(
-                title: "WATCH -> IPHONE APNEA",
-                message: "Record salvato e payload experimental \(watchSync.experimentalLastKind). Stato: \(watchSync.experimentalDeliveryState). Coda: \(watchSync.experimentalQueueCount). Profilo campioni reale non disponibile.",
-                color: DiveUI.cyan
-            )
-            .padding(.top, 12)
-
-            HStack(spacing: 8) {
-                apneaActionButton("FINE", icon: "checkmark", color: DiveUI.green) { screen = .menu }
-                apneaActionButton("LOGBOOK", icon: "list.bullet.rectangle", color: DiveUI.blue) { screen = .logbook }
-            }
-            .padding(.top, 18)
-        }
-        .frame(maxWidth: .infinity, minHeight: 260)
-        .task {
-            HapticService.shared.confirm()
-        }
-    }
-
-    private var apneaLogbookScreen: some View {
-        VStack(spacing: 8) {
-            HStack(alignment: .center, spacing: 8) {
-                Text("Logbook")
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundStyle(DiveUI.blue)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-
-                Spacer(minLength: 0)
-
-                // TODO: Wire to a shared watch clock if one is introduced.
-                Text("10:25")
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(.white)
-            }
-            .padding(.horizontal, 4)
-            .padding(.bottom, 8)
-
-            Button {
-                screen = .summary
-            } label: {
-                apneaLogbookRow(
-                    dateText: "Oggi, 10:09",
-                    depthText: lastApneaMaxDepthText,
-                    durationText: lastApneaDurationText
-                )
-            }
-            .buttonStyle(.plain)
-
-            // TODO: Replace placeholder history rows with persisted Apnea logbook records when available.
-            Button {
-                screen = .summary
-            } label: {
-                apneaLogbookRow(dateText: "15 Mag, 09:12", depthText: "18.6 m", durationText: "1:42")
-            }
-            .buttonStyle(.plain)
-
-            Button {
-                screen = .summary
-            } label: {
-                apneaLogbookRow(dateText: "13 Mag, 08:42", depthText: "20.1 m", durationText: "2:01")
-            }
-            .buttonStyle(.plain)
-        }
-        .frame(maxWidth: .infinity, minHeight: 260)
-    }
-
-    private var apneaStatisticsScreen: some View {
-        VStack(spacing: 8) {
-            HStack(alignment: .center, spacing: 8) {
-                Text("Statistiche")
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundStyle(DiveUI.blue)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-
-                Spacer(minLength: 0)
-
-                // TODO: Wire to a shared watch clock if one is introduced.
-                Text("10:25")
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(.white)
-            }
-            .padding(.horizontal, 4)
-            .padding(.bottom, 8)
-
-            statisticsRow("Prof. max", value: statisticsMaxDepthText)
-            statisticsRow("Tempo tot.", value: "TODO")
-            statisticsRow("Immersioni", value: statisticsDiveCountText)
-            statisticsRow("Media prof.", value: "TODO")
-            apneaDataNotice("Statistiche parziali: serve storico Apnea completo.")
-        }
-        .frame(maxWidth: .infinity, minHeight: 260)
-    }
-
-    private func apneaDepthStatusScreen(
-        icon: String,
-        depthText: String,
-        timeText: String,
-        stateText: String,
-        heartRateText: String = "HR OFF",
-        accent: Color = DiveUI.blue,
-        isAlarm: Bool = false
-    ) -> some View {
-        VStack(spacing: 0) {
-            surfaceWaitingHeader
-                .padding(.bottom, 16)
-
-            VStack(spacing: 8) {
-                HStack(alignment: .top) {
-                    Image(systemName: icon)
-                        .font(.system(size: 24, weight: .semibold))
-                        .foregroundStyle(accent)
-                    Spacer(minLength: 0)
-                    VStack(alignment: .trailing, spacing: 2) {
-                        Text("TEMP --")
-                            .font(.system(size: 18, weight: .semibold, design: .rounded))
-                            .monospacedDigit()
-                            .foregroundStyle(.white)
-                    }
-                }
-
-                HStack(alignment: .lastTextBaseline, spacing: 5) {
-                    Text(depthText)
-                        .font(.system(size: 72, weight: .regular, design: .rounded))
-                        .monospacedDigit()
-                        .foregroundStyle(isAlarm ? accent : .white)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.72)
-                    Text(depthText == "--" ? "" : "m")
-                        .font(.system(size: 17, weight: .bold, design: .rounded))
-                        .foregroundStyle(accent)
-                }
-
-                Rectangle()
-                    .fill(DiveUI.hairline)
-                    .frame(height: 1)
-
-                Text(timeText)
-                    .font(.system(size: 34, weight: .regular, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-
-                Text(stateText)
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-
-                Rectangle()
-                    .fill(DiveUI.hairline)
-                    .frame(height: 1)
-                    .padding(.top, 2)
-
-                HStack {
-                    HStack(spacing: 7) {
-                        Image(systemName: "heart.fill")
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundStyle(DiveUI.red)
-                        Text(heartRateText)
-                            .font(.system(size: heartRateText == "HR OFF" ? 12 : 20, weight: .semibold, design: .rounded))
-                            .monospacedDigit()
-                            .foregroundStyle(heartRateText == "HR OFF" ? DiveUI.yellow : .white)
-                    }
-
-                    Spacer(minLength: 0)
-
-                    Text("BAT --")
-                        .font(.system(size: 12, weight: .black, design: .rounded))
-                        .foregroundStyle(DiveUI.yellow)
-                }
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.horizontal, 22)
-        }
-        .frame(maxWidth: .infinity, minHeight: 260)
-        .overlay(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(isAlarm ? accent.opacity(0.95) : .clear, lineWidth: 2)
-                .shadow(color: isAlarm ? accent.opacity(0.45) : .clear, radius: 5, x: 0, y: 0)
-        )
-    }
-
-    private var sessionTypeScreen: some View {
-        VStack(spacing: 10) {
-            sessionTypeHeader
-            sessionTypeRow(
-                title: "Acque Libere",
-                subtitle: "Profondità",
-                systemImage: "water.waves",
-                destination: .openWaterConfig,
-                isEnabled: true
-            )
-            sessionTypeRow(
-                title: "Dinamica",
-                subtitle: "Piscina",
-                systemImage: "figure.pool.swim",
-                destination: .activeSession,
-                isEnabled: false
-            )
-            sessionTypeRow(
-                title: "Statica",
-                subtitle: "Apnea Statica",
-                systemImage: "stopwatch",
-                destination: .activeSession,
-                isEnabled: false
-            )
-            sessionTypeRow(
-                title: "Personalizzata",
-                subtitle: "Configura",
-                systemImage: "gearshape",
-                destination: .activeSession,
-                isEnabled: false
-            )
-        }
-    }
-
-    private var openWaterConfigScreen: some View {
-        VStack(spacing: 10) {
-            configHeader("Acque Libere")
-
-            VStack(spacing: 0) {
-                Button {
-                    screen = .apneaAlarms
-                } label: {
-                    configRow(
-                        title: "Allarmi",
-                        value: "Configura",
-                        systemImage: "bell",
-                        showsDivider: true
-                    )
-                }
-                .buttonStyle(.plain)
-                apneaAdjustRow(
-                    title: "Intervallo Superficie",
-                    value: Formatters.time(surfaceIntervalSeconds),
-                    unit: "min",
-                    systemImage: "stopwatch",
-                    decrement: { surfaceIntervalSeconds = max(30, surfaceIntervalSeconds - 15) },
-                    increment: { surfaceIntervalSeconds = min(600, surfaceIntervalSeconds + 15) }
-                )
-                apneaAdjustRow(
-                    title: "Profondità Max Allarme",
-                    value: String(format: "%.1f", maxDepthAlarmMeters),
-                    unit: "m",
-                    systemImage: "timer",
-                    decrement: { maxDepthAlarmMeters = max(5, maxDepthAlarmMeters - 1) },
-                    increment: { maxDepthAlarmMeters = min(80, maxDepthAlarmMeters + 1) }
-                )
-            }
-
-            Button {
-                HapticService.shared.notify()
-                screen = .countdown03
-            } label: {
-                Text("INIZIA")
-                    .font(.system(size: 18, weight: .black, design: .rounded))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity, minHeight: 54)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(
-                                LinearGradient(
-                                    colors: [DiveUI.blue.opacity(0.95), DiveUI.blue.opacity(0.62)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                    )
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    private var apneaAlarmsScreen: some View {
-        VStack(spacing: 10) {
-            submenuHeader("Allarmi Apnea")
-            DivePanel(stroke: DiveUI.yellow) {
-                VStack(spacing: 8) {
-                    configRow(title: "Intervallo superficie", value: Formatters.time(surfaceIntervalSeconds), systemImage: "stopwatch", showsDivider: true)
-                    configRow(title: "Profondità max", value: String(format: "%.1f m", maxDepthAlarmMeters), systemImage: "water.waves", showsDivider: true)
-                    configRow(title: "Risalita veloce", value: "DiveManager", systemImage: "arrow.up", showsDivider: false)
-                    apneaSyncBoundaryPanel(
-                        title: "SETTINGS SYNC LAB",
-                        message: "Persistenza locale AppStorage attiva. iPhone -> Watch settings usa contratto experimental e resta in coda/ACK lab.",
-                        color: DiveUI.yellow
-                    )
-                }
-            }
-        }
-    }
-
-    private func countdownScreen(
-        current: ApneaScreen,
-        header: String,
-        number: String,
-        message: String,
-        next: ApneaScreen
-    ) -> some View {
-        VStack(spacing: 0) {
-            countdownHeader(header)
-                .padding(.bottom, 34)
-
-            Text(number)
-                .font(.system(size: 78, weight: .regular, design: .rounded))
-                .monospacedDigit()
-                .foregroundStyle(.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
-
-            Text(message)
-                .font(.system(size: 18, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .padding(.top, 12)
-
-            Spacer(minLength: 28)
-
-            ApneaWaveMark()
-                .stroke(DiveUI.blue, style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
-                .frame(width: 134, height: 34)
-                .shadow(color: DiveUI.blue.opacity(0.55), radius: 5, x: 0, y: 0)
-                .padding(.bottom, 18)
-        }
-        .frame(maxWidth: .infinity, minHeight: 260)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            if next == .activeSession {
-                HapticService.shared.notify()
-            } else {
-                HapticService.shared.tick()
-            }
-            advanceCountdown(to: next)
-        }
-        .task(id: current) {
-            HapticService.shared.tick()
-            try? await Task.sleep(nanoseconds: 1_000_000_000)
-            await MainActor.run {
-                guard screen == current else { return }
-                if next == .activeSession {
-                    HapticService.shared.notify()
-                }
-                advanceCountdown(to: next)
-            }
-        }
-    }
-
-    private var menuHeader: some View {
-        HStack(alignment: .center, spacing: 8) {
-            Text("Apnea")
-                .font(.system(size: 15, weight: .semibold, design: .rounded))
-                .foregroundStyle(DiveUI.blue)
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
-
-            Spacer(minLength: 0)
-
-            // TODO: Wire to a shared watch clock if one is introduced.
-            Text("10:09")
-                .font(.system(size: 18, weight: .semibold, design: .rounded))
-                .monospacedDigit()
-                .foregroundStyle(.white)
-        }
-        .padding(.horizontal, 4)
-        .padding(.bottom, 8)
-    }
-
-    private var surfaceWaitingHeader: some View {
-        HStack(alignment: .center, spacing: 8) {
-            Spacer(minLength: 0)
-
-            // TODO: Wire to a shared watch clock if one is introduced.
-            Text("10:09")
-                .font(.system(size: 18, weight: .semibold, design: .rounded))
-                .monospacedDigit()
-                .foregroundStyle(.white)
-        }
-        .padding(.horizontal, 4)
-    }
-
-    private func menuRow(
-        title: String,
-        subtitle: String?,
-        systemImage: String,
-        destination: ApneaScreen
-    ) -> some View {
-        Button {
-            screen = destination
-        } label: {
-            HStack(spacing: 12) {
-                Image(systemName: systemImage)
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(DiveUI.blue)
-                    .frame(width: 36, height: 36)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .font(.system(size: 20, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.72)
-
-                    if let subtitle {
-                        Text(subtitle)
-                            .font(.system(size: 13, weight: .medium, design: .rounded))
-                            .foregroundStyle(DiveUI.secondaryText)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.72)
-                    }
-                }
-
-                Spacer(minLength: 0)
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(DiveUI.secondaryText)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 9)
-            .frame(maxWidth: .infinity, minHeight: 62, alignment: .leading)
-            .background(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [DiveUI.panelFillRaised.opacity(0.92), DiveUI.panelFill.opacity(0.98)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .stroke(DiveUI.hairline, lineWidth: 1)
-                    )
-            )
-            .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        }
-        .buttonStyle(.plain)
-    }
-
-    private var sessionTypeHeader: some View {
-        HStack(alignment: .center, spacing: 8) {
-            Text("Sessione")
-                .font(.system(size: 15, weight: .semibold, design: .rounded))
-                .foregroundStyle(DiveUI.blue)
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
-
-            Spacer(minLength: 0)
-
-            // TODO: Wire to a shared watch clock if one is introduced.
-            Text("10:09")
-                .font(.system(size: 18, weight: .semibold, design: .rounded))
-                .monospacedDigit()
-                .foregroundStyle(.white)
-        }
-        .padding(.horizontal, 4)
-        .padding(.bottom, 8)
-    }
-
-    private func sessionTypeRow(
-        title: String,
-        subtitle: String,
-        systemImage: String,
-        destination: ApneaScreen,
-        isEnabled: Bool
-    ) -> some View {
-        Button {
-            // TODO: Persist selected apnea session type when a dedicated model/store exists.
-            guard isEnabled else { return }
-            screen = destination
-        } label: {
-            HStack(spacing: 12) {
-                Image(systemName: systemImage)
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(isEnabled ? DiveUI.blue : DiveUI.mutedText)
-                    .frame(width: 36, height: 36)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .font(.system(size: 20, weight: .semibold, design: .rounded))
-                        .foregroundStyle(isEnabled ? .white : DiveUI.secondaryText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.72)
-
-                    Text(subtitle)
-                        .font(.system(size: 13, weight: .medium, design: .rounded))
-                        .foregroundStyle(DiveUI.secondaryText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.72)
-                }
-
-                Spacer(minLength: 0)
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(isEnabled ? DiveUI.secondaryText : DiveUI.hairline)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 9)
-            .frame(maxWidth: .infinity, minHeight: 62, alignment: .leading)
-            .background(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [DiveUI.panelFillRaised.opacity(0.92), DiveUI.panelFill.opacity(0.98)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .stroke(DiveUI.hairline, lineWidth: 1)
-                    )
-            )
-            .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        }
-        .buttonStyle(.plain)
-        .disabled(!isEnabled)
-    }
-
-    private func configHeader(_ title: String) -> some View {
-        HStack(alignment: .center, spacing: 8) {
-            Text(title)
-                .font(.system(size: 15, weight: .semibold, design: .rounded))
-                .foregroundStyle(DiveUI.blue)
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
-
-            Spacer(minLength: 0)
-
-            // TODO: Wire to a shared watch clock if one is introduced.
-            Text("10:09")
-                .font(.system(size: 18, weight: .semibold, design: .rounded))
-                .monospacedDigit()
-                .foregroundStyle(.white)
-        }
-        .padding(.horizontal, 4)
-        .padding(.bottom, 8)
-    }
-
-    private func countdownHeader(_ title: String) -> some View {
-        HStack(alignment: .center, spacing: 8) {
-            Text(title)
-                .font(.system(size: 15, weight: .semibold, design: .rounded))
-                .foregroundStyle(DiveUI.blue)
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
-
-            Spacer(minLength: 0)
-
-            // TODO: Wire to a shared watch clock if one is introduced.
-            Text("10:09")
-                .font(.system(size: 18, weight: .semibold, design: .rounded))
-                .monospacedDigit()
-                .foregroundStyle(.white)
-        }
-        .padding(.horizontal, 4)
-    }
-
-    private func configRow(
-        title: String,
-        value: String,
-        systemImage: String,
-        showsDivider: Bool
-    ) -> some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 12) {
-                Image(systemName: systemImage)
-                    .font(.system(size: 21, weight: .semibold))
-                    .foregroundStyle(DiveUI.blue)
-                    .frame(width: 36, height: 36)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .font(.system(size: 17, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
-                    Text(value)
-                        .font(.system(size: 15, weight: .semibold, design: .rounded))
-                        .foregroundStyle(DiveUI.secondaryText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.72)
-                }
-
-                Spacer(minLength: 0)
-            }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 9)
-
-            if showsDivider {
-                Rectangle()
-                    .fill(DiveUI.hairline)
-                    .frame(height: 1)
-                    .padding(.leading, 48)
-            }
-        }
-    }
-
-    private func apneaAdjustRow(
-        title: String,
-        value: String,
-        unit: String,
-        systemImage: String,
-        decrement: @escaping () -> Void,
-        increment: @escaping () -> Void
-    ) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: systemImage)
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(DiveUI.blue)
-                .frame(width: 28)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.68)
-                Text("\(value) \(unit)")
-                    .font(.system(size: 13, weight: .black, design: .rounded))
-                    .foregroundStyle(DiveUI.yellow)
-                    .monospacedDigit()
-            }
-            Spacer(minLength: 4)
-            Button(action: decrement) {
-                Image(systemName: "minus")
-                    .font(.system(size: 12, weight: .black))
-                    .foregroundStyle(DiveUI.blue)
-                    .frame(width: 30, height: 30)
-                    .background(RoundedRectangle(cornerRadius: 8).stroke(DiveUI.blue.opacity(0.75), lineWidth: 1))
-            }
-            .buttonStyle(.plain)
-            Button(action: increment) {
-                Image(systemName: "plus")
-                    .font(.system(size: 12, weight: .black))
-                    .foregroundStyle(DiveUI.blue)
-                    .frame(width: 30, height: 30)
-                    .background(RoundedRectangle(cornerRadius: 8).stroke(DiveUI.blue.opacity(0.75), lineWidth: 1))
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 9)
-    }
-
-    private func apneaActionButton(_ title: String, icon: String, color: Color, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            HStack(spacing: 5) {
-                Image(systemName: icon)
-                Text(title)
-            }
-            .font(.system(size: 11, weight: .black, design: .rounded))
-            .foregroundStyle(color)
-            .frame(maxWidth: .infinity, minHeight: 40)
-            .background(
-                RoundedRectangle(cornerRadius: 11, style: .continuous)
-                    .fill(Color.black.opacity(0.42))
-                    .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous).stroke(color.opacity(0.72), lineWidth: 1.2))
-            )
-        }
-        .buttonStyle(.plain)
-    }
-
-    private func apneaDataNotice(_ message: String) -> some View {
-        Text(message)
-            .font(.system(size: 9, weight: .black, design: .rounded))
-            .foregroundStyle(DiveUI.yellow)
-            .multilineTextAlignment(.center)
-            .fixedSize(horizontal: false, vertical: true)
-            .padding(.horizontal, 9)
-            .padding(.vertical, 6)
-            .frame(maxWidth: .infinity)
-            .background(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(Color.black.opacity(0.42))
-                    .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).stroke(DiveUI.yellow.opacity(0.45), lineWidth: 1))
-            )
-    }
-
-    private func apneaSyncBoundaryPanel(title: String, message: String, color: Color) -> some View {
-        VStack(alignment: .leading, spacing: 5) {
-            HStack(spacing: 5) {
-                Image(systemName: "arrow.triangle.2.circlepath")
-                Text(title)
-            }
-            .font(.system(size: 10, weight: .black, design: .rounded))
-            .foregroundStyle(color)
-            Text(message)
-                .font(.system(size: 9, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white.opacity(0.78))
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(9)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 11, style: .continuous)
-                .fill(Color.black.opacity(0.42))
-                .overlay(RoundedRectangle(cornerRadius: 11, style: .continuous).stroke(color.opacity(0.55), lineWidth: 1.1))
-        )
-    }
-
-    private func summaryRow(_ title: String, value: String, showsDivider: Bool) -> some View {
-        VStack(spacing: 0) {
-            HStack {
-                Text(title)
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-
-                Spacer(minLength: 8)
-
-                Text(value)
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-            }
-            .padding(.vertical, 13)
-
-            if showsDivider {
-                Rectangle()
-                    .fill(DiveUI.hairline)
-                    .frame(height: 1)
-            }
-        }
-    }
-
-    private func apneaLogbookRow(dateText: String, depthText: String, durationText: String) -> some View {
-        HStack(alignment: .bottom, spacing: 8) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(dateText)
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-                Text(depthText)
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-            }
-
-            Spacer(minLength: 8)
-
-            Text(durationText)
-                .font(.system(size: 15, weight: .semibold, design: .rounded))
-                .monospacedDigit()
-                .foregroundStyle(.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .frame(maxWidth: .infinity, minHeight: 66, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [DiveUI.panelFillRaised.opacity(0.92), DiveUI.panelFill.opacity(0.98)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .stroke(DiveUI.hairline, lineWidth: 1)
-                )
-        )
-        .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-    }
-
-    private func statisticsRow(_ title: String, value: String) -> some View {
-        HStack {
-            Text(title)
-                .font(.system(size: 17, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
-
-            Spacer(minLength: 8)
-
-            Text(value)
-                .font(.system(size: 17, weight: .semibold, design: .rounded))
-                .monospacedDigit()
-                .foregroundStyle(.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
-        }
-        .padding(.horizontal, 10)
-        .frame(maxWidth: .infinity, minHeight: 55, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [DiveUI.panelFillRaised.opacity(0.92), DiveUI.panelFill.opacity(0.98)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-        )
-    }
-
-    private func placeholderScreen(
-        title: String,
-        subtitle: String,
-        systemImage: String,
-        message: String
-    ) -> some View {
-        VStack(spacing: 10) {
-            submenuHeader(title)
-
-            DivePanel(stroke: DiveUI.blue) {
-                VStack(spacing: 10) {
-                    Image(systemName: systemImage)
-                        .font(.system(size: 34, weight: .bold))
-                        .foregroundStyle(DiveUI.blue)
-                    Text(title.uppercased())
-                        .font(.system(size: 14, weight: .black, design: .rounded))
-                        .foregroundStyle(.white)
-                    Text(subtitle)
-                        .font(.system(size: 11, weight: .semibold, design: .rounded))
-                        .foregroundStyle(DiveUI.secondaryText)
-                    // TODO: Connect this screen to the future Apnea module when the data source exists.
-                    Text(message)
-                        .font(.system(size: 10, weight: .semibold, design: .rounded))
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(DiveUI.mutedText)
-                }
-                .frame(maxWidth: .infinity)
-            }
-        }
-    }
-
-    private func submenuHeader(_ title: String) -> some View {
-        HStack(spacing: 8) {
-            Button {
-                screen = .menu
-            } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: "chevron.left")
-                    Text("Menu")
-                }
-                .font(.system(size: 11, weight: .semibold, design: .rounded))
-                .foregroundStyle(DiveUI.blue)
-            }
-            .buttonStyle(.plain)
-
-            Spacer(minLength: 0)
-
-            Text(title)
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
-        }
-    }
-
-    private var sessionTopBar: some View {
-        HStack(spacing: 8) {
-            Button {
-                screen = .menu
-            } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: "chevron.left")
-                    Text("Menu")
-                }
-                .font(.system(size: 11, weight: .semibold, design: .rounded))
-                .foregroundStyle(DiveUI.blue)
-            }
-            .buttonStyle(.plain)
-
-            Spacer(minLength: 0)
-
-            Text("Sessione")
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-        }
-    }
-
-    private var topBar: some View {
-        DiveScreenHeader(
-            "APNEA",
-            subtitle: exploration.apneaState.rawValue.uppercased(),
-            accent: exploration.apneaState == .warning ? DiveUI.red : DiveUI.yellow,
-            systemImage: "lungs"
-        )
-    }
-
-    private var mainTimer: some View {
-        DivePanel(stroke: exploration.apneaState == .warning ? DiveUI.red : DiveUI.yellow) {
-            VStack(spacing: 7) {
-                Text(Formatters.time(exploration.currentApneaSeconds))
-                    .font(.system(size: 56, weight: .black, design: .rounded))
-                    .minimumScaleFactor(0.62)
-                    .lineLimit(1)
-                    .monospacedDigit()
-                    .foregroundStyle(exploration.apneaState == .warning ? DiveUI.red : .white)
-                    .shadow(color: exploration.apneaState == .warning ? DiveUI.red.opacity(0.65) : .clear, radius: 8, x: 0, y: 0)
-
-                HStack {
-                    Text("APNEA TIMER")
-                        .font(.system(size: 11, weight: .black, design: .rounded))
-                        .foregroundStyle(DiveUI.yellow)
-                    Spacer()
-                    DiveStatusPill(exploration.apneaState.rawValue.uppercased(), color: exploration.apneaState == .warning ? DiveUI.red : DiveUI.yellow)
-                }
-
-                HStack(spacing: 0) {
-                    DiveMetric("DEPTH", value: dive.isDepthSensorAvailable ? String(format: "%.1f", dive.currentDepthMeters) : "--", unit: dive.isDepthSensorAvailable ? "m" : "", color: DiveUI.blue, valueSize: 28)
-                    Rectangle().fill(DiveUI.hairline).frame(width: 1, height: 38)
-                    DiveMetric("MAX", value: dive.isDepthSensorAvailable ? String(format: "%.1f", dive.maxDepthMeters) : "--", unit: dive.isDepthSensorAvailable ? "m" : "", color: DiveUI.blue, valueSize: 28)
-                }
-            }
-        }
-    }
-
-    private var recoveryPanel: some View {
-        DivePanel(stroke: recoveryColor) {
-            VStack(spacing: 8) {
-                HStack(alignment: .center, spacing: 8) {
-                    ZStack {
-                        Circle()
-                            .fill(recoveryColor.opacity(0.13))
-                        Circle()
-                            .stroke(DiveUI.hairline, lineWidth: 1)
-                        Circle()
-                            .trim(from: 0, to: recoveryProgress)
-                            .stroke(recoveryColor, style: StrokeStyle(lineWidth: 3, lineCap: .round))
-                            .rotationEffect(.degrees(-90))
-                            .shadow(color: recoveryColor.opacity(0.45), radius: 5, x: 0, y: 0)
-                        Image(systemName: recoveryIcon)
-                            .font(.title2.bold())
-                            .foregroundStyle(recoveryColor)
-                    }
-                    .frame(width: 54, height: 54)
-
-                    VStack(alignment: .leading, spacing: 1) {
-                        HStack(spacing: 5) {
-                            Text("RECUPERO")
-                                .font(.system(size: 10, weight: .black, design: .rounded))
-                                .foregroundStyle(.white)
-                            DiveStatusPill(recoveryStatusText, color: recoveryColor)
-                        }
-
-                        Text(Formatters.time(exploration.recoverySeconds))
-                            .font(.system(size: 34, weight: .black, design: .rounded))
-                            .minimumScaleFactor(0.62)
-                            .lineLimit(1)
-                            .monospacedDigit()
-                            .foregroundStyle(recoveryColor)
-
-                        Text(recoveryGuidanceText)
-                            .font(.system(size: 9, weight: .bold, design: .rounded))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.65)
-                            .foregroundStyle(DiveUI.secondaryText)
-                    }
-
-                    Spacer(minLength: 0)
-                }
-
-                GeometryReader { proxy in
-                    ZStack(alignment: .leading) {
-                        Capsule()
-                            .fill(DiveUI.hairline)
-                        Capsule()
-                            .fill(recoveryColor)
-                            .frame(width: max(6, proxy.size.width * recoveryProgress))
-                            .shadow(color: recoveryColor.opacity(0.4), radius: 4, x: 0, y: 0)
-                    }
-                }
-                .frame(height: 6)
-
-                HStack(spacing: 0) {
-                    recoveryDetail("APNEA", value: Formatters.time(exploration.currentApneaSeconds), color: DiveUI.yellow)
-                    Rectangle().fill(DiveUI.hairline).frame(width: 1, height: 24)
-                    recoveryDetail("TARGET", value: "2:1", color: DiveUI.secondaryText)
-                    Rectangle().fill(DiveUI.hairline).frame(width: 1, height: 24)
-                    recoveryDetail("RATIO", value: recoveryRatioText, color: recoveryColor)
-                }
-            }
-        }
-    }
-
-    private var counterPanel: some View {
+    private var readyPanel: some View {
         DivePanel(stroke: DiveUI.blue) {
-            HStack(spacing: 0) {
-                DiveMetric("DIVE", value: "\(exploration.apneaCount)", color: DiveUI.yellow, valueSize: 26)
-                Rectangle().fill(DiveUI.hairline).frame(width: 1, height: 38)
-                DiveMetric("BEST", value: bestDepth, unit: "m", color: DiveUI.blue, valueSize: 26)
-                Rectangle().fill(DiveUI.hairline).frame(width: 1, height: 38)
-                DiveMetric("LAST", value: lastDuration, color: .white, valueSize: 22)
-            }
-        }
-    }
+            VStack(spacing: 8) {
+                Text(String(localized: "apnea.ready.title"))
+                    .font(DiveUI.Typography.readyTitle)
+                    .foregroundStyle(.white)
 
-    private var compassPanel: some View {
-        DivePanel(stroke: DiveUI.green) {
-            HStack(spacing: 10) {
-                DiveBearingRing(headingDegrees: compass.headingDegrees, accent: DiveUI.green, size: 82)
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("BUSSOLA")
-                        .font(.system(size: 11, weight: .black, design: .rounded))
-                        .foregroundStyle(.white)
-                    Text("\(Int(compass.headingDegrees.rounded()))\u{00B0} heading")
-                        .font(.system(size: 13, weight: .semibold, design: .rounded))
-                        .monospacedDigit()
-                        .foregroundStyle(DiveUI.secondaryText)
-                    Text("Riferimento visuale")
-                        .font(.system(size: 9, weight: .medium, design: .rounded))
-                        .foregroundStyle(DiveUI.mutedText)
+                metricRow(label: String(localized: "apnea.ready.target"), value: "\(Int(input.targetDepthMeters)) m", valueColor: DiveUI.blue)
+                metricRow(label: String(localized: "apnea.ready.recovery"), value: input.recoveryPolicyLabel, valueColor: DiveUI.blue)
+                metricRow(label: String(localized: "apnea.ready.alarms"), value: ui.alarmLabel, valueColor: DiveUI.green)
+
+                if let revision = importedPlan.readyPresentation.packageRevision {
+                    metricRow(
+                        label: String(localized: "apnea.ready.revision"),
+                        value: "r\(revision)",
+                        valueColor: importedPlan.readyPresentation.isPendingWhileSessionActive ? DiveUI.yellow : DiveUI.cyan
+                    )
                 }
-                Spacer(minLength: 0)
+
+                if importedPlan.readyPresentation.isPendingWhileSessionActive {
+                    Text(String(localized: "apnea.ready.pending_plan"))
+                        .font(DiveUI.Typography.hintCaption)
+                        .foregroundStyle(DiveUI.yellow)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+
+                if !ui.configuredAlarms.isEmpty {
+                    VStack(alignment: .leading, spacing: 4) {
+                        ForEach(ui.configuredAlarms, id: \.self) { alarm in
+                            Text(alarm)
+                                .font(DiveUI.Typography.hintCaption)
+                                .foregroundStyle(DiveUI.secondaryText)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
+                }
+
+                metricRow(label: String(localized: "apnea.ready.sensor"), value: ui.sensorLabel, valueColor: input.sensorDegraded ? DiveUI.red : DiveUI.green)
+                metricRow(label: String(localized: "apnea.ready.buddy"), value: input.buddyReminderEnabled ? String(localized: "apnea.buddy.on") : String(localized: "apnea.buddy.off"), valueColor: DiveUI.yellow)
+
+                if input.sensorDegraded {
+                    DiveCommandButton(String(localized: "apnea.manual.fallback"), systemImage: "hand.tap.fill", color: DiveUI.yellow) {
+                        runtime.startManualFallback()
+                    }
+                }
+
+                DiveCommandButton(String(localized: "apnea.ready.start"), systemImage: "play.fill", color: ui.startEnabled ? DiveUI.green : DiveUI.red) {
+                    if ui.startEnabled {
+                        runtime.armSession()
+                    }
+                }
+                .disabled(!ui.startEnabled)
+                .accessibilityHint(ui.startEnabled ? String(localized: "apnea.a11y.start_hint") : (ui.startDisabledReason ?? ""))
+
+                if let reason = ui.startDisabledReason {
+                    Text(reason)
+                        .font(DiveUI.Typography.warningBody)
+                        .foregroundStyle(DiveUI.red)
+                        .multilineTextAlignment(.center)
+                }
             }
         }
     }
 
-    private var warningPanel: some View {
-        let hasWarning = exploration.apneaWarning != nil
-        let color = hasWarning ? DiveUI.red : DiveUI.green
+    private var surfaceRecoveryPanel: some View {
+        DivePanel(stroke: recoveryAccentColor) {
+            VStack(spacing: 8) {
+                Text(String(localized: "apnea.surface.title"))
+                    .font(DiveUI.Typography.statusTitle)
+                    .foregroundStyle(.white)
 
-        return DivePanel(stroke: color) {
-            HStack(spacing: 8) {
-                Image(systemName: hasWarning ? "exclamationmark.triangle.fill" : "checkmark.shield.fill")
-                    .font(.caption.bold())
-                Text(exploration.apneaWarning ?? "Buddy reminder, no-movement e depth warning attivi.")
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
-                    .multilineTextAlignment(.leading)
-                    .fixedSize(horizontal: false, vertical: true)
-                Spacer(minLength: 0)
+                Text(ui.surfaceElapsedText)
+                    .font(.system(size: 52, weight: .black, design: .rounded))
+                    .foregroundStyle(recoveryAccentColor)
+                    .monospacedDigit()
+                    .minimumScaleFactor(0.55)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(String(localized: "apnea.surface.a11y.elapsed"))
+                    .accessibilityValue(ui.surfaceElapsedText)
+
+                Text(String(localized: "apnea.surface.last_dive"))
+                    .font(DiveUI.Typography.hintCaption)
+                    .foregroundStyle(DiveUI.secondaryText)
+
+                HStack {
+                    Text(ui.lastDiveMaxDepthText)
+                        .font(DiveUI.Typography.statusValue)
+                        .foregroundStyle(.white)
+                        .monospacedDigit()
+                    Spacer()
+                    Text(ui.lastDiveDurationText)
+                        .font(DiveUI.Typography.statusValue)
+                        .foregroundStyle(.white)
+                        .monospacedDigit()
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(String(localized: "apnea.surface.a11y.last_dive"))
+                .accessibilityValue("\(ui.lastDiveMaxDepthText), \(ui.lastDiveDurationText)")
+
+                Text(String(localized: "apnea.surface.recovery_required"))
+                    .font(DiveUI.Typography.hintCaption)
+                    .foregroundStyle(DiveUI.secondaryText)
+
+                if let remaining = ui.recoveryRemainingText {
+                    Text(remaining)
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .foregroundStyle(recoveryAccentColor)
+                        .monospacedDigit()
+                        .accessibilityLabel(String(localized: "apnea.surface.a11y.recovery_remaining"))
+                        .accessibilityValue(remaining)
+                } else {
+                    Text(ui.recoveryRequiredText)
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .foregroundStyle(recoveryAccentColor)
+                        .monospacedDigit()
+                }
+
+                Text(ui.recoveryStateText)
+                    .font(DiveUI.Typography.rowTitle)
+                    .foregroundStyle(recoveryAccentColor)
+                    .accessibilityLabel(String(localized: "apnea.surface.a11y.recovery_state"))
+                    .accessibilityValue(ui.recoveryStateText)
+
+                if runtime.isSessionActive {
+                    DiveCommandButton(String(localized: "apnea.summary.open"), systemImage: "list.bullet", color: DiveUI.blue) {
+                        runtime.requestSessionSummary()
+                    }
+                }
             }
-            .foregroundStyle(color)
         }
     }
 
-    private var controls: some View {
+    private var sessionSummaryPanel: some View {
+        DivePanel(stroke: DiveUI.blue) {
+            VStack(spacing: 6) {
+                Text(String(localized: "apnea.summary.title"))
+                    .font(DiveUI.Typography.readyTitle)
+                    .foregroundStyle(.white)
+
+                metricRow(label: String(localized: "apnea.summary.dives"), value: ui.summaryDiveCountText, valueColor: .white)
+                metricRow(label: String(localized: "apnea.summary.max_depth"), value: ui.summaryMaxDepthText, valueColor: .white)
+                metricRow(label: String(localized: "apnea.summary.best_time"), value: ui.summaryBestTimeText, valueColor: .white)
+                metricRow(label: String(localized: "apnea.summary.average_time"), value: ui.summaryAverageTimeText, valueColor: .white)
+                metricRow(label: String(localized: "apnea.summary.total_underwater"), value: ui.summaryTotalUnderwaterText, valueColor: .white)
+                metricRow(label: String(localized: "apnea.summary.session_duration"), value: ui.summarySessionDurationText, valueColor: .white)
+
+                if let warnings = ui.summaryWarningsText {
+                    Text(warnings)
+                        .font(DiveUI.Typography.warningBody)
+                        .foregroundStyle(DiveUI.orange)
+                        .multilineTextAlignment(.center)
+                        .accessibilityLabel(String(localized: "apnea.summary.a11y.warnings"))
+                        .accessibilityValue(warnings)
+                }
+
+                DiveCommandButton(String(localized: "apnea.summary.save_end"), systemImage: "checkmark", color: DiveUI.green) {
+                    saveCurrentSessionToLogbook()
+                }
+                DiveCommandButton(String(localized: "apnea.summary.return"), systemImage: "arrow.uturn.backward", color: .white.opacity(0.78)) {
+                    runtime.showSessionSummary = false
+                    runtime.endSession()
+                }
+            }
+        }
+    }
+
+    private var savedConfirmationBanner: some View {
+        VStack {
+            Text(String(localized: "apnea.logbook.saved"))
+                .font(DiveUI.Typography.rowTitle)
+                .foregroundStyle(DiveUI.green)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(
+                    Capsule()
+                        .fill(Color.black.opacity(0.88))
+                        .overlay(Capsule().stroke(DiveUI.green.opacity(0.8), lineWidth: 1))
+                )
+                .accessibilityLabel(String(localized: "apnea.logbook.saved.a11y"))
+            Spacer()
+        }
+        .padding(.top, 8)
+        .transition(.opacity)
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                savedConfirmationVisible = false
+            }
+        }
+    }
+
+    private func saveCurrentSessionToLogbook() {
+        runtime.saveCompletedSession(to: apneaLogbook)
+        runtime.resetAfterSave()
+        savedConfirmationVisible = true
+        HapticService.shared.confirm()
+    }
+
+    private func eventOverlay(_ overlay: ApneaWatchOverlayPresentation) -> some View {
+        let accent = overlayAccentColor(for: overlay.kind)
+        return ZStack {
+            Color.black.opacity(0.55)
+                .ignoresSafeArea()
+            VStack(spacing: 8) {
+                Text(overlay.title)
+                    .font(DiveUI.Typography.statusTitle)
+                    .foregroundStyle(.white)
+                if let depth = overlay.depthMeters {
+                    Text("\(Formatters.one(depth)) m")
+                        .font(.system(size: 44, weight: .black, design: .rounded))
+                        .foregroundStyle(accent)
+                        .monospacedDigit()
+                }
+                Text(overlay.subtitle)
+                    .font(DiveUI.Typography.rowTitle)
+                    .foregroundStyle(accent)
+                overlayIcon(for: overlay.kind, color: accent)
+
+                if overlay.dismissSafe {
+                    DiveCommandButton(String(localized: "apnea.overlay.dismiss"), systemImage: "xmark", color: .white.opacity(0.78)) {
+                        runtime.dismissOperationalOverlay(eventID: runtime.operationalOverlay?.eventID ?? UUID())
+                    }
+                    .accessibilityHint(String(localized: "apnea.overlay.a11y.dismiss_hint"))
+                }
+            }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(Color.black.opacity(0.92))
+                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(accent.opacity(0.8), lineWidth: 1))
+            )
+            .padding(.horizontal, 10)
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(overlayAccessibilityLabel(for: overlay))
+    }
+
+    private func activeDivePanel(title: String, ascentAccent: Bool) -> some View {
+        DivePanel(stroke: ascentAccent ? ascentColor : DiveUI.blue) {
+            VStack(spacing: 8) {
+                Text(title)
+                    .font(DiveUI.Typography.statusTitle)
+                    .foregroundStyle(ascentAccent ? ascentColor : .white)
+
+                HStack(alignment: .lastTextBaseline, spacing: 4) {
+                    Text(Formatters.one(input.currentDepthMeters))
+                        .font(.system(size: 62, weight: .black, design: .rounded))
+                        .foregroundStyle(.white)
+                        .monospacedDigit()
+                        .minimumScaleFactor(0.55)
+                    Text("m")
+                        .font(DiveUI.Typography.metricUnitHero)
+                        .foregroundStyle(DiveUI.blue)
+                        .padding(.bottom, 8)
+                }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(String(localized: "live.depth.a11y"))
+                .accessibilityValue("\(Formatters.one(input.currentDepthMeters)) m")
+
+                metricRow(label: String(localized: "apnea.active.duration"), value: Formatters.time(input.diveElapsedSeconds), valueColor: .white)
+                metricRow(label: String(localized: "apnea.active.max"), value: "\(Formatters.one(input.maxDepthMeters)) m", valueColor: DiveUI.blue)
+
+                VStack(spacing: 2) {
+                    Text(ui.verticalSpeedText)
+                        .font(.system(size: 29, weight: .bold, design: .rounded))
+                        .foregroundStyle(ascentAccent ? ascentColor : .white)
+                        .monospacedDigit()
+                    Text(ui.verticalDirectionText)
+                        .font(DiveUI.Typography.hintCaption)
+                        .foregroundStyle(DiveUI.secondaryText)
+                }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(String(localized: "apnea.a11y.vertical_speed"))
+                .accessibilityValue("\(ui.verticalDirectionText), \(ui.verticalSpeedText)")
+
+                HStack(spacing: 8) {
+                    badge(systemImage: "thermometer", text: temperatureText, color: DiveUI.cyan)
+                    badge(systemImage: "number", text: "#\(input.diveCount)", color: DiveUI.blue)
+                    badge(systemImage: "dot.radiowaves.left.and.right", text: ui.sensorLabel, color: input.sensorDegraded ? DiveUI.red : DiveUI.green)
+                }
+
+                if ui.stage == .ascent {
+                    HStack(spacing: 6) {
+                        badge(systemImage: "water.waves", text: String(localized: "apnea.marker.indicator"), color: DiveUI.yellow)
+                        badge(systemImage: "checkmark.circle", text: String(localized: "apnea.target.indicator"), color: DiveUI.green)
+                    }
+                }
+
+                if runtime.isSessionActive && ui.stage != .dive {
+                    DiveCommandButton(String(localized: "apnea.summary.open"), systemImage: "list.bullet", color: DiveUI.blue) {
+                        runtime.requestSessionSummary()
+                    }
+                }
+
+                if runtime.lifecyclePhase == .sensorDegraded || input.sensorDegraded {
+                    HStack(spacing: 6) {
+                        DiveCommandButton(String(localized: "apnea.manual.descent"), systemImage: "arrow.down", color: DiveUI.cyan) {
+                            runtime.triggerManualDescent()
+                        }
+                        DiveCommandButton(String(localized: "apnea.manual.surface"), systemImage: "arrow.up", color: DiveUI.yellow) {
+                            runtime.triggerManualSurface()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var footerBadges: some View {
         HStack(spacing: 6) {
-            DiveCommandButton("START", systemImage: "play.fill", color: DiveUI.green) {
-                exploration.startApneaSession()
-                HapticService.shared.notify()
+            if !hapticsEnabled {
+                badge(systemImage: "bell.slash.fill", text: String(localized: "live.haptics.off"), color: DiveUI.yellow)
+                    .accessibilityLabel(String(localized: "a11y.watch.haptics_off_badge.label"))
+                    .accessibilityHint(String(localized: "a11y.watch.haptics_off_badge.hint"))
             }
-            DiveCommandButton("DIVE", systemImage: "arrow.down", color: DiveUI.yellow) {
-                exploration.beginApneaDive()
-                HapticService.shared.notify()
-            }
-            DiveCommandButton("SURFACE", systemImage: "arrow.up", color: DiveUI.blue) {
-                let record = exploration.surfaceFromApnea(maxDepthMeters: dive.maxDepthMeters)
-                WatchSyncService.shared.transferExperimentalApneaRecord(record)
-                HapticService.shared.confirm()
-            }
-            DiveCommandButton("WARN", systemImage: "exclamationmark.triangle", color: DiveUI.red) {
-                exploration.triggerApneaWarning("APNEA TROPPO LUNGA")
-                HapticService.shared.warnIfNeeded()
-            }
+            badge(systemImage: "bolt.fill", text: ui.missionLabel, color: input.missionModeEnabled ? DiveUI.cyan : DiveUI.secondaryText)
+            Spacer(minLength: 0)
         }
     }
 
-    private var recoveryColor: Color {
-        isRecoveryComplete ? DiveUI.green : DiveUI.yellow
-    }
-
-    private var isApneaDescentVisible: Bool {
-        // TODO: Replace this UI-only depth check with a dedicated Apnea descent state when exposed by the session engine.
-        dive.currentDepthMeters >= 0.5
-    }
-
-    private var isApneaBottomVisible: Bool {
-        // TODO: Replace this UI-only depth check with a dedicated Apnea bottom-phase state when exposed by the session engine.
-        dive.currentDepthMeters >= 15
-    }
-
-    private var isApneaAscentVisible: Bool {
-        // TODO: Replace this UI-only phase approximation with a dedicated Apnea ascent state when exposed by the session engine.
-        dive.currentDepthMeters >= 0.5 && dive.currentDepthMeters < 15 && exploration.currentApneaSeconds >= 60
-    }
-
-    private var isApneaAscentAlarmVisible: Bool {
-        dive.ascentStatus.isOverLimit && dive.currentDepthMeters >= 0.5
-    }
-
-    private var isApneaSurfaceEndVisible: Bool {
-        // Existing surfaceFromApnea(...) records the dive and starts recovery; use that state without changing timers.
-        exploration.apneaState == .surface && !exploration.apneaDives.isEmpty
-    }
-
-    private var isApneaRecoveryVisible: Bool {
-        exploration.recoverySeconds > 0
-    }
-
-    private var isApneaSummaryVisible: Bool {
-        exploration.apneaState == .surface && exploration.recoverySeconds <= 0 && !exploration.apneaDives.isEmpty
-    }
-
-    private var recoveryCountdownText: String {
-        if exploration.recoverySeconds > 0 {
-            return Formatters.time(exploration.recoverySeconds)
-        }
-        return "1:18"
-    }
-
-    private var lastApneaDurationText: String {
-        guard let last = exploration.apneaDives.first else { return apneaElapsedText(defaultText: "1:55") }
-        return Formatters.time(last.durationSeconds)
-    }
-
-    private var lastApneaMaxDepthText: String {
-        guard let last = exploration.apneaDives.first else { return "22.4 m" }
-        return String(format: "%.1f m", last.maxDepthMeters)
-    }
-
-    private var statisticsMaxDepthText: String {
-        let maxDepth = exploration.apneaDives.map(\.maxDepthMeters).max()
-        guard let maxDepth else { return "22.4 m" }
-        return String(format: "%.1f m", maxDepth)
-    }
-
-    private var statisticsDiveCountText: String {
-        let count = max(exploration.apneaCount, exploration.apneaDives.count)
-        return "\(max(count, 24))"
-    }
-
-    private var placeholderProfilePoints: [Double] {
-        [0, 0.5, 3.0, 4.0, 8.5, 12.5, 15.0, 14.0, 18.5, 13.5, 12.0, 15.5, 14.0, 9.0, 5.0, 2.5, 0.4, 0]
-    }
-
-    private func advanceCountdown(to next: ApneaScreen) {
-        if next == .activeSession {
-            exploration.startApneaSession()
-        }
-        screen = next
-    }
-
-    private func handleApneaDepthChange(_ depth: Double) {
-        guard screen == .activeSession else { return }
-
-        if exploration.apneaState == .surface,
-           exploration.recoverySeconds <= 0,
-           depth >= 0.5 {
-            exploration.beginApneaDive()
-            return
-        }
-
-        if exploration.apneaState == .dive,
-           depth < 0.5 {
-            let record = exploration.surfaceFromApnea(maxDepthMeters: dive.maxDepthMeters)
-            WatchSyncService.shared.transferExperimentalApneaRecord(record)
-            screen = .surfaceEnd
-        }
-    }
-
-    private var apneaDepthText: String {
-        guard dive.isDepthSensorAvailable else { return "--" }
-        return String(format: "%.1f", max(0, dive.currentDepthMeters))
-    }
-
-    private func apneaElapsedText(defaultText: String) -> String {
-        guard exploration.currentApneaSeconds > 0 else { return defaultText }
-        return Formatters.time(exploration.currentApneaSeconds)
-    }
-
-    private var isRecoveryComplete: Bool {
-        exploration.recoverySeconds <= 0
-    }
-
-    private var recoveryProgress: Double {
-        let target = max(exploration.currentApneaSeconds * 2, 30)
-        guard target > 0 else { return 1 }
-        let completed = 1 - min(max(exploration.recoverySeconds, 0), target) / target
-        return min(max(completed, 0.08), 1)
-    }
-
-    private var recoveryRatioText: String {
-        guard exploration.currentApneaSeconds > 0 else { return "--" }
-        return String(format: "%.1f", exploration.recoverySeconds / exploration.currentApneaSeconds)
-    }
-
-    private var recoveryStatusText: String {
-        isRecoveryComplete ? "OK" : "RECUPERO"
-    }
-
-    private var recoveryGuidanceText: String {
-        isRecoveryComplete ? "Recupero completato" : "Respira e attendi"
-    }
-
-    private var recoveryIcon: String {
-        exploration.recoverySeconds <= 0 ? "checkmark.circle.fill" : "lungs.fill"
-    }
-
-    private func recoveryDetail(_ title: String, value: String, color: Color) -> some View {
-        VStack(spacing: 1) {
-            Text(title)
-                .font(.system(size: 8, weight: .bold, design: .rounded))
-                .foregroundStyle(DiveUI.mutedText)
+    private func metricRow(label: String, value: String, valueColor: Color) -> some View {
+        HStack {
+            Text(label)
+                .font(DiveUI.Typography.rowTitle)
+                .foregroundStyle(.white)
+            Spacer()
             Text(value)
-                .font(.system(size: 13, weight: .black, design: .rounded))
-                .lineLimit(1)
-                .minimumScaleFactor(0.68)
+                .font(DiveUI.Typography.statusValue)
+                .foregroundStyle(valueColor)
                 .monospacedDigit()
+        }
+    }
+
+    private func badge(systemImage: String, text: String, color: Color) -> some View {
+        HStack(spacing: 3) {
+            Image(systemName: systemImage)
+            Text(text)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+        .font(DiveUI.Typography.hintCaptionBold)
+        .foregroundStyle(color)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 4)
+        .background(
+            Capsule()
+                .fill(color.opacity(0.12))
+                .overlay(Capsule().stroke(color.opacity(0.72), lineWidth: 1))
+        )
+    }
+
+    @ViewBuilder
+    private func overlayIcon(for kind: ApneaOperationalOverlay.Kind, color: Color) -> some View {
+        switch kind {
+        case .markerReached:
+            Image(systemName: "water.waves")
+                .font(.system(size: 28, weight: .bold))
+                .foregroundStyle(color)
+        case .targetReached:
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 28, weight: .bold))
+                .foregroundStyle(color)
+        case .alarm:
+            Image(systemName: "bell.fill")
+                .font(.system(size: 28, weight: .bold))
                 .foregroundStyle(color)
         }
-        .frame(maxWidth: .infinity)
     }
 
-    private var bestDepth: String {
-        let value = exploration.apneaDives.map(\.maxDepthMeters).max() ?? dive.maxDepthMeters
-        return String(format: "%.1f", value)
-    }
-
-    private var lastDuration: String {
-        guard let last = exploration.apneaDives.first else { return "--" }
-        return Formatters.time(last.durationSeconds)
-    }
-}
-
-private enum ApneaScreen: Equatable {
-    case menu
-    case session
-    case activeSession
-    case surfaceEnd
-    case depthProfile
-    case details
-    case saveConfirmation
-    case summary
-    case openWaterConfig
-    case apneaAlarms
-    case countdown03
-    case countdown02
-    case countdown01
-    case tables
-    case statistics
-    case logbook
-}
-
-private struct ApneaWaveMark: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let firstY = rect.midY - rect.height * 0.1
-        let secondY = rect.midY + rect.height * 0.16
-        let amplitude = rect.height * 0.16
-
-        path.move(to: CGPoint(x: rect.minX, y: firstY))
-        path.addCurve(
-            to: CGPoint(x: rect.minX + rect.width * 0.5, y: firstY),
-            control1: CGPoint(x: rect.minX + rect.width * 0.16, y: firstY + amplitude),
-            control2: CGPoint(x: rect.minX + rect.width * 0.34, y: firstY - amplitude)
-        )
-        path.addCurve(
-            to: CGPoint(x: rect.maxX, y: firstY),
-            control1: CGPoint(x: rect.minX + rect.width * 0.66, y: firstY + amplitude),
-            control2: CGPoint(x: rect.minX + rect.width * 0.84, y: firstY - amplitude)
-        )
-
-        path.move(to: CGPoint(x: rect.minX + rect.width * 0.18, y: secondY))
-        path.addCurve(
-            to: CGPoint(x: rect.minX + rect.width * 0.72, y: secondY),
-            control1: CGPoint(x: rect.minX + rect.width * 0.34, y: secondY + amplitude),
-            control2: CGPoint(x: rect.minX + rect.width * 0.52, y: secondY - amplitude)
-        )
-        path.addCurve(
-            to: CGPoint(x: rect.minX + rect.width * 0.94, y: secondY),
-            control1: CGPoint(x: rect.minX + rect.width * 0.8, y: secondY + amplitude * 0.75),
-            control2: CGPoint(x: rect.minX + rect.width * 0.86, y: secondY - amplitude * 0.75)
-        )
-
-        return path
-    }
-}
-
-private struct ApneaDepthProfileLine: Shape {
-    let points: [Double]
-
-    func path(in rect: CGRect) -> Path {
-        guard let first = points.first else { return Path() }
-        let maxDepth = max(points.max() ?? 22, 22)
-        var path = Path()
-        path.move(to: point(for: first, index: 0, maxDepth: maxDepth, in: rect))
-
-        for index in points.indices.dropFirst() {
-            path.addLine(to: point(for: points[index], index: index, maxDepth: maxDepth, in: rect))
+    private func overlayAccentColor(for kind: ApneaOperationalOverlay.Kind) -> Color {
+        switch kind {
+        case .markerReached: DiveUI.yellow
+        case .targetReached: DiveUI.green
+        case .alarm: DiveUI.orange
         }
-
-        return path
     }
 
-    private func point(for depth: Double, index: Int, maxDepth: Double, in rect: CGRect) -> CGPoint {
-        let xRatio = points.count <= 1 ? 0 : CGFloat(index) / CGFloat(points.count - 1)
-        let yRatio = CGFloat(min(max(depth / maxDepth, 0), 1))
-        return CGPoint(
-            x: rect.minX + rect.width * xRatio,
-            y: rect.minY + rect.height * yRatio
-        )
-    }
-}
-
-private struct ApneaDepthProfileArea: Shape {
-    let points: [Double]
-
-    func path(in rect: CGRect) -> Path {
-        guard let first = points.first else { return Path() }
-        let maxDepth = max(points.max() ?? 22, 22)
-        var path = Path()
-        path.move(to: CGPoint(x: rect.minX, y: rect.minY))
-        path.addLine(to: point(for: first, index: 0, maxDepth: maxDepth, in: rect))
-
-        for index in points.indices.dropFirst() {
-            path.addLine(to: point(for: points[index], index: index, maxDepth: maxDepth, in: rect))
+    private func overlayAccessibilityLabel(for overlay: ApneaWatchOverlayPresentation) -> String {
+        switch overlay.kind {
+        case .markerReached:
+            return String(localized: "apnea.overlay.a11y.marker")
+        case .targetReached:
+            return String(localized: "apnea.overlay.a11y.target")
+        case .alarm:
+            return String(localized: "apnea.overlay.a11y.alarm")
         }
-
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
-        path.closeSubpath()
-        return path
     }
 
-    private func point(for depth: Double, index: Int, maxDepth: Double, in rect: CGRect) -> CGPoint {
-        let xRatio = points.count <= 1 ? 0 : CGFloat(index) / CGFloat(points.count - 1)
-        let yRatio = CGFloat(min(max(depth / maxDepth, 0), 1))
-        return CGPoint(
-            x: rect.minX + rect.width * xRatio,
-            y: rect.minY + rect.height * yRatio
-        )
+    private var temperatureText: String {
+        guard let temperatureCelsius = input.temperatureCelsius else { return "--.-°C" }
+        return "\(Formatters.one(temperatureCelsius))°C"
+    }
+
+    private var ascentColor: Color {
+        abs(input.verticalSpeedMetersPerSecond) > 1.5 ? DiveUI.yellow : DiveUI.blue
+    }
+
+    private var recoveryAccentColor: Color {
+        switch ui.recoveryState {
+        case .completed: DiveUI.green
+        case .inProgress: DiveUI.yellow
+        case .insufficient: DiveUI.orange
+        }
     }
 }
