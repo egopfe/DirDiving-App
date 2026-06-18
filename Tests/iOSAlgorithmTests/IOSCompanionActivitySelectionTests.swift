@@ -52,22 +52,20 @@ final class IOSCompanionActivitySelectionTests: XCTestCase {
         XCTAssertTrue(IOSCompanionPostLegalEntry.consumePendingPlannerLanding())
     }
 
-    func testApneaCanBeSelectedWhileSnorkelingRemainsUnavailable() {
+    func testApneaAndSnorkelingCanBeSelectedOnIOSCompanion() {
         let store = CompanionActivityPreferenceStore(defaults: defaults)
         XCTAssertTrue(DIRActivityMode.apnea.isLaunchableOnIOSCompanionMAIN)
-        XCTAssertFalse(DIRActivityMode.snorkeling.isLaunchableOnIOSCompanionMAIN)
+        XCTAssertTrue(DIRActivityMode.snorkeling.isLaunchableOnIOSCompanionMAIN)
         XCTAssertTrue(CompanionActivityAvailability.isAvailable(.apnea))
-        XCTAssertFalse(CompanionActivityAvailability.isAvailable(.snorkeling))
+        XCTAssertTrue(CompanionActivityAvailability.isAvailable(.snorkeling))
         XCTAssertTrue(store.select(.apnea))
-        XCTAssertFalse(store.select(.snorkeling))
         XCTAssertEqual(store.preference.selectedMode, .apnea)
-    }
 
-    func testUnavailableSnorkelingCannotBeSelected() {
-        let store = CompanionActivityPreferenceStore(defaults: defaults)
-        XCTAssertFalse(store.select(.snorkeling))
-        XCTAssertNil(store.preference.selectedMode)
-        XCTAssertTrue(store.shouldPresentSelectionScreen)
+        let snorkelingStore = CompanionActivityPreferenceStore(defaults: defaults)
+        snorkelingStore.resetForTesting()
+        XCTAssertTrue(snorkelingStore.select(.snorkeling))
+        XCTAssertEqual(snorkelingStore.preference.selectedMode, .snorkeling)
+        XCTAssertTrue(IOSCompanionPostLegalEntry.consumePendingSnorkelingLanding())
     }
 
     func testShowAtLaunchPolicy() {

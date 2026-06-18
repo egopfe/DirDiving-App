@@ -37,6 +37,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     weak var plannerBriefingTransferService: PlannerBriefingWatchTransferService?
     weak var divePlanPackageTransferService: DivePlanPackageWatchTransferService?
     weak var apneaWatchTransferService: IOSApneaWatchTransferService?
+    weak var snorkelingWatchTransferService: IOSSnorkelingWatchTransferService?
     private weak var apneaLogbookStore: IOSApneaLogbookStore?
     private var photoIDByTransferFilePath: [String: String] = [:]
     private var companionPhotoTransfersByID: [String: CompanionPhotoTransferStatus] = [:]
@@ -477,6 +478,11 @@ final class WatchSyncService: NSObject, ObservableObject {
     private func handleApneaSyncAck(_ payload: [String: Any]) {
         guard let ack = ApneaSyncTransferSupport.parseAck(payload) else { return }
         apneaWatchTransferService?.handleAck(ack)
+    }
+
+    private func handleSnorkelingRouteSyncAck(_ payload: [String: Any]) {
+        guard let ack = SnorkelingRouteSyncTransferSupport.parseAck(payload) else { return }
+        snorkelingWatchTransferService?.handleAck(ack)
     }
 
     private func handleCompanionPhotoAck(_ payload: [String: Any]) {
@@ -970,6 +976,7 @@ extension WatchSyncService: WCSessionDelegate {
                 }
                 self.divePlanPackageTransferService?.flushIfNeeded()
                 self.apneaWatchTransferService?.flushIfNeeded()
+                self.snorkelingWatchTransferService?.flushIfNeeded()
             }
         }
     }
@@ -1008,6 +1015,10 @@ extension WatchSyncService: WCSessionDelegate {
                 self.handleApneaSyncAck(message)
                 return
             }
+            if SnorkelingRouteSyncTransferSupport.isPackageAck(message) {
+                self.handleSnorkelingRouteSyncAck(message)
+                return
+            }
             if let ackContext = self.importApneaSessionPayload(message) {
                 return
             }
@@ -1044,6 +1055,11 @@ extension WatchSyncService: WCSessionDelegate {
             }
             if ApneaSyncTransferSupport.isPackageAck(message) {
                 self.handleApneaSyncAck(message)
+                replyHandler(["status": "acknowledged"])
+                return
+            }
+            if SnorkelingRouteSyncTransferSupport.isPackageAck(message) {
+                self.handleSnorkelingRouteSyncAck(message)
                 replyHandler(["status": "acknowledged"])
                 return
             }
@@ -1100,6 +1116,10 @@ extension WatchSyncService: WCSessionDelegate {
             }
             if ApneaSyncTransferSupport.isPackageAck(userInfo) {
                 self.handleApneaSyncAck(userInfo)
+                return
+            }
+            if SnorkelingRouteSyncTransferSupport.isPackageAck(userInfo) {
+                self.handleSnorkelingRouteSyncAck(userInfo)
                 return
             }
             if ApneaSessionSyncCodec.isImportAck(userInfo) {

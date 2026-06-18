@@ -5,6 +5,7 @@ enum IOSCompanionPostLegalEntry {
     private static var pendingPlannerModeSelectionLanding = false
     private static var pendingActivitySelectionLanding = false
     private static var pendingApneaLanding = false
+    private static var pendingSnorkelingLanding = false
 
     static func markPendingActivitySelection() {
         pendingActivitySelectionLanding = true
@@ -36,11 +37,22 @@ enum IOSCompanionPostLegalEntry {
         return pending
     }
 
+    static func markPendingSnorkelingLanding() {
+        pendingSnorkelingLanding = true
+    }
+
+    static func consumePendingSnorkelingLanding() -> Bool {
+        let pending = pendingSnorkelingLanding
+        pendingSnorkelingLanding = false
+        return pending
+    }
+
     #if DEBUG
     static func resetForTesting() {
         pendingPlannerModeSelectionLanding = false
         pendingActivitySelectionLanding = false
         pendingApneaLanding = false
+        pendingSnorkelingLanding = false
     }
     #endif
 }
