@@ -13,6 +13,8 @@ final class ApneaArchitectureIsolationTests: XCTestCase {
         "Services/ApneaSessionSyncCodec.swift",
         "Services/ApneaSyncWatchReceiver.swift",
         "Shared/Utils/ApneaSyncTransferSupport.swift",
+        "Services/ApneaWatchRuntimeStore.swift",
+        "Views/ApneaView.swift",
     ]
 
     private let forbiddenSymbols = [
@@ -46,12 +48,27 @@ final class ApneaArchitectureIsolationTests: XCTestCase {
         XCTAssertTrue(text.contains("UI-independent"))
     }
 
-    func testApneaViewRemainsExcludedFromMainWatchTarget() throws {
+    func testApneaViewIncludedInMainWatchTarget() throws {
         let project = try String(
             contentsOf: repositoryRoot().appendingPathComponent("project.yml"),
             encoding: .utf8
         )
-        XCTAssertTrue(project.contains("- ApneaView.swift"))
+        XCTAssertFalse(project.contains("- ApneaView.swift"))
+    }
+
+    func testApneaProductionUIAndRuntimeDoNotReferenceDiveManager() throws {
+        let paths = ["Views/ApneaView.swift", "Services/ApneaWatchRuntimeStore.swift"]
+        let root = repositoryRoot()
+        var violations: [String] = []
+        for relative in paths {
+            let text = try String(contentsOf: root.appendingPathComponent(relative), encoding: .utf8)
+            for symbol in ["DiveManager", "DiveLogStore", "ExplorationStore"] {
+                if text.contains(symbol) {
+                    violations.append("\(relative): \(symbol)")
+                }
+            }
+        }
+        XCTAssertTrue(violations.isEmpty, violations.joined(separator: ", "))
     }
 
     func testSyncNamespaceKeysRemainIsolated() {

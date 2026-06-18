@@ -14,9 +14,9 @@ final class FullComputerTargetMembershipTests: XCTestCase {
         XCTAssertTrue(project.contains("Shared/BuhlmannCore/BuhlmannEngine.swift") || project.contains("path: Shared"))
     }
 
-    func testProjectYAMLExcludesApneaAndSnorkelingWatchUI() throws {
+    func testProjectYAMLExcludesSnorkelingWatchUI() throws {
         let project = try String(contentsOf: repoRoot.appendingPathComponent("project.yml"), encoding: .utf8)
-        XCTAssertTrue(project.contains("- ApneaView.swift"))
+        XCTAssertFalse(project.contains("- ApneaView.swift"))
         XCTAssertTrue(project.contains("- SnorkelingView.swift"))
     }
 
@@ -34,7 +34,7 @@ final class FullComputerTargetMembershipTests: XCTestCase {
 
     func testWatchLaunchabilityAPIsArePlatformSpecific() {
         XCTAssertTrue(DIRActivityMode.diving.isLaunchableOnWatchMAIN)
-        XCTAssertFalse(DIRActivityMode.apnea.isLaunchableOnWatchMAIN)
+        XCTAssertTrue(DIRActivityMode.apnea.isLaunchableOnWatchMAIN)
         XCTAssertFalse(DIRActivityMode.snorkeling.isLaunchableOnWatchMAIN)
 
         XCTAssertTrue(DIRActivityMode.diving.isLaunchableOnIOSCompanionMAIN)

@@ -47,10 +47,10 @@ final class DIRModesAndStartupFlowTests: XCTestCase {
         )
     }
 
-    func testApneaRoutesToComingSoon() {
+    func testApneaRoutesToReady() {
         XCTAssertEqual(
             DIRStartupSelectionPolicy.nextStepAfterActivitySelection(.apnea),
-            .comingSoon(activity: .apnea)
+            .ready(activity: .apnea, divingMode: .gauge)
         )
     }
 
@@ -61,9 +61,9 @@ final class DIRModesAndStartupFlowTests: XCTestCase {
         )
     }
 
-    func testWatchLaunchabilityPolicyBlocksApneaAndSnorkeling() {
+    func testWatchLaunchabilityPolicyAllowsApneaOnMAIN() {
         XCTAssertTrue(DIRActivityMode.diving.isLaunchableOnWatchMAIN)
-        XCTAssertFalse(DIRActivityMode.apnea.isLaunchableOnWatchMAIN)
+        XCTAssertTrue(DIRActivityMode.apnea.isLaunchableOnWatchMAIN)
         XCTAssertFalse(DIRActivityMode.snorkeling.isLaunchableOnWatchMAIN)
     }
 

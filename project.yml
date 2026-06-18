@@ -25,7 +25,6 @@ targets:
           - SecureBuddyStore.swift
       - path: Views
         excludes:
-          - ApneaView.swift
           - SnorkelingView.swift
           - BuddyAssistView.swift
           - ExperimentalConceptsView.swift
@@ -53,6 +52,8 @@ targets:
       - Services/SensorProviderFactory.swift
       - Services/AppleDepthSensorProvider.swift
       - Services/MockDepthSensorProvider.swift
+      - Services/ApneaWatchRuntimeProviding.swift
+      - Services/ApneaWatchRuntimeStore.swift
       - Models/DiveGPSConfirmation.swift
       - Services/AscentSafetyHapticCoordinator.swift
       - Services/GPSManager.swift
@@ -162,6 +163,8 @@ targets:
       - Services/DiveLogStore.swift
       - Services/ApneaLogbookStore.swift
       - Services/ApneaImportedPlanStore.swift
+      - Services/ApneaWatchRuntimeProviding.swift
+      - Services/ApneaWatchRuntimeStore.swift
       - Services/ApneaSyncWatchReceiver.swift
       - Services/ApneaSyncAckSigner.swift
       - Services/ApneaSessionSyncCodec.swift
