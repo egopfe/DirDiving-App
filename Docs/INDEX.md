@@ -1,7 +1,22 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-18  
-**Branch consigliato:** `main` = `origin/main` @ **`a559ec9`**
+**Branch consigliato:** `main` = `origin/main` @ **`f38dbd4`**
+
+---
+
+## Aggiornamento indice 2026-06-18 — Audit 09 Snorkeling domain / ingestion / lifecycle
+
+Audit read-only post-Commands 01–03; gate Command 04 **PASS WITH CONDITIONS**.
+
+| Campo | Valore |
+|-------|--------|
+| **Comando** | `09_AUDIT_SNORKELING_DOMAIN_INGESTION_LIFECYCLE.md` |
+| **Report** | [`AUDIT_SNORKELING_DOMAIN_INGESTION_LIFECYCLE_CURRENT.md`](AUDIT_SNORKELING_DOMAIN_INGESTION_LIFECYCLE_CURRENT.md) |
+| **Baseline** | `main` @ **`f38dbd4`** |
+| **Verdict** | **PASS WITH CONDITIONS** |
+| **Gate Command 04** | **GO** (fix P2 isolation test comment) |
+| **XCTest snorkeling** | 41/42 pass (1 isolation false positive) |
 
 ---
 
