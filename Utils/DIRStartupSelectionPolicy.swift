@@ -97,7 +97,7 @@ enum DIRStartupSelectionPolicy {
         case .diving:
             return .divingModeSelection(activity: .diving)
         case .snorkeling:
-            return .comingSoon(activity: activity)
+            return .ready(activity: .snorkeling, divingMode: .gauge)
         }
     }
 

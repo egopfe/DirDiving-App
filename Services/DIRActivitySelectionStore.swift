@@ -97,6 +97,9 @@ final class DIRActivitySelectionStore: ObservableObject {
         if let apnea = ApneaWatchRuntimeStore.shared, apnea.isSessionActive {
             return false
         }
+        if let snorkeling = SnorkelingWatchRuntimeStore.shared, snorkeling.isSessionActive {
+            return false
+        }
         guard let dive = DiveManager.shared else { return true }
         return !dive.isDiveActive
     }

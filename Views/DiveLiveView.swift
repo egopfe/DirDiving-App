@@ -68,6 +68,8 @@ struct DiveLiveView: View {
     var body: some View {
         if activitySelection.selectedActivity == .apnea {
             ApneaView()
+        } else if activitySelection.selectedActivity == .snorkeling {
+            SnorkelingView()
         } else {
             divingLiveBody
         }

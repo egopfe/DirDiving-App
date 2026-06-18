@@ -8,11 +8,10 @@ enum DIRActivityMode: String, Codable, CaseIterable, Identifiable, Hashable, Sen
 
     var id: String { rawValue }
 
-    /// Watch MAIN: Diving, Apnea, and Snorkeling policies (Snorkeling remains coming-soon).
+    /// Watch MAIN: Diving, Apnea, and Snorkeling.
     var isLaunchableOnWatchMAIN: Bool {
         switch self {
-        case .diving, .apnea: return true
-        case .snorkeling: return false
+        case .diving, .apnea, .snorkeling: return true
         }
     }
 

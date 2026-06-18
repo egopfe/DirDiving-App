@@ -85,11 +85,30 @@ enum SnorkelingDomainValidator {
 
     static func validate(marker: SnorkelingMarker) -> [SnorkelingDomainValidationIssue] {
         var issues: [SnorkelingDomainValidationIssue] = []
-        if !SnorkelingDomainSupport.isValidCoordinate(latitude: marker.latitude, longitude: marker.longitude) {
-            issues.append(.invalidCoordinate(field: "marker.coordinate"))
+        switch marker.positionQuality {
+        case .measured, .degraded:
+            guard let latitude = marker.latitude, let longitude = marker.longitude else {
+                issues.append(.invalidCoordinate(field: "marker.missingCoordinateForQuality"))
+                break
+            }
+            if !SnorkelingDomainSupport.isValidCoordinate(latitude: latitude, longitude: longitude) {
+                issues.append(.invalidCoordinate(field: "marker.coordinate"))
+            }
+        case .unavailable, .noFix:
+            if marker.latitude != nil || marker.longitude != nil {
+                issues.append(.invalidCoordinate(field: "marker.coordinatePresentForNoFix"))
+            }
         }
         if let depth = marker.depthMeters, (!depth.isFinite || depth < 0) {
             issues.append(.negativeValue(field: "marker.depthMeters"))
+        }
+        if let note = marker.note, note.count > SnorkelingMarker.maximumNoteLength {
+            issues.append(.negativeValue(field: "marker.noteTooLong"))
+        }
+        if marker.category == .custom,
+           let label = marker.customCategoryLabel?.trimmingCharacters(in: .whitespacesAndNewlines),
+           label.isEmpty {
+            issues.append(.negativeValue(field: "marker.customCategoryLabel"))
         }
         return issues
     }

@@ -13,6 +13,8 @@ struct DIRDivingApp: App {
     @StateObject private var navigationStore: AppNavigationStore
     @StateObject private var activitySelectionStore: DIRActivitySelectionStore
     @StateObject private var apneaRuntimeStore: ApneaWatchRuntimeStore
+    @StateObject private var snorkelingRuntimeStore: SnorkelingWatchRuntimeStore
+    @StateObject private var snorkelingLogbookStore: SnorkelingLogbookStore
     @StateObject private var watchSync: WatchSyncService
     @StateObject private var explorationStore: ExplorationStore
     @StateObject private var buddyAssist: BuddyAssistService
@@ -29,6 +31,8 @@ struct DIRDivingApp: App {
         let navigationStore = AppNavigationStore()
         let activitySelectionStore = DIRActivitySelectionStore()
         let apneaRuntimeStore = ApneaWatchRuntimeStore()
+        let snorkelingRuntimeStore = SnorkelingWatchRuntimeStore()
+        let snorkelingLogbookStore = SnorkelingLogbookStore()
         let plannerBriefingStore = PlannerBriefingCardStore()
         _logStore = StateObject(wrappedValue: logStore)
         _apneaLogbookStore = StateObject(wrappedValue: apneaLogbookStore)
@@ -41,6 +45,8 @@ struct DIRDivingApp: App {
         _navigationStore = StateObject(wrappedValue: navigationStore)
         _activitySelectionStore = StateObject(wrappedValue: activitySelectionStore)
         _apneaRuntimeStore = StateObject(wrappedValue: apneaRuntimeStore)
+        _snorkelingRuntimeStore = StateObject(wrappedValue: snorkelingRuntimeStore)
+        _snorkelingLogbookStore = StateObject(wrappedValue: snorkelingLogbookStore)
         _watchSync = StateObject(wrappedValue: WatchSyncService.shared)
         _explorationStore = StateObject(wrappedValue: ExplorationStore())
         _buddyAssist = StateObject(wrappedValue: BuddyAssistService())
@@ -82,6 +88,8 @@ struct DIRDivingApp: App {
             .environmentObject(navigationStore)
             .environmentObject(activitySelectionStore)
             .environmentObject(apneaRuntimeStore)
+            .environmentObject(snorkelingRuntimeStore)
+            .environmentObject(snorkelingLogbookStore)
             .environmentObject(watchSync)
             .environmentObject(explorationStore)
             .environmentObject(buddyAssist)
