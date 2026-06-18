@@ -4,10 +4,30 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
+MODE="internal"
+for arg in "$@"; do
+  case "$arg" in
+    --internal) MODE="internal" ;;
+    --release) MODE="release" ;;
+    -h|--help)
+      echo "Usage: $0 [--internal|--release]"
+      echo "  --internal  allow dirty tree; physical QA remains PENDING (default)"
+      echo "  --release   require clean main; physical QA must not be auto-passed"
+      exit 0
+      ;;
+    *)
+      echo "[apnea-readiness] unknown argument: $arg"
+      exit 2
+      ;;
+  esac
+done
+
 BRANCH="$(git branch --show-current)"
 HEAD_SHA="$(git rev-parse --short HEAD)"
 ALLOWED_BRANCH="${APNEA_RELEASE_ALLOWED_BRANCH:-main}"
+DIRTY="$(git status --porcelain)"
 
+echo "[apnea-readiness] mode: ${MODE}"
 echo "[apnea-readiness] start Apnea release-hard validation on branch: ${BRANCH} @ ${HEAD_SHA}"
 
 case "${BRANCH}" in
@@ -19,7 +39,24 @@ case "${BRANCH}" in
     ;;
 esac
 
-if [[ -n "$(git status --porcelain)" ]]; then
+if [[ "${MODE}" == "release" ]]; then
+  if [[ "${BRANCH}" != "${ALLOWED_BRANCH}" ]]; then
+    echo "[apnea-readiness] release mode requires branch ${ALLOWED_BRANCH}; got ${BRANCH}"
+    exit 1
+  fi
+  if [[ -n "${DIRTY}" ]]; then
+    echo "[apnea-readiness] release mode requires a clean working tree"
+    exit 1
+  fi
+else
+  if [[ -n "${DIRTY}" ]]; then
+    echo "[apnea-readiness] internal mode: dirty tree allowed — clean-commit validation still pending"
+  fi
+fi
+
+if [[ -n "${DIRTY}" && "${MODE}" == "internal" ]]; then
+  echo "[apnea-readiness] internal mode: dirty tree allowed — clean-commit validation still pending"
+elif [[ -n "${DIRTY}" ]]; then
   echo "[apnea-readiness] warning: working tree is not clean"
 fi
 
@@ -39,6 +76,7 @@ required_docs=(
   "Docs/DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md"
   "Docs/SAFETY_DISCLAIMER.md"
   "Docs/BUILD_AND_XCODEGEN_WORKFLOW.md"
+  "Docs/QA_EVIDENCE/APNEA_BATTERY_THERMAL/README.md"
 )
 
 echo "[apnea-readiness] checking required docs"
@@ -103,6 +141,7 @@ xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving Watch Algorithm Tests
   -only-testing:"DIRDiving Watch Algorithm Tests/ApneaLogbookStoreTests" \
   -only-testing:"DIRDiving Watch Algorithm Tests/ApneaSyncWatchReceiverTests" \
   -only-testing:"DIRDiving Watch Algorithm Tests/ApneaSuspendResumeLifecycleIntegrationTests" \
+  -only-testing:"DIRDiving Watch Algorithm Tests/ApneaMonotonicClockRestoreTests" \
   -only-testing:"DIRDiving Watch Algorithm Tests/ApneaCheckpointFailureInjectionTests" \
   -only-testing:"DIRDiving Watch Algorithm Tests/ApneaArchitectureIsolationTests" \
   -only-testing:"DIRDiving Watch Algorithm Tests/ApneaCommand04PromotionGateTests" \
@@ -123,11 +162,23 @@ xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving iOS Algorithm Tests" 
   -only-testing:"DIRDiving iOS Algorithm Tests/IOSApneaMapEquipmentExportTests" \
   -only-testing:"DIRDiving iOS Algorithm Tests/ApneaSyncCodecTests" \
   -only-testing:"DIRDiving iOS Algorithm Tests/ApneaSyncCodecNegativePathTests" \
+  -only-testing:"DIRDiving iOS Algorithm Tests/ApneaSyncCryptographicLogicTests" \
   -only-testing:"DIRDiving iOS Algorithm Tests/ApneaSessionSyncTransportNegativeTests" \
   -only-testing:"DIRDiving iOS Algorithm Tests/ApneaSyncAckNegativeTests" \
   -only-testing:"DIRDiving iOS Algorithm Tests/ApneaOfflineOnlineEndToEndIntegrationTests" \
   -only-testing:"DIRDiving iOS Algorithm Tests/ApneaSessionMergeIntegrityTests" \
   -only-testing:"DIRDiving iOS Algorithm Tests/ApneaCloudBackupStubTruthfulnessTests" >/tmp/dirdiving_apnea_ios_tests.log
 
+echo "[apnea-readiness] scanning docs for stale current-state phrases"
+stale_hits="$(rg -n "ApneaView excluded|Apnea not available on Watch MAIN" Docs/APNEA_RELEASE_CHECKLIST.md Docs/APNEA_RELEASE_HARD_TEST_MATRIX.md Docs/DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md Docs/SAFETY_DISCLAIMER.md 2>/dev/null || true)"
+if [[ -n "${stale_hits}" ]]; then
+  echo "[apnea-readiness] stale documentation phrases detected:"
+  echo "${stale_hits}"
+  exit 1
+fi
+
 echo "[apnea-readiness] physical QA status: PENDING (no automated PASS for device evidence)"
+if [[ "${MODE}" == "release" ]]; then
+  echo "[apnea-readiness] release mode: TestFlight/App Store remain NO-GO until physical QA evidence is signed"
+fi
 echo "[apnea-readiness] PASS"

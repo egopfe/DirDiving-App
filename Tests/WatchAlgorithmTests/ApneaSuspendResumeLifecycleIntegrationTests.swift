@@ -16,7 +16,7 @@ final class ApneaSuspendResumeLifecycleIntegrationTests: XCTestCase {
         var engine = makeEngine()
         let sessionID = engine.snapshot.session.id
 
-        engine.armSession(at: wallClock(0))
+        armSession(&engine, offset: 0)
         XCTAssertEqual(engine.snapshot.phase, .ready)
 
         ingest(&engine, depth: 0, offset: 0)
@@ -30,7 +30,7 @@ final class ApneaSuspendResumeLifecycleIntegrationTests: XCTestCase {
         let preSuspendPhase = engine.snapshot.phase
         let preSuspendDiveCount = engine.snapshot.session.dives.count
 
-        let envelope = try engine.exportCheckpoint(now: wallClock(5))
+        let envelope = try exportCheckpoint(&engine, offset: 5)
 
         // Simulate suspension: destroy engine, advance wall clock, restore.
         let resumedWallOffset: TimeInterval = 5 + 600
@@ -41,11 +41,11 @@ final class ApneaSuspendResumeLifecycleIntegrationTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(restored.snapshot.acceptedSampleCount, preSuspendAccepted)
         XCTAssertTrue([.descending, .submerged, .ascending].contains(restored.snapshot.phase) || restored.snapshot.phase == preSuspendPhase)
 
-        ingest(&restored, depth: 8, offset: resumedWallOffset + 1, uptimeOffset: 6)
-        ingest(&restored, depth: 5, offset: resumedWallOffset + 2, uptimeOffset: 7)
-        ingest(&restored, depth: 2, offset: resumedWallOffset + 3, uptimeOffset: 8)
-        ingest(&restored, depth: 0, offset: resumedWallOffset + 4, uptimeOffset: 9)
-        keepSurface(&restored, from: resumedWallOffset + 5, count: 5, uptimeBase: 10)
+        ingest(&restored, depth: 8, offset: resumedWallOffset + 1, uptimeOffset: resumedWallOffset + 1)
+        ingest(&restored, depth: 5, offset: resumedWallOffset + 2, uptimeOffset: resumedWallOffset + 2)
+        ingest(&restored, depth: 2, offset: resumedWallOffset + 3, uptimeOffset: resumedWallOffset + 3)
+        ingest(&restored, depth: 0, offset: resumedWallOffset + 4, uptimeOffset: resumedWallOffset + 4)
+        keepSurface(&restored, from: resumedWallOffset + 5, count: 5, uptimeBase: resumedWallOffset + 5)
 
         XCTAssertEqual(restored.snapshot.session.id, sessionID)
         XCTAssertEqual(restored.snapshot.session.dives.count, 1)
@@ -57,10 +57,10 @@ final class ApneaSuspendResumeLifecycleIntegrationTests: XCTestCase {
 
     func testSuspendWhileArmedRestoresReadyPhase() throws {
         var engine = makeEngine()
-        engine.armSession(at: wallClock(0))
+        armSession(&engine, offset: 0)
         ingest(&engine, depth: 0, offset: 0)
         let sessionID = engine.snapshot.session.id
-        let envelope = try engine.exportCheckpoint(now: wallClock(1))
+        let envelope = try exportCheckpoint(&engine, offset: 1)
         var restored = try ApneaSessionEngine(checkpoint: envelope)
         XCTAssertEqual(restored.snapshot.session.id, sessionID)
         XCTAssertTrue([.ready, .surface].contains(restored.snapshot.phase))
@@ -68,9 +68,9 @@ final class ApneaSuspendResumeLifecycleIntegrationTests: XCTestCase {
 
     func testSuspendWhileReadyPreservesSessionID() throws {
         var engine = makeEngine()
-        engine.armSession(at: wallClock(0))
+        armSession(&engine, offset: 0)
         let sessionID = engine.snapshot.session.id
-        let envelope = try engine.exportCheckpoint(now: wallClock(0))
+        let envelope = try exportCheckpoint(&engine, offset: 0)
         let restored = try ApneaSessionEngine(checkpoint: envelope)
         XCTAssertEqual(restored.snapshot.session.id, sessionID)
         XCTAssertEqual(restored.snapshot.phase, .ready)
@@ -78,12 +78,12 @@ final class ApneaSuspendResumeLifecycleIntegrationTests: XCTestCase {
 
     func testSuspendDuringDescentPreservesActiveDive() throws {
         var engine = makeEngine()
-        engine.armSession(at: wallClock(0))
+        armSession(&engine, offset: 0)
         ingest(&engine, depth: 0, offset: 0)
         ingest(&engine, depth: 2, offset: 1)
         ingest(&engine, depth: 4, offset: 2)
         let sessionID = engine.snapshot.session.id
-        let envelope = try engine.exportCheckpoint(now: wallClock(3))
+        let envelope = try exportCheckpoint(&engine, offset: 3)
         let restored = try ApneaSessionEngine(checkpoint: envelope)
         XCTAssertEqual(restored.snapshot.session.id, sessionID)
         XCTAssertTrue(engine.snapshot.session.dives.isEmpty)
@@ -93,20 +93,20 @@ final class ApneaSuspendResumeLifecycleIntegrationTests: XCTestCase {
 
     func testSuspendAtMaximumDepthPreservesMaxDepth() throws {
         var engine = makeEngine()
-        engine.armSession(at: wallClock(0))
+        armSession(&engine, offset: 0)
         replayDepths(&engine, depths: [0, 0, 2, 6, 12, 12, 12], interval: 1, endOffset: 7)
         let maxBefore = engine.snapshot.session.dives.map(\.maxDepthMeters).max()
             ?? engine.snapshot.currentDepthMeters ?? 0
-        let envelope = try engine.exportCheckpoint(now: wallClock(7))
+        let envelope = try exportCheckpoint(&engine, offset: 7)
         let restored = try ApneaSessionEngine(checkpoint: envelope)
         XCTAssertGreaterThanOrEqual(restored.snapshot.currentDepthMeters ?? 0, maxBefore - 0.5)
     }
 
     func testSuspendDuringAscentContinuesToSurface() throws {
         var engine = makeEngine()
-        engine.armSession(at: wallClock(0))
+        armSession(&engine, offset: 0)
         replayDepths(&engine, depths: [0, 0, 2, 8, 10, 8, 4], interval: 1, endOffset: 7)
-        let envelope = try engine.exportCheckpoint(now: wallClock(7))
+        let envelope = try exportCheckpoint(&engine, offset: 7)
         var restored = try ApneaSessionEngine(checkpoint: envelope)
         ingest(&restored, depth: 2, offset: 8)
         ingest(&restored, depth: 0, offset: 9)
@@ -116,21 +116,21 @@ final class ApneaSuspendResumeLifecycleIntegrationTests: XCTestCase {
 
     func testSuspendDuringSurfaceDwellPreservesSurfacedPhase() throws {
         var engine = makeEngine()
-        engine.armSession(at: wallClock(0))
+        armSession(&engine, offset: 0)
         let end = replayDepths(&engine, depths: [0, 0, 2, 6, 3, 0, 0], interval: 1, endOffset: 7)
         keepSurface(&engine, from: end, count: 1)
-        let envelope = try engine.exportCheckpoint(now: wallClock(end + 1))
+        let envelope = try exportCheckpoint(&engine, offset: end + 1)
         let restored = try ApneaSessionEngine(checkpoint: envelope)
         XCTAssertTrue([.surfaced, .recovery, .surface].contains(restored.snapshot.phase))
     }
 
     func testSuspendDuringRecoveryPreservesRecoveryInterval() throws {
         var engine = makeEngine()
-        engine.armSession(at: wallClock(0))
+        armSession(&engine, offset: 0)
         let end = replayDepths(&engine, depths: [0, 0, 2, 5, 8, 4, 0, 0, 0, 0], interval: 1, endOffset: 10)
         keepSurface(&engine, from: end, count: 5)
         let required = engine.snapshot.requiredRecoverySeconds
-        let envelope = try engine.exportCheckpoint(now: wallClock(end + 5))
+        let envelope = try exportCheckpoint(&engine, offset: end + 5)
         let restored = try ApneaSessionEngine(checkpoint: envelope)
         XCTAssertEqual(restored.snapshot.requiredRecoverySeconds, required)
         XCTAssertTrue([.recovery, .surface].contains(restored.snapshot.phase))
@@ -140,11 +140,11 @@ final class ApneaSuspendResumeLifecycleIntegrationTests: XCTestCase {
         var config = testConfiguration()
         config.sensorLossTimeoutSeconds = 2
         var engine = ApneaSessionEngine(configuration: config, sessionStart: startDate)
-        engine.armSession(at: wallClock(0))
+        armSession(&engine, offset: 0)
         ingest(&engine, depth: 0, offset: 0)
         engine.tick(now: wallClock(4), uptime: uptime(4))
         XCTAssertEqual(engine.snapshot.phase, .sensorDegraded)
-        let envelope = try engine.exportCheckpoint(now: wallClock(4))
+        let envelope = try exportCheckpoint(&engine, offset: 4)
         let restored = try ApneaSessionEngine(checkpoint: envelope)
         XCTAssertEqual(restored.snapshot.phase, .sensorDegraded)
         XCTAssertEqual(restored.snapshot.sensorHealth, .degraded)
@@ -152,11 +152,11 @@ final class ApneaSuspendResumeLifecycleIntegrationTests: XCTestCase {
 
     func testSuspendWithManualFallbackEnabledPreservesSessionForReEnable() throws {
         var engine = makeEngine()
-        engine.armSession(at: wallClock(0))
+        armSession(&engine, offset: 0)
         engine.enableManualFallback()
         let sessionID = engine.snapshot.session.id
         XCTAssertEqual(engine.snapshot.sensorHealth, .manualFallback)
-        let envelope = try engine.exportCheckpoint(now: wallClock(1))
+        let envelope = try exportCheckpoint(&engine, offset: 1)
         var restored = try ApneaSessionEngine(checkpoint: envelope)
         XCTAssertEqual(restored.snapshot.session.id, sessionID)
         restored.enableManualFallback()
@@ -165,10 +165,10 @@ final class ApneaSuspendResumeLifecycleIntegrationTests: XCTestCase {
 
     func testResumeAfterWallClockRegressionDoesNotRegressMonotonicElapsed() throws {
         var engine = makeEngine()
-        engine.armSession(at: wallClock(0))
+        armSession(&engine, offset: 0)
         ingest(&engine, depth: 0, offset: 0, uptimeOffset: 0)
         ingest(&engine, depth: 2, offset: 5, uptimeOffset: 5)
-        let envelope = try engine.exportCheckpoint(now: wallClock(5))
+        let envelope = try exportCheckpoint(&engine, offset: 5)
         var restored = try ApneaSessionEngine(checkpoint: envelope)
         ingest(&restored, depth: 2, offset: 2, uptimeOffset: 8)
         XCTAssertGreaterThanOrEqual(restored.snapshot.sessionElapsedSeconds, 5)
@@ -176,9 +176,9 @@ final class ApneaSuspendResumeLifecycleIntegrationTests: XCTestCase {
 
     func testResumeAfterLargeWallClockJumpUsesMonotonicPolicy() throws {
         var engine = makeEngine()
-        engine.armSession(at: wallClock(0))
+        armSession(&engine, offset: 0)
         ingest(&engine, depth: 0, offset: 0)
-        let envelope = try engine.exportCheckpoint(now: wallClock(1))
+        let envelope = try exportCheckpoint(&engine, offset: 1)
         var restored = try ApneaSessionEngine(checkpoint: envelope)
         ingest(&restored, depth: 0, offset: 1 + 86_400, uptimeOffset: 3)
         XCTAssertGreaterThanOrEqual(restored.snapshot.sessionElapsedSeconds, 1)
@@ -186,16 +186,16 @@ final class ApneaSuspendResumeLifecycleIntegrationTests: XCTestCase {
 
     func testResumeWithCorruptCheckpointFailsClosed() throws {
         var engine = makeEngine()
-        engine.armSession(at: wallClock(0))
-        var envelope = try engine.exportCheckpoint(now: wallClock(0))
+        armSession(&engine, offset: 0)
+        var envelope = try exportCheckpoint(&engine, offset: 0)
         envelope.checksum = "invalid"
         XCTAssertThrowsError(try ApneaSessionEngine(checkpoint: envelope))
     }
 
     func testResumeWithUnsupportedCheckpointSchemaFailsClosed() throws {
         var engine = makeEngine()
-        engine.armSession(at: wallClock(0))
-        var envelope = try engine.exportCheckpoint(now: wallClock(0))
+        armSession(&engine, offset: 0)
+        var envelope = try exportCheckpoint(&engine, offset: 0)
         var payload = try ApneaSessionCheckpointIntegrity.payload(from: envelope)
         payload.schemaVersion = 99
         envelope = try ApneaSessionCheckpointIntegrity.makeEnvelope(payload: payload)
@@ -211,13 +211,13 @@ final class ApneaSuspendResumeLifecycleIntegrationTests: XCTestCase {
 
     func testRepeatedSuspendResumeCyclesRemainDeterministic() throws {
         var engine = makeEngine()
-        engine.armSession(at: wallClock(0))
+        armSession(&engine, offset: 0)
         ingest(&engine, depth: 0, offset: 0)
         ingest(&engine, depth: 3, offset: 1)
 
         var lastID = engine.snapshot.session.id
         for cycle in 1...3 {
-            let envelope = try engine.exportCheckpoint(now: wallClock(TimeInterval(cycle)))
+            let envelope = try exportCheckpoint(&engine, offset: TimeInterval(cycle))
             engine = try ApneaSessionEngine(checkpoint: envelope)
             XCTAssertEqual(engine.snapshot.session.id, lastID)
             ingest(&engine, depth: Double(cycle + 2), offset: TimeInterval(cycle + 1))
@@ -228,22 +228,22 @@ final class ApneaSuspendResumeLifecycleIntegrationTests: XCTestCase {
         var config = testConfiguration()
         config.minimumDiveDurationSeconds = 30
         var engine = ApneaSessionEngine(configuration: config, sessionStart: startDate)
-        engine.armSession(at: wallClock(0))
+        armSession(&engine, offset: 0)
         replayDepths(&engine, depths: [0, 3, 5, 2], interval: 1, endOffset: 4)
         XCTAssertEqual(engine.snapshot.session.dives.count, 0)
-        let envelope = try engine.exportCheckpoint(now: wallClock(4))
+        let envelope = try exportCheckpoint(&engine, offset: 4)
         let restored = try ApneaSessionEngine(checkpoint: envelope)
         XCTAssertEqual(restored.snapshot.session.dives.count, 0)
     }
 
     func testSuspendAfterCompletedDivePreservesCommittedDive() throws {
         var engine = makeEngine()
-        engine.armSession(at: wallClock(0))
+        armSession(&engine, offset: 0)
         let end = replayDepths(&engine, depths: [0, 0, 2, 6, 8, 4, 0, 0, 0, 0], interval: 1, endOffset: 10)
         keepSurface(&engine, from: end, count: 5)
         XCTAssertEqual(engine.snapshot.session.dives.count, 1)
         let diveID = engine.snapshot.session.dives[0].id
-        let envelope = try engine.exportCheckpoint(now: wallClock(end + 5))
+        let envelope = try exportCheckpoint(&engine, offset: end + 5)
         let restored = try ApneaSessionEngine(checkpoint: envelope)
         XCTAssertEqual(restored.snapshot.session.dives.count, 1)
         XCTAssertEqual(restored.snapshot.session.dives[0].id, diveID)
@@ -254,7 +254,7 @@ final class ApneaSuspendResumeLifecycleIntegrationTests: XCTestCase {
         config.recoveryMinimumSeconds = 2
         config.surfaceStableDwellSeconds = 2
         var engine = ApneaSessionEngine(configuration: config, sessionStart: startDate)
-        engine.armSession(at: wallClock(0))
+        armSession(&engine, offset: 0)
 
         let firstEnd = replayDepths(&engine, depths: [0, 2, 5, 8, 4, 0, 0, 0, 0], interval: 1, endOffset: 9)
         keepSurface(&engine, from: firstEnd, count: 5)
@@ -262,9 +262,124 @@ final class ApneaSuspendResumeLifecycleIntegrationTests: XCTestCase {
 
         let secondStart = firstEnd + 6
         replayDepths(&engine, depths: [0, 2, 6, 3, 0, 0, 0, 0], interval: 1, startOffset: secondStart, endOffset: secondStart + 8)
-        let envelope = try engine.exportCheckpoint(now: wallClock(secondStart + 8))
+        let envelope = try exportCheckpoint(&engine, offset: secondStart + 8)
         let restored = try ApneaSessionEngine(checkpoint: envelope)
         XCTAssertGreaterThanOrEqual(restored.snapshot.session.dives.count, 1)
+    }
+
+    // MARK: - Release gate restoration coverage (Audit 08 remediation)
+
+    func testSuspendDuringActiveDiveRestoresSameActiveDive() throws {
+        var engine = makeEngine()
+        armSession(&engine, offset: 0)
+        ingest(&engine, depth: 0, offset: 0)
+        ingest(&engine, depth: 2, offset: 1)
+        ingest(&engine, depth: 6, offset: 2)
+        ingest(&engine, depth: 8, offset: 3)
+        let sessionID = engine.snapshot.session.id
+        let envelope = try exportCheckpoint(&engine, offset: 4)
+        var restored = try ApneaSessionEngine(checkpoint: envelope)
+        XCTAssertEqual(restored.snapshot.session.id, sessionID)
+        XCTAssertEqual(restored.snapshot.session.dives.count, 0)
+        XCTAssertTrue([.descending, .submerged, .ascending].contains(restored.snapshot.phase))
+        ingest(&restored, depth: 6, offset: 5)
+        ingest(&restored, depth: 2, offset: 6)
+        ingest(&restored, depth: 0, offset: 7)
+        keepSurface(&restored, from: 8, count: 5)
+        XCTAssertEqual(restored.snapshot.session.dives.count, 1)
+    }
+
+    func testResumeThenSurfaceCommitsRestoredDiveExactlyOnce() throws {
+        var engine = makeEngine()
+        armSession(&engine, offset: 0)
+        ingest(&engine, depth: 0, offset: 0)
+        ingest(&engine, depth: 2, offset: 1)
+        ingest(&engine, depth: 8, offset: 2)
+        ingest(&engine, depth: 10, offset: 3)
+        let envelope = try exportCheckpoint(&engine, offset: 4)
+        var restored = try ApneaSessionEngine(checkpoint: envelope)
+        ingest(&restored, depth: 8, offset: 5)
+        ingest(&restored, depth: 4, offset: 6)
+        ingest(&restored, depth: 0, offset: 7)
+        keepSurface(&restored, from: 8, count: 5)
+        XCTAssertEqual(restored.snapshot.session.dives.count, 1)
+        let diveID = restored.snapshot.session.dives[0].id
+        ingest(&restored, depth: 0, offset: 20)
+        keepSurface(&restored, from: 21, count: 3)
+        XCTAssertEqual(restored.snapshot.session.dives.count, 1)
+        XCTAssertEqual(restored.snapshot.session.dives[0].id, diveID)
+    }
+
+    func testRestoreDoesNotDropCommittedDives() throws {
+        var engine = makeEngine()
+        armSession(&engine, offset: 0)
+        let end = replayDepths(&engine, depths: [0, 0, 2, 6, 8, 4, 0, 0, 0, 0], interval: 1, endOffset: 10)
+        keepSurface(&engine, from: end, count: 5)
+        XCTAssertEqual(engine.snapshot.session.dives.count, 1)
+        let diveID = engine.snapshot.session.dives[0].id
+        let envelope = try exportCheckpoint(&engine, offset: end + 5)
+        let restored = try ApneaSessionEngine(checkpoint: envelope)
+        XCTAssertEqual(restored.snapshot.session.dives.count, 1)
+        XCTAssertEqual(restored.snapshot.session.dives[0].id, diveID)
+    }
+
+    func testRepeatedRestoreDoesNotDuplicateDive() throws {
+        var engine = makeEngine()
+        armSession(&engine, offset: 0)
+        let end = replayDepths(&engine, depths: [0, 0, 2, 5, 8, 4, 0, 0, 0, 0], interval: 1, endOffset: 10)
+        keepSurface(&engine, from: end, count: 5)
+        XCTAssertEqual(engine.snapshot.session.dives.count, 1)
+        var envelope = try exportCheckpoint(&engine, offset: end + 5)
+        for _ in 0..<3 {
+            var restored = try ApneaSessionEngine(checkpoint: envelope)
+            XCTAssertEqual(restored.snapshot.session.dives.count, 1)
+            envelope = try exportCheckpoint(&restored, offset: end + 6)
+        }
+    }
+
+    func testRestoreDuringSurfaceDwellPreservesConservativeState() throws {
+        var config = testConfiguration()
+        config.surfaceStableDwellSeconds = 5
+        var engine = ApneaSessionEngine(configuration: config, sessionStart: startDate)
+        armSession(&engine, offset: 0)
+        let end = replayDepths(&engine, depths: [0, 0, 2, 6, 3, 0, 0], interval: 1, endOffset: 7)
+        ingest(&engine, depth: 0, offset: end)
+        XCTAssertTrue([.surfaced, .ascending].contains(engine.snapshot.phase))
+        let envelope = try exportCheckpoint(&engine, offset: end)
+        let restored = try ApneaSessionEngine(checkpoint: envelope)
+        XCTAssertTrue([.surfaced, .ascending, .recovery].contains(restored.snapshot.phase))
+        XCTAssertEqual(restored.snapshot.session.dives.count, 0)
+    }
+
+    func testRestoreBeforeMinimumDurationDoesNotCommitInvalidDive() throws {
+        var config = testConfiguration()
+        config.minimumDiveDurationSeconds = 30
+        var engine = ApneaSessionEngine(configuration: config, sessionStart: startDate)
+        armSession(&engine, offset: 0)
+        replayDepths(&engine, depths: [0, 3, 5, 2, 0], interval: 1, endOffset: 5)
+        let envelope = try exportCheckpoint(&engine, offset: 5)
+        var restored = try ApneaSessionEngine(checkpoint: envelope)
+        ingest(&restored, depth: 0, offset: 6)
+        keepSurface(&restored, from: 7, count: 5)
+        XCTAssertEqual(restored.snapshot.session.dives.count, 0)
+    }
+
+    func testRestoreAfterMinimumDurationStillRequiresValidSurfaceTransition() throws {
+        var engine = makeEngine()
+        armSession(&engine, offset: 0)
+        ingest(&engine, depth: 0, offset: 0)
+        ingest(&engine, depth: 2, offset: 1)
+        ingest(&engine, depth: 8, offset: 2)
+        ingest(&engine, depth: 10, offset: 3)
+        let envelope = try exportCheckpoint(&engine, offset: 4)
+        var restored = try ApneaSessionEngine(checkpoint: envelope)
+        XCTAssertEqual(restored.snapshot.session.dives.count, 0)
+        ingest(&restored, depth: 8, offset: 5)
+        ingest(&restored, depth: 4, offset: 6)
+        ingest(&restored, depth: 0, offset: 7)
+        XCTAssertEqual(restored.snapshot.session.dives.count, 0)
+        keepSurface(&restored, from: 8, count: 5)
+        XCTAssertEqual(restored.snapshot.session.dives.count, 1)
     }
 
     // MARK: - Helpers
@@ -292,6 +407,17 @@ final class ApneaSuspendResumeLifecycleIntegrationTests: XCTestCase {
 
     private func uptime(_ offset: TimeInterval) -> TimeInterval {
         baseUptime + offset
+    }
+
+    private func armSession(_ engine: inout ApneaSessionEngine, offset: TimeInterval = 0) {
+        engine.armSession(at: wallClock(offset), uptime: uptime(offset))
+    }
+
+    private func exportCheckpoint(
+        _ engine: inout ApneaSessionEngine,
+        offset: TimeInterval
+    ) throws -> ApneaSessionCheckpointEnvelope {
+        try engine.exportCheckpoint(now: wallClock(offset), uptime: uptime(offset))
     }
 
     private func ingest(

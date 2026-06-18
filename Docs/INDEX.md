@@ -174,6 +174,33 @@ Read-only audit su `main`: runtime Bühlmann Watch, solver prospettico, state ma
 
 ---
 
+## Aggiornamento indice 2026-06-18 — Snorkeling domain models (Command 01)
+
+Dominio puro Snorkeling su `Shared/Models/Snorkeling*` + validator/migration; UI non attivata.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `01_SNORKELING_DOMAIN_MODELS_AND_VERSIONED_SCHEMA.md` |
+| **Report** | [`DIR_DIVING_SNORKELING_DOMAIN_MODELS_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_DOMAIN_MODELS_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Tests** | `SnorkelingDomainModelTests` (12) |
+| **MAIN promotion** | **not yet** — `SnorkelingView` excluded |
+
+---
+
+## Aggiornamento indice 2026-06-18 — Audit 08 release gate remediation
+
+Remediation Audit 08: suspend/resume + monotonic clock fix, release-hard script `--internal`/`--release`, pure HMAC tests, documentation alignment, `APNEA_BATTERY_THERMAL` QA scaffold.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit** | [`AUDIT_APNEA_RELEASE_GATE_CURRENT.md`](AUDIT_APNEA_RELEASE_GATE_CURRENT.md) |
+| **Remediation** | [`APNEA_RELEASE_GATE_REMEDIATION_REPORT_V1.0.md`](APNEA_RELEASE_GATE_REMEDIATION_REPORT_V1.0.md) |
+| **Baseline commit** | `51d3da0` (+ uncommitted Audit 08 fixes) |
+| **Internal gate** | **GO** (`validate_apnea_release_readiness.sh --internal`) |
+| **TestFlight / App Store** | **NO-GO** (physical QA PENDING) |
+
+---
+
 ## Aggiornamento indice 2026-06-17 — Apnea release-hard (Command 12)
 
 Pass release-hard su `integration/full-computer`: matrice 23 mockup `APNEA_*`, test automatizzati, script `validate_apnea_release_readiness.sh`, architettura e checklist.
