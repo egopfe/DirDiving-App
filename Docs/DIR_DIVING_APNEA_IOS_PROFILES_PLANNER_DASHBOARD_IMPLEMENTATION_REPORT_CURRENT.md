@@ -2,7 +2,7 @@
 
 **Command:** `08_IOS_APNEA_PROFILES_PLANNER_AND_DASHBOARD.md`  
 **Date:** 2026-06-17  
-**Branch:** `integration/full-computer`  
+**Branch:** `main`  
 **Result:** PASS
 
 ## Implemented

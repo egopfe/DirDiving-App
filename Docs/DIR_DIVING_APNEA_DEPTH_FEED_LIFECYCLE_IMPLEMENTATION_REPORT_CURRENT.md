@@ -2,7 +2,7 @@
 
 **Command:** `02_SHARED_DEPTH_FEED_AND_APNEA_LIFECYCLE_ENGINE.md`  
 **Date:** 2026-06-17  
-**Branch:** `integration/full-computer`  
+**Branch:** `main`  
 **Final result:** **PASS**
 
 ---

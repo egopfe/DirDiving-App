@@ -2,7 +2,7 @@
 
 **Command:** `07_APNEA_WATCH_LOGBOOK_AND_SESSION_STATISTICS.md`  
 **Date:** 2026-06-17  
-**Branch:** `integration/full-computer`  
+**Branch:** `main`  
 **Result:** PASS
 
 ## Implemented

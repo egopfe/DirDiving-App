@@ -2,7 +2,7 @@
 
 **Command:** `06_WATCH_SURFACE_RECOVERY_SUMMARY_UI.md`  
 **Date:** 2026-06-17  
-**Branch:** `integration/full-computer`  
+**Branch:** `main`  
 **Result:** PASS
 
 ## Implemented
