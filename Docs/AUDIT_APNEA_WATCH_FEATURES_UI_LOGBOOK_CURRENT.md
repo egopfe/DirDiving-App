@@ -29,6 +29,22 @@
 
 ---
 
+## Remediation addendum (2026-06-18, uncommitted)
+
+Audit 06 Remediation V1.0 on `main` @ `a1e0cab` closes code-fixable findings:
+
+- `ApneaView` promoted to Watch MAIN; routes via `DiveLiveView` when activity is `.apnea`
+- `ApneaWatchRuntimeStore` replaces `DiveManager` / `ExplorationStore` coupling
+- Target-not-reached operational tests added
+- Layout-contract tests + physical QA evidence scaffolds added
+- **Internal readiness after remediation:** **100%** (code/tests/docs)
+- **Physical QA:** still **PENDING**
+- **Command 08 gate:** `READY_FOR_APNEA_COMMAND_08`
+
+See `Docs/APNEA_WATCH_FEATURES_UI_LOGBOOK_REMEDIATION_REPORT_V1.0.md`.
+
+---
+
 ## Scope map (Commands 04–07)
 
 | Command | Primary artifacts | Status |
@@ -216,4 +232,4 @@
 
 ---
 
-*Audit 06 — read-only. No application code modified.*
+*Audit 06 — read-only baseline at `5baa97e`; remediation addendum documents post-audit implementation.*

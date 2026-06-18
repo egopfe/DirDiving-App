@@ -163,6 +163,12 @@ enum ApneaWatchPresentation {
         if !input.isSessionStarted {
             return .ready
         }
+        if input.diveCount == 0,
+           input.lastDiveDurationSeconds == 0,
+           input.recoveryRemainingSeconds == 0,
+           input.currentDepthMeters < 0.5 {
+            return .dive
+        }
         if input.currentDepthMeters < 0.5 && input.recoveryRemainingSeconds > 0 {
             return .surfaceRecovery
         }

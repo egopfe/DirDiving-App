@@ -66,6 +66,14 @@ struct DiveLiveView: View {
     }
 
     var body: some View {
+        if activitySelection.selectedActivity == .apnea {
+            ApneaView()
+        } else {
+            divingLiveBody
+        }
+    }
+
+    private var divingLiveBody: some View {
         ZStack {
             DiveScreenBackground()
 

@@ -52,6 +52,8 @@ required_sources=(
   "Shared/Utils/ApneaSessionCheckpoint.swift"
   "Shared/Utils/DepthMeasurementFeed.swift"
   "Utils/ApneaReleaseSelfCheck.swift"
+  "Services/ApneaWatchRuntimeStore.swift"
+  "Views/ApneaView.swift"
 )
 
 echo "[apnea-readiness] checking required Apnea sources"
@@ -59,9 +61,13 @@ for src in "${required_sources[@]}"; do
   [[ -f "$src" ]] || { echo "[apnea-readiness] missing source: $src"; exit 1; }
 done
 
-echo "[apnea-readiness] checking ApneaView MAIN exclusion in project.yml"
-grep -q -- "- ApneaView.swift" project.yml || {
-  echo "[apnea-readiness] ApneaView must remain excluded from MAIN Watch target"
+echo "[apnea-readiness] checking ApneaView MAIN promotion in project.yml"
+grep -q -- "- ApneaView.swift" project.yml && {
+  echo "[apnea-readiness] ApneaView must not remain excluded from MAIN Watch target"
+  exit 1
+}
+grep -q -- "Services/ApneaWatchRuntimeStore.swift" project.yml || {
+  echo "[apnea-readiness] ApneaWatchRuntimeStore must be in MAIN Watch target"
   exit 1
 }
 
@@ -100,6 +106,9 @@ xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving Watch Algorithm Tests
   -only-testing:"DIRDiving Watch Algorithm Tests/ApneaCheckpointFailureInjectionTests" \
   -only-testing:"DIRDiving Watch Algorithm Tests/ApneaArchitectureIsolationTests" \
   -only-testing:"DIRDiving Watch Algorithm Tests/ApneaCommand04PromotionGateTests" \
+  -only-testing:"DIRDiving Watch Algorithm Tests/ApneaWatchRuntimeStoreTests" \
+  -only-testing:"DIRDiving Watch Algorithm Tests/ApneaWatchMainPromotionTests" \
+  -only-testing:"DIRDiving Watch Algorithm Tests/ApneaWatchLayoutContractTests" \
   -only-testing:"DIRDiving Watch Algorithm Tests/ApneaDomainModelTests" >/tmp/dirdiving_apnea_watch_tests.log
 
 echo "[apnea-readiness] test iOS algorithms (Apnea companion + sync)"
