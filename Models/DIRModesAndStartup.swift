@@ -8,9 +8,12 @@ enum DIRActivityMode: String, Codable, CaseIterable, Identifiable, Hashable, Sen
 
     var id: String { rawValue }
 
-    /// Watch MAIN: only Diving may enter runtime; Apnea/Snorkeling route to `comingSoon`.
+    /// Watch MAIN: Diving, Apnea, and Snorkeling policies (Snorkeling remains coming-soon).
     var isLaunchableOnWatchMAIN: Bool {
-        self == .diving
+        switch self {
+        case .diving, .apnea: return true
+        case .snorkeling: return false
+        }
     }
 
     /// iOS Companion: Apnea preparatory flows are selectable; Snorkeling remains unavailable on MAIN.

@@ -22,9 +22,9 @@ final class ApneaReleaseHardValidationTests: XCTestCase {
             contentsOf: repositoryRoot().appendingPathComponent("project.yml"),
             encoding: .utf8
         )
-        XCTAssertTrue(
+        XCTAssertFalse(
             project.contains("- ApneaView.swift"),
-            "ApneaView must remain explicitly excluded from MAIN Watch target until promotion review"
+            "ApneaView must be included in MAIN Watch target after promotion"
         )
     }
 
