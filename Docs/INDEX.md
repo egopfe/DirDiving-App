@@ -1,7 +1,7 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-18  
-**Branch consigliato:** `main` = `origin/main` @ **`db06bcd`**
+**Branch consigliato:** `main` = `origin/main` @ **`8f7aeeb`**
 
 ---
 
@@ -182,6 +182,7 @@ Read-only audit su `main`: runtime Bühlmann Watch, solver prospettico, state ma
 |-------|--------|
 | **Command** | `03_SNORKELING_SESSION_AND_DIP_LIFECYCLE_ENGINE.md` |
 | **Report** | [`DIR_DIVING_SNORKELING_SESSION_LIFECYCLE_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_SESSION_LIFECYCLE_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Commit** | **`8f7aeeb`** |
 | **Tests** | `SnorkelingLifecycleEngineTests` (15) |
 | **MAIN promotion** | **not yet** |
 
@@ -195,6 +196,7 @@ Feed condivisi profondità + GPS su `Shared/Utils/Snorkeling*Feed`; UI non attiv
 |-------|--------|
 | **Command** | `02_SNORKELING_SHARED_SENSOR_GPS_INGESTION.md` |
 | **Report** | [`DIR_DIVING_SNORKELING_SENSOR_GPS_INGESTION_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_SENSOR_GPS_INGESTION_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Commit** | **`8f7aeeb`** |
 | **Tests** | `SnorkelingSensorGPSIngestionTests` (13) + isolation |
 | **MAIN promotion** | **not yet** |
 
