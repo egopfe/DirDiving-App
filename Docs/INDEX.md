@@ -1,7 +1,7 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-18  
-**Branch consigliato:** `main` = `origin/main` @ **`db06bcd`**
+**Branch consigliato:** `main` = `origin/main` @ **`8f7aeeb`**
 
 ---
 
@@ -171,6 +171,34 @@ Read-only audit su `main`: runtime Bühlmann Watch, solver prospettico, state ma
 | **Verdict** | **PASS** (Watch MAIN); iOS = planner/logbook only |
 | **Remediation** | P2/P3 closed @ post-`efdcb3a` commit — see audit addendum |
 | **Prerequisite** | [`FULL_COMPUTER_FOUNDATIONS_REMEDIATION_REPORT_V1.1.md`](FULL_COMPUTER_FOUNDATIONS_REMEDIATION_REPORT_V1.1.md) |
+
+---
+
+## Aggiornamento indice 2026-06-18 — Snorkeling session lifecycle (Command 03)
+
+`SnorkelingSessionEngine` deterministico + state machine dip; separato da `ExplorationStore`.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `03_SNORKELING_SESSION_AND_DIP_LIFECYCLE_ENGINE.md` |
+| **Report** | [`DIR_DIVING_SNORKELING_SESSION_LIFECYCLE_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_SESSION_LIFECYCLE_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Commit** | **`8f7aeeb`** |
+| **Tests** | `SnorkelingLifecycleEngineTests` (15) |
+| **MAIN promotion** | **not yet** |
+
+---
+
+## Aggiornamento indice 2026-06-18 — Snorkeling sensor/GPS ingestion (Command 02)
+
+Feed condivisi profondità + GPS su `Shared/Utils/Snorkeling*Feed`; UI non attivata.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `02_SNORKELING_SHARED_SENSOR_GPS_INGESTION.md` |
+| **Report** | [`DIR_DIVING_SNORKELING_SENSOR_GPS_INGESTION_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_SENSOR_GPS_INGESTION_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Commit** | **`8f7aeeb`** |
+| **Tests** | `SnorkelingSensorGPSIngestionTests` (13) + isolation |
+| **MAIN promotion** | **not yet** |
 
 ---
 
