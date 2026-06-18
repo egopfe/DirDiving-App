@@ -295,3 +295,22 @@ PASS WITH CONDITIONS
 ---
 
 *Audit 07 — read-only. No application code modified. Report: `Docs/AUDIT_APNEA_IOS_SYNC_END_TO_END_CURRENT.md`.*
+
+---
+
+## Remediation addendum (V1.0 — 2026-06-18)
+
+**Remediation report:** [`APNEA_IOS_SYNC_END_TO_END_REMEDIATION_REPORT_V1.0.md`](APNEA_IOS_SYNC_END_TO_END_REMEDIATION_REPORT_V1.0.md)
+
+| P3 finding | Remediation status |
+|------------|-------------------|
+| Plan `futureSchema` / corrupt decode tests | **CLOSED** — `ApneaSyncCodecNegativePathTests`, `ApneaPlanPackageWatchNegativeTests` |
+| Session `unsupportedVersion` / replay tests | **CLOSED** — `ApneaSessionSyncTransportNegativeTests`, `ApneaSessionSyncTransportNegativeWatchTests` |
+| Offline→online E2E harness | **CLOSED** — `ApneaOfflineOnlineEndToEndIntegrationTests` (iOS + Watch) |
+| Physical device sync QA | **PENDING** — `Docs/QA_EVIDENCE/APNEA_*` scaffolds |
+| Audit 06 Watch remediation uncommitted | **CLOSED** on `main` @ `2309320` / `cbc485e` |
+| Cloud backup stub | **CLOSED** — truthful EN/IT copy + `ApneaCloudBackupStubTruthfulnessTests` |
+
+**Post-remediation internal readiness:** **100%** (code + automation + docs). **Physical evidence:** **PENDING**.
+
+**Command 12 gate:** **READY_FOR_APNEA_COMMAND_12** (internal); physical QA still required before TestFlight.
