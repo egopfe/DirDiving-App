@@ -5,6 +5,48 @@
 
 ---
 
+## Aggiornamento indice 2026-06-18 — Snorkeling iOS photos/gear/export (Command 10)
+
+Foto sessione/marker, profili attrezzatura, buddy/gruppo, export privacy-gated (PDF/CSV/JSON/GPX/chart).
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `10_IOS_SNORKELING_PHOTOS_GEAR_BUDDY_EXPORT_PRIVACY.md` |
+| **Report** | [`DIR_DIVING_SNORKELING_IOS_PHOTOS_GEAR_BUDDY_EXPORT_PRIVACY_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_IOS_PHOTOS_GEAR_BUDDY_EXPORT_PRIVACY_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Tests focused** | 48/48 PASS (Command 08–10 suites) |
+| **Build** | DIRDiving iOS — BUILD SUCCEEDED |
+| **Gate** | `READY_FOR_SNORKELING_COMMAND_11` |
+
+---
+
+## Aggiornamento indice 2026-06-18 — Snorkeling iOS logbook (Command 09)
+
+Logbook, grafici sessione, statistiche, record personali, mappa superficie con gap GPS.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `09_IOS_SNORKELING_LOGBOOK_GRAPHS_STATS_RECORDS.md` |
+| **Report** | [`DIR_DIVING_SNORKELING_IOS_LOGBOOK_GRAPHS_STATS_RECORDS_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_IOS_LOGBOOK_GRAPHS_STATS_RECORDS_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Tests focused** | 38/38 PASS (`IOSSnorkelingLogbookAnalyticsTests` + Command 08 suites) |
+| **Build** | DIRDiving iOS — BUILD SUCCEEDED |
+| **Gate** | `READY_FOR_SNORKELING_COMMAND_10` |
+
+---
+
+## Aggiornamento indice 2026-06-18 — Snorkeling iOS companion (Command 08)
+
+Dashboard, profili, route planner MapKit, sync percorso iOS→Watch.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `08_IOS_SNORKELING_DASHBOARD_PROFILES_ROUTE_PLANNER_MAPS.md` |
+| **Report** | [`DIR_DIVING_SNORKELING_IOS_DASHBOARD_PROFILES_ROUTE_PLANNER_MAPS_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_IOS_DASHBOARD_PROFILES_ROUTE_PLANNER_MAPS_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Tests focused** | 26/26 PASS (`IOSSnorkelingCompanionTests`, `IOSSnorkelingRoutePlannerTests`, `SnorkelingRouteSyncCodecTests`, selection) |
+| **Build** | DIRDiving iOS — BUILD SUCCEEDED |
+| **Gate** | `READY_FOR_SNORKELING_COMMAND_09` |
+
+---
+
 ## Aggiornamento indice 2026-06-18 — Audit 10 remediation V1.0
 
 Remediation Audit 10 → internal readiness 100%.

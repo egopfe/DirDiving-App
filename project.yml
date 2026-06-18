@@ -172,6 +172,10 @@ targets:
       - Services/SnorkelingWatchRuntimeStore.swift
       - Services/SnorkelingLogbookStore.swift
       - Services/ApneaSyncWatchReceiver.swift
+      - Services/SnorkelingImportedRouteStore.swift
+      - Services/SnorkelingLogbookStore.swift
+      - Services/SnorkelingRouteWatchReceiver.swift
+      - Services/SnorkelingRouteSyncAckSigner.swift
       - Services/ApneaSyncAckSigner.swift
       - Services/ApneaSessionSyncCodec.swift
       - Services/ApneaSyncPendingTransfer.swift
@@ -421,10 +425,22 @@ targets:
       - iOSApp/Services/IOSApneaLogbookStore.swift
       - iOSApp/Services/IOSApneaSettingsStore.swift
       - iOSApp/Services/IOSApneaWatchTransferService.swift
+      - iOSApp/Services/IOSSnorkelingProfileStore.swift
+      - iOSApp/Services/IOSSnorkelingRoutePlannerStore.swift
+      - iOSApp/Services/IOSSnorkelingLogbookStore.swift
+      - iOSApp/Services/IOSSnorkelingWatchTransferService.swift
+      - iOSApp/Services/IOSSnorkelingEquipmentStore.swift
+      - iOSApp/Services/IOSSnorkelingBuddySafetyStore.swift
+      - iOSApp/Services/IOSSnorkelingSessionPhotoStore.swift
+      - iOSApp/Services/IOSSnorkelingSessionExportService.swift
+      - iOSApp/Services/SnorkelingRouteSyncAckSigner.swift
       - iOSApp/Services/ApneaSyncAckSigner.swift
       - iOSApp/Services/ApneaSessionSyncCodec.swift
       - Services/ApneaImportedPlanStore.swift
       - Services/ApneaSyncWatchReceiver.swift
+      - Services/SnorkelingImportedRouteStore.swift
+      - Services/SnorkelingLogbookStore.swift
+      - Services/SnorkelingRouteWatchReceiver.swift
       - Services/ApneaSyncPendingTransfer.swift
       - iOSApp/Services/IOSApneaEquipmentStore.swift
       - iOSApp/Services/IOSApneaBuddySafetyStore.swift
@@ -432,6 +448,9 @@ targets:
       - iOSApp/Utils/IOSApneaDashboardPresentation.swift
       - iOSApp/Utils/IOSApneaLogbookPresentation.swift
       - iOSApp/Utils/IOSApneaLocationPermission.swift
+      - iOSApp/Utils/IOSSnorkelingDashboardPresentation.swift
+      - iOSApp/Utils/IOSSnorkelingLogbookPresentation.swift
+      - iOSApp/Utils/IOSSnorkelingLocationPermission.swift
       - Tests/WatchAlgorithmTests/ApneaDomainModelTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingDomainModelTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingSensorGPSIngestionTests.swift
@@ -440,11 +459,10 @@ targets:
       - Tests/WatchAlgorithmTests/SnorkelingDepthOnlyLifecycleTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingCheckpointFoundationTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingCommand04FoundationGateTests.swift
-      - Tests/WatchAlgorithmTests/SnorkelingWatchMainPromotionTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingWatchPresentationTests.swift
+      - Utils/SnorkelingWatchPresentation.swift
       - Tests/WatchAlgorithmTests/SnorkelingWatchLayoutContractTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingPersistenceRecoveryTests.swift
-      - Tests/WatchAlgorithmTests/SnorkelingWatchRuntimeStorePersistenceTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingCrossDomainIsolationTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingBoundedDataTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingNavigationReturnEngineTests.swift
@@ -458,6 +476,11 @@ targets:
       - Tests/WatchAlgorithmTests/ApneaOperationalEventEngineTests.swift
       - Tests/WatchAlgorithmTests/ApneaTimeRecoveryCheckpointEngineTests.swift
       - Tests/iOSAlgorithmTests/IOSApneaCompanionTests.swift
+      - Tests/iOSAlgorithmTests/IOSSnorkelingCompanionTests.swift
+      - Tests/iOSAlgorithmTests/IOSSnorkelingRoutePlannerTests.swift
+      - Tests/iOSAlgorithmTests/IOSSnorkelingLogbookAnalyticsTests.swift
+      - Tests/iOSAlgorithmTests/IOSSnorkelingMapEquipmentExportTests.swift
+      - Tests/iOSAlgorithmTests/SnorkelingRouteSyncCodecTests.swift
       - Tests/iOSAlgorithmTests/IOSApneaLogbookAnalyticsTests.swift
       - Tests/iOSAlgorithmTests/IOSApneaMapEquipmentExportTests.swift
       - Tests/iOSAlgorithmTests/ApneaSyncCodecTests.swift
