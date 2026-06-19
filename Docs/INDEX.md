@@ -5,6 +5,23 @@
 
 ---
 
+## Aggiornamento indice 2026-06-17 — Command 15 UI/UX mockup and iOS root-flow audit
+
+Audit read-only UI/UX, mockup path integrity, activity selection, functional links e logbook ownership @ `138dccb`.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `15_DIR_DIVING_UI_UX_READINESS_MOCKUP_IOS_ROOT_FLOW_AND_LOGBOOK_OWNERSHIP_AUDIT_UPDATED.md` |
+| **Report** | [`DIR_DIVING_UI_UX_READINESS_AND_MOCKUP_AUDIT_CURRENT.md`](DIR_DIVING_UI_UX_READINESS_AND_MOCKUP_AUDIT_CURRENT.md) |
+| **iOS selection report** | [`DIR_DIVING_IOS_ACTIVITY_SELECTION_AND_LINKS_AUDIT_CURRENT.md`](DIR_DIVING_IOS_ACTIVITY_SELECTION_AND_LINKS_AUDIT_CURRENT.md) |
+| **Remediation plan** | [`DIR_DIVING_UI_UX_REMEDIATION_PLAN_CURRENT.md`](DIR_DIVING_UI_UX_REMEDIATION_PLAN_CURRENT.md) |
+| **Matrices** | [`DIR_DIVING_MOCKUP_PATH_VALIDATION_CURRENT.csv`](DIR_DIVING_MOCKUP_PATH_VALIDATION_CURRENT.csv), [`DIR_DIVING_MOCKUP_IMPLEMENTATION_MATRIX_CURRENT.csv`](DIR_DIVING_MOCKUP_IMPLEMENTATION_MATRIX_CURRENT.csv), [`DIR_DIVING_UI_SCREEN_INVENTORY_CURRENT.csv`](DIR_DIVING_UI_SCREEN_INVENTORY_CURRENT.csv), [`DIR_DIVING_IOS_FUNCTIONAL_LINK_MATRIX_CURRENT.csv`](DIR_DIVING_IOS_FUNCTIONAL_LINK_MATRIX_CURRENT.csv), [`DIR_DIVING_LOGBOOK_OWNERSHIP_AND_ROUTING_MATRIX_CURRENT.csv`](DIR_DIVING_LOGBOOK_OWNERSHIP_AND_ROUTING_MATRIX_CURRENT.csv) |
+| **Verdict** | **CONDITIONAL PASS** (84/100 global UI/UX; no P0) |
+| **Mockups** | `mockups/` 59 PNG + `Docs/ReferenceUI/` legacy/duplicate set |
+| **Validate** | `./Scripts/audit_localization.sh` PASS |
+
+---
+
 ## Aggiornamento indice 2026-06-17 — Command 14 activity-specific roots/settings/logbooks
 
 Consolidamento architettura iOS Companion per Diving, Apnea, Snorkeling: shared settings store, snorkeling settings domain, activity switching da tutte le settings, registry coerenza.
