@@ -1,0 +1,17 @@
+source_screen,source_control,activity,expected_destination,actual_destination,feature_flag,destination_exists,destination_is_real,navigation_works,back_navigation_works,status,severity,notes
+IOSCompanionActivitySelectionView,Diving card,Diving,ContentView (Diving root),ContentView,none,yes,yes,yes,yes,WORKING,,All modes launchable @138dccb
+IOSCompanionActivitySelectionView,Apnea card,Apnea,IOSApneaRootView,IOSApneaRootView,none,yes,yes,yes,yes,WORKING,,
+IOSCompanionActivitySelectionView,Snorkeling card,Snorkeling,IOSSnorkelingRootView,IOSSnorkelingRootView,none,yes,yes,yes,yes,WORKING,,
+ContentView,Logbook tab,Diving,LogbookView,LogbookView,none,yes,yes,yes,yes,WORKING,,Diving-only
+ContentView,Planner tab,Diving,PlannerRootView,PlannerRootView,none,yes,yes,yes,yes,WORKING,,Default home tab
+ContentView,Settings tab,Diving,MoreView,MoreView,none,yes,yes,yes,yes,WORKING,,
+IOSApneaRootView,Sessions tab,Apnea,IOSApneaSessionsListView,IOSApneaSessionsListView,none,yes,yes,yes,yes,WORKING,,Apnea logbook
+IOSApneaRootView,Statistics tab,Apnea,IOSApneaStatisticsView,IOSApneaStatisticsView,none,yes,yes,yes,yes,WORKING,,
+IOSApneaRootView,Profiles tab,Apnea,IOSApneaProfilesView,IOSApneaProfilesView,none,yes,yes,yes,yes,WORKING,,
+IOSApneaDashboardView,Planner button,Apnea,IOSApneaSessionPlannerView,IOSApneaSessionPlannerView (sheet),none,yes,yes,yes,yes,WORKING,,
+IOSApneaDashboardView,Last session card,Apnea,IOSApneaSessionDetailView,none,none,no,no,no,n/a,PARTIAL,P2,Chevron with no NavigationLink
+IOSSnorkelingRootView,Sessions tab,Snorkeling,IOSSnorkelingSessionsListView,IOSSnorkelingSessionsListView,none,yes,yes,yes,yes,WORKING,,Snorkeling logbook
+IOSSnorkelingRootView,Route Planner tab,Snorkeling,IOSSnorkelingRoutePlannerView,IOSSnorkelingRoutePlannerView,none,yes,yes,yes,yes,WORKING,,Real MapKit surface
+IOSSnorkelingDashboardView,New session,Snorkeling,IOSSnorkelingRoutePlannerView,IOSSnorkelingRoutePlannerView (tab+sheet),none,yes,yes,yes,yes,PARTIAL,P2,Dual entry path
+IOSSnorkelingDashboardView,Last session card,Snorkeling,IOSSnorkelingSessionDetailView,none,none,no,no,no,n/a,PARTIAL,P2,Non-interactive card
+IOSCompanionActivitySettingsSection,Change activity,Global,IOSCompanionActivitySelectionView,IOSCompanionActivitySelectionView,none,yes,yes,yes,yes,WORKING,,All three settings surfaces
