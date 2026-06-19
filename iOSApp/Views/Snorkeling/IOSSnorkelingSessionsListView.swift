@@ -25,6 +25,7 @@ struct IOSSnorkelingSessionsListView: View {
             }
             .navigationTitle(DIRIOSLocalizer.string("snorkeling.ios.sessions.title"))
         }
+        .accessibilityIdentifier("snorkeling.ios.logbook")
     }
 
     private var emptyState: some View {
@@ -81,6 +82,9 @@ struct IOSSnorkelingSessionsListView: View {
         }
         .padding(.vertical, 4)
         .accessibilityElement(children: .combine)
+        .accessibilityLabel(
+            "\(DIRIOSLocalizer.string("snorkeling.ios.sessions.title")), \(row.dateText)"
+        )
     }
 }
 

@@ -2,40 +2,72 @@
 
 | Field | Value |
 |-------|-------|
-| **Scope** | SNORKELING RELAUNCH |
+| **QA ID** | SNK-QA-012 |
+| **Command category** | SNORKELING_RECOVERY_RELAUNCH |
 | **Status** | **PENDING** |
-| **PASS requires** | Evidence files listed below + observed result matching expected |
-| **App SHA** | (record at test time) |
+| **Branch** | (record at execution) |
+| **Commit** | (record at execution) |
+| **Purpose** | App relaunch during/after Snorkeling session |
+| **Required device** | Physical Apple Watch |
 | **Tester** | |
-| **Date** | |
+| **Reviewer** | |
+| **Execution date** | |
 | **iPhone model** | |
-| **Apple Watch model** | |
 | **iOS version** | |
+| **Watch model** | |
 | **watchOS version** | |
+| **App build** | |
+| **Test environment** | |
+| **Rollback required** | YES |
 
-## Prerequisites
+## Preconditions
 
-- Paired iPhone + Apple Watch with DIR DIVING installed from TestFlight or dev build
-- Snorkeling profile configured on both devices
+Session in progress or recently ended
 
-## Steps
+## Test steps
 
-1. (Define per scenario)
-2. Record screen capture or logs
-3. Compare observed vs expected
+1. Install the build at the recorded commit SHA.
+2. Execute the scenario for **SNORKELING_RELAUNCH** per `PROCEDURE.md` when present.
+3. Capture screenshot, video, or log artifacts under this folder (do not commit until reviewed).
+4. Record observed results and compare to expected results.
+5. Obtain tester and reviewer signatures before marking PASS.
 
-## Expected result
+## Expected results
 
-(TBD per scenario)
+(Document per scenario before execution. Do not mark PASS without matching observed behavior.)
 
-## Observed result
+## Observed results
 
 **PENDING** — no physical evidence recorded yet.
 
-## Evidence filenames
+## Evidence artifacts
+
+- (none — add `evidence-YYYYMMDD.ext` paths after capture)
+
+## Battery / thermal notes
+
+(Required for battery/thermal scenarios; optional otherwise.)
+
+## Linked issues
 
 - (none)
 
-## Result
+## Signatures
 
-**PENDING** — PASS requires completed steps and attached evidence.
+| Role | Name | Date |
+|------|------|------|
+| Tester | | |
+| Reviewer | | |
+
+## Tester signature
+
+(pending)
+
+## Reviewer signature
+
+(pending)
+
+## Verdict
+
+**PENDING** — PASS requires completed steps, attached artifacts, tester signature, and reviewer signature.
+Do not mark PASS without real device execution.

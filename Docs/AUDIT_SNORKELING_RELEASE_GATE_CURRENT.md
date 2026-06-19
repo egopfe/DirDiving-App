@@ -75,10 +75,10 @@ GO WITH CONDITIONS
 
 | ID | Priority | Finding | Status |
 |----|----------|---------|--------|
-| AUDIT12-SNK-001 | **P1** | All 21 physical QA evidence folders PENDING | **OPEN** |
-| AUDIT12-SNK-002 | **P2** | `FullComputerTargetMembershipTests` stale vs Snorkeling MAIN promotion | **OPEN** |
-| AUDIT12-SNK-003 | **P3** | Unrelated stale tests in full algorithm suite (out of release-hard scope) | **OPEN** |
-| AUDIT12-SNK-004 | **P3** | VoiceOver, Water Lock, battery/thermal not executed on device | **OPEN** |
+| AUDIT12-SNK-001 | **P1** | All 21 physical QA evidence folders PENDING | **OPEN** (templates hardened; execution pending) |
+| AUDIT12-SNK-002 | **P2** | `FullComputerTargetMembershipTests` stale vs Snorkeling MAIN promotion | **CLOSED** @ remediation |
+| AUDIT12-SNK-003 | **P3** | Unrelated stale tests in full algorithm suite (out of release-hard scope) | **CLOSED** @ remediation (`DIRModesAndStartupFlowTests`) |
+| AUDIT12-SNK-004 | **P3** | VoiceOver, Water Lock, battery/thermal not executed on device | **OPEN** (procedures scaffolded) |
 
 No **P0** findings.
 

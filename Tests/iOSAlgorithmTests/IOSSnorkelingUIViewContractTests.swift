@@ -5,6 +5,7 @@ final class IOSSnorkelingUIViewContractTests: XCTestCase {
         let root = repositoryRoot()
         let dashboard = try String(contentsOf: root.appendingPathComponent("iOSApp/Views/Snorkeling/IOSSnorkelingDashboardView.swift"))
         XCTAssertTrue(dashboard.contains("accessibilityLabel"))
+        XCTAssertTrue(dashboard.contains("snorkeling.ios.dashboard"))
         XCTAssertTrue(dashboard.contains("mapPreviewAccessibilityLabel"))
         XCTAssertFalse(dashboard.contains("SNORKELING_IOS_"))
         XCTAssertFalse(dashboard.contains("Image(\"SNORKELING"))

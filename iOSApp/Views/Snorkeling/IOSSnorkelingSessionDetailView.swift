@@ -557,6 +557,7 @@ struct IOSSnorkelingSessionMapView: View {
                     .frame(maxWidth: .infinity, minHeight: 160, alignment: .center)
             }
         }
+        .accessibilityIdentifier("snorkeling.ios.map_summary")
     }
 
     private var fixQualityBadge: some View {
