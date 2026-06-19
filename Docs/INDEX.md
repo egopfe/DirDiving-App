@@ -1,7 +1,21 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-18  
+**Aggiornato:** 2026-06-19  
 **Branch consigliato:** `main` = `origin/main`
+
+---
+
+## Aggiornamento indice 2026-06-19 — Audit 11 remediation V1.0
+
+Chiusura finding AUDIT11-SNK-001…006; gate incondizionato Command 12.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit** | [`AUDIT_SNORKELING_IOS_MAPS_SYNC_EXPORT_CURRENT.md`](AUDIT_SNORKELING_IOS_MAPS_SYNC_EXPORT_CURRENT.md) |
+| **Remediation** | [`SNORKELING_IOS_MAPS_SYNC_EXPORT_REMEDIATION_REPORT_V1.0.md`](SNORKELING_IOS_MAPS_SYNC_EXPORT_REMEDIATION_REPORT_V1.0.md) |
+| **Verdict** | Internal code readiness 100% |
+| **Gate** | `READY_FOR_SNORKELING_COMMAND_12` |
+| **Validate** | `./Scripts/validate_snorkeling_release_readiness.sh --internal` |
 
 ---
 

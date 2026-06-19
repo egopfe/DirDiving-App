@@ -1,29 +1,28 @@
 import XCTest
 
+/// Cryptographic session transport negative-path coverage — never XCTSkip on peer secret.
 final class SnorkelingSessionSyncTransportNegativeTests: XCTestCase {
-    private let peerSecret = Data(repeating: 13, count: 32).base64EncodedString()
     private var replayCacheURL: URL!
 
     override func setUp() {
         super.setUp()
-        WatchSyncAuth.resetPeerTrust()
         SnorkelingSessionSyncCodec.resetTestHooks()
         replayCacheURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("snorkeling-replay-\(UUID().uuidString).json")
         SnorkelingSessionSyncCodec.testHook_bypassConnectivityChecks = true
         SnorkelingSessionSyncCodec.testHook_replayCacheFileURL = replayCacheURL
-        WatchSyncAuth.ingestSharedSecretFromContext([WatchSyncAuth.contextKey: peerSecret])
+        SnorkelingSyncTestSupport.installDeterministicSecrets()
+        SnorkelingSyncTestSupport.requirePeerSecret()
     }
 
     override func tearDown() {
         SnorkelingSessionSyncCodec.resetTestHooks()
-        WatchSyncAuth.resetPeerTrust()
+        SnorkelingSyncTestSupport.resetSecrets()
         try? FileManager.default.removeItem(at: replayCacheURL)
         super.tearDown()
     }
 
     func testSupportedV2TransportImports() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
         let session = makeCompletedSession()
         let payload = try SnorkelingSessionSyncCodec.makeTestWatchTransport(session: session)
         let parsed = try SnorkelingSessionSyncCodec.parsePayload(from: payload)
@@ -31,7 +30,6 @@ final class SnorkelingSessionSyncTransportNegativeTests: XCTestCase {
     }
 
     func testFutureSessionVersionIsRejected() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
         let session = makeCompletedSession()
         let payload = try SnorkelingSessionSyncCodec.makeTestWatchTransport(
             session: session,
@@ -43,7 +41,6 @@ final class SnorkelingSessionSyncTransportNegativeTests: XCTestCase {
     }
 
     func testReplayedSessionTransportNonceIsRejected() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
         let session = makeCompletedSession()
         let nonce = UUID().uuidString
         let payload = try SnorkelingSessionSyncCodec.makeTestWatchTransport(session: session, nonce: nonce)
@@ -54,20 +51,26 @@ final class SnorkelingSessionSyncTransportNegativeTests: XCTestCase {
     }
 
     func testInvalidSignatureRejected() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
         var payload = try SnorkelingSessionSyncCodec.makeTestWatchTransport(session: makeCompletedSession())
         guard var data = payload[SnorkelingSessionSyncCodec.payloadKey] as? Data else {
             return XCTFail("missing transport data")
         }
-        if let suffix = "}".data(using: .utf8) {
-            data.append(suffix)
-            payload[SnorkelingSessionSyncCodec.payloadKey] = data
-        }
+        data.append(Data("}".utf8))
+        payload[SnorkelingSessionSyncCodec.payloadKey] = data
         XCTAssertThrowsError(try SnorkelingSessionSyncCodec.parsePayload(from: payload))
     }
 
+    func testWrongBundleIDRejected() throws {
+        let payload = try SnorkelingSessionSyncCodec.makeTestWatchTransport(
+            session: makeCompletedSession(),
+            bundleID: "com.example.other"
+        )
+        XCTAssertThrowsError(try SnorkelingSessionSyncCodec.parsePayload(from: payload)) { error in
+            XCTAssertEqual(error as? SnorkelingSessionSyncError, .invalidSender)
+        }
+    }
+
     func testSignedAckRoundTrip() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
         let sessionID = UUID()
         let issuedAt = Date()
         let signature = SnorkelingSessionSyncCodec.ackSignature(sessionID: sessionID, issuedAt: issuedAt)
@@ -77,6 +80,33 @@ final class SnorkelingSessionSyncTransportNegativeTests: XCTestCase {
         let payload = SnorkelingSessionSyncCodec.makeImportAckPayload(sessionID: sessionID, issuedAt: issuedAt)
         let parsed = SnorkelingSessionSyncCodec.parseImportAck(from: payload)
         XCTAssertEqual(parsed?.sessionID, sessionID)
+    }
+
+    func testInvalidAckSignatureRejected() {
+        let sessionID = UUID()
+        let issuedAt = Date()
+        XCTAssertFalse(
+            SnorkelingSessionSyncCodec.verifyAckSignature("invalid", sessionID: sessionID, issuedAt: issuedAt)
+        )
+    }
+
+    func testWrongAckSessionIDRejected() throws {
+        let sessionID = UUID()
+        let otherID = UUID()
+        let issuedAt = Date()
+        let signature = SnorkelingSessionSyncCodec.ackSignature(sessionID: sessionID, issuedAt: issuedAt)
+        XCTAssertFalse(
+            SnorkelingSessionSyncCodec.verifyAckSignature(signature, sessionID: otherID, issuedAt: issuedAt)
+        )
+    }
+
+    func testStaleTimestampRejected() throws {
+        let session = makeCompletedSession()
+        let stale = Date(timeIntervalSinceNow: -(SnorkelingSessionSyncCodec.maxIssuedAtSkew + 120))
+        let payload = try SnorkelingSessionSyncCodec.makeTestWatchTransport(session: session, issuedAt: stale)
+        XCTAssertThrowsError(try SnorkelingSessionSyncCodec.parsePayload(from: payload)) { error in
+            XCTAssertEqual(error as? SnorkelingSessionSyncError, .stalePayload)
+        }
     }
 
     private func makeCompletedSession() -> SnorkelingSession {

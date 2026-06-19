@@ -1,8 +1,8 @@
-# Physical QA — SNORKELING_BATTERY_THERMAL
+# Physical QA — SNORKELING_ROUTE_PUSH
 
 | Field | Value |
 |-------|-------|
-| **Scope** | SNORKELING BATTERY THERMAL |
+| **Scope** | SNORKELING ROUTE PUSH |
 | **Status** | **PENDING** |
 | **PASS requires** | Evidence files listed below + observed result matching expected |
 | **App SHA** | (record at test time) |

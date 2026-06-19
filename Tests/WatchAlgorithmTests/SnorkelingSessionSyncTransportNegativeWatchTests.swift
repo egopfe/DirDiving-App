@@ -1,24 +1,21 @@
 import XCTest
 
 final class SnorkelingSessionSyncTransportNegativeWatchTests: XCTestCase {
-    private let peerSecret = Data(repeating: 17, count: 32).base64EncodedString()
-
     override func setUp() {
         super.setUp()
-        WatchSyncAuth.resetPeerTrust()
         SnorkelingSessionSyncCodec.resetTestHooks()
         SnorkelingSessionSyncCodec.testHook_bypassConnectivityChecks = true
-        WatchSyncAuth.ingestSharedSecretFromContext([WatchSyncAuth.contextKey: peerSecret])
+        SnorkelingSyncTestSupport.installDeterministicSecrets()
+        SnorkelingSyncTestSupport.requirePeerSecret()
     }
 
     override func tearDown() {
         SnorkelingSessionSyncCodec.resetTestHooks()
-        WatchSyncAuth.resetPeerTrust()
+        SnorkelingSyncTestSupport.resetSecrets()
         super.tearDown()
     }
 
     func testWatchPayloadEnvelopeBuilds() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
         let session = makeCompletedSession()
         let envelope = try SnorkelingSessionSyncCodec.makePayload(session: session)
         XCTAssertEqual(envelope.sessionID, session.id)

@@ -112,20 +112,53 @@ struct IOSSnorkelingDashboardView: View {
 
     private var mapPreviewCard: some View {
         DIRCard(DIRIOSLocalizer.string("snorkeling.ios.dashboard.map_preview"), icon: "map.fill", accent: DIRTheme.cyan) {
-            Map(initialPosition: .region(previewRegion)) {
-                MapPolyline(coordinates: presentation.mapCoordinates.map {
-                    CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
-                })
-                .stroke(DIRTheme.cyan, lineWidth: 2)
+            if let model = presentation.mapPreviewModel, model.isAvailable {
+                Map(initialPosition: .region(previewRegion(for: model))) {
+                    ForEach(model.segments) { segment in
+                        MapPolyline(
+                            coordinates: segment.coordinates.map {
+                                CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+                            }
+                        )
+                        .stroke(segment.hasGapBefore ? DIRTheme.orange : DIRTheme.cyan, lineWidth: 2)
+                    }
+                }
+                .frame(minHeight: 140)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                if model.gapCount > 0 {
+                    Text(String(format: DIRIOSLocalizer.string("snorkeling.ios.map.gap_format"), model.gapCount))
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.orange)
+                }
+                Text(mapPreviewAccessibilityLabel(for: model))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+                    .accessibilityHidden(true)
             }
-            .frame(minHeight: 140)
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .accessibilityLabel(DIRIOSLocalizer.string("snorkeling.ios.dashboard.map_preview"))
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(mapPreviewAccessibilityLabel(for: presentation.mapPreviewModel))
     }
 
-    private var previewRegion: MKCoordinateRegion {
-        let coords = presentation.mapCoordinates
+    private func mapPreviewAccessibilityLabel(for model: SnorkelingSessionMapModel?) -> String {
+        guard let model, model.isAvailable else {
+            return DIRIOSLocalizer.string("snorkeling.ios.map.unavailable")
+        }
+        if model.gapCount > 0 {
+            return String(
+                format: DIRIOSLocalizer.string("snorkeling.ios.dashboard.map_preview.a11y_gaps_format"),
+                model.segments.count,
+                model.gapCount
+            )
+        }
+        return String(
+            format: DIRIOSLocalizer.string("snorkeling.ios.dashboard.map_preview.a11y_segments_format"),
+            model.segments.count
+        )
+    }
+
+    private func previewRegion(for model: SnorkelingSessionMapModel) -> MKCoordinateRegion {
+        let coords = model.segments.flatMap(\.coordinates)
         guard let first = coords.first else {
             return MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 0, longitude: 0), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
         }
