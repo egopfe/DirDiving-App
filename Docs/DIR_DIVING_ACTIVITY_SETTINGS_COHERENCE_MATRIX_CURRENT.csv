@@ -1,0 +1,27 @@
+setting_key,display_name,scope,ios_location,watch_location,sync_policy,visible_in_diving,visible_in_apnea,visible_in_snorkeling,expected_visibility,status,severity,notes
+dirdiving_app_language,App language,shared,SharedIOSSettingsStore / MoreView / Apnea+Snorkeling settings,Watch Settings (system),local_only,yes,yes,yes,all,PRESENT,P0,Single key; affects all activity sections
+dirdiving_ios_units,Depth/distance units,shared,SharedIOSSettingsStore / MoreView / Apnea+Snorkeling settings,Watch unit prefs,local_only,yes,yes,yes,all,PRESENT,P0,Apnea syncs useMetricUnits from shared units
+dirdiving_ios_cloud_backup_enabled,Cloud backup,shared,MoreView / CloudBackupSettings,none,cloud_scope,yes,yes,yes,all,PRESENT,P1,Backup may include all activity stores; restore preserves separation
+dirdiving_ios_pressure_unit,Pressure unit (BAR/PSI),diving,MoreView / PlannerView / Equipment,none,local_only,yes,no,no,diving_only,PRESENT,P1,Gas/planner diving-only; excluded from Apnea/Snorkeling shared section
+dirdiving_ios_planner_cns_descent_bottom_check_enabled,CNS descent/bottom check,diving,MoreView,none,local_only,yes,no,no,diving_only,PRESENT,P0,Must not appear in Apnea/Snorkeling
+planner.ascentSpeedSettings.v1,Planner ascent speeds,diving,PlannerAscentSpeedSettingsView / MoreView,none,local_only,yes,no,no,diving_only,PRESENT,P1,Diving planner only
+dirdiving_ios_apnea_settings_v1,Apnea companion settings,apnea,IOSApneaSettingsView,Apnea WC namespace,watch_transfer_on_demand,no,yes,no,apnea_only,PRESENT,P0,Detection recovery equipment buddy feedback
+dirdiving.settings.snorkeling.v1,Snorkeling companion settings,snorkeling,IOSSnorkelingSettingsView,Snorkeling WC namespace,watch_transfer_on_demand,no,no,yes,snorkeling_only,PRESENT,P0,GPS return-to-entry dip detection alerts
+companion.activity.preference,Companion activity selection,shared,CompanionActivityPreferenceStore / selection view / settings sections,DIRActivitySelectionStore,preference_sync_when_idle,yes,yes,yes,all,PRESENT,P0,Does not interrupt active Watch session
+diving.logbook,Diving logbook,diving,LogbookView / DiveLogStore,Dive log sync,cloud_and_watch,no,no,no,diving_only,PRESENT,P0,Separate from Apnea/Snorkeling logbooks
+apnea.logbook,Apnea logbook,apnea,IOSApneaSessionsListView / IOSApneaLogbookStore,Apnea session sync,watch_transfer,no,no,no,apnea_only,PRESENT,P0,Isolated store and UI
+snorkeling.logbook,Snorkeling logbook,snorkeling,IOSSnorkelingSessionsListView / IOSSnorkelingLogbookStore,Snorkeling session sync,watch_transfer,no,no,no,snorkeling_only,PRESENT,P0,Isolated store and UI
+apnea.recovery.minimum_seconds,Minimum recovery time,apnea,IOSApneaSettingsView,Apnea settings WC,watch_transfer,no,yes,no,apnea_only,PRESENT,P1,Absent from Diving/Snorkeling settings
+apnea.detection.descent_depth,Descent detection threshold,apnea,IOSApneaSettingsView,Apnea settings WC,watch_transfer,no,yes,no,apnea_only,PRESENT,P1,Absent from Diving/Snorkeling settings
+snorkeling.gps.tracking,GPS route tracking,snorkeling,IOSSnorkelingSettingsView,Snorkeling settings WC,watch_transfer,no,no,yes,snorkeling_only,PRESENT,P1,Absent from Diving/Apnea settings
+snorkeling.return_to_entry_distance,Return-to-entry distance,snorkeling,IOSSnorkelingSettingsView,Snorkeling settings WC,watch_transfer,no,no,yes,snorkeling_only,PRESENT,P1,Absent from Diving/Apnea settings
+snorkeling.dip_threshold,Dip detection threshold,snorkeling,IOSSnorkelingSettingsView,Snorkeling settings WC,watch_transfer,no,no,yes,snorkeling_only,PRESENT,P1,Absent from Diving/Apnea settings
+diving.gf_low,Gradient Factor Low,diving,Watch FC settings / planner,Watch SettingsView,watch_local,yes,no,no,diving_only,PRESENT_WATCH_ONLY,P1,Watch SettingsView still diving-centric; iOS planner context only
+diving.gf_high,Gradient Factor High,diving,Watch FC settings / planner,Watch SettingsView,watch_local,yes,no,no,diving_only,PRESENT_WATCH_ONLY,P1,Same Watch scoping gap
+diving.ppo2_limits,PPO2 limits,diving,Planner / gas editors,Watch SettingsView,watch_local,yes,no,no,diving_only,PRESENT,P0,Not in Apnea/Snorkeling UI
+diving.cns_alarm,CNS alarm threshold,diving,MoreView summary / planner,Watch SettingsView,watch_local,yes,no,no,diving_only,PRESENT,P0,Registry confirms no cross-exposure
+diving.deco_stops,Decompression stop alerts,diving,Full Computer config,Watch FC,watch_local,yes,no,no,diving_only,PRESENT,P0,Algorithm unchanged; UI scoped to Diving
+watch.settings.global,Watch global settings surface,shared,none,SettingsView,local_only,yes,yes,yes,activity_scoped,DEFERRED,P2,Command 14 Watch settings refactor not completed; diving controls may leak visually
+diving.settings.consolidated_store,Diving settings store,diving,MoreView (fragmented),Watch SettingsView,local_only,yes,no,no,diving_only,MISSING,P2,No IOSDivingSettingsStore; future consolidation
+shared.settings.haptics_master,Haptic master preference,shared,none,none,local_only,yes,yes,yes,all,MISSING,P3,Command 14 §6 optional; per-activity haptics exist
+shared.settings.sync_troubleshooting,Sync troubleshooting panel,shared,MoreView partial,Watch partial,none,yes,yes,yes,all,PARTIAL,P2,Sync scope label in MoreView; full troubleshooting TBD

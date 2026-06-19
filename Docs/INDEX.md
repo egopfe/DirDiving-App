@@ -1,11 +1,41 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-19  
+**Aggiornato:** 2026-06-17  
 **Branch consigliato:** `main` = `origin/main`
 
 ---
 
-## Aggiornamento indice 2026-06-19 — Audit 12 Snorkeling release gate
+## Aggiornamento indice 2026-06-17 — Command 14 activity-specific roots/settings/logbooks
+
+Consolidamento architettura iOS Companion per Diving, Apnea, Snorkeling: shared settings store, snorkeling settings domain, activity switching da tutte le settings, registry coerenza.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `14_ACTIVITY_SPECIFIC_ROOT_FEATURES_SETTINGS_AND_LOGBOOKS_IMPLEMENTATION_UPDATED.md` |
+| **Report** | [`DIR_DIVING_ACTIVITY_SPECIFIC_ROOT_FEATURES_SETTINGS_AND_LOGBOOKS_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_ACTIVITY_SPECIFIC_ROOT_FEATURES_SETTINGS_AND_LOGBOOKS_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Coherence matrix** | [`DIR_DIVING_ACTIVITY_SETTINGS_COHERENCE_MATRIX_CURRENT.csv`](DIR_DIVING_ACTIVITY_SETTINGS_COHERENCE_MATRIX_CURRENT.csv) |
+| **Verdict** | **CONDITIONAL PASS** (iOS software; Watch settings scoping deferred) |
+| **XCTest (focused)** | `IOSActivitySettingsCoherenceTests` 7/7; `IOSCompanionActivitySelectionTests` 11/11 |
+| **Build** | DIRDiving iOS — BUILD SUCCEEDED |
+| **Validate** | `./Scripts/audit_localization.sh` PASS |
+
+---
+
+## Aggiornamento indice 2026-06-17 — Audit 13 integrated three-mode remediation
+
+Remediation software P1–P3 da [`AUDIT_INTEGRATO_TRE_MODALITA_CURRENT.md`](AUDIT_INTEGRATO_TRE_MODALITA_CURRENT.md): fix Apnea suspend/resume session clock, integrated validator, sequential flow tests.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit** | [`AUDIT_INTEGRATO_TRE_MODALITA_CURRENT.md`](AUDIT_INTEGRATO_TRE_MODALITA_CURRENT.md) |
+| **Remediation** | [`AUDIT_INTEGRATO_TRE_MODALITA_REMEDIATION_REPORT_CURRENT.md`](AUDIT_INTEGRATO_TRE_MODALITA_REMEDIATION_REPORT_CURRENT.md) |
+| **Validation matrix** | [`INTEGRATED_MODES_RELEASE_VALIDATION_MATRIX_CURRENT.csv`](INTEGRATED_MODES_RELEASE_VALIDATION_MATRIX_CURRENT.csv) |
+| **Traceability** | [`INTEGRATED_MODES_REMEDIATION_TRACEABILITY_CURRENT.csv`](INTEGRATED_MODES_REMEDIATION_TRACEABILITY_CURRENT.csv) |
+| **Verdict** | Internal **GO**; external **NO-GO** (physical QA pending) |
+| **Gate** | `INTEGRATED_MODES_INTERNAL_RELEASE_GATE_PASS` |
+| **Validate** | `./Scripts/validate_integrated_modes.sh --internal` |
+
+---
 
 Audit indipendente read-only post Command 12.
 
