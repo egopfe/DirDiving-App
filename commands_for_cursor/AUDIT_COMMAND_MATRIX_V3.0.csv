@@ -1,0 +1,16 @@
+sequence,command,primary_scope,code_changes_allowed
+0,Complete Math Functions,All mathematical functions and numerical isolation,No
+1,iOS Buhlmann,Planner and Full Computer Buhlmann parity,No
+2,Watch Algorithms,Watch Gauge Full Computer Apnea Snorkeling,No
+3,iOS Complete Algorithms,iOS planners analytics data and exports,No
+4,UI UX,All screens navigation settings and logbooks,No
+5,Deep Code,Bugs crashes races security performance,No
+6,Documentation Truthfulness,Docs consistency and stale claims,No
+7,Activity Architecture,Startup roots settings and logbook ownership,No
+8,Sync Persistence Schemas,Transport stores migration backup,No
+9,Security Privacy Trust,Threat model and privacy data flows,No
+10,Performance Concurrency Battery,Runtime budgets and race conditions,No
+11,Localization Accessibility,IT EN and accessibility,No
+12,Test QA Evidence,Traceability and physical external evidence,No
+13,Release Legal Claims Compliance,Claims release gates and store readiness,No
+14,Mockup Visual Regression,Paths fidelity snapshots and device coverage,No

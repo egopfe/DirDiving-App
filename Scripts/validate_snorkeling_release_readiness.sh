@@ -31,13 +31,15 @@ echo "[snorkeling-readiness] branch: ${BRANCH} @ ${HEAD_SHA}"
 if [[ "${MODE}" == "release" ]]; then
   [[ "${BRANCH}" == "${ALLOWED_BRANCH}" ]] || { echo "[snorkeling-readiness] release requires ${ALLOWED_BRANCH}"; exit 1; }
   [[ -z "${DIRTY}" ]] || { echo "[snorkeling-readiness] release requires clean tree"; exit 1; }
-  if ! rg -q "status: PASS" Docs/QA_EVIDENCE/SNORKELING_IOS_WATCH_SYNC/README.md 2>/dev/null; then
-    echo "[snorkeling-readiness] release requires physical QA evidence (PENDING blocks release mode)"
+  python3 ./Scripts/validate_snorkeling_qa_evidence.py --release || {
+    echo "[snorkeling-readiness] release requires signed physical QA evidence"
     exit 1
-  fi
+  }
 elif [[ -n "${DIRTY}" ]]; then
   echo "[snorkeling-readiness] internal mode: dirty tree allowed (clean commit validation pending)"
 fi
+
+python3 ./Scripts/validate_snorkeling_qa_evidence.py --internal
 
 ./Scripts/check_main_target_isolation.sh
 ./Scripts/check_secrets.sh
@@ -52,6 +54,7 @@ required_docs=(
   "Docs/SNORKELING_RELEASE_HARD_TEST_MATRIX.md"
   "Docs/DIR_DIVING_SNORKELING_RELEASE_HARD_VALIDATION_REPORT.md"
   "Docs/AUDIT_SNORKELING_RELEASE_GATE_CURRENT.md"
+  "Docs/SNORKELING_RELEASE_GATE_REMEDIATION_REPORT_CURRENT.md"
   "Docs/SNORKELING_IOS_MAPS_SYNC_EXPORT_REMEDIATION_REPORT_V1.0.md"
 )
 
@@ -107,7 +110,9 @@ xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving Watch Algorithm Tests
   -only-testing:"DIRDiving Watch Algorithm Tests/SnorkelingCrossDomainIsolationTests" \
   -only-testing:"DIRDiving Watch Algorithm Tests/SnorkelingSessionSyncTransportNegativeWatchTests" \
   -only-testing:"DIRDiving Watch Algorithm Tests/SnorkelingWatchPendingQueueTests" \
-  -only-testing:"DIRDiving Watch Algorithm Tests/SnorkelingRouteAckWatchTests"
+  -only-testing:"DIRDiving Watch Algorithm Tests/SnorkelingRouteAckWatchTests" \
+  -only-testing:"DIRDiving Watch Algorithm Tests/FullComputerTargetMembershipTests" \
+  -only-testing:"DIRDiving Watch Algorithm Tests/DIRModesAndStartupFlowTests"
 
 echo "[snorkeling-readiness] iOS Commands 08–12 focused suites"
 xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving iOS Algorithm Tests" -destination "${IOS_DEST}" test CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
@@ -127,7 +132,9 @@ xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving iOS Algorithm Tests" 
   -only-testing:"DIRDiving iOS Algorithm Tests/IOSSnorkelingExportServiceE2ETests" \
   -only-testing:"DIRDiving iOS Algorithm Tests/SnorkelingPhotoMetadataSanitizationTests" \
   -only-testing:"DIRDiving iOS Algorithm Tests/IOSSnorkelingReleaseHardValidationTests" \
-  -only-testing:"DIRDiving iOS Algorithm Tests/IOSSnorkelingUIViewContractTests"
+  -only-testing:"DIRDiving iOS Algorithm Tests/IOSSnorkelingUIViewContractTests" \
+  -only-testing:"DIRDiving iOS Algorithm Tests/SnorkelingQAEvidenceCatalogTests" \
+  -only-testing:"DIRDiving iOS Algorithm Tests/SnorkelingAccessibilityContractTests"
 
 echo "[snorkeling-readiness] physical QA status: PENDING (excluded from internal code readiness)"
 if [[ "${MODE}" == "release" ]]; then

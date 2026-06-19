@@ -5,6 +5,7 @@ final class SnorkelingWatchUIViewContractTests: XCTestCase {
         let source = try String(contentsOf: repositoryRoot().appendingPathComponent("Views/SnorkelingView.swift"))
         XCTAssertTrue(source.contains("dynamicTypeSize"))
         XCTAssertTrue(source.contains("accessibilityLabel"))
+        XCTAssertTrue(source.contains("accessibilityIdentifier"))
         XCTAssertTrue(source.contains("readyPanel"))
         XCTAssertTrue(source.contains("surfaceDashboardPanel"))
         XCTAssertTrue(source.contains("saveMarkerPanel"))

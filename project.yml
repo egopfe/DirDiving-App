@@ -82,6 +82,7 @@ targets:
       - Utils/SnorkelingReleaseHardTolerances.swift
       - Utils/SnorkelingReleaseSelfCheck.swift
       - Utils/SnorkelingMockupReferenceMatrix.swift
+      - Utils/SnorkelingQAEvidenceCatalog.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
       - Resources
@@ -272,6 +273,7 @@ targets:
       - Utils/SnorkelingReleaseHardTolerances.swift
       - Utils/SnorkelingReleaseSelfCheck.swift
       - Utils/SnorkelingMockupReferenceMatrix.swift
+      - Utils/SnorkelingQAEvidenceCatalog.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
       - Services/FullComputerRuntimeEngine.swift
@@ -481,6 +483,7 @@ targets:
       - Utils/SnorkelingReleaseHardTolerances.swift
       - Utils/SnorkelingReleaseSelfCheck.swift
       - Utils/SnorkelingMockupReferenceMatrix.swift
+      - Utils/SnorkelingQAEvidenceCatalog.swift
       - Tests/WatchAlgorithmTests/ApneaLifecycleEngineTests.swift
       - Tests/WatchAlgorithmTests/ApneaOperationalEventEngineTests.swift
       - Tests/WatchAlgorithmTests/ApneaTimeRecoveryCheckpointEngineTests.swift
@@ -502,6 +505,8 @@ targets:
       - Tests/iOSAlgorithmTests/SnorkelingPhotoMetadataSanitizationTests.swift
       - Tests/iOSAlgorithmTests/IOSSnorkelingReleaseHardValidationTests.swift
       - Tests/iOSAlgorithmTests/IOSSnorkelingUIViewContractTests.swift
+      - Tests/iOSAlgorithmTests/SnorkelingQAEvidenceCatalogTests.swift
+      - Tests/iOSAlgorithmTests/SnorkelingAccessibilityContractTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingMockupReferenceMatrixTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingWatchUIViewContractTests.swift
       - Tests/iOSAlgorithmTests/IOSApneaLogbookAnalyticsTests.swift
@@ -514,6 +519,7 @@ targets:
       - Utils/SnorkelingReleaseHardTolerances.swift
       - Utils/SnorkelingReleaseSelfCheck.swift
       - Utils/SnorkelingMockupReferenceMatrix.swift
+      - Utils/SnorkelingQAEvidenceCatalog.swift
       - Tests/iOSAlgorithmTests/IOSCompanionActivitySelectionTests.swift
       - Tests/iOSAlgorithmTests/BuhlmannComprehensiveReadinessV3RemediationTests.swift
     resources:
