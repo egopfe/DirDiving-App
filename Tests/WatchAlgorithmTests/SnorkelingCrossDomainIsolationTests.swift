@@ -20,11 +20,15 @@ final class SnorkelingCrossDomainIsolationTests: XCTestCase {
     }
 
     func testSnorkelingNamespacesDoNotCollideWithExistingDomains() {
-        let snorkelingKey = "dirdiving_snorkeling_session"
-        XCTAssertNotEqual(snorkelingKey, ApneaReleaseSelfCheck.apneaSessionPayloadKey)
-        XCTAssertNotEqual(snorkelingKey, ApneaReleaseSelfCheck.diveSessionPayloadKey)
-        XCTAssertNotEqual(snorkelingKey, ApneaReleaseSelfCheck.apneaPlanTransferType)
-        XCTAssertNotEqual(snorkelingKey, ApneaReleaseSelfCheck.fullComputerPlanTransferType)
+        let checkpointKey = "dirdiving_snorkeling_session"
+        let sessionSyncKey = SnorkelingSessionSyncCodec.payloadKey
+        XCTAssertNotEqual(checkpointKey, ApneaReleaseSelfCheck.apneaSessionPayloadKey)
+        XCTAssertNotEqual(checkpointKey, ApneaReleaseSelfCheck.diveSessionPayloadKey)
+        XCTAssertNotEqual(sessionSyncKey, ApneaReleaseSelfCheck.apneaSessionPayloadKey)
+        XCTAssertNotEqual(sessionSyncKey, ApneaReleaseSelfCheck.diveSessionPayloadKey)
+        XCTAssertNotEqual(sessionSyncKey, checkpointKey)
+        XCTAssertNotEqual(sessionSyncKey, ApneaReleaseSelfCheck.apneaPlanTransferType)
+        XCTAssertNotEqual(sessionSyncKey, ApneaReleaseSelfCheck.fullComputerPlanTransferType)
     }
 
     func testSharedDepthFeedUsesNamespacedConfiguration() {
