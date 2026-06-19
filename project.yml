@@ -81,6 +81,7 @@ targets:
       - Utils/ApneaReleaseSelfCheck.swift
       - Utils/SnorkelingReleaseHardTolerances.swift
       - Utils/SnorkelingReleaseSelfCheck.swift
+      - Utils/SnorkelingMockupReferenceMatrix.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
       - Resources
@@ -270,6 +271,7 @@ targets:
       - Utils/ApneaReleaseSelfCheck.swift
       - Utils/SnorkelingReleaseHardTolerances.swift
       - Utils/SnorkelingReleaseSelfCheck.swift
+      - Utils/SnorkelingMockupReferenceMatrix.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
       - Services/FullComputerRuntimeEngine.swift
@@ -456,6 +458,7 @@ targets:
       - iOSApp/Utils/IOSSnorkelingDashboardPresentation.swift
       - iOSApp/Utils/IOSSnorkelingLogbookPresentation.swift
       - iOSApp/Utils/IOSSnorkelingLocationPermission.swift
+      - iOSApp/Utils/IOSSnorkelingLocalizationCatalog.swift
       - Tests/WatchAlgorithmTests/ApneaDomainModelTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingDomainModelTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingSensorGPSIngestionTests.swift
@@ -477,6 +480,7 @@ targets:
       - Tests/WatchAlgorithmTests/SnorkelingReleaseHardValidationTests.swift
       - Utils/SnorkelingReleaseHardTolerances.swift
       - Utils/SnorkelingReleaseSelfCheck.swift
+      - Utils/SnorkelingMockupReferenceMatrix.swift
       - Tests/WatchAlgorithmTests/ApneaLifecycleEngineTests.swift
       - Tests/WatchAlgorithmTests/ApneaOperationalEventEngineTests.swift
       - Tests/WatchAlgorithmTests/ApneaTimeRecoveryCheckpointEngineTests.swift
@@ -497,6 +501,9 @@ targets:
       - Tests/iOSAlgorithmTests/IOSSnorkelingExportServiceE2ETests.swift
       - Tests/iOSAlgorithmTests/SnorkelingPhotoMetadataSanitizationTests.swift
       - Tests/iOSAlgorithmTests/IOSSnorkelingReleaseHardValidationTests.swift
+      - Tests/iOSAlgorithmTests/IOSSnorkelingUIViewContractTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingMockupReferenceMatrixTests.swift
+      - Tests/WatchAlgorithmTests/SnorkelingWatchUIViewContractTests.swift
       - Tests/iOSAlgorithmTests/IOSApneaLogbookAnalyticsTests.swift
       - Tests/iOSAlgorithmTests/IOSApneaMapEquipmentExportTests.swift
       - Tests/iOSAlgorithmTests/ApneaSyncCodecTests.swift
@@ -506,6 +513,7 @@ targets:
       - Utils/ApneaReleaseSelfCheck.swift
       - Utils/SnorkelingReleaseHardTolerances.swift
       - Utils/SnorkelingReleaseSelfCheck.swift
+      - Utils/SnorkelingMockupReferenceMatrix.swift
       - Tests/iOSAlgorithmTests/IOSCompanionActivitySelectionTests.swift
       - Tests/iOSAlgorithmTests/BuhlmannComprehensiveReadinessV3RemediationTests.swift
     resources:

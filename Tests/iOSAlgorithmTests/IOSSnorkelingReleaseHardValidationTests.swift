@@ -1,6 +1,12 @@
 import XCTest
 
 final class IOSSnorkelingReleaseHardValidationTests: XCTestCase {
+    func testNoRasterMockupEmbeddedInIOSBundle() {
+        let resourcePaths = Bundle.main.paths(forResourcesOfType: "png", inDirectory: nil)
+        let embeddedMockups = resourcePaths.filter { $0.contains("SNORKELING_") }
+        XCTAssertTrue(embeddedMockups.isEmpty, "SNORKELING mockups must not ship in iOS bundle: \(embeddedMockups)")
+    }
+
     func testReleaseSelfCheckPassesOnSnorkelingSources() throws {
         let root = repositoryRoot()
         let sources = try productionSourceCorpus(at: root)

@@ -3,6 +3,24 @@ import XCTest
 final class SnorkelingReleaseHardValidationTests: XCTestCase {
     private let startDate = Date(timeIntervalSince1970: 1_700_000_000)
 
+    func testNoRasterMockupEmbeddedInWatchBundle() {
+        let resourcePaths = Bundle.main.paths(forResourcesOfType: "png", inDirectory: nil)
+        let embeddedMockups = resourcePaths.filter { $0.contains("SNORKELING_") }
+        XCTAssertTrue(embeddedMockups.isEmpty, "SNORKELING mockups must not ship in the app bundle: \(embeddedMockups)")
+    }
+
+    func testMockupMatrixHasTenEntries() {
+        XCTAssertEqual(SnorkelingMockupReferenceMatrix.count, 10)
+    }
+
+    func testSensorDegradedBlocksReadyStart() {
+        var input = makeReadyInput()
+        input.depthPresentationState = .unavailable
+        let output = SnorkelingWatchPresentation.make(input)
+        XCTAssertFalse(output.startEnabled)
+        XCTAssertNotNil(output.startDisabledReason)
+    }
+
     func testReleaseSelfCheckPassesOnSnorkelingSources() throws {
         let root = repositoryRoot()
         let sources = try snorkelingSourceCorpus()
@@ -101,6 +119,52 @@ final class SnorkelingReleaseHardValidationTests: XCTestCase {
         XCTAssertNotNil(bearing)
         XCTAssertGreaterThan(bearing ?? 0, 0)
         XCTAssertLessThan(bearing ?? 180, 180)
+    }
+
+    private func makeReadyInput() -> SnorkelingWatchPresentationInput {
+        SnorkelingWatchPresentationInput(
+            phase: .ready,
+            isSessionArmed: true,
+            isSessionStarted: false,
+            showSessionSummary: false,
+            showSaveMarker: false,
+            currentDepthMeters: nil,
+            currentTemperatureCelsius: 22,
+            verticalSpeedMetersPerSecond: 0,
+            sessionElapsedSeconds: 0,
+            surfaceElapsedSeconds: 0,
+            underwaterTimeSeconds: 0,
+            activeDipElapsedSeconds: 0,
+            dipCount: 0,
+            sessionMaxDepthMeters: 0,
+            activeDipMaxDepthMeters: 0,
+            accumulatedDistanceMeters: 0,
+            averageSpeedMetersPerSecond: 0,
+            gpsPresentationState: .tracking,
+            depthPresentationState: .valid,
+            sensorHealth: .available,
+            entryPointCaptured: true,
+            entryDistanceMeters: nil,
+            targetDurationSeconds: 3_600,
+            maxDistanceMeters: 800,
+            missionModeEnabled: false,
+            hapticsEnabled: true,
+            buddyReminderEnabled: false,
+            batteryFraction: 1,
+            markerCount: 0,
+            minimumWaterTemperatureCelsius: nil,
+            waypointNavigation: .unavailable,
+            returnNavigation: .unavailable,
+            activeOverlays: [],
+            isUnderwater: false,
+            animationsEnabled: true,
+            selectedMarkerCategory: .reef,
+            markerPositionQualityLabel: "",
+            markerDistanceFromEntryText: nil,
+            sessionSaveState: .notSaved,
+            isRecoveredSession: false,
+            recoveryWarning: nil
+        )
     }
 
     private func snorkelingSourceCorpus() throws -> String {

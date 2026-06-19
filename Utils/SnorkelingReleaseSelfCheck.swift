@@ -1,6 +1,6 @@
 import Foundation
 
-/// Release-hard invariant checks for Snorkeling Commands 04–11 (Watch runtime + iOS companion).
+/// Release-hard invariant checks for Snorkeling Commands 04–12 (Watch runtime + iOS companion).
 enum SnorkelingReleaseSelfCheck {
     struct Issue: Equatable {
         let code: String
@@ -122,6 +122,30 @@ enum SnorkelingReleaseSelfCheck {
         }
     }
 
+    static func verifyNoRasterMockupInProductionBundles(in sources: String) -> [Issue] {
+        var issues: [Issue] = []
+        if sources.contains("Image(\"SNORKELING_WATCH_") || sources.contains("Image(\"SNORKELING_IOS_") {
+            issues.append(.init(code: "mockup.raster.embedded", detail: "SNORKELING raster mockups must not ship in production UI"))
+        }
+        if sources.contains("SNORKELING_WATCH_01_READY.png") && sources.contains("Bundle.main") {
+            issues.append(.init(code: "mockup.bundle.load", detail: "Reference mockup PNG must not load from app bundle"))
+        }
+        return issues
+    }
+
+    static func verifyMockupReferenceIndex(at root: URL) -> [Issue] {
+        let missing = SnorkelingMockupReferenceMatrix.referencePNGExists(at: root)
+        return missing.map { .init(code: "mockup.reference.missing", detail: $0) }
+    }
+
+    static func verifySensorStartGate(in sources: String) -> [Issue] {
+        guard sources.contains("SnorkelingWatchPresentation") else { return [] }
+        if !sources.contains("startDisabledReason") || !sources.contains("snorkeling.ready.sensor_unavailable") {
+            return [.init(code: "watch.sensor_gate.missing", detail: "Ready start must fail closed when depth sensor unavailable")]
+        }
+        return []
+    }
+
     static func verifyIOSProductionPolicies(in sources: String) -> [Issue] {
         var issues: [Issue] = []
         if sources.contains("ExplorationCenterView") && sources.contains("IOSSnorkelingRootView") {
@@ -144,6 +168,7 @@ enum SnorkelingReleaseSelfCheck {
     static func verifyProjectMembership(projectText: String) -> [Issue] {
         var issues: [Issue] = []
         let mustAppear = iosCommand11Files + [
+            "Utils/SnorkelingMockupReferenceMatrix.swift",
             "Shared/Utils/SnorkelingSyncTestSupport.swift",
             "Shared/Utils/SnorkelingPhotoMetadataSanitizer.swift",
             "Tests/iOSAlgorithmTests/SnorkelingSessionSyncTransportNegativeTests.swift",
@@ -156,6 +181,8 @@ enum SnorkelingReleaseSelfCheck {
             "Tests/iOSAlgorithmTests/IOSSnorkelingExportServiceE2ETests.swift",
             "Tests/iOSAlgorithmTests/SnorkelingPhotoMetadataSanitizationTests.swift",
             "Tests/iOSAlgorithmTests/IOSSnorkelingReleaseHardValidationTests.swift",
+            "Tests/iOSAlgorithmTests/IOSSnorkelingUIViewContractTests.swift",
+            "Tests/WatchAlgorithmTests/SnorkelingMockupReferenceMatrixTests.swift",
         ]
         for path in mustAppear where !projectText.contains(path) {
             if path.hasPrefix("Shared/"), projectText.contains("path: Shared") {
@@ -198,6 +225,9 @@ enum SnorkelingReleaseSelfCheck {
         verifyNamespaceIsolation()
             + verifyNoForbiddenSafetyClaims(in: snorkelingSourceText)
             + verifyRequiredProductionFilesExist(at: repositoryRoot)
+            + verifyNoRasterMockupInProductionBundles(in: snorkelingSourceText)
+            + verifyMockupReferenceIndex(at: repositoryRoot)
+            + verifySensorStartGate(in: snorkelingSourceText)
             + verifyIOSProductionPolicies(in: snorkelingSourceText)
             + (projectText.isEmpty ? [] : verifyProjectMembership(projectText: projectText))
             + (verifyWatchLocalization ? verifyLocalizationParity(english: english, italian: italian) : [])
