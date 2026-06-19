@@ -28,6 +28,8 @@ struct ApneaSessionCheckpointPayload: Codable, Hashable, Sendable {
     var feedState: DepthMeasurementFeedState
     var savedAtWallClock: Date
     var savedAtMonotonicSeconds: TimeInterval
+    var lifecycleConfiguration: ApneaLifecycleConfiguration
+    var recoveryPolicy: ApneaRecoveryPolicy
 
     init(
         sessionID: UUID,
@@ -46,7 +48,9 @@ struct ApneaSessionCheckpointPayload: Codable, Hashable, Sendable {
         tracker: ApneaLifecycleTracker,
         feedState: DepthMeasurementFeedState,
         savedAtWallClock: Date,
-        savedAtMonotonicSeconds: TimeInterval
+        savedAtMonotonicSeconds: TimeInterval,
+        lifecycleConfiguration: ApneaLifecycleConfiguration = .default,
+        recoveryPolicy: ApneaRecoveryPolicy = .default
     ) {
         self.schemaVersion = Self.currentSchemaVersion
         self.sessionID = sessionID
@@ -66,6 +70,39 @@ struct ApneaSessionCheckpointPayload: Codable, Hashable, Sendable {
         self.feedState = feedState
         self.savedAtWallClock = savedAtWallClock
         self.savedAtMonotonicSeconds = savedAtMonotonicSeconds
+        self.lifecycleConfiguration = lifecycleConfiguration
+        self.recoveryPolicy = recoveryPolicy
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case schemaVersion, sessionID, sessionState, lifecyclePhase, session, currentDive
+        case rawSamples, acceptedSamples, activeEvents, recoveryInterval, profileID, alarmState
+        case sessionClock, diveClock, tracker, feedState, savedAtWallClock, savedAtMonotonicSeconds
+        case lifecycleConfiguration, recoveryPolicy
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        schemaVersion = try container.decode(Int.self, forKey: .schemaVersion)
+        sessionID = try container.decode(UUID.self, forKey: .sessionID)
+        sessionState = try container.decode(ApneaSessionState.self, forKey: .sessionState)
+        lifecyclePhase = try container.decode(ApneaLifecyclePhase.self, forKey: .lifecyclePhase)
+        session = try container.decode(ApneaSession.self, forKey: .session)
+        currentDive = try container.decodeIfPresent(ApneaDive.self, forKey: .currentDive)
+        rawSamples = try container.decode([ApneaSample].self, forKey: .rawSamples)
+        acceptedSamples = try container.decode([ApneaSample].self, forKey: .acceptedSamples)
+        activeEvents = try container.decode([ApneaEvent].self, forKey: .activeEvents)
+        recoveryInterval = try container.decodeIfPresent(ApneaRecoveryInterval.self, forKey: .recoveryInterval)
+        profileID = try container.decodeIfPresent(UUID.self, forKey: .profileID)
+        alarmState = try container.decode(ApneaAlarmCheckpointState.self, forKey: .alarmState)
+        sessionClock = try container.decode(MonotonicElapsedClock.Snapshot.self, forKey: .sessionClock)
+        diveClock = try container.decode(MonotonicElapsedClock.Snapshot.self, forKey: .diveClock)
+        tracker = try container.decode(ApneaLifecycleTracker.self, forKey: .tracker)
+        feedState = try container.decode(DepthMeasurementFeedState.self, forKey: .feedState)
+        savedAtWallClock = try container.decode(Date.self, forKey: .savedAtWallClock)
+        savedAtMonotonicSeconds = try container.decode(TimeInterval.self, forKey: .savedAtMonotonicSeconds)
+        lifecycleConfiguration = try container.decodeIfPresent(ApneaLifecycleConfiguration.self, forKey: .lifecycleConfiguration) ?? .default
+        recoveryPolicy = try container.decodeIfPresent(ApneaRecoveryPolicy.self, forKey: .recoveryPolicy) ?? .default
     }
 }
 

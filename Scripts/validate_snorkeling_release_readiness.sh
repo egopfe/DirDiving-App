@@ -46,7 +46,9 @@ python3 ./Scripts/validate_snorkeling_qa_evidence.py --internal
 ./Scripts/audit_localization.sh
 
 echo "[snorkeling-readiness] running xcodegen"
-xcodegen generate
+# shellcheck source=Scripts/lib/xcodegen_once.sh
+source "${ROOT_DIR}/Scripts/lib/xcodegen_once.sh"
+xcodegen_once
 
 required_docs=(
   "Docs/SNORKELING_ARCHITECTURE.md"
