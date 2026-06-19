@@ -44,8 +44,8 @@ final class SnorkelingWatchPresentationTests: XCTestCase {
         )
         let output = SnorkelingWatchPresentation.make(input)
         XCTAssertEqual(output.stage, .navigation)
-        XCTAssertEqual(output.turnInstructionText, String(localized: "snorkeling.nav.turn_left"))
-        XCTAssertEqual(output.turnInstructionAccessibility, String(localized: "snorkeling.a11y.turn_left"))
+        XCTAssertEqual(output.turnInstructionText, DIRWatchLocalizer.string("snorkeling.nav.turn_left"))
+        XCTAssertEqual(output.turnInstructionAccessibility, DIRWatchLocalizer.string("snorkeling.a11y.turn_left"))
     }
 
     func testReturnStageShowsAdvisorLine() {
@@ -68,7 +68,7 @@ final class SnorkelingWatchPresentationTests: XCTestCase {
         let output = SnorkelingWatchPresentation.make(input)
         XCTAssertEqual(output.stage, .returnToEntry)
         XCTAssertTrue(output.showReturnAdvisor)
-        XCTAssertEqual(output.returnAdvisorText, String(localized: "snorkeling.return.advised"))
+        XCTAssertEqual(output.returnAdvisorText, DIRWatchLocalizer.string("snorkeling.return.advised"))
     }
 
     func testSaveMarkerStageWhenRequested() {
@@ -127,7 +127,7 @@ final class SnorkelingWatchPresentationTests: XCTestCase {
         input.isUnderwater = true
         input.gpsPresentationState = .underwaterUnavailable
         let output = SnorkelingWatchPresentation.make(input)
-        XCTAssertEqual(output.gpsStatusText, String(localized: "snorkeling.gps.underwater"))
+        XCTAssertEqual(output.gpsStatusText, DIRWatchLocalizer.string("snorkeling.gps.underwater"))
         XCTAssertEqual(output.overlay, .gpsDegradedUnderwater)
     }
 
@@ -147,7 +147,7 @@ final class SnorkelingWatchPresentationTests: XCTestCase {
     func testNoFixMarkerQualityOnSurface() {
         var input = baseInput(isSessionStarted: true, phase: .surfaceActive, showSaveMarker: true)
         input.gpsPresentationState = .unavailable
-        input.markerPositionQualityLabel = String(localized: "snorkeling.marker.quality.no_fix")
+        input.markerPositionQualityLabel = DIRWatchLocalizer.string("snorkeling.marker.quality.no_fix")
         let output = SnorkelingWatchPresentation.make(input)
         XCTAssertEqual(output.stage, .saveMarker)
         XCTAssertFalse(output.showsLiveGPSCoordinates)
@@ -175,9 +175,9 @@ final class SnorkelingWatchPresentationTests: XCTestCase {
     func testRecoveredSessionBannerIsPresentedAfterCheckpointRestore() {
         var input = baseInput(isSessionStarted: true, phase: .surfaceActive)
         input.isRecoveredSession = true
-        input.recoveryWarning = String(localized: "snorkeling.recovery.gps_degraded")
+        input.recoveryWarning = DIRWatchLocalizer.string("snorkeling.recovery.gps_degraded")
         let output = SnorkelingWatchPresentation.make(input)
-        XCTAssertEqual(output.recoveredSessionBannerText, String(localized: "snorkeling.recovery.banner"))
+        XCTAssertEqual(output.recoveredSessionBannerText, DIRWatchLocalizer.string("snorkeling.recovery.banner"))
         XCTAssertNotNil(output.recoveredSessionAccessibilityLabel)
         XCTAssertFalse(output.heroValue.isEmpty)
     }
@@ -212,7 +212,7 @@ final class SnorkelingWatchPresentationTests: XCTestCase {
         var input = baseInput(isSessionStarted: true, phase: .surfaceActive)
         input.isRecoveredSession = true
         let output = SnorkelingWatchPresentation.make(input)
-        XCTAssertEqual(output.recoveredSessionAccessibilityLabel, String(localized: "snorkeling.a11y.recovered_session"))
+        XCTAssertEqual(output.recoveredSessionAccessibilityLabel, DIRWatchLocalizer.string("snorkeling.a11y.recovered_session"))
     }
 
     func testNavigationPresentationHasAccessibilityText() {
@@ -244,7 +244,7 @@ final class SnorkelingWatchPresentationTests: XCTestCase {
             )
         ]
         let output = SnorkelingWatchPresentation.make(input)
-        XCTAssertEqual(output.overlayAccessibilityLabel, String(localized: "snorkeling.alarm.title"))
+        XCTAssertEqual(output.overlayAccessibilityLabel, DIRWatchLocalizer.string("snorkeling.alarm.title"))
     }
 
     func testSummaryPresentationHasAccessibilityText() {
@@ -309,7 +309,7 @@ final class SnorkelingWatchPresentationTests: XCTestCase {
             isUnderwater: (currentDepthMeters ?? 0) >= 0.5,
             animationsEnabled: true,
             selectedMarkerCategory: .reef,
-            markerPositionQualityLabel: String(localized: "snorkeling.marker.quality.measured"),
+            markerPositionQualityLabel: DIRWatchLocalizer.string("snorkeling.marker.quality.measured"),
             markerDistanceFromEntryText: "180 m",
             sessionSaveState: .notSaved,
             isRecoveredSession: false,

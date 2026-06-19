@@ -46,7 +46,7 @@ final class SnorkelingWatchLayoutContractTests: XCTestCase {
         input.animationsEnabled = false
         let output = SnorkelingWatchPresentation.make(input)
         XCTAssertFalse(output.animationsEnabled)
-        XCTAssertEqual(output.missionModeText, String(localized: "mission_mode.a11y.active"))
+        XCTAssertEqual(output.missionModeText, DIRWatchLocalizer.string("mission_mode.a11y.active"))
     }
 
     func testAccessibilityStringsPresentForNavigation() {
@@ -122,7 +122,7 @@ final class SnorkelingWatchLayoutContractTests: XCTestCase {
             isUnderwater: stage == .dipInProgress,
             animationsEnabled: true,
             selectedMarkerCategory: .reef,
-            markerPositionQualityLabel: String(localized: "snorkeling.marker.quality.measured"),
+            markerPositionQualityLabel: DIRWatchLocalizer.string("snorkeling.marker.quality.measured"),
             markerDistanceFromEntryText: "210 m",
             sessionSaveState: stage == .sessionSummary ? .saved : .notSaved,
             isRecoveredSession: false,

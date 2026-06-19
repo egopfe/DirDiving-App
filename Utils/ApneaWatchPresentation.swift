@@ -46,6 +46,8 @@ struct ApneaWatchPresentationInput: Equatable {
     var recoveryElapsedSeconds: TimeInterval
     var recoveryRemainingSeconds: TimeInterval
     var recoveryInsufficient: Bool
+    var recoveryInProgress: Bool
+    var allowEarlyDiveWhenIncomplete: Bool
     var sessionTotalSeconds: TimeInterval
     var totalUnderwaterSeconds: TimeInterval
     var sessionMaxDepthMeters: Double
@@ -87,8 +89,18 @@ struct ApneaWatchPresentationOutput: Equatable {
 enum ApneaWatchPresentation {
     static func make(_ input: ApneaWatchPresentationInput) -> ApneaWatchPresentationOutput {
         let stage = resolveStage(input)
-        let startEnabled = !input.sensorDegraded
-        let startDisabledReason: String? = startEnabled ? nil : String(localized: "apnea.ready.sensor_unavailable")
+        let recoveryBlockingStart = input.recoveryInProgress
+            && input.recoveryRemainingSeconds > 0
+            && !input.allowEarlyDiveWhenIncomplete
+        let startEnabled = !input.sensorDegraded && !recoveryBlockingStart
+        let startDisabledReason: String?
+        if input.sensorDegraded {
+            startDisabledReason = String(localized: "apnea.ready.sensor_unavailable")
+        } else if recoveryBlockingStart {
+            startDisabledReason = String(localized: "apnea.ready.recovery_incomplete")
+        } else {
+            startDisabledReason = nil
+        }
 
         let verticalDirectionText: String
         if input.verticalSpeedMetersPerSecond > 0.05 {

@@ -118,6 +118,7 @@ targets:
       - Utils/MonotonicElapsedClock.swift
       - Utils/ApneaWatchPresentation.swift
       - Utils/SnorkelingWatchPresentation.swift
+      - Utils/DIRWatchLocalizer.swift
       - path: Shared
       - path: iOSApp
         excludes:
@@ -232,6 +233,7 @@ targets:
       - Utils/MonotonicElapsedClock.swift
       - Utils/ApneaWatchPresentation.swift
       - Utils/SnorkelingWatchPresentation.swift
+      - Utils/DIRWatchLocalizer.swift
       - Utils/GPSConfirmationPresentation.swift
       - Utils/DiveSessionPersistenceClass.swift
       - Utils/DiveAlgorithmSelfCheck.swift
@@ -478,6 +480,7 @@ targets:
       - Tests/WatchAlgorithmTests/SnorkelingCommand04FoundationGateTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingWatchPresentationTests.swift
       - Utils/SnorkelingWatchPresentation.swift
+      - Utils/DIRWatchLocalizer.swift
       - Tests/WatchAlgorithmTests/SnorkelingWatchLayoutContractTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingPersistenceRecoveryTests.swift
       - Tests/WatchAlgorithmTests/SnorkelingCrossDomainIsolationTests.swift

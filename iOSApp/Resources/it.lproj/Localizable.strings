@@ -1729,6 +1729,7 @@
 "ccr.exposure.unavailable.modelLimit" = "Limite modello CNS/OTU raggiunto.";
 "ccr.exposure.unavailable.numericalFailure" = "Integrazione CNS/OTU fallita numericamente.";
 "ccr.exposure.unavailable.invalidInput" = "Input piano CCR non valido per integrazione CNS/OTU.";
+"planner.exposure.unavailable" = "Non disponibile";
 "planner.ratio_deco.unavailable_ccr" = "Ratio Deco è disponibile solo per pianificazioni indicative in circuito aperto.";
 "ccr.setpoint.header" = "Profilo setpoint";
 "ccr.setpoint.low" = "Setpoint basso";

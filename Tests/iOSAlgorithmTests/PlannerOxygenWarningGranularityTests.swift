@@ -63,6 +63,7 @@ final class PlannerOxygenWarningGranularityTests: XCTestCase {
             turnPressureBar: 120,
             cnsPercent: 20,
             cnsDescentBottomPercent: 10,
+            cnsDescentBottomAvailable: true,
             otu: 10,
             cnsDailyPercent: 20,
             otuDaily24h: 10,

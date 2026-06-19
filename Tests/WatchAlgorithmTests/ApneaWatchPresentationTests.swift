@@ -173,6 +173,8 @@ final class ApneaWatchPresentationTests: XCTestCase {
             recoveryElapsedSeconds: max(0, requiredRecoverySeconds - recoveryRemainingSeconds),
             recoveryRemainingSeconds: recoveryRemainingSeconds,
             recoveryInsufficient: recoveryInsufficient,
+            recoveryInProgress: recoveryRemainingSeconds > 0,
+            allowEarlyDiveWhenIncomplete: false,
             sessionTotalSeconds: sessionTotalSeconds,
             totalUnderwaterSeconds: totalUnderwaterSeconds,
             sessionMaxDepthMeters: 24.7,
