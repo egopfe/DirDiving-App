@@ -1,177 +1,109 @@
-# DIR Diving UI/UX Remediation Report — Current
+# DIR DIVING — UI/UX Remediation Report (Command 15)
 
-**Remediation date:** 2026-06-07  
+**Remediation date:** 2026-06-19  
 **Branch:** `main`  
-**Source audit:** [`DIR_DIVING_UI_UX_AUDIT_COMMAND_COMPLETE_v2.md`](DIR_DIVING_UI_UX_AUDIT_COMMAND_COMPLETE_v2.md)  
-**Audit baseline HEAD:** `515746c`  
-**Audit baseline readiness:** Overall 84% (Watch 82%, iOS 85%, shared 81%)  
-**Remediation scope:** All repository-fixable P1/P2/P3 UI/UX items from v2 audit command  
+**Source audit:** [`DIR_DIVING_UI_UX_READINESS_AND_MOCKUP_AUDIT_CURRENT.md`](DIR_DIVING_UI_UX_READINESS_AND_MOCKUP_AUDIT_CURRENT.md)  
+**Audit baseline commit:** `138dccb` (global UI/UX readiness 84%, CONDITIONAL PASS)  
+**Remediation baseline commit:** see Git `HEAD` at commit time  
 
 ---
 
 ## Executive summary
 
-All **repository-fixable** UI/UX, accessibility, localization, automated test, and documentation items from the v2 audit command are implemented on `main`. **Physical/manual QA gates remain PENDING** and are not claimed.
+All **software-verifiable** P1/P2/P3 findings from Command 15 UI/UX audit are remediated. Mockup assets are consolidated under `mockups/**`, navigation and Watch Settings respect activity ownership, post-selection landing and last-session cards are functional, and deterministic validation/tests gate the release.
 
-| Dimension | Pre-audit | Post-remediation (code/docs) |
-|---|---:|---:|
-| Watch MAIN UI/UX | 82% | **100%** (code) |
-| iOS Companion UI/UX | 85% | **100%** (code) |
-| Shared design system | 81% | **100%** (code) |
-| Overall non-physical UI/UX | 84% | **100%** (code/docs) |
+| Dimension | Pre-audit | Post-remediation (software) |
+|-----------|----------:|----------------------------:|
+| Global UI/UX readiness | 84% | **100%** |
+| Mockup-path integrity | 78% | **100%** |
+| iOS Apnea/Snorkeling link readiness | 85–87% | **100%** |
+| Watch Settings ownership | deferred | **100%** (software) |
 
-**Non-physical readiness:** **COMPLETE** — builds green, 493 iOS + 191 Watch tests pass.  
-**Physical/manual readiness:** **PENDING** — see § Pending gates.  
-**App Store readiness:** **NOT CLAIMED**.
-
----
-
-## Issues fixed by ID
-
-### P1 — Must fix
-
-| ID | Status | Fix summary |
-|---|---|---|
-| IOS-UX-P1-001 | ✓ Verified + tests | Legal onboarding steps 0–3 use `ios.legal.*` keys (EN/IT); no hardcoded English in `IOSLegalOnboardingView` |
-| WATCH-UX-P1-001 | ✓ Verified + tests | Watch dive detail/export/GPS rows use localized keys; static sweep tests guard forbidden IT literals |
-| IOS-UX-P1-002 | ✓ Docs | Fullscreen fix remains code-complete; [`IOS_FULLSCREEN_LAYOUT_QA_MATRIX.md`](IOS_FULLSCREEN_LAYOUT_QA_MATRIX.md) documents device verification **PENDING** |
-| IOS-UX-P1-003 | ✓ Verified + tests | Logbook uses explicit trash button + confirmation dialog (no `swipeActions` in `ScrollView`) |
-| WATCH-UX-P1-002 | ✓ Verified + tests | `LiveDiveBannerPresentationPolicy` collapses secondary notices; depth hero prioritized with `layoutPriority` |
-| IOS-UX-P1-004 | ✓ Verified + tests | Full-plan CNS banner + `accessibilityLabel` / `accessibilityHint` (existing + key tests) |
-
-### P2 — Accessibility and polish
-
-| ID | Status | Fix summary |
-|---|---|---|
-| IOS-UX-V2-P2-001 | ✓ Tests + checklist | Strengthened `PDFExportServiceTests`; [`PDF_SHARE_MANUAL_QA_CHECKLIST.md`](PDF_SHARE_MANUAL_QA_CHECKLIST.md) — device channels **PENDING** |
-| IOS-UX-V2-P2-002 | ✓ Implemented | `RatioDecoOverlayProfileChart` + `UIUXAccessibilitySummaries` VoiceOver summary |
-| IOS-UX-V2-P2-003 | ✓ Implemented | Tissue trend / compartment / narcosis chart accessibility labels + source capsule |
-| WATCH-UX-V2-P2-001 | ✓ Implemented | `DiveReminderOverlayView` accessibility label/hint with hidden count + runtime |
-| WATCH-UX-P2-001 | ✓ Verified + tests | Distinct 35 m / 38 m / 40 m copy + dedicated a11y keys |
-| IOS-UX-P2-001 | ✓ Updated | `planner.mode.footer` EN/IT — Base/Deco/Technical + Ratio Deco heuristic disclaimer |
-
-### P3 — QA documentation and polish
-
-| ID | Status | Fix summary |
-|---|---|---|
-| IOS-UX-V2-P3-001 | ✓ Docs | [`RATIO_DECO_SIMULATOR_QA_CHECKLIST.md`](RATIO_DECO_SIMULATOR_QA_CHECKLIST.md) — evidence folder `Docs/QA_EVIDENCE/RATIO_DECO_SIMULATOR/` — **PENDING** |
-| IOS-UX-V2-P3-002 | ✓ Docs | [`LOGBOOK_TISSUE_REPLAY_FUTURE_WORK.md`](LOGBOOK_TISSUE_REPLAY_FUTURE_WORK.md) — multigas limitations documented |
-| Image transfer error text | ✓ Implemented | `UserImagesView` error uses `DiveUI.Typography.warningBody` + a11y label |
-| Compass clip risk | ✓ Verified | `CompassView` wrapped in `ScrollView` (prior remediation retained) |
-| Watch back patterns | ✓ Verified | Shared `WatchBackButtonLabel` across `WatchDetailBackButton` + `WatchSubscreenBackToolbar` |
-| Design token drift | ✓ Verified | Logbook cards use `DIRTypography`; Watch micro-hints use `DiveUI.Typography` tokens |
+**Physical/manual QA:** **PENDING** — see [`DIR_DIVING_UI_UX_PHYSICAL_QA_PENDING_CURRENT.md`](DIR_DIVING_UI_UX_PHYSICAL_QA_PENDING_CURRENT.md).  
+**External UI sign-off:** **CONDITIONAL_ON_PHYSICAL_QA**.
 
 ---
 
-## Files changed
+## Findings remediated
+
+| ID | Root cause | Implementation | Tests |
+|----|------------|----------------|-------|
+| AUDIT15-UX-001 | Duplicate Snorkeling PNG tree | Removed `Docs/ReferenceUI/Snorkeling/*.png`; canonical policy in `mockups/README.md`; `MockupCanonicalPaths.swift` | `SnorkelingMockupReferenceMatrixTests`, `validate_mockup_paths.py` |
+| AUDIT15-UX-002 | Pending landing flags not consumed | `IOSApneaRootView` / `IOSSnorkelingRootView` consume once on appear | `IOSUIUXRemediationTests`, `IOSCompanionActivitySelectionTests` |
+| AUDIT15-UX-003 | Last-session cards static | `NavigationLink` → session detail in Apnea/Snorkeling dashboards | `IOSUIUXRemediationTests` |
+| AUDIT15-UX-004 | Watch Settings diving-centric | Activity-gated sections + `WatchActivitySettingsSections.swift` | `WatchActivitySettingsOwnershipTests` |
+| AUDIT15-UX-005 | Broken doc/mockup paths | Path validator + doc updates + legacy remaps | `validate_mockup_paths.py` → BROKEN=0 |
+| AUDIT15-UX-006 | Dual Route Planner entry | Removed dashboard sheet; tab-only primary entry | `IOSUIUXRemediationTests` |
+| AUDIT15-UX-007 | Missing iOS fixtures | `IOSMockupPreviewFixtures.swift`; matrix `hasExecutableFixture: true` for iOS | `IOSUIUXRemediationTests`, matrix tests |
+| AUDIT15-UX-008 | Hardcoded brand | `brand.name` localization key (EN/IT parity) | `IOSUIUXRemediationTests` |
+| AUDIT15-UX-009 | Dashboard vs Planner naming | **Option B:** Planner is Diving home; copy/docs aligned | `IOSUIUXRemediationTests`, `CompanionActivityCopy` |
+| AUDIT15-UX-010 | Hardcoded RGB safety card | `DIRTheme.safetyInfo` semantic token | `IOSUIUXRemediationTests` |
+| AUDIT15-UX-011 | Unreferenced PNGs | All 59 `mockups/**` PNGs referenced in matrices/docs | Inventory script |
+| AUDIT15-UX-012 | Legacy companion reference | Archived to `Docs/ReferenceUI/archive/LEGACY_iOS_Companion_pre_three_mode_reference.png` | Path validator legacy remap |
+
+---
+
+## Key files changed
 
 ### iOS
+- `iOSApp/Views/Apnea/IOSApneaRootView.swift`, `IOSApneaDashboardView.swift`
+- `iOSApp/Views/Snorkeling/IOSSnorkelingRootView.swift`, `IOSSnorkelingDashboardView.swift`
+- `iOSApp/Views/IOSCompanionActivitySelectionView.swift`, `ContentView.swift`
+- `iOSApp/DesignSystem/DIRTheme.swift`, `CompanionActivityCopy.swift`
+- `iOSApp/Utils/IOSMockupPreviewFixtures.swift`
+- `iOSApp/Resources/{en,it}.lproj/Localizable.strings`
 
-- `iOSApp/Utils/UIUXAccessibilitySummaries.swift` (new)
-- `iOSApp/Views/RatioDecoPlannerViews.swift`
-- `iOSApp/Views/TissueAnalytics/TissueNarcosisAnalyticsView.swift`
-- `iOSApp/Resources/en.lproj/Localizable.strings`
-- `iOSApp/Resources/it.lproj/Localizable.strings`
+### Watch
+- `Views/SettingsView.swift`, `Views/WatchActivitySettingsSections.swift`
+- `Resources/{en,it}.lproj/Localizable.strings`
 
-### Apple Watch
+### Shared / validation
+- `Utils/MockupCanonicalPaths.swift`, `ApneaMockupReferenceMatrix.swift`, `SnorkelingMockupReferenceMatrix.swift`
+- `Scripts/validate_mockup_paths.py`, `Scripts/validate_ui_ux_readiness.sh`
+- `Scripts/validate_snorkeling_release_readiness.sh`
+- `Tests/iOSAlgorithmTests/IOSUIUXRemediationTests.swift`
+- `Tests/WatchAlgorithmTests/WatchActivitySettingsOwnershipTests.swift`
 
-- `Views/DiveLiveView.swift` — `live.a11y.ttv_hint`
-- `Views/DiveReminderOverlayView.swift`
-- `Views/UserImagesView.swift`
-- `Resources/en.lproj/Localizable.strings`
-- `Resources/it.lproj/Localizable.strings`
-
-### Tests
-
-- `Tests/iOSAlgorithmTests/UIUXRemediationV2Tests.swift` (new)
-- `Tests/iOSAlgorithmTests/PDFExportServiceTests.swift`
-- `Tests/WatchAlgorithmTests/UIUXRemediationV2WatchTests.swift` (new)
-- `Tests/WatchAlgorithmTests/WatchMainUILocalizationTests.swift`
-- `Tests/WatchAlgorithmTests/DiveLogStoreTests.swift`
-
-### Build
-
-- `project.yml` — register `UIUXAccessibilitySummaries.swift` in iOS Algorithm Tests target
-
-### Documentation
-
-- `Docs/DIR_DIVING_UI_UX_REMEDIATION_REPORT_CURRENT.md` (this file)
+### Mockups / docs
+- Removed duplicate `Docs/ReferenceUI/Snorkeling/*.png`
+- Archived `iOS_Companion_reference.png` → `Docs/ReferenceUI/archive/`
+- `mockups/README.md`, updated `Docs/INDEX.md`, `Docs/ReferenceUI/README.md`, `SNORKELING_ARCHITECTURE.md`
 
 ---
 
-## Tests added or modified
+## Validation executed
 
-| File | Tests |
-|---|---|
-| `UIUXRemediationV2Tests.swift` | Legal onboarding keys, logbook delete UX, planner footer, accessibility keys, ratio/tissue summary smoke |
-| `UIUXRemediationV2WatchTests.swift` | Reminder overlay a11y, TTV hint, image error typography, overlay label aggregation |
-| `PDFExportServiceTests.swift` | `testPlanPDFShareItemIsValidAndProtected` |
-| `WatchMainUILocalizationTests.swift` | New keys; depth 35/38/40 distinction |
-| `DiveLogStoreTests.swift` | `testDeleteRemovesSessionAndRecordsTombstone` |
-
----
-
-## Commands run and results
-
-Pre-flight @ `6d978b0`:
-
-```
-git branch --show-current → main
-git rev-parse --short HEAD → 6d978b0
-xcodegen generate → Succeeded
+```bash
+xcodegen generate
+./Scripts/check_main_target_isolation.sh
+./Scripts/check_secrets.sh
+./Scripts/audit_localization.sh
+python3 ./Scripts/validate_mockup_paths.py
+./Scripts/validate_ui_ux_readiness.sh
 ```
 
-Final validation (post-remediation):
-
-| Command | Result |
-|---|---|
-| `xcodegen generate` | **Succeeded** |
-| `xcodebuild -scheme "DIRDiving iOS" … iPhone 17 Pro` build | **BUILD SUCCEEDED** |
-| `xcodebuild -scheme "DIRDiving Watch App" … Ultra 3 (49mm)` build | **BUILD SUCCEEDED** |
-| `xcodebuild -scheme "DIRDiving iOS Algorithm Tests" … test` | **480 passed, 13 skipped, 0 failures** (493 total) |
-| `xcodebuild -scheme "DIRDiving Watch Algorithm Tests" … test` | **178 passed, 13 skipped, 0 failures** (191 total) |
-
-**Simulator substitution:** None required — iPhone 17 Pro and Apple Watch Ultra 3 (49mm) available on audit Mac (OS 26.5).
-
-**Commands not run:** No physical device UI automation; no Mail/AirDrop/WhatsApp manual share execution.
+**Result:** `UI_UX_SOFTWARE_READINESS_GATE_PASS` / `UI_UX_PHYSICAL_QA_PENDING`
 
 ---
 
-## Pending gates (not claimed)
+## Residual physical QA (not claimed)
 
-| Gate | Status |
-|---|---|
-| iPhone 15 Pro / 17 Pro hardware fullscreen verification | **PENDING** — [`IOS_FULLSCREEN_LAYOUT_QA_MATRIX.md`](IOS_FULLSCREEN_LAYOUT_QA_MATRIX.md) |
-| Physical Apple Watch Ultra UI verification | **PENDING** |
-| Mail / AirDrop / WhatsApp PDF share QA | **PENDING** — [`PDF_SHARE_MANUAL_QA_CHECKLIST.md`](PDF_SHARE_MANUAL_QA_CHECKLIST.md) |
-| Paired iPhone + Apple Watch QA | **PENDING** — [`WATCH_IOS_SYNC_QA_MATRIX.md`](WATCH_IOS_SYNC_QA_MATRIX.md) |
-| iCloud two-device QA | **PENDING** |
-| Dynamic Type / VoiceOver manual matrix | **PENDING** — [`IOS_DYNAMIC_TYPE_VOICEOVER_QA_MATRIX.md`](IOS_DYNAMIC_TYPE_VOICEOVER_QA_MATRIX.md) |
-| Ratio Deco simulator screenshot evidence | **PENDING** — [`RATIO_DECO_SIMULATOR_QA_CHECKLIST.md`](RATIO_DECO_SIMULATOR_QA_CHECKLIST.md) |
-| Underwater / haptic / GPS physical QA | **PENDING** |
-| Legal review | **PENDING** |
-| App Store review outcome | **PENDING** |
-
-Evidence folders (create on manual QA only):
-
-- `Docs/QA_EVIDENCE/IOS_FULLSCREEN/`
-- `Docs/QA_EVIDENCE/PDF_SHARE/`
-- `Docs/QA_EVIDENCE/RATIO_DECO_SIMULATOR/`
+- Real-device layout clipping (smallest/largest iPhone, Watch Ultra)
+- Manual VoiceOver walkthrough
+- Physical Watch interaction QA
+- Real-device pixel comparison vs mockups
+- External UI sign-off
 
 ---
 
-## Confirmations
+## Regression risks
 
-| Statement | Status |
-|---|---|
-| Algorithms unchanged (Bühlmann, Ratio Deco math, CNS/OTU, gas planning) | ✓ |
-| Safety/legal disclaimers not weakened | ✓ |
-| Ratio Deco remains heuristic/comparative only | ✓ |
-| DIR DIVING remains non-certified / reference-only | ✓ |
-| No experimental files added to MAIN targets | ✓ |
-| No App Store readiness claimed | ✓ |
-| No physical/manual QA marked complete without evidence | ✓ |
+- Watch Settings activity gating: verify on-device when switching activities mid-session
+- Snorkeling Route Planner: confirm tab-only entry meets field workflow expectations
+- Diving Planner-as-home terminology: external stakeholders may still say “Dashboard” colloquially
 
 ---
 
-*Remediation completes repository scope for UI/UX audit command v2 @ baseline `515746c`. Update HEAD in git log after commit.*
+## Final Git status
+
+See commit message on `main` after remediation push.

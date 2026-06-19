@@ -35,51 +35,60 @@ struct SettingsView: View {
                     }
 
                     startupSettingsSection
-                    divingSettingsSection
 
-                    WatchSettingsSectionHeader(title: String(localized: "settings.section.safety"))
-
-                    NavigationLink {
-                        AscentRateSettingsView()
-                    } label: {
-                        settingsRow(
-                            icon: "gauge",
-                            iconColor: DiveUI.green,
-                            title: String(localized: "settings.row.ascent_rate.title"),
-                            subtitle: String(localized: "settings.row.ascent_rate.subtitle"),
-                            showsChevron: true
-                        )
+                    if activitySelection.selectedActivity == .diving {
+                        divingSettingsSection
+                    } else if activitySelection.selectedActivity == .apnea {
+                        WatchApneaActivitySettingsSection()
+                    } else if activitySelection.selectedActivity == .snorkeling {
+                        WatchSnorkelingActivitySettingsSection()
                     }
-                    .buttonStyle(.plain)
-                    .disabled(dive.isDiveActive)
 
-                    NavigationLink {
-                        AlarmSettingsView()
-                    } label: {
-                        settingsRow(
-                            icon: "bell",
-                            iconColor: DiveUI.yellow,
-                            title: String(localized: "settings.row.alarms.title"),
-                            subtitle: String(localized: "settings.row.alarms.subtitle"),
-                            showsChevron: true
-                        )
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(dive.isDiveActive)
+                    if activitySelection.selectedActivity == .diving {
+                        WatchSettingsSectionHeader(title: String(localized: "settings.section.safety"))
 
-                    NavigationLink {
-                        DiveReminderSettingsView()
-                    } label: {
-                        settingsRow(
-                            icon: "bell.badge",
-                            iconColor: DiveUI.orange,
-                            title: String(localized: "dive_reminder.nav.title"),
-                            subtitle: String(localized: "dive_reminder.settings.subtitle"),
-                            showsChevron: true
-                        )
+                        NavigationLink {
+                            AscentRateSettingsView()
+                        } label: {
+                            settingsRow(
+                                icon: "gauge",
+                                iconColor: DiveUI.green,
+                                title: String(localized: "settings.row.ascent_rate.title"),
+                                subtitle: String(localized: "settings.row.ascent_rate.subtitle"),
+                                showsChevron: true
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(dive.isDiveActive)
+
+                        NavigationLink {
+                            AlarmSettingsView()
+                        } label: {
+                            settingsRow(
+                                icon: "bell",
+                                iconColor: DiveUI.yellow,
+                                title: String(localized: "settings.row.alarms.title"),
+                                subtitle: String(localized: "settings.row.alarms.subtitle"),
+                                showsChevron: true
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(dive.isDiveActive)
+
+                        NavigationLink {
+                            DiveReminderSettingsView()
+                        } label: {
+                            settingsRow(
+                                icon: "bell.badge",
+                                iconColor: DiveUI.orange,
+                                title: String(localized: "dive_reminder.nav.title"),
+                                subtitle: String(localized: "dive_reminder.settings.subtitle"),
+                                showsChevron: true
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(dive.isDiveActive)
                     }
-                    .buttonStyle(.plain)
-                    .disabled(dive.isDiveActive)
 
                     WatchSettingsSectionHeader(title: String(localized: "settings.section.units_language"))
 
@@ -144,42 +153,47 @@ struct SettingsView: View {
                         title: String(localized: "settings.row.sync_companion.title"),
                         subtitle: watchSync.isSupported ? watchSync.lastSyncStatus : String(localized: "settings.sync.open_ios")
                     )
-                    Button {
-                        navigation.selectedPage = .diveLog
-                        HapticService.shared.confirm()
-                    } label: {
-                        settingsRow(
-                            icon: "square.and.arrow.up",
-                            iconColor: DiveUI.green,
-                            title: String(localized: "settings.row.export_logbook.title"),
-                            subtitle: String(localized: "settings.row.export_logbook.subtitle"),
-                            showsChevron: true
-                        )
+                    if activitySelection.selectedActivity == .diving {
+                        Button {
+                            navigation.selectedPage = .diveLog
+                            HapticService.shared.confirm()
+                        } label: {
+                            settingsRow(
+                                icon: "square.and.arrow.up",
+                                iconColor: DiveUI.green,
+                                title: String(localized: "settings.row.export_logbook.title"),
+                                subtitle: String(localized: "settings.row.export_logbook.subtitle"),
+                                showsChevron: true
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(dive.isDiveActive)
+                        .accessibilityLabel(String(localized: "settings.a11y.export_logbook"))
+                        .accessibilityHint(String(localized: "settings.row.export_logbook.subtitle"))
                     }
-                    .buttonStyle(.plain)
-                    .disabled(dive.isDiveActive)
-                    .accessibilityLabel(String(localized: "settings.a11y.export_logbook"))
-                    .accessibilityHint(String(localized: "settings.row.export_logbook.subtitle"))
 
-                    WatchSettingsSectionHeader(title: String(localized: "settings.section.mission"))
-
-                    missionModeControl
+                    if activitySelection.selectedActivity == .diving {
+                        WatchSettingsSectionHeader(title: String(localized: "settings.section.mission"))
+                        missionModeControl
+                    }
 
                     WatchSettingsSectionHeader(title: String(localized: "settings.section.advanced"))
 
-                    NavigationLink {
-                        PlannerBriefingCardsView()
-                    } label: {
-                        settingsRow(
-                            icon: "doc.richtext",
-                            iconColor: DiveUI.cyan,
-                            title: String(localized: "watch.planner_briefing.title"),
-                            subtitle: String(localized: "watch.planner_briefing.ref_only"),
-                            showsChevron: true
-                        )
+                    if activitySelection.selectedActivity == .diving {
+                        NavigationLink {
+                            PlannerBriefingCardsView()
+                        } label: {
+                            settingsRow(
+                                icon: "doc.richtext",
+                                iconColor: DiveUI.cyan,
+                                title: String(localized: "watch.planner_briefing.title"),
+                                subtitle: String(localized: "watch.planner_briefing.ref_only"),
+                                showsChevron: true
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(dive.isDiveActive)
                     }
-                    .buttonStyle(.plain)
-                    .disabled(dive.isDiveActive)
 
                     NavigationLink {
                         WatchShortcutHelpView()
@@ -369,19 +383,21 @@ struct SettingsView: View {
             .buttonStyle(.plain)
             .disabled(dive.isDiveActive)
 
-            NavigationLink {
-                WatchStartupDefaultDivingModePickerView()
-            } label: {
-                settingsRow(
-                    icon: "water.waves",
-                    iconColor: DiveUI.cyan,
-                    title: String(localized: "settings.startup.default_diving_mode"),
-                    subtitle: localizedDivingModeName(DIRStartupSelectionPolicy.defaultDivingMode),
-                    showsChevron: true
-                )
+            if activitySelection.selectedActivity == .diving {
+                NavigationLink {
+                    WatchStartupDefaultDivingModePickerView()
+                } label: {
+                    settingsRow(
+                        icon: "water.waves",
+                        iconColor: DiveUI.cyan,
+                        title: String(localized: "settings.startup.default_diving_mode"),
+                        subtitle: localizedDivingModeName(DIRStartupSelectionPolicy.defaultDivingMode),
+                        showsChevron: true
+                    )
+                }
+                .buttonStyle(.plain)
+                .disabled(dive.isDiveActive)
             }
-            .buttonStyle(.plain)
-            .disabled(dive.isDiveActive)
 
             Text(String(localized: "settings.startup.recommendation"))
                 .font(DiveUI.Typography.hintCaption)

@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Main iOS tab bar: Planner, Explore, Logbook, Analisi, Attrezzatura, Buddy, Checklist, Settings.
+/// Main iOS tab bar: Planner (Diving home), Explore, Logbook, Analisi, Attrezzatura, Buddy, Checklist, Settings.
 enum IOSTab: Hashable, CaseIterable {
     case planner
     case explore

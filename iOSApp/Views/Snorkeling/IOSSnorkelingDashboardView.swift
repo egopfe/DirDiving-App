@@ -21,31 +21,33 @@ struct IOSSnorkelingDashboardView: View {
     }
 
     var body: some View {
-        DIRScreenContainer {
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 16) {
-                    header
-                    if presentation.hasLastSession {
-                        lastSessionCard
-                    } else if let empty = presentation.emptyStateText {
-                        Text(DIRIOSLocalizer.string(empty))
-                            .font(.callout)
-                            .foregroundStyle(DIRTheme.muted)
-                            .multilineTextAlignment(.center)
-                            .frame(maxWidth: .infinity)
+        NavigationStack {
+            DIRScreenContainer {
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        header
+                        if presentation.hasLastSession, let session = logbook.lastSession {
+                            lastSessionCard(session: session)
+                        } else if let empty = presentation.emptyStateText {
+                            Text(DIRIOSLocalizer.string(empty))
+                                .font(.callout)
+                                .foregroundStyle(DIRTheme.muted)
+                                .multilineTextAlignment(.center)
+                                .frame(maxWidth: .infinity)
+                        }
+                        metricsGrid
+                        if presentation.mapPreviewAvailable {
+                            mapPreviewCard
+                        }
+                        syncStatusCard
+                        watchStatusCard
+                        newSessionButton
                     }
-                    metricsGrid
-                    if presentation.mapPreviewAvailable {
-                        mapPreviewCard
-                    }
-                    syncStatusCard
-                    watchStatusCard
-                    newSessionButton
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 12)
                 }
-                .padding(.horizontal, 18)
-                .padding(.vertical, 12)
+                .dirCompanionScrollSurface()
             }
-            .dirCompanionScrollSurface()
         }
         .accessibilityIdentifier("snorkeling.ios.dashboard")
     }
@@ -72,21 +74,27 @@ struct IOSSnorkelingDashboardView: View {
         }
     }
 
-    private var lastSessionCard: some View {
-        DIRCard(DIRIOSLocalizer.string("snorkeling.ios.dashboard.last_session"), icon: "clock.fill", accent: DIRTheme.cyan) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(presentation.lastSessionDateText)
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                HStack(spacing: 12) {
-                    metricInline(DIRIOSLocalizer.string("snorkeling.ios.dashboard.duration"), presentation.lastSessionDurationText)
-                    metricInline(DIRIOSLocalizer.string("snorkeling.ios.dashboard.max_depth"), presentation.lastSessionMaxDepthText)
-                    metricInline(DIRIOSLocalizer.string("snorkeling.ios.dashboard.distance"), presentation.lastSessionDistanceText)
+    private func lastSessionCard(session: SnorkelingSession) -> some View {
+        NavigationLink {
+            IOSSnorkelingSessionDetailView(session: session)
+        } label: {
+            DIRCard(DIRIOSLocalizer.string("snorkeling.ios.dashboard.last_session"), icon: "clock.fill", accent: DIRTheme.cyan) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(presentation.lastSessionDateText)
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                    HStack(spacing: 12) {
+                        metricInline(DIRIOSLocalizer.string("snorkeling.ios.dashboard.duration"), presentation.lastSessionDurationText)
+                        metricInline(DIRIOSLocalizer.string("snorkeling.ios.dashboard.max_depth"), presentation.lastSessionMaxDepthText)
+                        metricInline(DIRIOSLocalizer.string("snorkeling.ios.dashboard.distance"), presentation.lastSessionDistanceText)
+                    }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .accessibilityElement(children: .combine)
         }
+        .buttonStyle(.plain)
+        .accessibilityLabel(DIRIOSLocalizer.string("snorkeling.ios.dashboard.last_session.a11y"))
+        .accessibilityHint(DIRIOSLocalizer.string("snorkeling.ios.dashboard.last_session.hint"))
     }
 
     private func metricInline(_ title: String, _ value: String) -> some View {
@@ -202,7 +210,6 @@ struct IOSSnorkelingDashboardView: View {
     private var newSessionButton: some View {
         Button {
             snorkelingNavigation.selectedTab = .routePlanner
-            snorkelingNavigation.showRoutePlanner = true
         } label: {
             Text(DIRIOSLocalizer.string("snorkeling.ios.dashboard.new_session"))
                 .font(.headline.weight(.bold))

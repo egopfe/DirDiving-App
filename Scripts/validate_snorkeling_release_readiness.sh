@@ -76,9 +76,15 @@ assert len(set(ids)) == 10, "duplicate mockup ids"
 print("[snorkeling-readiness] mockup matrix ok (10 entries)")
 PY
 
-ref_dir="Docs/ReferenceUI/Snorkeling"
-for png in SNORKELING_WATCH_01_READY.png SNORKELING_WATCH_02_SURFACE_DASHBOARD.png SNORKELING_WATCH_03_DIP_IN_PROGRESS.png SNORKELING_WATCH_04_WAYPOINT_NAVIGATION.png SNORKELING_WATCH_05_RETURN_TO_ENTRY.png SNORKELING_WATCH_06_SAVE_MARKER.png SNORKELING_WATCH_07_SESSION_SUMMARY.png SNORKELING_IOS_01_DASHBOARD.png SNORKELING_IOS_02_ROUTE_PLANNER.png SNORKELING_IOS_03_SESSION_DETAIL.png; do
-  [[ -f "${ref_dir}/${png}" ]] || { echo "[snorkeling-readiness] missing reference PNG: ${png}"; exit 1; }
+python3 ./Scripts/validate_mockup_paths.py
+
+watch_ref_dir="mockups/Apple_Watch"
+ios_ref_dir="mockups/iOS"
+for png in SNORKELING_WATCH_01_READY.png SNORKELING_WATCH_02_SURFACE_DASHBOARD.png SNORKELING_WATCH_03_DIP_IN_PROGRESS.png SNORKELING_WATCH_04_WAYPOINT_NAVIGATION.png SNORKELING_WATCH_05_RETURN_TO_ENTRY.png SNORKELING_WATCH_06_SAVE_MARKER.png SNORKELING_WATCH_07_SESSION_SUMMARY.png; do
+  [[ -f "${watch_ref_dir}/${png}" ]] || { echo "[snorkeling-readiness] missing reference PNG: ${watch_ref_dir}/${png}"; exit 1; }
+done
+for png in SNORKELING_IOS_01_DASHBOARD.png SNORKELING_IOS_02_ROUTE_PLANNER.png SNORKELING_IOS_03_SESSION_DETAIL.png; do
+  [[ -f "${ios_ref_dir}/${png}" ]] || { echo "[snorkeling-readiness] missing reference PNG: ${ios_ref_dir}/${png}"; exit 1; }
 done
 
 WATCH_DEST="${SNORKELING_WATCH_SIM_DEST:-platform=watchOS Simulator,name=Apple Watch Series 11 (46mm)}"
