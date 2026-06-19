@@ -39,10 +39,16 @@ final class SnorkelingMockupReferenceMatrixTests: XCTestCase {
         XCTAssertEqual(stages, Set(SnorkelingWatchStage.allCases.map(\.rawValue)))
     }
 
-    func testReferencePNGsExistInDocsOnly() {
+    func testReferencePNGsExistUnderMockupsCanonicalTree() {
         let root = repositoryRoot()
         let missing = SnorkelingMockupReferenceMatrix.referencePNGExists(at: root)
-        XCTAssertTrue(missing.isEmpty, "Missing reference PNGs: \(missing)")
+        XCTAssertTrue(missing.isEmpty, "Missing reference PNGs under mockups/: \(missing)")
+    }
+
+    func testMatrixDocumentsMockupsCanonicalPath() throws {
+        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("Utils/SnorkelingMockupReferenceMatrix.swift"))
+        XCTAssertTrue(source.contains("mockups/**"))
+        XCTAssertFalse(source.contains("Docs/ReferenceUI/Snorkeling"))
     }
 
     func testExecutableWatchFixturesHavePresentationStage() {

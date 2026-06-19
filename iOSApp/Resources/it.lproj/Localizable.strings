@@ -1964,10 +1964,16 @@
 "companion.activitySelection.title" = "SCEGLI LA TUA ATTIVITÀ";
 "companion.activitySelection.subtitle" = "Seleziona l'attività che vuoi praticare. Potrai cambiarla in qualsiasi momento dalle impostazioni.";
 "companion.activity.diving.title" = "DIVING";
-"companion.activity.diving.subtitle" = "Immersioni con autorespiratore";
+"companion.activity.diving.subtitle" = "Immersioni con autorespiratore · home Planner";
 "companion.activity.diving.feature.decompression" = "Calcolo decompressione";
 "companion.activity.diving.feature.gas" = "Gestione gas";
 "companion.activity.diving.feature.logbook" = "Logbook dettagliato";
+"companion.activity.diving.feature.planner" = "Home Planner";
+"brand.name" = "DIR DIVING";
+"apnea.ios.dashboard.last_session.a11y" = "Ultima sessione Apnea";
+"apnea.ios.dashboard.last_session.hint" = "Apre il dettaglio dell'ultima sessione Apnea";
+"snorkeling.ios.dashboard.last_session.a11y" = "Ultima sessione Snorkeling";
+"snorkeling.ios.dashboard.last_session.hint" = "Apre il dettaglio dell'ultima sessione Snorkeling";
 "companion.activity.apnea.title" = "APNEA";
 "companion.activity.apnea.subtitle" = "Apnea in assetto costante";
 "companion.activity.apnea.feature.time" = "Tempo di immersione";

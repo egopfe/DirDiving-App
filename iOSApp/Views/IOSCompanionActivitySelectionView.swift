@@ -31,18 +31,20 @@ struct IOSCompanionActivitySelectionView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("DIR DIVING")
+            Text(DIRIOSLocalizer.string("brand.name"))
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(DIRTheme.muted)
                 .tracking(1.2)
             Text(DIRIOSLocalizer.string("companion.activitySelection.title"))
                 .font(.system(size: 30, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
-                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(3)
+                .minimumScaleFactor(0.85)
             Text(DIRIOSLocalizer.string("companion.activitySelection.subtitle"))
                 .font(.callout)
                 .foregroundStyle(DIRTheme.muted)
-                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(4)
+                .minimumScaleFactor(0.85)
         }
         .accessibilityElement(children: .combine)
         .accessibilitySortPriority(100)
@@ -112,7 +114,7 @@ struct IOSCompanionActivitySelectionView: View {
         DIRCard(
             DIRIOSLocalizer.string("companion.activitySelection.safety.title"),
             icon: "checkmark.shield.fill",
-            accent: Color(red: 0.04, green: 0.52, blue: 1.0)
+            accent: DIRTheme.safetyInfo
         ) {
             Text(DIRIOSLocalizer.string("companion.activitySelection.safety.body"))
                 .font(.callout)

@@ -37,7 +37,7 @@ stateDiagram-v2
     sensorDegraded --> ready: restored / manual policy
 ```
 
-Watch UI stages (`SnorkelingWatchStage`) map 1:1 to reference mockups in `Docs/ReferenceUI/Snorkeling/SNORKELING_WATCH_0*.png`.
+Watch UI stages (`SnorkelingWatchStage`) map 1:1 to reference mockups in `mockups/Apple_Watch/SNORKELING_WATCH_0*.png`.
 
 ## Sync namespaces
 
@@ -82,7 +82,7 @@ Watch UI stages (`SnorkelingWatchStage`) map 1:1 to reference mockups in `Docs/R
 | `SNORKELING_IOS_02_ROUTE_PLANNER` | `IOSSnorkelingRoutePlannerView` |
 | `SNORKELING_IOS_03_SESSION_DETAIL` | `IOSSnorkelingSessionDetailView` |
 
-Raster PNGs live under `Docs/ReferenceUI/Snorkeling/` only — **never** in app bundles (`SnorkelingMockupReferenceMatrix`).
+Raster PNGs live under `mockups/**` only — **never** in app bundles (`SnorkelingMockupReferenceMatrix`, `MockupCanonicalPaths`).
 
 ## Related contracts
 

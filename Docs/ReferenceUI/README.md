@@ -56,7 +56,8 @@ Complete before App Store visual gate or marking reference UI PASS.
 | File | Purpose | Source |
 |------|---------|--------|
 | `Watch_LIVE_reference.png` | Apple Watch Live Dive — depth, TTV, inline ascent banner, compact GPS | `main` — DIRDiving Watch App sim 41/45/49 mm |
-| `iOS_Companion_reference.png` | iOS Companion — Planner, Logbook, More tabs | `main` — DIRDiving iOS sim |
+| `mockups/IOS_COMPANION_ACTIVITY_SELECTION_POST_ONBOARDING.png` | iOS three-activity selection (canonical) | `mockups/` — not bundled in app |
+| `Docs/ReferenceUI/archive/LEGACY_iOS_Companion_pre_three_mode_reference.png` | **Historical** pre-three-mode companion UI | archive only — do not use as current reference |
 
 ## Ascent / safety UX reference
 
@@ -86,8 +87,8 @@ Mark all experimental captures **Experimental / not production** in commit messa
 2. Run **DIRDiving iOS** on iPhone SE and iPhone 17 — Planner, Logbook, More, Watch photo panel; repeat key screens in IT system language.
 3. Save screenshots here without altering in-app copy.
 4. Naming convention (exact for MAIN):
-   - `Watch_LIVE_reference.png`
-   - `iOS_Companion_reference.png`
+   - `Watch_LIVE_reference.png` (this folder)
+   - Per-activity mockups under `mockups/**` (see [`mockups/README.md`](../../mockups/README.md))
 5. Do **not** fabricate or AI-generate reference images.
 
 ## Text/clipping QA
