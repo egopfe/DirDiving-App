@@ -4,8 +4,12 @@ import CryptoKit
 enum PlannerBriefingCardKind: String, Codable, Hashable {
     case decoStops
     case runtime
-    case gasEmergency
     case ccrSummary
+
+    /// Legacy card kinds (e.g. removed `gasEmergency`) decode as nil and are filtered during import.
+    static func supported(rawValue: String) -> PlannerBriefingCardKind? {
+        PlannerBriefingCardKind(rawValue: rawValue)
+    }
 }
 
 struct PlannerBriefingCardMetadata: Codable, Hashable, Identifiable {
@@ -144,7 +148,52 @@ enum PlannerBriefingTransferSupport {
     static func decodeManifest(_ data: Data) throws -> PlannerBriefingCardManifest {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
-        return try decoder.decode(PlannerBriefingCardManifest.self, from: data)
+        let wire = try decoder.decode(LenientPlannerBriefingManifest.self, from: data)
+        let cards = wire.cards.compactMap { card -> PlannerBriefingCardMetadata? in
+            guard let kind = PlannerBriefingCardKind.supported(rawValue: card.kind) else { return nil }
+            return PlannerBriefingCardMetadata(
+                id: card.id,
+                title: card.title,
+                kind: kind,
+                order: card.order,
+                fileName: card.fileName,
+                pixelWidth: card.pixelWidth,
+                pixelHeight: card.pixelHeight,
+                contentHashSHA256: card.contentHashSHA256
+            )
+        }
+        return PlannerBriefingCardManifest(
+            id: wire.id,
+            plannerSessionId: wire.plannerSessionId,
+            generatedAt: wire.generatedAt,
+            modeLabel: wire.modeLabel,
+            title: wire.title,
+            subtitle: wire.subtitle,
+            referenceOnly: wire.referenceOnly,
+            cards: cards
+        )
+    }
+
+    private struct LenientPlannerBriefingManifest: Decodable {
+        struct LenientCard: Decodable {
+            let id: UUID
+            let title: String
+            let kind: String
+            let order: Int
+            let fileName: String
+            let pixelWidth: Int
+            let pixelHeight: Int
+            let contentHashSHA256: String
+        }
+
+        let id: UUID
+        let plannerSessionId: UUID?
+        let generatedAt: Date
+        let modeLabel: String
+        let title: String
+        let subtitle: String?
+        let referenceOnly: Bool
+        let cards: [LenientCard]
     }
 
     static func encodeManifest(_ manifest: PlannerBriefingCardManifest) throws -> Data {

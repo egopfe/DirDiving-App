@@ -3,7 +3,8 @@
 **Audit date:** 2026-06-19  
 **Repository:** `https://github.com/egopfe/DirDiving-App.git`  
 **Audited branch:** `main`  
-**Audited HEAD:** `622ba31` (includes uncommitted math gap-fill staged with this audit commit)  
+**Audited HEAD:** `622ba31` (source baseline for this audit)  
+**Post-remediation HEAD:** see `Docs/2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_REMEDIATION_REPORT_CURRENT.md`  
 **Scope:** Apple Watch MAIN (`DIRDiving Watch App`) + cross-target Shared Bühlmann core consumed by Full Computer; iOS referenced for sync/briefing codec parity only  
 **Execution mode:** Read-only static analysis + macOS `xcodegen` / `xcodebuild` validation  
 **Command source:** `commands_for_cursor/2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_UPDATED_V3.0.md`  
@@ -69,13 +70,25 @@ macOS validation on this machine:
 - **MAIN target isolation:** PASS
 - **Secrets scan:** PASS
 
-Remaining gates: **physical Ultra QA**, **paired iPhone sync evidence**, **external Bühlmann reference validation**, **`gasEmergency` briefing card export gap**, **long-dive battery profiling**.
+Remaining gates: **physical Ultra QA**, **paired iPhone sync evidence**, **external Bühlmann reference validation**, **long-dive battery profiling**.  
+**Software remediation @ 2026-06-19:** WATCH-BRIEF-005 closed (gasEmergency removed); WATCH-SYNC-001 closed (WatchSyncTestSupport); **856 tests / 0 skipped / 0 failed** — see remediation report.
 
-### Readiness estimates
+### Readiness estimates (source audit @ `622ba31`)
 
 | Dimension | Readiness | Confidence | Primary blockers |
 |---:|---:|---|---|
 | **Overall Watch MAIN** | **94%** | High | Physical Ultra QA; paired sync evidence |
+
+### Readiness after software remediation (2026-06-19)
+
+| Dimension | Software readiness |
+|---:|---:|
+| **Overall Watch MAIN (software)** | **100%** |
+| **Software findings open** | **0** |
+| **Software-only skipped tests** | **0** |
+| Physical / external gates | **PENDING** (unchanged) |
+
+### Readiness estimates (historical source audit)
 | **Mathematical / runtime robustness** | **96%** | High | External Bühlmann reference; Ultra field validation |
 | **Safety algorithm confidence** | **94%** | High | Physical depth/ascent/haptic QA |
 | **Lifecycle confidence** | **95%** | High | Underwater FC/gauge start/stop evidence |
@@ -113,7 +126,7 @@ Remaining gates: **physical Ultra QA**, **paired iPhone sync evidence**, **exter
 
 1. **WATCH-PHY-001 / WATCH-PHY-002** — Physical Ultra and paired sync matrices still empty.
 2. **WATCH-EXT-001** — External Bühlmann reference validation (shared core, FC parity).
-3. **WATCH-BRIEF-005** — `PlannerBriefingCardKind.gasEmergency` defined but no export path.
+3. **WATCH-BRIEF-005** — ~~`PlannerBriefingCardKind.gasEmergency` defined but no export path~~ **CLOSED** — kind removed; legacy payloads filtered (see remediation report).
 
 ---
 

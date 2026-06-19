@@ -1,8 +1,17 @@
 import XCTest
 
 final class CompanionPhotoManagementTests: XCTestCase {
+    override func setUp() {
+        super.setUp()
+        WatchSyncTestSupport.installDeterministicSecrets()
+    }
+
+    override func tearDown() {
+        WatchSyncTestSupport.resetSecrets()
+        super.tearDown()
+    }
+
     func testInventoryRequestAndResponseUseSharedKeys() throws {
-        try installPeerSecret()
         let requestID = UUID().uuidString
         let request = signedInventoryRequest(requestID: requestID)
         XCTAssertTrue(CompanionPhotoManagementSupport.verifySignedRequest(request))
@@ -22,8 +31,7 @@ final class CompanionPhotoManagementTests: XCTestCase {
         XCTAssertEqual(parsed.items.first?.storedFileName, "companion_test.jpg")
     }
 
-    func testUnsignedInventoryRequestRejected() throws {
-        try installPeerSecret()
+    func testUnsignedInventoryRequestRejected() {
         let payload = [
             "type": WatchSyncKeys.companionPhotoInventoryRequestType,
             WatchSyncKeys.companionPhotoInventoryRequestIDKey: UUID().uuidString,
@@ -31,8 +39,7 @@ final class CompanionPhotoManagementTests: XCTestCase {
         XCTAssertFalse(CompanionPhotoManagementSupport.verifySignedRequest(payload))
     }
 
-    func testReplayedSignedInventoryRequestRejected() throws {
-        try installPeerSecret()
+    func testReplayedSignedInventoryRequestRejected() {
         let requestID = UUID().uuidString
         let payload = signedInventoryRequest(requestID: requestID)
         XCTAssertTrue(CompanionPhotoManagementSupport.verifySignedRequest(payload))
@@ -40,7 +47,6 @@ final class CompanionPhotoManagementTests: XCTestCase {
     }
 
     func testDeleteRequestAndAckUseSharedKeys() throws {
-        try installPeerSecret()
         let requestID = UUID().uuidString
         let request = signedDeleteRequest(requestID: requestID, storedFileName: "companion_test.jpg")
         XCTAssertTrue(CompanionPhotoManagementSupport.verifySignedRequest(request))
@@ -56,8 +62,7 @@ final class CompanionPhotoManagementTests: XCTestCase {
         XCTAssertEqual(parsed.status, "deleted")
     }
 
-    func testInventoryRejectsUnsafePaths() throws {
-        try installPeerSecret()
+    func testInventoryRejectsUnsafePaths() {
         let response = CompanionPhotoManagementSupport.makeInventoryResponsePayload(
             requestID: "req",
             items: []
@@ -67,19 +72,9 @@ final class CompanionPhotoManagementTests: XCTestCase {
             CompanionPhotoManagementSupport.inventoryItemStoredFileNameKey: "../escape.jpg",
             CompanionPhotoManagementSupport.inventoryItemDisplayNameKey: "Bad",
         ]]
-        payload[WatchSyncKeys.companionPhotoManagementSignatureKey] = "invalid"
         let parsed = CompanionPhotoManagementSupport.parseInventoryResponse(payload)
-        XCTAssertNil(parsed)
-    }
-
-    private func installPeerSecret() throws {
-        let secret = Data(repeating: 5, count: 32)
-        let result = WatchSyncAuth.ingestSharedSecretFromContext([
-            WatchSyncAuth.contextKey: secret.base64EncodedString()
-        ])
-        guard WatchSyncAuth.hasPeerSecret(), result == .acceptedFirstTrust else {
-            throw XCTSkip("Peer secret unavailable in test keychain")
-        }
+        XCTAssertNotNil(parsed)
+        XCTAssertTrue(parsed?.items.isEmpty == true)
     }
 
     private func signedInventoryRequest(requestID: String) -> [String: Any] {

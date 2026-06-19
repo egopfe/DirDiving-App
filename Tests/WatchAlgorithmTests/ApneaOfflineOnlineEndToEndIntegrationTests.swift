@@ -2,26 +2,24 @@ import XCTest
 
 @MainActor
 final class ApneaOfflineOnlineEndToEndIntegrationTests: XCTestCase {
-    private let peerSecret = Data(repeating: 13, count: 32).base64EncodedString()
     private var pendingURL: URL!
 
     override func setUp() {
         super.setUp()
-        WatchSyncAuth.resetPeerTrust()
+        WatchSyncTestSupport.installDeterministicSecrets()
         ApneaImportedPlanStore.shared.resetForTests()
         pendingURL = FileManager.default.temporaryDirectory.appendingPathComponent("watch-pending-\(UUID().uuidString).json")
-        WatchSyncAuth.ingestSharedSecretFromContext([WatchSyncAuth.contextKey: peerSecret])
     }
 
     override func tearDown() {
         ApneaImportedPlanStore.shared.resetForTests()
-        WatchSyncAuth.resetPeerTrust()
+        WatchSyncTestSupport.resetSecrets()
         try? FileManager.default.removeItem(at: pendingURL)
         super.tearDown()
     }
 
     func testOfflineSessionQueuedAndPayloadSigned() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
+        WatchSyncTestSupport.requirePeerSecret()
         let package = try ApneaSyncPackageBuilder.build(
             plan: ApneaSessionPlan(kind: .custom, title: "Offline", entries: [
                 ApneaPlannedDiveEntry(orderIndex: 0, targetDepthMeters: 18, targetDurationSeconds: 60, plannedRecoverySeconds: 60)

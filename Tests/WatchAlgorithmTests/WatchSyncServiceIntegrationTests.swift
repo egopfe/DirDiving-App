@@ -5,18 +5,18 @@ import XCTest
 final class WatchSyncServiceIntegrationTests: XCTestCase {
     override func setUp() async throws {
         try await super.setUp()
-        WatchSyncAuth.resetPeerTrust()
+        WatchSyncTestSupport.resetSecrets()
+        WatchSyncTestSupport.installDeterministicSecrets()
         WatchSyncService.shared.testHook_resetPendingQueueForTests()
     }
 
     override func tearDown() async throws {
         WatchSyncService.shared.testHook_resetPendingQueueForTests()
-        WatchSyncAuth.resetPeerTrust()
+        WatchSyncTestSupport.resetSecrets()
         try await super.tearDown()
     }
 
     func testSignedAckDequeuesPendingSession() throws {
-        try installPeerSecret()
         let sync = WatchSyncService.shared
         let session = sampleSession()
         sync.testHook_enqueueSession(session)
@@ -24,16 +24,13 @@ final class WatchSyncServiceIntegrationTests: XCTestCase {
 
         let issuedAt = Date()
         let signature = WatchDiveSyncCodec.ackSignature(sessionID: session.id, issuedAt: issuedAt)
-        guard !signature.isEmpty else {
-            throw XCTSkip("Sync key unavailable")
-        }
+        XCTAssertFalse(signature.isEmpty)
         sync.testHook_confirmSignedAck(sessionID: session.id, issuedAt: issuedAt, signature: signature)
         XCTAssertTrue(sync.testHook_pendingSessionIDs.isEmpty)
         XCTAssertEqual(sync.acknowledgedTransferCount, 1)
     }
 
     func testInvalidAckDoesNotDequeuePendingSession() throws {
-        try installPeerSecret()
         let sync = WatchSyncService.shared
         let session = sampleSession()
         sync.testHook_enqueueSession(session)
@@ -42,7 +39,6 @@ final class WatchSyncServiceIntegrationTests: XCTestCase {
     }
 
     func testSignedImportAckPayloadParsesOnWatch() throws {
-        try installPeerSecret()
         let sessionID = UUID()
         let issuedAt = Date()
         let payload = WatchDiveSyncCodec.makeImportAckPayload(sessionID: sessionID, issuedAt: issuedAt)
@@ -52,7 +48,6 @@ final class WatchSyncServiceIntegrationTests: XCTestCase {
     }
 
     func testUserInfoDeliveryDoesNotDequeueWithoutSignedAck() throws {
-        try installPeerSecret()
         let sync = WatchSyncService.shared
         let session = sampleSession()
         sync.testHook_enqueueSession(session)
@@ -62,7 +57,6 @@ final class WatchSyncServiceIntegrationTests: XCTestCase {
     }
 
     func testUserInfoDeliveryFailureIncrementsFailedCount() throws {
-        try installPeerSecret()
         let sync = WatchSyncService.shared
         let session = sampleSession()
         sync.testHook_enqueueSession(session)
@@ -73,21 +67,11 @@ final class WatchSyncServiceIntegrationTests: XCTestCase {
     }
 
     func testImportedCompanionSessionIsNotReEnqueued() throws {
-        try installPeerSecret()
         let session = sampleSession()
         WatchDiveSyncCodec.saveImportedFromCompanionIDs([session.id])
+        WatchSyncService.shared.testHook_markImportedFromCompanionSession(session.id)
         WatchSyncService.shared.transfer(session)
         XCTAssertTrue(WatchSyncService.shared.testHook_pendingSessionIDs.isEmpty)
-    }
-
-    private func installPeerSecret() throws {
-        let secret = Data(repeating: 7, count: 32)
-        let result = WatchSyncAuth.ingestSharedSecretFromContext([
-            WatchSyncAuth.contextKey: secret.base64EncodedString()
-        ])
-        guard WatchSyncAuth.hasPeerSecret(), result == .acceptedFirstTrust else {
-            throw XCTSkip("Peer secret unavailable in test keychain")
-        }
     }
 
     private func sampleSession() -> DiveSession {
