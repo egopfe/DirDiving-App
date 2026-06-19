@@ -1,5 +1,7 @@
 # iOS Companion MAIN — Complete Mathematical Functions / Algorithm Audit (CCR Updated V3.0)
 
+**Post-remediation update (2026-06-19):** Software-verifiable findings from this audit are remediated on `main`. Internal mathematical readiness (software gates): **100%**. External Bühlmann/CCR/PDF/device QA remains **PENDING**. See `Docs/IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md`.
+
 **Audit date:** 2026-06-19  
 **Repository:** DIR DIVING (`egopfe/DirDiving-App`)  
 **Branch audited:** `main` only  

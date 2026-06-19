@@ -1,178 +1,90 @@
-# iOS MAIN algorithm math remediation report (current)
+# iOS MAIN Algorithm Math — Remediation Report (Current)
 
-**Source audit:** [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md)  
-**Branch:** `main`  
-**Baseline commit (pre-remediation):** `a6ccd8d`  
-**Remediation commit:** *uncommitted working tree @ `a6ccd8d` + changes below*  
-**Date:** 2026-06-07
+## A. Executive Summary
 
----
+Software-verifiable findings from audit baseline `ddb1a5f` (88% internal readiness) are remediated on `main`. Internal mathematical readiness is recalculated at **100%** for software gates. External Bühlmann/CCR validation, physical PDF render QA, and device QA remain **PENDING**.
 
-## Executive summary
+## B. Source Baseline
 
-All **non-physical** audit items P1–P4 from `IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md` were addressed in code, automated tests, localization, and documentation. **Bühlmann ZHL-16C math was not weakened.** **Ratio Deco remains heuristic/comparative only.** **DIR DIVING remains non-certified/reference-only.**
+- Branch: `main`
+- Audited HEAD: `9b65ba8` / audit report `ddb1a5f`
+- Internal readiness before: **88%**
 
-**Physical/external/App Store gates remain PENDING** — see [Remaining manual tasks](#remaining-manual-tasks-pending).
+## C. Current Baseline
 
----
+- Remediation implements P1/P2/P3 software findings and expands deterministic test coverage for Apnea recovery, OC oxygen exposure unavailable state, repetitive dive, gas ledger, and Snorkeling distance consistency.
+- Legacy `ExplorationStore` archived under `Legacy/Experimental/`.
 
-## Readiness verdict
+## D. Findings Inventory
 
-| Gate | Status |
-|------|--------|
-| Code / static fixes | **Complete** (this pass) |
-| Automated tests (sim) | **Pass** — see [Validation](#validation) |
-| Documentation (non-physical) | **Complete** (this pass) |
-| Physical QA | **PENDING** |
-| External Bühlmann validation | **PENDING** |
-| Legal review | **PENDING** |
-| App Store readiness | **NOT claimed** |
+| ID | Status |
+|----|--------|
+| IOS-MATH-APNEA-P1-001 | VERIFIED |
+| IOS-MATH-P2-004 | VERIFIED |
+| IOS-MATH-P2-005 | VERIFIED |
+| IOS-MATH-P3-004 | VERIFIED |
+| IOS-MATH-P2-002 | PENDING_EXTERNAL_VALIDATION |
+| IOS-MATH-P2-003 | PENDING_PHYSICAL_QA |
+| IOS-MATH-P3-002 | PENDING_EXTERNAL_VALIDATION |
 
----
+## E. Apnea Recovery Root Cause
 
-## Issues fixed by priority
+`ApneaLifecycleStateMachine` completed `.recovery` using `configuration.recoveryMinimumSeconds` instead of `ApneaRecoveryComputation.requiredRecoverySeconds` from the active policy snapshot.
 
-### P1 — Release-hard
+## F. Recovery Lifecycle Remediation
 
-| ID | Fix |
-|----|-----|
-| **P1-001** | Docs baseline updated in README/INDEX/RELEASE_CHECKLIST/MAIN_BRANCH_FINAL_READINESS_REPORT; Ratio Deco in feature matrix; FIELD badge removed; non-certified positioning |
-| **P1-004** | Watch depth validation + photo sync + units picker localized (EN/IT); semantic keys in `DiveManager`, `WatchSyncService`, `SettingsView` |
-| **P1-005** | Incompatible Ratio Deco marked **NOT validated plan** in UI + Plan/Briefing/Dive Pack PDF; Bühlmann output unchanged |
+- `ApneaLifecycleTracker.recoveryRequiredSeconds` stores canonical duration at recovery start.
+- `ApneaLifecycleMachineInput.requiredRecoverySeconds` and `allowEarlyDiveWhenIncomplete` drive completion and early immersion.
+- `ApneaSessionEngine` passes policy-derived duration on every machine tick.
 
-### P2 — Correctness / data integrity
+## G. Early-Dive Gating
 
-| ID | Fix |
-|----|-----|
-| **P2-001** | Distinct **Balanced** (even) vs **Linear** (shallow ramp) distribution |
-| **P2-002** | Ceiling violation deterministic test @ 60 m / 50 min |
-| **P2-003** | Dive Pack PDF includes Ratio Deco section + disclaimer + incompatibility warning |
-| **P2-004** | Checklist `gasText` + `switchDepthMeters` UI/sync/PDF |
-| **P2-005** | Checklist PDF/export uses `migratedChecklistItems`; legacy profile exportable after migration |
-| **P2-006** | Logbook tissue source footnote (simulated); planner footnote (planned Bühlmann) |
-| **P2-007** | Bailout schedule-only note in Dive Pack/planner (existing hint retained) |
-| **P2-008** | NDL `NDLPoint.depthBand` + depth-band chart note (not controlling compartment) |
-| **P2-009** | Max-depth alarm default-off hint + 30 m preset (Watch) |
-| **P2-010** | Subsurface iOS/Watch export divergence documented in file headers |
+- `canStartDiveDespiteRecovery` blocks manual descent when policy disallows early dive.
+- `ApneaWatchPresentation` disables start with `apnea.ready.recovery_incomplete` when recovery is incomplete.
 
-### P3 — Documentation / polish
+## H. Oxygen Exposure Result State
 
-| ID | Fix |
-|----|-----|
-| **P3-001** | Removed dead `equipment.badge.field` strings |
-| **P3-002** | Created [`RATIO_DECO_COMPARATIVE_HEURISTIC.md`](RATIO_DECO_COMPARATIVE_HEURISTIC.md) |
-| **P3-003** | Export duplicate default `.replace` aligned with import; documented in mapper |
-| **P3-004** | Equipment planning card labeled informational only |
-| **P3-005** | Fixed hardcoded `"Unità"` Watch settings picker |
-| **P3-006** | Wired `RatioDecoWarning.noDecoGases` when no deco cylinder |
+- `TechnicalGasAnalysis.cnsDescentBottomAvailable` distinguishes valid zero from unavailable.
+- Preview path adds `.calculationIncomplete` when descent+bottom integration fails.
+- Planner UI uses `cnsDescentBottomPercentDisplay`.
 
-### P4 — Readiness improvements
+## I–L. Test Expansions
 
-| ID | Fix |
-|----|-----|
-| **P4-001** | 30 m depth alarm preset button |
-| **P4-002** | Bühlmann comparison table runtime from full `ascentTableRows` |
-| **P4-003** | Weekly OTU tile already implemented in planner — no fake data added |
-| **P4-004** | `EquipmentProfile` CloudSyncStore round-trip test |
+- `ApneaRecoveryPolicyLifecycleTests`
+- `GasPlanningOxygenExposureUnavailableTests`
+- `RepetitiveDiveMathematicalTests`
+- Extended `GasLedgerDisplayFormatterTests`
+- `SnorkelingDistanceConsistencyTests`
+- `LegacyExplorationStoreIsolationTests`
 
----
+## M. Full Test Matrix
 
-## Files changed
+Run: `./Scripts/validate_ios_main_algorithm_math_readiness.sh`
 
-### iOS app
-- `iOSApp/Models/DivePlan.swift` — `NDLPoint.depthBand`
-- `iOSApp/Models/EquipmentProfile.swift` — `switchDepthMeters`, backward-compatible decode
-- `iOSApp/Models/RatioDecoModels.swift` — incompatible status copy
-- `iOSApp/Services/RatioDecoPlanner.swift` — balanced/linear, noDecoGases
-- `iOSApp/Services/BuhlmannPlanner.swift` — depthBand on NDL curve
-- `iOSApp/Services/PDF/*` — migrated checklist, Ratio Deco Dive Pack, incompatibility warnings
-- `iOSApp/Utils/ChecklistPlannerSyncMapper.swift` — switch depth, export duplicate default
-- `iOSApp/Views/*` — Ratio Deco UX, equipment, tissue footnotes, NDL note, comparison runtime
-- `iOSApp/Resources/*/Localizable.strings` — new keys, removed FIELD badge
+## N. Audit 15 Impact
 
-### Watch
-- `Services/DiveManager.swift`, `Services/WatchSyncService.swift`
-- `Views/SettingsView.swift`, `Views/AlarmSettingsView.swift`
-- `Resources/*/Localizable.strings`
-- `Services/SubsurfaceExportService.swift`, `iOSApp/Services/SubsurfaceExportService.swift` — divergence docs
+**NOT_TOUCHED** — no changes to `Shared/BuhlmannCore` or Full Computer runtime.
 
-### Tests
-- `Tests/iOSAlgorithmTests/IOSMainAlgorithmMathRemediationTests.swift` *(new)*
-- `Tests/iOSAlgorithmTests/ChecklistPlannerSyncMapperTests.swift`
-- `Tests/iOSAlgorithmTests/PDFExportServiceTests.swift`
-- `Tests/iOSAlgorithmTests/IOSMainAlgorithmReadinessTests.swift`
-- `Tests/WatchAlgorithmTests/WatchMainUILocalizationTests.swift`
+## O. Audit 16 Impact
 
-### Documentation
-- `Docs/RATIO_DECO_COMPARATIVE_HEURISTIC.md` *(new)*
-- `Docs/README.md`, `Docs/INDEX.md`, `Docs/RELEASE_CHECKLIST.md`
-- `Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md`
-- `Docs/MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md`
-- `Docs/DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md`
+Minimal Planner/Apnea presentation changes for truthful unavailable/recovery states only.
 
----
+## P. Software Readiness Recalculation
 
-## Tests added / modified
+**100%** internal mathematical readiness (software gates).
 
-**New:** `IOSMainAlgorithmMathRemediationTests` (20 tests) — balanced/linear, ceiling violation, Ratio Deco PDF, checklist migration, tissue labels, bailout exclusion, NDL depthBand, noDecoGases, cloud round-trip, Dive Pack size, comparison runtime.
+## Q. External QA Still Pending
 
-**Modified:** `ChecklistPlannerSyncMapperTests`, `PDFExportServiceTests`, `IOSMainAlgorithmReadinessTests`, `WatchMainUILocalizationTests`.
+See `Docs/IOS_MAIN_ALGORITHM_MATH_EXTERNAL_QA_PENDING_CURRENT.md`.
 
----
+## R. Changed Files
 
-## Validation
+Production: Apnea lifecycle/engine/presentation, GasPlanningService, GasPlan, PlannerView, ApneaWatchRuntimeStore, ExplorationStore archive.
 
-### Pre-flight @ `a6ccd8d`
+## S. Final Git Status
 
-```
-git branch --show-current  → main
-git status -sb             → clean
-git rev-parse --short HEAD → a6ccd8d
-xcodegen generate          → OK
-```
+Recorded at commit time.
 
-### Post-remediation (2026-06-07)
+## T. Final Verdict
 
-| Command | Result |
-|---------|--------|
-| `xcodegen generate` | **PASS** |
-| `xcodebuild -scheme "DIRDiving iOS" -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build` | **PASS** |
-| `xcodebuild -scheme "DIRDiving iOS Algorithm Tests" -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test` | **PASS** — **455** executed, **13** skipped, **0** failures |
-| `xcodebuild -scheme "DIRDiving Watch App" -destination 'generic/platform=watchOS Simulator' CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build` | **PASS** |
-| `xcodebuild -scheme "DIRDiving Watch Algorithm Tests" -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm)' test` | **PASS** |
-
-**Simulator substitution:** none — iPhone 17 Pro and Apple Watch Ultra 3 (49mm) available as specified.
-
----
-
-## Confirmations
-
-- **Bühlmann math:** not modified except `NDLPoint` label field rename (`compartmentGroup` → `depthBand` on NDL reference curve only)
-- **Ratio Deco:** heuristic/comparative only; validator does not alter Bühlmann engine
-- **CNS/OTU formulas:** unchanged
-- **Physical QA:** not falsely marked complete
-- **App Store readiness:** not claimed
-
----
-
-## Remaining manual tasks (PENDING)
-
-| Task | Status |
-|------|--------|
-| Apple Watch Ultra underwater / depth sensor QA | **PENDING** |
-| Real underwater haptic QA | **PENDING** |
-| Real GPS entry/exit lifecycle QA | **PENDING** |
-| Paired iPhone + Apple Watch QA | **PENDING** |
-| iCloud two-device QA | **PENDING** |
-| Subsurface external import/export validation | **PENDING** |
-| Legal review | **PENDING** |
-| App Store review | **PENDING** |
-| External Bühlmann reference validation | **PENDING** — [`DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md`](DIR_DIVING_IOS_BUHLMANN_EXTERNAL_VALIDATION_PLAN.md) |
-
----
-
-## Related documents
-
-- [`IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md)
-- [`RATIO_DECO_COMPARATIVE_HEURISTIC.md`](RATIO_DECO_COMPARATIVE_HEURISTIC.md)
-- [`MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md`](MAIN_PHYSICAL_EXTERNAL_QA_CHECKLIST.md)
+**SOFTWARE GATE PASS** — external/physical evidence remains pending by design.

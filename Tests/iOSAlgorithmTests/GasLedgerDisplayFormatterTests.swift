@@ -30,4 +30,35 @@ final class GasLedgerDisplayFormatterTests: XCTestCase {
         XCTAssertTrue(twelveLiter.pressureSecondaryText.contains("100"))
         XCTAssertTrue(fifteenLiter.pressureSecondaryText.contains("80"))
     }
+
+    func testZeroLitersShowsZeroWithoutPressureFallback() {
+        let display = GasLedgerDisplayFormatter.displayValue(
+            liters: 0,
+            pressureBar: nil,
+            cylinderVolumeLiters: 12,
+            pressureUnit: .bar
+        )
+        XCTAssertTrue(display.litersText.contains("0"))
+    }
+
+    func testZeroCylinderVolumeAvoidsInvalidPressureConversion() {
+        let display = GasLedgerDisplayFormatter.displayValue(
+            liters: 500,
+            pressureBar: nil,
+            cylinderVolumeLiters: 0,
+            pressureUnit: .bar
+        )
+        XCTAssertTrue(display.litersText.contains("500"))
+    }
+
+    func testPSIPresentationUsesCanonicalLiters() {
+        let display = GasLedgerDisplayFormatter.displayValue(
+            liters: 2400,
+            pressureBar: nil,
+            cylinderVolumeLiters: 12,
+            pressureUnit: .psi
+        )
+        XCTAssertTrue(display.litersText.contains("L"))
+        XCTAssertTrue(display.pressureSecondaryText.contains("≈"))
+    }
 }

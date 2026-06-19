@@ -78,6 +78,8 @@ final class ApneaWatchRuntimeStoreTests: XCTestCase {
             recoveryElapsedSeconds: 0,
             recoveryRemainingSeconds: 0,
             recoveryInsufficient: false,
+            recoveryInProgress: false,
+            allowEarlyDiveWhenIncomplete: false,
             sessionTotalSeconds: 0,
             totalUnderwaterSeconds: 0,
             sessionMaxDepthMeters: 0,
