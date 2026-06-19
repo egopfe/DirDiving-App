@@ -38,7 +38,9 @@ final class WatchSyncService: NSObject, ObservableObject {
     weak var divePlanPackageTransferService: DivePlanPackageWatchTransferService?
     weak var apneaWatchTransferService: IOSApneaWatchTransferService?
     weak var snorkelingWatchTransferService: IOSSnorkelingWatchTransferService?
+    weak var snorkelingSessionSyncService: IOSSnorkelingSessionSyncService?
     private weak var apneaLogbookStore: IOSApneaLogbookStore?
+    private weak var snorkelingLogbookStore: IOSSnorkelingLogbookStore?
     private var photoIDByTransferFilePath: [String: String] = [:]
     private var companionPhotoTransfersByID: [String: CompanionPhotoTransferStatus] = [:]
     private var pendingPhotoImportVerificationTasks: [String: Task<Void, Never>] = [:]
@@ -95,14 +97,18 @@ final class WatchSyncService: NSObject, ObservableObject {
         }
     }
 
-    func activate(logStore: DiveLogStore, apneaLogbookStore: IOSApneaLogbookStore? = nil) {
+    func activate(logStore: DiveLogStore, apneaLogbookStore: IOSApneaLogbookStore? = nil, snorkelingLogbookStore: IOSSnorkelingLogbookStore? = nil) {
         if let apneaLogbookStore {
             self.apneaLogbookStore = apneaLogbookStore
+        }
+        if let snorkelingLogbookStore {
+            self.snorkelingLogbookStore = snorkelingLogbookStore
         }
         deferPublishedMutation { [self] in
             self.logStore = logStore
             WatchDiveSyncCodec.bootstrapReplayCacheIfNeeded()
             ApneaSessionSyncCodec.bootstrapReplayCacheIfNeeded()
+            SnorkelingSessionSyncCodec.bootstrapReplayCacheIfNeeded()
             importedSessionIDs = WatchDiveSyncCodec.loadImportedSessionIDs()
             importedSessionCount = importedSessionIDs.count
             pushedToWatchSessionIDs = loadPushedToWatchSessionIDs()
@@ -121,6 +127,10 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     func attachApneaLogbookStore(_ store: IOSApneaLogbookStore) {
         apneaLogbookStore = store
+    }
+
+    func attachSnorkelingLogbookStore(_ store: IOSSnorkelingLogbookStore) {
+        snorkelingLogbookStore = store
     }
 
     /// Avoid SwiftUI runtime fault: "Publishing changes from within view updates".
@@ -647,6 +657,42 @@ final class WatchSyncService: NSObject, ObservableObject {
         }
     }
 
+    @discardableResult
+    private func importSnorkelingSessionPayload(_ payload: [String: Any]) -> AckContext? {
+        guard payload[SnorkelingSessionSyncCodec.payloadKey] != nil else { return nil }
+        guard let snorkelingLogbookStore else {
+            failedImportCount += 1
+            lastMessage = DIRIOSLocalizer.string("snorkeling.sync.import.logbook_unavailable")
+            return nil
+        }
+        do {
+            let parsed = try SnorkelingSessionSyncCodec.parsePayload(from: payload)
+            let result = snorkelingLogbookStore.mergeImportedSession(parsed.session)
+            snorkelingSessionSyncService?.recordImport(result)
+            switch result {
+            case .imported:
+                lastMessage = DIRIOSLocalizer.string("snorkeling.sync.received_from_watch")
+                recordActivity(title: DIRIOSLocalizer.string("snorkeling.sync.activity.received"), detail: parsed.session.id.uuidString, marksSuccess: true)
+            case .merged:
+                lastMessage = DIRIOSLocalizer.string("snorkeling.sync.updated_from_watch")
+                recordActivity(title: DIRIOSLocalizer.string("snorkeling.sync.activity.updated"), detail: parsed.session.id.uuidString, marksSuccess: true)
+            case .duplicateIgnored:
+                lastMessage = DIRIOSLocalizer.string("snorkeling.sync.duplicate_ignored")
+            case .failed(let reason):
+                failedImportCount += 1
+                lastMessage = reason
+                return nil
+            }
+            lastSuccessfulSyncDate = Date()
+            return AckContext(sessionID: parsed.session.id, issuedAt: parsed.issuedAt)
+        } catch {
+            failedImportCount += 1
+            snorkelingSessionSyncService?.recordImport(.failed(error.localizedDescription))
+            lastMessage = DIRIOSLocalizer.formatted("snorkeling.sync.import_error_format", error.localizedDescription)
+            return nil
+        }
+    }
+
     func resolveConflictUsingIncoming(_ conflict: SyncConflict) {
         logStore?.add(conflict.incoming, suppressWatchPush: true)
         importedSessionIDs.insert(conflict.id)
@@ -1022,6 +1068,9 @@ extension WatchSyncService: WCSessionDelegate {
             if let ackContext = self.importApneaSessionPayload(message) {
                 return
             }
+            if self.importSnorkelingSessionPayload(message) != nil {
+                return
+            }
             _ = self.importSessionPayload(message)
         }
     }
@@ -1068,6 +1117,15 @@ extension WatchSyncService: WCSessionDelegate {
                 reply["ackSignature"] = ApneaSessionSyncCodec.ackSignature(
                     sessionID: apneaAck.sessionID,
                     issuedAt: apneaAck.issuedAt
+                )
+                replyHandler(reply)
+                return
+            }
+            if let snorkelingAck = self.importSnorkelingSessionPayload(message) {
+                var reply: [String: Any] = ["status": "acknowledged"]
+                reply["ackSignature"] = SnorkelingSessionSyncCodec.ackSignature(
+                    sessionID: snorkelingAck.sessionID,
+                    issuedAt: snorkelingAck.issuedAt
                 )
                 replyHandler(reply)
                 return
@@ -1125,7 +1183,13 @@ extension WatchSyncService: WCSessionDelegate {
             if ApneaSessionSyncCodec.isImportAck(userInfo) {
                 return
             }
+            if SnorkelingSessionSyncCodec.isImportAck(userInfo) {
+                return
+            }
             if self.importApneaSessionPayload(userInfo) != nil {
+                return
+            }
+            if self.importSnorkelingSessionPayload(userInfo) != nil {
                 return
             }
             _ = self.importSessionPayload(userInfo)

@@ -1,36 +1,41 @@
-# SNORKELING_BATTERY_THERMAL — Physical QA Evidence
+# Physical QA — SNORKELING_BATTERY_THERMAL
 
-**Status:** PENDING  
-**Scope:** Snorkeling Watch Commands 04–07 physical validation  
-**App SHA:** (record at test time)  
-**Tester:** (name)  
-**Date:** (YYYY-MM-DD)
+| Field | Value |
+|-------|-------|
+| **Scope** | SNORKELING BATTERY THERMAL |
+| **Status** | **PENDING** |
+| **PASS requires** | Evidence files listed below + observed result matching expected |
+| **App SHA** | (record at test time) |
+| **Tester** | |
+| **Date** | |
+| **iPhone model** | |
+| **Apple Watch model** | |
+| **iOS version** | |
+| **watchOS version** | |
 
 ## Prerequisites
 
-- Production or TestFlight build on physical Apple Watch
-- Paired iPhone when required
-- Document watch model (41 / 45–46 / 49 mm) and watchOS version
+- Paired iPhone + Apple Watch with DIR DIVING installed from TestFlight or dev build
+- Snorkeling profile configured on both devices
 
 ## Steps
 
-1. Install the build at the recorded SHA.
-2. Execute the scenario described in this folder name.
-3. Capture screenshot, video, or log file.
-4. Record observed result.
+1. (Define per scenario)
+2. Record screen capture or logs
+3. Compare observed vs expected
 
 ## Expected result
 
-(Document per scenario before execution.)
+(TBD per scenario)
 
 ## Observed result
 
-(Pending physical execution.)
+**PENDING** — no physical evidence recorded yet.
 
-## Evidence files
+## Evidence filenames
 
-- `evidence-YYYYMMDD.ext` (not committed until captured)
+- (none)
 
-## Verdict
+## Result
 
-**PENDING** — PASS requires attached evidence. Do not mark PASS without proof.
+**PENDING** — PASS requires completed steps and attached evidence.
