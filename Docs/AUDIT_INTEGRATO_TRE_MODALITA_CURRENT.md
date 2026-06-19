@@ -1,10 +1,10 @@
 # AUDIT 13 — Audit integrato Diving / Apnea / Snorkeling
 
-**Date:** 2026-06-19  
+**Date:** 2026-06-19 (re-validated)  
 **Auditor:** Independent automated + manual code/doc review (no application code modified during this audit)  
 **Command:** `13_AUDIT_INTEGRATO_TRE_MODALITA.md`  
 **Branch:** `main`  
-**Baseline:** `9794ce5` (post Audit 12 Snorkeling release-gate remediation)  
+**Baseline:** `67e5d95`  
 **Scope:** Read-only integrated coexistence audit — Gauge, Full Computer, Apnea, Snorkeling on Watch MAIN + iOS Companion.
 
 **Prerequisites:** Per-activity release gates Audits 04 (FC), 08 (Apnea), 12 (Snorkeling); Commands 04–12 merged on `main`.
@@ -17,7 +17,7 @@
 |-----------|----------:|---------|
 | **Cross-domain architecture** | **98%** | Namespaces, runtime isolation, activity guards verified |
 | **Modalità e navigazione** | **97%** | Single-session policy; Watch + iOS routing coherent |
-| **Automated release-hard (per activity)** | **95%** | FC + Snorkeling PASS; Apnea script blocked by 1 stale iOS test |
+| **Automated release-hard (per activity)** | **92%** | FC + Snorkeling PASS; Apnea script FAIL (stale iOS test + suspend/resume) |
 | **Physical / device evidence (all activities)** | **0%** | Apnea 19 + Snorkeling 21 QA folders **PENDING**; Diving matrices unsigned |
 | **Integrated external release** | **0%** | **NO-GO** until per-activity physical QA + integrated field matrix |
 
@@ -47,12 +47,12 @@ GO WITH CONDITIONS
 |----------|------------:|---------------:|--------------:|------------:|------------------------|
 | **Diving Gauge** | **98%** | Partial (MAIN readiness; no dedicated Gauge-only gate) | **95%** | **0%** PENDING | **PASS** — baseline unchanged |
 | **Diving Full Computer** | **96%** | **PASS** `validate_full_computer_release_readiness.sh` | **98%** | **0%** PENDING | **PASS** — `FullComputerWatchArchitectureGuardTests` (7) |
-| **Apnea** | **98%** | **FAIL** `validate_apnea_release_readiness.sh` (1 stale iOS test) | **95%** | **0%** (19 folders PENDING) | **PASS** — `ApneaArchitectureIsolationTests` (6) |
+| **Apnea** | **98%** | **FAIL** `validate_apnea_release_readiness.sh` (stale iOS test + suspend/resume) | **95%** | **0%** (19 folders PENDING) | **PASS** — `ApneaArchitectureIsolationTests` (6) |
 | **Snorkeling** | **100%** | **PASS** `validate_snorkeling_release_readiness.sh --internal` | **100%** | **0%** (21 folders PENDING) | **PASS** — `SnorkelingCrossDomainIsolationTests` (6) |
 
 ---
 
-## Audit evidence (2026-06-19)
+## Audit evidence (2026-06-19 re-run @ `67e5d95`)
 
 | Check | Result |
 |-------|--------|
@@ -61,11 +61,11 @@ GO WITH CONDITIONS
 | `./Scripts/audit_localization.sh` | **PASS** (Watch EN=1195 IT=1195; iOS EN=2512 IT=2512) |
 | `validate_full_computer_release_readiness.sh` | **PASS** |
 | `validate_snorkeling_release_readiness.sh --internal` | **PASS** (Watch 212 + iOS 89 tests, 0 failures) |
-| `validate_apnea_release_readiness.sh --internal` | **FAIL** — `IOSApneaCompanionTests.testApneaSelectionAvailableAfterCommand08` |
-| Cross-domain Watch batch (51 tests) | **PASS** — Apnea/Snorkeling/FC architecture + startup |
-| `ApneaSuspendResumeLifecycleIntegrationTests` | **PASS** (26 tests) — prior Audit 08 failure not reproduced |
-| `IOSCompanionActivitySelectionTests` | **PASS** (16 tests) — Apnea + Snorkeling both available on iOS |
-| `IOSSnorkelingCompanionTests` | **PASS** (5 tests, excluding stale sibling in Apnea suite) |
+| `validate_apnea_release_readiness.sh --internal` | **FAIL** — `IOSApneaCompanionTests.testApneaSelectionAvailableAfterCommand08` + `ApneaSuspendResumeLifecycleIntegrationTests` |
+| Cross-domain Watch batch (41 tests) | **PASS** — Apnea/Snorkeling/FC architecture + startup |
+| `ApneaSuspendResumeLifecycleIntegrationTests` | **FAIL** (17 tests, 2 failures) — `testSuspendAndResumeRestoresApneaSessionWithoutSilentResetOrDuplicateDive`, `testSuspendDuringActiveDiveRestoresSameActiveDive` |
+| `IOSApneaCompanionTests.testApneaSelectionAvailableAfterCommand08` | **FAIL** — stale `XCTAssertFalse` for Snorkeling iOS availability |
+| `IOSCompanionActivitySelectionTests` | **PASS** (11 tests) — Apnea + Snorkeling both available on iOS |
 
 ---
 
@@ -162,6 +162,7 @@ The audit command lists eight sequential E2E scenarios. **None are automated as 
 | ID | Priority | Finding | Status |
 |----|----------|---------|--------|
 | AUDIT13-INT-001 | **P1** | `IOSApneaCompanionTests.testApneaSelectionAvailableAfterCommand08` stale — asserts Snorkeling unavailable on iOS; contradicts `DIRActivityMode` + `IOSCompanionActivitySelectionTests` | **OPEN** |
+| AUDIT13-INT-007 | **P1** | `ApneaSuspendResumeLifecycleIntegrationTests` failing (2+ cases) — blocks `validate_apnea_release_readiness.sh` | **OPEN** |
 | AUDIT13-INT-002 | **P1** | All integrated physical QA unsigned (Apnea 19 + Snorkeling 21 + Diving/FC matrices) | **OPEN** |
 | AUDIT13-INT-003 | **P2** | No single integrated E2E automation across Gauge → FC → Apnea → Snorkeling | **OPEN** (tooling debt) |
 | AUDIT13-INT-004 | **P2** | `validate_apnea_release_readiness.sh` can fail on concurrent `xcodegen` (race on `DIRDiving.xcodeproj`) | **OPEN** (environment) |
@@ -195,6 +196,7 @@ Automated guards: `FullComputerWatchArchitectureGuardTests`, `ApneaArchitectureI
 | Item | Risk | Mitigation |
 |------|------|------------|
 | Stale `IOSApneaCompanionTests` | Blocks Apnea release-hard script | Update assertion to match Snorkeling iOS companion availability |
+| `ApneaSuspendResumeLifecycleIntegrationTests` | Apnea recovery regression risk | Investigate suspend/resume lifecycle restore (no cross-domain bleed observed) |
 | Physical QA 0% all activities | Integrated TestFlight NO-GO | Execute signed QA folders per index |
 | No integrated E2E runner | Field regressions undetected | Manual matrix + future `validate_integrated_modes.sh` |
 | Parallel xcodegen in CI | Flaky validator scripts | Serialize xcodegen or use pre-generated project |
