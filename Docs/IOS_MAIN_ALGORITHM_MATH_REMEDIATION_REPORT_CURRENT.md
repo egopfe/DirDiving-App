@@ -12,8 +12,10 @@ Software-verifiable findings from audit baseline `ddb1a5f` (88% internal readine
 
 ## C. Current Baseline
 
+- Branch: `main`; core remediation @ `c120771`; gap-fill verification @ `622ba31` (uncommitted)
 - Remediation implements P1/P2/P3 software findings and expands deterministic test coverage for Apnea recovery, OC oxygen exposure unavailable state, repetitive dive, gas ledger, and Snorkeling distance consistency.
 - Legacy `ExplorationStore` archived under `Legacy/Experimental/`.
+- `DIRWatchLocalizer` enables correct Watch string resolution on iOS cross-target test host.
 
 ## D. Findings Inventory
 
@@ -59,6 +61,14 @@ Software-verifiable findings from audit baseline `ddb1a5f` (88% internal readine
 
 ## M. Full Test Matrix
 
+| Command | Destination | Executed | Failed | Skipped | Result |
+|---------|-------------|----------|--------|---------|--------|
+| `DIRDiving Watch Algorithm Tests` | Apple Watch Series 11 (46mm) | 844 | 0 | 19 | PASS |
+| `DIRDiving iOS Algorithm Tests` | iPhone 17 | 1313 | 0 | 28 | PASS |
+| `./Scripts/check_main_target_isolation.sh` | repo | — | — | — | PASS |
+| `./Scripts/check_secrets.sh` | repo | — | — | — | PASS |
+| `./Scripts/audit_localization.sh` | repo | — | — | — | PASS |
+
 Run: `./Scripts/validate_ios_main_algorithm_math_readiness.sh`
 
 ## N. Audit 15 Impact
@@ -79,11 +89,15 @@ See `Docs/IOS_MAIN_ALGORITHM_MATH_EXTERNAL_QA_PENDING_CURRENT.md`.
 
 ## R. Changed Files
 
-Production: Apnea lifecycle/engine/presentation, GasPlanningService, GasPlan, PlannerView, ApneaWatchRuntimeStore, ExplorationStore archive.
+**Production (c120771 + gap-fill):** `ApneaLifecycleStateMachine`, `ApneaSessionEngine`, `ApneaWatchPresentation`, `ApneaWatchRuntimeStore`, `GasPlanningService`, `GasPlan`, `PlannerView`, `SnorkelingWatchPresentation`, `DIRWatchLocalizer`, `Legacy/Experimental/ExplorationStore/`.
+
+**Tests:** `ApneaRecoveryPolicyLifecycleTests`, `GasPlanningOxygenExposureUnavailableTests`, `RepetitiveDiveMathematicalTests`, `GasLedgerDisplayFormatterTests`, `SnorkelingDistanceConsistencyTests`, `LegacyExplorationStoreIsolationTests`, Snorkeling localization/presentation/layout contract tests.
+
+**Docs/Scripts:** remediation report, audit update, traceability CSV, validation script, `Docs/QA_EVIDENCE/RATIO_DECO_EXTERNAL/README.md`.
 
 ## S. Final Git Status
 
-Recorded at commit time.
+Uncommitted gap-fill on `main` @ `622ba31`: DIRWatchLocalizer, expanded tests, audit doc update, RATIO_DECO_EXTERNAL scaffold. Prior remediation committed @ `c120771`.
 
 ## T. Final Verdict
 

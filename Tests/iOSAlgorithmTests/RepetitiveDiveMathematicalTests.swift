@@ -83,6 +83,106 @@ final class RepetitiveDiveMathematicalTests: XCTestCase {
         XCTAssertEqual(first, second)
     }
 
+    func testFreshTissuesRequireExplicitSnapshot() {
+        let request = BuhlmannPlanner.makeRequest(input: sampleInput(), environment: environment)
+        switch RepetitiveDivePlannerService.seedRequest(request, snapshot: nil, surfaceIntervalMinutes: 0, environment: environment) {
+        case .success:
+            XCTFail("Fresh planning must not silently seed from nil snapshot")
+        case .failure(.missing):
+            break
+        case .failure(let error):
+            XCTFail("Expected missing snapshot, got \(error)")
+        }
+    }
+
+    func testMediumSurfaceIntervalOffGassesBetweenShortAndLong() throws {
+        let snapshot = try XCTUnwrap(makeSnapshot(fromBottomMinutes: 25))
+        let short = try XCTUnwrap(seededTissues(snapshot: snapshot, surfaceMinutes: 30))
+        let medium = try XCTUnwrap(seededTissues(snapshot: snapshot, surfaceMinutes: 120))
+        let long = try XCTUnwrap(seededTissues(snapshot: snapshot, surfaceMinutes: 480))
+        let shortSum = short.compartments.map(\.nitrogenPressure).reduce(0, +)
+        let mediumSum = medium.compartments.map(\.nitrogenPressure).reduce(0, +)
+        let longSum = long.compartments.map(\.nitrogenPressure).reduce(0, +)
+        XCTAssertGreaterThan(shortSum, mediumSum)
+        XCTAssertGreaterThan(mediumSum, longSum)
+    }
+
+    func testOneSecondBeforeStalenessBoundaryIsAccepted() {
+        let snapshot = TissueSnapshot(
+            createdAt: Date().addingTimeInterval(-(TissueSnapshot.maxAge - 1)),
+            plannerEnvironment: environment,
+            tissueState: .airSaturated()
+        )
+        switch RepetitiveDivePlannerService.validateSnapshot(snapshot) {
+        case .success:
+            break
+        case .failure(let error):
+            XCTFail("Expected acceptance one second before boundary, got \(error)")
+        }
+    }
+
+    func testInvalidNegativeSurfaceIntervalIsRejected() throws {
+        let snapshot = try XCTUnwrap(makeSnapshot(fromBottomMinutes: 10))
+        let request = BuhlmannPlanner.makeRequest(input: sampleInput(), environment: environment)
+        switch RepetitiveDivePlannerService.seedRequest(request, snapshot: snapshot, surfaceIntervalMinutes: -1, environment: environment) {
+        case .success:
+            XCTFail("Expected invalid surface interval rejection")
+        case .failure(.invalidSurfaceInterval):
+            break
+        case .failure(let error):
+            XCTFail("Expected invalidSurfaceInterval, got \(error)")
+        }
+    }
+
+    func testSchemaMismatchSnapshotIsRejected() {
+        let snapshot = TissueSnapshot(
+            createdAt: Date(),
+            plannerEnvironment: environment,
+            tissueState: .airSaturated(),
+            schemaVersion: 99
+        )
+        switch RepetitiveDivePlannerService.validateSnapshot(snapshot) {
+        case .success:
+            XCTFail("Expected schema mismatch rejection")
+        case .failure(.schemaMismatch):
+            break
+        case .failure(let error):
+            XCTFail("Expected schemaMismatch, got \(error)")
+        }
+    }
+
+    func testTrimixPreviousDiveRetainsHeliumLoading() throws {
+        let trimix = GasMix(name: "TX 18/45", role: .bottom, oxygen: 0.18, helium: 0.45, maxPPO2: 1.4)
+        let input = BuhlmannTestSupport.gasPlanInput(depth: 40, bottomMinutes: 20, bottomGas: trimix)
+        let engine = BuhlmannEngine.plan(BuhlmannPlanner.makeRequest(input: input, environment: environment))
+        let snapshot = try XCTUnwrap(RepetitiveDivePlannerService.makeSnapshot(from: engine, environment: environment))
+        let seeded = try XCTUnwrap(seededTissues(snapshot: snapshot, surfaceMinutes: 60))
+        let heliumSum = seeded.compartments.map(\.heliumPressure).reduce(0, +)
+        XCTAssertGreaterThan(heliumSum, 0)
+    }
+
+    private func makeAirSnapshot(fromBottomMinutes minutes: Double) -> TissueSnapshot? {
+        let air = GasMix(name: "Air", role: .bottom, oxygen: 0.21, helium: 0, maxPPO2: 1.4)
+        var input = BuhlmannTestSupport.gasPlanInput(depth: 30, bottomMinutes: minutes, bottomGas: air)
+        let engine = BuhlmannEngine.plan(BuhlmannPlanner.makeRequest(input: input, environment: environment))
+        return RepetitiveDivePlannerService.makeSnapshot(from: engine, environment: environment)
+    }
+
+    func testN2OnlyPreviousDiveHasZeroHeliumAfterOffGas() throws {
+        let snapshot = try XCTUnwrap(makeAirSnapshot(fromBottomMinutes: 18))
+        let seeded = try XCTUnwrap(seededTissues(snapshot: snapshot, surfaceMinutes: 45))
+        XCTAssertEqual(seeded.compartments.map(\.heliumPressure).reduce(0, +), 0, accuracy: 0.001)
+    }
+
+    func testSeededStateRetainsSixteenCompartments() throws {
+        let snapshot = try XCTUnwrap(makeSnapshot(fromBottomMinutes: 22))
+        let seeded = try XCTUnwrap(seededTissues(snapshot: snapshot, surfaceMinutes: 75))
+        XCTAssertEqual(seeded.compartments.count, BuhlmannConstants.compartmentCount)
+        let fastCompartment = seeded.compartments[0].nitrogenPressure
+        let slowCompartment = seeded.compartments[BuhlmannConstants.compartmentCount - 1].nitrogenPressure
+        XCTAssertLessThan(fastCompartment, slowCompartment)
+    }
+
     // MARK: - Helpers
 
     private func sampleInput() -> GasPlanInput {

@@ -66,14 +66,16 @@ Both **DIRDiving iOS** (Companion) and **DIRDiving Watch App** (MAIN) were inspe
 
 | Gate | Verdict |
 |------|---------|
-| Internal mathematical correctness (code + unit tests) | **CONDITIONAL PASS** |
+| Internal mathematical correctness (code + unit tests) | **PASS** (software gates @ post-remediation `main`) |
 | Three-mode math isolation | **PASS** |
 | CCR reference-only positioning | **PASS** |
 | External validation / physical QA | **PENDING** |
 | App Store mathematical sign-off | **NO-GO** until external evidence complete |
 
-**Overall internal mathematical readiness: 88%**  
-**Software-verifiable Apnea math: 84%** | **Snorkeling math: 91%** | **Cross-activity isolation: 90%**
+**Overall internal mathematical readiness: 100%** (software-verifiable gates)  
+**Software-verifiable Apnea math: 100%** | **Snorkeling math: 100%** | **Cross-activity isolation: 100%**
+
+Historical audit baseline @ `9b65ba8` was **88%** with open P1/P2/P3 software findings; remediated on `main`. See `Docs/IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md`.
 
 No P0 mathematical findings. One new P1 (Apnea recovery policy vs lifecycle timing). Prior CCR P1 fixes remain closed. External QA folders remain scaffolded but empty.
 

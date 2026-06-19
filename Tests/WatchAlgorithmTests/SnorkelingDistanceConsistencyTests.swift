@@ -60,4 +60,68 @@ final class SnorkelingDistanceConsistencyTests: XCTestCase {
         ]
         XCTAssertEqual(SnorkelingDomainSupport.trackDistanceMeters(underwaterOnly), 0)
     }
+
+    func testStaleAndPoorAccuracyFixesDoNotIncreaseDistance() {
+        let points = [
+            SnorkelingTrackPoint(
+                monotonicRelativeTimestampSeconds: 0,
+                latitude: 44.405,
+                longitude: 8.946,
+                gpsQuality: .measured,
+                depthMeters: 0,
+                isUnderwater: false
+            ),
+            SnorkelingTrackPoint(
+                monotonicRelativeTimestampSeconds: 5,
+                latitude: 44.4052,
+                longitude: 8.9462,
+                gpsQuality: .stale,
+                depthMeters: 0,
+                isUnderwater: false
+            ),
+            SnorkelingTrackPoint(
+                monotonicRelativeTimestampSeconds: 10,
+                latitude: 44.4054,
+                longitude: 8.9464,
+                gpsQuality: .measured,
+                depthMeters: 0,
+                isUnderwater: false
+            )
+        ]
+        let withStale = SnorkelingDomainSupport.trackDistanceMeters(points)
+        let withoutStale = SnorkelingDomainSupport.trackDistanceMeters([points[0], points[2]])
+        XCTAssertEqual(withStale, withoutStale, accuracy: 0.001)
+    }
+
+    func testDuplicateTimestampDoesNotDoubleCountSegment() {
+        let points = [
+            SnorkelingTrackPoint(
+                monotonicRelativeTimestampSeconds: 0,
+                latitude: 44.405,
+                longitude: 8.946,
+                gpsQuality: .measured,
+                depthMeters: 0,
+                isUnderwater: false
+            ),
+            SnorkelingTrackPoint(
+                monotonicRelativeTimestampSeconds: 0,
+                latitude: 44.4051,
+                longitude: 8.9461,
+                gpsQuality: .measured,
+                depthMeters: 0,
+                isUnderwater: false
+            ),
+            SnorkelingTrackPoint(
+                monotonicRelativeTimestampSeconds: 10,
+                latitude: 44.4052,
+                longitude: 8.9462,
+                gpsQuality: .measured,
+                depthMeters: 0,
+                isUnderwater: false
+            )
+        ]
+        let distance = SnorkelingDomainSupport.trackDistanceMeters(points)
+        XCTAssertGreaterThan(distance, 0)
+        XCTAssertLessThan(distance, 100)
+    }
 }

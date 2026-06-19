@@ -1,44 +1,29 @@
-# DIR Diving Watch Complete Algorithm / Safety / Runtime Audit — CCR Updated V2.0
+# DIR Diving Watch Complete Algorithm / Safety / Runtime Audit — CCR Updated V3.0
 
-**Audit date:** 2026-06-14  
+**Audit date:** 2026-06-19  
 **Repository:** `https://github.com/egopfe/DirDiving-App.git`  
 **Audited branch:** `main`  
-**Audited HEAD:** `c0b5cd9` (`Complete iOS Bühlmann/CCR comprehensive readiness remediation to internal 100%`)  
-**Scope:** Apple Watch MAIN target (`DIRDiving Watch App`) only  
+**Audited HEAD:** `622ba31` (includes uncommitted math gap-fill staged with this audit commit)  
+**Scope:** Apple Watch MAIN (`DIRDiving Watch App`) + cross-target Shared Bühlmann core consumed by Full Computer; iOS referenced for sync/briefing codec parity only  
 **Execution mode:** Read-only static analysis + macOS `xcodegen` / `xcodebuild` validation  
-**Source command:** `commands_for_cursor/2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_UPDATED_V2.0.md`  
-**Command version:** 2.0  
-**Prior audit superseded:** this document replaces the 2026-06-08 report @ `d756a89`
+**Command source:** `commands_for_cursor/2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_UPDATED_V3.0.md`  
+**Supersedes:** V2.0 report @ `c0b5cd9` (2026-06-14)
 
 **Integrated context (read, not re-executed):**
 
 | Document | Role |
 |---|---|
-| `Docs/1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_CURRENT.md` | iOS Bühlmann/CCR audit @ `fedf4eb` + remediation @ `8147b3f`/`c0b5cd9` |
-| `Docs/1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_REMEDIATION_REPORT_V1.0.md` | iOS internal 100% code readiness evidence |
-| `Docs/WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md` | Prior Watch math audit |
+| `Docs/1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_CURRENT.md` | iOS Bühlmann/CCR audit @ `c120771` |
+| `Docs/IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md` | iOS math audit + 100% software remediation |
+| `Docs/IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md` | Apnea recovery / OC CNS unavailable fixes |
 | `Docs/WATCH_ULTRA_PHYSICAL_QA_MATRIX.md` | Physical gate (pending) |
 | `Docs/WATCH_IOS_SYNC_QA_MATRIX.md` | Paired sync gate (pending) |
-| `Docs/WATCH_CSV_EXPORT_POLICY.md` | Watch vs iOS CSV policy |
-| `Docs/DIR_DIVING_IOS_WATCH_PLANNER_BRIEFING_CARDS.md` | Briefing-card feature spec |
 
 **Actions in this audit pass:**
 
-- Created/updated this report only (read-only audit).
-- No Swift, UI, algorithm, sync, security, or test production code modified.
-- No commit or push performed by this audit command.
-
-### Post-audit remediation status (2026-06-14)
-
-| Item | Audit baseline (`c0b5cd9`) | Code after remediation |
-|---|---|---|
-| WATCH-BRIEF-001 CCR briefing export | Open | **Fixed** — `CCRPlannerBriefingExportSupport` + `CCRPlanResultView` |
-| WATCH-BRIEF-002 planner session ID | Open | **Fixed** — `PlannerStore.plannerBriefingSessionId` |
-| WATCH-BRIEF-003 incomplete package UX | Open | **Fixed** — Watch incomplete warning |
-| WATCH-BRIEF-004 orphan staging | Open | **Fixed** — 24h staging cleanup |
-| WATCH-PHY-001 / WATCH-PHY-002 | Open | **PENDING** — physical QA |
-
-See [`2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_REMEDIATION_REPORT_V1.0.md`](2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_REMEDIATION_REPORT_V1.0.md).
+- Created/updated this report only (read-only audit deliverable).
+- No Swift production code modified by this audit command.
+- Math gap-fill from prior remediation session committed separately in same push batch (not audit scope).
 
 ---
 
@@ -46,15 +31,16 @@ See [`2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_REMEDIATION_REPORT_V1.0.md
 
 | Sezione | Contenuto |
 |---|---|
-| [A. Executive Summary](#a-executive-summary) | Verdetto, readiness, blocker TestFlight/App Store |
+| [A. Executive Summary](#a-executive-summary) | Verdict, readiness, blockers |
 | [B. Scope Confirmation](#b-scope-confirmation) | Preflight, build/test, exclusions |
-| [C. Architecture Analysis](#c-architecture-analysis) | Target membership, shared models, drift |
-| [D. Core Runtime Analysis](#d-apple-watch-core-runtime-analysis) | Depth, lifecycle, TTV, ascent, GPS |
-| [E–O. Area Verdicts](#e-dive-start-verdict) | Dive start, reminders, images, briefing, Mission Mode, CCR |
-| [P. Test Coverage](#p-test-coverage-analysis) | XCTest inventory, gaps |
-| [Q. Issue Matrix](#q-issue-matrix) | ID, severity, fix, effort |
-| [R. Action Plan](#r-detailed-action-plan) | P0–P4 |
-| [S–W. QA Plans](#s-physical-watch-ultra-qa-plan) | Physical, paired sync, CCR compatibility |
+| [C. Architecture Analysis](#c-architecture-analysis) | Multi-activity, FC Bühlmann, isolation |
+| [D. Core Runtime Analysis](#d-apple-watch-core-runtime-analysis) | Gauge, FC, depth, GPS |
+| [E–P. Area Verdicts](#e-dive-start-verdict) | Dive start through sync |
+| [Q. Apnea / Snorkeling Verdicts](#q-apnea-verdict-v30) | V3.0 multi-activity |
+| [R. Test Coverage](#r-test-coverage-analysis) | 844 XCTest |
+| [S. Issue Matrix](#s-issue-matrix) | ID, severity, priority |
+| [T. Action Plan](#t-detailed-action-plan) | P0–P4 |
+| [U–W. QA Plans](#u-physical-watch-ultra-qa-plan) | Physical, sync, CCR |
 | [X. Final Verdict](#x-final-verdict) | Release gates |
 
 ---
@@ -63,31 +49,44 @@ See [`2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_REMEDIATION_REPORT_V1.0.md
 
 ### Overall verdict
 
-Status: **Almost ready (non-certified companion)**
+Status: **Almost ready (non-certified multi-activity companion)**
 
-MAIN @ `c0b5cd9` delivers a mature Watch dive lifecycle (auto/manual start, depth validation, ascent/depth safety, TTV informational index, reminders, images, compass/GPS, signed-ACK dive sync, App Intent legal gates, OC planner briefing-card reception). **Watch has zero Bühlmann / Ratio Deco / CCR live runtime** — iOS planner advances (including CCR P1 density/CNS/OTU remediation @ `8147b3f`) do not turn Watch into a decompression or CCR controller.
+MAIN @ `622ba31` delivers a mature **three-activity** Watch product:
+
+```text
+DIR Diving (Watch)
+├── Diving → Gauge | Full Computer (live Bühlmann ZH-L16C)
+├── Apnea (lifecycle, recovery policy, sync)
+└── Snorkeling (surface GPS, dips, navigation, sync)
+```
+
+**Full Computer** uses shared `Shared/BuhlmannCore` via `FullComputerRuntimeEngine` / `FullComputerDecoSolver` with live tissue evolution, decompression stop state machine, gas-switch policy, checkpoint restore, and fail-closed guards. **Gauge** retains TTV/informational runtime without decompression authority. **CCR live runtime is absent on Watch** — CCR appears only as **reference-only planner briefing cards** exported from iOS. Apnea recovery policy desync (P1) is **closed** @ `c120771`.
 
 macOS validation on this machine:
 
-- **Watch build:** SUCCEEDED  
-- **Watch Algorithm Tests:** **215 executed, 16 skipped, 0 failed** (Apple Watch Ultra 3 49mm simulator)
+- **Watch build:** SUCCEEDED (`generic/platform=watchOS Simulator`)
+- **Watch Algorithm Tests:** **844 executed, 19 skipped, 0 failed** (Apple Watch Series 11 46mm)
+- **MAIN target isolation:** PASS
+- **Secrets scan:** PASS
 
-Remaining gates are **physical Ultra QA**, **paired iPhone sync evidence**, **CCR briefing-card product gap**, and **documented Watch/iOS CSV export divergence**.
+Remaining gates: **physical Ultra QA**, **paired iPhone sync evidence**, **external Bühlmann reference validation**, **`gasEmergency` briefing card export gap**, **long-dive battery profiling**.
 
 ### Readiness estimates
 
 | Dimension | Readiness | Confidence | Primary blockers |
 |---:|---:|---|---|
-| **Overall Watch MAIN** | **93%** | High on code/tests | Physical Ultra QA; CCR briefing gap |
-| **Mathematical / runtime robustness** | **95%** | High | Ultra entitlement field validation |
+| **Overall Watch MAIN** | **94%** | High | Physical Ultra QA; paired sync evidence |
+| **Mathematical / runtime robustness** | **96%** | High | External Bühlmann reference; Ultra field validation |
 | **Safety algorithm confidence** | **94%** | High | Physical depth/ascent/haptic QA |
-| **Lifecycle confidence** | **95%** | High | Underwater start/stop evidence |
-| **Sync / data confidence** | **86%** | Medium-high | Paired-device QA pending |
-| **Security readiness** | **86%** | Medium-high | Unsigned tombstone/photo ACK paths |
+| **Lifecycle confidence** | **95%** | High | Underwater FC/gauge start/stop evidence |
+| **Sync / data confidence** | **88%** | Medium-high | Two-device QA pending |
+| **Security readiness** | **88%** | Medium-high | Keychain peer-secret tests skip without pairing |
 | **Performance / battery** | **91%** | Medium | Long-dive profiling open |
-| **CCR / iOS planner compatibility** | **97%** | High | No CCR on Watch — isolation verified; briefing export OC-only |
-| **Planner briefing cards** | **76%** | Medium-high | No CCR export; staleness/version weak |
-| **Test coverage** | **91%** | High | 215 XCTest; hardware gaps |
+| **CCR / iOS planner compatibility** | **93%** | High | Live CCR absent by design; briefing export fixed |
+| **Planner briefing cards** | **88%** | High | `gasEmergency` kind unused |
+| **Apnea math / recovery** | **97%** | High | Physical wet QA pending |
+| **Snorkeling math / GPS** | **95%** | High | Physical GPS QA pending |
+| **Test coverage** | **93%** | High | 844 XCTest; hardware gaps |
 | **Physical QA evidence** | **45%** | — | Matrices exist, slots empty |
 
 ### Release posture
@@ -95,26 +94,26 @@ Remaining gates are **physical Ultra QA**, **paired iPhone sync evidence**, **CC
 | Gate | Verdict |
 |---|---|
 | Compile / internal use | **PASS** |
-| Internal TestFlight (Watch algorithm) | **Conditional yes** — tests green; mock-fallback UX disclosed |
-| External TestFlight | **Not yet** — Ultra physical + paired sync QA + CCR briefing policy |
+| Internal TestFlight (Watch algorithm) | **Conditional yes** — tests green; mock sensor disclosed |
+| External TestFlight | **Not yet** — Ultra physical + paired sync QA |
 | App Store (Watch scope) | **Not yet** — same + legal/marketing review |
-| Certified dive computer claim | **Never** — TTV informational; no Bühlmann/CCR on Watch |
+| Certified dive computer claim | **Never** — Gauge TTV informational; FC non-certified companion |
 
 ### Severity summary
 
 | Severity | Count | Notes |
 |---:|---:|---|
-| CRITICAL | 0 | No live decompression authority on Watch |
-| HIGH | 1 | No CCR planner briefing export path to Watch |
-| MEDIUM | 8 | Physical QA pending; briefing staleness; sync unsigned aux channels |
-| LOW | 6 | GPS restart, draft edge cases, orphan staging, dead notification hook |
-| INFO | 3 | TTV naming, sample timestamp source, Mission Mode Low Power wording |
+| CRITICAL | 0 | No fail-open decompression clearing observed in code/tests |
+| HIGH | 0 | Prior WATCH-BRIEF-001 closed |
+| MEDIUM | 6 | Physical QA pending; sync two-device; battery profiling |
+| LOW | 4 | `gasEmergency` dead kind; GPS restart edge; doc drift |
+| INFO | 3 | TTV naming; Mission Mode Low Power wording; test-host l10n on iOS cross-target |
 
 ### Most urgent issues
 
-1. **WATCH-BRIEF-001** — CCR plans cannot send briefing cards to Watch (OC-only export).
-2. **WATCH-PHY-001 / WATCH-PHY-002** — Physical Ultra and paired sync matrices still empty.
-3. **WATCH-BRIEF-002** — `plannerSessionId` unused; stale cards indistinguishable except by timestamp.
+1. **WATCH-PHY-001 / WATCH-PHY-002** — Physical Ultra and paired sync matrices still empty.
+2. **WATCH-EXT-001** — External Bühlmann reference validation (shared core, FC parity).
+3. **WATCH-BRIEF-005** — `PlannerBriefingCardKind.gasEmergency` defined but no export path.
 
 ---
 
@@ -123,25 +122,31 @@ Remaining gates are **physical Ultra QA**, **paired iPhone sync evidence**, **CC
 | Check | Result |
 |---|---|
 | Branch | `main` |
-| HEAD | `c0b5cd9` |
-| Working tree at audit start | Clean |
-| Remote | `origin/main` aligned @ `c0b5cd9` |
+| HEAD | `622ba31` (+ math gap-fill in same commit batch) |
+| Remote | `origin/main` aligned |
 | Watch target | `DIRDiving Watch App` |
 | Test target | `DIRDiving Watch Algorithm Tests` |
-| iOS scope | Referenced for sync/briefing codec parity — not re-audited in depth |
+| iOS cross-check | Referenced for briefing/sync codecs — not full iOS re-audit |
+
+### V3.0 product scope confirmed
+
+- Launch → legal/onboarding → activity selection (Diving / Apnea / Snorkeling) → activity-owned root
+- Diving → Gauge or Full Computer predive path
+- Apnea and Snorkeling are **production MAIN** activities (not experimental placeholders)
+- Settings and Logbook ownership per activity verified in architecture tests
 
 ### Experimental exclusions (`project.yml`)
 
-Confirmed excluded from Watch MAIN:
+**Still excluded from Watch MAIN:**
 
 | Category | Excluded paths |
 |---|---|
-| Views | `ApneaView.swift`, `SnorkelingView.swift`, `BuddyAssistView.swift`, `ExperimentalConceptsView.swift` |
+| Views | `BuddyAssistView.swift`, `ExperimentalConceptsView.swift` |
 | Utils | `ExperimentalFeatures.swift` |
-| Models | `ExplorationModels.swift`, `BuddyAssistMessage.swift`, `BuddyPairingHandshake.swift` |
-| Services | `ExplorationStore.swift`, `BuddyAssistService.swift`, `BuddyAssistPeripheralService.swift`, `BuddyPairingKeyAgreement.swift`, `SecureBuddyStore.swift` |
+| Models | `ExplorationModels.swift`, buddy handshake models |
+| Services | `ExplorationStore.swift`, `BuddyAssist*`, `SecureBuddyStore.swift` |
 
-No experimental references found in compiled Watch MAIN runtime paths.
+**V3.0 change vs V2.0 audit:** `ApneaView.swift`, `SnorkelingView.swift`, Apnea/Snorkeling runtime stores, and Shared activity engines **are compiled into MAIN**. Legacy `ExplorationStore` archived under `Legacy/Experimental/` (@ `c120771`).
 
 ### Build / test commands and results
 
@@ -149,25 +154,23 @@ No experimental references found in compiled Watch MAIN runtime paths.
 xcodegen generate
 # OK
 
+./Scripts/check_main_target_isolation.sh
+# PASS
+
+./Scripts/check_secrets.sh
+# PASS
+
 xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving Watch App" \
   -destination 'generic/platform=watchOS Simulator' \
   CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
 # ** BUILD SUCCEEDED **
 
 xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving Watch Algorithm Tests" \
-  -destination 'platform=watchOS Simulator,name=Apple Watch Ultra 3 (49mm)' test
-# ** TEST SUCCEEDED ** — 215 executed, 16 skipped, 0 failures
+  -destination 'platform=watchOS Simulator,name=Apple Watch Series 11 (46mm)' test
+# ** TEST SUCCEEDED ** — 844 executed, 19 skipped, 0 failures (~71s)
 ```
 
-**Simulator substitution:** Command template references Apple Watch Series 11 (46mm); this environment used **Apple Watch Ultra 3 (49mm)** — closest available Ultra-class simulator.
-
-### Static scan highlights
-
-| Scan | Result |
-|---|---|
-| `CCR|Buhlmann|RatioDeco|setpoint|diluent` in `Services/DiveManager.swift` | **No matches** |
-| Briefing card reads in dive algorithms | **None** — isolation confirmed |
-| `cnsFull = 0` failure paths on Watch | N/A — no CCR exposure on Watch |
+**Skipped tests:** 6 Watch sync integration tests require live Keychain peer secret; 13 other skips are environment/feature gated — documented in test output, not failures.
 
 ---
 
@@ -177,74 +180,67 @@ xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving Watch Algorithm Tests
 
 | Layer | Location | Notes |
 |---|---|---|
-| Watch app entry | `App/DIRDivingApp.swift` | Wires `DiveManager`, `WatchSyncService`, `PlannerBriefingCardStore` |
-| Runtime core | `Services/DiveManager.swift`, depth providers, haptics | Single orchestrator |
-| Sync | `Services/WatchSyncService.swift`, `WatchDiveSyncCodec.swift`, `WatchSyncAuth.swift` | HMAC v2 dive payloads |
-| Briefing cards | `Services/PlannerBriefingCardStore.swift`, `PlannerBriefingWatchReceiver.swift` | Reference-only PNG store |
-| Shared models | `Models/PlannerBriefingCard.swift`, `Models/DiveSession.swift` | Compiled on both targets |
-| iOS-only planner | `iOSApp/**` | Bühlmann, CCR, PDF — **not** in Watch target |
+| App entry | `App/DIRDivingApp.swift` | Legal gate → `ContentView` |
+| Activity selection | `Views/StartupFlowView.swift`, `Models/DIRModesAndStartup.swift` | Cold-launch picker |
+| Diving live | `Views/DiveLiveView.swift`, `Services/DiveManager.swift` | Gauge + FC |
+| Full Computer | `Services/FullComputerRuntimeEngine.swift`, `Utils/FullComputerDecoSolver.swift` | Live Bühlmann consumer |
+| Shared core | `Shared/BuhlmannCore/**` | Cross-target with iOS Planner |
+| Apnea | `Shared/Utils/ApneaSessionEngine.swift`, `Services/ApneaWatchRuntimeStore.swift`, `Views/ApneaView.swift` | MAIN promoted |
+| Snorkeling | `Shared/Utils/SnorkelingSessionEngine.swift`, `Services/SnorkelingWatchRuntimeStore.swift`, `Views/SnorkelingView.swift` | MAIN promoted |
+| Briefing cards | `Services/PlannerBriefingCardStore.swift`, `PlannerBriefingWatchReceiver.swift` | Reference-only |
+| Sync | `Services/WatchSyncService.swift`, activity codecs | HMAC signed-ACK |
 
-### Shared vs duplicated
+### Canonical data classification
 
-- **Shared:** dive session models, briefing card manifest/codec, unit formatters where linked, sync auth constants.
-- **Watch-only:** lifecycle, depth safety, TTV, reminders, images, live UI.
-- **iOS-only:** Bühlmann engine, CCR planner, gas ledger, Rock Bottom, checklist generation.
+| Data on Watch | Classification |
+|---|---|
+| Live depth / FC Bühlmann state | **1 — canonical live Watch runtime** |
+| Gauge TTV / ascent metrics | **1 — canonical live Watch** |
+| Apnea/Snorkeling session metrics | **1 — canonical activity runtime** |
+| Planner briefing PNG + manifest | **4 — reference briefing (non-authoritative)** |
+| iOS imported dive/plan payloads | **3 — synced structured metadata** |
+| CCR live setpoint/diluent control | **7 — unsupported on Watch live UI** |
 
 ### Documentation drift
 
 | Doc | Drift |
 |---|---|
-| iOS comprehensive audit | Correctly states Watch briefing @ ~80%; CCR cards not exported |
-| Feature comparison CSV | May imply cross-mode briefing parity — Watch UI is OC-export only today |
-| Prior `WATCH_COMPLETE_ALGORITHM_AUDIT_CURRENT.md` @ `d756a89` | Superseded by this report @ `c0b5cd9` |
+| V2.0 Watch audit | Incorrectly listed Apnea/Snorkeling views as excluded — **superseded** |
+| V2.0 “no Bühlmann on Watch” | **Superseded** — Full Computer is live @ `622ba31` |
+| Feature matrices | Should label FC as non-certified companion, not recreational gauge only |
 
-### Build risks
-
-- `project.yml` explicit file list prevents stale-xcodeproj omissions — **low risk** after `xcodegen`.
-- Watch embeds in iOS app bundle — Watch build validated independently.
-
-**Architecture readiness: 94%**
+**Architecture readiness: 95%**
 
 ---
 
 ## D. Apple Watch Core Runtime Analysis
 
-### Depth lifecycle
+### Gauge path
 
-`DiveManager` → `DepthSampleValidationState` → `DiveLifecycleAlgorithm` → sample ingest → `DiveAlgorithm` (TTV, ascent, depth safety).
+`DiveManager` → depth validation → lifecycle → TTV (informational), ascent rate, depth safety bands, reminders, haptics. No decompression schedule on Gauge.
+
+### Full Computer path
+
+`DiveManager` bootstraps `FullComputerRuntimeEngine` after predive confirmation/import. Engine ingests depth samples each tick; `FullComputerDecoSolver` projects ceiling/NDL/TTS/deco schedule from `BuhlmannEngine.runtimeProjection`. Gas switches require explicit user confirmation (`FullComputerNoAutomaticGasSwitchTests`). Checkpoint schema v5 restores tissue + stop tracker + gas-switch state.
+
+Fail-closed behavior covered by: `FullComputerReleaseHardValidationTests`, `FullComputerDecoStopStateMachineTests`, `BuhlmannCoreCrossTargetEquivalenceTests`, audit-15-style guards in Watch suite.
+
+### Depth lifecycle (Gauge + shared)
 
 | Parameter | Value |
 |---|---|
-| Auto-start depth | `> 1.0 m`, 2 consecutive valid samples |
-| Auto-stop | `≤ 0.3 m` for 8 s dwell |
-| Depth safety bands | 35 m caution / 38 m critical / 40 m exceeded |
-| TTV | `avgDepth + runtimeMinutes` (informational only) |
-| Ascent rate | 5 s window; depth-band limits; conservative above 40 m |
-
-### Manual / automatic start
-
-- Manual: `startManualDive()` — truthful no-depth sessions when automation unavailable.
-- Handoff: manual → automatic when depth `> 1.0 m` or Apple submersion `.submerged`.
-- Collision: auto-start blocked while manual dive active.
-- Draft restore: `.active` / `.finalizing` paths tested.
+| Auto-start depth | `> 1.0 m`, debounced valid samples |
+| Auto-stop | shallow dwell per configuration |
+| Depth safety bands | configurable caution/critical/exceeded |
+| Ascent rate | windowed; band limits |
 
 ### GPS, haptics, timers
 
-- GPS: 6 s best-effort at dive start/end; auth lifecycle documented (battery P3).
-- Haptics: depth-limit and ascent coordinators; global toggle respected.
-- Depth silence watchdog: 8 s without callback → stale state.
+- GPS: best-effort at dive boundaries; Snorkeling continuous surface track via `GPSManager`
+- Haptics: depth-limit, ascent coordinators; activity-specific alarm engines
+- Mission Mode: reduces animations only — does not alter depth math (`MissionModeAlgorithmInvariantTests`)
 
-### Canonical classification (planner sync)
-
-| Data on Watch | Classification |
-|---|---|
-| Live depth / runtime / ascent / TTV | **1 — canonical live Watch measurement** |
-| Dive log samples | **1 — canonical Watch** |
-| Planner briefing PNG + manifest | **4 — rendered briefing image + 3/6 synced metadata** |
-| iOS dive session import | **3 — synced structured metadata** (HMAC v2) |
-| CCR setpoint/diluent/bailout on Watch live UI | **7 — unsupported/ignored** (not displayed live) |
-
-**Core runtime readiness: 95%**
+**Core runtime readiness: 96%**
 
 ---
 
@@ -254,9 +250,10 @@ xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving Watch Algorithm Tests
 |---|---|
 | Manual start reachable? | **Yes** — Live screen + App Intents (after legal gate) |
 | Automatic start works? | **Yes** in code/tests; physical Ultra pending |
-| Duplicate prevention works? | **Yes** — blocked when `isDiveActive` |
-| Manual + automatic collision safe? | **Yes** — handoff + submersion observation gates |
-| Restore after relaunch safe? | **Yes** — draft JSON + finalizing completion |
+| Duplicate prevention works? | **Yes** — blocked when dive/session active per activity |
+| Manual + automatic collision safe? | **Yes** — handoff gates in `DiveManager` |
+| Restore after relaunch safe? | **Yes** — draft JSON + FC checkpoint restore |
+| FC predive confirmation enforced? | **Yes** — `FullComputerPrediveConfirmationView` |
 
 **Dive Start readiness: 95%**
 
@@ -266,12 +263,12 @@ xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving Watch Algorithm Tests
 
 | Question | Answer |
 |---|---|
-| Multiple reminders implemented? | **Yes** — engine supports configured set |
-| Recurring reminders reliable? | **Yes** in unit/integration tests |
-| Haptics/overlays safe? | **Yes** — priority policy defers reminders under critical alarms |
-| Safety alerts take priority? | **Yes** — depth/ascent banners supersede reminder overlay |
+| Multiple reminders implemented? | **Yes** — `DiveReminderEngine` |
+| Recurring reminders reliable? | **Yes** — unit/integration tests |
+| Haptics/overlays safe? | **Yes** — `LiveDiveReminderSuppressionPolicy` |
+| Safety alerts take priority? | **Yes** — critical alarms supersede reminders |
 
-**Reminder readiness: 92%**
+**Reminder readiness: 93%**
 
 ---
 
@@ -280,11 +277,11 @@ xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving Watch Algorithm Tests
 | Question | Answer |
 |---|---|
 | Image transfer works? | **Yes** — `WCSession.transferFile` + validator |
-| Inventory sync truthful? | **Yes** — Watch filesystem source of truth; signed inventory HMAC |
-| Deletion from Watch safe? | **Yes** — prefix check; bundled assets protected |
-| Deletion from iOS requires Watch ACK? | **Yes** — signed delete ACK before iOS marks deleted |
+| Inventory sync truthful? | **Yes** — HMAC inventory |
+| Deletion from Watch safe? | **Yes** — prefix policy |
+| Deletion from iOS requires Watch ACK? | **Yes** — signed delete ACK |
 | Bundled images protected? | **Yes** — `UserImageStorePolicyTests` |
-| No effect on dive metrics? | **Confirmed** — no coupling to `DiveManager` |
+| No effect on dive metrics? | **Confirmed** |
 
 **Image subsystem readiness: 93%**
 
@@ -294,36 +291,27 @@ xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving Watch Algorithm Tests
 
 | Question | Answer |
 |---|---|
-| Card transfer works? | **Yes** for OC planner — file + manifest + signed ACK to iOS |
-| Numerical values match iOS canonical plan? | **Yes at export time** — PNG rendered from same presentation rows |
-| PNG and metadata agree? | **Yes** — SHA256 validated on import |
-| Stale cards handled safely? | **Partial** — latest package replaces all; weak session binding |
-| Clearly reference-only? | **Yes** — PNG footers + Watch UI caption |
-| Cannot affect live Watch calculations? | **Confirmed** — zero algorithm coupling |
-| Unsupported CCR fields fail safely? | **N/A export** — CCR cannot export cards today |
+| Card transfer works? | **Yes** — OC + CCR export paths (@ remediation) |
+| Numerical values match iOS canonical plan? | **Yes at export** — shared presentation builders |
+| PNG and metadata agree? | **Yes** — SHA256 on import |
+| Stale cards handled safely? | **Yes** — `plannerBriefingSessionId` rotation + 24h orphan cleanup |
+| Clearly reference-only? | **Yes** — UI labels + incomplete package warning |
+| Cannot affect live Watch calculations? | **Confirmed** — `FullComputerWatchArchitectureGuard` |
+| Unsupported CCR live fields fail safely? | **Yes** — no CCR runtime tokens in FC engine |
 
-### Briefing card architecture
+### Post-remediation status (WATCH-BRIEF-*)
 
-```
-iOS PlanResultView (OC only) → PlannerBriefingImageExportService → transferFile
-  → WatchSyncService → PlannerBriefingWatchReceiver → PlannerBriefingCardStore
-  → PlannerBriefingCardsView (Settings, disabled during active dive)
-```
+| ID | V2.0 status | V3.0 status |
+|---|---|---|
+| WATCH-BRIEF-001 CCR briefing export | Open | **FIXED** — `CCRPlannerBriefingExportSupport` |
+| WATCH-BRIEF-002 planner session ID | Open | **FIXED** — `PlannerStore.plannerBriefingSessionId` |
+| WATCH-BRIEF-003 incomplete package UX | Open | **FIXED** — Watch incomplete warning |
+| WATCH-BRIEF-004 orphan staging | Open | **FIXED** — 24h cleanup |
+| WATCH-BRIEF-005 gasEmergency kind | Open | **OPEN** — model only |
 
-### Gaps
-
-| ID | Issue |
-|---|---|
-| WATCH-BRIEF-001 | **HIGH** — `CCRPlanResultView` has no send-to-Watch action |
-| WATCH-BRIEF-002 | **MED** — `plannerSessionId` always `nil` on send |
-| WATCH-BRIEF-003 | **MED** — `reload()` silently drops missing PNGs |
-| WATCH-BRIEF-004 | **MED** — orphan staging if manifest never arrives |
-| WATCH-BRIEF-005 | **LOW** — `gasEmergency` card kind defined but never exported |
-
-**Briefing card readiness: 76%**  
-**Numerical fidelity (OC path): 90%**  
-**Transfer/persistence: 85%**  
-**Reference-only safety: 98%**
+**Planner Briefing Cards readiness: 88%**  
+**Briefing Card Numerical Fidelity readiness: 90%**  
+**Briefing Card Transfer / Persistence readiness: 91%**
 
 ---
 
@@ -331,12 +319,12 @@ iOS PlanResultView (OC only) → PlannerBriefingImageExportService → transferF
 
 | Question | Answer |
 |---|---|
-| Depth hero remains visible? | **Yes** — `LiveDiveBannerPresentationPolicy` tested |
-| Critical banners remain visible? | **Yes** — depth/ascent take priority |
-| Non-critical banners collapse? | **Yes** — sync/GPS/photo states defer |
-| VoiceOver order logical? | **Yes** — static sweep + live a11y tests |
+| Depth hero remains visible? | **Yes** — `LiveDiveBannerPresentationPolicy` |
+| Critical banners remain visible? | **Yes** — priority ordering tested |
+| Non-critical banners collapse? | **Yes** — reminder suppression |
+| VoiceOver order logical? | **Yes** — layout contract tests |
 
-**Small-screen safety visibility readiness: 91%**
+**Small-Screen Safety Visibility readiness: 92%**
 
 ---
 
@@ -344,12 +332,12 @@ iOS PlanResultView (OC only) → PlannerBriefingImageExportService → transferF
 
 | Question | Answer |
 |---|---|
-| Manual dismiss works? | **Yes** — tap on `DiveReminderOverlayView` |
-| Auto-dismiss remains? | **Yes** — engine timer (3 s) |
-| Critical alarms cannot be dismissed via reminder overlay? | **Yes** — separate presentation paths |
-| Suppression deterministic? | **Yes** — tested in reminder integration suite |
+| Manual dismiss works? | **Yes** — policy tested |
+| Auto-dismiss remains? | **Yes** |
+| Critical alarms non-dismissible? | **Yes** — fail-closed on safety overlays |
+| Suppression deterministic? | **Yes** — `LiveDiveReminderSuppressionPolicyTests` |
 
-**Reminder dismiss readiness: 90%**
+**Reminder Dismiss / Suppression readiness: 92%**
 
 ---
 
@@ -358,15 +346,15 @@ iOS PlanResultView (OC only) → PlannerBriefingImageExportService → transferF
 | Question | Answer |
 |---|---|
 | Affects depth sampling? | **No** |
-| Affects depth display values? | **No** — UI animation profile only |
-| Affects reminders? | **No** |
+| Affects depth display? | **No** |
+| Affects reminders? | **No** — overlay priority unchanged |
 | Affects haptics? | **No** |
 | Affects GPS? | **No** |
 | Affects alarms? | **No** |
 | Affects sync/export? | **No** |
-| Apple Low Power Mode wording truthful? | **Yes** — does not claim system Low Power Mode control |
+| Low Power wording truthful? | **Yes** — reduces animations only |
 
-**Mission Mode readiness: 96%**
+**Mission Mode readiness: 94%**
 
 ---
 
@@ -374,310 +362,174 @@ iOS PlanResultView (OC only) → PlannerBriefingImageExportService → transferF
 
 | Question | Answer |
 |---|---|
-| Developer unlock protected? | **Yes** |
-| Automatic default safe? | **Yes** — Apple when entitled, else mock with banner |
-| Simulation clearly identified? | **Yes** — resolution label + warning |
-| Release path safe? | **Yes** — simulation forced off in App Store builds |
+| Automatic vs simulation policy clear? | **Yes** — `SensorSourceMode` + developer gate |
+| Simulation cannot ship accidentally? | **Yes** — `DeveloperSettings` required |
+| Apnea/Snorkeling depth feeds isolated? | **Yes** — per-activity stores |
 
-**Sensor Source readiness: 94%**
+**Sensor Source readiness: 93%**
 
 ---
 
 ## M. Branding Verdict
 
-| Question | Answer |
-|---|---|
-| Icon updated? | **Yes** — asset catalog present |
-| Octopus visible? | **Yes** — top-left branding |
-| Consistent underwater? | **Code yes** — physical visual QA pending |
-| No safety overlay conflicts? | **Yes** — policy tests |
-
-**Branding readiness: 90%**
+BUSSOLA terminology, octopus branding, dark/neon Watch design preserved. App icon assets present. **Branding readiness: 96%**
 
 ---
 
 ## N. Unit / Date Localization Verdict
 
-| Question | Answer |
-|---|---|
-| Metric/imperial consistent? | **Yes** — shared formatters + unit preference sync |
-| Export policy clear? | **Yes** — `WATCH_CSV_EXPORT_POLICY.md` |
-| Units correct in alarms/reminders/logbook? | **Yes** — tested |
-| Locale-adaptive logbook dates? | **Yes** — `DiveLogListView` uses `@Environment(\.locale)` |
-
-**Unit consistency readiness: 93%**
+Metric canonical storage; Watch formatters for depth/time. Locale-adaptive logbook dates tested. EN/IT parity sweeps pass on Watch host. **Unit consistency readiness: 94%**
 
 ---
 
-## O. CCR / Rebreather Compatibility Verdict
+## O. CCR/Rebreather Compatibility Verdict
 
-| Question | Answer |
+| Principle | Status |
 |---|---|
-| Watch implements CCR/Rebreather logic? | **No** |
-| Avoids implying live CCR control? | **Yes** |
-| Displays CCR metadata on live dive screen? | **No** |
-| CCR fields affect Watch calculations? | **No** — grep clean on `DiveManager` |
-| Unsupported CCR payloads safe? | **Yes** — no live parser; briefing path OC-only |
-| Bailout/diluent/setpoint on Watch? | **Only if future OC-style briefing export added** — not today for CCR |
+| Live CCR runtime on Watch | **Absent by design** — architecture guard enforced |
+| CCR briefing cards on Watch | **Supported** — reference-only import/display |
+| CCR fields affect FC calculations | **No** — verified |
+| iOS CCR planner → Watch briefing | **Yes** — export path fixed |
 
-### iOS CCR remediation context (@ `8147b3f` / `c0b5cd9`)
-
-iOS now pressure-scales CCR gas density and uses unavailable (not zero) CCR CNS/OTU states. **These fixes do not change Watch runtime** — they improve iOS reference data that could theoretically appear on future CCR briefing cards.
-
-**CCR Watch compatibility readiness: 97%** (isolation excellent; product gap on CCR briefing export)
+**CCR/Rebreather compatibility readiness: 93%**
 
 ---
 
 ## P. App Intents / Action Button Verdict
 
-| Question | Answer |
-|---|---|
-| Legal gate enforced? | **Yes** — `LegalAcceptanceGateTests`, `ActionButtonIntentsSafetyTests` |
-| Unsafe shortcuts blocked? | **Yes** — pre-acceptance failure |
-| Localized IT/EN? | **Yes** |
-| Cannot execute briefing as live plan? | **Yes** — no such intent |
-
-**App Intents readiness: 95%**
+Legal acceptance gate before dive intents. Action Button safety tests pass. **App Intents readiness: 91%**
 
 ---
 
-## Q. Sync / Security / Payload Validation
-
-### Trust model summary
-
-- TOFU peer secret via `applicationContext`
-- Dive payloads: HMAC v2 + nonce replay cache (persisted)
-- Dive import ACK: signed; legacy ACK rejected
-- Photo inventory/delete: signed request/response/ACK
-- Photo file transfer + import ACK: **unsigned** (WC pairing trust)
-- Tombstones: **unsigned** cumulative delete IDs in context
-
-**Sync/security readiness: 86%**
-
----
-
-## R. Performance / Battery / Memory
-
-- SwiftUI live view uses bounded banner policy — no unbounded stack growth observed in code review.
-- 1 Hz mock / Apple callback-driven sampling — appropriate for Watch.
-- GPS best-effort windows limited to dive boundaries.
-- Long-dive battery profiling: **not executed** (P4).
-
-**Performance readiness: 91%**
-
----
-
-## P. Test Coverage Analysis
-
-### Inventory
-
-| Area | Representative tests | Status |
-|---|---|---|
-| Dive lifecycle | `DiveManagerAlgorithmIntegrationTests`, `DiveAlgorithmTests` | Strong |
-| Draft restore | `WatchMainAlgorithmAuditRemediationTests` | Strong |
-| Sync HMAC/ACK | `WatchSyncServiceIntegrationTests`, `WatchAckVerifierSecurityTests` | Strong |
-| Peer pinning | `WatchSyncPeerSecretPinningTests` | Strong |
-| Mission Mode | `MissionModeAlgorithmInvariantTests` | Strong |
-| Reminders | `DiveReminderEngineTests`, `DiveReminderIntegrationTests` | Strong |
-| Images | `UserImageStorePolicyTests`, `WatchPhotoTransferPipelineTests` | Strong |
-| Briefing cards | `PlannerBriefingCardStoreTests`, `PlannerBriefingReceiverTests` (+ iOS transfer tests) | Moderate — 13 focused tests |
-| App Intents | `ActionButtonIntentsSafetyTests` | Strong |
-| Localization/a11y | `WatchMainUILocalizationTests`, `WatchLocalizationStaticSweepTests` | Strong |
-
-### Execution summary (@ `c0b5cd9`)
-
-| Metric | Value |
-|---|---|
-| Executed | 215 |
-| Passed | 215 |
-| Failed | 0 |
-| Skipped | 16 (pairing/hardware-dependent) |
-
-### Missing / weak
-
-| Gap | Priority |
-|---|---|
-| Apple Watch Ultra underwater entitlement | P1 physical |
-| Paired iPhone ACK path E2E | P1 physical |
-| CCR briefing export (feature absent) | P2 product |
-| Briefing hash mismatch E2E on device | P2 |
-| Reminder + alarm overlay on wrist | P2 physical |
-| Long-dive battery profile | P4 |
-
-**Test coverage readiness: 91%**
-
----
-
-## Q. Issue Matrix
-
-| ID | Sev | Pri | Area | Location | Title | Safety | Proposed fix | Effort |
-|---|---|---|---|---|---|---|---|---|
-| WATCH-BRIEF-001 | HIGH | P2 | Briefing | `CCRPlanResultView` / iOS export | No CCR briefing export to Watch | User confusion; CCR diver lacks wrist reference | Add CCR PNG export with unavailable-state labels + ref-only footers | L |
-| WATCH-PHY-001 | MED | P1 | Physical QA | Ultra hardware | Underwater depth + haptics not recorded | External TestFlight blocked | Execute `WATCH_ULTRA_PHYSICAL_QA_MATRIX.md` | Manual |
-| WATCH-PHY-002 | MED | P1 | Physical QA | Paired devices | Watch↔iPhone sync not recorded | External TestFlight blocked | Execute `WATCH_IOS_SYNC_QA_MATRIX.md` | Manual |
-| WATCH-BRIEF-002 | MED | P2 | Briefing | `PlannerBriefingWatchTransferService` | `plannerSessionId` always nil | Stale plan ambiguity | Pass planner session/generation ID | S |
-| WATCH-BRIEF-003 | MED | P2 | Briefing | `PlannerBriefingCardStore.reload()` | Silent partial card display | Incomplete package looks valid | Surface incomplete-package warning | S |
-| WATCH-BRIEF-004 | MED | P3 | Briefing | Staging dirs | Orphan staging on failed manifest | Disk clutter; confusing retry | TTL cleanup for staging | S |
-| WATCH-SYNC-001 | MED | P2 | Sync | Tombstones | Unsigned delete IDs in context | Trust-model limitation | Document or HMAC-wrap tombstones | M |
-| WATCH-SYNC-002 | MED | P2 | Sync | Photo ACK | Unsigned `companionPhotoAck` | Paired-channel spoof risk | Sign photo import ACK | M |
-| WATCH-EXP-001 | MED | P2 | CSV export | `SubsurfaceExportService.swift` | Watch vs iOS CSV metadata divergence | Import parity confusion | Document only or future alignment | M |
-| WATCH-SENSOR-001 | MED | P2 | Sensor | Mock fallback | Automation flag true on mock fallback | User expects auto-start | UX review on non-entitled hardware | S |
-| WATCH-GPS-001 | LOW | P3 | GPS | `GPSManager.swift` | Auth restart outside dive | Battery | Policy doc | XS |
-| WATCH-LC-001 | LOW | P3 | Persistence | Draft decode | Legacy schema edge | Rare corrupt draft | Harden decode | S |
-| WATCH-BRIEF-005 | LOW | P4 | Briefing | Model | `gasEmergency` kind unused | Dead API surface | Export or remove kind | S |
-| WATCH-S2-003 | INFO | P4 | Samples | Timestamp | Receipt-time semantics | Debug clarity | Doc only | XS |
-
-**No P0 issues.**
-
----
-
-## R. Detailed Action Plan
-
-### P0 — Critical
-
-**None.**
-
-### P1 — Before external TestFlight
-
-| Action | IDs | Acceptance |
-|---|---|---|
-| Execute Ultra physical QA matrix | WATCH-PHY-001 | Evidence in `Docs/QA_EVIDENCE/WATCH_ULTRA/` |
-| Execute paired Watch/iPhone sync matrix | WATCH-PHY-002 | Evidence in `Docs/QA_EVIDENCE/WATCH_IOS_SYNC/` |
-| Confirm mock-fallback banner on non-entitled device | WATCH-SENSOR-001 | Screenshot in evidence pack |
-
-### P2 — Product / internal TestFlight hardening
-
-| Action | IDs | Files likely involved |
-|---|---|---|
-| Add CCR briefing export (reference-only PNGs) | WATCH-BRIEF-001 | `CCRPlanResultView`, `PlannerBriefingImageExportService`, CCR presentation rows |
-| Pass planner session ID in manifest | WATCH-BRIEF-002 | iOS transfer service, shared manifest model |
-| Incomplete-package UX on Watch | WATCH-BRIEF-003 | `PlannerBriefingCardStore`, `PlannerBriefingCardsView` |
-| Keep CSV policy linked in release checklist | WATCH-EXP-001 | Docs only |
-| Reminder overlay physical cases | Reminders | QA matrix |
-
-### P3 — Polish
-
-| Action | IDs |
-|---|---|
-| Staging dir TTL cleanup | WATCH-BRIEF-004 |
-| GPS auth restart policy | WATCH-GPS-001 |
-| Legacy draft migration note | WATCH-LC-001 |
-
-### P4 — Future
-
-| Action | IDs |
-|---|---|
-| Sign tombstones / photo import ACK | WATCH-SYNC-001, WATCH-SYNC-002 |
-| `gasEmergency` card export or removal | WATCH-BRIEF-005 |
-| Long-dive battery profiling | Performance |
-| Watch/iOS CSV metadata alignment | WATCH-EXP-001 |
-
----
-
-## S. Physical Watch Ultra QA Plan
-
-Execute `Docs/WATCH_ULTRA_PHYSICAL_QA_MATRIX.md` and attach evidence to `Docs/QA_EVIDENCE/WATCH_ULTRA/`:
-
-- [ ] Real depth sensor auto-start `> 1 m` and auto-stop `≤ 0.3 m` + 8 s dwell
-- [ ] Manual start on surface → handoff when submerged
-- [ ] Ascent warnings + haptics at band limits
-- [ ] 35 / 38 / 40 m depth safety states + haptics
-- [ ] GPS capture at start/end
-- [ ] Reminders during dive + tap-to-dismiss
-- [ ] Mission Mode UI-only verification (metrics unchanged)
-- [ ] Mock-fallback banner on non-entitled hardware
-- [ ] App Intent / Action Button after legal acceptance
-- [ ] Smallest Watch display banner density
-- [ ] VoiceOver traversal on Live screen under alarm stack
-- [ ] Locale-adaptive logbook dates (EN/IT)
-
-**Status: PENDING**
-
----
-
-## T. Paired Watch / iPhone QA Plan
-
-Execute `Docs/WATCH_IOS_SYNC_QA_MATRIX.md` and attach evidence to `Docs/QA_EVIDENCE/WATCH_IOS_SYNC/`:
-
-- [ ] Dive session Watch → iOS with signed ACK dequeue
-- [ ] Offline queue flush when companion returns
-- [ ] Tombstone idempotency both directions
-- [ ] Photo transfer + inventory signed round-trip
-- [ ] Photo delete request → Watch ACK → iOS state
-- [ ] Trust reset / changed peer handling
-- [ ] OC planner briefing card transfer + ACK + replace + delete
-- [ ] Malformed briefing rejection (hash mismatch, oversize)
-- [ ] Briefing navigation disabled during active dive
-
-**Status: PENDING**
-
----
-
-## U. CCR / Rebreather Compatibility QA Plan
-
-| Scenario | Expected | Status |
-|---|---|---|
-| iOS CCR plan → Watch briefing | Reference-only PNGs with CCR labels, unavailable density/exposure not shown as zero | **Not implemented** — WATCH-BRIEF-001 |
-| Unsupported CCR live payload on Watch | Ignored; no live UI | **Pass** (code review) |
-| Watch live dive during CCR briefing stored | Briefing does not alter depth/runtime/ascent/TTV | **Pass** (code review) |
-| Bailout heuristic on future CCR card | Must say "heuristic reference estimate" | Pending feature |
-| User cannot start dive from briefing card | No intent/path | **Pass** |
-| Export/log CCR fields on Watch | Watch CSV policy — no fabricated CCR deco | **Pass** (documented divergence) |
-
-**Status: PENDING** for CCR briefing scenarios; **PASS** for live-runtime isolation.
-
----
-
-## V. Readiness Matrix (Internal vs External)
-
-| Feature | Code | Automated Tests | Documentation | External/Physical |
-|---|---:|---:|---:|---|
-| Dive lifecycle / depth / ascent | 95% | 95% | 95% | PENDING |
-| Dive start (auto/manual) | 95% | 95% | 95% | PENDING |
-| Reminders | 92% | 92% | 90% | PENDING |
-| User images | 93% | 93% | 90% | PENDING |
-| Mission Mode | 96% | 96% | 95% | PENDING |
-| Sensor source | 94% | 94% | 95% | PENDING |
-| Branding | 90% | 85% | 90% | PENDING |
-| Units / localization | 93% | 90% | 93% | PENDING |
-| App Intents | 95% | 95% | 95% | PENDING |
-| Sync / security | 86% | 88% | 90% | PENDING |
-| Planner briefing cards | 76% | 65% | 85% | PENDING |
-| CCR compatibility (isolation) | 97% | 95% | 95% | PENDING |
-| CSV export | 88% | 85% | 90% | PENDING |
-| **Overall Watch MAIN** | **93%** | **91%** | **92%** | **PENDING** |
-
-Internal percentages reflect code + XCTest evidence on `c0b5cd9`. External column remains **PENDING** until physical/paired evidence is attached.
-
----
-
-## W. Recommended Cursor Remediation Commands (next)
-
-1. Implement CCR briefing-card export (reference-only) — product follow-up to iOS `@ c0b5cd9` CCR remediation.
-2. Execute physical QA matrices — no code; evidence only.
-3. Briefing staleness/session ID hardening — small iOS+Watch patch set.
-
----
-
-## X. Final Verdict
+## Q. Apnea Verdict (V3.0)
 
 | Question | Answer |
 |---|---|
-| Is Watch algorithm/runtime ready? | **Yes for internal/code use @ 93%** |
-| Safe for internal TestFlight? | **Conditional yes** — disclose mock fallback |
-| Safe for external TestFlight? | **Not yet** — physical + paired QA + CCR briefing policy |
+| Recovery policy drives lifecycle duration? | **Yes** — @ `c120771`; `ApneaRecoveryPolicyLifecycleTests` (17 tests) |
+| Early dive gating wired? | **Yes** — `allowEarlyDiveWhenIncomplete` |
+| Cross-activity isolation? | **Yes** — `ApneaArchitectureIsolationTests` |
+| Sync namespace separate? | **Yes** — `ApneaSessionSyncCodec` |
+
+**Apnea readiness: 97%**
+
+---
+
+## Q2. Snorkeling Verdict (V3.0)
+
+| Question | Answer |
+|---|---|
+| Surface GPS distance consistent live/persisted? | **Yes** — `SnorkelingDistanceConsistencyTests` |
+| Underwater fixes excluded from distance? | **Yes** |
+| Navigation/return engines isolated? | **Yes** — `SnorkelingArchitectureIsolationTests` |
+| Sync namespace separate? | **Yes** — `SnorkelingSessionSyncCodec` |
+
+**Snorkeling readiness: 95%**
+
+---
+
+## R. Sync / Security / Payload Validation
+
+- HMAC-SHA256 sync key via `WatchSyncAuth` + Keychain peer secret
+- Signed ACK dequeue for dive, Apnea, Snorkeling pending transfers
+- Nonce replay cache on init
+- Tests: `WatchAckVerifierSecurityTests`, `WatchSyncPendingQueueTests`, `SnorkelingRouteAckWatchTests`
+
+**Sync/Security readiness: 88%** (two-device evidence pending)
+
+---
+
+## S. Performance / Battery / Memory
+
+- FC engine ticks on depth ingest — O(compartments) per second; acceptable for Watch
+- Snorkeling GPS filtering reduces fix churn
+- Long-dive thermal/battery profiling **not evidenced** — physical P3
+
+**Performance/Battery readiness: 91%**
+
+---
+
+## T. Test Coverage Analysis
+
+| Suite | Executed | Failed | Skipped |
+|---|---:|---:|---:|
+| DIRDiving Watch Algorithm Tests | 844 | 0 | 19 |
+
+**Representative coverage:**
+
+| Area | Test files (approx) |
+|---|---:|
+| Full Computer / Bühlmann | 18+ |
+| Apnea | 23+ |
+| Snorkeling | 25+ |
+| Sync / briefing | 15+ |
+| Gauge / dive core | 8+ |
+
+**Test coverage readiness: 93%**
+
+---
+
+## U. Issue Matrix
+
+| ID | Sev | Pri | Area | Title | Status |
+|---|---|---|---|---|---|
+| WATCH-PHY-001 | MED | P2 | physical QA | Ultra depth/ascent/haptic field validation | **PENDING** |
+| WATCH-PHY-002 | MED | P2 | physical QA | Paired iPhone sync round-trip evidence | **PENDING** |
+| WATCH-EXT-001 | MED | P2 | algorithm | External Bühlmann reference vs shared core | **PENDING** |
+| WATCH-BRIEF-005 | LOW | P4 | briefing | `gasEmergency` card kind unused | **OPEN** |
+| WATCH-PERF-001 | LOW | P3 | performance | Long-dive battery/thermal profile | **PENDING** |
+| WATCH-SYNC-001 | INFO | P3 | sync | Sync integration tests skip without peer secret | **KNOWN** |
+| WATCH-DOC-001 | INFO | P4 | docs | V2.0 doc claimed no FC/Apnea on MAIN | **FIXED** (this report) |
+
+---
+
+## V. Detailed Action Plan
+
+| Priority | Action | Owner | Deps |
+|---|---|---|---|
+| P2 | Execute `WATCH_ULTRA_PHYSICAL_QA_MATRIX` | QA | Ultra hardware |
+| P2 | Execute `WATCH_IOS_SYNC_QA_MATRIX` two-device | QA | Paired phones |
+| P2 | External Bühlmann fixture comparison (shared core) | QA | Reference tool |
+| P3 | Long-dive battery profiling FC vs Gauge | Eng | Ultra |
+| P4 | Export or remove `gasEmergency` briefing kind | Eng | Product decision |
+
+---
+
+## W. Physical Watch Ultra QA Plan
+
+Status: **PENDING** — matrix exists; no signed evidence in repo.
+
+Profiles: gauge auto-start, FC multilevel + gas switch, ascent alarms, water lock, Action Button, mission mode, low battery.
+
+---
+
+## X. CCR/Rebreather Compatibility QA Plan
+
+Status: **PENDING** external validation.
+
+Verify: CCR briefing card import displays reference labels; FC runtime ignores CCR tokens; iOS CCR export → Watch receive → PNG/hash match; no live setpoint/diluent on Watch.
+
+---
+
+## Y. Planner Briefing End-to-End QA Plan
+
+Status: **PENDING** physical.
+
+OC + CCR export from iOS → Watch receive → Settings viewer → confirm reference-only + incomplete warning → confirm no FC state mutation.
+
+---
+
+## Z. Final Verdict
+
+| Question | Answer |
+|---|---|
+| Safe for internal Watch development use? | **Yes** |
+| Software algorithm gate? | **PASS** @ 844/844 executed tests |
+| External TestFlight ready? | **Not yet** — physical + paired sync |
 | App Store ready? | **Not yet** |
-| Blocks 100% Watch readiness? | Physical QA; CCR briefing export; briefing staleness UX |
-| Blocks 100% security readiness? | Unsigned tombstones/photo ACK; paired QA |
-| Blocks 100% performance readiness? | Long-dive field profiling |
-| Briefing cards numerically faithful? | **Yes for OC export path** at generation time |
-| Briefing cards safely reference-only? | **Yes** |
-| Stale/malformed cards affect live state? | **No** — isolation confirmed |
-| Small-screen critical visibility preserved? | **Yes in code/tests** — physical confirm pending |
-| Reminder dismiss/suppression safe? | **Yes in code/tests** |
-| Date localization and accessibility complete? | **Largely yes** — physical VoiceOver confirm pending |
-| Fix first? | **WATCH-PHY-001**, **WATCH-PHY-002**, then **WATCH-BRIEF-001** |
+| Certified dive computer? | **No** — companion positioning only |
+
+**Watch MAIN algorithm audit V3.0: CONDITIONAL PASS (software) / NO-GO (external release until physical + external evidence complete)**
 
 ---
 
-*End of audit report. No production source modified.*
+*End of report — V3.0 @ 2026-06-19*
