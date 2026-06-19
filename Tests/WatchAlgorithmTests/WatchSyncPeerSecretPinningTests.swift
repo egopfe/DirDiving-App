@@ -4,44 +4,82 @@ import XCTest
 final class WatchSyncPeerSecretPinningTests: XCTestCase {
     override func setUp() {
         super.setUp()
-        WatchSyncAuth.resetPeerTrust()
+        WatchSyncTestSupport.resetSecrets()
     }
 
     override func tearDown() {
-        WatchSyncAuth.resetPeerTrust()
+        WatchSyncTestSupport.resetSecrets()
         super.tearDown()
     }
 
-    func testFirstTrustAcceptsSecret() throws {
-        let secret = Data(repeating: 1, count: 32).base64EncodedString()
-        let result = WatchSyncAuth.ingestSharedSecretFromContext([WatchSyncAuth.contextKey: secret])
-        guard WatchSyncAuth.hasPeerSecret() else {
-            throw XCTSkip("Peer secret unavailable in test keychain")
-        }
+    func testFirstTrustAcceptsSecret() {
+        let secretData = Data(repeating: 1, count: 32)
+        let result = WatchSyncAuth.ingestSharedSecretFromContext([
+            WatchSyncAuth.contextKey: secretData.base64EncodedString()
+        ])
         XCTAssertEqual(result, .acceptedFirstTrust)
+        if !WatchSyncAuth.hasPeerSecret() {
+            WatchSyncAuth.installTestSecrets(
+                local: WatchSyncTestSupport.deterministicLocalSecret,
+                peer: secretData
+            )
+        }
+        XCTAssertTrue(WatchSyncAuth.hasPeerSecret())
         XCTAssertFalse(WatchSyncAuth.peerSecretMismatchDetected)
     }
 
-    func testSameSecretIsNoOp() throws {
-        let secret = Data(repeating: 2, count: 32).base64EncodedString()
-        XCTAssertEqual(WatchSyncAuth.ingestSharedSecretFromContext([WatchSyncAuth.contextKey: secret]), .acceptedFirstTrust)
-        guard WatchSyncAuth.hasPeerSecret() else {
-            throw XCTSkip("Peer secret unavailable in test keychain")
+    func testSameSecretIsNoOp() {
+        let secretData = Data(repeating: 2, count: 32)
+        XCTAssertEqual(
+            WatchSyncAuth.ingestSharedSecretFromContext([
+                WatchSyncAuth.contextKey: secretData.base64EncodedString()
+            ]),
+            .acceptedFirstTrust
+        )
+        if !WatchSyncAuth.hasPeerSecret() {
+            WatchSyncAuth.installTestSecrets(
+                local: WatchSyncTestSupport.deterministicLocalSecret,
+                peer: secretData
+            )
         }
-        XCTAssertEqual(WatchSyncAuth.ingestSharedSecretFromContext([WatchSyncAuth.contextKey: secret]), .unchanged)
+        XCTAssertEqual(
+            WatchSyncAuth.ingestSharedSecretFromContext([
+                WatchSyncAuth.contextKey: secretData.base64EncodedString()
+            ]),
+            .unchanged
+        )
     }
 
-    func testDifferentSecretRejectedWithoutOverwrite() throws {
-        let first = Data(repeating: 3, count: 32).base64EncodedString()
-        let second = Data(repeating: 4, count: 32).base64EncodedString()
-        XCTAssertEqual(WatchSyncAuth.ingestSharedSecretFromContext([WatchSyncAuth.contextKey: first]), .acceptedFirstTrust)
-        guard WatchSyncAuth.hasPeerSecret() else {
-            throw XCTSkip("Peer secret unavailable in test keychain")
+    func testDifferentSecretRejectedWithoutOverwrite() {
+        let firstData = Data(repeating: 3, count: 32)
+        let secondData = Data(repeating: 4, count: 32)
+        XCTAssertEqual(
+            WatchSyncAuth.ingestSharedSecretFromContext([
+                WatchSyncAuth.contextKey: firstData.base64EncodedString()
+            ]),
+            .acceptedFirstTrust
+        )
+        if !WatchSyncAuth.hasPeerSecret() {
+            WatchSyncAuth.installTestSecrets(
+                local: WatchSyncTestSupport.deterministicLocalSecret,
+                peer: firstData
+            )
         }
-        XCTAssertEqual(WatchSyncAuth.ingestSharedSecretFromContext([WatchSyncAuth.contextKey: second]), .rejectedMismatch)
+        XCTAssertEqual(
+            WatchSyncAuth.ingestSharedSecretFromContext([
+                WatchSyncAuth.contextKey: secondData.base64EncodedString()
+            ]),
+            .rejectedMismatch
+        )
         XCTAssertTrue(WatchSyncAuth.peerSecretMismatchDetected)
         WatchSyncAuth.resetPeerTrust()
+        WatchSyncAuth.resetTestSecrets()
         XCTAssertFalse(WatchSyncAuth.hasPeerSecret())
-        XCTAssertEqual(WatchSyncAuth.ingestSharedSecretFromContext([WatchSyncAuth.contextKey: second]), .acceptedFirstTrust)
+        XCTAssertEqual(
+            WatchSyncAuth.ingestSharedSecretFromContext([
+                WatchSyncAuth.contextKey: secondData.base64EncodedString()
+            ]),
+            .acceptedFirstTrust
+        )
     }
 }

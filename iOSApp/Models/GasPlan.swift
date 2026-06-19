@@ -432,6 +432,8 @@ struct TechnicalGasAnalysis: Hashable {
     let cnsPercent: Double
     /// CNS% integrated only over descent + bottom planner segments (informational; planner-only 15% rule).
     let cnsDescentBottomPercent: Double
+    /// False when descent+bottom CNS could not be computed; do not treat `cnsDescentBottomPercent` as a valid zero.
+    let cnsDescentBottomAvailable: Bool
     let otu: Double
     let cnsDailyPercent: Double
     let otuDaily24h: Double
@@ -454,10 +456,18 @@ struct TechnicalGasAnalysis: Hashable {
         checkEnabled: Bool,
         thresholdPercent: Double = PlannerCNSDescentBottomCheckSettings.thresholdPercentDouble
     ) -> Bool {
-        checkEnabled && CNSDescentBottomPlannerRule.exceedsPlannerThreshold(
+        guard cnsDescentBottomAvailable else { return false }
+        return checkEnabled && CNSDescentBottomPlannerRule.exceedsPlannerThreshold(
             percent: cnsDescentBottomPercent,
             thresholdPercent: thresholdPercent
         )
+    }
+
+    var cnsDescentBottomPercentDisplay: String {
+        guard cnsDescentBottomAvailable else {
+            return DIRIOSLocalizer.string("planner.exposure.unavailable")
+        }
+        return OxygenExposureDisplay.formatCNSPercent(cnsDescentBottomPercent)
     }
 
     var showsFullPlanOxygenExposureWarning: Bool {
@@ -478,6 +488,7 @@ struct TechnicalGasAnalysis: Hashable {
 
     /// Derived presentation-only difference (full-plan CNS minus descent+bottom); not a separate gas-by-gas model.
     var cnsAscentDecoEstimatePercent: Double {
+        guard cnsDescentBottomAvailable else { return 0 }
         let delta = cnsPercent - cnsDescentBottomPercent
         guard delta.isFinite else { return 0 }
         return min(300, max(0, delta))

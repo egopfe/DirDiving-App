@@ -2,24 +2,21 @@ import XCTest
 
 /// Watch-side session transport negative paths and offline autonomy.
 final class ApneaSessionSyncTransportNegativeWatchTests: XCTestCase {
-    private let peerSecret = Data(repeating: 5, count: 32).base64EncodedString()
-
     override func setUp() {
         super.setUp()
-        WatchSyncAuth.resetPeerTrust()
+        WatchSyncTestSupport.installDeterministicSecrets()
         ApneaSessionSyncCodec.resetTestHooks()
         ApneaSessionSyncCodec.testHook_bypassConnectivityChecks = true
-        WatchSyncAuth.ingestSharedSecretFromContext([WatchSyncAuth.contextKey: peerSecret])
     }
 
     override func tearDown() {
         ApneaSessionSyncCodec.resetTestHooks()
-        WatchSyncAuth.resetPeerTrust()
+        WatchSyncTestSupport.resetSecrets()
         super.tearDown()
     }
 
     func testWatchMakePayloadProducesV2Transport() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
+        WatchSyncTestSupport.requirePeerSecret()
         let session = ApneaSession(
             startMode: .watch,
             state: .completed,
@@ -30,7 +27,7 @@ final class ApneaSessionSyncTransportNegativeWatchTests: XCTestCase {
     }
 
     func testUnsupportedVersionOnWatchParseRejected() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
+        WatchSyncTestSupport.requirePeerSecret()
         let session = ApneaSession(
             startMode: .watch,
             state: .completed,

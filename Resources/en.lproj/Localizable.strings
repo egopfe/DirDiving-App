@@ -1074,6 +1074,7 @@
 "apnea.ready.buddy" = "Buddy";
 "apnea.ready.start" = "START SESSION";
 "apnea.ready.sensor_unavailable" = "Depth sensor unavailable. Check sensor status before starting.";
+"apnea.ready.recovery_incomplete" = "Recovery incomplete. Wait for the required surface interval or enable early dive in settings.";
 "apnea.ready.revision" = "Plan revision";
 "apnea.ready.pending_plan" = "New plan pending — activates when the session ends.";
 "apnea.sync.activity.pending_to_iphone" = "Apnea session queued for iPhone";

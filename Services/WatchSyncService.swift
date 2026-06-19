@@ -1044,6 +1044,11 @@ extension WatchSyncService {
         pendingSnorkelingTransfers = loadPendingSnorkelingTransfers()
         return pendingSnorkelingTransfers
     }
+
+    func testHook_markImportedFromCompanionSession(_ id: UUID) {
+        importedFromCompanionIDs.insert(id)
+        importedFromCompanionCount = importedFromCompanionIDs.count
+    }
 }
 
 

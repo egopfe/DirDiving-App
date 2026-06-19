@@ -49,6 +49,8 @@ struct ApneaLifecycleTracker: Hashable, Codable {
     var immersionCandidateSince: TimeInterval?
     var surfaceDwellSince: TimeInterval?
     var recoveryStartedAt: TimeInterval?
+    /// Canonical required recovery duration for the active recovery phase (from `ApneaRecoveryComputation`).
+    var recoveryRequiredSeconds: TimeInterval?
     var diveMaxDepthMeters: Double
     var diveStartedAt: TimeInterval?
     var lastMeasurementMonotonic: TimeInterval?
@@ -59,6 +61,7 @@ struct ApneaLifecycleTracker: Hashable, Codable {
         immersionCandidateSince: nil,
         surfaceDwellSince: nil,
         recoveryStartedAt: nil,
+        recoveryRequiredSeconds: nil,
         diveMaxDepthMeters: 0,
         diveStartedAt: nil,
         lastMeasurementMonotonic: nil
@@ -89,6 +92,9 @@ struct ApneaLifecycleMachineInput: Hashable {
     let sessionArmed: Bool
     let endSessionRequested: Bool
     let tickOnly: Bool
+    /// Required recovery duration from `ApneaRecoveryComputation` for the dive that just ended or is in recovery.
+    let requiredRecoverySeconds: TimeInterval
+    let allowEarlyDiveWhenIncomplete: Bool
 }
 
 struct ApneaLifecycleMachineOutput: Hashable {
@@ -167,6 +173,18 @@ enum ApneaLifecycleStateMachine {
                 clearImmersionCandidate(&tracker)
             }
 
+        case .recovery:
+            if input.allowEarlyDiveWhenIncomplete,
+               input.manualDescentTriggered || shouldStartImmersion(depth: depth, input: input, tracker: &tracker) {
+                tracker.immersionCandidateSince = nil
+                completeRecoveryEarly(input: input, tracker: &tracker, events: &events)
+                startDive(at: input.monotonicNow, depth: depth, tracker: &tracker, events: &events)
+                transition(&tracker, &events, to: .descending)
+            } else if recoveryElapsed(input: input, tracker: tracker) {
+                completeRecovery(input: input, tracker: &tracker, events: &events)
+                transition(&tracker, &events, to: .surface)
+            }
+
         case .descending:
             if input.manualSurfaceTriggered || depth <= input.configuration.surfaceDepthMeters {
                 closeDiveEarly(input: input, tracker: &tracker, events: &events)
@@ -196,14 +214,6 @@ enum ApneaLifecycleStateMachine {
             } else if depth > input.configuration.immersionStartDepthMeters + input.configuration.immersionHysteresisMeters {
                 tracker.surfaceDwellSince = nil
                 transition(&tracker, &events, to: .descending)
-            }
-
-        case .recovery:
-            if let started = tracker.recoveryStartedAt,
-               input.monotonicNow - started >= input.configuration.recoveryMinimumSeconds {
-                tracker.recoveryStartedAt = nil
-                events.append(.recoveryCompleted(atMonotonic: input.monotonicNow))
-                transition(&tracker, &events, to: .surface)
             }
 
         case .sensorDegraded, .recovered:
@@ -263,11 +273,8 @@ enum ApneaLifecycleStateMachine {
             finishDive(input: input, tracker: &tracker, events: &events)
         }
 
-        if tracker.phase == .recovery,
-           let started = tracker.recoveryStartedAt,
-           input.monotonicNow - started >= input.configuration.recoveryMinimumSeconds {
-            tracker.recoveryStartedAt = nil
-            events.append(.recoveryCompleted(atMonotonic: input.monotonicNow))
+        if tracker.phase == .recovery, recoveryElapsed(input: input, tracker: tracker) {
+            completeRecovery(input: input, tracker: &tracker, events: &events)
             transition(&tracker, &events, to: .surface)
         }
 
@@ -323,8 +330,61 @@ enum ApneaLifecycleStateMachine {
         tracker.diveMaxDepthMeters = 0
         tracker.surfaceDwellSince = nil
         tracker.recoveryStartedAt = input.monotonicNow
+        tracker.recoveryRequiredSeconds = resolvedRecoveryRequiredSeconds(input: input, diveDurationSeconds: diveDuration)
         events.append(.recoveryStarted(atMonotonic: input.monotonicNow))
         transition(&tracker, &events, to: .recovery)
+    }
+
+    private static func resolvedRecoveryRequiredSeconds(
+        input: ApneaLifecycleMachineInput,
+        diveDurationSeconds: TimeInterval
+    ) -> TimeInterval {
+        if input.requiredRecoverySeconds > 0 {
+            return input.requiredRecoverySeconds
+        }
+        return max(input.configuration.recoveryMinimumSeconds, 0)
+    }
+
+    private static func activeRecoveryRequiredSeconds(
+        input: ApneaLifecycleMachineInput,
+        tracker: ApneaLifecycleTracker
+    ) -> TimeInterval {
+        if let required = tracker.recoveryRequiredSeconds, required > 0 {
+            return required
+        }
+        if input.requiredRecoverySeconds > 0 {
+            return input.requiredRecoverySeconds
+        }
+        return input.configuration.recoveryMinimumSeconds
+    }
+
+    private static func recoveryElapsed(input: ApneaLifecycleMachineInput, tracker: ApneaLifecycleTracker) -> Bool {
+        guard let started = tracker.recoveryStartedAt else { return false }
+        let required = activeRecoveryRequiredSeconds(input: input, tracker: tracker)
+        if required <= 0 {
+            return input.monotonicNow - started >= input.configuration.recoveryMinimumSeconds
+        }
+        return input.monotonicNow - started >= required
+    }
+
+    private static func completeRecovery(
+        input: ApneaLifecycleMachineInput,
+        tracker: inout ApneaLifecycleTracker,
+        events: inout [ApneaLifecycleTransitionEvent]
+    ) {
+        tracker.recoveryStartedAt = nil
+        tracker.recoveryRequiredSeconds = nil
+        events.append(.recoveryCompleted(atMonotonic: input.monotonicNow))
+    }
+
+    private static func completeRecoveryEarly(
+        input: ApneaLifecycleMachineInput,
+        tracker: inout ApneaLifecycleTracker,
+        events: inout [ApneaLifecycleTransitionEvent]
+    ) {
+        tracker.recoveryStartedAt = nil
+        tracker.recoveryRequiredSeconds = nil
+        events.append(.recoveryCompleted(atMonotonic: input.monotonicNow))
     }
 
     private static func transition(
