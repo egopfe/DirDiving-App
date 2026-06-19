@@ -101,9 +101,11 @@ final class IOSApneaCompanionTests: XCTestCase {
         XCTAssertEqual(presentation.maxDepthText, "24.7 m")
     }
 
-    func testApneaSelectionAvailableAfterCommand08() {
+    func testApneaAndSnorkelingSelectionAvailableOnIOSCompanion() {
         XCTAssertTrue(CompanionActivityAvailability.isAvailable(.apnea))
-        XCTAssertFalse(CompanionActivityAvailability.isAvailable(.snorkeling))
+        XCTAssertTrue(CompanionActivityAvailability.isAvailable(.snorkeling))
+        XCTAssertTrue(DIRActivityMode.apnea.isLaunchableOnIOSCompanionMAIN)
+        XCTAssertTrue(DIRActivityMode.snorkeling.isLaunchableOnIOSCompanionMAIN)
     }
 
     func testApneaSelectionPersists() {
