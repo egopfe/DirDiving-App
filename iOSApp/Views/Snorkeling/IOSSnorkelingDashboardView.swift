@@ -47,6 +47,7 @@ struct IOSSnorkelingDashboardView: View {
             }
             .dirCompanionScrollSurface()
         }
+        .accessibilityIdentifier("snorkeling.ios.dashboard")
     }
 
     private var header: some View {

@@ -40,6 +40,7 @@ struct IOSSnorkelingRoutePlannerView: View {
             }
             .dirCompanionScrollSurface()
         }
+        .accessibilityIdentifier("snorkeling.ios.route_planner")
         .onAppear {
             mapPermission = IOSSnorkelingLocationPermission.currentState()
             updateMapPosition()
