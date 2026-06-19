@@ -40,6 +40,10 @@ final class WatchSyncService: NSObject, ObservableObject {
     private var pendingApneaUserInfoSessionIDs: [ObjectIdentifier: UUID] = [:]
     private var inFlightApneaSessionIDs: Set<UUID> = []
     private let pendingApneaFileName = "dirdiving_watch_pending_apnea_sync_sessions.json"
+    private var pendingSnorkelingTransfers: [SnorkelingSyncPendingTransfer] = []
+    private var pendingSnorkelingUserInfoSessionIDs: [ObjectIdentifier: UUID] = [:]
+    private var inFlightSnorkelingSessionIDs: Set<UUID> = []
+    private let pendingSnorkelingFileName = "dirdiving_watch_pending_snorkeling_sync_sessions.json"
     private var peerSecretObserver: NSObjectProtocol?
     private var pendingPhotoManagementResponses: [PendingPhotoManagementResponse] = []
     private var inFlightSessionIDs: Set<UUID> = []
@@ -55,8 +59,10 @@ final class WatchSyncService: NSObject, ObservableObject {
         super.init()
         WatchDiveSyncCodec.bootstrapReplayCacheIfNeeded()
         ApneaSessionSyncCodec.bootstrapReplayCacheIfNeeded()
+        SnorkelingSessionSyncCodec.bootstrapReplayCacheIfNeeded()
         pendingTransfers = loadPendingTransfers()
         pendingApneaTransfers = loadPendingApneaTransfers()
+        pendingSnorkelingTransfers = loadPendingSnorkelingTransfers()
         pendingTransferCount = pendingTransfers.count
         importedFromCompanionIDs = WatchDiveSyncCodec.loadImportedFromCompanionIDs()
         importedFromCompanionCount = importedFromCompanionIDs.count
@@ -66,7 +72,11 @@ final class WatchSyncService: NSObject, ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            Task { @MainActor in self?.flushPendingTransfers() }
+            Task { @MainActor in
+                self?.flushPendingTransfers()
+                self?.flushPendingApneaTransfers()
+                self?.flushPendingSnorkelingTransfers()
+            }
         }
         activate()
     }
@@ -107,9 +117,22 @@ final class WatchSyncService: NSObject, ObservableObject {
         if WatchSyncAuth.hasPeerSecret() {
             flushPendingTransfers()
             flushPendingApneaTransfers()
+            flushPendingSnorkelingTransfers()
         } else {
             WatchSyncAuth.publishSharedSecretIfNeeded()
             lastSyncStatus = String(format: String(localized: "sync.queue.pending_sync_key"), pendingTransferCount)
+        }
+    }
+
+    func transferSnorkelingSession(_ session: SnorkelingSession) {
+        guard WCSession.isSupported() else { return }
+        enqueuePendingSnorkelingSession(session)
+        recordActivity(title: String(localized: "snorkeling.sync.activity.pending_to_iphone"), detail: snorkelingSessionSummary(session))
+        if WatchSyncAuth.hasPeerSecret() {
+            flushPendingSnorkelingTransfers()
+        } else {
+            WatchSyncAuth.publishSharedSecretIfNeeded()
+            lastSyncStatus = String(localized: "snorkeling.sync.queue.pending_key")
         }
     }
 
@@ -157,6 +180,7 @@ final class WatchSyncService: NSObject, ObservableObject {
         if WatchSyncAuth.hasPeerSecret() {
             flushPendingTransfers()
             flushPendingApneaTransfers()
+            flushPendingSnorkelingTransfers()
         } else {
             lastSyncStatus = String(format: String(localized: "sync.queue.pending_companion_key"), pendingTransferCount)
         }
@@ -818,6 +842,125 @@ final class WatchSyncService: NSObject, ObservableObject {
         try? data.write(to: pendingApneaFileURL(), options: [.atomic, .completeFileProtection])
     }
 
+    private func snorkelingSessionSummary(_ session: SnorkelingSession) -> String {
+        let dips = session.dips.count
+        let maxDepth = Formatters.one(session.statistics.sessionMaxDepthMeters)
+        return "\(dips) dips · \(maxDepth) m"
+    }
+
+    private func flushPendingSnorkelingTransfers() {
+        guard WatchSyncAuth.hasPeerSecret(), !pendingSnorkelingTransfers.isEmpty else { return }
+        for entry in pendingSnorkelingTransfers.reversed() {
+            guard !inFlightSnorkelingSessionIDs.contains(entry.session.id) else { continue }
+            inFlightSnorkelingSessionIDs.insert(entry.session.id)
+            sendQueuedSnorkeling(entry.session)
+        }
+    }
+
+    private func sendQueuedSnorkeling(_ session: SnorkelingSession) {
+        do {
+            let envelope = try SnorkelingSessionSyncCodec.makePayload(session: session)
+            recordPendingSnorkelingAttempt(sessionID: session.id, issuedAt: envelope.issuedAt)
+            if WCSession.default.isReachable {
+                WCSession.default.sendMessage(envelope.message) { [weak self] reply in
+                    Task { @MainActor in
+                        guard let self else { return }
+                        let providedSignature = reply["ackSignature"] as? String
+                        if SnorkelingSessionSyncCodec.verifyAckSignature(
+                            providedSignature,
+                            sessionID: envelope.sessionID,
+                            issuedAt: envelope.issuedAt
+                        ) {
+                            self.confirmSnorkelingSignedAck(
+                                sessionID: envelope.sessionID,
+                                issuedAt: envelope.issuedAt,
+                                signature: providedSignature ?? ""
+                            )
+                        } else {
+                            self.inFlightSnorkelingSessionIDs.remove(envelope.sessionID)
+                            self.failedTransferCount += 1
+                            self.queueSnorkelingViaUserInfo(envelope: envelope, sessionID: session.id)
+                        }
+                    }
+                } errorHandler: { [weak self] _ in
+                    Task { @MainActor in
+                        guard let self else { return }
+                        self.inFlightSnorkelingSessionIDs.remove(envelope.sessionID)
+                        self.queueSnorkelingViaUserInfo(envelope: envelope, sessionID: session.id)
+                    }
+                }
+                sentTransferCount += 1
+            } else {
+                queueSnorkelingViaUserInfo(envelope: envelope, sessionID: session.id)
+            }
+        } catch {
+            inFlightSnorkelingSessionIDs.remove(session.id)
+            failedTransferCount += 1
+        }
+    }
+
+    private func queueSnorkelingViaUserInfo(envelope: SnorkelingSessionSyncCodec.PayloadEnvelope, sessionID: UUID) {
+        let transfer = WCSession.default.transferUserInfo(envelope.message)
+        pendingSnorkelingUserInfoSessionIDs[ObjectIdentifier(transfer)] = sessionID
+        sentTransferCount += 1
+        savePendingSnorkelingTransfers()
+    }
+
+    func confirmSnorkelingSignedAck(sessionID: UUID, issuedAt: Date, signature: String) {
+        guard SnorkelingSessionSyncCodec.verifyAckSignature(signature, sessionID: sessionID, issuedAt: issuedAt) else {
+            failedTransferCount += 1
+            return
+        }
+        inFlightSnorkelingSessionIDs.remove(sessionID)
+        removePendingSnorkelingTransfer(sessionID: sessionID)
+        acknowledgedTransferCount += 1
+        recordActivity(title: String(localized: "snorkeling.sync.activity.delivered_to_iphone"), detail: sessionID.uuidString)
+    }
+
+    private func handleSnorkelingImportAck(_ payload: [String: Any]) {
+        guard let parsed = SnorkelingSessionSyncCodec.parseImportAck(from: payload) else { return }
+        confirmSnorkelingSignedAck(sessionID: parsed.sessionID, issuedAt: parsed.issuedAt, signature: parsed.signature)
+    }
+
+    private func enqueuePendingSnorkelingSession(_ session: SnorkelingSession) {
+        let normalized = SnorkelingLogbookPolicy.normalizedSession(session)
+        pendingSnorkelingTransfers.removeAll { $0.session.id == normalized.id }
+        pendingSnorkelingTransfers.append(SnorkelingSyncPendingTransfer(session: normalized))
+        savePendingSnorkelingTransfers()
+    }
+
+    private func removePendingSnorkelingTransfer(sessionID: UUID) {
+        pendingSnorkelingTransfers.removeAll { $0.session.id == sessionID }
+        savePendingSnorkelingTransfers()
+    }
+
+    private func recordPendingSnorkelingAttempt(sessionID: UUID, issuedAt: Date) {
+        guard let index = pendingSnorkelingTransfers.firstIndex(where: { $0.session.id == sessionID }) else { return }
+        pendingSnorkelingTransfers[index].lastIssuedAt = issuedAt
+        pendingSnorkelingTransfers[index].lastAttemptAt = Date()
+        pendingSnorkelingTransfers[index].attemptCount += 1
+        savePendingSnorkelingTransfers()
+    }
+
+    private func pendingSnorkelingFileURL() -> URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent(pendingSnorkelingFileName)
+    }
+
+    private func loadPendingSnorkelingTransfers() -> [SnorkelingSyncPendingTransfer] {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        guard let data = try? Data(contentsOf: pendingSnorkelingFileURL()) else { return [] }
+        return (try? decoder.decode([SnorkelingSyncPendingTransfer].self, from: data)) ?? []
+    }
+
+    private func savePendingSnorkelingTransfers() {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        guard let data = try? encoder.encode(pendingSnorkelingTransfers) else { return }
+        try? data.write(to: pendingSnorkelingFileURL(), options: [.atomic, .completeFileProtection])
+    }
+
     private func recordActivity(title: String, detail: String) {
         let normalizedDetail = detail.isEmpty ? "—" : detail
         recentActivity.insert(
@@ -873,6 +1016,34 @@ extension WatchSyncService {
     func testHook_setActivationStateForTests(_ state: WCSessionActivationState) {
         activationState = state
     }
+
+    func testHook_resetSnorkelingPendingQueueForTests() {
+        pendingSnorkelingTransfers = []
+        pendingSnorkelingUserInfoSessionIDs = [:]
+        inFlightSnorkelingSessionIDs = []
+        savePendingSnorkelingTransfers()
+    }
+
+    var testHook_pendingSnorkelingSessionIDs: [UUID] {
+        pendingSnorkelingTransfers.map(\.session.id)
+    }
+
+    var testHook_pendingSnorkelingTransfers: [SnorkelingSyncPendingTransfer] {
+        pendingSnorkelingTransfers
+    }
+
+    func testHook_enqueueSnorkelingSession(_ session: SnorkelingSession) {
+        enqueuePendingSnorkelingSession(session)
+    }
+
+    func testHook_confirmSnorkelingSignedAck(sessionID: UUID, issuedAt: Date, signature: String) {
+        confirmSnorkelingSignedAck(sessionID: sessionID, issuedAt: issuedAt, signature: signature)
+    }
+
+    func testHook_reloadSnorkelingPendingFromPersistence() -> [SnorkelingSyncPendingTransfer] {
+        pendingSnorkelingTransfers = loadPendingSnorkelingTransfers()
+        return pendingSnorkelingTransfers
+    }
 }
 
 
@@ -887,6 +1058,8 @@ extension WatchSyncService: WCSessionDelegate {
                 WatchSyncAuth.publishSharedSecretIfNeeded()
                 self.flushPendingPhotoManagementResponses()
                 self.flushPendingTransfers()
+                self.flushPendingApneaTransfers()
+                self.flushPendingSnorkelingTransfers()
             }
         }
     }
@@ -895,6 +1068,8 @@ extension WatchSyncService: WCSessionDelegate {
         Task { @MainActor in
             self.ingestCompanionContext(applicationContext)
             self.flushPendingTransfers()
+            self.flushPendingApneaTransfers()
+            self.flushPendingSnorkelingTransfers()
         }
     }
 
@@ -960,6 +1135,10 @@ extension WatchSyncService: WCSessionDelegate {
             }
             if ApneaSessionSyncCodec.isImportAck(userInfo) {
                 handleApneaImportAck(userInfo)
+                return
+            }
+            if SnorkelingSessionSyncCodec.isImportAck(userInfo) {
+                handleSnorkelingImportAck(userInfo)
                 return
             }
             if let ackContext = self.ingestIncomingPayload(userInfo) {

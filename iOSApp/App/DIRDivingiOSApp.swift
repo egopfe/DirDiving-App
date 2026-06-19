@@ -28,6 +28,7 @@ struct DIRDivingiOSApp: App {
     @StateObject private var snorkelingRoutePlannerStore = IOSSnorkelingRoutePlannerStore()
     @StateObject private var snorkelingLogbookStore = IOSSnorkelingLogbookStore()
     @StateObject private var snorkelingWatchTransfer = IOSSnorkelingWatchTransferService()
+    @StateObject private var snorkelingSessionSync = IOSSnorkelingSessionSyncService()
     @StateObject private var snorkelingEquipmentStore = IOSSnorkelingEquipmentStore()
     @StateObject private var snorkelingBuddySafetyStore = IOSSnorkelingBuddySafetyStore()
     @StateObject private var snorkelingSessionPhotoStore = IOSSnorkelingSessionPhotoStore()
@@ -92,6 +93,7 @@ struct DIRDivingiOSApp: App {
             .environmentObject(snorkelingRoutePlannerStore)
             .environmentObject(snorkelingLogbookStore)
             .environmentObject(snorkelingWatchTransfer)
+            .environmentObject(snorkelingSessionSync)
             .environmentObject(snorkelingEquipmentStore)
             .environmentObject(snorkelingBuddySafetyStore)
             .environmentObject(snorkelingSessionPhotoStore)
@@ -99,11 +101,16 @@ struct DIRDivingiOSApp: App {
             .preferredColorScheme(.dark)
             .task {
                 logStore.attachWatchSync(watchSync)
-                watchSync.activate(logStore: logStore, apneaLogbookStore: apneaLogbookStore)
+                watchSync.activate(
+                    logStore: logStore,
+                    apneaLogbookStore: apneaLogbookStore,
+                    snorkelingLogbookStore: snorkelingLogbookStore
+                )
                 watchSync.plannerBriefingTransferService = plannerBriefingTransfer
                 watchSync.divePlanPackageTransferService = divePlanPackageTransfer
                 watchSync.apneaWatchTransferService = apneaWatchTransfer
                 watchSync.snorkelingWatchTransferService = snorkelingWatchTransfer
+                watchSync.snorkelingSessionSyncService = snorkelingSessionSync
             }
         }
     }

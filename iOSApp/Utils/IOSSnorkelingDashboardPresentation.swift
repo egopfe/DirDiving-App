@@ -17,7 +17,7 @@ struct IOSSnorkelingDashboardPresentation {
     var syncStatusText: String
     var syncStatusIsPositive: Bool
     var mapPreviewAvailable: Bool
-    var mapCoordinates: [(latitude: Double, longitude: Double)]
+    var mapPreviewModel: SnorkelingSessionMapModel?
     var emptyStateText: String?
 }
 
@@ -42,7 +42,7 @@ enum IOSSnorkelingDashboardPresentationMapper {
         formatter.dateStyle = .medium
         formatter.timeStyle = .short
 
-        let mapCoordinates = mapPreviewCoordinates(from: lastSession)
+        let mapPreviewModel = lastSession.map { SnorkelingSessionMapPresentation.make(from: $0) }
         let sessionsThisMonth = sessionsThisMonthCount(from: sessions)
 
         if let lastSession {
@@ -63,8 +63,8 @@ enum IOSSnorkelingDashboardPresentationMapper {
                 watchConnectivityIsPositive: watchConnectivityIsPositive,
                 syncStatusText: syncStatusText,
                 syncStatusIsPositive: syncStatusIsPositive,
-                mapPreviewAvailable: !mapCoordinates.isEmpty,
-                mapCoordinates: mapCoordinates,
+                mapPreviewAvailable: mapPreviewModel?.isAvailable == true,
+                mapPreviewModel: mapPreviewModel,
                 emptyStateText: nil
             )
         }
@@ -86,7 +86,7 @@ enum IOSSnorkelingDashboardPresentationMapper {
             syncStatusText: syncStatusText,
             syncStatusIsPositive: syncStatusIsPositive,
             mapPreviewAvailable: false,
-            mapCoordinates: [],
+            mapPreviewModel: nil,
             emptyStateText: "snorkeling.ios.dashboard.empty"
         )
     }
@@ -97,14 +97,6 @@ enum IOSSnorkelingDashboardPresentationMapper {
 
     private static func formatDistance(_ meters: Double) -> String {
         meters >= 1_000 ? String(format: "%.2f km", meters / 1_000) : String(format: "%.0f m", meters)
-    }
-
-    private static func mapPreviewCoordinates(from session: SnorkelingSession?) -> [(latitude: Double, longitude: Double)] {
-        guard let session else { return [] }
-        return SnorkelingDomainSupport.normalizedTrackPoints(session.trackPoints).compactMap { point in
-            guard let lat = point.latitude, let lon = point.longitude, point.gpsQuality.isMeasuredSurfaceFix else { return nil }
-            return (lat, lon)
-        }
     }
 
     private static func averageMaxDepth(from sessions: [SnorkelingSession]) -> Double {
