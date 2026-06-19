@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Inline ascent-speed alarm on the live dive screen (non-blocking).
-/// Visual target: `Docs/ReferenceUI/ascent_alarm.png` and product mockup 2026-05-20.
+/// Visual target: `Docs/FeatureScreenshots/02-ascent-warning.png` (inline ascent banner reference).
 struct AscentWarningBannerView: View {
     let rateMetersPerMinute: Double
     let isActive: Bool

@@ -822,7 +822,7 @@ Le modalita condividono il design system nero/neon, ma non devono condividere lo
 
 ## UI Master References
 
-Le UI Apple Watch devono seguire `Docs/ReferenceUI/Watch_LIVE_reference.png` come riferimento canonico per densita, gerarchia, colore e bordo. Le UI iOS devono seguire `Docs/ReferenceUI/iOS_Companion_reference.png`.
+Le UI Apple Watch devono seguire `Docs/ReferenceUI/Watch_LIVE_reference.png` come riferimento canonico per densita, gerarchia, colore e bordo. Le UI iOS Companion devono seguire `mockups/IOS_COMPANION_ACTIVITY_SELECTION_POST_ONBOARDING.png` per la selezione attivita e i mockup per-verticale sotto `mockups/**`. Il riferimento legacy pre-tre-modalita e archiviato in `Docs/ReferenceUI/archive/LEGACY_iOS_Companion_pre_three_mode_reference.png`.
 
 Riferimenti recenti per iOS main:
 

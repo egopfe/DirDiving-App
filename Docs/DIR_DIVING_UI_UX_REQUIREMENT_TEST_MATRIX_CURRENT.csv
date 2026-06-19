@@ -1,0 +1,15 @@
+requirement_id,finding_id,priority,area,requirement,implementation_evidence,automated_test,software_status,physical_qa_status
+REQ15-001,AUDIT15-UX-001,P1,Mockups,Single canonical mockup tree under mockups/**,mockups/README.md; MockupCanonicalPaths.swift; duplicate Docs/ReferenceUI/Snorkeling PNGs removed,SnorkelingMockupReferenceMatrixTests; validate_mockup_paths.py,PASS,PENDING
+REQ15-002,AUDIT15-UX-002,P1,Navigation,Consume Apnea/Snorkeling post-selection landing once,IOSApneaRootView; IOSSnorkelingRootView,IOSUIUXRemediationTests; IOSCompanionActivitySelectionTests,PASS,PENDING
+REQ15-003,AUDIT15-UX-003,P1,iOS UX,Last-session cards open activity session detail,NavigationLink in IOSApneaDashboardView; IOSSnorkelingDashboardView,IOSUIUXRemediationTests,PASS,PENDING
+REQ15-004,AUDIT15-UX-004,P1,Watch Settings,Activity-scoped Watch Settings sections,SettingsView activity gates; WatchActivitySettingsSections.swift,WatchActivitySettingsOwnershipTests,PASS,PENDING
+REQ15-005,AUDIT15-UX-005,P1,Documentation,Zero broken mockup path references,validate_mockup_paths.py; doc updates,validate_mockup_paths.py BROKEN=0,PASS,N/A
+REQ15-006,AUDIT15-UX-006,P2,Snorkeling,Single primary Route Planner entry,Tab-only; sheet removed from dashboard,IOSUIUXRemediationTests,PASS,PENDING
+REQ15-007,AUDIT15-UX-007,P2,Fixtures,iOS mockup executable fixtures declared,IOSMockupPreviewFixtures.swift; matrix hasExecutableFixture true,IOSUIUXRemediationTests; ApneaMockupReferenceMatrixTests,PASS,PENDING
+REQ15-008,AUDIT15-UX-008,P2,Localization,Brand string centralized via l10n,brand.name key in activity selection,IOSUIUXRemediationTests; audit_localization.sh,PASS,N/A
+REQ15-009,AUDIT15-UX-009,P2,Diving root,Planner-as-home canonical terminology,ContentView comment; CompanionActivityCopy planner feature,IOSUIUXRemediationTests,PASS,PENDING
+REQ15-010,AUDIT15-UX-010,P3,Design system,Safety card uses DIRTheme token,DIRTheme.safetyInfo,IOSUIUXRemediationTests,PASS,PENDING
+REQ15-011,AUDIT15-UX-011,P3,Mockups,All PNGs classified and referenced,59 mockups referenced in matrices,validate_mockup_paths.py,PASS,N/A
+REQ15-012,AUDIT15-UX-012,P3,Archive,Legacy companion reference archived,LEGACY_iOS_Companion_pre_three_mode_reference.png,validate_mockup_paths.py legacy remap,PASS,N/A
+REQ15-013,,P0,Logbook,No cross-activity logbook routes,Separate session list views per activity,IOSUIUXRemediationTests,PASS,PENDING
+REQ15-014,,P1,Gate,Software readiness validation script,Scripts/validate_ui_ux_readiness.sh,validate_ui_ux_readiness.sh,PASS,N/A

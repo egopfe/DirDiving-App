@@ -77,7 +77,7 @@ Mockup matrix, architecture doc, release checklist, hardened validation script.
 | **Test matrix** | [`SNORKELING_RELEASE_HARD_TEST_MATRIX.md`](SNORKELING_RELEASE_HARD_TEST_MATRIX.md) |
 | **Validation report** | [`DIR_DIVING_SNORKELING_RELEASE_HARD_VALIDATION_REPORT.md`](DIR_DIVING_SNORKELING_RELEASE_HARD_VALIDATION_REPORT.md) |
 | **Gate** | [`AUDIT_SNORKELING_RELEASE_GATE_CURRENT.md`](AUDIT_SNORKELING_RELEASE_GATE_CURRENT.md) |
-| **Mockups** | `Docs/ReferenceUI/Snorkeling/` (10 PNG) |
+| **Mockups** | `mockups/` (59 PNG canonical; Snorkeling under `mockups/iOS/` + `mockups/Apple_Watch/`) |
 | **Gate** | `SNORKELING_RELEASE_HARD_INTERNAL_GO` |
 
 ---

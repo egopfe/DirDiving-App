@@ -33,8 +33,8 @@ enum IOSSnorkelingTab: String, Hashable, CaseIterable, Identifiable {
 @MainActor
 final class IOSSnorkelingNavigationStore: ObservableObject {
     @Published var selectedTab: IOSSnorkelingTab = .dashboard
-    @Published var showRoutePlanner = false
     @Published var showSettings = false
+    @Published var pendingSessionDetailID: UUID?
 }
 
 struct IOSSnorkelingRootView: View {
@@ -59,11 +59,6 @@ struct IOSSnorkelingRootView: View {
             DIRBackground().ignoresSafeArea()
         }
         .tint(DIRTheme.cyan)
-        .sheet(isPresented: $snorkelingNavigation.showRoutePlanner) {
-            NavigationStack {
-                IOSSnorkelingRoutePlannerView()
-            }
-        }
         .sheet(isPresented: $snorkelingNavigation.showSettings) {
             NavigationStack {
                 IOSSnorkelingSettingsView()
@@ -72,6 +67,15 @@ struct IOSSnorkelingRootView: View {
         .onChange(of: snorkelingNavigation.selectedTab) { _, tab in
             mountedTabs.insert(tab)
         }
+        .onAppear {
+            applyPostSelectionLandingIfNeeded()
+        }
+    }
+
+    private func applyPostSelectionLandingIfNeeded() {
+        guard IOSCompanionPostLegalEntry.consumePendingSnorkelingLanding() else { return }
+        snorkelingNavigation.selectedTab = .dashboard
+        mountedTabs.insert(.dashboard)
     }
 
     private var iosSnorkelingTabBar: some View {

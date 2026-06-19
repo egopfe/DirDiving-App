@@ -21,8 +21,8 @@ enum CompanionActivityCopy {
         switch mode {
         case .diving:
             return [
+                DIRIOSLocalizer.string("companion.activity.diving.feature.planner"),
                 DIRIOSLocalizer.string("companion.activity.diving.feature.decompression"),
-                DIRIOSLocalizer.string("companion.activity.diving.feature.gas"),
                 DIRIOSLocalizer.string("companion.activity.diving.feature.logbook"),
             ]
         case .apnea:

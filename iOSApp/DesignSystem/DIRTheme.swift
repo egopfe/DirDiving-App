@@ -11,6 +11,8 @@ enum DIRTheme {
     static let orange = Color(red: 1.00, green: 0.43, blue: 0.15)
     static let red = Color(red: 1.00, green: 0.18, blue: 0.22)
     static let green = Color(red: 0.18, green: 0.90, blue: 0.45)
+    /// Safety / informational accent used on activity-selection and trust surfaces.
+    static let safetyInfo = Color(red: 0.04, green: 0.52, blue: 1.0)
     static let muted = Color.white.opacity(0.64)
     static let faint = Color.white.opacity(0.11)
     static let hairline = Color.white.opacity(0.14)
