@@ -1,807 +1,376 @@
-# iOS Companion MAIN Branch - Complete Mathematical Functions / Algorithm Audit (CCR Updated V2.0)
+# iOS Companion MAIN — Complete Mathematical Functions / Algorithm Audit (CCR Updated V3.0)
 
-**Audit date:** 2026-06-13  
-**Repository:** DIR DIVING (`DirDiving-App`)  
+**Audit date:** 2026-06-19  
+**Repository:** DIR DIVING (`egopfe/DirDiving-App`)  
 **Branch audited:** `main` only  
-**HEAD audited:** `5b85505` (`comandi aggiornati`)  
-**Remote alignment at audit start:** `main...origin/main = 0 / 0`  
-**Command source:** `H:/My Drive/App/MAIN_COMANDI_TO_OBJECTIVE/0-DIR_DIVING_IOS_COMPLETE_MATH_FUNCTIONS_AUDIT_CCR_UPDATED_V2.0.md`  
-**Mode:** audit only. No source code, UI, business logic, Watch runtime, commits, or pushes were performed.
+**HEAD audited:** `9b65ba8` (`Remediate Command 15 UI/UX findings to 100% software readiness.`)  
+**Command source:** `commands_for_cursor/0-DIR_DIVING_IOS_COMPLETE_MATH_FUNCTIONS_AUDIT_CCR_UPDATED_V3.0.md`  
+**Mode:** audit only — no production code, tests, project config, mockups, commits, or pushes were modified by this audit.
 
-### Post-remediation status (2026-06-14)
-
-| Item | Audit baseline (`5b85505`) | Code after remediation (`8147b3f` → `d756f59`) |
-|---|---|---|
-| IOS-MATH-P1-001 gas density pressure scaling | Open | **Fixed** — partial-pressure formula in `CCRGasDensityEstimator` |
-| IOS-MATH-P1-002 CNS/OTU failure-to-zero | Open | **Fixed** — `CCROxygenExposureState` unavailable semantics |
-| IOS-MATH-P2-001 bailout heuristic metadata | Partial | **Fixed (Policy A)** — typed metadata on `CCRBailoutScenarioResult` |
-| IOS-MATH-P3-001 synthetic `.air` diluent trace | Open | **Fixed** — actual `CCRDiluent` through exposure/trace |
-| IOS-MATH-P2-002 / P2-003 external + physical QA | PENDING | **Still PENDING** — evidence folders scaffolded |
-
-Internal code-level mathematical readiness is **100%**. See `Docs/IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT_V1.0.md`.
-
-This report is based on static repository inspection on Windows. Apple tooling is not available in this environment, so `xcodegen`, `xcodebuild`, and XCTest execution were not run. The codebase contains a large iOS algorithm test suite, but this audit reports static correctness and release-readiness risks separately from macOS build/test evidence.
-
----
-
-## Indice
-
-### Metadati e sintesi
-
-| Sezione | Contenuto |
-|---|---|
-| [A. Scope Confirmed](#a-scope-confirmed) | Ambito audit, esclusioni, preflight branch/repo |
-| [B. Executive Verdict](#b-executive-verdict) | Verdetto esecutivo e readiness complessiva |
-| [C. Readiness Matrix By Function](#c-readiness-matrix-by-function) | Matrice funzione × stato × readiness |
-| [D. Files Inspected](#d-files-inspected) | Inventario file ispezionati (planner, CCR, sync, test) |
-
-### Audit per area algoritmica
-
-| Sezione | Contenuto |
-|---|---|
-| [E. Buhlmann ZHL-16C Engine Audit](#e-buhlmann-zhl-16c-engine-audit) | Costanti, tissue loading, ceiling, NDL, GF |
-| [F. CCR / Rebreather Audit](#f-ccr--rebreather-audit) | Setpoint, density, CNS/OTU, bailout — finding P1/P2/P3 |
-| [G. Ratio Deco Audit](#g-ratio-deco-audit) | Heuristic comparator, limiti e labeling |
-| [H. Gas Planning / Gas Schedule Audit](#h-gas-planning--gas-schedule-audit) | Ruoli gas, schedule, ledger |
-| [I. Emergency Gas / Rock Bottom / Minimum Gas Audit](#i-emergency-gas--rock-bottom--minimum-gas-audit) | Rock bottom, minimum gas, assunzioni |
-| [J. Repetitive Dive / Residual Tissue Audit](#j-repetitive-dive--residual-tissue-audit) | Snapshot tessuti, off-gassing |
-| [K. Unit Conversion / Ambient Pressure / Salinity / Altitude Audit](#k-unit-conversion--ambient-pressure--salinity--altitude-audit) | Unità, pressione ambiente, salinità, quota |
-| [L. MOD / PPO2 / Dalton Law Audit](#l-mod--ppo2--dalton-law-audit) | Validazione MOD/PPO2, legge di Dalton |
-| [M. Tissue Analytics / Narcosis / END / EAD / PPN2 Audit](#m-tissue-analytics--narcosis--end--ead--ppn2-audit) | Analytics tessuti, narcosi, END/EAD |
-| [N. CNS / OTU Audit](#n-cns--otu-audit) | Esposizione ossigeno, hardening richiesto |
-| [O. Logbook / Manual Dive / Import / Export / Sync Math Audit](#o-logbook--manual-dive--import--export--sync-math-audit) | Logbook, import CSV, sync |
-| [P. PDF / Share / Planner Briefing Cards Audit](#p-pdf--share--planner-briefing-cards-audit) | Export PDF, briefing cards Watch |
-| [Q. Structured Equipment / Checklist Audit](#q-structured-equipment--checklist-audit) | Equipment strutturato, checklist |
-| [R. Watch Runtime / Watch Math Boundary Audit](#r-watch-runtime--watch-math-boundary-audit) | Confine iOS/Watch, nessuna autorità deco Watch |
-
-### Finding CCR (sezione F)
-
-| ID | Titolo |
-|---|---|
-| [CCR-P1-001](#finding-ccr-p1-001-gas-density-estimator-appears-not-pressure-scaled) | Gas density non scalata per pressione |
-| [CCR-P1-002](#finding-ccr-p1-002-oxygen-exposure-failures-fall-back-to-zero) | CNS/OTU fallback a zero |
-| [CCR-P3-001](#finding-ccr-p3-001-oxygen-exposure-synthetic-gas-labels-use-air-diluent) | Label gas diluent `.air` su trace CCR |
-| [CCR-P2-001](#finding-ccr-p2-001-bailout-scenario-calculator-is-heuristic) | Bailout euristico |
-
-### Chiusura audit
-
-| Sezione | Contenuto |
-|---|---|
-| [S. Test Coverage Audit](#s-test-coverage-audit) | Inventario test, gap di copertura |
-| [T. Findings And Priority Ranking](#t-findings-and-priority-ranking) | P0 / P1 / P2 / P3 — tabella finding ID |
-| [U. Implementation Plan For Remaining Issues](#u-implementation-plan-for-remaining-issues) | Fasi 1–5 remediation |
-| [V. Edge Cases To Keep Testing](#v-edge-cases-to-keep-testing) | Edge case da mantenere in test |
-| [W. Documentation Alignment](#w-documentation-alignment) | Allineamento con altri doc repo |
-| [X. Build / Test Execution Status](#x-build--test-execution-status) | Stato xcodegen/build/test |
-| [Y. Release Gate Status](#y-release-gate-status) | Gate TestFlight / App Store / claim certificati |
-| [Z. Final Verdict](#z-final-verdict) | Verdetto finale e prossimi passi |
-
-### Finding ID (sezione T)
-
-| Priorità | ID | Area |
-|---|---|---|
-| P1 | IOS-MATH-P1-001 | CCR gas density |
-| P1 | IOS-MATH-P1-002 | CCR CNS/OTU failure fallback |
-| P2 | IOS-MATH-P2-001 | CCR bailout heuristic |
-| P2 | IOS-MATH-P2-002 | External fixture evidence |
-| P2 | IOS-MATH-P2-003 | PDF/briefing render QA |
-| P3 | IOS-MATH-P3-001 | CCR oxygen exposure label |
-| P3 | IOS-MATH-P3-002 | Ratio Deco labeling |
-| P3 | IOS-MATH-P3-003 | macOS build/test gate |
+**Supersedes:** V2.0 report baseline (`5b85505`, 2026-06-13). Post-remediation math fixes through `8147b3f`/`d756f59` remain in place; this V3.0 pass adds Apnea/Snorkeling math scope, three-mode architecture verification, and re-execution of targeted test suites @ `9b65ba8`.
 
 ---
 
 ## A. Scope Confirmed
 
+### Product architecture audited
+
+```text
+DIR Diving
+├── Diving (Gauge + Full Computer)
+├── Apnea
+└── Snorkeling
+```
+
+Both **DIRDiving iOS** (Companion) and **DIRDiving Watch App** (MAIN) were inspected for mathematical/runtime features. Primary focus: iOS Planner and Shared algorithm stack. Watch audited only where it consumes, displays, or syncs algorithmic values.
+
 ### In scope
 
-- iOS Companion MAIN app only.
-- iOS planner mathematics and algorithmic services.
-- Buhlmann ZHL-16C, multigas, trimix, gradient factor, tissue history, NDL, decompression stops.
-- CCR / rebreather planning reference logic.
-- Ratio Deco compatibility logic.
-- Gas planning, gas ledger, reserve, rock-bottom/minimum-gas logic.
-- Planner ascent/descent timing and schedule-aware gas consumption.
-- Repetitive planning and residual tissue snapshots.
-- Manual dive, logbook-derived mathematics, import/export/sync validation where used by iOS.
-- Structured equipment, checklist integration, CCR checklist import/export.
-- Planner briefing cards and Watch transfer boundaries.
-- Watch math/runtime only where relevant to confirm iOS changes do not imply Watch decompression authority.
+- Shared Bühlmann ZH-L16C core, iOS planner integration, CCR/Rebreather reference planner
+- Ratio Deco heuristic comparator (reference-only)
+- Gas planning, schedule-aware consumption, rock bottom/emergency gas, gas ledger
+- Planner ascent-speed settings, dive runtime table, deco-stop presentation builders
+- Repetitive-dive tissue seeding (reference-only UI labeling)
+- Structured equipment/checklist gas mapping, CCR checklist import/export
+- Planner briefing cards / Watch transfer values
+- Logbook/manual dive/import/export mathematical fields
+- Apnea session engine mathematics (depth/time, recovery, targets, records)
+- Snorkeling GPS/navigation/dip mathematics
+- Cross-activity numerical isolation (stores, sync namespaces, settings)
+- Watch Full Computer deco solver (shared engine consumer)
+- Sync/persistence integrity for mathematical payloads
 
-### Out of scope
+### Out of scope / not performed
 
-- No Watch runtime change.
-- No experimental branch analysis beyond confirming MAIN target isolation.
-- No UI/UX redesign.
-- No code remediation.
-- No commit/push.
+- No code remediation, refactor, or algorithm change
+- No UI/UX redesign audit (see Command 4 / 15)
+- No experimental branch runtime analysis beyond MAIN target isolation check
+- External Bühlmann/CCR/PDF physical validation evidence not fabricated
+- Underwater field testing not claimed
 
-### Branch and repository preflight
+### Preflight
 
 | Check | Result |
-|---|---|
-| Current branch | `main` |
-| Remote | `https://github.com/egopfe/DirDiving-App.git` |
-| Local HEAD | `5b85505` |
-| Local vs remote | aligned at audit start (`0 / 0`) |
-| Working tree before report update | clean |
-| `project.yml` present | yes |
-| Experimental iOS files excluded from MAIN target | yes |
-| Experimental Watch files excluded from MAIN target | yes |
+|-------|--------|
+| Branch | `main` ✓ |
+| HEAD | `9b65ba8` |
+| Working tree | **Note:** `Docs/DIR_DIVING_MOCKUP_PATH_VALIDATION_CURRENT.csv` and localization inventory CSV were auto-regenerated by audit scripts during this pass (documentation artifacts only) |
+| MAIN target isolation | `./Scripts/check_main_target_isolation.sh` **PASS** |
+| Localization parity | `./Scripts/audit_localization.sh` **PASS** (2198 keys inventoried) |
 
 ---
 
 ## B. Executive Verdict
 
-The iOS Companion MAIN algorithm stack is substantially mature and internally coherent for a **non-certified Buhlmann-based planning reference**. The open-circuit Buhlmann ZHL-16C path is implemented with nitrogen, helium, trimix, multigas, gradient factors, tissue-state NDL, and generated decompression stops. Planner validation, gas-role separation, MOD/PPO2 checks, schedule-aware gas ledger, repetitive tissue snapshots, PDF/share outputs, checklist mapping, and Watch briefing transfer support are present.
+| Gate | Verdict |
+|------|---------|
+| Internal mathematical correctness (code + unit tests) | **CONDITIONAL PASS** |
+| Three-mode math isolation | **PASS** |
+| CCR reference-only positioning | **PASS** |
+| External validation / physical QA | **PENDING** |
+| App Store mathematical sign-off | **NO-GO** until external evidence complete |
 
-The main remaining algorithmic concerns are concentrated in the CCR/rebreather layer and evidence process:
+**Overall internal mathematical readiness: 88%**  
+**Software-verifiable Apnea math: 84%** | **Snorkeling math: 91%** | **Cross-activity isolation: 90%**
 
-1. **CCR gas density appears under-scaled** because the estimator returns a composition-weighted 1 bar style density instead of pressure-scaled density at depth.
-2. **CCR CNS/OTU calculation failures currently fall back to zero**, which can make an unavailable exposure calculation look safe.
-3. **CCR bailout is explicitly heuristic**, not a model-derived OC bailout decompression/gas simulation.
-4. **External reference validation evidence remains required** before calling the Buhlmann/CCR planner release-hard for public TestFlight or App Store language.
-5. **macOS build/test execution is still required** because this audit was performed on Windows.
-
-### Overall readiness
-
-| Area | Static readiness | Confidence | Blocker class |
-|---|---:|---|---|
-| Open-circuit Buhlmann planner | 92% | High | External fixtures / macOS tests |
-| Trimix / helium model | 90% | High | External validation |
-| CCR / rebreather planner | 74% | Medium | Gas density + exposure failure fallback |
-| CCR setpoint and diluent math | 84% | Medium-high | External CCR fixture validation |
-| CCR bailout scenarios | 70% | Medium | Heuristic by design |
-| Ratio Deco | 84% | Medium-high | Heuristic, must remain labeled |
-| Gas planning and gas ledger | 88% | High | Physical/review QA |
-| Emergency / rock bottom | 82% | Medium-high | Assumptions require field policy validation |
-| Schedule-aware gas consumption | 87% | High | External scenario validation |
-| Repetitive dive residual tissues | 80% | Medium-high | Snapshot provenance and validation |
-| Logbook/import/export math | 84% | Medium-high | CSV/PDF render QA |
-| Planner briefing card transfer | 81% | Medium | Device transfer QA |
-| Unit conversion / pressure model | 90% | High | macOS test run |
-| Watch isolation from decompression logic | 98% | High | Physical QA only |
-| Overall iOS math readiness | 83% | Medium-high | P1 CCR fixes + external validation |
+No P0 mathematical findings. One new P1 (Apnea recovery policy vs lifecycle timing). Prior CCR P1 fixes remain closed. External QA folders remain scaffolded but empty.
 
 ---
 
 ## C. Readiness Matrix By Function
 
-| Function | Status | Readiness | Notes |
-|---|---|---:|---|
-| Buhlmann ZHL-16C constants | Implemented | 95% | 16 N2 and He compartments present. |
-| Inspired inert gas pressure | Implemented | 91% | Water vapor subtraction and environment pressure present. |
-| Tissue loading | Implemented | 90% | Constant-depth and Schreiner-style linear loading present. |
-| Mixed N2/He coefficients | Implemented | 90% | Weighted by inert partial pressure. |
-| Ceiling calculation | Implemented | 89% | GF ceiling and controlling compartment present. |
-| GF Low/High interpolation | Implemented | 86% | Depth-progress interpolation present; external parity recommended. |
-| NDL search | Implemented | 86% | Binary search tissue-state based; no fake `999` fallback observed in engine path. |
-| Multigas switching | Implemented | 87% | Travel/deco gas switch scheduling and operational checks present. |
-| Trimix validation | Implemented | 88% | O2/He composition and hypoxic/MOD checks present. |
-| CCR setpoint tissue loading | Implemented | 82% | Dedicated CCR inspired gas path. |
-| CCR gas density | Needs fix | 58% | Appears not pressure-scaled at depth. |
-| CCR CNS/OTU failure semantics | Needs fix | 65% | Failure falls back to `0`. |
-| CCR bailout scenarios | Heuristic | 70% | Labeled reference, not engine-simulated bailout plan. |
-| Ratio Deco | Heuristic validated | 84% | Blocked in CCR, labeled comparator. |
-| Planner gas schedule | Implemented | 86% | Role-aware bottom/travel/deco/bailout/CCR handling. |
-| Gas ledger | Implemented | 88% | Schedule-aware consumption and warnings present. |
-| Rock bottom / minimum gas | Implemented | 82% | Assumptions centralized but need field validation. |
-| Repetitive planning | Implemented | 80% | Tissue snapshots/off-gassing present. |
-| Manual dive math | Implemented | 86% | Manual and synthetic profile helpers present. |
-| PDF/share exports | Implemented | 80% | Need render/snapshot QA on macOS. |
-| Briefing cards to Watch | Implemented | 80% | Needs paired-device QA. |
-| Structured equipment mapping | Implemented | 84% | CCR roles supported. |
-| iOS/Watch sync math integrity | Implemented | 82% | Extensive validation tests listed, physical QA pending. |
+| Feature | Readiness | Evidence summary |
+|---------|----------:|------------------|
+| Bühlmann | 92% | Shared `BuhlmannEngine` + ~141 targeted tests; external fixtures PENDING |
+| CCR / Rebreather | 88% | Full planner path; P1 fixes intact; external CCR evidence PENDING |
+| CCR Setpoint | 90% | `CCRInspiredGasModel`, setpoint profile in `CCRModels.swift` |
+| CCR Diluent | 90% | Actual diluent through exposure trace (P3-001 closed) |
+| CCR Bailout | 85% | Heuristic calculator with typed metadata (P2-001 closed) |
+| Ratio Deco | 85% | Heuristic + Bühlmann validator; reference-only labels; 10 tests |
+| Gas Planning | 90% | `GasPlanningService`, role-aware cylinders, MOD/density |
+| Emergency / Rock Bottom | 88% | `ScheduleGasConsumptionService.rockBottomLiters`; ascent settings wired |
+| Schedule-Aware Gas Consumption | 90% | Segment-walk allocation; 7 tests PASS |
+| Gas Ledger / Reserve Display | 85% | `GasLedgerDisplayFormatter`; liters + bar equivalent |
+| Ascent / Descent Transit Timing | 92% | `PlannerAscentSpeedSettings`; 11 tests; rock-bottom integration |
+| Dive Runtime / Deco Stop Truthfulness | 88% | `PlannerAscentTableBuilder` (25 tests); `DecoStopsPresentationBuilder` |
+| Repetitive Dive / Residual Tissues | 80% | Snapshot seeding + reference-only UI; limited dedicated tests |
+| MOD / PPO2 / Dalton | 90% | Validation in planner gas paths; switch-depth MOD clamp tests |
+| Switch Depth Clamp | 92% | `PlannerSwitchDepthMODClampTests` (12 tests) |
+| Tissue Loading | 90% | Schreiner loading; tissue history sampler |
+| Narcosis / END | 88% | Analytics services + tissue narcosis views |
+| CNS / OTU | 88% | CCR unavailable semantics fixed; OC preview still coerces 0 on failure |
+| Checklist Gas Sync | 87% | `ChecklistPlannerSyncMapperTests` (11 tests) |
+| Manual Dive Math | 86% | `ManualDiveEditorLogicTests` (9 tests) |
+| PDF / Share Math Output | 82% | `PDFExportServiceTests` (13 tests); physical render QA PENDING |
+| Planner Briefing Card / Watch Transfer | 85% | Export + receiver tests; reference-only on Watch |
+| Structured Equipment / Checklist Mapping | 87% | Structured model + mapper tests |
+| CCR Checklist Import / Export | 86% | Round-trip covered in equipment/CCR tests |
+| CCR Bailout Scenario | 85% | Heuristic with documented limitations |
+| CCR Gas Density | 90% | Partial-pressure formula (P1-001 closed) |
+| CSV / Subsurface Math Output | 85% | `CSVMetadataRoundTripTests` (6 tests) |
+| Apnea Math | 84% | Strong engine/tests; recovery policy/lifecycle P1 gap |
+| Snorkeling Math | 91% | GPS filter, geodesy, return advisor; 13+18 tests PASS |
+| Cross-Activity Math Isolation | 90% | Architecture scanners; separate stores/namespaces |
+| Watch Math Runtime | 85% | Shared Bühlmann via `FullComputerDecoSolver`; 9 tests PASS |
+| Sync / Persistence Math Integrity | 88% | Codec/merge tests; namespace isolation verified |
+| Unit Conversion | 90% | `DIRUnitConversions`, pressure model unification tests |
+| External Validation Status | 35% | QA evidence folders PENDING |
+| **Overall Math Readiness** | **88%** | Blocked from 100% by external evidence + Apnea recovery P1 |
 
 ---
 
-## D. Files Inspected
+## D. Mathematical Feature Inventory (Phase 1)
 
-### Planner / Buhlmann / gas planning
+### iOS Planner — implemented
 
-- `iOSApp/Algorithms/Buhlmann/BuhlmannConstants.swift`
-- `iOSApp/Algorithms/Buhlmann/BuhlmannEngine.swift`
-- `iOSApp/Algorithms/Buhlmann/BuhlmannGas.swift`
-- `iOSApp/Algorithms/Buhlmann/BuhlmannPlanPreflightValidator.swift`
-- `iOSApp/Algorithms/Buhlmann/BuhlmannTissueHistory.swift`
-- `iOSApp/Algorithms/Buhlmann/BuhlmannTissueModel.swift`
-- `iOSApp/Models/GasPlan.swift`
-- `iOSApp/Models/RatioDecoModels.swift`
-- `iOSApp/Services/BuhlmannPlanner.swift`
-- `iOSApp/Services/GasPlanningService.swift`
-- `iOSApp/Services/PlannerService.swift`
-- `iOSApp/Services/PlannerGasSchedule.swift`
-- `iOSApp/Services/PlannerAscentTableBuilder.swift`
-- `iOSApp/Services/PlannerAscentSpeedSettingsStore.swift`
-- `iOSApp/Services/PlannerEnvironment.swift`
-- `iOSApp/Services/RatioDecoPlanner.swift`
-- `iOSApp/Services/RatioDecoValidator.swift`
-- `iOSApp/Services/RepetitiveDivePlannerService.swift`
-- `iOSApp/Services/ScheduleGasConsumptionService.swift`
-- `iOSApp/Utils/IOSUnitConversions.swift`
-- `iOSApp/Utils/PlannerInputValidator.swift`
-- `iOSApp/Utils/PlannerModeLimits.swift`
-- `iOSApp/Utils/PlannerModePolicy.swift`
-- `iOSApp/Utils/PlannerResultState.swift`
+| Feature | Status | Primary files |
+|---------|--------|---------------|
+| Base / Deco / Technical modes | Implemented | `PlannerService.swift`, `PlannerModePolicyTests` |
+| CCR / Rebreather mode | Implemented (reference-only) | `CCRPlannerEngine.swift`, `CCRPlannerService.swift` |
+| Bühlmann ZH-L16C | Implemented | `Shared/BuhlmannCore/*` |
+| Ratio Deco | Implemented (heuristic) | `RatioDecoPlanner.swift` |
+| Multigas / Trimix / roles | Implemented | `BuhlmannGas.swift`, `GasMix` bridge |
+| GF low/high | Implemented | `BuhlmannEngine.swift` |
+| Repetitive dive seeding | Implemented (reference-only UI) | `RepetitiveDivePlannerService.swift` |
+| Ascent speed settings (5-band) | Implemented | `PlannerAscentSpeedSettings.swift` |
+| Emergency / Rock Bottom | Implemented | `ScheduleGasConsumptionService.swift` |
+| Schedule-aware gas consumption | Implemented | `ScheduleGasConsumptionService.swift` |
+| Technical avg-depth gas toggle | Implemented | `PlannerTechnicalAverageDepthGasConsumptionTests` |
+| Planner briefing PNG/card export | Implemented | `PlannerBriefingImageExportServiceTests` |
 
-### CCR / rebreather
+### Apnea — implemented
 
-- `iOSApp/Models/CCR/CCRModels.swift`
-- `iOSApp/Services/CCR/CCRBailoutScenarioCalculator.swift`
-- `iOSApp/Services/CCR/CCRGasDensityEstimator.swift`
-- `iOSApp/Services/CCR/CCRInspiredGasModel.swift`
-- `iOSApp/Services/CCR/CCRPlannerEngine.swift`
-- `iOSApp/Services/CCR/CCRPlannerService.swift`
-- `iOSApp/Services/CCR/CCRPlanValidator.swift`
-- `iOSApp/Services/CCR/CCRTissueHistorySampler.swift`
+| Feature | Status | Primary files |
+|---------|--------|---------------|
+| Depth/time sample integrity | Implemented | `DepthMeasurementFeed.swift`, `ApneaSessionEngine.swift` |
+| Monotonic session/dive clocks | Implemented | `MonotonicElapsedClock.swift` |
+| Lifecycle (immersion/surface/recovery) | Implemented | `ApneaLifecycleStateMachine.swift` |
+| Configurable recovery formulas | Implemented (computation) | `ApneaRecoveryPolicy.swift`, `ApneaRecoveryComputation` |
+| Targets / markers / alarms | Implemented | `ApneaOperationalEventEngine.swift` |
+| Personal records / statistics | Implemented | `ApneaPersonalRecordsEngine.swift`, `ApneaLogbookStatistics.swift` |
+| Bühlmann / deco | **Absent** (correct) | Architecture isolation tests |
 
-### Output / sync / checklist / briefing
+### Snorkeling — implemented
 
-- `iOSApp/Services/SubsurfaceExportService.swift`
-- `iOSApp/Services/PDF/*.swift`
-- `iOSApp/Services/PlannerBriefingImageExportService.swift`
-- `iOSApp/Services/PlannerBriefingWatchTransferService.swift`
-- `Models/PlannerBriefingCard.swift`
-- `Services/PlannerBriefingCardStore.swift`
-- `Services/PlannerBriefingWatchReceiver.swift`
-- `iOSApp/Utils/EquipmentPlannerMapper.swift`
-- `iOSApp/Utils/EquipmentChecklistGenerator.swift`
-- `iOSApp/Utils/CCRChecklistExportCoordinator.swift`
-- `iOSApp/Utils/CCRChecklistImportCoordinator.swift`
-
-### Watch cross-boundary files
-
-- `Services/DiveManager.swift`
-- `Services/WatchSyncService.swift`
-- `Models/AscentRateLimits.swift`
-- `Models/AscentStatus.swift`
-- `Utils/DIRUnitConversions.swift`
-- `Views/PlannerBriefingCardsView.swift`
-
-### Tests inventory
-
-Static count found:
-
-- iOS algorithm test methods: **770**
-- Watch algorithm test methods: **216**
-- iOS algorithm test files: **124**
-- Watch algorithm test files: **36**
+| Feature | Status | Primary files |
+|---------|--------|---------------|
+| Surface GPS filtering | Implemented | `SnorkelingGPSFeed.swift` |
+| Haversine distance / bearing | Implemented | `SnorkelingDomainSupport.swift` |
+| Return-to-entry advisor | Implemented | `SnorkelingReturnAdvisor.swift` |
+| Waypoint navigation | Implemented | `SnorkelingNavigationEngine.swift` |
+| Dip depth/time aggregation | Implemented | `SnorkelingDipAnalytics.swift`, lifecycle SM |
+| Measured-only track distance | Implemented | `SnorkelingSessionMapPresentation.swift` |
+| Underwater GPS rejection | Implemented | `SnorkelingGPSFeed` rejects `.underwater` |
 
 ---
 
-## E. Buhlmann ZHL-16C Engine Audit
+## E. Core Algorithm Assessments
 
-### Evidence found
+### E1. Bühlmann ZH-L16C
 
-`BuhlmannConstants.swift` defines:
+- **Engine:** `Shared/BuhlmannCore/BuhlmannEngine.swift` — single canonical implementation for iOS planner and Watch Full Computer (`FullComputerDecoSolver` delegates to shared engine).
+- **Verified:** 16-compartment constants, Schreiner loading, GF-aware ceiling, NDL, decompression schedule, multigas segments.
+- **Tests executed @ 9b65ba8:** `BuhlmannConstantsTests` (4/4), `BuhlmannEngineCanonicalConsistencyTests` (5/5) — **PASS**.
+- **Gap:** External Bühlmann reference fixtures in `Docs/QA_EVIDENCE/BUHLMANN_EXTERNAL/` — **PENDING** (IOS-MATH-P2-002).
 
-- `compartmentCount = 16`
-- N2 half-times:
-  `5.0, 8.0, 12.5, 18.5, 27.0, 38.3, 54.3, 77.0, 109.0, 146.0, 187.0, 239.0, 305.0, 390.0, 498.0, 635.0`
-- He half-times:
-  `1.88, 3.02, 4.72, 6.99, 10.21, 14.48, 20.53, 29.11, 41.20, 55.19, 70.69, 90.34, 115.29, 147.42, 188.24, 240.03`
-- ZHL-16C-style N2 and He `a` / `b` coefficient arrays.
-- Water vapor pressure `0.0627 bar`.
-- Sea-level surface pressure `1.01325 bar`.
-- Stop interval `3 m`.
+### E2. CCR / Rebreather
 
-`BuhlmannEngine.swift` provides:
+- **Reference-only:** UI strings (`planner.reference_only.warning`), export blocking on unavailable exposure, no certified loop-controller claims.
+- **Prior P1 fixes verified present:**
+  - IOS-MATH-P1-001: `CCRGasDensityEstimator` partial-pressure scaling — `CCRMathAuditRemediationV1Tests` 12/12 PASS
+  - IOS-MATH-P1-002: `CCROxygenExposureState.unavailable` — no zero fallback on failure
+  - IOS-MATH-P3-001: actual `CCRDiluent` in trace labels
+  - IOS-MATH-P2-001: bailout heuristic metadata on `CCRBailoutScenarioResult`
+- **Tests executed:** `CCRPlannerTests` (12/12), `CCRMathAuditRemediationV1Tests` (12/12) — **PASS**.
+- **Gap:** `Docs/QA_EVIDENCE/CCR_EXTERNAL/README.md` — **PENDING**.
 
-- Buhlmann plan request/result data structures.
-- Full validation path.
-- `noDecompressionLimit(...)`.
-- `gfAtDepth(...)`.
-- Tissue loading through descent, bottom, ascent, gas switch, and decompression schedule.
-- Stop generation from tissue ceiling, not static templates.
-- Multigas ascent gas selection.
+### E3. Ratio Deco
 
-`BuhlmannTissueModel.swift` provides:
+- Heuristic schedule in `RatioDecoPlanner.swift`; blocked in CCR mode; Bühlmann schedule unchanged when Ratio Deco selected (`IOSMainAlgorithmMathRemediationTests`).
+- Reference-only disclaimers in EN/IT localization.
+- **Tests executed:** `RatioDecoPlannerTests` (10/10) — **PASS**.
 
-- air saturation at surface pressure.
-- constant-depth loading.
-- linear-depth Schreiner-style loading.
-- mixed inert gas ceiling calculation.
+### E4. Gas / MOD / PPO2 / Rock Bottom / Ledger
 
-### Correctness assessment
+- Rock bottom: `ScheduleGasConsumptionService.rockBottomLiters` uses emergency SAC × team size × average ascent ATA × (ascent minutes + extra minutes) from `PlannerAscentSpeedSettings`.
+- Schedule consumption walks `BuhlmannEngineResult.segments` for per-cylinder allocation.
+- Gas ledger display: liters canonical, bar as cylinder-equivalent presentation only.
+- **Tests executed:** `ScheduleGasConsumptionServiceTests` (7/7) — **PASS**.
+- **Minor gap (P2):** OC `GasPlanningService` preview path sets CNS to `0` on oxygen-exposure failure (preview-only; inconsistent with CCR unavailable semantics).
 
-The OC Buhlmann implementation is coherent and materially complete for a reference planner. The implementation does not appear to use static stop templates for the Buhlmann path. It validates gases, depth/time/GF bounds, MOD/hypoxic use, and operational gas range. It rejects invalid compositions and has calculation-limit guards.
+### E5. Transit / Runtime / Deco Presentation
 
-### Remaining limitations
+- `PlannerAscentTableBuilder` builds ordered runtime rows (descent, bottom, travel, deco, surface).
+- `DecoStopsPresentationBuilder` mode-gates visibility (base hidden; deco/technical/ccr shown).
+- Presentation builders consume engine outputs; no independent deco schedule generation detected.
+- **Tests executed:** `PlannerAscentTableTests` (25 executed, 1 skipped, 0 failures) — **PASS**.
 
-- This audit did not execute numerical fixture tests.
-- External comparison against known planners/tables remains required before marketing as "release-hard".
-- GF interpolation is plausible but should be compared to reference fixtures profile-by-profile.
+### E6. Apnea Mathematics (V3.0 expansion)
 
----
+- Production engine: `Shared/Utils/ApneaSessionEngine.swift` + `ApneaLifecycleStateMachine.swift`.
+- Depth feed: spike rejection, regressive timestamp rejection, 60 m max, 3.5 m/s rate cap.
+- Recovery computation supports ratio1to1, ratio2to1, fixed, customRatio with minimum surface seconds.
+- **Tests executed:** `ApneaLifecycleEngineTests` (16/16), `ApneaTimeRecoveryCheckpointEngineTests` (8/8) — **PASS**.
+- **Finding IOS-MATH-APNEA-P1-001 (NEW):** Lifecycle exits `.recovery` after fixed `recoveryMinimumSeconds` (default 60 s) while policy may require longer (e.g. 2:1). UI snapshot may show recovery complete before policy interval elapses. `allowEarlyDiveWhenIncomplete` exists in policy but is not wired to engine start gating.
 
-## F. CCR / Rebreather Audit
+### E7. Snorkeling Mathematics (V3.0 expansion)
 
-### Evidence found
+- GPS feed rejects underwater fixes, stale (>90 s), low accuracy (>45 m), speed spikes (>3.5 m/s), gaps (>45 s).
+- Track distance and map presentation use measured surface fixes only.
+- Return advisor: Haversine distance/bearing, configurable thresholds.
+- **Tests executed:** `SnorkelingSensorGPSIngestionTests` (13/13), `SnorkelingNavigationReturnEngineTests` (18/18) — **PASS**.
 
-The CCR feature is implemented as a separate iOS planning path:
+### E8. Cross-Activity Numerical Isolation
 
-- `CCRPlannerEngine.swift` performs setpoint-profile tissue loading and decompression scheduling.
-- `CCRInspiredGasModel.swift` computes inspired ppO2, ppN2, and ppHe from setpoint, diluent, and environment.
-- `CCRPlanValidator.swift` validates setpoints, diluent, bailout gases, PPO2, hypoxic use, and MOD.
-- `CCRPlannerService.swift` assembles result, CNS/OTU exposure, timeline data, tissue trace, bailout scenarios, warnings, depth profile, and Buhlmann state.
-- `CCRTissueHistorySampler.swift` supports chart/tissue analytics.
+- Separate session engines, logbook stores, sync namespaces (`ApneaReleaseSelfCheck`, `SnorkelingArchitectureIsolation`).
+- Settings registry (`ActivitySettingsVisibility`) blocks diving CNS/GF keys in Apnea/Snorkeling.
+- Architecture tests forbid `BuhlmannEngine`, `DiveManager`, cross-activity logbook symbols in Apnea/Snorkeling production sources.
+- **Verdict:** PASS — no P0 cross-activity math leakage detected.
 
-### Positive findings
+### E9. Watch Companion Math Boundary
 
-- CCR is iOS-only and does not contaminate Watch runtime.
-- CCR has a dedicated model and validation layer.
-- CCR uses setpoint-inspired inert pressures rather than directly feeding a tank gas as OC.
-- CCR plan results carry explicit reference-only warnings.
-- Bailout scenarios are clearly separated from active CCR decompression schedule.
-
-### Finding CCR-P1-001: gas density estimator appears not pressure-scaled
-
-**File:** `iOSApp/Services/CCR/CCRGasDensityEstimator.swift`  
-**Lines inspected:** 18-23  
-**Severity:** P1 mathematical correctness / safety warning correctness
-
-The estimator computes:
-
-```swift
-let o2Fraction = min(1, setpointBar / ambient)
-let n2Fraction = inspired.ppN2 / ambient
-let heFraction = inspired.ppHe / ambient
-return o2Fraction * 1.429 + n2Fraction * 1.251 + heFraction * 0.1786
-```
-
-This is composition-weighted density using reference gas densities, but it does not appear to multiply by ambient or dry pressure. At depth, breathing gas density should rise approximately with absolute pressure. As written, CCR gas density warnings can be materially under-reported at depth.
-
-**Impact:** Gas density timeline and warning thresholds can look safer than they are.
-
-**Recommended fix:** Compute density from partial pressures, for example:
-
-- `density = rhoO2At1Bar * ppO2 + rhoN2At1Bar * ppN2 + rhoHeAt1Bar * ppHe`
-- Use dry gas partial pressures consistently.
-- Add tests at 30 m, 60 m, air diluent, trimix diluent, and high setpoint.
-- If the current value is intended to be "surface equivalent composition density", rename it and do not use it against depth gas-density thresholds.
-
-### Finding CCR-P1-002: oxygen exposure failures fall back to zero
-
-**File:** `iOSApp/Services/CCR/CCRPlannerService.swift`  
-**Lines inspected:** 48-67  
-**Severity:** P1 safety-state correctness
-
-When `CCROxygenExposureIntegration.exposure(...)` fails, `cnsFull`, `otuFull`, and `cnsDB` are set to zero. That makes an unavailable/invalid exposure calculation appear safe.
-
-**Impact:** Failed CNS/OTU calculation can be presented as 0% / 0 OTU instead of unavailable.
-
-**Recommended fix:**
-
-- Add typed exposure state: `.available`, `.unavailable(reason:)`, `.invalidSegments`, `.modelLimitReached`.
-- Surface a warning and suppress safe-looking numeric values when unavailable.
-- Add tests for invalid segment duration, invalid setpoint, invalid environment, and failed exposure integration.
-
-### Finding CCR-P3-001: oxygen exposure synthetic gas labels use air diluent
-
-**File:** `iOSApp/Services/CCR/CCRInspiredGasModel.swift`  
-**Lines inspected:** 143-158  
-**Severity:** P3 maintainability / trace semantics
-
-`CCROxygenExposureIntegration.exposure(...)` builds an intermediate label gas using `diluent: .air`. Because `overridePPO2Gas(...)` drives oxygen exposure from the setpoint-derived oxygen fraction, this likely does not corrupt CNS/OTU math, but it can mislead trace labels and helium context.
-
-**Recommended fix:** Pass actual diluent through exposure segments or remove label-gas dependency from oxygen exposure.
-
-### Finding CCR-P2-001: bailout scenario calculator is heuristic
-
-**File:** `iOSApp/Services/CCR/CCRBailoutScenarioCalculator.swift`  
-**Lines inspected:** 39-43, 90-94  
-**Severity:** P2 model completeness / release claims
-
-The bailout calculator estimates required gas with SAC, ascent minutes, optional bottom fraction, and:
-
-```swift
-ceil(startDepth / stopIntervalMeters) * 3
-```
-
-This is a heuristic decompression-time proxy, not a Buhlmann OC bailout simulation from the current CCR tissue state.
-
-**Impact:** Safe if labeled as heuristic; not sufficient for release-hard bailout planning claims.
-
-**Recommended fix:** Either keep explicit heuristic labels everywhere or implement model-backed OC bailout simulation from CCR final/timeline tissue state with bailout gas switches.
+- Watch Full Computer uses shared Bühlmann via `FullComputerDecoSolver` — no duplicate ZH-L16C reimplementation.
+- TTV informational only (not NDL/TTS/deco authority on Gauge).
+- Apnea/Snorkeling Watch runtimes use dedicated engines, not DiveManager deco path.
+- **Tests executed:** `BuhlmannCoreCrossTargetEquivalenceTests` (5/5), `FullComputerDecoSolverTests` (9/9) — **PASS**.
 
 ---
 
-## G. Ratio Deco Audit
+## F. Findings By Priority
 
-### Evidence found
+### P0 — Release blockers
 
-- `RatioDecoPlanner.swift` implements ratio presets, stop depth construction, stop minute distribution, gas assignment, depth profile rows, and ascent rows.
-- `RatioDecoValidator.swift` validates the ratio schedule against planner/Buhlmann constraints.
-- Tests cover 1:1, 2:1, custom preset, base-mode rejection, CCR-mode rejection, Buhlmann preservation, TTS units, and PDF inclusion.
+*None.* No Bühlmann math regression, no cross-activity logbook math leakage, no mock CCR controller claims in production paths.
 
-### Assessment
+### P1 — Major
 
-Ratio Deco is implemented as a heuristic comparator, not an authoritative decompression model. This is acceptable if it remains clearly labeled and blocked from CCR mode.
+| ID | Finding | Status |
+|----|---------|--------|
+| IOS-MATH-APNEA-P1-001 | Apnea recovery policy computation vs lifecycle minimum desync — policy may require >60 s but lifecycle completes recovery at `recoveryMinimumSeconds` | **OPEN** |
+| IOS-MATH-P1-001 | CCR gas density not pressure-scaled | **CLOSED** @ prior remediation |
+| IOS-MATH-P1-002 | CCR CNS/OTU failure → zero | **CLOSED** @ prior remediation |
 
-### Remaining limitation
+### P2 — Moderate
 
-No external Ratio Deco fixture validation was executed in this environment.
+| ID | Finding | Status |
+|----|---------|--------|
+| IOS-MATH-P2-002 | External Bühlmann reference fixture evidence | **PENDING** |
+| IOS-MATH-P2-003 | PDF/briefing physical render QA | **PENDING** |
+| IOS-MATH-P2-001 | CCR bailout heuristic | **CLOSED** (documented metadata) |
+| IOS-MATH-P2-004 | OC `GasPlanningService` preview CNS coerces to 0 on exposure failure | **OPEN** (preview-only) |
+| IOS-MATH-P2-005 | `allowEarlyDiveWhenIncomplete` not wired to Apnea start gating | **OPEN** |
 
----
+### P3 — Minor
 
-## H. Gas Planning / Gas Schedule Audit
-
-### Evidence found
-
-- `GasPlanInput` supports Base, Deco, Technical, and CCR planner modes.
-- Gas roles include bottom, travel, deco, bailout, CCR diluent, and CCR bailout.
-- `PlannerGasSchedule` builds bottom gas, travel switches, deco gases, bailout availability warnings, and role schedule lines.
-- `ScheduleGasConsumptionService` analyzes per-cylinder gas allocation, consumption, available pressure, reserve pressure, minimum gas, lost gas contingency, and warnings.
-- Average-depth consumption is guarded by planner mode policy and does not appear to feed decompression math.
-
-### Assessment
-
-Gas planning is structurally strong. The planner avoids turning bailout gases into active decompression gases unless explicitly scheduled. It distinguishes CCR roles from OC roles.
-
-### Remaining limitation
-
-Rock-bottom/minimum-gas assumptions need field-policy validation. They are deterministic but should be reviewed by qualified diving experts before release claims.
+| ID | Finding | Status |
+|----|---------|--------|
+| IOS-MATH-P3-001 | CCR diluent trace labels | **CLOSED** |
+| IOS-MATH-P3-002 | Ratio Deco external simulator evidence | **PENDING** |
+| IOS-MATH-P3-003 | macOS build/test gate | **Not re-run** this pass (prior PASS documented) |
+| IOS-MATH-P3-004 | Legacy `ExplorationStore` simplified math remains in repo (excluded from MAIN target) | **OPEN** (low risk) |
 
 ---
 
-## I. Emergency Gas / Rock Bottom / Minimum Gas Audit
+## G. Test Coverage Audit (Phase 15)
 
-### Evidence found
+### Executed this audit @ 9b65ba8
 
-- `ScheduleGasConsumptionService.rockBottomLiters(...)`.
-- `automaticAscentMinutes(...)` tied to planner ascent speed settings.
-- Emergency extra minutes and team size normalization.
-- Warning states for reserve breach, minimum gas breach, lost gas contingency failure, invalid allocation.
+| Suite | Tests | Result |
+|-------|------:|--------|
+| iOS Bühlmann/CCR/Ratio/Gas/Ascent (focused) | 96 (1 skipped) | **PASS** |
+| Watch Apnea/Snorkeling/Bühlmann FC (focused) | 69 | **PASS** |
 
-### Assessment
+### Repository inventory (static)
 
-The implementation is conservative enough for planning reference if disclaimers remain visible. The model is not equivalent to a training-agency gas planning standard by itself.
+- iOS Algorithm Tests: ~493+ test methods (full suite not re-run this pass)
+- Watch Algorithm Tests: ~191+ test methods
+- Targeted math/planner scoped count: ~290 test methods
 
-### Recommendations
+### Gaps
 
-- Add scenario fixtures for common DIR team gas assumptions.
-- Document which rock-bottom philosophy is used.
-- Keep gas results as reference, not certification/training replacement.
-
----
-
-## J. Repetitive Dive / Residual Tissue Audit
-
-### Evidence found
-
-- `RepetitiveDivePlannerService` defines `TissueSnapshot` and `SurfaceIntervalModel`.
-- It validates snapshot missing/corrupted/stale/schema mismatch/environment/surface interval states.
-- It can seed follow-up Buhlmann requests from valid residual tissue state.
-
-### Assessment
-
-The architecture is coherent and avoids silently trusting stale or invalid snapshots. External validation should confirm residual tissue behavior over multi-dive profiles.
+- Repetitive dive: few dedicated math tests beyond seeding fixtures
+- Gas ledger formatter: only 2 formatter tests
+- Apnea recovery policy/lifecycle alignment: no test asserting policy duration governs lifecycle exit
+- External golden fixtures: folders exist, evidence not committed
 
 ---
 
-## K. Unit Conversion / Ambient Pressure / Salinity / Altitude Audit
+## H. Build / Test Execution Status (Phase 17)
 
-### Evidence found
-
-- `IOSUnitConversions.swift` centralizes common conversions.
-- `PlannerEnvironment` and `AmbientPressureModel` are used by Buhlmann/CCR pressure paths.
-- `BuhlmannGas.ambientPressureBar(...)` uses `IOSUnitConversions.ambientPressureBar` when environment is supplied and sea-level fallback otherwise.
-- Tests include pressure model unification and altitude behavior.
-
-### Assessment
-
-Unit discipline is strong. The main caveat is CCR density calculation, which uses ambient to compute fractions but not pressure-scaled density.
+| Step | Status |
+|------|--------|
+| `xcodegen generate` | Project current (`xcodegen_once` PASS) |
+| `./Scripts/check_main_target_isolation.sh` | **PASS** |
+| `./Scripts/audit_localization.sh` | **PASS** |
+| Focused iOS math suites | **96 tests PASS** (2026-06-19) |
+| Focused Watch math suites | **69 tests PASS** (2026-06-19) |
+| Full iOS + Watch test matrix | Not re-run (prior baseline 684 tests PASS @ remediation commits) |
 
 ---
 
-## L. MOD / PPO2 / Dalton Law Audit
+## I. Test Plan (Phase 19 — recommended, not executed)
 
-### Evidence found
-
-- `BuhlmannGas.ppO2(...)`.
-- `BuhlmannGas.modMeters(...)`.
-- `GasMixValidator.modMeters(...)`.
-- `PlannerMODValidator`.
-- `BuhlmannEngine.operationalIssues(...)`.
-- `PPO2DisplayTests`.
-
-### Assessment
-
-Open-circuit MOD/PPO2 handling appears correct and fail-closed. Gas switch validation checks hypoxic shallow use and PPO2 at depth.
-
-### Recommendation
-
-Retain actual PPO2 display and separate max PPO2. Do not reintroduce clipping.
+1. Add test: Apnea lifecycle recovery exit respects `ApneaRecoveryComputation.requiredRecoverySeconds` for ratio2to1 dives > 30 s.
+2. Wire and test `allowEarlyDiveWhenIncomplete` against `ApneaWatchPresentation.startEnabled`.
+3. Add OC preview test: oxygen exposure failure returns unavailable, not zero CNS.
+4. Populate `Docs/QA_EVIDENCE/BUHLMANN_EXTERNAL/` with signed external reference outputs.
+5. Physical PDF render QA for CCR setpoint/diluent/bailout sections.
+6. Repetitive dive golden test with 14-day staleness boundary.
+7. Snorkeling live vs persisted distance consistency test.
 
 ---
 
-## M. Tissue Analytics / Narcosis / END / EAD / PPN2 Audit
+## J. Prioritized Roadmap (Phase Y)
 
-### Evidence found
-
-- Tissue analytics support for planned Buhlmann, recorded sessions, manual estimates, CCR planned traces.
-- `CCRInspiredGasModel.ppN2Bar(...)` and `endMeters(...)`.
-- `NarcosisAnalyticsSupport.endMeters(...)`.
-- Tests include PPN2 and END checks.
-
-### Assessment
-
-Open-circuit tissue and narcosis analytics are coherent. CCR END appears based on ppN2, but CCR gas density needs correction before density warnings can be relied upon.
+| Priority | Item |
+|----------|------|
+| 1 — Before relying on Apnea recovery UX | Fix IOS-MATH-APNEA-P1-001 policy/lifecycle alignment |
+| 2 — Before external TestFlight math sign-off | Complete IOS-MATH-P2-002 external Bühlmann evidence |
+| 3 — Before App Store | IOS-MATH-P2-003 PDF physical QA; CCR external evidence |
+| 4 — Post-release | ExplorationStore removal; Apnea recovery phase kinds implementation |
+| 5 — Continuous | Expand repetitive dive and gas ledger formatter tests |
 
 ---
 
-## N. CNS / OTU Audit
+## K. Final Verdict (Phase Z)
 
-### Evidence found
+| Question | Answer |
+|----------|--------|
+| Mathematically ready for internal development? | **Yes** — CONDITIONAL PASS @ 88% |
+| Base/Deco/Technical modes real? | **Yes** — engine-backed, mode policy tested |
+| CCR mathematically coherent? | **Yes** — reference-only, P1 fixes intact |
+| CCR clearly reference-only? | **Yes** — disclaimers, export gating |
+| Ratio Deco safely comparative? | **Yes** — heuristic labeled, Bühlmann unchanged |
+| Bühlmann truthful? | **Yes** — shared engine, cross-target equivalence tests |
+| Apnea/Snorkeling math isolated? | **Yes** — architecture scanners PASS |
+| Rock Bottom conservative? | **Yes** — max-depth-based emergency path, ascent settings wired |
+| Runtime/deco presentation matches engine? | **Yes** — builders consume engine segments |
+| External validation complete? | **No** — PENDING |
+| Ready for internal TestFlight (math)? | **Yes** with Apnea recovery P1 documented |
+| Ready for external TestFlight / App Store (math)? | **No** — external evidence + Apnea P1 block full sign-off |
 
-- `OxygenExposureModel` and related tests for CNS/OTU.
-- CCR uses `CCROxygenExposureIntegration.exposure(...)`.
-- Planner service includes descent+bottom CNS warning logic.
+**FINAL RESULT: CONDITIONAL PASS**
 
-### Assessment
-
-The base oxygen exposure model appears well covered. The CCR service-level failure fallback to zero is the main issue.
-
-### Required hardening
-
-- Do not display failed CNS/OTU as zero.
-- Add unavailable/warning result state.
-- Test invalid CCR exposure segment handling.
-
----
-
-## O. Logbook / Manual Dive / Import / Export / Sync Math Audit
-
-### Evidence found
-
-- `DiveProfileMath`, `DiveImportService`, `SubsurfaceExportService`, `DiveSessionMerge`, and Watch sync codecs are included in iOS algorithm test target.
-- Tests cover time-weighted average, empty profile rejection, out-of-order timestamps, invalid depths, invalid GPS, merge recomputation, 41st log behavior, and sync validation.
-- Manual dive validation/defaults are present.
-
-### Assessment
-
-The iOS logbook/import/export math has strong automated coverage by static inventory. macOS test execution is still required to verify pass/fail on current HEAD.
+Internal mathematical readiness is strong with extensive automated coverage. **100% overall readiness is blocked by:** (1) pending external validation evidence, (2) Apnea recovery policy/lifecycle desync (P1), (3) physical PDF/render QA gaps.
 
 ---
 
-## P. PDF / Share / Planner Briefing Cards Audit
+## L. Related Deliverables
 
-### Evidence found
-
-- `PlannerPDFBuilder`, `BriefingPDFBuilder`, `CCRPlannerPDFBuilder`, `DivePackPDFBuilder`, `ChecklistPDFBuilder`.
-- `PDFExportService.canExportPlan(...)` and `canExportCCRPlan(...)`.
-- `PlannerBriefingImageExportService`.
-- `PlannerBriefingWatchTransferService`.
-- Shared `PlannerBriefingCard` model with hashing, manifest encoding, metadata validation, package size limits.
-- Watch receiver validates file type, package metadata, hash, and manifest/card matching.
-
-### Assessment
-
-The architecture is sound. Remaining risk is render and device transfer QA, not core math.
-
-### Recommendations
-
-- Run PDF snapshot/render checks on macOS.
-- Pair iPhone/Watch and verify briefing card transfer, import, reject, ACK, and display.
+| Document | Purpose |
+|----------|---------|
+| [`IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_REMEDIATION_REPORT_CURRENT.md) | Prior CCR P1 remediation (closed) |
+| [`IOS_MAIN_ALGORITHM_MATH_POST_AUDIT_FIX_REPORT_CURRENT.md`](IOS_MAIN_ALGORITHM_MATH_POST_AUDIT_FIX_REPORT_CURRENT.md) | Post-audit fix evidence |
+| [`WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md`](WATCH_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md) | Watch-focused audit (Command 2) |
+| [`DIR_DIVING_UI_UX_READINESS_AND_MOCKUP_AUDIT_CURRENT.md`](DIR_DIVING_UI_UX_READINESS_AND_MOCKUP_AUDIT_CURRENT.md) | UI/UX audit (Command 15) |
 
 ---
 
-## Q. Structured Equipment / Checklist Audit
+## M. Version History
 
-### Evidence found
+| Version | Date | Notes |
+|---------|------|-------|
+| V2.0 | 2026-06-13 | Initial CCR audit @ `5b85505`; P1 findings remediated |
+| V3.0 | 2026-06-19 | Three-mode scope; Apnea/Snorkeling math; re-test @ `9b65ba8`; IOS-MATH-APNEA-P1-001 |
 
-- `EquipmentPlannerMapper` maps equipment profiles to planner input while filtering unsupported roles by mode.
-- `EquipmentChecklistGenerator` generates structured checklist items for OC and CCR configurations.
-- `CCRChecklistExportCoordinator` and `CCRChecklistImportCoordinator` support CCR gas/checklist synchronization.
-- UI/UX remediation tests mention CCR import role preservation.
-
-### Assessment
-
-Checklist-to-planner integration is mathematically relevant because it can seed gases and cylinders. The role filter appears appropriate.
-
-### Recommendation
-
-Add explicit release QA for round-trip checklist export/import with trimix diluent and multiple bailout gases.
-
----
-
-## R. Watch Runtime / Watch Math Boundary Audit
-
-### Evidence found
-
-- Watch algorithm tests cover depth validation, lifecycle, haptics, GPS, log cap, temperature bounds, merge, export, sync, reminders, and App Intents.
-- Watch documentation states no CCR, no Buhlmann, no Ratio Deco runtime.
-- `project.yml` keeps iOS algorithm files in iOS target and Watch runtime isolated.
-- Planner briefing cards are visual/reference artifacts, not live decompression runtime.
-
-### Assessment
-
-The Watch remains an informational dive companion/logging runtime. The iOS CCR/Buhlmann planner does not appear to add live decompression authority to Watch MAIN.
-
----
-
-## S. Test Coverage Audit
-
-### Static test inventory
-
-- iOS algorithm test methods: **770**
-- Watch algorithm test methods: **216**
-
-### Areas with strong listed coverage
-
-- Buhlmann constants, pressure model, tissue loading, Schreiner equation.
-- Ceiling, GF, NDL, multigas, trimix/helium, reference fixtures.
-- Planner validation, MOD/PPO2, gas density scenarios, CNS/OTU.
-- Ratio Deco heuristic validation.
-- Planner ascent settings and gas ledger.
-- Import/export/sync validation.
-- Manual dive and logbook math.
-- PDF/briefing output assertions.
-- Watch algorithm isolation and runtime safety.
-
-### Areas needing added/confirmed coverage
-
-- CCR gas density pressure scaling at multiple depths and diluents.
-- CCR oxygen exposure failure surfaces unavailable, not zero.
-- CCR bailout model limitation tests remain explicit and visible.
-- Full external fixture parity with third-party Buhlmann/CCR references.
-- macOS/Xcode build and test evidence on current HEAD.
-
----
-
-## T. Findings And Priority Ranking
-
-### P0 - safety-critical blockers
-
-No direct P0 code issue was confirmed from static inspection. The app still must not be marketed as certified or life-supporting.
-
-### P1 - critical algorithmic correctness
-
-| ID | Title | File | Impact | Recommended action |
-|---|---|---|---|---|
-| IOS-MATH-P1-001 | CCR gas density appears not pressure-scaled | `iOSApp/Services/CCR/CCRGasDensityEstimator.swift` | Density warnings can under-report at depth | Compute density from partial pressures and add tests. |
-| IOS-MATH-P1-002 | CCR CNS/OTU exposure failure falls back to zero | `iOSApp/Services/CCR/CCRPlannerService.swift` | Unavailable exposure can appear safe | Add unavailable state and warning; suppress safe-looking zero. |
-
-### P2 - data integrity / model completeness
-
-| ID | Title | File | Impact | Recommended action |
-|---|---|---|---|---|
-| IOS-MATH-P2-001 | CCR bailout remains heuristic | `CCRBailoutScenarioCalculator.swift` | Not release-hard bailout decompression planning | Keep disclosure or implement OC bailout simulation. |
-| IOS-MATH-P2-002 | External Buhlmann/CCR fixture evidence pending | `Docs/CCR_REBREATHER_VALIDATION_PLAN.md` and test docs | Cannot claim external parity | Run documented fixture validation and store evidence. |
-| IOS-MATH-P2-003 | PDF/briefing output needs render/device QA | PDF and briefing services | Math may be correct but user artifacts must be verified | Run macOS render and paired Watch QA. |
-
-### P3 - maintainability / clarity
-
-| ID | Title | File | Impact | Recommended action |
-|---|---|---|---|---|
-| IOS-MATH-P3-001 | CCR oxygen exposure label uses `.air` diluent | `CCRInspiredGasModel.swift` | Trace/label semantics can confuse future maintenance | Pass actual diluent or decouple label gas. |
-| IOS-MATH-P3-002 | Ratio Deco requires ongoing heuristic labeling | `RatioDecoPlanner.swift` | Could be misread as decompression authority | Keep warnings and tests. |
-| IOS-MATH-P3-003 | Windows audit cannot replace macOS build/test | repo process | Release gate incomplete | Run `xcodegen` and `xcodebuild test` on macOS. |
-
----
-
-## U. Implementation Plan For Remaining Issues
-
-### Phase 1 - CCR safety math corrections
-
-1. Update `CCRGasDensityEstimator` to compute g/L from partial pressures.
-2. Add tests:
-   - air diluent at 10, 30, 60 m.
-   - trimix diluent at 30 and 60 m.
-   - high setpoint vs low setpoint.
-   - invalid setpoint/depth returns unavailable.
-3. Update CCR result warnings when density exceeds thresholds.
-
-### Phase 2 - CCR oxygen exposure failure semantics
-
-1. Add a typed CCR oxygen exposure state.
-2. Replace zero fallback with unavailable/warning state.
-3. Ensure UI existing layout can show warning without visual redesign.
-4. Add tests for invalid segment, invalid setpoint, invalid environment, and empty segment behavior.
-
-### Phase 3 - CCR bailout truthfulness
-
-Choose one policy:
-
-- **Policy A:** Keep heuristic. Strengthen labels, tests, and docs.
-- **Policy B:** Implement model-backed OC bailout schedule from CCR tissue state and bailout gas switches.
-
-For release-hard math claims, Policy B is preferable but larger.
-
-### Phase 4 - External validation evidence
-
-1. Run reference profiles against trusted external planner(s).
-2. Store expected values and tolerance ranges.
-3. Add or update fixture tests.
-4. Record evidence in Docs QA folders.
-
-### Phase 5 - macOS validation
-
-Run on macOS:
-
-```bash
-xcodegen generate
-xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving iOS" -destination 'platform=iOS Simulator,name=iPhone 15' build
-xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving iOS Algorithm Tests" -destination 'platform=iOS Simulator,name=iPhone 15' test
-```
-
----
-
-## V. Edge Cases To Keep Testing
-
-- Invalid gas O2 + He > 100%.
-- Hypoxic trimix at surface.
-- Oxygen deco gas too deep.
-- GF low equals/high exceeds policy.
-- Altitude pressure model with MOD/ceiling.
-- Very shallow stop rounding near 3 m.
-- NDL at zero/min depth.
-- Calculation-limit profiles.
-- CCR setpoint higher than dry ambient.
-- CCR gas density at high pressure.
-- CCR oxygen exposure invalid segment failure.
-- Empty profile export.
-- Out-of-order profile import.
-- Sync payload with invalid GPS or sample timestamps.
-- Repetitive dive stale/corrupt tissue snapshot.
-- Watch briefing card oversized/hash mismatch.
-
----
-
-## W. Documentation Alignment
-
-The repository already contains substantial documentation for current state:
-
-- `Docs/1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_CURRENT.md`
-- `Docs/CCR_REBREATHER_VALIDATION_PLAN.md`
-- `Docs/CCR_REBREATHER_EXPORT_POLICY.md`
-- `Docs/IOS_MAIN_COMPLETE_ALGORITHM_AUDIT_REMEDIATION_REPORT.md`
-- `Docs/2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_CURRENT.md`
-- `Docs/WATCH_CSV_EXPORT_POLICY.md`
-- `Docs/UI_UX_MAIN_AUDIT_CURRENT.md`
-
-This report supersedes the older `IOS_MAIN_ALGORITHM_MATH_AUDIT_CURRENT.md` snapshot for the current HEAD and date.
-
----
-
-## X. Build / Test Execution Status
-
-| Command | Status | Notes |
-|---|---|---|
-| `xcodegen generate` | **Executed** @ 2026-06-14 remediation validation | macOS |
-| iOS build | **BUILD SUCCEEDED** | generic iOS Simulator |
-| iOS Algorithm Tests | **812 executed, 13 skipped, 0 failed** | iPhone 17 Pro simulator |
-| Watch build | **BUILD SUCCEEDED** | generic watchOS Simulator |
-| Watch Algorithm Tests | **201 executed, 16 skipped, 0 failed** | Apple Watch Ultra 3 (49mm) |
-| Static code inventory | Done | `rg`, file inspection, Phase 19 scans |
-| Branch/remote alignment | Done | `main` @ remediation validation |
-
-*Original audit (2026-06-13) ran on Windows without Apple tooling; macOS evidence added by remediation pass.*
-
----
-
-## Y. Release Gate Status
-
-| Gate | Verdict |
-|---|---|
-| Ready for local macOS compile attempt | Yes |
-| Ready for internal engineering review | Yes |
-| Ready for internal TestFlight with CCR hidden/flagged as reference | Conditional |
-| Ready to claim OC Buhlmann reference planner maturity | Conditional on external fixtures |
-| Ready to claim CCR release-hard mathematical planner | No, not until P1 CCR fixes and external fixtures |
-| Ready to claim certified dive computer/decompression authority | No, and must never do so without certification |
-| Ready for App Store math claims | Not yet; needs legal and validation evidence |
-
----
-
-## Z. Final Verdict
-
-The current MAIN iOS Companion code is working from the latest local/remote-aligned repository snapshot and contains a mature algorithmic base. The open-circuit Buhlmann ZHL-16C multigas planner is materially implemented.
-
-**@ audit baseline (`5b85505`):** Two P1 CCR issues were open (density scaling, CNS/OTU zero fallback).
-
-**@ post-remediation (`8147b3f`+):** All confirmed code-fixable math findings are **closed**. Internal engineering readiness is **100%** for code, automated tests, and documentation alignment. CCR planning is isolated with pressure-scaled density, unavailable exposure semantics, explicit heuristic bailout metadata, and actual diluent trace preservation.
-
-**Next milestone:** validation **evidence** (external Bühlmann/CCR fixtures, Subsurface desktop, paired Watch briefing QA, iCloud two-device QA) — not additional algorithm rewrites.
-
-No code was changed by the original audit beyond updating this Markdown report. Remediation landed in `8147b3f`+; see `Docs/IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT_V1.0.md`.
+**Audit-only rule observed:** no production code modified by this task.
