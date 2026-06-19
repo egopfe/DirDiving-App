@@ -65,9 +65,11 @@ enum SnorkelingLocalizationCatalog {
             regex.enumerateMatches(in: source, range: range) { match, _, _ in
                 guard let match, let keyRange = Range(match.range(at: 1), in: source) else { return }
                 let key = String(source[keyRange])
-                if !key.hasSuffix(".tests") {
-                    keys.insert(key)
+                if key.hasSuffix(".tests") { return }
+                if key.hasPrefix("snorkeling.watch.") || key.hasPrefix("snorkeling.ios.") {
+                    return
                 }
+                keys.insert(key)
             }
         }
         return keys
