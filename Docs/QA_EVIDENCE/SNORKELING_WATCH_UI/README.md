@@ -1,36 +1,73 @@
-# SNORKELING_WATCH_UI — Physical QA Evidence
+# Physical QA — SNORKELING_WATCH_UI
 
-**Status:** PENDING  
-**Scope:** Snorkeling Watch Commands 04–07 physical validation  
-**App SHA:** (record at test time)  
-**Tester:** (name)  
-**Date:** (YYYY-MM-DD)
+| Field | Value |
+|-------|-------|
+| **QA ID** | SNK-QA-005 |
+| **Command category** | SNORKELING_WATCH_UI |
+| **Status** | **PENDING** |
+| **Branch** | (record at execution) |
+| **Commit** | (record at execution) |
+| **Purpose** | Watch UI stages: ready, surface, dip, nav, return, marker, summary |
+| **Required device** | Physical Apple Watch |
+| **Tester** | |
+| **Reviewer** | |
+| **Execution date** | |
+| **iPhone model** | |
+| **iOS version** | |
+| **Watch model** | |
+| **watchOS version** | |
+| **App build** | |
+| **Test environment** | |
+| **Rollback required** | NO |
 
-## Prerequisites
+## Preconditions
 
-- Production or TestFlight build on physical Apple Watch
-- Paired iPhone when required
-- Document watch model (41 / 45–46 / 49 mm) and watchOS version
+Snorkeling session plan or manual session
 
-## Steps
+## Test steps
 
-1. Install the build at the recorded SHA.
-2. Execute the scenario described in this folder name.
-3. Capture screenshot, video, or log file.
-4. Record observed result.
+1. Install the build at the recorded commit SHA.
+2. Execute the scenario for **SNORKELING_WATCH_UI** per `PROCEDURE.md` when present.
+3. Capture screenshot, video, or log artifacts under this folder (do not commit until reviewed).
+4. Record observed results and compare to expected results.
+5. Obtain tester and reviewer signatures before marking PASS.
 
-## Expected result
+## Expected results
 
-(Document per scenario before execution.)
+(Document per scenario before execution. Do not mark PASS without matching observed behavior.)
 
-## Observed result
+## Observed results
 
-(Pending physical execution.)
+**PENDING** — no physical evidence recorded yet.
 
-## Evidence files
+## Evidence artifacts
 
-- `evidence-YYYYMMDD.ext` (not committed until captured)
+- (none — add `evidence-YYYYMMDD.ext` paths after capture)
+
+## Battery / thermal notes
+
+(Required for battery/thermal scenarios; optional otherwise.)
+
+## Linked issues
+
+- (none)
+
+## Signatures
+
+| Role | Name | Date |
+|------|------|------|
+| Tester | | |
+| Reviewer | | |
+
+## Tester signature
+
+(pending)
+
+## Reviewer signature
+
+(pending)
 
 ## Verdict
 
-**PENDING** — PASS requires attached evidence. Do not mark PASS without proof.
+**PENDING** — PASS requires completed steps, attached artifacts, tester signature, and reviewer signature.
+Do not mark PASS without real device execution.

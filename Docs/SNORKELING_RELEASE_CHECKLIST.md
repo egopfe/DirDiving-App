@@ -16,6 +16,9 @@
 - [ ] EXIF GPS removal asserted at metadata level
 - [ ] EN + IT localization audit passes (`audit_localization.sh`)
 - [ ] Implementation reports Commands 04–11 indexed in `Docs/INDEX.md`
+- [ ] All 21 `Docs/QA_EVIDENCE/SNORKELING_*` templates complete (`validate_snorkeling_qa_evidence.py --internal`)
+- [ ] `FullComputerTargetMembershipTests` and `DIRModesAndStartupFlowTests` aligned with Snorkeling MAIN promotion
+- [ ] VoiceOver / Water Lock / battery procedures in `Docs/QA_EVIDENCE/*/PROCEDURE.md` where applicable
 
 ## TestFlight (requires physical QA)
 
@@ -25,7 +28,7 @@
 - [ ] Real GPS acquisition, gap recovery, airplane mode
 - [ ] VoiceOver on all seven Watch stages + iOS tabs
 - [ ] Battery/thermal under 90+ minute session
-- [ ] Populate `Docs/QA_EVIDENCE/SNORKELING_*` with PASS evidence
+- [ ] Populate `Docs/QA_EVIDENCE/SNORKELING_*` with PASS evidence (see `SNORKELING_QA_EVIDENCE_INDEX.md`)
 
 ## App Store
 

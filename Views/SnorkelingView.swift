@@ -109,6 +109,7 @@ struct SnorkelingView: View {
 
     private var gpsPill: some View {
         DiveStatusPill(ui.gpsStatusText, color: color(for: ui.gpsStatusColorToken), systemImage: "location.fill")
+            .accessibilityIdentifier("snorkeling.watch.gps_status")
             .accessibilityLabel(String(localized: "snorkeling.a11y.gps_status"))
             .accessibilityValue(ui.gpsStatusText)
     }
@@ -120,18 +121,25 @@ struct SnorkelingView: View {
         switch ui.stage {
         case .ready:
             readyPanel
+                .accessibilityIdentifier("snorkeling.watch.stage.ready")
         case .surfaceDashboard:
             surfaceDashboardPanel
+                .accessibilityIdentifier("snorkeling.watch.stage.surface")
         case .dipInProgress:
             dipPanel
+                .accessibilityIdentifier("snorkeling.watch.stage.dip")
         case .navigation:
             navigationPanel
+                .accessibilityIdentifier("snorkeling.watch.stage.navigation")
         case .returnToEntry:
             returnPanel
+                .accessibilityIdentifier("snorkeling.watch.stage.return")
         case .saveMarker:
             saveMarkerPanel
+                .accessibilityIdentifier("snorkeling.watch.stage.marker")
         case .sessionSummary:
             sessionSummaryPanel
+                .accessibilityIdentifier("snorkeling.watch.stage.summary")
         }
     }
 

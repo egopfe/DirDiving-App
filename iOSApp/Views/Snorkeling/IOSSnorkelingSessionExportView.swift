@@ -105,6 +105,7 @@ struct IOSSnorkelingSessionExportView: View {
                 ShareSheetView(activityItems: [exportURL])
             }
         }
+        .accessibilityIdentifier("snorkeling.ios.export")
     }
 
     private func exportRow(_ titleKey: String, icon: String, format: SnorkelingExportFormat) -> some View {
