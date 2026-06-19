@@ -56,12 +56,13 @@ enum GasPlanningService {
             gas: BuhlmannGas(gas: gas, role: .bottom, switchDepthMeters: planningDepth),
             note: "Bottom"
         )
-        let previewDescentBottomCNS: Double
-        switch OxygenExposureModel.cnsPercentDescentAndBottom(segments: [bottomSegment], environment: environment) {
-        case .success(let percent):
-            previewDescentBottomCNS = min(300, max(0, percent))
-        case .failure:
-            previewDescentBottomCNS = 0
+        let previewDescentBottom = resolvedCNSDescentBottomResolution(
+            segments: [bottomSegment],
+            environment: environment
+        )
+        var previewExtraStates = validation.states
+        if !previewDescentBottom.available {
+            previewExtraStates = mergeStates(previewExtraStates, [.calculationIncomplete])
         }
         switch OxygenExposureModel.from(segments: [bottomSegment], environment: environment, carryover: .zero) {
         case .success(let exposure):
@@ -80,8 +81,9 @@ enum GasPlanningService {
                 minimumGasBar: minimumGasBar,
                 turnPressure: turnPressure,
                 exposure: exposure,
-                cnsDescentBottomPercent: previewDescentBottomCNS,
-                extraStates: validation.states,
+                cnsDescentBottomPercent: previewDescentBottom.percent,
+                cnsDescentBottomAvailable: previewDescentBottom.available,
+                extraStates: previewExtraStates,
                 exposureSegments: [bottomSegment],
                 usesBottomPhaseConsumptionEstimate: true
             )
@@ -105,11 +107,14 @@ enum GasPlanningService {
             return base
         }
         let environment: PlannerEnvironment
-        let cnsDescentBottomPercent: Double
+        let descentBottomResolution: CNSDescentBottomResolution
         switch PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) {
         case .success(let value):
             environment = value
-            cnsDescentBottomPercent = resolvedCNSDescentBottomPercent(enginePlan: enginePlan, environment: value)
+            descentBottomResolution = resolvedCNSDescentBottomResolution(
+                segments: enginePlan.segments,
+                environment: value
+            )
         case .failure:
             return TechnicalGasAnalysis(
                 gas: base.gas,
@@ -126,6 +131,7 @@ enum GasPlanningService {
                 turnPressureBar: base.turnPressureBar,
                 cnsPercent: base.cnsPercent,
                 cnsDescentBottomPercent: 0,
+                cnsDescentBottomAvailable: false,
                 otu: base.otu,
                 cnsDailyPercent: base.cnsDailyPercent,
                 otuDaily24h: base.otuDaily24h,
@@ -166,7 +172,8 @@ enum GasPlanningService {
                 minimumGasBar: base.minimumGasBar,
                 turnPressureBar: base.turnPressureBar,
                 cnsPercent: base.cnsPercent,
-                cnsDescentBottomPercent: cnsDescentBottomPercent,
+                cnsDescentBottomPercent: descentBottomResolution.percent,
+                cnsDescentBottomAvailable: descentBottomResolution.available,
                 otu: base.otu,
                 cnsDailyPercent: base.cnsDailyPercent,
                 otuDaily24h: base.otuDaily24h,
@@ -198,9 +205,13 @@ enum GasPlanningService {
                 from: exposure,
                 segments: enginePlan.segments,
                 environment: environment,
-                cnsDescentBottomPercent: cnsDescentBottomPercent
+                cnsDescentBottomPercent: descentBottomResolution.percent,
+                cnsDescentBottomAvailable: descentBottomResolution.available
             )
         )
+        if !descentBottomResolution.available {
+            states = mergeStates(states, [.calculationIncomplete])
+        }
         if maxDensity >= input.densityDangerLimit {
             states = mergeStates(states, [.gasDensityDanger])
         } else if maxDensity >= input.densityWarningLimit {
@@ -253,7 +264,8 @@ enum GasPlanningService {
                 minimumGasBar: base.minimumGasBar,
                 turnPressureBar: base.turnPressureBar,
                 cnsPercent: min(300, exposure.cnsSinglePercent),
-                cnsDescentBottomPercent: cnsDescentBottomPercent,
+                cnsDescentBottomPercent: descentBottomResolution.percent,
+                cnsDescentBottomAvailable: descentBottomResolution.available,
                 otu: exposure.otuDive,
                 cnsDailyPercent: min(300, exposure.cnsDailyPercent),
                 otuDaily24h: exposure.otuDaily24h,
@@ -281,7 +293,8 @@ enum GasPlanningService {
             minimumGasBar: base.minimumGasBar,
             turnPressureBar: base.turnPressureBar,
             cnsPercent: min(300, exposure.cnsSinglePercent),
-            cnsDescentBottomPercent: cnsDescentBottomPercent,
+            cnsDescentBottomPercent: descentBottomResolution.percent,
+            cnsDescentBottomAvailable: descentBottomResolution.available,
             otu: exposure.otuDive,
             cnsDailyPercent: min(300, exposure.cnsDailyPercent),
             otuDaily24h: exposure.otuDaily24h,
@@ -293,17 +306,31 @@ enum GasPlanningService {
         )
     }
 
-    private static func resolvedCNSDescentBottomPercent(
+    private struct CNSDescentBottomResolution: Hashable {
+        let percent: Double
+        let available: Bool
+    }
+
+    private static func resolvedCNSDescentBottomResolution(
+        segments: [BuhlmannRuntimeSegment],
+        environment: PlannerEnvironment
+    ) -> CNSDescentBottomResolution {
+        switch OxygenExposureModel.cnsPercentDescentAndBottom(segments: segments, environment: environment) {
+        case .success(let percent):
+            guard percent.isFinite else {
+                return CNSDescentBottomResolution(percent: 0, available: false)
+            }
+            return CNSDescentBottomResolution(percent: min(300, max(0, percent)), available: true)
+        case .failure:
+            return CNSDescentBottomResolution(percent: 0, available: false)
+        }
+    }
+
+    private static func resolvedCNSDescentBottomResolution(
         enginePlan: BuhlmannEngineResult,
         environment: PlannerEnvironment
-    ) -> Double {
-        switch OxygenExposureModel.cnsPercentDescentAndBottom(segments: enginePlan.segments, environment: environment) {
-        case .success(let percent):
-            guard percent.isFinite else { return 0 }
-            return min(300, max(0, percent))
-        case .failure:
-            return 0
-        }
+    ) -> CNSDescentBottomResolution {
+        resolvedCNSDescentBottomResolution(segments: enginePlan.segments, environment: environment)
     }
 
     static func ppO2(gas: GasMix, depthMeters: Double, environment: PlannerEnvironment = .seaLevelSaltWater) -> Double {
@@ -691,6 +718,7 @@ enum GasPlanningService {
         turnPressure: Double,
         exposure: OxygenExposureResult,
         cnsDescentBottomPercent: Double,
+        cnsDescentBottomAvailable: Bool = true,
         extraStates: [PlannerResultState],
         exposureSegments: [BuhlmannRuntimeSegment] = [],
         usesBottomPhaseConsumptionEstimate: Bool = false
@@ -710,7 +738,8 @@ enum GasPlanningService {
                 from: exposure,
                 segments: exposureSegments,
                 environment: input.plannerEnvironment,
-                cnsDescentBottomPercent: cnsDescentBottomPercent
+                cnsDescentBottomPercent: cnsDescentBottomPercent,
+                cnsDescentBottomAvailable: cnsDescentBottomAvailable
             )
         )
         return TechnicalGasAnalysis(
@@ -728,6 +757,7 @@ enum GasPlanningService {
             turnPressureBar: turnPressure,
             cnsPercent: min(300, exposure.cnsSinglePercent),
             cnsDescentBottomPercent: cnsDescentBottomPercent,
+            cnsDescentBottomAvailable: cnsDescentBottomAvailable,
             otu: exposure.otuDive,
             cnsDailyPercent: min(300, exposure.cnsDailyPercent),
             otuDaily24h: exposure.otuDaily24h,
@@ -744,6 +774,7 @@ enum GasPlanningService {
         segments: [BuhlmannRuntimeSegment] = [],
         environment: PlannerEnvironment = .seaLevelSaltWater,
         cnsDescentBottomPercent: Double = 0,
+        cnsDescentBottomAvailable: Bool = true,
         cnsDescentBottomCheckEnabled: Bool = PlannerCNSDescentBottomCheckSettings.isEnabled,
         cnsDescentBottomThresholdPercent: Double = PlannerCNSDescentBottomCheckSettings.thresholdPercentDouble
     ) -> [PlannerResultState] {
@@ -768,6 +799,7 @@ enum GasPlanningService {
             }
         }
         if cnsDescentBottomCheckEnabled,
+           cnsDescentBottomAvailable,
            CNSDescentBottomPlannerRule.exceedsPlannerThreshold(
             percent: cnsDescentBottomPercent,
             thresholdPercent: cnsDescentBottomThresholdPercent
@@ -804,6 +836,7 @@ enum GasPlanningService {
             turnPressureBar: 0,
             cnsPercent: 0,
             cnsDescentBottomPercent: 0,
+            cnsDescentBottomAvailable: false,
             otu: 0,
             cnsDailyPercent: 0,
             otuDaily24h: 0,

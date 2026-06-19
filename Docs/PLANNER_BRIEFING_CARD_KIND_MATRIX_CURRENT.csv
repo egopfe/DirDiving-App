@@ -1,0 +1,6 @@
+Card_Kind,iOS_Export,Transfer,Watch_Decode,Persist,Display,Delete,Stale,Reference_Only,Notes
+decoStops,yes,yes,yes,yes,yes,yes,yes,yes,OC/Technical planner deco stop PNG cards
+runtime,yes,yes,yes,yes,yes,yes,yes,yes,Dive runtime / ascent table cards
+ccrSummary,yes,yes,yes,yes,yes,yes,yes,yes,CCR planner summary cards; reference-only
+gasEmergency,removed,removed,filtered,filtered,n/a,n/a,n/a,n/a,Legacy kind removed @ remediation; lenient decode drops historical payloads
+futureUnknown,removed,removed,filtered,filtered,n/a,n/a,n/a,n/a,Unknown future kinds filtered without crash

@@ -1580,7 +1580,7 @@ struct PlanResultView: View {
     }
 
     private var cnsDescentBottomTileAccessibilityLabel: String {
-        let value = Formatters.zero(store.plan.gasAnalysis.cnsDescentBottomPercent)
+        let value = store.plan.gasAnalysis.cnsDescentBottomPercentDisplay
         let base = "\(DIRIOSLocalizer.string("planner.metric.cns_descent_bottom")), \(value) percent"
         guard cnsDescentBottomWarningActive else { return base }
         return String(
@@ -1812,7 +1812,7 @@ struct PlanResultView: View {
         lines.append(
             String(
                 format: DIRIOSLocalizer.string("planner.export.cns_descent_bottom_line"),
-                Formatters.zero(store.plan.gasAnalysis.cnsDescentBottomPercent)
+                store.plan.gasAnalysis.cnsDescentBottomPercentDisplay
             )
         )
         lines.append(

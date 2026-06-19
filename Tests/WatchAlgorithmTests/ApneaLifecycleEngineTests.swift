@@ -81,7 +81,9 @@ final class ApneaLifecycleEngineTests: XCTestCase {
             manualSurfaceTriggered: true,
             sessionArmed: true,
             endSessionRequested: false,
-            tickOnly: false
+            tickOnly: false,
+            requiredRecoverySeconds: testConfiguration().recoveryMinimumSeconds,
+            allowEarlyDiveWhenIncomplete: false
         )
         let output = ApneaLifecycleStateMachine.evaluate(input: input, tracker: tracker)
         XCTAssertEqual(output.tracker.phase, .surfaced)
@@ -106,7 +108,9 @@ final class ApneaLifecycleEngineTests: XCTestCase {
             manualSurfaceTriggered: false,
             sessionArmed: true,
             endSessionRequested: false,
-            tickOnly: false
+            tickOnly: false,
+            requiredRecoverySeconds: 120,
+            allowEarlyDiveWhenIncomplete: false
         )
         let output = ApneaLifecycleStateMachine.evaluate(input: input, tracker: tracker)
         XCTAssertTrue(output.events.contains(where: {
