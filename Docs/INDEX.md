@@ -1,7 +1,78 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-18  
+**Aggiornato:** 2026-06-19  
 **Branch consigliato:** `main` = `origin/main`
+
+---
+
+## Aggiornamento indice 2026-06-19 — Audit 12 Snorkeling release gate
+
+Audit indipendente read-only post Command 12.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `12_AUDIT_SNORKELING_RELEASE_GATE.md` |
+| **Report** | [`AUDIT_SNORKELING_RELEASE_GATE_CURRENT.md`](AUDIT_SNORKELING_RELEASE_GATE_CURRENT.md) |
+| **Verdict** | Internal 100%; external **GO WITH CONDITIONS** |
+| **Gate** | `SNORKELING_RELEASE_HARD_INTERNAL_GO` |
+
+---
+
+## Aggiornamento indice 2026-06-19 — Snorkeling Command 12 release hardening
+
+Mockup matrix, architecture doc, release checklist, hardened validation script.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `12_SNORKELING_RELEASE_HARDENING_AND_DOCUMENTATION.md` |
+| **Architecture** | [`SNORKELING_ARCHITECTURE.md`](SNORKELING_ARCHITECTURE.md) |
+| **Checklist** | [`SNORKELING_RELEASE_CHECKLIST.md`](SNORKELING_RELEASE_CHECKLIST.md) |
+| **Test matrix** | [`SNORKELING_RELEASE_HARD_TEST_MATRIX.md`](SNORKELING_RELEASE_HARD_TEST_MATRIX.md) |
+| **Validation report** | [`DIR_DIVING_SNORKELING_RELEASE_HARD_VALIDATION_REPORT.md`](DIR_DIVING_SNORKELING_RELEASE_HARD_VALIDATION_REPORT.md) |
+| **Gate** | [`AUDIT_SNORKELING_RELEASE_GATE_CURRENT.md`](AUDIT_SNORKELING_RELEASE_GATE_CURRENT.md) |
+| **Mockups** | `Docs/ReferenceUI/Snorkeling/` (10 PNG) |
+| **Gate** | `SNORKELING_RELEASE_HARD_INTERNAL_GO` |
+
+---
+
+## Aggiornamento indice 2026-06-19 — Audit 11 remediation V1.0
+
+Chiusura finding AUDIT11-SNK-001…006; gate incondizionato Command 12.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit** | [`AUDIT_SNORKELING_IOS_MAPS_SYNC_EXPORT_CURRENT.md`](AUDIT_SNORKELING_IOS_MAPS_SYNC_EXPORT_CURRENT.md) |
+| **Remediation** | [`SNORKELING_IOS_MAPS_SYNC_EXPORT_REMEDIATION_REPORT_V1.0.md`](SNORKELING_IOS_MAPS_SYNC_EXPORT_REMEDIATION_REPORT_V1.0.md) |
+| **Verdict** | Internal code readiness 100% |
+| **Gate** | `READY_FOR_SNORKELING_COMMAND_12` |
+| **Validate** | `./Scripts/validate_snorkeling_release_readiness.sh --internal` |
+
+---
+
+## Aggiornamento indice 2026-06-18 — Audit 11 iOS maps/sync/export
+
+Audit indipendente read-only post Commands 08–11; gate condizionato verso Command 12.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `11_AUDIT_SNORKELING_IOS_MAPS_SYNC_EXPORT.md` |
+| **Report** | [`AUDIT_SNORKELING_IOS_MAPS_SYNC_EXPORT_CURRENT.md`](AUDIT_SNORKELING_IOS_MAPS_SYNC_EXPORT_CURRENT.md) |
+| **Verdict** | Internal GO ~88%; release script gaps |
+| **Gate** | `READY_FOR_SNORKELING_COMMAND_12_WITH_CONDITIONS` |
+
+---
+
+## Aggiornamento indice 2026-06-18 — Snorkeling iOS/Watch sync protocol (Command 11)
+
+Namespace WC dedicato snorkeling: iOS→Watch route (Command 08) + Watch→iOS session signed transport, ACK, retry, merge idempotente.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `11_SNORKELING_IOS_WATCH_SYNC_PROTOCOL.md` |
+| **Report** | [`DIR_DIVING_SNORKELING_IOS_WATCH_SYNC_PROTOCOL_IMPLEMENTATION_REPORT_CURRENT.md`](DIR_DIVING_SNORKELING_IOS_WATCH_SYNC_PROTOCOL_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **Tests focused** | 9 PASS + 5 XCTSkip (peer keychain) — Command 11 session sync suites |
+| **Build** | DIRDiving iOS — BUILD SUCCEEDED |
+| **Gate** | `READY_FOR_SNORKELING_COMMAND_12` |
 
 ---
 

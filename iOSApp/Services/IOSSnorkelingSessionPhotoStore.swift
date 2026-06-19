@@ -51,8 +51,8 @@ final class IOSSnorkelingSessionPhotoStore: ObservableObject {
         )
         let url = SnorkelingSessionPhotoSupport.fileURL(for: attachment, base: storageBase())
         let payload: Data
-        if stripLocationMetadata, let image = UIImage(data: imageData) {
-            payload = image.jpegData(compressionQuality: 0.85) ?? imageData
+        if stripLocationMetadata {
+            payload = try SnorkelingPhotoMetadataSanitizer.sanitizeRemovingLocation(from: imageData)
         } else {
             payload = imageData
         }

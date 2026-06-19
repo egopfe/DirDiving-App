@@ -1065,6 +1065,9 @@
 "apnea.sync.activity.pending_to_iphone" = "Apnea session queued for iPhone";
 "apnea.sync.activity.delivered_to_iphone" = "Apnea session delivered to iPhone";
 "apnea.sync.queue.pending_key" = "Waiting for iPhone sync key";
+"snorkeling.sync.activity.pending_to_iphone" = "Snorkeling session queued for iPhone";
+"snorkeling.sync.activity.delivered_to_iphone" = "Snorkeling session delivered to iPhone";
+"snorkeling.sync.queue.pending_key" = "Waiting for iPhone sync key";
 "apnea.buddy.on" = "Reminder on";
 "apnea.buddy.off" = "Reminder off";
 "apnea.stage.dive" = "Dive in progress";

@@ -33,6 +33,11 @@ final class SnorkelingLogbookStore: ObservableObject {
             sessions = SnorkelingLogbookPolicy.normalizedAndCapped(sessions)
             guard save() else { return }
             lastSavedSessionID = normalized.id
+#if os(watchOS)
+            if normalized.state == .completed || normalized.state == .aborted {
+                WatchSyncService.shared.transferSnorkelingSession(normalized)
+            }
+#endif
         }
     }
 
