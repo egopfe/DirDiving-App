@@ -1966,10 +1966,16 @@
 "companion.activitySelection.title" = "CHOOSE YOUR ACTIVITY";
 "companion.activitySelection.subtitle" = "Select the activity you want to use. You can change it at any time in Settings.";
 "companion.activity.diving.title" = "DIVING";
-"companion.activity.diving.subtitle" = "Scuba diving";
+"companion.activity.diving.subtitle" = "Scuba diving · Planner home";
 "companion.activity.diving.feature.decompression" = "Decompression planning";
 "companion.activity.diving.feature.gas" = "Gas management";
 "companion.activity.diving.feature.logbook" = "Detailed logbook";
+"companion.activity.diving.feature.planner" = "Planner-first home";
+"brand.name" = "DIR DIVING";
+"apnea.ios.dashboard.last_session.a11y" = "Latest Apnea session";
+"apnea.ios.dashboard.last_session.hint" = "Opens the latest Apnea session detail";
+"snorkeling.ios.dashboard.last_session.a11y" = "Latest Snorkeling session";
+"snorkeling.ios.dashboard.last_session.hint" = "Opens the latest Snorkeling session detail";
 "companion.activity.apnea.title" = "APNEA";
 "companion.activity.apnea.subtitle" = "Freediving sessions";
 "companion.activity.apnea.feature.time" = "Dive time";

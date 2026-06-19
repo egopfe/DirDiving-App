@@ -15,27 +15,29 @@ struct IOSApneaDashboardView: View {
     }
 
     var body: some View {
-        DIRScreenContainer {
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 16) {
-                    header
-                    if presentation.hasLastSession {
-                        lastSessionCard
-                    } else if let empty = presentation.emptyStateText {
-                        Text(DIRIOSLocalizer.string(empty))
-                            .font(.callout)
-                            .foregroundStyle(DIRTheme.muted)
-                            .multilineTextAlignment(.center)
-                            .frame(maxWidth: .infinity)
+        NavigationStack {
+            DIRScreenContainer {
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        header
+                        if presentation.hasLastSession, let session = logbook.lastSession {
+                            lastSessionCard(session: session)
+                        } else if let empty = presentation.emptyStateText {
+                            Text(DIRIOSLocalizer.string(empty))
+                                .font(.callout)
+                                .foregroundStyle(DIRTheme.muted)
+                                .multilineTextAlignment(.center)
+                                .frame(maxWidth: .infinity)
+                        }
+                        metricsGrid
+                        watchStatusCard
+                        newSessionButton
                     }
-                    metricsGrid
-                    watchStatusCard
-                    newSessionButton
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 12)
                 }
-                .padding(.horizontal, 18)
-                .padding(.vertical, 12)
+                .dirCompanionScrollSurface()
             }
-            .dirCompanionScrollSurface()
         }
     }
 
@@ -57,20 +59,26 @@ struct IOSApneaDashboardView: View {
         }
     }
 
-    private var lastSessionCard: some View {
-        DIRCard(DIRIOSLocalizer.string("apnea.ios.dashboard.last_session"), icon: "clock.fill", accent: DIRTheme.cyan) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(presentation.lastSessionDateText)
-                        .font(.headline)
-                        .foregroundStyle(.white)
+    private func lastSessionCard(session: ApneaSession) -> some View {
+        NavigationLink {
+            IOSApneaSessionDetailView(session: session)
+        } label: {
+            DIRCard(DIRIOSLocalizer.string("apnea.ios.dashboard.last_session"), icon: "clock.fill", accent: DIRTheme.cyan) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(presentation.lastSessionDateText)
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .foregroundStyle(DIRTheme.muted)
                 }
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(DIRTheme.muted)
             }
-            .accessibilityElement(children: .combine)
         }
+        .buttonStyle(.plain)
+        .accessibilityLabel(DIRIOSLocalizer.string("apnea.ios.dashboard.last_session.a11y"))
+        .accessibilityHint(DIRIOSLocalizer.string("apnea.ios.dashboard.last_session.hint"))
     }
 
     private var metricsGrid: some View {
