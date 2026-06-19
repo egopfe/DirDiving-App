@@ -1,0 +1,34 @@
+Requirement_ID,Activity,Feature,Test_Class,Test_Method,Evidence_Type,Validation_Status,Physical_QA
+WMR-GAUGE-001,Gauge,Time-weighted average depth,DiveAlgorithmTests,testTimeWeightedAverageDepthHandlesIrregularZeroAndOneSample,unit,VERIFIED,no
+WMR-GAUGE-002,Gauge,TTV formula informational,GaugeOptionalTTVTests,multiple,unit,VERIFIED,no
+WMR-GAUGE-003,Gauge,Ascent rate window,DiveAlgorithmTests,testTTVIndexAndAscentRateBehavior,unit,VERIFIED,no
+WMR-GAUGE-004,Gauge,Depth validation fail-closed,DiveAlgorithmTests,testDepthValidation*,unit,VERIFIED,no
+WMR-GAUGE-005,Gauge,Mission Mode invariants,MissionModeAlgorithmInvariantTests,testMissionProfileDoesNotChangeTTVOrAverageDepthFormulas,unit,VERIFIED,no
+WMR-FC-001,Full Computer,16 compartment tissue state,FullComputerRecoveryCheckpointTests,testCheckpointRoundTripPreservesTissueState,integration,VERIFIED,no
+WMR-FC-002,Full Computer,Actual elapsed dt ingest,FullComputerRuntimeEngineTests,testIrregularDeltaUsesRealElapsedTime,unit,VERIFIED,no
+WMR-FC-003,Full Computer,Missed tick catch-up,FullComputerRuntimeEngineTests,testMissedTicksStayConservativeWithoutResettingTissues,unit,VERIFIED,no
+WMR-FC-004,Full Computer,Schreiner/Haldane equivalence,BuhlmannCoreCrossTargetEquivalenceTests,testSchreinerLinearLoadMatchesConstantAtZeroRate,oracle,VERIFIED,no
+WMR-FC-005,Full Computer,NDL/deco transition,FullComputerDecoSolverTests,multiple,unit,VERIFIED,no
+WMR-FC-006,Full Computer,Multilevel finite metrics,FullComputerReleaseHardValidationTests,testMultilevelProfileProducesFiniteDecoMetrics,integration,VERIFIED,no
+WMR-FC-007,Full Computer,NaN/Inf fail-closed,FullComputerReleaseHardValidationTests,multiple,unit,VERIFIED,no
+WMR-FC-008,Full Computer,Gas switch ordering,FullComputerGasSwitchPolicyTests,multiple,unit,VERIFIED,no
+WMR-FC-009,Full Computer,Stop state machine,FullComputerDecoStopStateMachineTests,multiple,unit,VERIFIED,no
+WMR-FC-010,Full Computer,Performance budget deco solve,FullComputerReleaseHardValidationTests,testDecoSolverRespectsPerformanceBudget,performance,VERIFIED,no
+WMR-FC-011,Full Computer,Checkpoint budget,FullComputerReleaseHardValidationTests,testCheckpointRoundTripWithinBudget,performance,VERIFIED,no
+WMR-FC-012,Full Computer,Planner TTS differential,FullComputerReleaseHardValidationTests,testDifferentialAirPlannerMatchesRuntimeTTS,integration,VERIFIED,no
+WMR-AUD15-001,Audit 15,Multilevel continuity,FullComputerRuntimeEngineTests,testMultiLevelProfileUpdatesTissues,integration,VERIFIED,no
+WMR-AUD15-002,Audit 15,Stale result rejection,FullComputerRuntimeEngineTests,multiple,unit,VERIFIED,no
+WMR-AUD15-003,Audit 15,Fail-closed no false clear,FullComputerReleaseHardValidationTests,multiple,unit,VERIFIED,no
+WMR-APNEA-001,Apnea,Recovery policy modes,ApneaRecoveryPolicyLifecycleTests,17 methods,integration,VERIFIED,yes
+WMR-APNEA-002,Apnea,Early dive gating,ApneaRecoveryPolicyLifecycleTests,early dive tests,unit,VERIFIED,yes
+WMR-APNEA-003,Apnea,Monotonic restore,ApneaMonotonicClockRestoreTests,multiple,integration,VERIFIED,yes
+WMR-SNORKEL-001,Snorkeling,GPS filtering,SnorkelingSensorGPSIngestionTests,multiple,unit,VERIFIED,yes
+WMR-SNORKEL-002,Snorkeling,Distance consistency,SnorkelingDistanceConsistencyTests,multiple,integration,VERIFIED,yes
+WMR-SNORKEL-003,Snorkeling,Navigation bearing,SnorkelingNavigationReturnEngineTests,multiple,unit,VERIFIED,yes
+WMR-UNIT-001,Cross,Localization/units,DIRDivingCompleteLocalizationAuditTests,multiple,static,VERIFIED,no
+WMR-SYNC-001,Cross,Sync crypto,WatchSyncCryptographicLogicTests,multiple,unit,VERIFIED,no
+WMR-SYNC-002,Cross,Signed ACK dequeue,WatchSyncServiceIntegrationTests,multiple,integration,VERIFIED,no
+WMR-BRIEF-001,Cross,Briefing card matrix,PlannerBriefingCardKindMatrixTests,testSupportedCardKindMatrix,integration,VERIFIED,no
+WMR-EXT-001,Full Computer,External Bühlmann reference,—,—,external,PENDING_EXTERNAL,yes
+WMR-PHY-001,All,Physical Ultra field QA,—,—,physical,PENDING_PHYSICAL,yes
+WMR-PHY-002,All,Paired device sync round-trip,—,—,physical,PENDING_PHYSICAL,yes
