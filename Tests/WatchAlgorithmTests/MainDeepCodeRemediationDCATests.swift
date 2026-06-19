@@ -5,7 +5,8 @@ import XCTest
 final class MainDeepCodeRemediationDCATests: XCTestCase {
     override func setUp() async throws {
         try await super.setUp()
-        WatchSyncAuth.resetPeerTrust()
+        WatchSyncTestSupport.resetSecrets()
+        WatchSyncTestSupport.installDeterministicSecrets()
         WatchDiveSyncCodec.replayCache.reset()
         WatchSyncService.shared.testHook_resetPendingQueueForTests()
         DiveManager.testHook_activeDraftWriteCount = 0
@@ -13,7 +14,7 @@ final class MainDeepCodeRemediationDCATests: XCTestCase {
 
     override func tearDown() async throws {
         WatchSyncService.shared.testHook_resetPendingQueueForTests()
-        WatchSyncAuth.resetPeerTrust()
+        WatchSyncTestSupport.resetSecrets()
         WatchDiveSyncCodec.replayCache.reset()
         try await super.tearDown()
     }
@@ -21,7 +22,6 @@ final class MainDeepCodeRemediationDCATests: XCTestCase {
     // MARK: - MAIN-DCA-001 import ACK via userInfo
 
     func testSignedImportAckViaUserInfoDequeuesPending() throws {
-        try installPeerSecret()
         let sync = WatchSyncService.shared
         let session = sampleSession()
         sync.testHook_enqueueSession(session)
@@ -38,7 +38,6 @@ final class MainDeepCodeRemediationDCATests: XCTestCase {
     }
 
     func testInvalidImportAckViaUserInfoRetainsPending() throws {
-        try installPeerSecret()
         let sync = WatchSyncService.shared
         let session = sampleSession()
         sync.testHook_enqueueSession(session)
@@ -125,16 +124,6 @@ final class MainDeepCodeRemediationDCATests: XCTestCase {
         }
         XCTAssertLessThan(DiveManager.testHook_activeDraftWriteCount, 20)
         XCTAssertGreaterThan(DiveManager.testHook_activeDraftWriteCount, 0)
-    }
-
-    private func installPeerSecret() throws {
-        let secret = Data(repeating: 9, count: 32)
-        let result = WatchSyncAuth.ingestSharedSecretFromContext([
-            WatchSyncAuth.contextKey: secret.base64EncodedString()
-        ])
-        guard WatchSyncAuth.hasPeerSecret(), result == .acceptedFirstTrust else {
-            throw XCTSkip("Peer secret unavailable in test keychain")
-        }
     }
 
     private func sampleSession() -> DiveSession {

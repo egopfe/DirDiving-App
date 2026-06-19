@@ -1,0 +1,35 @@
+Requirement_ID,Area,Description,Test_Class,Validation_Status,Physical_QA
+WATCH-FC-001,Full Computer,Bühlmann 16 N2/He compartments,FullComputerDecoSolverTests,VERIFIED,no
+WATCH-FC-002,Full Computer,One-second tissue evolution,FullComputerRuntimeEngineTests,VERIFIED,no
+WATCH-FC-003,Full Computer,Fail-closed on calculation error,FullComputerReleaseHardValidationTests,VERIFIED,no
+WATCH-FC-004,Full Computer,Stale result rejection,FullComputerRuntimeEngineTests,VERIFIED,no
+WATCH-FC-005,Full Computer,Checkpoint restore,FullComputerRecoveryCheckpointTests,VERIFIED,no
+WATCH-FC-006,Full Computer,Gas switch policy,FullComputerGasSwitchPolicyTests,VERIFIED,no
+WATCH-FC-007,Full Computer,Deco stop state machine,FullComputerDecoStopStateMachineTests,VERIFIED,no
+WATCH-FC-008,Full Computer,Performance budget deco solve,FullComputerReleaseHardValidationTests,VERIFIED,no
+WATCH-GAUGE-001,Gauge,TTV informational only,GaugeOptionalTTVTests,VERIFIED,no
+WATCH-GAUGE-002,Gauge,No decompression schedule,FullComputerWatchArchitectureGuardTests,VERIFIED,no
+WATCH-GAUGE-003,Gauge,Lifecycle integration,DiveManagerAlgorithmIntegrationTests,VERIFIED,yes
+WATCH-BRIEF-001,Briefing,Deco stops card E2E,PlannerBriefingCardKindMatrixTests,VERIFIED,no
+WATCH-BRIEF-002,Briefing,Runtime card E2E,PlannerBriefingCardKindMatrixTests,VERIFIED,no
+WATCH-BRIEF-003,Briefing,CCR summary card E2E,PlannerBriefingCardKindMatrixTests,VERIFIED,no
+WATCH-BRIEF-004,Briefing,Legacy gasEmergency filtered,PlannerBriefingLegacyKindDecodeTests,VERIFIED,no
+WATCH-BRIEF-005,Briefing,Reference-only semantics,PlannerBriefingReceiverTests,VERIFIED,no
+WATCH-SYNC-001,Sync,Deterministic peer secret tests,WatchSyncCryptographicLogicTests,VERIFIED,no
+WATCH-SYNC-002,Sync,Signed ACK dequeue,WatchSyncServiceIntegrationTests,VERIFIED,no
+WATCH-SYNC-003,Sync,Peer secret pinning,WatchSyncPeerSecretPinningTests,VERIFIED,no
+WATCH-SYNC-004,Sync,Companion photo crypto,CompanionPhotoManagementTests,VERIFIED,no
+WATCH-SYNC-005,Sync,Apnea transport negative,ApneaSessionSyncTransportNegativeWatchTests,VERIFIED,no
+WATCH-SYNC-006,Sync,Snorkeling transport negative,SnorkelingSessionSyncTransportNegativeWatchTests,VERIFIED,no
+WATCH-SYNC-007,Sync,Physical paired round-trip,—,PENDING_PHYSICAL_QA,yes
+WATCH-APNEA-001,Apnea,Release hard validation,ApneaReleaseHardValidationTests,VERIFIED,yes
+WATCH-SNORKEL-001,Snorkeling,Release hard validation,SnorkelingReleaseHardValidationTests,VERIFIED,yes
+WATCH-MM-001,Mission Mode,Algorithm invariants,MissionModeAlgorithmInvariantTests,VERIFIED,no
+WATCH-SENSOR-001,Sensor Source,Release policy,DeveloperSensorSourceTests,VERIFIED,no
+WATCH-INTENT-001,App Intents,Safety gates,ActionButtonIntentsSafetyTests,VERIFIED,no
+WATCH-L10N-001,Localization,EN/IT parity,DIRDivingCompleteLocalizationAuditTests,VERIFIED,no
+WATCH-UI-001,Small screen,FC UI state matrix,FullComputerUIStateMatrixTests,VERIFIED,yes
+WATCH-SEC-001,Security,Secrets scan,Scripts/check_secrets.sh,VERIFIED,no
+WATCH-ISO-001,Architecture,Target isolation,Scripts/check_main_target_isolation.sh,VERIFIED,no
+WATCH-PHY-001,Physical,Ultra depth/ascent/haptics,—,PENDING_PHYSICAL_QA,yes
+WATCH-EXT-001,External,Bühlmann reference,—,PENDING_EXTERNAL_VALIDATION,yes

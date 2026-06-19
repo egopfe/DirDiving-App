@@ -154,13 +154,13 @@ enum SnorkelingWatchPresentation {
         return SnorkelingWatchPresentationOutput(
             stage: stage,
             startEnabled: startEnabled,
-            startDisabledReason: startEnabled ? nil : String(localized: "snorkeling.ready.sensor_unavailable"),
+            startDisabledReason: startEnabled ? nil : DIRWatchLocalizer.string("snorkeling.ready.sensor_unavailable"),
             headerTitle: headerTitle(for: stage),
             headerSubtitle: headerSubtitle(for: input, stage: stage),
             heroValue: hero.value,
             heroUnit: hero.unit,
             heroAccessibilityLabel: hero.accessibility,
-            runtimeText: Formatters.time(input.sessionElapsedSeconds),
+            runtimeText: elapsedTimeText(input.sessionElapsedSeconds),
             distanceText: "\(Formatters.zero(input.accumulatedDistanceMeters)) m",
             surfaceSpeedText: "\(Formatters.one(input.averageSpeedMetersPerSecond)) m/s",
             waterTemperatureText: temperatureText(input.currentTemperatureCelsius),
@@ -173,16 +173,16 @@ enum SnorkelingWatchPresentation {
             targetDurationText: durationLimitText(input.targetDurationSeconds),
             maxDistanceText: distanceLimitText(input.maxDistanceMeters),
             missionModeText: input.missionModeEnabled
-                ? String(localized: "mission_mode.a11y.active")
-                : String(localized: "mission_mode.a11y.inactive"),
+                ? DIRWatchLocalizer.string("mission_mode.a11y.active")
+                : DIRWatchLocalizer.string("mission_mode.a11y.inactive"),
             buddyText: input.buddyReminderEnabled
-                ? String(localized: "snorkeling.buddy.on")
-                : String(localized: "snorkeling.buddy.off"),
-            dipDurationText: Formatters.time(input.activeDipElapsedSeconds),
+                ? DIRWatchLocalizer.string("snorkeling.buddy.on")
+                : DIRWatchLocalizer.string("snorkeling.buddy.off"),
+            dipDurationText: elapsedTimeText(input.activeDipElapsedSeconds),
             dipMaxDepthText: "\(Formatters.one(input.activeDipMaxDepthMeters)) m",
             verticalSpeedText: verticalSpeedText(input.verticalSpeedMetersPerSecond),
-            dipNumberText: String(format: String(localized: "snorkeling.dip.number"), max(1, input.dipCount)),
-            waypointNameText: input.waypointNavigation.waypointName?.uppercased() ?? String(localized: "snorkeling.nav.no_waypoint"),
+            dipNumberText: DIRWatchLocalizer.formatted("snorkeling.dip.number", max(1, input.dipCount)),
+            waypointNameText: input.waypointNavigation.waypointName?.uppercased() ?? DIRWatchLocalizer.string("snorkeling.nav.no_waypoint"),
             waypointDistanceText: distanceText(input.waypointNavigation.distanceToTargetMeters),
             turnInstructionText: turn.text,
             turnInstructionAccessibility: turn.accessibility,
@@ -196,10 +196,10 @@ enum SnorkelingWatchPresentation {
             markerCategoryLabels: SnorkelingMarkerCategory.allCases.map(markerCategoryLabel),
             selectedMarkerCategoryIndex: SnorkelingMarkerCategory.allCases.firstIndex(of: input.selectedMarkerCategory) ?? 0,
             saveMarkerEnabled: input.isSessionStarted && input.phase != .ended,
-            summaryTotalTimeText: Formatters.time(input.sessionElapsedSeconds),
+            summaryTotalTimeText: elapsedTimeText(input.sessionElapsedSeconds),
             summaryDistanceText: "\(Formatters.zero(input.accumulatedDistanceMeters)) m",
             summaryMaxDepthText: "\(Formatters.one(input.sessionMaxDepthMeters)) m",
-            summaryUnderwaterTimeText: Formatters.time(input.underwaterTimeSeconds),
+            summaryUnderwaterTimeText: elapsedTimeText(input.underwaterTimeSeconds),
             summaryDipCountText: "\(input.dipCount)",
             summaryMarkerCountText: "\(input.markerCount)",
             summaryAverageSpeedText: "\(Formatters.one(input.averageSpeedMetersPerSecond)) m/s",
@@ -209,15 +209,15 @@ enum SnorkelingWatchPresentation {
             showsLiveGPSCoordinates: !input.isUnderwater && input.gpsPresentationState == .tracking,
             animationsEnabled: input.animationsEnabled,
             recoveredSessionBannerText: input.isRecoveredSession
-                ? String(localized: "snorkeling.recovery.banner")
+                ? DIRWatchLocalizer.string("snorkeling.recovery.banner")
                 : nil,
             recoveryWarningText: input.recoveryWarning,
             recoveredSessionAccessibilityLabel: input.isRecoveredSession
-                ? String(localized: "snorkeling.a11y.recovered_session")
+                ? DIRWatchLocalizer.string("snorkeling.a11y.recovered_session")
                 : nil,
             returnAdvisorAccessibilityLabel: advisorText == nil
                 ? nil
-                : String(localized: "snorkeling.a11y.return_advisor"),
+                : DIRWatchLocalizer.string("snorkeling.a11y.return_advisor"),
             overlayAccessibilityLabel: overlayAccessibilityLabel(for: overlay)
         )
     }
@@ -225,11 +225,11 @@ enum SnorkelingWatchPresentation {
     private static func overlayAccessibilityLabel(for overlay: SnorkelingWatchOverlayPresentation?) -> String? {
         switch overlay {
         case .sensorDegraded:
-            return String(localized: "snorkeling.overlay.sensor_degraded")
+            return DIRWatchLocalizer.string("snorkeling.overlay.sensor_degraded")
         case .gpsDegradedUnderwater:
-            return String(localized: "snorkeling.overlay.gps_underwater")
+            return DIRWatchLocalizer.string("snorkeling.overlay.gps_underwater")
         case .operational(let operational):
-            return String(localized: String.LocalizationValue(operational.titleKey))
+            return DIRWatchLocalizer.string(operational.titleKey)
         case nil:
             return nil
         }
@@ -275,20 +275,20 @@ enum SnorkelingWatchPresentation {
     ) -> (value: String, unit: String?, accessibility: String) {
         switch stage {
         case .ready:
-            return (String(localized: "snorkeling.ready.title"), nil, String(localized: "snorkeling.ready.title"))
+            return (DIRWatchLocalizer.string("snorkeling.ready.title"), nil, DIRWatchLocalizer.string("snorkeling.ready.title"))
         case .surfaceDashboard:
-            return (Formatters.time(input.sessionElapsedSeconds), String(localized: "snorkeling.metric.runtime"), String(localized: "snorkeling.a11y.runtime"))
+            return (elapsedTimeText(input.sessionElapsedSeconds), DIRWatchLocalizer.string("snorkeling.metric.runtime"), DIRWatchLocalizer.string("snorkeling.a11y.runtime"))
         case .dipInProgress:
             let depth = input.currentDepthMeters ?? 0
-            return ("\(Formatters.one(depth))", "m", String(format: String(localized: "snorkeling.a11y.depth"), Formatters.one(depth)))
+            return ("\(Formatters.one(depth))", "m", DIRWatchLocalizer.formatted("snorkeling.a11y.depth", Formatters.one(depth)))
         case .navigation:
-            return (distanceText(input.waypointNavigation.distanceToTargetMeters), "m", String(localized: "snorkeling.a11y.waypoint_distance"))
+            return (distanceText(input.waypointNavigation.distanceToTargetMeters), "m", DIRWatchLocalizer.string("snorkeling.a11y.waypoint_distance"))
         case .returnToEntry:
-            return (distanceText(input.returnNavigation.distanceToEntryMeters), "m", String(localized: "snorkeling.a11y.return_distance"))
+            return (distanceText(input.returnNavigation.distanceToEntryMeters), "m", DIRWatchLocalizer.string("snorkeling.a11y.return_distance"))
         case .saveMarker:
             return (markerCategoryLabel(input.selectedMarkerCategory), nil, markerCategoryLabel(input.selectedMarkerCategory))
         case .sessionSummary:
-            return (Formatters.time(input.sessionElapsedSeconds), nil, String(localized: "snorkeling.summary.title"))
+            return (elapsedTimeText(input.sessionElapsedSeconds), nil, DIRWatchLocalizer.string("snorkeling.summary.title"))
         }
     }
 
@@ -349,23 +349,23 @@ enum SnorkelingWatchPresentation {
         headingQuality: SnorkelingHeadingQuality
     ) -> (instruction: SnorkelingTurnInstruction, text: String, accessibility: String) {
         if headingQuality == .unavailable || instruction == .unavailable {
-            let text = String(localized: "snorkeling.nav.gps_unavailable")
+            let text = DIRWatchLocalizer.string("snorkeling.nav.gps_unavailable")
             return (.unavailable, text, text)
         }
         let text: String
         let accessibility: String
         switch instruction {
         case .turnLeft:
-            text = String(localized: "snorkeling.nav.turn_left")
-            accessibility = String(localized: "snorkeling.a11y.turn_left")
+            text = DIRWatchLocalizer.string("snorkeling.nav.turn_left")
+            accessibility = DIRWatchLocalizer.string("snorkeling.a11y.turn_left")
         case .turnRight:
-            text = String(localized: "snorkeling.nav.turn_right")
-            accessibility = String(localized: "snorkeling.a11y.turn_right")
+            text = DIRWatchLocalizer.string("snorkeling.nav.turn_right")
+            accessibility = DIRWatchLocalizer.string("snorkeling.a11y.turn_right")
         case .onLine:
-            text = String(localized: "snorkeling.nav.on_line")
-            accessibility = String(localized: "snorkeling.a11y.on_line")
+            text = DIRWatchLocalizer.string("snorkeling.nav.on_line")
+            accessibility = DIRWatchLocalizer.string("snorkeling.a11y.on_line")
         case .unavailable:
-            text = String(localized: "snorkeling.nav.gps_unavailable")
+            text = DIRWatchLocalizer.string("snorkeling.nav.gps_unavailable")
             accessibility = text
         }
         return (instruction, text, accessibility)
@@ -375,23 +375,23 @@ enum SnorkelingWatchPresentation {
 
     private static func headerTitle(for stage: SnorkelingWatchStage) -> String {
         switch stage {
-        case .ready: return String(localized: "snorkeling.ready.header")
-        case .surfaceDashboard: return String(localized: "snorkeling.surface.header")
-        case .dipInProgress: return String(localized: "snorkeling.dip.header")
-        case .navigation: return String(localized: "snorkeling.nav.header")
-        case .returnToEntry: return String(localized: "snorkeling.return.header")
-        case .saveMarker: return String(localized: "snorkeling.marker.header")
-        case .sessionSummary: return String(localized: "snorkeling.summary.header")
+        case .ready: return DIRWatchLocalizer.string("snorkeling.ready.header")
+        case .surfaceDashboard: return DIRWatchLocalizer.string("snorkeling.surface.header")
+        case .dipInProgress: return DIRWatchLocalizer.string("snorkeling.dip.header")
+        case .navigation: return DIRWatchLocalizer.string("snorkeling.nav.header")
+        case .returnToEntry: return DIRWatchLocalizer.string("snorkeling.return.header")
+        case .saveMarker: return DIRWatchLocalizer.string("snorkeling.marker.header")
+        case .sessionSummary: return DIRWatchLocalizer.string("snorkeling.summary.header")
         }
     }
 
     private static func headerSubtitle(for input: SnorkelingWatchPresentationInput, stage: SnorkelingWatchStage) -> String {
         if input.isRecoveredSession {
-            return String(localized: "snorkeling.recovery.subtitle")
+            return DIRWatchLocalizer.string("snorkeling.recovery.subtitle")
         }
-        if input.phase == .paused { return String(localized: "snorkeling.phase.paused") }
+        if input.phase == .paused { return DIRWatchLocalizer.string("snorkeling.phase.paused") }
         if input.phase == .sensorDegraded || input.sensorHealth == .manualFallback {
-            return String(localized: "snorkeling.sensor.degraded")
+            return DIRWatchLocalizer.string("snorkeling.sensor.degraded")
         }
         return input.phase.rawValue.uppercased()
     }
@@ -401,17 +401,17 @@ enum SnorkelingWatchPresentation {
         underwater: Bool
     ) -> (text: String, color: SnorkelingWatchColorToken) {
         if underwater {
-            return (String(localized: "snorkeling.gps.underwater"), .secondary)
+            return (DIRWatchLocalizer.string("snorkeling.gps.underwater"), .secondary)
         }
         switch state {
         case .tracking:
-            return (String(localized: "snorkeling.gps.tracking"), .green)
+            return (DIRWatchLocalizer.string("snorkeling.gps.tracking"), .green)
         case .degraded:
-            return (String(localized: "snorkeling.gps.degraded"), .orange)
+            return (DIRWatchLocalizer.string("snorkeling.gps.degraded"), .orange)
         case .stale:
-            return (String(localized: "snorkeling.gps.stale"), .yellow)
+            return (DIRWatchLocalizer.string("snorkeling.gps.stale"), .yellow)
         case .unavailable, .underwaterUnavailable:
-            return (String(localized: "snorkeling.gps.unavailable"), .red)
+            return (DIRWatchLocalizer.string("snorkeling.gps.unavailable"), .red)
         }
     }
 
@@ -419,26 +419,35 @@ enum SnorkelingWatchPresentation {
         _ state: SnorkelingDepthPresentationState,
         health: SnorkelingSensorHealth
     ) -> String {
-        if health == .manualFallback { return String(localized: "snorkeling.sensor.manual") }
+        if health == .manualFallback { return DIRWatchLocalizer.string("snorkeling.sensor.manual") }
         switch state {
         case .valid:
-            return String(localized: "snorkeling.sensor.ok")
+            return DIRWatchLocalizer.string("snorkeling.sensor.ok")
         case .degraded:
-            return String(localized: "snorkeling.sensor.degraded")
+            return DIRWatchLocalizer.string("snorkeling.sensor.degraded")
         case .unavailable:
-            return String(localized: "snorkeling.sensor.unavailable")
+            return DIRWatchLocalizer.string("snorkeling.sensor.unavailable")
         }
     }
 
     private static func entryPointText(_ captured: Bool) -> String {
         captured
-            ? String(localized: "snorkeling.entry.set")
-            : String(localized: "snorkeling.entry.auto")
+            ? DIRWatchLocalizer.string("snorkeling.entry.set")
+            : DIRWatchLocalizer.string("snorkeling.entry.auto")
     }
 
     private static func durationLimitText(_ seconds: TimeInterval?) -> String {
         guard let seconds, seconds.isFinite, seconds > 0 else { return "--" }
-        return Formatters.time(seconds)
+        return elapsedTimeText(seconds)
+    }
+
+    private static func elapsedTimeText(_ interval: TimeInterval) -> String {
+        let total = max(0, Int(interval))
+        let hours = total / 3600
+        let minutes = (total % 3600) / 60
+        let seconds = total % 60
+        if hours > 0 { return String(format: "%02d:%02d:%02d", hours, minutes, seconds) }
+        return String(format: "%02d:%02d", minutes, seconds)
     }
 
     private static func distanceLimitText(_ meters: Double?) -> String {
@@ -473,29 +482,29 @@ enum SnorkelingWatchPresentation {
 
     private static func markerCategoryLabel(_ category: SnorkelingMarkerCategory) -> String {
         switch category {
-        case .marineLife: return String(localized: "snorkeling.marker.marine_life")
-        case .reef: return String(localized: "snorkeling.marker.reef")
-        case .wreck: return String(localized: "snorkeling.marker.wreck")
-        case .photoSpot: return String(localized: "snorkeling.marker.photo")
-        case .buoy: return String(localized: "snorkeling.marker.buoy")
-        case .custom: return String(localized: "snorkeling.marker.custom")
+        case .marineLife: return DIRWatchLocalizer.string("snorkeling.marker.marine_life")
+        case .reef: return DIRWatchLocalizer.string("snorkeling.marker.reef")
+        case .wreck: return DIRWatchLocalizer.string("snorkeling.marker.wreck")
+        case .photoSpot: return DIRWatchLocalizer.string("snorkeling.marker.photo")
+        case .buoy: return DIRWatchLocalizer.string("snorkeling.marker.buoy")
+        case .custom: return DIRWatchLocalizer.string("snorkeling.marker.custom")
         }
     }
 
     private static func returnAdvisorText(_ input: SnorkelingWatchPresentationInput) -> String? {
         guard input.returnNavigation.advisorActive else { return nil }
         if let key = input.returnNavigation.informationalMessageKey {
-            return String(localized: String.LocalizationValue(key))
+            return DIRWatchLocalizer.string(key)
         }
-        return String(localized: "snorkeling.return.advised")
+        return DIRWatchLocalizer.string("snorkeling.return.advised")
     }
 
     private static func summaryFooter(_ state: SnorkelingWatchSessionSaveState) -> String {
         switch state {
-        case .notSaved: return String(localized: "snorkeling.summary.not_saved")
-        case .saved: return String(localized: "snorkeling.summary.saved")
-        case .syncPending: return String(localized: "snorkeling.summary.sync_pending")
-        case .failed: return String(localized: "snorkeling.summary.save_failed")
+        case .notSaved: return DIRWatchLocalizer.string("snorkeling.summary.not_saved")
+        case .saved: return DIRWatchLocalizer.string("snorkeling.summary.saved")
+        case .syncPending: return DIRWatchLocalizer.string("snorkeling.summary.sync_pending")
+        case .failed: return DIRWatchLocalizer.string("snorkeling.summary.save_failed")
         }
     }
 

@@ -21,7 +21,8 @@ final class SnorkelingLocalizationParityTests: XCTestCase {
         XCTAssertEqual(snorkelingEN, snorkelingIT)
     }
 
-    func testReturnAdvisorKeysDoNotRenderAsRawKeys() {
+    func testReturnAdvisorKeysDoNotRenderAsRawKeys() throws {
+        let english = try loadWatchStrings(named: "en")
         let keys = [
             "snorkeling.return.advisor.unavailable",
             "snorkeling.return.advisor.distance",
@@ -34,17 +35,20 @@ final class SnorkelingLocalizationParityTests: XCTestCase {
             "snorkeling.return.near.entry",
         ]
         for key in keys {
-            let localized = String(localized: String.LocalizationValue(key))
+            let localized = DIRWatchLocalizer.string(key)
             XCTAssertNotEqual(localized, key, "Raw key fallback for \(key)")
             XCTAssertFalse(localized.isEmpty)
+            XCTAssertFalse(english[key, default: ""].isEmpty)
         }
     }
 
-    func testOperationalOverlayKeysDoNotRenderAsRawKeys() {
+    func testOperationalOverlayKeysDoNotRenderAsRawKeys() throws {
+        let english = try loadWatchStrings(named: "en")
         for key in ["snorkeling.alarm.title", "snorkeling.gps.lost"] {
-            let localized = String(localized: String.LocalizationValue(key))
+            let localized = DIRWatchLocalizer.string(key)
             XCTAssertNotEqual(localized, key)
             XCTAssertFalse(localized.isEmpty)
+            XCTAssertFalse(english[key, default: ""].isEmpty)
         }
     }
 

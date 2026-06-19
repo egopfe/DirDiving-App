@@ -1,0 +1,12 @@
+Requirement_ID,Suite,Test_Class,Status,Command
+MATH-APNEA-RECOVERY,Watch,ApneaRecoveryPolicyLifecycleTests,PASS,xcodebuild -scheme "DIRDiving Watch Algorithm Tests"
+MATH-OC-EXPOSURE-UNAV,iOS,GasPlanningOxygenExposureUnavailableTests,PASS,xcodebuild -scheme "DIRDiving iOS Algorithm Tests"
+MATH-REPETITIVE-DIVE,iOS,RepetitiveDiveMathematicalTests,PASS,xcodebuild -scheme "DIRDiving iOS Algorithm Tests"
+MATH-GAS-LEDGER,iOS,GasLedgerDisplayFormatterTests,PASS,xcodebuild -scheme "DIRDiving iOS Algorithm Tests"
+MATH-SNORKEL-DISTANCE,Watch,SnorkelingDistanceConsistencyTests,PASS,xcodebuild -scheme "DIRDiving Watch Algorithm Tests"
+MATH-LEGACY-EXPLORE,Watch,LegacyExplorationStoreIsolationTests,PASS,xcodebuild -scheme "DIRDiving Watch Algorithm Tests"
+MATH-FULL-WATCH,Watch,All Watch Algorithm Tests,PASS,832 executed 0 failed
+MATH-FULL-IOS,iOS,All iOS Algorithm Tests,PARTIAL,1298 executed 13 failed (pre-existing SnorkelingLocalizationParity in test host bundle)
+MATH-ISOLATION,Scripts,check_main_target_isolation.sh,PASS,./Scripts/check_main_target_isolation.sh
+MATH-SECRETS,Scripts,check_secrets.sh,PASS,./Scripts/check_secrets.sh
+MATH-L10N,Scripts,audit_localization.sh,PASS,./Scripts/audit_localization.sh

@@ -186,6 +186,7 @@ struct ApneaSessionEngine {
 
     mutating func triggerManualDescent(at wallClock: Date = Date()) {
         guard manualFallbackActive else { return }
+        guard canStartDiveDespiteRecovery(at: wallClock) else { return }
         if let interval = currentRecoveryInterval,
            (interval.completedSeconds ?? 0) < interval.plannedSeconds,
            !session.warnings.contains(.incompleteRecovery) {
@@ -194,6 +195,25 @@ struct ApneaSessionEngine {
         pendingManualDescent = true
         ingest(raw: DepthMeasurementRaw(depthMeters: configuration.immersionStartDepthMeters + 0.5, sensorTimestamp: wallClock, receivedAt: wallClock), wallClock: wallClock)
         pendingManualDescent = false
+    }
+
+    private mutating func canStartDiveDespiteRecovery(
+        at wallClock: Date,
+        uptime: TimeInterval = ProcessInfo.processInfo.systemUptime
+    ) -> Bool {
+        guard tracker.phase == .recovery else { return true }
+        let required = currentRecoveryInterval?.plannedSeconds
+            ?? ApneaRecoveryComputation.requiredRecoverySeconds(
+                policy: recoveryPolicy,
+                lastDiveDurationSeconds: lastDiveDurationSeconds
+            )
+        guard let started = tracker.recoveryStartedAt else {
+            return recoveryPolicy.allowEarlyDiveWhenIncomplete
+        }
+        let elapsed = sessionMonotonicElapsed(wallClock: wallClock, uptime: uptime) - started
+        let remaining = max(0, required - elapsed)
+        if remaining <= 0 { return true }
+        return recoveryPolicy.allowEarlyDiveWhenIncomplete
     }
 
     mutating func triggerManualSurface(at wallClock: Date = Date()) {
@@ -311,6 +331,12 @@ struct ApneaSessionEngine {
         tickOnly: Bool = false
     ) {
         let monotonicNow = sessionMonotonicElapsed(wallClock: wallClock, uptime: uptime)
+        let pendingDiveDuration = tracker.diveStartedAt.map { max(0, monotonicNow - $0) } ?? lastDiveDurationSeconds
+        let requiredRecovery = currentRecoveryInterval?.plannedSeconds
+            ?? ApneaRecoveryComputation.requiredRecoverySeconds(
+                policy: recoveryPolicy,
+                lastDiveDurationSeconds: pendingDiveDuration
+            )
         let input = ApneaLifecycleMachineInput(
             configuration: configuration,
             monotonicNow: monotonicNow,
@@ -320,11 +346,13 @@ struct ApneaSessionEngine {
             feedAccepted: feedAccepted,
             sensorAvailable: sensorAvailable,
             manualFallbackActive: manualFallbackActive,
-            manualDescentTriggered: pendingManualDescent,
+            manualDescentTriggered: pendingManualDescent && canStartDiveDespiteRecovery(at: wallClock, uptime: uptime),
             manualSurfaceTriggered: pendingManualSurface,
             sessionArmed: sessionArmed,
             endSessionRequested: endSessionRequested,
-            tickOnly: tickOnly
+            tickOnly: tickOnly,
+            requiredRecoverySeconds: requiredRecovery,
+            allowEarlyDiveWhenIncomplete: recoveryPolicy.allowEarlyDiveWhenIncomplete
         )
         let output = ApneaLifecycleStateMachine.evaluate(input: input, tracker: tracker)
         tracker = output.tracker
@@ -468,7 +496,7 @@ struct ApneaSessionEngine {
         }
         let requiredRecovery = currentRecoveryInterval?.plannedSeconds ?? ApneaRecoveryComputation.requiredRecoverySeconds(policy: recoveryPolicy, lastDiveDurationSeconds: lastDiveDurationSeconds)
         let recoveryElapsed = min(requiredRecovery, surfaceElapsed)
-        let recoveryRemaining = max(0, requiredRecovery - recoveryElapsed)
+        let recoveryRemaining = tracker.phase == .recovery ? max(0, requiredRecovery - recoveryElapsed) : 0
 
         if tracker.phase == .recovery, var interval = currentRecoveryInterval {
             interval.completedSeconds = recoveryElapsed
@@ -499,7 +527,7 @@ struct ApneaSessionEngine {
             requiredRecoverySeconds: requiredRecovery,
             recoveryElapsedSeconds: recoveryElapsed,
             recoveryRemainingSeconds: tracker.phase == .recovery ? recoveryRemaining : nil,
-            isRecoveryComplete: recoveryRemaining == 0,
+            isRecoveryComplete: tracker.phase != .recovery && recoveryRemaining == 0,
             sensorHealth: health,
             rawSampleCount: rawSamples.count,
             acceptedSampleCount: session.dives.reduce(0) { $0 + $1.samples.count } + activeDiveAcceptedSamples.count,
