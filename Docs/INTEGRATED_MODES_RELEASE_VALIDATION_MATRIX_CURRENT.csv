@@ -1,0 +1,16 @@
+Domain,Check,Validation_Command,Automated,Physical_QA,Status,Evidence_Date,Notes
+Cross-cutting,MAIN target isolation,./Scripts/check_main_target_isolation.sh,yes,no,PASS,2026-06-19,
+Cross-cutting,Secrets scan,./Scripts/check_secrets.sh,yes,no,PASS,2026-06-19,
+Cross-cutting,Localization parity EN/IT,./Scripts/audit_localization.sh,yes,no,PASS,2026-06-19,Watch 1195 keys; iOS 2512 keys
+Diving Gauge,Activity selection + mode lock,IntegratedModesSequentialFlowTests + DIRModesAndStartupFlowTests,yes,no,PASS,2026-06-19,Deterministic doubles
+Diving Full Computer,Release-hard validator,./Scripts/validate_full_computer_release_readiness.sh,yes,no,PASS,2026-06-19,Bühlmann golden fixtures included
+Apnea,Release-hard validator,./Scripts/validate_apnea_release_readiness.sh --internal,yes,no,PASS,2026-06-19,Suspend/resume suite included
+Apnea,Suspend/resume lifecycle,ApneaSuspendResumeLifecycleIntegrationTests,yes,no,PASS,2026-06-19,26 tests
+Snorkeling,Release-hard validator,./Scripts/validate_snorkeling_release_readiness.sh --internal,yes,no,PASS,2026-06-19,Watch 212 + iOS 89
+Integrated,Chained internal gate,./Scripts/validate_integrated_modes.sh --internal,yes,no,PASS,2026-06-19,Prints INTEGRATED_MODES_INTERNAL_RELEASE_GATE_PASS
+Integrated,Sequential mode flow,IntegratedModesSequentialFlowTests,yes,no,PASS,2026-06-19,Gauge→FC→Apnea suspend/resume→Snorkeling
+Integrated,Namespace isolation,ApneaArchitectureIsolationTests + SnorkelingCrossDomainIsolationTests + FullComputerNamespaceIsolationTests,yes,no,PASS,2026-06-19,Part of integrated script batch
+iOS Companion,Apnea + Snorkeling availability,IOSApneaCompanionTests + IOSCompanionActivitySelectionTests,yes,no,PASS,2026-06-19,
+Tooling,XcodeGen serialization,Scripts/lib/xcodegen_once.sh,yes,no,PASS,2026-06-19,Stamp + mkdir lock; DIR_DIVING_SKIP_XCODEGEN for child validators
+Physical QA,All activities signed evidence,N/A,no,yes,PENDING,,"Apnea 19 + Snorkeling 21 + Diving/FC matrices unsigned"
+External,TestFlight / App Store integrated release,N/A,no,yes,NO_GO,2026-06-19,INTEGRATED_EXTERNAL_NO_GO_PHYSICAL_QA_PENDING

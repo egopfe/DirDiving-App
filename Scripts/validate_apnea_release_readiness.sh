@@ -64,7 +64,9 @@ fi
 ./Scripts/audit_localization.sh
 
 echo "[apnea-readiness] running xcodegen"
-xcodegen generate
+# shellcheck source=Scripts/lib/xcodegen_once.sh
+source "${ROOT_DIR}/Scripts/lib/xcodegen_once.sh"
+xcodegen_once
 
 echo "[apnea-readiness] checking xcodegen drift"
 git diff --exit-code -- DIRDiving.xcodeproj
