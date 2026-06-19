@@ -43,21 +43,21 @@ enum ApneaMockupReferenceMatrix {
         .init(id: "APNEA_WATCH_07", fileName: "APNEA_WATCH_07_MARKER_REACHED.png", platform: .watch, implementationReference: "Views/ApneaView.swift (eventOverlay)", presentationStage: "dive", hasExecutableFixture: true),
         .init(id: "APNEA_WATCH_08", fileName: "APNEA_WATCH_08_TARGET_REACHED.png", platform: .watch, implementationReference: "Views/ApneaView.swift (eventOverlay)", presentationStage: "dive", hasExecutableFixture: true),
 
-        .init(id: "APNEA_IOS_01", fileName: "APNEA_IOS_01_DASHBOARD.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaDashboardView.swift", hasExecutableFixture: false),
-        .init(id: "APNEA_IOS_02", fileName: "APNEA_IOS_02_PROFILES.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaProfilesView.swift", hasExecutableFixture: false),
-        .init(id: "APNEA_IOS_03", fileName: "APNEA_IOS_03_SESSION_PLANNER.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaSessionPlannerView.swift", hasExecutableFixture: false),
-        .init(id: "APNEA_IOS_04", fileName: "APNEA_IOS_04_DIVE_DETAIL.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaSessionDetailView.swift", hasExecutableFixture: false),
-        .init(id: "APNEA_IOS_05", fileName: "APNEA_IOS_05_SESSION_CHARTS.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaSessionDetailView.swift (charts)", hasExecutableFixture: false),
-        .init(id: "APNEA_IOS_06", fileName: "APNEA_IOS_06_STATISTICS.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaStatisticsView.swift", hasExecutableFixture: false),
-        .init(id: "APNEA_IOS_07", fileName: "APNEA_IOS_07_EQUIPMENT.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaEquipmentView.swift", hasExecutableFixture: false),
-        .init(id: "APNEA_IOS_08", fileName: "APNEA_IOS_08_BUDDY_SAFETY.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaBuddySafetyView.swift", hasExecutableFixture: false),
-        .init(id: "APNEA_IOS_09", fileName: "APNEA_IOS_09_SESSION_MAP.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaSessionDetailView.swift (map)", hasExecutableFixture: false),
-        .init(id: "APNEA_IOS_10", fileName: "APNEA_IOS_10_LOGBOOK.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaSessionsListView.swift", hasExecutableFixture: false),
-        .init(id: "APNEA_IOS_11", fileName: "APNEA_IOS_11_ALARMS.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaSettingsView.swift (alarms)", hasExecutableFixture: false),
-        .init(id: "APNEA_IOS_12", fileName: "APNEA_IOS_12_MARKERS.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaSettingsView.swift (markers)", hasExecutableFixture: false),
-        .init(id: "APNEA_IOS_13", fileName: "APNEA_IOS_13_PERSONAL_RECORDS.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaPersonalRecordsView.swift", hasExecutableFixture: false),
-        .init(id: "APNEA_IOS_14", fileName: "APNEA_IOS_14_EXPORT_SHARE.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaSessionExportView.swift", hasExecutableFixture: false),
-        .init(id: "APNEA_IOS_15", fileName: "APNEA_IOS_15_SETTINGS.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaSettingsView.swift", hasExecutableFixture: false),
+        .init(id: "APNEA_IOS_01", fileName: "APNEA_IOS_01_DASHBOARD.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaDashboardView.swift", hasExecutableFixture: true),
+        .init(id: "APNEA_IOS_02", fileName: "APNEA_IOS_02_PROFILES.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaProfilesView.swift", hasExecutableFixture: true),
+        .init(id: "APNEA_IOS_03", fileName: "APNEA_IOS_03_SESSION_PLANNER.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaSessionPlannerView.swift", hasExecutableFixture: true),
+        .init(id: "APNEA_IOS_04", fileName: "APNEA_IOS_04_DIVE_DETAIL.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaSessionDetailView.swift", hasExecutableFixture: true),
+        .init(id: "APNEA_IOS_05", fileName: "APNEA_IOS_05_SESSION_CHARTS.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaSessionDetailView.swift (charts)", hasExecutableFixture: true),
+        .init(id: "APNEA_IOS_06", fileName: "APNEA_IOS_06_STATISTICS.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaStatisticsView.swift", hasExecutableFixture: true),
+        .init(id: "APNEA_IOS_07", fileName: "APNEA_IOS_07_EQUIPMENT.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaEquipmentView.swift", hasExecutableFixture: true),
+        .init(id: "APNEA_IOS_08", fileName: "APNEA_IOS_08_BUDDY_SAFETY.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaBuddySafetyView.swift", hasExecutableFixture: true),
+        .init(id: "APNEA_IOS_09", fileName: "APNEA_IOS_09_SESSION_MAP.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaSessionDetailView.swift (map)", hasExecutableFixture: true),
+        .init(id: "APNEA_IOS_10", fileName: "APNEA_IOS_10_LOGBOOK.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaSessionsListView.swift", hasExecutableFixture: true),
+        .init(id: "APNEA_IOS_11", fileName: "APNEA_IOS_11_ALARMS.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaSettingsView.swift (alarms)", hasExecutableFixture: true),
+        .init(id: "APNEA_IOS_12", fileName: "APNEA_IOS_12_MARKERS.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaSettingsView.swift (markers)", hasExecutableFixture: true),
+        .init(id: "APNEA_IOS_13", fileName: "APNEA_IOS_13_PERSONAL_RECORDS.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaPersonalRecordsView.swift", hasExecutableFixture: true),
+        .init(id: "APNEA_IOS_14", fileName: "APNEA_IOS_14_EXPORT_SHARE.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaSessionExportView.swift", hasExecutableFixture: true),
+        .init(id: "APNEA_IOS_15", fileName: "APNEA_IOS_15_SETTINGS.png", platform: .ios, implementationReference: "iOSApp/Views/Apnea/IOSApneaSettingsView.swift", hasExecutableFixture: true),
     ]
 
     static var count: Int { all.count }
@@ -70,5 +70,13 @@ enum ApneaMockupReferenceMatrix {
         Set(all.compactMap { reference in
             reference.platform == .watch ? reference.presentationStage : nil
         })
+    }
+
+    static func referencePNGExists(at repositoryRoot: URL) -> [String] {
+        all.compactMap { reference in
+            let path = repositoryRoot
+                .appendingPathComponent(MockupCanonicalPaths.apneaPNG(fileName: reference.fileName, platform: reference.platform))
+            return FileManager.default.fileExists(atPath: path.path) ? nil : reference.fileName
+        }
     }
 }

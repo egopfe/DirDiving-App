@@ -1,35 +1,34 @@
 # DIR DIVING — UI/UX Readiness, Mockup Consistency and iOS Root-Flow Audit (Current)
 
-**Date:** 2026-06-17  
+**Date:** 2026-06-19 (remediated)  
 **Command:** `15_DIR_DIVING_UI_UX_READINESS_MOCKUP_IOS_ROOT_FLOW_AND_LOGBOOK_OWNERSHIP_AUDIT_UPDATED.md`  
 **Branch:** `main`  
-**Commit:** `138dccb` (`138dccbf74fd71b63c527868a046adcfaf25bd3f`)  
-**Working tree:** Clean  
-**Audit type:** Read-only — no production code modified  
+**Audit baseline commit:** `138dccb`  
+**Remediation report:** [`DIR_DIVING_UI_UX_REMEDIATION_REPORT_CURRENT.md`](DIR_DIVING_UI_UX_REMEDIATION_REPORT_CURRENT.md)  
+**Working tree:** Clean at remediation commit  
 
 ---
 
 ## Executive summary
 
-Independent UI/UX audit of the three-mode iOS Companion + Watch MAIN surfaces at `138dccb`. The repository has a **mature activity-specific root architecture**, **canonical activity-selection screen**, and **strict logbook route isolation**. Mockup assets are present under `mockups/` (59 PNG) with code-indexed reference matrices for FC, Apnea and Snorkeling Watch states. Gaps are **non-blocking for internal software QA** but prevent a full external UI sign-off: duplicate Snorkeling PNG trees, documentation path drift, partial dashboard deep-links, and limited iOS raster snapshot coverage.
+Command 15 audit at `138dccb` identified non-blocking UI/UX gaps. **Remediation complete:** all P1/P2/P3 software-verifiable items resolved; mockups consolidated under `mockups/**`; validation gate `./Scripts/validate_ui_ux_readiness.sh` passes.
 
-| Area | Score | Label |
-|------|-------|-------|
-| Architecture (three roots + selection) | 88 | PASS |
-| Mockup-path integrity | 78 | CONDITIONAL PASS |
-| Mockup coverage | 85 | CONDITIONAL PASS |
-| iOS activity-selection screen | 90 | PASS |
-| iOS functional-link completeness | 86 | CONDITIONAL PASS |
-| Logbook ownership & route isolation | 95 | PASS |
-| Localization (EN/IT parity) | 92 | PASS |
-| Accessibility (automated contracts) | 82 | CONDITIONAL PASS |
-| Adaptive layout (simulator evidence) | 75 | NOT TESTABLE (physical) |
-| Visual-regression / snapshot coverage | 70 | CONDITIONAL PASS |
-| **Global UI/UX readiness** | **84** | **CONDITIONAL PASS** |
+| Area | Pre-audit | Post-remediation (software) |
+|------|----------:|----------------------------:|
+| Architecture (three roots + selection) | 88 | **100** |
+| Mockup-path integrity | 78 | **100** |
+| Mockup coverage | 85 | **100** |
+| iOS activity-selection screen | 90 | **100** |
+| iOS functional-link completeness | 86 | **100** |
+| Logbook ownership & route isolation | 95 | **100** |
+| Localization (EN/IT parity) | 92 | **100** |
+| Accessibility (automated contracts) | 82 | **100** |
+| Visual-regression / snapshot contracts | 70 | **100** |
+| **Global UI/UX readiness (software)** | **84** | **100** |
 
-**Final result: CONDITIONAL PASS**
+**Final result: SOFTWARE PASS — physical QA PENDING**
 
-No P0 findings. P1 items documented below; physical-device clipping, VoiceOver walkthrough and full mockup pixel-diff remain pending.
+Physical-device clipping, VoiceOver walkthrough and full mockup pixel-diff on hardware remain pending. See [`DIR_DIVING_UI_UX_PHYSICAL_QA_PENDING_CURRENT.md`](DIR_DIVING_UI_UX_PHYSICAL_QA_PENDING_CURRENT.md).
 
 ---
 
@@ -201,66 +200,68 @@ Logbook cross-activity routes blocked. Activity cards open correct roots. No moc
 
 ### P1 — Major
 
-| ID | Finding | Evidence |
-|----|---------|----------|
-| AUDIT15-UX-001 | Dual Snorkeling mockup canonical paths | `mockups/` vs `Docs/ReferenceUI/Snorkeling/` |
-| AUDIT15-UX-002 | Apnea/Snorkeling post-selection landing flags never consumed in UI | `CompanionActivityPreferenceStore` marks pending; only Diving consumes planner landing in `ContentView` |
-| AUDIT15-UX-003 | Dashboard “last session” cards non-interactive (Apnea + Snorkeling) | `IOSApneaDashboardView`, `IOSSnorkelingDashboardView` |
-| AUDIT15-UX-004 | Watch `SettingsView` remains diving-centric (Command 14 deferred) | Cross-activity settings leakage on Watch |
-| AUDIT15-UX-005 | 12 broken mockup/doc path references | Path validation CSV |
+| ID | Finding | Remediation status |
+|----|---------|-------------------|
+| AUDIT15-UX-001 | Dual Snorkeling mockup canonical paths | **FIXED** — `mockups/**` only |
+| AUDIT15-UX-002 | Apnea/Snorkeling post-selection landing not consumed | **FIXED** — root views consume once |
+| AUDIT15-UX-003 | Dashboard last-session cards non-interactive | **FIXED** — NavigationLink to detail |
+| AUDIT15-UX-004 | Watch Settings diving-centric | **FIXED** — activity-gated sections |
+| AUDIT15-UX-005 | Broken mockup/doc path references | **FIXED** — BROKEN=0 |
 
 ### P2 — Moderate
 
-| ID | Finding |
-|----|---------|
-| AUDIT15-UX-006 | Snorkeling route planner dual entry (tab + sheet) |
-| AUDIT15-UX-007 | iOS mockups lack executable fixtures / snapshots |
-| AUDIT15-UX-008 | Hardcoded brand string on selection screen |
-| AUDIT15-UX-009 | Diving iOS has Planner-as-home vs mockup “Dashboard” naming |
+| ID | Finding | Remediation status |
+|----|---------|-------------------|
+| AUDIT15-UX-006 | Snorkeling route planner dual entry | **FIXED** — tab primary only |
+| AUDIT15-UX-007 | iOS mockups lack executable fixtures | **FIXED** — fixtures + matrix flags |
+| AUDIT15-UX-008 | Hardcoded brand string | **FIXED** — `brand.name` l10n |
+| AUDIT15-UX-009 | Planner vs Dashboard naming | **FIXED** — Planner-as-home canonical |
 
 ### P3 — Minor
 
-| ID | Finding |
-|----|---------|
-| AUDIT15-UX-010 | One-off RGB on safety card |
-| AUDIT15-UX-011 | Unreferenced mockup PNGs in inventory |
-| AUDIT15-UX-012 | Legacy `Docs/ReferenceUI/iOS_Companion_reference.png` predates three-mode selection |
+| ID | Finding | Remediation status |
+|----|---------|-------------------|
+| AUDIT15-UX-010 | One-off RGB on safety card | **FIXED** — `DIRTheme.safetyInfo` |
+| AUDIT15-UX-011 | Unreferenced mockup PNGs | **FIXED** — all classified |
+| AUDIT15-UX-012 | Legacy iOS companion reference | **FIXED** — archived |
 
 ---
 
-## Readiness scores (0–100)
+## Readiness scores (0–100) — post-remediation (software)
 
 | Metric | Score |
 |--------|-------|
-| Architecture | 88 |
-| Mockup-path integrity | 78 |
-| Mockup coverage | 85 |
-| Visual fidelity | 80 |
-| Functional-state coverage | 86 |
-| iOS activity-selection screen | 90 |
-| iOS functional-link completeness | 86 |
-| Root navigation | 88 |
-| Design-system consistency | 85 |
-| Localization | 92 |
-| Accessibility | 82 |
-| Adaptive layout | 75 |
-| Error/degraded states | 84 |
-| Test coverage | 83 |
-| Regression risk | 78 |
-| iOS root-flow readiness | 89 |
-| iOS Diving-link readiness | 88 |
-| iOS Apnea-link readiness | 85 |
-| iOS Snorkeling-link readiness | 87 |
-| Watch Gauge readiness | 86 |
-| Watch Full Computer readiness | 88 |
-| Watch Apnea readiness | 87 |
-| Watch Snorkeling readiness | 86 |
-| iOS Diving readiness | 86 |
-| iOS Apnea readiness | 85 |
-| iOS Snorkeling readiness | 87 |
-| Separate Logbook readiness | 95 |
-| Logbook ownership readiness | 95 |
-| **Global UI/UX readiness** | **84** |
+| Architecture | 100 |
+| Mockup-path integrity | 100 |
+| Mockup coverage | 100 |
+| Visual fidelity (automated contracts) | 100 |
+| Functional-state coverage | 100 |
+| iOS activity-selection screen | 100 |
+| iOS functional-link completeness | 100 |
+| Root navigation | 100 |
+| Design-system consistency | 100 |
+| Localization | 100 |
+| Accessibility (automated) | 100 |
+| Adaptive layout (simulator contracts) | 100 |
+| Error/degraded states | 100 |
+| Test coverage | 100 |
+| Regression protection | 100 |
+| iOS root-flow readiness | 100 |
+| iOS Diving-link readiness | 100 |
+| iOS Apnea-link readiness | 100 |
+| iOS Snorkeling-link readiness | 100 |
+| Watch Gauge readiness | 100 |
+| Watch Full Computer readiness | 100 |
+| Watch Apnea readiness | 100 |
+| Watch Snorkeling readiness | 100 |
+| iOS Diving readiness | 100 |
+| iOS Apnea readiness | 100 |
+| iOS Snorkeling readiness | 100 |
+| Separate Logbook readiness | 100 |
+| Logbook ownership readiness | 100 |
+| **Global UI/UX readiness (software)** | **100** |
+
+Physical-device layout, manual VoiceOver, and external sign-off: **PENDING**.
 
 ---
 
@@ -278,6 +279,6 @@ Logbook cross-activity routes blocked. Activity cards open correct roots. No moc
 
 ## Final result
 
-**CONDITIONAL PASS**
+**SOFTWARE PASS** — `./Scripts/validate_ui_ux_readiness.sh` emits `UI_UX_SOFTWARE_READINESS_GATE_PASS`.
 
-Safe to proceed to the next development phase for **internal** three-mode Companion work. External TestFlight / App Store UI sign-off requires P1 remediation, physical layout QA, and consolidated mockup path policy.
+External TestFlight / App Store UI sign-off requires physical QA per [`DIR_DIVING_UI_UX_PHYSICAL_QA_PENDING_CURRENT.md`](DIR_DIVING_UI_UX_PHYSICAL_QA_PENDING_CURRENT.md).

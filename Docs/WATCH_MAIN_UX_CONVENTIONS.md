@@ -22,7 +22,7 @@ When `ascentStatus.isOverLimit` is true during an active dive:
 
 **Code:** `Views/AscentWarningBannerView.swift`, `Views/DiveLiveView.swift`, `Services/HapticService.swift` (`ascentAlarmTriggered`, `ascentAlarmRepeatIfNeeded`).
 
-**Visual reference:** ascent alarm mockup (`ascent_alarm.png`).
+**Visual reference:** `Docs/FeatureScreenshots/02-ascent-warning.png` (inline ascent banner).
 
 **Do not:**
 - Hide the ascent gauge during the alarm

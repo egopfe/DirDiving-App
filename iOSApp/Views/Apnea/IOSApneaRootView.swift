@@ -32,6 +32,7 @@ final class IOSApneaNavigationStore: ObservableObject {
     @Published var selectedTab: IOSApneaTab = .dashboard
     @Published var showPlanner = false
     @Published var showSettings = false
+    @Published var pendingSessionDetailID: UUID?
 }
 
 struct IOSApneaRootView: View {
@@ -68,6 +69,15 @@ struct IOSApneaRootView: View {
         .onChange(of: apneaNavigation.selectedTab) { _, tab in
             mountedTabs.insert(tab)
         }
+        .onAppear {
+            applyPostSelectionLandingIfNeeded()
+        }
+    }
+
+    private func applyPostSelectionLandingIfNeeded() {
+        guard IOSCompanionPostLegalEntry.consumePendingApneaLanding() else { return }
+        apneaNavigation.selectedTab = .dashboard
+        mountedTabs.insert(.dashboard)
     }
 
     private var iosApneaTabBar: some View {
