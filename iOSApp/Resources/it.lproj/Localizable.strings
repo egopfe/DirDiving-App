@@ -2566,3 +2566,17 @@
 "snorkeling.route.entry" = "Ingresso";
 "snorkeling.route.exit" = "Uscita";
 "snorkeling.route.waypoint" = "Waypoint";
+"shared.settings.general.title" = "Generale";
+"snorkeling.ios.settings.detection" = "Rilevamento sessione";
+"snorkeling.ios.settings.auto_water" = "Rilevamento acqua automatico";
+"snorkeling.ios.settings.dip_threshold" = "Soglia immersione: %.1f m";
+"snorkeling.ios.settings.surface_debounce" = "Debounce superficie: %d s";
+"snorkeling.ios.settings.gps" = "GPS";
+"snorkeling.ios.settings.gps_tracking" = "Tracciamento GPS";
+"snorkeling.ios.settings.return_distance" = "Allerta ritorno ingresso: %d m";
+"snorkeling.ios.settings.alerts" = "Allarmi";
+"snorkeling.ios.settings.session_duration_alert" = "Allerta durata sessione: %d min";
+"snorkeling.ios.settings.feedback" = "Feedback";
+"snorkeling.ios.settings.haptics" = "Haptica";
+"snorkeling.ios.settings.mission_mode" = "Mission mode";
+"snorkeling.ios.settings.reset" = "Ripristina impostazioni snorkeling";

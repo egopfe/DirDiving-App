@@ -32,6 +32,8 @@ struct DIRDivingiOSApp: App {
     @StateObject private var snorkelingEquipmentStore = IOSSnorkelingEquipmentStore()
     @StateObject private var snorkelingBuddySafetyStore = IOSSnorkelingBuddySafetyStore()
     @StateObject private var snorkelingSessionPhotoStore = IOSSnorkelingSessionPhotoStore()
+    @StateObject private var sharedSettingsStore = SharedIOSSettingsStore()
+    @StateObject private var snorkelingSettingsStore = IOSSnorkelingSettingsStore()
     @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
 
     init() {
@@ -97,7 +99,9 @@ struct DIRDivingiOSApp: App {
             .environmentObject(snorkelingEquipmentStore)
             .environmentObject(snorkelingBuddySafetyStore)
             .environmentObject(snorkelingSessionPhotoStore)
-            .environment(\.locale, DIRIOSAppLanguage.fromStorage(appLanguage).locale)
+            .environmentObject(sharedSettingsStore)
+            .environmentObject(snorkelingSettingsStore)
+            .environment(\.locale, sharedSettingsStore.locale)
             .preferredColorScheme(.dark)
             .task {
                 logStore.attachWatchSync(watchSync)

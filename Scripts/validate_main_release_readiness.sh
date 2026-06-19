@@ -16,7 +16,9 @@ fi
 ./Scripts/audit_localization.sh
 
 echo "[readiness] running xcodegen"
-xcodegen generate
+# shellcheck source=Scripts/lib/xcodegen_once.sh
+source "${ROOT_DIR}/Scripts/lib/xcodegen_once.sh"
+xcodegen_once
 
 echo "[readiness] checking xcodegen drift"
 git diff --exit-code -- DIRDiving.xcodeproj

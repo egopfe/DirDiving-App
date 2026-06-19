@@ -96,9 +96,9 @@ struct ApneaSessionEngine {
 
     init(checkpoint envelope: ApneaSessionCheckpointEnvelope) throws {
         let payload = try ApneaSessionCheckpointIntegrity.payload(from: envelope)
-        self.configuration = .default
+        self.configuration = payload.lifecycleConfiguration
         self.feedConfiguration = .apneaDefault
-        self.recoveryPolicy = payload.session.profile?.preferredRecoveryPolicy ?? .default
+        self.recoveryPolicy = payload.recoveryPolicy
         self.sessionClock = MonotonicElapsedClock()
         self.sessionClock.restore(from: payload.sessionClock)
         self.diveClock = MonotonicElapsedClock()
@@ -119,11 +119,23 @@ struct ApneaSessionEngine {
         self.pendingManualDescent = false
         self.pendingManualSurface = false
         self.endSessionRequested = payload.lifecyclePhase == .ended
+        if let currentDive = payload.currentDive {
+            let startedAt = currentDive.startedAtMonotonicSeconds
+            if tracker.diveStartedAt == nil {
+                tracker.diveStartedAt = startedAt
+            }
+            tracker.diveMaxDepthMeters = max(
+                tracker.diveMaxDepthMeters,
+                currentDive.maxDepthMeters,
+                currentDive.samples.map(\.depthMeters).max() ?? 0
+            )
+            activeDiveStartedAtMonotonic = startedAt
+        }
         self.snapshot = ApneaSessionEngineSnapshot(
             phase: payload.lifecyclePhase,
             session: payload.session,
-            currentDepthMeters: nil,
-            verticalSpeedMetersPerSecond: 0,
+            currentDepthMeters: payload.feedState.lastAccepted?.depthMeters,
+            verticalSpeedMetersPerSecond: payload.feedState.lastAccepted?.verticalSpeedMetersPerSecond ?? 0,
             diveElapsedSeconds: 0,
             surfaceElapsedSeconds: 0,
             sessionElapsedSeconds: 0,
@@ -134,7 +146,7 @@ struct ApneaSessionEngine {
             isRecoveryComplete: true,
             sensorHealth: .available,
             rawSampleCount: payload.rawSamples.count,
-            acceptedSampleCount: 0,
+            acceptedSampleCount: payload.acceptedSamples.count,
             activeDiveSampleCount: payload.acceptedSamples.count
         )
         refreshSnapshot(
@@ -148,6 +160,7 @@ struct ApneaSessionEngine {
         uptime: TimeInterval = ProcessInfo.processInfo.systemUptime
     ) {
         sessionArmed = true
+        sessionClock.reset(anchorDate: wallClock, uptime: uptime)
         runMachine(feedAccepted: false, acceptedDepth: nil, verticalSpeed: 0, wallClock: wallClock, uptime: uptime, tickOnly: true)
         refreshSnapshot(wallClock: wallClock, uptime: uptime)
     }
@@ -236,7 +249,9 @@ struct ApneaSessionEngine {
             tracker: tracker,
             feedState: feedState,
             savedAtWallClock: wallClock,
-            savedAtMonotonicSeconds: sessionMonotonic
+            savedAtMonotonicSeconds: sessionMonotonic,
+            lifecycleConfiguration: configuration,
+            recoveryPolicy: recoveryPolicy
         )
         return try ApneaSessionCheckpointIntegrity.makeEnvelope(payload: payload)
     }
