@@ -488,6 +488,15 @@ targets:
       - Tests/iOSAlgorithmTests/SnorkelingRouteSyncCodecTests.swift
       - Tests/iOSAlgorithmTests/SnorkelingSessionSyncCodecTests.swift
       - Tests/iOSAlgorithmTests/SnorkelingSessionSyncTransportNegativeTests.swift
+      - Tests/iOSAlgorithmTests/SnorkelingRouteAckRoundTripTests.swift
+      - Tests/iOSAlgorithmTests/SnorkelingSessionSyncInterruptedTransferTests.swift
+      - Tests/iOSAlgorithmTests/SnorkelingLegacyV1TransportTests.swift
+      - Tests/iOSAlgorithmTests/SnorkelingDuplicateIgnoredImportTests.swift
+      - Tests/iOSAlgorithmTests/IOSSnorkelingDashboardMapGapTests.swift
+      - Tests/iOSAlgorithmTests/IOSSnorkelingNoGPSPresentationTests.swift
+      - Tests/iOSAlgorithmTests/IOSSnorkelingExportServiceE2ETests.swift
+      - Tests/iOSAlgorithmTests/SnorkelingPhotoMetadataSanitizationTests.swift
+      - Tests/iOSAlgorithmTests/IOSSnorkelingReleaseHardValidationTests.swift
       - Tests/iOSAlgorithmTests/IOSApneaLogbookAnalyticsTests.swift
       - Tests/iOSAlgorithmTests/IOSApneaMapEquipmentExportTests.swift
       - Tests/iOSAlgorithmTests/ApneaSyncCodecTests.swift

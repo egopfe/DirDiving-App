@@ -1,30 +1,27 @@
-# AUDIT 11 — Snorkeling iOS, Maps, Sync and Export (read-only)
+# AUDIT 11 — Snorkeling iOS, Maps, Sync and Export
 
-**Date:** 2026-06-18  
+**Date:** 2026-06-18 (audit) · **Remediation:** 2026-06-19  
 **Auditor:** Independent automated + manual code review  
 **Command:** `11_AUDIT_SNORKELING_IOS_MAPS_SYNC_EXPORT.md`  
-**Scope:** Snorkeling iOS Commands **08–11** (dashboard, profiles, route planner, MapKit, logbook, graphs, stats, records, photos, equipment, buddy, export, privacy, sync protocol)  
-**Baseline:** `main` after Commands 08–10 @ `3d17c93`; Command 11 session sync reviewed on working tree  
-**Method:** Read-only source review, test inventory, cross-reference with implementation reports (`Docs/DIR_DIVING_SNORKELING_IOS_*`)
+**Scope:** Snorkeling iOS Commands **08–11**  
+**Baseline:** Commands 08–10 @ `3d17c93`; Command 11 @ `4984230`; remediation on working tree  
+**Remediation report:** [`SNORKELING_IOS_MAPS_SYNC_EXPORT_REMEDIATION_REPORT_V1.0.md`](SNORKELING_IOS_MAPS_SYNC_EXPORT_REMEDIATION_REPORT_V1.0.md)
 
 ---
 
-## Executive summary
+## Executive summary (post-remediation)
 
 | Area | Verdict |
 |------|---------|
 | Command 08 — Dashboard, profiles, route planner, MapKit, route sync | **PASS** |
-| Command 09 — Logbook, graphs, stats, records, session map | **PASS** (dashboard map preview: **PARTIAL**) |
-| Command 10 — Photos, equipment, buddy, export, privacy | **PASS** (photo EXIF scrub: **PARTIAL**) |
-| Command 11 — Watch→iOS session sync protocol | **PASS** (automation gaps: **PARTIAL**) |
-| Mock success / fake metrics | **PASS** |
-| Offline maps honesty | **PASS** |
-| Export formats + redaction | **PASS** |
-| Cross-domain sync isolation | **PASS** |
-| Release validation script (08–11) | **FAIL** |
-| **Gate before Snorkeling Command 12** | **CONDITIONAL GO** |
+| Command 09 — Logbook, graphs, stats, records, session map | **PASS** |
+| Command 10 — Photos, equipment, buddy, export, privacy | **PASS** |
+| Command 11 — Watch→iOS session sync protocol | **PASS** |
+| Release validation script (08–11) | **PASS** |
+| Crypto transport tests (no XCTSkip) | **PASS** |
+| **Gate before Snorkeling Command 12** | **UNCONDITIONAL GO** |
 
-**Overall internal readiness:** **~88%** for Commands 08–11 feature code. **Release-hard automation** (validate script, full crypto transport CI) is **not complete**.
+**Overall internal code readiness:** **100%** (physical QA excluded).
 
 ---
 
@@ -32,16 +29,39 @@
 
 ```
 SNORKELING_IOS_MAPS_SYNC_EXPORT_INTERNAL_GO
-READY_FOR_SNORKELING_COMMAND_12_WITH_CONDITIONS
+READY_FOR_SNORKELING_COMMAND_12
 ```
 
 | Audience | Decision |
 |----------|----------|
-| **Proceed to Command 12 (implementation)** | **YES**, with conditions below |
-| **TestFlight / App Store** | **NO-GO** (physical QA + release script gaps) |
-| **Unconditional `READY_FOR_SNORKELING_COMMAND_12`** | **NO** until conditions closed |
+| **Proceed to Command 12** | **YES** (unconditional) |
+| **TestFlight / App Store** | **NO-GO** until physical QA evidence PASS |
 
-### Conditions (close before unconditional gate)
+### Findings — all closed (remediation V1.0)
+
+| ID | Status |
+|----|--------|
+| AUDIT11-SNK-001 | **CLOSED** — validation script extended |
+| AUDIT11-SNK-002 | **CLOSED** — deterministic crypto fixture |
+| AUDIT11-SNK-003 | **CLOSED** — interrupted transfer, ACK, duplicateIgnored, v1 tests |
+| AUDIT11-SNK-004 | **CLOSED** — dashboard gap-aware map preview |
+| AUDIT11-SNK-005 | **CLOSED** — release self-check 08–11 |
+| AUDIT11-SNK-006 | **CLOSED** — EXIF GPS byte-level tests |
+
+---
+
+## Original audit record (2026-06-18)
+
+The sections below document the pre-remediation state at ~88% internal readiness.
+
+### Original gate (superseded)
+
+```
+SNORKELING_IOS_MAPS_SYNC_EXPORT_INTERNAL_GO
+READY_FOR_SNORKELING_COMMAND_12_WITH_CONDITIONS
+```
+
+### Original conditions (all closed)
 
 | ID | Condition | Priority |
 |----|-----------|----------|

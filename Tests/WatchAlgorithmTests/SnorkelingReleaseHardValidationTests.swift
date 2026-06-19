@@ -8,11 +8,13 @@ final class SnorkelingReleaseHardValidationTests: XCTestCase {
         let sources = try snorkelingSourceCorpus()
         let english = try loadWatchStrings(named: "en")
         let italian = try loadWatchStrings(named: "it")
+        let project = try String(contentsOf: root.appendingPathComponent("project.yml"), encoding: .utf8)
         let issues = SnorkelingReleaseSelfCheck.runAll(
             snorkelingSourceText: sources,
             english: english,
             italian: italian,
-            repositoryRoot: root
+            repositoryRoot: root,
+            projectText: project
         )
         XCTAssertTrue(issues.isEmpty, "Self-check issues: \(issues)")
     }
@@ -102,14 +104,11 @@ final class SnorkelingReleaseHardValidationTests: XCTestCase {
     }
 
     private func snorkelingSourceCorpus() throws -> String {
-        let paths = [
-            "Shared/Utils/SnorkelingNavigationEngine.swift",
-            "Shared/Utils/SnorkelingReturnAdvisor.swift",
-            "Shared/Utils/SnorkelingOperationalEventEngine.swift",
-            "Utils/SnorkelingWatchPresentation.swift",
-            "Views/SnorkelingView.swift",
-            "Services/SnorkelingWatchRuntimeStore.swift",
-        ]
+        let paths = SnorkelingReleaseSelfCheck.watchCommand04to07Files
+            + SnorkelingReleaseSelfCheck.iosCommand08Files
+            + SnorkelingReleaseSelfCheck.iosCommand09Files
+            + SnorkelingReleaseSelfCheck.iosCommand10Files
+            + SnorkelingReleaseSelfCheck.iosCommand11Files
         return try paths.map { try String(contentsOf: repositoryRoot().appendingPathComponent($0), encoding: .utf8) }.joined(separator: "\n")
     }
 

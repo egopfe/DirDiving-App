@@ -1016,6 +1016,34 @@ extension WatchSyncService {
     func testHook_setActivationStateForTests(_ state: WCSessionActivationState) {
         activationState = state
     }
+
+    func testHook_resetSnorkelingPendingQueueForTests() {
+        pendingSnorkelingTransfers = []
+        pendingSnorkelingUserInfoSessionIDs = [:]
+        inFlightSnorkelingSessionIDs = []
+        savePendingSnorkelingTransfers()
+    }
+
+    var testHook_pendingSnorkelingSessionIDs: [UUID] {
+        pendingSnorkelingTransfers.map(\.session.id)
+    }
+
+    var testHook_pendingSnorkelingTransfers: [SnorkelingSyncPendingTransfer] {
+        pendingSnorkelingTransfers
+    }
+
+    func testHook_enqueueSnorkelingSession(_ session: SnorkelingSession) {
+        enqueuePendingSnorkelingSession(session)
+    }
+
+    func testHook_confirmSnorkelingSignedAck(sessionID: UUID, issuedAt: Date, signature: String) {
+        confirmSnorkelingSignedAck(sessionID: sessionID, issuedAt: issuedAt, signature: signature)
+    }
+
+    func testHook_reloadSnorkelingPendingFromPersistence() -> [SnorkelingSyncPendingTransfer] {
+        pendingSnorkelingTransfers = loadPendingSnorkelingTransfers()
+        return pendingSnorkelingTransfers
+    }
 }
 
 

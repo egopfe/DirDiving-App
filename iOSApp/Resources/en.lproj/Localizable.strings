@@ -2275,6 +2275,8 @@
 "snorkeling.ios.dashboard.sessions_month" = "This month";
 "snorkeling.ios.dashboard.avg_max_depth" = "Avg max depth";
 "snorkeling.ios.dashboard.map_preview" = "Track preview";
+"snorkeling.ios.dashboard.map_preview.a11y_gaps_format" = "%d GPS gaps in track preview";
+"snorkeling.ios.dashboard.map_preview.a11y_segments_format" = "%d measured track segments";
 "snorkeling.ios.dashboard.sync_status" = "Latest sync";
 "snorkeling.ios.dashboard.watch_status" = "Watch";
 "snorkeling.ios.dashboard.new_session" = "NEW SESSION";
