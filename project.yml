@@ -287,6 +287,7 @@ targets:
       - Utils/WatchModeSelectionPreferences.swift
       - Services/DIRActivitySelectionStore.swift
       - Services/AppNavigationStore.swift
+      - Utils/WatchActivityPagePolicy.swift
       - Models/AppPage.swift
       - path: Shared
     settings:
@@ -344,6 +345,7 @@ targets:
       - iOSApp/Services/BuhlmannPlanner.swift
       - iOSApp/Services/CloudSyncStore.swift
       - iOSApp/Utils/CloudBackupSettings.swift
+      - iOSApp/Utils/CloudBackupCapability.swift
       - iOSApp/Services/WatchSyncAuth.swift
       - iOSApp/Services/DiveImportService.swift
       - iOSApp/Services/GasPlanningService.swift
@@ -438,6 +440,7 @@ targets:
       - iOSApp/Utils/IOSMockupPreviewFixtures.swift
       - Utils/MonotonicElapsedClock.swift
       - Models/DIRModesAndStartup.swift
+      - iOSApp/Utils/IOSActivityLogbookRoutingPolicy.swift
       - iOSApp/Models/CompanionActivityPreference.swift
       - iOSApp/Services/CompanionActivityPreferenceStore.swift
       - iOSApp/Utils/CompanionActivityCopy.swift

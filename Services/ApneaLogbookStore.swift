@@ -70,11 +70,21 @@ final class ApneaLogbookStore: ObservableObject {
         add(session)
     }
 
+    func applyRemoteDeletedSessionIDs(_ ids: Set<UUID>) {
+        guard !ids.isEmpty else { return }
+        deletedSessionIDs.formUnion(ids)
+        sessions.removeAll { deletedSessionIDs.contains($0.id) }
+        save()
+    }
+
     func delete(id: UUID) {
         guard sessions.contains(where: { $0.id == id }) else { return }
         deletedSessionIDs.insert(id)
         sessions.removeAll { $0.id == id }
         save()
+#if os(watchOS)
+        WatchSyncService.shared.publishDeletedApneaSessionIDs([id])
+#endif
     }
 
     func exportData() throws -> Data {

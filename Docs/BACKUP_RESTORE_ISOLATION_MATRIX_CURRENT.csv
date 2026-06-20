@@ -1,0 +1,12 @@
+activity,platform,local_storage_key,icloud_kvs_key,opt_in_control,upload_on_save,tombstone_key,wc_tombstone_broadcast,restore_isolation,test_reference,status,severity,notes
+Diving,Watch,dirdiving_sessions.json,dirdiving_watch_dive_sessions,implicit Watch iCloud,CloudSyncStore.save,dirdiving_shared_deleted_session_ids + legacy aliases,dirdiving_deleted_session_ids,yes — diving store only,CloudSessionMergeTests,PASS,,Watch iCloud when available
+Diving,iOS,dirdiving_ios_dive_sessions.json,dirdiving_ios_dive_sessions,dirdiving_ios_cloud_backup_enabled (default OFF),DiveLogStore.syncCloudSessionsBackup,dirdiving_ios_deleted_session_ids,dirdiving_deleted_session_ids,yes,CloudBackupPolicyTests,PASS,,Opt-in required on iOS
+Apnea,Watch,dirdiving_apnea_sessions.json,dirdiving_watch_apnea_sessions,Watch iCloud when available,ApneaLogbookStore cloud save,dirdiving_watch_deleted_apnea_session_ids,none,yes — apnea keys only,None,PARTIAL,P1,No WC delete sync to iOS
+Apnea,iOS,dirdiving_ios_apnea_sessions.json,none,dirdiving_ios_apnea_cloud_backup_enabled (reconciled OFF),ApneaCloudCapability blocks upload,none,none,yes,ApneaCloudBackupStubTruthfulnessTests,PASS,,Explicit local-only policy
+Snorkeling,Watch,dirdiving_snorkeling_sessions.json,none,none,none,none,none,yes — local file only,None,PARTIAL,P2,No cloud path on Watch
+Snorkeling,iOS,dirdiving_ios_snorkeling_sessions.json,none,dirdiving_ios_snorkeling_cloud_backup_enabled (reconciled OFF),SnorkelingCloudCapability blocks upload,none,none,yes,IOSSnorkelingReleaseHardValidationTests,PASS,,Explicit local-only policy
+Cross: Diving restore → Apnea,iOS,N/A,N/A,N/A,N/A,N/A,N/A,must not merge,IOSActivityLogbookDataIsolationTests,PASS,,Separate filenames
+Cross: shared UUID,iOS,N/A,N/A,N/A,N/A,N/A,N/A,independent stores,IOSActivityLogbookDataIsolationTests,PASS,,Same UUID allowed across activities
+Shared cloud toggle,iOS,N/A,N/A,dirdiving_ios_cloud_backup_enabled visible all activities,N/A,N/A,N/A,scope mismatch,SYNC-P1-002,PARTIAL,P1,Toggle shared; upload diving-only
+FC checkpoint,Watch,dirdiving_fc_runtime_checkpoint.json,none,N/A,N/A,none,none,yes — FC engine only,FullComputerRecoveryCheckpointTests,PASS,,Not merged into logbook stores
+Apnea checkpoint,Watch/Snorkeling,dirdiving_apnea_session_checkpoint.json / dirdiving_snorkeling_session_checkpoint.json,none,N/A,N/A,none,none,yes,ApneaCheckpointFoundationTests,PASS,,Activity-scoped checkpoint files

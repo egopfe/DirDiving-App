@@ -19,8 +19,18 @@ final class AppNavigationStore: ObservableObject {
     }
 
     /// Keeps `TabView` selection valid when optional pages are removed from the hierarchy.
-    func clampSelectedPage() {
-        // Mode selection tab is omitted when `hasMultipleStableModes` is false (startup flow + Settings handle mode changes).
+    func clampSelectedPage(
+        for activity: DIRActivityMode = .diving,
+        includeModeSelection: Bool = false
+    ) {
+        let normalized = WatchActivityPagePolicy.normalizedPage(
+            selectedPage,
+            for: activity,
+            includeModeSelection: includeModeSelection
+        )
+        if normalized != selectedPage {
+            selectedPage = normalized
+        }
     }
 
     func presentExportCompletion(fileName: String, exportURL: URL?) {

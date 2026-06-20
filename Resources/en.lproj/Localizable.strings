@@ -724,6 +724,8 @@
 "settings.row.export_logbook.title" = "Export from Logbook";
 "settings.row.export_logbook.subtitle" = "Open Logbook to export";
 "settings.row.gps_surface.title" = "Surface GPS";
+"settings.a11y.gps_surface.diving" = "Surface GPS status for diving";
+"settings.a11y.gps_route.snorkeling" = "GPS route status for snorkeling";
 "settings.row.gps_behavior.title" = "GPS behavior";
 "settings.row.gps_behavior.subtitle" = "Surface only. Underwater GPS is unreliable. Missing coordinates use last fix or are labeled unavailable.";
 "settings.row.depth_sensor.title" = "Depth sensor";
