@@ -1,7 +1,37 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-17  
+**Aggiornato:** 2026-06-20  
 **Branch consigliato:** `main` = `origin/main`
+
+---
+
+## Aggiornamento indice 2026-06-20 — Command 6 git/documentation alignment V3.0
+
+Allineamento documentazione multi-attività (Diving, Apnea, Snorkeling) su `main`; baseline README/INDEX/CSV; report branch alignment.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `6-DIR_DIVING_GIT_DOCUMENTATION_ALIGNMENT_COMMAND_CCR_UPDATED_V3.0.md` |
+| **Report** | [`DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md) |
+| **PR snapshot** | [`PR_STATUS_20260620.md`](PR_STATUS_20260620.md) |
+| **Baseline HEAD** | `bf03fb0` |
+| **Validate** | `./Scripts/validate_main_deep_code_readiness.sh` PASS (1362 iOS + 890 Watch tests, 0 skipped) |
+
+---
+
+## Aggiornamento indice 2026-06-20 — Command 5 deep code audit V3.0 + remediation
+
+Audit read-only V3.0 multi-attività; remediation software MAIN deep code readiness 100%.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `5-DIR_DIVING_MAIN_DEEP_CODE_ANALYSIS_COMMAND_CCR_UPDATED_V3.0.md` |
+| **Audit** | [`MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md) |
+| **Remediation** | [`MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_CURRENT.md) |
+| **Traceability** | [`MAIN_DEEP_CODE_FINDING_TRACEABILITY_CURRENT.csv`](MAIN_DEEP_CODE_FINDING_TRACEABILITY_CURRENT.csv) |
+| **Matrices** | [`MAIN_SECURITY_NEGATIVE_TEST_MATRIX_CURRENT.csv`](MAIN_SECURITY_NEGATIVE_TEST_MATRIX_CURRENT.csv), [`MAIN_SYNC_DATA_INTEGRITY_MATRIX_CURRENT.csv`](MAIN_SYNC_DATA_INTEGRITY_MATRIX_CURRENT.csv), [`MAIN_PRIVACY_FILE_PROTECTION_MATRIX_CURRENT.csv`](MAIN_PRIVACY_FILE_PROTECTION_MATRIX_CURRENT.csv) |
+| **Gate** | `MAIN_INTERNAL_CODE_READINESS_100` / `MAIN_SOFTWARE_FINDINGS_OPEN_0` |
+| **External QA** | [`MAIN_EXTERNAL_QA_PENDING_CURRENT.md`](MAIN_EXTERNAL_QA_PENDING_CURRENT.md) — all **PENDING** |
 
 ---
 
