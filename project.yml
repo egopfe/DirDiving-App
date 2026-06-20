@@ -287,6 +287,7 @@ targets:
       - Utils/WatchModeSelectionPreferences.swift
       - Services/DIRActivitySelectionStore.swift
       - Services/AppNavigationStore.swift
+      - Utils/WatchActivityPagePolicy.swift
       - Models/AppPage.swift
       - path: Shared
     settings:
@@ -438,6 +439,7 @@ targets:
       - iOSApp/Utils/IOSMockupPreviewFixtures.swift
       - Utils/MonotonicElapsedClock.swift
       - Models/DIRModesAndStartup.swift
+      - iOSApp/Utils/IOSActivityLogbookRoutingPolicy.swift
       - iOSApp/Models/CompanionActivityPreference.swift
       - iOSApp/Services/CompanionActivityPreferenceStore.swift
       - iOSApp/Utils/CompanionActivityCopy.swift

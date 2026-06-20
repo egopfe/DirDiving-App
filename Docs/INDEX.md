@@ -5,6 +5,34 @@
 
 ---
 
+## Aggiornamento indice 2026-06-20 — Command 8 sync/persistence/schema audit V3.0
+
+Audit read-only sync Watch↔iOS, persistence, schema, migration, backup/restore multi-attività.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit** | [`MULTI_ACTIVITY_SYNC_PERSISTENCE_SCHEMA_AUDIT_CURRENT.md`](MULTI_ACTIVITY_SYNC_PERSISTENCE_SCHEMA_AUDIT_CURRENT.md) |
+| **Namespaces** | [`SYNC_MESSAGE_NAMESPACE_MATRIX_CURRENT.csv`](SYNC_MESSAGE_NAMESPACE_MATRIX_CURRENT.csv) |
+| **Schema/migration** | [`SCHEMA_MIGRATION_COMPATIBILITY_MATRIX_CURRENT.csv`](SCHEMA_MIGRATION_COMPATIBILITY_MATRIX_CURRENT.csv) |
+| **Backup/restore** | [`BACKUP_RESTORE_ISOLATION_MATRIX_CURRENT.csv`](BACKUP_RESTORE_ISOLATION_MATRIX_CURRENT.csv) |
+| **Overall readiness** | **82/100** (P0=0, P1=2) |
+
+---
+
+## Aggiornamento indice 2026-06-20 — Command 7 activity architecture remediation
+
+Chiusura finding P0/P1 audit architettura multi-attività; logbook Watch gated; environment iOS isolato; settings facade.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit** | [`ACTIVITY_ARCHITECTURE_SETTINGS_LOGBOOK_AUDIT_CURRENT.md`](ACTIVITY_ARCHITECTURE_SETTINGS_LOGBOOK_AUDIT_CURRENT.md) |
+| **Remediation** | [`ACTIVITY_ARCHITECTURE_SETTINGS_LOGBOOK_REMEDIATION_REPORT_CURRENT.md`](ACTIVITY_ARCHITECTURE_SETTINGS_LOGBOOK_REMEDIATION_REPORT_CURRENT.md) |
+| **Traceability** | [`ACTIVITY_ARCHITECTURE_FINDING_TRACEABILITY_CURRENT.csv`](ACTIVITY_ARCHITECTURE_FINDING_TRACEABILITY_CURRENT.csv) |
+| **Validate** | `./Scripts/validate_activity_architecture_settings_logbook_readiness.sh` PASS (1381 iOS + 902 Watch) |
+| **External QA** | [`ACTIVITY_ARCHITECTURE_EXTERNAL_QA_PENDING_CURRENT.md`](ACTIVITY_ARCHITECTURE_EXTERNAL_QA_PENDING_CURRENT.md) — **PENDING** |
+
+---
+
 ## Aggiornamento indice 2026-06-20 — Command 6 git/documentation alignment V3.0
 
 Allineamento documentazione multi-attività (Diving, Apnea, Snorkeling) su `main`; baseline README/INDEX/CSV; report branch alignment.

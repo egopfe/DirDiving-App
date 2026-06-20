@@ -51,6 +51,16 @@ final class WatchActivitySettingsOwnershipTests: XCTestCase {
         }
     }
 
+    func testWatchGPSStatusRowIsActivityScoped() throws {
+        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("Views/SettingsView.swift"))
+        XCTAssertTrue(source.contains("divingSurfaceGPSStatusRow"))
+        XCTAssertTrue(source.contains("snorkelingRouteGPSStatusRow"))
+        XCTAssertTrue(source.contains("if activitySelection.selectedActivity == .diving"))
+        XCTAssertTrue(source.contains("if activitySelection.selectedActivity == .snorkeling"))
+        XCTAssertTrue(source.contains("settings.a11y.gps_surface.diving"))
+        XCTAssertTrue(source.contains("settings.a11y.gps_route.snorkeling"))
+    }
+
     func testDeveloperSettingsRemainProtected() throws {
         let source = try String(contentsOf: repositoryRoot().appendingPathComponent("Views/SettingsView.swift"))
         XCTAssertTrue(source.contains("DeveloperSettings.isDeveloperSectionVisible"))

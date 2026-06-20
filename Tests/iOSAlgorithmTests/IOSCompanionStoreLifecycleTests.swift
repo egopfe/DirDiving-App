@@ -33,6 +33,33 @@ final class IOSCompanionStoreLifecycleTests: XCTestCase {
         XCTAssertTrue(source.contains("private var snorkelingBundle"))
     }
 
+    func testApneaEnvironmentUsesGlobalNotDivingLayer() {
+        let source = readSource("iOSApp/Services/IOSCompanionStoreCoordinator.swift")
+        let apneaBody = extractFunctionBody(named: "applyApneaEnvironment", from: source)
+        XCTAssertTrue(apneaBody.contains("applyGlobalEnvironment"))
+        XCTAssertFalse(apneaBody.contains(".environmentObject(logStore)"))
+    }
+
+    private func extractFunctionBody(named name: String, from source: String) -> String {
+        guard let start = source.range(of: "func \(name)") else { return "" }
+        let tail = source[start.lowerBound...]
+        guard let openBrace = tail.firstIndex(of: "{") else { return "" }
+        var depth = 0
+        var index = openBrace
+        while index < tail.endIndex {
+            let char = tail[index]
+            if char == "{" { depth += 1 }
+            if char == "}" {
+                depth -= 1
+                if depth == 0 {
+                    return String(tail[openBrace...index])
+                }
+            }
+            index = tail.index(after: index)
+        }
+        return ""
+    }
+
     func testWatchSyncUsesLazyLogbookAttachment() {
         let source = readSource("iOSApp/Services/IOSCompanionStoreCoordinator.swift")
         XCTAssertTrue(source.contains("lazyApneaLogbookForSync"))

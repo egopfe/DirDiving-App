@@ -1,25 +1,11 @@
-route_id,source_activity,target_logbook,platform,navigation_path,store_bound,write_path_isolated,ui_route_blocked,automated_test,status,severity,data_safety_impact,notes
-own.diving,Diving,Diving Logbook,iOS,ContentView tab .logbook → LogbookView,DiveLogStore,yes,yes,manual,PASS,,none,Diving root only
-own.apnea,Apnea,Apnea Logbook,iOS,IOSApneaRootView tab .sessions → IOSApneaSessionsListView,IOSApneaLogbookStore,yes,yes,manual,PASS,,none,No DiveLogStore in Apnea views
-own.snorkeling,Snorkeling,Snorkeling Logbook,iOS,IOSSnorkelingRootView tab .sessions → IOSSnorkelingSessionsListView,IOSSnorkelingLogbookStore,yes,yes,manual,PASS,,none,No DiveLogStore in Snorkeling views
-own.diving.watch,Diving,Diving Logbook,Watch,ContentView crown → DiveLogListView,DiveLogStore,yes,yes,manual,PASS,,none,Intended for diving
-own.apnea.watch,Apnea,Apnea Logbook,Watch,ApneaView session save (no browse tab),ApneaLogbookStore,yes,yes,ApneaWatchRuntimeStoreTests,PASS,,none,No Apnea logbook list on Watch
-own.snorkeling.watch,Snorkeling,Snorkeling Logbook,Watch,SnorkelingView session save (no browse tab),SnorkelingLogbookStore,yes,yes,IntegratedModesSequentialFlowTests,PASS,,none,No Snorkeling logbook list on Watch
-cross.diving_to_apnea,Diving,Apnea Logbook,iOS,n/a (separate root),IOSApneaLogbookStore,n/a,yes,manual,PASS,,none,No NavigationLink cross-root
-cross.diving_to_apnea.watch,Diving,Apnea Logbook,Watch,n/a,ApneaLogbookStore,n/a,yes,manual,PASS,,none,No Apnea browse UI on Watch
-cross.diving_to_snorkeling,Diving,Snorkeling Logbook,iOS,n/a (separate root),IOSSnorkelingLogbookStore,n/a,yes,manual,PASS,,none,
-cross.diving_to_snorkeling.watch,Diving,Snorkeling Logbook,Watch,n/a,SnorkelingLogbookStore,n/a,yes,manual,PASS,,none,
-cross.apnea_to_diving,Apnea,Diving Logbook,iOS,n/a (separate root),DiveLogStore,n/a,yes,manual,PASS,,none,iOS Apnea root has no diving logbook tab
-cross.apnea_to_diving.watch,Apnea,Diving Logbook,Watch,ContentView crown → DiveLogListView (idle),DiveLogStore,yes,no,MISSING,FAIL,P0,medium,User sees diving entries while in Apnea mode
-cross.apnea_to_snorkeling,Apnea,Snorkeling Logbook,iOS,n/a,IOSSnorkelingLogbookStore,n/a,yes,manual,PASS,,none,
-cross.apnea_to_snorkeling.watch,Apnea,Snorkeling Logbook,Watch,n/a,SnorkelingLogbookStore,n/a,yes,manual,PASS,,none,
-cross.snorkeling_to_diving,Snorkeling,Diving Logbook,iOS,n/a (separate root),DiveLogStore,n/a,yes,manual,PASS,,none,
-cross.snorkeling_to_diving.watch,Snorkeling,Diving Logbook,Watch,ContentView crown → DiveLogListView (idle),DiveLogStore,yes,no,MISSING,FAIL,P0,medium,User sees diving entries while in Snorkeling mode
-cross.snorkeling_to_apnea,Snorkeling,Apnea Logbook,iOS,n/a,IOSApneaLogbookStore,n/a,yes,manual,PASS,,none,
-cross.snorkeling_to_apnea.watch,Snorkeling,Apnea Logbook,Watch,n/a,ApneaLogbookStore,n/a,yes,manual,PASS,,none,
-write.isolation.sequential,All,All stores,Watch,runtime sequential flow,all per-activity,yes,n/a,IntegratedModesSequentialFlowTests,PASS,,none,Data layer verified
-write.isolation.apnea_only,Apnea,Apnea Logbook,Watch,ApneaView complete session,ApneaLogbookStore,yes,n/a,ApneaWatchRuntimeStoreTests,PASS,,none,
-env.apnea_divelog_injection,Apnea,Diving Logbook (latent),iOS,applySharedEnvironment → DiveLogStore in tree,DiveLogStore,yes,yes_no_ui,manual,PARTIAL,P1,low,No current UI binding misuse
-settings.export_shortcut.diving,Diving,Diving Logbook,Watch,SettingsView export row → .diveLog,diving only,yes,yes,manual,PASS,,none,Gated selectedActivity == .diving
-session.active_nav_block,Apnea/Snorkeling,Diving Logbook,Watch,active session blocks non-live pages,DiveLogStore,n/a,temporary,manual,PARTIAL,P1,low,Hides leak during session not idle
-hub.universal,Global,Universal logbook,Both,n/a,none,n/a,yes,manual,PASS,,none,No global logbook hub exists
+logbook,owning_activity,visible_from_owning_section,visible_from_diving,visible_from_apnea,visible_from_snorkeling,deep_link_owner,state_restoration_owner,store,filters_activity_specific,statistics_activity_specific,exports_activity_specific,cross_activity_route_blocked,status,severity,notes
+Diving Logbook,Diving,yes,yes,no,no,Diving,Diving,DiveLogStore,yes,yes,yes,yes,PASS,,Watch tab gated selectedActivity == .diving; iOS LogbookView in Diving root only
+Apnea Logbook,Apnea,yes,no,yes,no,Apnea,Apnea,IOSApneaLogbookStore,yes,yes,yes,yes,PASS,,Tab .sessions in IOSApneaRootView
+Snorkeling Logbook,Snorkeling,yes,no,no,yes,Snorkeling,Snorkeling,IOSSnorkelingLogbookStore,yes,yes,yes,yes,PASS,,Tab .sessions in IOSSnorkelingRootView
+Cross: Diving→Apnea Logbook,Apnea,no,no,yes,no,Apnea,n/a,IOSApneaLogbookStore,n/a,n/a,n/a,yes,PASS,,No NavigationLink; no Watch browse tab
+Cross: Diving→Snorkeling Logbook,Snorkeling,no,no,yes,no,Snorkeling,n/a,IOSSnorkelingLogbookStore,n/a,n/a,n/a,yes,PASS,,No NavigationLink; no Watch browse tab
+Cross: Apnea→Diving Logbook,Diving,no,no,no,no,Diving,n/a,DiveLogStore,n/a,n/a,n/a,yes,PASS,,Watch diveLog tab not mounted for Apnea
+Cross: Apnea→Snorkeling Logbook,Snorkeling,no,no,no,yes,Snorkeling,n/a,IOSSnorkelingLogbookStore,n/a,n/a,n/a,yes,PASS,,
+Cross: Snorkeling→Diving Logbook,Diving,no,no,no,no,Diving,n/a,DiveLogStore,n/a,n/a,n/a,yes,PASS,,Watch diveLog tab not mounted for Snorkeling
+Cross: Snorkeling→Apnea Logbook,Apnea,no,no,no,yes,Apnea,n/a,IOSApneaLogbookStore,n/a,n/a,n/a,yes,PASS,,
+Universal logbook hub,Global,no,no,no,no,none,none,none,n/a,n/a,n/a,yes,PASS,,No global logbook hub

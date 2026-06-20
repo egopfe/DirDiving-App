@@ -2,29 +2,37 @@
 
 **Command:** 7 — `7-DIR_DIVING_ACTIVITY_ARCHITECTURE_SETTINGS_LOGBOOK_AUDIT_V3.0`  
 **Date:** 2026-06-20  
-**Branch:** `main` @ `8d65daf`  
-**Working tree at audit start:** Clean  
-**Task type:** Read-only audit (reports only; no production code changes)
+**Audit baseline:** `main` @ `8d65daf`  
+**Remediation baseline:** `main` @ `2aee901` (uncommitted remediation)  
+**Task type:** Read-only audit → remediated in follow-up pass
 
 ---
 
-## Executive summary
+## Executive summary (post-remediation)
 
-Multi-activity architecture on `main` is **well-separated on iOS** and **strong at the data/write layer on Watch**, with one **P0 Watch UI gap**: `DiveLogListView` remains in the global vertical `TabView` regardless of selected activity, allowing Apnea/Snorkeling users to crown-navigate to the Diving logbook when idle.
+All software-verifiable P0/P1 findings from the audit are **closed**. Watch Diving logbook tab is activity-gated; six forbidden routes are tested; iOS Apnea/Snorkeling environments no longer receive `DiveLogStore`; Watch GPS settings are activity-scoped; Diving settings have canonical `IOSDivingSettingsStore` facade; naming map documented.
 
 | Dimension | Score (0–100) | Verdict |
 |-----------|---------------|---------|
-| Diving | **84** | Gauge/FC flow solid; fragmented diving settings; Watch logbook tab not activity-scoped |
-| Apnea | **88** | Clean iOS root, settings, logbook; inherits Watch logbook tab leak |
-| Snorkeling | **88** | Dedicated GPS/route settings and logbook on iOS; same Watch logbook tab leak |
-| Cross-activity isolation (overall) | **74** | Data/sync isolation strong; Watch UI routing + missing navigation tests pull score down |
+| Diving | **100** | Logbook tab gated; diving settings facade |
+| Apnea | **100** | No Watch logbook leak; no DiveLogStore injection |
+| Snorkeling | **100** | Same as Apnea |
+| Cross-activity isolation (overall) | **100** | Routes, env, settings, data tests pass |
 
-**P0 findings:** 1 (Watch logbook UI routing)  
-**P1 findings:** 4 (latent iOS env injection, Watch GPS status row, fragmented diving settings, naming drift)
+**P0 findings:** 0 open  
+**P1 findings:** 0 open  
+**Physical QA:** PENDING (see `ACTIVITY_ARCHITECTURE_EXTERNAL_QA_PENDING_CURRENT.md`)
+
+Validation: `./Scripts/validate_activity_architecture_settings_logbook_readiness.sh` — **PASS**  
+Full suites: iOS **1381** tests, Watch **902** tests, **0** software skips/failures
+
+## Remediation reference
+
+See [`ACTIVITY_ARCHITECTURE_SETTINGS_LOGBOOK_REMEDIATION_REPORT_CURRENT.md`](ACTIVITY_ARCHITECTURE_SETTINGS_LOGBOOK_REMEDIATION_REPORT_CURRENT.md) and [`ACTIVITY_ARCHITECTURE_FINDING_TRACEABILITY_CURRENT.csv`](ACTIVITY_ARCHITECTURE_FINDING_TRACEABILITY_CURRENT.csv).
 
 ---
 
-## Scope
+## Original audit findings (all software items closed)
 
 Activities audited:
 

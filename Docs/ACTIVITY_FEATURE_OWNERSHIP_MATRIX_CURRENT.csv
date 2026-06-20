@@ -5,7 +5,7 @@ diving.planner,Planner & gas planning,Diving,PlannerRootView / PlannerView,Watch
 diving.equipment,Equipment profiles,Diving,EquipmentView,none,diving,none,none,yes,no,PRESENT,,,
 diving.analysis,Post-dive analysis,Diving,AnalysisView,none,diving,DiveLogStore,none,yes,no,PRESENT,,,
 diving.compass,Compass navigation,Diving,none,CompassView,shared,none,none,no,no,PRESENT,,,Shared vertical page on Watch during dive
-diving.logbook,Diving logbook browse/export,Diving,LogbookView,DiveLogListView,diving,DiveLogStore,none,yes,yes_watch_ui,FAIL_WATCH,P0,,Watch tab not activity-gated
+diving.logbook,Diving logbook browse/export,Diving,LogbookView,DiveLogListView,diving,DiveLogStore,none,yes,no,PRESENT,,,Watch tab gated to diving activity
 apnea.dashboard,Apnea dashboard,Apnea,IOSApneaDashboardView,ApneaView (summary),apnea,ApneaLogbookStore,ApneaSessionEngine,yes,no,PRESENT,,,
 apnea.profiles,Apnea profiles,Apnea,IOSApneaProfilesView,ApneaView settings,apnea,none,none,yes,no,PRESENT,,,
 apnea.planner,Apnea session planner,Apnea,IOSApneaSessionPlannerView,ApneaView,apnea,none,none,yes,no,PRESENT,,,
@@ -29,4 +29,4 @@ shared.watch_sync,WatchConnectivity sync,shared,IOSCompanionStoreCoordinator,Wat
 root.ios_diving,iOS Diving root shell,Diving,ContentView (iOS),n/a,diving,DiveLogStore,none,yes,no,PRESENT,,,
 root.ios_apnea,iOS Apnea root shell,Apnea,IOSApneaRootView,n/a,apnea,IOSApneaLogbookStore,none,yes,no,PRESENT,,,
 root.ios_snorkeling,iOS Snorkeling root shell,Snorkeling,IOSSnorkelingRootView,n/a,snorkeling,IOSSnorkelingLogbookStore,none,yes,no,PRESENT,,,
-root.watch_unified,Watch unified ContentView,shared,n/a,ContentView,activity_selected,activity_selected,multi,yes,yes_watch_logbook,PARTIAL,P0,,Single TabView; logbook tab not scoped
+root.watch_unified,Watch unified ContentView,shared,n/a,ContentView,activity_selected,activity_selected,multi,yes,no,PRESENT,,,diveLog tab gated by selectedActivity == .diving

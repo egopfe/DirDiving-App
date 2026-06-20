@@ -724,6 +724,8 @@
 "settings.row.export_logbook.title" = "Esporta dal Logbook";
 "settings.row.export_logbook.subtitle" = "Apri Logbook per esportare";
 "settings.row.gps_surface.title" = "GPS superficie";
+"settings.a11y.gps_surface.diving" = "Stato GPS di superficie per immersione";
+"settings.a11y.gps_route.snorkeling" = "Stato GPS percorso per snorkeling";
 "settings.row.gps_behavior.title" = "Comportamento GPS";
 "settings.row.gps_behavior.subtitle" = "Solo in superficie; in acqua il GPS non è attendibile. Coordinate mancanti = ultimo fix o non disponibile (etichettato).";
 "settings.row.depth_sensor.title" = "Sensore profondità";

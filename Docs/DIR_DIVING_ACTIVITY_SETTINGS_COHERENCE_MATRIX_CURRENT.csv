@@ -21,7 +21,7 @@ diving.gf_high,Gradient Factor High,diving,Watch FC settings / planner,Watch Set
 diving.ppo2_limits,PPO2 limits,diving,Planner / gas editors,Watch SettingsView,watch_local,yes,no,no,diving_only,PRESENT,P0,Not in Apnea/Snorkeling UI
 diving.cns_alarm,CNS alarm threshold,diving,MoreView summary / planner,Watch SettingsView,watch_local,yes,no,no,diving_only,PRESENT,P0,Registry confirms no cross-exposure
 diving.deco_stops,Decompression stop alerts,diving,Full Computer config,Watch FC,watch_local,yes,no,no,diving_only,PRESENT,P0,Algorithm unchanged; UI scoped to Diving
-watch.settings.global,Watch global settings surface,shared,none,SettingsView,local_only,yes,yes,yes,activity_scoped,DEFERRED,P2,Command 14 Watch settings refactor not completed; diving controls may leak visually
-diving.settings.consolidated_store,Diving settings store,diving,MoreView (fragmented),Watch SettingsView,local_only,yes,no,no,diving_only,MISSING,P2,No IOSDivingSettingsStore; future consolidation
+watch.settings.global,Watch global settings surface,shared,none,SettingsView,local_only,yes,yes,yes,activity_scoped,PRESENT,P2,Safety/GPS/export gated by activity; Command 7 remediation
+diving.settings.consolidated_store,Diving settings store,diving,IOSDivingSettingsStore facade / MoreView,Watch SettingsView,local_only,yes,no,no,diving_only,PRESENT,P1,IOSDivingSettingsStore facade — no duplicate persistence
 shared.settings.haptics_master,Haptic master preference,shared,none,none,local_only,yes,yes,yes,all,MISSING,P3,Command 14 §6 optional; per-activity haptics exist
 shared.settings.sync_troubleshooting,Sync troubleshooting panel,shared,MoreView partial,Watch partial,none,yes,yes,yes,all,PARTIAL,P2,Sync scope label in MoreView; full troubleshooting TBD
