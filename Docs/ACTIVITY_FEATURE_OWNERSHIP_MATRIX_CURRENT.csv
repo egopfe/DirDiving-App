@@ -1,0 +1,32 @@
+feature_id,feature_name,owning_activity,ios_surface,watch_surface,settings_scope,logbook_scope,session_engine,exclusive_to_owner,cross_activity_leak,status,severity,score_contribution,notes
+diving.gauge,Gauge diving runtime,Diving,ContentView / DiveLiveView,DiveLiveView (gauge branch),diving,DiveLogStore,DiveManager,yes,no,PRESENT,,,Default diving sub-mode
+diving.full_computer,Full Computer Bühlmann runtime,Diving,ContentView / planner context,DiveLiveView (FC branch),diving,DiveLogStore,FullComputerRuntimeEngine,yes,no,PRESENT,,,Predive + confirm gate
+diving.planner,Planner & gas planning,Diving,PlannerRootView / PlannerView,Watch FC predive config,diving,none,none,yes,no,PRESENT,,,Diving-only tabs
+diving.equipment,Equipment profiles,Diving,EquipmentView,none,diving,none,none,yes,no,PRESENT,,,
+diving.analysis,Post-dive analysis,Diving,AnalysisView,none,diving,DiveLogStore,none,yes,no,PRESENT,,,
+diving.compass,Compass navigation,Diving,none,CompassView,shared,none,none,no,no,PRESENT,,,Shared vertical page on Watch during dive
+diving.logbook,Diving logbook browse/export,Diving,LogbookView,DiveLogListView,diving,DiveLogStore,none,yes,yes_watch_ui,FAIL_WATCH,P0,,Watch tab not activity-gated
+apnea.dashboard,Apnea dashboard,Apnea,IOSApneaDashboardView,ApneaView (summary),apnea,ApneaLogbookStore,ApneaSessionEngine,yes,no,PRESENT,,,
+apnea.profiles,Apnea profiles,Apnea,IOSApneaProfilesView,ApneaView settings,apnea,none,none,yes,no,PRESENT,,,
+apnea.planner,Apnea session planner,Apnea,IOSApneaSessionPlannerView,ApneaView,apnea,none,none,yes,no,PRESENT,,,
+apnea.statistics,Apnea statistics,Apnea,IOSApneaStatisticsView,inline in ApneaView,apnea,ApneaLogbookStore,none,yes,no,PRESENT,,,
+apnea.recovery,Recovery timers & targets,Apnea,IOSApneaSettingsView,WatchApneaActivitySettingsSection,apnea,none,ApneaSessionEngine,yes,no,PRESENT,P1,,Absent from Diving/Snorkeling settings
+apnea.detection,Descent/ascent detection,Apnea,IOSApneaSettingsView,ApneaView,apnea,none,ApneaSessionEngine,yes,no,PRESENT,,,
+apnea.logbook,Apnea session logbook,Apnea,IOSApneaSessionsListView,ApneaView save only,apnea,ApneaLogbookStore / IOSApneaLogbookStore,ApneaSessionEngine,yes,no,PRESENT,,,No Watch browse tab by design
+snorkeling.dashboard,Snorkeling dashboard,Snorkeling,IOSSnorkelingDashboardView,SnorkelingView,snorkeling,SnorkelingLogbookStore,SnorkelingSessionEngine,yes,no,PRESENT,,,
+snorkeling.route_planner,Route planner & waypoints,Snorkeling,IOSSnorkelingRoutePlannerView,SnorkelingView map,snorkeling,none,none,yes,no,PRESENT,,,
+snorkeling.gps_tracking,GPS route tracking,Snorkeling,IOSSnorkelingSettingsView,Snorkeling settings WC,snorkeling,none,SnorkelingSessionEngine,yes,no,PRESENT,P1,,Absent from Diving/Apnea settings controls
+snorkeling.return_to_entry,Return-to-entry alerts,Snorkeling,IOSSnorkelingSettingsView,Snorkeling settings WC,snorkeling,none,SnorkelingSessionEngine,yes,no,PRESENT,,,
+snorkeling.dip_detection,Surface dip detection,Snorkeling,IOSSnorkelingSettingsView,Snorkeling settings WC,snorkeling,none,SnorkelingSessionEngine,yes,no,PRESENT,,,
+snorkeling.logbook,Snorkeling session logbook,Snorkeling,IOSSnorkelingSessionsListView,SnorkelingView save only,snorkeling,SnorkelingLogbookStore / IOSSnorkelingLogbookStore,SnorkelingSessionEngine,yes,no,PRESENT,,,
+shared.language,App language,shared,SharedIOSSettingsStore / all activity settings,Watch Settings,shared,none,none,no,no,PRESENT,,,All activities
+shared.units,Depth/distance units,shared,SharedIOSSettingsStore,Watch unit prefs,shared,none,none,no,no,PRESENT,,,
+shared.cloud_backup,Cloud backup toggle,shared,MoreView / CloudBackupSettings,none,shared,all logbooks,none,no,no,PRESENT,P1,,Restore preserves store separation
+shared.activity_selection,Activity/mode selection,shared,IOSCompanionActivitySelectionView,StartupFlowView / ActivitySelectionView,shared,none,none,no,no,PRESENT,,,Session lock on Watch
+shared.legal,Legal acceptance gate,shared,IOSLegalOnboardingView,WatchLegalOnboardingView,shared,none,none,no,no,PRESENT,,,
+shared.user_images,User images gallery,shared,none,UserImagesView,shared,none,none,no,no,PRESENT,,,Watch vertical tab
+shared.watch_sync,WatchConnectivity sync,shared,IOSCompanionStoreCoordinator,WatchSyncService,shared,per-activity namespaces,none,no,no,PRESENT,,,Namespaces isolated per activity
+root.ios_diving,iOS Diving root shell,Diving,ContentView (iOS),n/a,diving,DiveLogStore,none,yes,no,PRESENT,,,
+root.ios_apnea,iOS Apnea root shell,Apnea,IOSApneaRootView,n/a,apnea,IOSApneaLogbookStore,none,yes,no,PRESENT,,,
+root.ios_snorkeling,iOS Snorkeling root shell,Snorkeling,IOSSnorkelingRootView,n/a,snorkeling,IOSSnorkelingLogbookStore,none,yes,no,PRESENT,,,
+root.watch_unified,Watch unified ContentView,shared,n/a,ContentView,activity_selected,activity_selected,multi,yes,yes_watch_logbook,PARTIAL,P0,,Single TabView; logbook tab not scoped
