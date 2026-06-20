@@ -27,15 +27,29 @@ struct ContentView: View {
                 .tag(AppPage.settings)
             UserImagesView()
                 .tag(AppPage.userImages)
-            DiveLogListView()
-                .tag(AppPage.diveLog)
+            if activitySelection.selectedActivity == .diving {
+                DiveLogListView()
+                    .tag(AppPage.diveLog)
+            }
         }
         .tabViewStyle(.verticalPage)
         .onAppear {
-            navigation.clampSelectedPage()
+            navigation.clampSelectedPage(
+                for: activitySelection.selectedActivity,
+                includeModeSelection: WatchModeSelectionPreferences.hasMultipleStableModes
+            )
+        }
+        .onChange(of: activitySelection.selectedActivity) { _, activity in
+            navigation.clampSelectedPage(
+                for: activity,
+                includeModeSelection: WatchModeSelectionPreferences.hasMultipleStableModes
+            )
         }
         .onChange(of: imageStore.imageNames) { _, _ in
-            navigation.clampSelectedPage()
+            navigation.clampSelectedPage(
+                for: activitySelection.selectedActivity,
+                includeModeSelection: WatchModeSelectionPreferences.hasMultipleStableModes
+            )
         }
         .onChange(of: dive.isDiveActive) { _, isActive in
             if isActive {

@@ -9,9 +9,19 @@ final class IOSApneaLogbookStore: ObservableObject {
     @Published private(set) var loadErrorMessage: String?
 
     private let fileName = "dirdiving_ios_apnea_sessions.json"
+    private var deletedSessionIDs: Set<UUID> = []
 
     init() {
+        deletedSessionIDs = loadDeletedSessionIDs()
         load()
+    }
+
+    func applyRemoteDeletedSessionIDs(_ ids: Set<UUID>) {
+        guard !ids.isEmpty else { return }
+        deletedSessionIDs.formUnion(ids)
+        sessions.removeAll { deletedSessionIDs.contains($0.id) }
+        saveDeletedSessionIDs(deletedSessionIDs)
+        persistAtomically()
     }
 
     var lastSession: ApneaSession? { sessions.first }
@@ -69,7 +79,7 @@ final class IOSApneaLogbookStore: ObservableObject {
 
         sessions.removeAll { $0.id == merged.id }
         sessions.insert(merged, at: 0)
-        sessions = ApneaLogbookPolicy.normalizedAndCapped(sessions, deletedIDs: [])
+        sessions = ApneaLogbookPolicy.normalizedAndCapped(sessions, deletedIDs: deletedSessionIDs)
         persistAtomically()
         return outcome.result
     }
@@ -96,7 +106,7 @@ final class IOSApneaLogbookStore: ObservableObject {
             let data = try Data(contentsOf: url)
             let decoded = try ApneaLogbookPersistence.decodeSessionsResiliently(from: data)
             let filtered = ApneaLogbookPolicy.filterValidLoadedSessions(decoded)
-            sessions = ApneaLogbookPolicy.normalizedAndCapped(filtered.sessions, deletedIDs: [])
+            sessions = ApneaLogbookPolicy.normalizedAndCapped(filtered.sessions, deletedIDs: deletedSessionIDs)
         } catch {
             let base = Self.testHook_storageDirectoryURL
                 ?? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -110,6 +120,24 @@ final class IOSApneaLogbookStore: ObservableObject {
         let base = Self.testHook_storageDirectoryURL
             ?? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         return base.appendingPathComponent(fileName)
+    }
+
+    private func deletedIDsFileURL() -> URL {
+        fileURL().deletingLastPathComponent().appendingPathComponent("dirdiving_ios_apnea_deleted_session_ids.json")
+    }
+
+    private func loadDeletedSessionIDs() -> Set<UUID> {
+        let url = deletedIDsFileURL()
+        guard let data = try? Data(contentsOf: url),
+              let ids = try? JSONDecoder().decode([UUID].self, from: data) else {
+            return []
+        }
+        return Set(ids)
+    }
+
+    private func saveDeletedSessionIDs(_ ids: Set<UUID>) {
+        guard let data = try? JSONEncoder().encode(Array(ids)) else { return }
+        try? data.write(to: deletedIDsFileURL(), options: [.atomic, .completeFileProtection])
     }
 
     #if DEBUG

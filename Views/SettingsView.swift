@@ -135,12 +135,12 @@ struct SettingsView: View {
 
                     WatchSettingsSectionHeader(title: String(localized: "settings.section.hardware"))
 
-                    statusRow(
-                        icon: "location.fill",
-                        iconColor: gps.authorizationStatus == .denied ? DiveUI.red : DiveUI.green,
-                        title: String(localized: "settings.row.gps_surface.title"),
-                        subtitle: gpsStatusText
-                    )
+                    if activitySelection.selectedActivity == .diving {
+                        divingSurfaceGPSStatusRow
+                    }
+                    if activitySelection.selectedActivity == .snorkeling {
+                        snorkelingRouteGPSStatusRow
+                    }
                     statusRow(
                         icon: "drop.fill",
                         iconColor: dive.lastErrorMessage == nil ? DiveUI.green : DiveUI.yellow,
@@ -268,6 +268,28 @@ struct SettingsView: View {
         @unknown default:
             return String(localized: "watch.gps.status.unavailable")
         }
+    }
+
+    private var divingSurfaceGPSStatusRow: some View {
+        statusRow(
+            icon: "location.fill",
+            iconColor: gps.authorizationStatus == .denied ? DiveUI.red : DiveUI.green,
+            title: String(localized: "settings.row.gps_surface.title"),
+            subtitle: gpsStatusText
+        )
+        .accessibilityLabel(String(localized: "settings.a11y.gps_surface.diving"))
+        .accessibilityHint(gpsStatusText)
+    }
+
+    private var snorkelingRouteGPSStatusRow: some View {
+        statusRow(
+            icon: "location.fill",
+            iconColor: gps.authorizationStatus == .denied ? DiveUI.red : DiveUI.green,
+            title: String(localized: "settings.snorkeling.gps.title"),
+            subtitle: gpsStatusText
+        )
+        .accessibilityLabel(String(localized: "settings.a11y.gps_route.snorkeling"))
+        .accessibilityHint(gpsStatusText)
     }
 
     private var diveDepthSensorStatusText: String {

@@ -73,4 +73,25 @@ final class IOSActivitySettingsCoherenceTests: XCTestCase {
         let reloaded = IOSSnorkelingSettingsStore()
         XCTAssertEqual(reloaded.settings.returnToEntryDistanceMeters, 120, accuracy: 0.01)
     }
+
+    func testDivingSettingsFacadeRegistryEntryPresent() {
+        let divingFacade = ActivitySettingsVisibility.registry.first { $0.key == "dirdiving.settings.diving.v1" }
+        XCTAssertEqual(divingFacade?.scope, .diving)
+        XCTAssertTrue(divingFacade?.visibleInDiving == true)
+        XCTAssertFalse(divingFacade?.visibleInApnea == true)
+        XCTAssertFalse(divingFacade?.visibleInSnorkeling == true)
+    }
+
+    func testNamingMapDocumentsCanonicalStores() throws {
+        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Utils/ActivitySettingsNamingMap.swift"))
+        XCTAssertTrue(source.contains("IOSApneaSettingsStore"))
+        XCTAssertTrue(source.contains("IOSSnorkelingSettingsStore"))
+    }
+
+    private func repositoryRoot() -> URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+    }
 }

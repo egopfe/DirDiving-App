@@ -1,11 +1,11 @@
 logbook,owning_activity,visible_from_owning_section,visible_from_diving,visible_from_apnea,visible_from_snorkeling,deep_link_owner,state_restoration_owner,store,filters_activity_specific,statistics_activity_specific,exports_activity_specific,cross_activity_route_blocked,status,severity,notes
-Diving Logbook,Diving,yes,no,no,no,Diving,Diving,DiveLogStore,yes,yes,yes,yes,BLOCKED_AS_EXPECTED,,ContentView tab .logbook only
-Apnea Logbook,Apnea,yes,no,no,no,Apnea,Apnea,IOSApneaLogbookStore,yes,yes,yes,yes,BLOCKED_AS_EXPECTED,,Tab .sessions in IOSApneaRootView
-Snorkeling Logbook,Snorkeling,yes,no,no,no,Snorkeling,Snorkeling,IOSSnorkelingLogbookStore,yes,yes,yes,yes,BLOCKED_AS_EXPECTED,,Tab .sessions in IOSSnorkelingRootView
-Cross: Diving→Apnea Logbook,Apnea,no,no,yes,no,Apnea,n/a,IOSApneaLogbookStore,n/a,n/a,n/a,yes,BLOCKED_AS_EXPECTED,,No NavigationLink found
-Cross: Diving→Snorkeling Logbook,Snorkeling,no,no,yes,no,Snorkeling,n/a,IOSSnorkelingLogbookStore,n/a,n/a,n/a,yes,BLOCKED_AS_EXPECTED,,No NavigationLink found
-Cross: Apnea→Diving Logbook,Diving,no,yes,no,no,Diving,n/a,DiveLogStore,n/a,n/a,n/a,yes,BLOCKED_AS_EXPECTED,,No cross-root tab exposure
-Cross: Apnea→Snorkeling Logbook,Snorkeling,no,no,no,yes,Snorkeling,n/a,IOSSnorkelingLogbookStore,n/a,n/a,n/a,yes,BLOCKED_AS_EXPECTED,,
-Cross: Snorkeling→Diving Logbook,Diving,no,no,no,yes,Diving,n/a,DiveLogStore,n/a,n/a,n/a,yes,BLOCKED_AS_EXPECTED,,
-Cross: Snorkeling→Apnea Logbook,Apnea,no,no,no,yes,Apnea,n/a,IOSApneaLogbookStore,n/a,n/a,n/a,yes,BLOCKED_AS_EXPECTED,,
-Universal logbook hub,Global,no,no,no,no,none,none,none,n/a,n/a,n/a,yes,BLOCKED_AS_EXPECTED,,No global logbook entry exists
+Diving Logbook,Diving,yes,yes,no,no,Diving,Diving,DiveLogStore,yes,yes,yes,yes,PASS,,Watch tab gated; iOS Diving root only
+Apnea Logbook,Apnea,yes,no,yes,no,Apnea,Apnea,IOSApneaLogbookStore,yes,yes,yes,yes,PASS,,IOSApneaSessionsListView
+Snorkeling Logbook,Snorkeling,yes,no,no,yes,Snorkeling,Snorkeling,IOSSnorkelingLogbookStore,yes,yes,yes,yes,PASS,,IOSSnorkelingSessionsListView
+Cross: Diving→Apnea Logbook,Apnea,no,no,yes,no,Apnea,n/a,IOSApneaLogbookStore,n/a,n/a,n/a,yes,PASS,,
+Cross: Diving→Snorkeling Logbook,Snorkeling,no,no,yes,no,Snorkeling,n/a,IOSSnorkelingLogbookStore,n/a,n/a,n/a,yes,PASS,,
+Cross: Apnea→Diving Logbook,Diving,no,no,no,no,Diving,n/a,DiveLogStore,n/a,n/a,n/a,yes,PASS,,Remediated 2026-06-20
+Cross: Apnea→Snorkeling Logbook,Snorkeling,no,no,no,yes,Snorkeling,n/a,IOSSnorkelingLogbookStore,n/a,n/a,n/a,yes,PASS,,
+Cross: Snorkeling→Diving Logbook,Diving,no,no,no,no,Diving,n/a,DiveLogStore,n/a,n/a,n/a,yes,PASS,,Remediated 2026-06-20
+Cross: Snorkeling→Apnea Logbook,Apnea,no,no,no,yes,Apnea,n/a,IOSApneaLogbookStore,n/a,n/a,n/a,yes,PASS,,
+Universal logbook hub,Global,no,no,no,no,none,none,none,n/a,n/a,n/a,yes,PASS,,

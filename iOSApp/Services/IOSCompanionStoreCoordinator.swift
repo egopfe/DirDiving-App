@@ -15,6 +15,7 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
     let equipmentStore: EquipmentStore
     let navigationStore: IOSNavigationStore
     let plannerAscentSpeedSettingsStore: PlannerAscentSpeedSettingsStore
+    let divingSettingsStore: IOSDivingSettingsStore
     let plannerBriefingTransfer: PlannerBriefingWatchTransferService
     let divePlanPackageTransfer: DivePlanPackageWatchTransferService
 
@@ -38,6 +39,10 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
         equipmentStore = EquipmentStore(cloudSync: cloudSync)
         navigationStore = IOSNavigationStore()
         plannerAscentSpeedSettingsStore = PlannerAscentSpeedSettingsStore()
+        divingSettingsStore = IOSDivingSettingsStore(
+            sharedSettings: sharedSettings,
+            plannerAscentSpeedSettings: plannerAscentSpeedSettingsStore
+        )
         plannerBriefingTransfer = PlannerBriefingWatchTransferService()
         divePlanPackageTransfer = DivePlanPackageWatchTransferService()
     }
@@ -58,6 +63,7 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
         snorkelingBundle = bundle
         syncSnorkelingLogbook = nil
         watchSync.attachSnorkelingLogbookStore(bundle.logbookStore)
+        bundle.logbookStore.attachWatchSync(watchSync)
         watchSync.snorkelingWatchTransferService = bundle.watchTransfer
         watchSync.snorkelingSessionSyncService = bundle.sessionSync
         return bundle
@@ -65,6 +71,7 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
 
     func activateWatchSyncIfNeeded() {
         logStore.attachWatchSync(watchSync)
+        lazySnorkelingLogbookForSync().attachWatchSync(watchSync)
         watchSync.activate(
             logStore: logStore,
             apneaLogbookStore: lazyApneaLogbookForSync(),
@@ -87,26 +94,38 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
     }
 
     @ViewBuilder
-    func applySharedEnvironment<Content: View>(to content: Content) -> some View {
+    func applyGlobalEnvironment<Content: View>(to content: Content) -> some View {
         content
-            .environmentObject(logStore)
             .environmentObject(watchSync)
-            .environmentObject(plannerStore)
-            .environmentObject(equipmentStore)
             .environmentObject(cloudSync)
-            .environmentObject(navigationStore)
             .environmentObject(legalAcceptance)
-            .environmentObject(plannerAscentSpeedSettingsStore)
-            .environmentObject(plannerBriefingTransfer)
-            .environmentObject(divePlanPackageTransfer)
             .environmentObject(companionActivity)
             .environmentObject(sharedSettings)
     }
 
     @ViewBuilder
+    func applyDivingEnvironment<Content: View>(to content: Content) -> some View {
+        applyGlobalEnvironment(to: content)
+            .environmentObject(logStore)
+            .environmentObject(plannerStore)
+            .environmentObject(equipmentStore)
+            .environmentObject(navigationStore)
+            .environmentObject(plannerAscentSpeedSettingsStore)
+            .environmentObject(divingSettingsStore)
+            .environmentObject(plannerBriefingTransfer)
+            .environmentObject(divePlanPackageTransfer)
+    }
+
+    /// Backward-compatible alias for Diving root wiring.
+    @ViewBuilder
+    func applySharedEnvironment<Content: View>(to content: Content) -> some View {
+        applyDivingEnvironment(to: content)
+    }
+
+    @ViewBuilder
     func applyApneaEnvironment<Content: View>(to content: Content) -> some View {
         let bundle = ensureApneaStores()
-        applySharedEnvironment(to: content)
+        applyGlobalEnvironment(to: content)
             .environmentObject(bundle.navigation)
             .environmentObject(bundle.profileStore)
             .environmentObject(bundle.plannerStore)
@@ -120,7 +139,7 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
     @ViewBuilder
     func applySnorkelingEnvironment<Content: View>(to content: Content) -> some View {
         let bundle = ensureSnorkelingStores()
-        applySharedEnvironment(to: content)
+        applyGlobalEnvironment(to: content)
             .environmentObject(bundle.navigation)
             .environmentObject(bundle.profileStore)
             .environmentObject(bundle.routePlannerStore)
