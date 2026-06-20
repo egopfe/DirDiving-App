@@ -1,56 +1,56 @@
-Requirement_ID,Domain,Requirement,Primary_Test_Method,Evidence_Type,Platform,Status,Evidence_Location,Notes
-REQ-START-01,Startup,Activity selection isolation,DIRModesAndStartupFlowTests,automated unit,Watch,PASS,Tests/WatchAlgorithmTests/DIRModesAndStartupFlowTests.swift,
-REQ-START-02,Startup,iOS companion activity routing,IOSCompanionActivitySelectionTests,automated unit,iOS,PASS,Tests/iOSAlgorithmTests/IOSCompanionActivitySelectionTests.swift,
-REQ-START-03,Startup,Integrated modes sequential flow,IntegratedModesSequentialFlowTests,integration,Watch,PASS,Tests/WatchAlgorithmTests/IntegratedModesSequentialFlowTests.swift,
-REQ-GAUGE-01,Gauge,TTV isolated from Full Computer,WatchGaugeMathCompletionTests,automated unit,Watch,PASS,Tests/WatchAlgorithmTests/WatchGaugeMathCompletionTests.swift,
-REQ-GAUGE-02,Gauge,Optional TTV behavior,GaugeOptionalTTVTests,automated unit,Watch,PASS,Tests/WatchAlgorithmTests/GaugeOptionalTTVTests.swift,
-REQ-GAUGE-03,Gauge,Depth sample ingestion,DiveManagerAlgorithmIntegrationTests,integration,Watch,PASS,Tests/WatchAlgorithmTests/DiveManagerAlgorithmIntegrationTests.swift,
-REQ-FC-01,Full Computer,1 Hz timing fault matrix,FullComputerTimingFaultTests,automated unit,Watch,PASS,Tests/WatchAlgorithmTests/FullComputerTimingFaultTests.swift,
-REQ-FC-02,Full Computer,Runtime engine projection,FullComputerRuntimeEngineTests,automated unit,Watch,PASS,Tests/WatchAlgorithmTests/FullComputerRuntimeEngineTests.swift,
-REQ-FC-03,Full Computer,Deco solver budget,FullComputerReleaseHardValidationTests,automated unit,Watch,PASS,Tests/WatchAlgorithmTests/FullComputerReleaseHardValidationTests.swift,
-REQ-FC-04,Full Computer,Audit-15 multilevel oracle,Audit15Air39MultilevelProfileTests,automated unit,Watch,PASS,Tests/WatchAlgorithmTests/Audit15Air39MultilevelProfileTests.swift,
-REQ-FC-05,Full Computer,Recovery checkpoint,FullComputerRecoveryCheckpointTests,integration,Watch,PASS,Tests/WatchAlgorithmTests/FullComputerRecoveryCheckpointTests.swift,
-REQ-FC-06,Full Computer,Ultra long-dive battery,WATCH_ULTRA_PHYSICAL_QA_MATRIX,physical Watch,Watch,NOT_PASSED,Docs/QA_EVIDENCE/WATCH_ULTRA/,No artifact
-REQ-BM-01,Bühlmann,Engine canonical consistency,BuhlmannEngineCanonicalConsistencyTests,automated unit,iOS,PASS,Tests/iOSAlgorithmTests/BuhlmannEngineCanonicalConsistencyTests.swift,
-REQ-BM-02,Bühlmann,Comprehensive readiness v3,BuhlmannComprehensiveReadinessV3RemediationTests,automated unit,iOS,PASS,Tests/iOSAlgorithmTests/BuhlmannComprehensiveReadinessV3RemediationTests.swift,
-REQ-BM-03,Bühlmann,External golden reference,External validator campaign,external reference,Both,NOT_PASSED,Docs/QA_EVIDENCE/BUHLMANN_EXTERNAL/,Campaign pending
-REQ-GAS-01,Gas switching,No automatic unauthorized switch,FullComputerNoAutomaticGasSwitchTests,automated unit,Watch,PASS,Tests/WatchAlgorithmTests/FullComputerNoAutomaticGasSwitchTests.swift,
-REQ-GAS-02,Gas switching,Recovery integration,FullComputerGasSwitchRecoveryIntegrationTests,integration,Watch,PASS,Tests/WatchAlgorithmTests/FullComputerGasSwitchRecoveryIntegrationTests.swift,
-REQ-DECO-01,Deco SM,Stop state machine,FullComputerDecoStopStateMachineTests,automated unit,Watch,PASS,Tests/WatchAlgorithmTests/FullComputerDecoStopStateMachineTests.swift,
-REQ-APNEA-01,Apnea,Lifecycle engine,ApneaLifecycleEngineTests,automated unit,Watch,PASS,Tests/WatchAlgorithmTests/ApneaLifecycleEngineTests.swift,
-REQ-APNEA-02,Apnea,Recovery/checkpoint,ApneaTimeRecoveryCheckpointEngineTests,automated unit,Watch,PASS,Tests/WatchAlgorithmTests/ApneaTimeRecoveryCheckpointEngineTests.swift,
-REQ-APNEA-03,Apnea,Release hard validation,ApneaReleaseHardValidationTests,automated unit,Both,PASS,Tests/WatchAlgorithmTests/ApneaReleaseHardValidationTests.swift,
-REQ-APNEA-04,Apnea,Wet interaction physical,APNEA_WET_INTERACTION folder,physical Watch,Watch,NOT_PASSED,Docs/QA_EVIDENCE/APNEA_WET_INTERACTION/,PENDING
-REQ-SNORK-01,Snorkeling,GPS/navigation engine,SnorkelingNavigationReturnEngineTests,automated unit,Watch,PASS,Tests/WatchAlgorithmTests/SnorkelingNavigationReturnEngineTests.swift,
-REQ-SNORK-02,Snorkeling,Checkpoint dedup,SnorkelingWatchRuntimeStorePersistenceTests,automated unit,Watch,PASS,Tests/WatchAlgorithmTests/SnorkelingWatchRuntimeStorePersistenceTests.swift,
-REQ-SNORK-03,Snorkeling,Release hard validation,SnorkelingReleaseHardValidationTests,automated unit,Both,PASS,Tests/WatchAlgorithmTests/SnorkelingReleaseHardValidationTests.swift,
-REQ-SNORK-04,Snorkeling,Long-route physical GPS,Snorkeling GPS procedure,physical Watch,Watch,NOT_PASSED,Docs/QA_EVIDENCE/SNORKELING_GPS/,PENDING
-REQ-SET-01,Settings,Activity settings isolation,WatchActivitySettingsOwnershipTests,automated unit,Watch,PASS,Tests/WatchAlgorithmTests/WatchActivitySettingsOwnershipTests.swift,
-REQ-SET-02,Settings,iOS settings coherence,IOSActivitySettingsCoherenceTests,automated unit,iOS,PASS,Tests/iOSAlgorithmTests/IOSActivitySettingsCoherenceTests.swift,
-REQ-LOG-01,Logbook,Diving/Apnea/Snorkeling data isolation,IOSActivityLogbookDataIsolationTests,automated unit,iOS,PASS,Tests/iOSAlgorithmTests/IOSActivityLogbookDataIsolationTests.swift,
-REQ-LOG-02,Logbook,Large list scroll performance,Physical iPhone scroll QA,physical iPhone,iOS,NOT_PASSED,Docs/PERFORMANCE_EXTERNAL_QA_PENDING_CURRENT.md,PENDING
-REQ-SYNC-01,Sync,Signed ACK symmetry,ActivitySyncSignedAckSymmetryTests,integration,Both,PASS,Tests/iOSAlgorithmTests/ActivitySyncSignedAckSymmetryTests.swift,
-REQ-SYNC-02,Sync,Multi-activity sequential,MultiActivitySequentialSyncTests,integration,iOS,PASS,Tests/iOSAlgorithmTests/MultiActivitySequentialSyncTests.swift,
-REQ-SYNC-03,Sync,Command 8 schema gate,validate_multi_activity_sync_persistence_schema_readiness.sh,simulator,Both,PASS,Scripts/validate_multi_activity_sync_persistence_schema_readiness.sh,
-REQ-SYNC-04,Sync,Paired device under load,WATCH_IOS_SYNC_QA_MATRIX,paired-device,Both,NOT_PASSED,Docs/QA_EVIDENCE/WATCH_IOS_SYNC/,PENDING
-REQ-MIG-01,Migration,Legacy schema rejection,ActivitySyncCrossDecodeRejectionTests,automated unit,iOS,PASS,Tests/iOSAlgorithmTests/ActivitySyncCrossDecodeRejectionTests.swift,
-REQ-MIG-02,Migration,Apnea schema migration,ApneaSchemaMigration tests in suite,automated unit,Shared,PASS,Shared/Utils/ApneaSchemaMigration.swift,
-REQ-BKP-01,Backup,Cloud backup capability,CloudBackupCapabilityTests,automated unit,iOS,PASS,Tests/iOSAlgorithmTests/CloudBackupCapabilityTests.swift,
-REQ-BKP-02,Backup,iCloud two-device tombstones,ICLOUD_TWO_DEVICE_QA_MATRIX,paired-device,iOS,NOT_PASSED,Docs/QA_EVIDENCE/ICLOUD_TWO_DEVICE/,PENDING
-REQ-L10N-01,Localization,Catalog parity gate,audit_localization.sh,simulator,Both,PASS,Scripts/audit_localization.sh,
-REQ-L10N-02,Localization,Complete audit tests,DIRDivingCompleteLocalizationAuditTests,automated unit,Both,PASS,Tests/iOSAlgorithmTests/DIRDivingCompleteLocalizationAuditTests.swift,
-REQ-A11Y-01,Accessibility,Snorkeling identifier contracts,SnorkelingAccessibilityContractTests,UI/snapshot contract,iOS,PASS,Tests/iOSAlgorithmTests/SnorkelingAccessibilityContractTests.swift,
-REQ-A11Y-02,Accessibility,Physical VoiceOver pass,DYNAMIC_TYPE_VOICEOVER procedure,physical iPhone,Both,NOT_PASSED,Docs/QA_EVIDENCE/DYNAMIC_TYPE_VOICEOVER/,PENDING
-REQ-SEC-01,Security,Remediation suite,SecurityPrivacyTrustRemediationTests,automated unit,Both,PASS,Tests/iOSAlgorithmTests/SecurityPrivacyTrustRemediationTests.swift,
-REQ-SEC-02,Security,Command 9 gate,validate_security_privacy_trust_readiness.sh,simulator,Both,PASS,Scripts/validate_security_privacy_trust_readiness.sh,
-REQ-PERF-01,Performance,Remediation suite,PerformanceConcurrencyBatteryRemediationTests,automated unit,Both,PASS,Tests/iOSAlgorithmTests/PerformanceConcurrencyBatteryRemediationTests.swift,
-REQ-PERF-02,Performance,Command 10 gate,validate_performance_concurrency_battery_readiness.sh,simulator,Both,PASS,Scripts/validate_performance_concurrency_battery_readiness.sh,
-REQ-EXP-01,Export,PDF generation,PDFExportServiceTests,automated unit,iOS,PASS,Tests/iOSAlgorithmTests/PDFExportServiceTests.swift,
-REQ-EXP-02,Export,Snorkeling GPX/export E2E,IOSSnorkelingExportServiceE2ETests,integration,iOS,PASS,Tests/iOSAlgorithmTests/IOSSnorkelingExportServiceE2ETests.swift,
-REQ-EXP-03,Export,Subsurface external round-trip,SUBSURFACE_EXTERNAL folder,external reference,iOS,NOT_PASSED,Docs/QA_EVIDENCE/SUBSURFACE_EXTERNAL/,PENDING
-REQ-CCR-01,CCR,Math remediation suite,CCRMathRemediationTests,automated unit,iOS,PASS,Tests/iOSAlgorithmTests/CCRMathRemediationTests.swift,
-REQ-CCR-02,CCR,External rebreather validation,CCR_EXTERNAL folder,external reference,iOS,NOT_PASSED,Docs/QA_EVIDENCE/CCR_EXTERNAL/,PENDING
-REQ-ARCH-01,Architecture,Command 7 gate,validate_activity_architecture_settings_logbook_readiness.sh,simulator,Both,PASS,Scripts/validate_activity_architecture_settings_logbook_readiness.sh,
-REQ-LEGAL-01,Legal,Onboarding localization,IOSLegalSettingsLocalizationTests,automated unit,iOS,PASS,Tests/iOSAlgorithmTests/IOSLegalSettingsLocalizationTests.swift,
-REQ-LEGAL-02,Legal,App Store compliance review,APP_STORE_MARKETING folder,legal/compliance review,Both,NOT_PASSED,Docs/QA_EVIDENCE/APP_STORE_MARKETING/,PENDING
-REQ-UND-01,Underwater,Entitlement depth API,HARDWARE_QA_MATRIX QA-002,underwater,Watch,NOT_PASSED,Docs/HARDWARE_QA_MATRIX.md,Entitlement signed build required
+Requirement_ID,Domain,Requirement,Primary_Test_Method,Evidence_Type,Platform,Status,Software_Status,Evidence_Location,Notes
+REQ-START-01,Startup,Activity selection isolation,DIRModesAndStartupFlowTests,automated unit,Watch,PASS,PASS,Tests/WatchAlgorithmTests/DIRModesAndStartupFlowTests.swift,
+REQ-START-02,Startup,iOS companion activity routing,IOSCompanionActivitySelectionTests,automated unit,iOS,PASS,PASS,Tests/iOSAlgorithmTests/IOSCompanionActivitySelectionTests.swift,
+REQ-START-03,Startup,Integrated modes sequential flow,IntegratedModesSequentialFlowTests,integration,Watch,PASS,PASS,Tests/WatchAlgorithmTests/IntegratedModesSequentialFlowTests.swift,
+REQ-GAUGE-01,Gauge,TTV isolated from Full Computer,WatchGaugeMathCompletionTests,automated unit,Watch,PASS,PASS,Tests/WatchAlgorithmTests/WatchGaugeMathCompletionTests.swift,
+REQ-GAUGE-02,Gauge,Optional TTV behavior,GaugeOptionalTTVTests,automated unit,Watch,PASS,PASS,Tests/WatchAlgorithmTests/GaugeOptionalTTVTests.swift,
+REQ-GAUGE-03,Gauge,Depth sample ingestion,DiveManagerAlgorithmIntegrationTests,integration,Watch,PASS,PASS,Tests/WatchAlgorithmTests/DiveManagerAlgorithmIntegrationTests.swift,
+REQ-FC-01,Full Computer,1 Hz timing fault matrix,FullComputerTimingFaultTests,automated unit,Watch,PASS,PASS,Tests/WatchAlgorithmTests/FullComputerTimingFaultTests.swift,
+REQ-FC-02,Full Computer,Runtime engine projection,FullComputerRuntimeEngineTests,automated unit,Watch,PASS,PASS,Tests/WatchAlgorithmTests/FullComputerRuntimeEngineTests.swift,
+REQ-FC-03,Full Computer,Deco solver budget,FullComputerReleaseHardValidationTests,automated unit,Watch,PASS,PASS,Tests/WatchAlgorithmTests/FullComputerReleaseHardValidationTests.swift,
+REQ-FC-04,Full Computer,Audit-15 multilevel oracle,Audit15Air39MultilevelProfileTests,automated unit,Watch,PASS,PASS,Tests/WatchAlgorithmTests/Audit15Air39MultilevelProfileTests.swift,
+REQ-FC-05,Full Computer,Recovery checkpoint,FullComputerRecoveryCheckpointTests,integration,Watch,PASS,PASS,Tests/WatchAlgorithmTests/FullComputerRecoveryCheckpointTests.swift,
+REQ-FC-06,Full Computer,Ultra long-dive battery,WATCH_ULTRA_PHYSICAL_QA_MATRIX,physical Watch,Watch,NOT_PASSED,SOFTWARE_PASS,Docs/QA_EVIDENCE/WATCH_ULTRA/,Physical battery/thermal PENDING
+REQ-BM-01,Bühlmann,Engine canonical consistency,BuhlmannEngineCanonicalConsistencyTests,automated unit,iOS,PASS,PASS,Tests/iOSAlgorithmTests/BuhlmannEngineCanonicalConsistencyTests.swift,
+REQ-BM-02,Bühlmann,Comprehensive readiness v3,BuhlmannComprehensiveReadinessV3RemediationTests,automated unit,iOS,PASS,PASS,Tests/iOSAlgorithmTests/BuhlmannComprehensiveReadinessV3RemediationTests.swift,
+REQ-BM-03,Bühlmann,External golden reference,External validator campaign,external reference,Both,NOT_PASSED,SOFTWARE_PASS,Docs/QA_EVIDENCE/BUHLMANN_EXTERNAL/,Internal fixtures PASS; external campaign PENDING
+REQ-GAS-01,Gas switching,No automatic unauthorized switch,FullComputerNoAutomaticGasSwitchTests,automated unit,Watch,PASS,PASS,Tests/WatchAlgorithmTests/FullComputerNoAutomaticGasSwitchTests.swift,
+REQ-GAS-02,Gas switching,Recovery integration,FullComputerGasSwitchRecoveryIntegrationTests,integration,Watch,PASS,PASS,Tests/WatchAlgorithmTests/FullComputerGasSwitchRecoveryIntegrationTests.swift,
+REQ-DECO-01,Deco SM,Stop state machine,FullComputerDecoStopStateMachineTests,automated unit,Watch,PASS,PASS,Tests/WatchAlgorithmTests/FullComputerDecoStopStateMachineTests.swift,
+REQ-APNEA-01,Apnea,Lifecycle engine,ApneaLifecycleEngineTests,automated unit,Watch,PASS,PASS,Tests/WatchAlgorithmTests/ApneaLifecycleEngineTests.swift,
+REQ-APNEA-02,Apnea,Recovery/checkpoint,ApneaTimeRecoveryCheckpointEngineTests,automated unit,Watch,PASS,PASS,Tests/WatchAlgorithmTests/ApneaTimeRecoveryCheckpointEngineTests.swift,
+REQ-APNEA-03,Apnea,Release hard validation,ApneaReleaseHardValidationTests,automated unit,Both,PASS,PASS,Tests/WatchAlgorithmTests/ApneaReleaseHardValidationTests.swift,
+REQ-APNEA-04,Apnea,Wet interaction physical,APNEA_WET_INTERACTION folder,physical Watch,Watch,NOT_PASSED,SOFTWARE_PASS,Docs/QA_EVIDENCE/APNEA_WET_INTERACTION/,Release-hard tests PASS; wet field PENDING
+REQ-SNORK-01,Snorkeling,GPS/navigation engine,SnorkelingNavigationReturnEngineTests,automated unit,Watch,PASS,PASS,Tests/WatchAlgorithmTests/SnorkelingNavigationReturnEngineTests.swift,
+REQ-SNORK-02,Snorkeling,Checkpoint dedup,SnorkelingWatchRuntimeStorePersistenceTests,automated unit,Watch,PASS,PASS,Tests/WatchAlgorithmTests/SnorkelingWatchRuntimeStorePersistenceTests.swift,
+REQ-SNORK-03,Snorkeling,Release hard validation,SnorkelingReleaseHardValidationTests,automated unit,Both,PASS,PASS,Tests/WatchAlgorithmTests/SnorkelingReleaseHardValidationTests.swift,
+REQ-SNORK-04,Snorkeling,Long-route physical GPS,Snorkeling GPS procedure,physical Watch,Watch,NOT_PASSED,SOFTWARE_PASS,Docs/QA_EVIDENCE/SNORKELING_GPS/,Navigation engine tests PASS; field GPS PENDING
+REQ-SET-01,Settings,Activity settings isolation,WatchActivitySettingsOwnershipTests,automated unit,Watch,PASS,PASS,Tests/WatchAlgorithmTests/WatchActivitySettingsOwnershipTests.swift,
+REQ-SET-02,Settings,iOS settings coherence,IOSActivitySettingsCoherenceTests,automated unit,iOS,PASS,PASS,Tests/iOSAlgorithmTests/IOSActivitySettingsCoherenceTests.swift,
+REQ-LOG-01,Logbook,Diving/Apnea/Snorkeling data isolation,IOSActivityLogbookDataIsolationTests,automated unit,iOS,PASS,PASS,Tests/iOSAlgorithmTests/IOSActivityLogbookDataIsolationTests.swift,
+REQ-LOG-02,Logbook,Large list scroll performance,Physical iPhone scroll QA,physical iPhone,iOS,NOT_PASSED,SOFTWARE_PASS,Docs/PERFORMANCE_EXTERNAL_QA_PENDING_CURRENT.md,5k synthetic decode budget PASS; scroll PENDING
+REQ-SYNC-01,Sync,Signed ACK symmetry,ActivitySyncSignedAckSymmetryTests,integration,Both,PASS,PASS,Tests/iOSAlgorithmTests/ActivitySyncSignedAckSymmetryTests.swift,
+REQ-SYNC-02,Sync,Multi-activity sequential,MultiActivitySequentialSyncTests,integration,iOS,PASS,PASS,Tests/iOSAlgorithmTests/MultiActivitySequentialSyncTests.swift,
+REQ-SYNC-03,Sync,Command 8 schema gate,validate_multi_activity_sync_persistence_schema_readiness.sh,simulator,Both,PASS,PASS,Scripts/validate_multi_activity_sync_persistence_schema_readiness.sh,
+REQ-SYNC-04,Sync,Paired device under load,WATCH_IOS_SYNC_QA_MATRIX,paired-device,Both,NOT_PASSED,SOFTWARE_PASS,Docs/QA_EVIDENCE/WATCH_IOS_SYNC/,ACK burst + codec tests PASS; field PENDING
+REQ-MIG-01,Migration,Legacy schema rejection,ActivitySyncCrossDecodeRejectionTests,automated unit,iOS,PASS,PASS,Tests/iOSAlgorithmTests/ActivitySyncCrossDecodeRejectionTests.swift,
+REQ-MIG-02,Migration,Apnea schema migration,ApneaSchemaMigration tests in suite,automated unit,Shared,PASS,PASS,Shared/Utils/ApneaSchemaMigration.swift,
+REQ-BKP-01,Backup,Cloud backup capability,CloudBackupCapabilityTests,automated unit,iOS,PASS,PASS,Tests/iOSAlgorithmTests/CloudBackupCapabilityTests.swift,
+REQ-BKP-02,Backup,iCloud two-device tombstones,ICLOUD_TWO_DEVICE_QA_MATRIX,paired-device,iOS,NOT_PASSED,SOFTWARE_PASS,Docs/QA_EVIDENCE/ICLOUD_TWO_DEVICE/,Tombstone codec PASS; two-device PENDING
+REQ-L10N-01,Localization,Catalog parity gate,audit_localization.sh,simulator,Both,PASS,PASS,Scripts/audit_localization.sh,
+REQ-L10N-02,Localization,Complete audit tests,DIRDivingCompleteLocalizationAuditTests,automated unit,Both,PASS,PASS,Tests/iOSAlgorithmTests/DIRDivingCompleteLocalizationAuditTests.swift,
+REQ-A11Y-01,Accessibility,Snorkeling identifier contracts,SnorkelingAccessibilityContractTests,UI/snapshot contract,iOS,PASS,PASS,Tests/iOSAlgorithmTests/SnorkelingAccessibilityContractTests.swift,
+REQ-A11Y-02,Accessibility,Physical VoiceOver pass,DYNAMIC_TYPE_VOICEOVER procedure,physical iPhone,Both,NOT_PASSED,SOFTWARE_PASS,Docs/QA_EVIDENCE/DYNAMIC_TYPE_VOICEOVER/,Identifier contracts PASS; VoiceOver field PENDING
+REQ-SEC-01,Security,Remediation suite,SecurityPrivacyTrustRemediationTests,automated unit,Both,PASS,PASS,Tests/iOSAlgorithmTests/SecurityPrivacyTrustRemediationTests.swift,
+REQ-SEC-02,Security,Command 9 gate,validate_security_privacy_trust_readiness.sh,simulator,Both,PASS,PASS,Scripts/validate_security_privacy_trust_readiness.sh,
+REQ-PERF-01,Performance,Remediation suite,PerformanceConcurrencyBatteryRemediationTests,automated unit,Both,PASS,PASS,Tests/iOSAlgorithmTests/PerformanceConcurrencyBatteryRemediationTests.swift,
+REQ-PERF-02,Performance,Command 10 gate,validate_performance_concurrency_battery_readiness.sh,simulator,Both,PASS,PASS,Scripts/validate_performance_concurrency_battery_readiness.sh,
+REQ-EXP-01,Export,PDF generation,PDFExportServiceTests,automated unit,iOS,PASS,PASS,Tests/iOSAlgorithmTests/PDFExportServiceTests.swift,
+REQ-EXP-02,Export,Snorkeling GPX/export E2E,IOSSnorkelingExportServiceE2ETests,integration,iOS,PASS,PASS,Tests/iOSAlgorithmTests/IOSSnorkelingExportServiceE2ETests.swift,
+REQ-EXP-03,Export,Subsurface external round-trip,SUBSURFACE_EXTERNAL folder,external reference,iOS,NOT_PASSED,SOFTWARE_PASS,Docs/QA_EVIDENCE/SUBSURFACE_EXTERNAL/,CSV round-trip tests PASS; external tool PENDING
+REQ-CCR-01,CCR,Math remediation suite,CCRMathRemediationTests,automated unit,iOS,PASS,PASS,Tests/iOSAlgorithmTests/CCRMathRemediationTests.swift,
+REQ-CCR-02,CCR,External rebreather validation,CCR_EXTERNAL folder,external reference,iOS,NOT_PASSED,SOFTWARE_PASS,Docs/QA_EVIDENCE/CCR_EXTERNAL/,CCR math tests PASS; external campaign PENDING
+REQ-ARCH-01,Architecture,Command 7 gate,validate_activity_architecture_settings_logbook_readiness.sh,simulator,Both,PASS,PASS,Scripts/validate_activity_architecture_settings_logbook_readiness.sh,
+REQ-LEGAL-01,Legal,Onboarding localization,IOSLegalSettingsLocalizationTests,automated unit,iOS,PASS,PASS,Tests/iOSAlgorithmTests/IOSLegalSettingsLocalizationTests.swift,
+REQ-LEGAL-02,Legal,App Store compliance review,APP_STORE_MARKETING folder,legal/compliance review,Both,NOT_PASSED,SOFTWARE_PASS,Docs/QA_EVIDENCE/APP_STORE_MARKETING/,Legal tests + checklist PASS; marketing PENDING
+REQ-UND-01,Underwater,Entitlement depth API,HARDWARE_QA_MATRIX QA-002,underwater,Watch,NOT_PASSED,SOFTWARE_PASS,Docs/HARDWARE_QA_MATRIX.md,Mock depth + safety config PASS; entitlement field PENDING

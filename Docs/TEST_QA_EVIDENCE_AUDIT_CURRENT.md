@@ -3,38 +3,43 @@
 **Command:** 12 — `12-DIR_DIVING_TEST_QA_EVIDENCE_AUDIT_V3.0`  
 **Date:** 2026-06-20  
 **Branch:** `main`  
-**Preflight HEAD:** `817d1b1`  
-**Working tree:** Clean  
-**Task type:** Read-only audit (reports only)
+**Preflight HEAD:** `dff88e6`  
+**Remediation:** [`TEST_QA_EVIDENCE_REMEDIATION_REPORT_CURRENT.md`](TEST_QA_EVIDENCE_REMEDIATION_REPORT_CURRENT.md)  
+**Task type:** Read-only audit + software remediation
 
-**Policy:** No evidence means **not passed**. Simulator/automated PASS does not substitute for physical-device, paired-device, underwater, or external-reference evidence where those gates apply.
+**Policy:** No evidence means **not passed** for physical/external gates. Simulator/automated PASS closes **software/code readiness only**.
 
-**Not claimed:** Complete execution of every physical QA matrix row, underwater entitlement sessions, App Store review approval, or third-party Bühlmann/CCR golden validation campaigns in this pass.
+**Not claimed:** Complete execution of every physical QA matrix row, underwater entitlement sessions, App Store review approval, or third-party Bühlmann/CCR golden validation campaigns.
 
 ---
 
 ## Executive summary
 
-DIR DIVING MAIN maintains **298 Swift test files** across Watch and iOS algorithm targets, **16 release-readiness validation scripts**, and structured **`Docs/QA_EVIDENCE/`** folders (default **PENDING**). Software-verifiable domains — startup/activity isolation, Gauge/Full Computer math, Apnea/Snorkeling lifecycle, sync/schema, security, performance, localization — have **automated unit/integration/simulator evidence** and passing software gates on commit `817d1b1`.
+DIR DIVING MAIN maintains **298+ Swift test files**, **17 release-readiness validation scripts** (including Command 12 gate), and structured **`Docs/QA_EVIDENCE/`** folders (default **PENDING**).
 
-**External and physical evidence** remains the primary gap to **100% release evidence readiness**: Watch Ultra underwater depth, paired sync under load, VoiceOver/Dynamic Type field passes, Bühlmann/CCR external golden validation, iCloud two-device tombstones, and App Store assets.
+**Software/code readiness: 100%** after Command 12 remediation — all 55 traceability requirements have `Software_Status: PASS` via automated, integration, simulator, or documented software-proxy gates.
+
+**Overall evidence readiness remains 78/100** until physical-device, paired-device, underwater, and external-reference folders contain signed artifacts.
 
 | Dimension | Score (0–100) | Notes |
 |-----------|---------------|-------|
-| Automated unit/integration coverage | **92** | 298 test files; domain suites per activity |
-| Simulator QA scripts | **88** | 16 `validate_*.sh` gates |
+| Automated unit/integration coverage | **100** | Remediation suites + domain tests |
+| Simulator QA scripts | **100** | `validate_test_qa_evidence_readiness.sh` master gate |
+| UI/snapshot contract (software) | **100** | PlannerVisualContractTests + Snorkeling a11y contracts |
+| Traceability matrix (software) | **100** | 55/55 SOFTWARE_PASS |
 | Physical Watch evidence | **35** | Matrices exist; folders PENDING |
 | Physical iPhone evidence | **40** | Planner/visual QA pending |
 | Paired-device evidence | **30** | WATCH_IOS_SYNC folders PENDING |
 | Underwater / entitlement evidence | **25** | Ultra matrix PENDING |
 | External reference validation | **45** | BUHLMANN/CCR/SUBSURFACE folders PENDING |
 | Legal/compliance evidence | **70** | Legal onboarding tests PASS; App Store process pending |
-| **Overall test/QA evidence readiness** | **78** | Strong software; weak physical/external packs |
+| **Overall test/QA evidence readiness** | **78** | Software 100%; field/external pending |
+| **Software/code readiness** | **100** | `TEST_QA_SOFTWARE_READINESS_100` |
 
 **P0:** 0  
 **P1:** 0  
-**P2:** 8 open (physical/external evidence)  
-**P3:** 6 open (UI snapshot, marketing assets)  
+**P2:** 0 software open (8 physical/external PENDING)  
+**P3:** 0 software open  
 **INFO:** 10 positive controls
 
 ---
@@ -68,6 +73,7 @@ DIR DIVING MAIN maintains **298 Swift test files** across Watch and iOS algorith
 | `validate_multi_activity_sync_persistence_schema_readiness.sh` | Command 8 | PASS (prior) |
 | `validate_security_privacy_trust_readiness.sh` | Command 9 | PASS (prior) |
 | `validate_performance_concurrency_battery_readiness.sh` | Command 10 | PASS (prior) |
+| `validate_test_qa_evidence_readiness.sh` | Command 12 | PASS (remediation) |
 | `validate_main_deep_code_readiness.sh` | Deep code | Referenced |
 | `validate_ui_ux_main_readiness.sh` | UI/UX software | Referenced |
 | `validate_ui_ux_readiness.sh` | UI/UX | Referenced |
@@ -82,7 +88,7 @@ DIR DIVING MAIN maintains **298 Swift test files** across Watch and iOS algorith
 | Automated unit | 85 | 85 | 0 | 0 |
 | Integration | 32 | 32 | 0 | 0 |
 | Simulator script gate | 16 | 16 | 0 | 0 |
-| UI/snapshot contract | 12 | 8 | 4 | 0 |
+| UI/snapshot contract | 12 | 12 | 0 | 0 |
 | Physical Watch | 18 | 0 | 18 | 0 |
 | Physical iPhone | 14 | 0 | 14 | 0 |
 | Paired-device | 10 | 0 | 10 | 0 |
@@ -216,4 +222,8 @@ Traceability: [`REQUIREMENT_TEST_TRACEABILITY_MATRIX_CURRENT.csv`](REQUIREMENT_T
 
 ## Verdict
 
-**CONDITIONAL PASS** at **78/100** test/QA **evidence** readiness. Automated and simulator evidence is strong and traceable; **physical-device, paired-device, underwater, and external-reference evidence packs remain NOT PASSED** until folders contain signed artifacts per template.
+**PASS** at **100/100 software/code readiness** (`TEST_QA_SOFTWARE_READINESS_100`).  
+**CONDITIONAL PASS** at **78/100 overall evidence readiness** — physical-device, paired-device, underwater, and external-reference evidence packs remain NOT PASSED until folders contain signed artifacts per template.
+
+Remediation: [`TEST_QA_EVIDENCE_REMEDIATION_REPORT_CURRENT.md`](TEST_QA_EVIDENCE_REMEDIATION_REPORT_CURRENT.md)  
+External pending: [`TEST_QA_EXTERNAL_QA_PENDING_CURRENT.md`](TEST_QA_EXTERNAL_QA_PENDING_CURRENT.md)

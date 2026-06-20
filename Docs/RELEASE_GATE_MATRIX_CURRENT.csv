@@ -1,0 +1,23 @@
+Gate_ID,Gate,Software_Claims_Status,External_Evidence_Status,Legal_Review_Status,Blocks_External_TestFlight,Blocks_App_Store,Primary_Evidence,Notes
+RG-01,Non-certification copy (MAIN strings/docs),PASS,PENDING sign-off,PENDING,PARTIAL,YES,SAFETY_DISCLAIMER TERMS IOS_APP_STORE checklist,Software truthful; legal not signed
+RG-02,Legal onboarding + Terms/Privacy,PASS,PENDING field VoiceOver,PENDING,PARTIAL,YES,IOSLegalSettingsLocalizationTests legal onboarding,Re-consent on major revision
+RG-03,Planner reference-only posture,PASS,PENDING Bühlmann external,PENDING,NO,YES,IOS_PLANNER_LIMITATIONS planner strings,External golden PENDING
+RG-04,Full Computer experimental disclosure,PASS,PENDING Ultra battery/thermal,PENDING,PARTIAL,YES,FULL_COMPUTER_ARCHITECTURE validate_full_computer_release_readiness.sh,Not certified FC
+RG-05,CCR reference + heuristic bailout,PASS,PENDING CCR external,PENDING,NO,YES,CCR_REBREATHER_LIMITATIONS,No live loop control
+RG-06,Apnea recovery non-medical framing,PASS,N/A,PENDING,NO,NO,AUDIT_APNEA_DOMAIN_LIFECYCLE_RECOVERY,Policy tracking only
+RG-07,Snorkeling return reference navigation,PASS,PENDING field GPS,PENDING,PARTIAL,YES,snorkeling.return.* strings,Not guaranteed nav
+RG-08,GPS surface-only + export privacy,PASS,N/A,PENDING,NO,NO,Command 9 export privacy tests,Default omit GPS
+RG-09,CNS/OTU estimate disclaimers,PASS,N/A,PENDING,NO,NO,Bühlmann engine design + planner hints,Reference only
+RG-10,Privacy manifests + no tracking,PASS,PENDING App Store privacy review,PENDING,NO,YES,PRIVACY_MANIFEST_DECLARATION Command 9 gate,Store review pending
+RG-11,Water submersion entitlement disclosure,PASS,PENDING underwater QA,PENDING,YES,YES,SAFETY_DISCLAIMER HARDWARE_QA_MATRIX,Field depth session required
+RG-12,TestFlight review notes alignment,PASS,N/A,PENDING,NO,PARTIAL,TESTFLIGHT_REVIEW_NOTES,Internal TF software OK
+RG-13,App Store marketing assets,PASS software copy,PENDING screenshots,PENDING,YES,YES,QA_EVIDENCE/APP_STORE_MARKETING,Assets not captured
+RG-14,Physical Watch/iPhone QA evidence,PASS software proxies,NOT PASSED,N/A,YES,YES,PHYSICAL_DEVICE_QA_MATRIX Command 12,32 rows NOT PASSED
+RG-15,Paired sync + iCloud tombstone QA,PASS codec tests,NOT PASSED,N/A,YES,YES,WATCH_IOS_SYNC ICLOUD_TWO_DEVICE,Field evidence PENDING
+RG-16,External Bühlmann/CCR/Subsurface validation,PASS internal fixtures,NOT PASSED,N/A,YES,YES,BUHLMANN_EXTERNAL CCR_EXTERNAL SUBSURFACE_EXTERNAL,Campaign pending
+RG-17,Command 12 software QA gate,PASS,N/A,N/A,NO,NO,validate_test_qa_evidence_readiness.sh,100% code readiness
+RG-18,Command 9 security/privacy gate,PASS,N/A,PENDING,NO,PARTIAL,validate_security_privacy_trust_readiness.sh,Physical security QA pending
+RG-19,EN13319 / ISO 6425 strategy documented,PASS,N/A,N/A,NO,NO,FC/Apnea/Snorkeling release checklists,Explicitly out of scope
+RG-20,Release checklist + rollback path,PASS,N/A,PENDING,NO,PARTIAL,RELEASE_CHECKLIST,Incident runbook gap
+RG-21,Support / escalation path,PASS minimal,PENDING SLA,PENDING,NO,PARTIAL,TESTFLIGHT_REVIEW_NOTES GitHub,No formal SLA doc
+RG-22,External legal counsel sign-off,PASS software posture,NOT PASSED,NOT PASSED,YES,YES,IOS_APP_STORE marketing checklist,No attorney artifact
