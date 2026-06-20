@@ -1,0 +1,17 @@
+namespace_id,direction,mechanism,payload_key_or_transfer_type,ack_type,store_target,hmac,replay_cache,test_reference,status,severity,notes
+NS-DIVE-SESSION,Watch→iOS,WC message/userInfo,dirdiving_dive_session,diveImportAck + ackSignature,DiveLogStore / IOS DiveLogStore,yes,SyncNonceReplayCache,WatchSyncConflictTests,PASS,,Primary diving session transport
+NS-DIVE-SESSION,iOS→Watch,WC message/userInfo,dirdiving_dive_session,diveImportAck + ackSignature,DiveLogStore,yes,same,WatchSyncServiceIntegrationTests,PASS,,Signed ACK required to dequeue iOS outbound
+NS-APNEA-SESSION,Watch→iOS,WC message/userInfo,dirdiving_apnea_session,dirdiving_apnea_session_import_ack,IOSApneaLogbookStore,yes,ApneaSessionSyncCodec replay cache,ApneaSessionSyncTransportNegativeTests,PASS,,Distinct from diving key
+NS-APNEA-SESSION,iOS→Watch,WC message/userInfo,dirdiving_apnea_session,dirdiving_apnea_session_import_ack,ApneaLogbookStore,yes,same,ApneaSyncWatchReceiverTests,PASS,,Watch-origin session sync
+NS-SNORKEL-SESSION,Watch→iOS,WC message/userInfo,dirdiving_snorkeling_session_sync,dirdiving_snorkeling_session_import_ack,IOSSnorkelingLogbookStore,yes,SnorkelingSessionSyncCodec replay cache,SnorkelingSessionSyncTransportNegativeTests,PASS,,Distinct sync key suffix
+NS-FC-PLAN,iOS→Watch,transferUserInfo,fullComputerPlanPackage,fullComputerPlanPackageAck,FullComputerImportedPlanStore,yes,N/A,DivePlanPackageCodecTests,PASS,,Context dirdiving_fc_plan_snapshot
+NS-APNEA-PLAN,iOS→Watch,transferUserInfo,apneaSyncPlanPackage,apneaSyncPlanPackageAck,ApneaImportedPlanStore,yes,N/A,FullComputerNamespaceIsolationTests,PASS,,Context dirdiving_apnea_plan_snapshot
+NS-SNORKEL-ROUTE,iOS→Watch,transferUserInfo,snorkelingRoutePackage,snorkelingRoutePackageAck,SnorkelingImportedRouteStore,yes,N/A,SnorkelingRouteSyncCodecTests,PASS,,Context dirdiving_snorkeling_route_snapshot
+NS-PLANNER-BRIEF,iOS→Watch,WCSession file,plannerBriefingManifest / plannerBriefingCard,plannerBriefingAck,PlannerBriefingCardStore,hash+size,N/A,PlannerBriefingCardStoreTests,PASS,,Reference-only cards
+NS-COMPANION-PHOTO,iOS→Watch,WCSession file,photoFileName + photoID metadata,companionPhotoAck,UserImageStore,signed mgmt requests,N/A,CompanionPhotoTransferPipelineTests,PASS,,File transfer not userInfo envelope
+NS-TOMBSTONE-DIVE,Both,applicationContext,dirdiving_deleted_session_ids,N/A,DiveLogStore,N/A,N/A,Manual QA,PARTIAL,P1,Diving-only WC tombstone broadcast
+NS-TRUST,Both,applicationContext,dirdiving_watch_sync_secret,N/A,N/A,N/A,N/A,WatchSyncPeerSecretPinningIOSTests,PASS,,TOFU peer secret via WatchSyncAuth
+NS-SETTINGS-UNITS,Both,applicationContext,units,N/A,UserDefaults,N/A,N/A,IOSActivitySettingsCoherenceTests,PASS,,Shared preference sync
+NS-SETTINGS-TTV,Both,applicationContext,dirdiving_watch_gauge_show_ttv,N/A,UserDefaults,N/A,N/A,Manual,PASS,,Diving Gauge only
+NS-DELETED-KVS-DIVE,Both,iCloud KVS,dirdiving_shared_deleted_session_ids,N/A,DiveLogStore,N/A,N/A,CloudSessionMergeTests,PARTIAL,,iOS + Watch diving tombstones
+NS-DELETED-KVS-APNEA,Watch,iCloud KVS,dirdiving_watch_deleted_apnea_session_ids,N/A,ApneaLogbookStore,N/A,N/A,None,PARTIAL,P1,No WC broadcast wired

@@ -10,7 +10,7 @@ enum ApneaSessionSyncCodec {
     static let importAckSignatureKey = "apneaAckSignature"
 
     static let legacySchemaVersion = 1
-    static let schemaVersion = 2
+    static let schemaVersion = ActivitySyncSignedTransport.envelopeSchemaVersion
     static let maxPayloadBytes = IOSAlgorithmConfiguration.maxSyncPayloadBytes
     static let maxIssuedAtSkew: TimeInterval = IOSAlgorithmConfiguration.syncIssuedAtSkewSeconds
     static let importedSessionIDsKey = "dirdiving_ios_imported_apnea_session_ids"
@@ -48,14 +48,7 @@ enum ApneaSessionSyncCodec {
         replayCache.persistProtected(to: replayCacheFileURL())
     }
 
-    struct Transport: Codable {
-        let version: Int
-        let bundleID: String
-        let issuedAt: Date
-        let nonce: String?
-        let body: Data
-        let signature: String
-    }
+    typealias Transport = ActivitySyncSignedTransport
 
     struct ParsedPayload {
         let session: ApneaSession
@@ -85,7 +78,7 @@ enum ApneaSessionSyncCodec {
         }
 
         let transport = try JSONDecoder().decode(Transport.self, from: data)
-        guard transport.version == legacySchemaVersion || transport.version == schemaVersion else {
+        guard ActivitySyncCodecSupport.validateVersion(transport.version) else {
             throw ApneaSessionSyncError.unsupportedVersion
         }
         guard transport.bundleID == expectedWatchBundleID else {
@@ -94,10 +87,19 @@ enum ApneaSessionSyncCodec {
         guard abs(transport.issuedAt.timeIntervalSinceNow) <= maxIssuedAtSkew else {
             throw ApneaSessionSyncError.stalePayload
         }
-        guard verify(transport) else {
+        do {
+            try ActivitySyncCodecSupport.validateTransport(
+                transport,
+                payloadKey: payloadKey,
+                expectedActivity: .apnea
+            )
+        } catch {
             throw ApneaSessionSyncError.invalidSignature
         }
-        if transport.version == schemaVersion {
+        guard let key = try? syncKey(), transport.verify(with: key) else {
+            throw ApneaSessionSyncError.invalidSignature
+        }
+        if transport.version >= ActivitySyncSignedTransport.nonceRequiredFromVersion {
             guard let nonce = transport.nonce, !nonce.isEmpty else {
                 throw ApneaSessionSyncError.invalidSignature
             }
@@ -123,6 +125,15 @@ enum ApneaSessionSyncCodec {
         let canonical = "apneaAck|\(sessionID.uuidString)|\(issuedAt.timeIntervalSince1970)"
         let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: key)
         return Data(code).base64EncodedString()
+    }
+
+    static func verifyAckSignature(_ signature: String?, sessionID: UUID, issuedAt: Date) -> Bool {
+        guard let signature,
+              !signature.isEmpty,
+              let providedData = Data(base64Encoded: signature) else { return false }
+        let expected = ackSignature(sessionID: sessionID, issuedAt: issuedAt)
+        guard !expected.isEmpty, let expectedData = Data(base64Encoded: expected) else { return false }
+        return providedData.constantTimeEquals(expectedData)
     }
 
     static func isImportAck(_ payload: [String: Any]) -> Bool {
@@ -168,17 +179,6 @@ enum ApneaSessionSyncCodec {
         try WatchSyncAuth.deriveSyncKey(peerBundleID: expectedWatchBundleID)
     }
 
-    private static func verify(_ transport: Transport) -> Bool {
-        guard let key = try? syncKey() else { return false }
-        let nonceComponent = transport.version >= schemaVersion ? (transport.nonce ?? "") : ""
-        let canonical = "\(transport.version)|\(transport.bundleID)|\(transport.issuedAt.timeIntervalSince1970)|\(nonceComponent)|\(transport.body.base64EncodedString())"
-        let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: key)
-        let expected = Data(code).base64EncodedString()
-        guard let received = Data(base64Encoded: transport.signature) else { return false }
-        guard let expectedData = Data(base64Encoded: expected) else { return false }
-        return received.constantTimeEquals(expectedData)
-    }
-
     private static func validate(_ session: ApneaSession) throws {
         guard ApneaDomainValidator.isValid(session: session) else {
             throw ApneaSessionSyncError.invalidSession
@@ -192,7 +192,7 @@ enum ApneaSessionSyncCodec {
     }
 
 #if DEBUG
-    /// Builds a signed v2 transport envelope as if sent from the Watch companion (unit tests only).
+    /// Builds a signed transport envelope as if sent from the Watch companion (unit tests only).
     static func makeTestWatchTransport(
         session: ApneaSession,
         version: Int = schemaVersion,
@@ -211,27 +211,50 @@ enum ApneaSessionSyncCodec {
         guard body.count <= maxPayloadBytes else {
             throw ApneaSessionSyncError.payloadTooLarge
         }
-        var transport = Transport(
-            version: version,
-            bundleID: bundleID,
-            issuedAt: issuedAt,
-            nonce: version >= schemaVersion ? nonce : nil,
-            body: body,
-            signature: ""
-        )
-        let nonceComponent = transport.version >= schemaVersion ? (transport.nonce ?? "") : ""
-        let canonical = "\(transport.version)|\(transport.bundleID)|\(issuedAt.timeIntervalSince1970)|\(nonceComponent)|\(body.base64EncodedString())"
         let key = try syncKey()
-        let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: key)
-        transport = Transport(
-            version: version,
-            bundleID: bundleID,
-            issuedAt: issuedAt,
-            nonce: transport.nonce,
-            body: body,
-            signature: Data(code).base64EncodedString()
-        )
-        let transportData = try JSONEncoder().encode(transport)
+        let signed: ActivitySyncSignedTransport
+        if version == ActivitySyncSignedTransport.envelopeSchemaVersion {
+            let revision = ActivitySyncCodecSupport.revision(for: normalized.createdAt)
+            signed = ActivitySyncSignedTransport.makeSigned(
+                body: body,
+                bundleID: bundleID,
+                activity: .apnea,
+                messageType: .sessionUpsert,
+                revision: revision,
+                syncKey: key,
+                issuedAt: issuedAt,
+                nonce: nonce
+            )
+        } else {
+            var unsigned = ActivitySyncSignedTransport(
+                version: version,
+                bundleID: bundleID,
+                issuedAt: issuedAt,
+                nonce: version >= ActivitySyncSignedTransport.nonceRequiredFromVersion ? nonce : nil,
+                messageID: nil,
+                activityType: nil,
+                messageType: nil,
+                payloadHash: nil,
+                revision: nil,
+                body: body,
+                signature: ""
+            )
+            let signature = ActivitySyncHMAC.signCanonical(transport: unsigned, body: body, key: key)
+            signed = ActivitySyncSignedTransport(
+                version: unsigned.version,
+                bundleID: unsigned.bundleID,
+                issuedAt: unsigned.issuedAt,
+                nonce: unsigned.nonce,
+                messageID: nil,
+                activityType: nil,
+                messageType: nil,
+                payloadHash: nil,
+                revision: nil,
+                body: body,
+                signature: signature
+            )
+        }
+        let transportData = try JSONEncoder().encode(signed)
         return [payloadKey: transportData]
     }
 #endif

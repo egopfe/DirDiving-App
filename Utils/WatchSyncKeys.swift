@@ -2,8 +2,16 @@ import Foundation
 
 enum WatchSyncKeys {
     static let deletedSessionIDsKey = "dirdiving_shared_deleted_session_ids"
-    /// WatchConnectivity `applicationContext` broadcast of tombstone UUID strings.
+    /// WatchConnectivity `applicationContext` broadcast of tombstone UUID strings (legacy Diving).
     static let deletedSessionBroadcastKey = "dirdiving_deleted_session_ids"
+    /// Activity-scoped signed tombstone broadcast payloads (v1).
+    static let deletedDivingSessionTombstonesKey = "dirdiving_deleted_diving_session_tombstones"
+    static let deletedApneaSessionTombstonesKey = "dirdiving_deleted_apnea_session_tombstones"
+    static let deletedSnorkelingSessionTombstonesKey = "dirdiving_deleted_snorkeling_session_tombstones"
+    /// Legacy Apnea KVS tombstone UUID list (Watch local cloud sync).
+    static let deletedApneaSessionIDsKey = "dirdiving_watch_deleted_apnea_session_ids"
+    /// Local tombstone persistence filenames (per activity).
+    static let snorkelingDeletedSessionIDsLocalKey = "dirdiving_snorkeling_deleted_session_ids"
     static let unitsPreferenceKey = "units"
     /// Watch Gauge optional TTV index visibility (default OFF); synced via applicationContext.
     static let gaugeShowTTVKey = "dirdiving_watch_gauge_show_ttv"

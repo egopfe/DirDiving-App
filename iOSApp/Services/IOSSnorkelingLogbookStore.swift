@@ -9,9 +9,25 @@ final class IOSSnorkelingLogbookStore: ObservableObject {
     @Published private(set) var loadErrorMessage: String?
 
     private let fileName = "dirdiving_ios_snorkeling_sessions.json"
+    private let deletedLocalKey = WatchSyncKeys.snorkelingDeletedSessionIDsLocalKey
+    private var deletedSessionIDs: Set<UUID> = []
+    private weak var tombstonePublisher: (any SnorkelingSessionTombstonePublishing)?
 
     init() {
+        deletedSessionIDs = loadDeletedSessionIDs()
         load()
+    }
+
+    func attachWatchSync(_ service: any SnorkelingSessionTombstonePublishing) {
+        tombstonePublisher = service
+    }
+
+    func applyRemoteDeletedSessionIDs(_ ids: Set<UUID>) {
+        guard !ids.isEmpty else { return }
+        deletedSessionIDs.formUnion(ids)
+        sessions.removeAll { deletedSessionIDs.contains($0.id) }
+        saveDeletedSessionIDs(deletedSessionIDs)
+        persistAtomically()
     }
 
     var lastSession: SnorkelingSession? { sessions.first }
@@ -37,8 +53,11 @@ final class IOSSnorkelingLogbookStore: ObservableObject {
     }
 
     func delete(id: UUID) {
+        deletedSessionIDs.insert(id)
         sessions.removeAll { $0.id == id }
+        saveDeletedSessionIDs(deletedSessionIDs)
         persistAtomically()
+        tombstonePublisher?.publishDeletedSnorkelingSessionIDs([id])
     }
 
     func session(id: UUID) -> SnorkelingSession? {
@@ -46,11 +65,16 @@ final class IOSSnorkelingLogbookStore: ObservableObject {
     }
 
     func reload() {
+        deletedSessionIDs = loadDeletedSessionIDs()
         load()
     }
 
     @discardableResult
     func mergeImportedSession(_ incoming: SnorkelingSession) -> SnorkelingSessionSyncImportResult {
+        let normalizedIncoming = SnorkelingLogbookPolicy.normalizedSession(incoming)
+        guard !deletedSessionIDs.contains(normalizedIncoming.id) else {
+            return .duplicateIgnored
+        }
         let outcome = SnorkelingSessionSyncImportPolicy.importSession(
             incoming,
             existingSessions: sessions,
@@ -68,7 +92,7 @@ final class IOSSnorkelingLogbookStore: ObservableObject {
 
         sessions.removeAll { $0.id == merged.id }
         sessions.insert(merged, at: 0)
-        sessions = SnorkelingLogbookPolicy.normalizedAndCapped(sessions)
+        sessions = SnorkelingLogbookPolicy.normalizedAndCapped(sessions, deletedIDs: deletedSessionIDs)
         persistAtomically()
         return outcome.result
     }
@@ -95,7 +119,7 @@ final class IOSSnorkelingLogbookStore: ObservableObject {
             let data = try Data(contentsOf: url)
             let decoded = try SnorkelingLogbookPersistence.decodeSessionsResiliently(from: data)
             let filtered = SnorkelingLogbookPolicy.filterValidLoadedSessions(decoded)
-            sessions = SnorkelingLogbookPolicy.normalizedAndCapped(filtered.sessions)
+            sessions = SnorkelingLogbookPolicy.normalizedAndCapped(filtered.sessions, deletedIDs: deletedSessionIDs)
         } catch {
             let base = Self.testHook_storageDirectoryURL
                 ?? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -111,6 +135,30 @@ final class IOSSnorkelingLogbookStore: ObservableObject {
         return base.appendingPathComponent(fileName)
     }
 
+    private func deletedIDsFileURL() -> URL {
+        fileURL().deletingLastPathComponent().appendingPathComponent("dirdiving_ios_snorkeling_deleted_session_ids.json")
+    }
+
+    private func loadDeletedSessionIDs() -> Set<UUID> {
+        let url = deletedIDsFileURL()
+        guard let data = try? Data(contentsOf: url),
+              let ids = try? JSONDecoder().decode([UUID].self, from: data) else {
+            if let legacy = UserDefaults.standard.stringArray(forKey: deletedLocalKey) {
+                return Set(legacy.compactMap(UUID.init(uuidString:)))
+            }
+            return []
+        }
+        return Set(ids)
+    }
+
+    private func saveDeletedSessionIDs(_ ids: Set<UUID>) {
+        let sorted = ids.map(\.uuidString).sorted()
+        if let data = try? JSONEncoder().encode(sorted.compactMap(UUID.init(uuidString:))) {
+            try? data.write(to: deletedIDsFileURL(), options: [.atomic, .completeFileProtection])
+        }
+        UserDefaults.standard.set(sorted, forKey: deletedLocalKey)
+    }
+
     #if DEBUG
     func replaceSessionsForTesting(_ sessions: [SnorkelingSession]) throws {
         let envelope = try SnorkelingLogbookPersistence.makeEnvelope(sessions: sessions)
@@ -120,7 +168,10 @@ final class IOSSnorkelingLogbookStore: ObservableObject {
 
     func resetForTesting() {
         sessions = []
+        deletedSessionIDs = []
         try? FileManager.default.removeItem(at: fileURL())
+        try? FileManager.default.removeItem(at: deletedIDsFileURL())
+        UserDefaults.standard.removeObject(forKey: deletedLocalKey)
     }
 
     func resetImportedIDsForTesting() {

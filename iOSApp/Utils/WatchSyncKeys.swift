@@ -3,6 +3,11 @@ import Foundation
 enum WatchSyncKeys {
     static let deletedSessionIDsKey = "dirdiving_shared_deleted_session_ids"
     static let deletedSessionBroadcastKey = "dirdiving_deleted_session_ids"
+    static let deletedDivingSessionTombstonesKey = "dirdiving_deleted_diving_session_tombstones"
+    static let deletedApneaSessionTombstonesKey = "dirdiving_deleted_apnea_session_tombstones"
+    static let deletedSnorkelingSessionTombstonesKey = "dirdiving_deleted_snorkeling_session_tombstones"
+    static let deletedApneaSessionIDsKey = "dirdiving_watch_deleted_apnea_session_ids"
+    static let snorkelingDeletedSessionIDsLocalKey = "dirdiving_snorkeling_deleted_session_ids"
     static let unitsPreferenceKey = "units"
     static let gaugeShowTTVKey = "dirdiving_watch_gauge_show_ttv"
     static let companionPhotoFileNameKey = "photoFileName"

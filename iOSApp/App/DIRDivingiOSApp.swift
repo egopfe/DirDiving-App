@@ -26,7 +26,7 @@ struct DIRDivingiOSApp: App {
                     } else if stores.companionActivity.selectedMode == .snorkeling {
                         stores.applySnorkelingEnvironment(to: IOSSnorkelingRootView())
                     } else {
-                        stores.applySharedEnvironment(to: ContentView().id(stores.sharedSettings.language.rawValue))
+                        stores.applyDivingEnvironment(to: ContentView().id(stores.sharedSettings.language.rawValue))
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

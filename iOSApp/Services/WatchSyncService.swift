@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import WatchConnectivity
+import CryptoKit
 import os
 
 @MainActor
@@ -178,18 +179,79 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     func publishDeletedSessionIDs(_ ids: Set<UUID>) {
+        publishDeletedTombstones(ids, activity: .diving) { _ in
+            Int(Date().timeIntervalSince1970)
+        }
+    }
+
+    func publishDeletedApneaSessionIDs(_ ids: Set<UUID>) {
+        publishDeletedTombstones(ids, activity: .apnea) { _ in
+            ActivitySyncRevisionPolicy.sessionRevision(for: Date())
+        }
+    }
+
+    func publishDeletedSnorkelingSessionIDs(_ ids: Set<UUID>) {
+        publishDeletedTombstones(ids, activity: .snorkeling) { _ in
+            ActivitySyncRevisionPolicy.sessionRevision(for: Date())
+        }
+    }
+
+    private func publishDeletedTombstones(
+        _ ids: Set<UUID>,
+        activity: ActivitySyncActivityType,
+        revisionForSession: (UUID) -> Int
+    ) {
         guard WCSession.isSupported(), !ids.isEmpty else { return }
         guard WatchSyncAuth.canPublishApplicationContext() else {
             refreshCompanionSyncAvailabilityMessage()
             return
         }
-        var existing = Set((WCSession.default.applicationContext[WatchSyncKeys.deletedSessionBroadcastKey] as? [String]) ?? [])
-        existing.formUnion(ids.map(\.uuidString))
-        guard WatchSyncAuth.mergeApplicationContext([WatchSyncKeys.deletedSessionBroadcastKey: Array(existing)]) else {
-            refreshCompanionSyncAvailabilityMessage()
+        guard WatchSyncAuth.hasPeerSecret(),
+              let syncKey = try? WatchSyncAuth.deriveSyncKey(peerBundleID: "com.egopfe.dirdiving.ios.watch") else {
+            publishLegacyDivingUUIDTombstones(ids, activity: activity)
             return
         }
+        let bundleID = Bundle.main.bundleIdentifier ?? "com.egopfe.dirdiving.ios"
+        guard let signed = try? ActivitySyncTombstoneBroadcast.makeSignedTombstones(
+            sessionIDs: ids,
+            activity: activity,
+            revisionForSession: revisionForSession,
+            syncKey: syncKey,
+            bundleID: bundleID
+        ), !signed.isEmpty else {
+            publishLegacyDivingUUIDTombstones(ids, activity: activity)
+            return
+        }
+        let context = WCSession.default.applicationContext
+        let payload = ActivitySyncTombstoneBroadcast.mergeBroadcastPayload(
+            existing: context,
+            incoming: signed,
+            activity: activity
+        )
+        if activity == .diving {
+            var legacy = Set((context[WatchSyncKeys.deletedSessionBroadcastKey] as? [String]) ?? [])
+            legacy.formUnion(ids.map(\.uuidString))
+            var merged = payload
+            merged[WatchSyncKeys.deletedSessionBroadcastKey] = Array(legacy)
+            guard WatchSyncAuth.mergeApplicationContext(merged) else {
+                refreshCompanionSyncAvailabilityMessage()
+                return
+            }
+        } else {
+            guard WatchSyncAuth.mergeApplicationContext(payload) else {
+                refreshCompanionSyncAvailabilityMessage()
+                return
+            }
+        }
         lastMessage = DIRIOSLocalizer.formatted("sync.tombstone.sent_to_watch", ids.count)
+    }
+
+    private func publishLegacyDivingUUIDTombstones(_ ids: Set<UUID>, activity: ActivitySyncActivityType) {
+        guard activity == .diving, WCSession.isSupported(), !ids.isEmpty else { return }
+        guard WatchSyncAuth.canPublishApplicationContext() else { return }
+        var existing = Set((WCSession.default.applicationContext[WatchSyncKeys.deletedSessionBroadcastKey] as? [String]) ?? [])
+        existing.formUnion(ids.map(\.uuidString))
+        _ = WatchSyncAuth.mergeApplicationContext([WatchSyncKeys.deletedSessionBroadcastKey: Array(existing)])
     }
 
     func pushUnitsPreference(_ value: String) {
@@ -568,6 +630,34 @@ final class WatchSyncService: NSObject, ObservableObject {
                 lastMessage = DIRIOSLocalizer.formatted("sync.dive.watch_tombstone_applied_format", ids.count)
             }
         }
+        ingestSignedTombstones(from: context, activity: .diving) { ids in
+            logStore?.applyRemoteDeletedSessionIDs(ids)
+        }
+        ingestSignedTombstones(from: context, activity: .apnea) { ids in
+            apneaLogbookStore?.applyRemoteDeletedSessionIDs(ids)
+        }
+        ingestSignedTombstones(from: context, activity: .snorkeling) { ids in
+            snorkelingLogbookStore?.applyRemoteDeletedSessionIDs(ids)
+        }
+    }
+
+    private func ingestSignedTombstones(
+        from context: [String: Any],
+        activity: ActivitySyncActivityType,
+        apply: (Set<UUID>) -> Void
+    ) {
+        guard WatchSyncAuth.hasPeerSecret(),
+              let syncKey = try? WatchSyncAuth.deriveSyncKey(peerBundleID: "com.egopfe.dirdiving.ios.watch") else {
+            return
+        }
+        let ids = ActivitySyncTombstoneBroadcast.verifiedSessionIDs(
+            from: context,
+            activity: activity,
+            syncKey: syncKey,
+            expectedBundleID: "com.egopfe.dirdiving.ios.watch"
+        )
+        guard !ids.isEmpty else { return }
+        apply(ids)
     }
 
     private struct AckContext {
@@ -1266,5 +1356,22 @@ extension WatchSyncService {
     func testHook_markUserInfoDelivered(sessionID: UUID, error: Error?) {
         markUserInfoDelivered(sessionID: sessionID, error: error)
     }
+
+    @discardableResult
+    func testHook_importDivingPayload(_ payload: [String: Any]) -> Bool {
+        importSessionPayload(payload) != nil
+    }
+
+    @discardableResult
+    func testHook_importApneaPayload(_ payload: [String: Any]) -> Bool {
+        importApneaSessionPayload(payload) != nil
+    }
+
+    @discardableResult
+    func testHook_importSnorkelingPayload(_ payload: [String: Any]) -> Bool {
+        importSnorkelingSessionPayload(payload) != nil
+    }
 }
 #endif
+
+extension WatchSyncService: SnorkelingSessionTombstonePublishing {}
