@@ -47,14 +47,9 @@ final class ApneaSyncCodecTests: XCTestCase {
     }
 
     func testTransferSupportAckRoundTrip() throws {
-        WatchSyncAuth.resetPeerTrust()
-        defer { WatchSyncAuth.resetPeerTrust() }
-        let peerSecret = Data(repeating: 7, count: 32).base64EncodedString()
-        WatchSyncAuth.ingestSharedSecretFromContext([WatchSyncAuth.contextKey: peerSecret])
-        guard WatchSyncAuth.hasPeerSecret() else {
-            throw XCTSkip("Peer secret unavailable in test keychain")
-        }
-
+        WatchSyncTestSupport.installDeterministicSecrets()
+        defer { WatchSyncTestSupport.resetSecrets() }
+        WatchSyncTestSupport.requirePeerSecret()
         let package = try ApneaSyncPackageBuilder.build(
             plan: ApneaSessionPlan(kind: .custom, title: "Sync", entries: [
                 ApneaPlannedDiveEntry(orderIndex: 0, targetDepthMeters: 12, targetDurationSeconds: 45, plannedRecoverySeconds: 45)

@@ -112,6 +112,7 @@ enum WatchSyncAuth {
             return .rejectedMismatch
         }
         savePeerSecret(secret)
+        WatchSyncTrustStatePolicy.recordEstablishedTrust(peerSecret: secret)
         clearPeerSecretMismatch()
         NotificationCenter.default.post(name: .watchSyncPeerSecretDidUpdate, object: nil)
         return .acceptedFirstTrust
@@ -146,6 +147,7 @@ enum WatchSyncAuth {
 
     // F1: explicit peer-trust reset used by the iOS UI to force a fresh pairing handshake.
     static func resetPeerTrust() {
+        WatchSyncTrustStatePolicy.incrementTrustEpochOnReset()
         deleteKeychain(account: "\(keychainAccount)-peer", service: keychainService)
         deleteKeychain(account: "\(keychainAccount)-peer", service: legacyKeychainService)
         clearPeerSecretMismatch()

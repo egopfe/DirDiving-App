@@ -102,7 +102,7 @@ final class CloudSyncStore: ObservableObject {
 
         if let cloudData, let localData {
             if Self.prefersCloudPayload(localModifiedAt: localModifiedAt, cloudModifiedAt: cloudModifiedAt) {
-                if let decoded = decode(type, from: cloudData, key: key, source: DIRIOSLocalizer.string("cloud.source.icloud")) {
+                if let decoded = decodeCloudIfAllowed(type, cloudData: cloudData, key: key) {
                     defaults.set(cloudData, forKey: key)
                     defaults.set(cloudModifiedAt, forKey: modifiedAtKey(for: key))
                     publishDeferred { [self] in
@@ -132,7 +132,7 @@ final class CloudSyncStore: ObservableObject {
         }
 
         if let cloudData {
-            if let decoded = decode(type, from: cloudData, key: key, source: DIRIOSLocalizer.string("cloud.source.icloud")) {
+            if let decoded = decodeCloudIfAllowed(type, cloudData: cloudData, key: key) {
                 defaults.set(cloudData, forKey: key)
                 defaults.set(cloudModifiedAt, forKey: modifiedAtKey(for: key))
                 publishDeferred { [self] in
@@ -173,20 +173,32 @@ final class CloudSyncStore: ObservableObject {
             return
         }
 
-        let decision = CloudSyncBudgetPolicy.evaluateWrite(
+        let decision = CloudSyncLegacyMigrationPolicy.outgoingWriteDecision(
             key: key,
             newData: data,
             existingFootprints: CloudSyncBudgetPolicy.footprints(from: cloudStore)
         )
+        let partial = CloudSyncLegacyMigrationPolicy.evaluatePartialMigration(
+            hasLocalData: defaults.data(forKey: key) != nil,
+            writeDecision: decision,
+            alreadyCloudSynced: cloudStore.data(forKey: key) != nil
+        )
+        CloudSyncMigrationTelemetry.recordMigrationAttempt()
         switch decision {
         case .allowed:
             break
-        case .perKeyExceeded:
+        case .blockedPerKey:
+            if partial == .partialMigrationKeptLocal {
+                CloudSyncMigrationTelemetry.recordPartialMigrationKeptLocal()
+            }
             publishDeferred { [self] in
                 lastSyncStatus = DIRIOSLocalizer.string("cloud.status.payload_too_large")
             }
             return
-        case .aggregateExceeded:
+        case .blockedAggregate:
+            if partial == .partialMigrationKeptLocal {
+                CloudSyncMigrationTelemetry.recordPartialMigrationKeptLocal()
+            }
             publishDeferred { [self] in
                 lastSyncStatus = DIRIOSLocalizer.string("cloud.status.aggregate_budget_exceeded")
             }
@@ -269,6 +281,21 @@ final class CloudSyncStore: ObservableObject {
                 lastSyncStatus = DIRIOSLocalizer.string("cloud.status.encode_failed")
             }
             Self.logger.error("iCloud encode failed: \(error.localizedDescription, privacy: .private)")
+            return nil
+        }
+    }
+
+    private func decodeCloudIfAllowed<T: Decodable>(_ type: T.Type, cloudData: Data, key: String) -> T? {
+        switch CloudSyncLegacyMigrationPolicy.incomingPayloadDecision(byteCount: cloudData.count) {
+        case .usePayload:
+            return decode(type, from: cloudData, key: key, source: DIRIOSLocalizer.string("cloud.source.icloud"))
+        case .ignoreLegacyOversizedPerKey:
+            CloudSyncMigrationTelemetry.recordLegacyOversizedIgnored(storageKey: key)
+            publishDeferred { [self] in
+                lastSyncStatus = DIRIOSLocalizer.string("cloud.status.payload_too_large")
+            }
+            return nil
+        case .ignoreEmpty:
             return nil
         }
     }

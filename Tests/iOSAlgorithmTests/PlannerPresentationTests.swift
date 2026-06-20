@@ -199,7 +199,8 @@ final class PlannerPresentationTests: XCTestCase {
         )
         let plan = PlannerService.makePlan(input: input, mode: .technical)
         if plan.decoStops.isEmpty {
-            throw XCTSkip("No deco stops for profile")
+            XCTFail("No deco stops for profile")
+            return
         }
         let context = PDFExportPlannerContext(
             input: input,
@@ -244,9 +245,7 @@ final class PlannerPresentationTests: XCTestCase {
             )
         )
         let plan = PlannerService.makePlan(input: input, mode: .technical)
-        if plan.decoStops.isEmpty {
-            throw XCTSkip("No deco stops for profile")
-        }
+        XCTAssertFalse(plan.decoStops.isEmpty, "No deco stops for profile")
         return plan
     }
 
@@ -267,9 +266,7 @@ final class PlannerPresentationTests: XCTestCase {
             )
         )
         let plan = PlannerService.makePlan(input: input, mode: .deco)
-        if plan.decoStops.isEmpty {
-            throw XCTSkip("No deco stops for profile")
-        }
+        XCTAssertFalse(plan.decoStops.isEmpty, "No deco stops for profile")
         return plan
     }
 

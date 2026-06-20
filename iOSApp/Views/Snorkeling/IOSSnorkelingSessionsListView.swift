@@ -159,7 +159,7 @@ struct IOSSnorkelingStatisticsView: View {
                                 )
                                 statRow(
                                     DIRIOSLocalizer.string("snorkeling.ios.stats.avg_speed"),
-                                    String(format: "%.2f m/s", stats.averageSurfaceSpeedMetersPerSecond)
+                                    Formatters.surfaceSpeed(stats.averageSurfaceSpeedMetersPerSecond, units: unitPreference).text
                                 )
                                 statRow(
                                     DIRIOSLocalizer.string("snorkeling.ios.stats.total_dips"),
@@ -213,7 +213,7 @@ struct IOSSnorkelingStatisticsView: View {
     }
 
     private func formatDistance(_ meters: Double) -> String {
-        meters >= 1_000 ? String(format: "%.2f km", meters / 1_000) : String(format: "%.0f m", meters)
+        Formatters.distance(meters, units: unitPreference).text
     }
 }
 

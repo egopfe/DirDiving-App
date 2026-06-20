@@ -121,6 +121,17 @@ struct PlannerView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        PlannerAscentSpeedSettingsView()
+                    } label: {
+                        Image(systemName: "arrow.up.circle")
+                            .foregroundStyle(DIRTheme.cyan)
+                    }
+                    .accessibilityLabel(DIRIOSLocalizer.string("settings.planner_ascent_speeds.title"))
+                    .accessibilityHint(DIRIOSLocalizer.string("planner.ascent_speeds.link.a11y.hint"))
+                    .accessibilityIdentifier("planner.toolbar.ascent_speeds")
+                }
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         showPlannerPDFMenu = true
                     } label: {

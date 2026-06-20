@@ -1252,3 +1252,36 @@
 "snorkeling.recovery.subtitle" = "RECOVERED";
 "snorkeling.recovery.gps_degraded" = "GPS is stale or unavailable. Verify before navigating.";
 "snorkeling.recovery.checkpoint_failed" = "Could not restore the previous session. Checkpoint quarantined.";
+
+/* UI/UX remediation V3.0 */
+"brand.name" = "DIR DIVING";
+"settings.version.label" = "Version";
+"legal.acceptance.not_accepted" = "Not accepted";
+"legal.not_dive_computer" = "DIR Diving is NOT a dive computer.";
+"legal.badge.not_dive_computer" = "NOT A DIVE COMPUTER";
+"legal.onboarding.welcome.title" = "Welcome to DIR Diving";
+"legal.onboarding.welcome.body" = "Before using the app, review and accept the safety disclaimer.";
+"legal.onboarding.disclaimer.title" = "Legal Disclaimer";
+"legal.safety.title" = "Legal & Safety";
+"common.continue" = "Continue";
+"common.i_understand" = "I understand";
+"common.cancel" = "Cancel";
+"watch.sync.pending_count_format" = "%lld awaiting ack";
+"watch.sync.sent_count_format" = "%lld sent or in transit";
+"watch.sync.ack_count_format" = "%lld confirmed by iPhone";
+"watch.sync.failed_count_format" = "%lld failed · retry %@";
+"watch.info.depth_entitlement.title" = "Depth entitlement";
+"live.sync.status.a11y.label" = "Watch sync status";
+"live.sync.status.a11y.hint.ok" = "Companion sync status.";
+"live.sync.status.a11y.hint.error" = "Sync errors detected. Open Settings for details.";
+"live.warning.banner.a11y.hint" = "Safety warning during the dive.";
+"alarm.acknowledge.a11y.hint" = "Double tap to acknowledge this alarm.";
+"watch.planner_briefing.card_inventory.a11y" = "Briefing card %@";
+"watch.planner_briefing.card_detail.open.a11y" = "Opens full-screen briefing card detail.";
+"watch.planner_briefing.card_detail.a11y" = "Briefing card image for %@";
+"watch.planner_briefing.card_detail.missing_image" = "Briefing image unavailable.";
+"watch.planner_briefing.delete.a11y.hint" = "Deletes the entire planner briefing package.";
+"watch.planner_briefing.delete.disabled_dive.a11y" = "Unavailable during an active dive.";
+"watch.planner_briefing.delete.confirm.title" = "Delete briefing?";
+"watch.planner_briefing.delete.confirm.action" = "Delete briefing";
+"watch.reminder.suppression.note" = "Reminders are suppressed while critical safety alarms are active.";

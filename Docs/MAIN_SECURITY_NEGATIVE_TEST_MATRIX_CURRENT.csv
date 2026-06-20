@@ -1,0 +1,11 @@
+Test_ID,Threat,Test_Class,Test_Method,Expected_Result,Status
+SEC-NEG-01,Forged HMAC without peer secret,MainDeepCodeReadinessCurrentTests,testForgedHMACRejectedWhenPeerSecretMissing,deriveSyncKey throws,PASS
+SEC-NEG-02,Replayed nonce,MainDeepCodeReadinessCurrentTests,testReplayedNonceRejectedOnSecondUse,Second register fails,PASS
+SEC-NEG-03,TOFU peer secret mismatch,MainDeepCodeReadinessCurrentTests,testTOFURejectsPeerSecretMismatch,rejectedMismatch,PASS
+SEC-NEG-04,Briefing legacy schema protection,MainDeepCodeReadinessCurrentTests,testBriefingFilenameTraversalRejectedOnWatchPolicyTypeViaSchema,v1 briefing blocked,PASS
+SEC-NEG-05,Briefing path traversal Watch,MainDeepCodeReadinessCurrentWatchTests,testBriefingAdversarialFilenamesRejected,sanitizer nil,PASS
+SEC-NEG-06,Legacy v1 photo delete,MainDeepCodeAnalysisRemediationV1Tests,testLegacyV1ProtectedOperationsRejected,true for v1,PASS
+SEC-NEG-07,Apnea cross-activity cloud claim,MainDeepCodeReadinessCurrentTests,testApneaCloudCapabilityExplicitlyUnavailable,isUploadAvailable false,PASS
+SEC-NEG-08,Snorkeling cloud toggle truthfulness,MainDeepCodeReadinessCurrentTests,testSnorkelingCloudCapabilityStatusOnly,isUploadAvailable false,PASS
+SEC-NEG-09,Trust fingerprint no secret leak,MainDeepCodeReadinessCurrentTests,testTrustFingerprintNeverEqualsRawSecret,fingerprint != secret,PASS
+SEC-NEG-10,Legacy oversized KVS read,MainDeepCodeReadinessCurrentTests,testLegacyOversizedPerKeyPayloadIgnored,ignoreLegacyOversizedPerKey,PASS

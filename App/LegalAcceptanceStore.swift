@@ -40,18 +40,18 @@ final class LegalAcceptanceStore: ObservableObject {
     }
 
     var acceptedVersionText: String {
-        record?.appVersion ?? String(localized: "Not accepted")
+        record?.appVersion ?? String(localized: "legal.acceptance.not_accepted")
     }
 
     var acceptedTimestampText: String {
         guard let timestamp = record?.timestamp else {
-            return String(localized: "Not accepted")
+            return String(localized: "legal.acceptance.not_accepted")
         }
         return Self.timestampFormatter.string(from: timestamp)
     }
 
     var acceptedLanguageText: String {
-        record?.languageCode.uppercased() ?? String(localized: "Not accepted")
+        record?.languageCode.uppercased() ?? String(localized: "legal.acceptance.not_accepted")
     }
 
     func accept(languageCode: String, acknowledgedDepthOperatingLimits: Bool) {
@@ -79,7 +79,7 @@ final class LegalAcceptanceStore: ObservableObject {
            !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return text
         }
-        return String(localized: "DIR Diving is NOT a dive computer.")
+        return String(localized: "legal.not_dive_computer")
     }
 
     private static func loadRecord(from defaults: UserDefaults) -> LegalAcceptanceRecord? {

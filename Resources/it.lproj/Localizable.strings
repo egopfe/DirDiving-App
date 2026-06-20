@@ -1252,3 +1252,36 @@
 "snorkeling.recovery.subtitle" = "RECUPERATA";
 "snorkeling.recovery.gps_degraded" = "GPS obsoleto o non disponibile. Verifica prima di navigare.";
 "snorkeling.recovery.checkpoint_failed" = "Impossibile ripristinare la sessione precedente. Checkpoint in quarantena.";
+
+/* UI/UX remediation V3.0 */
+"brand.name" = "DIR DIVING";
+"settings.version.label" = "Versione";
+"legal.acceptance.not_accepted" = "Non accettato";
+"legal.not_dive_computer" = "DIR Diving NON è un computer subacqueo.";
+"legal.badge.not_dive_computer" = "NON È UN COMPUTER SUB";
+"legal.onboarding.welcome.title" = "Benvenuto in DIR Diving";
+"legal.onboarding.welcome.body" = "Prima di usare l'app, leggi e accetta il disclaimer di sicurezza.";
+"legal.onboarding.disclaimer.title" = "Disclaimer legale";
+"legal.safety.title" = "Legale e sicurezza";
+"common.continue" = "Continua";
+"common.i_understand" = "Ho capito";
+"common.cancel" = "Annulla";
+"watch.sync.pending_count_format" = "%lld in attesa ack";
+"watch.sync.sent_count_format" = "%lld inviati o in transito";
+"watch.sync.ack_count_format" = "%lld confermati da iPhone";
+"watch.sync.failed_count_format" = "%lld falliti · retry %@";
+"watch.info.depth_entitlement.title" = "Entitlement profondità";
+"live.sync.status.a11y.label" = "Stato sync Watch";
+"live.sync.status.a11y.hint.ok" = "Stato sincronizzazione companion.";
+"live.sync.status.a11y.hint.error" = "Errori di sync rilevati. Apri Impostazioni per i dettagli.";
+"live.warning.banner.a11y.hint" = "Avviso di sicurezza durante l'immersione.";
+"alarm.acknowledge.a11y.hint" = "Doppio tocco per confermare l'allarme.";
+"watch.planner_briefing.card_inventory.a11y" = "Scheda briefing %@";
+"watch.planner_briefing.card_detail.open.a11y" = "Apre il dettaglio a schermo intero della scheda briefing.";
+"watch.planner_briefing.card_detail.a11y" = "Immagine scheda briefing per %@";
+"watch.planner_briefing.card_detail.missing_image" = "Immagine briefing non disponibile.";
+"watch.planner_briefing.delete.a11y.hint" = "Elimina l'intero pacchetto briefing del planner.";
+"watch.planner_briefing.delete.disabled_dive.a11y" = "Non disponibile durante un'immersione attiva.";
+"watch.planner_briefing.delete.confirm.title" = "Eliminare il briefing?";
+"watch.planner_briefing.delete.confirm.action" = "Elimina briefing";
+"watch.reminder.suppression.note" = "I promemoria sono soppressi mentre allarmi di sicurezza critici sono attivi.";

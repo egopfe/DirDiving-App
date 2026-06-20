@@ -3,6 +3,7 @@ import SwiftUI
 struct DiveDetailView: View {
     let session: DiveSession
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.locale) private var locale
     @EnvironmentObject private var log: DiveLogStore
     @EnvironmentObject private var navigation: AppNavigationStore
     @AppStorage(DIRUnitPreference.storageKey) private var watchUnits = DIRUnitPreference.metric.rawValue
@@ -55,7 +56,7 @@ struct DiveDetailView: View {
                 DiveOctopusLogo(accent: DiveUI.yellow)
                     .frame(width: 23, height: 22, alignment: .leading)
                     .scaleEffect(0.68)
-                Text(String(localized: "DIR DIVING"))
+                Text(DIRBrandPresentation.displayName)
                     .font(DiveUI.Typography.brandTitleCompact)
                     .foregroundStyle(DiveUI.yellow)
                     .lineLimit(1)
@@ -68,12 +69,15 @@ struct DiveDetailView: View {
     }
 
     private var dateLine: some View {
-        Text("\(Self.dateFormatter.string(from: session.startDate))   \(Self.timeFormatter.string(from: session.startDate))")
+        Text(WatchLocaleAdaptiveDateFormatting.sessionDateTimeText(for: session.startDate, locale: locale))
             .font(DiveUI.Typography.secondaryLabel)
             .foregroundStyle(DiveUI.blue)
             .monospacedDigit()
             .lineLimit(1)
             .minimumScaleFactor(0.9)
+            .accessibilityLabel(
+                WatchLocaleAdaptiveDateFormatting.sessionDateTimeAccessibilityLabel(for: session.startDate, locale: locale)
+            )
     }
 
     private var summaryCards: some View {
@@ -362,16 +366,4 @@ struct DiveDetailView: View {
         let direction = value >= 0 ? positive : negative
         return String(format: "%.6f\u{00B0} %@", abs(value), direction)
     }
-
-    private static let dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM/yyyy"
-        return formatter
-    }()
-
-    private static let timeFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        return formatter
-    }()
 }

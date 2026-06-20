@@ -60,7 +60,12 @@ enum PlannerPDFBuilder {
                 page.drawLine(DIRIOSLocalizer.string("planner.gas.ppo2_max"), value: Formatters.one(entry.gas.maxPPO2))
                 page.drawLine(
                     DIRIOSLocalizer.string("planner.gas.editor.mod"),
-                    value: Formatters.depth(entry.modMeters(environment: environment), units: context.unitPreference).text
+                    value: MODPresentationPolicy.displayMOD(
+                        for: entry,
+                        mode: context.mode,
+                        environment: environment,
+                        units: context.unitPreference
+                    ).text
                 )
                 page.drawLine(
                     DIRIOSLocalizer.string("planner.gas.editor.working_pressure_section"),

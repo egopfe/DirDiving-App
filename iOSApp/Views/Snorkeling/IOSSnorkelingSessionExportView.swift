@@ -3,7 +3,7 @@ import PhotosUI
 
 struct IOSSnorkelingSessionExportView: View {
     let session: SnorkelingSession
-    @AppStorage("dirdiving_ios_snorkeling_cloud_backup_enabled") private var cloudBackupEnabled = false
+    private let cloudCapability = SnorkelingCloudCapability.current
     @State private var locationPrecision: SnorkelingExportLocationPrecision = .removed
     @State private var includeBuddyContact = false
     @State private var includeEmergencyContact = false
@@ -71,18 +71,18 @@ struct IOSSnorkelingSessionExportView: View {
                     exportRow("snorkeling.ios.export.chart", icon: "chart.xyaxis.line", format: .chartImage)
                 }
 
-                Section {
-                    Toggle(DIRIOSLocalizer.string("snorkeling.ios.export.cloud_backup"), isOn: $cloudBackupEnabled)
-                        .tint(DIRTheme.cyan)
-                    Text(DIRIOSLocalizer.string("snorkeling.ios.export.cloud_backup_note"))
+                Section(DIRIOSLocalizer.string("snorkeling.ios.export.cloud_backup")) {
+                    Text(DIRIOSLocalizer.string(cloudCapability.localizationStatusKey))
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(DIRTheme.muted)
+                    Text(DIRIOSLocalizer.string(cloudCapability.localizationNoteKey))
                         .font(.caption)
                         .foregroundStyle(DIRTheme.muted)
-                    if cloudBackupEnabled {
-                        Text(DIRIOSLocalizer.string("snorkeling.ios.export.cloud_backup_pending"))
-                            .font(.caption)
-                            .foregroundStyle(DIRTheme.orange)
-                    }
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(DIRIOSLocalizer.string("snorkeling.ios.export.cloud_backup"))
+                .accessibilityValue(DIRIOSLocalizer.string(cloudCapability.localizationStatusKey))
+                .accessibilityHint(DIRIOSLocalizer.string(cloudCapability.localizationNoteKey))
 
                 if let errorMessage {
                     Section {

@@ -21,6 +21,13 @@ struct DiveReminderSettingsView: View {
                         isOn: $reminderSettings.settings.remindersEnabled
                     )
 
+                    Text(String(localized: "watch.reminder.suppression.note"))
+                        .font(DiveUI.Typography.rowSubtitle)
+                        .foregroundStyle(DiveUI.secondaryText)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityLabel(String(localized: "watch.reminder.suppression.note"))
+
                     if reminderSettings.canAddReminder {
                         NavigationLink {
                             DiveReminderEditorView(reminder: DiveReminder.makeNew(), isNew: true)
@@ -62,7 +69,7 @@ struct DiveReminderSettingsView: View {
                 DiveOctopusLogo(accent: DiveUI.yellow)
                     .frame(width: 23, height: 22, alignment: .leading)
                     .scaleEffect(0.68)
-                Text("DIR DIVING")
+                Text(DIRBrandPresentation.displayName)
                     .font(.system(size: 11, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.yellow)
                     .lineLimit(1)

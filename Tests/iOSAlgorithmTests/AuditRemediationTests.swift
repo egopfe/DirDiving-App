@@ -187,18 +187,11 @@ final class AuditRemediationTests: XCTestCase {
     }
 
     func testPeerSecretPresentSigningWorks() throws {
-        WatchSyncAuth.resetPeerTrust()
-        defer { WatchSyncAuth.resetPeerTrust() }
-        let peerSecret = Data(repeating: 9, count: 32).base64EncodedString()
-        WatchSyncAuth.ingestSharedSecretFromContext([WatchSyncAuth.contextKey: peerSecret])
-        guard WatchSyncAuth.hasPeerSecret() else {
-            throw XCTSkip("Peer secret unavailable in test keychain")
-        }
-        do {
-            _ = try WatchSyncAuth.deriveSyncKey(peerBundleID: "com.egopfe.dirdiving.ios.watch")
-        } catch {
-            throw XCTSkip("Local sync secret unavailable in test keychain")
-        }
+        WatchSyncTestSupport.resetSecrets()
+        defer { WatchSyncTestSupport.resetSecrets() }
+        WatchSyncTestSupport.installDeterministicSecrets()
+        WatchSyncTestSupport.requirePeerSecret()
+        _ = try WatchSyncAuth.deriveSyncKey(peerBundleID: "com.egopfe.dirdiving.ios.watch")
         XCTAssertFalse(WatchDiveSyncCodec.ackSignature(sessionID: UUID(), issuedAt: Date()).isEmpty)
     }
 

@@ -110,9 +110,10 @@ final class BuhlmannComprehensiveReadinessCCRRemediationTests: XCTestCase {
         XCTAssertEqual(ChecklistPlannerSyncMapper.resolvedRole(for: item), .ccrBailout)
     }
 
-    func testInferRoleRecognizesItalianDiluentTitle() {
+    func testLegacyInferRoleRecognizesItalianDiluentTitle() {
         let item = EquipmentChecklistItem(title: "Bombola diluente CCR", usesGas: true)
-        XCTAssertEqual(ChecklistPlannerSyncMapper.resolvedRole(for: item), .ccrDiluent)
+        XCTAssertEqual(ChecklistPlannerSyncMapper.legacyInferRole(from: item.title), .ccrDiluent)
+        XCTAssertNil(ChecklistPlannerSyncMapper.resolvedRole(for: item))
     }
 
     func testCCRChecklistExportUpdatesMultipleBailoutRowsByOrder() {
