@@ -84,7 +84,8 @@ final class PlannerAscentSpeedSettingsTests: XCTestCase {
         ]
         let engine = BuhlmannPlanner.enginePlan(input: input)
         if engine.segments.filter({ $0.kind == .ascent }).isEmpty {
-            throw XCTSkip("No ascent segments")
+            XCTFail("No ascent segments")
+            return
         }
         let environment = PlannerEnvironment.seaLevelSaltWater
         let fast = engine.withPlannerTransitMinutes(using: .default)
@@ -120,7 +121,8 @@ final class PlannerAscentSpeedSettingsTests: XCTestCase {
         ]
         let engine = BuhlmannPlanner.enginePlan(input: input)
         if engine.stops.isEmpty {
-            throw XCTSkip("No deco stops")
+            XCTFail("No deco stops")
+            return
         }
         var slowSettings = PlannerAscentSpeedSettings.default
         slowSettings.from6To0Meters = 1
@@ -153,7 +155,8 @@ final class PlannerAscentSpeedSettingsTests: XCTestCase {
             ascentSpeedSettings: .default
         )
         if plan.decoStops.isEmpty {
-            throw XCTSkip("No deco stops")
+            XCTFail("No deco stops")
+            return
         }
         var slowSettings = PlannerAscentSpeedSettings.default
         slowSettings.from40To30Meters = 3

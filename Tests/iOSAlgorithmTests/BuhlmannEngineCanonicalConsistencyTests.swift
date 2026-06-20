@@ -48,7 +48,8 @@ final class BuhlmannEngineCanonicalConsistencyTests: XCTestCase {
         ]
         let plan = PlannerService.makePlan(input: input, mode: .technical)
         if plan.decoStops.isEmpty {
-            throw XCTSkip("No deco plan")
+            XCTFail("No deco plan")
+            return
         }
         XCTAssertGreaterThanOrEqual(plan.gasAnalysis.cnsPercent, plan.gasAnalysis.cnsDescentBottomPercent)
     }
@@ -74,7 +75,8 @@ final class BuhlmannEngineCanonicalConsistencyTests: XCTestCase {
         ]
         let plan = PlannerService.makePlan(input: input, mode: .technical)
         if plan.decoStops.isEmpty {
-            throw XCTSkip("No deco stops")
+            XCTFail("No deco stops")
+            return
         }
         let decoRows = plan.ascentTableRows.filter { $0.kind == .decoStop }
         XCTAssertEqual(decoRows.count, plan.decoStops.count)

@@ -32,3 +32,12 @@ WMR-BRIEF-001,Cross,Briefing card matrix,PlannerBriefingCardKindMatrixTests,test
 WMR-EXT-001,Full Computer,External Bühlmann reference,—,—,external,PENDING_EXTERNAL,yes
 WMR-PHY-001,All,Physical Ultra field QA,—,—,physical,PENDING_PHYSICAL,yes
 WMR-PHY-002,All,Paired device sync round-trip,—,—,physical,PENDING_PHYSICAL,yes
+WMR-AUD15-004,Audit 15,Named Air 39 m profile,Audit15Air39MultilevelProfileTests,testAudit15Air39MultilevelProfile,oracle,VERIFIED,no
+WMR-AUD15-005,Audit 15,Re-descent oracle,Audit15RedescentOracleTests,testAudit15DecoClearsThenReappearsAfterRedescent,oracle,VERIFIED,no
+WMR-AUD15-006,Audit 15,Independent oracle,IndependentBuhlmannOracle.swift,replayWithOracleComparison,oracle,VERIFIED,no
+WMR-AUD15-007,Audit 15,Schreiner analytic parity,SchreinerAnalyticParityTests,multiple,oracle,VERIFIED,no
+WMR-AUD15-008,Audit 15,Mutation resistance,BuhlmannMutationResistanceTests,multiple,unit,VERIFIED,no
+WMR-AUD15-009,Audit 15,Timing faults,FullComputerTimingFaultTests,multiple,unit,VERIFIED,no
+WMR-AUD15-010,Audit 15,Cross-target parity,WatchMathCrossTargetParityTests,multiple,oracle,VERIFIED,no
+WMR-GAUGE-006,Gauge,Completion edge cases,WatchGaugeMathCompletionTests,multiple,unit,VERIFIED,no
+WMR-UNIT-002,Cross,Unit round-trip,WatchUnitConversionRoundTripTests,multiple,unit,VERIFIED,no

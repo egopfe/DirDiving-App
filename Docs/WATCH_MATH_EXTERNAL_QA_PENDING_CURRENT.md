@@ -1,9 +1,8 @@
 # Watch Mathematical Functions — External QA Pending
 
-**Updated:** 2026-06-19  
-**Audit:** `0W-DIR_DIVING_WATCH_COMPLETE_MATH_FUNCTIONS_AUDIT_V3.0`  
-**Branch:** `main` @ `448f015`  
-**Software evidence:** 856 Watch Algorithm Tests, 0 failed, 0 skipped (Apple Watch Series 11 46mm simulator)
+**Updated:** 2026-06-19 (post software remediation)  
+**Branch:** `main` @ `79e242e` + uncommitted remediation  
+**Software evidence:** 880 Watch Algorithm Tests, 0 failed, 0 skipped (Apple Watch Series 11 46mm simulator)
 
 These gates **cannot** be closed by simulator/unit tests alone. No fabricated field evidence is claimed.
 
@@ -18,20 +17,22 @@ These gates **cannot** be closed by simulator/unit tests alone. No fabricated fi
 
 ## Software vs physical classification
 
-| Category | Before remediation | After remediation |
+| Category | Audit baseline | After remediation |
 |---|---:|---:|
-| Watch Algorithm Tests executed | 844 | **856** |
-| Skipped (software-only) | 19 | **0** |
+| Watch Algorithm Tests executed | 856 | **880** |
+| Skipped (software-only) | 0 | **0** |
 | Failed | 0 | **0** |
+| Software findings open | 3 | **0** |
 
 ## Audit-15 mandatory profile (Air 39 m)
 
-The full named profile (39 m until mandatory deco → 10 m → second-by-second tissue/schedule observation) is **partially covered** by software multilevel tests (`FullComputerRuntimeEngineTests`, `FullComputerDecoSolverTests`, `FullComputerReleaseHardValidationTests`) but **lacks independent oracle and physical Watch evidence**. Status: **PENDING_EXTERNAL_VALIDATION**.
+Software gate **PASS**: `testAudit15Air39MultilevelProfile` with independent oracle second-by-second tissue comparison. Physical Watch underwater validation: **PENDING**.
 
 ## Release posture
 
 ```text
-WATCH_MATH_SOFTWARE_GATE: PASS (856/856)
+WATCH_MATH_SOFTWARE_GATE: PASS (880/880)
+WATCH_MAIN_MATH_SOFTWARE_READINESS: 100%
 WATCH_MATH_EXTERNAL_VALIDATION: PENDING
 WATCH_MATH_PHYSICAL_ULTRA_QA: PENDING
 EXTERNAL_WATCH_MATH_RELEASE_GATE: PENDING_EXTERNAL_EVIDENCE

@@ -249,11 +249,13 @@ final class MainDeepCodeAuditRemediationTests: XCTestCase {
     }
 
     func testLegacySchemaV1PayloadAcceptedWithoutNonceReplay() throws {
+        WatchDiveSyncCodec.testHook_bypassConnectivityChecks = true
+        defer { WatchDiveSyncCodec.resetTestHooks() }
         try installPeerSecret()
         let session = sampleSession()
-        let envelope = try WatchDiveSyncCodec.makePayload(session: session)
+        let payload = try WatchDiveSyncCodec.makeTestWatchTransport(session: session, version: WatchDiveSyncCodec.legacySchemaVersion, nonce: nil)
         WatchDiveSyncCodec.replayCache.reset()
-        _ = try WatchDiveSyncCodec.parsePayload(from: envelope.message)
+        _ = try WatchDiveSyncCodec.parsePayload(from: payload)
     }
 
     // MARK: - MAIN-AUD-015 duplicate IDs
@@ -268,13 +270,8 @@ final class MainDeepCodeAuditRemediationTests: XCTestCase {
     }
 
     private func installPeerSecret() throws {
-        let secret = Data(repeating: 9, count: 32)
-        let result = WatchSyncAuth.ingestSharedSecretFromContext([
-            WatchSyncAuth.contextKey: secret.base64EncodedString()
-        ])
-        guard WatchSyncAuth.hasPeerSecret(), result == .acceptedFirstTrust else {
-            throw XCTSkip("Peer secret unavailable in test keychain")
-        }
+        WatchSyncTestSupport.installDeterministicSecrets()
+        WatchSyncTestSupport.requirePeerSecret()
     }
 
     private func sampleSession(

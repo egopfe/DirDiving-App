@@ -5,8 +5,9 @@
 **Repository:** `https://github.com/egopfe/DirDiving-App.git`  
 **Branch:** `main`  
 **Audited HEAD:** `448f015`  
+**Remediation HEAD (software gate):** `79e242e` + uncommitted remediation (see `WATCH_MAIN_COMPLETE_MATH_FUNCTIONS_REMEDIATION_REPORT_CURRENT.md`)  
 **Scope:** Apple Watch MAIN (`DIRDiving Watch App`) + Shared Bühlmann core and cross-target codecs where they feed Watch mathematical state  
-**Execution mode:** Read-only audit — no production code, tests, or project configuration modified  
+**Execution mode:** Read-only audit baseline; software remediation applied in follow-on work  
 **Integrated mandatory audit:** `15-DIR_DIVING_WATCH_LIVE_BUHLMANN_SCHREINER_MULTILEVEL_AUDIT` (software-verifiable scope)
 
 ---
@@ -15,29 +16,32 @@
 
 ### Verdict
 
-**Watch MAIN mathematical software readiness: 97% (high confidence)**  
+**Watch MAIN mathematical software readiness: 100% (high confidence)**  
 **Overall Watch math release readiness (including physical/external gates): 78%**
 
-MAIN @ `448f015` implements a coherent multi-activity mathematical architecture with strict runtime isolation. macOS validation:
+MAIN software remediation closes all open software findings. macOS validation after remediation:
 
 | Check | Result |
 |---|---|
-| Watch build (`generic/platform=watchOS Simulator`) | **SUCCEEDED** |
-| Watch Algorithm Tests (Apple Watch Series 11 46mm) | **856 executed, 0 skipped, 0 failed** (~138 s) |
+| Watch build (`Apple Watch Series 11 46mm`) | **SUCCEEDED** |
+| Watch Algorithm Tests | **880 executed, 0 skipped, 0 failed** (~143 s) |
 | Target isolation | **PASS** |
 | Secrets scan | **PASS** |
-| Localization audit | **PASS** (0 hardcoded Watch MAIN findings) |
+| Localization audit | **PASS** |
+| Audit-15 Air 39 m named test | **PASS** |
+| Audit-15 re-descent oracle test | **PASS** |
+| Independent Bühlmann oracle | **PASS** |
 
-**No open P0 or P1 software mathematical defects** were identified. Fail-closed guards prevent false decompression clearance, stale solver publication, and unsigned sync dequeue. Remaining gaps are **physical field validation**, **paired-device sync evidence**, and **independent external Bühlmann reference vectors** — explicitly pending, not fabricated.
+**No open P0–P3 software mathematical defects.** Physical field validation, paired-device sync evidence, and independent external Bühlmann reference vectors remain **PENDING**.
 
 ### Severity summary
 
 | Severity | Open software | Open physical/external |
 |---:|---:|---:|
-| P0 | 0 | 0 (none claimed passed) |
-| P1 | 0 | 2 (Audit-15 full oracle profile; re-descent oracle on hardware) |
-| P2 | 0 | 4 (Ultra depth/haptics; paired sync; GPS field; battery/thermal) |
-| P3 | 1 | — (Audit-15 named 39 m profile not single end-to-end test) |
+| P0 | 0 | 0 |
+| P1 | 0 | 2 (external Bühlmann; hardware re-descent) |
+| P2 | 0 | 4 (Ultra; paired sync; GPS field; battery/thermal) |
+| P3 | 0 | — |
 | P4 | 0 | — |
 
 ---

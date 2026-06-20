@@ -1,0 +1,9 @@
+Phase,Second_Start,Second_End,Depth_M,Rate_m_min,Gas,GF_Low,GF_High,Notes
+Descent,0,120,0→36,18,Air,30,70,Incur decompression
+Deep bottom,121,1920,36,0,Air,30,70,30 min @ 36 m
+Ascent to plateau,1921,2160,36→4,5.8,Air,30,70,Shallow plateau for potential deco clear
+Shallow plateau,2161,2760,4,0,Air,30,70,10 min @ 4 m; checkpoint before re-descent @ 2760
+Re-descent,2761,2880,4→28,12,Air,30,70,Verify deco reappearance
+Re-load bottom,2881,3180,28,0,Air,30,70,5 min @ 28 m
+Environment,—,—,—,—,—,—,—,Sea level salt water
+Validation,—,—,—,—,—,—,—,testAudit15DecoClearsThenReappearsAfterRedescent; oracle stream; checkpoint restore @ 2760

@@ -19,6 +19,8 @@ struct PlannerModeSelectionView: View {
                     DIRWarningBox(text: DIRIOSLocalizer.string("planner.reference_only.warning"))
                         .accessibilityHint(DIRIOSLocalizer.string("planner.mode_selection.safety.a11y"))
 
+                    PlannerAscentSpeedSettingsLink()
+
                     ForEach(PlannerMode.allCases) { mode in
                         modeCard(mode)
                             .accessibilitySortPriority(Double(90 - PlannerMode.allCases.firstIndex(of: mode)!))

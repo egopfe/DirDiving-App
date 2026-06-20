@@ -42,13 +42,8 @@ final class CompanionPhotoManagementIOSTests: XCTestCase {
     }
 
     private func installPeerSecret() throws {
-        let secret = Data(repeating: 3, count: 32)
-        let result = WatchSyncAuth.ingestSharedSecretFromContext([
-            WatchSyncAuth.contextKey: secret.base64EncodedString()
-        ])
-        guard WatchSyncAuth.hasPeerSecret(), result == .acceptedFirstTrust else {
-            throw XCTSkip("Peer secret unavailable in test keychain")
-        }
+        WatchSyncTestSupport.installDeterministicSecrets()
+        WatchSyncTestSupport.requirePeerSecret()
     }
 
     func testDeleteAckMapsRejectedAndNotFoundStates() {

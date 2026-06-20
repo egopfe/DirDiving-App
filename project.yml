@@ -378,6 +378,10 @@ targets:
       - iOSApp/Utils/PlannerInputValidator.swift
       - iOSApp/Utils/PlannerModePolicy.swift
       - iOSApp/Utils/ChecklistPlannerSyncMapper.swift
+      - iOSApp/Utils/ChecklistRoleMigration.swift
+      - iOSApp/Utils/ApneaCloudCapability.swift
+      - iOSApp/Utils/SnorkelingCloudCapability.swift
+      - iOSApp/Utils/MODPresentationPolicy.swift
       - iOSApp/Utils/CCRChecklistExportCoordinator.swift
       - iOSApp/Utils/CCRChecklistImportCoordinator.swift
       - iOSApp/Utils/DIRChecklistConfigurationEvaluator.swift

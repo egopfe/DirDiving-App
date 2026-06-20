@@ -11,7 +11,8 @@ final class PlannerOxygenWarningGranularityTests: XCTestCase {
         ]
         let plan = PlannerService.makePlan(input: input)
         if plan.decoStops.isEmpty {
-            throw XCTSkip("No deco plan generated")
+            XCTFail("No deco plan generated")
+            return
         }
         let states = plan.gasAnalysis.states
         if states.contains(.oxygenExposureElevated) {

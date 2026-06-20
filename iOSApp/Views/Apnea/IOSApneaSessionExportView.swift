@@ -2,7 +2,7 @@ import SwiftUI
 
 struct IOSApneaSessionExportView: View {
     let session: ApneaSession
-    @AppStorage("dirdiving_ios_apnea_cloud_backup_enabled") private var cloudBackupEnabled = false
+    private let cloudCapability = ApneaCloudCapability.current
     @State private var includeGPS = false
     @State private var includeBuddyContact = false
     @State private var includeEmergencyContact = false
@@ -63,17 +63,13 @@ struct IOSApneaSessionExportView: View {
                     exportRow("apnea.ios.export.chart", icon: "chart.xyaxis.line", format: .chartImage)
                 }
 
-                Section {
-                    Toggle(DIRIOSLocalizer.string("apnea.ios.export.cloud_backup"), isOn: $cloudBackupEnabled)
-                        .tint(DIRTheme.cyan)
-                    Text(DIRIOSLocalizer.string("apnea.ios.export.cloud_backup_note"))
+                Section(DIRIOSLocalizer.string("apnea.ios.export.cloud_backup")) {
+                    Text(DIRIOSLocalizer.string(cloudCapability.localizationStatusKey))
+                        .font(.callout.weight(.semibold))
+                        .foregroundStyle(DIRTheme.muted)
+                    Text(DIRIOSLocalizer.string(cloudCapability.localizationNoteKey))
                         .font(.caption)
                         .foregroundStyle(DIRTheme.muted)
-                    if cloudBackupEnabled {
-                        Text(DIRIOSLocalizer.string("apnea.ios.export.cloud_backup_pending"))
-                            .font(.caption)
-                            .foregroundStyle(DIRTheme.orange)
-                    }
                 }
 
                 if let errorMessage {

@@ -33,25 +33,25 @@ struct WatchSyncDiagnosticsView: View {
                         icon: "tray.and.arrow.up",
                         iconColor: watchSync.pendingTransferCount == 0 ? DiveUI.green : DiveUI.yellow,
                         title: String(localized: "settings.row.sync_pending.title"),
-                        subtitle: String(format: String(localized: "%lld in attesa ack"), watchSync.pendingTransferCount)
+                        subtitle: String(format: String(localized: "watch.sync.pending_count_format"), watchSync.pendingTransferCount)
                     )
                     statusRow(
                         icon: "paperplane.fill",
                         iconColor: watchSync.sentTransferCount == 0 ? DiveUI.secondaryText : DiveUI.cyan,
                         title: String(localized: "settings.row.sync_sent.title"),
-                        subtitle: String(format: String(localized: "%lld inviati o in transito"), watchSync.sentTransferCount)
+                        subtitle: String(format: String(localized: "watch.sync.sent_count_format"), watchSync.sentTransferCount)
                     )
                     statusRow(
                         icon: "checkmark.seal.fill",
                         iconColor: watchSync.acknowledgedTransferCount == 0 ? DiveUI.secondaryText : DiveUI.green,
                         title: String(localized: "settings.row.sync_ack.title"),
-                        subtitle: String(format: String(localized: "%lld confermati da iPhone"), watchSync.acknowledgedTransferCount)
+                        subtitle: String(format: String(localized: "watch.sync.ack_count_format"), watchSync.acknowledgedTransferCount)
                     )
                     statusRow(
                         icon: "exclamationmark.arrow.triangle.2.circlepath",
                         iconColor: watchSync.failedTransferCount == 0 ? DiveUI.green : DiveUI.red,
                         title: String(localized: "settings.row.sync_errors.title"),
-                        subtitle: String(format: String(localized: "%lld falliti · retry %@"), watchSync.failedTransferCount, lastRetryText)
+                        subtitle: String(format: String(localized: "watch.sync.failed_count_format"), watchSync.failedTransferCount, lastRetryText)
                     )
 
                     if !watchSync.recentActivity.isEmpty {
