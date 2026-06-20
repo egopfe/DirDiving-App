@@ -122,5 +122,6 @@ struct IOSSnorkelingRootView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .opacity(snorkelingNavigation.selectedTab == tab ? 1 : 0)
         .allowsHitTesting(snorkelingNavigation.selectedTab == tab)
+        .accessibilityHidden(snorkelingNavigation.selectedTab != tab)
     }
 }

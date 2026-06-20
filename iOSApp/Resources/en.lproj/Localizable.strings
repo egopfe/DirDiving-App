@@ -2235,6 +2235,8 @@
 "apnea.ios.export.cloud_backup" = "Cloud backup";
 "apnea.ios.export.cloud_backup_note" = "Preference only. No upload is started until cloud sync is available.";
 "apnea.ios.export.cloud_backup_pending" = "Queued preference — not uploaded yet.";
+"apnea.ios.export.cloud_backup_unavailable" = "Apnea cloud backup is not available on iOS Companion. Sessions remain stored locally on this device.";
+"apnea.ios.export.cloud_backup_status_unavailable" = "Not available";
 "apnea.ios.export.generating" = "Generating export…";
 "apnea.ios.export.error.privacy" = "Confirm privacy choices before exporting location or contacts.";
 "apnea.ios.export.error.gpx" = "GPX export requires at least two surface GPS points and confirmation.";
@@ -2589,3 +2591,18 @@
 "snorkeling.ios.settings.haptics" = "Haptics";
 "snorkeling.ios.settings.mission_mode" = "Mission mode";
 "snorkeling.ios.settings.reset" = "Reset snorkeling settings";
+
+/* UI/UX remediation V3.0 */
+"snorkeling.ios.export.cloud_backup_status_unavailable" = "Not available";
+"snorkeling.ios.export.cloud_backup_unavailable" = "Snorkeling cloud backup is not available on iOS Companion. Export remains local via share sheet.";
+"settings.version.label" = "Version";
+"more.export.subsurface" = "Subsurface";
+"more.export.bundle_id" = "Bundle";
+"planner.ascent_speeds.link.a11y.hint" = "Opens global ascent and descent speed settings used by the planner.";
+"more.sync.queue_count.a11y.hint" = "Sessions waiting to transfer to Apple Watch.";
+"more.sync.push_to_watch.a11y.hint" = "Sends unpushed diving logbook sessions to the paired Watch.";
+"more.sync.reset_pairing.a11y.hint" = "Clears Watch pairing trust. Use only when replacing or re-pairing devices.";
+"more.sync.use_watch.a11y.hint" = "Keeps the Watch version of this dive session.";
+"more.sync.keep_local.a11y.hint" = "Keeps the iPhone version of this dive session.";
+"more.icloud.decode_error.a11y" = "Cloud backup decode error: %@";
+"more.icloud.sync_now.a11y.hint" = "Synchronizes the diving logbook with iCloud when backup is enabled.";

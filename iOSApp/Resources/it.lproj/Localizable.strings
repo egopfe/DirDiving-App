@@ -2233,6 +2233,8 @@
 "apnea.ios.export.cloud_backup" = "Backup cloud";
 "apnea.ios.export.cloud_backup_note" = "Solo preferenza. Nessun upload finché il sync cloud non è disponibile.";
 "apnea.ios.export.cloud_backup_pending" = "Preferenza salvata — non ancora caricata.";
+"apnea.ios.export.cloud_backup_unavailable" = "Il backup cloud Apnea non è disponibile su iOS Companion. Le sessioni restano archiviate localmente su questo dispositivo.";
+"apnea.ios.export.cloud_backup_status_unavailable" = "Non disponibile";
 "apnea.ios.export.generating" = "Generazione export…";
 "apnea.ios.export.error.privacy" = "Conferma le scelte privacy prima di esportare posizione o contatti.";
 "apnea.ios.export.error.gpx" = "Export GPX richiede almeno due punti GPS e conferma.";
@@ -2587,3 +2589,18 @@
 "snorkeling.ios.settings.haptics" = "Haptica";
 "snorkeling.ios.settings.mission_mode" = "Mission mode";
 "snorkeling.ios.settings.reset" = "Ripristina impostazioni snorkeling";
+
+/* UI/UX remediation V3.0 */
+"snorkeling.ios.export.cloud_backup_status_unavailable" = "Non disponibile";
+"snorkeling.ios.export.cloud_backup_unavailable" = "Il backup cloud snorkeling non è disponibile su iOS Companion. L'esportazione resta locale tramite condivisione.";
+"settings.version.label" = "Versione";
+"more.export.subsurface" = "Subsurface";
+"more.export.bundle_id" = "Bundle";
+"planner.ascent_speeds.link.a11y.hint" = "Apre le impostazioni globali di velocità di salita e discesa usate dal planner.";
+"more.sync.queue_count.a11y.hint" = "Sessioni in attesa di trasferimento verso Apple Watch.";
+"more.sync.push_to_watch.a11y.hint" = "Invia al Watch le sessioni del logbook non ancora sincronizzate.";
+"more.sync.reset_pairing.a11y.hint" = "Cancella la fiducia di associazione Watch. Usare solo sostituendo o riassociando i dispositivi.";
+"more.sync.use_watch.a11y.hint" = "Mantiene la versione Watch di questa sessione.";
+"more.sync.keep_local.a11y.hint" = "Mantiene la versione iPhone di questa sessione.";
+"more.icloud.decode_error.a11y" = "Errore decodifica backup cloud: %@";
+"more.icloud.sync_now.a11y.hint" = "Sincronizza il logbook immersioni con iCloud quando il backup è attivo.";

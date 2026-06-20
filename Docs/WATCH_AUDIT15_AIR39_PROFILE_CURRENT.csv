@@ -1,0 +1,8 @@
+Phase,Second_Start,Second_End,Depth_M,Rate_m_min,Gas,GF_Low,GF_High,Notes
+Surface,0,0,0,—,Air,30,70,Air-saturated initial tissues
+Descent,1,130,0→39,18,Air,30,70,Schreiner linear load
+Bottom,131,VAR,39,0,Air,30,70,Remain until mandatory decompression (probe breaks on deco)
+Ascent,VAR+1,VAR+194,39→10,9,Air,30,70,Multilevel transition to 10 m
+Level,VAR+195,VAR+794,10,0,Air,30,70,600 s tissue/schedule evolution at 10 m
+Environment,—,—,—,—,—,—,—,Sea level salt water; metric canonical storage
+Validation,—,—,—,—,—,—,—,testAudit15Air39MultilevelProfile; oracle stream every second; solver snapshots every 60 s + phase boundaries

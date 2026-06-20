@@ -23,14 +23,15 @@ final class ApneaOfflineOnlineEndToEndIntegrationTests: XCTestCase {
 
         ApneaSessionSyncCodec.testHook_bypassConnectivityChecks = true
         ApneaSessionSyncCodec.testHook_replayCacheFileURL = replayCacheURL
-        WatchSyncAuth.ingestSharedSecretFromContext([WatchSyncAuth.contextKey: peerSecret])
+        ApneaSyncTestSupport.installDeterministicSecrets()
+        ApneaSyncTestSupport.requirePeerSecret()
     }
 
     override func tearDown() {
         ApneaSessionSyncCodec.resetTestHooks()
         IOSApneaLogbookStore.testHook_storageDirectoryURL = nil
         ApneaImportedPlanStore.shared.resetForTests()
-        WatchSyncAuth.resetPeerTrust()
+        ApneaSyncTestSupport.resetSecrets()
         try? FileManager.default.removeItem(at: logbookDirectory)
         try? FileManager.default.removeItem(at: replayCacheURL)
         try? FileManager.default.removeItem(at: pendingQueueURL)
@@ -38,8 +39,6 @@ final class ApneaOfflineOnlineEndToEndIntegrationTests: XCTestCase {
     }
 
     func testOfflineWatchSessionImportsOnceAfterReconnectWithSignedACK() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
-
         // 1–5. iOS plan seal → Watch import (offline-capable local store)
         let package = try ApneaSyncPackageBuilder.build(
             plan: ApneaSessionPlan(kind: .custom, title: "E2E", entries: [
@@ -111,7 +110,6 @@ final class ApneaOfflineOnlineEndToEndIntegrationTests: XCTestCase {
     }
 
     func testDuplicateTransportIsIdempotent() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
         let session = ApneaSession(
             startMode: .watch,
             state: .completed,

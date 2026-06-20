@@ -60,7 +60,7 @@ struct IOSLegalOnboardingView: View {
                 Image(systemName: "drop.fill")
                     .font(.title2.weight(.bold))
                     .foregroundStyle(DIRTheme.cyan)
-                Text("DIR DIVING")
+                Text(DIRIOSLocalizer.string("brand.name"))
                     .font(.system(size: 32, weight: .black, design: .rounded))
                     .foregroundStyle(.white)
                 Spacer()

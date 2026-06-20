@@ -15,6 +15,14 @@ enum WatchDiveSyncCodec {
     static var replayCache = SyncNonceReplayCache()
     private static let replayCacheFileName = "dirdiving_ios_sync_replay_cache.json"
 
+#if DEBUG
+    static var testHook_bypassConnectivityChecks = false
+
+    static func resetTestHooks() {
+        testHook_bypassConnectivityChecks = false
+    }
+#endif
+
     private static let expectedWatchBundleID = "com.egopfe.dirdiving.ios.watch"
 
     static func bootstrapReplayCacheIfNeeded() {
@@ -92,9 +100,17 @@ enum WatchDiveSyncCodec {
     // F11: full parse exposed so the receiver can sign the ack with the same
     // (sessionID, issuedAt) that the sender used to derive its expected MAC.
     static func parsePayload(from payload: [String: Any]) throws -> ParsedPayload {
+#if DEBUG
+        if !testHook_bypassConnectivityChecks {
+            guard WCSession.default.activationState == .activated else {
+                throw WatchDiveSyncError.sessionInactive
+            }
+        }
+#else
         guard WCSession.default.activationState == .activated else {
             throw WatchDiveSyncError.sessionInactive
         }
+#endif
         guard WatchSyncAuth.hasPeerSecret() else {
             throw WatchDiveSyncError.missingPeerSecret
         }
@@ -316,6 +332,37 @@ enum WatchDiveSyncError: LocalizedError {
         }
     }
 }
+
+#if DEBUG
+extension WatchDiveSyncCodec {
+    static func makeTestWatchTransport(
+        session: DiveSession,
+        version: Int = legacySchemaVersion,
+        nonce: String? = nil,
+        issuedAt: Date = Date(),
+        bundleID: String = expectedWatchBundleID
+    ) throws -> [String: Any] {
+        guard WatchSyncAuth.hasPeerSecret() else {
+            throw WatchDiveSyncError.missingPeerSecret
+        }
+        let validatedSession = try validateForSync(session)
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        let body = try encoder.encode(validatedSession)
+        let transport = Transport(
+            version: version,
+            bundleID: bundleID,
+            issuedAt: issuedAt,
+            nonce: version >= schemaVersion ? (nonce ?? UUID().uuidString) : nil,
+            body: body,
+            signature: ""
+        )
+        let signed = sign(transport, issuedAt: issuedAt, body: body)
+        let transportData = try JSONEncoder().encode(signed)
+        return [payloadKey: transportData]
+    }
+}
+#endif
 
 private extension Data {
     func constantTimeEquals(_ other: Data) -> Bool {

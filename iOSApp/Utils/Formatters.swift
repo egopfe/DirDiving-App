@@ -188,6 +188,16 @@ enum Formatters {
         }
     }
 
+    static func surfaceSpeed(_ metersPerSecond: Double, units: IOSUnitPreference) -> DisplayMeasurement {
+        switch units {
+        case .metric:
+            return DisplayMeasurement(value: String(format: "%.2f", metersPerSecond), unit: "m/s")
+        case .imperial:
+            let feetPerSecond = metersPerSecond * 3.280839895
+            return DisplayMeasurement(value: String(format: "%.2f", feetPerSecond), unit: "ft/s")
+        }
+    }
+
     static func pressure(fromBar bar: Double, unit: PressureUnit) -> DisplayMeasurement {
         switch unit {
         case .bar:

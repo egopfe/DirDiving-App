@@ -142,7 +142,7 @@ struct IOSApneaStatisticsView: View {
                                 statRow(DIRIOSLocalizer.string("apnea.ios.stats.total_underwater"), Formatters.stopwatch(stats.totalUnderwaterSeconds))
                                 statRow(DIRIOSLocalizer.string("apnea.ios.stats.avg_recovery"), Formatters.stopwatch(stats.averageRecoverySeconds))
                                 statRow(DIRIOSLocalizer.string("apnea.ios.stats.total_dives"), "\(stats.totalDiveCount)")
-                                statRow(DIRIOSLocalizer.string("apnea.ios.stats.cumulative_depth"), String(format: "%.0f m", stats.cumulativeDepthMeters))
+                                statRow(DIRIOSLocalizer.string("apnea.ios.stats.cumulative_depth"), Formatters.depth(stats.cumulativeDepthMeters, units: unitPreference).text)
                                 statRow(DIRIOSLocalizer.string("apnea.ios.stats.best_depth"), Formatters.depth(stats.bestSessionMaxDepthMeters, units: unitPreference).text)
                                 statRow(DIRIOSLocalizer.string("apnea.ios.stats.longest_apnea"), Formatters.stopwatch(stats.bestDiveDurationSeconds))
                             }

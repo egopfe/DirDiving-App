@@ -49,7 +49,7 @@ struct WatchLegalOnboardingView: View {
         }
         .navigationBarBackButtonHidden(true)
         .alert(String(localized: "legal.exit.title"), isPresented: $showExitGuidance) {
-            Button(String(localized: "I Understand"), role: .cancel) {}
+            Button(String(localized: "common.i_understand"), role: .cancel) {}
         } message: {
             Text(String(localized: "Close DIR Diving from the system app switcher if you do not accept the safety terms."))
         }
@@ -60,7 +60,7 @@ struct WatchLegalOnboardingView: View {
             DiveOctopusLogo(accent: DiveUI.blue)
                 .frame(width: 28, height: 25)
                 .scaleEffect(0.78)
-            Text("DIR DIVING")
+            Text(DIRBrandPresentation.displayName)
                 .font(.system(size: 13, weight: .black, design: .rounded))
                 .foregroundStyle(DiveUI.yellow)
                 .lineLimit(1)
@@ -76,19 +76,19 @@ struct WatchLegalOnboardingView: View {
                     Image(systemName: "checkmark.shield.fill")
                         .font(.system(size: 25, weight: .black))
                         .foregroundStyle(DiveUI.cyan)
-                    Text(String(localized: "Welcome to DIR Diving"))
+                    Text(String(localized: "legal.onboarding.welcome.title"))
                         .font(.system(size: 17, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
-                    Text(String(localized: "Before using the app, review and accept the safety disclaimer."))
+                    Text(String(localized: "legal.onboarding.welcome.body"))
                         .font(.system(size: 12, weight: .semibold, design: .rounded))
                         .foregroundStyle(DiveUI.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
-                    DiveStatusPill(String(localized: "NOT A DIVE COMPUTER"), color: DiveUI.red, systemImage: "exclamationmark.triangle.fill")
+                    DiveStatusPill(String(localized: "legal.badge.not_dive_computer"), color: DiveUI.red, systemImage: "exclamationmark.triangle.fill")
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            DiveCommandButton(String(localized: "Continue"), systemImage: "chevron.right", color: DiveUI.cyan) {
+            DiveCommandButton(String(localized: "common.continue"), systemImage: "chevron.right", color: DiveUI.cyan) {
                 withAnimation(.easeInOut(duration: 0.2)) { step = 1 }
             }
         }
@@ -98,7 +98,7 @@ struct WatchLegalOnboardingView: View {
         VStack(spacing: 9) {
             DivePanel(stroke: DiveUI.red) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(String(localized: "DIR Diving is NOT a dive computer."))
+                    Text(String(localized: "legal.not_dive_computer"))
                         .font(.system(size: 16, weight: .black, design: .rounded))
                         .foregroundStyle(DiveUI.red)
                         .fixedSize(horizontal: false, vertical: true)
@@ -113,7 +113,7 @@ struct WatchLegalOnboardingView: View {
                 DiveCommandButton(String(localized: "Exit App"), systemImage: "xmark", color: DiveUI.red) {
                     showExitGuidance = true
                 }
-                DiveCommandButton(String(localized: "I Understand"), systemImage: "checkmark", color: DiveUI.green) {
+                DiveCommandButton(String(localized: "common.i_understand"), systemImage: "checkmark", color: DiveUI.green) {
                     withAnimation(.easeInOut(duration: 0.2)) { step = 2 }
                 }
             }
@@ -124,7 +124,7 @@ struct WatchLegalOnboardingView: View {
         VStack(spacing: 9) {
             DivePanel(stroke: DiveUI.yellow) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(String(localized: "Legal Disclaimer"))
+                    Text(String(localized: "legal.onboarding.disclaimer.title"))
                         .font(.system(size: 15, weight: .black, design: .rounded))
                         .foregroundStyle(DiveUI.yellow)
 
@@ -143,7 +143,7 @@ struct WatchLegalOnboardingView: View {
                     }
 
                     if disclaimerReachedBottom {
-                        DiveCommandButton(String(localized: "Continue"), systemImage: "chevron.right", color: DiveUI.yellow) {
+                        DiveCommandButton(String(localized: "common.continue"), systemImage: "chevron.right", color: DiveUI.yellow) {
                             withAnimation(.easeInOut(duration: 0.2)) { step = 3 }
                         }
                     }
@@ -178,7 +178,7 @@ struct WatchLegalOnboardingView: View {
                 )
             } label: {
                 HStack {
-                    Text(String(localized: "Continue"))
+                    Text(String(localized: "common.continue"))
                     Image(systemName: "checkmark.seal.fill")
                 }
                 .font(.system(size: 13, weight: .black, design: .rounded))
@@ -258,15 +258,15 @@ struct WatchLegalSafetyView: View {
                         Spacer()
                     }
                     DiveScreenHeader(
-                        String(localized: "Legal & Safety"),
-                        subtitle: String(localized: "NOT A DIVE COMPUTER"),
+                        String(localized: "legal.safety.title"),
+                        subtitle: String(localized: "legal.badge.not_dive_computer"),
                         accent: DiveUI.red,
                         systemImage: "checkmark.shield.fill"
                     )
 
                     DivePanel(stroke: DiveUI.red) {
                         VStack(alignment: .leading, spacing: 7) {
-                            Text(String(localized: "DIR Diving is NOT a dive computer."))
+                            Text(String(localized: "legal.not_dive_computer"))
                                 .font(.system(size: 15, weight: .black, design: .rounded))
                                 .foregroundStyle(DiveUI.red)
                             infoRow(String(localized: "Version accepted"), legalAcceptance.acceptedVersionText)

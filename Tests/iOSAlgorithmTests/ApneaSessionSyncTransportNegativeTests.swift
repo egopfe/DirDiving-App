@@ -13,18 +13,18 @@ final class ApneaSessionSyncTransportNegativeTests: XCTestCase {
             .appendingPathComponent("apnea-replay-\(UUID().uuidString).json")
         ApneaSessionSyncCodec.testHook_bypassConnectivityChecks = true
         ApneaSessionSyncCodec.testHook_replayCacheFileURL = replayCacheURL
-        WatchSyncAuth.ingestSharedSecretFromContext([WatchSyncAuth.contextKey: peerSecret])
+        ApneaSyncTestSupport.installDeterministicSecrets()
+        ApneaSyncTestSupport.requirePeerSecret()
     }
 
     override func tearDown() {
         ApneaSessionSyncCodec.resetTestHooks()
-        WatchSyncAuth.resetPeerTrust()
+        ApneaSyncTestSupport.resetSecrets()
         try? FileManager.default.removeItem(at: replayCacheURL)
         super.tearDown()
     }
 
     func testSupportedV2TransportImports() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
         let session = makeCompletedSession()
         let payload = try ApneaSessionSyncCodec.makeTestWatchTransport(session: session)
         let parsed = try ApneaSessionSyncCodec.parsePayload(from: payload)
@@ -32,7 +32,6 @@ final class ApneaSessionSyncTransportNegativeTests: XCTestCase {
     }
 
     func testFutureSessionVersionIsRejected() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
         let session = makeCompletedSession()
         let payload = try ApneaSessionSyncCodec.makeTestWatchTransport(
             session: session,
@@ -44,7 +43,6 @@ final class ApneaSessionSyncTransportNegativeTests: XCTestCase {
     }
 
     func testUnsupportedOldSessionVersionRejected() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
         let session = makeCompletedSession()
         let payload = try ApneaSessionSyncCodec.makeTestWatchTransport(session: session, version: 0)
         XCTAssertThrowsError(try ApneaSessionSyncCodec.parsePayload(from: payload)) { error in
@@ -53,7 +51,6 @@ final class ApneaSessionSyncTransportNegativeTests: XCTestCase {
     }
 
     func testReplayedSessionTransportNonceIsRejected() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
         let session = makeCompletedSession()
         let nonce = UUID().uuidString
         let payload = try ApneaSessionSyncCodec.makeTestWatchTransport(session: session, nonce: nonce)
@@ -64,7 +61,6 @@ final class ApneaSessionSyncTransportNegativeTests: XCTestCase {
     }
 
     func testModifiedPayloadWithReusedNonceIsRejected() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
         let sessionA = makeCompletedSession()
         let sessionB = makeCompletedSession()
         let nonce = UUID().uuidString
@@ -77,7 +73,6 @@ final class ApneaSessionSyncTransportNegativeTests: XCTestCase {
     }
 
     func testReplayCachePersistsAcrossServiceRecreation() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
         let session = makeCompletedSession()
         let nonce = UUID().uuidString
         let payload = try ApneaSessionSyncCodec.makeTestWatchTransport(session: session, nonce: nonce)
@@ -92,7 +87,6 @@ final class ApneaSessionSyncTransportNegativeTests: XCTestCase {
     }
 
     func testWrongBundleIDRejected() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
         let session = makeCompletedSession()
         let payload = try ApneaSessionSyncCodec.makeTestWatchTransport(
             session: session,
@@ -104,7 +98,6 @@ final class ApneaSessionSyncTransportNegativeTests: XCTestCase {
     }
 
     func testInvalidSignatureRejected() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
         var payload = try ApneaSessionSyncCodec.makeTestWatchTransport(session: makeCompletedSession())
         guard var data = payload[ApneaSessionSyncCodec.payloadKey] as? Data else {
             return XCTFail("missing transport data")
@@ -118,7 +111,6 @@ final class ApneaSessionSyncTransportNegativeTests: XCTestCase {
 
     @MainActor
     func testUnsupportedVersionDoesNotEnterLogbook() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         IOSApneaLogbookStore.testHook_storageDirectoryURL = directory

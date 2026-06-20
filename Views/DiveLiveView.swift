@@ -187,6 +187,23 @@ struct DiveLiveView: View {
                         .stroke((watchSync.failedTransferCount > 0 ? DiveUI.yellow : DiveUI.cyan).opacity(0.65), lineWidth: 1)
                 )
         )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(String(localized: "live.sync.status.a11y.label"))
+        .accessibilityValue(syncStatusAccessibilityValue)
+        .accessibilityHint(
+            watchSync.failedTransferCount > 0
+                ? String(localized: "live.sync.status.a11y.hint.error")
+                : String(localized: "live.sync.status.a11y.hint.ok")
+        )
+        .accessibilityIdentifier("live.sync.status")
+    }
+
+    private var syncStatusAccessibilityValue: String {
+        var parts = [watchSync.lastSyncStatus]
+        if watchSync.pendingTransferCount > 0 {
+            parts.append(String(format: String(localized: "watch.sync.pending_count_format"), watchSync.pendingTransferCount))
+        }
+        return parts.joined(separator: ". ")
     }
 
     private var fullComputerRecoveryBanner: some View {
@@ -246,6 +263,10 @@ struct DiveLiveView: View {
                 .fill(gpsConfirmationColor(confirmation).opacity(0.11))
                 .overlay(RoundedRectangle(cornerRadius: 9, style: .continuous).stroke(gpsConfirmationColor(confirmation).opacity(0.72), lineWidth: 1))
         )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(gpsConfirmationTitle(confirmation)). \(gpsConfirmationDetail(confirmation))")
+        .accessibilityAddTraits(.isStaticText)
+        .accessibilityIdentifier("live.gps.confirmation")
     }
 
     private func gpsConfirmationIcon(_ confirmation: DiveGPSConfirmation) -> String {
@@ -564,7 +585,7 @@ struct DiveLiveView: View {
                 DiveOctopusLogo(accent: DiveUI.yellow)
                     .frame(width: 23, height: 22, alignment: .leading)
                     .scaleEffect(0.68)
-                Text("DIR DIVING")
+                Text(DIRBrandPresentation.displayName)
                     .font(.system(size: 11, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.yellow)
                     .lineLimit(1)
@@ -602,7 +623,7 @@ struct DiveLiveView: View {
                                 .offset(x: 2, y: -1)
                         }
                     }
-                Text("DIR DIVING")
+                Text(DIRBrandPresentation.displayName)
                     .font(DiveUI.Typography.brandTitle)
                     .foregroundStyle(DiveUI.yellow)
                     .lineLimit(1)
@@ -1151,6 +1172,15 @@ struct DiveLiveView: View {
                         .stroke(DiveUI.yellow.opacity(0.7), lineWidth: 1)
                 )
         )
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(message)
+        .accessibilityHint(
+            showAcknowledge
+                ? String(localized: "alarm.acknowledge.a11y.hint")
+                : String(localized: "live.warning.banner.a11y.hint")
+        )
+        .accessibilityAddTraits(.isStaticText)
+        .accessibilityIdentifier("live.warning.banner")
     }
 
     private var temperatureValueOnly: String {

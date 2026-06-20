@@ -1,0 +1,8 @@
+Budget_ID,Domain,Operation,Threshold_Unit,Threshold_Value,Test_Reference,Status
+PERF-01,Watch,Draft persistence interval,seconds,8,MainDeepCodeReadinessCurrentWatchTests.testDraftPersistenceIntervalIsThrottled,PASS
+PERF-02,Watch,Alarm blink global publish,Hz,0 (view-local),MainDeepCodeAnalysisRemediationV1WatchTests,PASS
+PERF-03,Both,Cloud budget evaluation 50 keys,ms,measure block,MainDeepCodeReadinessCurrentTests.testCloudBudgetEvaluationScalesLinearlyWithKeyCount,PASS
+PERF-04,iOS,Merge preferred 120 samples x20,ms,measure block,MainDeepCodeReadinessCurrentTests.testMergePreferredPerformanceBudget,PASS
+PERF-05,Watch,Full Computer 1s loop,timing fault tests,FullComputerTimingFaultTests,PASS
+PERF-06,Watch,4h simulated profile,oracle,Audit15Air39MultilevelProfileTests,PASS
+PERF-BATT-01,Watch,Long dive battery/thermal,field,PENDING,Manual Ultra QA,PENDING

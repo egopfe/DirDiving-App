@@ -6,19 +6,20 @@ final class ApneaSyncAckNegativeTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        WatchSyncAuth.resetPeerTrust()
-        WatchSyncAuth.ingestSharedSecretFromContext([WatchSyncAuth.contextKey: peerSecret])
+        ApneaSyncTestSupport.installDeterministicSecrets()
+        ApneaSyncTestSupport.requirePeerSecret()
+        IOSApneaWatchTransferService.testHook_bypassWatchConnectivityChecks = true
     }
 
     override func tearDown() {
-        WatchSyncAuth.resetPeerTrust()
+        IOSApneaWatchTransferService.testHook_bypassWatchConnectivityChecks = false
+        ApneaSyncTestSupport.resetSecrets()
         super.tearDown()
     }
 
     // MARK: - iOS → Watch plan ACK
 
     func testValidPlanAckClearsPendingQueue() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
         let service = IOSApneaWatchTransferService()
         service.testing_reset()
 
@@ -58,7 +59,6 @@ final class ApneaSyncAckNegativeTests: XCTestCase {
     }
 
     func testInvalidPlanAckLeavesQueuePending() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
         let service = IOSApneaWatchTransferService()
         service.testing_reset()
         let package = try ApneaSyncPackageBuilder.build(
@@ -100,7 +100,6 @@ final class ApneaSyncAckNegativeTests: XCTestCase {
     // MARK: - Watch → iOS session ACK
 
     func testValidSessionImportAckVerifies() throws {
-        guard WatchSyncAuth.hasPeerSecret() else { throw XCTSkip("peer secret unavailable") }
         let sessionID = UUID()
         let issuedAt = Date()
         let payload = ApneaSessionSyncCodec.makeImportAckPayload(sessionID: sessionID, issuedAt: issuedAt)

@@ -359,9 +359,14 @@ enum ChecklistPlannerSyncMapper {
         }
     }
 
+    /// Typed metadata only; legacy titles are migrated via `ChecklistRoleMigration`.
     static func resolvedRole(for item: EquipmentChecklistItem) -> GasRole? {
-        if let role = item.gasRole { return role }
-        return inferRole(from: item.title)
+        ChecklistRoleMigration.resolvedRole(for: item)
+    }
+
+    /// Migration-only title inference — not used for live role assignment after migration.
+    static func legacyInferRole(from title: String) -> GasRole? {
+        inferRole(from: title)
     }
 
     static func fingerprint(for item: EquipmentChecklistItem, role: GasRole) -> ChecklistPlannerGasFingerprint {
