@@ -1,7 +1,65 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-20  
+**Aggiornato:** 2026-06-17  
 **Branch consigliato:** `main` = `origin/main`
+
+---
+
+## Aggiornamento indice 2026-06-17 — Command 9 security/privacy/trust audit V3.0
+
+Audit read-only sicurezza/privacy/trust verticale su prodotto MAIN completo (Watch + iOS).
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `9-DIR_DIVING_SECURITY_PRIVACY_TRUST_AUDIT_V3.0.md` |
+| **Audit** | [`SECURITY_PRIVACY_TRUST_AUDIT_CURRENT.md`](SECURITY_PRIVACY_TRUST_AUDIT_CURRENT.md) |
+| **Threat model** | [`THREAT_MODEL_CURRENT.md`](THREAT_MODEL_CURRENT.md) |
+| **Data flow matrix** | [`PRIVACY_DATA_FLOW_MATRIX_CURRENT.csv`](PRIVACY_DATA_FLOW_MATRIX_CURRENT.csv) |
+| **Remediation plan** | [`SECURITY_REMEDIATION_PLAN_CURRENT.md`](SECURITY_REMEDIATION_PLAN_CURRENT.md) |
+| **Negative tests** | [`MAIN_SECURITY_NEGATIVE_TEST_MATRIX_CURRENT.csv`](MAIN_SECURITY_NEGATIVE_TEST_MATRIX_CURRENT.csv) — SEC-NEG-01…10 **PASS** |
+| **Overall readiness** | **83/100** (P0=0, P1=1 open: Privacy Manifest) |
+
+---
+
+## Aggiornamento indice 2026-06-17 — Command 8 sync/persistence/schema remediation
+
+Chiusura finding P1/P2/P3 audit sync/persistence/schema; envelope v3 firmato, tombstone multi-attività, cloud diving-only, large-payload transfer.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit (input)** | [`MULTI_ACTIVITY_SYNC_PERSISTENCE_SCHEMA_AUDIT_CURRENT.md`](MULTI_ACTIVITY_SYNC_PERSISTENCE_SCHEMA_AUDIT_CURRENT.md) |
+| **Remediation** | [`MULTI_ACTIVITY_SYNC_PERSISTENCE_SCHEMA_REMEDIATION_REPORT_CURRENT.md`](MULTI_ACTIVITY_SYNC_PERSISTENCE_SCHEMA_REMEDIATION_REPORT_CURRENT.md) |
+| **Traceability** | [`MULTI_ACTIVITY_SYNC_FINDING_TRACEABILITY_CURRENT.csv`](MULTI_ACTIVITY_SYNC_FINDING_TRACEABILITY_CURRENT.csv) |
+| **Validate** | `./Scripts/validate_multi_activity_sync_persistence_schema_readiness.sh` PASS |
+| **Software readiness** | **100%** (physical QA **PENDING**) |
+
+---
+
+## Aggiornamento indice 2026-06-20 — Command 8 sync/persistence/schema audit V3.0
+
+Audit read-only sync Watch↔iOS, persistence, schema, migration, backup/restore multi-attività.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit** | [`MULTI_ACTIVITY_SYNC_PERSISTENCE_SCHEMA_AUDIT_CURRENT.md`](MULTI_ACTIVITY_SYNC_PERSISTENCE_SCHEMA_AUDIT_CURRENT.md) |
+| **Namespaces** | [`SYNC_MESSAGE_NAMESPACE_MATRIX_CURRENT.csv`](SYNC_MESSAGE_NAMESPACE_MATRIX_CURRENT.csv) |
+| **Schema/migration** | [`SCHEMA_MIGRATION_COMPATIBILITY_MATRIX_CURRENT.csv`](SCHEMA_MIGRATION_COMPATIBILITY_MATRIX_CURRENT.csv) |
+| **Backup/restore** | [`BACKUP_RESTORE_ISOLATION_MATRIX_CURRENT.csv`](BACKUP_RESTORE_ISOLATION_MATRIX_CURRENT.csv) |
+| **Overall readiness** | **82/100** (P0=0, P1=2) |
+
+---
+
+## Aggiornamento indice 2026-06-20 — Command 7 activity architecture remediation
+
+Chiusura finding P0/P1 audit architettura multi-attività; logbook Watch gated; environment iOS isolato; settings facade.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit** | [`ACTIVITY_ARCHITECTURE_SETTINGS_LOGBOOK_AUDIT_CURRENT.md`](ACTIVITY_ARCHITECTURE_SETTINGS_LOGBOOK_AUDIT_CURRENT.md) |
+| **Remediation** | [`ACTIVITY_ARCHITECTURE_SETTINGS_LOGBOOK_REMEDIATION_REPORT_CURRENT.md`](ACTIVITY_ARCHITECTURE_SETTINGS_LOGBOOK_REMEDIATION_REPORT_CURRENT.md) |
+| **Traceability** | [`ACTIVITY_ARCHITECTURE_FINDING_TRACEABILITY_CURRENT.csv`](ACTIVITY_ARCHITECTURE_FINDING_TRACEABILITY_CURRENT.csv) |
+| **Validate** | `./Scripts/validate_activity_architecture_settings_logbook_readiness.sh` PASS (1381 iOS + 902 Watch) |
+| **External QA** | [`ACTIVITY_ARCHITECTURE_EXTERNAL_QA_PENDING_CURRENT.md`](ACTIVITY_ARCHITECTURE_EXTERNAL_QA_PENDING_CURRENT.md) — **PENDING** |
 
 ---
 

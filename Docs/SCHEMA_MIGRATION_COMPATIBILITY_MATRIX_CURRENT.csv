@@ -1,0 +1,14 @@
+domain,artifact,current_version,legacy_supported,future_schema_policy,migration_module,codec_validation,test_reference,status,severity,notes
+Diving WC session transport,WatchDiveSyncCodec.Transport,2,1 (no nonce),unsupportedVersion throw,N/A,HMAC + bundle ID + skew,MainDeepCodeAuditRemediationTests,PASS,,Shared HMAC v2 envelope
+Apnea WC session transport,ApneaSessionSyncCodec.Transport,2,1,unsupportedVersion throw,N/A,HMAC + replay,ApneaSessionSyncTransportNegativeTests.testFutureSessionVersionIsRejected,PASS,,payloadKey dirdiving_apnea_session
+Snorkeling WC session transport,SnorkelingSessionSyncCodec.Transport,2,1,unsupportedVersion throw,N/A,HMAC + replay,SnorkelingSessionSyncTransportNegativeTests.testFutureSessionVersionIsRejected,PASS,,payloadKey dirdiving_snorkeling_session_sync
+Apnea persisted session,ApneaSession.schemaVersion,1,0 via ApneaSchemaMigration,future → schemaMigrated warning,Shared/Utils/ApneaSchemaMigration.swift,resilient decode,ApneaSessionMergeIntegrityTests,PASS,,Multi-dive body supported
+Snorkeling persisted session,SnorkelingSession.schemaVersion,1,0 via SnorkelingSchemaMigration,future → schemaMigrated warning,Shared/Utils/SnorkelingSchemaMigration.swift,resilient decode,SnorkelingSessionSyncCodecTests,PASS,,trackPoints + dips in model
+Diving iCloud KVS blob,dirdiving_ios_dive_sessions,N/A,legacy KVS,oversized/partial reject,CloudSyncLegacyMigrationPolicy,byteCount gate,MainDeepCodeReadinessCurrentTests,PASS,,Per-key budget 1MB
+Diving Watch iCloud,dirdiving_watch_dive_sessions,N/A,legacy KVS,same policy,CloudSyncLegacyMigrationPolicy,byteCount gate,MainDeepCodeReadinessCurrentTests,PASS,,Watch CloudSyncStore
+FC dive plan package,DivePlanPackageBody.schemaVersion,1,N/A,future rejected,DivePlanPackageCodec,checksum + expiry,DivePlanPackageCodecTests,PASS,,Separate from session sync
+FC runtime checkpoint,FullComputerRuntimeCheckpointPayload,1,N/A,unsupportedSchema throw,N/A,SHA-256 checksum,FullComputerRecoveryCheckpointTests.testCheckpointRoundTripPreservesTissueState,PASS,,Tissue state round-trip
+Apnea sync plan package,ApneaSyncCodec body,currentSchemaVersion,N/A,future rejected,Shared/Utils/ApneaSyncCodec.swift,schemaVersion bounds,ApneaSyncCodecNegativePathTests,PASS,,Isolated from FC namespace
+Snorkeling route package,SnorkelingRouteSyncCodec,currentSchemaVersion,N/A,future rejected,Shared/Utils/SnorkelingRouteSyncCodec.swift,schemaVersion bounds,SnorkelingRouteSyncCodecTests,PASS,,Isolated from session sync
+Planner briefing manifest,PlannerBriefingCardManifest,N/A,legacy kinds filtered,unsupported kind → nil,PlannerBriefingTransferSupport.decodeManifest,lenient wire decode,PlannerBriefingLegacyKindDecodeTests,PASS,,File transfer route
+Corrupt local logbook,Apnea/Snorkeling JSON envelope,N/A,N/A,quarantine corrupt file,ApneaLogbookPersistence / SnorkelingLogbookPersistence,resilient decode,ApneaLogbookStoreTests,PASS,,Atomic write on persist

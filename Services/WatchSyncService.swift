@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import WatchConnectivity
+import CryptoKit
 import os
 
 @MainActor
@@ -33,6 +34,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     private weak var logStore: DiveLogStore?
     private weak var plannerBriefingStore: PlannerBriefingCardStore?
     private weak var apneaLogbookStore: ApneaLogbookStore?
+    private weak var snorkelingLogbookStore: SnorkelingLogbookStore?
     var isApneaSessionInProgress = false
     var isSnorkelingSessionInProgress = false
     private var importedFromCompanionIDs: Set<UUID> = []
@@ -93,6 +95,10 @@ final class WatchSyncService: NSObject, ObservableObject {
         apneaLogbookStore = store
     }
 
+    func attachSnorkelingLogbookStore(_ store: SnorkelingLogbookStore) {
+        snorkelingLogbookStore = store
+    }
+
     deinit {
         if let peerSecretObserver {
             NotificationCenter.default.removeObserver(peerSecretObserver)
@@ -148,13 +154,74 @@ final class WatchSyncService: NSObject, ObservableObject {
         }
     }
 
-    /// Broadcast tombstone UUIDs to iPhone via applicationContext (merge-safe).
+    /// Broadcast Diving tombstone UUIDs to iPhone via applicationContext (merge-safe).
     func publishDeletedSessionIDs(_ ids: Set<UUID>) {
-        guard WCSession.isSupported(), !ids.isEmpty else { return }
+        publishDeletedTombstones(ids, activity: .diving) { _ in
+            Int(Date().timeIntervalSince1970)
+        }
+    }
+
+    func publishDeletedApneaSessionIDs(_ ids: Set<UUID>) {
+        publishDeletedTombstones(ids, activity: .apnea) { id in
+            ActivitySyncRevisionPolicy.sessionRevision(for: Date())
+        }
+    }
+
+    func publishDeletedSnorkelingSessionIDs(_ ids: Set<UUID>) {
+        publishDeletedTombstones(ids, activity: .snorkeling) { id in
+            snorkelingLogbookStore?.revision(for: id) ?? ActivitySyncRevisionPolicy.sessionRevision(for: Date())
+        }
+    }
+
+    private func publishDeletedTombstones(
+        _ ids: Set<UUID>,
+        activity: ActivitySyncActivityType,
+        revisionForSession: (UUID) -> Int
+    ) {
+        guard WCSession.isSupported(), !ids.isEmpty, WatchSyncAuth.hasPeerSecret() else {
+            if !ids.isEmpty {
+                publishLegacyDivingUUIDTombstones(ids, activity: activity)
+            }
+            return
+        }
+        guard let syncKey = try? WatchSyncAuth.deriveSyncKey(peerBundleID: "com.egopfe.dirdiving.ios") else {
+            publishLegacyDivingUUIDTombstones(ids, activity: activity)
+            return
+        }
+        let bundleID = Bundle.main.bundleIdentifier ?? "com.egopfe.dirdiving.ios.watch"
+        guard let signed = try? ActivitySyncTombstoneBroadcast.makeSignedTombstones(
+            sessionIDs: ids,
+            activity: activity,
+            revisionForSession: revisionForSession,
+            syncKey: syncKey,
+            bundleID: bundleID
+        ), !signed.isEmpty else {
+            publishLegacyDivingUUIDTombstones(ids, activity: activity)
+            return
+        }
+        let context = WCSession.default.applicationContext
+        let payload = ActivitySyncTombstoneBroadcast.mergeBroadcastPayload(
+            existing: context,
+            incoming: signed,
+            activity: activity
+        )
+        if activity == .diving {
+            var legacy = Set((context[WatchSyncKeys.deletedSessionBroadcastKey] as? [String]) ?? [])
+            legacy.formUnion(ids.map(\.uuidString))
+            var merged = payload
+            merged[WatchSyncKeys.deletedSessionBroadcastKey] = Array(legacy)
+            WatchSyncAuth.mergeApplicationContext(merged)
+        } else {
+            WatchSyncAuth.mergeApplicationContext(payload)
+        }
+        lastSyncStatus = String(format: String(localized: "Tombstone inviata a iPhone (%lld)"), ids.count)
+    }
+
+    private func publishLegacyDivingUUIDTombstones(_ ids: Set<UUID>, activity: ActivitySyncActivityType) {
+        guard activity == .diving, WCSession.isSupported(), !ids.isEmpty else { return }
         var existing = Set((WCSession.default.applicationContext[WatchSyncKeys.deletedSessionBroadcastKey] as? [String]) ?? [])
         existing.formUnion(ids.map(\.uuidString))
         WatchSyncAuth.mergeApplicationContext([WatchSyncKeys.deletedSessionBroadcastKey: Array(existing)])
-        lastSyncStatus = String(format: String(localized: "Tombstone inviata a iPhone (%lld)"), ids.count)
     }
 
     func publishUnitsPreference(_ value: String) {
@@ -195,6 +262,25 @@ final class WatchSyncService: NSObject, ObservableObject {
         failedTransferCount = 0
         savePendingTransfers()
         lastSyncStatus = String(localized: "Coda sync cancellata su richiesta")
+    }
+
+    private func ingestSignedTombstones(
+        from context: [String: Any],
+        activity: ActivitySyncActivityType,
+        apply: (Set<UUID>) -> Void
+    ) {
+        guard WatchSyncAuth.hasPeerSecret(),
+              let syncKey = try? WatchSyncAuth.deriveSyncKey(peerBundleID: "com.egopfe.dirdiving.ios") else {
+            return
+        }
+        let ids = ActivitySyncTombstoneBroadcast.verifiedSessionIDs(
+            from: context,
+            activity: activity,
+            syncKey: syncKey,
+            expectedBundleID: "com.egopfe.dirdiving.ios"
+        )
+        guard !ids.isEmpty else { return }
+        apply(ids)
     }
 
     private struct AckContext {
@@ -415,6 +501,15 @@ final class WatchSyncService: NSObject, ObservableObject {
                 logStore?.applyRemoteDeletedSessionIDs(ids)
                 lastSyncStatus = String(format: String(localized: "Tombstone iPhone applicata (%lld)"), ids.count)
             }
+        }
+        ingestSignedTombstones(from: context, activity: .diving) { ids in
+            logStore?.applyRemoteDeletedSessionIDs(ids)
+        }
+        ingestSignedTombstones(from: context, activity: .apnea) { ids in
+            apneaLogbookStore?.applyRemoteDeletedSessionIDs(ids)
+        }
+        ingestSignedTombstones(from: context, activity: .snorkeling) { ids in
+            snorkelingLogbookStore?.applyRemoteDeletedSessionIDs(ids)
         }
         DivePlanPackageWatchReceiver.importSnapshot(context, store: FullComputerImportedPlanStore.shared)
         ApneaSyncWatchReceiver.importSnapshot(

@@ -1,0 +1,11 @@
+logbook,owning_activity,visible_from_owning_section,visible_from_diving,visible_from_apnea,visible_from_snorkeling,deep_link_owner,state_restoration_owner,store,filters_activity_specific,statistics_activity_specific,exports_activity_specific,cross_activity_route_blocked,status,severity,notes
+Diving Logbook,Diving,yes,yes,no,no,Diving,Diving,DiveLogStore,yes,yes,yes,yes,PASS,,Watch tab gated selectedActivity == .diving; iOS LogbookView in Diving root only
+Apnea Logbook,Apnea,yes,no,yes,no,Apnea,Apnea,IOSApneaLogbookStore,yes,yes,yes,yes,PASS,,Tab .sessions in IOSApneaRootView
+Snorkeling Logbook,Snorkeling,yes,no,no,yes,Snorkeling,Snorkeling,IOSSnorkelingLogbookStore,yes,yes,yes,yes,PASS,,Tab .sessions in IOSSnorkelingRootView
+Cross: Diving→Apnea Logbook,Apnea,no,no,yes,no,Apnea,n/a,IOSApneaLogbookStore,n/a,n/a,n/a,yes,PASS,,No NavigationLink; no Watch browse tab
+Cross: Diving→Snorkeling Logbook,Snorkeling,no,no,yes,no,Snorkeling,n/a,IOSSnorkelingLogbookStore,n/a,n/a,n/a,yes,PASS,,No NavigationLink; no Watch browse tab
+Cross: Apnea→Diving Logbook,Diving,no,no,no,no,Diving,n/a,DiveLogStore,n/a,n/a,n/a,yes,PASS,,Watch diveLog tab not mounted for Apnea
+Cross: Apnea→Snorkeling Logbook,Snorkeling,no,no,no,yes,Snorkeling,n/a,IOSSnorkelingLogbookStore,n/a,n/a,n/a,yes,PASS,,
+Cross: Snorkeling→Diving Logbook,Diving,no,no,no,no,Diving,n/a,DiveLogStore,n/a,n/a,n/a,yes,PASS,,Watch diveLog tab not mounted for Snorkeling
+Cross: Snorkeling→Apnea Logbook,Apnea,no,no,no,yes,Apnea,n/a,IOSApneaLogbookStore,n/a,n/a,n/a,yes,PASS,,
+Universal logbook hub,Global,no,no,no,no,none,none,none,n/a,n/a,n/a,yes,PASS,,No global logbook hub

@@ -1,0 +1,31 @@
+Data_Element,Activity,Source_Component,Collection_Trigger,Local_Storage,Storage_Protection,Watch_To_iOS_Sync,iOS_To_Watch_Sync,Cloud_Backup_KVS,Export_Path,Redaction_Available,Third_Party_Share,Retention_Deletion,Privacy_Risk,Control_Status,Notes
+Depth/time profile samples,Diving,DepthManager / DiveLogStore,Dive session,Application Support JSON,completeFileProtection,Yes HMAC v2/v3,Signed push queue,Opt-in diving only,Subsurface CSV PDF,No GPS in profile columns,N/A,User delete + tombstone,Medium,PASS,Samples capped; large payload file fallback
+Entry/exit GPS coordinates,Diving,DiveSession model,Sync from Watch,Logbook + UserDefaults pending,File protected / UD plain,Yes in session payload,Rare,Opt-in if in session,Subsurface CSV exact lat/lon,No diving redaction gate,User share sheet,Tombstone on delete,High,PARTIAL,Apnea/Snorkeling have export policies
+Gas mix and equipment,Diving,Planner / session metadata,User entry,Protected JSON,completeFileProtection,Yes,Plan package WC,Opt-in diving,PDF planner export,Partial notes only,N/A,Session delete,Medium,PASS,
+Tissue / Full Computer checkpoint,Diving,FullComputerRuntime,Post-dive,Protected checkpoint file,completeFileProtection,No bulk WC,No,Not in KVS by default,None,N/A,N/A,Checkpoint overwrite,High,PASS,Isolated namespace tests
+Apnea dive timings and stats,Apnea,ApneaLogbookStore,Session end,Protected JSON,completeFileProtection,Yes HMAC v3,Signed ACK path,Explicitly unavailable,CSV JSON PDF via redaction policy,Yes default redacted,N/A,Tombstone broadcast,Medium,PASS,Cloud SEC-NEG-07
+Apnea surface GPS points,Apnea,ApneaSession,Optional capture,Protected JSON,completeFileProtection,Yes if present,No,Unavailable,Export strips by default,Yes,N/A,Delete session,High,PASS,ApneaExportPrivacyPolicy
+Apnea buddy name/contact notes,Apnea,Session buddy field,User entry,Protected JSON,completeFileProtection,Yes,No,Unavailable,Redacted in default export,Yes,N/A,Delete session,Medium,PASS,
+Snorkeling route track points,Snorkeling,SnorkelingLogbookStore,Session,Protected JSON,completeFileProtection,Yes HMAC v3,No,Unavailable,Export redaction options,Yes,N/A,Tombstone,High,PASS,
+Snorkeling dip events,Snorkeling,Session model,Auto detect,Protected JSON,completeFileProtection,Yes,No,Unavailable,Included in export per policy,Partial,N/A,Delete session,Low,PASS,
+Snorkeling session photos,Snorkeling,Photo store + WC,User add / sync,Protected files + tmp staging,completeFileProtection,File transfer WC,Photo management msgs,Unavailable,Share sheet,EXIF QA pending,N/A,Delete photo/session,High,PARTIAL,SNK-QA-015 pending
+Peer sync secret,Cross,WatchSyncAuth,Pairing bootstrap,Keychain + WC context,Keychain afterFirstUnlock,Context only,Context only,Never,None,N/A,Never,resetPeerTrust(),Critical,MITIGATED,TOFU; no logging SEC-NEG-09
+Sync nonce registry,Cross,SyncNonceReplayCache,Each signed msg,Application Support,completeFileProtection,N/A,N/A,Never,None,N/A,N/A,Bounded FIFO evict,Low,PASS,SEC-NEG-02
+Signed import ACK tokens,Cross,WatchSyncService codecs,Post-import,Ephemeral in transit,In-memory,N/A,N/A,Never,None,N/A,N/A,N/A,Low,PASS,SignedAckSymmetryTests
+Dive plan package hash,Diving,PlannerStore,User save plan,Protected files,completeFileProtection,WC file/msg,ACK signed,Optional planner state,None,N/A,N/A,User delete,Medium,PASS,
+Briefing card PNG,Diving,BriefingCardStore,Generate card,Application Support,completeFileProtection,WC transfer,No,Not uploaded,None,N/A,N/A,User delete,Low,PASS,Path traversal blocked SEC-NEG-04
+Reference photo to Watch,Diving,iOS photo picker,User action,tmp then WC,completeFileProtection staging,WC file transfer,No,Never,None,N/A,N/A,Temp cleanup,Medium,PASS,Filename validation
+Legal acceptance flag,Cross,LegalAcceptanceStore,Onboarding,UserDefaults,Standard UD,No,No,Never,None,N/A,N/A,Re-onboard if reset,Low,PASS,Gates App Intents
+Developer unlock flag,Cross,DeveloperSettings,Hidden unlock,UserDefaults,Standard UD,No,No,Never,None,N/A,N/A,UserDefaults clear,Low,PASS,TestFlight section visible
+Simulation sensor mode,Cross,SensorSourceMode,Developer/TestFlight,UserDefaults,Standard UD,No,No,Never,None,N/A,N/A,Migrate on launch,Medium,PARTIAL,Blocked App Store not TestFlight
+Cloud backup opt-in flag,Diving,CloudBackupCapability,User toggle More,UserDefaults,Standard UD,No,No,Controls KVS upload,None,N/A,N/A,User toggle,Low,PASS,Diving-only migration
+iCloud KVS dive snapshot,Diving,Cloud sync service,Opt-in upload,iCloud KVS,Apple encrypted,No,No,Yes when enabled,None,N/A,Apple iCloud,User disable backup,High,PASS,User must opt in
+Pending sync conflict JSON,Diving,WatchSyncService,Failed merge,UserDefaults,Standard UD,No,No,Never,None,N/A,N/A,Conflict resolve,Medium,PARTIAL,P2 UserDefaults exposure
+WatchConnectivity diagnostics,Cross,WCSession,Runtime,System only,N/A,Apple managed,N/A,N/A,Never,None,N/A,N/A,N/A,INFO,N/A,Not logged with secrets
+Subsurface CSV temp export,Diving,SubsurfaceExportService,User export,tmp directory,completeFileProtection,No,No,Never,Share sheet,No GPS redaction,User controlled,Temp file,High,PARTIAL,Exact GPS columns
+Apnea CSV temp export,Apnea,ApneaSessionExportEngine,User export,tmp,completeFileProtection,No,No,Never,Share sheet,Default redacted,User controlled,Temp,Medium,PASS,
+Snorkeling export bundle,Snorkeling,SnorkelingExportPrivacyPolicy,User export,tmp,completeFileProtection,No,No,Never,Share sheet,Default redacted,User controlled,Temp,Medium,PASS,
+Session delete tombstone,Cross,ActivitySyncTombstoneCodec,User delete,WC + KVS keys,Signed envelope,Yes broadcast,Yes ingest,May mirror delete,None,N/A,N/A,Prevents resurrection,Medium,PASS,Physical QA pending
+Activity settings payloads,Cross,ActivitySettingsVisibility,Settings change,WC applicationContext,Apple WC,Yes,Yes,Never,None,N/A,N/A,Overwrite context,Low,PASS,No secrets in settings
+Log diagnostic prints,Cross,Various,Errors,Console,Ephemeral,No,No,Never,None,N/A,N/A,N/A,Low,PASS,Prefer os.Logger private
+Privacy manifest metadata,Cross,App bundle,N/A,Missing file,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,High,FAIL,SEC-P1-001 no xcprivacy

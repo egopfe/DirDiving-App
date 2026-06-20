@@ -5,7 +5,7 @@ import WatchConnectivity
 enum WatchDiveSyncCodec {
     static let payloadKey = "dirdiving_dive_session"
     static let legacySchemaVersion = 1
-    static let schemaVersion = 2
+    static let schemaVersion = ActivitySyncSignedTransport.envelopeSchemaVersion
     static let maxPayloadBytes = 512_000
     static let maxSamples = 20_000
     static let maxDepthMeters = 350.0
@@ -31,14 +31,7 @@ enum WatchDiveSyncCodec {
         replayCache.persistProtected(to: replayCacheFileURL())
     }
 
-    struct Transport: Codable {
-        let version: Int
-        let bundleID: String
-        let issuedAt: Date
-        let nonce: String?
-        let body: Data
-        let signature: String
-    }
+    typealias Transport = ActivitySyncSignedTransport
 
     struct PayloadEnvelope {
         let message: [String: Any]
@@ -66,16 +59,24 @@ enum WatchDiveSyncCodec {
 
         let issuedAt = Date()
         let nonce = UUID().uuidString
-        let transport = Transport(
-            version: schemaVersion,
-            bundleID: Bundle.main.bundleIdentifier ?? "com.egopfe.dirdiving.ios.watch",
-            issuedAt: issuedAt,
-            nonce: nonce,
+        let revision = ActivitySyncCodecSupport.revision(for: transportSession.endDate)
+        guard let key = try? syncKey() else {
+            throw WatchDiveSyncError.missingPeerSecret
+        }
+        let signed = ActivitySyncSignedTransport.makeSigned(
             body: body,
-            signature: ""
+            bundleID: Bundle.main.bundleIdentifier ?? "com.egopfe.dirdiving.ios.watch",
+            activity: .diving,
+            messageType: .sessionUpsert,
+            revision: revision,
+            syncKey: key,
+            issuedAt: issuedAt,
+            nonce: nonce
         )
-        let signed = sign(transport, issuedAt: issuedAt, body: body)
         let transportData = try JSONEncoder().encode(signed)
+        if ActivitySyncLargePayloadTransfer.shouldUseFileTransfer(transportDataSize: transportData.count) {
+            throw WatchDiveSyncError.payloadTooLarge
+        }
         guard transportData.count <= maxPayloadBytes else {
             throw WatchDiveSyncError.payloadTooLarge
         }
@@ -105,7 +106,7 @@ enum WatchDiveSyncCodec {
         }
 
         let transport = try JSONDecoder().decode(Transport.self, from: data)
-        guard transport.version == legacySchemaVersion || transport.version == schemaVersion else {
+        guard ActivitySyncCodecSupport.validateVersion(transport.version) else {
             throw WatchDiveSyncError.unsupportedVersion
         }
         guard transport.bundleID == expectedCompanionBundleID else {
@@ -117,13 +118,22 @@ enum WatchDiveSyncCodec {
         guard transport.body.count <= maxPayloadBytes else {
             throw WatchDiveSyncError.payloadTooLarge
         }
-        guard verify(transport) else {
+        do {
+            try ActivitySyncCodecSupport.validateTransport(
+                transport,
+                payloadKey: payloadKey,
+                expectedActivity: .diving
+            )
+        } catch {
+            throw WatchDiveSyncError.invalidSignature
+        }
+        guard let key = try? syncKey(), transport.verify(with: key) else {
             throw WatchDiveSyncError.invalidSignature
         }
         if transport.version == legacySchemaVersion {
             WatchSyncSchemaV1Policy.recordLegacyUsage()
         }
-        if transport.version == schemaVersion {
+        if transport.version >= ActivitySyncSignedTransport.nonceRequiredFromVersion {
             guard let nonce = transport.nonce, !nonce.isEmpty else {
                 throw WatchDiveSyncError.invalidSignature
             }
@@ -202,37 +212,6 @@ enum WatchDiveSyncCodec {
 
     private static func syncKey() throws -> SymmetricKey {
         try WatchSyncAuth.deriveSyncKey(peerBundleID: expectedCompanionBundleID)
-    }
-
-    private static func sign(_ transport: Transport, issuedAt: Date, body: Data) -> Transport {
-        let mac = hmac(transport: transport, issuedAt: issuedAt, body: body)
-        return Transport(
-            version: transport.version,
-            bundleID: transport.bundleID,
-            issuedAt: issuedAt,
-            nonce: transport.nonce,
-            body: body,
-            signature: mac
-        )
-    }
-
-    private static func hmac(transport: Transport, issuedAt: Date, body: Data) -> String {
-        guard let key = try? syncKey() else { return "" }
-        let nonceComponent = transport.version >= schemaVersion ? (transport.nonce ?? "") : ""
-        let canonical = "\(transport.version)|\(transport.bundleID)|\(issuedAt.timeIntervalSince1970)|\(nonceComponent)|\(body.base64EncodedString())"
-        let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: key)
-        return Data(code).base64EncodedString()
-    }
-
-    private static func verify(_ transport: Transport) -> Bool {
-        guard let key = try? syncKey() else { return false }
-        let nonceComponent = transport.version >= schemaVersion ? (transport.nonce ?? "") : ""
-        let canonical = "\(transport.version)|\(transport.bundleID)|\(transport.issuedAt.timeIntervalSince1970)|\(nonceComponent)|\(transport.body.base64EncodedString())"
-        let code = HMAC<SHA256>.authenticationCode(for: Data(canonical.utf8), using: key)
-        let expected = Data(code).base64EncodedString()
-        guard let received = Data(base64Encoded: transport.signature) else { return false }
-        guard let expectedData = Data(base64Encoded: expected) else { return false }
-        return received.constantTimeEquals(expectedData)
     }
 
     private static func validate(_ session: DiveSession) throws {
