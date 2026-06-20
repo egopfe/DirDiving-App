@@ -1,0 +1,39 @@
+Requirement_ID,Domain,Requirement,Test_Class,Test_Method,Platform,Status
+REQ-SEC-REM-01,Privacy,iOS privacy manifest exists and declares no tracking,SecurityPrivacyTrustRemediationTests,testPrivacyManifestIOSExistsAndDeclaresNoTracking,iOS,PASS
+REQ-SEC-REM-02,Privacy,Watch privacy manifest exists and declares no tracking,SecurityPrivacyTrustRemediationTests,testPrivacyManifestWatchExistsAndDeclaresNoTracking,iOS,PASS
+REQ-SEC-REM-03,Export,Diving export omits GPS by default,SecurityPrivacyTrustRemediationTests,testDivingExportOmitsGPSByDefault,iOS,PASS
+REQ-SEC-REM-04,Export,Diving approximate GPS reduces precision,SecurityPrivacyTrustRemediationTests,testDivingExportApproximateGPSReducesPrecision,iOS,PASS
+REQ-SEC-REM-05,Export,Diving precise GPS preserves six decimals,SecurityPrivacyTrustRemediationTests,testDivingExportPreciseGPSPreservesSixDecimals,iOS,PASS
+REQ-SEC-REM-06,Trust,Bootstrap rejects stale WC context,SecurityPrivacyTrustRemediationTests,testTrustBootstrapRejectsStaleContext,iOS,PASS
+REQ-SEC-REM-07,Trust,Bootstrap accepts fresh context with epoch,SecurityPrivacyTrustRemediationTests,testTrustBootstrapAcceptsFreshContext,iOS,PASS
+REQ-SEC-REM-08,Sync,Forged WC reply cannot dequeue pending,SecurityPrivacyTrustRemediationTests,testForgedReplyCannotDequeue,iOS,PASS
+REQ-SEC-REM-09,Sync,Transport hint reply does not dequeue,SecurityPrivacyTrustRemediationTests,testTransportHintReplyDoesNotDequeue,iOS,PASS
+REQ-SEC-REM-10,Import,CSV import rejects oversized preflight,SecurityPrivacyTrustRemediationTests,testCSVImportBoundsRejectOversizedPreflight,iOS,PASS
+REQ-SEC-REM-11,At-rest,Protected sensitive file store round trip,SecurityPrivacyTrustRemediationTests,testProtectedSensitiveFileStoreRoundTrip,iOS,PASS
+REQ-SEC-REM-12,Maintainability,Legacy security identifier registry,SecurityPrivacyTrustRemediationTests,testLegacySecurityIdentifierMigrationRegistry,iOS,PASS
+REQ-SEC-REM-13,Safety,Simulated session tag detection,SecurityPrivacyTrustRemediationTests,testSimulatedSessionTagDetection,iOS,PASS
+REQ-SEC-REM-14,Export,Watch Subsurface export omits GPS by default,SecurityPrivacyTrustRemediationWatchTests,testWatchSubsurfaceExportOmitsGPSByDefault,Watch,PASS
+REQ-SEC-REM-15,Export,Watch export tags simulation source,SecurityPrivacyTrustRemediationWatchTests,testWatchSubsurfaceExportTagsSimulation,Watch,PASS
+REQ-SEC-NEG-01,Security,Forged HMAC rejected,MainDeepCodeReadinessCurrentTests,testForgedHMACRejectedWhenPeerSecretMissing,iOS,PASS
+REQ-SEC-NEG-02,Security,Replayed nonce rejected,MainDeepCodeReadinessCurrentTests,testReplayedNonceRejectedOnSecondUse,iOS,PASS
+REQ-SEC-NEG-03,Security,TOFU peer secret mismatch,MainDeepCodeReadinessCurrentTests,testTOFURejectsPeerSecretMismatch,iOS,PASS
+REQ-SEC-NEG-04,Security,Briefing legacy schema blocked,MainDeepCodeReadinessCurrentTests,testBriefingFilenameTraversalRejectedOnWatchPolicyTypeViaSchema,iOS,PASS
+REQ-SEC-NEG-05,Security,Briefing path traversal Watch,MainDeepCodeReadinessCurrentWatchTests,testBriefingAdversarialFilenamesRejected,Watch,PASS
+REQ-SEC-NEG-06,Security,Legacy v1 protected ops blocked,MainDeepCodeAnalysisRemediationV1Tests,testLegacyV1ProtectedOperationsRejected,iOS,PASS
+REQ-SEC-NEG-07,Cloud,Apnea cloud unavailable,MainDeepCodeReadinessCurrentTests,testApneaCloudCapabilityExplicitlyUnavailable,iOS,PASS
+REQ-SEC-NEG-08,Cloud,Snorkeling cloud unavailable,MainDeepCodeReadinessCurrentTests,testSnorkelingCloudCapabilityStatusOnly,iOS,PASS
+REQ-SEC-NEG-09,Security,Fingerprint never equals secret,MainDeepCodeReadinessCurrentTests,testTrustFingerprintNeverEqualsRawSecret,iOS,PASS
+REQ-SEC-NEG-10,Cloud,Legacy oversized KVS ignored,MainDeepCodeReadinessCurrentTests,testLegacyOversizedPerKeyPayloadIgnored,iOS,PASS
+REQ-SEC-NEG-11,Privacy,iOS manifest no tracking,SecurityPrivacyTrustRemediationTests,testPrivacyManifestIOSExistsAndDeclaresNoTracking,iOS,PASS
+REQ-SEC-NEG-12,Privacy,Watch manifest no tracking,SecurityPrivacyTrustRemediationTests,testPrivacyManifestWatchExistsAndDeclaresNoTracking,iOS,PASS
+REQ-SEC-NEG-13,Export,Default export omits GPS,SecurityPrivacyTrustRemediationTests,testDivingExportOmitsGPSByDefault,iOS,PASS
+REQ-SEC-NEG-14,Trust,Stale bootstrap rejected,SecurityPrivacyTrustRemediationTests,testTrustBootstrapRejectsStaleContext,iOS,PASS
+REQ-SEC-NEG-15,Sync,Forged reply blocked,SecurityPrivacyTrustRemediationTests,testForgedReplyCannotDequeue,iOS,PASS
+REQ-SEC-NEG-16,Import,Oversized CSV blocked,SecurityPrivacyTrustRemediationTests,testCSVImportBoundsRejectOversizedPreflight,iOS,PASS
+REQ-SEC-NEG-17,At-rest,Protected store works,SecurityPrivacyTrustRemediationTests,testProtectedSensitiveFileStoreRoundTrip,iOS,PASS
+REQ-SEC-NEG-18,Maintainability,Legacy ID registry,SecurityPrivacyTrustRemediationTests,testLegacySecurityIdentifierMigrationRegistry,iOS,PASS
+REQ-SEC-NEG-19,Safety,Simulation tag detected,SecurityPrivacyTrustRemediationTests,testSimulatedSessionTagDetection,iOS,PASS
+REQ-SEC-NEG-20,Sync,Hint reply no dequeue,SecurityPrivacyTrustRemediationTests,testTransportHintReplyDoesNotDequeue,iOS,PASS
+REQ-SEC-GATE-01,Release,Security privacy trust readiness script,validate_security_privacy_trust_readiness.sh,N/A,Both,PASS
+REQ-SEC-GATE-02,Release,Command 7 architecture regression,validate_activity_architecture_settings_logbook_readiness.sh,N/A,Both,PASS
+REQ-SEC-GATE-03,Release,Command 8 sync regression,validate_multi_activity_sync_persistence_schema_readiness.sh,N/A,Both,PASS

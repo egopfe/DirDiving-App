@@ -218,6 +218,7 @@ final class DiveManager: ObservableObject {
     private let ascentSettings: AscentRateSettingsStore
     private var depthSensorProvider: DepthSensorProvider?
     private var runtimeTimer: Timer?
+    private var isFullComputerRuntimeTickInFlight = false
     private var stopwatchTimer: Timer?
     private var settingsCancellable: AnyCancellable?
     private var sessionStart: Date?
@@ -253,10 +254,6 @@ final class DiveManager: ObservableObject {
     private var fullComputerLogbookAccumulator: FullComputerRuntimeLogbookAccumulator?
 
     private let activeDiveDraftFileName = "dirdiving_active_dive_draft.json"
-    private let stopwatchAccumulatedKey = "dirdiving_watch_stopwatch_accumulated"
-    private let stopwatchStartedAtKey = "dirdiving_watch_stopwatch_started_at"
-    private let stopwatchRunningKey = "dirdiving_watch_stopwatch_running"
-
     private var missionModeAutoEnableOnDiveStart: Bool {
         UserDefaults.standard.bool(forKey: MissionModeSettings.autoEnableOnDiveStartKey)
     }
@@ -791,9 +788,9 @@ final class DiveManager: ObservableObject {
     }
 
     private func loadStopwatchState() {
-        stopwatchAccumulatedTime = max(0, UserDefaults.standard.double(forKey: stopwatchAccumulatedKey))
-        if UserDefaults.standard.bool(forKey: stopwatchRunningKey) {
-            stopwatchStartedAt = UserDefaults.standard.object(forKey: stopwatchStartedAtKey) as? Date ?? Date()
+        stopwatchAccumulatedTime = max(0, UserDefaults.standard.double(forKey: StopwatchPersistencePolicy.accumulatedTimeKey))
+        if UserDefaults.standard.bool(forKey: StopwatchPersistencePolicy.runningKey) {
+            stopwatchStartedAt = UserDefaults.standard.object(forKey: StopwatchPersistencePolicy.startedAtKey) as? Date ?? Date()
             if let stopwatchStartedAt {
                 stopwatchClock.reset(anchorDate: stopwatchStartedAt)
             }
@@ -808,13 +805,14 @@ final class DiveManager: ObservableObject {
     }
 
     private func persistStopwatchState() {
-        UserDefaults.standard.set(stopwatchAccumulatedTime, forKey: stopwatchAccumulatedKey)
-        UserDefaults.standard.set(isStopwatchRunning, forKey: stopwatchRunningKey)
+        UserDefaults.standard.set(stopwatchAccumulatedTime, forKey: StopwatchPersistencePolicy.accumulatedTimeKey)
+        UserDefaults.standard.set(isStopwatchRunning, forKey: StopwatchPersistencePolicy.runningKey)
         if let stopwatchStartedAt {
-            UserDefaults.standard.set(stopwatchStartedAt, forKey: stopwatchStartedAtKey)
+            UserDefaults.standard.set(stopwatchStartedAt, forKey: StopwatchPersistencePolicy.startedAtKey)
         } else {
-            UserDefaults.standard.removeObject(forKey: stopwatchStartedAtKey)
+            UserDefaults.standard.removeObject(forKey: StopwatchPersistencePolicy.startedAtKey)
         }
+        StopwatchPersistencePolicy.recordPersist()
     }
 
     private func startStopwatchTimer() {
@@ -1059,7 +1057,10 @@ final class DiveManager: ObservableObject {
             hasDepthProfile: hasDepthProfile,
             watchActivityMode: watchActivityMode ?? sessionActivityMode.rawValue,
             watchDivingMode: watchDivingMode ?? sessionDivingMode.rawValue,
-            fullComputerLogbookMetadata: fullComputerLogbookMetadata
+            fullComputerLogbookMetadata: fullComputerLogbookMetadata,
+            depthSensorSourceTag: depthSensorSourceResolution == .simulation
+                ? DivingRecordEligibilityPolicy.simulatedSourceTag
+                : nil
         )
         self.activeDiveExceededSupportedDepth = false
         self.sessionStartedManually = false
@@ -1601,6 +1602,11 @@ final class DiveManager: ObservableObject {
 
     private func tickFullComputerRuntimeIfNeeded(now: Date = Date()) {
         guard isFullComputerDiveActive, var engine = fullComputerEngine else { return }
+        guard !isFullComputerRuntimeTickInFlight else { return }
+        isFullComputerRuntimeTickInFlight = true
+        defer { isFullComputerRuntimeTickInFlight = false }
+        let signpost = DIRPerformanceSignpost.begin(.watchFullComputerTissueTick)
+        defer { signpost.end() }
         engine.tick(now: now)
         fullComputerEngine = engine
         fullComputerSnapshot = engine.snapshot

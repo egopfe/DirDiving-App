@@ -88,6 +88,7 @@ targets:
       - Services/FullComputerPrediveConfigurationStore.swift
       - Resources
       - path: Shared
+      - Config/PrivacyInfo-Watch.xcprivacy
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios.watch
@@ -129,6 +130,7 @@ targets:
           - Views/ExplorationCenterView.swift
           - Views/ExperimentalFutureConceptsView.swift
           - Views/BuddyExperimentalView.swift
+      - iOSApp/Config/PrivacyInfo-iOS.xcprivacy
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios
@@ -363,6 +365,7 @@ targets:
       - iOSApp/Services/WatchSyncAuth.swift
       - iOSApp/Services/IOSWatchSyncPendingTransfer.swift
       - iOSApp/Services/PlannerStore.swift
+      - iOSApp/Services/PlannerChartSnapshots.swift
       - iOSApp/Services/EquipmentStore.swift
       - iOSApp/Utils/ChecklistItemSupport.swift
       - iOSApp/Utils/SyncNonceReplayCache.swift

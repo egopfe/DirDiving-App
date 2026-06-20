@@ -28,6 +28,7 @@ final class PlannerStore: ObservableObject {
     @Published var surfaceIntervalMinutes: Double = 60 {
         didSet { scheduleSave() }
     }
+    @Published private(set) var chartSnapshots = PlannerChartSnapshots.empty
     @Published private(set) var isCalculating = false
     @Published private(set) var plannerBriefingSessionId = UUID()
     @Published private(set) var lastTissueSnapshot: TissueSnapshot?
@@ -245,6 +246,8 @@ final class PlannerStore: ObservableObject {
             refreshCCRPlan()
             return
         }
+        let signpost = DIRPerformanceSignpost.begin(.iosPlannerCalculation)
+        defer { signpost.end() }
         isApplyingInputSideEffects = true
         input.syncLegacyGasesFromPlannerCylinders()
         refreshAnalysis(force: false)
@@ -275,6 +278,35 @@ final class PlannerStore: ObservableObject {
         }
         isApplyingInputSideEffects = false
         plannerBriefingSessionId = UUID()
+        refreshChartSnapshots()
+    }
+
+    private func refreshChartSnapshots() {
+        let next = PlannerChartSnapshots.make(
+            from: plan,
+            buhlmann: buhlmann,
+            generation: planningGeneration
+        )
+        guard next != chartSnapshots else { return }
+#if DEBUG
+        PlannerChartSnapshots.testHook_invalidationCount += 1
+#endif
+        chartSnapshots = next
+    }
+
+    private func refreshCCRChartSnapshots() {
+        let next = PlannerChartSnapshots(
+            planningGeneration: planningGeneration,
+            tissueGroupedPoints: [],
+            depthProfilePoints: ccrPlan.depthProfilePoints,
+            ndlCurve: [],
+            tissueHistoryEmpty: true
+        )
+        guard next != chartSnapshots else { return }
+#if DEBUG
+        PlannerChartSnapshots.testHook_invalidationCount += 1
+#endif
+        chartSnapshots = next
     }
 
     func updateTeamMember(_ member: TeamMember) {
@@ -299,8 +331,11 @@ final class PlannerStore: ObservableObject {
 
     func refreshCCRPlan() {
         guard isReady, mode.isCCR else { return }
+        let signpost = DIRPerformanceSignpost.begin(.iosCCRPlannerCalculation)
+        defer { signpost.end() }
         ccrPlan = CCRPlannerService.makePlan(input: ccrInput)
         plannerBriefingSessionId = UUID()
+        refreshCCRChartSnapshots()
     }
 
     private func schedulePlanningUpdate(persistSnapshot: Bool = false) {

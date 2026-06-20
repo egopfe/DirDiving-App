@@ -563,17 +563,22 @@ final class WatchSyncService: NSObject, ObservableObject {
                 WCSession.default.sendMessage(envelope.message) { [weak self] reply in
                     Task { @MainActor in
                         guard let self else { return }
-                        let providedSignature = reply["ackSignature"] as? String
-                        if WatchDiveSyncCodec.verifyAckSignature(
-                            providedSignature,
-                            sessionID: envelope.sessionID,
-                            issuedAt: envelope.issuedAt
+                        let providedSignature = reply[WatchSyncReplyHandlerPolicy.ackSignatureKey] as? String ?? ""
+                        if WatchSyncReplyHandlerPolicy.mayDequeuePendingTransfer(
+                            reply: reply,
+                            expectedSessionID: envelope.sessionID,
+                            expectedIssuedAt: envelope.issuedAt,
+                            verifySignature: { signature, sessionID, issuedAt in
+                                WatchDiveSyncCodec.verifyAckSignature(signature, sessionID: sessionID, issuedAt: issuedAt)
+                            }
                         ) {
                             self.confirmSignedAck(
                                 sessionID: envelope.sessionID,
                                 issuedAt: envelope.issuedAt,
-                                signature: providedSignature ?? ""
+                                signature: providedSignature
                             )
+                        } else if WatchSyncReplyHandlerPolicy.disposition(for: reply) == .transportHintOnly {
+                            self.inFlightSessionIDs.remove(envelope.sessionID)
                         } else {
                             self.inFlightSessionIDs.remove(envelope.sessionID)
                             self.failedTransferCount += 1
@@ -664,8 +669,35 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     private func pendingFileURL() -> URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent(pendingFileName)
+        migrateLegacyPendingFileIfNeeded(activity: "Diving", fileName: pendingFileName)
+    }
+
+    private func pendingApneaFileURL() -> URL {
+        migrateLegacyPendingFileIfNeeded(activity: "Apnea", fileName: pendingApneaFileName)
+    }
+
+    private func pendingSnorkelingFileURL() -> URL {
+        migrateLegacyPendingFileIfNeeded(activity: "Snorkeling", fileName: pendingSnorkelingFileName)
+    }
+
+    private func migrateLegacyPendingFileIfNeeded(activity: String, fileName: String) -> URL {
+        let legacyDoc = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent(fileName)
+        guard let target = try? ProtectedSensitiveFileStore.fileURL(activity: activity, fileName: fileName) else {
+            return legacyDoc
+        }
+        if !FileManager.default.fileExists(atPath: target.path),
+           FileManager.default.fileExists(atPath: legacyDoc.path),
+           let data = try? Data(contentsOf: legacyDoc) {
+            try? ProtectedSensitiveFileStore.saveData(data, to: target)
+            try? FileManager.default.removeItem(at: legacyDoc)
+        }
+        _ = ProtectedSensitiveFileStore.migrateUserDefaultsData(
+            key: legacyPendingSessionsKey,
+            to: target,
+            removeLegacyAfterVerifiedWrite: activity == "Diving"
+        )
+        return target
     }
 
     private func loadPendingTransfers() -> [WatchSyncPendingTransfer] {
@@ -918,11 +950,6 @@ final class WatchSyncService: NSObject, ObservableObject {
         savePendingApneaTransfers()
     }
 
-    private func pendingApneaFileURL() -> URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent(pendingApneaFileName)
-    }
-
     private func loadPendingApneaTransfers() -> [ApneaSyncPendingTransfer] {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
@@ -1035,11 +1062,6 @@ final class WatchSyncService: NSObject, ObservableObject {
         pendingSnorkelingTransfers[index].lastAttemptAt = Date()
         pendingSnorkelingTransfers[index].attemptCount += 1
         savePendingSnorkelingTransfers()
-    }
-
-    private func pendingSnorkelingFileURL() -> URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent(pendingSnorkelingFileName)
     }
 
     private func loadPendingSnorkelingTransfers() -> [SnorkelingSyncPendingTransfer] {
