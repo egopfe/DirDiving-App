@@ -345,6 +345,7 @@ targets:
       - iOSApp/Services/BuhlmannPlanner.swift
       - iOSApp/Services/CloudSyncStore.swift
       - iOSApp/Utils/CloudBackupSettings.swift
+      - iOSApp/Utils/CloudBackupCapability.swift
       - iOSApp/Services/WatchSyncAuth.swift
       - iOSApp/Services/DiveImportService.swift
       - iOSApp/Services/GasPlanningService.swift

@@ -1,14 +1,16 @@
 import Foundation
 
-/// Full iCloud KVS logbook backup opt-in (SEC-P1-003). Default off for new installs.
+/// Diving-scoped iCloud KVS logbook backup opt-in (SYNC-P1-002). Default off for new installs.
 enum CloudBackupSettings {
-    static let enabledKey = "dirdiving_ios_cloud_backup_enabled"
+    static let enabledKey = CloudBackupCapability.divingEnabledKey
 
     static var isEnabled: Bool {
-        UserDefaults.standard.bool(forKey: enabledKey)
+        CloudBackupCapability.migrateLegacySharedKeyIfNeeded()
+        return CloudBackupCapability.isDivingEnabled
     }
 
     static func setEnabled(_ enabled: Bool) {
-        UserDefaults.standard.set(enabled, forKey: enabledKey)
+        CloudBackupCapability.migrateLegacySharedKeyIfNeeded()
+        CloudBackupCapability.setDivingEnabled(enabled)
     }
 }

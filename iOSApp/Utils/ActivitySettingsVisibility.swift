@@ -24,7 +24,7 @@ enum ActivitySettingsVisibility {
         .init(key: "dirdiving_ios_pressure_unit", scope: .diving, visibleInDiving: true, visibleInApnea: false, visibleInSnorkeling: false),
         .init(key: PlannerCNSDescentBottomCheckSettings.thresholdStorageKey, scope: .diving, visibleInDiving: true, visibleInApnea: false, visibleInSnorkeling: false),
         .init(key: "dirdiving_ascent_rate_limits", scope: .diving, visibleInDiving: true, visibleInApnea: false, visibleInSnorkeling: false),
-        .init(key: "dirdiving_ios_cloud_backup_enabled", scope: .shared, visibleInDiving: true, visibleInApnea: true, visibleInSnorkeling: true),
+        .init(key: CloudBackupCapability.divingEnabledKey, scope: .diving, visibleInDiving: true, visibleInApnea: false, visibleInSnorkeling: false),
         .init(key: "dirdiving_ios_planner_cns_descent_bottom_check_enabled", scope: .diving, visibleInDiving: true, visibleInApnea: false, visibleInSnorkeling: false),
         .init(key: "planner.ascentSpeedSettings.v1", scope: .diving, visibleInDiving: true, visibleInApnea: false, visibleInSnorkeling: false),
         .init(key: "dirdiving_ios_apnea_settings_v1", scope: .apnea, visibleInDiving: false, visibleInApnea: true, visibleInSnorkeling: false),

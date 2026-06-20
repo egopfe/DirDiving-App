@@ -1,7 +1,37 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-20  
+**Aggiornato:** 2026-06-17  
 **Branch consigliato:** `main` = `origin/main`
+
+---
+
+## Aggiornamento indice 2026-06-17 — Command 9 security/privacy/trust audit V3.0
+
+Audit read-only sicurezza/privacy/trust verticale su prodotto MAIN completo (Watch + iOS).
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `9-DIR_DIVING_SECURITY_PRIVACY_TRUST_AUDIT_V3.0.md` |
+| **Audit** | [`SECURITY_PRIVACY_TRUST_AUDIT_CURRENT.md`](SECURITY_PRIVACY_TRUST_AUDIT_CURRENT.md) |
+| **Threat model** | [`THREAT_MODEL_CURRENT.md`](THREAT_MODEL_CURRENT.md) |
+| **Data flow matrix** | [`PRIVACY_DATA_FLOW_MATRIX_CURRENT.csv`](PRIVACY_DATA_FLOW_MATRIX_CURRENT.csv) |
+| **Remediation plan** | [`SECURITY_REMEDIATION_PLAN_CURRENT.md`](SECURITY_REMEDIATION_PLAN_CURRENT.md) |
+| **Negative tests** | [`MAIN_SECURITY_NEGATIVE_TEST_MATRIX_CURRENT.csv`](MAIN_SECURITY_NEGATIVE_TEST_MATRIX_CURRENT.csv) — SEC-NEG-01…10 **PASS** |
+| **Overall readiness** | **83/100** (P0=0, P1=1 open: Privacy Manifest) |
+
+---
+
+## Aggiornamento indice 2026-06-17 — Command 8 sync/persistence/schema remediation
+
+Chiusura finding P1/P2/P3 audit sync/persistence/schema; envelope v3 firmato, tombstone multi-attività, cloud diving-only, large-payload transfer.
+
+| Campo | Valore |
+|-------|--------|
+| **Audit (input)** | [`MULTI_ACTIVITY_SYNC_PERSISTENCE_SCHEMA_AUDIT_CURRENT.md`](MULTI_ACTIVITY_SYNC_PERSISTENCE_SCHEMA_AUDIT_CURRENT.md) |
+| **Remediation** | [`MULTI_ACTIVITY_SYNC_PERSISTENCE_SCHEMA_REMEDIATION_REPORT_CURRENT.md`](MULTI_ACTIVITY_SYNC_PERSISTENCE_SCHEMA_REMEDIATION_REPORT_CURRENT.md) |
+| **Traceability** | [`MULTI_ACTIVITY_SYNC_FINDING_TRACEABILITY_CURRENT.csv`](MULTI_ACTIVITY_SYNC_FINDING_TRACEABILITY_CURRENT.csv) |
+| **Validate** | `./Scripts/validate_multi_activity_sync_persistence_schema_readiness.sh` PASS |
+| **Software readiness** | **100%** (physical QA **PENDING**) |
 
 ---
 

@@ -12,17 +12,41 @@ final class SnorkelingLogbookStore: ObservableObject {
     @Published private(set) var lastSavedSessionID: UUID?
 
     private let fileName = "dirdiving_snorkeling_sessions.json"
+    private let deletedLocalKey = WatchSyncKeys.snorkelingDeletedSessionIDsLocalKey
+    private var deletedSessionIDs: Set<UUID> = []
+    private var sessionRevisions: [UUID: Int] = [:]
 
     init() {
         load()
     }
 
+    func isDeleted(id: UUID) -> Bool {
+        deletedSessionIDs.contains(id)
+    }
+
+    func revision(for sessionID: UUID) -> Int {
+        sessionRevisions[sessionID] ?? 1
+    }
+
     func reloadFromPersistence() {
-        sessions = SnorkelingLogbookPolicy.normalizedAndCapped(loadLocalSessions())
+        deletedSessionIDs = loadDeletedSessionIDs()
+        sessions = SnorkelingLogbookPolicy.normalizedAndCapped(
+            loadLocalSessions(),
+            deletedIDs: deletedSessionIDs
+        )
+    }
+
+    func applyRemoteDeletedSessionIDs(_ ids: Set<UUID>) {
+        guard !ids.isEmpty else { return }
+        deletedSessionIDs.formUnion(ids)
+        sessions.removeAll { deletedSessionIDs.contains($0.id) }
+        saveDeletedSessionIDs(deletedSessionIDs)
+        _ = save()
     }
 
     func add(_ session: SnorkelingSession) {
         let normalized = SnorkelingLogbookPolicy.normalizedSession(session)
+        guard !deletedSessionIDs.contains(normalized.id) else { return }
         switch SnorkelingLogbookPolicy.classify(normalized) {
         case .invalid(let reason):
             loadErrorMessage = reason
@@ -30,7 +54,8 @@ final class SnorkelingLogbookStore: ObservableObject {
         case .exportable:
             sessions.removeAll { $0.id == normalized.id }
             sessions.insert(normalized, at: 0)
-            sessions = SnorkelingLogbookPolicy.normalizedAndCapped(sessions)
+            sessions = SnorkelingLogbookPolicy.normalizedAndCapped(sessions, deletedIDs: deletedSessionIDs)
+            sessionRevisions[normalized.id] = (sessionRevisions[normalized.id] ?? 0) + 1
             guard save() else { return }
             lastSavedSessionID = normalized.id
 #if os(watchOS)
@@ -47,8 +72,14 @@ final class SnorkelingLogbookStore: ObservableObject {
 
     func delete(id: UUID) {
         guard sessions.contains(where: { $0.id == id }) else { return }
+        deletedSessionIDs.insert(id)
+        sessionRevisions[id] = (sessionRevisions[id] ?? 0) + 1
         sessions.removeAll { $0.id == id }
+        saveDeletedSessionIDs(deletedSessionIDs)
         _ = save()
+#if os(watchOS)
+        WatchSyncService.shared.publishDeletedSnorkelingSessionIDs([id])
+#endif
     }
 
     func statistics() -> SnorkelingLogbookStatistics {
@@ -60,7 +91,8 @@ final class SnorkelingLogbookStore: ObservableObject {
     }
 
     private func load() {
-        sessions = SnorkelingLogbookPolicy.normalizedAndCapped(loadLocalSessions())
+        deletedSessionIDs = loadDeletedSessionIDs()
+        sessions = SnorkelingLogbookPolicy.normalizedAndCapped(loadLocalSessions(), deletedIDs: deletedSessionIDs)
     }
 
     private func loadLocalSessions() -> [SnorkelingSession] {
@@ -104,5 +136,29 @@ final class SnorkelingLogbookStore: ObservableObject {
             ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
             ?? FileManager.default.temporaryDirectory
         return base.appendingPathComponent(fileName)
+    }
+
+    private func deletedIDsFileURL() -> URL {
+        fileURL().deletingLastPathComponent().appendingPathComponent("dirdiving_snorkeling_deleted_session_ids.json")
+    }
+
+    private func loadDeletedSessionIDs() -> Set<UUID> {
+        let url = deletedIDsFileURL()
+        guard let data = try? Data(contentsOf: url),
+              let ids = try? JSONDecoder().decode([UUID].self, from: data) else {
+            if let legacy = UserDefaults.standard.stringArray(forKey: deletedLocalKey) {
+                return Set(legacy.compactMap(UUID.init(uuidString:)))
+            }
+            return []
+        }
+        return Set(ids)
+    }
+
+    private func saveDeletedSessionIDs(_ ids: Set<UUID>) {
+        let sorted = ids.map(\.uuidString).sorted()
+        if let data = try? JSONEncoder().encode(sorted.compactMap(UUID.init(uuidString:))) {
+            try? data.write(to: deletedIDsFileURL(), options: [.atomic, .completeFileProtection])
+        }
+        UserDefaults.standard.set(sorted, forKey: deletedLocalKey)
     }
 }

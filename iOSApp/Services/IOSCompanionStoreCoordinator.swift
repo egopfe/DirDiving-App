@@ -63,6 +63,7 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
         snorkelingBundle = bundle
         syncSnorkelingLogbook = nil
         watchSync.attachSnorkelingLogbookStore(bundle.logbookStore)
+        bundle.logbookStore.attachWatchSync(watchSync)
         watchSync.snorkelingWatchTransferService = bundle.watchTransfer
         watchSync.snorkelingSessionSyncService = bundle.sessionSync
         return bundle
@@ -70,6 +71,7 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
 
     func activateWatchSyncIfNeeded() {
         logStore.attachWatchSync(watchSync)
+        lazySnorkelingLogbookForSync().attachWatchSync(watchSync)
         watchSync.activate(
             logStore: logStore,
             apneaLogbookStore: lazyApneaLogbookForSync(),
