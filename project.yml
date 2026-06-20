@@ -220,6 +220,9 @@ targets:
       - Utils/LiveDiveBannerPresentationPolicy.swift
       - Utils/LiveDiveReminderSuppressionPolicy.swift
       - Utils/CloudSyncBudgetPolicy.swift
+      - Utils/CloudSyncLegacyMigrationPolicy.swift
+      - Utils/CloudSyncMigrationTelemetry.swift
+      - Utils/WatchSyncTrustStatePolicy.swift
       - Utils/PlannerBriefingFilenameSanitizer.swift
       - Utils/WatchSyncSchemaV1Policy.swift
       - Utils/WatchSyncPendingFlushPolicy.swift
@@ -394,6 +397,9 @@ targets:
       - iOSApp/Utils/PlannerResultState.swift
       - iOSApp/Utils/WatchSyncSessionDiff.swift
       - iOSApp/Utils/CloudSyncBudgetPolicy.swift
+      - iOSApp/Utils/CloudSyncLegacyMigrationPolicy.swift
+      - iOSApp/Utils/CloudSyncMigrationTelemetry.swift
+      - iOSApp/Utils/WatchSyncTrustStatePolicy.swift
       - iOSApp/Utils/CCRMODTolerancePolicy.swift
       - iOSApp/Utils/WatchSyncSchemaV1Policy.swift
       - iOSApp/Utils/CloudSyncNotifications.swift

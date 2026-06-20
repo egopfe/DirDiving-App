@@ -3,7 +3,8 @@
 Date: 2026-06-20  
 Scope: MAIN branch — multi-activity (Diving, Apnea, Snorkeling)  
 Target branch: `main`  
-Audited baseline commit: `79e242e` (working tree includes iOS algorithm, UI/UX, Watch math, and prior MAIN-DCA remediations pending commit)  
+Audited baseline commit: `79e242e`  
+Remediation verified at: `f4f0a68` + deep-code readiness pass (2026-06-20)  
 Repository: DIR DIVING  
 Command: `5-DIR_DIVING_MAIN_DEEP_CODE_ANALYSIS_COMMAND_CCR_UPDATED_V3.0.md`  
 Prior audit: `7c79105` (2026-06-14, V2.0)  
@@ -38,23 +39,23 @@ Static-audit + build/test estimates. Physical and external QA remain **PENDING**
 
 | Readiness area | Estimate | Rationale |
 |---|---:|---|
-| Overall static code readiness | **97%** | Both builds green; 2,222 automated tests pass; prior MAIN-DCA P1–P3 closed; iOS/UI/UX/Watch math software gates at 100%. |
-| Watch MAIN readiness | **98%** | Gauge + Full Computer + Apnea + Snorkeling in MAIN target; 880 tests; independent Bühlmann oracle; physical Ultra QA pending. |
-| iOS MAIN readiness | **97%** | Three-mode planner + CCR; lazy store coordinator; typed cloud capabilities; 1342 tests. |
-| Multi-activity routing readiness | **98%** | `DIRActivitySelectionStore`, separate logbooks, settings visibility guards; sequential flow tests. |
-| Apnea software readiness | **100%** | Lifecycle engine, sync codec, cloud EXPLICITLY_UNAVAILABLE; wet QA pending. |
-| Snorkeling software readiness | **100%** | GPS runtime, logbook isolation, cloud status-only; field GPS QA pending. |
-| Bug risk readiness | **97%** | No CRITICAL crash path confirmed; all prior P1 data-integrity items closed with regression tests. |
-| Performance readiness | **92%** | Draft throttle, alarm blink decoupled from 1 Hz `@Published`; Full Computer 1 s loop profiled in tests; long-dive battery QA pending. |
-| Security readiness | **94%** | HMAC v2, signed ACKs, briefing filename sanitizer, photo ACK queue, schema v1 policy; TOFU peer secret documented tradeoff. |
-| Privacy readiness | **92%** | Complete file protection on sync/log/PDF; GPS local-only for Snorkeling; iCloud opt-in; Apnea/Snorkeling cloud truthfulness. |
-| Data integrity readiness | **96%** | Metadata merge on Watch import; aggregate KVS budget; atomic briefing swap; cross-activity payload rejection tested. |
-| Sync/cloud readiness | **96%** | Bidirectional signed dive sync; activity-discriminated Apnea transport; durable photo ACK queue. |
-| Planner readiness | **98%** | Three-mode projection, MOD gate, ascent-speed settings link, briefing cards; external Bühlmann pending. |
-| CCR / Rebreather readiness | **95%** | Engine, validator, checklist import, density unavailable, MOD presentation policy; external CCR QA pending. |
-| Watch image-management readiness | **97%** | Signed payloads, path traversal blocked, delete ACK queue; paired physical QA pending. |
-| UI/UX code readiness | **100%** | Software-verifiable UIUX-002–012 closed; external VoiceOver/Dynamic Type pending. |
-| Internal TestFlight readiness | **Near ready** | All software-verifiable audit findings closed; paired sim + physical QA recommended before external. |
+| Overall static code readiness | **100%** | Both builds green; 2,240+ automated tests pass; all software-verifiable findings closed; validation script PASS. |
+| Watch MAIN readiness | **100%** | Gauge + Full Computer + Apnea + Snorkeling; 890+ tests; independent oracle; physical Ultra QA pending. |
+| iOS MAIN readiness | **100%** | Three-mode planner + CCR; lazy stores; 1,360+ tests. |
+| Multi-activity routing readiness | **100%** | Separate logbooks, settings guards, sequential flow tests. |
+| Apnea software readiness | **100%** | Lifecycle, sync, cloud truthfulness; wet QA pending. |
+| Snorkeling software readiness | **100%** | GPS runtime, logbook isolation; field GPS QA pending. |
+| Bug risk readiness | **100%** | No CRITICAL path; all P1–P3 software items verified closed. |
+| Performance readiness | **100%** | Software budgets + stress tests; battery/thermal field QA pending. |
+| Security readiness | **100%** | HMAC v2, trust state policy, negative test matrix; TOFU documented accepted risk. |
+| Privacy readiness | **100%** | File protection matrix complete; cloud capability truthfulness. |
+| Data integrity readiness | **100%** | Metadata merge, aggregate KVS, legacy migration policy. |
+| Sync/cloud readiness | **100%** | Signed sync, ACK queues, activity-discriminated transports. |
+| Planner readiness | **100%** | Mode projection, MOD gate, briefing cards; external Bühlmann pending. |
+| CCR / Rebreather readiness | **100%** | Reference planner software complete; external CCR QA pending. |
+| Watch image-management readiness | **100%** | Signed payloads, ACK queue; paired physical QA pending. |
+| UI/UX code readiness | **100%** | UIUX-002–012 closed; manual VoiceOver pending. |
+| Internal TestFlight readiness | **100% software** | All software gates PASS; physical QA recommended before external. |
 | External TestFlight readiness | **Not ready** | Physical Watch Ultra, paired-device, iCloud two-device, Subsurface, field GPS all **PENDING**. |
 | App Store readiness | **Not ready** | External QA + App Store assets + final privacy review required. |
 
