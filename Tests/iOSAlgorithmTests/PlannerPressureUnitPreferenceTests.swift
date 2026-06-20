@@ -59,7 +59,7 @@ final class PlannerPressureUnitPreferenceTests: XCTestCase {
     func testMoreViewContainsGlobalPressureUnitSelector() throws {
         let source = try String(contentsOfFile: moreViewSourcePath(), encoding: .utf8)
         XCTAssertTrue(source.contains("settings.units.pressure.title"))
-        XCTAssertTrue(source.contains("IOSPressureUnitPreference.storageKey"))
+        XCTAssertTrue(source.contains("sharedSettings.pressureUnit"))
     }
 
     func testPlannerEditorStillContainsWorkingPressureSection() throws {

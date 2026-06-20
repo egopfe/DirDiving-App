@@ -1,0 +1,20 @@
+Requirement_ID,Domain,Requirement,Test_Class,Test_Method,Platform,Status
+REQ-DCA-003-01,Cloud,Legacy oversized per-key payload ignored on read,MainDeepCodeReadinessCurrentTests,testLegacyOversizedPerKeyPayloadIgnored,iOS,PASS
+REQ-DCA-003-02,Cloud,Exact per-key boundary allowed,MainDeepCodeReadinessCurrentTests,testExactPerKeyBoundaryAllowedOneByteOverRejected,iOS,PASS
+REQ-DCA-003-03,Cloud,Partial migration keeps local on aggregate block,MainDeepCodeReadinessCurrentTests,testPartialMigrationKeepsLocalWhenAggregateBlocked,iOS,PASS
+REQ-DCA-003-04,Cloud,Migration telemetry non-sensitive,MainDeepCodeReadinessCurrentTests,testMigrationTelemetryDoesNotPersistSensitiveKeys,iOS,PASS
+REQ-DCA-013-01,Security,TOFU mismatch rejected,MainDeepCodeReadinessCurrentTests,testTOFURejectsPeerSecretMismatch,iOS,PASS
+REQ-DCA-013-02,Security,Trust fingerprint without secret,MainDeepCodeReadinessCurrentTests,testTrustFingerprintNeverEqualsRawSecret,iOS,PASS
+REQ-DCA-011-01,Merge,Metadata preserved on Watch import,MainDeepCodeAnalysisRemediationV1Tests,testMetadataOnlyWatchImportPreservesIOSNotes,iOS,PASS
+REQ-DCA-011-02,Merge,Stale Watch cannot overwrite newer iPhone,MainDeepCodeReadinessCurrentTests,testStaleWatchPayloadCannotOverwriteNewerIPhoneNotes,iOS,PASS
+REQ-DCA-019-01,Sync,Photo delete ACK queue persists,MainDeepCodeReadinessCurrentWatchTests,testPhotoDeleteAckQueueSurvivesRestart,Watch,PASS
+REQ-DCA-020-01,Security,Briefing traversal rejected,MainDeepCodeReadinessCurrentWatchTests,testBriefingAdversarialFilenamesRejected,Watch,PASS
+REQ-DCA-022-01,Runtime,Critical depth suppresses reminders,MainDeepCodeReadinessCurrentWatchTests,testCriticalDepthStateSuppressesReminders,Watch,PASS
+REQ-DCA-027-01,Security,Legacy v1 protected ops blocked,MainDeepCodeReadinessCurrentTests,testLegacySchemaV1HasDocumentedRemovalTarget,iOS,PASS
+REQ-DCA-024-01,CCR,Intentional bailout MOD tolerance,MainDeepCodeAnalysisRemediationV1Tests,testCCRBailoutMODToleranceIsIntentionallyLooserThanOC,iOS,PASS
+REQ-AUDIT15-01,Math,Air 39 multilevel oracle,Audit15Air39MultilevelProfileTests,testAudit15Air39MultilevelProfile,Watch,PASS
+REQ-AUDIT15-02,Math,Redescent deco reappearance,Audit15RedescentOracleTests,testAudit15DecoClearsThenReappearsAfterRedescent,Watch,PASS
+REQ-MULTI-01,Isolation,Sequential activity flow,IntegratedModesSequentialFlowTests,testSequentialGaugeFullComputerApneaSnorkeling,Watch,PASS
+REQ-UIUX-01,UI/UX,Software gate,validate_ui_ux_main_readiness.sh,N/A,Both,PASS
+REQ-IOS-ALG-01,Algorithm,iOS complete gate,validate_ios_complete_algorithm_readiness.sh,N/A,iOS,PASS
+REQ-WATCH-MATH-01,Math,Watch math gate,validate_watch_math_readiness.sh,N/A,Watch,PASS

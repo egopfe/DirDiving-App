@@ -38,9 +38,13 @@ final class ChecklistPlannerSyncMapperTests: XCTestCase {
         XCTAssertEqual(entry.role, .deco)
     }
 
-    func testInferRoleFromChecklistTitle() {
+    func testLegacyInferRoleFromChecklistTitle() {
         let item = EquipmentChecklistItem(title: "Back gas", usesGas: true)
-        XCTAssertEqual(ChecklistPlannerSyncMapper.resolvedRole(for: item), .bottom)
+        XCTAssertEqual(ChecklistPlannerSyncMapper.legacyInferRole(from: item.title), .bottom)
+        XCTAssertNil(ChecklistPlannerSyncMapper.resolvedRole(for: item))
+        var migrated = [item]
+        ChecklistRoleMigration.migrateLegacyRoles(in: &migrated)
+        XCTAssertEqual(migrated[0].gasRole, .bottom)
     }
 
     func testDuplicateDetectionMatchesTankMixAndRole() {
@@ -170,9 +174,10 @@ final class ChecklistPlannerSyncMapperTests: XCTestCase {
         XCTAssertFalse(bailouts.contains { $0.gasText == "OLD1" || $0.gasText == "OLD2" })
     }
 
-    func testInferRoleItalianDiluentTitle() {
+    func testLegacyInferRoleItalianDiluentTitle() {
         let item = EquipmentChecklistItem(title: "Bombola diluente CCR", usesGas: true)
-        XCTAssertEqual(ChecklistPlannerSyncMapper.resolvedRole(for: item), .ccrDiluent)
+        XCTAssertEqual(ChecklistPlannerSyncMapper.legacyInferRole(from: item.title), .ccrDiluent)
+        XCTAssertNil(ChecklistPlannerSyncMapper.resolvedRole(for: item))
     }
 
     func testHasCCRChecklistItemsMissingDetectsAbsentDiluentAndBailout() {

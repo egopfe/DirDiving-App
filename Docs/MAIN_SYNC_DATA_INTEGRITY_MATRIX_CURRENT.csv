@@ -1,0 +1,11 @@
+Path_ID,Direction,Mechanism,ACK_Required,Offline_Queue,Activity_Discriminator,Test_Reference,Status
+SYNC-01,Watch→iOS,Dive session HMAC v2,Yes,Yes,N/A (diving),WatchSyncConflictTests,PASS
+SYNC-02,iOS→Watch,Dive session HMAC v2,Yes,Yes,N/A (diving),WatchSyncServiceIntegrationTests,PASS
+SYNC-03,Watch→iOS,Apnea session codec,Yes,Yes,apnea,ApneaSessionSyncTransportNegativeTests,PASS
+SYNC-04,Watch→iOS,Snorkeling session codec,Yes,Yes,snorkeling,SnorkelingSessionSyncTransportNegativeTests,PASS
+SYNC-05,iOS→Watch,Planner briefing PNG,Hash+size,N/A,N/A,PlannerBriefingCardStoreTests,PASS
+SYNC-06,Watch→iOS,Photo delete ACK,Signed,Yes,N/A,MainDeepCodeReadinessCurrentWatchTests,PASS
+SYNC-07,Both,iCloud KVS merge,LWW+budget,N/A,N/A,MainDeepCodeAnalysisRemediationV1Tests,PASS
+SYNC-08,iOS,Watch import metadata merge,preferred(),N/A,N/A,MainDeepCodeReadinessCurrentTests,PASS
+SYNC-09,Both,Legacy schema v1 window,policy gated,N/A,N/A,MainDeepCodeReadinessCurrentTests,PASS
+SYNC-10,Both,TOFU trust establishment,fingerprint epoch,N/A,N/A,MainDeepCodeReadinessCurrentTests,PASS

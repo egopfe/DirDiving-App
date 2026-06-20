@@ -1,0 +1,28 @@
+activity,platform,screen,feature,settings_scope,logbook_owner,mockup_path,source_view,route,test_status,readiness
+diving,ios,ActivitySelection,post-legal activity picker,shared_language_units,mixed_n/a,mockups/IOS_COMPANION_ACTIVITY_SELECTION_POST_ONBOARDING.png,IOSCompanionActivitySelectionView.swift,legal→selection→diving,IOSActivitySettingsCoherenceTests,93
+diving,ios,ContentView,planner tab,diving_gas_gf_cns,diving,DiveLogStore,ContentView.swift,selection→ContentView→planner,PlannerPresentationTests,93
+diving,ios,ContentView,logbook tab,diving,diving,DiveLogStore,LogbookView.swift,tab.logbook,ManualDiveEditorTests,90
+diving,ios,ContentView,analysis tab,diving,diving,DiveLogStore,AnalysisView.swift,tab.analysis,TissueNarcosisTests,88
+diving,ios,ContentView,equipment tab,diving,diving,DiveLogStore,EquipmentView.swift,tab.gear,EquipmentStoreTests,89
+diving,ios,ContentView,checklist tab,diving,diving,DiveLogStore,ChecklistView.swift,tab.checklist,ChecklistPlannerSyncMapperTests,90
+diving,ios,MoreView,shared settings,shared_language_units_backup_sync,diving,DiveLogStore,MoreView.swift,tab.settings,IOSActivitySettingsCoherenceTests,91
+diving,ios,PlannerRootView,base/deco/technical/ccr,diving,diving,DiveLogStore,PlannerRootView.swift,planner→mode,PlannerPresentationTests,93
+apnea,ios,IOSApneaRootView,dashboard,apnea,apnea,IOSApneaLogbookStore,mockups/iOS/apnea_dashboard.png,IOSApneaDashboardView.swift,selection→apnea→dashboard,ApneaCloudBackupStubTruthfulnessTests,91
+apnea,ios,IOSApneaRootView,sessions logbook,apnea,apnea,IOSApneaLogbookStore,mockups/iOS/apnea_sessions.png,IOSApneaSessionsListView.swift,tab.sessions,ApneaSessionSyncCodecTests,92
+apnea,ios,IOSApneaRootView,statistics,apnea,apnea,IOSApneaLogbookStore,mockups/iOS/apnea_statistics.png,IOSApneaStatisticsView,tab.statistics,IOSUIUXRemediationTests,90
+apnea,ios,IOSApneaRootView,profiles,apnea,apnea,IOSApneaLogbookStore,mockups/iOS/apnea_profiles.png,IOSApneaProfilesView.swift,tab.profiles,IOSUIUXRemediationTests,90
+apnea,ios,IOSApneaSettingsView,apnea settings,apnea,apnea,IOSApneaLogbookStore,mockups/iOS/apnea_settings.png,IOSApneaSettingsView.swift,gear sheet,IOSActivitySettingsCoherenceTests,92
+apnea,ios,IOSApneaSessionExportView,export cloud status,apnea_n/a_cloud_unavailable,apnea,IOSApneaLogbookStore,,IOSApneaSessionExportView.swift,session→export,ApneaCloudBackupStubTruthfulnessTests,95
+snorkeling,ios,IOSSnorkelingRootView,dashboard,snorkeling_gps,snorkeling,IOSSnorkelingLogbookStore,mockups/iOS/snorkeling_dashboard.png,IOSSnorkelingDashboardView.swift,selection→snorkeling→dashboard,IOSSnorkelingUIViewContractTests,89
+snorkeling,ios,IOSSnorkelingRootView,sessions logbook,snorkeling,snorkeling,IOSSnorkelingLogbookStore,mockups/iOS/snorkeling_sessions.png,IOSSnorkelingSessionsListView.swift,tab.sessions,SnorkelingAccessibilityContractTests,90
+snorkeling,ios,IOSSnorkelingRootView,route planner,snorkeling_gps_route,snorkeling,IOSSnorkelingLogbookStore,mockups/iOS/snorkeling_route.png,IOSSnorkelingRoutePlannerView.swift,tab.routePlanner,IOSSnorkelingUIViewContractTests,88
+snorkeling,ios,IOSSnorkelingSettingsView,snorkeling settings,snorkeling,snorkeling,IOSSnorkelingLogbookStore,mockups/iOS/snorkeling_settings.png,IOSSnorkelingSettingsView.swift,gear sheet,IOSActivitySettingsCoherenceTests,90
+snorkeling,ios,IOSSnorkelingSessionExportView,export cloud toggle stub,snorkeling_pref_only,snorkeling,IOSSnorkelingLogbookStore,,IOSSnorkelingSessionExportView.swift,session→export,IOSSnorkelingUIViewContractTests,78
+diving,watch,StartupFlowView,activity+gauge/fc selection,watch_startup_diving,diving,mockups/FC_UI_*.png,StartupFlowView.swift,legal→startup→diving,WatchMainUILocalizationTests,91
+diving,watch,DiveLiveView,live gauge/fc,watch_diving_alarms,diving,,DiveLiveView.swift,tab.live,UIUXRemediationV2WatchTests,90
+diving,watch,CompassView,bussola,watch,diving,,CompassView.swift,tab.compass,WatchMainUILocalizationTests,90
+diving,watch,SettingsView,diving settings,watch_diving,diving,,SettingsView.swift,tab.settings,WatchMainUILocalizationTests,89
+diving,watch,DiveLogListView,diving logbook,watch,diving,,DiveLogListView.swift,tab.log,WatchMainUILocalizationTests,88
+diving,watch,PlannerBriefingCardsView,briefing inventory,watch,diving,,PlannerBriefingCardsView.swift,settings→briefing,PlannerBriefingCardStoreTests,87
+apnea,watch,ApneaView,live apnea session,watch_apnea,apnea,mockups/Apple_Watch/apnea_live.png,ApneaView.swift,live when apnea,ApneaWatchSessionTests,88
+snorkeling,watch,SnorkelingView,live snorkeling,watch_snorkeling_gps,snorkeling,mockups/Apple_Watch/snorkeling_live.png,SnorkelingView.swift,live when snorkeling,SnorkelingWatchSessionTests,87

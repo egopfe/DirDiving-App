@@ -62,7 +62,7 @@ final class CloudSyncStore: ObservableObject {
 
         if let cloudData, let localData {
             if cloudModifiedAt > localModifiedAt,
-               let decoded = decodeIfWithinPayloadCap(cloudData, type: type) {
+               let decoded = decodeIfWithinPayloadCap(cloudData, type: type, key: key) {
                 defaults.set(cloudData, forKey: key)
                 defaults.set(cloudModifiedAt, forKey: modifiedAtKey(for: key))
                 lastSyncStatus = "Dati caricati da iCloud"
@@ -78,14 +78,16 @@ final class CloudSyncStore: ObservableObject {
         }
 
         if let cloudData,
-           let decoded = decodeIfWithinPayloadCap(cloudData, type: type) {
+           let decoded = decodeIfWithinPayloadCap(cloudData, type: type, key: key) {
             defaults.set(cloudData, forKey: key)
             defaults.set(cloudModifiedAt, forKey: modifiedAtKey(for: key))
             lastSyncStatus = "Dati caricati da iCloud"
             return decoded
         }
 
-        if let cloudData, cloudData.count > DiveAlgorithmConfiguration.maxSyncPayloadBytes {
+        if let cloudData,
+           CloudSyncLegacyMigrationPolicy.incomingPayloadDecision(byteCount: cloudData.count) == .ignoreLegacyOversizedPerKey {
+            CloudSyncMigrationTelemetry.recordLegacyOversizedIgnored(storageKey: key)
             lastSyncStatus = "Payload iCloud troppo grande ignorato"
         }
 
@@ -104,18 +106,30 @@ final class CloudSyncStore: ObservableObject {
             return
         }
 
-        let decision = CloudSyncBudgetPolicy.evaluateWrite(
+        let decision = CloudSyncLegacyMigrationPolicy.outgoingWriteDecision(
             key: key,
             newData: data,
             existingFootprints: CloudSyncBudgetPolicy.footprints(from: cloudStore)
         )
+        let partial = CloudSyncLegacyMigrationPolicy.evaluatePartialMigration(
+            hasLocalData: defaults.data(forKey: key) != nil,
+            writeDecision: decision,
+            alreadyCloudSynced: cloudStore.data(forKey: key) != nil
+        )
+        CloudSyncMigrationTelemetry.recordMigrationAttempt()
         switch decision {
         case .allowed:
             break
-        case .perKeyExceeded:
+        case .blockedPerKey:
+            if partial == .partialMigrationKeptLocal {
+                CloudSyncMigrationTelemetry.recordPartialMigrationKeptLocal()
+            }
             lastSyncStatus = "Payload troppo grande per iCloud KVS"
             return
-        case .aggregateExceeded:
+        case .blockedAggregate:
+            if partial == .partialMigrationKeptLocal {
+                CloudSyncMigrationTelemetry.recordPartialMigrationKeptLocal()
+            }
             lastSyncStatus = "Budget iCloud KVS aggregato superato"
             return
         }
@@ -144,28 +158,46 @@ final class CloudSyncStore: ObservableObject {
         return try? decoder.decode(type, from: data)
     }
 
-    private func decodeIfWithinPayloadCap<T: Decodable>(_ data: Data, type: T.Type) -> T? {
-        guard data.count <= DiveAlgorithmConfiguration.maxSyncPayloadBytes else {
+    private func decodeIfWithinPayloadCap<T: Decodable>(_ data: Data, type: T.Type, key: String) -> T? {
+        switch CloudSyncLegacyMigrationPolicy.incomingPayloadDecision(byteCount: data.count) {
+        case .usePayload:
+            return decode(type, from: data)
+        case .ignoreLegacyOversizedPerKey:
+            CloudSyncMigrationTelemetry.recordLegacyOversizedIgnored(storageKey: key)
             lastSyncStatus = "Payload iCloud troppo grande ignorato"
             return nil
+        case .ignoreEmpty:
+            return nil
         }
-        return decode(type, from: data)
     }
 
     private func persistToCloudIfWithinCap(_ data: Data, key: String, modifiedAt: TimeInterval) {
-        let decision = CloudSyncBudgetPolicy.evaluateWrite(
+        CloudSyncMigrationTelemetry.recordMigrationAttempt()
+        let footprints = CloudSyncBudgetPolicy.footprints(from: cloudStore)
+        let writeDecision = CloudSyncLegacyMigrationPolicy.outgoingWriteDecision(
             key: key,
             newData: data,
-            existingFootprints: CloudSyncBudgetPolicy.footprints(from: cloudStore),
+            existingFootprints: footprints,
             replacingKey: key
         )
-        switch decision {
+        let partial = CloudSyncLegacyMigrationPolicy.evaluatePartialMigration(
+            hasLocalData: defaults.data(forKey: key) != nil,
+            writeDecision: writeDecision,
+            alreadyCloudSynced: cloudStore.data(forKey: key) != nil
+        )
+        switch writeDecision {
         case .allowed:
             break
-        case .perKeyExceeded:
+        case .blockedPerKey:
+            if partial == .partialMigrationKeptLocal {
+                CloudSyncMigrationTelemetry.recordPartialMigrationKeptLocal()
+            }
             lastSyncStatus = "Payload troppo grande per iCloud KVS"
             return
-        case .aggregateExceeded:
+        case .blockedAggregate:
+            if partial == .partialMigrationKeptLocal {
+                CloudSyncMigrationTelemetry.recordPartialMigrationKeptLocal()
+            }
             lastSyncStatus = "Budget iCloud KVS aggregato superato"
             return
         }

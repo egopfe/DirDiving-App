@@ -107,12 +107,14 @@ enum WatchSyncAuth {
             return .rejectedMismatch
         }
         savePeerSecret(secret)
+        WatchSyncTrustStatePolicy.recordEstablishedTrust(peerSecret: secret)
         clearPeerSecretMismatch()
         NotificationCenter.default.post(name: .watchSyncPeerSecretDidUpdate, object: nil)
         return .acceptedFirstTrust
     }
 
     static func resetPeerTrust() {
+        WatchSyncTrustStatePolicy.incrementTrustEpochOnReset()
         deleteKeychain(account: "\(keychainAccount)-peer")
         clearPeerSecretMismatch()
         NotificationCenter.default.post(name: .watchSyncPeerSecretDidUpdate, object: nil)

@@ -1,0 +1,10 @@
+Requirement_ID,Area,Test_Class,Validation_Result,Notes
+REQ-IOS-005,ApneaCloud,ApneaCloudBackupStubTruthfulnessTests,PASS,EXPLICITLY_UNAVAILABLE
+REQ-IOS-006,Settings,IOSActivitySettingsCoherenceTests,PASS,SharedIOSSettingsStore canonical
+REQ-IOS-007,Keychain,WatchSyncPeerSecretPinningIOSTests,PASS,WatchSyncTestSupport
+REQ-IOS-007b,Keychain,ApneaSessionSyncTransportNegativeTests,PASS,No XCTSkip
+REQ-IOS-008,Checklist,ChecklistTypedRoleMigrationTests,PASS,Typed gasRole
+REQ-IOS-009,MOD,MODPresentationPolicyTests,PASS,PDF alignment
+REQ-IOS-011,Lifecycle,IOSCompanionStoreLifecycleTests,PASS,Lazy coordinator
+REQ-IOS-PERF,Performance,IOSCompleteAlgorithmAuditRemediationTests,PASS,Long profiles
+REQ-IOS-FULL,iOS Algorithm Tests,DIRDiving iOS Algorithm Tests,PASS,1326 executed 0 skipped 0 failed

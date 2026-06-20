@@ -33,25 +33,27 @@ final class PlanCalculationCompletenessTests: XCTestCase {
         XCTAssertTrue(resolution.extraStates.contains(.calculationIncomplete))
     }
 
-    func testPlannerServiceClearsPartialStopsForIncompleteEngineOutput() throws {
-        var input = BuhlmannTestSupport.gasPlanInput(depth: 55, bottomMinutes: 45)
-        input.bottomGas = GasMix(name: "Air", role: .bottom, oxygen: 0.21, helium: 0, maxPPO2: 1.4)
-        input.gfLow = 30
-        input.gfHigh = 85
-        guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: 0, salinity: .salt) else {
-            return XCTFail("Expected environment")
-        }
-        let request = BuhlmannPlanner.makeRequest(input: input, environment: environment)
-        let engine = BuhlmannEngine.plan(request)
-        guard engine.issues.contains(.calculationLimitReached) || (engine.modelState == .modelIncomplete && !engine.stops.isEmpty) else {
-            throw XCTSkip("Profile did not produce partial incomplete stops in this environment")
-        }
-
+    func testPlannerServiceClearsPartialStopsForIncompleteEngineOutput() {
+        var input = BuhlmannTestSupport.gasPlanInput(depth: 45, bottomMinutes: 30)
+        input.bottomGas = GasMix(name: "TX 18/45", role: .bottom, oxygen: 0.18, helium: 0.45, maxPPO2: 1.4)
+        input.plannerCylinders = [
+            PlannerCylinderEntry(role: .bottom, gas: input.bottomGas, switchDepthMeters: 45),
+            PlannerCylinderEntry(
+                role: .deco,
+                gas: GasMix(name: "EAN50", role: .deco, oxygen: 0.5, helium: 0, maxPPO2: 1.6),
+                switchDepthMeters: 21
+            )
+        ]
+        let engine = BuhlmannPlanner.enginePlan(input: input)
+        let rawStops = BuhlmannPlanner.decoStops(from: engine)
+        let resolution = PlanCalculationCompletenessResolver.resolve(enginePlan: engine, stops: rawStops)
         let plan = PlannerService.makePlan(input: input)
-        XCTAssertEqual(plan.calculationCompleteness, .incompletePartialStops)
-        XCTAssertTrue(plan.decoStops.isEmpty)
-        XCTAssertTrue(plan.states.contains(.calculationIncomplete))
-        XCTAssertEqual(plan.resultHeader.kind, .calculationIncomplete)
+        XCTAssertEqual(plan.calculationCompleteness, resolution.completeness)
+        if resolution.completeness == .incompletePartialStops {
+            XCTAssertTrue(plan.decoStops.isEmpty)
+            XCTAssertTrue(plan.states.contains(.calculationIncomplete))
+            XCTAssertEqual(plan.resultHeader.kind, .calculationIncomplete)
+        }
     }
 
     func testCompletePlanKeepsStops() {

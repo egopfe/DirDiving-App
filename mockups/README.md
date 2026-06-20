@@ -6,6 +6,7 @@ All **current** raster mockups for DIR Diving MAIN live under `mockups/**`.
 
 - **Canonical:** `mockups/**` (this directory)
 - **Historical only:** `Docs/ReferenceUI/archive/` (deprecated pre-three-mode references)
+- **External raster assets:** Current PNG mockups are maintained outside this repository (design archive). Paths listed here and in `Docs/UI_UX_MOCKUP_INVENTORY_CURRENT.csv` are traceability references only — not runtime UI and not App Store screenshots.
 - **Never** embed PNG mockups in app bundles or live SwiftUI layouts
 - Reference matrices: `Utils/ApneaMockupReferenceMatrix.swift`, `Utils/SnorkelingMockupReferenceMatrix.swift`, `Utils/FullComputerMockupReferenceMatrix.swift`
 

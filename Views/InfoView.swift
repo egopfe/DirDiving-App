@@ -53,7 +53,7 @@ struct InfoView: View {
 
     private var versionRow: some View {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "n/d"
-        return infoRow(title: String(localized: "Versione"), value: version)
+        return infoRow(title: String(localized: "settings.version.label"), value: version)
             .developerVersionUnlock(tapCount: $versionTapCount) {
                 developerUnlockedNotice = true
             }
@@ -65,7 +65,7 @@ struct InfoView: View {
                 DiveOctopusLogo(accent: DiveUI.yellow)
                     .frame(width: 23, height: 22, alignment: .leading)
                     .scaleEffect(0.68)
-                Text("DIR DIVING")
+                Text(DIRBrandPresentation.displayName)
                     .font(.system(size: 11, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.yellow)
                     .lineLimit(1)
@@ -177,7 +177,7 @@ struct InfoView: View {
 
     private var depthDiagnostics: some View {
         VStack(alignment: .leading, spacing: 5) {
-            diagnosticRow(String(localized: "Entitlement profondità"), String(localized: "info.depth.entitlement.review_required"))
+            diagnosticRow(String(localized: "watch.info.depth_entitlement.title"), String(localized: "info.depth.entitlement.review_required"))
             diagnosticRow(
                 String(localized: "developer.sensor_source.title"),
                 dive.depthSensorSourceResolution.localizedLabel

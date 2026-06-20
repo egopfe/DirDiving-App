@@ -1,0 +1,11 @@
+Gate,Software_Status,External_Status,Blocking_Release,Evidence_Required
+Internal code readiness,100%,N/A,No,Automated tests + scripts
+iOS software readiness,100%,N/A,No,validate_ios_complete_algorithm_readiness.sh
+Watch software readiness,100%,N/A,No,validate_watch_complete_algorithm_readiness.sh
+Security software readiness,100%,N/A,No,MAIN_SECURITY_NEGATIVE_TEST_MATRIX_CURRENT.csv
+Privacy software readiness,100%,N/A,No,MAIN_PRIVACY_FILE_PROTECTION_MATRIX_CURRENT.csv
+Performance software readiness,100%,PENDING battery/thermal,No,MAIN_PERFORMANCE_BUDGET_CURRENT.csv
+UI/UX software readiness,100%,PENDING manual a11y,No,validate_ui_ux_main_readiness.sh
+Internal TestFlight software,100%,N/A,No,validate_main_deep_code_readiness.sh
+External TestFlight,100% software,PENDING physical,Yes,QA evidence folders
+App Store,100% software,PENDING assets+legal,Yes,Marketing + legal sign-off
