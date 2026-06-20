@@ -2,11 +2,11 @@
 
 Copyright Federico Lombardo di Monte Iato 2026
 
-DIR DIVING is a SwiftUI **watchOS + iOS companion** project (XcodeGen) for Apple Watch Ultra-class devices and iPhone. The stable **`main`** branch delivers **Diving mode** on Watch (depth, ascent awareness, **BUSSOLA**, log, GPS surface entry/exit, Subsurface CSV) plus the iOS companion (logbook, planner, equipment, analysis, sync). Snorkeling, Apnea, and Buddy Assist live on **experimental** branches only.
+DIR DIVING is a SwiftUI **watchOS + iOS companion** project (XcodeGen) for Apple Watch Ultra-class devices and iPhone. The stable **`main`** branch delivers **multi-activity production**: **Diving** (Gauge + Full Computer), **Apnea**, and **Snorkeling** on Watch and iOS Companion, plus planner, equipment, analysis, sync, and export. **Buddy Assist** and legacy exploration concepts remain **experimental-only** (excluded from MAIN targets).
 
-**Apnea integration (`main`):** shared domain engine, iOS companion screens, and isolated WatchConnectivity sync are documented in [`APNEA_ARCHITECTURE.md`](APNEA_ARCHITECTURE.md). Release-hard validation: `./Scripts/validate_apnea_release_readiness.sh` · report: [`DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md`](DIR_DIVING_APNEA_RELEASE_HARD_VALIDATION_REPORT.md). **Not certified** for freediving; physical QA pending (`Docs/QA_EVIDENCE/APNEA_*/`).
+**Apnea / Snorkeling on `main`:** activity-owned roots, settings, logbooks, and sync — see [`APNEA_ARCHITECTURE.md`](APNEA_ARCHITECTURE.md), [`SNORKELING_ARCHITECTURE.md`](SNORKELING_ARCHITECTURE.md). Release-hard: `./Scripts/validate_apnea_release_readiness.sh`, `./Scripts/validate_snorkeling_release_readiness.sh`. **Not certified**; physical QA **PENDING** (`Docs/QA_EVIDENCE/`).
 
-**Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](INDEX.md) · **Baseline:** `main` = `origin/main` @ **`99ea74a`** (deep-code remediation V1.0 MAIN-DCA-011…031). Run `xcodegen generate` before Xcode.
+**Documentazione italiana (panoramica):** [`Docs/PRODUCT_FEATURES_IT.md`](PRODUCT_FEATURES_IT.md) · **Indice:** [`Docs/INDEX.md`](INDEX.md) · **Baseline:** `main` = `origin/main` @ **`bf03fb0`**. Run `xcodegen generate` before Xcode.
 
 ## Safety and limitations (MAIN)
 
@@ -22,10 +22,13 @@ DIR DIVING is a **support and logging tool**: it records dives, surfaces ascent 
 - Run `./Scripts/validate_main_release_readiness.sh` before release.
 - Full workflow: [`Docs/BUILD_AND_XCODEGEN_WORKFLOW.md`](BUILD_AND_XCODEGEN_WORKFLOW.md).
 
-### Stato corrente (`main` = `origin/main`, 2026-06-14)
+### Stato corrente (`main` = `origin/main`, 2026-06-20)
 
 | Pass | Commit | Contenuto |
 |------|--------|-----------|
+| **Docs / branch alignment V3.0** | docs pass | INDEX, README, CSV, multi-activity scope @ HEAD — [`DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md) |
+| **MAIN deep code readiness 100%** | `bf03fb0` | CloudSync legacy migration, TOFU trust state, validate_main_deep_code_readiness.sh — [`MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_CURRENT.md) |
+| **Deep code analysis audit V3.0** | `f4f0a68` | Multi-activity scope; iOS/UI/UX/Watch math remediation bundle — [`MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md) |
 | **Docs / branch alignment** | docs pass | INDEX, README, CSV, branch policy @ `99ea74a` — [`DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md) |
 | **Deep code analysis remediation V1.0 (MAIN-DCA)** | `99ea74a` | MAIN-DCA-011…031 — metadata merge, photo ACK queue, aggregate KVS, alarm blink, briefing sanitize/swap, reminder suppression, sync flush, l10n — [`MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_V1.0.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_V1.0.md) |
 | **Deep code analysis audit (read-only)** | `009855e` | Audited @ `7c79105` — [`MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_BUG_PERFORMANCE_SECURITY_AUDIT_CURRENT.md) |

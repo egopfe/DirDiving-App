@@ -3,6 +3,7 @@ import SwiftUI
 struct PlannerBriefingCardsView: View {
     @EnvironmentObject private var briefingStore: PlannerBriefingCardStore
     @EnvironmentObject private var dive: DiveManager
+    @State private var selectedCard: PlannerBriefingCardMetadata?
 
     private var freshnessState: PlannerBriefingFreshnessState {
         PlannerBriefingFreshnessPolicy.evaluate(
@@ -58,16 +59,25 @@ struct PlannerBriefingCardsView: View {
                     ForEach(briefingStore.sortedCards) { card in
                         if let path = briefingStore.imagePaths[card.id],
                            let image = UIImage(contentsOfFile: path) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(card.title)
-                                    .font(.caption2.weight(.semibold))
-                                    .foregroundStyle(DiveUI.cyan)
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(maxWidth: .infinity)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                            Button {
+                                selectedCard = card
+                            } label: {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(card.title)
+                                        .font(.caption2.weight(.semibold))
+                                        .foregroundStyle(DiveUI.cyan)
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(maxWidth: .infinity)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                                }
                             }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(
+                                String(format: String(localized: "watch.planner_briefing.card_inventory.a11y"), card.title)
+                            )
+                            .accessibilityHint(String(localized: "watch.planner_briefing.card_detail.open.a11y"))
                         }
                     }
 
@@ -95,6 +105,15 @@ struct PlannerBriefingCardsView: View {
         }
         .onAppear {
             briefingStore.reload()
+        }
+        .sheet(item: $selectedCard) { card in
+            PlannerBriefingCardDetailSheet(
+                card: card,
+                imagePath: briefingStore.imagePaths[card.id],
+                freshnessState: freshnessState,
+                isDiveActive: dive.isDiveActive,
+                onDelete: { try? briefingStore.deleteBriefing() }
+            )
         }
     }
 }

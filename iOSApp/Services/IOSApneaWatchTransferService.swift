@@ -90,6 +90,12 @@ final class IOSApneaWatchTransferService: ObservableObject {
     }
 
     func send(package: ApneaSyncPackage) {
+#if DEBUG
+        if Self.testHook_bypassWatchConnectivityChecks {
+            enqueuePackageForTesting(package)
+            return
+        }
+#endif
         guard WCSession.isSupported() else {
             state = .failed(messageKey: "apnea.ios.watch.unsupported")
             return
@@ -174,6 +180,34 @@ final class IOSApneaWatchTransferService: ObservableObject {
     }
 
     #if DEBUG
+    static var testHook_bypassWatchConnectivityChecks = false
+
+    private func enqueuePackageForTesting(_ package: ApneaSyncPackage) {
+        do {
+            let data = try ApneaSyncCodec.encode(package)
+            pendingQueue.append(
+                PendingTransfer(
+                    packageID: package.body.packageID,
+                    revision: package.body.revision,
+                    checksum: package.payloadChecksumSHA256,
+                    packageData: data,
+                    enqueuedAt: Date()
+                )
+            )
+            currentPackage = package
+            activePackageID = package.body.packageID
+            nextRevision = max(nextRevision, package.body.revision + 1)
+            state = .awaitingAck(
+                packageID: package.body.packageID,
+                revision: package.body.revision,
+                checksum: package.payloadChecksumSHA256
+            )
+        } catch {
+            state = .failed(messageKey: "apnea.ios.watch.encode_failed")
+            lastErrorMessage = "apnea.ios.watch.encode_failed"
+        }
+    }
+
     func testing_handleAck(_ ack: ApneaSyncTransferSupport.ParsedAck) {
         handleAck(ack)
     }

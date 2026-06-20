@@ -28,7 +28,8 @@ final class PlannerAscentTableTests: XCTestCase {
         ]
         let plan = PlannerService.makePlan(input: input)
         if plan.decoStops.isEmpty {
-            throw XCTSkip("No deco stops for profile")
+            XCTFail("No deco stops for profile")
+            return
         }
         let stopRows = plan.ascentTableRows.filter { $0.kind == .decoStop }
         XCTAssertEqual(stopRows.count, plan.decoStops.count)
@@ -81,7 +82,8 @@ final class PlannerAscentTableTests: XCTestCase {
         ]
         let plan = PlannerService.makePlan(input: input)
         if plan.decoStops.isEmpty {
-            throw XCTSkip("No deco stops for profile")
+            XCTFail("No deco stops for profile")
+            return
         }
         XCTAssertEqual(plan.ascentTableRows.last?.kind, .surface)
     }
@@ -96,7 +98,8 @@ final class PlannerAscentTableTests: XCTestCase {
         let engine = BuhlmannPlanner.enginePlan(input: input)
         let stops = BuhlmannPlanner.decoStops(from: engine)
         if stops.isEmpty {
-            throw XCTSkip("No deco stops for profile")
+            XCTFail("No deco stops for profile")
+            return
         }
         let rows = PlannerAscentTableBuilder.rows(from: engine, decoStops: stops, environment: environment())
 
@@ -133,7 +136,8 @@ final class PlannerAscentTableTests: XCTestCase {
         ]
         let plan = PlannerService.makePlan(input: input)
         if plan.decoStops.isEmpty {
-            throw XCTSkip("No deco stops for profile")
+            XCTFail("No deco stops for profile")
+            return
         }
         for row in plan.ascentTableRows where row.kind != .surface {
             XCTAssertTrue(row.ppO2.isFinite)
@@ -142,14 +146,42 @@ final class PlannerAscentTableTests: XCTestCase {
         }
     }
 
-    func testIncompletePlanSuppressesDecompressionTableRows() throws {
-        var input = BuhlmannTestSupport.gasPlanInput(depth: 120, bottomMinutes: 120)
-        input.bottomGas = GasMix(name: "Air", role: .bottom, oxygen: 0.21, helium: 0, maxPPO2: 1.4)
-        let plan = PlannerService.makePlan(input: input)
-        if plan.calculationCompleteness != .incompletePartialStops {
-            throw XCTSkip("Profile did not hit calculation limit")
-        }
-        XCTAssertTrue(plan.decoStops.isEmpty)
+    func testIncompletePlanSuppressesDecompressionTableRows() {
+        let gas = BuhlmannTestSupport.air(switchDepth: 30)
+        let stop = BuhlmannDecompressionStop(
+            depthMeters: 21,
+            minutes: 5,
+            gas: gas,
+            ppO2: 1.2,
+            maxPPO2: 1.4,
+            gradientFactor: 0.7
+        )
+        let engine = BuhlmannEngineResult(
+            ndlMinutes: 0,
+            ttsMinutes: 45,
+            totalRuntimeMinutes: 60,
+            descentMinutes: 2,
+            bottomMinutes: 30,
+            gasSwitchMinutes: 0,
+            finalTissueState: nil,
+            stops: [stop],
+            segments: [],
+            tissueHistory: .empty,
+            issues: [.calculationLimitReached],
+            modelState: .modelIncomplete
+        )
+        let resolution = PlanCalculationCompletenessResolver.resolve(
+            enginePlan: engine,
+            stops: engine.stops.map(BuhlmannPlanner.makeDecoStop)
+        )
+        XCTAssertEqual(resolution.completeness, .incompletePartialStops)
+        XCTAssertTrue(resolution.presentationStops.isEmpty)
+        let rows = PlannerAscentTableBuilder.rows(
+            from: engine,
+            decoStops: resolution.presentationStops,
+            environment: .seaLevelSaltWater
+        )
+        XCTAssertFalse(rows.contains { $0.kind == .decoStop })
     }
 
     func testRuntimeTableDecoStopsAreMarkedAsDecoStop() throws {
@@ -161,7 +193,8 @@ final class PlannerAscentTableTests: XCTestCase {
         ]
         let plan = PlannerService.makePlan(input: input)
         if plan.decoStops.isEmpty {
-            throw XCTSkip("No deco stops for profile")
+            XCTFail("No deco stops for profile")
+            return
         }
         let stopRows = plan.ascentTableRows.filter { $0.kind == .decoStop }
         XCTAssertEqual(stopRows.count, plan.decoStops.count)
@@ -178,7 +211,8 @@ final class PlannerAscentTableTests: XCTestCase {
         let engine = BuhlmannPlanner.enginePlan(input: input)
         let stops = BuhlmannPlanner.decoStops(from: engine)
         if stops.isEmpty {
-            throw XCTSkip("No deco stops for profile")
+            XCTFail("No deco stops for profile")
+            return
         }
         let rows = PlannerAscentTableBuilder.rows(from: engine, decoStops: stops, environment: environment())
         let decoDepths = rows.filter { $0.kind == .decoStop }.map(\.depthMeters)
@@ -196,7 +230,8 @@ final class PlannerAscentTableTests: XCTestCase {
         ]
         let plan = PlannerService.makePlan(input: input, mode: .technical)
         if plan.decoStops.isEmpty {
-            throw XCTSkip("No deco stops for profile")
+            XCTFail("No deco stops for profile")
+            return
         }
         XCTAssertGreaterThan(plan.ascentTableRows.filter { $0.kind == .travel }.count, 0)
     }
@@ -241,13 +276,15 @@ final class PlannerAscentTableTests: XCTestCase {
         ]
         let plan = PlannerService.makePlan(input: input)
         if plan.decoStops.count < 2 {
-            throw XCTSkip("Need at least two deco stops for interleaving")
+            XCTFail("Need at least two deco stops for interleaving")
+            return
         }
         let kinds = plan.ascentTableRows.map(\.kind)
         guard let firstDeco = kinds.firstIndex(of: .decoStop),
               let lastDeco = kinds.lastIndex(of: .decoStop),
               firstDeco != lastDeco else {
-            throw XCTSkip("Need distinct deco stop rows")
+            XCTFail("Need distinct deco stop rows")
+            return
         }
         XCTAssertTrue(kinds[firstDeco..<lastDeco].contains(.travel))
         if let lastTravel = kinds.lastIndex(of: .travel) {
@@ -264,7 +301,8 @@ final class PlannerAscentTableTests: XCTestCase {
         ]
         let plan = PlannerService.makePlan(input: input)
         if plan.decoStops.isEmpty {
-            throw XCTSkip("No deco stops for profile")
+            XCTFail("No deco stops for profile")
+            return
         }
         guard let bottomIndex = plan.ascentTableRows.firstIndex(where: { $0.kind == .bottom }) else {
             XCTFail("Missing bottom row")
@@ -284,7 +322,8 @@ final class PlannerAscentTableTests: XCTestCase {
         ]
         let plan = PlannerService.makePlan(input: input)
         if plan.decoStops.isEmpty {
-            throw XCTSkip("No deco stops for profile")
+            XCTFail("No deco stops for profile")
+            return
         }
         XCTAssertEqual(plan.ascentTableRows.filter { $0.kind == .decoStop }.count, plan.decoStops.count)
     }
@@ -298,7 +337,8 @@ final class PlannerAscentTableTests: XCTestCase {
         ]
         let plan = PlannerService.makePlan(input: input)
         if plan.decoStops.isEmpty {
-            throw XCTSkip("No deco stops for profile")
+            XCTFail("No deco stops for profile")
+            return
         }
         let stopRows = plan.ascentTableRows.filter { $0.kind == .decoStop }
         XCTAssertEqual(stopRows.map(\.depthMeters), plan.decoStops.map(\.depthMeters))
@@ -322,7 +362,8 @@ final class PlannerAscentTableTests: XCTestCase {
         ]
         let plan = PlannerService.makePlan(input: input, mode: .technical)
         if plan.decoStops.isEmpty {
-            throw XCTSkip("No deco stops for profile")
+            XCTFail("No deco stops for profile")
+            return
         }
         let engine = BuhlmannPlanner.enginePlan(input: input)
         let lastBottom = engine.segments.lastIndex(where: { $0.kind == .bottom }) ?? -1

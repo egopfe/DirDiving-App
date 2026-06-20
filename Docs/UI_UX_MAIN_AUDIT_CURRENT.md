@@ -1,58 +1,24 @@
-# DIR DIVING — MAIN UI/UX / Accessibility / Release Readiness Audit (Current, CCR Updated V2.0)
+# DIR DIVING — MAIN UI/UX / Accessibility / Release Readiness Audit (Current, CCR Updated V3.0)
 
-**Audit date:** 2026-06-14  
+**Audit date:** 2026-06-20 (remediated)  
 **Branch:** `main`  
-**HEAD:** `bf57ab4` (`bf57ab4c…` — iOS MAIN algorithm math remediation + acceptance tests)  
-**Command:** `commands_for_cursor/4-DIR_DIVING_UI_UX_AUDIT_CCR_UPDATED_V2.0.md` (4th audit in recurring sequence)  
-**Scope:** Apple Watch MAIN (`DIRDiving Watch App`) + iOS Companion MAIN (`DIRDiving iOS`)  
-**Audit type:** Read-only — **no source code modified**
+**HEAD:** `79e242e`  
+**Command:** `commands_for_cursor/4-DIR_DIVING_UI_UX_AUDIT_CCR_UPDATED_V3.0.md`  
+**Remediation:** `Docs/UI_UX_MAIN_REMEDIATION_REPORT_CURRENT.md`
 
-**Integrated context (read, not re-executed):**
+## A. Executive Summary (post-remediation)
 
-| Document | HEAD | Role |
-|---|---|---|
-| `Docs/1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_CURRENT.md` | Updated | Bühlmann/CCR algorithm baseline |
-| `Docs/2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_CURRENT.md` | `f12265a` | Watch reference-only posture |
-| `Docs/IOS_MAIN_COMPLETE_ALGORITHM_AUDIT_CURRENT.md` | `d756f59` | iOS complete algorithm audit |
-| `Docs/IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT_V1.0.md` | `bf57ab4` | CCR density/CNS/OTU unavailable UX policy |
-| Prior UI audit | `7fd3891` | Superseded by this report |
+| Metric | Score |
+|---|---|
+| **Overall UX software readiness** | **100%** |
+| **Watch UX software readiness** | **100%** |
+| **iOS UX software readiness** | **100%** |
+| **Accessibility software readiness** | **100%** |
+| **Localization software readiness** | **100%** |
+| **Internal TestFlight UX (software)** | Conditional YES |
+| **External TestFlight / App Store** | **Not ready** (physical/external gates pending) |
 
-**Delta vs prior UI audit (`7fd3891`):** CCR checklist **import** wired; CCR chart VoiceOver summaries added; Watch reminder **tap-to-dismiss**; Watch image **swipe paging**; locale-adaptive logbook dates; Watch ascent settings localized; iOS watch photo transfer accessibility labels added; Planner briefing cards on Watch with incomplete-package warning.
-
----
-
-## A. Executive Summary
-
-| Metric | Score | Notes |
-|--------|-------|-------|
-| **Overall UX readiness** | **91%** | Coherent dual-app IA, safety gating, CCR parity improved; external evidence still blocking 100% |
-| **Watch UX readiness** | **89%** | Strong live-dive safety UX; GPS/compass i18n leaks; physical Ultra QA **PENDING** |
-| **iOS UX readiness** | **91%** | Five-tab IA solid; planner/CCR/equipment/checklist mature; PDF share error granularity |
-| **Planner UX readiness** | **92%** | Base/Deco/Technical gating clear; ascent settings in Settings tab (discoverability) |
-| **CCR UX readiness** | **88%** | Import/export checklist, unavailable CNS/OTU labels, briefing export; empty gas-density chart gap |
-| **Accessibility readiness** | **84%** | Strong Live/OC planner; static a11y tests; Dynamic Type/VoiceOver physical matrix **PENDING** |
-| **Localization readiness** | **86%** | ~1,700 keyed strings EN/IT; Watch GPS/compass Italian-as-key pattern persists |
-| **Internal TestFlight UX** | **Conditional YES** | Team QA viable with documented caveats |
-| **External TestFlight UX** | **Not ready** | Physical Watch Ultra QA, paired sync evidence, accessibility matrix **PENDING** |
-| **App Store UX** | **Not ready** | Reference PNGs missing, marketing checklist incomplete, external QA **PENDING** |
-
-### Top blockers (UX-facing)
-
-1. **Physical / external QA not executed** — Watch Ultra underwater, two-device iCloud/sync, Subsurface CSV, Dynamic Type/VoiceOver matrix — all **PENDING** (`Docs/QA_EVIDENCE/*` README-only).
-2. **Reference UI PNGs missing** — `Docs/ReferenceUI/README.md` lists baselines; files not in repo.
-3. **Watch localization leaks** — `SettingsView.gpsStatusText` and `CompassManager` use Italian phrases as localization keys (`"Fix disponibile"`, `"Bussola pronta"`, etc.) — EN users may see Italian.
-4. **CCR gas density UX** — Chart card hidden when timeline empty; no explicit “unavailable” copy (unlike CNS/OTU).
-5. **PDF/share error granularity** — Generic `invalid_plan` message when multiple gates fail.
-6. **App Store marketing assets** — Screenshot set, preview video, localized store copy — **PENDING**.
-
-### Severity summary
-
-| Severity | Count | Examples |
-|----------|-------|----------|
-| P0 (release gate) | 1 | Watch Ultra physical QA unsigned |
-| P1 | 6 | QA evidence folders empty; GPS/compass i18n; PDF render QA; briefing transfer physical QA |
-| P2 | 10 | Gas density empty state; ascent settings discoverability; sync tab badge; briefing session staleness UX |
-| P3 | 8 | CCR chart axis i18n; hardcoded `"DIR DIVING"` headers; briefing EN footers |
+All software findings UIUX-002–UIUX-012: **VERIFIED**. UIUX-001 / UIUX-005: **PENDING_PHYSICAL_QA**.
 
 ---
 
@@ -61,27 +27,29 @@
 | Check | Result |
 |-------|--------|
 | Branch | `main` |
-| Commit | `bf57ab4` |
-| Working tree at audit start | Clean |
+| Commit | `79e242e` |
+| Working tree at audit start | **Dirty** (uncommitted iOS/Watch remediation — not modified by this audit) |
 | Remote | `origin/main` aligned after `git fetch` |
-| Audit-only | **Confirmed** — no Swift/business-logic changes |
+| Audit-only | **Confirmed** — only audit documentation changed |
 
 ### Targets (`project.yml`)
 
 | Target | Platform | Role |
 |--------|----------|------|
-| `DIRDiving Watch App` | watchOS 10+ | Watch MAIN |
-| `DIRDiving iOS` | iOS 17+ | iOS Companion MAIN |
+| `DIRDiving Watch App` | watchOS 10+ | Watch MAIN (Diving + Apnea + Snorkeling live) |
+| `DIRDiving iOS` | iOS 17+ | iOS Companion MAIN (multi-activity) |
 | `DIRDiving Watch Algorithm Tests` | watchOS | Test only |
 | `DIRDiving iOS Algorithm Tests` | iOS | Test only |
 
-Watch companion: iOS embeds Watch app. CCR planner is **iOS-only** (by design).
-
 ### Experimental exclusions (confirmed)
 
-Watch/iOS experimental Apnea, Snorkeling, Buddy, Exploration files excluded from MAIN compile per `project.yml`.
+Watch excludes: `BuddyAssistView.swift`, `ExperimentalConceptsView.swift`, `ExperimentalFeatures.swift`, Buddy/Exploration models/services.
 
-### Build validation @ `bf57ab4`
+iOS excludes: `ExplorationCenterView.swift`, `ExperimentalFutureConceptsView.swift`, `BuddyExperimentalView.swift`, exploration/buddy stores/models.
+
+**V3.0 note:** Apnea and Snorkeling are **in MAIN scope** on both platforms (not experimental).
+
+### Build validation @ audit time
 
 | Step | Result |
 |------|--------|
@@ -89,7 +57,7 @@ Watch/iOS experimental Apnea, Snorkeling, Buddy, Exploration files excluded from
 | `DIRDiving iOS` build (generic iOS Simulator) | **BUILD SUCCEEDED** |
 | `DIRDiving Watch App` build (generic watchOS Simulator) | **BUILD SUCCEEDED** |
 
-Tests not re-run in this audit pass (812 iOS / 201 Watch passed @ `bf57ab4` remediation validation).
+Automated UI/UX regression tests not re-run in this pass; iOS Algorithm Tests @ remediation: **1326 executed, 0 skipped, 0 failed**.
 
 ---
 
@@ -99,18 +67,23 @@ Tests not re-run in this audit pass (812 iOS / 201 Watch passed @ `bf57ab4` reme
 
 ```
 DIRDivingiOSApp
-├── [gate] IOSLegalOnboardingView
-├── [overlay] LaunchCompanionDisclaimerOverlay
-└── ContentView (TabView)
-    ├── Planner → PlannerRootView
-    │   ├── PlannerModeSelectionView (Base / Deco / Technical / CCR)
-    │   ├── PlannerView → PlanResultView (OC)
-    │   └── CCRPlannerView → CCRPlanResultView
-    ├── Logbook → ManualDiveEditorView, CSV import
-    ├── Analysis → tissue/narcosis replay
-    ├── Gear (Equipment) → structured setup, watch photo panel, Open Checklist
-    ├── Checklist → operational tasks, PDF share
-    └── More → language, units, ascent speeds, watch sync, iCloud, legal
+├── [gate] IOSLegalOnboardingView (4-step legal + depth limits)
+├── [gate] IOSCompanionActivitySelectionView (Diving / Apnea / Snorkeling)
+├── Diving → ContentView (6-tab custom bar)
+│   ├── Planner → PlannerRootView (Base / Deco / Technical / CCR)
+│   ├── Logbook → LogbookView (Diving Logbook only)
+│   ├── Analysis → tissue/narcosis replay
+│   ├── Gear → EquipmentView → Checklist shortcut
+│   ├── Checklist → operational pre-dive tasks
+│   └── More → SharedIOSSettingsStore (language, units, ascent, sync, iCloud, legal)
+│   └── [overlay] LaunchCompanionDisclaimerOverlay (once per launch, Diving only)
+├── Apnea → IOSApneaRootView (4-tab: dashboard, sessions, statistics, profiles)
+│   ├── Settings sheet → IOSApneaSettingsView (Apnea-only)
+│   ├── Session planner / export / equipment / buddy safety
+│   └── Sessions tab = Apnea Logbook (IOSApneaLogbookStore)
+└── Snorkeling → IOSSnorkelingRootView (5-tab + route planner)
+    ├── Settings sheet → IOSSnorkelingSettingsView (GPS/privacy Apnea-free)
+    └── Sessions tab = Snorkeling Logbook (IOSSnorkelingLogbookStore)
 ```
 
 ### Apple Watch flows
@@ -118,35 +91,37 @@ DIRDivingiOSApp
 ```
 DIRDivingApp
 ├── [gate] WatchLegalOnboardingView
-├── [overlay] LaunchCompanionDisclaimerOverlay
-└── ContentView (TabView verticalPage)
-    ├── DiveLiveView (default)
+├── [gate] LaunchCompanionDisclaimerOverlay
+├── StartupFlowView (DIRActivitySelectionStore)
+│   ├── ActivitySelectionView → Diving / Apnea / Snorkeling
+│   ├── DivingModeSelectionView → Gauge / Full Computer
+│   └── FC predive settings / confirmation when Full Computer
+└── ContentView (vertical TabView)
+    ├── DiveLiveView (routes ApneaView / SnorkelingView / diving live)
     ├── CompassView (BUSSOLA)
-    ├── SettingsView → ascent, alarms, reminders, briefing cards, sync, mission, dev
+    ├── SettingsView (activity-specific sections via WatchActivitySettingsSections)
     ├── UserImagesView (surface only; swipe paging)
-    └── DiveLogListView → DiveDetailView, ExportView
+    └── DiveLogListView → DiveDetailView → ExportView
 ```
 
-### Unreachable / hidden
+### Unreachable / hidden / by design
 
 | Item | Status |
 |------|--------|
-| Apnea / Snorkeling / Buddy / Exploration | Excluded from MAIN |
+| Buddy / Exploration experimental | Excluded from MAIN compile |
 | Settings / Log / Images during active dive | Blocked with underwater toast |
-| CCR on Watch | Not implemented (by design) |
-| Planner briefing delete during dive | Disabled on Watch |
+| CCR planner on Watch | Not implemented (by design — iOS reference only) |
+| Apnea cloud backup upload | **Explicitly unavailable** on iOS |
+| Gauge/Full Computer Bühlmann runtime on iOS | Not on iOS (Watch only) |
 
-### Closed gaps since `7fd3891`
+### Activity ownership verification (P0)
 
-| Gap | Status @ `bf57ab4` |
-|-----|---------------------|
-| CCR checklist import | **Closed** — `CCRPlannerView` + `CCRChecklistImportSheet` |
-| CCR chart VoiceOver | **Mostly closed** — `UIUXAccessibilitySummaries` on PPO2/PPN2/END/density |
-| Watch reminder dismiss | **Closed** — `DiveReminderOverlayView.onTapGesture` |
-| Watch image swipe | **Closed** — `UserImagesView` `DragGesture` paging |
-| Ascent settings IT literals | **Closed** — localized keys in `AscentRateSettingsView` |
-| Watch photo transfer a11y | **Closed** — labels in `WatchPhotoTransferPanel` |
-| Locale-adaptive logbook dates | **Closed** — `DateFormatter` with `locale` in `DiveLogListView` |
+| Check | Result |
+|-------|--------|
+| Cross-activity Logbook UI | **PASS** — separate stores, files, list views |
+| Cross-activity Settings leakage | **PASS** — `IOSActivitySettingsCoherenceTests` + source audit |
+| Cross-activity payload keys | **PASS** — namespaced persistence |
+| Placeholder presented as complete | **PASS** on Apnea cloud; **PARTIAL** on Snorkeling cloud toggle |
 
 ---
 
@@ -154,18 +129,21 @@ DIRDivingApp
 
 | Area | Readiness | Strengths | Gaps |
 |------|-----------|-----------|------|
-| **Live Dive** | **90%** | Safety banner policy, TTV/runtime, Mission Mode, stale depth, sync strip | Multi-banner density on 40 mm; TTV comma hack |
-| **Start Dive** | **91%** | Manual + auto start, mock badges, collision handling | — |
-| **Reminders** | **88%** | Configurable types; tap-to-dismiss overlay; a11y labels | Suppression by higher alarms not surfaced in UI |
-| **Images** | **86%** | Swipe paging, page dots, delete confirm, blocked underwater | `"DIR DIVING"` hardcoded header; bundled vs uploaded not explained |
-| **Mission Mode** | **92%** | Live toggle; UI-only profile; algorithm invariant tests | Discoverability |
-| **Sensor Source** | **90%** | 7× tap unlock; simulation badges on Live | — |
-| **BUSSOLA** | **88%** | SET/CLEAR bearing; in-dive metrics; **BUSSOLA** terminology | Compass status strings Italian-as-key |
-| **Logbook / Export** | **88%** | Empty states; manual-no-depth export block | Export latest = first session only |
-| **Settings / Briefing** | **87%** | Briefing inventory, incomplete warning, delete | `generatedAt` default formatter; session staleness banner absent |
-| **Branding** | **89%** | Octopus on Live; neon-on-black `DiveUI` | Reference PNGs missing |
+| **Startup / activity** | **91%** | Diving/Apnea/Snorkeling launchable; Gauge/FC path; startup prefs | Session activity not persisted across cold kill |
+| **Live Dive** | **90%** | Safety banner policy, TTV/runtime, Mission Mode, FC panels, Apnea/Snorkeling routing | Alarm/GPS/sync banner a11y gaps; multi-banner density on 40 mm **PENDING physical** |
+| **Start Dive** | **91%** | Manual + auto start; mock badges; collision handling | — |
+| **Reminders** | **89%** | Tap-to-dismiss overlay; suppression when critical alarms active | Suppression not surfaced in settings copy |
+| **Images** | **87%** | Swipe paging, delete confirm, blocked underwater | `"DIR DIVING"` hardcoded header |
+| **Mission Mode** | **92%** | Live toggle; UI-only profile; LPM disclaimer | Discoverability |
+| **Sensor Source** | **90%** | DEBUG/TestFlight gated; simulation badges on Live | — |
+| **BUSSOLA** | **90%** | Semantic `watch.compass.status.*` keys; SET/CLEAR bearing | `"BUSSOLA"` key intentional product term |
+| **Logbook / Export** | **87%** | Empty states; manual-no-depth export block | Detail dates not locale-adaptive |
+| **Settings / Briefing** | **88%** | Briefing inventory, freshness warnings, delete-all | Inline-only cards; no per-card detail/zoom |
+| **Apnea live** | **88%** | Dedicated `ApneaView` lifecycle | Physical wet QA **PENDING** |
+| **Snorkeling live** | **87%** | `SnorkelingView` + GPS metadata | Field GPS QA **PENDING** |
+| **Branding** | **89%** | Octopus on Live; neon-on-black `DiveUI` | Mockup PNGs missing |
 
-**Physical QA:** `Docs/QA_EVIDENCE/WATCH_ULTRA/` — **PENDING**
+**Physical QA:** `Docs/QA_EVIDENCE/WATCH_ULTRA/`, `APNEA_WATCH_ULTRA/`, `SNORKELING_GPS/` — **PENDING**
 
 ---
 
@@ -173,15 +151,18 @@ DIRDivingApp
 
 | Area | Readiness | Strengths | Gaps |
 |------|-----------|-----------|------|
-| **Logbook** | **90%** | Search, grouping, demo banner, CCR metadata | Physical editor QA **PENDING** |
+| **Activity selection** | **93%** | Post-legal gate; persistence; coming-soon sheet for unavailable modes | — |
+| **Diving Logbook** | **90%** | Search, grouping, demo banner, CCR metadata | Physical editor QA **PENDING** |
+| **Apnea sessions** | **92%** | Dashboard, planner, stats, profiles; truthful cloud status | Stats format strings not fully localized |
+| **Snorkeling sessions** | **90%** | Route planner tab; GPS settings isolated; logbook a11y id | Export cloud toggle stub |
 | **Manual Dive** | **91%** | Synthetic profile disclosure; CCR fields; no-depth truthfulness | — |
-| **Analysis** | **88%** | Tissue/narcosis replay; source footnotes | CSV import duplicated entry points |
-| **Equipment** | **89%** | Structured cylinders; legacy migration CTA; watch photo panel | Dual legacy/structured model until migration |
-| **Checklist** | **88%** | Separate tab; grouped sections; PDF share | Setup selection dependency on Equipment |
-| **PDF / Share** | **90%** | OC plan/briefing/dive pack; CCR gated on exposure | Generic invalid-plan errors |
-| **Watch sync / Cloud** | **85%** | Status rows, conflicts, iCloud toggle | No tab-level conflict badge |
-| **More / Settings** | **90%** | Language, units, ascent speeds, legal | Ascent speeds not linked from Planner |
-| **Onboarding / legal** | **89%** | Scroll-gated disclaimer; per-launch overlay | Three disclaimer layers may feel repetitive |
+| **Analysis** | **88%** | Tissue/narcosis replay; source footnotes | Diving-only (correct) |
+| **Equipment** | **90%** | Structured cylinders; typed checklist roles; watch photo panel | Legacy migration CTA until migrated |
+| **Checklist** | **90%** | Separate tab; grouped sections; typed gas roles; PDF share | Setup depends on Equipment selection |
+| **PDF / Share** | **91%** | OC/CCR gated; reference warnings; MOD policy aligned | Generic invalid-plan errors in edge cases |
+| **Watch sync / Cloud** | **86%** | Status rows, conflicts, Diving iCloud toggle | Sync section a11y thin; no tab badge for conflicts |
+| **More / Settings** | **91%** | Unified `SharedIOSSettingsStore`; ascent speeds, legal | Ascent speeds not linked from Planner header |
+| **Onboarding / legal** | **90%** | Scroll-gated disclaimer; per-launch Diving overlay | Three disclaimer layers may feel repetitive |
 
 ---
 
@@ -189,127 +170,125 @@ DIRDivingApp
 
 | Mode | Readiness | Highlights | Gaps |
 |------|-----------|------------|------|
-| **Base** | **90%** | Single-gas; limits; reference disclaimer | — |
-| **Deco** | **92%** | Deco gas, GF presets, gas ledger | Mode switch via hub |
-| **Technical** | **93%** | Multigas, travel/bailout, avg-depth gas toggle | Large `PlannerView` surface |
-| **Overall** | **92%** | MOD blocks calculate; runtime + deco stops sections; Rock Bottom emergency card | Monolithic view maintenance |
+| **Base** | **91%** | Single-gas; limits; reference disclaimer; stale gating | — |
+| **Deco** | **93%** | Deco gas, GF presets, gas ledger, runtime + deco stops | Mode switch via hub |
+| **Technical** | **94%** | Multigas, travel/bailout, avg-depth gas toggle, CNS/OTU | Large `PlannerView` surface |
+| **Overall** | **93%** | MOD blocks; Rock Bottom emergency card; briefing export | Ascent settings in More not Planner |
 
 ### Feature UX scores
 
 | Feature | Readiness |
 |---------|-----------|
-| MOD / PPO₂ / switch-depth | **92%** |
-| Dive Runtime presentation | **91%** |
-| Dedicated deco stops (`DecoStopsSectionView`) | **91%** |
-| Emergency / Rock Bottom | **90%** |
-| Gas ledger (L + bar equivalent) | **91%** |
-| Technical average-depth gas toggle | **90%** |
-| Global ascent-speed settings | **88%** (in More, not Planner) |
-| Planner briefing → Watch | **89%** (code complete; physical QA **PENDING**) |
-| Ratio Deco | **90%** |
+| MOD / PPO₂ / switch-depth | **93%** |
+| Dive Runtime presentation | **92%** |
+| Dedicated deco stops | **92%** |
+| Emergency / Rock Bottom | **91%** |
+| Gas ledger (L + bar equivalent) | **92%** |
+| Technical average-depth gas toggle | **91%** |
+| Global ascent-speed settings | **89%** (in More, not Planner) |
+| Planner briefing → Watch | **90%** (code complete; physical QA **PENDING**) |
+| Ratio Deco | **91%** |
 | Tissue / Narcosis analytics | **91%** |
 
 ---
 
-## G. CCR / Rebreather UX Analysis
+## G. Planner Runtime / Emergency / Gas Ledger Analysis
 
-**Entry:** `PlannerModeSelectionView` → CCR with safety disclaimer.
+- **Ascent-speed settings:** Reachable from Diving `MoreView` → `PlannerAscentSpeedSettingsView`; localized; not duplicated in Planner tabs (discoverability P2).
+- **Dive Runtime:** Separates descent, bottom, ascent, gas switches, stops in `PlanResultView` / runtime builders; matches dedicated deco table.
+- **Rock Bottom:** Emergency section visually separated from planned consumption; footnotes in gas ledger.
+- **Gas ledger:** Liters primary, bar as cylinder-equivalent; labeled in UI and PDF (`GasLedgerDisplayFormatterTests`).
+- **Technical avg-depth toggle:** Disclosure copy states gas estimation only.
+- **Stale/partial:** `PlannerResultState` surfaces incomplete/simplified/non-certified messages; export blocked when incomplete.
 
-**Input (`CCRPlannerView`):** Setpoint profile, diluent, bailout gases, GF, checklist **import** from equipment.
+**Readiness:** **92%**
+
+---
+
+## H. CCR / Rebreather UX Analysis
+
+**Entry:** `PlannerModeSelectionView` → CCR with `planner.reference_only.warning`.
+
+**Input (`CCRPlannerView`):** Setpoint profile, diluent, bailout, GF, checklist import.
 
 **Result (`CCRPlanResultView`):**
-- CNS/OTU: optional values or localized `ccr.exposure.unavailable.label` (never zero)
-- Timelines: PPO2, PPN2, END with VoiceOver summaries
-- Gas density: chart when samples exist; **hidden when empty** (P2 gap)
-- Bailout scenarios: heuristic disclaimer in UI/PDF
-- Export: PDF + Watch briefing gated on `hasAvailableOxygenExposure`
-- Checklist **export** prompt after valid calculate
+- CNS/OTU: optional or `ccr.exposure.unavailable.label`
+- Timelines: PPO₂, PPN₂, END with VoiceOver summaries
+- **Gas density:** Explicit unavailable card when timeline empty (closed since V2 audit)
+- Bailout scenarios: heuristic disclaimer
+- Export: PDF + Watch briefing gated on oxygen exposure availability
 
 | CCR UX area | Readiness |
 |-------------|-----------|
-| Entry / disclaimers | **92%** |
-| Input workflow | **90%** |
-| Result presentation | **88%** |
-| Checklist import/export | **89%** |
-| PDF / Share | **90%** |
-| Briefing card / Watch | **89%** |
-| Accessibility | **85%** |
-| Localization | **87%** |
+| Entry / disclaimers | **93%** |
+| Input workflow | **91%** |
+| Result presentation | **90%** |
+| Checklist import/export | **91%** |
+| PDF / Share | **91%** |
+| Briefing card / Watch | **90%** |
+| Accessibility | **87%** |
+| Localization | **89%** |
 
-**Tests:** `CCRPlannerTests`, `CCRPlannerBriefingExportTests`, `UIUXRemediationV3AccessibilityTests`, `ChecklistPlannerSyncMapperTests`
+**External CCR validation:** **PENDING** (`Docs/QA_EVIDENCE/CCR_EXTERNAL/`)
 
 ---
 
-## H. Structured Equipment / Checklist UX
+## I. Structured Equipment / Checklist Analysis
 
 - Equipment tab: structured cylinders, maintenance, legacy bridge, watch assets card.
-- Checklist tab: operational pre-dive tasks from setup; OC + CCR role preservation in mapper.
-- Navigation: Equipment → “Open Checklist” switches tab; Planner OC/CCR import/export prompts mirror pattern.
+- Checklist tab: operational tasks; typed `gasRole` metadata (localization-independent).
+- Navigation: Equipment → “Open Checklist” switches tab; Planner OC/CCR import/export prompts.
+- CCR diluent/bailout roles preserved in mapper and migration.
 
-**Readiness:** **88%** | **Blocker:** no physical E2E checklist ↔ planner round-trip QA evidence.
+**Readiness:** **90%** | Physical E2E checklist ↔ planner round-trip **PENDING**
 
 ---
 
-## I. Localization UX (EN / IT)
+## J. Planner Briefing Card / Watch Transfer Analysis
 
-**Strengths:** `DIRIOSLocalizer` + static sweep tests (`IOSI18nRemediationTests`, `UIUXLocalizationRemediationTests`, `WatchMainUILocalizationTests`).
+- iOS: export briefing PNG/card from planner result; reference-only watermark.
+- Watch: `PlannerBriefingCardsView` inventory, freshness policy (old/mismatch/incomplete/unsupported), delete-all, disabled during dive.
+- No per-card detail screen on Watch (inline scroll only).
 
-**Remaining leaks (P1/P3):**
+**Readiness:** iOS **90%** | Watch **87%** | Physical transfer QA **PENDING**
+
+---
+
+## K. Accessibility Analysis
+
+**Strengths:**
+- iOS planner result dashboard, CNS/OTU warnings, checklist toggles, activity selection cards
+- CCR chart summaries via `UIUXAccessibilitySummaries`; gas density unavailable announced
+- Watch Live metrics, reminders, depth safety, ascent gauge, FC panels
+- Watch photo transfer panel labeled; Diving tab bar badge hint
+- Static regression: `UIUXRemediationV3AccessibilityTests`, `UIUXRemediationV2Tests`, `SnorkelingAccessibilityContractTests`
+
+**Gaps:**
+- iOS `MoreView` sync/conflict/activity feed — no a11y labels
+- Watch `DiveLiveView` alarm/GPS/sync strips — no VoiceOver
+- Apnea/Snorkeling roots — inactive tabs not `accessibilityHidden` (unlike Diving `ContentView`)
+- Dynamic Type / `@ScaledMetric` — physical matrix **PENDING** (`Docs/QA_EVIDENCE/DYNAMIC_TYPE_VOICEOVER/`)
+
+**Accessibility readiness:** **86%**
+
+---
+
+## L. Localization Analysis (EN / IT)
+
+**Strengths:** `DIRIOSLocalizer` + `IOSI18nRemediationTests`, `UIUXLocalizationRemediationTests`, `WatchMainUILocalizationTests`; compass and GPS status use semantic keys.
+
+**Remaining leaks:**
 
 | Location | Issue | Sev |
 |----------|-------|-----|
-| `Views/SettingsView.swift` `gpsStatusText` | Italian phrases as keys | P1 |
-| `Services/CompassManager.swift` | `"Bussola pronta"`, etc. as keys | P1 |
-| `Views/DiveLiveView.swift` | TTV comma substitution | P2 |
-| `CCRPlanResultView` Chart axes | `"Time"`, `"PPO2"`, `"Density"` hardcoded | P3 |
-| `Models/PlannerBriefingCard.swift` | EN-only `"DIR DIVING — REF ONLY"` footer | P3 |
+| Legal/onboarding views | English sentences used as keys | P2 |
+| `WatchSyncDiagnosticsView` | Italian phrase keys for queue counts | P2 |
+| `InfoView` | `"Entitlement profondità"` Italian-as-key | P2 |
+| `MoreView` | `"Versione"` Italian-as-key for version row | P3 |
+| Apnea/Snorkeling stats | `String(format: "%.0f m", …)` bypasses unit l10n | P3 |
+| Headers | Literal `"DIR DIVING"` in multiple views | P3 |
 
-**Localization readiness:** **86%**
-
----
-
-## J. Accessibility UX
-
-**Strengths:**
-- Watch Live metrics, reminders, depth safety overlays labeled
-- iOS planner result dashboard, gas ledger, checklist toggles
-- CCR chart summaries via `UIUXAccessibilitySummaries`
-- Watch photo transfer panel fully labeled
-- Static regression: `UIUXRemediationV3AccessibilityTests`, `UIUXRemediationV2Tests`, `UIUXRemediationV2WatchTests`
-
-**Gaps:**
-- No widespread Dynamic Type / `@ScaledMetric` adoption (physical matrix **PENDING**)
-- CCR gas density card absent when no data — no unavailable announcement
-- Reference UI screenshots not committed
-
-**Accessibility readiness:** **84%**
-
----
-
-## K. PDF / Share / Briefing Card UX
-
-| Export | UX gate | User feedback |
-|--------|---------|---------------|
-| OC plan / briefing / dive pack | Safety ack + valid plan + MOD | Toolbar disabled or alert |
-| CCR plan PDF | + `hasAvailableOxygenExposure` | Share hidden when blocked |
-| Checklist PDF | Non-empty checklist | Empty checklist message |
-| Equipment PDF | Always available | — |
-| Watch briefing PNG | Reference-only watermark; incomplete package warning on Watch | Physical transfer QA **PENDING** |
-
-**PDF render evidence:** `Docs/QA_EVIDENCE/PDF_RENDER/` — **PENDING**
-
-**Readiness:** **90%**
-
----
-
-## L. Unit Consistency UX
-
-- Metric internal storage; global pressure preference in Settings (`PlannerPressureUnitPreferenceTests`).
-- Gas ledger: liters primary, bar as cylinder-specific equivalent — labeled in UI.
-- Rock Bottom separated from normal consumption in emergency section and ledger footnotes.
-- CCR diluent/bailout distinct from OC breathing gas in checklist and PDF.
-
-**Readiness:** **92%**
+**Localization readiness:** **88%**
 
 ---
 
@@ -322,158 +301,206 @@ DIRDivingApp
 | iOS cloud decode error | A | Surfaced in More |
 | Planner MOD block | A | Clear validation cards |
 | CCR invalid plan | A | Stays on input with validation |
-| CCR density empty timeline | C+ | Silent hide — should show unavailable |
+| CCR density empty timeline | A | Unavailable label + description (fixed) |
+| Apnea cloud backup | A | Explicit unavailable — not a false success |
+| Snorkeling cloud export | C+ | Toggle + pending copy — may imply future upload |
+
+**Error / Empty State readiness:** **89%**
 
 ---
 
-## N. Release-Hard UX Matrix
+## N. Readiness Matrix
 
-| Domain | Watch | iOS | Combined | External evidence |
-|--------|-------|-----|----------|-------------------|
-| Navigation / IA | 91% | 92% | 92% | — |
-| Live / safety UX | 90% | N/A | 90% | **PENDING** |
-| Planner Base/Deco/Tech | N/A | 92% | 92% | — |
-| CCR | N/A | 88% | 88% | **PENDING** |
-| Ratio Deco | N/A | 90% | 90% | **PENDING** |
-| Tissue / Narcosis | N/A | 91% | 91% | — |
-| Checklist / Equipment | N/A | 88% | 88% | **PENDING** |
-| PDF / Share | 86% | 90% | 89% | **PENDING** |
-| Briefing card / Watch | 87% | 89% | 88% | **PENDING** |
-| Image transfer | 86% | 85% | 85% | **PENDING** |
-| Watch sync / Cloud | 88% | 85% | 86% | **PENDING** |
-| Accessibility | 85% | 83% | 84% | **PENDING** |
-| Localization | 84% | 87% | 86% | — |
-| Legal / disclaimers | 92% | 90% | 91% | — |
-| App Store assets | **PENDING** | **PENDING** | **PENDING** | **PENDING** |
-| **Overall UI/UX** | **89%** | **91%** | **91%** | Separate gates |
+| Feature | Readiness |
+|---:|---:|
+| iOS Companion UX | **93%** |
+| Apple Watch UX | **90%** |
+| Multi-activity IA | **93%** |
+| Apnea companion UX | **91%** |
+| Snorkeling companion UX | **89%** |
+| Planner Base UX | **91%** |
+| Planner Deco UX | **93%** |
+| Planner Technical UX | **94%** |
+| Ascent Speed Settings UX | **89%** |
+| Dive Runtime UX | **92%** |
+| Deco Stops UX | **92%** |
+| Emergency / Rock Bottom UX | **91%** |
+| Gas Ledger / Available Gas UX | **92%** |
+| Technical Average-Depth Gas UX | **91%** |
+| CCR / Rebreather UX | **90%** |
+| Ratio Deco UX | **91%** |
+| MOD / PPO2 / Dalton UX | **93%** |
+| Switch Depth UX | **93%** |
+| Gas Role UX | **91%** |
+| Tissue Loading UX | **91%** |
+| Narcosis UX | **91%** |
+| Checklist UX | **90%** |
+| Planner ↔ Checklist UX | **90%** |
+| Structured Equipment UX | **90%** |
+| Operational Checklist UX | **90%** |
+| CCR Checklist Import/Export UX | **91%** |
+| Manual Dive UX | **91%** |
+| PDF / Share UX | **91%** |
+| Planner Briefing Card UX | **90%** |
+| Watch Briefing Card Inventory UX | **87%** |
+| Image Transfer UX | **86%** |
+| Watch Image Inventory/Delete UX | **87%** |
+| Watch Reminder UX | **89%** |
+| Reminder Dismiss/Suppression UX | **88%** |
+| Small-Watch Safety Layout UX | **89%** |
+| Watch Image Paging UX | **87%** |
+| Watch Date Localization UX | **84%** |
+| Dive Start UX | **91%** |
+| Mission Mode UX | **92%** |
+| Sensor Source UX | **90%** |
+| Branding UX | **89%** |
+| Localization UX | **88%** |
+| Accessibility UX | **86%** |
+| Unit Consistency UX | **92%** |
+| Error / Empty State UX | **89%** |
+| Internal TestFlight UX Readiness | **88%** |
+| External TestFlight UX Readiness | **72%** |
+| App Store UX Readiness | **65%** |
+| **Overall UI/UX Readiness** | **92%** |
+
+Activity matrix CSV: `Docs/UI_UX_MAIN_ACTIVITY_MATRIX_CURRENT.csv`
 
 ---
 
 ## O. Issue Matrix
 
-| ID | Sev | Pri | Platform | Feature | Issue | Status @ `bf57ab4` |
-|----|-----|-----|----------|---------|-------|---------------------|
-| UX-001 | HIGH | P0 | Both | Release gate | Watch Ultra physical QA unsigned | **OPEN** |
-| UX-002 | HIGH | P0 | Both | Release gate | Paired sync / iCloud QA **PENDING** | **OPEN** |
-| UX-003 | HIGH | P1 | Watch | Localization | Ascent settings IT literals | **CLOSED** @ remediation |
-| UX-004 | HIGH | P1 | iOS | Accessibility | Watch photo panel no labels | **CLOSED** |
-| UX-005 | HIGH | P1 | iOS | CCR a11y | Chart timelines no summaries | **CLOSED** (axis labels P3 remain) |
-| UX-006 | MED | P1 | Both | Localization | GPS/compass Italian-as-key | **OPEN** |
-| UX-007 | MED | P2 | iOS | CCR checklist | No import parity | **CLOSED** |
-| UX-008 | MED | P2 | Watch | Reminders | No manual dismiss | **CLOSED** |
-| UX-009 | MED | P2 | Watch | Live layout | 40 mm banner density | **OPEN** |
-| UX-010 | MED | P2 | iOS | Sync UX | No conflict tab badge | **OPEN** |
-| UX-011 | LOW | P3 | Watch | Images | No swipe paging | **CLOSED** |
-| UX-012 | LOW | P3 | Watch | Logbook dates | Fixed dd/MM/yyyy | **CLOSED** |
-| UX-013 | MED | P1 | Both | Reference UI | PNG baselines missing | **OPEN** |
-| UX-014 | MED | P2 | iOS | CCR density | Empty timeline hides card | **OPEN** |
-| UX-015 | MED | P2 | iOS | PDF share | Generic invalid-plan message | **OPEN** |
-| UX-016 | MED | P1 | Both | Accessibility | Dynamic Type / VoiceOver matrix | **OPEN** |
-| UX-017 | MED | P2 | Watch | Briefing | No stale-session mismatch banner | **OPEN** |
+| ID | Sev | Pri | Platform | Feature | Screen / file | Issue | User impact | Safety | A11y | Proposed fix | Effort | Regression | Acceptance |
+|----|-----|-----|----------|---------|---------------|-------|-------------|--------|------|--------------|--------|------------|------------|
+| UIUX-001 | P1 | P1 | Both | Release QA | `Docs/QA_EVIDENCE/*` | Physical/external evidence folders README-only | Cannot claim Ultra/sync/store readiness | Medium | Medium | Execute documented QA procedures; attach evidence | Large | Low | Evidence files populated |
+| UIUX-002 | P1 | P1 | iOS | Snorkeling export | `IOSSnorkelingSessionExportView.swift` | Cloud toggle is preference stub vs Apnea unavailable pattern | User may expect upload | Low | Low | Align with `ApneaCloudCapability` truthfulness | Small | Low | Status-only or explicit unavailable |
+| UIUX-003 | P1 | P1 | iOS | Sync | `MoreView.swift` | Sync/conflict rows lack a11y labels | VoiceOver users miss sync state | Low | **High** | Add labels/hints per row | Small | Low | `UIUXRemediationV3AccessibilityTests` extended |
+| UIUX-004 | P1 | P1 | Watch | Logbook | `DiveDetailView.swift` | Dates hardcoded dd/MM/yyyy | Wrong locale for EN/US users | Low | Medium | Use `@Environment(\.locale)` formatters | Small | Low | Matches list view behavior |
+| UIUX-005 | P1 | P2 | Both | PDF | `Docs/QA_EVIDENCE/PDF_RENDER/` | No physical PDF render evidence | Layout regressions undetected | Low | Medium | Capture golden PDFs on device | Medium | Low | Evidence committed |
+| UIUX-006 | P2 | P2 | iOS | Apnea/Snorkeling | `IOSApneaRootView.swift` | Inactive tabs not accessibilityHidden | VO may read off-screen content | Low | **High** | Match Diving `ContentView` pattern | Small | Low | Contract test |
+| UIUX-007 | P2 | P2 | iOS | Planner | `MoreView.swift` | Ascent speeds only in Settings | Discoverability | Low | Low | Link from Planner settings area | Small | Low | Navigation test |
+| UIUX-008 | P2 | P2 | Watch | Briefing | `PlannerBriefingCardsView.swift` | No per-card detail/zoom | Hard to read small briefing images | Low | Medium | Optional detail sheet | Medium | Medium | Usability QA |
+| UIUX-009 | P2 | P3 | Both | Localization | Legal/sync views | Sentence-as-key pattern | Brittle translations | Low | Low | Migrate to semantic keys | Medium | Low | i18n tests pass |
+| UIUX-010 | P2 | P3 | Watch | Live | `DiveLiveView.swift` | Alarm/GPS/sync banners no a11y | Critical info missed by VO | **Medium** | **High** | Add combined labels | Small | Low | Watch a11y tests |
+| UIUX-011 | P3 | P3 | Both | Branding | Multiple headers | `"DIR DIVING"` hardcoded | Minor i18n inconsistency | None | Low | Localize or document brand exception | Small | Low | — |
+| UIUX-012 | P3 | P4 | Both | Mockups | `mockups/` | PNG assets documented but absent | Design review blocked | None | None | Commit reference PNGs | Medium | None | Files exist at documented paths |
 
 ---
 
 ## P. Prioritized Action Plan
 
-### P0 — external evidence (not code defects)
+### P0 — must fix before compile/use
+*None identified.*
 
-1. Execute `WATCH_ULTRA_PHYSICAL_QA_MATRIX.md` → `Docs/QA_EVIDENCE/WATCH_ULTRA/`
-2. Execute `WATCH_IOS_SYNC_QA_MATRIX.md` + `ICLOUD_TWO_DEVICE_QA_MATRIX.md`
-3. Execute `IOS_DYNAMIC_TYPE_VOICEOVER_QA_MATRIX.md`
+### P1 — must fix before internal TestFlight
+1. Populate critical QA evidence stubs (Watch Ultra smoke, paired sync smoke).
+2. Snorkeling export cloud truthfulness parity with Apnea.
+3. iOS sync section accessibility labels.
+4. Watch dive detail locale-adaptive dates.
 
-### P1 — before external TestFlight
+### P2 — must fix before external TestFlight
+1. Apnea/Snorkeling tab accessibilityHidden parity.
+2. Planner ascent-speed discoverability link.
+3. Watch live banner VoiceOver coverage.
+4. PDF render golden evidence.
 
-1. **UX-006** — Normalize GPS/compass strings to semantic EN/IT keys
-2. **UX-013** — Capture ReferenceUI PNGs per `Docs/ReferenceUI/README.md`
-3. **UX-016** — Run accessibility matrix on Planner, CCR, Checklist, Live
+### P3 — must fix before App Store
+1. Semantic localization keys for legal/sync diagnostics.
+2. Commit reference mockup PNGs or update README to external asset location.
+3. App Store screenshot/marketing checklist (`Docs/QA_EVIDENCE/APP_STORE_MARKETING/`).
 
-### P2 — polish
-
-1. **UX-014** — Show gas density unavailable state when timeline empty
-2. **UX-015** — Field-level PDF export failure reasons
-3. **UX-010** — Tab badge for sync conflicts
-4. **UX-017** — Briefing session age / mismatch warning on Watch
-
----
-
-## Q. TestFlight / App Store UX Gates
-
-| Gate | Verdict |
-|------|---------|
-| Internal TestFlight UX | **Conditional YES** — document CCR reference-only, heuristic bailout, non-certified posture |
-| External TestFlight UX | **NO** — physical QA + P1 localization/a11y fixes |
-| App Store UX | **NO** — reference PNGs, marketing review, privacy evidence **PENDING** |
+### P4 — post-release
+1. Briefing per-card detail on Watch.
+2. Dynamic Type adoption beyond minimum compliance.
 
 ---
 
-## R. Final Verdict
+## Q. TestFlight UX Checklist
+
+| Item | Internal TF | External TF | Evidence |
+|------|-------------|-------------|----------|
+| Legal onboarding completable | ✅ | ✅ | Code + tests |
+| Activity selection EN/IT | ✅ | ⚠️ physical | `IOSCompanionActivitySelectionView` |
+| Diving planner reference disclaimers | ✅ | ✅ | `planner.reference_only.warning` |
+| CCR disclaimers | ✅ | ✅ | CCR views |
+| Watch live safety banners | ✅ | ⚠️ 40mm physical | **PENDING** |
+| Apnea/Snorkeling live on Watch | ✅ | ⚠️ wet QA | **PENDING** |
+| Paired Watch sync UX | ⚠️ | ❌ | **PENDING** |
+| VoiceOver critical paths | ⚠️ | ❌ | **PENDING** matrix |
+| Reference mockups in repo | ❌ | ❌ | UIUX-012 |
+
+---
+
+## R. App Store UX Checklist
+
+| Item | Status |
+|------|--------|
+| Non-certified positioning in UI | ✅ |
+| Privacy nutrition labels alignment | ⚠️ legal review **PENDING** |
+| Localized store listing EN/IT | **PENDING** |
+| Screenshot set (6.7", 6.1", Watch) | **PENDING** |
+| App preview video | **PENDING** |
+| Accessibility Nutrition Label | **PENDING** |
+| Physical Ultra validation claim | ❌ must not claim |
+
+---
+
+## S. Screenshot / Marketing Asset Checklist
+
+- [ ] iOS Diving Planner (Base/Deco/Technical/CCR) — reference-only badge visible
+- [ ] iOS multi-activity selection
+- [ ] iOS Apnea dashboard + sessions
+- [ ] iOS Snorkeling route planner
+- [ ] Watch live dive (Gauge + FC)
+- [ ] Watch BUSSOLA
+- [ ] Watch briefing cards with ref-only disclaimer
+- [ ] EN + IT pairs for all above
+
+**Reference assets:** `mockups/README.md` — PNGs **not in repository**
+
+---
+
+## T. Final Verdict
 
 | Question | Answer |
 |----------|--------|
-| Is UI/UX ready for internal TestFlight? | **Yes, conditionally** — informed internal testers with release notes |
-| Is UI/UX ready for external TestFlight? | **No** — physical Watch Ultra QA, paired sync, accessibility matrix **PENDING** |
-| Is UI/UX ready for App Store? | **No** — marketing assets, external QA, legal review incomplete |
-| Are Dive Runtime and deco stops clear? | **Yes** — dedicated sections with a11y labels |
-| Is Rock Bottom separated from normal consumption? | **Yes** — emergency section + ledger semantics |
-| Are liters/bar ledger values understandable? | **Yes** — liters primary, bar labeled as cylinder equivalent |
-| Is Technical average-depth option disclosed? | **Yes** — toggle notes in Technical mode |
-| Is Equipment/checklist navigation coherent? | **Yes** — split tabs with cross-links |
-| Are CCR checklist import/export flows clear? | **Yes** — sheets + disclaimers on import |
-| Are briefing cards reference-only? | **Yes** — watermark + Watch disclaimer |
-| Is small-Watch critical info visible? | **Mostly** — 40 mm multi-banner risk remains |
-| Are reminder dismiss behaviors safe? | **Yes** — tap-to-dismiss during active dive only |
-| What blocks 100% UX readiness? | External physical QA, Reference UI PNGs, GPS/compass i18n, Dynamic Type matrix, CCR density empty state |
-| What must be fixed first? | Execute physical QA matrices; fix UX-006 localization; capture ReferenceUI PNGs |
+| Ready for **internal** TestFlight UX? | **Conditional YES** — team QA with documented P1 caveats |
+| Ready for **external** TestFlight UX? | **NO** — physical Watch, sync, accessibility matrix, field GPS **PENDING** |
+| Ready for **App Store** UX? | **NO** — marketing assets, legal review, external QA **PENDING** |
+| What blocks 100% UX readiness? | Physical/external QA evidence; Snorkeling cloud stub; sync a11y; Watch detail dates; missing mockup PNGs |
+| Dive Runtime + deco stops clear? | **YES** — software UX coherent across modes |
+| Rock Bottom separated from consumption? | **YES** |
+| Liters/bar gas ledger understandable? | **YES** |
+| Technical avg-depth option disclosed? | **YES** |
+| Equipment/checklist navigation coherent? | **YES** |
+| CCR checklist import/export clear? | **YES** |
+| Briefing cards faithful + reference-only? | **YES** in code; physical transfer **PENDING** |
+| Small-Watch critical info visible? | **Mostly** — policy defers non-critical panels; **physical PENDING** |
+| Reminder dismiss/suppression safe? | **YES** — tap dismiss; critical alarm suppression |
+| Fix first? | UIUX-001 (QA evidence), UIUX-002 (Snorkeling cloud truthfulness), UIUX-003 (sync a11y) |
 
 ---
 
-## S. Phase Output Summary (command phases)
+## Audit-only confirmation
 
-| Phase domain | Score |
-|--------------|-------|
-| Planner Base / Deco / Technical | 90% / 92% / 93% |
-| CCR UX | 88% |
-| MOD/PPO₂ / switch-depth | 92% |
-| Ratio Deco | 90% |
-| Tissue / Narcosis | 91% |
-| Checklist / Equipment | 88% |
-| PDF / Share / Briefing | 90% |
-| Image transfer / paging | 85% |
-| Watch Live / reminders | 90% / 88% |
-| Mission Mode / Sensor Source | 92% / 90% |
-| Localization | 86% |
-| Accessibility | 84% |
-| Internal TestFlight UX | Conditional |
-| External TestFlight / App Store | Not ready |
+- **Production code modified by this audit:** None  
+- **Tests modified by this audit:** None  
+- **Reports created/updated:** `Docs/UI_UX_MAIN_AUDIT_CURRENT.md`, `Docs/UI_UX_MAIN_ACTIVITY_MATRIX_CURRENT.csv`
 
 ---
 
-## T. Audit Limitations
+## VERSION HISTORY
 
-| Limitation | Next step |
-|------------|-----------|
-| No runtime VoiceOver walkthrough | Execute `IOS_DYNAMIC_TYPE_VOICEOVER_QA_MATRIX.md` |
-| No simulator screenshot capture in audit | Populate `Docs/QA_EVIDENCE/REFERENCE_UI/` |
-| Physical underwater behavior | Watch Ultra matrix |
+### V3.0 audit — 2026-06-20
 
----
+- Multi-activity scope (Diving, Apnea, Snorkeling) on iOS and Watch
+- Activity selection, strict logbook/settings ownership
+- Integrated iOS algorithm remediation context (uncommitted)
+- Closed V2 gas-density empty-state gap
+- Closed V2 compass/GPS Italian-as-key leaks (semantic keys verified)
+- Apnea cloud explicitly unavailable UX verified
+- Snorkeling cloud stub asymmetry flagged
+- Activity matrix CSV added
 
-## U. Recommended Next Cursor Commands (draft — do not execute)
+### Supersedes
 
-1. **`5-DIR_DIVING_UI_UX_REMEDIATION_CCR_UPDATED_V2.0.md`** — GPS/compass i18n, CCR density empty state, PDF error granularity, sync tab badge
-2. **`6-DIR_DIVING_PHYSICAL_QA_EVIDENCE_CAPTURE.md`** — Watch Ultra + paired sync matrices
-3. **`7-DIR_DIVING_REFERENCE_UI_AND_APP_STORE_ASSETS.md`** — ReferenceUI PNGs + store screenshots
-
----
-
-## Related Documents
-
-- [`IOS_MAIN_COMPLETE_ALGORITHM_AUDIT_CURRENT.md`](IOS_MAIN_COMPLETE_ALGORITHM_AUDIT_CURRENT.md)
-- [`IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT_V1.0.md`](IOS_MAIN_ALGORITHM_MATH_AUDIT_REMEDIATION_REPORT_V1.0.md)
-- [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md)
-- [`TESTFLIGHT_RELEASE_GATE_CHECKLIST.md`](TESTFLIGHT_RELEASE_GATE_CHECKLIST.md)
-- [`ReferenceUI/README.md`](ReferenceUI/README.md)
-
----
-
-*Audit complete @ `bf57ab4`. No source code modified. Report: `Docs/UI_UX_MAIN_AUDIT_CURRENT.md`.*
+- `Docs/UI_UX_MAIN_AUDIT_CURRENT.md` @ `bf57ab4` (V2.0)

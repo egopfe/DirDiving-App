@@ -24,6 +24,7 @@ final class EquipmentStore: ObservableObject {
         profile = cloudSync?.load(EquipmentProfile.self, forKey: profileKey) ?? EquipmentProfile()
         templates = cloudSync?.load([EquipmentTemplate].self, forKey: templatesKey) ?? Self.defaultTemplates()
         selectedChecklistTemplateID = cloudSync?.load(UUID.self, forKey: checklistSelectionKey)
+        migrateChecklistGasRolesIfNeeded()
         isReady = true
         deferInitialPersistence()
     }
@@ -188,6 +189,13 @@ final class EquipmentStore: ObservableObject {
         templates[index].checklistItems = checklistItems
     }
 
+    private func migrateChecklistGasRolesIfNeeded() {
+        ChecklistRoleMigration.migrateLegacyRoles(in: &profile.checklistItems)
+        for index in templates.indices {
+            ChecklistRoleMigration.migrateLegacyRoles(in: &templates[index].checklistItems)
+        }
+    }
+
     private func saveIfReady() {
         guard isReady else { return }
         cloudSync?.save(profile, forKey: profileKey)
@@ -210,7 +218,7 @@ final class EquipmentStore: ObservableObject {
                 checklistItems: [
                     EquipmentChecklistItem(title: "Mask", isReady: false, kind: .equipment),
                     EquipmentChecklistItem(title: "Fins", isReady: false, kind: .equipment),
-                    EquipmentChecklistItem(title: "Regulator", isReady: false, usesGas: true, tankSize: .s80, kind: .equipment),
+                    EquipmentChecklistItem(title: "Regulator", isReady: false, usesGas: true, tankSize: .s80, gasRole: .bottom, kind: .equipment),
                     EquipmentChecklistItem(title: DIRIOSLocalizer.string("checklist.quick.analyze_gas"), isReady: false, kind: .gas),
                     EquipmentChecklistItem(title: DIRIOSLocalizer.string("checklist.quick.check_pressure"), isReady: false, kind: .gas),
                     EquipmentChecklistItem(title: DIRIOSLocalizer.string("checklist.template.buddy_check"), isReady: false, kind: .safety),
@@ -222,8 +230,8 @@ final class EquipmentStore: ObservableObject {
                 checklistItems: [
                     EquipmentChecklistItem(title: "Backup mask", isReady: false, kind: .equipment),
                     EquipmentChecklistItem(title: "Spool", isReady: false, kind: .equipment),
-                    EquipmentChecklistItem(title: "Back gas", isReady: false, usesGas: true, tankSize: .liters12, kind: .equipment),
-                    EquipmentChecklistItem(title: "Deco stage", isReady: false, usesGas: true, tankSize: .liters12, kind: .equipment),
+                    EquipmentChecklistItem(title: "Back gas", isReady: false, usesGas: true, tankSize: .liters12, gasRole: .bottom, kind: .equipment),
+                    EquipmentChecklistItem(title: "Deco stage", isReady: false, usesGas: true, tankSize: .liters12, gasRole: .deco, kind: .equipment),
                     EquipmentChecklistItem(title: DIRIOSLocalizer.string("checklist.template.analyze_back_gas"), isReady: false, kind: .gas),
                     EquipmentChecklistItem(title: DIRIOSLocalizer.string("checklist.template.analyze_deco_gas"), isReady: false, kind: .gas),
                     EquipmentChecklistItem(title: DIRIOSLocalizer.string("checklist.quick.verify_mod"), isReady: false, kind: .gas),

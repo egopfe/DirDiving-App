@@ -124,5 +124,6 @@ struct IOSApneaRootView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .opacity(apneaNavigation.selectedTab == tab ? 1 : 0)
         .allowsHitTesting(apneaNavigation.selectedTab == tab)
+        .accessibilityHidden(apneaNavigation.selectedTab != tab)
     }
 }

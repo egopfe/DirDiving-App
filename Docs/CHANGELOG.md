@@ -4,6 +4,24 @@ Tutte le date in formato ISO. Le voci documentano soprattutto **documentazione**
 
 ## [Unreleased]
 
+### Added (2026-06-20, documentation alignment V3.0 — docs-only)
+
+- **Documentazione:** [`Docs/DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md) (updated), [`Docs/PR_STATUS_20260620.md`](PR_STATUS_20260620.md).
+- **Allineamento V3.0:** multi-activity scope (Diving + Apnea + Snorkeling on `main`); `Docs/README.md`, `Docs/INDEX.md`, root `README.md`, `DIR_DIVING_Feature_Comparison.csv` (additive rows + corrected navigation/exclusion notes).
+- **Baseline:** `main` @ `f4f0a68` + MAIN deep-code readiness; **1362** iOS + **890** Watch algorithm tests, **0** skipped; external QA **PENDING**.
+
+### Added (2026-06-20, MAIN deep code readiness — runtime + docs)
+
+- **Cloud:** `CloudSyncLegacyMigrationPolicy`, `CloudSyncMigrationTelemetry` — legacy oversized KVS safe ignore + partial migration telemetry (MAIN-DCA-003).
+- **Security:** `WatchSyncTrustStatePolicy` — TOFU fingerprint/epoch metadata (MAIN-DCA-013 accepted residual).
+- **Validation:** `./Scripts/validate_main_deep_code_readiness.sh`; matrices under `Docs/MAIN_*_CURRENT.*`.
+- **Test:** `MainDeepCodeReadinessCurrentTests`, `MainDeepCodeReadinessCurrentWatchTests`.
+- **Documentazione:** [`Docs/MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_CURRENT.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_CURRENT.md), audit @ 100% software readiness.
+
+### Added (2026-06-20, deep code audit V3.0 + remediation bundle — `f4f0a68`)
+
+- iOS algorithm, UI/UX, Watch math software gates @ 100%; deep code audit V3.0 multi-activity report.
+
 ### Added (2026-06-14, documentation alignment — docs-only @ `99ea74a`)
 
 - **Documentazione:** [`Docs/DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md`](DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md) (updated in place), [`Docs/PR_STATUS_20260614.md`](PR_STATUS_20260614.md), [`Docs/DOCUMENTATION_UPDATE_REPORT_20260614.md`](DOCUMENTATION_UPDATE_REPORT_20260614.md).

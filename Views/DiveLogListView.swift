@@ -58,7 +58,7 @@ struct DiveLogListView: View {
                     DiveOctopusLogo(accent: DiveUI.yellow)
                         .frame(width: 23, height: 22, alignment: .leading)
                         .scaleEffect(0.68)
-                    Text("DIR DIVING")
+                    Text(DIRBrandPresentation.displayName)
                         .font(.system(size: 11, weight: .black, design: .rounded))
                         .foregroundStyle(DiveUI.yellow)
                         .lineLimit(1)

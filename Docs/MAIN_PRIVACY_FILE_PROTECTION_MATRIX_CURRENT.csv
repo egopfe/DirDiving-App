@@ -1,0 +1,12 @@
+Asset_Type,Location,Protection_Class,Staging_Protected,Test_Reference,Status
+Dive log JSON,Application Support,completeFileProtection,Yes,MainDeepCodeAuditRemediationTests,PASS
+Active dive draft,Application Support,completeFileProtection,Yes,DiveManager tests,PASS
+Full Computer checkpoint,Application Support,completeFileProtection,Yes,FullComputerRecoveryCheckpointTests,PASS
+Snorkeling GPS route,Application Support,completeFileProtection,Yes,SnorkelingReleaseHardValidationTests,PASS
+Apnea session log,Application Support,completeFileProtection,Yes,ApneaReleaseHardValidationTests,PASS
+PDF export,Application Support,completeFileProtection,Yes,PDFExportServiceTests,PASS
+Briefing card PNG,Application Support,completeFileProtection,Yes,PlannerBriefingCardStoreTests,PASS
+Photo staging temp,tmp,completeFileProtection,Yes,MainDeepCodeAuditRemediationTests,PASS
+Photo ACK queue,Documents,completeFileProtection,Yes,MainDeepCodeReadinessCurrentWatchTests,PASS
+Sync replay cache,Application Support,completeFileProtection,Yes,SyncNonceReplayCache tests,PASS
+Cloud migration telemetry,UserDefaults,counters only,N/A,MainDeepCodeReadinessCurrentTests,PASS

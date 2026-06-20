@@ -91,6 +91,7 @@ final class ChecklistItemKindTests: XCTestCase {
             title: "Back gas",
             usesGas: true,
             gasText: "TMX 18/45",
+            gasRole: .bottom,
             kind: .equipment
         )
         XCTAssertEqual(ChecklistPlannerSyncMapper.resolvedRole(for: item), .bottom)

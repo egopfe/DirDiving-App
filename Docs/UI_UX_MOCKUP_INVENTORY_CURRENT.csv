@@ -1,0 +1,8 @@
+Path,Activity,Platform,Screen,State,Status,Canonical,Local,External_Source,Snapshot_Fixture,Notes
+mockups/README.md,all,all,documentation,policy,CURRENT,true,true,,,Canonical policy; raster PNGs maintained externally
+mockups/IOS_COMPANION_ACTIVITY_SELECTION_POST_ONBOARDING.png,diving,ios,activity_selection,post_legal,EXTERNAL,true,false,design_archive,IOSMockupPreviewFixtures.companionSelectionMockupPath,Referenced by fixtures; not bundled in repo
+mockups/iOS/apnea_dashboard.png,apnea,ios,dashboard,default,EXTERNAL,true,false,design_archive,ApneaMockupReferenceMatrix,Executable fixture matrix only
+mockups/iOS/snorkeling_dashboard.png,snorkeling,ios,dashboard,default,EXTERNAL,true,false,design_archive,SnorkelingMockupReferenceMatrix,Executable fixture matrix only
+mockups/Apple_Watch/apnea_live.png,apnea,watch,live,default,EXTERNAL,true,false,design_archive,ApneaMockupReferenceMatrix,Not embedded in app targets
+mockups/FC_UI_*.png,diving,watch,full_computer,states,EXTERNAL,true,false,design_archive,FullComputerMockupReferenceMatrix,Pattern reference for FC states
+Docs/ReferenceUI/archive/,all,all,historical,deprecated,HISTORICAL,false,true,,,Pre-three-mode references only

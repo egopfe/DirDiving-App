@@ -13,9 +13,39 @@ struct FullComputerRuntimeEngine: Equatable {
     private var decoStopTracker: FullComputerDecoStopTracker
     private var gasSwitchTracker: FullComputerGasSwitchTracker
     private var lastTickTimestamp: Date
+#if DEBUG
+    private var testHookDefersSnapshotRefresh = false
+    private var testHookDeferredEngineState: FullComputerRuntimeEngineState?
+    private var testHookDeferredDiagnostics: [String] = []
+#endif
 
     var gasSwitchAuditTrail: [FullComputerGasSwitchAuditEvent] { gasSwitchTracker.events }
     var persistedGasSwitchTracker: FullComputerGasSwitchTracker { gasSwitchTracker }
+
+#if DEBUG
+    /// Test-only tissue read without an extra decompression solve beyond the last refresh.
+    var testHook_tissueState: BuhlmannTissueState { tissueState }
+
+    /// Test-only explicit snapshot refresh for Audit regression recorders.
+    mutating func testHook_refreshSnapshotForTests(
+        engineState: FullComputerRuntimeEngineState? = nil,
+        diagnostics: [String]? = nil
+    ) {
+        refreshSnapshot(
+            engineState: engineState ?? testHookDeferredEngineState ?? snapshot.engineState,
+            diagnostics: diagnostics ?? testHookDeferredDiagnostics
+        )
+        testHookDeferredEngineState = nil
+        testHookDeferredDiagnostics = []
+    }
+
+    mutating func testHook_setDeferSnapshotRefresh(_ deferRefresh: Bool) {
+        testHookDefersSnapshotRefresh = deferRefresh
+        if !deferRefresh {
+            testHook_refreshSnapshotForTests()
+        }
+    }
+#endif
 
     mutating func restoreGasSwitchTracker(_ tracker: FullComputerGasSwitchTracker) {
         gasSwitchTracker = tracker
@@ -97,12 +127,26 @@ struct FullComputerRuntimeEngine: Equatable {
             nextState = .valid
         }
         if depthDelta >= FullComputerRuntimeConfiguration.criticalDepthChangeMeters {
-            refreshSnapshot(engineState: nextState, diagnostics: [])
+            finishIngestSampleRefresh(engineState: nextState, diagnostics: [])
         } else {
-            refreshSnapshot(engineState: nextState, diagnostics: snapshot.diagnostics)
+            finishIngestSampleRefresh(engineState: nextState, diagnostics: snapshot.diagnostics)
         }
         previousEngineState = nextState
         return true
+    }
+
+    private mutating func finishIngestSampleRefresh(
+        engineState: FullComputerRuntimeEngineState,
+        diagnostics: [String]
+    ) {
+#if DEBUG
+        if testHookDefersSnapshotRefresh {
+            testHookDeferredEngineState = engineState
+            testHookDeferredDiagnostics = diagnostics
+            return
+        }
+#endif
+        refreshSnapshot(engineState: engineState, diagnostics: diagnostics)
     }
 
     /// Nominal 1 Hz tick using real elapsed time; applies constant-depth load when no fresh sample arrives.
@@ -129,8 +173,22 @@ struct FullComputerRuntimeEngine: Equatable {
             diagnostics = []
             nextState = .valid
         }
-        refreshSnapshot(engineState: nextState, diagnostics: diagnostics)
+        finishTickRefresh(engineState: nextState, diagnostics: diagnostics)
         previousEngineState = nextState
+    }
+
+    private mutating func finishTickRefresh(
+        engineState: FullComputerRuntimeEngineState,
+        diagnostics: [String]
+    ) {
+#if DEBUG
+        if testHookDefersSnapshotRefresh {
+            testHookDeferredEngineState = engineState
+            testHookDeferredDiagnostics = diagnostics
+            return
+        }
+#endif
+        refreshSnapshot(engineState: engineState, diagnostics: diagnostics)
     }
 
     mutating func changeGas(_ gas: BuhlmannGas, at timestamp: Date = Date()) {

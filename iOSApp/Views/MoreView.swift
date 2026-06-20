@@ -5,10 +5,7 @@ struct MoreView: View {
     @EnvironmentObject private var cloudSync: CloudSyncStore
     @EnvironmentObject private var logStore: DiveLogStore
     @EnvironmentObject private var companionActivity: CompanionActivityPreferenceStore
-    @AppStorage(DIRIOSAppLanguage.storageKey) private var appLanguage = DIRIOSAppLanguage.system.rawValue
-    @AppStorage("dirdiving_ios_units") private var units = IOSUnitPreference.metric.rawValue
-    @AppStorage(IOSPressureUnitPreference.storageKey) private var pressureUnitRaw = IOSPressureUnitPreference.storageValue(for: .bar)
-    @AppStorage(CloudBackupSettings.enabledKey) private var cloudBackupEnabled = false
+    @EnvironmentObject private var sharedSettings: SharedIOSSettingsStore
     @State private var showResetPairingConfirm = false
     @State private var versionTapCount = 0
     @State private var developerUnlockedNotice = false
@@ -84,11 +81,34 @@ struct MoreView: View {
                         }
                         IOSCompanionActivitySettingsCard()
                         DIRCard(DIRIOSLocalizer.string("more.section.sync_watch"), icon: "applewatch", accent: DIRTheme.cyan) {
-                            row(DIRIOSLocalizer.string("more.sync.supported"), watchSync.isSupported ? DIRIOSLocalizer.string("more.yes") : DIRIOSLocalizer.string("more.no"))
-                            row(DIRIOSLocalizer.string("more.sync.state"), watchSync.userVisibleState)
-                            row(DIRIOSLocalizer.string("more.sync.last_event"), watchSync.lastMessage)
-                            row(DIRIOSLocalizer.string("more.sync.queue_count"), "\(watchSync.pendingWatchQueueCount)")
-                            row(DIRIOSLocalizer.string("more.sync.last_success"), formattedWatchLastSuccess)
+                            accessibleInfoRow(
+                                title: DIRIOSLocalizer.string("more.sync.supported"),
+                                value: watchSync.isSupported ? DIRIOSLocalizer.string("more.yes") : DIRIOSLocalizer.string("more.no"),
+                                identifier: "more.sync.supported"
+                            )
+                            accessibleInfoRow(
+                                title: DIRIOSLocalizer.string("more.sync.state"),
+                                value: watchSync.userVisibleState,
+                                identifier: "more.sync.state"
+                            )
+                            accessibleInfoRow(
+                                title: DIRIOSLocalizer.string("more.sync.last_event"),
+                                value: watchSync.lastMessage,
+                                identifier: "more.sync.last_event"
+                            )
+                            accessibleInfoRow(
+                                title: DIRIOSLocalizer.string("more.sync.queue_count"),
+                                value: "\(watchSync.pendingWatchQueueCount)",
+                                identifier: "more.sync.queue_count",
+                                hint: watchSync.pendingWatchQueueCount > 0
+                                    ? DIRIOSLocalizer.string("more.sync.queue_count.a11y.hint")
+                                    : nil
+                            )
+                            accessibleInfoRow(
+                                title: DIRIOSLocalizer.string("more.sync.last_success"),
+                                value: formattedWatchLastSuccess,
+                                identifier: "more.sync.last_success"
+                            )
                             syncActivitySection
                             Button {
                                 watchSync.syncUnpushedSessionsToWatch()
@@ -101,6 +121,10 @@ struct MoreView: View {
                                     .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.cyan, lineWidth: 1))
                             }
                             .buttonStyle(.plain)
+                            .accessibilityLabel(DIRIOSLocalizer.string("more.sync.push_to_watch"))
+                            .accessibilityHint(DIRIOSLocalizer.string("more.sync.push_to_watch.a11y.hint"))
+                            .accessibilityIdentifier("more.sync.push_to_watch")
+                            .disabled(!watchSync.isSupported)
                             Button(role: .destructive) {
                                 showResetPairingConfirm = true
                             } label: {
@@ -112,7 +136,12 @@ struct MoreView: View {
                                     .background(RoundedRectangle(cornerRadius: 8).stroke(DIRTheme.orange.opacity(0.8), lineWidth: 1))
                             }
                             .buttonStyle(.plain)
+                            .accessibilityLabel(DIRIOSLocalizer.string("more.sync.reset_pairing"))
+                            .accessibilityHint(DIRIOSLocalizer.string("more.sync.reset_pairing.a11y.hint"))
+                            .accessibilityIdentifier("more.sync.reset_pairing")
                         }
+                        .accessibilityElement(children: .contain)
+                        .accessibilityLabel(DIRIOSLocalizer.string("more.section.sync_watch"))
                         if !watchSync.conflicts.isEmpty {
                             watchSyncConflictsCard
                         }
@@ -120,7 +149,7 @@ struct MoreView: View {
                             cloudMergeConflictsCard
                         }
                         DIRCard(DIRIOSLocalizer.string("more.section.cloud_backup"), icon: "icloud", accent: DIRTheme.green) {
-                            Toggle(isOn: $cloudBackupEnabled) {
+                            Toggle(isOn: $sharedSettings.cloudBackupEnabled) {
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(DIRIOSLocalizer.string("more.icloud.backup_toggle"))
                                         .foregroundStyle(.white)
@@ -131,8 +160,7 @@ struct MoreView: View {
                                 }
                             }
                             .tint(DIRTheme.cyan)
-                            .onChange(of: cloudBackupEnabled) { _, enabled in
-                                CloudBackupSettings.setEnabled(enabled)
+                            .onChange(of: sharedSettings.cloudBackupEnabled) { _, enabled in
                                 if enabled {
                                     Task { @MainActor in
                                         logStore.synchronizeCloud()
@@ -141,14 +169,25 @@ struct MoreView: View {
                             }
                             row(DIRIOSLocalizer.string("more.icloud.sync_title"), cloudBackupStatusTitle)
                             row(DIRIOSLocalizer.string("more.icloud.backup_scope"), DIRIOSLocalizer.string("more.icloud.backup_scope_value"))
-                            row(DIRIOSLocalizer.string("more.icloud.last_event"), cloudSync.lastSyncStatus)
-                            row(DIRIOSLocalizer.string("more.icloud.last_success"), formattedCloudLastSuccess)
+                            accessibleInfoRow(
+                                title: DIRIOSLocalizer.string("more.icloud.last_event"),
+                                value: cloudSync.lastSyncStatus,
+                                identifier: "more.icloud.last_event"
+                            )
+                            accessibleInfoRow(
+                                title: DIRIOSLocalizer.string("more.icloud.last_success"),
+                                value: formattedCloudLastSuccess,
+                                identifier: "more.icloud.last_success"
+                            )
                             if let cloudDecodeError = cloudSync.lastDecodeError {
                                 Text(cloudDecodeError)
                                     .font(.caption2.weight(.semibold))
                                     .foregroundStyle(DIRTheme.orange)
                                     .fixedSize(horizontal: false, vertical: true)
-                                    .accessibilityLabel(cloudDecodeError)
+                                    .accessibilityLabel(
+                                        DIRIOSLocalizer.formatted("more.icloud.decode_error.a11y", cloudDecodeError)
+                                    )
+                                    .accessibilityIdentifier("more.icloud.decode_error")
                             }
                             Button {
                                 cloudSync.clearDecodeError()
@@ -170,6 +209,9 @@ struct MoreView: View {
                             }
                             .buttonStyle(.plain)
                             .disabled(cloudSync.isSynchronizing)
+                            .accessibilityLabel(DIRIOSLocalizer.string("more.icloud.sync_now"))
+                            .accessibilityHint(DIRIOSLocalizer.string("more.icloud.sync_now.a11y.hint"))
+                            .accessibilityIdentifier("more.icloud.sync_now")
                         }
                         DIRCard(DIRIOSLocalizer.string("more.section.reviewer"), icon: "books.vertical", accent: DIRTheme.yellow) {
                             Toggle(isOn: Binding(
@@ -187,8 +229,8 @@ struct MoreView: View {
                             .tint(DIRTheme.cyan)
                         }
                         DIRCard(DIRIOSLocalizer.string("more.section.export"), icon: "square.and.arrow.up", accent: DIRTheme.cyan) {
-                            row(DIRIOSLocalizer.string("Subsurface"), "CSV")
-                            row(DIRIOSLocalizer.string("Bundle"), "com.egopfe.dirdiving.ios")
+                            row(DIRIOSLocalizer.string("more.export.subsurface"), "CSV")
+                            row(DIRIOSLocalizer.string("more.export.bundle_id"), "com.egopfe.dirdiving.ios")
                             CSVImportPanel()
                         }
                         appVersionRow
@@ -229,7 +271,7 @@ struct MoreView: View {
         if !cloudSync.isICloudAvailable {
             return DIRIOSLocalizer.string("more.icloud.unavailable")
         }
-        if cloudBackupEnabled {
+        if sharedSettings.cloudBackupEnabled {
             return DIRIOSLocalizer.string("more.icloud.backup_on")
         }
         return DIRIOSLocalizer.string("more.icloud.backup_off")
@@ -243,23 +285,20 @@ struct MoreView: View {
     }
 
     private var unitsPreferenceSection: some View {
-        let preference = IOSUnitPreference.fromStorage(units)
-        let pressurePreference = IOSPressureUnitPreference.fromStorage(pressureUnitRaw)
-
-        return VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Text(DIRIOSLocalizer.string("settings.units.depth.title"))
                         .foregroundStyle(DIRTheme.muted)
                     Spacer()
-                    Text(preference.shortLabel)
+                    Text(sharedSettings.units.shortLabel)
                         .foregroundStyle(.white)
                         .fontWeight(.semibold)
                 }
                 .font(.callout)
-                Picker(DIRIOSLocalizer.string("settings.units.depth.title"), selection: $units) {
+                Picker(DIRIOSLocalizer.string("settings.units.depth.title"), selection: $sharedSettings.units) {
                     ForEach(IOSUnitPreference.allCases) { option in
-                        Text(option.shortLabel).tag(option.rawValue)
+                        Text(option.shortLabel).tag(option)
                     }
                 }
                 .pickerStyle(.segmented)
@@ -270,16 +309,20 @@ struct MoreView: View {
                     Text(DIRIOSLocalizer.string("settings.units.pressure.title"))
                         .foregroundStyle(DIRTheme.muted)
                     Spacer()
-                    Text(pressurePreference == .bar
+                    Text(sharedSettings.pressureUnit == .bar
                         ? DIRIOSLocalizer.string("settings.units.pressure.bar")
                         : DIRIOSLocalizer.string("settings.units.pressure.psi"))
                         .foregroundStyle(.white)
                         .fontWeight(.semibold)
                 }
                 .font(.callout)
-                Picker(DIRIOSLocalizer.string("settings.units.pressure.title"), selection: $pressureUnitRaw) {
-                    Text(DIRIOSLocalizer.string("settings.units.pressure.bar")).tag(IOSPressureUnitPreference.storageValue(for: .bar))
-                    Text(DIRIOSLocalizer.string("settings.units.pressure.psi")).tag(IOSPressureUnitPreference.storageValue(for: .psi))
+                Picker(DIRIOSLocalizer.string("settings.units.pressure.title"), selection: $sharedSettings.pressureUnit) {
+                    ForEach(PressureUnit.allCases) { unit in
+                        Text(unit == .bar
+                             ? DIRIOSLocalizer.string("settings.units.pressure.bar")
+                             : DIRIOSLocalizer.string("settings.units.pressure.psi")
+                        ).tag(unit)
+                    }
                 }
                 .pickerStyle(.segmented)
             }
@@ -290,8 +333,8 @@ struct MoreView: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.vertical, 5)
-        .onChange(of: units) { _, newValue in
-            watchSync.pushUnitsPreference(newValue)
+        .onChange(of: sharedSettings.units) { _, newValue in
+            watchSync.pushUnitsPreference(newValue.rawValue)
         }
     }
 
@@ -308,25 +351,23 @@ struct MoreView: View {
     }
 
     private var languagePreferencePicker: some View {
-        let selectedLanguage = DIRIOSAppLanguage.fromStorage(appLanguage)
-
-        return VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(DIRIOSLocalizer.string("more.language.title"))
                     .foregroundStyle(DIRTheme.muted)
                 Spacer()
-                Text(selectedLanguage.localizedTitle)
+                Text(sharedSettings.language.localizedTitle)
                     .foregroundStyle(.white)
                     .fontWeight(.semibold)
             }
             .font(.callout)
-            Picker(DIRIOSLocalizer.string("more.language.title"), selection: $appLanguage) {
+            Picker(DIRIOSLocalizer.string("more.language.title"), selection: $sharedSettings.language) {
                 ForEach(DIRIOSAppLanguage.allCases) { language in
-                    Text(language.localizedTitle).tag(language.rawValue)
+                    Text(language.localizedTitle).tag(language)
                 }
             }
             .pickerStyle(.segmented)
-            Text(selectedLanguage.localizedDetail)
+            Text(sharedSettings.language.localizedDetail)
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.yellow)
             Text(DIRIOSLocalizer.string("more.language.units_disclaimer"))
@@ -359,6 +400,8 @@ struct MoreView: View {
                                 .background(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.cyan, lineWidth: 1))
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel(DIRIOSLocalizer.string("more.sync.use_watch"))
+                        .accessibilityHint(DIRIOSLocalizer.string("more.sync.use_watch.a11y.hint"))
                         Button {
                             watchSync.resolveConflictKeepingLocal(conflict)
                         } label: {
@@ -370,9 +413,13 @@ struct MoreView: View {
                                 .background(RoundedRectangle(cornerRadius: 6).stroke(DIRTheme.yellow, lineWidth: 1))
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel(DIRIOSLocalizer.string("more.sync.keep_local"))
+                        .accessibilityHint(DIRIOSLocalizer.string("more.sync.keep_local.a11y.hint"))
                     }
                 }
                 .padding(.vertical, 4)
+                .accessibilityElement(children: .contain)
+                .accessibilityLabel(conflict.localSummary)
                 if conflict.id != watchSync.conflicts.last?.id {
                     Divider().overlay(DIRTheme.hairline)
                 }
@@ -451,6 +498,9 @@ struct MoreView: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     .padding(.vertical, 2)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("\(activity.title). \(activity.detail)")
+                    .accessibilityIdentifier("more.sync.activity.\(activity.id.uuidString)")
                 }
             }
         }
@@ -459,7 +509,7 @@ struct MoreView: View {
     private var appVersionRow: some View {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "n/d"
         return DIRCard(DIRIOSLocalizer.string("more.section.about"), icon: "info.circle", accent: DIRTheme.muted) {
-            row(DIRIOSLocalizer.string("Versione"), version)
+            row(DIRIOSLocalizer.string("settings.version.label"), version)
                 .developerVersionUnlock(tapCount: $versionTapCount) {
                     developerUnlockedNotice = true
                 }
@@ -475,5 +525,26 @@ struct MoreView: View {
         }
         .font(.callout)
         .padding(.vertical, 4)
+    }
+
+    private func accessibleInfoRow(
+        title: String,
+        value: String,
+        identifier: String,
+        hint: String? = nil
+    ) -> some View {
+        HStack {
+            Text(title).foregroundStyle(DIRTheme.muted)
+            Spacer()
+            Text(value).foregroundStyle(.white)
+                .multilineTextAlignment(.trailing)
+        }
+        .font(.callout)
+        .padding(.vertical, 4)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(title)
+        .accessibilityValue(value)
+        .accessibilityHint(hint ?? "")
+        .accessibilityIdentifier(identifier)
     }
 }
