@@ -56,7 +56,8 @@ struct FullComputerRuntimeLogbookAccumulator: Hashable {
         gfHigh: Double,
         gasSwitchEvents: [FullComputerLogbookGasSwitchEvent],
         unavailableGasMixIds: [UUID],
-        algorithmVersion: String
+        algorithmVersion: String,
+        environmentRecord: FullComputerEnvironmentRecord?
     ) -> FullComputerDiveLogbookMetadata {
         FullComputerDiveLogbookMetadata(
             watchDivingMode: watchDivingMode,
@@ -73,7 +74,14 @@ struct FullComputerRuntimeLogbookAccumulator: Hashable {
             unavailableGasMixIds: unavailableGasMixIds,
             recoveryEventCount: recoveryEventCount,
             recoveryDiagnostics: recoveryDiagnostics,
-            algorithmVersion: algorithmVersion
+            algorithmVersion: algorithmVersion,
+            environmentSchemaVersion: environmentRecord?.schemaVersion,
+            altitudeMeters: environmentRecord?.altitudeMeters,
+            surfacePressureBar: environmentRecord?.surfacePressureBar,
+            salinityRaw: environmentRecord?.salinityRaw,
+            waterDensityKgPerM3: environmentRecord?.waterDensityKgPerM3,
+            environmentSourceRaw: environmentRecord?.source.rawValue,
+            environmentCapturedAt: environmentRecord?.capturedAt
         )
     }
 }

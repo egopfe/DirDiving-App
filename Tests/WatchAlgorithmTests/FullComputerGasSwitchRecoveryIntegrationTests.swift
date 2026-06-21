@@ -128,6 +128,6 @@ final class FullComputerGasSwitchRecoveryIntegrationTests: XCTestCase {
         profile.bottomGas.heliumFraction = 0.45
         profile.bottomGas.name = "Trimix 18/45"
         profile.decoGases = [.ean50(at: 21)]
-        return FullComputerRuntimePlan(profile: profile)
+        return FullComputerRuntimePlan(profile: profile, plannerEnvironment: .seaLevelSaltWater)
     }
 }

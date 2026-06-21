@@ -13,6 +13,8 @@ enum FullComputerGasValidationIssue: Hashable, Codable {
     case invalidGradientFactors
     case disabledBottomGas
     case invalidSelection(String)
+    case missingEnvironment
+    case invalidEnvironment(String)
 
     var localizationKey: String {
         switch self {
@@ -28,6 +30,8 @@ enum FullComputerGasValidationIssue: Hashable, Codable {
         case .invalidGradientFactors: return "fc.gas.error.gf"
         case .disabledBottomGas: return "fc.gas.error.bottom_disabled"
         case .invalidSelection: return "fc.gas.error.selection"
+        case .missingEnvironment: return "fc.environment.error.missing"
+        case .invalidEnvironment: return "fc.environment.error.invalid"
         }
     }
 
@@ -43,6 +47,8 @@ enum FullComputerGasValidationIssue: Hashable, Codable {
             return name
         case .duplicateSwitchDepth(let depth):
             return Formatters.one(depth)
+        case .invalidEnvironment(let code):
+            return code
         default:
             return nil
         }
@@ -52,11 +58,15 @@ enum FullComputerGasValidationIssue: Hashable, Codable {
 enum FullComputerGasProfileValidator {
     static func validate(
         _ profile: FullComputerGasProfile,
-        environment: PlannerEnvironment = .seaLevelSaltWater,
+        environment: PlannerEnvironment?,
         referenceDepthMeters: Double = 0
     ) -> [FullComputerGasValidationIssue] {
         var issues: [FullComputerGasValidationIssue] = []
 
+        guard let environment else {
+            issues.append(.missingEnvironment)
+            return issues
+        }
         if !profile.bottomGas.isEnabled {
             issues.append(.disabledBottomGas)
         }
@@ -111,8 +121,8 @@ enum FullComputerGasProfileValidator {
         return unique(issues)
     }
 
-    static func isValid(_ profile: FullComputerGasProfile) -> Bool {
-        validate(profile).isEmpty
+    static func isValid(_ profile: FullComputerGasProfile, environment: PlannerEnvironment? = nil) -> Bool {
+        validate(profile, environment: environment).isEmpty
     }
 
     private static func validateGas(

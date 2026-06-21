@@ -34,4 +34,68 @@ struct FullComputerDiveLogbookMetadata: Codable, Hashable {
     let recoveryEventCount: Int
     let recoveryDiagnostics: [String]
     let algorithmVersion: String
+    let environmentSchemaVersion: Int?
+    let altitudeMeters: Double?
+    let surfacePressureBar: Double?
+    let salinityRaw: String?
+    let waterDensityKgPerM3: Double?
+    let environmentSourceRaw: String?
+    let environmentCapturedAt: Date?
+
+    init(
+        watchDivingMode: String,
+        gfLow: Double,
+        gfHigh: Double,
+        gasSwitchEvents: [FullComputerLogbookGasSwitchEvent],
+        minimumNDLMinutes: Double?,
+        maximumCeilingMeters: Double,
+        maximumTTSMinutes: Int,
+        plannedStopDepthsMeters: [Double],
+        completedStopDepthsMeters: [Double],
+        stopViolationCount: Int,
+        ceilingViolationCount: Int,
+        unavailableGasMixIds: [UUID],
+        recoveryEventCount: Int,
+        recoveryDiagnostics: [String],
+        algorithmVersion: String,
+        environmentSchemaVersion: Int? = nil,
+        altitudeMeters: Double? = nil,
+        surfacePressureBar: Double? = nil,
+        salinityRaw: String? = nil,
+        waterDensityKgPerM3: Double? = nil,
+        environmentSourceRaw: String? = nil,
+        environmentCapturedAt: Date? = nil
+    ) {
+        self.watchDivingMode = watchDivingMode
+        self.gfLow = gfLow
+        self.gfHigh = gfHigh
+        self.gasSwitchEvents = gasSwitchEvents
+        self.minimumNDLMinutes = minimumNDLMinutes
+        self.maximumCeilingMeters = maximumCeilingMeters
+        self.maximumTTSMinutes = maximumTTSMinutes
+        self.plannedStopDepthsMeters = plannedStopDepthsMeters
+        self.completedStopDepthsMeters = completedStopDepthsMeters
+        self.stopViolationCount = stopViolationCount
+        self.ceilingViolationCount = ceilingViolationCount
+        self.unavailableGasMixIds = unavailableGasMixIds
+        self.recoveryEventCount = recoveryEventCount
+        self.recoveryDiagnostics = recoveryDiagnostics
+        self.algorithmVersion = algorithmVersion
+        self.environmentSchemaVersion = environmentSchemaVersion
+        self.altitudeMeters = altitudeMeters
+        self.surfacePressureBar = surfacePressureBar
+        self.salinityRaw = salinityRaw
+        self.waterDensityKgPerM3 = waterDensityKgPerM3
+        self.environmentSourceRaw = environmentSourceRaw
+        self.environmentCapturedAt = environmentCapturedAt
+    }
+
+    var environmentSource: FullComputerEnvironmentSource? {
+        guard let environmentSourceRaw else { return nil }
+        return FullComputerEnvironmentSource(rawValue: environmentSourceRaw)
+    }
+
+    var hasKnownEnvironment: Bool {
+        environmentSchemaVersion != nil && altitudeMeters != nil && surfacePressureBar != nil
+    }
 }

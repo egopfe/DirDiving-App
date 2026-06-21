@@ -143,7 +143,12 @@ final class FullComputerRecoveryCheckpointTests: XCTestCase {
             gfHigh: 70,
             gasSwitchEvents: [],
             unavailableGasMixIds: [],
-            algorithmVersion: FullComputerRuntimeConfiguration.algorithmVersion
+            algorithmVersion: FullComputerRuntimeConfiguration.algorithmVersion,
+            environmentRecord: FullComputerEnvironmentRecord.from(
+                plannerEnvironment: .seaLevelSaltWater,
+                source: .watchSettingsManual,
+                capturedAt: start
+            )
         )
         XCTAssertNotNil(metadata.minimumNDLMinutes)
         XCTAssertEqual(metadata.algorithmVersion, FullComputerRuntimeConfiguration.algorithmVersion)

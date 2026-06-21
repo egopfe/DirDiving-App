@@ -43,6 +43,11 @@ struct FullComputerImportedPlanView: View {
                             row(label: String(localized: "startup.fc_confirm.row.gf"), value: gfLabel(package))
                             divider
                             row(
+                                label: String(localized: "fc.environment.confirm.row"),
+                                value: environmentLabel(package)
+                            )
+                            divider
+                            row(
                                 label: String(localized: "fc.imported_plan.runtime"),
                                 value: String(
                                     format: String(localized: "fc.imported_plan.runtime_minutes_format"),
@@ -147,6 +152,13 @@ struct FullComputerImportedPlanView: View {
 
     private func gfLabel(_ package: DivePlanPackage) -> String {
         "\(Int(package.body.gfLow))/\(Int(package.body.gfHigh))"
+    }
+
+    private func environmentLabel(_ package: DivePlanPackage) -> String {
+        guard case .success(let record) = package.body.environment.validatedRecord(source: .iPhonePlanImported) else {
+            return String(localized: "fc.environment.error.invalid")
+        }
+        return FullComputerEnvironmentPresentation.summary(for: record)
     }
 
     private func activatePlan() {

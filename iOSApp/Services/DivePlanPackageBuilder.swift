@@ -47,6 +47,17 @@ enum DivePlanPackageBuilder {
         let decoStopCount = plan?.decoStops.count ?? 0
         let requiresDeco = decoStopCount > 0 || (plan?.ttsMinutes ?? 0) > 0
         let planKind = bottomSegments.count > 1 ? "multilevel" : "single"
+        let environmentPayload: DivePlanEnvironmentPayload
+        switch PlannerEnvironment.make(altitudeMeters: workingInput.altitudeMeters, salinity: workingInput.salinity) {
+        case .success(let environment):
+            environmentPayload = DivePlanEnvironmentPayload(
+                altitudeMeters: environment.altitudeMeters,
+                salinityRaw: workingInput.salinity.rawValue,
+                surfacePressureBar: environment.surfacePressureBar
+            )
+        case .failure:
+            throw DivePlanPackageValidationError.invalidEnvironment
+        }
 
         let body = DivePlanPackageBody(
             schemaVersion: DivePlanPackageCodec.currentSchemaVersion,
@@ -55,10 +66,7 @@ enum DivePlanPackageBuilder {
             revision: revision,
             createdAt: createdAt,
             expiresAt: expiresAt ?? createdAt.addingTimeInterval(DivePlanPackageCodec.defaultTTL),
-            environment: DivePlanEnvironmentPayload(
-                altitudeMeters: workingInput.altitudeMeters,
-                salinityRaw: workingInput.salinity.rawValue
-            ),
+            environment: environmentPayload,
             gfLow: workingInput.gfLow,
             gfHigh: workingInput.gfHigh,
             gases: gases,
