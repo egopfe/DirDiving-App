@@ -7,38 +7,77 @@ enum FullComputerDecoSolver {
     static let ceilingViolationToleranceMeters = 0.35
     static let decoCeilingEpsilonMeters = 0.05
 
-    private struct CacheKey: Hashable {
-        let tissueState: BuhlmannTissueState
-        let depthMilliMeters: Int
-        let gasMixId: UUID
-        let gfLowMilli: Int
-        let gfHighMilli: Int
-        let runtimeMinutes: Int
-        let travelSignature: Int
-        let decoSignature: Int
+    /// Instance-scoped presentation cache owned by `FullComputerRuntimeEngine` (not process-wide).
+    struct Cache: Equatable {
+        fileprivate struct CacheKey: Hashable {
+            let tissueState: BuhlmannTissueState
+            let depthMilliMeters: Int
+            let gasMixId: UUID
+            let gfLowMilli: Int
+            let gfHighMilli: Int
+            let runtimeMinutes: Int
+            let travelSignature: Int
+            let decoSignature: Int
+        }
+
+        fileprivate var cachedKey: CacheKey?
+        fileprivate var cachedPresentation: FullComputerDecoPresentation?
+
+        mutating func reset() {
+            cachedKey = nil
+            cachedPresentation = nil
+        }
     }
 
-    private static var cachedKey: CacheKey?
-    private static var cachedPresentation: FullComputerDecoPresentation?
-    private static var cachedProjection: BuhlmannRuntimeProjection?
+    /// Test-only hook for suites that call static `solve(input:)` without an engine-owned cache.
+    private static var uncachedTestCounter = 0
 
     static func resetCacheForTests() {
-        cachedKey = nil
-        cachedPresentation = nil
-        cachedProjection = nil
+        uncachedTestCounter = 0
     }
 
+    /// Builds presentation from a precomputed canonical projection (single projection per snapshot refresh).
+    static func solve(
+        input: FullComputerDecoSolverInput,
+        projection: BuhlmannRuntimeProjection,
+        cache: inout Cache?,
+        budgetSeconds: TimeInterval = performanceBudgetSeconds,
+        timingDegraded: Bool = false
+    ) -> FullComputerDecoPresentation {
+        let key = cacheKey(for: input)
+        if !timingDegraded, var cache, cache.cachedKey == key, let cachedPresentation = cache.cachedPresentation {
+            _ = budgetSeconds
+            return cachedPresentation
+        }
+
+        let started = ProcessInfo.processInfo.systemUptime
+        let elapsed = ProcessInfo.processInfo.systemUptime - started
+        if elapsed > budgetSeconds, !timingDegraded, var cache, let cachedPresentation = cache.cachedPresentation, cache.cachedKey != key {
+            return conservativeFallback(from: cachedPresentation, diagnostics: ["solver_budget_exceeded"])
+        }
+
+        let presentation = buildPresentation(
+            input: input,
+            projection: projection,
+            usedConservativeFallback: false,
+            diagnostics: projection.issues.isEmpty ? [] : ["projection_issues:\(projection.issues.count)"],
+            timingDegraded: timingDegraded
+        )
+        if !timingDegraded, cache != nil {
+            cache!.cachedKey = key
+            cache!.cachedPresentation = presentation
+        }
+        return presentation
+    }
+
+    /// Uncached path for unit tests and legacy callers.
     static func solve(
         input: FullComputerDecoSolverInput,
         now: Date = Date(),
         budgetSeconds: TimeInterval = performanceBudgetSeconds
     ) -> FullComputerDecoPresentation {
-        let key = cacheKey(for: input)
-        if key == cachedKey, let cachedPresentation {
-            return cachedPresentation
-        }
-
-        let started = ProcessInfo.processInfo.systemUptime
+        _ = now
+        uncachedTestCounter &+= 1
         let projection = BuhlmannEngine.runtimeProjection(
             tissueState: input.tissueState,
             depthMeters: input.depthMeters,
@@ -51,23 +90,12 @@ enum FullComputerDecoSolver {
             ascentRateMetersPerMinute: input.plan.ascentRateMetersPerMinute,
             stopIntervalMeters: input.plan.stopIntervalMeters
         )
-
-        let elapsed = ProcessInfo.processInfo.systemUptime - started
-        if elapsed > budgetSeconds, let cachedPresentation, key != cachedKey {
-            return conservativeFallback(from: cachedPresentation, diagnostics: ["solver_budget_exceeded"])
-        }
-
-        let presentation = buildPresentation(
+        return buildPresentation(
             input: input,
             projection: projection,
             usedConservativeFallback: false,
             diagnostics: projection.issues.isEmpty ? [] : ["projection_issues:\(projection.issues.count)"]
         )
-        cachedKey = key
-        cachedPresentation = presentation
-        cachedProjection = projection
-        _ = now
-        return presentation
     }
 
     static func presentationCeilingMeters(_ exact: Double) -> Double {
@@ -94,11 +122,12 @@ enum FullComputerDecoSolver {
             || projection.operationalCeilingMeters > decoCeilingEpsilonMeters
     }
 
-    private static func buildPresentation(
+    static func buildPresentation(
         input: FullComputerDecoSolverInput,
         projection: BuhlmannRuntimeProjection,
         usedConservativeFallback: Bool,
-        diagnostics: [String]
+        diagnostics: [String],
+        timingDegraded: Bool = false
     ) -> FullComputerDecoPresentation {
         let depth = max(0, input.depthMeters)
         let decoRequired = requiresDecompression(projection: projection, depthMeters: depth)
@@ -117,11 +146,18 @@ enum FullComputerDecoSolver {
             && depth + 0.2 >= ceilingExact
             && (firstStop == nil || depth <= (firstStop?.depthMeters ?? 0) + 0.5)
 
+        var mergedDiagnostics = diagnostics
+        if timingDegraded {
+            mergedDiagnostics.append("timing_degraded")
+        }
+
         if decoRequired {
             let immersionAccent: FullComputerImmersionAccent = ceilingViolation ? .ceilingViolation : .decompression
-            let statusKey = ceilingViolation
-                ? "live.fc.status.ceiling_violation"
-                : "live.fc.status.in_deco"
+            let statusKey = timingDegraded
+                ? "live.fc.status.runtime_degraded"
+                : ceilingViolation
+                    ? "live.fc.status.ceiling_violation"
+                    : "live.fc.status.in_deco"
             return FullComputerDecoPresentation(
                 mode: .decompression,
                 immersionAccent: immersionAccent,
@@ -136,11 +172,11 @@ enum FullComputerDecoSolver {
                 nextStopMinutes: firstStop?.minutes,
                 remainingStopCount: remainingStops,
                 ceilingViolation: ceilingViolation,
-                ascentAllowedBetweenStops: ascentAllowed,
+                ascentAllowedBetweenStops: timingDegraded ? false : ascentAllowed,
                 showDecoStopPanel: showDecoStopPanel,
                 showCeilingViolationBanner: ceilingViolation,
-                usedConservativeFallback: usedConservativeFallback,
-                diagnostics: diagnostics,
+                usedConservativeFallback: usedConservativeFallback || timingDegraded,
+                diagnostics: mergedDiagnostics,
                 stopState: nil,
                 stopDirection: .none,
                 stopPanelAccent: .yellow,
@@ -156,12 +192,13 @@ enum FullComputerDecoSolver {
 
         let ndlRounded = max(0, Int(floor(projection.ndlMinutes ?? 0)))
         let accent = ndlAccent(for: ndlRounded)
+        let statusKey = timingDegraded ? "live.fc.status.runtime_degraded" : "live.status.in_dive"
         return FullComputerDecoPresentation(
             mode: .noDecompression,
             immersionAccent: .diving,
-            immersionStatusKey: "live.status.in_dive",
-            ndlDisplayMinutes: ndlRounded,
-            ndlAccent: accent,
+            immersionStatusKey: statusKey,
+            ndlDisplayMinutes: timingDegraded ? nil : ndlRounded,
+            ndlAccent: timingDegraded ? nil : accent,
             ttsMinutes: projection.ttsMinutes,
             runtimeMinutes: input.runtimeMinutes,
             ceilingMetersExact: ceilingExact,
@@ -170,11 +207,11 @@ enum FullComputerDecoSolver {
             nextStopMinutes: nil,
             remainingStopCount: 0,
             ceilingViolation: false,
-            ascentAllowedBetweenStops: true,
+            ascentAllowedBetweenStops: !timingDegraded,
             showDecoStopPanel: false,
             showCeilingViolationBanner: false,
-            usedConservativeFallback: usedConservativeFallback,
-            diagnostics: diagnostics,
+            usedConservativeFallback: usedConservativeFallback || timingDegraded,
+            diagnostics: mergedDiagnostics,
             stopState: nil,
             stopDirection: .none,
             stopPanelAccent: .green,
@@ -185,6 +222,21 @@ enum FullComputerDecoSolver {
             showDecoProgressPanel: false,
             hideManualStopwatch: false,
             timerAccruing: false
+        )
+    }
+
+    private static func buildPresentation(
+        input: FullComputerDecoSolverInput,
+        projection: BuhlmannRuntimeProjection,
+        usedConservativeFallback: Bool,
+        diagnostics: [String]
+    ) -> FullComputerDecoPresentation {
+        buildPresentation(
+            input: input,
+            projection: projection,
+            usedConservativeFallback: usedConservativeFallback,
+            diagnostics: diagnostics,
+            timingDegraded: false
         )
     }
 
@@ -224,8 +276,8 @@ enum FullComputerDecoSolver {
         )
     }
 
-    private static func cacheKey(for input: FullComputerDecoSolverInput) -> CacheKey {
-        CacheKey(
+    private static func cacheKey(for input: FullComputerDecoSolverInput) -> Cache.CacheKey {
+        Cache.CacheKey(
             tissueState: input.tissueState,
             depthMilliMeters: Int((input.depthMeters * 1_000).rounded()),
             gasMixId: input.plan.activeGas.gasMixId,

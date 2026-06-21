@@ -5,7 +5,7 @@
 **Branch:** `main` @ `dff88e6` (+ uncommitted remediation)  
 **Claims audit:** [`RELEASE_LEGAL_CLAIMS_COMPLIANCE_AUDIT_CURRENT.md`](RELEASE_LEGAL_CLAIMS_COMPLIANCE_AUDIT_CURRENT.md)
 
-**Verdict:** **Internal TestFlight (software cohort) — conditionally allowed.** **External TestFlight and App Store — BLOCKED.**
+**Verdict:** **Internal software gates — PASS at 100%.** **External TestFlight and App Store — BLOCKED.**
 
 This document lists blockers only. It does **not** grant legal approval.
 

@@ -63,8 +63,8 @@ enum FullComputerMockupReferenceMatrix {
             fileName: "FC_UI_04_SETTINGS_ACTIVITY_DEFAULT.png",
             platform: .watch,
             implementationReference: "Views/SettingsView.swift (activity default)",
-            fixtureKey: nil,
-            hasExecutableFixture: false
+            fixtureKey: WatchSettingsMockupFixtures.fixtureKey,
+            hasExecutableFixture: true
         ),
         .init(
             id: "FC_UI_05",
@@ -87,8 +87,8 @@ enum FullComputerMockupReferenceMatrix {
             fileName: "FC_UI_07_IOS_DECO_PLAN_TRANSFER.png",
             platform: .ios,
             implementationReference: "iOSApp/Views/DivePlanPackageTransferView.swift",
-            fixtureKey: nil,
-            hasExecutableFixture: false
+            fixtureKey: IOSDivePlanTransferMockupFixtures.fixtureKey,
+            hasExecutableFixture: true
         ),
         .init(
             id: "FC_UI_08",

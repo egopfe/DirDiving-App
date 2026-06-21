@@ -3,6 +3,9 @@ import Foundation
 struct IOSApneaDashboardPresentation: Equatable {
     var hasLastSession: Bool
     var lastSessionDateText: String
+    var lastSessionDurationText: String
+    var lastSessionMaxDepthText: String
+    var lastSessionDiveCountText: String
     var maxDepthText: String
     var bestTimeText: String
     var diveCountText: String
@@ -31,6 +34,9 @@ enum IOSApneaDashboardPresentationMapper {
             return IOSApneaDashboardPresentation(
                 hasLastSession: true,
                 lastSessionDateText: formatter.string(from: lastSession.createdAt),
+                lastSessionDurationText: Formatters.time(stats.sessionDurationSeconds),
+                lastSessionMaxDepthText: formatDepth(stats.sessionMaxDepthMeters),
+                lastSessionDiveCountText: "\(stats.diveCount)",
                 maxDepthText: formatDepth(stats.sessionMaxDepthMeters),
                 bestTimeText: Formatters.time(stats.bestDiveDurationSeconds),
                 diveCountText: "\(stats.diveCount)",
@@ -45,6 +51,9 @@ enum IOSApneaDashboardPresentationMapper {
         return IOSApneaDashboardPresentation(
             hasLastSession: false,
             lastSessionDateText: "—",
+            lastSessionDurationText: "—",
+            lastSessionMaxDepthText: "—",
+            lastSessionDiveCountText: "—",
             maxDepthText: aggregate.bestSessionMaxDepthMeters > 0 ? formatDepth(aggregate.bestSessionMaxDepthMeters) : "—",
             bestTimeText: aggregate.bestDiveDurationSeconds > 0 ? Formatters.time(aggregate.bestDiveDurationSeconds) : "—",
             diveCountText: aggregate.totalDiveCount > 0 ? "\(aggregate.totalDiveCount)" : "—",

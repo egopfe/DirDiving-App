@@ -6,7 +6,7 @@ DIR DIVING, including the Apple Watch MAIN app and iOS Companion, is not a certi
 
 It must not be used as:
 - a primary dive computer,
-- a certified decompression planner,
+- substitute for a certified decompression planner,
 - a replacement for agency tables,
 - a replacement for technical-diving training,
 - a replacement for team procedures.

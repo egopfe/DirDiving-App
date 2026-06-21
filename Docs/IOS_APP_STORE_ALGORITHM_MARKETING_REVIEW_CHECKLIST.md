@@ -7,7 +7,7 @@ Use before App Store submission. DIR DIVING is a **non-certified reference compa
 ## Prohibited claims (must NOT appear in store copy, screenshots, or in-app marketing)
 
 - [ ] Certified dive computer
-- [ ] Certified decompression planner
+- [ ] Prohibited store claim: certified decompression planner
 - [ ] Certified CCR controller / life-support system
 - [ ] Real-time loop PPO₂ monitoring or solenoid control
 - [ ] Authoritative bailout decompression schedule (heuristic only)

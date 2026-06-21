@@ -1,0 +1,18 @@
+Requirement_ID,Area,Requirement,Source_File,Test_File,Profiles,Oracle_Coverage,Production_Coverage,Result,Evidence,Severity,Notes
+REQ-A15-001,ZH-L16C,16 compartment constants,Shared/BuhlmannCore/BuhlmannConstants.swift,WatchMathCrossTargetParityTests,All,yes,yes,PASS,cross-target,—,
+REQ-A15-002,N2 tissue,Schreiner/Haldane N2 loading,Shared/BuhlmannCore/BuhlmannTissueModel.swift,Audit15MultilevelOracleProfilesTests,ML-01..ML-10,yes,yes,PASS,per-second oracle,—,
+REQ-A15-003,He tissue,Independent He compartments,Shared/BuhlmannCore/BuhlmannTissueModel.swift,Audit15MultilevelOracleProfilesTests testML03,ML-03,yes,yes,PASS,He>0 after trimix,—,
+REQ-A15-004,Schreiner,Analytic parity,Schreiner private fn,SchreinerAnalyticParityTests,Segments,yes,yes,PASS,0.0005 bar,—,
+REQ-A15-005,Timing,Actual dt integration,FullComputerRuntimeEngine.swift,FullComputerTimingFaultTests,Fault matrix,yes,yes,PASS,elapsed not capped,—,
+REQ-A15-006,Multilevel,39m to 10m oracle,FullComputerRuntimeEngine.swift,Audit15Air39MultilevelProfileTests,ML-01,yes,yes,PASS,0 tissue failures,—,
+REQ-A15-007,Gas switch,Ordering + 0.5min load,FullComputerRuntimeEngine.changeGas,Audit15MultilevelOracleProfilesTests testML02,ML-02,yes,yes,PASS,EAN50 active after switch,—,
+REQ-A15-008,TTS,No optimistic TTS vs oracle tissues,BuhlmannEngine.runtimeProjection,Audit15TTSScheduleOracleSweepTests,ML-01 ML-03,partial,yes,PASS,<=3 min tolerance,—,
+REQ-A15-009,Cache,Instance-scoped solver cache,FullComputerDecoSolver.Cache,FullComputerDecoSolverCacheIsolationTests,Engine pair,yes,yes,PASS,isolation tests,—,
+REQ-A15-010,Projection,Single runtimeProjection refresh,FullComputerRuntimeEngine.makeSnapshot,FullComputerProjectionDeduplicationTests,Deco profile,yes,yes,PASS,TTS parity,—,
+REQ-A15-011,Suspension,Full integrate + degraded,FullComputerRuntimeEngine.tick,FullComputerTimingFaultTests,121-1800s,yes,yes,PASS,no false clear,—,
+REQ-A15-012,Stop FSM,Timer separate from tissues,FullComputerDecoStopStateMachine,Audit15MultilevelOracleProfilesTests testML06,ML-06,yes,yes,PASS,tissues mutate on hover,—,
+REQ-A15-013,Restore,Checkpoint tissue equality,FullComputerRuntimeCheckpoint,Audit15RedescentOracleTests,ML-05,yes,yes,PASS,bit-equal restore,—,
+REQ-A15-014,Degraded UX,Truthful non-authoritative NDL,Views/DiveLiveView.swift,FullComputerProjectionDeduplicationTests,200s gap,yes,yes,PASS,runtime_degraded key,—,
+REQ-A15-015,Mutation,Wrong formula detection,IndependentOracleMutationFixtures,BuhlmannMutationResistanceTests,—,yes,yes,PASS,mutations diverge,—,
+REQ-A15-016,Repetitive,Surface interval tissues preserved,FullComputerRuntimeEngine,Audit15MultilevelOracleProfilesTests testML10,ML-10,yes,yes,PASS,not air saturated,Watch live multi-dive product scope documented in ML-10 test
+REQ-A15-017,External CSV,Replay export scaffolds,Scripts/export_watch_live_buhlmann_replay_vectors.py,validate script,ML-01..ML-10,scaffold,n/a,PASS,scaffold files,PENDING external fill,—,

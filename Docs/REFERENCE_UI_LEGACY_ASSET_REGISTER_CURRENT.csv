@@ -1,0 +1,3 @@
+Path,Status,Canonical,Historical,Used_By_Tests,Used_By_Runtime,Used_By_Docs,Action,Notes
+Docs/ReferenceUI/Watch_LIVE_reference.png,historical_reference,no,yes,no,no,yes,retain,Pre-canonical Watch live reference; not in mockups/** matrices
+Docs/ReferenceUI/archive/LEGACY_iOS_Companion_pre_three_mode_reference.png,historical_reference,no,yes,no,no,yes,retain,Deprecated pre-three-mode companion reference; canonical selection mockup is mockups/IOS_COMPANION_ACTIVITY_SELECTION_POST_ONBOARDING.png

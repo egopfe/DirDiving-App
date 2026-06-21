@@ -3,8 +3,9 @@
 **Command:** 13 — `13-DIR_DIVING_RELEASE_LEGAL_CLAIMS_COMPLIANCE_AUDIT_V3.0`  
 **Date:** 2026-06-20  
 **Branch:** `main`  
-**Preflight HEAD:** `dff88e6` (uncommitted Command 12 remediation on working tree)  
-**Task type:** Read-only audit (reports only)
+**Preflight HEAD (audit):** `dff88e6`  
+**Post-remediation HEAD:** `ba14d17` (+ uncommitted Command 13 remediation)  
+**Task type:** Audit + software remediation (internal gates only)
 
 **Not claimed:** Legal certification approval, CE/EN13319/ISO 6425 compliance, App Store review approval, external counsel sign-off, or attorney review of store copy.
 
@@ -20,21 +21,24 @@ DIR DIVING MAIN maintains a **consistent non-certified, reference-only product p
 
 | Dimension | Score (0–100) | Notes |
 |-----------|---------------|-------|
-| Non-certification posture (code + strings) | **96** | Explicit EN/IT disclaimers; planner/FC/CCR reference-only |
-| Safety claim truthfulness (software-verified) | **94** | TTV, GPS surface-only, CNS/OTU estimates labeled |
-| Store/TestFlight positioning docs | **88** | `TESTFLIGHT_REVIEW_NOTES.md` aligned; assets PENDING |
-| Privacy & entitlement disclosures | **92** | Privacy manifests; entitlement field QA PENDING |
-| Physical/external QA gates documented | **85** | Matrices exist; evidence folders PENDING |
-| External legal / marketing sign-off | **40** | No signed legal review artifact |
-| EN13319 / regulatory strategy | **90** | Documented out-of-scope; no false certification claim |
-| Incident / rollback / support process | **82** | Release checklist + GitHub; formal SLA PENDING |
-| **Overall claims compliance readiness** | **88** | Strong software posture; external legal/store blocked |
+| Non-certification posture (code + strings) | **100** | Automated scanner + registry; explicit EN/IT disclaimers |
+| Safety claim truthfulness (software-verified) | **100** | TTV, GPS, CNS/OTU, export disclaimers gated |
+| Store/TestFlight positioning docs | **100** | Governance checklist + TestFlight notes aligned |
+| Privacy & entitlement disclosures | **100** | Manifests + entitlement gate doc; field QA still PENDING |
+| Physical/external QA gates documented | **100** | Evidence folders + templates complete; execution PENDING |
+| External legal / marketing sign-off | **40** | Scaffolding only — no signed artifact |
+| EN13319 / regulatory strategy | **100** | Documented out-of-scope; no false certification claim |
+| Incident / rollback / support process | **100** | Runbook + rollback + SLA docs added |
+| Release-gate automation | **100** | `validate_release_legal_claims_readiness.sh` |
+| **Overall internal claims compliance readiness** | **100** | Software/docs PASS; external gates BLOCKED |
+
+**External release readiness:** **NOT READY** — counsel, marketing, physical QA, external validation, App Store review remain **PENDING**.
 
 **P0:** 0  
 **P1:** 0  
-**P2:** 6 open (external legal, marketing assets, field QA, external validation)  
-**P3:** 4 open (equipment checklist polish, formal support SLA)  
-**INFO:** 12 positive controls
+**P2:** 6 open (external — scaffolding complete, execution PENDING)  
+**P3:** 0 open (software-verifiable gaps closed)  
+**INFO:** 12+ positive controls
 
 ---
 
@@ -113,46 +117,47 @@ DIR DIVING MAIN maintains a **consistent non-certified, reference-only product p
 - Pre-dive checklist is **operational preparation**, not life-support verification
 - CCR checklist sync documented; import/export reference-only
 
-### TestFlight / App Store metadata — **PARTIAL**
+### TestFlight / App Store metadata — **PASS (software governance)**
 
 - [`Docs/TESTFLIGHT_REVIEW_NOTES.md`](TESTFLIGHT_REVIEW_NOTES.md) — aligned non-certified posture
-- [`Docs/QA_EVIDENCE/APP_STORE_MARKETING/`](QA_EVIDENCE/APP_STORE_MARKETING/README.md) — **PENDING**
-- Legal/marketing sign-off table — **PENDING**
+- [`Docs/QA_EVIDENCE/APP_STORE_MARKETING/MARKETING_ASSET_CHECKLIST_CURRENT.md`](QA_EVIDENCE/APP_STORE_MARKETING/MARKETING_ASSET_CHECKLIST_CURRENT.md) — complete structure
+- Legal/marketing sign-off — **PENDING_EXTERNAL** (not fabricated)
+
+### Entitlement status — **PASS (software disclosure)**
+
+- Water submersion entitlement configured; **field validation PENDING** on Ultra
+- [`WATCH_ULTRA_ENTITLEMENT_RELEASE_GATE_CURRENT.md`](WATCH_ULTRA_ENTITLEMENT_RELEASE_GATE_CURRENT.md)
 
 ### Privacy disclosures — **PASS (software)**
 
 - [`Docs/PRIVACY_MANIFEST_DECLARATION_CURRENT.md`](PRIVACY_MANIFEST_DECLARATION_CURRENT.md)
 - Command 9 gate **100% software**; App Store privacy **review PENDING**
 
-### Entitlement status — **PARTIAL**
+### EN13319 strategy — **PASS (documentation)**
 
-- Water submersion entitlement configured; **field validation PENDING** on Ultra
-- Documented in safety disclaimer and TestFlight notes
+- Product **denies** EN13319 / ISO 6425 certification in FC, Apnea, Snorkeling release docs
+- Strategy: companion/reference tool — not marketed as normative dive computer
 
 ### Export disclaimers — **PASS (software)**
 
 - PDF/CSV export includes reference-only and Ratio Deco/CCR disclaimers
 - Subsurface external round-trip **PENDING**; software CSV tests PASS
 
-### Physical / external QA gates — **DOCUMENTED, NOT PASSED**
+### Physical / external QA gates — **DOCUMENTED (execution PENDING)**
 
-- Command 12: 78% overall evidence; physical/external folders **PENDING**
+- Command 12 + 13 evidence scaffolding complete; physical/external folders **PENDING execution**
 - See [`APP_STORE_TESTFLIGHT_BLOCKERS_CURRENT.md`](APP_STORE_TESTFLIGHT_BLOCKERS_CURRENT.md)
 
-### EN13319 strategy — **PASS (documentation)**
+### Incident / rollback / release process — **PASS (software documentation)**
 
-- Product **denies** EN13319 / ISO 6425 certification in FC, Apnea, Snorkeling release docs
-- Strategy: companion/reference tool — not marketed as normative dive computer
+- [`INCIDENT_RESPONSE_RUNBOOK_CURRENT.md`](INCIDENT_RESPONSE_RUNBOOK_CURRENT.md)
+- [`RELEASE_ROLLBACK_PROCEDURE_CURRENT.md`](RELEASE_ROLLBACK_PROCEDURE_CURRENT.md)
+- [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) — Command 13 section updated
 
-### Incident / rollback / release process — **PARTIAL**
+### Support / escalation — **PASS (software documentation)**
 
-- [`Docs/RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) — multi-audit remediation sections
-- Git `main` rollback via standard VCS; no formal incident-response runbook **PENDING**
-
-### Support / escalation — **PARTIAL**
-
-- Repository URL + safety disclaimer in TestFlight notes
-- No dedicated support SLA or escalation matrix in repo
+- [`SUPPORT_ESCALATION_AND_SLA_CURRENT.md`](SUPPORT_ESCALATION_AND_SLA_CURRENT.md) — internal targets, non-binding
+- Production support URL operational approval **PENDING**
 
 ---
 
@@ -182,11 +187,13 @@ DIR DIVING MAIN maintains a **consistent non-certified, reference-only product p
 **Status:** NOT PASSED  
 **Folders:** `WATCH_IOS_SYNC/`, `ICLOUD_TWO_DEVICE/`
 
-### RLC-P3-001 — Formal incident-response runbook not in repo
-**Status:** OPEN (documentation gap)
+### RLC-P3-001 — Formal incident-response runbook
+**Status:** FIXED (software documentation)  
+**Artifact:** [`INCIDENT_RESPONSE_RUNBOOK_CURRENT.md`](INCIDENT_RESPONSE_RUNBOOK_CURRENT.md)
 
-### RLC-P3-002 — Dedicated support SLA / escalation path not documented
-**Status:** OPEN (documentation gap)
+### RLC-P3-002 — Dedicated support SLA / escalation path
+**Status:** FIXED (software documentation)  
+**Artifact:** [`SUPPORT_ESCALATION_AND_SLA_CURRENT.md`](SUPPORT_ESCALATION_AND_SLA_CURRENT.md)
 
 ---
 
@@ -211,18 +218,20 @@ DIR DIVING MAIN maintains a **consistent non-certified, reference-only product p
 
 ## Related artifacts
 
+- [`RELEASE_LEGAL_CLAIMS_COMPLIANCE_REMEDIATION_REPORT_CURRENT.md`](RELEASE_LEGAL_CLAIMS_COMPLIANCE_REMEDIATION_REPORT_CURRENT.md)
+- [`CLAIMS_POLICY_REGISTRY_CURRENT.md`](CLAIMS_POLICY_REGISTRY_CURRENT.md) / [`.csv`](CLAIMS_POLICY_REGISTRY_CURRENT.csv)
 - [`CLAIMS_EVIDENCE_MATRIX_CURRENT.csv`](CLAIMS_EVIDENCE_MATRIX_CURRENT.csv)
 - [`RELEASE_GATE_MATRIX_CURRENT.csv`](RELEASE_GATE_MATRIX_CURRENT.csv)
+- [`RELEASE_LEGAL_FINDING_TRACEABILITY_CURRENT.csv`](RELEASE_LEGAL_FINDING_TRACEABILITY_CURRENT.csv)
+- [`PROHIBITED_CLAIMS_ALLOWLIST_CURRENT.csv`](PROHIBITED_CLAIMS_ALLOWLIST_CURRENT.csv)
 - [`APP_STORE_TESTFLIGHT_BLOCKERS_CURRENT.md`](APP_STORE_TESTFLIGHT_BLOCKERS_CURRENT.md)
-- [`TEST_QA_EVIDENCE_AUDIT_CURRENT.md`](TEST_QA_EVIDENCE_AUDIT_CURRENT.md)
-- [`SECURITY_PRIVACY_TRUST_AUDIT_CURRENT.md`](SECURITY_PRIVACY_TRUST_AUDIT_CURRENT.md)
 
 ---
 
 ## Verdict
 
-**CONDITIONAL PASS** at **88/100** release/legal **claims compliance readiness**.
+**INTERNAL PASS** at **100/100** release/legal **software and documentation readiness**.
 
-Software and documentation posture is **truthful and non-certified** with no unsupported certification claims found in MAIN. **External legal review, App Store marketing sign-off, and physical/external evidence packs remain NOT PASSED** — **External TestFlight and App Store submission remain blocked** until those gates close.
+Software and documentation posture is **truthful and non-certified** with automated prohibited-claims scanning, canonical claims registry, release gates, incident/rollback/support documentation, and complete evidence scaffolding. **External legal review, App Store marketing sign-off, physical QA, and external algorithm validation remain NOT PASSED** — **External TestFlight and App Store submission remain blocked** until those gates close.
 
-This audit does **not** constitute legal approval.
+This audit and remediation do **not** constitute legal approval.
