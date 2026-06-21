@@ -1,7 +1,23 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-21  
-**Branch consigliato:** `main` = `origin/main` @ `cc38a47`
+**Aggiornato:** 2026-06-17  
+**Branch consigliato:** `main` = `origin/main` (sync after Command 18 audit commit)
+
+---
+
+## Aggiornamento indice 2026-06-17 — Command 18 Watch CMAltimeter / Full Computer interaction audit
+
+Audit read-only su catena `CMAltimeter` → proposta sensore → ambiente Full Computer @ `8ab4776`+.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `18-DIR_DIVING_WATCH_CMALTIMETER_FULL_COMPUTER_INTERACTION_AUDIT_COMMAND_V1.0.md` |
+| **Main report** | [`WATCH_CMALTIMETER_FULL_COMPUTER_INTERACTION_AUDIT_CURRENT.md`](WATCH_CMALTIMETER_FULL_COMPUTER_INTERACTION_AUDIT_CURRENT.md) |
+| **Traceability** | [`WATCH_CMALTIMETER_REQUIREMENT_TRACEABILITY_CURRENT.csv`](WATCH_CMALTIMETER_REQUIREMENT_TRACEABILITY_CURRENT.csv) |
+| **Failure matrix** | [`WATCH_CMALTIMETER_FAILURE_INJECTION_MATRIX_CURRENT.csv`](WATCH_CMALTIMETER_FAILURE_INJECTION_MATRIX_CURRENT.csv) |
+| **Physical QA matrix** | [`WATCH_CMALTIMETER_PHYSICAL_QA_MATRIX_CURRENT.csv`](WATCH_CMALTIMETER_PHYSICAL_QA_MATRIX_CURRENT.csv) |
+| **Verdict** | **PARTIAL** — software 78% · physical 0% · blockers WCMA-001, WCMA-002, PENDING_PHYSICAL |
+| **Watch tests** | 965/965 PASS (macOS simulator) |
 
 ---
 
@@ -2212,6 +2228,10 @@ Audit storici ora consolidati in `Docs/`: vedi anche **§13** — [`DIR_DIVING_W
 | [`TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md`](TESTFLIGHT_ENTITLEMENT_AND_DEVICE_QA_20260523.md), [`TESTFLIGHT_REVIEW_NOTES.md`](TESTFLIGHT_REVIEW_NOTES.md) | §3, §12 |
 | [`TERMS_OF_USE.md`](TERMS_OF_USE.md) | §6 |
 | [`UI_UX_VISUAL_GUIDELINES.md`](UI_UX_VISUAL_GUIDELINES.md) | §10 |
+| [`WATCH_CMALTIMETER_FAILURE_INJECTION_MATRIX_CURRENT.csv`](WATCH_CMALTIMETER_FAILURE_INJECTION_MATRIX_CURRENT.csv) | **agg. 2026-06-17** — Command 18 failure/concurrency matrix (30 cases) |
+| [`WATCH_CMALTIMETER_FULL_COMPUTER_INTERACTION_AUDIT_CURRENT.md`](WATCH_CMALTIMETER_FULL_COMPUTER_INTERACTION_AUDIT_CURRENT.md) | **agg. 2026-06-17** — Command 18 CMAltimeter → Full Computer audit (PARTIAL) |
+| [`WATCH_CMALTIMETER_PHYSICAL_QA_MATRIX_CURRENT.csv`](WATCH_CMALTIMETER_PHYSICAL_QA_MATRIX_CURRENT.csv) | **agg. 2026-06-17** — Command 18 physical Watch QA (PENDING_PHYSICAL) |
+| [`WATCH_CMALTIMETER_REQUIREMENT_TRACEABILITY_CURRENT.csv`](WATCH_CMALTIMETER_REQUIREMENT_TRACEABILITY_CURRENT.csv) | **agg. 2026-06-17** — Command 18 requirement traceability (30 reqs) |
 | [`WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md`](WATCH_CONTROL_STRATEGY_IMPLEMENTATION_REPORT.md) | §3, §12 |
 | [`WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md`](WATCH_IOS_SYNC_DEVICE_QA_CHECKLIST.md) | §4, §6 |
 | [`WATCH_MAIN_UX_CONVENTIONS.md`](WATCH_MAIN_UX_CONVENTIONS.md) | §3 |

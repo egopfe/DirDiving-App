@@ -1,0 +1,31 @@
+requirement_id,requirement_text,policy_source,implementation_symbol,implementation_file_line,test_or_evidence,status,severity_if_gap,gap_id
+REQ-01,Use CMAltimeter absolute altitude API on Watch,Command §7,AppleWatchAbsoluteAltitudeProvider.start,Services/FullComputerEnvironmentSensorService.swift:88,Static review + Watch build PASS,PASS,,
+REQ-02,Check isAbsoluteAltitudeAvailable before subscribe,Command §7,CMAltimeter.isAbsoluteAltitudeAvailable(),Services/FullComputerEnvironmentSensorService.swift:77,Static review,PASS,,
+REQ-03,Retain CMAltimeter for async operation,Command §7,private let altimeter,Services/FullComputerEnvironmentSensorService.swift:74,Static review,PASS,,
+REQ-04,Stop updates on success error timeout cancel,Command §7,provider.stop / finish / cancel,Services/FullComputerEnvironmentSensorService.swift:164-210,Partial lifecycle review,PARTIAL,P1,WCMA-001
+REQ-05,Reject late callbacks from prior requests,Command §7,state == .sampling guard only,Services/FullComputerEnvironmentSensorService.swift:174-175,No generation token test,FAIL,P1,WCMA-002
+REQ-06,Use sensor timestamp for freshness,Command §8,receivedAt = Date(),Services/FullComputerEnvironmentSensorService.swift:101,Not using CMLogItem.timestamp,FAIL,P2,WCMA-003
+REQ-07,Enforce sample count accuracy spread timeout,Command §8,FullComputerAltitudeSamplingPolicy,Services/FullComputerEnvironmentSensorService.swift:27-60,OrchestratedAltitudeEnvironmentTests.testSensorSamplingRejectsInaccurateOrUnstableWindows,PARTIAL,P2,WCMA-004
+REQ-08,Sensor proposal never silently overwrites draft,Command §9,proposeSensorEnvironment vs draftEnvironment,Services/FullComputerPrediveConfigurationStore.swift:101-105,OrchestratedAltitudeEnvironmentTests.testSensorMeasurementRemainsPendingUntilExplicitAcceptance,PASS,,
+REQ-09,Explicit accept promotes proposal,Command §9,acceptPendingSensorProposal,Services/FullComputerPrediveConfigurationStore.swift:86-94,OrchestratedAltitudeEnvironmentTests.testSensorMeasurementRemainsPendingUntilExplicitAcceptance,PASS,,
+REQ-10,Reject preserves prior manual/import,Command §9,dismissPendingSensorProposal,Services/FullComputerPrediveConfigurationStore.swift:97-98,OrchestratedAltitudeEnvironmentTests.testSensorMeasurementRemainsPendingUntilExplicitAcceptance,PASS,,
+REQ-11,Block start while sampling or pending,Command §9,canStart gates,Views/FullComputerPrediveConfirmationView.swift:128-131,Static review + UI tests indirect,PASS,,
+REQ-12,Fail-closed without validated environment,Command §9,runtimePlan returns nil,Services/FullComputerPrediveConfigurationStore.swift:155-162,OrchestratedAltitudeEnvironmentTests.testRuntimePlanWithoutEnvironmentIsNil,PASS,,
+REQ-13,Canonical record with schema altitude pressure salinity density source capturedAt sensor metadata,Command §10,FullComputerEnvironmentRecord,Shared/Models/FullComputerEnvironmentRecord.swift:33-133,OrchestratedAltitudeEnvironmentTests.testLiveEnvironmentRejectsFutureSchemaDensityMismatchAndMissingSensorMetadata,PASS,,
+REQ-14,Independent surface pressure derivation,Command §10,AmbientPressureModel + IndependentBuhlmannOracle,Shared/BuhlmannCore/PlannerEnvironment.swift:31-37,OrchestratedAltitudeEnvironmentTests.testIndependentOraclePressureDiffersFromSeaLevelAtAltitude,PASS,,
+REQ-15,No implicit sea level on live startup,Command §2,runtimePlan nil without env,Services/FullComputerPrediveConfigurationStore.swift:155-162,DiveManager.startFullComputerRuntimeIfNeeded missing_environment,PASS,,
+REQ-16,Live engine receives explicit runtime plan,Command §11,FullComputerRuntimeEngine.init(plan:),Services/FullComputerRuntimeEngine.swift:67-73,Watch build + integration tests,PASS,,
+REQ-17,Tissue init uses plan surface pressure,Command §12,BuhlmannTissueState.airSaturated,Services/FullComputerRuntimeEngine.swift:73,Static review,PASS,,
+REQ-18,All runtime calculations use plannerEnvironment,Command §12,plan.plannerEnvironment in engine,Services/FullComputerRuntimeEngine.swift:218+,Static review,PARTIAL,P2,WCMA-005
+REQ-19,Altitude applied exactly once,Command §12,AmbientPressureModel.ambientPressureBar,Shared/BuhlmannCore/PlannerEnvironment.swift:40-45,Independent oracle ambient test,PASS,,
+REQ-20,Environment immutable during active dive,Command §11,canEdit guard,Services/FullComputerPrediveConfigurationStore.swift:150-153,Static review,PASS,,
+REQ-21,Checkpoint embeds full runtime plan with environment,Command §13,FullComputerRuntimeCheckpointPayload.plan,Utils/FullComputerRuntimeCheckpoint.swift:18,FullComputerRecoveryCheckpointTests in 965 suite,PASS,,
+REQ-22,Logbook exports environment provenance,Command §13,FullComputerRuntimeLogbookAccumulator.export,Utils/FullComputerRuntimeLogbookAccumulator.swift:78-86,OrchestratedAltitudeEnvironmentTests.testLogbookMetadataCapturesEnvironment,PARTIAL,P2,WCMA-008
+REQ-23,iPhone plan environment preserved on import,Command §2,FullComputerImportedPlanStore,Services/FullComputerImportedPlanStore.swift,OrchestratedAltitudeEnvironmentTests.testImported1500mSaltPlanPropagatesToRuntimeEnvironment,PASS,,
+REQ-24,Manual Watch environment validated,Command §2,setDraftEnvironment,Services/FullComputerPrediveConfigurationStore.swift:56-75,OrchestratedAltitudeEnvironmentTests.testWatchManualEnvironmentPropagatesToConfirmedRuntime,PASS,,
+REQ-25,CoreMotion linked to Watch target,Command §6,project.yml dependencies,project.yml:110,Watch build PASS,PASS,,
+REQ-26,NSMotionUsageDescription present,Command §6,App/Info.plist,App/Info.plist:7-8,Static review,PARTIAL,P3,WCMA-010
+REQ-27,Physical Watch sensor validation,Command §17,Phase L scenarios,N/A,NOT_EXECUTED,PENDING_PHYSICAL,P1,PENDING_PHYSICAL
+REQ-28,Automated timeout cancel late-callback tests,Command §15,OrchestratedAltitudeEnvironmentTests,Tests/WatchAlgorithmTests/OrchestratedAltitudeEnvironmentTests.swift,Missing cases,FAIL,P2,WCMA-005
+REQ-29,Stale sensor rejected at live start,Command §10,validateForLiveStart staleSensorMeasurement,Shared/Models/FullComputerEnvironmentRecord.swift:125-128,OrchestratedAltitudeEnvironmentTests.testLiveEnvironmentRejectsFutureSchemaDensityMismatchAndMissingSensorMetadata,PASS,,
+REQ-30,Pending proposal not persisted,Command §13,No UserDefaults key for pending,Services/FullComputerPrediveConfigurationStore.swift,By design undocumented,PARTIAL,P2,WCMA-006

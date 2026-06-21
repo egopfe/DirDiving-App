@@ -1,0 +1,31 @@
+case_id,failure_mode,injection_method,expected_state,expected_environment_authority,start_enabled,expected_ui,subscription_cleanup,actual_state_inferred,actual_start,severity,finding_id,test_coverage
+FI-01,absolute altitude unavailable,Mock provider isAvailable=false,unavailable,draft/manual/import unchanged,no,sampling unavailable or hidden,yes stop,N/A fail-closed,PASS,P2,WCMA-005,NOT_TESTED
+FI-02,motion permission denied,Deny motion on physical Watch,unavailable or failed,prior draft unchanged,no,diagnostic,no live updates,PENDING_PHYSICAL,PENDING,P1,PENDING_PHYSICAL,NOT_EXECUTED
+FI-03,Core Motion callback error,Provider emit failure after start,failed or unavailable,prior draft unchanged,no,error state,yes stop,failed,PARTIAL,P1,WCMA-001,NOT_TESTED
+FI-04,timeout no usable samples,Sleep past 8s without 5 usable,sampling→timedOut,prior draft unchanged,no,timeout message,yes stop,timedOut,no,P2,WCMA-005,NOT_TESTED
+FI-05,inaccurate-only samples,accuracy>30m ×5,sampling continues no proposal,prior draft unchanged,no,sampling,yes stop at timeout,blocked,PARTIAL,P2,WCMA-005,TESTED policy unit only
+FI-06,unstable-only samples,spread>12m ×5,no proposal,prior draft unchanged,no,sampling,yes stop at timeout,blocked,PARTIAL,P2,WCMA-005,TESTED policy unit only
+FI-07,valid samples then error,Late error after proposalReady,proposalReady + pending intact,proposal pending,no,accept/reject panel,yes stop,failed + pending remains,PARTIAL,P1,WCMA-001,NOT_TESTED
+FI-08,cancel before first sample,cancel() during sampling,idle,prior draft unchanged,no,idle,yes stop,idle,no,P2,WCMA-005,NOT_TESTED
+FI-09,cancel after partial window,cancel with 2/5 samples,idle,draft unchanged,no,idle,yes stop,idle,no,P2,WCMA-005,NOT_TESTED
+FI-10,cancel concurrent with final sample,race cancel vs 5th sample,idle or proposalReady per race,draft or pending per outcome,no,varies,yes stop,unknown,PARTIAL,P1,WCMA-002,NOT_TESTED
+FI-11,two rapid requestProposal,Double onAppear navigation,new sampling only latest,draft unchanged until accept,no,sampling once expected,yes stop old,in-flight risk,PARTIAL,P1,WCMA-002,NOT_TESTED
+FI-12,late callback first request during second,Delayed callback after cancel+restart,second window only,draft unchanged,no,sampling,yes stop,guard state==sampling,PARTIAL,P1,WCMA-002,NOT_TESTED
+FI-13,settings→confirmation navigation,route change,re-sample on confirmation,draft unchanged,no,sampling on confirm,yes stop on disappear,duplicate sample,PARTIAL,P3,WCMA-009,NOT_TESTED
+FI-14,confirmation dismissal,onDisappear cancel,idle,pending may remain in store if was ready,no,back to settings,yes stop,cancel clears sampling only,PARTIAL,P2,WCMA-006,NOT_TESTED
+FI-15,app background during sampling,watchOS suspend/resume,timeout or resume sampling,draft unchanged,no,sampling/orange,PARTIAL,P2,WCMA-003,PENDING_PHYSICAL
+FI-16,relaunch before dive start,Kill app with pending proposal,pending lost draft persisted,draft only,no,no pending panel,N/A,proposal not persisted,PARTIAL,P2,WCMA-006,NOT_TESTED
+FI-17,clock discontinuity,Manual clock change during sampling,freshness via validateForLiveStart,draft/proposal revalidated at start,no,stale rejection at commit,PARTIAL,P2,WCMA-003,NOT_TESTED
+FI-18,corrupt persisted proposal,N/A not persisted,N/A,N/A,N/A,N/A,N/A,N/A,N/A,P2,WCMA-006,N/A
+FI-19,active dive altitude change,canEdit=false,setDraftEnvironment no-op,frozen runtime env,no,settings blocked,yes N/A,immutable,PARTIAL,P0,none,NOT_TESTED
+FI-20,sensor altitude outside model range,altitude>4500 on sample,failed validation,no proposal,no,failed,yes stop,failed,no,P2,WCMA-005,NOT_TESTED
+FI-21,missing sensor metadata,Record without accuracy at accept,accept guard fails,draft unchanged,no,accept no-op,yes N/A,blocked,PASS,P2,WCMA-005,TESTED validation
+FI-22,derived pressure mismatch,tampered record,validateForLiveStart mismatch,draft invalid,no,validation error,N/A,blocked,PASS,P2,none,TESTED
+FI-23,nil data nil error callback,Apple callback with both nil,sampling until timeout,draft unchanged,no,sampling 8s,yes stop at timeout,silent drop,PARTIAL,P2,WCMA-007,NOT_TESTED
+FI-24,NaN infinity altitude,Provider emit non-finite,isUsable false skip,draft unchanged,no,sampling→timeout,yes stop,blocked,PARTIAL,P2,WCMA-005,NOT_TESTED
+FI-25,accept then delay >120s before start,stale capturedAt,validateForLiveStart stale at runtimePlan,nil plan,no,missing env error,N/A,fail-closed,PASS,P2,WCMA-008,NOT_TESTED
+FI-26,imported plan vs sensor conflict,Import 1500m sensor proposes 900m,pending proposal import draft intact,import until accept,no,conflict panel both sources,yes stop after window,PASS,P2,none,TESTED partial
+FI-27,reject sensor keep manual,dismissPendingSensorProposal,draft manual unchanged,manual,no,no pending panel,yes stop,PASS,PASS,none,TESTED
+FI-28,checkpoint restore mid-dive,Restore from checkpoint,engine plan.plannerEnvironment from checkpoint,runtime frozen,no,N/A,N/A,PASS,PASS,none,TESTED suite
+FI-29,restore attempts current sensor,After restore no requestProposal during dive,runtime from checkpoint not sensor,runtime checkpoint,no,no sensor UI,N/A,PASS,PASS,none,NOT_TESTED explicit
+FI-30,start without environment,runtimePlan nil,engine nil unavailable snapshot,none,no,missing_environment,yes N/A,PASS,PASS,none,TESTED
