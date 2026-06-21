@@ -1,7 +1,29 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` = `origin/main`
+**Aggiornato:** 2026-06-21  
+**Branch consigliato:** `main` = `origin/main` @ `cc38a47`
+
+---
+
+## Aggiornamento indice 2026-06-21 — Orchestrated audit V1.1 (orchestrator) · Command 17 remediation pending
+
+Audit read-only orchestrato su 19 comandi audit V3/V1.0 @ `6cbba649`; output consolidato in `Docs/*ORCHESTRATED*`. Nessuna modifica production; remediation successiva via Command 17.
+
+| Campo | Valore |
+|-------|--------|
+| **Orchestrator** | `DIR_DIVING_CODEX_ORCHESTRATOR_AUDIT_COMMAND_V1.1` |
+| **Next command** | `17-DIR_DIVING_ORCHESTRATED_AUDIT_FULL_REMEDIATION_COMMAND_V1.0.md` |
+| **Consolidated report** | [`ORCHESTRATED_AUDIT_CONSOLIDATED_REPORT_CURRENT.md`](ORCHESTRATED_AUDIT_CONSOLIDATED_REPORT_CURRENT.md) |
+| **Issue register** | [`ORCHESTRATED_AUDIT_ISSUE_REGISTER_CURRENT.csv`](ORCHESTRATED_AUDIT_ISSUE_REGISTER_CURRENT.csv) — ORCH-001…015 (**P0=1, P1=7, P2=7**) |
+| **Remediation roadmap** | [`ORCHESTRATED_AUDIT_REMEDIATION_ROADMAP_CURRENT.md`](ORCHESTRATED_AUDIT_REMEDIATION_ROADMAP_CURRENT.md) |
+| **Non-regression plan** | [`ORCHESTRATED_AUDIT_NON_REGRESSION_PLAN_CURRENT.md`](ORCHESTRATED_AUDIT_NON_REGRESSION_PLAN_CURRENT.md) |
+| **Release readiness matrix** | [`ORCHESTRATED_AUDIT_RELEASE_READINESS_MATRIX_CURRENT.csv`](ORCHESTRATED_AUDIT_RELEASE_READINESS_MATRIX_CURRENT.csv) |
+| **Run log** | [`ORCHESTRATED_AUDIT_RUN_LOG_CURRENT.md`](ORCHESTRATED_AUDIT_RUN_LOG_CURRENT.md) |
+| **Command inventory** | [`ORCHESTRATED_AUDIT_COMMAND_INVENTORY_CURRENT.csv`](ORCHESTRATED_AUDIT_COMMAND_INVENTORY_CURRENT.csv) |
+| **Audit baseline** | `main` @ `6cbba649` (19 executed, 7 superseded skipped) |
+| **P0 root cause** | Watch Full Computer drops imported altitude/salinity → silent sea-level default (ORCH-001) |
+| **Verdict** | **NO-GO** internal code/tests · TestFlight/App Store **NO-GO** · physical/external **PENDING** |
+| **Supporting (Command 17)** | [`WATCH_BUHLMANN_ALTITUDE_SCHREINER_AUDIT_CURRENT.md`](WATCH_BUHLMANN_ALTITUDE_SCHREINER_AUDIT_CURRENT.md), [`COMPLETE_UI_UX_IMPLEMENTATION_COHERENCE_AUDIT_CURRENT.md`](COMPLETE_UI_UX_IMPLEMENTATION_COHERENCE_AUDIT_CURRENT.md) + related matrices |
 
 ---
 
@@ -2154,6 +2176,13 @@ Audit storici ora consolidati in `Docs/`: vedi anche **§13** — [`DIR_DIVING_W
 | [`MAIN_PRE_RELEASE_OPEN_ITEMS_20260519.md`](MAIN_PRE_RELEASE_OPEN_ITEMS_20260519.md), [`MAIN_PRE_RELEASE_SIMULATOR_QA_20260519.md`](MAIN_PRE_RELEASE_SIMULATOR_QA_20260519.md) | §5, §6 |
 | [`MAIN_READINESS_100_IMPLEMENTATION_REPORT_20260517.md`](MAIN_READINESS_100_IMPLEMENTATION_REPORT_20260517.md) | §8 |
 | [`MAIN_UX_*`](MAIN_UX_COMPLETION_REPORT.md) | §8 |
+| [`ORCHESTRATED_AUDIT_COMMAND_INVENTORY_CURRENT.csv`](ORCHESTRATED_AUDIT_COMMAND_INVENTORY_CURRENT.csv) | **agg. 2026-06-21** — orchestrator command inventory (19 executed) |
+| [`ORCHESTRATED_AUDIT_CONSOLIDATED_REPORT_CURRENT.md`](ORCHESTRATED_AUDIT_CONSOLIDATED_REPORT_CURRENT.md) | **agg. 2026-06-21** — orchestrated audit consolidated report @ `6cbba649` |
+| [`ORCHESTRATED_AUDIT_ISSUE_REGISTER_CURRENT.csv`](ORCHESTRATED_AUDIT_ISSUE_REGISTER_CURRENT.csv) | **agg. 2026-06-21** — ORCH-001…015 deduplicated issue register |
+| [`ORCHESTRATED_AUDIT_NON_REGRESSION_PLAN_CURRENT.md`](ORCHESTRATED_AUDIT_NON_REGRESSION_PLAN_CURRENT.md) | **agg. 2026-06-21** — macOS build/test/readiness non-regression gates |
+| [`ORCHESTRATED_AUDIT_RELEASE_READINESS_MATRIX_CURRENT.csv`](ORCHESTRATED_AUDIT_RELEASE_READINESS_MATRIX_CURRENT.csv) | **agg. 2026-06-21** — release gate matrix (internal/TestFlight/App Store) |
+| [`ORCHESTRATED_AUDIT_REMEDIATION_ROADMAP_CURRENT.md`](ORCHESTRATED_AUDIT_REMEDIATION_ROADMAP_CURRENT.md) | **agg. 2026-06-21** — Phase A–E remediation roadmap (Command 17 input) |
+| [`ORCHESTRATED_AUDIT_RUN_LOG_CURRENT.md`](ORCHESTRATED_AUDIT_RUN_LOG_CURRENT.md) | **agg. 2026-06-21** — orchestrator run log (V1.1, audit-only) |
 | [`PHASE0_MAIN_UX_PREFLIGHT_PLAN.md`](PHASE0_MAIN_UX_PREFLIGHT_PLAN.md) | §8 |
 | [`PRIVACY_AND_DATA_USE.md`](PRIVACY_AND_DATA_USE.md) | §6 |
 | [`PR_STATUS_20260520.md`](PR_STATUS_20260520.md) … [`PR_STATUS_20260527.md`](PR_STATUS_20260527.md) | §2 |
@@ -2179,4 +2208,4 @@ Altri asset in `Docs/`: `.docx`, `.csv`, `.xlsx`, `.py` (generatori §11), `Refe
 
 ---
 
-*Indice per ripresa lavoro su `main` @ `origin/main` @ `e47c860`. Baseline documentale: piano UI/UX readiness 100% 2026-06-05, audit full UI/UX @ `bdd3a43`, photo transfer + image delete plan 2026-06-05, reaudit/UX Bühlmann 2026-05-28, hardening + motore Buhlmann in `Docs/` §6.*
+*Indice per ripresa lavoro su `main` @ `origin/main` @ `cc38a47`. Baseline orchestrator audit 2026-06-21 @ `6cbba649`; next remediation Command 17. Baseline documentale storica: piano UI/UX readiness 100% 2026-06-05, audit full UI/UX @ `bdd3a43`.*

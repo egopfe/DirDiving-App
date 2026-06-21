@@ -42,7 +42,7 @@ final class FullComputerFutureGasTTSPolicyTests: XCTestCase {
         var profile = FullComputerGasProfile.defaultAirGF3070
         profile.decoGases = [.ean50(at: 21)]
         profile.futureGasTTSPolicy = .activeGasOnly
-        let plan = FullComputerRuntimePlan(profile: profile)
+        let plan = FullComputerRuntimePlan(profile: profile, plannerEnvironment: .seaLevelSaltWater)
         XCTAssertTrue(plan.decoGases.isEmpty)
     }
 
@@ -138,7 +138,7 @@ final class FullComputerFutureGasTTSPolicyTests: XCTestCase {
                 switchDepthMeters: 0
             )
         ]
-        let plan = FullComputerRuntimePlan(profile: profile)
+        let plan = FullComputerRuntimePlan(profile: profile, plannerEnvironment: .seaLevelSaltWater)
         var tracker = FullComputerGasSwitchTracker.initial
         tracker.bootstrap(bottomGasMixId: plan.activeGas.gasMixId)
         tracker.confirmedGasMixIds.insert(profile.bailoutGases[0].id)
@@ -150,7 +150,7 @@ final class FullComputerFutureGasTTSPolicyTests: XCTestCase {
     func testPolicyStateAfterCheckpointRestore() throws {
         var profile = FullComputerGasProfile.defaultAirGF3070
         profile.decoGases = [.ean50(at: 21)]
-        let plan = FullComputerRuntimePlan(profile: profile)
+        let plan = FullComputerRuntimePlan(profile: profile, plannerEnvironment: .seaLevelSaltWater)
         let start = Date(timeIntervalSince1970: 1_730_000_000)
         var engine = try FullComputerRuntimeEngine(plan: plan, sessionStart: start)
         _ = engine.ingestSample(depthMeters: 21, timestamp: start.addingTimeInterval(100))

@@ -169,7 +169,8 @@ def is_forbidden_term_definition(line: str) -> bool:
 
 
 def should_skip_path(path: Path) -> bool:
-    parts = set(path.parts)
+    rel = path.as_posix()
+    parts = set(Path(rel).parts)
     if parts & SKIP_DIR_PARTS:
         return True
     if path.name in SKIP_FILE_PARTS:
@@ -202,7 +203,7 @@ def iter_production_files() -> list[Path]:
 
 
 def scan_file(path: Path, allowlist: set[tuple[str, int, str]]) -> list[Violation]:
-    rel = str(path.relative_to(ROOT))
+    rel = path.relative_to(ROOT).as_posix()
     violations: list[Violation] = []
     try:
         text = path.read_text(encoding="utf-8", errors="replace")
