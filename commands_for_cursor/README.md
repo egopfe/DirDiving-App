@@ -23,5 +23,9 @@ This package is read-only and designed for the current multi-activity architectu
 12. Tests, QA and evidence
 13. Release, legal claims and compliance
 14. Mockups and visual regression
+15. Watch live Bühlmann / Schreiner / multilevel engine
+16. Complete UI/UX implementation coherence
+17. Orchestrated full remediation (implementation command, not audit-only)
+18. Watch `CMAltimeter` and Full Computer interaction
 
-Every command is audit-only. Reports and remediation plans may be created; production code must not be changed.
+Commands 0 through 16 and Command 18 are audit-only. Reports and remediation plans may be created; production code must not be changed. Command 17 is the separate implementation/remediation command.
