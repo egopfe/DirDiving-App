@@ -1,0 +1,15 @@
+ID,Feature,Watch_Status,iOS_Status,Classification,Names,Units,State_Parity,Sync_Parity,Intentional_Difference,Result,Severity,Finding_ID,Notes
+PAR-001,Activity selection,Implemented,Implemented,shared,yes,yes,yes,partial,Platform navigation differs,PASS,,,
+PAR-002,Gauge live,Authoritative live sensor,Logbook companion,Watch-only,yes,yes,n/a,yes,yes,PASS,,,
+PAR-003,Full Computer live,Live runtime,Planner/reference,Intentionally asymmetric,yes,yes,partial,yes,yes,PARTIAL,P0,UI16-P0-001,Altitude environment mismatch is not intentional
+PAR-004,Planner environment,Discarded at Watch activation,Visible and canonical,synchronized,partial,no,no,no,no,FAIL,P0,UI16-P0-001,Altitude/salinity dropped
+PAR-005,Briefing cards,Reference display,Generation/transfer,reference-only,yes,yes,yes,yes,yes,PASS,,,
+PAR-006,Diving logbook,Browse/save,Browse/edit/analyze,synchronized,yes,yes,partial,yes,yes,PARTIAL,P1,ALT-P1-002,Environment metadata absent
+PAR-007,Apnea session,Live/save,Review/logbook/settings,synchronized,yes,yes,partial,partial,yes,PARTIAL,P1,UI16-P1-002,Paired-device QA pending
+PAR-008,Snorkeling session,Live GPS/dips,Maps/logbook/settings,synchronized,yes,yes,partial,partial,yes,PARTIAL,P1,UI16-P1-002,Physical GPS and sync pending
+PAR-009,Settings,Activity-scoped,Activity-scoped,shared,yes,yes,yes,partial,Platform controls differ,PASS,,,
+PAR-010,Localization,EN/IT,EN/IT,shared,yes,yes,partial,n/a,no,PARTIAL,P2,UI16-P2-003,Static scanner portability
+PAR-011,Accessibility,Software semantics,Software semantics,shared,yes,yes,partial,n/a,no,PARTIAL,P1,UI16-P1-002,Physical evidence pending
+PAR-012,Visual language,Watch neon compact,iOS card/navigation,Intentionally asymmetric,yes,yes,partial,n/a,yes,PARTIAL,P2,UI16-P2-002,Manual baselines pending
+PAR-013,Security/trust,Signed payload/ACK,Signed payload/ACK,synchronized,yes,n/a,yes,partial,no,PARTIAL,P1,UI16-P1-002,Physical paired trust QA pending
+

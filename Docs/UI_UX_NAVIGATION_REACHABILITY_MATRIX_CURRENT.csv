@@ -1,0 +1,17 @@
+ID,Platform,Activity,Mode,Feature,Entry_Point,Destination,Exit,Availability_Condition,Target_Membership,Deep_Link,Restoration,Reachable,Functional,Severity,Finding_ID,Notes
+NAV-001,Watch,Global,All,Legal acceptance,Launch,WatchLegalOnboardingView,Accept,First/versioned launch,yes,n/a,persisted,yes,yes,,,
+NAV-002,Watch,Global,All,Activity selection,Cold launch/Settings,ActivitySelectionView,Choose activity,No active session,yes,n/a,preference,yes,yes,,,
+NAV-003,Watch,Diving,Gauge,Dive live,Activity→Diving→Gauge,DiveLiveView,End session,Configured and sensor ready,yes,n/a,checkpoint,yes,yes,,,
+NAV-004,Watch,Diving,Full Computer,Predive,Activity→Diving→Full Computer,FullComputerPrediveSettingsView/Confirmation,Confirm/cancel,Valid gas/GF,yes,n/a,persisted profile,yes,no,P0,UI16-P0-001,Altitude plan accepted without environment continuity
+NAV-005,Watch,Diving,Full Computer,Live deco,Confirmed predive,DiveLiveView,End session,Runtime self-check,yes,n/a,checkpoint,yes,partial,P0,UI16-P0-001,Sea-level fallback at altitude
+NAV-006,Watch,Apnea,Apnea,Session,Activity→Apnea,ApneaView,Save/end,Recovery/sensor gates,yes,n/a,checkpoint,yes,yes,,,
+NAV-007,Watch,Snorkeling,Snorkeling,Session,Activity→Snorkeling,SnorkelingView,Save/end,Permission/sensor gates,yes,n/a,checkpoint,yes,yes,,,
+NAV-008,Watch,Diving,All,Diving logbook,Crown page,DiveLogListView,Back/crown,Activity is Diving,yes,n/a,store,yes,yes,,,Not mounted for Apnea/Snorkeling
+NAV-009,iOS,Global,All,Activity selection,Launch/Settings,IOSCompanionActivitySelectionView,Choose activity,No incompatible active state,yes,n/a,preference,yes,yes,,,
+NAV-010,iOS,Diving,All,Planner,Diving root,PlannerView,Back/tab,Activity is Diving,yes,n/a,store,yes,yes,,,
+NAV-011,iOS,Diving,All,Equipment/checklist,Diving root,EquipmentView/ChecklistView,Back/tab,Activity is Diving,yes,n/a,store,yes,yes,,,
+NAV-012,iOS,Diving,All,Diving logbook,Diving tab,LogbookView,Back/tab,Activity is Diving,yes,n/a,store,yes,yes,,,
+NAV-013,iOS,Apnea,Apnea,Apnea logbook,Apnea root sessions tab,IOSApneaSessionsListView,Tab/back,Activity is Apnea,yes,n/a,store,yes,yes,,,
+NAV-014,iOS,Snorkeling,Snorkeling,Snorkeling logbook,Snorkeling root sessions tab,IOSSnorkelingSessionsListView,Tab/back,Activity is Snorkeling,yes,n/a,store,yes,yes,,,
+NAV-015,Watch+iOS,Diving,Planner→Watch,Briefing card,Planner transfer/Watch cards,PlannerBriefingCardDetailSheet,Close/delete,Signed current card,yes,n/a,persisted,yes,yes,,,Reference-only
+
