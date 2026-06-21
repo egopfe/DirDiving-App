@@ -1,0 +1,14 @@
+ID,Platform,Activity,Feature,Initial,Empty,Loading,Success,Partial,Stale,Offline,Unavailable,Permission_Denied,Validation_Error,Algorithm_Error,Sync_Error,Conflict,Destructive_Confirmation,Retry,Restored,Future_Schema,Accessibility,Status,Severity,Finding_ID,Notes
+STATE-001,Watch,Diving Gauge,Live,yes,yes,n/a,yes,yes,yes,n/a,yes,n/a,yes,n/a,yes,n/a,yes,yes,yes,n/a,partial,PARTIAL,P1,UI16-P1-002,Physical combined states pending
+STATE-002,Watch,Diving Full Computer,Predive environment,no,no,n/a,no,no,no,n/a,no,n/a,no,no,n/a,yes,n/a,n/a,no,partial,no,FAIL,P0,UI16-P0-001,Altitude/source/fallback state missing
+STATE-003,Watch,Diving Full Computer,Live deco,yes,n/a,n/a,yes,yes,yes,n/a,yes,n/a,yes,yes,yes,n/a,yes,yes,yes,yes,partial,PARTIAL,P0,UI16-P0-001,Audit15 states present but environment can be wrong
+STATE-004,Watch,Apnea,Session,yes,yes,n/a,yes,yes,yes,n/a,yes,n/a,yes,n/a,yes,n/a,yes,yes,yes,yes,partial,PARTIAL,P1,UI16-P1-002,Physical sensor QA pending
+STATE-005,Watch,Snorkeling,Session/GPS,yes,yes,n/a,yes,yes,yes,yes,yes,yes,yes,n/a,yes,n/a,yes,yes,yes,yes,partial,PARTIAL,P1,UI16-P1-002,Physical permissions/GPS QA pending
+STATE-006,iOS,Diving,Planner,yes,yes,yes,yes,yes,yes,n/a,yes,n/a,yes,yes,n/a,n/a,yes,yes,yes,yes,yes,PASS,,,,
+STATE-007,iOS,Diving,Equipment/checklist,yes,yes,n/a,yes,yes,yes,n/a,yes,n/a,yes,n/a,n/a,yes,yes,yes,yes,yes,yes,PASS,,,,
+STATE-008,iOS,Diving,Logbook/import/export,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,n/a,yes,yes,yes,yes,yes,yes,yes,PARTIAL,P1,UI16-P1-002,PDF/Subsurface physical external evidence pending
+STATE-009,iOS,Apnea,Root/logbook,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,n/a,yes,yes,yes,yes,yes,yes,yes,PARTIAL,P1,UI16-P1-002,Physical QA pending
+STATE-010,iOS,Snorkeling,Root/maps/logbook,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,n/a,yes,yes,yes,yes,yes,yes,partial,PARTIAL,P1,UI16-P1-002,Map/location physical QA pending
+STATE-011,Watch+iOS,Global,Sync,yes,yes,yes,yes,yes,yes,yes,yes,n/a,yes,n/a,yes,yes,n/a,yes,yes,yes,yes,PARTIAL,P1,UI16-P1-002,Paired-device QA pending
+STATE-012,Watch+iOS,Global,Localization/accessibility,yes,n/a,n/a,yes,partial,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,yes,n/a,partial,PARTIAL,P1,UI16-P1-002,Physical VoiceOver/Dynamic Type pending
+
