@@ -100,11 +100,12 @@ final class UIUXMainRemediationCurrentTests: XCTestCase {
         }
     }
 
-    func testMockupInventoryDocumentsExternalAssets() throws {
+    func testMockupInventoryDocumentsLocalCanonicalAssets() throws {
         let readme = try String(contentsOf: repositoryRoot().appendingPathComponent("mockups/README.md"))
-        XCTAssertTrue(readme.contains("External"))
+        XCTAssertTrue(readme.contains("59"))
+        XCTAssertTrue(readme.localizedCaseInsensitiveContains("design references only"))
         let inventory = try String(contentsOf: repositoryRoot().appendingPathComponent("Docs/UI_UX_MOCKUP_INVENTORY_CURRENT.csv"))
-        XCTAssertTrue(inventory.contains("Status"))
+        XCTAssertTrue(inventory.contains("Mockup_ID"))
     }
 
     private func repositoryRoot() -> URL {

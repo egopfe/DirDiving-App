@@ -1,0 +1,26 @@
+Screen_ID,Platform,Activity,Surface,VoiceOver_Labels,VoiceOver_Hints,Chart_Summary,Map_Summary,Dynamic_Type,Reduced_Motion,Contrast,Identifiers,Localization_Keys,Software_Status,Physical_QA_Status,Notes
+watch.activity_selection,Watch,Global,Activity picker,yes,yes,no,no,inherit,mission_mode_optional,theme,yes,yes,PASS,PENDING,ActivitySelectionView
+watch.diving_mode_selection,Watch,Diving,Gauge vs Full Computer,yes,no,no,no,inherit,mission_mode_optional,theme,yes,yes,PASS,PENDING,DivingModeSelectionView
+watch.dive_live_gauge,Watch,Diving,Gauge live,yes,yes,no,no,inherit,mission_mode_optional,theme,yes,live.* gauge.*,PASS,PENDING,DiveLiveView TTV
+watch.dive_live_fc,Watch,Diving,Full Computer live,yes,yes,no,no,inherit,mission_mode_optional,theme,yes,fc.* live.* deco.*,PASS,PENDING,FullComputerLivePanels
+watch.alarms,Watch,Diving,Alarm settings,yes,yes,no,no,inherit,standard,theme,yes,alarms.*,PASS,PENDING,AlarmSettingsView
+watch.settings,Watch,Global,Settings,yes,yes,no,no,inherit,standard,theme,yes,settings.*,PASS,PENDING,GPS surface vs route labels
+watch.apnea_ready,Watch,Apnea,Ready/start,yes,yes,no,no,inherit,standard,theme,yes,apnea.*,PASS,PENDING,Production Apnea flow
+watch.apnea_active,Watch,Apnea,Active session,yes,yes,no,no,inherit,standard,theme,yes,apnea.*,PASS,PENDING,Overlays localized
+watch.snorkeling_stages,Watch,Snorkeling,Stage UI,yes,yes,no,yes,inherit,standard,theme,yes,snorkeling.*,PASS,PENDING,SnorkelingAccessibilityContractTests
+watch.logbook_list,Watch,Diving,Logbook list,partial,no,no,no,inherit,standard,theme,partial,log.*,PASS,PENDING,DiveLogListView
+watch.compass,Watch,Diving,Compass,yes,yes,no,no,inherit,standard,theme,yes,compass.*,PASS,PENDING,CompassView
+ios.activity_selection,iOS,Global,Companion activity,yes,no,no,no,scaled,standard,theme,yes,global.*,PASS,PENDING,IOSCompanionActivitySelectionView
+ios.planner_oc,iOS,Diving,Planner OC,yes,yes,yes,no,scaled,standard,theme,yes,planner.*,PASS,PENDING,PlannerView chart a11y summaries
+ios.planner_ccr,iOS,Diving,Planner CCR,yes,yes,yes,no,scaled,standard,theme,yes,ccr.* planner.*,PASS,PENDING,CCRPlanResultView summaries
+ios.tissue_analytics,iOS,Diving,Tissue/narcosis charts,yes,yes,yes,no,scaled,standard,theme,yes,tissue_analytics.*,PASS,PENDING,TissueNarcosisAnalyticsView
+ios.logbook_diving,iOS,Diving,Dive logbook,partial,no,no,no,scaled,standard,theme,partial,logbook.*,PASS,PENDING,LogbookView
+ios.logbook_apnea,iOS,Apnea,Apnea logbook,partial,no,no,no,scaled,standard,theme,partial,apnea.ios.*,PASS,PENDING,IOSApneaSessionsListView
+ios.logbook_snorkeling,iOS,Snorkeling,Snorkeling logbook,partial,no,no,yes,scaled,standard,theme,yes,snorkeling.ios.*,PASS,PENDING,IOSSnorkelingSessionsListView
+ios.snorkeling_dashboard,iOS,Snorkeling,Dashboard/map,yes,yes,no,yes,scaled,standard,theme,yes,snorkeling.ios.*,PASS,PENDING,IOSSnorkelingDashboardView
+ios.snorkeling_export,iOS,Snorkeling,Export/GPX,yes,yes,no,no,scaled,standard,theme,yes,snorkeling.ios.export.*,PASS,PENDING,IOSSnorkelingSessionExportView
+ios.checklist,iOS,Diving,Equipment checklist,yes,yes,no,no,scaled,standard,theme,yes,checklist.*,PASS,PENDING,ChecklistView toggles
+ios.settings_more,iOS,Global,Settings/More,yes,partial,no,no,scaled,standard,theme,yes,settings.*,PASS,PENDING,MoreView
+ios.watch_photo_transfer,iOS,Diving,Photo transfer,yes,yes,no,no,scaled,standard,theme,yes,a11y.watch_photo_transfer.*,PASS,PENDING,WatchPhotoTransferPanel
+ios.pdf_export,iOS,Diving,PDF/share,yes,yes,no,no,scaled,standard,theme,partial,pdf.* export.*,PASS,PENDING,Locale at export time
+ios.legal_onboarding,iOS,Global,Legal gate,yes,no,no,no,scaled,standard,theme,yes,legal.*,PASS,PENDING,IOSLegalOnboardingView

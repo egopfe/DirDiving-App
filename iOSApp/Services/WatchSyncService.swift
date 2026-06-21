@@ -827,8 +827,27 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     private func conflictsFileURL() -> URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        migrateLegacyConflictsFileIfNeeded()
+    }
+
+    private func migrateLegacyConflictsFileIfNeeded() -> URL {
+        let legacyDoc = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
             .appendingPathComponent(conflictsFileName)
+        guard let target = try? ProtectedSensitiveFileStore.conflictFileURL(fileName: conflictsFileName) else {
+            return legacyDoc
+        }
+        if !FileManager.default.fileExists(atPath: target.path),
+           FileManager.default.fileExists(atPath: legacyDoc.path),
+           let data = try? Data(contentsOf: legacyDoc) {
+            try? ProtectedSensitiveFileStore.saveData(data, to: target)
+            try? FileManager.default.removeItem(at: legacyDoc)
+        }
+        _ = ProtectedSensitiveFileStore.migrateUserDefaultsData(
+            key: legacyConflictsKey,
+            to: target,
+            removeLegacyAfterVerifiedWrite: true
+        )
+        return target
     }
 
     private func loadConflicts() -> [SyncConflict] {
@@ -1007,8 +1026,21 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     private func pendingOutboundFileURL() -> URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let legacyDoc = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
             .appendingPathComponent(pendingOutboundFileName)
+        guard let target = try? ProtectedSensitiveFileStore.fileURL(
+            activity: "Diving",
+            fileName: pendingOutboundFileName
+        ) else {
+            return legacyDoc
+        }
+        if !FileManager.default.fileExists(atPath: target.path),
+           FileManager.default.fileExists(atPath: legacyDoc.path),
+           let data = try? Data(contentsOf: legacyDoc) {
+            try? ProtectedSensitiveFileStore.saveData(data, to: target)
+            try? FileManager.default.removeItem(at: legacyDoc)
+        }
+        return target
     }
 
     private func loadPendingOutboundTransfers() -> [IOSWatchSyncPendingTransfer] {

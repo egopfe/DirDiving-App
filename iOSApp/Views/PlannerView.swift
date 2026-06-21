@@ -2342,7 +2342,7 @@ struct PlanResultView: View {
     }
 
     private var showsTissueAnalyticsEntry: Bool {
-        store.mode != .base && !store.plan.tissueHistory.isEmpty && store.plan.buhlmannState != .invalidInput
+        store.mode != .base && !store.chartSnapshots.tissueHistoryEmpty && store.plan.buhlmannState != .invalidInput
     }
 
     private var tissueAnalyticsPresentation: TissueAnalyticsPresentation? {
@@ -3072,10 +3072,10 @@ struct PlanResultView: View {
     }
 
     private var buhlmannChartAccessibilitySummary: String {
-        guard !store.plan.tissueHistory.isEmpty else {
+        guard !store.chartSnapshots.tissueHistoryEmpty else {
             return DIRIOSLocalizer.string("planner.buhlmann.tissue_curve_empty")
         }
-        let peak = store.plan.tissueHistory.groupedPoints.map(\.loadPercent).max() ?? 0
+        let peak = store.chartSnapshots.tissueGroupedPoints.map(\.loadPercent).max() ?? 0
         return String(
             format: DIRIOSLocalizer.string("planner.buhlmann.tissue_chart.a11y.summary"),
             Formatters.zero(peak)
@@ -3094,7 +3094,7 @@ struct PlanResultView: View {
                     .foregroundStyle(DIRTheme.muted)
                     .fixedSize(horizontal: false, vertical: true)
 
-                if store.plan.tissueHistory.isEmpty {
+                if store.chartSnapshots.tissueHistoryEmpty {
                     VStack(alignment: .leading, spacing: 8) {
                         Image(systemName: "chart.line.uptrend.xyaxis")
                             .font(.title2)
@@ -3114,7 +3114,7 @@ struct PlanResultView: View {
                     .accessibilityLabel(DIRIOSLocalizer.string("planner.buhlmann.tissue_curve_empty"))
                 } else {
                     tissueLoadingLegend
-                    Chart(store.plan.tissueHistory.groupedPoints) { point in
+                    Chart(store.chartSnapshots.tissueGroupedPoints) { point in
                         LineMark(
                             x: .value(DIRIOSLocalizer.string("planner.buhlmann.axis.time"), point.elapsedMinutes),
                             y: .value(DIRIOSLocalizer.string("planner.buhlmann.axis.load"), point.loadPercent),
@@ -3146,7 +3146,7 @@ struct PlanResultView: View {
                 }
             }
 
-            if showNDLReference, !store.buhlmann.curve.isEmpty {
+            if showNDLReference, !store.chartSnapshots.ndlCurve.isEmpty {
                 ndlReferenceChart
             }
         }
@@ -3182,7 +3182,7 @@ struct PlanResultView: View {
                 .font(.caption2)
                 .foregroundStyle(DIRTheme.muted)
                 .fixedSize(horizontal: false, vertical: true)
-            Chart(store.buhlmann.curve) { point in
+            Chart(store.chartSnapshots.ndlCurve) { point in
                 LineMark(
                     x: .value(DIRIOSLocalizer.string("planner.buhlmann.axis.depth"), point.depthMeters),
                     y: .value(DIRIOSLocalizer.string("planner.buhlmann.axis.ndl"), point.ndlMinutes)
@@ -3217,12 +3217,12 @@ struct PlanResultView: View {
 
     private var depthProfileChart: some View {
         DIRCard(DIRIOSLocalizer.string("planner.charts.depth_profile"), icon: "chart.xyaxis.line", accent: DIRTheme.cyan) {
-            if store.plan.depthProfilePoints.isEmpty {
+            if store.chartSnapshots.depthProfilePoints.isEmpty {
                 Text(DIRIOSLocalizer.string("planner.charts.depth_profile_empty"))
                     .font(.caption)
                     .foregroundStyle(DIRTheme.muted)
             } else {
-                Chart(store.plan.depthProfilePoints) { point in
+                Chart(store.chartSnapshots.depthProfilePoints) { point in
                     LineMark(
                         x: .value(DIRIOSLocalizer.string("planner.buhlmann.axis.time"), point.elapsedMinutes),
                         y: .value(depthProfileYAxisLabel, depthProfileDisplayDepth(meters: point.depthMeters))

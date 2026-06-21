@@ -2049,6 +2049,7 @@
 "apnea.ios.dashboard.max_depth" = "Max depth";
 "apnea.ios.dashboard.best_time" = "Best time";
 "apnea.ios.dashboard.dives" = "Dives";
+"apnea.ios.dashboard.duration" = "Duration";
 "apnea.ios.dashboard.total_time" = "Total time";
 "apnea.ios.dashboard.total_recovery" = "Total recovery";
 "apnea.ios.dashboard.watch_status" = "Apple Watch";

@@ -1,0 +1,15 @@
+Requirement_ID,Description,Test_Suite,Validation_Type,Status
+MVR-REQ-01,59 canonical mockup paths valid,MockupVisualRegressionRemediationTests,software,PASS
+MVR-REQ-02,59 executable fixtures,MockupVisualRegressionRemediationTests,software,PASS
+MVR-REQ-03,No runtime mockup embedding,MockupAntiEmbeddingTests,software,PASS
+MVR-REQ-04,iOS raster snapshot regression,IOSMockupRasterSnapshotTests,software,PASS
+MVR-REQ-05,FC_UI_04 fixture,MockupVisualRegressionRemediationWatchTests,software,PASS
+MVR-REQ-06,FC_UI_07 fixture,MockupVisualRegressionRemediationTests,software,PASS
+MVR-REQ-07,APNEA_IOS_01 dashboard fidelity,IOSDashboardMockupFidelityTests,software,PASS
+MVR-REQ-08,SNORKELING_IOS_01 dashboard fidelity,IOSDashboardMockupFidelityTests,software,PASS
+MVR-REQ-09,Dynamic Type XL planner simulator,IOSPlannerDynamicTypeContractTests,software,PASS
+MVR-REQ-10,Smallest Watch simulator contracts,SmallestWatchLayoutContractTests,software,PASS
+MVR-REQ-11,Legacy ReferenceUI classification,MockupVisualRegressionRemediationTests,software,PASS
+MVR-REQ-12,Physical pixel-diff evidence,PENDING,N/A,PENDING_PHYSICAL_QA
+MVR-REQ-13,Manual visual fidelity,PENDING,N/A,PENDING_MANUAL_VISUAL_QA
+MVR-REQ-14,App Store screenshot approval,PENDING,N/A,PENDING_APP_STORE_REVIEW

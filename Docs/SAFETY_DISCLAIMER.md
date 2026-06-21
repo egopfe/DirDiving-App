@@ -9,7 +9,7 @@ DIR DIVING (Apple Watch MAIN + iOS Companion) e uno strumento companion per log 
 L'app **non** deve essere usata come:
 
 - computer subacqueo primario;
-- planner decompressivo certificato;
+- sostituto di planner decompressivo certificato;
 - sostituto di tabelle o procedure di agenzia;
 - sostituto di formazione tecnica o di team;
 - unica fonte per decisioni di sicurezza in immersione.
