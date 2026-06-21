@@ -1,0 +1,12 @@
+ID,Altitude,Surface_Pressure,Water_Type,Gas,Profile,Expected_Behavior,Actual_Behavior,Oracle_Result,Absolute_Error,Relative_Error,Pass,Severity,Evidence,Notes
+ALT-EC-001,0,1.01325000,salt,Air,Air39-to-10m,Sea-level environment frozen,Sea-level default used,Scalar pressure agrees,0,0,YES,P3,Static source review,Full profile not rerun on Windows
+ALT-EC-002,500,0.95460835,salt,Air,Air39-to-10m,Imported environment frozen and used,Environment dropped; sea-level used,Scalar pressure available,N/A,N/A,NO,P0,Package-to-runtime trace,Profile blocked by root cause
+ALT-EC-003,1000,0.89874563,salt,Air,Air39-to-10m,Imported environment frozen and used,Environment dropped; sea-level used,Scalar pressure available,N/A,N/A,NO,P0,Package-to-runtime trace,Profile blocked by root cause
+ALT-EC-004,1500,0.84555994,salt,Air,Multilevel 30-24-18-12-6m,All outputs altitude-aware,Environment dropped; sea-level used,Scalar pressure available,N/A,N/A,NO,P0,Package-to-runtime trace,iOS scalar test exists
+ALT-EC-005,2000,0.79495202,fresh,Trimix,Gas switch and re-descent,All N2 He switches and stops altitude-aware,Environment and salinity dropped,Scalar pressure available,N/A,N/A,NO,P0,Package-to-runtime trace,No Watch profile evidence
+ALT-EC-006,4500,0.57728301,salt,Nitrox,Maximum supported,Accept and freeze validated environment,Environment dropped,Scalar pressure available,N/A,N/A,NO,P0,Range and activation source,No Watch max-altitude test
+ALT-EC-007,4501,INVALID,salt,Air,Invalid altitude,Reject before activation,iOS rejects; Watch has no independent environment validation,Rejected by scalar range,N/A,N/A,PARTIAL,P1,PlannerEnvironment.make,Transfer validation does not construct environment
+ALT-EC-008,NaN,INVALID,salt,Air,Invalid altitude,Fail closed,iOS environment factory rejects; Watch path lacks environment construction,Rejected,N/A,N/A,PARTIAL,P1,PlannerEnvironment.make,No Watch negative suite
+ALT-EC-009,1500,0.84555994,fresh,Air,Checkpoint restore,Environment and tissues remain unchanged,Checkpoint would preserve plan but imported plan is sea-level,Not run,N/A,N/A,NO,P0,FullComputerRuntimeCheckpointPayload,Correct serializer cannot recover discarded input
+ALT-EC-010,1500,0.84555994,salt,Trimix,Imported plan then gas switch,Old interval and new interval use same frozen altitude,All intervals use sea-level environment,Not run,N/A,N/A,NO,P0,Runtime plan and gas switch source,Audit 15 ordering otherwise covered
+
