@@ -3,7 +3,7 @@ import XCTest
 final class FullComputerGasProfileTests: XCTestCase {
     func testAirProfileValidates() {
         let profile = FullComputerGasProfile.defaultAirGF3070
-        XCTAssertTrue(FullComputerGasProfileValidator.isValid(profile))
+        XCTAssertTrue(FullComputerGasProfileValidator.isValid(profile, environment: .seaLevelSaltWater))
         XCTAssertEqual(profile.bottomGas.nitrogenFraction, 0.79, accuracy: 0.01)
     }
 
@@ -12,8 +12,8 @@ final class FullComputerGasProfileTests: XCTestCase {
         profile.applyBottomGasKind(.ean)
         profile.bottomGas.oxygenFraction = 0.32
         profile.bottomGas.name = "EAN32"
-        XCTAssertTrue(FullComputerGasProfileValidator.isValid(profile))
-        let plan = FullComputerRuntimePlan(profile: profile)
+        XCTAssertTrue(FullComputerGasProfileValidator.isValid(profile, environment: .seaLevelSaltWater))
+        let plan = FullComputerRuntimePlan(profile: profile, plannerEnvironment: .seaLevelSaltWater)
         XCTAssertEqual(plan.activeGas.name, "EAN32")
         XCTAssertEqual(Int((plan.activeGas.oxygenFraction * 100).rounded()), 32)
     }
@@ -23,9 +23,9 @@ final class FullComputerGasProfileTests: XCTestCase {
         profile.applyBottomGasKind(.trimix)
         profile.bottomGas.oxygenFraction = 0.18
         profile.bottomGas.heliumFraction = 0.45
-        XCTAssertTrue(FullComputerGasProfileValidator.isValid(profile))
+        XCTAssertTrue(FullComputerGasProfileValidator.isValid(profile, environment: .seaLevelSaltWater))
         profile.bottomGas.heliumFraction = 0.90
-        XCTAssertFalse(FullComputerGasProfileValidator.isValid(profile))
+        XCTAssertFalse(FullComputerGasProfileValidator.isValid(profile, environment: .seaLevelSaltWater))
     }
 
     func testMultipleDecoGasesOrderedBySwitchDepth() {
@@ -39,8 +39,8 @@ final class FullComputerGasProfileTests: XCTestCase {
         profile.normalizeSortOrders()
         let enabled = profile.enabledDecoGases
         XCTAssertEqual(enabled.map(\.name), ["EAN50", "O2"])
-        XCTAssertTrue(FullComputerGasProfileValidator.isValid(profile))
-        let plan = FullComputerRuntimePlan(profile: profile)
+        XCTAssertTrue(FullComputerGasProfileValidator.isValid(profile, environment: .seaLevelSaltWater))
+        let plan = FullComputerRuntimePlan(profile: profile, plannerEnvironment: .seaLevelSaltWater)
         XCTAssertEqual(plan.decoGases.count, 2)
         XCTAssertEqual(plan.decoGases.first?.name, "EAN50")
     }
@@ -57,7 +57,7 @@ final class FullComputerGasProfileTests: XCTestCase {
                 switchDepthMeters: 3
             )
         ]
-        let issues = FullComputerGasProfileValidator.validate(profile)
+        let issues = FullComputerGasProfileValidator.validate(profile, environment: .seaLevelSaltWater)
         XCTAssertTrue(issues.contains(where: {
             if case .hypoxic = $0 { return true }
             return false
@@ -91,7 +91,7 @@ final class FullComputerGasProfileTests: XCTestCase {
         var profile = FullComputerGasProfile.defaultAirGF3070
         profile.decoGases = [.ean50(at: 21)]
         profile.futureGasTTSPolicy = .activeGasOnly
-        let plan = FullComputerRuntimePlan(profile: profile)
+        let plan = FullComputerRuntimePlan(profile: profile, plannerEnvironment: .seaLevelSaltWater)
         XCTAssertTrue(plan.decoGases.isEmpty)
     }
 }

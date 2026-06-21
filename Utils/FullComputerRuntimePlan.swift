@@ -11,7 +11,7 @@ struct FullComputerRuntimePlan: Hashable, Codable {
     var stopIntervalMeters: Double
 
     static var defaultAirGF3070: FullComputerRuntimePlan {
-        FullComputerRuntimePlan(profile: .defaultAirGF3070)
+        FullComputerRuntimePlan(profile: .defaultAirGF3070, plannerEnvironment: .seaLevelSaltWater)
     }
 
     init(
@@ -34,7 +34,7 @@ struct FullComputerRuntimePlan: Hashable, Codable {
         self.stopIntervalMeters = stopIntervalMeters
     }
 
-    init(profile: FullComputerGasProfile, plannerEnvironment: PlannerEnvironment = .seaLevelSaltWater) {
+    init(profile: FullComputerGasProfile, plannerEnvironment: PlannerEnvironment) {
         let bottom = profile.bottomGas.toBuhlmannGas()
         let deco = profile.enabledDecoGases.map { $0.toBuhlmannGas() }
         let travel = profile.enabledTravelGases.map { $0.toBuhlmannGas() }

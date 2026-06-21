@@ -121,11 +121,43 @@ enum IndependentBuhlmannOracle {
     static let defaultEnvironment = PlannerEnvironment.seaLevelSaltWater
     static let productionSubStepSeconds: TimeInterval = 30
 
+    /// Independent ISA barometric formula — must not call production `AmbientPressureModel`.
+    static func independentSurfacePressureBar(altitudeMeters: Double) -> Double? {
+        guard altitudeMeters.isFinite, altitudeMeters >= -500, altitudeMeters <= 4_500 else {
+            return nil
+        }
+        let pressure = 1.01325 * pow(1.0 - 2.25577e-5 * altitudeMeters, 5.25588)
+        guard pressure.isFinite, pressure > 0 else { return nil }
+        return pressure
+    }
+
+    static func independentAmbientPressureBar(
+        depthMeters: Double,
+        environment: PlannerEnvironment
+    ) -> Double? {
+        guard depthMeters.isFinite, depthMeters >= 0 else { return nil }
+        let rho = environment.waterDensityKgPerM3
+        let pressure = environment.surfacePressureBar + (rho * IndependentOracleConstants.gravity * depthMeters) / 100_000.0
+        guard pressure.isFinite, pressure > 0 else { return nil }
+        return pressure
+    }
+
+    static func independentDepthMeters(
+        ambientPressureBar: Double,
+        environment: PlannerEnvironment
+    ) -> Double? {
+        guard ambientPressureBar.isFinite, ambientPressureBar >= environment.surfacePressureBar else { return nil }
+        let rho = environment.waterDensityKgPerM3
+        let meters = (ambientPressureBar - environment.surfacePressureBar) * 100_000.0 / (rho * IndependentOracleConstants.gravity)
+        guard meters.isFinite, meters >= 0 else { return nil }
+        return meters
+    }
+
     static func ambientPressureBar(
         depthMeters: Double,
         environment: PlannerEnvironment = defaultEnvironment
     ) -> Double {
-        AmbientPressureModel.ambientPressureBar(depthMeters: depthMeters, environment: environment)
+        independentAmbientPressureBar(depthMeters: depthMeters, environment: environment)
             ?? environment.surfacePressureBar
     }
 
@@ -251,7 +283,7 @@ enum IndependentBuhlmannOracle {
             guard denominator.isFinite, denominator > 0 else { continue }
             let toleratedAmbient = (total - fraction * a) / denominator
             guard toleratedAmbient.isFinite, toleratedAmbient >= environment.surfacePressureBar else { continue }
-            let depth = AmbientPressureModel.depthMeters(ambientPressureBar: toleratedAmbient, environment: environment) ?? 0
+            let depth = independentDepthMeters(ambientPressureBar: toleratedAmbient, environment: environment) ?? 0
             perCompartment[index] = depth
             if depth > maxDepth {
                 maxDepth = depth

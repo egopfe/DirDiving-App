@@ -22,6 +22,7 @@ struct FullComputerPrediveSettingsView: View {
                     bottomGasSection
                     compositionSection
                     gfSection
+                    environmentSection
                     sensorSection
 
                     NavigationLink {
@@ -195,6 +196,89 @@ struct FullComputerPrediveSettingsView: View {
         }
     }
 
+    private var environmentSection: some View {
+        DivePanel(stroke: DiveUI.cyan) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(String(localized: "fc.environment.settings.title"))
+                    .font(DiveUI.Typography.rowSubtitle)
+                    .foregroundStyle(DiveUI.secondaryText)
+                Stepper(
+                    altitudeLabel,
+                    value: altitudeMeters,
+                    in: -500...4_500,
+                    step: 100
+                )
+                .font(DiveUI.Typography.rowSubtitle)
+                HStack(spacing: 6) {
+                    salinityButton(.salt, label: String(localized: "fc.environment.salinity.salt"))
+                    salinityButton(.fresh, label: String(localized: "fc.environment.salinity.fresh"))
+                }
+                if let draft = configuration.draftEnvironment {
+                    Text(FullComputerEnvironmentPresentation.summary(for: draft))
+                        .font(DiveUI.Typography.hintCaption)
+                        .foregroundStyle(DiveUI.mutedText)
+                }
+                if let proposal = configuration.pendingSensorProposal {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(String(localized: "fc.environment.sensor.proposal"))
+                            .font(DiveUI.Typography.hintCaptionBold)
+                            .foregroundStyle(DiveUI.orange)
+                        Text(FullComputerEnvironmentPresentation.summary(for: proposal))
+                            .font(DiveUI.Typography.hintCaption)
+                        Button(String(localized: "fc.environment.sensor.accept")) {
+                            configuration.acceptPendingSensorProposal()
+                        }
+                        .font(DiveUI.Typography.hintCaptionBold)
+                    }
+                }
+            }
+        }
+        .onAppear {
+            FullComputerEnvironmentSensorService.refreshProposal(into: configuration)
+        }
+    }
+
+    private var altitudeLabel: String {
+        String(format: String(localized: "fc.environment.altitude_format"), altitudeMeters.wrappedValue)
+    }
+
+    private var altitudeMeters: Binding<Int> {
+        Binding(
+            get: { Int((configuration.draftEnvironment?.altitudeMeters ?? 0).rounded()) },
+            set: { newValue in
+                let salinity = configuration.draftEnvironment?.salinity ?? .salt
+                configuration.setDraftEnvironment(
+                    altitudeMeters: Double(newValue),
+                    salinity: salinity,
+                    source: .watchSettingsManual
+                )
+            }
+        )
+    }
+
+    private func salinityButton(_ salinity: SalinityMode, label: String) -> some View {
+        let selected = configuration.draftEnvironment?.salinity == salinity
+        return Button {
+            let altitude = configuration.draftEnvironment?.altitudeMeters ?? 0
+            configuration.setDraftEnvironment(
+                altitudeMeters: altitude,
+                salinity: salinity,
+                source: .watchSettingsManual
+            )
+        } label: {
+            Text(label)
+                .font(DiveUI.Typography.hintCaptionBold)
+                .foregroundStyle(selected ? .black : .white)
+                .frame(maxWidth: .infinity, minHeight: 30)
+                .background(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(selected ? DiveUI.cyan : Color.white.opacity(0.08))
+                )
+        }
+        .buttonStyle(.plain)
+        .disabled(!configuration.canEdit)
+    }
+
     private var sensorSection: some View {
         settingsRow(
             title: String(localized: "startup.fc_confirm.row.sensor"),
@@ -205,10 +289,11 @@ struct FullComputerPrediveSettingsView: View {
 
 
     private var modText: String {
-        if let mod = profile.bottomGas.modMeters() {
-            return Formatters.one(mod)
+        guard let environment = configuration.draftEnvironment?.plannerEnvironment,
+              let mod = profile.bottomGas.modMeters(environment: environment) else {
+            return "—"
         }
-        return "—"
+        return Formatters.one(mod)
     }
 
     private var decoSummary: String {
