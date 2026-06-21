@@ -796,7 +796,9 @@
 "live.fc.metric.ppo2" = "PPO2";
 "live.fc.status.deco" = "FUORI CURVA";
 "live.fc.status.in_deco" = "IN IMMERSIONE | DECOMPRESSIONE";
-"live.fc.status.ceiling_violation" = "VIOLAZIONE CEILING";
+"live.fc.status.runtime_degraded" = "TIMING DECO DEGRADATO";
+"live.fc.runtime.degraded.banner" = "Il timing decompressione è degradato. NDL/TTS non sono affidabili finché la continuità del sensore non è ripristinata.";
+"live.fc.status.ceiling_violation" = "VIOLAZIONE SOFFITTO";
 "live.fc.gas.a11y" = "Gas attivo: %@";
 "live.fc.gas_switch.available.title" = "CAMBIO GAS DISPONIBILE";
 "live.fc.gas_switch.active_gas" = "Gas attivo";

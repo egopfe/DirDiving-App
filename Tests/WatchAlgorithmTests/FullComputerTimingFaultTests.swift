@@ -66,4 +66,36 @@ final class FullComputerTimingFaultTests: XCTestCase {
             tissueBefore.compartments[0].nitrogenPressure
         )
     }
+
+    func testLongSuspensionIntegratesFullElapsedAndMarksDegraded() throws {
+        let gaps: [TimeInterval] = [121, 300, 600, 1_800]
+        for gap in gaps {
+            var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+            _ = engine.ingestSample(depthMeters: 20, timestamp: sessionStart)
+            let before = engine.snapshot.tissueState.compartments[0].nitrogenPressure
+            engine.tick(now: sessionStart.addingTimeInterval(gap))
+            XCTAssertEqual(engine.snapshot.engineState, .degraded)
+            XCTAssertTrue(engine.snapshot.diagnostics.contains(where: { $0.hasPrefix("missed_tick:") }))
+            XCTAssertGreaterThan(engine.snapshot.tissueState.compartments[0].nitrogenPressure, before)
+            if gap > 120 {
+                XCTAssertTrue(engine.snapshot.decoPresentation.usedConservativeFallback)
+            }
+        }
+    }
+
+    func testLongSuspensionDoesNotFalseClearDeco() throws {
+        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        _ = engine.ingestSample(depthMeters: 36, timestamp: sessionStart)
+        for minute in 1...20 { engine.tick(now: sessionStart.addingTimeInterval(Double(minute * 60))) }
+        let requiredDeco = engine.snapshot.rawCeilingMeters > 0.05 || (engine.snapshot.ndlMinutes ?? 999) <= 0
+        guard requiredDeco else { throw XCTSkip("no deco in setup") }
+        engine.tick(now: sessionStart.addingTimeInterval(1_500))
+        let oracleCeiling = engine.snapshot.tissueState.ceiling(
+            gf: 0.30,
+            environment: engine.runtimePlan.plannerEnvironment
+        ).depthMeters
+        if oracleCeiling > 0.05 {
+            XCTAssertGreaterThan(engine.snapshot.rawCeilingMeters, 0.01)
+        }
+    }
 }
