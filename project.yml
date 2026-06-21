@@ -294,6 +294,7 @@ targets:
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
       - Services/FullComputerEnvironmentSensorService.swift
+      - Services/WatchFullComputerAltitudeSensorProposalSettingsStore.swift
       - Services/FullComputerRuntimeEngine.swift
       - Utils/WatchModeSelectionPreferences.swift
       - Services/DIRActivitySelectionStore.swift

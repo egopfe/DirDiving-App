@@ -448,6 +448,8 @@ struct SettingsView: View {
 
             WatchSettingsSectionHeader(title: String(localized: "settings.section.gauge"))
 
+            WatchFullComputerAltitudeSensorSettingsSection()
+
             Toggle(isOn: gaugeShowTTVBinding) {
                 settingsRow(
                     icon: "gauge.with.dots.needle.67percent",

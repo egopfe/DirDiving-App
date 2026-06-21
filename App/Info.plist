@@ -5,7 +5,7 @@
     <key>CFBundleDisplayName</key>
     <string>DIR DIVING</string>
     <key>NSMotionUsageDescription</key>
-    <string>DIR DIVING usa i sensori di movimento e profondit&#224; per registrare profilo di immersione e velocit&#224; di risalita.</string>
+    <string>DIR DIVING uses motion and depth sensors to record dive profiles and ascent rate. For Full Computer predive setup, Apple Watch may propose an altitude/environment reading that you must explicitly review and accept before any dive starts; it never becomes live authority without your confirmation.</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>DIR DIVING usa la posizione per salvare il punto GPS di inizio e fine immersione.</string>
     <key>WKCompanionAppBundleIdentifier</key>
