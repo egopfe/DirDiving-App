@@ -896,7 +896,7 @@ Classify every match. Prohibition text, test fixtures, and historical records ar
 After remediation, rerun the complete current audit sequence:
 
 ```text
-0 → 0W → 01W → 1 → 2 → 15 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12 → 13 → 14 → 16
+0 → 0W → 01W → 1 → 2 → 15 → 18 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12 → 13 → 14 → 16
 ```
 
 Do not reuse old verdicts without a current-commit delta and evidence review.
