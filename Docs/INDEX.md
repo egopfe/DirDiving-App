@@ -17,6 +17,7 @@ Audit read-only su catena `CMAltimeter` → proposta sensore → ambiente Full C
 | **Failure matrix** | [`WATCH_CMALTIMETER_FAILURE_INJECTION_MATRIX_CURRENT.csv`](WATCH_CMALTIMETER_FAILURE_INJECTION_MATRIX_CURRENT.csv) |
 | **Physical QA matrix** | [`WATCH_CMALTIMETER_PHYSICAL_QA_MATRIX_CURRENT.csv`](WATCH_CMALTIMETER_PHYSICAL_QA_MATRIX_CURRENT.csv) |
 | **Verdict** | **PARTIAL** — software 78% · physical 0% · blockers WCMA-001, WCMA-002, PENDING_PHYSICAL |
+| **Remediation** | [`WATCH_CMALTIMETER_FULL_COMPUTER_REMEDIATION_REPORT_CURRENT.md`](WATCH_CMALTIMETER_FULL_COMPUTER_REMEDIATION_REPORT_CURRENT.md) — software 100% @ post-`27d9097` |
 | **Watch tests** | 965/965 PASS (macOS simulator) |
 
 ---

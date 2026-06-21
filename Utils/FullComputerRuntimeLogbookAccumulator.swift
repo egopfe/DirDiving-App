@@ -83,7 +83,8 @@ struct FullComputerRuntimeLogbookAccumulator: Hashable {
             environmentSourceRaw: environmentRecord?.source.rawValue,
             environmentCapturedAt: environmentRecord?.capturedAt,
             environmentSensorAccuracyMeters: environmentRecord?.sensorAccuracyMeters,
-            environmentSensorPrecisionMeters: environmentRecord?.sensorPrecisionMeters
+            environmentSensorPrecisionMeters: environmentRecord?.sensorPrecisionMeters,
+            environmentSensorReceivedAt: environmentRecord?.sensorReceivedAt
         )
     }
 }

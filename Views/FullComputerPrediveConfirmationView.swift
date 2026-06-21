@@ -117,12 +117,7 @@ struct FullComputerPrediveConfirmationView: View {
             .padding(.vertical, 10)
         }
         .accessibilityElement(children: .contain)
-        .onAppear {
-            environmentSensor.requestProposal(into: configuration)
-        }
-        .onDisappear {
-            environmentSensor.cancel()
-        }
+        .fullComputerPrediveAltitudeSensorLifecycle(configuration: configuration)
     }
 
     private var canStart: Bool {
