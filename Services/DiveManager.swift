@@ -254,6 +254,7 @@ final class DiveManager: ObservableObject {
     private var lastReportedRuntime: TimeInterval = 0
     private var fullComputerEngine: FullComputerRuntimeEngine?
     private var fullComputerLogbookAccumulator: FullComputerRuntimeLogbookAccumulator?
+    private var fullComputerSessionEnvironmentRecord: FullComputerEnvironmentRecord?
 
     private let activeDiveDraftFileName = "dirdiving_active_dive_draft.json"
     private var missionModeAutoEnableOnDiveStart: Bool {
@@ -1441,6 +1442,9 @@ final class DiveManager: ObservableObject {
             return
         }
         do {
+            fullComputerSessionEnvironmentRecord =
+                FullComputerPrediveConfigurationStore.shared.confirmedEnvironment
+                ?? FullComputerPrediveConfigurationStore.shared.draftEnvironment
             var engine = try FullComputerRuntimeEngine(plan: plan, sessionStart: sessionStart)
             engine.tick(now: sessionStart)
             fullComputerEngine = engine
@@ -1529,16 +1533,12 @@ final class DiveManager: ObservableObject {
         updateFullComputerLogbookAccumulator(from: resolvedEngine)
         let accumulator = fullComputerLogbookAccumulator ?? FullComputerRuntimeLogbookAccumulator()
         let runtimeEnvironment = resolvedEngine.runtimePlan.plannerEnvironment
-        var environmentRecord = FullComputerPrediveConfigurationStore.shared.confirmedEnvironment
-            ?? FullComputerEnvironmentRecord.from(
-                plannerEnvironment: runtimeEnvironment,
-                source: .legacyUnknown,
-                capturedAt: Date()
-            )
-        environmentRecord.altitudeMeters = runtimeEnvironment.altitudeMeters
-        environmentRecord.surfacePressureBar = runtimeEnvironment.surfacePressureBar
-        environmentRecord.salinityRaw = runtimeEnvironment.salinity.rawValue
-        environmentRecord.waterDensityKgPerM3 = runtimeEnvironment.waterDensityKgPerM3
+        let store = FullComputerPrediveConfigurationStore.shared
+        let environmentRecord = FullComputerEnvironmentRecord.logbookRecord(
+            plannerEnvironment: runtimeEnvironment,
+            preferred: store.confirmedEnvironment ?? store.draftEnvironment,
+            sessionSnapshot: fullComputerSessionEnvironmentRecord
+        )
         return accumulator.export(
             watchDivingMode: sessionDivingMode.rawValue,
             gfLow: resolvedEngine.runtimePlan.gfLow,
@@ -1605,6 +1605,7 @@ final class DiveManager: ObservableObject {
     private func stopFullComputerRuntime() {
         fullComputerEngine = nil
         fullComputerSnapshot = nil
+        fullComputerSessionEnvironmentRecord = nil
     }
 
     private func ingestFullComputerSample(_ sample: DiveSample) {
