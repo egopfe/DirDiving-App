@@ -9,7 +9,7 @@ final class FullComputerRuntimeEngineTests: XCTestCase {
     }
 
     func testStartupRequiresValidPlanAndSelfCheck() {
-        let readiness = FullComputerRuntimeEngine.canStart()
+        let readiness = FullComputerRuntimeEngine.canStart(plan: .defaultAirGF3070)
         XCTAssertTrue(readiness.ready, readiness.diagnostics.joined(separator: ", "))
         XCTAssertThrowsError(try FullComputerRuntimeEngine(
             plan: FullComputerRuntimePlan(
@@ -34,7 +34,7 @@ final class FullComputerRuntimeEngineTests: XCTestCase {
     }
 
     func testOneSecondTickAdvancesTissuesAtConstantDepth() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 20, timestamp: sessionStart)
         let before = engine.snapshot.tissueState.compartments[0].nitrogenPressure
         engine.tick(now: sessionStart.addingTimeInterval(1))
@@ -44,7 +44,7 @@ final class FullComputerRuntimeEngineTests: XCTestCase {
     }
 
     func testIrregularDeltaUsesRealElapsedTime() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 18, timestamp: sessionStart)
         engine.tick(now: sessionStart.addingTimeInterval(2.7))
         XCTAssertEqual(engine.snapshot.engineState, .degraded)
@@ -52,7 +52,7 @@ final class FullComputerRuntimeEngineTests: XCTestCase {
     }
 
     func testMultiLevelProfileUpdatesTissues() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 0, timestamp: sessionStart)
         _ = engine.ingestSample(depthMeters: 10, timestamp: sessionStart.addingTimeInterval(60))
         _ = engine.ingestSample(depthMeters: 30, timestamp: sessionStart.addingTimeInterval(180))
@@ -65,7 +65,7 @@ final class FullComputerRuntimeEngineTests: XCTestCase {
     }
 
     func testDescentAndAscentProfile() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         var t = sessionStart
         for depth in stride(from: 0, through: 30, by: 3) {
             _ = engine.ingestSample(depthMeters: Double(depth), timestamp: t)
@@ -83,7 +83,7 @@ final class FullComputerRuntimeEngineTests: XCTestCase {
     }
 
     func testMissedTicksStayConservativeWithoutResettingTissues() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 25, timestamp: sessionStart)
         let loaded = engine.snapshot.tissueState
         engine.tick(now: sessionStart.addingTimeInterval(90))
@@ -95,7 +95,7 @@ final class FullComputerRuntimeEngineTests: XCTestCase {
     }
 
     func testTimestampedGasSwitchRecalculatesImmediately() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 21, timestamp: sessionStart.addingTimeInterval(600))
         let ean32 = BuhlmannGas(
             name: "EAN32",
@@ -112,12 +112,12 @@ final class FullComputerRuntimeEngineTests: XCTestCase {
 
     func testRecoveryReplayMatchesContinuousIngest() throws {
         let samples = sampleProfileConstantBottom()
-        var continuous = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var continuous = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         for sample in samples {
             _ = continuous.ingestSample(depthMeters: sample.depthMeters, timestamp: sample.timestamp)
         }
 
-        var replayed = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var replayed = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         replayed.replaySamples(samples)
 
         XCTAssertEqual(
@@ -131,7 +131,7 @@ final class FullComputerRuntimeEngineTests: XCTestCase {
     func testRuntimeMatchesPlannerForConstantDepthProfile() throws {
         let bottomMinutes = 22.0
         let depthMeters = 32.0
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 0, timestamp: sessionStart)
         _ = engine.ingestSample(depthMeters: depthMeters, timestamp: sessionStart.addingTimeInterval(120))
         let bottomSeconds = bottomMinutes * 60.0
@@ -165,7 +165,7 @@ final class FullComputerRuntimeEngineTests: XCTestCase {
     }
 
     func testNonMonotonicSampleRejectedWithoutResettingTissues() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 12, timestamp: sessionStart.addingTimeInterval(30))
         let before = engine.snapshot.tissueState
         XCTAssertFalse(engine.ingestSample(depthMeters: 13, timestamp: sessionStart.addingTimeInterval(20)))
@@ -174,7 +174,7 @@ final class FullComputerRuntimeEngineTests: XCTestCase {
     }
 
     func testProjectionPerformanceBudget() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 28, timestamp: sessionStart.addingTimeInterval(400))
         measure {
             for offset in 0..<60 {

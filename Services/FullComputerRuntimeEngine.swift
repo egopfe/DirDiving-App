@@ -54,7 +54,7 @@ struct FullComputerRuntimeEngine: Equatable {
     }
 
     static func canStart(
-        plan: FullComputerRuntimePlan = .defaultAirGF3070,
+        plan: FullComputerRuntimePlan,
         algorithmSelfCheckFailures: [String] = DiveAlgorithmSelfCheck.failures()
     ) -> (ready: Bool, diagnostics: [String]) {
         var diagnostics = plan.validate()
@@ -64,7 +64,7 @@ struct FullComputerRuntimeEngine: Equatable {
         return (diagnostics.isEmpty, diagnostics)
     }
 
-    init(plan: FullComputerRuntimePlan = .defaultAirGF3070, sessionStart: Date) throws {
+    init(plan: FullComputerRuntimePlan, sessionStart: Date) throws {
         let readiness = Self.canStart(plan: plan)
         guard readiness.ready else {
             throw FullComputerRuntimeStartupFailure.invalidPlan(readiness.diagnostics)

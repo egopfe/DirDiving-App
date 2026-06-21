@@ -1,7 +1,7 @@
 # 12-DIR_DIVING_TEST_QA_EVIDENCE_AUDIT_V3.0
 
 **Command version:** 3.0  
-**Updated for MAIN:** 2026-06-19  
+**Updated for MAIN:** 2026-06-21
 **Repository:** `egopfe/DirDiving-App`  
 **Required branch:** `main`  
 **Task type:** audit-only
@@ -48,6 +48,7 @@ Create a requirement-to-test matrix covering:
 - security;
 - performance;
 - exports.
+- Watch Full Computer pre-dive absolute-altitude acquisition and proposal acceptance.
 
 Classify evidence:
 
@@ -63,6 +64,12 @@ Classify evidence:
 - legal/compliance review.
 
 No evidence means not passed.
+
+## Mandatory Watch altimeter evidence gate
+
+Trace the production Watch path from `CMAltimeter.startAbsoluteAltitudeUpdates(to:withHandler:)` through `CMAbsoluteAltitudeData` sample validation to the pending pre-dive environment proposal. Evidence must prove that the sample is acquired immediately before Full Computer start, is fresh, sufficiently accurate and stable, remains non-authoritative until explicit diver acceptance, and cannot silently replace an imported iPhone Plan or manual Watch setting.
+
+Require automated injected-provider coverage for unavailable/error/timeout/inaccurate/unstable/stale/near-zero/elevated samples, acceptance, rejection, and cancellation. Require physical Apple Watch evidence for a real Core Motion sample; simulator-only evidence is insufficient. Treat cached `CLLocationManager.location.altitude`, hard-coded altitude, implicit sea-level fallback, missing sensor metadata, or an unretained asynchronous provider as a failed safety requirement.
 
 # OUTPUT
 

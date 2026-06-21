@@ -122,7 +122,7 @@ final class FullComputerTravelBailoutPolicyTests: XCTestCase {
             gasMixId: UUID()
         )
         let start = Date(timeIntervalSince1970: 1_720_000_000)
-        var engine = try FullComputerRuntimeEngine(sessionStart: start)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: start)
         _ = engine.ingestSample(depthMeters: 15, timestamp: start.addingTimeInterval(60))
         XCTAssertFalse(engine.confirmGasSwitch(to: bailout.gasMixId, at: start.addingTimeInterval(61)))
         XCTAssertTrue(engine.confirmOffPlanGasSwitch(bailout, at: start.addingTimeInterval(62)))

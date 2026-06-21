@@ -4,6 +4,7 @@ struct FullComputerPrediveConfirmationView: View {
     @EnvironmentObject private var activitySelection: DIRActivitySelectionStore
     @EnvironmentObject private var dive: DiveManager
     @ObservedObject private var configuration = FullComputerPrediveConfigurationStore.shared
+    @ObservedObject private var environmentSensor = FullComputerEnvironmentSensorService.shared
 
     private var profile: FullComputerGasProfile { configuration.draftProfile }
 
@@ -25,6 +26,15 @@ struct FullComputerPrediveConfirmationView: View {
                     Text(String(localized: "startup.fc_confirm.subheader"))
                         .font(DiveUI.Typography.hintCaptionBold)
                         .foregroundStyle(DiveUI.mutedText)
+                        .multilineTextAlignment(.center)
+                }
+
+                if let proposal = configuration.pendingSensorProposal {
+                    sensorProposalPanel(proposal)
+                } else if environmentSensor.state == .sampling {
+                    Text(String(localized: "fc.environment.sensor.sampling"))
+                        .font(DiveUI.Typography.hintCaptionBold)
+                        .foregroundStyle(DiveUI.orange)
                         .multilineTextAlignment(.center)
                 }
 
@@ -86,7 +96,7 @@ struct FullComputerPrediveConfirmationView: View {
                     .buttonStyle(.plain)
 
                     Button {
-                        guard readiness.isReady else { return }
+                        guard canStart else { return }
                         HapticService.shared.confirm()
                         activitySelection.confirmFullComputerPredive()
                     } label: {
@@ -96,17 +106,52 @@ struct FullComputerPrediveConfirmationView: View {
                             .frame(maxWidth: .infinity, minHeight: DiveUI.Layout.commandButtonMinHeight)
                             .background(
                                 RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                    .fill(readiness.isReady ? DiveUI.green : DiveUI.mutedText)
+                                    .fill(canStart ? DiveUI.green : DiveUI.mutedText)
                             )
                     }
                     .buttonStyle(.plain)
-                    .disabled(!readiness.isReady)
+                    .disabled(!canStart)
                 }
             }
             .padding(.horizontal, DiveUI.screenPadding)
             .padding(.vertical, 10)
         }
         .accessibilityElement(children: .contain)
+        .onAppear {
+            environmentSensor.requestProposal(into: configuration)
+        }
+        .onDisappear {
+            environmentSensor.cancel()
+        }
+    }
+
+    private var canStart: Bool {
+        readiness.isReady
+            && configuration.pendingSensorProposal == nil
+            && environmentSensor.state != .sampling
+    }
+
+    private func sensorProposalPanel(_ proposal: FullComputerEnvironmentRecord) -> some View {
+        DivePanel(stroke: DiveUI.orange) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(String(localized: "fc.environment.sensor.proposal"))
+                    .font(DiveUI.Typography.hintCaptionBold)
+                    .foregroundStyle(DiveUI.orange)
+                Text(FullComputerEnvironmentPresentation.summary(for: proposal))
+                    .font(DiveUI.Typography.hintCaption)
+                    .foregroundStyle(.white)
+                HStack(spacing: 8) {
+                    Button(String(localized: "fc.environment.sensor.accept")) {
+                        configuration.acceptPendingSensorProposal()
+                    }
+                    Button(String(localized: "fc.environment.sensor.keep_current")) {
+                        configuration.dismissPendingSensorProposal()
+                    }
+                    .disabled(configuration.draftEnvironment == nil)
+                }
+                .font(DiveUI.Typography.hintCaptionBold)
+            }
+        }
     }
 
     private var decoSummary: String {
