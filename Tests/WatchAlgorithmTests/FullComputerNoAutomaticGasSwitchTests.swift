@@ -59,6 +59,6 @@ final class FullComputerNoAutomaticGasSwitchTests: XCTestCase {
         profile.bottomGas.oxygenFraction = 0.18
         profile.bottomGas.heliumFraction = 0.45
         profile.decoGases = [.ean50(at: 21)]
-        return FullComputerRuntimePlan(profile: profile)
+        return FullComputerRuntimePlan(profile: profile, plannerEnvironment: .seaLevelSaltWater)
     }
 }

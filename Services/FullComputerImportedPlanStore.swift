@@ -41,8 +41,15 @@ final class FullComputerImportedPlanStore: ObservableObject {
 
         do {
             try DivePlanPackageCodec.validate(package)
+            guard case .success(let environmentRecord) = package.body.environment.validatedRecord(source: .iPhonePlanImported) else {
+                lastImportError = .invalidEnvironment
+                return false
+            }
             let profile = try FullComputerGasProfile(importing: package)
-            if !FullComputerGasProfileValidator.validate(profile).isEmpty {
+            if !FullComputerGasProfileValidator.validate(
+                profile,
+                environment: environmentRecord.plannerEnvironment
+            ).isEmpty {
                 lastImportError = .invalidGases
                 return false
             }
@@ -80,11 +87,14 @@ final class FullComputerImportedPlanStore: ObservableObject {
 
     func activatePendingPlan(configuration: FullComputerPrediveConfigurationStore = .shared) throws {
         guard let package = pendingPackage else { return }
+        guard case .success(let environment) = package.body.environment.validatedRecord(source: .iPhonePlanImported) else {
+            throw DivePlanPackageValidationError.invalidEnvironment
+        }
         var profile = try FullComputerGasProfile(importing: package)
         let preserved = configuration.draftProfile
         profile.travelGases = preserved.travelGases
         profile.bailoutGases = preserved.bailoutGases
-        configuration.importProfile(profile)
+        configuration.importProfile(profile, environment: environment)
         activatedPlanID = package.body.planID
         activatedRevision = package.body.revision
         pendingPackage = nil

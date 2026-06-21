@@ -175,7 +175,7 @@ enum Audit15OracleTestSupport {
     static func ean50AirPlan() -> FullComputerRuntimePlan {
         var profile = FullComputerGasProfile.defaultAirGF3070
         profile.decoGases = [.ean50(at: 21)]
-        return FullComputerRuntimePlan(profile: profile)
+        return FullComputerRuntimePlan(profile: profile, plannerEnvironment: .seaLevelSaltWater)
     }
 
     static func trimixDecoPlan() -> FullComputerRuntimePlan {
@@ -185,7 +185,7 @@ enum Audit15OracleTestSupport {
         profile.bottomGas.heliumFraction = 0.35
         profile.bottomGas.name = "TX18/35"
         profile.decoGases = [.ean50(at: 21)]
-        return FullComputerRuntimePlan(profile: profile)
+        return FullComputerRuntimePlan(profile: profile, plannerEnvironment: .seaLevelSaltWater)
     }
 }
 

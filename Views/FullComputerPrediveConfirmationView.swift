@@ -46,6 +46,11 @@ struct FullComputerPrediveConfirmationView: View {
                         )
                         divider
                         confirmRow(
+                            label: String(localized: "fc.environment.confirm.row"),
+                            value: environmentSummary
+                        )
+                        divider
+                        confirmRow(
                             label: String(localized: "startup.fc_confirm.row.sensor"),
                             value: sensorLabel
                         )
@@ -108,6 +113,13 @@ struct FullComputerPrediveConfirmationView: View {
         let gases = profile.enabledDecoGases
         if gases.isEmpty { return String(localized: "fc.predive.settings.deco_none") }
         return gases.map(\.displayName).joined(separator: ", ")
+    }
+
+    private var environmentSummary: String {
+        guard let record = configuration.draftEnvironment else {
+            return String(localized: "fc.environment.error.missing")
+        }
+        return FullComputerEnvironmentPresentation.summary(for: record)
     }
 
     private var sensorLabel: String {
