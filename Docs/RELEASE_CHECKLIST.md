@@ -17,8 +17,11 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 - [ ] Release gate matrix: [`RELEASE_GATE_MATRIX_CURRENT.csv`](RELEASE_GATE_MATRIX_CURRENT.csv)
 - [ ] App Store / TestFlight blockers: [`APP_STORE_TESTFLIGHT_BLOCKERS_CURRENT.md`](APP_STORE_TESTFLIGHT_BLOCKERS_CURRENT.md)
 - [ ] External legal counsel sign-off **PENDING** — [`IOS_APP_STORE_ALGORITHM_MARKETING_REVIEW_CHECKLIST.md`](IOS_APP_STORE_ALGORITHM_MARKETING_REVIEW_CHECKLIST.md)
-- [ ] **Code-level claims compliance:** **88/100** — truthful non-certified posture; **not legal approval**
-- [ ] **External TestFlight / App Store:** **BLOCKED** until P1 blockers close
+- [ ] Run `./Scripts/validate_release_legal_claims_readiness.sh` — expect `RELEASE_CLAIMS_SOFTWARE_READINESS_100`
+- [ ] Claims registry: [`CLAIMS_POLICY_REGISTRY_CURRENT.csv`](CLAIMS_POLICY_REGISTRY_CURRENT.csv) + [`PROHIBITED_CLAIMS_ALLOWLIST_CURRENT.csv`](PROHIBITED_CLAIMS_ALLOWLIST_CURRENT.csv)
+- [ ] Remediation report: [`RELEASE_LEGAL_CLAIMS_COMPLIANCE_REMEDIATION_REPORT_CURRENT.md`](RELEASE_LEGAL_CLAIMS_COMPLIANCE_REMEDIATION_REPORT_CURRENT.md)
+- [ ] **Code-level claims compliance:** **100%** software/documentation gates — truthful non-certified posture; **not legal approval**
+- [ ] **External TestFlight / App Store:** **BLOCKED** until P1/P2 external gates close
 
 ## Audit remediation (2026-06-20 — Command 12 test/QA evidence @ `TEST_QA_EVIDENCE_REMEDIATION_REPORT_CURRENT.md`)
 

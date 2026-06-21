@@ -1,0 +1,60 @@
+mockup_id,path,platform,activity,implemented,fixture_exists,snapshot_regression,embedded_in_live_ui,runtime_bundled,status,notes
+FC_UI_01,mockups/FC_UI_01_ACTIVITY_SELECTION.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_02,mockups/FC_UI_02_DIVING_MODE_SELECTION.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_03,mockups/FC_UI_03_FULL_COMPUTER_PREDIVE_CONFIRMATION.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_04,mockups/FC_UI_04_SETTINGS_ACTIVITY_DEFAULT.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_05,mockups/FC_UI_05_SETTINGS_DIVING_MODE_AND_TTV.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_06,mockups/FC_UI_06_PREDIVE_GAS_CONFIGURATION.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_07,mockups/FC_UI_07_IOS_DECO_PLAN_TRANSFER.png,iOS,Diving FC,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_08,mockups/FC_UI_08_DECO_GAS_LIST.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_09,mockups/FC_UI_09_GAS_SWITCH_AVAILABLE.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_10,mockups/FC_UI_10_GAS_SWITCH_MISSED.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_11,mockups/FC_UI_11_NDL_GREEN.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_12,mockups/FC_UI_12_NDL_YELLOW_10_MIN.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_13,mockups/FC_UI_13_NDL_RED_5_MIN.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_14,mockups/FC_UI_14_DECO_APPROACH_STOP.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_15,mockups/FC_UI_15_CEILING_VIOLATION.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_16,mockups/FC_UI_16_DECO_HOLD_GREEN.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_17,mockups/FC_UI_17_DECO_HOLD_GREEN_LEFT_ARROW.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_18,mockups/FC_UI_18_TOO_DEEP_ASCEND_TO_STOP.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_19,mockups/FC_UI_19_TOO_SHALLOW_DESCEND_TO_STOP.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_20,mockups/FC_UI_20_DECO_COMPLETED.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_21,mockups/FC_UI_21_DECO_COMPLETED_ALT.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_22,mockups/FC_UI_22_FULL_DECO_SCREEN_REFERENCE.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_23,mockups/FC_UI_23_NO_DECO_WITH_CONTROLS.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_24,mockups/FC_UI_24_DECO_WITH_STOP_TABLE.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+FC_UI_25,mockups/FC_UI_25_DECO_WITH_PROGRESS_PANEL.png,watchOS,Diving FC,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_WATCH_01,mockups/Apple_Watch/APNEA_WATCH_01_READY.png,watchOS,Apnea,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_WATCH_02,mockups/Apple_Watch/APNEA_WATCH_02_DIVE_IN_PROGRESS.png,watchOS,Apnea,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_WATCH_03,mockups/Apple_Watch/APNEA_WATCH_03_ASCENT.png,watchOS,Apnea,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_WATCH_04,mockups/Apple_Watch/APNEA_WATCH_04_SURFACE_RECOVERY.png,watchOS,Apnea,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_WATCH_05,mockups/Apple_Watch/APNEA_WATCH_05_SESSION_SUMMARY.png,watchOS,Apnea,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_WATCH_06,mockups/Apple_Watch/APNEA_WATCH_06_DEPTH_ALARMS.png,watchOS,Apnea,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_WATCH_07,mockups/Apple_Watch/APNEA_WATCH_07_MARKER_REACHED.png,watchOS,Apnea,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_WATCH_08,mockups/Apple_Watch/APNEA_WATCH_08_TARGET_REACHED.png,watchOS,Apnea,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+SNORKELING_WATCH_01,mockups/Apple_Watch/SNORKELING_WATCH_01_READY.png,watchOS,Snorkeling,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+SNORKELING_WATCH_02,mockups/Apple_Watch/SNORKELING_WATCH_02_SURFACE_DASHBOARD.png,watchOS,Snorkeling,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+SNORKELING_WATCH_03,mockups/Apple_Watch/SNORKELING_WATCH_03_DIP_IN_PROGRESS.png,watchOS,Snorkeling,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+SNORKELING_WATCH_04,mockups/Apple_Watch/SNORKELING_WATCH_04_WAYPOINT_NAVIGATION.png,watchOS,Snorkeling,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+SNORKELING_WATCH_05,mockups/Apple_Watch/SNORKELING_WATCH_05_RETURN_TO_ENTRY.png,watchOS,Snorkeling,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+SNORKELING_WATCH_06,mockups/Apple_Watch/SNORKELING_WATCH_06_SAVE_MARKER.png,watchOS,Snorkeling,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+SNORKELING_WATCH_07,mockups/Apple_Watch/SNORKELING_WATCH_07_SESSION_SUMMARY.png,watchOS,Snorkeling,yes,yes,presentation_fixture,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_IOS_01,mockups/iOS/APNEA_IOS_01_DASHBOARD.png,iOS,Apnea,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_IOS_02,mockups/iOS/APNEA_IOS_02_PROFILES.png,iOS,Apnea,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_IOS_03,mockups/iOS/APNEA_IOS_03_SESSION_PLANNER.png,iOS,Apnea,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_IOS_04,mockups/iOS/APNEA_IOS_04_DIVE_DETAIL.png,iOS,Apnea,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_IOS_05,mockups/iOS/APNEA_IOS_05_SESSION_CHARTS.png,iOS,Apnea,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_IOS_06,mockups/iOS/APNEA_IOS_06_STATISTICS.png,iOS,Apnea,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_IOS_07,mockups/iOS/APNEA_IOS_07_EQUIPMENT.png,iOS,Apnea,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_IOS_08,mockups/iOS/APNEA_IOS_08_BUDDY_SAFETY.png,iOS,Apnea,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_IOS_09,mockups/iOS/APNEA_IOS_09_SESSION_MAP.png,iOS,Apnea,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_IOS_10,mockups/iOS/APNEA_IOS_10_LOGBOOK.png,iOS,Apnea,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_IOS_11,mockups/iOS/APNEA_IOS_11_ALARMS.png,iOS,Apnea,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_IOS_12,mockups/iOS/APNEA_IOS_12_MARKERS.png,iOS,Apnea,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_IOS_13,mockups/iOS/APNEA_IOS_13_PERSONAL_RECORDS.png,iOS,Apnea,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_IOS_14,mockups/iOS/APNEA_IOS_14_EXPORT_SHARE.png,iOS,Apnea,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle
+APNEA_IOS_15,mockups/iOS/APNEA_IOS_15_SETTINGS.png,iOS,Apnea,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle
+SNORKELING_IOS_01,mockups/iOS/SNORKELING_IOS_01_DASHBOARD.png,iOS,Snorkeling,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle
+SNORKELING_IOS_02,mockups/iOS/SNORKELING_IOS_02_ROUTE_PLANNER.png,iOS,Snorkeling,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle
+SNORKELING_IOS_03,mockups/iOS/SNORKELING_IOS_03_SESSION_DETAIL.png,iOS,Snorkeling,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle
+IOS_COMPANION_ACTIVITY_SELECTION,mockups/IOS_COMPANION_ACTIVITY_SELECTION_POST_ONBOARDING.png,iOS,Companion,yes,yes,yes,no,no,IMPLEMENTED,Reference only — not in app bundle

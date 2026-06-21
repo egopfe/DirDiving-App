@@ -83,6 +83,10 @@ targets:
       - Utils/SnorkelingReleaseSelfCheck.swift
       - Utils/SnorkelingMockupReferenceMatrix.swift
       - Utils/MockupCanonicalPaths.swift
+      - Utils/FullComputerMockupReferenceMatrix.swift
+      - Utils/MockupVisualRegressionRegistry.swift
+      - Utils/WatchSettingsMockupFixtures.swift
+      - Utils/IOSDivePlanTransferMockupFixtures.swift
       - Utils/SnorkelingQAEvidenceCatalog.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
@@ -282,6 +286,10 @@ targets:
       - Utils/SnorkelingReleaseSelfCheck.swift
       - Utils/SnorkelingMockupReferenceMatrix.swift
       - Utils/MockupCanonicalPaths.swift
+      - Utils/FullComputerMockupReferenceMatrix.swift
+      - Utils/MockupVisualRegressionRegistry.swift
+      - Utils/WatchSettingsMockupFixtures.swift
+      - Utils/IOSDivePlanTransferMockupFixtures.swift
       - Utils/SnorkelingQAEvidenceCatalog.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
@@ -510,6 +518,10 @@ targets:
       - Utils/SnorkelingReleaseSelfCheck.swift
       - Utils/SnorkelingMockupReferenceMatrix.swift
       - Utils/MockupCanonicalPaths.swift
+      - Utils/FullComputerMockupReferenceMatrix.swift
+      - Utils/MockupVisualRegressionRegistry.swift
+      - Utils/WatchSettingsMockupFixtures.swift
+      - Utils/IOSDivePlanTransferMockupFixtures.swift
       - Utils/SnorkelingQAEvidenceCatalog.swift
       - Tests/WatchAlgorithmTests/ApneaLifecycleEngineTests.swift
       - Tests/WatchAlgorithmTests/ApneaOperationalEventEngineTests.swift
@@ -547,6 +559,10 @@ targets:
       - Utils/SnorkelingReleaseSelfCheck.swift
       - Utils/SnorkelingMockupReferenceMatrix.swift
       - Utils/MockupCanonicalPaths.swift
+      - Utils/FullComputerMockupReferenceMatrix.swift
+      - Utils/MockupVisualRegressionRegistry.swift
+      - Utils/WatchSettingsMockupFixtures.swift
+      - Utils/IOSDivePlanTransferMockupFixtures.swift
       - Utils/SnorkelingQAEvidenceCatalog.swift
       - Tests/iOSAlgorithmTests/IOSCompanionActivitySelectionTests.swift
       - Tests/iOSAlgorithmTests/IOSActivitySettingsCoherenceTests.swift

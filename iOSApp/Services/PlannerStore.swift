@@ -555,6 +555,11 @@ extension PlannerStore {
     var testHook_planningGeneration: UInt { planningGeneration }
 
     func testHook_flushDebouncedWork() async {
+        for _ in 0..<5 {
+            await Task.yield()
+        }
+        // Drain init deferPublishedMutation(calculate) and debounced schedulePlanningUpdate tasks.
+        try? await Task.sleep(nanoseconds: 250_000_000)
         planningUpdateTask?.cancel()
         saveTask?.cancel()
         isCalculating = false
