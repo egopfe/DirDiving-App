@@ -456,6 +456,8 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
 
     private func persistCheckpoint() {
         guard sessionArmed || sessionStarted || showSessionSummary else { return }
+        let signpost = DIRPerformanceSignpost.begin(.snorkelingRouteCheckpoint)
+        defer { signpost.end() }
         do {
             let runtime = SnorkelingCheckpointRuntimeState(
                 sessionArmed: sessionArmed,

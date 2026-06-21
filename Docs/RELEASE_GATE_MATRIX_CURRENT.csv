@@ -1,0 +1,19 @@
+Gate_ID,Gate,Tier,Software_Claims_Status,External_Evidence_Status,Legal_Review_Status,Marketing_Review_Status,Blocks_External_TestFlight,Blocks_App_Store,Primary_Evidence,Notes
+RG-01,Prohibited-claims production scan,All,PASS,N/A,N/A,N/A,Yes,Yes,scan_prohibited_claims.py,CI gate
+RG-02,Claims registry + traceability,All,PASS,N/A,N/A,N/A,No,Yes,CLAIMS_POLICY_REGISTRY_CURRENT.csv,
+RG-03,Legal onboarding + re-consent,All,PASS,N/A,PENDING,PENDING,Partial,Yes,LegalAcceptanceGateTests,
+RG-04,Export disclaimer consistency,All,PASS,N/A,PENDING,N/A,No,Yes,EXPORT_DISCLAIMER_POLICY_CURRENT.md,
+RG-05,TestFlight notes alignment,Internal TF,PASS,N/A,PENDING,N/A,No,Partial,TESTFLIGHT_REVIEW_NOTES.md,
+RG-06,App Store marketing assets,App Store,PASS software copy,PENDING,PENDING,PENDING,Yes,Yes,APP_STORE_MARKETING/MARKETING_ASSET_CHECKLIST_CURRENT.md,
+RG-07,External legal counsel,App Store,PASS,PENDING,PENDING_LEGAL_REVIEW,PENDING,Yes,Yes,QA_EVIDENCE/LEGAL_REVIEW/,Not fabricated
+RG-08,External Bühlmann validation,Marketing,PASS,PENDING,PENDING,PENDING,Yes,Yes,BUHLMANN_EXTERNAL,PENDING_EXTERNAL_VALIDATION
+RG-09,External CCR validation,Marketing,PASS,PENDING,PENDING,PENDING,Yes,Yes,CCR_EXTERNAL,PENDING_EXTERNAL_VALIDATION
+RG-10,Watch entitlement field QA,External TF,PASS,PENDING,PENDING,N/A,Yes,Yes,HARDWARE_ENTITLEMENT,PENDING_PHYSICAL_QA
+RG-11,VoiceOver legal journey,App Store,PASS,PENDING,PENDING,N/A,Partial,Yes,DYNAMIC_TYPE_VOICEOVER/LEGAL_JOURNEY_TEMPLATE.md,PENDING_PHYSICAL_QA
+RG-12,Paired sync field QA,External TF,PASS,PENDING,N/A,N/A,Yes,Yes,WATCH_IOS_SYNC,PENDING_PHYSICAL_QA
+RG-13,iCloud two-device QA,External TF,PASS,PENDING,N/A,N/A,Yes,Yes,ICLOUD_TWO_DEVICE,PENDING_PHYSICAL_QA
+RG-14,Incident response runbook,Governance,PASS,N/A,N/A,N/A,No,Partial,INCIDENT_RESPONSE_RUNBOOK_CURRENT.md,
+RG-15,Release rollback procedure,Governance,PASS,N/A,N/A,N/A,No,Partial,RELEASE_ROLLBACK_PROCEDURE_CURRENT.md,
+RG-16,Support escalation SLA,Governance,PASS,N/A,PENDING,N/A,Partial,Yes,SUPPORT_ESCALATION_AND_SLA_CURRENT.md,Support URL pending
+RG-17,Release legal claims software gate,All,PASS,N/A,N/A,N/A,No,No,validate_release_legal_claims_readiness.sh,Master gate
+RG-18,App Store review,App Store,PASS software,PENDING,PENDING,PENDING,Yes,Yes,App Store Connect,PENDING_APP_STORE_REVIEW

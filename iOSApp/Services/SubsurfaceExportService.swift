@@ -21,7 +21,10 @@ enum SubsurfaceExportService {
         }
     }
 
-    static func makeCSV(for session: DiveSession) -> String? {
+    static func makeCSV(
+        for session: DiveSession,
+        privacyOptions: DivingExportPrivacyOptions = DivingExportPrivacyPreferences.currentOptions()
+    ) -> String? {
         guard let normalized = try? DiveSessionAlgorithmValidator.normalizedForStorage(
             session,
             allowEmptySamples: false,
@@ -35,7 +38,7 @@ enum SubsurfaceExportService {
         )
         guard let first = samples.first?.timestamp else { return nil }
         var rows = ["time_seconds,depth_m,temperature_c,entry_lat,entry_lon,exit_lat,exit_lon,is_manual,equipment,entry_pressure,exit_pressure,deco_notes"]
-        rows.append(contentsOf: metadataLines(for: normalized))
+        rows.append(contentsOf: metadataLines(for: normalized, privacyOptions: privacyOptions))
         let manualMeta = [
             normalized.isManual ? "1" : "0",
             csvField(normalized.equipmentUsed ?? ""),
@@ -51,18 +54,22 @@ enum SubsurfaceExportService {
             let seconds = max(previousSeconds, Int(elapsed.rounded()))
             previousSeconds = seconds
             let temp = sample.temperatureCelsius.map { String(format: "%.1f", $0) } ?? ""
-            let entryLat = normalized.entryGPS.map { String(format: "%.6f", $0.latitude) } ?? ""
-            let entryLon = normalized.entryGPS.map { String(format: "%.6f", $0.longitude) } ?? ""
-            let exitLat = normalized.exitGPS.map { String(format: "%.6f", $0.latitude) } ?? ""
-            let exitLon = normalized.exitGPS.map { String(format: "%.6f", $0.longitude) } ?? ""
+            let entryCoords = DivingExportPrivacyPolicy.exportCoordinateStrings(
+                point: normalized.entryGPS,
+                precision: privacyOptions.locationPrecision
+            )
+            let exitCoords = DivingExportPrivacyPolicy.exportCoordinateStrings(
+                point: normalized.exitGPS,
+                precision: privacyOptions.locationPrecision
+            )
             let fields = [
                 String(seconds),
                 String(format: "%.2f", sample.depthMeters),
                 temp,
-                entryLat,
-                entryLon,
-                exitLat,
-                exitLon,
+                entryCoords.latitude,
+                entryCoords.longitude,
+                exitCoords.latitude,
+                exitCoords.longitude,
                 normalized.isManual ? "1" : "0",
                 normalized.equipmentUsed ?? "",
                 normalized.entryPressureText ?? "",
@@ -74,14 +81,18 @@ enum SubsurfaceExportService {
         return rows.joined(separator: "\n")
     }
 
-    private static func metadataLines(for session: DiveSession) -> [String] {
+    private static func metadataLines(
+        for session: DiveSession,
+        privacyOptions: DivingExportPrivacyOptions
+    ) -> [String] {
         let formatter = ISO8601DateFormatter()
-        return [
+        var lines = [
             "# session_meta",
             "# dirdiving_session_id: \(session.id.uuidString)",
             "# dirdiving_start_date: \(formatter.string(from: session.startDate))",
             "# dirdiving_end_date: \(formatter.string(from: session.endDate))",
             "# dirdiving_is_manual: \(session.isManual ? 1 : 0)",
+            "# dirdiving_export_location_precision: \(privacyOptions.locationPrecision.rawValue)",
             "# dirdiving_equipment: \(csvField(session.equipmentUsed ?? ""))",
             "# dirdiving_entry_pressure: \(csvField(session.entryPressureText ?? ""))",
             "# dirdiving_exit_pressure: \(csvField(session.exitPressureText ?? ""))",
@@ -90,7 +101,11 @@ enum SubsurfaceExportService {
             "# dirdiving_buddy: \(csvField(session.buddy ?? ""))",
             "# dirdiving_gas_label: \(session.gasLabel.rawValue)",
             "# dirdiving_sac: \(session.sacLitersMinute.map { String(format: "%.2f", $0) } ?? "")"
-        ] + ccrMetadataLines(for: session)
+        ]
+        if DivingRecordEligibilityPolicy.isSimulatedSession(depthSensorSourceTag: session.depthSensorSourceTag) {
+            lines.append("# dirdiving_depth_sensor_source: \(DivingRecordEligibilityPolicy.simulatedSourceTag)")
+        }
+        return lines + ccrMetadataLines(for: session)
     }
 
     private static func ccrMetadataLines(for session: DiveSession) -> [String] {
@@ -117,15 +132,19 @@ enum SubsurfaceExportService {
         return escaped
     }
 
-    static func writeCSV(for session: DiveSession) -> Result<URL, ExportError> {
+    static func writeCSV(
+        for session: DiveSession,
+        privacyOptions: DivingExportPrivacyOptions = DivingExportPrivacyPreferences.currentOptions()
+    ) -> Result<URL, ExportError> {
         guard !session.samples.isEmpty else { return .failure(.emptySamples) }
         cleanupTemporaryExports()
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent("DIRDiving_Export_\(UUID().uuidString).csv")
         do {
-            guard let csv = makeCSV(for: session), let data = csv.data(using: .utf8) else {
+            guard let csv = makeCSV(for: session, privacyOptions: privacyOptions), let data = csv.data(using: .utf8) else {
                 return .failure(.writeFailed("UTF-8"))
             }
+            DivingExportPrivacyPreferences.markExportPerformed()
             try data.write(to: url, options: [.atomic, .completeFileProtection])
             return .success(url)
         } catch {

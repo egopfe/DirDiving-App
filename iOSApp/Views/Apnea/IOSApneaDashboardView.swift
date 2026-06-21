@@ -39,6 +39,7 @@ struct IOSApneaDashboardView: View {
                 .dirCompanionScrollSurface()
             }
         }
+        .accessibilityIdentifier("apnea.ios.dashboard")
     }
 
     private var header: some View {
@@ -64,21 +65,29 @@ struct IOSApneaDashboardView: View {
             IOSApneaSessionDetailView(session: session)
         } label: {
             DIRCard(DIRIOSLocalizer.string("apnea.ios.dashboard.last_session"), icon: "clock.fill", accent: DIRTheme.cyan) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(presentation.lastSessionDateText)
-                            .font(.headline)
-                            .foregroundStyle(.white)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(presentation.lastSessionDateText)
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                    HStack(spacing: 12) {
+                        metricInline(DIRIOSLocalizer.string("apnea.ios.dashboard.duration"), presentation.lastSessionDurationText)
+                        metricInline(DIRIOSLocalizer.string("apnea.ios.dashboard.max_depth"), presentation.lastSessionMaxDepthText)
+                        metricInline(DIRIOSLocalizer.string("apnea.ios.dashboard.dives"), presentation.lastSessionDiveCountText)
                     }
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .foregroundStyle(DIRTheme.muted)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .buttonStyle(.plain)
         .accessibilityLabel(DIRIOSLocalizer.string("apnea.ios.dashboard.last_session.a11y"))
         .accessibilityHint(DIRIOSLocalizer.string("apnea.ios.dashboard.last_session.hint"))
+    }
+
+    private func metricInline(_ title: String, _ value: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title).font(.caption2).foregroundStyle(DIRTheme.muted)
+            Text(value).font(.subheadline.weight(.semibold)).foregroundStyle(.white)
+        }
     }
 
     private var metricsGrid: some View {

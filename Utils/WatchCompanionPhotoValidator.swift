@@ -30,10 +30,14 @@ enum WatchCompanionPhotoValidationError: LocalizedError, Equatable {
 enum WatchCompanionPhotoValidator {
     static let maxBytes = 10 * 1_024 * 1_024
     static let maxPixelDimension: CGFloat = 4_096
+    static let maxMegapixels: Int = 16_777_216
     private static let allowedExtensions: Set<String> = ["png", "jpg", "jpeg", "heic"]
     private static let storedExtensions: Set<String> = ["png", "jpg", "jpeg"]
 
     static func validateAndNormalize(data: Data, suggestedFileName: String) throws -> (data: Data, fileName: String) {
+        guard hasSupportedMagicBytes(data) else {
+            throw WatchCompanionPhotoValidationError.undecodableImage
+        }
         guard isAllowedByteCount(data.count) else {
             throw WatchCompanionPhotoValidationError.invalidFileSize
         }
@@ -44,6 +48,10 @@ enum WatchCompanionPhotoValidator {
         let pixelHeight = image.size.height * image.scale
         guard pixelWidth > 0, pixelHeight > 0 else {
             throw WatchCompanionPhotoValidationError.undecodableImage
+        }
+        let pixelCount = Int(pixelWidth * pixelHeight)
+        guard pixelCount <= maxMegapixels else {
+            throw WatchCompanionPhotoValidationError.dimensionsTooLarge
         }
         guard max(pixelWidth, pixelHeight) <= maxPixelDimension else {
             throw WatchCompanionPhotoValidationError.dimensionsTooLarge
@@ -186,6 +194,18 @@ enum WatchCompanionPhotoValidator {
 
     private static func isAllowedByteCount(_ byteCount: Int) -> Bool {
         byteCount > 0 && byteCount <= maxBytes
+    }
+
+    static func hasSupportedMagicBytes(_ data: Data) -> Bool {
+        guard data.count >= 4 else { return false }
+        let bytes = [UInt8](data.prefix(4))
+        if bytes[0] == 0xFF, bytes[1] == 0xD8, bytes[2] == 0xFF { return true }
+        if bytes[0] == 0x89, bytes[1] == 0x50, bytes[2] == 0x4E, bytes[3] == 0x47 { return true }
+        if data.count >= 12 {
+            let ftyp = String(data: data.subdata(in: 4..<8), encoding: .ascii)
+            if ftyp == "ftyp" { return true }
+        }
+        return false
     }
 
     private static func sanitizedFileName(_ fileName: String) -> String? {

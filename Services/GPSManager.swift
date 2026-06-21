@@ -34,10 +34,12 @@ final class GPSManager: NSObject, ObservableObject {
     func start() {
         requestAuthorization()
         maintainsLocationUpdates = true
+        GPSLifecyclePolicy.record(.diveSessionStart)
         locationManager.startUpdatingLocation()
     }
     func stop() {
         maintainsLocationUpdates = false
+        GPSLifecyclePolicy.record(.diveSessionStop)
         locationManager.stopUpdatingLocation()
     }
     func currentBestPoint() -> GPSPoint? {

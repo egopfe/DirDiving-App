@@ -11,12 +11,13 @@ enum DeveloperSettings {
         #endif
     }
 
-    /// Simulation depth is DEBUG/TestFlight-only (SEC-P1-002).
+    /// Simulation depth is DEBUG/TestFlight-only with explicit acknowledgment (SEC-P2-004).
     static var allowsSimulationSensorSelection: Bool {
         #if DEBUG
         return true
         #else
-        return isTestFlightBuild
+        return TestFlightSimulationSafetyPolicy.isTestFlightBuild
+            && TestFlightSimulationSafetyPolicy.hasAcknowledgedSimulation
         #endif
     }
 
