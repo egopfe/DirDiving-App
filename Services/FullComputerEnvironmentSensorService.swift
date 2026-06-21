@@ -124,8 +124,8 @@ final class FullComputerEnvironmentSensorService: ObservableObject {
     private var timeoutTask: Task<Void, Never>?
     private weak var configuration: FullComputerPrediveConfigurationStore?
 
-    init(provider: FullComputerAbsoluteAltitudeProviding = AppleWatchAbsoluteAltitudeProvider()) {
-        self.provider = provider
+    init(provider: FullComputerAbsoluteAltitudeProviding? = nil) {
+        self.provider = provider ?? AppleWatchAbsoluteAltitudeProvider()
     }
 
     func requestProposal(into configuration: FullComputerPrediveConfigurationStore) {
