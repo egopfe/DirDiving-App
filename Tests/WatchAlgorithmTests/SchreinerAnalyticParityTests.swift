@@ -20,7 +20,7 @@ final class SchreinerAnalyticParityTests: XCTestCase {
     }
 
     func testProductionMatchesOracleOneSecondStepsAt39mDescent() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: Date(timeIntervalSince1970: 1_711_000_000))
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: Date(timeIntervalSince1970: 1_711_000_000))
         var oracleState = IndependentOracleTissueState.airSaturated()
         var previousDepth = 0.0
         let sessionStart = Date(timeIntervalSince1970: 1_711_000_000)

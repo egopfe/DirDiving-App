@@ -29,7 +29,7 @@ final class FullComputerGasSwitchTimestampTests: XCTestCase {
     }
 
     func testNonMonotonicTimestampRejected() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 12, timestamp: sessionStart.addingTimeInterval(30))
         let before = engine.snapshot.tissueState
         XCTAssertFalse(engine.ingestSample(depthMeters: 13, timestamp: sessionStart.addingTimeInterval(20)))
@@ -55,7 +55,7 @@ final class FullComputerGasSwitchTimestampTests: XCTestCase {
     }
 
     func testInvalidGasIDCannotBeConfirmed() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 15, timestamp: sessionStart.addingTimeInterval(10))
         XCTAssertFalse(engine.confirmGasSwitch(to: UUID(), at: sessionStart.addingTimeInterval(11)))
     }

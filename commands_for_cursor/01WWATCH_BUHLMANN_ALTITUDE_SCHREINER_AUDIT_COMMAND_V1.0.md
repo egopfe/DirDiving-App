@@ -409,6 +409,22 @@ Determine whether altitude comes from:
 - default sea level;
 - mixed sources.
 
+For the Watch sensor path, prove from target membership and the live call graph that the pre-dive proposal is obtained directly from Core Motion absolute-altitude updates:
+
+```text
+CMAltimeter.isAbsoluteAltitudeAvailable()
+→ CMAltimeter.startAbsoluteAltitudeUpdates(to:withHandler:)
+→ fresh CMAbsoluteAltitudeData.altitude samples
+→ accuracy/precision and stability validation
+→ pending WatchSensorMeasuredProposal
+→ explicit diver acceptance
+→ immutable confirmed environment at dive start
+```
+
+Fail this check if the implementation uses `CLLocationManager.location.altitude`, cached GPS elevation, a hard-coded value, an implicit sea-level fallback, or an unretained/one-shot provider that cannot reliably deliver the asynchronous samples. Verify that sampling starts immediately before the Full Computer confirmation flow, stops on completion/cancellation/timeout, and never silently overwrites an imported iPhone Plan or manually entered Watch value.
+
+Require deterministic tests with an injected altitude provider for unavailable hardware, provider error, timeout, inaccurate samples, unstable samples, stale samples, valid near-zero altitude, valid elevated altitude, explicit acceptance, explicit rejection, and preservation of the previously selected source. Require a physical Apple Watch test because simulator evidence cannot prove the sensor path.
+
 Verify whether it is configurable, synchronized, snapshotted at dive start, mutable during an active dive, persisted, exported and restored.
 
 Required safety policy:
@@ -416,7 +432,7 @@ Required safety policy:
 - snapshot environment at dive start;
 - no silent active-dive change;
 - unavailable altitude must not look measured;
-- sea-level fallback must be explicit;
+- no explicit sea-level option and no implicit sea-level fallback;
 - invalid altitude must fail safely.
 
 If the product is intentionally sea-level-only, UI and documentation must state that clearly.
@@ -637,6 +653,8 @@ The report must explicitly answer:
 19. Are there hidden sea-level constants?
 20. Can altitude change unsafely during a dive?
 21. What blocks 100% readiness?
+22. Does the Watch proposal come directly from fresh `CMAbsoluteAltitudeData` sampled immediately before Full Computer start?
+23. Are accuracy, stability, freshness, timeout, cancellation, and explicit acceptance enforced before the sensor value becomes authoritative?
 
 For each negative or partial answer provide severity, root cause, affected files, mathematical consequence, required remediation, tests and acceptance criteria.
 
@@ -718,6 +736,9 @@ Print exactly:
 WATCH_BUHLMANN_ALTITUDE_AUDIT: PASS / PARTIAL / FAIL
 ALTITUDE_SUPPORTED: YES / PARTIAL / NO
 ALTITUDE_SOURCE: MANUAL / SENSOR / PLANNER / DEFAULT_SEA_LEVEL / MIXED / UNKNOWN
+WATCH_CMALTIMETER_PREDIVE_ACQUISITION: PASS / FAIL
+SENSOR_PROPOSAL_EXPLICIT_ACCEPTANCE: PASS / FAIL
+SENSOR_SAMPLE_QUALITY_AND_FRESHNESS: PASS / FAIL
 SURFACE_PRESSURE_ALTITUDE_AWARE: PASS / FAIL
 TISSUE_INITIALIZATION_ALTITUDE_AWARE: PASS / FAIL
 SCHREINER_ALTITUDE_AWARE: PASS / FAIL

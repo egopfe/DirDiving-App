@@ -4,6 +4,7 @@ struct FullComputerPrediveSettingsView: View {
     @EnvironmentObject private var activitySelection: DIRActivitySelectionStore
     @EnvironmentObject private var dive: DiveManager
     @ObservedObject private var configuration = FullComputerPrediveConfigurationStore.shared
+    @ObservedObject private var environmentSensor = FullComputerEnvironmentSensorService.shared
     @State private var showsDecoGasList = false
 
     private var profile: FullComputerGasProfile { configuration.draftProfile }
@@ -62,7 +63,7 @@ struct FullComputerPrediveSettingsView: View {
                         .buttonStyle(.plain)
 
                         Button {
-                            guard configuration.isDraftValid else { return }
+                            guard canReview else { return }
                             HapticService.shared.confirm()
                             activitySelection.proceedToFullComputerConfirmation()
                         } label: {
@@ -72,11 +73,11 @@ struct FullComputerPrediveSettingsView: View {
                                 .frame(maxWidth: .infinity, minHeight: DiveUI.Layout.commandButtonMinHeight)
                                 .background(
                                     RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                        .fill(configuration.isDraftValid ? DiveUI.green : DiveUI.mutedText)
+                                        .fill(canReview ? DiveUI.green : DiveUI.mutedText)
                                 )
                         }
                         .buttonStyle(.plain)
-                        .disabled(!configuration.isDraftValid)
+                        .disabled(!canReview)
                     }
                 }
                 .padding(.horizontal, DiveUI.screenPadding)
@@ -225,17 +226,35 @@ struct FullComputerPrediveSettingsView: View {
                             .foregroundStyle(DiveUI.orange)
                         Text(FullComputerEnvironmentPresentation.summary(for: proposal))
                             .font(DiveUI.Typography.hintCaption)
-                        Button(String(localized: "fc.environment.sensor.accept")) {
-                            configuration.acceptPendingSensorProposal()
+                        HStack(spacing: 8) {
+                            Button(String(localized: "fc.environment.sensor.accept")) {
+                                configuration.acceptPendingSensorProposal()
+                            }
+                            Button(String(localized: "fc.environment.sensor.keep_current")) {
+                                configuration.dismissPendingSensorProposal()
+                            }
                         }
                         .font(DiveUI.Typography.hintCaptionBold)
                     }
+                } else if environmentSensor.state == .sampling {
+                    Text(String(localized: "fc.environment.sensor.sampling"))
+                        .font(DiveUI.Typography.hintCaptionBold)
+                        .foregroundStyle(DiveUI.orange)
                 }
             }
         }
         .onAppear {
-            FullComputerEnvironmentSensorService.refreshProposal(into: configuration)
+            environmentSensor.requestProposal(into: configuration)
         }
+        .onDisappear {
+            environmentSensor.cancel()
+        }
+    }
+
+    private var canReview: Bool {
+        configuration.isDraftValid
+            && configuration.pendingSensorProposal == nil
+            && environmentSensor.state != .sampling
     }
 
     private var altitudeLabel: String {

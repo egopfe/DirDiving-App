@@ -13,7 +13,7 @@ final class FullComputerTimingFaultTests: XCTestCase {
     func testTimingFaultMatrix() throws {
         let deltas: [TimeInterval] = [0.5, 1.0, 1.5, 2, 5, 10, 30]
         for delta in deltas {
-            var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+            var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
             _ = engine.ingestSample(depthMeters: 22, timestamp: sessionStart)
             let before = engine.snapshot.tissueState.compartments[0].nitrogenPressure
             engine.tick(now: sessionStart.addingTimeInterval(delta))
@@ -25,7 +25,7 @@ final class FullComputerTimingFaultTests: XCTestCase {
     }
 
     func testDuplicateTimestampDoesNotDoubleIntegrate() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         let t = sessionStart.addingTimeInterval(10)
         XCTAssertTrue(engine.ingestSample(depthMeters: 12, timestamp: t))
         let tissueAfterFirst = engine.snapshot.tissueState
@@ -34,13 +34,13 @@ final class FullComputerTimingFaultTests: XCTestCase {
     }
 
     func testOutOfOrderTimestampRejected() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 12, timestamp: sessionStart.addingTimeInterval(20))
         XCTAssertFalse(engine.ingestSample(depthMeters: 11, timestamp: sessionStart.addingTimeInterval(10)))
     }
 
     func testMissedTickMarksDegradedWithoutTissueReset() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 24, timestamp: sessionStart)
         let loaded = engine.snapshot.tissueState
         engine.tick(now: sessionStart.addingTimeInterval(45))
@@ -53,7 +53,7 @@ final class FullComputerTimingFaultTests: XCTestCase {
     }
 
     func testRestorePreservesTimingContinuity() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 18, timestamp: sessionStart.addingTimeInterval(300))
         let tissueBefore = engine.snapshot.tissueState
         let checkpoint = try engine.exportCheckpoint(sessionID: UUID(), watchDivingMode: DIRDivingMode.fullComputer.rawValue)
@@ -70,7 +70,7 @@ final class FullComputerTimingFaultTests: XCTestCase {
     func testLongSuspensionIntegratesFullElapsedAndMarksDegraded() throws {
         let gaps: [TimeInterval] = [121, 300, 600, 1_800]
         for gap in gaps {
-            var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+            var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
             _ = engine.ingestSample(depthMeters: 20, timestamp: sessionStart)
             let before = engine.snapshot.tissueState.compartments[0].nitrogenPressure
             engine.tick(now: sessionStart.addingTimeInterval(gap))
@@ -84,7 +84,7 @@ final class FullComputerTimingFaultTests: XCTestCase {
     }
 
     func testLongSuspensionDoesNotFalseClearDeco() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 36, timestamp: sessionStart)
         for minute in 1...20 { engine.tick(now: sessionStart.addingTimeInterval(Double(minute * 60))) }
         let requiredDeco = engine.snapshot.rawCeilingMeters > 0.05 || (engine.snapshot.ndlMinutes ?? 999) <= 0

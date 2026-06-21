@@ -1,7 +1,7 @@
 # CURSOR / CODEX COMMAND — DIR DIVING APPLE WATCH LIVE BÜHLMANN / SCHREINER / MULTILEVEL DECOMPRESSION ENGINE FORENSIC AUDIT — V1.0
 
 **Command version:** 1.0  
-**Updated for MAIN:** 2026-06-19  
+**Updated for MAIN:** 2026-06-21
 **Repository:** `egopfe/DirDiving-App`  
 **Required branch:** `main`  
 **Primary target:** `DIRDiving Watch App`  
@@ -470,6 +470,21 @@ Audit:
 - salinity setting;
 - temperature usage if any;
 - rounding location.
+
+Before tissue initialization, audit the Watch pre-dive altitude source as a separate safety-critical input path:
+
+```text
+retained CMAltimeter
+→ isAbsoluteAltitudeAvailable
+→ startAbsoluteAltitudeUpdates
+→ fresh CMAbsoluteAltitudeData altitude/accuracy/precision
+→ stable validated sample window
+→ pending proposal
+→ explicit acceptance
+→ frozen runtime surface environment
+```
+
+Prove the Full Computer startup flow requests a new measurement immediately before confirmation, stops updates on success/error/timeout/cancellation, rejects stale, inaccurate, unstable, non-finite, or unsupported samples, and blocks start while sampling or while a proposal is unresolved. Fail the audit if cached `CLLocationManager.location.altitude`, GPS elevation, a silent sea-level default, or automatic proposal acceptance can reach the live engine. Verify that imported iPhone Plan and manual Watch environments remain unchanged unless the diver explicitly accepts the sensor proposal.
 
 Verify gas fractions:
 
@@ -1058,6 +1073,7 @@ Audit behavior for:
 - computation timeout;
 - unsupported profile;
 - NaN/Inf.
+- unavailable absolute-altitude hardware, Core Motion error, sampling timeout, inaccurate/unstable altitude window, stale pre-dive proposal, and user rejection.
 
 Required safety posture:
 

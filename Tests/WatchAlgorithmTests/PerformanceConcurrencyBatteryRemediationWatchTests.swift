@@ -20,7 +20,7 @@ final class PerformanceConcurrencyBatteryRemediationWatchTests: XCTestCase {
     func testFullComputerTimingFaultMatrixExtended() throws {
         let deltas: [TimeInterval] = [0.5, 1.0, 1.5, 2, 5, 10, 30]
         for delta in deltas {
-            var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+            var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
             _ = engine.ingestSample(depthMeters: 22, timestamp: sessionStart)
             let before = engine.snapshot.tissueState.compartments[0].nitrogenPressure
             engine.tick(now: sessionStart.addingTimeInterval(delta))
@@ -32,7 +32,7 @@ final class PerformanceConcurrencyBatteryRemediationWatchTests: XCTestCase {
     }
 
     func testDuplicateTickDoesNotDoubleIntegrate() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 18, timestamp: sessionStart)
         let tissue = engine.snapshot.tissueState
         engine.tick(now: sessionStart)
@@ -41,7 +41,7 @@ final class PerformanceConcurrencyBatteryRemediationWatchTests: XCTestCase {
     }
 
     func testDecoSolverWithinBudget() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 40, timestamp: sessionStart)
         let budget = DIRPerformanceBudgets.entry(for: .watchFullComputerCompleteSolver)!
         let start = CFAbsoluteTimeGetCurrent()

@@ -17,10 +17,14 @@ enum FullComputerEnvironmentSource: String, Codable, Hashable {
 }
 
 enum FullComputerEnvironmentValidationError: String, Error, Hashable, Equatable {
+    case unsupportedSchema
     case invalidAltitude
     case invalidSalinity
     case missingEnvironment
     case surfacePressureMismatch
+    case waterDensityMismatch
+    case invalidSensorMetadata
+    case staleSensorMeasurement
     case unauthorizedSource
     case nonFiniteValue
 }
@@ -28,7 +32,10 @@ enum FullComputerEnvironmentValidationError: String, Error, Hashable, Equatable 
 /// Versioned frozen Full Computer dive environment with provenance.
 struct FullComputerEnvironmentRecord: Codable, Hashable {
     static let currentSchemaVersion = 1
+    static let maximumSensorAccuracyMeters = 30.0
+    static let maximumSensorAgeSeconds: TimeInterval = 120
     private static let surfacePressureToleranceBar = 0.02
+    private static let waterDensityToleranceKgPerM3 = 0.5
 
     var schemaVersion: Int
     var altitudeMeters: Double
@@ -37,6 +44,8 @@ struct FullComputerEnvironmentRecord: Codable, Hashable {
     var waterDensityKgPerM3: Double
     var source: FullComputerEnvironmentSource
     var capturedAt: Date
+    var sensorAccuracyMeters: Double? = nil
+    var sensorPrecisionMeters: Double? = nil
 
     var salinity: SalinityMode? {
         SalinityMode(rawValue: salinityRaw)
@@ -84,7 +93,8 @@ struct FullComputerEnvironmentRecord: Codable, Hashable {
         }
     }
 
-    func validateForLiveStart() -> FullComputerEnvironmentValidationError? {
+    func validateForLiveStart(now: Date = Date()) -> FullComputerEnvironmentValidationError? {
+        guard schemaVersion == Self.currentSchemaVersion else { return .unsupportedSchema }
         guard source.isLiveStartAuthorized else { return .unauthorizedSource }
         guard altitudeMeters.isFinite, surfacePressureBar.isFinite, waterDensityKgPerM3.isFinite else {
             return .nonFiniteValue
@@ -98,6 +108,24 @@ struct FullComputerEnvironmentRecord: Codable, Hashable {
         case .success(let expected):
             if abs(expected.surfacePressureBar - surfacePressureBar) > Self.surfacePressureToleranceBar {
                 return .surfacePressureMismatch
+            }
+            if abs(expected.waterDensityKgPerM3 - waterDensityKgPerM3) > Self.waterDensityToleranceKgPerM3 {
+                return .waterDensityMismatch
+            }
+            if source == .watchSensorMeasuredProposal {
+                guard let sensorAccuracyMeters,
+                      let sensorPrecisionMeters,
+                      sensorAccuracyMeters.isFinite,
+                      sensorAccuracyMeters >= 0,
+                      sensorAccuracyMeters <= Self.maximumSensorAccuracyMeters,
+                      sensorPrecisionMeters.isFinite,
+                      sensorPrecisionMeters >= 0 else {
+                    return .invalidSensorMetadata
+                }
+                let age = now.timeIntervalSince(capturedAt)
+                guard age >= -5, age <= Self.maximumSensorAgeSeconds else {
+                    return .staleSensorMeasurement
+                }
             }
             return nil
         }

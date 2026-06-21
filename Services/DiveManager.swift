@@ -1526,6 +1526,17 @@ final class DiveManager: ObservableObject {
         guard let resolvedEngine else { return nil }
         updateFullComputerLogbookAccumulator(from: resolvedEngine)
         let accumulator = fullComputerLogbookAccumulator ?? FullComputerRuntimeLogbookAccumulator()
+        let runtimeEnvironment = resolvedEngine.runtimePlan.plannerEnvironment
+        var environmentRecord = FullComputerPrediveConfigurationStore.shared.confirmedEnvironment
+            ?? FullComputerEnvironmentRecord.from(
+                plannerEnvironment: runtimeEnvironment,
+                source: .legacyUnknown,
+                capturedAt: Date()
+            )
+        environmentRecord.altitudeMeters = runtimeEnvironment.altitudeMeters
+        environmentRecord.surfacePressureBar = runtimeEnvironment.surfacePressureBar
+        environmentRecord.salinityRaw = runtimeEnvironment.salinity.rawValue
+        environmentRecord.waterDensityKgPerM3 = runtimeEnvironment.waterDensityKgPerM3
         return accumulator.export(
             watchDivingMode: sessionDivingMode.rawValue,
             gfLow: resolvedEngine.runtimePlan.gfLow,
@@ -1533,11 +1544,7 @@ final class DiveManager: ObservableObject {
             gasSwitchEvents: resolvedEngine.gasSwitchAuditTrail.map(Self.logbookGasSwitchEvent(from:)),
             unavailableGasMixIds: Array(resolvedEngine.persistedGasSwitchTracker.unavailableGasMixIds),
             algorithmVersion: FullComputerRuntimeConfiguration.algorithmVersion,
-            environmentRecord: FullComputerEnvironmentRecord.from(
-                plannerEnvironment: resolvedEngine.runtimePlan.plannerEnvironment,
-                source: FullComputerPrediveConfigurationStore.shared.confirmedEnvironment?.source ?? .legacyUnknown,
-                capturedAt: FullComputerPrediveConfigurationStore.shared.confirmedEnvironment?.capturedAt ?? Date()
-            )
+            environmentRecord: environmentRecord
         )
     }
 

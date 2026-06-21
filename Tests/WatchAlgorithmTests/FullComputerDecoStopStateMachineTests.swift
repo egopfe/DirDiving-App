@@ -81,7 +81,7 @@ final class FullComputerDecoStopStateMachineTests: XCTestCase {
 
     func testEngineIntegratesStopStateInSnapshot() throws {
         let start = Date(timeIntervalSince1970: 1_700_000_000)
-        var engine = try FullComputerRuntimeEngine(sessionStart: start)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: start)
         _ = engine.ingestSample(depthMeters: 40, timestamp: start)
         for minute in 1...28 {
             engine.tick(now: start.addingTimeInterval(Double(minute * 60)))
