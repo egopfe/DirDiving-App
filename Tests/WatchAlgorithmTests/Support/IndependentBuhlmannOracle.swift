@@ -402,6 +402,74 @@ enum IndependentBuhlmannOracle {
         }
         return snapshots
     }
+
+    /// Mirrors production `changeGas` 0.5-minute constant-depth load after switch.
+    static func simulateGasSwitchLoad(
+        state: IndependentOracleTissueState,
+        depthMeters: Double,
+        gas: IndependentOracleGas,
+        environment: PlannerEnvironment = defaultEnvironment
+    ) -> IndependentOracleTissueState {
+        advanceLinear(
+            state: state,
+            fromDepthMeters: depthMeters,
+            toDepthMeters: depthMeters,
+            durationSeconds: BuhlmannConstants.gasSwitchMinutes * 60,
+            gas: gas,
+            environment: environment
+        )
+    }
+
+    static func oracleGas(from gas: BuhlmannGas) -> IndependentOracleGas {
+        IndependentOracleGas(oxygenFraction: gas.oxygenFraction, heliumFraction: gas.heliumFraction)
+    }
+
+    /// Schedule/TTS reference on independently loaded oracle tissues (shared schedule engine, independent tissues).
+    static func productionProjectionOnOracleTissues(
+        state: IndependentOracleTissueState,
+        depthMeters: Double,
+        plan: FullComputerRuntimePlan,
+        environment: PlannerEnvironment = defaultEnvironment
+    ) -> BuhlmannRuntimeProjection {
+        BuhlmannEngine.runtimeProjection(
+            tissueState: state.buhlmannTissueState(),
+            depthMeters: depthMeters,
+            gas: plan.activeGas,
+            gfLow: plan.gfLow,
+            gfHigh: plan.gfHigh,
+            plannerEnvironment: environment,
+            travelGases: plan.travelGases,
+            decoGases: plan.decoGases,
+            ascentRateMetersPerMinute: plan.ascentRateMetersPerMinute,
+            stopIntervalMeters: plan.stopIntervalMeters
+        )
+    }
+
+    static func compareTissueToProduction(
+        oracle: IndependentOracleTissueState,
+        production: BuhlmannTissueState,
+        second: Int,
+        failures: inout [String],
+        maxFailures: Int = 5
+    ) {
+        for index in 0..<IndependentOracleConstants.compartmentCount {
+            let oN2 = oracle.compartments[index].pn2Bar
+            let pN2 = production.compartments[index].nitrogenPressure
+            if abs(oN2 - pN2) > IndependentBuhlmannOracleTolerances.tissuePressureBar {
+                failures.append("s\(second) c\(index) pn2 oracle=\(oN2) prod=\(pN2)")
+                break
+            }
+            let oHe = oracle.compartments[index].pheBar
+            let pHe = production.compartments[index].heliumPressure
+            if abs(oHe - pHe) > IndependentBuhlmannOracleTolerances.tissuePressureBar {
+                failures.append("s\(second) c\(index) phe oracle=\(oHe) prod=\(pHe)")
+                break
+            }
+        }
+        if failures.count >= maxFailures {
+            return
+        }
+    }
 }
 
 extension IndependentOracleTissueState {

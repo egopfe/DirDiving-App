@@ -40,6 +40,13 @@ struct DiveLiveView: View {
         dive.fullComputerSnapshot?.decoPresentation
     }
 
+    private var showsFullComputerRuntimeDegradedBanner: Bool {
+        guard isFullComputerMode, dive.isDiveActive, let snapshot = dive.fullComputerSnapshot else { return false }
+        return snapshot.engineState == .degraded
+            || snapshot.engineState == .unavailable
+            || snapshot.decoPresentation.usedConservativeFallback
+    }
+
     private var fullComputerHidesManualControls: Bool {
         isFullComputerMode && (fullComputerPresentation?.hideManualStopwatch == true)
     }
@@ -90,6 +97,9 @@ struct DiveLiveView: View {
                     }
                     if dive.isFullComputerRecoveryActive, dive.isDiveActive {
                         fullComputerRecoveryBanner
+                    }
+                    if showsFullComputerRuntimeDegradedBanner {
+                        fullComputerRuntimeDegradedBanner
                     }
                     if dive.isDiveActive {
                         activeDiveContent(leftWidth: leftWidth, gaugeWidth: gaugeWidth)
@@ -230,6 +240,31 @@ struct DiveLiveView: View {
         )
         .accessibilityLabel(recoveryAccessibilityLabel)
         .accessibilityHint(String(localized: "watch.full_computer.recovery_active.a11y"))
+    }
+
+    private var fullComputerRuntimeDegradedBanner: some View {
+        HStack(spacing: 7) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 14, weight: .black))
+            Text(String(localized: "live.fc.runtime.degraded.banner"))
+                .font(DiveUI.Typography.warningTitle)
+                .lineLimit(3)
+                .minimumScaleFactor(0.85)
+            Spacer(minLength: 0)
+        }
+        .foregroundStyle(DiveUI.yellow)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 5)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(DiveUI.yellow.opacity(0.12))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .stroke(DiveUI.yellow.opacity(0.65), lineWidth: 1)
+                )
+        )
+        .accessibilityLabel(String(localized: "live.fc.status.runtime_degraded"))
     }
 
     private var recoveryAccessibilityLabel: String {
