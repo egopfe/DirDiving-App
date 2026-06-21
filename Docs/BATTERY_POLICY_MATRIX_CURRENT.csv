@@ -1,0 +1,8 @@
+Activity,Sensor,Timer_Frequency_Hz,GPS_State,Haptic_State,WC_Behavior,Checkpoint_Frequency,Display_Behavior,Mission_Mode_Effect,Expected_Stop_Condition
+Gauge,Depth,1,Off unless dive-owned capture,On user policy,Event-driven,≥8s draft throttle unless immediate,Standard UI density,Optional reduced animations,Session end
+Full Computer,Depth,1,Off unless dive-owned capture,Safety coordinated,Event-driven,≥8s draft throttle unless immediate,Standard UI density,Optional reduced animations,Session end
+Apnea,Depth,1,Off,Session cues,Event-driven,250ms debounced fingerprint dedup,Standard UI density,Optional reduced animations,Session end
+Snorkeling,Depth+GPS,1,Active during session,Safety coordinated,Event-driven,250ms debounced fingerprint dedup,Map/navigation UI,Optional reduced animations,Session end
+Idle,None,0,Off,Off,Event-driven,None,Home/idle,None,Activity selected
+Background,None,0,Off,Off,Queued flush only,None,Minimal,None,App suspended
+Restoring,None,0,Off,Off,Replay pending,Immediate on critical restore,Recovery banners,None,Restore complete

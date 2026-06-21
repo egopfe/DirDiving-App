@@ -16,8 +16,16 @@ final class FullComputerMockupReferenceMatrixTests: XCTestCase {
 
     func testFixtureKeysMapToVisualRegressionStates() {
         let regression = Set(FullComputerLivePanelFixtures.visualRegressionStateNames)
+            .union([WatchSettingsMockupFixtures.fixtureKey, IOSDivePlanTransferMockupFixtures.fixtureKey])
         let referenced = FullComputerMockupReferenceMatrix.fixtureKeysReferencedByMockups()
         XCTAssertTrue(referenced.isSubset(of: regression), "Unknown fixture keys: \(referenced.subtracting(regression))")
+    }
+
+    func testAllTwentyFiveMockupsHaveExecutableFixtures() {
+        for reference in FullComputerMockupReferenceMatrix.all {
+            XCTAssertTrue(reference.hasExecutableFixture, reference.id)
+            XCTAssertNotNil(reference.fixtureKey, reference.id)
+        }
     }
 
     func testExecutableFixturesResolveForLivePresentationStates() {
@@ -28,7 +36,8 @@ final class FullComputerMockupReferenceMatrixTests: XCTestCase {
                 continue
             }
             XCTAssertTrue(
-                FullComputerLivePanelFixtures.visualRegressionStateNames.contains(key),
+                FullComputerLivePanelFixtures.visualRegressionStateNames.contains(key)
+                    || MockupVisualRegressionRegistry.resolveFixtureKey(key),
                 "Fixture key \(key) for \(reference.id) is not in visual regression list"
             )
         }

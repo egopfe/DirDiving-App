@@ -1,0 +1,25 @@
+Risk_ID,Platform,Area,Pattern,Severity,Status,Mitigation,Test_Evidence,Physical_QA_Required,Notes
+CONC-01,Watch,DiveManager,1Hz Timer to MainActor Task,LOW,MITIGATED,weak self; single runtime timer,invalidate on stop,PENDING,Standard Watch pattern
+CONC-02,Watch,DiveManager,automaticSurfaceEndTask cancellation,LOW,MITIGATED,cancel on submersion resume,DiveLifecycleAlgorithm tests,No,
+CONC-03,Watch,DiveManager,diveReminderDismissTask,LOW,MITIGATED,cancellable Task,MainDeepCodeReadinessCurrentWatchTests,No,
+CONC-04,Watch,Full Computer,tick vs ingestSample ordering,MEDIUM,MITIGATED,monotonic timestamp reject; degraded state,FullComputerTimingFaultTests,PENDING,
+CONC-05,Watch,Apnea,tickTask lifecycle,MEDIUM,MITIGATED,cancel on session end; weak self,ApneaWatchRuntimeStoreTests,No,
+CONC-06,Watch,Snorkeling,tickTask + checkpointTask,MEDIUM,MITIGATED,cancel on end; 250ms debounce,SnorkelingReleaseHardValidationTests,PENDING,
+CONC-07,Watch,GPS,CLLocation delegate on MainActor,LOW,MITIGATED,@MainActor GPSManager; stop when inactive,GPSFallbackPolicy tests,PENDING,
+CONC-08,Watch,WatchSyncService,nonisolated WC delegate to MainActor,MEDIUM,MITIGATED,Task { @MainActor },ActivitySync tests,PENDING,Paired device
+CONC-09,Watch,WatchSyncService,pending queue file persistence,MEDIUM,MITIGATED,ProtectedSensitiveFileStore; atomic writes,Security remediation tests,PENDING,
+CONC-10,Watch,UserImageStore,NotificationCenter observer,LOW,MITIGATED,weak self,CompanionPhotoImportSupportTests,No,
+CONC-11,iOS,PlannerStore,planningUpdateTask stale publish,MEDIUM,MITIGATED,planningGeneration guard; cancel prior,MainDeepCodeAuditRemediationTests,No,
+CONC-12,iOS,PlannerStore,saveTask overlap,MEDIUM,MITIGATED,cancel in calculate/deinit,PlannerStore,No,
+CONC-13,iOS,PlannerStore,publish during view update,MEDIUM,MITIGATED,deferPublishedMutation yield,PlannerStore,No,
+CONC-14,iOS,WatchSyncService,deferPublishedMutation on activate,MEDIUM,MITIGATED,Task yield before @Published,IOSCompanionStoreLifecycleTests,PENDING,
+CONC-15,iOS,WatchSyncService,WC reply handler trust,MEDIUM,DOCUMENTED,signed ACK authoritative; reply hint only,WatchSyncReplyHandlerPolicy tests,PENDING,
+CONC-16,Both,Sync,Sendable transport DTOs,LOW,PASS,ActivitySyncSignedTransport Sendable paths,ActivitySyncEnvelopeTests,No,
+CONC-17,Both,Sync,Cross-activity routing,MEDIUM,PASS,ActivitySyncRoutingGuard,CrossDecodeRejectionTests,No,
+CONC-18,Watch,Stores,@MainActor logbook stores,LOW,PASS,isolated per activity,Activity architecture tests,No,
+CONC-19,iOS,Logbook,lazy store coordinator init,LOW,PASS,IOSCompanionStoreCoordinator gated init,IOSCompanionStoreLifecycleTests,No,
+CONC-20,Watch,Haptics,MainActor HapticService,LOW,PASS,user toggle; no background loop,HapticService,No,
+CONC-21,Watch,Depth,provider callback to DiveManager,MEDIUM,MITIGATED,MainActor DiveManager ingestion,DepthSensorProvider tests,PENDING,
+CONC-22,iOS,Export,main-thread CSV build for large sessions,MEDIUM,OPEN,single-pass string; bounded import opposite path,SubsurfaceExportService tests,PENDING,Share sheet size
+CONC-23,Watch,Background,WC userInfo transfer callbacks,MEDIUM,MITIGATED,pending maps by ObjectIdentifier,MultiActivitySequentialSyncTests,PENDING,
+CONC-24,Both,Testing,simulator ≠ battery truth,HIGH,ACCEPTED,physical QA plan separate,NOT_APPLICABLE,Yes,Do not conflate
