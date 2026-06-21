@@ -111,14 +111,14 @@ The required builds, iOS/Watch test schemes, and deterministic altitude profiles
 
 - **Evidence:** `DivePlanPackageBuilder` writes altitude/salinity; `FullComputerGasProfile(importing:)` omits them; activation imports only the profile.
 - **Impact:** a Watch dive can present live decompression computed with an environment different from the accepted iOS plan.
-- **Required remediation:** resolve and validate `PlannerEnvironment` during Watch import, persist it with the confirmed predive configuration, and make activation fail closed on invalid/missing environment.
+- **Required remediation:** resolve and validate `PlannerEnvironment` from an imported iPhone plan, manual Watch Full Computer Settings, or a confirmed Watch sensor-measured startup proposal at detected elevation. Persist the selected source with the predive configuration, never overwrite a source silently, provide no explicit sea-level option, and make activation fail closed on invalid/missing/unresolved input.
 - **Acceptance:** a 0–4,500 m signed package produces an identical frozen environment in runtime, checkpoint, restore, logbook, and UI; missing/corrupt/future environment cannot start Full Computer.
 
 ### ALT-P0-002 — Watch runtime silently defaults to sea level
 
 - **Evidence:** `runtimePlan()` calls `FullComputerRuntimePlan(profile:)`; its default parameter is `.seaLevelSaltWater`; Watch has no altitude control or explicit sea-level-only warning.
 - **Impact:** false altitude support and potentially unsafe ceiling/NDL/TTS/schedule.
-- **Required remediation:** remove implicit safety-path defaulting; require a validated environment snapshot for live Full Computer.
+- **Required remediation:** remove implicit safety-path defaulting and prohibit a separate explicit sea-level choice; require a validated environment snapshot from one of the three approved sources for live Full Computer.
 - **Acceptance:** no production live-start path can construct a Full Computer runtime plan without an explicit validated environment.
 
 ### ALT-P1-001 — No independent Watch altitude profile suite
@@ -134,7 +134,7 @@ The required builds, iOS/Watch test schemes, and deterministic altitude profiles
 ### ALT-P1-003 — Watch UI/documentation does not disclose live limitation
 
 - **Evidence:** imported plan visibly contains environment data, but Watch predive confirmation exposes no environment/fallback truthfulness state.
-- **Acceptance:** until end-to-end support is fixed, altitude plans are rejected or explicitly blocked as unsupported; after remediation, source and frozen values are visible.
+- **Acceptance:** until end-to-end support is fixed, altitude plans are rejected or explicitly blocked as unsupported; after remediation, imported-plan, Watch-manual, and sensor-proposal paths are reachable, confirmed source and frozen values are visible, and no explicit sea-level option exists.
 
 ## L. Readiness matrix
 
@@ -189,4 +189,3 @@ ALTITUDE_BUHLMANN_SOFTWARE_READINESS: 28%
 PHYSICAL_ALTITUDE_DIVE_QA: PENDING
 EXTERNAL_BUHLMANN_ALTITUDE_VALIDATION: PENDING
 ```
-

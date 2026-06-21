@@ -92,7 +92,12 @@ rg -n "FullComputerRuntimePlan\(profile:|FullComputerGasProfile\(importing:" Ser
 ## 6. Acceptance invariants for ORCH-001
 
 - An imported environment is validated before activation.
+- Watch Full Computer Settings accepts and validates a manual Altitude/Environment source.
+- Full Computer startup at detected elevation obtains a sensor measurement and presents it as a proposal requiring confirmation.
+- A sensor proposal never silently overwrites an imported iPhone plan or Watch manual value.
+- There is no explicit sea-level option and no implicit sea-level fallback; a validated source may resolve naturally to near-zero altitude.
 - No live Full Computer plan can omit an explicit environment.
+- Source disagreements beyond tolerance require explicit resolution or fail closed.
 - Environment is immutable during an active dive.
 - All calculations, UI, checkpoint, restore, logbook, sync, and export agree bit-for-bit or within documented serialization tolerance.
 - Missing/corrupt/future environment fails closed and never becomes “no deco.”
@@ -111,4 +116,3 @@ Remain PENDING until evidence is attached:
 - External Bühlmann/CCR altitude and multilevel validation; Subsurface round trip; legal/certification/App Store review.
 
 No physical or external gate may be inferred from simulator/unit evidence.
-

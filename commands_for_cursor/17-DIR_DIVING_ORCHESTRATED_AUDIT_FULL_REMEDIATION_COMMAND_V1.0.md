@@ -309,18 +309,24 @@ confidenceOrFallbackState
 capturedAt
 ```
 
-Valid sources must be explicit, for example:
+The only supported live environment sources are:
 
 ```text
-iOSPlannerManual
-WatchManual
-MeasuredSensor
-ImportedMetadata
-ExplicitSeaLevelDefault
-LegacyUnknown
+iPhonePlanImported
+WatchSettingsManual
+WatchSensorMeasuredProposal
 ```
 
-Do not use `LegacyUnknown` or missing data for a live Full Computer start. Do not convert unknown data to explicit sea level.
+`LegacyUnknown` may exist only as a migration/forensic state and may never authorize a live Full Computer start.
+
+Apply this source policy:
+
+1. **Imported from iPhone Plan:** preserve and validate the complete environment received with the signed plan.
+2. **Manually entered on Watch:** provide an Altitude/Environment option in Watch Full Computer Settings. Validate and persist it as a draft source until predive confirmation.
+3. **Sensor-measured proposal:** when the user starts Full Computer and the Watch detects elevation, measure the available altitude/surface-pressure signal and propose the validated value on the predive screen. The user must confirm it; never apply or replace another source silently.
+4. **No explicit sea-level option:** do not expose a separate sea-level choice and do not use sea level as an explicit or implicit default. A validated source may naturally resolve to approximately zero altitude, but missing, rejected, or unavailable input must block live start.
+
+When imported, manual, and sensor values disagree beyond a documented tolerance, show the values and sources, require an explicit selection/confirmation, record the decision, and fail closed if the conflict is not resolved. Freeze the confirmed source and values when the dive starts.
 
 ## 5.2 Package construction and validation
 
@@ -362,6 +368,9 @@ Views/FullComputerPrediveConfirmationView.swift
 Requirements:
 
 - preserve the exact validated package environment during import;
+- provide a manually editable Altitude/Environment field in Watch Full Computer Settings;
+- request a sensor measurement when Full Computer startup begins at detected elevation and present it as a confirmation proposal;
+- never let a sensor proposal silently overwrite an imported iPhone plan or Watch manual value;
 - persist gas profile and environment atomically;
 - keep draft and confirmed environment separate;
 - freeze the confirmed environment at dive start;
@@ -370,7 +379,7 @@ Requirements:
 - require an explicit environment argument when creating a live `FullComputerRuntimePlan`;
 - fail closed with a clear localized diagnostic when the environment is missing, invalid, stale, corrupt, future-schema, or inconsistent;
 - expose altitude, surface pressure, salinity, source, and fallback/confidence on imported-plan and predive-confirmation UI;
-- make explicit sea-level operation a visible confirmed choice, never a hidden fallback;
+- prohibit an explicit sea-level setting and every implicit sea-level fallback;
 - keep planner cards reference-only.
 
 ## 5.4 Runtime propagation
@@ -662,7 +671,7 @@ Execute on supported Apple Watch Ultra hardware:
 - Water Lock;
 - wet/glove/crown interaction;
 - manual and automatic Gauge start/stop;
-- Full Computer start at explicit sea level and at validated altitude configuration where safely testable;
+- Full Computer start with imported iPhone, Watch Settings manual, and confirmed sensor-proposal environments, including validated near-zero and elevated configurations where safely testable;
 - sensor unavailable, stale, spike, gap, out-of-order, relaunch, checkpoint restore;
 - deco/stop/gas-switch UI states using safe replay/simulation where real decompression exposure is inappropriate;
 - haptics enabled/disabled alternatives;
