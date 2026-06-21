@@ -1429,14 +1429,18 @@ final class DiveManager: ObservableObject {
             stopFullComputerRuntime()
             return
         }
-        let readiness = FullComputerRuntimeEngine.canStart(plan: FullComputerPrediveConfigurationStore.shared.runtimePlan())
+        guard let plan = FullComputerPrediveConfigurationStore.shared.runtimePlan() else {
+            fullComputerEngine = nil
+            fullComputerSnapshot = unavailableFullComputerSnapshot(diagnostics: ["missing_environment"])
+            return
+        }
+        let readiness = FullComputerRuntimeEngine.canStart(plan: plan)
         guard readiness.ready else {
             fullComputerEngine = nil
             fullComputerSnapshot = unavailableFullComputerSnapshot(diagnostics: readiness.diagnostics)
             return
         }
         do {
-            let plan = FullComputerPrediveConfigurationStore.shared.runtimePlan()
             var engine = try FullComputerRuntimeEngine(plan: plan, sessionStart: sessionStart)
             engine.tick(now: sessionStart)
             fullComputerEngine = engine
@@ -1530,7 +1534,12 @@ final class DiveManager: ObservableObject {
             gfHigh: resolvedEngine.runtimePlan.gfHigh,
             gasSwitchEvents: resolvedEngine.gasSwitchAuditTrail.map(Self.logbookGasSwitchEvent(from:)),
             unavailableGasMixIds: Array(resolvedEngine.persistedGasSwitchTracker.unavailableGasMixIds),
-            algorithmVersion: FullComputerRuntimeConfiguration.algorithmVersion
+            algorithmVersion: FullComputerRuntimeConfiguration.algorithmVersion,
+            environmentRecord: FullComputerEnvironmentRecord.from(
+                plannerEnvironment: resolvedEngine.runtimePlan.plannerEnvironment,
+                source: FullComputerPrediveConfigurationStore.shared.confirmedEnvironment?.source ?? .legacyUnknown,
+                capturedAt: FullComputerPrediveConfigurationStore.shared.confirmedEnvironment?.capturedAt ?? Date()
+            )
         )
     }
 

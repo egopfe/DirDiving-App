@@ -72,7 +72,7 @@ final class FullComputerReleaseHardValidationTests: XCTestCase {
         profile.applyBottomGasKind(.ean)
         profile.bottomGas.oxygenFraction = 0.32
         profile.bottomGas.name = "EAN32"
-        let plan = FullComputerRuntimePlan(profile: profile)
+        let plan = FullComputerRuntimePlan(profile: profile, plannerEnvironment: .seaLevelSaltWater)
         try assertPlannerRuntimeTTSAlignment(plan: plan, depthMeters: 30, bottomMinutes: 25)
     }
 
@@ -84,7 +84,7 @@ final class FullComputerReleaseHardValidationTests: XCTestCase {
         profile.bottomGas.name = "TMX18/45"
         profile.decoGases = []
         profile.futureGasTTSPolicy = .enabledSwitchGasesOnly
-        let plan = FullComputerRuntimePlan(profile: profile)
+        let plan = FullComputerRuntimePlan(profile: profile, plannerEnvironment: .seaLevelSaltWater)
         XCTAssertTrue(plan.decoGases.isEmpty)
         try assertPlannerRuntimeTTSAlignment(plan: plan, depthMeters: 45, bottomMinutes: 15)
     }

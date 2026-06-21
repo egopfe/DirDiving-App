@@ -33,7 +33,7 @@ final class FullComputerTravelBailoutPolicyTests: XCTestCase {
             )
         ]
         XCTAssertEqual(profile.enabledTravelGases.count, 1)
-        XCTAssertTrue(FullComputerGasProfileValidator.isValid(profile))
+        XCTAssertTrue(FullComputerGasProfileValidator.isValid(profile, environment: .seaLevelSaltWater))
     }
 
     func testLocalTravelGasDoesNotAutoActivateInRuntime() throws {
@@ -48,7 +48,7 @@ final class FullComputerTravelBailoutPolicyTests: XCTestCase {
                 switchDepthMeters: 30
             )
         ]
-        let plan = FullComputerRuntimePlan(profile: profile)
+        let plan = FullComputerRuntimePlan(profile: profile, plannerEnvironment: .seaLevelSaltWater)
         let tracker = FullComputerGasSwitchTracker.initial
         var bootstrapped = tracker
         bootstrapped.bootstrap(bottomGasMixId: plan.activeGas.gasMixId)
@@ -68,7 +68,7 @@ final class FullComputerTravelBailoutPolicyTests: XCTestCase {
                 switchDepthMeters: 0
             )
         ]
-        let plan = FullComputerRuntimePlan(profile: profile)
+        let plan = FullComputerRuntimePlan(profile: profile, plannerEnvironment: .seaLevelSaltWater)
         XCTAssertTrue(plan.decoGases.allSatisfy { $0.role != .bailout })
         XCTAssertTrue(plan.travelGases.allSatisfy { $0.role != .bailout })
     }

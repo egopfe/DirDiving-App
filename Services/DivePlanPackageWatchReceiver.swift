@@ -82,6 +82,7 @@ enum DivePlanPackageWatchReceiver {
         case .expired: return "expired"
         case .invalidGradientFactors: return "invalidGF"
         case .invalidGases: return "invalidGases"
+        case .invalidEnvironment: return "invalidEnvironment"
         case .unsupportedCapabilities: return "unsupportedCapabilities"
         case .decodeFailed, .none: return "invalidPackage"
         }

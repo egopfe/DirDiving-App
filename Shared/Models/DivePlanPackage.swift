@@ -126,6 +126,7 @@ enum DivePlanPackageValidationError: Error, Equatable {
     case invalidGases
     case unsupportedCapabilities
     case decodeFailed
+    case invalidEnvironment
 }
 
 extension FullComputerGasProfile {
