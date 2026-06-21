@@ -8,8 +8,8 @@ final class FullComputerDecoSolverCacheIsolationTests: XCTestCase {
     }
 
     func testSeparateEnginesDoNotSharePresentationCache() throws {
-        var engineA = try FullComputerRuntimeEngine(sessionStart: start)
-        var engineB = try FullComputerRuntimeEngine(sessionStart: start.addingTimeInterval(10_000))
+        var engineA = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: start)
+        var engineB = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: start.addingTimeInterval(10_000))
         _ = engineA.ingestSample(depthMeters: 30, timestamp: start.addingTimeInterval(600))
         _ = engineB.ingestSample(depthMeters: 12, timestamp: start.addingTimeInterval(10_600))
         let snapA = engineA.snapshot
@@ -19,7 +19,7 @@ final class FullComputerDecoSolverCacheIsolationTests: XCTestCase {
     }
 
     func testCacheInvalidatesAfterTissueChange() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: start)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: start)
         _ = engine.ingestSample(depthMeters: 24, timestamp: start.addingTimeInterval(300))
         let first = engine.snapshot.decoPresentation
         engine.tick(now: start.addingTimeInterval(360))
@@ -36,7 +36,7 @@ final class FullComputerProjectionDeduplicationTests: XCTestCase {
     private let start = Date(timeIntervalSince1970: 1_723_000_000)
 
     func testSnapshotUsesSingleRuntimeProjectionPath() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: start)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: start)
         _ = engine.ingestSample(depthMeters: 33, timestamp: start.addingTimeInterval(400))
         for minute in 1...15 {
             engine.tick(now: start.addingTimeInterval(400 + Double(minute * 60)))
@@ -48,7 +48,7 @@ final class FullComputerProjectionDeduplicationTests: XCTestCase {
     }
 
     func testDegradedPresentationFlagsAfterLongMissedTick() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: start)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: start)
         _ = engine.ingestSample(depthMeters: 18, timestamp: start)
         engine.tick(now: start.addingTimeInterval(200))
         XCTAssertEqual(engine.snapshot.engineState, .degraded)

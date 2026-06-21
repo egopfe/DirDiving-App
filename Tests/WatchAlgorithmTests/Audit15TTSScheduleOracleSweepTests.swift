@@ -19,7 +19,7 @@ final class Audit15TTSScheduleOracleSweepTests: XCTestCase {
 
         try runProfile(label: "ML-01") {
             let timeline = try buildML01Timeline()
-            var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+            var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
             return Audit15OracleTestSupport.replayProductionAgainstOracle(
                 engine: &engine,
                 depthAtSecond: timeline.depth,
