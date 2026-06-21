@@ -43,7 +43,10 @@ struct FullComputerEnvironmentRecord: Codable, Hashable {
     var salinityRaw: String
     var waterDensityKgPerM3: Double
     var source: FullComputerEnvironmentSource
+    /// Canonical measurement time (sensor timestamp for proposals; commit time otherwise).
     var capturedAt: Date
+    /// Callback receipt time for sensor proposals (diagnostics only).
+    var sensorReceivedAt: Date? = nil
     var sensorAccuracyMeters: Double? = nil
     var sensorPrecisionMeters: Double? = nil
 
@@ -65,7 +68,8 @@ struct FullComputerEnvironmentRecord: Codable, Hashable {
         altitudeMeters: Double,
         salinity: SalinityMode,
         source: FullComputerEnvironmentSource,
-        capturedAt: Date = Date()
+        capturedAt: Date = Date(),
+        sensorReceivedAt: Date? = nil
     ) -> Result<FullComputerEnvironmentRecord, FullComputerEnvironmentValidationError> {
         guard source.isLiveStartAuthorized else {
             return .failure(.unauthorizedSource)
@@ -83,7 +87,8 @@ struct FullComputerEnvironmentRecord: Codable, Hashable {
                     salinityRaw: salinity.rawValue,
                     waterDensityKgPerM3: environment.waterDensityKgPerM3,
                     source: source,
-                    capturedAt: capturedAt
+                    capturedAt: capturedAt,
+                    sensorReceivedAt: sensorReceivedAt
                 )
             )
         case .failure(.invalidAltitude):
@@ -165,7 +170,10 @@ extension FullComputerEnvironmentRecord {
     static func from(
         plannerEnvironment: PlannerEnvironment,
         source: FullComputerEnvironmentSource,
-        capturedAt: Date
+        capturedAt: Date,
+        sensorReceivedAt: Date? = nil,
+        sensorAccuracyMeters: Double? = nil,
+        sensorPrecisionMeters: Double? = nil
     ) -> FullComputerEnvironmentRecord {
         FullComputerEnvironmentRecord(
             schemaVersion: currentSchemaVersion,
@@ -174,7 +182,32 @@ extension FullComputerEnvironmentRecord {
             salinityRaw: plannerEnvironment.salinity.rawValue,
             waterDensityKgPerM3: plannerEnvironment.waterDensityKgPerM3,
             source: source,
-            capturedAt: capturedAt
+            capturedAt: capturedAt,
+            sensorReceivedAt: sensorReceivedAt,
+            sensorAccuracyMeters: sensorAccuracyMeters,
+            sensorPrecisionMeters: sensorPrecisionMeters
+        )
+    }
+
+    /// Best available provenance for logbook export when only runtime plan values are present.
+    static func logbookRecord(
+        plannerEnvironment: PlannerEnvironment,
+        preferred: FullComputerEnvironmentRecord?,
+        sessionSnapshot: FullComputerEnvironmentRecord?
+    ) -> FullComputerEnvironmentRecord {
+        if let sessionSnapshot {
+            return sessionSnapshot
+        }
+        if let preferred, preferred.source.isLiveStartAuthorized {
+            return preferred
+        }
+        return from(
+            plannerEnvironment: plannerEnvironment,
+            source: preferred?.source ?? .watchSettingsManual,
+            capturedAt: preferred?.capturedAt ?? Date(),
+            sensorReceivedAt: preferred?.sensorReceivedAt,
+            sensorAccuracyMeters: preferred?.sensorAccuracyMeters,
+            sensorPrecisionMeters: preferred?.sensorPrecisionMeters
         )
     }
 

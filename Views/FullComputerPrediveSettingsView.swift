@@ -79,11 +79,12 @@ struct FullComputerPrediveSettingsView: View {
                         .buttonStyle(.plain)
                         .disabled(!canReview)
                     }
-                }
-                .padding(.horizontal, DiveUI.screenPadding)
-                .padding(.vertical, 10)
             }
+            .padding(.horizontal, DiveUI.screenPadding)
+            .padding(.vertical, 10)
         }
+        .fullComputerPrediveAltitudeSensorLifecycle(configuration: configuration)
+    }
     }
 
     private var bottomGasSection: some View {
@@ -207,9 +208,15 @@ struct FullComputerPrediveSettingsView: View {
                     altitudeLabel,
                     value: altitudeMeters,
                     in: -500...4_500,
-                    step: 100
+                    step: 10
                 )
                 .font(DiveUI.Typography.rowSubtitle)
+                HStack(spacing: 6) {
+                    Button("-100") { adjustAltitude(by: -100) }
+                    Button("+100") { adjustAltitude(by: 100) }
+                }
+                .font(DiveUI.Typography.hintCaptionBold)
+                .disabled(!configuration.canEdit)
                 HStack(spacing: 6) {
                     salinityButton(.salt, label: String(localized: "fc.environment.salinity.salt"))
                     salinityButton(.fresh, label: String(localized: "fc.environment.salinity.fresh"))
@@ -240,15 +247,25 @@ struct FullComputerPrediveSettingsView: View {
                     Text(String(localized: "fc.environment.sensor.sampling"))
                         .font(DiveUI.Typography.hintCaptionBold)
                         .foregroundStyle(DiveUI.orange)
+                } else if WatchFullComputerAltitudeSensorProposalSettingsStore.shared.mode != .manualOnly {
+                    Button(String(localized: "fc.environment.sensor.refresh")) {
+                        environmentSensor.refreshProposal(into: configuration)
+                    }
+                    .font(DiveUI.Typography.hintCaptionBold)
                 }
             }
         }
-        .onAppear {
-            environmentSensor.requestProposal(into: configuration)
-        }
-        .onDisappear {
-            environmentSensor.cancel()
-        }
+    }
+
+    private func adjustAltitude(by delta: Int) {
+        let current = Int((configuration.draftEnvironment?.altitudeMeters ?? 0).rounded())
+        let next = min(4_500, max(-500, current + delta))
+        let salinity = configuration.draftEnvironment?.salinity ?? .salt
+        configuration.setDraftEnvironment(
+            altitudeMeters: Double(next),
+            salinity: salinity,
+            source: .watchSettingsManual
+        )
     }
 
     private var canReview: Bool {
