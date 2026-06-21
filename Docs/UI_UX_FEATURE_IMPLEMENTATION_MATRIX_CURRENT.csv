@@ -1,0 +1,20 @@
+ID,Activity,Mode,Platform,Feature,Entry_Point,Screen,Implementation_Status,Reachable,Interaction_Complete,State_Complete,Localized_IT,Localized_EN,Accessible,Persisted,Restored,Synced,Exported,Tested,Documented,Mockup_Aligned,Safety_Truthful,Readiness_Percent,Severity,Finding_IDs,Notes
+UIF-001,Global,All,Watch+iOS,Legal acceptance,Launch,Legal onboarding,Fully implemented,yes,yes,yes,yes,yes,yes,yes,yes,n/a,n/a,yes,yes,partial,yes,92,,,
+UIF-002,Global,All,Watch+iOS,Activity selection,Launch and Settings,Activity selection,Fully implemented,yes,yes,yes,yes,yes,yes,yes,yes,partial,n/a,yes,yes,partial,yes,95,,,
+UIF-003,Diving,Gauge,Watch,Live Gauge,Activity selection,DiveLiveView,Fully implemented,yes,yes,partial,yes,yes,partial,yes,yes,yes,yes,yes,yes,partial,yes,90,,,
+UIF-004,Diving,Full Computer,Watch,Predive environment,Diving mode selection,FullComputerPrediveSettingsView,Reachable but unsafe,yes,no,no,partial,partial,partial,no,no,no,no,no,no,no,no,10,P0,UI16-P0-001,Altitude/salinity absent and imported values dropped
+UIF-005,Diving,Full Computer,Watch,Live Bühlmann/deco,DiveLiveView,DiveLiveView,Fully implemented with blocker,yes,yes,partial,yes,yes,partial,yes,yes,yes,yes,yes,yes,partial,no,58,P0,UI16-P0-001,Audit 15 software state coverage; environment wrong at altitude
+UIF-006,Diving,Base/Deco/Technical,iOS,Planner,Diving root,PlannerView,Fully implemented,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,partial,yes,92,,,
+UIF-007,Diving,CCR,iOS,CCR planner,Planner mode,CCR planner views,Fully implemented reference-only,yes,yes,partial,yes,yes,partial,yes,yes,yes,yes,yes,yes,partial,yes,85,P1,UI16-P1-002,External validation pending
+UIF-008,Diving,All,iOS,Equipment and checklist,Diving root,EquipmentView/ChecklistView,Fully implemented,yes,yes,yes,yes,yes,yes,yes,yes,partial,yes,yes,yes,partial,yes,90,,,
+UIF-009,Diving,All,Watch+iOS,Diving logbook,Activity root,DiveLogListView/LogbookView,Fully implemented,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,partial,partial,88,P1,ALT-P1-002,Environment metadata absent
+UIF-010,Apnea,Apnea,Watch,Session lifecycle,Activity selection,ApneaView,Fully implemented,yes,yes,partial,yes,yes,partial,yes,yes,yes,yes,yes,yes,partial,yes,88,P1,UI16-P1-002,Physical underwater QA pending
+UIF-011,Apnea,Apnea,iOS,Root/logbook/settings,Activity selection,IOSApneaRootView,Fully implemented,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,partial,yes,92,,,
+UIF-012,Snorkeling,Snorkeling,Watch,Session/GPS/navigation,Activity selection,SnorkelingView,Fully implemented,yes,yes,partial,yes,yes,partial,yes,yes,yes,yes,yes,yes,partial,partial,82,P1,UI16-P1-002,Physical GPS/navigation QA pending
+UIF-013,Snorkeling,Snorkeling,iOS,Root/maps/logbook/settings,Activity selection,IOSSnorkelingRootView,Fully implemented,yes,yes,partial,yes,yes,partial,yes,yes,yes,yes,yes,yes,partial,yes,88,P1,UI16-P1-002,Permissions/device QA pending
+UIF-014,Diving,Planner→Watch,Watch+iOS,Briefing card,Planner share/transfer,PlannerBriefingCardsView,Fully implemented reference-only,yes,yes,yes,yes,yes,yes,yes,yes,yes,n/a,yes,yes,partial,yes,88,,,
+UIF-015,Global,All,Watch+iOS,Sync/security,Settings/automatic,Sync status surfaces,Fully implemented software path,yes,yes,partial,yes,yes,yes,yes,yes,yes,n/a,yes,yes,n/a,partial,85,P1,UI16-P1-002,Paired-device evidence pending
+UIF-016,Global,All,Watch+iOS,Localization,All screens,Catalog-driven,Implemented,yes,yes,partial,yes,yes,partial,n/a,n/a,n/a,yes,yes,yes,n/a,yes,88,P2,UI16-P2-003,Windows tooling portability gap
+UIF-017,Global,All,Watch+iOS,Accessibility,All screens,Semantic contracts,Implemented software partial,yes,yes,partial,yes,yes,partial,n/a,n/a,n/a,partial,yes,yes,partial,yes,72,P1,UI16-P1-002,Physical VoiceOver/Dynamic Type pending
+UIF-018,Global,All,Watch+iOS,Visual regression,All screens,Mockup/snapshot registry,Implemented software partial,yes,partial,partial,yes,yes,partial,n/a,n/a,n/a,n/a,yes,yes,partial,yes,70,P2,UI16-P2-002,Manual/device baselines pending
+
