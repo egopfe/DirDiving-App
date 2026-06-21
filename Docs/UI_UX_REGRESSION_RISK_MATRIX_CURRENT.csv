@@ -1,0 +1,13 @@
+ID,Area,Recent_Change,Risk,Existing_Guard,Evidence_Gap,Severity,Finding_ID,Required_Reruns,Status
+REG-001,Full Computer environment,Audit 15/runtime changes and newly audited transfer path,Altitude silently defaults to sea level,Shared environment-aware core,No end-to-end altitude activation suite,P0,UI16-P0-001,01W 0W 2 8 12 13 15 16,OPEN
+REG-002,Full Computer deco,Audit 15 timing/schedule remediation,False/stale deco presentation,Audit15 oracle and state tests,Current HEAD macOS rerun missing,P1,UI16-P1-001,0W 2 15 16,PENDING
+REG-003,Activity roots,Multi-activity promotion,Cross-activity route/store leak,Ownership policies and routing tests,Physical navigation replay missing,P2,UI16-P1-002,7 12 16,PENDING
+REG-004,Sync/security,Envelope/HMAC/ACK/tombstone changes,Wrong activity decode or trust failure,Negative and namespace tests,Paired-device load missing,P1,UI16-P1-002,8 9 12 16,PENDING
+REG-005,Localization,Large catalog updates,Hardcoded/cross-language copy,Key parity tests and catalogs,Portable scanner path normalization,P2,UI16-P2-003,11 12 16,OPEN
+REG-006,Accessibility,UI remediation,Hidden/ambiguous safety state,Semantic contract tests,Physical VoiceOver/Dynamic Type,P1,UI16-P1-002,11 12 16,PENDING
+REG-007,Mockups/visual,Snapshot registry and mockup inventory,Layout drift/manual false confidence,Software registry tests,Device pixel/manual scoring,P2,UI16-P2-002,14 16,PENDING
+REG-008,Release claims,Claims policy/scanner,Unsupported claim slips through,Policy registry and source scan,Windows allowlist path mismatch,P2,UI16-P2-003,13 16,OPEN
+REG-009,Documentation,Multi-activity promotion,Readers follow stale architecture statements,Current opening/report,Pervasive historical contradictions,P2,UI16-P2-001,6 13 16,OPEN
+REG-010,Performance,Signposts/budgets,Watch battery/thermal regression,Software budgets,Physical profiling,P2,UI16-P1-002,10 12 16,PENDING
+REG-011,Exports/PDF,Planner/logbook changes,Stale or clipped safety values,Model/export tests,Physical render/Subsurface validation,P1,UI16-P1-002,3 12 13 16,PENDING
+
