@@ -1,0 +1,11 @@
+scenario_id,scenario_name,required_hardware,reference_instrument,execution_status,watch_model,watchos_version,app_commit,permissions,location_context,sensor_proposal_observed,time_to_stable_proposal_s,timeout_observed,accuracy_metadata,spread_observed_m,independent_elevation_m,delta_m,ui_state_correct,environment_reached_runtime,logbook_provenance_correct,notes,finding_id
+PQ-01,Validated near-zero elevation,Physical Apple Watch,Barometric/GPS reference,NOT_EXECUTED,,,8ab4776,,,,,,,,,,,,,Simulator cannot prove CMAltimeter absolute altitude,PENDING_PHYSICAL
+PQ-02,Safely accessible elevated location,Physical Apple Watch,Known elevation benchmark,NOT_EXECUTED,,,8ab4776,,,,,,,,,,,,,Required for threshold validation WCMA-004,PENDING_PHYSICAL
+PQ-03,Sensor unavailable or denied if reproducible,Physical Apple Watch,N/A,NOT_EXECUTED,,,8ab4776,,,,,,,,,,,,,Test motion denial path FI-02,PENDING_PHYSICAL
+PQ-04,Stable measurement accepted,Physical Apple Watch,Reference altimeter,NOT_EXECUTED,,,8ab4776,,,,,,,,,,,,,Verify accept→commit→runtime plan,PENDING_PHYSICAL
+PQ-05,Stable measurement rejected manual preserved,Physical Apple Watch,Reference altimeter,NOT_EXECUTED,,,8ab4776,,,,,,,,,,,,,Manual draft must remain after dismiss,PENDING_PHYSICAL
+PQ-06,Imported iPhone Plan vs different sensor proposal,Physical Watch + iPhone,Plan import + reference,NOT_EXECUTED,,,8ab4776,,,,,,,,,,,,,Conflict UI both sources visible,PENDING_PHYSICAL
+PQ-07,App background/foreground during sampling,Physical Apple Watch,N/A,NOT_EXECUTED,,,8ab4776,,,,,,,,,,,,,Tests suspend/resume + timestamp WCMA-003,PENDING_PHYSICAL
+PQ-08,Rapid Settings/Confirmation navigation,Physical Apple Watch,N/A,NOT_EXECUTED,,,8ab4776,,,,,,,,,,,,,Duplicate requestProposal WCMA-009,PENDING_PHYSICAL
+PQ-09,Relaunch before dive start,Physical Apple Watch,N/A,NOT_EXECUTED,,,8ab4776,,,,,,,,,,,,,Pending proposal persistence WCMA-006,PENDING_PHYSICAL
+PQ-10,Controlled dry-run runtime+logbook without real deco,Physical Apple Watch,Reference + simulator dive,NOT_EXECUTED,,,8ab4776,,,,,,,,,,,,,Accept sensor→start→verify metadata fields,PENDING_PHYSICAL
