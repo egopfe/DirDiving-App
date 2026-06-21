@@ -57,7 +57,7 @@ Current active deduplicated findings: **15 total — P0 1, P1 7, P2 7, P3 0, P4 
 - **Evidence:** `DivePlanPackageBuilder` writes altitude/salinity; `FullComputerGasProfile.init(importing:)` drops them; `FullComputerImportedPlanStore.activatePendingPlan` imports only the gas profile; `FullComputerPrediveConfigurationStore.runtimePlan()` calls a constructor defaulting to `.seaLevelSaltWater`.
 - **Affected:** iOS→Watch plan transfer, Watch predive, live tissues, ceiling/NDL/TTS/schedule, checkpoint provenance, logbook, UI truthfulness.
 - **Why it matters:** an accepted altitude plan can run with a different atmospheric pressure and present unsafe or misleading decompression output.
-- **Fix:** require a validated frozen environment in every live plan; block missing/invalid/incompatible plans; expose it in UI and persist it everywhere.
+- **Fix:** require a validated frozen environment from exactly one confirmed source: imported iPhone plan, manual Watch Full Computer Settings, or a Watch sensor-measured startup proposal at detected elevation. Never overwrite sources silently; provide no explicit or implicit sea-level option; block missing/invalid/incompatible input; expose and persist the selected source everywhere.
 - **Tests:** independent all-16-compartment profiles at required altitudes/water/gases; import, gas switch, restore, clear/re-descent, logbook/sync/export.
 
 ### P1 — Independent Watch altitude test/oracle coverage missing
@@ -148,4 +148,3 @@ P1_EXISTS: YES
 ```
 
 Audit orchestration complete. No production code was modified. No commit or push was performed.
-

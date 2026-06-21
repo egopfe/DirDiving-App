@@ -1,5 +1,5 @@
 Gate,Area,RequiredEvidence,AutomatedEvidence,PhysicalEvidence,ExternalEvidence,Status,Blockers,NextAction
-Internal code,All production paths,No P0/P1 code defect,Static audit finds altitude P0,None,None,FAIL,ORCH-001,Implement explicit fail-closed environment propagation
+Internal code,All production paths,No P0/P1 code defect,Static audit finds altitude P0,None,None,FAIL,ORCH-001,Implement fail-closed three-source environment propagation without an explicit or implicit sea-level mode
 Internal tests,All critical requirements,Full schemes and independent safety tests,Historical suites only; no independent Watch altitude/current HEAD run,None,Independent reference missing,FAIL,"ORCH-002; ORCH-008",Add altitude suite and run all gates on macOS
 Documentation,Current architecture and limitations,Canonical consistent docs,Current headers/reports present,None,External review not required,FAIL,ORCH-013,Archive or mark contradictory historical sections
 UI/UX,Complete truthful reachable flows,Audit 16 plus simulator/device evidence,Audit 16 FAIL,None,Manual visual pending,FAIL,"ORCH-001; ORCH-010; ORCH-011",Fix altitude truthfulness then run device UX matrix
