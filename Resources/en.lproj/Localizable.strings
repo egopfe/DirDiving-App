@@ -796,6 +796,8 @@
 "live.fc.metric.ppo2" = "PPO2";
 "live.fc.status.deco" = "OFF-GASSING";
 "live.fc.status.in_deco" = "IN DIVE | DECOMPRESSION";
+"live.fc.status.runtime_degraded" = "DECO TIMING DEGRADED";
+"live.fc.runtime.degraded.banner" = "Decompression timing is degraded. Treat NDL/TTS as non-authoritative until sensor continuity returns.";
 "live.fc.status.ceiling_violation" = "CEILING VIOLATION";
 "live.fc.gas.a11y" = "Active gas: %@";
 "live.fc.gas_switch.available.title" = "GAS SWITCH AVAILABLE";

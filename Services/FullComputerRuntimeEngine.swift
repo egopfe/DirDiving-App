@@ -13,6 +13,7 @@ struct FullComputerRuntimeEngine: Equatable {
     private var decoStopTracker: FullComputerDecoStopTracker
     private var gasSwitchTracker: FullComputerGasSwitchTracker
     private var lastTickTimestamp: Date
+    private var decoSolverCache = FullComputerDecoSolver.Cache()
 #if DEBUG
     private var testHookDefersSnapshotRefresh = false
     private var testHookDeferredEngineState: FullComputerRuntimeEngineState?
@@ -81,6 +82,8 @@ struct FullComputerRuntimeEngine: Equatable {
         gasSwitchTracker.bootstrap(bottomGasMixId: plan.activeGas.gasMixId)
         lastTickTimestamp = sessionStart
         var tracker = FullComputerDecoStopTracker.initial
+        var localGasTracker = gasSwitchTracker
+        var localSolverCache = FullComputerDecoSolver.Cache()
         snapshot = Self.makeSnapshot(
             engineState: .valid,
             tissueState: tissueState,
@@ -90,10 +93,13 @@ struct FullComputerRuntimeEngine: Equatable {
             lastSampleTimestamp: nil,
             diagnostics: [],
             decoStopTracker: &tracker,
-            gasSwitchTracker: &gasSwitchTracker,
+            gasSwitchTracker: &localGasTracker,
+            decoSolverCache: &localSolverCache,
             deltaSeconds: 0
         )
         decoStopTracker = tracker
+        gasSwitchTracker = localGasTracker
+        decoSolverCache = localSolverCache
     }
 
     mutating func ingestSample(depthMeters: Double, timestamp: Date) -> Bool {
@@ -149,18 +155,20 @@ struct FullComputerRuntimeEngine: Equatable {
         refreshSnapshot(engineState: engineState, diagnostics: diagnostics)
     }
 
-    /// Nominal 1 Hz tick using real elapsed time; applies constant-depth load when no fresh sample arrives.
+    /// Nominal 1 Hz tick using real elapsed time; integrates the full elapsed interval (sub-stepped).
     mutating func tick(now: Date = Date()) {
         let delta = now.timeIntervalSince(lastComputedTimestamp)
         guard delta > 0 else { return }
 
-        let capped = min(delta, FullComputerRuntimeConfiguration.maxMissedTickSeconds)
-        advanceTissuesConstant(depthMeters: lastDepthMeters, durationSeconds: capped)
-        lastComputedTimestamp = lastComputedTimestamp.addingTimeInterval(capped)
+        advanceTissuesConstant(depthMeters: lastDepthMeters, durationSeconds: delta)
+        lastComputedTimestamp = now
 
         let diagnostics: [String]
         let nextState: FullComputerRuntimeEngineState
-        if delta > FullComputerRuntimeConfiguration.nominalTickSeconds * 2 {
+        if delta > FullComputerRuntimeConfiguration.maxMissedTickSeconds {
+            diagnostics = ["missed_tick:\(Int(delta.rounded()))s"]
+            nextState = .degraded
+        } else if delta > FullComputerRuntimeConfiguration.missedTickDegradedThresholdSeconds {
             diagnostics = ["missed_tick:\(Int(delta.rounded()))s"]
             nextState = .degraded
         } else if previousEngineState == .unavailable {
@@ -362,10 +370,14 @@ struct FullComputerRuntimeEngine: Equatable {
     mutating func applyConservativeCatchUp(now: Date = Date()) {
         let elapsed = now.timeIntervalSince(lastComputedTimestamp)
         guard elapsed > 0 else { return }
-        let capped = min(elapsed, FullComputerRuntimeConfiguration.maxMissedTickSeconds * 4)
-        advanceTissuesConstant(depthMeters: lastDepthMeters, durationSeconds: capped)
-        lastComputedTimestamp = lastComputedTimestamp.addingTimeInterval(capped)
-        tick(now: lastComputedTimestamp)
+        advanceTissuesConstant(depthMeters: lastDepthMeters, durationSeconds: elapsed)
+        lastComputedTimestamp = now
+        let degraded = elapsed > FullComputerRuntimeConfiguration.maxMissedTickSeconds
+        refreshSnapshot(
+            engineState: degraded ? .degraded : snapshot.engineState,
+            diagnostics: degraded ? ["missed_tick:\(Int(elapsed.rounded()))s"] : snapshot.diagnostics
+        )
+        if degraded { previousEngineState = .degraded }
     }
 
     mutating func replaySamplesAfterCheckpoint(_ samples: [DiveSample], checkpointTimestamp: Date?) {
@@ -398,6 +410,7 @@ struct FullComputerRuntimeEngine: Equatable {
         lastTickTimestamp = payload.lastComputedTimestamp
         var tracker = payload.decoStopTracker
         var gasTracker = payload.gasSwitchTracker
+        var localSolverCache = FullComputerDecoSolver.Cache()
         snapshot = Self.makeSnapshot(
             engineState: payload.previousEngineState,
             tissueState: payload.tissueState,
@@ -405,13 +418,15 @@ struct FullComputerRuntimeEngine: Equatable {
             depthMeters: payload.lastDepthMeters,
             monotonicElapsedSeconds: payload.monotonicClock.lastElapsed,
             lastSampleTimestamp: payload.lastSampleTimestamp,
-            diagnostics: [],
+            diagnostics: payload.previousEngineState == .degraded ? ["restored_degraded"] : [],
             decoStopTracker: &tracker,
             gasSwitchTracker: &gasTracker,
+            decoSolverCache: &localSolverCache,
             deltaSeconds: 0
         )
         decoStopTracker = tracker
         gasSwitchTracker = gasTracker
+        decoSolverCache = localSolverCache
         _ = sessionStart
     }
 
@@ -473,6 +488,7 @@ struct FullComputerRuntimeEngine: Equatable {
             diagnostics: diagnostics,
             decoStopTracker: &decoStopTracker,
             gasSwitchTracker: &gasSwitchTracker,
+            decoSolverCache: &decoSolverCache,
             deltaSeconds: delta
         )
     }
@@ -497,6 +513,7 @@ struct FullComputerRuntimeEngine: Equatable {
         diagnostics: [String],
         decoStopTracker: inout FullComputerDecoStopTracker,
         gasSwitchTracker: inout FullComputerGasSwitchTracker,
+        decoSolverCache: inout FullComputerDecoSolver.Cache,
         deltaSeconds: TimeInterval
     ) -> FullComputerRuntimeSnapshot {
         let projectionGases = FullComputerGasSwitchPolicy.projectionGases(from: plan, tracker: gasSwitchTracker)
@@ -520,14 +537,22 @@ struct FullComputerRuntimeEngine: Equatable {
         var projectionPlan = plan
         projectionPlan.travelGases = projectionGases.travel
         projectionPlan.decoGases = projectionGases.deco
-        let basePresentation = FullComputerDecoSolver.solve(
-            input: FullComputerDecoSolverInput(
-                tissueState: tissueState,
-                depthMeters: depthMeters,
-                plan: projectionPlan,
-                runtimeMinutes: runtimeMinutes
-            )
+        let timingDegraded = engineState == .degraded || engineState == .unavailable
+            || diagnostics.contains(where: { $0.hasPrefix("missed_tick:") })
+        let solverInput = FullComputerDecoSolverInput(
+            tissueState: tissueState,
+            depthMeters: depthMeters,
+            plan: projectionPlan,
+            runtimeMinutes: runtimeMinutes
         )
+        var solverCacheBox: FullComputerDecoSolver.Cache? = decoSolverCache
+        let basePresentation = FullComputerDecoSolver.solve(
+            input: solverInput,
+            projection: projection,
+            cache: &solverCacheBox,
+            timingDegraded: timingDegraded
+        )
+        decoSolverCache = solverCacheBox ?? decoSolverCache
         let decoRequired = basePresentation.mode == .decompression
         let machine = FullComputerDecoStopStateMachine.evaluate(
             input: FullComputerDecoStopMachineInput(
