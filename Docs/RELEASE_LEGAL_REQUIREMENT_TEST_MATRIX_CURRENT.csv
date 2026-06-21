@@ -1,0 +1,21 @@
+Requirement_ID,Domain,Requirement,Primary_Test_Method,Evidence_Type,Status,Evidence_Location,Notes
+RLR-01,Claims,Prohibited production claims scan,scan_prohibited_claims.py,script gate,PASS,Scripts/scan_prohibited_claims.py,
+RLR-02,Claims,Claims registry minimum coverage,ReleaseLegalClaimsRemediationTests,automated unit,PASS,Docs/CLAIMS_POLICY_REGISTRY_CURRENT.csv,
+RLR-03,Legal,Legal revision parity Watch/iOS,ReleaseLegalClaimsRemediationTests,automated unit,PASS,App/LegalAcceptanceStore.swift iOSApp/App/LegalAcceptanceStore.swift,
+RLR-04,Legal,Re-consent gate blocks without acceptance,LegalAcceptanceGateTests,automated unit,PASS,Utils/LegalAcceptanceGate.swift,
+RLR-05,Legal,App Intents legal gate,ActionButtonIntentsSafetyTests,automated unit,PASS,Utils/LegalAcceptanceGate.swift,
+RLR-06,Legal,IOS legal settings keys EN/IT,IOSLegalSettingsLocalizationTests,automated unit,PASS,iOSApp/Resources Localizable.strings,
+RLR-07,Export,PDF/CSV disclaimer keys,ReleaseLegalClaimsRemediationTests,automated unit,PASS,iOSApp/Resources/en.lproj/Localizable.strings,
+RLR-08,Export,CSV metadata round-trip,CSVMetadataRoundTripTests,integration,PASS,Tests/iOSAlgorithmTests/CSVMetadataRoundTripTests.swift,
+RLR-09,Privacy,Privacy manifests no tracking,SecurityPrivacyTrustRemediationTests,automated unit,PASS,Config/PrivacyInfo-Watch.xcprivacy,
+RLR-10,Sync,Truthful cloud scope Diving-only,CloudBackupCapabilityTests,automated unit,PASS,iOSApp/Utils/CloudBackupCapability.swift,
+RLR-11,Governance,Incident runbook exists,validate_release_legal_claims_readiness.sh,documentation,PASS,Docs/INCIDENT_RESPONSE_RUNBOOK_CURRENT.md,
+RLR-12,Governance,Rollback procedure exists,validate_release_legal_claims_readiness.sh,documentation,PASS,Docs/RELEASE_ROLLBACK_PROCEDURE_CURRENT.md,
+RLR-13,Governance,Support escalation doc exists,validate_release_legal_claims_readiness.sh,documentation,PASS,Docs/SUPPORT_ESCALATION_AND_SLA_CURRENT.md,
+RLR-14,Governance,Release claims gate policy,validate_release_legal_claims_readiness.sh,documentation,PASS,Docs/RELEASE_CLAIMS_GATE_POLICY_CURRENT.md,
+RLR-15,Evidence,QA evidence package structure,ReleaseLegalClaimsRemediationTests,automated unit,PASS,Docs/QA_EVIDENCE/*/STATUS.md,
+RLR-16,Store,TestFlight notes alignment,scan_prohibited_claims.py + manual,documentation,PASS,Docs/TESTFLIGHT_REVIEW_NOTES.md,
+RLR-17,Entitlement,Entitlement gate documentation,ReleaseLegalClaimsRemediationWatchTests,documentation,PASS,Docs/WATCH_ULTRA_ENTITLEMENT_RELEASE_GATE_CURRENT.md,Field QA PENDING
+RLR-18,A11y,Planner visual/legal contracts,PlannerVisualContractTests,UI contract,PASS,Tests/iOSAlgorithmTests/PlannerVisualContractTests.swift,
+RLR-19,External,Legal counsel sign-off,LEGAL_REVIEW folder,external,PENDING_LEGAL_REVIEW,Docs/QA_EVIDENCE/LEGAL_REVIEW/,Not fabricated
+RLR-20,External,App Store marketing sign-off,MARKETING_ASSET_CHECKLIST,external,PENDING_MARKETING_SIGN_OFF,Docs/QA_EVIDENCE/APP_STORE_MARKETING/,Not fabricated

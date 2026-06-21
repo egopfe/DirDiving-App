@@ -71,7 +71,9 @@ enum WatchSyncAuth {
             logger.error("Local Watch sync secret unavailable: SecRandomCopyBytes failed; refusing to publish a deterministic fallback.")
             return
         }
-        mergeApplicationContext([contextKey: secret.base64EncodedString()], session: session)
+        var updates = WatchSyncTrustBootstrapPolicy.bootstrapMetadata(for: WatchSyncTrustStatePolicy.trustEpoch)
+        updates[contextKey] = secret.base64EncodedString()
+        mergeApplicationContext(updates, session: session)
     }
 
     @discardableResult
@@ -101,6 +103,15 @@ enum WatchSyncAuth {
         guard let encoded = context[contextKey] as? String,
               let secret = Data(base64Encoded: encoded),
               secret.count >= 32 else { return .unchanged }
+        if loadPeerSecret() == nil,
+           !WatchSyncTrustBootstrapPolicy.shouldAcceptSecretBootstrap(
+               context: context,
+               trustEpoch: WatchSyncTrustStatePolicy.trustEpoch,
+               hasExistingPeerSecret: false
+           ) {
+            logger.warning("Rejected stale or invalid iOS sync bootstrap context.")
+            return .unchanged
+        }
         if let existing = loadPeerSecret() {
             if existing.constantTimeEquals(secret) {
                 clearPeerSecretMismatch()
@@ -114,7 +125,14 @@ enum WatchSyncAuth {
         savePeerSecret(secret)
         WatchSyncTrustStatePolicy.recordEstablishedTrust(peerSecret: secret)
         clearPeerSecretMismatch()
+        LegacySecurityIdentifierMigration.markCompletedIfNeeded()
         NotificationCenter.default.post(name: .watchSyncPeerSecretDidUpdate, object: nil)
+        if WCSession.isSupported() {
+            let sanitized = WatchSyncTrustBootstrapPolicy.sanitizedContextAfterTrustEstablished(
+                WCSession.default.applicationContext
+            )
+            mergeApplicationContext(sanitized, session: WCSession.default)
+        }
         return .acceptedFirstTrust
     }
 

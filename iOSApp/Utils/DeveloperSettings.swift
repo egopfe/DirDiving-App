@@ -15,7 +15,8 @@ enum DeveloperSettings {
         #if DEBUG
         return true
         #else
-        return isTestFlightBuild
+        return TestFlightSimulationSafetyPolicy.isTestFlightBuild
+            && TestFlightSimulationSafetyPolicy.hasAcknowledgedSimulation
         #endif
     }
 

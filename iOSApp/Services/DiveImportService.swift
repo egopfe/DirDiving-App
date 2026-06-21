@@ -62,11 +62,11 @@ enum DiveImportService {
             return .failure(.fileTooLarge)
         }
 
-        guard let contents = try? String(contentsOf: url, encoding: .utf8) else {
+        guard let contents = try? DiveCSVImportBounds.readBoundedUTF8(from: url) else {
+            if DiveCSVImportBounds.preflightFileSize(at: url) == .fileTooLarge {
+                return .failure(.fileTooLarge)
+            }
             return .failure(.unreadableFile)
-        }
-        guard contents.utf8.count <= maxImportBytes else {
-            return .failure(.fileTooLarge)
         }
 
         guard !contents.contains("\0") else {

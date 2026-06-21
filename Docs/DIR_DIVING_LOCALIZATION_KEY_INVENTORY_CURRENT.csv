@@ -842,6 +842,7 @@ apnea.ios.charts.temperature,apnea,ios,iOSApp/Views/Apnea/IOSApneaSessionDetailV
 apnea.ios.charts.time,apnea,ios,iOSApp/Views/Apnea/IOSApneaSessionDetailView.swift,Tempo,Time,no,no,no,PASS,
 apnea.ios.dashboard.best_time,apnea,ios,iOSApp/Views/Apnea/IOSApneaDashboardView.swift,Apnea piÃ¹ lunga,Best time,no,no,no,PASS,
 apnea.ios.dashboard.dives,apnea,ios,iOSApp/Views/Apnea/IOSApneaDashboardView.swift;iOSApp/Views/Apnea/IOSApneaSessionDetailView.swift,Immersioni,Dives,no,no,no,PASS,
+apnea.ios.dashboard.duration,apnea,ios,iOSApp/Views/Apnea/IOSApneaDashboardView.swift,Durata,Duration,no,no,no,PASS,
 apnea.ios.dashboard.empty,apnea,ios,,Nessuna sessione Apnea salvata. Completa una sessione su Apple Watch o pianifica una nuova.,No saved Apnea sessions yet. Complete a session on Apple Watch or plan a new one.,no,no,no,PASS,
 apnea.ios.dashboard.last_session,apnea,ios,iOSApp/Views/Apnea/IOSApneaDashboardView.swift,Ultima sessione,Last session,no,no,no,PASS,
 apnea.ios.dashboard.last_session.a11y,apnea,ios,iOSApp/Views/Apnea/IOSApneaDashboardView.swift,Ultima sessione Apnea,Latest Apnea session,no,no,yes,PASS,

@@ -10,6 +10,29 @@ Compilare su **macOS** dopo `xcodegen generate`. Non spuntare voci non verificat
 | Commit `HEAD` | __________ |
 | Esecutore | __________ |
 
+## Audit remediation (2026-06-20 — Command 13 release/legal/claims @ `RELEASE_LEGAL_CLAIMS_COMPLIANCE_AUDIT_CURRENT.md`)
+
+- [ ] Review [`RELEASE_LEGAL_CLAIMS_COMPLIANCE_AUDIT_CURRENT.md`](RELEASE_LEGAL_CLAIMS_COMPLIANCE_AUDIT_CURRENT.md)
+- [ ] Claims matrix: [`CLAIMS_EVIDENCE_MATRIX_CURRENT.csv`](CLAIMS_EVIDENCE_MATRIX_CURRENT.csv) — no unsupported certification claims in MAIN software audit
+- [ ] Release gate matrix: [`RELEASE_GATE_MATRIX_CURRENT.csv`](RELEASE_GATE_MATRIX_CURRENT.csv)
+- [ ] App Store / TestFlight blockers: [`APP_STORE_TESTFLIGHT_BLOCKERS_CURRENT.md`](APP_STORE_TESTFLIGHT_BLOCKERS_CURRENT.md)
+- [ ] External legal counsel sign-off **PENDING** — [`IOS_APP_STORE_ALGORITHM_MARKETING_REVIEW_CHECKLIST.md`](IOS_APP_STORE_ALGORITHM_MARKETING_REVIEW_CHECKLIST.md)
+- [ ] Run `./Scripts/validate_release_legal_claims_readiness.sh` — expect `RELEASE_CLAIMS_SOFTWARE_READINESS_100`
+- [ ] Claims registry: [`CLAIMS_POLICY_REGISTRY_CURRENT.csv`](CLAIMS_POLICY_REGISTRY_CURRENT.csv) + [`PROHIBITED_CLAIMS_ALLOWLIST_CURRENT.csv`](PROHIBITED_CLAIMS_ALLOWLIST_CURRENT.csv)
+- [ ] Remediation report: [`RELEASE_LEGAL_CLAIMS_COMPLIANCE_REMEDIATION_REPORT_CURRENT.md`](RELEASE_LEGAL_CLAIMS_COMPLIANCE_REMEDIATION_REPORT_CURRENT.md)
+- [ ] **Code-level claims compliance:** **100%** software/documentation gates — truthful non-certified posture; **not legal approval**
+- [ ] **External TestFlight / App Store:** **BLOCKED** until P1/P2 external gates close
+
+## Audit remediation (2026-06-20 — Command 12 test/QA evidence @ `TEST_QA_EVIDENCE_REMEDIATION_REPORT_CURRENT.md`)
+
+- [ ] Review [`TEST_QA_EVIDENCE_REMEDIATION_REPORT_CURRENT.md`](TEST_QA_EVIDENCE_REMEDIATION_REPORT_CURRENT.md)
+- [ ] Run `./Scripts/validate_test_qa_evidence_readiness.sh` — expect `TEST_QA_SOFTWARE_READINESS_100`
+- [ ] Traceability matrix: [`REQUIREMENT_TEST_TRACEABILITY_MATRIX_CURRENT.csv`](REQUIREMENT_TEST_TRACEABILITY_MATRIX_CURRENT.csv) — 55/55 `Software_Status: PASS`
+- [ ] Finding traceability: [`TEST_QA_FINDING_TRACEABILITY_CURRENT.csv`](TEST_QA_FINDING_TRACEABILITY_CURRENT.csv) — `SOFTWARE_VERIFIABLE_FINDINGS_OPEN_0`
+- [ ] Evidence folders **PENDING**: see [`TEST_QA_EXTERNAL_QA_PENDING_CURRENT.md`](TEST_QA_EXTERNAL_QA_PENDING_CURRENT.md)
+- [ ] **Code-level test/QA readiness:** **100%** software gates (Commands 7–12)
+- [ ] **External TestFlight / App Store:** **BLOCKED** until physical QA + external validation + marketing evidence
+
 ## Audit remediation (2026-06-14 — deep code V1.0 @ `MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_V1.0.md`)
 
 - [ ] Review [`MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_V1.0.md`](MAIN_DEEP_CODE_ANALYSIS_REMEDIATION_REPORT_V1.0.md)

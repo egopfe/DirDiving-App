@@ -83,11 +83,16 @@ targets:
       - Utils/SnorkelingReleaseSelfCheck.swift
       - Utils/SnorkelingMockupReferenceMatrix.swift
       - Utils/MockupCanonicalPaths.swift
+      - Utils/FullComputerMockupReferenceMatrix.swift
+      - Utils/MockupVisualRegressionRegistry.swift
+      - Utils/WatchSettingsMockupFixtures.swift
+      - Utils/IOSDivePlanTransferMockupFixtures.swift
       - Utils/SnorkelingQAEvidenceCatalog.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
       - Resources
       - path: Shared
+      - Config/PrivacyInfo-Watch.xcprivacy
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios.watch
@@ -129,6 +134,7 @@ targets:
           - Views/ExplorationCenterView.swift
           - Views/ExperimentalFutureConceptsView.swift
           - Views/BuddyExperimentalView.swift
+      - iOSApp/Config/PrivacyInfo-iOS.xcprivacy
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.egopfe.dirdiving.ios
@@ -280,6 +286,10 @@ targets:
       - Utils/SnorkelingReleaseSelfCheck.swift
       - Utils/SnorkelingMockupReferenceMatrix.swift
       - Utils/MockupCanonicalPaths.swift
+      - Utils/FullComputerMockupReferenceMatrix.swift
+      - Utils/MockupVisualRegressionRegistry.swift
+      - Utils/WatchSettingsMockupFixtures.swift
+      - Utils/IOSDivePlanTransferMockupFixtures.swift
       - Utils/SnorkelingQAEvidenceCatalog.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
@@ -363,6 +373,7 @@ targets:
       - iOSApp/Services/WatchSyncAuth.swift
       - iOSApp/Services/IOSWatchSyncPendingTransfer.swift
       - iOSApp/Services/PlannerStore.swift
+      - iOSApp/Services/PlannerChartSnapshots.swift
       - iOSApp/Services/EquipmentStore.swift
       - iOSApp/Utils/ChecklistItemSupport.swift
       - iOSApp/Utils/SyncNonceReplayCache.swift
@@ -507,6 +518,10 @@ targets:
       - Utils/SnorkelingReleaseSelfCheck.swift
       - Utils/SnorkelingMockupReferenceMatrix.swift
       - Utils/MockupCanonicalPaths.swift
+      - Utils/FullComputerMockupReferenceMatrix.swift
+      - Utils/MockupVisualRegressionRegistry.swift
+      - Utils/WatchSettingsMockupFixtures.swift
+      - Utils/IOSDivePlanTransferMockupFixtures.swift
       - Utils/SnorkelingQAEvidenceCatalog.swift
       - Tests/WatchAlgorithmTests/ApneaLifecycleEngineTests.swift
       - Tests/WatchAlgorithmTests/ApneaOperationalEventEngineTests.swift
@@ -544,6 +559,10 @@ targets:
       - Utils/SnorkelingReleaseSelfCheck.swift
       - Utils/SnorkelingMockupReferenceMatrix.swift
       - Utils/MockupCanonicalPaths.swift
+      - Utils/FullComputerMockupReferenceMatrix.swift
+      - Utils/MockupVisualRegressionRegistry.swift
+      - Utils/WatchSettingsMockupFixtures.swift
+      - Utils/IOSDivePlanTransferMockupFixtures.swift
       - Utils/SnorkelingQAEvidenceCatalog.swift
       - Tests/iOSAlgorithmTests/IOSCompanionActivitySelectionTests.swift
       - Tests/iOSAlgorithmTests/IOSActivitySettingsCoherenceTests.swift
