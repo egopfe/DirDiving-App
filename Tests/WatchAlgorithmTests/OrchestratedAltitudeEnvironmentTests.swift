@@ -9,9 +9,13 @@ final class OrchestratedAltitudeEnvironmentTests: XCTestCase {
         FullComputerImportedPlanStore.shared.resetForTests()
         FullComputerPrediveConfigurationStore.shared.resetForTests()
         FullComputerPrediveConfigurationStore.shared.clearEnvironmentForTestsOnly()
+        FullComputerEnvironmentSensorService.shared.resetForTests()
+        WatchFullComputerAltitudeSensorProposalSettingsStore.shared.resetForTests()
     }
 
     override func tearDown() {
+        FullComputerEnvironmentSensorService.shared.resetForTests()
+        WatchFullComputerAltitudeSensorProposalSettingsStore.shared.resetForTests()
         FullComputerImportedPlanStore.shared.resetForTests()
         FullComputerPrediveConfigurationStore.shared.resetForTests()
         super.tearDown()
@@ -171,6 +175,7 @@ final class OrchestratedAltitudeEnvironmentTests: XCTestCase {
                 altitudeMeters: 1_000 + Double(index),
                 accuracyMeters: FullComputerEnvironmentRecord.maximumSensorAccuracyMeters + 1,
                 precisionMeters: 1,
+                sensorMeasuredAt: now.addingTimeInterval(Double(index)),
                 receivedAt: now.addingTimeInterval(Double(index))
             )
         }
@@ -182,6 +187,7 @@ final class OrchestratedAltitudeEnvironmentTests: XCTestCase {
                 altitudeMeters: altitude,
                 accuracyMeters: 5,
                 precisionMeters: 1,
+                sensorMeasuredAt: now.addingTimeInterval(Double(index)),
                 receivedAt: now.addingTimeInterval(Double(index))
             )
         }
@@ -351,38 +357,6 @@ final class OrchestratedAltitudeEnvironmentTests: XCTestCase {
             capabilities: .current
         )
         return try DivePlanPackageCodec.seal(body)
-    }
-}
-
-@MainActor
-private final class FakeAbsoluteAltitudeProvider: FullComputerAbsoluteAltitudeProviding {
-    var isAvailable = true
-    private var handler: ((Result<FullComputerAbsoluteAltitudeSample, FullComputerEnvironmentSensorError>) -> Void)?
-
-    func start(
-        handler: @escaping (Result<FullComputerAbsoluteAltitudeSample, FullComputerEnvironmentSensorError>) -> Void
-    ) {
-        self.handler = handler
-    }
-
-    func stop() {}
-
-    func emit(
-        altitudeMeters: Double,
-        accuracyMeters: Double,
-        precisionMeters: Double,
-        receivedAt: Date = Date()
-    ) {
-        handler?(
-            .success(
-                FullComputerAbsoluteAltitudeSample(
-                    altitudeMeters: altitudeMeters,
-                    accuracyMeters: accuracyMeters,
-                    precisionMeters: precisionMeters,
-                    receivedAt: receivedAt
-                )
-            )
-        )
     }
 }
 
