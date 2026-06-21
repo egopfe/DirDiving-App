@@ -680,6 +680,9 @@
 "fc.environment.confirm.row" = "Ambiente";
 "fc.environment.sensor.proposal" = "Proposta elevazione sensore — conferma per usare";
 "fc.environment.sensor.accept" = "Usa valore sensore";
+"fc.environment.sensor.keep_current" = "Mantieni valore attuale";
+"fc.environment.sensor.sampling" = "Misurazione altitudine attuale…";
+"fc.environment.sensor.accuracy_format" = "precisione ±%d m";
 "startup.coming_soon.subtitle" = "NON ANCORA DISPONIBILE";
 "startup.coming_soon.body" = "Questa attività non è ancora pronta su MAIN. Usa Diving per l'esperienza stabile.";
 "startup.coming_soon.back" = "INDIETRO";

@@ -41,6 +41,8 @@ struct FullComputerDiveLogbookMetadata: Codable, Hashable {
     let waterDensityKgPerM3: Double?
     let environmentSourceRaw: String?
     let environmentCapturedAt: Date?
+    let environmentSensorAccuracyMeters: Double?
+    let environmentSensorPrecisionMeters: Double?
 
     init(
         watchDivingMode: String,
@@ -64,7 +66,9 @@ struct FullComputerDiveLogbookMetadata: Codable, Hashable {
         salinityRaw: String? = nil,
         waterDensityKgPerM3: Double? = nil,
         environmentSourceRaw: String? = nil,
-        environmentCapturedAt: Date? = nil
+        environmentCapturedAt: Date? = nil,
+        environmentSensorAccuracyMeters: Double? = nil,
+        environmentSensorPrecisionMeters: Double? = nil
     ) {
         self.watchDivingMode = watchDivingMode
         self.gfLow = gfLow
@@ -88,6 +92,8 @@ struct FullComputerDiveLogbookMetadata: Codable, Hashable {
         self.waterDensityKgPerM3 = waterDensityKgPerM3
         self.environmentSourceRaw = environmentSourceRaw
         self.environmentCapturedAt = environmentCapturedAt
+        self.environmentSensorAccuracyMeters = environmentSensorAccuracyMeters
+        self.environmentSensorPrecisionMeters = environmentSensorPrecisionMeters
     }
 
     var environmentSource: FullComputerEnvironmentSource? {

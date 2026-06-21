@@ -4,7 +4,7 @@ import XCTest
 final class WatchMathCrossTargetParityTests: XCTestCase {
     func testWatchProductionMatchesIndependentOracleAt30mConstantLoad() throws {
         let sessionStart = Date(timeIntervalSince1970: 1_714_000_000)
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         var oracle = IndependentOracleTissueState.airSaturated()
 
         for second in 1...1_200 {

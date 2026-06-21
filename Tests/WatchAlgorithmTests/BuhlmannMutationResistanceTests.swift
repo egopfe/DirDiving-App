@@ -10,7 +10,7 @@ final class BuhlmannMutationResistanceTests: XCTestCase {
     }
 
     func testReversedSchreinerRateMutationDivergesFromProduction() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 0, timestamp: sessionStart)
         _ = engine.ingestSample(depthMeters: 30, timestamp: sessionStart.addingTimeInterval(120))
 
@@ -85,7 +85,7 @@ final class BuhlmannMutationResistanceTests: XCTestCase {
     }
 
     func testStaleSolverCacheDoesNotMaskFreshTissueChange() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 28, timestamp: sessionStart.addingTimeInterval(600))
         let firstTTS = engine.snapshot.ttsMinutes
         _ = engine.ingestSample(depthMeters: 8, timestamp: sessionStart.addingTimeInterval(900))
@@ -94,7 +94,7 @@ final class BuhlmannMutationResistanceTests: XCTestCase {
     }
 
     func testCalculationFailureDoesNotPresentAsZeroDeco() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 28, timestamp: sessionStart.addingTimeInterval(600))
         let tissueBefore = engine.snapshot.tissueState
         let loadedCeiling = engine.snapshot.rawCeilingMeters

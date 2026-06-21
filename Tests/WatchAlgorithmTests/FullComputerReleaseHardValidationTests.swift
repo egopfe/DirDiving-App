@@ -37,7 +37,7 @@ final class FullComputerReleaseHardValidationTests: XCTestCase {
     // MARK: - Numerical robustness
 
     func testNaNDepthRejectedWithoutResettingTissues() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 15, timestamp: sessionStart.addingTimeInterval(30))
         let before = engine.snapshot.tissueState
         XCTAssertFalse(engine.ingestSample(depthMeters: .nan, timestamp: sessionStart.addingTimeInterval(31)))
@@ -46,13 +46,13 @@ final class FullComputerReleaseHardValidationTests: XCTestCase {
     }
 
     func testInfiniteDepthRejected() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         XCTAssertFalse(engine.ingestSample(depthMeters: .infinity, timestamp: sessionStart))
         XCTAssertEqual(engine.snapshot.engineState, .unavailable)
     }
 
     func testNegativeDepthRejected() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         XCTAssertFalse(engine.ingestSample(depthMeters: -1, timestamp: sessionStart))
         XCTAssertEqual(engine.snapshot.engineState, .unavailable)
     }
@@ -90,7 +90,7 @@ final class FullComputerReleaseHardValidationTests: XCTestCase {
     }
 
     func testRepetitiveInitialTissuesReduceNDLAndMatchSolver() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 0, timestamp: sessionStart)
         _ = engine.ingestSample(depthMeters: 28, timestamp: sessionStart.addingTimeInterval(120))
         var tickTime = sessionStart.addingTimeInterval(120)
@@ -143,7 +143,7 @@ final class FullComputerReleaseHardValidationTests: XCTestCase {
     }
 
     func testMultilevelProfileProducesFiniteDecoMetrics() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         let depths: [(Double, TimeInterval)] = [
             (0, 0),
             (18, 90),
@@ -217,7 +217,7 @@ final class FullComputerReleaseHardValidationTests: XCTestCase {
     // MARK: - Performance budgets
 
     func testDecoSolverRespectsPerformanceBudget() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 32, timestamp: sessionStart.addingTimeInterval(600))
         engine.tick(now: sessionStart.addingTimeInterval(600))
         let input = FullComputerDecoSolverInput(
@@ -234,7 +234,7 @@ final class FullComputerReleaseHardValidationTests: XCTestCase {
 
     func testCheckpointRoundTripWithinBudget() throws {
         let sessionID = UUID()
-        var engine = try FullComputerRuntimeEngine(sessionStart: sessionStart)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: sessionStart)
         _ = engine.ingestSample(depthMeters: 26, timestamp: sessionStart.addingTimeInterval(300))
         engine.tick(now: sessionStart.addingTimeInterval(300))
 

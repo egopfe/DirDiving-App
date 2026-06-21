@@ -680,6 +680,9 @@
 "fc.environment.confirm.row" = "Environment";
 "fc.environment.sensor.proposal" = "Sensor elevation proposal — confirm to use";
 "fc.environment.sensor.accept" = "Use sensor value";
+"fc.environment.sensor.keep_current" = "Keep current value";
+"fc.environment.sensor.sampling" = "Measuring current altitude…";
+"fc.environment.sensor.accuracy_format" = "accuracy ±%d m";
 "startup.coming_soon.subtitle" = "NOT YET AVAILABLE";
 "startup.coming_soon.body" = "This activity is not release-ready on MAIN. Use Diving for the stable experience.";
 "startup.coming_soon.back" = "BACK";

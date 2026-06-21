@@ -25,7 +25,7 @@ final class WatchGaugeMathCompletionTests: XCTestCase {
     func testTTVRemainsIsolatedFromFullComputerPlan() {
         let ttv = DiveAlgorithm.ttvIndex(averageDepthMeters: 20, durationSeconds: 1_200)
         XCTAssertEqual(ttv, 40, accuracy: 0.001)
-        let readiness = FullComputerRuntimeEngine.canStart()
+        let readiness = FullComputerRuntimeEngine.canStart(plan: .defaultAirGF3070)
         XCTAssertTrue(readiness.ready)
         XCTAssertNotEqual(ttv, Double(readiness.diagnostics.count))
     }

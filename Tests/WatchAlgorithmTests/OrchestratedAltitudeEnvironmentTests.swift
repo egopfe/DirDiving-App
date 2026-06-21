@@ -97,6 +97,141 @@ final class OrchestratedAltitudeEnvironmentTests: XCTestCase {
         XCTAssertLessThan(ambient, seaAmbient)
     }
 
+    func testWatchManualEnvironmentPropagatesToConfirmedRuntime() throws {
+        let config = FullComputerPrediveConfigurationStore.shared
+        config.setDraftEnvironment(
+            altitudeMeters: 1_200,
+            salinity: .fresh,
+            source: .watchSettingsManual
+        )
+        config.commitConfirmedProfile()
+
+        let plan = try XCTUnwrap(config.runtimePlan())
+        XCTAssertEqual(plan.plannerEnvironment.altitudeMeters, 1_200, accuracy: 0.01)
+        XCTAssertEqual(plan.plannerEnvironment.salinity, .fresh)
+        XCTAssertEqual(config.confirmedEnvironment?.source, .watchSettingsManual)
+    }
+
+    func testSensorMeasurementRemainsPendingUntilExplicitAcceptance() throws {
+        let config = FullComputerPrediveConfigurationStore.shared
+        config.setDraftEnvironment(
+            altitudeMeters: 900,
+            salinity: .salt,
+            source: .watchSettingsManual
+        )
+        let provider = FakeAbsoluteAltitudeProvider()
+        let service = FullComputerEnvironmentSensorService(provider: provider)
+
+        service.requestProposal(into: config)
+        for offset in [0.0, 1.0, -1.0, 2.0, 0.5] {
+            provider.emit(
+                altitudeMeters: 1_250 + offset,
+                accuracyMeters: 8,
+                precisionMeters: 1
+            )
+        }
+
+        XCTAssertEqual(service.state, .proposalReady)
+        XCTAssertEqual(try XCTUnwrap(config.draftEnvironment?.altitudeMeters), 900, accuracy: 0.01)
+        XCTAssertEqual(config.draftEnvironment?.source, .watchSettingsManual)
+        XCTAssertEqual(config.pendingSensorProposal?.source, .watchSensorMeasuredProposal)
+        XCTAssertEqual(try XCTUnwrap(config.pendingSensorProposal?.altitudeMeters), 1_250.5, accuracy: 0.01)
+
+        config.acceptPendingSensorProposal()
+        XCTAssertNil(config.pendingSensorProposal)
+        XCTAssertEqual(config.draftEnvironment?.source, .watchSensorMeasuredProposal)
+        XCTAssertEqual(try XCTUnwrap(config.draftEnvironment?.sensorAccuracyMeters), 8, accuracy: 0.01)
+        service.cancel()
+    }
+
+    func testSensorProposalDoesNotCreateEnvironmentWithoutAcceptance() {
+        let config = FullComputerPrediveConfigurationStore.shared
+        let provider = FakeAbsoluteAltitudeProvider()
+        let service = FullComputerEnvironmentSensorService(provider: provider)
+
+        service.requestProposal(into: config)
+        for altitude in [1_498.0, 1_500.0, 1_501.0, 1_499.0, 1_500.5] {
+            provider.emit(
+                altitudeMeters: altitude,
+                accuracyMeters: 6,
+                precisionMeters: 1
+            )
+        }
+
+        XCTAssertNil(config.draftEnvironment)
+        XCTAssertNotNil(config.pendingSensorProposal)
+        XCTAssertNil(config.runtimePlan())
+        service.cancel()
+    }
+
+    func testSensorSamplingRejectsInaccurateOrUnstableWindows() {
+        let now = Date(timeIntervalSince1970: 50_000)
+        let inaccurate = (0..<5).map { index in
+            FullComputerAbsoluteAltitudeSample(
+                altitudeMeters: 1_000 + Double(index),
+                accuracyMeters: FullComputerEnvironmentRecord.maximumSensorAccuracyMeters + 1,
+                precisionMeters: 1,
+                receivedAt: now.addingTimeInterval(Double(index))
+            )
+        }
+        XCTAssertNil(FullComputerAltitudeSamplingPolicy.stableProposal(from: inaccurate))
+
+        let unstableAltitudes = [1_000.0, 1_030.0, 990.0, 1_025.0, 980.0]
+        let unstable = unstableAltitudes.enumerated().map { index, altitude in
+            FullComputerAbsoluteAltitudeSample(
+                altitudeMeters: altitude,
+                accuracyMeters: 5,
+                precisionMeters: 1,
+                receivedAt: now.addingTimeInterval(Double(index))
+            )
+        }
+        XCTAssertNil(FullComputerAltitudeSamplingPolicy.stableProposal(from: unstable))
+    }
+
+    func testLiveEnvironmentRejectsFutureSchemaDensityMismatchAndMissingSensorMetadata() throws {
+        var future = try XCTUnwrap(
+            FullComputerEnvironmentRecord.make(
+                altitudeMeters: 1_000,
+                salinity: .salt,
+                source: .watchSettingsManual
+            ).successValue
+        )
+        future.schemaVersion += 1
+        XCTAssertEqual(future.validateForLiveStart(), .unsupportedSchema)
+
+        var wrongDensity = try XCTUnwrap(
+            FullComputerEnvironmentRecord.make(
+                altitudeMeters: 1_000,
+                salinity: .fresh,
+                source: .watchSettingsManual
+            ).successValue
+        )
+        wrongDensity.waterDensityKgPerM3 += 10
+        XCTAssertEqual(wrongDensity.validateForLiveStart(), .waterDensityMismatch)
+
+        let sensorWithoutAccuracy = try XCTUnwrap(
+            FullComputerEnvironmentRecord.make(
+                altitudeMeters: 1_000,
+                salinity: .salt,
+                source: .watchSensorMeasuredProposal
+            ).successValue
+        )
+        XCTAssertEqual(sensorWithoutAccuracy.validateForLiveStart(), .invalidSensorMetadata)
+
+        let now = Date(timeIntervalSince1970: 60_000)
+        var staleSensor = try XCTUnwrap(
+            FullComputerEnvironmentRecord.make(
+                altitudeMeters: 1_000,
+                salinity: .salt,
+                source: .watchSensorMeasuredProposal,
+                capturedAt: now.addingTimeInterval(-(FullComputerEnvironmentRecord.maximumSensorAgeSeconds + 1))
+            ).successValue
+        )
+        staleSensor.sensorAccuracyMeters = 5
+        staleSensor.sensorPrecisionMeters = 1
+        XCTAssertEqual(staleSensor.validateForLiveStart(now: now), .staleSensorMeasurement)
+    }
+
     private func activateAndAssert(
         _ package: DivePlanPackage,
         expectedAltitude: Double,
@@ -216,6 +351,38 @@ final class OrchestratedAltitudeEnvironmentTests: XCTestCase {
             capabilities: .current
         )
         return try DivePlanPackageCodec.seal(body)
+    }
+}
+
+@MainActor
+private final class FakeAbsoluteAltitudeProvider: FullComputerAbsoluteAltitudeProviding {
+    var isAvailable = true
+    private var handler: ((Result<FullComputerAbsoluteAltitudeSample, FullComputerEnvironmentSensorError>) -> Void)?
+
+    func start(
+        handler: @escaping (Result<FullComputerAbsoluteAltitudeSample, FullComputerEnvironmentSensorError>) -> Void
+    ) {
+        self.handler = handler
+    }
+
+    func stop() {}
+
+    func emit(
+        altitudeMeters: Double,
+        accuracyMeters: Double,
+        precisionMeters: Double,
+        receivedAt: Date = Date()
+    ) {
+        handler?(
+            .success(
+                FullComputerAbsoluteAltitudeSample(
+                    altitudeMeters: altitudeMeters,
+                    accuracyMeters: accuracyMeters,
+                    precisionMeters: precisionMeters,
+                    receivedAt: receivedAt
+                )
+            )
+        )
     }
 }
 

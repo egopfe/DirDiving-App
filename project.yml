@@ -293,6 +293,7 @@ targets:
       - Utils/SnorkelingQAEvidenceCatalog.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
+      - Services/FullComputerEnvironmentSensorService.swift
       - Services/FullComputerRuntimeEngine.swift
       - Utils/WatchModeSelectionPreferences.swift
       - Services/DIRActivitySelectionStore.swift

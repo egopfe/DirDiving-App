@@ -25,11 +25,19 @@ enum FullComputerEnvironmentPresentation {
         guard let salinity = record.salinity else {
             return String(localized: "fc.environment.summary.invalid")
         }
-        return String(
+        let base = String(
             format: String(localized: "fc.environment.summary_format"),
             Int(record.altitudeMeters.rounded()),
             salinityLabel(salinity: salinity),
             sourceLabel(source: record.source)
+        )
+        guard record.source == .watchSensorMeasuredProposal,
+              let accuracy = record.sensorAccuracyMeters else {
+            return base
+        }
+        return base + " · " + String(
+            format: String(localized: "fc.environment.sensor.accuracy_format"),
+            Int(accuracy.rounded())
         )
     }
 }
