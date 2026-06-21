@@ -307,6 +307,8 @@ waterDensityKgPerM3
 environmentSource
 confidenceOrFallbackState
 capturedAt
+sensorAccuracyMeters
+sensorPrecisionMeters
 ```
 
 The only supported live environment sources are:
@@ -323,7 +325,7 @@ Apply this source policy:
 
 1. **Imported from iPhone Plan:** preserve and validate the complete environment received with the signed plan.
 2. **Manually entered on Watch:** provide an Altitude/Environment option in Watch Full Computer Settings. Validate and persist it as a draft source until predive confirmation.
-3. **Sensor-measured proposal:** when the user starts Full Computer and the Watch detects elevation, measure the available altitude/surface-pressure signal and propose the validated value on the predive screen. The user must confirm it; never apply or replace another source silently.
+3. **Sensor-measured proposal:** immediately before Full Computer confirmation, use a retained `CMAltimeter` and `startAbsoluteAltitudeUpdates(to:withHandler:)` to collect fresh `CMAbsoluteAltitudeData` directly on Apple Watch. Validate availability, finite altitude, accuracy, precision, sample count, stability, freshness, timeout, and supported range; then present the result as a pending proposal. The user must explicitly accept it; never apply or replace another source silently. Do not use cached `CLLocationManager.location.altitude` or GPS elevation for this authority path.
 4. **No explicit sea-level option:** do not expose a separate sea-level choice and do not use sea level as an explicit or implicit default. A validated source may naturally resolve to approximately zero altitude, but missing, rejected, or unavailable input must block live start.
 
 When imported, manual, and sensor values disagree beyond a documented tolerance, show the values and sources, require an explicit selection/confirmation, record the decision, and fail closed if the conflict is not resolved. Freeze the confirmed source and values when the dive starts.
@@ -370,6 +372,9 @@ Requirements:
 - preserve the exact validated package environment during import;
 - provide a manually editable Altitude/Environment field in Watch Full Computer Settings;
 - request a sensor measurement when Full Computer startup begins at detected elevation and present it as a confirmation proposal;
+- retain the asynchronous `CMAltimeter` provider until completion and stop absolute-altitude updates on success, error, timeout, cancellation, or view exit;
+- require a fresh stable sample window and persist the accepted sensor timestamp, accuracy, and precision with the canonical environment;
+- block live start while sensor sampling is active or a sensor proposal remains unresolved;
 - never let a sensor proposal silently overwrite an imported iPhone plan or Watch manual value;
 - persist gas profile and environment atomically;
 - keep draft and confirmed environment separate;
@@ -671,7 +676,7 @@ Execute on supported Apple Watch Ultra hardware:
 - Water Lock;
 - wet/glove/crown interaction;
 - manual and automatic Gauge start/stop;
-- Full Computer start with imported iPhone, Watch Settings manual, and confirmed sensor-proposal environments, including validated near-zero and elevated configurations where safely testable;
+- Full Computer start with imported iPhone, Watch Settings manual, and a fresh physical-Watch `CMAbsoluteAltitudeData` proposal, including validated near-zero and elevated configurations where safely testable;
 - sensor unavailable, stale, spike, gap, out-of-order, relaunch, checkpoint restore;
 - deco/stop/gas-switch UI states using safe replay/simulation where real decompression exposure is inappropriate;
 - haptics enabled/disabled alternatives;
@@ -877,6 +882,7 @@ rg -n "DiveManager|DiveLogStore|ApneaSessionEngine|Snorkeling|FullComputerRuntim
 rg -n "fullComputerPlanPackage|apneaSyncPlanPackage|dirdiving_apnea_session|dirdiving_snorkeling|dirdiving_dive_session" .
 rg -n "TODO|FIXME" Shared Services Models Views iOSApp Tests Docs Scripts
 rg -n "plannerEnvironment|altitudeMeters|surfacePressureBar|seaLevelSaltWater" Shared Services Models Utils Views iOSApp Tests
+rg -n "CMAltimeter|startAbsoluteAltitudeUpdates|CMAbsoluteAltitudeData|CLLocationManager\.location\.altitude|pendingSensorProposal|sensorAccuracyMeters|sensorPrecisionMeters" Services Shared Utils Views Tests project.yml
 rg -n "FullComputerRuntimePlan\(profile:|FullComputerGasProfile\(importing:" Services Shared Utils Tests
 rg -n "P0|P1|P2|P3|P4|OPEN|PENDING|BLOCKED|DEFERRED" Docs/ORCHESTRATED_AUDIT_* Docs/WATCH_BUHLMANN_ALTITUDE_* Docs/UI_UX_*
 ```
@@ -1064,6 +1070,8 @@ OPEN_P2: 0
 OPEN_P3: 0
 OPEN_P4: 0
 WATCH_ALTITUDE_END_TO_END: PASS
+WATCH_CMALTIMETER_PREDIVE_ACQUISITION: PASS
+WATCH_SENSOR_PROPOSAL_EXPLICIT_ACCEPTANCE: PASS
 INDEPENDENT_ALTITUDE_ORACLE: PASS
 FULL_COMPUTER_ENVIRONMENT_PERSISTENCE: PASS
 FULL_COMPUTER_LOGBOOK_ENVIRONMENT: PASS

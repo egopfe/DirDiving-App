@@ -34,7 +34,7 @@ final class FullComputerDecoSolverTests: XCTestCase {
     }
 
     func testAtomicTransitionToDecompressionNeverShowsZeroNDL() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: start)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: start)
         _ = engine.ingestSample(depthMeters: 0, timestamp: start)
         _ = engine.ingestSample(depthMeters: 38, timestamp: start.addingTimeInterval(120))
         for minute in 1...24 {
@@ -50,7 +50,7 @@ final class FullComputerDecoSolverTests: XCTestCase {
     }
 
     func testCeilingPresentationRoundingIsSeparateFromExact() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: start)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: start)
         _ = engine.ingestSample(depthMeters: 35, timestamp: start)
         for minute in 1...30 {
             engine.tick(now: start.addingTimeInterval(Double(minute * 60)))
@@ -70,7 +70,7 @@ final class FullComputerDecoSolverTests: XCTestCase {
     }
 
     func testSolverCachingReturnsIdenticalResultForSameInput() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: start)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: start)
         _ = engine.ingestSample(depthMeters: 24, timestamp: start.addingTimeInterval(300))
         let first = engine.snapshot.decoPresentation
         engine.tick(now: start.addingTimeInterval(301))
@@ -81,7 +81,7 @@ final class FullComputerDecoSolverTests: XCTestCase {
     func testPlannerRuntimeTTSWithinTolerance() throws {
         let depth = 32.0
         let bottomMinutes = 22.0
-        var engine = try FullComputerRuntimeEngine(sessionStart: start)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: start)
         _ = engine.ingestSample(depthMeters: 0, timestamp: start)
         _ = engine.ingestSample(depthMeters: depth, timestamp: start.addingTimeInterval(120))
         var tick = start.addingTimeInterval(120)
@@ -111,7 +111,7 @@ final class FullComputerDecoSolverTests: XCTestCase {
     }
 
     func testDecoStopPanelAppearsWhenStopsExist() throws {
-        var engine = try FullComputerRuntimeEngine(sessionStart: start)
+        var engine = try FullComputerRuntimeEngine(plan: .defaultAirGF3070, sessionStart: start)
         _ = engine.ingestSample(depthMeters: 40, timestamp: start)
         for minute in 1...28 {
             engine.tick(now: start.addingTimeInterval(Double(minute * 60)))

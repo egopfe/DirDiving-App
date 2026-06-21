@@ -84,7 +84,11 @@ final class FullComputerPrediveConfigurationStore: ObservableObject {
     }
 
     func acceptPendingSensorProposal() {
-        guard canEdit, let pendingSensorProposal else { return }
+        guard canEdit,
+              let pendingSensorProposal,
+              pendingSensorProposal.validateForLiveStart() == nil else {
+            return
+        }
         draftEnvironment = pendingSensorProposal
         self.pendingSensorProposal = nil
         persistDraftEnvironment()
@@ -97,12 +101,8 @@ final class FullComputerPrediveConfigurationStore: ObservableObject {
     func proposeSensorEnvironment(_ record: FullComputerEnvironmentRecord) {
         guard canEdit else { return }
         guard record.source == .watchSensorMeasuredProposal else { return }
-        if let existing = draftEnvironment, existing.source != .watchSensorMeasuredProposal {
-            pendingSensorProposal = record
-            return
-        }
-        draftEnvironment = record
-        persistDraftEnvironment()
+        guard record.validateForLiveStart() == nil else { return }
+        pendingSensorProposal = record
     }
 
     func setBottomGasKind(_ kind: FullComputerBottomGasKind) {
