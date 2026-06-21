@@ -15,11 +15,13 @@ Exit: deterministic failing evidence exists and remediation scope is reviewed.
 ## Phase B — P0 safety and data integrity
 
 1. Introduce a versioned Watch Full Computer predive configuration that contains gas profile plus validated frozen `PlannerEnvironment` and source/confidence state.
-2. Convert `DivePlanEnvironmentPayload` to that environment during import; reject invalid/future/missing data.
-3. Remove implicit `.seaLevelSaltWater` defaults from live-start APIs. Sea level may be an explicit user choice, never an invisible fallback.
-4. Show environment on imported-plan/predive confirmation and block incompatible altitude plans.
-5. Propagate the same immutable environment to tissues, solver, gas eligibility, PPO2/MOD, schedule, checkpoint, restore, UI, and diagnostics.
-6. Prove no calculation failure becomes optimistic no-decompression.
+2. Support exactly three live sources: environment imported from an iPhone plan, altitude/environment entered manually in Watch Full Computer Settings, or a Watch sensor-measured value proposed for confirmation when Full Computer starts at detected elevation.
+3. Convert `DivePlanEnvironmentPayload` to the canonical environment during import; reject invalid/future/missing data.
+4. Add the Watch manual Altitude/Environment setting and the startup sensor proposal. Never silently overwrite an imported or manual source; require explicit confirmation when sources disagree.
+5. Remove implicit `.seaLevelSaltWater` defaults and prohibit a separate explicit sea-level option. A validated source may resolve to near-zero altitude, but missing or unavailable input must block live start.
+6. Show environment values and source on imported-plan/predive confirmation and block incompatible altitude plans.
+7. Freeze the confirmed environment at dive start and propagate it to tissues, solver, gas eligibility, PPO2/MOD, schedule, checkpoint, restore, UI, and diagnostics.
+8. Prove no calculation failure becomes optimistic no-decompression.
 
 Exit: ORCH-001 closed with independent altitude evidence; rerun audits 0, 0W, 01W, 1, 2, 3, 4, 8, 12, 13, 15, 16.
 
@@ -74,4 +76,3 @@ Every remediation must preserve:
 - HMAC, signed ACK, nonce/replay, trust-reset, schema, revision, and activity namespace protections;
 - no unsupported certification claims;
 - physical/external QA marked pending until demonstrated.
-
