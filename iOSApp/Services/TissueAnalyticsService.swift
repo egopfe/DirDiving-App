@@ -1,34 +1,52 @@
 import Foundation
 
 enum TissueAnalyticsService {
+    private static let maxCacheEntries = 32
     private static var cache: [String: TissueAnalyticsTrace] = [:]
+    private static var cacheOrder: [String] = []
 
     static func presentationForCCRPlan(plan: CCRPlanResult, input: CCRPlanInput) -> TissueAnalyticsPresentation? {
         let key = ccrPlannerCacheKey(plan: plan, input: input)
-        if let cached = cache[key] { return TissueAnalyticsPresentation(trace: cached, cacheKey: key) }
+        if let cached = cachedTrace(for: key) { return TissueAnalyticsPresentation(trace: cached, cacheKey: key) }
         guard let trace = buildFromCCRPlan(plan: plan, input: input) else { return nil }
-        cache[key] = trace
+        storeTrace(trace, for: key)
         return TissueAnalyticsPresentation(trace: trace, cacheKey: key)
     }
 
     static func presentationForPlanner(plan: DivePlanResult, input: GasPlanInput, mode: PlannerMode) -> TissueAnalyticsPresentation? {
         let key = plannerCacheKey(plan: plan, input: input, mode: mode)
-        if let cached = cache[key] { return TissueAnalyticsPresentation(trace: cached, cacheKey: key) }
+        if let cached = cachedTrace(for: key) { return TissueAnalyticsPresentation(trace: cached, cacheKey: key) }
         guard let trace = buildFromPlanner(plan: plan, input: input, mode: mode) else { return nil }
-        cache[key] = trace
+        storeTrace(trace, for: key)
         return TissueAnalyticsPresentation(trace: trace, cacheKey: key)
     }
 
     static func presentationForSession(_ session: DiveSession) -> TissueAnalyticsPresentation? {
         let key = "session-\(session.id.uuidString)-\(session.samples.count)-\(session.durationSeconds)"
-        if let cached = cache[key] { return TissueAnalyticsPresentation(trace: cached, cacheKey: key) }
+        if let cached = cachedTrace(for: key) { return TissueAnalyticsPresentation(trace: cached, cacheKey: key) }
         guard let trace = buildFromSession(session) else { return nil }
-        cache[key] = trace
+        storeTrace(trace, for: key)
         return TissueAnalyticsPresentation(trace: trace, cacheKey: key)
     }
 
     static func invalidateCache() {
         cache.removeAll()
+        cacheOrder.removeAll()
+    }
+
+    private static func cachedTrace(for key: String) -> TissueAnalyticsTrace? {
+        cache[key]
+    }
+
+    private static func storeTrace(_ trace: TissueAnalyticsTrace, for key: String) {
+        if cache[key] != nil {
+            cacheOrder.removeAll { $0 == key }
+        } else if cacheOrder.count >= maxCacheEntries, let evicted = cacheOrder.first {
+            cache.removeValue(forKey: evicted)
+            cacheOrder.removeFirst()
+        }
+        cache[key] = trace
+        cacheOrder.append(key)
     }
 
     static func buildFromCCRPlan(plan: CCRPlanResult, input: CCRPlanInput) -> TissueAnalyticsTrace? {
@@ -83,6 +101,9 @@ enum TissueAnalyticsService {
     }
 
     static func buildFromPlanner(plan: DivePlanResult, input: GasPlanInput, mode: PlannerMode) -> TissueAnalyticsTrace? {
+        let signpost = DIRPerformanceSignpost.begin(.tissueAnalyticsGeneration)
+        defer { signpost.end() }
+
         guard !plan.tissueHistory.isEmpty else { return nil }
         guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) else {
             return nil
@@ -118,17 +139,29 @@ enum TissueAnalyticsService {
         )
 
         return TissueAnalyticsTrace(
-            samples: samples,
+            samples: downsampledSamples(samples),
             finalCompartments: finalCompartments,
             controllingCompartment: controlling,
             maxPPN2Bar: maxPPN2,
             endEquivalentMeters: endMeters,
             source: .planned,
             summary: summary,
-            depthProfilePoints: plan.depthProfilePoints,
+            depthProfilePoints: downsampledDepthPoints(plan.depthProfilePoints),
             segments: plan.segments,
             decoStops: plan.decoStops.map { TissueAnalyticsTrace.DecoStopSnapshot(depthMeters: $0.depthMeters, minutes: $0.minutes, gas: $0.gas) }
         )
+    }
+
+    private static func downsampledSamples(_ samples: [TissueAnalyticsSample]) -> [TissueAnalyticsSample] {
+        let cap = PresentationSeriesDownsampler.defaultMaxPresentationPoints
+        guard samples.count > cap else { return samples }
+        return PresentationSeriesDownsampler.downsampleUniform(samples, maxPoints: cap)
+    }
+
+    private static func downsampledDepthPoints(_ points: [DepthProfilePoint]) -> [DepthProfilePoint] {
+        let cap = PresentationSeriesDownsampler.defaultMaxPresentationPoints
+        guard points.count > cap else { return points }
+        return PresentationSeriesDownsampler.downsampleUniform(points, maxPoints: cap)
     }
 
     static func logbookEntrySubtitle(for session: DiveSession) -> String {

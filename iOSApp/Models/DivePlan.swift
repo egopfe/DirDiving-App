@@ -111,6 +111,42 @@ struct DivePlanResult: Hashable {
     let plannerMode: PlannerMode
     let modeGuidanceMessage: PlannerUserFacingMessage?
     let ratioDeco: RatioDecoPlanningBundle?
+
+    static let empty = DivePlanResult(
+        ndlMinutes: 0,
+        ttsMinutes: 0,
+        totalRuntimeMinutes: 0,
+        calculationCompleteness: .noDecompressionSolution,
+        decoStops: [],
+        ascentTableRows: [],
+        tissueHistory: .empty,
+        depthProfilePoints: [],
+        cnsPercent: 0,
+        otu: 0,
+        gasAnalysis: GasPlanningService.analyze(input: GasPlanInput(), mode: .base),
+        segments: [],
+        gfComparisons: [],
+        contingencyPlans: [],
+        teamMatches: [],
+        briefingLines: [],
+        modValidationIssues: [],
+        states: [],
+        buhlmannState: .invalidInput,
+        resultHeader: PlannerResultHeader(
+            kind: .environmentAdjustedReferencePlan,
+            title: "",
+            subtitle: "",
+            severity: .info
+        ),
+        repetitiveContext: nil,
+        environmentSummary: nil,
+        gasLedger: nil,
+        gasLedgerFailure: nil,
+        userFacingWarnings: [],
+        plannerMode: .base,
+        modeGuidanceMessage: nil,
+        ratioDeco: nil
+    )
 }
 
 struct NDLPoint: Identifiable, Hashable {
@@ -130,4 +166,15 @@ struct BuhlmannPlanResult: Hashable {
     let curve: [NDLPoint]
     let warning: String?
     let modelState: BuhlmannModelState
+
+    static let emptyReference = BuhlmannPlanResult(
+        depthMeters: 0,
+        gasO2Fraction: 0.21,
+        heliumFraction: 0,
+        nitrogenFraction: 0.79,
+        ndlMinutes: 0,
+        curve: [],
+        warning: nil,
+        modelState: .invalidInput
+    )
 }

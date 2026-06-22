@@ -50,7 +50,7 @@ enum IOSApneaLogbookPresentationMapper {
         _ session: ApneaSession,
         units: IOSUnitPreference
     ) -> IOSApneaSessionRowPresentation {
-        let stats = session.refreshedStatistics()
+        let stats = session.statistics
         return IOSApneaSessionRowPresentation(
             id: session.id,
             dateText: session.createdAt.formatted(date: .abbreviated, time: .omitted),
@@ -66,7 +66,7 @@ enum IOSApneaLogbookPresentationMapper {
         _ session: ApneaSession,
         units: IOSUnitPreference
     ) -> IOSApneaSessionSummaryPresentation {
-        let stats = session.refreshedStatistics()
+        let stats = session.statistics
         return IOSApneaSessionSummaryPresentation(
             title: DIRIOSLocalizer.string("apnea.ios.session.detail.title"),
             dateText: session.createdAt.formatted(date: .abbreviated, time: .shortened),

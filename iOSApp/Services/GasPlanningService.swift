@@ -470,22 +470,20 @@ enum GasPlanningService {
     ) -> [ContingencyPlan] {
         let baseRequest = BuhlmannPlanner.makeRequest(input: input, environment: environment)
 
-        func ttsMinutes(for request: BuhlmannPlanRequest) -> Int {
-            BuhlmannEngine.plan(request).ttsMinutes
-        }
-
-        func gasRequiredLiters(for request: BuhlmannPlanRequest) -> Double {
+        func scenarioMetrics(for request: BuhlmannPlanRequest) -> (tts: Int, gasLiters: Double) {
             let plan = BuhlmannEngine.plan(request)
+            let gasLiters: Double
             switch ScheduleGasConsumptionService.analyze(input: input, enginePlan: plan, environment: environment) {
             case .success(let ledger):
-                return ledger.totalConsumedLiters
+                gasLiters = ledger.totalConsumedLiters
             case .failure:
                 let bottomATA = AmbientPressureModel.ambientPressureBar(
                     depthMeters: request.maxDepthMeters,
                     environment: environment
                 ) ?? environment.surfacePressureBar
-                return input.sacLitersPerMinute * bottomATA * request.bottomMinutes
+                gasLiters = input.sacLitersPerMinute * bottomATA * request.bottomMinutes
             }
+            return (plan.ttsMinutes, gasLiters)
         }
 
         var delayed = baseRequest
@@ -510,11 +508,15 @@ enum GasPlanningService {
         )
 
         let lostGasLiters = baseAnalysis.rockBottomLiters
-        let delayedTTS = ttsMinutes(for: delayed)
-        let extendedTTS = ttsMinutes(for: extended)
-        let deeperTTS = ttsMinutes(for: deeper)
-        let extendedLiters = gasRequiredLiters(for: extended)
-        let deeperLiters = gasRequiredLiters(for: deeper)
+        let delayedMetrics = scenarioMetrics(for: delayed)
+        let extendedMetrics = scenarioMetrics(for: extended)
+        let deeperMetrics = scenarioMetrics(for: deeper)
+        let delayedTTS = delayedMetrics.tts
+        let extendedTTS = extendedMetrics.tts
+        let deeperTTS = deeperMetrics.tts
+        let delayedLiters = delayedMetrics.gasLiters
+        let extendedLiters = extendedMetrics.gasLiters
+        let deeperLiters = deeperMetrics.gasLiters
         let stressTTS = max(extendedTTS, deeperTTS)
         let stressLiters = extendedTTS >= deeperTTS ? extendedLiters : deeperLiters
         let stressAction = extendedTTS >= deeperTTS
@@ -532,7 +534,7 @@ enum GasPlanningService {
             ContingencyPlan(
                 scenario: .delayedAscent,
                 ttsMinutes: delayedTTS,
-                gasRequiredLiters: gasRequiredLiters(for: delayed),
+                gasRequiredLiters: delayedLiters,
                 action: DIRIOSLocalizer.string("planner.contingency.delayed_ascent.action"),
                 warning: DIRIOSLocalizer.string("planner.contingency.delayed_ascent.warning")
             ),

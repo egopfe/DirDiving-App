@@ -50,7 +50,7 @@ enum IOSSnorkelingLogbookPresentationMapper {
         _ session: SnorkelingSession,
         units: IOSUnitPreference
     ) -> IOSSnorkelingSessionRowPresentation {
-        let stats = session.refreshedStatistics()
+        let stats = session.statistics
         return IOSSnorkelingSessionRowPresentation(
             id: session.id,
             dateText: session.createdAt.formatted(date: .abbreviated, time: .shortened),
@@ -68,7 +68,7 @@ enum IOSSnorkelingLogbookPresentationMapper {
         _ session: SnorkelingSession,
         units: IOSUnitPreference
     ) -> IOSSnorkelingSessionSummaryPresentation {
-        let stats = session.refreshedStatistics()
+        let stats = session.statistics
         return IOSSnorkelingSessionSummaryPresentation(
             title: DIRIOSLocalizer.string("snorkeling.ios.session.detail.title"),
             dateText: session.createdAt.formatted(date: .abbreviated, time: .shortened),

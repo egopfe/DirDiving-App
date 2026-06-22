@@ -1,0 +1,23 @@
+Requirement_ID,Area,Requirement,Source_File,Existing_Test,Missing_Test,Dataset_Size,Budget,Current_Result,Severity,Notes
+REQ-IOS-PERF-001,Startup,Coordinator must not block first frame with unbounded sync I/O,IOSCompanionStoreCoordinator.swift,IOSCompanionStoreLifecycleTests (source),Startup timing integration test,N/A,BUD-IOS-001,NOT_MEASURED,P1,Eager diving init
+REQ-IOS-PERF-002,Startup,Apnea/Snorkeling stores lazy until activity selected,IOSCompanionStoreCoordinator.swift,IOSCompanionStoreLifecycleTests,Runtime lazy attach test,N/A,N/A,PASS source,P3,Full bundle on Settings tab exception
+REQ-IOS-PERF-003,Settings,Mode switch must not mutate runtime activity,IOSCompanionSettingsScopeStore.swift,IOSActivitySettingsModeSwitchTests,Settings switch perf test,N/A,BUD-IOS-003,PASS functional,N/A,Perf not measured
+REQ-IOS-PERF-004,Settings,Settings content visible without nested Form,MoreView.swift,IOSActivitySettingsContentVisibilityTests,None,N/A,N/A,PASS,N/A,
+REQ-IOS-PERF-005,Planner,Rapid edits debounced not storming solver,PlannerStore.swift,PerformanceConcurrencyBatteryRemediationTests.testPlannerRapidEditStressBounded,Planner timing budget test,100 edits,BUD-IOS-004,PASS debounce,P1,No wall-clock budget assert
+REQ-IOS-PERF-006,Planner,Calculate must not show stale results,PlannerStore.swift,PlannerResultState tests,Stale guard stress test,N/A,N/A,PASS gen token,P2,
+REQ-IOS-PERF-007,Planner,Heavy solve off main thread or bounded,PlannerStore.swift,None,Main thread stall test,Long deco,BUD-IOS-019,FAIL,P0,All on MainActor
+REQ-IOS-PERF-008,Charts,OC planner charts capped at 2048 points,PlannerChartSnapshots.swift,PerformanceConcurrencyBatteryRemediationTests,Long runtime integration test,600 min,BUD-IOS-006,PASS downsample,P3,
+REQ-IOS-PERF-009,Charts,Tissue analytics charts bounded,TissueAnalyticsCharts.swift,None,Point count cap test,300+ min,BUD-IOS-007,FAIL,P1,
+REQ-IOS-PERF-010,Logbook,Decode 5000 synthetic sessions under budget,IOSDiveLogbookScalabilitySupport,testLogbookLoadBudgetSynthetic5000,Real store load test,5000,BUD-IOS-008,PASS,P3,Synthetic not production store
+REQ-IOS-PERF-011,Logbook,Sort/filter 1000 sessions bounded,LogbookScalabilitySupport,testLogbookSortAndFilterBounded,UI list test,1000,BUD-IOS-009,PASS,P2,
+REQ-IOS-PERF-012,Logbook,Runtime caps enforced,IOSAlgorithmConfiguration,IOSAlgorithmTests cap tests,5k session attempt,N/A,N/A,PASS cap,P3,40/80 limits
+REQ-IOS-PERF-013,Export,CSV import 10MB bounded,DiveImportService,PerformanceConcurrencyBatteryRemediationTests,Timing test,10MB,BUD-IOS-012,PARTIAL size,P2,
+REQ-IOS-PERF-014,Export,Export cancellable,IOSApneaSessionExportService,None,Cancel mid-export test,Large PDF,BUD-IOS-011,FAIL,P2,
+REQ-IOS-PERF-015,Sync,512KB payload codec roundtrip,WatchDiveSyncCodec,ActivitySyncLargePayloadTransferTests,None,512KB,BUD-IOS-013,PASS,N/A,
+REQ-IOS-PERF-016,Sync,iOS outbound flush backpressure,iOSApp/Services/WatchSyncService.swift,WatchSyncPendingFlushPolicy (Watch only),iOS flush policy test,40 sessions,BUD-IOS-014,FAIL,P1,
+REQ-IOS-PERF-017,Map,50k route downsampled to 4096,SnorkelingRoutePresentationSampling,testSnorkelingRoutePresentationSamplingBounded,UI map integration test,50000,BUD-IOS-016,PASS utility FAIL UI,P1,Unwired
+REQ-IOS-PERF-018,Map,Gap segmentation preserves discontinuities,SnorkelingSessionMapPresentation,IOSSnorkelingDashboardMapGapTests,None,N/A,N/A,PASS,N/A,
+REQ-IOS-PERF-019,Memory,Signpost catalog complete,DIRPerformanceSignpost.swift,PerformanceConcurrencyBatteryRemediationTests,Usage coverage audit,24 categories,N/A,PASS registry,P3,Gaps in usage
+REQ-IOS-PERF-020,Concurrency,Planner task cancellation on mode change,PlannerStore.swift,testPlannerRapidEditStressBounded,Mode switch cancel test,N/A,N/A,PASS debounce,P2,
+REQ-IOS-PERF-021,Battery,No accidental background loops,iOSApp/Services/WatchSyncService.swift,None,Energy log QA,N/A,N/A,NOT_MEASURED,P3,PENDING_PHYSICAL
+REQ-IOS-PERF-022,Observability,Budget registry covers operations,DIRPerformanceBudgets.swift,testPerformanceBudgetRegistryCoversAllOperations,Per-operation timing tests,All ops,N/A,PASS registry,P2,Enforcement missing
