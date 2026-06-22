@@ -1,0 +1,21 @@
+Budget_ID,Area,Metric,Target,Warning_Threshold,Fail_Threshold,Measurement_Method,Automated,Physical_Required,Current_Result,Status,Notes
+BUD-IOS-001,Startup,App launch to first UI frame,1000 ms,1500 ms,2500 ms,Instruments Time Profiler,PENDING,Yes,NOT_MEASURED,PENDING_PHYSICAL,Coordinator eager init not profiled
+BUD-IOS-002,Startup,First dashboard interactive,1500 ms,2000 ms,3500 ms,Instruments,PENDING,Yes,NOT_MEASURED,PENDING_PHYSICAL,
+BUD-IOS-003,Settings,Mode switch visible update,100 ms,200 ms,500 ms,SwiftUI Body Updates / manual,PENDING,Yes,NOT_MEASURED,PENDING_PHYSICAL,Dual bundle env injection cost unknown
+BUD-IOS-004,Planner,Debounced OC recalc,200 ms soft,500 ms,5000 ms,DIRPerformanceBudgets iosPlannerOCCalculation,Partial,No,SYNTHETIC_DEBOUNCE_PASS,WARN,Registry exists; no timing assertion in CI
+BUD-IOS-005,Planner,Calculate button full solve,100 ms UI feedback,300 ms,5000 ms,Instruments main thread,PENDING,Yes,NOT_MEASURED,PENDING_PHYSICAL,Synchronous bypass debounce
+BUD-IOS-006,Charts,OC planner chart snapshot build,50 ms,150 ms,500 ms,Signpost chart_snapshot_prep,PARTIAL,No,NOT_MEASURED,OPEN,Signpost present; no CI timing
+BUD-IOS-007,Charts,Tissue analytics generation,300 ms soft,800 ms,5000 ms,DIRPerformanceBudgets tissueAnalyticsGeneration,No,No,NOT_MEASURED,FAIL,No signpost instrumentation
+BUD-IOS-008,Logbook,Decode 5000 synthetic sessions,500 ms soft,2000 ms,5000 ms,PerformanceConcurrencyBatteryRemediationTests,Yes,No,PASS,PASS,testLogbookLoadBudgetSynthetic5000
+BUD-IOS-009,Logbook,List first paint 1000 sessions,300 ms,800 ms,2000 ms,Instruments,PENDING,Yes,NOT_APPLICABLE_CAP,CAP_BOUNDED,Runtime cap 40 dive / 80 apnea-snorkeling
+BUD-IOS-010,Statistics,Recompute 5000 sessions,500 ms,1500 ms,5000 ms,Unit test / Instruments,PENDING,Yes,NOT_APPLICABLE_CAP,CAP_BOUNDED,UI scans in-memory capped arrays
+BUD-IOS-011,Export,Single session PDF,2000 ms,5000 ms,15000 ms,Instruments Allocations,PENDING,Yes,NOT_MEASURED,PENDING_PHYSICAL,No cancellation
+BUD-IOS-012,Import,CSV parse 10 MB,3000 ms,8000 ms,30000 ms,DIRPerformanceBudgets csvImport,PARTIAL,No,NOT_MEASURED,OPEN,Size cap enforced; timing not tested
+BUD-IOS-013,Sync,WC encode/decode 512 KB,100 ms,300 ms,1000 ms,ActivitySyncLargePayloadTransferTests,Yes,No,PASS,PASS,Codec tests
+BUD-IOS-014,Sync,Outbound flush 40 sessions,500 ms,2000 ms,10000 ms,Instruments,PENDING,Yes,NOT_MEASURED,OPEN,iOS lacks backpressure policy
+BUD-IOS-015,Map,Dashboard preview 10k points,100 ms,300 ms,1000 ms,Instruments,PENDING,Yes,NOT_MEASURED,FAIL,Downsampler not wired
+BUD-IOS-016,Map,Session detail 50k points,300 ms,800 ms,3000 ms,Instruments,PENDING,Yes,NOT_MEASURED,FAIL,Full polyline render
+BUD-IOS-017,Memory,Peak during planner solve,150 MB,250 MB,400 MB,Allocations instrument,PENDING,Yes,NOT_MEASURED,PENDING_PHYSICAL,
+BUD-IOS-018,Concurrency,Task cancellation latency,50 ms,200 ms,1000 ms,Unit test,PENDING,No,NOT_MEASURED,OPEN,Export paths lack cancellation
+BUD-IOS-019,Main thread,Stall during slider edit,16 ms,33 ms,100 ms,Time Profiler,PENDING,Yes,NOT_MEASURED,PENDING_PHYSICAL,Multi-solve on main actor
+BUD-IOS-020,Battery,Background sync after suspend,0 unexpected work,N/A,policy violation,Energy Log,PENDING,Yes,NOT_MEASURED,PENDING_PHYSICAL,

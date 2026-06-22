@@ -5,6 +5,28 @@
 
 ---
 
+## Aggiornamento indice 2026-06-22 — iOS Performance Optimization Audit V1.0
+
+Audit read-only performance iOS Companion: startup, SwiftUI, planner, charts, logbook, export/import, sync, map, observability. Nessuna remediation production.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `IOS_PERFORMANCE_OPTIMIZATION_AUDIT_COMMAND_V1.0.md` |
+| **Main report** | [`IOS_PERFORMANCE_OPTIMIZATION_AUDIT_CURRENT.md`](IOS_PERFORMANCE_OPTIMIZATION_AUDIT_CURRENT.md) |
+| **Findings** | [`IOS_PERFORMANCE_FINDING_TRACEABILITY_CURRENT.csv`](IOS_PERFORMANCE_FINDING_TRACEABILITY_CURRENT.csv) — **P0=4, P1=11, P2=7, P3=6** |
+| **Budget matrix** | [`IOS_PERFORMANCE_BUDGET_MATRIX_CURRENT.csv`](IOS_PERFORMANCE_BUDGET_MATRIX_CURRENT.csv) |
+| **Test matrix** | [`IOS_PERFORMANCE_REQUIREMENT_TEST_MATRIX_CURRENT.csv`](IOS_PERFORMANCE_REQUIREMENT_TEST_MATRIX_CURRENT.csv) |
+| **Scalability inventory** | [`IOS_PERFORMANCE_SCALABILITY_MATRIX_CURRENT.csv`](IOS_PERFORMANCE_SCALABILITY_MATRIX_CURRENT.csv) |
+| **Profiling plan** | [`IOS_PERFORMANCE_PROFILING_PLAN_CURRENT.md`](IOS_PERFORMANCE_PROFILING_PLAN_CURRENT.md) |
+| **Signpost catalog** | [`IOS_PERFORMANCE_SIGNPOST_CATALOG_CURRENT.md`](IOS_PERFORMANCE_SIGNPOST_CATALOG_CURRENT.md) |
+| **External QA** | [`IOS_PERFORMANCE_EXTERNAL_QA_PENDING_CURRENT.md`](IOS_PERFORMANCE_EXTERNAL_QA_PENDING_CURRENT.md) |
+| **Validate** | `./Scripts/validate_ios_performance_audit_readiness.sh` PASS |
+| **XCTest (gate subset)** | iOS 53/53 · 0 skipped |
+| **Verdict** | **PARTIAL** — overall 58% · physical Instruments **PENDING** |
+| **Baseline** | `main` @ `73eb836` |
+
+---
+
 ## Aggiornamento indice 2026-06-22 — iOS embeddable activity settings content fix
 
 Apnea/Snorkeling Settings resi visibili sotto mode switcher: sostituito Form annidato in ScrollView con `IOSApneaSettingsContent` / `IOSSnorkelingSettingsContent` (DIRCard + row components).
