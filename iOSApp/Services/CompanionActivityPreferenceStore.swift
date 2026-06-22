@@ -17,7 +17,11 @@ final class CompanionActivityPreferenceStore: ObservableObject {
         self.defaults = defaults
         if let data = defaults.data(forKey: storageKey),
            let decoded = try? JSONDecoder().decode(CompanionActivityPreference.self, from: data) {
-            preference = decoded
+            let migrated = CompanionActivityPreference.applyingLaunchSelectionPolicyMigration(decoded)
+            preference = migrated
+            if migrated != decoded {
+                persist()
+            }
         } else {
             preference = Self.migrateLegacyIfNeeded(defaults: defaults)
             persist()
@@ -62,22 +66,28 @@ final class CompanionActivityPreferenceStore: ObservableObject {
 
     func select(_ mode: DIRActivityMode, watchReportsActiveSession: Bool = false) -> Bool {
         guard CompanionActivityAvailability.isAvailable(mode) else { return false }
+        let previousMode = preference.selectedMode
         preference.selectedMode = mode
         preference.hasCompletedPostOnboardingSelection = true
         preference.schemaVersion = CompanionActivityPreference.currentSchemaVersion
         persist()
         updateWatchActiveSessionNote(watchReportsActiveSession: watchReportsActiveSession)
         dismissSelectionScreenAfterChoice()
-        if mode == .diving {
-            IOSCompanionPostLegalEntry.markPendingPlannerLanding()
-        }
-        if mode == .apnea {
-            IOSCompanionPostLegalEntry.markPendingApneaLanding()
-        }
-        if mode == .snorkeling {
-            IOSCompanionPostLegalEntry.markPendingSnorkelingLanding()
+        if previousMode != mode {
+            switch mode {
+            case .diving:
+                IOSCompanionPostLegalEntry.markPendingPlannerLanding()
+            case .apnea:
+                IOSCompanionPostLegalEntry.markPendingApneaLanding()
+            case .snorkeling:
+                IOSCompanionPostLegalEntry.markPendingSnorkelingLanding()
+            }
         }
         return true
+    }
+
+    func isLastUsedMode(_ mode: DIRActivityMode) -> Bool {
+        preference.hasCompletedPostOnboardingSelection && preference.selectedMode == mode
     }
 
     func updateWatchActiveSessionNote(watchReportsActiveSession: Bool) {

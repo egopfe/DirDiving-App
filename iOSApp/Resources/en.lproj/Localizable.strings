@@ -1989,15 +1989,16 @@
 "companion.activity.snorkeling.feature.return" = "Return to entry";
 "companion.activitySelection.safety.title" = "SAFETY";
 "companion.activitySelection.safety.body" = "Your safety is our priority. Always use appropriate equipment and follow safe diving practices.";
-"companion.activitySelection.settingsReminder" = "You can change activity at any time in the app Settings.";
+"companion.activitySelection.settingsReminder" = "Use Switch mode in Settings to change activity without restarting the app.";
+"companion.activitySelection.lastUsed" = "Last used";
 "companion.activitySelection.unavailable" = "This activity is not yet available in this release.";
 "companion.activitySelection.watch_active_note" = "Apple Watch has an active dive session. iOS activity preference updated locally; Watch sync will resume when idle.";
 "companion.activity.card.a11y.summary" = "%@. %@. %@.";
 "companion.activity.card.a11y.hint" = "Opens %@.";
 "companion.settings.activity.title" = "Activity";
 "companion.settings.activity.current" = "Current activity";
-"companion.settings.activity.change" = "Change activity";
-"companion.settings.activity.showAtLaunch" = "Show activity selection at launch";
+"companion.settings.activity.change" = "Switch mode";
+"companion.settings.activity.showAtLaunch" = "Open last mode directly";
 "companion.settings.activity.none" = "Not selected";
 
 /* UI/UX audit remediation V1.0 2026-06-02 */

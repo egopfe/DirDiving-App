@@ -22,15 +22,18 @@ final class IOSCompanionActivitySelectionTests: XCTestCase {
         let store = CompanionActivityPreferenceStore(defaults: defaults)
         XCTAssertFalse(store.preference.hasCompletedPostOnboardingSelection)
         XCTAssertNil(store.preference.selectedMode)
+        XCTAssertTrue(store.preference.showActivitySelectionAtLaunch)
         XCTAssertTrue(store.shouldPresentSelectionScreen)
     }
 
-    func testLegacyUserWithLegalAcceptanceMigratesToDivingWithoutSelection() {
+    func testLegacyUserWithLegalAcceptanceMigratesToDivingAndShowsLaunchSelection() {
         defaults.set(Date().timeIntervalSince1970, forKey: "dirdiving_legal_acceptance_timestamp")
         let store = CompanionActivityPreferenceStore(defaults: defaults)
         XCTAssertEqual(store.preference.selectedMode, .diving)
         XCTAssertTrue(store.preference.hasCompletedPostOnboardingSelection)
-        XCTAssertFalse(store.shouldPresentSelectionScreen)
+        XCTAssertTrue(store.preference.showActivitySelectionAtLaunch)
+        XCTAssertTrue(store.shouldPresentSelectionScreen)
+        XCTAssertTrue(store.isLastUsedMode(.diving))
     }
 
     func testCorruptPreferenceFallsBackWithoutCrashing() {
@@ -49,7 +52,19 @@ final class IOSCompanionActivitySelectionTests: XCTestCase {
 
         let reloaded = CompanionActivityPreferenceStore(defaults: defaults)
         XCTAssertEqual(reloaded.preference.selectedMode, .diving)
+        XCTAssertTrue(reloaded.shouldPresentSelectionScreen)
         XCTAssertTrue(IOSCompanionPostLegalEntry.consumePendingPlannerLanding())
+    }
+
+    func testRelaunchSameModeDoesNotMarkPlannerLandingAgain() {
+        let store = CompanionActivityPreferenceStore(defaults: defaults)
+        XCTAssertTrue(store.select(.diving))
+        XCTAssertTrue(IOSCompanionPostLegalEntry.consumePendingPlannerLanding())
+
+        let relaunched = CompanionActivityPreferenceStore(defaults: defaults)
+        XCTAssertTrue(relaunched.shouldPresentSelectionScreen)
+        XCTAssertTrue(relaunched.select(.diving))
+        XCTAssertFalse(IOSCompanionPostLegalEntry.consumePendingPlannerLanding())
     }
 
     func testApneaAndSnorkelingCanBeSelectedOnIOSCompanion() {
@@ -77,6 +92,31 @@ final class IOSCompanionActivitySelectionTests: XCTestCase {
 
         store.dismissSelectionScreenAfterChoice()
         XCTAssertFalse(store.shouldPresentSelectionScreen)
+    }
+
+    func testOpenLastModeDirectlySkipsLaunchSelection() {
+        var preference = CompanionActivityPreference.legacyDivingMigration()
+        preference.showActivitySelectionAtLaunch = false
+        let store = CompanionActivityPreferenceStore(defaults: defaults)
+        store.applyPreferenceForTesting(preference)
+        XCTAssertFalse(store.shouldPresentSelectionScreen)
+    }
+
+    func testSavedV1PreferenceMigratesToLaunchSelectionPolicy() throws {
+        let legacy = CompanionActivityPreference(
+            selectedMode: .apnea,
+            showActivitySelectionAtLaunch: false,
+            hasCompletedPostOnboardingSelection: true,
+            schemaVersion: 1
+        )
+        let data = try JSONEncoder().encode(legacy)
+        defaults.set(data, forKey: "dirdiving_ios_companion_activity_preference_v1")
+
+        let store = CompanionActivityPreferenceStore(defaults: defaults)
+        XCTAssertEqual(store.preference.selectedMode, .apnea)
+        XCTAssertTrue(store.preference.showActivitySelectionAtLaunch)
+        XCTAssertEqual(store.preference.schemaVersion, 2)
+        XCTAssertTrue(store.shouldPresentSelectionScreen)
     }
 
     func testSettingsCanReopenSelection() {
@@ -118,6 +158,7 @@ final class IOSCompanionActivitySelectionTests: XCTestCase {
             "companion.activity.snorkeling.title",
             "companion.activitySelection.safety.body",
             "companion.activitySelection.settingsReminder",
+            "companion.activitySelection.lastUsed",
             "companion.activitySelection.unavailable",
             "companion.activitySelection.watch_active_note",
             "companion.settings.activity.title",
