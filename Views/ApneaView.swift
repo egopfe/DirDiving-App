@@ -4,6 +4,7 @@ struct ApneaView: View {
     @EnvironmentObject private var runtime: ApneaWatchRuntimeStore
     @EnvironmentObject private var apneaLogbook: ApneaLogbookStore
     @EnvironmentObject private var watchSync: WatchSyncService
+    @EnvironmentObject private var navigation: AppNavigationStore
     @ObservedObject private var importedPlan = ApneaImportedPlanStore.shared
     @AppStorage(HapticService.hapticsEnabledKey) private var hapticsEnabled = true
 
@@ -76,6 +77,10 @@ struct ApneaView: View {
                 .font(DiveUI.Typography.brandTitle)
                 .foregroundStyle(DiveUI.cyan)
             Spacer()
+            WatchInModeSettingsAccessButton(
+                isSessionActive: runtime.isSessionActive,
+                accessibilityLabelKey: "apnea.settings.a11y.open"
+            )
             DiveClockText(size: 14)
         }
     }

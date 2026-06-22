@@ -4,6 +4,7 @@ struct SnorkelingView: View {
     @EnvironmentObject private var runtime: SnorkelingWatchRuntimeStore
     @EnvironmentObject private var snorkelingLogbook: SnorkelingLogbookStore
     @EnvironmentObject private var watchSync: WatchSyncService
+    @EnvironmentObject private var navigation: AppNavigationStore
     @ObservedObject private var importedRoute = SnorkelingImportedRouteStore.shared
     @EnvironmentObject private var gps: GPSManager
     @EnvironmentObject private var compass: CompassManager
@@ -101,6 +102,10 @@ struct SnorkelingView: View {
             }
             Spacer(minLength: 0)
             VStack(alignment: .trailing, spacing: 4) {
+                WatchInModeSettingsAccessButton(
+                    isSessionActive: runtime.isSessionActive,
+                    accessibilityLabelKey: "snorkeling.settings.a11y.open"
+                )
                 DiveClockText(size: 14)
                 gpsPill
             }

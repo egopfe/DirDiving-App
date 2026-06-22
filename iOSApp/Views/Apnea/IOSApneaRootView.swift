@@ -37,6 +37,7 @@ final class IOSApneaNavigationStore: ObservableObject {
 
 struct IOSApneaRootView: View {
     @EnvironmentObject private var apneaNavigation: IOSApneaNavigationStore
+    @EnvironmentObject private var coordinator: IOSCompanionStoreCoordinator
     @State private var mountedTabs: Set<IOSApneaTab> = [.dashboard]
 
     var body: some View {
@@ -62,9 +63,11 @@ struct IOSApneaRootView: View {
             }
         }
         .sheet(isPresented: $apneaNavigation.showSettings) {
-            NavigationStack {
-                IOSApneaSettingsView()
-            }
+            coordinator.applyCompanionSettingsSheetEnvironment(to:
+                NavigationStack {
+                    IOSCompanionSettingsRootView(initialMode: .apnea)
+                }
+            )
         }
         .onChange(of: apneaNavigation.selectedTab) { _, tab in
             mountedTabs.insert(tab)

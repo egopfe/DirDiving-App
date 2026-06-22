@@ -2001,6 +2001,19 @@
 "companion.settings.activity.showAtLaunch" = "Open last mode directly";
 "companion.settings.activity.none" = "Not selected";
 
+"settings.mode_switch.title" = "Settings activity";
+"settings.mode_switch.diving" = "Diving";
+"settings.mode_switch.apnea" = "Apnea";
+"settings.mode_switch.snorkeling" = "Snorkeling";
+"settings.mode_switch.a11y.label" = "Settings activity";
+"settings.mode_switch.a11y.hint" = "Changes which activity settings are shown. Does not start a session or switch the Watch.";
+"apnea.settings.title" = "Apnea Settings";
+"apnea.settings.open" = "Open Apnea Settings";
+"apnea.settings.summary" = "Apnea session preferences and companion tools";
+"snorkeling.settings.title" = "Snorkeling Settings";
+"snorkeling.settings.open" = "Open Snorkeling Settings";
+"snorkeling.settings.summary" = "Snorkeling route and session preferences";
+
 /* UI/UX audit remediation V1.0 2026-06-02 */
 "ccr.chart.axis.time" = "Time";
 "ccr.chart.axis.ppo2" = "PPO2";

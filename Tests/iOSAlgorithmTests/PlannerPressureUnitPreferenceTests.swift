@@ -57,7 +57,7 @@ final class PlannerPressureUnitPreferenceTests: XCTestCase {
     }
 
     func testMoreViewContainsGlobalPressureUnitSelector() throws {
-        let source = try String(contentsOfFile: moreViewSourcePath(), encoding: .utf8)
+        let source = try String(contentsOfFile: divingSettingsSourcePath(), encoding: .utf8)
         XCTAssertTrue(source.contains("settings.units.pressure.title"))
         XCTAssertTrue(source.contains("sharedSettings.pressureUnit"))
     }
@@ -74,6 +74,15 @@ final class PlannerPressureUnitPreferenceTests: XCTestCase {
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .appendingPathComponent("iOSApp/Views/PlannerCylinderGasEditorView.swift")
+            .path
+    }
+
+    private func divingSettingsSourcePath() -> String {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("iOSApp/Views/IOSDivingSettingsEmbeddedContent.swift")
             .path
     }
 
