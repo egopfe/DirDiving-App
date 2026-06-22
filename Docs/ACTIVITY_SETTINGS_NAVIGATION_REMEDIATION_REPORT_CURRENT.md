@@ -6,12 +6,12 @@
 
 ## A. Executive Summary
 
-Implemented activity-scoped Settings navigation for iOS Companion and Apple Watch. iOS now exposes a unified Settings mode switcher (Diving / Apnea / Snorkeling) that controls visible settings only. Watch Apnea and Snorkeling screens expose in-mode Settings affordances routing to the global `SettingsView`.
+Implemented activity-scoped Settings navigation for iOS Companion and Apple Watch. iOS exposes a unified Settings mode switcher (Diving / Apnea / Snorkeling) with **embeddable** activity content rendered directly below the switcher. Replaced nested `Form`-in-`ScrollView` Apnea/Snorkeling settings with `DIRCard`-based content so toggles, steppers, navigation rows and reset actions are visible and editable.
 
 ## B. Current Behavior
 
-- **iOS Diving:** `MoreView` tab with segmented mode switcher + diving embedded content.
-- **iOS Apnea/Snorkeling:** Dashboard gear opens `IOSCompanionSettingsRootView` with initial scope.
+- **iOS Diving:** `MoreView` tab with segmented mode switcher + `IOSDivingSettingsEmbeddedContent`.
+- **iOS Apnea/Snorkeling:** `IOSApneaSettingsContent` / `IOSSnorkelingSettingsContent` render below switcher in `MoreView` and `IOSCompanionSettingsRootView` sheets.
 - **Watch:** Crown vertical pages preserved; Apnea/Snorkeling headers add gear when session inactive.
 
 ## C. iOS Settings Mode Switch
@@ -20,9 +20,10 @@ Implemented activity-scoped Settings navigation for iOS Companion and Apple Watc
 
 ## D–F. iOS Activity Settings
 
-- `IOSDivingSettingsEmbeddedContent` — diving-owned cards (extracted from MoreView)
-- `IOSApneaSettingsForm` — apnea-owned controls
-- `IOSSnorkelingSettingsForm` — snorkeling-owned controls
+- `IOSDivingSettingsEmbeddedContent` — diving-owned cards
+- `IOSApneaSettingsContent` — Apnea-owned DIRCard sections with real store bindings
+- `IOSSnorkelingSettingsContent` — Snorkeling-owned DIRCard sections with real store bindings
+- `IOSApneaSettingsForm` / `IOSSnorkelingSettingsForm` — thin backward-compatible wrappers (no nested Form)
 - Gear routing preserved; sheets use `applyCompanionSettingsSheetEnvironment`.
 
 ## G–H. Watch Settings Access
@@ -45,6 +46,7 @@ EN/IT keys added for mode switcher and in-mode settings affordances. VoiceOver l
 
 - `IOSActivitySettingsModeSwitchTests`
 - `IOSActivitySettingsRoutingTests`
+- `IOSActivitySettingsContentVisibilityTests`
 - `WatchSettingsRoutingTests`
 - Updated `WatchActivitySettingsOwnershipTests`
 
