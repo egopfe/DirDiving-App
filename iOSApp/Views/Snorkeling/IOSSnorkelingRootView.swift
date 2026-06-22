@@ -39,6 +39,7 @@ final class IOSSnorkelingNavigationStore: ObservableObject {
 
 struct IOSSnorkelingRootView: View {
     @EnvironmentObject private var snorkelingNavigation: IOSSnorkelingNavigationStore
+    @EnvironmentObject private var coordinator: IOSCompanionStoreCoordinator
     @State private var mountedTabs: Set<IOSSnorkelingTab> = [.dashboard]
 
     var body: some View {
@@ -60,9 +61,11 @@ struct IOSSnorkelingRootView: View {
         }
         .tint(DIRTheme.cyan)
         .sheet(isPresented: $snorkelingNavigation.showSettings) {
-            NavigationStack {
-                IOSSnorkelingSettingsView()
-            }
+            coordinator.applyCompanionSettingsSheetEnvironment(to:
+                NavigationStack {
+                    IOSCompanionSettingsRootView(initialMode: .snorkeling)
+                }
+            )
         }
         .onChange(of: snorkelingNavigation.selectedTab) { _, tab in
             mountedTabs.insert(tab)

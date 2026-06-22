@@ -1,0 +1,8 @@
+req_id,area,requirement,test_file,result
+REQ-IOS-SET-01,iOS,Mode switcher visible,IOSActivitySettingsRoutingTests,PASS
+REQ-IOS-SET-02,iOS,Scope does not mutate runtime,IOSActivitySettingsModeSwitchTests,PASS
+REQ-IOS-SET-03,iOS,Apnea gear opens apnea scope,IOSActivitySettingsRoutingTests,PASS
+REQ-IOS-SET-04,iOS,Diving-only isolation,IOSActivitySettingsCoherenceTests,PASS
+REQ-WATCH-SET-01,Watch,Apnea settings affordance,WatchSettingsRoutingTests,PASS
+REQ-WATCH-SET-02,Watch,Active session block,WatchSettingsRoutingTests,PASS
+REQ-WATCH-SET-03,Watch,Activity sections gated,WatchActivitySettingsOwnershipTests,PASS
