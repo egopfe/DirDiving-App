@@ -23,7 +23,7 @@ Audit read-only performance iOS Companion: startup, SwiftUI, planner, charts, lo
 | **Validate** | `./Scripts/validate_ios_performance_audit_readiness.sh` PASS |
 | **XCTest (gate subset)** | iOS 53/53 · 0 skipped |
 | **Verdict** | **PARTIAL** — overall 58% · physical Instruments **PENDING** |
-| **Baseline** | `main` @ `73eb836` |
+| **Baseline** | `main` @ `6bc4111` |
 
 ---
 
