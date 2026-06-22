@@ -2331,7 +2331,7 @@ struct PlanResultView: View {
 
     @ViewBuilder
     private var tissueAnalyticsEntry: some View {
-        if showsTissueAnalyticsEntry, let presentation = tissueAnalyticsPresentation {
+        if showsTissueAnalyticsEntry, let presentation = store.tissueAnalyticsPresentation {
             NavigationLink {
                 TissueNarcosisAnalyticsView(presentation: presentation, initialTab: .tissues)
             } label: {
@@ -2343,10 +2343,6 @@ struct PlanResultView: View {
 
     private var showsTissueAnalyticsEntry: Bool {
         store.mode != .base && !store.chartSnapshots.tissueHistoryEmpty && store.plan.buhlmannState != .invalidInput
-    }
-
-    private var tissueAnalyticsPresentation: TissueAnalyticsPresentation? {
-        TissueAnalyticsService.presentationForPlanner(plan: store.plan, input: store.input, mode: store.mode)
     }
 
     private var secondaryMetricsSection: some View {

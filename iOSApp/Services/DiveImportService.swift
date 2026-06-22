@@ -442,6 +442,9 @@ enum DiveImportService {
                 }
                 if row.contains(where: { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) {
                     rows.append(row)
+                    if !DiveCSVImportBounds.validateRowCount(rows.count) {
+                        return nil
+                    }
                 }
                 row = []
                 field = ""
@@ -459,6 +462,9 @@ enum DiveImportService {
         }
         if row.contains(where: { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) {
             rows.append(row)
+            if !DiveCSVImportBounds.validateRowCount(rows.count) {
+                return nil
+            }
         }
         if inQuotes {
             return nil

@@ -65,7 +65,7 @@ enum SnorkelingSessionMapPresentation {
             )
         }
 
-        let measuredPoints = measuredSurfacePoints(from: session.trackPoints)
+        let measuredPoints = downsampledMeasuredPoints(from: session.trackPoints)
         guard measuredPoints.count >= 2 else {
             if session.warnings.contains(.incompleteGPS) || session.warnings.contains(.sparseTrack) {
                 return SnorkelingSessionMapModel(
@@ -119,6 +119,13 @@ enum SnorkelingSessionMapPresentation {
                   let lon = point.longitude else { return false }
             return SnorkelingDomainSupport.isValidCoordinate(latitude: lat, longitude: lon)
         }
+    }
+
+    private static func downsampledMeasuredPoints(from trackPoints: [SnorkelingTrackPoint]) -> [SnorkelingTrackPoint] {
+        let signpost = DIRPerformanceSignpost.begin(.snorkelingGPSProcessing)
+        defer { signpost.end() }
+        let measured = measuredSurfacePoints(from: trackPoints)
+        return SnorkelingRoutePresentationSampling.downsampleTrackPointsForPresentation(measured)
     }
 
     private static func buildSegments(from points: [SnorkelingTrackPoint]) -> [SnorkelingMapTrackSegment] {
