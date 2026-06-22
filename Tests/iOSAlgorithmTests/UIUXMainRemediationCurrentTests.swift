@@ -8,7 +8,7 @@ final class UIUXMainRemediationCurrentTests: XCTestCase {
     }
 
     func testMoreViewSyncRowsExposeAccessibility() throws {
-        let source = try readSource("iOSApp/Views/MoreView.swift")
+        let source = try readSource("iOSApp/Views/IOSDivingSettingsEmbeddedContent.swift")
         XCTAssertTrue(source.contains("accessibleInfoRow"))
         XCTAssertTrue(source.contains("more.sync.push_to_watch.a11y.hint"))
         XCTAssertTrue(source.contains("more.icloud.sync_now.a11y.hint"))

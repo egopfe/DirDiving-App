@@ -29,6 +29,7 @@ enum ActivitySettingsVisibility {
         .init(key: "planner.ascentSpeedSettings.v1", scope: .diving, visibleInDiving: true, visibleInApnea: false, visibleInSnorkeling: false),
         .init(key: "dirdiving_ios_apnea_settings_v1", scope: .apnea, visibleInDiving: false, visibleInApnea: true, visibleInSnorkeling: false),
         .init(key: "dirdiving.settings.snorkeling.v1", scope: .snorkeling, visibleInDiving: false, visibleInApnea: false, visibleInSnorkeling: true),
+        .init(key: "dirdiving_ios_companion_settings_scope_v1", scope: .shared, visibleInDiving: true, visibleInApnea: true, visibleInSnorkeling: true),
     ]
 
     static func descriptors(for activity: DIRActivityMode) -> [ActivitySettingDescriptor] {

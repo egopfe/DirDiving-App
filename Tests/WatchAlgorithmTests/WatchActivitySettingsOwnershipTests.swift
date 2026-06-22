@@ -39,9 +39,15 @@ final class WatchActivitySettingsOwnershipTests: XCTestCase {
             "settings.section.apnea",
             "settings.section.snorkeling",
             "settings.apnea.recovery.title",
+            "settings.apnea.target_depth.title",
+            "settings.apnea.mission_mode.title",
             "settings.snorkeling.gps.title",
             "settings.snorkeling.route.title",
             "settings.snorkeling.return.title",
+            "settings.snorkeling.waypoints.title",
+            "settings.snorkeling.mission_mode.title",
+            "apnea.settings.a11y.open",
+            "snorkeling.settings.a11y.open",
         ]
         let en = try loadWatchStrings(named: "en")
         let it = try loadWatchStrings(named: "it")

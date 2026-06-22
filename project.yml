@@ -300,6 +300,7 @@ targets:
       - Services/DIRActivitySelectionStore.swift
       - Services/AppNavigationStore.swift
       - Utils/WatchActivityPagePolicy.swift
+      - Utils/WatchInModeSettingsAccess.swift
       - Models/AppPage.swift
       - path: Shared
     settings:
@@ -456,6 +457,7 @@ targets:
       - iOSApp/Utils/IOSActivityLogbookRoutingPolicy.swift
       - iOSApp/Models/CompanionActivityPreference.swift
       - iOSApp/Services/CompanionActivityPreferenceStore.swift
+      - iOSApp/Services/IOSCompanionSettingsScopeStore.swift
       - iOSApp/Utils/CompanionActivityCopy.swift
       - iOSApp/Services/IOSApneaProfileStore.swift
       - iOSApp/Services/IOSApneaPlannerStore.swift
@@ -568,6 +570,8 @@ targets:
       - Utils/SnorkelingQAEvidenceCatalog.swift
       - Tests/iOSAlgorithmTests/IOSCompanionActivitySelectionTests.swift
       - Tests/iOSAlgorithmTests/IOSActivitySettingsCoherenceTests.swift
+      - Tests/iOSAlgorithmTests/IOSActivitySettingsModeSwitchTests.swift
+      - Tests/iOSAlgorithmTests/IOSActivitySettingsRoutingTests.swift
       - Tests/iOSAlgorithmTests/BuhlmannComprehensiveReadinessV3RemediationTests.swift
     resources:
       - path: Tests/iOSAlgorithmTests/Fixtures

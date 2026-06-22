@@ -9,6 +9,7 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
     let sharedSettings: SharedIOSSettingsStore
     let legalAcceptance: LegalAcceptanceStore
     let companionActivity: CompanionActivityPreferenceStore
+    let companionSettingsScope: IOSCompanionSettingsScopeStore
 
     // Diving stores — default Companion landing activity.
     let logStore: DiveLogStore
@@ -36,6 +37,7 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
         sharedSettings = SharedIOSSettingsStore()
         legalAcceptance = LegalAcceptanceStore()
         companionActivity = CompanionActivityPreferenceStore()
+        companionSettingsScope = IOSCompanionSettingsScopeStore()
         logStore = DiveLogStore(cloudSync: cloudSync)
         plannerStore = PlannerStore(cloudSync: cloudSync)
         equipmentStore = EquipmentStore(cloudSync: cloudSync)
@@ -50,6 +52,7 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
 
         forwardNestedStoreChanges(from: legalAcceptance)
         forwardNestedStoreChanges(from: companionActivity)
+        forwardNestedStoreChanges(from: companionSettingsScope)
         forwardNestedStoreChanges(from: sharedSettings)
     }
 
@@ -110,11 +113,27 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
     @ViewBuilder
     func applyGlobalEnvironment<Content: View>(to content: Content) -> some View {
         content
+            .environmentObject(self)
             .environmentObject(watchSync)
             .environmentObject(cloudSync)
             .environmentObject(legalAcceptance)
             .environmentObject(companionActivity)
+            .environmentObject(companionSettingsScope)
             .environmentObject(sharedSettings)
+    }
+
+    @ViewBuilder
+    func applyCompanionSettingsSheetEnvironment<Content: View>(to content: Content) -> some View {
+        let apnea = ensureApneaStores()
+        let snorkeling = ensureSnorkelingStores()
+        applyDivingEnvironment(to: content)
+            .environmentObject(apnea.settingsStore)
+            .environmentObject(apnea.profileStore)
+            .environmentObject(apnea.equipmentStore)
+            .environmentObject(apnea.buddySafetyStore)
+            .environmentObject(snorkeling.settingsStore)
+            .environmentObject(snorkeling.equipmentStore)
+            .environmentObject(snorkeling.buddySafetyStore)
     }
 
     @ViewBuilder

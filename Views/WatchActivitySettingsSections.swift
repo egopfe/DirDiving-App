@@ -17,6 +17,11 @@ enum WatchActivitySettingsScope {
 
 struct WatchApneaActivitySettingsSection: View {
     @EnvironmentObject private var dive: DiveManager
+    @ObservedObject private var importedPlan = ApneaImportedPlanStore.shared
+
+    private var presentation: ApneaWatchImportedPlanPresentation {
+        importedPlan.readyPresentation
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -26,8 +31,35 @@ struct WatchApneaActivitySettingsSection: View {
                 icon: "lungs.fill",
                 iconColor: DiveUI.cyan,
                 title: String(localized: "settings.apnea.recovery.title"),
-                subtitle: String(localized: "settings.apnea.recovery.subtitle")
+                subtitle: presentation.hasImportedPlan
+                    ? presentation.recoveryPolicyLabel
+                    : String(localized: "settings.apnea.recovery.subtitle")
             )
+
+            if presentation.hasImportedPlan {
+                settingsInfoRow(
+                    icon: "target",
+                    iconColor: DiveUI.blue,
+                    title: String(localized: "settings.apnea.target_depth.title"),
+                    subtitle: String(format: String(localized: "settings.apnea.target_depth.value"), Int(presentation.targetDepthMeters))
+                )
+                settingsInfoRow(
+                    icon: "bell.badge.fill",
+                    iconColor: DiveUI.green,
+                    title: String(localized: "settings.apnea.alarms.title"),
+                    subtitle: presentation.enabledAlarmLabels.isEmpty
+                        ? String(localized: "settings.apnea.alarms.none")
+                        : presentation.enabledAlarmLabels.joined(separator: ", ")
+                )
+                settingsInfoRow(
+                    icon: "moon.stars.fill",
+                    iconColor: presentation.missionModeEnabled ? DiveUI.yellow : DiveUI.mutedText,
+                    title: String(localized: "settings.apnea.mission_mode.title"),
+                    subtitle: presentation.missionModeEnabled
+                        ? String(localized: "settings.apnea.mission_mode.on")
+                        : String(localized: "settings.apnea.mission_mode.off")
+                )
+            }
 
             settingsInfoRow(
                 icon: "iphone.and.arrow.forward",
@@ -77,6 +109,12 @@ struct WatchApneaActivitySettingsSection: View {
 struct WatchSnorkelingActivitySettingsSection: View {
     @EnvironmentObject private var dive: DiveManager
     @EnvironmentObject private var gps: GPSManager
+    @ObservedObject private var importedRoute = SnorkelingImportedRouteStore.shared
+    @AppStorage(MissionModeSettings.autoEnableOnDiveStartKey) private var missionModeAutoEnableOnDiveStart = false
+
+    private var routePlan: SnorkelingRoutePlan? {
+        importedRoute.activeRoutePlan
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -86,15 +124,24 @@ struct WatchSnorkelingActivitySettingsSection: View {
                 icon: "location.fill",
                 iconColor: gps.authorizationStatus == .denied ? DiveUI.red : DiveUI.green,
                 title: String(localized: "settings.snorkeling.gps.title"),
-                subtitle: String(localized: "settings.snorkeling.gps.subtitle")
+                subtitle: gpsStatusSubtitle
             )
 
             settingsInfoRow(
                 icon: "map.fill",
                 iconColor: DiveUI.cyan,
                 title: String(localized: "settings.snorkeling.route.title"),
-                subtitle: String(localized: "settings.snorkeling.route.subtitle")
+                subtitle: routePlan?.name ?? String(localized: "settings.snorkeling.route.subtitle")
             )
+
+            if let routePlan {
+                settingsInfoRow(
+                    icon: "mappin.and.ellipse",
+                    iconColor: DiveUI.cyan,
+                    title: String(localized: "settings.snorkeling.waypoints.title"),
+                    subtitle: String(format: String(localized: "settings.snorkeling.waypoints.count"), routePlan.waypoints.count)
+                )
+            }
 
             settingsInfoRow(
                 icon: "arrow.uturn.backward.circle.fill",
@@ -103,12 +150,34 @@ struct WatchSnorkelingActivitySettingsSection: View {
                 subtitle: String(localized: "settings.snorkeling.return.subtitle")
             )
 
+            settingsInfoRow(
+                icon: "moon.stars.fill",
+                iconColor: missionModeAutoEnableOnDiveStart ? DiveUI.yellow : DiveUI.mutedText,
+                title: String(localized: "settings.snorkeling.mission_mode.title"),
+                subtitle: missionModeAutoEnableOnDiveStart
+                    ? String(localized: "settings.snorkeling.mission_mode.on")
+                    : String(localized: "settings.snorkeling.mission_mode.off")
+            )
+
             Text(String(localized: "settings.snorkeling.scope.note"))
                 .font(DiveUI.Typography.hintCaption)
                 .foregroundStyle(DiveUI.mutedText)
                 .multilineTextAlignment(.leading)
         }
         .disabled(dive.isDiveActive)
+    }
+
+    private var gpsStatusSubtitle: String {
+        switch gps.authorizationStatus {
+        case .authorizedAlways, .authorizedWhenInUse:
+            return String(localized: "settings.snorkeling.gps.authorized")
+        case .denied, .restricted:
+            return String(localized: "settings.snorkeling.gps.denied")
+        case .notDetermined:
+            return String(localized: "settings.snorkeling.gps.subtitle")
+        @unknown default:
+            return String(localized: "settings.snorkeling.gps.subtitle")
+        }
     }
 
     private func settingsInfoRow(icon: String, iconColor: Color, title: String, subtitle: String) -> some View {
