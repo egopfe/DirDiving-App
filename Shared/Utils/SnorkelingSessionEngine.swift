@@ -62,6 +62,8 @@ struct SnorkelingSessionEngineSnapshot: Equatable, Hashable, Sendable {
 
 /// UI-independent snorkeling session engine with shared depth/GPS feeds and dip lifecycle.
 struct SnorkelingSessionEngine {
+    static let maxPersistedTrackPoints = 50_000
+
     private(set) var configuration: SnorkelingLifecycleConfiguration
     private(set) var depthFeedConfiguration: SnorkelingDepthFeedConfiguration
     private(set) var gpsFeedConfiguration: SnorkelingGPSFeedConfiguration
@@ -675,6 +677,12 @@ struct SnorkelingSessionEngine {
                 isUnderwater: depthResult.isUnderwater
             )
         )
+        if session.trackPoints.count > Self.maxPersistedTrackPoints {
+            session.trackPoints = SnorkelingRoutePresentationSampling.downsampleTrackPointsForPresentation(
+                session.trackPoints,
+                maxPoints: Self.maxPersistedTrackPoints
+            )
+        }
         if session.entryPoint == nil, gpsResult.gpsQuality == .measured, let accepted {
             session.entryPoint = SnorkelingTrackPoint(
                 monotonicRelativeTimestampSeconds: monotonic,

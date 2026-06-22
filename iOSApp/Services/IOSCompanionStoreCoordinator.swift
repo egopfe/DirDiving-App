@@ -25,6 +25,8 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
     private var snorkelingBundle: IOSSnorkelingStoreBundle?
     private var syncApneaLogbook: IOSApneaLogbookStore?
     private var syncSnorkelingLogbook: IOSSnorkelingLogbookStore?
+    private var lazyApneaSettingsStore: IOSApneaSettingsStore?
+    private var lazySnorkelingSettingsStore: IOSSnorkelingSettingsStore?
     private var nestedStoreCancellables = Set<AnyCancellable>()
 
     var isApneaStoreActive: Bool { apneaBundle != nil }
@@ -52,8 +54,19 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
 
         forwardNestedStoreChanges(from: legalAcceptance)
         forwardNestedStoreChanges(from: companionActivity)
-        forwardNestedStoreChanges(from: companionSettingsScope)
         forwardNestedStoreChanges(from: sharedSettings)
+    }
+
+    func ensureApneaSettingsStore() -> IOSApneaSettingsStore {
+        if let bundle = apneaBundle { return bundle.settingsStore }
+        if lazyApneaSettingsStore == nil { lazyApneaSettingsStore = IOSApneaSettingsStore() }
+        return lazyApneaSettingsStore!
+    }
+
+    func ensureSnorkelingSettingsStore() -> IOSSnorkelingSettingsStore {
+        if let bundle = snorkelingBundle { return bundle.settingsStore }
+        if lazySnorkelingSettingsStore == nil { lazySnorkelingSettingsStore = IOSSnorkelingSettingsStore() }
+        return lazySnorkelingSettingsStore!
     }
 
     private func forwardNestedStoreChanges(from store: some ObservableObject) {
@@ -66,9 +79,13 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
 
     func ensureApneaStores() -> IOSApneaStoreBundle {
         if let apneaBundle { return apneaBundle }
-        let bundle = IOSApneaStoreBundle(logbookStore: syncApneaLogbook)
+        let bundle = IOSApneaStoreBundle(
+            logbookStore: syncApneaLogbook,
+            settingsStore: lazyApneaSettingsStore
+        )
         apneaBundle = bundle
         syncApneaLogbook = nil
+        lazyApneaSettingsStore = nil
         watchSync.attachApneaLogbookStore(bundle.logbookStore)
         watchSync.apneaWatchTransferService = bundle.watchTransfer
         return bundle
@@ -76,9 +93,13 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
 
     func ensureSnorkelingStores() -> IOSSnorkelingStoreBundle {
         if let snorkelingBundle { return snorkelingBundle }
-        let bundle = IOSSnorkelingStoreBundle(logbookStore: syncSnorkelingLogbook)
+        let bundle = IOSSnorkelingStoreBundle(
+            logbookStore: syncSnorkelingLogbook,
+            settingsStore: lazySnorkelingSettingsStore
+        )
         snorkelingBundle = bundle
         syncSnorkelingLogbook = nil
+        lazySnorkelingSettingsStore = nil
         watchSync.attachSnorkelingLogbookStore(bundle.logbookStore)
         bundle.logbookStore.attachWatchSync(watchSync)
         watchSync.snorkelingWatchTransferService = bundle.watchTransfer
@@ -88,14 +109,22 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
 
     func activateWatchSyncIfNeeded() {
         logStore.attachWatchSync(watchSync)
-        lazySnorkelingLogbookForSync().attachWatchSync(watchSync)
-        watchSync.activate(
-            logStore: logStore,
-            apneaLogbookStore: lazyApneaLogbookForSync(),
-            snorkelingLogbookStore: lazySnorkelingLogbookForSync()
-        )
+        watchSync.apneaLogbookProvider = { [weak self] in self?.lazyApneaLogbookForSync() }
+        watchSync.snorkelingLogbookProvider = { [weak self] in self?.lazySnorkelingLogbookForSync() }
+        watchSync.activate(logStore: logStore)
         watchSync.plannerBriefingTransferService = plannerBriefingTransfer
         watchSync.divePlanPackageTransferService = divePlanPackageTransfer
+    }
+
+    func attachActivityLogbookForSyncIfNeeded(activity: DIRActivityMode) {
+        switch activity {
+        case .diving:
+            break
+        case .apnea:
+            _ = lazyApneaLogbookForSync()
+        case .snorkeling:
+            _ = lazySnorkelingLogbookForSync()
+        }
     }
 
     private func lazyApneaLogbookForSync() -> IOSApneaLogbookStore {
@@ -124,16 +153,11 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
 
     @ViewBuilder
     func applyCompanionSettingsSheetEnvironment<Content: View>(to content: Content) -> some View {
-        let apnea = ensureApneaStores()
-        let snorkeling = ensureSnorkelingStores()
-        applyDivingEnvironment(to: content)
-            .environmentObject(apnea.settingsStore)
-            .environmentObject(apnea.profileStore)
-            .environmentObject(apnea.equipmentStore)
-            .environmentObject(apnea.buddySafetyStore)
-            .environmentObject(snorkeling.settingsStore)
-            .environmentObject(snorkeling.equipmentStore)
-            .environmentObject(snorkeling.buddySafetyStore)
+        applyDivingEnvironment(to:
+            IOSCompanionSettingsEnvironmentHost {
+                content
+            }
+        )
     }
 
     @ViewBuilder
@@ -192,13 +216,14 @@ final class IOSApneaStoreBundle {
     let profileStore = IOSApneaProfileStore()
     let plannerStore = IOSApneaPlannerStore()
     let logbookStore: IOSApneaLogbookStore
-    let settingsStore = IOSApneaSettingsStore()
+    let settingsStore: IOSApneaSettingsStore
     let watchTransfer = IOSApneaWatchTransferService()
     let equipmentStore = IOSApneaEquipmentStore()
     let buddySafetyStore = IOSApneaBuddySafetyStore()
 
-    init(logbookStore existing: IOSApneaLogbookStore? = nil) {
+    init(logbookStore existing: IOSApneaLogbookStore? = nil, settingsStore existingSettings: IOSApneaSettingsStore? = nil) {
         logbookStore = existing ?? IOSApneaLogbookStore()
+        settingsStore = existingSettings ?? IOSApneaSettingsStore()
     }
 }
 
@@ -213,9 +238,10 @@ final class IOSSnorkelingStoreBundle {
     let equipmentStore = IOSSnorkelingEquipmentStore()
     let buddySafetyStore = IOSSnorkelingBuddySafetyStore()
     let sessionPhotoStore = IOSSnorkelingSessionPhotoStore()
-    let settingsStore = IOSSnorkelingSettingsStore()
+    let settingsStore: IOSSnorkelingSettingsStore
 
-    init(logbookStore existing: IOSSnorkelingLogbookStore? = nil) {
+    init(logbookStore existing: IOSSnorkelingLogbookStore? = nil, settingsStore existingSettings: IOSSnorkelingSettingsStore? = nil) {
         logbookStore = existing ?? IOSSnorkelingLogbookStore()
+        settingsStore = existingSettings ?? IOSSnorkelingSettingsStore()
     }
 }

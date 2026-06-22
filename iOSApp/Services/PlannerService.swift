@@ -44,7 +44,8 @@ enum PlannerService {
         decompressionMethod: PlannerDecompressionMethod = .buhlmann,
         ratioDecoPreset: RatioDecoPreset = .preset1to1,
         unitPreference: IOSUnitPreference = .metric,
-        ascentSpeedSettings: PlannerAscentSpeedSettings = PlannerAscentSpeedSettings.load()
+        ascentSpeedSettings: PlannerAscentSpeedSettings = PlannerAscentSpeedSettings.load(),
+        precomputedAnalysis: TechnicalGasAnalysis? = nil
     ) -> DivePlanResult {
         guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) else {
             let activeInput = PlannerModePolicy.activePlanInput(from: input, mode: mode)
@@ -143,14 +144,19 @@ enum PlannerService {
             environment: environment,
             ascentSpeedSettings: ascentSpeedSettings
         )
-        let analysis = GasPlanningService.analyze(
-            input: working,
-            enginePlan: enginePlan,
-            oxygenCarryover: oxygenCarryover,
-            mode: mode,
-            ascentSpeedSettings: ascentSpeedSettings,
-            operationalEnginePlan: operationalEnginePlan
-        )
+        let analysis: TechnicalGasAnalysis
+        if let precomputedAnalysis {
+            analysis = precomputedAnalysis
+        } else {
+            analysis = GasPlanningService.analyze(
+                input: working,
+                enginePlan: enginePlan,
+                oxygenCarryover: oxygenCarryover,
+                mode: mode,
+                ascentSpeedSettings: ascentSpeedSettings,
+                operationalEnginePlan: operationalEnginePlan
+            )
+        }
         let rawStops = BuhlmannPlanner.decoStops(from: enginePlan)
         let completenessResolution = PlanCalculationCompletenessResolver.resolve(
             enginePlan: enginePlan,
@@ -194,12 +200,21 @@ enum PlannerService {
         )
         let depthProfilePoints = PlannerDepthProfileBuilder.points(from: segments)
         let scheduleLines = PlannerGasSchedule.roleScheduleLines(input: working)
-        let gfComparisons = BuhlmannPlanner.gfComparisons(baseRequest: {
-            var seededBase = baseRequest
-            seededBase.initialTissueState = request.initialTissueState
-            return seededBase
-        }())
-        let contingencies = GasPlanningService.contingencyPlans(input: working, baseAnalysis: analysis, baseTTS: tts, environment: environment)
+        let gfComparisons = mode == .base
+            ? []
+            : BuhlmannPlanner.gfComparisons(baseRequest: {
+                var seededBase = baseRequest
+                seededBase.initialTissueState = request.initialTissueState
+                return seededBase
+            }())
+        let contingencies = mode == .base
+            ? []
+            : GasPlanningService.contingencyPlans(
+                input: working,
+                baseAnalysis: analysis,
+                baseTTS: tts,
+                environment: environment
+            )
         // Reserved for future Team / Buddy Planning module. Not surfaced in main Planner until full compatibility model exists.
         let teamMatches = GasPlanningService.teamGasMatches(input: working, minimumGasLiters: analysis.rockBottomLiters)
         var briefing = GasPlanningService.briefingLines(input: working, analysis: analysis, tts: tts, stops: stops)
