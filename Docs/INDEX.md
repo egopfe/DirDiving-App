@@ -1,7 +1,20 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-22  
-**Branch consigliato:** `main` = `origin/main` @ `a909686`
+**Branch consigliato:** `main` = `origin/main`
+
+---
+
+## Aggiornamento indice 2026-06-22 — iOS embeddable activity settings content fix
+
+Apnea/Snorkeling Settings resi visibili sotto mode switcher: sostituito Form annidato in ScrollView con `IOSApneaSettingsContent` / `IOSSnorkelingSettingsContent` (DIRCard + row components).
+
+| Campo | Valore |
+|-------|--------|
+| **Tests** | `IOSActivitySettingsContentVisibilityTests` |
+| **Components** | `IOSCompanionSettingsRows`, `IOSCompanionSharedSettingsEmbeddedContent` |
+| **Validate** | `./Scripts/validate_activity_settings_navigation_readiness.sh` PASS |
+| **XCTest** | iOS 1510/1510 · Watch 992/992 · 0 skipped |
 
 ---
 

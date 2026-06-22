@@ -65,9 +65,9 @@ struct IOSCompanionSettingsRootView: View {
         case .diving:
             IOSDivingSettingsEmbeddedContent()
         case .apnea:
-            IOSApneaSettingsForm()
+            IOSApneaSettingsContent()
         case .snorkeling:
-            IOSSnorkelingSettingsForm()
+            IOSSnorkelingSettingsContent()
         }
     }
 

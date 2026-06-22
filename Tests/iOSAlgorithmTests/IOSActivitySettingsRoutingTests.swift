@@ -1,12 +1,12 @@
 import XCTest
 
 final class IOSActivitySettingsRoutingTests: XCTestCase {
-    func testMoreViewUsesModeSwitcherAndEmbeddedActivityForms() throws {
+    func testMoreViewUsesModeSwitcherAndEmbeddedActivityContent() throws {
         let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/MoreView.swift"))
         XCTAssertTrue(source.contains("IOSCompanionSettingsModeSwitcher"))
         XCTAssertTrue(source.contains("IOSDivingSettingsEmbeddedContent"))
-        XCTAssertTrue(source.contains("IOSApneaSettingsForm"))
-        XCTAssertTrue(source.contains("IOSSnorkelingSettingsForm"))
+        XCTAssertTrue(source.contains("IOSApneaSettingsContent"))
+        XCTAssertTrue(source.contains("IOSSnorkelingSettingsContent"))
         XCTAssertTrue(source.contains("companionSettingsScope"))
     }
 
@@ -19,15 +19,23 @@ final class IOSActivitySettingsRoutingTests: XCTestCase {
         XCTAssertTrue(snorkelingRoot.contains("applyCompanionSettingsSheetEnvironment"))
     }
 
-    func testApneaFormDoesNotReferenceDivingOnlyKeys() throws {
-        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/Apnea/IOSApneaSettingsForm.swift"))
+    func testUnifiedSettingsRootUsesEmbeddableActivityContent() throws {
+        let root = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/IOSCompanionSettingsRootView.swift"))
+        XCTAssertTrue(root.contains("IOSApneaSettingsContent()"))
+        XCTAssertTrue(root.contains("IOSSnorkelingSettingsContent()"))
+        XCTAssertFalse(root.contains("IOSApneaSettingsForm()"))
+        XCTAssertFalse(root.contains("IOSSnorkelingSettingsForm()"))
+    }
+
+    func testApneaContentDoesNotReferenceDivingOnlyKeys() throws {
+        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/Apnea/IOSApneaSettingsContent.swift"))
         XCTAssertFalse(source.contains("PlannerAscentSpeedSettings"))
         XCTAssertFalse(source.contains("dirdiving.settings.diving"))
         XCTAssertFalse(source.contains("snorkeling.ios.settings"))
     }
 
-    func testSnorkelingFormDoesNotReferenceDivingOnlyKeys() throws {
-        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/Snorkeling/IOSSnorkelingSettingsForm.swift"))
+    func testSnorkelingContentDoesNotReferenceDivingOnlyKeys() throws {
+        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/Snorkeling/IOSSnorkelingSettingsContent.swift"))
         XCTAssertFalse(source.contains("PlannerAscentSpeedSettings"))
         XCTAssertFalse(source.contains("apnea.ios.settings.detection"))
     }
