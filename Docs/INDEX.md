@@ -1,7 +1,24 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` = `origin/main` (sync after Command 18 audit commit)
+**Aggiornato:** 2026-06-22  
+**Branch consigliato:** `main` = `origin/main` @ `a909686`
+
+---
+
+## Aggiornamento indice 2026-06-22 — Activity settings navigation remediation
+
+Settings activity-scoped per iOS Companion e Apple Watch (Diving / Apnea / Snorkeling): mode switcher UI-only, gear routing, sezioni Watch, ownership tests.
+
+| Campo | Valore |
+|-------|--------|
+| **Remediation** | [`ACTIVITY_SETTINGS_NAVIGATION_REMEDIATION_REPORT_CURRENT.md`](ACTIVITY_SETTINGS_NAVIGATION_REMEDIATION_REPORT_CURRENT.md) |
+| **iOS mode switch** | [`IOS_COMPANION_SETTINGS_MODE_SWITCH_CURRENT.md`](IOS_COMPANION_SETTINGS_MODE_SWITCH_CURRENT.md) |
+| **Watch access** | [`WATCH_ACTIVITY_SETTINGS_ACCESS_CURRENT.md`](WATCH_ACTIVITY_SETTINGS_ACCESS_CURRENT.md) |
+| **Ownership matrix** | [`ACTIVITY_SETTINGS_OWNERSHIP_MATRIX_CURRENT.csv`](ACTIVITY_SETTINGS_OWNERSHIP_MATRIX_CURRENT.csv) |
+| **Test matrix** | [`ACTIVITY_SETTINGS_REQUIREMENT_TEST_MATRIX_CURRENT.csv`](ACTIVITY_SETTINGS_REQUIREMENT_TEST_MATRIX_CURRENT.csv) |
+| **Validate** | `./Scripts/validate_activity_settings_navigation_readiness.sh` PASS |
+| **Baseline** | `main` @ `a909686` |
+| **XCTest** | iOS 1501/1501 · Watch 992/992 · 0 skipped |
 
 ---
 
