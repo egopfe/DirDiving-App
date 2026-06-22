@@ -7,6 +7,7 @@ final class IOSActivitySettingsRoutingTests: XCTestCase {
         XCTAssertTrue(source.contains("IOSDivingSettingsEmbeddedContent"))
         XCTAssertTrue(source.contains("IOSApneaSettingsContent"))
         XCTAssertTrue(source.contains("IOSSnorkelingSettingsContent"))
+        XCTAssertTrue(source.contains("applyCompanionSettingsSheetEnvironment"))
         XCTAssertTrue(source.contains("companionSettingsScope"))
     }
 

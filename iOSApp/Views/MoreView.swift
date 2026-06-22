@@ -5,42 +5,47 @@ struct MoreView: View {
     @EnvironmentObject private var coordinator: IOSCompanionStoreCoordinator
 
     var body: some View {
-        NavigationStack {
-            DIRScreenContainer {
-                ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 16) {
-                        VStack(alignment: .leading, spacing: 7) {
-                            Text(DIRIOSLocalizer.string("settings.title"))
-                                .dirScreenTitleStyle()
-                            Text(DIRIOSLocalizer.string("more.header.subtitle"))
-                                .font(.callout)
-                                .foregroundStyle(DIRTheme.muted)
-                        }
+        coordinator.applyCompanionSettingsSheetEnvironment(to:
+            NavigationStack {
+                DIRScreenContainer {
+                    ScrollView(showsIndicators: false) {
+                        VStack(alignment: .leading, spacing: 16) {
+                            VStack(alignment: .leading, spacing: 7) {
+                                Text(DIRIOSLocalizer.string("settings.title"))
+                                    .dirScreenTitleStyle()
+                                Text(DIRIOSLocalizer.string("more.header.subtitle"))
+                                    .font(.callout)
+                                    .foregroundStyle(DIRTheme.muted)
+                            }
 
-                        IOSCompanionSettingsModeSwitcher(
-                            selection: Binding(
-                                get: { companionSettingsScope.displayedMode },
-                                set: { companionSettingsScope.setDisplayedMode($0) }
+                            IOSCompanionSettingsModeSwitcher(
+                                selection: Binding(
+                                    get: { companionSettingsScope.displayedMode },
+                                    set: { companionSettingsScope.setDisplayedMode($0) }
+                                )
                             )
-                        )
 
-                        settingsBody
+                            settingsBody
 
-                        IOSCompanionSharedCompanionSections()
+                            IOSCompanionSharedCompanionSections()
 
-                        if companionSettingsScope.displayedMode == .diving {
-                            DIRWarningBox(text: DIRIOSLocalizer.string("more.safety.footer"))
+                            if companionSettingsScope.displayedMode == .diving {
+                                DIRWarningBox(text: DIRIOSLocalizer.string("more.safety.footer"))
+                            }
                         }
+                        .padding(16)
                     }
-                    .padding(16)
+                    .dirCompanionScrollSurface()
                 }
-                .dirCompanionScrollSurface()
+                .toolbar(.hidden, for: .navigationBar)
+                .onAppear {
+                    ensureStores(for: companionSettingsScope.displayedMode)
+                }
+                .onChange(of: companionSettingsScope.displayedMode) { _, mode in
+                    ensureStores(for: mode)
+                }
             }
-            .toolbar(.hidden, for: .navigationBar)
-            .onChange(of: companionSettingsScope.displayedMode) { _, mode in
-                ensureStores(for: mode)
-            }
-        }
+        )
         .dirCompanionTabRoot()
     }
 
