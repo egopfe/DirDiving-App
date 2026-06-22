@@ -38,16 +38,19 @@ final class PlannerPresentationTests: XCTestCase {
     }
 
     func testPlannerAscentSpeedSettingsPresentation() throws {
-        let moreSource = try String(
-            contentsOf: URL(fileURLWithPath: #filePath)
-                .deletingLastPathComponent()
-                .deletingLastPathComponent()
-                .deletingLastPathComponent()
-                .appendingPathComponent("iOSApp/Views/MoreView.swift"),
+        let divingSettingsSource = try String(
+            contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/IOSDivingSettingsEmbeddedContent.swift"),
             encoding: .utf8
         )
-        XCTAssertTrue(moreSource.contains("settings.planner_ascent_speeds.title"))
-        XCTAssertTrue(moreSource.contains("PlannerAscentSpeedSettingsView"))
+        XCTAssertTrue(divingSettingsSource.contains("settings.planner_ascent_speeds.title"))
+        XCTAssertTrue(divingSettingsSource.contains("PlannerAscentSpeedSettingsView"))
+    }
+
+    private func repositoryRoot() -> URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
     }
 
     func testEmergencyWindowLocalizationKeysExist() throws {
