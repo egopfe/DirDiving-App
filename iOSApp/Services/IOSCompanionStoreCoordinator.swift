@@ -1,3 +1,4 @@
+import Combine
 import SwiftUI
 
 /// Activity-scoped store bundles — Apnea and Snorkeling are created on first use only.
@@ -23,6 +24,7 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
     private var snorkelingBundle: IOSSnorkelingStoreBundle?
     private var syncApneaLogbook: IOSApneaLogbookStore?
     private var syncSnorkelingLogbook: IOSSnorkelingLogbookStore?
+    private var nestedStoreCancellables = Set<AnyCancellable>()
 
     var isApneaStoreActive: Bool { apneaBundle != nil }
     var isSnorkelingStoreActive: Bool { snorkelingBundle != nil }
@@ -45,6 +47,18 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
         )
         plannerBriefingTransfer = PlannerBriefingWatchTransferService()
         divePlanPackageTransfer = DivePlanPackageWatchTransferService()
+
+        forwardNestedStoreChanges(from: legalAcceptance)
+        forwardNestedStoreChanges(from: companionActivity)
+        forwardNestedStoreChanges(from: sharedSettings)
+    }
+
+    private func forwardNestedStoreChanges(from store: some ObservableObject) {
+        store.objectWillChange
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &nestedStoreCancellables)
     }
 
     func ensureApneaStores() -> IOSApneaStoreBundle {
