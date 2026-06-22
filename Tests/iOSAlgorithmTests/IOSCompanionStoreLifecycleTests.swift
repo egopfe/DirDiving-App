@@ -65,4 +65,10 @@ final class IOSCompanionStoreLifecycleTests: XCTestCase {
         XCTAssertTrue(source.contains("lazyApneaLogbookForSync"))
         XCTAssertTrue(source.contains("lazySnorkelingLogbookForSync"))
     }
+
+    func testCoordinatorForwardsNestedStoreChangesForRootRouting() {
+        let source = readSource("iOSApp/Services/IOSCompanionStoreCoordinator.swift")
+        XCTAssertTrue(source.contains("forwardNestedStoreChanges(from: companionActivity)"))
+        XCTAssertTrue(source.contains("forwardNestedStoreChanges(from: legalAcceptance)"))
+    }
 }
