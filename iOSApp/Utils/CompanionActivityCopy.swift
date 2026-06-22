@@ -40,14 +40,20 @@ enum CompanionActivityCopy {
         }
     }
 
-    static func accessibilitySummary(for mode: DIRActivityMode) -> String {
+    static func accessibilitySummary(for mode: DIRActivityMode, isLastUsed: Bool = false) -> String {
         let features = features(for: mode).joined(separator: ", ")
-        return String(
+        let summary = String(
             format: DIRIOSLocalizer.string("companion.activity.card.a11y.summary"),
             title(for: mode),
             subtitle(for: mode),
             features
         )
+        guard isLastUsed else { return summary }
+        return "\(summary) \(lastUsedBadge())"
+    }
+
+    static func lastUsedBadge() -> String {
+        DIRIOSLocalizer.string("companion.activitySelection.lastUsed")
     }
 
     static func accessibilityHint(for mode: DIRActivityMode, isAvailable: Bool) -> String {

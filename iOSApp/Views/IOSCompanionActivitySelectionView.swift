@@ -52,6 +52,7 @@ struct IOSCompanionActivitySelectionView: View {
 
     private func activityCard(_ mode: DIRActivityMode) -> some View {
         let isAvailable = CompanionActivityAvailability.isAvailable(mode)
+        let isLastUsed = activityStore.isLastUsedMode(mode)
         let accent = CompanionActivityPresentation.accent(for: mode)
         return Button {
             handleSelection(mode)
@@ -70,9 +71,27 @@ struct IOSCompanionActivitySelectionView: View {
                 }
 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(CompanionActivityPresentation.title(for: mode))
-                        .font(.system(size: 24, weight: .bold, design: .rounded))
-                        .foregroundStyle(isAvailable ? .white : DIRTheme.muted)
+                    HStack(spacing: 8) {
+                        Text(CompanionActivityPresentation.title(for: mode))
+                            .font(.system(size: 24, weight: .bold, design: .rounded))
+                            .foregroundStyle(isAvailable ? .white : DIRTheme.muted)
+                        if isLastUsed {
+                            Text(CompanionActivityCopy.lastUsedBadge())
+                                .font(.caption2.weight(.bold))
+                                .foregroundStyle(accent)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 3)
+                                .background(
+                                    Capsule()
+                                        .fill(accent.opacity(0.16))
+                                        .overlay(
+                                            Capsule()
+                                                .stroke(accent.opacity(0.55), lineWidth: 1)
+                                        )
+                                )
+                                .accessibilityHidden(true)
+                        }
+                    }
                     Text(CompanionActivityPresentation.subtitle(for: mode))
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(DIRTheme.muted)
@@ -86,18 +105,21 @@ struct IOSCompanionActivitySelectionView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                Image(systemName: "chevron.right")
-                    .font(.caption.weight(.bold))
+                Image(systemName: isLastUsed ? "checkmark.circle.fill" : "chevron.right")
+                    .font(isLastUsed ? .body.weight(.bold) : .caption.weight(.bold))
                     .foregroundStyle(isAvailable ? accent : DIRTheme.muted.opacity(0.5))
                     .padding(.top, 8)
             }
             .padding(16)
             .background(
                 RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
-                    .fill(Color.black.opacity(0.55))
+                    .fill(Color.black.opacity(isLastUsed ? 0.62 : 0.55))
                     .overlay(
                         RoundedRectangle(cornerRadius: DIRTheme.cardRadius)
-                            .stroke(accent.opacity(isAvailable ? 0.65 : 0.25), lineWidth: 1)
+                            .stroke(
+                                accent.opacity(isAvailable ? (isLastUsed ? 0.95 : 0.65) : 0.25),
+                                lineWidth: isLastUsed ? 2 : 1
+                            )
                     )
             )
             .opacity(isAvailable ? 1 : 0.72)
@@ -105,7 +127,7 @@ struct IOSCompanionActivitySelectionView: View {
         .buttonStyle(.plain)
         .disabled(!isAvailable)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(CompanionActivityPresentation.accessibilitySummary(for: mode))
+        .accessibilityLabel(CompanionActivityPresentation.accessibilitySummary(for: mode, isLastUsed: isLastUsed))
         .accessibilityHint(CompanionActivityPresentation.accessibilityHint(for: mode, isAvailable: isAvailable))
         .accessibilityAddTraits(.isButton)
     }
