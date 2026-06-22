@@ -15,6 +15,7 @@ Apnea/Snorkeling Settings resi visibili sotto mode switcher: sostituito Form ann
 | **Components** | `IOSCompanionSettingsRows`, `IOSCompanionSharedSettingsEmbeddedContent` |
 | **Validate** | `./Scripts/validate_activity_settings_navigation_readiness.sh` PASS |
 | **XCTest** | iOS 1510/1510 · Watch 992/992 · 0 skipped |
+| **Baseline** | `main` @ `2f1d702` |
 
 ---
 
