@@ -1987,15 +1987,16 @@
 "companion.activity.snorkeling.feature.return" = "Ritorno all'ingresso";
 "companion.activitySelection.safety.title" = "SICUREZZA";
 "companion.activitySelection.safety.body" = "La tua sicurezza è la nostra priorità. Usa sempre l'attrezzatura adeguata e rispetta le procedure di sicurezza.";
-"companion.activitySelection.settingsReminder" = "Puoi cambiare attività in qualsiasi momento dalle Impostazioni dell'app.";
+"companion.activitySelection.settingsReminder" = "Usa Cambia modalità nelle Impostazioni per cambiare attività senza riavviare l'app.";
+"companion.activitySelection.lastUsed" = "Ultima usata";
 "companion.activitySelection.unavailable" = "Questa attività non è ancora disponibile in questa release.";
 "companion.activitySelection.watch_active_note" = "Apple Watch ha una sessione immersione attiva. Preferenza iOS aggiornata localmente; la sync Watch riprenderà a sessione conclusa.";
 "companion.activity.card.a11y.summary" = "%@. %@. %@.";
 "companion.activity.card.a11y.hint" = "Apre %@.";
 "companion.settings.activity.title" = "Attività";
 "companion.settings.activity.current" = "Attività corrente";
-"companion.settings.activity.change" = "Cambia attività";
-"companion.settings.activity.showAtLaunch" = "Mostra scelta attività all'avvio";
+"companion.settings.activity.change" = "Cambia modalità";
+"companion.settings.activity.showAtLaunch" = "Apri ultima modalità direttamente";
 "companion.settings.activity.none" = "Non selezionata";
 
 /* UI/UX audit remediation V1.0 2026-06-02 */

@@ -26,8 +26,8 @@ struct IOSCompanionActivitySettingsSection: View {
             Toggle(
                 DIRIOSLocalizer.string("companion.settings.activity.showAtLaunch"),
                 isOn: Binding(
-                    get: { companionActivity.preference.showActivitySelectionAtLaunch },
-                    set: { companionActivity.setShowActivitySelectionAtLaunch($0) }
+                    get: { !companionActivity.preference.showActivitySelectionAtLaunch },
+                    set: { companionActivity.setShowActivitySelectionAtLaunch(!$0) }
                 )
             )
         }
@@ -70,8 +70,8 @@ struct IOSCompanionActivitySettingsCard: View {
             Toggle(
                 DIRIOSLocalizer.string("companion.settings.activity.showAtLaunch"),
                 isOn: Binding(
-                    get: { companionActivity.preference.showActivitySelectionAtLaunch },
-                    set: { companionActivity.setShowActivitySelectionAtLaunch($0) }
+                    get: { !companionActivity.preference.showActivitySelectionAtLaunch },
+                    set: { companionActivity.setShowActivitySelectionAtLaunch(!$0) }
                 )
             )
             .tint(DIRTheme.cyan)
