@@ -37,9 +37,6 @@ struct MoreView: View {
                 .dirCompanionScrollSurface()
             }
             .toolbar(.hidden, for: .navigationBar)
-            .onAppear {
-                companionSettingsScope.applyInitialScope(.diving)
-            }
             .onChange(of: companionSettingsScope.displayedMode) { _, mode in
                 ensureStores(for: mode)
             }
@@ -53,9 +50,9 @@ struct MoreView: View {
         case .diving:
             IOSDivingSettingsEmbeddedContent()
         case .apnea:
-            IOSApneaSettingsForm()
+            IOSApneaSettingsContent()
         case .snorkeling:
-            IOSSnorkelingSettingsForm()
+            IOSSnorkelingSettingsContent()
         }
     }
 

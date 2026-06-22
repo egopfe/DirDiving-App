@@ -572,6 +572,7 @@ targets:
       - Tests/iOSAlgorithmTests/IOSActivitySettingsCoherenceTests.swift
       - Tests/iOSAlgorithmTests/IOSActivitySettingsModeSwitchTests.swift
       - Tests/iOSAlgorithmTests/IOSActivitySettingsRoutingTests.swift
+      - Tests/iOSAlgorithmTests/IOSActivitySettingsContentVisibilityTests.swift
       - Tests/iOSAlgorithmTests/BuhlmannComprehensiveReadinessV3RemediationTests.swift
     resources:
       - path: Tests/iOSAlgorithmTests/Fixtures

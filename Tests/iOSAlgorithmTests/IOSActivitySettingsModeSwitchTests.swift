@@ -48,8 +48,8 @@ final class IOSActivitySettingsModeSwitchTests: XCTestCase {
         let root = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/IOSCompanionSettingsRootView.swift"))
         let switcher = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/Components/IOSCompanionSettingsModeSwitcher.swift"))
         XCTAssertTrue(root.contains("IOSCompanionSettingsModeSwitcher"))
-        XCTAssertTrue(root.contains("IOSApneaSettingsForm"))
-        XCTAssertTrue(root.contains("IOSSnorkelingSettingsForm"))
+        XCTAssertTrue(root.contains("IOSApneaSettingsContent"))
+        XCTAssertTrue(root.contains("IOSSnorkelingSettingsContent"))
         XCTAssertTrue(root.contains("IOSDivingSettingsEmbeddedContent"))
         XCTAssertTrue(switcher.contains("settings.mode_switch.title"))
     }
