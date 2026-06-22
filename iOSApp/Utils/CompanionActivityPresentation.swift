@@ -29,8 +29,8 @@ enum CompanionActivityPresentation {
         }
     }
 
-    static func accessibilitySummary(for mode: DIRActivityMode) -> String {
-        CompanionActivityCopy.accessibilitySummary(for: mode)
+    static func accessibilitySummary(for mode: DIRActivityMode, isLastUsed: Bool = false) -> String {
+        CompanionActivityCopy.accessibilitySummary(for: mode, isLastUsed: isLastUsed)
     }
 
     static func accessibilityHint(for mode: DIRActivityMode, isAvailable: Bool) -> String {
