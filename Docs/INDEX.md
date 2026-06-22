@@ -17,6 +17,7 @@ Remediation software-verificabile di tutti i finding audit performance iOS (P0�
 | **Validate** | `./Scripts/validate_ios_performance_readiness.sh` PASS |
 | **XCTest** | iOS 1519/1519 · Watch 992/992 · 0 skipped |
 | **Verdict** | **PASS** — software 100% · physical Instruments **PENDING** |
+| **Baseline** | `main` @ `3f6f349` |
 
 ---
 
