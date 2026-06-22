@@ -14,6 +14,7 @@ final class IOSActivitySettingsContentVisibilityTests: XCTestCase {
         let more = try String(contentsOf: repositoryRoot().appendingPathComponent("iOSApp/Views/MoreView.swift"))
         XCTAssertTrue(more.contains("IOSApneaSettingsContent()"))
         XCTAssertTrue(more.contains("IOSSnorkelingSettingsContent()"))
+        XCTAssertTrue(more.contains("applyCompanionSettingsSheetEnvironment"))
         XCTAssertFalse(more.contains("IOSApneaSettingsForm()"))
         XCTAssertFalse(more.contains("IOSSnorkelingSettingsForm()"))
         XCTAssertFalse(more.contains("applyInitialScope(.diving)"))

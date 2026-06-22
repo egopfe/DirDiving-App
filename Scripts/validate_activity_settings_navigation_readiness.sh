@@ -92,6 +92,10 @@ if ! test -f iOSApp/Views/Snorkeling/IOSSnorkelingSettingsContent.swift; then
   echo "ERROR: missing IOSSnorkelingSettingsContent.swift" >&2
   exit 1
 fi
+if ! grep -q 'applyCompanionSettingsSheetEnvironment' iOSApp/Views/MoreView.swift; then
+  echo "ERROR: MoreView must inject companion settings environment for activity settings stores" >&2
+  exit 1
+fi
 if ! grep -q 'IOSApneaSettingsContent()' iOSApp/Views/MoreView.swift; then
   echo "ERROR: MoreView must render IOSApneaSettingsContent below mode switcher" >&2
   exit 1
