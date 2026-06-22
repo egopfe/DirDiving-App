@@ -35,6 +35,7 @@ final class DiveLogStore: ObservableObject {
     ]
     private var deletedSessionIDs: Set<UUID> = []
     private var isReady = false
+    private var hasLoadedSessions = false
     private weak var watchSync: WatchSyncService?
 
     init(cloudSync: CloudSyncStore? = nil, watchSync: WatchSyncService? = nil) {
@@ -42,6 +43,30 @@ final class DiveLogStore: ObservableObject {
         self.watchSync = watchSync
         includeDemoLogbook = UserDefaults.standard.bool(forKey: Self.includeDemoLogbookKey)
         deletedSessionIDs = loadDeletedSessionIDs()
+        isReady = true
+
+        NotificationCenter.default.addObserver(
+            forName: .cloudSyncDidChangeExternally,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in self?.reloadFromCloud() }
+        }
+
+        Task { @MainActor in
+            await self.performInitialLoadIfNeeded()
+        }
+    }
+
+    func loadIfNeeded() async {
+        await performInitialLoadIfNeeded()
+    }
+
+    private func performInitialLoadIfNeeded() async {
+        guard !hasLoadedSessions else { return }
+        hasLoadedSessions = true
+        let signpost = DIRPerformanceSignpost.begin(.logbookLoad)
+        defer { signpost.end() }
         let localSessions = loadLocalSessions()
         let cloudSessions = loadRawCloudSessions()
         updateMergeConflictState(local: localSessions, cloud: cloudSessions ?? [])
@@ -54,16 +79,7 @@ final class DiveLogStore: ObservableObject {
             insertDemoDives()
         }
 
-        isReady = true
         saveIfReady()
-
-        NotificationCenter.default.addObserver(
-            forName: .cloudSyncDidChangeExternally,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            Task { @MainActor in self?.reloadFromCloud() }
-        }
     }
 
     func attachWatchSync(_ service: WatchSyncService) {

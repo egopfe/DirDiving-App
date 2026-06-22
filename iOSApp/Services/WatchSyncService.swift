@@ -42,6 +42,8 @@ final class WatchSyncService: NSObject, ObservableObject {
     weak var snorkelingSessionSyncService: IOSSnorkelingSessionSyncService?
     private weak var apneaLogbookStore: IOSApneaLogbookStore?
     private weak var snorkelingLogbookStore: IOSSnorkelingLogbookStore?
+    var apneaLogbookProvider: (() -> IOSApneaLogbookStore?)?
+    var snorkelingLogbookProvider: (() -> IOSSnorkelingLogbookStore?)?
     private var photoIDByTransferFilePath: [String: String] = [:]
     private var companionPhotoTransfersByID: [String: CompanionPhotoTransferStatus] = [:]
     private var pendingPhotoImportVerificationTasks: [String: Task<Void, Never>] = [:]
@@ -52,6 +54,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     private var importedSessionIDs: Set<UUID> = []
     private var pushedToWatchSessionIDs: Set<UUID> = []
     private var pendingOutboundTransfers: [IOSWatchSyncPendingTransfer] = []
+    private var inFlightOutboundSessionIDs: Set<UUID> = []
     private var pendingUserInfoTransferSessionIDs: [ObjectIdentifier: UUID] = [:]
     private let pushedToWatchIDsKey = "dirdiving_ios_pushed_to_watch_session_ids"
     private let pendingOutboundFileName = "dirdiving_ios_pending_watch_sync_sessions.json"
@@ -132,6 +135,16 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     func attachSnorkelingLogbookStore(_ store: IOSSnorkelingLogbookStore) {
         snorkelingLogbookStore = store
+    }
+
+    private func resolvedApneaLogbookStore() -> IOSApneaLogbookStore? {
+        if let apneaLogbookStore { return apneaLogbookStore }
+        return apneaLogbookProvider?()
+    }
+
+    private func resolvedSnorkelingLogbookStore() -> IOSSnorkelingLogbookStore? {
+        if let snorkelingLogbookStore { return snorkelingLogbookStore }
+        return snorkelingLogbookProvider?()
     }
 
     /// Avoid SwiftUI runtime fault: "Publishing changes from within view updates".
@@ -716,7 +729,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     @discardableResult
     private func importApneaSessionPayload(_ payload: [String: Any]) -> AckContext? {
         guard payload[ApneaSessionSyncCodec.payloadKey] != nil else { return nil }
-        guard let apneaLogbookStore else {
+        guard let apneaLogbookStore = resolvedApneaLogbookStore() else {
             failedImportCount += 1
             lastMessage = DIRIOSLocalizer.string("apnea.sync.import.logbook_unavailable")
             return nil
@@ -750,7 +763,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     @discardableResult
     private func importSnorkelingSessionPayload(_ payload: [String: Any]) -> AckContext? {
         guard payload[SnorkelingSessionSyncCodec.payloadKey] != nil else { return nil }
-        guard let snorkelingLogbookStore else {
+        guard let snorkelingLogbookStore = resolvedSnorkelingLogbookStore() else {
             failedImportCount += 1
             lastMessage = DIRIOSLocalizer.string("snorkeling.sync.import.logbook_unavailable")
             return nil
@@ -902,6 +915,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             return
         }
         guard pendingOutboundTransfers.contains(where: { $0.session.id == sessionID }) else { return }
+        inFlightOutboundSessionIDs.remove(sessionID)
         markPushedToWatch(sessionID)
         removeOutboundTransfer(sessionID: sessionID)
         lastMessage = DIRIOSLocalizer.string("sync.dive.sent_to_watch")
@@ -945,8 +959,16 @@ final class WatchSyncService: NSObject, ObservableObject {
 
     private func flushOutboundTransfers() {
         guard WatchSyncAuth.hasPeerSecret(), !pendingOutboundTransfers.isEmpty else { return }
-        let queue = pendingOutboundTransfers
-        for entry in queue.reversed() {
+        let signpost = DIRPerformanceSignpost.begin(.wcEncodeDecode)
+        defer { signpost.end() }
+        let eligible = WatchSyncPendingFlushPolicy.sessionsEligibleForSend(
+            transfers: pendingOutboundTransfers,
+            sessionID: { $0.session.id },
+            lastAttemptAt: { $0.lastAttemptAt },
+            inFlightSessionIDs: inFlightOutboundSessionIDs
+        )
+        for entry in eligible.reversed() {
+            inFlightOutboundSessionIDs.insert(entry.session.id)
             sendOutbound(entry.session)
         }
     }

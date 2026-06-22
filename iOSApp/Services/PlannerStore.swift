@@ -15,11 +15,8 @@ final class PlannerStore: ObservableObject {
             deferInputMutationSideEffects()
         }
     }
-    @Published var plan = PlannerService.makePlan(input: GasPlanInput(), mode: .base)
-    @Published var buhlmann = BuhlmannPlanner.plan(
-        depthMeters: 40,
-        bottomGas: GasMix(name: "Gas di Fondo", oxygen: 0.18, helium: 0.45, maxPPO2: 1.40)
-    )
+    @Published var plan = DivePlanResult.empty
+    @Published var buhlmann = BuhlmannPlanResult.emptyReference
     @Published private(set) var analysis: TechnicalGasAnalysis = GasPlanningService.analyze(input: GasPlanInput(), mode: .base)
     var briefingText: String { plan.briefingLines.joined(separator: "\n") }
     @Published var repetitivePlanningEnabled: Bool = false {
@@ -29,6 +26,7 @@ final class PlannerStore: ObservableObject {
         didSet { scheduleSave() }
     }
     @Published private(set) var chartSnapshots = PlannerChartSnapshots.empty
+    @Published private(set) var tissueAnalyticsPresentation: TissueAnalyticsPresentation?
     @Published private(set) var isCalculating = false
     @Published private(set) var plannerBriefingSessionId = UUID()
     @Published private(set) var lastTissueSnapshot: TissueSnapshot?
@@ -69,6 +67,7 @@ final class PlannerStore: ObservableObject {
     private var planningUpdateTask: Task<Void, Never>?
     private var saveTask: Task<Void, Never>?
     private var planningGeneration: UInt = 0
+    private var activeCalculationGeneration: UInt?
     private var cachedAnalysis: TechnicalGasAnalysis?
     private var analysisCacheKey: AnalysisCacheKey?
     private var ascentSpeedObserver: NSObjectProtocol?
@@ -102,8 +101,10 @@ final class PlannerStore: ObservableObject {
             }
         }
         deferPublishedMutation { [self] in
-            calculate()
-            refreshCCRPlan()
+            schedulePlanningUpdate(persistSnapshot: false)
+            if mode.isCCR {
+                scheduleCCRPlanningUpdate(immediate: true)
+            }
             saveIfReady()
         }
     }
@@ -118,7 +119,7 @@ final class PlannerStore: ObservableObject {
         mode = selected
         plannerShowsModeSelection = false
         if selected.isCCR {
-            refreshCCRPlan()
+            scheduleCCRPlanningUpdate(immediate: true)
         } else {
             schedulePlanningUpdate()
         }
@@ -128,7 +129,6 @@ final class PlannerStore: ObservableObject {
         plannerShowsModeSelection = true
     }
 
-    /// Called once after legal onboarding so Planner tab opens on the mode selection screen.
     func preparePostLegalOnboardingEntry() {
         guard isReady else { return }
         plannerShowsModeSelection = true
@@ -226,87 +226,98 @@ final class PlannerStore: ObservableObject {
 
     func calculate() {
         guard isReady else { return }
-        planningUpdateTask?.cancel()
         saveTask?.cancel()
-        isCalculating = true
-        defer { isCalculating = false }
         if mode.isCCR {
-            refreshCCRPlan()
+            scheduleCCRPlanningUpdate(immediate: true)
         } else {
-            refreshAnalysis(force: true)
-            applyInputToPlanningOutputs(persistSnapshot: true)
+            schedulePlanningUpdate(persistSnapshot: true, immediate: true)
         }
         saveIfReady()
     }
 
-    /// Keeps plan, Bühlmann NDL, and analysis in sync with mode-projected planner input.
-    private func applyInputToPlanningOutputs(persistSnapshot: Bool = false) {
-        guard isReady else { return }
-        guard mode.isOpenCircuit else {
-            refreshCCRPlan()
-            return
+    private func schedulePlanningUpdate(persistSnapshot: Bool = false, immediate: Bool = false) {
+        guard isReady, mode.isOpenCircuit else { return }
+        planningUpdateTask?.cancel()
+        planningGeneration &+= 1
+        let generation = planningGeneration
+        planningUpdateTask = Task { @MainActor in
+            if !immediate {
+                await Task.yield()
+                try? await Task.sleep(nanoseconds: 200_000_000)
+            }
+            guard !Task.isCancelled, generation == planningGeneration else { return }
+            await runBackgroundOCCalculation(generation: generation, persistSnapshot: persistSnapshot)
         }
-        let signpost = DIRPerformanceSignpost.begin(.iosPlannerCalculation)
-        defer { signpost.end() }
-        isApplyingInputSideEffects = true
-        input.syncLegacyGasesFromPlannerCylinders()
+    }
+
+    private func runBackgroundOCCalculation(generation: UInt, persistSnapshot: Bool) async {
+        guard generation == planningGeneration else { return }
+        if activeCalculationGeneration == generation { return }
+        activeCalculationGeneration = generation
+        isCalculating = true
+
         refreshAnalysis(force: false)
-        let active = PlannerModePolicy.activePlanInput(from: input, mode: mode)
-        if case .success(let environment) = PlannerEnvironment.make(altitudeMeters: active.altitudeMeters, salinity: active.salinity) {
-            buhlmann = BuhlmannPlanner.plan(
-                depthMeters: active.buhlmannPlanningDepthMeters,
-                bottomGas: active.buhlmannBackGas,
-                environment: environment,
-                gfHigh: active.gfHigh
-            )
-        }
-        plan = PlannerService.makePlan(
-            input: input,
+        let snapshot = PlannerOCCalculationInput(
             mode: mode,
+            input: input,
             repetitivePlanningEnabled: repetitivePlanningEnabled,
-            repetitiveSnapshot: repetitivePlanningEnabled ? lastTissueSnapshot : nil,
+            lastTissueSnapshot: lastTissueSnapshot,
             surfaceIntervalMinutes: surfaceIntervalMinutes,
             decompressionMethod: decompressionMethod,
             ratioDecoPreset: ratioDecoPreset,
-            unitPreference: .metric,
-            ascentSpeedSettings: PlannerAscentSpeedSettings.load()
+            ascentSpeedSettings: PlannerAscentSpeedSettings.load(),
+            precomputedAnalysis: analysis
         )
-        if persistSnapshot,
-           let environment = try? makeEnvironment(from: active),
-           let snapshot = RepetitiveDivePlannerService.makeSnapshot(from: BuhlmannPlanner.enginePlan(input: active), environment: environment) {
+
+        let result = await Task.detached(priority: .userInitiated) {
+            PlannerBackgroundCalculation.compute(
+                snapshot: snapshot,
+                generation: generation,
+                persistSnapshot: persistSnapshot
+            )
+        }.value
+
+        guard !Task.isCancelled, generation == planningGeneration else {
+            isCalculating = false
+            activeCalculationGeneration = nil
+            return
+        }
+
+        applyCalculationResult(result, generation: generation)
+        isCalculating = false
+        activeCalculationGeneration = nil
+    }
+
+    private func applyCalculationResult(_ result: PlannerOCCalculationResult, generation: UInt) {
+        guard generation == planningGeneration else { return }
+        isApplyingInputSideEffects = true
+        plan = result.plan
+        buhlmann = result.buhlmann
+        analysis = result.analysis
+        cachedAnalysis = result.analysis
+        analysisCacheKey = AnalysisCacheKey(input: input, mode: mode)
+        if let snapshot = result.lastTissueSnapshot {
             lastTissueSnapshot = snapshot
         }
         isApplyingInputSideEffects = false
         plannerBriefingSessionId = UUID()
-        refreshChartSnapshots()
-    }
-
-    private func refreshChartSnapshots() {
-        let next = PlannerChartSnapshots.make(
-            from: plan,
-            buhlmann: buhlmann,
-            generation: planningGeneration
-        )
-        guard next != chartSnapshots else { return }
+        if chartSnapshots != result.chartSnapshots {
 #if DEBUG
-        PlannerChartSnapshots.testHook_invalidationCount += 1
+            PlannerChartSnapshots.testHook_invalidationCount += 1
 #endif
-        chartSnapshots = next
+            chartSnapshots = result.chartSnapshots
+        }
+        tissueAnalyticsPresentation = result.tissueAnalytics
     }
 
     private func refreshCCRChartSnapshots() {
-        let next = PlannerChartSnapshots(
-            planningGeneration: planningGeneration,
-            tissueGroupedPoints: [],
-            depthProfilePoints: ccrPlan.depthProfilePoints,
-            ndlCurve: [],
-            tissueHistoryEmpty: true
-        )
+        let next = PlannerChartSnapshots.make(fromCCR: ccrPlan, generation: planningGeneration)
         guard next != chartSnapshots else { return }
 #if DEBUG
         PlannerChartSnapshots.testHook_invalidationCount += 1
 #endif
         chartSnapshots = next
+        tissueAnalyticsPresentation = TissueAnalyticsService.presentationForCCRPlan(plan: ccrPlan, input: ccrInput)
     }
 
     func updateTeamMember(_ member: TeamMember) {
@@ -314,46 +325,40 @@ final class PlannerStore: ObservableObject {
         input.teamMembers[index] = member
     }
 
-    private func scheduleCCRPlanningUpdate() {
+    private func scheduleCCRPlanningUpdate(immediate: Bool = false) {
         guard isReady, mode.isCCR else { return }
         planningUpdateTask?.cancel()
         planningGeneration &+= 1
         let generation = planningGeneration
         planningUpdateTask = Task { @MainActor in
-            await Task.yield()
-            isCalculating = true
-            try? await Task.sleep(nanoseconds: 200_000_000)
+            if !immediate {
+                await Task.yield()
+                try? await Task.sleep(nanoseconds: 200_000_000)
+            }
             guard !Task.isCancelled, generation == planningGeneration else { return }
-            refreshCCRPlan()
-            isCalculating = false
+            await runBackgroundCCRCalculation(generation: generation)
         }
     }
 
-    func refreshCCRPlan() {
-        guard isReady, mode.isCCR else { return }
-        let signpost = DIRPerformanceSignpost.begin(.iosCCRPlannerCalculation)
-        defer { signpost.end() }
-        ccrPlan = CCRPlannerService.makePlan(input: ccrInput)
+    private func runBackgroundCCRCalculation(generation: UInt) async {
+        guard generation == planningGeneration else { return }
+        isCalculating = true
+        let capturedInput = ccrInput
+        let result = await Task.detached(priority: .userInitiated) {
+            let signpost = DIRPerformanceSignpost.begin(.iosCCRPlannerCalculation)
+            defer { signpost.end() }
+            return CCRPlannerService.makePlan(input: capturedInput)
+        }.value
+        guard !Task.isCancelled, generation == planningGeneration else {
+            isCalculating = false
+            return
+        }
+        ccrPlan = result
         plannerBriefingSessionId = UUID()
         refreshCCRChartSnapshots()
+        isCalculating = false
     }
 
-    private func schedulePlanningUpdate(persistSnapshot: Bool = false) {
-        guard isReady, mode.isOpenCircuit else { return }
-        planningUpdateTask?.cancel()
-        planningGeneration &+= 1
-        let generation = planningGeneration
-        planningUpdateTask = Task { @MainActor in
-            await Task.yield()
-            isCalculating = true
-            try? await Task.sleep(nanoseconds: 200_000_000)
-            guard !Task.isCancelled, generation == planningGeneration else { return }
-            applyInputToPlanningOutputs(persistSnapshot: persistSnapshot)
-            isCalculating = false
-        }
-    }
-
-    /// Avoids SwiftUI "Publishing changes from within view updates" when bindings mutate @Published state.
     private func deferPublishedMutation(_ operation: @MainActor @escaping () -> Void) {
         Task { @MainActor in
             await Task.yield()
@@ -442,15 +447,6 @@ final class PlannerStore: ObservableObject {
         cachedAnalysis = computed
         analysisCacheKey = key
         analysis = computed
-    }
-
-    private func makeEnvironment(from input: GasPlanInput) throws -> PlannerEnvironment {
-        switch PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) {
-        case .success(let environment):
-            return environment
-        case .failure:
-            throw NSError(domain: "PlannerEnvironment", code: 2)
-        }
     }
 }
 
@@ -558,12 +554,12 @@ extension PlannerStore {
         for _ in 0..<5 {
             await Task.yield()
         }
-        // Drain init deferPublishedMutation(calculate) and debounced schedulePlanningUpdate tasks.
         try? await Task.sleep(nanoseconds: 250_000_000)
         planningUpdateTask?.cancel()
         saveTask?.cancel()
         isCalculating = false
-        applyInputToPlanningOutputs()
+        activeCalculationGeneration = nil
+        await runBackgroundOCCalculation(generation: planningGeneration, persistSnapshot: false)
         saveIfReady()
     }
 }
