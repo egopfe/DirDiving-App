@@ -5,6 +5,22 @@
 
 ---
 
+## Aggiornamento indice 2026-06-22 — iOS Performance Remediation V1.0
+
+Remediation software-verificabile di tutti i finding audit performance iOS (P0–P3). Readiness software 100%; physical QA pending.
+
+| Campo | Valore |
+|-------|--------|
+| **Remediation report** | [`IOS_PERFORMANCE_REMEDIATION_REPORT_CURRENT.md`](IOS_PERFORMANCE_REMEDIATION_REPORT_CURRENT.md) |
+| **Audit (updated)** | [`IOS_PERFORMANCE_OPTIMIZATION_AUDIT_CURRENT.md`](IOS_PERFORMANCE_OPTIMIZATION_AUDIT_CURRENT.md) |
+| **Findings** | [`IOS_PERFORMANCE_FINDING_TRACEABILITY_CURRENT.csv`](IOS_PERFORMANCE_FINDING_TRACEABILITY_CURRENT.csv) — **SOFTWARE_OPEN=0** |
+| **Validate** | `./Scripts/validate_ios_performance_readiness.sh` PASS |
+| **XCTest** | iOS 1519/1519 · Watch 992/992 · 0 skipped |
+| **Verdict** | **PASS** — software 100% · physical Instruments **PENDING** |
+| **Baseline** | `main` @ `3f6f349` |
+
+---
+
 ## Aggiornamento indice 2026-06-22 — iOS Performance Optimization Audit V1.0
 
 Audit read-only performance iOS Companion: startup, SwiftUI, planner, charts, logbook, export/import, sync, map, observability. Nessuna remediation production.
@@ -23,7 +39,7 @@ Audit read-only performance iOS Companion: startup, SwiftUI, planner, charts, lo
 | **Validate** | `./Scripts/validate_ios_performance_audit_readiness.sh` PASS |
 | **XCTest (gate subset)** | iOS 53/53 · 0 skipped |
 | **Verdict** | **PARTIAL** — overall 58% · physical Instruments **PENDING** |
-| **Baseline** | `main` @ `73eb836` |
+| **Baseline** | `main` @ `6bc4111` |
 
 ---
 

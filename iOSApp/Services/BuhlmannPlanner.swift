@@ -97,6 +97,57 @@ enum BuhlmannPlanner {
         )
     }
 
+    /// Builds NDL presentation using engine NDL when available to avoid duplicate depth NDL solve.
+    static func planPresentation(
+        depthMeters: Double,
+        bottomGas: GasMix,
+        environment: PlannerEnvironment,
+        gfHigh: Double,
+        engineNDLMinutes: Double?
+    ) -> BuhlmannPlanResult {
+        let o2 = bottomGas.oxygen
+        let he = bottomGas.helium
+        let gas = BuhlmannGas(
+            name: "Reference gas",
+            role: .bottom,
+            oxygenFraction: o2,
+            heliumFraction: he,
+            maxPPO2Bar: bottomGas.maxPPO2,
+            switchDepthMeters: depthMeters
+        )
+        guard depthMeters.isFinite,
+              depthMeters >= IOSAlgorithmConfiguration.minPlannerDepthMeters,
+              depthMeters <= IOSAlgorithmConfiguration.maxPlannerDepthMeters,
+              gas.isCompositionValid else {
+            return plan(depthMeters: depthMeters, bottomGas: bottomGas, environment: environment, gfHigh: gfHigh)
+        }
+
+        let ndlValue: Double
+        if let engineNDLMinutes, engineNDLMinutes > 0 {
+            ndlValue = engineNDLMinutes
+        } else {
+            let initialTissueState = BuhlmannTissueState.airSaturated(surfacePressureBar: environment.surfacePressureBar)
+            ndlValue = BuhlmannEngine.noDecompressionLimit(
+                depthMeters: depthMeters,
+                gas: gas,
+                gfHigh: gfHigh,
+                initialTissueState: initialTissueState,
+                plannerEnvironment: environment
+            ) ?? 0
+        }
+
+        return BuhlmannPlanResult(
+            depthMeters: depthMeters,
+            gasO2Fraction: o2,
+            heliumFraction: he,
+            nitrogenFraction: max(0, gas.nitrogenFraction),
+            ndlMinutes: ndlValue,
+            curve: ndlCurve(for: gas, environment: environment, gfHigh: gfHigh),
+            warning: DIRIOSLocalizer.string("planner.buhlmann.reference_disclaimer"),
+            modelState: .validReference
+        )
+    }
+
     static func enginePlan(input: GasPlanInput) -> BuhlmannEngineResult {
         guard case .success(let environment) = PlannerEnvironment.make(altitudeMeters: input.altitudeMeters, salinity: input.salinity) else {
             return BuhlmannEngineResult(

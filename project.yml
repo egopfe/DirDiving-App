@@ -121,6 +121,7 @@ targets:
       - Models/PlannerBriefingCard.swift
       - Models/DIRModesAndStartup.swift
       - Utils/MonotonicElapsedClock.swift
+      - Utils/WatchSyncPendingFlushPolicy.swift
       - Utils/ApneaWatchPresentation.swift
       - Utils/SnorkelingWatchPresentation.swift
       - Utils/DIRWatchLocalizer.swift
@@ -351,6 +352,7 @@ targets:
       - iOSApp/Models/GPSPoint.swift
       - iOSApp/Models/TankSize.swift
       - path: Shared
+      - Utils/WatchSyncPendingFlushPolicy.swift
       - iOSApp/Algorithms/Buhlmann/BuhlmannGas+GasMix.swift
       - iOSApp/Services/PlannerAscentTableBuilder.swift
       - iOSApp/Services/DecoStopsPresentationBuilder.swift
@@ -376,7 +378,9 @@ targets:
       - iOSApp/Services/WatchSyncAuth.swift
       - iOSApp/Services/IOSWatchSyncPendingTransfer.swift
       - iOSApp/Services/PlannerStore.swift
+      - iOSApp/Services/PlannerBackgroundCalculation.swift
       - iOSApp/Services/PlannerChartSnapshots.swift
+      - iOSApp/Services/IOSExportCancellation.swift
       - iOSApp/Services/EquipmentStore.swift
       - iOSApp/Utils/ChecklistItemSupport.swift
       - iOSApp/Utils/SyncNonceReplayCache.swift
