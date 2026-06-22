@@ -1,0 +1,30 @@
+Surface_ID,Activity,Screen_or_Service,File_Path,Performance_Risk,Data_Size_Risk,MainThread_Risk,Memory_Risk,Async_Risk,Current_Tests,Current_Instrumentation,Notes
+IOS-START-001,Shared,App launch coordinator,iOSApp/Services/IOSCompanionStoreCoordinator.swift,High,Med,High,Med,Low,IOSCompanionStoreLifecycleTests (source),None,Full Diving store graph eager at init even on legal gate
+IOS-START-002,Shared,WatchSync activation,iOSApp/App/DIRDivingiOSApp.swift,Med,Med,Med,Med,Med,IOSCompanionStoreLifecycleTests,Logger,Creates Apnea+Snorkeling lite logbooks every launch
+IOS-START-003,Shared,CloudSync init,iOSApp/Services/CloudSyncStore.swift,Med,Low,Med,Low,Med,CloudSync tests,Logger,KVS synchronize() on init when iCloud available
+IOS-UI-001,Diving,ContentView tab mounting,iOSApp/Views/ContentView.swift,Low,Low,Low,Low,Low,IOSEquipmentChecklistTabSplitTests,None,Lazy tab mount — positive pattern
+IOS-UI-002,Shared,Settings mode switcher,iOSApp/Views/MoreView.swift,Med,Low,Med,Med,Low,IOSActivitySettingsContentVisibilityTests,None,applyCompanionSettingsSheetEnvironment creates both activity bundles
+IOS-UI-003,Shared,Settings sheet root,iOSApp/Views/IOSCompanionSettingsRootView.swift,Med,Low,Med,Med,Low,IOSActivitySettingsRoutingTests,None,Same dual-bundle environment as MoreView
+IOS-PLAN-001,Diving,PlannerStore,iOSApp/Services/PlannerStore.swift,High,High,High,Med,Med,PerformanceConcurrencyBatteryRemediationTests,ios_planner_calc signpost,200ms debounce; all math @MainActor
+IOS-PLAN-002,Diving,PlannerView charts,iOSApp/Views/PlannerView.swift,High,High,High,Med,Low,PlannerChartSnapshots tests,chart_snapshot_prep,Tissue analytics in body without signpost
+IOS-CHART-001,Diving,PlannerChartSnapshots,iOSApp/Services/PlannerChartSnapshots.swift,Med,Med,Med,Low,Low,PerformanceConcurrencyBatteryRemediationTests,chart_snapshot_prep,2048 point cap via PresentationSeriesDownsampler
+IOS-CHART-002,Diving,TissueAnalyticsCharts,iOSApp/Views/TissueAnalytics/TissueAnalyticsCharts.swift,High,High,High,Med,Low,TissueAnalyticsServiceTests,None,Full minute resolution; no decimation
+IOS-CHART-003,Diving,CCRPlanResultView,iOSApp/Views/CCR/CCRPlanResultView.swift,Med,Med,Med,Low,Low,CCR planner tests,None,Raw plan arrays; no downsampling
+IOS-LOG-001,Diving,DiveLogStore,iOSApp/Services/DiveLogStore.swift,Med,Med,High,Med,Low,PerformanceConcurrencyBatteryRemediationTests,Logger,Full JSON load/save; cap 40 sessions
+IOS-LOG-002,Diving,LogbookView,iOSApp/Views/LogbookView.swift,Med,Low,Med,Low,Low,Logbook sort tests,None,ScrollView+ForEach not lazy; bounded by cap
+IOS-LOG-003,Apnea,IOSApneaLogbookStore,iOSApp/Services/IOSApneaLogbookStore.swift,Med,Med,Med,Med,Low,LogbookScalabilitySupport tests,None,Full envelope decode; cap 80
+IOS-LOG-004,Snorkeling,IOSSnorkelingLogbookStore,iOSApp/Services/IOSSnorkelingLogbookStore.swift,Med,Med,Med,Med,Low,LogbookScalabilitySupport tests,None,Full envelope decode; cap 80
+IOS-LOG-005,Apnea,IOSApneaStatisticsView,iOSApp/Views/Apnea/IOSApneaStatisticsView.swift,Med,Med,Med,Low,Low,IOSApneaLogbookAnalyticsTests,None,Full array scan on render
+IOS-LOG-006,Snorkeling,IOSSnorkelingStatisticsView,iOSApp/Views/Snorkeling/IOSSnorkelingStatisticsView.swift,Med,Med,Med,Low,Low,IOSSnorkelingLogbookAnalyticsTests,None,Full array scan on render
+IOS-EXP-001,Diving,SubsurfaceExportService,iOSApp/Services/SubsurfaceExportService.swift,Med,Med,Med,Med,Low,CSVMetadataRoundTripTests,None,Synchronous; temp file cleanup 24h
+IOS-EXP-002,Diving,DiveImportService,iOSApp/Services/DiveImportService.swift,Med,Med,Med,Med,Low,PerformanceConcurrencyBatteryRemediationTests,None,10MB cap; row count not enforced in parse
+IOS-EXP-003,Apnea,IOSApneaSessionExportService,iOSApp/Services/IOSApneaSessionExportService.swift,Med,Low,High,Med,Low,Apnea export tests,None,PDF in memory; no cancellation
+IOS-EXP-004,Snorkeling,IOSSnorkelingSessionExportService,iOSApp/Services/IOSSnorkelingSessionExportService.swift,Med,Low,High,Med,Low,Snorkeling export tests,None,PDF/GPX in memory; no cancellation
+IOS-SYNC-001,Diving,WatchSyncService iOS,iOSApp/Services/WatchSyncService.swift,Med,High,Med,Med,Med,WatchSyncServiceIntegrationTests,Logger,Bulk flush; no in-flight dedup on iOS
+IOS-SYNC-002,Apnea,IOSApneaWatchTransferService,iOSApp/Services/IOSApneaWatchTransferService.swift,Med,Med,Med,Low,Med,Apnea sync tests,None,Pending queue flush all entries
+IOS-SYNC-003,Snorkeling,IOSSnorkelingWatchTransferService,iOSApp/Services/IOSSnorkelingWatchTransferService.swift,Med,Med,Med,Low,Med,Snorkeling sync tests,None,Pending queue flush all entries
+IOS-MAP-001,Snorkeling,Session detail map,iOSApp/Views/Snorkeling/IOSSnorkelingSessionDetailView.swift,High,High,Med,Med,Low,IOSSnorkelingDashboardMapGapTests,None,Full MapPolyline coordinates; downsampler unwired
+IOS-MAP-002,Snorkeling,Dashboard map preview,iOSApp/Views/Snorkeling/IOSSnorkelingDashboardView.swift,High,High,Med,Med,Low,IOSSnorkelingDashboardMapGapTests,None,Preview region from all coordinates
+IOS-MAP-003,Snorkeling,Route presentation sampling,Shared/Performance/SnorkelingRoutePresentationSampling.swift,Low,High,Low,Low,Low,PerformanceConcurrencyBatteryRemediationTests,None,4096 cap utility tested; not used in UI
+IOS-SET-001,Shared,SharedIOSSettingsStore,iOSApp/Services/SharedIOSSettingsStore.swift,Low,Low,Low,Low,Low,IOSActivitySettingsCoherenceTests,None,Forwards objectWillChange to coordinator
+IOS-SET-002,Shared,IOSCompanionSettingsScopeStore,iOSApp/Services/IOSCompanionSettingsScopeStore.swift,Low,Low,Low,Low,Low,IOSActivitySettingsModeSwitchTests,None,Root invalidation via coordinator forwarding

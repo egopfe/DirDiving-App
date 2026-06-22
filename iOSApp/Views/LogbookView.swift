@@ -61,7 +61,7 @@ struct LogbookView: View {
         NavigationStack {
             DIRScreenContainer {
                 ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 16) {
+                    LazyVStack(alignment: .leading, spacing: 16) {
                         header
                         if hasMixedDemoAndRealDives {
                             mixedDemoBanner
@@ -140,6 +140,9 @@ struct LogbookView: View {
             }
         }
         .dirCompanionTabRoot()
+        .task {
+            await logStore.loadIfNeeded()
+        }
     }
 
     private var csvImportSection: some View {

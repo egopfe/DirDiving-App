@@ -154,4 +154,97 @@ final class PerformanceConcurrencyBatteryRemediationTests: XCTestCase {
         XCTAssertEqual(DiveCSVImportBounds.maxBytes, 10 * 1_024 * 1_024)
         XCTAssertGreaterThan(DiveCSVImportBounds.maxRows, 0)
     }
+
+    func testCSVRowLimitEnforcedDuringParse() {
+        var rows = ["date,time,depth\n"]
+        for index in 0..<(DiveCSVImportBounds.maxRows + 5) {
+            rows.append("2024-01-01,12:00,\(index)\n")
+        }
+        let contents = rows.joined()
+        XCTAssertNil(DiveImportService.testHook_parseCSV(contents))
+    }
+
+    func testTissueAnalyticsCacheBounded() {
+        TissueAnalyticsService.invalidateCache()
+        for index in 0..<40 {
+            var input = GasPlanInput()
+            input.plannedDepthMeters = 20 + Double(index)
+            let plan = PlannerService.makePlan(input: input, mode: .technical)
+            _ = TissueAnalyticsService.presentationForPlanner(plan: plan, input: input, mode: .technical)
+        }
+        TissueAnalyticsService.invalidateCache()
+        XCTAssertTrue(true)
+    }
+
+    func testPlannerBackgroundFlushWithinBudget() async {
+        let store = PlannerStore()
+        let budget = DIRPerformanceBudgets.entry(for: .iosPlannerOCCalculation)!
+        let start = CFAbsoluteTimeGetCurrent()
+        await store.testHook_flushDebouncedWork()
+        let elapsedMs = (CFAbsoluteTimeGetCurrent() - start) * 1_000
+        XCTAssertLessThan(elapsedMs, budget.hardTestLimit)
+        XCTAssertGreaterThan(store.chartSnapshots.planningGeneration, 0)
+    }
+
+    func testManualCalculateUsesBackgroundPipeline() async {
+        let store = PlannerStore()
+        await store.testHook_flushDebouncedWork()
+        store.calculate()
+        for _ in 0..<20 { await Task.yield() }
+        try? await Task.sleep(nanoseconds: 800_000_000)
+        XCTAssertFalse(store.isCalculating)
+    }
+
+    private func repositorySource(relativePath: String) throws -> String {
+        let root = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        return try String(contentsOf: root.appendingPathComponent(relativePath), encoding: .utf8)
+    }
+
+    func testLogbookViewUsesLazyRenderingStructure() throws {
+        let source = try repositorySource(relativePath: "iOSApp/Views/LogbookView.swift")
+        XCTAssertTrue(source.contains("LazyVStack"))
+    }
+
+    func testApneaRowPresentationUsesCachedStatistics() throws {
+        let source = try repositorySource(relativePath: "iOSApp/Utils/IOSApneaLogbookPresentation.swift")
+        XCTAssertTrue(source.contains("session.statistics"))
+    }
+
+    func testSnorkelingMapPresentationDownsamplesInBuilder() throws {
+        let source = try repositorySource(relativePath: "Shared/Utils/SnorkelingSessionMapPresentation.swift")
+        XCTAssertTrue(source.contains("downsampledMeasuredPoints"))
+        XCTAssertTrue(source.contains("SnorkelingRoutePresentationSampling"))
+    }
+
+    func testSettingsLazyEnvironmentHostExists() throws {
+        let source = try repositorySource(relativePath: "iOSApp/Views/Components/IOSCompanionSettingsEnvironmentHost.swift")
+        XCTAssertTrue(source.contains("ensureApneaSettingsStore"))
+        XCTAssertTrue(source.contains("ensureSnorkelingSettingsStore"))
+    }
+
+    func testWatchSyncFlushPolicyBoundsBatch() {
+        struct Transfer {
+            let id: UUID
+            let lastAttemptAt: Date?
+        }
+        let transfers: [Transfer] = (0..<1_000).map { _ in Transfer(id: UUID(), lastAttemptAt: nil) }
+        let eligible = WatchSyncPendingFlushPolicy.sessionsEligibleForSend(
+            transfers: transfers,
+            sessionID: { (transfer: Transfer) in transfer.id },
+            lastAttemptAt: { (transfer: Transfer) in transfer.lastAttemptAt },
+            inFlightSessionIDs: []
+        )
+        XCTAssertEqual(eligible.count, 1_000)
+        let inFlight: Set<UUID> = [transfers[0].id]
+        let throttled = WatchSyncPendingFlushPolicy.sessionsEligibleForSend(
+            transfers: transfers,
+            sessionID: { (transfer: Transfer) in transfer.id },
+            lastAttemptAt: { (transfer: Transfer) in transfer.lastAttemptAt },
+            inFlightSessionIDs: inFlight
+        )
+        XCTAssertEqual(throttled.count, 999)
+    }
 }

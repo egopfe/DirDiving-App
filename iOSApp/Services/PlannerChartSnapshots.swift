@@ -73,6 +73,31 @@ struct PlannerChartSnapshots: Equatable {
         )
     }
 
+    static func make(
+        fromCCR plan: CCRPlanResult,
+        generation: UInt,
+        maxDepthPoints: Int = PresentationSeriesDownsampler.defaultMaxPresentationPoints
+    ) -> PlannerChartSnapshots {
+        let interval = DIRPerformanceSignpost.begin(.chartSnapshotPreparation)
+        defer { interval.end() }
+
+        let depthPoints = plan.depthProfilePoints
+        let downsampledDepth: [DepthProfilePoint]
+        if depthPoints.count > maxDepthPoints {
+            downsampledDepth = PresentationSeriesDownsampler.downsampleUniform(depthPoints, maxPoints: maxDepthPoints)
+        } else {
+            downsampledDepth = depthPoints
+        }
+
+        return PlannerChartSnapshots(
+            planningGeneration: generation,
+            tissueGroupedPoints: [],
+            depthProfilePoints: downsampledDepth,
+            ndlCurve: [],
+            tissueHistoryEmpty: plan.tissueTrace.isEmpty
+        )
+    }
+
 #if DEBUG
     static var testHook_invalidationCount = 0
 
