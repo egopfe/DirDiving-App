@@ -68,6 +68,43 @@ grep -q 'WatchInModeSettingsAccessButton' Utils/WatchInModeSettingsAccess.swift
 grep -q 'WatchInModeSettingsAccessButton' Views/ApneaView.swift
 grep -q 'WatchInModeSettingsAccessButton' Views/SnorkelingView.swift
 
+if ! grep -q 'IOSApneaSettingsContent()' iOSApp/Views/IOSCompanionSettingsRootView.swift; then
+  echo "ERROR: IOSCompanionSettingsRootView must embed IOSApneaSettingsContent" >&2
+  exit 1
+fi
+if ! grep -q 'IOSSnorkelingSettingsContent()' iOSApp/Views/IOSCompanionSettingsRootView.swift; then
+  echo "ERROR: IOSCompanionSettingsRootView must embed IOSSnorkelingSettingsContent" >&2
+  exit 1
+fi
+if grep -q 'IOSApneaSettingsForm()' iOSApp/Views/IOSCompanionSettingsRootView.swift; then
+  echo "ERROR: IOSCompanionSettingsRootView must not embed IOSApneaSettingsForm" >&2
+  exit 1
+fi
+if grep -q 'IOSSnorkelingSettingsForm()' iOSApp/Views/IOSCompanionSettingsRootView.swift; then
+  echo "ERROR: IOSCompanionSettingsRootView must not embed IOSSnorkelingSettingsForm" >&2
+  exit 1
+fi
+if ! test -f iOSApp/Views/Apnea/IOSApneaSettingsContent.swift; then
+  echo "ERROR: missing IOSApneaSettingsContent.swift" >&2
+  exit 1
+fi
+if ! test -f iOSApp/Views/Snorkeling/IOSSnorkelingSettingsContent.swift; then
+  echo "ERROR: missing IOSSnorkelingSettingsContent.swift" >&2
+  exit 1
+fi
+if ! grep -q 'IOSApneaSettingsContent()' iOSApp/Views/MoreView.swift; then
+  echo "ERROR: MoreView must render IOSApneaSettingsContent below mode switcher" >&2
+  exit 1
+fi
+if grep -q 'Form {' iOSApp/Views/Apnea/IOSApneaSettingsContent.swift; then
+  echo "ERROR: IOSApneaSettingsContent must not use Form" >&2
+  exit 1
+fi
+if grep -q 'Form {' iOSApp/Views/Snorkeling/IOSSnorkelingSettingsContent.swift; then
+  echo "ERROR: IOSSnorkelingSettingsContent must not use Form" >&2
+  exit 1
+fi
+
 echo "[activity-settings-navigation] build iOS MAIN"
 run_build "DIRDiving iOS" 'generic/platform=iOS Simulator'
 
@@ -78,6 +115,7 @@ echo "[activity-settings-navigation] iOS settings suites"
 run_tests "${IOS_SCHEME}" "${IOS_DEST}" \
   IOSActivitySettingsModeSwitchTests \
   IOSActivitySettingsRoutingTests \
+  IOSActivitySettingsContentVisibilityTests \
   IOSActivitySettingsCoherenceTests \
   IOSCompanionActivitySelectionTests \
   IOSCompanionStoreLifecycleTests
@@ -99,6 +137,7 @@ if [[ -x "${ROOT_DIR}/Scripts/validate_ui_ux_main_readiness.sh" ]]; then
 fi
 
 echo "ACTIVITY_SETTINGS_NAVIGATION_SOFTWARE_GATE_PASS"
+echo "IOS_ACTIVITY_SETTINGS_CONTENT_READINESS_100"
 echo "IOS_SETTINGS_MODE_SWITCH_READINESS_100"
 echo "IOS_APNEA_SETTINGS_ACCESS_READINESS_100"
 echo "IOS_SNORKELING_SETTINGS_ACCESS_READINESS_100"
