@@ -1,0 +1,13 @@
+Blocker_ID,Consolidated_Finding_ID,Severity,Gate,Internal_TestFlight,External_TestFlight,App_Store,Owner_Batch,Target_Burn_Down,Status,Required_Evidence,Notes
+BLK-001,CONS-007,P2,Build/test @ HEAD,ALLOW, ALLOW, ALLOW,Batch-0,Day 1-2,PARTIAL,1519 iOS + 990 Watch PASS @ 1f62235; 7 IntegratedModes tests stall P3,
+BLK-002,CONS-001,P1,External decompression claim,ALLOW, BLOCK, BLOCK,Batch-1,Day 3-14,OPEN,Independent oracle or signed tolerance doc,
+BLK-003,CONS-002,P1,External validation,ALLOW, BLOCK, BLOCK,Batch-8,Day 7-30,OPEN,QA_EVIDENCE/BUHLMANN_EXTERNAL signed,
+BLK-004,CONS-003,P1,Physical Watch FC,ALLOW, BLOCK, BLOCK,Batch-8,Day 7-21,OPEN,WATCH_ULTRA_PHYSICAL_QA_MATRIX executed,
+BLK-005,CONS-004,P1,Paired sync,ALLOW, BLOCK, BLOCK,Batch-8,Day 7-21,OPEN,WATCH_IOS_SYNC paired matrix,
+BLK-006,CONS-005,P1,Accessibility,ALLOW, BLOCK, BLOCK,Batch-6,Day 7-21,OPEN,VoiceOver/Dynamic Type device matrix,
+BLK-007,CONS-006,P1,Release PDF/legal,ALLOW, BLOCK, BLOCK,Batch-9,Day 14-30,OPEN,Golden PDF + legal review artifact,
+BLK-008,CONS-008,P2,UX restoration,ALLOW, ALLOW, ALLOW,Batch-3,Day 7-14,OPEN,State restoration tests or doc,
+BLK-009,CONS-009,P2,Visual regression,ALLOW, CONDITIONAL, CONDITIONAL,Batch-6,Day 14-30,OPEN,59 pixel baselines,
+BLK-010,CONS-010,P2,Field performance,ALLOW, CONDITIONAL, CONDITIONAL,Batch-8,Day 14-30,OPEN,Instruments Energy Log,
+BLK-011,CONS-011,P2,Subsurface compat,ALLOW, ALLOW, CONDITIONAL,Batch-8,Day 14-30,OPEN,Desktop round-trip evidence,
+BLK-012,CONS-012,P2,Documentation truth,ALLOW, ALLOW, CONDITIONAL,Batch-9,Day 7-14,OPEN,INDEX/README repair,

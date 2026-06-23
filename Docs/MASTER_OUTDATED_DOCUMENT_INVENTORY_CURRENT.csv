@@ -1,0 +1,39 @@
+File,Type,Last_Known_Update,Outdated_Topic,Severity,Reason,Superseded_By,Keep_Archive,Required_Action,Notes
+README.md,Root index,2026-06-20,baseline SHA bf03fb0,Medium,HEAD is 1f62235; missing master audit chain,DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT + this audit,yes,Update baseline and link Launch Sequence 01-06,P1
+Docs/README.md,Project overview,2026-06-20,baseline bf03fb0; long historical table,Medium,Opening multi-activity text current; stato table stale,This audit remediation,yes,Refresh stato corrente to 1f62235; trim duplicate alignment rows,P1
+Docs/INDEX.md,Documentation index,2026-06-22,Missing MASTER audit 01-06 outputs,High,745 files indexed but no Launch Order 01-06 block,00-DIR_DIVING_MASTER_AUDIT_LAUNCH_SEQUENCE.md,no,Add master audit section with all MASTER_*_CURRENT links,P0
+Docs/INDEX.md,Documentation index,2026-06-22,Command 6 still V3.0 git alignment,Medium,Superseded command reference,06-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT,yes,Mark V3.0 Command 6 superseded; link Command 06,P1
+Docs/PRODUCT_FEATURES_IT.md,Feature overview,2026-05-31,Apnea/Snorkeling marked experimental,High,Contradicts MAIN @ 1f62235,APNEA_ARCHITECTURE.md; SNORKELING_ARCHITECTURE.md,yes,Rewrite modalità Apnea/Snorkeling as MAIN,P1
+Docs/EXPERIMENTAL_FEATURES.md,Experimental scope,2026-06-17,Apnea excluded from MAIN,High,Apnea/Snorkeling production in MAIN,Buddy/exploration sections only,yes,Scope doc to Buddy/exploration; cross-link MAIN architecture,P1
+Docs/TESTFLIGHT_REVIEW_NOTES.md,Release,2026-06-xx,Apnea/Snorkeling codex-only,High,Unsafe for TestFlight testers on MAIN build,PR_STATUS_20260620,yes,Replace branch table with MAIN multi-activity + PENDING QA,P0
+Docs/ROADMAP.md,Roadmap,2026-06-14,baseline 99ea74a; Snorkeling experimental table,Medium,MAIN Snorkeling shipped; date stale,Feature matrix MAIN rows,yes,Update date/SHA; split legacy branch vs MAIN,P1
+Docs/DIR_DIVING_Feature_Comparison.csv,Feature matrix,2026-06-20,Duplicate experimental vs MAIN Apnea/Snorkeling,Medium,Rows 12-26 conflict with 430-433,MASTER_UI_UX_FEATURE_IMPLEMENTATION_MATRIX,yes,Reconcile or annotate branch scope,P1
+Docs/DIR_DIVING_Feature_Comparison.csv,Feature matrix,2026-06-22,Missing mode switch Ratio Deco briefing rows,Low,Gaps vs implemented features,ACTIVITY_SETTINGS matrices,yes,Add planned rows per repair plan,P2
+Docs/WATCH_MISSION_MODE_UX_SAFETY_VERIFICATION_REPORT.md,Safety UX,2026-05-xx,App Store ready Yes,High,Unsupported without physical/legal gates,MASTER_IOS release matrix,no,Correct to conditional internal / PENDING,P0
+Docs/WATCH_LOW_POWER_MISSION_MODE_IMPLEMENTATION_REPORT.md,Implementation,2026-05-xx,App Store ready conditional,Medium,Overstates release readiness,TESTFLIGHT_REVIEW_NOTES,yes,Add PENDING physical QA banner,P1
+Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md,Readiness,2026-05-23,Apnea/Snorkeling excluded project.yml,Medium,Pre-V3.0 snapshot,MAIN_DEEP_CODE_ANALYSIS audit,yes,Superseded header; archive narrative,P1
+Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260530.md,Branch alignment,2026-05-30,MAIN excludes Apnea/Snorkeling,Low,Historical,DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT,yes,Archive only,P3
+Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260527.md,Branch alignment,2026-05-27,Experimental Apnea on codex only,Low,Historical,20260620 report,yes,Archive only,P3
+Docs/PR_STATUS_20260607.md,PR status,2026-06-07,Apnea not in MAIN,Low,Superseded by 20260620,PR_STATUS_20260620.md,yes,INDEX should prefer 20260620,P3
+Docs/DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md,Alignment,2026-06-20,baseline bf03fb0,Medium,Pre-master-audit pass,This audit Command 06,yes,Append master audit delta section,P2
+Docs/ORCHESTRATED_AUDIT_CONSOLIDATED_REPORT_CURRENT.md,Consolidated audit,2026-06-21,ORCH-001 P0 altitude drop,Medium,May be fixed @ 1f62235,MASTER_WATCH_FULL_COMPUTER audit,yes,Add remediation status footnote,P2
+Docs/RELEASE_LEGAL_CLAIMS_COMPLIANCE_AUDIT_CURRENT.md,Release legal,2026-06-20,Command 13 not Command 05 master,Low,Naming/sequence drift,05-MASTER_RELEASE command,yes,Cross-link when MASTER_RELEASE output exists,P2
+Docs/IOS_PERFORMANCE_OPTIMIZATION_AUDIT_CURRENT.md,Performance,2026-06-22,baseline 6bc4111 in INDEX,Low,SHA drift,IOS_PERFORMANCE remediation report,yes,Normalize baseline references,P2
+Docs/MAIN_UI_UX_READINESS_QA_ANALYSIS.md,UI/UX,2026-05-xx,100% excl physical,Low,Ambiguous headline,MASTER_UI_UX audit,yes,Clarify software-only,P3
+Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md,Algorithm,2026-05-31,100% without physical qualifier,Low,Software-only implied,MASTER_WATCH FC audit,yes,Add software-only subtitle,P3
+Docs/IOS_MAIN_ALGORITHM_READINESS_100_REPORT.md,Algorithm,2026-05-xx,100% software,Low,External validation pending,MASTER_IOS audit,yes,Cross-link external pending,P3
+commands_for_cursor/OOLD/*.md,Audit commands,2026-06-22,Partial V3.0 archive only,Medium,Commands 4-17 V3.0 not all archived,01-06 MASTER commands,yes,Complete archive inventory in INDEX,P2
+commands_for_cursor/OLD/*.md,Audit commands,2026-06-19,V2.0 superseded,Low,Archived,01-06 MASTER,yes,List in superseded commands section,P3
+Docs/DOCUMENTATION_BRANCH_ALIGNMENT_20260606.md,Alignment,2026-06-06,Superseded notice present,Low,Already marked,DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT,yes,None,P3
+Docs/APNEA_EXPERIMENTAL_SPEC.md,Spec,2025-xx,Experimental spec name,Medium,Apnea on MAIN,APNEA_ARCHITECTURE.md,yes,Rename or mark legacy branch spec,P2
+Docs/SNORKELING_EXPERIMENTAL_SPEC.md,Spec,2025-xx,Experimental spec name,Medium,Snorkeling on MAIN,SNORKELING_ARCHITECTURE.md,yes,Rename or mark legacy branch spec,P2
+Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260522.md,Readiness,2026-05-22,Pre-V3.0 App Store verdict,Low,Historical,MASTER_IOS release matrix,yes,Archive,P3
+Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_20260523.md,Readiness,2026-05-23,Pre-V3.0,Low,Historical,Same,yes,Archive,P3
+Docs/DOCUMENTATION_UPDATE_REPORT_20260524.md,Update report,2026-05-24,Snorkeling/Apnea experimental narrative,Low,Historical changelog,20260620 alignment,yes,Archive,P3
+Docs/BRANCH_AND_TARGET_ISOLATION_POLICY.md,Policy,2026-06-14,Mostly current,Low,Minor SHA drift,Current,yes,Refresh HEAD reference,P3
+Docs/CHANGELOG.md,Changelog,2026-06-20,Missing master audit 01-06 entries,Medium,No unreleased master audit notes,This audit,yes,Add Unreleased master audit summary,P2
+Docs/QA_EVIDENCE/**,QA evidence,ongoing,Empty evidence execution,Low,By design PENDING,MASTER_* external plans,yes,None if STATUS says PENDING,P3
+Docs/ReferenceUI/README.md,Mockups,2026-06-06,Legacy companion reference paths,Low,Pre three-mode reference archived,MASTER_MOCKUP matrices,yes,Verify links in mockup matrix,P3
+Docs/TERMINOLOGY_GLOSSARY_IT_EN_CURRENT.md,Glossary,2026-06-xx,May lack Settings mode switch terms,Low,New UI surfaces,IOS_COMPANION_SETTINGS_MODE_SWITCH,yes,Add mode switcher terms,P3
+Docs/MASTER_*_CURRENT.* (untracked),Audit outputs,2026-06-22,Not in INDEX,High,Produced by Commands 01-05 not indexed,INDEX repair plan,no,Index after commit decision,P1
+Scripts/validate_master_main_code_sync_security_performance_audit.sh,Validation,2026-06-22,Not in README quick links,Low,New gate script,INDEX,no,Optional link from INDEX,P3

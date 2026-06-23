@@ -1,0 +1,17 @@
+ID,Platform,Activity,Feature,Initial,Empty,Loading,Success,Partial,Stale,Offline,Unavailable,Permission_Denied,Validation_Error,Algorithm_Error,Sync_Error,Conflict,Destructive_Confirmation,Retry,Restored,Future_Schema,Accessibility,Status,Severity,Finding_ID,Notes
+ST-001,Watch,Diving Gauge,Live dive,yes,yes,n/a,yes,yes,yes,n/a,yes,n/a,yes,n/a,yes,n/a,yes,yes,yes,n/a,partial,PARTIAL,P1,MUIUX-P1-001,Physical combined-banner states PENDING
+ST-002,Watch,Diving Full Computer,Predive environment,yes,yes,n/a,yes,yes,yes,n/a,yes,n/a,yes,no,n/a,yes,n/a,yes,yes,yes,n/a,partial,PASS,,,Altitude/source/fallback states present @ 1f62235
+ST-003,Watch,Diving Full Computer,Live deco,yes,n/a,n/a,yes,yes,yes,n/a,yes,n/a,yes,yes,yes,n/a,yes,yes,yes,yes,partial,PASS,,,Audit15 degraded/stale/conservative fallback
+ST-004,Watch,Apnea,Session lifecycle,yes,yes,n/a,yes,yes,yes,n/a,yes,n/a,yes,n/a,yes,n/a,yes,yes,yes,yes,partial,PARTIAL,P1,MUIUX-P1-001,Physical sensor QA PENDING
+ST-005,Watch,Snorkeling,Session/GPS,yes,yes,n/a,yes,yes,yes,yes,yes,yes,yes,n/a,yes,n/a,yes,yes,yes,yes,partial,PARTIAL,P1,MUIUX-P1-001,GPS permission denied coded; field QA PENDING
+ST-006,iOS,Diving,Planner modes,yes,yes,yes,yes,yes,yes,n/a,yes,n/a,yes,yes,n/a,n/a,yes,yes,yes,yes,yes,PASS,,,
+ST-007,iOS,Diving,Equipment/checklist,yes,yes,n/a,yes,yes,yes,n/a,yes,n/a,yes,n/a,n/a,yes,yes,yes,yes,yes,PASS,,,
+ST-008,iOS,Global,Settings mode switch,yes,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,yes,yes,n/a,yes,PASS,,,
+ST-009,iOS,Apnea,Root/logbook/settings,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,n/a,yes,yes,yes,yes,yes,partial,PARTIAL,P1,MUIUX-P1-001,Physical QA PENDING
+ST-010,iOS,Snorkeling,Root/maps/logbook,yes,yes,yes,yes,yes,yes,yes,yes,yes,yes,n/a,yes,yes,yes,yes,yes,partial,PARTIAL,P1,MUIUX-P1-001,Map/location physical QA PENDING
+ST-011,Watch+iOS,Global,Sync/conflict,yes,yes,yes,yes,yes,yes,yes,n/a,n/a,yes,n/a,yes,yes,n/a,yes,yes,yes,yes,yes,PARTIAL,P1,MUIUX-P1-002,Paired-device QA PENDING
+ST-012,Watch+iOS,Diving,Briefing card transfer,yes,yes,yes,yes,yes,yes,n/a,n/a,n/a,yes,n/a,yes,n/a,yes,yes,yes,yes,partial,PASS,,,Pending/transferred/failed/stale/superseded coded
+ST-013,Watch+iOS,Global,Accessibility states,yes,n/a,n/a,yes,partial,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,partial,PARTIAL,P1,MUIUX-P1-003,Physical VoiceOver/Dynamic Type PENDING
+ST-014,Watch+iOS,Global,Image transfer/delete,yes,yes,yes,yes,yes,yes,yes,n/a,n/a,yes,n/a,yes,yes,yes,yes,yes,partial,PARTIAL,P1,MUIUX-P1-002,Watch ACK truthfulness; paired QA PENDING
+ST-015,iOS,Diving,PDF/share/export,yes,yes,yes,yes,yes,yes,n/a,yes,n/a,yes,n/a,n/a,yes,yes,yes,yes,yes,PARTIAL,P1,MUIUX-P1-004,Physical PDF render PENDING
+ST-016,Watch,Diving Full Computer,Sensor simulation,yes,n/a,n/a,yes,yes,yes,n/a,yes,n/a,yes,yes,n/a,n/a,n/a,yes,yes,yes,n/a,partial,PASS,,,Simulation badges visible; developer gated

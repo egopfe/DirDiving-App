@@ -1,0 +1,38 @@
+Requirement_ID,Requirement,Activity,Platform,Automated_Test,Integration_Test,UI_Test,Simulator,Physical_Watch,Physical_iPhone,Paired_Device,External_Reference,Evidence_Status,Gap_Notes
+REQ-START-01,App launches without crash,All,Both,IOSCompanionStoreLifecycleTests,No,No,Yes,No,No,No,N/A,PASS simulator build,
+REQ-ACT-01,Activity selection Diving/Apnea/Snorkeling,All,Both,IntegratedModesSequentialFlowTests,Yes,Partial,Yes,PENDING,PENDING,No,N/A,PARTIAL,Physical tab switch QA open
+REQ-GAUGE-01,Gauge dive lifecycle,Gauge,Watch,DiveManager lifecycle tests,Yes,No,Yes,PENDING,PENDING,No,N/A,PARTIAL,
+REQ-FC-01,Full Computer 1Hz tissue tick,Diving FC,Watch,FullComputerTimingFaultTests,Yes,No,Yes,PENDING,PENDING,No,Bühlmann reference,PARTIAL,Physical Ultra pending
+REQ-FC-02,FC checkpoint recovery,Diving FC,Watch,FullComputerRecoveryCheckpointTests,Yes,No,Yes,PENDING,No,No,N/A,PARTIAL,
+REQ-BUHL-01,iOS Bühlmann planner correctness,Diving,iOS,Buhlmann planner test suite,Yes,No,Yes,No,No,No,External oracle,PENDING_EXTERNAL,
+REQ-GAS-01,Gas switching MOD/PPO2,Diving,Both,GasPlanningService tests,Yes,No,Yes,PENDING,PENDING,No,N/A,PARTIAL,
+REQ-DECO-01,Deco stop state machine,Diving FC,Watch,FullComputerReleaseHardValidationTests,Yes,No,Yes,PENDING,PENDING,No,N/A,PARTIAL,
+REQ-APNEA-01,Apnea lifecycle/recovery,Apnea,Watch,Apnea lifecycle tests,Yes,No,Yes,PENDING,PENDING,No,N/A,PARTIAL,
+REQ-SNORK-01,Snorkeling GPS/dips/navigation,Snorkeling,Watch,SnorkelingSessionSyncCodecTests,Yes,No,Yes,PENDING,PENDING,No,N/A,PARTIAL,
+REQ-SET-01,Settings activity isolation,All,Both,IOSActivitySettingsCoherenceTests,Yes,Yes,Yes,No,No,No,N/A,PASS,
+REQ-LOG-01,Logbook ownership per activity,All,Both,IOSActivityLogbookDataIsolationTests,Yes,No,Yes,No,No,No,N/A,PASS,
+REQ-SYNC-01,HMAC session sync all activities,All,Both,ActivitySync*TransportNegativeTests,Yes,No,Yes,PENDING,PENDING,Yes,N/A,PARTIAL,Field paired QA
+REQ-SYNC-02,Cross-decode rejection,All,Both,ActivitySyncCrossDecodeRejectionTests,Yes,No,Yes,No,No,No,N/A,PASS,
+REQ-SYNC-03,Activity tombstones,All,Both,ActivitySyncTombstoneTests,Yes,No,Yes,PENDING,PENDING,Yes,N/A,PARTIAL,Field propagation
+REQ-SYNC-04,Large payload file transfer,All,Both,ActivitySyncLargePayloadTransferTests,Yes,No,Yes,PENDING,PENDING,Yes,N/A,PARTIAL,Field WC file transfer
+REQ-MIG-01,Schema migration Apnea/Snorkeling,All,Both,ApneaSchemaMigration tests,Yes,No,Yes,No,No,No,N/A,PASS,
+REQ-MIG-02,Legacy KVS migration,Diving,Both,CloudSyncLegacyMigrationPolicy tests,Yes,No,Yes,PENDING,No,Yes,N/A,PARTIAL,Two-device KVS restore
+REQ-BKP-01,Backup restore isolation,All,iOS,CloudBackupCapabilityTests,Yes,No,Yes,No,No,Yes,N/A,PARTIAL,Diving-only opt-in verified software
+REQ-L10N-01,Localization parity EN/IT,All,Both,audit_localization.sh,No,No,N/A,No,No,No,N/A,PASS,0 hardcoded Watch findings
+REQ-A11Y-01,Accessibility labels key flows,All,Both,Partial UI tests,No,Partial,Yes,PENDING,PENDING,No,N/A,PARTIAL,VoiceOver physical pending
+REQ-SEC-01,HMAC/replay/TOFU,All,Both,SEC-NEG-01..20 matrix,Yes,No,Yes,PENDING,PENDING,Yes,N/A,PARTIAL,Static PASS; field pending
+REQ-SEC-02,App Intents legal gate,Diving,Watch,SecurityPrivacyTrustRemediationTests,Yes,No,Yes,PENDING,No,No,N/A,PARTIAL,
+REQ-SEC-03,Simulation release block,All,Both,TestFlightSimulationSafetyPolicy tests,Yes,No,Yes,No,No,No,N/A,PASS,
+REQ-PERF-01,iOS planner background pipeline,Diving,iOS,PerformanceConcurrencyBatteryRemediationTests,Yes,No,Yes,No,PENDING,No,N/A,PARTIAL,Instruments pending
+REQ-PERF-02,Watch FC timing budget,Diving FC,Watch,FullComputerTimingFaultTests,Yes,No,Yes,PENDING,PENDING,No,N/A,PARTIAL,
+REQ-EXP-01,Subsurface export fidelity,Diving,Both,Subsurface export tests,Yes,No,Yes,No,No,No,Subsurface,PENDING_EXTERNAL,
+REQ-EXP-02,CSV import bounds,All,iOS,DiveCSVImportBounds tests,Yes,No,Yes,No,No,No,N/A,PASS,
+REQ-IMG-01,Watch image inventory/delete,Diving,Both,CompanionPhotoTransferPipelineTests,Yes,No,Yes,PENDING,PENDING,Yes,N/A,PARTIAL,Paired delete ACK
+REQ-BRIEF-01,Planner briefing reference-only,Diving,Both,PlannerBriefingCardStoreTests,Yes,No,Yes,PENDING,PENDING,Yes,N/A,PARTIAL,
+REQ-CCR-01,CCR reference-only planner,Diving,iOS,CCR planner tests,Yes,No,Yes,No,No,No,External CCR,PENDING_EXTERNAL,
+REQ-RB-01,Rock Bottom calculations,Diving,iOS,Rock Bottom tests,Yes,No,Yes,No,No,No,N/A,PASS,
+REQ-GL-01,Gas ledger display,Diving,iOS,Gas ledger tests,Yes,No,Yes,No,No,No,N/A,PASS,
+REQ-REP-01,Repetitive dive tissue,Diving,iOS,RepetitiveDivePlannerService tests,Yes,No,Yes,No,No,No,N/A,PASS,
+REQ-EQUIP-01,Structured equipment/checklist,Diving,iOS,Checklist migration tests,Yes,No,Yes,No,No,No,N/A,PASS,
+REQ-CMALT-01,Watch CMAltimeter pre-dive,Gauge,Watch,WatchCMAltimeter tests,Yes,No,Yes,PENDING,PENDING,No,N/A,PARTIAL,Physical sensor pending
+REQ-IOS-PERF-01,iOS scalability stress,Diving,iOS,PerformanceConcurrencyBatteryRemediationTests,Yes,No,Yes,No,PENDING,No,N/A,PARTIAL,
