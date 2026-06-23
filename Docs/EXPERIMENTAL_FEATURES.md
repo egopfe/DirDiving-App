@@ -1,18 +1,8 @@
 # DIR DIVING Experimental Features
 
-This document describes exploratory features. Production MAIN excludes these sources via `project.yml`.
+This document describes **exploratory / legacy-branch** features only. Production **MAIN** ships Diving, Apnea, and Snorkeling; see [`APNEA_ARCHITECTURE.md`](APNEA_ARCHITECTURE.md) and [`SNORKELING_ARCHITECTURE.md`](SNORKELING_ARCHITECTURE.md).
 
-## Apnea integration (`integration/full-computer`)
-
-As of Command 12 (2026-06-17), Apnea has a dedicated integration branch with:
-
-- Shared domain models and `ApneaSessionEngine` lifecycle on Watch.
-- iOS companion (`iOSApp/Views/Apnea/`) for planner, logbook, statistics, export.
-- Isolated WatchConnectivity namespaces (`apneaSyncPlanPackage`, `dirdiving_apnea_session`).
-- Release-hard validation: `./Scripts/validate_apnea_release_readiness.sh`.
-- Feature flag: `ExperimentalFeatures.apneaIntegrationEnabled`.
-
-`Views/ApneaView.swift` remains excluded from the MAIN Watch app target until promotion review. See [`APNEA_ARCHITECTURE.md`](APNEA_ARCHITECTURE.md).
+**Buddy Assist**, exploration mockups, and pre-promotion prototypes remain experimental-only and are **not** implied to ship on App Store without separate review.
 
 ## Legacy branch `codex/experimental-features`
 

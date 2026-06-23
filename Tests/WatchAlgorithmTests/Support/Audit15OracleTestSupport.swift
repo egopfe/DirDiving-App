@@ -104,15 +104,15 @@ enum Audit15OracleTestSupport {
                     if checkTTS, snap.ttsMinutes > 0 || rawOracle > 0.05 {
                         var activePlan = plan
                         activePlan.activeGas = snap.activeGas
-                        let ref = IndependentBuhlmannOracle.productionProjectionOnOracleTissues(
+                        let refMinutes = IndependentBuhlmannOracle.independentTTSMinutesOnOracleTissues(
                             state: oracleState,
                             depthMeters: depth,
                             plan: activePlan,
                             environment: plan.plannerEnvironment
                         )
-                        let delta = snap.ttsMinutes - ref.ttsMinutes
+                        let delta = snap.ttsMinutes - refMinutes
                         if delta < -Int(IndependentBuhlmannOracleTolerances.ttsMinutes.rounded()) {
-                            ttsFailures.append("s\(second) optimistic TTS prod=\(snap.ttsMinutes) ref=\(ref.ttsMinutes)")
+                            ttsFailures.append("s\(second) optimistic TTS prod=\(snap.ttsMinutes) ref=\(refMinutes)")
                         }
                     }
                 }
