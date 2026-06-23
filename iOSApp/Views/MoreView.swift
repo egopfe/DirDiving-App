@@ -26,6 +26,7 @@ struct MoreView: View {
                             )
 
                             settingsBody
+                                .id(companionSettingsScope.displayedMode)
 
                             IOSCompanionSharedCompanionSections()
 

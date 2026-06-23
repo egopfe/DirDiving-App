@@ -84,6 +84,11 @@ struct IOSApneaRootView: View {
                 IOSApneaSessionPlannerView()
             }
         }
+        .onChange(of: apneaNavigation.showSettings) { _, isPresented in
+            if isPresented {
+                coordinator.companionSettingsScope.applyInitialScope(.apnea)
+            }
+        }
         .sheet(isPresented: $apneaNavigation.showSettings) {
             coordinator.applyCompanionSettingsSheetEnvironment(to:
                 NavigationStack {

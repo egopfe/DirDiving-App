@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Injects activity-scoped settings environment objects only for the selected mode.
+/// Injects activity-scoped settings and navigation destination stores only for the selected mode.
 struct IOSCompanionSettingsEnvironmentHost<Content: View>: View {
     @EnvironmentObject private var companionSettingsScope: IOSCompanionSettingsScopeStore
     @EnvironmentObject private var coordinator: IOSCompanionStoreCoordinator
@@ -14,14 +14,21 @@ struct IOSCompanionSettingsEnvironmentHost<Content: View>: View {
         switch companionSettingsScope.displayedMode {
         case .diving:
             content()
+                .id(DIRActivityMode.diving)
         case .apnea:
-            let settings = coordinator.ensureApneaSettingsStore()
+            let bundle = coordinator.ensureApneaStores()
             content()
-                .environmentObject(settings)
+                .environmentObject(bundle.settingsStore)
+                .environmentObject(bundle.equipmentStore)
+                .environmentObject(bundle.buddySafetyStore)
+                .id(DIRActivityMode.apnea)
         case .snorkeling:
-            let settings = coordinator.ensureSnorkelingSettingsStore()
+            let bundle = coordinator.ensureSnorkelingStores()
             content()
-                .environmentObject(settings)
+                .environmentObject(bundle.settingsStore)
+                .environmentObject(bundle.equipmentStore)
+                .environmentObject(bundle.buddySafetyStore)
+                .id(DIRActivityMode.snorkeling)
         }
     }
 }
