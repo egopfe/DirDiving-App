@@ -1,0 +1,36 @@
+Budget_ID,Platform,Domain,Operation,Metric,Threshold,Test_Or_Evidence,Simulator_Status,Physical_Status,Notes
+PERF-W-01,Watch,Full Computer,Deco solver single solve,wall_seconds,0.05,FullComputerDecoSolver.performanceBudgetSeconds,PASS,PENDING,FullComputerReleaseHardValidationTests
+PERF-W-02,Watch,Full Computer,Checkpoint encode+decode+restore,wall_seconds,0.05,FullComputerReleaseHardTolerances.checkpointRoundTripBudgetSeconds,PASS,PENDING,
+PERF-W-03,Watch,Full Computer,1 Hz runtime tick integration,timing_fault,degraded_not_reset,FullComputerTimingFaultTests,PASS,PENDING,Missed tick marks degraded
+PERF-W-04,Watch,Full Computer,4h multilevel profile oracle,numerical,Audit15 tolerances,Audit15Air39MultilevelProfileTests,PASS,PENDING,Not wall-time gate
+PERF-W-05,Watch,Full Computer,60 tick projection,XCTest measure,baseline regression,FullComputerRuntimeEngineTests,PASS,PENDING,
+PERF-W-06,Watch,Diving,Active draft persistence interval,seconds,>=8,DiveAlgorithmConfiguration.activeDiveDraftPersistenceIntervalSeconds,PASS,N/A,Throttled unless immediate
+PERF-W-07,Watch,Diving,Runtime/stopwatch timer frequency,Hz,1,DiveManager.startRuntimeTimer,PASS,PENDING,Main run loop — DOCUMENTED_ACCEPTED_RISK
+PERF-W-08,Watch,Diving,Depth stale detection,seconds,config,DiveAlgorithmConfiguration.activeDepthCallbackSilenceSeconds,PASS,PENDING,
+PERF-W-09,Watch,GPS,Location update ownership,policy,dive_only,GPSManager.maintainsLocationUpdates,PASS,PENDING,distanceFilter=5
+PERF-W-10,Watch,Apnea,Session tick loop,Hz,1,ApneaWatchRuntimeStore tickTask,PASS,PENDING,Cancelled on end
+PERF-W-11,Watch,Apnea,Checkpoint debounce,ms,250,ApneaWatchRuntimeStore checkpointTask,PASS,PENDING,
+PERF-W-12,Watch,Snorkeling,Session tick loop,Hz,1,SnorkelingWatchRuntimeStore tickTask,PASS,PENDING,
+PERF-W-13,Watch,Snorkeling,Checkpoint debounce,ms,250,SnorkelingWatchRuntimeStore checkpointTask,PASS,PENDING,
+PERF-W-14,Watch,Snorkeling,GPS sensor loss timeout,seconds,8,SnorkelingLifecycleStateMachine,PASS,PENDING,
+PERF-W-15,Watch,UI,Alarm blink global publish,Hz,0,view_local blink,MainDeepCodeAnalysisRemediationV1WatchTests,PASS,N/A,MAIN-DCA-012 closed
+PERF-W-16,Watch,Sync,Session encode/decode,crypto,implicit,WatchSyncCryptographicLogicTests,PASS,PENDING,
+PERF-W-17,Watch,Photo,Import decode bounds,bytes,10MB;16MP,WatchCompanionPhotoValidator,PASS,PENDING,
+PERF-W-18,Watch,Battery,Long dive session drain,field,PENDING,Manual Ultra QA,NOT_RUN,PENDING,MASTER-PERF-001
+PERF-W-19,Watch,Thermal,Sustained Full Computer,field,PENDING,Manual Ultra QA,NOT_RUN,PENDING,
+PERF-I-01,iOS,Planner,Debounced recompute delay,ms,200,PlannerStore.schedulePlanningUpdate,PASS,N/A,Generation token stale guard
+PERF-I-02,iOS,Planner,Background calculate pipeline,wall_seconds,5000 soft,PlannerBackgroundCalculation + testPlannerBackgroundFlushWithinBudget,PASS,PENDING,Off MainActor post-remediation
+PERF-I-03,iOS,Merge,120 samples x20 merge,ms,measure block,MainDeepCodeReadinessCurrentTests.testMergePreferredPerformanceBudget,PASS,PENDING,
+PERF-I-04,iOS,Cloud,KVS budget 50 keys,ms,linear,MainDeepCodeReadinessCurrentTests.testCloudBudgetEvaluationScalesLinearlyWithKeyCount,PASS,PENDING,
+PERF-I-05,iOS,Import,CSV file size cap,bytes,10485760,DiveCSVImportBounds.maxBytes,PASS,N/A,
+PERF-I-06,iOS,Import,CSV max rows,count,200000,DiveCSVImportBounds.maxRows + parseCSV validate,PASS,N/A,IOS-PERF-P2-005 FIXED
+PERF-I-07,iOS,Export,Subsurface CSV generation,single_pass,memory bounded,SubsurfaceExportService + IOSExportCancellation,PASS,PENDING,
+PERF-I-08,iOS,Charts,Planner tissue/depth charts,invalidation,on plan change,PlannerChartSnapshots + Equatable guard,PASS,PENDING,2048 downsample
+PERF-I-09,iOS,Charts,CCR multi-timeline charts,invalidation,on plan change,PlannerChartSnapshots.make(fromCCR:),PASS,PENDING,Downsampled post-remediation
+PERF-I-10,iOS,Logbook,Large list scroll latency,field,PENDING,Physical iPhone QA,NOT_RUN,PENDING,Cap 40 sessions; LazyVStack
+PERF-I-11,iOS,Maps,Snorkeling route render,field,PENDING,Physical QA,NOT_RUN,PENDING,4096 presentation cap wired
+PERF-I-12,iOS,Sync,Watch import merge path,functional,metadata merge,IOSCompanionStoreCoordinator,PASS,PENDING,
+PERF-I-13,iOS,Sync,Outbound flush backpressure,policy,inFlight cap,WatchSyncPendingFlushPolicy iOS,PASS,PENDING,IOS-PERF-P1-009 FIXED
+PERF-I-14,iOS,Sync,Large payload codec roundtrip,bytes,512KB-5MB,ActivitySyncLargePayloadTransferTests,PASS,PENDING,Field QA MASTER-SYNC-001
+PERF-I-15,iOS,Startup,Async logbook first load,functional,off main frame,DiveLogStore.performInitialLoadIfNeeded,PASS,PENDING_INSTRUMENTS,MASTER-IOS-001
+PERF-I-16,iOS,Tissue analytics,LRU cache bound,entries,32,TissueAnalyticsService,PASS,N/A,IOS-PERF-P2-004 FIXED

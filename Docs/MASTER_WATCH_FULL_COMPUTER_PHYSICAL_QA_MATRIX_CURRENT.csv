@@ -1,0 +1,24 @@
+scenario_id,scenario_name,required_hardware,reference_instrument,execution_status,watch_model,watchos_version,app_commit,permissions,location_context,sensor_proposal_observed,time_to_stable_proposal_s,timeout_observed,accuracy_metadata,spread_observed_m,independent_elevation_m,delta_m,ui_state_correct,environment_reached_runtime,logbook_provenance_correct,notes,finding_id
+PQ-001,Physical Watch target install,Physical Apple Watch,N/A,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,PENDING_PHYSICAL,—
+PQ-002,Real depth sensor availability,Apple Watch Ultra,Reference depth gauge,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,PENDING_PHYSICAL,MWFC-P2-001
+PQ-003,Dry-run FC start blocked without environment,Physical Watch,N/A,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,Software verified OrchestratedAltitudeEnvironmentTests,—
+PQ-004,Manual Watch environment accepted,Physical Watch,Reference altimeter,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,PENDING_PHYSICAL,—
+PQ-005,Imported iPhone Plan environment accepted,Paired Watch+iPhone,Plan altitude benchmark,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,PENDING_PHYSICAL,—
+PQ-006,CMAltimeter available on device,Physical Watch,CMAltimeter API,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,PENDING_PHYSICAL,—
+PQ-007,CMAltimeter unavailable hardware,Physical Watch without baro,N/A,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,PENDING_PHYSICAL,—
+PQ-008,CMAltimeter permission denied,Physical Watch,N/A,NOT_EXECUTED,,,1f62235,motion denied,,,,,,,,,,,PENDING_PHYSICAL,FI-002
+PQ-009,Stable sensor proposal accept flow,Physical Watch,Reference altimeter,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,PENDING_PHYSICAL,—
+PQ-010,Unstable sensor proposal rejected,Physical Watch,Reference altimeter,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,PENDING_PHYSICAL,—
+PQ-011,Sensor rejected manual preserved,Physical Watch,Reference altimeter,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,Software PASS dismissPending,—
+PQ-012,Background/foreground during sampling,Physical Watch,N/A,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,PENDING_PHYSICAL,FI-013
+PQ-013,Rapid Settings/Confirmation navigation,Physical Watch,N/A,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,PENDING_PHYSICAL,—
+PQ-014,Relaunch before dive start,Physical Watch,N/A,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,PENDING_PHYSICAL,WCMA-006
+PQ-015,Checkpoint/restore dry run,Physical Watch,N/A,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,Simulator PASS recovery tests,—
+PQ-016,Paired iPhone sync logbook provenance,Paired devices,N/A,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,PENDING_PHYSICAL,—
+PQ-017,Smallest Watch display 41mm clipping,Apple Watch 41mm,N/A,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,Simulator contract only SmallestWatchLayoutContractTests,—
+PQ-018,VoiceOver traversal FC predive+live,Physical Watch,VoiceOver,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,PENDING_PHYSICAL,—
+PQ-019,Haptic priority critical over reminder,Physical Watch,N/A,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,PENDING_PHYSICAL,—
+PQ-020,Depth sensor wet test,Apple Watch Ultra,Controlled water,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,PENDING_PHYSICAL,MWFC-P2-001
+PQ-021,Ascent warning wet/dry safe test,Physical Watch,N/A,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,PENDING_PHYSICAL,—
+PQ-022,Controlled multilevel replay if possible,Physical Watch+chamber,Pressure pot,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,PENDING_EXTERNAL_VALIDATION,MWFC-P1-002
+PQ-023,Battery/thermal observation long FC dive,Physical Watch,Instruments,NOT_EXECUTED,,,1f62235,,,,,,,,,,,,,PENDING_PHYSICAL,—

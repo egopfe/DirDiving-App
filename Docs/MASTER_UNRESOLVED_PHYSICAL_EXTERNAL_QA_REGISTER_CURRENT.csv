@@ -1,0 +1,12 @@
+Register_ID,Consolidated_Finding_ID,QA_Type,Platform,Activity,Matrix_Source,Status,Required_Artifact,Blocking_Gate,Notes
+PHY-001,CONS-003,Physical,Watch,Diving,MASTER_WATCH_FULL_COMPUTER_PHYSICAL_QA_MATRIX_CURRENT.csv,NOT_EXECUTED,Ultra wet depth + CMAltimeter log,External TestFlight FC,
+PHY-002,CONS-004,Physical,Watch+iOS,All,MASTER_PHYSICAL_DEVICE_QA_MATRIX_CURRENT.csv,NOT_EXECUTED,Paired sync round-trip pack,External TestFlight,
+PHY-003,CONS-005,Physical,Watch+iOS,All,ACCESSIBILITY_SCREEN_MATRIX (prior),NOT_EXECUTED,VoiceOver + Dynamic Type device notes,External TestFlight,
+PHY-004,CONS-010,Physical,Watch+iOS,All,MASTER_PHYSICAL_PERFORMANCE_QA_PLAN_CURRENT.md,NOT_EXECUTED,Instruments Energy + thermal log,External TestFlight,
+PHY-005,IOS-MASTER-F012,Physical,iOS,Diving,ICLOUD_TWO_DEVICE QA,NOT_EXECUTED,Two-device iCloud merge evidence,App Store cloud claims,
+PHY-006,IOS-MASTER-F015,Physical,iOS,Snorkeling,SNORKELING_GPS QA,NOT_EXECUTED,Field GPS route validation,External TestFlight Snorkeling,
+EXT-001,CONS-002,External,Watch+iOS,Diving,MASTER_WATCH_FULL_COMPUTER_EXTERNAL_VALIDATION_PLAN_CURRENT.md,NOT_EXECUTED,Third-party Bühlmann comparison,App Store algorithm claims,
+EXT-002,CONS-011,External,iOS,Diving,SUBSURFACE_EXTERNAL,NOT_EXECUTED,Desktop Subsurface import/export,App Store interoperability,
+EXT-003,CONS-006,External,All,All,LEGAL_REVIEW QA,NOT_EXECUTED,Counsel + marketing sign-off,App Store,
+EXT-004,MWFC-P2-002,External,Watch,Diving,Altitude oracle replay 500-2000m,PARTIAL,ML-01 altitude matrix completion,External validation,
+EXT-005,CONS-001,External,Watch,Diving,Independent schedule oracle,PENDING,External tool TTS comparison or independent simulator,External decompression claim,

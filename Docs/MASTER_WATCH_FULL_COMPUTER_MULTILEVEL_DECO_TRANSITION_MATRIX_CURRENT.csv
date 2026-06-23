@@ -1,0 +1,18 @@
+Profile_ID,Timestamp,Depth,Gas,Overall_Ceiling,Rounded_Stop,TTS,NDL,Controlling_Compartment,Deco_State,Expected_Transition,Actual_Transition,Pass,Evidence
+ML-01,0,0.00,Air,0.00,0.0,projection,>0,1,ndl,steady,steady,YES,Audit15Air39MultilevelProfileTests @1f62235
+ML-01,130,39.00,Air,0.00,0.0,projection,>0,1,ndl,bottom_arrival,bottom_arrival,YES,Audit15Air39MultilevelProfileTests
+ML-01,210,39.00,Air,0.15,3.0,projection,0,1,deco,deco_first_appears,deco_first_appears,YES,Audit15Air39MultilevelProfileTests
+ML-01,360,16.58,Air,3.17,6.0,projection,0,1,deco,deepest_ceiling,deepest_ceiling,YES,Audit15Air39MultilevelProfileTests
+ML-01,404,10.00,Air,3.02,6.0,projection,0,1,deco,level_arrival_10m,level_arrival_10m,YES,Audit15Air39MultilevelProfileTests
+ML-01,780,10.00,Air,1.13,3.0,projection,0,2,deco,controller_1_to_2,controller_1_to_2,YES,Audit15Air39MultilevelProfileTests
+ML-01,1004,10.00,Air,0.98,3.0,projection,0,2,deco,ceiling_reduced_not_cleared,ceiling_reduced_not_cleared,YES,Audit15Air39MultilevelProfileTests; clearance model-dependent
+ML-02,switch,21.00,EAN50,deco,3.0,projection,0,1,deco,gas_switch_at_21m,gas_switch_at_21m,YES,Audit15MultilevelOracleProfilesTests testML02
+ML-03,600,45.00,Trimix,deco,variable,projection,0,multi,deco,He_compartments_loaded,He_compartments_loaded,YES,Audit15MultilevelOracleProfilesTests testML03
+ML-04,variable,sawtooth,Air,variable,variable,projection,variable,variable,deco/ndl,no_tissue_reset,no_tissue_reset,YES,Audit15MultilevelOracleProfilesTests testML04
+ML-05,clear,shallow,Air,0.00,0.0,projection,>0,variable,ndl,deco_clears_when_permitted,deco_clears_when_permitted,YES,Audit15RedescentOracleTests
+ML-05,redescent,30.00,Air,>0,>0,projection,0,variable,deco,reappears_after_descent,reappears_after_descent,YES,Audit15RedescentOracleTests
+ML-06,stop_band,stop±0.5m,Air,positive,rounded,projection,0,1,deco,timer_pause_not_tissue,timer_pause_not_tissue,YES,Audit15MultilevelOracleProfilesTests testML06
+ML-07,slow_ascent,1m/min,Air,deco,variable,projection,0,1,deco,schreiner_negative_rate,schreiner_negative_rate,YES,Audit15MultilevelOracleProfilesTests testML07
+ML-08,fast_ascent,configured max,Air,deco,variable,projection,0,1,deco,no_false_clear,no_false_clear,YES,Audit15MultilevelOracleProfilesTests testML08
+ML-09,1800,10.00,Air,variable,variable,projection,0,2,deco,slow_compartment_evolution,slow_compartment_evolution,YES,Audit15MultilevelOracleProfilesTests testML09
+ML-10,interval,surface,Air,residual,residual,projection,variable,variable,ndl/residual,tissues_not_fresh_air,tissues_not_fresh_air,YES,Audit15MultilevelOracleProfilesTests testML10

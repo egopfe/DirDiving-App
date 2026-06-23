@@ -1,0 +1,13 @@
+ID,Area,Change_Source,Regression_Risk,Detection_Evidence,Current_Status,Severity,Finding_ID,Status,Notes
+REG-001,FC altitude environment,Prior UI16-P0-001,Silent sea-level fallback on imported plans,OrchestratedAltitudeEnvironmentTests,Fixed @ 1f62235,,,PASS,Prior P0 closed
+REG-002,iOS Settings mode switch,Multi-activity promotion,Cross-activity settings leakage,IOSActivitySettingsRoutingTests / IOSActivitySettingsModeSwitchTests,Verified,,,PASS,
+REG-003,Logbook ownership,Multi-activity promotion,Cross-activity logbook routes,IOSActivityLogbookRoutingTests / WatchActivityLogbookRoutingTests,Verified,,,PASS,Six forbidden routes blocked
+REG-004,Mockup fixtures FC_UI_04/07,Command 14 remediation,Missing executable fixtures,MockupVisualRegressionRemediationTests,59/59 fixtures,,,PASS,
+REG-005,Apnea/Snorkeling Settings,Activity promotion,Hidden nested Form blocking edits,IOSActivitySettingsContentVisibilityTests,Verified,,,PASS,
+REG-006,Full Computer deco UI,Audit 15 remediation,False/stale deco presentation,FullComputerUIStateMatrixTests / Audit15 oracles,Software verified,,,PASS,Physical layout PENDING
+REG-007,Physical QA baselines,Prior audits,False confidence from software-only gates,QA_EVIDENCE folders largely empty,Still pending,P1,MUIUX-P1-001,OPEN,
+REG-008,Documentation history,Multi-activity promotion,Readers follow stale experimental scope,Docs/README.md / Docs/INDEX.md historical sections,Contradiction remains,P2,MUIUX-P2-003,OPEN,
+REG-009,Accessibility,UI remediation waves,Safety state color-only,Semantic contract tests,Physical not rerun,P1,MUIUX-P1-003,OPEN,
+REG-010,Visual pixel regression,Mockup audit,Layout drift undetected,Software fixtures 59/59; pixel baselines 0/59,Gap remains,P2,MUIUX-P2-001,OPEN,
+REG-011,Build verification @ HEAD,Audit execution,Unverified commit buildability,xcodebuild DerivedData lock then long isolated build,PARTIAL,P1,MUIUX-P1-005,OPEN,First attempt DB locked; isolated build inconclusive at report time
+REG-012,Planner ascent speed discoverability,UX polish,Users miss ascent settings in More only,Source routing audit,Open,P2,MUIUX-P2-004,OPEN,
