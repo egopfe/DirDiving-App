@@ -1,3 +1,4 @@
+import Combine
 import SwiftUI
 
 /// Main iOS tab bar: Planner (Diving home), Logbook, Analisi, Attrezzatura, Checklist, Settings.
@@ -12,7 +13,45 @@ enum IOSTab: Hashable, CaseIterable {
 
 @MainActor
 final class IOSNavigationStore: ObservableObject {
-    @Published var selectedTab: IOSTab = .planner
+    @Published var selectedTab: IOSTab
+    private var persistCancellable: AnyCancellable?
+
+    init(defaults: UserDefaults = .standard) {
+        if let token = IOSCompanionNavigationPersistence.restoreDivingTabToken(defaults: defaults),
+           let restored = IOSTab(persistenceToken: token) {
+            selectedTab = restored
+        } else {
+            selectedTab = .planner
+        }
+        persistCancellable = $selectedTab
+            .dropFirst()
+            .sink { IOSCompanionNavigationPersistence.persistDivingTabToken($0.persistenceToken, defaults: defaults) }
+    }
+}
+
+extension IOSTab {
+    var persistenceToken: String {
+        switch self {
+        case .planner: return "planner"
+        case .logbook: return "logbook"
+        case .analysis: return "analysis"
+        case .gear: return "gear"
+        case .checklist: return "checklist"
+        case .settings: return "settings"
+        }
+    }
+
+    init?(persistenceToken: String) {
+        switch persistenceToken {
+        case "planner": self = .planner
+        case "logbook": self = .logbook
+        case "analysis": self = .analysis
+        case "gear": self = .gear
+        case "checklist": self = .checklist
+        case "settings": self = .settings
+        default: return nil
+        }
+    }
 }
 
 struct ContentView: View {

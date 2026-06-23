@@ -1,6 +1,6 @@
 # Note per TestFlight / App Review - DIR DIVING
 
-**Aggiornato:** 2026-06-08 — branch `main` (Bühlmann comprehensive readiness remediation @ audit `cc4d783`)
+**Aggiornato:** 2026-06-17 — branch `main` (master software remediation @ audit baseline `7b620f3`)
 
 ## CCR / Rebreather planner (iOS reference-only)
 
@@ -109,7 +109,7 @@ Runtime iOS 26.5 / watchOS 26.5: Xcode -> Settings -> Components. Vedi [`Docs/BU
 
 ## Rami non inclusi in questa build MAIN
 
-Apnea, Snorkeling, Buddy Assist: solo su branch `codex/experimental-features` / `codex/ios-experimental-features`. **Non** mergeare in candidata App Store senza review.
+**Apnea** e **Snorkeling** sono inclusi su `main` (Watch + iOS companion). **Buddy Assist** e le superfici di esplorazione legacy restano **solo sperimentali** (`codex/*` o flag disabilitati). QA fisica Watch/iPhone e review App Store esterna: **PENDING** — vedi [`Docs/QA_EVIDENCE/README.md`](QA_EVIDENCE/README.md).
 
 ## Contatto / supporto
 

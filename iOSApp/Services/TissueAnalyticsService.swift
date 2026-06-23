@@ -34,6 +34,12 @@ enum TissueAnalyticsService {
         cacheOrder.removeAll()
     }
 
+    #if DEBUG
+    static func testHook_cacheEntryCount() -> Int {
+        cacheOrder.count
+    }
+    #endif
+
     private static func cachedTrace(for key: String) -> TissueAnalyticsTrace? {
         cache[key]
     }
