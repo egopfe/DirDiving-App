@@ -1,0 +1,16 @@
+ID,Feature,Platform_Classification,Parity_Type,Names_Aligned,Units_Aligned,Labels_Aligned,Error_States_Aligned,Status,Severity,Finding_ID,Notes
+PAR-001,Activity selection,Watch+iOS,shared,yes,yes,yes,yes,PASS,,,DIRActivitySelectionStore / CompanionActivityPreferenceStore
+PAR-002,Settings mode switch,iOS-only,iOS-only,yes,n/a,yes,n/a,PASS,,,Watch uses activity-gated sections not iOS switcher
+PAR-003,Live sensors/decompression,Watch-only,Watch-only,yes,n/a,partial,n/a,PASS,,,By design; iOS has planner not live Bühlmann
+PAR-004,Planner/analysis/export,iOS-only,iOS-only,yes,n/a,yes,n/a,PASS,,,Reference-only briefing cards to Watch
+PAR-005,FC altitude environment,iOS→Watch,synchronized,yes,yes,yes,yes,PASS,,,OrchestratedAltitudeEnvironmentTests @ 1f62235
+PAR-006,Apnea logbook browse,iOS browse / Watch save,intentionally asymmetric,yes,partial,partial,yes,PASS,,,Watch ApneaLogbookStore save-only
+PAR-007,Snorkeling maps/route planner,iOS-heavy,intentionally asymmetric,yes,partial,partial,yes,PARTIAL,P1,MUIUX-P1-001,Physical GPS/navigation QA PENDING
+PAR-008,Gauge TTV vs Full Computer TTS,Watch,intentionally distinct,yes,yes,yes,yes,PASS,,,Terminology and panels distinct
+PAR-009,Units and language,Watch+iOS,shared,yes,yes,partial,yes,PASS,,,EN/IT key parity; device layout PENDING
+PAR-010,Alarm/reminder naming,Watch+iOS,shared,yes,yes,partial,partial,PASS,,,
+PAR-011,Mission Mode status,Watch primary,reference-only on iOS,yes,n/a,partial,n/a,PASS,,,
+PAR-012,Accessibility labels,Watch+iOS,shared,yes,yes,partial,no,PARTIAL,P1,MUIUX-P1-003,Physical VoiceOver evidence PENDING
+PAR-013,Visual language,Watch neon / iOS cards,intentionally asymmetric,yes,yes,partial,yes,PARTIAL,P2,MUIUX-P2-002,Manual on-device fidelity PENDING
+PAR-014,Sync namespaces,Watch+iOS,synchronized,yes,yes,yes,partial,PARTIAL,P1,MUIUX-P1-002,Paired round-trip QA PENDING
+PAR-015,CCR reference UX,iOS planner,iOS-only reference,yes,n/a,yes,n/a,PASS,,,No live-loop PPO2 claim

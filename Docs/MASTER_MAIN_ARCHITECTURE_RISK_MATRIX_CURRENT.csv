@@ -1,0 +1,16 @@
+Risk_ID,Domain,Component,Platform,Activity,Isolation_Status,Severity,Probability,Impact,Detection,Mitigation,Test_Evidence,Status,Notes
+ARCH-001,Target membership,Shared sync modules,Both,All,PASS,P4,Low,Low,Build graph,Separate Watch/iOS targets with Shared/,check_main_target_isolation.sh,PASS,Experimental targets excluded
+ARCH-002,Activity routing,Diving logbook store,Both,Diving,PASS,P4,Low,High,Key-based import,dirdiving_dive_session → DiveLogStore only,IOSActivityLogbookDataIsolationTests,PASS,
+ARCH-003,Activity routing,Apnea logbook store,Both,Apnea,PASS,P4,Low,High,Key-based import,dirdiving_apnea_session → ApneaLogbookStore,ApneaSessionSyncTransportNegativeTests,PASS,
+ARCH-004,Activity routing,Snorkeling logbook store,Both,Snorkeling,PASS,P4,Low,High,Key-based import,dirdiving_snorkeling_session_sync → SnorkelingLogbookStore,SnorkelingSessionSyncTransportNegativeTests,PASS,
+ARCH-005,Settings ownership,Diving settings,Both,Diving,PASS,P4,Low,Medium,ActivitySettingsVisibility,Scoped WC keys + UI guards,IOSActivitySettingsCoherenceTests,PASS,
+ARCH-006,Settings ownership,Apnea settings,Both,Apnea,PASS,P4,Low,Medium,Separate stores,Apnea settings namespace,IntegratedModesSequentialFlowTests,PASS,
+ARCH-007,Settings ownership,Snorkeling settings,Both,Snorkeling,PASS,P4,Low,Medium,Separate stores,Snorkeling settings namespace,SnorkelingCrossDomainIsolationTests,PASS,
+ARCH-008,Cross-decode,Wrong codec to store,Both,All,PASS,P1,Low,Critical,Envelope activityType + key guard,ActivitySyncCrossDecodeRejectionTests,ActivitySyncCrossDecodeRejectionTests,PASS,SYNC-P2-001 FIXED
+ARCH-009,Briefing cards,Planner reference-only,Watch,Diving,PASS,P4,Low,High,Separate store + no live mutation,PlannerBriefingCardStore,PlannerBriefingCardStoreTests,PASS,Does not mutate DiveManager
+ARCH-010,FC checkpoint,Runtime recovery,Watch,Diving,PASS,P4,Low,Critical,Separate file + checksum,FullComputerRuntimeCheckpointCodec,FullComputerRecoveryCheckpointTests,PASS,Not merged into logbook
+ARCH-011,iOS coordinator,Eager Diving graph,iOS,Diving,MITIGATED,P3,Medium,Medium,Async init,performInitialLoadIfNeeded lazy sync logbooks,IOSCompanionStoreLifecycleTests,PASS,IOS-PERF remediated
+ARCH-012,CCR leakage,OC mode gas visibility,iOS,Diving,PASS,P4,Low,High,Mode projection,PlannerEnvironment fallback,PlanCalculationCompletenessTests,PASS,CCR reference-only in OC
+ARCH-013,Simulation release,Depth sensor source,Both,Diving,PASS,P1,Low,Critical,TestFlightSimulationSafetyPolicy,App Store blocks simulation,SecurityPrivacyTrustRemediationTests,PASS,SEC-P2-004 FIXED
+ARCH-014,Experimental leakage,Buddy Assist BLE,Both,N/A,PASS,P4,Low,Low,project.yml exclusion,Not in MAIN compile,isolation script,PASS,Noted only
+ARCH-015,Sequential activity,Cross-domain bleed,Both,All,PASS,P0,Low,Critical,Integration test,Gauge→FC→Apnea→Snorkeling flow,IntegratedModesSequentialFlowTests,PASS,No shared mutable state

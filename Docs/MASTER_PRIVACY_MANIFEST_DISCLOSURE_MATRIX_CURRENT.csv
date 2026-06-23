@@ -1,0 +1,23 @@
+Data_Category,Activity,Collected,Stored,Synced,Exported,Shared,Backed_Up,Encrypted_Protected,User_Controllable,Privacy_Policy,Privacy_Manifest,Release_Risk,Status,Notes
+Dive profiles depth samples,Diving,yes,yes,yes,yes,no,opt-in iCloud diving,yes,yes,yes,yes,Medium,PASS,Samples capped; large payload fallback
+Entry exit GPS,Diving,yes,yes,yes,optional CSV,no,opt-in if in session,yes,yes,yes,yes,High,PASS,Default export omits GPS
+Snorkeling route track,Snorkeling,yes,yes,yes,yes,no,no,yes,yes,yes,yes,High,PASS,Local-only cloud
+Snorkeling dip events,Snorkeling,yes,yes,yes,yes,no,no,yes,yes,yes,yes,Low,PASS,
+Session photos,Snorkeling,yes,yes,yes,share sheet,no,no,yes,yes,yes,yes,High,PARTIAL,SNK photo privacy field QA pending
+Apnea timings stats,Apnea,yes,yes,yes,yes,no,no,yes,yes,yes,yes,Medium,PASS,Cloud explicitly unavailable
+Apnea buddy notes,Apnea,yes,yes,yes,redacted export,no,no,yes,yes,yes,yes,Medium,PASS,
+Equipment gas data,Diving,yes,yes,yes,PDF export,no,opt-in diving,yes,yes,yes,yes,Medium,PASS,
+CCR bailout data,Diving,yes,yes,plan package only,PDF export,no,opt-in diving,yes,yes,yes,yes,High,PASS,Reference-only posture
+User notes,All,yes,yes,activity scoped,export per policy,no,diving opt-in,yes,yes,yes,yes,Medium,PASS,
+Sync identifiers,Cross,yes,yes,WC only,no,no,no,yes,resetPeerTrust,yes,yes,Critical,PASS,TOFU pinning tests PASS
+Device identifiers,Cross,no,no,no,no,no,no,N/A,N/A,yes,yes,Low,PASS,No IDFA; no tracking
+Diagnostics logs,Cross,limited,ephemeral,none,no,no,no,N/A,N/A,yes,partial,Low,PASS,Prefer os.Logger private
+iCloud KVS dive snapshot,Diving,yes,iCloud,yes,no,Apple iCloud,opt-in,yes,user toggle,yes,yes,High,PASS,Two-device QA pending
+Exported CSV PDF files,All,yes,tmp,user initiated,share sheet,user share,no,yes,user share,yes,yes,Medium,PENDING_PHYSICAL,Manual render QA pending
+Briefing card PNG,Diving,yes,yes,WC transfer,no,no,no,yes,delete card,yes,yes,Low,PASS,Path traversal blocked
+App Intents metadata,Cross,yes,UserDefaults,no,no,no,no,standard UD,re-onboard,yes,yes,Low,PASS,Gated by legal acceptance
+Planner plans,Diving,yes,yes,WC file transfer,none,no,opt-in planner state,yes,user delete,yes,yes,Medium,PASS,
+Full Computer checkpoint,Diving,yes,yes,no,no,no,no,yes,overwrite,yes,yes,High,PASS,Isolated namespace
+Legal acceptance flag,Cross,yes,UserDefaults,no,no,no,no,standard UD,re-onboard,yes,yes,Low,PASS,
+Developer unlock flag,Cross,yes,UserDefaults,no,no,no,no,standard UD,clear defaults,yes,yes,Low,PASS,TestFlight section
+Simulation sensor mode,Cross,yes,UserDefaults,no,no,no,no,standard UD,migrate on launch,yes,yes,Medium,PASS,TestFlight acknowledgment
