@@ -19,7 +19,7 @@ Master consolidated plan/register, remediation command V1.0, audit outputs 01–
 
 - **Branch:** `main`
 - **Pre-remediation baseline:** `7b620f3`
-- **Post-remediation:** `8c7b47c`
+- **Post-remediation:** `6e35f42`
 
 ## D. Consolidated Findings Addressed
 
