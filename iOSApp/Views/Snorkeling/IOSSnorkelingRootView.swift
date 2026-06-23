@@ -1,3 +1,4 @@
+import Combine
 import SwiftUI
 
 enum IOSSnorkelingTab: String, Hashable, CaseIterable, Identifiable {
@@ -32,9 +33,30 @@ enum IOSSnorkelingTab: String, Hashable, CaseIterable, Identifiable {
 
 @MainActor
 final class IOSSnorkelingNavigationStore: ObservableObject {
-    @Published var selectedTab: IOSSnorkelingTab = .dashboard
+    @Published var selectedTab: IOSSnorkelingTab
     @Published var showSettings = false
     @Published var pendingSessionDetailID: UUID?
+    private var persistCancellable: AnyCancellable?
+
+    init(defaults: UserDefaults = .standard) {
+        if let token = IOSCompanionNavigationPersistence.restoreSnorkelingTabToken(defaults: defaults),
+           let restored = IOSSnorkelingTab(rawValue: token) {
+            selectedTab = restored
+        } else {
+            selectedTab = .dashboard
+        }
+        persistCancellable = $selectedTab
+            .dropFirst()
+            .sink { IOSCompanionNavigationPersistence.persistSnorkelingTabToken($0.rawValue, defaults: defaults) }
+    }
+
+    func requestSessionDetail(id: UUID, activeActivity: DIRActivityMode?) {
+        guard IOSCompanionDeepLinkPolicy.allowsSessionDetail(requestedActivity: .snorkeling, activeActivity: activeActivity) else {
+            pendingSessionDetailID = nil
+            return
+        }
+        pendingSessionDetailID = id
+    }
 }
 
 struct IOSSnorkelingRootView: View {

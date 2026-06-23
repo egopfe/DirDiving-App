@@ -1,3 +1,4 @@
+import Combine
 import SwiftUI
 
 enum IOSApneaTab: String, Hashable, CaseIterable, Identifiable {
@@ -29,10 +30,31 @@ enum IOSApneaTab: String, Hashable, CaseIterable, Identifiable {
 
 @MainActor
 final class IOSApneaNavigationStore: ObservableObject {
-    @Published var selectedTab: IOSApneaTab = .dashboard
+    @Published var selectedTab: IOSApneaTab
     @Published var showPlanner = false
     @Published var showSettings = false
     @Published var pendingSessionDetailID: UUID?
+    private var persistCancellable: AnyCancellable?
+
+    init(defaults: UserDefaults = .standard) {
+        if let token = IOSCompanionNavigationPersistence.restoreApneaTabToken(defaults: defaults),
+           let restored = IOSApneaTab(rawValue: token) {
+            selectedTab = restored
+        } else {
+            selectedTab = .dashboard
+        }
+        persistCancellable = $selectedTab
+            .dropFirst()
+            .sink { IOSCompanionNavigationPersistence.persistApneaTabToken($0.rawValue, defaults: defaults) }
+    }
+
+    func requestSessionDetail(id: UUID, activeActivity: DIRActivityMode?) {
+        guard IOSCompanionDeepLinkPolicy.allowsSessionDetail(requestedActivity: .apnea, activeActivity: activeActivity) else {
+            pendingSessionDetailID = nil
+            return
+        }
+        pendingSessionDetailID = id
+    }
 }
 
 struct IOSApneaRootView: View {

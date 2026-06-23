@@ -49,6 +49,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     private var peerSecretObserver: NSObjectProtocol?
     private var pendingPhotoManagementResponses: [PendingPhotoManagementResponse] = []
     private var inFlightSessionIDs: Set<UUID> = []
+    private var suppressOutboundTransferForTests = false
 
     private static let logger = Logger(subsystem: "com.egopfe.dirdiving", category: "WatchSyncService")
     private static let activityDateFormatter: DateFormatter = {
@@ -115,6 +116,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     func transfer(_ session: DiveSession) {
+        guard !suppressOutboundTransferForTests else { return }
         guard WCSession.isSupported() else { return }
         if importedFromCompanionIDs.contains(session.id) { return }
         enqueuePendingSession(session)
@@ -131,6 +133,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     func transferSnorkelingSession(_ session: SnorkelingSession) {
+        guard !suppressOutboundTransferForTests else { return }
         guard WCSession.isSupported() else { return }
         enqueuePendingSnorkelingSession(session)
         recordActivity(title: String(localized: "snorkeling.sync.activity.pending_to_iphone"), detail: snorkelingSessionSummary(session))
@@ -143,6 +146,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     func transferApneaSession(_ session: ApneaSession) {
+        guard !suppressOutboundTransferForTests else { return }
         guard WCSession.isSupported() else { return }
         enqueuePendingApneaSession(session)
         recordActivity(title: String(localized: "apnea.sync.activity.pending_to_iphone"), detail: apneaSessionSummary(session))
@@ -525,6 +529,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     private func flushPendingTransfers() {
+        guard !suppressOutboundTransferForTests else { return }
         guard WatchSyncAuth.hasPeerSecret(), !pendingTransfers.isEmpty else { return }
         let eligible = WatchSyncPendingFlushPolicy.sessionsEligibleForSend(
             transfers: pendingTransfers,
@@ -857,6 +862,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     private func flushPendingApneaTransfers() {
+        guard !suppressOutboundTransferForTests else { return }
         guard WatchSyncAuth.hasPeerSecret(), !pendingApneaTransfers.isEmpty else { return }
         for entry in pendingApneaTransfers.reversed() {
             guard !inFlightApneaSessionIDs.contains(entry.session.id) else { continue }
@@ -971,6 +977,7 @@ final class WatchSyncService: NSObject, ObservableObject {
     }
 
     private func flushPendingSnorkelingTransfers() {
+        guard !suppressOutboundTransferForTests else { return }
         guard WatchSyncAuth.hasPeerSecret(), !pendingSnorkelingTransfers.isEmpty else { return }
         for entry in pendingSnorkelingTransfers.reversed() {
             guard !inFlightSnorkelingSessionIDs.contains(entry.session.id) else { continue }
@@ -1091,6 +1098,10 @@ final class WatchSyncService: NSObject, ObservableObject {
 // MARK: - Algorithm test hooks
 
 extension WatchSyncService {
+    func testHook_setSuppressOutboundTransferForTests(_ suppress: Bool) {
+        suppressOutboundTransferForTests = suppress
+    }
+
     func testHook_resetPendingQueueForTests() {
         pendingTransfers = []
         pendingUserInfoTransferSessionIDs = [:]

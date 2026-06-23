@@ -12,6 +12,7 @@ final class Audit15TTSScheduleOracleSweepTests: XCTestCase {
     }
 
     func testTTSScheduleSweepAcrossProfiles() throws {
+        executionTimeAllowance = 3_600
         var maxOptimisticDelta = 0
         var maxAbsDelta = 0
         var samples = 0

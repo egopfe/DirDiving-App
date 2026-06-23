@@ -1,0 +1,11 @@
+Gate_ID,Category,Status,Evidence_Path,Blocks_External_TestFlight,Blocks_App_Store
+PHY-001,Watch Ultra field QA,PENDING_PHYSICAL,Docs/QA_EVIDENCE/WATCH_ULTRA/,yes,yes
+PHY-002,CMAltimeter entitlement QA,PENDING_PHYSICAL,Docs/QA_EVIDENCE/WATCH_CMALTIMETER_PHYSICAL/,yes,yes
+PHY-003,Underwater depth sensor wet QA,PENDING_PHYSICAL,Docs/QA_EVIDENCE/SNORKELING_WET_GLOVE/,yes,yes
+PHY-004,Paired Watch+iPhone sync QA,PENDING_PHYSICAL,Docs/QA_EVIDENCE/WATCH_IOS_SYNC/,yes,yes
+PHY-005,Accessibility manual QA,PENDING_PHYSICAL,Docs/QA_EVIDENCE/IOS_ACCESSIBILITY/,no,yes
+PHY-006,Visual/pixel baseline capture,PENDING_PHYSICAL,Docs/QA_EVIDENCE/MANUAL_VISUAL_FIDELITY/,no,yes
+EXT-001,External Bühlmann tool comparison,PENDING_EXTERNAL_VALIDATION,Docs/QA_EVIDENCE/BUHLMANN_EXTERNAL/,yes,yes
+EXT-002,Subsurface desktop round-trip,PENDING_EXTERNAL_VALIDATION,Docs/QA_EVIDENCE/SUBSURFACE_EXTERNAL/,no,yes
+LEG-001,Legal/marketing counsel review,PENDING_LEGAL_REVIEW,Docs/QA_EVIDENCE/LEGAL_REVIEW/,no,yes
+ASR-001,App Store review,PENDING_APP_STORE_REVIEW,,yes,yes

@@ -278,7 +278,7 @@ Snorkeling, Apnea, Buddy, Exploration Lab — **not referenced** by Mission Mode
 | **GPS affected?** | **No** |
 | **Logging / sync / export affected?** | **No** |
 | **TestFlight ready (UX/safety)?** | **Yes** — with hardware QA checklist. |
-| **App Store ready (UX/safety/copy)?** | **Yes** — disclaimers in place; avoid system LPM marketing. |
+| **App Store ready (UX/safety/copy)?** | **No** for external App Store — internal UX/copy acceptable; physical QA, entitlements, and legal review **PENDING**. |
 | **What blocks 100% UX/safety readiness?** | (1) Hardware validation, (2) integration tests for safety invariants, (3) optional P2 polish on warning animations under Mission Mode. |
 
 ### Classification summary

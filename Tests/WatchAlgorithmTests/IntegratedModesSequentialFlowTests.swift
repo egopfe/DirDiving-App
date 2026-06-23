@@ -52,6 +52,7 @@ final class IntegratedModesSequentialFlowTests: XCTestCase {
         )
         diveManager.testHook_setDepthAutomationAvailableForTests(true)
         activityStore = DIRActivitySelectionStore()
+        WatchSyncService.shared.testHook_setSuppressOutboundTransferForTests(true)
         WatchSyncService.shared.testHook_resetPendingQueueForTests()
         WatchSyncService.shared.testHook_resetSnorkelingPendingQueueForTests()
     }
@@ -65,6 +66,7 @@ final class IntegratedModesSequentialFlowTests: XCTestCase {
         DiveLogStore.testHook_storageDirectoryURL = nil
         ApneaLogbookStore.testHook_storageDirectoryURL = nil
         SnorkelingLogbookStore.testHook_storageDirectoryURL = nil
+        WatchSyncService.shared.testHook_setSuppressOutboundTransferForTests(false)
         WatchSyncService.shared.testHook_resetPendingQueueForTests()
         WatchSyncService.shared.testHook_resetSnorkelingPendingQueueForTests()
         #if DEBUG

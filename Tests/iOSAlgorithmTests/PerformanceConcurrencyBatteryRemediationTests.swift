@@ -166,14 +166,15 @@ final class PerformanceConcurrencyBatteryRemediationTests: XCTestCase {
 
     func testTissueAnalyticsCacheBounded() {
         TissueAnalyticsService.invalidateCache()
-        for index in 0..<40 {
+        for index in 0..<36 {
             var input = GasPlanInput()
-            input.plannedDepthMeters = 20 + Double(index)
-            let plan = PlannerService.makePlan(input: input, mode: .technical)
-            _ = TissueAnalyticsService.presentationForPlanner(plan: plan, input: input, mode: .technical)
+            input.plannedDepthMeters = 18 + Double(index % 6)
+            input.plannedBottomMinutes = 25
+            let plan = PlannerService.makePlan(input: input, mode: .base)
+            _ = TissueAnalyticsService.presentationForPlanner(plan: plan, input: input, mode: .base)
         }
+        XCTAssertLessThanOrEqual(TissueAnalyticsService.testHook_cacheEntryCount(), 32)
         TissueAnalyticsService.invalidateCache()
-        XCTAssertTrue(true)
     }
 
     func testPlannerBackgroundFlushWithinBudget() async {
