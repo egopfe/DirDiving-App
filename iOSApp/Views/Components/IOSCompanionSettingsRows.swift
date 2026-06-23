@@ -117,27 +117,27 @@ struct IOSCompanionSettingsIntStepperRow: View {
     }
 }
 
-struct IOSCompanionSettingsNavigationRow: View {
+struct IOSCompanionSettingsNavigationRow<Destination: View>: View {
     let title: String
     let systemImage: String
-    let destination: AnyView
     var identifier: String? = nil
+    @ViewBuilder private let destination: () -> Destination
 
-    init<Destination: View>(
+    init(
         title: String,
         systemImage: String,
         identifier: String? = nil,
-        @ViewBuilder destination: () -> Destination
+        @ViewBuilder destination: @escaping () -> Destination
     ) {
         self.title = title
         self.systemImage = systemImage
         self.identifier = identifier
-        self.destination = AnyView(destination())
+        self.destination = destination
     }
 
     var body: some View {
         NavigationLink {
-            destination
+            destination()
         } label: {
             HStack {
                 Label(title, systemImage: systemImage)

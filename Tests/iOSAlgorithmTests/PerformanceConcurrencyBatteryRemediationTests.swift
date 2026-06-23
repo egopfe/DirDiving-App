@@ -222,8 +222,10 @@ final class PerformanceConcurrencyBatteryRemediationTests: XCTestCase {
 
     func testSettingsLazyEnvironmentHostExists() throws {
         let source = try repositorySource(relativePath: "iOSApp/Views/Components/IOSCompanionSettingsEnvironmentHost.swift")
-        XCTAssertTrue(source.contains("ensureApneaSettingsStore"))
-        XCTAssertTrue(source.contains("ensureSnorkelingSettingsStore"))
+        XCTAssertTrue(source.contains("ensureApneaStores()"))
+        XCTAssertTrue(source.contains("ensureSnorkelingStores()"))
+        XCTAssertTrue(source.contains(".id(DIRActivityMode.apnea)"))
+        XCTAssertTrue(source.contains("bundle.equipmentStore"))
     }
 
     func testWatchSyncFlushPolicyBoundsBatch() {
