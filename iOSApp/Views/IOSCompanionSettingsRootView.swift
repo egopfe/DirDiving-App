@@ -23,6 +23,7 @@ struct IOSCompanionSettingsRootView: View {
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 16) {
                         settingsContent
+                            .id(companionSettingsScope.displayedMode)
                         IOSCompanionSharedCompanionSections()
                     }
                     .padding(16)

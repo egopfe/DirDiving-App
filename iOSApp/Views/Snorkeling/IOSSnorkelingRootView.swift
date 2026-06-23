@@ -82,6 +82,11 @@ struct IOSSnorkelingRootView: View {
             DIRBackground().ignoresSafeArea()
         }
         .tint(DIRTheme.cyan)
+        .onChange(of: snorkelingNavigation.showSettings) { _, isPresented in
+            if isPresented {
+                coordinator.companionSettingsScope.applyInitialScope(.snorkeling)
+            }
+        }
         .sheet(isPresented: $snorkelingNavigation.showSettings) {
             coordinator.applyCompanionSettingsSheetEnvironment(to:
                 NavigationStack {
