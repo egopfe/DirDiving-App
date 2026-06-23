@@ -1,0 +1,27 @@
+ID,Platform,Activity,Mode,Feature,Entry_Point,Destination,Exit,Availability_Condition,Target_Membership,Deep_Link,Restoration,Reachable,Functional,Severity,Finding_ID,Notes
+NAV-001,Watch,Global,All,Legal acceptance,Launch,WatchLegalOnboardingView,Accept,First/versioned launch,yes,n/a,persisted,yes,yes,,,
+NAV-002,Watch,Global,All,Activity selection,Cold launch/Settings,ActivitySelectionView,Choose activity,No active session,yes,n/a,preference,yes,yes,,,
+NAV-003,Watch,Diving,Gauge,Live dive,Activity→Gauge,DiveLiveView,End session,Sensor ready,yes,n/a,checkpoint,yes,yes,,,
+NAV-004,Watch,Diving,Full Computer,Predive environment,FC path,FullComputerPrediveSettingsView/Confirmation,Confirm/cancel,Valid env/gas/GF,yes,n/a,persisted profile,yes,yes,,,Altitude propagated OrchestratedAltitudeEnvironmentTests
+NAV-005,Watch,Diving,Full Computer,Live deco,Confirmed predive,DiveLiveView,End session,Runtime self-check,yes,n/a,checkpoint,yes,yes,,,
+NAV-006,Watch,Apnea,Apnea,Session,Activity→Apnea,ApneaView,Save/end,Recovery/sensor gates,yes,n/a,checkpoint,yes,yes,P1,MUIUX-P1-001,Physical wet QA PENDING
+NAV-007,Watch,Apnea,Apnea,In-mode settings,ApneaView gear,SettingsView,Back/crown,Session inactive,yes,n/a,n/a,yes,yes,,,Blocked when active WatchInModeSettingsAccessPolicy
+NAV-008,Watch,Snorkeling,Snorkeling,Session,Activity→Snorkeling,SnorkelingView,Save/end,Permission/sensor gates,yes,n/a,checkpoint,yes,yes,P1,MUIUX-P1-001,Physical GPS QA PENDING
+NAV-009,Watch,Snorkeling,Snorkeling,In-mode settings,SnorkelingView gear,SettingsView,Back/crown,Session inactive,yes,n/a,n/a,yes,yes,,,
+NAV-010,Watch,Diving,All,Diving logbook,Crown page,DiveLogListView,Back/crown,Activity is Diving,yes,n/a,store,yes,yes,,,Not mounted for Apnea/Snorkeling
+NAV-011,iOS,Global,All,Activity selection,Launch/Settings,IOSCompanionActivitySelectionView,Choose activity,Post-legal gate,yes,n/a,preference,yes,yes,,,
+NAV-012,iOS,Global,All,Settings mode switch,More tab / gear sheets,IOSCompanionSettingsRootView,Back/dismiss,Any activity root,yes,n/a,scope only,yes,yes,,,Does not mutate runtime
+NAV-013,iOS,Diving,All,More Settings diving,Diving More tab,MoreView,Tab switch,Diving root only,yes,n/a,store,yes,yes,,,Embedded IOSDivingSettingsEmbeddedContent
+NAV-014,iOS,Apnea,Apnea,Apnea settings gear,Dashboard gear,IOSCompanionSettingsRootView initialMode apnea,Dismiss sheet,Apnea root,yes,n/a,scope,yes,yes,,,
+NAV-015,iOS,Snorkeling,Snorkeling,Snorkeling settings gear,Dashboard gear,IOSCompanionSettingsRootView initialMode snorkeling,Dismiss sheet,Snorkeling root,yes,n/a,scope,yes,yes,,,
+NAV-016,iOS,Diving,All,Planner,Diving Planner tab,PlannerRootView,Tab/back,Activity is Diving,yes,n/a,store,yes,yes,,,
+NAV-017,iOS,Diving,All,Equipment/checklist,Gear/Checklist tabs,EquipmentView/ChecklistView,Tab/back,Diving root,yes,n/a,store,yes,yes,,,
+NAV-018,iOS,Diving,All,Diving logbook,Logbook tab,LogbookView,Tab/back,Diving only,yes,n/a,store,yes,yes,,,
+NAV-019,iOS,Apnea,Apnea,Apnea logbook,Sessions tab,IOSApneaSessionsListView,Tab/back,Apnea only,yes,n/a,store,yes,yes,,,
+NAV-020,iOS,Snorkeling,Snorkeling,Snorkeling logbook,Sessions tab,IOSSnorkelingSessionsListView,Tab/back,Snorkeling only,yes,n/a,store,yes,yes,,,
+NAV-021,Watch+iOS,Diving,Planner→Watch,Briefing card,Planner transfer/Watch inventory,Briefing card views,Close/delete,Signed current card,yes,n/a,persisted,yes,yes,,,Reference-only; not live authority
+NAV-022,iOS,Diving,All,Ascent speed settings,MoreView only,PlannerAscentSpeedSettingsView,Back,Any Diving session,yes,n/a,store,yes,yes,P2,MUIUX-P2-004,Not linked from Planner header
+NAV-023,Watch,Diving,All,Start dive manual/auto,Live screen,DiveLiveView,End,Depth/sensor gates,yes,n/a,checkpoint,yes,yes,,,Auto >1.0 m; collision handling tested
+NAV-024,Watch,Diving,All,Images surface,Images tab,UserImagesView,Back/crown,Surface only; blocked underwater,yes,n/a,store,yes,yes,,,
+NAV-025,iOS,Diving,All,Manual dive,Logbook add,ManualDiveEditorView,Save/cancel,Diving logbook,yes,n/a,store,yes,yes,,,
+NAV-026,iOS,Diving,All,Analysis replay,Analysis tab,AnalysisView,Tab/back,Diving-only tissue/narcosis,yes,n/a,store,yes,yes,,,

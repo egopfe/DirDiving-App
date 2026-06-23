@@ -1,0 +1,11 @@
+Duplicate_Group_ID,Consolidated_Finding_ID,Source_Audit,Source_Finding_ID,Source_Title,Same_Root_Cause,Same_Symptom,Same_Affected_Files,Same_Affected_Runtime,Merge_Decision,Severity_Adjustment,Reason,Notes
+DG-EXT-001,CONS-002,01-Watch,MWFC-P1-002,External Bühlmann validation gap,Yes,Yes,No,No,MERGE,None,Same evidence gap across Watch+iOS+Release,
+DG-EXT-001,CONS-002,02-iOS,IOS-MASTER-F011,External Bühlmann validation gap,Yes,Yes,No,No,MERGE,None,Same root cause,
+DG-PHY-001,CONS-003,01-Watch,MWFC-P2-001,Physical Watch QA,Yes,Yes,Partial,Yes,MERGE,None,Simulator ≠ hardware,
+DG-PHY-001,CONS-003,03-UI/UX,MUIUX-P1-001,Physical UI QA,Yes,Yes,No,Yes,MERGE,None,UI/UX physical matrix overlap,
+DG-SYNC-001,CONS-004,03-UI/UX,MUIUX-P1-002,Paired sync UI QA,Yes,Yes,No,Yes,MERGE,None,Same paired-device campaign,
+DG-SYNC-001,CONS-004,04-Main,MASTER-SEC-001,Field sync security,Yes,Yes,Yes,Yes,MERGE,None,Security+sync same field matrix,
+DG-SYNC-001,CONS-004,04-Main,MASTER-SYNC-001,Large payload transfer,Yes,Yes,Yes,Yes,MERGE,None,Same paired test session,
+DG-SYNC-001,CONS-004,02-iOS,IOS-MASTER-F014,Briefing transfer QA,Yes,Yes,Partial,Yes,MERGE,None,Briefing in paired campaign,
+DG-DOC-001,CONS-012,03-UI/UX,MUIUX-P2-003,Doc history,Yes,Yes,Yes,No,MERGE,None,Same documentation debt,
+DG-DOC-001,CONS-012,06-Docs,DOC-HIST-001,Doc history,Yes,Yes,Yes,No,MERGE,None,Prior orchestrated finding,

@@ -1,0 +1,22 @@
+Capability_ID,Platform,Feature,Required,Implemented,Entitlement_Or_Plist,Simulator_Only,Physical_Required,Apple_Approval_Required,Release_Blocker,Status,Evidence_Path,Notes
+CAP-W-DEPTH,Watch,Submerged depth and pressure,yes,yes,Config/DIRDiving.WithWaterSubmersion.entitlements,no,yes,yes,yes,PENDING_PHYSICAL,QA_EVIDENCE/HARDWARE_ENTITLEMENT/,Entitlement configured; field QA NOT EXECUTED
+CAP-W-CM,Watch,CoreMotion CMAltimeter absolute altitude,yes,yes,NSMotionUsageDescription in App/Info.plist,yes,yes,no,yes,PENDING_PHYSICAL,QA_EVIDENCE/WATCH_CMALTIMETER_PHYSICAL/,Software WCMA remediation PASS
+CAP-W-WC,Watch,WatchConnectivity sync,yes,yes,Linked framework,no,yes,no,no,PASS,Tests/WatchAlgorithmTests/WatchSync*,Codec + integration tests PASS
+CAP-W-LOC,Watch,Location for GPS track,yes,yes,Info.plist location usage,no,yes,no,no,PENDING_PHYSICAL,QA_EVIDENCE/SNORKELING_GPS/,Surface-only disclosure in copy
+CAP-W-KIT,Watch,WatchKit runtime,yes,yes,Watch App target,no,no,no,no,PASS,project.yml,
+CAP-W-GRP,Watch,App Groups,optional,no,N/A,N/A,N/A,N/A,no,PASS,Not used in MAIN,
+CAP-W-HK,Watch,HealthKit,optional,no,N/A,N/A,N/A,N/A,no,PASS,Not used in MAIN,
+CAP-W-BG,Watch,Background modes,optional,limited,Info.plist as configured,yes,yes,no,no,CONDITIONAL,PERFORMANCE_EXTERNAL_QA_PENDING_CURRENT.md,Session lifecycle dependent
+CAP-I-LOC,iOS,Location permission,yes,yes,iOSApp Info.plist location keys,no,yes,no,no,PENDING_PHYSICAL,QA_EVIDENCE/SNORKELING_IOS_MAPS/,Snorkeling maps
+CAP-I-PHOTO,iOS,Photos/files permission,yes,yes,Info.plist photo usage,no,yes,no,no,PENDING_PHYSICAL,QA_EVIDENCE/SNORKELING_PHOTO_PRIVACY/,Reference photo to Watch
+CAP-I-ICLOUD,iOS,iCloud KVS + CloudKit (diving opt-in),yes,yes,iOSApp/Config/DIRDivingiOS.entitlements,no,yes,no,yes,PENDING_PHYSICAL,QA_EVIDENCE/ICLOUD_TWO_DEVICE/,Apnea/Snorkeling explicitly local-only
+CAP-I-WC,iOS,WatchConnectivity companion,yes,yes,Linked framework,no,yes,no,no,PENDING_PHYSICAL,QA_EVIDENCE/WATCH_IOS_SYNC/,Paired smoke PENDING
+CAP-I-GRP,iOS,App Groups,optional,no,N/A,N/A,N/A,N/A,no,PASS,Not used,
+CAP-I-HK,iOS,HealthKit,optional,no,N/A,N/A,N/A,N/A,no,PASS,Not used,
+CAP-I-CHARTS,iOS,Charts framework,yes,yes,Linked SDK,yes,no,no,no,PASS,Planner charts,
+CAP-BOTH-PRIV,Both,PrivacyInfo.xcprivacy,yes,yes,Config/PrivacyInfo-Watch.xcprivacy + iOSApp/Config/PrivacyInfo-iOS.xcprivacy,no,no,no,no,PASS,Tests SecurityPrivacyTrustRemediationTests,App Store nutrition preview PENDING
+CAP-BOTH-EXPORT,Both,Export/share file handling,yes,yes,Share sheet + tmp staging,no,yes,no,no,PENDING_PHYSICAL,QA_EVIDENCE/PDF_RENDER/,Manual share QA pending
+CAP-W-DSS,Watch,Developer Sensor Source release gating,yes,yes,DeveloperSettings + SensorSourceMode,no,yes,no,no,PASS,DeveloperSensorSourceTests,TestFlight disclosure required
+CAP-W-SIM,Watch,Simulation mode release gating,yes,yes,SensorSourceMode + UI badges,yes,yes,no,yes,CONDITIONAL,TESTFLIGHT_REVIEW_NOTES.md,Must remain labeled simulation
+CAP-ASC-CAT,App Store,Category and age rating,yes,partial,App Store Connect metadata,N/A,N/A,yes,yes,PENDING,QA_EVIDENCE/APP_STORE_MARKETING/,Final ASC config pending
+CAP-W-BUNDLE,Watch,iOS embeds Watch companion,yes,yes,DIRDiving iOS embeds Watch App,no,yes,no,no,PASS,xcodebuild DIRDiving iOS build PASS 2026-06-22,

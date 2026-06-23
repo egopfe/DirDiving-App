@@ -1,0 +1,8 @@
+Logbook_ID,Activity,Platform,Entry_Point,List_View,Detail_View,Store,Session_Type,Filters,Statistics,Export,Sync,Deep_Link,Restoration,Visible_From_Diving,Visible_From_Apnea,Visible_From_Snorkeling,Cross_Activity_Leak,Evidence,Pass,Notes
+diving_logbook,Diving,Watch+iOS,Crown page / Diving tab,DiveLogListView,DiveDetailView,DiveLogStore,DiveSession,yes,yes,yes,yes,Diving,Diving,no,WatchActivityLogbookRoutingTests,PASS,Watch tab gated to Diving activity,,,
+apnea_logbook,Apnea,iOS,Apnea sessions tab,IOSApneaSessionsListView,IOSApneaSessionDetailView,IOSApneaLogbookStore,ApneaSession,yes,yes,no,yes,Apnea,Apnea,no,IOSActivityLogbookRoutingTests,PASS,Watch saves only; browse iOS-only,,,
+snorkeling_logbook,Snorkeling,iOS,Snorkeling sessions tab,IOSSnorkelingSessionsListView,IOSSnorkelingSessionDetailView,IOSSnorkelingLogbookStore,SnorkelingSession,yes,yes,no,yes,Snorkeling,Snorkeling,no,IOSActivityLogbookRoutingTests,PASS,Watch saves only; browse iOS-only,,,
+cross_diving_apnea,Diving→Apnea,Watch+iOS,n/a,n/a,n/a,IOSApneaLogbookStore,n/a,no,no,no,blocked,Apnea,n/a,no,IOSActivityLogbookRoutingTests,PASS,P0 route blocked,,,
+cross_diving_snorkeling,Diving→Snorkeling,Watch+iOS,n/a,n/a,n/a,IOSSnorkelingLogbookStore,n/a,no,no,no,blocked,Snorkeling,n/a,no,IOSActivityLogbookRoutingTests,PASS,P0 route blocked,,,
+cross_apnea_diving,Apnea→Diving,Watch+iOS,n/a,n/a,n/a,DiveLogStore,n/a,no,no,no,blocked,Diving,n/a,no,WatchActivityLogbookRoutingTests,PASS,Watch diveLog tab not mounted,,,
+universal_hub,Global,Watch+iOS,n/a,n/a,n/a,none,n/a,no,no,no,blocked,none,n/a,no,IOSActivityLogbookRoutingPolicy,PASS,No mixed logbook hub,,,
