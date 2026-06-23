@@ -1,0 +1,16 @@
+Risk_ID,Component,Platform,Pattern,Severity,Status,Root_Cause,Mitigation,Test_Evidence,Notes
+CONC-001,DiveManager,Watch,1Hz Timer → MainActor tick,P3,DOCUMENTED_ACCEPTED_RISK,Main run loop tissue tick,Solver budget 50ms + degraded state,FullComputerTimingFaultTests,MASTER-PERF-005
+CONC-002,PlannerStore,iOS,Task.detached background calc,P4,MITIGATED,MainActor planner blocking,PlannerBackgroundCalculation + generation guard,PerformanceConcurrencyBatteryRemediationTests,IOS-PERF remediated
+CONC-003,PlannerStore,iOS,planningGeneration stale guard,P4,MITIGATED,Async publish race,Generation token before @Published write,PlannerPresentationTests,
+CONC-004,WatchSyncService,Both,nonisolated delegate → MainActor,P4,MITIGATED,WC callback thread hop,@MainActor service + deferPublishedMutation,WatchSyncServiceIntegrationTests,
+CONC-005,ApneaWatchRuntimeStore,Watch,Cancellable tick Task,P4,MITIGATED,Session end leak,[weak self] + task cancel,Apnea lifecycle tests,
+CONC-006,SnorkelingWatchRuntimeStore,Watch,Cancellable tick + checkpoint debounce,P4,MITIGATED,Write storm,250ms debounce + fingerprint,SnorkelingWatchRuntimeStorePersistenceTests,
+CONC-007,GPSManager,Watch,Authorization callback no restart when inactive,P4,MITIGATED,Battery drain,maintainsLocationUpdates gate,Code review + comments,
+CONC-008,DiveLogStore,iOS,Async initial load,P4,MITIGATED,Init blocking main,performInitialLoadIfNeeded Task,IOSCompanionStoreLifecycleTests,
+CONC-009,WatchSyncService,iOS,Pending flush inFlightOutboundSessionIDs,P4,MITIGATED,Duplicate WC send,WatchSyncPendingFlushPolicy,MainDeepCodeReadinessCurrentWatchTests,
+CONC-010,IOSExportCancellation,iOS,Export Task cancellation,P4,MITIGATED,Long export block,checkCancellation wrappers,PerformanceConcurrencyBatteryRemediationTests,
+CONC-011,TissueAnalyticsService,iOS,LRU cache 32 entries,P4,MITIGATED,Unbounded memory,LRU eviction,PerformanceConcurrencyBatteryRemediationTests,
+CONC-012,HapticService,Watch,@MainActor haptic coordination,P4,ACCEPTED,MainActor burst,Coordinated coordinators,AscentSafetyHapticCoordinator tests,
+CONC-013,CloudSyncStore,iOS,KVS sync on init,P3,MONITOR,Startup I/O,Generation token success delay,MainDeepCodeAnalysisRemediationV1Tests,
+CONC-014,FullComputerRuntimeEngine,Watch,Overlap guard on tick,P4,MITIGATED,Reentrant tick,tickInProgress flag,FullComputerRuntimeEngineTests,
+CONC-015,ActivitySyncSignedTransport,Both,Sendable DTOs,P4,PASS,Cross-actor payloads,Sendable conformance,Compile-time + tests,

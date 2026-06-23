@@ -1,0 +1,14 @@
+Policy_ID,Area,Do_Not_Touch_Until,Reason,Allowed_After_Batch,Notes
+DNTP-001,Bühlmann/Schreiner/GF core math,Batch-1 complete + regression tests,Live decompression safety,Batch-1 with oracle rerun,No shortcut fixes
+DNTP-002,Watch Full Computer live runtime timer/degraded policy,Batch-1 evidence,1Hz tick + degraded = safe posture,Batch-1 only with timing tests,
+DNTP-003,HMAC/nonce/replay/tombstone sync,Batch-2 complete,Data integrity,Batch-2 with sync audit rerun,No perf bypass
+DNTP-004,Activity sync payload routing keys,Batch-2 complete,Cross-activity isolation,Batch-2,
+DNTP-005,iOS Planner → Watch live mutation paths,Never,Planner must not mutate active dive,Always forbidden,
+DNTP-006,Planner briefing cards reference-only contract,Never,Misleading live data risk,Always forbidden,
+DNTP-007,CCR/Rebreather live controller semantics,Never,Not implemented/validated,Reference-only until separate program,
+DNTP-008,Altitude environment propagation (import→runtime→logbook),Never without Batch-1,P0 regression risk,Only with full altitude test matrix,
+DNTP-009,App Store / legal certification wording,Never without Batch-9,Unsupported claims liability,After technical + evidence gates,
+DNTP-010,Mockup PNG assets embedded in production UI,Never,Visual regression contract,Use SwiftUI only,
+DNTP-011,Privacy manifests / entitlement declarations,Never without Batch-7,App Store rejection risk,With security audit rerun,
+DNTP-012,Performance remediation generation tokens / background planner,Batch-5 verified,Recently remediated @ 3f6f349,Batch-5 regression tests only,
+DNTP-013,Documentation INDEX baseline SHAs,Never before Batch-9 truth,False readiness reporting,After technical reality known,

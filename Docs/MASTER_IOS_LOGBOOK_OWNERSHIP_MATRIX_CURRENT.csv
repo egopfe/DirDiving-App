@@ -1,0 +1,27 @@
+Route_ID,Source_Activity,Target_Logbook,Store,View,Allowed,Test_Evidence,Pass,Notes
+DIVING_TO_DIVING,Diving,Diving,DiveLogStore,LogbookView,yes,IOSActivityLogbookRoutingTests.testDivingRootUsesDivingLogbookOnly,PASS,Primary diving logbook
+APNEA_TO_APNEA,Apnea,Apnea,IOSApneaLogbookStore,IOSApneaSessionsListView,yes,IOSActivityLogbookRoutingTests,PASS,No DiveLogStore in Apnea env
+SNORKEL_TO_SNORKEL,Snorkeling,Snorkeling,IOSSnorkelingLogbookStore,IOSSnorkelingSessionsListView,yes,IOSActivityLogbookRoutingTests,PASS,No DiveLogStore in Snorkeling env
+DIVING_TO_APNEA,Diving,Apnea,n/a,n/a,no,IOSActivityLogbookRoutingTests.testSixForbiddenCrossActivityLogbookRoutesDataDriven,PASS,P0 if allowed — blocked
+DIVING_TO_SNORKEL,Diving,Snorkeling,n/a,n/a,no,IOSActivityLogbookRoutingTests.testSixForbiddenCrossActivityLogbookRoutesDataDriven,PASS,Forbidden cross-route
+APNEA_TO_DIVING,Apnea,Diving,n/a,n/a,no,IOSActivityLogbookRoutingTests.testSixForbiddenCrossActivityLogbookRoutesDataDriven,PASS,Forbidden cross-route
+APNEA_TO_SNORKEL,Apnea,Snorkeling,n/a,n/a,no,IOSActivityLogbookRoutingTests.testSixForbiddenCrossActivityLogbookRoutesDataDriven,PASS,Forbidden cross-route
+SNORKEL_TO_DIVING,Snorkeling,Diving,n/a,n/a,no,IOSActivityLogbookRoutingTests.testSixForbiddenCrossActivityLogbookRoutesDataDriven,PASS,Forbidden cross-route
+SNORKEL_TO_APNEA,Snorkeling,Apnea,n/a,n/a,no,IOSActivityLogbookRoutingTests.testSixForbiddenCrossActivityLogbookRoutesDataDriven,PASS,Forbidden cross-route
+APNEA_VIEWS_NO_DIVING,Apnea,Diving,n/a,IOSApneaSessionsListView tree,no,IOSActivityLogbookRoutingTests.testApneaViewsDoNotReferenceDivingLogbook,PASS,Static directory sweep
+SNORKEL_VIEWS_NO_DIVING,Snorkeling,Diving,n/a,IOSSnorkelingSessionsListView tree,no,IOSActivityLogbookRoutingTests.testSnorkelingViewsDoNotReferenceDivingLogbook,PASS,Static directory sweep
+ENV_APNEA_NO_DIVELOG,Apnea,Diving,n/a,applyApneaEnvironment,no,IOSCompanionEnvironmentIsolationTests,PASS,No .environmentObject(logStore)
+ENV_SNORKEL_NO_DIVELOG,Snorkeling,Diving,n/a,applySnorkelingEnvironment,no,IOSCompanionEnvironmentIsolationTests,PASS,No .environmentObject(logStore)
+DATA_ISOLATION_APNEA,Apnea,Apnea,IOSApneaLogbookStore,JSON file,yes,IOSActivityLogbookDataIsolationTests,PASS,Delete in one store does not affect other
+DATA_ISOLATION_SNORKEL,Snorkeling,Snorkeling,IOSSnorkelingLogbookStore,JSON file,yes,IOSActivityLogbookDataIsolationTests,PASS,Separate persistence files
+SYNC_DIVING_ONLY,Watch→iOS,Diving,DiveLogStore,WatchSyncService,yes,WatchSyncServiceIntegrationTests,PASS,Activity-scoped sync codecs
+SYNC_APNEA_ONLY,Watch→iOS,Apnea,IOSApneaLogbookStore,Apnea sync codec,yes,ApneaSyncCodecTests,PASS,Cross-decode rejected
+SYNC_SNORKEL_ONLY,Watch→iOS,Snorkeling,IOSSnorkelingLogbookStore,Snorkeling sync codec,yes,SnorkelingSessionSyncCodecTests,PASS,Cross-decode rejected
+STATS_DIVING,Diving,Diving,DiveLogStore,Logbook analytics,yes,IOSActivityLogbookDataIsolationTests,PASS,No mixed statistics query
+STATS_APNEA,Apnea,Apnea,IOSApneaLogbookStore,Apnea analytics,yes,IOSApneaLogbookAnalyticsTests,PASS,Apnea-only stats
+STATS_SNORKEL,Snorkeling,Snorkeling,IOSSnorkelingLogbookStore,Snorkeling analytics,yes,IOSSnorkelingLogbookAnalyticsTests,PASS,Snorkeling-only stats
+EXPORT_DIVING,Diving,Diving,DiveLogStore,PDF/CSV export,yes,PDFExportServiceTests,PASS,No cross-activity export path
+EXPORT_APNEA,Apnea,Apnea,IOSApneaLogbookStore,Apnea export,yes,IOSApneaMapEquipmentExportTests,PASS,
+EXPORT_SNORKEL,Snorkeling,Snorkeling,IOSSnorkelingLogbookStore,Snorkeling export,yes,IOSSnorkelingExportServiceE2ETests,PASS,
+DEEP_LINK_MIXED,Any,Mixed,n/a,onOpenURL,N/A,DIR_DIVING_IOS_ACTIVITY_SELECTION_AND_LINKS_AUDIT_CURRENT.md,PASS,No URL handlers — N/A
+STATE_RESTORE_MIXED,Any,Mixed,n/a,Scene restoration,no,IOS-MASTER-F002,PARTIAL,Session checkpoints only; nav restore gap

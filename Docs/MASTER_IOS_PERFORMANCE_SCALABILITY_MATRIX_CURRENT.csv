@@ -1,0 +1,31 @@
+Surface_ID,Area,Input_Scale,Downsampling,Cancellation,MainActor_Work,Cap_Enforced,Test_Coverage,Simulator_Evidence,Physical_Evidence,Readiness_Score,Status,Notes
+IOS-SURF-001,Startup,Full coordinator graph,No,N/A,Minimal after async init,No,IOSCompanionStoreLifecycleTests,PASS,PENDING,85,PARTIAL,Lazy activity bundles
+IOS-SURF-002,Diving Planner,100 depth edits,Debounce 200ms,Yes generation token,Background Task.detached,N/A,testPlannerDebouncedStress,PASS,PENDING,95,PASS,
+IOS-SURF-003,Diving Planner Calculate,1 immediate solve,N/A,Yes,Background, N/A,testPlannerBackgroundFlushWithinBudget,PASS,PENDING,95,PASS,
+IOS-SURF-004,OC Chart,2048 points,PresentationSeriesDownsampler,N/A,Snapshot prep only,N/A,PlannerChartSnapshots tests,PASS,PENDING,90,PASS,
+IOS-SURF-005,Tissue Analytics,Minute resolution → 2048,Yes LRU cache,N/A,Background precompute,N/A,PerformanceConcurrencyBatteryRemediationTests,PASS,PENDING,92,PASS,
+IOS-SURF-006,CCR Chart,Large deco arrays,Downsampled in make(fromCCR:),N/A,Background CCR path,N/A,PlannerStore CCR tests,PASS,PENDING,88,PASS,
+IOS-SURF-007,Diving Logbook,40 sessions cap,LazyVStack,N/A,Row mappers only,40 sessions,LogbookView tests,PASS,PENDING,88,PASS,
+IOS-SURF-008,Apnea Logbook,80 sessions cap,LazyVStack,N/A,Persisted statistics,80 sessions,IOSApneaLogbookPresentation,PASS,PENDING,85,PASS,
+IOS-SURF-009,Snorkeling Logbook,80 sessions cap,LazyVStack,N/A,Persisted statistics,80 sessions,IOSSnorkelingLogbookPresentation,PASS,PENDING,85,PASS,
+IOS-SURF-010,Snorkeling Map dashboard,10k track points,4096 presentation,N/A,MapPolyline downsampled,50000 persist cap,SnorkelingRoutePresentationSampling,PASS,PENDING,85,PARTIAL,Field map QA pending
+IOS-SURF-011,Snorkeling Map detail,50k track points,4096 presentation,N/A,downsampledMeasuredPoints,50000 persist cap,Same,PASS,PENDING,85,PARTIAL,
+IOS-SURF-012,CSV Import,10 MB / 200k rows,Chunked read,No,Parse on caller thread,Bounds enforced,DiveCSVImportBounds tests,PASS,N/A,90,PASS,
+IOS-SURF-013,Subsurface Export,Full logbook,Single pass,Yes IOSExportCancellation,Background optional,Session cap,Export tests,PASS,PENDING,85,PASS,
+IOS-SURF-014,PDF Export,Single session,In-memory,Yes,MainActor render,Per session,Export tests,PASS,PENDING,80,PARTIAL,
+IOS-SURF-015,Watch Sync flush,40 outbound sessions,Backpressure batch,Yes inFlight cap,MainActor WC,512KB-5MB,ActivitySyncLargePayloadTransferTests,PASS,PENDING,88,PARTIAL,Field paired QA
+IOS-SURF-016,Cloud KVS merge,50 keys,Linear budget test,N/A,MainActor,1MB per key,MainDeepCodeReadinessCurrentTests,PASS,PENDING,90,PASS,
+IOS-SURF-017,Settings mode switch,50 switches,Mode-scoped env only,N/A,Minimal,N/A,IOSCompanionSettingsEnvironmentHost,PASS,PENDING,90,PASS,
+IOS-SURF-018,GF sweep planner,Multi GF comparisons,Skip in base mode,N/A,Background,N/A,PlannerService tests,PASS,PENDING,92,PASS,
+IOS-SURF-019,10 gas planner,Multi gas MOD,Contingency dedup,N/A,Background,N/A,GasPlanningService tests,PASS,PENDING,90,PASS,
+IOS-SURF-020,Long deco plan,Deep multilevel,Chart downsample,N/A,Background,N/A,Buhlmann planner tests,PASS,PENDING,88,PASS,
+IOS-SURF-021,Background/foreground,App lifecycle,Resume async load,N/A,Coordinator,N/A,Lifecycle tests,PARTIAL,PENDING,85,PARTIAL,
+IOS-SURF-022,Briefing card burst,Multiple transfers,File transfer,N/A,Watch receiver,N/A,PlannerBriefingCardStoreTests,PASS,PENDING,90,PASS,
+IOS-SURF-023,Watch image inventory,Large inventory,Bounded decode,N/A,N/A,Photo validator,CompanionPhotoTransferPipelineTests,PASS,PENDING,88,PARTIAL,Paired QA
+IOS-SURF-024,Apnea dashboard,80 sessions stats,Full array scan,N/A,MainActor,80 cap,Apnea dashboard tests,PASS,PENDING,85,PASS,
+IOS-SURF-025,Snorkeling route planner,iOS planning,Background N/A,N/A,MainActor,N/A,Route planner tests,PASS,PENDING,85,PASS,
+IOS-SURF-026,Tissue loading charts,N/A,2048 cap,N/A,Precomputed,N/A,TissueAnalyticsService,PASS,PENDING,90,PASS,
+IOS-SURF-027,Localization access,2000+ keys,Cached,N/A,N/A,N/A,audit_localization.sh,PASS,N/A,95,PASS,
+IOS-SURF-028,Memory retain cycles,Store graph,weak self common,N/A,N/A,N/A,Code review + deinit cancel,PASS,PENDING,88,PASS,
+IOS-SURF-029,1k sync messages,Stress codec,Bounded replay cache,N/A,N/A,Cache persist,PerformanceConcurrencyBatteryRemediationTests,PARTIAL,PENDING,85,PARTIAL,
+IOS-SURF-030,5k logbook synthetic,Decode only,Full envelope,Async load,N/A,Cap in prod UI,testLogbookLoadBudgetSynthetic5000,PASS,N/A,90,PASS,Not production UI at 5k

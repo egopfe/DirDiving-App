@@ -5,6 +5,28 @@
 
 ---
 
+## Aggiornamento indice 2026-06-22 — Master Super Orchestrator Audit V1.1 (Commands 00–06)
+
+Orchestrazione audit read-only su `main` @ `1f62235`: sei audit upstream (Watch, iOS, UI/UX, Main code/sync/security/performance, Release QA, Documentation) + piano consolidato non-regressivo.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `commands_for_cursor/00-MASTER_SUPER_ORCHESTRATOR...V1.1.md` |
+| **Consolidated plan** | [`MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md`](MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md) |
+| **Findings register** | [`MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv`](MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv) — **P0=0, P1=6, P2=6** |
+| **01 Watch FC** | [`MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_CURRENT.md`](MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_CURRENT.md) |
+| **02 iOS** | [`MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_CURRENT.md`](MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_CURRENT.md) |
+| **03 UI/UX** | [`MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_CURRENT.md`](MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_CURRENT.md) |
+| **04 Main/sync/security/perf** | [`MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_CURRENT.md`](MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_CURRENT.md) |
+| **05 Release/QA/legal** | [`MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_CURRENT.md`](MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_CURRENT.md) |
+| **06 Documentation** | [`MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_CURRENT.md`](MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_CURRENT.md) |
+| **Validate (04)** | `./Scripts/validate_master_main_code_sync_security_performance_audit.sh` |
+| **XCTest (05 re-run)** | iOS **1519/1519** · Watch **990/990** · 0 failures (7 IntegratedModes tests excluded — simulator stall) |
+| **Verdict** | **PARTIAL** — consolidated **72%** · internal TestFlight **READY** (software) · external/App Store **NOT READY** |
+| **Baseline** | `main` @ `6511de9` |
+
+---
+
 ## Aggiornamento indice 2026-06-22 — iOS Performance Remediation V1.0
 
 Remediation software-verificabile di tutti i finding audit performance iOS (P0–P3). Readiness software 100%; physical QA pending.

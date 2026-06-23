@@ -1,0 +1,50 @@
+Feature,Readiness_Percent,Blockers,Priority,Evidence,Physical_QA,External_Validation,Notes
+Bühlmann,94,EXT-IOS-BUHL-01,P2,BuhlmannEngine.swift;1326 algorithm tests;BUILD SUCCEEDED,PENDING,PENDING,Shared BuhlmannCore ZH-L16C; no P0 math defect
+Planner Base/Deco/Technical,92,External validation,P2,PlannerModePolicyTests;PlannerModeLimitsTests,PENDING,PENDING,Mode isolation enforced in tests
+Full Computer Watch parity,85,Gauge/FC Watch-only; iOS planner reference,P2,BuhlmannCoreCrossTargetEquivalenceTests (Watch),PENDING,PENDING,iOS does not run live deco SM
+CCR / Rebreather,90,EXT-IOS-CCR-01; heuristic bailout,P2,CCRPlannerTests;referenceOnly disclaimers,PENDING,PENDING,Reference-only by design
+CCR Setpoint,91,External validation,P2,CCRMathRemediationTests,PENDING,PENDING,Setpoint not treated as FO2
+CCR Diluent,90,Hypoxic edge external review,P3,CCRPlanValidator,PENDING,PENDING,Validator blocks invalid diluent
+CCR Bailout,88,Heuristic scenario calculator,INFO,CCRBailoutScenarioCalculator,PENDING,PENDING,Explicit OC transition
+Ratio Deco,86,Heuristic comparative,INFO,RatioDecoPlannerTests;blocked in CCR,PENDING,PENDING,Bühlmann remains primary
+Gas Planning,91,None,P4,GasPlanningServiceTests;ScheduleGasConsumptionServiceTests,PENDING,N/A,Schedule-aware consumption tested
+Gas Roles,90,Checklist inference edges,P4,EquipmentPlannerMapperTests;GasLedgerDisplayFormatterTests,PENDING,N/A,Stable IDs and roles
+MOD/PPO2/Dalton,93,PDF display asymmetry F008,P4,PlannerSwitchDepthMODClampTests;MODPresentationPolicyTests,PENDING,N/A,O2 100% PPO2 1.6 → ~6m tested
+Switch Depth Clamp,93,None,P4,PlannerSwitchDepthMODClampTests,PENDING,N/A,Switch depth <= MOD enforced
+Emergency / Rock Bottom,90,External review pending,P2,PlannerAscentSpeedSettingsTests rock bottom cases,PENDING,PENDING,Conservative SAC model
+Ascent / Descent Timing,92,None,P4,PlannerAscentSpeedSettingsTests;PlannerAscentTableTests,PENDING,N/A,Transit formula tested
+Dive Runtime / Deco Stops,91,Presentation ordering note resolved,P4,PlannerAscentTableTests;DecoStopsPresentationBuilder,PENDING,N/A,Canonical schedule match tested
+Schedule-Aware Gas Consumption,91,None,P4,ScheduleGasConsumptionServiceTests,PENDING,N/A,Segment allocation tested
+Gas Ledger / Reserve,91,None,P4,GasLedgerDisplayFormatterTests,PENDING,N/A,Liters canonical
+Technical Average-Depth Gas Toggle,93,None,P4,PlannerTechnicalAverageDepthGasConsumptionTests,PENDING,N/A,Bühlmann unchanged when toggled
+Repetitive Dive / Residual Tissues,90,OC only; CCR excluded,P3,RepetitiveDiveMathematicalTests,PENDING,N/A,No silent fresh-tissue fallback
+Tissue Loading,90,Multigas logbook replay partial F005,P3,TissueAnalyticsServiceTests,PENDING,PENDING,Planner tissue history strong
+Narcosis / END / PPN2,89,CCR density model limits,P3,TissueAnalyticsServiceTests,PENDING,N/A,Finite guards present
+CNS / OTU,91,None,P4,CNSDescentBottomTests;OTUCanonicalFixtureTests,PENDING,N/A,Lambertsen OTU monotonic
+Structured Equipment,90,Title inference F010,P4,EquipmentProfileStructuredModelTests,PENDING,N/A,REC/TEC/CCR templates
+Operational Checklist,90,UI E2E partial,P3,ChecklistPlannerSyncMapperTests,PENDING,N/A,DIR/READY badge semantics tested
+CCR Checklist Import / Export,91,None,P4,CCRChecklistImportCoordinator;CCRChecklistExportCoordinator,PENDING,N/A,Role round trip tested
+CCR Bailout Scenario,88,Heuristic,INFO,CCRBailoutScenarioCalculator,PENDING,PENDING,Reference-only
+CCR Gas Density,90,None,P4,CCRGasDensityEstimator,PENDING,N/A,Metadata traceable
+Manual Dive,88,Profile editor not implemented F006,P3,ManualDiveEditorLogicTests,PENDING,N/A,Synthetic profile reliable
+Diving Logbook,93,None,P4,DiveLogStore;IOSActivityLogbookRoutingTests,PENDING,N/A,Strict diving ownership
+Apnea Logbook,91,Cloud stub F003,P3,IOSApneaLogbookStore;IOSApneaLogbookAnalyticsTests,PENDING,N/A,No DiveLogStore injection
+Snorkeling Logbook,89,Field GPS F015,P2,IOSSnorkelingLogbookStore;IOSSnorkelingLogbookAnalyticsTests,PENDING,N/A,Strict snorkeling ownership
+Diving Settings,92,Dual-binding F004,P3,IOSDivingSettingsEmbeddedContent;IOSDivingSettingsStore,PENDING,N/A,Mode switcher PASS
+Apnea Settings,93,None,P4,IOSApneaSettingsContent;IOSApneaSettingsStore,PENDING,N/A,Editable below switcher
+Snorkeling Settings,93,None,P4,IOSSnorkelingSettingsContent;IOSSnorkelingSettingsStore,PENDING,N/A,Editable below switcher
+Shared Settings,92,None,P4,SharedIOSSettingsStore;MoreView,PENDING,N/A,Language/units/backup scoped
+PDF / Share,90,Physical render F008,P3,PDFExportServiceTests;BriefingPDFBuilderTests,PENDING,PENDING,Disclaimers present
+Planner Briefing Card / Watch Transfer,91,EXT-IOS-PAIR-06,P2,PlannerBriefingImageExportServiceTests;referenceOnly,PENDING,N/A,Software codec PASS
+CSV / Subsurface,86,EXT-IOS-SS-01,P2,CSVMetadataRoundTripTests,PENDING,PENDING,Malformed fail-closed
+Cloud / Sync / Persistence,87,EXT-IOS-PAIR-03; Apnea cloud,P2,CloudSessionMergeTests;ActivitySyncEnvelopeTests,PENDING,N/A,Crypto tests PASS
+Security / Privacy,88,Keychain CI skips F007,P4,SecurityPrivacyTrustRemediationTests,PENDING,N/A,HMAC/signature validated in software
+Unit Conversion,93,None,P4,IOSUnitConversions;PressureModelUnificationTests,PENDING,N/A,m/ft bar/psi tested
+Localization,91,Manual VoiceOver pending,P3,DIRDivingCompleteLocalizationAuditTests,PENDING,N/A,EN/IT keys for math labels
+Accessibility,85,EXT-IOS-A11Y-01,P3,UIUXRemediationV3AccessibilityTests,PENDING,N/A,Software contracts PASS
+Performance / Numerical Robustness,82,F001 test timeout,P3,PerformanceConcurrencyBatteryRemediationTests,PENDING,N/A,1 perf test flaky on audit run
+Test Coverage,93,F001; env skips,P3,1281 test funcs;595+ executed 0 fail except timeout,PENDING,N/A,1 crash/timeout on audit run
+Internal TestFlight,88,Disclaimers + F001 flake,P2,Build PASS; algorithm tests mostly green,PENDING,PENDING,Conditional yes with non-certified posture
+External TestFlight,52,F011-F015 external QA,P1,Software ready; evidence packs empty,PENDING,PENDING,Not yet
+App Store,48,Legal + all external gates,P1,ReleaseLegalClaimsRemediationTests,PENDING,PENDING,Not yet
+Overall,91,External/physical evidence; F001,P2,This master audit @1f62235,PENDING,PENDING,No P0/P1 software safety defects
