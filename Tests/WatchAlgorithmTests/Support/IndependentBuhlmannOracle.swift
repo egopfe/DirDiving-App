@@ -456,24 +456,401 @@ enum IndependentBuhlmannOracle {
         IndependentOracleGas(oxygenFraction: gas.oxygenFraction, heliumFraction: gas.heliumFraction)
     }
 
-    /// Schedule/TTS reference on independently loaded oracle tissues (shared schedule engine, independent tissues).
+    /// TTS minutes only — independent schedule without production `BuhlmannEngine.runtimeProjection`.
+    static func independentTTSMinutesOnOracleTissues(
+        state: IndependentOracleTissueState,
+        depthMeters: Double,
+        plan: FullComputerRuntimePlan,
+        environment: PlannerEnvironment = defaultEnvironment
+    ) -> Int {
+        let schedule = independentDecompressionSchedule(
+            stateAtBottom: state,
+            currentDepthMeters: max(0, depthMeters.isFinite ? depthMeters : 0),
+            startingGas: plan.activeGas,
+            gfLow: plan.gfLow,
+            gfHigh: plan.gfHigh,
+            environment: environment,
+            travelGases: plan.travelGases,
+            decoGases: plan.decoGases,
+            ascentRateMetersPerMinute: plan.ascentRateMetersPerMinute,
+            stopIntervalMeters: plan.stopIntervalMeters
+        )
+        return Int(ceil(schedule.elapsedMinutes))
+    }
+
+    /// Independent schedule/TTS reference on oracle-loaded tissues — does not call production `BuhlmannEngine`.
+    static func independentRuntimeProjectionOnOracleTissues(
+        state: IndependentOracleTissueState,
+        depthMeters: Double,
+        plan: FullComputerRuntimePlan,
+        environment: PlannerEnvironment = defaultEnvironment
+    ) -> BuhlmannRuntimeProjection {
+        let safeDepth = max(0, depthMeters.isFinite ? depthMeters : 0)
+        let oracleGas = oracleGas(from: plan.activeGas)
+        let projection = project(
+            state: state,
+            depthMeters: safeDepth,
+            gas: oracleGas,
+            gfLow: plan.gfLow,
+            gfHigh: plan.gfHigh,
+            stopIntervalMeters: plan.stopIntervalMeters,
+            environment: environment,
+            ascentRateMetersPerMinute: plan.ascentRateMetersPerMinute
+        )
+        let rawCeiling = BuhlmannCeiling(
+            depthMeters: projection.rawCeiling.depthMeters,
+            controllingCompartment: projection.rawCeiling.controllingCompartment
+        )
+        let operationalCeiling = BuhlmannCeiling(
+            depthMeters: projection.operationalCeiling.depthMeters,
+            controllingCompartment: projection.operationalCeiling.controllingCompartment
+        )
+        let schedule = independentDecompressionSchedule(
+            stateAtBottom: state,
+            currentDepthMeters: safeDepth,
+            startingGas: plan.activeGas,
+            gfLow: plan.gfLow,
+            gfHigh: plan.gfHigh,
+            environment: environment,
+            travelGases: plan.travelGases,
+            decoGases: plan.decoGases,
+            ascentRateMetersPerMinute: plan.ascentRateMetersPerMinute,
+            stopIntervalMeters: plan.stopIntervalMeters
+        )
+        let modelState: BuhlmannModelState = schedule.issues.isEmpty ? .validReference : .modelIncomplete
+        return BuhlmannRuntimeProjection(
+            ndlMinutes: projection.ndlMinutes,
+            rawCeiling: rawCeiling,
+            operationalCeiling: operationalCeiling,
+            ttsMinutes: Int(ceil(schedule.elapsedMinutes)),
+            stops: schedule.stops,
+            issues: schedule.issues,
+            modelState: modelState
+        )
+    }
+
+    private struct IndependentOracleScheduleResult {
+        let stops: [BuhlmannDecompressionStop]
+        let elapsedMinutes: Double
+        let issues: [BuhlmannPlanIssue]
+    }
+
+    private static func independentDecompressionSchedule(
+        stateAtBottom: IndependentOracleTissueState,
+        currentDepthMeters: Double,
+        startingGas: BuhlmannGas,
+        gfLow: Double,
+        gfHigh: Double,
+        environment: PlannerEnvironment,
+        travelGases: [BuhlmannGas],
+        decoGases: [BuhlmannGas],
+        ascentRateMetersPerMinute: Double,
+        stopIntervalMeters: Double
+    ) -> IndependentOracleScheduleResult {
+        let gfLowFraction = max(0, min(1, gfLow / 100))
+        let firstCeiling = ceiling(state: stateAtBottom, gfFraction: gfLowFraction, environment: environment).depthMeters
+        guard firstCeiling > 0.01 else {
+            let ascent = independentLoadAscentToSurface(
+                startingState: stateAtBottom,
+                startingDepth: currentDepthMeters,
+                startingGas: startingGas,
+                environment: environment,
+                travelGases: travelGases,
+                decoGases: decoGases,
+                ascentRateMetersPerMinute: ascentRateMetersPerMinute
+            )
+            return IndependentOracleScheduleResult(stops: [], elapsedMinutes: ascent.elapsedMinutes, issues: ascent.issues)
+        }
+
+        let firstStopDepth = min(currentDepthMeters, ceilToStop(firstCeiling, interval: stopIntervalMeters))
+        var currentDepth = currentDepthMeters
+        var currentGas = startingGas
+        var state = stateAtBottom
+        var stopDepth = firstStopDepth
+        var stops: [BuhlmannDecompressionStop] = []
+        var elapsed = 0.0
+        var issues: [BuhlmannPlanIssue] = []
+        var limitReached = false
+
+        while stopDepth > 0.01 {
+            if elapsed >= Double(BuhlmannConstants.maxScheduleMinutes) {
+                issues.append(.calculationLimitReached)
+                limitReached = true
+                break
+            }
+            if currentDepth > stopDepth {
+                guard independentAscendSegment(
+                    currentDepth: &currentDepth,
+                    to: stopDepth,
+                    state: &state,
+                    currentGas: &currentGas,
+                    elapsed: &elapsed,
+                    environment: environment,
+                    travelGases: travelGases,
+                    decoGases: decoGases,
+                    ascentRateMetersPerMinute: ascentRateMetersPerMinute,
+                    issues: &issues
+                ) else {
+                    limitReached = true
+                    break
+                }
+            }
+
+            let nextDepth = max(0, stopDepth - stopIntervalMeters)
+            var stopMinutes = 0
+            while true {
+                let gf = gfAtDepth(depthMeters: nextDepth, firstStopDepthMeters: firstStopDepth, gfLow: gfLow, gfHigh: gfHigh)
+                let stopCeiling = ceiling(state: state, gfFraction: gf, environment: environment).depthMeters
+                if stopCeiling <= nextDepth + 0.05 { break }
+                if stopMinutes >= BuhlmannConstants.maxStopMinutesPerDepth || elapsed >= Double(BuhlmannConstants.maxScheduleMinutes) {
+                    issues.append(.calculationLimitReached)
+                    limitReached = true
+                    break
+                }
+                state = loadOracleConstantDepth(
+                    state: state,
+                    depthMeters: stopDepth,
+                    minutes: 1,
+                    gas: oracleGas(from: currentGas),
+                    environment: environment
+                )
+                stopMinutes += 1
+                elapsed += 1
+            }
+
+            if stopMinutes > 0 {
+                let gf = gfAtDepth(depthMeters: stopDepth, firstStopDepthMeters: firstStopDepth, gfLow: gfLow, gfHigh: gfHigh)
+                stops.append(
+                    BuhlmannDecompressionStop(
+                        depthMeters: stopDepth,
+                        minutes: stopMinutes,
+                        gas: currentGas,
+                        ppO2: currentGas.ppO2(depthMeters: stopDepth, environment: environment),
+                        maxPPO2: currentGas.maxPPO2Bar,
+                        gradientFactor: gf
+                    )
+                )
+            }
+
+            if limitReached { break }
+            currentDepth = stopDepth
+            stopDepth = nextDepth
+        }
+
+        if !limitReached, currentDepth > 0 {
+            let ascent = independentLoadAscentToSurface(
+                startingState: state,
+                startingDepth: currentDepth,
+                startingGas: currentGas,
+                environment: environment,
+                travelGases: travelGases,
+                decoGases: decoGases,
+                ascentRateMetersPerMinute: ascentRateMetersPerMinute
+            )
+            elapsed += ascent.elapsedMinutes
+            issues.append(contentsOf: ascent.issues)
+        }
+
+        return IndependentOracleScheduleResult(
+            stops: stops,
+            elapsedMinutes: elapsed,
+            issues: uniquePlanIssues(issues)
+        )
+    }
+
+    private struct IndependentOracleAscentResult {
+        let elapsedMinutes: Double
+        let issues: [BuhlmannPlanIssue]
+    }
+
+    private static func independentLoadAscentToSurface(
+        startingState: IndependentOracleTissueState,
+        startingDepth: Double,
+        startingGas: BuhlmannGas,
+        environment: PlannerEnvironment,
+        travelGases: [BuhlmannGas],
+        decoGases: [BuhlmannGas],
+        ascentRateMetersPerMinute: Double
+    ) -> IndependentOracleAscentResult {
+        var state = startingState
+        var currentDepth = max(0, startingDepth)
+        var currentGas = startingGas
+        var elapsed = 0.0
+        var issues: [BuhlmannPlanIssue] = []
+        _ = independentAscendSegment(
+            currentDepth: &currentDepth,
+            to: 0,
+            state: &state,
+            currentGas: &currentGas,
+            elapsed: &elapsed,
+            environment: environment,
+            travelGases: travelGases,
+            decoGases: decoGases,
+            ascentRateMetersPerMinute: ascentRateMetersPerMinute,
+            issues: &issues
+        )
+        return IndependentOracleAscentResult(elapsedMinutes: elapsed, issues: uniquePlanIssues(issues))
+    }
+
+    private static func independentAscendSegment(
+        currentDepth: inout Double,
+        to endDepth: Double,
+        state: inout IndependentOracleTissueState,
+        currentGas: inout BuhlmannGas,
+        elapsed: inout Double,
+        environment: PlannerEnvironment,
+        travelGases: [BuhlmannGas],
+        decoGases: [BuhlmannGas],
+        ascentRateMetersPerMinute: Double,
+        issues: inout [BuhlmannPlanIssue]
+    ) -> Bool {
+        independentSwitchGasIfNeeded(
+            at: currentDepth,
+            state: &state,
+            currentGas: &currentGas,
+            elapsed: &elapsed,
+            environment: environment,
+            travelGases: travelGases,
+            decoGases: decoGases
+        )
+        for targetDepth in independentAscentWaypoints(from: currentDepth, to: endDepth, travelGases: travelGases, decoGases: decoGases) {
+            guard currentDepth > targetDepth + 0.01 else {
+                independentSwitchGasIfNeeded(
+                    at: currentDepth,
+                    state: &state,
+                    currentGas: &currentGas,
+                    elapsed: &elapsed,
+                    environment: environment,
+                    travelGases: travelGases,
+                    decoGases: decoGases
+                )
+                continue
+            }
+            guard currentGas.isOperational(fromDepthMeters: currentDepth, toDepthMeters: targetDepth, environment: environment) else {
+                issues.append(.gasNotOperationalInSegment(currentGas.name))
+                return false
+            }
+            let ascentMinutes = max(0.1, (currentDepth - targetDepth) / ascentRateMetersPerMinute)
+            state = advanceLinearSingleStep(
+                state: state,
+                fromDepthMeters: currentDepth,
+                toDepthMeters: targetDepth,
+                durationSeconds: ascentMinutes * 60,
+                gas: oracleGas(from: currentGas),
+                environment: environment
+            )
+            elapsed += ascentMinutes
+            currentDepth = targetDepth
+            independentSwitchGasIfNeeded(
+                at: currentDepth,
+                state: &state,
+                currentGas: &currentGas,
+                elapsed: &elapsed,
+                environment: environment,
+                travelGases: travelGases,
+                decoGases: decoGases
+            )
+        }
+        return true
+    }
+
+    private static func independentSwitchGasIfNeeded(
+        at depth: Double,
+        state: inout IndependentOracleTissueState,
+        currentGas: inout BuhlmannGas,
+        elapsed: inout Double,
+        environment: PlannerEnvironment,
+        travelGases: [BuhlmannGas],
+        decoGases: [BuhlmannGas]
+    ) {
+        let nextGas = independentBestAscentGas(
+            atDepth: depth,
+            currentGas: currentGas,
+            environment: environment,
+            travelGases: travelGases,
+            decoGases: decoGases
+        )
+        guard nextGas != currentGas else { return }
+        currentGas = nextGas
+        state = simulateGasSwitchLoad(
+            state: state,
+            depthMeters: depth,
+            gas: oracleGas(from: currentGas),
+            environment: environment
+        )
+        elapsed += BuhlmannConstants.gasSwitchMinutes
+    }
+
+    private static func independentBestAscentGas(
+        atDepth depth: Double,
+        currentGas: BuhlmannGas,
+        environment: PlannerEnvironment,
+        travelGases: [BuhlmannGas],
+        decoGases: [BuhlmannGas]
+    ) -> BuhlmannGas {
+        let candidates = (decoGases + travelGases)
+            .filter { $0.switchDepthMeters + 0.05 >= depth }
+            .filter { gas in
+                let ppo2 = gas.ppO2(depthMeters: depth, environment: environment)
+                return ppo2 >= BuhlmannConstants.minBreathablePPO2Bar
+                    && ppo2 <= gas.maxPPO2Bar + 0.000_1
+            }
+            .sorted { $0.oxygenFraction > $1.oxygenFraction }
+        return candidates.first ?? currentGas
+    }
+
+    private static func independentAscentWaypoints(
+        from startDepth: Double,
+        to endDepth: Double,
+        travelGases: [BuhlmannGas],
+        decoGases: [BuhlmannGas]
+    ) -> [Double] {
+        guard startDepth > endDepth + 0.01 else { return [] }
+        let switches = (travelGases + decoGases)
+            .map(\.switchDepthMeters)
+            .filter { $0.isFinite && $0 > 0.05 && $0 < startDepth - 0.05 }
+        let unique = Array(Set(switches)).sorted(by: >).filter { $0 > endDepth + 0.01 }
+        return unique + [max(0, endDepth)]
+    }
+
+    private static func loadOracleConstantDepth(
+        state: IndependentOracleTissueState,
+        depthMeters: Double,
+        minutes: Double,
+        gas: IndependentOracleGas,
+        environment: PlannerEnvironment
+    ) -> IndependentOracleTissueState {
+        advanceLinearSingleStep(
+            state: state,
+            fromDepthMeters: depthMeters,
+            toDepthMeters: depthMeters,
+            durationSeconds: minutes * 60,
+            gas: gas,
+            environment: environment
+        )
+    }
+
+    private static func uniquePlanIssues(_ issues: [BuhlmannPlanIssue]) -> [BuhlmannPlanIssue] {
+        var seen = Set<BuhlmannPlanIssue>()
+        var result: [BuhlmannPlanIssue] = []
+        for issue in issues where seen.insert(issue).inserted {
+            result.append(issue)
+        }
+        return result
+    }
+
+    /// Deprecated alias — use `independentRuntimeProjectionOnOracleTissues`.
     static func productionProjectionOnOracleTissues(
         state: IndependentOracleTissueState,
         depthMeters: Double,
         plan: FullComputerRuntimePlan,
         environment: PlannerEnvironment = defaultEnvironment
     ) -> BuhlmannRuntimeProjection {
-        BuhlmannEngine.runtimeProjection(
-            tissueState: state.buhlmannTissueState(),
+        independentRuntimeProjectionOnOracleTissues(
+            state: state,
             depthMeters: depthMeters,
-            gas: plan.activeGas,
-            gfLow: plan.gfLow,
-            gfHigh: plan.gfHigh,
-            plannerEnvironment: environment,
-            travelGases: plan.travelGases,
-            decoGases: plan.decoGases,
-            ascentRateMetersPerMinute: plan.ascentRateMetersPerMinute,
-            stopIntervalMeters: plan.stopIntervalMeters
+            plan: plan,
+            environment: environment
         )
     }
 

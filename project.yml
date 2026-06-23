@@ -461,6 +461,7 @@ targets:
       - iOSApp/Utils/IOSActivityLogbookRoutingPolicy.swift
       - iOSApp/Models/CompanionActivityPreference.swift
       - iOSApp/Services/CompanionActivityPreferenceStore.swift
+      - iOSApp/Services/IOSCompanionNavigationPersistence.swift
       - iOSApp/Services/IOSCompanionSettingsScopeStore.swift
       - iOSApp/Utils/CompanionActivityCopy.swift
       - iOSApp/Services/IOSApneaProfileStore.swift
@@ -575,6 +576,7 @@ targets:
       - Tests/iOSAlgorithmTests/IOSCompanionActivitySelectionTests.swift
       - Tests/iOSAlgorithmTests/IOSActivitySettingsCoherenceTests.swift
       - Tests/iOSAlgorithmTests/IOSActivitySettingsModeSwitchTests.swift
+      - Tests/iOSAlgorithmTests/IOSCompanionNavigationRestorationTests.swift
       - Tests/iOSAlgorithmTests/IOSActivitySettingsRoutingTests.swift
       - Tests/iOSAlgorithmTests/IOSActivitySettingsContentVisibilityTests.swift
       - Tests/iOSAlgorithmTests/BuhlmannComprehensiveReadinessV3RemediationTests.swift
