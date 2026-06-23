@@ -48,24 +48,19 @@ Vedi [`SAFETY_DISCLAIMER.md`](SAFETY_DISCLAIMER.md), [`TESTFLIGHT_REVIEW_NOTES.m
 - App Intents / Action Button: cronometro, bearing, allarmi (quando watchOS espone gli intent).
 - **Algorithm hardening MAIN (`92e639a`):** pipeline depth validata, lifecycle automatico >1 m con debounce, TTV/time-weighted average depth, haptic coordinator fuori da SwiftUI view; resta **non certificato** — vedi [`DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md`](DIR_DIVING_WATCH_ALGORITHM_RELEASE_HARDENING.md).
 
-### Snorkeling (sperimentale — `codex/experimental-features`)
+### Snorkeling (MAIN — Watch + iOS companion)
 
-- **Snorkeling Live:** runtime, distanza, velocità, profondità, GPS, waypoint, ritorno.
-- **Mappa Waypoint** e **Mappa Ritorno** (SwiftUI leggera, senza tile online su Watch).
-- **Direzione Waypoint:** bearing verso waypoint (non bussola generica).
-- **Return-to-entry:** ritorno al punto di partenza (logica snorkeling, non Diving).
-- Marcatori POI, log/dettaglio, allarmi snorkeling locali.
-- Non incluso nel target MAIN (`project.yml` excludes).
+- **Snorkeling Live (Watch):** runtime, distanza, velocità, profondità, GPS, waypoint, ritorno.
+- **iOS companion:** dashboard, sessioni, statistiche, route planner, profili, logbook isolato.
+- Architettura: [`SNORKELING_ARCHITECTURE.md`](SNORKELING_ARCHITECTURE.md). QA fisica paired-device: **PENDING**.
 
-Spec: [`SNORKELING_EXPERIMENTAL_SPEC.md`](SNORKELING_EXPERIMENTAL_SPEC.md).
-
-### Apnea (sperimentale — `codex/experimental-features`)
+### Apnea (MAIN — Watch + iOS companion)
 
 - Menu Sessione / Tabelle / Statistiche / Logbook; acque libere con countdown e recovery.
-- Stati discesa/fondo/risalita/superficie; logbook parziale dove dati mancanti.
-- Non certificato; non nel target MAIN.
+- **iOS companion:** planner, logbook, statistiche, export isolato da Diving/Snorkeling.
+- Architettura: [`APNEA_ARCHITECTURE.md`](APNEA_ARCHITECTURE.md). Non certificato; QA fisica: **PENDING**.
 
-Spec: [`APNEA_EXPERIMENTAL_SPEC.md`](APNEA_EXPERIMENTAL_SPEC.md).
+Spec legacy branch (solo esplorazione): [`APNEA_EXPERIMENTAL_SPEC.md`](APNEA_EXPERIMENTAL_SPEC.md), [`SNORKELING_EXPERIMENTAL_SPEC.md`](SNORKELING_EXPERIMENTAL_SPEC.md).
 
 ---
 
@@ -109,10 +104,10 @@ Implementazione v8/v9: [`DIR_DIVING_v8_IMPLEMENTATION_REPORT.md`](DIR_DIVING_v8_
 
 | Branch | Ruolo |
 |--------|--------|
-| `main` | Produzione Diving + companion iOS nello stesso workspace; esclude sorgenti experimental da `project.yml` |
+| `main` | Produzione Diving + Apnea + Snorkeling (Watch + iOS companion) nello stesso workspace |
 | `main-iOS` | Worktree storico divergente; usare solo per review manuali o port selettivi verso `main` |
-| `codex/experimental-features` | Watch Snorkeling/Apnea/Buddy |
-| `codex/ios-experimental-features` | iOS experimental companion: snorkeling/apnea/buddy/exploration concepts |
+| `codex/experimental-features` | Esplorazione legacy Watch (Buddy Assist, mockups) — non baseline MAIN |
+| `codex/ios-experimental-features` | Esplorazione legacy iOS — non baseline MAIN |
 
 Regole merge: preservare Diving stabile, GPS surface-only, BUSSOLA, export Subsurface, security F1–F12. PR #8/#9: non auto-merge (vedi [`PR_STATUS_20260526.md`](PR_STATUS_20260526.md)).
 

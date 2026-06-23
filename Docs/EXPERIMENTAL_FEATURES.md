@@ -1,31 +1,17 @@
 # DIR DIVING Experimental Features
 
-This document describes exploratory features. Production MAIN excludes these sources via `project.yml`.
+This document describes **exploratory / legacy-branch** features only. Production **MAIN** ships Diving, Apnea, and Snorkeling; see [`APNEA_ARCHITECTURE.md`](APNEA_ARCHITECTURE.md) and [`SNORKELING_ARCHITECTURE.md`](SNORKELING_ARCHITECTURE.md).
+
+**Buddy Assist**, exploration mockups, and pre-promotion prototypes remain experimental-only on `codex/*` branches and are **not** implied to ship on App Store without separate review.
 
 ## Current Branch Sync Status
 
-Latest verification before this documentation update:
+- `origin/main` @ `beced25` (Apnea/Snorkeling on MAIN)
+- This branch: `codex/ios-experimental-features`
 
-- `origin/main` @ `9ff45ac`
-- `origin/codex/ios-experimental-features` (this branch)
-
-`codex/ios-experimental-features` is aligned for app/project code paths and keeps branch-specific iOS documentation. Apnea and Snorkeling remain experimental-only on this branch. Buddy Assist, BLE relay, peer pairing, and messaging remain lab-only.
+This branch retains legacy iOS exploration surfaces. Production Apnea/Snorkeling ship on `main`; do not treat this branch as the production baseline.
 
 Detailed sync report: [`Docs/EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md`](EXPERIMENTAL_BRANCH_SYNC_REPORT_20260605.md).
-
-## Branch Scope
-
-## Apnea integration (`main`)
-
-As of Command 12 (2026-06-17), Apnea has a dedicated integration branch with:
-
-- Shared domain models and `ApneaSessionEngine` lifecycle on Watch.
-- iOS companion (`iOSApp/Views/Apnea/`) for planner, logbook, statistics, export.
-- Isolated WatchConnectivity namespaces (`apneaSyncPlanPackage`, `dirdiving_apnea_session`).
-- Release-hard validation: `./Scripts/validate_apnea_release_readiness.sh`.
-- Feature flag: `ExperimentalFeatures.apneaIntegrationEnabled`.
-
-`Views/ApneaView.swift` remains excluded from the MAIN Watch app target until promotion review. See [`APNEA_ARCHITECTURE.md`](APNEA_ARCHITECTURE.md).
 
 ## Legacy branch `codex/experimental-features`
 

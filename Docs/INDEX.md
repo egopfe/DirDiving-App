@@ -1,7 +1,23 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-22  
+**Aggiornato:** 2026-06-23  
 **Branch consigliato:** `main` = `origin/main`
+
+---
+
+## Aggiornamento indice 2026-06-23 — Master Software Remediation to 100% V1.0
+
+Implementazione remediation software post-orchestrator: oracle TTS indipendente, IntegratedModes test gate, persistenza navigazione iOS, doc P0, test performance.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | [`0000MASTER_SOFTWARE_REMEDIATION_TO_100_READINESS_COMMAND_V1.0.md`](0000MASTER_SOFTWARE_REMEDIATION_TO_100_READINESS_COMMAND_V1.0.md) |
+| **Report** | [`MASTER_SOFTWARE_REMEDIATION_TO_100_REPORT_CURRENT.md`](MASTER_SOFTWARE_REMEDIATION_TO_100_REPORT_CURRENT.md) |
+| **Finding status** | [`MASTER_SOFTWARE_REMEDIATION_FINDING_STATUS_CURRENT.csv`](MASTER_SOFTWARE_REMEDIATION_FINDING_STATUS_CURRENT.csv) |
+| **Test evidence** | [`MASTER_SOFTWARE_REMEDIATION_TEST_EVIDENCE_CURRENT.md`](MASTER_SOFTWARE_REMEDIATION_TEST_EVIDENCE_CURRENT.md) |
+| **Validate** | `./Scripts/validate_master_software_remediation_readiness.sh` |
+| **Verdict** | **SOFTWARE 100%** · internal TestFlight software **100%** · physical/external **PENDING** |
+| **Baseline** | `main` @ `ed5d599` |
 
 ---
 
