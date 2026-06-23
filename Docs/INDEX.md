@@ -17,7 +17,7 @@ Implementazione remediation software post-orchestrator: oracle TTS indipendente,
 | **Test evidence** | [`MASTER_SOFTWARE_REMEDIATION_TEST_EVIDENCE_CURRENT.md`](MASTER_SOFTWARE_REMEDIATION_TEST_EVIDENCE_CURRENT.md) |
 | **Validate** | `./Scripts/validate_master_software_remediation_readiness.sh` |
 | **Verdict** | **SOFTWARE 100%** · internal TestFlight software **100%** · physical/external **PENDING** |
-| **Baseline** | `main` @ `6e35f42` |
+| **Baseline** | `main` @ `ed5d599` |
 
 ---
 
