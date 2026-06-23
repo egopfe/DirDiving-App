@@ -23,7 +23,7 @@ Orchestrazione audit read-only su `main` @ `1f62235`: sei audit upstream (Watch,
 | **Validate (04)** | `./Scripts/validate_master_main_code_sync_security_performance_audit.sh` |
 | **XCTest (05 re-run)** | iOS **1519/1519** · Watch **990/990** · 0 failures (7 IntegratedModes tests excluded — simulator stall) |
 | **Verdict** | **PARTIAL** — consolidated **72%** · internal TestFlight **READY** (software) · external/App Store **NOT READY** |
-| **Baseline** | `main` @ commit after this entry |
+| **Baseline** | `main` @ `6511de9` |
 
 ---
 
