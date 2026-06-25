@@ -110,6 +110,9 @@ struct FullComputerPrediveSettingsView: View {
             Text(label)
                 .font(DiveUI.Typography.hintCaptionBold)
                 .foregroundStyle(selected ? .black : .white)
+                .lineLimit(2)
+                .minimumScaleFactor(0.78)
+                .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity, minHeight: 30)
                 .background(
                     RoundedRectangle(cornerRadius: 8, style: .continuous)
@@ -125,20 +128,24 @@ struct FullComputerPrediveSettingsView: View {
             VStack(spacing: 0) {
                 if profile.bottomGasKind != .air {
                     Stepper(
-                        String(format: String(localized: "fc.predive.deco_editor.fo2"), Int((profile.bottomGas.oxygenFraction * 100).rounded())),
                         value: fo2Percent,
                         in: profile.bottomGasKind == .ean ? 22...40 : 10...40
-                    )
-                    .font(DiveUI.Typography.rowSubtitle)
+                    ) {
+                        prediveStepperLabel(
+                            String(format: String(localized: "fc.predive.deco_editor.fo2"), Int((profile.bottomGas.oxygenFraction * 100).rounded()))
+                        )
+                    }
                     divider
                 }
                 if profile.bottomGasKind == .trimix {
                     Stepper(
-                        String(format: String(localized: "fc.predive.settings.fhe")) + " \(Int((profile.bottomGas.heliumFraction * 100).rounded()))%",
                         value: fhePercent,
                         in: 0...70
-                    )
-                    .font(DiveUI.Typography.rowSubtitle)
+                    ) {
+                        prediveStepperLabel(
+                            String(format: String(localized: "fc.predive.settings.fhe")) + " \(Int((profile.bottomGas.heliumFraction * 100).rounded()))%"
+                        )
+                    }
                     divider
                 }
                 settingsReadOnlyRow(
@@ -147,11 +154,13 @@ struct FullComputerPrediveSettingsView: View {
                 )
                 divider
                 Stepper(
-                    String(localized: "fc.predive.settings.ppo2_max") + " \(Formatters.one(profile.bottomGas.maxPPO2Bar)) bar",
                     value: ppo2Tenths,
                     in: 12...16
-                )
-                .font(DiveUI.Typography.rowSubtitle)
+                ) {
+                    prediveStepperLabel(
+                        String(localized: "fc.predive.settings.ppo2_max") + " \(Formatters.one(profile.bottomGas.maxPPO2Bar)) bar"
+                    )
+                }
                 divider
                 settingsReadOnlyRow(
                     title: String(localized: "fc.predive.settings.mod"),
@@ -354,10 +363,15 @@ struct FullComputerPrediveSettingsView: View {
                 Text(title)
                     .font(DiveUI.Typography.rowSubtitle)
                     .foregroundStyle(DiveUI.secondaryText)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.82)
                 Spacer(minLength: 4)
                 Text(value)
                     .font(DiveUI.Typography.rowTitle)
                     .foregroundStyle(accent)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .layoutPriority(1)
                 Image(systemName: "chevron.right")
                     .font(.system(size: 11, weight: .black))
                     .foregroundStyle(accent)
@@ -371,13 +385,27 @@ struct FullComputerPrediveSettingsView: View {
             Text(title)
                 .font(DiveUI.Typography.rowSubtitle)
                 .foregroundStyle(DiveUI.secondaryText)
-            Spacer()
+                .lineLimit(2)
+                .minimumScaleFactor(0.82)
+            Spacer(minLength: 4)
             Text(value)
                 .font(DiveUI.Typography.rowTitle)
                 .foregroundStyle(DiveUI.green)
                 .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .layoutPriority(1)
         }
         .padding(.vertical, 8)
+    }
+
+    private func prediveStepperLabel(_ label: String) -> some View {
+        Text(label)
+            .font(DiveUI.Typography.rowSubtitle)
+            .foregroundStyle(.white)
+            .lineLimit(2)
+            .minimumScaleFactor(0.78)
+            .fixedSize(horizontal: false, vertical: true)
     }
 
     private func validationMessage(_ issue: FullComputerGasValidationIssue) -> some View {

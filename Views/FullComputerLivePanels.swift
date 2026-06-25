@@ -77,7 +77,7 @@ struct FullComputerTopMetricsPanel: View {
                 decoPanel
             }
         }
-        .frame(maxWidth: .infinity, minHeight: 70)
+        .frame(maxWidth: .infinity, minHeight: presentation.mode == .decompression ? 88 : 70)
         .background(panelBackground)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilitySummary)
@@ -104,25 +104,27 @@ struct FullComputerTopMetricsPanel: View {
     }
 
     private var decoPanel: some View {
-        HStack(spacing: 0) {
-            metricColumn(
-                title: String(localized: "live.fc.metric.tts"),
-                value: "\(presentation.ttsMinutes)",
-                unit: minuteUnit,
-                valueColor: presentation.ceilingViolation ? DiveUI.red : .white,
-                footer: String(localized: "live.fc.metric.tts.footer")
-            )
-            divider
-            metricColumn(
-                title: String(localized: "live.fc.metric.ceiling"),
-                value: ceilingValueText,
-                unit: depthUnit,
-                valueColor: presentation.stopState == .decoCompleted ? DiveUI.green : DiveUI.blue,
-                footer: presentation.stopState == .decoCompleted
-                    ? String(localized: "live.fc.metric.ceiling.completed.footer")
-                    : nil
-            )
-            divider
+        VStack(spacing: 2) {
+            HStack(spacing: 0) {
+                metricColumn(
+                    title: String(localized: "live.fc.metric.tts"),
+                    value: "\(presentation.ttsMinutes)",
+                    unit: minuteUnit,
+                    valueColor: presentation.ceilingViolation ? DiveUI.red : .white,
+                    footer: String(localized: "live.fc.metric.tts.footer")
+                )
+                divider
+                metricColumn(
+                    title: String(localized: "live.fc.metric.ceiling"),
+                    value: ceilingValueText,
+                    unit: depthUnit,
+                    valueColor: presentation.stopState == .decoCompleted ? DiveUI.green : DiveUI.blue,
+                    footer: presentation.stopState == .decoCompleted
+                        ? String(localized: "live.fc.metric.ceiling.completed.footer")
+                        : nil
+                )
+            }
+            compactDivider
             metricColumn(
                 title: String(localized: "live.metric.runtime"),
                 value: "\(presentation.runtimeMinutes)",
@@ -148,6 +150,13 @@ struct FullComputerTopMetricsPanel: View {
             .frame(width: 1, height: 54)
     }
 
+    private var compactDivider: some View {
+        Rectangle()
+            .fill(.white.opacity(0.22))
+            .frame(height: 1)
+            .padding(.horizontal, 8)
+    }
+
     private func metricColumn(
         title: String,
         value: String,
@@ -164,15 +173,18 @@ struct FullComputerTopMetricsPanel: View {
             HStack(alignment: .lastTextBaseline, spacing: 3) {
                 Text(value)
                     .font(DiveUI.Typography.dashboardValue)
-                    .minimumScaleFactor(0.5)
+                    .minimumScaleFactor(0.72)
                     .lineLimit(1)
                     .monospacedDigit()
                     .foregroundStyle(valueColor)
+                    .layoutPriority(1)
                 if let unit {
                     Text(unit)
                         .font(DiveUI.Typography.dashboardUnit)
                         .foregroundStyle(unitColor(for: valueColor))
                         .padding(.bottom, 4)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
             }
             if let footer {

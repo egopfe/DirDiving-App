@@ -789,6 +789,9 @@ struct DiveLiveView: View {
                 .font(.system(size: 12, weight: .black))
             Text(String(localized: "live.simulation_depth.badge"))
                 .font(DiveUI.Typography.warningTitle)
+                .lineLimit(2)
+                .minimumScaleFactor(0.82)
+                .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
         }
         .foregroundStyle(DiveUI.red)
@@ -809,6 +812,9 @@ struct DiveLiveView: View {
                 .font(.system(size: 12, weight: .black))
             Text(String(localized: "live.depth_mock_fallback.badge"))
                 .font(DiveUI.Typography.warningTitle)
+                .lineLimit(2)
+                .minimumScaleFactor(0.82)
+                .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
         }
         .foregroundStyle(DiveUI.orange)
@@ -827,11 +833,18 @@ struct DiveLiveView: View {
         HStack(spacing: 6) {
             Image(systemName: "bell.slash.fill")
                 .font(.system(size: 12, weight: .black))
-            Text(String(localized: "live.haptics.off"))
-                .font(DiveUI.Typography.warningTitle)
-            Spacer(minLength: 0)
-            Text(String(localized: "live.haptics.visual_only"))
-                .font(DiveUI.Typography.warningBody)
+                .frame(width: 14)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(String(localized: "live.haptics.off"))
+                    .font(DiveUI.Typography.warningTitle)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.82)
+                Text(String(localized: "live.haptics.visual_only"))
+                    .font(DiveUI.Typography.warningBody)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.82)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .foregroundStyle(DiveUI.yellow)
         .padding(.horizontal, 8)
@@ -935,18 +948,23 @@ struct DiveLiveView: View {
             Text(title)
                 .font(DiveUI.Typography.dashboardLabel)
                 .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
             HStack(alignment: .lastTextBaseline, spacing: 4) {
                 Text(value)
                     .font(DiveUI.Typography.dashboardValue)
-                    .minimumScaleFactor(0.54)
+                    .minimumScaleFactor(0.72)
                     .lineLimit(1)
                     .monospacedDigit()
                     .foregroundStyle(color)
+                    .layoutPriority(1)
                 if let unit {
                     Text(unit)
                         .font(DiveUI.Typography.dashboardUnit)
                         .foregroundStyle(color)
                         .padding(.bottom, 5)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                 }
             }
         }
@@ -984,12 +1002,14 @@ struct DiveLiveView: View {
     private func depthReadoutContent(alarmBlinkHighlight: Bool) -> some View {
         let style = DepthSafetyReadoutStyle.forState(depthSafetyState, alarmBlinkHighlight: alarmBlinkHighlight)
         let depthDisplay = WatchDepthFormatting.display(meters: dive.currentDepthMeters, units: unitPreference)
+        let depthFontSize: CGFloat = depthDisplay.valueText.count > 4 || depthDisplay.unitLabel.count > 1 ? 58 : 72
+        let unitFontSize: CGFloat = depthDisplay.unitLabel.count > 1 ? 24 : 31
         let depthOpacity = dive.isDepthDataStale ? 0.72 : 1.0
         return VStack(spacing: 0) {
             HStack(alignment: .lastTextBaseline, spacing: 4) {
                 Text(depthDisplay.valueText)
-                    .font(DiveUI.Typography.metricValueHero)
-                    .minimumScaleFactor(0.42)
+                    .font(.system(size: depthFontSize, weight: .black, design: .rounded))
+                    .minimumScaleFactor(0.7)
                     .lineLimit(1)
                     .monospacedDigit()
                     .foregroundStyle(style.depthColor)
@@ -1002,10 +1022,12 @@ struct DiveLiveView: View {
                     )
                     .layoutPriority(1)
                 Text(depthDisplay.unitLabel)
-                    .font(DiveUI.Typography.metricUnitHero)
+                    .font(.system(size: unitFontSize, weight: .black, design: .rounded))
                     .foregroundStyle(style.labelColor)
                     .opacity(depthOpacity)
                     .padding(.bottom, 9)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .accessibilityElement(children: .ignore)
@@ -1080,26 +1102,30 @@ struct DiveLiveView: View {
     }
 
     private var stopwatchPanel: some View {
-        HStack(spacing: 15) {
+        let timeText = Formatters.time(dive.stopwatchTime)
+        let timeSize: CGFloat = timeText.count > 5 ? 34 : 39
+        return HStack(spacing: 10) {
             Image(systemName: "stopwatch")
-                .font(.system(size: 35, weight: .black))
+                .font(.system(size: 31, weight: .black))
                 .foregroundStyle(DiveUI.yellow)
 
             VStack(spacing: 0) {
-                Text(Formatters.time(dive.stopwatchTime))
-                    .font(.system(size: 39, weight: .black, design: .rounded))
+                Text(timeText)
+                    .font(.system(size: timeSize, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.yellow)
                     .monospacedDigit()
                     .lineLimit(1)
-                    .minimumScaleFactor(0.66)
+                    .minimumScaleFactor(0.76)
+                    .layoutPriority(1)
                 Text(String(localized: "live.stopwatch.title"))
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(DiveUI.yellow)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.82)
             }
             .frame(maxWidth: .infinity)
         }
-        .padding(.horizontal, 14)
+        .padding(.horizontal, 10)
         .frame(maxWidth: .infinity, minHeight: 63)
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)

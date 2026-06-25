@@ -335,10 +335,15 @@ struct SnorkelingView: View {
                             .font(DiveUI.Typography.dashboardValue)
                             .monospacedDigit()
                             .foregroundStyle(DiveUI.green)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.72)
+                            .layoutPriority(1)
                             .accessibilityLabel(ui.heroAccessibilityLabel)
                         Text(ui.returnBearingText)
                             .font(DiveUI.Typography.hintCaption)
                             .foregroundStyle(DiveUI.secondaryText)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.8)
                     }
                     Spacer(minLength: 0)
                 }
@@ -559,14 +564,17 @@ struct SnorkelingView: View {
         HStack(alignment: .lastTextBaseline, spacing: 6) {
             Text(value)
                 .font(.system(size: 40, weight: .black, design: .rounded))
-                .minimumScaleFactor(0.65)
+                .minimumScaleFactor(0.72)
                 .lineLimit(1)
                 .monospacedDigit()
                 .foregroundStyle(color)
+                .layoutPriority(1)
             if let unit {
                 Text(unit)
                     .font(DiveUI.Typography.unitLabel)
                     .foregroundStyle(DiveUI.blue)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
             }
             Spacer(minLength: 0)
         }
