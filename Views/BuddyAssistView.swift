@@ -128,7 +128,7 @@ struct BuddyAssistView: View {
                         .font(.caption2.monospacedDigit().bold())
                         .foregroundStyle(pairingColor)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.55)
+                        .minimumScaleFactor(0.72)
                 }
                 if let code = buddyAssist.pairingConfirmationCode {
                     VStack(spacing: 3) {

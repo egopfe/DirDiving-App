@@ -458,7 +458,7 @@ private func premiumMiniCard(_ title: String, value: String, symbol: String, col
                 .foregroundStyle(DiveUI.secondaryText)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
-                .minimumScaleFactor(0.68)
+                .minimumScaleFactor(0.72)
         }
         .frame(minHeight: 78)
     }
@@ -489,7 +489,7 @@ private func metric(_ title: String, _ value: String, _ color: Color) -> some Vi
             .monospacedDigit()
             .foregroundStyle(color)
             .lineLimit(1)
-            .minimumScaleFactor(0.62)
+            .minimumScaleFactor(0.72)
     }
     .frame(maxWidth: .infinity)
 }

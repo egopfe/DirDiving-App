@@ -133,7 +133,10 @@ struct CompassView: View {
                 Text(compass.cardinal)
                     .font(.system(size: 17, weight: .black, design: .rounded))
                     .foregroundStyle(DiveUI.green)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
             }
+            .frame(width: 92)
         }
         .frame(width: 156, height: 156)
         .accessibilityElement(children: .ignore)
@@ -226,6 +229,8 @@ struct CompassView: View {
                     Text(String(localized: "compass.bearing.set"))
                         .font(DiveUI.Typography.commandButton)
                         .foregroundStyle(DiveUI.yellow)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.82)
                         .frame(maxWidth: .infinity, minHeight: DiveUI.Layout.compassActionMinHeight)
                 }
                 .buttonStyle(.plain)
@@ -240,6 +245,8 @@ struct CompassView: View {
                     Text(String(localized: "compass.bearing.clear"))
                         .font(DiveUI.Typography.commandButton)
                         .foregroundStyle(compass.bearingDegrees == nil ? .white.opacity(0.34) : DiveUI.red)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.82)
                         .frame(maxWidth: .infinity, minHeight: DiveUI.Layout.compassActionMinHeight)
                 }
                 .buttonStyle(.plain)
