@@ -46,6 +46,17 @@ final class DIRActivitySelectionStore: ObservableObject {
             presentModeChangeBlocked()
             return
         }
+        let policy = DepthCapabilityPolicy.current
+        if mode == .fullComputer, !policy.supportsFullComputerRuntime {
+            modeChangeBlockedToast = policy.fullComputerDisabledReason
+            scheduleToastClear()
+            return
+        }
+        if mode == .gauge, !policy.supportsDivingGaugeRuntime {
+            modeChangeBlockedToast = policy.gaugeDisabledReason
+            scheduleToastClear()
+            return
+        }
         selection.divingMode = mode
         selection.fullComputerPrediveConfirmed = false
         applyLaunchStep(
@@ -106,6 +117,10 @@ final class DIRActivitySelectionStore: ObservableObject {
 
     func presentModeChangeBlocked() {
         modeChangeBlockedToast = String(localized: "startup.mode_change.blocked")
+        scheduleToastClear()
+    }
+
+    private func scheduleToastClear() {
         toastTask?.cancel()
         toastTask = Task { @MainActor in
             try? await Task.sleep(nanoseconds: 2_200_000_000)

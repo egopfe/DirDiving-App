@@ -45,12 +45,18 @@ targets:
       - Utils/DiveSessionAlgorithmValidator.swift
       - Utils/SensorSourceMode.swift
       - Utils/DepthSensorSourceResolution.swift
+      - Utils/DepthCapabilityMode.swift
+      - Utils/DepthSampleSource.swift
+      - Utils/DepthCapabilityEntitlementProbe.swift
+      - Utils/DepthCapabilityResolver.swift
+      - Utils/DepthCapabilityPolicy.swift
       - Utils/DeveloperSettings.swift
       - Utils/DeveloperVersionUnlock.swift
       - Services/DepthSensorProvider.swift
       - Services/SensorProviderFactory.swift
       - Services/AppleDepthSensorProvider.swift
       - Services/MockDepthSensorProvider.swift
+      - Services/UnavailableDepthSensorProvider.swift
       - Services/ApneaWatchRuntimeProviding.swift
       - Services/ApneaWatchRuntimeStore.swift
       - Services/SnorkelingWatchRuntimeStore.swift
@@ -167,6 +173,11 @@ targets:
       - Services/DiveManager.swift
       - Utils/SensorSourceMode.swift
       - Utils/DepthSensorSourceResolution.swift
+      - Utils/DepthCapabilityMode.swift
+      - Utils/DepthSampleSource.swift
+      - Utils/DepthCapabilityEntitlementProbe.swift
+      - Utils/DepthCapabilityResolver.swift
+      - Utils/DepthCapabilityPolicy.swift
       - Utils/DeveloperSettings.swift
       - Utils/LegalAcceptanceGate.swift
       - App/LegalAcceptanceStore.swift
@@ -175,6 +186,7 @@ targets:
       - Services/SensorProviderFactory.swift
       - Services/AppleDepthSensorProvider.swift
       - Services/MockDepthSensorProvider.swift
+      - Services/UnavailableDepthSensorProvider.swift
       - Services/DiveLogStore.swift
       - Services/ApneaLogbookStore.swift
       - Services/ApneaImportedPlanStore.swift

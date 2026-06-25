@@ -2,8 +2,10 @@ import Foundation
 
 enum SensorSourceMode: String, CaseIterable, Identifiable {
     case automatic
-    case appleSensor
+    case appleShallow
+    case appleFull
     case simulation
+    case appleSensor
 
     var id: String { rawValue }
 
@@ -27,7 +29,7 @@ enum SensorSourceMode: String, CaseIterable, Identifiable {
 
     static var selectableModes: [SensorSourceMode] {
         if DeveloperSettings.allowsSimulationSensorSelection {
-            return SensorSourceMode.allCases
+            return [.automatic, .appleSensor, .simulation]
         }
         return [.automatic, .appleSensor]
     }
@@ -46,5 +48,18 @@ enum SensorSourceMode: String, CaseIterable, Identifiable {
         guard !DeveloperSettings.allowsSimulationSensorSelection else { return }
         guard persisted == .simulation else { return }
         persist(.automatic)
+    }
+}
+
+extension SensorSourceMode {
+    var displayName: String {
+        switch self {
+        case .automatic:
+            return String(localized: "developer.sensor_source.automatic")
+        case .appleSensor, .appleShallow, .appleFull:
+            return String(localized: "developer.sensor_source.apple_sensor")
+        case .simulation:
+            return String(localized: "developer.sensor_source.simulation")
+        }
     }
 }

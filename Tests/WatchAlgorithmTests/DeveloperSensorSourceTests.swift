@@ -28,14 +28,14 @@ final class DeveloperSensorSourceTests: XCTestCase {
         XCTAssertTrue(provider is MockDepthSensorProvider)
     }
 
-    func testFactoryAutomaticFallsBackToMockWhenAppleUnavailable() {
-        guard !AppleDepthSensorProvider.isAvailable else {
-            let provider = SensorProviderFactory.makeProvider(mode: .automatic)
-            XCTAssertTrue(provider is AppleDepthSensorProvider)
-            return
+    func testFactoryAutomaticUsesUnavailableWhenNoCapabilityInReleasePolicy() {
+        let resolver = DepthCapabilityResolver(testHook_capability: .none)
+        let selection = SensorProviderFactory.makeSelection(mode: .automatic, resolver: resolver)
+        if DeveloperSettings.allowsSimulationSensorSelection {
+            XCTAssertTrue(selection.provider is MockDepthSensorProvider || selection.provider is UnavailableDepthSensorProvider)
+        } else {
+            XCTAssertTrue(selection.provider is UnavailableDepthSensorProvider)
         }
-        let provider = SensorProviderFactory.makeProvider(mode: .automatic)
-        XCTAssertTrue(provider is MockDepthSensorProvider)
     }
 
     func testPersistRoundTrip() {
