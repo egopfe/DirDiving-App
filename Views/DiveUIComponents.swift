@@ -238,7 +238,8 @@ struct DiveCommandButton: View {
                 Text(LocalizedStringKey(title))
                     .font(DiveUI.Typography.commandButton)
                     .lineLimit(2)
-                    .minimumScaleFactor(0.85)
+                    .minimumScaleFactor(0.8)
+                    .multilineTextAlignment(.center)
                 if let systemImage {
                     Image(systemName: systemImage)
                         .font(.system(size: 12, weight: .bold))
@@ -433,10 +434,12 @@ struct DiveStatusPill: View {
                 Image(systemName: systemImage)
             }
             Text(LocalizedStringKey(text))
+                .lineLimit(2)
+                .minimumScaleFactor(0.82)
         }
         .font(DiveUI.Typography.secondaryLabel)
         .lineLimit(2)
-        .minimumScaleFactor(0.9)
+        .minimumScaleFactor(0.82)
         .foregroundStyle(color)
         .padding(.horizontal, 7)
         .padding(.vertical, 4)

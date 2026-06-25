@@ -7,6 +7,22 @@
 
 ---
 
+## 0. 2026-06-25 Addendum - Font Fit P1/P2/P3 Remediation
+
+The current `main` branch was refreshed from `origin/main` at `b6f4c30` and the latest font-fit audit was re-run statically on Watch SwiftUI files. A targeted UI-only remediation pass was applied for the current P1/P2/P3 findings:
+
+- `FullComputerTopMetricsPanel` decompression mode no longer relies on a three-column row with `minimumScaleFactor(0.5)`; it uses a two-row layout to preserve readable TTS, ceiling, and runtime values.
+- `FullComputerPrediveSettingsView` gas `Stepper` labels and read-only rows now have explicit line limits, minimum scale factors, and layout priorities.
+- `DiveLiveView` stopwatch, depth hero, dashboard values, simulation/fallback badges, and haptics-off badge now avoid very aggressive text compression.
+- `AscentGaugeView` allocates wider label columns in imperial units and reduces unit clipping risk.
+- `ApneaView`, `SnorkelingView`, and `CompassView` received targeted line-limit, scale, and layout-priority guards for hero metrics and controls.
+- `BuddyAssistView` and `ExperimentalConceptsView` received conservative scale-factor guards for remaining micro-label outliers.
+- `DiveCommandButton` and `DiveStatusPill` now use more resilient multiline alignment and scale behavior.
+
+No managers, stores, models, sensors, algorithms, GPS, sync, persistence, or calculations were changed. Windows static validation was performed; watchOS simulator/Xcode screenshot verification remains pending on macOS.
+
+---
+
 ## 1. Executive summary
 
 Watch MAIN typography and layout were updated to meet the audit remediation plan: shared Watch-native type scale, Settings row density and section grouping, larger safety/warning copy, secondary-screen label minimums, tap-target heights, reduced micro-text and aggressive `minimumScaleFactor` on small UI. Live Dive hierarchy (hero depth, TTV/runtime, stopwatch) was preserved. No algorithm, safety threshold, or business-logic changes.
@@ -44,7 +60,7 @@ All work traces to `DIR_DIVING_WATCH_UI_TEXT_VISIBILITY_AUDIT_CURRENT.md` priori
 | `Resources/en.lproj/Localizable.strings` |
 | `Resources/it.lproj/Localizable.strings` |
 
-**Not modified:** `iOSApp/**`, excluded experimental Watch views (`ApneaView`, `SnorkelingView`, `BuddyAssistView`, `ExperimentalConceptsView`).  
+**Not modified:** `iOSApp/**`, managers, stores, models, algorithms, persistence, sync, GPS, compass math, dive calculations.
 **Unchanged (no user-facing micro-text):** `Utils/LegalDisclaimerScrollGate.swift` (scroll-gate logic only).
 
 ---

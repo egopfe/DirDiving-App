@@ -5,6 +5,8 @@ struct AscentGaugeView: View {
     var units: DIRUnitPreference = .metric
 
     private var rateUnitLabel: String { units.ascentRateUnitLabel }
+    private var labelWidth: CGFloat { units == .imperial ? 70 : 64 }
+    private var scaleLabelWidth: CGFloat { units == .imperial ? 32 : 27 }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
@@ -14,11 +16,11 @@ struct AscentGaugeView: View {
                 .lineLimit(2)
                 .minimumScaleFactor(0.9)
                 .multilineTextAlignment(.leading)
-                .frame(width: 64, alignment: .leading)
+                .frame(width: labelWidth, alignment: .leading)
 
             HStack(alignment: .center, spacing: 5) {
                 scaleLabels
-                    .frame(width: 27)
+                    .frame(width: scaleLabelWidth)
 
                 gaugeBar
                     .frame(width: 31, height: 126)
@@ -28,8 +30,8 @@ struct AscentGaugeView: View {
                 .font(DiveUI.Typography.unitLabel)
                 .foregroundStyle(.white)
                 .lineLimit(1)
-                .minimumScaleFactor(0.9)
-                .frame(width: 64, alignment: .trailing)
+                .minimumScaleFactor(0.78)
+                .frame(width: labelWidth, alignment: .trailing)
         }
         .padding(.vertical, 6)
         .padding(.horizontal, 4)
@@ -133,7 +135,7 @@ struct AscentGaugeView: View {
             .monospacedDigit()
             .foregroundStyle(color)
             .lineLimit(1)
-            .minimumScaleFactor(0.75)
+            .minimumScaleFactor(0.7)
     }
 
     private func pointerOffset(in height: CGFloat) -> CGFloat {
