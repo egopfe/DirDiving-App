@@ -128,8 +128,11 @@ struct ContentView: View {
         .animation(.easeInOut(duration: 0.22), value: crownHintDismissed)
         .launchCompanionDisclaimer(isPresented: $showLaunchDisclaimer)
         .onAppear {
-            if !activitySelection.sessionConfigured, !activitySelection.isStartupFlowActive {
-                activitySelection.beginInitialLaunch(entry: .userColdLaunch)
+            beginInitialLaunchIfNeeded()
+        }
+        .onChange(of: showLaunchDisclaimer) { _, isPresented in
+            if !isPresented {
+                beginInitialLaunchIfNeeded()
             }
         }
         .fullScreenCover(isPresented: startupFlowPresented) {
@@ -156,7 +159,7 @@ struct ContentView: View {
 
     private var startupFlowPresented: Binding<Bool> {
         Binding(
-            get: { activitySelection.isStartupFlowActive },
+            get: { !showLaunchDisclaimer && activitySelection.isStartupFlowActive },
             set: { isPresented in
                 if !isPresented, activitySelection.isStartupFlowActive {
                     // Startup flow dismisses only through explicit completion paths.
@@ -164,6 +167,12 @@ struct ContentView: View {
                 }
             }
         )
+    }
+
+    private func beginInitialLaunchIfNeeded() {
+        guard !showLaunchDisclaimer else { return }
+        guard !activitySelection.sessionConfigured, !activitySelection.isStartupFlowActive else { return }
+        activitySelection.beginInitialLaunch(entry: .userColdLaunch)
     }
 
     private func navigationToast(_ message: String, accessibilityLabel: String? = nil) -> some View {
