@@ -1,0 +1,23 @@
+Requirement_ID,Area,Feature,Source_File,Source_Symbol,Expected_Behavior,Automated_Test,Simulator_Evidence,Physical_QA,Water_Lock_QA,Action_Button_QA,Digital_Crown_QA,Legal_Gate,Safety_Gate,Result,Severity,Finding_ID,Notes
+UW-001,Crown,Vertical page navigation,Views/ContentView.swift,TabView.verticalPage,Crown rotation changes screens,yes,yes,PENDING,PENDING,n/a,PENDING,n/a,PASS,PASS,,,
+UW-002,Crown,Active session page policy,Utils/WatchUnderwaterPagePolicy.swift,allowedPages,Activity-restricted pages during session,yes,yes,PENDING,PENDING,n/a,PENDING,n/a,PASS,PASS,,,
+UW-003,Crown,Diving Live+Compass+Images,Utils/WatchUnderwaterPagePolicy.swift,allowedPages,Diving allows live compass images if present,yes,yes,PENDING,PENDING,n/a,PENDING,n/a,PASS,PASS,,,
+UW-004,Crown,Apnea live only,Utils/WatchUnderwaterPagePolicy.swift,allowedPages,Apnea active only live,yes,yes,PENDING,PENDING,n/a,PENDING,n/a,PASS,PASS,,,
+UW-005,Crown,Snorkeling live only,Utils/WatchUnderwaterPagePolicy.swift,allowedPages,Snorkeling active only live,yes,yes,PENDING,PENDING,n/a,PENDING,n/a,PASS,PASS,,,
+UW-006,Crown,Block settings logbook mode,Views/ContentView.swift,clampToAllowedPage,Forbidden pages clamp to live,yes,partial,PENDING,PENDING,n/a,PENDING,n/a,PASS,PARTIAL,P2,P2-TEST-003,No ContentView integration test
+UW-007,Crown,Blocked toast,Services/AppNavigationStore.swift,reportUnderwaterNavigationBlocked,Toast on blocked navigation,yes,partial,PENDING,PENDING,n/a,PENDING,n/a,PASS,PARTIAL,P2,P2-UX-003,Diving-centric copy
+UW-008,Action,Context-aware primary,Services/WatchUnderwaterActionRouter.swift,resolvedPrimaryAction,Page-specific safe action,yes,yes,PENDING,PENDING,PENDING,n/a,yes,PASS,PASS,,,
+UW-009,Action,Alarm ack priority,Services/WatchUnderwaterActionRouter.swift,resolvedPrimaryAction,Alarm ack first,yes,yes,PENDING,PENDING,PENDING,n/a,yes,PASS,PASS,,,
+UW-010,Action,Diving stopwatch toggle,Services/WatchUnderwaterActionRouter.swift,execute,Start/stop when visible,yes,yes,PENDING,PENDING,PENDING,n/a,yes,PASS,PASS,,,
+UW-011,Action,FC hidden stopwatch unavailable,Services/WatchUnderwaterActionRouter.swift,resolvedPrimaryAction,Unavailable when hidden,yes,yes,PENDING,PENDING,PENDING,n/a,yes,PASS,PASS,,,
+UW-012,Action,Compass set/update bearing,Services/WatchUnderwaterActionRouter.swift,execute,Set or update bearing never clear,yes,yes,PENDING,PENDING,PENDING,n/a,yes,PASS,PASS,,,
+UW-013,Action,Images next when present,Services/WatchUnderwaterActionRouter.swift,execute,Advance image if inventory,yes,yes,PENDING,PENDING,PENDING,n/a,yes,PASS,PASS,,,
+UW-014,Action,Underwater Action intent,Services/ActionButtonIntents.swift,ExecuteUnderwaterPrimaryActionIntent,Routes through router,yes,yes,PENDING,PENDING,PENDING,n/a,yes,PASS,PASS,,,
+UW-015,Action,Legacy intents bypass router,Services/ActionButtonIntents.swift,ToggleStopwatchIntent et al,Direct manager calls,yes,yes,PENDING,PENDING,PENDING,n/a,partial,FAIL,PARTIAL,P1,P1-AB-001,7 legacy shortcuts
+UW-016,UX,Underwater hint overlay,Views/WatchUnderwaterPrimaryActionHintView.swift,body,Crown+Action hint during session,yes,yes,PENDING,PENDING,n/a,n/a,n/a,PASS,PASS,,,
+UW-017,UX,Crown hint pre-session,Views/ContentView.swift,crownNavigationHint,Hint when idle on live,yes,yes,PENDING,n/a,n/a,PENDING,n/a,PASS,PASS,,,
+UW-018,Docs,Side button not claimed,Resources/en.lproj/Localizable.strings,shortcuts.help.side_button,No false hardware claims,yes,yes,PENDING,n/a,n/a,n/a,n/a,PASS,PASS,,,
+UW-019,Legal,All intents require acceptance,Services/ActionButtonIntents.swift,requireLegalAcceptanceForSafetyIntent,Legal gate,yes,yes,PENDING,n/a,n/a,n/a,yes,PASS,PASS,,,
+UW-PHY-001,Physical,Water Lock behavior,Docs/QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_WATER_LOCK,README,Physical validation,n/a,n/a,PENDING,PENDING,PENDING,PENDING,n/a,PENDING,PENDING,,,NOT_EXECUTED
+UW-PHY-002,Physical,Action Button Ultra,Docs/QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_ACTION_BUTTON,README,Physical validation,n/a,n/a,PENDING,n/a,PENDING,n/a,n/a,PENDING,PENDING,,,NOT_EXECUTED
+UW-PHY-003,Physical,Crown paging underwater,Docs/QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_NAVIGATION,README,Physical validation,n/a,n/a,PENDING,PENDING,n/a,PENDING,n/a,PENDING,PENDING,,,NOT_EXECUTED

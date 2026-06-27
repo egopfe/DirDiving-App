@@ -1,0 +1,18 @@
+Requirement_ID,Area,Feature,Source_File,Source_Symbol,Expected_Behavior,Automated_Test,Simulator_Evidence,Physical_QA,Water_Lock_QA,Action_Button_QA,Digital_Crown_QA,Legal_Gate,Safety_Gate,Result,Severity,Finding_ID,Notes
+WAO-001,Policy,Default disabled,Utils/WatchWaterAutoOpenPolicy.swift,migrateIfNeeded,Default mode disabled,yes,yes,PENDING,n/a,n/a,n/a,n/a,PASS,PASS,,,
+WAO-002,Policy,Three modes,Views/WatchWaterAutoOpenSettingsView.swift,body,Disabled Last Preferred,yes,yes,PENDING,n/a,n/a,n/a,n/a,PASS,PASS,,,
+WAO-003,Policy,Sanitize preferred,Utils/WatchWaterAutoOpenPolicy.swift,sanitize,Safe destination defaults,yes,yes,PENDING,n/a,n/a,n/a,n/a,PASS,PASS,,,
+WAO-004,Policy,Non-diving gauge semantics,Utils/WatchWaterAutoOpenPolicy.swift,sanitize,Apnea/Snorkeling no diving mode leak,yes,yes,PENDING,n/a,n/a,n/a,n/a,PASS,PASS,,,
+WAO-005,Routing,Preferred FC predive,Utils/DIRStartupSelectionPolicy.swift,resolveWaterAutoLaunchStep,FC routes predive not live,yes,yes,PENDING,n/a,n/a,n/a,yes,PASS,PASS,,,
+WAO-006,Routing,Does not start dive,Services/DIRActivitySelectionStore.swift,beginWaterAutoLaunch,Startup routing only,yes,yes,PENDING,n/a,n/a,n/a,yes,PASS,PASS,,,
+WAO-007,Routing,Blocks active sessions,Services/DIRActivitySelectionStore.swift,beginWaterAutoLaunch,No routing during session,yes,yes,PENDING,n/a,n/a,n/a,yes,PASS,PASS,,,
+WAO-008,Intent,OpenWaterAutoLaunchModeIntent,Services/ActionButtonIntents.swift,OpenWaterAutoLaunchModeIntent,Legal gate no startManualDive,yes,yes,PENDING,n/a,n/a,n/a,yes,PASS,PASS,,,
+WAO-009,UX,System limitation copy,Views/WatchWaterAutoOpenSettingsView.swift,systemLimitationFooter,No false system claim,yes,yes,PENDING,n/a,n/a,n/a,n/a,PASS,PASS,,,
+WAO-010,UX,FC warning copy,Views/WatchWaterAutoOpenSettingsView.swift,fullComputerWarning,Predive required for FC,yes,yes,PENDING,n/a,n/a,n/a,yes,PASS,PASS,,,
+WAO-011,UX,Settings disabled active dive,Views/SettingsView.swift,waterAutoOpenRow,Disabled when dive active,yes,yes,PENDING,n/a,n/a,n/a,n/a,PASS,PASS,,,
+WAO-012,Wiring,Cold launch applies policy,Views/ContentView.swift,onAppear,beginWaterAutoLaunch on water entry,no,FAIL,PENDING,n/a,n/a,n/a,n/a,FAIL,PARTIAL,P1,P1-WAO-001,Only beginColdLaunch
+WAO-013,UX,Cold launch limitation disclosure,Views/WatchWaterAutoOpenSettingsView.swift,n/a,Disclose detection limits,no,n/a,PENDING,n/a,n/a,n/a,n/a,FAIL,P1,P1-WAO-002,Impl report only
+WAO-T04,Test,Last selected FC predive,Tests/WatchAlgorithmTests/WatchWaterAutoOpenPolicyTests.swift,n/a,lastSelected FC predive test,no,no,PENDING,n/a,n/a,n/a,n/a,FAIL,P2,P2-TEST-001,Missing test
+WAO-PHY-001,Physical,End-to-end water entry,Docs/QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_PREFERRED,README,Physical water auto-open,n/a,n/a,PENDING,PENDING,n/a,n/a,n/a,PENDING,PENDING,,,NOT_EXECUTED
+WAO-PHY-002,Physical,System Auto-Launch listing,Docs/QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_SYSTEM_LISTING,README,watchOS submerged list,n/a,n/a,PENDING,n/a,n/a,n/a,n/a,PENDING,PENDING,,,NOT_EXECUTED
+WAO-PHY-003,Physical,Active session block,Docs/QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_ACTIVE_SESSION_BLOCK,README,Physical block validation,n/a,n/a,PENDING,n/a,n/a,n/a,yes,PENDING,PENDING,,,NOT_EXECUTED
