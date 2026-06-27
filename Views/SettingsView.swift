@@ -392,6 +392,24 @@ struct SettingsView: View {
             .disabled(dive.isDiveActive)
 
             NavigationLink {
+                WatchWaterAutoOpenSettingsView()
+            } label: {
+                settingsRow(
+                    icon: "drop.fill",
+                    iconColor: DiveUI.cyan,
+                    title: String(localized: "settings.water_auto_open.title"),
+                    subtitle: String(localized: String.LocalizationValue(WatchWaterAutoOpenPolicy.mode.settingsSubtitleKey)),
+                    showsChevron: true
+                )
+            }
+            .buttonStyle(.plain)
+            .disabled(dive.isDiveActive)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(String(localized: "settings.water_auto_open.title"))
+            .accessibilityValue(WatchWaterAutoOpenPolicy.mode.accessibilityLabel)
+            .accessibilityHint(String(localized: "settings.water_auto_open.row.a11y.hint"))
+
+            NavigationLink {
                 WatchStartupDefaultActivityPickerView()
             } label: {
                 settingsRow(

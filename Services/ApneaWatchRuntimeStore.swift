@@ -16,6 +16,7 @@ final class ApneaWatchRuntimeStore: ObservableObject, ApneaWatchRuntimeProviding
     private var dismissedOverlayEventIDs: Set<UUID> = []
     private var temperatureCelsius: Double?
     private var depthProvider: DepthSensorProvider?
+    private var activeDepthSensorMetadata = DepthSensorSessionMetadata()
     private var tickTask: Task<Void, Never>?
     private var checkpointTask: Task<Void, Never>?
     private var firedHapticEventIDs: Set<UUID> = []
@@ -117,6 +118,8 @@ final class ApneaWatchRuntimeStore: ObservableObject, ApneaWatchRuntimeProviding
         if isSensorDegraded, !session.warnings.contains(.dataQualityDegraded) {
             session.warnings.append(.dataQualityDegraded)
         }
+        session.depthSampleSource = activeDepthSensorMetadata.depthSampleSource
+        session.depthCapabilityMode = activeDepthSensorMetadata.depthCapabilityMode
         logbook.add(session)
     }
 
@@ -224,7 +227,9 @@ final class ApneaWatchRuntimeStore: ObservableObject, ApneaWatchRuntimeProviding
     private func startDepthSensor() {
         stopDepthSensor()
         let mode = SensorSourceMode.runtimeMode
-        let provider = SensorProviderFactory.makeProvider(mode: mode)
+        let selection = SensorProviderFactory.makeSelection(mode: mode)
+        activeDepthSensorMetadata = DepthSensorSessionMetadata.capture(from: selection)
+        let provider = selection.provider
         provider.onDepthMeasurement = { [weak self] depth, timestamp, temperature in
             Task { @MainActor in
                 self?.handleDepthMeasurement(depth: depth, temperature: temperature, timestamp: timestamp)

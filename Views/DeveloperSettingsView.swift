@@ -39,6 +39,12 @@ struct DeveloperSettingsView: View {
                             .font(DiveUI.Typography.hintCaption)
                             .foregroundStyle(DiveUI.secondaryText)
                             .fixedSize(horizontal: false, vertical: true)
+
+                        Text(depthCapabilityStatusLine)
+                            .font(DiveUI.Typography.hintCaption)
+                            .foregroundStyle(DiveUI.cyan)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .accessibilityLabel(depthCapabilityStatusLine)
                     }
                     .padding(.horizontal, 10)
                     .padding(.vertical, 8)
@@ -91,20 +97,16 @@ struct DeveloperSettingsView: View {
         dive.reloadDepthSensorConfiguration()
         if dive.developerSensorSourceWarning != nil {
             showAppleFallbackAlert = true
-            sensorSourceRaw = SensorSourceMode.automatic.rawValue
         }
     }
-}
 
-private extension SensorSourceMode {
-    var displayName: String {
-        switch self {
-        case .automatic:
-            return String(localized: "developer.sensor_source.automatic")
-        case .appleSensor:
-            return String(localized: "developer.sensor_source.apple_sensor")
-        case .simulation:
-            return String(localized: "developer.sensor_source.simulation")
-        }
+    private var depthCapabilityStatusLine: String {
+        let capability = DepthCapabilityResolver.resolve()
+        let resolution = dive.depthSensorSourceResolution
+        return String(
+            format: String(localized: "developer.sensor_source.capability_status"),
+            capability.localizedLabel,
+            resolution.localizedLabel
+        )
     }
 }

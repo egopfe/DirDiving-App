@@ -237,8 +237,8 @@ struct InfoView: View {
         switch DeveloperSettings.sensorSourceMode {
         case .automatic:
             return String(localized: "developer.sensor_source.automatic")
-        case .appleSensor:
-            return String(localized: "developer.sensor_source.apple_sensor")
+        case .appleSensor, .appleShallow, .appleFull:
+            return DepthCapabilityResolver.resolve().localizedLabel
         case .simulation:
             return String(localized: "developer.sensor_source.simulation")
         }

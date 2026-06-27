@@ -31,6 +31,22 @@ final class DIRActivitySelectionStore: ObservableObject {
         applyLaunchStep(DIRStartupSelectionPolicy.resolveLaunchStep())
     }
 
+    /// Applies water-entry startup routing without starting a session or bypassing Full Computer predive.
+    func beginWaterAutoLaunch() {
+        guard canChangeModes else {
+            presentModeChangeBlocked()
+            return
+        }
+        sessionConfigured = false
+        selection.fullComputerPrediveConfirmed = false
+        if WatchWaterAutoOpenPolicy.mode != .disabled {
+            let destination = WatchWaterAutoOpenPolicy.activeDestination()
+            selection.activity = destination.activity
+            selection.divingMode = destination.divingMode
+        }
+        applyLaunchStep(DIRStartupSelectionPolicy.resolveWaterAutoLaunchStep())
+    }
+
     func selectActivity(_ activity: DIRActivityMode) {
         guard canChangeModes else {
             presentModeChangeBlocked()
@@ -44,6 +60,17 @@ final class DIRActivitySelectionStore: ObservableObject {
     func selectDivingMode(_ mode: DIRDivingMode) {
         guard canChangeModes else {
             presentModeChangeBlocked()
+            return
+        }
+        let policy = DepthCapabilityPolicy.current
+        if mode == .fullComputer, !policy.supportsFullComputerRuntime {
+            modeChangeBlockedToast = policy.fullComputerDisabledReason
+            scheduleToastClear()
+            return
+        }
+        if mode == .gauge, !policy.supportsDivingGaugeRuntime {
+            modeChangeBlockedToast = policy.gaugeDisabledReason
+            scheduleToastClear()
             return
         }
         selection.divingMode = mode
@@ -106,6 +133,10 @@ final class DIRActivitySelectionStore: ObservableObject {
 
     func presentModeChangeBlocked() {
         modeChangeBlockedToast = String(localized: "startup.mode_change.blocked")
+        scheduleToastClear()
+    }
+
+    private func scheduleToastClear() {
         toastTask?.cancel()
         toastTask = Task { @MainActor in
             try? await Task.sleep(nanoseconds: 2_200_000_000)
@@ -133,6 +164,10 @@ final class DIRActivitySelectionStore: ObservableObject {
         }
         startupStep = nil
         sessionConfigured = true
+        WatchWaterAutoOpenPolicy.recordSelectedDestination(
+            activity: activity,
+            divingMode: divingMode
+        )
         DiveManager.shared?.recordSessionModeSelection(
             activity: activity,
             divingMode: divingMode
