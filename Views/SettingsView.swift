@@ -734,6 +734,16 @@ private struct WatchShortcutHelpView: View {
                         body: String(localized: "shortcuts.help.underwater.body")
                     )
                     helpPanel(
+                        icon: "button.programmable",
+                        title: String(localized: "shortcuts.help.underwater_primary.title"),
+                        body: String(localized: "shortcuts.help.underwater_primary.body")
+                    )
+                    helpPanel(
+                        icon: "exclamationmark.shield",
+                        title: String(localized: "shortcuts.help.legacy_intents.title"),
+                        body: String(localized: "shortcuts.help.legacy_intents.body")
+                    )
+                    helpPanel(
                         icon: "stopwatch",
                         title: String(localized: "shortcuts.help.stopwatch.title"),
                         body: String(localized: "shortcuts.help.stopwatch.body")

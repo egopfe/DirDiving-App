@@ -2008,6 +2008,7 @@
 "settings.mode_switch.snorkeling" = "Snorkeling";
 "settings.mode_switch.a11y.label" = "Settings activity";
 "settings.mode_switch.a11y.hint" = "Changes which activity settings are shown. Does not start a session or switch the Watch.";
+"settings.mode_switch.visible_hint" = "Shows settings for the selected activity only. Does not change the Watch runtime activity.";
 "apnea.settings.title" = "Apnea Settings";
 "apnea.settings.open" = "Open Apnea Settings";
 "apnea.settings.summary" = "Apnea session preferences and companion tools";

@@ -380,7 +380,11 @@
 "shortcuts.help.touch.title" = "Touch";
 "shortcuts.help.touch.body" = "Usa i pulsanti a schermo per confermare. Le azioni distruttive sui log richiedono ancora conferma.";
 "shortcuts.help.underwater.title" = "Sott'acqua";
-"shortcuts.help.underwater.body" = "Durante l'immersione restano solo Live e Bussola. Log, impostazioni e immagini dopo la fine immersione.";
+"shortcuts.help.underwater.body" = "Durante una sessione attiva le pagine Crown sono limitate. Diving: Live, BUSSOLA e Immagini se presenti. Apnea e Snorkeling: solo Live. Assegna Azione subacquea primaria al tasto Azione su Ultra.";
+"shortcuts.help.underwater_primary.title" = "Azione subacquea primaria (consigliata)";
+"shortcuts.help.underwater_primary.body" = "Scorciatoia consigliata per Action Button su Apple Watch Ultra. Esegue l'azione sicura della schermata corrente: ACK allarme, cronometro, bussola o immagine successiva. Configura in Impostazioni watchOS → Tasto Azione.";
+"shortcuts.help.legacy_intents.title" = "Scorciatoie legacy";
+"shortcuts.help.legacy_intents.body" = "Altre scorciatoie possono essere bloccate o reindirizzate durante una sessione attiva per sicurezza. Usa Azione subacquea primaria sott'acqua. Blocco acqua disabilita il touch — usa Corona e Action Button.";
 "live.auto_dive.waiting.title" = "Immersione automatica";
 "live.auto_dive.waiting.subtitle" = "Parte automaticamente in immersione; puoi anche usare AVVIO MANUALE.";
 "live.manual_start.title" = "Avvio manuale";
@@ -499,7 +503,14 @@
 "watch_photo_status_rejected_detail" = "Apple Watch ha rifiutato la foto (%@).";
 "watch_photo_status_failed" = "Invio foto non riuscito.";
 
-"nav.underwater.blocked" = "Impostazioni bloccate in immersione";
+"nav.underwater.blocked" = "Schermata non disponibile durante la sessione";
+"nav.underwater.blocked.diving" = "Schermata bloccata in immersione";
+"nav.underwater.blocked.apnea" = "Schermata bloccata durante sessione Apnea";
+"nav.underwater.blocked.snorkeling" = "Schermata bloccata durante sessione Snorkeling";
+"nav.underwater.blocked.diving.a11y" = "Navigazione bloccata durante immersione attiva";
+"nav.underwater.blocked.apnea.a11y" = "Navigazione bloccata durante sessione Apnea attiva";
+"nav.underwater.blocked.snorkeling.a11y" = "Navigazione bloccata durante sessione Snorkeling attiva";
+"nav.toast.a11y.generic" = "Messaggio di stato";
 "nav.crown.hint.title" = "Gira la Corona";
 "nav.crown.hint.body" = "Usa la Digital Crown per Log immersioni, Impostazioni e Immagini.";
 "nav.crown.hint.dismiss" = "OK";
@@ -534,6 +545,9 @@
 "shortcut.error.app_unavailable" = "DIR DIVING non e pronto: apri l'app sul Watch e riprova.";
 "shortcut.error.stopwatch_reset_blocked" = "Reset cronometro bloccato: usa la conferma a schermo se il tempo e in corso.";
 "shortcut.error.legal_acceptance_required" = "Apri DIR DIVING e accetta l'onboarding legale e di sicurezza prima di usare le scorciatoie del tasto Azione.";
+"shortcut.error.legacy_blocked_active_session" = "Scorciatoia bloccata durante sessione attiva. Usa Azione subacquea primaria.";
+"shortcut.error.no_active_diving_session" = "Nessuna sessione Diving attiva da terminare.";
+"shortcut.error.water_auto_open_disabled" = "Avvio ingresso acqua disattivato nelle Impostazioni.";
 "sync.trust.mismatch" = "La fiducia di sincronizzazione è cambiata. Reimposta la fiducia di abbinamento per riconnettere Apple Watch/iPhone.";
 "live.simulation_depth.badge" = "SIMULAZIONE";
 "live.simulation_depth.a11y" = "Profondità simulata attiva. Non è profondità da sensore reale.";
@@ -791,6 +805,14 @@
 "settings.water_auto_open.explanation.a11y" = "L'avvio ingresso acqua apre la destinazione selezionata. Non avvia automaticamente una sessione.";
 "settings.water_auto_open.system_limitation.a11y" = "La lista di Apertura Automatica di sistema Apple Watch è controllata da watchOS, non da DIR Diving.";
 "settings.water_auto_open.full_computer_warning.a11y" = "Full Computer richiede configurazione e conferma pre-immersione prima del runtime live.";
+"settings.water_auto_open.cold_launch_limitation" = "L'avvio normale dall'icona non rileva l'ingresso in acqua. Il routing acqua si applica con la scorciatoia Apri modalità acqua, Apertura automatica di sistema (se elencata da Apple) o Applica percorso ora.";
+"settings.water_auto_open.cold_launch_limitation.a11y" = "L'avvio a freddo normale non rileva l'ingresso in acqua. Usa la scorciatoia acqua o Applica percorso ora.";
+"settings.water_auto_open.apply_now.explanation" = "Prova o prepara il percorso ingresso acqua configurato. Non avvia una sessione.";
+"settings.water_auto_open.apply_now.button" = "Applica percorso ora";
+"settings.water_auto_open.apply_now.a11y.hint" = "Instrada alla destinazione ingresso acqua configurata senza avviare una sessione.";
+"settings.water_auto_open.apply_now.blocked" = "Bloccato durante sessione attiva.";
+"settings.water_auto_open.apply_now.disabled" = "Attiva prima una modalità ingresso acqua.";
+"settings.water_auto_open.apply_now.started" = "Instradamento alla destinazione configurata…";
 "settings.diving.default_mode" = "Modalità Diving predefinita";
 "settings.diving.gauge_show_ttv" = "Gauge · Mostra TTV";
 "settings.diving.gauge_show_ttv.subtitle" = "Indice TTV opzionale su Live Dive";
