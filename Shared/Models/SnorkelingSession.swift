@@ -99,6 +99,8 @@ struct SnorkelingSession: Identifiable, Codable, Hashable, Sendable {
     var equipment: SnorkelingEquipmentProfile?
     var buddy: SnorkelingBuddyInfo?
     var warnings: [SnorkelingSessionWarning]
+    var depthSampleSource: String?
+    var depthCapabilityMode: String?
 
     init(
         id: UUID = UUID(),
@@ -120,7 +122,9 @@ struct SnorkelingSession: Identifiable, Codable, Hashable, Sendable {
         profile: SnorkelingProfile? = nil,
         equipment: SnorkelingEquipmentProfile? = nil,
         buddy: SnorkelingBuddyInfo? = nil,
-        warnings: [SnorkelingSessionWarning] = []
+        warnings: [SnorkelingSessionWarning] = [],
+        depthSampleSource: String? = nil,
+        depthCapabilityMode: String? = nil
     ) {
         self.id = id
         self.schemaVersion = schemaVersion
@@ -147,6 +151,8 @@ struct SnorkelingSession: Identifiable, Codable, Hashable, Sendable {
         self.equipment = equipment
         self.buddy = buddy
         self.warnings = warnings
+        self.depthSampleSource = depthSampleSource
+        self.depthCapabilityMode = depthCapabilityMode
     }
 
     enum CodingKeys: String, CodingKey {
@@ -170,6 +176,8 @@ struct SnorkelingSession: Identifiable, Codable, Hashable, Sendable {
         case equipment
         case buddy
         case warnings
+        case depthSampleSource
+        case depthCapabilityMode
     }
 
     init(from decoder: Decoder) throws {
@@ -200,6 +208,8 @@ struct SnorkelingSession: Identifiable, Codable, Hashable, Sendable {
         try container.encodeIfPresent(equipment, forKey: .equipment)
         try container.encodeIfPresent(buddy, forKey: .buddy)
         try container.encode(warnings, forKey: .warnings)
+        try container.encodeIfPresent(depthSampleSource, forKey: .depthSampleSource)
+        try container.encodeIfPresent(depthCapabilityMode, forKey: .depthCapabilityMode)
     }
 
     func refreshedStatistics() -> SnorkelingSessionStatistics {

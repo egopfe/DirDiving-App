@@ -79,11 +79,30 @@ struct ContentView: View {
             }
         }
         .onChange(of: navigation.selectedPage) { _, page in
-            guard dive.isDiveActive || apneaRuntime.isSessionActive || snorkelingRuntime.isSessionActive else { return }
-            // During an active dive, only Live and Compass remain reachable (v9: images/menus available on surface).
-            if page != .live && page != .compass {
+            guard isAnySessionActive else { return }
+            let allowed = WatchUnderwaterPagePolicy.allowedPages(
+                activity: activitySelection.selectedActivity,
+                divingMode: activitySelection.selectedDivingMode,
+                isSessionActive: true,
+                hasUserImages: !imageStore.imageNames.isEmpty,
+                includeModeSelection: WatchModeSelectionPreferences.hasMultipleStableModes
+            )
+            if !allowed.contains(page) {
                 navigation.reportUnderwaterNavigationBlocked()
                 navigation.selectedPage = .live
+            }
+        }
+        .overlay(alignment: .topTrailing) {
+            if isAnySessionActive {
+                WatchUnderwaterPrimaryActionHintView()
+                    .padding(.top, 4)
+                    .padding(.trailing, 6)
+            }
+        }
+        .overlay(alignment: .bottom) {
+            if let toast = navigation.hardwareActionToast {
+                navigationToast(toast)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .overlay(alignment: .bottom) {
@@ -99,6 +118,7 @@ struct ContentView: View {
             }
         }
         .animation(.easeInOut(duration: 0.22), value: navigation.underwaterNavigationToast)
+        .animation(.easeInOut(duration: 0.22), value: navigation.hardwareActionToast)
         .animation(.easeInOut(duration: 0.22), value: crownHintDismissed)
         .launchCompanionDisclaimer(isPresented: $showLaunchDisclaimer)
         .onAppear {
@@ -122,6 +142,10 @@ struct ContentView: View {
             }
         }
         .animation(.easeInOut(duration: 0.22), value: activitySelection.modeChangeBlockedToast)
+    }
+
+    private var isAnySessionActive: Bool {
+        dive.isDiveActive || apneaRuntime.isSessionActive || snorkelingRuntime.isSessionActive
     }
 
     private var startupFlowPresented: Binding<Bool> {

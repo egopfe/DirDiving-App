@@ -14,6 +14,8 @@ enum UserImageStoreNotificationKeys {
 final class UserImageStore: ObservableObject {
     @Published private(set) var imageNames: [String] = []
     @Published private(set) var uploadedInventory: [WatchUserImageInventoryItem] = []
+    /// Selection driven by underwater Action Button next-image action.
+    @Published var watchRuntimeSelectedImageName: String?
 
     enum ImportError: LocalizedError, Equatable {
         case invalidFileName
@@ -106,6 +108,24 @@ final class UserImageStore: ObservableObject {
         }
         imageNames = names.sorted()
         uploadedInventory = buildUploadedInventory()
+        if let watchRuntimeSelectedImageName,
+           !imageNames.contains(watchRuntimeSelectedImageName) {
+            self.watchRuntimeSelectedImageName = imageNames.first
+        }
+    }
+
+    /// Advances the watch runtime image selection for Action Button next-image. Returns false when no images exist.
+    @discardableResult
+    func advanceToNextImageForWatchRuntime() -> Bool {
+        guard !imageNames.isEmpty else { return false }
+        if let current = watchRuntimeSelectedImageName,
+           let index = imageNames.firstIndex(of: current) {
+            let nextIndex = (index + 1) % imageNames.count
+            watchRuntimeSelectedImageName = imageNames[nextIndex]
+        } else {
+            watchRuntimeSelectedImageName = imageNames.first
+        }
+        return true
     }
 
     func canDeleteImage(named fileName: String) -> Bool {

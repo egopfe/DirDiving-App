@@ -60,7 +60,9 @@ final class WatchCompleteAlgorithmAuditRemediationTests: XCTestCase {
             "EndManualDiveIntent",
             "SetBearingIntent",
             "ClearBearingIntent",
-            "AcknowledgeAlarmIntent"
+            "AcknowledgeAlarmIntent",
+            "OpenWaterAutoLaunchModeIntent",
+            "ExecuteUnderwaterPrimaryActionIntent"
         ]
         for name in intentStructs {
             let pattern = "struct \(name)[\\s\\S]*?func perform\\(\\)[\\s\\S]*?requireLegalAcceptanceForSafetyIntent\\(\\)"

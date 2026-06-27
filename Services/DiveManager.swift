@@ -313,30 +313,18 @@ final class DiveManager: ObservableObject {
             return
         }
 
-        var mode = DeveloperSettings.sensorSourceMode
-        if mode == .appleSensor, !AppleDepthSensorProvider.isAvailable {
-            let fallback: SensorSourceMode = DeveloperSettings.allowsSimulationSensorSelection ? .simulation : .automatic
-            DeveloperSettings.persistSensorSource(fallback)
-            mode = fallback
-            developerSensorSourceWarning = String(localized: "developer.sensor_source.apple_fallback")
+        let requestedMode = DeveloperSettings.sensorSourceMode
+        let selection = SensorProviderFactory.makeSelection(mode: requestedMode)
+        let provider = selection.provider
+
+        depthSensorSourceResolution = selection.resolution
+        isSimulationDepthActive = selection.sampleSource == .simulation
+        isDepthAutomationMockFallbackActive = selection.didFallbackFromApple && selection.sampleSource == .simulation
+
+        if selection.unavailableReason != nil, requestedMode == .appleSensor || requestedMode == .appleShallow || requestedMode == .appleFull {
+            developerSensorSourceWarning = selection.unavailableReason?.localizedMessage
         }
 
-        let provider = SensorProviderFactory.makeProvider(mode: mode)
-        let usesMockProvider = provider is MockDepthSensorProvider
-        isSimulationDepthActive = usesMockProvider
-        switch mode {
-        case .simulation:
-            depthSensorSourceResolution = .simulation
-            isDepthAutomationMockFallbackActive = false
-        case .automatic, .appleSensor:
-            if usesMockProvider {
-                depthSensorSourceResolution = .mockFallback
-                isDepthAutomationMockFallbackActive = true
-            } else {
-                depthSensorSourceResolution = .appleSensor
-                isDepthAutomationMockFallbackActive = false
-            }
-        }
         provider.onDepthMeasurement = { [weak self] depth, timestamp, temperature in
             self?.processDepthMeasurement(
                 rawDepthMeters: depth,
@@ -358,11 +346,15 @@ final class DiveManager: ObservableObject {
         provider.start()
         depthSensorProvider = provider
 
-        switch mode {
-        case .simulation, .automatic:
-            isDepthAutomationAvailable = true
-        case .appleSensor:
-            isDepthAutomationAvailable = AppleDepthSensorProvider.isAvailable
+        isDepthAutomationAvailable = selection.sampleSource != .unavailable
+    }
+
+    private func depthSensorSourceTagForPersistedSession() -> String? {
+        switch depthSensorSourceResolution.sampleSource {
+        case .simulation:
+            return DivingRecordEligibilityPolicy.simulatedSourceTag
+        case .appleShallow, .appleFull, .unavailable:
+            return depthSensorSourceResolution.sampleSource.rawValue
         }
     }
 
@@ -1061,9 +1053,7 @@ final class DiveManager: ObservableObject {
             watchActivityMode: watchActivityMode ?? sessionActivityMode.rawValue,
             watchDivingMode: watchDivingMode ?? sessionDivingMode.rawValue,
             fullComputerLogbookMetadata: fullComputerLogbookMetadata,
-            depthSensorSourceTag: depthSensorSourceResolution == .simulation
-                ? DivingRecordEligibilityPolicy.simulatedSourceTag
-                : nil
+            depthSensorSourceTag: depthSensorSourceTagForPersistedSession()
         )
         self.activeDiveExceededSupportedDepth = false
         self.sessionStartedManually = false

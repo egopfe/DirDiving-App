@@ -29,6 +29,11 @@ struct UserImagesView: View {
             imageStore.reload()
             syncDefaultSelection()
         }
+        .onChange(of: imageStore.watchRuntimeSelectedImageName) { _, name in
+            if let name, imageStore.imageNames.contains(name) {
+                selectedName = name
+            }
+        }
         .onChange(of: imageStore.imageNames) { _, names in
             if let selectedName, !names.contains(selectedName) {
                 self.selectedName = nil

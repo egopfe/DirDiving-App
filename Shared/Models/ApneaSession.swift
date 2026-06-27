@@ -161,6 +161,8 @@ struct ApneaSession: Identifiable, Codable, Hashable, Sendable {
     var equipment: ApneaEquipmentProfile?
     var profile: ApneaProfile?
     var warnings: [ApneaSessionWarning]
+    var depthSampleSource: String?
+    var depthCapabilityMode: String?
 
     init(
         id: UUID = UUID(),
@@ -176,7 +178,9 @@ struct ApneaSession: Identifiable, Codable, Hashable, Sendable {
         buddy: ApneaBuddyInfo? = nil,
         equipment: ApneaEquipmentProfile? = nil,
         profile: ApneaProfile? = nil,
-        warnings: [ApneaSessionWarning] = []
+        warnings: [ApneaSessionWarning] = [],
+        depthSampleSource: String? = nil,
+        depthCapabilityMode: String? = nil
     ) {
         self.id = id
         self.schemaVersion = schemaVersion
@@ -192,6 +196,8 @@ struct ApneaSession: Identifiable, Codable, Hashable, Sendable {
         self.equipment = equipment
         self.profile = profile
         self.warnings = warnings
+        self.depthSampleSource = depthSampleSource
+        self.depthCapabilityMode = depthCapabilityMode
     }
 
     enum CodingKeys: String, CodingKey {
@@ -209,6 +215,8 @@ struct ApneaSession: Identifiable, Codable, Hashable, Sendable {
         case equipment
         case profile
         case warnings
+        case depthSampleSource
+        case depthCapabilityMode
     }
 
     init(from decoder: Decoder) throws {
@@ -234,6 +242,8 @@ struct ApneaSession: Identifiable, Codable, Hashable, Sendable {
         try container.encodeIfPresent(equipment, forKey: .equipment)
         try container.encodeIfPresent(profile, forKey: .profile)
         try container.encode(warnings, forKey: .warnings)
+        try container.encodeIfPresent(depthSampleSource, forKey: .depthSampleSource)
+        try container.encodeIfPresent(depthCapabilityMode, forKey: .depthCapabilityMode)
     }
 
     func refreshedStatistics() -> ApneaSessionStatistics {

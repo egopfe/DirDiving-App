@@ -73,16 +73,3 @@ struct DeveloperSettingsView: View {
         DeveloperSettings.persistSensorSource(mode)
     }
 }
-
-private extension SensorSourceMode {
-    var displayName: String {
-        switch self {
-        case .automatic:
-            return DIRIOSLocalizer.string("developer.sensor_source.automatic")
-        case .appleSensor:
-            return DIRIOSLocalizer.string("developer.sensor_source.apple_sensor")
-        case .simulation:
-            return DIRIOSLocalizer.string("developer.sensor_source.simulation")
-        }
-    }
-}

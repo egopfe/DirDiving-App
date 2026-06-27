@@ -19,6 +19,7 @@ struct DIRDivingApp: App {
     @StateObject private var explorationStore: ExplorationStore
     @StateObject private var buddyAssist: BuddyAssistService
     @StateObject private var plannerBriefingStore: PlannerBriefingCardStore
+    @StateObject private var underwaterActionRouter: WatchUnderwaterActionRouter
     @StateObject private var legalAcceptance = LegalAcceptanceStore()
     @AppStorage(DIRAppLanguage.storageKey) private var appLanguage = DIRAppLanguage.system.rawValue
 
@@ -34,12 +35,15 @@ struct DIRDivingApp: App {
         let snorkelingRuntimeStore = SnorkelingWatchRuntimeStore()
         let snorkelingLogbookStore = SnorkelingLogbookStore()
         let plannerBriefingStore = PlannerBriefingCardStore()
+        let compassManager = CompassManager()
+        let imageStore = UserImageStore()
+        let diveManager = DiveManager(logStore: logStore, gpsManager: gpsManager, ascentSettings: ascentSettings)
         _logStore = StateObject(wrappedValue: logStore)
         _apneaLogbookStore = StateObject(wrappedValue: apneaLogbookStore)
         _gpsManager = StateObject(wrappedValue: gpsManager)
-        _compassManager = StateObject(wrappedValue: CompassManager())
-        _diveManager = StateObject(wrappedValue: DiveManager(logStore: logStore, gpsManager: gpsManager, ascentSettings: ascentSettings))
-        _imageStore = StateObject(wrappedValue: UserImageStore())
+        _compassManager = StateObject(wrappedValue: compassManager)
+        _diveManager = StateObject(wrappedValue: diveManager)
+        _imageStore = StateObject(wrappedValue: imageStore)
         _ascentSettings = StateObject(wrappedValue: ascentSettings)
         _diveReminderSettings = StateObject(wrappedValue: diveReminderSettings)
         _navigationStore = StateObject(wrappedValue: navigationStore)
@@ -51,11 +55,22 @@ struct DIRDivingApp: App {
         _explorationStore = StateObject(wrappedValue: ExplorationStore())
         _buddyAssist = StateObject(wrappedValue: BuddyAssistService())
         _plannerBriefingStore = StateObject(wrappedValue: plannerBriefingStore)
+        _underwaterActionRouter = StateObject(
+            wrappedValue: WatchUnderwaterActionRouter(
+                navigation: navigationStore,
+                dive: diveManager,
+                compass: compassManager,
+                activitySelection: activitySelectionStore,
+                apneaRuntime: apneaRuntimeStore,
+                imageStore: imageStore
+            )
+        )
         WatchSyncService.shared.attachLogStore(logStore)
         WatchSyncService.shared.attachPlannerBriefingStore(plannerBriefingStore)
         WatchSyncService.shared.attachApneaLogbookStore(apneaLogbookStore)
         SensorSourceMode.applyReleaseSafeMigrationIfNeeded()
         FullComputerPrediveConfigurationStore.migrateIfNeeded()
+        WatchWaterAutoOpenPolicy.migrateIfNeeded()
     }
 
     var body: some Scene {
@@ -94,6 +109,7 @@ struct DIRDivingApp: App {
             .environmentObject(explorationStore)
             .environmentObject(buddyAssist)
             .environmentObject(plannerBriefingStore)
+            .environmentObject(underwaterActionRouter)
             .environmentObject(legalAcceptance)
             .environment(\.locale, DIRAppLanguage.fromStorage(appLanguage).locale)
         }

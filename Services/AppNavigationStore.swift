@@ -7,11 +7,13 @@ final class AppNavigationStore: ObservableObject {
 
     @Published var selectedPage: AppPage = .modeSelection
     @Published var underwaterNavigationToast: String?
+    @Published var hardwareActionToast: String?
     @Published var exportCompletionPresented = false
     @Published var exportCompletionFileName = "export.csv"
     @Published var exportCompletionURL: URL?
 
     private var underwaterToastTask: Task<Void, Never>?
+    private var hardwareToastTask: Task<Void, Never>?
 
     init() {
         Self.shared = self
@@ -46,6 +48,17 @@ final class AppNavigationStore: ObservableObject {
             try? await Task.sleep(nanoseconds: 2_200_000_000)
             if !Task.isCancelled {
                 underwaterNavigationToast = nil
+            }
+        }
+    }
+
+    func reportHardwareActionToast(_ message: String) {
+        hardwareActionToast = message
+        hardwareToastTask?.cancel()
+        hardwareToastTask = Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 1_800_000_000)
+            if !Task.isCancelled {
+                hardwareActionToast = nil
             }
         }
     }
