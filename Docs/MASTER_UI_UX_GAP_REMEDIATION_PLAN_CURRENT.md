@@ -1,144 +1,87 @@
 # Master UI/UX Gap Remediation Plan — Current
 
-**Audit:** Command 03 — Master UI/UX Full Deep Comprehensive Audit V2.0  
-**Date:** 2026-06-22  
-**Branch:** `main`  
-**Commit:** `1f62235`  
-**Open findings:** P0 0 · P1 5 · P2 5 · P3 3 · P4 2
-
-Prior P0 **UI16-P0-001** (altitude environment silently discarded on Watch) is **CLOSED** at `1f62235` via `OrchestratedAltitudeEnvironmentTests` and predive environment UI. No P0 UI/UX blockers remain in source.
+**Audit:** `03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.1.md`  
+**Date:** 2026-06-27  
+**Commit:** `83f884e`  
+**Open findings:** P0=0, P1=8, P2=11, P3=4, P4=2
 
 ---
 
 ## P0 — Must fix before any safety-critical use
 
-**None open.**
-
-| ID | Status | Notes |
-|----|--------|-------|
-| UI16-P0-001 | **CLOSED @ 1f62235** | Imported altitude/salinity propagate to `runtimePlan()`; invalid packages rejected |
+**None open.** Prior P0 altitude/environment mismatch remains closed.
 
 ---
 
 ## P1 — Must fix before internal TestFlight
 
-### MUIUX-P1-001 — Physical Watch and iPhone UI QA pending
+| ID | Title | Remediation | Acceptance criteria | Tests | Physical QA |
+|----|-------|-------------|---------------------|-------|-------------|
+| P1-WAO-001 | Water auto-open not wired to cold launch | Wire watchOS water-entry/auto-launch callback to `beginWaterAutoLaunch()` **or** revise all Settings/marketing copy to state intent-only routing | User with Preferred Mode sees correct destination when watchOS launches app after water entry; OR copy explicitly documents intent requirement | Integration test for launch path; existing policy tests pass | WATCH_WATER_AUTO_OPEN_* packs |
+| P1-WAO-002 | Cold-launch limitation not in Settings UI | Add localized string in `WatchWaterAutoOpenSettingsView` footer | Settings show submersion detection limits without opening impl report | L10n audit | n/a |
+| P1-AB-001 | Legacy App Intents bypass underwater router | Route legacy intents through router when session active; or mark shortcuts surface-only in catalog + help | Action Button with **Underwater Action** is only recommended underwater path; legacy intents documented | Extend `ActionButtonIntentsSafetyTests` | ACTION_BUTTON QA pack |
+| MUIUX-P1-001 | Apnea/Snorkeling physical underwater QA | Execute physical session QA templates | Evidence folders filled with device logs/screenshots | n/a | Required |
+| MUIUX-P1-002 | Paired Watch↔iOS sync UI QA | Execute WATCH_IOS_SYNC evidence pack | Conflict/transfer states verified on paired devices | n/a | Required |
+| MUIUX-P1-003 | Accessibility manual QA | VoiceOver pass on critical flows | A11Y evidence for Planner, Watch Live, Settings switch | n/a | Required |
+| MUIUX-P1-004 | PDF render physical QA | Render Planner/Checklist PDFs on device | PDF matches UI values; disclaimers present | n/a | Required |
+| MVR-P1-002 | No physical pixel-diff baselines | Capture simulator/device screenshots vs 59 mockups | PHYSICAL_PIXEL_DIFF folder populated | n/a | Recommended |
 
-- **Affected:** All live surfaces, smallest Watch layout, Apnea underwater, Snorkeling GPS, multi-banner density.
-- **Remediation:** Execute scenarios in `WATCH_ULTRA`, `APNEA_WATCH_ULTRA`, `SNORKELING_WATCH_LAYOUTS`, `IOS_ACCESSIBILITY`, `IOS_PLANNER` evidence folders.
-- **Acceptance:** Signed artifacts per `EVIDENCE_TEMPLATE.md`; no clipping of safety-critical metrics on 41 mm.
-- **Tests:** Manual QA only; retain existing `SmallestWatchLayoutContractTests`.
-- **Physical QA:** **Required**
-- **Rerun audits:** Master UI/UX (03), Audit 12, Audit 16
-
-### MUIUX-P1-002 — Paired Watch↔iOS sync UI QA pending
-
-- **Affected:** Briefing card transfer states, image delete ACK, sync conflict UI, iCloud restore messaging.
-- **Remediation:** Paired-device journeys documented in `WATCH_IOS_SYNC`, `ICLOUD_TWO_DEVICE`.
-- **Acceptance:** UI shows pending/failed/stale truthfully; iOS never shows delete success before Watch ACK.
-- **Physical QA:** **Required** (paired devices)
-- **Rerun audits:** 8, 9, 12, Master UI/UX
-
-### MUIUX-P1-003 — Accessibility manual QA pending
-
-- **Affected:** Planner tabs, CCR controls, gas ledger, charts, checklist, Watch live overlays, Settings mode switch.
-- **Remediation:** VoiceOver + Dynamic Type XL passes on physical iPhone and Watch.
-- **Acceptance:** Safety-critical states not color-only; chart summaries audible.
-- **Physical QA:** **Required**
-- **Rerun audits:** 11, Master UI/UX
-
-### MUIUX-P1-004 — PDF render and external release evidence pending
-
-- **Affected:** Planner PDF, checklist PDF, briefing card PNG, export/share sheets.
-- **Remediation:** Populate `PDF_RENDER`, `LEGAL_REVIEW`, `APP_STORE_MARKETING`.
-- **Acceptance:** Rendered values match UI; disclaimers present; no certification implication.
-- **Physical QA:** Device PDF preview required
-- **Rerun audits:** 13, Master UI/UX
-
-### MUIUX-P1-005 — Executable build/test evidence @ HEAD inconclusive
-
-- **Affected:** Release confidence for commit `1f62235`.
-- **Remediation:** Sequential macOS build: iOS app, Watch app, both algorithm test schemes; `./Scripts/validate_ui_ux_readiness.sh`.
-- **Acceptance:** BUILD SUCCEEDED + tests green @ HEAD.
-- **Rerun audits:** 12, Master UI/UX
+**Rerun after remediation:** Master UI/UX audit V2.1; Watch water auto-open audit; underwater hardware audit.
 
 ---
 
 ## P2 — Must fix before external TestFlight
 
-### MUIUX-P2-001 — Physical pixel-diff baselines absent (0/59)
-
-- **Remediation:** Capture device screenshots; optional snapshot PNG baselines for 20 iOS raster entries.
-- **Acceptance:** `MASTER_VISUAL_REGRESSION_COVERAGE_MATRIX` Physical_Pixel_Diff = captured for primary screens.
-- **Rerun audits:** 14, Master UI/UX
-
-### MUIUX-P2-002 — Manual on-device visual fidelity not scored
-
-- **Remediation:** Score all 59 mockups NOT_SCORED_DEVICE → PASS/PARTIAL/FAIL on reference devices.
-- **Acceptance:** Documented scores in visual regression matrix.
-- **Physical QA:** Required
-
-### MUIUX-P2-003 — Historical documentation contradicts current multi-activity scope
-
-- **Affected:** `Docs/README.md`, `Docs/INDEX.md` historical sections still mention Apnea/Snorkeling as experimental.
-- **Remediation:** Mark historical sections explicitly or archive; align INDEX baseline to `1f62235`.
-- **Acceptance:** No reader path from current INDEX to obsolete scope without warning.
-- **Rerun audits:** 6, Master UI/UX
-
-### MUIUX-P2-004 — Ascent speed settings discoverability
-
-- **Affected:** `PlannerAscentSpeedSettingsView` reachable only via Diving `MoreView`.
-- **Remediation:** Add Planner header link or inline disclosure (UX-only).
-- **Acceptance:** User can discover ascent speeds from Planner without searching More.
-- **Rerun audits:** Master UI/UX
-
-### MUIUX-P2-005 — iOS dashboard last-session card mockup partial fidelity
-
-- **Affected:** `APNEA_IOS_01`, `SNORKELING_IOS_01` dashboard cards.
-- **Remediation:** Pixel review vs mockups; adjust layout if needed.
-- **Acceptance:** Functional links + visual parity on reference iPhone.
-- **Rerun audits:** 14, Master UI/UX
+| ID | Title | Remediation |
+|----|-------|-------------|
+| P2-UX-001 | Stale underwater help body | Update `shortcuts.help.underwater.body` EN/IT |
+| P2-UX-002 | Missing Underwater Action help panel | Add panel to `WatchShortcutHelpView` |
+| P2-UX-003 | Diving-centric blocked-nav toast | Activity-neutral or per-activity `nav.underwater.blocked` strings |
+| P2-TEST-001 | Missing lastSelected FC predive test | Add to `WatchWaterAutoOpenPolicyTests` |
+| P2-TEST-002 | Stale WatchSettingsRoutingTests | Update assertion to `WatchUnderwaterPagePolicy` |
+| P2-TEST-003 | Missing ContentView clamp tests | Add integration tests for blocked pages |
+| MUIUX-P2-001 | CCR external validation UX | Keep reference-only copy; no controller implication |
+| MUIUX-P2-002 | Watch FC pixel baselines | Device captures for FC_UI mockups |
+| MUIUX-P2-003 | Localization scanner path | Fix portable scanner if CI gap |
+| MUIUX-P2-004 | Ascent speed not linked from Planner | Add discoverable link from Planner header |
+| MVR-P2-002 | Manual visual fidelity 0/59 | Score mockups in MANUAL_VISUAL_FIDELITY |
+| MVR-P2-004 | 41 mm physical layout | Smallest Watch hardware QA |
 
 ---
 
 ## P3 — App Store polish
 
-| ID | Item | Remediation |
-|----|------|-------------|
-| MUIUX-P3-001 | `mockups/README.md` states assets maintained outside repo | Update README — all 59 PNGs exist locally |
-| MUIUX-P3-002 | 2 legacy PNGs in `Docs/ReferenceUI/` | Archive or index as non-canonical |
-| MUIUX-P3-003 | Watch dive detail dates not locale-adaptive | Use locale-aware formatting in `DiveDetailView` |
+| ID | Title |
+|----|-------|
+| MUIUX-P3-001 | Duplicate Legal link in Diving iOS settings |
+| MUIUX-P3-002 | Settings scope vs runtime activity mismatch UX hint |
+| MUIUX-P3-003 | Diving gear tab vs Apnea/Snorkeling settings asymmetry |
+| MUIUX-P3-004 | Shared settings layout inconsistency across modes |
 
 ---
 
-## P4 — Optional enhancements
+## P4 — Optional
 
-| ID | Item |
-|----|------|
-| MUIUX-P4-001 | Mission Mode discoverability on Watch Live |
-| MUIUX-P4-002 | Reminder suppression policy copy in Settings |
+| ID | Title |
+|----|-------|
+| MUIUX-P4-001 | Mission Mode discoverability |
+| MUIUX-P4-002 | Reminder suppression copy |
 
 ---
 
 ## Full Computer remediation rule
 
-Any future change affecting Watch Full Computer live decompression UI or environment propagation must rerun:
+Any fix touching Full Computer live UI or predive flow must rerun:
 
-1. Watch Full Computer forensic audit (Audit 15 / 01W)
-2. Master UI/UX audit (Command 03)
+- `MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_CURRENT.md`
+- Master UI/UX audit V2.1
 
 ---
 
-## Recommended execution order
+## Suggested execution order
 
-1. **MUIUX-P1-005** — Confirm builds/tests @ HEAD (unblocks evidence claims)
-2. **MUIUX-P1-001 + P1-002 + P1-003** — Physical and paired QA campaigns
-3. **MUIUX-P1-004** — PDF/legal/marketing evidence
-4. **MUIUX-P2-001 + P2-002** — Visual regression baselines
-5. **MUIUX-P2-003** — Documentation clarity
-6. P3/P4 polish before App Store
-
-**Release blockers for external TestFlight:** MUIUX-P1-001, MUIUX-P1-002, MUIUX-P1-003, MUIUX-P1-004  
-**Release blockers for App Store:** all P1 + P2 + legal/marketing gates
-
-No production code was modified by this audit.
+1. P1-WAO-001 + P1-WAO-002 (truthfulness)
+2. P1-AB-001 + P2-UX-001/002/003 (underwater UX coherence)
+3. P2-TEST-* (test debt)
+4. Physical QA packs (parallel)
+5. MVR pixel diff + manual fidelity (external TestFlight gate)

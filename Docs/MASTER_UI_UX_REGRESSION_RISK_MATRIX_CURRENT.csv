@@ -11,3 +11,8 @@ REG-009,Accessibility,UI remediation waves,Safety state color-only,Semantic cont
 REG-010,Visual pixel regression,Mockup audit,Layout drift undetected,Software fixtures 59/59; pixel baselines 0/59,Gap remains,P2,MUIUX-P2-001,OPEN,
 REG-011,Build verification @ HEAD,Audit execution,Unverified commit buildability,xcodebuild DerivedData lock then long isolated build,PARTIAL,P1,MUIUX-P1-005,OPEN,First attempt DB locked; isolated build inconclusive at report time
 REG-012,Planner ascent speed discoverability,UX polish,Users miss ascent settings in More only,Source routing audit,Open,P2,MUIUX-P2-004,OPEN,
+REG-V21-001,Water auto-open cold launch,Watch,High,P1-WAO-001,New feature wiring incomplete
+REG-V21-002,Legacy App Intents vs router,Watch,Medium,P1-AB-001,Dual shortcut paths
+REG-V21-003,Underwater crown policy,Watch,Low,,Regression-free vs prior main
+REG-V21-004,iOS settings mode switch,iOS,Low,,Stable since 1f62235
+REG-V21-005,Logbook ownership,iOS+Watch,Low,,Six forbidden routes still blocked

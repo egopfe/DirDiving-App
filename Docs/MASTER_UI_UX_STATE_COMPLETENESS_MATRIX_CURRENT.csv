@@ -15,3 +15,7 @@ ST-013,Watch+iOS,Global,Accessibility states,yes,n/a,n/a,yes,partial,n/a,n/a,n/a
 ST-014,Watch+iOS,Global,Image transfer/delete,yes,yes,yes,yes,yes,yes,yes,n/a,n/a,yes,n/a,yes,yes,yes,yes,yes,partial,PARTIAL,P1,MUIUX-P1-002,Watch ACK truthfulness; paired QA PENDING
 ST-015,iOS,Diving,PDF/share/export,yes,yes,yes,yes,yes,yes,n/a,yes,n/a,yes,n/a,n/a,yes,yes,yes,yes,yes,PARTIAL,P1,MUIUX-P1-004,Physical PDF render PENDING
 ST-016,Watch,Diving Full Computer,Sensor simulation,yes,n/a,n/a,yes,yes,yes,n/a,yes,n/a,yes,yes,n/a,n/a,n/a,yes,yes,yes,n/a,partial,PASS,,,Simulation badges visible; developer gated
+ST-UW-001,Watch underwater blocked nav,Watch,toast,yes,partial,P2-UX-003,Copy gap
+ST-UW-002,Watch action unavailable,Watch,toast+haptic,yes,yes,,
+ST-WAO-001,Water auto-open disabled,Watch,settings,yes,yes,,
+ST-WAO-002,Water auto-open blocked active session,Watch,toast,yes,yes,,
