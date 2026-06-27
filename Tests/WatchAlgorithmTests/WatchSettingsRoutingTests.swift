@@ -24,7 +24,8 @@ final class WatchSettingsRoutingTests: XCTestCase {
         let source = try String(contentsOf: repositoryRoot().appendingPathComponent("Views/ContentView.swift"))
         XCTAssertTrue(source.contains("WatchUnderwaterNavigationClampPolicy.clampIfNeeded"))
         XCTAssertTrue(source.contains("reportUnderwaterNavigationBlocked(activity:"))
-        XCTAssertTrue(source.contains("beginInitialLaunch(entry: .userColdLaunch)"))
+        XCTAssertTrue(source.contains("beginInitialLaunchIfNeeded()"))
+        XCTAssertTrue(source.contains("!showLaunchDisclaimer && activitySelection.isStartupFlowActive"))
         XCTAssertFalse(source.contains("page != .live && page != .compass"))
     }
 
