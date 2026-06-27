@@ -41,8 +41,9 @@ final class AppNavigationStore: ObservableObject {
         exportCompletionPresented = true
     }
 
-    func reportUnderwaterNavigationBlocked() {
-        underwaterNavigationToast = String(localized: "nav.underwater.blocked")
+    func reportUnderwaterNavigationBlocked(activity: DIRActivityMode = .diving) {
+        let key = WatchUnderwaterNavigationClampPolicy.blockedMessageKey(activity: activity)
+        underwaterNavigationToast = String(localized: String.LocalizationValue(key))
         underwaterToastTask?.cancel()
         underwaterToastTask = Task { @MainActor in
             try? await Task.sleep(nanoseconds: 2_200_000_000)
@@ -50,6 +51,12 @@ final class AppNavigationStore: ObservableObject {
                 underwaterNavigationToast = nil
             }
         }
+    }
+
+    func blockedNavigationAccessibilityLabel(activity: DIRActivityMode) -> String {
+        String(localized: String.LocalizationValue(
+            WatchUnderwaterNavigationClampPolicy.blockedAccessibilityKey(activity: activity)
+        ))
     }
 
     func reportHardwareActionToast(_ message: String) {

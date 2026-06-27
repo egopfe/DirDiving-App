@@ -68,16 +68,17 @@ struct ContentView: View {
         }
         .onChange(of: navigation.selectedPage) { _, page in
             guard isAnySessionActive else { return }
-            let allowed = WatchUnderwaterPagePolicy.allowedPages(
+            let result = WatchUnderwaterNavigationClampPolicy.clampIfNeeded(
+                selectedPage: page,
                 activity: activitySelection.selectedActivity,
                 divingMode: activitySelection.selectedDivingMode,
                 isSessionActive: true,
                 hasUserImages: !imageStore.imageNames.isEmpty,
                 includeModeSelection: WatchModeSelectionPreferences.hasMultipleStableModes
             )
-            if !allowed.contains(page) {
-                navigation.reportUnderwaterNavigationBlocked()
-                navigation.selectedPage = .live
+            if result.wasBlocked {
+                navigation.reportUnderwaterNavigationBlocked(activity: activitySelection.selectedActivity)
+                navigation.selectedPage = result.page
             }
         }
         .overlay(alignment: .topTrailing) {
@@ -95,7 +96,12 @@ struct ContentView: View {
         }
         .overlay(alignment: .bottom) {
             if let toast = navigation.underwaterNavigationToast {
-                navigationToast(toast)
+                navigationToast(
+                    toast,
+                    accessibilityLabel: navigation.blockedNavigationAccessibilityLabel(
+                        activity: activitySelection.selectedActivity
+                    )
+                )
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
@@ -111,7 +117,7 @@ struct ContentView: View {
         .launchCompanionDisclaimer(isPresented: $showLaunchDisclaimer)
         .onAppear {
             if !activitySelection.sessionConfigured, !activitySelection.isStartupFlowActive {
-                activitySelection.beginColdLaunch()
+                activitySelection.beginInitialLaunch(entry: .userColdLaunch)
             }
         }
         .fullScreenCover(isPresented: startupFlowPresented) {
@@ -148,7 +154,7 @@ struct ContentView: View {
         )
     }
 
-    private func navigationToast(_ message: String) -> some View {
+    private func navigationToast(_ message: String, accessibilityLabel: String? = nil) -> some View {
         Text(message)
             .font(DiveUI.Typography.hintCaptionBold)
             .foregroundStyle(DiveUI.yellow)
@@ -168,7 +174,7 @@ struct ContentView: View {
             .padding(.bottom, 6)
             .accessibilityElement(children: .combine)
             .accessibilityAddTraits(.isStaticText)
-            .accessibilityLabel(String(localized: "nav.underwater.blocked.a11y.label"))
+            .accessibilityLabel(accessibilityLabel ?? String(localized: "nav.toast.a11y.generic"))
             .accessibilityValue(message)
     }
 
