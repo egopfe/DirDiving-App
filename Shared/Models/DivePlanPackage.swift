@@ -105,6 +105,8 @@ struct DivePlanPackageBody: Codable, Hashable {
     var environment: DivePlanEnvironmentPayload
     var gfLow: Double
     var gfHigh: Double
+    /// Optional Watch preset id (`conservative2080`, `standard3070`, `moderate4085`). Legacy packages omit this field.
+    var gradientFactorPreset: String?
     var gases: [DivePlanGasPayload]
     var bottomSegments: [DivePlanBottomSegmentPayload]
     var plannedSwitches: [DivePlanGasSwitchPayload]

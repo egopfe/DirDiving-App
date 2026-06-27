@@ -464,6 +464,20 @@ struct SettingsView: View {
             .buttonStyle(.plain)
             .disabled(dive.isDiveActive)
 
+            NavigationLink {
+                FullComputerDivingSettingsView()
+            } label: {
+                settingsRow(
+                    icon: "water.waves",
+                    iconColor: DiveUI.green,
+                    title: String(localized: "settings.section.full_computer"),
+                    subtitle: fullComputerSettingsSubtitle,
+                    showsChevron: true
+                )
+            }
+            .buttonStyle(.plain)
+            .disabled(dive.isDiveActive)
+
             WatchSettingsSectionHeader(title: String(localized: "settings.section.gauge"))
 
             WatchFullComputerAltitudeSensorSettingsSection()
@@ -530,6 +544,13 @@ struct SettingsView: View {
         case .gauge: return String(localized: "startup.diving_mode.gauge.title")
         case .fullComputer: return String(localized: "startup.diving_mode.full_computer.title")
         }
+    }
+
+    private var fullComputerSettingsSubtitle: String {
+        FullComputerPrediveConfigurationStore.shared
+            .resolvedGradientFactorsForRuntime()
+            .preset
+            .settingsSummary
     }
 
     private var missionModeStatusText: String {
