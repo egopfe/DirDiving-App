@@ -19,6 +19,9 @@ struct ToggleStopwatchIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
             try requireLegalAcceptanceForSafetyIntent()
+            if try WatchIntentSafetyPolicy.routePrimaryActionIfUnderwaterSession() {
+                return
+            }
             guard let manager = DiveManager.shared else {
                 throw DIRDivingShortcutError.appStateUnavailable
             }
@@ -37,6 +40,7 @@ struct ResetStopwatchIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
             try requireLegalAcceptanceForSafetyIntent()
+            try WatchIntentSafetyPolicy.requireNoActiveUnderwaterSessionForLegacyIntent()
             guard let manager = DiveManager.shared else {
                 throw DIRDivingShortcutError.appStateUnavailable
             }
@@ -58,6 +62,7 @@ struct StartManualDiveIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
             try requireLegalAcceptanceForSafetyIntent()
+            try WatchIntentSafetyPolicy.requireNoActiveUnderwaterSessionForLegacyIntent()
             guard let manager = DiveManager.shared else {
                 throw DIRDivingShortcutError.appStateUnavailable
             }
@@ -76,6 +81,7 @@ struct EndManualDiveIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
             try requireLegalAcceptanceForSafetyIntent()
+            try WatchIntentSafetyPolicy.requireActiveDivingSessionForEndManualDive()
             guard let manager = DiveManager.shared else {
                 throw DIRDivingShortcutError.appStateUnavailable
             }
@@ -94,6 +100,9 @@ struct SetBearingIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
             try requireLegalAcceptanceForSafetyIntent()
+            if try WatchIntentSafetyPolicy.routePrimaryActionIfUnderwaterSession() {
+                return
+            }
             guard let compass = CompassManager.shared else {
                 throw DIRDivingShortcutError.appStateUnavailable
             }
@@ -113,6 +122,7 @@ struct ClearBearingIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
             try requireLegalAcceptanceForSafetyIntent()
+            try WatchIntentSafetyPolicy.requireNoActiveUnderwaterSessionForLegacyIntent()
             guard let compass = CompassManager.shared else {
                 throw DIRDivingShortcutError.appStateUnavailable
             }
@@ -132,6 +142,9 @@ struct AcknowledgeAlarmIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
             try requireLegalAcceptanceForSafetyIntent()
+            if try WatchIntentSafetyPolicy.routePrimaryActionIfUnderwaterSession() {
+                return
+            }
             guard let manager = DiveManager.shared else {
                 throw DIRDivingShortcutError.appStateUnavailable
             }
@@ -151,6 +164,9 @@ struct OpenWaterAutoLaunchModeIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         try await MainActor.run {
             try requireLegalAcceptanceForSafetyIntent()
+            guard WatchWaterAutoOpenPolicy.mode != .disabled else {
+                throw DIRDivingShortcutError.waterAutoOpenModeDisabled
+            }
             guard let selection = DIRActivitySelectionStore.shared else {
                 throw DIRDivingShortcutError.appStateUnavailable
             }
@@ -179,25 +195,28 @@ struct ExecuteUnderwaterPrimaryActionIntent: AppIntent {
     }
 }
 
-private enum DIRDivingShortcutError: LocalizedError {
-    case appStateUnavailable
-    case stopwatchResetBlocked
-    case legalAcceptanceRequired
-
-    var errorDescription: String? {
-        switch self {
-        case .appStateUnavailable:
-            return String(localized: "shortcut.error.app_unavailable")
-        case .stopwatchResetBlocked:
-            return String(localized: "shortcut.error.stopwatch_reset_blocked")
-        case .legalAcceptanceRequired:
-            return String(localized: "shortcut.error.legal_acceptance_required")
-        }
-    }
-}
-
 struct DIRDivingAppShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
+        AppShortcut(
+            intent: ExecuteUnderwaterPrimaryActionIntent(),
+            phrases: [
+                "Execute underwater action in \(.applicationName)",
+                "Press DIR Diving action in \(.applicationName)",
+                "Run primary water action in \(.applicationName)"
+            ],
+            shortTitle: LocalizedStringResource("intent.shortcut.underwater_primary_action"),
+            systemImageName: "button.programmable"
+        )
+        AppShortcut(
+            intent: OpenWaterAutoLaunchModeIntent(),
+            phrases: [
+                "Open water mode in \(.applicationName)",
+                "Open last water mode in \(.applicationName)",
+                "Open preferred water mode in \(.applicationName)"
+            ],
+            shortTitle: LocalizedStringResource("intent.shortcut.water_auto_open"),
+            systemImageName: "drop.fill"
+        )
         AppShortcut(
             intent: ToggleStopwatchIntent(),
             phrases: [
@@ -245,26 +264,6 @@ struct DIRDivingAppShortcuts: AppShortcutsProvider {
             phrases: ["Acknowledge alarm in \(.applicationName)"],
             shortTitle: LocalizedStringResource("intent.shortcut.ack_alarm"),
             systemImageName: "bell.slash"
-        )
-        AppShortcut(
-            intent: OpenWaterAutoLaunchModeIntent(),
-            phrases: [
-                "Open water mode in \(.applicationName)",
-                "Open last water mode in \(.applicationName)",
-                "Open preferred water mode in \(.applicationName)"
-            ],
-            shortTitle: LocalizedStringResource("intent.shortcut.water_auto_open"),
-            systemImageName: "drop.fill"
-        )
-        AppShortcut(
-            intent: ExecuteUnderwaterPrimaryActionIntent(),
-            phrases: [
-                "Execute underwater action in \(.applicationName)",
-                "Press DIR Diving action in \(.applicationName)",
-                "Run primary water action in \(.applicationName)"
-            ],
-            shortTitle: LocalizedStringResource("intent.shortcut.underwater_primary_action"),
-            systemImageName: "button.programmable"
         )
     }
 }

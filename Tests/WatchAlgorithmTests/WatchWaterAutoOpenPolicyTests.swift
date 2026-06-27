@@ -69,6 +69,38 @@ final class WatchWaterAutoOpenPolicyTests: XCTestCase {
         )
     }
 
+    func testLastSelectedFullComputerRoutesPrediveConfiguration() {
+        WatchWaterAutoOpenPolicy.recordSelectedDestination(activity: .diving, divingMode: .fullComputer)
+        WatchWaterAutoOpenPolicy.mode = .lastSelectedMode
+        XCTAssertEqual(
+            DIRStartupSelectionPolicy.resolveWaterAutoLaunchStep(),
+            .fullComputerPrediveConfiguration
+        )
+    }
+
+    func testBeginInitialLaunchColdLaunchDoesNotApplyWaterRouting() {
+        let store = DIRActivitySelectionStore()
+        WatchWaterAutoOpenPolicy.mode = .preferredMode
+        WatchWaterAutoOpenPolicy.preferredDestination = WatchWaterPreferredLaunchDestination(
+            activity: .apnea,
+            divingMode: .gauge
+        )
+        store.beginInitialLaunch(entry: .userColdLaunch)
+        XCTAssertNotEqual(store.selectedActivity, .apnea)
+    }
+
+    func testBeginInitialLaunchWaterIntentAppliesRouting() {
+        let store = DIRActivitySelectionStore()
+        WatchWaterAutoOpenPolicy.mode = .preferredMode
+        WatchWaterAutoOpenPolicy.preferredDestination = WatchWaterPreferredLaunchDestination(
+            activity: .apnea,
+            divingMode: .gauge
+        )
+        store.beginInitialLaunch(entry: .waterAutoLaunchIntent)
+        XCTAssertEqual(store.selectedActivity, .apnea)
+        XCTAssertTrue(store.sessionConfigured)
+    }
+
     func testPreferredDivingGaugeResolvesToReady() {
         WatchWaterAutoOpenPolicy.mode = .preferredMode
         WatchWaterAutoOpenPolicy.preferredDestination = WatchWaterPreferredLaunchDestination(

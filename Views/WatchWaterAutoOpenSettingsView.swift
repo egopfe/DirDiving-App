@@ -1,8 +1,10 @@
 import SwiftUI
 
 struct WatchWaterAutoOpenSettingsView: View {
+    @EnvironmentObject private var activitySelection: DIRActivitySelectionStore
     @State private var selectedMode = WatchWaterAutoOpenPolicy.mode
     @State private var preferredDestination = WatchWaterAutoOpenPolicy.preferredDestination
+    @State private var applyRouteResultMessage: String?
 
     var body: some View {
         ZStack {
@@ -18,7 +20,11 @@ struct WatchWaterAutoOpenSettingsView: View {
                         }
                     }
                     explanationSection
+                    coldLaunchLimitationSection
                     systemLimitationSection
+                    if selectedMode != .disabled {
+                        applyRouteNowSection
+                    }
                     if selectedMode == .preferredMode,
                        preferredDestination.activity == .diving,
                        preferredDestination.divingMode == .fullComputer {
@@ -146,6 +152,63 @@ struct WatchWaterAutoOpenSettingsView: View {
             body: String(localized: "settings.water_auto_open.explanation"),
             accessibilityLabel: String(localized: "settings.water_auto_open.explanation.a11y")
         )
+    }
+
+    private var coldLaunchLimitationSection: some View {
+        infoBlock(
+            title: nil,
+            body: String(localized: "settings.water_auto_open.cold_launch_limitation"),
+            accessibilityLabel: String(localized: "settings.water_auto_open.cold_launch_limitation.a11y")
+        )
+    }
+
+    private var applyRouteNowSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(String(localized: "settings.water_auto_open.apply_now.explanation"))
+                .font(DiveUI.Typography.hintCaption)
+                .foregroundStyle(DiveUI.mutedText)
+                .fixedSize(horizontal: false, vertical: true)
+            Button {
+                applyConfiguredWaterRouteNow()
+            } label: {
+                Text(String(localized: "settings.water_auto_open.apply_now.button"))
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .foregroundStyle(DiveUI.cyan)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 7)
+                    .background(
+                        RoundedRectangle(cornerRadius: 7, style: .continuous)
+                            .stroke(DiveUI.cyan.opacity(0.65), lineWidth: 1)
+                    )
+            }
+            .buttonStyle(.plain)
+            .disabled(!activitySelection.canChangeModes)
+            .accessibilityLabel(String(localized: "settings.water_auto_open.apply_now.button"))
+            .accessibilityHint(String(localized: "settings.water_auto_open.apply_now.a11y.hint"))
+            if let applyRouteResultMessage {
+                Text(applyRouteResultMessage)
+                    .font(DiveUI.Typography.hintCaption)
+                    .foregroundStyle(DiveUI.yellow)
+                    .accessibilityLabel(applyRouteResultMessage)
+            }
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .background(settingsCardBackground)
+    }
+
+    private func applyConfiguredWaterRouteNow() {
+        guard activitySelection.canChangeModes else {
+            applyRouteResultMessage = String(localized: "settings.water_auto_open.apply_now.blocked")
+            return
+        }
+        guard selectedMode != .disabled else {
+            applyRouteResultMessage = String(localized: "settings.water_auto_open.apply_now.disabled")
+            return
+        }
+        activitySelection.beginWaterAutoLaunch()
+        applyRouteResultMessage = String(localized: "settings.water_auto_open.apply_now.started")
+        HapticService.shared.confirm()
     }
 
     private var systemLimitationSection: some View {

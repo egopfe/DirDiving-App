@@ -53,21 +53,6 @@ struct IOSDivingSettingsEmbeddedContent: View {
                                 }
                                 .buttonStyle(.plain)
                             }
-                            NavigationLink {
-                                IOSLegalSafetyView()
-                            } label: {
-                                HStack {
-                                    Label(DIRIOSLocalizer.string("more.legal_safety"), systemImage: "checkmark.shield")
-                                        .foregroundStyle(DIRTheme.cyan)
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .font(.caption.weight(.bold))
-                                        .foregroundStyle(DIRTheme.muted)
-                                }
-                                .font(.callout.weight(.semibold))
-                                .padding(.vertical, 6)
-                            }
-                            .buttonStyle(.plain)
                         }
 
                         DIRCard(DIRIOSLocalizer.string("more.section.sync_watch"), icon: "applewatch", accent: DIRTheme.cyan) {

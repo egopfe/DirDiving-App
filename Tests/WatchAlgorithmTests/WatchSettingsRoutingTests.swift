@@ -20,10 +20,12 @@ final class WatchSettingsRoutingTests: XCTestCase {
         XCTAssertTrue(WatchInModeSettingsAccessPolicy.canPresentSettings(isSessionActive: false))
     }
 
-    func testContentViewBlocksSettingsDuringActiveSessions() throws {
+    func testContentViewUsesUnderwaterNavigationClampPolicy() throws {
         let source = try String(contentsOf: repositoryRoot().appendingPathComponent("Views/ContentView.swift"))
-        XCTAssertTrue(source.contains("reportUnderwaterNavigationBlocked"))
-        XCTAssertTrue(source.contains("page != .live && page != .compass"))
+        XCTAssertTrue(source.contains("WatchUnderwaterNavigationClampPolicy.clampIfNeeded"))
+        XCTAssertTrue(source.contains("reportUnderwaterNavigationBlocked(activity:"))
+        XCTAssertTrue(source.contains("beginInitialLaunch(entry: .userColdLaunch)"))
+        XCTAssertFalse(source.contains("page != .live && page != .compass"))
     }
 
     private func repositoryRoot() -> URL {
