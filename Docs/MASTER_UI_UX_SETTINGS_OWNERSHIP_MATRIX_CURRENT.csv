@@ -22,3 +22,6 @@ watch_gauge_ttv,Gauge TTV toggle,Diving,Gauge,no,SettingsView,SharedIOSSettingsS
 watch_fc_altitude,FC altitude sensor proposal,Diving,FC,no,SettingsView,WatchFullComputerAltitudeSensorProposalSettingsStore,yes,no,no,no,yes,partial,yes,yes,yes,WatchFullComputerAltitudeSensorSettingsTests,PASS,,,,
 watch_apnea_settings,Apnea in-mode settings,Apnea,Apnea,no,WatchApneaActivitySettingsSection,ApneaSettingsStore,no,yes,no,no,yes,no,yes,yes,yes,WatchSettingsRoutingTests,PASS,Blocked during active session,,,
 watch_snorkeling_settings,Snorkeling in-mode settings,Snorkeling,Snorkeling,no,WatchSnorkelingActivitySettingsSection,SnorkelingSettingsStore,no,no,yes,no,yes,no,yes,yes,yes,WatchSettingsRoutingTests,PASS,Blocked during active session,,,
+WAO-MODE,Water auto-open mode,Global,All,yes,Watch,WatchWaterAutoOpenSettingsView,WatchWaterAutoOpenPolicy,no,no,no,yes,yes,yes,no,yes,yes,yes,partial,P1-WAO-001,Disabled during active dive
+WAO-PREF-ACT,Preferred activity,Global,All,yes,Watch,WatchWaterAutoOpenSettingsView,WatchWaterAutoOpenPolicy,no,no,no,yes,yes,yes,no,yes,yes,yes,yes,,
+WAO-PREF-DIV,Preferred diving mode,Diving,Gauge+FC,no,Watch,WatchWaterAutoOpenSettingsView,WatchWaterAutoOpenPolicy,yes,no,no,yes,yes,yes,no,yes,yes,yes,yes,,Gauge only when Diving preferred

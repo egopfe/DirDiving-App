@@ -25,3 +25,8 @@ NAV-023,Watch,Diving,All,Start dive manual/auto,Live screen,DiveLiveView,End,Dep
 NAV-024,Watch,Diving,All,Images surface,Images tab,UserImagesView,Back/crown,Surface only; blocked underwater,yes,n/a,store,yes,yes,,,
 NAV-025,iOS,Diving,All,Manual dive,Logbook add,ManualDiveEditorView,Save/cancel,Diving logbook,yes,n/a,store,yes,yes,,,
 NAV-026,iOS,Diving,All,Analysis replay,Analysis tab,AnalysisView,Tab/back,Diving-only tissue/narcosis,yes,n/a,store,yes,yes,,,
+NAV-UW-001,Watch,Diving,All,Crown paging active session,ContentView TabView,yes,yes,yes,WatchUnderwaterPagePolicy,yes,partial,P2-TEST-003,Policy tested; integration partial
+NAV-UW-002,Watch,Apnea,Apnea,Live only when active,ApneaView,yes,yes,yes,WatchUnderwaterPagePolicy,yes,yes,,
+NAV-UW-003,Watch,Snorkeling,Snorkeling,Live only when active,SnorkelingView,yes,yes,yes,WatchUnderwaterPagePolicy,yes,yes,,
+NAV-WAO-001,Watch,Global,All,Water auto-open settings,SettingsView,yes,yes,yes,WatchWaterAutoOpenSettingsView,yes,partial,P1-WAO-001,Cold launch wiring gap
+NAV-WAO-002,Watch,Global,All,OpenWaterAutoLaunch intent,Shortcuts,yes,yes,yes,OpenWaterAutoLaunchModeIntent,yes,yes,,Intent path only
