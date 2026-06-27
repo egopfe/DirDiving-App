@@ -31,20 +31,37 @@ final class DIRActivitySelectionStore: ObservableObject {
         applyLaunchStep(DIRStartupSelectionPolicy.resolveLaunchStep())
     }
 
+    /// Routes startup for the given launch entry. Normal cold launch never applies water auto-open routing.
+    func beginInitialLaunch(entry: WatchLaunchEntryPoint = .userColdLaunch) {
+        sessionConfigured = false
+        if entry == .userColdLaunch {
+            selection = DIRActivitySelectionState(
+                activity: DIRStartupSelectionPolicy.defaultActivityMode,
+                divingMode: DIRStartupSelectionPolicy.defaultDivingMode,
+                fullComputerPrediveConfirmed: false
+            )
+        } else if WatchWaterAutoOpenPolicy.mode != .disabled {
+            selection.fullComputerPrediveConfirmed = false
+            let destination = WatchWaterAutoOpenPolicy.activeDestination()
+            selection.activity = destination.activity
+            selection.divingMode = destination.divingMode
+        } else {
+            selection = DIRActivitySelectionState(
+                activity: DIRStartupSelectionPolicy.defaultActivityMode,
+                divingMode: DIRStartupSelectionPolicy.defaultDivingMode,
+                fullComputerPrediveConfirmed: false
+            )
+        }
+        applyLaunchStep(WatchLaunchRoutingPolicy.resolvedStartupStep(for: entry))
+    }
+
     /// Applies water-entry startup routing without starting a session or bypassing Full Computer predive.
     func beginWaterAutoLaunch() {
         guard canChangeModes else {
             presentModeChangeBlocked()
             return
         }
-        sessionConfigured = false
-        selection.fullComputerPrediveConfirmed = false
-        if WatchWaterAutoOpenPolicy.mode != .disabled {
-            let destination = WatchWaterAutoOpenPolicy.activeDestination()
-            selection.activity = destination.activity
-            selection.divingMode = destination.divingMode
-        }
-        applyLaunchStep(DIRStartupSelectionPolicy.resolveWaterAutoLaunchStep())
+        beginInitialLaunch(entry: .waterAutoLaunchIntent)
     }
 
     func selectActivity(_ activity: DIRActivityMode) {

@@ -2006,6 +2006,7 @@
 "settings.mode_switch.snorkeling" = "Snorkeling";
 "settings.mode_switch.a11y.label" = "Attività impostazioni";
 "settings.mode_switch.a11y.hint" = "Cambia le impostazioni visualizzate. Non avvia una sessione né cambia la modalità sul Watch.";
+"settings.mode_switch.visible_hint" = "Mostra solo le impostazioni dell'attività selezionata. Non cambia l'attività runtime sul Watch.";
 "apnea.settings.title" = "Impostazioni Apnea";
 "apnea.settings.open" = "Apri impostazioni Apnea";
 "apnea.settings.summary" = "Preferenze sessione Apnea e strumenti companion";

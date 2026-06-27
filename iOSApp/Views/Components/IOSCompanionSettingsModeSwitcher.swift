@@ -23,6 +23,10 @@ struct IOSCompanionSettingsModeSwitcher: View {
             .accessibilityLabel(DIRIOSLocalizer.string("settings.mode_switch.a11y.label"))
             .accessibilityValue(label(for: selection))
             .accessibilityHint(DIRIOSLocalizer.string("settings.mode_switch.a11y.hint"))
+            Text(DIRIOSLocalizer.string("settings.mode_switch.visible_hint"))
+                .font(.caption)
+                .foregroundStyle(DIRTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.vertical, 4)
         .accessibilityElement(children: .contain)
