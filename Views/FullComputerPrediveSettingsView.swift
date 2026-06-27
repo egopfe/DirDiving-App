@@ -79,12 +79,20 @@ struct FullComputerPrediveSettingsView: View {
                         .buttonStyle(.plain)
                         .disabled(!canReview)
                     }
-            }
+                }
             .padding(.horizontal, DiveUI.screenPadding)
             .padding(.vertical, 10)
         }
+        }
         .fullComputerPrediveAltitudeSensorLifecycle(configuration: configuration)
-    }
+        .onAppear {
+            FullComputerGradientFactorSettingsStore.shared.syncDraftProfileFromWatchSettingsIfAllowed(
+                isDiveActive: dive.isDiveActive,
+                isApneaActive: ApneaWatchRuntimeStore.shared?.isSessionActive ?? false,
+                isSnorkelingActive: SnorkelingWatchRuntimeStore.shared?.isSessionActive ?? false,
+                isFullComputerRuntimeStarted: dive.hasActiveFullComputerEngine
+            )
+        }
     }
 
     private var bottomGasSection: some View {
@@ -192,19 +200,34 @@ struct FullComputerPrediveSettingsView: View {
     }
 
     private var gfSection: some View {
-        DivePanel(stroke: DiveUI.green) {
-            HStack {
-                Text(String(localized: "startup.fc_confirm.row.gf"))
-                    .font(DiveUI.Typography.rowSubtitle)
-                    .foregroundStyle(DiveUI.secondaryText)
-                Spacer()
-                Text("\(Int(profile.gfLow))/\(Int(profile.gfHigh))")
-                    .font(DiveUI.Typography.rowTitle)
-                    .foregroundStyle(DiveUI.green)
-                    .monospacedDigit()
+        let resolved = configuration.resolvedGradientFactorsForRuntime()
+        return NavigationLink {
+            FullComputerGradientFactorsInfoView()
+        } label: {
+            DivePanel(stroke: DiveUI.green) {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Text(String(localized: "full_computer.gradient_factors.title"))
+                            .font(DiveUI.Typography.rowSubtitle)
+                            .foregroundStyle(DiveUI.secondaryText)
+                        Spacer()
+                        if resolved.isLocked {
+                            Image(systemName: "lock.fill")
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundStyle(DiveUI.orange)
+                        }
+                    }
+                    Text(resolved.confirmSummary)
+                        .font(DiveUI.Typography.rowTitle)
+                        .foregroundStyle(DiveUI.green)
+                    Text(resolved.sourceLine)
+                        .font(DiveUI.Typography.hintCaption)
+                        .foregroundStyle(DiveUI.mutedText)
+                }
+                .padding(.vertical, 6)
             }
-            .padding(.vertical, 6)
         }
+        .buttonStyle(.plain)
     }
 
     private var environmentSection: some View {

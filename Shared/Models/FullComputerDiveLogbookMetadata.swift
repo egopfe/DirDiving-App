@@ -22,6 +22,8 @@ struct FullComputerDiveLogbookMetadata: Codable, Hashable {
     let watchDivingMode: String
     let gfLow: Double
     let gfHigh: Double
+    let gradientFactorPreset: String?
+    let gradientFactorSource: String?
     let gasSwitchEvents: [FullComputerLogbookGasSwitchEvent]
     let minimumNDLMinutes: Double?
     let maximumCeilingMeters: Double
@@ -49,6 +51,8 @@ struct FullComputerDiveLogbookMetadata: Codable, Hashable {
         watchDivingMode: String,
         gfLow: Double,
         gfHigh: Double,
+        gradientFactorPreset: String? = nil,
+        gradientFactorSource: String? = nil,
         gasSwitchEvents: [FullComputerLogbookGasSwitchEvent],
         minimumNDLMinutes: Double?,
         maximumCeilingMeters: Double,
@@ -75,6 +79,8 @@ struct FullComputerDiveLogbookMetadata: Codable, Hashable {
         self.watchDivingMode = watchDivingMode
         self.gfLow = gfLow
         self.gfHigh = gfHigh
+        self.gradientFactorPreset = gradientFactorPreset
+        self.gradientFactorSource = gradientFactorSource
         self.gasSwitchEvents = gasSwitchEvents
         self.minimumNDLMinutes = minimumNDLMinutes
         self.maximumCeilingMeters = maximumCeilingMeters
@@ -102,6 +108,27 @@ struct FullComputerDiveLogbookMetadata: Codable, Hashable {
     var environmentSource: FullComputerEnvironmentSource? {
         guard let environmentSourceRaw else { return nil }
         return FullComputerEnvironmentSource(rawValue: environmentSourceRaw)
+    }
+
+    var resolvedGradientFactorPreset: FullComputerGradientFactorPreset? {
+        if let gradientFactorPreset {
+            return FullComputerGradientFactorPreset(rawValue: gradientFactorPreset)
+        }
+        return FullComputerGradientFactorPreset.matching(low: gfLow, high: gfHigh)
+    }
+
+    var resolvedGradientFactorSource: FullComputerGradientFactorSource? {
+        guard let gradientFactorSource else { return nil }
+        return FullComputerGradientFactorSource(rawValue: gradientFactorSource)
+    }
+
+    var gradientFactorLogbookLine: String? {
+        guard let preset = resolvedGradientFactorPreset else { return nil }
+        let summary = preset.confirmSummary
+        if let source = resolvedGradientFactorSource {
+            return "\(summary)\n\(String(format: String(localized: "full_computer.gradient_factors.source.line_format"), source.localizedLabel))"
+        }
+        return summary
     }
 
     var hasKnownEnvironment: Bool {
