@@ -1,123 +1,90 @@
-# Master UI/UX External and Physical QA Pending — Current
+# Master UI/UX External & Physical QA Pending — Current
 
-**Audit:** Command 03 — Master UI/UX Full Deep Comprehensive Audit V2.0  
-**Date:** 2026-06-22  
-**Branch:** `main`  
-**Commit:** `1f62235`  
-**Policy:** No physical, paired-device, underwater, external validation, or App Store approval is claimed unless signed evidence exists in `Docs/QA_EVIDENCE/`.
+**Audit:** `03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.1.md`  
+**Date:** 2026-06-27  
+**Commit:** `83f884e` on `main`
 
----
-
-## Summary
-
-Software/source UI/UX gates largely pass at commit `1f62235`. All external and physical release gates remain **PENDING**. This document lists every pending gate referenced by the master audit.
-
-| Gate category | Status | Blocking release tier |
-|---------------|--------|----------------------|
-| Physical Apple Watch UI QA | **PENDING_PHYSICAL** | External TestFlight, App Store |
-| Physical iPhone UI QA | **PENDING_PHYSICAL** | External TestFlight, App Store |
-| Paired Watch↔iOS sync UI QA | **PENDING_PAIRED_DEVICE_QA** | External TestFlight |
-| Accessibility manual QA (VoiceOver, Dynamic Type) | **PENDING_PHYSICAL** | External TestFlight |
-| Physical pixel-diff / visual fidelity | **NOT_EXECUTED** | External TestFlight |
-| PDF render on device | **NOT_EXECUTED** | External TestFlight |
-| Underwater / wet / glove interaction | **NOT_EXECUTED** | App Store |
-| External Bühlmann / CCR / Subsurface validation | **PENDING_EXTERNAL_VALIDATION** | App Store marketing claims |
-| Legal counsel / App Store marketing sign-off | **PENDING_EXTERNAL_VALIDATION** | App Store |
+No physical, paired-device, external validation, or App Store review evidence was executed during this audit. All items below remain **PENDING** unless a folder contains completed evidence.
 
 ---
 
-## Physical Apple Watch UI QA — PENDING
+## Physical Apple Watch UI/UX
 
-**Finding:** MUIUX-P1-001  
-**Evidence folders (scaffolding only):**
-
-| Folder | Scenarios |
-|--------|-----------|
-| `Docs/QA_EVIDENCE/WATCH_ULTRA/` | Full Computer live/deco, multi-banner density, smallest Watch 41 mm |
-| `Docs/QA_EVIDENCE/APNEA_WATCH_ULTRA/` | Apnea wet session, recovery, alarms |
-| `Docs/QA_EVIDENCE/SNORKELING_WATCH_LAYOUTS/` | Snorkeling GPS, waypoints, return-to-entry, 41 mm clipping |
-| `Docs/QA_EVIDENCE/HARDWARE_ENTITLEMENT/` | Depth entitlement, Water Lock, underwater depth |
-
-**Required before external TestFlight:** signed screenshots, screen recordings, or checklists per `EVIDENCE_TEMPLATE.md` for Gauge live, Full Computer deco states, Apnea live, Snorkeling navigation, reminders overlay vs safety data, Mission Mode, haptics-off badge, image paging/delete.
-
----
-
-## Physical iPhone UI QA — PENDING
-
-**Finding:** MUIUX-P1-001, MUIUX-P1-004  
-**Evidence folders:**
-
-| Folder | Scenarios |
-|--------|-----------|
-| `Docs/QA_EVIDENCE/IOS_ACCESSIBILITY/` | Dynamic Type XL, VoiceOver on Planner/CCR/gas ledger/checklist |
-| `Docs/QA_EVIDENCE/PDF_RENDER/` | Planner PDF, checklist PDF, dive pack, briefing card PNG |
-| `Docs/QA_EVIDENCE/IOS_PLANNER/` | Planner modes, runtime table, emergency/Rock Bottom layout |
-
-**Required:** device captures for Settings mode switch, Apnea/Snorkeling gear sheets, dashboard cards, route planner map, manual dive editor, export/share sheets.
+| ID | Area | Evidence path | Status |
+|----|------|---------------|--------|
+| PHY-WATCH-001 | Water Lock + Crown paging | `Docs/QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_WATER_LOCK/` | PENDING_PHYSICAL |
+| PHY-WATCH-002 | Action Button primary action | `Docs/QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_ACTION_BUTTON/` | PENDING_PHYSICAL |
+| PHY-WATCH-003 | Underwater navigation blocks | `Docs/QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_NAVIGATION/` | PENDING_PHYSICAL |
+| PHY-WATCH-004 | Stopwatch via Action Button | `Docs/QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_STOPWATCH/` | PENDING_PHYSICAL |
+| PHY-WATCH-005 | Compass bearing via Action Button | `Docs/QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_COMPASS/` | PENDING_PHYSICAL |
+| PHY-WATCH-006 | User Images via Action Button | `Docs/QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_IMAGES/` | PENDING_PHYSICAL |
+| PHY-WATCH-007 | Settings limits underwater | `Docs/QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_SETTINGS_LIMITS/` | PENDING_PHYSICAL |
+| PHY-WATCH-008 | Water auto-open preferred | `Docs/QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_PREFERRED/` | PENDING_PHYSICAL |
+| PHY-WATCH-009 | Water auto-open last selected | `Docs/QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_LAST_SELECTED/` | PENDING_PHYSICAL |
+| PHY-WATCH-010 | System Auto-Launch listing | `Docs/QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_SYSTEM_LISTING/` | PENDING_PHYSICAL |
+| PHY-WATCH-011 | FC predive on water auto-open | `Docs/QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_FULL_COMPUTER_CONFIRMATION/` | PENDING_PHYSICAL |
+| PHY-WATCH-012 | Active session block water auto-open | `Docs/QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_ACTIVE_SESSION_BLOCK/` | PENDING_PHYSICAL |
+| PHY-WATCH-013 | Smallest Watch layout (41 mm) | `Docs/QA_EVIDENCE/WATCH_ULTRA/` + layout contracts | PENDING_PHYSICAL |
+| PHY-WATCH-014 | Mockup pixel baselines | `Docs/QA_EVIDENCE/WATCH_MOCKUP_PIXEL_BASELINES/` | PENDING_PHYSICAL |
+| PHY-WATCH-015 | CMAltimeter physical | `Docs/QA_EVIDENCE/WATCH_CMALTIMETER_PHYSICAL/` | PENDING_PHYSICAL |
 
 ---
 
-## Paired Watch↔iOS Sync UI QA — PENDING
+## Physical iPhone UI/UX
 
-**Finding:** MUIUX-P1-002  
-**Evidence folders:**
-
-| Folder | Scenarios |
-|--------|-----------|
-| `Docs/QA_EVIDENCE/WATCH_IOS_SYNC/` | Briefing card transfer, image inventory/delete ACK, sync conflict UI, activity namespace isolation |
-| `Docs/QA_EVIDENCE/ICLOUD_TWO_DEVICE/` | Diving iCloud backup/restore UI truthfulness |
-
-**Required:** paired-device journeys for briefing card pending→transferred→stale, image delete ACK before iOS success, conflict resolution UI, altitude plan import→predive→live continuity.
+| ID | Area | Status |
+|----|------|--------|
+| PHY-IOS-001 | VoiceOver manual pass (Planner, CCR, Logbook) | PENDING_PHYSICAL |
+| PHY-IOS-002 | Dynamic Type XL Planner layout | PENDING_PHYSICAL |
+| PHY-IOS-003 | PDF render fidelity (Planner, Checklist, Dive Pack) | PENDING_PHYSICAL |
+| PHY-IOS-004 | Manual visual fidelity scoring (59 mockups) | PENDING_PHYSICAL |
 
 ---
 
-## Accessibility Manual QA — PENDING
+## Paired Watch ↔ iOS
 
-**Finding:** MUIUX-P1-003  
-Software semantic contracts exist (`SnorkelingAccessibilityContractTests`, planner/chart summaries, Watch live safety overlays). Physical VoiceOver traversal, Dynamic Type at largest sizes, and reduced-motion behavior on real devices are **NOT_EXECUTED**.
-
----
-
-## Visual Regression / Pixel QA — NOT_EXECUTED
-
-**Findings:** MUIUX-P2-001, MUIUX-P2-002  
-Software registry: 59/59 mockups indexed; 59/59 executable fixtures; 20/59 iOS raster snapshot contracts; 0/59 physical pixel-diff baselines captured.
+| ID | Area | Evidence path | Status |
+|----|------|---------------|--------|
+| PHY-PAIR-001 | Watch ↔ iOS sync UI | `Docs/QA_EVIDENCE/WATCH_IOS_SYNC/` | PENDING_PAIRED_DEVICE_QA |
+| PHY-PAIR-002 | Briefing card transfer states | QA templates | PENDING_PAIRED_DEVICE_QA |
+| PHY-PAIR-003 | Image transfer/delete ACK | QA templates | PENDING_PAIRED_DEVICE_QA |
+| PHY-PAIR-004 | Conflict resolution UI | QA templates | PENDING_PAIRED_DEVICE_QA |
 
 ---
 
-## External Validation — PENDING
+## External validation
 
-| Domain | Folder | Status |
-|--------|--------|--------|
-| Bühlmann external | `Docs/QA_EVIDENCE/BUHLMANN_EXTERNAL/` | PENDING_EXTERNAL_VALIDATION |
-| CCR external | `Docs/QA_EVIDENCE/CCR_EXTERNAL/` | PENDING_EXTERNAL_VALIDATION |
-| Subsurface CSV | `Docs/QA_EVIDENCE/SUBSURFACE/` | NOT_EXECUTED |
-| Legal review | `Docs/QA_EVIDENCE/LEGAL_REVIEW/` | PENDING_EXTERNAL_VALIDATION |
-| App Store marketing | `Docs/QA_EVIDENCE/APP_STORE_MARKETING/` | PENDING_EXTERNAL_VALIDATION |
-
----
-
-## Build/Test Evidence @ Audit Time
-
-| Step | Result |
-|------|--------|
-| `git branch` | `main` @ `1f62235` |
-| `git status` | Clean vs `origin/main` (0/0) |
-| `xcodegen generate` | **OK** |
-| Concurrent `xcodebuild` iOS + Watch | **FAILED** — DerivedData DB locked |
-| Isolated DerivedData build (audit pass) | **INCONCLUSIVE** — long-running at report time (MUIUX-P1-005) |
-| Algorithm test schemes | **NOT_EXECUTED** in this audit pass |
-
-Prior macOS evidence on earlier commits does not substitute for `1f62235` sign-off.
+| ID | Area | Status |
+|----|------|--------|
+| EXT-001 | External Bühlmann / decompression validation | PENDING_EXTERNAL_VALIDATION |
+| EXT-002 | Subsurface export validation | PENDING_EXTERNAL_VALIDATION |
+| EXT-003 | CCR planning external review | PENDING_EXTERNAL_VALIDATION |
+| EXT-004 | App Store review / legal asset approval | PENDING_EXTERNAL_VALIDATION |
 
 ---
 
-## Acceptance Criteria to Close Pending Gates
+## Accessibility manual QA
 
-1. Populate each `Docs/QA_EVIDENCE/*` folder with signed artifacts per template.
-2. Re-run `./Scripts/validate_ui_ux_readiness.sh` and full algorithm schemes on macOS @ HEAD.
-3. Execute manual visual-fidelity scoring for all 59 mockups on smallest Watch + representative iPhone.
-4. Record paired-device briefing-card and image-delete round-trips with UI screenshots.
-5. Obtain legal/marketing sign-off before any App Store readiness claim.
+| ID | Area | Status |
+|----|------|--------|
+| A11Y-001 | Watch VoiceOver underwater flows | PENDING_PHYSICAL |
+| A11Y-002 | iOS chart VoiceOver summaries | PENDING_PHYSICAL |
+| A11Y-003 | Settings mode switch VoiceOver | NOT_EXECUTED (software labels present) |
 
-No production code was modified by this audit.
+---
+
+## Build / test environment notes @ audit
+
+| Check | Result |
+|-------|--------|
+| `xcodegen generate` | PASS |
+| Watch App build | PASS |
+| iOS App build | PASS |
+| Watch Algorithm Tests (named simulator) | NOT_EXECUTED — simulator device name unavailable |
+| Physical Watch available | Detected (`Apple Watch di Federico`) — not used in this read-only audit |
+
+---
+
+## Release impact
+
+Internal TestFlight UI/UX may proceed **conditionally** on software gates. External TestFlight and App Store UI/UX readiness require closing P1 truthfulness gaps (water auto-open wiring/copy) and executing physical QA matrices above.
