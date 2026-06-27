@@ -57,6 +57,7 @@ targets:
       - Services/AppleDepthSensorProvider.swift
       - Services/MockDepthSensorProvider.swift
       - Services/UnavailableDepthSensorProvider.swift
+      - Services/WatchUnderwaterActionRouter.swift
       - Services/ApneaWatchRuntimeProviding.swift
       - Services/ApneaWatchRuntimeStore.swift
       - Services/SnorkelingWatchRuntimeStore.swift
@@ -187,6 +188,8 @@ targets:
       - Services/AppleDepthSensorProvider.swift
       - Services/MockDepthSensorProvider.swift
       - Services/UnavailableDepthSensorProvider.swift
+      - Services/DepthSensorSessionMetadata+Watch.swift
+      - Services/WatchUnderwaterActionRouter.swift
       - Services/DiveLogStore.swift
       - Services/ApneaLogbookStore.swift
       - Services/ApneaImportedPlanStore.swift
@@ -274,6 +277,9 @@ targets:
       - Utils/PlannerBriefingFreshnessPolicy.swift
       - Models/DIRModesAndStartup.swift
       - Utils/DIRStartupSelectionPolicy.swift
+      - Utils/WatchWaterAutoOpenPolicy.swift
+      - Utils/WatchUnderwaterPagePolicy.swift
+      - Utils/WatchUnderwaterPagePolicy.swift
       - Utils/GaugeLivePresentationPolicy.swift
       - Utils/FullComputerRuntimeConfiguration.swift
       - Utils/FullComputerRuntimeModels.swift

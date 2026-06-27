@@ -31,6 +31,22 @@ final class DIRActivitySelectionStore: ObservableObject {
         applyLaunchStep(DIRStartupSelectionPolicy.resolveLaunchStep())
     }
 
+    /// Applies water-entry startup routing without starting a session or bypassing Full Computer predive.
+    func beginWaterAutoLaunch() {
+        guard canChangeModes else {
+            presentModeChangeBlocked()
+            return
+        }
+        sessionConfigured = false
+        selection.fullComputerPrediveConfirmed = false
+        if WatchWaterAutoOpenPolicy.mode != .disabled {
+            let destination = WatchWaterAutoOpenPolicy.activeDestination()
+            selection.activity = destination.activity
+            selection.divingMode = destination.divingMode
+        }
+        applyLaunchStep(DIRStartupSelectionPolicy.resolveWaterAutoLaunchStep())
+    }
+
     func selectActivity(_ activity: DIRActivityMode) {
         guard canChangeModes else {
             presentModeChangeBlocked()
@@ -148,6 +164,10 @@ final class DIRActivitySelectionStore: ObservableObject {
         }
         startupStep = nil
         sessionConfigured = true
+        WatchWaterAutoOpenPolicy.recordSelectedDestination(
+            activity: activity,
+            divingMode: divingMode
+        )
         DiveManager.shared?.recordSessionModeSelection(
             activity: activity,
             divingMode: divingMode
