@@ -33,6 +33,18 @@ final class FullComputerImportedPlanStore: ObservableObject {
         pendingPackage != nil
     }
 
+    var hasActiveImportedIOSPlan: Bool {
+        activatedPlanID != nil
+    }
+
+    func resolvedImportedPreset(from profile: FullComputerGasProfile) -> FullComputerGradientFactorPreset? {
+        FullComputerGradientFactorPreset.matching(low: profile.gfLow, high: profile.gfHigh)
+    }
+
+    func resolvedImportedPreset(from package: DivePlanPackage) -> FullComputerGradientFactorPreset? {
+        FullComputerGradientFactorPreset.matching(package: package)
+    }
+
     func importPayload(_ package: DivePlanPackage, source: String) -> Bool {
         let fingerprint = "\(package.body.planID.uuidString)|\(package.body.revision)|\(package.payloadChecksumSHA256)"
         if importedChecksums.contains(fingerprint) {
@@ -41,6 +53,10 @@ final class FullComputerImportedPlanStore: ObservableObject {
 
         do {
             try DivePlanPackageCodec.validate(package)
+            guard resolvedImportedPreset(from: package) != nil else {
+                lastImportError = .invalidGradientFactors
+                return false
+            }
             guard case .success(let environmentRecord) = package.body.environment.validatedRecord(source: .iPhonePlanImported) else {
                 lastImportError = .invalidEnvironment
                 return false
@@ -94,7 +110,14 @@ final class FullComputerImportedPlanStore: ObservableObject {
         let preserved = configuration.draftProfile
         profile.travelGases = preserved.travelGases
         profile.bailoutGases = preserved.bailoutGases
-        configuration.importProfile(profile, environment: environment)
+        guard let preset = resolvedImportedPreset(from: package) else {
+            throw DivePlanPackageValidationError.invalidGradientFactors
+        }
+        configuration.importProfile(
+            profile,
+            environment: environment,
+            gradientFactors: .iosPlan(preset: preset)
+        )
         activatedPlanID = package.body.planID
         activatedRevision = package.body.revision
         pendingPackage = nil
