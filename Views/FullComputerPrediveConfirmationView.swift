@@ -8,6 +8,10 @@ struct FullComputerPrediveConfirmationView: View {
 
     private var profile: FullComputerGasProfile { configuration.draftProfile }
 
+    private var resolvedGradientFactors: FullComputerResolvedGradientFactors {
+        configuration.resolvedGradientFactorsForRuntime(activitySelection: activitySelection)
+    }
+
     private var readiness: FullComputerPrediveReadiness {
         FullComputerPrediveReadiness.evaluate(
             depthAutomationAvailable: dive.isDepthAutomationAvailable,
@@ -50,10 +54,17 @@ struct FullComputerPrediveConfirmationView: View {
                             value: decoSummary
                         )
                         divider
-                        confirmRow(
-                            label: String(localized: "startup.fc_confirm.row.gf"),
-                            value: "\(Int(profile.gfLow))/\(Int(profile.gfHigh))"
-                        )
+                        VStack(alignment: .leading, spacing: 3) {
+                            confirmRow(
+                                label: String(localized: "full_computer.gradient_factors.title"),
+                                value: resolvedGradientFactors.confirmSummary
+                            )
+                            Text(resolvedGradientFactors.sourceLine)
+                                .font(DiveUI.Typography.hintCaption)
+                                .foregroundStyle(DiveUI.mutedText)
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                        .padding(.vertical, 4)
                         divider
                         confirmRow(
                             label: String(localized: "fc.environment.confirm.row"),

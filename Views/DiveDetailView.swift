@@ -20,6 +20,10 @@ struct DiveDetailView: View {
                     header
                     dateLine
                     summaryCards
+                    if let metadata = session.fullComputerLogbookMetadata,
+                       let gfLine = metadata.gradientFactorLogbookLine {
+                        fullComputerGradientFactorPanel(line: gfLine)
+                    }
                     if session.exceededSupportedDepthRange {
                         exceededDepthLogBanner
                     }
@@ -96,6 +100,29 @@ struct DiveDetailView: View {
                 color: .white
             )
         }
+    }
+
+    private func fullComputerGradientFactorPanel(line: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(String(localized: "full_computer.gradient_factors.title"))
+                .font(DiveUI.Typography.secondaryLabel)
+                .foregroundStyle(DiveUI.green)
+            Text(line)
+                .font(DiveUI.Typography.rowSubtitle)
+                .foregroundStyle(.white)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                .fill(Color.black.opacity(0.48))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .stroke(DiveUI.green.opacity(0.7), lineWidth: 1)
+                )
+        )
     }
 
     private var exceededDepthLogBanner: some View {
