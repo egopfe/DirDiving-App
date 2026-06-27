@@ -105,6 +105,8 @@ These remain available for **Shortcuts** or optional Action Button assignment (s
 | Open Water Mode | Open water-entry startup destination |
 | **Underwater Action** | **Recommended for Ultra Action Button in water** |
 
+Legacy shortcuts (stopwatch, bearing, manual dive) may be **blocked or routed** during an active session. Use **Underwater Primary Action** underwater.
+
 All shortcuts require **legal/safety acceptance** in the app before they run.
 
 ---

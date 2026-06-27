@@ -279,7 +279,10 @@ targets:
       - Utils/DIRStartupSelectionPolicy.swift
       - Utils/WatchWaterAutoOpenPolicy.swift
       - Utils/WatchUnderwaterPagePolicy.swift
-      - Utils/WatchUnderwaterPagePolicy.swift
+      - Utils/WatchLaunchRoutingPolicy.swift
+      - Utils/WatchUnderwaterNavigationClampPolicy.swift
+      - Utils/WatchIntentSafetyPolicy.swift
+      - Utils/WatchAppShortcutErrors.swift
       - Utils/GaugeLivePresentationPolicy.swift
       - Utils/FullComputerRuntimeConfiguration.swift
       - Utils/FullComputerRuntimeModels.swift
@@ -317,6 +320,14 @@ targets:
       - Services/FullComputerRuntimeEngine.swift
       - Utils/WatchModeSelectionPreferences.swift
       - Services/DIRActivitySelectionStore.swift
+      - Utils/WatchLaunchRoutingPolicy.swift
+      - Utils/WatchUnderwaterNavigationClampPolicy.swift
+      - Utils/WatchIntentSafetyPolicy.swift
+      - Utils/WatchAppShortcutErrors.swift
+      - Utils/WatchWaterAutoOpenPolicy.swift
+      - Utils/WatchUnderwaterPagePolicy.swift
+      - Utils/WatchActivityPagePolicy.swift
+      - Models/AppPage.swift
       - Services/AppNavigationStore.swift
       - Utils/WatchActivityPagePolicy.swift
       - Utils/WatchInModeSettingsAccess.swift
