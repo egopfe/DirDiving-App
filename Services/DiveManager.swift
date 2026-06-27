@@ -150,6 +150,10 @@ final class DiveManager: ObservableObject {
     @Published var stopwatchTime: TimeInterval = 0
     @Published var isStopwatchRunning = false
     @Published var isDiveActive = false
+
+    var hasActiveFullComputerEngine: Bool {
+        fullComputerEngine != nil
+    }
     @Published var ascentStatus = AscentStatus.make(rate: 0, depth: 0)
     @Published private(set) var alarmBlinkActive = false
     @Published var lastErrorMessage: String?
@@ -1529,10 +1533,13 @@ final class DiveManager: ObservableObject {
             preferred: store.confirmedEnvironment ?? store.draftEnvironment,
             sessionSnapshot: fullComputerSessionEnvironmentRecord
         )
+        let gradientSnapshot = store.confirmedGradientFactors
         return accumulator.export(
             watchDivingMode: sessionDivingMode.rawValue,
             gfLow: resolvedEngine.runtimePlan.gfLow,
             gfHigh: resolvedEngine.runtimePlan.gfHigh,
+            gradientFactorPreset: gradientSnapshot?.preset.rawValue,
+            gradientFactorSource: gradientSnapshot?.source.rawValue,
             gasSwitchEvents: resolvedEngine.gasSwitchAuditTrail.map(Self.logbookGasSwitchEvent(from:)),
             unavailableGasMixIds: Array(resolvedEngine.persistedGasSwitchTracker.unavailableGasMixIds),
             algorithmVersion: FullComputerRuntimeConfiguration.algorithmVersion,
