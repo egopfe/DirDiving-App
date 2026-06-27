@@ -14,3 +14,7 @@ PAR-012,Accessibility labels,Watch+iOS,shared,yes,yes,partial,no,PARTIAL,P1,MUIU
 PAR-013,Visual language,Watch neon / iOS cards,intentionally asymmetric,yes,yes,partial,yes,PARTIAL,P2,MUIUX-P2-002,Manual on-device fidelity PENDING
 PAR-014,Sync namespaces,Watch+iOS,synchronized,yes,yes,yes,partial,PARTIAL,P1,MUIUX-P1-002,Paired round-trip QA PENDING
 PAR-015,CCR reference UX,iOS planner,iOS-only reference,yes,n/a,yes,n/a,PASS,,,No live-loop PPO2 claim
+PAR-UW-001,Underwater Crown paging,Watch-only,asymmetric,yes,Documented in user guide,PASS
+PAR-UW-002,Action Button primary action,Watch-only,asymmetric,yes,Ultra only,PASS
+PAR-WAO-001,Water auto-open,Watch-only,asymmetric,yes,No iOS equivalent,PASS
+PAR-SET-001,Settings mode switch,iOS-only,asymmetric,yes,Watch uses activity sections,PASS

@@ -1,7 +1,17 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-23  
+**Aggiornato:** 2026-06-27  
 **Branch consigliato:** `main` = `origin/main`
+
+---
+
+## Guida utente Watch — Corona e pulsanti
+
+| Documento | Descrizione |
+|-----------|-------------|
+| [`WATCH_CROWN_AND_BUTTONS_USER_GUIDE.md`](WATCH_CROWN_AND_BUTTONS_USER_GUIDE.md) | **Guida utente** — Corona (navigazione), Action Button Ultra, Water Lock, ingresso acqua · EN + IT |
+
+Policy tecniche correlate: [`WATCH_UNDERWATER_FAST_CONTROLS.md`](WATCH_UNDERWATER_FAST_CONTROLS.md) · [`WATCH_WATER_AUTO_OPEN_POLICY.md`](WATCH_WATER_AUTO_OPEN_POLICY.md)
 
 ---
 

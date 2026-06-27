@@ -1,60 +1,11 @@
-Mockup_ID,Platform,Activity,Matrix_Index_Test,Executable_Fixture,IOS_Raster_Snapshot,Watch_Presentation_Contract,Physical_Pixel_Diff,Manual_Fidelity_Score,EN_Fixture,IT_Fixture,Smallest_Device_QA,Large_Device_QA,Coverage_Percent,Finding_ID,Notes
-FC_UI_01,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_02,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_03,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_04,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_05,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_06,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_07,iOS,Diving FC,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
-FC_UI_08,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_09,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_10,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_11,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_12,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_13,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_14,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_15,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_16,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_17,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_18,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_19,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_20,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_21,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_22,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_23,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_24,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-FC_UI_25,watchOS,Diving FC,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-APNEA_WATCH_01,watchOS,Apnea,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-APNEA_WATCH_02,watchOS,Apnea,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-APNEA_WATCH_03,watchOS,Apnea,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-APNEA_WATCH_04,watchOS,Apnea,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-APNEA_WATCH_05,watchOS,Apnea,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-APNEA_WATCH_06,watchOS,Apnea,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-APNEA_WATCH_07,watchOS,Apnea,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-APNEA_WATCH_08,watchOS,Apnea,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-SNORKELING_WATCH_01,watchOS,Snorkeling,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-SNORKELING_WATCH_02,watchOS,Snorkeling,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-SNORKELING_WATCH_03,watchOS,Snorkeling,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-SNORKELING_WATCH_04,watchOS,Snorkeling,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-SNORKELING_WATCH_05,watchOS,Snorkeling,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-SNORKELING_WATCH_06,watchOS,Snorkeling,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-SNORKELING_WATCH_07,watchOS,Snorkeling,yes,yes,no,yes,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-001,Software fixtures 59/59; physical baselines 0/59
-APNEA_IOS_01,iOS,Apnea,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
-APNEA_IOS_02,iOS,Apnea,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
-APNEA_IOS_03,iOS,Apnea,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
-APNEA_IOS_04,iOS,Apnea,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
-APNEA_IOS_05,iOS,Apnea,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
-APNEA_IOS_06,iOS,Apnea,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
-APNEA_IOS_07,iOS,Apnea,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
-APNEA_IOS_08,iOS,Apnea,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
-APNEA_IOS_09,iOS,Apnea,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
-APNEA_IOS_10,iOS,Apnea,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
-APNEA_IOS_11,iOS,Apnea,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
-APNEA_IOS_12,iOS,Apnea,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
-APNEA_IOS_13,iOS,Apnea,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
-APNEA_IOS_14,iOS,Apnea,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
-APNEA_IOS_15,iOS,Apnea,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
-SNORKELING_IOS_01,iOS,Snorkeling,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
-SNORKELING_IOS_02,iOS,Snorkeling,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
-SNORKELING_IOS_03,iOS,Snorkeling,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
-IOS_COMPANION_ACTIVITY_SELECTION,iOS,Companion,yes,yes,yes,n/a,PENDING,NOT_SCORED,yes,yes,PENDING_PHYSICAL,PENDING_PHYSICAL,75,MUIUX-P2-002,Software fixtures 59/59; physical baselines 0/59
+Coverage_Area,Total_Items,Software_Covered,Pixel_Diff_Covered,Manual_Scored,Readiness_Percent,Finding_ID,Notes
+Canonical mockups on disk,59,59,0,0,100,,59/59 exist
+Executable fixture registry,59,59,0,0,100,,MockupVisualRegressionRemediationTests
+iOS raster structural contracts,20,20,0,0,100,MVR-P1-002,IOSMockupRasterSnapshotTests
+Watch FC presentation contracts,25,25,0,0,100,MUIUX-P2-002,FullComputerUIStateMatrixTests
+Apnea watch layout contracts,8,8,0,0,100,,ApneaWatchLayoutContractTests
+Snorkeling watch layout contracts,7,7,0,0,0,,SnorkelingWatchLayoutContractTests
+Physical pixel diff baselines,59,0,0,0,0,MVR-P1-002,PHYSICAL_PIXEL_DIFF PENDING
+Manual visual fidelity scoring,59,0,0,0,0,MVR-P2-002,MANUAL_VISUAL_FIDELITY PENDING
+Smallest watch physical layout,1,1,0,0,50,MVR-P2-004,Simulator contract only
+Overall visual regression readiness,59,50,0,0,85,MVR-P1-002,Software ~85%; pixel 0%
