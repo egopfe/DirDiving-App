@@ -141,6 +141,44 @@ struct AcknowledgeAlarmIntent: AppIntent {
     }
 }
 
+struct OpenWaterAutoLaunchModeIntent: AppIntent {
+    static var title: LocalizedStringResource = "intent.water_auto_open.title"
+    static var description: IntentDescription {
+        IntentDescription(LocalizedStringResource("intent.water_auto_open.description"))
+    }
+    static var openAppWhenRun = true
+
+    func perform() async throws -> some IntentResult {
+        try await MainActor.run {
+            try requireLegalAcceptanceForSafetyIntent()
+            guard let selection = DIRActivitySelectionStore.shared else {
+                throw DIRDivingShortcutError.appStateUnavailable
+            }
+            selection.beginWaterAutoLaunch()
+        }
+        return .result()
+    }
+}
+
+struct ExecuteUnderwaterPrimaryActionIntent: AppIntent {
+    static var title: LocalizedStringResource = "intent.underwater_primary_action.title"
+    static var description: IntentDescription {
+        IntentDescription(LocalizedStringResource("intent.underwater_primary_action.description"))
+    }
+    static var openAppWhenRun = true
+
+    func perform() async throws -> some IntentResult {
+        try await MainActor.run {
+            try requireLegalAcceptanceForSafetyIntent()
+            guard let router = WatchUnderwaterActionRouter.shared else {
+                throw DIRDivingShortcutError.appStateUnavailable
+            }
+            try router.executePrimaryAction()
+        }
+        return .result()
+    }
+}
+
 private enum DIRDivingShortcutError: LocalizedError {
     case appStateUnavailable
     case stopwatchResetBlocked
@@ -207,6 +245,26 @@ struct DIRDivingAppShortcuts: AppShortcutsProvider {
             phrases: ["Acknowledge alarm in \(.applicationName)"],
             shortTitle: LocalizedStringResource("intent.shortcut.ack_alarm"),
             systemImageName: "bell.slash"
+        )
+        AppShortcut(
+            intent: OpenWaterAutoLaunchModeIntent(),
+            phrases: [
+                "Open water mode in \(.applicationName)",
+                "Open last water mode in \(.applicationName)",
+                "Open preferred water mode in \(.applicationName)"
+            ],
+            shortTitle: LocalizedStringResource("intent.shortcut.water_auto_open"),
+            systemImageName: "drop.fill"
+        )
+        AppShortcut(
+            intent: ExecuteUnderwaterPrimaryActionIntent(),
+            phrases: [
+                "Execute underwater action in \(.applicationName)",
+                "Press DIR Diving action in \(.applicationName)",
+                "Run primary water action in \(.applicationName)"
+            ],
+            shortTitle: LocalizedStringResource("intent.shortcut.underwater_primary_action"),
+            systemImageName: "button.programmable"
         )
     }
 }

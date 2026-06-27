@@ -45,12 +45,19 @@ targets:
       - Utils/DiveSessionAlgorithmValidator.swift
       - Utils/SensorSourceMode.swift
       - Utils/DepthSensorSourceResolution.swift
+      - Utils/DepthCapabilityMode.swift
+      - Utils/DepthSampleSource.swift
+      - Utils/DepthCapabilityEntitlementProbe.swift
+      - Utils/DepthCapabilityResolver.swift
+      - Utils/DepthCapabilityPolicy.swift
       - Utils/DeveloperSettings.swift
       - Utils/DeveloperVersionUnlock.swift
       - Services/DepthSensorProvider.swift
       - Services/SensorProviderFactory.swift
       - Services/AppleDepthSensorProvider.swift
       - Services/MockDepthSensorProvider.swift
+      - Services/UnavailableDepthSensorProvider.swift
+      - Services/WatchUnderwaterActionRouter.swift
       - Services/ApneaWatchRuntimeProviding.swift
       - Services/ApneaWatchRuntimeStore.swift
       - Services/SnorkelingWatchRuntimeStore.swift
@@ -167,6 +174,11 @@ targets:
       - Services/DiveManager.swift
       - Utils/SensorSourceMode.swift
       - Utils/DepthSensorSourceResolution.swift
+      - Utils/DepthCapabilityMode.swift
+      - Utils/DepthSampleSource.swift
+      - Utils/DepthCapabilityEntitlementProbe.swift
+      - Utils/DepthCapabilityResolver.swift
+      - Utils/DepthCapabilityPolicy.swift
       - Utils/DeveloperSettings.swift
       - Utils/LegalAcceptanceGate.swift
       - App/LegalAcceptanceStore.swift
@@ -175,6 +187,9 @@ targets:
       - Services/SensorProviderFactory.swift
       - Services/AppleDepthSensorProvider.swift
       - Services/MockDepthSensorProvider.swift
+      - Services/UnavailableDepthSensorProvider.swift
+      - Services/DepthSensorSessionMetadata+Watch.swift
+      - Services/WatchUnderwaterActionRouter.swift
       - Services/DiveLogStore.swift
       - Services/ApneaLogbookStore.swift
       - Services/ApneaImportedPlanStore.swift
@@ -262,6 +277,9 @@ targets:
       - Utils/PlannerBriefingFreshnessPolicy.swift
       - Models/DIRModesAndStartup.swift
       - Utils/DIRStartupSelectionPolicy.swift
+      - Utils/WatchWaterAutoOpenPolicy.swift
+      - Utils/WatchUnderwaterPagePolicy.swift
+      - Utils/WatchUnderwaterPagePolicy.swift
       - Utils/GaugeLivePresentationPolicy.swift
       - Utils/FullComputerRuntimeConfiguration.swift
       - Utils/FullComputerRuntimeModels.swift

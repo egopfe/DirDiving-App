@@ -44,6 +44,8 @@ enum SnorkelingSchemaMigration {
         let equipment = try container.decodeIfPresent(SnorkelingEquipmentProfile.self, forKey: .equipment)
         let buddy = try container.decodeIfPresent(SnorkelingBuddyInfo.self, forKey: .buddy)
         var warnings = try container.decodeIfPresent([SnorkelingSessionWarning].self, forKey: .warnings) ?? []
+        let depthSampleSource = try container.decodeIfPresent(String.self, forKey: .depthSampleSource)
+        let depthCapabilityMode = try container.decodeIfPresent(String.self, forKey: .depthCapabilityMode)
         if markSchemaMigrated, !warnings.contains(.schemaMigrated) {
             warnings.append(.schemaMigrated)
         }
@@ -68,7 +70,9 @@ enum SnorkelingSchemaMigration {
             profile: profile,
             equipment: equipment,
             buddy: buddy,
-            warnings: warnings
+            warnings: warnings,
+            depthSampleSource: depthSampleSource,
+            depthCapabilityMode: depthCapabilityMode
         )
     }
 }

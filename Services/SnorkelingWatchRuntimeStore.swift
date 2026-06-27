@@ -20,6 +20,7 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
 
     private var engine = SnorkelingSessionEngine()
     private var depthProvider: DepthSensorProvider?
+    private var activeDepthSensorMetadata = DepthSensorSessionMetadata()
     private var tickTask: Task<Void, Never>?
     private var checkpointTask: Task<Void, Never>?
     private var gpsCancellable: AnyCancellable?
@@ -205,6 +206,8 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
             session.warnings.append(.dataQualityDegraded)
         }
         session.statistics = session.refreshedStatistics()
+        session.depthSampleSource = activeDepthSensorMetadata.depthSampleSource
+        session.depthCapabilityMode = activeDepthSensorMetadata.depthCapabilityMode
         logbook.add(session)
         if logbook.lastSavedSessionID == session.id {
             sessionSaveState = .saved
@@ -355,7 +358,9 @@ final class SnorkelingWatchRuntimeStore: ObservableObject {
 
     private func startDepthSensor() {
         stopDepthSensor()
-        let provider = SensorProviderFactory.makeProvider(mode: SensorSourceMode.runtimeMode)
+        let selection = SensorProviderFactory.makeSelection(mode: SensorSourceMode.runtimeMode)
+        activeDepthSensorMetadata = DepthSensorSessionMetadata.capture(from: selection)
+        let provider = selection.provider
         provider.onDepthMeasurement = { [weak self] depth, timestamp, temperature in
             Task { @MainActor in
                 self?.handleDepthMeasurement(depth: depth, temperature: temperature, timestamp: timestamp)

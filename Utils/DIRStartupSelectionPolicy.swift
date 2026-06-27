@@ -74,6 +74,21 @@ enum DIRStartupSelectionPolicy {
         )
     }
 
+    /// Routes startup when watchOS opens DIR Diving after water entry (or via water App Intent).
+    static func resolveWaterAutoLaunchStep() -> DIRStartupLaunchStep {
+        WatchWaterAutoOpenPolicy.migrateIfNeeded()
+        switch WatchWaterAutoOpenPolicy.mode {
+        case .disabled:
+            return resolveLaunchStep()
+        case .lastSelectedMode, .preferredMode:
+            let destination = WatchWaterAutoOpenPolicy.activeDestination()
+            return resolveAutomaticStep(
+                activity: destination.activity,
+                divingMode: destination.divingMode
+            )
+        }
+    }
+
     static func resolveAutomaticStep(
         activity: DIRActivityMode,
         divingMode: DIRDivingMode
@@ -136,6 +151,7 @@ enum DIRStartupSelectionPolicy {
             preferencesMigratedKey,
             WatchModeSelectionPreferences.skipWhenSingleModeKey
         ].forEach { defaults.removeObject(forKey: $0) }
+        WatchWaterAutoOpenPolicy.resetForTests()
     }
     #endif
 }

@@ -60,6 +60,8 @@ enum ApneaSchemaMigration {
         let equipment = try container.decodeIfPresent(ApneaEquipmentProfile.self, forKey: .equipment)
         let profile = try container.decodeIfPresent(ApneaProfile.self, forKey: .profile)
         var warnings = try container.decodeIfPresent([ApneaSessionWarning].self, forKey: .warnings) ?? []
+        let depthSampleSource = try container.decodeIfPresent(String.self, forKey: .depthSampleSource)
+        let depthCapabilityMode = try container.decodeIfPresent(String.self, forKey: .depthCapabilityMode)
         if markSchemaMigrated, !warnings.contains(.schemaMigrated) {
             warnings.append(.schemaMigrated)
         }
@@ -78,7 +80,9 @@ enum ApneaSchemaMigration {
             buddy: buddy,
             equipment: equipment,
             profile: profile,
-            warnings: warnings
+            warnings: warnings,
+            depthSampleSource: depthSampleSource,
+            depthCapabilityMode: depthCapabilityMode
         )
     }
 }

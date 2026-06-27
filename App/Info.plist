@@ -12,6 +12,8 @@
     <string>com.egopfe.dirdiving.ios</string>
     <key>WKSupportsAutomaticDepthLaunch</key>
     <true/>
+    <key>DIRDepthEntitlementTier</key>
+    <string>none</string>
     <key>WKBackgroundModes</key>
     <array>
         <string>underwater-depth</string>
