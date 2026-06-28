@@ -9,18 +9,21 @@ final class FullComputerPrediveConfigurationStore: ObservableObject {
     static let confirmedStorageKey = "dirdiving_watch_fc_confirmed_profile_v1"
     static let draftEnvironmentKey = "dirdiving_watch_fc_draft_environment_v1"
     static let confirmedEnvironmentKey = "dirdiving_watch_fc_confirmed_environment_v1"
+    static let confirmedGradientFactorsKey = "dirdiving_watch_fc_confirmed_gradient_factors_v1"
 
     @Published private(set) var draftProfile: FullComputerGasProfile
     @Published private(set) var confirmedProfile: FullComputerGasProfile?
     @Published private(set) var draftEnvironment: FullComputerEnvironmentRecord?
     @Published private(set) var confirmedEnvironment: FullComputerEnvironmentRecord?
     @Published private(set) var pendingSensorProposal: FullComputerEnvironmentRecord?
+    @Published private(set) var confirmedGradientFactors: FullComputerResolvedGradientFactors?
 
     private init() {
         draftProfile = Self.loadProfile(key: Self.storageKey) ?? .defaultAirGF3070
         confirmedProfile = Self.loadProfile(key: Self.confirmedStorageKey)
         draftEnvironment = Self.loadEnvironment(key: Self.draftEnvironmentKey)
         confirmedEnvironment = Self.loadEnvironment(key: Self.confirmedEnvironmentKey)
+        confirmedGradientFactors = Self.loadGradientFactors(key: Self.confirmedGradientFactorsKey)
     }
 
     var validationIssues: [FullComputerGasValidationIssue] {
@@ -125,26 +128,93 @@ final class FullComputerPrediveConfigurationStore: ObservableObject {
         }
     }
 
-    func commitConfirmedProfile() {
+    func commitConfirmedProfile(
+        resolvedGradientFactors: FullComputerResolvedGradientFactors? = nil
+    ) {
         guard isDraftValid else { return }
+        let snapshot = resolvedGradientFactors ?? resolvedGradientFactorsForRuntime()
+        applyGradientFactors(snapshot, to: &draftProfile)
+        confirmedGradientFactors = snapshot
         confirmedProfile = draftProfile
         confirmedEnvironment = draftEnvironment
         persistConfirmed()
+        persistConfirmedGradientFactors()
     }
 
-    func importProfile(_ profile: FullComputerGasProfile, environment: FullComputerEnvironmentRecord) {
+    func importProfile(
+        _ profile: FullComputerGasProfile,
+        environment: FullComputerEnvironmentRecord,
+        gradientFactors: FullComputerResolvedGradientFactors? = nil
+    ) {
         guard canEdit else { return }
-        draftProfile = profile
-        confirmedProfile = profile
+        var importedDraft = profile
+        var importedConfirmed = profile
+        if let gradientFactors {
+            confirmedGradientFactors = gradientFactors
+            applyGradientFactors(gradientFactors, to: &importedDraft)
+            applyGradientFactors(gradientFactors, to: &importedConfirmed)
+        }
+        draftProfile = importedDraft
+        confirmedProfile = importedConfirmed
         importEnvironment(environment)
         persistConfirmed()
+        persistConfirmedGradientFactors()
     }
 
     func reloadDraftFromConfirmed() {
         draftProfile = confirmedProfile ?? .defaultAirGF3070
         draftEnvironment = confirmedEnvironment
+        if let confirmedGradientFactors {
+            applyGradientFactors(confirmedGradientFactors, to: &draftProfile)
+        }
         persistDraft()
         persistDraftEnvironment()
+    }
+
+    func applyWatchGradientFactorPresetIfAllowed(_ preset: FullComputerGradientFactorPreset) {
+        guard canEdit else { return }
+        guard FullComputerImportedPlanStore.shared.activatedPlanID == nil else { return }
+        updateDraft { profile in
+            profile.gfLow = Double(preset.gfLow)
+            profile.gfHigh = Double(preset.gfHigh)
+        }
+    }
+
+    func resolvedGradientFactorsForRuntime(
+        gradientFactorStore: FullComputerGradientFactorSettingsStore? = nil,
+        importedPlanStore: FullComputerImportedPlanStore? = nil,
+        activitySelection: DIRActivitySelectionStore? = nil,
+        diveManager: DiveManager? = nil
+    ) -> FullComputerResolvedGradientFactors {
+        if let confirmedGradientFactors {
+            return confirmedGradientFactors
+        }
+
+        let gradientStore = gradientFactorStore ?? FullComputerGradientFactorSettingsStore.shared
+        let planStore = importedPlanStore ?? FullComputerImportedPlanStore.shared
+        let dive = diveManager ?? DiveManager.shared
+
+        let importedPreset = planStore.resolvedImportedPreset(from: draftProfile)
+        let hasActiveImportedIOSPlan = planStore.activatedPlanID != nil
+        let isDiveActive = dive?.isDiveActive ?? false
+        let isApneaActive = ApneaWatchRuntimeStore.shared?.isSessionActive ?? false
+        let isSnorkelingActive = SnorkelingWatchRuntimeStore.shared?.isSessionActive ?? false
+        let isRuntimeStarted = FullComputerGradientFactorLockContext.isFullComputerRuntimeStarted(
+            fullComputerPrediveConfirmed: activitySelection?.selection.fullComputerPrediveConfirmed ?? false,
+            hasFullComputerEngine: dive?.hasActiveFullComputerEngine ?? false,
+            sessionConfigured: activitySelection?.sessionConfigured ?? false,
+            divingMode: activitySelection?.selection.divingMode
+        )
+
+        return gradientStore.resolvedPreset(
+            importedPlanPreset: importedPreset,
+            hasActiveImportedIOSPlan: hasActiveImportedIOSPlan,
+            isDiveActive: isDiveActive,
+            isApneaActive: isApneaActive,
+            isSnorkelingActive: isSnorkelingActive,
+            isFullComputerRuntimeStarted: isRuntimeStarted,
+            confirmedSnapshot: nil
+        )
     }
 
     var canEdit: Bool {
@@ -153,7 +223,10 @@ final class FullComputerPrediveConfigurationStore: ObservableObject {
     }
 
     func runtimePlan() -> FullComputerRuntimePlan? {
-        let profile = confirmedProfile ?? draftProfile
+        var profile = confirmedProfile ?? draftProfile
+        if let confirmedGradientFactors {
+            applyGradientFactors(confirmedGradientFactors, to: &profile)
+        }
         guard let environmentRecord = confirmedEnvironment ?? draftEnvironment,
               environmentRecord.validateForLiveStart() == nil,
               let plannerEnvironment = environmentRecord.plannerEnvironment else {
@@ -162,10 +235,26 @@ final class FullComputerPrediveConfigurationStore: ObservableObject {
         return FullComputerRuntimePlan(profile: profile, plannerEnvironment: plannerEnvironment)
     }
 
+    private static func applyGradientFactors(
+        _ factors: FullComputerResolvedGradientFactors,
+        to profile: inout FullComputerGasProfile
+    ) {
+        profile.gfLow = Double(factors.low)
+        profile.gfHigh = Double(factors.high)
+    }
+
+    private func applyGradientFactors(
+        _ factors: FullComputerResolvedGradientFactors,
+        to profile: inout FullComputerGasProfile
+    ) {
+        Self.applyGradientFactors(factors, to: &profile)
+    }
+
     #if DEBUG
     func resetForTests() {
         draftProfile = .defaultAirGF3070
         confirmedProfile = nil
+        confirmedGradientFactors = nil
         draftEnvironment = nil
         confirmedEnvironment = nil
         pendingSensorProposal = nil
@@ -173,6 +262,7 @@ final class FullComputerPrediveConfigurationStore: ObservableObject {
         UserDefaults.standard.removeObject(forKey: Self.confirmedStorageKey)
         UserDefaults.standard.removeObject(forKey: Self.draftEnvironmentKey)
         UserDefaults.standard.removeObject(forKey: Self.confirmedEnvironmentKey)
+        UserDefaults.standard.removeObject(forKey: Self.confirmedGradientFactorsKey)
         seedTestEnvironment()
     }
 
@@ -234,6 +324,23 @@ final class FullComputerPrediveConfigurationStore: ObservableObject {
 
     private static func saveEnvironment(_ environment: FullComputerEnvironmentRecord?, key: String) {
         guard let environment, let data = try? JSONEncoder().encode(environment) else {
+            UserDefaults.standard.removeObject(forKey: key)
+            return
+        }
+        UserDefaults.standard.set(data, forKey: key)
+    }
+
+    private func persistConfirmedGradientFactors() {
+        Self.saveGradientFactors(confirmedGradientFactors, key: Self.confirmedGradientFactorsKey)
+    }
+
+    private static func loadGradientFactors(key: String) -> FullComputerResolvedGradientFactors? {
+        guard let data = UserDefaults.standard.data(forKey: key) else { return nil }
+        return try? JSONDecoder().decode(FullComputerResolvedGradientFactors.self, from: data)
+    }
+
+    private static func saveGradientFactors(_ factors: FullComputerResolvedGradientFactors?, key: String) {
+        guard let factors, let data = try? JSONEncoder().encode(factors) else {
             UserDefaults.standard.removeObject(forKey: key)
             return
         }

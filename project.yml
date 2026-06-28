@@ -97,6 +97,7 @@ targets:
       - Utils/SnorkelingQAEvidenceCatalog.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
+      - Services/FullComputerGradientFactorSettingsStore.swift
       - Resources
       - path: Shared
       - Config/PrivacyInfo-Watch.xcprivacy
@@ -315,6 +316,8 @@ targets:
       - Utils/SnorkelingQAEvidenceCatalog.swift
       - Services/FullComputerDecoHapticCoordinator.swift
       - Services/FullComputerPrediveConfigurationStore.swift
+      - Services/FullComputerGradientFactorSettingsStore.swift
+      - Services/FullComputerImportedPlanStore.swift
       - Services/FullComputerEnvironmentSensorService.swift
       - Services/WatchFullComputerAltitudeSensorProposalSettingsStore.swift
       - Services/FullComputerRuntimeEngine.swift
