@@ -110,7 +110,7 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_FILE: App/Info.plist
         INFOPLIST_KEY_CFBundleIdentifier: com.egopfe.dirdiving.ios.watch
-        CODE_SIGN_ENTITLEMENTS: Config/DIRDiving.entitlements
+        CODE_SIGN_ENTITLEMENTS: Config/DIRDiving.WithShallowDepth.entitlements
         PRODUCT_NAME: DIRDivingWatchApp
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_WKCompanionAppBundleIdentifier: com.egopfe.dirdiving.ios
