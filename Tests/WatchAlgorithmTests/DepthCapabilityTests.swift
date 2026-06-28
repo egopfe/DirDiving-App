@@ -3,14 +3,26 @@ import XCTest
 
 @MainActor
 final class DepthCapabilityTests: XCTestCase {
+    override func setUp() {
+        #if DEBUG
+        DeveloperSettings.resetShallowDepthDivingTestingForTests()
+        #endif
+        super.setUp()
+    }
+
     override func tearDown() {
         DepthCapabilityEntitlementProbe.testHook_hasShallowEntitlement = nil
         DepthCapabilityEntitlementProbe.testHook_hasFullEntitlement = nil
         AppleDepthSensorProvider.testHook_isAvailable = nil
+        #if DEBUG
+        DeveloperSettings.resetShallowDepthDivingTestingForTests()
+        #endif
         super.tearDown()
     }
 
-    func testShallowDoesNotImplyFullCapability() {
+    func testShallowDoesNotImplyFullCapabilityWhenTestingDisabled() {
+        DeveloperSettings.setShallowGaugeTestingEnabled(false)
+        DeveloperSettings.setShallowDepthDivingTestingEnabled(false)
         DepthCapabilityEntitlementProbe.testHook_hasShallowEntitlement = true
         DepthCapabilityEntitlementProbe.testHook_hasFullEntitlement = false
         let resolver = DepthCapabilityResolver()
@@ -19,6 +31,23 @@ final class DepthCapabilityTests: XCTestCase {
         XCTAssertTrue(policy.supportsSnorkelingRuntime)
         XCTAssertTrue(policy.supportsApneaRuntime)
         XCTAssertFalse(policy.supportsFullComputerRuntime)
+        XCTAssertFalse(policy.supportsDivingGaugeRuntime)
+    }
+
+    func testShallowAllowsGaugeWhenGaugeTestingEnabled() {
+        DeveloperSettings.setShallowGaugeTestingEnabled(true)
+        DeveloperSettings.setShallowDepthDivingTestingEnabled(false)
+        let policy = DepthCapabilityPolicy(capability: .appleShallow)
+        XCTAssertTrue(policy.supportsDivingGaugeRuntime)
+        XCTAssertFalse(policy.supportsFullComputerRuntime)
+    }
+
+    func testShallowAllowsGaugeAndFullComputerWhenTestingEnabled() {
+        DeveloperSettings.setShallowGaugeTestingEnabled(true)
+        DeveloperSettings.setShallowDepthDivingTestingEnabled(true)
+        let policy = DepthCapabilityPolicy(capability: .appleShallow)
+        XCTAssertTrue(policy.supportsDivingGaugeRuntime)
+        XCTAssertTrue(policy.supportsFullComputerRuntime)
     }
 
     func testFullCapabilityUnlocksFullComputerPolicy() {
