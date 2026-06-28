@@ -1,65 +1,57 @@
 # Master Documentation Remediation Plan — Current
 
-**Audit:** Command 06 — Master Documentation / Repository Alignment Audit V1.0  
-**Date:** 2026-06-22  
+**Audit:** Command 06 — Master Documentation / Repository Alignment Audit **V1.1**  
+**Date:** 2026-06-28  
 **Branch:** `main`  
-**Commit:** `1f62235` (`1f62235996c5a00418db36519479df289c212744`)  
+**Commit:** `7dfefe2` (`7dfefe2cd7817780a903a64e51b890d901111ffd`)  
 **Type:** Remediation plan only — no documentation edits in this pass
 
 ---
 
-## P0 — Unsafe / unsupported claims / wrong architecture causing unsafe use
+## P0 — Unsafe / unsupported claims / wrong architecture / command integrity
 
 | ID | File | Section | Exact change required | Why | Priority | Audit to rerun |
 |----|------|---------|----------------------|-----|----------|----------------|
-| DOC-P0-001 | `Docs/TESTFLIGHT_REVIEW_NOTES.md` | § Rami non inclusi | Replace "Apnea, Snorkeling … solo su branch codex/*" with "Apnea and Snorkeling ship on MAIN @ current baseline; Buddy Assist and exploration remain experimental-only; physical QA PENDING." | TestFlight reviewers may believe MAIN build lacks Apnea/Snorkeling | P0 | 05 Release QA; 06 Documentation |
-| DOC-P0-002 | `Docs/WATCH_MISSION_MODE_UX_SAFETY_VERIFICATION_REPORT.md` | App Store ready row | Change "App Store ready (UX/safety/copy)? **Yes**" to "**No** for external App Store — internal UX copy acceptable; physical QA, entitlement, and legal review **PENDING**." | Unsupported App Store readiness claim | P0 | 05 Release QA |
-| DOC-P0-003 | `Docs/PRODUCT_FEATURES_IT.md` | § Snorkeling / § Apnea | Rewrite both sections as MAIN production (Watch + iOS), link `APNEA_ARCHITECTURE.md` / `SNORKELING_ARCHITECTURE.md`, mark `codex/*` as legacy exploration only | Contradicts V3.0 MAIN architecture; Italian overview misleads | P0 | 06 Documentation |
-| DOC-P0-004 | `Docs/EXPERIMENTAL_FEATURES.md` | Opening + Apnea integration | State Buddy Assist / exploration / legacy branch surfaces only; remove "Apnea excluded from MAIN Watch target until promotion" | Implies Apnea not in production MAIN | P0 | 06 Documentation |
+| DOC-P0-001 | `commands_for_cursor/01`–`04` | Entire body vs filename | **Permutation repair:** restore bodies so 01=Watch FC V2.1, 02=iOS V1.1, 03=UI/UX V2.2, 04=Main Code V1.1. Current state: **01=file04, 02=file03, 03=file01, 04=file02** (CONFLICTING). Use OOLD archives + V1.2 source as restore references. | Wrong audit would execute if launch sequence followed filenames | P0 | 00 Orchestrator; all 01–06 |
+| DOC-P0-002 | `Docs/WATCH_LOW_POWER_MISSION_MODE_IMPLEMENTATION_REPORT.md` | Executive table App Store ready row | Change "**Conditional yes**" to "**No** for external App Store — internal TestFlight UX only; physical QA and copy review **PENDING**." | Unsupported App Store readiness | P0 | 05 Release QA |
+| DOC-P0-003 | `Docs/DOCUMENTATION_UPDATE_REPORT_20260609.md` | § Not claimed | Remove bullet "**CCR external validation complete**" or rewrite as "**CCR external validation PENDING** (see CCR_REBREATHER_VALIDATION_EVIDENCE.md)." | Contradicts PENDING external validation posture | P0 | 05 Release QA; 06 Documentation |
+| DOC-P0-004 | `commands_for_cursor/00-MASTER_SUPER_ORCHESTRATOR...V1.2.md` | Preflight / execution gate | Add explicit **STOP** if 01–04 body SHA/title mismatch detected (permutation guard). | Prevents silent wrong-audit execution until repair | P0 | 00 Orchestrator |
 
 ---
 
-## P1 — README / matrix / command sequence / release wording / ownership
+## P1 — README / matrix / command sequence / release wording / 2026-06-28 wave
 
 | ID | File | Section | Exact change required | Why | Priority | Audit to rerun |
 |----|------|---------|----------------------|-----|----------|----------------|
-| DOC-P1-001 | `README.md` | Release baseline | Update `origin/main` @ **`1f62235`**; add link to `commands_for_cursor/00-DIR_DIVING_MASTER_AUDIT_LAUNCH_SEQUENCE.md` | Stale SHA bf03fb0 | P1 | 06 Documentation |
-| DOC-P1-002 | `Docs/README.md` | Baseline + stato corrente | Refresh baseline to `1f62235`; add row for master audits 01–05 outputs | Primary project doc stale | P1 | 06 Documentation |
-| DOC-P1-003 | `Docs/INDEX.md` | New top section | Insert "Aggiornamento indice 2026-06-22 — Master audit Launch Order 01–06" with links to all `MASTER_*_CURRENT` reports/matrices | Master audit outputs invisible | P1 | 06 Documentation |
-| DOC-P1-004 | `Docs/INDEX.md` | Command 6 V3.0 section | Add superseded banner → `06-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.0.md` | Wrong active command | P1 | 06 Documentation |
-| DOC-P1-005 | `Docs/ROADMAP.md` | Header + experimental table | Update date/SHA; add MAIN Snorkeling/Apnea shipped rows; relabel codex table "legacy branch exploration" | ROADMAP contradicts MAIN | P1 | 06 Documentation |
-| DOC-P1-006 | `Docs/DIR_DIVING_Feature_Comparison.csv` | Rows 12–26 vs 430–433 | Prefix experimental rows with `branch=codex/* (legacy)` or move to appendix; ensure no conflict with MAIN rows | Feature matrix drift | P1 | 06 Documentation |
-| DOC-P1-007 | `Docs/WATCH_LOW_POWER_MISSION_MODE_IMPLEMENTATION_REPORT.md` | App Store rows | Demote "App Store ready" to conditional internal; cite PENDING physical QA | Overstates release readiness | P1 | 05 Release QA |
-| DOC-P1-008 | `Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md` | project.yml claim | Add superseded banner @ top; note Apnea/Snorkeling now in MAIN | Pre-V3.0 false exclusion | P1 | 06 Documentation |
-| DOC-P1-009 | `commands_for_cursor/` archive | Missing V3.0 files | Restore or document absence of Commands 4–17 V3.0 in `INDEX` superseded table | INDEX references missing files | P1 | 06 Documentation |
-| DOC-P1-010 | `Docs/DIR_DIVING_DOCUMENTATION_BRANCH_ALIGNMENT_REPORT.md` | Scope | Append § post-master-audit delta @ `1f62235` | Last alignment @ bf03fb0 | P1 | 06 Documentation |
-| DOC-P1-011 | `Docs/CHANGELOG.md` | Unreleased | Add master audit 01–06 execution summary (audit-only outputs) | Release notes gap | P1 | 06 Documentation |
-| DOC-P1-012 | `Docs/ORCHESTRATED_AUDIT_CONSOLIDATED_REPORT_CURRENT.md` | ORCH-001 | Footnote: altitude environment P0 remediated @ 1f62235 per MASTER_WATCH audit | Stale NO-GO root cause | P1 | 01 Watch FC |
+| DOC-P1-001 | `README.md` | Release baseline | Update `origin/main` @ **`7dfefe2`**; link `commands_for_cursor/00-DIR_DIVING_MASTER_AUDIT_LAUNCH_SEQUENCE_UPDATED_2026-06-28.md` | Stale SHA bf03fb0 | P1 | 06 Documentation |
+| DOC-P1-002 | `Docs/README.md` | Baseline + stato corrente | Refresh baseline to `7dfefe2`; add master audits 01–06 @ 7dfefe2 row | Primary project doc stale | P1 | 06 Documentation |
+| DOC-P1-003 | `Docs/INDEX.md` | New top section | Insert "**Aggiornamento indice 2026-06-28** — Master audit V1.2 + 2026-06-28 Watch wave" with links to water auto-open, shallow depth, GF preset matrices and `MASTER_*_CURRENT` @ 7dfefe2 | Master outputs and new wave invisible | P1 | 06 Documentation |
+| DOC-P1-004 | `Docs/INDEX.md` | 2026-06-22 master table | Update command filenames to V2.1/V1.1/V2.2/V1.1/V1.1/V1.1; add **P0 permutation blocker** note until repaired | Wrong command versions indexed | P1 | 06 Documentation |
+| DOC-P1-005 | `Docs/DIR_DIVING_Feature_Comparison.csv` | Rows 12–26 vs 430–433 | Prefix experimental rows `branch=codex/* (legacy)`; add GF preset, shallow testing, water auto-open rows from feature inventory | Matrix drift + 2026-06-28 gap | P1 | 06 Documentation |
+| DOC-P1-006 | `Docs/ROADMAP.md` | Header | Update date/SHA to `7dfefe2` | Stale header | P1 | 06 Documentation |
+| DOC-P1-007 | `Docs/MAIN_BRANCH_FINAL_READINESS_REPORT.md` | Top | Add superseded banner — pre-V3.0; Apnea/Snorkeling now on MAIN | False exclusion claim | P1 | 06 Documentation |
+| DOC-P1-008 | `Docs/INDEX.md` | Command 6 V3.0 | Superseded banner → `06-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.1.md` | Wrong active command | P1 | 06 Documentation |
+| DOC-P1-009 | `Docs/MASTER_WATCH_DEPTH_CAPABILITY_SHALLOW_TESTING_MATRIX_CURRENT.csv` | Git + INDEX | Commit when approved; link from INDEX Watch entitlement subsection | Untracked audit output | P1 | 01 Watch FC |
+| DOC-P1-010 | `Docs/MASTER_WATCH_FULL_COMPUTER_GF_PRESET_MATRIX_CURRENT.csv` | Git + INDEX | Commit when approved; link from INDEX FC subsection | Untracked audit output | P1 | 01 Watch FC |
+| DOC-P1-011 | `Docs/TESTFLIGHT_REVIEW_NOTES.md` | Header baseline | Update SHA from `7b620f3` to `7dfefe2`; add shallow-depth + water auto-open reviewer bullets | Reviewer context stale | P1 | 05 Release QA |
+| DOC-P1-012 | `Docs/PRODUCT_FEATURES_IT.md` | Branch table intro | Add sentence: table compares MAIN vs legacy codex branches; Apnea/Snorkeling ship on MAIN | Ambiguous branch table | P1 | 06 Documentation |
 
 ---
 
-## P2 — Missing links / incomplete index / stale readiness / screenshots
+## P2 — Missing links / incomplete index / stale readiness / baseline drift
 
 | ID | File | Section | Exact change required | Why | Priority | Audit to rerun |
 |----|------|---------|----------------------|-----|----------|----------------|
-| DOC-P2-001 | `Docs/INDEX.md` | Settings / Logbook | Consolidated link block: `IOS_COMPANION_SETTINGS_MODE_SWITCH_CURRENT.md`, `WATCH_ACTIVITY_SETTINGS_ACCESS_CURRENT.md`, `MASTER_UI_UX_*_OWNERSHIP` | Ownership docs scattered | P2 | 03 UI/UX |
-| DOC-P2-002 | `Docs/DIR_DIVING_Feature_Comparison.csv` | New rows | Add iOS Settings mode switcher, Activity Settings, Briefing cards (reference-only), Ratio Deco heuristic | Matrix gaps | P2 | 06 Documentation |
-| DOC-P2-003 | `Docs/INDEX.md` | Physical/external QA | Link `MASTER_*_EXTERNAL_*` and `MASTER_*_PHYSICAL_*` pending docs from audits 01–05 | QA pending not centralized | P2 | 05 Release QA |
-| DOC-P2-004 | `Docs/APNEA_EXPERIMENTAL_SPEC.md` | Title/header | Rename or mark "legacy branch spec — see APNEA_ARCHITECTURE.md for MAIN" | Misleading filename | P2 | 06 Documentation |
-| DOC-P2-005 | `Docs/SNORKELING_EXPERIMENTAL_SPEC.md` | Title/header | Same as DOC-P2-004 for Snorkeling | Misleading filename | P2 | 06 Documentation |
-| DOC-P2-006 | `Docs/IOS_PERFORMANCE_OPTIMIZATION_AUDIT_CURRENT.md` | INDEX baseline | Normalize referenced SHA to current or mark audit baseline explicitly | SHA drift in INDEX | P2 | 04 Main code |
-| DOC-P2-007 | `README.md` | Quick links | Add master audit launch sequence + `MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_CURRENT.md` after remediation | Discoverability | P2 | 06 Documentation |
-| DOC-P2-008 | `Docs/TERMINOLOGY_GLOSSARY_IT_EN_CURRENT.md` | Settings | Add "mode switcher", "activity-scoped settings", "logbook ownership" | New UI vocabulary | P2 | 03 UI/UX |
-| DOC-P2-009 | `Docs/RELEASE_CHECKLIST.md` | Master audits | Checkbox: master audits 01–06 outputs indexed and claims reviewed | Release gate alignment | P2 | 05 Release QA |
-| DOC-P2-010 | `Docs/PR_STATUS_*.md` | INDEX preference | Ensure INDEX primary link is latest PR_STATUS (20260620+) | Stale PR narrative | P2 | 06 Documentation |
-| DOC-P2-011 | `Docs/WATCH_MAIN_ALGORITHM_READINESS_100_REPORT.md` | Title | Append "(software readiness)" | Ambiguous 100% | P2 | 01 Watch FC |
-| DOC-P2-012 | `Docs/MAIN_UI_UX_READINESS_QA_ANALYSIS.md` | Headline | Clarify software-only vs overall UI/UX % | Ambiguous readiness | P2 | 03 UI/UX |
-| DOC-P2-013 | `Docs/INDEX.md` | Command 18 | Mark superseded by 01-MASTER_WATCH; retain report link | Duplicate audit track | P2 | 01 Watch FC |
-| DOC-P2-014 | `Docs/INDEX.md` | Orchestrator | Mark `00-MASTER_SUPER_ORCHESTRATOR` superseded for execution; keep roadmap link | Two command systems | P2 | 06 Documentation |
-| DOC-P2-015 | `Docs/PLANNER_BRIEFING_CARD_KIND_MATRIX_CURRENT.csv` | INDEX | Add to Planner/Briefing index subsection | Orphan matrix | P2 | 02 iOS |
-| DOC-P2-016 | `Docs/RATIO_DECO_COMPARATIVE_HEURISTIC.md` | Feature matrix + INDEX | Cross-link from planner section | Heuristic under-documented in index | P2 | 02 iOS |
-| DOC-P2-017 | `Docs/MASTER_*_CURRENT.*` | Git | Commit audit outputs from Commands 01–05 when approved (separate from this plan) | Untracked evidence | P2 | 06 Documentation |
-| DOC-P2-018 | `Docs/BRANCH_AND_TARGET_ISOLATION_POLICY.md` | HEAD | Refresh commit reference to `1f62235` | Minor staleness | P2 | 06 Documentation |
+| DOC-P2-001 | `Docs/INDEX.md` | Settings / Logbook | Consolidated block: settings mode switch, activity settings, logbook ownership matrices | Ownership docs scattered | P2 | 03 UI/UX |
+| DOC-P2-002 | `Docs/INDEX.md` | Physical/external QA | Link all `MASTER_*_PHYSICAL_*`, `MASTER_*_EXTERNAL_*`, `QA_EVIDENCE/` | QA pending not centralized | P2 | 05 Release QA |
+| DOC-P2-003 | `Docs/MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_CURRENT.md` | Header baseline | Re-run @ `7dfefe2` or update baseline note | Output @ 1f62235 | P2 | 05 Release QA |
+| DOC-P2-004 | `Docs/APNEA_EXPERIMENTAL_SPEC.md` | Header | Legacy branch spec banner → `APNEA_ARCHITECTURE.md` | Misleading filename | P2 | 06 Documentation |
+| DOC-P2-005 | `Docs/SNORKELING_EXPERIMENTAL_SPEC.md` | Header | Same legacy banner | Misleading filename | P2 | 06 Documentation |
+| DOC-P2-006 | `README.md` | Quick links | Add master audit launch sequence + documentation alignment audit | Discoverability | P2 | 06 Documentation |
+| DOC-P2-007 | `Docs/PLANNER_BRIEFING_CARD_KIND_MATRIX_CURRENT.csv` | INDEX | Add under Planner + briefing subsection | Orphan matrix | P2 | 02 iOS |
+| DOC-P2-008 | `Docs/RATIO_DECO_COMPARATIVE_HEURISTIC.md` | INDEX + CSV | Cross-link; add CSV row | Heuristic under-indexed | P2 | 02 iOS |
+| DOC-P2-009 | `Docs/RELEASE_CHECKLIST.md` | Master audits | Checkbox: commands 01–06 aligned (post permutation fix) and outputs indexed | Release gate | P2 | 05 Release QA |
+| DOC-P2-010 | `Docs/DIR_DIVING_IOS_DECO_GF_PRESET_CARD_SELECTOR_REPORT_CURRENT.md` | Cross-links | Link FC GF preset matrix | iOS/Watch GF separation | P2 | 01+02 |
 
 ---
 
@@ -67,29 +59,38 @@
 
 | ID | File | Section | Exact change required | Why | Priority | Audit to rerun |
 |----|------|---------|----------------------|-----|----------|----------------|
-| DOC-P3-001 | `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_202605*.md` | All | Ensure each has "superseded for HEAD" banner pointing to latest alignment report | Archive clarity | P3 | 06 Documentation |
-| DOC-P3-002 | `Docs/MAIN_BRANCH_COMPLETE_READINESS_AUDIT_202605*.md` | Verdict | Add archive banner — pre-V3.0 | Historical confusion | P3 | 06 Documentation |
-| DOC-P3-003 | `Docs/PR_STATUS_20260607.md` | Header | Superseded by 20260620 | Duplicate PR snapshots | P3 | 06 Documentation |
-| DOC-P3-004 | `Docs/INDEX.md` | Length | Consider collapsible/archive section for pre-2026-06 entries | INDEX >2300 lines | P3 | 06 Documentation |
-| DOC-P3-005 | `commands_for_cursor/OLD/` | README stub | Add `commands_for_cursor/ARCHIVE_README.md` listing OLD vs OOLD vs missing V3 | Archive discoverability | P3 | 06 Documentation |
-| DOC-P3-006 | `Docs/ReferenceUI/README.md` | Legacy paths | Verify all mockup paths match MASTER_MOCKUP_PATH_VALIDATION | Broken reference risk | P3 | 03 UI/UX |
-| DOC-P3-007 | `Docs/WATCH_MISSION_MODE_UX_SAFETY_VERIFICATION_REPORT.md` | Formatting | After P0 fix, align table with RELEASE_LEGAL claim registry | Consistency | P3 | 05 Release QA |
-| DOC-P3-008 | `Scripts/validate_master_main_code_sync_security_performance_audit.sh` | INDEX | Optional script link under Command 04 | Minor discoverability | P3 | 04 Main code |
+| DOC-P3-001 | `commands_for_cursor/OLD/` + `OOLD/` | Archive | Add `commands_for_cursor/ARCHIVE_README.md` listing OLD vs OOLD vs active 00–06 | Archive discoverability | P3 | 06 Documentation |
+| DOC-P3-002 | `Docs/DOCUMENTATION_BRANCH_ALIGNMENT_202605*.md` | Header | Superseded banner → latest alignment report | Historical confusion | P3 | 06 Documentation |
+| DOC-P3-003 | `Docs/1-DIR_DIVING_*` / `2-DIR_DIVING_*` / `IOS_MAIN_COMPLETE_*` | Header | Archive banners — superseded by MASTER audits | Legacy audit docs | P3 | 06 Documentation |
+| DOC-P3-004 | `Docs/INDEX.md` | Length | Collapsible archive section for pre-2026-06 entries | INDEX >2300 lines | P3 | 06 Documentation |
+| DOC-P3-005 | `Docs/PR_STATUS_20260607.md` | Header | Superseded by 20260620+ | Duplicate PR snapshots | P3 | 06 Documentation |
+| DOC-P3-006 | `Docs/ORCHESTRATED_AUDIT_CONSOLIDATED_REPORT_CURRENT.md` | Verdict | Superseded notice → MASTER consolidated plan | Two orchestration narratives | P3 | 00 Orchestrator |
+
+---
+
+## P4 — Verified fixed since prior audit (track only)
+
+| ID | File | Status | Notes |
+|----|------|--------|-------|
+| DOC-P4-001 | `Docs/TESTFLIGHT_REVIEW_NOTES.md` | FIXED | Apnea/Snorkeling on MAIN correctly stated |
+| DOC-P4-002 | `Docs/EXPERIMENTAL_FEATURES.md` | FIXED | Buddy/exploration legacy scope only |
+| DOC-P4-003 | `Docs/WATCH_MISSION_MODE_UX_SAFETY_VERIFICATION_REPORT.md` | FIXED | App Store ready = No external |
+| DOC-P4-004 | `commands_for_cursor/05` + `06` | ALIGNED | Bodies match filenames @ 7dfefe2 |
+| DOC-P4-005 | `commands_for_cursor/00` V1.2 | ALIGNED | Orchestrator filename/body match |
 
 ---
 
 ## Summary counts
 
-| Priority | Open items |
-|----------|------------|
+| Priority | Count |
+|----------|-------|
 | P0 | 4 |
 | P1 | 12 |
-| P2 | 18 |
-| P3 | 8 |
-| **Total** | **42** |
+| P2 | 10 |
+| P3 | 6 |
+| P4 | 5 (track-only / verified fixed) |
+| **Total remediation items** | **37** |
 
-**Recommended execution order:** P0 → P1 (INDEX + README + TestFlight + PRODUCT_FEATURES_IT) → P2 feature matrix → P3 archive hygiene → rerun Command 06.
+**Recommended execution order:** DOC-P0-001 (command permutation) → DOC-P0-004 → P0 claims → P1 INDEX/README → P1 feature matrix → P2 links → P3 archive.
 
----
-
-*End of plan — audit-only @ `1f62235`*
+**Audit to rerun after remediation:** Command 06 (this audit); Command 00 orchestrator validation; Commands 01–05 only after permutation repair.

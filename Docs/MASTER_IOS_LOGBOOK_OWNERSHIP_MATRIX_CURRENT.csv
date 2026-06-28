@@ -23,5 +23,6 @@ STATS_SNORKEL,Snorkeling,Snorkeling,IOSSnorkelingLogbookStore,Snorkeling analyti
 EXPORT_DIVING,Diving,Diving,DiveLogStore,PDF/CSV export,yes,PDFExportServiceTests,PASS,No cross-activity export path
 EXPORT_APNEA,Apnea,Apnea,IOSApneaLogbookStore,Apnea export,yes,IOSApneaMapEquipmentExportTests,PASS,
 EXPORT_SNORKEL,Snorkeling,Snorkeling,IOSSnorkelingLogbookStore,Snorkeling export,yes,IOSSnorkelingExportServiceE2ETests,PASS,
-DEEP_LINK_MIXED,Any,Mixed,n/a,onOpenURL,N/A,DIR_DIVING_IOS_ACTIVITY_SELECTION_AND_LINKS_AUDIT_CURRENT.md,PASS,No URL handlers — N/A
-STATE_RESTORE_MIXED,Any,Mixed,n/a,Scene restoration,no,IOS-MASTER-F002,PARTIAL,Session checkpoints only; nav restore gap
+DEEP_LINK_MIXED,Any,Mixed,n/a,IOSCompanionDeepLinkPolicy,no,IOSCompanionNavigationRestorationTests.testCrossActivitySessionDetailDeepLinkRejected,PASS,Cross-activity session detail rejected
+STATE_RESTORE_MIXED,Any,Mixed,n/a,IOSCompanionNavigationPersistence,partial,IOSCompanionNavigationRestorationTests,PARTIAL,Tab/settings tokens persist; root tab wiring partial F002
+GF_LOGBOOK_METADATA,Diving,Diving,DiveLogStore / FC metadata,FullComputerDiveLogbookMetadata,yes,FullComputerGradientFactorRuntimeResolutionTests,PASS,GF preset/source stored when FC dive completes

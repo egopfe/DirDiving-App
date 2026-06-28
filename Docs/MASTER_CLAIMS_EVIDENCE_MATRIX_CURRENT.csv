@@ -1,30 +1,37 @@
-Claim_ID,Activity,Mode,Surface,Claim_Text_or_Key,Allowed,Required_Disclaimer,Evidence_Type,Evidence_Path,Technical_Status,Physical_Status,External_Validation_Status,Legal_Status,Marketing_Status,Release_Blocking,Owner_Role,Last_Reviewed,Notes
-CLM-GLOBAL-01,Global,All,All,Not a certified dive computer,yes,SAFETY_DISCLAIMER + onboarding,legal doc + strings,Docs/SAFETY_DISCLAIMER.md,PASS,N/A,N/A,PENDING_LEGAL_REVIEW,PENDING_MARKETING_SIGN_OFF,Yes,Product,2026-06-22,Counsel sign-off pending
-CLM-GLOBAL-02,Global,All,Legal flow,legalRevision acceptance,yes,Scroll gate + depth ack,persistence,LegalAcceptanceStore.swift,PASS,N/A,N/A,PASS,N/A,No,Product,2026-06-22,
-CLM-GAUGE-01,Diving,Gauge,Watch,TTV informational,yes,Not NDL/TTS/deco,strings,detail.ttv.note,PASS,N/A,N/A,PASS,N/A,No,Algorithm,2026-06-22,
-CLM-FC-01,Diving,Full Computer,Watch,Non-certified experimental runtime,yes,briefing.reference_only.footer,architecture + tests,FULL_COMPUTER_ARCHITECTURE.md,PASS,PENDING,PENDING,PASS,N/A,Yes,Algorithm,2026-06-22,Battery + CMAltimeter field QA pending
-CLM-FC-02,Diving,Full Computer,Watch,Depth entitlement disclosure,yes,Field validation pending,docs,HARDWARE_ENTITLEMENT,PASS,PENDING,N/A,PASS,N/A,Yes,Product,2026-06-22,
-CLM-FC-03,Diving,Full Computer,Watch,CMAltimeter non-authoritative until accept,yes,Explicit diver acceptance,tests + audit,WatchCMAltimeterRemediationTests,PASS,PENDING,N/A,PASS,N/A,Yes,Algorithm,2026-06-22,WCMA software remediated; physical PENDING
-CLM-PLN-01,Diving,Planner,iOS,Reference-only planner,yes,planner.reference_only.warning,strings + ack,IOS_PLANNER_LIMITATIONS.md,PASS,N/A,PENDING,PASS,PENDING,Yes,Algorithm,2026-06-22,Bühlmann external pending
-CLM-PLN-02,Diving,Planner,iOS,Ratio Deco heuristic,yes,planner.ratio_deco.disclaimer,strings,RatioDecoPlannerTests,PASS,N/A,N/A,PASS,N/A,No,Algorithm,2026-06-22,
-CLM-PLN-03,Diving,Planner,iOS,CNS/OTU estimates,yes,Reference-only hints,strings,Bühlmann engine design,PASS,N/A,N/A,PASS,N/A,No,Algorithm,2026-06-22,
-CLM-PLN-04,Diving,Planner,iOS,CCR reference-only planner,yes,ccr.safety.disclaimer,limitations doc,CCR_REBREATHER_LIMITATIONS.md,PASS,N/A,PENDING,PASS,PENDING,Yes,Algorithm,2026-06-22,
-CLM-BRIEF-01,Diving,Briefing cards,Watch,Reference-only briefing footer,yes,briefing.reference_only.footer,strings + tests,WatchBriefingCardRemediationTests,PASS,PENDING,N/A,PASS,N/A,No,Product,2026-06-22,Physical WC transfer PENDING
-CLM-CCR-01,Diving,CCR,iOS,Reference CCR planner,yes,ccr.safety.disclaimer,limitations doc,CCR_REBREATHER_LIMITATIONS.md,PASS,N/A,PENDING,PASS,PENDING,Yes,Algorithm,2026-06-22,CCR external pending
-CLM-APNEA-01,Apnea,All,Watch+iOS,Recovery policy not medical,yes,No medical guarantee,strings + audit,Apnea lifecycle tests,PASS,N/A,N/A,PASS,N/A,No,Apnea,2026-06-22,
-CLM-SNORK-01,Snorkeling,All,Watch,Reference return navigation,yes,GPS quality qualifiers,strings,snorkeling.return.*,PASS,PENDING,N/A,PASS,N/A,Yes,Snorkeling,2026-06-22,Field GPS pending
-CLM-GPS-01,All,All,All,Surface-only GPS,yes,more.safety.footer,legal + export,Docs/iOS/SAFETY_DISCLAIMER.md,PASS,N/A,N/A,PASS,N/A,No,Product,2026-06-22,
-CLM-EXP-01,All,All,Export,PDF/CSV disclaimers,yes,EXPORT_DISCLAIMER_POLICY,tests,CSVMetadataRoundTripTests,PASS,N/A,PENDING,PASS,N/A,No,Product,2026-06-22,Subsurface external pending
-CLM-PRIV-01,All,All,Privacy,No tracking declared,yes,PRIVACY_MANIFEST,manifest,Config/PrivacyInfo-*.xcprivacy,PASS,N/A,N/A,PASS,N/A,Yes,Security,2026-06-22,App Store review pending
-CLM-ENT-01,Diving,All,Watch,Entitlement vs validation,yes,WATCH_ULTRA_ENTITLEMENT_RELEASE_GATE,docs,HARDWARE_ENTITLEMENT,PASS,PENDING,N/A,PASS,N/A,Yes,Product,2026-06-22,Water submersion entitlement configured
-CLM-DSS-01,All,All,Settings,Developer Sensor Source gating,yes,TestFlight disclosure,tests,DeveloperSensorSourceTests,PASS,N/A,N/A,PASS,N/A,Yes,Product,2026-06-22,Simulation mode must stay labeled
-CLM-EQUIP-01,Diving,Checklist,iOS,Operational prep not life-support,yes,PRE_DIVE_CHECKLIST docs,source scan,EquipmentChecklistGenerator,PASS,N/A,N/A,PASS,N/A,No,Product,2026-06-22,
-CLM-STORE-01,All,All,App Store,Non-certified positioning,yes,IOS_APP_STORE checklist,checklist,APP_STORE_MARKETING,PASS,N/A,N/A,PENDING,PENDING,Yes,Marketing,2026-06-22,
-CLM-STORE-02,All,All,TestFlight,Aligned review notes,yes,TESTFLIGHT_REVIEW_NOTES,doc,TESTFLIGHT_REVIEW_NOTES.md,PASS,N/A,N/A,PASS,N/A,No,Product,2026-06-22,
-CLM-SYNC-01,All,All,Sync,No guaranteed instant sync,yes,Sync may be delayed,codec tests,WATCH_IOS_SYNC,PASS,PENDING,N/A,PASS,N/A,Yes,Sync,2026-06-22,
-CLM-CLOUD-01,Diving,Logbook,iOS,Diving-only optional iCloud,yes,Apnea/Snorkeling local-only,tests,CloudBackupCapabilityTests,PASS,PENDING,N/A,PASS,N/A,Yes,Cloud,2026-06-22,iCloud two-device pending
-CLM-LEGAL-01,All,All,Terms/Privacy,Non-binding terms,yes,TERMS_OF_USE,legal tests,IOSLegalSettingsLocalizationTests,PASS,N/A,N/A,PENDING,N/A,Yes,Legal,2026-06-22,
-CLM-BM-EXT-01,Diving,Planner,Marketing,Reference-only until external,yes,BUHLMANN_EXTERNAL template,fixtures,BuhlmannReferenceFixtureTests,PASS,N/A,PENDING,PASS,PENDING,Yes,Algorithm,2026-06-22,
-CLM-CCR-EXT-01,Diving,CCR,Marketing,Reference-only until external,yes,CCR_EXTERNAL template,tests,CCRMathRemediationTests,PASS,N/A,PENDING,PASS,PENDING,Yes,Algorithm,2026-06-22,
-CLM-RB-01,Diving,Planner,iOS,Rock Bottom estimate not guarantee,yes,Estimate wording,strings,GasLedgerDisplayFormatterTests,PASS,N/A,N/A,PASS,N/A,No,Algorithm,2026-06-22,
-CLM-GL-01,Diving,Planner,iOS,Gas ledger bar estimate,yes,Estimate wording,strings,GasLedgerDisplayFormatterTests,PASS,N/A,N/A,PASS,N/A,No,Algorithm,2026-06-22,
+Claim_ID,Activity,Mode,Surface,Claim_Text_or_Key,Allowed,Required_Disclaimer,Evidence_Type,Evidence_Path,Technical_Status,Software_Status,Physical_Status,External_Validation_Status,Legal_Status,Marketing_Status,Release_Blocking,Owner_Role,Last_Reviewed,Notes
+CLM-GLOBAL-01,Global,All,All,Not a certified dive computer,yes,SAFETY_DISCLAIMER + onboarding,legal doc + strings,Docs/SAFETY_DISCLAIMER.md,PASS,SOFTWARE_READY,N/A,N/A,PENDING_LEGAL_REVIEW,PENDING_MARKETING_SIGN_OFF,Yes,Product,2026-06-28,Counsel sign-off pending
+CLM-GLOBAL-02,Global,All,Legal flow,legalRevision acceptance,yes,Scroll gate + depth ack,persistence,LegalAcceptanceStore.swift,PASS,SOFTWARE_READY,N/A,N/A,PASS,N/A,No,Product,2026-06-28,
+CLM-GAUGE-01,Diving,Gauge,Watch,TTV informational,yes,Not NDL/TTS/deco,strings,detail.ttv.note,PASS,SOFTWARE_READY,N/A,N/A,PASS,N/A,No,Algorithm,2026-06-28,
+CLM-FC-01,Diving,Full Computer,Watch,Non-certified experimental runtime,yes,briefing.reference_only.footer,architecture + tests,FULL_COMPUTER_ARCHITECTURE.md,PASS,SOFTWARE_READY,PENDING,PENDING,PASS,N/A,Yes,Algorithm,2026-06-28,CMAltimeter + battery field QA pending
+CLM-FC-02,Diving,Full Computer,Watch,Depth entitlement disclosure,yes,Field validation pending,docs,HARDWARE_ENTITLEMENT,PASS,SOFTWARE_READY,PENDING,N/A,PASS,N/A,Yes,Product,2026-06-28,Shallow default signing @7dfefe2
+CLM-FC-03,Diving,Full Computer,Watch,CMAltimeter non-authoritative until accept,yes,Explicit diver acceptance,tests,WatchCMAltimeterRemediationTests,PASS,SOFTWARE_READY,PENDING,N/A,PASS,N/A,Yes,Algorithm,2026-06-28,WCMA software remediated
+CLM-SHALLOW-01,Diving,All,Watch,Shallow-depth ~6m limitation when shallow signed,yes,Not full-depth certified,DepthCapabilityPolicy + strings,DepthCapabilityTests,PASS,SOFTWARE_READY,PENDING,N/A,PASS,N/A,Yes,Product,2026-06-28,New @6197673
+CLM-SHALLOW-02,Diving,Full Computer,Watch,Developer shallow FC internal testing only,yes,Internal QA not public feature,DeveloperSettingsView,DeveloperSettingsTests,PASS,SOFTWARE_READY,PENDING,N/A,PASS,N/A,Yes,Product,2026-06-28,SDG-008 P1 exposure risk on TF
+CLM-WAO-01,Diving,All,Watch,Water auto-open does not start dive,yes,Predive required for FC,WatchWaterAutoOpenPolicyTests,WatchWaterAutoOpenPolicyTests,PASS,SOFTWARE_READY,PENDING,N/A,PASS,N/A,Yes,Product,2026-06-28,Physical WAO PENDING
+CLM-WAO-02,Diving,All,Watch,System Auto-Launch limitation truthful,yes,settings.water_auto_open.system_limitation,strings,WatchWaterAutoOpenSettingsView,PASS,SOFTWARE_READY,PENDING,N/A,PASS,N/A,Yes,Product,2026-06-28,No false listing claim
+CLM-GF-01,Diving,Full Computer,Watch,GF presets are user conservatism setting,yes,Not validation/certification,FullComputerGradientFactorPreset,GF matrix,PASS,SOFTWARE_READY,PENDING,N/A,PASS,N/A,Yes,Algorithm,2026-06-28,GF-E-010
+CLM-GF-02,Diving,Planner,iOS,iOS GF presets may not import to Watch,yes,Import limitation until F016 fixed,DivePlanPackage import,IOS-MASTER-F016,FAIL,SOFTWARE_GAP,N/A,N/A,PASS,N/A,Yes,Algorithm,2026-06-28,Only 40/85 matches Watch
+CLM-PLN-01,Diving,Planner,iOS,Reference-only planner,yes,planner.reference_only.warning,strings + ack,IOS_PLANNER_LIMITATIONS.md,PASS,SOFTWARE_READY,N/A,PENDING,PASS,PENDING,Yes,Algorithm,2026-06-28,
+CLM-PLN-02,Diving,Planner,iOS,Ratio Deco heuristic,yes,planner.ratio_deco.disclaimer,strings,RatioDecoPlannerTests,PASS,SOFTWARE_READY,N/A,N/A,PASS,N/A,No,Algorithm,2026-06-28,
+CLM-PLN-03,Diving,Planner,iOS,CNS/OTU estimates,yes,Reference-only hints,strings,Bühlmann engine design,PASS,SOFTWARE_READY,N/A,N/A,PASS,N/A,No,Algorithm,2026-06-28,
+CLM-PLN-04,Diving,Planner,iOS,CCR reference-only planner,yes,ccr.safety.disclaimer,limitations doc,CCR_REBREATHER_LIMITATIONS.md,PASS,SOFTWARE_READY,N/A,PENDING,PASS,PENDING,Yes,Algorithm,2026-06-28,
+CLM-BRIEF-01,Diving,Briefing cards,Watch,Reference-only briefing footer,yes,briefing.reference_only.footer,strings + tests,WatchBriefingCardRemediationTests,PASS,SOFTWARE_READY,PENDING,N/A,PASS,N/A,No,Product,2026-06-28,
+CLM-CCR-01,Diving,CCR,iOS,Reference CCR planner,yes,ccr.safety.disclaimer,limitations doc,CCR_REBREATHER_LIMITATIONS.md,PASS,SOFTWARE_READY,N/A,PENDING,PASS,PENDING,Yes,Algorithm,2026-06-28,
+CLM-APNEA-01,Apnea,All,Watch+iOS,Recovery policy not medical,yes,No medical guarantee,strings + audit,Apnea lifecycle tests,PASS,SOFTWARE_READY,N/A,N/A,PASS,N/A,No,Apnea,2026-06-28,
+CLM-SNORK-01,Snorkeling,All,Watch,Reference return navigation,yes,GPS quality qualifiers,strings,snorkeling.return.*,PASS,SOFTWARE_READY,PENDING,N/A,PASS,N/A,Yes,Snorkeling,2026-06-28,
+CLM-GPS-01,All,All,All,Surface-only GPS,yes,more.safety.footer,legal + export,Docs/iOS/SAFETY_DISCLAIMER.md,PASS,SOFTWARE_READY,N/A,N/A,PASS,N/A,No,Product,2026-06-28,
+CLM-EXP-01,All,All,Export,PDF/CSV disclaimers,yes,EXPORT_DISCLAIMER_POLICY,tests,CSVMetadataRoundTripTests,PASS,SOFTWARE_READY,N/A,PENDING,PASS,N/A,No,Product,2026-06-28,
+CLM-PRIV-01,All,All,Privacy,No tracking declared,yes,PRIVACY_MANIFEST,manifest,Config/PrivacyInfo-*.xcprivacy,PASS,SOFTWARE_READY,N/A,N/A,PASS,N/A,Yes,Security,2026-06-28,
+CLM-ENT-01,Diving,All,Watch,Entitlement vs validation,yes,WATCH_ULTRA_ENTITLEMENT_RELEASE_GATE,docs,HARDWARE_ENTITLEMENT,PASS,SOFTWARE_READY,PENDING,N/A,PASS,N/A,Yes,Product,2026-06-28,Shallow + full paths documented
+CLM-DSS-01,All,All,Settings,Developer Sensor Source gating,yes,TestFlight disclosure,tests,DeveloperSensorSourceTests,PASS,SOFTWARE_READY,N/A,N/A,PASS,N/A,Yes,Product,2026-06-28,
+CLM-EQUIP-01,Diving,Checklist,iOS,Operational prep not life-support,yes,PRE_DIVE_CHECKLIST docs,source scan,EquipmentChecklistGenerator,PASS,SOFTWARE_READY,N/A,N/A,PASS,N/A,No,Product,2026-06-28,
+CLM-STORE-01,All,All,App Store,Non-certified positioning,yes,IOS_APP_STORE checklist,checklist,APP_STORE_MARKETING,PASS,SOFTWARE_READY,N/A,N/A,PENDING,PENDING,Yes,Marketing,2026-06-28,
+CLM-STORE-02,All,All,TestFlight,Aligned review notes,yes,TESTFLIGHT_REVIEW_NOTES,doc,TESTFLIGHT_REVIEW_NOTES.md,PASS,SOFTWARE_READY,N/A,N/A,PASS,N/A,No,Product,2026-06-28,Must include shallow-depth disclosure
+CLM-SYNC-01,All,All,Sync,No guaranteed instant sync,yes,Sync may be delayed,codec tests,WATCH_IOS_SYNC,PASS,SOFTWARE_READY,PENDING,N/A,PASS,N/A,Yes,Sync,2026-06-28,
+CLM-CLOUD-01,Diving,Logbook,iOS,Diving-only optional iCloud,yes,Apnea/Snorkeling local-only,tests,CloudBackupCapabilityTests,PASS,SOFTWARE_READY,PENDING,N/A,PASS,N/A,Yes,Cloud,2026-06-28,
+CLM-LEGAL-01,All,All,Terms/Privacy,Non-binding terms,yes,TERMS_OF_USE,legal tests,IOSLegalSettingsLocalizationTests,PASS,SOFTWARE_READY,N/A,N/A,PENDING,N/A,Yes,Legal,2026-06-28,
+CLM-BM-EXT-01,Diving,Planner,Marketing,Reference-only until external,yes,BUHLMANN_EXTERNAL template,fixtures,BuhlmannReferenceFixtureTests,PASS,SOFTWARE_READY,N/A,PENDING,PASS,PENDING,Yes,Algorithm,2026-06-28,
+CLM-CCR-EXT-01,Diving,CCR,Marketing,Reference-only until external,yes,CCR_EXTERNAL template,tests,CCRMathRemediationTests,PASS,SOFTWARE_READY,N/A,PENDING,PASS,PENDING,Yes,Algorithm,2026-06-28,
+CLM-RB-01,Diving,Planner,iOS,Rock Bottom estimate not guarantee,yes,Estimate wording,strings,GasLedgerDisplayFormatterTests,PASS,SOFTWARE_READY,N/A,N/A,PASS,N/A,No,Algorithm,2026-06-28,
+CLM-GL-01,Diving,Planner,iOS,Gas ledger bar estimate,yes,Estimate wording,strings,GasLedgerDisplayFormatterTests,PASS,SOFTWARE_READY,N/A,N/A,PASS,N/A,No,Algorithm,2026-06-28,
+CLM-HW-01,Diving,All,Watch,Crown/Action Button reference-only underwater hints,yes,Help strings not hardware cert,WatchUnderwaterActionResolver,HWC matrix,PASS,SOFTWARE_READY,PENDING,N/A,PASS,N/A,Yes,Product,2026-06-28,Physical HW QA PENDING

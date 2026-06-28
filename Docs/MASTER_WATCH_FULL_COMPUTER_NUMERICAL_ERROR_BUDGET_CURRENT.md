@@ -1,9 +1,9 @@
 # Master Watch Full Computer — Numerical Error Budget — CURRENT
 
 **Audit command:** `01-MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V2.0.md`  
-**Audit date:** 2026-06-22  
+**Audit date:** 2026-06-28  
 **Branch:** `main`  
-**Commit:** `1f62235`  
+**Commit:** `7dfefe2`  
 **Authority:** `Tests/WatchAlgorithmTests/Support/IndependentBuhlmannOracleTolerances.swift`; prior `WATCH_MATH_NUMERICAL_ERROR_BUDGET_CURRENT.md`
 
 ---
