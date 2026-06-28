@@ -24,8 +24,9 @@
 - Experimental files remain excluded per `project.yml`.
 - This workflow does not certify physical QA, underwater tests, or App Store asset completeness.
 
-## Watch entitlements (Simulation / dev device builds)
+## Watch entitlements (shallow depth device builds)
 
-- Default signing uses `Config/DIRDiving.entitlements` **without** `com.apple.developer.coremotion.water-submersion`.
-- This allows iPhone + Apple Watch device installs while depth runs in **Simulation** mode (`MockDepthSensorProvider`).
-- After Apple grants the Submerged Depth and Pressure capability, point `CODE_SIGN_ENTITLEMENTS` in `project.yml` to `Config/DIRDiving.WithWaterSubmersion.entitlements` for production archives.
+- Default signing uses `Config/DIRDiving.WithShallowDepth.entitlements` (`com.apple.developer.submerged-shallow-depth-and-pressure`).
+- Watch `App/Info.plist` sets `DIRDepthEntitlementTier` to `shallow` so runtime capability resolution matches the signed build.
+- Full Ultra depth / legacy water-submersion archives: switch `CODE_SIGN_ENTITLEMENTS` to `Config/DIRDiving.WithWaterSubmersion.entitlements` and set tier `full` when Apple approves that capability.
+- Entitlement-free simulator builds are not the default on `main`; use `Config/DIRDiving.entitlements` only on a dedicated dev branch if simulation-only signing is required.
