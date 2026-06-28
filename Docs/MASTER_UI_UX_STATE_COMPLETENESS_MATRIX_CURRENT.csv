@@ -15,7 +15,9 @@ ST-013,Watch+iOS,Global,Accessibility states,yes,n/a,n/a,yes,partial,n/a,n/a,n/a
 ST-014,Watch+iOS,Global,Image transfer/delete,yes,yes,yes,yes,yes,yes,yes,n/a,n/a,yes,n/a,yes,yes,yes,yes,yes,partial,PARTIAL,P1,MUIUX-P1-002,Watch ACK truthfulness; paired QA PENDING
 ST-015,iOS,Diving,PDF/share/export,yes,yes,yes,yes,yes,yes,n/a,yes,n/a,yes,n/a,n/a,yes,yes,yes,yes,yes,PARTIAL,P1,MUIUX-P1-004,Physical PDF render PENDING
 ST-016,Watch,Diving Full Computer,Sensor simulation,yes,n/a,n/a,yes,yes,yes,n/a,yes,n/a,yes,yes,n/a,n/a,n/a,yes,yes,yes,n/a,partial,PASS,,,Simulation badges visible; developer gated
-ST-UW-001,Watch underwater blocked nav,Watch,toast,yes,partial,P2-UX-003,Copy gap
-ST-UW-002,Watch action unavailable,Watch,toast+haptic,yes,yes,,
-ST-WAO-001,Water auto-open disabled,Watch,settings,yes,yes,,
-ST-WAO-002,Water auto-open blocked active session,Watch,toast,yes,yes,,
+ST-UW-001,Watch,Global,Underwater blocked nav toast,yes,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,yes,PASS,,,Per-activity keys @7dfefe2
+ST-UW-002,Watch,Global,Action unavailable toast+haptic,yes,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,yes,PASS,,,
+ST-WAO-001,Watch,Global,Water auto-open settings states,yes,yes,n/a,yes,yes,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,yes,yes,n/a,yes,PASS,,,Disabled/blocked/active-dive states
+ST-WAO-002,Watch,Global,Water auto-open cold launch routing,yes,n/a,n/a,yes,yes,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,yes,yes,n/a,partial,PASS,,,Physical submersion probe PENDING
+ST-FC-GF-001,Watch,Diving Full Computer,GF preset lock states,yes,n/a,n/a,yes,n/a,n/a,n/a,yes,n/a,yes,n/a,n/a,n/a,n/a,yes,yes,n/a,partial,PASS,,,Active dive/import/runtime locks
+ST-DEV-001,Watch,Global,Developer shallow toggles,yes,n/a,n/a,yes,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,n/a,yes,yes,n/a,yes,PASS,,,Not exposed to public users

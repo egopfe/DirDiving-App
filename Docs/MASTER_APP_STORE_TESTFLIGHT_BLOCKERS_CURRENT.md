@@ -1,9 +1,9 @@
 # DIR DIVING — Master App Store & TestFlight Blockers (Current)
 
-**Command:** 05 — Master Release / QA / Evidence / Compliance Audit V1.0  
-**Date:** 2026-06-22  
-**Branch:** `main` @ `1f62235`  
-**Merged sources:** Commands 12 + 13
+**Command:** 05 — `05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.1.md`  
+**Date:** 2026-06-28  
+**Branch:** `main` @ `7dfefe2`  
+**Merged sources:** Commands 12 + 13; upstream audits 01–04
 
 **Verdict:** **Internal TestFlight — CONDITIONAL.** **External TestFlight and App Store — BLOCKED (NOT READY).**
 
@@ -13,31 +13,48 @@ This document lists blockers only. It does **not** grant legal approval or certi
 
 ## Blocker summary
 
-| Category | Open blockers | Blocks external TF | Blocks App Store |
-|----------|--------------:|:------------------:|:----------------:|
-| Legal / marketing sign-off | 2 | Yes | Yes |
-| Physical Watch (incl. CMAltimeter) | 31 | Yes | Yes |
-| Physical iPhone / a11y | 16 | Partial | Yes |
-| Paired-device sync | 8 | Yes | Yes |
-| Underwater entitlement depth | 1 | Yes | Yes |
-| External algorithm validation | 4 | Yes | Yes |
-| App Store marketing assets | 1 | No | Yes |
-| **Total tracked** | **63** | — | — |
+| Category | Open blockers | Blocks internal TF | Blocks external TF | Blocks App Store |
+|----------|--------------:|:------------------:|:------------------:|:----------------:|
+| Software P1 (GF import, sync) | **7** | Partial | Yes | Yes |
+| Legal / marketing sign-off | **2** | No | Yes | Yes |
+| Physical Watch (incl. shallow/wet/CMA) | **38** | Disclosure only | Yes | Yes |
+| Physical iPhone / a11y | **16** | No | Partial | Yes |
+| Paired-device sync | **8** | Partial | Yes | Yes |
+| Water auto-open physical | **3** | No | Yes | Yes |
+| Hardware controls physical | **4** | No | Yes | Yes |
+| External algorithm validation | **4** | No | Yes | Yes |
+| App Store marketing assets | **1** | No | No | Yes |
+| **Total tracked** | **83** | — | — | — |
 
 ---
 
 ## P0 — Must not ship with false claims
 
-| Blocker | Software status @ 1f62235 | Field status |
+| Blocker | Software status @ 7dfefe2 | Field status |
 |---------|----------------------------|--------------|
 | Certified dive computer claim | **CLEAR** | N/A |
 | Certified decompression planner claim | **CLEAR** | N/A |
 | Certified CCR / life-support claim | **CLEAR** | N/A |
 | Guaranteed navigation / medical recovery | **CLEAR** | N/A |
-| False physical QA passed claim | **CLEAR** — all matrices PENDING | N/A |
+| False physical QA passed claim | **CLEAR** — all matrices PENDING_PHYSICAL | N/A |
 | False external Bühlmann validation passed | **CLEAR** | N/A |
+| Shallow testing marketed as certified deco | **CLEAR** | N/A |
 
 **P0 blockers: NONE** in production copy or audit posture.
+
+---
+
+## P1 — Internal TestFlight blockers (software)
+
+| ID | Blocker | Evidence | Exit criteria |
+|----|---------|----------|---------------|
+| MASB-SW-01 | iOS GF preset → Watch import mismatch (IOS-MASTER-F016) | GF-E-013, REQ-GF-02 | Align preset pairs or document limitation |
+| MASB-SW-02 | iOS sync in-flight stuck state (MASTER-SYNC-001) | Main code audit §AD | Remediation + test |
+| MASB-SW-03 | Asymmetric userInfo ACK (MASTER-SYNC-002) | Main code audit | Symmetric ACK |
+| MASB-SW-04 | Legacy unsigned tombstones (MASTER-SYNC-003) | Main code audit | Policy + migration |
+| MASB-SW-05 | Shallow FC TestFlight exposure labeling (SDG-008) | Shallow risk assessment | TF notes + in-app label |
+| MASB-SW-06 | Depth tier metadata trust (MASTER-DEPTH-002) | Shallow gate matrix | CI signing check |
+| MASB-SW-07 | Watch test suite 2 failures (startup flow drift) | xcresult 2026-06-28 | Update tests or routing expectations |
 
 ---
 
@@ -51,16 +68,27 @@ This document lists blockers only. It does **not** grant legal approval or certi
 | MASB-L-02 | Product/marketing sign-off | Same checklist | Marketing row signed |
 | MASB-L-03 | App Store screenshots + copy pack | `QA_EVIDENCE/APP_STORE_MARKETING/` | Checklist PASS + assets |
 
-### Physical / entitlement / CMAltimeter
+### Physical / entitlement / CMAltimeter / shallow
 
 | ID | Blocker | Folder / doc | Exit criteria |
 |----|---------|--------------|---------------|
 | MASB-P-01 | Watch Ultra physical QA matrix | `QA_EVIDENCE/WATCH_ULTRA/` | Signed artifacts |
 | MASB-P-02 | Underwater entitlement depth session | `HARDWARE_QA_MATRIX` QA-002 | Signed Ultra build log |
 | MASB-P-03 | CMAltimeter physical CoreMotion samples | `QA_EVIDENCE/WATCH_CMALTIMETER_PHYSICAL/` | EVIDENCE_TEMPLATE complete |
-| MASB-P-04 | VoiceOver / Dynamic Type journeys | `QA_EVIDENCE/DYNAMIC_TYPE_VOICEOVER/` | Procedure PASS |
-| MASB-P-05 | Planner visual QA Dynamic Type XL | `QA_EVIDENCE/IOS_ACCESSIBILITY/` | Screenshots |
-| MASB-P-06 | PDF render/share manual QA | `QA_EVIDENCE/PDF_RENDER/` | Checklist PASS |
+| MASB-P-04 | Shallow wet Gauge session | `QA_EVIDENCE/HARDWARE_ENTITLEMENT/` | SDG-010 PASS |
+| MASB-P-05 | Developer shallow FC wet (internal only) | `QA_EVIDENCE/WATCH_ULTRA/` | SDG-011 if TF scope includes FC |
+| MASB-P-06 | VoiceOver / Dynamic Type journeys | `QA_EVIDENCE/DYNAMIC_TYPE_VOICEOVER/` | Procedure PASS |
+| MASB-P-07 | PDF render/share manual QA | `QA_EVIDENCE/PDF_RENDER/` | Checklist PASS |
+
+### Water auto-open / hardware controls
+
+| ID | Blocker | Folder / doc | Exit criteria |
+|----|---------|--------------|---------------|
+| MASB-WAO-01 | End-to-end water auto-open | `QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_PREFERRED/` | WAO-PHY-001 |
+| MASB-WAO-02 | System Auto-Launch listing | `QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_SYSTEM_LISTING/` | WAO-PHY-002 |
+| MASB-HW-01 | Water Lock physical QA | `QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_WATER_LOCK/` | HWC-PHY-004 |
+| MASB-HW-02 | Action Button underwater | `QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_ACTION_BUTTON/` | HWC-PHY-003 |
+| MASB-HW-03 | Crown paging underwater | `QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_CROWN/` | HWC-PHY-002 |
 
 ### Paired / cloud
 
@@ -78,65 +106,21 @@ This document lists blockers only. It does **not** grant legal approval or certi
 | MASB-E-01 | External Bühlmann golden validation | `QA_EVIDENCE/BUHLMANN_EXTERNAL/` | Signed report |
 | MASB-E-02 | External Schreiner golden validation | `QA_EVIDENCE/BUHLMANN_EXTERNAL/` | Signed report |
 | MASB-E-03 | External CCR rebreather validation | `QA_EVIDENCE/CCR_EXTERNAL/` | Signed report |
-| MASB-E-04 | Subsurface CSV external round-trip | `QA_EVIDENCE/SUBSURFACE_EXTERNAL/` | External tool PASS |
+| MASB-E-04 | Subsurface CSV external round-trip | `QA_EVIDENCE/SUBSURFACE_EXTERNAL/` | Signed report |
 
 ---
 
-## Internal TestFlight — allowed with conditions
+## Internal TestFlight conditions (must all hold)
 
-Software gates that **PASS** on `1f62235`:
-
-- **iOS Algorithm Tests:** 1519 tests, 0 failures (2026-06-22 audit run)
-- **Watch Algorithm Tests:** in progress / see master audit §E
-- **Build iOS + Watch:** PASS (simulator builds verified 2026-06-22)
-- Legal onboarding + non-certified disclaimers EN/IT
-- Privacy manifests; `NSPrivacyTracking=false`
-- TestFlight review notes aligned with limitations
-- Demo logbook toggle for reviewers without Watch hardware
-- WCMA software remediation (request generation, timestamp freshness)
-
-**Conditions:**
-
-1. Review notes and in-app copy must **not** imply certification.
-2. Depth/automatic dive features must disclose entitlement/simulation status per `TESTFLIGHT_REVIEW_NOTES.md`.
-3. Do **not** expand external cohort until P1 blockers close or documented accepted risk in `RELEASE_CHECKLIST.md`.
-4. Do **not** claim CMAltimeter or depth entitlement physically validated.
+1. `TESTFLIGHT_REVIEW_NOTES.md` states non-certified, shallow-depth default, developer toggles internal-only.
+2. Demo logbook / simulation disclosure if simulation enabled.
+3. No marketing copy implying certified decompression or full-depth without entitlement evidence.
+4. Watch test failures tracked — not blocking if disclosed as known test maintenance (MRQA-P1-007).
 
 ---
 
-## App Store — blocked
+## What blocks 100% release readiness
 
-Submission remains **BLOCKED** until:
+All **PENDING_PHYSICAL**, **PENDING_EXTERNAL_VALIDATION**, **PENDING_LEGAL_REVIEW**, and **PENDING_APP_STORE_REVIEW** rows in physical matrix, external gaps doc, and claims matrix — plus software P1 items above.
 
-1. All P1 blockers above close or receive documented product/legal accepted risk.
-2. `IOS_APP_STORE_ALGORITHM_MARKETING_REVIEW_CHECKLIST.md` sign-off complete.
-3. Prohibited-claims checklist verified against final store metadata.
-4. Privacy nutrition labels match `PRIVACY_MANIFEST_DECLARATION_CURRENT.md`.
-5. Physical accessibility journeys complete.
-
----
-
-## Non-blockers (software verified @ 1f62235)
-
-- Reference-only planner/FC/CCR copy in repo
-- EN13319 / ISO 6425 documented out of scope
-- CSV metadata round-trip software tests
-- Command 9 security/privacy software readiness
-- Command 12 traceability software readiness (68 requirements; software PASS on safety-critical automated paths)
-- Incident/rollback/support documentation present
-
----
-
-## Closure rule
-
-Remove a blocker only when the linked evidence folder or checklist row contains completed tester/reviewer fields and required artifacts. **Do not** close from simulator tests or audit documents alone.
-
----
-
-## Related
-
-- [`MASTER_RELEASE_GATE_MATRIX_CURRENT.csv`](MASTER_RELEASE_GATE_MATRIX_CURRENT.csv)
-- [`MASTER_CLAIMS_EVIDENCE_MATRIX_CURRENT.csv`](MASTER_CLAIMS_EVIDENCE_MATRIX_CURRENT.csv)
-- [`MASTER_EXTERNAL_VALIDATION_GAPS_CURRENT.md`](MASTER_EXTERNAL_VALIDATION_GAPS_CURRENT.md)
-- [`TEST_QA_EVIDENCE_AUDIT_CURRENT.md`](TEST_QA_EVIDENCE_AUDIT_CURRENT.md)
-- [`RELEASE_LEGAL_CLAIMS_COMPLIANCE_AUDIT_CURRENT.md`](RELEASE_LEGAL_CLAIMS_COMPLIANCE_AUDIT_CURRENT.md)
+**RELEASE_BLOCKERS:** MASB-SW-01..07, MASB-P-01..07, MASB-WAO-01..02, MASB-HW-01..03, MASB-S-01..04, MASB-E-01..04, MASB-L-01..03

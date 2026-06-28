@@ -1,31 +1,26 @@
 Case_ID,Area,Activity,Mode,Input,Initial_State,Expected_Result,Actual_Result,Absolute_Error,Relative_Error,Pass,Severity,Evidence,Notes
-EC-IOS-001,Gas,Diving,All,FO2=0 invalid gas,Fresh planner,Blocking validation error,Blocking issue,n/a,n/a,PASS,,BuhlmannGasValidationTests,Preflight rejects
-EC-IOS-002,MOD,Diving,All,O2 100% PPO2 1.6,Fresh,MOD ~6m,~6m,<0.5m,<5%,PASS,,PlannerSwitchDepthMODClampTests,Mandatory example
-EC-IOS-003,Switch Depth,Diving,All,Switch 40m MOD 30m,Gas configured,Clamp to 30m,Clamped,n/a,n/a,PASS,,PlannerSwitchDepthMODClampTests,Deeper switch blocked
-EC-IOS-004,Switch Depth,Diving,All,Switch 20m MOD 30m,Gas configured,Allow 20m,Allowed,n/a,n/a,PASS,,BottomGasSwitchDepthTests,Shallower OK
-EC-IOS-005,Planner Input,Diving,Technical,Avg depth > max depth,Technical mode,Validation error,Rejected,n/a,n/a,PASS,,PlannerAverageDepthPolicyTests,
-EC-IOS-006,Ascent Speed,Diving,All,Zero ascent speed,Default settings,Reject or default positive,Guarded,n/a,n/a,PASS,,PlannerAscentSpeedSettingsTests,
-EC-IOS-007,Repetitive,Diving,Technical,Future dive timestamp,Prior dive loaded,Reject stale/future,Rejected,n/a,n/a,PASS,,RepetitiveDiveMathematicalTests,
-EC-IOS-008,Repetitive,Diving,Technical,Missing prior tissues,Repetitive mode,No silent fresh fallback,Explicit fresh vs repetitive,n/a,n/a,PASS,,RepetitiveDiveMathematicalTests,
-EC-IOS-009,CCR,Diving,CCR,Invalid setpoint high,CCR input,Validator blocks,Blocked,n/a,n/a,PASS,,CCRPlannerTests,
-EC-IOS-010,CCR,Diving,CCR,Hypoxic diluent shallow,CCR input,Validator blocks,Blocked,n/a,n/a,PASS,,CCRPlanValidator,
-EC-IOS-011,CCR,Diving,CCR,Invalid bailout gas,CCR input,Validator blocks,Blocked,n/a,n/a,PASS,,CCRPlannerTests,
-EC-IOS-012,Ratio Deco,Diving,CCR,Ratio deco request,CCR mode,Unavailable,Unavailable,n/a,n/a,PASS,,RatioDecoPlannerTests,Blocked in CCR
-EC-IOS-013,GF,Diving,All,GF Low >= GF High,Planner input,Rejected conservative,Rejected,n/a,n/a,PASS,,BuhlmannGradientFactorTests,Fail-closed
-EC-IOS-014,Logbook Routing,Apnea,All,Navigate to Diving logbook,Apnea root,Blocked,Blocked,n/a,n/a,PASS,,IOSActivityLogbookRoutingTests,P0 if allowed
-EC-IOS-015,Logbook Routing,Snorkeling,All,Navigate to Diving logbook,Snorkeling root,Blocked,Blocked,n/a,n/a,PASS,,IOSActivityLogbookRoutingTests,
-EC-IOS-016,Settings Leakage,Apnea,All,Open Apnea settings,Apnea mode,No GF/PPO2/MOD visible,Absent,n/a,n/a,PASS,,IOSActivitySettingsRoutingTests,
-EC-IOS-017,Settings Leakage,Diving,All,Open Diving settings,Diving mode,No apnea recovery/GPS,Absent,n/a,n/a,PASS,,IOSActivitySettingsRoutingTests,
-EC-IOS-018,Settings Switch,All,All,Switch to Apnea during Watch session,Active Watch dive,No remote mode change,Deferred sync only,n/a,n/a,PASS,,CompanionActivityWatchSessionGuard,Paired confirm pending
-EC-IOS-019,Sync,Apnea,All,Apnea payload to Diving decoder,Diving store,Reject cross-decode,Rejected,n/a,n/a,PASS,,ActivitySyncCrossDecodeRejectionTests,
-EC-IOS-020,CSV,Diving,All,Malformed CSV rows,Import,Fail-closed skip/error,Fail-closed,n/a,n/a,PASS,,CSVMetadataRoundTripTests,
-EC-IOS-021,Sync,All,All,Invalid HMAC payload,Sync receiver,Reject not merge zero,Rejected,n/a,n/a,PASS,,SecurityPrivacyTrustRemediationTests,P0 if zero substituted
-EC-IOS-022,Manual Dive,Diving,All,No depth metadata,Manual entry,Truthful flags not fake depth,Metadata-only,n/a,n/a,PASS,,WatchManualNoDepthSyncTests,
-EC-IOS-023,Export,Diving,Technical,Incomplete plan state,Partial calc,No stale stops exported,Suppressed,n/a,n/a,PASS,,PlanCalculationCompletenessTests,
-EC-IOS-024,Performance,Diving,Technical,40 rapid tissue analytics plans,Empty cache,Complete within budget,Timeout/crash,n/a,n/a,FAIL,P3,PerformanceConcurrencyBatteryRemediationTests,F001 audit run
-EC-IOS-025,Navigation,All,All,Process kill mid-tab,Mixed activity,Restore tab+activity,Partial restore,n/a,n/a,PARTIAL,P2,IOS-MASTER-F002,Session data only
-EC-IOS-026,GPS,Snorkeling,All,Invalid route coordinates,Snorkeling session,Graceful handling,Software guards,n/a,n/a,PASS,,SnorkelingRouteSyncCodecTests,Field accuracy pending
-EC-IOS-027,Briefing,Diving,All,Stale briefing card,Old timestamp,Reference-only not live deco,referenceOnly footer,n/a,n/a,PASS,,PlannerBriefingImageExportServiceTests,Physical stale policy pending
-EC-IOS-028,Cloud,Diving,All,Conflicting tombstone merge,Two sessions same ID,Deterministic merge,Tested merge,n/a,n/a,PASS,,CloudSessionMergeTests,Two-device QA pending
-EC-IOS-029,Numerical,Diving,All,NaN depth input,Planner,Reject not propagate NaN,Guarded,n/a,n/a,PASS,,BuhlmannNumericalRobustnessTests,
-EC-IOS-030,Altitude,Diving,All,Altitude profile if supported,Environment set,Adjusted surface pressure,Environment-aware,n/a,n/a,PASS,,BuhlmannPressureModelTests,If supported in planner env
+EC-IOS-001,Bühlmann,Diving,All,Invalid gas O2>100%,Fresh tissues,Preflight block,Blocked,0,0,PASS,,BuhlmannGasValidationTests,Fail-closed
+EC-IOS-002,MOD,Diving,All,O2 100% PPO2 1.6,Fresh,MOD ~6m,~6m,0,0,PASS,,PlannerSwitchDepthMODClampTests,Mandatory example
+EC-IOS-003,MOD,Diving,All,Switch depth deeper than MOD,Gas configured,Clamp to MOD,Clamped,0,0,PASS,,BottomGasSwitchDepthTests,
+EC-IOS-004,Planner,Diving,Technical,Average depth > max depth,Technical mode,Validation error,Rejected,0,0,PASS,,PlannerAverageDepthPolicyTests,
+EC-IOS-005,Ascent,Diving,All,Zero/negative ascent speed,Default settings,Fallback to minimum,Guarded,0,0,PASS,,PlannerAscentSpeedSettingsTests,
+EC-IOS-006,Repetitive,Diving,Technical,Future-dive timestamp,Prior dive loaded,Reject stale,Rejected,0,0,PASS,,RepetitiveDiveMathematicalTests,
+EC-IOS-007,Repetitive,Diving,Technical,Stale previous tissues,Surface interval invalid,Explicit error,Fail-closed,0,0,PASS,,RepetitiveDiveMathematicalTests,No silent fresh tissue
+EC-IOS-008,CCR,Diving,CCR,Invalid setpoint,CCR mode,Block plan,Blocked,0,0,PASS,,CCRPlannerTests,
+EC-IOS-009,CCR,Diving,CCR,Hypoxic diluent,CCR mode,Validation issue,Blocked,0,0,PASS,,CCRMathRemediationTests,
+EC-IOS-010,CCR,Diving,CCR,Invalid bailout gas,CCR mode,Validation issue,Blocked,0,0,PASS,,CCRPlannerTests,
+EC-IOS-011,Logbook,Apnea,All,Cross-activity deep link,Active diving,Reject,Rejected,0,0,PASS,,IOSCompanionNavigationRestorationTests,
+EC-IOS-012,Logbook,All,All,Mixed logbook restore,Wrong activity,No mixed query,Isolated stores,0,0,PASS,,IOSActivityLogbookDataIsolationTests,
+EC-IOS-013,Settings,All,All,Settings mode switch during Watch session,Watch active,No runtime mutation,Scope UI only,0,0,PASS,,IOSActivitySettingsModeSwitchTests,Physical confirm pending
+EC-IOS-014,Export,Diving,All,Missing export fields,Incomplete plan,Block export,Blocked,0,0,PASS,,PlanCalculationCompletenessTests,
+EC-IOS-015,CSV,Diving,All,Malformed CSV import,Import path,Fail-closed,Rejected,0,0,PASS,,CSVMetadataRoundTripTests,
+EC-IOS-016,Sync,All,All,Invalid sync payload,HMAC check,Reject,Rejected,0,0,PASS,,ActivitySyncCrossDecodeRejectionTests,
+EC-IOS-017,GF preset,Diving,All,iOS conservative 20/70 plan package,Watch import,Map to FC preset or reject clearly,invalidGradientFactors,0,0,FAIL,P1,FullComputerImportedPlanStore;IOS-MASTER-F016,Watch expects 20/80
+EC-IOS-018,GF preset,Diving,All,iOS standard 30/80 plan package,Watch import,Map to FC preset or reject clearly,invalidGradientFactors,0,0,FAIL,P1,FullComputerImportedPlanStore;IOS-MASTER-F016,Watch expects 30/70
+EC-IOS-019,GF preset,Diving,All,iOS aggressive 40/85 plan package,Watch import,Import success,Accepted as moderate4085,0,0,PASS,,FullComputerGradientFactorPreset.matching,Only matching preset
+EC-IOS-020,GF preset,Diving,All,Manual GF 30/70 in package builder,Watch import,Import success,Accepted,0,0,PASS,,DivePlanPackageBuilderTests,Non-preset pair that matches Watch standard
+EC-IOS-021,Briefing,Diving,All,Briefing card manifest,Export,referenceOnly true,Always true,0,0,PASS,,PlannerBriefingCardManifest;PlannerBriefingTransferSupport,
+EC-IOS-022,Route,Snorkeling,All,Invalid GPS track,Session start,Graceful empty state,Handled,0,0,PASS,,IOSSnorkelingNoGPSPresentationTests,
+EC-IOS-023,Cloud,Diving,All,Conflicting tombstone merge,Two revisions,Deterministic merge,Tested merge,0,0,PASS,,CloudSessionMergeTests,Field QA pending
+EC-IOS-024,Performance,Diving,Technical,40 sequential tissue analytics solves,Cache warm,Complete within budget,PASS @7dfefe2,0,0,PASS,,PerformanceConcurrencyBatteryRemediationTests,F001 closed
+EC-IOS-025,Navigation,All,All,Process death mid-tab,Tokens persisted,Restore tab on relaunch,PARTIAL,0,0,FAIL,P3,IOSCompanionNavigationRestorationTests,F002 open

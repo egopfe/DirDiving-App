@@ -1,8 +1,8 @@
 # Master Physical Performance QA Plan (Current)
 
 **Audit command:** 04 — MASTER MAIN CODE / SYNC / SECURITY / PERFORMANCE AUDIT V1.0  
-**Branch:** `main` @ `1f62235`  
-**Date:** 2026-06-22
+**Branch:** `main` @ `7dfefe2`  
+**Date:** 2026-06-28
 
 **Status:** All scenarios below are **PENDING** unless evidence file exists in `Docs/QA_EVIDENCE/`. No fabricated pass claims.
 

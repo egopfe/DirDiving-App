@@ -60,3 +60,10 @@ PDQ-E-003,External,N/A,Diving,CCR rebreather external validation,external refere
 PDQ-E-004,External,N/A,Diving,Subsurface CSV round-trip,external reference,QA_EVIDENCE/SUBSURFACE_EXTERNAL,SUBSURFACE_CSV_ROUNDTRIP.md,NOT_PASSED,,,,
 PDQ-E-005,External,N/A,All,App Store marketing/screenshots,legal/compliance review,QA_EVIDENCE/APP_STORE_MARKETING,RELEASE_CHECKLIST.md,NOT_PASSED,,,,
 PDQ-E-006,External,N/A,All,External legal counsel review,legal/compliance review,QA_EVIDENCE/LEGAL_REVIEW,IOS_APP_STORE_ALGORITHM_MARKETING_REVIEW_CHECKLIST.md,NOT_PASSED,,,,PENDING_LEGAL_REVIEW
+PDQ-W-032,Watch,Ultra,Diving,Shallow depth wet Gauge session,underwater,QA_EVIDENCE/HARDWARE_ENTITLEMENT,HARDWARE_QA_MATRIX.md QA-002,NOT_PASSED,,,,PENDING_PHYSICAL; SDG-010
+PDQ-W-033,Watch,Ultra,Full Computer,Developer shallow FC internal wet test,underwater,QA_EVIDENCE/WATCH_ULTRA,Developer toggle + predive chain,NOT_PASSED,,,,PENDING_PHYSICAL; SDG-011 internal TF only
+PDQ-W-034,Watch,Ultra,All,Water auto-open end-to-end physical,physical Watch,QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_PREFERRED,WAO-PHY-001,NOT_PASSED,,,,PENDING_PHYSICAL
+PDQ-W-035,Watch,Ultra,All,System Auto-Launch submerged listing,physical Watch,QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_SYSTEM_LISTING,WAO-PHY-002,NOT_PASSED,,,,PENDING_PHYSICAL; WATCHOS_SYSTEM_AUTO_LAUNCH_LISTING_EVIDENCE
+PDQ-W-036,Watch,Ultra,All,Water Lock + Digital Crown paging,physical Watch,QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_WATER_LOCK,HWC-PHY-004,NOT_PASSED,,,,PENDING_PHYSICAL; WATER_LOCK_PHYSICAL_QA
+PDQ-W-037,Watch,Ultra,All,Action Button underwater primary action,physical Watch,QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_ACTION_BUTTON,HWC-PHY-003,NOT_PASSED,,,,PENDING_PHYSICAL; ACTION_BUTTON_PHYSICAL_QA
+PDQ-W-038,Watch,Ultra,Full Computer,GF preset Settings on wrist,physical Watch,QA_EVIDENCE/WATCH_ULTRA,GF-E-011,NOT_PASSED,,,,PENDING_PHYSICAL

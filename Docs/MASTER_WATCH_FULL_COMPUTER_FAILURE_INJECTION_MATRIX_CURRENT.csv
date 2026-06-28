@@ -29,3 +29,5 @@ FI-027,Planner,Stale briefing card,superseded manifest,stale display only,no FC 
 FI-028,Runtime,Schedule non-convergence,N/A forward sim,conservative TTS,bounded minutes steps,N/A,yes,TTS may over-estimate,P2,Audit15TTSScheduleOracleSweepTests,External compare,MWFC-P1-001
 FI-029,Memory,Memory pressure during dive,N/A,degraded not silent clear,PENDING,PENDING,PENDING,PENDING,PENDING,P2,NOT_EXECUTED,Instruments on device,PENDING_PHYSICAL
 FI-030,Calculation,Computation exceeds 1s tick,actual dt on next sample,catch-up integrate,PENDING static review,actual dt semantics,yes,degraded if >2s,P2,FullComputerRuntimeEngine static,Physical profiling,PENDING_PHYSICAL
+FI-031,Depth capability,Shallow entitlement FC start attempt,appleShallow no dev toggle,start blocked,FC unavailable reason shown,no runtime,N/A,no FC engine init,P2,DepthCapabilityTests,None,Production gate @7dfefe2
+FI-032,Water auto-open,Submerged cold launch without predive confirm,route only,FC predive still required,no tissue start,N/A,predive gate intact,P2,WatchLaunchRoutingPolicy static,Update DIRModes test MWFC-P2-005,PENDING_PHYSICAL UX
