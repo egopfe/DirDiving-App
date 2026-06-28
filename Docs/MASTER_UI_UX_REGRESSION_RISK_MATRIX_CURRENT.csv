@@ -11,8 +11,11 @@ REG-009,Accessibility,UI remediation waves,Safety state color-only,Semantic cont
 REG-010,Visual pixel regression,Mockup audit,Layout drift undetected,Software fixtures 59/59; pixel baselines 0/59,Gap remains,P2,MUIUX-P2-001,OPEN,
 REG-011,Build verification @ HEAD,Audit execution,Unverified commit buildability,xcodebuild DerivedData lock then long isolated build,PARTIAL,P1,MUIUX-P1-005,OPEN,First attempt DB locked; isolated build inconclusive at report time
 REG-012,Planner ascent speed discoverability,UX polish,Users miss ascent settings in More only,Source routing audit,Open,P2,MUIUX-P2-004,OPEN,
-REG-V21-001,Water auto-open cold launch,Watch,High,P1-WAO-001,New feature wiring incomplete
-REG-V21-002,Legacy App Intents vs router,Watch,Medium,P1-AB-001,Dual shortcut paths
-REG-V21-003,Underwater crown policy,Watch,Low,,Regression-free vs prior main
-REG-V21-004,iOS settings mode switch,iOS,Low,,Stable since 1f62235
-REG-V21-005,Logbook ownership,iOS+Watch,Low,,Six forbidden routes still blocked
+REG-V21-001,Water auto-open cold launch,Watch,Low,WatchLaunchRoutingPolicyTests,Fixed @9176da8,,,PASS,CLOSED P1-WAO-001
+REG-V21-002,Legacy App Intents vs router,Watch,Low,WatchIntentSafetyPolicyTests,Fixed @79a51e7,,,PASS,CLOSED P1-AB-001
+REG-V21-003,Underwater crown policy,Watch,Low,WatchUnderwaterNavigationClampPolicyTests,Verified,,,PASS,
+REG-V21-004,iOS settings mode switch,iOS,Low,IOSActivitySettingsModeSwitchTests,Verified,,,PASS,
+REG-V21-005,Logbook ownership,iOS+Watch,Low,WatchActivityLogbookRoutingTests,Verified,,,PASS,
+REG-V21-006,GF preset UI,Watch,Low,FullComputerGradientFactorSelectionView,Added @0673018,,,PASS,3 presets + lock
+REG-V21-007,Shallow depth capability UI,Watch,Low,DepthCapabilityTests + DivingModeSelectionView,Added @b666772,,,PASS,Entitlement-aware locks
+REG-V21-008,Cold launch modal sequencing,Watch,Low,ContentView startupFlowPresented,Fixed @2e3f262,,,PASS,No double fullScreenCover

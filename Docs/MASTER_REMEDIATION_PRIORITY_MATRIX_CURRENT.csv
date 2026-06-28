@@ -1,14 +1,42 @@
 Rank,Consolidated_Finding_ID,Severity,Priority,Recommended_Batch,Recommended_Command,Dependency_Level,Safety_Critical,Release_Blocker,Quick_Win,High_Regression_Risk,Needs_Physical_QA,Needs_External_Validation,Reason_For_Rank,Acceptance_Gate,Notes
-1,CONS-001,P1,P1,Batch-1,01-MASTER_WATCH remediation block,1,Yes,Yes,No,Yes,No,Yes,Blocks external decompression parity claim,Per §8 orchestrator gates,
-2,CONS-002,P1,P1,Batch-8,External validation campaign (non-code),1,Yes,Yes,No,No,Yes,Yes,Blocks App Store decompression claims,Per §8 orchestrator gates,
-3,CONS-003,P1,P1,Batch-8,Physical QA matrix execution,1,No,Yes,No,No,Yes,No,Blocks external TestFlight FC claims,Per §8 orchestrator gates,
-4,CONS-004,P1,P1,Batch-8,Paired device QA campaign,1,No,Yes,No,No,Yes,No,Blocks external TestFlight,Per §8 orchestrator gates,
-5,CONS-005,P1,P1,Batch-6,Accessibility field matrix,1,No,Yes,No,No,Yes,No,Blocks external TestFlight,Per §8 orchestrator gates,
-6,CONS-006,P1,P1,Batch-9,Release/legal review,1,No,Yes,No,No,No,Yes,Blocks App Store,Per §8 orchestrator gates,
-7,CONS-007,P1,P1,Batch-0,Re-run full build+test on clean DerivedData,0,No,Yes,Yes,No,No,No,Blocks internal TestFlight confidence,Per §8 orchestrator gates,
-8,CONS-008,P2,P2,Batch-3,iOS activity architecture remediation,1,No,Conditional,No,No,Yes,No,Conditional internal TestFlight,Per §8 orchestrator gates,
-9,CONS-009,P2,P2,Batch-6,Visual regression baseline capture,1,No,Conditional,No,No,Yes,No,Blocks external TestFlight polish gate,Per §8 orchestrator gates,
-10,CONS-010,P2,P2,Batch-8,PHYSICAL_PERFORMANCE_QA_PLAN execution,1,No,Conditional,No,No,Yes,No,Conditional external TestFlight,Per §8 orchestrator gates,
-11,CONS-011,P2,P2,Batch-8,Subsurface QA campaign,1,No,Conditional,No,No,No,Yes,App Store confidence gap,Per §8 orchestrator gates,
-12,CONS-012,P2,P2,Batch-9,06 documentation remediation,1,No,Conditional,Yes,No,No,No,Documentation gate,Per §8 orchestrator gates,
-13,CONS-013,P3,P3,Batch-5,iOS performance test hardening,1,No,Conditional,Yes,No,No,No,CI flake risk,Per §8 orchestrator gates,
+1,CONS-001,P0,P0,Batch-9,06 documentation + OOLD restore,0,No,Yes,Yes,No,No,No,Wrong audit executes if filenames trusted — blocks all re-audit,Command body SHA match,Doc-only P0
+2,CONS-002,P1,P1,Batch-4,iOS GF preset alignment,1,Yes,Yes,No,Yes,Yes,Yes,iOS 20/70 30/80 vs Watch 20/80 30/70 — safety-visible import gap,GF import tests PASS all presets,Top P1 software
+3,CONS-003,P1,P1,Batch-2,04 sync in-flight fix,1,No,Yes,Yes,Yes,Yes,No,Sync stuck worse than retry — data path reliability,WatchSyncPendingQueueTests negative ACK,MASTER-PERF-006
+4,CONS-004,P1,P1,Batch-2,04 userInfo ACK symmetry,1,No,Yes,Yes,Yes,Yes,No,Watch pending queue asymmetry,UserInfo round-trip test,MASTER-SYNC-002
+5,CONS-005,P1,P1,Batch-2,04 tombstone HMAC hardening,1,No,Yes,No,Yes,Yes,No,Legacy unsigned tombstone residual spoof,Unsigned rejected when signed available,MASTER-SYNC-003
+6,CONS-006,P1,P1,Batch-7,04 depth process gating,1,Yes,Yes,No,No,Yes,Yes,Shallow FC toggle TestFlight exposure,Default OFF + labeling,MASTER-DEPTH-001
+7,CONS-007,P1,P1,Batch-7,04 signing manifest CI,1,Yes,Yes,No,No,Yes,No,Plist vs signing misalignment risk,Manifest test PASS,MASTER-DEPTH-002
+8,CONS-008,P1,P1,Batch-1,01 oracle independence,1,Yes,Yes,No,Yes,No,Yes,Blocks external decompression parity,Oracle sweep + external compare,MWFC-P1-001
+9,CONS-009,P1,P1,Batch-8,External Bühlmann campaign,2,Yes,Yes,No,No,Yes,Yes,0% external validation executed,Signed QA_EVIDENCE,MWFC-P1-002 + F011
+10,CONS-010,P1,P1,Batch-8,Physical Watch Ultra matrix,2,Yes,Yes,No,No,Yes,No,0% physical depth QA,Signed wet depth log,MWFC-P2-001
+11,CONS-011,P1,P1,Batch-8,Paired device QA campaign,2,No,Yes,No,No,Yes,No,Blocks external TestFlight sync,Signed paired pack,MUIUX-P1-002 cluster
+12,CONS-012,P1,P1,Batch-6,Accessibility field matrix,2,No,Yes,No,No,Yes,No,VoiceOver manual pending,Signed a11y notes,MUIUX-P1-003
+13,CONS-013,P1,P1,Batch-9,PDF device render + legal,2,No,Yes,No,No,Yes,Yes,App Store evidence gap,Golden PDF artifacts,MUIUX-P1-004
+14,CONS-021,P1,P1,Batch-8,WAO physical QA,2,No,Yes,No,No,Yes,No,SOFTWARE_READY — physical pending,Signed WAO artifacts,WAO-G-008
+15,CONS-022,P1,P1,Batch-8,Underwater HW QA,2,No,Yes,No,No,Yes,No,Crown/Action Button physical,Signed HW artifacts,MASB-HW-01..03
+16,CONS-042,P1,P1,Batch-8,Shallow wet QA gate,2,Yes,Yes,No,No,Yes,Yes,Shallow/full depth separation field,Signed shallow wet,MASB-P-07
+17,CONS-044,P1,P1,Batch-9,Release legal counsel review,3,No,Yes,No,No,No,Yes,App Store NOT READY,Signed legal approval,MASB-L-01..03
+18,CONS-014,P2,P2,Batch-0,Full build+test @7dfefe2,0,No,Conditional,Yes,No,No,No,Gates confidence in all evidence,1091 Watch 0 failures,1089/1091 today
+19,CONS-015,P2,P2,Batch-1,Altitude oracle replay,1,Yes,Conditional,No,Yes,Yes,Yes,500-2000m matrix partial,Altitude matrix PASS,MWFC-P2-002
+20,CONS-016,P2,P2,Batch-1,Document TTS tolerance,1,No,Conditional,Yes,No,No,Yes,Conservative 1-min steps,3-min sweep tolerance,Separate from CONS-008
+21,CONS-017,P2,P2,Batch-0,Fix Watch test maintenance,0,No,Conditional,Yes,No,No,No,2 non-FC test failures,1091 PASS,MWFC-P2-004
+22,CONS-018,P2,P2,Batch-6,Update WAO startup tests,1,No,Conditional,Yes,No,No,No,WAO routing test drift,DIRModesAndStartupFlowTests PASS,MWFC-P2-005
+23,CONS-019,P2,P2,Batch-6,Water FC DepthCapabilityPolicy gate,1,Yes,Conditional,Yes,No,Yes,No,Shallow user FC via water path,WatchWaterAutoOpenPolicyTests,MASTER-WAO-001
+24,CONS-020,P2,P2,Batch-8,Physical submerged cold launch,1,No,Conditional,No,No,Yes,No,400ms timeout risk,Field submerged routing,MASTER-WAO-002
+25,CONS-023,P2,P2,Batch-8,Physical perf Ultra session,2,No,Conditional,No,No,Yes,No,2-4h FC battery unknown,Instruments Energy log,MASTER-PERF-001
+26,CONS-024,P2,P2,Batch-8,Paired sync load profiling,2,No,Conditional,No,No,Yes,No,Large payload latency,Low-battery burst test,MASTER-PERF-002
+27,CONS-027,P2,P2,Batch-5,PlannerStore deinit cancel,1,No,Conditional,Yes,No,No,No,Stale planner tasks,Perf concurrency tests,MASTER-PERF-007
+28,CONS-029,P2,P2,Batch-8,iCloud two-device QA,2,No,Conditional,No,No,Yes,No,Cloud merge field gap,Signed two-device pack,IOS-MASTER-F012
+29,CONS-030,P2,P2,Batch-8,Subsurface desktop QA,2,No,Conditional,No,No,No,Yes,CSV interoperability,Signed Subsurface evidence,IOS-MASTER-F013
+30,CONS-031,P2,P2,Batch-8,Snorkeling GPS field QA,2,No,Conditional,No,No,Yes,No,Snorkeling navigation trust,Signed GPS course,IOS-MASTER-F015
+31,CONS-032,P2,P2,Batch-6,Pixel baseline capture,2,No,Conditional,No,No,Yes,No,0/59 mockups executed,59 baselines captured,MUIUX-P2-002
+32,CONS-033,P2,P2,Batch-8,CCR reference validation review,2,No,Conditional,No,No,No,Yes,Reference-only external check,Copy unchanged,MUIUX-P2-001
+33,CONS-034,P2,P2,Batch-9,06 INDEX/README repair,1,No,Conditional,Yes,No,No,No,June wave under-indexed,INDEX @7dfefe2,DG-DOC-001
+34,CONS-043,P2,P2,Batch-8,GF preset external spot-check,2,Yes,Conditional,No,No,No,Yes,After CONS-002 software fix,External preset compare,GF preset matrix
+35,CONS-045,P2,P2,Batch-8,Execute all physical matrices,2,No,Conditional,No,No,Yes,Yes,Meta 0% evidence execution,Signed QA_EVIDENCE folder,MASTER-DCA-018
+36,CONS-028,P3,P3,Batch-3,iOS navigation restoration,1,No,No,No,No,Yes,No,UX polish not safety,Restoration tests,IOS-MASTER-F002
+37,CONS-035,P3,P3,Batch-1,Stop FSM cleanup,1,No,No,Yes,No,No,No,Dead deltaSeconds field,FSM tests PASS,MWFC-P3-001
+38,CONS-038,P3,P3,Batch-4,Import test GF fixture,1,No,No,Yes,No,No,No,Related CONS-002 test,Import tests PASS,MWFC-P3-004
+39,CONS-039,P3,P3,Batch-3,Apnea cloud or disclosure,1,No,No,No,No,No,No,Accepted risk,Stub truthfulness tests,By design
+40,CONS-040,P3,P3,Batch-3,Settings store unification,1,No,No,Yes,No,No,No,Maintainability,Coherence tests,IOS-MASTER-F004
+41,CONS-041,P3,P3,Batch-4,Gas-switch replay future work,1,No,No,No,No,No,No,Documented future,Single-gas OK today,IOS-MASTER-F005
