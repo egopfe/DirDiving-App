@@ -1,107 +1,79 @@
 # Master Main Code Remediation Plan (Current)
 
 **Audit command:** 04 — MASTER MAIN CODE / SYNC / SECURITY / PERFORMANCE AUDIT V1.0  
-**Branch:** `main` @ `1f62235`  
-**Date:** 2026-06-22
+**Branch:** `main` @ `7dfefe2`  
+**Date:** 2026-06-28
 
 ---
 
 ## Executive summary
 
-Re-audit of `main` @ `1f62235` consolidates five merged audit scopes. **No open P0 or P1 software defects** were identified. Prior remediations (deep code, sync/schema, security/privacy, performance/concurrency, iOS performance) are **present and verified** in source at this commit.
+Re-audit of `main` @ `7dfefe2` consolidates five merged audit scopes plus 4A (GF presets, shallow depth, water auto-open, developer settings).
 
-Remaining gaps are **physical QA**, **Instruments profiling**, and **external validation** — not implementation defects.
+**Five open P1 software findings** require remediation before internal TestFlight confidence. **Nine P2** findings (six physical QA + three software). Architecture, activity isolation, and release simulation safety remain strong.
 
-| Category | Software readiness | Blocker for external TestFlight |
+| Category | Software readiness | Blocker for internal TestFlight |
 |----------|-------------------|--------------------------------|
-| Architecture / isolation | 100% | No |
-| Sync / schema | 95% | Field tombstone/large-payload QA |
-| Security / privacy | 98% | Paired-device SEC-NEG field |
-| Performance (software) | 92% | Instruments + battery field |
+| Architecture / isolation | 97% | No |
+| Sync / schema | 90% | P1 ACK + tombstone + in-flight |
+| Security / privacy | 94% | P1 tombstone compat |
+| Performance (software) | 86% | P1 sync stuck + planner lifecycle |
+| Depth / developer gates | 92% | P1 shallow FC process risk |
 | Test coverage (automated) | 95% | Physical matrices |
 
 ---
 
 ## Priority 0 — None open
 
-No cross-activity corruption, HMAC bypass, simulation-in-release, or safety-critical stale-async defects found open at `1f62235`.
+No cross-activity corruption, HMAC bypass, water-auto-open live-runtime bypass, or simulation-in-release defects at `7dfefe2`.
 
 ---
 
-## Priority 1 — None open (software)
+## Priority 1 — Open (software)
 
-All prior P1 items closed including:
-
-- Activity-scoped tombstones (`ActivitySyncTombstoneBroadcast`)
-- Cloud backup truthfulness (`CloudBackupCapability`)
-- iOS planner MainActor blocking (`PlannerBackgroundCalculation`)
-- Sync backpressure (`WatchSyncPendingFlushPolicy` on iOS)
-- Cross-decode rejection tests (`ActivitySyncCrossDecodeRejectionTests`)
-
----
-
-## Priority 2 — Field QA (no code fix in this audit)
-
-| ID | Action | Command / doc | Owner |
-|----|--------|---------------|-------|
-| MASTER-PERF-001 | Ultra 2-4h FC battery/thermal | MASTER_PHYSICAL_PERFORMANCE_QA_PLAN PHYS-W-FC-01/02 | QA |
-| MASTER-PERF-002 | Paired sync under load | PHYS-PAIR-01/04 | QA |
-| MASTER-PERF-003 | iPhone logbook scroll at cap | PHYS-I-03 | QA |
-| MASTER-PERF-004 | Snorkeling long-route map | PHYS-W-SN-01/02, PHYS-I-04 | QA |
-| MASTER-SEC-001 | Paired security matrix | SEC-NEG field + PHYS-PAIR-02 | QA |
-| MASTER-SYNC-001 | Large payload file transfer | PHYS-PAIR-03 | QA |
+| ID | Finding | Remediation | Tests |
+|----|---------|-------------|-------|
+| MASTER-PERF-006 | iOS sync in-flight stuck | Clear `inFlightOutboundSessionIDs` on ACK failure, encode error, userInfo fallback | Negative ACK failure test |
+| MASTER-SYNC-002 | Watch→iOS userInfo ACK gap | Send `diveImportAck` from iOS `didReceiveUserInfo` import path | Round-trip userInfo test |
+| MASTER-SYNC-003 | Legacy unsigned tombstones | Reject `dirdiving_deleted_session_ids` when signed path available | Tombstone negative test |
+| MASTER-DEPTH-001 | Shallow FC internal exposure | Enforce TestFlight process; strengthen internal-only labeling; optional hard block without toggle | Manual QA gate |
+| MASTER-DEPTH-002 | Tier metadata trust | CI manifest check: entitlements file ↔ Info.plist tier | Signing manifest test |
 
 ---
 
-## Priority 3 — Observability / accepted risks
+## Priority 2 — Open
 
-| ID | Action | Type |
-|----|--------|------|
-| MASTER-IOS-001 | Cold-start Instruments profile | Profiling |
-| MASTER-IOS-002 | Map Instruments profile | Profiling |
-| MASTER-PERF-005 | Monitor FC solver budget regression | Accepted risk |
-| MASTER-SEC-002 | Maintain TOFU documentation | Accepted risk |
-
----
-
-## Priority 4 — Informational
-
-- INFO-01..08 positive controls — maintain via regression gates
-- MAIN-DCA-018 — populate QA_EVIDENCE when physical QA runs
-- MAIN-DCA-032 — deferred reminder visibility indicator (product decision)
+| ID | Finding | Remediation |
+|----|---------|-------------|
+| MASTER-PERF-001..004 | Physical battery/sync/scroll/map | Execute `MASTER_PHYSICAL_PERFORMANCE_QA_PLAN_CURRENT.md` |
+| MASTER-SEC-001 | Field sync security | Paired-device SEC-NEG matrix |
+| MASTER-SYNC-001 | Large payload field | Paired 5MB round-trip |
+| MASTER-WAO-001 | Water FC policy skip | Apply `DepthCapabilityPolicy` before FC water routing |
+| MASTER-WAO-002 | Probe timeout | Physical submerged launch QA; evaluate adaptive timeout |
+| MASTER-PERF-007 | Planner lifecycle | Cancel tasks in `deinit`; move `refreshAnalysis` off main |
 
 ---
 
-## Recommended remediation command sequence
+## Priority 3 — Monitor / profiling
 
-1. **Physical paired-device QA command** — execute MASTER_PHYSICAL_PERFORMANCE_QA_PLAN (read-only evidence).
-2. **Instruments iOS profiling command** — BUD-IOS-001/002/016 wall-clock capture.
-3. **External Bühlmann/CCR validation command** — reference oracle only (no math changes).
-
----
-
-## Non-regression requirements
-
-Any future remediation MUST preserve:
-
-- HMAC v3 envelope integrity
-- Activity payload key isolation
-- Signed import ACK dequeue policy
-- Full Computer degraded-not-reset tick policy
-- Diving-only cloud opt-in truthfulness
-- App Store simulation block
+- MASTER-IOS-001/002 — Instruments startup and map profiling
+- MASTER-PERF-005, MASTER-SEC-002, MASTER-DEPTH-003, MASTER-WAO-DOC — documented accepted risks
 
 ---
 
-## Validation after any fix
+## Priority 4 — Positive controls (maintain)
 
-```bash
-./Scripts/validate_master_main_code_sync_security_performance_audit.sh
-./Scripts/validate_security_privacy_trust_readiness.sh
-./Scripts/validate_ios_performance_readiness.sh
-./Scripts/validate_multi_activity_sync_persistence_schema_readiness.sh
-```
+INFO-01..10 — no action; regression tests on touch.
 
 ---
 
-**No production code changes from this audit pass.**
+## Sequencing
+
+1. **Week 1:** P1 sync fixes (PERF-006, SYNC-002, SYNC-003).
+2. **Week 1–2:** WAO policy alignment (WAO-001); planner lifecycle (PERF-007).
+3. **Week 2–3:** Physical QA plan execution; depth signing CI check (DEPTH-002).
+4. **Ongoing:** Instruments profiling; external validation per roadmap.
+
+---
+
+**No production changes in this audit pass.** Remediation requires separate implementation command.

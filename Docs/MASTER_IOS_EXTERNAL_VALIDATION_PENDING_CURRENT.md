@@ -1,10 +1,10 @@
 # iOS Master Audit — External / Physical Validation Pending
 
-**Command:** `02-MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.0`  
-**Date:** 2026-06-22  
+**Command:** `02-MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.1` (LAUNCH ORDER 02)  
+**Date:** 2026-06-28  
 **Branch:** `main`  
-**Commit:** `1f62235` (`1f62235996c5a00418db36519479df289c212744`)  
-**Scope:** DIR Diving iOS Companion — merged math, Bühlmann, algorithm, multi-activity audit
+**Commit:** `7dfefe2` (`7dfefe2cd7817780a903a64e51b890d901111ffd`)  
+**Scope:** DIR Diving iOS Companion — merged math, Bühlmann, algorithm, multi-activity audit including GF preset override compatibility and briefing-card reference-only posture
 
 All items below remain **NOT EXECUTED** or **PENDING** unless signed evidence exists in `Docs/QA_EVIDENCE/`. No physical iPhone, paired Watch, underwater, external Bühlmann, Subsurface, or App Store legal review was performed during this audit pass.
 
@@ -16,14 +16,14 @@ All items below remain **NOT EXECUTED** or **PENDING** unless signed evidence ex
 |----------|----------:|------------------------------|
 | Physical Watch Ultra | 12 | **No** |
 | Physical iPhone | 7 | **No** |
-| Paired-device sync | 8 | **No** |
+| Paired-device sync | 9 | **No** |
 | Underwater entitlement | 1 | **No** |
 | External algorithm reference | 4 | **No** |
 | App Store / legal | 2 | **No** |
 | Accessibility manual QA | 3 | **No** |
-| **Total NOT PASSED** | **37** | — |
+| **Total NOT PASSED** | **38** | — |
 
-Integrated from: `Docs/EXTERNAL_VALIDATION_GAPS_CURRENT.md`, `Docs/ACTIVITY_ARCHITECTURE_EXTERNAL_QA_PENDING_CURRENT.md`, `Docs/TEST_QA_EVIDENCE_AUDIT_CURRENT.md`.
+Integrated from: `Docs/EXTERNAL_VALIDATION_GAPS_CURRENT.md`, `Docs/ACTIVITY_ARCHITECTURE_EXTERNAL_QA_PENDING_CURRENT.md`, `Docs/WATCH_FULL_COMPUTER_GRADIENT_FACTORS_IMPLEMENTATION_REPORT_CURRENT.md`.
 
 ---
 
@@ -34,7 +34,7 @@ Integrated from: `Docs/EXTERNAL_VALIDATION_GAPS_CURRENT.md`, `Docs/ACTIVITY_ARCH
 | EXT-IOS-BUHL-01 | PENDING_EXTERNAL_VALIDATION | `QA_EVIDENCE/BUHLMANN_EXTERNAL/` | Algorithm marketing / third-party sign-off |
 | EXT-IOS-BUHL-02 | PENDING_EXTERNAL_VALIDATION | `BUHLMANN_EXTERNAL_VALIDATION_FIXTURES_TEMPLATE.md` | `reviewerSignOff: PENDING` |
 
-**Software baseline:** Shared `BuhlmannCore` ZH-L16C engine; iOS golden fixtures (`BuhlmannGoldenFixtureTests`, `BuhlmannReferenceFixtureTests`); 1281 XCTest definitions in `Tests/iOSAlgorithmTests`. Internal consistency **PASS**; external oracle comparison **NOT EXECUTED**.
+**Software baseline:** Shared `BuhlmannCore` ZH-L16C engine; iOS golden fixtures (`BuhlmannGoldenFixtureTests`, `BuhlmannReferenceFixtureTests`); **1526 executed tests, 0 failures** in `DIRDiving iOS Algorithm Tests` @ `7dfefe2`. Internal consistency **PASS**; external oracle comparison **NOT EXECUTED**.
 
 ---
 
@@ -80,6 +80,17 @@ Integrated from: `Docs/EXTERNAL_VALIDATION_GAPS_CURRENT.md`, `Docs/ACTIVITY_ARCH
 
 ---
 
+## GF preset / iOS plan → Watch Full Computer override
+
+| ID | Status | Evidence folder | Blocking |
+|----|--------|-----------------|----------|
+| EXT-IOS-GF-01 | PENDING_PAIRED_DEVICE_QA | `QA_EVIDENCE/WATCH_IOS_SYNC/` | Physical confirm iOS plan GF lock on Watch predive |
+| EXT-IOS-GF-02 | OPEN (software) | — | iOS conservative/standard presets rejected at import (`IOS-MASTER-F016`) |
+
+**Software baseline:** Watch `FullComputerGradientFactorSettingsStoreTests` PASS; iOS `PlannerGFPresetDisplayTests` PASS for iOS values; cross-preset mapping **FAIL** for 20/70 and 30/80 until remediated.
+
+---
+
 ## Physical iPhone QA
 
 | ID | Status | Evidence folder | Blocking |
@@ -106,6 +117,7 @@ Integrated from: `Docs/EXTERNAL_VALIDATION_GAPS_CURRENT.md`, `Docs/ACTIVITY_ARCH
 | EXT-IOS-PAIR-06 | PENDING_PAIRED_DEVICE_QA | — | Planner briefing card PNG transfer + ACK on paired hardware |
 | EXT-IOS-PAIR-07 | PENDING_PAIRED_DEVICE_QA | — | iOS Settings mode switch does not mutate Watch runtime (physical confirm) |
 | EXT-IOS-PAIR-08 | PENDING_PAIRED_DEVICE_QA | Performance external QA | Low-battery paired sync |
+| EXT-IOS-PAIR-09 | PENDING_PAIRED_DEVICE_QA | — | iOS plan GF override end-to-end on paired Watch FC |
 
 ---
 
@@ -116,7 +128,7 @@ Integrated from: `Docs/EXTERNAL_VALIDATION_GAPS_CURRENT.md`, `Docs/ACTIVITY_ARCH
 | EXT-IOS-LEGAL-01 | NOT_EXECUTED | `QA_EVIDENCE/APP_STORE_MARKETING/` | Screenshots and marketing copy |
 | EXT-IOS-LEGAL-02 | NOT_EXECUTED | `Docs/RELEASE_LEGAL_CLAIMS_COMPLIANCE_AUDIT_CURRENT.md` | Non-certified planner / CCR / briefing disclaimers legal sign-off |
 
-**Software baseline:** `ReleaseLegalClaimsRemediationTests`; no EN13319/ISO 6425/CE claims in production strings audited at `1f62235`.
+**Software baseline:** `ReleaseLegalClaimsRemediationTests`; no EN13319/ISO 6425/CE claims in production strings audited at `7dfefe2`.
 
 ---
 
@@ -135,11 +147,11 @@ Integrated from: `Docs/EXTERNAL_VALIDATION_GAPS_CURRENT.md`, `Docs/ACTIVITY_ARCH
 | Limitation | Impact |
 |------------|--------|
 | No physical iPhone QA | Layout, haptics, share sheet unverified |
-| No paired Watch QA | Briefing transfer ACK unverified on hardware |
+| No paired Watch QA | Briefing transfer ACK and GF override unverified on hardware |
 | No external Bühlmann oracle | Cannot claim third-party decompression parity |
 | No Subsurface desktop round-trip | CSV compatibility claim software-only |
-| `testTissueAnalyticsCacheBounded` crash/timeout on audit run | Performance gate flaky; see finding IOS-MASTER-F001 |
+| GF preset cross-target gap | iOS conservative/standard plans cannot activate Watch FC override until aligned |
 
 ---
 
-*End of external validation pending report — audit-only @ `1f62235`.*
+*End of external validation pending report — audit-only @ `7dfefe2`.*

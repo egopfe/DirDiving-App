@@ -1,14 +1,17 @@
 # Master Watch Full Computer — Full Deep Forensic Audit — CURRENT
 
-**Command:** `01-MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V2.0.md`  
-**Audit date:** 2026-06-22  
+**Command:** `03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.2.md` (LAUNCH ORDER 01 — Watch Full Computer forensic scope)  
+**Canonical:** `01-MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V2.0.md`  
+**Audit date:** 2026-06-28  
 **Repository:** `egopfe/DirDiving-App`  
 **Branch:** `main`  
-**Commit:** `1f62235`  
+**Commit:** `7dfefe2`  
 **Working tree:** clean (`main...origin/main` 0/0)  
 **Task type:** read-only forensic audit (Docs outputs only)
 
 **Merged scope:** Watch Diving Computer full audit + Live Bühlmann/Schreiner multilevel audit (Command 15)
+
+**2026-06-27/28 additional scope:** water auto-open routing, Apple shallow depth entitlement, developer shallow Gauge/FC toggles, Full Computer GF presets, Crown/Action Button policy where they touch FC.
 
 **Deliverables:** 12 files under `Docs/MASTER_WATCH_FULL_COMPUTER_*_CURRENT.*`
 
@@ -16,21 +19,23 @@
 
 ## A. Executive Summary
 
-This merged forensic audit re-examines the Apple Watch **Full Computer** live decompression path on `main` @ `1f62235`: environment authority, CMAltimeter predive flow, Bühlmann ZH-L16C Schreiner/Haldane tissue integration, multilevel schedule recomputation, checkpoint/restore, and reference-only planner/CCR isolation.
+This merged forensic audit re-examines the Apple Watch **Full Computer** live decompression path on `main` @ `7dfefe2`: environment authority, CMAltimeter predive flow, Bühlmann ZH-L16C Schreiner/Haldane tissue integration, multilevel schedule recomputation, checkpoint/restore, reference-only planner/CCR isolation, plus June 2026 Watch platform scope (water auto-open, shallow entitlement, GF presets, developer shallow testing gates).
 
-**Headline:** No **P0** safety defect confirmed in static review or targeted automated testing at this baseline. Prior altitude sea-level fallback issues (ALT-P0) are **verified FIXED** — `runtimePlan()` returns `nil` without validated environment; imported plans propagate altitude. ML-01 through ML-10 oracle profiles **PASS** in Audit-15 suites. The central **39 m Air → 10 m** scenario is answered from tissue state: ceiling reduces, controlling compartment migrates, schedule rebuilds each refresh; clearance at 10 m is model-dependent, not timer-driven.
+**Headline:** No **P0** safety defect confirmed in static review or targeted automated testing at this baseline. Prior altitude sea-level fallback issues (ALT-P0) remain **verified FIXED** — `runtimePlan()` returns `nil` without validated environment; imported plans propagate altitude. ML-01 through ML-10 oracle profiles **PASS** in Audit-15 suites. The central **39 m Air → 10 m** scenario is answered from tissue state: ceiling reduces, controlling compartment migrates, schedule rebuilds each refresh; clearance at 10 m is model-dependent, not timer-driven.
 
-**Gaps:** TTS/schedule oracle uses production projection (MWFC-P1-001); external tool validation **PENDING**; physical Watch QA **PENDING**; full Watch Algorithm Tests session incomplete in audit run (507 tests, 0 failures, no final banner).
+**June 2026 scope verdict:** Shallow depth entitlement correctly blocks production FC without full entitlement or developer shallow-testing flag (`DepthCapabilityTests` PASS). GF presets are FC-scoped, snapshotted at dive start, locked during active dive (`FullComputerGradientFactorSettingsStoreTests` PASS). Water auto-open routes to configured destination but does **not** bypass legal gate or FC predive confirmation (`WatchLaunchRoutingPolicy`, `WatchSubmersionLaunchProbeTests` PASS). Crown/Action Button underwater resolver does not expose GF mutation (`WatchUnderwaterActionResolverTests` PASS).
+
+**Gaps:** TTS/schedule oracle uses production projection (MWFC-P1-001); external tool validation **PENDING**; physical Watch QA **PENDING**; two non-algorithm Watch test cases fail (startup-flow test drift after water auto-open; import checksum test expectation vs GF validation order).
 
 | Severity | Count | Summary |
 |---:|---:|---|
 | P0 | 0 | No confirmed false clearance, tissue corruption, or fail-open active-dive deco path |
 | P1 | 2 | Hybrid TTS oracle; external validation not executed |
-| P2 | 4 | Physical QA pending; altitude ML replay partial; TTS 1-min quanta; test session incomplete |
-| P3 | 3 | Dead deltaSeconds in stop FSM; logbook provenance edge; project.yml explicit list |
+| P2 | 5 | Physical QA pending; altitude ML replay partial; TTS 1-min quanta; test session partial + startup-flow test drift |
+| P3 | 4 | Stop FSM dead field; logbook provenance edge; project.yml glob; import checksum test expectation |
 | P4 | 2 | Test-only seaLevel defaults; external CSV scaffold fill pending |
 
-**Verdict:** **PARTIAL** — strong software evidence; physical and external gates open.
+**Verdict:** **PARTIAL** — strong software evidence on FC math/runtime; physical and external gates open; minor test maintenance items.
 
 ---
 
@@ -43,7 +48,27 @@ This merged forensic audit re-examines the Apple Watch **Full Computer** live de
 
 ## C. Latest Development Update
 
-Respected current architecture: Settings mode switch, activity isolation, Watch FC altitude/environment policy, CMAltimeter proposal flow, multilevel Bühlmann/Schreiner runtime, live decompression state, planner briefing cards reference-only, no cross-activity leakage.
+**Baseline commits since prior audit (`1f62235`):**
+
+| Commit | Scope |
+|---|---|
+| `b9b2c82` | Water auto-open startup and underwater fast controls |
+| `6197673` | Apple Shallow Depth entitlement support |
+| `b666772` | Shallow entitlement in default Watch signing |
+| `0673018` | Full Computer GF preset selection (20/80, 30/70, 40/85) |
+| `9176da8` | Water auto-open wiring + settings UX |
+| `47d8af8` | Developer toggles for shallow Gauge and FC testing |
+| `3c120a4` | Crown and buttons user guide (EN/IT) |
+
+**Respected architecture:** Settings mode switch, activity isolation, Watch FC altitude/environment policy, CMAltimeter proposal flow, multilevel Bühlmann/Schreiner runtime, live decompression state, planner briefing cards reference-only, no cross-activity leakage.
+
+**Shallow depth entitlement:** `DepthCapabilityPolicy` gates FC to `appleFull` or developer shallow-testing flag behind `DepthCapabilityEntitlementProbe.hasShallowEntitlement`. Production users with shallow-only entitlement cannot start FC without explicit developer unlock + toggle.
+
+**GF presets:** Three fixed presets in `FullComputerGradientFactorPreset`; Watch store + predive confirmation display resolved GF/source; active dive lock via `FullComputerGradientFactorLockContext`.
+
+**Water auto-open:** `WatchSubmersionLaunchProbe` + `WatchLaunchRoutingPolicy.resolveColdLaunchEntryPoint` detect system submerged launch; routes via `WatchWaterAutoOpenPolicy` when enabled — does not skip `fullComputerPrediveConfirmed` gate.
+
+**Crown/Action Button:** `WatchUnderwaterActionResolver` prioritizes alarm ack, stopwatch, compass bearing — no GF or environment mutation paths for FC underwater.
 
 ---
 
@@ -52,11 +77,12 @@ Respected current architecture: Settings mode switch, activity isolation, Watch 
 | Check | Result |
 |---|---|
 | Branch | `main` ✓ |
-| Commit | `1f62235` |
+| Commit | `7dfefe2` |
 | origin/main | synced 0/0 |
 | Primary target | `DIRDiving Watch App` — Full Computer |
 | Test target | `DIRDiving Watch Algorithm Tests` |
-| Xcode | 26.5 (17F42) |
+| Xcode | 26.6 (17F113) |
+| watchOS SDK | 26.5 (simulator) |
 | Physical Watch | **Not available** — PENDING_PHYSICAL |
 | External oracle tool | **Not executed** — PENDING_EXTERNAL_VALIDATION |
 
@@ -66,18 +92,29 @@ Respected current architecture: Settings mode switch, activity isolation, Watch 
 
 ```text
 git branch --show-current → main
-git rev-parse --short HEAD → 1f62235
+git rev-parse --short HEAD → 7dfefe2
+git status → clean
 xcodegen generate → SUCCESS
+./Scripts/check_main_target_isolation.sh → PASS
+./Scripts/check_secrets.sh → PASS
 ```
+
+**Watch App build:** `xcodebuild -scheme "DIRDiving Watch App" -destination generic/watchOS Simulator` → **BUILD SUCCEEDED**
 
 **Watch Algorithm Tests:**
 
 | Attempt | Result |
 |---|---|
-| 1 (default DerivedData) | **NOT_EXECUTED** — build.db locked |
-| 2 (isolated DerivedData /tmp/DIRDiving-Audit-DD) | **PARTIAL** — 507 tests executed, 0 failures; Audit15 + FC suites PASS; no TEST SUCCEEDED banner (session incomplete) |
+| Isolated DerivedData `/tmp/DIRDiving-Audit-DD7dfefe2` | **TEST FAILED** — **1091 tests**, **7 failures** (2 test cases, ~538 s); all Audit-15 and core FC engine suites **PASS** |
 
-**Confirmed PASS suites (log evidence):** Audit15Air39MultilevelProfileTests, Audit15MultilevelOracleProfilesTests (ML-02..ML-10), Audit15RedescentOracleTests, Audit15TTSScheduleOracleSweepTests, SchreinerAnalyticParityTests, FullComputerTimingFaultTests, OrchestratedAltitudeEnvironmentTests.
+**Confirmed PASS (log evidence @ 7dfefe2):** Audit15Air39MultilevelProfileTests, Audit15MultilevelOracleProfilesTests (ML-02..ML-10), Audit15RedescentOracleTests, Audit15TTSScheduleOracleSweepTests, FullComputerRuntimeEngineTests (11 tests), SchreinerAnalyticParityTests, FullComputerTimingFaultTests, OrchestratedAltitudeEnvironmentTests, DepthCapabilityTests (9 tests), WatchSubmersionLaunchProbeTests, FullComputerGradientFactorSettingsStoreTests.
+
+**Failures (non-algorithm):**
+
+| Test | Failure | Assessment |
+|---|---|---|
+| `DIRModesAndStartupFlowTests.testFullComputerCompletionRequiresExplicitConfirm` | 6 assertions — routing returns `divingModeSelection` not predive steps | **P2** test drift after water auto-open routing (MWFC-P2-005) — not FC tissue safety |
+| `FullComputerImportedPlanStoreTests.testEqualRevisionWithDifferentChecksumFailsClosed` | Expected `checksumMismatch`, got `invalidGradientFactors` | **P3** validation order change — still fail-closed (MWFC-P3-004) |
 
 **iOS parity tests:** **NOT_EXECUTED** in this session.
 
@@ -88,17 +125,18 @@ xcodegen generate → SUCCESS
 | Prior audit | Covered | This audit adds |
 |---|---|---|
 | WATCH_MAIN_ALGORITHM_MATH_AUDIT | Gauge lifecycle, depth pipeline | FC live tissue authority proof |
-| WATCH_LIVE_BUHLMANN_SCHREINER_MULTILEVEL | ML-01/05, Schreiner, timing | **Re-audit @ 1f62235**, ML-02..10 confirmation, merged master matrices |
+| WATCH_LIVE_BUHLMANN_SCHREINER_MULTILEVEL | ML-01/05, Schreiner, timing | **Re-audit @ 7dfefe2**, ML-02..10 confirmation |
 | WATCH_CMALTIMETER_* | Sensor lifecycle | Integrated failure injection + startup authority |
-| WATCH_BUHLMANN_ALTITUDE (ALT-P0) | Reported sea-level fallback | **Verified FIXED** at current baseline |
+| WATCH_BUHLMANN_ALTITUDE (ALT-P0) | Reported sea-level fallback | **Verified FIXED** |
+| UI/UX V2.1 | GF presets, shallow UX | **FC safety cross-check** of GF/entitlement/auto-open |
 
-**Still open:** external tool parity, physical Ultra QA, altitude ML oracle at elevation, fully independent TTS schedule oracle.
+**Still open:** external tool parity, physical Ultra QA, altitude ML oracle at elevation, fully independent TTS schedule oracle, startup-flow test update after water auto-open.
 
 ---
 
 ## G. Target Membership and Architecture
 
-**Watch App compiles:** `FullComputerRuntimeEngine.swift`, `FullComputerEnvironmentSensorService.swift`, `FullComputerPrediveConfigurationStore.swift`, `Shared/BuhlmannCore/*`, FC views/utils, co-resident Gauge/Apnea/Snorkeling.
+**Watch App compiles:** `FullComputerRuntimeEngine.swift`, `FullComputerEnvironmentSensorService.swift`, `FullComputerPrediveConfigurationStore.swift`, `FullComputerGradientFactorSettingsStore.swift`, `Shared/BuhlmannCore/*`, FC views/utils, co-resident Gauge/Apnea/Snorkeling.
 
 **Single tissue authority:** `FullComputerRuntimeEngine.tissueState` on `@MainActor` `DiveManager` when `sessionDivingMode == .fullComputer`.
 
@@ -114,6 +152,7 @@ Evidence: `project.yml`, `FullComputerTargetMembershipTests`, `FullComputerWatch
 - Physical Apple Watch QA: **PENDING_PHYSICAL**
 - External Bühlmann validation: **PENDING_EXTERNAL_VALIDATION**
 - Planner briefing cards: **reference-only** verified
+- Shallow developer testing copy does not imply certified decompression guidance (static review `DeveloperSettingsView`)
 
 ---
 
@@ -126,6 +165,8 @@ Launch → legal gate → activity Diving → Full Computer
   → ingestSample/tick → refreshSnapshot → UI
 ```
 
+Optional water auto-open cold launch: `WatchSubmersionLaunchProbe` → `WatchLaunchRoutingPolicy` → may route to water destination but FC still requires predive confirmation flag.
+
 Gauge/Apnea/Snorkeling do not mutate FC tissues (`FullComputerNamespaceIsolationTests`, architecture guard).
 
 ---
@@ -135,7 +176,8 @@ Gauge/Apnea/Snorkeling do not mutate FC tissues (`FullComputerNamespaceIsolation
 - `runtimePlan()` requires validated `confirmedEnvironment ?? draftEnvironment` — **no silent sea level**
 - `legacyUnknown` source not authorized for live start
 - `fullComputerPrediveConfirmed` gate in `DIRActivitySelectionStore`
-- Active dive: `canEdit == false` — environment immutable
+- Active dive: `canEdit == false` — environment and GF immutable
+- `DepthCapabilityPolicy.supportsFullComputerRuntime` blocks FC when shallow entitlement without developer toggle
 
 ---
 
@@ -145,7 +187,7 @@ Gauge/Apnea/Snorkeling do not mutate FC tissues (`FullComputerNamespaceIsolation
 
 **CMAltimeter:** `AppleWatchAbsoluteAltitudeProvider` — 5 samples, ±12 m spread, 8 s timeout, accuracy ≤30 m, requestGeneration isolation, fail-closed nil-data (3-strike), late error cannot overwrite `proposalReady`.
 
-Evidence: `WatchCMAltimeterLifecycleTests`, `WatchCMAltimeterRemediationTests`, WCMA findings FIXED.
+Evidence: `WatchCMAltimeterLifecycleTests`, `WatchCMAltimeterRemediationTests`.
 
 **FullComputerEnvironmentRecord:** schema v1, altitude, surface pressure, salinity, water density, source, capturedAt, sensor metadata; `validateForLiveStart()`.
 
@@ -181,6 +223,8 @@ Evidence: `WatchCMAltimeterLifecycleTests`, `WatchCMAltimeterRemediationTests`, 
 
 Every `refreshSnapshot` → `BuhlmannEngine.runtimeProjection` + `FullComputerDecoSolver.solve` on current tissues.
 
+**GF presets:** Resolved at predive via `FullComputerGradientFactorSettingsStore`; snapshotted in `FullComputerRuntimePlan` at start; not mutable mid-dive via Crown/Action Button or water auto-open.
+
 Schedule at 39 m **not** authoritative after 10 m stay — rebuilds from tissues each refresh.
 
 ---
@@ -195,7 +239,7 @@ Stop FSM: model-synchronized timer; **does not** mutate tissues; completing disp
 
 ## AB. Multilevel Profiles ML-01..ML-10
 
-| Profile | Oracle test | Result @ 1f62235 |
+| Profile | Oracle test | Result @ 7dfefe2 |
 |---|---|---|
 | ML-01 | Audit15Air39MultilevelProfileTests | **PASS** |
 | ML-02 | testML02EAN50SwitchAt21m | **PASS** |
@@ -248,7 +292,7 @@ Shared `BuhlmannCore` between Watch live and iOS Planner math. Planner cards are
 
 Checkpoint: SHA256, full tissue vector, environment, GF, gas, stop state. Restore fail-closed on corrupt.
 
-Logbook metadata includes environment fields when provided (`FullComputerDiveLogbookMetadata`).
+Logbook metadata includes environment fields and GF preset when provided (`FullComputerDiveLogbookMetadata`).
 
 ---
 
@@ -261,6 +305,8 @@ Logbook metadata includes environment fields when provided (`FullComputerDiveLog
 ## AM–AN. UI Truthfulness and App Intents
 
 Environment source shown in predive UI; degraded timing banner; legal gate on intents (`LegalAcceptanceGateTests`, `ActionButtonIntentsSafetyTests`).
+
+Water auto-open settings copy explains system Settings path; does not claim forced system listing.
 
 Physical small-screen VoiceOver/haptic priority: **PENDING_PHYSICAL**.
 
@@ -280,15 +326,17 @@ See `MASTER_WATCH_FULL_COMPUTER_NUMERICAL_ERROR_BUDGET_CURRENT.md`.
 
 ## AS–AT. Concurrency and Performance
 
-`@MainActor` DiveManager serializes tissue updates; instance-scoped solver cache (P2-AUD15-001 FIXED). Solver budget 50 ms → conservative fallback.
+`@MainActor` DiveManager serializes tissue updates; instance-scoped solver cache. Solver budget 50 ms → conservative fallback.
 
 ---
 
 ## AU. Test Coverage
 
-Strong FC coverage: runtime, timing faults, deco solver/stop FSM, recovery, CMAltimeter, Audit15 oracle, mutation resistance, altitude orchestration.
+Strong FC coverage: runtime, timing faults, deco solver/stop FSM, recovery, CMAltimeter, Audit15 oracle, mutation resistance, altitude orchestration, depth capability, GF presets, submersion launch probe.
 
 **Mutation tests:** reversed rate, seconds-as-minutes detected.
+
+**Gaps:** `DIRModesAndStartupFlowTests` FC completion path needs update for water auto-open routing.
 
 ---
 
@@ -312,6 +360,9 @@ See `MASTER_WATCH_FULL_COMPUTER_FINDING_TRACEABILITY_CURRENT.csv`.
 | ACTIVITY_ISOLATION | 98 |
 | ENVIRONMENT_SOURCE_POLICY | 95 |
 | CMALTIMETER_LIFECYCLE (software) | 94 |
+| DEPTH_CAPABILITY_SHALLOW_ENTITLEMENT | 96 |
+| GF_PRESET_RUNTIME_LOCK | 97 |
+| WATER_AUTO_OPEN_FC_SAFETY | 94 |
 | SCHREINER_FORMULA | 99 |
 | ONE_SECOND_TIMING / ACTUAL_DT | 97 |
 | MULTILEVEL_ORACLE (ML-01..10) | 96 |
@@ -322,18 +373,19 @@ See `MASTER_WATCH_FULL_COMPUTER_FINDING_TRACEABILITY_CURRENT.csv`.
 | PERSISTENCE_RESTORE | 96 |
 | PHYSICAL_WATCH_QA | 0 |
 | EXTERNAL_VALIDATION | 15 |
-| OVERALL_WATCH_FULL_COMPUTER_SOFTWARE_READINESS | **88** |
-| OVERALL_WATCH_FULL_COMPUTER_RELEASE_READINESS | **42** |
+| OVERALL_WATCH_FULL_COMPUTER_SOFTWARE_READINESS | **87** |
+| OVERALL_WATCH_FULL_COMPUTER_RELEASE_READINESS | **41** |
 
 ---
 
 ## AZ. Prioritized Remediation Plan
 
 1. **MWFC-P1-002:** Execute external validation plan (Subsurface spot checks + ML-01 CSV).
-2. **MWFC-P2-001:** Complete physical QA matrix on Ultra hardware.
+2. **MWFC-P2-001:** Complete physical QA matrix on Ultra hardware (include water auto-open + shallow entitlement).
 3. **MWFC-P1-001:** Independent TTS/schedule forward simulator or documented third-party acceptance.
 4. **MWFC-P2-002:** Altitude ML oracle replay campaign at 500–2000 m.
-5. **MWFC-P3-001..003:** Maintainability items (non-blocking).
+5. **MWFC-P2-005:** Update `DIRModesAndStartupFlowTests` for water auto-open routing.
+6. **MWFC-P3-001..004:** Maintainability items (non-blocking).
 
 ---
 
@@ -369,6 +421,9 @@ CANONICAL_ENVIRONMENT_VALIDATION: PASS
 SURFACE_PRESSURE_DERIVATION: PASS
 WATER_DENSITY_SALINITY_CONSISTENCY: PASS
 ACTIVE_DIVE_ENVIRONMENT_IMMUTABLE: PASS
+DEPTH_CAPABILITY_SHALLOW_ENTITLEMENT: PASS
+GF_PRESET_RUNTIME_LOCK: PASS
+WATER_AUTO_OPEN_DOES_NOT_BYPASS_FC_PREDIVE: PASS
 ZH_L16C_CONSTANTS: PASS
 TISSUE_INITIALIZATION_ALTITUDE_AWARE: PASS
 ALL_16_N2_COMPARTMENTS: PASS
@@ -405,18 +460,18 @@ CCR_REFERENCE_ONLY_SAFETY: PASS
 UI_DOCUMENTATION_TRUTHFULNESS: PASS
 APP_INTENTS_SAFETY_GATE: PASS
 FAILURE_INJECTION_COVERAGE: PARTIAL
-WATCH_ALGORITHM_TESTS: PARTIAL
+WATCH_ALGORITHM_TESTS: FAIL
 IOS_PARITY_TESTS: NOT_EXECUTED
-MACOS_WATCH_BUILD: NOT_EXECUTED
+MACOS_WATCH_BUILD: PASS
 P0_FINDINGS: 0
 P1_FINDINGS: 2
-P2_FINDINGS: 4
-P3_FINDINGS: 3
+P2_FINDINGS: 5
+P3_FINDINGS: 4
 P4_FINDINGS: 2
-SOFTWARE_READINESS_PERCENT: 88
+SOFTWARE_READINESS_PERCENT: 87
 PHYSICAL_WATCH_QA_READINESS_PERCENT: 0
 EXTERNAL_VALIDATION_READINESS_PERCENT: 15
-OVERALL_RELEASE_READINESS_PERCENT: 42
+OVERALL_RELEASE_READINESS_PERCENT: 41
 PHYSICAL_APPLE_WATCH_SENSOR_QA: PENDING_PHYSICAL
 PHYSICAL_DEPTH_SENSOR_QA: PENDING_PHYSICAL
 PHYSICAL_ALTITUDE_DIVE_QA: PENDING_PHYSICAL
@@ -443,6 +498,10 @@ RELEASE_BLOCKERS: MWFC-P1-001, MWFC-P1-002, MWFC-P2-001, MWFC-P2-002
 | 45–49 | Tolerances; checkpoint; logbook/sync | **PARTIAL** |
 | 50–51 | Briefing/CCR reference-only | **YES** |
 | 52–58 | UI truth; performance; fail-open | **PARTIAL** / **PENDING_PHYSICAL** |
+| Shallow entitlement | FC blocked without full entitlement or dev toggle | **YES** |
+| GF presets | FC-only; locked at dive start | **YES** |
+| Water auto-open | Does not bypass FC predive confirmation | **YES** (software) |
+| Crown/Action Button | No GF mutation underwater | **YES** |
 | 59–62 | Traceability; blockers | Documented in this report |
 
 ---

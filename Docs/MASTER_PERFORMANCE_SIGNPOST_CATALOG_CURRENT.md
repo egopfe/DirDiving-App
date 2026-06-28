@@ -1,7 +1,7 @@
 # Master Performance Signpost Catalog (Current)
 
 **Audit command:** 04 — MASTER MAIN CODE / SYNC / SECURITY / PERFORMANCE AUDIT V1.0  
-**Branch:** `main` @ `1f62235`  
+**Branch:** `main` @ `7dfefe2`  
 **Registry source:** `Shared/Performance/DIRPerformanceSignpost.swift`  
 **Categories:** 24 (`DIRPerformanceSignpostCategory.allCases`)
 
@@ -91,4 +91,4 @@ Recommended additions (non-blocking):
 
 ---
 
-**Catalog audit completed:** 2026-06-22 @ `1f62235`.
+**Catalog audit completed:** 2026-06-28 @ `7dfefe2`.

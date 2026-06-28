@@ -1,7 +1,8 @@
 Feature,Readiness_Percent,Blockers,Priority,Evidence,Physical_QA,External_Validation,Notes
-Bühlmann,94,EXT-IOS-BUHL-01,P2,BuhlmannEngine.swift;1326 algorithm tests;BUILD SUCCEEDED,PENDING,PENDING,Shared BuhlmannCore ZH-L16C; no P0 math defect
+Bühlmann,94,EXT-IOS-BUHL-01,P2,BuhlmannEngine.swift;1526 tests PASS;BUILD SUCCEEDED,PENDING,PENDING,Shared BuhlmannCore ZH-L16C; no P0 math defect
 Planner Base/Deco/Technical,92,External validation,P2,PlannerModePolicyTests;PlannerModeLimitsTests,PENDING,PENDING,Mode isolation enforced in tests
-Full Computer Watch parity,85,Gauge/FC Watch-only; iOS planner reference,P2,BuhlmannCoreCrossTargetEquivalenceTests (Watch),PENDING,PENDING,iOS does not run live deco SM
+Full Computer Watch parity,78,IOS-MASTER-F016 GF preset mismatch,P1,BuhlmannCore + FullComputerGradientFactorPreset;Watch tests PASS,PENDING,PENDING,iOS planner reference; import rejects 2/3 iOS presets
+GF Preset Override Compatibility,72,IOS-MASTER-F016,P1,FullComputerImportedPlanStore;PlannerGFPreset vs FullComputerGradientFactorPreset,PENDING,PENDING,iOS 20/70 30/80 vs Watch 20/80 30/70
 CCR / Rebreather,90,EXT-IOS-CCR-01; heuristic bailout,P2,CCRPlannerTests;referenceOnly disclaimers,PENDING,PENDING,Reference-only by design
 CCR Setpoint,91,External validation,P2,CCRMathRemediationTests,PENDING,PENDING,Setpoint not treated as FO2
 CCR Diluent,90,Hypoxic edge external review,P3,CCRPlanValidator,PENDING,PENDING,Validator blocks invalid diluent
@@ -13,7 +14,7 @@ MOD/PPO2/Dalton,93,PDF display asymmetry F008,P4,PlannerSwitchDepthMODClampTests
 Switch Depth Clamp,93,None,P4,PlannerSwitchDepthMODClampTests,PENDING,N/A,Switch depth <= MOD enforced
 Emergency / Rock Bottom,90,External review pending,P2,PlannerAscentSpeedSettingsTests rock bottom cases,PENDING,PENDING,Conservative SAC model
 Ascent / Descent Timing,92,None,P4,PlannerAscentSpeedSettingsTests;PlannerAscentTableTests,PENDING,N/A,Transit formula tested
-Dive Runtime / Deco Stops,91,Presentation ordering note resolved,P4,PlannerAscentTableTests;DecoStopsPresentationBuilder,PENDING,N/A,Canonical schedule match tested
+Dive Runtime / Deco Stops,91,None,P4,PlannerAscentTableTests;DecoStopsPresentationBuilder,PENDING,N/A,Canonical schedule match tested
 Schedule-Aware Gas Consumption,91,None,P4,ScheduleGasConsumptionServiceTests,PENDING,N/A,Segment allocation tested
 Gas Ledger / Reserve,91,None,P4,GasLedgerDisplayFormatterTests,PENDING,N/A,Liters canonical
 Technical Average-Depth Gas Toggle,93,None,P4,PlannerTechnicalAverageDepthGasConsumptionTests,PENDING,N/A,Bühlmann unchanged when toggled
@@ -35,16 +36,16 @@ Apnea Settings,93,None,P4,IOSApneaSettingsContent;IOSApneaSettingsStore,PENDING,
 Snorkeling Settings,93,None,P4,IOSSnorkelingSettingsContent;IOSSnorkelingSettingsStore,PENDING,N/A,Editable below switcher
 Shared Settings,92,None,P4,SharedIOSSettingsStore;MoreView,PENDING,N/A,Language/units/backup scoped
 PDF / Share,90,Physical render F008,P3,PDFExportServiceTests;BriefingPDFBuilderTests,PENDING,PENDING,Disclaimers present
-Planner Briefing Card / Watch Transfer,91,EXT-IOS-PAIR-06,P2,PlannerBriefingImageExportServiceTests;referenceOnly,PENDING,N/A,Software codec PASS
+Planner Briefing Card / Watch Transfer,90,EXT-IOS-PAIR-06,P2,PlannerBriefingImageExportServiceTests;referenceOnly=true,PENDING,N/A,Software codec PASS; reference-only enforced
 CSV / Subsurface,86,EXT-IOS-SS-01,P2,CSVMetadataRoundTripTests,PENDING,PENDING,Malformed fail-closed
 Cloud / Sync / Persistence,87,EXT-IOS-PAIR-03; Apnea cloud,P2,CloudSessionMergeTests;ActivitySyncEnvelopeTests,PENDING,N/A,Crypto tests PASS
-Security / Privacy,88,Keychain CI skips F007,P4,SecurityPrivacyTrustRemediationTests,PENDING,N/A,HMAC/signature validated in software
-Unit Conversion,93,None,P4,IOSUnitConversions;PressureModelUnificationTests,PENDING,N/A,m/ft bar/psi tested
-Localization,91,Manual VoiceOver pending,P3,DIRDivingCompleteLocalizationAuditTests,PENDING,N/A,EN/IT keys for math labels
-Accessibility,85,EXT-IOS-A11Y-01,P3,UIUXRemediationV3AccessibilityTests,PENDING,N/A,Software contracts PASS
-Performance / Numerical Robustness,82,F001 test timeout,P3,PerformanceConcurrencyBatteryRemediationTests,PENDING,N/A,1 perf test flaky on audit run
-Test Coverage,93,F001; env skips,P3,1281 test funcs;595+ executed 0 fail except timeout,PENDING,N/A,1 crash/timeout on audit run
-Internal TestFlight,88,Disclaimers + F001 flake,P2,Build PASS; algorithm tests mostly green,PENDING,PENDING,Conditional yes with non-certified posture
-External TestFlight,52,F011-F015 external QA,P1,Software ready; evidence packs empty,PENDING,PENDING,Not yet
-App Store,48,Legal + all external gates,P1,ReleaseLegalClaimsRemediationTests,PENDING,PENDING,Not yet
-Overall,91,External/physical evidence; F001,P2,This master audit @1f62235,PENDING,PENDING,No P0/P1 software safety defects
+Security / Privacy,88,Keychain CI skip F007,P4,SecurityPrivacyTrustRemediationTests,PENDING,N/A,HMAC sync validated
+Unit Conversion,93,None,P4,PressureModelUnificationTests,PENDING,N/A,Canonical meters/bar
+Localization,91,None,P4,DIRDivingCompleteLocalizationAuditTests,PENDING,N/A,EN/IT GF preset keys
+Accessibility,86,Manual QA pending,P2,UIUXRemediationV3AccessibilityTests,PENDING,N/A,Software contracts pass
+Performance / Numerical Robustness,88,None,P4,PerformanceConcurrencyBatteryRemediationTests;1526 PASS,PENDING,N/A,F001 closed @7dfefe2
+Test Coverage,94,GF cross-target gap F016,P1,1526 iOS Algorithm Tests executed,PENDING,N/A,0 assertion failures
+Internal TestFlight,86,IOS-MASTER-F016,P1,Build+tests green;1 P1 integration gap,PENDING,PENDING,Conditional after GF alignment
+External TestFlight,50,EXT-IOS-BUHL-01;F011-F015,P2,External QA matrix open,PENDING,PENDING,Not ready for external RC
+App Store,46,Legal + external gates,P2,ReleaseLegalClaimsRemediationTests,PENDING,PENDING,Non-certified posture preserved
+Overall,89,IOS-MASTER-F016 + external QA,P1,This audit @7dfefe2,PENDING,PENDING,Almost ready reference planner + multi-activity companion

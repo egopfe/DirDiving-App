@@ -1,6 +1,6 @@
 Requirement_ID,Area,Activity,Mode,Requirement,Production_Source,Test_File,Test_Name,Expected_Result,Actual_Result,Oracle_or_Reference,Physical_QA,External_Validation,Result,Evidence,Severity,Notes
 REQ-IOS-001,Startup,All,All,Legal gate before main app,DIRDivingiOSApp.swift,LegalAcceptanceGateTests,testRequiresAcceptanceWhenNotAccepted,Onboarding shown,PASS,Policy,PENDING,N/A,PASS,LegalAcceptanceStore,,
-REQ-IOS-002,Activity Selection,All,All,Three activities launchable,IOSCompanionActivitySelectionView.swift,IOSCompanionActivitySelectionTests,testAllModesLaunchable,All modes enabled,PASS,DIRActivityMode,PENDING,N/A,PASS,1f62235,,
+REQ-IOS-002,Activity Selection,All,All,Three activities launchable,IOSCompanionActivitySelectionView.swift,IOSCompanionActivitySelectionTests,testAllModesLaunchable,All modes enabled,PASS,DIRActivityMode,PENDING,N/A,PASS,7dfefe2,,
 REQ-IOS-003,Settings,iOS,All,Mode switch does not mutate runtime,IOSCompanionSettingsScopeStore.swift,IOSActivitySettingsModeSwitchTests,testSettingsScopeStoreDefaultsToDivingAndDoesNotMutateRuntime,Preference unchanged,PASS,Design,PENDING,N/A,PASS,Static test,,
 REQ-IOS-004,Settings,Diving,All,CNS settings not in Apnea,ActivitySettingsVisibility.swift,IOSActivitySettingsRoutingTests,testApneaContentExcludesDivingKeys,No diving keys,PASS,Registry,PENDING,N/A,PASS,Routing tests,,
 REQ-IOS-005,Settings,Apnea,All,Recovery settings not in Diving,IOSApneaSettingsContent.swift,IOSActivitySettingsRoutingTests,testDivingContentExcludesApneaKeys,No apnea keys,PASS,Registry,PENDING,N/A,PASS,Routing tests,,
@@ -23,19 +23,19 @@ REQ-IOS-021,MOD,Diving,All,O2 100% PPO2 1.6 MOD ~6m,PlannerMODValidator.swift,Pl
 REQ-IOS-022,MOD,Diving,All,Switch depth <= MOD,PlannerGasEditingSupport.swift,PlannerSwitchDepthMODClampTests,testSwitchDepthClampedToMOD,Clamp enforced,PASS,Policy,PENDING,N/A,PASS,,
 REQ-IOS-023,Ratio Deco,Diving,Technical,Blocked in CCR,RatioDecoPlanner.swift,RatioDecoPlannerTests,testUnavailableInCCRMode,Unavailable,PASS,Policy,PENDING,N/A,PASS,,
 REQ-IOS-024,Rock Bottom,Diving,Technical,Independent from consumption,GasPlanningService.swift,PlannerAscentSpeedSettingsTests,testRockBottomStillUsesEmergencyExtraMinutes,Separate calc,PASS,Design,PENDING,PENDING,PASS,,
-REQ-IOS-025,Gas Consumption,Diving,Technical,Schedule-aware liters,ScheduleGasConsumptionService.swift,ScheduleGasConsumptionServiceTests,testSegmentAllocation,Per-segment liters,PASS,Internal,PENDING,N/A,PASS,,
-REQ-IOS-026,Avg Depth Gas,Diving,Technical,Toggle does not change Bühlmann,GasPlanningService.swift,PlannerTechnicalAverageDepthGasConsumptionTests,testBuhlmannUnchangedWhenToggle,Same stops,PASS,Engine,PENDING,N/A,PASS,,
-REQ-IOS-027,Repetitive,Diving,Technical,Explicit prior dive source,RepetitiveDivePlannerService.swift,RepetitiveDiveMathematicalTests,testRejectsFutureDive,Rejected,PASS,Policy,PENDING,N/A,PASS,,
-REQ-IOS-028,CNS/OTU,Diving,All,OTU monotonic formula,OxygenExposureModels.swift,OTUCanonicalFixtureTests,testOTUMonotonic,Lambertsen form,PASS,Lambertsen,PENDING,N/A,PASS,,
-REQ-IOS-029,CCR,Diving,CCR,Setpoint not FO2,CCRPlanValidator.swift,CCRMathRemediationTests,testSetpointNotGasFraction,Separate model,PASS,Design,PENDING,PENDING,PASS,,
-REQ-IOS-030,Briefing,Diving,All,referenceOnly manifest,PlannerBriefingCard.swift,PlannerBriefingImageExportServiceTests,testExportPackageReferenceOnly,true,PASS,Policy,PENDING,N/A,PASS,,
-REQ-IOS-031,CSV,Diving,All,Malformed import fail-closed,CSV import,CSVMetadataRoundTripTests,testMalformedCSVRejected,Error not silent merge,PASS,Policy,PENDING,PENDING,PASS,,
-REQ-IOS-032,Sync,All,All,Cross-activity decode rejected,Activity sync codec,ActivitySyncCrossDecodeRejectionTests,testCrossDecodeRejected,Reject,PASS,Schema,PENDING,N/A,PASS,,
-REQ-IOS-033,Equipment,Diving,All,Planner equipment mapping,EquipmentPlannerMapper.swift,EquipmentPlannerMapperTests,testGasRoleMapping,Roles preserved,PASS,Policy,PENDING,N/A,PASS,,
-REQ-IOS-034,Checklist,Diving,CCR,CCR import export roles,CCRChecklistImportCoordinator.swift,ChecklistTypedRoleMigrationTests,testCCRRoleRoundTrip,Roles match,PASS,Policy,PENDING,N/A,PASS,,
-REQ-IOS-035,Performance,All,All,Tissue cache bounded,PerformanceConcurrencyBatteryRemediationTests.swift,PerformanceConcurrencyBatteryRemediationTests,testTissueAnalyticsCacheBounded,Completes in budget,TIMEOUT/CRASH,DIRPerformanceBudgets,PENDING,N/A,FAIL,Audit run 2026-06-22,P3,F001
-REQ-IOS-036,External,Bühlmann,All,Third-party profile match,BuhlmannEngine.swift,BuhlmannExternalValidationMetadataTests,n/a,Signed oracle,PENDING,External reviewer,PENDING,PENDING,PENDING,QA_EVIDENCE/BUHLMANN_EXTERNAL/,P2,F011
-REQ-IOS-037,External,Subsurface,All,Desktop round-trip,CSV export,CSVMetadataRoundTripTests,n/a,Subsurface desktop,PENDING,Subsurface,PENDING,PENDING,PENDING,QA_EVIDENCE/SUBSURFACE_EXTERNAL/,P2,F013
-REQ-IOS-038,Physical,All,All,VoiceOver journey,All views,UIUXRemediationV3AccessibilityTests,n/a,Manual pass,PENDING,Apple HIG,PENDING,N/A,PENDING,QA_EVIDENCE/DYNAMIC_TYPE_VOICEOVER/,P3,EXT-IOS-A11Y-01
-REQ-IOS-039,Physical,Pair,All,Briefing card ACK paired,PlannerBriefingWatchTransferService.swift,PlannerWatchBriefingTransferTests,n/a,Hardware ACK,PENDING,Field,PENDING,N/A,PENDING,QA_EVIDENCE/WATCH_IOS_SYNC/,P2,F014
-REQ-IOS-040,Navigation,All,All,Tab restore after kill,DIRDivingiOSApp.swift,n/a,n/a,Restore selection,PARTIAL,SwiftUI restoration,PENDING,N/A,PARTIAL,IOS-MASTER-F002,P2,Session checkpoints only
+REQ-IOS-025,Briefing,Diving,All,Briefing cards reference-only,PlannerBriefingCard.swift,PlannerBriefingImageExportServiceTests,multiple,referenceOnly true,PASS,Design,PENDING,N/A,PASS,Manifest + transfer metadata,,
+REQ-IOS-026,Navigation,All,All,Cross-activity deep link rejected,IOSCompanionDeepLinkPolicy.swift,IOSCompanionNavigationRestorationTests,testCrossActivitySessionDetailDeepLinkRejected,Rejected,PASS,Policy,PENDING,N/A,PASS,,
+REQ-IOS-027,GF Preset,Diving,All,iOS conservative preset values,PlannerModePolicy.swift,PlannerGFPresetDisplayTests,testConservativeGFPresetValuesUnchanged,20/70,PASS,iOS design,PENDING,N/A,PASS,iOS planner values,,
+REQ-IOS-028,GF Preset,Diving,All,Watch FC preset mapping,FullComputerGradientFactorPreset.swift,FullComputerGradientFactorPresetTests,testMatchingPresets,20/80 30/70 40/85,PASS,Watch design,PENDING,N/A,PASS,Watch-only test target,,
+REQ-IOS-029,GF Override,Diving,All,iOS standard plan imports to Watch FC,FullComputerImportedPlanStore.swift,DivePlanPackageBuilderTests,N/A — missing,Import success,FAIL,Cross-target,PENDING,N/A,FAIL,IOS-MASTER-F016,P1,30/80 rejected
+REQ-IOS-030,GF Override,Diving,All,iOS aggressive plan imports to Watch FC,FullComputerImportedPlanStore.swift,FullComputerGradientFactorPresetTests,testMatching40_85,Import success,PASS,Cross-target,PENDING,N/A,PASS,40/85 only preset match,,
+REQ-IOS-031,GF Override,Diving,All,DivePlanPackage emits gradientFactorPreset,DivePlanPackageBuilder.swift,DivePlanPackageBuilderTests,N/A — missing,Preset field set,FAIL,Schema,PENDING,N/A,FAIL,Builder omits field,P2,Backward compatible low/high only
+REQ-IOS-032,Performance,Diving,Technical,Tissue analytics cache bounded,PerformanceConcurrencyBatteryRemediationTests.swift,PerformanceConcurrencyBatteryRemediationTests,testTissueAnalyticsCacheBounded,Completes,PASS,Budget,PENDING,N/A,PASS,7dfefe2,,
+REQ-IOS-033,Sync,All,All,Activity sync envelope HMAC,ActivitySyncEnvelope.swift,ActivitySyncEnvelopeTests,multiple,Valid signature,PASS,Crypto,PENDING,N/A,PASS,,
+REQ-IOS-034,Localization,All,All,EN IT planner GF keys,iOSApp/Resources,PlannerGFPresetDisplayTests,testGFPresetExplanationLocalizationKeysExist,Keys present,PASS,Locale,PENDING,N/A,PASS,,
+REQ-IOS-035,Accessibility,Diving,All,Planner Dynamic Type contract,PlannerView.swift,IOSPlannerDynamicTypeContractTests,multiple,No clipping at XL,PASS,HIG,PENDING,N/A,PASS,Software contract,,
+REQ-IOS-036,Apnea,Apnea,All,Release hard validation,IOSApneaLogbookStore.swift,ApneaReleaseHardValidationTests,multiple,PASS,PASS,Policy,PENDING,N/A,PASS,,
+REQ-IOS-037,Snorkeling,Snorkeling,All,Release hard validation,IOSSnorkelingLogbookStore.swift,IOSSnorkelingReleaseHardValidationTests,multiple,PASS,PASS,Policy,PENDING,N/A,PASS,,
+REQ-IOS-038,Security,All,All,Peer secret pinning,WatchSyncService.swift,WatchSyncPeerSecretPinningIOSTests,testDifferentSecretRejectedOnIOS,Reject,PASS,TOFU,PENDING,N/A,PASS,,
+REQ-IOS-039,Cloud,Diving,All,Session merge tombstone,CloudSyncStore.swift,CloudSessionMergeTests,multiple,Deterministic merge,PASS,Design,PENDING,N/A,PASS,Field QA pending,,
+REQ-IOS-040,Legal,All,All,No certified dive computer claim,Localizable.strings,ReleaseLegalClaimsRemediationTests,multiple,No CE claim,PASS,Policy,PENDING,N/A,PASS,,
