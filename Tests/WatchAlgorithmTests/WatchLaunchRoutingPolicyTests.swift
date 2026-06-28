@@ -12,12 +12,41 @@ final class WatchLaunchRoutingPolicyTests: XCTestCase {
     }
 
     func testColdLaunchDoesNotUseWaterAutoOpenWhenModeDisabled() {
-        WatchWaterAutoOpenPolicy.mode = .preferredMode
+        WatchWaterAutoOpenPolicy.mode = .disabled
         WatchWaterAutoOpenPolicy.preferredDestination = WatchWaterPreferredLaunchDestination(
             activity: .apnea,
             divingMode: .gauge
         )
         XCTAssertFalse(WatchLaunchRoutingPolicy.shouldApplyWaterAutoOpenRouting(entry: .userColdLaunch))
+        XCTAssertEqual(
+            WatchLaunchRoutingPolicy.resolveColdLaunchEntryPoint(isSubmergedAtLaunch: true),
+            .userColdLaunch
+        )
+    }
+
+    func testSystemWaterAutoLaunchUsesWaterRoutingWhenEnabled() {
+        WatchWaterAutoOpenPolicy.mode = .preferredMode
+        WatchWaterAutoOpenPolicy.preferredDestination = WatchWaterPreferredLaunchDestination(
+            activity: .apnea,
+            divingMode: .gauge
+        )
+        XCTAssertTrue(WatchLaunchRoutingPolicy.shouldApplyWaterAutoOpenRouting(entry: .systemWaterAutoLaunch))
+        let store = DIRActivitySelectionStore()
+        store.beginInitialLaunch(entry: .systemWaterAutoLaunch)
+        XCTAssertEqual(store.selectedActivity, .apnea)
+        XCTAssertTrue(store.sessionConfigured)
+    }
+
+    func testResolveColdLaunchEntryPointRoutesWhenSubmergedAndEnabled() {
+        WatchWaterAutoOpenPolicy.mode = .preferredMode
+        XCTAssertEqual(
+            WatchLaunchRoutingPolicy.resolveColdLaunchEntryPoint(isSubmergedAtLaunch: true),
+            .systemWaterAutoLaunch
+        )
+        XCTAssertEqual(
+            WatchLaunchRoutingPolicy.resolveColdLaunchEntryPoint(isSubmergedAtLaunch: false),
+            .userColdLaunch
+        )
     }
 
     func testWaterAutoOpenIntentUsesWaterRoutingWhenEnabled() {
