@@ -380,17 +380,6 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 8) {
             WatchSettingsSectionHeader(title: String(localized: "settings.section.startup"))
 
-            Toggle(isOn: showActivitySelectionBinding) {
-                settingsRow(
-                    icon: "arrow.triangle.branch",
-                    iconColor: DiveUI.green,
-                    title: String(localized: "settings.startup.show_activity_selection"),
-                    subtitle: String(localized: "settings.startup.show_activity_selection.subtitle")
-                )
-            }
-            .toggleStyle(SwitchToggleStyle(tint: DiveUI.green))
-            .disabled(dive.isDiveActive)
-
             NavigationLink {
                 WatchWaterAutoOpenSettingsView()
             } label: {
@@ -408,6 +397,17 @@ struct SettingsView: View {
             .accessibilityLabel(String(localized: "settings.water_auto_open.title"))
             .accessibilityValue(WatchWaterAutoOpenPolicy.mode.accessibilityLabel)
             .accessibilityHint(String(localized: "settings.water_auto_open.row.a11y.hint"))
+
+            Toggle(isOn: showActivitySelectionBinding) {
+                settingsRow(
+                    icon: "arrow.triangle.branch",
+                    iconColor: DiveUI.green,
+                    title: String(localized: "settings.startup.show_activity_selection"),
+                    subtitle: String(localized: "settings.startup.show_activity_selection.subtitle")
+                )
+            }
+            .toggleStyle(SwitchToggleStyle(tint: DiveUI.green))
+            .disabled(dive.isDiveActive)
 
             NavigationLink {
                 WatchStartupDefaultActivityPickerView()
