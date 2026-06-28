@@ -1101,6 +1101,10 @@
 "developer.sensor_source.simulation" = "Simulazione";
 "developer.sensor_source.footer" = "Opzione di test per sviluppatori. Non visibile agli utenti finali.";
 "developer.sensor_source.apple_fallback" = "Sensore di profondità Apple non disponibile. Passaggio alla modalità Simulazione.";
+"developer.shallow_gauge_testing.title" = "Abilita Diving Gauge con shallow depth (~6 m)";
+"developer.shallow_gauge_testing.footer" = "Solo test interni. Usa campioni profondità shallow Apple reali su Apple Watch Ultra.";
+"developer.shallow_diving_testing.title" = "Abilita Full Computer con shallow depth";
+"developer.shallow_diving_testing.footer" = "Solo test interni (~6 m). Non è guida decompressiva certificata.";
 "developer.unlock.confirmed" = "Le impostazioni sviluppatore sono ora visibili in Impostazioni.";
 
 "pdf.export.share.a11y" = "Condividi";
