@@ -28,7 +28,7 @@ struct DepthCapabilityPolicy: Equatable, Sendable {
         case .appleFull:
             return true
         case .appleShallow:
-            return DeveloperSettings.allowsSimulationSensorSelection
+            return DeveloperSettings.allowsShallowGaugeTesting
         case .simulation:
             return DeveloperSettings.allowsSimulationSensorSelection
         case .none:
@@ -37,7 +37,14 @@ struct DepthCapabilityPolicy: Equatable, Sendable {
     }
 
     var supportsFullComputerRuntime: Bool {
-        capability == .appleFull
+        switch capability {
+        case .appleFull:
+            return true
+        case .appleShallow:
+            return DeveloperSettings.allowsShallowDepthDivingTesting
+        case .simulation, .none:
+            return false
+        }
     }
 
     var fullComputerDisabledReason: String? {
