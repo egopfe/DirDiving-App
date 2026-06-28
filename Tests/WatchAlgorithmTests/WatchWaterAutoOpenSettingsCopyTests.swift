@@ -7,6 +7,8 @@ final class WatchWaterAutoOpenSettingsCopyTests: XCTestCase {
         for key in [
             "settings.water_auto_open.cold_launch_limitation",
             "settings.water_auto_open.apply_now.button",
+            "settings.water_auto_open.system_setup.title",
+            "settings.water_auto_open.system_setup.body",
             "shortcuts.help.underwater_primary.title",
             "nav.underwater.blocked.diving",
             "shortcut.error.legacy_blocked_active_session"

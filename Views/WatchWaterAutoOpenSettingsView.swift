@@ -13,6 +13,7 @@ struct WatchWaterAutoOpenSettingsView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 12) {
                     modeSection
+                    systemAutoLaunchSetupSection
                     if selectedMode == .preferredMode {
                         preferredActivitySection
                         if preferredDestination.activity == .diving {
@@ -41,6 +42,14 @@ struct WatchWaterAutoOpenSettingsView: View {
             selectedMode = WatchWaterAutoOpenPolicy.mode
             preferredDestination = WatchWaterAutoOpenPolicy.preferredDestination
         }
+    }
+
+    private var systemAutoLaunchSetupSection: some View {
+        infoBlock(
+            title: String(localized: "settings.water_auto_open.system_setup.title"),
+            body: String(localized: "settings.water_auto_open.system_setup.body"),
+            accessibilityLabel: String(localized: "settings.water_auto_open.system_setup.a11y")
+        )
     }
 
     private var modeSection: some View {
