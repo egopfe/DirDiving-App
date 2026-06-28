@@ -7,6 +7,8 @@ echo "[watch-underwater-uiux] software readiness checks"
 
 files=(
   Utils/WatchLaunchRoutingPolicy.swift
+  Utils/WatchSubmersionLaunchProbe.swift
+  Utils/WatchAutomaticDepthLaunchConfiguration.swift
   Utils/WatchIntentSafetyPolicy.swift
   Utils/WatchUnderwaterNavigationClampPolicy.swift
   Utils/WatchAppShortcutErrors.swift
@@ -17,6 +19,8 @@ for f in "${files[@]}"; do
 done
 
 grep -q beginInitialLaunch Services/DIRActivitySelectionStore.swift
+grep -q WatchSubmersionLaunchProbe Views/ContentView.swift
+grep -q resolveColdLaunchEntryPoint Utils/WatchLaunchRoutingPolicy.swift
 grep -q WatchUnderwaterNavigationClampPolicy Views/ContentView.swift
 grep -q routePrimaryActionIfUnderwaterSession Services/ActionButtonIntents.swift
 grep -q cold_launch_limitation Resources/en.lproj/Localizable.strings

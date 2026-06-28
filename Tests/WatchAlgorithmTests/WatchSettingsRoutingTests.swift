@@ -25,8 +25,16 @@ final class WatchSettingsRoutingTests: XCTestCase {
         XCTAssertTrue(source.contains("WatchUnderwaterNavigationClampPolicy.clampIfNeeded"))
         XCTAssertTrue(source.contains("reportUnderwaterNavigationBlocked(activity:"))
         XCTAssertTrue(source.contains("beginInitialLaunchIfNeeded()"))
+        XCTAssertTrue(source.contains("WatchSubmersionLaunchProbe.isSubmergedAtLaunch()"))
+        XCTAssertTrue(source.contains("WatchLaunchRoutingPolicy.resolveColdLaunchEntryPoint(isSubmergedAtLaunch:"))
         XCTAssertTrue(source.contains("!showLaunchDisclaimer && activitySelection.isStartupFlowActive"))
         XCTAssertFalse(source.contains("page != .live && page != .compass"))
+    }
+
+    func testSettingsViewExposesWaterAutoOpenRow() throws {
+        let source = try String(contentsOf: repositoryRoot().appendingPathComponent("Views/SettingsView.swift"))
+        XCTAssertTrue(source.contains("WatchWaterAutoOpenSettingsView()"))
+        XCTAssertTrue(source.contains("settings.water_auto_open.title"))
     }
 
     private func repositoryRoot() -> URL {

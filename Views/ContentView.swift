@@ -10,6 +10,7 @@ struct ContentView: View {
     @EnvironmentObject private var activitySelection: DIRActivitySelectionStore
     @AppStorage(WatchNavigationHints.crownHintDismissedKey) private var crownHintDismissed = false
     @State private var showLaunchDisclaimer = CompanionDisclaimerAcceptance.requiresDisplay
+    @State private var coldLaunchProbeTask: Task<Void, Never>?
 
     var body: some View {
         TabView(selection: $navigation.selectedPage) {
@@ -172,7 +173,18 @@ struct ContentView: View {
     private func beginInitialLaunchIfNeeded() {
         guard !showLaunchDisclaimer else { return }
         guard !activitySelection.sessionConfigured, !activitySelection.isStartupFlowActive else { return }
-        activitySelection.beginInitialLaunch(entry: .userColdLaunch)
+
+        coldLaunchProbeTask?.cancel()
+        coldLaunchProbeTask = Task {
+            let submerged = await WatchSubmersionLaunchProbe.isSubmergedAtLaunch()
+            guard !Task.isCancelled else { return }
+            let entry = WatchLaunchRoutingPolicy.resolveColdLaunchEntryPoint(isSubmergedAtLaunch: submerged)
+            await MainActor.run {
+                guard !showLaunchDisclaimer else { return }
+                guard !activitySelection.sessionConfigured, !activitySelection.isStartupFlowActive else { return }
+                activitySelection.beginInitialLaunch(entry: entry)
+            }
+        }
     }
 
     private func navigationToast(_ message: String, accessibilityLabel: String? = nil) -> some View {
