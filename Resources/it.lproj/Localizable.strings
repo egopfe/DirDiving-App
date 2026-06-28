@@ -820,7 +820,7 @@
 "settings.startup.default_activity" = "Attività predefinita";
 "settings.startup.default_diving_mode" = "Modalità Diving predefinita";
 "settings.startup.recommendation" = "Consigliato: ON per evitare errori";
-"settings.water_auto_open.title" = "Quando Apple Watch entra in acqua";
+"settings.water_auto_open.title" = "Apertura automatica in acqua";
 "settings.water_auto_open.subtitle.disabled" = "Disattivato";
 "settings.water_auto_open.subtitle.last_selected" = "Ultima modalità selezionata";
 "settings.water_auto_open.subtitle.preferred" = "Modalità preferita";
@@ -832,6 +832,9 @@
 "settings.water_auto_open.preferred_diving_mode" = "Modalità Diving preferita";
 "settings.water_auto_open.explanation" = "Quando watchOS apre DIR Diving dopo l'ingresso in acqua, l'app aprirà la destinazione scelta. Questo non avvia automaticamente una sessione.";
 "settings.water_auto_open.system_limitation" = "La lista di Apertura Automatica di Apple Watch è controllata da watchOS e dipende da capability, entitlement e provisioning Apple. DIR Diving può preparare la destinazione di avvio, ma non può forzare la presenza nella lista di sistema.";
+"settings.water_auto_open.system_setup.title" = "Apertura automatica Apple Watch";
+"settings.water_auto_open.system_setup.body" = "Su Apple Watch: Impostazioni → Generali → Apertura automatica → Quando immerso → App → DIR Diving. Da iPhone: app Watch → Il mio orologio → Generali → Apertura automatica. Richiede una build con entitlement profondità installata su Ultra.";
+"settings.water_auto_open.system_setup.a11y" = "Come abilitare l'Apertura automatica immersa di DIR Diving nelle Impostazioni di sistema Apple Watch.";
 "settings.water_auto_open.full_computer_warning" = "Full Computer richiede sempre configurazione e conferma pre-immersione prima del runtime live.";
 "settings.water_auto_open.last_selected_label" = "Ultima modalità selezionata";
 "settings.water_auto_open.row.a11y.hint" = "Apre le impostazioni di avvio ingresso acqua. Non avvia automaticamente una sessione.";
@@ -841,8 +844,8 @@
 "settings.water_auto_open.explanation.a11y" = "L'avvio ingresso acqua apre la destinazione selezionata. Non avvia automaticamente una sessione.";
 "settings.water_auto_open.system_limitation.a11y" = "La lista di Apertura Automatica di sistema Apple Watch è controllata da watchOS, non da DIR Diving.";
 "settings.water_auto_open.full_computer_warning.a11y" = "Full Computer richiede configurazione e conferma pre-immersione prima del runtime live.";
-"settings.water_auto_open.cold_launch_limitation" = "L'avvio normale dall'icona non rileva l'ingresso in acqua. Il routing acqua si applica con la scorciatoia Apri modalità acqua, Apertura automatica di sistema (se elencata da Apple) o Applica percorso ora.";
-"settings.water_auto_open.cold_launch_limitation.a11y" = "L'avvio a freddo normale non rileva l'ingresso in acqua. Usa la scorciatoia acqua o Applica percorso ora.";
+"settings.water_auto_open.cold_launch_limitation" = "L'avvio dall'icona in superficie usa l'avvio normale. Quando watchOS apre DIR Diving sott'acqua (Apertura automatica Apple + entitlement profondità), il routing usa la scelta sopra. Puoi anche usare la scorciatoia Apri modalità acqua o Applica percorso ora.";
+"settings.water_auto_open.cold_launch_limitation.a11y" = "L'avvio dall'icona in superficie è normale. L'apertura automatica di sistema sott'acqua usa il routing configurato.";
 "settings.water_auto_open.apply_now.explanation" = "Prova o prepara il percorso ingresso acqua configurato. Non avvia una sessione.";
 "settings.water_auto_open.apply_now.button" = "Applica percorso ora";
 "settings.water_auto_open.apply_now.a11y.hint" = "Instrada alla destinazione ingresso acqua configurata senza avviare una sessione.";

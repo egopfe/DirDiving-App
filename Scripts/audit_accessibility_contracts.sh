@@ -13,6 +13,7 @@ keys=(
   nav.underwater.blocked.snorkeling.a11y
   settings.water_auto_open.apply_now.a11y.hint
   settings.water_auto_open.cold_launch_limitation.a11y
+  settings.water_auto_open.system_setup.a11y
   settings.mode_switch.a11y.hint
 )
 
