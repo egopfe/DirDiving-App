@@ -1,36 +1,59 @@
 # Master Consolidated Audit and Non-Regressive Remediation Plan — Current
 
-**Orchestrator:** `00-MASTER_SUPER_ORCHESTRATOR_FULL_AUDIT_SEQUENCE_AND_NON_REGRESSIVE_REMEDIATION_PLAN_COMMAND_V1.1.md`  
-**Date:** 2026-06-22  
+**Orchestrator:** `00-MASTER_SUPER_ORCHESTRATOR_FULL_AUDIT_SEQUENCE_AND_NON_REGRESSIVE_REMEDIATION_PLAN_COMMAND_V1.2.md`  
+**Execution date:** 2026-06-28  
 **Repository:** `egopfe/DirDiving-App`  
 **Branch:** `main`  
-**Commit:** `1f62235` (`1f62235996c5a00418db36519479df289c212744`)  
+**Commit:** `7dfefe2` (`7dfefe2cd7817780a903a64e51b890d901111ffd`)  
 **Execution mode:** Read-only orchestration — no production code modified
 
 ---
 
 ## A. Executive Summary
 
-All six upstream master audits (**01–06**) were executed @ `1f62235`, producing **67 upstream `Docs/MASTER_*` artifacts** plus **12 orchestrator consolidation deliverables**. Software readiness is **strong** (performance remediation complete, altitude P0 fixed, activity isolation verified, legal-claims scanner PASS). **Overall consolidated readiness: 72%**. The dominant gap is **physical/external evidence**, not open P0 code defects.
+Orchestrator **V1.2** consolidated six upstream master audits (**01–06**) executed @ `7dfefe2`, absorbing the **June 2026 Watch development wave**: water auto-open, shallow-depth entitlement, GF presets, developer Gauge/FC toggles, Crown/Action Button underwater policy, and cold-launch modal sequencing.
 
-**First remediation batch:** **Batch 8 — QA/evidence** (physical/external campaigns). Batch 0 largely **done** — audit 05 re-run @ `1f62235`: builds PASS, **1519/1519 iOS**, **990/990 Watch** (7 `IntegratedModesSequentialFlowTests` excluded — simulator stall, P3).
+**Overall verdict: PARTIAL.** Software posture is strong and truthful; **physical and external evidence remain at 0% execution**. **P0 software safety defects across Watch Full Computer forensic audit: 0.** One **P0 documentation/process blocker** exists: `commands_for_cursor/01`–`04` bodies are **permuted** (wrong audit executes if launch sequence follows filenames).
 
-**Next Cursor command:** Physical Watch Ultra QA + paired-device sync campaign; investigate Watch sync flush stall in integrated suite.
+| Dimension | Score | Class |
+|-----------|------:|-------|
+| Watch FC software | **87%** | SOFTWARE_READY |
+| iOS companion software | **90%** | SOFTWARE_READY |
+| UI/UX software | **100%** | SOFTWARE_READY |
+| Main code / sync / security | **88%** | SOFTWARE_GAP (P1 sync/depth) |
+| Release / QA / legal software | **76%** | Mixed |
+| Documentation alignment | **62%** | CONFLICTING (01–04 permutation) |
+| Physical QA | **0%** | PENDING_PHYSICAL |
+| External validation | **0%** | PENDING_EXTERNAL_VALIDATION |
+| **Overall consolidated release readiness** | **~71%** | PARTIAL |
+
+**Release posture:** Internal TestFlight **CONDITIONAL** · External TestFlight **NOT READY** · App Store **NOT READY**
+
+**First remediation batch:** **Batch 0** — verify build/test @ `7dfefe2`; **Batch 9 (doc-only)** — repair `commands_for_cursor/01`–`04` permutation before any filename-based audit re-run.
 
 ---
 
 ## B. Source Audit Inputs and Completeness
 
-| Audit | Command | Outputs | Completeness |
-|-------|---------|---------|--------------|
-| **01** Watch FC Forensic | `01-...V2.0.md` | 12 files | **COMPLETE** |
-| **02** iOS Deep | `02-...V1.0.md` | 9 files | **COMPLETE** |
-| **03** UI/UX Deep | `03-...V2.0.md` | 13 files | **COMPLETE** |
-| **04** Main/Sync/Security/Perf | `04-...V1.0.md` | 17 files | **COMPLETE** |
-| **05** Release/QA/Legal | `05-...V1.0.md` | 10 files | **COMPLETE** |
-| **06** Documentation | `06-...V1.0.md` | 7 files | **COMPLETE** |
+| Audit | Command (filename) | Body @ 7dfefe2 | Outputs | Completeness |
+|-------|-------------------|----------------|---------|--------------|
+| **01** Watch FC Forensic | `01-...V2.1.md` | **CONFLICTING** (body = Main Code V1.0) | 14+ `MASTER_WATCH_FULL_COMPUTER_*` | **COMPLETE** (outputs @ 7dfefe2) |
+| **02** iOS Deep | `02-...V1.1.md` | **CONFLICTING** (body = UI/UX V2.1) | 9+ `MASTER_IOS_*` | **COMPLETE** |
+| **03** UI/UX Deep | `03-...V2.2.md` | **CONFLICTING** (body = Watch FC V2.0) | 15+ `MASTER_UI_UX_*` + WAO/HW | **COMPLETE** |
+| **04** Main/Sync/Security/Perf | `04-...V1.1.md` | **CONFLICTING** (body = iOS V1.1) | 17+ `MASTER_MAIN_CODE_*` | **COMPLETE** |
+| **05** Release/QA/Legal | `05-...V1.1.md` | **ALIGNED** | 10+ `MASTER_RELEASE_*` + gate matrices | **COMPLETE** |
+| **06** Documentation | `06-...V1.1.md` | **ALIGNED** | 7+ `MASTER_DOCUMENTATION_*` | **COMPLETE** |
 
-No `MISSING_UPSTREAM_AUDIT_OUTPUT` at consolidation time. Partial test execution noted in 01/03/05 (DerivedData lock) — marked **INCOMPLETE_UPSTREAM_AUDIT_OUTPUT** for build banner only, not missing files.
+**Permutation map (CONFLICTING — P0 doc):**
+
+```text
+01-MASTER_WATCH...V2.1.md     → contains 04-MASTER_MAIN_CODE...V1.0 body
+02-MASTER_IOS...V1.1.md       → contains 03-MASTER_UI_UX...V2.1 body
+03-MASTER_UI_UX...V2.2.md     → contains 01-MASTER_WATCH...V2.0 body
+04-MASTER_MAIN_CODE...V1.1.md → contains 02-MASTER_IOS...V1.1 body
+```
+
+No `MISSING_UPSTREAM_AUDIT_OUTPUT`. Watch test run **INCOMPLETE_UPSTREAM_AUDIT_OUTPUT** for banner only: **1089/1091 PASS** (2 test-maintenance failures; FC math suites PASS).
 
 ---
 
@@ -39,56 +62,70 @@ No `MISSING_UPSTREAM_AUDIT_OUTPUT` at consolidation time. Partial test execution
 | Field | Value |
 |-------|-------|
 | Branch | `main` ✓ |
-| HEAD | `1f62235` |
-| origin/main | Aligned |
-| commands_for_cursor/ | Present; 01–06 subcommands verified |
-| Working tree @ orchestration | Docs/ MASTER outputs only (uncommitted) |
+| HEAD | `7dfefe2` |
+| origin/main | Aligned at audit time |
+| Orchestrator | V1.2 **ALIGNED** |
+| commands_for_cursor/ | Present; **01–04 bodies CONFLICTING** |
+| Working tree @ orchestration | Docs/ MASTER outputs (uncommitted) |
 
 ---
 
-## D. Consolidated Readiness Overview
+## D. June 2026 Development Wave — Consolidated Status
 
-| Dimension | Score | Notes |
-|-----------|------:|-------|
-| Watch FC software | 88% | P0=0; P1 oracle + external gaps |
-| iOS companion software | 90% | Performance remediated; evidence gaps |
-| UI/UX software | 82% | 0 P0; physical/visual pending |
-| Main code/sync/security | 94% | Software PASS; field sync pending |
-| Release/QA/legal software | 100% | Claims scanner PASS |
-| Documentation alignment | 58% | INDEX/matrix drift |
-| Physical QA | 15% | Matrices exist; not executed |
-| External validation | 20% | Scaffolds only |
-| **Overall consolidated** | **72%** | Weighted toward release gates |
+| Feature area | SOFTWARE_READY | PENDING_PHYSICAL / EXTERNAL |
+|--------------|:--------------:|----------------------------|
+| Water auto-open policy + Settings | **PASS** | Submerged auto-launch listing, end-to-end water entry, Water Lock |
+| Digital Crown underwater clamp | **PASS** | Crown paging underwater, Water Lock interaction |
+| Action Button / App Intents router | **PASS** | Ultra Action Button under Water Lock |
+| Cold-launch modal sequencing | **PASS** | Submersion probe on real hardware (400 ms timeout risk) |
+| GF presets (Watch 20/80, 30/70, 40/85) | **PASS** (Watch) | iOS Planner preset **mismatch** (CONS-002); external Bühlmann |
+| Shallow-depth entitlement + dev toggles | **PASS** (gated) | Wet shallow QA; signing/plist CI pairing |
+| Developer Gauge/FC testing toggles | **PASS** | TestFlight process discipline |
 
----
-
-## E. Release Blocker Overview
-
-| Gate | Status | Top blockers |
-|------|--------|--------------|
-| Internal TestFlight | **READY** (software) | Physical/external still pending |
-| External TestFlight | **NOT READY** | CONS-003..006 physical/external |
-| App Store | **NOT READY** | + legal/marketing (CONS-006) |
+**Policy:** Do not downgrade `PENDING_PHYSICAL` into software defects; do not upgrade `SOFTWARE_READY` into physical validation.
 
 ---
 
-## F. Consolidated Finding Register Summary
+## E. Consolidated Finding Register Summary
 
-**14 consolidated findings** (deduplicated from 50+ upstream rows). See `MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv`.
+**45 consolidated findings** (deduplicated from 120+ upstream rows). See `MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv`.
 
 | Severity | Open / Pending | Notes |
 |----------|----------------:|-------|
-| P0 | **0** | Altitude P0 verified FIXED |
-| P1 | **7** | Evidence + build verify |
-| P2 | **5** | UX/docs/visual/perf field |
-| P3 | **1** | CI perf test flake |
-| P4 | **0** | Accepted-risk items excluded |
+| **P0** | **1** | Doc only — command permutation (CONS-001); **P0 FC software = 0** |
+| **P1** | **14** | GF parity, sync×3, depth×2, oracle, evidence campaigns |
+| **P2** | **18** | Physical/external partial, perf field, WAO/HW software gaps |
+| **P3** | **9** | Maintainability, accepted risks, test drift |
+| **P4** | **3** | Positive controls / optional polish |
+
+---
+
+## F. Top P1 Software Findings (non-evidence)
+
+| ID | Source | Issue |
+|----|--------|-------|
+| **CONS-002** | IOS-MASTER-F016 + Release | iOS GF 20/70, 30/80 vs Watch 20/80, 30/70; `DivePlanPackageBuilder` omits `gradientFactorPreset` |
+| **CONS-003** | MASTER-PERF-006 | iOS sync `inFlightOutboundSessionIDs` stuck after failed ACK |
+| **CONS-004** | MASTER-SYNC-002 | Watch→iOS `userInfo` import without symmetric `diveImportAck` |
+| **CONS-005** | MASTER-SYNC-003 | Legacy unsigned diving tombstones when peer secret missing |
+| **CONS-006** | MASTER-DEPTH-001 | Shallow FC internal testing toggle exposure (process/regulatory) |
+| **CONS-007** | MASTER-DEPTH-002 | Depth tier from plist not runtime entitlements |
+| **CONS-008** | MWFC-P1-001 | TTS/schedule oracle uses production projection path |
 
 ---
 
 ## G. Deduplication Method and Results
 
-**9 duplicate groups** mapped in `MASTER_FINDING_DEDUPLICATION_MATRIX_CURRENT.csv`. Merged only on **shared root cause** (e.g., external Bühlmann gap across Watch+iOS+Release). Kept separate: TTS quantization (P2) vs independent oracle (P1).
+**18 duplicate groups** in `MASTER_FINDING_DEDUPLICATION_MATRIX_CURRENT.csv`. Merged only on **shared root cause**:
+
+- **DG-GF-001:** IOS-MASTER-F016 + Release GF gate → CONS-002 (one cluster, multiple source links)
+- **DG-EXT-001:** MWFC-P1-002 + IOS-MASTER-F011 → CONS-009
+- **DG-PHY-001:** MWFC-P2-001 + physical matrices → CONS-010
+- **DG-SYNC-001:** MUIUX-P1-002 + MASTER-SEC-001 + MASTER-SYNC-001 + IOS-MASTER-F014 → CONS-011
+- **DG-WAO-001:** WAO-G-008..015 + MASTER-WAO-* software → CONS-021 (SOFTWARE_READY vs PENDING_PHYSICAL preserved)
+- **DG-HW-001:** HW gates + underwater audit → CONS-022
+
+**Not merged:** MWFC-P2-003 TTS quantization (conservative bias) vs MWFC-P1-001 oracle independence (different root causes).
 
 ---
 
@@ -96,8 +133,10 @@ No `MISSING_UPSTREAM_AUDIT_OUTPUT` at consolidation time. Partial test execution
 
 | Finding | Escalation | Rationale |
 |---------|------------|-----------|
-| CONS-004 | P1 (from P2 sync items) | UI+security+sync same paired campaign blocks external TestFlight |
-| CONS-002 | P1 | Multiple audits independently flag external validation |
+| CONS-001 | **P0** (doc) | Wrong audit execution if filenames trusted |
+| CONS-002 | **P1** | iOS+Release independently flag GF import safety-visible mismatch |
+| CONS-003..005 | **P1** | Sync integrity + release blockers per audit 04/05 |
+| CONS-021, CONS-022 | **P1** (physical) | External TestFlight gates; software PASS must not imply physical PASS |
 
 No severity **downgrades** applied.
 
@@ -107,182 +146,119 @@ No severity **downgrades** applied.
 
 | Conflict | Resolution |
 |----------|------------|
-| Prior ALT-P0 OPEN in old CSV vs FIXED @ 1f62235 | **Resolved:** code + OrchestratedAltitudeEnvironmentTests — upstream 01 marks FIXED |
-| TEST_QA 100% software vs 78% overall evidence | **No conflict:** different weighting — consolidated uses 72% |
-| Documentation audit 58% vs UI/UX 82% | **No conflict:** doc INDEX drift vs UI implementation quality |
+| Command filename vs body (01–04) | **UNRESOLVED P0** — repair before re-run |
+| UI/UX 100% software vs Release 71% overall | **No conflict** — different weighting (physical 0%) |
+| Water auto-open SOFTWARE_READY vs Release PENDING_PHYSICAL | **No conflict** — both preserved |
+| Prior consolidated plan @ 1f62235 | **Superseded** by this plan @ 7dfefe2 |
 
-**CROSS_AUDIT_CONFLICTS: 0 unresolved**
+**CROSS_AUDIT_CONFLICTS (technical): 0** · **COMMAND_INTEGRITY_CONFLICTS: 1 (P0)**
 
 ---
 
 ## J. Root-Cause Clusters
 
-1. **Evidence execution gap** — physical/external QA not run (CONS-002..006, CONS-010)  
-2. **Release confidence gap** — build/test banner incomplete (CONS-007)  
-3. **Oracle independence** — schedule sweep hybrid path (CONS-001)  
-4. **Documentation drift** — INDEX/README/TestFlight stale (CONS-012)  
-5. **UX polish** — state restoration, visual baselines (CONS-008, CONS-009)
+1. **Command/doc integrity** — permutation + INDEX drift (CONS-001, CONS-034)  
+2. **Cross-platform GF/planner parity** — iOS→Watch import (CONS-002)  
+3. **Sync reliability** — in-flight stuck, ACK asymmetry, legacy tombstones (CONS-003..005)  
+4. **Depth capability trust** — shallow signing, dev toggles, metadata probe (CONS-006..007, CONS-042)  
+5. **Evidence execution gap** — physical 0%, external 0% (CONS-009..013, CONS-021..022, CONS-029..033)  
+6. **Oracle / external decompression confidence** — independent path + third-party compare (CONS-008, CONS-009)  
+7. **June 2026 wave physical gates** — WAO, Crown, Action Button, shallow wet (CONS-021, CONS-022, CONS-042)
 
 ---
 
 ## K. Dependency Graph Summary
 
-See `MASTER_FINDING_DEPENDENCY_GRAPH_CURRENT.md`. **CONS-007** gates confidence in all downstream evidence work.
+See `MASTER_FINDING_DEPENDENCY_GRAPH_CURRENT.md`. **CONS-001** blocks trustworthy audit re-run. **CONS-014** (build/test baseline) gates confidence in all evidence work. **CONS-002** (GF) should precede external GF/decompression claims.
 
 ---
 
 ## L. Remediation Priority Matrix
 
-See `MASTER_REMEDIATION_PRIORITY_MATRIX_CURRENT.csv`. Rank 1: CONS-007; Ranks 2–7: P1 evidence; then P2 software/docs.
+See `MASTER_REMEDIATION_PRIORITY_MATRIX_CURRENT.csv`. Rank 1: CONS-001 (doc repair); Ranks 2–8: P1 software (GF, sync, depth); Ranks 9+: evidence campaigns.
 
 ---
 
-## M. Non-Regressive Batch Plan
+## M. Non-Regressive Batch Plan (V1.2)
 
-| Batch | Name | Primary findings |
-|-------|------|------------------|
-| **0** | Baseline protection | CONS-007 |
-| **1** | Watch FC safety/oracle | CONS-001 |
-| **2** | Sync/persistence | (no open P0/P1 software) |
-| **3** | Activity architecture | CONS-008 |
-| **4** | iOS planner/data | CONS-014 accepted-risk |
-| **5** | Performance | CONS-013 |
-| **6** | UI/UX/a11y | CONS-005, CONS-009 |
-| **7** | Security/privacy | maintain gates |
-| **8** | QA/evidence | CONS-002..004, CONS-010, CONS-011 |
-| **9** | Release/docs | CONS-006, CONS-012 |
+| Batch | Name | Primary findings | Forbidden areas |
+|-------|------|------------------|-----------------|
+| **0** | Baseline protection | CONS-014; snapshot register | Unrelated dirty work |
+| **1** | Safety-critical Watch FC | CONS-008, CONS-016; altitude | Shortcut math fixes without oracle rerun |
+| **2** | Data integrity / sync | CONS-003, CONS-004, CONS-005 | HMAC bypass; unsigned tombstone expansion |
+| **3** | Activity architecture / Settings | CONS-028, CONS-040 | Cross-activity store leakage |
+| **4** | iOS Planner / companion | **CONS-002** (GF presets) | Planner→Watch live mutation |
+| **5** | Performance / concurrency | CONS-027, CONS-023..026 | Weakening generation tokens |
+| **6** | UI/UX truthfulness / a11y | CONS-012, CONS-032, CONS-019..020 | Hiding critical FC state |
+| **7** | Security / privacy / platform | CONS-006, CONS-007, CONS-042 | Entitlement weakening |
+| **8** | Tests / QA / evidence | CONS-009..013, CONS-021..022, CONS-029..031 | Fabricated physical evidence |
+| **9** | Release / legal / documentation | **CONS-001**, CONS-034, CONS-044 | Unsupported certification claims |
 
----
-
-## N–W. Batch Details (summary)
-
-- **Batch 0:** Clean DerivedData; full xcodebuild test both platforms; snapshot findings.  
-- **Batch 1:** Independent oracle path or signed external tolerance; rerun audit 01.  
-- **Batch 8:** Execute physical matrices; populate QA_EVIDENCE.  
-- **Batch 9:** Legal/PDF/docs after technical truth confirmed.
-
-Full command sequence: `MASTER_CURSOR_REMEDIATION_COMMAND_SEQUENCE_CURRENT.md`
+Each batch: required gates in `MASTER_NON_REGRESSION_GATE_MATRIX_CURRENT.csv`; audits to rerun in `MASTER_AUDIT_RERUN_PLAN_CURRENT.md`.
 
 ---
 
-## X. Cursor / Codex Remediation Command Sequence
+## N. Release Blocker Overview
 
-1. Batch 0 build/test @ HEAD  
-2. Batch 5 perf test fix (CONS-013)  
-3. Batch 3 state restoration (CONS-008)  
-4. Batch 8 physical/external campaigns  
-5. Re-run orchestrator 00
+| Gate | Status | Top blockers |
+|------|--------|--------------|
+| Internal TestFlight | **CONDITIONAL** | CONS-014 partial Watch tests; P1 software open |
+| External TestFlight | **NOT READY** | All physical QA 0%; CONS-002 GF; CONS-009 external |
+| App Store | **NOT READY** | + CONS-044 legal; shallow/FC claims |
 
----
-
-## Y. Audit Rerun Plan
-
-See `MASTER_AUDIT_RERUN_PLAN_CURRENT.md`.
+Burndown: `MASTER_RELEASE_BLOCKER_BURNDOWN_PLAN_CURRENT.md`
 
 ---
 
-## Z. Non-Regression Gate Matrix
+## O. Physical / External QA Register
 
-See `MASTER_NON_REGRESSION_GATE_MATRIX_CURRENT.csv`.
-
----
-
-## AA. Physical / External QA Register
-
-See `MASTER_UNRESOLVED_PHYSICAL_EXTERNAL_QA_REGISTER_CURRENT.csv` — **11 rows NOT_EXECUTED/PENDING**.
+See `MASTER_UNRESOLVED_PHYSICAL_EXTERNAL_QA_REGISTER_CURRENT.csv` — **all matrices NOT_EXECUTED** @ 7dfefe2 except partial altitude unit tests.
 
 ---
 
-## AB. Release Blocker Burndown
+## P. Do-Not-Touch Policies
 
-See `MASTER_RELEASE_BLOCKER_BURNDOWN_PLAN_CURRENT.csv`.
-
----
-
-## AC. Do-Not-Touch Policies
-
-See `MASTER_DO_NOT_TOUCH_POLICY_REGISTER_CURRENT.csv` — 13 policies including Bühlmann core, sync HMAC, briefing reference-only.
+See `MASTER_DO_NOT_TOUCH_POLICY_REGISTER_CURRENT.md` — Bühlmann core, HMAC/sync, Planner reference-only, CCR live semantics, certification wording.
 
 ---
 
-## AD. Readiness Roadmap 7 / 14 / 30 Days
+## Q. Cursor Remediation Sequence
+
+See `MASTER_CURSOR_REMEDIATION_COMMAND_SEQUENCE_CURRENT.md`.
+
+**Recommended first actions:**
+
+1. Batch 0 — full build/test @ `7dfefe2`  
+2. Batch 9 (doc) — repair `commands_for_cursor/01`–`04` permutation  
+3. Batch 4 — CONS-002 GF preset alignment  
+4. Batch 2 — CONS-003..005 sync fixes  
+5. Batch 8 — physical/external campaigns (no code unless blockers found)
+
+---
+
+## R. Readiness Trajectory
 
 See `MASTER_READINESS_ROADMAP_7_14_30_DAYS_CURRENT.md`.
 
 ---
 
-## AE. Final Recommendation
+## S. Orchestrator Deliverables Checklist
 
-**Proceed with remediation execution — CONDITIONAL.** Software P0 is clear. Do **not** pursue external TestFlight or App Store until Batch 8 evidence exists. Do **not** update release claims before Batch 9.
-
----
-
-## AF. Final Verdict
-
-```text
-MASTER_AUDIT_ORCHESTRATOR: PARTIAL
-COMMANDS_FOR_CURSOR_FOUND: PASS
-SUBCOMMAND_FILES_FOUND: PASS
-UPSTREAM_AUDITS_FOUND: PASS
-UPSTREAM_AUDITS_COMPLETE: PARTIAL
-CONSOLIDATED_FINDINGS_REGISTER_CREATED: PASS
-DEDUPLICATION_MATRIX_CREATED: PASS
-DEPENDENCY_GRAPH_CREATED: PASS
-PRIORITY_MATRIX_CREATED: PASS
-NON_REGRESSION_GATE_MATRIX_CREATED: PASS
-REMEDIATION_COMMAND_SEQUENCE_CREATED: PASS
-AUDIT_RERUN_PLAN_CREATED: PASS
-RELEASE_BLOCKER_BURNDOWN_CREATED: PASS
-PHYSICAL_EXTERNAL_QA_REGISTER_CREATED: PASS
-DO_NOT_TOUCH_POLICY_REGISTER_CREATED: PASS
-READINESS_ROADMAP_CREATED: PASS
-CONSOLIDATED_P0_FINDINGS: 0
-CONSOLIDATED_P1_FINDINGS: 6
-CONSOLIDATED_P2_FINDINGS: 6
-CONSOLIDATED_P3_FINDINGS: 1
-CONSOLIDATED_P4_FINDINGS: 0
-DUPLICATE_GROUPS_FOUND: 9
-SEVERITY_ESCALATIONS: 2
-CROSS_AUDIT_CONFLICTS: 0
-INTERNAL_TESTFLIGHT_BLOCKERS: 0
-EXTERNAL_TESTFLIGHT_BLOCKERS: 6
-APP_STORE_BLOCKERS: 9
-PHYSICAL_QA_BLOCKERS: 6
-EXTERNAL_VALIDATION_BLOCKERS: 4
-OVERALL_CONSOLIDATED_READINESS: 72
-REMEDIATION_EXECUTION_READINESS: CONDITIONAL
-INTERNAL_TESTFLIGHT_READINESS: READY
-EXTERNAL_TESTFLIGHT_READINESS: NOT_READY
-APP_STORE_READINESS: NOT_READY
-FIRST_REMEDIATION_BATCH: Batch-8 — QA / Physical / External Evidence
-NEXT_CURSOR_COMMAND_TO_RUN: Batch 8 — Physical Watch Ultra + paired-device QA campaign
-```
+| Deliverable | Status |
+|-------------|--------|
+| MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md | **PASS** |
+| MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv | **PASS** (45 rows) |
+| MASTER_FINDING_DEDUPLICATION_MATRIX_CURRENT.csv | **PASS** |
+| MASTER_FINDING_DEPENDENCY_GRAPH_CURRENT.md | **PASS** |
+| MASTER_REMEDIATION_PRIORITY_MATRIX_CURRENT.csv | **PASS** |
+| MASTER_NON_REGRESSION_GATE_MATRIX_CURRENT.csv | **PASS** |
+| MASTER_CURSOR_REMEDIATION_COMMAND_SEQUENCE_CURRENT.md | **PASS** |
+| MASTER_AUDIT_RERUN_PLAN_CURRENT.md | **PASS** |
+| MASTER_RELEASE_BLOCKER_BURNDOWN_PLAN_CURRENT.md | **PASS** |
+| MASTER_READINESS_ROADMAP_7_14_30_DAYS_CURRENT.md | **PASS** |
+| MASTER_UNRESOLVED_PHYSICAL_EXTERNAL_QA_REGISTER_CURRENT.csv | **PASS** |
+| MASTER_DO_NOT_TOUCH_POLICY_REGISTER_CURRENT.md | **PASS** |
 
 ---
 
-## Required Final Questions (summary)
-
-| # | Answer |
-|---|--------|
-| 1 | All six upstream outputs found? **YES** |
-| 2 | Stale/incomplete? **PARTIAL** — build/test banner incomplete (CONS-007) |
-| 3 | Conflicting findings? **NO** unresolved |
-| 4–7 | P0=0, P1=7, P2=5, P3=1, P4=0 |
-| 8 | Duplicated: 9 groups (external, physical, sync, doc, visual) |
-| 9 | Escalated: CONS-002, CONS-004 |
-| 10–12 | Internal TF: 1 blocker; External TF: 6; App Store: 9 |
-| 13–14 | Physical: 6; External: 4 |
-| 15 | First batch: **Batch 0** |
-| 16–18 | UI polish after Batch 1–5; docs after Batch 9; claims after Batch 8–9 |
-| 19 | Rerun plan per batch in §Y |
-| 20 | Safest order: Batch 0 → 5/3 software → 8 evidence → 9 release |
-| 21 | Do-not-touch: Bühlmann, sync crypto, briefing reference-only |
-| 22 | Top blockers: build verify, physical Watch, paired sync, external Bühlmann, a11y, PDF/legal, docs drift |
-| 23–25 | 7d: 78%; 14d: 85%; 30d: 92% — see roadmap |
-| 26 | Remediation ready? **CONDITIONAL** |
-| 27–29 | Internal TF: CONDITIONAL; External/App Store: NOT READY |
-| 30 | Next command: **Batch 0 build/test @ HEAD** |
-
----
-
-*End of consolidated orchestrator report.*
+**CONSOLIDATED_PLAN_STATUS: COMPLETE @ 7dfefe2 · Orchestrator V1.2 · 2026-06-28**

@@ -8,4 +8,4 @@ Snorkeling watch layout contracts,7,7,0,0,0,,SnorkelingWatchLayoutContractTests
 Physical pixel diff baselines,59,0,0,0,0,MVR-P1-002,PHYSICAL_PIXEL_DIFF PENDING
 Manual visual fidelity scoring,59,0,0,0,0,MVR-P2-002,MANUAL_VISUAL_FIDELITY PENDING
 Smallest watch physical layout,1,1,0,0,50,MVR-P2-004,Simulator contract only
-Overall visual regression readiness,59,50,0,0,85,MVR-P1-002,Software ~85%; pixel 0%
+Overall visual regression readiness,59,59,0,0,85,MVR-P1-002,Software 100%; pixel 0% @7dfefe2

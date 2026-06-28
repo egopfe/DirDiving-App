@@ -1,0 +1,19 @@
+Gate_ID,Control,Scenario,Software_Evidence,Physical_Evidence,Water_Lock_Evidence,Action_Button_Evidence,Digital_Crown_Evidence,Safety_Gate,Status,Software_Status,Physical_Status,Severity,Finding_ID,Evidence_Folder,Notes
+HWC-G-001,Digital Crown,Vertical page navigation underwater,WatchUnderwaterPagePolicy + ContentView TabView,yes,NOT_EXECUTED,NOT_EXECUTED,NOT_EXECUTED,n/a,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P2,HWC-PHY-001,QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_CROWN,Simulator does not close physical gate
+HWC-G-002,Digital Crown,Diving active: Live+Compass+Images pages,WatchUnderwaterPagePolicyTests,yes,NOT_EXECUTED,NOT_EXECUTED,NOT_EXECUTED,n/a,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P4,,,
+HWC-G-003,Digital Crown,Apnea/Snorkeling active: Live only,WatchUnderwaterPagePolicyTests,yes,NOT_EXECUTED,NOT_EXECUTED,NOT_EXECUTED,n/a,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P4,,,
+HWC-G-004,Digital Crown,Blocked nav → Live + per-activity toast,WatchUnderwaterNavigationClampPolicyTests,yes,NOT_EXECUTED,NOT_EXECUTED,NOT_EXECUTED,n/a,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P2,HWC-PHY-002,QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_WATER_LOCK,Crown paging under Water Lock PENDING
+HWC-G-005,Action Button,Underwater Primary Action router,ExecuteUnderwaterPrimaryActionIntent + WatchUnderwaterActionResolver,yes,NOT_EXECUTED,NOT_EXECUTED,n/a,n/a,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P2,HWC-PHY-003,QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_ACTION_BUTTON,Ultra Action Button under Water Lock PENDING
+HWC-G-006,Action Button,Alarm ack highest priority,WatchUnderwaterActionResolverTests,yes,NOT_EXECUTED,NOT_EXECUTED,n/a,n/a,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P4,,,
+HWC-G-007,Action Button,No GF/environment mutation underwater,WatchUnderwaterActionResolverTests,yes,NOT_EXECUTED,NOT_EXECUTED,n/a,yes,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P4,,,FC GF lock preserved
+HWC-G-008,App Intents,Legacy intents route through safety policy,WatchIntentSafetyPolicy,yes,NOT_EXECUTED,NOT_EXECUTED,n/a,yes,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P4,,,CLOSED P1-AB-001
+HWC-G-009,App Intents,Legal gate on all 9 intents,ActionButtonIntents,yes,NOT_EXECUTED,n/a,n/a,yes,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P4,,,
+HWC-G-010,Water Lock,Physical Water Lock engagement during dive,None,n/a,n/a,NOT_EXECUTED,n/a,n/a,PENDING,SOFTWARE_PASS,PENDING_PHYSICAL,P1,HWC-PHY-004,QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_WATER_LOCK,WATER_LOCK_PHYSICAL_QA NOT_EXECUTED
+HWC-G-011,Water Lock,Toast/haptic under Water Lock,None,n/a,n/a,NOT_EXECUTED,n/a,n/a,NOT_EXECUTED,SOFTWARE_PASS,PENDING_PHYSICAL,P2,,,Physical UX validation required
+HWC-G-012,Side button,Not claimed as dive control,Help strings + user guide,yes,n/a,n/a,n/a,n/a,PASS,SOFTWARE_READY,N/A,P4,,,Truthful copy
+HWC-G-013,Crown press,Not claimed as dive control,Help strings EN/IT,yes,n/a,n/a,n/a,n/a,PASS,SOFTWARE_READY,N/A,P4,,,
+HWC-G-014,Hint overlay,Underwater primary action hint,WatchUnderwaterPrimaryActionHintView,yes,NOT_EXECUTED,n/a,n/a,n/a,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P3,,,Physical readability PENDING
+HWC-G-015,FC stopwatch,Hidden stopwatch unavailable underwater,WatchUnderwaterActionResolverTests,yes,NOT_EXECUTED,n/a,n/a,n/a,PASS,SOFTWARE_READY,PENDING_PHYSICAL,P4,,,
+HWC-G-016,41mm layout,Smallest Watch physical layout,Static contracts only,partial,NOT_EXECUTED,n/a,n/a,n/a,NOT_EXECUTED,SOFTWARE_PASS,PENDING_PHYSICAL,P2,MVR-P2-004,QA_EVIDENCE/SNORKELING_WATCH_LAYOUTS,
+HWC-G-017,Haptics,Ascent/depth warning wet/dry safe,Algorithm tests PASS,NOT_EXECUTED,NOT_EXECUTED,n/a,n/a,n/a,NOT_EXECUTED,SOFTWARE_PASS,PENDING_PHYSICAL,P2,PDQ-W-026,QA_EVIDENCE/WATCH_ULTRA,Dry safe unless controlled wet session
+HWC-G-018,Mission Mode,Reminders under hardware constraints,MissionModeAlgorithmInvariantTests,yes,NOT_EXECUTED,n/a,n/a,n/a,NOT_EXECUTED,SOFTWARE_PASS,PENDING_PHYSICAL,P4,MUIUX-P4-001,,
