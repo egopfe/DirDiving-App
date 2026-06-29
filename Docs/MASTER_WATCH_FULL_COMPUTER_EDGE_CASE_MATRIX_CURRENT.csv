@@ -19,6 +19,6 @@ EC-017,Diving,Full Computer,Freshwater salinity,fresh 2000m import,predive,Corre
 EC-018,Diving,Full Computer,Cross-activity isolation,Gauge dive active,FC inactive,No FC tissue mutation,Namespace tests PASS,N/A,N/A,YES,—,FullComputerNamespaceIsolationTests,
 EC-019,Diving,Full Computer,Malformed sync payload,bad HMAC,sync,Reject payload,ActivitySync tests,N/A,N/A,YES,—,WatchSyncCryptographicLogicTests,Paired device NOT_EXECUTED
 EC-020,Diving,Full Computer,No physical evidence,underwater dive,N/A,PENDING_PHYSICAL,PENDING_PHYSICAL,N/A,N/A,PENDING,P2,PHYSICAL_QA_MATRIX,Do not fabricate
-EC-021,Diving,Full Computer,Shallow entitlement without dev toggle,appleShallow capability,FC start blocked,DepthCapabilityPolicy blocks FC,No runtime start,N/A,N/A,YES,—,DepthCapabilityTests @7dfefe2,Production path
+EC-021,Diving,Full Computer,Shallow entitlement without dev toggle,appleShallow capability,FC start blocked,DepthCapabilityPolicy blocks FC,No runtime start,N/A,N/A,YES,—,DepthCapabilityTests; resolveAutomaticStep @5d757cc,Production + WAO path
 EC-022,Diving,Full Computer,Water auto-open cold launch,submerged at launch,route to water destination not skip predive,WatchLaunchRoutingPolicy,No tissue mutation,N/A,N/A,YES,—,WatchSubmersionLaunchProbeTests,PENDING_PHYSICAL routing UX
 EC-023,Diving,Full Computer,GF change attempt underwater,Crown/Action Button,GF unchanged in plan,No mid-dive GF mutation,N/A,N/A,YES,—,WatchUnderwaterActionResolverTests,Locked at dive start

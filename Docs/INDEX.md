@@ -1,7 +1,35 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-28  
-**Branch consigliato:** `main` = `origin/main`
+**Branch consigliato:** `main` = `origin/main` @ `5d757cc`
+
+---
+
+## Aggiornamento indice 2026-06-28 — Post-remediation audit reruns 01 / 02 / 04 / 05 / 06 @ `5d757cc`
+
+Read-only reruns after consolidated software remediation. Checklist: [`MASTER_CONSOLIDATED_POST_REMEDIATION_AUDIT_RERUN_CHECKLIST_CURRENT.md`](MASTER_CONSOLIDATED_POST_REMEDIATION_AUDIT_RERUN_CHECKLIST_CURRENT.md).
+
+| # | Report | Verdict |
+|---|--------|---------|
+| 01 | [`MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_CURRENT.md`](MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_CURRENT.md) | **PARTIAL** — software strong; P0=0; physical/external pending |
+| 02 | [`MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_CURRENT.md`](MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_CURRENT.md) | **PASS** (software) — GF parity verified |
+| 04 | [`MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_CURRENT.md`](MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_CURRENT.md) | **PARTIAL** — CONS-003–007 closed; P1=0 |
+| 05 | [`MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_CURRENT.md`](MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_CURRENT.md) | Software **100%**; physical/legal **PENDING** |
+| 06 | [`MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_CURRENT.md`](MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_CURRENT.md) | **PARTIAL** — command integrity PASS; README drift P2 |
+
+---
+
+## Aggiornamento indice 2026-06-28 — Command 04 post-remediation audit rerun
+
+Post-remediation read-only rerun @ `5d757cc`: **CONS-003–007 VERIFIED** — sync in-flight release, symmetric `diveImportAck`, signed tombstones, shallow dev toggles default OFF, `runtimeAuthorityTier` compile authority. Gate scripts PASS.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `04-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.1.md` |
+| **Report** | [`MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_CURRENT.md`](MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_CURRENT.md) |
+| **Validate** | `./Scripts/validate_master_main_code_sync_security_performance_audit.sh` |
+| **Verdict** | **PARTIAL** — P1 software closed; P2 physical/WAO/planner open |
+| **Audit baseline** | `5d757cc` |
 
 ---
 
@@ -18,7 +46,30 @@ Remediation software post-orchestrator V1.2: permutazione `commands_for_cursor/0
 | **Completion summary** | [`MASTER_CONSOLIDATED_SOFTWARE_READINESS_TO_100_COMPLETION_SUMMARY_CURRENT.md`](MASTER_CONSOLIDATED_SOFTWARE_READINESS_TO_100_COMPLETION_SUMMARY_CURRENT.md) |
 | **Validate** | `./Scripts/validate_consolidated_software_readiness.sh` |
 | **Verdict** | **SOFTWARE 100%** · internal TestFlight software **100%** · physical/external/legal **PENDING** |
-| **Audit baseline** | `7dfefe2` · orchestrator docs @ `626c619` · remediation working tree (uncommitted) |
+| **Audit baseline** | `5d757cc` · consolidated software remediation committed on `main` |
+
+---
+
+## Aggiornamento indice 2026-06-28 — Documentation / Repository Alignment Audit V1.1 (Command 06 post-remediation)
+
+Post-remediation read-only rerun @ `5d757cc`: **CONS-001** command integrity **PASS** (`validate_commands_for_cursor_integrity.sh`); **CONS-034** INDEX wave **PARTIAL** (Command 10 section present; README baseline + feature matrix drift remain).
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `06-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.1.md` |
+| **Report** | [`MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_CURRENT.md`](MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_CURRENT.md) |
+| **Truthfulness matrix** | [`MASTER_DOCUMENTATION_TRUTHFULNESS_MATRIX_CURRENT.csv`](MASTER_DOCUMENTATION_TRUTHFULNESS_MATRIX_CURRENT.csv) |
+| **Outdated inventory** | [`MASTER_OUTDATED_DOCUMENT_INVENTORY_CURRENT.csv`](MASTER_OUTDATED_DOCUMENT_INVENTORY_CURRENT.csv) |
+| **Command alignment** | [`MASTER_COMMAND_VERSION_ALIGNMENT_MATRIX_CURRENT.csv`](MASTER_COMMAND_VERSION_ALIGNMENT_MATRIX_CURRENT.csv) · [`MASTER_COMMAND_SEQUENCE_VERSION_ALIGNMENT_CURRENT.csv`](MASTER_COMMAND_SEQUENCE_VERSION_ALIGNMENT_CURRENT.csv) |
+| **Remediation plan** | [`MASTER_DOCUMENTATION_REMEDIATION_PLAN_CURRENT.md`](MASTER_DOCUMENTATION_REMEDIATION_PLAN_CURRENT.md) |
+| **Index repair plan** | [`MASTER_DOCS_INDEX_REPAIR_PLAN_CURRENT.md`](MASTER_DOCS_INDEX_REPAIR_PLAN_CURRENT.md) |
+| **Feature matrix repair** | [`MASTER_FEATURE_MATRIX_REPAIR_PLAN_CURRENT.md`](MASTER_FEATURE_MATRIX_REPAIR_PLAN_CURRENT.md) |
+| **Watch wave alignment** | [`MASTER_LATEST_WATCH_DEVELOPMENT_DOC_ALIGNMENT_CURRENT.csv`](MASTER_LATEST_WATCH_DEVELOPMENT_DOC_ALIGNMENT_CURRENT.csv) |
+| **Entitlement alignment** | [`MASTER_ENTITLEMENT_DOCUMENTATION_ALIGNMENT_CURRENT.csv`](MASTER_ENTITLEMENT_DOCUMENTATION_ALIGNMENT_CURRENT.csv) |
+| **Launch sequence** | [`commands_for_cursor/00-DIR_DIVING_MASTER_AUDIT_LAUNCH_SEQUENCE_UPDATED_2026-06-28.md`](../commands_for_cursor/00-DIR_DIVING_MASTER_AUDIT_LAUNCH_SEQUENCE_UPDATED_2026-06-28.md) |
+| **Validate** | `./Scripts/validate_commands_for_cursor_integrity.sh` **PASS** |
+| **Verdict** | **PARTIAL** — command integrity PASS; README baseline FAIL; feature matrix PARTIAL; 2× P0 claim docs remain |
+| **Audit baseline** | `5d757cc` |
 
 ---
 

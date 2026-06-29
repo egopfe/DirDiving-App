@@ -3,22 +3,25 @@
 **Command:** `06-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.1.md` (Launch Order 06)  
 **Date:** 2026-06-28  
 **Branch:** `main`  
-**Commit:** `7dfefe2` (`7dfefe2cd7817780a903a64e51b890d901111ffd`)  
+**Commit:** `5d757cc` (`5d757cc0217755f5c6d5429af2f13ce5c4748c5d`)  
 **Repository:** `egopfe/DirDiving-App`  
-**Type:** Audit-only — no production code or existing documentation edited
+**Type:** Post-remediation audit rerun — audit-only; no production code or existing documentation edited  
+**Prior audit:** @ `7dfefe2` (pre-remediation; command permutation P0)
 
 ---
 
 ## A. Executive Summary
 
-Documentation on `main` @ `7dfefe2` maintains **strong non-certified safety posture** in primary legal, planner, Full Computer, and recent master audit outputs (Commands 01–05). The **2026-06-28 Watch development wave** (water auto-open, shallow-depth entitlement, GF presets, underwater hardware interaction) is **documented in policy docs and upstream audit matrices** but **under-indexed** in `Docs/INDEX.md` and absent from `DIR_DIVING_Feature_Comparison.csv`.
+Post-remediation documentation alignment on `main` @ **`5d757cc`** confirms **CONS-001 cleared**: `commands_for_cursor/01`–`04` launch-order bodies are restored and **`Scripts/validate_commands_for_cursor_integrity.sh` PASS**. Filename-based audit launch is again trustworthy for launch-order routing.
 
-**Repository alignment is PARTIAL with a new P0 blocker:** `commands_for_cursor/01`–`04` have **permuted bodies** — filenames do not match content (**01=file04, 02=file03, 03=file01, 04=file02**). Inner command versions also lag filenames (e.g. file `01` body is Main Code **V1.0**, not Watch FC **V2.1**). Until repaired, launching audits by filename will execute the **wrong audit**.
+**CONS-034 is PARTIAL:** `Docs/INDEX.md` carries the **2026-06-28 consolidated remediation wave** section (Command 10) and updated header date, but **Command 06 documentation-alignment outputs**, Watch-wave matrix cross-links, and README baseline refresh remain incomplete. `DIR_DIVING_Feature_Comparison.csv` still lacks 2026-06-28 wave rows (water auto-open, GF presets, shallow depth, mode switcher).
 
-Several P0 findings from the prior audit @ `1f62235` are **verified fixed** (TestFlight Apnea/Snorkeling on MAIN, EXPERIMENTAL_FEATURES scope, Mission Mode App Store claim). **Two P0 claim issues remain** (Mission Mode LPM report App Store conditional yes; DOCUMENTATION_UPDATE_REPORT false CCR validation bullet).
+**Two P0 claim issues persist** from prior audit: Mission Mode LPM report App Store conditional yes; `DOCUMENTATION_UPDATE_REPORT_20260609` false CCR validation bullet. Primary safety posture (non-certified FC, CCR reference-only, physical/external PENDING) remains **strong** in legal, planner, and master audit outputs.
 
-**Aggregate documentation readiness:** 62% (safety truth strong; command integrity FAIL; index/matrix drift).  
-**Release documentation readiness:** 58% (PENDING gates documented in master audits; stale README baselines; command permutation blocks trustworthy audit execution).
+**Minor command-version drift:** files `01`, `03`, `04` have filenames at V2.1/V2.2/V1.1 but inner canonical/body headers still cite V2.0/V2.1/V1.0 — launch order correct; cosmetic version alignment P2.
+
+**Aggregate documentation readiness:** 72% (up from 62% pre-remediation).  
+**Release documentation readiness:** 65% (README baseline stale; P0 claim docs remain).
 
 ---
 
@@ -35,24 +38,24 @@ Launch sequence: [`commands_for_cursor/00-DIR_DIVING_MASTER_AUDIT_LAUNCH_SEQUENC
 
 ## C. Current Master Audit Structure
 
-| # | Expected command | Body @ 7dfefe2 | Output |
+| # | Expected command | Body @ 5d757cc | Output |
 |---|------------------|----------------|--------|
-| 00 | SUPER_ORCHESTRATOR V1.2 | **ALIGNED** | Consolidated plan exists |
-| 01 | WATCH_FULL_COMPUTER V2.1 | **CONFLICTING** (body = Main Code V1.0) | `MASTER_WATCH_FULL_COMPUTER_*` (modified) |
-| 02 | IOS_FULL_DEEP V1.1 | **CONFLICTING** (body = UI/UX V2.1) | `MASTER_IOS_*` (modified) |
-| 03 | UI_UX_FULL_DEEP V2.2 | **CONFLICTING** (body = Watch FC V2.0) | `MASTER_UI_UX_*` (modified) |
-| 04 | MAIN_CODE_SYNC_SECURITY V1.1 | **CONFLICTING** (body = iOS V1.1) | `MASTER_MAIN_CODE_*` (modified) |
+| 00 | SUPER_ORCHESTRATOR V1.2 | **ALIGNED** | Consolidated plan + remediation @ 5d757cc |
+| 01 | WATCH_FULL_COMPUTER V2.1 | **ALIGNED** (launch 01; body header V2.0) | `MASTER_WATCH_FULL_COMPUTER_*` |
+| 02 | IOS_FULL_DEEP V1.1 | **ALIGNED** | `MASTER_IOS_*` |
+| 03 | UI_UX_FULL_DEEP V2.2 | **ALIGNED** (launch 03; body header V2.1) | `MASTER_UI_UX_*` |
+| 04 | MAIN_CODE_SYNC_SECURITY V1.1 | **ALIGNED** (launch 04; body header V1.0) | `MASTER_MAIN_CODE_*` |
 | 05 | RELEASE_QA_EVIDENCE V1.1 | **ALIGNED** | `MASTER_RELEASE_QA_*` |
 | 06 | DOCUMENTATION_REPOSITORY_ALIGNMENT V1.1 | **ALIGNED** | **This audit** |
 
-**Permutation map (CONFLICTING):**
+**Post-remediation integrity check:**
 
-```text
-01-MASTER_WATCH...V2.1.md     → contains 04-MASTER_MAIN_CODE...V1.0 body
-02-MASTER_IOS...V1.1.md       → contains 03-MASTER_UI_UX...V2.1 body
-03-MASTER_UI_UX...V2.2.md     → contains 01-MASTER_WATCH...V2.0 body
-04-MASTER_MAIN_CODE...V1.1.md → contains 02-MASTER_IOS...V1.1 body
+```bash
+./Scripts/validate_commands_for_cursor_integrity.sh
+# PASS: commands_for_cursor integrity (01–06 launch order aligned)
 ```
+
+**Prior permutation (FIXED @ 5d757cc):** 01=file04, 02=file03, 03=file01, 04=file02 — no longer present.
 
 Archived V3.0 commands: 15 files in `commands_for_cursor/OOLD/`, 7 in `OLD/` — superseded, not deleted.
 
@@ -63,9 +66,9 @@ Archived V3.0 commands: 15 files in `commands_for_cursor/OOLD/`, 7 in `OLD/` —
 | Field | Value |
 |-------|-------|
 | Branch | `main` ✓ |
-| Commit | `7dfefe2` ✓ (matches required baseline) |
-| Dirty working tree | **Yes** — 47 modified Docs + 2 untracked matrices + 1 script |
-| Documentation files (`Docs/` md+csv) | **848** |
+| Commit | `5d757cc` ✓ (matches required baseline) |
+| Dirty working tree | **No** (clean @ audit time) |
+| Documentation files (`Docs/` md+csv) | **866** |
 | Active command files (`commands_for_cursor/` root) | **8** |
 | Archived commands | **22** (OLD + OOLD) |
 | Scope | README, Docs/**, commands_for_cursor/**, CHANGELOG, ROADMAP, QA_EVIDENCE, feature matrices |
@@ -76,15 +79,16 @@ Archived V3.0 commands: 15 files in `commands_for_cursor/OOLD/`, 7 in `OLD/` —
 
 ```text
 branch: main
-commit: 7dfefe2cd7817780a903a64e51b890d901111ffd
+commit: 5d757cc0217755f5c6d5429af2f13ce5c4748c5d
 remote: origin https://github.com/egopfe/DirDiving-App
-status: main...origin/main (aligned); working tree dirty (upstream audit outputs)
-docs index: Docs/INDEX.md present (2350+ lines)
+status: main...origin/main (aligned); working tree clean
+docs index: Docs/INDEX.md present (2350+ lines); Aggiornato 2026-06-28
 feature matrix: Docs/DIR_DIVING_Feature_Comparison.csv present
 release docs: TESTFLIGHT_REVIEW_NOTES, RELEASE_CHECKLIST, APP_STORE_REVIEW_NOTES
 QA evidence: Docs/QA_EVIDENCE/ (templates; execution PENDING)
 known master commands: 00–06 @ commands_for_cursor/
 superseded: V3.0 0–18 in OOLD/OLD; Orchestrator V1.1 in OOLD
+command integrity: validate_commands_for_cursor_integrity.sh PASS
 ```
 
 ---
@@ -93,10 +97,9 @@ superseded: V3.0 0–18 in OOLD/OLD; Orchestrator V1.1 in OOLD
 
 | Category | Count | Notes |
 |----------|-------|-------|
-| Markdown in Docs/ | ~400+ | Includes historical audits |
-| CSV in Docs/ | ~400+ | Matrices and inventories |
-| MASTER_*_CURRENT outputs | 103+ | Upstream audits 01–05 largely present |
-| Command files (active) | 8 | 01–04 permuted |
+| Markdown + CSV in Docs/ | 866 | Includes historical audits |
+| MASTER_*_CURRENT outputs | 120+ | Upstream audits 01–05 + consolidated remediation |
+| Command files (active) | 8 | 01–04 launch order aligned |
 | QA_EVIDENCE subfolders | 20+ | README templates; mostly empty execution |
 
 ---
@@ -107,31 +110,32 @@ superseded: V3.0 0–18 in OOLD/OLD; Orchestrator V1.1 in OOLD
 
 | Truth_Status | Count |
 |--------------|-------|
-| TRUE | 18 |
-| PARTIAL | 6 |
+| TRUE | 22 |
+| PARTIAL | 7 |
 | OUTDATED | 5 |
 | UNSUPPORTED | 1 |
-| CONTRADICTED | 7 |
+| CONTRADICTED | 3 |
 | MISSING | 4 |
 | PENDING_EVIDENCE | 3 |
-| SUPERSEDED | 8 |
+| SUPERSEDED | 7 |
 
-**Highest-risk rows:** command permutation (4× CONTRADICTED), WATCH_LOW_POWER Mission Mode App Store claim (UNSUPPORTED), CCR validation complete bullet (CONTRADICTED), feature matrix experimental duplicates (CONTRADICTED).
+**Highest-risk rows:** WATCH_LOW_POWER Mission Mode App Store claim (UNSUPPORTED), CCR validation complete bullet (CONTRADICTED), feature matrix experimental duplicates (CONTRADICTED). **Command permutation rows now TRUE.**
 
 ---
 
 ## H. Outdated Document Inventory Summary
 
-**File:** [`MASTER_OUTDATED_DOCUMENT_INVENTORY_CURRENT.csv`](MASTER_OUTDATED_DOCUMENT_INVENTORY_CURRENT.csv) — **32 rows**
+**File:** [`MASTER_OUTDATED_DOCUMENT_INVENTORY_CURRENT.csv`](MASTER_OUTDATED_DOCUMENT_INVENTORY_CURRENT.csv) — **28 rows**
 
 | Classification | Count |
 |----------------|-------|
-| conflicting | 4 (commands 01–04) |
-| needs update | 12 |
+| needs update | 11 |
 | superseded | 6 |
 | historical | 5 |
 | unsafe claim | 2 |
-| current (verified fixed) | 3 |
+| current (verified fixed) | 4 |
+
+**Removed from inventory:** 4× command permutation conflicting entries (CONS-001 FIXED).
 
 ---
 
@@ -141,12 +145,11 @@ superseded: V3.0 0–18 in OOLD/OLD; Orchestrator V1.1 in OOLD
 
 | Status | Count |
 |--------|-------|
-| Active aligned (00, 05, 06) | 3 |
-| Active CONFLICTING (01–04) | 4 |
+| Active aligned (00, 01–06 launch order) | 7 |
+| Active inner-version lag (01 V2.0 body, 03 V2.1 body, 04 V1.0 body) | 3 |
 | Superseded V3.0/V2.0 legacy | 25+ |
-| Missing from active dir (INDEX-referenced V3.0) | 17 |
 
-**Verdict:** `COMMAND_VERSION_ALIGNMENT_CURRENT: FAIL` — permutation is operational P0.
+**Verdict:** `COMMAND_VERSION_ALIGNMENT_CURRENT: PARTIAL` — launch order PASS; inner header version strings lag filenames (P2 cosmetic).
 
 ---
 
@@ -163,13 +166,13 @@ superseded: V3.0 0–18 in OOLD/OLD; Orchestrator V1.1 in OOLD
 
 | Criterion | Verdict |
 |-----------|---------|
-| Master audit 01–06 indexed | **PARTIAL** — 2026-06-22 block exists; wrong command versions |
-| 2026-06-28 launch sequence | **MISSING** |
-| 2026-06-28 Watch wave matrices | **MISSING** |
-| Command permutation documented | **MISSING** (this audit adds plan) |
+| 2026-06-28 consolidated remediation section | **PASS** (Command 10 wave) |
+| Master audit 01–06 indexed | **PARTIAL** — 2026-06-22 block; command versions stale |
+| 2026-06-28 Watch wave matrices in INDEX | **PARTIAL** — policy docs linked; GF/shallow matrices not in top block |
+| Command 06 post-remediation section | **MISSING** (this audit adds INDEX entry) |
 | Superseded V3.0 commands | **PARTIAL** — still listed as active in places |
 
-**Verdict:** `DOCS_INDEX_CURRENT: FAIL`
+**Verdict:** `DOCS_INDEX_CURRENT: PARTIAL` (improved from FAIL — CONS-034 wave section exists)
 
 ---
 
@@ -186,7 +189,7 @@ superseded: V3.0 0–18 in OOLD/OLD; Orchestrator V1.1 in OOLD
 | `TESTFLIGHT_REVIEW_NOTES.md` | **PASS** — Apnea/Snorkeling on MAIN; CCR reference-only; baseline SHA stale |
 | `APP_STORE_REVIEW_NOTES.md` | **PASS** — not certified |
 | `RELEASE_CHECKLIST.md` | **PARTIAL** — no master audit gate checkbox |
-| `MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_CURRENT.md` | **PASS** content; baseline @ 1f62235 |
+| `MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_CURRENT.md` | **PARTIAL** — baseline lag vs 5d757cc |
 | `WATCH_LOW_POWER_MISSION_MODE_IMPLEMENTATION_REPORT.md` | **FAIL** — App Store conditional yes |
 
 ---
@@ -232,10 +235,10 @@ All master `*_PHYSICAL_*` / `*_EXTERNAL_*` pending docs correctly label **PENDIN
 | Topic | Verdict |
 |-------|---------|
 | Not certified positioning | **PASS** |
-| Bühlmann/Schreiner runtime | **PASS** (master audit outputs @ 7dfefe2) |
-| GF presets | **PASS** in feature inventory + new matrix; **MISSING** in INDEX/CSV |
+| Bühlmann/Schreiner runtime | **PASS** (master audit outputs) |
+| GF presets | **PASS** in feature inventory + matrix; **MISSING** in INDEX top block/CSV |
 | Shallow depth gating | **PASS** (BUILD workflow, entitlement docs, depth matrix) |
-| Water auto-open | **PASS** (WATCH_WATER_AUTO_OPEN_POLICY); INDEX gap |
+| Water auto-open | **PASS** (WATCH_WATER_AUTO_OPEN_POLICY); partial INDEX |
 | Physical/external QA | **PENDING** — correctly labeled |
 
 **Verdict:** `WATCH_FULL_COMPUTER_DOCS_CURRENT: PARTIAL`
@@ -255,7 +258,7 @@ All master `*_PHYSICAL_*` / `*_EXTERNAL_*` pending docs correctly label **PENDIN
 
 ## S. Privacy / Security / Performance Documentation Status
 
-Master audit outputs `MASTER_SECURITY_*`, `MASTER_PRIVACY_*`, `MASTER_PERFORMANCE_*`, `MASTER_CONCURRENCY_*` exist and were modified @ 7dfefe2 working tree. INDEX links to legacy IOS_PERFORMANCE docs more prominently than master 04 matrices.
+Master audit outputs `MASTER_SECURITY_*`, `MASTER_PRIVACY_*`, `MASTER_PERFORMANCE_*`, `MASTER_CONCURRENCY_*` exist. INDEX links to legacy IOS_PERFORMANCE docs more prominently than master 04 matrices.
 
 **Verdict:** `SECURITY_PRIVACY_DOCS_CURRENT: PARTIAL` · `PERFORMANCE_DOCS_CURRENT: PARTIAL`
 
@@ -267,11 +270,11 @@ See [`MASTER_DOCUMENTATION_REMEDIATION_PLAN_CURRENT.md`](MASTER_DOCUMENTATION_RE
 
 | Priority | Count |
 |----------|-------|
-| P0 | 4 |
-| P1 | 12 |
-| P2 | 10 |
+| P0 | 2 |
+| P1 | 10 |
+| P2 | 11 |
 | P3 | 6 |
-| P4 | 5 (verified fixed / aligned track-only) |
+| P4 | 6 (verified fixed / aligned track-only) |
 
 Supporting plans: [`MASTER_DOCS_INDEX_REPAIR_PLAN_CURRENT.md`](MASTER_DOCS_INDEX_REPAIR_PLAN_CURRENT.md), [`MASTER_FEATURE_MATRIX_REPAIR_PLAN_CURRENT.md`](MASTER_FEATURE_MATRIX_REPAIR_PLAN_CURRENT.md).
 
@@ -281,11 +284,11 @@ Supporting plans: [`MASTER_DOCS_INDEX_REPAIR_PLAN_CURRENT.md`](MASTER_DOCS_INDEX
 
 ```text
 MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT: PARTIAL
-BASELINE_CURRENT_AND_CLEAN: FAIL
+BASELINE_CURRENT_AND_CLEAN: PASS
 README_CURRENT: FAIL
-DOCS_INDEX_CURRENT: FAIL
+DOCS_INDEX_CURRENT: PARTIAL
 FEATURE_MATRIX_CURRENT: PARTIAL
-COMMAND_VERSION_ALIGNMENT_CURRENT: FAIL
+COMMAND_VERSION_ALIGNMENT_CURRENT: PARTIAL
 ARCHITECTURE_DOCS_CURRENT: PARTIAL
 SETTINGS_OWNERSHIP_DOCS_CURRENT: PASS
 LOGBOOK_OWNERSHIP_DOCS_CURRENT: PASS
@@ -298,21 +301,27 @@ PERFORMANCE_DOCS_CURRENT: PARTIAL
 RELEASE_DOCS_CURRENT: PARTIAL
 QA_EVIDENCE_DOCS_CURRENT: PASS
 UNSUPPORTED_CLAIMS_FOUND: 2
-OUTDATED_DOCS_FOUND: 32
+OUTDATED_DOCS_FOUND: 28
 SUPERSEDED_COMMANDS_FOUND: 25
-P0_DOC_FINDINGS: 4
-P1_DOC_FINDINGS: 12
-P2_DOC_FINDINGS: 10
+P0_DOC_FINDINGS: 2
+P1_DOC_FINDINGS: 10
+P2_DOC_FINDINGS: 11
 P3_DOC_FINDINGS: 6
-P4_DOC_FINDINGS: 5
-DOCUMENTATION_READINESS: 62
-RELEASE_DOCUMENTATION_READINESS: 58
-REQUIRED_DOC_REMEDIATION_FILES: 37
+P4_DOC_FINDINGS: 6
+DOCUMENTATION_READINESS: 72
+RELEASE_DOCUMENTATION_READINESS: 65
+REQUIRED_DOC_REMEDIATION_FILES: 29
 ```
 
-**BASELINE_CURRENT_AND_CLEAN: FAIL** — commit matches `7dfefe2` but working tree is dirty with upstream audit modifications (expected during audit wave; not introduced by this command).
+**Post-remediation delta vs prior audit @ 7dfefe2:**
 
-**Primary blocker:** Repair `commands_for_cursor/01`–`04` permutation before any filename-based audit launch.
+| Gate | Prior | Now |
+|------|-------|-----|
+| CONS-001 command integrity | FAIL | **PASS** |
+| CONS-034 INDEX wave section | MISSING | **PARTIAL** (Command 10 present) |
+| COMMAND_VERSION_ALIGNMENT | FAIL | **PARTIAL** |
+| DOCS_INDEX | FAIL | **PARTIAL** |
+| P0 doc findings | 4 | **2** |
 
 ---
 
