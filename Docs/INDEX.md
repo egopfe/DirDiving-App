@@ -1,7 +1,21 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-29  
-**Branch consigliato:** `main` = `origin/main`
+**Branch consigliato:** `main` = `origin/main` @ `4d415c0`
+
+---
+
+## Aggiornamento indice 2026-06-29 — Orchestrator V1.2 refresh @ `4d415c0`
+
+All six upstream audits (01–06) refreshed post-remediation. **UPSTREAM_AUDITS_COMPLETE: PASS.** Audit 03 no longer stale.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `00-MASTER_SUPER_ORCHESTRATOR_...V1.2.md` |
+| **Plan** | [`MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md`](MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md) |
+| **Checklist** | [`MASTER_CONSOLIDATED_POST_REMEDIATION_AUDIT_RERUN_CHECKLIST_CURRENT.md`](MASTER_CONSOLIDATED_POST_REMEDIATION_AUDIT_RERUN_CHECKLIST_CURRENT.md) |
+| **Verdict** | **PARTIAL** · software **100%** · P0=0 · P1 software=0 · overall **~72%** |
+| **Next** | Physical/external QA · README/matrix doc-only · legal packaging |
 
 ---
 
@@ -22,7 +36,7 @@ Post-remediation read-only rerun after Command 10 @ `5d757cc`. CONS-019 WAO dept
 
 ## Aggiornamento indice 2026-06-28 — Orchestrator V1.2 refresh @ `8ae1034`
 
-Command **00** consolidation refresh after Command 10 remediation @ `5d757cc` and post-remediation reruns 01/02/04/05/06. Audit **03** refreshed @ `15c8068` (see section above).
+Command **00** consolidation refresh after Command 10 remediation @ `5d757cc` and post-remediation reruns **01–06** @ `4d415c0`.
 
 | Campo | Valore |
 |-------|--------|
