@@ -4,8 +4,9 @@ Batch-0,xcodegen,Always,xcodegen generate,All,All,Stop,Project consistency
 Batch-0,Target isolation,Always,./Scripts/check_main_target_isolation.sh,All,All,Stop,No experimental target bleed
 Batch-0,Secrets scan,Always,./Scripts/check_secrets.sh,All,All,Stop,No credential leak
 Batch-0,Localization audit,Always,./Scripts/audit_localization.sh,All,All,Stop,Key parity EN/IT
-Batch-0,Command permutation check,Batch-specific,Verify commands_for_cursor/01-04 body titles match filenames,Batch-0,Batch-1+,Warn if CONFLICTING,CONS-001 — doc repair in Batch-9
-Batch-0,Full build+test @ HEAD,Batch-specific,xcodebuild iOS+Watch schemes test @7dfefe2,Batch-0,Batch-1+,Blocks all batches,CONS-014; target 1091 Watch 0 fail
+Batch-0,Command permutation check,Batch-specific,./Scripts/validate_commands_for_cursor_integrity.sh,Batch-0,Batch-1+,Stop if FAIL,CONS-001 FIXED @ 5d757cc — PASS
+Batch-0,Consolidated software readiness,Batch-specific,./Scripts/validate_consolidated_software_readiness.sh,Batch-0,Batch-1+,Stop if FAIL,Software 100% @ 5d757cc
+Batch-0,Full build+test @ HEAD,Batch-specific,xcodebuild iOS+Watch remediation test lanes @5d757cc,Batch-0,Batch-1+,Blocks all batches,CONS-014 VERIFIED; Watch compile maintenance deferred
 Batch-1,Watch algorithm tests,Watch,./Scripts/validate_watch_complete_algorithm_readiness.sh,Batch-1,Batch-1,Stop,Full Computer safety CONS-008
 Batch-1,Altitude readiness,Watch,./Scripts/validate_watch_buhlmann_altitude_readiness.sh,Batch-1,Batch-1,Stop,CONS-015 altitude replay
 Batch-1,FC release hard,Watch,./Scripts/validate_full_computer_release_readiness.sh,Batch-1,Batch-1,Stop,Timing/degraded policy
@@ -31,6 +32,6 @@ Batch-8,WAO physical gate,Manual,MASTER_WATER_AUTO_OPEN_PHYSICAL_QA_GATE executi
 Batch-8,HW underwater gate,Manual,WATCH_UNDERWATER_FAST_CONTROLS templates,Batch-8,Batch-8,Mark PENDING_PHYSICAL,CONS-022
 Batch-8,Shallow depth gate,Manual,MASTER_SHALLOW_DEPTH_RELEASE_GATE_MATRIX execution,Batch-8,Batch-8,Mark PENDING_PHYSICAL,CONS-042
 Batch-8,External Bühlmann,Manual,BUHLMANN_EXTERNAL QA_EVIDENCE,Batch-8,Batch-8,Mark PENDING_EXTERNAL,CONS-009
-Batch-9,Command body repair,Manual,Restore 01-04 from OOLD/V1.2 sources,Batch-9,Batch-9,Stop,CONS-001 P0 doc
+Batch-9,Command body repair,Manual,validate_commands_for_cursor_integrity.sh PASS,Batch-9,Batch-9,Stop if FAIL,CONS-001 FIXED @ 5d757cc — regression guard only
 Batch-9,Documentation truth,Manual,Docs/INDEX.md + feature matrix review,Batch-9,Batch-9,Stop,CONS-034 post-technical
 Batch-9,Legal marketing sign-off,Manual,Counsel approval artifacts,Batch-9,Batch-9,Stop,CONS-044 App Store
