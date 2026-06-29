@@ -20,6 +20,7 @@ struct DIRDivingApp: App {
     @StateObject private var buddyAssist: BuddyAssistService
     @StateObject private var plannerBriefingStore: PlannerBriefingCardStore
     @StateObject private var underwaterActionRouter: WatchUnderwaterActionRouter
+    @StateObject private var snorkelingMapTypeSettings = SnorkelingMapTypeSettingsStore()
     @StateObject private var legalAcceptance = LegalAcceptanceStore()
     @AppStorage(DIRAppLanguage.storageKey) private var appLanguage = DIRAppLanguage.system.rawValue
 
@@ -111,6 +112,7 @@ struct DIRDivingApp: App {
             .environmentObject(plannerBriefingStore)
             .environmentObject(underwaterActionRouter)
             .environmentObject(legalAcceptance)
+            .environmentObject(snorkelingMapTypeSettings)
             .environment(\.locale, DIRAppLanguage.fromStorage(appLanguage).locale)
         }
     }
