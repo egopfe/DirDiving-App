@@ -508,6 +508,8 @@ struct GasPlanInput: Codable, Hashable {
     var teamSize: Double = 2
     /// Extra emergency margin minutes added to automatic ascent time for Rock Bottom estimate.
     var emergencyExtraMinutes: Double = IOSAlgorithmConfiguration.defaultEmergencyExtraMinutes
+    /// Emergency section: when true, required decompression gas includes an assisted buddy (2× primary deco gas).
+    var includeBuddyDecoGas: Bool = false
     var plannedDepthMeters: Double = 40
     var plannedAverageDepthMeters: Double = 20
     var planningDepthReference: PlanningDepthReference = .maximumDepth
@@ -718,6 +720,7 @@ struct GasPlanInput: Codable, Hashable {
         case emergencySacLitersPerMinute
         case teamSize
         case emergencyExtraMinutes
+        case includeBuddyDecoGas
         case plannedDepthMeters
         case plannedAverageDepthMeters
         case planningDepthReference
@@ -746,6 +749,7 @@ struct GasPlanInput: Codable, Hashable {
         teamSize = try container.decodeIfPresent(Double.self, forKey: .teamSize) ?? 2
         emergencyExtraMinutes = try container.decodeIfPresent(Double.self, forKey: .emergencyExtraMinutes)
             ?? IOSAlgorithmConfiguration.defaultEmergencyExtraMinutes
+        includeBuddyDecoGas = try container.decodeIfPresent(Bool.self, forKey: .includeBuddyDecoGas) ?? false
         plannedDepthMeters = try container.decodeIfPresent(Double.self, forKey: .plannedDepthMeters) ?? 40
         plannedAverageDepthMeters = try container.decodeIfPresent(Double.self, forKey: .plannedAverageDepthMeters) ?? 20
         planningDepthReference = try container.decodeIfPresent(PlanningDepthReference.self, forKey: .planningDepthReference) ?? .maximumDepth
