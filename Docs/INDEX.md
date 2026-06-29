@@ -1,7 +1,25 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-28  
-**Branch consigliato:** `main` = `origin/main` @ `5d757cc`
+**Aggiornato:** 2026-06-29  
+**Branch consigliato:** `main` = `origin/main` @ `8ae1034`
+
+---
+
+## Aggiornamento indice 2026-06-28 — Orchestrator V1.2 refresh @ `8ae1034`
+
+Command **00** consolidation refresh after Command 10 remediation @ `5d757cc` and post-remediation reruns 01/02/04/05/06. Audit **03** UI/UX **STALE @ 7dfefe2** (optional rerun).
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `00-MASTER_SUPER_ORCHESTRATOR_FULL_AUDIT_SEQUENCE_AND_NON_REGRESSIVE_REMEDIATION_PLAN_COMMAND_V1.2.md` |
+| **Plan** | [`MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md`](MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md) |
+| **Findings register** | [`MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv`](MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv) (45 rows CONS-001..045) |
+| **Checklist** | [`MASTER_CONSOLIDATED_POST_REMEDIATION_AUDIT_RERUN_CHECKLIST_CURRENT.md`](MASTER_CONSOLIDATED_POST_REMEDIATION_AUDIT_RERUN_CHECKLIST_CURRENT.md) |
+| **Validate** | `./Scripts/validate_consolidated_software_readiness.sh` **PASS** |
+| **Verdict** | **PARTIAL** · P0=0 · P1 software open=0 · software **100%** · physical/external/legal **PENDING** · overall **~72%** |
+| **Audit baseline** | `8ae1034` (remediation `5d757cc`) |
+
+Deliverables: deduplication matrix, dependency graph, priority matrix, non-regression gates, remediation sequence, audit rerun plan, release blocker burndown, 7/14/30 roadmap, physical/external QA register, do-not-touch policies.
 
 ---
 

@@ -1,7 +1,7 @@
 # Master Do-Not-Touch Policy Register — Current
 
-**Orchestrator:** V1.2 @ `7dfefe2`  
-**Date:** 2026-06-28  
+**Orchestrator:** V1.2 refresh @ `8ae1034`  
+**Date:** 2026-06-29  
 **Purpose:** Policies remediation must not violate. See also `MASTER_NON_REGRESSION_GATE_MATRIX_CURRENT.csv`.
 
 ---
@@ -22,9 +22,9 @@
 |-----------|------|-------------------|--------|
 | DNTP-010 | Bühlmann / Schreiner / GF core math | Batch-1 complete + oracle rerun | Live decompression safety; P0 FC count must stay 0 |
 | DNTP-011 | Watch FC live runtime timer / degraded policy | Batch-1 evidence | 1Hz tick + degraded = safe posture; no silent reset on overlap |
-| DNTP-012 | Altitude environment propagation | Never without Batch-1 full matrix | import→runtime→logbook chain; prior P0 FIXED @ 7dfefe2 |
+| DNTP-012 | Altitude environment propagation | Never without Batch-1 full matrix | import→runtime→logbook chain; prior P0 FIXED |
 | DNTP-013 | CMAltimeter accept/reject flows | Batch-1 + physical QA | Environment sensor gating |
-| DNTP-014 | GF preset locked iosPlan import contract | Batch-4 complete + tests | Predive snapshot integrity; CONS-002 fix must preserve fail-closed |
+| DNTP-014 | GF preset locked iosPlan import contract | **CLOSED @ 5d757cc** — regression tests required | CONS-002 fixed; fail-closed preserved |
 
 ---
 
@@ -32,7 +32,7 @@
 
 | Policy ID | Area | Do not touch until | Reason |
 |-----------|------|-------------------|--------|
-| DNTP-020 | HMAC / nonce / replay / tombstone sync | Batch-2 complete | CONS-003..005 fixes must not weaken integrity |
+| DNTP-020 | HMAC / nonce / replay / tombstone sync | **CLOSED @ 5d757cc** — regression tests required | CONS-003..005 fixes must not weaken integrity |
 | DNTP-021 | Activity sync payload routing keys | Batch-2 complete | Cross-activity isolation |
 | DNTP-022 | Planner briefing cards reference-only | **Never** | `referenceOnlyKey` always true; no live planner state on Watch |
 | DNTP-023 | Legacy unsigned tombstone expansion | Never | Do not add unsigned fallbacks beyond documented compat |
@@ -51,11 +51,11 @@
 
 | Policy ID | Area | Do not touch until | Reason |
 |-----------|------|-------------------|--------|
-| DNTP-040 | Water auto-open predive gate | Batch-6 policy fix only | Must not auto-start live FC runtime; legal gate on intents |
+| DNTP-040 | Water auto-open predive gate | **CLOSED @ 5d757cc** — physical QA only | CONS-019 DepthCapabilityPolicy applied; must not auto-start live FC runtime |
 | DNTP-041 | Crown underwater navigation clamp | Batch-6 + physical QA | Do not re-enable Settings/Logbook during active session |
 | DNTP-042 | Action Button / App Intents router | Batch-6 + physical QA | Legacy intents must route through `WatchIntentSafetyPolicy` |
-| DNTP-043 | Shallow depth signing default | Batch-7 + physical QA | `WithShallowDepth` entitlements; do not ship full-depth FC on App Store shallow build |
-| DNTP-044 | Developer shallow Gauge/FC toggles | Batch-7 process only | Default OFF; internal-only labeling; TestFlight process discipline |
+| DNTP-043 | Shallow depth signing default | **CLOSED @ 5d757cc** — wet QA pending | `WithShallowDepth` entitlements; do not ship full-depth FC on App Store shallow build |
+| DNTP-044 | Developer shallow Gauge/FC toggles | **CLOSED @ 5d757cc** — process only | Default OFF; internal-only labeling; TestFlight process discipline |
 
 ---
 
@@ -84,7 +84,7 @@
 | Policy ID | Area | Do not touch until | Reason |
 |-----------|------|-------------------|--------|
 | DNTP-070 | Privacy manifests / Info.plist usage strings | Batch-7 + audit rerun | App Store rejection risk |
-| DNTP-071 | Entitlement declarations | Batch-7 | Shallow/full depth separation |
+| DNTP-071 | Entitlement declarations | **CLOSED @ 5d757cc** — wet QA pending | Shallow/full depth separation |
 | DNTP-072 | TOFU peer secret bootstrap | Documented accepted risk only | WC boundary; no bypass for convenience |
 
 ---
@@ -94,22 +94,25 @@
 | Policy ID | Area | Do not touch until | Reason |
 |-----------|------|-------------------|--------|
 | DNTP-080 | App Store / legal certification wording | Batch-9 + evidence gates | Unsupported claims liability; CONS-044 |
-| DNTP-081 | Documentation INDEX baseline SHAs | Batch-9 truth | False readiness reporting; CONS-034 |
-| DNTP-082 | `commands_for_cursor/01`–`04` bodies | Batch-9 repair only | CONS-001 P0 — wrong audit execution |
-| DNTP-083 | Performance generation tokens / background planner | Batch-5 verified | Recently remediated; regression tests required |
+| DNTP-081 | Documentation INDEX baseline SHAs | Batch-9 truth | False readiness reporting; CONS-034 partial |
+| DNTP-082 | `commands_for_cursor/01`–`04` bodies | **CLOSED @ 5d757cc** — regression guard only | CONS-001 FIXED — validate_commands_for_cursor_integrity.sh |
+| DNTP-083 | Performance generation tokens / background planner | **CLOSED @ 5d757cc** | CONS-027 deinit cancellation; regression tests required |
 
 ---
 
 ## Recently verified fixed — do not regress
 
-| Area | Evidence @ 7dfefe2 |
+| Area | Evidence @ 5d757cc |
 |------|-------------------|
+| Command 01–04 body alignment | `validate_commands_for_cursor_integrity.sh` PASS |
+| iOS GF preset parity + import | DivePlanPackageBuilderTests; 15/15 PASS |
+| Sync in-flight / userInfo ACK / tombstones | Audit 04 rerun P1=0 |
+| Shallow depth authority + dev toggles | validate_depth_capability_runtime_authority.sh; shallow gate PASS |
+| Water auto-open DepthCapabilityPolicy | WatchWaterAutoOpenPolicyTests lane |
+| PlannerStore deinit cancellation | Code review + perf concurrency lane |
 | Altitude P0 environment propagation | `OrchestratedAltitudeEnvironmentTests` |
-| Water auto-open cold-launch probe wiring | `WatchSubmersionLaunchProbe`, `WatchLaunchRoutingPolicyTests` |
 | Crown clamp + intent router | `WatchUnderwaterNavigationClampPolicyTests` |
-| Activity-scoped signed tombstones (Apnea/Snorkeling) | `ActivitySyncTombstoneTests` |
-| Legal gate on App Intents | `ActionButtonIntents` tests |
 
 ---
 
-**POLICY_REGISTER_STATUS: ACTIVE · 28 policies · Baseline 7dfefe2**
+**POLICY_REGISTER_STATUS: ACTIVE · 28 policies · Baseline 8ae1034**
