@@ -1,7 +1,21 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-29  
-**Branch consigliato:** `main` = `origin/main` @ `4d415c0`
+**Branch consigliato:** `main` = `origin/main` @ `88f9009`
+
+---
+
+## Aggiornamento indice 2026-06-29 — Snorkeling Map Type settings @ `88f9009`
+
+Snorkeling-only Satellite / Explore map type preference (default Satellite); iOS Route Planner, Session Detail, Dashboard preview; Watch settings parity (stored, no interactive Watch map yet).
+
+| Campo | Valore |
+|-------|--------|
+| **Spec** | [`SNORKELING_MAP_TYPE_SETTINGS.md`](SNORKELING_MAP_TYPE_SETTINGS.md) |
+| **Report** | [`SNORKELING_MAP_TYPE_SETTINGS_IMPLEMENTATION_REPORT_CURRENT.md`](SNORKELING_MAP_TYPE_SETTINGS_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **QA** | SNK-QA-022…025 · `Docs/QA_EVIDENCE/SNORKELING_MAP_TYPE_*` |
+| **Validate** | `./Scripts/validate_snorkeling_release_readiness.sh` **PASS** (internal) |
+| **Verdict** | **INTERNAL_READY** · **PHYSICAL_QA_PENDING** |
 
 ---
 
