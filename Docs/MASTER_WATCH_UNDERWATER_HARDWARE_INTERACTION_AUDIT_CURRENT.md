@@ -1,16 +1,19 @@
 # Master Watch Underwater Hardware Interaction Audit — Current
 
-**Command:** `03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.1.md` §30.2–30.3  
-**Audit date:** 2026-06-28  
+**Command:** `03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.2.md` §30.2–30.3  
+**Audit date:** 2026-06-29  
 **Branch:** `main`  
-**Commit:** `7dfefe2`  
-**Method:** Read-only static audit + XCTest contract review (tests NOT re-run — DerivedData lock)
+**Commit:** `15c8068`  
+**Prior baseline:** `7dfefe2`  
+**Method:** Read-only static audit + XCTest contract review
 
 ---
 
 ## Executive summary
 
-Digital Crown vertical paging and the **Underwater Primary Action** router pass **software** gates. Crown page policy restricts active-session navigation by activity. Alarm/overlay acknowledgement has highest priority. Legacy App Intents now route through `WatchIntentSafetyPolicy` during active sessions.
+Digital Crown vertical paging and the **Underwater Primary Action** router pass **software** gates at `15c8068`. Crown page policy restricts active-session navigation by activity. Alarm/overlay acknowledgement has highest priority. Legacy App Intents route through `WatchIntentSafetyPolicy` during active sessions.
+
+Consolidated remediation @ `5d757cc` did **not** change Crown/Action Button UX layout; CONS-019 depth gate affects startup/water routing only, not underwater page policy or primary-action resolver.
 
 | Layer | Verdict |
 |-------|---------|
@@ -37,18 +40,7 @@ Digital Crown vertical paging and the **Underwater Primary Action** router pass 
 | Underwater hint overlay | PASS | `WatchUnderwaterPrimaryActionHintView` |
 | Underwater Primary Action help panel | PASS | `SettingsView` `WatchShortcutHelpView` |
 | Legacy intents help panel | PASS | `shortcuts.help.legacy_intents.*` |
-
----
-
-## Closed findings (since 83f884e)
-
-| ID | Was | Now |
-|----|-----|-----|
-| P1-AB-001 | Legacy intents bypass router | **CLOSED** — `WatchIntentSafetyPolicy.routePrimaryActionIfUnderwaterSession` |
-| P2-UX-001 | Stale underwater help body | **CLOSED** — EN/IT updated |
-| P2-UX-002 | Missing Underwater Action help | **CLOSED** — help panel added |
-| P2-UX-003 | Diving-centric blocked toast | **CLOSED** — per-activity keys |
-| P2-TEST-002/003 | Stale/missing clamp tests | **CLOSED** — `WatchUnderwaterNavigationClampPolicyTests` |
+| FC GF presets not mutable via Action Button | PASS | Router does not expose GF mutation |
 
 ---
 
