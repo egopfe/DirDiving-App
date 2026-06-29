@@ -7,6 +7,7 @@ struct IOSSnorkelingDashboardView: View {
     @EnvironmentObject private var snorkelingNavigation: IOSSnorkelingNavigationStore
     @EnvironmentObject private var transferService: IOSSnorkelingWatchTransferService
     @EnvironmentObject private var sessionSyncService: IOSSnorkelingSessionSyncService
+    @EnvironmentObject private var settingsStore: IOSSnorkelingSettingsStore
 
     private var presentation: IOSSnorkelingDashboardPresentation {
         IOSSnorkelingDashboardPresentationMapper.make(
@@ -132,6 +133,7 @@ struct IOSSnorkelingDashboardView: View {
                         .stroke(segment.hasGapBefore ? DIRTheme.orange : DIRTheme.cyan, lineWidth: 2)
                     }
                 }
+                .mapStyle(IOSSnorkelingMapStyleMapper.mapStyle(for: settingsStore.mapType))
                 .frame(minHeight: 140)
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 if model.gapCount > 0 {

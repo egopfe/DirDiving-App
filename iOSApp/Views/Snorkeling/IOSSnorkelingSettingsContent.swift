@@ -48,6 +48,25 @@ struct IOSSnorkelingSettingsContent: View {
                 )
             }
 
+            DIRCard(DIRIOSLocalizer.string("snorkeling.map_type.title"), icon: "map.fill", accent: DIRTheme.cyan) {
+                Picker(DIRIOSLocalizer.string("snorkeling.map_type.title"), selection: mapTypeBinding) {
+                    ForEach(SnorkelingMapType.allCases) { type in
+                        Text(DIRIOSLocalizer.string(type.displayNameKey)).tag(type)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .accessibilityIdentifier("snorkeling.settings.map_type")
+
+                Text(DIRIOSLocalizer.string(settingsStore.mapType.descriptionKey))
+                    .font(.caption)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text(String(format: DIRIOSLocalizer.string("snorkeling.settings.map_type.current"), DIRIOSLocalizer.string(settingsStore.mapType.displayNameKey)))
+                    .font(.caption2)
+                    .foregroundStyle(DIRTheme.muted)
+            }
+
             DIRCard(DIRIOSLocalizer.string("snorkeling.ios.settings.alerts"), icon: "bell.fill", accent: DIRTheme.yellow) {
                 IOSCompanionSettingsIntStepperRow(
                     title: DIRIOSLocalizer.string("snorkeling.ios.settings.session_duration_alert_label"),
@@ -159,6 +178,13 @@ struct IOSSnorkelingSettingsContent: View {
         Binding(
             get: { settingsStore.settings.missionModeEnabled },
             set: { settingsStore.settings.missionModeEnabled = $0 }
+        )
+    }
+
+    private var mapTypeBinding: Binding<SnorkelingMapType> {
+        Binding(
+            get: { settingsStore.mapType },
+            set: { settingsStore.setMapType($0) }
         )
     }
 }

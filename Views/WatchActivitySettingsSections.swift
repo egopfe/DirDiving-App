@@ -109,6 +109,7 @@ struct WatchApneaActivitySettingsSection: View {
 struct WatchSnorkelingActivitySettingsSection: View {
     @EnvironmentObject private var dive: DiveManager
     @EnvironmentObject private var gps: GPSManager
+    @EnvironmentObject private var snorkelingMapTypeSettings: SnorkelingMapTypeSettingsStore
     @ObservedObject private var importedRoute = SnorkelingImportedRouteStore.shared
     @AppStorage(MissionModeSettings.autoEnableOnDiveStartKey) private var missionModeAutoEnableOnDiveStart = false
 
@@ -133,6 +134,45 @@ struct WatchSnorkelingActivitySettingsSection: View {
                 title: String(localized: "settings.snorkeling.route.title"),
                 subtitle: routePlan?.name ?? String(localized: "settings.snorkeling.route.subtitle")
             )
+
+            WatchSettingsSectionHeader(title: String(localized: "snorkeling.map_type.title"))
+            ForEach(SnorkelingMapType.allCases) { type in
+                Button {
+                    snorkelingMapTypeSettings.setMapType(type)
+                } label: {
+                    HStack(alignment: .top, spacing: 8) {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(String(localized: String.LocalizationValue(type.displayNameKey)))
+                                .font(DiveUI.Typography.rowTitle)
+                                .foregroundStyle(.white)
+                            Text(String(localized: String.LocalizationValue(type.descriptionKey)))
+                                .font(DiveUI.Typography.hintCaption)
+                                .foregroundStyle(DiveUI.secondaryText)
+                                .multilineTextAlignment(.leading)
+                        }
+                        Spacer(minLength: 0)
+                        if snorkelingMapTypeSettings.mapType == type {
+                            Image(systemName: "checkmark")
+                                .foregroundStyle(DiveUI.cyan)
+                        }
+                    }
+                    .frame(minHeight: DiveUI.Layout.settingsRowInteractiveMinHeight)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 7)
+                    .background(
+                        RoundedRectangle(cornerRadius: 7, style: .continuous)
+                            .fill(Color.black.opacity(0.52))
+                            .overlay(RoundedRectangle(cornerRadius: 7, style: .continuous).stroke(.white.opacity(0.24), lineWidth: 1))
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("snorkeling.watch.settings.map_type.\(type.rawValue)")
+            }
+
+            Text(String(format: String(localized: "snorkeling.settings.map_type.current"), String(localized: String.LocalizationValue(snorkelingMapTypeSettings.mapType.displayNameKey))))
+                .font(DiveUI.Typography.hintCaption)
+                .foregroundStyle(DiveUI.mutedText)
+                .multilineTextAlignment(.leading)
 
             if let routePlan {
                 settingsInfoRow(

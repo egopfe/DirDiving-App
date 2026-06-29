@@ -58,6 +58,10 @@ enum SnorkelingQAEvidenceCatalog {
         .init(qaID: "SNK-QA-019", folderName: "SNORKELING_HAPTICS", commandCategory: "SNORKELING_WATCH_UI", purpose: "Haptic alarms and marker confirmation on Watch", requiredDevice: "Physical Apple Watch", prerequisites: "Haptics enabled in settings", rollbackRequired: false),
         .init(qaID: "SNK-QA-020", folderName: "SNORKELING_WET_GLOVE", commandCategory: "SNORKELING_WATER_LOCK", purpose: "Wet glove / crown interaction limits", requiredDevice: "Physical Apple Watch", prerequisites: "Water Lock optional per scenario", rollbackRequired: false),
         .init(qaID: "SNK-QA-021", folderName: "SNORKELING_KEYCHAIN", commandCategory: "SNORKELING_IOS_WATCH_SYNC", purpose: "Sync crypto keychain trust and rotation", requiredDevice: "Paired iPhone + Watch", prerequisites: "Fresh install or key rotation scenario", rollbackRequired: true),
+        .init(qaID: "SNK-QA-022", folderName: "SNORKELING_MAP_TYPE_DEFAULT_SATELLITE", commandCategory: "SNORKELING_MAP_TYPE", purpose: "Default Satellite map type on Snorkeling maps", requiredDevice: "Physical iPhone", prerequisites: "Fresh install or reset map type preference", rollbackRequired: false),
+        .init(qaID: "SNK-QA-023", folderName: "SNORKELING_MAP_TYPE_EXPLORE_SELECTION", commandCategory: "SNORKELING_MAP_TYPE", purpose: "Explore map type selection and persistence", requiredDevice: "Physical iPhone", prerequisites: "Snorkeling settings accessible", rollbackRequired: false),
+        .init(qaID: "SNK-QA-024", folderName: "SNORKELING_MAP_TYPE_ROUTE_PLANNER_RENDERING", commandCategory: "SNORKELING_MAP_TYPE", purpose: "Route Planner map style follows Snorkeling map type", requiredDevice: "Physical iPhone", prerequisites: "Location permission granted; route draft", rollbackRequired: false),
+        .init(qaID: "SNK-QA-025", folderName: "SNORKELING_MAP_TYPE_SESSION_DETAIL_RENDERING", commandCategory: "SNORKELING_MAP_TYPE", purpose: "Session detail map style follows Snorkeling map type", requiredDevice: "Physical iPhone", prerequisites: "Snorkeling session with GPS track", rollbackRequired: false),
     ]
 
     static var folderCount: Int { entries.count }

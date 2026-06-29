@@ -800,6 +800,12 @@
 "settings.apnea.scope.note" = "Recupero, target e allarmi Apnea si configurano su iPhone e si applicano su Watch.";
 "settings.snorkeling.gps.title" = "GPS di superficie";
 "settings.snorkeling.gps.subtitle" = "Solo navigazione in superficie; nessuna promessa GPS subacquea";
+"snorkeling.map_type.title" = "Tipo mappa";
+"snorkeling.map_type.satellite" = "Satellite";
+"snorkeling.map_type.explore" = "Esplora";
+"snorkeling.map_type.satellite.description" = "Vista satellitare con etichette, utile per costa, baie, ingresso e uscita.";
+"snorkeling.map_type.explore.description" = "Vista cartografica standard, utile per strade, luoghi e orientamento generale.";
+"snorkeling.settings.map_type.current" = "Tipo mappa corrente: %@";
 "settings.snorkeling.route.title" = "Percorso e waypoint";
 "settings.snorkeling.route.subtitle" = "Sincronizzato dal planner iPhone";
 "settings.snorkeling.return.title" = "Ritorno al punto di ingresso";

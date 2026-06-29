@@ -9,6 +9,7 @@ struct IOSSnorkelingRoutePlannerView: View {
     @EnvironmentObject private var transferService: IOSSnorkelingWatchTransferService
     @EnvironmentObject private var watchSync: WatchSyncService
     @EnvironmentObject private var locationPermission: IOSLocationPermissionService
+    @EnvironmentObject private var settingsStore: IOSSnorkelingSettingsStore
 
     @State private var mapSelectionMode: MapSelectionMode = .entry
     @State private var mapPosition: MapCameraPosition = .automatic
@@ -67,6 +68,7 @@ struct IOSSnorkelingRoutePlannerView: View {
                                     .stroke(DIRTheme.cyan, lineWidth: 3)
                             }
                         }
+                        .mapStyle(IOSSnorkelingMapStyleMapper.mapStyle(for: settingsStore.mapType))
                         .frame(minHeight: 260)
                         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         .onTapGesture { location in

@@ -488,6 +488,7 @@ struct IOSSnorkelingDipDetailView: View {
 
 struct IOSSnorkelingSessionMapView: View {
     let model: SnorkelingSessionMapModel
+    @EnvironmentObject private var settingsStore: IOSSnorkelingSettingsStore
 
     var body: some View {
         DIRCard(DIRIOSLocalizer.string("snorkeling.ios.map.session_title"), icon: "map.fill", accent: DIRTheme.cyan) {
@@ -508,6 +509,7 @@ struct IOSSnorkelingSessionMapView: View {
                         )
                     }
                 }
+                .mapStyle(IOSSnorkelingMapStyleMapper.mapStyle(for: settingsStore.mapType))
                 .frame(minHeight: 220)
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
