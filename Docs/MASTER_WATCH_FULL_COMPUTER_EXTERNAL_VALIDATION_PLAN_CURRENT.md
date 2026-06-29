@@ -2,7 +2,7 @@
 
 **Audit command:** `01-MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V2.0.md`  
 **Date:** 2026-06-28  
-**Branch:** `main` @ `7dfefe2`  
+**Branch:** `main` @ `5d757cc` (post-remediation rerun)  
 **Status:** **PLANNED** — no external tool run or physical chamber evidence collected in this audit session
 
 ---
@@ -17,8 +17,8 @@ Independently confirm DIR Diving Apple Watch **Full Computer** live decompressio
 
 | Tool / reference | Role | Status |
 |---|---|---|
-| In-repo `IndependentBuhlmannOracle` | Primary **tissue** oracle (Audit-15) | **EXECUTED** — ML-01..ML-10 PASS @ 7dfefe2 |
-| Production `BuhlmannEngine.runtimeProjection` | TTS/schedule (used in sweep) | **EXECUTED** — partial independence (MWFC-P1-001) |
+| In-repo `IndependentBuhlmannOracle` | Primary tissue + TTS/schedule oracle (Audit-15) | **EXECUTED** — ML-01..ML-10 PASS prior; independent path verified @ 5d757cc |
+| Production `BuhlmannEngine.runtimeProjection` | Live FC presentation only (not oracle reference) | **EXECUTED** — oracle sweep uses independent reference (CONS-008 CLOSED) |
 | Subsurface / libdivecomputer ZH-L16C tables | Constant cross-check | **PENDING_EXTERNAL_VALIDATION** |
 | MultiDeco / V-Planner / GAP manual | TTS/stop spot checks | **PENDING_EXTERNAL_VALIDATION** |
 | Hand Schreiner calculations | Compartments 1,4,8 at t=130,404,1004 | **EXECUTED** via SchreinerAnalyticParityTests |
@@ -55,7 +55,7 @@ Export script: `Scripts/export_watch_live_buhlmann_replay_vectors.py`
 ## Physical validation strategy
 
 1. **Dry run:** Predive environment accept → start → verify frozen `FullComputerRuntimePlan.plannerEnvironment` in logbook metadata (PQ-015).
-2. **Simulator replay:** Audit-15 tests (completed @ 7dfefe2 — core FC suites PASS).
+2. **Simulator replay:** Audit-15 tests (prior evidence @ 7dfefe2; remediation targeted tests 36/36 PASS @ 5d757cc).
 3. **Paired-device logging:** Watch + iPhone sync round-trip for FC logbook environment fields (PQ-016).
 4. **Controlled water / pressure pot:** Ascent warnings and depth scaling (PQ-020, PQ-022).
 5. **Apple Watch Ultra underwater:** Real submersion depth API — **PENDING_PHYSICAL** only.

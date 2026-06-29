@@ -1,7 +1,7 @@
 Case_ID,Altitude_m,SurfacePressure_bar,Water_Type,Gas,Profile,Runtime_s,N2_01,N2_16,He_01,He_16,Ceiling_m,Controlling_Compartment,NDL_s,TTS_s,Schedule,Production_Result,Oracle_Result,Absolute_Error,Relative_Error,Pass,Severity,Evidence,Notes
 ALT-001,0,1.013250,salt,Air,ML-01 Air39→10m,1004,oracle_matched,oracle_matched,0,0,0.98@1004s,2@1004s,0,projection,deco stops,PASS,PASS,0 tissue,0,YES,—,Audit15Air39MultilevelProfileTests,Sea level full oracle
 ALT-002,500,0.954608,salt,Air,Import activation,0,init_altitude,init_altitude,0,0,N/A,1,N/A,N/A,N/A,PASS,PARTIAL,N/A,N/A,YES,—,OrchestratedAltitudeEnvironmentTests testImported500m,Env propagation not full ML replay
-ALT-003,1000,0.898746,salt,Air,Import activation,0,init_altitude,init_altitude,0,0,N/A,1,N/A,N/A,N/A,PASS,PARTIAL,N/A,N/A,PARTIAL,P2,OrchestratedAltitudeEnvironmentTests,Full ML oracle at 1000m NOT_EXECUTED this session
+ALT-003,1000,0.898746,salt,Air,Import activation,0,init_altitude,init_altitude,0,0,N/A,1,N/A,N/A,N/A,PASS,PARTIAL,N/A,N/A,PARTIAL,P2,OrchestratedAltitudeEnvironmentTests,Full ML oracle at 1000m NOT_EXECUTED; baseline 5d757cc post-remediation rerun
 ALT-004,1500,0.845560,salt,Air,Import+runtime plan,60,loaded,loaded,0,0,computed,1,>0,projection,ndl/deco,PASS,PARTIAL,within env tol,N/A,YES,—,OrchestratedAltitudeEnvironmentTests testImported1500m,Prior ALT-P0 FIXED
 ALT-005,2000,0.794952,fresh,Air,Import activation,0,init_altitude,init_altitude,0,0,N/A,1,N/A,N/A,N/A,PASS,PARTIAL,N/A,N/A,YES,—,OrchestratedAltitudeEnvironmentTests testImported500mAirAnd2000mFresh,
 ALT-006,4500,0.577283,salt,Nitrox,Max supported import,0,validated,validated,0,0,N/A,1,N/A,N/A,N/A,PASS,PARTIAL,N/A,N/A,PARTIAL,P2,PlannerEnvironment.make range,Watch ML profile NOT_EXECUTED
