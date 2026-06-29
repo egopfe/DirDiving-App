@@ -22,10 +22,10 @@ watch_gauge_ttv,Gauge TTV toggle,Diving,Gauge,no,SettingsView,SharedIOSSettingsS
 watch_fc_altitude,FC altitude sensor proposal,Diving,FC,no,SettingsView,WatchFullComputerAltitudeSensorProposalSettingsStore,yes,no,no,no,yes,partial,yes,yes,yes,WatchFullComputerAltitudeSensorSettingsTests,PASS,,,,
 watch_apnea_settings,Apnea in-mode settings,Apnea,Apnea,no,WatchApneaActivitySettingsSection,ApneaSettingsStore,no,yes,no,no,yes,no,yes,yes,yes,WatchSettingsRoutingTests,PASS,Blocked during active session,,,
 watch_snorkeling_settings,Snorkeling in-mode settings,Snorkeling,Snorkeling,no,WatchSnorkelingActivitySettingsSection,SnorkelingSettingsStore,no,no,yes,no,yes,no,yes,yes,yes,WatchSettingsRoutingTests,PASS,Blocked during active session,,,
-WAO-MODE,Water auto-open mode,Global,All,yes,Watch,WatchWaterAutoOpenSettingsView,WatchWaterAutoOpenPolicy,no,no,no,yes,yes,yes,no,yes,yes,yes,yes,PASS,Disabled during active dive @7dfefe2
+WAO-MODE,Water auto-open mode,Global,All,yes,Watch,WatchWaterAutoOpenSettingsView,WatchWaterAutoOpenPolicy,no,no,no,yes,yes,yes,no,yes,yes,yes,yes,PASS,Disabled during active dive @15c8068
 WAO-PREF-ACT,Preferred activity,Global,All,yes,Watch,WatchWaterAutoOpenSettingsView,WatchWaterAutoOpenPolicy,no,no,no,yes,yes,yes,no,yes,yes,yes,yes,PASS,
 WAO-PREF-DIV,Preferred diving mode,Diving,Gauge+FC,no,Watch,WatchWaterAutoOpenSettingsView,WatchWaterAutoOpenPolicy,yes,no,no,yes,yes,yes,no,yes,yes,yes,yes,PASS,Gauge only when Diving preferred
 watch_fc_gf_presets,FC GF preset selection,Diving,FC,no,Watch,FullComputerGradientFactorSelectionView,FullComputerGradientFactorSettingsStore,yes,no,no,no,yes,partial,yes,yes,yes,FullComputerGradientFactorSelectionView,PASS,Locked during dive/import/runtime
-dev_shallow_gauge,Developer shallow Gauge toggle,Diving,Gauge,no,Watch,DeveloperSettingsView,DeveloperSettings,yes,no,no,no,yes,no,no,no,yes,DeveloperSettingsView,PASS,Dev unlock only
-dev_shallow_fc,Developer shallow FC toggle,Diving,FC,no,Watch,DeveloperSettingsView,DeveloperSettings,yes,no,no,no,yes,no,no,no,yes,DeveloperSettingsView,PASS,Dev unlock only
+dev_shallow_gauge,Developer shallow Gauge toggle,Diving,Gauge,no,Watch,DeveloperSettingsView,DeveloperSettings,yes,no,no,no,yes,no,no,no,yes,DeveloperSettingsView,PASS,Dev unlock only; default OFF @ 5d757cc CONS-006
+dev_shallow_fc,Developer shallow FC toggle,Diving,FC,no,Watch,DeveloperSettingsView,DeveloperSettings,yes,no,no,no,yes,no,no,no,yes,DeveloperSettingsView,PASS,Dev unlock only; default OFF @ 5d757cc CONS-006
 dev_sensor_source,Developer sensor source,Global,All,no,Watch,DeveloperSettingsView,DeveloperSettings,yes,yes,yes,no,yes,no,no,no,yes,DeveloperSettingsView,PASS,Simulation labeled
