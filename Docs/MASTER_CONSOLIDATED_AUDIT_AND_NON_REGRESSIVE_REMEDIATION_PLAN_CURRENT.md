@@ -4,7 +4,7 @@
 **Execution date:** 2026-06-29  
 **Repository:** `egopfe/DirDiving-App`  
 **Branch:** `main`  
-**Commit:** `8ae1034` (includes remediation @ `5d757cc` + post-remediation audit docs @ `8ae1034`)  
+**Commit:** `4d415c0` (orchestrator touch-up; audit 03 @ `4d415c0`; remediation @ `5d757cc`; prior orchestrator @ `8ae1034`)  
 **Prior orchestrator:** `7dfefe2` · **Prior remediation:** Command 10 @ `5d757cc`  
 **Execution mode:** Read-only orchestration — no production code modified
 
@@ -12,7 +12,7 @@
 
 ## A. Executive Summary
 
-Orchestrator **V1.2 refresh** consolidates six upstream master audits after **Command 10 consolidated software remediation** and **post-remediation read-only reruns** of audits **01, 02, 04, 05, 06** @ `5d757cc` (committed in `8ae1034`). Audit **03 UI/UX** was **not rerun** — marked **STALE_UPSTREAM_AUDIT_OUTPUT @ 7dfefe2**; no UI layout changes in remediation wave; software-ready items remain valid.
+Orchestrator **V1.2 refresh** consolidates six upstream master audits after **Command 10 consolidated software remediation** and **post-remediation read-only reruns of all six audits (01–06)** @ `5d757cc`–`4d415c0`. Audit **03 UI/UX** refreshed @ `4d415c0` — **PARTIAL** (software PASS; physical/pixel PENDING).
 
 **Overall verdict: PARTIAL.** **Software-actionable scope: 100%** (`validate_consolidated_software_readiness.sh` PASS). **P0 software safety defects: 0.** **P1 software open: 0.** Physical and external evidence remain **0% executed** — do not claim PASS.
 
@@ -20,7 +20,7 @@ Orchestrator **V1.2 refresh** consolidates six upstream master audits after **Co
 |-----------|------:|-------|
 | Watch FC software | **92%** | SOFTWARE_READY |
 | iOS companion software | **92%** | SOFTWARE_READY |
-| UI/UX software | **100%** | SOFTWARE_READY (stale audit @ 7dfefe2) |
+| UI/UX software | **100%** | SOFTWARE_READY @ `4d415c0` |
 | Main code / sync / security | **93%** | SOFTWARE_READY |
 | Release / QA / legal software | **78%** | Mixed — physical/legal pending |
 | Documentation alignment | **72%** | PARTIAL (README/matrix P2 drift) |
@@ -30,24 +30,24 @@ Orchestrator **V1.2 refresh** consolidates six upstream master audits after **Co
 
 **Release posture:** Internal TestFlight software **READY** · External TestFlight **NOT READY** · App Store **NOT READY**
 
-**Recommended next:** Physical/external QA campaigns OR Command 10 follow-up doc-only (README/feature matrix) OR optional audit 03 rerun.
+**Recommended next:** Physical/external QA campaigns · optional doc-only README/feature matrix · legal/release packaging.
 
 ---
 
 ## B. Source Audit Inputs and Completeness
 
-| Audit | Command (filename) | Body @ 8ae1034 | Rerun @ 5d757cc | Outputs | Completeness |
-|-------|-------------------|----------------|-----------------|---------|--------------|
-| **01** Watch FC Forensic | `01-...V2.1.md` | **ALIGNED** | **COMPLETE** | 14+ `MASTER_WATCH_FULL_COMPUTER_*` | **COMPLETE** @ 5d757cc |
-| **02** iOS Deep | `02-...V1.1.md` | **ALIGNED** | **COMPLETE** | 9+ `MASTER_IOS_*` | **COMPLETE** @ 5d757cc |
-| **03** UI/UX Deep | `03-...V2.2.md` | **ALIGNED** | **SKIPPED** | 15+ `MASTER_UI_UX_*` @ 7dfefe2 | **STALE_UPSTREAM_AUDIT_OUTPUT** |
-| **04** Main/Sync/Security/Perf | `04-...V1.1.md` | **ALIGNED** | **COMPLETE** | 17+ `MASTER_MAIN_CODE_*` | **COMPLETE** @ 5d757cc |
-| **05** Release/QA/Legal | `05-...V1.1.md` | **ALIGNED** | **COMPLETE** | 10+ release gate matrices | **COMPLETE** @ 5d757cc |
-| **06** Documentation | `06-...V1.1.md` | **ALIGNED** | **COMPLETE** | 7+ `MASTER_DOCUMENTATION_*` | **COMPLETE** @ 5d757cc |
+| Audit | Command (filename) | Body @ 4d415c0 | Rerun | Outputs | Completeness |
+|-------|-------------------|----------------|-------|---------|--------------|
+| **01** Watch FC Forensic | `01-...V2.1.md` | **ALIGNED** | **COMPLETE** @ `5d757cc` | 14+ `MASTER_WATCH_FULL_COMPUTER_*` | **COMPLETE** |
+| **02** iOS Deep | `02-...V1.1.md` | **ALIGNED** | **COMPLETE** @ `5d757cc` | 9+ `MASTER_IOS_*` | **COMPLETE** |
+| **03** UI/UX Deep | `03-...V2.2.md` | **ALIGNED** | **COMPLETE** @ `4d415c0` | 17+ `MASTER_UI_UX_*` + WAO/HW | **COMPLETE** |
+| **04** Main/Sync/Security/Perf | `04-...V1.1.md` | **ALIGNED** | **COMPLETE** @ `5d757cc` | 17+ `MASTER_MAIN_CODE_*` | **COMPLETE** |
+| **05** Release/QA/Legal | `05-...V1.1.md` | **ALIGNED** | **COMPLETE** @ `5d757cc` | 10+ release gate matrices | **COMPLETE** |
+| **06** Documentation | `06-...V1.1.md` | **ALIGNED** | **COMPLETE** @ `5d757cc` | 7+ `MASTER_DOCUMENTATION_*` | **COMPLETE** |
 
-**CONS-001 command permutation:** **FIXED** — `validate_commands_for_cursor_integrity.sh` PASS @ `5d757cc`.
+**CONS-001 command permutation:** **FIXED** — `validate_commands_for_cursor_integrity.sh` PASS.
 
-**Audit 03 stale note:** No UI layout changes in remediation wave; CONS-019 WAO policy gate was software-only. Software-ready WAO/Crown/a11y findings @ 7dfefe2 remain valid; physical gates still PENDING.
+**Audit 03 @ 4d415c0:** CONS-019 WAO depth gate **FIXED_SOFTWARE**; `audit_accessibility_contracts.sh` PASS; pixel baselines **0/59 PENDING**; physical WAO/HW/a11y gates unchanged **PENDING_PHYSICAL**.
 
 ---
 
@@ -56,11 +56,12 @@ Orchestrator **V1.2 refresh** consolidates six upstream master audits after **Co
 | Field | Value |
 |-------|-------|
 | Branch | `main` ✓ |
-| HEAD | `8ae1034` |
+| HEAD | `4d415c0` |
 | Remediation commit | `5d757cc` (Command 10) |
+| Audit 03 refresh | `4d415c0` |
 | Pre-remediation baseline | `7dfefe2` |
-| Orchestrator prior | `7dfefe2` @ 2026-06-28 |
-| Orchestrator refresh | `8ae1034` @ 2026-06-29 |
+| Orchestrator prior | `8ae1034` @ 2026-06-29 |
+| Orchestrator refresh | `4d415c0` @ 2026-06-29 |
 | `commands_for_cursor/` | Present; **01–04 ALIGNED** (CONS-001 FIXED) |
 | Software readiness script | `validate_consolidated_software_readiness.sh` **PASS** |
 
@@ -70,7 +71,7 @@ Orchestrator **V1.2 refresh** consolidates six upstream master audits after **Co
 
 | Lane | Status | Evidence |
 |------|--------|----------|
-| Software-actionable findings | **100% closed** | Command 10 + reruns 01/02/04/05/06 |
+| Software-actionable findings | **100% closed** | Command 10 + reruns **01–06** |
 | Internal TestFlight (software) | **READY** | Audit 05 + consolidated script PASS |
 | External TestFlight | **NOT READY** | Physical QA 0%; external validation 0% |
 | App Store | **NOT READY** | + legal/marketing pending (CONS-044) |
@@ -78,11 +79,11 @@ Orchestrator **V1.2 refresh** consolidates six upstream master audits after **Co
 | External validation execution | **0%** | Templates only — NOT_EXECUTED |
 | Legal review | **PENDING** | CONS-044 template only |
 
-**June 2026 wave — consolidated status @ 8ae1034:**
+**June 2026 wave — consolidated status @ 4d415c0:**
 
 | Feature area | SOFTWARE_READY | PENDING_PHYSICAL / EXTERNAL |
 |--------------|:--------------:|----------------------------|
-| Water auto-open policy + Settings | **PASS** @ 5d757cc | Submerged auto-launch, end-to-end water entry, Water Lock |
+| Water auto-open policy + Settings | **PASS** @ `4d415c0` (audit 03) | Submerged auto-launch, end-to-end water entry, Water Lock |
 | Digital Crown underwater clamp | **PASS** | Crown paging underwater, Water Lock interaction |
 | Action Button / App Intents router | **PASS** | Ultra Action Button under Water Lock |
 | Cold-launch modal sequencing | **PASS** | Submersion probe on real hardware (400 ms timeout risk) |
@@ -151,9 +152,9 @@ No new escalations in this refresh. No severity downgrades applied.
 |----------|------------|
 | Command filename vs body (01–04) | **RESOLVED** @ 5d757cc — CONS-001 FIXED |
 | UI/UX 100% software vs Release 72% overall | **No conflict** — physical 0% weighting |
-| Audit 03 stale vs 04/05 WAO software PASS | **No conflict** — stale banner only; no layout change |
+| Audit 03 @ 4d415c0 vs 04/05 WAO software PASS | **Aligned** — CONS-019 verified in audit 03 |
 | Water auto-open SOFTWARE_READY vs Release PENDING_PHYSICAL | **No conflict** — both preserved |
-| Prior orchestrator @ 7dfefe2 | **Superseded** by this plan @ 8ae1034 |
+| Prior orchestrator @ 8ae1034 | **Superseded** by this plan @ 4d415c0 |
 
 **CROSS_AUDIT_CONFLICTS (technical): 0** · **COMMAND_INTEGRITY_CONFLICTS: 0**
 
@@ -271,11 +272,11 @@ Software P1 items (formerly Ranks 1–8) marked **COMPLETE @ 5d757cc**.
 
 ## T. Batch 6 — UI/UX Truthfulness / Accessibility
 
-**Status: COMPLETE (software) @ 5d757cc / stale audit 03**
+**Status: COMPLETE (software) @ 4d415c0 — audit 03 refreshed**
 
 - CONS-019 FIXED — DepthCapabilityPolicy on water auto-open path
 - **Remaining:** CONS-012 manual a11y; CONS-032 pixel baselines (physical)
-- Optional: rerun audit 03 @ HEAD for fresh UI/UX banner
+- All six upstream audits refreshed post-remediation (01–06 @ `5d757cc`–`4d415c0`)
 
 ---
 
@@ -333,7 +334,8 @@ See `MASTER_CURSOR_REMEDIATION_COMMAND_SEQUENCE_CURRENT.md`.
 See `MASTER_AUDIT_RERUN_PLAN_CURRENT.md`.
 
 **Completed post-remediation @ 5d757cc:** 01, 02, 04, 05, 06  
-**Stale:** 03 @ 7dfefe2 (optional rerun)  
+**Complete:** 01–06 @ `5d757cc`–`4d415c0`  
+**Stale:** none
 **This refresh:** 00 @ 8ae1034
 
 ---
@@ -380,8 +382,7 @@ Starting point **~72%** (not 71%) — software lane at 100%; physical/external d
 2. **Execute** Batch 8 physical QA campaigns (Ultra depth, shallow wet, WAO, underwater HW, paired sync).  
 3. **Execute** external Bühlmann comparison before App Store algorithm claims.  
 4. **Optional** doc-only: README baseline + feature matrix (CONS-034 partial).  
-5. **Optional** audit 03 rerun if UI/UX freshness required before external TF.  
-6. **Re-run orchestrator 00** after major evidence milestones.
+5. **Re-run orchestrator 00** after major evidence milestones (post physical QA).
 
 **Remediation execution readiness:** **READY** for physical/external campaigns (software prerequisites met).
 
@@ -394,7 +395,7 @@ MASTER_AUDIT_ORCHESTRATOR: PARTIAL
 COMMANDS_FOR_CURSOR_FOUND: PASS
 SUBCOMMAND_FILES_FOUND: PASS
 UPSTREAM_AUDITS_FOUND: PASS
-UPSTREAM_AUDITS_COMPLETE: PARTIAL (03 stale @ 7dfefe2; 01/02/04/05/06 refreshed @ 5d757cc)
+UPSTREAM_AUDITS_COMPLETE: PASS (01–06 refreshed @ 5d757cc–4d415c0)
 CONSOLIDATED_FINDINGS_REGISTER_CREATED: PASS
 DEDUPLICATION_MATRIX_CREATED: PASS
 DEPENDENCY_GRAPH_CREATED: PASS
@@ -430,15 +431,15 @@ APP_STORE_READINESS: NOT_READY
 PHYSICAL_QA: PENDING_PHYSICAL
 EXTERNAL_VALIDATION: PENDING_EXTERNAL_VALIDATION
 FIRST_REMEDIATION_BATCH: Batch-8 — Tests / QA / Evidence (physical campaigns)
-RECOMMENDED_NEXT_COMMAND: Physical/external QA campaigns OR Command 10 follow-up doc-only (README/matrix) OR optional audit 03 rerun
+RECOMMENDED_NEXT_COMMAND: Physical/external QA campaigns OR doc-only README/feature matrix OR legal/release packaging
 ```
 
 ### Final questions (§21 summary)
 
 | # | Answer |
 |---|--------|
-| 1 | Six upstream groups found — **YES** (03 stale) |
-| 2 | Stale: **03 @ 7dfefe2** — optional rerun |
+| 1 | Six upstream groups found — **YES** (all complete @ 4d415c0) |
+| 2 | Stale: **none** |
 | 3 | Technical conflicts: **0** |
 | 4–7 | P0=0 · P1=9 pending evidence · P2=15 · P3=6 · P4=1 |
 | 8 | 18 duplicate groups mapped |
@@ -450,14 +451,14 @@ RECOMMENDED_NEXT_COMMAND: Physical/external QA campaigns OR Command 10 follow-up
 | 15 | First batch: **Batch-8 evidence** |
 | 16–18 | UI polish deferred; docs/README before release claims |
 | 19 | Rerun 01/03/05 after physical QA; 00 after milestones |
-| 20 | Physical QA → external validation → legal → optional 03 |
+| 20 | Physical QA → external validation → legal |
 | 21–22 | Do-not-touch: Bühlmann, HMAC, Planner reference-only |
 | 23–25 | Roadmap in AD — 7d physical planning; 14d campaigns; 30d external+legal |
 | 26 | Remediation execution: **READY** (software) |
 | 27 | Internal TF software: **READY** |
 | 28–29 | External TF / App Store: **NOT READY** |
-| 30 | **Physical/external QA OR doc-only README/matrix OR audit 03** |
+| 30 | **Physical/external QA OR doc-only README/matrix** |
 
 ---
 
-**CONSOLIDATED_PLAN_STATUS: COMPLETE @ 8ae1034 · Orchestrator V1.2 refresh · 2026-06-29**
+**CONSOLIDATED_PLAN_STATUS: COMPLETE @ 4d415c0 · Orchestrator V1.2 refresh · 2026-06-29**
