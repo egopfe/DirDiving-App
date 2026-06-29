@@ -9,6 +9,7 @@ REG-007,Physical QA baselines,Prior audits,False confidence from software-only g
 REG-008,Documentation history,Multi-activity promotion,Readers follow stale experimental scope,Docs/README.md / Docs/INDEX.md historical sections,Contradiction remains,P2,MUIUX-P2-003,OPEN,
 REG-009,Accessibility,UI remediation waves,Safety state color-only,Semantic contract tests,Physical not rerun,P1,MUIUX-P1-003,OPEN,
 REG-010,Visual pixel regression,Mockup audit,Layout drift undetected,Software fixtures 59/59; pixel baselines 0/59,Gap remains,P2,MUIUX-P2-001,OPEN,
+REG-013,Water auto-open depth gate,CONS-019 remediation @ 5d757cc,Shallow WAO routes to FC predive,DIRStartupSelectionPolicy.resolveAutomaticStep,DepthCapabilityPolicy gate,,,PASS,CONS-019 FIXED_SOFTWARE @ 15c8068
 REG-011,Build verification @ HEAD,Audit execution,Unverified commit buildability,xcodebuild DerivedData lock then long isolated build,PARTIAL,P1,MUIUX-P1-005,OPEN,First attempt DB locked; isolated build inconclusive at report time
 REG-012,Planner ascent speed discoverability,UX polish,Users miss ascent settings in More only,Source routing audit,Open,P2,MUIUX-P2-004,OPEN,
 REG-V21-001,Water auto-open cold launch,Watch,Low,WatchLaunchRoutingPolicyTests,Fixed @9176da8,,,PASS,CLOSED P1-WAO-001
@@ -17,5 +18,7 @@ REG-V21-003,Underwater crown policy,Watch,Low,WatchUnderwaterNavigationClampPoli
 REG-V21-004,iOS settings mode switch,iOS,Low,IOSActivitySettingsModeSwitchTests,Verified,,,PASS,
 REG-V21-005,Logbook ownership,iOS+Watch,Low,WatchActivityLogbookRoutingTests,Verified,,,PASS,
 REG-V21-006,GF preset UI,Watch,Low,FullComputerGradientFactorSelectionView,Added @0673018,,,PASS,3 presets + lock
-REG-V21-007,Shallow depth capability UI,Watch,Low,DepthCapabilityTests + DivingModeSelectionView,Added @b666772,,,PASS,Entitlement-aware locks
+REG-V21-007,Shallow depth capability UI,Watch,Low,DepthCapabilityTests + DivingModeSelectionView,Added @b666772,,,PASS,Entitlement-aware locks; dev toggles default OFF @ 5d757cc
 REG-V21-008,Cold launch modal sequencing,Watch,Low,ContentView startupFlowPresented,Fixed @2e3f262,,,PASS,No double fullScreenCover
+REG-V21-009,CONS-019 WAO depth gate,Watch,Low,DIRStartupSelectionPolicy.resolveAutomaticStep,Fixed @ 5d757cc verified @ 15c8068,,,PASS,Policy-only; no UI layout change
+REG-V21-010,CONS-002 GF iOS import,iOS+Watch,Low,DivePlanPackageBuilder.gradientFactorPreset,Fixed @ 5d757cc,,,PASS,iOS emits preset; Watch import parity
