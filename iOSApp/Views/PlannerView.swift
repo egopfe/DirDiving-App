@@ -892,6 +892,19 @@ struct PlannerView: View {
                 )
                 plannerMutedFootnote(DIRIOSLocalizer.string("planner.emergency.extra_minutes.detail"))
                 Divider().overlay(DIRTheme.hairline)
+                Toggle(isOn: includeBuddyDecoGasBinding) {
+                    Text(DIRIOSLocalizer.string("planner.emergency.include_buddy_deco_gas.title"))
+                        .font(.callout)
+                        .foregroundStyle(.white)
+                }
+                .tint(DIRTheme.cyan)
+                Text(DIRIOSLocalizer.string("planner.emergency.include_buddy_deco_gas.description"))
+                    .font(.caption)
+                    .foregroundStyle(DIRTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, 4)
+                Divider().overlay(DIRTheme.hairline)
                 plannerReadOnlyRow(
                     DIRIOSLocalizer.string("planner.emergency.automatic_ascent"),
                     value: String(
@@ -933,6 +946,13 @@ struct PlannerView: View {
         Binding(
             get: { store.input.emergencyExtraMinutes },
             set: { store.input.emergencyExtraMinutes = ScheduleGasConsumptionService.normalizedEmergencyExtraMinutes($0) }
+        )
+    }
+
+    private var includeBuddyDecoGasBinding: Binding<Bool> {
+        Binding(
+            get: { store.input.includeBuddyDecoGas },
+            set: { store.input.includeBuddyDecoGas = $0 }
         )
     }
 
@@ -1881,6 +1901,9 @@ struct PlanResultView: View {
                         }
                         if modePresentation.showsGasLedger {
                             gasLedgerCard
+                        }
+                        if let emergencyDecoGas = store.plan.emergencyDecoGasAdequacy, emergencyDecoGas.hasDecoGasChecks {
+                            emergencyDecoGasCard(emergencyDecoGas)
                         }
                         if showsDecoStopsSection {
                             DecoStopsSectionView(rows: decoStopsPresentationRows)
@@ -2967,6 +2990,135 @@ struct PlanResultView: View {
                 }
             }
         }
+    }
+
+    private func emergencyDecoGasCard(_ report: EmergencyDecoGasAdequacyReport) -> some View {
+        let summaryColor = report.isOverallAdequate ? DIRTheme.green : DIRTheme.orange
+        return DIRCard(DIRIOSLocalizer.string("planner.emergency.deco_gas.title"), icon: "cross.case.fill", accent: summaryColor) {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(
+                    DIRIOSLocalizer.string(
+                        report.isOverallAdequate
+                            ? "planner.emergency.deco_gas.summary_adequate"
+                            : "planner.emergency.deco_gas.summary_not_adequate"
+                    )
+                )
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(summaryColor)
+                Text(
+                    String(
+                        format: DIRIOSLocalizer.string("planner.emergency.deco_gas.buddy_included.value"),
+                        DIRIOSLocalizer.string(
+                            report.buddyIncluded
+                                ? "planner.emergency.deco_gas.buddy_included.yes"
+                                : "planner.emergency.deco_gas.buddy_included.no"
+                        )
+                    )
+                )
+                .font(.caption)
+                .foregroundStyle(DIRTheme.muted)
+                if report.buddyIncluded && !report.isOverallAdequate {
+                    Text(DIRIOSLocalizer.string("planner.emergency.deco_gas.warning_buddy_insufficient"))
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.orange)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                ForEach(report.perGasResults) { result in
+                    Divider().overlay(DIRTheme.hairline)
+                    emergencyDecoGasResultRow(result)
+                }
+            }
+        }
+    }
+
+    private func emergencyDecoGasResultRow(_ result: DecoGasAdequacyResult) -> some View {
+        let statusColor = result.isAdequate ? DIRTheme.green : DIRTheme.red
+        let cylinderVolume = result.cylinderWaterCapacityLiters
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(result.gasName)
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(.white)
+                Spacer()
+                Text(
+                    DIRIOSLocalizer.string(
+                        result.isAdequate
+                            ? "planner.emergency.deco_gas.adequate"
+                            : "planner.emergency.deco_gas.not_adequate"
+                    )
+                )
+                .font(.caption.weight(.bold))
+                .foregroundStyle(statusColor)
+            }
+            emergencyDecoGasMetricRow(
+                titleKey: "planner.emergency.deco_gas.required_diver",
+                liters: result.requiredLitersPrimaryDiver,
+                cylinderVolume: cylinderVolume
+            )
+            if result.buddyIncluded {
+                emergencyDecoGasMetricRow(
+                    titleKey: "planner.emergency.deco_gas.required_buddy",
+                    liters: result.requiredLitersBuddy,
+                    cylinderVolume: cylinderVolume
+                )
+            }
+            emergencyDecoGasMetricRow(
+                titleKey: "planner.emergency.deco_gas.required_total",
+                liters: result.requiredLitersTotal,
+                cylinderVolume: cylinderVolume
+            )
+            emergencyDecoGasMetricRow(
+                titleKey: "planner.emergency.deco_gas.available",
+                liters: result.availableLiters,
+                cylinderVolume: cylinderVolume
+            )
+            if result.isAdequate {
+                emergencyDecoGasDeltaRow(
+                    titleKey: "planner.emergency.deco_gas.reserve",
+                    liters: result.reserveLiters,
+                    bar: result.reserveBar,
+                    isShortfall: false
+                )
+            } else {
+                emergencyDecoGasDeltaRow(
+                    titleKey: "planner.emergency.deco_gas.shortfall",
+                    liters: result.shortfallLiters,
+                    bar: result.shortfallBar,
+                    isShortfall: true
+                )
+            }
+        }
+    }
+
+    private func emergencyDecoGasMetricRow(titleKey: String, liters: Double, cylinderVolume: Double?) -> some View {
+        HStack {
+            Text(DIRIOSLocalizer.string(titleKey))
+                .font(.caption)
+                .foregroundStyle(DIRTheme.muted)
+            Spacer()
+            Text(String(format: DIRIOSLocalizer.string("planner.emergency.deco_gas.liters_only_format"), Formatters.zero(liters)))
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(.white)
+        }
+    }
+
+    private func emergencyDecoGasDeltaRow(titleKey: String, liters: Double, bar: Double?, isShortfall: Bool) -> some View {
+        HStack {
+            Text(DIRIOSLocalizer.string(titleKey))
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(DIRTheme.muted)
+            Spacer()
+            Text(emergencyDecoGasLitersBarDisplay(liters: liters, bar: bar))
+                .font(.caption.monospacedDigit().weight(.semibold))
+                .foregroundStyle(isShortfall ? DIRTheme.red : DIRTheme.green)
+        }
+    }
+
+    private func emergencyDecoGasLitersBarDisplay(liters: Double, bar: Double?) -> String {
+        if let bar {
+            return String(format: DIRIOSLocalizer.string("planner.emergency.deco_gas.liters_bar_format"), Formatters.zero(liters), Formatters.one(bar))
+        }
+        return String(format: DIRIOSLocalizer.string("planner.emergency.deco_gas.liters_only_format"), Formatters.zero(liters))
     }
 
     private var briefingCard: some View {

@@ -380,6 +380,8 @@ targets:
       - Models/PlannerBriefingCard.swift
       - iOSApp/Models/DemoDiveCatalog.swift
       - iOSApp/Models/DivePlan.swift
+      - iOSApp/Models/DecoGasAdequacyResult.swift
+      - iOSApp/Models/DivePlannerEmergencyOptions.swift
       - iOSApp/Models/RatioDecoModels.swift
       - iOSApp/Models/DiveSample.swift
       - iOSApp/Models/DiveSession.swift
@@ -427,6 +429,7 @@ targets:
       - iOSApp/Services/RepetitiveDivePlannerService.swift
       - iOSApp/Services/RouteSummaryService.swift
       - iOSApp/Services/ScheduleGasConsumptionService.swift
+      - iOSApp/Services/DivePlannerEmergencyDecoGasService.swift
       - iOSApp/Services/SubsurfaceExportService.swift
       - iOSApp/Services/WatchDiveSyncCodec.swift
       - iOSApp/Services/WatchSyncAuth.swift
