@@ -435,6 +435,14 @@
 "planner.table.row.a11y.two" = "%@, %@";
 "planner.table.row.a11y.three" = "%@, %@, %@";
 "logbook.delete.button.a11y" = "Delete dive log";
+"ios.location.permission.first_launch.title" = "Enable GPS location";
+"ios.location.permission.first_launch.body" = "DIR DIVING uses location for maps, entry, exit and waypoints in activities that require it. You can change this choice in iOS Settings.";
+"ios.location.permission.allow" = "Allow location";
+"ios.location.permission.not_now" = "Not now";
+"ios.location.permission.enable" = "Enable GPS location";
+"ios.location.permission.open_settings" = "Open Settings";
+"ios.location.permission.denied.body" = "Location access is disabled. You can enable it in iOS Settings.";
+"ios.location.permission.required.body" = "Location access is required to use maps, entry, exit and waypoints.";
 "ios.legal.welcome.card" = "Welcome";
 "ios.legal.welcome.title" = "Welcome to DIR Diving";
 "ios.legal.welcome.body" = "Before using the app, review and accept the safety disclaimer.";

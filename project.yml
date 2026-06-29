@@ -545,6 +545,8 @@ targets:
       - iOSApp/Utils/IOSApneaDashboardPresentation.swift
       - iOSApp/Utils/IOSApneaLogbookPresentation.swift
       - iOSApp/Utils/IOSApneaLocationPermission.swift
+      - iOSApp/Services/IOSLocationPermissionService.swift
+      - iOSApp/Utils/IOSFirstLaunchLocationPermissionPolicy.swift
       - iOSApp/Utils/IOSSnorkelingDashboardPresentation.swift
       - iOSApp/Utils/IOSSnorkelingLogbookPresentation.swift
       - iOSApp/Utils/IOSSnorkelingLocationPermission.swift
