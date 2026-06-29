@@ -1,90 +1,85 @@
 # Master Cursor Remediation Command Sequence — Current
 
-**Baseline:** `main` @ `7dfefe2`  
-**Orchestrator:** `00-MASTER_SUPER_ORCHESTRATOR...V1.2`  
-**Date:** 2026-06-28
+**Baseline:** `main` @ `8ae1034` (remediation @ `5d757cc`)  
+**Orchestrator:** `00-MASTER_SUPER_ORCHESTRATOR...V1.2` refresh  
+**Date:** 2026-06-29
 
-Execute remediation **only after** Batch 0 gates pass. Do not skip batches without documenting dependency override in the consolidated plan.
+**Command 10 consolidated software remediation: COMPLETE @ `5d757cc`.** Steps 0–8 below are **DONE**. Execute remaining steps without regressing closed findings.
 
 ---
 
 ## Sequence
 
-| Step | Command / action | Batch | Findings |
-|------|------------------|-------|----------|
-| 0 | **Batch 0:** Clean DerivedData; full `xcodebuild` iOS + Watch test @ `7dfefe2` | Batch-0 | CONS-014 |
-| 1 | **Batch 9 (doc P0):** Restore `commands_for_cursor/01`–`04` bodies from OOLD + V1.2 sources; add orchestrator STOP guard | Batch-9 | CONS-001 |
-| 2 | **Batch 4:** Align iOS GF presets with Watch FC; emit `gradientFactorPreset` in `DivePlanPackageBuilder` | Batch-4 | CONS-002, CONS-038 |
-| 3 | **Batch 2:** Fix sync in-flight stuck; symmetric userInfo ACK; harden tombstone HMAC | Batch-2 | CONS-003, CONS-004, CONS-005 |
-| 4 | **Batch 6:** Apply `DepthCapabilityPolicy` to water auto-open FC routing; fix WAO startup tests | Batch-6 | CONS-019, CONS-018 |
-| 5 | **Batch 1:** Oracle independence hardening OR documented external tolerance | Batch-1 | CONS-008 |
-| 6 | **Batch 5:** PlannerStore deinit task cancellation | Batch-5 | CONS-027 |
-| 7 | **Batch 3:** iOS navigation state restoration; settings store unification | Batch-3 | CONS-028, CONS-040 |
-| 8 | **Batch 7:** Shallow FC toggle labeling; signing manifest CI check | Batch-7 | CONS-006, CONS-007 |
-| 9 | **Physical QA:** Watch Ultra depth/CMAltimeter matrix | Batch-8 | CONS-010 |
-| 10 | **Physical QA:** Shallow wet + entitlement separation | Batch-8 | CONS-042 |
-| 11 | **Physical QA:** Water auto-open end-to-end + Water Lock | Batch-8 | CONS-021 |
-| 12 | **Physical QA:** Crown / Action Button underwater | Batch-8 | CONS-022 |
-| 13 | **Paired device QA:** sync + briefing + large payload + security | Batch-8 | CONS-011 |
-| 14 | **Accessibility field matrix:** VoiceOver + Dynamic Type | Batch-6 | CONS-012 |
-| 15 | **External validation:** Bühlmann reference tool comparison | Batch-8 | CONS-009, CONS-043 |
-| 16 | **Subsurface desktop round-trip** on exported CSV | Batch-8 | CONS-030 |
-| 17 | Pixel-diff baseline capture (59 mockups) | Batch-6 | CONS-032 |
-| 18 | **Release/legal:** PDF golden renders + counsel/marketing review | Batch-9 | CONS-013, CONS-044 |
-| 19 | Documentation INDEX/README/feature matrix repair | Batch-9 | CONS-034 |
-| 20 | Re-run **00 orchestrator V1.2** to refresh consolidated plan | — | All |
+| Step | Command / action | Batch | Findings | Status |
+|------|------------------|-------|----------|--------|
+| 0 | **Batch 0:** Full `xcodebuild` iOS + Watch targeted remediation tests | Batch-0 | CONS-014 | **COMPLETE** @ 5d757cc |
+| 1 | **Batch 9 (doc P0):** Restore `commands_for_cursor/01`–`04` bodies | Batch-9 | CONS-001 | **COMPLETE** @ 5d757cc |
+| 2 | **Batch 4:** Align iOS GF presets; emit `gradientFactorPreset` | Batch-4 | CONS-002, CONS-038 | **COMPLETE** @ 5d757cc |
+| 3 | **Batch 2:** Sync in-flight, userInfo ACK, tombstone HMAC | Batch-2 | CONS-003..005 | **COMPLETE** @ 5d757cc |
+| 4 | **Batch 6:** DepthCapabilityPolicy on water auto-open; WAO tests | Batch-6 | CONS-019, CONS-018 | **COMPLETE** @ 5d757cc |
+| 5 | **Batch 1:** Oracle independence verified | Batch-1 | CONS-008 | **COMPLETE** @ 5d757cc |
+| 6 | **Batch 5:** PlannerStore deinit task cancellation | Batch-5 | CONS-027 | **COMPLETE** @ 5d757cc |
+| 7 | **Batch 3:** iOS navigation / settings (deferred) | Batch-3 | CONS-028, CONS-040 | **OPEN** (P3) |
+| 8 | **Batch 7:** Shallow toggles + entitlement authority | Batch-7 | CONS-006, CONS-007 | **COMPLETE** @ 5d757cc |
+| 9 | **Physical QA:** Watch Ultra depth/CMAltimeter matrix | Batch-8 | CONS-010 | **NEXT** |
+| 10 | **Physical QA:** Shallow wet + entitlement separation | Batch-8 | CONS-042 | **NEXT** |
+| 11 | **Physical QA:** Water auto-open end-to-end + Water Lock | Batch-8 | CONS-021 | **NEXT** |
+| 12 | **Physical QA:** Crown / Action Button underwater | Batch-8 | CONS-022 | **NEXT** |
+| 13 | **Paired device QA:** sync + briefing + large payload | Batch-8 | CONS-011 | **NEXT** |
+| 14 | **Accessibility field matrix:** VoiceOver + Dynamic Type | Batch-6/8 | CONS-012 | **NEXT** |
+| 15 | **External validation:** Bühlmann reference comparison | Batch-8 | CONS-009, CONS-043 | **NEXT** |
+| 16 | **Subsurface desktop round-trip** on exported CSV | Batch-8 | CONS-030 | **NEXT** |
+| 17 | Pixel-diff baseline capture (59 mockups) | Batch-6/8 | CONS-032 | **NEXT** |
+| 18 | **Release/legal:** PDF golden renders + counsel review | Batch-9 | CONS-013, CONS-044 | **NEXT** |
+| 19 | Documentation README/feature matrix repair (doc-only) | Batch-9 | CONS-034 partial | **OPTIONAL** |
+| 20 | Optional audit **03** UI/UX rerun @ HEAD | — | Stale @ 7dfefe2 | **OPTIONAL** |
+| 21 | Re-run **00 orchestrator V1.2** after evidence milestones | — | All | **DONE** @ 8ae1034 |
 
 ---
 
-## Do-not-run early
+## Do-not-run / do-not-regress
 
-- Filename-based audits **01**–**04** until **CONS-001** repaired
-- UI polish-only commands before Batch 2 sync and Batch 4 GF fixes
-- Documentation claiming external validation before Batch 8 evidence exists
-- Performance micro-optimizations that weaken HMAC/ACK/replay (Batch 7 policy)
-- Converting `SOFTWARE_READY` water auto-open / Crown / GF UI into physical PASS
+- Do not revert CONS-001..008, CONS-019, CONS-027 fixes without audit rerun
+- Do not fabricate physical/external evidence (Batch 8 policy)
+- Do not convert `SOFTWARE_READY` WAO/Crown/GF into physical PASS
+- Do not weaken HMAC/ACK/tombstone paths (Batch 2 closed)
+- UI polish-only before evidence campaigns is **deprioritized** — software P1 closed
 
 ---
 
-## Recommended first commands after orchestrator
+## Recommended next commands
 
 ```text
-Batch 0 — Full build and test verification @ 7dfefe2 (clean DerivedData; fix 2 Watch test failures)
+Batch 8 — Physical QA campaign (Ultra depth, shallow wet, WAO, underwater HW, paired sync)
 ```
 
-Then (parallel tracks):
+Parallel optional track:
 
 ```text
-Batch 9 (doc) — Repair commands_for_cursor/01–04 permutation (CONS-001)
-Batch 4 — iOS GF preset alignment (CONS-002)
-Batch 2 — Sync reliability fixes (CONS-003..005)
-```
-
-Evidence track (no code unless blockers found):
-
-```text
-Batch 8 — Physical + external QA campaign planning and execution
+Batch 9 (doc-only) — README + DIR_DIVING_Feature_Comparison.csv repair (CONS-034 partial)
+Batch 8 — External Bühlmann + GF spot-check planning
+Optional — Audit 03 UI/UX rerun @ HEAD (fresh banner; not blocking internal TF software)
 ```
 
 ---
 
 ## Batch 0–9 reference (V1.2)
 
-| Batch | Scope |
-|-------|-------|
-| 0 | Baseline protection, build/test snapshot |
-| 1 | Watch FC safety, oracle, altitude, TTS tolerance |
-| 2 | Sync, persistence, HMAC, tombstones |
-| 3 | Activity architecture, Settings, Logbooks |
-| 4 | iOS Planner, GF presets, import parity |
-| 5 | Performance, concurrency, planner lifecycle |
-| 6 | UI/UX truthfulness, WAO policy, a11y, visual |
-| 7 | Security, privacy, depth entitlements, shallow gating |
-| 8 | Tests, physical QA, external validation, paired device |
-| 9 | Release, legal, documentation, command repair |
+| Batch | Scope | @ 8ae1034 |
+|-------|-------|-----------|
+| 0 | Baseline protection | **COMPLETE** |
+| 1 | Watch FC safety, oracle, altitude | **COMPLETE** (software) |
+| 2 | Sync, persistence, HMAC | **COMPLETE** |
+| 3 | Activity architecture | P3 backlog |
+| 4 | iOS Planner, GF presets | **COMPLETE** |
+| 5 | Performance, concurrency | **COMPLETE** (CONS-027) |
+| 6 | UI/UX truthfulness, WAO, a11y | **COMPLETE** (software) |
+| 7 | Security, depth entitlements | **COMPLETE** |
+| 8 | Physical QA, external validation | **ACTIVE** |
+| 9 | Release, legal, documentation | **PARTIAL** |
 
 ---
 
 ## Audit rerun triggers
 
-After any Batch 1/2/4/6/7 software change: rerun affected upstream audits per `MASTER_AUDIT_RERUN_PLAN_CURRENT.md` before updating release claims.
+Post-remediation reruns **01, 02, 04, 05, 06** complete @ `5d757cc`. After Batch 8 physical QA: rerun **01, 03, 05**; update physical register. See `MASTER_AUDIT_RERUN_PLAN_CURRENT.md`.

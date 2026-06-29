@@ -1,35 +1,31 @@
 # Master Finding Dependency Graph — Current
 
 **Orchestrator:** `00-MASTER_SUPER_ORCHESTRATOR...V1.2`  
-**Baseline:** `main` @ `7dfefe2`  
-**Date:** 2026-06-28
+**Baseline:** `main` @ `8ae1034` (remediation @ `5d757cc`)  
+**Date:** 2026-06-29
 
 ---
 
 ## Summary
 
-At `7dfefe2`, open work splits into **three lanes**: (1) **P0 doc integrity** — command permutation blocks trustworthy re-audit; (2) **P1 software** — GF import parity, sync reliability, depth gating; (3) **evidence execution** — physical and external QA at **0%**. Watch Full Computer **P0 software safety = 0**.
+Post **Command 10** software remediation and audits **01/02/04/05/06** rerun @ `5d757cc`, open work splits into **two lanes**: (1) **evidence execution** — physical and external QA at **0%**; (2) **P3 maintainability** — navigation, settings, stop FSM. Watch Full Computer **P0/P1 software = 0**. **CONS-001 command integrity CLOSED.**
 
 ---
 
-## Critical path
+## Critical path (post-remediation)
 
 ```mermaid
 graph TD
-  CONS001[CONS-001 Command 01-04 repair] --> RERUN[Trustworthy audit re-run]
-  CONS014[CONS-014 Build/test baseline] --> PHY[CONS-010 Physical Watch QA]
-  CONS014 --> PAIR[CONS-011 Paired sync QA]
-  CONS002[CONS-002 GF preset parity] --> GFEXT[CONS-043 GF external check]
-  CONS002 --> IMP[Watch plan import path]
-  CONS003[CONS-003 Sync in-flight] --> PAIR
-  CONS004[CONS-004 userInfo ACK] --> PAIR
-  CONS008[CONS-008 Independent oracle] --> EXT[CONS-009 External Bühlmann]
-  PHY --> EXT
-  PAIR --> REL[CONS-044 Legal release]
-  CONS034[CONS-034 Doc INDEX] --> REL
-  CONS021[CONS-021 WAO physical] --> EXTTF[External TestFlight gate]
-  CONS022[CONS-022 HW physical] --> EXTTF
-  CONS042[CONS-042 Shallow wet QA] --> EXTTF
+  PHY[CONS-010 Physical Watch QA] --> EXT[CONS-009 External Bühlmann]
+  PAIR[CONS-011 Paired sync QA] --> EXTTF[External TestFlight gate]
+  WAO[CONS-021 WAO physical] --> EXTTF
+  HW[CONS-022 Underwater HW QA] --> EXTTF
+  SHAL[CONS-042 Shallow wet QA] --> EXTTF
+  GFEXT[CONS-043 GF external check] --> EXT
+  EXT --> REL[CONS-044 Legal release]
+  PDF[CONS-013 PDF evidence] --> REL
+  DOC[CONS-034 README/matrix doc-only] --> REL
+  EXTTF --> REL
 ```
 
 ---
@@ -38,15 +34,27 @@ graph TD
 
 | Finding | Must precede | Because |
 |---------|--------------|---------|
-| **CONS-001** | Any filename-based audit re-run | Wrong body executes without repair |
-| **CONS-014** | CONS-010, CONS-011, CONS-012, CONS-021, CONS-022 | Evidence campaigns need verified build/test @ HEAD |
-| **CONS-002** | CONS-043, external GF/decompression claims | iOS→Watch GF must match before preset validation narrative |
-| **CONS-003, CONS-004, CONS-005** | CONS-011 paired QA closure | Field sync campaign validates fixes |
-| **CONS-008** | CONS-009 | External validation should use independent path or documented tolerance |
 | **CONS-010** | CONS-009, CONS-042 | Hardware depth/environment before decompression release claims |
-| **CONS-006, CONS-007** | CONS-042 | Shallow signing/process gates before wet shallow sign-off |
-| **CONS-034** | CONS-044 | Store copy must match documented scope before legal sign-off |
-| **CONS-019, CONS-020** | CONS-021 | Software WAO fixes should land before physical WAO campaign (optional ordering) |
+| **CONS-011** | External TF sync sign-off | Field sync validates CONS-003..005 fixes @ 5d757cc |
+| **CONS-009** | App Store algorithm claims | Third-party Bühlmann compare required |
+| **CONS-043** | GF release narrative (optional) | Software parity achieved — external spot-check for claims only |
+| **CONS-034** (partial) | CONS-044 | Store copy should match documented scope before legal sign-off |
+| **CONS-021, CONS-022** | External TF WAO/HW gates | SOFTWARE_READY @ 5d757cc — physical validates only |
+
+---
+
+## Resolved dependencies (do not reopen)
+
+| Finding | Closed @ | Unblocks |
+|---------|----------|----------|
+| **CONS-001** | 5d757cc | Trustworthy filename-based audit re-run |
+| **CONS-002** | 5d757cc | CONS-043 external GF narrative; Watch import path |
+| **CONS-003..005** | 5d757cc | CONS-011 paired QA validation |
+| **CONS-006, CONS-007** | 5d757cc | CONS-042 shallow wet QA (process gates met) |
+| **CONS-008, CONS-017..019** | 5d757cc | External oracle compare (CONS-009) |
+| **CONS-019** | 5d757cc | CONS-021 WAO physical (software gate applied) |
+| **CONS-027** | 5d757cc | — (maintainability) |
+| **CONS-034** | 5d757cc partial | INDEX wave; README/matrix optional |
 
 ---
 
@@ -54,9 +62,8 @@ graph TD
 
 | Finding | Batch | Notes |
 |---------|-------|-------|
-| CONS-028, CONS-040 | Batch-3 | Navigation/settings — independent of FC math |
-| CONS-027 | Batch-5 | Planner lifecycle — no safety blocker |
-| CONS-035..037 | Batch-1 | P3 maintainability — after Batch 0 |
+| CONS-028, CONS-040 | Batch-3 | Navigation/settings — not release blockers |
+| CONS-035..037 | Batch-1 P3 | Maintainability — after evidence if desired |
 | CONS-039, CONS-041 | Batch-3/4 | Accepted/future work |
 
 ---
@@ -67,7 +74,7 @@ Cannot close without hardware or field execution:
 
 - CONS-010, CONS-011, CONS-012, CONS-021, CONS-022, CONS-023, CONS-024, CONS-025, CONS-026, CONS-029, CONS-031, CONS-032, CONS-042, CONS-045
 
-**SOFTWARE_READY preserved:** CONS-021, CONS-022 software layers PASS @ 7dfefe2.
+**SOFTWARE_READY preserved:** CONS-021, CONS-022 software layers PASS @ 5d757cc.
 
 ---
 
@@ -77,14 +84,12 @@ Cannot close without hardware or field execution:
 
 ---
 
-## Resolved P0 software cluster (do not regress)
+## Stale upstream note
 
-Prior altitude/environment P0 verified **FIXED** @ `7dfefe2` via `OrchestratedAltitudeEnvironmentTests` and imported-plan environment propagation. Remediation must not reintroduce silent sea-level fallback.
-
-**Watch FC forensic P0 @ 7dfefe2: 0 open.**
+Audit **03 UI/UX @ 7dfefe2** — no layout changes in remediation; software-ready WAO/Crown findings remain valid. Optional rerun 03 @ HEAD does not block physical QA.
 
 ---
 
 ## June 2026 wave dependency note
 
-Water auto-open, Crown/Action Button, shallow depth, and GF presets touch **Batch 1, 4, 6, 7, 8**. Physical gates (CONS-021, CONS-022, CONS-042) depend on Batch 0 baseline only — no software P0 prerequisite beyond CONS-019 optional fix.
+Water auto-open, Crown/Action Button, shallow depth, and GF presets: **software batches COMPLETE**. Physical gates (CONS-021, CONS-022, CONS-042) depend on Batch 8 execution only.
