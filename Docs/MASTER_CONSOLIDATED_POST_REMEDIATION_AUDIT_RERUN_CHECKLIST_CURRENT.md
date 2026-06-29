@@ -24,8 +24,8 @@
 
 | # | Audit command file | Rerun status | Trigger | Notes |
 |---|-------------------|--------------|---------|-------|
-| 03 | `03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.2.md` | **Optional — skipped** | CONS-019 WAO UI path | No layout changes; policy gate only |
-| 00 | `00-MASTER_SUPER_ORCHESTRATOR_...V1.2.md` | **COMPLETE** @ `8ae1034` | Refresh consolidated % | CONS register + 12 deliverables refreshed; audit 03 stale noted |
+| 03 | `03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.2.md` | **COMPLETE** @ `15c8068` | CONS-019 WAO UI path; GF/shallow gates | **PARTIAL** — software PASS; CONS-019 FIXED; physical/pixel PENDING |
+| 00 | `00-MASTER_SUPER_ORCHESTRATOR_...V1.2.md` | **COMPLETE** @ `8ae1034` | Refresh consolidated % | CONS register + 12 deliverables refreshed; audit 03 refreshed @ `15c8068` |
 
 ---
 

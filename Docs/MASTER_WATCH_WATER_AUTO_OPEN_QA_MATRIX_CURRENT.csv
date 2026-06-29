@@ -1,5 +1,5 @@
 Requirement_ID,Area,Feature,Source_File,Source_Symbol,Expected_Behavior,Automated_Test,Simulator_Evidence,Physical_QA,Water_Lock_QA,Action_Button_QA,Digital_Crown_QA,Legal_Gate,Safety_Gate,Result,Severity,Finding_ID,Notes
-WAO-001,Policy,Default disabled,Utils/WatchWaterAutoOpenPolicy.swift,migrateIfNeeded,Default mode disabled,yes,yes,PENDING,n/a,n/a,n/a,n/a,PASS,PASS,,,@7dfefe2
+WAO-001,Policy,Default disabled,Utils/WatchWaterAutoOpenPolicy.swift,migrateIfNeeded,Default mode disabled,yes,yes,PENDING,n/a,n/a,n/a,n/a,PASS,PASS,,,@15c8068
 WAO-002,Policy,Three modes,Views/WatchWaterAutoOpenSettingsView.swift,body,Disabled Last Preferred,yes,yes,PENDING,n/a,n/a,n/a,n/a,PASS,PASS,,,
 WAO-003,Policy,Sanitize preferred,Utils/WatchWaterAutoOpenPolicy.swift,sanitize,Safe destination defaults,yes,yes,PENDING,n/a,n/a,n/a,n/a,PASS,PASS,,,
 WAO-004,Policy,Non-diving gauge semantics,Utils/WatchWaterAutoOpenPolicy.swift,sanitize,Apnea/Snorkeling no diving mode leak,yes,yes,PENDING,n/a,n/a,n/a,n/a,PASS,PASS,,,
@@ -16,6 +16,7 @@ WAO-014,Wiring,Normal icon launch ignores water policy,Utils/WatchLaunchRoutingP
 WAO-015,UX,Apply Route Now test path,Views/WatchWaterAutoOpenSettingsView.swift,applyConfiguredWaterRouteNow,In-app routing without dive start,yes,yes,PENDING,n/a,n/a,n/a,yes,PASS,PASS,,,
 WAO-016,UX,Modal sequencing disclaimer first,Views/ContentView.swift,startupFlowPresented,No double fullScreenCover,yes,partial,PENDING,n/a,n/a,n/a,n/a,PASS,PASS,,,@2e3f262
 WAO-017,Entitlement,Shallow depth plist flag,Utils/WatchAutomaticDepthLaunchConfiguration.swift,isEnabled,Reads WKSupportsAutomaticDepthLaunch,yes,yes,PENDING,n/a,n/a,n/a,n/a,PASS,PASS,,,Software reads plist; physical listing PENDING
+WAO-018,Policy,Depth capability gate on auto routing,Utils/DIRStartupSelectionPolicy.swift,resolveAutomaticStep,Shallow-only downgrades FC→gauge or mode selection before predive,yes,yes,PENDING,n/a,n/a,n/a,yes,PASS,PASS,P4,CONS-019,FIXED_SOFTWARE @ 5d757cc; verified L99-107 @ 15c8068
 WAO-T04,Test,Last selected FC predive,Tests/WatchAlgorithmTests/WatchWaterAutoOpenPolicyTests.swift,testLastSelectedFullComputerRoutesPrediveConfiguration,lastSelected FC predive,yes,yes,PENDING,n/a,n/a,n/a,n/a,PASS,PASS,,,CLOSED P2-TEST-001
 WAO-T05,Test,System submerged launch routing,Tests/WatchAlgorithmTests/WatchLaunchRoutingPolicyTests.swift,testSystemWaterAutoLaunchUsesWaterRoutingWhenEnabled,Submerged entry routes,yes,yes,PENDING,n/a,n/a,n/a,n/a,PASS,PASS,,,
 WAO-PHY-001,Physical,End-to-end water entry,Docs/QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_PREFERRED,README,Physical water auto-open,n/a,n/a,PENDING,PENDING,n/a,n/a,n/a,PENDING,PENDING,,,NOT_EXECUTED
