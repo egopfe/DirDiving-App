@@ -3,6 +3,8 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject private var navigation: AppNavigationStore
     @EnvironmentObject private var dive: DiveManager
+    @EnvironmentObject private var gps: GPSManager
+    @EnvironmentObject private var legalAcceptance: LegalAcceptanceStore
     @EnvironmentObject private var apneaRuntime: ApneaWatchRuntimeStore
     @EnvironmentObject private var snorkelingRuntime: SnorkelingWatchRuntimeStore
     @EnvironmentObject private var snorkelingLogbook: SnorkelingLogbookStore
@@ -13,6 +15,7 @@ struct ContentView: View {
     @State private var coldLaunchProbeTask: Task<Void, Never>?
 
     var body: some View {
+        WatchFirstLaunchLocationPermissionHost(launchDisclaimerPresented: $showLaunchDisclaimer) {
         TabView(selection: $navigation.selectedPage) {
             // MAIN stable runtime is single-mode Diving. Keep this scaffold hidden unless
             // multiple stable modes are explicitly enabled in a future non-experimental release.
@@ -152,6 +155,7 @@ struct ContentView: View {
             }
         }
         .animation(.easeInOut(duration: 0.22), value: activitySelection.modeChangeBlockedToast)
+        }
     }
 
     private var isAnySessionActive: Bool {

@@ -7,6 +7,7 @@ final class GPSManager: NSObject, ObservableObject {
     @Published private(set) var lastPoint: GPSPoint?
     @Published private(set) var lastSpeedMetersPerSecond: Double = 0
     @Published private(set) var authorizationStatus: CLAuthorizationStatus = .notDetermined
+    @Published private(set) var locationPermissionState: WatchLocationPermissionState = .notDetermined
     @Published private(set) var fallbackQuality: GPSFallbackQuality = .unavailable
     private let locationManager = CLLocationManager()
     private var previousSpeedSample: (point: GPSPoint, date: Date)?
@@ -28,9 +29,21 @@ final class GPSManager: NSObject, ObservableObject {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.distanceFilter = 5
+        refreshAuthorizationStatus()
+    }
+
+    func refreshAuthorizationStatus() {
+        authorizationStatus = locationManager.authorizationStatus
+        locationPermissionState = WatchLocationPermissionState.map(locationManager.authorizationStatus)
     }
 
     func requestAuthorization() { locationManager.requestWhenInUseAuthorization() }
+
+    func requestWhenInUseFromOnboarding() {
+        refreshAuthorizationStatus()
+        guard authorizationStatus == .notDetermined else { return }
+        locationManager.requestWhenInUseAuthorization()
+    }
     func start() {
         requestAuthorization()
         maintainsLocationUpdates = true
@@ -98,6 +111,7 @@ extension GPSManager: CLLocationManagerDelegate {
     nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         Task { @MainActor in
             authorizationStatus = manager.authorizationStatus
+            locationPermissionState = WatchLocationPermissionState.map(manager.authorizationStatus)
             guard authorizationStatus == .authorizedAlways || authorizationStatus == .authorizedWhenInUse else { return }
             guard maintainsLocationUpdates || bestEffortCapture != nil else { return }
             manager.startUpdatingLocation()

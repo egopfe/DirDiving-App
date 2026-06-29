@@ -122,7 +122,7 @@ struct WatchSnorkelingActivitySettingsSection: View {
 
             settingsInfoRow(
                 icon: "location.fill",
-                iconColor: gps.authorizationStatus == .denied ? DiveUI.red : DiveUI.green,
+                iconColor: gps.locationPermissionState.isAuthorized ? DiveUI.green : DiveUI.red,
                 title: String(localized: "settings.snorkeling.gps.title"),
                 subtitle: gpsStatusSubtitle
             )
@@ -168,14 +168,12 @@ struct WatchSnorkelingActivitySettingsSection: View {
     }
 
     private var gpsStatusSubtitle: String {
-        switch gps.authorizationStatus {
-        case .authorizedAlways, .authorizedWhenInUse:
+        switch gps.locationPermissionState {
+        case .authorized:
             return String(localized: "settings.snorkeling.gps.authorized")
         case .denied, .restricted:
             return String(localized: "settings.snorkeling.gps.denied")
         case .notDetermined:
-            return String(localized: "settings.snorkeling.gps.subtitle")
-        @unknown default:
             return String(localized: "settings.snorkeling.gps.subtitle")
         }
     }
