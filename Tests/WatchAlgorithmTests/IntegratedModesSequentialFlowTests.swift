@@ -21,6 +21,10 @@ final class IntegratedModesSequentialFlowTests: XCTestCase {
         #if DEBUG
         DIRStartupSelectionPolicy.resetForTests()
         FullComputerPrediveConfigurationStore.shared.resetForTests()
+        DeveloperSettings.resetShallowDepthDivingTestingForTests()
+        UserDefaults.standard.removeObject(forKey: SensorSourceMode.storageKey)
+        DeveloperSettings.setShallowGaugeTestingEnabled(true)
+        DeveloperSettings.setShallowDepthDivingTestingEnabled(true)
         SnorkelingSyncTestSupport.installDeterministicSecrets()
         #endif
 
@@ -72,6 +76,8 @@ final class IntegratedModesSequentialFlowTests: XCTestCase {
         #if DEBUG
         SnorkelingSyncTestSupport.resetSecrets()
         FullComputerPrediveConfigurationStore.shared.resetForTests()
+        DeveloperSettings.resetShallowDepthDivingTestingForTests()
+        UserDefaults.standard.removeObject(forKey: SensorSourceMode.storageKey)
         #endif
         try? FileManager.default.removeItem(at: diveTempDirectory)
         try await super.tearDown()

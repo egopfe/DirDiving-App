@@ -67,9 +67,6 @@ enum ActivitySyncTombstoneBroadcast {
                   entry.record.activity == activity else { continue }
             ids.insert(entry.record.sessionID)
         }
-        if activity == .diving {
-            ids.formUnion(ActivitySyncTombstoneCodec.legacyUUIDs(from: context, key: "dirdiving_deleted_session_ids"))
-        }
         return ids
     }
 

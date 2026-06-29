@@ -7,7 +7,17 @@ final class DIRModesAndStartupFlowTests: XCTestCase {
         super.setUp()
         #if DEBUG
         DIRStartupSelectionPolicy.resetForTests()
+        DeveloperSettings.resetShallowDepthDivingTestingForTests()
+        UserDefaults.standard.removeObject(forKey: SensorSourceMode.storageKey)
         #endif
+    }
+
+    override func tearDown() {
+        #if DEBUG
+        DeveloperSettings.resetShallowDepthDivingTestingForTests()
+        UserDefaults.standard.removeObject(forKey: SensorSourceMode.storageKey)
+        #endif
+        super.tearDown()
     }
 
     func testDefaultPreferences() {
@@ -29,6 +39,7 @@ final class DIRModesAndStartupFlowTests: XCTestCase {
     }
 
     func testAutomaticGaugeReadySkipsActivityUI() {
+        DeveloperSettings.setShallowGaugeTestingEnabled(true)
         DIRStartupSelectionPolicy.showActivitySelectionAtLaunch = false
         DIRStartupSelectionPolicy.defaultActivityMode = .diving
         DIRStartupSelectionPolicy.defaultDivingMode = .gauge
@@ -39,6 +50,7 @@ final class DIRModesAndStartupFlowTests: XCTestCase {
     }
 
     func testAutomaticFullComputerRequiresConfiguration() {
+        DeveloperSettings.setShallowDepthDivingTestingEnabled(true)
         DIRStartupSelectionPolicy.showActivitySelectionAtLaunch = false
         DIRStartupSelectionPolicy.defaultDivingMode = .fullComputer
         XCTAssertEqual(
@@ -98,7 +110,13 @@ final class DIRModesAndStartupFlowTests: XCTestCase {
     }
 
     func testFullComputerCompletionRequiresExplicitConfirm() {
+        DeveloperSettings.setShallowDepthDivingTestingEnabled(true)
         FullComputerPrediveConfigurationStore.shared.resetForTests()
+        FullComputerPrediveConfigurationStore.shared.setDraftEnvironment(
+            altitudeMeters: 0,
+            salinity: .salt,
+            source: .watchSettingsManual
+        )
         let store = DIRActivitySelectionStore()
         store.selectActivity(.diving)
         store.selectDivingMode(.fullComputer)
@@ -116,6 +134,7 @@ final class DIRModesAndStartupFlowTests: XCTestCase {
     }
 
     func testGaugePathCompletesWithoutPrediveConfirm() {
+        DeveloperSettings.setShallowGaugeTestingEnabled(true)
         let store = DIRActivitySelectionStore()
         store.selectActivity(.diving)
         store.selectDivingMode(.gauge)

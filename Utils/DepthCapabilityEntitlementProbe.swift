@@ -13,41 +13,48 @@ enum DepthCapabilityEntitlementProbe {
 
     static var hasShallowEntitlement: Bool {
         if let testHook_hasShallowEntitlement { return testHook_hasShallowEntitlement }
-        switch configuredTier {
-        case .shallow, .full:
-            return true
-        case .none:
-            return false
-        }
+        return runtimeAuthorityTier == .shallow || runtimeAuthorityTier == .full
     }
 
     static var hasFullEntitlement: Bool {
         if let testHook_hasFullEntitlement { return testHook_hasFullEntitlement }
-        switch configuredTier {
-        case .full:
-            return true
-        case .shallow, .none:
-            return false
-        }
+        return runtimeAuthorityTier == .full
     }
 
-    private enum ConfiguredTier: String {
-        case none
-        case shallow
-        case full
-    }
-
-    private static var configuredTier: ConfiguredTier {
+    /// Compile-time signing authority takes precedence over Info.plist metadata (CONS-007).
+    static var runtimeAuthorityTier: ConfiguredTier {
         #if DEPTH_ENTITLEMENT_FULL
         return .full
         #elseif DEPTH_ENTITLEMENT_SHALLOW
         return .shallow
         #else
+        return .none
+        #endif
+    }
+
+    enum ConfiguredTier: String {
+        case none
+        case shallow
+        case full
+    }
+
+    /// Metadata-only tier from Info.plist when compile-time authority is absent (non-authoritative for safety).
+    static var infoPlistMetadataTier: ConfiguredTier {
         if let raw = Bundle.main.object(forInfoDictionaryKey: infoPlistTierKey) as? String,
            let tier = ConfiguredTier(rawValue: raw.lowercased()) {
             return tier
         }
         return .none
-        #endif
+    }
+
+    private static var configuredTier: ConfiguredTier {
+        if runtimeAuthorityTier != .none {
+            return runtimeAuthorityTier
+        }
+        if let raw = Bundle.main.object(forInfoDictionaryKey: infoPlistTierKey) as? String,
+           let tier = ConfiguredTier(rawValue: raw.lowercased()) {
+            return tier
+        }
+        return .none
     }
 }

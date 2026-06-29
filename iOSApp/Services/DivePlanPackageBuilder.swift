@@ -59,6 +59,9 @@ enum DivePlanPackageBuilder {
             throw DivePlanPackageValidationError.invalidEnvironment
         }
 
+        let gfPresetRaw = PlannerModePolicy.matchingGFPreset(for: workingInput)?
+            .fullComputerGradientFactorPresetRawValue
+
         let body = DivePlanPackageBody(
             schemaVersion: DivePlanPackageCodec.currentSchemaVersion,
             algorithmVersion: DivePlanPackageCodec.algorithmVersion,
@@ -69,6 +72,7 @@ enum DivePlanPackageBuilder {
             environment: environmentPayload,
             gfLow: workingInput.gfLow,
             gfHigh: workingInput.gfHigh,
+            gradientFactorPreset: gfPresetRaw,
             gases: gases,
             bottomSegments: bottomSegments,
             plannedSwitches: switches,

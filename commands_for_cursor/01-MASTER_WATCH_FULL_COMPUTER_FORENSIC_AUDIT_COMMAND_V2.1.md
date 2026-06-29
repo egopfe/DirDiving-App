@@ -1,159 +1,192 @@
-# LAUNCH ORDER 04
+# LAUNCH ORDER 01
 
-**Launch order note:** FOURTH — main code, sync, security, privacy, performance and concurrency audit. Run after feature-specific audits to verify cross-cutting architecture, data integrity and performance risks.
+**Launch order note:** FIRST — Watch Full Computer forensic audit. Run this first because Full Computer safety, Bühlmann/Schreiner, altitude, CMAltimeter and live decompression are the highest-risk core.
 
-**Canonical numbered filename:** `04-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.0.md`
+**Canonical numbered filename:** `01-MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V2.0.md`
 
 ---
 
-# MASTER CURSOR / CODEX COMMAND — DIR DIVING MAIN CODE / SYNC / SECURITY / PERFORMANCE AUDIT — V1.0
+# MASTER CURSOR / CODEX COMMAND — DIR DIVING APPLE WATCH FULL COMPUTER FULL DEEP FORENSIC AUDIT — V2.0
 
 **Repository:** `egopfe/DirDiving-App`  
 **Required branch:** `main`  
-**Targets:**  
-
-```text
-DIRDiving Watch App
-DIRDiving iOS
-DIRDiving Watch Algorithm Tests
-DIRDiving iOS Algorithm Tests
-```
-
-**Task type:** audit-only, read-only, full deep code / sync / persistence / schema / security / privacy / performance / concurrency / battery audit  
-**Updated for latest development:**  
-
-```text
-DIR Diving
-├── Diving
-│   ├── Gauge
-│   └── Full Computer
-├── Apnea
-└── Snorkeling
-```
+**Primary target:** `DIRDiving Watch App`  
+**Primary test target:** `DIRDiving Watch Algorithm Tests`  
+**Secondary cross-target scope:** iOS Companion and Shared code only where they feed, validate, sync, export, compare, configure, or display values used by the Apple Watch Diving Computer / Full Computer  
+**Task type:** audit-only, read-only, safety-critical, forensic  
+**Updated for latest development:** Settings mode switch, activity isolation, Watch Full Computer altitude/environment policy, CMAltimeter proposal flow, multilevel Bühlmann/Schreiner runtime, live decompression state, planner briefing cards as reference-only, and strict no cross-activity leakage policy.
 
 **Merged source commands:**
 
 ```text
-5-DIR_DIVING_MAIN_DEEP_CODE_ANALYSIS_COMMAND_CCR_UPDATED_V3.0.md
-8-DIR_DIVING_SYNC_PERSISTENCE_SCHEMA_AUDIT_V3.0.md
-9-DIR_DIVING_SECURITY_PRIVACY_TRUST_AUDIT_V3.0.md
-10-DIR_DIVING_PERFORMANCE_CONCURRENCY_BATTERY_AUDIT_V3.0.md
-IOS_PERFORMANCE_OPTIMIZATION_AUDIT_COMMAND_V1.0.md
+MASTER_WATCH_DIVING_COMPUTER_FULL_AUDIT_COMMAND_V1.0.md
+15-DIR_DIVING_WATCH_LIVE_BUHLMANN_SCHREINER_MULTILEVEL_AUDIT_V3.0.md
 ```
 
-This command supersedes the separate deep-code, sync/persistence/schema, security/privacy/trust, global performance/concurrency/battery and iOS performance optimization audits by merging them into one single full deep comprehensive audit command.
+This command supersedes the previous separate Watch Full Computer master audit and the specialized Live Bühlmann/Schreiner multilevel audit by merging them into one single full deep comprehensive audit command for the Apple Watch Full Computer.
 
 ---
 
 # 0. ABSOLUTE EXECUTION RULE
 
-This is strictly read-only.
+This is a **single merged master forensic audit command** for the Apple Watch Diving Computer / Full Computer.
+
+Audit the production implementation exactly as it exists on `main`.
 
 Do **not** modify:
 
 - production code;
 - tests;
 - project configuration;
+- localization;
 - assets;
 - mockups;
-- localization resources;
-- runtime documentation;
 - algorithms;
 - business logic;
-- sync schemas;
 - persistence schemas;
-- security model;
+- sync schemas;
 - Git history.
 
 Do **not**:
 
 - refactor;
 - apply fixes;
-- change UI;
-- change UX;
-- change app visual identity;
-- change Watch live runtime;
-- change Buehlmann / Bühlmann math;
-- change Schreiner;
-- change Haldane;
+- change UI/UX;
+- change gas logic;
 - change Gradient Factors;
-- change NDL / TTS / ceiling;
-- change decompression schedule;
-- change gas-switch logic;
-- change Apnea recovery logic;
-- change Snorkeling GPS/geodesy;
-- change CCR/Rebreather logic;
-- weaken HMAC/security;
+- change decompression-stop rules;
+- change sampling frequency;
+- change power-management behavior;
 - commit;
 - push;
 - merge.
 
-You may create or update only the requested audit reports and matrices under `Docs/` and the validation scripts explicitly listed in this command.
+The only permitted writes are audit outputs under `Docs/`.
 
 If a defect is found, record it as an open finding with:
 
 ```text
 severity
 priority
-area
-platform
-activity
-mode
-affected files/symbols
 root cause
-user impact
+affected files/symbols
+affected profile/timestamp/compartment where applicable
+mathematical impact
 safety impact
-security/privacy impact
-performance impact
-data-integrity impact
-recommended remediation
-tests required
-acceptance criteria
+user-visible impact
+required remediation
+acceptance tests
 release impact
+physical QA requirement
+external validation requirement
 ```
 
-Do not implement the fix.
+Never claim physical Apple Watch / underwater / CMAltimeter / depth sensor / external decompression validation from simulator evidence.
 
-Never claim physical Apple Watch, physical iPhone, paired-device, underwater, Instruments, penetration-test, certification, App Store or external decompression validation unless actual evidence exists.
-
-If evidence is unavailable, mark:
+If hardware, Xcode, a physical Watch, permissions, safe test location, external decompression oracle, pressure pot/chamber, or Instruments are unavailable, mark the evidence:
 
 ```text
 PENDING_PHYSICAL
-PENDING_INSTRUMENTS
-PENDING_PAIRED_DEVICE_QA
 PENDING_EXTERNAL_VALIDATION
 NOT_EXECUTED
 ```
+
+Do not convert missing evidence into a pass.
 
 ---
 
 # 1. MASTER OBJECTIVE
 
-Perform a complete and deep audit of the entire `main` codebase covering:
+Perform the deepest possible audit of the Apple Watch **Full Computer** implementation.
 
-1. Bugs and crash risks.
-2. Data-loss and data-corruption risks.
-3. Activity architecture and cross-activity isolation.
-4. Settings ownership.
-5. Logbook ownership.
-6. Sync, schema, persistence, migration, backup and restore.
-7. WatchConnectivity transport, HMAC, signed ACK and replay behavior.
-8. Security, privacy and trust.
-9. File import/export security.
-10. Image, photo and briefing-card payload routing.
-11. Planner briefing-card versioning, metadata and reference-only policy.
-12. Performance, concurrency, battery, memory and thermal risks.
-13. iOS-specific performance optimization.
-14. Watch runtime performance and Full Computer update deadlines.
-15. iOS Planner recalculation / chart / logbook / map scalability.
-16. SwiftUI invalidation, MainActor overuse, retain-cycle risks and stale async publication.
-17. Cloud/iCloud KVS, conflict, tombstone and payload-size behavior.
-18. App Intents / Action Button safety gates.
-19. Developer Sensor Source and simulation release safety.
-20. External/physical QA gates that must not be falsely marked passed.
+This audit must combine:
 
-The audit must verify the current product architecture:
+1. Full Watch Diving Computer architecture audit.
+2. Full Watch algorithm and mathematical-functions audit.
+3. Full Watch live Bühlmann ZH-L16C runtime audit.
+4. Full Watch Schreiner equation forensic audit.
+5. Full one-second / actual elapsed-time tissue update audit.
+6. Full multilevel-dive decompression-obligation audit.
+7. Full altitude-aware pressure/environment audit.
+8. Full CMAltimeter → Full Computer environment-source audit.
+9. Full environment authority / explicit acceptance audit.
+10. Full gas-switch, PPO2/MOD, TTS, ceiling, NDL and schedule audit.
+11. Full decompression-stop state-machine audit.
+12. Full persistence / checkpoint / restore audit.
+13. Full logbook / sync / export integrity audit.
+14. Full planner briefing card / CCR reference-only safety audit.
+15. Full independent oracle parity and external validation plan.
+16. Full physical Apple Watch QA matrix.
+
+The complete chain to audit is:
+
+```text
+Activity selection
+→ Diving
+→ Full Computer
+→ Predive configuration
+→ environment source
+   ├── imported iPhone Plan
+   ├── manually entered Watch environment
+   └── Watch CMAltimeter sensor proposal
+→ explicit user confirmation
+→ immutable Full Computer runtime plan
+→ local surface pressure
+→ water density / salinity
+→ ambient absolute pressure
+→ inspired N2 / He partial pressure
+→ initial equilibrium for all 16 N2 and 16 He compartments
+→ Haldane / Schreiner update
+→ actual elapsed-time / one-second live integration
+→ GF ceiling
+→ NDL
+→ TTS
+→ decompression schedule
+→ gas switching
+→ decompression stop-state machine
+→ warnings / UI / haptics
+→ checkpoint / restore
+→ completed-dive logbook metadata
+→ sync / export / iOS parity
+→ physical / external validation gates
+```
+
+---
+
+# 2. CENTRAL FORENSIC QUESTION
+
+The audit must explicitly answer this scenario:
+
+```text
+A diver descends to 39 m on Air.
+The diver remains long enough to incur a decompression obligation.
+The diver ascends to 10 m.
+The diver remains at 10 m for an extended time.
+The Watch must continue updating all 16 N2 and all 16 He compartments.
+The Watch must continuously recalculate ceiling, NDL, TTS and schedule.
+The previous decompression obligation may reduce.
+The decompression obligation may disappear only if the current tissue state mathematically permits direct ascent.
+The decompression obligation may reappear after a later descent.
+```
+
+The audit must not assume that decompression disappears merely because the diver spends time at 10 m.
+
+At 10 m:
+
+- fast compartments may off-gas;
+- some compartments may remain supersaturated;
+- slow compartments may still on-gas depending on current tissue pressure, gas composition, and inspired inert-gas pressure;
+- the controlling compartment may change;
+- the ceiling may reduce, remain stable, or evolve non-monotonically;
+- decompression may disappear only when the complete current tissue state, Gradient Factors, ambient pressure, and ascent model permit surfacing.
+
+The implementation must derive the answer from the actual 16-compartment state, not from elapsed shallow time, a cached schedule, a stop timer, or a heuristic.
+
+---
+
+# 3. CURRENT PRODUCT ARCHITECTURE TO RESPECT
+
+The current product architecture is:
 
 ```text
 DIR Diving
@@ -164,93 +197,142 @@ DIR Diving
 └── Snorkeling
 ```
 
-Both Apple Watch and iOS Companion are multi-activity apps.
-
----
-
-# 2. REQUIRED OUTPUT FILES
-
-Create or replace:
+This audit focuses on:
 
 ```text
-Docs/MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_CURRENT.md
-Docs/MASTER_MAIN_CODE_FINDING_TRACEABILITY_CURRENT.csv
-Docs/MASTER_MAIN_ARCHITECTURE_RISK_MATRIX_CURRENT.csv
-Docs/MASTER_SYNC_MESSAGE_NAMESPACE_MATRIX_CURRENT.csv
-Docs/MASTER_SCHEMA_MIGRATION_COMPATIBILITY_MATRIX_CURRENT.csv
-Docs/MASTER_BACKUP_RESTORE_ISOLATION_MATRIX_CURRENT.csv
-Docs/MASTER_SECURITY_THREAT_MODEL_CURRENT.md
-Docs/MASTER_PRIVACY_DATA_FLOW_MATRIX_CURRENT.csv
-Docs/MASTER_PERFORMANCE_BUDGET_MATRIX_CURRENT.csv
-Docs/MASTER_CONCURRENCY_RISK_MATRIX_CURRENT.csv
-Docs/MASTER_IOS_PERFORMANCE_BUDGET_MATRIX_CURRENT.csv
-Docs/MASTER_IOS_PERFORMANCE_SCALABILITY_MATRIX_CURRENT.csv
-Docs/MASTER_PHYSICAL_PERFORMANCE_QA_PLAN_CURRENT.md
-Docs/MASTER_SECURITY_REMEDIATION_PLAN_CURRENT.md
-Docs/MASTER_MAIN_CODE_REMEDIATION_PLAN_CURRENT.md
-Scripts/validate_master_main_code_sync_security_performance_audit.sh
+Diving → Full Computer → Apple Watch live runtime
 ```
 
-Do not create production changes.
+However, it must verify that Full Computer logic remains isolated from Gauge, Apnea and Snorkeling.
+
+Mandatory isolation rules:
+
+```text
+Gauge math/runtime → Gauge only
+Full Computer Bühlmann/decompression → Full Computer only
+Apnea lifecycle/recovery math → Apnea only
+Snorkeling GPS/navigation math → Snorkeling only
+```
+
+Mandatory negative checks:
+
+- Full Computer tissues must not be mutated by Gauge.
+- Full Computer tissues must not be mutated by Apnea.
+- Full Computer tissues must not be mutated by Snorkeling.
+- Planner briefing cards must not mutate live Watch tissues.
+- iOS Planner must not mutate an active Watch Full Computer dive.
+- iOS Settings mode switch must not remotely switch an active Watch session.
+- Watch activity Settings must not leak Apnea/Snorkeling settings into Full Computer.
+- No cross-activity checkpoint restore.
+- No cross-activity logbook contamination.
+- No cross-activity settings leakage.
 
 ---
 
-# 3. SEVERITY MODEL
+# 4. PRODUCT SAFETY POSITIONING
 
-## P0 — Must block any internal safety-critical use
+Preserve current safety posture:
+
+- no certified dive-computer claim;
+- no certified decompression-planner claim;
+- no CCR controller claim;
+- no life-support controller claim;
+- no EN13319 / ISO 6425 / CE claim unless official evidence exists;
+- physical Apple Watch QA remains pending unless physically executed;
+- depth-sensor wet validation remains pending unless physically executed;
+- CMAltimeter physical validation remains pending unless physically executed;
+- external Bühlmann/decompression validation remains pending unless actually executed;
+- Planner briefing cards remain reference-only;
+- CCR / Rebreather metadata remains reference-only unless explicitly implemented, validated and positioned as live authority.
+
+Any unsupported claim is a release/legal finding.
+
+---
+
+# 5. REQUIRED OUTPUT FILES
+
+Create or replace only these files:
+
+```text
+Docs/MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_CURRENT.md
+Docs/MASTER_WATCH_FULL_COMPUTER_FEATURE_INVENTORY_CURRENT.csv
+Docs/MASTER_WATCH_FULL_COMPUTER_REQUIREMENT_TEST_MATRIX_CURRENT.csv
+Docs/MASTER_WATCH_FULL_COMPUTER_EDGE_CASE_MATRIX_CURRENT.csv
+Docs/MASTER_WATCH_FULL_COMPUTER_ALTITUDE_MATRIX_CURRENT.csv
+Docs/MASTER_WATCH_FULL_COMPUTER_FAILURE_INJECTION_MATRIX_CURRENT.csv
+Docs/MASTER_WATCH_FULL_COMPUTER_SCHREINER_TEST_VECTOR_MATRIX_CURRENT.csv
+Docs/MASTER_WATCH_FULL_COMPUTER_MULTILEVEL_DECO_TRANSITION_MATRIX_CURRENT.csv
+Docs/MASTER_WATCH_FULL_COMPUTER_NUMERICAL_ERROR_BUDGET_CURRENT.md
+Docs/MASTER_WATCH_FULL_COMPUTER_FINDING_TRACEABILITY_CURRENT.csv
+Docs/MASTER_WATCH_FULL_COMPUTER_PHYSICAL_QA_MATRIX_CURRENT.csv
+Docs/MASTER_WATCH_FULL_COMPUTER_EXTERNAL_VALIDATION_PLAN_CURRENT.md
+```
+
+No production source writes are permitted.
+
+---
+
+# 6. SEVERITY MODEL
+
+## P0 — Safety-critical / must block any Full Computer release
 
 Use P0 for:
 
-- cross-activity data corruption;
-- wrong activity payload decoded into wrong store;
-- wrong Settings or Logbook ownership affecting safety data;
-- tissue/checkpoint corruption;
-- false no-decompression state due to race/performance failure;
-- stale async result overwriting newer safety/planner data;
-- sync/HMAC bypass or replay that can corrupt data;
-- profile merge that silently fuses divergent dives;
-- unbounded memory growth causing realistic termination;
-- path traversal or arbitrary file write/delete;
-- simulation sensor silently active in release;
-- App Intent bypassing legal/safety gate;
-- briefing-card metadata mutating live Watch runtime;
-- cloud backup exposing sensitive data without opt-in.
+- false no-decompression clearance;
+- Watch shows no decompression while oracle says decompression is required;
+- wrong ceiling due to math, altitude, tissue, gas or timing error;
+- missed mandatory decompression stop;
+- tissue reset during active dive;
+- corrupted tissue state;
+- stale schedule presented as current;
+- gas switch retroactively applied;
+- stop timer force-clears ceiling;
+- sea-level pressure silently used when altitude-aware mode is implied;
+- stale/unvalidated sensor environment authorizes Full Computer start;
+- active-dive environment changes silently;
+- checkpoint/restore substitutes a different environment or fresh tissues;
+- failure path becomes optimistic NDL/TTS/zero ceiling;
+- NaN/Inf propagates into user-facing deco state;
+- cross-activity state corrupts Full Computer runtime;
+- planner/CCR/reference-card value affects live decompression authority.
 
-## P1 — Must fix before internal TestFlight
+## P1 — Serious algorithm/release blocker
 
 Use P1 for:
 
-- crash risk with realistic data;
-- sync queue without backpressure;
-- schema migration ambiguity;
-- stale payload accepted;
-- large logbook unusable;
-- planner recalculation storm;
-- heavy math on main thread;
-- map/chart unbounded rendering;
-- missing security/privacy manifest;
-- missing physical/paired-device evidence for safety-relevant path;
-- developer mode not safely hidden.
+- material Bühlmann/Schreiner error;
+- timing drift causing material ceiling/TTS/NDL error;
+- segment discontinuity;
+- incorrect GF interpolation;
+- wrong controlling compartment;
+- incomplete altitude propagation;
+- incomplete all-16 N2/He coverage;
+- TTS or schedule not fully oracle-swept;
+- request-generation/lifecycle risk in CMAltimeter sampling;
+- missing fail-closed behavior for sampling/restore/timing faults;
+- Watch/iOS parity mismatch;
+- insufficient independent oracle coverage;
+- inadequate persistence/logbook provenance.
 
 ## P2
 
-Use P2 for:
-
-- bounded performance issue;
-- missing performance budget;
-- missing signpost;
-- incomplete negative tests;
-- incomplete privacy documentation;
-- incomplete conflict/tombstone coverage;
-- inefficient but bounded path.
+Use P2 for safe failures with incomplete diagnostics, bounded numerical discrepancy, incomplete UI truthfulness, missing negative tests, incomplete documentation, incomplete QA plan, performance risk without proven wrong output, or incomplete observability.
 
 ## P3
 
-Use P3 for documentation gaps, observability gaps, non-blocking optimizations and maintainability.
+Use P3 for maintainability, observability, non-blocking performance, documentation clarity and polish.
+
+## P4
+
+Use P4 for optional improvements.
+
+Any unresolved P0 means final audit verdict is `FAIL`.
+
+Missing physical Watch or external decompression evidence prevents full `PASS`.
 
 ---
 
-# 4. PREFLIGHT
+# 7. PREFLIGHT AND BASELINE
 
 Run:
 
@@ -259,6 +341,7 @@ git branch --show-current
 git rev-parse --short HEAD
 git rev-parse HEAD
 git fetch --prune origin
+git rev-parse --short origin/main
 git status --short
 git status -sb
 git rev-list --left-right --count HEAD...origin/main
@@ -266,7 +349,21 @@ git remote -v
 xcodebuild -version
 ```
 
-Stop if branch is not `main`.
+If available:
+
+```bash
+gh auth status
+```
+
+Requirements:
+
+- branch must be exactly `main`;
+- local HEAD and origin/main status must be recorded;
+- dirty worktree must be recorded;
+- no production files may be changed;
+- if code is behind/diverged/dirty, document limitation and decide whether baseline is valid.
+
+Stop and report `BASELINE_INVALID` if branch is not `main`.
 
 Inspect:
 
@@ -274,16 +371,16 @@ Inspect:
 project.yml
 README.md
 Docs/**
-iOSApp/**
+Shared/**
+App/**
 Views/**
 Services/**
 Models/**
 Utils/**
-Shared/**
 Tests/**
 Scripts/**
 Resources/**
-Assets.xcassets/**
+iOSApp/**
 ```
 
 Record:
@@ -293,55 +390,60 @@ branch
 commit
 origin/main
 dirty files
-Watch target
-iOS target
+targets
+source folders
+excluded files
 test targets
 entitlements
 bundle IDs
-experimental exclusions
+deployment targets
 available simulators
 Xcode version
+watchOS SDK
+iOS SDK
 physical Watch availability
-physical iPhone availability
-paired-device availability
-Instruments availability
-external validation availability
+external oracle availability
 ```
 
 ---
 
-# 5. BUILD AND TEST BASELINE
+# 8. BUILD AND TEST BASELINE
 
-If environment allows, run:
+If environment allows:
 
 ```bash
 xcodegen generate
+
 ./Scripts/check_main_target_isolation.sh
 ./Scripts/check_secrets.sh
 ./Scripts/audit_localization.sh
 ```
 
-Build:
+Build Watch:
 
 ```bash
 xcodebuild -project DIRDiving.xcodeproj \
   -scheme "DIRDiving Watch App" \
   -destination 'generic/platform=watchOS Simulator' \
   CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
-
-xcodebuild -project DIRDiving.xcodeproj \
-  -scheme "DIRDiving iOS" \
-  -destination 'generic/platform=iOS Simulator' \
-  CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
 ```
 
-Run:
+Run Watch tests:
 
 ```bash
 xcodebuild -project DIRDiving.xcodeproj \
   -scheme "DIRDiving Watch Algorithm Tests" \
   -destination 'platform=watchOS Simulator,name=Apple Watch Series 11 (46mm)' \
   CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO test
+```
+
+If shared code, parity or iOS planner inputs are relevant:
+
+```bash
+xcodebuild -project DIRDiving.xcodeproj \
+  -scheme "DIRDiving iOS" \
+  -destination 'generic/platform=iOS Simulator' \
+  CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
 
 xcodebuild -project DIRDiving.xcodeproj \
   -scheme "DIRDiving iOS Algorithm Tests" \
@@ -349,784 +451,2438 @@ xcodebuild -project DIRDiving.xcodeproj \
   CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO test
 ```
 
-Do not fix failures. Record exact command, destination, duration, passed/failed/skipped and limitations.
+Record:
+
+```text
+exact command
+destination
+build result
+test count
+failures
+skips
+duration
+simulator limitations
+```
+
+Do not fix failures.
 
 ---
 
-# 6. ARCHITECTURE / TARGET MEMBERSHIP AUDIT
+# 9. EXISTING AUDIT COVERAGE AND SPECIALIZED GAP
+
+Before auditing, inspect the latest relevant reports/commands if present:
+
+```text
+0-DIR_DIVING_IOS_COMPLETE_MATH_FUNCTIONS_AUDIT_CCR_UPDATED_V3.0.md
+1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_UPDATED_V3.0.md
+2-DIR_DIVING_WATCH_COMPLETE_ALGORITHM_AUDIT_CCR_UPDATED_V3.0.md
+3-DIR_DIVING_IOS_COMPLETE_ALGORITHM_AUDIT_CCR_UPDATED_V3.0.md
+5-DIR_DIVING_MAIN_DEEP_CODE_ANALYSIS_COMMAND_CCR_UPDATED_V3.0.md
+10-DIR_DIVING_PERFORMANCE_CONCURRENCY_BATTERY_AUDIT_V3.0.md
+12-DIR_DIVING_TEST_QA_EVIDENCE_AUDIT_V3.0.md
+15-DIR_DIVING_WATCH_LIVE_BUHLMANN_SCHREINER_MULTILEVEL_AUDIT_V3.0.md
+MASTER_WATCH_DIVING_COMPUTER_FULL_AUDIT_COMMAND_V1.0.md
+```
+
+State explicitly:
+
+- what is already covered by broad Watch audits;
+- what is newly covered by this merged forensic audit;
+- which gaps this command closes.
+
+Expected specialized coverage:
+
+```text
+exact Schreiner formula verification
+unit and rate conventions
+one-second / actual-dt semantics
+missed/delayed/duplicated/out-of-order tick behavior
+continuity across depth ramps
+segment boundary correctness
+live multilevel schedule invalidation and rebuilding
+dynamic deco-obligation regression
+controlling-compartment migration
+tissue-state conservation across lifecycle events
+independent second-by-second oracle parity
+numerical error budget
+Watch-specific concurrency and stale-publication risk
+fail-safe behavior when computation cannot keep pace
+```
+
+---
+
+# 10. TARGET MEMBERSHIP AND SOURCE AUTHORITY AUDIT
+
+From `project.yml`, generated project membership and build logs, prove:
+
+- Full Computer production files are compiled into `DIRDiving Watch App`;
+- shared Bühlmann core files are compiled into correct targets;
+- `FullComputerEnvironmentSensorService.swift`, if present, is compiled into production Watch target;
+- CoreMotion is linked where required;
+- effective Watch `Info.plist` contains Motion usage disclosure where required;
+- Full Computer runtime is not dead/test-only code;
+- no experimental implementation shadows production one;
+- there is one canonical live tissue state;
+- no duplicated live decompression authority exists;
+- no iOS-only altitude provider supplies live Watch Full Computer path;
+- no legacy Gauge-only path can start Full Computer accidentally;
+- no Planner briefing card path can become live runtime authority.
+
+Search:
+
+```bash
+rg -n "FullComputer|Buhlmann|Buehlmann|Schreiner|Haldane|Gradient|GF|ceiling|NDL|TTS|deco|decompression|tissue|compartment|gasSwitch|CMAltimeter|CMAbsoluteAltitudeData|altitude|surfacePressure|waterDensity|seaLevel|legacyUnknown|PlannerBriefingCard|CCR|Rebreather|setpoint|diluent|bailout" App Services Shared Utils Views Models Tests iOSApp project.yml
+```
+
+Classify each match as:
+
+```text
+production live authority
+predive proposal
+manual/imported source
+derived runtime value
+test fixture
+independent oracle
+reference-only planner card
+display-only
+persistence/cache
+unsupported payload
+unsafe fallback
+```
+
+---
+
+# 11. FULL FEATURE INVENTORY
+
+Create:
+
+```text
+Docs/MASTER_WATCH_FULL_COMPUTER_FEATURE_INVENTORY_CURRENT.csv
+```
+
+Required columns:
+
+```text
+Feature_ID
+Activity
+Mode
+Feature
+Canonical_Source
+Runtime_Owner
+Input_Validation
+Mathematical_Functions
+Persistence
+Restore
+Sync
+Presentation
+Tests
+Independent_Oracle
+External_Validation
+Physical_QA
+Readiness_Percent
+Notes
+```
+
+Inventory:
+
+## Diving / Gauge boundary
+
+```text
+depth
+max depth
+average depth
+runtime
+ascent rate
+TTV
+alarms
+reminders
+lifecycle thresholds
+sensor validation
+unit conversion
+persistence
+sync/export
+Gauge → Full Computer boundary
+```
+
+## Diving / Full Computer
+
+```text
+environment source
+CMAltimeter proposal
+manual Watch environment
+imported iPhone Plan environment
+local surface pressure
+salinity
+water density
+ambient pressure
+inspired inert pressures
+water-vapour pressure
+all 16 N2 compartments
+all 16 He compartments
+Haldane
+Schreiner
+actual elapsed time
+one-second semantics
+GF Low/High
+ceiling
+NDL
+TTS
+decompression schedule
+first stop
+stop increments
+stop-state machine
+gas definitions
+gas switching
+PPO2/MOD
+CNS/OTU if live
+controlling compartment
+multilevel continuity
+checkpoint restore
+logbook metadata
+export/sync
+UI/haptic warnings
+fail-closed states
+```
+
+## Reference-only compatibility
+
+```text
+Planner briefing cards
+PNG card rendering
+structured metadata
+decompression stop reference values
+Rock Bottom / emergency gas
+gas ledger
+CCR setpoints
+diluent
+bailout
+gas density
+stale/superseded card policy
+```
+
+---
+
+# 12. LIVE ENGINE ARCHITECTURE MAP
+
+Build a call graph from sensor sample to displayed result:
+
+```text
+Depth/pressure sample
+→ validation/filtering
+→ monotonic timestamp
+→ depth/ambient-pressure conversion
+→ active gas resolution
+→ inspired inert-gas pressure
+→ tissue update
+→ GF/ceiling computation
+→ NDL/decompression schedule/TTS
+→ stop-state machine
+→ published runtime state
+→ UI/haptic/persistence
+```
+
+Identify exact symbols responsible for:
+
+```text
+tissue initialization
+tissue update
+Schreiner calculation
+Haldane constant-depth calculation
+pressure-depth conversion
+water-vapour pressure
+surface pressure
+N2 inspired pressure
+He inspired pressure
+mixed a/b coefficients
+GF interpolation
+ceiling
+NDL
+schedule generation
+TTS
+first stop
+stop rounding
+gas switching
+decompression-stop tracking
+controlling compartment
+runtime publication
+state checkpointing/restoration
+```
+
+Classify each component:
+
+```text
+Component
+File/Symbol
+Canonical
+Derived
+PresentationOnly
+Stateful
+ActorOrThread
+Tests
+Evidence
+```
+
+---
+
+# 13. ROOT FLOW AND FULL COMPUTER STARTUP AUTHORITY
 
 Audit:
 
-- repository structure;
-- target membership;
-- shared files between Watch and iOS;
-- duplicate code;
-- stale/dead files;
-- orphan views/services;
-- experimental leakage;
-- build settings;
-- entitlements;
-- generated project policy;
-- localization resources;
-- documentation consistency;
-- test target coverage.
+```text
+Launch
+→ legal/onboarding gate
+→ activity selection
+→ Diving
+→ Full Computer
+→ Predive Settings / Confirmation
+→ accepted environment
+→ confirmed profile
+→ commitConfirmedProfile
+→ FullComputerRuntimePlan
+→ FullComputerPrediveReadiness
+→ DiveManager Full Computer start
+→ FullComputerRuntimeEngine.init(plan:sessionStart:)
+```
+
+Verify:
+
+- legal/safety prerequisites before Full Computer start;
+- no default sea-level runtime plan authorizes start;
+- no incomplete environment authorizes start;
+- profile/environment committed atomically;
+- start revalidates freshness;
+- gas/environment cannot be mixed from different sources;
+- accepted environment frozen at dive start;
+- later altimeter callback cannot mutate active plan;
+- Watch setting change cannot mutate active plan;
+- iPhone sync cannot mutate active plan;
+- Planner briefing card cannot mutate active plan.
+
+Search:
+
+```bash
+rg -n "FullComputerRuntimeEngine\\(|FullComputerRuntimeEngine\\.canStart|FullComputerRuntimePlan\\(|seaLevelSaltWater|legacyUnknown|runtimePlan\\(|commitConfirmedProfile|confirmedEnvironment|draftEnvironment|pendingSensorProposal" Services Shared Utils Views Tests
+```
+
+---
+
+# 14. ENVIRONMENT SOURCE POLICY
+
+Evaluate exact policy:
+
+## Imported from iPhone Plan
+
+- preserve complete signed/validated plan environment;
+- never silently overwritten by sensor proposal;
+- source displayed and logged.
+
+## Manually entered on Watch
+
+- altitude/environment setting on Watch;
+- validated before use;
+- source displayed and logged.
+
+## Sensor-measured proposal
+
+- sampled directly from Watch absolute-altitude sensor immediately before Full Computer confirmation;
+- requires explicit diver acceptance;
+- never becomes authority automatically.
+
+## No sea-level fallback
+
+- no exposed sea-level shortcut;
+- no implicit sea-level fallback;
+- validated zero/near-zero altitude may naturally occur;
+- missing environment must fail closed.
 
 Verify:
 
 ```text
-Diving payloads → Diving store only
-Apnea payloads → Apnea store only
-Snorkeling payloads → Snorkeling store only
-Diving Settings → Diving only
-Apnea Settings → Apnea only
-Snorkeling Settings → Snorkeling only
-Diving Logbook → Diving only
-Apnea Logbook → Apnea only
-Snorkeling Logbook → Snorkeling only
+source precedence
+conflict detection
+explicit user choice
+source provenance
+start blocking
+active-dive immutability
+logbook provenance
+restore provenance
 ```
-
-Any cross-decoding or cross-routing is P0/P1.
 
 ---
 
-# 7. APPLE WATCH DEEP CODE AUDIT
+# 15. CMALTIMETER / ABSOLUTE ALTITUDE FORENSIC AUDIT
 
-Inspect at minimum:
+Inspect:
 
 ```text
-Services/DiveManager.swift
-Services/DepthSensorProvider.swift
-Services/AppleDepthSensorProvider.swift
-Services/MockDepthSensorProvider.swift
-Services/SensorProviderFactory.swift
-Services/GPSManager.swift
-Services/HapticService.swift
-Services/DepthLimitHapticCoordinator.swift
-Services/AscentSafetyHapticCoordinator.swift
-Services/WatchSyncService.swift
-Services/WatchDiveSyncCodec.swift
-Services/WatchSyncAuth.swift
-Services/DiveLogStore.swift
-Services/SubsurfaceExportService.swift
-Services/UserImageStore.swift
-Services/PlannerBriefingCardStore.swift
-Services/PlannerBriefingWatchReceiver.swift
-Services/ActionButtonIntents.swift
-Views/DiveLiveView.swift
-Views/AscentGaugeView.swift
-Views/AscentWarningView.swift
-Views/DepthSafetyLiveViews.swift
-Views/DiveDetailView.swift
-Views/DiveLogListView.swift
-Views/SettingsView.swift
-Views/InfoView.swift
-Views/UserImagesView.swift
-Views/MissionModeIndicatorView.swift
-Views/WatchShortcutHelpView.swift
-Views/ApneaView.swift
-Views/SnorkelingView.swift
-Views/WatchActivitySettingsSections.swift
-Utils/**
-Models/**
+FullComputerEnvironmentSensorService
+AppleWatchAbsoluteAltitudeProvider
+FullComputerPrediveConfigurationStore
+FullComputerPrediveConfirmationView
+FullComputerPrediveSettingsView
+Watch Settings
+tests involving altitude provider
 ```
 
-Audit for:
+Prove:
 
-- dive lifecycle bugs;
-- manual/automatic start conflicts;
-- draft restore bugs;
-- timer/race issues;
-- stale depth/frozen depth;
-- invalid depth;
-- depth safety thresholds;
-- ascent-rate bugs;
-- haptic storms;
-- Mission Mode invariant breaks;
-- GPS lifecycle/battery risk;
-- App Intent legal gate bypass;
-- sensor source/simulation release risk;
-- WatchConnectivity routing;
-- sync replay/tamper risk;
-- local persistence;
-- image inventory/delete;
-- path traversal;
-- CSV/export consistency;
-- briefing-card stale/overwrite/malformed payload;
-- card values affecting live Watch state;
-- Apnea lifecycle concurrency;
-- Snorkeling GPS/battery/privacy;
-- Full Computer one-second runtime performance;
-- small-display layout performance.
+- `CMAltimeter.isAbsoluteAltitudeAvailable()` is checked;
+- a retained `CMAltimeter` instance survives asynchronous sampling;
+- `CMAltimeter.startAbsoluteAltitudeUpdates(to:withHandler:)` is used;
+- relative altitude is not used as authoritative source;
+- GPS altitude is not used as authoritative source;
+- callbacks use documented queue/actor behavior;
+- both `data` and `error` are handled;
+- nil data + nil error handled fail-closed;
+- `stopAbsoluteAltitudeUpdates()` called on success/error/timeout/cancel/replacement;
+- repeated starts cannot leak subscriptions;
+- callback after cancellation ignored;
+- callback from superseded request ignored;
+- request-generation identity exists where needed;
+- old request cannot contaminate newer request;
+- late error after success cannot overwrite proposalReady;
+- imported/manual authority is preserved unless diver explicitly accepts the sensor proposal.
+
+Audit sample policy:
+
+```text
+required sample count
+maximum accepted accuracy
+maximum stable spread
+timeout
+median/selection statistic
+supported altitude range
+sensor max age
+timestamp/freshness logic
+NaN/Inf rejection
+negative accuracy/precision rejection
+stale sample rejection
+future timestamp rejection
+```
+
+Distinguish:
+
+```text
+sensor measurement timestamp
+callback receipt time
+wall-clock conversion
+freshness age
+diagnostic receipt timestamp
+```
 
 ---
 
-# 8. iOS DEEP CODE AUDIT
+# 16. SENSOR PROPOSAL STATE MACHINE
 
-Inspect at minimum:
+Trace:
 
 ```text
-iOSApp/App/**
-iOSApp/Services/IOSCompanionStoreCoordinator.swift
-iOSApp/Services/PlannerStore.swift
-iOSApp/Services/PlannerService.swift
-iOSApp/Services/BuhlmannPlanner.swift
-iOSApp/Services/GasPlanningService.swift
-iOSApp/Services/ScheduleGasConsumptionService.swift
-iOSApp/Services/GasLedgerDisplayFormatter.swift
-iOSApp/Services/RepetitiveDivePlannerService.swift
-iOSApp/Services/DiveLogStore.swift
-iOSApp/Services/CloudSyncStore.swift
-iOSApp/Services/WatchSyncService.swift
-iOSApp/Services/WatchDiveSyncCodec.swift
-iOSApp/Services/WatchSyncAuth.swift
-iOSApp/Services/DiveImportService.swift
-iOSApp/Services/SubsurfaceExportService.swift
-iOSApp/Views/PlannerView.swift
-iOSApp/Views/PlannerGasMixCard.swift
-iOSApp/Views/LogbookView.swift
-iOSApp/Views/DiveDetailView.swift
-iOSApp/Views/ManualDiveEditorView.swift
-iOSApp/Views/MoreView.swift
-iOSApp/Views/IOSCompanionSettingsRootView.swift
-iOSApp/Views/IOSCompanionSettingsModeSwitcher.swift
-iOSApp/Views/Diving/**
-iOSApp/Views/Apnea/**
-iOSApp/Views/Snorkeling/**
-iOSApp/Algorithms/Buhlmann/**
-iOSApp/Models/**
-iOSApp/Utils/**
-Shared/**
+FullComputerEnvironmentSensorState
+requestProposal
+pendingSensorProposal
+proposeSensorEnvironment
+acceptPendingSensorProposal
+dismissPendingSensorProposal
+draftEnvironment
+confirmedEnvironment
 ```
 
-Audit for:
+Create transition table:
 
-- Base/Deco/Technical mode bugs;
-- CCR leakage into OC modes;
-- hidden gas affecting simpler modes;
-- MOD/PPO2/switch-depth bugs;
-- PlannerEnvironment fallback;
-- NDL preview using wrong input;
-- GasPlanningService preview mismatch;
-- cloud merge silent fusing;
-- duplicate session IDs;
-- iCloud payload size;
-- manual pressure unit bugs;
-- CSV parser robustness;
-- Subsurface fidelity;
-- Watch sync ACK/pending-state bugs;
-- iOS Watch image inventory stale state;
-- delete success before Watch ACK;
-- SwiftUI state loops;
-- performance bottlenecks;
-- privacy-sensitive iCloud behavior;
-- stale ascent-speed/runtime/Rock Bottom/gas ledger/repetitive tissue results;
-- structured equipment/checklist role loss;
-- briefing-card metadata/PNG divergence;
-- transfer success before ACK;
-- unsupported schema handling.
+```text
+State
+Event
+Guard
+Next_State
+Environment_Mutation
+UI_State
+Persistence_Effect
+Start_Allowed
+Evidence
+```
+
+Verify:
+
+- sampling clears obsolete pending proposal only;
+- sampling does not mutate imported/manual authority;
+- valid sensor window creates pending proposal;
+- only explicit acceptance promotes proposal;
+- rejection preserves previous authority exactly;
+- acceptance revalidates freshness and quality;
+- start/review controls blocked while sampling/unresolved proposal;
+- no automatic lifecycle event counts as acceptance;
+- VoiceOver/Digital Crown/double tap cannot bypass acceptance;
+- active dive cannot accept or alter environment.
 
 ---
 
-# 9. SYNC / PERSISTENCE / SCHEMA AUDIT
+# 17. CANONICAL ENVIRONMENT RECORD AUDIT
 
-Create:
+Audit:
 
 ```text
-Docs/MASTER_SYNC_MESSAGE_NAMESPACE_MATRIX_CURRENT.csv
-Docs/MASTER_SCHEMA_MIGRATION_COMPATIBILITY_MATRIX_CURRENT.csv
-Docs/MASTER_BACKUP_RESTORE_ISOLATION_MATRIX_CURRENT.csv
+FullComputerEnvironmentRecord
+PlannerEnvironment
+AmbientPressureModel
+FullComputerRuntimePlan
+FullComputerPrediveReadiness
+```
+
+A valid environment must include or derive:
+
+```text
+schemaVersion
+altitudeMeters
+surfacePressureBar
+salinity
+waterDensityKgPerM3
+environmentSource
+capturedAt
+sensorAccuracyMeters
+sensorPrecisionMeters
+```
+
+Verify:
+
+- finite altitude;
+- supported range;
+- altitude-to-pressure formula;
+- independent surface-pressure cross-check;
+- no fixed sea-level pressure;
+- salinity/density consistency;
+- future schema rejection;
+- stale sensor rejection;
+- source-specific validation;
+- old schema cannot authorize incomplete sensor environment;
+- `.seaLevelSaltWater` or default runtime plan cannot authorize live Full Computer start.
+
+---
+
+# 18. PRESSURE, DEPTH AND INSPIRED-GAS MODEL
+
+Verify complete conversion:
+
+```text
+sensor depth/pressure
+→ validated depth
+→ local surface pressure
+→ hydrostatic pressure
+→ ambient absolute pressure
+→ water-vapour subtraction
+→ inspired gas pressure
+→ inert-gas partial pressure
 ```
 
 Audit:
 
 ```text
-shared transport envelope
-activity discriminator
-separate codecs
-separate stores
-revision/checksum
-HMAC/peer trust
-ACK/retry/idempotency
-payload chunking
-large profile transfer
-out-of-order delivery
-tombstones
-conflict resolution
-corrupt/future schema
-legacy Diving migration
-Full Computer tissue checkpoints
-Apnea session with multiple dives
-Snorkeling surface track + dips
-Settings payload namespaces
-plan/card/photo payload route separation
-backup/restore isolation
+seawater/freshwater constants
+depth-to-pressure convention
+altitude/surface pressure
+water-vapour pressure
+respiratory assumptions if any
+pressure clamping
+negative depth
+sensor noise near surface
+salinity setting
+water density
+temperature usage if any
+rounding location
 ```
 
-Mandatory route checks:
+Verify ambient pressure equivalent:
 
 ```text
-Diving payload → Diving store only
-Apnea payload → Apnea store only
-Snorkeling payload → Snorkeling store only
-Planner briefing card payload → briefing-card receiver only
-Image payload → image/photo handler only
-Settings payload → correct activity namespace only
+ambientAbsolutePressure =
+localSurfacePressure +
+hydrostaticPressureFromDepth
 ```
 
-Reject all cross-decoding.
+Reject hardcoded sea-level models where altitude is claimed:
+
+```text
+ambient = 1.0 + depth / 10
+```
+
+Verify gas fractions:
+
+```text
+FN2 = 1 - FO2 - FHe
+```
+
+Ensure:
+
+- fraction sum validated;
+- inspired N2/He derived from active gas;
+- gas switch changes inspired model exactly at intended timestamp/depth;
+- stale gas not used for later interval;
+- display-rounded depth never feeds canonical pressure;
+- invalid pressure never reaches tissue math.
 
 ---
 
-# 10. SECURITY / PRIVACY / TRUST AUDIT
+# 19. BÜHLMANN ZH-L16C CONSTANTS AND MODEL IDENTITY
 
-Create:
+Verify claimed ZH-L16C model variant against authoritative reference constants.
+
+For all 16 compartments inspect:
 
 ```text
-Docs/MASTER_SECURITY_THREAT_MODEL_CURRENT.md
-Docs/MASTER_PRIVACY_DATA_FLOW_MATRIX_CURRENT.csv
-Docs/MASTER_SECURITY_REMEDIATION_PLAN_CURRENT.md
+N2 half-times
+He half-times
+N2 a coefficients
+N2 b coefficients
+He a coefficients
+He b coefficients
+ordering and indexing
+precision type
+initialization values
+serialization order
 ```
+
+Mandatory checks:
+
+- exactly 16 compartments;
+- no off-by-one mapping;
+- N2 and He arrays have identical compartment ordering;
+- no coefficient copied from ZH-L16A/B while claiming ZH-L16C;
+- no truncated/rounded constant causing material drift;
+- no locale parsing;
+- no percentage/fraction confusion;
+- constants immutable during dive;
+- restored tissue vectors preserve exact compartment identity.
+
+Create constants table.
+
+External reference validation remains pending unless actually executed.
+
+---
+
+# 20. TISSUE INITIALIZATION WITH ALTITUDE
+
+Verify all initial equilibrium states use local surface pressure:
+
+```text
+PN2_initial = (surfacePressure - waterVapourPressure) × FN2
+PHe_initial = (surfacePressure - waterVapourPressure) × FHe
+```
+
+Check:
+
+```text
+Air
+Nitrox
+Trimix
+zero helium
+helium-containing gas
+high altitude
+near-zero altitude
+freshwater
+saltwater
+repetitive residual state
+restore
+invalid/missing altitude
+manual environment
+imported environment
+accepted sensor proposal
+```
+
+Reject:
+
+- tissue initialization at sea level followed by altitude later;
+- altitude/surface pressure applied twice;
+- missing He initialization;
+- fresh fallback on restore;
+- default fresh tissues after active checkpoint restore.
+
+---
+
+# 21. SCHREINER EQUATION FORENSIC VERIFICATION
+
+Locate every implementation or equivalent transformation of the Schreiner equation.
+
+For each inert gas and compartment, verify algebraic equivalence to:
+
+```text
+P_t(t) =
+P_i0
++ R * (t - 1/k)
+- (P_i0 - P_t0 - R/k) * exp(-k*t)
+```
+
+where:
+
+```text
+k = ln(2) / halfTime
+P_t0 = initial tissue inert-gas pressure
+P_i0 = inspired inert-gas pressure at segment start
+R = linear inspired inert-gas pressure change rate
+t = elapsed segment time
+```
+
+The audit must prove equivalence rather than rely on naming.
+
+Verify formula correctness:
+
+- sign of each term;
+- exponential term;
+- use of ln(2);
+- half-time unit;
+- inspired-pressure start value;
+- pressure-rate sign during descent/ascent;
+- gas fraction;
+- water-vapour subtraction;
+- surface/ambient pressure convention;
+- N2 and He independently;
+- no O2 tissue compartment;
+- no total ambient pressure used as inert pressure;
+- no end-of-segment inspired pressure substituted for start pressure;
+- no double rate application.
+
+Verify units:
+
+```text
+seconds vs minutes
+metres vs bar/ATA
+metres/min vs bar/second
+gas fractions vs percentages
+absolute vs gauge pressure
+salt/freshwater pressure conversion
+altitude surface pressure
+```
+
+Mandatory limiting cases:
+
+1. `R = 0` reduces to Haldane exponential equation.
+2. `t = 0` returns `P_t0`.
+3. Very small `dt` stable.
+4. Positive rate models descent.
+5. Negative rate models ascent.
+6. N2-only gas with He = 0 keeps He behavior correct.
+7. Helium removal/switch never creates negative tissue pressure.
+8. Constant-depth repeated one-second updates converge toward inspired pressure.
+9. Full linear segment once ≈ same segment split into one-second updates.
+10. Segment splitting error quantified and bounded.
+
+Any unit ambiguity or equation mismatch is at least P1 and P0 if it can understate decompression.
+
+---
+
+# 22. HALDANE CONSTANT-DEPTH PARITY
+
+Verify constant-depth Haldane update:
+
+- altitude-aware inspired pressure;
+- all 16 N2 and all 16 He compartments;
+- finite guards;
+- zero-rate Schreiner parity;
+- tested at compartments 1, 4, 8, 12, 16;
+- tested at sea level and altitude;
+- tested for Air, Nitrox, Trimix, O2 stop gas where relevant.
+
+Zero-rate Schreiner and Haldane must agree within documented tolerance.
+
+---
+
+# 23. ONE-SECOND AND ACTUAL-DT SEMANTICS
+
+The phrase “updated every second” must be proven from runtime behavior.
 
 Audit:
 
 ```text
-WatchConnectivity authentication
-peer secret lifecycle
-HMAC
-nonce/replay
-signed ACK
-trust reset
-malformed payload rejection
-path traversal
-file import/export
-image/card storage
-temporary files
-cloud backup opt-in
-GPS privacy
-photo metadata
-exact-coordinate redaction
-logs and diagnostics
-sensitive equipment/gas data
-App Intents
-feature flags/developer mode
-simulation release safety
-deep links
-activity cross-routing
-data deletion
-backup encryption assumptions
-privacy manifests and usage descriptions
-least privilege
-third-party dependencies
+timer source
+sensor callback frequency
+computation trigger
+timestamp source
+monotonic clock
+actual dt
+actor/task ownership
+cancellation
+app lifecycle
+background/foreground
+dropped frames
+duplicate callbacks
+sensor bursts
+delayed samples
+stale samples
+out-of-order timestamps
 ```
 
-Activity-specific privacy risks:
+Determine whether engine:
+
+1. blindly assumes `dt = 1.0 s`;
+2. uses actual elapsed monotonic time;
+3. integrates per sensor sample;
+4. accumulates time and steps in fixed quanta;
+5. mixes more than one method.
+
+Mandatory invariants:
+
+- tissue evolution uses elapsed time, not UI timer count;
+- delayed tick does not lose exposure;
+- duplicate tick does not double-count;
+- out-of-order sample rejected or safely handled;
+- UI frequency does not control tissue math;
+- sensor frequency does not double-integrate same interval;
+- computations cannot overlap and publish out of order;
+- slow calculation cannot overwrite newer tissue state;
+- `dt <= 0`, huge dt, NaN and Inf fail safely;
+- app background/restore semantics explicit;
+- active dive restore does not reset tissue history.
+
+Create timing-fault coverage for:
 
 ```text
-Diving plan/gas/tissue data
-Apnea session/health-like data
-Snorkeling location routes/photos
-wrong activity data exposure
+0.5 s
+1.0 s
+1.5 s
+2 s
+5 s
+10 s
+30 s
+120 s
+121 s
+5 min
+10 min
+30 min
+duplicate timestamp
+negative timestamp delta
+out-of-order timestamp
+suspended app
+Watch restart/restore
 ```
-
-Do not claim penetration testing or compliance certification without evidence.
 
 ---
 
-# 11. GLOBAL PERFORMANCE / CONCURRENCY / BATTERY AUDIT
+# 24. TISSUE STATE INTEGRITY
+
+Audit full 16-compartment state.
+
+Verify:
+
+- N2 and He stored separately;
+- update atomic across all compartments;
+- previous state immutable during calculation;
+- no partial publication;
+- no aliasing/copy-on-write bug;
+- no race between schedule generation and tissue mutation;
+- controlling compartment derived from same snapshot;
+- ceiling and TTS use same tissue snapshot;
+- persistence encodes all 32 inert values with adequate precision;
+- restoration does not reorder compartments;
+- version migration explicit;
+- corrupt checkpoints fail closed;
+- no fresh-tissue fallback during active/restored dive unless surfaced as critical failure.
+
+Mandatory invariants:
+
+- tissue pressure finite;
+- tissue pressure never materially negative;
+- no discontinuity at segment boundary;
+- no reset on gas switch;
+- no reset when deco appears/disappears;
+- no reset when moving between UI screens;
+- no reset under Mission Mode;
+- Gauge cannot contaminate Full Computer tissue state;
+- iOS planner card cannot alter live tissue state.
+
+---
+
+# 25. GRADIENT FACTORS AND CEILING
+
+Verify:
+
+```text
+GF Low/High validation
+bounds and ordering
+storage/persistence
+dive-start snapshot
+no unsafe mid-dive remote mutation
+interpolation method
+interpolation anchors
+first-stop/deepest-ceiling reference
+surface endpoint
+compartment-wise allowable ambient pressure
+N2/He combined a/b
+zero-total-inert edge
+controlling compartment
+ceiling conversion to depth
+ceiling rounding
+negative ceiling handling
+```
+
+Ceiling conversion must be equivalent:
+
+```text
+ceilingDepth =
+(requiredAmbientPressure - localSurfacePressure) /
+waterPressureGradient
+```
+
+Determine whether GF interpolation is:
+
+- based on current ambient pressure;
+- based on first stop and surface;
+- recomputed consistently when schedule changes;
+- stable when deco obligation disappears and later reappears.
+
+Mandatory scenarios:
+
+```text
+fresh tissues at surface
+no-deco descent
+newly incurred deco
+reduced ceiling during shallow multilevel stay
+ceiling reaches zero
+re-descent after zero ceiling
+controlling compartment changes
+gas switch changes controlling compartment
+GF 30/70
+GF 20/80
+GF 30/30
+GF 50/50
+invalid GF values
+```
+
+---
+
+# 26. LIVE NDL, SCHEDULE AND TTS RECOMPUTATION
+
+Determine exactly how often the Watch recomputes:
+
+```text
+NDL
+current ceiling
+decompression schedule
+first stop
+stop list
+TTS
+controlling compartment
+```
+
+Verify schedule generation uses:
+
+- latest tissue state;
+- latest active gas;
+- current depth;
+- configured ascent rates;
+- configured stop increments;
+- current GF;
+- valid future gas switches.
+
+Mandatory requirements:
+
+- a schedule generated at 39 m must not remain authoritative after prolonged 10 m stay;
+- schedule cache invalidation deterministic;
+- TTS reduces when tissue state permits;
+- stop times reduce/disappear only through recomputation;
+- no negative stop time;
+- no stale stop retained after ceiling clears;
+- no NDL displayed while positive ceiling exists;
+- no no-deco state while mandatory stops remain;
+- no schedule disappearance merely because diver entered shallower band;
+- no schedule generated from display-rounded tissues/depth;
+- failure/timeout retains conservative stale/error state, not optimistic zero-deco.
+
+Quantify schedule recomputation latency and maximum stale-output window.
+
+---
+
+# 27. GAS / PPO2 / MOD / SWITCH AUDIT
+
+Audit:
+
+```text
+gas inventory
+active gas identity
+switch eligibility
+MOD
+PPO2
+switch depth
+user confirmation if required
+timestamp/order of switch
+tissue update before/after switch
+schedule future-gas assumptions
+duplicate/rejected switch
+reversion to previous gas
+unavailable gas
+hypoxic gas
+O2 100%
+Trimix
+```
+
+Mandatory ordering proof:
+
+```text
+previous interval integrated with old gas
+→ switch event committed
+→ next interval integrated with new gas
+→ schedule rebuilt with new current/future gas state
+```
+
+A gas switch must not retroactively change the preceding second.
+
+---
+
+# 28. DECOMPRESSION STOP STATE MACHINE
+
+Audit semantic states:
+
+```text
+noDecompression
+approachingNDL
+decompressionRequired
+approachingStop
+atStop
+aboveStop
+belowStop
+stopPaused
+stopReset/restarted
+stopCompleted
+decompressionCleared
+surfaced
+error/stale
+```
+
+Verify relationships among:
+
+```text
+mathematical ceiling
+rounded stop depth
+current depth
+stop tolerance band
+stop timer
+schedule
+TTS
+UI status
+haptic status
+```
+
+Product stop rules to verify:
+
+- timer pauses outside permitted band;
+- too shallow never credits stop;
+- descending materially below the stop may require stop again;
+- UI/state rules do not mutate tissue pressure;
+- schedule remains mathematically authoritative;
+- completing displayed stop does not force-clear deco if ceiling still requires it.
+
+Test:
+
+```text
+exact stop
+0.5 m above
+1.0 m above
+1.0 m below
+more than 2.0 m below
+sensor jitter
+leave/re-enter band
+gas switch during stop
+schedule shortens while at stop
+stop disappears because ceiling clears
+deeper stop appears after re-descent
+```
+
+---
+
+# 29. MULTILEVEL DIVE FORENSIC PROFILES ML-01 THROUGH ML-10
+
+Generate deterministic second-by-second test vectors and compare Watch engine against independent oracle.
+
+## ML-01 — Air 39 m → 10 m, deco incurred then shallow level
+
+```text
+Gas: Air
+GF: project defaults and at least 30/70
+Surface: sea level and at least one altitude case
+Descent: configured rate to 39 m
+Bottom: duration sufficient to produce mandatory deco
+Ascent: configured rate to 10 m
+Level: remain at 10 m until:
+  a. ceiling reduces;
+  b. controlling compartment changes;
+  c. schedule changes;
+  d. deco obligation possibly disappears, if mathematically permitted
+Then ascend to surface only when model allows.
+```
+
+Record every second:
+
+```text
+runtime
+depth
+ambient pressure
+active gas
+inspired PN2
+inspired PHe
+N2_01 ... N2_16
+He_01 ... He_16
+compartment ceiling
+controlling compartment
+overall ceiling
+GF applied
+NDL/deco state
+stop list
+TTS
+event
+production result
+oracle result
+absolute error
+relative error
+pass/fail
+```
+
+Identify exact second:
+
+- deco first appears;
+- deepest ceiling occurs;
+- each schedule transition occurs;
+- controlling compartment changes;
+- deco clears if it clears.
+
+## ML-02 — Same profile with EAN50 switch at 21 m
+
+Verify gas-switch boundary, tissue continuity, accelerated off-gassing where expected, MOD/PPO2 validity, schedule rebuild and CNS/OTU isolation.
+
+## ML-03 — Trimix bottom gas + deco gases
+
+Verify N2/He dual-gas tissue behavior and changing combined coefficients.
+
+## ML-04 — Sawtooth profile
+
+```text
+39 m → 18 m → 30 m → 12 m → 24 m → 9 m
+```
+
+Verify no schedule cache assumption and no tissue reset.
+
+## ML-05 — Deco clears, then re-descent
+
+Verify preserved tissue state, no fresh NDL reset, deco reappears if required, controller changes and schedule rebuilt.
+
+## ML-06 — Hover around stop/ceiling boundary
+
+Verify stop timer/state logic separately from tissue math.
+
+## ML-07 — Very slow ascent
+
+Verify Schreiner rate handling and one-second stepping parity.
+
+## ML-08 — Rapid but valid ascent
+
+Verify negative rate, stability and alarm/math separation.
+
+## ML-09 — Long shallow 10 m level
+
+Show slow compartments may continue loading depending on state and gas.
+
+## ML-10 — Surface interval and repetitive continuation
+
+Verify off-gassing and next-dive initialization where supported.
+
+For every profile create:
+
+```text
+Watch result
+oracle result
+absolute error
+relative error
+pass/fail tolerance
+first divergence timestamp
+affected compartment
+user-visible consequence
+```
+
+---
+
+# 30. ALTITUDE SCENARIO MATRIX
 
 Create:
 
 ```text
-Docs/MASTER_PERFORMANCE_BUDGET_MATRIX_CURRENT.csv
-Docs/MASTER_CONCURRENCY_RISK_MATRIX_CURRENT.csv
-Docs/MASTER_PHYSICAL_PERFORMANCE_QA_PLAN_CURRENT.md
+Docs/MASTER_WATCH_FULL_COMPUTER_ALTITUDE_MATRIX_CURRENT.csv
 ```
 
-Audit Watch:
+Run deterministic profiles at:
 
 ```text
-one-second Full Computer tissue updates
-sensor sampling
-GPS
-haptics
-reminders
-Mission Mode invariants
-Apnea lifecycle
-Snorkeling GPS/navigation
-timers/tasks
-background transitions
-WatchConnectivity
-image/card decoding
-small-screen rendering
-battery/thermal risk
+0 m
+500 m
+1,000 m
+1,500 m
+2,000 m
+maximum supported altitude
+one value above maximum
 ```
 
-Audit iOS:
+For each altitude run:
 
 ```text
-planner recomputation
-charts
-maps
-large Logbooks
-large GPS tracks
-tissue histories
-exports
-backup
-sync import
-SwiftUI invalidation
-cancellation/stale result publication
-settings mode switch
-startup
-file I/O
-JSON encoding/decoding
-large dataset behavior
-```
-
-Audit actor isolation, Sendable correctness, retain cycles, uncancelled tasks, timer duplication, race conditions and main-thread blocking.
-
----
-
-# 12. iOS PERFORMANCE OPTIMIZATION AUDIT
-
-Create:
-
-```text
-Docs/MASTER_IOS_PERFORMANCE_BUDGET_MATRIX_CURRENT.csv
-Docs/MASTER_IOS_PERFORMANCE_SCALABILITY_MATRIX_CURRENT.csv
-```
-
-Audit iOS performance areas:
-
-```text
-Startup and first render
-Navigation and tab switching
-SwiftUI diffing and body recomputation
-Diving Planner
-Full Computer planning previews
-Buehlmann chart rendering
-Tissue loading charts
-Logbook list scalability
-Session detail rendering
-PDF export
-CSV/Subsurface export
-Import parsing
-Photo/image handling
-WatchConnectivity processing
-iCloud / KVS backup paths
-Apnea dashboard
-Apnea planner/settings/logbook
-Snorkeling dashboard
-Snorkeling route planner
-Snorkeling map rendering
-Snorkeling session track rendering
-Settings mode switcher
-Shared localization access
-Shared theme/rendering components
-Memory/retain-cycle hygiene
-Task lifecycle and cancellation
-MainActor overuse
-Background queue correctness
-File I/O and JSON encoding/decoding
-Large dataset behavior
-Battery-impacting loops
-Instrumentation and observability
-```
-
-Score:
-
-```text
-IOS_STARTUP_PERFORMANCE_READINESS
-IOS_SWIFTUI_RENDERING_READINESS
-IOS_PLANNER_PERFORMANCE_READINESS
-IOS_CHART_RENDERING_READINESS
-IOS_LOGBOOK_SCALABILITY_READINESS
-IOS_EXPORT_IMPORT_PERFORMANCE_READINESS
-IOS_SYNC_PERFORMANCE_READINESS
-IOS_MAP_ROUTE_RENDERING_READINESS
-IOS_MEMORY_READINESS
-IOS_CONCURRENCY_READINESS
-IOS_BATTERY_POLICY_READINESS
-IOS_OBSERVABILITY_READINESS
-IOS_PERFORMANCE_TEST_COVERAGE_READINESS
-OVERALL_IOS_PERFORMANCE_READINESS
-```
-
-Physical Instruments profiling remains pending unless executed.
-
----
-
-# 13. REQUIRED PERFORMANCE SCENARIOS
-
-Audit/plan tests for:
-
-```text
-rapid planner depth edit 100 times
-rapid planner runtime edit 100 times
-rapid gas edit 100 times
-GF sweep
-10 gases
-long deco plan
-CCR reference plan if present
-1k / 10k / 50k chart points
-1k / 5k / 10k logbook sessions
-large PDF export
-large CSV/Subsurface export
-large import
-100 / 1k / 5k sync messages
-50k snorkeling route points
-settings mode switch 50 times
-large Watch image inventory
-briefing-card render/transfer burst
-background/foreground cycle
-```
-
-Budget targets must be documented. No score without evidence.
-
----
-
-# 14. OBSERVABILITY / SIGNPOST AUDIT
-
-Search for:
-
-```text
-OSLog
-Logger
-os_signpost
-Signposter
-measure
-XCTestMetrics
-```
-
-Create or update:
-
-```text
-Docs/MASTER_PERFORMANCE_SIGNPOST_CATALOG_CURRENT.md
-```
-
-Required signpost categories:
-
-```text
-startup
-planner solve
-chart render
-logbook load
-statistics compute
-export
-import
-sync decode
-sync persist
-cloud backup
-map simplification
-route render
-settings switch
-Watch tissue tick
-Watch schedule recompute
-Watch haptic
-Watch image decode
-briefing-card render
-briefing-card transfer
-```
-
----
-
-# 15. TEST COVERAGE AUDIT
-
-Create:
-
-```text
-Docs/MASTER_MAIN_REQUIREMENT_TEST_TRACEABILITY_CURRENT.csv
-```
-
-Audit automated and missing tests for:
-
-```text
-startup and activity selection
-Gauge
-Full Computer
-Bühlmann
-gas switching
-deco stop state machine
-Apnea lifecycle/recovery
-Snorkeling GPS/dips/navigation
-Settings isolation
-Logbook ownership
-sync/schema
-migration
-backup/restore
-localization/accessibility
-security
-performance
-exports
-Watch CMAltimeter pre-dive acquisition
-iOS performance/scalability
-Watch image inventory/delete
-Planner briefing cards
-CCR reference-only
-Rock Bottom
-Gas ledger
-Repetitive dive
-Structured equipment/checklist
-```
-
-Classify evidence:
-
-```text
-automated unit
-integration
-UI/snapshot
-simulator
-physical Watch
-physical iPhone
-paired-device
-underwater
-external reference
-legal/compliance review
-```
-
-No evidence means not passed.
-
----
-
-# 16. FINDING TRACEABILITY
-
-Create:
-
-```text
-Docs/MASTER_MAIN_CODE_FINDING_TRACEABILITY_CURRENT.csv
+Air profile
+Nitrox profile
+Trimix / helium profile
+multilevel ascent
+gas switch
+NDL-to-deco transition
+checkpoint/restore
+invalid altitude
 ```
 
 Columns:
 
 ```text
-Finding_ID
+Case_ID
+Altitude_m
+SurfacePressure_bar
+Water_Type
+Gas
+Profile
+Runtime_s
+N2_01 ... N2_16
+He_01 ... He_16
+Ceiling_m
+Controlling_Compartment
+NDL_s
+TTS_s
+Schedule
+Production_Result
+Oracle_Result
+Absolute_Error
+Relative_Error
+Pass
 Severity
-Priority
-Area
-Platform
-Activity
-Mode
-Status
-Root_Cause
-Affected_Files
-Affected_Symbols
-User_Impact
-Safety_Impact
-Security_Privacy_Impact
-Performance_Impact
-Data_Integrity_Impact
-Recommended_Remediation
-Tests_Required
-Acceptance_Criteria
-Regression_Risk
-Physical_QA_Required
-External_Validation_Required
 Evidence
 Notes
 ```
 
-Allowed statuses:
-
-```text
-OPEN
-VERIFIED
-DOCUMENTED_ACCEPTED_RISK
-NOT_APPLICABLE
-PENDING_PHYSICAL
-PENDING_INSTRUMENTS
-PENDING_EXTERNAL_VALIDATION
-```
-
-Because this is audit-only, new defects remain `OPEN`.
-
 ---
 
-# 17. VALIDATION SCRIPT
-
-Create or update:
-
-```text
-Scripts/validate_master_main_code_sync_security_performance_audit.sh
-```
-
-The script must:
-
-- use `set -euo pipefail`;
-- verify repository root;
-- verify branch `main`;
-- avoid concurrent XcodeGen;
-- run target isolation;
-- run secrets scan;
-- run localization audit;
-- build iOS app;
-- build Watch app;
-- run iOS algorithm tests;
-- run Watch algorithm tests;
-- run available performance/scalability tests;
-- verify audit docs exist;
-- verify finding traceability exists;
-- verify budget matrices exist;
-- verify threat model exists;
-- verify sync/schema matrices exist;
-- verify QA plan exists.
-
-On success print:
-
-```text
-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_GATE_PASS
-MASTER_MAIN_CODE_AUDIT_DOCUMENTATION_COMPLETE
-MASTER_SYNC_SCHEMA_MATRICES_COMPLETE
-MASTER_SECURITY_PRIVACY_MATRICES_COMPLETE
-MASTER_PERFORMANCE_BUDGETS_COMPLETE
-MASTER_IOS_PERFORMANCE_MATRICES_COMPLETE
-PHYSICAL_QA_PENDING_UNLESS_EVIDENCED
-```
-
-Do not print software readiness 100 unless all findings are verified and this has become an implementation/remediation command.
-
----
-
-# 18. MASTER REPORT STRUCTURE
+# 31. SCHREINER TEST VECTOR MATRIX
 
 Create:
 
 ```text
-Docs/MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_CURRENT.md
+Docs/MASTER_WATCH_FULL_COMPUTER_SCHREINER_TEST_VECTOR_MATRIX_CURRENT.csv
+```
+
+Minimum columns:
+
+```text
+ID
+Profile
+Gas
+GF_Low
+GF_High
+Environment
+Compartment
+HalfTime
+Initial_PN2
+Initial_PHe
+Start_Depth
+End_Depth
+Duration_s
+Rate
+Expected_PN2
+Expected_PHe
+Watch_PN2
+Watch_PHe
+Absolute_Error
+Relative_Error
+Expected_Ceiling
+Watch_Ceiling
+Expected_Controller
+Watch_Controller
+Expected_Deco_State
+Watch_Deco_State
+Pass
+Evidence
+Notes
+```
+
+Include hand-checkable vectors for compartments:
+
+```text
+1
+4
+8
+12
+16
+```
+
+and all 16 compartments for core multilevel profiles.
+
+---
+
+# 32. MULTILEVEL DECO TRANSITION MATRIX
+
+Create:
+
+```text
+Docs/MASTER_WATCH_FULL_COMPUTER_MULTILEVEL_DECO_TRANSITION_MATRIX_CURRENT.csv
+```
+
+Columns:
+
+```text
+Profile_ID
+Timestamp
+Depth
+Gas
+Overall_Ceiling
+Rounded_Stop
+TTS
+NDL
+Controlling_Compartment
+Deco_State
+Expected_Transition
+Actual_Transition
+Pass
+Evidence
+```
+
+---
+
+# 33. INDEPENDENT ORACLE REQUIREMENT
+
+Do not compare production only with itself.
+
+Use or create a test-only independent oracle that:
+
+- does not import production tissue update;
+- does not reuse production constants without independent checking;
+- implements Bühlmann/Schreiner separately;
+- supports same pressure/environment assumptions;
+- emits all 16 N2/He compartment values;
+- supports one-second and analytic segment calculations;
+- produces ceiling and controlling compartment;
+- can replay CSV depth/gas timelines.
+
+Preferred evidence hierarchy:
+
+1. independently implemented mathematical oracle;
+2. trusted open decompression implementation with documented assumptions;
+3. hand calculations for selected compartments/timestamps;
+4. external comparison against established tools;
+5. production self-tests only as supplementary evidence.
+
+The iOS Planner is not automatically independent if it shares core logic.
+
+Self-comparison masquerading as oracle is a P1 finding.
+
+---
+
+# 34. SCHREINER ANALYTIC VS ONE-SECOND PARITY
+
+For each test gas and compartment compare:
+
+```text
+A. One analytic Schreiner update over complete linear segment
+B. Repeated 1-second Schreiner updates
+C. Repeated 1-second constant-depth/Haldane approximation using sampled end depths, if production does this
+D. Production Watch result
+```
+
+Test segments:
+
+```text
+surface to 39 m
+39 m to 10 m
+10 m to 3 m
+3 m to surface
+60 m to 21 m
+slow 1 m/min ascent
+fast configured ascent
+depth reversal mid-segment
+```
+
+Quantify:
+
+```text
+maximum compartment pressure error
+ceiling error in metres
+TTS error in seconds/minutes
+time-to-deco-clear error
+accumulated error after 30, 60, 120 and 240 minutes
+```
+
+Define explicit acceptance tolerances and justify them.
+
+A tolerance must not be selected merely because current implementation passes.
+
+---
+
+# 35. CROSS-ENGINE PARITY
+
+Where iOS and Watch have separate or shared implementations, compare:
+
+```text
+constants
+initial tissues
+pressure model
+Schreiner equation
+Haldane
+GF
+ceiling
+schedule
+gas switch
+result rounding
+environment source
+Planner briefing card values
+logbook/export fields
+```
+
+Determine whether:
+
+- code is shared;
+- one engine wraps another;
+- implementations are duplicated;
+- outputs diverge.
+
+Run identical profile replays through both if possible.
+
+Differences must be explained by intentional configuration, not platform drift.
+
+---
+
+# 36. PERSISTENCE / CHECKPOINT / RESTORE
+
+Trace:
+
+```text
+FullComputerPrediveConfigurationStore
+FullComputerRuntimeCheckpoint
+DiveManager checkpoint/restore
+FullComputerRuntimeLogbookAccumulator
+FullComputerDiveLogbookMetadata
+DiveLogStore
+WatchSyncService
+```
+
+Verify checkpoint preserves:
+
+```text
+altitude
+surface pressure
+water density
+salinity
+environment source
+sensor timestamp
+accuracy
+precision
+gas
+GF
+runtime
+depth
+all 16 N2 tissues
+all 16 He tissues
+active gas
+current ceiling
+current schedule
+stop state
+last timestamp
+degraded state
+schema version
+checksum/integrity if present
+```
+
+Restore invariants:
+
+- no fresh tissue fallback;
+- no sea-level fallback;
+- no current sensor substitution;
+- no current Watch setting substitution;
+- no newly imported plan substitution;
+- schedule recomputed from restored tissues/environment;
+- corrupt/missing environment fails safely;
+- future schema fails safely;
+- repeated restore idempotent;
+- elapsed suspension handled explicitly;
+- wall-clock changes do not corrupt dt.
+
+Generate restore tests at:
+
+```text
+no-deco bottom
+immediately after deco appears
+during ascent
+at a deco stop
+during prolonged 10 m level
+immediately after deco clears
+after gas switch
+after controlling-compartment change
+during degraded state
+after relaunch
+```
+
+---
+
+# 37. LOGBOOK / EXPORT / SYNC MATHEMATICAL INTEGRITY
+
+Verify completed-dive metadata matches frozen runtime environment, not later store value.
+
+Logbook must preserve:
+
+```text
+environment source
+altitude
+surface pressure
+salinity
+water density
+sensor timestamp
+accuracy
+precision
+degraded state
+gas switches
+GF
+ceiling/TTS/deco events where intended
+```
+
+Verify sync/export:
+
+- units exact;
+- precision preserved;
+- schema version;
+- HMAC/signature preserved;
+- activity discriminator;
+- duplicate ID handling;
+- future schema handling;
+- malformed payloads fail safely;
+- Watch/iOS parity;
+- no manual/imported value mislabeled as sensor-measured;
+- unavailable CCR/planner values not shown as zero.
+
+---
+
+# 38. PLANNER BRIEFING CARD / CCR REFERENCE-ONLY
+
+Audit:
+
+```text
+PlannerBriefingCard
+PlannerBriefingWatchReceiver
+PlannerBriefingCardStore
+briefing card views
+structured metadata
+rendered PNG
+transfer ACK/status
+replacement/deletion/stale handling
+```
+
+Verify briefing cards are reference-only and cannot:
+
+- change live Watch dive state;
+- start/stop a dive;
+- change alarms/reminders/Mission Mode/sensor source;
+- change Full Computer environment;
+- change gases;
+- change tissues;
+- execute decompression schedule.
+
+If CCR/Rebreather metadata exists:
+
+- setpoint reference-only;
+- diluent labelled separately;
+- bailout labelled separately;
+- gas density estimate labelled;
+- bailout scenario reference-only;
+- no live CCR controller claim;
+- no live PPO2 control.
+
+Any CCR/planner reference value feeding live decompression calculation is P0 unless explicitly designed, validated and legally positioned.
+
+---
+
+# 39. UI / HAPTIC / SAFETY PRESENTATION TRUTHFULNESS
+
+Without redesigning UI, audit truthfulness:
+
+- environment source visible;
+- altitude support truthful;
+- no hidden sea-level fallback;
+- Full Computer unavailable/degraded states visible;
+- NDL/TTS not shown authoritative when stale;
+- critical alerts prioritized;
+- stop state truthful;
+- gas switch confirmation truthful;
+- physical QA pending not hidden in docs;
+- reference-only planner/CCR data labelled.
+
+Small-screen safety visibility:
+
+- depth hero visible;
+- runtime visible;
+- ceiling/deco/stop visible;
+- ascent warning visible;
+- critical banners visible;
+- non-critical badges collapse;
+- Mission Mode does not hide safety;
+- VoiceOver order logical;
+- no scroll required to discover primary critical metric.
+
+Reminder/haptic interaction:
+
+- reminder cannot suppress critical alert;
+- critical alert cannot be dismissed like reminder;
+- haptic storm avoided;
+- haptics respect global toggle;
+- degraded state has appropriate alert policy.
+
+---
+
+# 40. APP INTENTS / ACTION BUTTON AUDIT
+
+Audit any intent related to:
+
+```text
+start dive
+stop dive
+Full Computer start
+alarm acknowledgement
+bearing set/clear
+reminder acknowledgement
+Mission Mode
+briefing cards
+gas switch
+settings
+```
+
+Verify:
+
+- legal/safety gate enforced;
+- unsafe shortcuts blocked;
+- active state validation;
+- no simulation-as-real bypass;
+- no sensor source bypass;
+- no briefing-card execution;
+- no CCR/planner metadata live authority;
+- error messages localized;
+- haptic policy respected.
+
+---
+
+# 41. FAILURE INJECTION MATRIX
+
+Create:
+
+```text
+Docs/MASTER_WATCH_FULL_COMPUTER_FAILURE_INJECTION_MATRIX_CURRENT.csv
+```
+
+Include:
+
+```text
+absolute altitude unavailable
+Core Motion permission/privacy denied
+Core Motion callback error
+timeout with no data
+inaccurate-only data
+unstable-only data
+valid samples followed by error
+nil data + nil error
+cancel before first sample
+cancel after partial window
+cancel concurrent with final sample
+two rapid requestProposal calls
+late callback from old request
+late error after success
+settings-to-confirmation race
+confirmation dismissal
+app background during sampling
+app relaunch before start
+clock discontinuity
+corrupt persisted proposal
+active-dive altitude change attempt
+sensor value outside range
+missing sensor metadata
+derived pressure mismatch
+invalid gas
+NaN depth
+Inf depth
+negative depth
+duplicate timestamp
+negative dt
+out-of-order tick
+long suspension
+checkpoint corruption
+future schema
+stale planner card
+malformed planner card
+unsupported CCR card
+sync replay
+duplicate ACK
+missing ACK
+HMAC failure
+calculation timeout
+schedule non-convergence
+memory pressure
+```
+
+Columns:
+
+```text
+Case_ID
+Area
+Initial_State
+Fault
+Expected_Result
+Actual_Result
+Environment_Authority_After_Fault
+Start_Allowed
+Runtime_Output
+UI_Diagnostic
+Subscription_Cleanup
+Persistence_Effect
+Severity
+Evidence
+Required_Remediation
+Acceptance_Test
+```
+
+Any error path that becomes sea level, no-deco, zero ceiling, zero TTS, or authorized legacy environment is P0.
+
+---
+
+# 42. EDGE-CASE MATRIX
+
+Create:
+
+```text
+Docs/MASTER_WATCH_FULL_COMPUTER_EDGE_CASE_MATRIX_CURRENT.csv
+```
+
+Columns:
+
+```text
+ID
+Activity
+Mode
+Feature
+Input
+Initial_State
+Expected_Result
+Actual_Result
+Absolute_Error
+Relative_Error
+Pass
+Severity
+Evidence
+Notes
+```
+
+Include:
+
+```text
+zero depth
+negative depth
+high depth
+exact thresholds
+invalid depth
+irregular timing
+long dive
+multilevel deco
+gas switch
+deco clear
+re-descent
+stop-band violations
+altitude changes
+freshwater/saltwater
+unit conversion
+restore
+malformed sync
+stale sensor
+future schema
+no physical evidence
+```
+
+---
+
+# 43. REQUIREMENT / TEST MATRIX
+
+Create:
+
+```text
+Docs/MASTER_WATCH_FULL_COMPUTER_REQUIREMENT_TEST_MATRIX_CURRENT.csv
+```
+
+Required columns:
+
+```text
+Requirement_ID
+Area
+Requirement
+Production_Source
+Test_File
+Test_Name
+Sea_Level
+Altitude_500m
+Altitude_1000m
+Altitude_1500m
+Altitude_2000m
+Max_Altitude
+Invalid_Case
+Oracle_Coverage
+Physical_QA
+External_Validation
+Result
+Evidence
+Severity
+Notes
+```
+
+Cover:
+
+```text
+target membership
+legal gate
+activity isolation
+environment source policy
+CMAltimeter lifecycle
+sample quality
+explicit acceptance
+no sea-level fallback
+pressure model
+tissue initialization
+all 16 N2
+all 16 He
+Haldane
+Schreiner
+actual dt
+GF
+ceiling
+NDL
+TTS
+schedule
+gas switch
+stop state
+persistence
+restore
+logbook
+sync/export
+briefing cards
+CCR reference-only
+physical QA
+```
+
+---
+
+# 44. NUMERICAL ROBUSTNESS AND ERROR BUDGET
+
+Audit:
+
+```text
+Double vs Float
+exponent underflow/overflow
+cancellation error
+exp
+division by near-zero
+NaN
+infinity
+denormals
+comparison epsilon
+exact zero checks
+rounding
+integer truncation
+time conversion
+pressure conversion
+serialization precision
+```
+
+Run adversarial values:
+
+```text
+zero depth
+tiny depth
+extreme bounded depth
+very long runtime
+GF limits
+FO2/He boundaries
+zero inert fraction
+tiny dt
+huge dt
+invalid half-time
+corrupt tissue state
+negative rate
+rate sign reversal
+```
+
+Canonical calculations must not use display rounding.
+
+Create:
+
+```text
+Docs/MASTER_WATCH_FULL_COMPUTER_NUMERICAL_ERROR_BUDGET_CURRENT.md
+```
+
+with:
+
+```text
+Source_of_Error
+Bound
+Measured_Worst_Case
+Safety_Direction
+Accepted
+Evidence
+```
+
+---
+
+# 45. CONCURRENCY, ORDERING AND STALE RESULTS
+
+Inspect Swift concurrency and state publication.
+
+Verify:
+
+- one owner for mutable tissue state;
+- actor/main-actor boundaries;
+- no unsynchronized access;
+- no overlapping update tasks;
+- schedule calculation cancellation;
+- generation/version token for async results;
+- stale result rejection;
+- deterministic event ordering;
+- sensor event ordering;
+- gas-switch event ordering;
+- lifecycle event ordering;
+- persistence ordering;
+- UI cannot mutate canonical tissue snapshot.
+
+Race scenarios:
+
+```text
+new depth sample while schedule calculation is running
+gas switch while prior tissue update pending
+app background during update
+restore while stale task completes
+rapid UI navigation
+WatchConnectivity payload during dive
+settings change attempt during active dive
+duplicate sensor callback
+timer and sensor callback at same timestamp
+computation exceeds one second
+```
+
+Older result overwriting newer state is P0/P1 depending on output.
+
+---
+
+# 46. PERFORMANCE, BATTERY AND DEADLINE BEHAVIOR
+
+Measure or statically estimate:
+
+```text
+tissue update duration
+ceiling calculation duration
+NDL calculation duration
+full schedule/TTS generation duration
+allocations per tick
+memory growth
+CPU wakeups
+main-thread work
+thermal/battery risk
+worst-case multigas technical profile
+longest schedule
+history/chart sampling if live
+```
+
+Requirements:
+
+- one-second deadline normally met;
+- missed deadline policy explicit;
+- actual dt accounts for delay;
+- backlog cannot accumulate indefinitely;
+- schedule throttling cannot hide stale/optimistic output;
+- Mission Mode does not reduce tissue update fidelity;
+- low-power UI behavior does not reduce decompression authority;
+- background policy truthful.
+
+Separate simulator measurements from physical Apple Watch evidence.
+
+---
+
+# 47. TEST COVERAGE AND MUTATION AUDIT
+
+Inventory tests covering:
+
+```text
+Bühlmann constants
+Haldane
+Schreiner
+one-second update
+descent
+ascent
+constant depth
+multilevel
+Trimix
+gas switch
+GF
+ceiling
+NDL
+TTS
+schedule convergence
+stop state
+restore
+concurrency
+performance
+invalid input
+CMAltimeter lifecycle
+altitude source
+proposal state
+logbook provenance
+planner briefing card reference-only
+```
+
+Classify evidence:
+
+```text
+unit
+integration
+replay
+oracle
+simulator
+physical Watch
+paired device
+underwater
+external reference
+```
+
+Negative checks:
+
+- production self-comparison does not count as independent validation;
+- snapshot/UI tests do not prove tissue correctness;
+- planner tests do not automatically prove live Watch parity;
+- build success does not prove algorithm validity;
+- code coverage without assertion quality does not count as readiness.
+
+Propose mutation tests:
+
+```text
+reverse Schreiner rate sign
+use seconds as minutes
+swap N2/He half-times
+alter one coefficient
+skip one compartment
+cache schedule indefinitely
+drop one-second update
+duplicate tick
+use end pressure as Pi0
+reset tissues on gas switch
+clear deco on error
+sea-level fallback at altitude
+stale sensor accepted
+late callback overwrites proposal
+stop timer clears tissue ceiling
+planner card mutates live runtime
+cross-activity checkpoint contamination
+```
+
+The existing test suite should fail each material mutation.
+
+---
+
+# 48. PHYSICAL WATCH QA MATRIX
+
+Create:
+
+```text
+Docs/MASTER_WATCH_FULL_COMPUTER_PHYSICAL_QA_MATRIX_CURRENT.csv
+```
+
+Every unexecuted scenario must be `PENDING_PHYSICAL`.
+
+Include:
+
+```text
+physical Watch target install
+real depth sensor availability
+dry-run Full Computer start blocked without valid environment
+manual Watch environment accepted
+imported iPhone plan accepted
+CMAltimeter available
+CMAltimeter unavailable
+CMAltimeter permission denied
+stable sensor proposal
+unstable sensor proposal
+sensor accepted
+sensor rejected preserving manual/imported value
+background/foreground during sampling
+rapid Settings/Confirmation navigation
+relaunch before dive start
+controlled dry-run runtime plan source preservation
+checkpoint/restore dry run
+paired iPhone sync
+logbook provenance
+smallest Watch display
+VoiceOver traversal
+haptic priority
+depth sensor wet test
+ascent warning wet/dry safe test
+controlled multilevel replay if possible
+battery/thermal observation
+```
+
+---
+
+# 49. EXTERNAL VALIDATION PLAN
+
+Create:
+
+```text
+Docs/MASTER_WATCH_FULL_COMPUTER_EXTERNAL_VALIDATION_PLAN_CURRENT.md
+```
+
+Include:
+
+```text
+independent Bühlmann implementation comparison
+Subsurface/reference tool where applicable
+exported replay vectors
+sea-level and altitude profiles
+Air / Nitrox / Trimix
+39 m → 10 m profile
+gas-switch profile
+re-descent profile
+surface interval profile
+TTS/schedule comparison
+tolerance table
+profile CSV format
+environment assumptions
+GF assumptions
+ascent/descent rates
+stop increments
+gas-switch rules
+discrepancy triage
+physical dry run
+simulator replay
+paired-device logging
+controlled-water testing
+pressure-pot/chamber strategy where appropriate
+real Apple Watch Ultra underwater validation
+safety governance
+independent reviewer sign-off
+```
+
+Status remains `PENDING_EXTERNAL_VALIDATION` unless actual evidence exists.
+
+Do not claim EN13319, medical, decompression or dive-computer certification.
+
+---
+
+# 50. MASTER REPORT STRUCTURE
+
+Create:
+
+```text
+Docs/MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_CURRENT.md
 ```
 
 Required sections:
 
 A. Executive Summary  
 B. Source Commands Merged  
-C. Latest Development Context  
+C. Latest Development Update  
 D. Branch, Commit and Scope  
 E. Preflight and Build/Test Baseline  
-F. Target Membership and Architecture  
-G. Activity Isolation and Cross-Activity Risk  
-H. Apple Watch Deep Code Analysis  
-I. iOS Companion Deep Code Analysis  
-J. Planner-Specific Deep Code Analysis  
-K. Full Computer Runtime Integration Risk  
-L. Sync / Persistence / Schema  
-M. Backup / Restore Isolation  
-N. Cloud / iCloud / KVS  
-O. Security / Privacy / Trust  
-P. Threat Model  
-Q. Import / Export / File Security  
-R. Watch Image / Planner Briefing Card Payload Routing  
-S. App Intents / Action Button / Developer Sensor Source  
-T. Performance / Concurrency / Battery — Global  
-U. iOS Performance Optimization  
-V. Watch Performance / Full Computer Timing  
-W. Snorkeling Map / Route Performance  
-X. Logbook Scalability  
-Y. Memory / Retain-Cycle Hygiene  
-Z. Concurrency / Cancellation / Stale Result Guards  
-AA. Observability / Signposts  
-AB. Test Coverage and Evidence  
-AC. Physical / Instruments / External QA Pending  
-AD. Detailed Findings  
-AE. Readiness Matrix  
-AF. Prioritized Remediation Plan  
-AG. Future Cursor Remediation Commands  
-AH. Final Verdict
+F. Existing Audit Coverage and Specialized Gap  
+G. Target Membership and Architecture  
+H. Product Safety Positioning  
+I. Activity Isolation and Root Flow  
+J. Full Computer Startup Authority  
+K. Feature Inventory  
+L. Environment Source Policy  
+M. CMAltimeter / Sensor Proposal Path  
+N. Sensor Sample Quality and Freshness  
+O. Sensor Proposal State Machine  
+P. Canonical Environment Record  
+Q. Pressure, Depth and Inspired-Gas Model  
+R. Bühlmann ZH-L16C Constants  
+S. Tissue Initialization  
+T. Schreiner Equation Forensic Verification  
+U. Haldane Constant-Depth Parity  
+V. One-Second / Actual-DT Semantics  
+W. Tissue State Integrity  
+X. Gradient Factors and Ceiling  
+Y. NDL / Schedule / TTS  
+Z. Gas / PPO2 / MOD / Switch Logic  
+AA. Decompression Stop State Machine  
+AB. Multilevel Profiles ML-01 through ML-10  
+AC. 39 m → 10 m Scenario Verdict  
+AD. Altitude Scenario Matrix  
+AE. Schreiner Test Vector Matrix  
+AF. Multilevel Deco Transition Matrix  
+AG. Independent Oracle Results  
+AH. Schreiner Analytic vs One-Second Parity  
+AI. Cross-Engine Parity  
+AJ. Persistence / Checkpoint / Restore  
+AK. Logbook / Export / Sync Integrity  
+AL. Planner Briefing Cards / CCR Reference-Only  
+AM. UI / Haptics / Safety Presentation Truthfulness  
+AN. App Intents / Action Button  
+AO. Failure Injection Matrix  
+AP. Edge-Case Matrix  
+AQ. Requirement / Test Matrix  
+AR. Numerical Error Budget  
+AS. Concurrency and Stale Results  
+AT. Performance / Battery / Deadline Behavior  
+AU. Test Coverage and Mutation Audit  
+AV. Physical Watch QA Matrix  
+AW. External Validation Plan  
+AX. Findings P0-P4  
+AY. Readiness Matrix  
+AZ. Prioritized Remediation Plan  
+BA. Release Blockers  
+BB. Final Verdict
 
 ---
 
-# 19. REQUIRED FINAL QUESTIONS
+# 51. REQUIRED FINAL QUESTIONS
 
 The report must explicitly answer:
 
-1. Is MAIN architecture clean and isolated?
-2. Are Diving, Apnea and Snorkeling separated at code, sync, settings and logbook levels?
-3. Are sync payloads activity-discriminated and cross-decoding rejected?
-4. Are schemas versioned and migration-safe?
-5. Is backup/restore activity-isolated?
-6. Is WatchConnectivity authentication intact?
-7. Are HMAC, nonce/replay and ACK policies safe?
-8. Are file import/export paths safe?
-9. Are images/cards protected from path traversal and arbitrary delete/write?
-10. Are privacy flows truthful and opt-in where required?
-11. Are simulation/developer modes release-safe?
-12. Do App Intents respect legal/safety gates?
-13. Are iOS Planner calculations performance-safe?
-14. Are heavy computations off main thread where needed?
-15. Are stale async results rejected?
-16. Are charts/maps/logbooks bounded for realistic data?
-17. Is sync queue bounded/backpressured?
-18. Are caches bounded?
-19. Are tasks cancellable?
-20. Are there retain-cycle risks?
-21. Are performance budgets documented?
-22. Is Instruments profiling complete or pending?
-23. What blocks 100% main-code readiness?
-24. What blocks 100% security readiness?
-25. What blocks 100% performance readiness?
-26. What blocks internal TestFlight?
-27. What blocks external TestFlight?
+1. Is Full Computer implemented and compiled into Watch MAIN?
+2. Is the live Full Computer path proven from sensor/depth sample to UI?
+3. Is there one canonical live tissue state?
+4. Is Full Computer isolated from Gauge, Apnea and Snorkeling?
+5. Is there any route to start Full Computer without legal/safety prerequisites?
+6. Is there any route to start Full Computer without explicit valid environment?
+7. Is sea level absent as explicit choice and implicit fallback?
+8. Does Watch directly use CMAltimeter absolute-altitude updates where sensor proposal is supported?
+9. Is the altimeter retained during async sampling?
+10. Can an old callback contaminate a newer request?
+11. Is sensor timestamp distinguished from callback receipt time?
+12. Are sample count, accuracy, precision, stability, timeout, range and freshness enforced?
+13. Does proposal remain non-authoritative until explicit acceptance?
+14. Does rejection preserve imported/manual authority exactly?
+15. Can unresolved sampling/proposal be bypassed to start Full Computer?
+16. Is the accepted environment frozen at dive start?
+17. Can environment change during active dive?
+18. Are all live runtime plans explicit and free from default sea-level authorization?
+19. Is surface pressure independently derived from accepted altitude?
+20. Is water density consistent with salinity?
+21. Are ZH-L16C constants exact and ordered?
+22. Are all 16 N2 compartments initialized altitude-aware?
+23. Are all 16 He compartments initialized altitude-aware?
+24. Are all 16 N2 compartments updated every interval?
+25. Are all 16 He compartments updated every interval?
+26. Is Schreiner algebraically correct?
+27. Are Schreiner units and pressure rates correct?
+28. Is Haldane correct at altitude?
+29. Does zero-rate Schreiner equal Haldane within tolerance?
+30. Is actual elapsed time handled correctly?
+31. Is long suspension fail-closed or accurately integrated?
+32. Is tissue state atomic and snapshot-consistent?
+33. Is GF ceiling altitude-aware?
+34. Is NDL altitude-aware?
+35. Is schedule rebuilt from current tissue state?
+36. Is TTS altitude-aware and not stale?
+37. Is gas switch ordering correct?
+38. Is stop-state timer separated from tissue state?
+39. Can a completed displayed stop force-clear deco incorrectly?
+40. Can deco appear, reduce, disappear and reappear correctly in multilevel profiles?
+41. Is the 39 m Air → 10 m profile oracle-validated second-by-second?
+42. Are ML-01 through ML-10 covered?
+43. Are Trimix / helium profiles oracle-validated?
+44. Is analytic Schreiner parity with one-second stepping quantified?
+45. Are numerical tolerances justified independently?
+46. Does checkpoint/restore preserve tissues/environment/stop state?
+47. Is restore idempotent and fail-safe?
+48. Does logbook preserve environment source and sensor quality?
+49. Do sync/export preserve mathematical values and activity discriminator?
+50. Are planner briefing cards reference-only?
+51. Can planner/CCR metadata affect live decompression?
+52. Are UI and docs truthful about altitude, Full Computer and validation limits?
+53. Are critical metrics visible on small Watch screens?
+54. Are haptics/reminders subordinate to critical alerts?
+55. Are App Intents safety-gated?
+56. Is performance sufficient to keep up with runtime?
+57. What happens if computation exceeds one second?
+58. Are fail-open paths impossible or documented as open blockers?
+59. Are all findings traceable to evidence?
+60. What blocks 100% software readiness?
+61. What blocks physical readiness?
+62. What blocks external release readiness?
 
-Every `NO`, `PARTIAL`, `UNKNOWN`, `PENDING`, or `NOT_EXECUTED` must include severity, root cause, affected files/symbols, impact, remediation and tests.
+Every `NO`, `PARTIAL`, `UNKNOWN`, `PENDING`, or `NOT_EXECUTED` must include:
+
+```text
+severity
+priority
+root cause
+affected files/symbols
+affected profile/timestamp/compartment if applicable
+credible impact
+required remediation
+acceptance tests
+release impact
+```
 
 ---
 
-# 20. FINAL VERDICT
+# 52. READINESS MATRIX
+
+The report must score:
+
+```text
+TARGET_MEMBERSHIP_READINESS
+ACTIVITY_ISOLATION_READINESS
+LEGAL_SAFETY_GATE_READINESS
+LIVE_ENGINE_CALL_GRAPH_READINESS
+FULL_COMPUTER_STARTUP_AUTHORITY_READINESS
+ENVIRONMENT_SOURCE_POLICY_READINESS
+CMALTIMETER_ACQUISITION_READINESS
+CMALTIMETER_LIFECYCLE_READINESS
+REQUEST_GENERATION_ISOLATION_READINESS
+LATE_CALLBACK_ISOLATION_READINESS
+SENSOR_SAMPLE_QUALITY_READINESS
+PROPOSAL_STATE_MACHINE_READINESS
+NO_SEA_LEVEL_FALLBACK_READINESS
+CANONICAL_ENVIRONMENT_READINESS
+SURFACE_PRESSURE_READINESS
+WATER_DENSITY_READINESS
+ZH_L16C_CONSTANTS_READINESS
+TISSUE_INITIALIZATION_READINESS
+N2_TISSUE_READINESS
+HE_TISSUE_READINESS
+HALDANE_READINESS
+SCHREINER_FORMULA_READINESS
+SCHREINER_UNIT_RATE_READINESS
+ONE_SECOND_TIMING_READINESS
+ACTUAL_DT_READINESS
+TISSUE_STATE_INTEGRITY_READINESS
+GF_CEILING_READINESS
+NDL_READINESS
+TTS_READINESS
+LIVE_DECO_SCHEDULE_READINESS
+GAS_SWITCH_READINESS
+STOP_STATE_READINESS
+MULTILEVEL_ORACLE_READINESS
+AIR39_TO_10M_READINESS
+TRIMIX_HELIUM_READINESS
+ALTITUDE_AWARENESS_READINESS
+ANALYTIC_VS_ONE_SECOND_PARITY_READINESS
+NUMERICAL_ERROR_BUDGET_READINESS
+CONCURRENCY_STALE_RESULT_READINESS
+PERSISTENCE_RESTORE_READINESS
+LOGBOOK_PROVENANCE_READINESS
+SYNC_EXPORT_INTEGRITY_READINESS
+PLANNER_BRIEFING_CARD_SAFETY_READINESS
+CCR_REFERENCE_ONLY_READINESS
+UI_TRUTHFULNESS_READINESS
+APP_INTENTS_SAFETY_READINESS
+FAILURE_INJECTION_COVERAGE_READINESS
+TEST_COVERAGE_READINESS
+PERFORMANCE_BATTERY_READINESS
+PHYSICAL_WATCH_QA_READINESS
+EXTERNAL_VALIDATION_READINESS
+OVERALL_WATCH_FULL_COMPUTER_SOFTWARE_READINESS
+OVERALL_WATCH_FULL_COMPUTER_RELEASE_READINESS
+```
+
+No percentage may be awarded without evidence.
+
+---
+
+# 53. FINAL VERDICT
 
 Print exactly:
 
 ```text
-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT: PASS / PARTIAL / FAIL
+MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT: PASS / PARTIAL / FAIL
 BASELINE_CURRENT_AND_CLEAN: PASS / FAIL
 TARGET_MEMBERSHIP: PASS / FAIL
-MULTI_ACTIVITY_ARCHITECTURE: PASS / FAIL
-ACTIVITY_ISOLATION_CODE: PASS / FAIL
-SETTINGS_OWNERSHIP_CODE: PASS / FAIL
-LOGBOOK_OWNERSHIP_CODE: PASS / FAIL
-SYNC_ACTIVITY_DISCRIMINATORS: PASS / FAIL
-SCHEMA_MIGRATION_SAFETY: PASS / FAIL
-BACKUP_RESTORE_ISOLATION: PASS / FAIL
-WATCHCONNECTIVITY_AUTHENTICATION: PASS / FAIL
-HMAC_REPLAY_ACK_POLICY: PASS / FAIL
-SECURITY_FILE_PATH_SAFETY: PASS / FAIL
-PRIVACY_DATA_FLOW_TRUTHFULNESS: PASS / FAIL
-SIMULATION_RELEASE_SAFETY: PASS / FAIL
+LIVE_ENGINE_PATH_PROVEN: PASS / FAIL
+SINGLE_CANONICAL_TISSUE_STATE: PASS / FAIL
+ACTIVITY_ISOLATION: PASS / FAIL
+LEGAL_SAFETY_GATE: PASS / FAIL
+FULL_COMPUTER_STARTUP_AUTHORITY: PASS / FAIL
+ENVIRONMENT_SOURCE_POLICY: PASS / FAIL
+NO_EXPLICIT_OR_IMPLICIT_SEA_LEVEL: PASS / FAIL
+WATCH_CMALTIMETER_PREDIVE_ACQUISITION: PASS / FAIL / NOT_SUPPORTED
+CMALTIMETER_LIFECYCLE_AND_CANCELLATION: PASS / FAIL
+REQUEST_GENERATION_ISOLATION: PASS / FAIL
+LATE_CALLBACK_ISOLATION: PASS / FAIL
+SENSOR_SAMPLE_QUALITY_AND_FRESHNESS: PASS / FAIL
+EXPLICIT_SENSOR_PROPOSAL_ACCEPTANCE: PASS / FAIL
+IMPORTED_AND_MANUAL_SOURCE_PRESERVATION: PASS / FAIL
+CANONICAL_ENVIRONMENT_VALIDATION: PASS / FAIL
+SURFACE_PRESSURE_DERIVATION: PASS / FAIL
+WATER_DENSITY_SALINITY_CONSISTENCY: PASS / FAIL
+ACTIVE_DIVE_ENVIRONMENT_IMMUTABLE: PASS / FAIL
+ZH_L16C_CONSTANTS: PASS / FAIL
+TISSUE_INITIALIZATION_ALTITUDE_AWARE: PASS / FAIL
+ALL_16_N2_COMPARTMENTS: PASS / FAIL
+ALL_16_HE_COMPARTMENTS: PASS / FAIL
+HALDANE_PARITY: PASS / FAIL
+SCHREINER_FORMULA_VERIFIED: PASS / FAIL
+SCHREINER_UNIT_RATE_CONVENTIONS: PASS / FAIL
+SCHREINER_PARITY: PASS / FAIL
+ONE_SECOND_UPDATE_SEMANTICS: PASS / FAIL
+TIMING_ACTUAL_DT: PASS / FAIL
+TISSUE_STATE_INTEGRITY: PASS / FAIL
+GF_CEILING_ALTITUDE_AWARE: PASS / FAIL
+NDL_ALTITUDE_AWARE: PASS / FAIL
+TTS_ALTITUDE_AWARE: PASS / FAIL
+LIVE_DECO_SCHEDULE_RECOMPUTATION: PASS / FAIL
+GAS_SWITCH_ORDERING: PASS / FAIL
+STOP_STATE_SEPARATION: PASS / FAIL
+MULTILEVEL_ORACLE_PROFILES: PASS / FAIL
+AIR39_TO_10M_PROFILE: PASS / FAIL
+DYNAMIC_DECO_REDUCTION: PASS / FAIL
+DYNAMIC_DECO_DISAPPEARANCE_WHEN_MODEL_PERMITS: PASS / FAIL
+DECO_REAPPEARANCE_AFTER_REDESCENT: PASS / FAIL
+TRIMIX_HELIUM_PROFILE: PASS / FAIL
+INDEPENDENT_ORACLE_PARITY: PASS / FAIL
+ANALYTIC_VS_ONE_SECOND_PARITY: PASS / FAIL
+NUMERICAL_ERROR_BUDGET: PASS / FAIL
+CONCURRENCY_STALE_RESULT_GUARDS: PASS / FAIL
+CHECKPOINT_RESTORE_ENVIRONMENT: PASS / FAIL
+PERSISTENCE_TISSUE_STATE: PASS / FAIL
+LOGBOOK_SENSOR_PROVENANCE: PASS / FAIL
+SYNC_EXPORT_MATH_INTEGRITY: PASS / FAIL
+PLANNER_BRIEFING_CARDS_REFERENCE_ONLY: PASS / FAIL
+CCR_REFERENCE_ONLY_SAFETY: PASS / FAIL
+UI_DOCUMENTATION_TRUTHFULNESS: PASS / FAIL
 APP_INTENTS_SAFETY_GATE: PASS / FAIL
-WATCH_IMAGE_CARD_PAYLOAD_ROUTING: PASS / FAIL
-PLANNER_BRIEFING_CARDS_REFERENCE_ONLY_CODE: PASS / FAIL
-IOS_STARTUP_PERFORMANCE_READINESS: <0-100>
-IOS_SWIFTUI_RENDERING_READINESS: <0-100>
-IOS_PLANNER_PERFORMANCE_READINESS: <0-100>
-IOS_CHART_RENDERING_READINESS: <0-100>
-IOS_LOGBOOK_SCALABILITY_READINESS: <0-100>
-IOS_EXPORT_IMPORT_PERFORMANCE_READINESS: <0-100>
-IOS_SYNC_PERFORMANCE_READINESS: <0-100>
-IOS_MAP_ROUTE_RENDERING_READINESS: <0-100>
-IOS_MEMORY_READINESS: <0-100>
-IOS_CONCURRENCY_READINESS: <0-100>
-IOS_BATTERY_POLICY_READINESS: <0-100>
-WATCH_RUNTIME_PERFORMANCE_READINESS: <0-100>
-WATCH_FULL_COMPUTER_TIMING_READINESS: <0-100>
-GLOBAL_SECURITY_READINESS: <0-100>
-GLOBAL_PRIVACY_READINESS: <0-100>
-GLOBAL_SYNC_SCHEMA_READINESS: <0-100>
-GLOBAL_PERFORMANCE_CONCURRENCY_BATTERY_READINESS: <0-100>
-TEST_COVERAGE_READINESS: <0-100>
-OVERALL_MAIN_CODE_READINESS: <0-100>
+FAILURE_INJECTION_COVERAGE: PASS / FAIL
+WATCH_ALGORITHM_TESTS: PASS / FAIL / NOT_EXECUTED
+IOS_PARITY_TESTS: PASS / FAIL / NOT_EXECUTED
+MACOS_WATCH_BUILD: PASS / FAIL / NOT_EXECUTED
 P0_FINDINGS: <number>
 P1_FINDINGS: <number>
 P2_FINDINGS: <number>
 P3_FINDINGS: <number>
-PHYSICAL_WATCH_QA: PASS / FAIL / PENDING_PHYSICAL
-PHYSICAL_IOS_QA: PASS / FAIL / PENDING_PHYSICAL
-PAIRED_DEVICE_QA: PASS / FAIL / PENDING_PHYSICAL
-PHYSICAL_INSTRUMENTS_PROFILING: PASS / FAIL / PENDING_INSTRUMENTS
-EXTERNAL_VALIDATION: PASS / FAIL / PENDING_EXTERNAL_VALIDATION
+P4_FINDINGS: <number>
+SOFTWARE_READINESS_PERCENT: <0-100>
+PHYSICAL_WATCH_QA_READINESS_PERCENT: <0-100>
+EXTERNAL_VALIDATION_READINESS_PERCENT: <0-100>
+OVERALL_RELEASE_READINESS_PERCENT: <0-100>
+PHYSICAL_APPLE_WATCH_SENSOR_QA: PASS / FAIL / PENDING_PHYSICAL
+PHYSICAL_DEPTH_SENSOR_QA: PASS / FAIL / PENDING_PHYSICAL
+PHYSICAL_ALTITUDE_DIVE_QA: PASS / FAIL / PENDING_PHYSICAL
+PHYSICAL_MULTILEVEL_DIVE_QA: PASS / FAIL / PENDING_PHYSICAL
+EXTERNAL_BUHLMANN_VALIDATION: PASS / FAIL / PENDING_EXTERNAL_VALIDATION
+EXTERNAL_LIVE_DECO_VALIDATION: PASS / FAIL / PENDING_EXTERNAL_VALIDATION
 RELEASE_BLOCKERS: <comma-separated IDs or NONE>
 ```
 
-`PASS` is allowed only when every software gate passes, no P0-P2 finding remains open, and any claimed physical/external evidence actually exists.
+`PASS` is permitted only when:
+
+- every software gate passes;
+- no P0-P2 finding remains open;
+- live engine path is proven;
+- independent oracle parity is passed;
+- all 16 N2 and all 16 He compartments are verified;
+- ML-01 through ML-10 are covered;
+- physical Watch sensor path passes if claimed;
+- physical depth-related QA passes if release readiness is claimed;
+- external decompression validation passes if release readiness is claimed;
+- every claim is traceable to code, test, official reference, physical evidence or external validation.
+
+If physical/external evidence is missing, final audit can be `PARTIAL` at best even if software evidence is strong.
 
 ---
 
-# 21. SUCCESS CRITERIA
+# 54. SUCCESS CRITERIA
 
 The task is complete only if:
 
@@ -1136,41 +2892,45 @@ The task is complete only if:
 - no business logic is modified;
 - no algorithms are modified;
 - no sync/security model is modified;
-- all required reports/matrices/scripts are created;
-- all five merged command scopes are preserved;
-- latest multi-activity development is included;
-- Settings and Logbook isolation are audited;
-- sync/persistence/schema are audited;
-- security/privacy/trust are audited;
-- performance/concurrency/battery are audited;
-- iOS performance optimization is audited in detail;
-- physical and external QA remain pending unless executed;
+- all required report files are created;
+- both merged command scopes are preserved;
+- Watch Full Computer master audit is included;
+- live Bühlmann/Schreiner multilevel forensic audit is included;
+- CMAltimeter/environment-source audit is included;
+- all 16 N2 and all 16 He compartments are audited;
+- altitude-aware initialization/update/ceiling/NDL/TTS/schedule are audited;
+- exact Schreiner formula is algebraically verified;
+- units and rate conventions are verified;
+- actual-dt / one-second semantics are verified;
+- ML-01 through ML-10 profile coverage is evaluated;
+- 39 m → 10 m scenario is answered with evidence;
+- dynamic deco reduction/disappearance/reappearance is evaluated from tissue state;
+- analytic-vs-one-second parity is quantified;
+- independent oracle requirements are evaluated;
+- numerical error budget is produced;
+- persistence/restore/logbook/sync/export are audited;
+- planner briefing cards and CCR reference-only safety are audited;
+- physical Watch QA is separated from simulator/software evidence;
+- external validation is separated from internal tests;
 - readiness percentages are evidence-based;
-- final git status confirms only Docs/Scripts audit outputs changed.
+- all findings have remediation and acceptance tests;
+- final git status is recorded.
 
 Do not commit or push automatically.
 
-Stop after producing the merged master code/sync/security/performance audit report, matrices, validation script and final summary.
+Stop after producing the merged forensic master audit reports, matrices, QA plan, external validation plan and final summary.
 
 
 
-# 4A. LATEST WATCH FULL COMPUTER DEVELOPMENT SCOPE — GF PRESETS, SHALLOW DEPTH AND WATER ENTRY
+# 3A. ADDITIONAL LATEST UI/UX SCOPE — GF PRESETS, SHALLOW DEPTH TESTING AND SYSTEM AUTO-LAUNCH SETUP
 
-This forensic audit must now include the latest Watch development wave.
+In addition to the V2.1 underwater hardware scope, audit the following new UI/UX surfaces.
 
-## 4A.1 Full Computer Gradient Factor preset audit
+## 3A.1 Full Computer Gradient Factor preset UX
 
-Inspect at minimum:
+Inspect:
 
 ```text
-Shared/Models/FullComputerGradientFactorPreset.swift
-Shared/Models/DivePlanPackage.swift
-Shared/Models/FullComputerDiveLogbookMetadata.swift
-Services/FullComputerGradientFactorSettingsStore.swift
-Services/FullComputerPrediveConfigurationStore.swift
-Services/FullComputerImportedPlanStore.swift
-Services/DIRActivitySelectionStore.swift
-Services/DiveManager.swift
 Views/FullComputerDivingSettingsView.swift
 Views/FullComputerConservatismSettingsView.swift
 Views/FullComputerGradientFactorsInfoView.swift
@@ -1179,86 +2939,69 @@ Views/FullComputerGradientFactorCurrentValueView.swift
 Views/FullComputerPrediveSettingsView.swift
 Views/FullComputerPrediveConfirmationView.swift
 Views/DiveDetailView.swift
-Tests/**/FullComputerGradientFactor*
+Resources/en.lproj/Localizable.strings
+Resources/it.lproj/Localizable.strings
 Docs/WATCH_FULL_COMPUTER_GRADIENT_FACTORS_SETTINGS.md
-Docs/WATCH_FULL_COMPUTER_GRADIENT_FACTORS_IMPLEMENTATION_REPORT_CURRENT.md
-Docs/QA_EVIDENCE/WATCH_FULL_COMPUTER_GF_*
 ```
 
 Verify:
 
 ```text
-Only supported presets are accepted on Watch.
-No custom GF editor exists on Watch unless explicitly introduced and audited.
-iOS plan GF override has higher precedence than Watch default only for imported/activated iOS plans.
-Unsupported iOS GF pairs are rejected or safely handled.
-Predive confirmation freezes a GF snapshot.
-Runtime reads the frozen snapshot, not live UserDefaults.
-Active Full Computer dive cannot change GF.
-Logbook stores GF preset/source/low/high from the runtime snapshot.
-GF does not appear in Gauge, Apnea or Snorkeling.
-GF cannot be changed via Action Button / App Intent / water auto-open.
+GF settings appear only under Diving → Full Computer.
+Gauge, Apnea and Snorkeling do not expose GF settings.
+Three fixed presets are understandable.
+iOS plan override/lock state is visible and truthful.
+Active dive lock state is visible and truthful.
+Predive confirmation displays final GF/source before runtime.
+Logbook displays GF/source for Full Computer dives only.
+No Action Button, Crown shortcut or water auto-open flow changes GF underwater.
+EN/IT copy is complete and uses safe terminology.
 ```
 
-Create or update inside the report:
+## 3A.2 Shallow-depth developer testing UX
+
+Inspect:
 
 ```text
-Docs/MASTER_WATCH_FULL_COMPUTER_GF_PRESET_MATRIX_CURRENT.csv
-```
-
-## 4A.2 Shallow-depth entitlement and developer testing audit
-
-Inspect at minimum:
-
-```text
-Config/DIRDiving.WithShallowDepth.entitlements
-Config/DIRDiving.WithWaterSubmersion.entitlements
-Config/DIRDiving.entitlements
-App/Info.plist
-project.yml
-Utils/DepthCapabilityPolicy.swift
-Utils/DepthCapabilityResolver.swift
-Utils/DepthCapabilityEntitlementProbe.swift
-Services/AppleDepthSensorProvider.swift
-Services/SensorProviderFactory.swift
 Views/DeveloperSettingsView.swift
 Utils/DeveloperSettings.swift
-Tests/WatchAlgorithmTests/DepthCapabilityTests.swift
+Utils/DepthCapabilityPolicy.swift
+Resources/en.lproj/Localizable.strings
+Resources/it.lproj/Localizable.strings
 Docs/BUILD_AND_XCODEGEN_WORKFLOW.md
 ```
 
 Verify:
 
 ```text
-Default Watch signing intentionally uses the shallow-depth entitlement only when the provisioned capability supports it.
-DIRDepthEntitlementTier = shallow is consistent with signed entitlements.
-Full-depth behavior remains separate and requires full Apple capability/provisioning.
-Shallow-depth capability does not imply full decompression-depth validation.
-Developer shallow Gauge testing and developer shallow Full Computer testing are gated separately.
-Developer shallow toggles are DEBUG/TestFlight/internal only and never public production defaults.
-Shallow Full Computer runtime remains clearly labelled as internal testing only, not certified decompression guidance.
-Simulation fallback cannot be confused with real Apple depth samples.
+Developer shallow Gauge testing toggle is hidden behind developer unlock.
+Developer shallow Full Computer testing toggle is hidden behind developer unlock.
+Copy clearly says internal testing only.
+Copy clearly says ~6 m / shallow depth where relevant.
+Full Computer shallow testing copy does not imply certified decompression guidance.
+Production users cannot confuse shallow testing with full-depth entitlement.
+Simulation source, shallow Apple source and full Apple source are visually distinguishable.
 ```
 
-Create or update inside the report:
-
-```text
-Docs/MASTER_WATCH_DEPTH_CAPABILITY_SHALLOW_TESTING_MATRIX_CURRENT.csv
-```
-
-## 4A.3 Water auto-open interaction with Full Computer audit
+## 3A.3 System Auto-Launch setup UX
 
 Verify:
 
 ```text
-Water auto-open may route to Diving Full Computer predive configuration/confirmation.
-Water auto-open never starts Full Computer live runtime directly.
-Water auto-open never bypasses environment confirmation.
-Water auto-open never bypasses GF predive snapshot.
-Water auto-open never mutates tissues, gases, GF, environment or runtime state.
-System submerged auto-launch remains physical/watchOS evidence gated.
+Water auto-open Settings explain Apple Watch system path:
+Settings → General → Auto-Launch → When Submerged → App → DIR Diving.
+The copy explains that listing depends on watchOS, entitlement and provisioning.
+The app does not claim it can force system listing.
+Icon launch on the surface remains described as normal startup.
+Underwater system auto-open routing is described as conditional on watchOS auto-opening the app.
 ```
 
-These checks must be cross-referenced with Audit 03, 04 and 05.
+Create or update inside this audit:
+
+```text
+Docs/MASTER_UI_UX_GF_PRESET_UX_MATRIX_CURRENT.csv
+Docs/MASTER_UI_UX_SHALLOW_DEPTH_DEVELOPER_UX_MATRIX_CURRENT.csv
+Docs/MASTER_UI_UX_SYSTEM_AUTO_LAUNCH_SETUP_UX_MATRIX_CURRENT.csv
+```
 
 ---

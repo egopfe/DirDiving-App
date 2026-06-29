@@ -3,14 +3,16 @@ import XCTest
 final class PlannerGFPresetDisplayTests: XCTestCase {
     func testConservativeGFPresetValuesUnchanged() {
         XCTAssertEqual(PlannerGFPreset.conservative.gfLow, 20, accuracy: 0.001)
-        XCTAssertEqual(PlannerGFPreset.conservative.gfHigh, 70, accuracy: 0.001)
-        XCTAssertEqual(PlannerGFPreset.conservative.displayPair, "20/70")
+        XCTAssertEqual(PlannerGFPreset.conservative.gfHigh, 80, accuracy: 0.001)
+        XCTAssertEqual(PlannerGFPreset.conservative.displayPair, "20/80")
+        XCTAssertEqual(PlannerGFPreset.conservative.fullComputerGradientFactorPresetRawValue, "conservative2080")
     }
 
     func testStandardGFPresetValuesUnchanged() {
         XCTAssertEqual(PlannerGFPreset.standard.gfLow, 30, accuracy: 0.001)
-        XCTAssertEqual(PlannerGFPreset.standard.gfHigh, 80, accuracy: 0.001)
-        XCTAssertEqual(PlannerGFPreset.standard.displayPair, "30/80")
+        XCTAssertEqual(PlannerGFPreset.standard.gfHigh, 70, accuracy: 0.001)
+        XCTAssertEqual(PlannerGFPreset.standard.displayPair, "30/70")
+        XCTAssertEqual(PlannerGFPreset.standard.fullComputerGradientFactorPresetRawValue, "standard3070")
     }
 
     func testAggressiveGFPresetValuesUnchanged() {
@@ -90,7 +92,7 @@ final class PlannerGFPresetDisplayTests: XCTestCase {
         var input = GasPlanInput()
         PlannerModePolicy.applyGFPreset(.conservative, to: &input)
         XCTAssertEqual(input.gfLow, 20, accuracy: 0.001)
-        XCTAssertEqual(input.gfHigh, 70, accuracy: 0.001)
+        XCTAssertEqual(input.gfHigh, 80, accuracy: 0.001)
         PlannerModePolicy.applyGFPreset(.aggressive, to: &input)
         XCTAssertEqual(input.gfLow, 40, accuracy: 0.001)
         XCTAssertEqual(input.gfHigh, 85, accuracy: 0.001)
