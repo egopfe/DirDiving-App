@@ -514,6 +514,7 @@ private struct AnalysisCacheKey: Equatable {
     let emergencySacLitersPerMinute: Double
     let teamSize: Double
     let emergencyExtraMinutes: Double
+    let includeBuddyDecoGas: Bool
     let altitudeMeters: Double
     let salinity: SalinityMode
     let bottomGasSignature: String
@@ -533,6 +534,7 @@ private struct AnalysisCacheKey: Equatable {
         emergencySacLitersPerMinute = input.emergencySacLitersPerMinute
         teamSize = input.teamSize
         emergencyExtraMinutes = input.emergencyExtraMinutes
+        includeBuddyDecoGas = input.includeBuddyDecoGas
         altitudeMeters = input.altitudeMeters
         salinity = input.salinity
         bottomGasSignature = "\(input.bottomGas.oxygen)-\(input.bottomGas.helium)-\(input.bottomGas.maxPPO2)"
