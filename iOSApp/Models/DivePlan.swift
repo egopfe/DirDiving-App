@@ -111,6 +111,7 @@ struct DivePlanResult: Hashable {
     let plannerMode: PlannerMode
     let modeGuidanceMessage: PlannerUserFacingMessage?
     let ratioDeco: RatioDecoPlanningBundle?
+    let emergencyDecoGasAdequacy: EmergencyDecoGasAdequacyReport?
 
     static let empty = DivePlanResult(
         ndlMinutes: 0,
@@ -145,7 +146,8 @@ struct DivePlanResult: Hashable {
         userFacingWarnings: [],
         plannerMode: .base,
         modeGuidanceMessage: nil,
-        ratioDeco: nil
+        ratioDeco: nil,
+        emergencyDecoGasAdequacy: nil
     )
 }
 

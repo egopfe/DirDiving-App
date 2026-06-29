@@ -220,6 +220,21 @@ enum PlannerService {
         var briefing = GasPlanningService.briefingLines(input: working, analysis: analysis, tts: tts, stops: stops)
         briefing.insert(contentsOf: scheduleLines, at: min(1, briefing.count))
 
+        let emergencyDecoGasAdequacy: EmergencyDecoGasAdequacyReport?
+        if mode == .deco || mode == .technical {
+            emergencyDecoGasAdequacy = DivePlannerEmergencyDecoGasService.analyze(
+                input: working,
+                enginePlan: operationalEnginePlan,
+                environment: environment,
+                includeBuddyDecoGas: working.includeBuddyDecoGas
+            )
+        } else {
+            emergencyDecoGasAdequacy = nil
+        }
+        if let emergencyDecoGasAdequacy {
+            briefing.append(contentsOf: DivePlannerEmergencyDecoGasService.briefingLines(for: emergencyDecoGasAdequacy))
+        }
+
         let environmentSummary = PlannerUserFacingCopy.environmentSummary(for: environment)
         let resultHeader = PlannerPresentationSupport.resultHeader(
             stops: stops,
@@ -235,6 +250,19 @@ enum PlannerService {
             for warning in ledger.warnings {
                 userFacingWarnings.append(PlannerUserFacingCopy.gasUsageWarning(for: warning))
             }
+        }
+        if let emergencyDecoGasAdequacy,
+           emergencyDecoGasAdequacy.buddyIncluded,
+           !emergencyDecoGasAdequacy.isOverallAdequate {
+            userFacingWarnings.append(
+                PlannerUserFacingMessage(
+                    id: "planner.emergency.deco_gas.buddy_insufficient",
+                    title: DIRIOSLocalizer.string("planner.emergency.deco_gas.title"),
+                    message: DIRIOSLocalizer.string("planner.emergency.deco_gas.warning_buddy_insufficient"),
+                    correctiveHint: nil,
+                    severity: .warning
+                )
+            )
         }
 
         if let guidance = PlannerModePolicy.modeGuidance(mode: mode, enginePlan: enginePlan, stops: stops) {
@@ -280,7 +308,8 @@ enum PlannerService {
             userFacingWarnings: uniqueWarnings(userFacingWarnings),
             plannerMode: mode,
             modeGuidanceMessage: PlannerModePolicy.modeGuidance(mode: mode, enginePlan: enginePlan, stops: stops),
-            ratioDeco: ratioDeco
+            ratioDeco: ratioDeco,
+            emergencyDecoGasAdequacy: emergencyDecoGasAdequacy
         )
     }
 
@@ -388,7 +417,8 @@ enum PlannerService {
             userFacingWarnings: PlannerUserFacingCopy.userFacingWarnings(from: states),
             plannerMode: mode,
             modeGuidanceMessage: nil,
-            ratioDeco: nil
+            ratioDeco: nil,
+            emergencyDecoGasAdequacy: nil
         )
     }
 

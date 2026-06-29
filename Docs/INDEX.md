@@ -1,7 +1,20 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-29  
-**Branch consigliato:** `main` = `origin/main` @ `88f9009`
+**Branch consigliato:** `main` = `origin/main` @ `79854fa`
+
+---
+
+## Aggiornamento indice 2026-06-29 — Diving Planner emergency buddy deco gas @ `79854fa`
+
+Emergency-section toggle for per-deco-gas adequacy with optional 2× buddy multiplier; no Bühlmann/deco schedule or runtime changes.
+
+| Campo | Valore |
+|-------|--------|
+| **Spec** | [`DIVE_PLANNER_EMERGENCY_BUDDY_DECO_GAS.md`](DIVE_PLANNER_EMERGENCY_BUDDY_DECO_GAS.md) |
+| **Report** | [`DIVE_PLANNER_EMERGENCY_BUDDY_DECO_GAS_IMPLEMENTATION_REPORT_CURRENT.md`](DIVE_PLANNER_EMERGENCY_BUDDY_DECO_GAS_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **QA** | DPL-QA-EBDG-001…004 · `Docs/QA_EVIDENCE/DIVE_PLANNER_EMERGENCY_BUDDY_DECO_GAS_*` |
+| **Verdict** | **INTERNAL_READY** · **PHYSICAL_QA_PENDING** |
 
 ---
 
