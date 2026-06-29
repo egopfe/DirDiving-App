@@ -1,6 +1,6 @@
 # Master Release Blocker Burndown Plan — Current
 
-**Baseline:** `main` @ `8ae1034` (remediation @ `5d757cc`)  
+**Baseline:** `main` @ `0126699` (code-bearing audit baseline @ `4d415c0`; remediation @ `5d757cc`)
 **Orchestrator:** V1.2 refresh · 2026-06-29  
 **Overall release readiness:** ~**72%** · Verdict **PARTIAL** · **Software readiness 100%**
 
@@ -30,7 +30,7 @@
 - [x] Batch 6: CONS-019 WAO policy gate
 - [x] Batch 7: CONS-006..007 depth authority
 - [x] Post-remediation reruns: 01, 02, 04, 05, 06
-- [x] Orchestrator 00 refresh @ 8ae1034
+- [x] Orchestrator 00 refresh @ 0126699
 
 **Exit criteria met:** Internal TestFlight software **READY**; trustworthy audit re-run enabled
 
@@ -79,7 +79,7 @@
 
 ## Metrics tracker
 
-| Metric | @ 7dfefe2 | @ 8ae1034 | Phase B target | Phase C target |
+| Metric | @ 7dfefe2 | @ 0126699 | Phase B target | Phase C target |
 |--------|----------:|----------:|---------------:|---------------:|
 | Overall release readiness | 71% | **72%** | 85% | 92% |
 | Software readiness | ~88% | **100%** | 100% | 100% |
@@ -102,4 +102,4 @@
 
 ---
 
-**BURNDOWN_PLAN_STATUS: ACTIVE @ 8ae1034 · Phase B next**
+**BURNDOWN_PLAN_STATUS: ACTIVE @ 0126699 · Phase B next**

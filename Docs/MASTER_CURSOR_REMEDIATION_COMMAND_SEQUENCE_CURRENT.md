@@ -1,6 +1,6 @@
 # Master Cursor Remediation Command Sequence — Current
 
-**Baseline:** `main` @ `8ae1034` (remediation @ `5d757cc`)  
+**Baseline:** `main` @ `0126699` (code-bearing audit baseline @ `4d415c0`; remediation @ `5d757cc`)
 **Orchestrator:** `00-MASTER_SUPER_ORCHESTRATOR...V1.2` refresh  
 **Date:** 2026-06-29
 
@@ -32,8 +32,8 @@
 | 17 | Pixel-diff baseline capture (59 mockups) | Batch-6/8 | CONS-032 | **NEXT** |
 | 18 | **Release/legal:** PDF golden renders + counsel review | Batch-9 | CONS-013, CONS-044 | **NEXT** |
 | 19 | Documentation README/feature matrix repair (doc-only) | Batch-9 | CONS-034 partial | **OPTIONAL** |
-| 20 | Optional audit **03** UI/UX rerun @ HEAD | — | Stale @ 7dfefe2 | **OPTIONAL** |
-| 21 | Re-run **00 orchestrator V1.2** after evidence milestones | — | All | **DONE** @ 8ae1034 |
+| 20 | Optional audit **03** UI/UX rerun @ HEAD | — | Fresh banner only; audit 03 software rerun @ 4d415c0 | **OPTIONAL** |
+| 21 | Re-run **00 orchestrator V1.2** after evidence milestones | — | All | **DONE** @ 0126699 |
 
 ---
 
@@ -65,7 +65,7 @@ Optional — Audit 03 UI/UX rerun @ HEAD (fresh banner; not blocking internal TF
 
 ## Batch 0–9 reference (V1.2)
 
-| Batch | Scope | @ 8ae1034 |
+| Batch | Scope | @ 0126699 |
 |-------|-------|-----------|
 | 0 | Baseline protection | **COMPLETE** |
 | 1 | Watch FC safety, oracle, altitude | **COMPLETE** (software) |
