@@ -1,9 +1,10 @@
 # DIR DIVING — Master Main Code / Sync / Security / Performance Audit (Current)
 
-**Command:** 04 — `04-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.0`  
+**Command:** 04 — `04-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.1`  
 **Date:** 2026-06-28  
 **Branch:** `main`  
-**Commit:** `7dfefe2` (`7dfefe2cd7817780a903a64e51b890d901111ffd`)  
+**Commit:** `5d757cc` (`5d757cc0217755f5c6d5429af2f13ce5c4748c5d`)  
+**Pass type:** Post-remediation audit rerun (read-only)  
 **Task type:** Audit-only — read-only; no production changes  
 **Xcode:** 26.6 (Build 17F113)
 
@@ -17,24 +18,24 @@
 
 ## A. Executive Summary
 
-This master audit re-evaluates the entire MAIN codebase (Watch + iOS) for Diving (Gauge + Full Computer), Apnea, and Snorkeling at commit **`7dfefe2`**.
+This master audit re-evaluates the entire MAIN codebase (Watch + iOS) for Diving (Gauge + Full Computer), Apnea, and Snorkeling at commit **`5d757cc`** — **post-remediation rerun** for CONS-003–007 (sync in-flight release, symmetric diveImportAck, signed tombstones, shallow dev toggles default OFF, depth compile authority).
 
 **Software architecture and isolation remain strong.** Activity-scoped logbooks, settings, sync payload keys, signed HMAC v3 envelopes, activity tombstones, and cloud backup truthfulness are implemented and tested. iOS performance remediations (`PlannerBackgroundCalculation`, lazy startup, map downsampling, sync flush policy) are present.
 
-**Five open P1 software findings** were identified this pass (iOS sync in-flight stuck, asymmetric userInfo ACK, legacy unsigned tombstones, shallow FC internal-testing exposure, depth tier metadata trust). **No P0** safety bypasses (water auto-open, simulation-in-release, cross-activity decode).
+**All five prior P1 software findings are VERIFIED closed** at `5d757cc`. **No P0** safety bypasses. **Nine P2** findings remain (physical QA, WAO policy gap, planner lifecycle).
 
 | Dimension | Score (0–100) | Notes |
 |-----------|---------------|-------|
-| Multi-activity architecture | **97** | Key routing + envelope guard; WAO FC policy gap |
-| Sync / schema | **90** | P1 ACK asymmetry + legacy tombstones |
-| Security (software) | **94** | HMAC static PASS; field + tombstone compat gaps |
+| Multi-activity architecture | **97** | Key routing + envelope guard; WAO FC policy gap P2 |
+| Sync / schema | **96** | P1 sync fixes verified; bootstrap tombstone mirror P3 |
+| Security (software) | **97** | HMAC static PASS; field QA pending |
 | Privacy | **98** | Manifests + export policies + cloud truthfulness |
-| Performance (software) | **86** | P1 sync stuck; planner lifecycle gaps |
-| iOS performance (software) | **82** | Down from prior pass due to sync + planner concurrency |
-| Test coverage (automated) | **95** | Strong negative paths; full suite NOT_EXECUTED this pass |
-| **Overall MAIN software readiness** | **88** | Physical QA not counted as passed |
+| Performance (software) | **90** | Sync in-flight fixed; planner lifecycle P2 |
+| iOS performance (software) | **86** | Sync readiness improved; planner concurrency P2 |
+| Test coverage (automated) | **96** | Remediation lanes PASS @ 5d757cc |
+| **Overall MAIN software readiness** | **93** | Physical QA not counted as passed |
 
-**Build evidence (this pass):** iOS **BUILD SUCCEEDED** (`generic/platform=iOS Simulator`). Preflight scripts PASS. Full algorithm test suites **NOT_EXECUTED** this pass.
+**Build evidence (this pass):** iOS **BUILD SUCCEEDED**, Watch **BUILD SUCCEEDED** (`generic/platform=* Simulator`). Preflight + remediation validation scripts **PASS**. Remediation test lanes: iOS **45 tests PASS**, Watch **18 tests PASS** (`validate_master_main_code_sync_security_performance_audit.sh`).
 
 ---
 
@@ -61,10 +62,11 @@ DIR Diving
 └── Snorkeling
 ```
 
-**4A additions at `7dfefe2`:**
+**4A additions at `5d757cc`:**
 
-- **Shallow depth:** `project.yml` signs `Config/DIRDiving.WithShallowDepth.entitlements`; `App/Info.plist` `DIRDepthEntitlementTier=shallow`.
-- **Developer settings:** Separate shallow Gauge vs shallow Full Computer toggles; TestFlight default OFF; App Store hidden.
+- **Shallow depth:** `project.yml` signs `Config/DIRDiving.WithShallowDepth.entitlements`; `DEPTH_ENTITLEMENT_SHALLOW` compile authority via `DepthCapabilityEntitlementProbe.runtimeAuthorityTier`.
+- **Developer settings:** Separate shallow Gauge vs shallow Full Computer toggles; **default OFF** (`bool(forKey)` absent → false); DEBUG/TestFlight-only; App Store hidden.
+- **Sync remediation:** `releaseInFlightOutboundSession` on failed send/ACK; symmetric `sendDiveImportAckToWatch` on iOS `didReceiveUserInfo`; signed tombstone primary path.
 - **Water auto-open:** `WatchSubmersionLaunchProbe` + `ContentView` cold-launch routing; FC destinations require predive + confirm (no live bypass).
 - **GF presets:** Watch preset-only; frozen at `confirmFullComputerPredive()`; see `MASTER_WATCH_FULL_COMPUTER_GF_PRESET_MATRIX_CURRENT.csv`.
 
@@ -74,9 +76,9 @@ DIR Diving
 
 | Item | Value |
 |------|-------|
-| Branch | `main` (aligned with `origin/main` 0/0) |
-| Commit | `7dfefe2` |
-| Dirty files at audit start | Other Watch FC docs modified (not this audit scope) |
+| Branch | `main` (aligned with `origin/main`) |
+| Commit | `5d757cc` |
+| Dirty files at audit start | None (Docs-only updates this pass) |
 | Watch target | DIRDiving Watch App |
 | iOS target | DIRDiving iOS |
 | Test targets | Watch Algorithm Tests, iOS Algorithm Tests |
@@ -95,15 +97,17 @@ DIR Diving
 | Check | Result |
 |-------|--------|
 | Branch is `main` | PASS |
-| Commit `7dfefe2` | PASS |
-| `git fetch --prune origin` | PASS |
+| Commit `5d757cc` | PASS |
 | `check_main_target_isolation.sh` | PASS |
 | `check_secrets.sh` | PASS |
 | `audit_localization.sh` | PASS — inventory 2389 keys; Watch hardcoded 0 |
+| `validate_depth_capability_runtime_authority.sh` | PASS |
+| `validate_developer_shallow_testing_release_gate.sh` | PASS |
 | iOS build (iOS Simulator) | **BUILD SUCCEEDED** |
-| Watch build | Included in iOS scheme dependency build |
-| iOS Algorithm Tests full suite | NOT_EXECUTED this pass |
-| Watch Algorithm Tests full suite | NOT_EXECUTED this pass |
+| Watch build (watchOS Simulator) | **BUILD SUCCEEDED** |
+| iOS remediation test lane (45 tests) | **TEST SUCCEEDED** |
+| Watch remediation test lane (18 tests) | **TEST SUCCEEDED** |
+| `validate_master_main_code_sync_security_performance_audit.sh` | **GATE_PASS** |
 
 ---
 
@@ -112,7 +116,7 @@ DIR Diving
 - Shared modules under `Shared/` for sync codecs, performance signposts, tombstones, large payload transfer.
 - Experimental targets excluded from MAIN compile — verified by isolation script.
 - Entitlements and privacy manifests present for both MAIN targets.
-- Shallow-depth signing consistent with Info.plist tier at `7dfefe2`.
+- Shallow-depth signing consistent with compile authority at `5d757cc`.
 - **Verdict:** TARGET_MEMBERSHIP **PASS**
 
 ---
@@ -157,7 +161,7 @@ DIR Diving
 
 **Planner:** `PlannerBackgroundCalculation` + `Task.detached`; generation token stale guard. **P2:** `deinit` does not cancel planning tasks; `refreshAnalysis` may run on MainActor before detach (`MASTER-PERF-007`).
 
-**Watch sync:** **P1:** `inFlightOutboundSessionIDs` not cleared on ACK failure (`MASTER-PERF-006`). **P1:** userInfo import path does not send import-ACK to Watch (`MASTER-SYNC-002`).
+**Watch sync:** `releaseInFlightOutboundSession` clears in-flight on bad ACK, sendMessage error, and encode failure (`MASTER-PERF-006` **VERIFIED**). iOS `didReceiveUserInfo` sends symmetric `sendDiveImportAckToWatch` after dive import (`MASTER-SYNC-002` **VERIFIED**).
 
 **Cloud:** `CloudBackupCapability` — Diving-only opt-in with legacy key migration.
 
@@ -177,7 +181,7 @@ DIR Diving
 - Checkpoint codec v1 with SHA-256 checksum.
 - Plan package isolated namespace from Apnea plan ACK.
 - Missed tick → degraded state (safe posture).
-- Shallow FC on shallow entitlement requires developer toggle — process risk `MASTER-DEPTH-001`.
+- Shallow FC on shallow entitlement requires explicit developer toggle (default OFF) — process risk mitigated (`MASTER-DEPTH-001` **VERIFIED**).
 
 **Verdict:** WATCH_FULL_COMPUTER_TIMING_READINESS **93** (simulator); physical Ultra pending.
 
@@ -188,7 +192,7 @@ DIR Diving
 - HMAC v3 `ActivitySyncSignedTransport` with `activityType` + `messageType`.
 - Distinct payload keys per activity (see `MASTER_SYNC_MESSAGE_NAMESPACE_MATRIX_CURRENT.csv`).
 - Large payload: `ActivitySyncLargePayloadTransfer` — direct ≤512 KB; file transfer up to 5 MB.
-- **P1:** Legacy unsigned diving tombstone list still accepted (`MASTER-SYNC-003`).
+- **Signed tombstones primary:** `ActivitySyncTombstoneBroadcast.verifiedSessionIDs` when peer secret present (`MASTER-SYNC-003` **VERIFIED**). Legacy UUID mirror retained for diving pairing-bootstrap only (P3 compat).
 
 **Verdict:** SYNC_ACTIVITY_DISCRIMINATORS **PASS**, SCHEMA_MIGRATION_SAFETY **PASS**
 
@@ -221,13 +225,13 @@ See `MASTER_SECURITY_THREAT_MODEL_CURRENT.md` and `MASTER_PRIVACY_DATA_FLOW_MATR
 - Export GPS omit default — PASS.
 - Protected sensitive file store — PASS.
 
-**Verdict:** WATCHCONNECTIVITY_AUTHENTICATION **PASS**, HMAC_REPLAY_ACK_POLICY **PARTIAL** (legacy tombstone + ACK asymmetry), PRIVACY_DATA_FLOW_TRUTHFULNESS **PASS**
+**Verdict:** WATCHCONNECTIVITY_AUTHENTICATION **PASS**, HMAC_REPLAY_ACK_POLICY **PASS** (software; field QA pending), PRIVACY_DATA_FLOW_TRUTHFULNESS **PASS**
 
 ---
 
 ## P. Threat Model
 
-STRIDE summary in `MASTER_SECURITY_THREAT_MODEL_CURRENT.md`. Residual: TOFU bootstrap (`MASTER-SEC-002`); legacy tombstone compat (`MASTER-SYNC-003`).
+STRIDE summary in `MASTER_SECURITY_THREAT_MODEL_CURRENT.md`. Residual: TOFU bootstrap (`MASTER-SEC-002`); legacy tombstone bootstrap mirror (`MASTER-SYNC-003` P3 compat).
 
 ---
 
@@ -255,7 +259,7 @@ STRIDE summary in `MASTER_SECURITY_THREAT_MODEL_CURRENT.md`. Residual: TOFU boot
 - Legal gate on safety intents — PASS.
 - Simulation tagged; App Store disallowed — PASS.
 - Developer section: DEBUG always; TestFlight via sandbox receipt; App Store hidden.
-- Shallow FC toggle: internal testing only; TestFlight default OFF.
+- Shallow FC toggle: internal testing only; **default OFF** (`MASTER-DEPTH-001` VERIFIED).
 
 **Verdict:** SIMULATION_RELEASE_SAFETY **PASS**, APP_INTENTS_SAFETY_GATE **PASS**
 
@@ -264,7 +268,7 @@ STRIDE summary in `MASTER_SECURITY_THREAT_MODEL_CURRENT.md`. Residual: TOFU boot
 ## T. Performance / Concurrency / Battery — Global
 
 Watch: 1 Hz loops, GPS gated, haptics @MainActor, draft throttle.  
-iOS: debounced/background planner, bounded caches; sync in-flight defect lowers sync readiness.
+iOS: debounced/background planner, bounded caches; sync in-flight defect **remediated**.
 
 See `MASTER_PERFORMANCE_BUDGET_MATRIX_CURRENT.csv`, `MASTER_CONCURRENCY_RISK_MATRIX_CURRENT.csv`.
 
@@ -282,14 +286,14 @@ See `MASTER_PERFORMANCE_BUDGET_MATRIX_CURRENT.csv`, `MASTER_CONCURRENCY_RISK_MAT
 | Chart rendering | 88 |
 | Logbook scalability | 86 |
 | Export/import | 84 |
-| Sync performance | 72 |
+| Sync performance | 88 |
 | Map/route rendering | 84 |
 | Memory | 86 |
 | Concurrency | 80 |
 | Battery policy | 78 |
 | Observability | 70 |
 | Performance test coverage | 90 |
-| **OVERALL_IOS_PERFORMANCE** | **82** |
+| **OVERALL_IOS_PERFORMANCE** | **86** |
 
 ---
 
@@ -332,7 +336,7 @@ See `MASTER_PERFORMANCE_BUDGET_MATRIX_CURRENT.csv`, `MASTER_CONCURRENCY_RISK_MAT
 ## Z. Concurrency / Cancellation / Stale Result Guards
 
 - `planningGeneration` token — planner stale publish prevented.
-- `WatchSyncPendingFlushPolicy` — duplicate flush prevented; in-flight stuck on error — `MASTER-PERF-006`.
+- `WatchSyncPendingFlushPolicy` — duplicate flush prevented; in-flight released on error — `MASTER-PERF-006` **VERIFIED**.
 - `IOSExportCancellation` — export cancellation present.
 - Signed ACK authoritative for WC dequeue when ACK received.
 
@@ -373,9 +377,9 @@ Consolidated in `MASTER_MAIN_CODE_FINDING_TRACEABILITY_CURRENT.csv`.
 | Severity | Count | Summary |
 |----------|-------|---------|
 | P0 | 0 | — |
-| P1 | 5 | Sync in-flight, ACK gap, legacy tombstones, shallow FC exposure, tier metadata trust |
+| P1 | 0 | All five prior P1 items VERIFIED @ 5d757cc |
 | P2 | 9 | 6 physical QA + WAO policy/probe + planner concurrency |
-| P3 | 6 | Instruments + accepted risks + doc drift |
+| P3 | 6 | Instruments + accepted risks + doc drift + tombstone bootstrap mirror |
 | P4 | 10 | INFO positive controls |
 
 ---
@@ -394,7 +398,7 @@ Consolidated in `MASTER_MAIN_CODE_FINDING_TRACEABILITY_CURRENT.csv`.
 | SCHEMA_MIGRATION_SAFETY | PASS |
 | BACKUP_RESTORE_ISOLATION | PASS |
 | WATCHCONNECTIVITY_AUTHENTICATION | PASS |
-| HMAC_REPLAY_ACK_POLICY | PARTIAL |
+| HMAC_REPLAY_ACK_POLICY | PASS |
 | SECURITY_FILE_PATH_SAFETY | PASS |
 | PRIVACY_DATA_FLOW_TRUTHFULNESS | PASS |
 | SIMULATION_RELEASE_SAFETY | PASS |
@@ -408,13 +412,13 @@ Consolidated in `MASTER_MAIN_CODE_FINDING_TRACEABILITY_CURRENT.csv`.
 
 See `MASTER_MAIN_CODE_REMEDIATION_PLAN_CURRENT.md` and `MASTER_SECURITY_REMEDIATION_PLAN_CURRENT.md`.
 
-**P1 software fixes required** before internal TestFlight confidence: sync in-flight cleanup, symmetric userInfo ACK, legacy tombstone policy.
+**P1 software fixes verified** at `5d757cc`. Remaining: P2 physical QA, WAO policy, planner lifecycle.
 
 ---
 
 ## AG. Future Cursor Remediation Commands
 
-1. iOS WatchSync in-flight + ACK symmetry remediation.
+1. ~~iOS WatchSync in-flight + ACK symmetry remediation.~~ **DONE @ 5d757cc**
 2. Water auto-open DepthCapabilityPolicy alignment.
 3. Physical paired-device QA (read-only evidence capture).
 4. Instruments iOS/Watch profiling command.
@@ -435,7 +439,7 @@ SYNC_ACTIVITY_DISCRIMINATORS: PASS
 SCHEMA_MIGRATION_SAFETY: PASS
 BACKUP_RESTORE_ISOLATION: PASS
 WATCHCONNECTIVITY_AUTHENTICATION: PASS
-HMAC_REPLAY_ACK_POLICY: PARTIAL
+HMAC_REPLAY_ACK_POLICY: PASS
 SECURITY_FILE_PATH_SAFETY: PASS
 PRIVACY_DATA_FLOW_TRUTHFULNESS: PASS
 SIMULATION_RELEASE_SAFETY: PASS
@@ -448,21 +452,21 @@ IOS_PLANNER_PERFORMANCE_READINESS: 86
 IOS_CHART_RENDERING_READINESS: 88
 IOS_LOGBOOK_SCALABILITY_READINESS: 86
 IOS_EXPORT_IMPORT_PERFORMANCE_READINESS: 84
-IOS_SYNC_PERFORMANCE_READINESS: 72
+IOS_SYNC_PERFORMANCE_READINESS: 88
 IOS_MAP_ROUTE_RENDERING_READINESS: 84
 IOS_MEMORY_READINESS: 86
-IOS_CONCURRENCY_READINESS: 80
+IOS_CONCURRENCY_READINESS: 82
 IOS_BATTERY_POLICY_READINESS: 78
 WATCH_RUNTIME_PERFORMANCE_READINESS: 88
 WATCH_FULL_COMPUTER_TIMING_READINESS: 93
-GLOBAL_SECURITY_READINESS: 94
+GLOBAL_SECURITY_READINESS: 97
 GLOBAL_PRIVACY_READINESS: 98
-GLOBAL_SYNC_SCHEMA_READINESS: 90
-GLOBAL_PERFORMANCE_CONCURRENCY_BATTERY_READINESS: 86
-TEST_COVERAGE_READINESS: 95
-OVERALL_MAIN_CODE_READINESS: 88
+GLOBAL_SYNC_SCHEMA_READINESS: 96
+GLOBAL_PERFORMANCE_CONCURRENCY_BATTERY_READINESS: 90
+TEST_COVERAGE_READINESS: 96
+OVERALL_MAIN_CODE_READINESS: 93
 P0_FINDINGS: 0
-P1_FINDINGS: 5
+P1_FINDINGS: 0
 P2_FINDINGS: 9
 P3_FINDINGS: 6
 P4_FINDINGS: 10
@@ -471,10 +475,10 @@ PHYSICAL_IOS_QA: PENDING_PHYSICAL
 PAIRED_DEVICE_QA: PENDING_PHYSICAL
 PHYSICAL_INSTRUMENTS_PROFILING: PENDING_INSTRUMENTS
 EXTERNAL_VALIDATION: PENDING_EXTERNAL_VALIDATION
-RELEASE_BLOCKERS: MASTER-PERF-006,MASTER-SYNC-002,MASTER-SYNC-003,MASTER-DEPTH-001,MASTER-DEPTH-002,MASTER-PERF-001,MASTER-SEC-001,MASTER-DCA-018
+RELEASE_BLOCKERS: MASTER-PERF-001,MASTER-SEC-001,MASTER-SYNC-001,MASTER-WAO-001,MASTER-WAO-002,MASTER-PERF-007,MASTER-DCA-018
 ```
 
-**PARTIAL** because five P1 software findings and nine P2 findings remain open. PASS requires zero open P0–P2.
+**PARTIAL** because nine P2 findings remain open (physical QA, WAO policy, planner lifecycle). All P1 software findings **VERIFIED closed** @ `5d757cc`. PASS requires zero open P0–P2.
 
 ---
 
@@ -488,7 +492,7 @@ RELEASE_BLOCKERS: MASTER-PERF-006,MASTER-SYNC-002,MASTER-SYNC-003,MASTER-DEPTH-0
 | 4 | Schemas versioned and migration-safe? | **YES** — migration modules + fail-closed |
 | 5 | Backup/restore activity-isolated? | **YES** — CloudBackupCapability |
 | 6 | WC authentication intact? | **YES** — HMAC + TOFU |
-| 7 | HMAC/nonce/ACK safe? | **PARTIAL** — legacy tombstones + ACK asymmetry (P1) |
+| 7 | HMAC/nonce/ACK safe? | **YES** — symmetric ACK + signed tombstones verified (field QA P2) |
 | 8 | Import/export paths safe? | **YES** — bounds + protection |
 | 9 | Images/cards path-safe? | **YES** — sanitizer + validator |
 | 10 | Privacy flows truthful? | **YES** — opt-in Diving cloud only |
@@ -498,18 +502,18 @@ RELEASE_BLOCKERS: MASTER-PERF-006,MASTER-SYNC-002,MASTER-SYNC-003,MASTER-DEPTH-0
 | 14 | Heavy compute off main thread? | **PARTIAL** — planner mostly detached; prefetch gap |
 | 15 | Stale async results rejected? | **YES** — generation tokens |
 | 16 | Charts/maps/logbooks bounded? | **YES** — caps + downsampling |
-| 17 | Sync queue backpressured? | **PARTIAL** — flush policy yes; in-flight stuck P1 |
+| 17 | Sync queue backpressured? | **YES** — flush policy + in-flight release verified |
 | 18 | Caches bounded? | **YES** — tissue LRU 32 |
 | 19 | Tasks cancellable? | **PARTIAL** — planner deinit gap |
 | 20 | Retain-cycle risks? | **LOW** — weak captures common |
 | 21 | Performance budgets documented? | **YES** — MASTER_* matrices |
 | 22 | Instruments complete? | **PENDING** — MASTER-IOS-001/002 |
-| 23 | Blocks 100% main-code readiness? | P1 sync + depth process risks + P2 physical QA |
-| 24 | Blocks 100% security readiness? | Legacy tombstones + field SEC-NEG |
-| 25 | Blocks 100% performance readiness? | Sync stuck + Instruments + Ultra battery |
-| 26 | Blocks internal TestFlight? | **P1 software findings** should be fixed first |
-| 27 | Blocks external TestFlight? | **YES** — physical QA + external validation + P1 items |
+| 23 | Blocks 100% main-code readiness? | P2 physical QA + WAO + planner lifecycle |
+| 24 | Blocks 100% security readiness? | Field SEC-NEG only |
+| 25 | Blocks 100% performance readiness? | Instruments + Ultra battery + planner lifecycle |
+| 26 | Blocks internal TestFlight? | **P2 physical QA** (software P1 closed) |
+| 27 | Blocks external TestFlight? | **YES** — physical QA + external validation |
 
 ---
 
-**Audit completed:** 2026-06-28 on `main` @ `7dfefe2`. No production code modified.
+**Audit completed:** 2026-06-28 on `main` @ `5d757cc` (post-remediation rerun). No production code modified.

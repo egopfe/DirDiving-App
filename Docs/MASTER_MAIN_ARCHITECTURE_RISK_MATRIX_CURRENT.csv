@@ -14,8 +14,8 @@ ARCH-012,CCR leakage,OC mode gas visibility,iOS,Diving,PASS,P4,Low,High,Mode pro
 ARCH-013,Simulation release,Depth sensor source,Both,Diving,PASS,P1,Low,Critical,TestFlightSimulationSafetyPolicy,App Store blocks simulation,SecurityPrivacyTrustRemediationTests,PASS,SEC-P2-004 FIXED
 ARCH-014,Experimental leakage,Buddy Assist BLE,Both,N/A,PASS,P4,Low,Low,project.yml exclusion,Not in MAIN compile,isolation script,PASS,Noted only
 ARCH-015,Sequential activity,Cross-domain bleed,Both,All,PASS,P0,Low,Critical,Integration test,Gauge→FC→Apnea→Snorkeling flow,IntegratedModesSequentialFlowTests,PASS,No shared mutable state
-ARCH-016,Shallow depth signing,WithShallowDepth default,Watch,Diving,PASS,P4,Low,Medium,project.yml + Info.plist,Shallow tier consistent at 7dfefe2,DepthCapabilityTests,PASS,main shallow-signed
-ARCH-017,Shallow FC dev toggle,Internal testing only,Watch,Diving,OPEN,P1,Medium,High,DeveloperSettings allowsShallowDepthDivingTesting,TestFlight default OFF + labeling,DepthCapabilityTests,OPEN,MASTER-DEPTH-001
+ARCH-016,Shallow depth signing,WithShallowDepth default,Watch,Diving,PASS,P4,Low,Medium,project.yml + runtimeAuthorityTier,Shallow tier consistent at 5d757cc,DepthCapabilityTests + validate_depth_capability_runtime_authority.sh,PASS,main shallow-signed CONS-007
+ARCH-017,Shallow FC dev toggle,Internal testing only,Watch,Diving,PASS,P1,Low,High,DeveloperSettings resolvedShallowTestingFlag default OFF,TestFlight opt-in only,validate_developer_shallow_testing_release_gate.sh,PASS,MASTER-DEPTH-001 VERIFIED CONS-006
 ARCH-018,Water auto-open FC,Predive not live,Watch,Diving,PASS,P4,Low,High,completeStartup gate,GF/env confirm required,DIRModesAndStartupFlowTests,PASS,No P0 bypass
 ARCH-019,Water FC capability,Policy skip on routing,Watch,Diving,OPEN,P2,Medium,Medium,Water path skips DepthCapabilityPolicy,Align with selectDivingMode,WatchWaterAutoOpenPolicyTests,OPEN,MASTER-WAO-001
-ARCH-020,iOS sync in-flight,iOS WatchSync stuck session,iOS,All,OPEN,P1,Medium,High,inFlight not cleared on ACK fail,Clear on all error paths,Code review,OPEN,MASTER-PERF-006
+ARCH-020,iOS sync in-flight,iOS WatchSync stuck session,iOS,All,PASS,P1,Low,High,releaseInFlightOutboundSession on error paths,Clear on all error paths,validate_master_main_code_sync_security_performance_audit.sh,PASS,MASTER-PERF-006 VERIFIED CONS-003

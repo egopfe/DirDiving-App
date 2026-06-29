@@ -26,8 +26,8 @@ FI-024,Runtime,Solver slow,budget exceeded 50ms,prior conservative presentation,
 FI-025,Environment,Start without env,runtimePlan nil,unavailable snapshot missing_environment,none blocked,no,missing_environment UI,N/A,P0 prevention,OrchestratedAltitudeEnvironmentTests,None,runtimePlan nil test
 FI-026,CMAltimeter,Sampling,nil data nil error,3-strike failed,draft unchanged,draft unchanged,no,failed after strikes,yes stop,P2,WatchCMAltimeterRemediationTests,None,WCMA-007
 FI-027,Planner,Stale briefing card,superseded manifest,stale display only,no FC mutation,N/A,no,stale badge,N/A,P2,PlannerBriefingCardStoreTests,None,briefing tests
-FI-028,Runtime,Schedule non-convergence,N/A forward sim,conservative TTS,bounded minutes steps,N/A,yes,TTS may over-estimate,P2,Audit15TTSScheduleOracleSweepTests,External compare,MWFC-P1-001
+FI-028,Runtime,Schedule non-convergence,N/A forward sim,conservative TTS,bounded minutes steps,N/A,yes,TTS may over-estimate,P2,Audit15TTSScheduleOracleSweepTests,External compare,MWFC-P2-003
 FI-029,Memory,Memory pressure during dive,N/A,degraded not silent clear,PENDING,PENDING,PENDING,PENDING,PENDING,P2,NOT_EXECUTED,Instruments on device,PENDING_PHYSICAL
 FI-030,Calculation,Computation exceeds 1s tick,actual dt on next sample,catch-up integrate,PENDING static review,actual dt semantics,yes,degraded if >2s,P2,FullComputerRuntimeEngine static,Physical profiling,PENDING_PHYSICAL
-FI-031,Depth capability,Shallow entitlement FC start attempt,appleShallow no dev toggle,start blocked,FC unavailable reason shown,no runtime,N/A,no FC engine init,P2,DepthCapabilityTests,None,Production gate @7dfefe2
-FI-032,Water auto-open,Submerged cold launch without predive confirm,route only,FC predive still required,no tissue start,N/A,predive gate intact,P2,WatchLaunchRoutingPolicy static,Update DIRModes test MWFC-P2-005,PENDING_PHYSICAL UX
+FI-031,Depth capability,Shallow entitlement FC start attempt,appleShallow no dev toggle,start blocked,FC unavailable reason shown,no runtime,N/A,no FC engine init,P2,DepthCapabilityTests; resolveAutomaticStep,None,Production gate @5d757cc CONS-019
+FI-032,Water auto-open,Submerged cold launch without predive confirm,route only,FC predive still required,no tissue start,N/A,predive gate intact,P2,DIRModesAndStartupFlowTests 14/14 PASS,None,PENDING_PHYSICAL UX

@@ -1,8 +1,8 @@
 Feature,Readiness_Percent,Blockers,Priority,Evidence,Physical_QA,External_Validation,Notes
 Bühlmann,94,EXT-IOS-BUHL-01,P2,BuhlmannEngine.swift;1526 tests PASS;BUILD SUCCEEDED,PENDING,PENDING,Shared BuhlmannCore ZH-L16C; no P0 math defect
 Planner Base/Deco/Technical,92,External validation,P2,PlannerModePolicyTests;PlannerModeLimitsTests,PENDING,PENDING,Mode isolation enforced in tests
-Full Computer Watch parity,78,IOS-MASTER-F016 GF preset mismatch,P1,BuhlmannCore + FullComputerGradientFactorPreset;Watch tests PASS,PENDING,PENDING,iOS planner reference; import rejects 2/3 iOS presets
-GF Preset Override Compatibility,72,IOS-MASTER-F016,P1,FullComputerImportedPlanStore;PlannerGFPreset vs FullComputerGradientFactorPreset,PENDING,PENDING,iOS 20/70 30/80 vs Watch 20/80 30/70
+Full Computer Watch parity,95,External validation,P2,BuhlmannCore + FullComputerGradientFactorPreset;DivePlanPackageBuilderTests 15/15 PASS,PENDING,PENDING,iOS planner reference; GF preset parity CONS-002 FIXED @5d757cc
+GF Preset Override Compatibility,95,External Bühlmann spot-check CONS-043,P2,PlannerGFPreset 20/80 30/70 40/85;gradientFactorPreset emission,PENDING,PENDING,iOS↔Watch software parity PASS; external preset oracle pending
 CCR / Rebreather,90,EXT-IOS-CCR-01; heuristic bailout,P2,CCRPlannerTests;referenceOnly disclaimers,PENDING,PENDING,Reference-only by design
 CCR Setpoint,91,External validation,P2,CCRMathRemediationTests,PENDING,PENDING,Setpoint not treated as FO2
 CCR Diluent,90,Hypoxic edge external review,P3,CCRPlanValidator,PENDING,PENDING,Validator blocks invalid diluent
@@ -43,9 +43,9 @@ Security / Privacy,88,Keychain CI skip F007,P4,SecurityPrivacyTrustRemediationTe
 Unit Conversion,93,None,P4,PressureModelUnificationTests,PENDING,N/A,Canonical meters/bar
 Localization,91,None,P4,DIRDivingCompleteLocalizationAuditTests,PENDING,N/A,EN/IT GF preset keys
 Accessibility,86,Manual QA pending,P2,UIUXRemediationV3AccessibilityTests,PENDING,N/A,Software contracts pass
-Performance / Numerical Robustness,88,None,P4,PerformanceConcurrencyBatteryRemediationTests;1526 PASS,PENDING,N/A,F001 closed @7dfefe2
-Test Coverage,94,GF cross-target gap F016,P1,1526 iOS Algorithm Tests executed,PENDING,N/A,0 assertion failures
-Internal TestFlight,86,IOS-MASTER-F016,P1,Build+tests green;1 P1 integration gap,PENDING,PENDING,Conditional after GF alignment
-External TestFlight,50,EXT-IOS-BUHL-01;F011-F015,P2,External QA matrix open,PENDING,PENDING,Not ready for external RC
-App Store,46,Legal + external gates,P2,ReleaseLegalClaimsRemediationTests,PENDING,PENDING,Non-certified posture preserved
-Overall,89,IOS-MASTER-F016 + external QA,P1,This audit @7dfefe2,PENDING,PENDING,Almost ready reference planner + multi-activity companion
+Performance / Numerical Robustness,92,None,P4,PerformanceConcurrencyBatteryRemediationTests;PlannerStore deinit cancel @5d757cc;1527 PASS,PENDING,N/A,F001 closed; CONS-027 deinit cancel verified
+Test Coverage,96,External QA only,P2,1527 iOS Algorithm Tests executed @5d757cc,PENDING,N/A,0 assertion failures; GF cross-target tests PASS
+Internal TestFlight,91,External QA matrix,P2,Build+tests green; CONS-002 remediated,PENDING,PENDING,Conditional — reference-only posture; physical QA pending
+External TestFlight,52,EXT-IOS-BUHL-01;F011-F015,P2,External QA matrix open,PENDING,PENDING,Not ready for external RC
+App Store,48,Legal + external gates,P2,ReleaseLegalClaimsRemediationTests,PENDING,PENDING,Non-certified posture preserved
+Overall,92,External QA + physical gates,P2,Post-remediation audit @5d757cc,PENDING,PENDING,Software remediation PASS; GF parity restored
