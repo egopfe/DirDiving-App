@@ -34,6 +34,8 @@ targets:
       - Utils/MissionModeRuntimeProfile.swift
       - Utils/DiveDepthMeasurementIngestion.swift
       - Utils/GPSFallbackPolicy.swift
+      - Utils/WatchLocationPermissionState.swift
+      - Utils/WatchFirstLaunchLocationPermissionPolicy.swift
       - Utils/WatchNavigationHints.swift
       - Utils/DiveSessionPersistenceClass.swift
       - Utils/DepthSampleValidation.swift
@@ -177,6 +179,8 @@ targets:
       - Utils/MissionModeRuntimeProfile.swift
       - Utils/DiveDepthMeasurementIngestion.swift
       - Utils/GPSFallbackPolicy.swift
+      - Utils/WatchLocationPermissionState.swift
+      - Utils/WatchFirstLaunchLocationPermissionPolicy.swift
       - Services/DiveManager.swift
       - Utils/SensorSourceMode.swift
       - Utils/DepthSensorSourceResolution.swift
