@@ -2,8 +2,9 @@
 
 **Command:** 05 — `05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.1.md`  
 **Date:** 2026-06-28  
-**Branch:** `main` @ `7dfefe2`  
-**Merged sources:** Commands 12 + 13; upstream audits 01–04 @ `7dfefe2`
+**Branch:** `main` @ `5d757cc`  
+**Pre-remediation baseline:** `7dfefe2`  
+**Merged sources:** Commands 12 + 13; post-remediation audit 05 @ `5d757cc`
 
 **Policy:** External validation and physical QA remain **NOT PASSED** until signed artifacts exist in `Docs/QA_EVIDENCE/`. Simulator and automated tests do **not** close these gaps. **Do not upgrade simulator evidence to physical validation.**
 
