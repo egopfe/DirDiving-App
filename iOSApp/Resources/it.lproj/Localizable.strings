@@ -2612,6 +2612,12 @@
 "snorkeling.ios.settings.surface_debounce" = "Debounce superficie: %d s";
 "snorkeling.ios.settings.gps" = "GPS";
 "snorkeling.ios.settings.gps_tracking" = "Tracciamento GPS";
+"snorkeling.map_type.title" = "Tipo mappa";
+"snorkeling.map_type.satellite" = "Satellite";
+"snorkeling.map_type.explore" = "Esplora";
+"snorkeling.map_type.satellite.description" = "Vista satellitare con etichette, utile per costa, baie, ingresso e uscita.";
+"snorkeling.map_type.explore.description" = "Vista cartografica standard, utile per strade, luoghi e orientamento generale.";
+"snorkeling.settings.map_type.current" = "Tipo mappa corrente: %@";
 "snorkeling.ios.settings.return_distance_label" = "Allerta ritorno ingresso";
 "snorkeling.ios.settings.return_distance" = "Allerta ritorno ingresso: %d m";
 "snorkeling.ios.settings.alerts" = "Allarmi";

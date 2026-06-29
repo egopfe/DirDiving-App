@@ -224,6 +224,10 @@ targets:
       - Tests/WatchAlgorithmTests/DiveReminderEngineTests.swift
       - Tests/WatchAlgorithmTests/DiveReminderIntegrationTests.swift
       - Services/GPSManager.swift
+      - Services/SnorkelingMapTypeSettingsStore.swift
+      - Shared/Models/SnorkelingMapType.swift
+      - Shared/Utils/SnorkelingMapTypeStorage.swift
+      - Shared/Utils/SnorkelingMapStyleMapper.swift
       - Services/CompassManager.swift
       - Services/HapticService.swift
       - Services/AscentSafetyHapticCoordinator.swift
@@ -520,6 +524,9 @@ targets:
       - iOSApp/Services/IOSApneaSettingsStore.swift
       - iOSApp/Services/SharedIOSSettingsStore.swift
       - iOSApp/Services/IOSSnorkelingSettingsStore.swift
+      - Shared/Models/SnorkelingMapType.swift
+      - Shared/Utils/SnorkelingMapTypeStorage.swift
+      - Shared/Utils/SnorkelingMapStyleMapper.swift
       - iOSApp/Models/SnorkelingCompanionSettings.swift
       - iOSApp/Utils/ActivitySettingsVisibility.swift
       - iOSApp/Services/IOSApneaWatchTransferService.swift
