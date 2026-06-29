@@ -1,18 +1,18 @@
 # Master Readiness Roadmap — 7 / 14 / 30 Days
 
-**Baseline:** `main` @ `8ae1034` (remediation @ `5d757cc`)  
+**Baseline:** `main` @ `0126699` (code-bearing audit baseline @ `4d415c0`; remediation @ `5d757cc`)
 **Orchestrator:** V1.2 refresh · 2026-06-29  
 **Overall consolidated readiness:** **~72%** (software **100%**; physical **0%**)  
 **Verdict:** PARTIAL · Internal TestFlight software **READY** · External TF / App Store **NOT READY**
 
 ---
 
-## Starting point (@ 8ae1034)
+## Starting point (@ 0126699)
 
 - Command 10 software remediation **COMPLETE**
 - Post-remediation audits 01/02/04/05/06 **COMPLETE** @ 5d757cc
-- Orchestrator 00 refresh **COMPLETE** @ 8ae1034
-- Audit 03 **STALE** @ 7dfefe2 (optional rerun)
+- Orchestrator 00 refresh **COMPLETE** @ 0126699
+- Audit 03 software refresh **COMPLETE** @ 4d415c0; optional rerun only for a fresh banner
 - P0=0 · P1 software open=0 · Physical/external 0% executed
 
 ---
@@ -62,7 +62,7 @@
 
 ```text
 Prior audit @ 7dfefe2:     71% — P0 doc + P1 software open; physical 0%
-Post-remediation @ 8ae1034: 72% — software 100%; physical 0%
+Post-orchestrator @ 0126699: 72% — software 100%; physical 0%
 +7 days:                    78% — physical campaign started
 +14 days:                   85% — partial physical QA (WAO/HW/shallow/Ultra)
 +30 days:                   92% — external validation + release packaging
