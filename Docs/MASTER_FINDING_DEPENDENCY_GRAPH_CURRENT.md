@@ -1,7 +1,7 @@
 # Master Finding Dependency Graph — Current
 
 **Orchestrator:** `00-MASTER_SUPER_ORCHESTRATOR...V1.2`  
-**Baseline:** `main` @ `8ae1034` (remediation @ `5d757cc`)  
+**Baseline:** `main` @ `0126699` (code-bearing audit baseline @ `4d415c0`; remediation @ `5d757cc`)
 **Date:** 2026-06-29
 
 ---
@@ -86,7 +86,7 @@ Cannot close without hardware or field execution:
 
 ## Stale upstream note
 
-Audit **03 UI/UX @ 7dfefe2** — no layout changes in remediation; software-ready WAO/Crown findings remain valid. Optional rerun 03 @ HEAD does not block physical QA.
+Audit **03 UI/UX @ 4d415c0** — software-ready WAO/Crown findings remain valid. Optional rerun 03 @ HEAD is only for a fresh execution banner and does not block physical QA.
 
 ---
 

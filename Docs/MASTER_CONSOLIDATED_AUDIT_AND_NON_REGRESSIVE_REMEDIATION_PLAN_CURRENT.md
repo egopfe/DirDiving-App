@@ -4,7 +4,7 @@
 **Execution date:** 2026-06-29  
 **Repository:** `egopfe/DirDiving-App`  
 **Branch:** `main`  
-**Commit:** `4d415c0` (orchestrator touch-up; audit 03 @ `4d415c0`; remediation @ `5d757cc`; prior orchestrator @ `8ae1034`)  
+**Execution HEAD:** `0126699` (orchestrator refresh; code-bearing audit baseline @ `4d415c0`; remediation @ `5d757cc`; prior orchestrator @ `8ae1034`)
 **Prior orchestrator:** `7dfefe2` · **Prior remediation:** Command 10 @ `5d757cc`  
 **Execution mode:** Read-only orchestration — no production code modified
 
@@ -12,7 +12,7 @@
 
 ## A. Executive Summary
 
-Orchestrator **V1.2 refresh** consolidates six upstream master audits after **Command 10 consolidated software remediation** and **post-remediation read-only reruns of all six audits (01–06)** @ `5d757cc`–`4d415c0`. Audit **03 UI/UX** refreshed @ `4d415c0` — **PARTIAL** (software PASS; physical/pixel PENDING).
+Orchestrator **V1.2 refresh** executed @ `0126699` and consolidates six upstream master audits after **Command 10 consolidated software remediation** and **post-remediation read-only reruns of all six audits (01–06)** @ `5d757cc`–`4d415c0`. The delta from `4d415c0` to `0126699` is documentation/orchestrator-only, so the code-bearing audit baseline remains usable. Audit **03 UI/UX** refreshed @ `4d415c0` — **PARTIAL** (software PASS; physical/pixel PENDING).
 
 **Overall verdict: PARTIAL.** **Software-actionable scope: 100%** (`validate_consolidated_software_readiness.sh` PASS). **P0 software safety defects: 0.** **P1 software open: 0.** Physical and external evidence remain **0% executed** — do not claim PASS.
 
@@ -36,7 +36,7 @@ Orchestrator **V1.2 refresh** consolidates six upstream master audits after **Co
 
 ## B. Source Audit Inputs and Completeness
 
-| Audit | Command (filename) | Body @ 4d415c0 | Rerun | Outputs | Completeness |
+| Audit | Command (filename) | Body @ 0126699 | Rerun | Outputs | Completeness |
 |-------|-------------------|----------------|-------|---------|--------------|
 | **01** Watch FC Forensic | `01-...V2.1.md` | **ALIGNED** | **COMPLETE** @ `5d757cc` | 14+ `MASTER_WATCH_FULL_COMPUTER_*` | **COMPLETE** |
 | **02** iOS Deep | `02-...V1.1.md` | **ALIGNED** | **COMPLETE** @ `5d757cc` | 9+ `MASTER_IOS_*` | **COMPLETE** |
@@ -56,12 +56,13 @@ Orchestrator **V1.2 refresh** consolidates six upstream master audits after **Co
 | Field | Value |
 |-------|-------|
 | Branch | `main` ✓ |
-| HEAD | `4d415c0` |
+| Execution HEAD | `0126699` |
 | Remediation commit | `5d757cc` (Command 10) |
+| Code-bearing audit baseline | `4d415c0` |
 | Audit 03 refresh | `4d415c0` |
 | Pre-remediation baseline | `7dfefe2` |
 | Orchestrator prior | `8ae1034` @ 2026-06-29 |
-| Orchestrator refresh | `4d415c0` @ 2026-06-29 |
+| Orchestrator refresh | `0126699` @ 2026-06-29 |
 | `commands_for_cursor/` | Present; **01–04 ALIGNED** (CONS-001 FIXED) |
 | Software readiness script | `validate_consolidated_software_readiness.sh` **PASS** |
 
@@ -125,7 +126,7 @@ Burndown: `MASTER_RELEASE_BLOCKER_BURNDOWN_PLAN_CURRENT.md`
 
 ## G. Deduplication Method and Results
 
-**18 duplicate groups** in `MASTER_FINDING_DEDUPLICATION_MATRIX_CURRENT.csv`. Merged only on **shared root cause** — unchanged from prior orchestrator @ 7dfefe2.
+**17 multi-source duplicate groups** in `MASTER_FINDING_DEDUPLICATION_MATRIX_CURRENT.csv` (**19 root-cause groups tracked**). Merged only on **shared root cause** — refreshed from prior orchestrator @ 7dfefe2.
 
 Key groups: DG-DOC-002 (CONS-001), DG-GF-001 (CONS-002/038/043), DG-SYNC-001 (CONS-011), DG-WAO-001 (CONS-021), DG-EVID-001 (CONS-045).
 
@@ -154,7 +155,7 @@ No new escalations in this refresh. No severity downgrades applied.
 | UI/UX 100% software vs Release 72% overall | **No conflict** — physical 0% weighting |
 | Audit 03 @ 4d415c0 vs 04/05 WAO software PASS | **Aligned** — CONS-019 verified in audit 03 |
 | Water auto-open SOFTWARE_READY vs Release PENDING_PHYSICAL | **No conflict** — both preserved |
-| Prior orchestrator @ 8ae1034 | **Superseded** by this plan @ 4d415c0 |
+| Prior orchestrator @ 8ae1034 | **Superseded** by this execution @ 0126699 |
 
 **CROSS_AUDIT_CONFLICTS (technical): 0** · **COMMAND_INTEGRITY_CONFLICTS: 0**
 
@@ -195,7 +196,7 @@ Software P1 items (formerly Ranks 1–8) marked **COMPLETE @ 5d757cc**.
 
 ## M. Non-Regressive Batch Plan (V1.2)
 
-| Batch | Name | Status @ 8ae1034 | Primary remaining |
+| Batch | Name | Status @ 0126699 | Primary remaining |
 |-------|------|------------------|-------------------|
 | **0** | Baseline protection | **COMPLETE** | CONS-014 VERIFIED |
 | **1** | Safety-critical Watch FC | **COMPLETE** (software) | CONS-015 partial altitude; CONS-016 documented |
@@ -272,7 +273,7 @@ Software P1 items (formerly Ranks 1–8) marked **COMPLETE @ 5d757cc**.
 
 ## T. Batch 6 — UI/UX Truthfulness / Accessibility
 
-**Status: COMPLETE (software) @ 4d415c0 — audit 03 refreshed**
+**Status: COMPLETE (software) @ 0126699 — audit 03 refreshed; code baseline unchanged from 4d415c0**
 
 - CONS-019 FIXED — DepthCapabilityPolicy on water auto-open path
 - **Remaining:** CONS-012 manual a11y; CONS-032 pixel baselines (physical)
@@ -325,7 +326,7 @@ See `MASTER_CURSOR_REMEDIATION_COMMAND_SEQUENCE_CURRENT.md`.
 2. Batch 8 — external Bühlmann / GF / Subsurface validation  
 3. Batch 9 (doc-only) — README + feature matrix repair  
 4. Optional — audit 03 rerun @ HEAD  
-5. Orchestrator 00 refresh after evidence milestones (this refresh @ 8ae1034)
+5. Orchestrator 00 refresh after evidence milestones (this refresh @ 0126699)
 
 ---
 
@@ -336,7 +337,7 @@ See `MASTER_AUDIT_RERUN_PLAN_CURRENT.md`.
 **Completed post-remediation @ 5d757cc:** 01, 02, 04, 05, 06  
 **Complete:** 01–06 @ `5d757cc`–`4d415c0`  
 **Stale:** none
-**This refresh:** 00 @ 8ae1034
+**This refresh:** 00 @ 0126699
 
 ---
 
@@ -364,7 +365,7 @@ See `MASTER_RELEASE_BLOCKER_BURNDOWN_PLAN_CURRENT.md`.
 
 ## AC. Do-Not-Touch Policies
 
-See `MASTER_DO_NOT_TOUCH_POLICY_REGISTER_CURRENT.md` — 28 policies active @ 8ae1034.
+See `MASTER_DO_NOT_TOUCH_POLICY_REGISTER_CURRENT.md` — 28 policies active @ 0126699.
 
 ---
 
@@ -395,7 +396,7 @@ MASTER_AUDIT_ORCHESTRATOR: PARTIAL
 COMMANDS_FOR_CURSOR_FOUND: PASS
 SUBCOMMAND_FILES_FOUND: PASS
 UPSTREAM_AUDITS_FOUND: PASS
-UPSTREAM_AUDITS_COMPLETE: PASS (01–06 refreshed @ 5d757cc–4d415c0)
+UPSTREAM_AUDITS_COMPLETE: PASS
 CONSOLIDATED_FINDINGS_REGISTER_CREATED: PASS
 DEDUPLICATION_MATRIX_CREATED: PASS
 DEPENDENCY_GRAPH_CREATED: PASS
@@ -409,11 +410,10 @@ DO_NOT_TOUCH_POLICY_REGISTER_CREATED: PASS
 READINESS_ROADMAP_CREATED: PASS
 CONSOLIDATED_P0_FINDINGS: 0
 CONSOLIDATED_P1_FINDINGS: 9
-CONSOLIDATED_P1_SOFTWARE_OPEN: 0
-CONSOLIDATED_P2_FINDINGS: 15
-CONSOLIDATED_P3_FINDINGS: 6
-CONSOLIDATED_P4_FINDINGS: 1
-DUPLICATE_GROUPS_FOUND: 18
+CONSOLIDATED_P2_FINDINGS: 14
+CONSOLIDATED_P3_FINDINGS: 7
+CONSOLIDATED_P4_FINDINGS: 0
+DUPLICATE_GROUPS_FOUND: 17
 SEVERITY_ESCALATIONS: 0
 CROSS_AUDIT_CONFLICTS: 0
 INTERNAL_TESTFLIGHT_BLOCKERS: 0
@@ -422,17 +422,15 @@ APP_STORE_BLOCKERS: 11
 PHYSICAL_QA_BLOCKERS: 14
 EXTERNAL_VALIDATION_BLOCKERS: 5
 OVERALL_CONSOLIDATED_READINESS: 72
-SOFTWARE_READINESS: 100%
 REMEDIATION_EXECUTION_READINESS: READY
-INTERNAL_TESTFLIGHT_SOFTWARE_READINESS: READY
 INTERNAL_TESTFLIGHT_READINESS: CONDITIONAL
 EXTERNAL_TESTFLIGHT_READINESS: NOT_READY
 APP_STORE_READINESS: NOT_READY
-PHYSICAL_QA: PENDING_PHYSICAL
-EXTERNAL_VALIDATION: PENDING_EXTERNAL_VALIDATION
 FIRST_REMEDIATION_BATCH: Batch-8 — Tests / QA / Evidence (physical campaigns)
-RECOMMENDED_NEXT_COMMAND: Physical/external QA campaigns OR doc-only README/feature matrix OR legal/release packaging
+NEXT_CURSOR_COMMAND_TO_RUN: Batch 8 physical/external QA campaign (Ultra depth, shallow wet, WAO, underwater HW, paired sync) OR Batch 9 doc-only README/feature matrix repair
 ```
+
+Upstream audits 01–06 were refreshed @ `5d757cc`–`4d415c0`; this orchestrator execution refreshed the consolidated outputs @ `0126699`. Register totals retained for traceability: P0=1, P1=16, P2=20, P3=8, P4=0. Active unresolved/non-fixed counts in the verdict are P0=0, P1=9, P2=14, P3=7, P4=0.
 
 ### Final questions (§21 summary)
 
@@ -441,8 +439,8 @@ RECOMMENDED_NEXT_COMMAND: Physical/external QA campaigns OR doc-only README/feat
 | 1 | Six upstream groups found — **YES** (all complete @ 4d415c0) |
 | 2 | Stale: **none** |
 | 3 | Technical conflicts: **0** |
-| 4–7 | P0=0 · P1=9 pending evidence · P2=15 · P3=6 · P4=1 |
-| 8 | 18 duplicate groups mapped |
+| 4–7 | Active unresolved: P0=0 · P1=9 pending evidence · P2=14 · P3=7 · P4=0; register totals: P0=1 · P1=16 · P2=20 · P3=8 · P4=0 |
+| 8 | 17 multi-source duplicate groups mapped (19 root-cause groups tracked) |
 | 9 | No new escalations; prior P0/P1 software closed |
 | 10 | Internal TF software blockers: **0** |
 | 11 | External TF blockers: **9 P1 physical/external/legal** |
@@ -457,8 +455,8 @@ RECOMMENDED_NEXT_COMMAND: Physical/external QA campaigns OR doc-only README/feat
 | 26 | Remediation execution: **READY** (software) |
 | 27 | Internal TF software: **READY** |
 | 28–29 | External TF / App Store: **NOT READY** |
-| 30 | **Physical/external QA OR doc-only README/matrix** |
+| 30 | **Batch 8 physical/external QA campaign OR Batch 9 doc-only README/matrix repair** |
 
 ---
 
-**CONSOLIDATED_PLAN_STATUS: COMPLETE @ 4d415c0 · Orchestrator V1.2 refresh · 2026-06-29**
+**CONSOLIDATED_PLAN_STATUS: COMPLETE @ 0126699 · Orchestrator V1.2 refresh · 2026-06-29**
