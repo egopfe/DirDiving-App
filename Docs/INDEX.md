@@ -1,13 +1,28 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-29  
-**Branch consigliato:** `main` = `origin/main` @ `8ae1034`
+**Branch consigliato:** `main` = `origin/main`
+
+---
+
+## Aggiornamento indice 2026-06-29 — UI/UX audit rerun (Command 03) @ post-remediation
+
+Post-remediation read-only rerun after Command 10 @ `5d757cc`. CONS-019 WAO depth gate **FIXED_SOFTWARE**; GF/shallow dev surfaces verified; physical/pixel/a11y remain **PENDING**.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.2.md` |
+| **Report** | [`MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_CURRENT.md`](MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_CURRENT.md) |
+| **WAO audit** | [`MASTER_WATCH_WATER_AUTO_OPEN_AUDIT_CURRENT.md`](MASTER_WATCH_WATER_AUTO_OPEN_AUDIT_CURRENT.md) |
+| **Underwater HW** | [`MASTER_WATCH_UNDERWATER_HARDWARE_INTERACTION_AUDIT_CURRENT.md`](MASTER_WATCH_UNDERWATER_HARDWARE_INTERACTION_AUDIT_CURRENT.md) |
+| **Validate** | `audit_accessibility_contracts.sh` **PASS** · pixel baselines **0/59 PENDING** |
+| **Verdict** | **PARTIAL** — P0=0 · software UI/UX **PASS** · physical/pixel **PENDING** |
 
 ---
 
 ## Aggiornamento indice 2026-06-28 — Orchestrator V1.2 refresh @ `8ae1034`
 
-Command **00** consolidation refresh after Command 10 remediation @ `5d757cc` and post-remediation reruns 01/02/04/05/06. Audit **03** UI/UX **STALE @ 7dfefe2** (optional rerun).
+Command **00** consolidation refresh after Command 10 remediation @ `5d757cc` and post-remediation reruns 01/02/04/05/06. Audit **03** refreshed @ `15c8068` (see section above).
 
 | Campo | Valore |
 |-------|--------|
@@ -31,6 +46,7 @@ Read-only reruns after consolidated software remediation. Checklist: [`MASTER_CO
 |---|--------|---------|
 | 01 | [`MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_CURRENT.md`](MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_CURRENT.md) | **PARTIAL** — software strong; P0=0; physical/external pending |
 | 02 | [`MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_CURRENT.md`](MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_CURRENT.md) | **PASS** (software) — GF parity verified |
+| 03 | [`MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_CURRENT.md`](MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_CURRENT.md) | **PARTIAL** @ `15c8068` — software PASS; physical/pixel pending |
 | 04 | [`MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_CURRENT.md`](MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_CURRENT.md) | **PARTIAL** — CONS-003–007 closed; P1=0 |
 | 05 | [`MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_CURRENT.md`](MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_CURRENT.md) | Software **100%**; physical/legal **PENDING** |
 | 06 | [`MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_CURRENT.md`](MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_CURRENT.md) | **PARTIAL** — command integrity PASS; README drift P2 |
