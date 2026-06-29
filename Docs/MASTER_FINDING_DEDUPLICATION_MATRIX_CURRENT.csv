@@ -1,7 +1,7 @@
 Duplicate_Group_ID,Consolidated_Finding_ID,Source_Audit,Source_Finding_ID,Source_Title,Same_Root_Cause,Same_Symptom,Same_Affected_Files,Same_Affected_Runtime,Merge_Decision,Severity_Adjustment,Reason,Notes
-DG-DOC-002,CONS-001,06-Docs,DOC-P0-001,Command 01 body mismatch,Yes,Yes,Yes,No,MERGE,Escalated P0,Same permutation root cause across 01-04,
+DG-DOC-002,CONS-001,06-Docs,DOC-P0-001,Command 01 body mismatch,Yes,Yes,Yes,No,MERGE,Escalated P0,Same permutation root cause across 01-04,FIXED @ 5d757cc — orchestrator refresh @ 8ae1034
 DG-DOC-002,CONS-001,06-Docs,DOC-P0-004,Orchestrator preflight missing STOP,Yes,Yes,Partial,No,MERGE,None,Same command integrity cluster,
-DG-GF-001,CONS-002,02-iOS,IOS-MASTER-F016,iOS GF preset mismatch,Yes,Yes,Yes,Yes,MERGE,None,iOS+Release same import parity gap,
+DG-GF-001,CONS-002,02-iOS,IOS-MASTER-F016,iOS GF preset mismatch,Yes,Yes,Yes,Yes,MERGE,None,iOS+Release same import parity gap,FIXED_SOFTWARE @ 5d757cc
 DG-GF-001,CONS-002,05-Release,MASB-SW-01,GF software gate FAIL,Yes,Yes,Yes,Yes,MERGE,None,Release gate reflects same root cause,
 DG-GF-001,CONS-038,01-Watch,MWFC-P3-004,Import test GF order,Yes,Partial,Yes,Yes,LINK_NOT_MERGE,None,Same GF mismatch symptom; test maintenance separate ID,
 DG-GF-001,CONS-043,01-Watch,MASB-SW-04,GF preset external gate,Partial,Yes,Partial,Yes,LINK_NOT_MERGE,None,External validation layer on CONS-002 software fix,

@@ -1,9 +1,10 @@
 # Master Consolidated Post-Remediation Audit Rerun Checklist
 
-**Date:** 2026-06-28  
+**Date:** 2026-06-29 (orchestrator refresh) · 2026-06-28 (audit reruns)  
 **Remediation:** consolidated software remediation @ `main` @ `5d757cc`  
+**Orchestrator 00 refresh:** `8ae1034` — all 12 consolidation deliverables updated  
 **Pre-remediation baseline:** `7dfefe2`  
-**Report:** [`MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_REPORT_CURRENT.md`](MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_REPORT_CURRENT.md)
+**Report:** [`MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_REPORT_CURRENT.md`](MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_REPORT_CURRENT.md) · [`MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md`](MASTER_CONSOLIDATED_AUDIT_AND_NON_REGRESSIVE_REMEDIATION_PLAN_CURRENT.md)
 
 **Policy:** Read-only audit re-runs only. **CONS-001 repaired** — filename-based launch of `commands_for_cursor/01`–`04` is now trustworthy.
 
@@ -24,7 +25,7 @@
 | # | Audit command file | Rerun status | Trigger | Notes |
 |---|-------------------|--------------|---------|-------|
 | 03 | `03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.2.md` | **Optional — skipped** | CONS-019 WAO UI path | No layout changes; policy gate only |
-| 00 | `00-MASTER_SUPER_ORCHESTRATOR_...V1.2.md` | **Recommended next** | Refresh consolidated % | Recompute CONS register after 01–06 reruns |
+| 00 | `00-MASTER_SUPER_ORCHESTRATOR_...V1.2.md` | **COMPLETE** @ `8ae1034` | Refresh consolidated % | CONS register + 12 deliverables refreshed; audit 03 stale noted |
 
 ---
 
@@ -53,6 +54,7 @@ bash Scripts/validate_consolidated_software_readiness.sh # PASS @ 5d757cc
 
 ```
 POST_REMEDIATION_AUDIT_RERUN: COMPLETE @ 5d757cc (01, 02, 04, 05, 06)
+ORCHESTRATOR_00_REFRESH: COMPLETE @ 8ae1034
 CONS-001_COMMAND_INTEGRITY: PASS
 validate_consolidated_software_readiness.sh: PASS
 SOFTWARE_READINESS: 100% (software-actionable scope)
@@ -60,5 +62,8 @@ INTERNAL_TESTFLIGHT_SOFTWARE_READINESS: READY
 PHYSICAL_QA: PENDING_PHYSICAL
 EXTERNAL_VALIDATION: PENDING_EXTERNAL_VALIDATION
 APP_STORE_READY: NOT_READY
+OVERALL_RELEASE_READINESS: ~72%
 DOCUMENTATION_READINESS: 72% (README/feature matrix P2 drift — doc-only)
+UPSTREAM_AUDIT_03: STALE @ 7dfefe2 (optional rerun)
+RECOMMENDED_NEXT: Physical/external QA OR doc-only README/matrix OR optional audit 03
 ```
