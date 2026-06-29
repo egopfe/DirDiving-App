@@ -8,8 +8,8 @@ struct IOSSnorkelingRoutePlannerView: View {
     @EnvironmentObject private var profileStore: IOSSnorkelingProfileStore
     @EnvironmentObject private var transferService: IOSSnorkelingWatchTransferService
     @EnvironmentObject private var watchSync: WatchSyncService
+    @EnvironmentObject private var locationPermission: IOSLocationPermissionService
 
-    @State private var mapPermission: ApneaMapPermissionState = .notDetermined
     @State private var mapSelectionMode: MapSelectionMode = .entry
     @State private var mapPosition: MapCameraPosition = .automatic
     @State private var transferMessage: String?
@@ -42,7 +42,7 @@ struct IOSSnorkelingRoutePlannerView: View {
         }
         .accessibilityIdentifier("snorkeling.ios.route_planner")
         .onAppear {
-            mapPermission = IOSSnorkelingLocationPermission.currentState()
+            locationPermission.refresh()
             updateMapPosition()
         }
     }
@@ -58,7 +58,7 @@ struct IOSSnorkelingRoutePlannerView: View {
                 }
                 .pickerStyle(.segmented)
 
-                if mapPermission == .authorized {
+                if locationPermission.permissionState == .authorized {
                     MapReader { proxy in
                         Map(position: $mapPosition, interactionModes: [.pan, .zoom]) {
                             routeAnnotations
@@ -254,17 +254,31 @@ struct IOSSnorkelingRoutePlannerView: View {
 
     private var permissionBanner: some View {
         Group {
-            switch mapPermission {
+            switch locationPermission.permissionState {
             case .authorized:
                 EmptyView()
             case .denied, .restricted:
-                Text(DIRIOSLocalizer.string("snorkeling.ios.map.permission_denied"))
-                    .font(.caption)
-                    .foregroundStyle(DIRTheme.orange)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(DIRIOSLocalizer.string("ios.location.permission.denied.body"))
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.orange)
+                    Button(DIRIOSLocalizer.string("ios.location.permission.open_settings")) {
+                        IOSLocationSettingsOpener.openAppSettings()
+                    }
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.cyan)
+                }
             case .notDetermined:
-                Text(DIRIOSLocalizer.string("snorkeling.ios.map.permission_required"))
-                    .font(.caption)
-                    .foregroundStyle(DIRTheme.muted)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(DIRIOSLocalizer.string("ios.location.permission.required.body"))
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.muted)
+                    Button(DIRIOSLocalizer.string("ios.location.permission.enable")) {
+                        locationPermission.requestWhenInUseFromUserAction()
+                    }
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(DIRTheme.cyan)
+                }
             }
         }
     }
