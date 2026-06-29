@@ -25,6 +25,9 @@ struct SnorkelingView: View {
             ScrollView {
                 VStack(spacing: DiveUI.spaceM) {
                     header
+                    if shouldShowLocationPermissionNotice {
+                        WatchLocationPermissionNoticeView()
+                    }
                     if let recovered = ui.recoveredSessionBannerText {
                         recoveredBanner(recovered, warning: ui.recoveryWarningText)
                     }
@@ -117,6 +120,17 @@ struct SnorkelingView: View {
             .accessibilityIdentifier("snorkeling.watch.gps_status")
             .accessibilityLabel(String(localized: "snorkeling.a11y.gps_status"))
             .accessibilityValue(ui.gpsStatusText)
+    }
+
+    private var shouldShowLocationPermissionNotice: Bool {
+        guard !gps.locationPermissionState.isAuthorized else { return false }
+        if importedRoute.activeRoutePlan != nil { return true }
+        switch ui.stage {
+        case .navigation, .returnToEntry:
+            return true
+        default:
+            return false
+        }
     }
 
     // MARK: - Content

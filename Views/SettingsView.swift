@@ -110,6 +110,9 @@ struct SettingsView: View {
                     }
                     .buttonStyle(.plain)
 
+                    WatchSettingsSectionHeader(title: String(localized: "watch.settings.privacy_location.title"))
+                    WatchPrivacyLocationSettingsSection()
+
                     WatchSettingsSectionHeader(title: String(localized: "settings.section.sync"))
 
                     settingsRow(

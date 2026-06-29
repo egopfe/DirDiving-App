@@ -39,6 +39,8 @@ final class LegalAcceptanceStore: ObservableObject {
             || !defaults.bool(forKey: Key.depthLimitsAcknowledged)
     }
 
+    var hasAccepted: Bool { !requiresAcceptance }
+
     var acceptedVersionText: String {
         record?.appVersion ?? String(localized: "legal.acceptance.not_accepted")
     }
