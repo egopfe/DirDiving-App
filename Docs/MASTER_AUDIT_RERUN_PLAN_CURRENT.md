@@ -1,12 +1,12 @@
 # Master Audit Rerun Plan — Current
 
-**Orchestrator:** V1.2 refresh @ `4d415c0`  
+**Orchestrator:** V1.2 refresh @ `0126699`
 **Remediation baseline:** `5d757cc` · **Date:** 2026-06-29  
 **Policy:** Rerun upstream master audits after remediation batches. **CONS-001 FIXED** — filename-based launch of **01–04** is trustworthy.
 
 ---
 
-## Post-remediation reruns (COMPLETE @ 4d415c0)
+## Post-remediation reruns (COMPLETE @ 4d415c0; consolidated @ 0126699)
 
 | Audit | Status | Trigger | Verify |
 |-------|--------|---------|--------|
@@ -16,7 +16,7 @@
 | **04** Main/Sync/Security | **COMPLETE** @ `5d757cc` | CONS-003–007 | P1=0; gate scripts PASS |
 | **05** Release/QA/Legal | **COMPLETE** @ `5d757cc` | Full gate matrix refresh | `validate_consolidated_software_readiness.sh` PASS |
 | **06** Documentation | **COMPLETE** @ `5d757cc` | CONS-001 repair; CONS-034 INDEX | Command integrity PASS |
-| **00** Orchestrator | **COMPLETE** @ `4d415c0` | Consolidation refresh after 01–06 | 12 deliverables updated |
+| **00** Orchestrator | **COMPLETE** @ `0126699` | Consolidation refresh after 01–06 | 12 deliverables verified; gate/QA schemas refreshed |
 
 **All six upstream audits refreshed.** No stale upstream outputs.
 
@@ -70,4 +70,4 @@ Rerun **01**, **02**, **05**; attach evidence under `Docs/QA_EVIDENCE/BUHLMANN_E
 
 After Batch 8 evidence milestones or Batch 9 legal closure: rerun **00** to regenerate all 12 orchestrator consolidation deliverables.
 
-**Last refresh:** orchestrator **00** @ `4d415c0` · 2026-06-29
+**Last refresh:** orchestrator **00** @ `0126699` · 2026-06-29
