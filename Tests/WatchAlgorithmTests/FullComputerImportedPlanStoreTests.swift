@@ -65,7 +65,7 @@ final class FullComputerImportedPlanStoreTests: XCTestCase {
         let first = try makePackage(revision: 6)
         XCTAssertTrue(store.importPayload(first, source: "test"))
         var body = first.body
-        body.gfHigh = 75
+        body.bottomSegments[0].durationMinutes += 1
         let conflicting = try DivePlanPackageCodec.seal(body)
         XCTAssertFalse(store.importPayload(conflicting, source: "test"))
         XCTAssertEqual(store.lastImportError, .checksumMismatch)

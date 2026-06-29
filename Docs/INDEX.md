@@ -1,7 +1,24 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-27  
+**Aggiornato:** 2026-06-28  
 **Branch consigliato:** `main` = `origin/main`
+
+---
+
+## Aggiornamento indice 2026-06-28 — Master Consolidated Software Remediation to 100% V1.0 (Command 10)
+
+Remediation software post-orchestrator V1.2: permutazione `commands_for_cursor/01`–`04` riparata, parità GF iOS↔Watch, sync Watch (inFlight/ACK/tombstones), authority depth shallow, gate dev toggles, test hardening.
+
+| Campo | Valore |
+|-------|--------|
+| **Command** | `10-MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_CODE_READINESS_COMMAND_V1.0.md` |
+| **Report** | [`MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_REPORT_CURRENT.md`](MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TO_100_REPORT_CURRENT.md) |
+| **Finding status** | [`MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_FINDING_STATUS_CURRENT.csv`](MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_FINDING_STATUS_CURRENT.csv) |
+| **Test evidence** | [`MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TEST_EVIDENCE_CURRENT.md`](MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_TEST_EVIDENCE_CURRENT.md) |
+| **Completion summary** | [`MASTER_CONSOLIDATED_SOFTWARE_READINESS_TO_100_COMPLETION_SUMMARY_CURRENT.md`](MASTER_CONSOLIDATED_SOFTWARE_READINESS_TO_100_COMPLETION_SUMMARY_CURRENT.md) |
+| **Validate** | `./Scripts/validate_consolidated_software_readiness.sh` |
+| **Verdict** | **SOFTWARE 100%** · internal TestFlight software **100%** · physical/external/legal **PENDING** |
+| **Audit baseline** | `7dfefe2` · orchestrator docs @ `626c619` · remediation working tree (uncommitted) |
 
 ---
 

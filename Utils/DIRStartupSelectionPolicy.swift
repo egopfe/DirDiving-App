@@ -96,10 +96,21 @@ enum DIRStartupSelectionPolicy {
         guard activity.isLaunchableOnWatchMAIN else {
             return .comingSoon(activity: activity)
         }
-        if divingMode == .fullComputer {
+        let policy = DepthCapabilityPolicy.current
+        var effectiveMode = divingMode
+        if divingMode == .fullComputer, !policy.supportsFullComputerRuntime {
+            if policy.supportsDivingGaugeRuntime {
+                effectiveMode = .gauge
+            } else {
+                return .divingModeSelection(activity: activity)
+            }
+        } else if divingMode == .gauge, !policy.supportsDivingGaugeRuntime {
+            return .divingModeSelection(activity: activity)
+        }
+        if effectiveMode == .fullComputer {
             return .fullComputerPrediveConfiguration
         }
-        return .ready(activity: activity, divingMode: divingMode)
+        return .ready(activity: activity, divingMode: effectiveMode)
     }
 
     static func nextStepAfterActivitySelection(_ activity: DIRActivityMode) -> DIRStartupLaunchStep {
