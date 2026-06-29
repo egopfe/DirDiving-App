@@ -64,11 +64,6 @@ enum DeveloperSettings {
 
     private static func resolvedShallowTestingFlag(key: String) -> Bool {
         guard isDeveloperSectionVisible else { return false }
-        #if DEBUG
-        if UserDefaults.standard.object(forKey: key) == nil {
-            return true
-        }
-        #endif
         return UserDefaults.standard.bool(forKey: key)
     }
 

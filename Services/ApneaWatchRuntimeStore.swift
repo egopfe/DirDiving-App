@@ -190,7 +190,13 @@ final class ApneaWatchRuntimeStore: ObservableObject, ApneaWatchRuntimeProviding
         let profile = package?.body.profile
         let recoveryPolicy = plan?.recoveryPolicy ?? profile?.recoveryPolicy ?? .default
         engine = ApneaSessionEngine(
-            configuration: Self.testLifecycleConfiguration ?? .default,
+            configuration: {
+                #if DEBUG
+                return Self.testLifecycleConfiguration ?? .default
+                #else
+                return .default
+                #endif
+            }(),
             recoveryPolicy: recoveryPolicy
         )
         missionModeEnabled = package?.body.settings.missionModeEnabled ?? false

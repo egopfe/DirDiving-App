@@ -1,150 +1,26 @@
-# LAUNCH ORDER 02
+# LAUNCH ORDER 04
 
-**Launch order note:** SECOND — iOS deep audit. Run after Watch core to validate iOS Planner, Bühlmann parity, CCR/reference-only, gas planning, Equipment, Checklist, Logbook and briefing-card generation.
+**Launch order note:** FOURTH — main code, sync, security, privacy, performance and concurrency audit. Run after feature-specific audits to verify cross-cutting architecture, data integrity and performance risks.
 
-**Canonical numbered filename:** `02-MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.1.md`
+**Canonical numbered filename:** `04-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.0.md`
 
 ---
 
-# MASTER CURSOR / CODEX COMMAND — DIR DIVING iOS FULL DEEP COMPREHENSIVE AUDIT — V1.1
+# MASTER CURSOR / CODEX COMMAND — DIR DIVING MAIN CODE / SYNC / SECURITY / PERFORMANCE AUDIT — V1.0
 
 **Repository:** `egopfe/DirDiving-App`  
 **Required branch:** `main`  
-**Primary target:** `DIRDiving iOS`  
-**Primary test target:** `DIRDiving iOS Algorithm Tests`  
-**Secondary scope:** Apple Watch and Shared code only where they feed, validate, sync, receive, compare or display iOS-generated mathematical/planner/logbook/settings data  
-**Task type:** audit-only, read-only, release-hard readiness audit  
-**Merged source commands:**
+**Targets:**  
 
 ```text
-0-DIR_DIVING_IOS_COMPLETE_MATH_FUNCTIONS_AUDIT_CCR_UPDATED_V3.0.md
-1-DIR_DIVING_IOS_BUHLMANN_COMPREHENSIVE_READINESS_AUDIT_CCR_UPDATED_V3.0.md
-3-DIR_DIVING_IOS_COMPLETE_ALGORITHM_AUDIT_CCR_UPDATED_V3.0.md
+DIRDiving Watch App
+DIRDiving iOS
+DIRDiving Watch Algorithm Tests
+DIRDiving iOS Algorithm Tests
 ```
 
+**Task type:** audit-only, read-only, full deep code / sync / persistence / schema / security / privacy / performance / concurrency / battery audit  
 **Updated for latest development:**  
-
-```text
-Multi-activity product architecture
-Diving / Apnea / Snorkeling as first-class vertical product areas
-iOS Companion Settings mode switcher
-iOS Settings content for Diving / Apnea / Snorkeling
-Dashboard gear routing to mode-scoped Settings
-Activity-specific Settings ownership
-Activity-specific Logbook ownership
-Watch briefing cards as reference-only
-CCR / Rebreather planner concepts as reference-only unless independently validated
-Strict no cross-activity leakage policy
-```
-
----
-
-# 0. ABSOLUTE EXECUTION RULE
-
-This is a single merged master audit command for the iOS Companion.
-
-Audit the production implementation exactly as it exists.
-
-Do **not** modify:
-
-- production code;
-- tests;
-- project configuration;
-- localization;
-- assets;
-- mockups;
-- algorithms;
-- business logic;
-- planner logic;
-- CCR / Rebreather logic;
-- Ratio Deco logic;
-- gas planning logic;
-- UI/UX;
-- sync schemas;
-- persistence schemas;
-- security model;
-- Git history.
-
-Do **not** refactor, fix, commit, push or merge.
-
-The only permitted writes are audit outputs under `Docs/`.
-
-If a defect is found, record it as an open finding with:
-
-```text
-severity
-priority
-root cause
-affected files/symbols
-canonical-vs-presentation classification
-mathematical impact
-safety impact
-user impact
-required remediation
-acceptance tests
-release impact
-```
-
-Do not implement the fix during this audit.
-
-Never claim:
-
-- physical iPhone QA;
-- physical Apple Watch QA;
-- paired-device QA;
-- underwater QA;
-- external Subsurface validation;
-- external Bühlmann validation;
-- App Store readiness;
-
-unless actual evidence exists.
-
-If evidence is unavailable, mark:
-
-```text
-PENDING_PHYSICAL
-PENDING_PAIRED_DEVICE_QA
-PENDING_EXTERNAL_VALIDATION
-NOT_EXECUTED
-```
-
----
-
-# 1. MASTER OBJECTIVE
-
-Perform a complete, deep, release-hard audit of the DIR Diving iOS Companion application.
-
-This merged audit must cover:
-
-1. Complete iOS mathematical-functions audit.
-2. Complete iOS Bühlmann comprehensive readiness audit.
-3. Complete iOS algorithm / planner / data-readiness audit.
-4. Multi-activity architecture: Diving, Apnea, Snorkeling.
-5. Activity-specific Settings and Logbooks.
-6. iOS Settings mode switcher and latest activity-scoped Settings UX.
-7. Bühlmann / Planner / Full Computer parity with Watch where relevant.
-8. CCR / Rebreather concepts as reference-only unless fully validated.
-9. Ratio Deco as heuristic/comparative unless otherwise proven.
-10. Gas roles, MOD, PPO2, Dalton validation and switch-depth safety.
-11. Emergency / Rock Bottom.
-12. Schedule-aware gas consumption and gas ledger.
-13. Repetitive-dive residual tissues.
-14. Tissue loading, narcotic loading, CNS and OTU.
-15. Structured Equipment and operational checklist.
-16. CCR checklist import/export.
-17. Manual dives, Logbooks, analytics and exports.
-18. Planner briefing card / PNG export to Apple Watch.
-19. Cloud, sync, persistence, privacy, security and schema integrity.
-20. Unit conversion, localization and accessibility for math-bearing UI.
-21. Test coverage, release-hard matrix and prioritized remediation plan.
-
-The audit must answer whether the iOS Companion is mathematically, architecturally, functionally and release-wise ready as the central planning, logbook, settings, export and companion application for DIR Diving.
-
----
-
-# 2. CURRENT PRODUCT ARCHITECTURE TO RESPECT
-
-The current product architecture is:
 
 ```text
 DIR Diving
@@ -155,334 +31,226 @@ DIR Diving
 └── Snorkeling
 ```
 
-Both iOS Companion and Apple Watch must be treated as multi-activity applications.
-
-The audit must not reduce Apnea and Snorkeling to three logbooks or placeholder modules.
-
-## Startup/root-flow requirements
-
-Audit:
+**Merged source commands:**
 
 ```text
-Launch
-→ legal/onboarding gate when required
-→ activity selection
-   ├── Diving
-   ├── Apnea
-   └── Snorkeling
-→ activity-owned root, dashboard, functions, Settings and Logbook
+5-DIR_DIVING_MAIN_DEEP_CODE_ANALYSIS_COMMAND_CCR_UPDATED_V3.0.md
+8-DIR_DIVING_SYNC_PERSISTENCE_SCHEMA_AUDIT_V3.0.md
+9-DIR_DIVING_SECURITY_PRIVACY_TRUST_AUDIT_V3.0.md
+10-DIR_DIVING_PERFORMANCE_CONCURRENCY_BATTERY_AUDIT_V3.0.md
+IOS_PERFORMANCE_OPTIMIZATION_AUDIT_COMMAND_V1.0.md
 ```
 
-Verify:
-
-- selection persistence;
-- safe migration from Diving-only installations;
-- no placeholder route presented as production-ready;
-- no remote switch of an active Watch session;
-- no duplicate root coordinator;
-- no duplicate NavigationStack authority;
-- correct deep-link ownership;
-- correct state-restoration ownership;
-- Italian and English;
-- accessibility;
-- deterministic tests.
-
-## Activity-specific feature ownership
-
-### Diving
-
-Audit:
-
-- Gauge;
-- Full Computer;
-- Bühlmann ZH-L16C;
-- Gradient Factors;
-- NDL, TTS, Ceiling;
-- decompression-stop state machine;
-- multilevel tissue update;
-- gas configuration;
-- runtime gas switching;
-- gas planning;
-- CNS/OTU;
-- PPO2/MOD;
-- Planner;
-- Ratio Deco;
-- CCR / Rebreather planner concepts;
-- Emergency / Rock Bottom;
-- Diving equipment and checklist;
-- Diving Logbook;
-- Diving-specific Settings.
-
-### Apnea
-
-Audit:
-
-- automatic session/dive lifecycle;
-- depth/time profile;
-- descent/ascent;
-- surface interval;
-- configurable recovery;
-- targets;
-- alarms;
-- markers;
-- profiles/planner;
-- statistics and records;
-- Apnea equipment/buddy;
-- Apnea Logbook;
-- Apnea-specific Settings;
-- iOS Settings content under Apnea mode.
-
-### Snorkeling
-
-Audit:
-
-- surface session lifecycle;
-- GPS surface track;
-- dips;
-- waypoints;
-- markers;
-- return to entry;
-- route planner;
-- photos;
-- map/privacy;
-- Snorkeling Logbook;
-- Snorkeling-specific Settings;
-- iOS Settings content under Snorkeling mode.
+This command supersedes the separate deep-code, sync/persistence/schema, security/privacy/trust, global performance/concurrency/battery and iOS performance optimization audits by merging them into one single full deep comprehensive audit command.
 
 ---
 
-# 3. SETTINGS OWNERSHIP AND LATEST DEVELOPMENT REQUIREMENTS
+# 0. ABSOLUTE EXECUTION RULE
 
-The latest development introduced / must be audited for:
+This is strictly read-only.
 
-```text
-iOS Companion Settings mode switcher
-Diving / Apnea / Snorkeling selectable Settings scope
-Dashboard gear routing to Settings with correct initial activity
-Editable Settings content directly visible below the switcher
-No nested Form-in-ScrollView hiding activity Settings
-Activity-owned Settings content
-Shared Settings only where semantically shared
-Watch in-mode Settings access for Apnea and Snorkeling where relevant
-```
+Do **not** modify:
 
-## Shared Settings may include only genuinely shared concerns
+- production code;
+- tests;
+- project configuration;
+- assets;
+- mockups;
+- localization resources;
+- runtime documentation;
+- algorithms;
+- business logic;
+- sync schemas;
+- persistence schemas;
+- security model;
+- Git history.
 
-```text
-Shared Settings
-├── Language
-├── Units
-├── Backup
-├── Synchronization
-├── Privacy
-├── Appearance where supported
-├── Global haptic preference where semantically valid
-└── About / Legal
-```
+Do **not**:
 
-## Activity Settings must remain separate
+- refactor;
+- apply fixes;
+- change UI;
+- change UX;
+- change app visual identity;
+- change Watch live runtime;
+- change Buehlmann / Bühlmann math;
+- change Schreiner;
+- change Haldane;
+- change Gradient Factors;
+- change NDL / TTS / ceiling;
+- change decompression schedule;
+- change gas-switch logic;
+- change Apnea recovery logic;
+- change Snorkeling GPS/geodesy;
+- change CCR/Rebreather logic;
+- weaken HMAC/security;
+- commit;
+- push;
+- merge.
 
-```text
-Diving Settings
-├── Gauge / Full Computer defaults
-├── Gas
-├── GF
-├── PPO2 / MOD
-├── CNS / OTU
-├── NDL / TTS / Ceiling
-├── Deco-stop and gas-switch alerts
-├── Environment / altitude where supported
-├── Mission Mode where supported
-└── Diving alarms
-```
+You may create or update only the requested audit reports and matrices under `Docs/` and the validation scripts explicitly listed in this command.
 
-```text
-Apnea Settings
-├── Session detection
-├── Recovery
-├── Targets
-├── Depth/time/speed alarms
-├── Markers
-├── Buddy / equipment where supported
-└── Apnea profiles
-```
+If a defect is found, record it as an open finding with:
 
 ```text
-Snorkeling Settings
-├── GPS
-├── Route / Waypoints
-├── Return to entry
-├── Marker categories
-├── Dip/session alarms
-├── Location privacy
-├── Photos/map privacy
-└── Snorkeling route defaults
+severity
+priority
+area
+platform
+activity
+mode
+affected files/symbols
+root cause
+user impact
+safety impact
+security/privacy impact
+performance impact
+data-integrity impact
+recommended remediation
+tests required
+acceptance criteria
+release impact
 ```
 
-## Mandatory negative checks
+Do not implement the fix.
 
-- CNS, OTU, PPO2, MOD, GF, gas and decompression settings must not appear in Apnea or Snorkeling.
-- Apnea recovery and target-training settings must not appear in Diving or Snorkeling.
-- Snorkeling GPS route, waypoint and return settings must not appear in Diving or Apnea.
-- iOS Settings mode switch must not mutate Watch active runtime.
-- iOS Settings mode switch must not remotely change active Watch activity.
-- Opening Settings for Apnea must not eagerly initialize unrelated Snorkeling or Diving-heavy stores unless explicitly shared and justified.
-- Opening Settings for Snorkeling must not eagerly initialize unrelated Apnea or Diving-heavy stores unless explicitly shared and justified.
-- Dashboard gear must open the Settings root with the correct initial selected mode.
-- MoreView Settings must expose the same mode switch and content.
-- Activity Settings content must not be hidden by nested `Form` inside `ScrollView`.
+Never claim physical Apple Watch, physical iPhone, paired-device, underwater, Instruments, penetration-test, certification, App Store or external decompression validation unless actual evidence exists.
 
-Any cross-activity Settings leakage is at least P1 and may be P0 if it affects live Full Computer/decompression behavior.
+If evidence is unavailable, mark:
+
+```text
+PENDING_PHYSICAL
+PENDING_INSTRUMENTS
+PENDING_PAIRED_DEVICE_QA
+PENDING_EXTERNAL_VALIDATION
+NOT_EXECUTED
+```
 
 ---
 
-# 4. STRICT LOGBOOK OWNERSHIP
+# 1. MASTER OBJECTIVE
+
+Perform a complete and deep audit of the entire `main` codebase covering:
+
+1. Bugs and crash risks.
+2. Data-loss and data-corruption risks.
+3. Activity architecture and cross-activity isolation.
+4. Settings ownership.
+5. Logbook ownership.
+6. Sync, schema, persistence, migration, backup and restore.
+7. WatchConnectivity transport, HMAC, signed ACK and replay behavior.
+8. Security, privacy and trust.
+9. File import/export security.
+10. Image, photo and briefing-card payload routing.
+11. Planner briefing-card versioning, metadata and reference-only policy.
+12. Performance, concurrency, battery, memory and thermal risks.
+13. iOS-specific performance optimization.
+14. Watch runtime performance and Full Computer update deadlines.
+15. iOS Planner recalculation / chart / logbook / map scalability.
+16. SwiftUI invalidation, MainActor overuse, retain-cycle risks and stale async publication.
+17. Cloud/iCloud KVS, conflict, tombstone and payload-size behavior.
+18. App Intents / Action Button safety gates.
+19. Developer Sensor Source and simulation release safety.
+20. External/physical QA gates that must not be falsely marked passed.
+
+The audit must verify the current product architecture:
 
 ```text
-Diving section → Diving Logbook only
-Apnea section → Apnea Logbook only
-Snorkeling section → Snorkeling Logbook only
+DIR Diving
+├── Diving
+│   ├── Gauge
+│   └── Full Computer
+├── Apnea
+└── Snorkeling
 ```
 
-A Logbook must be visible and reachable only inside its owning activity section.
-
-Verify:
-
-- no normal global mixed Logbook;
-- no cross-activity menu route;
-- no cross-activity deep link;
-- no wrong state restoration;
-- no mixed store query;
-- no mixed filters;
-- no mixed statistics;
-- no mixed details;
-- no mixed exports;
-- no universal detail view with irrelevant optional fields.
-
-Any cross-activity Logbook visibility or routing is P0.
+Both Apple Watch and iOS Companion are multi-activity apps.
 
 ---
 
-# 5. SHARED INFRASTRUCTURE VERSUS DOMAIN SEPARATION
+# 2. REQUIRED OUTPUT FILES
 
-Shared infrastructure is allowed for:
-
-- authenticated WatchConnectivity transport;
-- checksums;
-- ACK/retry;
-- backup;
-- persistence helpers;
-- generic visual primitives;
-- localization infrastructure;
-- theme components;
-- common file I/O helpers;
-- generic PDF rendering primitives.
-
-Activity payloads, stores, Settings, Logbooks, statistics and exports must remain discriminated and independently versioned.
-
----
-
-# 6. PRODUCT SAFETY POSITIONING
-
-Preserve:
-
-- non-certified planner positioning;
-- no certified dive-computer claim;
-- no certified decompression planner claim;
-- no CCR controller claim;
-- no live loop PPO2 monitoring claim;
-- no EN13319 / ISO 6425 / CE claim unless official evidence exists;
-- iOS Planner is reference/planning support unless formally validated;
-- Watch briefing cards are reference-only;
-- external validation remains pending unless actually executed;
-- physical QA remains pending unless actually executed.
-
-Unsupported release/legal claim is a finding.
-
----
-
-# 7. REQUIRED OUTPUT FILES
-
-Create or replace only these files:
+Create or replace:
 
 ```text
-Docs/MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_CURRENT.md
-Docs/MASTER_IOS_FEATURE_INVENTORY_CURRENT.csv
-Docs/MASTER_IOS_REQUIREMENT_TEST_MATRIX_CURRENT.csv
-Docs/MASTER_IOS_EDGE_CASE_MATRIX_CURRENT.csv
-Docs/MASTER_IOS_FINDING_TRACEABILITY_CURRENT.csv
-Docs/MASTER_IOS_RELEASE_HARD_MATRIX_CURRENT.csv
-Docs/MASTER_IOS_SETTINGS_OWNERSHIP_MATRIX_CURRENT.csv
-Docs/MASTER_IOS_LOGBOOK_OWNERSHIP_MATRIX_CURRENT.csv
-Docs/MASTER_IOS_EXTERNAL_VALIDATION_PENDING_CURRENT.md
+Docs/MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_CURRENT.md
+Docs/MASTER_MAIN_CODE_FINDING_TRACEABILITY_CURRENT.csv
+Docs/MASTER_MAIN_ARCHITECTURE_RISK_MATRIX_CURRENT.csv
+Docs/MASTER_SYNC_MESSAGE_NAMESPACE_MATRIX_CURRENT.csv
+Docs/MASTER_SCHEMA_MIGRATION_COMPATIBILITY_MATRIX_CURRENT.csv
+Docs/MASTER_BACKUP_RESTORE_ISOLATION_MATRIX_CURRENT.csv
+Docs/MASTER_SECURITY_THREAT_MODEL_CURRENT.md
+Docs/MASTER_PRIVACY_DATA_FLOW_MATRIX_CURRENT.csv
+Docs/MASTER_PERFORMANCE_BUDGET_MATRIX_CURRENT.csv
+Docs/MASTER_CONCURRENCY_RISK_MATRIX_CURRENT.csv
+Docs/MASTER_IOS_PERFORMANCE_BUDGET_MATRIX_CURRENT.csv
+Docs/MASTER_IOS_PERFORMANCE_SCALABILITY_MATRIX_CURRENT.csv
+Docs/MASTER_PHYSICAL_PERFORMANCE_QA_PLAN_CURRENT.md
+Docs/MASTER_SECURITY_REMEDIATION_PLAN_CURRENT.md
+Docs/MASTER_MAIN_CODE_REMEDIATION_PLAN_CURRENT.md
+Scripts/validate_master_main_code_sync_security_performance_audit.sh
 ```
 
-No production source writes are permitted.
+Do not create production changes.
 
 ---
 
-# 8. SEVERITY MODEL
+# 3. SEVERITY MODEL
 
-## P0 — Safety-critical / release-blocking
+## P0 — Must block any internal safety-critical use
 
 Use P0 for:
 
-- false or misleading decompression output;
-- false no-decompression status;
-- wrong ceiling/NDL/TTS/schedule due to algorithm or projection error;
-- gas switch deeper than MOD persisting;
-- invalid gas used in Bühlmann;
-- stale hidden planner values exported as valid plan;
-- cross-activity Logbook or Settings routing that can corrupt or display wrong safety data;
-- iOS plan/briefing card mutating live Watch runtime;
-- unsupported CCR metadata affecting live decompression authority;
-- cloud/sync merge corrupting mathematical profile data;
-- failure path turning unavailable values into zero.
+- cross-activity data corruption;
+- wrong activity payload decoded into wrong store;
+- wrong Settings or Logbook ownership affecting safety data;
+- tissue/checkpoint corruption;
+- false no-decompression state due to race/performance failure;
+- stale async result overwriting newer safety/planner data;
+- sync/HMAC bypass or replay that can corrupt data;
+- profile merge that silently fuses divergent dives;
+- unbounded memory growth causing realistic termination;
+- path traversal or arbitrary file write/delete;
+- simulation sensor silently active in release;
+- App Intent bypassing legal/safety gate;
+- briefing-card metadata mutating live Watch runtime;
+- cloud backup exposing sensitive data without opt-in.
 
 ## P1 — Must fix before internal TestFlight
 
 Use P1 for:
 
-- Bühlmann or Planner algorithm correctness gaps;
-- incomplete CCR / OC separation where CCR is visible;
-- MOD/PPO2/Dalton inconsistency;
-- Ratio Deco displayed without Bühlmann validation;
-- incomplete gas-role mapping;
-- Rock Bottom unsafe or non-conservative behavior;
-- repetitive-dive tissue ambiguity;
-- incomplete planner result-state gating;
-- non-traceable PDF/card numerical output;
-- incomplete test coverage for safety-relevant math;
-- Settings mode switch causing broad runtime mutation or cross-activity leakage.
+- crash risk with realistic data;
+- sync queue without backpressure;
+- schema migration ambiguity;
+- stale payload accepted;
+- large logbook unusable;
+- planner recalculation storm;
+- heavy math on main thread;
+- map/chart unbounded rendering;
+- missing security/privacy manifest;
+- missing physical/paired-device evidence for safety-relevant path;
+- developer mode not safely hidden.
 
-## P2 — Must fix before external TestFlight
+## P2
 
 Use P2 for:
 
-- bounded numerical discrepancy;
-- missing docs/tests;
-- incomplete export labels;
-- incomplete localization/accessibility for math-bearing labels;
-- incomplete performance safeguards;
-- incomplete validation matrices.
+- bounded performance issue;
+- missing performance budget;
+- missing signpost;
+- incomplete negative tests;
+- incomplete privacy documentation;
+- incomplete conflict/tombstone coverage;
+- inefficient but bounded path.
 
-## P3 — Before App Store / polish
+## P3
 
-Use P3 for:
-
-- maintainability;
-- observability;
-- non-blocking performance;
-- documentation clarity;
-- polish.
-
-## P4 — Post-release improvement
-
-Optional improvements.
+Use P3 for documentation gaps, observability gaps, non-blocking optimizations and maintainability.
 
 ---
 
-# 9. PREFLIGHT
+# 4. PREFLIGHT
 
 Run:
 
@@ -493,8 +261,8 @@ git rev-parse HEAD
 git fetch --prune origin
 git status --short
 git status -sb
+git rev-list --left-right --count HEAD...origin/main
 git remote -v
-git branch -a
 xcodebuild -version
 ```
 
@@ -507,36 +275,73 @@ project.yml
 README.md
 Docs/**
 iOSApp/**
-Shared/**
+Views/**
 Services/**
 Models/**
 Utils/**
-Views/**
+Shared/**
 Tests/**
 Scripts/**
 Resources/**
+Assets.xcassets/**
 ```
 
-Confirm:
+Record:
 
-- target `DIRDiving iOS`;
-- test target `DIRDiving iOS Algorithm Tests`;
-- Watch runtime is secondary/cross-target only;
-- experimental files remain excluded;
-- audit-only state;
-- dirty files;
-- docs found/missing;
-- simulator availability.
+```text
+branch
+commit
+origin/main
+dirty files
+Watch target
+iOS target
+test targets
+entitlements
+bundle IDs
+experimental exclusions
+available simulators
+Xcode version
+physical Watch availability
+physical iPhone availability
+paired-device availability
+Instruments availability
+external validation availability
+```
 
-If macOS/Xcode available:
+---
+
+# 5. BUILD AND TEST BASELINE
+
+If environment allows, run:
 
 ```bash
 xcodegen generate
+./Scripts/check_main_target_isolation.sh
+./Scripts/check_secrets.sh
+./Scripts/audit_localization.sh
+```
+
+Build:
+
+```bash
+xcodebuild -project DIRDiving.xcodeproj \
+  -scheme "DIRDiving Watch App" \
+  -destination 'generic/platform=watchOS Simulator' \
+  CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
 
 xcodebuild -project DIRDiving.xcodeproj \
   -scheme "DIRDiving iOS" \
   -destination 'generic/platform=iOS Simulator' \
   CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
+```
+
+Run:
+
+```bash
+xcodebuild -project DIRDiving.xcodeproj \
+  -scheme "DIRDiving Watch Algorithm Tests" \
+  -destination 'platform=watchOS Simulator,name=Apple Watch Series 11 (46mm)' \
+  CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO test
 
 xcodebuild -project DIRDiving.xcodeproj \
   -scheme "DIRDiving iOS Algorithm Tests" \
@@ -544,1024 +349,550 @@ xcodebuild -project DIRDiving.xcodeproj \
   CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO test
 ```
 
-If Watch parity/briefing-card receiver is relevant:
-
-```bash
-xcodebuild -project DIRDiving.xcodeproj \
-  -scheme "DIRDiving Watch Algorithm Tests" \
-  -destination 'platform=watchOS Simulator,name=Apple Watch Series 11 (46mm)' \
-  CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO test
-```
-
-Do not fix failures.
-
-Record exact commands, destination, result, failure summary and limitations.
+Do not fix failures. Record exact command, destination, duration, passed/failed/skipped and limitations.
 
 ---
 
-# 10. MASTER FEATURE INVENTORY
+# 6. ARCHITECTURE / TARGET MEMBERSHIP AUDIT
+
+Audit:
+
+- repository structure;
+- target membership;
+- shared files between Watch and iOS;
+- duplicate code;
+- stale/dead files;
+- orphan views/services;
+- experimental leakage;
+- build settings;
+- entitlements;
+- generated project policy;
+- localization resources;
+- documentation consistency;
+- test target coverage.
+
+Verify:
+
+```text
+Diving payloads → Diving store only
+Apnea payloads → Apnea store only
+Snorkeling payloads → Snorkeling store only
+Diving Settings → Diving only
+Apnea Settings → Apnea only
+Snorkeling Settings → Snorkeling only
+Diving Logbook → Diving only
+Apnea Logbook → Apnea only
+Snorkeling Logbook → Snorkeling only
+```
+
+Any cross-decoding or cross-routing is P0/P1.
+
+---
+
+# 7. APPLE WATCH DEEP CODE AUDIT
+
+Inspect at minimum:
+
+```text
+Services/DiveManager.swift
+Services/DepthSensorProvider.swift
+Services/AppleDepthSensorProvider.swift
+Services/MockDepthSensorProvider.swift
+Services/SensorProviderFactory.swift
+Services/GPSManager.swift
+Services/HapticService.swift
+Services/DepthLimitHapticCoordinator.swift
+Services/AscentSafetyHapticCoordinator.swift
+Services/WatchSyncService.swift
+Services/WatchDiveSyncCodec.swift
+Services/WatchSyncAuth.swift
+Services/DiveLogStore.swift
+Services/SubsurfaceExportService.swift
+Services/UserImageStore.swift
+Services/PlannerBriefingCardStore.swift
+Services/PlannerBriefingWatchReceiver.swift
+Services/ActionButtonIntents.swift
+Views/DiveLiveView.swift
+Views/AscentGaugeView.swift
+Views/AscentWarningView.swift
+Views/DepthSafetyLiveViews.swift
+Views/DiveDetailView.swift
+Views/DiveLogListView.swift
+Views/SettingsView.swift
+Views/InfoView.swift
+Views/UserImagesView.swift
+Views/MissionModeIndicatorView.swift
+Views/WatchShortcutHelpView.swift
+Views/ApneaView.swift
+Views/SnorkelingView.swift
+Views/WatchActivitySettingsSections.swift
+Utils/**
+Models/**
+```
+
+Audit for:
+
+- dive lifecycle bugs;
+- manual/automatic start conflicts;
+- draft restore bugs;
+- timer/race issues;
+- stale depth/frozen depth;
+- invalid depth;
+- depth safety thresholds;
+- ascent-rate bugs;
+- haptic storms;
+- Mission Mode invariant breaks;
+- GPS lifecycle/battery risk;
+- App Intent legal gate bypass;
+- sensor source/simulation release risk;
+- WatchConnectivity routing;
+- sync replay/tamper risk;
+- local persistence;
+- image inventory/delete;
+- path traversal;
+- CSV/export consistency;
+- briefing-card stale/overwrite/malformed payload;
+- card values affecting live Watch state;
+- Apnea lifecycle concurrency;
+- Snorkeling GPS/battery/privacy;
+- Full Computer one-second runtime performance;
+- small-display layout performance.
+
+---
+
+# 8. iOS DEEP CODE AUDIT
+
+Inspect at minimum:
+
+```text
+iOSApp/App/**
+iOSApp/Services/IOSCompanionStoreCoordinator.swift
+iOSApp/Services/PlannerStore.swift
+iOSApp/Services/PlannerService.swift
+iOSApp/Services/BuhlmannPlanner.swift
+iOSApp/Services/GasPlanningService.swift
+iOSApp/Services/ScheduleGasConsumptionService.swift
+iOSApp/Services/GasLedgerDisplayFormatter.swift
+iOSApp/Services/RepetitiveDivePlannerService.swift
+iOSApp/Services/DiveLogStore.swift
+iOSApp/Services/CloudSyncStore.swift
+iOSApp/Services/WatchSyncService.swift
+iOSApp/Services/WatchDiveSyncCodec.swift
+iOSApp/Services/WatchSyncAuth.swift
+iOSApp/Services/DiveImportService.swift
+iOSApp/Services/SubsurfaceExportService.swift
+iOSApp/Views/PlannerView.swift
+iOSApp/Views/PlannerGasMixCard.swift
+iOSApp/Views/LogbookView.swift
+iOSApp/Views/DiveDetailView.swift
+iOSApp/Views/ManualDiveEditorView.swift
+iOSApp/Views/MoreView.swift
+iOSApp/Views/IOSCompanionSettingsRootView.swift
+iOSApp/Views/IOSCompanionSettingsModeSwitcher.swift
+iOSApp/Views/Diving/**
+iOSApp/Views/Apnea/**
+iOSApp/Views/Snorkeling/**
+iOSApp/Algorithms/Buhlmann/**
+iOSApp/Models/**
+iOSApp/Utils/**
+Shared/**
+```
+
+Audit for:
+
+- Base/Deco/Technical mode bugs;
+- CCR leakage into OC modes;
+- hidden gas affecting simpler modes;
+- MOD/PPO2/switch-depth bugs;
+- PlannerEnvironment fallback;
+- NDL preview using wrong input;
+- GasPlanningService preview mismatch;
+- cloud merge silent fusing;
+- duplicate session IDs;
+- iCloud payload size;
+- manual pressure unit bugs;
+- CSV parser robustness;
+- Subsurface fidelity;
+- Watch sync ACK/pending-state bugs;
+- iOS Watch image inventory stale state;
+- delete success before Watch ACK;
+- SwiftUI state loops;
+- performance bottlenecks;
+- privacy-sensitive iCloud behavior;
+- stale ascent-speed/runtime/Rock Bottom/gas ledger/repetitive tissue results;
+- structured equipment/checklist role loss;
+- briefing-card metadata/PNG divergence;
+- transfer success before ACK;
+- unsupported schema handling.
+
+---
+
+# 9. SYNC / PERSISTENCE / SCHEMA AUDIT
 
 Create:
 
 ```text
-Docs/MASTER_IOS_FEATURE_INVENTORY_CURRENT.csv
+Docs/MASTER_SYNC_MESSAGE_NAMESPACE_MATRIX_CURRENT.csv
+Docs/MASTER_SCHEMA_MIGRATION_COMPATIBILITY_MATRIX_CURRENT.csv
+Docs/MASTER_BACKUP_RESTORE_ISOLATION_MATRIX_CURRENT.csv
 ```
-
-Required columns:
-
-```text
-Family
-Activity
-Mode
-Feature
-Files
-Canonical_Source
-Validation_Source
-Projection_Source
-Persistence_Source
-Presentation_Source
-Export_Source
-Tests
-Reachable_From_UI
-Target_Membership
-Physical_QA
-External_Validation
-Readiness_Percent
-Notes
-```
-
-Families must include:
-
-```text
-Startup / Root Flow
-Activity Selection
-iOS Settings Mode Switch
-Diving Settings
-Apnea Settings
-Snorkeling Settings
-Shared Settings
-Diving Logbook
-Apnea Logbook
-Snorkeling Logbook
-Bühlmann
-Planner Base
-Planner Deco
-Planner Technical
-Full Computer parity
-CCR / Rebreather
-Ratio Deco
-Gas Roles
-MOD / PPO2 / Dalton
-Switch Depth Clamp
-Emergency / Rock Bottom
-Ascent / Descent Transit
-Dive Runtime
-Decompression Stops
-Schedule-Aware Gas Consumption
-Gas Ledger / Reserve
-Technical Average-Depth Gas Toggle
-Repetitive Dive / Residual Tissues
-Tissue Loading
-Narcosis / END / PPN2
-CNS / OTU
-Structured Equipment
-Operational Checklist
-CCR Checklist Import / Export
-CCR Bailout Scenario
-CCR Gas Density
-Manual Dive
-PDF / Share Export
-Planner Briefing Card / Watch Transfer
-CSV / Subsurface
-Cloud / Sync / Persistence
-Unit Conversion
-Localization
-Accessibility
-Performance / Numerical Robustness
-Security / Privacy
-Test Coverage
-Release / Legal Claims
-```
-
----
-
-# 11. PHASE A — STARTUP, ROOT FLOW AND ACTIVITY ARCHITECTURE
 
 Audit:
 
 ```text
-Launch
-→ legal/onboarding
-→ activity selection
-→ Diving / Apnea / Snorkeling
-→ activity root
-→ activity dashboard
-→ activity functions
-→ activity Settings
-→ activity Logbook
+shared transport envelope
+activity discriminator
+separate codecs
+separate stores
+revision/checksum
+HMAC/peer trust
+ACK/retry/idempotency
+payload chunking
+large profile transfer
+out-of-order delivery
+tombstones
+conflict resolution
+corrupt/future schema
+legacy Diving migration
+Full Computer tissue checkpoints
+Apnea session with multiple dives
+Snorkeling surface track + dips
+Settings payload namespaces
+plan/card/photo payload route separation
+backup/restore isolation
 ```
 
-Verify:
+Mandatory route checks:
 
-- selection persistence;
-- safe migration from Diving-only installs;
-- feature flags;
-- no placeholder production route;
-- no duplicate root coordinator;
-- no duplicate NavigationStack authority;
-- no remote active-Watch mode switch;
-- deep-link/state restoration ownership;
-- iOS/Watch consistency;
-- legal/safety gate where required.
+```text
+Diving payload → Diving store only
+Apnea payload → Apnea store only
+Snorkeling payload → Snorkeling store only
+Planner briefing card payload → briefing-card receiver only
+Image payload → image/photo handler only
+Settings payload → correct activity namespace only
+```
 
-Create findings for any cross-activity leakage.
+Reject all cross-decoding.
 
 ---
 
-# 12. PHASE B — IOS SETTINGS MODE SWITCH AND ACTIVITY SETTINGS
-
-Audit latest Settings implementation.
-
-Inspect:
-
-```text
-IOSCompanionSettingsRootView
-IOSCompanionSettingsModeSwitcher
-IOSCompanionSettingsScopeStore
-MoreView
-IOSDivingSettingsEmbeddedContent
-IOSApneaSettingsContent
-IOSSnorkelingSettingsContent
-IOSApneaSettingsForm
-IOSSnorkelingSettingsForm
-IOSApneaRootView
-IOSSnorkelingRootView
-Dashboard gear buttons
-Settings environment injection
-Store coordinator
-```
-
-Verify:
-
-- switch includes Diving, Apnea, Snorkeling;
-- Diving opens Diving Settings;
-- Apnea gear opens Settings with Apnea selected;
-- Snorkeling gear opens Settings with Snorkeling selected;
-- MoreView exposes switch and selected content;
-- selected content visible directly below switch;
-- no nested `Form` inside `ScrollView` hiding content;
-- Apnea content has backed editable controls;
-- Snorkeling content has backed editable controls;
-- Diving settings remain intact;
-- switching Settings mode does not mutate runtime/session state;
-- switching Settings mode does not remotely change Watch active mode;
-- activity-owned settings do not leak;
-- shared settings are documented;
-- EN/IT localization;
-- VoiceOver labels/hints;
-- Dynamic Type;
-- tests exist.
+# 10. SECURITY / PRIVACY / TRUST AUDIT
 
 Create:
 
 ```text
-Docs/MASTER_IOS_SETTINGS_OWNERSHIP_MATRIX_CURRENT.csv
+Docs/MASTER_SECURITY_THREAT_MODEL_CURRENT.md
+Docs/MASTER_PRIVACY_DATA_FLOW_MATRIX_CURRENT.csv
+Docs/MASTER_SECURITY_REMEDIATION_PLAN_CURRENT.md
 ```
-
-Columns:
-
-```text
-Setting_ID
-Label
-Activity
-Shared
-Backing_Store
-Visible_In_Diving
-Visible_In_Apnea
-Visible_In_Snorkeling
-Visible_In_iOS
-Visible_In_Watch
-Can_Edit_During_Active_Session
-Syncs_To_Watch
-Runtime_Effect
-Evidence
-Pass
-Notes
-```
-
----
-
-# 13. PHASE C — STRICT LOGBOOK OWNERSHIP
 
 Audit:
 
 ```text
-DiveLogStore
-IOSApneaLogbookStore
-IOSSnorkelingLogbookStore
-Diving Logbook views
-Apnea sessions/logbook views
-Snorkeling sessions/logbook views
-statistics views
-detail views
-exports
+WatchConnectivity authentication
+peer secret lifecycle
+HMAC
+nonce/replay
+signed ACK
+trust reset
+malformed payload rejection
+path traversal
+file import/export
+image/card storage
+temporary files
+cloud backup opt-in
+GPS privacy
+photo metadata
+exact-coordinate redaction
+logs and diagnostics
+sensitive equipment/gas data
+App Intents
+feature flags/developer mode
+simulation release safety
 deep links
-state restoration
-sync routing
+activity cross-routing
+data deletion
+backup encryption assumptions
+privacy manifests and usage descriptions
+least privilege
+third-party dependencies
 ```
+
+Activity-specific privacy risks:
+
+```text
+Diving plan/gas/tissue data
+Apnea session/health-like data
+Snorkeling location routes/photos
+wrong activity data exposure
+```
+
+Do not claim penetration testing or compliance certification without evidence.
+
+---
+
+# 11. GLOBAL PERFORMANCE / CONCURRENCY / BATTERY AUDIT
 
 Create:
 
 ```text
-Docs/MASTER_IOS_LOGBOOK_OWNERSHIP_MATRIX_CURRENT.csv
+Docs/MASTER_PERFORMANCE_BUDGET_MATRIX_CURRENT.csv
+Docs/MASTER_CONCURRENCY_RISK_MATRIX_CURRENT.csv
+Docs/MASTER_PHYSICAL_PERFORMANCE_QA_PLAN_CURRENT.md
 ```
 
-Verify:
-
-- Diving route only sees Diving sessions.
-- Apnea route only sees Apnea sessions.
-- Snorkeling route only sees Snorkeling sessions.
-- no mixed query;
-- no universal detail with irrelevant optional fields;
-- no cross-activity export;
-- no cross-activity stats;
-- no wrong restoration;
-- no wrong sync import path.
-
-Any cross-activity Logbook route is P0.
-
----
-
-# 14. PHASE D — BÜHLMANN CORE AUDIT
-
-Audit:
+Audit Watch:
 
 ```text
-BuhlmannConstants
-BuhlmannGas
-BuhlmannTissueModel
-BuhlmannEngine
-BuhlmannTissueHistory
-BuhlmannPlanPreflightValidator
-BuhlmannPlanner
-PlannerEnvironment
+one-second Full Computer tissue updates
+sensor sampling
+GPS
+haptics
+reminders
+Mission Mode invariants
+Apnea lifecycle
+Snorkeling GPS/navigation
+timers/tasks
+background transitions
+WatchConnectivity
+image/card decoding
+small-screen rendering
+battery/thermal risk
 ```
 
-Verify:
-
-- ZH-L16C constants;
-- 16 N2/He compartments;
-- half-times;
-- a/b coefficients;
-- tissue initialization;
-- inspired inert pressure;
-- altitude/salinity/freshwater if present;
-- GF Low/High;
-- ceiling;
-- controlling compartment;
-- NDL;
-- first stop;
-- stop rounding;
-- TTS;
-- schedule convergence;
-- gas switch integration;
-- Trimix/He;
-- O2 100%;
-- invalid gas preflight;
-- finite guards;
-- deterministic output;
-- no fake/static values;
-- parity with Watch runtime where relevant.
-
-Required scenarios:
+Audit iOS:
 
 ```text
-Air no-deco
-Nitrox no-deco
-Air deco
-EAN50 deco gas
-Trimix bottom
-O2 stop gas
-Altitude profile
-Freshwater/saltwater if supported
-GF 30/70
-GF 20/80
-Invalid gas
-Missing gas
-Extreme input rejection
+planner recomputation
+charts
+maps
+large Logbooks
+large GPS tracks
+tissue histories
+exports
+backup
+sync import
+SwiftUI invalidation
+cancellation/stale result publication
+settings mode switch
+startup
+file I/O
+JSON encoding/decoding
+large dataset behavior
 ```
 
----
-
-# 15. PHASE E — PLANNER MODE PROJECTION
-
-Audit Base, Deco, Technical and CCR/reference-only mode.
-
-## Base
-
-- one active gas;
-- no hidden technical gas influence;
-- NDL uses Base projection;
-- mandatory deco detected;
-- full technical schedule hidden;
-- no CCR leakage.
-
-## Deco
-
-- bottom + allowed deco gases;
-- depth/average depth limits;
-- simplified schedule;
-- mode-aware preview/export;
-- no unsupported bailout projection.
-
-## Technical
-
-- back/travel/deco/bailout;
-- multiple deco gases;
-- manual GF if supported;
-- full Bühlmann schedule;
-- gas ledger;
-- Emergency/Rock Bottom;
-- average-depth gas toggle isolated;
-- full analytics.
-
-## CCR
-
-- explicit reference-only mode;
-- OC/CCR separation;
-- setpoint/diluent/bailout projection;
-- Ratio Deco blocked unless supported;
-- no live CCR controller claim.
+Audit actor isolation, Sendable correctness, retain cycles, uncancelled tasks, timer duplication, race conditions and main-thread blocking.
 
 ---
 
-# 16. PHASE F — MOD / PPO2 / DALTON / SWITCH DEPTH
+# 12. iOS PERFORMANCE OPTIMIZATION AUDIT
 
-Verify:
-
-- single canonical MOD formula;
-- automatic MOD update;
-- PPO2 increments exactly 0.1;
-- Air lock;
-- EAN O2-only;
-- Trimix O2+He;
-- O2 100%;
-- O2+He+N2 = 100;
-- environment-aware MOD;
-- displayed MOD == validated MOD;
-- switch depth <= MOD;
-- shallower switch allowed;
-- hidden/stale values cannot bypass clamp;
-- export/PDF/checklist use same values;
-- CCR setpoint not treated as FO2;
-- diluent/bailout validation role-correct.
-
-Mandatory example:
+Create:
 
 ```text
-O2 100%, PPO2 1.6 → MOD approximately 6 m
+Docs/MASTER_IOS_PERFORMANCE_BUDGET_MATRIX_CURRENT.csv
+Docs/MASTER_IOS_PERFORMANCE_SCALABILITY_MATRIX_CURRENT.csv
 ```
 
----
-
-# 17. PHASE G — GAS ROLES AND SCHEDULE-AWARE CONSUMPTION
-
-Audit:
+Audit iOS performance areas:
 
 ```text
-GasPlanningService
-PlannerGasSchedule
-ScheduleGasConsumptionService
-GasLedgerDisplayFormatter
-gas role models
-cylinder models
+Startup and first render
+Navigation and tab switching
+SwiftUI diffing and body recomputation
+Diving Planner
+Full Computer planning previews
+Buehlmann chart rendering
+Tissue loading charts
+Logbook list scalability
+Session detail rendering
+PDF export
+CSV/Subsurface export
+Import parsing
+Photo/image handling
+WatchConnectivity processing
+iCloud / KVS backup paths
+Apnea dashboard
+Apnea planner/settings/logbook
+Snorkeling dashboard
+Snorkeling route planner
+Snorkeling map rendering
+Snorkeling session track rendering
+Settings mode switcher
+Shared localization access
+Shared theme/rendering components
+Memory/retain-cycle hygiene
+Task lifecycle and cancellation
+MainActor overuse
+Background queue correctness
+File I/O and JSON encoding/decoding
+Large dataset behavior
+Battery-impacting loops
+Instrumentation and observability
 ```
 
-Roles:
+Score:
 
 ```text
-Back Gas
-Travel
-Decompression
-Bailout
-CCR Diluent
-CCR Oxygen Supply
-CCR Bailout
+IOS_STARTUP_PERFORMANCE_READINESS
+IOS_SWIFTUI_RENDERING_READINESS
+IOS_PLANNER_PERFORMANCE_READINESS
+IOS_CHART_RENDERING_READINESS
+IOS_LOGBOOK_SCALABILITY_READINESS
+IOS_EXPORT_IMPORT_PERFORMANCE_READINESS
+IOS_SYNC_PERFORMANCE_READINESS
+IOS_MAP_ROUTE_RENDERING_READINESS
+IOS_MEMORY_READINESS
+IOS_CONCURRENCY_READINESS
+IOS_BATTERY_POLICY_READINESS
+IOS_OBSERVABILITY_READINESS
+IOS_PERFORMANCE_TEST_COVERAGE_READINESS
+OVERALL_IOS_PERFORMANCE_READINESS
 ```
 
-Verify:
-
-- stable IDs;
-- segment allocation;
-- switch depth/runtime;
-- schedule-aware consumption;
-- ascent/descent gas;
-- travel gas ranges;
-- bailout excluded from normal consumption unless bailout scenario;
-- CCR diluent not consumed as OC breathing gas in setpoint phases;
-- CCR bailout becomes OC only after explicit transition;
-- liters canonical;
-- cylinder-equivalent bar display only;
-- duplicate gas/cylinder aggregation deterministic;
-- insufficient-gas warnings use compatible units.
+Physical Instruments profiling remains pending unless executed.
 
 ---
 
-# 18. PHASE H — EMERGENCY / ROCK BOTTOM
+# 13. REQUIRED PERFORMANCE SCENARIOS
 
-Audit:
-
-- maximum-depth reference;
-- ambient pressure;
-- stressed RMV/SAC;
-- team size / affected diver count;
-- response/problem-solving time;
-- ascent transit;
-- stop/deco gas inclusion policy;
-- reserve separation;
-- liters required;
-- cylinder bar equivalent;
-- available vs required comparison;
-- rounding direction;
-- unit conversion;
-- invalid/NaN/Inf guards;
-- Base/Deco/Technical/CCR eligibility;
-- PDF/share/briefing-card consistency.
-
-Critical invariants:
-
-- Emergency/Rock Bottom gas is independent from normal planned consumption.
-- Technical average-depth gas toggle must not reduce Rock Bottom unless explicitly safe.
-- Canonical liters are source of truth.
-- CCR bailout emergency logic must not reuse OC assumptions silently.
-
----
-
-# 19. PHASE I — ASCENT SPEED / RUNTIME / DECO STOP PRESENTATION
-
-Audit:
+Audit/plan tests for:
 
 ```text
-PlannerAscentSpeedSettings
-PlannerAscentTableBuilder
-DecoStopsPresentationBuilder
-RouteSummaryService
-RouteSummaryAggregation
-Dive Runtime rows
-TTS/TTR totals
+rapid planner depth edit 100 times
+rapid planner runtime edit 100 times
+rapid gas edit 100 times
+GF sweep
+10 gases
+long deco plan
+CCR reference plan if present
+1k / 10k / 50k chart points
+1k / 5k / 10k logbook sessions
+large PDF export
+large CSV/Subsurface export
+large import
+100 / 1k / 5k sync messages
+50k snorkeling route points
+settings mode switch 50 times
+large Watch image inventory
+briefing-card render/transfer burst
+background/foreground cycle
 ```
 
-Verify:
-
-- defaults/bounds;
-- no zero/negative speed;
-- unit semantics;
-- transit duration formula;
-- runtime accumulation;
-- phase ordering;
-- descent, bottom, ascent, gas switch, deco stop, final ascent;
-- dedicated deco-stop table exactly matches canonical schedule;
-- presentation builders do not mutate/recompute canonical results incorrectly;
-- ascent speed affects transit and gas consistently;
-- CCR setpoint switch placement if present.
+Budget targets must be documented. No score without evidence.
 
 ---
 
-# 20. PHASE J — TECHNICAL AVERAGE-DEPTH GAS TOGGLE
-
-Verify:
-
-- default conservative max-depth consumption;
-- toggle affects gas consumption only;
-- Bühlmann unchanged;
-- decompression unchanged;
-- MOD/PPO2 unchanged;
-- switch depth unchanged;
-- Rock Bottom unchanged;
-- average depth <= max depth;
-- state does not leak to Base/Deco/CCR;
-- persistence safe;
-- PDF/share/briefing card disclose selected basis.
-
----
-
-# 21. PHASE K — REPETITIVE DIVE / RESIDUAL TISSUE
-
-Audit:
-
-```text
-RepetitiveDivePlannerService
-prior dive source
-tissue state inputs
-surface interval
-residual tissue persistence
-export disclosure
-```
-
-Verify:
-
-- previous tissue source explicit;
-- chronology;
-- surface interval;
-- N2/He off-gassing;
-- GF compatibility;
-- OC/CCR compatibility;
-- stale/future dive rejection;
-- deterministic output;
-- no silent fresh-tissue fallback;
-- UI/output distinguishes fresh vs repetitive.
-
----
-
-# 22. PHASE L — RATIO DECO
-
-Verify:
-
-- heuristic/comparative status;
-- Bühlmann remains primary;
-- disclaimer visible;
-- presets 1:1, 2:1, custom;
-- custom persistence;
-- first stop/step/distribution/minimum stop;
-- schedule generation;
-- active gas projection;
-- gas assignment;
-- MOD/PPO2 validation;
-- ceiling validation;
-- comparison table;
-- overlay chart;
-- PDF export;
-- localization;
-- CCR blocked unless explicitly supported and labelled.
-
----
-
-# 23. PHASE M — TISSUE / NARCOSIS / CNS / OTU
-
-Audit:
-
-- tissue analytics;
-- 16 compartments;
-- N2/He loading;
-- controlling compartment;
-- M-value / GF-relative loading;
-- tissue trends;
-- chart data source;
-- source label: recorded/planned/simulated/CCR;
-- PPN2;
-- END;
-- EAD if present;
-- active gas timeline;
-- CCR setpoint/diluent model;
-- bailout transition;
-- CNS full-plan;
-- OTU;
-- warnings;
-- finite guards;
-- no fake/static charts;
-- accessibility summaries.
-
----
-
-# 24. PHASE N — CCR / REBREATHER
-
-Search and audit:
-
-```text
-CCR
-Rebreather
-ClosedCircuit
-OpenCircuit
-Setpoint
-Diluent
-Bailout
-Loop
-Scrubber
-Sorb
-Cell
-ppO2Setpoint
-setpointLow
-setpointHigh
-diluentGas
-bailoutGas
-CCRBailoutScenarioCalculator
-CCRGasDensityEstimator
-CCRChecklistImportCoordinator
-CCRChecklistExportCoordinator
-```
-
-Verify:
-
-## CCR mode separation
-
-- explicit CCR mode;
-- no OC/CCR silent mixing;
-- no CCR leakage into Base/Deco;
-- no OC state using setpoint PPO2.
-
-## Setpoint
-
-- low/high validation;
-- switch depth/time;
-- setpoint PPO2 not gas fraction;
-- exposure/tissue outputs consistent.
-
-## Diluent
-
-- O2/He/N2 validation;
-- inert gas assumptions;
-- MOD/MND if applicable;
-- hypoxic validation;
-- END/EAD;
-- gas density.
-
-## Bailout
-
-- explicit OC transition;
-- bailout schedule;
-- MOD/PPO2;
-- gas quantity;
-- CNS/OTU;
-- tissue/narcosis transition.
-
-## CCR integration
-
-- setpoint drives oxygen partial pressure;
-- inert loading coherent;
-- GF behavior unchanged;
-- bailout uses OC model.
-
-## CCR output truthfulness
-
-- no live loop PPO2 monitoring claim;
-- no certified CCR controller claim;
-- limitations explicit;
-- all CCR planner/card/export data reference-only unless externally validated.
-
----
-
-# 25. PHASE O — STRUCTURED EQUIPMENT / CHECKLIST
-
-Audit:
-
-```text
-EquipmentStructuredModels
-EquipmentStructuredSupport
-EquipmentPlannerMapper
-EquipmentChecklistGenerator
-ChecklistPlannerSyncMapper
-CCRChecklistImportCoordinator
-CCRChecklistExportCoordinator
-DIRChecklistConfigurationEvaluator
-Equipment Setup PDF
-```
-
-Verify:
-
-- equipment templates;
-- REC/TEC/CCR/custom;
-- gas types;
-- cylinder role;
-- planner mapping;
-- checklist generation;
-- duplicate prevention;
-- task/equipment/gas linkage;
-- cylinder size;
-- pressure;
-- gas mix;
-- gas role;
-- DIR/READY badge semantics;
-- CCR role round trip;
-- no user-data loss.
-
----
-
-# 26. PHASE P — MANUAL DIVE / LOGBOOK / ANALYTICS
-
-Verify:
-
-- max depth;
-- average depth;
-- profile;
-- GPS start/end;
-- equipment;
-- gases;
-- bar in/out;
-- pressure math;
-- deco notes;
-- CCR metadata;
-- metadata-only no-depth truthfulness;
-- recorded/planned/simulated source;
-- tissue/narcosis eligibility;
-- malformed profile handling;
-- duplicate prevention;
-- cloud merge.
-
----
-
-# 27. PHASE Q — PDF / SHARE / CSV / BRIEFING CARD
-
-Audit:
-
-- plan PDF;
-- briefing PDF;
-- Dive Pack;
-- checklist PDF;
-- Equipment Setup PDF;
-- CCR PDF;
-- Ratio Deco sections;
-- tissue/narcosis;
-- CNS/OTU;
-- Rock Bottom;
-- ascent-speed assumptions;
-- full runtime;
-- deco stops;
-- gas ledger;
-- repetitive-dive status;
-- average-depth basis;
-- disclaimers;
-- units.
-
-## Planner briefing card / PNG to Watch
-
-Verify:
-
-- canonical values;
-- rendered PNG/card text;
-- structured metadata;
-- units/localization;
-- plan mode;
-- gas mixes;
-- stops/runtime;
-- Rock Bottom where included;
-- timestamp/version;
-- stale-card policy;
-- transfer ACK;
-- failure handling;
-- Watch reference-only labeling;
-- no live-deco implication.
-
-## CSV / Subsurface
-
-Verify:
-
-- metric policy;
-- time base;
-- samples;
-- GPS;
-- gas fields;
-- CCR limitations;
-- malformed import;
-- round trip;
-- external validation status.
-
----
-
-# 28. PHASE R — CLOUD / SYNC / PERSISTENCE / SECURITY
-
-Verify:
-
-- mathematical values survive save/load;
-- unit values canonical;
-- planner settings persistence;
-- ascent-speed settings;
-- emergency settings;
-- average-depth toggle;
-- repetitive-dive metadata;
-- structured Equipment values;
-- CCR values;
-- checklist roles;
-- briefing-card versioning;
-- conflict/tombstone behavior;
-- duplicate IDs;
-- no hybrid profile merge;
-- payload size limits;
-- HMAC/signature/nonce validation;
-- malformed data fail-safe;
-- privacy/GPS handling.
-
----
-
-# 29. PHASE S — UNIT CONVERSION / LOCALIZATION / ACCESSIBILITY
-
-Verify:
-
-- m/ft;
-- bar/psi;
-- Celsius/Fahrenheit;
-- liters/cubic feet where used;
-- m/min and ft/min;
-- RMV/SAC;
-- gas ledger liters/bar;
-- Rock Bottom;
-- CCR setpoint units;
-- gas density;
-- PDF/CSV/card values;
-- locale-safe decimals/dates;
-- EN/IT mathematical labels;
-- chart accessibility summaries;
-- no Italian-as-key leakage;
-- Dynamic Type.
-
----
-
-# 30. PHASE T — PERFORMANCE / NUMERICAL ROBUSTNESS
-
-Audit:
-
-- repeated planner recomputation;
-- debouncing;
-- stale async result publication;
-- result-state races;
-- SwiftUI update loops;
-- tissue timelines;
-- CCR timelines;
-- Ratio Deco overlay;
-- repetitive calculations;
-- gas schedule calculations;
-- Rock Bottom;
-- PDF/card rendering;
-- export;
-- large profiles;
-- many gases;
-- NaN/Inf/overflow;
-- zero/negative inputs.
-
----
-
-# 31. PHASE U — TEST COVERAGE
-
-Inspect all iOS algorithm tests and relevant Watch parity tests.
-
-Required coverage:
-
-- root activity architecture;
-- activity Settings ownership;
-- activity Logbook ownership;
-- Bühlmann;
-- Base/Deco/Technical/CCR;
-- MOD/PPO2/switch clamp;
-- Ratio Deco;
-- gas roles;
-- schedule-aware consumption;
-- Rock Bottom vectors;
-- ascent/descent timing;
-- runtime ordering;
-- deco-stop equivalence;
-- average-depth toggle isolation;
-- repetitive dive;
-- tissue/narcosis;
-- CNS/OTU;
-- CCR setpoint/diluent/bailout;
-- CCR bailout scenario;
-- CCR gas density;
-- structured Equipment;
-- CCR checklist round trip;
-- manual dive;
-- PDF/export;
-- briefing card encode/render/transfer/receive;
-- CSV/Subsurface;
-- cloud conflicts;
-- units;
-- localization/accessibility;
-- performance/numerical robustness.
-
-Classify missing tests by priority.
-
----
-
-# 32. STATIC SCANS
-
-Run or suggest:
-
-- compiler warnings;
-- SwiftLint if configured;
-- force unwraps;
-- `try!`;
-- `as!`;
-- unsafe dictionary construction;
-- TODO/FIXME;
-- hardcoded secrets;
-- hardcoded user-facing strings;
-- recursive `.onChange`;
-- uncancelled tasks/timers;
-- temporary file handling;
-- stale test-only code in MAIN.
+# 14. OBSERVABILITY / SIGNPOST AUDIT
 
 Search for:
 
 ```text
-RockBottom
-Emergency
-PlannerAscentSpeedSettings
-PlannerAscentTableBuilder
-DecoStopsPresentationBuilder
-GasLedgerDisplayFormatter
-ScheduleGasConsumptionService
-RepetitiveDivePlannerService
-RouteSummary
-PlanCalculationCompleteness
-CCRChecklistImportCoordinator
-CCRBailoutScenarioCalculator
-CCRGasDensityEstimator
-PlannerBriefingCard
-IOSCompanionSettingsRootView
-IOSCompanionSettingsModeSwitcher
-IOSApneaSettingsContent
-IOSSnorkelingSettingsContent
+OSLog
+Logger
+os_signpost
+Signposter
+measure
+XCTestMetrics
 ```
 
-Do not fix anything.
-
----
-
-# 33. REQUIREMENT / TEST MATRIX
-
-Create:
+Create or update:
 
 ```text
-Docs/MASTER_IOS_REQUIREMENT_TEST_MATRIX_CURRENT.csv
+Docs/MASTER_PERFORMANCE_SIGNPOST_CATALOG_CURRENT.md
 ```
 
-Columns:
+Required signpost categories:
 
 ```text
-Requirement_ID
-Area
-Activity
-Mode
-Requirement
-Production_Source
-Test_File
-Test_Name
-Expected_Result
-Actual_Result
-Oracle_or_Reference
-Physical_QA
-External_Validation
-Result
-Evidence
-Severity
-Notes
+startup
+planner solve
+chart render
+logbook load
+statistics compute
+export
+import
+sync decode
+sync persist
+cloud backup
+map simplification
+route render
+settings switch
+Watch tissue tick
+Watch schedule recompute
+Watch haptic
+Watch image decode
+briefing-card render
+briefing-card transfer
 ```
 
 ---
 
-# 34. EDGE-CASE MATRIX
+# 15. TEST COVERAGE AUDIT
 
 Create:
 
 ```text
-Docs/MASTER_IOS_EDGE_CASE_MATRIX_CURRENT.csv
+Docs/MASTER_MAIN_REQUIREMENT_TEST_TRACEABILITY_CURRENT.csv
 ```
 
-Columns:
+Audit automated and missing tests for:
 
 ```text
-Case_ID
-Area
-Activity
-Mode
-Input
-Initial_State
-Expected_Result
-Actual_Result
-Absolute_Error
-Relative_Error
-Pass
-Severity
-Evidence
-Notes
+startup and activity selection
+Gauge
+Full Computer
+Bühlmann
+gas switching
+deco stop state machine
+Apnea lifecycle/recovery
+Snorkeling GPS/dips/navigation
+Settings isolation
+Logbook ownership
+sync/schema
+migration
+backup/restore
+localization/accessibility
+security
+performance
+exports
+Watch CMAltimeter pre-dive acquisition
+iOS performance/scalability
+Watch image inventory/delete
+Planner briefing cards
+CCR reference-only
+Rock Bottom
+Gas ledger
+Repetitive dive
+Structured equipment/checklist
 ```
 
-Include:
+Classify evidence:
 
-- invalid gases;
-- invalid MOD;
-- switch depth deeper than MOD;
-- average depth > max depth;
-- zero/negative speed;
-- repetitive future dive;
-- stale previous tissues;
-- CCR setpoint invalid;
-- diluent invalid;
-- bailout invalid;
-- route/gps invalid;
-- mixed activity restore;
-- mixed logbook deep link;
-- settings mode switch during active Watch session;
-- missing export fields;
-- malformed CSV;
-- invalid sync payload.
+```text
+automated unit
+integration
+UI/snapshot
+simulator
+physical Watch
+physical iPhone
+paired-device
+underwater
+external reference
+legal/compliance review
+```
+
+No evidence means not passed.
 
 ---
 
-# 35. FINDING TRACEABILITY
+# 16. FINDING TRACEABILITY
 
 Create:
 
 ```text
-Docs/MASTER_IOS_FINDING_TRACEABILITY_CURRENT.csv
+Docs/MASTER_MAIN_CODE_FINDING_TRACEABILITY_CURRENT.csv
 ```
 
 Columns:
@@ -1570,19 +901,19 @@ Columns:
 Finding_ID
 Severity
 Priority
-Family
+Area
+Platform
 Activity
 Mode
 Status
 Root_Cause
 Affected_Files
 Affected_Symbols
-Canonical_vs_Presentation
-Mathematical_Impact
-Safety_Impact
 User_Impact
+Safety_Impact
 Security_Privacy_Impact
 Performance_Impact
+Data_Integrity_Impact
 Recommended_Remediation
 Tests_Required
 Acceptance_Criteria
@@ -1593,7 +924,7 @@ Evidence
 Notes
 ```
 
-Statuses:
+Allowed statuses:
 
 ```text
 OPEN
@@ -1601,6 +932,7 @@ VERIFIED
 DOCUMENTED_ACCEPTED_RISK
 NOT_APPLICABLE
 PENDING_PHYSICAL
+PENDING_INSTRUMENTS
 PENDING_EXTERNAL_VALIDATION
 ```
 
@@ -1608,387 +940,325 @@ Because this is audit-only, new defects remain `OPEN`.
 
 ---
 
-# 36. RELEASE-HARD MATRIX
+# 17. VALIDATION SCRIPT
 
-Create:
-
-```text
-Docs/MASTER_IOS_RELEASE_HARD_MATRIX_CURRENT.csv
-```
-
-Mandatory rows:
+Create or update:
 
 ```text
-Bühlmann
-Planner Base/Deco/Technical
-Full Computer Watch parity
-CCR / Rebreather
-CCR Setpoint
-CCR Diluent
-CCR Bailout
-Ratio Deco
-Gas Planning
-Gas Roles
-MOD/PPO2/Dalton
-Switch Depth Clamp
-Emergency / Rock Bottom
-Ascent / Descent Timing
-Dive Runtime / Deco Stops
-Schedule-Aware Gas Consumption
-Gas Ledger / Reserve
-Technical Average-Depth Gas Toggle
-Repetitive Dive / Residual Tissues
-Tissue Loading
-Narcosis / END / PPN2
-CNS / OTU
-Structured Equipment
-Operational Checklist
-CCR Checklist Import / Export
-CCR Bailout Scenario
-CCR Gas Density
-Manual Dive
-Diving Logbook
-Apnea Logbook
-Snorkeling Logbook
-Diving Settings
-Apnea Settings
-Snorkeling Settings
-Shared Settings
-PDF / Share
-Planner Briefing Card / Watch Transfer
-CSV / Subsurface
-Cloud / Sync / Persistence
-Security / Privacy
-Unit Conversion
-Localization
-Accessibility
-Performance / Numerical Robustness
-Test Coverage
-Internal TestFlight
-External TestFlight
-App Store
-Overall
+Scripts/validate_master_main_code_sync_security_performance_audit.sh
 ```
 
-Columns:
+The script must:
+
+- use `set -euo pipefail`;
+- verify repository root;
+- verify branch `main`;
+- avoid concurrent XcodeGen;
+- run target isolation;
+- run secrets scan;
+- run localization audit;
+- build iOS app;
+- build Watch app;
+- run iOS algorithm tests;
+- run Watch algorithm tests;
+- run available performance/scalability tests;
+- verify audit docs exist;
+- verify finding traceability exists;
+- verify budget matrices exist;
+- verify threat model exists;
+- verify sync/schema matrices exist;
+- verify QA plan exists.
+
+On success print:
 
 ```text
-Feature
-Readiness_Percent
-Blockers
-Priority
-Evidence
-Physical_QA
-External_Validation
-Notes
+MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_GATE_PASS
+MASTER_MAIN_CODE_AUDIT_DOCUMENTATION_COMPLETE
+MASTER_SYNC_SCHEMA_MATRICES_COMPLETE
+MASTER_SECURITY_PRIVACY_MATRICES_COMPLETE
+MASTER_PERFORMANCE_BUDGETS_COMPLETE
+MASTER_IOS_PERFORMANCE_MATRICES_COMPLETE
+PHYSICAL_QA_PENDING_UNLESS_EVIDENCED
 ```
 
-Every percentage must cite evidence.
+Do not print software readiness 100 unless all findings are verified and this has become an implementation/remediation command.
 
 ---
 
-# 37. EXTERNAL VALIDATION PENDING REPORT
+# 18. MASTER REPORT STRUCTURE
 
 Create:
 
 ```text
-Docs/MASTER_IOS_EXTERNAL_VALIDATION_PENDING_CURRENT.md
-```
-
-Include:
-
-- Bühlmann external validation;
-- Subsurface validation;
-- CCR external validation;
-- Ratio Deco validation;
-- PDF/export validation;
-- physical iPhone QA;
-- paired Watch/iPhone sync QA;
-- App Store legal/release review;
-- accessibility manual QA.
-
-Mark pending unless actually executed.
-
----
-
-# 38. MASTER REPORT STRUCTURE
-
-Create:
-
-```text
-Docs/MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_CURRENT.md
+Docs/MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_CURRENT.md
 ```
 
 Required sections:
 
 A. Executive Summary  
 B. Source Commands Merged  
-C. Latest Development Update  
+C. Latest Development Context  
 D. Branch, Commit and Scope  
 E. Preflight and Build/Test Baseline  
 F. Target Membership and Architecture  
-G. Multi-Activity Root Flow  
-H. iOS Settings Mode Switch and Activity Settings  
-I. Strict Logbook Ownership  
-J. Feature Inventory  
-K. Bühlmann Core  
-L. Planner Mode Projection  
-M. MOD / PPO2 / Dalton / Switch Depth  
-N. Gas Roles and Schedule-Aware Consumption  
-O. Emergency / Rock Bottom  
-P. Ascent Speed / Runtime / Deco Stops  
-Q. Technical Average-Depth Gas Toggle  
-R. Repetitive Dive / Residual Tissues  
-S. Ratio Deco  
-T. Tissue / Narcosis / CNS / OTU  
-U. CCR / Rebreather  
-V. Structured Equipment / Checklist  
-W. Manual Dive / Logbook / Analytics  
-X. PDF / Share / CSV / Briefing Card  
-Y. Cloud / Sync / Persistence / Security  
-Z. Unit Conversion / Localization / Accessibility  
-AA. Performance / Numerical Robustness  
-AB. Test Coverage  
-AC. Static Scans  
-AD. Requirement / Test Matrix  
-AE. Edge-Case Matrix  
-AF. Findings P0-P4  
-AG. Release-Hard Matrix  
-AH. Prioritized Remediation Plan  
-AI. 7-Day / 14-Day Readiness Plan  
-AJ. Future Cursor Remediation Commands  
-AK. External / Physical QA Pending  
-AL. Final Verdict
+G. Activity Isolation and Cross-Activity Risk  
+H. Apple Watch Deep Code Analysis  
+I. iOS Companion Deep Code Analysis  
+J. Planner-Specific Deep Code Analysis  
+K. Full Computer Runtime Integration Risk  
+L. Sync / Persistence / Schema  
+M. Backup / Restore Isolation  
+N. Cloud / iCloud / KVS  
+O. Security / Privacy / Trust  
+P. Threat Model  
+Q. Import / Export / File Security  
+R. Watch Image / Planner Briefing Card Payload Routing  
+S. App Intents / Action Button / Developer Sensor Source  
+T. Performance / Concurrency / Battery — Global  
+U. iOS Performance Optimization  
+V. Watch Performance / Full Computer Timing  
+W. Snorkeling Map / Route Performance  
+X. Logbook Scalability  
+Y. Memory / Retain-Cycle Hygiene  
+Z. Concurrency / Cancellation / Stale Result Guards  
+AA. Observability / Signposts  
+AB. Test Coverage and Evidence  
+AC. Physical / Instruments / External QA Pending  
+AD. Detailed Findings  
+AE. Readiness Matrix  
+AF. Prioritized Remediation Plan  
+AG. Future Cursor Remediation Commands  
+AH. Final Verdict
 
 ---
 
-# 39. REQUIRED FINAL QUESTIONS
+# 19. REQUIRED FINAL QUESTIONS
 
 The report must explicitly answer:
 
-1. Is the iOS app truly multi-activity?
-2. Are Diving, Apnea and Snorkeling each first-class product areas?
-3. Is the Settings mode switch implemented, visible and safe?
-4. Are Apnea/Snorkeling Settings editable and not hidden by layout?
-5. Are Settings activity-owned without leakage?
-6. Are Logbooks activity-owned without leakage?
-7. Is Bühlmann complete and internally consistent?
-8. Is iOS Planner parity with Watch Full Computer understood and separated?
-9. Are Base/Deco/Technical modes real and isolated?
-10. Is CCR mathematically coherent and reference-only?
-11. Is Ratio Deco safely comparative?
-12. Are MOD/PPO2/Dalton/switch-depth rules consistent?
-13. Are gas roles preserved end to end?
-14. Is Rock Bottom conservative and correct?
-15. Are ascent/descent timing and runtime rows coherent?
-16. Does deco-stop presentation match canonical schedule?
-17. Is schedule-aware gas consumption correct by segment and role?
-18. Is Technical average-depth gas toggle isolated to gas estimation?
-19. Are repetitive-dive residual tissues coherent?
-20. Are tissue/narcosis/CNS/OTU truthful?
-21. Are Equipment/checklist mappings safe?
-22. Does CCR checklist round trip preserve roles?
-23. Are CCR bailout and gas density traceable?
-24. Are manual dives and exports reliable?
-25. Are briefing cards numerically faithful and reference-only?
-26. Is cloud/sync/data integrity release-hard?
-27. Are unit/localization/accessibility outputs safe?
-28. Are performance/numerical robustness acceptable?
-29. Is the app ready for internal TestFlight?
-30. Is it ready for external TestFlight?
-31. Is it ready for App Store?
-32. What blocks 100% readiness?
-33. What must be fixed first?
+1. Is MAIN architecture clean and isolated?
+2. Are Diving, Apnea and Snorkeling separated at code, sync, settings and logbook levels?
+3. Are sync payloads activity-discriminated and cross-decoding rejected?
+4. Are schemas versioned and migration-safe?
+5. Is backup/restore activity-isolated?
+6. Is WatchConnectivity authentication intact?
+7. Are HMAC, nonce/replay and ACK policies safe?
+8. Are file import/export paths safe?
+9. Are images/cards protected from path traversal and arbitrary delete/write?
+10. Are privacy flows truthful and opt-in where required?
+11. Are simulation/developer modes release-safe?
+12. Do App Intents respect legal/safety gates?
+13. Are iOS Planner calculations performance-safe?
+14. Are heavy computations off main thread where needed?
+15. Are stale async results rejected?
+16. Are charts/maps/logbooks bounded for realistic data?
+17. Is sync queue bounded/backpressured?
+18. Are caches bounded?
+19. Are tasks cancellable?
+20. Are there retain-cycle risks?
+21. Are performance budgets documented?
+22. Is Instruments profiling complete or pending?
+23. What blocks 100% main-code readiness?
+24. What blocks 100% security readiness?
+25. What blocks 100% performance readiness?
+26. What blocks internal TestFlight?
+27. What blocks external TestFlight?
 
-Every `NO`, `PARTIAL` or `UNKNOWN` must include:
-
-```text
-severity
-priority
-root cause
-affected files/symbols
-credible impact
-required remediation
-acceptance tests
-release impact
-```
+Every `NO`, `PARTIAL`, `UNKNOWN`, `PENDING`, or `NOT_EXECUTED` must include severity, root cause, affected files/symbols, impact, remediation and tests.
 
 ---
 
-# 40. FINAL VERDICT
+# 20. FINAL VERDICT
 
 Print exactly:
 
 ```text
-MASTER_IOS_FULL_DEEP_AUDIT: PASS / PARTIAL / FAIL
+MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT: PASS / PARTIAL / FAIL
 BASELINE_CURRENT_AND_CLEAN: PASS / FAIL
 TARGET_MEMBERSHIP: PASS / FAIL
 MULTI_ACTIVITY_ARCHITECTURE: PASS / FAIL
-ROOT_FLOW_ACTIVITY_SELECTION: PASS / FAIL
-LEGAL_SAFETY_GATE: PASS / FAIL
-IOS_SETTINGS_MODE_SWITCH: PASS / FAIL
-IOS_DIVING_SETTINGS_OWNERSHIP: PASS / FAIL
-IOS_APNEA_SETTINGS_OWNERSHIP: PASS / FAIL
-IOS_SNORKELING_SETTINGS_OWNERSHIP: PASS / FAIL
-IOS_SETTINGS_NO_CROSS_ACTIVITY_LEAKAGE: PASS / FAIL
-IOS_LOGBOOK_STRICT_OWNERSHIP: PASS / FAIL
-BUHLMANN_CORE_READINESS: <0-100>
-IOS_PLANNER_WATCH_PARITY_READINESS: <0-100>
-BASE_MODE_READINESS: <0-100>
-DECO_MODE_READINESS: <0-100>
-TECHNICAL_MODE_READINESS: <0-100>
-CCR_REFERENCE_ONLY_READINESS: <0-100>
-RATIO_DECO_READINESS: <0-100>
-MOD_PPO2_DALTON_READINESS: <0-100>
-SWITCH_DEPTH_CLAMP_READINESS: <0-100>
-GAS_ROLE_READINESS: <0-100>
-ROCK_BOTTOM_READINESS: <0-100>
-ASCENT_DESCENT_RUNTIME_READINESS: <0-100>
-DECO_STOP_PRESENTATION_READINESS: <0-100>
-SCHEDULE_AWARE_GAS_READINESS: <0-100>
-GAS_LEDGER_READINESS: <0-100>
-TECHNICAL_AVERAGE_DEPTH_GAS_TOGGLE_READINESS: <0-100>
-REPETITIVE_DIVE_READINESS: <0-100>
-TISSUE_LOADING_READINESS: <0-100>
-NARCOSIS_END_PPN2_READINESS: <0-100>
-CNS_OTU_READINESS: <0-100>
-STRUCTURED_EQUIPMENT_READINESS: <0-100>
-CHECKLIST_SYNC_READINESS: <0-100>
-CCR_CHECKLIST_ROUNDTRIP_READINESS: <0-100>
-CCR_BAILOUT_SCENARIO_READINESS: <0-100>
-CCR_GAS_DENSITY_READINESS: <0-100>
-MANUAL_DIVE_READINESS: <0-100>
-PDF_SHARE_EXPORT_READINESS: <0-100>
-PLANNER_BRIEFING_CARD_WATCH_TRANSFER_READINESS: <0-100>
-CSV_SUBSURFACE_READINESS: <0-100>
-CLOUD_SYNC_PERSISTENCE_READINESS: <0-100>
-SECURITY_PRIVACY_READINESS: <0-100>
-UNIT_CONVERSION_READINESS: <0-100>
-LOCALIZATION_READINESS: <0-100>
-ACCESSIBILITY_READINESS: <0-100>
-PERFORMANCE_NUMERICAL_ROBUSTNESS_READINESS: <0-100>
+ACTIVITY_ISOLATION_CODE: PASS / FAIL
+SETTINGS_OWNERSHIP_CODE: PASS / FAIL
+LOGBOOK_OWNERSHIP_CODE: PASS / FAIL
+SYNC_ACTIVITY_DISCRIMINATORS: PASS / FAIL
+SCHEMA_MIGRATION_SAFETY: PASS / FAIL
+BACKUP_RESTORE_ISOLATION: PASS / FAIL
+WATCHCONNECTIVITY_AUTHENTICATION: PASS / FAIL
+HMAC_REPLAY_ACK_POLICY: PASS / FAIL
+SECURITY_FILE_PATH_SAFETY: PASS / FAIL
+PRIVACY_DATA_FLOW_TRUTHFULNESS: PASS / FAIL
+SIMULATION_RELEASE_SAFETY: PASS / FAIL
+APP_INTENTS_SAFETY_GATE: PASS / FAIL
+WATCH_IMAGE_CARD_PAYLOAD_ROUTING: PASS / FAIL
+PLANNER_BRIEFING_CARDS_REFERENCE_ONLY_CODE: PASS / FAIL
+IOS_STARTUP_PERFORMANCE_READINESS: <0-100>
+IOS_SWIFTUI_RENDERING_READINESS: <0-100>
+IOS_PLANNER_PERFORMANCE_READINESS: <0-100>
+IOS_CHART_RENDERING_READINESS: <0-100>
+IOS_LOGBOOK_SCALABILITY_READINESS: <0-100>
+IOS_EXPORT_IMPORT_PERFORMANCE_READINESS: <0-100>
+IOS_SYNC_PERFORMANCE_READINESS: <0-100>
+IOS_MAP_ROUTE_RENDERING_READINESS: <0-100>
+IOS_MEMORY_READINESS: <0-100>
+IOS_CONCURRENCY_READINESS: <0-100>
+IOS_BATTERY_POLICY_READINESS: <0-100>
+WATCH_RUNTIME_PERFORMANCE_READINESS: <0-100>
+WATCH_FULL_COMPUTER_TIMING_READINESS: <0-100>
+GLOBAL_SECURITY_READINESS: <0-100>
+GLOBAL_PRIVACY_READINESS: <0-100>
+GLOBAL_SYNC_SCHEMA_READINESS: <0-100>
+GLOBAL_PERFORMANCE_CONCURRENCY_BATTERY_READINESS: <0-100>
 TEST_COVERAGE_READINESS: <0-100>
+OVERALL_MAIN_CODE_READINESS: <0-100>
 P0_FINDINGS: <number>
 P1_FINDINGS: <number>
 P2_FINDINGS: <number>
 P3_FINDINGS: <number>
-P4_FINDINGS: <number>
-OVERALL_IOS_SOFTWARE_READINESS: <0-100>
-INTERNAL_TESTFLIGHT_READINESS: <0-100>
-EXTERNAL_TESTFLIGHT_READINESS: <0-100>
-APP_STORE_READINESS: <0-100>
+PHYSICAL_WATCH_QA: PASS / FAIL / PENDING_PHYSICAL
 PHYSICAL_IOS_QA: PASS / FAIL / PENDING_PHYSICAL
-PAIRED_WATCH_IOS_QA: PASS / FAIL / PENDING_PHYSICAL
-EXTERNAL_BUHLMANN_VALIDATION: PASS / FAIL / PENDING_EXTERNAL_VALIDATION
-EXTERNAL_SUBSURFACE_VALIDATION: PASS / FAIL / PENDING_EXTERNAL_VALIDATION
+PAIRED_DEVICE_QA: PASS / FAIL / PENDING_PHYSICAL
+PHYSICAL_INSTRUMENTS_PROFILING: PASS / FAIL / PENDING_INSTRUMENTS
+EXTERNAL_VALIDATION: PASS / FAIL / PENDING_EXTERNAL_VALIDATION
 RELEASE_BLOCKERS: <comma-separated IDs or NONE>
 ```
 
+`PASS` is allowed only when every software gate passes, no P0-P2 finding remains open, and any claimed physical/external evidence actually exists.
+
 ---
 
-# 41. SUCCESS CRITERIA
+# 21. SUCCESS CRITERIA
 
 The task is complete only if:
 
-- no production code is modified;
+- no production source code is modified;
 - no tests are modified;
 - no UI is modified;
 - no business logic is modified;
 - no algorithms are modified;
-- no CCR/Rebreather logic is modified;
-- no Watch runtime is modified;
 - no sync/security model is modified;
-- all required report files are created;
-- all three source command scopes are preserved;
-- latest Settings mode switch / activity Settings development is included;
-- Apnea and Snorkeling are audited as first-class product areas;
-- Settings and Logbook ownership are audited;
-- Bühlmann, Planner, CCR, Ratio Deco and gas logic are audited;
-- latest MAIN components are audited;
-- canonical calculation and presentation-only logic are separated;
-- readiness percentages are evidence-backed;
-- external validation remains pending unless executed;
-- physical QA remains pending unless executed;
-- report contains prioritized remediation plan;
-- final git status confirms only report/docs changed.
+- all required reports/matrices/scripts are created;
+- all five merged command scopes are preserved;
+- latest multi-activity development is included;
+- Settings and Logbook isolation are audited;
+- sync/persistence/schema are audited;
+- security/privacy/trust are audited;
+- performance/concurrency/battery are audited;
+- iOS performance optimization is audited in detail;
+- physical and external QA remain pending unless executed;
+- readiness percentages are evidence-based;
+- final git status confirms only Docs/Scripts audit outputs changed.
 
 Do not commit or push automatically.
 
-Stop after producing the merged master iOS audit report, matrices, external validation pending report and final summary.
+Stop after producing the merged master code/sync/security/performance audit report, matrices, validation script and final summary.
 
 
 
-# 1A. LATEST CROSS-CUTTING DEVELOPMENT SCOPE — WATER ENTRY, INTENTS, GF, ENTITLEMENTS, SHALLOW TESTING
+# 4A. LATEST WATCH FULL COMPUTER DEVELOPMENT SCOPE — GF PRESETS, SHALLOW DEPTH AND WATER ENTRY
 
-This audit must include the 2026-06-27 / 2026-06-28 development wave as cross-cutting code, sync, security, privacy, performance and concurrency scope.
+This forensic audit must now include the latest Watch development wave.
+
+## 4A.1 Full Computer Gradient Factor preset audit
 
 Inspect at minimum:
 
 ```text
-Utils/WatchLaunchRoutingPolicy.swift
-Utils/WatchSubmersionLaunchProbe.swift
-Utils/WatchAutomaticDepthLaunchConfiguration.swift
-Utils/WatchWaterAutoOpenPolicy.swift
-Utils/WatchUnderwaterNavigationClampPolicy.swift
-Services/DIRActivitySelectionStore.swift
-Services/ActionButtonIntents.swift
-Services/WatchUnderwaterActionRouter.swift
-Services/WatchIntentSafetyPolicy.swift
 Shared/Models/FullComputerGradientFactorPreset.swift
+Shared/Models/DivePlanPackage.swift
+Shared/Models/FullComputerDiveLogbookMetadata.swift
 Services/FullComputerGradientFactorSettingsStore.swift
 Services/FullComputerPrediveConfigurationStore.swift
 Services/FullComputerImportedPlanStore.swift
-Utils/DepthCapabilityPolicy.swift
-Utils/DepthCapabilityResolver.swift
-Utils/DepthCapabilityEntitlementProbe.swift
-Utils/DeveloperSettings.swift
-Views/DeveloperSettingsView.swift
+Services/DIRActivitySelectionStore.swift
+Services/DiveManager.swift
+Views/FullComputerDivingSettingsView.swift
+Views/FullComputerConservatismSettingsView.swift
+Views/FullComputerGradientFactorsInfoView.swift
+Views/FullComputerGradientFactorSelectionView.swift
+Views/FullComputerGradientFactorCurrentValueView.swift
+Views/FullComputerPrediveSettingsView.swift
+Views/FullComputerPrediveConfirmationView.swift
+Views/DiveDetailView.swift
+Tests/**/FullComputerGradientFactor*
+Docs/WATCH_FULL_COMPUTER_GRADIENT_FACTORS_SETTINGS.md
+Docs/WATCH_FULL_COMPUTER_GRADIENT_FACTORS_IMPLEMENTATION_REPORT_CURRENT.md
+Docs/QA_EVIDENCE/WATCH_FULL_COMPUTER_GF_*
+```
+
+Verify:
+
+```text
+Only supported presets are accepted on Watch.
+No custom GF editor exists on Watch unless explicitly introduced and audited.
+iOS plan GF override has higher precedence than Watch default only for imported/activated iOS plans.
+Unsupported iOS GF pairs are rejected or safely handled.
+Predive confirmation freezes a GF snapshot.
+Runtime reads the frozen snapshot, not live UserDefaults.
+Active Full Computer dive cannot change GF.
+Logbook stores GF preset/source/low/high from the runtime snapshot.
+GF does not appear in Gauge, Apnea or Snorkeling.
+GF cannot be changed via Action Button / App Intent / water auto-open.
+```
+
+Create or update inside the report:
+
+```text
+Docs/MASTER_WATCH_FULL_COMPUTER_GF_PRESET_MATRIX_CURRENT.csv
+```
+
+## 4A.2 Shallow-depth entitlement and developer testing audit
+
+Inspect at minimum:
+
+```text
 Config/DIRDiving.WithShallowDepth.entitlements
 Config/DIRDiving.WithWaterSubmersion.entitlements
 Config/DIRDiving.entitlements
 App/Info.plist
 project.yml
-Tests/WatchAlgorithmTests/WatchLaunchRoutingPolicyTests.swift
-Tests/WatchAlgorithmTests/WatchSubmersionLaunchProbeTests.swift
-Tests/WatchAlgorithmTests/WatchIntentSafetyPolicyTests.swift
+Utils/DepthCapabilityPolicy.swift
+Utils/DepthCapabilityResolver.swift
+Utils/DepthCapabilityEntitlementProbe.swift
+Services/AppleDepthSensorProvider.swift
+Services/SensorProviderFactory.swift
+Views/DeveloperSettingsView.swift
+Utils/DeveloperSettings.swift
 Tests/WatchAlgorithmTests/DepthCapabilityTests.swift
-Tests/**/FullComputerGradientFactor*
-Scripts/validate_watch_underwater_uiux_readiness.sh
+Docs/BUILD_AND_XCODEGEN_WORKFLOW.md
 ```
 
-Audit for:
+Verify:
 
 ```text
-cold-launch routing race
-overlapping fullScreenCover prevention
-submersion probe timeout / nil / error / stale behavior
-systemWaterAutoLaunch route not starting a session
-waterAutoLaunchIntent route not starting a session
-active-session block on water routing
-App Intent legacy safety blocking during active session
-Action Button router-only policy
-developer shallow testing flag leakage into production
-shallow-depth entitlement / Info.plist / runtime capability mismatch
-full-depth entitlement separation
-GF setting persistence race
-GF active-dive lock
-GF iOS plan override validation
-GF snapshot immutability at runtime
-GF logbook metadata schema compatibility
-WatchConnectivity payload compatibility after GF fields
-privacy manifest impact of submerged launch / App Intents / depth samples
-performance impact of submersion probe at cold launch
-battery impact of underwater Auto-Launch probing
+Default Watch signing intentionally uses the shallow-depth entitlement only when the provisioned capability supports it.
+DIRDepthEntitlementTier = shallow is consistent with signed entitlements.
+Full-depth behavior remains separate and requires full Apple capability/provisioning.
+Shallow-depth capability does not imply full decompression-depth validation.
+Developer shallow Gauge testing and developer shallow Full Computer testing are gated separately.
+Developer shallow toggles are DEBUG/TestFlight/internal only and never public production defaults.
+Shallow Full Computer runtime remains clearly labelled as internal testing only, not certified decompression guidance.
+Simulation fallback cannot be confused with real Apple depth samples.
 ```
 
-Create or update:
+Create or update inside the report:
 
 ```text
-Docs/MASTER_WATER_AUTO_OPEN_CODE_RISK_MATRIX_CURRENT.csv
-Docs/MASTER_APP_INTENT_UNDERWATER_SAFETY_MATRIX_CURRENT.csv
-Docs/MASTER_GF_PRESET_SYNC_SCHEMA_MATRIX_CURRENT.csv
-Docs/MASTER_DEPTH_CAPABILITY_ENTITLEMENT_MATRIX_CURRENT.csv
-Docs/MASTER_DEVELOPER_SHALLOW_TESTING_RELEASE_GATE_MATRIX_CURRENT.csv
+Docs/MASTER_WATCH_DEPTH_CAPABILITY_SHALLOW_TESTING_MATRIX_CURRENT.csv
 ```
+
+## 4A.3 Water auto-open interaction with Full Computer audit
+
+Verify:
+
+```text
+Water auto-open may route to Diving Full Computer predive configuration/confirmation.
+Water auto-open never starts Full Computer live runtime directly.
+Water auto-open never bypasses environment confirmation.
+Water auto-open never bypasses GF predive snapshot.
+Water auto-open never mutates tissues, gases, GF, environment or runtime state.
+System submerged auto-launch remains physical/watchOS evidence gated.
+```
+
+These checks must be cross-referenced with Audit 03, 04 and 05.
 
 ---
