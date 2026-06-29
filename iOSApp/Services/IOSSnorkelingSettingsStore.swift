@@ -5,7 +5,15 @@ import Foundation
 final class IOSSnorkelingSettingsStore: ObservableObject {
     static var testHook_defaults: UserDefaults?
 
+    static let mapTypeStorageKey = SnorkelingMapTypeStorage.storageKey
+
     @Published var settings: SnorkelingCompanionSettings
+    @Published var mapType: SnorkelingMapType {
+        didSet {
+            guard isReady else { return }
+            SnorkelingMapTypeStorage.save(mapType, to: defaults)
+        }
+    }
 
     private let storageKey = SnorkelingCompanionSettings.storageNamespace
     private var defaults: UserDefaults { Self.testHook_defaults ?? .standard }
@@ -19,7 +27,12 @@ final class IOSSnorkelingSettingsStore: ObservableObject {
         } else {
             settings = .default
         }
+        mapType = SnorkelingMapTypeStorage.load(from: defaults)
         isReady = true
+    }
+
+    func setMapType(_ type: SnorkelingMapType) {
+        mapType = type
     }
 
     func persist() {
@@ -31,13 +44,17 @@ final class IOSSnorkelingSettingsStore: ObservableObject {
 
     func resetToDefaults() {
         settings = .default
+        mapType = .defaultValue
         persist()
+        SnorkelingMapTypeStorage.save(mapType, to: defaults)
     }
 
     #if DEBUG
     func resetForTesting() {
         defaults.removeObject(forKey: storageKey)
+        defaults.removeObject(forKey: Self.mapTypeStorageKey)
         settings = .default
+        mapType = .defaultValue
     }
     #endif
 }

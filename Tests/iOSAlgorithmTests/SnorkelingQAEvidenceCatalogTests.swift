@@ -2,8 +2,8 @@ import XCTest
 
 final class SnorkelingQAEvidenceCatalogTests: XCTestCase {
     func testCatalogDefinesTwentyOneFolders() {
-        XCTAssertEqual(SnorkelingQAEvidenceCatalog.entries.count, 21)
-        XCTAssertEqual(SnorkelingQAEvidenceCatalog.folderCount, 21)
+        XCTAssertEqual(SnorkelingQAEvidenceCatalog.entries.count, 25)
+        XCTAssertEqual(SnorkelingQAEvidenceCatalog.folderCount, 25)
     }
 
     func testCatalogQAIDsAreUnique() {
