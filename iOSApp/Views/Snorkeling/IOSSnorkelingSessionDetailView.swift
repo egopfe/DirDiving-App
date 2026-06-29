@@ -7,8 +7,8 @@ struct IOSSnorkelingSessionDetailView: View {
     @EnvironmentObject private var logbook: IOSSnorkelingLogbookStore
     @EnvironmentObject private var photoStore: IOSSnorkelingSessionPhotoStore
     @EnvironmentObject private var equipmentStore: IOSSnorkelingEquipmentStore
+    @EnvironmentObject private var locationPermission: IOSLocationPermissionService
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
-    @State private var mapPermission: ApneaMapPermissionState = .notDetermined
     @State private var secondaryChart: IOSSnorkelingSecondaryChartKind = .distance
 
     private enum IOSSnorkelingSecondaryChartKind: String, CaseIterable {
@@ -24,7 +24,7 @@ struct IOSSnorkelingSessionDetailView: View {
     }
     private var charts: SnorkelingSessionChartsModel { logbook.charts(for: session) }
     private var mapModel: SnorkelingSessionMapModel {
-        SnorkelingSessionMapPresentation.make(from: session, permission: mapPermission)
+        SnorkelingSessionMapPresentation.make(from: session, permission: locationPermission.permissionState)
     }
     private var dipMetrics: [SnorkelingDipMetrics] { logbook.dipMetrics(for: session) }
 
@@ -61,7 +61,7 @@ struct IOSSnorkelingSessionDetailView: View {
             }
         }
         .onAppear {
-            mapPermission = IOSSnorkelingLocationPermission.currentState()
+            locationPermission.refresh()
         }
     }
 

@@ -21,9 +21,9 @@ enum IOSApneaSessionDetailTab: String, CaseIterable, Identifiable {
 struct IOSApneaSessionDetailView: View {
     let session: ApneaSession
     @EnvironmentObject private var logbook: IOSApneaLogbookStore
+    @EnvironmentObject private var locationPermission: IOSLocationPermissionService
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
     @State private var tab: IOSApneaSessionDetailTab = .summary
-    @State private var mapPermission: ApneaMapPermissionState = .notDetermined
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
     private var summary: IOSApneaSessionSummaryPresentation {
@@ -31,7 +31,7 @@ struct IOSApneaSessionDetailView: View {
     }
     private var charts: ApneaSessionChartsModel { logbook.charts(for: session) }
     private var mapModel: ApneaSessionMapModel {
-        ApneaSessionMapPresentation.make(from: session, permission: mapPermission)
+        ApneaSessionMapPresentation.make(from: session, permission: locationPermission.permissionState)
     }
     private var diveMetrics: [ApneaDiveMetrics] { logbook.diveMetrics(for: session) }
 
@@ -69,7 +69,7 @@ struct IOSApneaSessionDetailView: View {
             }
         }
         .onAppear {
-            mapPermission = IOSApneaLocationPermission.currentState()
+            locationPermission.refresh()
         }
     }
 

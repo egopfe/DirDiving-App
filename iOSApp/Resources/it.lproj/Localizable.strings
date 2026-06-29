@@ -433,6 +433,14 @@
 "planner.table.row.a11y.two" = "%@, %@";
 "planner.table.row.a11y.three" = "%@, %@, %@";
 "logbook.delete.button.a11y" = "Elimina log immersione";
+"ios.location.permission.first_launch.title" = "Abilita posizione GPS";
+"ios.location.permission.first_launch.body" = "DIR DIVING usa la posizione per mappe, ingresso, uscita e waypoint nelle attività che lo richiedono. Puoi modificare questa scelta nelle Impostazioni iOS.";
+"ios.location.permission.allow" = "Consenti posizione";
+"ios.location.permission.not_now" = "Non ora";
+"ios.location.permission.enable" = "Abilita posizione GPS";
+"ios.location.permission.open_settings" = "Apri Impostazioni";
+"ios.location.permission.denied.body" = "L'accesso alla posizione è disattivato. Puoi abilitarlo dalle Impostazioni iOS.";
+"ios.location.permission.required.body" = "Per usare mappe, ingresso, uscita e waypoint è necessario consentire l'accesso alla posizione.";
 "ios.legal.welcome.card" = "Benvenuto";
 "ios.legal.welcome.title" = "Benvenuto in DIR Diving";
 "ios.legal.welcome.body" = "Prima di usare l'app, leggi e accetta l'informativa di sicurezza.";
