@@ -3,8 +3,10 @@
 **Command:** `02-MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.1` (LAUNCH ORDER 02)  
 **Date:** 2026-06-28  
 **Branch:** `main`  
-**Commit:** `7dfefe2` (`7dfefe2cd7817780a903a64e51b890d901111ffd`)  
+**Commit:** `5d757cc` (`5d757cc0217755f5c6d5429af2f13ce5c4748c5d`)  
 **Scope:** DIR Diving iOS Companion — merged math, Bühlmann, algorithm, multi-activity audit including GF preset override compatibility and briefing-card reference-only posture
+
+**Post-remediation note:** CONS-002 GF preset parity and CONS-027 PlannerStore deinit cancellation verified @ `5d757cc`. Software GF import **PASS**; external Bühlmann preset spot-check (CONS-043) remains pending.
 
 All items below remain **NOT EXECUTED** or **PENDING** unless signed evidence exists in `Docs/QA_EVIDENCE/`. No physical iPhone, paired Watch, underwater, external Bühlmann, Subsurface, or App Store legal review was performed during this audit pass.
 
@@ -34,7 +36,7 @@ Integrated from: `Docs/EXTERNAL_VALIDATION_GAPS_CURRENT.md`, `Docs/ACTIVITY_ARCH
 | EXT-IOS-BUHL-01 | PENDING_EXTERNAL_VALIDATION | `QA_EVIDENCE/BUHLMANN_EXTERNAL/` | Algorithm marketing / third-party sign-off |
 | EXT-IOS-BUHL-02 | PENDING_EXTERNAL_VALIDATION | `BUHLMANN_EXTERNAL_VALIDATION_FIXTURES_TEMPLATE.md` | `reviewerSignOff: PENDING` |
 
-**Software baseline:** Shared `BuhlmannCore` ZH-L16C engine; iOS golden fixtures (`BuhlmannGoldenFixtureTests`, `BuhlmannReferenceFixtureTests`); **1526 executed tests, 0 failures** in `DIRDiving iOS Algorithm Tests` @ `7dfefe2`. Internal consistency **PASS**; external oracle comparison **NOT EXECUTED**.
+**Software baseline:** Shared `BuhlmannCore` ZH-L16C engine; iOS golden fixtures (`BuhlmannGoldenFixtureTests`, `BuhlmannReferenceFixtureTests`); **1527 executed tests, 0 failures** in `DIRDiving iOS Algorithm Tests` @ `5d757cc`. Post-remediation GF tests **15/15 PASS**. Internal consistency **PASS**; external oracle comparison **NOT EXECUTED**.
 
 ---
 
@@ -128,7 +130,7 @@ Integrated from: `Docs/EXTERNAL_VALIDATION_GAPS_CURRENT.md`, `Docs/ACTIVITY_ARCH
 | EXT-IOS-LEGAL-01 | NOT_EXECUTED | `QA_EVIDENCE/APP_STORE_MARKETING/` | Screenshots and marketing copy |
 | EXT-IOS-LEGAL-02 | NOT_EXECUTED | `Docs/RELEASE_LEGAL_CLAIMS_COMPLIANCE_AUDIT_CURRENT.md` | Non-certified planner / CCR / briefing disclaimers legal sign-off |
 
-**Software baseline:** `ReleaseLegalClaimsRemediationTests`; no EN13319/ISO 6425/CE claims in production strings audited at `7dfefe2`.
+**Software baseline:** `ReleaseLegalClaimsRemediationTests`; no EN13319/ISO 6425/CE claims in production strings audited at `5d757cc`.
 
 ---
 
@@ -154,4 +156,4 @@ Integrated from: `Docs/EXTERNAL_VALIDATION_GAPS_CURRENT.md`, `Docs/ACTIVITY_ARCH
 
 ---
 
-*End of external validation pending report — audit-only @ `7dfefe2`.*
+*End of external validation pending report — post-remediation audit @ `5d757cc`.*

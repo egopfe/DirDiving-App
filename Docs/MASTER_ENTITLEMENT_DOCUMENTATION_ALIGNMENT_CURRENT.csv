@@ -1,5 +1,5 @@
 Entitlement_Topic,Documentation_Path,Documented_Claim,Code_Signing_Evidence,Truth_Status,Risk,Physical_Evidence,Required_Update,Priority,Notes
-com.apple.developer.submerged-shallow-depth-and-pressure,Config/DIRDiving.WithShallowDepth.entitlements; BUILD_AND_XCODEGEN_WORKFLOW.md,Default Watch signing uses shallow entitlement,project.yml entitlements path,TRUE,Low,PENDING,None,P3,Production default @ 7dfefe2
+com.apple.developer.submerged-shallow-depth-and-pressure,Config/DIRDiving.WithShallowDepth.entitlements; BUILD_AND_XCODEGEN_WORKFLOW.md,Default Watch signing uses shallow entitlement,project.yml entitlements path,TRUE,Low,PENDING,None,P3,Production default @ 5d757cc
 com.apple.developer.submerged-depth-and-pressure,Entitlement docs; FULL_COMPUTER_ARCHITECTURE,Full depth requires separate entitlement / Apple approval,DepthCapabilityEntitlementProbe,TRUE,Medium,PENDING,Keep PENDING label in INDEX entitlement block,P2,Not default on main builds
 DIRDepthEntitlementTier=shallow,App/Info.plist; BUILD_AND_XCODEGEN_WORKFLOW,Runtime tier matches shallow signing,Info.plist key,TRUE,Low,PENDING,None,P3,
 WithShallowDepth vs WithWaterSubmersion,APPLE_SHALLOW_DEPTH_ENTITLEMENT_SUPPORT.md; SENSOR_SOURCE_POLICY,Separate capabilities; shallow ≠ full FC,DepthCapabilityResolver mapping,TRUE,Medium,PENDING,Add row to PLATFORM_ENTITLEMENT matrix if missing,P2,

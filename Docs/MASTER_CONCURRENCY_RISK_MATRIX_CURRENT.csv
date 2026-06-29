@@ -7,7 +7,7 @@ CONC-005,ApneaWatchRuntimeStore,Watch,Cancellable tick Task,P4,MITIGATED,Session
 CONC-006,SnorkelingWatchRuntimeStore,Watch,Cancellable tick + checkpoint debounce,P4,MITIGATED,Write storm,250ms debounce + fingerprint,SnorkelingWatchRuntimeStorePersistenceTests,
 CONC-007,GPSManager,Watch,Authorization callback no restart when inactive,P4,MITIGATED,Battery drain,maintainsLocationUpdates gate,Code review,
 CONC-008,DiveLogStore,iOS,Async initial load,P4,MITIGATED,Init blocking main,performInitialLoadIfNeeded Task,IOSCompanionStoreLifecycleTests,
-CONC-009,WatchSyncService,iOS,inFlightOutboundSessionIDs stuck,P1,OPEN,ACK failure does not clear in-flight set,MASTER-PERF-006 remediation,Code review 7dfefe2,PC-05
+CONC-009,WatchSyncService,iOS,inFlightOutboundSessionIDs stuck,P1,PASS,releaseInFlightOutboundSession on ACK failure send error encode error,CONS-003 verified @ 5d757cc,validate_master_main_code_sync_security_performance_audit.sh,PC-05
 CONC-010,IOSExportCancellation,iOS,Export Task cancellation,P4,MITIGATED,Long export block,checkCancellation wrappers,PerformanceConcurrencyBatteryRemediationTests,
 CONC-011,TissueAnalyticsService,iOS,LRU cache 32 entries,P4,MITIGATED,Unbounded memory,LRU eviction,PerformanceConcurrencyBatteryRemediationTests,
 CONC-012,HapticService,Watch,@MainActor haptic coordination,P4,ACCEPTED,MainActor burst,Coordinated coordinators,AscentSafetyHapticCoordinator tests,

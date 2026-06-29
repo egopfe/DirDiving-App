@@ -86,5 +86,5 @@ REQ-HW-01,Hardware controls,Crown underwater page policy,WatchUnderwaterPagePoli
 REQ-HW-02,Hardware controls,Action Button underwater router,WatchUnderwaterActionResolverTests,automated unit,Watch,PASS,SOFTWARE_READY,Tests/WatchAlgorithmTests/WatchUnderwaterActionResolverTests.swift,
 REQ-HW-03,Hardware controls,Water Lock physical QA,WATCH_UNDERWATER_FAST_CONTROLS_WATER_LOCK,physical Watch,Watch,NOT_PASSED,PENDING_PHYSICAL,Docs/QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_WATER_LOCK/,HWC-PHY-004
 REQ-GF-01,GF presets,Watch preset selection + active dive lock,FullComputerGradientFactorSettingsStoreTests,automated unit,Watch,PASS,SOFTWARE_READY,Tests/WatchAlgorithmTests/FullComputerGradientFactorSettingsStoreTests.swift,
-REQ-GF-02,GF presets,iOS plan GF override compatibility,DivePlanPackageCodecTests,automated unit,Both,FAIL,SOFTWARE_GAP,Tests/iOSAlgorithmTests + Watch import tests,IOS-MASTER-F016 preset mismatch
+REQ-GF-02,GF presets,iOS plan GF override compatibility,DivePlanPackageBuilderTests;PlannerGFPresetDisplayTests;FullComputerImportedPlanStoreTests,automated unit,Both,PASS,SOFTWARE_READY,Tests/iOSAlgorithmTests + Watch import tests @5d757cc,CONS-002 closed — 20/80 30/70 40/85 parity
 REQ-GF-03,GF presets,Physical Watch GF Settings QA,WATCH_ULTRA physical matrix,physical Watch,Watch,NOT_PASSED,PENDING_PHYSICAL,Docs/QA_EVIDENCE/WATCH_ULTRA/,GF-E-011
