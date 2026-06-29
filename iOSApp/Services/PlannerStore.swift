@@ -110,6 +110,8 @@ final class PlannerStore: ObservableObject {
     }
 
     deinit {
+        planningUpdateTask?.cancel()
+        saveTask?.cancel()
         if let ascentSpeedObserver {
             NotificationCenter.default.removeObserver(ascentSpeedObserver)
         }

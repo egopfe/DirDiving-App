@@ -17,10 +17,18 @@ enum PlannerGFPreset: String, CaseIterable, Identifiable {
 
     var gfHigh: Double {
         switch self {
-        case .conservative: return 70
-        case .standard: return 80
+        case .conservative: return 80
+        case .standard: return 70
         case .aggressive: return 85
         }
+    }
+
+    /// Watch Full Computer preset raw value when this planner preset is transferred.
+    var fullComputerGradientFactorPresetRawValue: String? {
+        FullComputerGradientFactorPreset.matching(
+            low: Int(gfLow.rounded()),
+            high: Int(gfHigh.rounded())
+        )?.rawValue
     }
 
     var localizedTitle: String {

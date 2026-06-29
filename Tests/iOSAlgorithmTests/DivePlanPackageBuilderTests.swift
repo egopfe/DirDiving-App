@@ -19,6 +19,27 @@ final class DivePlanPackageBuilderTests: XCTestCase {
         try DivePlanPackageCodec.validate(package)
         XCTAssertFalse(package.body.gases.isEmpty)
         XCTAssertEqual(package.body.plannerSummary.planKind, "single")
+        XCTAssertEqual(package.body.gradientFactorPreset, FullComputerGradientFactorPreset.standard3070.rawValue)
+    }
+
+    func testBuilderEmitsGradientFactorPresetForAllPlannerPresets() throws {
+        for preset in PlannerGFPreset.allCases {
+            var input = GasPlanInput()
+            input.ensurePlannerCylindersFromLegacy()
+            PlannerModePolicy.applyGFPreset(preset, to: &input)
+            let package = try DivePlanPackageBuilder.build(
+                input: input,
+                plan: nil,
+                modeLabel: "Deco",
+                planID: UUID(),
+                revision: 1
+            )
+            XCTAssertEqual(
+                package.body.gradientFactorPreset,
+                preset.fullComputerGradientFactorPresetRawValue
+            )
+            XCTAssertNotNil(FullComputerGradientFactorPreset.matching(package: package))
+        }
     }
 
     func testBuilderExcludesTravelAndBailoutRoles() throws {

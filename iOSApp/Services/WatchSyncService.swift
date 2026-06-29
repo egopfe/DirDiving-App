@@ -907,14 +907,22 @@ final class WatchSyncService: NSObject, ObservableObject {
         savePendingOutboundTransfers()
     }
 
+    private func releaseInFlightOutboundSession(_ sessionID: UUID) {
+        inFlightOutboundSessionIDs.remove(sessionID)
+    }
+
     /// Removes a pending outbound transfer after a verified signed Watch import ACK.
     func confirmSignedAck(sessionID: UUID, issuedAt: Date, signature: String) {
         guard WatchDiveSyncCodec.verifyAckSignature(signature, sessionID: sessionID, issuedAt: issuedAt) else {
             failedImportCount += 1
             lastMessage = DIRIOSLocalizer.string("sync.watch.pending_ack")
+            releaseInFlightOutboundSession(sessionID)
             return
         }
-        guard pendingOutboundTransfers.contains(where: { $0.session.id == sessionID }) else { return }
+        guard pendingOutboundTransfers.contains(where: { $0.session.id == sessionID }) else {
+            releaseInFlightOutboundSession(sessionID)
+            return
+        }
         inFlightOutboundSessionIDs.remove(sessionID)
         markPushedToWatch(sessionID)
         removeOutboundTransfer(sessionID: sessionID)
@@ -989,6 +997,7 @@ final class WatchSyncService: NSObject, ObservableObject {
                         guard signedOK else {
                             self.failedImportCount += 1
                             self.lastMessage = DIRIOSLocalizer.string("sync.watch.pending_ack")
+                            self.releaseInFlightOutboundSession(session.id)
                             self.recordActivity(title: DIRIOSLocalizer.string("sync.activity.pending_to_watch"), detail: self.sessionSummary(session))
                             return
                         }
@@ -1001,6 +1010,7 @@ final class WatchSyncService: NSObject, ObservableObject {
                 } errorHandler: { [weak self] _ in
                     Task { @MainActor in
                         guard let self else { return }
+                        self.releaseInFlightOutboundSession(session.id)
                         self.queueViaUserInfo(envelope: envelope, sessionID: session.id)
                         self.recordActivity(title: DIRIOSLocalizer.string("sync.activity.queued_to_watch"), detail: self.sessionSummary(session))
                     }
@@ -1011,6 +1021,7 @@ final class WatchSyncService: NSObject, ObservableObject {
             }
             Self.logger.info("Outbound session push queued id=\(session.id.uuidString, privacy: .public)")
         } catch {
+            releaseInFlightOutboundSession(session.id)
             failedImportCount += 1
             lastMessage = DIRIOSLocalizer.formatted("sync.dive.send_error_format", error.localizedDescription)
             Self.logger.error("Outbound Watch push failed: \(error.localizedDescription, privacy: .private)")
@@ -1336,7 +1347,22 @@ extension WatchSyncService: WCSessionDelegate {
             if self.importSnorkelingSessionPayload(userInfo) != nil {
                 return
             }
-            _ = self.importSessionPayload(userInfo)
+            if let ackContext = self.importSessionPayload(userInfo) {
+                self.sendDiveImportAckToWatch(sessionID: ackContext.sessionID, issuedAt: ackContext.issuedAt)
+            }
+        }
+    }
+
+    private func sendDiveImportAckToWatch(sessionID: UUID, issuedAt: Date) {
+        guard WCSession.isSupported() else { return }
+        let payload = WatchDiveSyncCodec.makeImportAckPayload(sessionID: sessionID, issuedAt: issuedAt)
+        let session = WCSession.default
+        if session.isReachable {
+            session.sendMessage(payload, replyHandler: nil) { _ in
+                session.transferUserInfo(payload)
+            }
+        } else {
+            session.transferUserInfo(payload)
         }
     }
 
