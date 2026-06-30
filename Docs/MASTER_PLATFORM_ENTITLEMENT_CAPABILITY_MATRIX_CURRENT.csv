@@ -24,4 +24,4 @@ CAP-W-DSS,Watch,Developer Sensor Source release gating,yes,yes,DeveloperSettings
 CAP-W-SIM,Watch,Simulation mode release gating,yes,yes,SensorSourceMode + UI badges,yes,yes,no,yes,CONDITIONAL,SOFTWARE_READY,PENDING_PHYSICAL,TESTFLIGHT_REVIEW_NOTES.md,Must remain labeled simulation
 CAP-W-DEV-SHALLOW,Watch,Developer shallow Gauge/FC toggles,yes,yes,DeveloperSettingsView + DepthCapabilityPolicy,no,yes,no,yes,CONDITIONAL,SOFTWARE_READY,PENDING_PHYSICAL,DeveloperSettingsTests,App Store hidden; TF default OFF
 CAP-ASC-CAT,App Store,Category and age rating,yes,partial,App Store Connect metadata,N/A,N/A,yes,yes,PENDING,SOFTWARE_PASS,PENDING,QA_EVIDENCE/APP_STORE_MARKETING/,Final ASC config pending
-CAP-W-BUNDLE,Watch,iOS embeds Watch companion,yes,yes,DIRDiving iOS embeds Watch App,no,yes,no,no,PASS,SOFTWARE_READY,PENDING_PHYSICAL,xcodebuild iOS build PASS 2026-06-28,
+CAP-W-BUNDLE,Watch,iOS embeds Watch companion,yes,yes,DIRDiving iOS embeds Watch App,no,yes,no,no,PASS,SOFTWARE_READY,PENDING_PHYSICAL,xcodebuild iOS build PASS @451f8fb,

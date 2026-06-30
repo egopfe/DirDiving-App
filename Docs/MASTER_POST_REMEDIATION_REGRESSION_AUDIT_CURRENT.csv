@@ -1,0 +1,19 @@
+Regression_Area,Pre_Remediation_Baseline,Post_Remediation_Status,Verification_Method,Result,Regression_Detected,Notes
+Watch FC Bühlmann/Schreiner/GF,7dfefe2 audit,5d757cc remediation + tests,Audit 01 traceability + oracle tests,PASS,no,No algorithm change in remediation or Snorkeling
+iOS Planner math/exports,7dfefe2,5d757cc GF alignment,DivePlanPackageBuilderTests,PASS,no,CONS-002 verified
+GF preset parity Watch↔iOS,FAIL import,PASS all presets,FullComputerImportedPlanStoreTests,PASS,no,CONS-002 038 closed
+Watch↔iOS sync ACK/retry,Stuck in-flight,Released on failure,WatchSync remediation tests,PASS,no,CONS-003 004 closed
+Tombstone HMAC security,Unsigned fallback,Signed-only merge,ActivitySyncTombstoneTests,PASS,no,CONS-005 closed
+Depth capability authority,Plist-only,Compile authority,DepthCapabilityTests,PASS,no,CONS-006 007 closed
+Developer shallow testing gates,Exposure risk,Default OFF gated,validate_developer_shallow_testing_release_gate.sh,PASS,no,CONS-006 closed
+Water auto-open safety,Skipped depth gate,DepthCapabilityPolicy applied,WatchWaterAutoOpenPolicyTests,PASS,no,CONS-019 closed
+Action Button router-only policy,Prior audit PASS,Unchanged @ bb204f5,Policy code review,PASS,no,No Snorkeling change
+Digital Crown underwater clamp,Prior audit PASS,Unchanged,Policy code review,PASS,no,No change
+Activity Settings ownership,Isolated per activity,Snorkeling settings isolated,SnorkelingArchitectureIsolationTests,PASS,no,dbe5d8b
+Activity Logbook ownership,Isolated,Snorkeling logbook isolated,IOSActivityLogbookRoutingTests,PASS,no,dbe5d8b
+Snorkeling cross-activity leakage,N/A new scope,Isolated stores,SnorkelingCrossDomainIsolationTests,PASS,no,Software only; field QA pending
+Command body alignment,CONS-001 permuted,01-07 bodies aligned,Manual LAUNCH ORDER check,PASS,no,CONS-001 closed; CONS-046 is script only
+Command integrity script,PASS @ 5d757cc,FAIL @ bb204f5,validate_commands_for_cursor_integrity.sh,FAIL,yes,CONS-046 — tooling regression not product
+Privacy/security claims,No overclaim,Templates PENDING,Doc review,PASS,no,NO_FAKE_PHYSICAL PASS
+Release wording,Scanner PASS,Unchanged legal posture,validate_release_claims lane,PASS,no,CONS-044 still pending external
+Domain audit freshness,COMPLETE @ 4d415c0,STALE vs dbe5d8b,Output timestamp compare,STALE,yes,CONS-047 — audit coverage gap not code regression

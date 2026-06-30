@@ -24,5 +24,9 @@ EXPORT_DIVING,Diving,Diving,DiveLogStore,PDF/CSV export,yes,PDFExportServiceTest
 EXPORT_APNEA,Apnea,Apnea,IOSApneaLogbookStore,Apnea export,yes,IOSApneaMapEquipmentExportTests,PASS,
 EXPORT_SNORKEL,Snorkeling,Snorkeling,IOSSnorkelingLogbookStore,Snorkeling export,yes,IOSSnorkelingExportServiceE2ETests,PASS,
 DEEP_LINK_MIXED,Any,Mixed,n/a,IOSCompanionDeepLinkPolicy,no,IOSCompanionNavigationRestorationTests.testCrossActivitySessionDetailDeepLinkRejected,PASS,Cross-activity session detail rejected
-STATE_RESTORE_MIXED,Any,Mixed,n/a,IOSCompanionNavigationPersistence,partial,IOSCompanionNavigationRestorationTests,PARTIAL,Tab/settings tokens persist; root tab wiring partial F002
+STATE_RESTORE_MIXED,Any,Mixed,n/a,IOSCompanionNavigationPersistence,partial,IOSCompanionNavigationRestorationTests,PARTIAL,Tab/settings tokens persist; root tab wiring partial IOS-P3-001
 GF_LOGBOOK_METADATA,Diving,Diving,DiveLogStore / FC metadata,FullComputerDiveLogbookMetadata,yes,FullComputerGradientFactorRuntimeResolutionTests,PASS,GF preset/source stored when FC dive completes
+FAKE_LOGBOOK_DIVING,Diving,Diving,DiveLogStore.includeDemoLogbook,LogbookView demo section,yes,AnalysisDemoIsolationTests,PASS,Diving demo toggle in Settings; separate from real sessions
+FAKE_LOGBOOK_APNEA,Apnea,Apnea,IOSActivityDemoLogbookSettingsStore,IOSApneaSessionsListView demo section,yes,ApneaDemoLogbookPresentationTests,PASS,Default OFF; independent from Snorkeling toggle
+FAKE_LOGBOOK_SNORKEL,Snorkeling,Snorkeling,IOSActivityDemoLogbookSettingsStore,IOSSnorkelingSessionsListView demo section,yes,SnorkelingDemoLogbookPresentationTests;FakeSnorkelingLogbookProviderTests,PASS,DEMO banner; does not pollute real store stats
+FAKE_LOGBOOK_NOT_DEVSETTINGS,All,All,N/A — activity Settings not DeveloperSettings,N/A,yes,IOSActivityDemoLogbookSettingsStoreTests,PASS,Fake logbook NOT in DeveloperSettings.swift

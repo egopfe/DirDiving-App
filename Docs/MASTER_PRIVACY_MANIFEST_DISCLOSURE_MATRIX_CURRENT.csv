@@ -16,7 +16,7 @@ iCloud KVS dive snapshot,Diving,yes,iCloud,yes,no,Apple iCloud,opt-in,yes,user t
 Exported CSV PDF files,All,yes,tmp,user initiated,share sheet,user share,no,yes,user share,yes,yes,Medium,PENDING_PHYSICAL,SOFTWARE_READY,PENDING_PHYSICAL,Manual render QA pending
 Briefing card PNG,Diving,yes,yes,WC transfer,no,no,no,yes,delete card,yes,yes,Low,PASS,SOFTWARE_READY,PENDING_PHYSICAL,Path traversal blocked
 App Intents metadata,Cross,yes,UserDefaults,no,no,no,no,standard UD,re-onboard,yes,yes,Low,PASS,SOFTWARE_READY,N/A,Gated by legal acceptance
-Planner plans GF presets,Diving,yes,yes,WC file transfer,none,no,opt-in planner state,yes,user delete,yes,yes,Medium,PASS,SOFTWARE_READY,N/A,GF import mismatch tracked F016
+Planner plans GF presets,Diving,yes,yes,WC file transfer,none,no,opt-in planner state,yes,user delete,yes,yes,Medium,PASS,SOFTWARE_READY,N/A,GF import CONS-002 closed @451f8fb
 Full Computer checkpoint,Diving,yes,yes,no,no,no,no,yes,overwrite,yes,yes,High,PASS,SOFTWARE_READY,N/A,Isolated namespace
 Legal acceptance flag,Cross,yes,UserDefaults,no,no,no,no,standard UD,re-onboard,yes,yes,Low,PASS,SOFTWARE_READY,N/A,
 Developer unlock shallow flags,Cross,yes,UserDefaults,no,no,no,no,standard UD,clear defaults,yes,yes,Low,PASS,SOFTWARE_READY,N/A,TestFlight shallow toggles

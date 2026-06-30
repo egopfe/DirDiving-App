@@ -1,82 +1,94 @@
-# Master Watch Full Computer — External Validation Plan — CURRENT
+# Watch Full Computer — External Validation Plan — CURRENT
 
-**Audit command:** `01-MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V2.0.md`  
-**Date:** 2026-06-28  
-**Branch:** `main` @ `5d757cc` (post-remediation rerun)  
-**Status:** **PLANNED** — no external tool run or physical chamber evidence collected in this audit session
+**Baseline:** `main` @ `451f8fb`  
+**Status:** **PENDING_EXTERNAL_VALIDATION** (all items unless noted)
 
 ---
 
-## Objective
+## Objectives
 
-Independently confirm DIR Diving Apple Watch **Full Computer** live decompression output against established Bühlmann ZH-L16C models and real Apple Watch hardware behavior. This plan does **not** claim EN 13319, ISO 6425, medical, or certified dive-computer status.
+1. Compare Watch Full Computer Bühlmann ZH-L16C runtime against independent decompression tools.
+2. Validate TTS/schedule/stop list at sea level and altitude.
+3. Produce signed evidence under `Docs/QA_EVIDENCE/BUHLMANN_EXTERNAL/`.
+4. Do **not** claim EN13319, ISO 6425, CE, or certified dive-computer status without official evidence.
 
 ---
 
-## Reference implementations
+## Independent Oracle (Software — COMPLETE)
 
-| Tool / reference | Role | Status |
+| Item | Status | Evidence |
 |---|---|---|
-| In-repo `IndependentBuhlmannOracle` | Primary tissue + TTS/schedule oracle (Audit-15) | **EXECUTED** — ML-01..ML-10 PASS prior; independent path verified @ 5d757cc |
-| Production `BuhlmannEngine.runtimeProjection` | Live FC presentation only (not oracle reference) | **EXECUTED** — oracle sweep uses independent reference (CONS-008 CLOSED) |
-| Subsurface / libdivecomputer ZH-L16C tables | Constant cross-check | **PENDING_EXTERNAL_VALIDATION** |
-| MultiDeco / V-Planner / GAP manual | TTS/stop spot checks | **PENDING_EXTERNAL_VALIDATION** |
-| Hand Schreiner calculations | Compartments 1,4,8 at t=130,404,1004 | **EXECUTED** via SchreinerAnalyticParityTests |
-
-**Rule:** Normalize assumptions (GF, ascent rate, stop increment, water vapour 0.0627 bar, surface pressure, salinity) before judging external deltas.
+| Tissue loading oracle | PASS | `IndependentBuhlmannOracle.swift` |
+| Schedule/TTS on oracle tissues | PASS | CONS-008 remediation |
+| ML-01…ML-10 replay | PASS | Audit15 test suites @451f8fb (353/355 Watch tests pass) |
 
 ---
 
-## Canonical profiles
+## External Tool Comparison (PENDING)
 
-| Profile | Description | Software oracle | External replay |
+### Tools
+
+- **Subsurface** — Bühlmann ZH-L16C with GF; export dive profiles.
+- **RatioDeco / VPM-B reference** — spot-check selected stops (document GF assumptions).
+- **Pressure pot / chamber** (optional) — ambient pressure validation at altitude simulation.
+
+### Profile CSV Format
+
+```csv
+second,depth_m,gas_name,o2_frac,he_frac,gf_low,gf_high,altitude_m,salinity_ppt
+```
+
+### Required Profiles
+
+| Profile ID | Description | GF | Altitude |
 |---|---|---|---|
-| ML-01 | Air 39 m → 10 m, GF 30/70 | PASS 0 tissue failures | CSV: `Docs/WATCH_AUDIT15_AIR39_PROFILE_CURRENT.csv` — **PENDING fill** |
-| ML-02 | EAN50 @ 21 m | PASS | Scaffold exported |
-| ML-03 | Trimix + deco gases | PASS | Scaffold exported |
-| ML-05 | Deco clear → re-descent | PASS | Scaffold exported |
-| Altitude | 500/1000/1500/2000 m import | Env propagation PASS | Full ML replay **PENDING** |
+| EXT-01 | Air 39m bottom → 10m level → surface | 30/70 | 0 m |
+| EXT-02 | Same with EAN50 @ 21m | 30/70 | 0 m |
+| EXT-03 | Trimix bottom + deco gases | 30/70 | 0 m |
+| EXT-04 | Air multilevel re-descent | 30/70 | 0 m |
+| EXT-05 | Air 30m NDL boundary | 30/70 | 1000 m |
+| EXT-06 | GF preset triplet spot-check | 20/80 30/70 40/85 | 0 m |
 
-Export script: `Scripts/export_watch_live_buhlmann_replay_vectors.py`
+### Tolerance Table (proposed)
 
----
+| Metric | Tolerance | Direction |
+|---|---|---|
+| Tissue PN2/PHe (bar) | 0.001 | Document divergence |
+| Ceiling (m) | 0.5 | Either |
+| TTS (min) | 3 | Watch may read higher (1-min quanta) |
+| First stop depth (m) | 3 (stop interval) | Either |
 
-## Tolerance table (release comparison)
+### Discrepancy Triage
 
-| Quantity | Tolerance | Direction |
-|---|---:|---|
-| Tissue N2/He (bar) | ±0.0002 | Neutral |
-| Ceiling (m) | ±0.2 | Neutral |
-| NDL (min) | ±0.6 | Neutral |
-| TTS (min) | ±3.0 | Conservative acceptable |
-
----
-
-## Physical validation strategy
-
-1. **Dry run:** Predive environment accept → start → verify frozen `FullComputerRuntimePlan.plannerEnvironment` in logbook metadata (PQ-015).
-2. **Simulator replay:** Audit-15 tests (prior evidence @ 7dfefe2; remediation targeted tests 36/36 PASS @ 5d757cc).
-3. **Paired-device logging:** Watch + iPhone sync round-trip for FC logbook environment fields (PQ-016).
-4. **Controlled water / pressure pot:** Ascent warnings and depth scaling (PQ-020, PQ-022).
-5. **Apple Watch Ultra underwater:** Real submersion depth API — **PENDING_PHYSICAL** only.
+1. Verify environment (surface pressure, water density, vapour pressure).
+2. Verify GF interpolation anchor (first stop vs ambient).
+3. Verify ascent rate and stop increment assumptions.
+4. Verify gas switch timing (0.5 min Buhlmann switch).
+5. Escalate to P1 if Watch reads **lower** TTS/ceiling than external tool (optimistic).
 
 ---
 
-## Discrepancy triage
+## Execution Phases
 
-| Delta type | Action |
-|---|---|
-| Tissue > 0.0002 bar | Block — investigate Schreiner/units |
-| Ceiling > 0.2 m | Check GF interpolation and rounding |
-| TTS > 3 min | Check 1-min simulation quanta (MWFC-P2-003) |
-| External only diverges | Document assumption mismatch before code change |
+| Phase | Method | Status |
+|---|---|---|
+| 1 | Simulator CSV replay export from Audit15 recorders | NOT_EXECUTED |
+| 2 | Subsurface manual profile entry + compare | PENDING_EXTERNAL_VALIDATION |
+| 3 | Paired iPhone logging during dry run | PENDING_PHYSICAL |
+| 4 | Controlled water / pressure pot | PENDING_PHYSICAL |
+| 5 | Independent reviewer sign-off | NOT_EXECUTED |
 
 ---
 
 ## Governance
 
-- Independent reviewer sign-off required before any external decompression parity claim.
-- Physical QA matrix (`MASTER_WATCH_FULL_COMPUTER_PHYSICAL_QA_MATRIX_CURRENT.csv`) must reach **EXECUTED** for release gate.
-- Finding MWFC-P1-002 tracks external validation gap.
+- No release claim of external parity until signed artifacts exist.
+- Physical Watch sensor validation is separate gate (see PHYSICAL_QA matrix).
+- Planner briefing cards and CCR metadata remain reference-only in all comparisons.
 
-**All external rows remain `PENDING_EXTERNAL_VALIDATION` unless evidence files exist under `Docs/QA_EVIDENCE/`.**
+---
+
+## Related Findings
+
+- **MWFC-P1-001** (CONS-009) — blocks external release readiness claim.
+- **CONS-043** — GF preset external spot-check pending.

@@ -15,12 +15,17 @@ EC-IOS-013,Settings,All,All,Settings mode switch during Watch session,Watch acti
 EC-IOS-014,Export,Diving,All,Missing export fields,Incomplete plan,Block export,Blocked,0,0,PASS,,PlanCalculationCompletenessTests,
 EC-IOS-015,CSV,Diving,All,Malformed CSV import,Import path,Fail-closed,Rejected,0,0,PASS,,CSVMetadataRoundTripTests,
 EC-IOS-016,Sync,All,All,Invalid sync payload,HMAC check,Reject,Rejected,0,0,PASS,,ActivitySyncCrossDecodeRejectionTests,
-EC-IOS-017,GF preset,Diving,All,iOS conservative 20/80 plan package,Watch import,Map to FC conservative2080,Import accepts preset,0,0,PASS,P4,FullComputerImportedPlanStore;DivePlanPackageBuilderTests @5d757cc,CONS-002 remediated
-EC-IOS-018,GF preset,Diving,All,iOS standard 30/70 plan package,Watch import,Map to FC standard3070,Import accepts preset,0,0,PASS,P4,FullComputerImportedPlanStore;DivePlanPackageBuilderTests @5d757cc,CONS-002 remediated
-EC-IOS-019,GF preset,Diving,All,iOS aggressive 40/85 plan package,Watch import,Import success,Accepted as moderate4085,0,0,PASS,,FullComputerGradientFactorPreset.matching,Only matching preset
-EC-IOS-020,GF preset,Diving,All,Manual GF 30/70 in package builder,Watch import,Import success,Accepted,0,0,PASS,,DivePlanPackageBuilderTests,Non-preset pair that matches Watch standard
-EC-IOS-021,Briefing,Diving,All,Briefing card manifest,Export,referenceOnly true,Always true,0,0,PASS,,PlannerBriefingCardManifest;PlannerBriefingTransferSupport,
+EC-IOS-017,GF preset,Diving,All,iOS conservative 20/80 plan package,Watch import,Map to FC conservative2080,Import accepts preset,0,0,PASS,,DivePlanPackageBuilder @451f8fb,CONS-002 verified
+EC-IOS-018,GF preset,Diving,All,iOS standard 30/70 plan package,Watch import,Map to FC standard3070,Import accepts preset,0,0,PASS,,FullComputerGradientFactorPreset,CONS-002 verified
+EC-IOS-019,GF preset,Diving,All,iOS aggressive 40/85 plan package,Watch import,Import success,Accepted as moderate4085,0,0,PASS,,FullComputerGradientFactorPreset.matching,
+EC-IOS-020,GF preset,Diving,All,Invalid pair 30/80,Watch import,Fail-closed,invalidGradientFactors,0,0,PASS,,FullComputerImportedPlanStoreTests,
+EC-IOS-021,Briefing,Diving,All,Briefing card manifest,Export,referenceOnly true,Always true,0,0,PASS,,PlannerBriefingCardManifest,
 EC-IOS-022,Route,Snorkeling,All,Invalid GPS track,Session start,Graceful empty state,Handled,0,0,PASS,,IOSSnorkelingNoGPSPresentationTests,
-EC-IOS-023,Cloud,Diving,All,Conflicting tombstone merge,Two revisions,Deterministic merge,Tested merge,0,0,PASS,,CloudSessionMergeTests,Field QA pending
-EC-IOS-024,Performance,Diving,Technical,40 sequential tissue analytics solves,Cache warm,Complete within budget,PASS @5d757cc,0,0,PASS,,PerformanceConcurrencyBatteryRemediationTests,F001 closed
-EC-IOS-025,Navigation,All,All,Process death mid-tab,Tokens persisted,Restore tab on relaunch,PARTIAL,0,0,FAIL,P3,IOSCompanionNavigationRestorationTests,F002 open
+EC-IOS-023,Snorkeling,Snorkeling,Route,Empty point array distance,SnorkelingDistanceCalculator,distanceMeters 0,Compile+return 0,Compile fail,0,0,FAIL,P1,SnorkelingDistanceCalculatorTests,IOS-P1-001 ambiguous overload
+EC-IOS-024,Snorkeling,Snorkeling,Route,Invalid route for Watch transfer,Validation,Block transfer,allowsWatchTransfer false,0,0,PASS,,SnorkelingRouteValidatorTests,
+EC-IOS-025,Snorkeling,Snorkeling,All,Fake logbook ON,Real sessions present,DEMO section only stats isolated,Isolated,0,0,NOT_EXECUTED,,SnorkelingExportPayloadTests,Compile blocked
+EC-IOS-026,Sync,Diving,All,Unsigned legacy tombstone with secret,Signed path active,Prefer signed verify,Signed primary + legacy mirror,0,0,PASS,P3,ActivitySyncTombstoneTests,CONS-005 documented
+EC-IOS-027,Sync,All,All,Failed ACK signature,inFlight set,Clear inFlight retry,releaseInFlightOutboundSession,0,0,PASS,,WatchSyncService @451f8fb,CONS-003
+EC-IOS-028,Navigation,All,All,Process death mid-tab,Tokens persisted,Restore tab on relaunch,PARTIAL,0,0,FAIL,P3,IOSCompanionNavigationRestorationTests,IOS-P3-001
+EC-IOS-029,Map,Snorkeling,Route,Reset map with waypoints,Planner open,Confirm destructive alert,Alert shown,0,0,PASS,,SnorkelingRoutePlannerResetMapTests,
+EC-IOS-030,Settings,Snorkeling,All,Map type satellite,Settings change,Planner map style updates,Applied,0,0,PASS,,SnorkelingMapTypeTests,
