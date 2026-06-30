@@ -1,11 +1,11 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` = `origin/main` @ (pending commit)
+**Branch consigliato:** `main` = `origin/main` @ `b230672`
 
 ---
 
-## Aggiornamento indice 2026-06-17 — iOS Apnea & Snorkeling fake logbook
+## Aggiornamento indice 2026-06-17 — iOS Apnea & Snorkeling fake logbook @ `b230672`
 
 iOS-only demo logbook toggles for Apnea and Snorkeling (default OFF); separate in-memory providers; no real storage, Watch sync, or export contamination.
 
