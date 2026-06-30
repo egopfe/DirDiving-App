@@ -4,6 +4,7 @@ import SwiftUI
 struct IOSApneaSettingsContent: View {
     @EnvironmentObject private var settingsStore: IOSApneaSettingsStore
     @EnvironmentObject private var sharedSettings: SharedIOSSettingsStore
+    @EnvironmentObject private var demoLogbookSettings: IOSActivityDemoLogbookSettingsStore
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -75,6 +76,15 @@ struct IOSApneaSettingsContent: View {
                 )
             }
 
+            DIRCard(DIRIOSLocalizer.string("settings.demo_logbook.title"), icon: "doc.text.magnifyingglass", accent: DIRTheme.orange) {
+                IOSCompanionSettingsToggleRow(
+                    title: DIRIOSLocalizer.string("settings.apnea.fake_logbook.title"),
+                    isOn: apneaFakeLogbookBinding,
+                    identifier: "apnea.settings.fake_logbook"
+                )
+                IOSCompanionSettingsFootnoteText(text: DIRIOSLocalizer.string("settings.apnea.fake_logbook.description"))
+            }
+
             DIRCard(nil, icon: nil, accent: DIRTheme.orange) {
                 IOSCompanionSettingsResetButton(
                     title: DIRIOSLocalizer.string("apnea.ios.settings.reset"),
@@ -139,6 +149,13 @@ struct IOSApneaSettingsContent: View {
         Binding(
             get: { settingsStore.settings.missionModeEnabled },
             set: { settingsStore.settings.missionModeEnabled = $0 }
+        )
+    }
+
+    private var apneaFakeLogbookBinding: Binding<Bool> {
+        Binding(
+            get: { demoLogbookSettings.isApneaFakeLogbookEnabled },
+            set: { demoLogbookSettings.setApneaFakeLogbookEnabled($0) }
         )
     }
 }

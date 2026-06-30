@@ -3,6 +3,7 @@ import SwiftUI
 /// Embeddable Snorkeling-owned settings content for unified Settings scroll surfaces.
 struct IOSSnorkelingSettingsContent: View {
     @EnvironmentObject private var settingsStore: IOSSnorkelingSettingsStore
+    @EnvironmentObject private var demoLogbookSettings: IOSActivityDemoLogbookSettingsStore
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -112,6 +113,15 @@ struct IOSSnorkelingSettingsContent: View {
                 IOSCompanionSettingsFootnoteText(text: DIRIOSLocalizer.string("snorkeling.ios.settings.privacy_note"))
             }
 
+            DIRCard(DIRIOSLocalizer.string("settings.demo_logbook.title"), icon: "doc.text.magnifyingglass", accent: DIRTheme.orange) {
+                IOSCompanionSettingsToggleRow(
+                    title: DIRIOSLocalizer.string("settings.snorkeling.fake_logbook.title"),
+                    isOn: snorkelingFakeLogbookBinding,
+                    identifier: "snorkeling.settings.fake_logbook"
+                )
+                IOSCompanionSettingsFootnoteText(text: DIRIOSLocalizer.string("settings.snorkeling.fake_logbook.description"))
+            }
+
             DIRCard(nil, icon: nil, accent: DIRTheme.orange) {
                 IOSCompanionSettingsResetButton(
                     title: DIRIOSLocalizer.string("snorkeling.ios.settings.reset"),
@@ -185,6 +195,13 @@ struct IOSSnorkelingSettingsContent: View {
         Binding(
             get: { settingsStore.mapType },
             set: { settingsStore.setMapType($0) }
+        )
+    }
+
+    private var snorkelingFakeLogbookBinding: Binding<Bool> {
+        Binding(
+            get: { demoLogbookSettings.isSnorkelingFakeLogbookEnabled },
+            set: { demoLogbookSettings.setSnorkelingFakeLogbookEnabled($0) }
         )
     }
 }
