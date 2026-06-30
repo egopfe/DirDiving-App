@@ -1,0 +1,19 @@
+Claim_ID,Post_Remediation_Claim,Allowed,Evidence_Required,Software_Evidence,Physical_Evidence,External_Evidence,Legal_Evidence,Status,Truthfulness,Release_Impact,Finding_ID,Notes
+PR-001,Software remediations CONS-002..008 closed,yes,Code + audit verification,MASTER_* @ 451f8fb,N/A,N/A,N/A,PASS,TRUE,Low,None,Verified static @ 451f8fb
+PR-002,Internal TestFlight software ready,yes,Build + test + script gates,BUILD PASS; IOS test FAIL; script FAIL,N/A,N/A,N/A,CONDITIONAL,PARTIAL,High,IOS-P1-001; CONS-046,iOS compile blocks full PASS
+PR-003,External TestFlight ready with physical gates,no,Signed QA artifacts,Software PASS,0% executed,0% executed,N/A,NOT_READY,TRUE,High,CONS-048,Gates correctly open
+PR-004,App Store ready with legal/physical/external,no,All gates + counsel,Partial,N/A,N/A,PENDING,NOT_READY,TRUE,High,CONS-044,Correctly blocked
+PR-005,Physical Watch QA passed,no,QA_EVIDENCE artifacts,Software only,NOT_EXECUTED,N/A,N/A,NOT_CLAIMED,TRUE,None,None,No fake PASS
+PR-006,Physical iPhone QA passed,no,QA_EVIDENCE artifacts,Software only,NOT_EXECUTED,N/A,N/A,NOT_CLAIMED,TRUE,None,None,No fake PASS
+PR-007,CMAltimeter physically validated,no,CoreMotion field samples,Unit tests PASS,NOT_EXECUTED,N/A,N/A,NOT_CLAIMED,TRUE,None,None,Simulator insufficient
+PR-008,External Bühlmann validated,no,Third-party oracle,Internal oracle PASS,N/A,NOT_EXECUTED,N/A,NOT_CLAIMED,TRUE,None,WFC-P1-001,Correctly pending
+PR-009,Shallow wet QA passed,no,Wet session artifacts,DepthCapabilityTests PASS,NOT_EXECUTED,N/A,N/A,NOT_CLAIMED,TRUE,None,SDG-010,Correctly pending
+PR-010,Water auto-open physical QA passed,no,WAO field artifacts,Policy tests PASS,NOT_EXECUTED,N/A,N/A,NOT_CLAIMED,TRUE,None,WAO-PHY-001,Correctly pending
+PR-011,Water Lock / Crown / Action Button physical passed,no,HW field artifacts,Resolver tests PASS,NOT_EXECUTED,N/A,N/A,NOT_CLAIMED,TRUE,None,HWC-PHY-004,Correctly pending
+PR-012,Snorkeling navigation field verified,no,12 SNORKELING_* artifacts,14 test files software,NOT_EXECUTED,N/A,N/A,NOT_CLAIMED,TRUE,High,CONS-048,12/12 PENDING
+PR-013,GF presets are user conservatism not certification,yes,Copy + tests,GF matrix PASS,N/A,N/A,N/A,PASS,TRUE,Low,None,CLM-GF-01
+PR-014,Developer shallow testing is internal QA only,yes,DeveloperSettings + TF notes,DeveloperSettingsTests PASS,NOT_EXECUTED,N/A,N/A,PASS,TRUE,Medium,SDG-008,TF disclosure required
+PR-015,Command integrity automation trustworthy,yes,validate_commands script,Script FAIL,N/A,N/A,N/A,FAIL,FALSE,Medium,CONS-046,Regression after command upgrade
+PR-016,iOS automated regression trustworthy,yes,Full iOS test suite,BUILD FAILED,N/A,N/A,N/A,FAIL,FALSE,High,IOS-P1-001,Snorkeling compile regression
+PR-017,No EN13319/ISO 6425 certification claimed,yes,Copy scan,Disclaimers present,N/A,N/A,PENDING,PASS,TRUE,None,None,Correct posture
+PR-018,Privacy manifest complete,yes,PrivacyInfo.xcprivacy,Both targets PASS,N/A,N/A,N/A,PASS,TRUE,Low,None,Static review @ 451f8fb

@@ -1,24 +1,21 @@
 ID,Activity,Mode,Feature,Input,Initial_State,Expected_Result,Actual_Result,Absolute_Error,Relative_Error,Pass,Severity,Evidence,Notes
-EC-001,Diving,Full Computer,Zero depth,depth=0m,surface,Inspired pressure at surface; no NaN,Finite NDL at surface,N/A,N/A,YES,—,FullComputerRuntimeEngineTests,PENDING_PHYSICAL depth sensor
-EC-002,Diving,Full Computer,Negative depth,depth=-0.5m,active dive,Reject or clamp fail-closed,Sample rejected degraded,N/A,N/A,YES,—,DepthSampleValidation; FullComputerReleaseHardValidationTests,Simulator only
-EC-003,Diving,Full Computer,High depth,depth=350m cap,active dive,Reject beyond cap,Ingest blocked,N/A,N/A,YES,—,DepthSampleValidation,PENDING_PHYSICAL
-EC-004,Diving,Full Computer,Irregular timing,dt=0.5-30s,22m constant,Tissues integrate real elapsed,Oracle parity within 0.0002 bar,0,0,YES,—,FullComputerTimingFaultTests,
-EC-005,Diving,Full Computer,Duplicate timestamp,same timestamp twice,active dive,No double integration,Second sample ignored,0,0,YES,—,FullComputerTimingFaultTests,
-EC-006,Diving,Full Computer,Out-of-order timestamp,t2<t1,active dive,Reject degraded,non_monotonic_timestamp,N/A,N/A,YES,—,FullComputerTimingFaultTests,
-EC-007,Diving,Full Computer,Long suspension,121-1800s gap,active dive,Full integrate + degraded flag,No false deco clear,N/A,N/A,YES,P2,FullComputerTimingFaultTests,Conservative fallback presentation
-EC-008,Diving,Full Computer,Multilevel 39→10m,ML-01 profile,fresh tissues,Deco evolves from tissue state not timer,Schedule rebuilds; ceiling reduces at 10m,0 tissue error,0,YES,—,Audit15Air39MultilevelProfileTests,
-EC-009,Diving,Full Computer,Gas switch EAN50,ML-02 @21m,deco incurred,Old gas integrated to switch; new gas after,Oracle 0 failures,0,0,YES,—,Audit15MultilevelOracleProfilesTests testML02,
-EC-010,Diving,Full Computer,Deco clear then re-descent,ML-05,shallow clearance,Tissues preserved; deco may reappear,Oracle + checkpoint PASS,N/A,N/A,YES,—,Audit15RedescentOracleTests,
-EC-011,Diving,Full Computer,Stop band violation,±1m from stop,at stop,Timer pauses; tissues unchanged,Tissues not mutated by FSM,N/A,N/A,YES,—,FullComputerDecoStopStateMachineTests; testML06,
-EC-012,Diving,Full Computer,Invalid altitude import,5000m package,predive,Import rejected,invalidEnvironment,N/A,N/A,YES,—,OrchestratedAltitudeEnvironmentTests testInvalidAltitudePackageRejected,
-EC-013,Diving,Full Computer,Missing environment,predive,no env,runtimePlan nil; unavailable snapshot,missing_environment,N/A,N/A,YES,—,OrchestratedAltitudeEnvironmentTests,Prior ALT-P0 FIXED
-EC-014,Diving,Full Computer,Stale sensor proposal,>120s before start,pending proposal,validateForLiveStart stale; start blocked,Fail-closed,N/A,N/A,YES,—,FullComputerEnvironmentRecord.validateForLiveStart,PENDING_PHYSICAL sensor age
-EC-015,Diving,Full Computer,Corrupt checkpoint,SHA256 mismatch,restore,Reject restore; no fresh tissues,Fail-closed,N/A,N/A,YES,—,FullComputerRecoveryCheckpointTests,
-EC-016,Diving,Full Computer,NaN depth,non-finite sample,active dive,unavailable/degraded,No tissue NaN propagation,N/A,N/A,YES,—,FullComputerReleaseHardValidationTests,
-EC-017,Diving,Full Computer,Freshwater salinity,fresh 2000m import,predive,Correct water density in plan,Orchestrated test PASS,N/A,N/A,YES,—,OrchestratedAltitudeEnvironmentTests,
-EC-018,Diving,Full Computer,Cross-activity isolation,Gauge dive active,FC inactive,No FC tissue mutation,Namespace tests PASS,N/A,N/A,YES,—,FullComputerNamespaceIsolationTests,
-EC-019,Diving,Full Computer,Malformed sync payload,bad HMAC,sync,Reject payload,ActivitySync tests,N/A,N/A,YES,—,WatchSyncCryptographicLogicTests,Paired device NOT_EXECUTED
-EC-020,Diving,Full Computer,No physical evidence,underwater dive,N/A,PENDING_PHYSICAL,PENDING_PHYSICAL,N/A,N/A,PENDING,P2,PHYSICAL_QA_MATRIX,Do not fabricate
-EC-021,Diving,Full Computer,Shallow entitlement without dev toggle,appleShallow capability,FC start blocked,DepthCapabilityPolicy blocks FC,No runtime start,N/A,N/A,YES,—,DepthCapabilityTests; resolveAutomaticStep @5d757cc,Production + WAO path
-EC-022,Diving,Full Computer,Water auto-open cold launch,submerged at launch,route to water destination not skip predive,WatchLaunchRoutingPolicy,No tissue mutation,N/A,N/A,YES,—,WatchSubmersionLaunchProbeTests,PENDING_PHYSICAL routing UX
-EC-023,Diving,Full Computer,GF change attempt underwater,Crown/Action Button,GF unchanged in plan,No mid-dive GF mutation,N/A,N/A,YES,—,WatchUnderwaterActionResolverTests,Locked at dive start
+EC-001,Diving,Full Computer,Zero depth,depth=0,surface valid,NDL shown finite,NDL shown,PENDING,PENDING,PASS,P4,FullComputerRuntimeEngineTests,
+EC-002,Diving,Full Computer,Negative depth,depth=-1,active dive,Rejected non_finite/negative,Rejected,PENDING,PENDING,PASS,P4,ingestSample guard,
+EC-003,Diving,Full Computer,High depth,depth=60m,valid plan,Tissues load finite,Finite tissues,PENDING,PENDING,PASS,P3,Static review max depth policy,
+EC-004,Diving,Full Computer,Irregular timing,dt=2.7s,constant depth,degraded missed_tick,tissues integrated,PENDING,PENDING,PASS,P3,FullComputerTimingFaultTests,
+EC-005,Diving,Full Computer,Long dive,4h bottom,valid,Schedule capped maxScheduleMinutes,Capped,PENDING,PENDING,PASS,P3,BuhlmannConstants.maxScheduleMinutes,
+EC-006,Diving,Full Computer,Multilevel deco,39→10m,air GF30/70,Schedule evolves; no timer clear,Oracle PASS,PENDING,PENDING,PASS,P4,Audit15Air39MultilevelProfileTests,
+EC-007,Diving,Full Computer,Gas switch,EAN50@21m,deco incurred,Tissue continuous,Oracle PASS,PENDING,PENDING,PASS,P4,ML-02,
+EC-008,Diving,Full Computer,Deco clear at 10m,extended shallow,supersaturated,Clear only if model permits,Model-dependent,PENDING,PENDING,PASS,P4,Central forensic Q answered,
+EC-009,Diving,Full Computer,Re-descent after clear,surface interval partial,loaded tissues,Deco may reappear,Oracle PASS,PENDING,PENDING,PASS,P4,Audit15RedescentOracleTests,
+EC-010,Diving,Full Computer,Stop band 0.5m above,stop engaged,timer paused,timer paused,N/A,PENDING,PENDING,PASS,P4,FullComputerDecoStopStateMachineTests,
+EC-011,Diving,Full Computer,Stop band 1m below,stop engaged,stop reset/required,FSM requires again,N/A,PENDING,PENDING,PASS,P4,FullComputerDecoStopStateMachineTests,
+EC-012,Diving,Full Computer,Altitude 1000m,imported env,valid record,Surface pressure reduced,Orchestrated PASS,PENDING,PENDING,PASS,P3,OrchestratedAltitudeEnvironmentTests,
+EC-013,Diving,Full Computer,Freshwater salinity,manual env,freshwater,density consistent,Validated,PENDING,PENDING,PASS,P4,FullComputerEnvironmentRecord,
+EC-014,Diving,Full Computer,Restore mid-deco,checkpoint valid,32 tissues restored,No fresh tissues,PASS,PENDING,PENDING,PASS,P3,FullComputerRecoveryCheckpointTests,
+EC-015,Diving,Full Computer,Malformed sync,invalid HMAC,reject import,Fail closed,PASS,PENDING,PENDING,PASS,P3,DivePlanPackageCodecTests,
+EC-016,Diving,Full Computer,Stale sensor proposal,age>max,reject start,Fail closed,PASS,PENDING,PENDING,PASS,P3,FullComputerAltitudeSamplingPolicy,
+EC-017,Diving,Full Computer,Future schema checkpoint,schemaVersion+1,restore fails,Fail closed,PASS,PENDING,PENDING,PASS,P3,FullComputerRecoveryCheckpointTests,
+EC-018,Diving,Full Computer,No physical evidence,all paths,N/A,PENDING_PHYSICAL marked,PENDING,PENDING,PENDING,N/A,P2,Audit rule,
+EC-019,Snorkeling,Snorkeling,GPS isolation,route active,N/A,No FC engine reference,PASS,PENDING,PENDING,PASS,P4,SnorkelingCrossDomainIsolationTests,Isolation check only
+EC-020,Diving,Full Computer,Duplicate timestamp,duplicate tick,no double integrate,Guard or degrade,Degraded/reject,PENDING,PENDING,PASS,P3,FullComputerTimingFaultTests,

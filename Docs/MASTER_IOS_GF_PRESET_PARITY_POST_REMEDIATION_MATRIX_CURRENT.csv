@@ -1,0 +1,9 @@
+Check_ID,Component,iOS_Value,Watch_Value,Package_Field,Import_Result,Test_Coverage,CONS_ID,Verdict,Evidence,Notes
+GF-PAR-001,Conservative preset,20/80,conservative2080,gradientFactorPreset=conservative2080,Import accepts,PlannerGFPresetDisplayTests;DivePlanPackageBuilderTests,CONS-002,PASS,PlannerModePolicy.swift @451f8fb,Aligned triplet
+GF-PAR-002,Standard preset,30/70,standard3070,gradientFactorPreset=standard3070,Import accepts,PlannerGFPresetDisplayTests;DivePlanPackageBuilderTests,CONS-002,PASS,FullComputerGradientFactorPreset.matching,Watch default preset
+GF-PAR-003,Aggressive preset,40/85,moderate4085,gradientFactorPreset=moderate4085,Import accepts,PlannerGFPresetDisplayTests;DivePlanPackageBuilderTests,CONS-002,PASS,iOS aggressive ↔ Watch moderate4085 naming only
+GF-PAR-004,Invalid pair 30/80,30/80,unsupported,none or mismatch,Import fail-closed,FullComputerImportedPlanStoreTests,CONS-002,PASS,invalidGradientFactors before checksumMismatch,Fail-closed preserved
+GF-PAR-005,Builder emission,All three presets,All three FC presets,gradientFactorPreset optional field,Watch codec round-trip,DivePlanPackageBuilderTests.testBuilderEmitsGradientFactorPresetForAllPlannerPresets,CONS-002,PASS,DivePlanPackageBuilder.build @451f8fb,Schema field populated
+GF-PAR-006,Base mode GF override,Forced 30/70,standard3070 if exported,N/A if Base hidden,Base projection only,PlannerModePolicyTests,CONS-002,PASS,Base strips draft GF for calculation,UI must not show draft GF as authoritative
+GF-PAR-007,iOS plan lock on Watch,iosPlan source,FullComputerGradientFactorSettingsStore,package gradientFactorPreset,Active dive locks override,FullComputerGradientFactorSettingsStoreTests,CONS-002,PASS,Watch-side; iOS emits compatible package,Physical paired QA pending
+GF-PAR-008,External Bühlmann spot-check,N/A,N/A,N/A,N/A,Not executed,CONS-043,PENDING_EXTERNAL_VALIDATION,MASTER_WATCH_FULL_COMPUTER_GF_PRESET_MATRIX,Software PASS only

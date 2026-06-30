@@ -1,66 +1,37 @@
-# Master Security Remediation Plan (Current)
+# DIR DIVING — Master Security Remediation Plan (Current)
 
-**Audit command:** 04 — MASTER MAIN CODE / SYNC / SECURITY / PERFORMANCE AUDIT V1.1  
-**Branch:** `main` @ `5d757cc`  
-**Date:** 2026-06-28  
-**Pass type:** Post-remediation audit rerun (read-only)
+**Audit:** 04 @ `451f8fb` | **Date:** 2026-06-30
 
----
+## Software posture
 
-## Executive summary
+Static security controls **PASS** at `451f8fb`: HMAC v3 envelopes, activity routing guards, signed tombstones, peer secret pinning, path-sanitized file transfers, Privacy Manifests, App Intent legal gates, simulation release blocks.
 
-Software-verifiable security posture **strong** at `5d757cc`. **All three P1 sync integrity items closed** (in-flight release, symmetric userInfo ACK, signed tombstone primary path). Remaining work: **field QA** and **documented accepted risks**.
+## Open remediation (by priority)
 
-| Severity | Open (software) | Pending physical | Documented accepted |
-|----------|-----------------|------------------|---------------------|
-| P0 | 0 | 0 | 0 |
-| P1 | 0 | 0 | 1 (legacy tombstone bootstrap mirror P3) |
-| P2 | 0 | 2 | 0 |
-| P3 | 0 | 0 | 2 |
+### P1
 
----
+| ID | Gap | Remediation | Tests |
+|----|-----|-------------|-------|
+| MAIN-P1-001 | Command integrity script stale | Update script paths (process gate) | `validate_commands_for_cursor_integrity.sh` PASS |
 
-## Closed P1 (verified @ 5d757cc)
+### P2 — field validation (no fake evidence)
 
-| ID | Topic | Remediation verified |
-|----|-------|---------------------|
-| MASTER-SYNC-002 / CONS-004 | userInfo ACK asymmetry | `sendDiveImportAckToWatch` on iOS `didReceiveUserInfo` |
-| MASTER-SYNC-003 / CONS-005 | Tombstone HMAC | Signed primary via `ActivitySyncTombstoneBroadcast.verifiedSessionIDs` |
-| MASTER-PERF-006 / CONS-003 | Sync queue stuck | `releaseInFlightOutboundSession` on all error paths |
-| MASTER-DEPTH-001 / CONS-006 | Shallow FC dev toggles | Default OFF; TestFlight opt-in |
-| MASTER-DEPTH-002 / CONS-007 | Depth tier authority | `runtimeAuthorityTier` compile flags |
+| ID | Gap | Remediation | Tests |
+|----|-----|-------------|-------|
+| MAIN-SEC-001 | Paired sync security not field-verified | Execute paired QA matrix | SEC-NEG field cases |
+| MAIN-SYNC-001 | Large payload file transfer not field-verified | 5MB round-trip on hardware | ActivitySyncLargePayloadTransfer + field |
 
----
+### P3 — accepted architectural boundaries
 
-## Closed findings (verified)
+| ID | Gap | Posture |
+|----|-----|---------|
+| MAIN-SEC-002 | WC TOFU peer secret bootstrap | DOCUMENTED_ACCEPTED_RISK — pinning + reset epoch |
+| MAIN-SYNC-004 | Legacy diving tombstone UUID mirror at bootstrap | DOCUMENTED_ACCEPTED_RISK — signed path primary |
 
-| ID | Topic | Status | Evidence |
-|----|-------|--------|----------|
-| SEC-P1-001 | Privacy manifests | FIXED | PrivacyInfo-Watch/iOS.xcprivacy |
-| SEC-P2-004 | Simulation release safety | FIXED | TestFlightSimulationSafetyPolicy |
-| SEC-P2-005 | Protected sync queues | FIXED | ProtectedSensitiveFileStore |
-| INFO-06 | App Intent legal gate | PASS | ActionButtonIntents |
-| INFO-09 | Water auto-open predive gate | PASS | DIRModesAndStartupFlowTests |
+## Do not weaken
 
----
-
-## Pending physical (P2)
-
-| ID | Topic |
-|----|-------|
-| MASTER-SEC-001 | Paired tombstone/HMAC/replay field verification |
-| MASTER-SYNC-001 | Large payload paired round-trip |
-
----
-
-## Documented accepted risks (P3)
-
-| ID | Topic |
-|----|-------|
-| MASTER-SEC-002 | TOFU peer secret via WC applicationContext |
-| MASTER-DEPTH-003 | DEBUG depth API bypass |
-| MASTER-SYNC-003-residual | Legacy diving UUID tombstone bootstrap mirror when peer secret absent |
-
----
-
-**Remediation sequencing:** P1 sync/depth closed; execute field SEC-NEG matrix; maintain TOFU documentation.
+- HMAC verification or constant-time compare
+- Activity envelope `activityType` discriminator
+- Cross-decode rejection in `ActivitySyncRoutingGuard`
+- Briefing card reference-only policy on Watch
+- Cloud backup opt-in truthfulness per activity
