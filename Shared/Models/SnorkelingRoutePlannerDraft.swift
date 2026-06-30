@@ -128,3 +128,16 @@ struct SnorkelingRoutePlannerDraft: Identifiable, Codable, Hashable, Sendable {
         }
     }
 }
+
+extension SnorkelingRoutePlannerDraft {
+    var hasRoutePoints: Bool {
+        entryPoint != nil || !waypoints.isEmpty || exitPoint != nil
+    }
+
+    mutating func resetMapPoints() {
+        entryPoint = nil
+        waypoints.removeAll()
+        exitPoint = nil
+        updatedAt = Date()
+    }
+}

@@ -2423,6 +2423,14 @@
 "snorkeling.ios.planner.issue.invalid_coordinate" = "One or more coordinates are invalid";
 "snorkeling.ios.planner.issue.exceeds_distance" = "Route exceeds max distance limit";
 "snorkeling.ios.planner.issue.duplicate_point" = "Duplicate route point";
+"snorkeling.map.center_current_location" = "Center on current location";
+"snorkeling.map.current_location_unavailable" = "Current location is not available yet.";
+"snorkeling.map.location_permission_required_to_center" = "Enable location to center the map on your current position.";
+"snorkeling.route_points.reset_map" = "Reset map";
+"snorkeling.route_points.reset_map.confirm_title" = "Reset map?";
+"snorkeling.route_points.reset_map.confirm_message" = "This will remove entry, waypoints and exit from the current route.";
+"snorkeling.route_points.reset_map.confirm_action" = "Reset";
+"snorkeling.route_points.reset_map.disabled_hint" = "No route points to reset.";
 "snorkeling.ios.map.permission_denied" = "Location permission denied. Enable Location to place route points on the map.";
 "snorkeling.ios.map.permission_required" = "Location permission is required to use the map.";
 "snorkeling.ios.map.unavailable" = "Map unavailable until location permission is granted.";
