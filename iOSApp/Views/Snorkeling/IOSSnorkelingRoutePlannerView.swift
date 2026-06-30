@@ -14,6 +14,9 @@ struct IOSSnorkelingRoutePlannerView: View {
     @State private var mapSelectionMode: MapSelectionMode = .entry
     @State private var mapPosition: MapCameraPosition = .automatic
     @State private var transferMessage: String?
+    @State private var mapNotice: String?
+    @State private var pendingCenterOnLocation = false
+    @State private var isResetMapConfirmationPresented = false
 
     private enum MapSelectionMode: String, CaseIterable, Identifiable {
         case entry, waypoint, exit
@@ -29,8 +32,8 @@ struct IOSSnorkelingRoutePlannerView: View {
                         .foregroundStyle(.white)
 
                     mapSection
-                    planFields
                     waypointList
+                    profilesSection
                     estimatesCard
                     validationSection
                     transferSection
@@ -46,12 +49,23 @@ struct IOSSnorkelingRoutePlannerView: View {
             locationPermission.refresh()
             updateMapPosition()
         }
+        .onChange(of: locationPermission.lastKnownCoordinate?.latitude) { _, _ in
+            guard pendingCenterOnLocation, let coordinate = locationPermission.lastKnownCoordinate else { return }
+            applyMapCenter(coordinate)
+            pendingCenterOnLocation = false
+            mapNotice = nil
+        }
     }
 
     private var mapSection: some View {
         DIRCard(DIRIOSLocalizer.string("snorkeling.ios.planner.map_title"), icon: "map.fill", accent: DIRTheme.cyan) {
             VStack(alignment: .leading, spacing: 10) {
                 permissionBanner
+                if let mapNotice {
+                    Text(mapNotice)
+                        .font(.caption)
+                        .foregroundStyle(DIRTheme.orange)
+                }
                 Picker(DIRIOSLocalizer.string("snorkeling.ios.planner.map_mode"), selection: $mapSelectionMode) {
                     Text(DIRIOSLocalizer.string("snorkeling.ios.planner.entry")).tag(MapSelectionMode.entry)
                     Text(DIRIOSLocalizer.string("snorkeling.ios.planner.waypoint")).tag(MapSelectionMode.waypoint)
@@ -71,6 +85,9 @@ struct IOSSnorkelingRoutePlannerView: View {
                         .mapStyle(IOSSnorkelingMapStyleMapper.mapStyle(for: settingsStore.mapType))
                         .frame(minHeight: 260)
                         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .overlay(alignment: .topTrailing) {
+                            centerCurrentLocationButton
+                        }
                         .onTapGesture { location in
                             guard let coordinate = proxy.convert(location, from: .local) else { return }
                             applyCoordinate(coordinate)
@@ -81,6 +98,20 @@ struct IOSSnorkelingRoutePlannerView: View {
                 }
             }
         }
+    }
+
+    private var centerCurrentLocationButton: some View {
+        Button(action: centerMapOnCurrentLocation) {
+            Image(systemName: "location.north.fill")
+                .font(.headline)
+                .foregroundStyle(DIRTheme.cyan)
+                .padding(10)
+                .background(.ultraThinMaterial)
+                .clipShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .padding(12)
+        .accessibilityLabel(DIRIOSLocalizer.string("snorkeling.map.center_current_location"))
     }
 
     @MapContentBuilder
@@ -99,8 +130,8 @@ struct IOSSnorkelingRoutePlannerView: View {
         }
     }
 
-    private var planFields: some View {
-        DIRCard(accent: DIRTheme.cyan) {
+    private var profilesSection: some View {
+        DIRCard(DIRIOSLocalizer.string("snorkeling.ios.planner.profile"), icon: "person.fill", accent: DIRTheme.cyan) {
             VStack(alignment: .leading, spacing: 12) {
                 TextField(DIRIOSLocalizer.string("snorkeling.ios.planner.name"), text: $plannerStore.draft.name)
                     .textFieldStyle(.roundedBorder)
@@ -123,6 +154,26 @@ struct IOSSnorkelingRoutePlannerView: View {
     private var waypointList: some View {
         DIRCard(DIRIOSLocalizer.string("snorkeling.ios.planner.waypoints"), icon: "point.3.connected.trianglepath.dotted", accent: DIRTheme.cyan) {
             VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Spacer()
+                    Button(role: .destructive) {
+                        isResetMapConfirmationPresented = true
+                    } label: {
+                        Label(
+                            DIRIOSLocalizer.string("snorkeling.route_points.reset_map"),
+                            systemImage: "arrow.counterclockwise"
+                        )
+                        .font(.subheadline.weight(.semibold))
+                    }
+                    .disabled(!plannerStore.draft.hasRoutePoints)
+                    .accessibilityLabel(DIRIOSLocalizer.string("snorkeling.route_points.reset_map"))
+                    .accessibilityHint(
+                        plannerStore.draft.hasRoutePoints
+                            ? DIRIOSLocalizer.string("snorkeling.route_points.reset_map.confirm_message")
+                            : DIRIOSLocalizer.string("snorkeling.route_points.reset_map.disabled_hint")
+                    )
+                }
+
                 pointRow(
                     title: DIRIOSLocalizer.string("snorkeling.ios.planner.entry"),
                     point: plannerStore.draft.entryPoint,
@@ -148,6 +199,17 @@ struct IOSSnorkelingRoutePlannerView: View {
                     color: DIRTheme.orange
                 )
             }
+        }
+        .alert(
+            DIRIOSLocalizer.string("snorkeling.route_points.reset_map.confirm_title"),
+            isPresented: $isResetMapConfirmationPresented
+        ) {
+            Button(DIRIOSLocalizer.string("common.cancel"), role: .cancel) {}
+            Button(DIRIOSLocalizer.string("snorkeling.route_points.reset_map.confirm_action"), role: .destructive) {
+                resetCurrentRoutePoints()
+            }
+        } message: {
+            Text(DIRIOSLocalizer.string("snorkeling.route_points.reset_map.confirm_message"))
         }
     }
 
@@ -333,6 +395,46 @@ struct IOSSnorkelingRoutePlannerView: View {
             longitudeDelta: max(0.01, (lons.max()! - lons.min()!) * 1.5)
         )
         mapPosition = .region(MKCoordinateRegion(center: center, span: span))
+    }
+
+    private func centerMapOnCurrentLocation() {
+        let coordinate = locationPermission.currentCoordinate
+        let outcome = SnorkelingRoutePlannerMapCenterPolicy.resolve(
+            permissionState: locationPermission.permissionState,
+            currentLatitude: coordinate?.latitude,
+            currentLongitude: coordinate?.longitude
+        )
+        switch outcome {
+        case .center(let region):
+            applyMapCenter(CLLocationCoordinate2D(latitude: region.latitude, longitude: region.longitude), spanDelta: region.latitudeDelta)
+            mapNotice = nil
+            pendingCenterOnLocation = false
+        case .requestPermission:
+            locationPermission.requestWhenInUseFromUserAction()
+        case .notice(let key):
+            mapNotice = DIRIOSLocalizer.string(key)
+            if locationPermission.permissionState == .authorized {
+                pendingCenterOnLocation = true
+                locationPermission.requestCurrentLocationForMapCenter()
+            }
+        }
+    }
+
+    private func applyMapCenter(_ coordinate: CLLocationCoordinate2D, spanDelta: Double = SnorkelingMapCenterRegion.plannerDefaultSpan) {
+        withAnimation(.easeInOut(duration: 0.25)) {
+            mapPosition = .region(
+                MKCoordinateRegion(
+                    center: coordinate,
+                    span: MKCoordinateSpan(latitudeDelta: spanDelta, longitudeDelta: spanDelta)
+                )
+            )
+        }
+    }
+
+    private func resetCurrentRoutePoints() {
+        plannerStore.resetMapPoints()
+        mapSelectionMode = .entry
+        updateMapPosition()
     }
 
     private func sendToWatch() {

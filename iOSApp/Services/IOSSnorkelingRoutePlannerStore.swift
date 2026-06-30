@@ -90,6 +90,11 @@ final class IOSSnorkelingRoutePlannerStore: ObservableObject {
         persistDraft()
     }
 
+    func resetMapPoints() {
+        draft.resetMapPoints()
+        persistDraft()
+    }
+
     func resetDraft() {
         draft = SnorkelingRoutePlannerDraft(name: "")
         persistDraft()
