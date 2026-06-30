@@ -76,16 +76,18 @@ enum SnorkelingRouteValidator {
         }
 
         let sortedWaypoints = draft.waypoints.sorted { $0.routeOrder < $1.routeOrder }
-        for index in 1 ..< sortedWaypoints.count {
-            let previous = sortedWaypoints[index - 1]
-            let current = sortedWaypoints[index]
-            let spacing = SnorkelingDomainSupport.distanceMeters(
-                from: (previous.latitude, previous.longitude),
-                to: (current.latitude, current.longitude)
-            )
-            if spacing > 250 {
-                warnings.append(.waypointSpacingLarge)
-                break
+        if sortedWaypoints.count >= 2 {
+            for index in 1 ..< sortedWaypoints.count {
+                let previous = sortedWaypoints[index - 1]
+                let current = sortedWaypoints[index]
+                let spacing = SnorkelingDomainSupport.distanceMeters(
+                    from: (previous.latitude, previous.longitude),
+                    to: (current.latitude, current.longitude)
+                )
+                if spacing > 250 {
+                    warnings.append(.waypointSpacingLarge)
+                    break
+                }
             }
         }
 

@@ -1,0 +1,9 @@
+Gate_ID,Category,Status,Notes
+CONS-048,Snorkeling field QA,PENDING_PHYSICAL,12 templates unchanged
+CONS-010,Watch FC wet depth,PENDING_PHYSICAL,
+CONS-021,Water auto-open,PENDING_PHYSICAL,
+CONS-022,Crown/Action Button,PENDING_PHYSICAL,
+CONS-042,Shallow wet QA,PENDING_PHYSICAL,
+CONS-009,External Bühlmann,PENDING_EXTERNAL_VALIDATION,
+CONS-044,Legal review,PENDING_LEGAL_REVIEW,
+APP_STORE,Release,NOT_READY,Physical/external/legal pending

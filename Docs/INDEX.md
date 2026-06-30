@@ -1,7 +1,19 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` = `origin/main` @ `abfb574`
+**Branch consigliato:** `main` = `origin/main` @ `7a429a7`
+
+---
+
+## Aggiornamento indice 2026-06-17 — Command 11 software remediation @ `7a429a7`
+
+IOS-P1-001 / CONS-049 and CONS-046 fixed; 1637 iOS tests PASS; internal TestFlight software **READY**; physical/external gates pending.
+
+| Campo | Valore |
+|-------|--------|
+| **Report** | [`MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_FROM_2026_06_30_AUDIT_REPORT_CURRENT.md`](MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_FROM_2026_06_30_AUDIT_REPORT_CURRENT.md) |
+| **Verdict** | [`MASTER_POST_REMEDIATION_FINAL_VERDICT_CURRENT.md`](MASTER_POST_REMEDIATION_FINAL_VERDICT_CURRENT.md) |
+| **Verdict** | **SOFTWARE_READY 100%** · **INTERNAL_TF_READY** · **PHYSICAL_QA_PENDING** |
 
 ---
 
