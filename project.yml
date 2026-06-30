@@ -524,6 +524,10 @@ targets:
       - iOSApp/Services/IOSApneaProfileStore.swift
       - iOSApp/Services/IOSApneaPlannerStore.swift
       - iOSApp/Services/IOSApneaLogbookStore.swift
+      - iOSApp/Services/IOSActivityDemoLogbookSettingsStore.swift
+      - iOSApp/Services/FakeApneaLogbookProvider.swift
+      - iOSApp/Services/FakeSnorkelingLogbookProvider.swift
+      - iOSApp/Models/IOSLogbookDisplayModels.swift
       - iOSApp/Services/IOSApneaSettingsStore.swift
       - iOSApp/Services/SharedIOSSettingsStore.swift
       - iOSApp/Services/IOSSnorkelingSettingsStore.swift

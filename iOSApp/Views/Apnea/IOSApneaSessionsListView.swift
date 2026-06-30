@@ -2,29 +2,79 @@ import SwiftUI
 
 struct IOSApneaSessionsListView: View {
     @EnvironmentObject private var logbook: IOSApneaLogbookStore
+    @EnvironmentObject private var demoLogbookSettings: IOSActivityDemoLogbookSettingsStore
     @AppStorage(IOSUnitPreference.storageKey) private var unitsRaw = IOSUnitPreference.metric.rawValue
 
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
 
+    private var realEntries: [IOSApneaLogbookDisplayEntry] {
+        IOSLogbookDisplayComposer.apneaEntries(realSessions: logbook.sessions, demoSessions: [])
+    }
+
+    private var demoEntries: [IOSApneaLogbookDisplayEntry] {
+        guard demoLogbookSettings.isApneaFakeLogbookEnabled else { return [] }
+        return IOSLogbookDisplayComposer.apneaEntries(
+            realSessions: [],
+            demoSessions: FakeApneaLogbookProvider.entries()
+        )
+    }
+
+    private var hasRealLogs: Bool { !logbook.sessions.isEmpty }
+    private var hasDemoLogs: Bool { !demoEntries.isEmpty }
+    private var isEmpty: Bool { !hasRealLogs && !hasDemoLogs }
+
     var body: some View {
         NavigationStack {
             DIRScreenContainer {
-                if logbook.sessions.isEmpty {
+                if isEmpty {
                     emptyState
                 } else {
-                    List(logbook.sessions) { session in
-                        NavigationLink {
-                            IOSApneaSessionDetailView(session: session)
-                        } label: {
-                            sessionRow(for: session)
+                    List {
+                        if hasDemoLogs && !hasRealLogs {
+                            demoOnlyBanner
+                                .listRowBackground(Color.clear)
                         }
-                        .listRowBackground(Color.clear)
+                        if hasRealLogs {
+                            if hasDemoLogs {
+                                Section(DIRIOSLocalizer.string("settings.demo_logbook.real_logs")) {
+                                    ForEach(realEntries) { entry in
+                                        sessionLink(entry)
+                                    }
+                                }
+                                .listRowBackground(Color.clear)
+                            } else {
+                                ForEach(realEntries) { entry in
+                                    sessionLink(entry)
+                                }
+                                .listRowBackground(Color.clear)
+                            }
+                        }
+                        if hasDemoLogs {
+                            Section(DIRIOSLocalizer.string("settings.demo_logbook.demo_logs")) {
+                                ForEach(demoEntries) { entry in
+                                    sessionLink(entry)
+                                }
+                            }
+                            .listRowBackground(Color.clear)
+                        }
                     }
                     .scrollContentBackground(.hidden)
                 }
             }
             .navigationTitle(DIRIOSLocalizer.string("apnea.ios.sessions.title"))
         }
+    }
+
+    private var demoOnlyBanner: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(DIRIOSLocalizer.string("settings.demo_logbook.viewing_demo_banner"))
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(DIRTheme.orange)
+            Text(DIRIOSLocalizer.string("settings.demo_logbook.not_saved_real"))
+                .font(.caption)
+                .foregroundStyle(DIRTheme.muted)
+        }
+        .padding(.vertical, 4)
     }
 
     private var emptyState: some View {
@@ -42,9 +92,21 @@ struct IOSApneaSessionsListView: View {
         }
     }
 
-    private func sessionRow(for session: ApneaSession) -> some View {
-        let row = IOSApneaLogbookPresentationMapper.sessionRow(session, units: unitPreference)
+    @ViewBuilder
+    private func sessionLink(_ entry: IOSApneaLogbookDisplayEntry) -> some View {
+        NavigationLink {
+            IOSApneaSessionDetailView(session: entry.session, isDemoSession: entry.isDemo)
+        } label: {
+            sessionRow(for: entry)
+        }
+    }
+
+    private func sessionRow(for entry: IOSApneaLogbookDisplayEntry) -> some View {
+        let row = IOSApneaLogbookPresentationMapper.sessionRow(entry.session, units: unitPreference)
         return HStack(spacing: 12) {
+            if entry.isDemo {
+                DemoLogbookBadge()
+            }
             if row.showsQualityWarning {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .foregroundStyle(DIRTheme.orange)
@@ -85,7 +147,8 @@ struct IOSApneaStatisticsView: View {
     private var unitPreference: IOSUnitPreference { IOSUnitPreference.fromStorage(unitsRaw) }
 
     private var filteredSessions: [ApneaSession] {
-        let ranged = ApneaLogbookStatistics.filteredSessions(in: range, from: logbook.sessions)
+        let realOnly = logbook.sessions.filter { !DemoApneaSessionCatalog.isDemoSession(id: $0.id) }
+        let ranged = ApneaLogbookStatistics.filteredSessions(in: range, from: realOnly)
         guard eligibleOnly else { return ranged }
         return ranged.filter {
             ApneaRecordEligibilityPolicy.isEligibleForRecords($0, options: .default)

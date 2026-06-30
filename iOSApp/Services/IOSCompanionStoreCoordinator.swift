@@ -20,6 +20,7 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
     let divingSettingsStore: IOSDivingSettingsStore
     let plannerBriefingTransfer: PlannerBriefingWatchTransferService
     let divePlanPackageTransfer: DivePlanPackageWatchTransferService
+    let demoLogbookSettings: IOSActivityDemoLogbookSettingsStore
 
     private var apneaBundle: IOSApneaStoreBundle?
     private var snorkelingBundle: IOSSnorkelingStoreBundle?
@@ -51,10 +52,12 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
         )
         plannerBriefingTransfer = PlannerBriefingWatchTransferService()
         divePlanPackageTransfer = DivePlanPackageWatchTransferService()
+        demoLogbookSettings = IOSActivityDemoLogbookSettingsStore()
 
         forwardNestedStoreChanges(from: legalAcceptance)
         forwardNestedStoreChanges(from: companionActivity)
         forwardNestedStoreChanges(from: sharedSettings)
+        forwardNestedStoreChanges(from: demoLogbookSettings)
     }
 
     func ensureApneaSettingsStore() -> IOSApneaSettingsStore {
@@ -149,6 +152,7 @@ final class IOSCompanionStoreCoordinator: ObservableObject {
             .environmentObject(companionActivity)
             .environmentObject(companionSettingsScope)
             .environmentObject(sharedSettings)
+            .environmentObject(demoLogbookSettings)
     }
 
     @ViewBuilder
