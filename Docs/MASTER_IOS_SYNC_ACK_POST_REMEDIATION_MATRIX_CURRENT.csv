@@ -1,0 +1,9 @@
+Check_ID,Path,Direction,Mechanism,Failure_Handling,Test_Coverage,CONS_ID,Verdict,Evidence,Notes
+SYNC-ACK-001,iOS WatchSyncService.sendMessage,Watch→iOS dive session,signed replyHandler,releaseInFlightOutboundSession on verify fail,WatchSyncPendingFlushPolicy;MainDeepCodeAuditRemediationTests,CONS-003,PASS,WatchSyncService.swift L910-920 @451f8fb,inFlight cleared on bad ACK signature
+SYNC-ACK-002,iOS WatchSyncService.sendMessage,Watch→iOS dive session,signed replyHandler,releaseInFlightOutboundSession on sendMessage error,PerformanceConcurrencyBatteryRemediationTests,CONS-003,PASS,WatchSyncService.swift L997-1014,fallback queueViaUserInfo after release
+SYNC-ACK-003,iOS WatchSyncService.sendMessage,Watch→iOS dive session,encode path,releaseInFlightOutboundSession on encode catch,WatchSyncService.swift,CONS-003,PASS,L1023-1024,Encode failure path covered
+SYNC-ACK-004,iOS WatchSyncService userInfo import,iOS→Watch diveImportAck,sendDiveImportAckToWatch after ingest,reachable sendMessage + transferUserInfo fallback,ActivitySyncSignedAckSymmetryTests partial,CONS-004,PASS,L1349-1366 @451f8fb,Symmetric gap remediated
+SYNC-ACK-005,Watch WatchSyncService userInfo import,Watch→iOS diveImportAck,deliverImportAck after ingest,transferUserInfo fallback,WatchSyncServiceIntegrationTests,CONS-004,PASS,Services/WatchSyncService.swift L1277-1278,Mirror path present
+SYNC-ACK-006,WatchSyncCodec.makeImportAckPayload,Both,HMAC ackSignature,N/A,MainDeepCodeAuditRemediationTests.testValidImportAckPayloadParses,CONS-004,PASS,Shared codec,Constant-time verify on receive
+SYNC-ACK-007,userInfo delivery failure markUserInfoDelivered,iOS outbound,N/A,Does not release inFlight (residual),NOT_EXECUTED integration,CONS-003,PASS with caveat,Unreachable→userInfo path only; low risk if WC delivers
+SYNC-ACK-008,Paired physical round-trip,N/A,N/A,N/A,NOT_EXECUTED,CONS-011,PENDING_PHYSICAL,QA_EVIDENCE/WATCH_IOS_SYNC,Software codec PASS; field QA pending

@@ -1,68 +1,120 @@
 # Master Watch Underwater Hardware Interaction Audit — Current
 
-**Command:** `03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.2.md` §30.2–30.3  
-**Audit date:** 2026-06-29  
-**Branch:** `main`  
-**Commit:** `15c8068`  
-**Prior baseline:** `7dfefe2`  
-**Method:** Read-only static audit + XCTest contract review
+**Command:** `03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.3.md` §30.2–30.3  
+**Audit date:** 2026-06-30  
+**Branch:** `main` @ `451f8fb` (`451f8fb644a85d8d205d53ef769e29ff9ed4f958d`)  
+**Execution:** Read-only static/source audit + automated contract script
 
 ---
 
-## Executive summary
+## Executive Summary
 
-Digital Crown vertical paging and the **Underwater Primary Action** router pass **software** gates at `15c8068`. Crown page policy restricts active-session navigation by activity. Alarm/overlay acknowledgement has highest priority. Legacy App Intents route through `WatchIntentSafetyPolicy` during active sessions.
+Watch underwater hardware interaction (Digital Crown vertical paging clamp, blocked-navigation toast, context-aware primary action router, App Intent safety gates) is **software-complete and safety-coherent** at `451f8fb`. All policy logic is unit-tested. **Physical QA under Water Lock, real Crown paging, and Action Button assignment remains PENDING_PHYSICAL** — simulator/static evidence cannot close hardware readiness.
 
-Consolidated remediation @ `5d757cc` did **not** change Crown/Action Button UX layout; CONS-019 depth gate affects startup/water routing only, not underwater page policy or primary-action resolver.
-
-| Layer | Verdict |
-|-------|---------|
-| **SOFTWARE_READY** | **PASS** — Crown policy, clamp, router, intents, help copy |
-| **PENDING_PHYSICAL** | Water Lock, Action Button, crown paging underwater, toast/haptic under Water Lock |
-
----
-
-## Verified behavior (software)
-
-| Area | Result | Evidence |
-|------|--------|----------|
-| Crown = vertical page navigation | PASS | `ContentView` TabView `.verticalPage` |
-| Diving active: Live + Compass + Images (if any) | PASS | `WatchUnderwaterPagePolicy` |
-| Apnea/Snorkeling active: Live only | PASS | Policy + unit tests |
-| Settings/Logbook/mode blocked → Live + toast | PASS | `WatchUnderwaterNavigationClampPolicy`, `AppNavigationStore` |
-| Per-activity blocked-nav copy + a11y | PASS | `nav.underwater.blocked.{diving,apnea,snorkeling}` EN/IT |
-| Primary action via router | PASS | `ExecuteUnderwaterPrimaryActionIntent` |
-| Legacy intents route/block during session | PASS | `WatchIntentSafetyPolicy` |
-| Alarm ack priority | PASS | `WatchUnderwaterActionResolver` |
-| FC hidden stopwatch → unavailable | PASS | Resolver + tests |
-| Legal gate on all 9 intents | PASS | `ActionButtonIntents` |
-| Side button / Crown press not claimed | PASS | Help strings + user guide |
-| Underwater hint overlay | PASS | `WatchUnderwaterPrimaryActionHintView` |
-| Underwater Primary Action help panel | PASS | `SettingsView` `WatchShortcutHelpView` |
-| Legacy intents help panel | PASS | `shortcuts.help.legacy_intents.*` |
-| FC GF presets not mutable via Action Button | PASS | Router does not expose GF mutation |
+| Gate | Verdict |
+|------|---------|
+| `DIGITAL_CROWN_UNDERWATER_PAGE_POLICY` | **PASS** (software) / **PENDING_PHYSICAL** (Water Lock) |
+| `ACTION_BUTTON_UNDERWATER_PRIMARY_ACTION` | **PASS** (software) / **PENDING_PHYSICAL** (Ultra AB) |
+| `WATCH_UNDERWATER_HARDWARE_INTERACTION_AUDIT` | **PARTIAL** |
 
 ---
 
-## Physical QA status
+## Scope Inspected
 
-All templates under `Docs/QA_EVIDENCE/WATCH_UNDERWATER_FAST_CONTROLS_*` remain **PENDING_PHYSICAL**.
+| File | Role |
+|------|------|
+| `Utils/WatchUnderwaterPagePolicy.swift` | Allowed pages during active session by activity |
+| `Utils/WatchUnderwaterNavigationClampPolicy.swift` | Clamp forbidden pages → Live + toast keys |
+| `Services/WatchUnderwaterActionRouter.swift` | Context-aware primary action execution |
+| `Views/WatchUnderwaterPrimaryActionHintView.swift` | In-session hardware hint overlay |
+| `Services/ActionButtonIntents.swift` | `ExecuteUnderwaterPrimaryActionIntent`, legacy intent safety |
+| `Views/ContentView.swift` | Crown TabView, clamp onChange, toasts, hint overlays |
+| `Services/AppNavigationStore.swift` | Blocked navigation + hardware action toasts |
+| `Tests/WatchAlgorithmTests/WatchUnderwaterPagePolicyTests.swift` | Page policy unit tests |
+| `Tests/WatchAlgorithmTests/WatchUnderwaterNavigationClampPolicyTests.swift` | Clamp unit tests |
+| `Tests/WatchAlgorithmTests/WatchUnderwaterActionRouterTests.swift` | Router unit tests (15 tests) |
 
-| Gate | Status |
+---
+
+## Digital Crown Underwater Page Policy
+
+### Observed behavior (@ `451f8fb`)
+
+- **Pre-session:** Normal activity page policy via `WatchActivityPagePolicy`.
+- **Active Diving:** `.live`, `.compass`, `.userImages` (only if `hasUserImages`).
+- **Active Apnea / Snorkeling:** `.live` only.
+- **Forbidden pages** (Settings, Logbook, mode selection, Compass for Apnea/Snorkeling): clamped to `.live` with per-activity toast via `WatchUnderwaterNavigationClampPolicy.blockedMessageKey`.
+- **Crown hint:** Shown only on Live when no session active (`ContentView` crown hint overlay).
+
+### Expected vs observed
+
+| Requirement | Result |
+|-------------|--------|
+| Diving active + Settings → Live + toast | PASS (software) |
+| Diving active + Logbook → Live + toast | PASS (software) |
+| Diving active + no images + User Images → Live + toast | PASS (software) |
+| Apnea active + Compass → Live + toast | PASS (software) |
+| Snorkeling active + Settings → Live + toast | PASS (software) |
+| Water Lock + real Crown underwater | **PENDING_PHYSICAL** |
+
+---
+
+## Action Button / Underwater Primary Action Router
+
+### Observed behavior
+
+- `WatchUnderwaterActionResolver` priority: alarm warning → Apnea operational overlay → page-specific action.
+- **Live (Diving):** stopwatch start/stop unless `stopwatchHiddenByFullComputer`.
+- **Compass (Diving):** set/update bearing (never clear underwater).
+- **User Images (Diving):** next image when inventory exists.
+- **Settings / default:** return to dashboard (Live) without mutating settings.
+- **Unavailable:** toast + warning haptic; throws `WatchUnderwaterActionRouterError.unavailable`.
+- `ExecuteUnderwaterPrimaryActionIntent` requires legal acceptance and routes exclusively through `WatchUnderwaterActionRouter`.
+- Legacy intents (`ToggleStopwatchIntent`, etc.) delegate to `WatchIntentSafetyPolicy.routePrimaryActionIfUnderwaterSession()` when session active.
+
+### Safety gates verified
+
+- No hidden dive start via underwater primary action.
+- No stopwatch reset via primary action path.
+- Full Computer hidden stopwatch → unavailable (not silent no-op).
+- Side button / Crown press unsupported assumptions **not claimed** in UI copy.
+
+### Physical gaps
+
+| Item | Status |
 |------|--------|
-| PENDING_PHYSICAL_WATER_LOCK_QA | NOT_EXECUTED |
-| PENDING_PHYSICAL_ACTION_BUTTON_QA | NOT_EXECUTED |
-| PENDING_PHYSICAL (crown underwater) | NOT_EXECUTED |
-
-**Matrix:** [`MASTER_WATCH_UNDERWATER_HARDWARE_INTERACTION_MATRIX_CURRENT.csv`](MASTER_WATCH_UNDERWATER_HARDWARE_INTERACTION_MATRIX_CURRENT.csv)
+| Ultra Action Button + Water Lock | **PENDING_PHYSICAL_ACTION_BUTTON_QA** |
+| Toast/haptic visibility under Water Lock | **PENDING_PHYSICAL** |
+| Shortcut assignment documentation | PASS — `DIRDivingAppShortcuts` + Settings help copy |
 
 ---
 
-## Final verdict
+## Accessibility & Localization
+
+- `Scripts/audit_accessibility_contracts.sh` — **PASS** @ `451f8fb` (underwater + water auto-open keys EN/IT).
+- Blocked navigation accessibility keys per activity present.
+
+---
+
+## Findings
+
+| ID | Sev | Title | Status |
+|----|-----|-------|--------|
+| MUIUX-P1-002 | P1 | Underwater Crown/Action Button physical QA pending | OPEN — PENDING_PHYSICAL |
+| MUIUX-P2-004 | P2 | Watch test runner bootstrap failure this audit session | OPEN — NOT_EXECUTED this run |
+
+No open **software P0** underwater hardware findings.
+
+---
+
+## Final Verdict Block
 
 ```text
-WATCH_UNDERWATER_HARDWARE_INTERACTION_AUDIT: PARTIAL (software PASS; physical PENDING)
-DIGITAL_CROWN_UNDERWATER_PAGE_POLICY: PASS (software) / PENDING_PHYSICAL
-ACTION_BUTTON_UNDERWATER_PRIMARY_ACTION: PASS (software) / PENDING_PHYSICAL
+WATCH_UNDERWATER_HARDWARE_INTERACTION_AUDIT: PARTIAL
+DIGITAL_CROWN_UNDERWATER_PAGE_POLICY: PASS
+ACTION_BUTTON_UNDERWATER_PRIMARY_ACTION: PASS
 WATER_LOCK_PHYSICAL_QA: PENDING_PHYSICAL
+PHYSICAL_WATCH_UI_QA: PENDING_PHYSICAL
 ```
+
+Matrix: `Docs/MASTER_WATCH_UNDERWATER_HARDWARE_INTERACTION_MATRIX_CURRENT.csv`

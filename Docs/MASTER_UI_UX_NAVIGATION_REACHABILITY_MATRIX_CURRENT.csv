@@ -1,36 +1,23 @@
-ID,Platform,Activity,Mode,Feature,Entry_Point,Destination,Exit,Availability_Condition,Target_Membership,Deep_Link,Restoration,Reachable,Functional,Severity,Finding_ID,Notes
-NAV-001,Watch,Global,All,Legal acceptance,Launch,WatchLegalOnboardingView,Accept,First/versioned launch,yes,n/a,persisted,yes,yes,,,
-NAV-002,Watch,Global,All,Activity selection,Cold launch/Settings,ActivitySelectionView,Choose activity,No active session,yes,n/a,preference,yes,yes,,,
-NAV-003,Watch,Diving,Gauge,Live dive,Activity→Gauge,DiveLiveView,End session,Sensor ready,yes,n/a,checkpoint,yes,yes,,,
-NAV-004,Watch,Diving,Full Computer,Predive environment,FC path,FullComputerPrediveSettingsView/Confirmation,Confirm/cancel,Valid env/gas/GF,yes,n/a,persisted profile,yes,yes,,,Altitude propagated OrchestratedAltitudeEnvironmentTests
-NAV-005,Watch,Diving,Full Computer,Live deco,Confirmed predive,DiveLiveView,End session,Runtime self-check,yes,n/a,checkpoint,yes,yes,,,
-NAV-006,Watch,Apnea,Apnea,Session,Activity→Apnea,ApneaView,Save/end,Recovery/sensor gates,yes,n/a,checkpoint,yes,yes,P1,MUIUX-P1-001,Physical wet QA PENDING
-NAV-007,Watch,Apnea,Apnea,In-mode settings,ApneaView gear,SettingsView,Back/crown,Session inactive,yes,n/a,n/a,yes,yes,,,Blocked when active WatchInModeSettingsAccessPolicy
-NAV-008,Watch,Snorkeling,Snorkeling,Session,Activity→Snorkeling,SnorkelingView,Save/end,Permission/sensor gates,yes,n/a,checkpoint,yes,yes,P1,MUIUX-P1-001,Physical GPS QA PENDING
-NAV-009,Watch,Snorkeling,Snorkeling,In-mode settings,SnorkelingView gear,SettingsView,Back/crown,Session inactive,yes,n/a,n/a,yes,yes,,,
-NAV-010,Watch,Diving,All,Diving logbook,Crown page,DiveLogListView,Back/crown,Activity is Diving,yes,n/a,store,yes,yes,,,Not mounted for Apnea/Snorkeling
-NAV-011,iOS,Global,All,Activity selection,Launch/Settings,IOSCompanionActivitySelectionView,Choose activity,Post-legal gate,yes,n/a,preference,yes,yes,,,
-NAV-012,iOS,Global,All,Settings mode switch,More tab / gear sheets,IOSCompanionSettingsRootView,Back/dismiss,Any activity root,yes,n/a,scope only,yes,yes,,,Does not mutate runtime
-NAV-013,iOS,Diving,All,More Settings diving,Diving More tab,MoreView,Tab switch,Diving root only,yes,n/a,store,yes,yes,,,Embedded IOSDivingSettingsEmbeddedContent
-NAV-014,iOS,Apnea,Apnea,Apnea settings gear,Dashboard gear,IOSCompanionSettingsRootView initialMode apnea,Dismiss sheet,Apnea root,yes,n/a,scope,yes,yes,,,
-NAV-015,iOS,Snorkeling,Snorkeling,Snorkeling settings gear,Dashboard gear,IOSCompanionSettingsRootView initialMode snorkeling,Dismiss sheet,Snorkeling root,yes,n/a,scope,yes,yes,,,
-NAV-016,iOS,Diving,All,Planner,Diving Planner tab,PlannerRootView,Tab/back,Activity is Diving,yes,n/a,store,yes,yes,,,
-NAV-017,iOS,Diving,All,Equipment/checklist,Gear/Checklist tabs,EquipmentView/ChecklistView,Tab/back,Diving root,yes,n/a,store,yes,yes,,,
-NAV-018,iOS,Diving,All,Diving logbook,Logbook tab,LogbookView,Tab/back,Diving only,yes,n/a,store,yes,yes,,,
-NAV-019,iOS,Apnea,Apnea,Apnea logbook,Sessions tab,IOSApneaSessionsListView,Tab/back,Apnea only,yes,n/a,store,yes,yes,,,
-NAV-020,iOS,Snorkeling,Snorkeling,Snorkeling logbook,Sessions tab,IOSSnorkelingSessionsListView,Tab/back,Snorkeling only,yes,n/a,store,yes,yes,,,
-NAV-021,Watch+iOS,Diving,Planner→Watch,Briefing card,Planner transfer/Watch inventory,Briefing card views,Close/delete,Signed current card,yes,n/a,persisted,yes,yes,,,Reference-only; not live authority
-NAV-022,iOS,Diving,All,Ascent speed settings,MoreView only,PlannerAscentSpeedSettingsView,Back,Any Diving session,yes,n/a,store,yes,yes,P2,MUIUX-P2-004,Not linked from Planner header
-NAV-023,Watch,Diving,All,Start dive manual/auto,Live screen,DiveLiveView,End,Depth/sensor gates,yes,n/a,checkpoint,yes,yes,,,Auto >1.0 m; collision handling tested
-NAV-024,Watch,Diving,All,Images surface,Images tab,UserImagesView,Back/crown,Surface only; blocked underwater,yes,n/a,store,yes,yes,,,
-NAV-025,iOS,Diving,All,Manual dive,Logbook add,ManualDiveEditorView,Save/cancel,Diving logbook,yes,n/a,store,yes,yes,,,
-NAV-026,iOS,Diving,All,Analysis replay,Analysis tab,AnalysisView,Tab/back,Diving-only tissue/narcosis,yes,n/a,store,yes,yes,,,
-NAV-UW-001,Watch,Diving,All,Crown paging active session,ContentView TabView,Live/Compass/Images,Clamp+toast,Session active,yes,n/a,n/a,yes,yes,,,WatchUnderwaterNavigationClampPolicyTests @15c8068
-NAV-UW-002,Watch,Apnea,Apnea,Live only when active,ApneaView,ApneaView,Clamp+toast,Session active,yes,n/a,n/a,yes,yes,,,
-NAV-UW-003,Watch,Snorkeling,Snorkeling,Live only when active,SnorkelingView,SnorkelingView,Clamp+toast,Session active,yes,n/a,n/a,yes,yes,,,
-NAV-WAO-001,Watch,Global,All,Water auto-open settings,Settings→Startup,WatchWaterAutoOpenSettingsView,Back,Not during active dive,yes,n/a,persisted,yes,yes,,,CLOSED P1-WAO-001 @15c8068
-NAV-WAO-002,Watch,Global,All,OpenWaterAutoLaunch intent,Shortcuts/OpenWater,StartupFlowView,Complete flow,Mode enabled + legal,yes,n/a,routing,yes,yes,,,Intent + submerged cold launch
-NAV-WAO-003,Watch,Global,All,Apply Route Now,Water auto-open settings,StartupFlowView,Complete flow,Mode enabled + no session,yes,n/a,routing,yes,yes,,,In-app test path
-NAV-FC-GF-001,Watch,Diving,Full Computer,GF preset selection,Settings/FC predive,FullComputerGradientFactorSelectionView,Dismiss,Not locked,yes,n/a,persisted,yes,yes,,,3 presets @0673018
-NAV-DEV-001,Watch,Global,All,Developer shallow toggles,Settings→Developer,DeveloperSettingsView,Back,Dev unlock,yes,n/a,persisted,yes,yes,,,Gauge cyan / FC yellow @47d8af8
-NAV-DEPTH-001,Watch,Diving,Gauge+FC,Shallow capability locks,Startup mode select,DivingModeSelectionView,Back/cancel,Shallow entitlement,yes,n/a,n/a,yes,yes,,,DepthCapabilityPolicy @b666772
+Feature_ID,Activity,Mode,Platform,Entry_Point,Label,Availability,Target,Reachable,Route_Complete,Blocked_Condition,Hidden_Impl,Placeholder_Route,Stale_Block,Deep_Link,Return_Path,Pass,Finding_ID,Notes
+NAV-001,Global,All,Watch,Launch,Startup flow,Always,StartupFlowView,yes,yes,Legal not accepted,no,no,no,n/a,yes,yes,,Legal gate first
+NAV-002,Global,All,Watch,Launch,Water auto-open routing,Policy enabled,DIRActivitySelectionStore,yes,yes,Active session blocks,no,no,no,OpenWaterAutoLaunchModeIntent,yes,yes,MUIUX-P1-001,Does not start dive
+NAV-003,Diving,Gauge,Watch,Startup,Gauge live ready,Activity selected,DiveLiveView,yes,yes,FC predive incomplete,no,no,no,n/a,yes,yes,,
+NAV-004,Diving,Full Computer,Watch,Startup,FC predive confirm,FC selected,FullComputerPrediveConfirmationView,yes,yes,Depth policy deny FC,no,no,no,WAO preferred FC,yes,yes,,CONS-019 depth gate applied
+NAV-005,Diving,All,Watch,TabView,Crown pages,Surface,ContentView tabs,yes,yes,Underwater clamp when active,no,no,no,n/a,yes,yes,MUIUX-P1-002,Live/Compass/Images diving
+NAV-006,Diving,All,Watch,Session active,Settings blocked,Underwater,Clamp→Live,yes,yes,Always during session,no,no,no,n/a,yes,yes,,
+NAV-007,Apnea,All,Watch,Apnea root,Live only underwater,Session active,ApneaView,yes,yes,Compass blocked,no,no,no,n/a,yes,yes,,
+NAV-008,Snorkeling,All,Watch,Snorkeling root,Live only underwater,Session active,SnorkelingView,yes,yes,Compass blocked,no,no,no,n/a,yes,yes,,
+NAV-009,Apnea,All,Watch,In-mode gear,Apnea Settings,Not active session,SettingsView,yes,yes,Session active hides gear,no,no,no,n/a,yes,yes,,
+NAV-010,Snorkeling,All,Watch,In-mode gear,Snorkeling Settings,Not active session,SettingsView,yes,yes,Session active hides gear,no,no,no,n/a,yes,yes,,
+NAV-011,Global,All,iOS,More tab,Settings mode switch,Always,IOSCompanionSettingsRootView,yes,yes,None,no,no,no,gear initialMode,yes,yes,,
+NAV-012,Diving,All,iOS,Dashboard gear,Diving Settings,Always,IOSDivingSettingsEmbeddedContent,yes,yes,None,no,no,no,initialMode=diving,yes,yes,,
+NAV-013,Apnea,All,iOS,Apnea dashboard gear,Apnea Settings,Always,IOSApneaSettingsContent,yes,yes,None,no,no,no,initialMode=apnea,yes,yes,,
+NAV-014,Snorkeling,All,iOS,Snorkeling dashboard gear,Snorkeling Settings,Always,IOSSnorkelingSettingsContent,yes,yes,None,no,no,no,initialMode=snorkeling,yes,yes,,
+NAV-015,Diving,All,iOS,Logbook tab,Diving logbook,Always,LogbookView,yes,yes,None,no,no,no,n/a,yes,yes,,Diving-only query
+NAV-016,Apnea,All,iOS,Apnea section,Apnea logbook,Apnea root,IOSApneaSessionsListView,yes,yes,None,no,no,no,n/a,yes,yes,,No global mixed logbook
+NAV-017,Snorkeling,All,iOS,Snorkeling section,Snorkeling logbook,Snorkeling root,IOSSnorkelingSessionsListView,yes,yes,None,no,no,no,n/a,yes,yes,,
+NAV-018,Snorkeling,All,iOS,Snorkeling dashboard,Route planner,Always,IOSSnorkelingRoutePlannerView,yes,yes,GPS permission may limit map,no,no,no,NavigationLink,yes,yes,,
+NAV-019,Diving,All,iOS,Planner tab,Planner modes,Always,PlannerView,yes,yes,None,no,no,no,n/a,yes,yes,,
+NAV-020,Diving,All,Watch,Settings,Water auto-open,Settings route,WatchWaterAutoOpenSettingsView,yes,yes,Apply blocked if session,no,no,no,n/a,yes,yes,,
+NAV-021,Diving,All,Watch,App Intent,Underwater primary action,Shortcut assigned,ExecuteUnderwaterPrimaryActionIntent,yes,yes,Legal not accepted,no,no,no,Shortcuts,yes,yes,MUIUX-P1-002,Physical AB pending
+NAV-022,Diving,All,Watch,Developer,Shallow testing toggles,Dev unlock,DeveloperSettingsView,yes,yes,Release builds gated,no,no,no,n/a,yes,yes,MUIUX-P1-005,Not public surface

@@ -1,31 +1,20 @@
 Setting_ID,Label,Activity,Mode,Shared,Platform,Screen,Backing_Store,Visible_In_Diving,Visible_In_Apnea,Visible_In_Snorkeling,Visible_In_iOS,Visible_In_Watch,Can_Edit_During_Active_Session,Syncs_To_Watch,Runtime_Effect,Accessibility_Label,Localization_EN,Localization_IT,Evidence,Pass,Notes
-language,Language,Shared,All,yes,IOSCompanionSharedSettingsSection,SharedIOSSettingsStore,yes,no,no,yes,yes,no,yes,yes,yes,IOSActivitySettingsCoherenceTests,PASS,,,,
-units,Units,Shared,All,yes,IOSCompanionSharedSettingsSection,SharedIOSSettingsStore,yes,no,no,yes,yes,no,yes,yes,yes,IOSActivitySettingsCoherenceTests,PASS,,,,
-settings_mode_switch,Settings scope switcher,Shared,All,yes,IOSCompanionSettingsModeSwitcher,IOSCompanionSettingsScopeStore,yes,yes,yes,yes,no,no,yes,yes,yes,IOSActivitySettingsModeSwitchTests,PASS,UI-only; no runtime mutation,,,
-diving_gauge_fc,Gauge/Full Computer defaults,Diving,Gauge+FC,no,IOSDivingSettingsEmbeddedContent,SharedIOSSettingsStore,yes,no,no,partial,yes,no,yes,yes,yes,IOSActivitySettingsRoutingTests,PASS,,,,
-diving_gas,Gas mixes,Diving,FC,no,IOSDivingSettingsEmbeddedContent,SharedIOSSettingsStore,yes,no,no,partial,yes,partial,yes,yes,yes,IOSActivitySettingsCoherenceTests,PASS,Watch predive + iOS planner,,,
-diving_gf,Gradient Factors,Diving,FC,no,IOSDivingSettingsEmbeddedContent,SharedIOSSettingsStore,yes,no,no,partial,yes,partial,yes,yes,yes,IOSActivitySettingsCoherenceTests,PASS,,,,
-diving_ppo2_mod,PPO2/MOD,Diving,FC,no,IOSDivingSettingsEmbeddedContent,SharedIOSSettingsStore,yes,no,no,partial,yes,partial,yes,yes,yes,IOSActivitySettingsCoherenceTests,PASS,,,,
-diving_cns_otu,CNS/OTU alarms,Diving,FC,no,IOSDivingSettingsEmbeddedContent,SharedIOSSettingsStore,yes,no,no,partial,yes,partial,yes,yes,yes,IOSActivitySettingsCoherenceTests,PASS,,,,
-diving_alarms,Diving alarms,Diving,All,no,IOSDivingSettingsEmbeddedContent,SharedIOSSettingsStore,yes,no,no,partial,yes,partial,yes,yes,yes,WatchActivitySettingsOwnershipTests,PASS,,,,
-apnea_detection,Session detection,Apnea,Apnea,no,IOSApneaSettingsContent,IOSApneaSettingsStore,no,yes,no,yes,yes,no,yes,yes,yes,IOSActivitySettingsCoherenceTests,PASS,,,,
-apnea_recovery,Recovery targets,Apnea,Apnea,no,IOSApneaSettingsContent,IOSApneaSettingsStore,no,yes,no,yes,yes,no,yes,yes,yes,IOSActivitySettingsCoherenceTests,PASS,,,,
-apnea_alarms,Depth/time alarms,Apnea,Apnea,no,IOSApneaSettingsContent,IOSApneaSettingsStore,no,yes,no,yes,yes,no,yes,yes,yes,IOSActivitySettingsCoherenceTests,PASS,,,,
-snorkeling_gps,GPS/route,Snorkeling,Snorkeling,no,IOSSnorkelingSettingsContent,IOSSnorkelingSettingsStore,no,no,yes,yes,yes,no,yes,yes,yes,IOSActivitySettingsCoherenceTests,PASS,,,,
-snorkeling_return,Return to entry,Snorkeling,Snorkeling,no,IOSSnorkelingSettingsContent,IOSSnorkelingSettingsStore,no,no,yes,yes,yes,no,yes,yes,yes,IOSActivitySettingsCoherenceTests,PASS,,,,
-snorkeling_privacy,Location/photo privacy,Snorkeling,Snorkeling,no,IOSSnorkelingSettingsContent,IOSSnorkelingSettingsStore,no,no,yes,yes,yes,no,yes,yes,yes,IOSActivitySettingsCoherenceTests,PASS,,,,
-backup,Backup,Shared,All,yes,IOSCompanionSharedSettingsSection,SharedIOSSettingsStore,yes,yes,yes,yes,partial,partial,yes,yes,yes,IOSActivitySettingsCoherenceTests,PASS,Apnea upload unavailable by policy,,,
-sync,Synchronization,Shared,All,yes,IOSCompanionSharedSettingsSection,SharedIOSSettingsStore,yes,yes,yes,yes,partial,partial,yes,yes,yes,IOSActivitySettingsCoherenceTests,PASS,,,,
-privacy,Privacy,Shared,All,yes,IOSCompanionSharedSettingsSection,SharedIOSSettingsStore,yes,yes,yes,yes,partial,partial,yes,yes,yes,IOSActivitySettingsCoherenceTests,PASS,,,,
-about_legal,About/Legal,Shared,All,yes,IOSCompanionSharedSettingsSection,SharedIOSSettingsStore,yes,yes,yes,yes,yes,yes,yes,yes,yes,IOSActivitySettingsCoherenceTests,PASS,,,,
-watch_gauge_ttv,Gauge TTV toggle,Diving,Gauge,no,SettingsView,SharedIOSSettingsStore,yes,no,no,no,yes,partial,yes,yes,yes,GaugeOptionalTTVTests,PASS,,,,
-watch_fc_altitude,FC altitude sensor proposal,Diving,FC,no,SettingsView,WatchFullComputerAltitudeSensorProposalSettingsStore,yes,no,no,no,yes,partial,yes,yes,yes,WatchFullComputerAltitudeSensorSettingsTests,PASS,,,,
-watch_apnea_settings,Apnea in-mode settings,Apnea,Apnea,no,WatchApneaActivitySettingsSection,ApneaSettingsStore,no,yes,no,no,yes,no,yes,yes,yes,WatchSettingsRoutingTests,PASS,Blocked during active session,,,
-watch_snorkeling_settings,Snorkeling in-mode settings,Snorkeling,Snorkeling,no,WatchSnorkelingActivitySettingsSection,SnorkelingSettingsStore,no,no,yes,no,yes,no,yes,yes,yes,WatchSettingsRoutingTests,PASS,Blocked during active session,,,
-WAO-MODE,Water auto-open mode,Global,All,yes,Watch,WatchWaterAutoOpenSettingsView,WatchWaterAutoOpenPolicy,no,no,no,yes,yes,yes,no,yes,yes,yes,yes,PASS,Disabled during active dive @15c8068
-WAO-PREF-ACT,Preferred activity,Global,All,yes,Watch,WatchWaterAutoOpenSettingsView,WatchWaterAutoOpenPolicy,no,no,no,yes,yes,yes,no,yes,yes,yes,yes,PASS,
-WAO-PREF-DIV,Preferred diving mode,Diving,Gauge+FC,no,Watch,WatchWaterAutoOpenSettingsView,WatchWaterAutoOpenPolicy,yes,no,no,yes,yes,yes,no,yes,yes,yes,yes,PASS,Gauge only when Diving preferred
-watch_fc_gf_presets,FC GF preset selection,Diving,FC,no,Watch,FullComputerGradientFactorSelectionView,FullComputerGradientFactorSettingsStore,yes,no,no,no,yes,partial,yes,yes,yes,FullComputerGradientFactorSelectionView,PASS,Locked during dive/import/runtime
-dev_shallow_gauge,Developer shallow Gauge toggle,Diving,Gauge,no,Watch,DeveloperSettingsView,DeveloperSettings,yes,no,no,no,yes,no,no,no,yes,DeveloperSettingsView,PASS,Dev unlock only; default OFF @ 5d757cc CONS-006
-dev_shallow_fc,Developer shallow FC toggle,Diving,FC,no,Watch,DeveloperSettingsView,DeveloperSettings,yes,no,no,no,yes,no,no,no,yes,DeveloperSettingsView,PASS,Dev unlock only; default OFF @ 5d757cc CONS-006
-dev_sensor_source,Developer sensor source,Global,All,no,Watch,DeveloperSettingsView,DeveloperSettings,yes,yes,yes,no,yes,no,no,no,yes,DeveloperSettingsView,PASS,Simulation labeled
+SET-001,Language,Global,All,yes,Both,Shared Settings,LanguageSettingsStore,yes,yes,yes,yes,yes,no,partial,Restart UI,yes,yes,yes,SharedIOSSettingsStore,yes,
+SET-002,Units,Global,All,yes,Both,Shared Settings,UnitPreferenceStore,yes,yes,yes,yes,yes,no,partial,Display units,yes,yes,yes,Unit tests,yes,
+SET-003,iOS mode switch,Global,All,no,iOS,IOSCompanionSettingsRootView,IOSCompanionSettingsScopeStore,yes,yes,yes,yes,no,n/a,no,no,Display scope only,yes,yes,yes,IOSActivitySettingsModeSwitchTests,yes,No runtime mutation
+SET-004,Diving GF presets,Diving,Full Computer,no,Both,FC Settings,FullComputerGradientFactorSettingsStore,yes,no,no,yes,yes,no,partial,FC runtime,yes,yes,yes,FullComputerGradientFactorPresetTests,yes,
+SET-005,Diving gas/PPO2/MOD,Diving,Full Computer,no,Both,Diving Settings,FullComputerPrediveConfigurationStore,yes,no,no,yes,yes,no,partial,FC runtime,yes,yes,yes,WatchActivitySettingsOwnershipTests,yes,
+SET-006,Diving alarms/reminders,Diving,All,no,Watch,Diving Settings,DiveReminderSettingsStore,yes,no,no,no,yes,no,no,Diving alarms,yes,yes,yes,WatchSettingsRoutingTests,yes,
+SET-007,Gauge TTV settings,Diving,Gauge,no,Watch,Diving Settings,AscentRateSettingsStore,yes,no,no,no,yes,no,no,Gauge TTV,yes,yes,yes,GaugeOptionalTTVTests,yes,
+SET-008,Apnea session detection,Apnea,All,no,Both,Apnea Settings,IOSApneaSettingsStore,no,yes,no,yes,yes,no,partial,Apnea runtime,yes,yes,yes,IOSApneaSettingsContent,yes,
+SET-009,Apnea recovery/targets,Apnea,All,no,Both,Apnea Settings,IOSApneaSettingsStore,no,yes,no,yes,yes,no,partial,Apnea runtime,yes,yes,yes,ApneaRecoveryPolicyLifecycleTests,yes,
+SET-010,Apnea alarms/markers,Apnea,All,no,Both,Apnea Settings,IOSApneaSettingsStore,no,yes,no,yes,yes,no,partial,Apnea alarms,yes,yes,yes,WatchActivitySettingsOwnershipTests,yes,
+SET-011,Snorkeling GPS/route,Apnea,All,no,Both,Snorkeling Settings,IOSSnorkelingSettingsStore,no,no,yes,yes,yes,no,partial,Snorkeling nav,yes,yes,yes,IOSSnorkelingSettingsStoreTests,yes,
+SET-012,Snorkeling return to entry,Snorkeling,All,no,Both,Snorkeling Settings,IOSSnorkelingSettingsStore,no,no,yes,yes,yes,no,partial,Return alert,yes,yes,yes,SnorkelingReturnAlertRuntimeTests,yes,
+SET-013,Snorkeling privacy/photos,Snorkeling,All,no,iOS,Snorkeling Settings,IOSSnorkelingSettingsStore,no,no,yes,yes,no,no,no,Privacy,yes,yes,yes,IOSSnorkelingSettingsContent,yes,
+SET-014,Water auto-open,Global,All,no,Watch,WatchWaterAutoOpenSettingsView,WatchWaterAutoOpenPolicy,yes,yes,yes,no,yes,no,no,Launch routing only,yes,yes,yes,WatchWaterAutoOpenPolicyTests,yes,Does not start dive
+SET-015,Developer shallow toggles,Diving,Depth,no,Watch,DeveloperSettingsView,DeveloperSettings,yes,no,no,no,yes,no,no,Dev depth scope,yes,yes,yes,DepthCapabilityTests,yes,Default OFF; dev unlock
+SET-016,Developer sensor source,Global,All,no,Watch,DeveloperSettingsView,DeveloperSettings,yes,yes,yes,no,yes,no,no,Simulation visibility,yes,yes,yes,DeveloperSensorSourceTests,yes,
+SET-017,Backup/sync/privacy,Global,All,yes,iOS,Shared Settings,CloudBackupSettings,yes,yes,yes,yes,no,n/a,partial,Cloud sync,yes,yes,yes,CloudBackupPolicyTests,yes,
+SET-018,Watch in-mode Settings access,Apnea,All,no,Watch,ApneaView,WatchInModeSettingsAccessButton,no,yes,no,no,yes,no,no,Navigation only,yes,yes,yes,WatchInModeSettingsAccess.swift,yes,Hidden during session
+SET-019,Watch in-mode Settings access,Snorkeling,All,no,Watch,SnorkelingView,WatchInModeSettingsAccessButton,no,no,yes,no,yes,no,no,Navigation only,yes,yes,yes,WatchInModeSettingsAccess.swift,yes,Hidden during session

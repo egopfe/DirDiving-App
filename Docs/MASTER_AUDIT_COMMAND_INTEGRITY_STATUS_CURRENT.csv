@@ -1,0 +1,10 @@
+Command_File,Expected_Launch_Order,File_Exists,Body_Aligned,Script_References,Validation_Status,Notes
+commands_for_cursor/00-MASTER_SUPER_ORCHESTRATOR_FULL_AUDIT_SEQUENCE_AND_NON_REGRESSIVE_REMEDIATION_PLAN_COMMAND_V1.3.md,00,yes,yes,not_referenced_by_script,PASS,Orchestrator V1.3 @ bb204f5; supersedes V1.2 in OOLD/
+commands_for_cursor/01-MASTER_WATCH_FULL_COMPUTER_FORENSIC_AUDIT_COMMAND_V2.2.md,01,yes,yes,FAIL — script expects V2.1,FAIL,Body LAUNCH ORDER 01 + Watch FC forensic; validate_commands_for_cursor_integrity.sh still points to OOLD V2.1 (CONS-046)
+commands_for_cursor/02-MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.2.md,02,yes,yes,FAIL — script expects V1.1,FAIL,Body LAUNCH ORDER 02 + iOS deep; script drift V1.1 (CONS-046)
+commands_for_cursor/03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.3.md,03,yes,yes,FAIL — script expects V2.2,FAIL,Body LAUNCH ORDER 03 + UI/UX V2.3; script drift V2.2 (CONS-046)
+commands_for_cursor/04-MASTER_MAIN_CODE_SYNC_SECURITY_PERFORMANCE_AUDIT_COMMAND_V1.2.md,04,yes,yes,FAIL — script expects V1.1,FAIL,Body LAUNCH ORDER 04 + Main V1.2; script drift V1.1 (CONS-046)
+commands_for_cursor/05-MASTER_RELEASE_QA_EVIDENCE_COMPLIANCE_AUDIT_COMMAND_V1.2.md,05,yes,yes,FAIL — script expects V1.1,FAIL,Body LAUNCH ORDER 05 + Release V1.2; script drift V1.1 (CONS-046)
+commands_for_cursor/06-MASTER_DOCUMENTATION_REPOSITORY_ALIGNMENT_AUDIT_COMMAND_V1.2.md,06,yes,yes,FAIL — script expects V1.1,FAIL,Body LAUNCH ORDER 06 + Docs V1.2; script drift V1.1 (CONS-046)
+commands_for_cursor/07-MASTER_POST_REMEDIATION_CODE_READINESS_VERIFICATION_AUDIT_COMMAND_V1.0.md,07,yes,yes,not_referenced_by_script,PASS,Post-remediation verification; consumed by orchestrator 0D
+Scripts/validate_commands_for_cursor_integrity.sh,integrity_gate,n/a,n/a,SELF — references superseded V2.1/V1.1 paths,FAIL,Exits 1 @ bb204f5; must update to V2.2/V1.2/V2.3 filenames (CONS-046 P1 OPEN)

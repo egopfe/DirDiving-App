@@ -1,16 +1,15 @@
 # DIR Diving iOS — Master Full Deep Comprehensive Audit — CURRENT
 
-**Command:** `02-MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.1` (LAUNCH ORDER 02)  
-**Audit date:** 2026-06-28  
+**Command:** `02-MASTER_IOS_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V1.2` (LAUNCH ORDER 02)  
+**Audit date:** 2026-06-30  
 **Repository:** `https://github.com/egopfe/DirDiving-App.git`  
 **Branch:** `main`  
-**Commit:** `5d757cc` (`5d757cc0217755f5c6d5429af2f13ce5c4748c5d`)  
-**HEAD subject:** post-remediation software readiness baseline  
-**Scope:** DIRDiving iOS Companion — merged math + Bühlmann + algorithm + multi-activity master audit  
-**Execution mode:** Read-only static analysis + macOS `xcodegen` / `xcodebuild` validation (post-remediation rerun)  
+**Commit:** `451f8fb` (`451f8fb644a85d8d205d53ef769e29ff9ed4f958`)  
+**Scope:** DIRDiving iOS Companion — merged math + Bühlmann + algorithm + multi-activity + Snorkeling P1/P2/P3 + map UX + fake logbook toggles + post-remediation CONS verification  
+**Execution mode:** Read-only static analysis + macOS `xcodegen` / `xcodebuild` validation  
 **Xcode:** 26.6 (Build 17F113)
 
-**Post-remediation focus:** CONS-002 GF preset parity (`PlannerModePolicy`, `DivePlanPackageBuilder.gradientFactorPreset`); CONS-027 `PlannerStore.deinit` task cancellation.
+**Post-remediation focus:** CONS-002 GF preset parity; CONS-003 inFlight ACK cleanup; CONS-004 diveImportAck symmetry; CONS-005 tombstone HMAC; Snorkeling route planner P1/P2/P3; activity fake logbook toggles; map UX.
 
 **Merged source commands:**
 
@@ -20,8 +19,6 @@
 3-DIR_DIVING_IOS_COMPLETE_ALGORITHM_AUDIT_CCR_UPDATED_V3.0.md
 ```
 
-**Cross-cutting scope (2026-06-27/28 wave):** GF preset override compatibility, multi-activity architecture, planner briefing cards reference-only, Watch FC preset sync schema (read-only parity).
-
 **Permitted writes:** Audit outputs under `Docs/` only. No production code, tests, or `project.yml` modified.
 
 ---
@@ -30,71 +27,63 @@
 
 ### Overall verdict
 
-**Status: Software-ready — non-certified reference planner + first-class multi-activity iOS Companion; post-remediation GF parity restored**
+**Status: Software-ready architecture with test-gate regression at HEAD — non-certified reference planner + first-class multi-activity iOS Companion**
 
-`main` @ `5d757cc` delivers a **first-class multi-activity iOS Companion** with strict vertical ownership for Diving (planner reference, logbook, equipment, checklist), Apnea (sessions, profiles, statistics), and Snorkeling (GPS routes, dips, analytics). **Gauge and Full Computer live Bühlmann runtime** execute on **Apple Watch**; iOS provides planner reference, sealed dive-plan packages, briefing cards (**reference-only**), and logbook import — not live decompression control.
+`main` @ `451f8fb` delivers a **first-class multi-activity iOS Companion** with strict vertical ownership for Diving (planner reference, logbook, equipment, checklist), Apnea (sessions, profiles, statistics), and Snorkeling (GPS routes, P1/P2/P3 route planner, map UX, analytics). Gauge and Full Computer live Bühlmann runtime execute on **Apple Watch**; iOS provides planner reference, sealed dive-plan packages, briefing cards (**reference-only**), and logbook import.
 
-**Post-remediation @ `5d757cc`:** CONS-002 **FIXED** — iOS Planner GF presets now align with Watch Full Computer triplets (`20/80`, `30/70`, `40/85`); `DivePlanPackageBuilder` emits `gradientFactorPreset`. CONS-027 **FIXED** — `PlannerStore.deinit` cancels `planningUpdateTask` and `saveTask`. See **IOS-MASTER-F016** and **IOS-MASTER-F017** (VERIFIED).
+**Post-remediation CONS verification @ `451f8fb`:** CONS-002/003/004/005 **PASS** in code (see `Docs/MASTER_IOS_POST_REMEDIATION_GF_SYNC_VERIFICATION_CURRENT.md`).
 
-### macOS validation (@ `5d757cc`)
+**Regression @ `451f8fb`:** iOS Algorithm Tests **BUILD FAILED** — Snorkeling test compile errors (**IOS-P1-001**). Prior baseline `5d757cc` reported 1527 tests, 0 failures.
+
+### macOS validation (@ `451f8fb`)
 
 | Check | Result |
 |---|---|
-| Branch | `main` ✓ |
+| Branch / commit | `main` @ `451f8fb` ✓ |
 | Working tree | Clean at audit start |
 | `xcodegen generate` | **SUCCEEDED** |
-| iOS MAIN build (`generic/platform=iOS Simulator`, `CODE_SIGNING_ALLOWED=NO`) | **BUILD SUCCEEDED** (prior baseline) |
-| iOS Algorithm Tests (`iPhone 17 Pro` simulator) | **TEST SUCCEEDED** — **1527 tests, 0 failures** (~151 s) |
-| Post-remediation GF tests | **15/15 PASS** — `DivePlanPackageBuilderTests` (4) + `PlannerGFPresetDisplayTests` (11) |
-| Test inventory | **1288+** `func test` definitions in `Tests/iOSAlgorithmTests` |
+| iOS MAIN build (`generic/platform=iOS Simulator`, `CODE_SIGNING_ALLOWED=NO`) | **BUILD SUCCEEDED** |
+| iOS Algorithm Tests (`iPhone 17 Pro` simulator) | **TEST FAILED** — compile errors in Snorkeling tests (IOS-P1-001) |
 | Production `try!` / `as!` in `iOSApp/` | **0** matches |
-| Production TODO/FIXME in core iOS | **0** (experimental concept views only) |
+| Test inventory | **1290+** `func test` definitions in `Tests/iOSAlgorithmTests` |
 
 ### Severity summary (software findings)
 
 | Priority | Count | Notes |
 |---:|---:|---|
 | **P0** | **0** | No safety-critical algorithm or cross-activity routing defect |
-| **P1** | **0** | GF preset iOS→Watch FC import mismatch **remediated** (F016 VERIFIED) |
-| **P2** | **5** | External validation + physical QA pending (F011–F015) |
-| **P3** | **5** | Navigation restore partial, Apnea cloud stub, dual-binding, tissue replay, manual editor |
+| **P1** | **1** | IOS-P1-001 Snorkeling test compile failure blocks CI gate |
+| **P2** | **6** | External validation + physical QA pending (IOS-P2-001..006) |
+| **P3** | **6** | Navigation restore, Apnea cloud, dual-binding, tissue replay, manual editor, map GPS quirk |
 | **P4** | **4** | Keychain skips, PDF MOD asymmetry, eager stores, checklist inference |
 
 ### Release posture
 
 | Gate | Verdict |
 |---|---|
-| Internal algorithm / code review | **Ready** — build green; 1527 tests PASS; GF parity restored |
-| Internal TestFlight (algorithm) | **Conditional** — reference-only posture; physical QA pending |
-| External TestFlight / RC | **Not yet** — external math + iCloud + paired Watch physical QA **PENDING** |
+| Internal algorithm / code review | **Conditional** — app build green; test suite compile blocked |
+| Internal TestFlight (algorithm) | **Conditional** — fix IOS-P1-001; reference-only posture |
+| External TestFlight / RC | **Not yet** — external math + paired Watch + Snorkeling field QA **PENDING** |
 | App Store | **Not yet** — legal/marketing + all external gates |
 | Certified decompression planner | **Never** — reference-only by design |
-| Certified CCR controller | **Never** — planning reference only |
-| Briefing cards on Watch | **Reference-only** — `PlannerBriefingCardManifest.referenceOnly == true` |
 
 ---
 
 ## B. Source Commands Merged
 
-This report merges three iOS audit command scopes into one master deliverable:
-
-1. **Complete math functions audit** — canonical vs presentation separation, MOD/PPO₂, gas roles, rock bottom, schedule consumption, units.
-2. **Bühlmann comprehensive readiness** — ZH-L16C engine, GF, stops, multigas, tissue history, CNS/OTU, environment model.
-3. **Complete algorithm / planner / data audit** — Base/Deco/Technical/CCR modes, Ratio Deco, equipment/checklist, exports, sync, multi-activity architecture.
-
-Plus V1.1 requirements: Settings mode switcher, activity-owned Settings/Logbooks, Apnea/Snorkeling as first-class verticals, GF preset override compatibility, briefing-card reference-only posture.
+This report merges three iOS audit command scopes plus V1.2 requirements: Settings mode switcher, activity-owned Settings/Logbooks, Apnea/Snorkeling as first-class verticals, Snorkeling P1/P2/P3 route planner, map UX, fake logbook toggles, GF/sync post-remediation verification, cross-cutting water-entry/GF/entitlements scope (read-only).
 
 ---
 
 ## C. Latest Development Update
 
-Since prior iOS master audit (`7dfefe2`), `main` @ `5d757cc` includes post-remediation software fixes:
+Since prior iOS master audit (`5d757cc`), `main` @ `451f8fb` includes:
 
-- **CONS-002 GF preset parity:** `PlannerGFPreset` values aligned to Watch FC triplets (`20/80`, `30/70`, `40/85`); `PlannerGFPreset.fullComputerGradientFactorPresetRawValue` maps to `FullComputerGradientFactorPreset`; `DivePlanPackageBuilder.build` emits `gradientFactorPreset`.
-- **CONS-027 PlannerStore lifecycle:** `PlannerStore.deinit` cancels `planningUpdateTask` and `saveTask`.
-- **1527-test green suite** — full `DIRDiving iOS Algorithm Tests` @ `5d757cc`; targeted GF tests **15/15 PASS**.
-
-**GF preset compatibility:** **PASS** @ `5d757cc` — all three iOS planner presets emit matching `gradientFactorPreset`; Watch import fail-closed preserved for invalid pairs. See `Docs/MASTER_GF_PRESET_SYNC_SCHEMA_MATRIX_CURRENT.csv`.
+- **Snorkeling P1/P2/P3 route planner** — return-to-entry, safety check, profiles, gated Watch transfer, off-route Watch runtime (P3).
+- **Snorkeling map UX** — center-on-location, map type picker, reset map confirmation, tap-to-place waypoints.
+- **Activity fake logbook toggles** — `IOSActivityDemoLogbookSettingsStore` in Apnea/Snorkeling Settings (NOT `DeveloperSettings`); Diving uses `DiveLogStore.includeDemoLogbook`.
+- **Second `SnorkelingDistanceCalculator.distanceMeters` overload** — introduced `[SnorkelingRoutePlannerPoint]` overload; test compile ambiguity at HEAD (IOS-P1-001).
+- **CONS remediations retained** — GF parity, sync ACK cleanup, symmetric diveImportAck, tombstone HMAC (verified static @ `451f8fb`).
 
 ---
 
@@ -103,11 +92,10 @@ Since prior iOS master audit (`7dfefe2`), `main` @ `5d757cc` includes post-remed
 | Item | Value |
 |---|---|
 | Required branch | `main` ✓ |
-| Audited commit | `5d757cc` |
+| Audited commit | `451f8fb` |
 | Primary target | `DIRDiving iOS` |
 | Primary test target | `DIRDiving iOS Algorithm Tests` |
-| Secondary scope | Shared/`BuhlmannCore`, Watch GF/briefing codecs (read-only parity) |
-| Out of scope for fixes | All production code (audit-only) |
+| Secondary scope | Shared/BuhlmannCore, Watch GF/briefing/sync codecs (read-only parity) |
 
 ---
 
@@ -117,8 +105,9 @@ Since prior iOS master audit (`7dfefe2`), `main` @ `5d757cc` includes post-remed
 
 ```bash
 git branch --show-current          # main
-git rev-parse --short HEAD         # 5d757cc
-git status -sb
+git rev-parse --short HEAD         # 451f8fb
+git fetch --prune origin
+git status -sb                     # clean
 xcodegen generate
 xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving iOS" \
   -destination 'generic/platform=iOS Simulator' \
@@ -132,33 +121,26 @@ xcodebuild -project DIRDiving.xcodeproj -scheme "DIRDiving iOS Algorithm Tests" 
 
 | Step | Outcome |
 |---|---|
-| Branch / commit | `main` @ `5d757cc` ✓ |
-| Build | **BUILD SUCCEEDED** (prior baseline) |
-| Full suite | **TEST SUCCEEDED** — 1527 executed, 0 failures (~151 s) |
-| Post-remediation GF tests | **15/15 PASS** — `DivePlanPackageBuilderTests` + `PlannerGFPresetDisplayTests` |
-| Simulator | iPhone 17 Pro (iOS Simulator 26.x) |
+| Branch / commit | `main` @ `451f8fb` ✓ |
+| iOS build | **BUILD SUCCEEDED** |
+| iOS Algorithm Tests | **TEST FAILED** — compile: ambiguous `distanceMeters(points:)`; `SnorkelingRoutePlannerDraft` type mismatch test vs app module |
+| Prior baseline | `5d757cc`: 1527 executed, 0 failures |
 
 ---
 
 ## F. Target Membership and Architecture
 
 ```text
-DIR Diving (iOS Companion @ 5d757cc)
-├── Shared/BuhlmannCore              → canonical ZH-L16C (iOS planner + Watch FC)
-├── Shared/Models/
-│   ├── FullComputerGradientFactorPreset.swift  → Watch FC presets + iOS plan matching
-│   └── DivePlanPackage.swift        → optional gradientFactorPreset field
+DIR Diving (iOS Companion @ 451f8fb)
+├── Shared/BuhlmannCore              → canonical ZH-L16C
+├── Shared/Models/                   → FullComputerGradientFactorPreset; DivePlanPackage
 ├── iOSApp/
-│   ├── App/DIRDivingiOSApp.swift
-│   ├── Algorithms/Buhlmann/         → iOS façade adapters
-│   ├── Services/                    → Planner, gas, sync, logbooks, CCR
-│   ├── Views/                       → Planner, settings, activity roots
-│   └── Utils/PlannerModePolicy.swift → PlannerGFPreset (20/80 30/70 40/85 + FC raw mapping)
-├── Models/PlannerBriefingCard.swift → reference-only briefing manifest
-└── Tests/iOSAlgorithmTests/         → 1288 test function definitions; 1526 executed
+│   ├── Services/                    → Planner, sync, logbooks, Snorkeling route planner
+│   ├── Views/                       → Activity roots, Settings mode switcher, route planner map
+│   └── Utils/PlannerModePolicy.swift
+├── Snorkeling P1/P2/P3              → IOSSnorkelingRoutePlannerView + Shared validators
+└── Tests/iOSAlgorithmTests/         → 1290+ test functions (compile blocked @ HEAD)
 ```
-
-**Watch runtime** (Gauge, Full Computer live tissue engine, deco-stop state machine) is **out of iOS live authority**; iOS consumes/produces reference plans and briefing artifacts only.
 
 ---
 
@@ -172,17 +154,14 @@ Launch → IOSLegalOnboardingView (if required)
       → else (Diving) → ContentView
 ```
 
-| Check | Verdict | Evidence |
-|---|---|---|
-| Selection persistence | **PASS** | `CompanionActivityPreferenceStore` |
-| Legacy Diving migration | **PASS** | `IOSCompanionActivitySelectionTests` |
-| No placeholder production route | **PASS** | Experimental views labeled |
-| No duplicate root coordinator | **PASS** | Single `DIRDivingiOSApp` entry |
-| Watch session guard | **PASS** | Settings scope does not mutate activity preference |
-| Deep links | **PASS** | `IOSCompanionDeepLinkPolicy` rejects cross-activity |
-| Navigation state restoration | **PARTIAL** | Tab tokens persist; root tab wiring incomplete (F002) |
-| EN/IT | **PASS** | `DIRDivingCompleteLocalizationAuditTests` |
-| Deterministic tests | **PASS** | Activity selection + routing suites |
+| Check | Verdict |
+|---|---|
+| Selection persistence | **PASS** |
+| Legacy Diving migration | **PASS** |
+| No placeholder production route | **PASS** |
+| Settings scope ≠ runtime activity | **PASS** |
+| Cross-activity deep links | **PASS** — rejected |
+| Navigation state restoration | **PARTIAL** — IOS-P3-001 |
 
 **Q1–2:** iOS is **truly multi-activity**; Diving, Apnea, and Snorkeling are **first-class product areas**.
 
@@ -190,222 +169,116 @@ Launch → IOSLegalOnboardingView (if required)
 
 ## H. iOS Settings Mode Switch and Activity Settings
 
-| Check | Verdict | Evidence |
-|---|---|---|
-| Switch includes Diving/Apnea/Snorkeling | **PASS** | `IOSCompanionSettingsModeSwitcher` |
-| Content visible below switcher | **PASS** | `IOSCompanionSettingsRootView` — no nested Form-in-ScrollView hide |
-| Gear routing initial mode | **PASS** | `IOSActivitySettingsRoutingTests` |
-| MoreView exposes same switcher | **PASS** | `IOSActivitySettingsContentVisibilityTests` |
-| No cross-activity leakage | **PASS** | `IOSActivitySettingsRoutingTests` |
-| No Watch runtime mutation | **PASS** | `IOSActivitySettingsModeSwitchTests` |
-| Apnea/Snorkeling editable controls | **PASS** | `IOSApneaSettingsContent`, `IOSSnorkelingSettingsContent` |
+| Check | Verdict |
+|---|---|
+| Switch includes Diving/Apnea/Snorkeling | **PASS** |
+| Content visible below switcher | **PASS** |
+| Gear routing initial mode | **PASS** |
+| No cross-activity leakage | **PASS** — CNS/GPS/recovery isolated |
+| Apnea/Snorkeling editable controls | **PASS** |
+| Fake logbook toggles | **PASS** — activity Settings; default OFF |
 
-**Q3–5:** Settings mode switch **implemented, visible, safe**; activity-owned without leakage.
-
-Detail: `Docs/MASTER_IOS_SETTINGS_OWNERSHIP_MATRIX_CURRENT.csv`
+See `Docs/MASTER_IOS_SETTINGS_OWNERSHIP_MATRIX_CURRENT.csv`.
 
 ---
 
 ## I. Strict Logbook Ownership
 
-| Check | Verdict | Evidence |
+| Activity | Store | Isolation |
 |---|---|---|
-| Diving → DiveLogStore only | **PASS** | `IOSActivityLogbookRoutingTests` |
-| Apnea → IOSApneaLogbookStore only | **PASS** | Environment isolation tests |
-| Snorkeling → IOSSnorkelingLogbookStore only | **PASS** | Separate JSON files |
-| No mixed query/export/stats | **PASS** | `IOSActivityLogbookDataIsolationTests` |
-| Cross-activity deep link | **PASS** | Rejected by `IOSCompanionDeepLinkPolicy` |
+| Diving | `DiveLogStore` | Diving route only |
+| Apnea | `IOSApneaLogbookStore` | Separate JSON; no `DiveLogStore` env |
+| Snorkeling | `IOSSnorkelingLogbookStore` | Separate JSON; fake logbook isolated |
 
-**Q6:** Logbooks **strictly activity-owned** — no P0 leakage.
-
-Detail: `Docs/MASTER_IOS_LOGBOOK_OWNERSHIP_MATRIX_CURRENT.csv`
+Cross-activity routes: **6/6 blocked** (tests). See `Docs/MASTER_IOS_LOGBOOK_OWNERSHIP_MATRIX_CURRENT.csv`.
 
 ---
 
 ## J. Feature Inventory
 
-Full inventory: `Docs/MASTER_IOS_FEATURE_INVENTORY_CURRENT.csv` (50 rows covering all mandated families).
-
-Highlights: multi-activity roots, Settings switcher, Bühlmann planner modes, CCR reference-only, briefing cards reference-only, GF preset override row (72% readiness).
+`Docs/MASTER_IOS_FEATURE_INVENTORY_CURRENT.csv` — 58 feature rows including Snorkeling P1/P2/P3, map UX, fake logbook toggles.
 
 ---
 
 ## K. Bühlmann Core
 
-| Check | Verdict | Evidence |
-|---|---|---|
-| ZH-L16C 16 N2+He compartments | **PASS** | `BuhlmannConstantsTests` |
-| GF interpolation | **PASS** | `BuhlmannGradientFactorTests` |
-| NDL / ceiling / TTS | **PASS** | `BuhlmannNDLTests`, `BuhlmannCeilingTests` |
-| Multigas / Trimix | **PASS** | `BuhlmannMultigasPlannerTests`, `BuhlmannTrimixHeliumTests` |
-| Invalid gas preflight | **PASS** | `BuhlmannGasValidationTests` |
-| Numerical robustness | **PASS** | `BuhlmannNumericalRobustnessTests` |
-| External oracle | **PENDING** | F011 |
-
-**Q7:** Bühlmann **complete and internally consistent**; external validation pending.
+ZH-L16C shared core: 16 N2+He compartments, GF interpolation, multigas, preflight validation, deterministic output. No P0 math defect identified. External validation **PENDING** (IOS-P2-001).
 
 ---
 
 ## L. Planner Mode Projection
 
-| Mode | Verdict | Notes |
+| Mode | Isolation | Readiness |
 |---|---|---|
-| Base | **PASS** | Single gas; no technical leakage (`PlannerModePolicyTests`) |
-| Deco | **PASS** | Simplified schedule; GF presets visible |
-| Technical | **PASS** | Full schedule, gas ledger, rock bottom |
-| CCR | **PASS** | Reference-only; Ratio Deco blocked |
-
-**Q8–9:** iOS Planner vs Watch FC **understood and separated**; modes **real and isolated**.
+| Base | Single gas; GF forced 30/70; no deco leakage | 92% |
+| Deco | Simplified schedule; GF preset cards | 91% |
+| Technical | Full schedule + gas ledger + rock bottom | 92% |
+| CCR | Separate engine; reference-only | 90% |
 
 ---
 
 ## M. MOD / PPO2 / Dalton / Switch Depth
 
-**PASS** — `PlannerSwitchDepthMODClampTests`, `MODPresentationPolicyTests`. O2 100% @ PPO2 1.6 → MOD ~6 m verified. Switch depth ≤ MOD enforced. PDF MOD display minor asymmetry (F008, P4).
-
-**Q12:** **PASS** with P4 presentation note.
+Canonical MOD formula; switch depth ≤ MOD enforced. Mandatory O2 100% @ PPO2 1.6 → ~6 m tested. CCR setpoint not treated as FO2.
 
 ---
 
-## N. Gas Roles and Schedule-Aware Consumption
+## N–U. Gas, Rock Bottom, Runtime, CCR, Equipment
 
-**PASS** — Back/travel/deco/bailout/CCR roles stable; `ScheduleGasConsumptionServiceTests`, `GasLedgerDisplayFormatterTests`. Liters canonical; bar display projection only.
-
-**Q13–17:** **PASS**.
+Schedule-aware consumption, rock bottom independent from planned consumption, deco-stop presentation matches canonical schedule, CCR reference-only with explicit OC/CCR separation, equipment/checklist role mapping tested. Rock bottom uses simplified average-ascent depth model (conservative direction).
 
 ---
 
-## O. Emergency / Rock Bottom
+## Snorkeling Route Planner P1/P2/P3 (V1.2 scope)
 
-**PASS** — Independent from planned consumption; conservative stressed RMV; `PlannerAscentSpeedSettingsTests` rock-bottom cases.
-
-**Q14:** **PASS** (external review pending per F011).
-
----
-
-## P. Ascent Speed / Runtime / Deco Stops
-
-**PASS** — `PlannerAscentTableTests` (25 tests), `DecoStopsPresentationBuilder` matches canonical schedule.
-
-**Q15–16:** **PASS**.
-
----
-
-## Q. Technical Average-Depth Gas Toggle
-
-**PASS** — `PlannerTechnicalAverageDepthGasConsumptionTests` — affects gas only; Bühlmann/MOD/Rock Bottom unchanged.
-
-**Q18:** **PASS**.
-
----
-
-## R. Repetitive Dive / Residual Tissues
-
-**PASS** — `RepetitiveDiveMathematicalTests` — explicit prior dive source; no silent fresh-tissue fallback; OC only.
-
-**Q19:** **PASS**.
-
----
-
-## S. Ratio Deco
-
-**PASS** — Heuristic/comparative; disclaimer visible; blocked in CCR/Base (`RatioDecoPlannerTests`).
-
-**Q11:** **PASS** — safely comparative.
-
----
-
-## T. Tissue / Narcosis / CNS / OTU
-
-**PASS** — 16-compartment analytics; CNS/OTU with reference disclaimers. Multigas logbook replay partial (F005, P3).
-
-**Q20:** **PARTIAL** — analytics replay gap only.
-
----
-
-## U. CCR / Rebreather
-
-**PASS** — Reference-only mode; setpoint not FO2; diluent/bailout validation; no live controller claim (`CCRPlannerTests`, `CCRMathRemediationTests`).
-
-**Q10:** **PASS** — mathematically coherent and reference-only.
-
----
-
-## V. Structured Equipment / Checklist
-
-**PASS** — REC/TEC/CCR templates; checklist generation; CCR import/export round trip (`ChecklistTypedRoleMigrationTests`).
-
-**Q21–23:** **PASS** with P4 title inference edge (F010).
-
----
-
-## W. Manual Dive / Logbook / Analytics
-
-**PARTIAL** — Manual dive entry reliable; interactive profile editor not implemented (F006). Logbooks strict per activity.
-
-**Q24:** **PARTIAL** — editor gap only.
-
----
-
-## X. PDF / Share / CSV / Briefing Card
-
-| Surface | Verdict | Notes |
+| Tier | iOS software | Verdict |
 |---|---|---|
-| Plan PDF | **PASS** | Disclaimers; `PDFExportServiceTests` |
-| Briefing PNG/card | **PASS** | `referenceOnly: true` always; footer localized |
-| Watch transfer | **PARTIAL** | Software codec PASS; paired QA pending (F014) |
-| CSV/Subsurface | **PARTIAL** | Malformed fail-closed; desktop round-trip pending (F013) |
+| **P1** | Return-to-entry preview, safety check, checklist, gated Watch transfer | **PASS** software |
+| **P2** | Profile kinds, validation warnings, return alert policy | **PASS** software |
+| **P3** | Off-route detection (Watch runtime 50 m) | **PASS** software (Watch primary) |
 
-**Q25:** Briefing cards **numerically faithful in software** and **reference-only**; physical transfer unverified.
-
-Key evidence:
-
-```swift
-// Models/PlannerBriefingCard.swift
-struct PlannerBriefingCardManifest {
-    let referenceOnly: Bool  // always true in export path
-}
-```
+Physical open-water QA: **PENDING** (IOS-P2-006, CONS-048).
 
 ---
 
-## Y. Cloud / Sync / Persistence / Security
+## Snorkeling Map UX (V1.2 scope)
 
-**PASS** (software) — `CloudSessionMergeTests`, `ActivitySyncEnvelopeTests`, HMAC peer pinning. Apnea iCloud stub honest (F003). Two-device field QA pending (F012).
-
-**Q26:** **PARTIAL** — software PASS; field gaps pending.
+Center-on-location button, map type (standard/satellite/hybrid), reset map confirmation, tap-to-place coordinates, route polyline/markers. **IOS-P3-006:** slow GPS may require second center tap.
 
 ---
 
-## Z. Unit Conversion / Localization / Accessibility
+## Fake Logbook Toggles (V1.2 scope)
 
-**PASS** (software) — `PressureModelUnificationTests`, `DIRDivingCompleteLocalizationAuditTests`, `UIUXRemediationV3AccessibilityTests`. Manual VoiceOver journey pending.
+| Activity | Toggle location | Default | Isolation |
+|---|---|---|---|
+| Diving | `DiveLogStore.includeDemoLogbook` | OFF | Demo section separate |
+| Apnea | `dirdiving.ios.apnea.fakeLogbook.enabled` | OFF | Independent toggle |
+| Snorkeling | `dirdiving.ios.snorkeling.fakeLogbook.enabled` | OFF | DEMO banner; no stat pollution |
 
-**Q27:** **PARTIAL** — manual a11y pending.
+**Not** in `DeveloperSettings.swift` (shallow testing toggles remain Watch-side developer gates).
 
 ---
 
-## AA. Performance / Numerical Robustness
+## Post-Remediation CONS Verification
 
-**PASS** @ `5d757cc` — 1527 tests including `PerformanceConcurrencyBatteryRemediationTests`; debounced planner; bounded caches; `PlannerStore.deinit` cancels tasks (CONS-027). F001 **VERIFIED closed**.
+| CONS ID | iOS impact | Verdict |
+|---|---|---|
+| CONS-002 | GF preset parity | **PASS** |
+| CONS-003 | inFlight ACK cleanup | **PASS** |
+| CONS-004 | diveImportAck symmetry | **PASS** |
+| CONS-005 | Tombstone HMAC | **PASS** (legacy diving UUID mirror documented) |
+| CONS-028 | Navigation restoration | **PARTIAL** |
+| CONS-040 | Dual diving settings binding | **OPEN P3** |
 
-**Q28:** **PASS**.
+Detail: `Docs/MASTER_IOS_POST_REMEDIATION_GF_SYNC_VERIFICATION_CURRENT.md`
 
 ---
 
 ## AB. Test Coverage
 
-| Area | Coverage |
-|---|---|
-| Multi-activity architecture | Strong — selection, settings, logbook routing |
-| Bühlmann / planner modes | Strong — golden fixtures, mode policy, multigas |
-| GF presets (iOS display) | Strong — `PlannerGFPresetDisplayTests` 11/11 |
-| GF iOS→Watch import | **PASS** — `DivePlanPackageBuilderTests` all presets @ `5d757cc` |
-| Briefing cards | Strong — encode/render/transfer software tests |
-| CCR / Ratio Deco | Strong |
-| Apnea / Snorkeling release hard | Strong |
+**1290+** test function definitions. @ `451f8fb`: **compile failure** in Snorkeling suites prevents execution. Prior `5d757cc`: 1527 executed, 0 failures.
 
-**1288+** test definitions; **1527** executed @ `5d757cc`, **0 failures**; post-remediation GF subset **15/15 PASS**.
+**IOS-P1-001 root cause:** `SnorkelingDistanceCalculator.distanceMeters(points: [])` ambiguous between `[SnorkelingCoordinate]` and `[SnorkelingRoutePlannerPoint]` overloads; test-local `SnorkelingRoutePlannerDraft` types mismatch app module types in export payload tests.
 
 ---
 
@@ -414,21 +287,8 @@ struct PlannerBriefingCardManifest {
 | Scan | Result |
 |---|---|
 | `try!` / `as!` in `iOSApp/` | **0** |
-| TODO/FIXME in production core | **0** (experimental views only) |
+| Settings cross-activity keys in UI | **None** — routing tests PASS |
 | Hardcoded secrets | **None found** |
-| Settings cross-activity keys | **None** — routing tests PASS |
-
----
-
-## AD. Requirement / Test Matrix
-
-`Docs/MASTER_IOS_REQUIREMENT_TEST_MATRIX_CURRENT.csv` — 40 requirements; **0 FAIL** (REQ-IOS-029/031 GF import + emission PASS @ `5d757cc`).
-
----
-
-## AE. Edge-Case Matrix
-
-`Docs/MASTER_IOS_EDGE_CASE_MATRIX_CURRENT.csv` — 25 cases; **0 FAIL** on GF preset cases (EC-IOS-017/018 PASS); **1 PARTIAL** (EC-IOS-025 navigation restore).
 
 ---
 
@@ -436,50 +296,28 @@ struct PlannerBriefingCardManifest {
 
 | ID | Priority | Summary | Status |
 |---|---|---|---|
-| F016 | **P1** | iOS GF presets ↔ Watch FC parity + `gradientFactorPreset` emission | **VERIFIED** @ `5d757cc` (CONS-002) |
-| F017 | **P2** | `PlannerStore.deinit` cancels async tasks | **VERIFIED** @ `5d757cc` (CONS-027) |
-| F011–F015 | P2 | External/physical QA pending | PENDING |
-| F002–F006 | P3 | Nav restore partial, Apnea cloud, dual-binding, tissue replay, manual editor | OPEN |
-| F007–F010 | P4 | Keychain skip, PDF MOD, eager stores, checklist inference | VERIFIED |
-| F001 | P3 | Perf test flake | **VERIFIED closed** @ `5d757cc` |
+| IOS-P1-001 | **P1** | Snorkeling test compile failure blocks algorithm test suite | **OPEN** |
+| IOS-P2-001..006 | P2 | External/physical QA pending (Bühlmann, iCloud, Subsurface, briefing, Snorkeling GPS, Snorkeling field) | PENDING |
+| IOS-P3-001..006 | P3 | Nav restore, Apnea cloud, dual-binding, tissue replay, manual editor, map GPS quirk | OPEN |
+| IOS-P4-001..004 | P4 | Keychain skip, PDF MOD, eager stores, checklist inference | VERIFIED |
+| CONS-002/027 | — | GF parity + PlannerStore deinit | **VERIFIED** |
 
 Full traceability: `Docs/MASTER_IOS_FINDING_TRACEABILITY_CURRENT.csv`
 
 ---
 
-## AG. Release-Hard Matrix
-
-`Docs/MASTER_IOS_RELEASE_HARD_MATRIX_CURRENT.csv` — Overall **92%** software readiness; blockers reduced to external QA only.
-
----
-
 ## AH. Prioritized Remediation Plan
 
-1. **P2 — External QA:** Execute Bühlmann external fixture review (F011), paired briefing transfer (F014), iCloud two-device (F012), Subsurface CSV (F013), Snorkeling GPS field (F015).
-2. **P3 — F002:** Wire `IOSCompanionNavigationPersistence` tokens into root tab selection on cold launch.
-3. **P3 — F003–F006:** Apnea cloud or continued stub; unify settings binding; tissue replay; manual editor per future-work docs.
-4. **Regression guard:** Retain `DivePlanPackageBuilderTests` + `PlannerGFPresetDisplayTests` on any GF/package builder change.
-
----
-
-## AI. 7-Day / 14-Day Readiness Plan
-
-**7 days:** Complete paired Watch briefing + GF override physical QA (EXT-IOS-PAIR-06/09); begin Bühlmann external fixture sign-off.
-
-**14 days:** Execute external QA matrix (F011–F015); navigation restoration wiring (F002).
-
----
-
-## AJ. Future Cursor Remediation Commands
-
-- Navigation restoration wiring command
-- Apnea cloud backup implementation (if scheduled)
+1. **P1 — IOS-P1-001:** Disambiguate Snorkeling test calls (`[] as [SnorkelingCoordinate]`); use production `SnorkelingRoutePlannerDraft` in tests or shared test support module.
+2. **P2 — External QA:** Execute Bühlmann external review, paired briefing transfer, iCloud two-device, Subsurface CSV, Snorkeling 12-folder field matrix.
+3. **P3 — IOS-P3-001:** Wire navigation persistence tokens into root tab selection.
+4. **Regression guard:** Retain GF package builder tests on any planner/sync change.
 
 ---
 
 ## AK. External / Physical QA Pending
 
-See `Docs/MASTER_IOS_EXTERNAL_VALIDATION_PENDING_CURRENT.md` — **38 open gaps**; none executed in this pass.
+See `Docs/MASTER_IOS_EXTERNAL_VALIDATION_PENDING_CURRENT.md`.
 
 ---
 
@@ -493,21 +331,22 @@ See `Docs/MASTER_IOS_EXTERNAL_VALIDATION_PENDING_CURRENT.md` — **38 open gaps*
 | 3–5 | Settings switch safe / editable / no leakage | **YES** |
 | 6 | Logbook strict ownership | **YES** |
 | 7 | Bühlmann complete | **YES** (external pending) |
-| 8–9 | Planner/Watch parity / mode isolation | **PASS** — GF preset parity restored @ `5d757cc` |
+| 8–9 | Planner/Watch parity / mode isolation | **PASS** — CONS-002 verified |
 | 10–11 | CCR reference-only / Ratio Deco safe | **YES** |
 | 12–19 | Gas/MOD/Rock Bottom/runtime/repetitive | **YES** |
-| 20 | Tissue/narcosis/CNS/OTU | **PARTIAL** — replay F005 |
+| 20 | Tissue/narcosis/CNS/OTU | **PARTIAL** — IOS-P3-004 |
 | 21–23 | Equipment/checklist/CCR traceable | **YES** |
-| 24 | Manual dives/exports | **PARTIAL** — editor F006 |
-| 25 | Briefing cards faithful + reference-only | **YES** (software); paired QA pending |
-| 26–28 | Sync/units/performance | **PARTIAL** — field QA pending; perf PASS |
-| 29–31 | TestFlight / App Store ready | **Conditional internal / Not external / Not App Store** |
-| 32–33 | Blocks 100% / fix first | **External QA matrix** (F011–F015), then navigation restore (F002) |
+| 24 | Manual dives/exports | **PARTIAL** — IOS-P3-005 |
+| 25 | Briefing cards faithful + reference-only | **YES** (software) |
+| 26–28 | Sync/units/performance | **PARTIAL** — field QA pending |
+| 29 | Internal TestFlight | **Conditional** — fix IOS-P1-001 |
+| 30–31 | External TestFlight / App Store | **Not yet** |
+| 32–33 | Blocks 100% / fix first | **IOS-P1-001**, then external QA matrix |
 
 ### Machine-readable verdict block
 
 ```text
-MASTER_IOS_FULL_DEEP_AUDIT: PASS
+MASTER_IOS_FULL_DEEP_AUDIT: PARTIAL
 BASELINE_CURRENT_AND_CLEAN: PASS
 TARGET_MEMBERSHIP: PASS
 MULTI_ACTIVITY_ARCHITECTURE: PASS
@@ -548,27 +387,32 @@ MANUAL_DIVE_READINESS: 88
 PDF_SHARE_EXPORT_READINESS: 90
 PLANNER_BRIEFING_CARD_WATCH_TRANSFER_READINESS: 90
 CSV_SUBSURFACE_READINESS: 86
-CLOUD_SYNC_PERSISTENCE_READINESS: 87
+CLOUD_SYNC_PERSISTENCE_READINESS: 88
 SECURITY_PRIVACY_READINESS: 88
 UNIT_CONVERSION_READINESS: 93
 LOCALIZATION_READINESS: 91
 ACCESSIBILITY_READINESS: 86
-PERFORMANCE_NUMERICAL_ROBUSTNESS_READINESS: 92
-TEST_COVERAGE_READINESS: 96
+PERFORMANCE_NUMERICAL_ROBUSTNESS_READINESS: 91
+TEST_COVERAGE_READINESS: 78
 P0_FINDINGS: 0
-P1_FINDINGS: 0
-P2_FINDINGS: 5
-P3_FINDINGS: 5
+P1_FINDINGS: 1
+P2_FINDINGS: 6
+P3_FINDINGS: 6
 P4_FINDINGS: 4
-OVERALL_IOS_SOFTWARE_READINESS: 92
-INTERNAL_TESTFLIGHT_READINESS: 91
-EXTERNAL_TESTFLIGHT_READINESS: 52
-APP_STORE_READINESS: 48
+OVERALL_IOS_SOFTWARE_READINESS: 90
+INTERNAL_TESTFLIGHT_READINESS: 88
+EXTERNAL_TESTFLIGHT_READINESS: 50
+APP_STORE_READINESS: 46
 PHYSICAL_IOS_QA: PENDING_PHYSICAL
 PAIRED_WATCH_IOS_QA: PENDING_PHYSICAL
 EXTERNAL_BUHLMANN_VALIDATION: PENDING_EXTERNAL_VALIDATION
 EXTERNAL_SUBSURFACE_VALIDATION: PENDING_EXTERNAL_VALIDATION
-RELEASE_BLOCKERS: IOS-MASTER-F011,IOS-MASTER-F012,IOS-MASTER-F013,IOS-MASTER-F014,IOS-MASTER-F015
+RELEASE_BLOCKERS: IOS-P1-001,IOS-P2-001,IOS-P2-004,IOS-P2-006
+IOS_GF_PRESET_PARITY: PASS
+IOS_INFLIGHT_ACK_CLEANUP: PASS
+IOS_DIVE_IMPORT_ACK_SYMMETRY: PASS
+IOS_TOMBSTONE_SECURITY: PASS
+IOS_SOFTWARE_READINESS_AFTER_REMEDIATION: 91
 ```
 
 ---
@@ -586,12 +430,18 @@ RELEASE_BLOCKERS: IOS-MASTER-F011,IOS-MASTER-F012,IOS-MASTER-F013,IOS-MASTER-F01
 | `Docs/MASTER_IOS_SETTINGS_OWNERSHIP_MATRIX_CURRENT.csv` | Replaced |
 | `Docs/MASTER_IOS_LOGBOOK_OWNERSHIP_MATRIX_CURRENT.csv` | Replaced |
 | `Docs/MASTER_IOS_EXTERNAL_VALIDATION_PENDING_CURRENT.md` | Replaced |
-
+| `Docs/MASTER_IOS_POST_REMEDIATION_GF_SYNC_VERIFICATION_CURRENT.md` | Created |
+| `Docs/MASTER_IOS_GF_PRESET_PARITY_POST_REMEDIATION_MATRIX_CURRENT.csv` | Created |
+| `Docs/MASTER_IOS_SYNC_ACK_POST_REMEDIATION_MATRIX_CURRENT.csv` | Created |
+| `Docs/MASTER_IOS_TOMBSTONE_SECURITY_POST_REMEDIATION_MATRIX_CURRENT.csv` | Created |
+| `Docs/MASTER_WATER_AUTO_OPEN_CODE_RISK_MATRIX_CURRENT.csv` | Created |
+| `Docs/MASTER_APP_INTENT_UNDERWATER_SAFETY_MATRIX_CURRENT.csv` | Created |
 | `Docs/MASTER_GF_PRESET_SYNC_SCHEMA_MATRIX_CURRENT.csv` | Created |
-| `Docs/MASTER_GF_PRESET_RELEASE_EVIDENCE_MATRIX_CURRENT.csv` | Updated |
+| `Docs/MASTER_DEPTH_CAPABILITY_ENTITLEMENT_MATRIX_CURRENT.csv` | Created |
+| `Docs/MASTER_DEVELOPER_SHALLOW_TESTING_RELEASE_GATE_MATRIX_CURRENT.csv` | Created |
 
-**Git status after audit:** Only `Docs/MASTER_IOS_*` and GF matrix files modified/created. No production code changes.
+**Git status after audit:** Only `Docs/MASTER_IOS_*` and related matrix files modified/created. No production code changes.
 
 ---
 
-*End of master iOS audit — V1.1 post-remediation rerun @ `5d757cc`, audit-only.*
+*End of master iOS audit — V1.2 @ `451f8fb`, audit-only.*

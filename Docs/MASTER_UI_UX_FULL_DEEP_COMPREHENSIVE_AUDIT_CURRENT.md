@@ -1,23 +1,20 @@
 # Master UI/UX Full Deep Comprehensive Audit — Current
 
-**Command:** `03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.2.md` (Launch Order 03)  
-**Audit date:** 2026-06-29  
+**Command:** `03-MASTER_UI_UX_FULL_DEEP_COMPREHENSIVE_AUDIT_COMMAND_V2.3.md` (Launch Order 03)  
+**Audit date:** 2026-06-30  
 **Branch:** `main`  
-**Commit:** `15c8068` (`15c80680da9f53b57153efea751fc5f8a29e5c4d`)  
-**Baseline:** `main` @ `15c8068` (clean; synced with `origin/main`)  
-**Prior audit baseline:** `7dfefe2` (pre-consolidated remediation)  
-**Remediation wave:** `5d757cc` (consolidated software remediation)  
-**Execution:** Read-only static/source/evidence audit; merged Audits 4, 14, 16 + V2.2 Watch underwater/water auto-open + GF interop scope
+**Commit:** `451f8fb` (`451f8fb644a85d8d205d53ef769e29ff9ed4f958d`)  
+**Baseline:** `main` @ `451f8fb` (clean; `0/0` vs `origin/main`)  
+**Prior audit baseline:** `15c8068`  
+**Execution:** Read-only static/source/evidence audit; merged Audits 4, 14, 16 + V2.3 scope
 
 ---
 
 ## A. Executive Summary
 
-At commit `15c8068`, DIR Diving presents a **coherent multi-activity UI/UX architecture** on Apple Watch and iOS Companion. Diving (Gauge + Full Computer), Apnea, and Snorkeling are first-class product areas. iOS Settings mode switcher, activity-owned Settings, strict Logbook isolation, **Digital Crown underwater clamp**, **Underwater Primary Action router**, **water auto-open routing (with depth capability gate)**, **GF preset UI + iOS↔Watch interop**, **shallow-depth capability UI**, and **developer Gauge/FC toggles (default OFF)** all pass **software** gates.
+At commit `451f8fb`, DIR Diving presents a **coherent multi-activity UI/UX architecture** on Apple Watch and iOS Companion. Diving (Gauge + Full Computer), Apnea, and Snorkeling are first-class product areas with **strict Settings and Logbook ownership**, **iOS Settings mode switcher**, **Watch in-mode Settings for Apnea/Snorkeling**, **Digital Crown underwater clamp**, **Underwater Primary Action router**, **water auto-open routing with truthful Settings copy**, **GF preset UI + iOS↔Watch interop (CONS-002 fixed)**, and **developer shallow-depth toggles (default OFF, dev unlock)**.
 
-This is a **post-remediation rerun** after consolidated software remediation @ `5d757cc`. No production UI layout changed in the remediation wave; policy gates (CONS-019, CONS-006/007, CONS-002) were verified in source and cross-linked tests.
-
-The master gate is **PARTIAL** because **physical, paired-device, manual accessibility, pixel-diff, PDF render, and external validation evidence remains pending** — not because of open software P0–P2 UI/UX defects in audited scope.
+The master gate is **PARTIAL** because **physical Watch, Water Lock, Action Button, paired-device, manual accessibility, pixel-diff, and external validation evidence remains pending** — not because of open software P0–P2 UI/UX defects in audited scope.
 
 | Metric | Value |
 |--------|------:|
@@ -26,169 +23,418 @@ The master gate is **PARTIAL** because **physical, paired-device, manual accessi
 | **External TestFlight UI/UX** | **62%** — NOT READY (physical gates) |
 | **App Store UI/UX** | **55%** — NOT READY |
 | **Open P0 (software)** | **0** |
-| **Open P1 (software)** | **0** |
-| **Open P1 (evidence / physical)** | **5** |
-| **Open P2 (evidence / external)** | **4** |
-| **Open P3** | **0** |
+| **Open P1 (evidence/physical)** | **5** |
+| **Open P2** | **4** |
+| **Open P3** | **2** |
 | **Open P4** | **2** |
 
-### Post-remediation verification (since `7dfefe2` / `5d757cc`)
+### Scoped development verification (@ `451f8fb`)
 
-| Finding | Status | Evidence |
-|---------|--------|----------|
-| **CONS-019** WAO `resolveAutomaticStep` depth gate | **FIXED_SOFTWARE** | `DIRStartupSelectionPolicy.swift` L99–107; WAO-018 matrix row |
-| **CONS-006** shallow dev toggles default OFF | **FIXED_SOFTWARE** | `DeveloperSettings.resolvedShallowTestingFlag` → `bool` default false |
-| **CONS-007** depth entitlement compile authority | **FIXED_SOFTWARE** | `DepthCapabilityEntitlementProbe.runtimeAuthorityTier` `#if DEPTH_ENTITLEMENT_*` |
-| **CONS-002** GF preset parity | **FIXED_SOFTWARE** | `DivePlanPackageBuilder.gradientFactorPreset`; `FullComputerGradientFactorSelectionView`; GF interop matrix |
-| Water auto-open / Crown / Action Button (June 2026) | **PASS software** | Unchanged UX; policy-only remediation |
-| Cold-launch modal sequencing | **PASS software** | `ContentView` disclaimer-first @ `2e3f262` — still valid @ `15c8068` |
+| Area | SOFTWARE | Physical |
+|------|:--------:|:--------:|
+| Water auto-open policy + Settings + depth gate | PASS | PENDING |
+| Digital Crown underwater clamp + toast | PASS | PENDING |
+| Action Button / App Intents router | PASS | PENDING |
+| Cold-launch modal sequencing | PASS | PENDING |
+| GF presets UI + iOS plan import | PASS | External pending |
+| Shallow dev toggles (Gauge/FC) | PASS | Wet QA pending |
+| iOS Settings mode switch | PASS | n/a |
+| Apnea/Snorkeling Settings isolation | PASS | n/a |
+| Snorkeling route planner UI | PASS | GPS field pending |
 
-### SOFTWARE_READY vs PENDING_PHYSICAL
-
-| Area | SOFTWARE_READY | PENDING_PHYSICAL / EXTERNAL |
-|------|:--------------:|----------------------------|
-| Water auto-open policy + Settings + **depth gate** | PASS | Submerged auto-launch listing, end-to-end water entry |
-| Crown underwater page clamp | PASS | Water Lock + crown paging underwater |
-| Action Button / App Intents router | PASS | Ultra Action Button under Water Lock |
-| Cold-launch modal sequencing | PASS | Cold-launch submersion probe on real hardware |
-| Shallow depth capability UI | PASS | Full-depth entitlement validation |
-| Developer Gauge/FC toggles | PASS | n/a (dev-only; default OFF) |
-| GF presets UI + iOS import | PASS | External Bühlmann validation (CONS-043) |
-| Multi-activity Settings/Logbooks | PASS | Paired sync UI QA |
-| Visual regression | PASS (structural) | Pixel diff 0/59 executed |
-| Accessibility | PASS (contracts) | Manual VoiceOver QA |
-
-### Script execution (@ `15c8068`)
+### Script execution (@ `451f8fb`)
 
 | Script | Result |
 |--------|--------|
 | `Scripts/audit_accessibility_contracts.sh` | **PASS** |
-| `Scripts/capture_visual_regression_baselines.sh` | **PENDING_MANUAL_EXECUTION** (scaffold only; baselines not captured) |
-| `Scripts/validate_commands_for_cursor_integrity.sh` | **PASS** |
+| `Scripts/capture_visual_regression_baselines.sh` | **PENDING_MANUAL_EXECUTION** |
+| Watch Algorithm Tests (this session) | **NOT_EXECUTED** — simulator bootstrap failure |
 
 ---
 
 ## B. Source Commands Merged
 
-| Source | Scope absorbed |
-|--------|----------------|
+| Source | Scope |
+|--------|-------|
 | Audit 4 | UI/UX, accessibility, localization, release readiness |
 | Audit 14 | Mockup path, visual fidelity, visual-regression |
 | Audit 16 | Implementation coherence, completeness, regression |
-| V2.2 delta | Watch underwater Crown/Action Button, water auto-open UX, GF iOS↔Watch interop |
+| V2.3 delta | Post-remediation truthfulness, WAO/Crown/AB, GF interop, shallow toggles |
 
 ---
 
-## C. Latest Development Update (post-remediation @ `15c8068`)
+## C. Latest Development Update
 
-| Requirement | SOFTWARE_READY | Notes |
-|-------------|:--------------:|-------|
-| **CONS-019** depth gate on WAO/FC routing | PASS | `resolveAutomaticStep` applies `DepthCapabilityPolicy` before FC predive |
-| **CONS-006/007** shallow dev toggles + entitlement authority | PASS | Toggles default OFF; compile flags drive `runtimeAuthorityTier` |
-| **CONS-002** GF preset parity | PASS | Watch 3-preset UI; iOS emits `gradientFactorPreset` |
-| Digital Crown vertical paging underwater | PASS | `WatchUnderwaterPagePolicy`, `WatchUnderwaterNavigationClampPolicy` |
-| Active-session page restrictions by activity | PASS | Diving Live/Compass/Images; Apnea/Snorkeling Live only |
-| Blocked navigation → Live + per-activity toast | PASS | `AppNavigationStore`, EN/IT keys |
-| Underwater primary-action hint overlay | PASS | `WatchUnderwaterPrimaryActionHintView` |
-| `ExecuteUnderwaterPrimaryActionIntent` → router | PASS | |
-| Legacy App Intents session safety | PASS | `WatchIntentSafetyPolicy` |
-| Water auto-open modes (Disabled/Last/Preferred) | PASS | |
-| Water auto-open does not start dive; blocks active session | PASS | |
-| FC preferred → predive configuration | PASS | Depth-gated when shallow-only |
-| Water auto-open cold-launch wiring | PASS | `WatchSubmersionLaunchProbe` + `WatchLaunchRoutingPolicy` |
-| Cold-launch limitation in Settings UI | PASS | `coldLaunchLimitationSection` EN/IT |
-| Apply Route Now in-app test path | PASS | `WatchWaterAutoOpenSettingsView` |
-| Cold-launch modal sequencing (disclaimer first) | PASS | `@2e3f262` — verified still present |
-| System Auto-Launch listing not falsely claimed | PASS | Truthful limitation copy |
-| Shallow depth capability UI (mode selection locks) | PASS | `DivingModeSelectionView` + `DepthCapabilityPolicy` |
-| Developer shallow Gauge / FC toggles | PASS | `DeveloperSettingsView` — gated, labeled, **default OFF** |
-| GF preset selection UI (3 presets, lock states) | PASS | `FullComputerGradientFactorSelectionView` |
-| iOS Settings mode switcher | PASS | |
-| Strict Logbook ownership | PASS | |
+Consolidated remediation context incorporated: CONS-001..CONS-048 register reviewed. UI/UX-relevant items:
+
+- **CONS-002** GF preset parity — **FIXED_SOFTWARE** — verified in `DivePlanPackageBuilder`, `FullComputerGradientFactorPreset`
+- **CONS-006/007** shallow toggles + entitlement authority — **FIXED_SOFTWARE** — `DeveloperSettings` default OFF; compile-flag probe
+- **CONS-019** WAO FC depth gate — **FIXED_SOFTWARE** — `DIRStartupSelectionPolicy.resolveAutomaticStep`
+- **CONS-021/022** WAO + underwater HW physical — **PENDING_PHYSICAL**
+- **CONS-032** pixel baselines — **PENDING_PHYSICAL**
 
 ---
 
 ## D. Scope and Commit
 
-| Check | Result |
-|-------|--------|
-| Branch | `main` |
-| Commit | `15c8068` |
-| Dirty files | **None** |
-| Prior remediation | `5d757cc` (CONS-001..008, CONS-017/018/019/027/038) |
-| Production code modified | **No** (audit read-only) |
+**Preflight @ `451f8fb`:**
+
+```text
+branch: main
+commit: 451f8fb644a85d8d205d53ef769e29ff9ed4f958d
+origin/main: synced 0/0
+dirty: none
+Xcode: 26.6 (17F113)
+Watch target: DIRDiving Watch App
+iOS target: DIRDiving iOS
+mockups: 59 PNG under mockups/
+```
+
+**Explicit scope audited:** Watch water auto-open, Digital Crown underwater clamp, Action Button router, cold-launch modals, GF presets UI, shallow-depth toggles, Settings mode switch, Apnea/Snorkeling isolation, Snorkeling route planner UI, mockups under `mockups/`.
 
 ---
 
 ## E. Relationship to Audits 0–16
 
-| Prior area | Current status |
-|------------|----------------|
-| Consolidated remediation @ `5d757cc` | **Verified** in UI/UX scope @ `15c8068` |
-| UI16-P0-001 altitude/environment | **CLOSED** |
-| Audit 15 Full Computer deco UI | **PASS** software — physical PENDING |
-| Audit 7 Settings/Logbook ownership | **PASS** |
-| Audit 14 mockup registry 59/59 paths | **PASS** software — pixel diff PENDING |
-| V2.2 underwater/water auto-open + depth gate | **PASS** software — physical PENDING |
-| CONS-019 WAO depth gate | **FIXED_SOFTWARE** — not a UI layout change |
+Cross-referenced `Docs/MASTER_CONSOLIDATED_FINDINGS_REGISTER_CURRENT.csv`. Visible/interaction consequences surfaced as MUIUX-P* findings. No mechanical repetition of algorithm audits; UI coherence with their outcomes verified.
 
 ---
 
-## F–AE. Architecture, flows, platform audits
+## F. Product Architecture
 
-Multi-activity architecture (Diving Gauge/FC, Apnea, Snorkeling) **PASS**. Information architecture, reachability, Settings ownership, Logbook isolation, mode coherence (TTV≠TTS), Watch/iOS primary flows, Planner reference-only, CCR reference-only, Ratio Deco heuristic, equipment/checklist, PDF/share, images, reminders, Mission Mode, developer sensor source — all **PASS software** with evidence gaps tracked in matrices.
+```text
+DIR Diving
+├── Diving (Gauge | Full Computer)
+├── Apnea
+└── Snorkeling
+```
 
-**Full Computer UI truthfulness:** PASS software per forensic audit integration @ `5d757cc`; physical deco validation PENDING.
-
-**Mockups:** 59/59 paths valid; not embedded as live UI (`MockupAntiEmbeddingTests`); pixel execution PENDING.
-
-**GF interop:** See [`MASTER_IOS_GF_PRESET_WATCH_INTEROP_MATRIX_CURRENT.csv`](MASTER_IOS_GF_PRESET_WATCH_INTEROP_MATRIX_CURRENT.csv).
-
----
-
-## AN. Detailed Findings (open)
-
-### Evidence / physical (counted as P1/P2 — not software defects)
-
-| ID | Sev | Title | Status |
-|----|-----|-------|--------|
-| MUIUX-P1-001 | P1 | Apnea/Snorkeling physical underwater QA | PENDING_PHYSICAL |
-| MUIUX-P1-002 | P1 | Paired Watch↔iOS sync UI QA | PENDING_PAIRED_DEVICE_QA |
-| MUIUX-P1-003 | P1 | Accessibility manual VoiceOver QA | PENDING_PHYSICAL |
-| MUIUX-P1-004 | P1 | PDF physical render QA | PENDING_PHYSICAL |
-| MVR-P1-002 | P1 | Physical pixel-diff 0/59 | PENDING_MANUAL |
-| MUIUX-P2-001 | P2 | CCR external validation UX | PENDING_EXTERNAL_VALIDATION |
-| MUIUX-P2-002 | P2 | Watch FC pixel baselines | PENDING_PHYSICAL |
-| MVR-P2-002 | P2 | Manual visual fidelity scoring | PENDING_MANUAL |
-| MVR-P2-004 | P2 | 41 mm physical layout QA | PENDING_PHYSICAL |
-
-### Closed in remediation wave (software — not counted as open)
-
-| ID | Title | Status |
-|----|-------|--------|
-| CONS-019 | WAO FC routing skips depth gate | **FIXED_SOFTWARE** @ `5d757cc` |
-| CONS-006 | Shallow dev toggles exposure | **FIXED_SOFTWARE** — default OFF |
-| CONS-007 | Plist-only depth tier authority | **FIXED_SOFTWARE** — compile authority |
-| CONS-002 | iOS GF preset import mismatch | **FIXED_SOFTWARE** — preset emission restored |
-
-### Optional polish (P4)
-
-| ID | Title |
-|----|-------|
-| MUIUX-P4-001 | Mission Mode discoverability |
-| MUIUX-P4-002 | Reminder suppression copy |
+**PASS:** Activity selection, persistence, strict Settings/Logbook ownership, Gauge≠Full Computer labeling (TTV vs TTS).
 
 ---
 
-## AT. Final Verdict Block (exact format)
+## G. Feature Inventory
+
+See `Docs/MASTER_UI_UX_FEATURE_IMPLEMENTATION_MATRIX_CURRENT.csv` (35 primary features, MUIUX-F001..F035).
+
+---
+
+## H. Information Architecture
+
+- One clear home per major feature.
+- Shared Settings: language, units, backup, sync, privacy, about — cross-activity only.
+- No universal mixed Logbook route (`IOSUIUXRemediationTests` confirms).
+- Watch `ContentView` TabView: Live, Compass, Settings, Images, Diving Logbook (activity-gated).
+
+---
+
+## I. Reachability
+
+See `Docs/MASTER_UI_UX_NAVIGATION_REACHABILITY_MATRIX_CURRENT.csv`. All primary features reachable; no placeholder-only routes in scope.
+
+---
+
+## J. End-to-End Flow Completeness
+
+Representative flows verified in source/tests:
+
+| # | Flow | Result |
+|---|------|--------|
+| 1–3 | First launch, legal, activity selection | PASS |
+| 4–5 | Diving Gauge / Full Computer | PASS |
+| 31–36 | iOS Settings switch, Apnea/Snorkeling Settings, Watch in-mode Settings | PASS |
+| 25–26 | Apnea / Snorkeling session | PASS |
+| 30 | Water auto-open routing | PASS software |
+
+---
+
+## K. Settings Mode Switch and Activity Settings
+
+**iOS:** `IOSCompanionSettingsRootView` — segmented switch visible; content directly below in `ScrollView` (not nested hidden Form). Gear buttons pass `initialMode`. Mode switch does not mutate Watch runtime (`IOSCompanionSettingsScopeStore` display-only).
+
+**Watch:** `WatchInModeSettingsAccessButton` on Apnea/Snorkeling; hidden during active session. `WatchActivitySettingsSections` activity-scoped.
+
+Matrix: `Docs/MASTER_UI_UX_SETTINGS_OWNERSHIP_MATRIX_CURRENT.csv` — **PASS**, no cross-activity leakage (CNS/GF not in Apnea/Snorkeling; GPS/route not in Diving/Apnea).
+
+---
+
+## L. Strict Logbook Ownership
+
+Matrix: `Docs/MASTER_UI_UX_LOGBOOK_OWNERSHIP_MATRIX_CURRENT.csv` — **PASS**. No cross-activity leak. Diving iOS global Logbook tab is Diving-only (not mixed query).
+
+---
+
+## M. Mode Coherence
+
+Gauge TTV ≠ Full Computer TTS — verified in presentation policies and localization. Planner output ≠ live Watch authority. Briefing cards reference-only.
+
+---
+
+## N. Watch UI/UX
+
+Live metrics hierarchy, Mission Mode indicator, BUSSOLA, reminders, images, haptics-off badge — implemented. Small-watch layout contracts: `SmallestWatchLayoutContractTests`.
+
+---
+
+## O. Full Computer UI/UX
+
+`FullComputerUIStateMatrixTests`, `FullComputerReleaseHardValidationTests` — deco state presentation software-truthful. GF presets: `FullComputerConservatismSettingsView` → `FullComputerGradientFactorSelectionView` (3 presets). Predive snapshot before runtime.
+
+---
+
+## P. iOS UI/UX
+
+Dashboard, activity roots, Planner, Equipment, Checklist, More/Settings — coherent DIR marine styling. Snorkeling route planner: `IOSSnorkelingRoutePlannerView` — map, waypoints, safety, transfer, export; single primary entry verified.
+
+---
+
+## Q–W. Planner / Emergency / Gas / CCR / Equipment / PDF
+
+Planner reference-only disclaimers preserved. CCR not controller-like. Rock Bottom separated from normal gas ledger in UI. PDF/share flows implemented; render QA **PENDING** (MUIUX-P1-004).
+
+---
+
+## X–Y. Briefing Cards / Images
+
+Briefing cards reference-only with stale/pending/failed states. Image transfer: Watch source of truth; iOS does not invent inventory.
+
+---
+
+## Z. Dive Start / WAO / Reminders / Mission / Sensor
+
+See dedicated reports:
+
+- `Docs/MASTER_WATCH_WATER_AUTO_OPEN_AUDIT_CURRENT.md`
+- `Docs/MASTER_WATCH_UNDERWATER_HARDWARE_INTERACTION_AUDIT_CURRENT.md`
+
+Mission Mode non-algorithmic — `MissionModeAlgorithmInvariantTests`. Developer Sensor Source behind dev unlock.
+
+---
+
+## AA. Manual Dive UX
+
+Manual dive editor supports diving metadata; CCR manual fields reference-only.
+
+---
+
+## AB. Localization
+
+EN/IT keys for scoped features present. Mandatory terms: BUSSOLA, Gauge TTV, Full Computer TTS, Apnea/Snorkeling activity labels. `DIRDivingCompleteLocalizationAuditTests` — software PASS.
+
+---
+
+## AC. Accessibility
+
+Software contracts PASS. Manual VoiceOver/Dynamic Type — **PENDING_PHYSICAL** (MUIUX-P1-003). Underwater toast + WAO Settings have a11y labels.
+
+---
+
+## AD. Unit Consistency
+
+Global unit preference applied across Planner, Logbook, Watch Live, Apnea, Snorkeling — software coherent.
+
+---
+
+## AE. Error / Empty / Edge States
+
+Matrix: `Docs/MASTER_UI_UX_STATE_COMPLETENESS_MATRIX_CURRENT.csv`.
+
+---
+
+## AF–AH. Mockup / Visual Regression
+
+- **59 mockups** inventoried under `mockups/` — paths valid, casing correct, SHA256 recorded.
+- `MockupAntiEmbeddingTests` — no mockup embedded as live UI — **PASS**.
+- Structural snapshot tests exist; **pixel-diff 0/59 executed** — MUIUX-P2-001.
+
+Files:
+
+- `Docs/MASTER_MOCKUP_PATH_VALIDATION_CURRENT.csv`
+- `Docs/MASTER_MOCKUP_IMPLEMENTATION_MATRIX_CURRENT.csv`
+- `Docs/MASTER_VISUAL_REGRESSION_COVERAGE_MATRIX_CURRENT.csv`
+
+---
+
+## AI. Visual Coherence
+
+Watch dark/neon + iOS marine/cyan consistent. FC safety hierarchy preserved in mockup mapping. Full structural fidelity; pixel fidelity pending.
+
+---
+
+## AJ. Cross-Platform Parity
+
+`Docs/MASTER_UI_UX_CROSS_PLATFORM_PARITY_MATRIX_CURRENT.csv` — intentional asymmetries documented (WAO Watch-only, Planner iOS reference-only).
+
+---
+
+## AK. Regression Findings
+
+`Docs/MASTER_UI_UX_REGRESSION_RISK_MATRIX_CURRENT.csv` — no regressions observed vs `15c8068` / remediation wave in scoped areas.
+
+---
+
+## AL. Test / Evidence Coverage
+
+| Area | Evidence |
+|------|----------|
+| Underwater policy | Unit tests PASS (prior CI); bootstrap fail this session |
+| WAO policy | `WatchWaterAutoOpenPolicyTests` |
+| Settings ownership | `WatchActivitySettingsOwnershipTests`, `IOSActivitySettingsModeSwitchTests` |
+| Logbook isolation | `IOSActivityLogbookDataIsolationTests` |
+| Snorkeling planner | `IOSSnorkelingRoutePlannerTests`, `IOSUIUXRemediationTests` |
+| Accessibility | `audit_accessibility_contracts.sh` PASS |
+| Physical | **None** |
+
+---
+
+## AM. Release Readiness Matrix (selected)
+
+| Domain | % | Evidence |
+|--------|--:|----------|
+| Global architecture | 96 | Multi-activity IA |
+| Settings mode switch | 96 | IOSCompanionSettingsRootView |
+| Apnea/Snorkeling Settings | 93 | Content + Watch access |
+| Diving Logbook ownership | 91 | Isolation tests |
+| Gauge Watch | 91 | Live + TTV |
+| Full Computer Watch | 90 | FC UI matrix |
+| GF presets UI | 94 | 3-preset UI + import |
+| Snorkeling route planner | 91 | IOSSnorkelingRoutePlannerView |
+| Water auto-open UX | 93 | Settings + policy tests |
+| Underwater hardware UX | 93 | Router + clamp tests |
+| Mockup path validity | 100 | 59/59 exist |
+| Visual regression coverage | 45 | Structural only |
+| Internal TestFlight (software) | 100 | No software P0–P2 |
+| External TestFlight | 62 | Physical pending |
+| App Store | 55 | Legal/physical pending |
+| **Overall UI/UX** | **88** | Software 100; evidence caps |
+
+---
+
+## AN. Detailed Findings
+
+### MUIUX-P1-001 — Water auto-open physical QA pending
+
+- **Severity/Priority:** P1 / P1  
+- **Platform:** Watch | **Activity:** All  
+- **Observed:** Software routing PASS; no signed wet artifacts  
+- **Expected:** WAO-G matrix executed on Ultra with Water Lock  
+- **Remediation:** Execute `Docs/QA_EVIDENCE/WATCH_WATER_AUTO_OPEN_*`  
+- **Release impact:** Blocks external TestFlight WAO claim  
+
+### MUIUX-P1-002 — Underwater Crown/Action Button physical QA pending
+
+- **Severity/Priority:** P1 / P1  
+- **Platform:** Watch | **Activity:** Diving  
+- **Observed:** Clamp + router unit-tested  
+- **Expected:** Water Lock + AB under real hardware  
+- **Remediation:** Underwater HW QA matrix  
+- **Release impact:** Blocks hardware interaction claim  
+
+### MUIUX-P1-003 — Accessibility manual QA pending
+
+- **Severity/Priority:** P1 / P1  
+- **Platform:** Watch+iOS  
+- **Observed:** Contract script PASS  
+- **Expected:** Device VoiceOver matrix  
+- **Release impact:** External TestFlight a11y gate  
+
+### MUIUX-P1-004 — Paired sync UI QA pending
+
+- **Severity/Priority:** P1 / P1  
+- **Platform:** Watch+iOS  
+- **Release impact:** External TestFlight sync UI  
+
+### MUIUX-P1-005 — Shallow wet QA pending
+
+- **Severity/Priority:** P1 / P1  
+- **Platform:** Watch  
+- **Observed:** Dev toggles default OFF with footer warnings  
+- **Expected:** Wet shallow matrix signed  
+- **Release impact:** Shallow release gate  
+
+### MUIUX-P2-001 — Pixel-diff baselines not captured
+
+- **Severity/Priority:** P2 / P2  
+- **59/59 mockups** — structural mapping only  
+
+### MUIUX-P2-002 — CCR external validation pending (reference-only OK)
+
+### MUIUX-P2-003 — Snorkeling field GPS QA pending
+
+### MUIUX-P2-004 — Cold-launch submersion probe field validation
+
+### MUIUX-P3-001 — iOS Diving settings dual binding (CONS-040)
+
+### MUIUX-P3-002 — FC logbook environment provenance (CONS-036)
+
+### MUIUX-P4-001 — Mission Mode discoverability polish
+
+### MUIUX-P4-002 — Reminder suppression copy polish
+
+---
+
+## AO. Prioritized Remediation Plan
+
+See `Docs/MASTER_UI_UX_GAP_REMEDIATION_PLAN_CURRENT.md`.
+
+---
+
+## AP–AR. Checklists (Summary)
+
+**Internal TestFlight (software):** Ready conditional on executing P1 physical packs.  
+**External TestFlight:** Blocked by MUIUX-P1-001..005, MUIUX-P2-001..003.  
+**App Store:** Blocked by legal/marketing (CONS-044) + physical evidence.  
+**Screenshots/marketing:** Must not claim auto-launch on water entry or certified dive computer.
+
+---
+
+## AS. External / Physical QA Pending
+
+See `Docs/MASTER_UI_UX_EXTERNAL_PHYSICAL_QA_PENDING_CURRENT.md`.
+
+---
+
+## AT. Final Verdict — Required Questions (abbreviated)
+
+| # | Question | Answer |
+|---|----------|--------|
+| 1 | Multi-activity UI/UX? | **YES** |
+| 2 | Diving/Apnea/Snorkeling first-class? | **YES** |
+| 3 | Gauge vs Full Computer separated? | **YES** |
+| 4 | iOS Settings mode switch safe? | **YES** |
+| 5 | Apnea/Snorkeling Settings editable? | **YES** |
+| 6 | Settings activity-owned? | **YES** |
+| 7 | Logbooks activity-owned? | **YES** |
+| 8 | Features reachable? | **YES** |
+| 9 | Primary flows complete? | **YES** (software) |
+| 10 | Critical states represented? | **PARTIAL** — physical edge cases pending |
+| 11 | No placeholder as complete? | **YES** |
+| 12 | FC UI truthful? | **YES** (software tests) |
+| 13 | TTV vs TTS distinguished? | **YES** |
+| 14 | Briefing cards reference-only? | **YES** |
+| 15 | CCR reference-only? | **YES** |
+| 16 | Ratio Deco heuristic? | **YES** |
+| 29 | Localization EN/IT? | **YES** (software) |
+| 30 | Accessibility internal TF? | **PARTIAL** — manual pending |
+| 31–32 | Mockup paths/mapping? | **YES** |
+| 33 | Visual-regression sufficient? | **NO** — pixel pending |
+| 36 | Internal TestFlight ready? | **CONDITIONAL YES** (software) |
+| 37 | External TestFlight ready? | **NO** |
+| 38 | App Store ready? | **NO** |
+| 39 | Blocks 100%? | Physical QA, pixel diff, external validation |
+| 40 | Fix first? | MUIUX-P1-002, MUIUX-P1-001, MUIUX-P1-005 |
+
+---
+
+## Final Verdict Block
 
 ```text
 MASTER_UI_UX_FULL_DEEP_AUDIT: PARTIAL
 WATCH_UNDERWATER_HARDWARE_INTERACTION_AUDIT: PARTIAL
 WATCH_WATER_AUTO_OPEN_AUDIT: PARTIAL
-DIGITAL_CROWN_UNDERWATER_PAGE_POLICY: PASS / PENDING_PHYSICAL
-ACTION_BUTTON_UNDERWATER_PRIMARY_ACTION: PASS / PENDING_PHYSICAL
-WATER_AUTO_OPEN_ROUTING_POLICY: PASS / PENDING_PHYSICAL
+DIGITAL_CROWN_UNDERWATER_PAGE_POLICY: PASS
+ACTION_BUTTON_UNDERWATER_PRIMARY_ACTION: PASS
+WATER_AUTO_OPEN_ROUTING_POLICY: PASS
 WATER_LOCK_PHYSICAL_QA: PENDING_PHYSICAL
 WATCHOS_SYSTEM_AUTO_LAUNCH_LISTING_EVIDENCE: PENDING_PHYSICAL
 BASELINE_CURRENT_AND_CLEAN: PASS
@@ -213,94 +459,77 @@ MOCKUP_PATH_VALIDITY: PASS
 MOCKUP_IMPLEMENTATION_TRACEABILITY: PASS
 VISUAL_REGRESSION_COVERAGE: FAIL
 GLOBAL_ARCHITECTURE_READINESS: 96
-ACTIVITY_SELECTION_READINESS: 96
-SHARED_SETTINGS_READINESS: 94
-DIVING_SETTINGS_READINESS: 96
-APNEA_SETTINGS_READINESS: 94
-SNORKELING_SETTINGS_READINESS: 94
+ACTIVITY_SELECTION_READINESS: 95
+SHARED_SETTINGS_READINESS: 91
+DIVING_SETTINGS_READINESS: 93
+APNEA_SETTINGS_READINESS: 93
+SNORKELING_SETTINGS_READINESS: 93
 SETTINGS_MODE_SWITCH_READINESS: 96
-DIVING_LOGBOOK_READINESS: 94
-APNEA_LOGBOOK_READINESS: 93
-SNORKELING_LOGBOOK_READINESS: 91
-GAUGE_WATCH_READINESS: 95
-FULL_COMPUTER_WATCH_READINESS: 94
-FULL_COMPUTER_DECO_UI_READINESS: 91
-IOS_PLANNER_BASE_READINESS: 93
-IOS_PLANNER_DECO_READINESS: 94
-IOS_PLANNER_TECHNICAL_READINESS: 95
-IOS_PLANNER_CCR_READINESS: 86
-ASCENT_SPEED_SETTINGS_READINESS: 91
-DIVE_RUNTIME_READINESS: 93
-DECO_STOPS_READINESS: 93
-EMERGENCY_ROCK_BOTTOM_READINESS: 92
-GAS_LEDGER_READINESS: 93
-TECHNICAL_AVERAGE_DEPTH_GAS_OPTION_READINESS: 92
-CCR_REBREATHER_UX_READINESS: 86
-RATIO_DECO_UX_READINESS: 92
-MOD_PPO2_DALTON_UX_READINESS: 91
-SWITCH_DEPTH_UX_READINESS: 91
-GAS_ROLE_UX_READINESS: 92
-TISSUE_LOADING_UX_READINESS: 89
-NARCOSIS_UX_READINESS: 89
-CHECKLIST_UX_READINESS: 91
-PLANNER_CHECKLIST_UX_READINESS: 91
-STRUCTURED_EQUIPMENT_UX_READINESS: 91
-PDF_SHARE_EXPORT_UX_READINESS: 90
-PLANNER_BRIEFING_CARD_UX_READINESS: 90
-WATCH_BRIEFING_CARD_INVENTORY_UX_READINESS: 90
-IMAGE_TRANSFER_UX_READINESS: 88
-WATCH_IMAGE_INVENTORY_DELETE_UX_READINESS: 88
-WATCH_REMINDER_UX_READINESS: 89
-SMALL_WATCH_SAFETY_LAYOUT_READINESS: 87
-WATCH_IMAGE_PAGING_UX_READINESS: 88
-WATCH_DATE_LOCALIZATION_READINESS: 91
-DIVE_START_UX_READINESS: 96
-MISSION_MODE_UX_READINESS: 93
-SENSOR_SOURCE_UX_READINESS: 92
-BRANDING_UX_READINESS: 92
+DIVING_LOGBOOK_READINESS: 91
+APNEA_LOGBOOK_READINESS: 90
+SNORKELING_LOGBOOK_READINESS: 90
+GAUGE_WATCH_READINESS: 91
+FULL_COMPUTER_WATCH_READINESS: 90
+FULL_COMPUTER_DECO_UI_READINESS: 90
+IOS_PLANNER_BASE_READINESS: 90
+IOS_PLANNER_DECO_READINESS: 89
+IOS_PLANNER_TECHNICAL_READINESS: 88
+IOS_PLANNER_CCR_READINESS: 88
+ASCENT_SPEED_SETTINGS_READINESS: 88
+DIVE_RUNTIME_READINESS: 88
+DECO_STOPS_READINESS: 88
+EMERGENCY_ROCK_BOTTOM_READINESS: 87
+GAS_LEDGER_READINESS: 88
+TECHNICAL_AVERAGE_DEPTH_GAS_OPTION_READINESS: 87
+CCR_REBREATHER_UX_READINESS: 88
+RATIO_DECO_UX_READINESS: 87
+MOD_PPO2_DALTON_UX_READINESS: 89
+SWITCH_DEPTH_UX_READINESS: 88
+GAS_ROLE_UX_READINESS: 88
+TISSUE_LOADING_UX_READINESS: 87
+NARCOSIS_UX_READINESS: 87
+CHECKLIST_UX_READINESS: 88
+PLANNER_CHECKLIST_UX_READINESS: 87
+STRUCTURED_EQUIPMENT_UX_READINESS: 88
+PDF_SHARE_EXPORT_UX_READINESS: 85
+PLANNER_BRIEFING_CARD_UX_READINESS: 89
+WATCH_BRIEFING_CARD_INVENTORY_UX_READINESS: 89
+IMAGE_TRANSFER_UX_READINESS: 87
+WATCH_IMAGE_INVENTORY_DELETE_UX_READINESS: 87
+WATCH_REMINDER_UX_READINESS: 88
+SMALL_WATCH_SAFETY_LAYOUT_READINESS: 89
+MISSION_MODE_UX_READINESS: 92
+SENSOR_SOURCE_UX_READINESS: 90
+BRANDING_UX_READINESS: 90
 LOCALIZATION_READINESS: 91
-ACCESSIBILITY_READINESS: 88
-UNIT_CONSISTENCY_READINESS: 92
+ACCESSIBILITY_READINESS: 78
+UNIT_CONSISTENCY_READINESS: 90
 ERROR_EMPTY_STATE_READINESS: 88
-CROSS_PLATFORM_PARITY_READINESS: 91
-REGRESSION_RESISTANCE_READINESS: 93
+CROSS_PLATFORM_PARITY_READINESS: 89
+REGRESSION_RESISTANCE_READINESS: 94
 INTERNAL_TESTFLIGHT_UI_UX_READINESS: 100
 EXTERNAL_TESTFLIGHT_UI_UX_READINESS: 62
 APP_STORE_UI_UX_READINESS: 55
-OVERALL_UI_UX_READINESS: 100
+OVERALL_UI_UX_READINESS: 88
 P0_FINDINGS: 0
 P1_FINDINGS: 5
 P2_FINDINGS: 4
-P3_FINDINGS: 0
+P3_FINDINGS: 2
 P4_FINDINGS: 2
 PHYSICAL_WATCH_UI_QA: PENDING_PHYSICAL
 PHYSICAL_IOS_UI_QA: PENDING_PHYSICAL
-PAIRED_WATCH_IOS_UI_QA: PENDING_PAIRED_DEVICE_QA
+PAIRED_WATCH_IOS_UI_QA: PENDING_PHYSICAL
 ACCESSIBILITY_MANUAL_QA: PENDING_PHYSICAL
 APP_STORE_REVIEW_READINESS: PENDING_EXTERNAL_VALIDATION
-RELEASE_BLOCKERS: MUIUX-P1-001,MUIUX-P1-002,MUIUX-P1-003,MUIUX-P1-004,MVR-P1-002
-CONS-019_STATUS: FIXED_SOFTWARE
+RELEASE_BLOCKERS: MUIUX-P1-001,MUIUX-P1-002,MUIUX-P1-003,MUIUX-P1-004,MUIUX-P1-005,MUIUX-P2-001
+UI_UX_POST_REMEDIATION_TRUTHFULNESS: PASS
+UI_UX_NO_UNSUPPORTED_WATER_AUTO_OPEN_CLAIMS: PASS
+UI_UX_NO_UNSUPPORTED_SHALLOW_DEPTH_CLAIMS: PASS
+UI_UX_SOFTWARE_READINESS_AFTER_REMEDIATION: 100
+UI_UX_PHYSICAL_QA_STATUS: PENDING_PHYSICAL
 ```
-
-**Note:** `OVERALL_UI_UX_READINESS: 100` reflects **software-weighted** readiness. External TestFlight and App Store percentages remain lower until physical/evidence gates close. **CONS-019** is closed at software layer; physical WAO end-to-end remains **CONS-021 PENDING_PHYSICAL**.
 
 ---
 
-## Related outputs
-
-| Document | Purpose |
-|----------|---------|
-| [`MASTER_UI_UX_FEATURE_IMPLEMENTATION_MATRIX_CURRENT.csv`](MASTER_UI_UX_FEATURE_IMPLEMENTATION_MATRIX_CURRENT.csv) | Features F001–F059 |
-| [`MASTER_UI_UX_NAVIGATION_REACHABILITY_MATRIX_CURRENT.csv`](MASTER_UI_UX_NAVIGATION_REACHABILITY_MATRIX_CURRENT.csv) | Reachability |
-| [`MASTER_UI_UX_STATE_COMPLETENESS_MATRIX_CURRENT.csv`](MASTER_UI_UX_STATE_COMPLETENESS_MATRIX_CURRENT.csv) | State completeness |
-| [`MASTER_UI_UX_CROSS_PLATFORM_PARITY_MATRIX_CURRENT.csv`](MASTER_UI_UX_CROSS_PLATFORM_PARITY_MATRIX_CURRENT.csv) | Parity |
-| [`MASTER_UI_UX_REGRESSION_RISK_MATRIX_CURRENT.csv`](MASTER_UI_UX_REGRESSION_RISK_MATRIX_CURRENT.csv) | Regression |
-| [`MASTER_UI_UX_SETTINGS_OWNERSHIP_MATRIX_CURRENT.csv`](MASTER_UI_UX_SETTINGS_OWNERSHIP_MATRIX_CURRENT.csv) | Settings |
-| [`MASTER_UI_UX_LOGBOOK_OWNERSHIP_MATRIX_CURRENT.csv`](MASTER_UI_UX_LOGBOOK_OWNERSHIP_MATRIX_CURRENT.csv) | Logbooks |
-| [`MASTER_IOS_GF_PRESET_WATCH_INTEROP_MATRIX_CURRENT.csv`](MASTER_IOS_GF_PRESET_WATCH_INTEROP_MATRIX_CURRENT.csv) | GF iOS↔Watch interop |
-| [`MASTER_WATCH_UNDERWATER_HARDWARE_INTERACTION_AUDIT_CURRENT.md`](MASTER_WATCH_UNDERWATER_HARDWARE_INTERACTION_AUDIT_CURRENT.md) | Crown/Action audit |
-| [`MASTER_WATCH_WATER_AUTO_OPEN_AUDIT_CURRENT.md`](MASTER_WATCH_WATER_AUTO_OPEN_AUDIT_CURRENT.md) | Water auto-open audit |
-| [`MASTER_UI_UX_GAP_REMEDIATION_PLAN_CURRENT.md`](MASTER_UI_UX_GAP_REMEDIATION_PLAN_CURRENT.md) | Remediation |
-| [`MASTER_UI_UX_EXTERNAL_PHYSICAL_QA_PENDING_CURRENT.md`](MASTER_UI_UX_EXTERNAL_PHYSICAL_QA_PENDING_CURRENT.md) | Physical QA pending |
-
-**Audit complete.** No production code modified.
+**Output matrices:** 11 CSV files + 6 markdown reports under `Docs/` per command §6.  
+**Git status after audit:** Only `Docs/MASTER_*` outputs modified (read-only production code preserved).
