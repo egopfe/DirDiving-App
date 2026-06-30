@@ -1,7 +1,19 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
 **Aggiornato:** 2026-06-17  
-**Branch consigliato:** `main` = `origin/main` @ `7a429a7`
+**Branch consigliato:** `main` = `origin/main` @ `6a0005b`
+
+---
+
+## Aggiornamento indice 2026-06-17 — CONS-046 V1.5 integrity script @ `6a0005b`
+
+Post-merge V1.5 command upgrade: integrity script aligned to V1.5 paths; consolidated readiness PASS.
+
+| Campo | Valore |
+|-------|--------|
+| **Report** | [`MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_FROM_2026_06_30_AUDIT_REPORT_CURRENT.md`](MASTER_CONSOLIDATED_SOFTWARE_REMEDIATION_FROM_2026_06_30_AUDIT_REPORT_CURRENT.md) |
+| **Verdict** | [`MASTER_POST_REMEDIATION_FINAL_VERDICT_CURRENT.md`](MASTER_POST_REMEDIATION_FINAL_VERDICT_CURRENT.md) |
+| **Verdict** | **SOFTWARE_READY 100%** · **INTERNAL_TF_READY** · **CONS-046 V1.5 PASS** |
 
 ---
 
