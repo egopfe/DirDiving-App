@@ -1,7 +1,7 @@
 # Master Do-Not-Touch Policy Register — Current
 
-**Orchestrator:** V1.2 refresh @ `0126699`
-**Date:** 2026-06-29  
+**Orchestrator:** V1.3 refresh @ `451f8fb`  
+**Date:** 2026-06-30  
 **Purpose:** Policies remediation must not violate. See also `MASTER_NON_REGRESSION_GATE_MATRIX_CURRENT.csv`.
 
 ---
