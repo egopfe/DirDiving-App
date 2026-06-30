@@ -126,7 +126,13 @@ final class SnorkelingWatchLayoutContractTests: XCTestCase {
             markerDistanceFromEntryText: "210 m",
             sessionSaveState: stage == .sessionSummary ? .saved : .notSaved,
             isRecoveredSession: false,
-            recoveryWarning: nil
+            recoveryWarning: nil,
+            gpsQualityBand: .good,
+            routeProgressPercent: 55,
+            offRouteDistanceMeters: nil,
+            isOffRoute: false,
+            offRouteWarningPaused: false,
+            plannedReturnAlertActive: false
         )
 
         switch stage {

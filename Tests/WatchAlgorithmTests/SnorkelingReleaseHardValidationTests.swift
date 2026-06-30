@@ -163,7 +163,13 @@ final class SnorkelingReleaseHardValidationTests: XCTestCase {
             markerDistanceFromEntryText: nil,
             sessionSaveState: .notSaved,
             isRecoveredSession: false,
-            recoveryWarning: nil
+            recoveryWarning: nil,
+            gpsQualityBand: nil,
+            routeProgressPercent: nil,
+            offRouteDistanceMeters: nil,
+            isOffRoute: false,
+            offRouteWarningPaused: false,
+            plannedReturnAlertActive: false
         )
     }
 

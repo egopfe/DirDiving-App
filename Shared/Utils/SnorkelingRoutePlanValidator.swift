@@ -42,7 +42,9 @@ enum SnorkelingRoutePlanValidator {
         let trimmed = draft.name.trimmingCharacters(in: .whitespacesAndNewlines)
         if trimmed.isEmpty { issues.append(.emptyName) }
         if draft.entryPoint == nil { issues.append(.missingEntry) }
-        if draft.exitPoint == nil { issues.append(.missingExit) }
+        if draft.resolvedRouteType == .differentExit, draft.exitPoint == nil {
+            issues.append(.missingExit)
+        }
         let ordered = draft.orderedPoints
         if ordered.count < minimumPoints { issues.append(.insufficientPoints) }
         if draft.waypoints.count > maxWaypoints { issues.append(.insufficientPoints) }
@@ -96,8 +98,12 @@ enum SnorkelingRoutePlanValidator {
         return distanceMeters / swimSpeedMetersPerSecond
     }
 
-    static func estimatedDurationSeconds(for draft: SnorkelingRoutePlannerDraft) -> TimeInterval {
-        estimatedDurationSeconds(distanceMeters: routeDistanceMeters(draft.orderedPoints))
+    static func estimatedDurationSeconds(for draft: SnorkelingRoutePlannerDraft, profile: SnorkelingCompanionProfile? = nil) -> TimeInterval {
+        SnorkelingDurationEstimator.estimatedDurationSeconds(
+            distanceMeters: routeDistanceMeters(draft.routingPoints),
+            draft: draft,
+            profile: profile
+        )
     }
 
     static func moveWaypoint(in draft: inout SnorkelingRoutePlannerDraft, from source: Int, to destination: Int) {
