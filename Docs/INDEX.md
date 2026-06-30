@@ -1,7 +1,20 @@
 # DIR DIVING — Indice documentazione (`Docs/`)
 
-**Aggiornato:** 2026-06-29  
-**Branch consigliato:** `main` = `origin/main` @ `79854fa`
+**Aggiornato:** 2026-06-17  
+**Branch consigliato:** `main` = `origin/main` @ (pending commit)
+
+---
+
+## Aggiornamento indice 2026-06-17 — iOS Apnea & Snorkeling fake logbook
+
+iOS-only demo logbook toggles for Apnea and Snorkeling (default OFF); separate in-memory providers; no real storage, Watch sync, or export contamination.
+
+| Campo | Valore |
+|-------|--------|
+| **Spec** | [`IOS_APNEA_SNORKELING_FAKE_LOGBOOK.md`](IOS_APNEA_SNORKELING_FAKE_LOGBOOK.md) |
+| **Report** | [`IOS_APNEA_SNORKELING_FAKE_LOGBOOK_IMPLEMENTATION_REPORT_CURRENT.md`](IOS_APNEA_SNORKELING_FAKE_LOGBOOK_IMPLEMENTATION_REPORT_CURRENT.md) |
+| **QA** | IOS-QA-AFL-001…004 · `Docs/QA_EVIDENCE/IOS_*_FAKE_LOGBOOK_*` |
+| **Verdict** | **INTERNAL_READY** · **PHYSICAL_QA_PENDING** |
 
 ---
 
