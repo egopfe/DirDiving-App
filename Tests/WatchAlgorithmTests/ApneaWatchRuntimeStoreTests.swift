@@ -87,7 +87,12 @@ final class ApneaWatchRuntimeStoreTests: XCTestCase {
             averageDiveDurationSeconds: 0,
             sessionWarnings: [],
             dataQualityDegraded: true,
-            activeOverlay: nil
+            activeOverlay: nil,
+            runtimeLayout: .freeTrainingCompact,
+            sensorQualityLabels: [],
+            maxRepetitions: nil,
+            averageRecoverySeconds: 0,
+            dataQualityLevel: .good
         )
         let output = ApneaWatchPresentation.make(input)
         XCTAssertFalse(output.startEnabled)

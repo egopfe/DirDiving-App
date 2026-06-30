@@ -435,6 +435,20 @@ final class ApneaWatchRuntimeStore: ObservableObject, ApneaWatchRuntimeProviding
             sessionWarnings.append(String(localized: "apnea.recovery.state.insufficient"))
         }
 
+        let package = importedPlan.activatedPackage ?? importedPlan.pendingPackage
+        let profile = package?.body.profile
+        let profileKind = profile?.profileKind ?? (profile.map { ApneaSessionProfileBridge.profileKind(for: $0.discipline) } ?? .freeTraining)
+        let sessionProfile = profile.map(ApneaSessionProfileBridge.fromCompanion) ?? .freeTrainingDefault
+        let sensorQuality = ApneaSensorQuality(
+            depth: isSensorDegraded ? .weak : (currentDepth > 0 || sessionMax > 0 ? .good : .unavailable),
+            heartRate: .unavailable,
+            spO2: .unavailable
+        )
+        let sensorLabels = ApneaSensorQualityEvaluator.compactLabels(for: sensorQuality)
+        let recoveries = dives.compactMap { $0.recoveryAfter?.completedSeconds ?? $0.recoveryAfter?.plannedSeconds }
+        let averageRecovery = recoveries.isEmpty ? 0 : recoveries.reduce(0, +) / Double(recoveries.count)
+        let qualityReport = ApneaDataQualityEvaluator.evaluate(session: snapshot.session)
+
         return ApneaWatchPresentationInput(
             isSessionStarted: lifecyclePhase != .idle,
             showSessionSummary: showSessionSummary,
@@ -470,7 +484,12 @@ final class ApneaWatchRuntimeStore: ObservableObject, ApneaWatchRuntimeProviding
             averageDiveDurationSeconds: average,
             sessionWarnings: sessionWarnings,
             dataQualityDegraded: isSensorDegraded,
-            activeOverlay: overlay
+            activeOverlay: overlay,
+            runtimeLayout: sessionProfile.watchRuntimeLayout,
+            sensorQualityLabels: sensorLabels,
+            maxRepetitions: sessionProfile.maxRepetitions,
+            averageRecoverySeconds: averageRecovery,
+            dataQualityLevel: qualityReport.overall
         )
     }
 }
@@ -509,6 +528,11 @@ private extension ApneaWatchPresentationInput {
         averageDiveDurationSeconds: 0,
         sessionWarnings: [],
         dataQualityDegraded: false,
-        activeOverlay: nil
+        activeOverlay: nil,
+        runtimeLayout: .freeTrainingCompact,
+        sensorQualityLabels: [],
+        maxRepetitions: nil,
+        averageRecoverySeconds: 0,
+        dataQualityLevel: .unavailable
     )
 }
